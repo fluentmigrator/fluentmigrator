@@ -1,13 +1,13 @@
-﻿#region License
+#region License
 
-// Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
-// 
+// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,12 +23,12 @@ namespace FluentMigrator.Runner.Announcers
 {
     public class CompositeAnnouncer : IAnnouncer
     {
-        private readonly IEnumerable<IAnnouncer> announcers;
-
         public CompositeAnnouncer(params IAnnouncer[] announcers)
         {
-            this.announcers = announcers ?? new IAnnouncer[] {};
+            Announcers = announcers ?? new IAnnouncer[0];
         }
+
+        public IEnumerable<IAnnouncer> Announcers { get; }
 
         public void Heading(string message)
         {
@@ -59,7 +59,7 @@ namespace FluentMigrator.Runner.Announcers
         {
             Each(a => a.Error(message));
         }
-        
+
         public void Error(Exception exception)
         {
             while (exception != null)
@@ -69,14 +69,15 @@ namespace FluentMigrator.Runner.Announcers
             }
         }
 
-        public void Write(string message, bool escaped)
+        [Obsolete]
+        public void Write(string message, bool isNotSql)
         {
-            Each(a => a.Write(message, escaped));
+            Each(a => a.Write(message, isNotSql));
         }
 
         private void Each(Action<IAnnouncer> action)
         {
-            foreach (var announcer in announcers)
+            foreach (var announcer in Announcers)
                 action(announcer);
         }
     }

@@ -1,7 +1,7 @@
 #region License
-// 
-// Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
-// 
+//
+// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -41,6 +41,17 @@ namespace FluentMigrator.Builders.Execute
             _context.Expressions.Add(expression);
         }
 
+        public void Script(string pathToSqlScript, IDictionary<string, string> parameters)
+        {
+            var expression = new ExecuteSqlScriptExpression
+            {
+                SqlScript = pathToSqlScript,
+                Parameters = parameters,
+            };
+
+            _context.Expressions.Add(expression);
+        }
+
         public void Script(string pathToSqlScript)
         {
             var expression = new ExecuteSqlScriptExpression { SqlScript = pathToSqlScript };
@@ -53,26 +64,22 @@ namespace FluentMigrator.Builders.Execute
             _context.Expressions.Add(expression);
         }
 
-        public void EmbeddedScript(string EmbeddedSqlScriptName)
+        public void EmbeddedScript(string embeddedSqlScriptName)
         {
-            var expression = new ExecuteEmbeddedSqlScriptExpression { SqlScript = EmbeddedSqlScriptName, MigrationAssemblies = _context.MigrationAssemblies };
+            var expression = new ExecuteEmbeddedSqlScriptExpression { SqlScript = embeddedSqlScriptName, MigrationAssemblies = _context.MigrationAssemblies };
             _context.Expressions.Add(expression);
         }
-    }
 
-    public class PerformDBOperationExpression : MigrationExpressionBase
-    {
-        public override void ExecuteWith(IMigrationProcessor processor)
+        public void EmbeddedScript(string embeddedSqlScriptName, IDictionary<string, string> parameters)
         {
-            processor.Process(this);
-        }
+            var expression = new ExecuteEmbeddedSqlScriptExpression
+            {
+                SqlScript = embeddedSqlScriptName,
+                MigrationAssemblies = _context.MigrationAssemblies,
+                Parameters = parameters,
+            };
 
-        public override void CollectValidationErrors(ICollection<string> errors)
-        {
-            if (Operation == null)
-                errors.Add(ErrorMessages.OperationCannotBeNull);
+            _context.Expressions.Add(expression);
         }
-
-        public Action<IDbConnection, IDbTransaction> Operation { get; set; }
     }
 }

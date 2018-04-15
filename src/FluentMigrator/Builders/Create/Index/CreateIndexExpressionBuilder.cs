@@ -1,7 +1,7 @@
 #region License
-// 
-// Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
-// 
+//
+// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -16,7 +16,10 @@
 //
 #endregion
 
+using System.Collections.Generic;
+
 using FluentMigrator.Expressions;
+using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 
 namespace FluentMigrator.Builders.Create.Index
@@ -25,14 +28,19 @@ namespace FluentMigrator.Builders.Create.Index
         ICreateIndexForTableSyntax,
         ICreateIndexOnColumnOrInSchemaSyntax,
         ICreateIndexColumnOptionsSyntax,
-        ICreateIndexOptionsSyntax
+        ICreateIndexOptionsSyntax,
+        ISupportAdditionalFeatures,
+        ICreateIndexColumnUniqueOptionsSyntax,
+        ICreateIndexMoreColumnOptionsSyntax
     {
-        public IndexColumnDefinition CurrentColumn { get; set; }
-
         public CreateIndexExpressionBuilder(CreateIndexExpression expression)
             : base(expression)
         {
         }
+
+        public IDictionary<string, object> AdditionalFeatures => Expression.Index.AdditionalFeatures;
+
+        public IndexColumnDefinition CurrentColumn { get; set; }
 
         public ICreateIndexOnColumnOrInSchemaSyntax OnTable(string tableName)
         {
@@ -58,25 +66,25 @@ namespace FluentMigrator.Builders.Create.Index
             return this;
         }
 
-        public ICreateIndexOnColumnSyntax Ascending()
+        public ICreateIndexMoreColumnOptionsSyntax Ascending()
         {
             CurrentColumn.Direction = Direction.Ascending;
             return this;
         }
 
-        public ICreateIndexOnColumnSyntax Descending()
+        public ICreateIndexMoreColumnOptionsSyntax Descending()
         {
             CurrentColumn.Direction = Direction.Descending;
             return this;
         }
 
-        ICreateIndexOnColumnSyntax ICreateIndexColumnOptionsSyntax.Unique()
+        public ICreateIndexColumnUniqueOptionsSyntax Unique()
         {
             Expression.Index.IsUnique = true;
             return this;
         }
 
-        public ICreateIndexOnColumnSyntax Unique()
+        ICreateIndexOnColumnSyntax ICreateIndexOptionsSyntax.Unique()
         {
             Expression.Index.IsUnique = true;
             return this;

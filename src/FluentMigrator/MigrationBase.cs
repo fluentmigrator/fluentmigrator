@@ -1,6 +1,6 @@
 #region License
 // 
-// Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 //
 #endregion
 
+using System;
+
 using FluentMigrator.Builders.Alter;
 using FluentMigrator.Builders.Create;
 using FluentMigrator.Builders.IfDatabase;
@@ -30,7 +32,7 @@ namespace FluentMigrator
     {
         internal IMigrationContext _context;
         private readonly object _mutex = new object();
-        
+
         /// <summary>The arbitrary application context passed to the task runner.</summary>
         public object ApplicationContext { get; protected set; }
 
@@ -39,15 +41,8 @@ namespace FluentMigrator
         /// </summary>
         public string ConnectionString { get; protected set; }
 
-
         public abstract void Up();
         public abstract void Down();
-
-        public void ApplyConventions(IMigrationContext context)
-        {
-            foreach (var expression in context.Expressions)
-                expression.ApplyConventions(context.Conventions);
-        }
 
         public virtual void GetUpExpressions(IMigrationContext context)
         {
@@ -101,6 +96,11 @@ namespace FluentMigrator
         public IIfDatabaseExpressionRoot IfDatabase(params string[] databaseType)
         {
             return new IfDatabaseExpressionRoot(_context, databaseType);
+        }
+
+        public IIfDatabaseExpressionRoot IfDatabase(Predicate<string> databaseTypeFunc)
+        {
+            return new IfDatabaseExpressionRoot(_context, databaseTypeFunc);
         }
     }
 }

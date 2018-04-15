@@ -1,7 +1,7 @@
 #region License
-// 
-// Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
-// 
+//
+// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -29,7 +29,7 @@ namespace FluentMigrator.Runner
     {
         private readonly IDictionary<MigrationStage, IList<IMigration>> _maintenance;
 
-        public MaintenanceLoader(IAssemblyCollection assemblyCollection, IEnumerable<string> tags, IMigrationConventions conventions)
+        public MaintenanceLoader(IAssemblyCollection assemblyCollection, IEnumerable<string> tags, IMigrationRunnerConventions conventions)
         {
             tags = tags ?? new string[] {};
             var requireTags = tags.Any();

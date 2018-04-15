@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "FluentMigrator.DotNet.Cli": {
+      "commandName": "Project",
+      "commandLineArgs": "migrate -p sql -c conn -a asd -a qwe"
+    }
+  }
+}

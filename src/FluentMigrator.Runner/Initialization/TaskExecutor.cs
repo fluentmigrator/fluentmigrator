@@ -1,7 +1,7 @@
 #region License
-// 
-// Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
-// 
+//
+// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -17,13 +17,14 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
+using System.Reflection;
+
 using FluentMigrator.Exceptions;
+using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Initialization.AssemblyLoader;
 using FluentMigrator.Runner.Processors;
-using FluentMigrator.Infrastructure;
-using System.Reflection;
-using System.Collections.Generic;
 
 namespace FluentMigrator.Runner.Initialization
 {
@@ -36,35 +37,48 @@ namespace FluentMigrator.Runner.Initialization
         private MigrationProcessorFactoryProvider ProcessorFactoryProvider { get; set; }
 
         public TaskExecutor(IRunnerContext runnerContext)
-            : this(runnerContext, new AssemblyLoaderFactory(), new MigrationProcessorFactoryProvider())
+            : this(runnerContext, new DefaultConnectionStringProvider(), new AssemblyLoaderFactory(), new MigrationProcessorFactoryProvider())
         {
         }
 
-        public TaskExecutor(IRunnerContext runnerContext, AssemblyLoaderFactory assemblyLoaderFactory, MigrationProcessorFactoryProvider processorFactoryProvider)
+        public TaskExecutor(IRunnerContext runnerContext, IConnectionStringProvider connectionStringProvider, AssemblyLoaderFactory assemblyLoaderFactory, MigrationProcessorFactoryProvider processorFactoryProvider)
         {
             if (runnerContext == null) throw new ArgumentNullException("runnerContext");
             if (assemblyLoaderFactory == null) throw new ArgumentNullException("assemblyLoaderFactory");
 
             RunnerContext = runnerContext;
+            ConnectionStringProvider = connectionStringProvider;
             AssemblyLoaderFactory = assemblyLoaderFactory;
             ProcessorFactoryProvider = processorFactoryProvider;
         }
 
-        protected virtual void Initialize()
+        protected IConnectionStringProvider ConnectionStringProvider { get; }
+
+        protected virtual IEnumerable<Assembly> GetTargetAssemblies()
         {
-            List<Assembly> assemblies = new List<Assembly>();
+            var assemblies = new HashSet<Assembly>();
 
             foreach (var target in RunnerContext.Targets)
             {
                 var assembly = AssemblyLoaderFactory.GetAssemblyLoader(target).Load();
 
-                if (!assemblies.Contains(assembly))
+                if (assemblies.Add(assembly))
                 {
-                    assemblies.Add(assembly);
+                    yield return assembly;
                 }
             }
+        }
+
+        protected virtual void Initialize()
+        {
+            var assemblies = GetTargetAssemblies();
 
             var assemblyCollection = new AssemblyCollection(assemblies);
+
+            if (!RunnerContext.NoConnection && ConnectionStringProvider == null)
+            {
+                RunnerContext.NoConnection = true;
+            }
 
             var processor = RunnerContext.NoConnection? InitializeConnectionlessProcessor():InitializeProcessor(assemblyCollection);
 
@@ -114,6 +128,44 @@ namespace FluentMigrator.Runner.Initialization
             RunnerContext.Announcer.Say("Task completed.");
         }
 
+        /// <summary>
+        /// Checks whether the current task will actually run any migrations.
+        /// Can be used to decide whether it's necessary perform a backup before the migrations are executed.
+        /// </summary>
+        public bool HasMigrationsToApply()
+        {
+            Initialize();
+
+            try
+            {
+                switch (RunnerContext.Task)
+                {
+                    case null:
+                    case "":
+                    case "migrate":
+                    case "migrate:up":
+                        if (RunnerContext.Version != 0)
+                            return Runner.HasMigrationsToApplyUp(RunnerContext.Version);
+
+                        return Runner.HasMigrationsToApplyUp();
+                    case "rollback":
+                    case "rollback:all":
+                        // Number of steps doesn't matter as long as there's at least
+                        // one migration applied (at least that one will be rolled back)
+                        return Runner.HasMigrationsToApplyRollback();
+                    case "rollback:toversion":
+                    case "migrate:down":
+                        return Runner.HasMigrationsToApplyDown(RunnerContext.Version);
+                    default:
+                        return false;
+                }
+            }
+            finally
+            {
+                Runner.Processor.Dispose();
+            }
+        }
+
         private IMigrationProcessor InitializeConnectionlessProcessor()
         {
             var options = new ProcessorOptions
@@ -123,7 +175,10 @@ namespace FluentMigrator.Runner.Initialization
                 ProviderSwitches = RunnerContext.ProviderSwitches
             };
 
-            var generator = new MigrationGeneratorFactory().GetGenerator(RunnerContext.Database);
+            var generatorFactory = new MigrationGeneratorFactory();
+            var generator = generatorFactory.GetGenerator(RunnerContext.Database);
+            if (generator == null)
+                throw new ProcessorFactoryNotFoundException(string.Format("The provider or dbtype parameter is incorrect. Available choices are {0}: ", generatorFactory.ListAvailableGeneratorTypes()));
 
             var processor = new ConnectionlessProcessor(generator, RunnerContext, options);
 
@@ -132,12 +187,6 @@ namespace FluentMigrator.Runner.Initialization
 
         private IMigrationProcessor InitializeProcessor(IAssemblyCollection assemblyCollection)
         {
-
-            if (RunnerContext.Timeout == 0)
-            {
-                RunnerContext.Timeout = 30; // Set default timeout for command
-            }
-
             var connectionString = LoadConnectionString(assemblyCollection);
             var processorFactory = ProcessorFactoryProvider.GetFactory(RunnerContext.Database);
 
@@ -159,12 +208,14 @@ namespace FluentMigrator.Runner.Initialization
             var singleAssembly = (assemblyCollection != null && assemblyCollection.Assemblies != null && assemblyCollection.Assemblies.Length == 1) ? assemblyCollection.Assemblies[0] : null;
             var singleAssemblyLocation = singleAssembly != null ? singleAssembly.Location : string.Empty;
 
-            var manager = new ConnectionStringManager(new NetConfigManager(), RunnerContext.Announcer, RunnerContext.Connection,
-                                                      RunnerContext.ConnectionStringConfigPath, singleAssemblyLocation,
-                                                      RunnerContext.Database);
+            var connectionString = ConnectionStringProvider.GetConnectionString(
+                RunnerContext.Announcer,
+                RunnerContext.Connection,
+                RunnerContext.ConnectionStringConfigPath,
+                singleAssemblyLocation,
+                RunnerContext.Database);
 
-            manager.LoadConnectionString();
-            return manager.ConnectionString;
+            return connectionString;
         }
     }
 }

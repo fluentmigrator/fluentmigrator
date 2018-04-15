@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--- Copyright xxxx-xxxx IBM Corporation -->
+<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
+<assemblyIdentity
+   type="win32"
+   name="IBM.DB2.SEC64"
+   version="9.1.0.000"
+   processorArchitecture="amd64"
+/>
+<file name="msvcr71d.dll"/>
+<file name="libmmd.dll"/>
+<file name="db2osse64.dll"/>
+<description>DB2 Security Plugin</description>
+</assembly>

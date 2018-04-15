@@ -1,0 +1,89 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net461</TargetFramework>
+    <DefineConstants>NOT_CLS_COMPLIANT;$(DefineConstants)</DefineConstants>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\..\FluentMigrator.snk</AssemblyOriginatorKeyFile>
+    <UserSecretsId>FluentMigrator.Tests</UserSecretsId>
+  </PropertyGroup>
+  <Import Project="$(MSBuildThisFileDirectory)../../Global.proj" />
+  <ItemGroup>
+    <DotNetCliToolReference Include="Microsoft.Extensions.SecretManager.Tools" Version="2.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="EmbeddedResources/**/*.sql" />
+    <None Include="..\..\FluentMigrator.snk" Link="FluentMigrator.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="5.12.1" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="2.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="2.0.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.7.0" />
+    <PackageReference Include="Moq" Version="4.8.2" />
+    <PackageReference Include="MySql.Data" Version="6.10.6" />
+    <PackageReference Include="Npgsql" Version="3.2.7" />
+    <PackageReference Include="NUnit" Version="3.10.1" />
+    <PackageReference Include="NUnit.Console" Version="3.8.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.10.0" />
+    <PackageReference Include="Shouldly" Version="3.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\FluentMigrator.Console\FluentMigrator.Console.csproj" />
+    <ProjectReference Include="..\..\src\FluentMigrator.Runner.Db2\FluentMigrator.Runner.Db2.csproj" />
+    <ProjectReference Include="..\..\src\FluentMigrator.Runner.Firebird\FluentMigrator.Runner.Firebird.csproj" />
+    <ProjectReference Include="..\..\src\FluentMigrator.Runner.Hana\FluentMigrator.Runner.Hana.csproj" />
+    <ProjectReference Include="..\..\src\FluentMigrator.Runner.Jet\FluentMigrator.Runner.Jet.csproj" />
+    <ProjectReference Include="..\..\src\FluentMigrator.Runner.MySql\FluentMigrator.Runner.MySql.csproj" />
+    <ProjectReference Include="..\..\src\FluentMigrator.Runner.Oracle\FluentMigrator.Runner.Oracle.csproj" />
+    <ProjectReference Include="..\..\src\FluentMigrator.Runner.Postgres\FluentMigrator.Runner.Postgres.csproj" />
+    <ProjectReference Include="..\..\src\FluentMigrator.Runner.Redshift\FluentMigrator.Runner.Redshift.csproj" />
+    <ProjectReference Include="..\..\src\FluentMigrator.Runner.SQLite\FluentMigrator.Runner.SQLite.csproj" />
+    <ProjectReference Include="..\..\src\FluentMigrator.Runner.SqlServerCe\FluentMigrator.Runner.SqlServerCe.csproj" />
+    <ProjectReference Include="..\..\src\FluentMigrator.Runner.SqlServer\FluentMigrator.Runner.SqlServer.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="IBM.Data.DB2">
+      <HintPath>..\..\lib\DB2\amd64\IBM.Data.DB2.dll</HintPath>
+    </Reference>
+    <Reference Include="Sap.Data.Hana.v4.5">
+      <HintPath>..\..\lib\Hana\ado.net\v4.5\Sap.Data.Hana.v4.5.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data.SqlServerCe">
+      <Private>True</Private>
+      <HintPath>..\..\lib\SQLServerCE4\System.Data.SqlServerCe.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="../../lib/SQLServerCE4/amd64/**/*.*">
+      <Link>amd64/%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="../../lib/SQLServerCE4/x86/**/*.*">
+      <Link>x86/%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="../../lib/DB2/clidriver/**/*.*">
+      <Link>clidriver/%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="../../lib/Hana/*.*">
+      <Link>%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="*.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Unit\Initialization\Fixtures\*.*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
+  </ItemGroup>
+</Project>

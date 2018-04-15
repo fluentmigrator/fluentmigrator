@@ -1,13 +1,13 @@
 #region License
 
-// Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
-// 
+// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,28 +17,38 @@
 #endregion
 using System;
 using System.Collections.Generic;
-using FluentMigrator.Helpers;
 
 namespace FluentMigrator.Infrastructure
 {
     public class MigrationInfo : IMigrationInfo
     {
         private readonly Dictionary<string, object> _traits = new Dictionary<string, object>();
-        private LazyLoader<IMigration> _lazyMigration;
+        private Lazy<IMigration> _lazyMigration;
 
         public MigrationInfo(long version, TransactionBehavior transactionBehavior, IMigration migration)
-            : this(version, null, transactionBehavior, () => migration)
+            : this(version, null, transactionBehavior, false, () => migration)
         {
         }
 
-        public MigrationInfo(long version, string description, TransactionBehavior transactionBehavior, Func<IMigration> migrationFunc)
+        public MigrationInfo(long version, TransactionBehavior transactionBehavior, bool isBreakingChange, IMigration migration)
+            : this(version, null, transactionBehavior, isBreakingChange, () => migration)
         {
-            if (migrationFunc == null) throw new ArgumentNullException("migrationFunc");
+        }
+
+        public MigrationInfo(
+            long version,
+            string description,
+            TransactionBehavior transactionBehavior,
+            bool isBreakingChange,
+            Func<IMigration> migrationFunc)
+        {
+            if (migrationFunc == null) throw new ArgumentNullException(nameof(migrationFunc));
 
             Version = version;
             Description = description;
             TransactionBehavior = transactionBehavior;
-            _lazyMigration = new LazyLoader<IMigration>(migrationFunc);
+            IsBreakingChange = isBreakingChange;
+            _lazyMigration = new Lazy<IMigration>(migrationFunc);
         }
 
         public long Version { get; private set; }
@@ -51,6 +61,7 @@ namespace FluentMigrator.Infrastructure
                 return _lazyMigration.Value;
             }
         }
+        public bool IsBreakingChange { get; }
 
         public object Trait(string name)
         {

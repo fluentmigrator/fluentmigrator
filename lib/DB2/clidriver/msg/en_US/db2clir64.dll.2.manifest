@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--- Copyright xxxx-xxxx IBM Corporation -->
+<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
+<dependency>
+<dependentAssembly>
+<assemblyIdentity
+   type="win32"
+   name="amd64.VC12.CRT"
+   version="9.1.0.000"
+   processorArchitecture="amd64"
+/>
+</dependentAssembly>
+</dependency>
+</assembly>

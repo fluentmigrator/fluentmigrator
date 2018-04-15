@@ -1,7 +1,7 @@
 #region License
-// 
-// Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
-// 
+//
+// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -16,8 +16,12 @@
 //
 #endregion
 
+using System;
 using System.IO;
 using System.Reflection;
+
+using FluentMigrator.Infrastructure;
+using FluentMigrator.Runner.Infrastructure;
 
 namespace FluentMigrator.Runner.Initialization.AssemblyLoader
 {
@@ -35,8 +39,17 @@ namespace FluentMigrator.Runner.Initialization.AssemblyLoader
             string fileName = this.name;
             if (!Path.IsPathRooted(fileName))
             {
-                fileName = Path.GetFullPath(this.name);
+                fileName = Path.Combine(RuntimeHost.Current.BaseDirectory, this.name);
+                if (!File.Exists(fileName))
+                {
+                    fileName = Path.GetFullPath(this.name);
+                    if (!File.Exists(fileName))
+                    {
+                        fileName = this.name;
+                    }
+                }
             }
+
             Assembly assembly = Assembly.LoadFrom(fileName);
             return assembly;
         }

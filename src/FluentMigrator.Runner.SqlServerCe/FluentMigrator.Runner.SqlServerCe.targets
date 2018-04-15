@@ -1,0 +1,14 @@
+﻿<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+    <ItemGroup>
+        <Content Include="$(MSBuildThisFileDirectory)../../runtimes/win-x64/**/*.*">
+            <Link>amd64/%(RecursiveDir)%(Filename)%(Extension)</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <Content Include="$(MSBuildThisFileDirectory)../../runtimes/win-x86/**/*.*">
+            <Link>x86/%(RecursiveDir)%(Filename)%(Extension)</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
+
+</Project>

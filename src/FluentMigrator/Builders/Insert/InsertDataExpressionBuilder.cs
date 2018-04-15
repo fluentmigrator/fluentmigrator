@@ -1,7 +1,7 @@
 #region License
-// 
-// Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
-// 
+//
+// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -33,6 +33,8 @@ namespace FluentMigrator.Builders.Insert
             _expression = expression;
         }
 
+        public IDictionary<string, object> AdditionalFeatures => _expression.AdditionalFeatures;
+
         public IInsertDataSyntax Row(object dataAsAnonymousType)
         {
             IDictionary<string, object> data = ExtractData(dataAsAnonymousType);
@@ -49,18 +51,6 @@ namespace FluentMigrator.Builders.Insert
             _expression.Rows.Add(dataDefinition);
 
             return this;
-        }
-
-        void ISupportAdditionalFeatures.AddAdditionalFeature(string feature, object value)
-        {
-            if (!_expression.AdditionalFeatures.ContainsKey(feature))
-            {
-                _expression.AdditionalFeatures.Add(feature, value);
-            }
-            else
-            {
-                _expression.AdditionalFeatures[feature] = value;
-            }
         }
 
         public IInsertDataSyntax InSchema(string schemaName)

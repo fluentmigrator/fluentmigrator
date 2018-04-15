@@ -1,6 +1,6 @@
 #region License
 
-// Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -165,6 +165,7 @@ namespace FluentMigrator.Builders.Create.Column
 
             _context.Expressions.Add(fk);
             CurrentForeignKey = fk.ForeignKey;
+            Expression.Column.ForeignKey = fk.ForeignKey;
             return this;
         }
 
@@ -204,36 +205,6 @@ namespace FluentMigrator.Builders.Create.Column
         public ICreateColumnOptionOrForeignKeyCascadeSyntax ForeignKey()
         {
             Expression.Column.IsForeignKey = true;
-            return this;
-        }
-
-        [Obsolete("Please use ReferencedBy syntax. This method will be removed in the next version")]
-        public ICreateColumnOptionSyntax References(string foreignKeyName, string foreignTableName, IEnumerable<string> foreignColumnNames)
-        {
-            return References(foreignKeyName, null, foreignTableName, foreignColumnNames);
-        }
-
-        [Obsolete("Please use ReferencedBy syntax. This method will be removed in the next version")]
-        public ICreateColumnOptionSyntax References(string foreignKeyName, string foreignTableSchema, string foreignTableName,
-                                                    IEnumerable<string> foreignColumnNames)
-        {
-            var fk = new CreateForeignKeyExpression
-                         {
-                             ForeignKey = new ForeignKeyDefinition
-                                              {
-                                                  Name = foreignKeyName,
-                                                  PrimaryTable = Expression.TableName,
-                                                  PrimaryTableSchema = Expression.SchemaName,
-                                                  ForeignTable = foreignTableName,
-                                                  ForeignTableSchema = foreignTableSchema
-                                              }
-                         };
-
-            fk.ForeignKey.PrimaryColumns.Add(Expression.Column.Name);
-            foreach (var foreignColumnName in foreignColumnNames)
-                fk.ForeignKey.ForeignColumns.Add(foreignColumnName);
-
-            _context.Expressions.Add(fk);
             return this;
         }
 

@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <VersionPrefix>2.0.0</VersionPrefix>
+    <Product>FluentMigrator</Product>
+    <Copyright>Sean Chambers and the FluentMigrator project 2008-2018</Copyright>
+    <Company>FluentMigrator Project</Company>
+    <Authors>Sean Chambers;Josh Coffman;Tom Marien;Mark Junker</Authors>
+    <PackageProjectUrl>https://github.com/fluentmigrator/fluentmigrator/wiki</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/fluentmigrator/fluentmigrator/blob/master/LICENSE.txt</PackageLicenseUrl>
+    <PackageReleaseNotes>https://github.com/fluentmigrator/fluentmigrator/releases</PackageReleaseNotes>
+    <RepositoryUrl>https://github.com/fluentmigrator/fluentmigrator.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <MinClientVersion>3.5</MinClientVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)src/GlobalAssemblyInfo.cs" Link="Properties\GlobalAssemblyInfo.cs" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)'=='net40' or '$(TargetFramework)'=='net45' or '$(TargetFramework)'=='net461'">
+    <DefineConstants>$(DefineConstants);NETFRAMEWORK</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(OutputType)' == 'library' and '$(AssemblyName)' != 'FluentMigrator.Tests' ">
+    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(AssemblyName)' != 'FluentMigrator.Tests' ">
+    <DebugType>portable</DebugType> <!-- Required for EmbedSources -->
+  </PropertyGroup>
+
+  <ItemGroup Condition=" '$(Configuration)' == 'Release' and '$(AssemblyName)' != 'FluentMigrator.Tests' ">
+    <PackageReference Include="SourceLink.Embed.AllSourceFiles" Version="2.8.0" PrivateAssets="all" />
+    <PackageReference Include="SourceLink.Copy.PdbFiles" Version="2.8.0" PrivateAssets="All" />
+  </ItemGroup>
+
+  <PropertyGroup Condition=" '$(AssemblyName)' == 'FluentMigrator.Tests' ">
+    <DebugType>full</DebugType>
+  </PropertyGroup>
+
+</Project>

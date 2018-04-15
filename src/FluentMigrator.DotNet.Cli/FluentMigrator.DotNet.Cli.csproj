@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>dotnet-fm</AssemblyName>
+    <PackageId>FluentMigrator.DotNet.Cli</PackageId>
+    <DefineConstants>NOT_CLS_COMPLIANT;$(DefineConstants)</DefineConstants>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildThisFileDirectory)../../Global.proj" />
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="6.2.2" />
+    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="2.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="2.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="2.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FluentMigrator.Runner\FluentMigrator.Runner.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,7 +1,7 @@
 #region License
-// 
-// Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
-// 
+//
+// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -37,14 +37,26 @@ namespace FluentMigrator.Runner.Initialization
         string Profile { get; set; }
         IAnnouncer Announcer { get; }
         IStopWatch StopWatch { get; }
-        int Timeout { get; set; }
+        int? Timeout { get; set; }
         string ConnectionStringConfigPath { get; set; }
         IEnumerable<string> Tags { get; set; }
         string ProviderSwitches { get; set; }
 
         bool TransactionPerSession { get; set; }
 
-        /// <summary>The arbitrary application context passed to the task runner.</summary>
+        /// <summary>
+        /// Gets or sets a value indicating whether the migration runner is allowed to apply breaking changes
+        /// </summary>
+        bool AllowBreakingChange { get; set; }
+
+        /// <summary>
+        /// Gets or sets the arbitrary application context passed to the task runner
+        /// </summary>
         object ApplicationContext { get; set; }
+
+        /// <summary>
+        /// Gets or sets the default schema name
+        /// </summary>
+        string DefaultSchemaName { get;set; }
     }
 }

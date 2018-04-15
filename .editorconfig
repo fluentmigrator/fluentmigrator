@@ -1,11 +1,56 @@
-; This file is for unifying the coding style for different editors and IDEs.
-; More information at http://EditorConfig.org
-
 root = true
 
 [*]
 end_of_line = CRLF
+indent_style = space
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.sql]
+insert_final_newline = false
 
 [*.cs]
-indent_style = space
 indent_size = 4
+charset = utf-8
+csharp_style_var_for_built_in_types = true:suggestion
+csharp_style_var_when_type_is_apparent = true:suggestion
+csharp_style_pattern_matching_over_is_with_cast_check = true:warning
+csharp_style_pattern_matching_over_as_with_null_check = true:suggestion
+csharp_prefer_braces = true:suggestion
+dotnet_sort_system_directives_first = true
+dotnet_separate_import_directive_groups = true
+csharp_new_line_before_open_brace = all
+
+# name all constant fields using PascalCase
+dotnet_naming_rule.constant_fields_should_be_pascal_case.severity = suggestion
+dotnet_naming_rule.constant_fields_should_be_pascal_case.symbols  = constant_fields
+dotnet_naming_rule.constant_fields_should_be_pascal_case.style    = constant_fields_style
+
+dotnet_naming_symbols.constant_fields.applicable_kinds   = field
+dotnet_naming_symbols.constant_fields.required_modifiers = const
+
+dotnet_naming_style.constant_fields_style.capitalization = pascal_case
+
+# static fields should have s_ prefix
+dotnet_naming_rule.static_fields_fields_should_be_pascal_case.severity = suggestion
+dotnet_naming_rule.static_fields_fields_should_be_pascal_case.symbols  = static_fields
+dotnet_naming_rule.static_fields_fields_should_be_pascal_case.style    = static_fields_style
+
+dotnet_naming_symbols.static_fields.applicable_kinds   = field
+dotnet_naming_symbols.static_fields.required_modifiers = static
+
+dotnet_naming_style.static_fields_style.capitalization = pascal_case
+
+# internal and private fields should be _camelCase
+dotnet_naming_rule.camel_case_for_private_internal_fields.severity = suggestion
+dotnet_naming_rule.camel_case_for_private_internal_fields.symbols  = private_internal_fields
+dotnet_naming_rule.camel_case_for_private_internal_fields.style    = camel_case_underscore_style
+
+dotnet_naming_symbols.private_internal_fields.applicable_kinds = field
+dotnet_naming_symbols.private_internal_fields.applicable_accessibilities = private, internal
+
+dotnet_naming_style.camel_case_underscore_style.required_prefix = _
+dotnet_naming_style.camel_case_underscore_style.capitalization = camel_case
+
+[*.{csproj,proj,targets}]
+indent_size = 2

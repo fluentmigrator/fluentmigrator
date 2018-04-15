@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--- Copyright xxxx-xxxx IBM Corporation -->
+<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
+<assemblyIdentity
+   type="win32"
+   name="IBM.DB2.ODBC64"
+   version="9.1.0.000"
+   processorArchitecture="amd64"
+/>
+<file name="db2app64.dll"/>
+<description>IBM DB2 DRIVER for ODBC Setup DLL</description>
+</assembly>

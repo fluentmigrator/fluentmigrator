@@ -1,0 +1,116 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
+  <file datatype="xml" source-language="en-US" target-language="de-DE" original="FLUENTMIGRATOR.ABSTRACTIONS/INFRASTRUCTURE/ERRORMESSAGES.RESX" tool-id="MultilingualAppToolkit" product-name="n/a" product-version="n/a" build-num="n/a">
+    <header>
+      <tool tool-id="MultilingualAppToolkit" tool-name="Multilingual App Toolkit" tool-version="4.0.6900.0" tool-company="Microsoft" />
+    </header>
+    <body>
+      <group id="FLUENTMIGRATOR.ABSTRACTIONS/INFRASTRUCTURE/ERRORMESSAGES.RESX" datatype="resx">
+        <trans-unit id="ColumnNameCannotBeNullOrEmpty" translate="yes" xml:space="preserve">
+          <source>The column's name cannot be null or an empty string.</source>
+          <target state="final">Der Spaltenname darf nicht null oder leer sein.</target>
+        </trans-unit>
+        <trans-unit id="ColumnNamesMustBeUnique" translate="yes" xml:space="preserve">
+          <source>Column names must be unique.</source>
+          <target state="final" state-qualifier="tm-suggestion">Spaltennamen müssen eindeutig sein.</target>
+        </trans-unit>
+        <trans-unit id="ColumnTypeMustBeDefined" translate="yes" xml:space="preserve">
+          <source>The column does not have a type defined.</source>
+          <target state="final">Die Spalte hat keinen definierten Typen.</target>
+        </trans-unit>
+        <trans-unit id="ConstraintMustHaveAtLeastOneColumn" translate="yes" xml:space="preserve">
+          <source>The constraint must have at least one column specified.</source>
+          <target state="final">Die Einschränkung muss mindestens eine Spalte umfassen.</target>
+        </trans-unit>
+        <trans-unit id="DefaultValueCannotBeNull" translate="yes" xml:space="preserve">
+          <source>The default value cannot be null.</source>
+          <target state="final">Der Standard-Wert darf nicht null sein.</target>
+        </trans-unit>
+        <trans-unit id="DestinationSchemaCannotBeNull" translate="yes" xml:space="preserve">
+          <source>The destination schema's name cannot be null or an empty string.</source>
+          <target state="final">Der Schema-Name des Ziels darf nicht null oder leer sein.</target>
+        </trans-unit>
+        <trans-unit id="ForeignKeyMustHaveOneOrMoreForeignColumns" translate="yes" xml:space="preserve">
+          <source>The foreign key must have one or more foreign columns.</source>
+          <target state="final">Der Fremdschlüssel muss eine oder mehrere referenzierenden Spalten umfassen.</target>
+        </trans-unit>
+        <trans-unit id="ForeignKeyMustHaveOneOrMorePrimaryColumns" translate="yes" xml:space="preserve">
+          <source>The foreign key must have one or more primary columns.</source>
+          <target state="final">Der Fremdschlüssel muss eine oder mehrere Primärspalten umfassen.</target>
+        </trans-unit>
+        <trans-unit id="ForeignKeyNameCannotBeNullOrEmpty" translate="yes" xml:space="preserve">
+          <source>The foreign key's name cannot be null or an empty string.</source>
+          <target state="final">Der Fremdschlüssel-Name darf nicht null oder leer sein.</target>
+        </trans-unit>
+        <trans-unit id="ForeignTableNameCannotBeNullOrEmpty" translate="yes" xml:space="preserve">
+          <source>The foreign table name cannot be null or empty.</source>
+          <target state="final">Der Name der referenzierenden Tabelle darf nicht null oder leer sein.</target>
+        </trans-unit>
+        <trans-unit id="IndexMustHaveOneOrMoreColumns" translate="yes" xml:space="preserve">
+          <source>The index must have one or more columns.</source>
+          <target state="final">Der Index muss eine oder mehrere Spalten umfassen.</target>
+        </trans-unit>
+        <trans-unit id="IndexNameCannotBeNullOrEmpty" translate="yes" xml:space="preserve">
+          <source>The index's name cannot be null or an empty string.</source>
+          <target state="final">Der Index-Name darf nicht null oder leer sein.</target>
+        </trans-unit>
+        <trans-unit id="NewColumnNameCannotBeNullOrEmpty" translate="yes" xml:space="preserve">
+          <source>The new column name cannot be null or empty.</source>
+          <target state="final">Der neue Spaltenname darf nicht null oder leer sein.</target>
+        </trans-unit>
+        <trans-unit id="NewTableNameCannotBeNullOrEmpty" translate="yes" xml:space="preserve">
+          <source>The new table name cannot be null or empty.</source>
+          <target state="final">Der neue Tabellenname darf nicht null oder leer sein.</target>
+        </trans-unit>
+        <trans-unit id="OldColumnNameCannotBeNullOrEmpty" translate="yes" xml:space="preserve">
+          <source>The old column name cannot be null or empty.</source>
+          <target state="final">Der alte Spaltenname darf nicht null oder leer sein.</target>
+        </trans-unit>
+        <trans-unit id="OldTableNameCannotBeNullOrEmpty" translate="yes" xml:space="preserve">
+          <source>The old table name cannot be null or empty.</source>
+          <target state="final">Der alte Tabellenname darf nicht null oder leer sein.</target>
+        </trans-unit>
+        <trans-unit id="OperationCannotBeNull" translate="yes" xml:space="preserve">
+          <source>The operation to be performed using the database connection cannot be null.</source>
+          <target state="final">Die auf der Datenbankverbindung auszuführende Aktion darf nicht null sein.</target>
+        </trans-unit>
+        <trans-unit id="PrimaryTableNameCannotBeNullOrEmpty" translate="yes" xml:space="preserve">
+          <source>The primary table name cannot be null or empty.</source>
+          <target state="final">Der primäre Tabellenname darf nicht null oder leer sein.</target>
+        </trans-unit>
+        <trans-unit id="SchemaNameCannotBeNullOrEmpty" translate="yes" xml:space="preserve">
+          <source>The schema's name cannot be null or an empty string.</source>
+          <target state="final">Der Schema-Name darf nicht null oder leer sein.</target>
+        </trans-unit>
+        <trans-unit id="SequenceNameCannotBeNullOrEmpty" translate="yes" xml:space="preserve">
+          <source>The sequence's name cannot be null or an empty string.</source>
+          <target state="final">Der Sequenz-Name darf nicht null oder leer sein.</target>
+        </trans-unit>
+        <trans-unit id="SqlScriptCannotBeNullOrEmpty" translate="yes" xml:space="preserve">
+          <source>The sql script cannot be null or an empty string.</source>
+          <target state="final">Das SQL-Script darf nicht null oder leer sein.</target>
+        </trans-unit>
+        <trans-unit id="SqlStatementCannotBeNullOrEmpty" translate="yes" xml:space="preserve">
+          <source>The sql statement cannot be null or an empty string.</source>
+          <target state="final">Die SQL-Anweisung darf nicht null oder leer sein.</target>
+        </trans-unit>
+        <trans-unit id="TableNameCannotBeNullOrEmpty" translate="yes" xml:space="preserve">
+          <source>The table's name cannot be null or an empty string.</source>
+          <target state="final">Der abellenname darf nicht null oder leer sein.</target>
+        </trans-unit>
+        <trans-unit id="UpdateDataExpressionMustNotSpecifyBothWhereClauseAndAllRows" translate="yes" xml:space="preserve">
+          <source>Update statement specifies both a .Where() condition and that .AllRows() should be targeted. Specify one or the other, but not both.</source>
+          <target state="final">Die Update-Anweisung spezifiziert sowohl eine .Where()-Bedingung und auch, dass .AllRows() als Ziel gewählt werden sollen. Nur eines von beiden darf angegeben werden.</target>
+        </trans-unit>
+        <trans-unit id="UpdateDataExpressionMustSpecifyWhereClauseOrAllRows" translate="yes" xml:space="preserve">
+          <source>Update statement is missing a condition. Specify one by calling .Where() or target all rows by calling .AllRows().</source>
+          <target state="final">Der Update-Anweisung fehlt eine Bedingung, wie z.B. .Where() für einen oder mehrere Datensätze oder .AllRows() für alle Datensätze.</target>
+        </trans-unit>
+        <trans-unit id="MethodXMustBeCalledOnObjectImplementingY" translate="yes" xml:space="preserve">
+          <source>The {0} method must be called on an object that implements {1}.</source>
+          <target state="final">Die Methode {0} darf nur auf einem Objekt aufgerufen werden, dass {1} implementiert.</target>
+        </trans-unit>
+      </group>
+    </body>
+  </file>
+</xliff>

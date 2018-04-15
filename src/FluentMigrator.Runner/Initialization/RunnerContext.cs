@@ -23,25 +23,23 @@ namespace FluentMigrator.Runner.Initialization
         public int Steps { get; set; }
         public string WorkingDirectory { get; set; }
         public string Profile { get; set; }
-        public int Timeout { get; set; }
+        public int? Timeout { get; set; }
         public string ConnectionStringConfigPath { get; set; }
         public IEnumerable<string> Tags { get; set; }
         public bool TransactionPerSession { get; set; }
+
+        /// <inheritdoc />
+        public bool AllowBreakingChange { get; set; }
         public string ProviderSwitches { get; set; }
 
-        public IAnnouncer Announcer
-        {
-            get;
-            private set;
-        }
+        public IAnnouncer Announcer { get; }
 
-        public IStopWatch StopWatch
-        {
-            get;
-            private set;
-        }
+        public IStopWatch StopWatch { get; }
 
-        /// <summary>The arbitrary application context passed to the task runner.</summary>
+        /// <inheritdoc />
         public object ApplicationContext { get; set; }
+
+        /// <inheritdoc />
+        public string DefaultSchemaName { get; set; }
     }
 }

@@ -1,11 +1,15 @@
+using System.Collections.Generic;
+
 using FluentMigrator.Expressions;
+using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Create.Constraint
 {
-    public class CreateConstraintExpressionBuilder : ExpressionBuilderBase<CreateConstraintExpression>, 
-        ICreateConstraintOnTableSyntax, 
+    public class CreateConstraintExpressionBuilder : ExpressionBuilderBase<CreateConstraintExpression>,
+        ICreateConstraintOnTableSyntax,
         ICreateConstraintWithSchemaOrColumnSyntax,
-        ICreateConstraintOptionsSyntax
+        ICreateConstraintOptionsSyntax,
+        ISupportAdditionalFeatures
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="T:CreateConstraintExpressionBuilder"/> class.
@@ -14,6 +18,8 @@ namespace FluentMigrator.Builders.Create.Constraint
             : base(expression)
         {
         }
+
+        public IDictionary<string, object> AdditionalFeatures => Expression.Constraint.AdditionalFeatures;
 
         public ICreateConstraintWithSchemaOrColumnSyntax OnTable(string tableName)
         {

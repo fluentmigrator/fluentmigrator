@@ -1,0 +1,11 @@
+<!--- Copyright xxxx-xxxx IBM Corporation -->
+<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
+<assemblyIdentity
+   type="win32"
+   name="IBM.DB2.CLIXML4C64"
+   version="9.1.0.000"
+   processorArchitecture="amd64"
+/>
+<file name="DB2xml4c_cli64_5_8.dll"/>
+<description>DB2 XML4C Wrappers for CLI</description>
+</assembly>

@@ -4,19 +4,21 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using FluentMigrator.Expressions;
+using FluentMigrator.Runner.Conventions;
+using FluentMigrator.Runner.Exceptions;
 
 namespace FluentMigrator.Runner
 {
     public class MigrationValidator
     {
         private readonly IAnnouncer _announcer;
-        private readonly IMigrationConventions _conventions;
+        private readonly IConventionSet _conventions;
 
         public MigrationValidator()
         {
         }
 
-        public MigrationValidator(IAnnouncer announcer, IMigrationConventions conventions)
+        public MigrationValidator(IAnnouncer announcer, IConventionSet conventions)
         {
             _announcer = announcer;
             _conventions = conventions;
@@ -32,10 +34,8 @@ namespace FluentMigrator.Runner
         {
             var errorMessageBuilder = new StringBuilder();
 
-            foreach (var expression in expressions)
+            foreach (var expression in expressions.Apply(_conventions))
             {
-                expression.ApplyConventions(_conventions);
-
                 var errors = new Collection<string>();
                 expression.CollectValidationErrors(errors);
 

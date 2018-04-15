@@ -1,7 +1,7 @@
 #region License
-// 
-// Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
-// 
+//
+// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -24,15 +24,31 @@ using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Extensions;
 using FluentMigrator.Runner.Initialization;
+using FluentMigrator.Runner.Processors;
+using FluentMigrator.Runner.Processors.DB2;
+using FluentMigrator.Runner.Processors.DotConnectOracle;
+using FluentMigrator.Runner.Processors.Firebird;
+using FluentMigrator.Runner.Processors.MySql;
+using FluentMigrator.Runner.Processors.Oracle;
+using FluentMigrator.Runner.Processors.Postgres;
+using FluentMigrator.Runner.Processors.SqlServer;
+using FluentMigrator.Runner.Processors.SQLite;
+
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
+using Processors = FluentMigrator.Runner.Processors;
+
 namespace FluentMigrator.MSBuild
 {
-    public class Migrate : AppDomainIsolatedTask
+    [CLSCompliant(false)]
+    public class Migrate :
+#if NETFRAMEWORK
+        AppDomainIsolatedTask
+#else
+        Task
+#endif
     {
-
-
         /// <summary>
         /// Initializes a new instance of the <see cref="T:Migrate"/> class.
         /// </summary>
@@ -50,7 +66,7 @@ namespace FluentMigrator.MSBuild
         private string databaseType;
 
         public string ApplicationContext { get; set; }
-        
+
         [Required]
         public string Connection { get; set; }
 
@@ -79,7 +95,7 @@ namespace FluentMigrator.MSBuild
 
         public string WorkingDirectory { get; set; }
 
-        public int Timeout { get; set; }
+        public int? Timeout { get; set; }
 
         public string Profile { get; set; }
 
@@ -131,7 +147,7 @@ namespace FluentMigrator.MSBuild
             }
 
             Log.LogMessage(MessageImportance.Low, "Creating Context");
-                   
+
             var runnerContext = new RunnerContext(announcer)
             {
                 ApplicationContext = ApplicationContext,
