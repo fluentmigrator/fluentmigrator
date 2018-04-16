@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -18,8 +18,16 @@
 
 namespace FluentMigrator.Builders.Create.Index
 {
+    /// <summary>
+    /// Definition of the schema the table belongs to
+    /// </summary>
     public interface ICreateIndexOnColumnOrInSchemaSyntax : ICreateIndexOnColumnSyntax
     {
+        /// <summary>
+        /// Defines the schema of the table to create the index for
+        /// </summary>
+        /// <param name="schemaName">The schema name</param>
+        /// <returns>Definition of index columns</returns>
         ICreateIndexOnColumnSyntax InSchema(string schemaName);
     }
 }

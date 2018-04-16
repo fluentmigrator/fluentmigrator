@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -20,8 +20,16 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Create.Column
 {
+    /// <summary>
+    /// Interface to specify the table for a column
+    /// </summary>
     public interface ICreateColumnOnTableSyntax : IFluentSyntax
     {
+        /// <summary>
+        /// Specify the table for the column
+        /// </summary>
+        /// <param name="name">The table name</param>
+        /// <returns>The interface to specify the table schema or column information</returns>
         ICreateColumnAsTypeOrInSchemaSyntax OnTable(string name);
     }
 }

@@ -20,8 +20,16 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Create.Constraint
 {
+    /// <summary>
+    /// Specify the constraint schema
+    /// </summary>
     public interface ICreateConstraintWithSchemaSyntax : IFluentSyntax
     {
+        /// <summary>
+        /// The constraint schema
+        /// </summary>
+        /// <param name="schemaName">The schema name</param>
+        /// <returns>Specify the constraint columns</returns>
         ICreateConstraintColumnsSyntax WithSchema(string schemaName);
     }
 }

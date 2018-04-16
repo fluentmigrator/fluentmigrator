@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -20,9 +20,23 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Create.ForeignKey
 {
+    /// <summary>
+    /// Interface to define the foreign key columns
+    /// </summary>
     public interface ICreateForeignKeyForeignColumnSyntax : IFluentSyntax
     {
+        /// <summary>
+        /// Define the foreign key column
+        /// </summary>
+        /// <param name="column">The column name</param>
+        /// <returns>Define the foreign keys primary table</returns>
         ICreateForeignKeyToTableSyntax ForeignColumn(string column);
+
+        /// <summary>
+        /// Define the foreign key columns
+        /// </summary>
+        /// <param name="columns">The column names</param>
+        /// <returns>Define the foreign keys primary table</returns>
         ICreateForeignKeyToTableSyntax ForeignColumns(params string[] columns);
     }
 }
