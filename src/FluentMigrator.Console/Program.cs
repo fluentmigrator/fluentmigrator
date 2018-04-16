@@ -20,7 +20,7 @@ using System;
 
 namespace FluentMigrator.Console
 {
-    class Program
+    static class Program
     {
         static int Main(string[] args)
         {
