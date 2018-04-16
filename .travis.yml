@@ -5,7 +5,6 @@ solution: FluentMigrator.sln
 mono: latest
 dotnet: 2.1.103
 script:
-- dotnet restore ./FluentMigrator.sln
-- msbuild ./FluentMigrator.sln /v:m
+- dotnet build ./FluentMigrator.sln
 - dotnet vstest test/FluentMigrator.Tests/bin/Debug/net461/FluentMigrator.Tests.dll
   --TestCaseFilter:'TestCategory!=NotWorkingOnMono&(TestCategory!=Integration|(TestCategory=Integration&(TestCategory=SQLite)))'
