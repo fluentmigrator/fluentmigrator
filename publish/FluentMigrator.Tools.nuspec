@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
 	<metadata>
-		<id>FluentMigrator.Console</id>
+		<id>FluentMigrator.Tools</id>
 		<version>$version$</version>
 		<authors>Josh Coffman, Tom Marien, Mark Junker</authors>
 		<summary>!!!OBSOLETE!!! Please use FluentMigrator.Console instead</summary>
