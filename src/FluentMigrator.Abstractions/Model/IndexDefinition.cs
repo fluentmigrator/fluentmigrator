@@ -25,24 +25,47 @@ using FluentMigrator.Infrastructure.Extensions;
 
 namespace FluentMigrator.Model
 {
+    /// <summary>
+    /// The index definition
+    /// </summary>
     public class IndexDefinition : ICloneable, ICanBeValidated, ISupportAdditionalFeatures
     {
         private readonly IDictionary<string, object> _additionalFeatures = new Dictionary<string, object>();
 
+        /// <summary>
+        /// Gets or sets the index name
+        /// </summary>
         public virtual string Name { get; set; }
+
+        /// <summary>
+        /// Gets or sets the schema name
+        /// </summary>
         public virtual string SchemaName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the table name
+        /// </summary>
         public virtual string TableName { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whteher the index only allows unique values
+        /// </summary>
         public virtual bool IsUnique { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the index is clustered
+        /// </summary>
         public bool IsClustered { get; set; }
-        public virtual ICollection<IndexColumnDefinition> Columns { get; set; }
 
-        public IndexDefinition()
-        {
-            Columns = new List<IndexColumnDefinition>();
-        }
+        /// <summary>
+        /// Gets or sets a collection of index column definitions
+        /// </summary>
+        public virtual ICollection<IndexColumnDefinition> Columns { get; set; } = new List<IndexColumnDefinition>();
 
+        /// <inheritdoc />
         public virtual IDictionary<string, object> AdditionalFeatures => _additionalFeatures;
 
+        /// <inheritdoc />
         public virtual void CollectValidationErrors(ICollection<string> errors)
         {
             if (String.IsNullOrEmpty(Name))
@@ -61,6 +84,7 @@ namespace FluentMigrator.Model
                 additionalFeature.CollectValidationErrors(errors);
         }
 
+        /// <inheritdoc />
         public object Clone()
         {
             var result = new IndexDefinition

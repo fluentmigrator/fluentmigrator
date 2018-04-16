@@ -22,8 +22,17 @@ using System.Linq;
 
 namespace FluentMigrator.Infrastructure.Extensions
 {
+    /// <summary>
+    /// Extension methods for cloning
+    /// </summary>
     public static class CloneExtensions
     {
+        /// <summary>
+        /// Clones all <paramref name="items"/>
+        /// </summary>
+        /// <typeparam name="T">The item type</typeparam>
+        /// <param name="items">The items to clone</param>
+        /// <returns>The cloned items</returns>
         public static IEnumerable<T> CloneAll<T>(this IEnumerable<T> items)
             where T : ICloneable
         {
@@ -31,6 +40,11 @@ namespace FluentMigrator.Infrastructure.Extensions
                 yield return (T)item.Clone();
         }
 
+        /// <summary>
+        /// Clones all key/value pairs
+        /// </summary>
+        /// <param name="dict">The key value pairs to clone</param>
+        /// <returns>The cloned key/value pairs</returns>
         public static Dictionary<string, object> Clone(this IEnumerable<KeyValuePair<string, object>> dict)
         {
             return dict
@@ -38,6 +52,11 @@ namespace FluentMigrator.Infrastructure.Extensions
                 .ToDictionary(x => x.Item1, x => x.Item2);
         }
 
+        /// <summary>
+        /// Clones the values of <paramref name="dict"/> and stores them into <paramref name="target"/>
+        /// </summary>
+        /// <param name="dict">The key/value pairs to clone</param>
+        /// <param name="target">The target dictionary to store the cloned key/value pairs</param>
         public static void CloneTo(this IEnumerable<KeyValuePair<string, object>> dict, IDictionary<string, object> target)
         {
             var clonedItems = dict

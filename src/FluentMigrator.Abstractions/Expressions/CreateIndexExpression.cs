@@ -24,31 +24,39 @@ using FluentMigrator.Model;
 
 namespace FluentMigrator.Expressions
 {
+    /// <summary>
+    /// Expression to create an index
+    /// </summary>
     public class CreateIndexExpression : MigrationExpressionBase, ISupportAdditionalFeatures, IIndexExpression
     {
+        /// <inheritdoc />
         public virtual IndexDefinition Index { get; set; } = new IndexDefinition();
 
+        /// <inheritdoc />
         public IDictionary<string, object> AdditionalFeatures => Index.AdditionalFeatures;
 
+        /// <inheritdoc />
         public override void CollectValidationErrors(ICollection<string> errors)
         {
             Index.CollectValidationErrors(errors);
         }
 
+        /// <inheritdoc />
         public override void ExecuteWith(IMigrationProcessor processor)
         {
             processor.Process(this);
         }
 
+        /// <inheritdoc />
         public override IMigrationExpression Reverse()
         {
             return new DeleteIndexExpression { Index = Index.Clone() as IndexDefinition };
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return base.ToString() + Index.TableName + " (" + string.Join(", ", Index.Columns.Select(x => x.Name).ToArray()) + ")";
         }
-
     }
 }

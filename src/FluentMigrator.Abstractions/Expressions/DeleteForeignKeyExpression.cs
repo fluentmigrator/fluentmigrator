@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -24,10 +24,15 @@ using System.Linq;
 
 namespace FluentMigrator.Expressions
 {
+    /// <summary>
+    /// Expression to delete a foreign key
+    /// </summary>
     public class DeleteForeignKeyExpression : MigrationExpressionBase, IForeignKeyExpression
     {
+        /// <inheritdoc />
         public virtual ForeignKeyDefinition ForeignKey { get; set; } = new ForeignKeyDefinition();
 
+        /// <inheritdoc />
         public override void CollectValidationErrors(ICollection<string> errors)
         {
             if (ForeignKey.ForeignColumns.Count > 0)
@@ -42,11 +47,13 @@ namespace FluentMigrator.Expressions
             }
         }
 
+        /// <inheritdoc />
         public override void ExecuteWith(IMigrationProcessor processor)
         {
             processor.Process(this);
         }
 
+        /// <inheritdoc />
         public override IMigrationExpression Reverse()
         {
             // there are 2 types of delete FK statements
@@ -80,6 +87,7 @@ namespace FluentMigrator.Expressions
             return new CreateForeignKeyExpression { ForeignKey = reverseForeignKey };
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return base.ToString() + ForeignKey.Name + " "

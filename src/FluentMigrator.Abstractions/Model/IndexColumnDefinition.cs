@@ -23,19 +23,32 @@ using FluentMigrator.Infrastructure.Extensions;
 
 namespace FluentMigrator.Model
 {
+    /// <summary>
+    /// Index column definition
+    /// </summary>
     public class IndexColumnDefinition : ICloneable, ICanBeValidated, ISupportAdditionalFeatures
     {
+        /// <summary>
+        /// Gets or sets the column name
+        /// </summary>
         public virtual string Name { get; set; }
+
+        /// <summary>
+        /// Gets or sets the sort direction of the index column
+        /// </summary>
         public virtual Direction Direction { get; set; }
 
+        /// <inheritdoc />
         public virtual IDictionary<string, object> AdditionalFeatures { get; } = new Dictionary<string, object>();
 
+        /// <inheritdoc />
         public virtual void CollectValidationErrors(ICollection<string> errors)
         {
             if (String.IsNullOrEmpty(Name))
                 errors.Add(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
         }
 
+        /// <inheritdoc />
         public object Clone()
         {
             var result = new IndexColumnDefinition()

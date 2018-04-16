@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -20,9 +20,21 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Expressions
 {
+    /// <summary>
+    /// The interface for a migration expression
+    /// </summary>
     public interface IMigrationExpression : ICanBeValidated
     {
+        /// <summary>
+        /// Execute the expression with the given <paramref name="processor"/>
+        /// </summary>
+        /// <param name="processor">The processor to execute the expression with</param>
         void ExecuteWith(IMigrationProcessor processor);
+
+        /// <summary>
+        /// Create a reversing migration expression
+        /// </summary>
+        /// <returns>The reversing migration expression</returns>
         IMigrationExpression Reverse();
     }
 }

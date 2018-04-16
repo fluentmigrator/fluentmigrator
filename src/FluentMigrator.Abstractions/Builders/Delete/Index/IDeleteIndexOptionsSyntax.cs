@@ -18,6 +18,9 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Delete.Index
 {
+    /// <summary>
+    /// Extension point for index options
+    /// </summary>
     public interface IDeleteIndexOptionsSyntax : IFluentSyntax
     {
     }

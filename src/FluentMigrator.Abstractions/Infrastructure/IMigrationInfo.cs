@@ -18,16 +18,54 @@
 
 namespace FluentMigrator.Infrastructure
 {
+    /// <summary>
+    /// Interface for migration information
+    /// </summary>
     public interface IMigrationInfo
     {
+        /// <summary>
+        /// Gets the migration version
+        /// </summary>
         long Version { get; }
+
+        /// <summary>
+        /// Gets the migration description
+        /// </summary>
         string Description { get; }
+
+        /// <summary>
+        /// Gets the desired transaction behavior
+        /// </summary>
         TransactionBehavior TransactionBehavior { get; }
+
+        /// <summary>
+        /// Gets the migration
+        /// </summary>
         IMigration Migration { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether the migration is a breaking change
+        /// </summary>
         bool IsBreakingChange { get; }
 
+        /// <summary>
+        /// Gets the trait object with the given name
+        /// </summary>
+        /// <param name="name">The trait name</param>
+        /// <returns>The object associated with the given <paramref name="name"/></returns>
         object Trait(string name);
+
+        /// <summary>
+        /// Returns a value indicating whether a given trait was specified
+        /// </summary>
+        /// <param name="name">The trait name</param>
+        /// <returns><c>true</c> when the trait was specified</returns>
         bool HasTrait(string name);
+
+        /// <summary>
+        /// Gets the migration name
+        /// </summary>
+        /// <returns></returns>
         string GetName();
     }
 }

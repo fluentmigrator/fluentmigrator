@@ -5,30 +5,38 @@ using FluentMigrator.Model;
 
 namespace FluentMigrator.Expressions
 {
+    /// <summary>
+    /// The expression to create a constraint
+    /// </summary>
     public class CreateConstraintExpression : MigrationExpressionBase, ISupportAdditionalFeatures, IConstraintExpression
     {
+        /// <inheritdoc />
         public virtual ConstraintDefinition Constraint { get; set; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:CreateConstraintExpression"/> class.
+        /// Initializes a new instance of the <see cref="CreateConstraintExpression"/> class.
         /// </summary>
         public CreateConstraintExpression(ConstraintType type)
         {
             Constraint = new ConstraintDefinition(type);
         }
 
+        /// <inheritdoc />
         public IDictionary<string, object> AdditionalFeatures => Constraint.AdditionalFeatures;
 
+        /// <inheritdoc />
         public override void ExecuteWith(IMigrationProcessor processor)
         {
             processor.Process(this);
         }
 
+        /// <inheritdoc />
         public override void CollectValidationErrors(ICollection<string> errors)
         {
             Constraint.CollectValidationErrors(errors);
         }
 
+        /// <inheritdoc />
         public override IMigrationExpression Reverse()
         {
             //constraint type is private in ConstraintDefinition
@@ -38,9 +46,9 @@ namespace FluentMigrator.Expressions
             };
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
-
             return base.ToString() + Constraint.ConstraintName;
         }
     }

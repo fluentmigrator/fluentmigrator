@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -18,8 +18,16 @@
 
 namespace FluentMigrator.Builders.Delete.ForeignKey
 {
+    /// <summary>
+    /// Define the schema or foreign key column to delete
+    /// </summary>
     public interface IDeleteForeignKeyForeignColumnOrInSchemaSyntax : IDeleteForeignKeyForeignColumnSyntax
     {
+        /// <summary>
+        /// Define the schema
+        /// </summary>
+        /// <param name="foreignSchemaName">The schema of the foreign key</param>
+        /// <returns>The next step</returns>
         IDeleteForeignKeyForeignColumnSyntax InSchema(string foreignSchemaName);
     }
 }

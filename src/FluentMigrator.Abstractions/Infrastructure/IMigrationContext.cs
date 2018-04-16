@@ -22,15 +22,34 @@ using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Infrastructure
 {
+    /// <summary>
+    /// The context of a migration while collecting up/down expressions
+    /// </summary>
     public interface IMigrationContext
     {
+        /// <summary>
+        /// Gets or sets the collection of expressions
+        /// </summary>
         ICollection<IMigrationExpression> Expressions { get; set; }
+
+        /// <summary>
+        /// Gets the <see cref="IQuerySchema"/> to access the database
+        /// </summary>
         IQuerySchema QuerySchema { get; }
+
+        /// <summary>
+        /// Gets or sets the collection of migration assemblies
+        /// </summary>
         IAssemblyCollection MigrationAssemblies { get; set; }
 
-        /// <summary>The arbitrary application context passed to the task runner.</summary>
+        /// <summary>
+        /// Gets or sets the arbitrary application context passed to the task runner
+        /// </summary>
         object ApplicationContext { get; set; }
 
+        /// <summary>
+        /// Gets or sets the connection string
+        /// </summary>
         string Connection { get; set; }
     }
 }

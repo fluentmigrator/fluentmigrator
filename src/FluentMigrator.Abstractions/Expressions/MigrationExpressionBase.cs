@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -21,16 +21,24 @@ using System.Collections.Generic;
 
 namespace FluentMigrator.Expressions
 {
+    /// <summary>
+    /// The base class for migration expressions
+    /// </summary>
     public abstract class MigrationExpressionBase : IMigrationExpression
     {
+        /// <inheritdoc />
         public abstract void ExecuteWith(IMigrationProcessor processor);
+
+        /// <inheritdoc />
         public abstract void CollectValidationErrors(ICollection<string> errors);
 
+        /// <inheritdoc />
         public virtual IMigrationExpression Reverse()
         {
             throw new NotSupportedException(String.Format("The {0} cannot be automatically reversed", GetType().Name));
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return GetType().Name.Replace("Expression", "") + " ";

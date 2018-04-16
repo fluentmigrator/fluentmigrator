@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -22,10 +22,17 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Expressions
 {
+    /// <summary>
+    /// Expression to execute an SQL statement
+    /// </summary>
     public class ExecuteSqlStatementExpression : MigrationExpressionBase
     {
+        /// <summary>
+        /// Gets or sets the SQL statement to be executed
+        /// </summary>
         public virtual string SqlStatement { get; set; }
 
+        /// <inheritdoc />
         public override void ExecuteWith(IMigrationProcessor processor)
         {
             // since all the Processors are using String.Format() in their Execute method
@@ -34,12 +41,14 @@ namespace FluentMigrator.Expressions
             processor.Execute(sqlText);
         }
 
+        /// <inheritdoc />
         public override void CollectValidationErrors(ICollection<string> errors)
         {
             if (String.IsNullOrEmpty(SqlStatement))
                 errors.Add(ErrorMessages.SqlStatementCannotBeNullOrEmpty);
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return base.ToString() + SqlStatement;

@@ -20,20 +20,27 @@ using FluentMigrator.Model;
 
 namespace FluentMigrator.Expressions
 {
+    /// <summary>
+    /// Expression to crate a sequence
+    /// </summary>
     public class CreateSequenceExpression : MigrationExpressionBase, ISequenceExpression
     {
+        /// <inheritdoc />
         public virtual SequenceDefinition Sequence { get; set; } = new SequenceDefinition();
 
+        /// <inheritdoc />
         public override void ExecuteWith(IMigrationProcessor processor)
         {
             processor.Process(this);
         }
 
+        /// <inheritdoc />
         public override void CollectValidationErrors(ICollection<string> errors)
         {
             Sequence.CollectValidationErrors(errors);
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return base.ToString() + Sequence.Name;

@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -22,11 +22,36 @@ using FluentMigrator.Builders.Schema.Index;
 
 namespace FluentMigrator.Builders.Schema.Table
 {
+    /// <summary>
+    /// Queries a tables (or one of its childs) existence
+    /// </summary>
     public interface ISchemaTableSyntax
     {
+        /// <summary>
+        /// Returns <c>true</c> when the table exists
+        /// </summary>
+        /// <returns><c>true</c> when the table exists</returns>
         bool Exists();
+
+        /// <summary>
+        /// Specifies the column to check
+        /// </summary>
+        /// <param name="column">The column name</param>
+        /// <returns>The next step</returns>
         ISchemaColumnSyntax Column(string column);
+
+        /// <summary>
+        /// Specify the index to check
+        /// </summary>
+        /// <param name="indexName">The index name</param>
+        /// <returns>The next step</returns>
         ISchemaIndexSyntax Index(string indexName);
+
+        /// <summary>
+        /// Specify the constraint to check
+        /// </summary>
+        /// <param name="constraintName">The constraint name</param>
+        /// <returns>The next step</returns>
         ISchemaConstraintSyntax Constraint(string constraintName);
     }
 }

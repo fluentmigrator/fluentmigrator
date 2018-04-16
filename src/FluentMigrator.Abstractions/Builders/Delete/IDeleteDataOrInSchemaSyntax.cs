@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -18,8 +18,16 @@
 
 namespace FluentMigrator.Builders.Delete
 {
+    /// <summary>
+    /// Specify the schema or the condition of the data to delete
+    /// </summary>
     public interface IDeleteDataOrInSchemaSyntax : IDeleteDataSyntax
     {
+        /// <summary>
+        /// Specify the schema of the table to delete from
+        /// </summary>
+        /// <param name="schemaName">The schema name</param>
+        /// <returns>The next step</returns>
         IDeleteDataSyntax InSchema(string schemaName);
     }
 }

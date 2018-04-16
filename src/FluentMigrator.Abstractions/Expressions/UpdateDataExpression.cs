@@ -22,15 +22,35 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Expressions
 {
+    /// <summary>
+    /// Expression to update data
+    /// </summary>
     public class UpdateDataExpression : MigrationExpressionBase, ISchemaExpression
     {
+        /// <inheritdoc />
         public string SchemaName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the table name
+        /// </summary>
         public string TableName { get; set; }
 
+        /// <summary>
+        /// Gets or sets the values to be set
+        /// </summary>
         public List<KeyValuePair<string, object>> Set { get; set; }
+
+        /// <summary>
+        /// Gets or sets the condition column/value pairs
+        /// </summary>
         public List<KeyValuePair<string, object>> Where { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether all rows should be updated
+        /// </summary>
         public bool IsAllRows { get; set; }
 
+        /// <inheritdoc />
         public override void CollectValidationErrors(ICollection<string> errors)
         {
             if (String.IsNullOrEmpty(TableName))
@@ -43,6 +63,7 @@ namespace FluentMigrator.Expressions
                 errors.Add(ErrorMessages.UpdateDataExpressionMustNotSpecifyBothWhereClauseAndAllRows);
         }
 
+        /// <inheritdoc />
         public override void ExecuteWith(IMigrationProcessor processor)
         {
             processor.Process(this);

@@ -23,12 +23,18 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Expressions
 {
+    /// <summary>
+    /// Expression to execute SQL scripts
+    /// </summary>
     public class ExecuteSqlScriptExpression : MigrationExpressionBase, IFileSystemExpression
     {
         private string _rootPath;
         private string _sqlScript;
         private string _unchangedSqlScript;
 
+        /// <summary>
+        /// Gets or sets the SQL script to be executed
+        /// </summary>
         public string SqlScript
         {
             get => _sqlScript;
@@ -39,6 +45,9 @@ namespace FluentMigrator.Expressions
             }
         }
 
+        /// <summary>
+        /// Gets or sets the root path where the SQL script file should be loaded from
+        /// </summary>
         public string RootPath
         {
             get => _rootPath;
@@ -54,6 +63,7 @@ namespace FluentMigrator.Expressions
         /// </summary>
         public IDictionary<string, string> Parameters { get; set; }
 
+        /// <inheritdoc />
         public override void ExecuteWith(IMigrationProcessor processor)
         {
             string sqlText;
@@ -67,12 +77,14 @@ namespace FluentMigrator.Expressions
             processor.Execute(sqlText);
         }
 
+        /// <inheritdoc />
         public override void CollectValidationErrors(ICollection<string> errors)
         {
             if (string.IsNullOrEmpty(SqlScript))
                 errors.Add(ErrorMessages.SqlScriptCannotBeNullOrEmpty);
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return base.ToString() + SqlScript;

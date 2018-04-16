@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -21,9 +21,23 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Rename
 {
+    /// <summary>
+    /// The expression root for renaming tables or columns
+    /// </summary>
     public interface IRenameExpressionRoot : IFluentSyntax
     {
+        /// <summary>
+        /// Specify the table (or its column) to be renamed
+        /// </summary>
+        /// <param name="oldName">The current table name</param>
+        /// <returns>The next step</returns>
         IRenameTableToOrInSchemaSyntax Table(string oldName);
+
+        /// <summary>
+        /// Specify the column to be renamed
+        /// </summary>
+        /// <param name="oldName">The current column name</param>
+        /// <returns>The next step</returns>
         IRenameColumnTableSyntax Column(string oldName);
     }
 }

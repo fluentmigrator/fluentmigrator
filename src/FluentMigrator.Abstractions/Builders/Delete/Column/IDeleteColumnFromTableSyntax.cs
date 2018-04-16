@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -20,9 +20,23 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Delete.Column
 {
+    /// <summary>
+    /// Delete a column from a table
+    /// </summary>
     public interface IDeleteColumnFromTableSyntax : IFluentSyntax
     {
+        /// <summary>
+        /// Define the table to delete the column from
+        /// </summary>
+        /// <param name="tableName">The table name</param>
+        /// <returns>The next step</returns>
         IInSchemaSyntax FromTable(string tableName);
+
+        /// <summary>
+        /// Delete define the column to delete
+        /// </summary>
+        /// <param name="columnName">The name of the column to delete</param>
+        /// <returns>The next step</returns>
         IDeleteColumnFromTableSyntax Column(string columnName);
     }
 }

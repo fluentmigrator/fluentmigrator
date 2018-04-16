@@ -23,10 +23,19 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Expressions
 {
+    /// <summary>
+    /// Expression to execute an embedded SQL script
+    /// </summary>
     public class ExecuteEmbeddedSqlScriptExpression : MigrationExpressionBase
     {
+        /// <summary>
+        /// Gets or sets the SQL script name
+        /// </summary>
         public string SqlScript { get; set; }
 
+        /// <summary>
+        /// Gets or sets the migration assemblies
+        /// </summary>
         public IAssemblyCollection MigrationAssemblies { get; set; }
 
         /// <summary>
@@ -34,6 +43,7 @@ namespace FluentMigrator.Expressions
         /// </summary>
         public IDictionary<string, string> Parameters { get; set; }
 
+        /// <inheritdoc />
         public override void ExecuteWith(IMigrationProcessor processor)
         {
 
@@ -52,22 +62,35 @@ namespace FluentMigrator.Expressions
             processor.Execute(sqlText);
         }
 
+        /// <inheritdoc />
         public override void CollectValidationErrors(ICollection<string> errors)
         {
             if (string.IsNullOrEmpty(SqlScript))
                 errors.Add(ErrorMessages.SqlScriptCannotBeNullOrEmpty);
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return base.ToString() + SqlScript;
         }
 
+        /// <summary>
+        /// Creates an exception about a missing SQL script
+        /// </summary>
+        /// <param name="sqlScript">The name of the SQL script</param>
+        /// <returns>The exception to be thrown</returns>
         protected Exception NewNotFoundException(string sqlScript)
         {
             return new InvalidOperationException(string.Format("Could not find resource named {0} in assemblies {1}", sqlScript, string.Join(", ", MigrationAssemblies.Assemblies.Select(a => a.FullName).ToArray())));
         }
 
+        /// <summary>
+        /// An exception to be thrown when the name of the embedded SQL script is ambiguous.
+        /// </summary>
+        /// <param name="sqlScript">The name of the SQL script</param>
+        /// <param name="foundResources">The found resource names</param>
+        /// <returns>The exception to be thrown</returns>
         protected Exception NewNoUniqueResourceException(string sqlScript, IEnumerable<ManifestResourceNameWithAssembly> foundResources)
         {
             return new InvalidOperationException(string.Format(@"Could not find unique resource named {0} in assemblies {1}.
@@ -80,6 +103,10 @@ Possible candidates are:
                 string.Join(Environment.NewLine + "\t", foundResources.Select(r => r.Name).ToArray())));
         }
 
+        /// <summary>
+        /// Gets the fully qualified ressource name and assembly
+        /// </summary>
+        /// <returns>the fully qualified ressource name and assembly</returns>
         protected virtual ManifestResourceNameWithAssembly GetQualifiedResourcePath()
         {
             var foundResources = FindResourceName(SqlScript);
@@ -93,6 +120,11 @@ Possible candidates are:
             return foundResources[0];
         }
 
+        /// <summary>
+        /// Finds ressources with the given name
+        /// </summary>
+        /// <param name="sqlScript">The name of the SQL script ressource to be found</param>
+        /// <returns>The found ressources</returns>
         protected virtual ManifestResourceNameWithAssembly[] FindResourceName(string sqlScript)
         {
             var resources = MigrationAssemblies.GetManifestResourceNames();

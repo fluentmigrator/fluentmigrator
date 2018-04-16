@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -23,17 +23,25 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Expressions
 {
+    /// <summary>
+    /// Expression to delete a column
+    /// </summary>
     public class DeleteColumnExpression : MigrationExpressionBase, ISchemaExpression
     {
-        public DeleteColumnExpression()
-        {
-            ColumnNames = new List<string>();
-        }
-
+        /// <inheritdoc />
         public virtual string SchemaName { get; set; }
-        public virtual string TableName { get; set; }
-        public ICollection<string> ColumnNames { get; set; }
 
+        /// <summary>
+        /// Gets or sets a table name
+        /// </summary>
+        public virtual string TableName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the column names
+        /// </summary>
+        public ICollection<string> ColumnNames { get; set; } = new List<string>();
+
+        /// <inheritdoc />
         public override void CollectValidationErrors(ICollection<string> errors)
         {
             if (String.IsNullOrEmpty(TableName))
@@ -46,11 +54,13 @@ namespace FluentMigrator.Expressions
                 errors.Add(ErrorMessages.ColumnNamesMustBeUnique);
         }
 
+        /// <inheritdoc />
         public override void ExecuteWith(IMigrationProcessor processor)
         {
             processor.Process(this);
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return base.ToString() + TableName + " " + ColumnNames.Aggregate((a, b) => a + ", " + b);

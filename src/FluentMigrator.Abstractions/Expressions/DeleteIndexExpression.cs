@@ -18,18 +18,25 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
-using System.Linq;
 
 namespace FluentMigrator.Expressions
 {
+    /// <summary>
+    /// Expression to delete an index
+    /// </summary>
     public class DeleteIndexExpression : MigrationExpressionBase, ISupportAdditionalFeatures, IIndexExpression
     {
+        /// <inheritdoc />
         public virtual IndexDefinition Index { get; set; } = new IndexDefinition();
 
+        /// <inheritdoc />
         public IDictionary<string, object> AdditionalFeatures => Index.AdditionalFeatures;
 
+        /// <inheritdoc />
         public override void CollectValidationErrors(ICollection<string> errors)
         {
             if (String.IsNullOrEmpty(Index.Name))
@@ -39,11 +46,13 @@ namespace FluentMigrator.Expressions
                 errors.Add(ErrorMessages.TableNameCannotBeNullOrEmpty);
         }
 
+        /// <inheritdoc />
         public override void ExecuteWith(IMigrationProcessor processor)
         {
             processor.Process(this);
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return base.ToString() + Index.TableName + " (" + string.Join(", ", Index.Columns.Select(x => x.Name).ToArray()) + ")";

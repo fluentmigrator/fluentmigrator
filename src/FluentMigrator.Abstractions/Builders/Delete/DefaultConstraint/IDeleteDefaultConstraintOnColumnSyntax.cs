@@ -20,8 +20,15 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Delete.DefaultConstraint
 {
+    /// <summary>
+    /// Specify the column to delete the default constraint from
+    /// </summary>
     public interface IDeleteDefaultConstraintOnColumnSyntax : IFluentSyntax
     {
+        /// <summary>
+        /// The column to delete the default constraint from
+        /// </summary>
+        /// <param name="columnName">The column name</param>
         void OnColumn(string columnName);
     }
 }
