@@ -2,12 +2,13 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net40;net45;netcoreapp2.0</TargetFrameworks>
+    <TargetFramework>net461</TargetFramework>
     <AssemblyName>Migrate</AssemblyName>
     <PackageId>FluentMigrator.Console</PackageId>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\FluentMigrator.snk</AssemblyOriginatorKeyFile>
     <Description>Console runner for FluentMigrator</Description>
+    <IsTool>true</IsTool>
   </PropertyGroup>
 
   <Import Project="$(MSBuildThisFileDirectory)../../PackageTool.proj" />
@@ -16,7 +17,7 @@
     <None Include="..\..\FluentMigrator.snk" Link="FluentMigrator.snk" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net40' or '$(TargetFramework)' == 'net45' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
     <Reference Include="System.Configuration" />
   </ItemGroup>
 
