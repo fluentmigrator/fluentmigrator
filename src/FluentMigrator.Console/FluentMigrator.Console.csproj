@@ -1,5 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net45</TargetFramework>
@@ -8,9 +7,10 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\FluentMigrator.snk</AssemblyOriginatorKeyFile>
     <Description>Console runner for FluentMigrator</Description>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
-  <Import Project="$(MSBuildThisFileDirectory)../../PackageTool.proj" />
+  <Import Project="$(MSBuildThisFileDirectory)../../Global.proj" />
 
   <ItemGroup>
     <None Include="..\..\FluentMigrator.snk" Link="FluentMigrator.snk" />
