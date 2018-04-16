@@ -6,6 +6,7 @@
     <PackageId>FluentMigrator.DotNet.Cli</PackageId>
     <DefineConstants>NOT_CLS_COMPLIANT;$(DefineConstants)</DefineConstants>
     <Description>.NET Core CLI tool for FluentMigrator</Description>
+    <PackageType>DotnetCliTool</PackageType>
   </PropertyGroup>
 
   <Import Project="$(MSBuildThisFileDirectory)../../PackageTool.proj" />
