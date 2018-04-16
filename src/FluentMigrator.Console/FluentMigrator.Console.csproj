@@ -1,12 +1,13 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net40;net45;netcoreapp2.0</TargetFrameworks>
+    <TargetFrameworks>net40;net45</TargetFrameworks>
     <AssemblyName>Migrate</AssemblyName>
     <PackageId>FluentMigrator.Console</PackageId>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\FluentMigrator.snk</AssemblyOriginatorKeyFile>
+    <Description>Console runner for FluentMigrator</Description>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <Import Project="$(MSBuildThisFileDirectory)../../Global.proj" />

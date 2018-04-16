@@ -5,6 +5,7 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\FluentMigrator.snk</AssemblyOriginatorKeyFile>
     <UserSecretsId>FluentMigrator.Tests</UserSecretsId>
+    <DebugType>full</DebugType>
   </PropertyGroup>
   <Import Project="$(MSBuildThisFileDirectory)../../Global.proj" />
   <ItemGroup>

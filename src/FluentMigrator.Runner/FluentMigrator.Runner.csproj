@@ -5,7 +5,7 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\FluentMigrator.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
-  <Import Project="$(MSBuildThisFileDirectory)../../Global.proj" />
+  <Import Project="$(MSBuildThisFileDirectory)../../PackageLibrary.proj" />
   <ItemGroup Condition=" '$(TargetFramework)' == 'net40' or '$(TargetFramework)' == 'net45' ">
     <Reference Include="System.Configuration" />
   </ItemGroup>

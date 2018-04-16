@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata>
+		<id>FluentMigrator.Console</id>
+		<version>$version$</version>
+		<authors>Josh Coffman, Tom Marien, Mark Junker</authors>
+		<summary>FluentMigrator is a database migration framework for .NET written in C#.</summary>
+		<description>FluentMigrator is a database migration framework for .NET written in C#. The basic idea is that you can create migrations which are simply classes that derive from the Migration base class and have a Migration attribute with a unique version number attached to them. Upon executing FluentMigrator, you tell it which version to migrate to and it will run all necessary migrations in order to bring your database up to that version.
+In addition to forward migration support, FluentMigrator also supports different ways to execute the migrations along with selective migrations called profiles and executing arbitrary SQL.</description>
+		<language>en-US</language>
+		<projectUrl>https://github.com/fluentmigrator/fluentmigrator/wiki/</projectUrl>
+		<licenseUrl>https://github.com/fluentmigrator/fluentmigrator/blob/master/LICENSE.txt</licenseUrl>
+		<releaseNotes>https://github.com/fluentmigrator/fluentmigrator/releases</releaseNotes>
+		<dependencies>
+			<dependency id="FluentMigrator" version="$version$"/>
+		</dependencies>
+	</metadata>
+	<files>
+		<file src="_._" target="content"/>
+		<file src="tools\" target="tools\"/>
+	</files>
+</package>
