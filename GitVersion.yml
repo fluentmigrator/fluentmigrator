@@ -4,5 +4,7 @@ next-version: 2.0.0
 branches:
   release:
     mode: ContinuousDeployment
+  hotfix:
+    mode: ContinuousDeployment
 ignore:
   sha: []
