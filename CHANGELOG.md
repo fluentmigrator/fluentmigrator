@@ -16,6 +16,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - Expression conventions are now bundled in the new `IConventionSet`
 - `ICanBeConventional` was removed during the overhaul of the expression convention system
 - Strings are now Unicode by default. Use `NonUnicodeString` for ANSI strings
+- `FluentMigrator.Tools` was split into the following packages
+  - `FluentMigrator.Console`: The `Migrate.exe` tool
+  - `FluentMigrator.MSBuild`: The MSBuild `Migrate` task
 
 ### Added
 
