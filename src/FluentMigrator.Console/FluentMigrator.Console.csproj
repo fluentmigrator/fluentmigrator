@@ -7,9 +7,10 @@
     <PackageId>FluentMigrator.Console</PackageId>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\FluentMigrator.snk</AssemblyOriginatorKeyFile>
+    <Description>Console runner for FluentMigrator</Description>
   </PropertyGroup>
 
-  <Import Project="$(MSBuildThisFileDirectory)../../Global.proj" />
+  <Import Project="$(MSBuildThisFileDirectory)../../PackageTool.proj" />
 
   <ItemGroup>
     <None Include="..\..\FluentMigrator.snk" Link="FluentMigrator.snk" />

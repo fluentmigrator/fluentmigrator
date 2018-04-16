@@ -1,7 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Description>Assembly containing migrations for the example project</Description>
   </PropertyGroup>
+
+  <Import Project="$(MSBuildThisFileDirectory)../../Global.proj" />
+
   <ItemGroup>
     <ProjectReference Include="..\..\src\FluentMigrator\FluentMigrator.csproj" />
   </ItemGroup>
