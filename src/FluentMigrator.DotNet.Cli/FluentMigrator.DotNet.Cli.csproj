@@ -5,9 +5,10 @@
     <AssemblyName>dotnet-fm</AssemblyName>
     <PackageId>FluentMigrator.DotNet.Cli</PackageId>
     <DefineConstants>NOT_CLS_COMPLIANT;$(DefineConstants)</DefineConstants>
+    <Description>.NET Core CLI tool for FluentMigrator</Description>
   </PropertyGroup>
 
-  <Import Project="$(MSBuildThisFileDirectory)../../Global.proj" />
+  <Import Project="$(MSBuildThisFileDirectory)../../PackageTool.proj" />
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="6.2.2" />
