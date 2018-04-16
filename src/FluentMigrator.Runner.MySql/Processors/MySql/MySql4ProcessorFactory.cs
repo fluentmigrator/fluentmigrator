@@ -24,7 +24,7 @@ namespace FluentMigrator.Runner.Processors.MySql
         {
             var factory = new MySqlDbFactory();
             var connection = factory.CreateConnection(connectionString);
-            return new MySqlProcessor(connection, new MySql5Generator(), announcer, options, factory);
+            return new MySqlProcessor(connection, new MySql4Generator(), announcer, options, factory);
         }
     }
 }
