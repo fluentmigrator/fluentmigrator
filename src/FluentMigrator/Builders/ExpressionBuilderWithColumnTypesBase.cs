@@ -6,7 +6,7 @@ using FluentMigrator.Model;
 namespace FluentMigrator.Builders
 {
     public abstract class ExpressionBuilderWithColumnTypesBase<ExpressionT, NextT> : ExpressionBuilderBase<ExpressionT>
-        where ExpressionT : IMigrationExpression
+        where ExpressionT : class, IMigrationExpression
         where NextT : IFluentSyntax
     {
         protected ExpressionBuilderWithColumnTypesBase(ExpressionT expression)

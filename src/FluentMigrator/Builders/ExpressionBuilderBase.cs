@@ -21,7 +21,7 @@ using FluentMigrator.Expressions;
 namespace FluentMigrator.Builders
 {
     public abstract class ExpressionBuilderBase<T>
-        where T : IMigrationExpression
+        where T : class, IMigrationExpression
     {
         public T Expression { get; private set; }
 
