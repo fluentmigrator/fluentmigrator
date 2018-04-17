@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -20,6 +20,9 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Schema.Column
 {
+    /// <summary>
+    /// The implementation of the <see cref="ISchemaColumnSyntax"/> interface
+    /// </summary>
     public class SchemaColumnQuery : ISchemaColumnSyntax
     {
         private readonly string _schemaName;
@@ -27,6 +30,13 @@ namespace FluentMigrator.Builders.Schema.Column
         private readonly string _columnName;
         private readonly IMigrationContext _context;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SchemaColumnQuery"/> class.
+        /// </summary>
+        /// <param name="schemaName">The schema name</param>
+        /// <param name="tableName">The table name</param>
+        /// <param name="columnName">The column name</param>
+        /// <param name="context">The migration context</param>
         public SchemaColumnQuery(string schemaName, string tableName, string columnName, IMigrationContext context)
         {
             _schemaName = schemaName;
@@ -35,6 +45,7 @@ namespace FluentMigrator.Builders.Schema.Column
             _context = context;
         }
 
+        /// <inheritdoc />
         public bool Exists()
         {
             return _context.QuerySchema.ColumnExists(_schemaName, _tableName, _columnName);

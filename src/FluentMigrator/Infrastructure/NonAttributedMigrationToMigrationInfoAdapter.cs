@@ -19,43 +19,57 @@ using System;
 namespace FluentMigrator.Infrastructure
 {
     /// <summary>
-    /// This adapter wraps a migration into a MigrationInfo instance, used to keep IMigration backwards compatible with new IMigrationInfo.
+    /// This adapter wraps a migration into a MigrationInfo instance, used to keep <see cref="IMigration"/> backwards compatible with new <see cref="IMigrationInfo"/>.
     /// </summary>
     public class NonAttributedMigrationToMigrationInfoAdapter : IMigrationInfo
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="NonAttributedMigrationToMigrationInfoAdapter"/> class.
+        /// </summary>
+        /// <param name="migration">The underlying migration</param>
         public NonAttributedMigrationToMigrationInfoAdapter(IMigration migration)
             : this(migration, TransactionBehavior.Default)
         {}
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="NonAttributedMigrationToMigrationInfoAdapter"/> class.
+        /// </summary>
+        /// <param name="migration">The underlying migration</param>
+        /// <param name="transactionBehavior">The desired transaction behavior</param>
         public NonAttributedMigrationToMigrationInfoAdapter(IMigration migration, TransactionBehavior transactionBehavior)
         {
             Migration = migration ?? throw new ArgumentNullException(nameof(migration));
             TransactionBehavior = transactionBehavior;
         }
 
+        /// <inheritdoc />
         public string Description { get; } = string.Empty;
 
-        public long Version
-        {
-            get { return -1; }
-        }
+        /// <inheritdoc />
+        public long Version => -1;
 
+        /// <inheritdoc />
         public TransactionBehavior TransactionBehavior { get; private set;}
 
+        /// <inheritdoc />
         public IMigration Migration { get; private set; }
 
+        /// <inheritdoc />
         public bool IsBreakingChange => false;
 
+        /// <inheritdoc />
         public object Trait(string name)
         {
             return null;
         }
 
+        /// <inheritdoc />
         public bool HasTrait(string name)
         {
             return false;
         }
 
+        /// <inheritdoc />
         public string GetName()
         {
             return string.Format("{0}", Migration.GetType().Name);

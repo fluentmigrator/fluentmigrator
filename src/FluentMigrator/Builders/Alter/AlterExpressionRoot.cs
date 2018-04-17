@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -23,15 +23,23 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Alter
 {
+    /// <summary>
+    /// The root expression for alterations
+    /// </summary>
     public class AlterExpressionRoot : IAlterExpressionRoot
     {
         private readonly IMigrationContext _context;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AlterExpressionRoot"/> class.
+        /// </summary>
+        /// <param name="context">The migration context</param>
         public AlterExpressionRoot(IMigrationContext context)
         {
             _context = context;
         }
 
+        /// <inheritdoc />
         public IAlterTableAddColumnOrAlterColumnOrSchemaOrDescriptionSyntax Table(string tableName)
         {
             var expression = new AlterTableExpression { TableName = tableName };
@@ -39,6 +47,7 @@ namespace FluentMigrator.Builders.Alter
             return new AlterTableExpressionBuilder(expression, _context);
         }
 
+        /// <inheritdoc />
         public IAlterColumnOnTableSyntax Column(string columnName)
         {
             var expression = new AlterColumnExpression { Column = { Name = columnName } };

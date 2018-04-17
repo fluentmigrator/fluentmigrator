@@ -1,13 +1,30 @@
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
-using System;
+#region License
+//
+// Copyright (c) 2018, Fluent Migrator Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+#endregion
+
 using System.Collections.Generic;
 
 namespace FluentMigrator.Builders
 {
     /// <summary>
-    /// This class provides a common location for logic pertaining to setting and maintaining 
+    /// This class provides a common location for logic pertaining to setting and maintaining
     /// expressions for expression builders which manipulate the the ColumnDefinition.
     /// </summary>
     /// <remarks>
@@ -31,10 +48,18 @@ namespace FluentMigrator.Builders
         private Dictionary<ColumnDefinition, ExistingRowsData> _existingRowsDataByColumn { get; set; }
 
         /// <summary>
-        /// For easy mockability only.
+        /// Initializes a new instance of the <see cref="ColumnExpressionBuilderHelper"/> class.
         /// </summary>
+        /// <remarks>
+        /// This constructor exists only to ease creating mock objects.
+        /// </remarks>
         protected ColumnExpressionBuilderHelper() { }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ColumnExpressionBuilderHelper"/> class.
+        /// </summary>
+        /// <param name="builder">The expression builder</param>
+        /// <param name="context">The migration context</param>
         public ColumnExpressionBuilderHelper(IColumnExpressionBuilder builder, IMigrationContext context)
         {
             _builder = builder;
@@ -92,7 +117,7 @@ namespace FluentMigrator.Builders
                 }
             }
 
-            //At this point, we know there's no existing row expression, so just pass it onto the 
+            //At this point, we know there's no existing row expression, so just pass it onto the
             //underlying column.
             column.IsNullable = isNullable;
         }
@@ -139,6 +164,10 @@ namespace FluentMigrator.Builders
             }
         }
 
+        /// <summary>
+        /// Creates a new CREATE INDEX expression to create a new unique index
+        /// </summary>
+        /// <param name="indexName">The new name of the index</param>
         public virtual void Unique(string indexName)
         {
             var column = _builder.Column;
@@ -163,6 +192,10 @@ namespace FluentMigrator.Builders
             _context.Expressions.Add(index);
         }
 
+        /// <summary>
+        /// Creates a new CREATE INDEX expression
+        /// </summary>
+        /// <param name="indexName">The index name</param>
         public virtual void Indexed(string indexName)
         {
             _builder.Column.IsIndexed = true;

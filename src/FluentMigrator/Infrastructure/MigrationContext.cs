@@ -22,27 +22,40 @@ using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Infrastructure
 {
+    /// <summary>
+    /// The default implementation of the <see cref="IMigrationContext"/>
+    /// </summary>
     public class MigrationContext : IMigrationContext
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MigrationContext"/> class.
+        /// </summary>
+        /// <param name="querySchema">The provider used to query the database</param>
+        /// <param name="migrationAssemblies">The collection of migration assemblies</param>
+        /// <param name="context">The arbitrary application context passed to the task runner</param>
+        /// <param name="connection">The database connection</param>
         public MigrationContext(IQuerySchema querySchema, IAssemblyCollection migrationAssemblies, object context, string connection)
         {
             Expressions = new List<IMigrationExpression>();
             QuerySchema = querySchema;
             MigrationAssemblies = migrationAssemblies;
-            this.ApplicationContext = context;
-            this.Connection = connection;
+            ApplicationContext = context;
+            Connection = connection;
         }
 
+        /// <inheritdoc />
         public virtual ICollection<IMigrationExpression> Expressions { get; set; }
+
+        /// <inheritdoc />
         public virtual IQuerySchema QuerySchema { get; set; }
+
+        /// <inheritdoc />
         public virtual IAssemblyCollection MigrationAssemblies { get; set; }
 
-        /// <summary>The arbitrary application context passed to the task runner.</summary>
+        /// <inheritdoc />
         public virtual object ApplicationContext { get; set; }
 
-        /// <summary>
-        /// Connection String from the runner.
-        /// </summary>
+        /// <inheritdoc />
         public string Connection { get; set; }
     }
 }

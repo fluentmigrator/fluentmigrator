@@ -121,6 +121,7 @@ namespace FluentMigrator.Builders.IfDatabase
             get { return new ExecuteExpressionRoot(_context); }
         }
 
+        /// <inheritdoc />
         public ISchemaExpressionRoot Schema
         {
             get { return new SchemaExpressionRoot(_context); }
@@ -134,6 +135,7 @@ namespace FluentMigrator.Builders.IfDatabase
             get { return new UpdateExpressionRoot(_context); }
         }
 
+        /// <inheritdoc />
         public void Delegate(Action delegation)
         {
             if (_context.QuerySchema is NullIfDatabaseProcessor)
