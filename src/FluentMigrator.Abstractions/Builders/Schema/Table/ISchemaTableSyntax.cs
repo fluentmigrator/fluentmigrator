@@ -36,9 +36,9 @@ namespace FluentMigrator.Builders.Schema.Table
         /// <summary>
         /// Specifies the column to check
         /// </summary>
-        /// <param name="column">The column name</param>
+        /// <param name="columnName">The column name</param>
         /// <returns>The next step</returns>
-        ISchemaColumnSyntax Column(string column);
+        ISchemaColumnSyntax Column(string columnName);
 
         /// <summary>
         /// Specify the index to check
