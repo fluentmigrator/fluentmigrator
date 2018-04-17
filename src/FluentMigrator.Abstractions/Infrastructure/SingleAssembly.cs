@@ -39,7 +39,15 @@ namespace FluentMigrator.Infrastructure
         /// <inheritdoc />
         public Type[] GetExportedTypes()
         {
-            return Assemblies[0].GetExportedTypes();
+            try
+            {
+                return Assemblies[0].GetExportedTypes();
+            }
+            catch
+            {
+                // Ignore assemblies that couldn't be loaded
+                return Type.EmptyTypes;
+            }
         }
 
         /// <inheritdoc />

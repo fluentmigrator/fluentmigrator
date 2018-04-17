@@ -40,8 +40,21 @@ namespace FluentMigrator.Infrastructure
         /// <inheritdoc />
         public Type[] GetExportedTypes()
         {
-            return Assemblies.SelectMany(a => a.GetExportedTypes()).ToArray();
-        }
+            var result = new List<Type>();
+
+            foreach (var assembly in Assemblies)
+            {
+                try
+                {
+                    result.AddRange(assembly.GetExportedTypes());
+                }
+                catch
+                {
+                    // Ignore assemblies that couldn't be loaded
+                }
+            }
+
+            return result.ToArray();         }
 
         /// <inheritdoc />
         public Assembly[] Assemblies { get; }
