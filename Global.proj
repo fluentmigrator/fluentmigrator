@@ -11,6 +11,7 @@
     <PackageProjectUrl>https://github.com/fluentmigrator/fluentmigrator/wiki</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/fluentmigrator/fluentmigrator/blob/master/LICENSE.txt</PackageLicenseUrl>
     <PackageReleaseNotes>https://github.com/fluentmigrator/fluentmigrator/releases</PackageReleaseNotes>
+    <PackageIconUrl>https://github.com/fluentmigrator/fluentmigrator/raw/develop/docs/logo.png</PackageIconUrl>
     <RepositoryUrl>https://github.com/fluentmigrator/fluentmigrator.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <MinClientVersion>3.5</MinClientVersion>
