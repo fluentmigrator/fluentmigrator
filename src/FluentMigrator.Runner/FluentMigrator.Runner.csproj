@@ -28,6 +28,9 @@
     <ProjectReference Include="..\FluentMigrator.Runner.Jet\FluentMigrator.Runner.Jet.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="JetBrains.Annotations" Version="11.1.0" PrivateAssets="All" />
+  </ItemGroup>
+  <ItemGroup>
     <None Include="..\..\FluentMigrator.snk" Link="FluentMigrator.snk" />
   </ItemGroup>
 </Project>

@@ -1,5 +1,5 @@
 #region License
-// Copyright (c) 2007-2018, Fluent Migrator Project
+// Copyright (c) 2018, FluentMigrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,18 +14,23 @@
 // limitations under the License.
 #endregion
 
-using System;
 using System.Collections.Generic;
+using System.Reflection;
 
-using FluentMigrator.Infrastructure;
+using JetBrains.Annotations;
 
-namespace FluentMigrator.Runner
+namespace FluentMigrator.Infrastructure
 {
-    public interface IProfileLoader
+    /// <summary>
+    /// Interface for getting all embedded resources
+    /// </summary>
+    public interface IEmbeddedResourceProvider
     {
-        void ApplyProfiles();
-
-        [Obsolete]
-        IEnumerable<IMigration> FindProfilesIn(IAssemblyCollection assemblies, string profile);
+        /// <summary>
+        /// Gets all embedded resources
+        /// </summary>
+        /// <returns>A tuple for every embedded resource and the containing assembly</returns>
+        [NotNull]
+        IEnumerable<(string name, Assembly assembly)> GetEmbeddedResources();
     }
 }

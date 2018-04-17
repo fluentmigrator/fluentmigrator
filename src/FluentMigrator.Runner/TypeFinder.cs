@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
+using JetBrains.Annotations;
+
 namespace FluentMigrator.Runner
 {
     /// <summary>
@@ -19,7 +21,7 @@ namespace FluentMigrator.Runner
         /// This parameter is ignored if <paramref name="namespace"/> is null or empty string.
         /// </param>
         /// <returns>Collection of types matching specified criteria.</returns>
-        public static IEnumerable<Type> FilterByNamespace(this IEnumerable<Type> types, string @namespace, bool loadNestedNamespaces)
+        public static IEnumerable<Type> FilterByNamespace([NotNull, ItemNotNull] this IEnumerable<Type> types, [CanBeNull] string @namespace, bool loadNestedNamespaces)
         {
             if (!string.IsNullOrEmpty(@namespace))
             {

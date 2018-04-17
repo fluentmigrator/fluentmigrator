@@ -26,7 +26,7 @@ namespace FluentMigrator.Expressions
     /// <summary>
     /// Expression to execute SQL scripts
     /// </summary>
-    public class ExecuteSqlScriptExpression : MigrationExpressionBase, IFileSystemExpression
+    public class ExecuteSqlScriptExpression : ExecuteSqlScriptExpressionBase, IFileSystemExpression
     {
         private string _rootPath;
         private string _sqlScript;
@@ -58,11 +58,6 @@ namespace FluentMigrator.Expressions
             }
         }
 
-        /// <summary>
-        /// Gets or sets parameters to be replaced before script execution
-        /// </summary>
-        public IDictionary<string, string> Parameters { get; set; }
-
         /// <inheritdoc />
         public override void ExecuteWith(IMigrationProcessor processor)
         {
@@ -72,9 +67,7 @@ namespace FluentMigrator.Expressions
                 sqlText = reader.ReadToEnd();
             }
 
-            sqlText = SqlScriptTokenReplacer.ReplaceSqlScriptTokens(sqlText, Parameters);
-
-            processor.Execute(sqlText);
+            Execute(processor, sqlText);
         }
 
         /// <inheritdoc />

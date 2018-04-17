@@ -24,11 +24,13 @@ namespace FluentMigrator.Infrastructure
     /// <summary>
     /// A bundle of one or more Assembly instances
     /// </summary>
+    [Obsolete]
     public interface IAssemblyCollection
     {
         /// <summary>
         /// Gets the Assemblies contained in this collection
         /// </summary>
+        [Obsolete]
         Assembly[] Assemblies { get; }
 
         /// <summary>
@@ -36,6 +38,7 @@ namespace FluentMigrator.Infrastructure
         /// on each Assembly in Assemblies.
         /// </summary>
         /// <returns>The array of exported types</returns>
+        [Obsolete]
         Type[] GetExportedTypes();
 
         /// <summary>
@@ -43,6 +46,7 @@ namespace FluentMigrator.Infrastructure
         /// contained in this collection, plus which assembly it is defined in.
         /// </summary>
         /// <returns>An array of value pairs of resource name plus assembly.</returns>
+        [Obsolete]
         ManifestResourceNameWithAssembly[] GetManifestResourceNames();
     }
 }

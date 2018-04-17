@@ -25,12 +25,26 @@ namespace FluentMigrator.Runner
 {
     public interface IMigrationRunnerConventions
     {
+        [Obsolete]
         Func<Type, bool> TypeIsMigration { get; }
+
         Func<Type, bool> TypeIsProfile { get; }
+
         Func<Type, MigrationStage?> GetMaintenanceStage { get; }
+
+        [Obsolete]
         Func<Type, bool> TypeIsVersionTableMetaData { get; }
+
+        [Obsolete]
         Func<Type, IMigrationInfo> GetMigrationInfo { get; }
+
+        /// <summary>
+        /// Create an <see cref="IMigrationInfo"/> instance for a given <see cref="IMigration"/>
+        /// </summary>
+        Func<IMigration, IMigrationInfo> GetMigrationInfoForMigration { get; }
+
         Func<Type, bool> TypeHasTags { get; }
+
         Func<Type, IEnumerable<string>, bool> TypeHasMatchingTags { get; }
     }
 }

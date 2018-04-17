@@ -28,21 +28,32 @@ namespace FluentMigrator.Runner
     {
         private static readonly IMigrationRunnerConventions _default = DefaultMigrationRunnerConventions.Instance;
 
+        [Obsolete]
         public Func<Type, bool> TypeIsMigration { get; set; }
         public Func<Type, bool> TypeIsProfile { get; set; }
         public Func<Type, MigrationStage?> GetMaintenanceStage { get; set; }
+
+        [Obsolete]
         public Func<Type, bool> TypeIsVersionTableMetaData { get; set; }
+
+        [Obsolete]
         public Func<Type, IMigrationInfo> GetMigrationInfo { get; set; }
+
+        /// <inheritdoc />
+        public Func<IMigration, IMigrationInfo> GetMigrationInfoForMigration { get; }
         public Func<Type, bool> TypeHasTags { get; set; }
         public Func<Type, IEnumerable<string>, bool> TypeHasMatchingTags { get; set; }
 
         public MigrationRunnerConventions()
         {
+#pragma warning disable CS0612 // Typ oder Element ist veraltet
             TypeIsMigration = _default.TypeIsMigration;
-            TypeIsProfile = _default.TypeIsProfile;
-            GetMaintenanceStage = _default.GetMaintenanceStage;
             TypeIsVersionTableMetaData = _default.TypeIsVersionTableMetaData;
             GetMigrationInfo = _default.GetMigrationInfo;
+#pragma warning restore CS0612 // Typ oder Element ist veraltet
+            TypeIsProfile = _default.TypeIsProfile;
+            GetMaintenanceStage = _default.GetMaintenanceStage;
+            GetMigrationInfoForMigration = _default.GetMigrationInfoForMigration;
             TypeHasTags = _default.TypeHasTags;
             TypeHasMatchingTags = _default.TypeHasMatchingTags;
         }

@@ -30,11 +30,15 @@ using FluentMigrator.Model;
 using FluentMigrator.Runner.Exceptions;
 using FluentMigrator.Runner.VersionTableInfo;
 
+using JetBrains.Annotations;
+
 namespace FluentMigrator.Runner
 {
     public class MigrationRunner : IMigrationRunner
     {
+        [CanBeNull]
         private IAssemblyCollection _migrationAssemblies;
+
         private IAnnouncer _announcer;
         private IStopWatch _stopWatch;
         private bool _alreadyOutputPreviewOnlyModeWarning;
@@ -49,7 +53,10 @@ namespace FluentMigrator.Runner
         public bool SilentlyFail { get; set; }
 
         public IMigrationProcessor Processor { get; private set; }
+
+        [Obsolete]
         public IMigrationInformationLoader MigrationLoader { get; set; }
+
         public IProfileLoader ProfileLoader { get; set; }
         public IMaintenanceLoader MaintenanceLoader { get; set; }
         public IMigrationRunnerConventions Conventions { get; private set; }
@@ -69,11 +76,13 @@ namespace FluentMigrator.Runner
 
         public IRunnerContext RunnerContext { get; private set; }
 
+        [Obsolete]
         public MigrationRunner(Assembly assembly, IRunnerContext runnerContext, IMigrationProcessor processor)
           : this(new SingleAssembly(assembly), runnerContext, processor)
         {
         }
 
+        [Obsolete]
         public MigrationRunner(
             IAssemblyCollection assemblies, IRunnerContext runnerContext,
             IMigrationProcessor processor, IVersionTableMetaData versionTableMetaData = null,
@@ -109,6 +118,46 @@ namespace FluentMigrator.Runner
             else
             {
                 VersionLoader = new VersionLoader(this, _migrationAssemblies, convSet, Conventions, versionTableMetaData);
+            }
+        }
+
+        public MigrationRunner(
+            [NotNull] IRunnerContext runnerContext,
+            [NotNull] IMigrationProcessor processor,
+            [NotNull] IVersionTableMetaData versionTableMetaData,
+            [NotNull] IMigrationRunnerConventions migrationRunnerConventions,
+            [NotNull] IMaintenanceLoader maintenanceLoader,
+            [NotNull] IMigrationInformationLoader migrationLoader)
+        {
+            _announcer = runnerContext.Announcer;
+            Processor = processor;
+            _stopWatch = runnerContext.StopWatch;
+            RunnerContext = runnerContext;
+
+            SilentlyFail = false;
+            CaughtExceptions = null;
+
+            Conventions = migrationRunnerConventions;
+
+            var convSet = new DefaultConventionSet(runnerContext);
+
+            _migrationScopeHandler = new MigrationScopeHandler(Processor);
+            _migrationValidator = new MigrationValidator(_announcer, convSet);
+#pragma warning disable 612
+            MigrationLoader = migrationLoader;
+#pragma warning restore 612
+            ProfileLoader = new ProfileLoader(runnerContext, this, Conventions);
+            MaintenanceLoader = maintenanceLoader;
+
+            if (runnerContext.NoConnection)
+            {
+                VersionLoader = new ConnectionlessVersionLoader(
+                    this, convSet, Conventions,
+                    runnerContext.StartVersion, runnerContext.Version, versionTableMetaData);
+            }
+            else
+            {
+                VersionLoader = new VersionLoader(this, convSet, Conventions, versionTableMetaData);
             }
         }
 
@@ -180,8 +229,12 @@ namespace FluentMigrator.Runner
             VersionLoader.LoadVersionInfo();
         }
 
+        [Obsolete]
         private IMigrationRunnerConventions GetMigrationRunnerConventions(IRunnerContext runnerContext)
         {
+            if (_migrationAssemblies == null)
+                return new MigrationRunnerConventions();
+
             var matchedType = _migrationAssemblies
                 .GetExportedTypes()
                 .FirstOrDefault(t => typeof(IMigrationRunnerConventions).IsAssignableFrom(t));

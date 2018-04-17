@@ -16,6 +16,7 @@
 //
 #endregion
 
+using System;
 using System.Collections.Generic;
 
 using FluentMigrator.Expressions;
@@ -34,6 +35,7 @@ namespace FluentMigrator.Infrastructure
         /// <param name="migrationAssemblies">The collection of migration assemblies</param>
         /// <param name="context">The arbitrary application context passed to the task runner</param>
         /// <param name="connection">The database connection</param>
+        [Obsolete]
         public MigrationContext(IQuerySchema querySchema, IAssemblyCollection migrationAssemblies, object context, string connection)
         {
             Expressions = new List<IMigrationExpression>();
@@ -50,6 +52,7 @@ namespace FluentMigrator.Infrastructure
         public virtual IQuerySchema QuerySchema { get; set; }
 
         /// <inheritdoc />
+        [Obsolete]
         public virtual IAssemblyCollection MigrationAssemblies { get; set; }
 
         /// <inheritdoc />

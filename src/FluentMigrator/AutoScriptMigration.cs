@@ -16,6 +16,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
@@ -44,7 +46,9 @@ namespace FluentMigrator
                 GetDatabaseNames(),
                 MigrationDirection.Up)
             {
+#pragma warning disable 612
                 MigrationAssemblies = _context.MigrationAssemblies,
+#pragma warning restore 612
             };
             _context.Expressions.Add(expression);
         }
@@ -57,7 +61,9 @@ namespace FluentMigrator
                 GetDatabaseNames(),
                 MigrationDirection.Down)
             {
+#pragma warning disable 612
                 MigrationAssemblies = _context.MigrationAssemblies,
+#pragma warning restore 612
             };
             _context.Expressions.Add(expression);
         }
@@ -70,7 +76,7 @@ namespace FluentMigrator
         }
 
         private sealed class ExecuteEmbeddedAutoSqlScriptExpression :
-            ExecuteEmbeddedSqlScriptExpression,
+            ExecuteEmbeddedSqlScriptExpressionBase,
             IAutoNameExpression
         {
             public ExecuteEmbeddedAutoSqlScriptExpression(Type migrationType, IList<string> databaseNames, MigrationDirection direction)
@@ -86,21 +92,35 @@ namespace FluentMigrator
             public IList<string> DatabaseNames { get; }
             public MigrationDirection Direction { get; }
 
-            protected override ManifestResourceNameWithAssembly GetQualifiedResourcePath()
+            /// <summary>
+            /// Gets or sets the migration assemblies
+            /// </summary>
+            [Obsolete]
+            public IAssemblyCollection MigrationAssemblies { get; set; }
+
+            /// <inheritdoc />
+            public override void ExecuteWith(IMigrationProcessor processor)
             {
-                foreach (var sqlScript in AutoNames)
+#pragma warning disable 612
+                var resourceNames = MigrationAssemblies.GetManifestResourceNames()
+                    .Select(item => (name: item.Name, assembly: item.Assembly))
+                    .ToList();
+#pragma warning restore 612
+
+                var embeddedResourceNameWithAssembly = GetQualifiedResourcePath(resourceNames, AutoNames.ToArray());
+                string sqlText;
+
+                using (var stream = embeddedResourceNameWithAssembly
+                    .assembly.GetManifestResourceStream(embeddedResourceNameWithAssembly.name))
+                using (var reader = new StreamReader(stream))
                 {
-                    var res = FindResourceName(sqlScript);
-                    if (res.Length > 1)
-                        throw NewNoUniqueResourceException(sqlScript, res);
-                    if (res.Length == 1)
-                        return res[0];
+                    sqlText = reader.ReadToEnd();
                 }
 
-                var sqlScripts = string.Concat("(", string.Join(",", AutoNames), ")");
-                throw NewNotFoundException(sqlScripts);
+                Execute(processor, sqlText);
             }
 
+            /// <inheritdoc />
             public override void CollectValidationErrors(ICollection<string> errors)
             {
                 if (AutoNames.Count == 0)

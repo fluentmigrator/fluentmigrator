@@ -14,6 +14,7 @@
 // limitations under the License.
 #endregion
 
+using System;
 using System.Reflection;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Initialization;
@@ -23,8 +24,13 @@ namespace FluentMigrator.Runner
     public interface IMigrationRunner : IMigrationScopeStarter
     {
         IMigrationProcessor Processor { get; }
+
+        [Obsolete]
         IMigrationInformationLoader MigrationLoader { get; set; }
+
+        [Obsolete]
         IAssemblyCollection MigrationAssemblies { get; }
+
         IRunnerContext RunnerContext { get; }
         void Up(IMigration migration);
         void Down(IMigration migration);

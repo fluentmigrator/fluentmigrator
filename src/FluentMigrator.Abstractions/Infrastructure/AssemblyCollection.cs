@@ -24,6 +24,7 @@ namespace FluentMigrator.Infrastructure
     /// <summary>
     /// An assembly collection for multiple assemblies
     /// </summary>
+    [Obsolete]
     public class AssemblyCollection : IAssemblyCollection
     {
         /// <summary>

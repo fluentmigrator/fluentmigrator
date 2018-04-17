@@ -22,6 +22,7 @@ namespace FluentMigrator.Infrastructure
     /// <summary>
     /// Combines a ManifestResourceName with the assembly it belongs to
     /// </summary>
+    [Obsolete]
     public class ManifestResourceNameWithAssembly
     {
         /// <summary>
@@ -31,8 +32,8 @@ namespace FluentMigrator.Infrastructure
         /// <param name="assembly">The assembly this ressource name belongs to</param>
         public ManifestResourceNameWithAssembly(string name, Assembly assembly)
         {
-            Name = name ?? throw new ArgumentNullException(nameof(name));
-            Assembly = assembly ?? throw new ArgumentNullException(nameof(assembly));
+            Name = name;
+            Assembly = assembly;
         }
 
         /// <summary>

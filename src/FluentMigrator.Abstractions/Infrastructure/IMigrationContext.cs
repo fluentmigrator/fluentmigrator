@@ -16,6 +16,7 @@
 //
 #endregion
 
+using System;
 using System.Collections.Generic;
 
 using FluentMigrator.Expressions;
@@ -40,6 +41,7 @@ namespace FluentMigrator.Infrastructure
         /// <summary>
         /// Gets or sets the collection of migration assemblies
         /// </summary>
+        [Obsolete]
         IAssemblyCollection MigrationAssemblies { get; set; }
 
         /// <summary>
