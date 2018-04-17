@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -35,7 +36,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
                 TableName = "TestTable1",
             };
 
-            new CreateTableExpressionBuilder(expression, new MigrationContext(null, null, null, null))
+            new CreateTableExpressionBuilder(expression, new MigrationContext(null, null, null, (IServiceProvider)null))
                 .WithColumn("Id").AsGuid().PrimaryKey().RowGuid();
 
             var result = Generator.Generate(expression);

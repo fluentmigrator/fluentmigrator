@@ -23,6 +23,8 @@ using System.Data;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 
+using Microsoft.Extensions.DependencyInjection;
+
 namespace FluentMigrator.Builders.Execute
 {
     /// <summary>
@@ -77,19 +79,44 @@ namespace FluentMigrator.Builders.Execute
         /// <inheritdoc />
         public void EmbeddedScript(string embeddedSqlScriptName)
         {
-            var expression = new ExecuteEmbeddedSqlScriptExpression { SqlScript = embeddedSqlScriptName, MigrationAssemblies = _context.MigrationAssemblies };
-            _context.Expressions.Add(expression);
+            var embeddedResourceProvider = _context.ServiceProvider?.GetService<IEmbeddedResourceProvider>();
+            if (embeddedResourceProvider == null)
+            {
+#pragma warning disable CS0612 // Typ oder Element ist veraltet
+                var expression = new ExecuteEmbeddedSqlScriptExpression(_context.MigrationAssemblies) { SqlScript = embeddedSqlScriptName };
+#pragma warning restore CS0612 // Typ oder Element ist veraltet
+                _context.Expressions.Add(expression);
+            }
+            else
+            {
+                var expression = new ExecuteEmbeddedSqlScriptExpression(embeddedResourceProvider) { SqlScript = embeddedSqlScriptName };
+                _context.Expressions.Add(expression);
+            }
         }
 
         /// <inheritdoc />
         public void EmbeddedScript(string embeddedSqlScriptName, IDictionary<string, string> parameters)
         {
-            var expression = new ExecuteEmbeddedSqlScriptExpression
+            var embeddedResourceProvider = _context.ServiceProvider?.GetService<IEmbeddedResourceProvider>();
+            ExecuteEmbeddedSqlScriptExpression expression;
+            if (embeddedResourceProvider == null)
             {
-                SqlScript = embeddedSqlScriptName,
-                MigrationAssemblies = _context.MigrationAssemblies,
-                Parameters = parameters,
-            };
+#pragma warning disable CS0612 // Typ oder Element ist veraltet
+                expression = new ExecuteEmbeddedSqlScriptExpression(_context.MigrationAssemblies)
+                {
+                    SqlScript = embeddedSqlScriptName,
+                    Parameters = parameters,
+                };
+#pragma warning restore CS0612 // Typ oder Element ist veraltet
+            }
+            else
+            {
+                expression = new ExecuteEmbeddedSqlScriptExpression(embeddedResourceProvider)
+                {
+                    SqlScript = embeddedSqlScriptName,
+                    Parameters = parameters,
+                };
+            }
 
             _context.Expressions.Add(expression);
         }

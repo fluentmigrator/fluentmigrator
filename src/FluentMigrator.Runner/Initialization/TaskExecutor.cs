@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 using FluentMigrator.Exceptions;
@@ -41,19 +42,21 @@ namespace FluentMigrator.Runner.Initialization
         {
         }
 
-        public TaskExecutor(IRunnerContext runnerContext, IConnectionStringProvider connectionStringProvider, AssemblyLoaderFactory assemblyLoaderFactory, MigrationProcessorFactoryProvider processorFactoryProvider)
+        public TaskExecutor(
+            IRunnerContext runnerContext,
+            IConnectionStringProvider connectionStringProvider,
+            AssemblyLoaderFactory assemblyLoaderFactory,
+            MigrationProcessorFactoryProvider processorFactoryProvider)
         {
-            if (runnerContext == null) throw new ArgumentNullException("runnerContext");
-            if (assemblyLoaderFactory == null) throw new ArgumentNullException("assemblyLoaderFactory");
-
-            RunnerContext = runnerContext;
+            RunnerContext = runnerContext ?? throw new ArgumentNullException(nameof(runnerContext));
             ConnectionStringProvider = connectionStringProvider;
-            AssemblyLoaderFactory = assemblyLoaderFactory;
+            AssemblyLoaderFactory = assemblyLoaderFactory ?? throw new ArgumentNullException(nameof(assemblyLoaderFactory));
             ProcessorFactoryProvider = processorFactoryProvider;
         }
 
         protected IConnectionStringProvider ConnectionStringProvider { get; }
 
+        [Obsolete]
         protected virtual IEnumerable<Assembly> GetTargetAssemblies()
         {
             var assemblies = new HashSet<Assembly>();
@@ -71,18 +74,34 @@ namespace FluentMigrator.Runner.Initialization
 
         protected virtual void Initialize()
         {
-            var assemblies = GetTargetAssemblies();
-
+#pragma warning disable CS0612 // Typ oder Element ist veraltet
+            var assemblies = GetTargetAssemblies().ToList();
             var assemblyCollection = new AssemblyCollection(assemblies);
+#pragma warning restore CS0612 // Typ oder Element ist veraltet
 
             if (!RunnerContext.NoConnection && ConnectionStringProvider == null)
             {
                 RunnerContext.NoConnection = true;
             }
 
-            var processor = RunnerContext.NoConnection? InitializeConnectionlessProcessor():InitializeProcessor(assemblyCollection);
+            var processor = RunnerContext.NoConnection
+                ? InitializeConnectionlessProcessor()
+                : InitializeProcessor(assemblies);
 
-            Runner = new MigrationRunner(assemblyCollection, RunnerContext, processor);
+            var convSet = new DefaultConventionSet(RunnerContext);
+#pragma warning disable CS0612 // Typ oder Element ist veraltet
+            var migConv = assemblyCollection.GetMigrationRunnerConventions();
+            var versionTableMetaData = assemblyCollection.GetVersionTableMetaData(convSet, migConv, RunnerContext);
+            var maintenanceLoader = new MaintenanceLoader(assemblyCollection, RunnerContext.Tags, migConv);
+            var migrationLoader = new DefaultMigrationInformationLoader(
+                migConv,
+                assemblyCollection,
+                RunnerContext.Namespace,
+                RunnerContext.NestedNamespaces,
+                RunnerContext.Tags);
+#pragma warning restore CS0612 // Typ oder Element ist veraltet
+            var migrations = migrationLoader.LoadMigrations().Values.Select(x => x.Migration).ToList();
+            Runner = new MigrationRunner(RunnerContext, processor, versionTableMetaData, migConv, maintenanceLoader, migrationLoader, migrations);
         }
 
         public void Execute()
@@ -185,9 +204,9 @@ namespace FluentMigrator.Runner.Initialization
             return processor;
         }
 
-        private IMigrationProcessor InitializeProcessor(IAssemblyCollection assemblyCollection)
+        private IMigrationProcessor InitializeProcessor(IReadOnlyCollection<Assembly> assemblies)
         {
-            var connectionString = LoadConnectionString(assemblyCollection);
+            var connectionString = LoadConnectionString(assemblies);
             var processorFactory = ProcessorFactoryProvider.GetFactory(RunnerContext.Database);
 
             if (processorFactory == null)
@@ -203,9 +222,9 @@ namespace FluentMigrator.Runner.Initialization
             return processor;
         }
 
-        private string LoadConnectionString(IAssemblyCollection assemblyCollection)
+        private string LoadConnectionString(IReadOnlyCollection<Assembly> assemblies)
         {
-            var singleAssembly = (assemblyCollection != null && assemblyCollection.Assemblies != null && assemblyCollection.Assemblies.Length == 1) ? assemblyCollection.Assemblies[0] : null;
+            var singleAssembly = assemblies.Count == 1 ? assemblies.Single() : null;
             var singleAssemblyLocation = singleAssembly != null ? singleAssembly.Location : string.Empty;
 
             var connectionString = ConnectionStringProvider.GetConnectionString(

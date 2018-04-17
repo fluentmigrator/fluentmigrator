@@ -25,7 +25,6 @@ namespace FluentMigrator.Runner
     {
         IMigrationProcessor Processor { get; }
 
-        [Obsolete]
         IMigrationInformationLoader MigrationLoader { get; set; }
 
         [Obsolete]

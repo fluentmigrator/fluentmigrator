@@ -18,9 +18,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
+
+using JetBrains.Annotations;
 
 namespace FluentMigrator
 {
@@ -38,30 +41,60 @@ namespace FluentMigrator
     /// </remarks>
     public abstract class AutoScriptMigration : MigrationBase
     {
+        [CanBeNull]
+        private readonly IEmbeddedResourceProvider _embeddedResourceProvider;
+
+        [Obsolete]
+        protected AutoScriptMigration()
+        {
+        }
+
+        protected AutoScriptMigration([NotNull] IEmbeddedResourceProvider embeddedResourceProvider)
+        {
+            _embeddedResourceProvider = embeddedResourceProvider;
+        }
+
         /// <inheritdoc />
         public sealed override void Up()
         {
-            var expression = new ExecuteEmbeddedAutoSqlScriptExpression(
-                GetType(),
-                GetDatabaseNames(),
-                MigrationDirection.Up)
+            ExecuteEmbeddedAutoSqlScriptExpression expression;
+            if (_embeddedResourceProvider == null)
             {
+#pragma warning disable CS0612 // Typ oder Element ist veraltet
+                expression = new ExecuteEmbeddedAutoSqlScriptExpression(
+                    _context.MigrationAssemblies,
+                    GetType(),
+                    GetDatabaseNames(),
+                    MigrationDirection.Up);
+#pragma warning restore CS0612 // Typ oder Element ist veraltet
+            }
+            else
+            {
+                expression = new ExecuteEmbeddedAutoSqlScriptExpression(
+                    _embeddedResourceProvider,
+                    GetType(),
+                    GetDatabaseNames(),
+                    MigrationDirection.Up)
+                {
 #pragma warning disable 612
-                MigrationAssemblies = _context.MigrationAssemblies,
+                    MigrationAssemblies = _context.MigrationAssemblies,
 #pragma warning restore 612
-            };
+                };
+            }
+
             _context.Expressions.Add(expression);
         }
 
         /// <inheritdoc />
         public sealed override void Down()
         {
+#pragma warning disable 612
             var expression = new ExecuteEmbeddedAutoSqlScriptExpression(
+                _embeddedResourceProvider ?? new DefaultEmbeddedResourceProvider(_context.MigrationAssemblies),
                 GetType(),
                 GetDatabaseNames(),
                 MigrationDirection.Down)
             {
-#pragma warning disable 612
                 MigrationAssemblies = _context.MigrationAssemblies,
 #pragma warning restore 612
             };
@@ -79,8 +112,21 @@ namespace FluentMigrator
             ExecuteEmbeddedSqlScriptExpressionBase,
             IAutoNameExpression
         {
-            public ExecuteEmbeddedAutoSqlScriptExpression(Type migrationType, IList<string> databaseNames, MigrationDirection direction)
+            [NotNull]
+            private readonly IEmbeddedResourceProvider _embeddedResourceProvider;
+
+            public ExecuteEmbeddedAutoSqlScriptExpression([NotNull] IEmbeddedResourceProvider embeddedResourceProvider, Type migrationType, IList<string> databaseNames, MigrationDirection direction)
             {
+                _embeddedResourceProvider = embeddedResourceProvider;
+                MigrationType = migrationType;
+                DatabaseNames = databaseNames;
+                Direction = direction;
+            }
+
+            [Obsolete]
+            public ExecuteEmbeddedAutoSqlScriptExpression(IAssemblyCollection assemblyCollection, Type migrationType, IList<string> databaseNames, MigrationDirection direction)
+            {
+                _embeddedResourceProvider = new DefaultEmbeddedResourceProvider(assemblyCollection);
                 MigrationType = migrationType;
                 DatabaseNames = databaseNames;
                 Direction = direction;
@@ -96,16 +142,25 @@ namespace FluentMigrator
             /// Gets or sets the migration assemblies
             /// </summary>
             [Obsolete]
+            [CanBeNull]
             public IAssemblyCollection MigrationAssemblies { get; set; }
 
             /// <inheritdoc />
             public override void ExecuteWith(IMigrationProcessor processor)
             {
+                IReadOnlyCollection<(string name, Assembly Assembly)> resourceNames;
 #pragma warning disable 612
-                var resourceNames = MigrationAssemblies.GetManifestResourceNames()
-                    .Select(item => (name: item.Name, assembly: item.Assembly))
-                    .ToList();
+                if (MigrationAssemblies != null)
+                {
+                    resourceNames = MigrationAssemblies.GetManifestResourceNames()
+                        .Select(item => (name: item.Name, assembly: item.Assembly))
+                        .ToList();
 #pragma warning restore 612
+                }
+                else
+                {
+                    resourceNames = _embeddedResourceProvider.GetEmbeddedResources().ToList();
+                }
 
                 var embeddedResourceNameWithAssembly = GetQualifiedResourcePath(resourceNames, AutoNames.ToArray());
                 string sqlText;

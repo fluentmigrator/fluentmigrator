@@ -14,22 +14,21 @@
 // limitations under the License.
 #endregion
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-using FluentMigrator.Infrastructure;
-
 using JetBrains.Annotations;
 
-namespace FluentMigrator.Runner
+namespace FluentMigrator.Infrastructure
 {
     /// <summary>
     /// The default implementation of the <see cref="IEmbeddedResourceProvider"/> interface
     /// </summary>
     public class DefaultEmbeddedResourceProvider : IEmbeddedResourceProvider
     {
-        [NotNull, ItemNotNull]
+        [CanBeNull, ItemNotNull]
         private readonly IReadOnlyCollection<Assembly> _assemblies;
 
         /// <summary>
@@ -41,9 +40,22 @@ namespace FluentMigrator.Runner
             _assemblies = migrations.Select(m => m.GetType().Assembly).Distinct().ToList();
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DefaultEmbeddedResourceProvider"/> class.
+        /// </summary>
+        /// <param name="assemblyCollection">The assembly collection to get the ebmedded resources for</param>
+        [Obsolete]
+        public DefaultEmbeddedResourceProvider([CanBeNull] IAssemblyCollection assemblyCollection)
+        {
+            _assemblies = assemblyCollection?.Assemblies;
+        }
+
         /// <inheritdoc />
         public IEnumerable<(string name, Assembly assembly)> GetEmbeddedResources()
         {
+            if (_assemblies == null)
+                yield break;
+
             foreach (var assembly in _assemblies)
             {
                 foreach (var resourceName in assembly.GetManifestResourceNames())

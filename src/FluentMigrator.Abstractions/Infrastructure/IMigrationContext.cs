@@ -29,6 +29,11 @@ namespace FluentMigrator.Infrastructure
     public interface IMigrationContext
     {
         /// <summary>
+        /// Gets the service provider used to create this migration context
+        /// </summary>
+        IServiceProvider ServiceProvider { get; }
+
+        /// <summary>
         /// Gets or sets the collection of expressions
         /// </summary>
         ICollection<IMigrationExpression> Expressions { get; set; }

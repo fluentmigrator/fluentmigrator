@@ -16,6 +16,7 @@
 //
 #endregion
 
+using System;
 using System.Linq;
 
 using FluentMigrator.Expressions;
@@ -398,7 +399,7 @@ namespace FluentMigrator.Tests.Unit
         public void GetAutoScriptUpName()
         {
             var querySchema = new SqlServerProcessor(new[] { "SqlServer2016", "SqlServer" }, null, null, null, null, null);
-            var context = new MigrationContext(querySchema, null, null, null);
+            var context = new MigrationContext(querySchema, null, null, (IServiceProvider)null);
             var expr = new AutoScriptMigrationFake();
             expr.GetUpExpressions(context);
 
@@ -419,7 +420,7 @@ namespace FluentMigrator.Tests.Unit
         public void GetAutoScriptDownName()
         {
             var querySchema = new SqlServerProcessor(new[] { "SqlServer2016", "SqlServer" }, null, null, null, null, null);
-            var context = new MigrationContext(querySchema, null, null, null);
+            var context = new MigrationContext(querySchema, null, null, (IServiceProvider)null);
             var expr = new AutoScriptMigrationFake();
             expr.GetDownExpressions(context);
 

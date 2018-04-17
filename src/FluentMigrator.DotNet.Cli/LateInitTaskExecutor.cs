@@ -16,6 +16,7 @@
 //
 #endregion
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -37,6 +38,7 @@ namespace FluentMigrator.DotNet.Cli
             _announcer = runnerContext.Announcer;
         }
 
+        [Obsolete]
         protected override IEnumerable<Assembly> GetTargetAssemblies()
         {
             var targetAssemblies = base.GetTargetAssemblies().ToList();

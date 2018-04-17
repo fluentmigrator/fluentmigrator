@@ -21,6 +21,10 @@ using System.Collections.Generic;
 
 using FluentMigrator.Expressions;
 
+using JetBrains.Annotations;
+
+using Microsoft.Extensions.DependencyInjection;
+
 namespace FluentMigrator.Infrastructure
 {
     /// <summary>
@@ -36,13 +40,37 @@ namespace FluentMigrator.Infrastructure
         /// <param name="context">The arbitrary application context passed to the task runner</param>
         /// <param name="connection">The database connection</param>
         [Obsolete]
-        public MigrationContext(IQuerySchema querySchema, IAssemblyCollection migrationAssemblies, object context, string connection)
+        public MigrationContext([NotNull] IQuerySchema querySchema, [NotNull] IAssemblyCollection migrationAssemblies, object context, string connection)
         {
             Expressions = new List<IMigrationExpression>();
             QuerySchema = querySchema;
             MigrationAssemblies = migrationAssemblies;
             ApplicationContext = context;
             Connection = connection;
+            var services = new ServiceCollection();
+            services
+                .AddScoped(sp => migrationAssemblies)
+                .AddScoped<IEmbeddedResourceProvider, DefaultEmbeddedResourceProvider>();
+            ServiceProvider = services.BuildServiceProvider();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MigrationContext"/> class.
+        /// </summary>
+        /// <param name="querySchema">The provider used to query the database</param>
+        /// <param name="context">The arbitrary application context passed to the task runner</param>
+        /// <param name="connection">The database connection</param>
+        /// <param name="serviceProvider">The service provider</param>
+        public MigrationContext([NotNull] IQuerySchema querySchema, object context, string connection, [NotNull] IServiceProvider serviceProvider)
+        {
+            Expressions = new List<IMigrationExpression>();
+            QuerySchema = querySchema;
+#pragma warning disable CS0612 // Typ oder Element ist veraltet
+            MigrationAssemblies = serviceProvider?.GetService<IAssemblyCollection>();
+#pragma warning restore CS0612 // Typ oder Element ist veraltet
+            ApplicationContext = context;
+            Connection = connection;
+            ServiceProvider = serviceProvider;
         }
 
         /// <inheritdoc />
@@ -53,6 +81,7 @@ namespace FluentMigrator.Infrastructure
 
         /// <inheritdoc />
         [Obsolete]
+        [CanBeNull]
         public virtual IAssemblyCollection MigrationAssemblies { get; set; }
 
         /// <inheritdoc />
@@ -60,5 +89,9 @@ namespace FluentMigrator.Infrastructure
 
         /// <inheritdoc />
         public string Connection { get; set; }
+
+        /// <inheritdoc />
+        [NotNull]
+        public IServiceProvider ServiceProvider { get; }
     }
 }

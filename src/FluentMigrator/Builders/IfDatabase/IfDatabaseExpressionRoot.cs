@@ -30,6 +30,8 @@ using FluentMigrator.Builders.Schema;
 using FluentMigrator.Builders.Update;
 using FluentMigrator.Infrastructure;
 
+using Microsoft.Extensions.DependencyInjection;
+
 namespace FluentMigrator.Builders.IfDatabase
 {
     /// <summary>
@@ -184,9 +186,9 @@ namespace FluentMigrator.Builders.IfDatabase
         {
             var result = new MigrationContext(
                 new NullIfDatabaseProcessor(),
-                originalContext.MigrationAssemblies,
                 originalContext.ApplicationContext,
-                string.Empty);
+                string.Empty,
+                originalContext.ServiceProvider);
             return result;
         }
     }

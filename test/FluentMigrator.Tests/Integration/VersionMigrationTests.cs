@@ -29,6 +29,8 @@ using FluentMigrator.Runner.Versioning;
 using FluentMigrator.Runner.VersionTableInfo;
 using FluentMigrator.Tests.Unit;
 
+using Microsoft.Extensions.DependencyInjection;
+
 using NUnit.Framework;
 using NUnit.Should;
 
@@ -49,9 +51,14 @@ namespace FluentMigrator.Tests.Integration
         [Test]
         public void CanUseVersionInfo()
         {
-            ExecuteWithSupportedProcessors(processor =>
+            ExecuteWithSupportedProcessors(
+                processor =>
                 {
-                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), new RunnerContext(new TextWriterAnnouncer(TestContext.Out)) { Namespace = "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3" }, processor);
+                    var serviceProvider = Services
+                        .WithMigrationsIn("FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3")
+                        .WithProcessor(processor)
+                        .BuildServiceProvider();
+                    var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
 
                     IVersionTableMetaData tableMetaData = new DefaultVersionTableMetaData();
 

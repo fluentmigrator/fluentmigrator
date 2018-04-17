@@ -130,25 +130,7 @@ namespace FluentMigrator.Runner
         [Obsolete]
         public IVersionTableMetaData GetVersionTableMetaData()
         {
-            if (Assemblies == null)
-            {
-                var result = new DefaultVersionTableMetaData();
-                _conventionSet.SchemaConvention?.Apply(result);
-                return result;
-            }
-
-            var matchedType = Assemblies.GetExportedTypes()
-                .FilterByNamespace(Runner.RunnerContext.Namespace, Runner.RunnerContext.NestedNamespaces)
-                .FirstOrDefault(t => Conventions.TypeIsVersionTableMetaData(t));
-
-            if (matchedType == null)
-            {
-                var result = new DefaultVersionTableMetaData();
-                _conventionSet.SchemaConvention?.Apply(result);
-                return result;
-            }
-
-            return (IVersionTableMetaData) Activator.CreateInstance(matchedType);
+            return Assemblies.GetVersionTableMetaData(_conventionSet, Conventions, Runner.RunnerContext);
         }
 
         public void LoadVersionInfo()

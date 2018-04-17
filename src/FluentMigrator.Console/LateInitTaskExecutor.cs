@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 //
 // Copyright (c) 2018, FluentMigrator Project
 //
@@ -16,6 +16,7 @@
 //
 #endregion
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -35,6 +36,7 @@ namespace FluentMigrator.Console
             _announcer = runnerContext.Announcer;
         }
 
+        [Obsolete]
         protected override IEnumerable<Assembly> GetTargetAssemblies()
         {
             var targetAssemblies = base.GetTargetAssemblies().ToList();

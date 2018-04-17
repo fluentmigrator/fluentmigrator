@@ -18,8 +18,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
+using System.Reflection;
 
 using FluentMigrator.Infrastructure;
+
+using JetBrains.Annotations;
 
 namespace FluentMigrator.Expressions
 {
@@ -28,6 +31,29 @@ namespace FluentMigrator.Expressions
     /// </summary>
     public sealed class ExecuteEmbeddedSqlScriptExpression : ExecuteEmbeddedSqlScriptExpressionBase
     {
+        [NotNull]
+        private readonly IEmbeddedResourceProvider _embeddedResourceProvider;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExecuteEmbeddedSqlScriptExpression"/> class.
+        /// </summary>
+        /// <param name="embeddedResourceProvider">The embedded resource provider</param>
+        public ExecuteEmbeddedSqlScriptExpression([NotNull] IEmbeddedResourceProvider embeddedResourceProvider)
+        {
+            _embeddedResourceProvider = embeddedResourceProvider;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExecuteEmbeddedSqlScriptExpression"/> class.
+        /// </summary>
+        /// <param name="assemblyCollection">The collection of assemblies to be searched for the resources</param>
+        [Obsolete]
+        public ExecuteEmbeddedSqlScriptExpression([NotNull] IAssemblyCollection assemblyCollection)
+        {
+            MigrationAssemblies = assemblyCollection;
+            _embeddedResourceProvider = new DefaultEmbeddedResourceProvider(assemblyCollection);
+        }
+
         /// <summary>
         /// Gets or sets the SQL script name
         /// </summary>
@@ -36,17 +62,26 @@ namespace FluentMigrator.Expressions
         /// <summary>
         /// Gets or sets the migration assemblies
         /// </summary>
-        [Obsolete]
+        [Obsolete()]
+        [CanBeNull]
         public IAssemblyCollection MigrationAssemblies { get; set; }
 
         /// <inheritdoc />
         public override void ExecuteWith(IMigrationProcessor processor)
         {
+            List<(string name, Assembly assembly)> resourceNames;
 #pragma warning disable 612
-            var resourceNames = MigrationAssemblies.GetManifestResourceNames()
-                .Select(item => (name: item.Name, assembly: item.Assembly))
-                .ToList();
+            if (MigrationAssemblies != null)
+            {
+                resourceNames = MigrationAssemblies.GetManifestResourceNames()
+                    .Select(item => (name: item.Name, assembly: item.Assembly))
+                    .ToList();
 #pragma warning restore 612
+            }
+            else
+            {
+                resourceNames = _embeddedResourceProvider.GetEmbeddedResources().ToList();
+            }
 
             var embeddedResourceNameWithAssembly = GetQualifiedResourcePath(resourceNames, SqlScript);
             string sqlText;

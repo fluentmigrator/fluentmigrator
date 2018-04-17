@@ -105,7 +105,8 @@ namespace FluentMigrator.Runner
             }
             else if (_migrations != null)
             {
-                foreach (var migrationInfo in FindMigrations(Conventions, _migrations, TagsToMatch))
+                var migrationInfos = FindMigrations(Conventions, _migrations, TagsToMatch).ToList();
+                foreach (var migrationInfo in migrationInfos)
                 {
                     if (_migrationInfos.ContainsKey(migrationInfo.Version))
                     {
@@ -133,11 +134,13 @@ namespace FluentMigrator.Runner
                 throw new MissingMigrationsException("No migrations found");
             }
 
-            return
-                from migration in migrations
-                let type = migration.GetType()
-                where conventions.TypeHasMatchingTags(type, tagsToMatch) || !conventions.TypeHasTags(type)
-                select conventions.GetMigrationInfoForMigration(migration);
+            var migrationInfos =
+                (from migration in migrations
+                 let type = migration.GetType()
+                 where conventions.TypeHasMatchingTags(type, tagsToMatch) || !conventions.TypeHasTags(type)
+                 select conventions.GetMigrationInfoForMigration(migration)).ToList();
+
+            return migrationInfos;
         }
 
         [Obsolete]

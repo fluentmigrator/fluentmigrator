@@ -6,7 +6,6 @@
     <AssemblyOriginatorKeyFile>..\..\FluentMigrator.snk</AssemblyOriginatorKeyFile>
     <UserSecretsId>FluentMigrator.Tests</UserSecretsId>
     <DebugType>full</DebugType>
-    <NoWarn>$(NoWarn);612</NoWarn>
   </PropertyGroup>
   <Import Project="$(MSBuildThisFileDirectory)../../Global.proj" />
   <ItemGroup>

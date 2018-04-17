@@ -1,3 +1,5 @@
+using System;
+
 using FluentMigrator.Builders.Create.Table;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
@@ -28,7 +30,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
                 TableName = "TestTable1",
             };
 
-            new CreateTableExpressionBuilder(expression, new MigrationContext(null, null, null, null))
+            new CreateTableExpressionBuilder(expression, new MigrationContext(null, null, null, (IServiceProvider)null))
                 .WithColumn("Id").AsGuid().PrimaryKey().RowGuid();
 
             var result = Generator.Generate(expression);
