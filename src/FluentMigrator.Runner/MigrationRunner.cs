@@ -54,7 +54,6 @@ namespace FluentMigrator.Runner
 
         public IMigrationProcessor Processor { get; private set; }
 
-        [Obsolete]
         public IMigrationInformationLoader MigrationLoader { get; set; }
 
         public IProfileLoader ProfileLoader { get; set; }
@@ -127,7 +126,8 @@ namespace FluentMigrator.Runner
             [NotNull] IVersionTableMetaData versionTableMetaData,
             [NotNull] IMigrationRunnerConventions migrationRunnerConventions,
             [NotNull] IMaintenanceLoader maintenanceLoader,
-            [NotNull] IMigrationInformationLoader migrationLoader)
+            [NotNull] IMigrationInformationLoader migrationLoader,
+            [NotNull] IProfileLoader profileLoader)
         {
             _announcer = runnerContext.Announcer;
             Processor = processor;
@@ -143,10 +143,8 @@ namespace FluentMigrator.Runner
 
             _migrationScopeHandler = new MigrationScopeHandler(Processor);
             _migrationValidator = new MigrationValidator(_announcer, convSet);
-#pragma warning disable 612
             MigrationLoader = migrationLoader;
-#pragma warning restore 612
-            ProfileLoader = new ProfileLoader(runnerContext, this, Conventions);
+            ProfileLoader = profileLoader;
             MaintenanceLoader = maintenanceLoader;
 
             if (runnerContext.NoConnection)

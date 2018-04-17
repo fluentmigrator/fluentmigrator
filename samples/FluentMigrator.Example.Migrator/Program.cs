@@ -73,6 +73,12 @@ namespace FluentMigrator.Example.Migrator
                 // Configure the loader for migrations that should be executed during maintenance steps
                 .AddScoped<IMaintenanceLoader, MaintenanceLoader>()
 
+                // Configure the loader for migrations tagged for a profile
+                .AddScoped<IProfileLoader, ProfileLoader>()
+
+                // Configure the migration information loader
+                .AddScoped<IMigrationInformationLoader, DefaultMigrationInformationLoader>()
+
                 // Configure the runner context
                 .AddScoped<IRunnerContext>(sp =>
                 {
@@ -121,8 +127,7 @@ namespace FluentMigrator.Example.Migrator
         private static void ConfigureLegacyServices(IServiceCollection services)
         {
             services
-                .AddScoped<IAssemblyCollection, AssemblyCollectionService>()
-                .AddScoped<IMigrationInformationLoader, DefaultMigrationInformationLoader>();
+                .AddScoped<IAssemblyCollection, AssemblyCollectionService>();
         }
     }
 }

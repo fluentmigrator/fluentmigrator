@@ -21,10 +21,22 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Runner
 {
+    /// <summary>
+    /// Interface to load migrations tagged with a profile name
+    /// </summary>
     public interface IProfileLoader
     {
+        /// <summary>
+        /// Apply all loaded profiles
+        /// </summary>
         void ApplyProfiles();
 
+        /// <summary>
+        /// Find all profile name tagged migrations in the given assembly collection
+        /// </summary>
+        /// <param name="assemblies">The assemblies to load the profile tagged migrations from</param>
+        /// <param name="profile">The profile name to search the migrations for</param>
+        /// <returns>The found migrations</returns>
         [Obsolete]
         IEnumerable<IMigration> FindProfilesIn(IAssemblyCollection assemblies, string profile);
     }
