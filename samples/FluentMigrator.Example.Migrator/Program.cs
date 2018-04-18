@@ -25,7 +25,7 @@ namespace FluentMigrator.Example.Migrator
 {
     internal static partial class Program
     {
-        static void Main()
+        static void Main(string[] args)
         {
             // Configure the DB connection
             var dbFileName = Path.Combine(AppContext.BaseDirectory, "test.db");
@@ -35,9 +35,17 @@ namespace FluentMigrator.Example.Migrator
                 Mode = SqliteOpenMode.ReadWriteCreate
             };
 
-            RunWithServices(csb.ConnectionString);
+            // The poor mans command line parser
+            var useLegacyMode = args.Length > 0 && args[0] == "--mode=legacy";
 
-            // RunInLegacyMode(csb.ConnectionString);
+            if (!useLegacyMode)
+            {
+                RunWithServices(csb.ConnectionString);
+            }
+            else
+            {
+                RunInLegacyMode(csb.ConnectionString);
+            }
         }
     }
 }

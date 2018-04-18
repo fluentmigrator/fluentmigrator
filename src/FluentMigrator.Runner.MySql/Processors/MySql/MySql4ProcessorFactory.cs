@@ -14,15 +14,30 @@
 // limitations under the License.
 #endregion
 
+using System;
+
 using FluentMigrator.Runner.Generators.MySql;
 
 namespace FluentMigrator.Runner.Processors.MySql
 {
     public class MySql4ProcessorFactory : MigrationProcessorFactory
     {
+        private readonly IServiceProvider _serviceProvider;
+
+        [Obsolete]
+        public MySql4ProcessorFactory()
+            : this(serviceProvider: null)
+        {
+        }
+
+        public MySql4ProcessorFactory(IServiceProvider serviceProvider)
+        {
+            _serviceProvider = serviceProvider;
+        }
+
         public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
         {
-            var factory = new MySqlDbFactory();
+            var factory = new MySqlDbFactory(_serviceProvider);
             var connection = factory.CreateConnection(connectionString);
             return new MySqlProcessor(connection, new MySql4Generator(), announcer, options, factory);
         }

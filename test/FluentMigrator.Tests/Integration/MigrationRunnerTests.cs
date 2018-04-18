@@ -888,11 +888,14 @@ namespace FluentMigrator.Tests.Integration
                     .AddScoped<IRunnerContext>(sp => runnerContext)
                     .WithMigrationsIn(typeof(TenantATable).Namespace)
                     .WithProcessor(processor).BuildServiceProvider();
-                var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
 
                 try
                 {
-                    runner.MigrateUp(false);
+                    using (var scope = serviceProvider.CreateScope())
+                    {
+                        var runner = (MigrationRunner) scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
+                        runner.MigrateUp(false);
+                    }
 
                     processor.TableExists(null, "TenantATable").ShouldBeTrue();
                     processor.TableExists(null, "NormalTable").ShouldBeTrue();
@@ -901,7 +904,11 @@ namespace FluentMigrator.Tests.Integration
 
                     runnerContext.Tags = new[] { "TenantB" };
 
-                    runner.MigrateDown(0, false);
+                    using (var scope = serviceProvider.CreateScope())
+                    {
+                        var runner = (MigrationRunner)scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
+                        runner.MigrateDown(0, false);
+                    }
 
                     processor.TableExists(null, "TenantATable").ShouldBeTrue();
                     processor.TableExists(null, "NormalTable").ShouldBeFalse();
@@ -912,7 +919,11 @@ namespace FluentMigrator.Tests.Integration
                 {
                     runnerContext.Tags = new[] { "TenantA" };
 
-                    runner.RollbackToVersion(0, false);
+                    using (var scope = serviceProvider.CreateScope())
+                    {
+                        var runner = (MigrationRunner)scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
+                        runner.RollbackToVersion(0, false);
+                    }
                 }
             }, true, typeof(SQLiteProcessor));
         }
@@ -1034,8 +1045,6 @@ namespace FluentMigrator.Tests.Integration
             // Using SqlServer instead of SqlLite as versions not deleted from VersionInfo table when using Sqlite.
             var excludedProcessors = new[] { typeof(SQLiteProcessor), typeof(MySqlProcessor), typeof(PostgresProcessor) };
 
-            var assembly = typeof(User).Assembly;
-
             var runnerContext1 = new RunnerContext(new TextWriterAnnouncer(TestContext.Out)) { Namespace = typeof(Migrations.Interleaved.Pass2.User).Namespace };
             var runnerContext2 = new RunnerContext(new TextWriterAnnouncer(TestContext.Out)) { Namespace = typeof(Migrations.Interleaved.Pass3.User).Namespace };
 
@@ -1044,14 +1053,20 @@ namespace FluentMigrator.Tests.Integration
                 ExecuteWithSupportedProcessors(processor =>
                 {
                     var runner1 = Services
+                        .Reset()
                         .WithRunnerContext(runnerContext1)
+                        .WithMigrationsIn(runnerContext1.Namespace)
+                        .WithProcessor(processor)
                         .BuildServiceProvider()
                         .GetRequiredService<IMigrationRunner>();
 
                     runner1.MigrateUp(3);
 
                     var runner2 = Services
+                        .Reset()
                         .WithRunnerContext(runnerContext2)
+                        .WithMigrationsIn(runnerContext2.Namespace)
+                        .WithProcessor(processor)
                         .BuildServiceProvider()
                         .GetRequiredService<IMigrationRunner>();
 
@@ -1063,7 +1078,10 @@ namespace FluentMigrator.Tests.Integration
                 ExecuteWithSupportedProcessors(processor =>
                 {
                     var runner = Services
+                        .Reset()
                         .WithRunnerContext(runnerContext2)
+                        .WithMigrationsIn(runnerContext2.Namespace)
+                        .WithProcessor(processor)
                         .BuildServiceProvider()
                         .GetRequiredService<IMigrationRunner>();
                     runner.RollbackToVersion(0);
@@ -1702,7 +1720,9 @@ namespace FluentMigrator.Tests.Integration
                 AllowBreakingChange = true,
             };
 
-            var serviceProvider = Services
+            var services = ServiceCollectionExtensions.CreateServiceCollection();
+
+            var serviceProvider = services
                 .AddScoped<IRunnerContext>(sp => runnerContext)
                 .WithMigrationsIn(runnerContext.Namespace)
                 .WithProcessor(processor).BuildServiceProvider();

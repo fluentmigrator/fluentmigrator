@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace FluentMigrator.Runner.Initialization
@@ -12,10 +13,17 @@ namespace FluentMigrator.Runner.Initialization
 
         public string Database { get; set; }
         public string Connection { get; set; }
+
+        [Obsolete]
         public string[] Targets { get; set; }
         public bool PreviewOnly { get; set; }
+
+        [Obsolete]
         public string Namespace { get; set; }
+
+        [Obsolete]
         public bool NestedNamespaces { get; set; }
+
         public string Task { get; set; }
         public long Version { get; set; }
         public long StartVersion { get; set; }

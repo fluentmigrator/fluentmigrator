@@ -35,7 +35,12 @@ namespace FluentMigrator.Tests
     {
         public static IServiceCollection CreateServiceCollection()
         {
-            var services = new ServiceCollection();
+            return new ServiceCollection().Reset();
+        }
+
+        public static IServiceCollection Reset(this IServiceCollection services)
+        {
+            services.Clear();
             services
                 // Create the announcer to output the migration messages
                 .AddSingleton<IAnnouncer>(sp => new TextWriterAnnouncer(TestContext.Out) { ShowSql = true })

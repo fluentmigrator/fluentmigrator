@@ -17,30 +17,25 @@
 #endregion
 
 using System;
-using System.Data.Common;
-using System.Reflection;
 
 namespace FluentMigrator.Runner.Processors.Redshift
 {
     public class RedshiftDbFactory : ReflectionBasedDbFactory
     {
+        private static readonly TestEntry[] _entries =
+        {
+            new TestEntry("Npgsql", "Npgsql.NpgsqlFactory"),
+        };
+
+        [Obsolete]
         public RedshiftDbFactory()
-            : base("Npgsql", "Npgsql.NpgsqlFactory")
+            : this(null)
         {
         }
 
-        protected override DbProviderFactory CreateFactory()
+        public RedshiftDbFactory(IServiceProvider serviceProvider)
+            : base(serviceProvider, _entries)
         {
-            var assembly = AppDomain.CurrentDomain.Load("Npgsql");
-            var type = assembly.GetType("Npgsql.NpgsqlFactory");
-            var field = type.GetField("Instance", BindingFlags.Static | BindingFlags.Public);
-
-            if (field == null)
-            {
-                return base.CreateFactory();
-            }
-
-            return (DbProviderFactory)field.GetValue(null);
         }
     }
 }

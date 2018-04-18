@@ -25,6 +25,7 @@ using FluentMigrator.Runner.Processors;
 
 namespace FluentMigrator.Runner.Generators
 {
+    [Obsolete]
     public class MigrationGeneratorFactory
     {
         private static readonly IDictionary<string, IMigrationGenerator> _migrationGenerators;
@@ -55,6 +56,11 @@ namespace FluentMigrator.Runner.Generators
             _migrationGenerators = available;
         }
 
+        [Obsolete]
+        public static IEnumerable<IMigrationGenerator> RegisteredGenerators
+            => _migrationGenerators.Values;
+
+        [Obsolete]
         public virtual IMigrationGenerator GetGenerator(string name)
         {
             return _migrationGenerators
@@ -63,6 +69,7 @@ namespace FluentMigrator.Runner.Generators
                    .FirstOrDefault();
         }
 
+        [Obsolete]
         public string ListAvailableGeneratorTypes()
         {
             return string.Join(", ", _migrationGenerators.Keys.ToArray());

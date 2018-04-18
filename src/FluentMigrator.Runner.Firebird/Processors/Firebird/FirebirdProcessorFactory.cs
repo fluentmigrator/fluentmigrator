@@ -24,19 +24,30 @@ namespace FluentMigrator.Runner.Processors.Firebird
 {
     public class FirebirdProcessorFactory : MigrationProcessorFactory
     {
-        public FirebirdOptions FbOptions { get; set; }
+        private readonly IServiceProvider _serviceProvider;
 
+        [Obsolete]
         public FirebirdProcessorFactory() : this(FirebirdOptions.AutoCommitBehaviour()) { }
+
+        [Obsolete]
         public FirebirdProcessorFactory(FirebirdOptions fbOptions)
+            : this(serviceProvider: null, fbOptions)
         {
+        }
+
+        public FirebirdProcessorFactory(IServiceProvider serviceProvider, FirebirdOptions fbOptions = null)
+        {
+            _serviceProvider = serviceProvider;
             FbOptions = fbOptions ?? throw new ArgumentNullException(nameof(fbOptions));
         }
+
+        public FirebirdOptions FbOptions { get; set; }
 
         public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
         {
             var fbOpt = ((FirebirdOptions) FbOptions.Clone())
                 .ApplyProviderSwitches(options.ProviderSwitches);
-            var factory = new FirebirdDbFactory();
+            var factory = new FirebirdDbFactory(_serviceProvider);
             var connection = factory.CreateConnection(connectionString);
             return new FirebirdProcessor(connection, new FirebirdGenerator(FbOptions), announcer, options, factory, fbOpt);
         }

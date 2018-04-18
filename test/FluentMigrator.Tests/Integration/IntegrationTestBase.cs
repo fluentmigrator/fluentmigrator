@@ -168,6 +168,8 @@ namespace FluentMigrator.Tests.Integration
                 if (!isMatch(processorType))
                     continue;
 
+                Services = ServiceCollectionExtensions.CreateServiceCollection();
+
                 executed = true;
                 executeFunc(test, tryRollback, opt);
             }

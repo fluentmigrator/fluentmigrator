@@ -15,26 +15,20 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
-using JetBrains.Annotations;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace FluentMigrator.Infrastructure
+namespace FluentMigrator.Runner
 {
     /// <summary>
-    /// A compatibility service to get the assembly collection from the found migrations
+    /// An interface for configuring migration runner services
     /// </summary>
-    [Obsolete("Exists only to simplify the migration to the new FluentMigration version")]
-    public class AssemblyCollectionService : AssemblyCollection
+    [CLSCompliant(false)]
+    public interface IMigrationRunnerBuilder
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="AssemblyCollectionService"/> class.
+        /// Gets the <see cref="IServiceCollection"/> where the migration runner services are configured
         /// </summary>
-        /// <param name="migrations">The migrations to get the assemblies for</param>
-        public AssemblyCollectionService([NotNull, ItemNotNull] IEnumerable<IMigration> migrations)
-            : base(migrations.Select(m => m.GetType().Assembly).Distinct())
-        {
-        }
+        IServiceCollection Services { get; }
     }
 }

@@ -19,7 +19,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Extensions;
 using FluentMigrator.Runner.Infrastructure;
 using FluentMigrator.Runner.Processors.DB2;
@@ -36,6 +35,7 @@ using FluentMigrator.Runner.Processors.SQLite;
 
 namespace FluentMigrator.Runner.Processors
 {
+    [Obsolete("Ony the statically provided factories are accessed")]
     public class MigrationProcessorFactoryProvider
     {
         private static readonly object _lock = new object();
@@ -85,9 +85,11 @@ namespace FluentMigrator.Runner.Processors
             }
         }
 
+        [Obsolete]
         public static IEnumerable<IMigrationProcessorFactory> RegisteredFactories
             => MigrationProcessorFactories.Values;
 
+        [Obsolete]
         public static void Register(IMigrationProcessorFactory factory)
         {
             lock (_lock)
@@ -101,9 +103,11 @@ namespace FluentMigrator.Runner.Processors
             }
         }
 
+        [Obsolete]
         public static IEnumerable<string> ProcessorTypes
             => MigrationProcessorFactories.Keys;
 
+        [Obsolete]
         public virtual IMigrationProcessorFactory GetFactory(string name)
         {
             if (MigrationProcessorFactories.TryGetValue(name, out var result))
@@ -111,6 +115,7 @@ namespace FluentMigrator.Runner.Processors
             return null;
         }
 
+        [Obsolete]
         public string ListAvailableProcessorTypes()
         {
             return string.Join(", ", MigrationProcessorFactories.Keys.ToArray());

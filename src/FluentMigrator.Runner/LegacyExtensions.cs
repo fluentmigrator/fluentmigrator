@@ -17,17 +17,23 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Initialization;
+using FluentMigrator.Runner.Initialization.AssemblyLoader;
 using FluentMigrator.Runner.VersionTableInfo;
 
 using JetBrains.Annotations;
 
 namespace FluentMigrator.Runner
 {
+    /// <summary>
+    /// Extension methods
+    /// </summary>
     [Obsolete]
     internal static class LegacyExtensions
     {
@@ -76,6 +82,28 @@ namespace FluentMigrator.Runner
             }
 
             return new MigrationRunnerConventions();
+        }
+
+        /// <summary>
+        /// Get all assemblies for the given assembly names
+        /// </summary>
+        /// <param name="loaderFactory">The factory to create an <see cref="IAssemblyLoader"/> for a given assembly (file) name</param>
+        /// <param name="assemblyNames">The assembly (file) names</param>
+        /// <returns>The collection of assemblies that could be loaded</returns>
+        public static IEnumerable<Assembly> GetTargetAssemblies(
+            this AssemblyLoaderFactory loaderFactory,
+            IEnumerable<string> assemblyNames)
+        {
+            var assemblies = new HashSet<Assembly>();
+
+            foreach (var target in assemblyNames)
+            {
+                var assembly = loaderFactory.GetAssemblyLoader(target).Load();
+                if (assemblies.Add(assembly))
+                {
+                    yield return assembly;
+                }
+            }
         }
     }
 }
