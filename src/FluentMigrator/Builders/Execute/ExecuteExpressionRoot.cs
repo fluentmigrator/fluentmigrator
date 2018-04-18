@@ -19,28 +19,36 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
-using System.Runtime.CompilerServices;
-using System.Reflection;
 
 namespace FluentMigrator.Builders.Execute
 {
+    /// <summary>
+    /// The implementation of the <see cref="IExecuteExpressionRoot"/> interface.
+    /// </summary>
     public class ExecuteExpressionRoot : IExecuteExpressionRoot
     {
         private readonly IMigrationContext _context;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExecuteExpressionRoot"/> class.
+        /// </summary>
+        /// <param name="context">The migration context</param>
         public ExecuteExpressionRoot(IMigrationContext context)
         {
             _context = context;
         }
 
+        /// <inheritdoc />
         public void Sql(string sqlStatement)
         {
             var expression = new ExecuteSqlStatementExpression { SqlStatement = sqlStatement };
             _context.Expressions.Add(expression);
         }
 
+        /// <inheritdoc />
         public void Script(string pathToSqlScript, IDictionary<string, string> parameters)
         {
             var expression = new ExecuteSqlScriptExpression
@@ -52,24 +60,28 @@ namespace FluentMigrator.Builders.Execute
             _context.Expressions.Add(expression);
         }
 
+        /// <inheritdoc />
         public void Script(string pathToSqlScript)
         {
             var expression = new ExecuteSqlScriptExpression { SqlScript = pathToSqlScript };
             _context.Expressions.Add(expression);
         }
 
+        /// <inheritdoc />
         public void WithConnection(Action<IDbConnection, IDbTransaction> operation)
         {
             var expression = new PerformDBOperationExpression { Operation = operation };
             _context.Expressions.Add(expression);
         }
 
+        /// <inheritdoc />
         public void EmbeddedScript(string embeddedSqlScriptName)
         {
             var expression = new ExecuteEmbeddedSqlScriptExpression { SqlScript = embeddedSqlScriptName, MigrationAssemblies = _context.MigrationAssemblies };
             _context.Expressions.Add(expression);
         }
 
+        /// <inheritdoc />
         public void EmbeddedScript(string embeddedSqlScriptName, IDictionary<string, string> parameters)
         {
             var expression = new ExecuteEmbeddedSqlScriptExpression

@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -20,6 +20,9 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Schema.Constraint
 {
+    /// <summary>
+    /// The implementation of the <see cref="ISchemaConstraintSyntax"/> interface.
+    /// </summary>
     public class SchemaConstraintQuery : ISchemaConstraintSyntax
     {
         private readonly string _schemaName;
@@ -27,6 +30,13 @@ namespace FluentMigrator.Builders.Schema.Constraint
         private readonly string _constraintName;
         private readonly IMigrationContext _context;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SchemaConstraintQuery"/> class.
+        /// </summary>
+        /// <param name="schemaName">The schema name</param>
+        /// <param name="tableName">The table name</param>
+        /// <param name="constraintName">The constraint name</param>
+        /// <param name="context">The migration context</param>
         public SchemaConstraintQuery(string schemaName, string tableName, string constraintName, IMigrationContext context)
         {
             _schemaName = schemaName;
@@ -35,6 +45,7 @@ namespace FluentMigrator.Builders.Schema.Constraint
             _context = context;
         }
 
+        /// <inheritdoc />
         public bool Exists()
         {
             return _context.QuerySchema.ConstraintExists(_schemaName, _tableName, _constraintName);

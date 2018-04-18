@@ -5,223 +5,272 @@ using FluentMigrator.Model;
 
 namespace FluentMigrator.Builders
 {
-    public abstract class ExpressionBuilderWithColumnTypesBase<ExpressionT, NextT> : ExpressionBuilderBase<ExpressionT>
-        where ExpressionT : IMigrationExpression
-        where NextT : IFluentSyntax
+    /// <summary>
+    /// A base class for expressions that affect column types
+    /// </summary>
+    /// <remarks>
+    /// This class will be removed as soon as C# supports default interface methods.
+    /// </remarks>
+    /// <typeparam name="TExpression">The migration expression</typeparam>
+    /// <typeparam name="TNext">The next type</typeparam>
+    public abstract class ExpressionBuilderWithColumnTypesBase<TExpression, TNext> : ExpressionBuilderBase<TExpression>, IColumnTypeSyntax<TNext>
+        where TExpression : class, IMigrationExpression
+        where TNext : IFluentSyntax
     {
-        protected ExpressionBuilderWithColumnTypesBase(ExpressionT expression)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExpressionBuilderWithColumnTypesBase{TExpression,TNext}"/> class.
+        /// </summary>
+        /// <param name="expression">The underlying expression</param>
+        protected ExpressionBuilderWithColumnTypesBase(TExpression expression)
             : base(expression)
         {
         }
 
+        /// <summary>
+        /// Returns the column definition to set the type for
+        /// </summary>
+        /// <returns>The column definition to set the type for</returns>
         public abstract ColumnDefinition GetColumnForType();
 
-        private ColumnDefinition Column
-        {
-            get { return GetColumnForType(); }
-        }
+        /// <summary>
+        /// Gets the current column definition
+        /// </summary>
+        private ColumnDefinition Column => GetColumnForType();
 
-        public NextT AsAnsiString()
+        /// <inheritdoc />
+        public TNext AsAnsiString()
         {
             SetColumnAsString(DbType.AnsiString);
-            return (NextT)(object)this;
+            return (TNext)(object)this;
         }
 
-        public NextT AsAnsiString(string collationName)
+        /// <inheritdoc />
+        public TNext AsAnsiString(string collationName)
         {
             SetColumnAsString(dbType: DbType.AnsiString, collationName: collationName);
-            return (NextT)(object)this;
+            return (TNext)(object)this;
         }
 
-        public NextT AsAnsiString(int size)
+        /// <inheritdoc />
+        public TNext AsAnsiString(int size)
         {
             SetColumnAsString(DbType.AnsiString, size);
-            return (NextT)(object)this;
+            return (TNext)(object)this;
         }
 
-        public NextT AsAnsiString(int size, string collationName)
+        /// <inheritdoc />
+        public TNext AsAnsiString(int size, string collationName)
         {
             SetColumnAsString(DbType.AnsiString, size, collationName);
-            return (NextT)(object)this;
+            return (TNext)(object)this;
         }
 
-        public NextT AsBinary()
+        /// <inheritdoc />
+        public TNext AsBinary()
         {
             Column.Type = DbType.Binary;
-            return (NextT)(object)this;
+            return (TNext)(object)this;
         }
 
-        public NextT AsBinary(int size)
+        /// <inheritdoc />
+        public TNext AsBinary(int size)
         {
             Column.Type = DbType.Binary;
             Column.Size = size;
-            return (NextT)(object)this;
+            return (TNext)(object)this;
         }
 
-        public NextT AsBoolean()
+        /// <inheritdoc />
+        public TNext AsBoolean()
         {
             Column.Type = DbType.Boolean;
-            return (NextT)(object)this;
+            return (TNext)(object)this;
         }
 
-        public NextT AsByte()
+        /// <inheritdoc />
+        public TNext AsByte()
         {
             Column.Type = DbType.Byte;
-            return (NextT)(object)this;
+            return (TNext)(object)this;
         }
 
-        public NextT AsCurrency()
+        /// <inheritdoc />
+        public TNext AsCurrency()
         {
             Column.Type = DbType.Currency;
-            return (NextT)(object)this;
+            return (TNext)(object)this;
         }
 
-        public NextT AsDate()
+        /// <inheritdoc />
+        public TNext AsDate()
         {
             Column.Type = DbType.Date;
-            return (NextT)(object)this;
+            return (TNext)(object)this;
         }
 
-        public NextT AsDateTime()
+        /// <inheritdoc />
+        public TNext AsDateTime()
         {
             Column.Type = DbType.DateTime;
-            return (NextT)(object)this;
+            return (TNext)(object)this;
         }
 
-        public NextT AsDateTime2()
+        /// <inheritdoc />
+        public TNext AsDateTime2()
         {
             Column.Type = DbType.DateTime2;
-            return (NextT)(object)this;
+            return (TNext)(object)this;
         }
 
-        public NextT AsDateTimeOffset()
+        /// <inheritdoc />
+        public TNext AsDateTimeOffset()
         {
             Column.Type = DbType.DateTimeOffset;
-            return (NextT)(object)this;
+            return (TNext)(object)this;
         }
 
-        public NextT AsDecimal()
+        /// <inheritdoc />
+        public TNext AsDecimal()
         {
             Column.Type = DbType.Decimal;
-            return (NextT)(object)this;
+            return (TNext)(object)this;
         }
 
-        public NextT AsDecimal(int size, int precision)
+        /// <inheritdoc />
+        public TNext AsDecimal(int size, int precision)
         {
             Column.Type = DbType.Decimal;
             Column.Size = size;
             Column.Precision = precision;
-            return (NextT)(object)this;
+            return (TNext)(object)this;
         }
 
-        public NextT AsDouble()
+        /// <inheritdoc />
+        public TNext AsDouble()
         {
             Column.Type = DbType.Double;
-            return (NextT)(object)this;
+            return (TNext)(object)this;
         }
 
-        public NextT AsFixedLengthString(int size)
+        /// <inheritdoc />
+        public TNext AsFixedLengthString(int size)
         {
             SetColumnAsString(DbType.StringFixedLength, size);
-            return (NextT)(object)this;
+            return (TNext)(object)this;
         }
 
-        public NextT AsFixedLengthString(int size, string collationName)
+        /// <inheritdoc />
+        public TNext AsFixedLengthString(int size, string collationName)
         {
             SetColumnAsString(DbType.StringFixedLength, size, collationName);
-            return (NextT)(object)this;
+            return (TNext)(object)this;
         }
 
-        public NextT AsFixedLengthAnsiString(int size)
+        /// <inheritdoc />
+        public TNext AsFixedLengthAnsiString(int size)
         {
             SetColumnAsString(DbType.AnsiStringFixedLength, size);
-            return (NextT)(object)this;
+            return (TNext)(object)this;
         }
 
-        public NextT AsFixedLengthAnsiString(int size, string collationName)
+        /// <inheritdoc />
+        public TNext AsFixedLengthAnsiString(int size, string collationName)
         {
             SetColumnAsString(DbType.AnsiStringFixedLength, size, collationName);
-            return (NextT)(object)this;
+            return (TNext)(object)this;
         }
 
-        public NextT AsFloat()
+        /// <inheritdoc />
+        public TNext AsFloat()
         {
             Column.Type = DbType.Single;
-            return (NextT)(object)this;
+            return (TNext)(object)this;
         }
 
-        public NextT AsGuid()
+        /// <inheritdoc />
+        public TNext AsGuid()
         {
             Column.Type = DbType.Guid;
-            return (NextT)(object)this;
+            return (TNext)(object)this;
         }
 
-        public NextT AsInt16()
+        /// <inheritdoc />
+        public TNext AsInt16()
         {
             Column.Type = DbType.Int16;
-            return (NextT)(object)this;
+            return (TNext)(object)this;
         }
 
-        public NextT AsInt32()
+        /// <inheritdoc />
+        public TNext AsInt32()
         {
             Column.Type = DbType.Int32;
-            return (NextT)(object)this;
+            return (TNext)(object)this;
         }
 
-        public NextT AsInt64()
+        /// <inheritdoc />
+        public TNext AsInt64()
         {
             Column.Type = DbType.Int64;
-            return (NextT)(object)this;
+            return (TNext)(object)this;
         }
 
-        public NextT AsString()
+        /// <inheritdoc />
+        public TNext AsString()
         {
             SetColumnAsString(DbType.String);
-            return (NextT)(object)this;
+            return (TNext)(object)this;
         }
 
-        public NextT AsString(string collationName)
+        /// <inheritdoc />
+        public TNext AsString(string collationName)
         {
             SetColumnAsString(dbType: DbType.String, collationName: collationName);
-            return (NextT)(object)this;
+            return (TNext)(object)this;
         }
 
-        public NextT AsString(int size)
+        /// <inheritdoc />
+        public TNext AsString(int size)
         {
             SetColumnAsString(DbType.String, size);
-            return (NextT)(object)this;
+            return (TNext)(object)this;
         }
 
-        public NextT AsString(int size, string collationName)
+        /// <inheritdoc />
+        public TNext AsString(int size, string collationName)
         {
             SetColumnAsString(DbType.String, size, collationName);
-            return (NextT)(object)this;
+            return (TNext)(object)this;
         }
 
-        public NextT AsTime()
+        /// <inheritdoc />
+        public TNext AsTime()
         {
             Column.Type = DbType.Time;
-            return (NextT)(object)this;
+            return (TNext)(object)this;
         }
 
-        public NextT AsXml()
+        /// <inheritdoc />
+        public TNext AsXml()
         {
             Column.Type = DbType.Xml;
-            return (NextT)(object)this;
+            return (TNext)(object)this;
         }
 
-        public NextT AsXml(int size)
+        /// <inheritdoc />
+        public TNext AsXml(int size)
         {
             Column.Type = DbType.Xml;
             Column.Size = size;
-            return (NextT)(object)this;
+            return (TNext)(object)this;
         }
 
-        public NextT AsCustom(string customType)
+        /// <inheritdoc />
+        public TNext AsCustom(string customType)
         {
             Column.Type = null;
             Column.CustomType = customType;
-            return (NextT)(object)this;
+            return (TNext)(object)this;
         }
 
         private void SetColumnAsString(DbType dbType, int size = -100, string collationName = "")

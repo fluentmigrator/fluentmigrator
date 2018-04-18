@@ -21,13 +21,21 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Create.Schema
 {
+    /// <summary>
+    /// An expression builder for a <see cref="CreateSchemaExpression"/>
+    /// </summary>
     public class CreateSchemaExpressionBuilder : ExpressionBuilderBase<CreateSchemaExpression>, ICreateSchemaOptionsSyntax, ISupportAdditionalFeatures
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CreateSchemaExpressionBuilder"/> class.
+        /// </summary>
+        /// <param name="expression">The underlying expression</param>
         public CreateSchemaExpressionBuilder(CreateSchemaExpression expression)
             : base(expression)
         {
         }
 
+        /// <inheritdoc />
         public IDictionary<string, object> AdditionalFeatures => Expression.AdditionalFeatures;
     }
 }

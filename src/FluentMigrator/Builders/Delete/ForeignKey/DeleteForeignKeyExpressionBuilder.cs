@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -20,6 +20,9 @@ using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Builders.Delete.ForeignKey
 {
+    /// <summary>
+    /// An expression builder for a <see cref="DeleteForeignKeyExpression"/>
+    /// </summary>
     public class DeleteForeignKeyExpressionBuilder : ExpressionBuilderBase<DeleteForeignKeyExpression>,
         IDeleteForeignKeyFromTableSyntax,
         IDeleteForeignKeyForeignColumnOrInSchemaSyntax,
@@ -28,29 +31,37 @@ namespace FluentMigrator.Builders.Delete.ForeignKey
         IDeleteForeignKeyOnTableSyntax,
         IInSchemaSyntax
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DeleteForeignKeyExpressionBuilder"/> class.
+        /// </summary>
+        /// <param name="expression">The underlying expression</param>
         public DeleteForeignKeyExpressionBuilder(DeleteForeignKeyExpression expression)
             : base(expression)
         {
         }
 
+        /// <inheritdoc />
         public IDeleteForeignKeyForeignColumnOrInSchemaSyntax FromTable(string foreignTableName)
         {
             Expression.ForeignKey.ForeignTable = foreignTableName;
             return this;
         }
 
+        /// <inheritdoc />
         public IDeleteForeignKeyForeignColumnSyntax InSchema(string foreignSchemaName)
         {
             Expression.ForeignKey.ForeignTableSchema = foreignSchemaName;
             return this;
         }
 
+        /// <inheritdoc />
         public IDeleteForeignKeyToTableSyntax ForeignColumn(string column)
         {
             Expression.ForeignKey.ForeignColumns.Add(column);
             return this;
         }
 
+        /// <inheritdoc />
         public IDeleteForeignKeyToTableSyntax ForeignColumns(params string[] columns)
         {
             foreach (var column in columns)
@@ -59,29 +70,34 @@ namespace FluentMigrator.Builders.Delete.ForeignKey
             return this;
         }
 
+        /// <inheritdoc />
         public IDeleteForeignKeyPrimaryColumnSyntax ToTable(string table)
         {
             Expression.ForeignKey.PrimaryTable = table;
             return this;
         }
 
+        /// <inheritdoc />
         public void PrimaryColumn(string column)
         {
             Expression.ForeignKey.PrimaryColumns.Add(column);
         }
 
+        /// <inheritdoc />
         public void PrimaryColumns(params string[] columns)
         {
             foreach (var column in columns)
                 Expression.ForeignKey.PrimaryColumns.Add(column);
         }
 
+        /// <inheritdoc />
         IInSchemaSyntax IDeleteForeignKeyOnTableSyntax.OnTable(string foreignTableName)
         {
             Expression.ForeignKey.ForeignTable = foreignTableName;
             return this;
         }
 
+        /// <inheritdoc />
         void IInSchemaSyntax.InSchema(string schemaName)
         {
             Expression.ForeignKey.ForeignTableSchema = schemaName;

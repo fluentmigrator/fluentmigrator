@@ -22,8 +22,21 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator
 {
+    /// <summary>
+    /// Migration that automatically uses embedded SQL scripts depending on the database type name
+    /// </summary>
+    /// <remarks>
+    /// The embedded SQL scripts must end in <c>Scripts.{Direction}.{Version}_{DerivedTypeName}_{DatabaseType}.sql</c>.
+    /// <para>The <c>{Direction}</c> can be <c>Up</c> or <c>Down</c>.</para>
+    /// <para>The <c>{Version}</c> is the migration version.</para>
+    /// <para>The <c>{DerivedTypeName}</c> is the name of the type derived from <see cref="AutoScriptMigration"/>.</para>
+    /// <para>The <c>{DatabaseType}</c> is the database type name. For SQL Server 2016, the variants <c>SqlServer2016</c>,
+    /// <c>SqlServer</c>, and <c>Generic</c> will be tested.</para>
+    /// <para>The behavior may be overriden by providing a custom <c>FluentMigrator.Runner.Conventions.IAutoNameConvention</c>.</para>
+    /// </remarks>
     public abstract class AutoScriptMigration : MigrationBase
     {
+        /// <inheritdoc />
         public sealed override void Up()
         {
             var expression = new ExecuteEmbeddedAutoSqlScriptExpression(
@@ -36,6 +49,7 @@ namespace FluentMigrator
             _context.Expressions.Add(expression);
         }
 
+        /// <inheritdoc />
         public sealed override void Down()
         {
             var expression = new ExecuteEmbeddedAutoSqlScriptExpression(

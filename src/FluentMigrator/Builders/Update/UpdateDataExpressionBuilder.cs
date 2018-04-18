@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -23,35 +23,47 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Update
 {
+    /// <summary>
+    /// An expression builder for a <see cref="UpdateDataExpression"/>
+    /// </summary>
     public class UpdateDataExpressionBuilder : IUpdateSetOrInSchemaSyntax,
         IUpdateWhereSyntax
     {
         private readonly UpdateDataExpression _expression;
         private readonly IMigrationContext _context;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UpdateDataExpressionBuilder"/> class.
+        /// </summary>
+        /// <param name="expression">The underlying expression</param>
+        /// <param name="context">The migration context</param>
         public UpdateDataExpressionBuilder(UpdateDataExpression expression, IMigrationContext context)
         {
             _context = context;
             _expression = expression;
         }
 
+        /// <inheritdoc />
         public IUpdateSetSyntax InSchema(string schemaName)
         {
             _expression.SchemaName = schemaName;
             return this;
         }
 
+        /// <inheritdoc />
         public IUpdateWhereSyntax Set(object dataAsAnonymousType)
         {
             _expression.Set = GetData(dataAsAnonymousType);
             return this;
         }
 
+        /// <inheritdoc />
         public void Where(object dataAsAnonymousType)
         {
             _expression.Where = GetData(dataAsAnonymousType);
         }
 
+        /// <inheritdoc />
         public void AllRows()
         {
             _expression.IsAllRows = true;

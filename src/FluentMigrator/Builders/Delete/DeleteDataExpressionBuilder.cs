@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -18,20 +18,29 @@
 
 using System.Collections.Generic;
 using System.ComponentModel;
+
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 
 namespace FluentMigrator.Builders.Delete
 {
+    /// <summary>
+    /// An expression builder for a <see cref="DeleteDataExpression"/>
+    /// </summary>
     public class DeleteDataExpressionBuilder : IDeleteDataOrInSchemaSyntax
     {
         private readonly DeleteDataExpression _expression;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DeleteDataExpressionBuilder"/> class.
+        /// </summary>
+        /// <param name="expression">The underlying expression</param>
         public DeleteDataExpressionBuilder(DeleteDataExpression expression)
         {
             _expression = expression;
         }
 
+        /// <inheritdoc />
         public void IsNull(string columnName)
         {
             _expression.Rows.Add(new DeletionDataDefinition
@@ -40,18 +49,21 @@ namespace FluentMigrator.Builders.Delete
                                     });
         }
 
+        /// <inheritdoc />
         public IDeleteDataSyntax Row(object dataAsAnonymousType)
         {
             _expression.Rows.Add(GetData(dataAsAnonymousType));
             return this;
         }
 
+        /// <inheritdoc />
         public IDeleteDataSyntax InSchema(string schemaName)
         {
             _expression.SchemaName = schemaName;
             return this;
         }
 
+        /// <inheritdoc />
         public void AllRows()
         {
             _expression.IsAllRows = true;

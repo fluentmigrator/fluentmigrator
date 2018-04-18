@@ -22,12 +22,20 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator
 {
+    /// <summary>
+    /// A migration base class that will automatically generate the down expressions
+    /// </summary>
+    /// <remarks>
+    /// This only works for some expressions like CREATE TABLE, but not for DROP TABLE.
+    /// </remarks>
     public abstract class AutoReversingMigration : MigrationBase
     {
+        /// <inheritdoc />
         public sealed override void Down()
         {
         }
 
+        /// <inheritdoc />
         public override void GetDownExpressions(IMigrationContext context)
         {
             GetUpExpressions(context);

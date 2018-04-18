@@ -26,39 +26,49 @@ namespace FluentMigrator.Builders.IfDatabase
     /// </summary>
     public class NullIfDatabaseProcessor : IQuerySchema
     {
+        /// <inheritdoc />
+        public string DatabaseType => "Unknown";
+
+        /// <inheritdoc />
+        public IList<string> DatabaseTypeAliases { get; } = new List<string>();
+
+        /// <inheritdoc />
         public bool SequenceExists(string schemaName, string sequenceName)
         {
             return false;
         }
 
+        /// <inheritdoc />
         public bool DefaultValueExists(string schemaName, string tableName, string columnName, object defaultValue)
         {
             return false;
         }
 
-        public string DatabaseType { get { return "Unknown"; } }
-        public IList<string> DatabaseTypeAliases { get; } = new List<string>();
-
+        /// <inheritdoc />
         public bool SchemaExists(string schemaName)
         {
             return false;
         }
 
+        /// <inheritdoc />
         public bool TableExists(string schemaName, string tableName)
         {
             return false;
         }
 
+        /// <inheritdoc />
         public bool ColumnExists(string schemaName, string tableName, string columnName)
         {
             return false;
         }
 
+        /// <inheritdoc />
         public bool ConstraintExists(string schemaName, string tableName, string constraintName)
         {
             return false;
         }
 
+        /// <inheritdoc />
         public bool IndexExists(string schemaName, string tableName, string indexName)
         {
             return false;

@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -20,26 +20,36 @@ using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Builders.Delete.Column
 {
+    /// <summary>
+    /// An expression builder for a <see cref="DeleteColumnExpression"/>
+    /// </summary>
     public class DeleteColumnExpressionBuilder : ExpressionBuilderBase<DeleteColumnExpression>,
         IDeleteColumnFromTableSyntax, IInSchemaSyntax
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DeleteColumnExpressionBuilder"/> class.
+        /// </summary>
+        /// <param name="expression">The underlying expression</param>
         public DeleteColumnExpressionBuilder(DeleteColumnExpression expression)
             : base(expression)
         {
         }
 
+        /// <inheritdoc />
         public IInSchemaSyntax FromTable(string tableName)
         {
             Expression.TableName = tableName;
             return this;
         }
 
-        public IDeleteColumnFromTableSyntax Column(string columnName) 
+        /// <inheritdoc />
+        public IDeleteColumnFromTableSyntax Column(string columnName)
         {
             Expression.ColumnNames.Add(columnName);
             return this;
         }
 
+        /// <inheritdoc />
         public void InSchema(string schemaName)
         {
             Expression.SchemaName = schemaName;
