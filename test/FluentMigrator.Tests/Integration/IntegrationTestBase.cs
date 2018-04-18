@@ -257,7 +257,7 @@ namespace FluentMigrator.Tests.Integration
             var announcer = new TextWriterAnnouncer(TestContext.Out);
             announcer.Heading("Testing Migration against SQLite");
 
-            var factory = new SQLiteDbFactory();
+            var factory = new SQLiteDbFactory(serviceProvider: null);
             using (var connection = new SqliteConnection(serverOptions.ConnectionString))
             {
                 var processor = new SQLiteProcessor(connection, new SQLiteGenerator(), announcer, new ProcessorOptions(), factory);
@@ -302,7 +302,7 @@ namespace FluentMigrator.Tests.Integration
 
             using (var connection = new NpgsqlConnection(serverOptions.ConnectionString))
             {
-                var processor = new PostgresProcessor(connection, new PostgresGenerator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), new PostgresDbFactory());
+                var processor = new PostgresProcessor(connection, new PostgresGenerator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), new PostgresDbFactory(serviceProvider: null));
 
                 test(processor);
 
@@ -323,7 +323,7 @@ namespace FluentMigrator.Tests.Integration
 
             using (var connection = new MySqlConnection(serverOptions.ConnectionString))
             {
-                var processor = new MySqlProcessor(connection, new MySql4Generator(), announcer, new ProcessorOptions(), new MySqlDbFactory());
+                var processor = new MySqlProcessor(connection, new MySql4Generator(), announcer, new ProcessorOptions(), new MySqlDbFactory(serviceProvider: null));
                 test(processor);
 
                 if (tryRollback && !processor.WasCommitted)
@@ -351,7 +351,7 @@ namespace FluentMigrator.Tests.Integration
             using (var connection = new FbConnection(serverOptions.ConnectionString))
             {
                 var options = FirebirdOptions.AutoCommitBehaviour();
-                var processor = new FirebirdProcessor(connection, new FirebirdGenerator(options), announcer, new ProcessorOptions(), new FirebirdDbFactory(), options);
+                var processor = new FirebirdProcessor(connection, new FirebirdGenerator(options), announcer, new ProcessorOptions(), new FirebirdDbFactory(serviceProvider: null), options);
 
                 try
                 {

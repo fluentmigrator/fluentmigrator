@@ -569,7 +569,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             announcer.ShowSql = true;
             var options = FirebirdOptions.AutoCommitBehaviour();
             processor = new FirebirdProcessor(connection, new FirebirdGenerator(options), announcer,
-                new ProcessorOptions(), new FirebirdDbFactory(), options);
+                new ProcessorOptions(), new FirebirdDbFactory(serviceProvider: null), options);
             var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), runnerContext, processor);
             return runner;
         }
@@ -685,7 +685,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                     var options = FirebirdOptions.AutoCommitBehaviour();
                     options.TruncateLongNames = false;
                     processor = new FirebirdProcessor(connection, new FirebirdGenerator(options), announcer,
-                        new ProcessorOptions(), new FirebirdDbFactory(), options);
+                        new ProcessorOptions(), new FirebirdDbFactory(serviceProvider: null), options);
                     var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), runnerContext, processor);
                     runner.Up(new MigrationWhichCreatesTwoRelatedTables());
                     processor.CommitTransaction();
@@ -702,7 +702,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                     announcer.ShowSql = true;
                     var options = FirebirdOptions.AutoCommitBehaviour();
                     processor = new FirebirdProcessor(connection, new FirebirdGenerator(options), announcer,
-                        new ProcessorOptions(), new FirebirdDbFactory(), options);
+                        new ProcessorOptions(), new FirebirdDbFactory(serviceProvider: null), options);
                     var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), runnerContext, processor);
                     runner.Up(new MigrationWhichAltersTableWithFK());
                     processor.CommitTransaction();

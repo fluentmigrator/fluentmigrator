@@ -30,7 +30,7 @@ namespace FluentMigrator.Tests.Helpers
             Connection = processor.Connection;
             Transaction = processor.Transaction;
             Processor = processor;
-            Factory = new Db2DbFactory();
+            Factory = new Db2DbFactory(serviceProvider: null);
             _schema = schema;
 
             if (Connection.State != ConnectionState.Open)
@@ -46,7 +46,7 @@ namespace FluentMigrator.Tests.Helpers
             Connection = processor.Connection;
             Transaction = processor.Transaction;
             Processor = processor;
-            Factory = new Db2DbFactory();
+            Factory = new Db2DbFactory(serviceProvider: null);
             _schema = schema;
 
             if (Connection.State != ConnectionState.Open)

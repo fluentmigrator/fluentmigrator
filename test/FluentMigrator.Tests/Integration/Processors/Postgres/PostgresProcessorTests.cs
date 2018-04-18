@@ -48,7 +48,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
                 Assert.Ignore();
             Connection = new NpgsqlConnection(IntegrationTestOptions.Postgres.ConnectionString);
             Processor = new PostgresProcessor(Connection, new PostgresGenerator(),
-                new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), new PostgresDbFactory());
+                new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), new PostgresDbFactory(serviceProvider: null));
             Connection.Open();
         }
 
@@ -172,7 +172,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
                 new PostgresGenerator(),
                 new TextWriterAnnouncer(output),
                 new ProcessorOptions { PreviewOnly = true },
-                new PostgresDbFactory());
+                new PostgresDbFactory(serviceProvider: null));
 
             bool tableExists;
 

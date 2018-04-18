@@ -38,6 +38,12 @@ namespace FluentMigrator.Tests
             return new ServiceCollection().Reset();
         }
 
+        public static IServiceCollection CreateServices(this IMigrationProcessor processor)
+        {
+            return CreateServiceCollection()
+                .WithProcessor(processor);
+        }
+
         public static IServiceCollection Reset(this IServiceCollection services)
         {
             services.Clear();
@@ -116,6 +122,11 @@ namespace FluentMigrator.Tests
             return services
                 .AddScoped(sp => runnerContext);
         }
+
+        public static IServiceCollection WithRunnerContext(this IServiceCollection services, Func<IServiceProvider, IRunnerContext> runnerContextFunc)
+        {
+            return services
+                .AddScoped(runnerContextFunc);
+        }
     }
 }
-

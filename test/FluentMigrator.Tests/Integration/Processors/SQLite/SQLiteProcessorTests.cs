@@ -49,7 +49,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
         public void SetUp()
         {
             // This connection used in the tests
-            _dbFactory = new SQLiteDbFactory();
+            _dbFactory = new SQLiteDbFactory(serviceProvider: null);
             _connection = _dbFactory.CreateConnection(IntegrationTestOptions.SqlLite.ConnectionString);
             _connection.Open();
             _command = _connection.CreateCommand();
@@ -152,7 +152,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
                 new SQLiteGenerator(),
                 new TextWriterAnnouncer(output),
                 new ProcessorOptions { PreviewOnly = true },
-                new SQLiteDbFactory());
+                new SQLiteDbFactory(serviceProvider: null));
 
             bool tableExists;
 

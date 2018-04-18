@@ -79,7 +79,10 @@ namespace FluentMigrator.Tests.Integration
         {
             ExecuteWithSupportedProcessors(processor =>
             {
-                var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), new RunnerContext(new TextWriterAnnouncer(TestContext.Out)) { Namespace = "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3" }, processor);
+                var services = processor.CreateServices()
+                    .WithMigrationsIn("FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3")
+                    .AddSingleton<IVersionTableMetaData, TestVersionTableMetaData>();
+                var runner = services.BuildServiceProvider().GetRequiredService<IMigrationRunner>();
 
                 var tableMetaData = new TestVersionTableMetaData();
 
@@ -91,17 +94,14 @@ namespace FluentMigrator.Tests.Integration
                 if (processor.SchemaExists(tableMetaData.SchemaName))
                     runner.Down(new VersionSchemaMigration(tableMetaData));
 
+                runner.MigrateUp(200909060930);
 
-                runner.Up(new VersionSchemaMigration(tableMetaData));
                 processor.SchemaExists(tableMetaData.SchemaName).ShouldBeTrue();
-
-                runner.Up(new VersionMigration(tableMetaData));
                 processor.TableExists(tableMetaData.SchemaName, tableMetaData.TableName).ShouldBeTrue();
 
-                runner.Down(new VersionMigration(tableMetaData));
-                processor.TableExists(tableMetaData.SchemaName, tableMetaData.TableName).ShouldBeFalse();
+                runner.RollbackToVersion(0);
 
-                runner.Down(new VersionSchemaMigration(tableMetaData));
+                processor.TableExists(tableMetaData.SchemaName, tableMetaData.TableName).ShouldBeFalse();
                 processor.SchemaExists(tableMetaData.SchemaName).ShouldBeFalse();
             }, true, typeof(SQLiteProcessor), typeof(MySqlProcessor), typeof(FirebirdProcessor), typeof(SqlAnywhereProcessor));
         }
@@ -111,19 +111,27 @@ namespace FluentMigrator.Tests.Integration
         {
             ExecuteWithSupportedProcessors(processor =>
             {
-                var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), new RunnerContext(new TextWriterAnnouncer(TestContext.Out)) { Namespace = "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3" }, processor);
+                var services = processor.CreateServices()
+                    .WithMigrationsIn("FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3")
+                    .AddSingleton<IVersionTableMetaData>(
+                        sp => new TestVersionTableMetaData()
+                        {
+                            SchemaName = null
+                        });
+                var runner = services.BuildServiceProvider().GetRequiredService<IMigrationRunner>();
 
                 IVersionTableMetaData tableMetaData = new TestVersionTableMetaData { SchemaName = null };
-
 
                 //ensure table doesn't exist
                 if (processor.TableExists(tableMetaData.SchemaName, tableMetaData.TableName))
                     runner.Down(new VersionMigration(tableMetaData));
 
-                runner.Up(new VersionMigration(tableMetaData));
+                runner.MigrateUp(200909060930);
+
                 processor.TableExists(null, tableMetaData.TableName).ShouldBeTrue();
 
-                runner.Down(new VersionMigration(tableMetaData));
+                runner.RollbackToVersion(0);
+
                 processor.TableExists(null, tableMetaData.TableName).ShouldBeFalse();
             });
         }

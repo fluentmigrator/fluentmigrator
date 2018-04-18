@@ -393,7 +393,13 @@ namespace FluentMigrator.Tests.Unit
         }
 
         [Migration(20130508175300)]
-        class AutoScriptMigrationFake : AutoScriptMigration { }
+        class AutoScriptMigrationFake : AutoScriptMigration
+        {
+            public AutoScriptMigrationFake()
+                : base(embeddedResourceProvider: null)
+            {
+            }
+        }
 
         [Test]
         public void GetAutoScriptUpName()

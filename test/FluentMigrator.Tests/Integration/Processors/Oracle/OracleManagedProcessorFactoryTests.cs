@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Collections.Generic;
 using System;
 
@@ -13,7 +13,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
         [SetUp]
         public void SetUp()
         {
-            base.SetUp( new OracleManagedProcessorFactory() );
+            base.SetUp( new OracleManagedProcessorFactory(serviceProvider: null) );
         }
     }
 }

@@ -32,7 +32,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
             Output = new StringWriter();
             Connection = new HanaConnection(IntegrationTestOptions.Hana.ConnectionString);
             Processor = new HanaProcessor(Connection, new HanaGenerator(), new TextWriterAnnouncer(Output),
-                new ProcessorOptions() { PreviewOnly = true }, new HanaDbFactory());
+                new ProcessorOptions() { PreviewOnly = true }, new HanaDbFactory(serviceProvider: null));
             Connection.Open();
             Processor.BeginTransaction();
         }

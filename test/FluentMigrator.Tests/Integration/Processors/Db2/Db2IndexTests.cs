@@ -140,7 +140,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Db2
         {
             if (!IntegrationTestOptions.Db2.IsEnabled)
                 Assert.Ignore();
-            Factory = new Db2DbFactory();
+            Factory = new Db2DbFactory(serviceProvider: null);
             Connection = Factory.CreateConnection(IntegrationTestOptions.Db2.ConnectionString);
             Quoter = new Db2Quoter();
             Processor = new Db2Processor(Connection, new Db2Generator(Quoter), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), Factory);

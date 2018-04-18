@@ -109,8 +109,7 @@ namespace Microsoft.Extensions.DependencyInjection
             [NotNull] string connectionString)
         {
             return services
-                // Initialize the DB-specific processor
-                .AddScoped(sp => CreateMigrationProcessor(sp, connectionString));
+                .ConfigureProcessor(_ => connectionString);
         }
 
         /// <summary>

@@ -27,7 +27,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
             if (!IntegrationTestOptions.Hana.IsEnabled)
                 Assert.Ignore();
             Connection = new HanaConnection(IntegrationTestOptions.Hana.ConnectionString);
-            Processor = new HanaProcessor(Connection, new HanaGenerator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), new HanaDbFactory());
+            Processor = new HanaProcessor(Connection, new HanaGenerator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), new HanaDbFactory(serviceProvider: null));
             Quoter = new HanaQuoter();
             Connection.Open();
             Processor.BeginTransaction();

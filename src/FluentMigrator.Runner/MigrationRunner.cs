@@ -43,6 +43,10 @@ namespace FluentMigrator.Runner
         [CanBeNull]
         private readonly IServiceProvider _serviceProvider;
 
+        private readonly Lazy<IVersionLoader> _versionLoader;
+
+        private IVersionLoader _currentVersionLoader;
+
         [CanBeNull]
         [Obsolete]
         private IAssemblyCollection _migrationAssemblies;
@@ -118,13 +122,20 @@ namespace FluentMigrator.Runner
 
             if (runnerContext.NoConnection)
             {
-                VersionLoader = new ConnectionlessVersionLoader(
-                    this, _migrationAssemblies, convSet, Conventions,
-                    runnerContext.StartVersion, runnerContext.Version, versionTableMetaData);
+                _versionLoader = new Lazy<IVersionLoader>(
+                    () => new ConnectionlessVersionLoader(
+                        this,
+                        _migrationAssemblies,
+                        convSet,
+                        Conventions,
+                        runnerContext.StartVersion,
+                        runnerContext.Version,
+                        versionTableMetaData));
             }
             else
             {
-                VersionLoader = new VersionLoader(this, _migrationAssemblies, convSet, Conventions, versionTableMetaData);
+                _versionLoader = new Lazy<IVersionLoader>(
+                    () => new VersionLoader(this, _migrationAssemblies, convSet, Conventions, versionTableMetaData));
             }
         }
 
@@ -159,17 +170,27 @@ namespace FluentMigrator.Runner
 
             if (runnerContext.NoConnection)
             {
-                VersionLoader = new ConnectionlessVersionLoader(
-                    this, convSet, Conventions,
-                    runnerContext.StartVersion, runnerContext.Version, versionTableMetaData);
+                _versionLoader = new Lazy<IVersionLoader>(
+                    () => new ConnectionlessVersionLoader(
+                        this,
+                        convSet,
+                        Conventions,
+                        runnerContext.StartVersion,
+                        runnerContext.Version,
+                        versionTableMetaData));
             }
             else
             {
-                VersionLoader = new VersionLoader(this, convSet, Conventions, versionTableMetaData);
+                _versionLoader = new Lazy<IVersionLoader>(
+                    () => new VersionLoader(this, convSet, Conventions, versionTableMetaData));
             }
         }
 
-        public IVersionLoader VersionLoader { get; set; }
+        public IVersionLoader VersionLoader
+        {
+            get => _currentVersionLoader ?? _versionLoader.Value;
+            set => _currentVersionLoader = value;
+        }
 
         public void ApplyProfiles()
         {
