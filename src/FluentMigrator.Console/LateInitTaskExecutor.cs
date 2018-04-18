@@ -36,7 +36,6 @@ namespace FluentMigrator.Console
             _announcer = runnerContext.Announcer;
         }
 
-        [Obsolete]
         protected override IEnumerable<Assembly> GetTargetAssemblies()
         {
             var targetAssemblies = base.GetTargetAssemblies().ToList();

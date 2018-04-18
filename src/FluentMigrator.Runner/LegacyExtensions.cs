@@ -105,5 +105,26 @@ namespace FluentMigrator.Runner
                 }
             }
         }
+
+        /// <summary>
+        /// Returns <c>true</c> when the type is probably a FluentMigrator-owned class
+        /// </summary>
+        /// <param name="type">The type to check</param>
+        /// <returns><c>true</c> when the type is probably a FluentMigrator-owned class</returns>
+        internal static bool IsFluentMigratorRunnerType(this Type type)
+        {
+            return type.Namespace != null && type.Namespace.StartsWith("FluentMigrator.Runner.", StringComparison.Ordinal);
+        }
+
+        /// <summary>
+        /// Gets the name for a given migration generator instance
+        /// </summary>
+        /// <param name="generator">The migration generator instance to get its name for</param>
+        /// <returns>The name of the migration generator</returns>
+        [NotNull]
+        public static string GetName([NotNull] this IMigrationGenerator generator)
+        {
+            return generator.GetType().Name.Replace("Generator", string.Empty);
+        }
     }
 }

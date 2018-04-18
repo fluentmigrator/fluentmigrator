@@ -57,30 +57,16 @@ namespace FluentMigrator
         /// <inheritdoc />
         public sealed override void Up()
         {
-            ExecuteEmbeddedAutoSqlScriptExpression expression;
-            if (_embeddedResourceProvider == null)
-            {
-#pragma warning disable CS0612 // Typ oder Element ist veraltet
-                expression = new ExecuteEmbeddedAutoSqlScriptExpression(
-                    _context.MigrationAssemblies,
-                    GetType(),
-                    GetDatabaseNames(),
-                    MigrationDirection.Up);
-#pragma warning restore CS0612 // Typ oder Element ist veraltet
-            }
-            else
-            {
-                expression = new ExecuteEmbeddedAutoSqlScriptExpression(
-                    _embeddedResourceProvider,
-                    GetType(),
-                    GetDatabaseNames(),
-                    MigrationDirection.Up)
-                {
 #pragma warning disable 612
-                    MigrationAssemblies = _context.MigrationAssemblies,
+            var expression = new ExecuteEmbeddedAutoSqlScriptExpression(
+                _embeddedResourceProvider ?? new DefaultEmbeddedResourceProvider(_context.MigrationAssemblies),
+                GetType(),
+                GetDatabaseNames(),
+                MigrationDirection.Up)
+            {
+                MigrationAssemblies = _context.MigrationAssemblies,
 #pragma warning restore 612
-                };
-            }
+            };
 
             _context.Expressions.Add(expression);
         }
@@ -98,6 +84,7 @@ namespace FluentMigrator
                 MigrationAssemblies = _context.MigrationAssemblies,
 #pragma warning restore 612
             };
+
             _context.Expressions.Add(expression);
         }
 

@@ -25,17 +25,14 @@ namespace FluentMigrator.Runner
 {
     public interface IMigrationRunnerConventions
     {
-        [Obsolete]
         Func<Type, bool> TypeIsMigration { get; }
 
         Func<Type, bool> TypeIsProfile { get; }
 
         Func<Type, MigrationStage?> GetMaintenanceStage { get; }
 
-        [Obsolete]
         Func<Type, bool> TypeIsVersionTableMetaData { get; }
 
-        [Obsolete]
         Func<Type, IMigrationInfo> GetMigrationInfo { get; }
 
         /// <summary>

@@ -65,9 +65,9 @@ namespace FluentMigrator.Infrastructure
         {
             Expressions = new List<IMigrationExpression>();
             QuerySchema = querySchema;
-#pragma warning disable CS0612 // Typ oder Element ist veraltet
+#pragma warning disable 612
             MigrationAssemblies = serviceProvider?.GetService<IAssemblyCollection>();
-#pragma warning restore CS0612 // Typ oder Element ist veraltet
+#pragma warning restore 612
             ApplicationContext = context;
             Connection = connection;
             ServiceProvider = serviceProvider;

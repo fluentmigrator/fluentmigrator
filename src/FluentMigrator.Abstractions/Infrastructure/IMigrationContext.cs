@@ -21,6 +21,8 @@ using System.Collections.Generic;
 
 using FluentMigrator.Expressions;
 
+using JetBrains.Annotations;
+
 namespace FluentMigrator.Infrastructure
 {
     /// <summary>
@@ -31,6 +33,7 @@ namespace FluentMigrator.Infrastructure
         /// <summary>
         /// Gets the service provider used to create this migration context
         /// </summary>
+        [NotNull]
         IServiceProvider ServiceProvider { get; }
 
         /// <summary>
@@ -47,6 +50,7 @@ namespace FluentMigrator.Infrastructure
         /// Gets or sets the collection of migration assemblies
         /// </summary>
         [Obsolete]
+        [CanBeNull]
         IAssemblyCollection MigrationAssemblies { get; set; }
 
         /// <summary>

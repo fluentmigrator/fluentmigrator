@@ -171,7 +171,8 @@ namespace FluentMigrator.MSBuild
             Log.LogMessage(MessageImportance.Low, "Executing Migration Runner");
             try
             {
-                new TaskExecutor(runnerContext).Execute();
+                new TaskExecutor(runnerContext)
+                    .Execute();
             }
             catch (ProcessorFactoryNotFoundException ex)
             {

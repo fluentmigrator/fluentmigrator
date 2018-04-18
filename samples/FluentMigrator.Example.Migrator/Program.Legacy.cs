@@ -37,7 +37,9 @@ namespace FluentMigrator.Example.Migrator
             var options = new ProcessorOptions();
 
             // Initialize the DB-specific processor
+#pragma warning disable 612
             var processorFactory = new SQLiteProcessorFactory();
+#pragma warning restore 612
             var processor = processorFactory.Create(connectionString, announcer, options);
 
             // Configure the runner
@@ -47,12 +49,12 @@ namespace FluentMigrator.Example.Migrator
             };
 
             // Create the migration runner
-#pragma warning disable CS0612 // Typ oder Element ist veraltet
+#pragma warning disable 612
             var runner = new MigrationRunner(
                 typeof(AddGTDTables).Assembly,
                 context,
                 processor);
-#pragma warning restore CS0612 // Typ oder Element ist veraltet
+#pragma warning restore 612
 
             // Run the migrations
             runner.MigrateUp();

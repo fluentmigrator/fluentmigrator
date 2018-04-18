@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
@@ -82,9 +83,10 @@ namespace FluentMigrator.Builders.Execute
             var embeddedResourceProvider = _context.ServiceProvider?.GetService<IEmbeddedResourceProvider>();
             if (embeddedResourceProvider == null)
             {
-#pragma warning disable CS0612 // Typ oder Element ist veraltet
+#pragma warning disable 612
+                Debug.Assert(_context.MigrationAssemblies != null, "_context.MigrationAssemblies != null");
                 var expression = new ExecuteEmbeddedSqlScriptExpression(_context.MigrationAssemblies) { SqlScript = embeddedSqlScriptName };
-#pragma warning restore CS0612 // Typ oder Element ist veraltet
+#pragma warning restore 612
                 _context.Expressions.Add(expression);
             }
             else
@@ -101,13 +103,14 @@ namespace FluentMigrator.Builders.Execute
             ExecuteEmbeddedSqlScriptExpression expression;
             if (embeddedResourceProvider == null)
             {
-#pragma warning disable CS0612 // Typ oder Element ist veraltet
+#pragma warning disable 612
+                Debug.Assert(_context.MigrationAssemblies != null, "_context.MigrationAssemblies != null");
                 expression = new ExecuteEmbeddedSqlScriptExpression(_context.MigrationAssemblies)
                 {
                     SqlScript = embeddedSqlScriptName,
                     Parameters = parameters,
                 };
-#pragma warning restore CS0612 // Typ oder Element ist veraltet
+#pragma warning restore 612
             }
             else
             {

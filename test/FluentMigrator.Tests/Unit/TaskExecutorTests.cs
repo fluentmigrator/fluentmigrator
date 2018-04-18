@@ -204,6 +204,7 @@ namespace FluentMigrator.Tests.Unit
             this.runner = runner;
         }
 
+        [Obsolete]
         protected override void Initialize()
         {
             Runner = runner;

@@ -16,7 +16,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
+using FluentMigrator.Runner.Exceptions;
+using FluentMigrator.Runner.Infrastructure;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Initialization.AssemblyLoader;
 using FluentMigrator.Runner.VersionTableInfo;
@@ -24,8 +28,6 @@ using FluentMigrator.Runner.VersionTableInfo;
 using JetBrains.Annotations;
 
 using Microsoft.Extensions.DependencyInjection;
-
-using Scrutor;
 
 namespace FluentMigrator.Runner
 {
@@ -35,12 +37,24 @@ namespace FluentMigrator.Runner
     [CLSCompliant(false)]
     public static class MigrationRunnerBuilderExtensions
     {
+        /// <summary>
+        /// Sets the announcer
+        /// </summary>
+        /// <param name="builder">The runner builder</param>
+        /// <param name="announcer">The announcer to use</param>
+        /// <returns>The runner builder</returns>
         public static IMigrationRunnerBuilder WithAnnouncer(this IMigrationRunnerBuilder builder, IAnnouncer announcer)
         {
             builder.Services.AddSingleton(_ => announcer);
             return builder;
         }
 
+        /// <summary>
+        /// Sets the migration processor options
+        /// </summary>
+        /// <param name="builder">The runner builder</param>
+        /// <param name="options">The migration processor options</param>
+        /// <returns>The runner builder</returns>
         public static IMigrationRunnerBuilder WithProcessorOptions(this IMigrationRunnerBuilder builder,
             IMigrationProcessorOptions options)
         {
@@ -48,6 +62,12 @@ namespace FluentMigrator.Runner
             return builder;
         }
 
+        /// <summary>
+        /// Sets the version table meta data
+        /// </summary>
+        /// <param name="builder">The runner builder</param>
+        /// <param name="versionTableMetaData">The version table meta data</param>
+        /// <returns>The runner builder</returns>
         public static IMigrationRunnerBuilder ConfigureVersionTable(
             this IMigrationRunnerBuilder builder,
             IVersionTableMetaData versionTableMetaData)
@@ -56,6 +76,12 @@ namespace FluentMigrator.Runner
             return builder;
         }
 
+        /// <summary>
+        /// Sets the runner context
+        /// </summary>
+        /// <param name="builder">The runner builder</param>
+        /// <param name="context">The runner context</param>
+        /// <returns>The runner builder</returns>
         public static IMigrationRunnerBuilder WithRunnerContext(
             this IMigrationRunnerBuilder builder,
             IRunnerContext context)
@@ -64,6 +90,12 @@ namespace FluentMigrator.Runner
             return builder;
         }
 
+        /// <summary>
+        /// Sets the migration runner conventions
+        /// </summary>
+        /// <param name="builder">The runner builder</param>
+        /// <param name="conventions">The migration runner conventions</param>
+        /// <returns>The runner builder</returns>
         public static IMigrationRunnerBuilder WithRunnerConventions(
             this IMigrationRunnerBuilder builder,
             IMigrationRunnerConventions conventions)
@@ -72,6 +104,14 @@ namespace FluentMigrator.Runner
             return builder;
         }
 
+        /// <summary>
+        /// Adds the migrations
+        /// </summary>
+        /// <param name="builder">The runner builder</param>
+        /// <param name="targets">The target assemblies</param>
+        /// <param name="namespace">The required namespace</param>
+        /// <param name="withNestedNamespaces">Indicates whether migrations in the nested namespaces should be used too</param>
+        /// <returns>The runner builder</returns>
         public static IMigrationRunnerBuilder AddMigrations(
             this IMigrationRunnerBuilder builder,
             IEnumerable<string> targets,
@@ -80,45 +120,60 @@ namespace FluentMigrator.Runner
         {
             using (var sp = builder.Services.BuildServiceProvider())
             {
-                var loaderFactory = sp.GetRequiredService<AssemblyLoaderFactory>();
+                var loaderFactory = sp.GetService<AssemblyLoaderFactory>() ?? new AssemblyLoaderFactory();
                 var assemblies = loaderFactory.GetTargetAssemblies(targets);
-                builder.Services.Scan(
-                    selector => selector
-                        .FromAssemblies(assemblies)
-                        .AddClasses(filter =>
-                        {
-                            if (string.IsNullOrEmpty(@namespace))
-                                return;
+                return builder.AddMigrations(assemblies, @namespace, withNestedNamespaces);
+            }
+        }
 
-                            if (!withNestedNamespaces)
-                            {
-                                filter.InNamespaces(@namespace);
-                                return;
-                            }
+        /// <summary>
+        /// Adds the migrations
+        /// </summary>
+        /// <param name="builder">The runner builder</param>
+        /// <param name="assemblies">The target assemblies</param>
+        /// <param name="namespace">The required namespace</param>
+        /// <param name="withNestedNamespaces">Indicates whether migrations in the nested namespaces should be used too</param>
+        /// <returns>The runner builder</returns>
+        public static IMigrationRunnerBuilder AddMigrations(
+            this IMigrationRunnerBuilder builder,
+            IEnumerable<Assembly> assemblies,
+            [CanBeNull] string @namespace = null,
+            bool withNestedNamespaces = false)
+        {
+            var migrations = GetExportedTypes(assemblies)
+                .FilterByNamespace(@namespace, withNestedNamespaces)
+                .Where(t => DefaultMigrationRunnerConventions.Instance.TypeIsMigration(t))
+                .ToList();
+            if (migrations.Count == 0)
+            {
+                throw new MissingMigrationsException($"No migrations found in the namespace {@namespace}");
+            }
 
-                            var namespaceWithDot = $"{@namespace}.";
-                            filter.Where(t =>
-                            {
-                                if (t.Namespace == null)
-                                    return false;
-                                return t.Namespace == @namespace
-                                 || t.Namespace.StartsWith(namespaceWithDot,
-                                        StringComparison.InvariantCulture);
-                            });
-                        })
-                        .As<IMigration>()
-                        .WithScopedLifetime());
+            foreach (var migration in migrations)
+            {
+                builder.Services.AddScoped(typeof(IMigration), migration);
             }
 
             return builder;
         }
 
-        public static IMigrationRunnerBuilder AddMigrations(
-            this IMigrationRunnerBuilder builder,
-            Action<ITypeSourceSelector> typeSelectorAction)
+        private static Type[] GetExportedTypes(IEnumerable<Assembly> assemblies)
         {
-            builder.Services.Scan(typeSelectorAction);
-            return builder;
+            var result = new List<Type>();
+
+            foreach (var assembly in assemblies)
+            {
+                try
+                {
+                    result.AddRange(assembly.GetExportedTypes());
+                }
+                catch
+                {
+                    // Ignore assemblies that couldn't be loaded
+                }
+            }
+
+            return result.ToArray();
         }
     }
 }

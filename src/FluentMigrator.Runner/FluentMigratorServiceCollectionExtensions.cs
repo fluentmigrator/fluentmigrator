@@ -15,12 +15,16 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 using FluentMigrator;
+using FluentMigrator.Exceptions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Conventions;
+using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Initialization.AssemblyLoader;
 using FluentMigrator.Runner.Processors;
@@ -73,23 +77,55 @@ namespace Microsoft.Extensions.DependencyInjection
             if (configure == null)
                 throw new ArgumentNullException(nameof(configure));
 
-            services
-                .AddFluentMigrator(connectionString)
+            return services
+                .AddFluentMigratorCore()
+                .ConfigureProcessorFactory(migrationProcessorFactoryType, connectionString)
+                .ConfigureRunner(configure);
+        }
 
-                // Initialize the DB-specific processor
-                .AddSingleton(typeof(IMigrationProcessorFactory), migrationProcessorFactoryType)
-                .AddScoped(sp =>
-                {
-                    var processorFactory = sp.GetRequiredService<IMigrationProcessorFactory>();
-                    var announcer = sp.GetRequiredService<IAnnouncer>();
-                    var options = sp.GetRequiredService<IMigrationProcessorOptions>();
-                    return processorFactory.Create(connectionString, announcer, options);
-                });
-
+        /// <summary>
+        /// Configures the migration runner
+        /// </summary>
+        /// <param name="services">The <see cref="IServiceCollection" /> to add services to.</param>
+        /// <param name="configure">The <see cref="IMigrationRunnerBuilder"/> configuration delegate.</param>
+        /// <returns>The updated service collection</returns>
+        public static IServiceCollection ConfigureRunner(
+            [NotNull] this IServiceCollection services,
+            [NotNull] Action<IMigrationRunnerBuilder> configure)
+        {
             var builder = new MigrationRunnerBuilder(services);
             configure.Invoke(builder);
-
             return services;
+        }
+
+        /// <summary>
+        /// Adds a migration generator accessor service
+        /// </summary>
+        /// <param name="services">The <see cref="IServiceCollection" /> to add services to.</param>
+        /// <param name="connectionString">The connection string used to connect to the database</param>
+        /// <returns>The updated service collection</returns>
+        public static IServiceCollection ConfigureProcessor(
+            [NotNull] this IServiceCollection services,
+            [NotNull] string connectionString)
+        {
+            return services
+                // Initialize the DB-specific processor
+                .AddScoped(sp => CreateMigrationProcessor(sp, connectionString));
+        }
+
+        /// <summary>
+        /// Adds a migration generator accessor service
+        /// </summary>
+        /// <param name="services">The <see cref="IServiceCollection" /> to add services to.</param>
+        /// <param name="connectionStringAccessor">Used to get the connection string</param>
+        /// <returns>The updated service collection</returns>
+        public static IServiceCollection ConfigureProcessor(
+            [NotNull] this IServiceCollection services,
+            [NotNull] Func<IServiceProvider, string> connectionStringAccessor)
+        {
+            return services
+                // Initialize the DB-specific processor
+                .AddScoped(sp => CreateMigrationProcessor(sp, connectionStringAccessor(sp)));
         }
 
         /// <summary>
@@ -98,7 +134,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="services">The <see cref="IServiceCollection" /> to add services to.</param>
         /// <returns>The updated service collection</returns>
         [NotNull]
-        internal static IServiceCollection AddFluentMigrator(
+        public static IServiceCollection AddFluentMigratorCore(
             [NotNull] this IServiceCollection services)
         {
             if (services == null)
@@ -114,11 +150,14 @@ namespace Microsoft.Extensions.DependencyInjection
                 // The default assembly loader factory
                 .AddSingleton<AssemblyLoaderFactory>()
 
-                // Add the default embedded resource provider
-                .AddScoped<IEmbeddedResourceProvider, DefaultEmbeddedResourceProvider>()
+                // Configure the default way to get the connection string
+                .AddSingleton<IConnectionStringProvider, DefaultConnectionStringProvider>()
 
                 // Configure the default version table metadata
                 .AddSingleton<IVersionTableMetaData, DefaultVersionTableMetaData>()
+
+                // Add the default embedded resource provider
+                .AddScoped<IEmbeddedResourceProvider, DefaultEmbeddedResourceProvider>()
 
                 // Configure the loader for migrations that should be executed during maintenance steps
                 .AddScoped<IMaintenanceLoader, MaintenanceLoader>()
@@ -128,6 +167,9 @@ namespace Microsoft.Extensions.DependencyInjection
 
                 // Configure the runner context
                 .AddScoped<IRunnerContext, RunnerContext>()
+
+                // Provide a way to get the migration accessor selected by the runner context
+                .AddScoped<IMigrationGeneratorAccessor, DefaultMigrationGeneratorAccessor>()
 
                 // Configure the runner conventions
                 .AddScoped<IMigrationRunnerConventions, MigrationRunnerConventions>()
@@ -139,6 +181,102 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddScoped<IMigrationRunner, MigrationRunner>();
 
             return services;
+        }
+
+        /// <summary>
+        /// Adds a migration processor factory services
+        /// </summary>
+        /// <param name="services">The <see cref="IServiceCollection" /> to add services to.</param>
+        /// <param name="migrationProcessorFactoryType">The type of the migration processor factory</param>
+        /// <param name="connectionString">The connection string used to connect to the database</param>
+        /// <returns>The updated service collection</returns>
+        public static IServiceCollection ConfigureProcessorFactory(
+            [NotNull] this IServiceCollection services,
+            [NotNull] Type migrationProcessorFactoryType,
+            [NotNull] string connectionString)
+        {
+            return services
+                // Initialize the DB-specific processor
+                .AddSingleton(typeof(IMigrationProcessorFactory), migrationProcessorFactoryType)
+                .ConfigureProcessor(connectionString);
+        }
+
+        /// <summary>
+        /// Adds all migration generators and let the default logic sort it out
+        /// </summary>
+        /// <param name="services">The <see cref="IServiceCollection" /> to add services to.</param>
+        /// <param name="generators">The generators to add</param>
+        /// <returns>The updated service collection</returns>
+        public static IServiceCollection AddMigrationGenerators(
+            [NotNull] this IServiceCollection services,
+            [NotNull, ItemNotNull] IEnumerable<IMigrationGenerator> generators)
+        {
+            foreach (var generator in generators)
+            {
+                var type = generators.GetType();
+                if (type.IsFluentMigratorRunnerType())
+                {
+                    services.AddSingleton(typeof(IMigrationGenerator), type);
+                }
+                else
+                {
+                    services.AddSingleton(generator);
+                }
+            }
+
+            return services;
+        }
+
+        /// <summary>
+        /// Adds all migration processor factories and let the default logic sort it out
+        /// </summary>
+        /// <param name="services">The <see cref="IServiceCollection" /> to add services to.</param>
+        /// <param name="factories">The factories to add</param>
+        /// <returns>The updated service collection</returns>
+        public static IServiceCollection AddMigrationProcessorFactories(
+            [NotNull] this IServiceCollection services,
+            [NotNull, ItemNotNull] IEnumerable<IMigrationProcessorFactory> factories)
+        {
+            foreach (var factory in factories)
+            {
+                var type = factory.GetType();
+                if (type.IsFluentMigratorRunnerType())
+                {
+                    services.AddSingleton(typeof(IMigrationProcessorFactory), type);
+                }
+                else
+                {
+                    services.AddSingleton(factory);
+                }
+            }
+
+            return services;
+        }
+
+        private static IMigrationProcessor CreateMigrationProcessor(IServiceProvider serviceProvider, string connectionString)
+        {
+            var processorFactories = serviceProvider.GetRequiredService<IEnumerable<IMigrationProcessorFactory>>().ToList();
+            IMigrationProcessorFactory processorFactory;
+            if (processorFactories.Count == 1)
+            {
+                processorFactory = processorFactories[0];
+            }
+            else
+            {
+                var runnerContext = serviceProvider.GetRequiredService<IRunnerContext>();
+                processorFactory = processorFactories
+                    .FirstOrDefault(f => string.Equals(f.Name, runnerContext.Database, StringComparison.OrdinalIgnoreCase));
+                if (processorFactory == null)
+                {
+                    var choices = string.Join(", ", processorFactories.Select(x => x.Name));
+                    throw new ProcessorFactoryNotFoundException(
+                        $"The provider or dbtype parameter is incorrect. Available choices are: {choices}");
+                }
+            }
+
+            var announcer = serviceProvider.GetRequiredService<IAnnouncer>();
+            var options = serviceProvider.GetRequiredService<IMigrationProcessorOptions>();
+            return processorFactory.Create(connectionString, announcer, options);
         }
 
         private class MigrationRunnerBuilder : IMigrationRunnerBuilder

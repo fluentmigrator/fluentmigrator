@@ -38,7 +38,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
         public FirebirdProcessorFactory(IServiceProvider serviceProvider, FirebirdOptions fbOptions = null)
         {
             _serviceProvider = serviceProvider;
-            FbOptions = fbOptions ?? throw new ArgumentNullException(nameof(fbOptions));
+            FbOptions = fbOptions ?? FirebirdOptions.AutoCommitBehaviour();
         }
 
         public FirebirdOptions FbOptions { get; set; }

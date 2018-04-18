@@ -35,12 +35,12 @@ using FluentMigrator.Runner.Processors.SQLite;
 
 namespace FluentMigrator.Runner.Processors
 {
-    [Obsolete("Ony the statically provided factories are accessed")]
     public class MigrationProcessorFactoryProvider
     {
         private static readonly object _lock = new object();
         private static IDictionary<string, IMigrationProcessorFactory> _migrationProcessorFactories;
 
+        [Obsolete]
         static MigrationProcessorFactoryProvider()
         {
             // Register all available processor factories. The library usually tries
@@ -74,6 +74,11 @@ namespace FluentMigrator.Runner.Processors
 #endif
         }
 
+        [Obsolete("Ony the statically provided factories are accessed")]
+        public MigrationProcessorFactoryProvider()
+        {
+        }
+
         private static IDictionary<string, IMigrationProcessorFactory> MigrationProcessorFactories
         {
             get
@@ -85,11 +90,9 @@ namespace FluentMigrator.Runner.Processors
             }
         }
 
-        [Obsolete]
         public static IEnumerable<IMigrationProcessorFactory> RegisteredFactories
             => MigrationProcessorFactories.Values;
 
-        [Obsolete]
         public static void Register(IMigrationProcessorFactory factory)
         {
             lock (_lock)
@@ -103,11 +106,10 @@ namespace FluentMigrator.Runner.Processors
             }
         }
 
-        [Obsolete]
         public static IEnumerable<string> ProcessorTypes
             => MigrationProcessorFactories.Keys;
 
-        [Obsolete]
+        [Obsolete("Ony the statically provided factories are accessed")]
         public virtual IMigrationProcessorFactory GetFactory(string name)
         {
             if (MigrationProcessorFactories.TryGetValue(name, out var result))

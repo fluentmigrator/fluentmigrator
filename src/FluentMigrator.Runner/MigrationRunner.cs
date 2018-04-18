@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 
@@ -27,6 +28,7 @@ using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Versioning;
 using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Model;
+using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Exceptions;
 using FluentMigrator.Runner.VersionTableInfo;
 
@@ -38,6 +40,9 @@ namespace FluentMigrator.Runner
 {
     public class MigrationRunner : IMigrationRunner
     {
+        [CanBeNull]
+        private readonly IServiceProvider _serviceProvider;
+
         [CanBeNull]
         [Obsolete]
         private IAssemblyCollection _migrationAssemblies;
@@ -130,8 +135,10 @@ namespace FluentMigrator.Runner
             [NotNull] IMigrationRunnerConventions migrationRunnerConventions,
             [NotNull] IMaintenanceLoader maintenanceLoader,
             [NotNull] IMigrationInformationLoader migrationLoader,
-            [NotNull] IEnumerable<IMigration> migrations)
+            [NotNull] IEnumerable<IMigration> migrations,
+            [NotNull] IServiceProvider serviceProvider)
         {
+            _serviceProvider = serviceProvider;
             _announcer = runnerContext.Announcer;
             Processor = processor;
             _stopWatch = runnerContext.StopWatch;
@@ -231,9 +238,10 @@ namespace FluentMigrator.Runner
         }
 
         [Obsolete]
+        [CanBeNull]
         private IMigrationRunnerConventions GetMigrationRunnerConventions()
         {
-            return _migrationAssemblies.GetMigrationRunnerConventions();
+            return _migrationAssemblies?.GetMigrationRunnerConventions();
         }
 
         private IEnumerable<IMigrationInfo> GetUpMigrationsToApply(long version)
@@ -506,6 +514,7 @@ namespace FluentMigrator.Runner
         }
 
         [Obsolete]
+        [CanBeNull]
         public IAssemblyCollection MigrationAssemblies
         {
             get { return _migrationAssemblies; }
@@ -521,14 +530,20 @@ namespace FluentMigrator.Runner
         private void ExecuteMigration(IMigration migration, Action<IMigration, IMigrationContext> getExpressions)
         {
             CaughtExceptions = new List<Exception>();
-            var services = new ServiceCollection();
-#pragma warning disable CS0612 // Typ oder Element ist veraltet
-            services
-                .AddSingleton(sp => _migrationAssemblies)
-                .AddScoped<IEmbeddedResourceProvider, DefaultEmbeddedResourceProvider>();
-#pragma warning restore CS0612 // Typ oder Element ist veraltet
-            var serviceProvider = services.BuildServiceProvider();
-            var context = new MigrationContext(Processor, RunnerContext.ApplicationContext, Processor.ConnectionString, serviceProvider);
+
+            MigrationContext context;
+
+            if (_serviceProvider == null)
+            {
+#pragma warning disable 612
+                Debug.Assert(_migrationAssemblies != null, "_migrationAssemblies != null");
+                context = new MigrationContext(Processor, _migrationAssemblies, RunnerContext.ApplicationContext, Processor.ConnectionString);
+#pragma warning restore 612
+            }
+            else
+            {
+                context = new MigrationContext(Processor, RunnerContext.ApplicationContext, Processor.ConnectionString, _serviceProvider);
+            }
 
             getExpressions(migration, context);
 

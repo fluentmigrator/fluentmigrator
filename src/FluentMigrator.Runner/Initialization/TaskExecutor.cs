@@ -21,67 +21,70 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-using FluentMigrator.Exceptions;
 using FluentMigrator.Infrastructure;
+using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Initialization.AssemblyLoader;
 using FluentMigrator.Runner.Processors;
+
+using JetBrains.Annotations;
 
 using Microsoft.Extensions.DependencyInjection;
 
 namespace FluentMigrator.Runner.Initialization
 {
+    [CLSCompliant(false)]
     public class TaskExecutor
     {
         private readonly IRunnerContext _runnerContext;
         private readonly AssemblyLoaderFactory _assemblyLoaderFactory;
-        private readonly IReadOnlyCollection<IMigrationProcessorFactory> _processorFactories;
-        private readonly IReadOnlyCollection<IMigrationGenerator> _migrationGenerators;
 
-        [Obsolete]
+        [CanBeNull]
+        private readonly IServiceProvider _serviceProvider;
+
         public TaskExecutor(IRunnerContext runnerContext)
             : this(
                 runnerContext,
-                new DefaultConnectionStringProvider(),
                 new AssemblyLoaderFactory(),
-                new MigrationProcessorFactoryProvider())
+                new DefaultConnectionStringProvider())
         {
         }
 
-        [Obsolete]
+        public TaskExecutor(IRunnerContext runnerContext, IServiceProvider serviceProvider)
+        {
+            _runnerContext = runnerContext ?? throw new ArgumentNullException(nameof(runnerContext));
+            ConnectionStringProvider = serviceProvider.GetService<IConnectionStringProvider>();
+            _assemblyLoaderFactory = serviceProvider.GetRequiredService<AssemblyLoaderFactory>();
+            _serviceProvider = serviceProvider;
+        }
+
+        [Obsolete("Ony the statically provided factories are accessed")]
         public TaskExecutor(
             IRunnerContext runnerContext,
-            IConnectionStringProvider connectionStringProvider,
+            [CanBeNull] IConnectionStringProvider connectionStringProvider,
             AssemblyLoaderFactory assemblyLoaderFactory,
             MigrationProcessorFactoryProvider _)
             : this(
                 runnerContext,
-                connectionStringProvider,
                 assemblyLoaderFactory,
-                MigrationProcessorFactoryProvider.RegisteredFactories,
-                MigrationGeneratorFactory.RegisteredGenerators)
+                connectionStringProvider)
         {
         }
 
         public TaskExecutor(
             IRunnerContext runnerContext,
-            IConnectionStringProvider connectionStringProvider,
             AssemblyLoaderFactory assemblyLoaderFactory,
-            IEnumerable<IMigrationProcessorFactory> processorFactories,
-            IEnumerable<IMigrationGenerator> migrationGenerators)
+            [CanBeNull] IConnectionStringProvider connectionStringProvider = null)
         {
             _runnerContext = runnerContext ?? throw new ArgumentNullException(nameof(runnerContext));
             ConnectionStringProvider = connectionStringProvider;
             _assemblyLoaderFactory = assemblyLoaderFactory ?? throw new ArgumentNullException(nameof(assemblyLoaderFactory));
-            _processorFactories = processorFactories.ToList();
-            _migrationGenerators = migrationGenerators.ToList();
         }
 
         protected IMigrationRunner Runner { get; set; }
 
         protected IConnectionStringProvider ConnectionStringProvider { get; }
 
-        [Obsolete]
         protected virtual IEnumerable<Assembly> GetTargetAssemblies()
         {
             var assemblies = new HashSet<Assembly>();
@@ -97,67 +100,78 @@ namespace FluentMigrator.Runner.Initialization
             }
         }
 
-        protected virtual IServiceProvider ConfigureServices(IServiceCollection services)
+        private ServiceProvider ConfigureServices()
         {
-#pragma warning disable CS0612 // Typ oder Element ist veraltet
+            var processorFactories = MigrationProcessorFactoryProvider.RegisteredFactories;
+            var migrationGenerators = MigrationGeneratorFactory.RegisteredGenerators;
+            var services = new ServiceCollection();
             var assemblies = GetTargetAssemblies().ToList();
-#pragma warning restore CS0612 // Typ oder Element ist veraltet
-
-            var connectionString = LoadConnectionString(assemblies);
-            var processorFactoryType = FindProcessorFactory().GetType();
-
-            services
-                .AddFluentMigrator(
-                    processorFactoryType,
-                    connectionString,
-                    builder =>
-                    {
-                        builder
-                            .WithProcessorOptions(CreateProcessorOptions())
-                            .WithRunnerContext(_runnerContext)
-                            .WithAnnouncer(_runnerContext.Announcer);
-                    });
-
-            return services.BuildServiceProvider();
-        }
-
-        protected virtual void Initialize()
-        {
-#pragma warning disable CS0612 // Typ oder Element ist veraltet
-            var assemblies = GetTargetAssemblies().ToList();
+#pragma warning disable 612
             var assemblyCollection = new AssemblyCollection(assemblies);
-#pragma warning restore CS0612 // Typ oder Element ist veraltet
+#pragma warning restore 612
 
             if (!_runnerContext.NoConnection && ConnectionStringProvider == null)
             {
                 _runnerContext.NoConnection = true;
             }
 
-            var processor = _runnerContext.NoConnection
-                ? InitializeConnectionlessProcessor()
-                : InitializeProcessor(assemblies);
+            // Configure without the processor and migrations
+            services
+                .AddFluentMigratorCore();
 
-            var convSet = new DefaultConventionSet(_runnerContext);
-#pragma warning disable CS0612 // Typ oder Element ist veraltet
-            var migConv = assemblyCollection.GetMigrationRunnerConventions();
-            var versionTableMetaData = assemblyCollection.GetVersionTableMetaData(convSet, migConv, _runnerContext);
-            var maintenanceLoader = new MaintenanceLoader(assemblyCollection, _runnerContext.Tags, migConv);
-            var migrationLoader = new DefaultMigrationInformationLoader(
-                migConv,
-                assemblyCollection,
-                _runnerContext.Namespace,
-                _runnerContext.NestedNamespaces,
-                _runnerContext.Tags);
-#pragma warning restore CS0612 // Typ oder Element ist veraltet
-            var migrations = migrationLoader.LoadMigrations().Values.Select(x => x.Migration).ToList();
-            Runner = new MigrationRunner(_runnerContext, processor, versionTableMetaData, migConv, maintenanceLoader, migrationLoader, migrations);
+            // Configure the processor
+            if (_runnerContext.NoConnection)
+            {
+                var processorFactoryType = typeof(ConnectionlessProcessorFactory);
+                services
+                    .AddMigrationGenerators(migrationGenerators)
+                    .ConfigureProcessorFactory(processorFactoryType, string.Empty);
+            }
+            else
+            {
+                var connectionString = LoadConnectionString(assemblies);
+                services
+                    .AddMigrationProcessorFactories(processorFactories)
+                    .ConfigureProcessor(connectionString);
+            }
+
+            // Configure other options
+            services
+                .ConfigureRunner(
+                    builder =>
+                    {
+                        builder
+                            .WithProcessorOptions(CreateProcessorOptions())
+                            .WithRunnerContext(_runnerContext)
+                            .WithAnnouncer(_runnerContext.Announcer)
+#pragma warning disable 612
+                            .WithRunnerConventions(assemblyCollection.GetMigrationRunnerConventions())
+#pragma warning restore 612
+                            .AddMigrations(assemblies, _runnerContext.Namespace, _runnerContext.NestedNamespaces);
+                    });
+
+            // Configure the version table
+            using (var sp = services.BuildServiceProvider(false))
+            {
+                var migConv = sp.GetRequiredService<IMigrationRunnerConventions>();
+                var convSet = sp.GetRequiredService<IConventionSet>();
+#pragma warning disable 612
+                var versionTableMetaData = assemblyCollection.GetVersionTableMetaData(convSet, migConv, _runnerContext);
+#pragma warning restore 612
+                services.ConfigureRunner(builder => builder.ConfigureVersionTable(versionTableMetaData));
+            }
+
+            return services.BuildServiceProvider();
+        }
+
+        [Obsolete("This is not functional any more")]
+        protected virtual void Initialize()
+        {
         }
 
         public void Execute()
         {
-            Initialize();
-
-            try
+            using (new RunnerScope(_serviceProvider, this))
             {
                 switch (_runnerContext.Task)
                 {
@@ -192,7 +206,7 @@ namespace FluentMigrator.Runner.Initialization
                         break;
                 }
             }
-            finally { Runner.Processor.Dispose(); }
+
             _runnerContext.Announcer.Say("Task completed.");
         }
 
@@ -202,9 +216,7 @@ namespace FluentMigrator.Runner.Initialization
         /// </summary>
         public bool HasMigrationsToApply()
         {
-            Initialize();
-
-            try
+            using (new RunnerScope(_serviceProvider, this))
             {
                 switch (_runnerContext.Task)
                 {
@@ -228,44 +240,6 @@ namespace FluentMigrator.Runner.Initialization
                         return false;
                 }
             }
-            finally
-            {
-                Runner.Processor.Dispose();
-            }
-        }
-
-        private IMigrationProcessor InitializeConnectionlessProcessor()
-        {
-            var options = new ProcessorOptions
-            {
-                PreviewOnly = _runnerContext.PreviewOnly,
-                Timeout = _runnerContext.Timeout,
-                ProviderSwitches = _runnerContext.ProviderSwitches
-            };
-
-            var generatorFactory = new MigrationGeneratorFactory();
-            var generator = generatorFactory.GetGenerator(_runnerContext.Database);
-            if (generator == null)
-                throw new ProcessorFactoryNotFoundException(string.Format("The provider or dbtype parameter is incorrect. Available choices are {0}: ", generatorFactory.ListAvailableGeneratorTypes()));
-
-            var processor = new ConnectionlessProcessor(generator, _runnerContext, options);
-
-            return processor;
-        }
-
-        private IMigrationProcessorFactory FindProcessorFactory()
-        {
-            var processorFactory = _processorFactories
-                .FirstOrDefault(x => string.Equals(x.Name, _runnerContext.Database, StringComparison.OrdinalIgnoreCase));
-
-            if (processorFactory == null)
-            {
-                var choices = string.Join(", ", _processorFactories.Select(x => x.Name));
-                throw new ProcessorFactoryNotFoundException(
-                    $"The provider or dbtype parameter is incorrect. Available choices are {choices}: ");
-            }
-
-            return processorFactory;
         }
 
         private IMigrationProcessorOptions CreateProcessorOptions()
@@ -291,6 +265,64 @@ namespace FluentMigrator.Runner.Initialization
                 _runnerContext.Database);
 
             return connectionString;
+        }
+
+        private class RunnerScope : IDisposable
+        {
+            [CanBeNull]
+            private readonly ServiceProvider _temporaryServiceProvider;
+
+            [NotNull]
+            private readonly TaskExecutor _executor;
+
+            [CanBeNull]
+            private readonly IServiceScope _serviceScope;
+
+            private readonly bool _hasCustomRunner;
+
+            public RunnerScope([CanBeNull] IServiceProvider serviceProvider, [NotNull] TaskExecutor executor)
+            {
+                _executor = executor;
+
+#pragma warning disable 618
+                executor.Initialize();
+#pragma warning restore 618
+
+                if (executor.Runner != null)
+                {
+                    _hasCustomRunner = true;
+                }
+                else
+                {
+                    IServiceScope serviceScope;
+                    if (serviceProvider == null)
+                    {
+                        _temporaryServiceProvider = executor.ConfigureServices();
+                        serviceScope = _temporaryServiceProvider.CreateScope();
+                    }
+                    else
+                    {
+                        serviceScope = serviceProvider.CreateScope();
+                    }
+
+                    _serviceScope = serviceScope;
+                    _executor.Runner = serviceScope.ServiceProvider.GetRequiredService<IMigrationRunner>();
+                }
+            }
+
+            public void Dispose()
+            {
+                if (_hasCustomRunner)
+                {
+                    _executor.Runner.Processor?.Dispose();
+                }
+                else
+                {
+                    _executor.Runner = null;
+                    _serviceScope?.Dispose();
+                    _temporaryServiceProvider?.Dispose();
+                }
+            }
         }
     }
 }

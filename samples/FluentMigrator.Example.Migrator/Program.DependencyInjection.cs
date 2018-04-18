@@ -42,8 +42,10 @@ namespace FluentMigrator.Example.Migrator
                 .AddFluentMigrator<SQLiteProcessorFactory>(
                     connectionString,
                     builder => builder
-                        .AddMigrations(sel => sel.FromAssemblyOf<AddGTDTables>().AddClasses(f => f.AssignableTo<IMigration>()).As<IMigrationRunnerBuilder>().WithScopedLifetime())
                         .WithAnnouncer(new ConsoleAnnouncer() { ShowSql = true }));
+
+            services
+                .Scan(sel => sel.FromAssemblyOf<AddGTDTables>().AddClasses(f => f.AssignableTo<IMigration>()).As<IMigration>().WithScopedLifetime());
 
             return services.BuildServiceProvider();
         }
