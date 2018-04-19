@@ -38,6 +38,7 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
     [TestFixture]
     public class IfDatabaseExpressionRootTests
     {
+        [Test]
         public void CallsDelegateIfDatabaseTypeApplies()
         {
             var delegateCalled = false;
@@ -46,10 +47,11 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
                 expr.Delegate(() => delegateCalled = true);
             });
 
-            context.Expressions.Count.ShouldBe(1);
+            context.Expressions.Count.ShouldBe(0);
             delegateCalled.ShouldBeTrue();
         }
 
+        [Test]
         public void DoesntCallsDelegateIfDatabaseTypeDoesntMatch()
         {
             var delegateCalled = false;
