@@ -25,6 +25,7 @@ using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Initialization.AssemblyLoader;
+using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.VersionTableInfo;
 
 using JetBrains.Annotations;
@@ -37,6 +38,14 @@ namespace FluentMigrator.Runner
     [Obsolete]
     internal static class LegacyExtensions
     {
+        /// <summary>
+        /// Find the version table meta data in the given assembly collection
+        /// </summary>
+        /// <param name="assemblies">The assembly collection</param>
+        /// <param name="conventionSet">The convention set whose schema convention should be applied to the default version table metadata</param>
+        /// <param name="runnerConventions">The runner conventions used to identify a version table metadata type</param>
+        /// <param name="runnerContext">The runner context defining the search boundaries for the custom version table metadata type</param>
+        /// <returns>A custom or the default version table metadata instance</returns>
         [Obsolete]
         public static IVersionTableMetaData GetVersionTableMetaData(
             [CanBeNull] this IAssemblyCollection assemblies,
@@ -65,6 +74,11 @@ namespace FluentMigrator.Runner
             return (IVersionTableMetaData) Activator.CreateInstance(matchedType);
         }
 
+        /// <summary>
+        /// Search for custom migration runner conventions
+        /// </summary>
+        /// <param name="assemblies">The assemblies to search for</param>
+        /// <returns>The custom or the default migration runner conventions</returns>
         [Obsolete]
         public static IMigrationRunnerConventions GetMigrationRunnerConventions(
             [CanBeNull] this IAssemblyCollection assemblies)
@@ -82,6 +96,31 @@ namespace FluentMigrator.Runner
             }
 
             return new MigrationRunnerConventions();
+        }
+
+        /// <summary>
+        /// Loads the connection string using the connection string provider for the given assembly
+        /// </summary>
+        /// <param name="assemblies">The assembly to load the connection string from</param>
+        /// <param name="connectionStringProvider">The connection string provider</param>
+        /// <param name="runnerContext">The runner context</param>
+        /// <returns>The found connection string</returns>
+        public static string LoadConnectionString(
+            this IReadOnlyCollection<Assembly> assemblies,
+            IConnectionStringProvider connectionStringProvider,
+            IRunnerContext runnerContext)
+        {
+            var singleAssembly = assemblies.Count == 1 ? assemblies.Single() : null;
+            var singleAssemblyLocation = singleAssembly != null ? singleAssembly.Location : string.Empty;
+
+            var connectionString = connectionStringProvider.GetConnectionString(
+                runnerContext.Announcer,
+                runnerContext.Connection,
+                runnerContext.ConnectionStringConfigPath,
+                singleAssemblyLocation,
+                runnerContext.Database);
+
+            return connectionString;
         }
 
         /// <summary>

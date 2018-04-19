@@ -98,13 +98,77 @@ namespace Microsoft.Extensions.DependencyInjection
             return services;
         }
 
+        public static IServiceCollection CreateServices(
+            this IRunnerContext runnerContext,
+            IConnectionStringProvider connectionStringProvider,
+            AssemblyLoaderFactory assemblyLoaderFactory)
+        {
+            var services = new ServiceCollection();
+            var assemblies = assemblyLoaderFactory.GetTargetAssemblies(runnerContext.Targets).ToList();
+#pragma warning disable 612
+            var assemblyCollection = new AssemblyCollection(assemblies);
+#pragma warning restore 612
+
+            if (!runnerContext.NoConnection && connectionStringProvider == null)
+            {
+                runnerContext.NoConnection = true;
+            }
+
+            // Configure without the processor and migrations
+            services
+                .AddFluentMigratorCore();
+
+            // Configure the processor
+            if (runnerContext.NoConnection)
+            {
+                var processorFactoryType = typeof(ConnectionlessProcessorFactory);
+                services
+                    .AddMigrationGenerators(MigrationGeneratorFactory.RegisteredGenerators)
+                    .ConfigureProcessorFactory(processorFactoryType, string.Empty);
+            }
+            else
+            {
+                var connectionString = assemblies.LoadConnectionString(connectionStringProvider, runnerContext);
+                services
+                    .AddMigrationProcessorFactories(MigrationProcessorFactoryProvider.RegisteredFactories)
+                    .ConfigureProcessor(connectionString);
+            }
+
+            // Configure other options
+            services
+                .ConfigureRunner(
+                    builder =>
+                    {
+                        builder
+                            .WithRunnerContext(runnerContext)
+                            .WithAnnouncer(runnerContext.Announcer)
+#pragma warning disable 612
+                            .WithRunnerConventions(assemblyCollection.GetMigrationRunnerConventions())
+#pragma warning restore 612
+                            .AddMigrations(assemblies, runnerContext.Namespace, runnerContext.NestedNamespaces);
+                    });
+
+            // Configure the version table
+            using (var sp = services.BuildServiceProvider(false))
+            {
+                var migConv = sp.GetRequiredService<IMigrationRunnerConventions>();
+                var convSet = sp.GetRequiredService<IConventionSet>();
+#pragma warning disable 612
+                var versionTableMetaData = assemblyCollection.GetVersionTableMetaData(convSet, migConv, runnerContext);
+#pragma warning restore 612
+                services.ConfigureRunner(builder => builder.ConfigureVersionTable(versionTableMetaData));
+            }
+
+            return services;
+        }
+
         /// <summary>
         /// Adds a migration generator accessor service
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection" /> to add services to.</param>
         /// <param name="connectionString">The connection string used to connect to the database</param>
         /// <returns>The updated service collection</returns>
-        public static IServiceCollection ConfigureProcessor(
+        internal static IServiceCollection ConfigureProcessor(
             [NotNull] this IServiceCollection services,
             [NotNull] string connectionString)
         {
@@ -118,7 +182,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="services">The <see cref="IServiceCollection" /> to add services to.</param>
         /// <param name="connectionStringAccessor">Used to get the connection string</param>
         /// <returns>The updated service collection</returns>
-        public static IServiceCollection ConfigureProcessor(
+        internal static IServiceCollection ConfigureProcessor(
             [NotNull] this IServiceCollection services,
             [NotNull] Func<IServiceProvider, string> connectionStringAccessor)
         {
@@ -133,7 +197,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="services">The <see cref="IServiceCollection" /> to add services to.</param>
         /// <returns>The updated service collection</returns>
         [NotNull]
-        public static IServiceCollection AddFluentMigratorCore(
+        internal static IServiceCollection AddFluentMigratorCore(
             [NotNull] this IServiceCollection services)
         {
             if (services == null)
@@ -189,7 +253,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="migrationProcessorFactoryType">The type of the migration processor factory</param>
         /// <param name="connectionString">The connection string used to connect to the database</param>
         /// <returns>The updated service collection</returns>
-        public static IServiceCollection ConfigureProcessorFactory(
+        internal static IServiceCollection ConfigureProcessorFactory(
             [NotNull] this IServiceCollection services,
             [NotNull] Type migrationProcessorFactoryType,
             [NotNull] string connectionString)
@@ -206,7 +270,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="services">The <see cref="IServiceCollection" /> to add services to.</param>
         /// <param name="generators">The generators to add</param>
         /// <returns>The updated service collection</returns>
-        public static IServiceCollection AddMigrationGenerators(
+        internal static IServiceCollection AddMigrationGenerators(
             [NotNull] this IServiceCollection services,
             [NotNull, ItemNotNull] IEnumerable<IMigrationGenerator> generators)
         {
@@ -232,7 +296,7 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="services">The <see cref="IServiceCollection" /> to add services to.</param>
         /// <param name="factories">The factories to add</param>
         /// <returns>The updated service collection</returns>
-        public static IServiceCollection AddMigrationProcessorFactories(
+        internal static IServiceCollection AddMigrationProcessorFactories(
             [NotNull] this IServiceCollection services,
             [NotNull, ItemNotNull] IEnumerable<IMigrationProcessorFactory> factories)
         {

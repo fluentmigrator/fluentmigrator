@@ -87,23 +87,11 @@ namespace FluentMigrator.Runner.Initialization
 
         protected virtual IEnumerable<Assembly> GetTargetAssemblies()
         {
-            var assemblies = new HashSet<Assembly>();
-
-            foreach (var target in _runnerContext.Targets)
-            {
-                var assembly = _assemblyLoaderFactory.GetAssemblyLoader(target).Load();
-
-                if (assemblies.Add(assembly))
-                {
-                    yield return assembly;
-                }
-            }
+            return _assemblyLoaderFactory.GetTargetAssemblies(_runnerContext.Targets);
         }
 
         private ServiceProvider ConfigureServices()
         {
-            var processorFactories = MigrationProcessorFactoryProvider.RegisteredFactories;
-            var migrationGenerators = MigrationGeneratorFactory.RegisteredGenerators;
             var services = new ServiceCollection();
             var assemblies = GetTargetAssemblies().ToList();
 #pragma warning disable 612
@@ -124,14 +112,14 @@ namespace FluentMigrator.Runner.Initialization
             {
                 var processorFactoryType = typeof(ConnectionlessProcessorFactory);
                 services
-                    .AddMigrationGenerators(migrationGenerators)
+                    .AddMigrationGenerators(MigrationGeneratorFactory.RegisteredGenerators)
                     .ConfigureProcessorFactory(processorFactoryType, string.Empty);
             }
             else
             {
                 var connectionString = LoadConnectionString(assemblies);
                 services
-                    .AddMigrationProcessorFactories(processorFactories)
+                    .AddMigrationProcessorFactories(MigrationProcessorFactoryProvider.RegisteredFactories)
                     .ConfigureProcessor(connectionString);
             }
 
