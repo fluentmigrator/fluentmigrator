@@ -22,7 +22,6 @@ using System.Linq;
 
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Infrastructure.Extensions;
-using FluentMigrator.Model;
 using FluentMigrator.Runner.VersionTableInfo;
 
 namespace FluentMigrator.Runner.Infrastructure
@@ -39,7 +38,13 @@ namespace FluentMigrator.Runner.Infrastructure
         public Func<Type, bool> TypeIsProfile => TypeIsProfileImpl;
         public Func<Type, MigrationStage?> GetMaintenanceStage => GetMaintenanceStageImpl;
         public Func<Type, bool> TypeIsVersionTableMetaData => TypeIsVersionTableMetaDataImpl;
+
+        [Obsolete]
         public Func<Type, IMigrationInfo> GetMigrationInfo => GetMigrationInfoForImpl;
+
+        /// <inheritdoc />
+        public Func<IMigration, IMigrationInfo> GetMigrationInfoForMigration => GetMigrationInfoForMigrationImpl;
+
         public Func<Type, bool> TypeHasTags => TypeHasTagsImpl;
         public Func<Type, IEnumerable<string>, bool> TypeHasMatchingTags => TypeHasMatchingTagsImpl;
 
@@ -67,20 +72,22 @@ namespace FluentMigrator.Runner.Infrastructure
             return typeof(IVersionTableMetaData).IsAssignableFrom(type) && type.HasAttribute<VersionTableMetaDataAttribute>();
         }
 
-        private static IMigrationInfo GetMigrationInfoForImpl(Type migrationType)
+        private static IMigrationInfo GetMigrationInfoForMigrationImpl(IMigration migration)
         {
-            IMigration CreateMigration()
-            {
-                return (IMigration) Activator.CreateInstance(migrationType);
-            }
-
+            var migrationType = migration.GetType();
             var migrationAttribute = migrationType.GetOneAttribute<MigrationAttribute>();
-            var migrationInfo = new MigrationInfo(migrationAttribute.Version, migrationAttribute.Description, migrationAttribute.TransactionBehavior, migrationAttribute.BreakingChange, CreateMigration);
+            var migrationInfo = new MigrationInfo(migrationAttribute.Version, migrationAttribute.Description, migrationAttribute.TransactionBehavior, migrationAttribute.BreakingChange, () => migration);
 
-            foreach (MigrationTraitAttribute traitAttribute in migrationType.GetAllAttributes<MigrationTraitAttribute>())
+            foreach (var traitAttribute in migrationType.GetAllAttributes<MigrationTraitAttribute>())
                 migrationInfo.AddTrait(traitAttribute.Name, traitAttribute.Value);
 
             return migrationInfo;
+        }
+
+        private IMigrationInfo GetMigrationInfoForImpl(Type migrationType)
+        {
+            var migration = (IMigration) Activator.CreateInstance(migrationType);
+            return GetMigrationInfoForMigration(migration);
         }
 
         private static bool TypeHasTagsImpl(Type type)
@@ -90,19 +97,20 @@ namespace FluentMigrator.Runner.Infrastructure
 
         private static bool TypeHasMatchingTagsImpl(Type type, IEnumerable<string> tagsToMatch)
         {
-            var tags = type.GetAllAttributes<TagsAttribute>(true);
+            var tags = type.GetAllAttributes<TagsAttribute>(true).ToList();
+            var matchTagsList = tagsToMatch.ToList();
 
-            if (tags.Any() && !tagsToMatch.Any())
+            if (tags.Count != 0 && matchTagsList.Count == 0)
                 return false;
 
             var tagNamesForAllBehavior = tags.Where(t => t.Behavior == TagBehavior.RequireAll).SelectMany(t => t.TagNames).ToArray();
-            if (tagNamesForAllBehavior.Any() && tagsToMatch.All(t => tagNamesForAllBehavior.Any(t.Equals)))
+            if (tagNamesForAllBehavior.Any() && matchTagsList.All(t => tagNamesForAllBehavior.Any(t.Equals)))
             {
                 return true;
             }
 
             var tagNamesForAnyBehavior = tags.Where(t => t.Behavior == TagBehavior.RequireAny).SelectMany(t => t.TagNames).ToArray();
-            if (tagNamesForAnyBehavior.Any() && tagsToMatch.Any(t => tagNamesForAnyBehavior.Any(t.Equals)))
+            if (tagNamesForAnyBehavior.Any() && matchTagsList.Any(t => tagNamesForAnyBehavior.Any(t.Equals)))
             {
                 return true;
             }

@@ -32,17 +32,25 @@ namespace FluentMigrator.Runner
         public Func<Type, bool> TypeIsProfile { get; set; }
         public Func<Type, MigrationStage?> GetMaintenanceStage { get; set; }
         public Func<Type, bool> TypeIsVersionTableMetaData { get; set; }
+
+        [Obsolete]
         public Func<Type, IMigrationInfo> GetMigrationInfo { get; set; }
+
+        /// <inheritdoc />
+        public Func<IMigration, IMigrationInfo> GetMigrationInfoForMigration { get; }
         public Func<Type, bool> TypeHasTags { get; set; }
         public Func<Type, IEnumerable<string>, bool> TypeHasMatchingTags { get; set; }
 
         public MigrationRunnerConventions()
         {
             TypeIsMigration = _default.TypeIsMigration;
+            TypeIsVersionTableMetaData = _default.TypeIsVersionTableMetaData;
+#pragma warning disable 612
+            GetMigrationInfo = _default.GetMigrationInfo;
+#pragma warning restore 612
             TypeIsProfile = _default.TypeIsProfile;
             GetMaintenanceStage = _default.GetMaintenanceStage;
-            TypeIsVersionTableMetaData = _default.TypeIsVersionTableMetaData;
-            GetMigrationInfo = _default.GetMigrationInfo;
+            GetMigrationInfoForMigration = _default.GetMigrationInfoForMigration;
             TypeHasTags = _default.TypeHasTags;
             TypeHasMatchingTags = _default.TypeHasMatchingTags;
         }

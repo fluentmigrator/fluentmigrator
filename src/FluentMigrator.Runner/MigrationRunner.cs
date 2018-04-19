@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 
@@ -27,14 +28,35 @@ using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Versioning;
 using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Model;
+using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Exceptions;
 using FluentMigrator.Runner.VersionTableInfo;
+
+using JetBrains.Annotations;
+
+using Microsoft.Extensions.DependencyInjection;
 
 namespace FluentMigrator.Runner
 {
     public class MigrationRunner : IMigrationRunner
     {
-        private IAssemblyCollection _migrationAssemblies;
+        [CanBeNull]
+        private readonly IServiceProvider _serviceProvider;
+
+        [NotNull]
+        private readonly Lazy<IVersionLoader> _versionLoader;
+
+        [NotNull]
+        private readonly Lazy<IProfileLoader> _lazyProfileLoader;
+
+        [CanBeNull]
+        [Obsolete]
+        private readonly IAssemblyCollection _migrationAssemblies;
+
+        private IVersionLoader _currentVersionLoader;
+
+        private IProfileLoader _currentProfileLoader;
+
         private IAnnouncer _announcer;
         private IStopWatch _stopWatch;
         private bool _alreadyOutputPreviewOnlyModeWarning;
@@ -48,32 +70,35 @@ namespace FluentMigrator.Runner
 
         public bool SilentlyFail { get; set; }
 
-        public IMigrationProcessor Processor { get; private set; }
+        public IMigrationProcessor Processor { get; }
+
         public IMigrationInformationLoader MigrationLoader { get; set; }
-        public IProfileLoader ProfileLoader { get; set; }
+
+        public IProfileLoader ProfileLoader
+        {
+            get => _currentProfileLoader ?? _lazyProfileLoader.Value;
+            set => _currentProfileLoader = value;
+        }
+
         public IMaintenanceLoader MaintenanceLoader { get; set; }
         public IMigrationRunnerConventions Conventions { get; private set; }
         public IList<Exception> CaughtExceptions { get; private set; }
 
         public IMigrationScope CurrentScope
         {
-            get
-            {
-                return _migrationScopeHandler.CurrentScope;
-            }
-            set
-            {
-                _migrationScopeHandler.CurrentScope = value;
-            }
+            get => _migrationScopeHandler.CurrentScope;
+            set => _migrationScopeHandler.CurrentScope = value;
         }
 
         public IRunnerContext RunnerContext { get; private set; }
 
+        [Obsolete]
         public MigrationRunner(Assembly assembly, IRunnerContext runnerContext, IMigrationProcessor processor)
           : this(new SingleAssembly(assembly), runnerContext, processor)
         {
         }
 
+        [Obsolete]
         public MigrationRunner(
             IAssemblyCollection assemblies, IRunnerContext runnerContext,
             IMigrationProcessor processor, IVersionTableMetaData versionTableMetaData = null,
@@ -88,7 +113,7 @@ namespace FluentMigrator.Runner
             SilentlyFail = false;
             CaughtExceptions = null;
 
-            Conventions = migrationRunnerConventions ?? GetMigrationRunnerConventions(runnerContext);
+            Conventions = migrationRunnerConventions ?? GetMigrationRunnerConventions();
 
             var convSet = new DefaultConventionSet(runnerContext);
 
@@ -97,26 +122,97 @@ namespace FluentMigrator.Runner
             MigrationLoader = new DefaultMigrationInformationLoader(Conventions, _migrationAssemblies,
                                                                     runnerContext.Namespace,
                                                                     runnerContext.NestedNamespaces, runnerContext.Tags);
-            ProfileLoader = new ProfileLoader(runnerContext, this, Conventions);
+            _lazyProfileLoader = new Lazy<IProfileLoader>(() => new ProfileLoader(runnerContext, this, Conventions));
             MaintenanceLoader = new MaintenanceLoader(_migrationAssemblies, runnerContext.Tags, Conventions);
 
             if (runnerContext.NoConnection)
             {
-                VersionLoader = new ConnectionlessVersionLoader(
-                    this, _migrationAssemblies, convSet, Conventions,
-                    runnerContext.StartVersion, runnerContext.Version, versionTableMetaData);
+                _versionLoader = new Lazy<IVersionLoader>(
+                    () => new ConnectionlessVersionLoader(
+                        this,
+                        _migrationAssemblies,
+                        convSet,
+                        Conventions,
+                        runnerContext.StartVersion,
+                        runnerContext.Version,
+                        versionTableMetaData));
             }
             else
             {
-                VersionLoader = new VersionLoader(this, _migrationAssemblies, convSet, Conventions, versionTableMetaData);
+                _versionLoader = new Lazy<IVersionLoader>(
+                    () => new VersionLoader(this, _migrationAssemblies, convSet, Conventions, versionTableMetaData));
             }
         }
 
-        public IVersionLoader VersionLoader { get; set; }
+        public MigrationRunner(
+            [NotNull] IRunnerContext runnerContext,
+            [NotNull] IMigrationProcessor processor,
+            [NotNull] IVersionTableMetaData versionTableMetaData,
+            [NotNull] IMigrationRunnerConventions migrationRunnerConventions,
+            [NotNull] IMaintenanceLoader maintenanceLoader,
+            [NotNull] IMigrationInformationLoader migrationLoader,
+            [NotNull] IServiceProvider serviceProvider)
+        {
+            _serviceProvider = serviceProvider;
+            _announcer = runnerContext.Announcer;
+            Processor = processor;
+            _stopWatch = runnerContext.StopWatch;
+            RunnerContext = runnerContext;
+
+            SilentlyFail = false;
+            CaughtExceptions = null;
+
+            Conventions = migrationRunnerConventions;
+
+            var convSet = new DefaultConventionSet(runnerContext);
+
+            _migrationScopeHandler = new MigrationScopeHandler(Processor);
+            _migrationValidator = new MigrationValidator(_announcer, convSet);
+            MigrationLoader = migrationLoader;
+            _lazyProfileLoader = new Lazy<IProfileLoader>(() => new ProfileLoader(
+                runnerContext,
+                migrationRunnerConventions,
+                _serviceProvider.GetRequiredService<IEnumerable<IMigration>>(),
+                _serviceProvider
+            ));
+            MaintenanceLoader = maintenanceLoader;
+
+            if (runnerContext.NoConnection)
+            {
+                _versionLoader = new Lazy<IVersionLoader>(
+                    () => new ConnectionlessVersionLoader(
+                        this,
+                        convSet,
+                        Conventions,
+                        runnerContext.StartVersion,
+                        runnerContext.Version,
+                        versionTableMetaData));
+            }
+            else
+            {
+                _versionLoader = new Lazy<IVersionLoader>(
+                    () => new VersionLoader(this, convSet, Conventions, versionTableMetaData));
+            }
+        }
+
+        public IVersionLoader VersionLoader
+        {
+            get => _currentVersionLoader ?? _versionLoader.Value;
+            set => _currentVersionLoader = value;
+        }
 
         public void ApplyProfiles()
         {
-            ProfileLoader.ApplyProfiles();
+#pragma warning disable 612
+            if (ProfileLoader.SupportsParameterlessApplyProfile)
+            {
+                ProfileLoader.ApplyProfiles();
+#pragma warning restore 612
+            }
+            else
+            {
+                ProfileLoader.ApplyProfiles(this);
+            }
         }
 
         public void ApplyMaintenance(MigrationStage stage, bool useAutomaticTransactionManagement)
@@ -180,18 +276,11 @@ namespace FluentMigrator.Runner
             VersionLoader.LoadVersionInfo();
         }
 
-        private IMigrationRunnerConventions GetMigrationRunnerConventions(IRunnerContext runnerContext)
+        [Obsolete]
+        [CanBeNull]
+        private IMigrationRunnerConventions GetMigrationRunnerConventions()
         {
-            var matchedType = _migrationAssemblies
-                .GetExportedTypes()
-                .FirstOrDefault(t => typeof(IMigrationRunnerConventions).IsAssignableFrom(t));
-
-            if (matchedType != null)
-            {
-                return (IMigrationRunnerConventions) Activator.CreateInstance(matchedType);
-            }
-
-            return new MigrationRunnerConventions();
+            return _migrationAssemblies?.GetMigrationRunnerConventions();
         }
 
         private IEnumerable<IMigrationInfo> GetUpMigrationsToApply(long version)
@@ -463,6 +552,8 @@ namespace FluentMigrator.Runner
                 VersionLoader.RemoveVersionTable();
         }
 
+        [Obsolete]
+        [CanBeNull]
         public IAssemblyCollection MigrationAssemblies
         {
             get { return _migrationAssemblies; }
@@ -478,7 +569,20 @@ namespace FluentMigrator.Runner
         private void ExecuteMigration(IMigration migration, Action<IMigration, IMigrationContext> getExpressions)
         {
             CaughtExceptions = new List<Exception>();
-            var context = new MigrationContext(Processor, MigrationAssemblies, RunnerContext.ApplicationContext, Processor.ConnectionString);
+
+            MigrationContext context;
+
+            if (_serviceProvider == null)
+            {
+#pragma warning disable 612
+                Debug.Assert(_migrationAssemblies != null, "_migrationAssemblies != null");
+                context = new MigrationContext(Processor, _migrationAssemblies, RunnerContext.ApplicationContext, Processor.ConnectionString);
+#pragma warning restore 612
+            }
+            else
+            {
+                context = new MigrationContext(Processor, RunnerContext.ApplicationContext, Processor.ConnectionString, _serviceProvider);
+            }
 
             getExpressions(migration, context);
 
@@ -556,7 +660,7 @@ namespace FluentMigrator.Runner
 
         public void ListMigrations()
         {
-            var currentVersionInfo = this.VersionLoader.VersionInfo;
+            var currentVersionInfo = VersionLoader.VersionInfo;
             var currentVersion = currentVersionInfo.Latest();
 
             _announcer.Heading("Migrations");

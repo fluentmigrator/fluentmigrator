@@ -16,6 +16,7 @@
 //
 #endregion
 
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.VersionTableInfo;
 
 #pragma warning disable 3005
@@ -34,6 +35,12 @@ namespace FluentMigrator.Tests.Unit
         {
             SchemaName = "testSchemaName";
             OwnsSchema = true;
+        }
+
+        public TestVersionTableMetaData(IRunnerContext runnerContext)
+            : this()
+        {
+            ApplicationContext = runnerContext.ApplicationContext;
         }
 
         public object ApplicationContext { get; set; }

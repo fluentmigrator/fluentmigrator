@@ -16,18 +16,54 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
+using System.Diagnostics;
 using System.Linq;
 using System.IO;
+using System.Reflection;
 
 using FluentMigrator.Infrastructure;
+
+using JetBrains.Annotations;
 
 namespace FluentMigrator.Expressions
 {
     /// <summary>
     /// Expression to execute an embedded SQL script
     /// </summary>
-    public class ExecuteEmbeddedSqlScriptExpression : MigrationExpressionBase
+    public sealed class ExecuteEmbeddedSqlScriptExpression : ExecuteEmbeddedSqlScriptExpressionBase
     {
+        [CanBeNull]
+        private readonly IEmbeddedResourceProvider _embeddedResourceProvider;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExecuteEmbeddedSqlScriptExpression"/> class.
+        /// </summary>
+        [Obsolete]
+        public ExecuteEmbeddedSqlScriptExpression()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExecuteEmbeddedSqlScriptExpression"/> class.
+        /// </summary>
+        /// <param name="embeddedResourceProvider">The embedded resource provider</param>
+        public ExecuteEmbeddedSqlScriptExpression([NotNull] IEmbeddedResourceProvider embeddedResourceProvider)
+        {
+            _embeddedResourceProvider = embeddedResourceProvider;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExecuteEmbeddedSqlScriptExpression"/> class.
+        /// </summary>
+        /// <param name="assemblyCollection">The collection of assemblies to be searched for the resources</param>
+        [Obsolete]
+        public ExecuteEmbeddedSqlScriptExpression([NotNull] IAssemblyCollection assemblyCollection)
+        {
+            MigrationAssemblies = assemblyCollection;
+            _embeddedResourceProvider = new DefaultEmbeddedResourceProvider(assemblyCollection);
+        }
+
         /// <summary>
         /// Gets or sets the SQL script name
         /// </summary>
@@ -36,30 +72,44 @@ namespace FluentMigrator.Expressions
         /// <summary>
         /// Gets or sets the migration assemblies
         /// </summary>
+        [Obsolete()]
+        [CanBeNull]
         public IAssemblyCollection MigrationAssemblies { get; set; }
-
-        /// <summary>
-        /// Gets or sets parameters to be replaced before script execution
-        /// </summary>
-        public IDictionary<string, string> Parameters { get; set; }
 
         /// <inheritdoc />
         public override void ExecuteWith(IMigrationProcessor processor)
         {
+            List<(string name, Assembly assembly)> resourceNames;
+#pragma warning disable 612
+            if (MigrationAssemblies != null)
+            {
+                resourceNames = MigrationAssemblies.GetManifestResourceNames()
+                    .Select(item => (name: item.Name, assembly: item.Assembly))
+                    .ToList();
+#pragma warning restore 612
+            }
+            else if (_embeddedResourceProvider != null)
+            {
+                resourceNames = _embeddedResourceProvider.GetEmbeddedResources().ToList();
+            }
+            else
+            {
+#pragma warning disable 612
+                throw new InvalidOperationException($"The caller forgot to set the {nameof(MigrationAssemblies)} property.");
+#pragma warning restore 612
+            }
 
+            var embeddedResourceNameWithAssembly = GetQualifiedResourcePath(resourceNames, SqlScript);
             string sqlText;
-            var embeddedResourceNameWithAssembly = GetQualifiedResourcePath();
 
             using (var stream = embeddedResourceNameWithAssembly
-                .Assembly.GetManifestResourceStream(embeddedResourceNameWithAssembly.Name))
+                .assembly.GetManifestResourceStream(embeddedResourceNameWithAssembly.name))
             using (var reader = new StreamReader(stream))
             {
                 sqlText = reader.ReadToEnd();
             }
 
-            sqlText = SqlScriptTokenReplacer.ReplaceSqlScriptTokens(sqlText, Parameters);
-
-            processor.Execute(sqlText);
+            Execute(processor, sqlText);
         }
 
         /// <inheritdoc />
@@ -73,72 +123,6 @@ namespace FluentMigrator.Expressions
         public override string ToString()
         {
             return base.ToString() + SqlScript;
-        }
-
-        /// <summary>
-        /// Creates an exception about a missing SQL script
-        /// </summary>
-        /// <param name="sqlScript">The name of the SQL script</param>
-        /// <returns>The exception to be thrown</returns>
-        protected Exception NewNotFoundException(string sqlScript)
-        {
-            return new InvalidOperationException(string.Format("Could not find resource named {0} in assemblies {1}", sqlScript, string.Join(", ", MigrationAssemblies.Assemblies.Select(a => a.FullName).ToArray())));
-        }
-
-        /// <summary>
-        /// An exception to be thrown when the name of the embedded SQL script is ambiguous.
-        /// </summary>
-        /// <param name="sqlScript">The name of the SQL script</param>
-        /// <param name="foundResources">The found resource names</param>
-        /// <returns>The exception to be thrown</returns>
-        protected Exception NewNoUniqueResourceException(string sqlScript, IEnumerable<ManifestResourceNameWithAssembly> foundResources)
-        {
-            return new InvalidOperationException(string.Format(@"Could not find unique resource named {0} in assemblies {1}.
-Possible candidates are:
-
-{2}
-",
-                sqlScript,
-                string.Join(", ", MigrationAssemblies.Assemblies.Select(a => a.FullName).ToArray()),
-                string.Join(Environment.NewLine + "\t", foundResources.Select(r => r.Name).ToArray())));
-        }
-
-        /// <summary>
-        /// Gets the fully qualified ressource name and assembly
-        /// </summary>
-        /// <returns>the fully qualified ressource name and assembly</returns>
-        protected virtual ManifestResourceNameWithAssembly GetQualifiedResourcePath()
-        {
-            var foundResources = FindResourceName(SqlScript);
-
-            if (foundResources.Length == 0)
-                throw NewNotFoundException(SqlScript);
-
-            if (foundResources.Length > 1)
-                throw NewNoUniqueResourceException(SqlScript, foundResources);
-
-            return foundResources[0];
-        }
-
-        /// <summary>
-        /// Finds ressources with the given name
-        /// </summary>
-        /// <param name="sqlScript">The name of the SQL script ressource to be found</param>
-        /// <returns>The found ressources</returns>
-        protected virtual ManifestResourceNameWithAssembly[] FindResourceName(string sqlScript)
-        {
-            var resources = MigrationAssemblies.GetManifestResourceNames();
-
-            //resource full name is in format `namespace.resourceName`
-            var sqlScriptParts = sqlScript.Split('.').Reverse().ToArray();
-            Func<ManifestResourceNameWithAssembly, bool> isNameMatch = x =>
-                x.Name.Split('.')
-                    .Reverse()
-                    .Take(sqlScriptParts.Length)
-                    .SequenceEqual(sqlScriptParts, StringComparer.InvariantCultureIgnoreCase);
-
-            var foundResources = resources.Where(isNameMatch).ToArray();
-            return foundResources;
         }
     }
 }

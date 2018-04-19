@@ -19,9 +19,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
+
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Infrastructure.Extensions;
+using FluentMigrator.Runner.Initialization;
 
 namespace FluentMigrator.Runner
 {
@@ -29,30 +30,48 @@ namespace FluentMigrator.Runner
     {
         private readonly IDictionary<MigrationStage, IList<IMigration>> _maintenance;
 
+        [Obsolete]
         public MaintenanceLoader(IAssemblyCollection assemblyCollection, IEnumerable<string> tags, IMigrationRunnerConventions conventions)
         {
-            tags = tags ?? new string[] {};
-            var requireTags = tags.Any();
+            var tagsList = tags?.ToArray() ?? new string[0];
+            var requireTags = tagsList.Length != 0;
 
             _maintenance = (
                 from a in assemblyCollection.Assemblies
                     from type in a.GetExportedTypes()
                     let stage = conventions.GetMaintenanceStage(type)
                     where stage != null
-                where (requireTags && conventions.TypeHasMatchingTags(type, tags)) || (!requireTags && !conventions.TypeHasTags(type))
+                where (requireTags && conventions.TypeHasMatchingTags(type, tagsList)) || (!requireTags && !conventions.TypeHasTags(type))
                 let migration = (IMigration)Activator.CreateInstance(type)
-                group migration by stage
+                group migration by stage.GetValueOrDefault()
             ).ToDictionary(
-                g => g.Key.Value,
+                g => g.Key,
+                g => (IList<IMigration>)g.OrderBy(m => m.GetType().Name).ToArray()
+            );
+        }
+
+        public MaintenanceLoader(IEnumerable<IMigration> migrations, IRunnerContext runnerContext, IMigrationRunnerConventions conventions)
+        {
+            var tags = runnerContext.Tags?.ToList() ?? new List<string>();
+            var requireTags = tags.Count != 0;
+
+            _maintenance = (
+                from migration in migrations
+                let type = migration.GetType()
+                let stage = conventions.GetMaintenanceStage(type)
+                where stage != null
+                where (requireTags && conventions.TypeHasMatchingTags(type, tags)) || (!requireTags && !conventions.TypeHasTags(type))
+                group migration by stage.GetValueOrDefault()
+            ).ToDictionary(
+                g => g.Key,
                 g => (IList<IMigration>)g.OrderBy(m => m.GetType().Name).ToArray()
             );
         }
 
         public IList<IMigrationInfo> LoadMaintenance(MigrationStage stage)
         {
-            IList<IMigration> migrations;
             IList<IMigrationInfo> migrationInfos = new List<IMigrationInfo>();
-            if (!_maintenance.TryGetValue(stage, out migrations))
+            if (!_maintenance.TryGetValue(stage, out var migrations))
                 return migrationInfos;
 
             foreach (var migration in migrations)

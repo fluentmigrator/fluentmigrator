@@ -123,7 +123,7 @@ namespace FluentMigrator.DotNet.Cli
             NestedNamespaces = cmd.NestedNamespaces;
             StartVersion = cmd.StartVersion;
             WorkingDirectory = cmd.WorkingDirectory;
-            Tags = cmd.Tags.ToList();
+            Tags = cmd.Tags?.ToList() ?? new List<string>();
             return this;
         }
     }

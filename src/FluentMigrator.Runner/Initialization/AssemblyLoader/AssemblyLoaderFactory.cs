@@ -1,8 +1,8 @@
 #region License
 
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -20,8 +20,16 @@
 
 namespace FluentMigrator.Runner.Initialization.AssemblyLoader
 {
+    /// <summary>
+    /// Class that creates an <see cref="IAssemblyLoader"/> for a given assembly name
+    /// </summary>
     public class AssemblyLoaderFactory
     {
+        /// <summary>
+        /// Returns an assembly loader for an assembly with the given name
+        /// </summary>
+        /// <param name="name">The assembly name (can be an assembly name or file name)</param>
+        /// <returns>The new assembly loader</returns>
         public virtual IAssemblyLoader GetAssemblyLoader(string name)
         {
             var nameInLowerCase = name.ToLower();

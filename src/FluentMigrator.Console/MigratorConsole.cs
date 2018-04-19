@@ -77,7 +77,7 @@ namespace FluentMigrator.Console
                                         {
                                             "provider=|dbType=|db=",
                                             string.Format("REQUIRED. The kind of database you are migrating against. Available choices are: {0}.",
-                                                          new MigrationProcessorFactoryProvider().ListAvailableProcessorTypes()),
+                                                          string.Join(", ", MigrationProcessorFactoryProvider.ProcessorTypes)),
                                             v => { ProcessorType = v; }
                                             },
                                         {
@@ -342,8 +342,8 @@ namespace FluentMigrator.Console
             {
                 Database = ProcessorType,
                 Connection = Connection,
-                Targets = new[] {TargetAssembly},
                 PreviewOnly = PreviewOnly,
+                Targets = new[] {TargetAssembly},
                 Namespace = Namespace,
                 NestedNamespaces = NestedNamespaces,
                 Task = Task,

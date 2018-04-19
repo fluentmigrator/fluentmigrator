@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 //
 // Copyright (c) 2018, Fluent Migrator Project
 //
@@ -19,20 +19,13 @@
 using System;
 using System.IO;
 
-using FluentMigrator.Example.Migrations;
-using FluentMigrator.Runner;
-using FluentMigrator.Runner.Announcers;
-using FluentMigrator.Runner.Initialization;
-using FluentMigrator.Runner.Processors;
-using FluentMigrator.Runner.Processors.SQLite;
-
 using Microsoft.Data.Sqlite;
 
 namespace FluentMigrator.Example.Migrator
 {
-    static class Program
+    internal static partial class Program
     {
-        static void Main()
+        static void Main(string[] args)
         {
             // Configure the DB connection
             var dbFileName = Path.Combine(AppContext.BaseDirectory, "test.db");
@@ -42,33 +35,19 @@ namespace FluentMigrator.Example.Migrator
                 Mode = SqliteOpenMode.ReadWriteCreate
             };
 
-            // Create the announcer to output the migration messages
-            var announcer = new ConsoleAnnouncer()
+            // The poor mans command line parser
+            var useLegacyMode = args.Length > 0 && args[0] == "--mode=legacy";
+
+            if (!useLegacyMode)
             {
-                ShowSql = true,
-            };
-
-            // Processor specific options (usually none are needed)
-            var options = new ProcessorOptions();
-
-            // Initialize the DB-specific processor
-            var processorFactory = new SQLiteProcessorFactory();
-            var processor = processorFactory.Create(csb.ConnectionString, announcer, options);
-
-            // Configure the runner
-            var context = new RunnerContext(announcer)
+                Console.WriteLine(@"Using dependency injection");
+                RunWithServices(csb.ConnectionString);
+            }
+            else
             {
-                AllowBreakingChange = true,
-            };
-
-            // Create the migration runner
-            var runner = new MigrationRunner(
-                typeof(AddGTDTables).Assembly,
-                context,
-                processor);
-
-            // Run the migrations
-            runner.MigrateUp();
+                Console.WriteLine(@"Using legacy mode");
+                RunInLegacyMode(csb.ConnectionString);
+            }
         }
     }
 }

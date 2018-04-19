@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 //
 // Copyright (c) 2018, FluentMigrator Project
 //
@@ -16,6 +16,7 @@
 //
 #endregion
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -25,7 +26,7 @@ using FluentMigrator.Runner.Initialization;
 
 namespace FluentMigrator.Console
 {
-    class LateInitTaskExecutor : TaskExecutor
+    internal class LateInitTaskExecutor : TaskExecutor
     {
         private readonly IAnnouncer _announcer;
 
@@ -35,16 +36,15 @@ namespace FluentMigrator.Console
             _announcer = runnerContext.Announcer;
         }
 
-        protected override IEnumerable<Assembly> GetTargetAssemblies()
+        /// <inheritdoc />
+        protected override void Initialize()
         {
-            var targetAssemblies = base.GetTargetAssemblies().ToList();
+            var targetAssemblies = GetTargetAssemblies().ToList();
             if (targetAssemblies.Count != 0 && _announcer is LateInitAnnouncer announcer && string.IsNullOrEmpty(announcer.OutputTo))
             {
                 var targetAssembly = targetAssemblies.First();
                 announcer.OutputTo = targetAssembly.Location + ".sql";
             }
-
-            return targetAssemblies;
         }
     }
 }

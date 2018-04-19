@@ -23,14 +23,6 @@ using FluentMigrator.DotNet.Cli.CustomAnnouncers;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Initialization;
-using FluentMigrator.Runner.Processors.DB2;
-using FluentMigrator.Runner.Processors.DotConnectOracle;
-using FluentMigrator.Runner.Processors.Firebird;
-using FluentMigrator.Runner.Processors.MySql;
-using FluentMigrator.Runner.Processors.Oracle;
-using FluentMigrator.Runner.Processors.Postgres;
-using FluentMigrator.Runner.Processors.SqlServer;
-using FluentMigrator.Runner.Processors.SQLite;
 
 using McMaster.Extensions.CommandLineUtils;
 
@@ -41,7 +33,7 @@ namespace FluentMigrator.DotNet.Cli
 {
     public class Setup
     {
-        public IServiceProvider BuildServiceProvider(MigratorOptions options, IConsole console)
+        public static IServiceProvider BuildServiceProvider(MigratorOptions options, IConsole console)
         {
             var serviceCollection = new ServiceCollection();
             var serviceProvider = ConfigureServices(serviceCollection, options, console);
@@ -49,29 +41,13 @@ namespace FluentMigrator.DotNet.Cli
             return serviceProvider;
         }
 
-        private IServiceProvider ConfigureServices(IServiceCollection services, MigratorOptions options, IConsole console)
+        private static IServiceProvider ConfigureServices(IServiceCollection services, MigratorOptions options, IConsole console)
         {
             var mapper = ConfigureMapper();
             services
                 .AddLogging()
                 .AddOptions()
-                .AddSingleton(mapper)
-                .AddProcessorFactory<Db2ProcessorFactory>()
-                .AddProcessorFactory<DotConnectOracleProcessorFactory>()
-                .AddProcessorFactory<FirebirdProcessorFactory>()
-                .AddProcessorFactory<MySql4ProcessorFactory>()
-                .AddProcessorFactory<MySql5ProcessorFactory>()
-                .AddProcessorFactory<OracleManagedProcessorFactory>()
-                .AddProcessorFactory<OracleProcessorFactory>()
-                .AddProcessorFactory<PostgresProcessorFactory>()
-                .AddProcessorFactory<SQLiteProcessorFactory>()
-                .AddProcessorFactory<SqlServer2000ProcessorFactory>()
-                .AddProcessorFactory<SqlServer2005ProcessorFactory>()
-                .AddProcessorFactory<SqlServer2008ProcessorFactory>()
-                .AddProcessorFactory<SqlServer2012ProcessorFactory>()
-                .AddProcessorFactory<SqlServer2014ProcessorFactory>()
-                .AddProcessorFactory<SqlServerProcessorFactory>()
-                .AddProcessorFactory<SqlServerCeProcessorFactory>();
+                .AddSingleton(mapper);
             services
                 .Configure<MigratorOptions>(mc => mapper.Map(options, mc));
             services
@@ -86,22 +62,20 @@ namespace FluentMigrator.DotNet.Cli
                 .AddSingleton<LateInitAnnouncer>()
                 .AddSingleton<LoggingAnnouncer>()
                 .AddSingleton<ParserConsoleAnnouncer>()
-                .AddSingleton(sp => CreateAnnouncer(sp, options));
+                .AddSingleton(CreateAnnouncer);
             services
                 .AddSingleton(sp => CreateRunnerContext(sp, options));
-            services
-                .AddTransient<IStopWatch, StopWatch>();
             services
                 .AddTransient<TaskExecutor, LateInitTaskExecutor>();
             return services.BuildServiceProvider();
         }
 
-        private void Configure(ILoggerFactory loggerFactory)
+        private static void Configure(ILoggerFactory loggerFactory)
         {
             loggerFactory.AddDebug(LogLevel.Trace);
         }
 
-        private IMapper ConfigureMapper()
+        private static IMapper ConfigureMapper()
         {
             var mapperConfig = new MapperConfiguration(cfg =>
             {
@@ -111,7 +85,7 @@ namespace FluentMigrator.DotNet.Cli
             return new Mapper(mapperConfig);
         }
 
-        private IAnnouncer CreateAnnouncer(IServiceProvider serviceProvider, MigratorOptions options)
+        private static IAnnouncer CreateAnnouncer(IServiceProvider serviceProvider)
         {
             var loggingAnnouncer = serviceProvider.GetRequiredService<LoggingAnnouncer>();
             var consoleAnnouncer = serviceProvider.GetRequiredService<ParserConsoleAnnouncer>();
@@ -119,7 +93,7 @@ namespace FluentMigrator.DotNet.Cli
             return new CompositeAnnouncer(loggingAnnouncer, consoleAnnouncer, lateInitAnnouncer);
         }
 
-        private IRunnerContext CreateRunnerContext(IServiceProvider serviceProvider, MigratorOptions options)
+        private static IRunnerContext CreateRunnerContext(IServiceProvider serviceProvider, MigratorOptions options)
         {
             var announcer = serviceProvider.GetRequiredService<IAnnouncer>();
             return new RunnerContext(announcer)

@@ -16,9 +16,12 @@
 //
 #endregion
 
+using System;
 using System.Collections.Generic;
 
 using FluentMigrator.Expressions;
+
+using JetBrains.Annotations;
 
 namespace FluentMigrator.Infrastructure
 {
@@ -27,6 +30,12 @@ namespace FluentMigrator.Infrastructure
     /// </summary>
     public interface IMigrationContext
     {
+        /// <summary>
+        /// Gets the service provider used to create this migration context
+        /// </summary>
+        [NotNull]
+        IServiceProvider ServiceProvider { get; }
+
         /// <summary>
         /// Gets or sets the collection of expressions
         /// </summary>
@@ -40,6 +49,8 @@ namespace FluentMigrator.Infrastructure
         /// <summary>
         /// Gets or sets the collection of migration assemblies
         /// </summary>
+        [Obsolete]
+        [CanBeNull]
         IAssemblyCollection MigrationAssemblies { get; set; }
 
         /// <summary>

@@ -16,6 +16,8 @@
 //
 #endregion
 
+using System;
+
 namespace FluentMigrator.Runner.Processors.DB2.iSeries
 {
     public class Db2ISeriesDbFactory : ReflectionBasedDbFactory
@@ -25,8 +27,14 @@ namespace FluentMigrator.Runner.Processors.DB2.iSeries
             new TestEntry("IBM.Data.DB2.iSeries", "IBM.Data.DB2.iSeries.iDB2Factory"),
         };
 
+        [Obsolete]
         public Db2ISeriesDbFactory()
             : base(_testEntries)
+        {
+        }
+
+        public Db2ISeriesDbFactory(IServiceProvider serviceProvider)
+            : base(serviceProvider, _testEntries)
         {
         }
     }

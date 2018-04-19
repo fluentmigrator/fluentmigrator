@@ -24,6 +24,7 @@ namespace FluentMigrator.Infrastructure
     /// <summary>
     /// An assembly collection for multiple assemblies
     /// </summary>
+    [Obsolete]
     public class AssemblyCollection : IAssemblyCollection
     {
         /// <summary>
@@ -54,7 +55,8 @@ namespace FluentMigrator.Infrastructure
                 }
             }
 
-            return result.ToArray();         }
+            return result.ToArray();
+        }
 
         /// <inheritdoc />
         public Assembly[] Assemblies { get; }

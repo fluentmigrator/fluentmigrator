@@ -10,7 +10,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle
     public class OracleConstraintTests : OracleConstraintTestsBase {
         [SetUp]
         public void SetUp( ) {
-            base.SetUp( new OracleDbFactory() );
+            base.SetUp( new OracleDbFactory(serviceProvider: null) );
         }
     }
 }

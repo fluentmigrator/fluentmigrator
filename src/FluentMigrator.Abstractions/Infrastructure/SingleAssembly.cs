@@ -23,6 +23,7 @@ namespace FluentMigrator.Infrastructure
     /// <summary>
     /// A simple wrapper which is equivalent to a collection with a single Assembly
     /// </summary>
+    [Obsolete]
     public class SingleAssembly : IAssemblyCollection
     {
         /// <summary>

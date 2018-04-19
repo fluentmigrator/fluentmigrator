@@ -19,9 +19,12 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
+
+using Microsoft.Extensions.DependencyInjection;
 
 namespace FluentMigrator.Builders.Execute
 {
@@ -77,19 +80,46 @@ namespace FluentMigrator.Builders.Execute
         /// <inheritdoc />
         public void EmbeddedScript(string embeddedSqlScriptName)
         {
-            var expression = new ExecuteEmbeddedSqlScriptExpression { SqlScript = embeddedSqlScriptName, MigrationAssemblies = _context.MigrationAssemblies };
-            _context.Expressions.Add(expression);
+            var embeddedResourceProvider = _context.ServiceProvider?.GetService<IEmbeddedResourceProvider>();
+            if (embeddedResourceProvider == null)
+            {
+#pragma warning disable 612
+                Debug.Assert(_context.MigrationAssemblies != null, "_context.MigrationAssemblies != null");
+                var expression = new ExecuteEmbeddedSqlScriptExpression(_context.MigrationAssemblies) { SqlScript = embeddedSqlScriptName };
+#pragma warning restore 612
+                _context.Expressions.Add(expression);
+            }
+            else
+            {
+                var expression = new ExecuteEmbeddedSqlScriptExpression(embeddedResourceProvider) { SqlScript = embeddedSqlScriptName };
+                _context.Expressions.Add(expression);
+            }
         }
 
         /// <inheritdoc />
         public void EmbeddedScript(string embeddedSqlScriptName, IDictionary<string, string> parameters)
         {
-            var expression = new ExecuteEmbeddedSqlScriptExpression
+            var embeddedResourceProvider = _context.ServiceProvider?.GetService<IEmbeddedResourceProvider>();
+            ExecuteEmbeddedSqlScriptExpression expression;
+            if (embeddedResourceProvider == null)
             {
-                SqlScript = embeddedSqlScriptName,
-                MigrationAssemblies = _context.MigrationAssemblies,
-                Parameters = parameters,
-            };
+#pragma warning disable 612
+                Debug.Assert(_context.MigrationAssemblies != null, "_context.MigrationAssemblies != null");
+                expression = new ExecuteEmbeddedSqlScriptExpression(_context.MigrationAssemblies)
+                {
+                    SqlScript = embeddedSqlScriptName,
+                    Parameters = parameters,
+                };
+#pragma warning restore 612
+            }
+            else
+            {
+                expression = new ExecuteEmbeddedSqlScriptExpression(embeddedResourceProvider)
+                {
+                    SqlScript = embeddedSqlScriptName,
+                    Parameters = parameters,
+                };
+            }
 
             _context.Expressions.Add(expression);
         }

@@ -26,6 +26,8 @@ using FluentMigrator.Builders.IfDatabase;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Processors.SQLite;
 
+using Microsoft.Extensions.DependencyInjection;
+
 using Moq;
 
 using NUnit.Framework;
@@ -36,6 +38,7 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
     [TestFixture]
     public class IfDatabaseExpressionRootTests
     {
+        [Test]
         public void CallsDelegateIfDatabaseTypeApplies()
         {
             var delegateCalled = false;
@@ -44,10 +47,11 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
                 expr.Delegate(() => delegateCalled = true);
             });
 
-            context.Expressions.Count.ShouldBe(1);
+            context.Expressions.Count.ShouldBe(0);
             delegateCalled.ShouldBeTrue();
         }
 
+        [Test]
         public void DoesntCallsDelegateIfDatabaseTypeDoesntMatch()
         {
             var delegateCalled = false;
@@ -196,7 +200,17 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
             // Arrange
             var mock = new Mock<IDbConnection>(MockBehavior.Loose);
             mock.Setup(x => x.State).Returns(ConnectionState.Open);
-            var context = new MigrationContext(processor ?? new SQLiteProcessor(mock.Object, null, null, null, new SQLiteDbFactory()), new SingleAssembly(GetType().Assembly), null, "");
+
+            var services = new ServiceCollection();
+            services
+#pragma warning disable 612
+                .AddScoped(sp => new SingleAssembly(GetType().Assembly))
+#pragma warning restore 612
+                .AddScoped<IEmbeddedResourceProvider, DefaultEmbeddedResourceProvider>();
+
+            var context = new MigrationContext(
+                processor ?? new SQLiteProcessor(mock.Object, generator: null, announcer: null, options: null, new SQLiteDbFactory(serviceProvider: null)),
+                context: null, connection: string.Empty, services.BuildServiceProvider());
 
             var expression = new IfDatabaseExpressionRoot(context, databaseType.ToArray());
 
@@ -220,7 +234,17 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
             // Arrange
             var mock = new Mock<IDbConnection>(MockBehavior.Loose);
             mock.Setup(x => x.State).Returns(ConnectionState.Open);
-            var context = new MigrationContext(new SQLiteProcessor(mock.Object, null, null, null, new SQLiteDbFactory()), new SingleAssembly(GetType().Assembly), null, "");
+
+            var services = new ServiceCollection();
+            services
+#pragma warning disable 612
+                .AddScoped(sp => new SingleAssembly(GetType().Assembly))
+#pragma warning restore 612
+                .AddScoped<IEmbeddedResourceProvider, DefaultEmbeddedResourceProvider>();
+
+            var context = new MigrationContext(
+                new SQLiteProcessor(mock.Object, generator: null, announcer: null, options: null, new SQLiteDbFactory(serviceProvider: null)),
+                context: null, connection: string.Empty, services.BuildServiceProvider());
 
             var expression = new IfDatabaseExpressionRoot(context, databaseTypePredicate);
 
@@ -233,7 +257,6 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
                 {
                     action(expression);
                 }
-
             }
 
             return context;

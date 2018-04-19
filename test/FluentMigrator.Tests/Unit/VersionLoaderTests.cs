@@ -16,6 +16,7 @@
 //
 #endregion
 
+using System;
 using System.Linq;
 using System.Reflection;
 
@@ -23,6 +24,8 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.VersionTableInfo;
+
+using Microsoft.Extensions.DependencyInjection;
 
 using Moq;
 
@@ -64,9 +67,18 @@ namespace FluentMigrator.Tests.Unit
             runner.SetupGet(r => r.Processor.Options).Returns(new TestMigrationProcessorOptions());
             runner.SetupGet(r => r.RunnerContext).Returns(runnerContext.Object);
 
-            var conventions = new MigrationRunnerConventions();
             var asm = Assembly.GetExecutingAssembly();
-            var loader = new VersionLoader(runner.Object, asm, ConventionSets.NoSchemaName, conventions);
+
+            var serviceProvider = new ServiceCollection()
+                .AddScoped(_ => runner.Object)
+                .AddScoped(_ => runnerContext.Object)
+                .AddScoped(_ => ConventionSets.NoSchemaName)
+                .AddScoped<IMigrationRunnerConventions, MigrationRunnerConventions>()
+                .AddVersionTableMetaData(sp => new[] { asm }.GetVersionTableMetaDataType(sp))
+                .AddScoped<IVersionLoader, VersionLoader>()
+                .BuildServiceProvider();
+
+            var loader = serviceProvider.GetRequiredService<IVersionLoader>();
 
             var versionTableMetaData = loader.GetVersionTableMetaData();
             versionTableMetaData.ShouldBeOfType<TestVersionTableMetaData>();
@@ -81,15 +93,25 @@ namespace FluentMigrator.Tests.Unit
             runner.SetupGet(r => r.Processor.Options).Returns(new TestMigrationProcessorOptions());
             runner.SetupGet(r => r.RunnerContext).Returns(runnerContext.Object);
 
-            var conventions = new MigrationRunnerConventions();
             var asm = "s".GetType().Assembly;
-            var loader = new VersionLoader(runner.Object, asm, ConventionSets.NoSchemaName, conventions);
+
+            var serviceProvider = new ServiceCollection()
+                .AddScoped(_ => runner.Object)
+                .AddScoped(_ => runnerContext.Object)
+                .AddScoped(_ => ConventionSets.NoSchemaName)
+                .AddScoped<IMigrationRunnerConventions, MigrationRunnerConventions>()
+                .AddVersionTableMetaData(sp => new[] { asm }.GetVersionTableMetaDataType(sp))
+                .AddScoped<IVersionLoader, VersionLoader>()
+                .BuildServiceProvider();
+
+            var loader = serviceProvider.GetRequiredService<IVersionLoader>();
 
             var versionTableMetaData = loader.GetVersionTableMetaData();
             versionTableMetaData.ShouldBeOfType<DefaultVersionTableMetaData>();
         }
 
         [Test]
+        [Obsolete]
         public void CanSetupApplicationContext()
         {
             var applicationContext = "Test context";
@@ -101,9 +123,18 @@ namespace FluentMigrator.Tests.Unit
             runner.SetupGet(r => r.Processor.Options).Returns(new TestMigrationProcessorOptions());
             runner.SetupGet(r => r.RunnerContext).Returns(runnerContext.Object);
 
-            var conventions = new MigrationRunnerConventions();
             var asm = Assembly.GetExecutingAssembly();
-            var loader = new VersionLoader(runner.Object, asm, ConventionSets.NoSchemaName, conventions);
+
+            var serviceProvider = new ServiceCollection()
+                .AddScoped(_ => runner.Object)
+                .AddScoped(_ => runnerContext.Object)
+                .AddScoped(_ => ConventionSets.NoSchemaName)
+                .AddScoped<IMigrationRunnerConventions, MigrationRunnerConventions>()
+                .AddVersionTableMetaData(sp => new[] { asm }.GetVersionTableMetaDataType(sp))
+                .AddScoped<IVersionLoader, VersionLoader>()
+                .BuildServiceProvider();
+
+            var loader = serviceProvider.GetRequiredService<IVersionLoader>();
 
             var versionTableMetaData = loader.GetVersionTableMetaData();
             versionTableMetaData.ApplicationContext.ShouldBe(applicationContext);
@@ -119,9 +150,18 @@ namespace FluentMigrator.Tests.Unit
             runner.SetupGet(r => r.Processor).Returns(processor.Object);
             runner.SetupGet(r => r.RunnerContext).Returns(runnerContext.Object);
 
-            var conventions = new MigrationRunnerConventions();
             var asm = Assembly.GetExecutingAssembly();
-            var loader = new VersionLoader(runner.Object, asm, ConventionSets.NoSchemaName, conventions);
+
+            var serviceProvider = new ServiceCollection()
+                .AddScoped(_ => runner.Object)
+                .AddScoped(_ => runnerContext.Object)
+                .AddScoped(_ => ConventionSets.NoSchemaName)
+                .AddScoped<IMigrationRunnerConventions, MigrationRunnerConventions>()
+                .AddVersionTableMetaData(sp => new[] { asm }.GetVersionTableMetaDataType(sp))
+                .AddScoped<IVersionLoader, VersionLoader>()
+                .BuildServiceProvider();
+
+            var loader = serviceProvider.GetRequiredService<IVersionLoader>();
 
             processor.Setup(p => p.Process(It.Is<DeleteDataExpression>(expression =>
                                                                        expression.SchemaName == loader.VersionTableMetaData.SchemaName
@@ -147,9 +187,18 @@ namespace FluentMigrator.Tests.Unit
             runner.SetupGet(r => r.Processor).Returns(processor.Object);
             runner.SetupGet(r => r.RunnerContext).Returns(runnerContext.Object);
 
-            var conventions = new MigrationRunnerConventions();
             var asm = Assembly.GetExecutingAssembly();
-            var loader = new VersionLoader(runner.Object, asm, ConventionSets.NoSchemaName, conventions);
+
+            var serviceProvider = new ServiceCollection()
+                .AddScoped(_ => runner.Object)
+                .AddScoped(_ => runnerContext.Object)
+                .AddScoped(_ => ConventionSets.NoSchemaName)
+                .AddScoped<IMigrationRunnerConventions, MigrationRunnerConventions>()
+                .AddVersionTableMetaData(sp => new[] { asm }.GetVersionTableMetaDataType(sp))
+                .AddScoped<IVersionLoader, VersionLoader>()
+                .BuildServiceProvider();
+
+            var loader = serviceProvider.GetRequiredService<IVersionLoader>();
 
             processor.Setup(p => p.Process(It.Is<DeleteTableExpression>(expression =>
                                                                         expression.SchemaName == loader.VersionTableMetaData.SchemaName
@@ -174,9 +223,18 @@ namespace FluentMigrator.Tests.Unit
             runner.SetupGet(r => r.Processor).Returns(processor.Object);
             runner.SetupGet(r => r.RunnerContext).Returns(runnerContext.Object);
 
-            var conventions = new MigrationRunnerConventions();
             var asm = Assembly.GetExecutingAssembly();
-            var loader = new VersionLoader(runner.Object, asm, ConventionSets.NoSchemaName, conventions);
+
+            var serviceProvider = new ServiceCollection()
+                .AddScoped(_ => runner.Object)
+                .AddScoped(_ => runnerContext.Object)
+                .AddScoped(_ => ConventionSets.NoSchemaName)
+                .AddScoped<IMigrationRunnerConventions, MigrationRunnerConventions>()
+                .AddVersionTableMetaData(sp => new[] { asm }.GetVersionTableMetaDataType(sp))
+                .AddScoped<IVersionLoader, VersionLoader>()
+                .BuildServiceProvider();
+
+            var loader = serviceProvider.GetRequiredService<IVersionLoader>();
 
             ((TestVersionTableMetaData) loader.VersionTableMetaData).OwnsSchema = false;
 
@@ -199,9 +257,18 @@ namespace FluentMigrator.Tests.Unit
             runner.SetupGet(r => r.Processor).Returns(processor.Object);
             runner.SetupGet(r => r.RunnerContext).Returns(runnerContext.Object);
 
-            var conventions = new MigrationRunnerConventions();
             var asm = Assembly.GetExecutingAssembly();
-            var loader = new VersionLoader(runner.Object, asm, ConventionSets.NoSchemaName, conventions);
+
+            var serviceProvider = new ServiceCollection()
+                .AddScoped(_ => runner.Object)
+                .AddScoped(_ => runnerContext.Object)
+                .AddScoped(_ => ConventionSets.NoSchemaName)
+                .AddScoped<IMigrationRunnerConventions, MigrationRunnerConventions>()
+                .AddVersionTableMetaData(sp => new[] { asm }.GetVersionTableMetaDataType(sp))
+                .AddScoped<IVersionLoader, VersionLoader>()
+                .BuildServiceProvider();
+
+            var loader = serviceProvider.GetRequiredService<IVersionLoader>();
 
             processor.Setup(p => p.Process(It.Is<InsertDataExpression>(expression =>
                                                                        expression.SchemaName == loader.VersionTableMetaData.SchemaName
@@ -222,7 +289,6 @@ namespace FluentMigrator.Tests.Unit
         public void VersionSchemaMigrationOnlyRunOnceEvenIfExistenceChecksReturnFalse()
         {
             var runnerContext = new Mock<IRunnerContext>();
-            var conventions = new MigrationRunnerConventions();
             var processor = new Mock<IMigrationProcessor>();
             var runner = new Mock<IMigrationRunner>();
             var asm = Assembly.GetExecutingAssembly();
@@ -232,7 +298,16 @@ namespace FluentMigrator.Tests.Unit
 
             processor.Setup(p => p.SchemaExists(It.IsAny<string>())).Returns(false);
 
-            var loader = new VersionLoader(runner.Object, asm, ConventionSets.NoSchemaName, conventions);
+            var serviceProvider = new ServiceCollection()
+                .AddScoped(_ => runner.Object)
+                .AddScoped(_ => runnerContext.Object)
+                .AddScoped(_ => ConventionSets.NoSchemaName)
+                .AddScoped<IMigrationRunnerConventions, MigrationRunnerConventions>()
+                .AddVersionTableMetaData(sp => new[] { asm }.GetVersionTableMetaDataType(sp))
+                .AddScoped<VersionLoader>()
+                .BuildServiceProvider();
+
+            var loader = serviceProvider.GetRequiredService<VersionLoader>();
 
             loader.LoadVersionInfo();
 
@@ -243,7 +318,6 @@ namespace FluentMigrator.Tests.Unit
         public void VersionMigrationOnlyRunOnceEvenIfExistenceChecksReturnFalse()
         {
             var runnerContext = new Mock<IRunnerContext>();
-            var conventions = new MigrationRunnerConventions();
             var processor = new Mock<IMigrationProcessor>();
             var runner = new Mock<IMigrationRunner>();
             var asm = Assembly.GetExecutingAssembly();
@@ -253,7 +327,16 @@ namespace FluentMigrator.Tests.Unit
 
             processor.Setup(p => p.TableExists(new TestVersionTableMetaData().SchemaName, TestVersionTableMetaData.TABLENAME)).Returns(false);
 
-            var loader = new VersionLoader(runner.Object, asm, ConventionSets.NoSchemaName, conventions);
+            var serviceProvider = new ServiceCollection()
+                .AddScoped(_ => runner.Object)
+                .AddScoped(_ => runnerContext.Object)
+                .AddScoped(_ => ConventionSets.NoSchemaName)
+                .AddScoped<IMigrationRunnerConventions, MigrationRunnerConventions>()
+                .AddVersionTableMetaData(sp => new[] { asm }.GetVersionTableMetaDataType(sp))
+                .AddScoped<VersionLoader>()
+                .BuildServiceProvider();
+
+            var loader = serviceProvider.GetRequiredService<VersionLoader>();
 
             loader.LoadVersionInfo();
 
@@ -264,7 +347,6 @@ namespace FluentMigrator.Tests.Unit
         public void VersionUniqueMigrationOnlyRunOnceEvenIfExistenceChecksReturnFalse()
         {
             var runnerContext = new Mock<IRunnerContext>();
-            var conventions = new MigrationRunnerConventions();
             var processor = new Mock<IMigrationProcessor>();
             var runner = new Mock<IMigrationRunner>();
             var asm = Assembly.GetExecutingAssembly();
@@ -274,7 +356,16 @@ namespace FluentMigrator.Tests.Unit
 
             processor.Setup(p => p.ColumnExists(new TestVersionTableMetaData().SchemaName, TestVersionTableMetaData.TABLENAME, TestVersionTableMetaData.APPLIEDONCOLUMNNAME)).Returns(false);
 
-            var loader = new VersionLoader(runner.Object, asm, ConventionSets.NoSchemaName, conventions);
+            var serviceProvider = new ServiceCollection()
+                .AddScoped(_ => runner.Object)
+                .AddScoped(_ => runnerContext.Object)
+                .AddScoped(_ => ConventionSets.NoSchemaName)
+                .AddScoped<IMigrationRunnerConventions, MigrationRunnerConventions>()
+                .AddVersionTableMetaData(sp => new[] { asm }.GetVersionTableMetaDataType(sp))
+                .AddScoped<VersionLoader>()
+                .BuildServiceProvider();
+
+            var loader = serviceProvider.GetRequiredService<VersionLoader>();
 
             loader.LoadVersionInfo();
 
@@ -285,7 +376,6 @@ namespace FluentMigrator.Tests.Unit
         public void VersionDescriptionMigrationOnlyRunOnceEvenIfExistenceChecksReturnFalse()
         {
             var runnerContext = new Mock<IRunnerContext>();
-            var conventions = new MigrationRunnerConventions();
             var processor = new Mock<IMigrationProcessor>();
             var runner = new Mock<IMigrationRunner>();
             var asm = Assembly.GetExecutingAssembly();
@@ -295,7 +385,16 @@ namespace FluentMigrator.Tests.Unit
 
             processor.Setup(p => p.ColumnExists(new TestVersionTableMetaData().SchemaName, TestVersionTableMetaData.TABLENAME, TestVersionTableMetaData.APPLIEDONCOLUMNNAME)).Returns(false);
 
-            var loader = new VersionLoader(runner.Object, asm, ConventionSets.NoSchemaName, conventions);
+            var serviceProvider = new ServiceCollection()
+                .AddScoped(_ => runner.Object)
+                .AddScoped(_ => runnerContext.Object)
+                .AddScoped(_ => ConventionSets.NoSchemaName)
+                .AddScoped<IMigrationRunnerConventions, MigrationRunnerConventions>()
+                .AddVersionTableMetaData(sp => new[] { asm }.GetVersionTableMetaDataType(sp))
+                .AddScoped<VersionLoader>()
+                .BuildServiceProvider();
+
+            var loader = serviceProvider.GetRequiredService<VersionLoader>();
 
             loader.LoadVersionInfo();
 

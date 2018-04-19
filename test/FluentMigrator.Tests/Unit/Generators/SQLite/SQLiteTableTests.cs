@@ -1,3 +1,5 @@
+using System;
+
 using FluentMigrator.Builders.Create.Table;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
@@ -301,7 +303,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         [Test]
         public void Issue804()
         {
-            var context = new MigrationContext(null, null, null, null);
+            var context = new MigrationContext(null, null, null, (IServiceProvider)null);
 
             var expression = new CreateTableExpression()
             {

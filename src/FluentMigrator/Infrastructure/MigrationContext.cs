@@ -16,9 +16,14 @@
 //
 #endregion
 
+using System;
 using System.Collections.Generic;
 
 using FluentMigrator.Expressions;
+
+using JetBrains.Annotations;
+
+using Microsoft.Extensions.DependencyInjection;
 
 namespace FluentMigrator.Infrastructure
 {
@@ -34,13 +39,38 @@ namespace FluentMigrator.Infrastructure
         /// <param name="migrationAssemblies">The collection of migration assemblies</param>
         /// <param name="context">The arbitrary application context passed to the task runner</param>
         /// <param name="connection">The database connection</param>
-        public MigrationContext(IQuerySchema querySchema, IAssemblyCollection migrationAssemblies, object context, string connection)
+        [Obsolete]
+        public MigrationContext([NotNull] IQuerySchema querySchema, [NotNull] IAssemblyCollection migrationAssemblies, object context, string connection)
         {
             Expressions = new List<IMigrationExpression>();
             QuerySchema = querySchema;
             MigrationAssemblies = migrationAssemblies;
             ApplicationContext = context;
             Connection = connection;
+            var services = new ServiceCollection();
+            services
+                .AddScoped(sp => migrationAssemblies)
+                .AddScoped<IEmbeddedResourceProvider, DefaultEmbeddedResourceProvider>();
+            ServiceProvider = services.BuildServiceProvider();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MigrationContext"/> class.
+        /// </summary>
+        /// <param name="querySchema">The provider used to query the database</param>
+        /// <param name="context">The arbitrary application context passed to the task runner</param>
+        /// <param name="connection">The database connection</param>
+        /// <param name="serviceProvider">The service provider</param>
+        public MigrationContext([NotNull] IQuerySchema querySchema, object context, string connection, [NotNull] IServiceProvider serviceProvider)
+        {
+            Expressions = new List<IMigrationExpression>();
+            QuerySchema = querySchema;
+#pragma warning disable 612
+            MigrationAssemblies = serviceProvider?.GetService<IAssemblyCollection>();
+#pragma warning restore 612
+            ApplicationContext = context;
+            Connection = connection;
+            ServiceProvider = serviceProvider;
         }
 
         /// <inheritdoc />
@@ -50,6 +80,7 @@ namespace FluentMigrator.Infrastructure
         public virtual IQuerySchema QuerySchema { get; set; }
 
         /// <inheritdoc />
+        [Obsolete]
         public virtual IAssemblyCollection MigrationAssemblies { get; set; }
 
         /// <inheritdoc />
@@ -57,5 +88,8 @@ namespace FluentMigrator.Infrastructure
 
         /// <inheritdoc />
         public string Connection { get; set; }
+
+        /// <inheritdoc />
+        public IServiceProvider ServiceProvider { get; }
     }
 }
