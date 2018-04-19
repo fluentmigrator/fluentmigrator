@@ -50,7 +50,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         [Test]
         public void ExecutesTheStatement()
         {
-            var provider = new DefaultEmbeddedResourceProvider(new SingleAssembly(Assembly.GetExecutingAssembly()));
+            var provider = new DefaultEmbeddedResourceProvider(Assembly.GetExecutingAssembly());
             var expression = new ExecuteEmbeddedSqlScriptExpression(provider) { SqlScript = testSqlScript };
 
             var processor = new Mock<IMigrationProcessor>();
@@ -64,7 +64,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         public void ExecutesTheStatementWithParameters()
         {
             const string scriptContentsWithParameters = "TEST SCRIPT ParameterValue $(escaped_parameter) $(missing_parameter)";
-            var provider = new DefaultEmbeddedResourceProvider(new SingleAssembly(Assembly.GetExecutingAssembly()));
+            var provider = new DefaultEmbeddedResourceProvider(Assembly.GetExecutingAssembly());
             var expression = new ExecuteEmbeddedSqlScriptExpression(provider)
             {
                 SqlScript = "EmbeddedTestScriptWithParameters.sql",
@@ -81,7 +81,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         [Test]
         public void ResourceFinderIsCaseInsensitive()
         {
-            var provider = new DefaultEmbeddedResourceProvider(new SingleAssembly(Assembly.GetExecutingAssembly()));
+            var provider = new DefaultEmbeddedResourceProvider(Assembly.GetExecutingAssembly());
             var expression = new ExecuteEmbeddedSqlScriptExpression(provider) { SqlScript = testSqlScript.ToUpper() };
             var processor = new Mock<IMigrationProcessor>();
             processor.Setup(x => x.Execute(scriptContents)).Verifiable();
@@ -93,7 +93,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         [Test]
         public void ResourceFinderFindFileWithFullName()
         {
-            var provider = new DefaultEmbeddedResourceProvider(new SingleAssembly(Assembly.GetExecutingAssembly()));
+            var provider = new DefaultEmbeddedResourceProvider(Assembly.GetExecutingAssembly());
             var expression = new ExecuteEmbeddedSqlScriptExpression(provider) { SqlScript = "InitialSchema.sql" };
             var processor = new Mock<IMigrationProcessor>();
             processor.Setup(x => x.Execute("InitialSchema")).Verifiable();
@@ -105,7 +105,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         [Test]
         public void ResourceFinderFindFileWithFullNameAndNamespace()
         {
-            var provider = new DefaultEmbeddedResourceProvider(new SingleAssembly(Assembly.GetExecutingAssembly()));
+            var provider = new DefaultEmbeddedResourceProvider(Assembly.GetExecutingAssembly());
             var expression = new ExecuteEmbeddedSqlScriptExpression(provider) { SqlScript = "FluentMigrator.Tests.EmbeddedResources.InitialSchema.sql" };
             var processor = new Mock<IMigrationProcessor>();
             processor.Setup(x => x.Execute("InitialSchema")).Verifiable();
@@ -117,7 +117,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         [Test]
         public void ResourceFinderFindThrowsExceptionIfFoundMoreThenOneResource()
         {
-            var provider = new DefaultEmbeddedResourceProvider(new SingleAssembly(Assembly.GetExecutingAssembly()));
+            var provider = new DefaultEmbeddedResourceProvider(Assembly.GetExecutingAssembly());
             var expression = new ExecuteEmbeddedSqlScriptExpression(provider) { SqlScript = "NotUniqueResource.sql" };
             var processor = new Mock<IMigrationProcessor>();
 

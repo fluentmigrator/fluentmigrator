@@ -73,7 +73,7 @@ namespace FluentMigrator.Runner
             Assemblies = assemblies;
 
             Conventions = conventions;
-            VersionTableMetaData = versionTableMetaData ?? GetVersionTableMetaData();
+            VersionTableMetaData = versionTableMetaData ?? CreateVersionTableMetaData();
             VersionMigration = new VersionMigration(VersionTableMetaData);
             VersionSchemaMigration = new VersionSchemaMigration(VersionTableMetaData);
             VersionUniqueMigration = new VersionUniqueMigration(VersionTableMetaData);
@@ -117,33 +117,10 @@ namespace FluentMigrator.Runner
             dataExpression.ExecuteWith(Processor);
         }
 
-        [Obsolete]
         [NotNull]
         public IVersionTableMetaData GetVersionTableMetaData()
         {
-            if (Assemblies == null)
-            {
-                var result = new DefaultVersionTableMetaData();
-                _conventionSet.SchemaConvention?.Apply(result);
-                return result;
-            }
-
-            Type matchedType = Assemblies.GetExportedTypes()
-                .FilterByNamespace(Runner.RunnerContext.Namespace, Runner.RunnerContext.NestedNamespaces)
-                .FirstOrDefault(t => Conventions.TypeIsVersionTableMetaData(t));
-
-            if (matchedType == null)
-            {
-                var result = new DefaultVersionTableMetaData();
-                _conventionSet.SchemaConvention?.Apply(result);
-                return result;
-            }
-
-            var versionTableMetaData = (IVersionTableMetaData)Activator.CreateInstance(matchedType);
-
-            versionTableMetaData.ApplicationContext = Runner.RunnerContext.ApplicationContext;
-
-            return versionTableMetaData;
+            return VersionTableMetaData;
         }
 
         protected virtual InsertionDataDefinition CreateVersionInfoInsertionData(long version, string description)
@@ -270,6 +247,22 @@ namespace FluentMigrator.Runner
                                         new KeyValuePair<string, object>(VersionTableMetaData.ColumnName, version)
                                     });
             expression.ExecuteWith(Processor);
+        }
+
+        [Obsolete]
+        [NotNull]
+        private IVersionTableMetaData CreateVersionTableMetaData()
+        {
+            var type = Assemblies?.Assemblies.GetVersionTableMetaDataType(Conventions, Runner.RunnerContext)
+             ?? typeof(DefaultVersionTableMetaData);
+
+            var instance = (IVersionTableMetaData) Activator.CreateInstance(type);
+            if (instance is ISchemaExpression schemaExpression)
+            {
+                _conventionSet.SchemaConvention?.Apply(schemaExpression);
+            }
+
+            return instance;
         }
     }
 }

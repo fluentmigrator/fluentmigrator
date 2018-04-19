@@ -19,6 +19,7 @@
 namespace FluentMigrator.Example.Migrations
 {
     [Migration(20090906205342)]
+    // ReSharper disable once InconsistentNaming
     public class AddGTDTables : Migration
     {
         public override void Up()

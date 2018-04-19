@@ -18,11 +18,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Infrastructure;
+
+using Microsoft.Extensions.DependencyInjection;
 
 namespace FluentMigrator.Runner
 {
@@ -31,21 +34,23 @@ namespace FluentMigrator.Runner
     /// </summary>
     public class ProfileLoader : IProfileLoader
     {
+        [Obsolete]
         private readonly IMigrationRunner _runner;
 
         private readonly IMigrationRunnerConventions _conventions;
+        private readonly IServiceProvider _serviceProvider;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProfileLoader"/> class.
         /// </summary>
         /// <param name="runnerContext">The migration runner context</param>
-        /// <param name="runner">The migration runner</param>
         /// <param name="conventions">The migration runner conventions</param>
         /// <param name="migrations">The migrations</param>
-        public ProfileLoader(IRunnerContext runnerContext, IMigrationRunner runner, IMigrationRunnerConventions conventions, IEnumerable<IMigration> migrations)
+        /// <param name="serviceProvider">The service provider</param>
+        public ProfileLoader(IRunnerContext runnerContext, IMigrationRunnerConventions conventions, IEnumerable<IMigration> migrations, IServiceProvider serviceProvider)
         {
-            _runner = runner;
             _conventions = conventions;
+            _serviceProvider = serviceProvider;
             Profiles = FindProfilesIn(migrations, runnerContext.Profile).ToList();
         }
 
@@ -86,12 +91,28 @@ namespace FluentMigrator.Runner
         public IEnumerable<IMigration> Profiles { get; }
 
         /// <inheritdoc />
+        [Obsolete]
         public void ApplyProfiles()
+        {
+            if (_runner == null)
+            {
+                Debug.Assert(_serviceProvider != null, "_serviceProvider != null");
+                var runner = _serviceProvider.GetRequiredService<IMigrationRunner>();
+                ApplyProfiles(runner);
+            }
+            else
+            {
+                ApplyProfiles(_runner);
+            }
+        }
+
+        /// <inheritdoc />
+        public void ApplyProfiles(IMigrationRunner runner)
         {
             // Run Profile if applicable
             foreach (var profile in Profiles)
             {
-                _runner.Up(profile);
+                runner.Up(profile);
             }
         }
 

@@ -43,13 +43,19 @@ namespace FluentMigrator.Runner
         [CanBeNull]
         private readonly IServiceProvider _serviceProvider;
 
+        [NotNull]
         private readonly Lazy<IVersionLoader> _versionLoader;
 
-        private IVersionLoader _currentVersionLoader;
+        [NotNull]
+        private readonly Lazy<IProfileLoader> _lazyProfileLoader;
 
         [CanBeNull]
         [Obsolete]
-        private IAssemblyCollection _migrationAssemblies;
+        private readonly IAssemblyCollection _migrationAssemblies;
+
+        private IVersionLoader _currentVersionLoader;
+
+        private IProfileLoader _currentProfileLoader;
 
         private IAnnouncer _announcer;
         private IStopWatch _stopWatch;
@@ -64,25 +70,24 @@ namespace FluentMigrator.Runner
 
         public bool SilentlyFail { get; set; }
 
-        public IMigrationProcessor Processor { get; private set; }
+        public IMigrationProcessor Processor { get; }
 
         public IMigrationInformationLoader MigrationLoader { get; set; }
 
-        public IProfileLoader ProfileLoader { get; set; }
+        public IProfileLoader ProfileLoader
+        {
+            get => _currentProfileLoader ?? _lazyProfileLoader.Value;
+            set => _currentProfileLoader = value;
+        }
+
         public IMaintenanceLoader MaintenanceLoader { get; set; }
         public IMigrationRunnerConventions Conventions { get; private set; }
         public IList<Exception> CaughtExceptions { get; private set; }
 
         public IMigrationScope CurrentScope
         {
-            get
-            {
-                return _migrationScopeHandler.CurrentScope;
-            }
-            set
-            {
-                _migrationScopeHandler.CurrentScope = value;
-            }
+            get => _migrationScopeHandler.CurrentScope;
+            set => _migrationScopeHandler.CurrentScope = value;
         }
 
         public IRunnerContext RunnerContext { get; private set; }
@@ -117,7 +122,7 @@ namespace FluentMigrator.Runner
             MigrationLoader = new DefaultMigrationInformationLoader(Conventions, _migrationAssemblies,
                                                                     runnerContext.Namespace,
                                                                     runnerContext.NestedNamespaces, runnerContext.Tags);
-            ProfileLoader = new ProfileLoader(runnerContext, this, Conventions);
+            _lazyProfileLoader = new Lazy<IProfileLoader>(() => new ProfileLoader(runnerContext, this, Conventions));
             MaintenanceLoader = new MaintenanceLoader(_migrationAssemblies, runnerContext.Tags, Conventions);
 
             if (runnerContext.NoConnection)
@@ -146,7 +151,6 @@ namespace FluentMigrator.Runner
             [NotNull] IMigrationRunnerConventions migrationRunnerConventions,
             [NotNull] IMaintenanceLoader maintenanceLoader,
             [NotNull] IMigrationInformationLoader migrationLoader,
-            [NotNull] IEnumerable<IMigration> migrations,
             [NotNull] IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
@@ -165,7 +169,12 @@ namespace FluentMigrator.Runner
             _migrationScopeHandler = new MigrationScopeHandler(Processor);
             _migrationValidator = new MigrationValidator(_announcer, convSet);
             MigrationLoader = migrationLoader;
-            ProfileLoader = new ProfileLoader(runnerContext, this, migrationRunnerConventions, migrations);
+            _lazyProfileLoader = new Lazy<IProfileLoader>(() => new ProfileLoader(
+                runnerContext,
+                migrationRunnerConventions,
+                _serviceProvider.GetRequiredService<IEnumerable<IMigration>>(),
+                _serviceProvider
+            ));
             MaintenanceLoader = maintenanceLoader;
 
             if (runnerContext.NoConnection)
@@ -194,7 +203,7 @@ namespace FluentMigrator.Runner
 
         public void ApplyProfiles()
         {
-            ProfileLoader.ApplyProfiles();
+            ProfileLoader.ApplyProfiles(this);
         }
 
         public void ApplyMaintenance(MigrationStage stage, bool useAutomaticTransactionManagement)
@@ -642,7 +651,7 @@ namespace FluentMigrator.Runner
 
         public void ListMigrations()
         {
-            var currentVersionInfo = this.VersionLoader.VersionInfo;
+            var currentVersionInfo = VersionLoader.VersionInfo;
             var currentVersion = currentVersionInfo.Latest();
 
             _announcer.Heading("Migrations");

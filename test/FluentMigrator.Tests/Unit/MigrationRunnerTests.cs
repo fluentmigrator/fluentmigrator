@@ -27,7 +27,10 @@ using FluentMigrator.Runner;
 using FluentMigrator.Runner.Exceptions;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
+using FluentMigrator.Runner.VersionTableInfo;
 using FluentMigrator.Tests.Integration.Migrations;
+
+using Microsoft.Extensions.DependencyInjection;
 
 using Moq;
 
@@ -83,14 +86,18 @@ namespace FluentMigrator.Tests.Unit
 
             _migrationLoaderMock.Setup(x => x.LoadMigrations()).Returns(()=> _migrationList);
 
-            _runner = new MigrationRunner(Assembly.GetAssembly(typeof(MigrationRunnerTests)), _runnerContextMock.Object, _processorMock.Object)
-                        {
-                            MigrationLoader = _migrationLoaderMock.Object,
-                            ProfileLoader = _profileLoaderMock.Object,
-                        };
+            var servicesProvider = _processorMock.Object.CreateServices()
+                .AddSingleton(_announcer.Object)
+                .WithRunnerContext(_runnerContextMock.Object)
+                .WithMigrations(_ => _migrationList.Values.Select(mi => mi.Migration))
+                .WithRunnerConventions(new CustomMigrationConventions())
+                .AddScoped(_ => _migrationLoaderMock.Object)
+                .BuildServiceProvider();
+
+            _runner = (MigrationRunner) servicesProvider.GetRequiredService<IMigrationRunner>();
+            _runner.ProfileLoader = _profileLoaderMock.Object;
 
             _fakeVersionLoader = new TestVersionLoader(_runner, _runner.VersionLoader.VersionTableMetaData);
-
             _runner.VersionLoader = _fakeVersionLoader;
 
             _processorMock.Setup(x => x.SchemaExists(It.Is<string>(s => s == _runner.VersionLoader.VersionTableMetaData.SchemaName)))
@@ -119,21 +126,21 @@ namespace FluentMigrator.Tests.Unit
         public void ProfilesAreAppliedWhenMigrateUpIsCalledWithNoVersion()
         {
             _runner.MigrateUp();
-            _profileLoaderMock.Verify(x => x.ApplyProfiles(), Times.Once());
+            _profileLoaderMock.Verify(x => x.ApplyProfiles(_runner), Times.Once());
         }
 
         [Test]
         public void ProfilesAreAppliedWhenMigrateUpIsCalledWithVersionParameter()
         {
             _runner.MigrateUp(2009010101);
-            _profileLoaderMock.Verify(x => x.ApplyProfiles(), Times.Once());
+            _profileLoaderMock.Verify(x => x.ApplyProfiles(_runner), Times.Once());
         }
 
         [Test]
         public void ProfilesAreAppliedWhenMigrateDownIsCalled()
         {
             _runner.MigrateDown(2009010101);
-            _profileLoaderMock.Verify(x => x.ApplyProfiles(), Times.Once());
+            _profileLoaderMock.Verify(x => x.ApplyProfiles(_runner), Times.Once());
         }
 
         /// <summary>Unit test which ensures that the application context is correctly propagated down to each migration class.</summary>
@@ -255,13 +262,6 @@ namespace FluentMigrator.Tests.Unit
         private string containsAll(params string[] words)
         {
             return ".*?" + string.Join(".*?", words) + ".*?";
-        }
-
-        [Test]
-        public void LoadsCorrectCallingAssembly()
-        {
-            var asm = _runner.MigrationAssemblies.Assemblies.Single();
-            asm.ShouldBe(Assembly.GetAssembly(typeof(MigrationRunnerTests)));
         }
 
         [Test]
@@ -651,9 +651,11 @@ namespace FluentMigrator.Tests.Unit
 
             processorMock.SetupGet(x => x.Options).Returns(options);
 
-            var asm = "s".GetType().Assembly;
-
-            var runner = new MigrationRunner(asm, _runnerContextMock.Object, processorMock.Object);
+            var runner = (MigrationRunner) processorMock.Object.CreateServices()
+                .AddScoped<IMigrationProcessorOptions>(_ => options)
+                .WithRunnerContext(_runnerContextMock.Object)
+                .BuildServiceProvider()
+                .GetRequiredService<IMigrationRunner>();
 
             Assert.That(runner.Conventions, Is.TypeOf<MigrationRunnerConventions>());
         }

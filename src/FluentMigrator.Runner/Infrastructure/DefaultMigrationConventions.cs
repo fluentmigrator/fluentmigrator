@@ -38,6 +38,8 @@ namespace FluentMigrator.Runner.Infrastructure
         public Func<Type, bool> TypeIsProfile => TypeIsProfileImpl;
         public Func<Type, MigrationStage?> GetMaintenanceStage => GetMaintenanceStageImpl;
         public Func<Type, bool> TypeIsVersionTableMetaData => TypeIsVersionTableMetaDataImpl;
+
+        [Obsolete]
         public Func<Type, IMigrationInfo> GetMigrationInfo => GetMigrationInfoForImpl;
 
         /// <inheritdoc />

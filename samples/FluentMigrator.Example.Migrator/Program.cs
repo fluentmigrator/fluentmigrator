@@ -40,12 +40,12 @@ namespace FluentMigrator.Example.Migrator
 
             if (!useLegacyMode)
             {
-                Console.WriteLine("Using dependency injection");
+                Console.WriteLine(@"Using dependency injection");
                 RunWithServices(csb.ConnectionString);
             }
             else
             {
-                Console.WriteLine("Using legacy mode");
+                Console.WriteLine(@"Using legacy mode");
                 RunInLegacyMode(csb.ConnectionString);
             }
         }

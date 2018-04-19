@@ -11,6 +11,9 @@ using FluentMigrator.Runner.Generators.Firebird;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Firebird;
+
+using Microsoft.Extensions.DependencyInjection;
+
 using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Integration.Processors.Firebird
@@ -563,14 +566,20 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             }
         }
 
-        private static MigrationRunner CreateFirebirdEmbeddedRunnerFor(FbConnection connection, RunnerContext runnerContext, out FirebirdProcessor processor)
+        private static IMigrationRunner CreateFirebirdEmbeddedRunnerFor(FbConnection connection, RunnerContext runnerContext, out FirebirdProcessor processor)
         {
             var announcer = new TextWriterAnnouncer(TestContext.Out);
             announcer.ShowSql = true;
             var options = FirebirdOptions.AutoCommitBehaviour();
             processor = new FirebirdProcessor(connection, new FirebirdGenerator(options), announcer,
                 new ProcessorOptions(), new FirebirdDbFactory(serviceProvider: null), options);
-            var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), runnerContext, processor);
+
+            var runner = processor.CreateServices()
+                .WithRunnerContext(runnerContext)
+                .WithMigrationsIn(runnerContext.Namespace)
+                .BuildServiceProvider()
+                .GetRequiredService<IMigrationRunner>();
+
             return runner;
         }
 
@@ -686,7 +695,13 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                     options.TruncateLongNames = false;
                     processor = new FirebirdProcessor(connection, new FirebirdGenerator(options), announcer,
                         new ProcessorOptions(), new FirebirdDbFactory(serviceProvider: null), options);
-                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), runnerContext, processor);
+
+                    var runner = processor.CreateServices()
+                        .WithRunnerContext(runnerContext)
+                        .WithMigrationsIn(runnerContext.Namespace)
+                        .BuildServiceProvider()
+                        .GetRequiredService<IMigrationRunner>();
+
                     runner.Up(new MigrationWhichCreatesTwoRelatedTables());
                     processor.CommitTransaction();
                     FbConnection.ClearPool(connection);
@@ -703,7 +718,13 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                     var options = FirebirdOptions.AutoCommitBehaviour();
                     processor = new FirebirdProcessor(connection, new FirebirdGenerator(options), announcer,
                         new ProcessorOptions(), new FirebirdDbFactory(serviceProvider: null), options);
-                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), runnerContext, processor);
+
+                    var runner = processor.CreateServices()
+                        .WithRunnerContext(runnerContext)
+                        .WithMigrationsIn(runnerContext.Namespace)
+                        .BuildServiceProvider()
+                        .GetRequiredService<IMigrationRunner>();
+
                     runner.Up(new MigrationWhichAltersTableWithFK());
                     processor.CommitTransaction();
                 }

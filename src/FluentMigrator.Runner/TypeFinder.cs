@@ -10,7 +10,7 @@ namespace FluentMigrator.Runner
     /// <summary>
     /// Advanced searching and filtration of types collections.
     /// </summary>
-    static class TypeFinder
+    internal static class TypeFinder
     {
         /// <summary>
         /// Searches for types located in the specifying namespace and optionally in its nested namespaces.
@@ -34,8 +34,39 @@ namespace FluentMigrator.Runner
 
                 return types.Where(shouldInclude);
             }
-            else
-                return types;
+
+            return types;
+        }
+
+        /// <summary>
+        /// Test if the type is in the given namespace
+        /// </summary>
+        /// <remarks>
+        /// All types will be accepted when no namespace is given.
+        /// </remarks>
+        /// <param name="type">The type to test</param>
+        /// <param name="namespace">The namespace</param>
+        /// <param name="loadNestedNamespaces">Indicates whether nested namespaces should be accepted</param>
+        /// <returns><c>true</c> when the type is in the given namespace</returns>
+        public static bool IsInNamespace(
+            [NotNull] this Type type,
+            [CanBeNull] string @namespace,
+            bool loadNestedNamespaces)
+        {
+            if (string.IsNullOrEmpty(@namespace))
+                return true;
+
+            if (type.Namespace == null)
+                return false;
+
+            if (type.Namespace == @namespace)
+                return true;
+
+            if (!loadNestedNamespaces)
+                return false;
+
+            var matchNested = @namespace + ".";
+            return type.Namespace.StartsWith(matchNested, StringComparison.Ordinal);
         }
     }
 }

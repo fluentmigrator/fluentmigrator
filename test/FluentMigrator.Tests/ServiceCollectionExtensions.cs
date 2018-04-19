@@ -15,15 +15,19 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
+using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Infrastructure;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.VersionTableInfo;
+
+using JetBrains.Annotations;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -52,7 +56,7 @@ namespace FluentMigrator.Tests
                 .AddSingleton<IAnnouncer>(sp => new TextWriterAnnouncer(TestContext.Out) { ShowSql = true })
 
                 // Processor specific options (usually none are needed)
-                .AddSingleton<IMigrationProcessorOptions, ProcessorOptions>()
+                .AddScoped<IMigrationProcessorOptions, ProcessorOptions>()
 
                 // Configure the default version table metadata
                 .AddSingleton<IVersionTableMetaData, DefaultVersionTableMetaData>()
@@ -64,13 +68,9 @@ namespace FluentMigrator.Tests
                 .AddScoped<IMigrationInformationLoader, DefaultMigrationInformationLoader>()
 
                 // Configure the runner context
-                .AddScoped<IRunnerContext>(sp =>
+                .AddScoped<IRunnerContext>(sp => new RunnerContext(sp.GetRequiredService<IAnnouncer>())
                 {
-                    var announcer = sp.GetRequiredService<IAnnouncer>();
-                    return new RunnerContext(announcer)
-                    {
-                        AllowBreakingChange = true,
-                    };
+                    AllowBreakingChange = true,
                 })
 
                 // Configure the runner conventions
@@ -82,12 +82,30 @@ namespace FluentMigrator.Tests
             return services;
         }
 
-        public static IServiceCollection WithMigrationsIn(this IServiceCollection services, string @namespace, bool recursive = false)
+        public static IServiceCollection WithMigrations(
+            [NotNull] this IServiceCollection services,
+            [NotNull] Func<IServiceProvider, IEnumerable<IMigration>> migrations)
         {
-            var conv = DefaultMigrationRunnerConventions.Instance;
-            var migrationTypes = Assembly.GetExecutingAssembly()
-                .GetExportedTypes()
-                .Where(t => conv.TypeIsMigration(t));
+            return services
+                .AddScoped(migrations);
+        }
+
+        public static IServiceCollection WithAllTestMigrations(
+            [NotNull] this IServiceCollection services)
+        {
+            return services
+                .WithMigrationsIn(@namespace: null);
+        }
+
+        public static IServiceCollection WithMigrationsIn(
+            [NotNull] this IServiceCollection services,
+            [CanBeNull] string @namespace,
+            bool recursive = false)
+        {
+            var allTypes = Assembly.GetExecutingAssembly().GetExportedTypes().ToList();
+            var migrationTypes = allTypes
+                .Where(t => typeof(IMigration).IsAssignableFrom(t))
+                .Where(t => !t.IsAbstract && t.IsClass);
 
             if (!string.IsNullOrEmpty(@namespace))
             {
@@ -114,7 +132,13 @@ namespace FluentMigrator.Tests
         public static IServiceCollection WithProcessor(this IServiceCollection services, IMigrationProcessor processor)
         {
             return services
-                .AddSingleton(processor);
+                .AddSingleton(processor)
+                .AddSingleton<IQuerySchema>(_ => processor)
+                .AddScoped<IMigrationContext>(sp =>
+                {
+                    var runnerContext = sp.GetRequiredService<IRunnerContext>();
+                    return new MigrationContext(processor, runnerContext.ApplicationContext, runnerContext.Connection, sp);
+                });
         }
 
         public static IServiceCollection WithRunnerContext(this IServiceCollection services, IRunnerContext runnerContext)
@@ -127,6 +151,12 @@ namespace FluentMigrator.Tests
         {
             return services
                 .AddScoped(runnerContextFunc);
+        }
+
+        public static IServiceCollection WithRunnerConventions(this IServiceCollection services, IMigrationRunnerConventions conventions)
+        {
+            return services
+                .AddScoped(_ => conventions);
         }
     }
 }

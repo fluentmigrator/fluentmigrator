@@ -343,11 +343,9 @@ namespace FluentMigrator.Console
                 Database = ProcessorType,
                 Connection = Connection,
                 PreviewOnly = PreviewOnly,
-#pragma warning disable 612
                 Targets = new[] {TargetAssembly},
                 Namespace = Namespace,
                 NestedNamespaces = NestedNamespaces,
-#pragma warning restore 612
                 Task = Task,
                 Version = Version,
                 StartVersion = StartVersion,

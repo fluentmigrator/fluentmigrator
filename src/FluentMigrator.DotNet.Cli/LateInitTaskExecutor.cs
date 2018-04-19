@@ -16,10 +16,8 @@
 //
 #endregion
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 using FluentMigrator.DotNet.Cli.CustomAnnouncers;
 using FluentMigrator.Runner;
@@ -28,7 +26,7 @@ using FluentMigrator.Runner.Initialization;
 
 namespace FluentMigrator.DotNet.Cli
 {
-    class LateInitTaskExecutor : TaskExecutor
+    internal class LateInitTaskExecutor : TaskExecutor
     {
         private readonly IAnnouncer _announcer;
 
@@ -38,9 +36,10 @@ namespace FluentMigrator.DotNet.Cli
             _announcer = runnerContext.Announcer;
         }
 
-        protected override IEnumerable<Assembly> GetTargetAssemblies()
+        /// <inheritdoc />
+        protected override void Initialize()
         {
-            var targetAssemblies = base.GetTargetAssemblies().ToList();
+            var targetAssemblies = GetTargetAssemblies().ToList();
             if (targetAssemblies.Count != 0)
             {
                 var targetAssembly = targetAssemblies.First();
@@ -50,8 +49,6 @@ namespace FluentMigrator.DotNet.Cli
                     lia.OutputFileName = outputTo;
                 }
             }
-
-            return targetAssemblies;
         }
 
         private static IEnumerable<TAnnouncer> OfType<TAnnouncer>(IAnnouncer announcer)

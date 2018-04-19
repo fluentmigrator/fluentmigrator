@@ -19,6 +19,8 @@ using System.Collections.Generic;
 
 using FluentMigrator.Infrastructure;
 
+using JetBrains.Annotations;
+
 namespace FluentMigrator.Runner
 {
     /// <summary>
@@ -29,7 +31,14 @@ namespace FluentMigrator.Runner
         /// <summary>
         /// Apply all loaded profiles
         /// </summary>
+        [Obsolete]
         void ApplyProfiles();
+
+        /// <summary>
+        /// Apply all loaded profiles with the given runner
+        /// </summary>
+        /// <param name="runner">The migration ruinner</param>
+        void ApplyProfiles([NotNull] IMigrationRunner runner);
 
         /// <summary>
         /// Find all profile name tagged migrations in the given assembly collection

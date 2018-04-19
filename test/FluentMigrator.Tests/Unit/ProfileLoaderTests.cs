@@ -7,6 +7,8 @@ using NUnit.Framework;
 using NUnit.Should;
 using FluentMigrator.Infrastructure;
 
+using Microsoft.Extensions.DependencyInjection;
+
 namespace FluentMigrator.Tests.Unit
 {
     [TestFixture]
@@ -20,12 +22,16 @@ namespace FluentMigrator.Tests.Unit
             var _conventionsMock = new Mock<IMigrationRunnerConventions>();
 
             _runnerContextMock.Setup(x => x.Profile).Returns(string.Empty);
-            //_runnerContextMock.VerifyGet(x => x.Profile).Returns(string.Empty);
-            _runnerMock.SetupGet(x => x.MigrationAssemblies).Returns(new SingleAssembly(typeof(MigrationRunnerTests).Assembly));
 
-            var profileLoader = new ProfileLoader(_runnerContextMock.Object, _runnerMock.Object, _conventionsMock.Object);
+            var profileLoader = new ServiceCollection()
+                .ConfigureRunner(rb =>
+                    rb.WithRunnerContext(_runnerContextMock.Object).WithRunnerConventions(_conventionsMock.Object))
+                .AddScoped<ProfileLoader>()
+                .WithAllTestMigrations()
+                .BuildServiceProvider()
+                .GetRequiredService<ProfileLoader>();
 
-            profileLoader.ApplyProfiles();
+            profileLoader.ApplyProfiles(_runnerMock.Object);
 
             profileLoader.Profiles.Count().ShouldBe(0);
         }

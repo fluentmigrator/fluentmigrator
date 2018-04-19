@@ -26,6 +26,8 @@ using FluentMigrator.Builders.IfDatabase;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Processors.SQLite;
 
+using Microsoft.Extensions.DependencyInjection;
+
 using Moq;
 
 using NUnit.Framework;
@@ -196,7 +198,17 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
             // Arrange
             var mock = new Mock<IDbConnection>(MockBehavior.Loose);
             mock.Setup(x => x.State).Returns(ConnectionState.Open);
-            var context = new MigrationContext(processor ?? new SQLiteProcessor(mock.Object, null, null, null, new SQLiteDbFactory(serviceProvider: null)), new SingleAssembly(GetType().Assembly), null, "");
+
+            var services = new ServiceCollection();
+            services
+#pragma warning disable 612
+                .AddScoped(sp => new SingleAssembly(GetType().Assembly))
+#pragma warning restore 612
+                .AddScoped<IEmbeddedResourceProvider, DefaultEmbeddedResourceProvider>();
+
+            var context = new MigrationContext(
+                processor ?? new SQLiteProcessor(mock.Object, generator: null, announcer: null, options: null, new SQLiteDbFactory(serviceProvider: null)),
+                context: null, connection: string.Empty, services.BuildServiceProvider());
 
             var expression = new IfDatabaseExpressionRoot(context, databaseType.ToArray());
 
@@ -220,7 +232,17 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
             // Arrange
             var mock = new Mock<IDbConnection>(MockBehavior.Loose);
             mock.Setup(x => x.State).Returns(ConnectionState.Open);
-            var context = new MigrationContext(new SQLiteProcessor(mock.Object, null, null, null, new SQLiteDbFactory(serviceProvider: null)), new SingleAssembly(GetType().Assembly), null, "");
+
+            var services = new ServiceCollection();
+            services
+#pragma warning disable 612
+                .AddScoped(sp => new SingleAssembly(GetType().Assembly))
+#pragma warning restore 612
+                .AddScoped<IEmbeddedResourceProvider, DefaultEmbeddedResourceProvider>();
+
+            var context = new MigrationContext(
+                new SQLiteProcessor(mock.Object, generator: null, announcer: null, options: null, new SQLiteDbFactory(serviceProvider: null)),
+                context: null, connection: string.Empty, services.BuildServiceProvider());
 
             var expression = new IfDatabaseExpressionRoot(context, databaseTypePredicate);
 
@@ -233,7 +255,6 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
                 {
                     action(expression);
                 }
-
             }
 
             return context;

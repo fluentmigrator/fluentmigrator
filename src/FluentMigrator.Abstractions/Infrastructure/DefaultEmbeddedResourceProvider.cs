@@ -36,8 +36,26 @@ namespace FluentMigrator.Infrastructure
         /// </summary>
         /// <param name="migrations">The migrations used as hint for the assemblies to be scanned for the embedded resources</param>
         public DefaultEmbeddedResourceProvider([NotNull, ItemNotNull] IEnumerable<IMigration> migrations)
+            : this(migrations.Select(m => m.GetType().Assembly).Distinct())
         {
-            _assemblies = migrations.Select(m => m.GetType().Assembly).Distinct().ToList();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DefaultEmbeddedResourceProvider"/> class.
+        /// </summary>
+        /// <param name="assemblies">The assemblies to be scanned for the embedded resources</param>
+        public DefaultEmbeddedResourceProvider([NotNull, ItemNotNull] IEnumerable<Assembly> assemblies)
+            : this(assemblies.ToArray())
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DefaultEmbeddedResourceProvider"/> class.
+        /// </summary>
+        /// <param name="assemblies">The assemblies to be scanned for the embedded resources</param>
+        public DefaultEmbeddedResourceProvider([NotNull, ItemNotNull] params Assembly[] assemblies)
+        {
+            _assemblies = assemblies;
         }
 
         /// <summary>

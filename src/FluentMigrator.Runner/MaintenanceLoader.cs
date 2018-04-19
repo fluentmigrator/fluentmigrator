@@ -57,7 +57,7 @@ namespace FluentMigrator.Runner
 
             _maintenance = (
                 from migration in migrations
-                let type = migrations.GetType()
+                let type = migration.GetType()
                 let stage = conventions.GetMaintenanceStage(type)
                 where stage != null
                 where (requireTags && conventions.TypeHasMatchingTags(type, tags)) || (!requireTags && !conventions.TypeHasTags(type))

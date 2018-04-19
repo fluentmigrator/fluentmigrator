@@ -52,11 +52,18 @@ namespace FluentMigrator.Runner
             Processor = Runner.Processor;
 
             VersionInfo = new VersionInfo();
-            VersionTableMetaData = versionTableMetaData ?? GetVersionTableMetaData();
+            VersionTableMetaData = versionTableMetaData ??
+                (IVersionTableMetaData)Activator.CreateInstance(assemblies.Assemblies.GetVersionTableMetaDataType(
+                    Conventions, Runner.RunnerContext));
             VersionMigration = new VersionMigration(VersionTableMetaData);
             VersionSchemaMigration = new VersionSchemaMigration(VersionTableMetaData);
             VersionUniqueMigration = new VersionUniqueMigration(VersionTableMetaData);
             VersionDescriptionMigration = new VersionDescriptionMigration(VersionTableMetaData);
+
+            if (VersionTableMetaData is DefaultVersionTableMetaData defaultMetaData)
+            {
+                conventionSet.SchemaConvention?.Apply(defaultMetaData);
+            }
 
             LoadVersionInfo();
         }
@@ -127,10 +134,9 @@ namespace FluentMigrator.Runner
             expression.ExecuteWith(Processor);
         }
 
-        [Obsolete]
         public IVersionTableMetaData GetVersionTableMetaData()
         {
-            return Assemblies.GetVersionTableMetaData(_conventionSet, Conventions, Runner.RunnerContext);
+            return VersionTableMetaData;
         }
 
         public void LoadVersionInfo()

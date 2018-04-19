@@ -16,6 +16,8 @@
 //
 #endregion
 
+using System;
+
 namespace FluentMigrator.Runner.VersionTableInfo
 {
     public interface IVersionTableMetaData
@@ -28,6 +30,7 @@ namespace FluentMigrator.Runner.VersionTableInfo
         /// implementing <code>IVersionTableMetaData</code> and before any of properties of <code>IVersionTableMetaData</code>
         /// is called. Properties can use <code>ApplicationContext</code> value to implement context-depending logic.
         /// </remarks>
+        [Obsolete("Use dependency injection to get the IRunnerContext")]
         object ApplicationContext { get; set; }
         bool OwnsSchema { get; }
         string SchemaName { get; }

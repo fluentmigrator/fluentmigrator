@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 using FluentMigrator;
 using FluentMigrator.Exceptions;
@@ -98,13 +99,24 @@ namespace Microsoft.Extensions.DependencyInjection
             return services;
         }
 
+        /// <summary>
+        /// Creates services for a given runner context, connection string provider and assembly loader factory.
+        /// </summary>
+        /// <param name="runnerContext">The runner context</param>
+        /// <param name="assemblyLoadFunc">Function to load the assemblies</param>
+        /// <param name="connectionStringProvider">The connection string provider</param>
+        /// <param name="defaultAssemblyLoaderFactory">The assembly loader factory</param>
+        /// <returns>The new service collection</returns>
+        [NotNull]
         public static IServiceCollection CreateServices(
-            this IRunnerContext runnerContext,
-            IConnectionStringProvider connectionStringProvider,
-            AssemblyLoaderFactory assemblyLoaderFactory)
+            [NotNull] this IRunnerContext runnerContext,
+            [NotNull] Func<AssemblyLoaderFactory, IRunnerContext, IEnumerable<Assembly>> assemblyLoadFunc,
+            [CanBeNull] IConnectionStringProvider connectionStringProvider,
+            [CanBeNull] AssemblyLoaderFactory defaultAssemblyLoaderFactory = null)
         {
             var services = new ServiceCollection();
-            var assemblies = assemblyLoaderFactory.GetTargetAssemblies(runnerContext.Targets).ToList();
+            var assemblyLoaderFactory = defaultAssemblyLoaderFactory ?? new AssemblyLoaderFactory();
+            var assemblies = assemblyLoadFunc(assemblyLoaderFactory, runnerContext).ToList();
 #pragma warning disable 612
             var assemblyCollection = new AssemblyCollection(assemblies);
 #pragma warning restore 612
@@ -116,7 +128,9 @@ namespace Microsoft.Extensions.DependencyInjection
 
             // Configure without the processor and migrations
             services
-                .AddFluentMigratorCore();
+                .AddFluentMigratorCore()
+                .AddSingleton(assemblyLoaderFactory)
+                .AddSingleton(connectionStringProvider);
 
             // Configure the processor
             if (runnerContext.NoConnection)
@@ -149,17 +163,27 @@ namespace Microsoft.Extensions.DependencyInjection
                     });
 
             // Configure the version table
-            using (var sp = services.BuildServiceProvider(false))
-            {
-                var migConv = sp.GetRequiredService<IMigrationRunnerConventions>();
-                var convSet = sp.GetRequiredService<IConventionSet>();
-#pragma warning disable 612
-                var versionTableMetaData = assemblyCollection.GetVersionTableMetaData(convSet, migConv, runnerContext);
-#pragma warning restore 612
-                services.ConfigureRunner(builder => builder.ConfigureVersionTable(versionTableMetaData));
-            }
+            services.AddVersionTableMetaData(sp => assemblies.GetVersionTableMetaDataType(sp));
 
             return services;
+        }
+
+        /// <summary>
+        /// Add the version table meta data using the configured services
+        /// </summary>
+        /// <param name="services">The service collection</param>
+        /// <param name="getVersionTableMetaDataType">The function to determine the version table meta data type</param>
+        /// <returns>The updated service collection</returns>
+        public static IServiceCollection AddVersionTableMetaData(
+            [NotNull] this IServiceCollection services,
+            Func<IServiceProvider, Type> getVersionTableMetaDataType)
+        {
+            // Configure the version table
+            using (var sp = services.BuildServiceProvider(false))
+            {
+                var versionTableMetaDataType = getVersionTableMetaDataType(sp);
+                return services.AddScoped(typeof(IVersionTableMetaData), versionTableMetaDataType);
+            }
         }
 
         /// <summary>
@@ -208,7 +232,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddSingleton<IAnnouncer, NullAnnouncer>()
 
                 // Processor specific options (usually none are needed)
-                .AddSingleton<IMigrationProcessorOptions, ProcessorOptions>()
+                .AddScoped<IMigrationProcessorOptions, ProcessorOptions>()
 
                 // The default assembly loader factory
                 .AddSingleton<AssemblyLoaderFactory>()
@@ -217,7 +241,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddSingleton<IConnectionStringProvider, DefaultConnectionStringProvider>()
 
                 // Configure the default version table metadata
-                .AddSingleton<IVersionTableMetaData, DefaultVersionTableMetaData>()
+                .AddScoped<IVersionTableMetaData, DefaultVersionTableMetaData>()
 
                 // Add the default embedded resource provider
                 .AddScoped<IEmbeddedResourceProvider, DefaultEmbeddedResourceProvider>()
@@ -239,6 +263,9 @@ namespace Microsoft.Extensions.DependencyInjection
 
                 // The default set of conventions to be applied to migration expressions
                 .AddScoped<IConventionSet, DefaultConventionSet>()
+
+                // IQuerySchema is the base interface for the IMigrationProcessor
+                .AddScoped<IQuerySchema>(sp => sp.GetRequiredService<IMigrationProcessor>())
 
                 // Configure the runner
                 .AddScoped<IMigrationRunner, MigrationRunner>();

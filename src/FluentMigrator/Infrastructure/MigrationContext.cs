@@ -81,7 +81,6 @@ namespace FluentMigrator.Infrastructure
 
         /// <inheritdoc />
         [Obsolete]
-        [CanBeNull]
         public virtual IAssemblyCollection MigrationAssemblies { get; set; }
 
         /// <inheritdoc />
@@ -91,7 +90,6 @@ namespace FluentMigrator.Infrastructure
         public string Connection { get; set; }
 
         /// <inheritdoc />
-        [NotNull]
         public IServiceProvider ServiceProvider { get; }
     }
 }

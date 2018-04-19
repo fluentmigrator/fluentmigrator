@@ -16,11 +16,7 @@
 //
 #endregion
 
-using System.Reflection;
-
 using FluentMigrator.Runner;
-using FluentMigrator.Runner.Announcers;
-using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Runner.Processors.MySql;
 using FluentMigrator.Runner.Processors.SqlAnywhere;
@@ -54,13 +50,12 @@ namespace FluentMigrator.Tests.Integration
             ExecuteWithSupportedProcessors(
                 processor =>
                 {
-                    var serviceProvider = Services
+                    var serviceProvider = processor.CreateServices()
                         .WithMigrationsIn("FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3")
-                        .WithProcessor(processor)
                         .BuildServiceProvider();
                     var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
 
-                    IVersionTableMetaData tableMetaData = new DefaultVersionTableMetaData();
+                    IVersionTableMetaData tableMetaData = new DefaultVersionTableMetaData(ConventionSets.NoSchemaName, runner.RunnerContext);
 
                     //ensure table doesn't exist
                     if (processor.TableExists(tableMetaData.SchemaName, tableMetaData.TableName))

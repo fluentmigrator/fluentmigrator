@@ -10,9 +10,9 @@ namespace FluentMigrator.Runner.Processors
 
         public ProcessorOptions(IRunnerContext runnerContext)
         {
-            PreviewOnly = runnerContext.PreviewOnly,
-            Timeout = runnerContext.Timeout,
-            ProviderSwitches = runnerContext.ProviderSwitches
+            PreviewOnly = runnerContext.PreviewOnly;
+            Timeout = runnerContext.Timeout;
+            ProviderSwitches = runnerContext.ProviderSwitches;
         }
 
         public bool PreviewOnly { get; set; }

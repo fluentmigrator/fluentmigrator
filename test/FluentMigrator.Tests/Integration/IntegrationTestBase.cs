@@ -41,7 +41,6 @@ using FluentMigrator.Runner.Generators.SqlAnywhere;
 using FluentMigrator.Runner.Processors.SqlAnywhere;
 
 using Microsoft.Data.Sqlite;
-using Microsoft.Extensions.DependencyInjection;
 
 using MySql.Data.MySqlClient;
 
@@ -92,12 +91,6 @@ namespace FluentMigrator.Tests.Integration
             AppDomain.CurrentDomain.SetData("DataDirectory", _tempDataDirectory);
         }
 
-        [SetUp]
-        public void SetUpServices()
-        {
-            Services = ServiceCollectionExtensions.CreateServiceCollection();
-        }
-
         [TearDown]
         public void TearDownDataDirectory()
         {
@@ -106,8 +99,6 @@ namespace FluentMigrator.Tests.Integration
                 Directory.Delete(_tempDataDirectory, true);
             }
         }
-
-        protected IServiceCollection Services { get; private set; }
 
         protected bool IsAnyServerEnabled(params Type[] exceptProcessors)
         {
@@ -167,8 +158,6 @@ namespace FluentMigrator.Tests.Integration
 
                 if (!isMatch(processorType))
                     continue;
-
-                Services = ServiceCollectionExtensions.CreateServiceCollection();
 
                 executed = true;
                 executeFunc(test, tryRollback, opt);

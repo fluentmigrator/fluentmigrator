@@ -25,10 +25,11 @@ using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Initialization.AssemblyLoader;
-using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.VersionTableInfo;
 
 using JetBrains.Annotations;
+
+using Microsoft.Extensions.DependencyInjection;
 
 namespace FluentMigrator.Runner
 {
@@ -42,36 +43,46 @@ namespace FluentMigrator.Runner
         /// Find the version table meta data in the given assembly collection
         /// </summary>
         /// <param name="assemblies">The assembly collection</param>
-        /// <param name="conventionSet">The convention set whose schema convention should be applied to the default version table metadata</param>
         /// <param name="runnerConventions">The runner conventions used to identify a version table metadata type</param>
         /// <param name="runnerContext">The runner context defining the search boundaries for the custom version table metadata type</param>
         /// <returns>A custom or the default version table metadata instance</returns>
-        [Obsolete]
-        public static IVersionTableMetaData GetVersionTableMetaData(
-            [CanBeNull] this IAssemblyCollection assemblies,
-            [NotNull] IConventionSet conventionSet,
+        public static Type GetVersionTableMetaDataType(
+            [CanBeNull] this IEnumerable<Assembly> assemblies,
             [NotNull] IMigrationRunnerConventions runnerConventions,
             [NotNull] IRunnerContext runnerContext)
         {
             if (assemblies == null)
             {
-                var result = new DefaultVersionTableMetaData();
-                conventionSet.SchemaConvention?.Apply(result);
-                return result;
+                return typeof(DefaultVersionTableMetaData);
             }
 
-            var matchedType = assemblies.GetExportedTypes()
+            var exportedTypes = assemblies.GetExportedTypes();
+
+            var matchedType = exportedTypes
                 .FilterByNamespace(runnerContext.Namespace, runnerContext.NestedNamespaces)
                 .FirstOrDefault(t => runnerConventions.TypeIsVersionTableMetaData(t));
 
             if (matchedType == null)
             {
-                var result = new DefaultVersionTableMetaData();
-                conventionSet.SchemaConvention?.Apply(result);
-                return result;
+                return typeof(DefaultVersionTableMetaData);
             }
 
-            return (IVersionTableMetaData) Activator.CreateInstance(matchedType);
+            return matchedType;
+        }
+
+        /// <summary>
+        /// Find the version table meta data in the given assembly collection
+        /// </summary>
+        /// <param name="assemblies">The assembly collection</param>
+        /// <param name="serviceProvider">The service provider to get all the required services from</param>
+        /// <returns>A custom or the default version table metadata instance</returns>
+        public static Type GetVersionTableMetaDataType(
+            [CanBeNull] this IEnumerable<Assembly> assemblies,
+            [NotNull] IServiceProvider serviceProvider)
+        {
+            var runnerConventions = serviceProvider.GetRequiredService<IMigrationRunnerConventions>();
+            var runnerContext = serviceProvider.GetRequiredService<IRunnerContext>();
+            return assemblies.GetVersionTableMetaDataType(runnerConventions, runnerContext);
         }
 
         /// <summary>
@@ -146,11 +157,41 @@ namespace FluentMigrator.Runner
         }
 
         /// <summary>
+        /// Get the collection of exported types
+        /// </summary>
+        /// <param name="assemblies">The assemblies to get the exported types from</param>
+        /// <returns>The exported types</returns>
+        public static IReadOnlyCollection<Type> GetExportedTypes(this IEnumerable<Assembly> assemblies)
+        {
+            var result = new List<Type>();
+
+            foreach (var assembly in assemblies)
+            {
+                try
+                {
+                    foreach (var exportedType in assembly.GetExportedTypes())
+                    {
+                        if (!exportedType.IsAbstract && exportedType.IsClass)
+                        {
+                            result.Add(exportedType);
+                        }
+                    }
+                }
+                catch
+                {
+                    // Ignore assemblies that couldn't be loaded
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
         /// Returns <c>true</c> when the type is probably a FluentMigrator-owned class
         /// </summary>
         /// <param name="type">The type to check</param>
         /// <returns><c>true</c> when the type is probably a FluentMigrator-owned class</returns>
-        internal static bool IsFluentMigratorRunnerType(this Type type)
+        public static bool IsFluentMigratorRunnerType(this Type type)
         {
             return type.Namespace != null && type.Namespace.StartsWith("FluentMigrator.Runner.", StringComparison.Ordinal);
         }

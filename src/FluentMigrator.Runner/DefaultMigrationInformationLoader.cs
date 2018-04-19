@@ -57,6 +57,8 @@ namespace FluentMigrator.Runner
             [NotNull] IMigrationRunnerConventions conventions,
             [NotNull] IRunnerContext runnerContext)
         {
+            Namespace = runnerContext.Namespace;
+            LoadNestedNamespaces = runnerContext.NestedNamespaces;
             _migrations = migrations.ToList();
             Conventions = conventions;
             TagsToMatch = runnerContext.Tags ?? Enumerable.Empty<string>();
@@ -69,11 +71,9 @@ namespace FluentMigrator.Runner
         [CanBeNull]
         public IAssemblyCollection Assemblies { get; }
 
-        [Obsolete]
         [CanBeNull]
         public string Namespace { get; }
 
-        [Obsolete]
         public bool LoadNestedNamespaces { get; }
 
         [NotNull, ItemNotNull]
@@ -105,7 +105,7 @@ namespace FluentMigrator.Runner
             }
             else if (_migrations != null)
             {
-                var migrationInfos = FindMigrations(Conventions, _migrations, TagsToMatch).ToList();
+                var migrationInfos = FindMigrations(Conventions, _migrations, Namespace, LoadNestedNamespaces, TagsToMatch);
                 foreach (var migrationInfo in migrationInfos)
                 {
                     if (_migrationInfos.ContainsKey(migrationInfo.Version))
@@ -127,6 +127,8 @@ namespace FluentMigrator.Runner
         private static IEnumerable<IMigrationInfo> FindMigrations(
             IMigrationRunnerConventions conventions,
             IReadOnlyCollection<IMigration> migrations,
+            string @namespace,
+            bool loadNestedNamespaces,
             IEnumerable<string> tagsToMatch)
         {
             if (migrations.Count == 0)
@@ -137,10 +139,11 @@ namespace FluentMigrator.Runner
             var migrationInfos =
                 (from migration in migrations
                  let type = migration.GetType()
+                 where type.IsInNamespace(@namespace, loadNestedNamespaces)
                  where conventions.TypeHasMatchingTags(type, tagsToMatch) || !conventions.TypeHasTags(type)
-                 select conventions.GetMigrationInfoForMigration(migration)).ToList();
+                 select conventions.GetMigrationInfoForMigration(migration));
 
-            return migrationInfos;
+            return migrationInfos.ToList();
         }
 
         [Obsolete]

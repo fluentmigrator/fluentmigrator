@@ -22,10 +22,13 @@ using System.Collections.Generic;
 
 using FluentMigrator.Infrastructure;
 
+using JetBrains.Annotations;
+
 namespace FluentMigrator.Runner
 {
     public interface IMigrationInformationLoader
     {
+        [NotNull]
         SortedList<long, IMigrationInfo> LoadMigrations();
     }
 }

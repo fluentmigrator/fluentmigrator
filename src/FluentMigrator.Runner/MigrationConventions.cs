@@ -32,6 +32,8 @@ namespace FluentMigrator.Runner
         public Func<Type, bool> TypeIsProfile { get; set; }
         public Func<Type, MigrationStage?> GetMaintenanceStage { get; set; }
         public Func<Type, bool> TypeIsVersionTableMetaData { get; set; }
+
+        [Obsolete]
         public Func<Type, IMigrationInfo> GetMigrationInfo { get; set; }
 
         /// <inheritdoc />
@@ -43,7 +45,9 @@ namespace FluentMigrator.Runner
         {
             TypeIsMigration = _default.TypeIsMigration;
             TypeIsVersionTableMetaData = _default.TypeIsVersionTableMetaData;
+#pragma warning disable 612
             GetMigrationInfo = _default.GetMigrationInfo;
+#pragma warning restore 612
             TypeIsProfile = _default.TypeIsProfile;
             GetMaintenanceStage = _default.GetMaintenanceStage;
             GetMigrationInfoForMigration = _default.GetMigrationInfoForMigration;

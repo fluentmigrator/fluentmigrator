@@ -16,7 +16,6 @@
 //
 #endregion
 
-using System;
 using System.Linq;
 
 using FluentMigrator.Expressions;
@@ -25,6 +24,8 @@ using FluentMigrator.Model;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Infrastructure;
 using FluentMigrator.Runner.Processors.SqlServer;
+
+using Microsoft.Extensions.DependencyInjection;
 
 using NUnit.Framework;
 using NUnit.Should;
@@ -162,32 +163,32 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void MigrationInfoShouldRetainMigration()
         {
-            var migrationType = typeof(DefaultConventionMigrationFake);
-            var migrationinfo = _default.GetMigrationInfo(migrationType);
-            migrationinfo.Migration.GetType().ShouldBeSameAs(migrationType);
+            var migration = new DefaultConventionMigrationFake();
+            var migrationinfo = _default.GetMigrationInfoForMigration(migration);
+            migrationinfo.Migration.GetType().ShouldBeSameAs(migration.GetType());
         }
 
         [Test]
         public void MigrationInfoShouldExtractVersion()
         {
-            var migrationType = typeof(DefaultConventionMigrationFake);
-            var migrationinfo = _default.GetMigrationInfo(migrationType);
+            var migration = new DefaultConventionMigrationFake();
+            var migrationinfo = _default.GetMigrationInfoForMigration(migration);
             migrationinfo.Version.ShouldBe(123);
         }
 
         [Test]
         public void MigrationInfoShouldExtractTransactionBehavior()
         {
-            var migrationType = typeof(DefaultConventionMigrationFake);
-            var migrationinfo = _default.GetMigrationInfo(migrationType);
+            var migration = new DefaultConventionMigrationFake();
+            var migrationinfo = _default.GetMigrationInfoForMigration(migration);
             migrationinfo.TransactionBehavior.ShouldBe(TransactionBehavior.None);
         }
 
         [Test]
         public void MigrationInfoShouldExtractTraits()
         {
-            var migrationType = typeof(DefaultConventionMigrationFake);
-            var migrationinfo = _default.GetMigrationInfo(migrationType);
+            var migration = new DefaultConventionMigrationFake();
+            var migrationinfo = _default.GetMigrationInfoForMigration(migration);
             migrationinfo.Trait("key").ShouldBe("test");
         }
 
@@ -396,7 +397,7 @@ namespace FluentMigrator.Tests.Unit
         class AutoScriptMigrationFake : AutoScriptMigration
         {
             public AutoScriptMigrationFake()
-                : base(embeddedResourceProvider: null)
+                : base(new DefaultEmbeddedResourceProvider(new IMigration[0]))
             {
             }
         }
@@ -404,8 +405,8 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void GetAutoScriptUpName()
         {
-            var querySchema = new SqlServerProcessor(new[] { "SqlServer2016", "SqlServer" }, null, null, null, null, null);
-            var context = new MigrationContext(querySchema, null, null, (IServiceProvider)null);
+            var processor = new SqlServerProcessor(new[] { "SqlServer2016", "SqlServer" }, null, null, null, null, null);
+            var context = processor.CreateServices().BuildServiceProvider().GetRequiredService<IMigrationContext>();
             var expr = new AutoScriptMigrationFake();
             expr.GetUpExpressions(context);
 
@@ -425,8 +426,8 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void GetAutoScriptDownName()
         {
-            var querySchema = new SqlServerProcessor(new[] { "SqlServer2016", "SqlServer" }, null, null, null, null, null);
-            var context = new MigrationContext(querySchema, null, null, (IServiceProvider)null);
+            var processor = new SqlServerProcessor(new[] { "SqlServer2016", "SqlServer" }, null, null, null, null, null);
+            var context = processor.CreateServices().BuildServiceProvider().GetRequiredService<IMigrationContext>();
             var expr = new AutoScriptMigrationFake();
             expr.GetDownExpressions(context);
 

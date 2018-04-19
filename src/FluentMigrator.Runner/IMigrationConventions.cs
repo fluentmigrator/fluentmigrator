@@ -33,6 +33,7 @@ namespace FluentMigrator.Runner
 
         Func<Type, bool> TypeIsVersionTableMetaData { get; }
 
+        [Obsolete]
         Func<Type, IMigrationInfo> GetMigrationInfo { get; }
 
         /// <summary>
