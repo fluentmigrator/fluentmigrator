@@ -16,6 +16,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
+using System.Diagnostics;
 using System.Linq;
 using System.IO;
 using System.Reflection;
@@ -31,8 +33,16 @@ namespace FluentMigrator.Expressions
     /// </summary>
     public sealed class ExecuteEmbeddedSqlScriptExpression : ExecuteEmbeddedSqlScriptExpressionBase
     {
-        [NotNull]
+        [CanBeNull]
         private readonly IEmbeddedResourceProvider _embeddedResourceProvider;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExecuteEmbeddedSqlScriptExpression"/> class.
+        /// </summary>
+        [Obsolete]
+        public ExecuteEmbeddedSqlScriptExpression()
+        {
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ExecuteEmbeddedSqlScriptExpression"/> class.
@@ -78,9 +88,15 @@ namespace FluentMigrator.Expressions
                     .ToList();
 #pragma warning restore 612
             }
-            else
+            else if (_embeddedResourceProvider != null)
             {
                 resourceNames = _embeddedResourceProvider.GetEmbeddedResources().ToList();
+            }
+            else
+            {
+#pragma warning disable 612
+                throw new InvalidOperationException($"The caller forgot to set the {nameof(MigrationAssemblies)} property.");
+#pragma warning restore 612
             }
 
             var embeddedResourceNameWithAssembly = GetQualifiedResourcePath(resourceNames, SqlScript);

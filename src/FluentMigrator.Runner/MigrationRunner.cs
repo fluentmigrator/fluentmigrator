@@ -203,7 +203,16 @@ namespace FluentMigrator.Runner
 
         public void ApplyProfiles()
         {
-            ProfileLoader.ApplyProfiles(this);
+#pragma warning disable 612
+            if (ProfileLoader.SupportsParameterlessApplyProfile)
+            {
+                ProfileLoader.ApplyProfiles();
+#pragma warning restore 612
+            }
+            else
+            {
+                ProfileLoader.ApplyProfiles(this);
+            }
         }
 
         public void ApplyMaintenance(MigrationStage stage, bool useAutomaticTransactionManagement)

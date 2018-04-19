@@ -92,6 +92,10 @@ namespace FluentMigrator.Runner
 
         /// <inheritdoc />
         [Obsolete]
+        public bool SupportsParameterlessApplyProfile => _runner != null;
+
+        /// <inheritdoc />
+        [Obsolete]
         public void ApplyProfiles()
         {
             if (_runner == null)

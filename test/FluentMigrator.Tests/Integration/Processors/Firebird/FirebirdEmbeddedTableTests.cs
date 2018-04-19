@@ -566,6 +566,18 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             }
         }
 
+        [Obsolete]
+        private static MigrationRunner ObsoleteCreateFirebirdEmbeddedRunnerFor(FbConnection connection, RunnerContext runnerContext, out FirebirdProcessor processor)
+        {
+            var announcer = new TextWriterAnnouncer(TestContext.Out);
+            announcer.ShowSql = true;
+            var options = FirebirdOptions.AutoCommitBehaviour();
+            processor = new FirebirdProcessor(connection, new FirebirdGenerator(options), announcer,
+                                              new ProcessorOptions(), new FirebirdDbFactory(), options);
+            var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), runnerContext, processor);
+            return runner;
+        }
+
         private static IMigrationRunner CreateFirebirdEmbeddedRunnerFor(FbConnection connection, RunnerContext runnerContext, out FirebirdProcessor processor)
         {
             var announcer = new TextWriterAnnouncer(TestContext.Out);
@@ -672,7 +684,54 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             }
         }
 
+        [Test]
+        [Obsolete]
+        public void ObsoleteAlterTable_MigrationRequiresAutomaticDelete_AndProcessorHasUndoDisabled_ShouldNotThrow()
+        {
+            using (var tempDb = new TemporaryDatabase(IntegrationTestOptions.Firebird, _firebirdLibraryProber))
+            {
+                var connectionString = tempDb.ConnectionString;
 
+                var runnerContext = new RunnerContext(new TextWriterAnnouncer(TestContext.Out))
+                {
+                    Namespace = "FluentMigrator.Tests.Integration.Migrations"
+                };
+
+                using (var connection = new FbConnection(connectionString))
+                {
+                    FirebirdProcessor processor;
+                    var announcer = new TextWriterAnnouncer(TestContext.Out);
+                    announcer.ShowSql = true;
+                    var options = FirebirdOptions.AutoCommitBehaviour();
+                    options.TruncateLongNames = false;
+                    processor = new FirebirdProcessor(connection, new FirebirdGenerator(options), announcer,
+                        new ProcessorOptions(), new FirebirdDbFactory(), options);
+                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), runnerContext, processor);
+                    runner.Up(new MigrationWhichCreatesTwoRelatedTables());
+                    processor.CommitTransaction();
+                    FbConnection.ClearPool(connection);
+                }
+
+                //---------------Assert Precondition----------------
+                Assert.IsTrue(ForeignKeyExists(connectionString, MigrationWhichCreatesTwoRelatedTables.ForeignKeyName),
+                    "Foreign key does not exist after first migration");
+                using (var connection = new FbConnection(connectionString))
+                {
+                    FirebirdProcessor processor;
+                    var announcer = new TextWriterAnnouncer(TestContext.Out);
+                    announcer.ShowSql = true;
+                    var options = FirebirdOptions.AutoCommitBehaviour();
+                    processor = new FirebirdProcessor(connection, new FirebirdGenerator(options), announcer,
+                        new ProcessorOptions(), new FirebirdDbFactory(), options);
+                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), runnerContext, processor);
+                    runner.Up(new MigrationWhichAltersTableWithFK());
+                    processor.CommitTransaction();
+                }
+
+                Assert.IsTrue(ForeignKeyExists(connectionString, MigrationWhichCreatesTwoRelatedTables.ForeignKeyName),
+                    "Foreign key does not exist after second migration");
+            }
+        }
 
         [Test]
         public void AlterTable_MigrationRequiresAutomaticDelete_AndProcessorHasUndoDisabled_ShouldNotThrow()

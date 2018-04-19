@@ -79,6 +79,8 @@ namespace FluentMigrator.Runner
             VersionUniqueMigration = new VersionUniqueMigration(VersionTableMetaData);
             VersionDescriptionMigration = new VersionDescriptionMigration(VersionTableMetaData);
 
+            VersionTableMetaData.ApplicationContext = runner.RunnerContext.ApplicationContext;
+
             LoadVersionInfo();
         }
 
@@ -98,6 +100,10 @@ namespace FluentMigrator.Runner
             VersionSchemaMigration = new VersionSchemaMigration(VersionTableMetaData);
             VersionUniqueMigration = new VersionUniqueMigration(VersionTableMetaData);
             VersionDescriptionMigration = new VersionDescriptionMigration(VersionTableMetaData);
+
+#pragma warning disable 618
+            VersionTableMetaData.ApplicationContext = runner.RunnerContext.ApplicationContext;
+#pragma warning restore 618
 
             LoadVersionInfo();
         }
