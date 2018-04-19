@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Breaking changes
+
+- [#850](https://github.com/fluentmigrator/fluentmigrator/issues/850): Set minimum .NET Framework version to 4.6.1. Older versions aren't supported anymore.
+
+### Added
+
+- [#851](https://github.com/fluentmigrator/fluentmigrator/issues/851): Enable the usage of [Microsoft.Extensions.DependencyInjection](https://github.com/aspnet/DependencyInjection/)
+
+### Deprecated
+
+- `IAssemblyCollection`
+- `IMigrationRunnerConventions.GetMigrationInfo`
+- `IProfileLoader.ApplyProfiles()`
+- `IProfileLoader.FindProfilesIn`
+
 ## 2.0.2 (2018-04-17)
 
 ### Fixed
