@@ -37,6 +37,7 @@ namespace FluentMigrator.Runner.Announcers
             this._write = write;
         }
 
+        [CLSCompliant(false)]
         public TextWriterAnnouncer(IOptions<TextWriterAnnouncerOptions> options)
             : base(options)
         {
