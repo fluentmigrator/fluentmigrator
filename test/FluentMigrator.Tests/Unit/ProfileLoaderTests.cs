@@ -1,13 +1,33 @@
-﻿using System.Linq;
-using System.Reflection;
+﻿#region License
+//
+// Copyright (c) 2018, Fluent Migrator Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+#endregion
+
+using System.Linq;
+
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Initialization;
-using Moq;
-using NUnit.Framework;
-using NUnit.Should;
-using FluentMigrator.Infrastructure;
 
 using Microsoft.Extensions.DependencyInjection;
+
+using Moq;
+
+using NUnit.Framework;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Unit
 {
@@ -17,21 +37,21 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void BlankProfileDoesntLoadProfiles()
         {
-            var _runnerContextMock = new Mock<IRunnerContext>();
-            var _runnerMock = new Mock<IMigrationRunner>();
-            var _conventionsMock = new Mock<IMigrationRunnerConventions>();
+            var runnerContextMock = new Mock<IRunnerContext>();
+            var runnerMock = new Mock<IMigrationRunner>();
+            var conventionsMock = new Mock<IMigrationRunnerConventions>();
 
-            _runnerContextMock.Setup(x => x.Profile).Returns(string.Empty);
+            runnerContextMock.Setup(x => x.Profile).Returns(string.Empty);
 
             var profileLoader = new ServiceCollection()
                 .ConfigureRunner(rb =>
-                    rb.WithRunnerContext(_runnerContextMock.Object).WithRunnerConventions(_conventionsMock.Object))
+                    rb.WithRunnerContext(runnerContextMock.Object).WithRunnerConventions(conventionsMock.Object))
                 .AddScoped<ProfileLoader>()
                 .WithAllTestMigrations()
                 .BuildServiceProvider()
                 .GetRequiredService<ProfileLoader>();
 
-            profileLoader.ApplyProfiles(_runnerMock.Object);
+            profileLoader.ApplyProfiles(runnerMock.Object);
 
             profileLoader.Profiles.Count().ShouldBe(0);
         }

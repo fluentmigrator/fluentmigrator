@@ -18,7 +18,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
@@ -33,7 +32,6 @@ namespace FluentMigrator.Runner
 {
     public class ConnectionlessVersionLoader : IVersionLoader
     {
-        private readonly IConventionSet _conventionSet;
         private bool _versionsLoaded;
 
         [Obsolete]
@@ -42,7 +40,6 @@ namespace FluentMigrator.Runner
             IMigrationRunnerConventions conventions, long startVersion, long targetVersion,
             IVersionTableMetaData versionTableMetaData = null)
         {
-            _conventionSet = conventionSet;
             Runner = runner;
             Assemblies = assemblies;
             Conventions = conventions;
@@ -75,7 +72,6 @@ namespace FluentMigrator.Runner
             long startVersion, long targetVersion,
             [NotNull] IVersionTableMetaData versionTableMetaData)
         {
-            _conventionSet = conventionSet;
             Runner = runner;
             Conventions = conventions;
             StartVersion = startVersion;

@@ -3,8 +3,10 @@ using FluentMigrator.Runner.Generators.Postgres;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Postgres;
 using NUnit.Framework;
-using NUnit.Should;
+
 using Npgsql;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Integration.Processors.Postgres
 {

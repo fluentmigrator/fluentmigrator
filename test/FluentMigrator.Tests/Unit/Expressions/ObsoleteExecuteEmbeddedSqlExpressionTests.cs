@@ -21,10 +21,12 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Tests.Helpers;
 using FluentMigrator.Infrastructure;
 using Moq;
-using NUnit.Should;
+
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Expressions
 {
@@ -32,8 +34,8 @@ namespace FluentMigrator.Tests.Unit.Expressions
     [Obsolete]
     public class ObsoleteExecuteEmbeddedSqlScriptExpressionTests
     {
-        private const string testSqlScript = "embeddedtestscript.sql";
-        private const string scriptContents = "TEST SCRIPT";
+        private const string TestSqlScript = "embeddedtestscript.sql";
+        private const string ScriptContents = "TEST SCRIPT";
 
         [Test]
         public void ErrorIsReturnWhenSqlScriptIsNullOrEmpty()
@@ -46,10 +48,10 @@ namespace FluentMigrator.Tests.Unit.Expressions
         [Test]
         public void ExecutesTheStatement()
         {
-            var expression = new ExecuteEmbeddedSqlScriptExpression { SqlScript = testSqlScript, MigrationAssemblies = new SingleAssembly(Assembly.GetExecutingAssembly()) };
+            var expression = new ExecuteEmbeddedSqlScriptExpression { SqlScript = TestSqlScript, MigrationAssemblies = new SingleAssembly(Assembly.GetExecutingAssembly()) };
 
             var processor = new Mock<IMigrationProcessor>();
-            processor.Setup(x => x.Execute(scriptContents)).Verifiable();
+            processor.Setup(x => x.Execute(ScriptContents)).Verifiable();
 
             expression.ExecuteWith(processor.Object);
             processor.Verify();
@@ -76,9 +78,9 @@ namespace FluentMigrator.Tests.Unit.Expressions
         [Test]
         public void ResourceFinderIsCaseInsensitive()
         {
-            var expression = new ExecuteEmbeddedSqlScriptExpression { SqlScript = testSqlScript.ToUpper(), MigrationAssemblies = new SingleAssembly(Assembly.GetExecutingAssembly()) };
+            var expression = new ExecuteEmbeddedSqlScriptExpression { SqlScript = TestSqlScript.ToUpper(), MigrationAssemblies = new SingleAssembly(Assembly.GetExecutingAssembly()) };
             var processor = new Mock<IMigrationProcessor>();
-            processor.Setup(x => x.Execute(scriptContents)).Verifiable();
+            processor.Setup(x => x.Execute(ScriptContents)).Verifiable();
 
             expression.ExecuteWith(processor.Object);
             processor.Verify();
@@ -119,7 +121,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         [Test]
         public void ToStringIsDescriptive()
         {
-            var expression = new ExecuteSqlScriptExpression { SqlScript = testSqlScript };
+            var expression = new ExecuteSqlScriptExpression { SqlScript = TestSqlScript };
             expression.ToString().ShouldBe("ExecuteSqlScript embeddedtestscript.sql");
         }
     }

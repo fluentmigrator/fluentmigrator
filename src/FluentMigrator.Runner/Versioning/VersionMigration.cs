@@ -67,54 +67,46 @@ namespace FluentMigrator.Runner.Versioning
 
     public class VersionUniqueMigration : ForwardOnlyMigration
     {
-        private readonly IVersionTableMetaData versionTableMeta;
+        private readonly IVersionTableMetaData _versionTableMeta;
 
         public VersionUniqueMigration(IVersionTableMetaData versionTableMeta)
         {
-            this.versionTableMeta = versionTableMeta;
+            _versionTableMeta = versionTableMeta;
         }
 
         public override void Up()
         {
-            Create.Index(versionTableMeta.UniqueIndexName)
-                .OnTable(versionTableMeta.TableName)
-                .InSchema(versionTableMeta.SchemaName)
+            Create.Index(_versionTableMeta.UniqueIndexName)
+                .OnTable(_versionTableMeta.TableName)
+                .InSchema(_versionTableMeta.SchemaName)
                 .WithOptions().Unique()
                 .WithOptions().Clustered()
-                .OnColumn(versionTableMeta.ColumnName);
+                .OnColumn(_versionTableMeta.ColumnName);
 
-            Alter.Table(versionTableMeta.TableName).InSchema(versionTableMeta.SchemaName).AddColumn(versionTableMeta.AppliedOnColumnName).AsDateTime().Nullable();
+            Alter.Table(_versionTableMeta.TableName).InSchema(_versionTableMeta.SchemaName).AddColumn(_versionTableMeta.AppliedOnColumnName).AsDateTime().Nullable();
         }
 
     }
 
     public class VersionDescriptionMigration : Migration
     {
-        private readonly IVersionTableMetaData versionTableMeta;
+        private readonly IVersionTableMetaData _versionTableMeta;
 
         public VersionDescriptionMigration(IVersionTableMetaData versionTableMeta)
         {
-            this.versionTableMeta = versionTableMeta;
+            _versionTableMeta = versionTableMeta;
         }
 
         public override void Up()
         {
-            Alter.Table(versionTableMeta.TableName).InSchema(versionTableMeta.SchemaName)
-                .AddColumn(versionTableMeta.DescriptionColumnName).AsString(1024).Nullable();
+            Alter.Table(_versionTableMeta.TableName).InSchema(_versionTableMeta.SchemaName)
+                .AddColumn(_versionTableMeta.DescriptionColumnName).AsString(1024).Nullable();
         }
 
         public override void Down()
         {
-            Delete.Column(versionTableMeta.DescriptionColumnName)
-                  .FromTable(versionTableMeta.TableName).InSchema(versionTableMeta.SchemaName);
-        }
-    }
-
-    internal static class DateTimeExtensions
-    {
-        public static string ToISO8601(this DateTime dateTime)
-        {
-            return dateTime.ToString("u").Replace("Z", "");
+            Delete.Column(_versionTableMeta.DescriptionColumnName)
+                  .FromTable(_versionTableMeta.TableName).InSchema(_versionTableMeta.SchemaName);
         }
     }
 }

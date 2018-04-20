@@ -1,7 +1,8 @@
 ﻿using System.Data;
 using FluentMigrator.Runner.Generators.SqlServer;
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
 {
@@ -362,7 +363,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
         {
             var expression = GeneratorTestHelper.GetDeleteUniqueConstraintExpression();
             expression.Constraint.SchemaName = "TestSchema";
-            
+
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE [TestTable1] DROP CONSTRAINT [TESTUNIQUECONSTRAINT]");
         }

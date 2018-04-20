@@ -33,19 +33,9 @@ namespace FluentMigrator.Builders
     /// </remarks>
     public class ColumnExpressionBuilderHelper
     {
-        /// <summary>
-        /// For each distinct column which has an existing row default, an instance of this
-        /// will be stored in the _expressionsByColumn.
-        /// </summary>
-        private class ExistingRowsData
-        {
-            public UpdateDataExpression SetExistingRowsExpression;
-            public AlterColumnExpression SetColumnNotNullableExpression;
-        }
-
-        private IColumnExpressionBuilder _builder;
-        private IMigrationContext _context;
-        private Dictionary<ColumnDefinition, ExistingRowsData> _existingRowsDataByColumn { get; set; }
+        private readonly Dictionary<ColumnDefinition, ExistingRowsData> _existingRowsDataByColumn;
+        private readonly IColumnExpressionBuilder _builder;
+        private readonly IMigrationContext _context;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ColumnExpressionBuilderHelper"/> class.
@@ -216,6 +206,16 @@ namespace FluentMigrator.Builders
             });
 
             _context.Expressions.Add(index);
+        }
+
+        /// <summary>
+        /// For each distinct column which has an existing row default, an instance of this
+        /// will be stored in the _expressionsByColumn.
+        /// </summary>
+        private class ExistingRowsData
+        {
+            public UpdateDataExpression SetExistingRowsExpression;
+            public AlterColumnExpression SetColumnNotNullableExpression;
         }
     }
 }

@@ -13,12 +13,12 @@ namespace FluentMigrator.Tests
         [SetUp]
         public void Setup()
         {
-            migration = Mock.Of<IMigration>();
-            migrationValidator = new MigrationValidator(Mock.Of<IAnnouncer>(), new DefaultConventionSet(null));
+            _migration = Mock.Of<IMigration>();
+            _migrationValidator = new MigrationValidator(Mock.Of<IAnnouncer>(), new DefaultConventionSet(null));
         }
 
-        private MigrationValidator migrationValidator;
-        private IMigration migration;
+        private MigrationValidator _migrationValidator;
+        private IMigration _migration;
 
         private IMigrationExpression BuildInvalidExpression()
         {
@@ -36,7 +36,7 @@ namespace FluentMigrator.Tests
         public void it_does_not_throw_if_expressions_are_valid()
         {
             Assert.DoesNotThrow(
-                () => migrationValidator.ApplyConventionsToAndValidateExpressions(migration
+                () => _migrationValidator.ApplyConventionsToAndValidateExpressions(_migration
                                                                                   , new[] {BuildValidExpression()}));
         }
 
@@ -44,7 +44,7 @@ namespace FluentMigrator.Tests
         public void it_throws_invalid_migration_exception_if_expressions_are_invalid()
         {
             Assert.Throws<InvalidMigrationException>(
-                () => migrationValidator.ApplyConventionsToAndValidateExpressions(migration
+                () => _migrationValidator.ApplyConventionsToAndValidateExpressions(_migration
                                                                                   , new[] {BuildInvalidExpression()}));
         }
 
@@ -52,7 +52,7 @@ namespace FluentMigrator.Tests
         public void it_throws_invalid_migration_exception_if_expressions_contains_multiple_invalid_of_same_type()
         {
             Assert.Throws<InvalidMigrationException>(
-                () => migrationValidator.ApplyConventionsToAndValidateExpressions(migration
+                () => _migrationValidator.ApplyConventionsToAndValidateExpressions(_migration
                                                                                   , new[] {BuildInvalidExpression(), BuildInvalidExpression()}));
         }
     }

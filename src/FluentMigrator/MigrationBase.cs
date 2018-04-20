@@ -36,7 +36,11 @@ namespace FluentMigrator
         /// <summary>
         /// Gets or sets the migration context
         /// </summary>
+        [Obsolete("Use the Context property instead")]
+        // ReSharper disable once InconsistentNaming
+        // ReSharper disable once MemberCanBePrivate.Global
         internal IMigrationContext _context;
+
         private readonly object _mutex = new object();
 
         /// <inheritdoc />
@@ -44,6 +48,13 @@ namespace FluentMigrator
 
         /// <inheritdoc />
         public string ConnectionString { get; protected set; }
+
+        /// <summary>
+        /// Gets the migration context
+        /// </summary>
+#pragma warning disable 618
+        internal IMigrationContext Context => _context ?? throw new InvalidOperationException("The context is not set");
+#pragma warning restore 618
 
         /// <summary>
         /// Collect the UP migration expressions
@@ -60,11 +71,15 @@ namespace FluentMigrator
         {
             lock (_mutex)
             {
+#pragma warning disable 618
                 _context = context;
+#pragma warning restore 618
                 ApplicationContext = context.ApplicationContext;
                 ConnectionString = context.Connection;
                 Up();
+#pragma warning disable 618
                 _context = null;
+#pragma warning restore 618
             }
         }
 
@@ -73,11 +88,15 @@ namespace FluentMigrator
         {
             lock (_mutex)
             {
+#pragma warning disable 618
                 _context = context;
+#pragma warning restore 618
                 ApplicationContext = context.ApplicationContext;
                 ConnectionString = context.Connection;
                 Down();
+#pragma warning disable 618
                 _context = null;
+#pragma warning restore 618
             }
         }
 
@@ -86,7 +105,7 @@ namespace FluentMigrator
         /// </summary>
         public IAlterExpressionRoot Alter
         {
-            get { return new AlterExpressionRoot(_context); }
+            get { return new AlterExpressionRoot(Context); }
         }
 
         /// <summary>
@@ -94,7 +113,7 @@ namespace FluentMigrator
         /// </summary>
         public ICreateExpressionRoot Create
         {
-            get { return new CreateExpressionRoot(_context); }
+            get { return new CreateExpressionRoot(Context); }
         }
 
         /// <summary>
@@ -102,7 +121,7 @@ namespace FluentMigrator
         /// </summary>
         public IRenameExpressionRoot Rename
         {
-            get { return new RenameExpressionRoot(_context); }
+            get { return new RenameExpressionRoot(Context); }
         }
 
         /// <summary>
@@ -110,7 +129,7 @@ namespace FluentMigrator
         /// </summary>
         public IInsertExpressionRoot Insert
         {
-            get { return new InsertExpressionRoot(_context); }
+            get { return new InsertExpressionRoot(Context); }
         }
 
         /// <summary>
@@ -118,7 +137,7 @@ namespace FluentMigrator
         /// </summary>
         public ISchemaExpressionRoot Schema
         {
-            get { return new SchemaExpressionRoot(_context); }
+            get { return new SchemaExpressionRoot(Context); }
         }
 
         /// <summary>
@@ -128,7 +147,7 @@ namespace FluentMigrator
         /// <returns>The database specific expression</returns>
         public IIfDatabaseExpressionRoot IfDatabase(params string[] databaseType)
         {
-            return new IfDatabaseExpressionRoot(_context, databaseType);
+            return new IfDatabaseExpressionRoot(Context, databaseType);
         }
 
         /// <summary>
@@ -138,7 +157,7 @@ namespace FluentMigrator
         /// <returns>The database specific expression</returns>
         public IIfDatabaseExpressionRoot IfDatabase(Predicate<string> databaseTypeFunc)
         {
-            return new IfDatabaseExpressionRoot(_context, databaseTypeFunc);
+            return new IfDatabaseExpressionRoot(Context, databaseTypeFunc);
         }
     }
 }

@@ -24,12 +24,12 @@ namespace FluentMigrator.Runner.Processors
 {
     public abstract class DbFactoryBase : IDbFactory
     {
-        private readonly object @lock = new object();
-        private volatile DbProviderFactory factory;
+        private readonly object _lock = new object();
+        private volatile DbProviderFactory _factory;
 
         protected DbFactoryBase(DbProviderFactory factory)
         {
-            this.factory = factory;
+            _factory = factory;
         }
 
         protected DbFactoryBase()
@@ -40,17 +40,17 @@ namespace FluentMigrator.Runner.Processors
         {
             get
             {
-                if (factory == null)
+                if (_factory == null)
                 {
-                    lock (@lock)
+                    lock (_lock)
                     {
-                        if (factory == null)
+                        if (_factory == null)
                         {
-                            factory = CreateFactory();
+                            _factory = CreateFactory();
                         }
                     }
                 }
-                return factory;
+                return _factory;
             }
         }
 
@@ -61,6 +61,7 @@ namespace FluentMigrator.Runner.Processors
         public IDbConnection CreateConnection(string connectionString)
         {
             var connection = Factory.CreateConnection();
+            Debug.Assert(connection != null, nameof(connection) + " != null");
             connection.ConnectionString = connectionString;
             return connection;
         }

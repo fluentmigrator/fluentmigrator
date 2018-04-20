@@ -19,8 +19,4 @@
     <ProjectReference Include="..\FluentMigrator.Runner.Core\FluentMigrator.Runner.Core.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="JetBrains.Annotations" Version="11.1.0" PrivateAssets="All" />
-  </ItemGroup>
-
 </Project>

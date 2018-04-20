@@ -47,7 +47,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
 
         public IQuoter Quoter
         {
-            get { return ((OracleGenerator) this.Generator).Quoter; }
+            get { return ((OracleGenerator) Generator).Quoter; }
         }
 
         public override bool SchemaExists(string schemaName)

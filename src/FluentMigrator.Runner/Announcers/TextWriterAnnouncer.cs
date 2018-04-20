@@ -34,7 +34,7 @@ namespace FluentMigrator.Runner.Announcers
 
         public TextWriterAnnouncer(Action<string> write)
         {
-            this._write = write;
+            _write = write;
         }
 
         [CLSCompliant(false)]
@@ -56,7 +56,7 @@ namespace FluentMigrator.Runner.Announcers
             _write(Environment.NewLine);
         }
 
-        public override void Write(string message, bool isNotSql)
+        public override void Write(string message, bool isNotSql = true)
         {
             _write(isNotSql ? string.Format("/* {0} */", message) : message);
             _write(Environment.NewLine);

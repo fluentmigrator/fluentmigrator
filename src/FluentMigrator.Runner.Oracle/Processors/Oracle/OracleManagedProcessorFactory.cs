@@ -41,7 +41,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
         {
             var factory = new OracleManagedDbFactory(_serviceProvider);
             var connection = factory.CreateConnection(connectionString);
-            return new OracleProcessor(connection, new OracleGenerator(this.Quoted(options.ProviderSwitches)), announcer, options, factory);
+            return new OracleProcessor(connection, new OracleGenerator(Quoted(options.ProviderSwitches)), announcer, options, factory);
         }
 
         private bool Quoted(string options)

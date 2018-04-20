@@ -17,6 +17,7 @@
 namespace FluentMigrator.Tests.Integration.Migrations.Firebird.Issue817
 {
     [Migration(100)]
+    // ReSharper disable once InconsistentNaming
     public class Migration_v100_AddUsersTable : Migration
     {
         public override void Up()

@@ -42,7 +42,7 @@ namespace FluentMigrator.Runner.Generators.MySql
 
         public override string Generate(CreateTableExpression expression)
         {
-            if (string.IsNullOrEmpty(expression.TableName)) throw new ArgumentNullException(nameof(expression), "expression.TableName cannot be empty");
+            if (string.IsNullOrEmpty(expression.TableName)) throw new ArgumentNullException(nameof(expression), @"expression.TableName cannot be empty");
             if (expression.Columns.Count == 0) throw new ArgumentException("You must specifiy at least one column");
 
             string errors = ValidateAdditionalFeatureCompatibility(expression.Columns.SelectMany(x => x.AdditionalFeatures));
@@ -91,12 +91,12 @@ namespace FluentMigrator.Runner.Generators.MySql
 
         public override string Generate(CreateSequenceExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("Sequences is not supporteed for MySql");
+            return CompatabilityMode.HandleCompatabilty("Sequences is not supporteed for MySql");
         }
 
         public override string Generate(DeleteSequenceExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("Sequences is not supporteed for MySql");
+            return CompatabilityMode.HandleCompatabilty("Sequences is not supporteed for MySql");
         }
 
         public override string Generate(DeleteConstraintExpression expression)

@@ -79,8 +79,10 @@ namespace FluentMigrator.Runner
                 .Where(t => _conventions.TypeIsProfile(t) && t.GetOneAttribute<ProfileAttribute>().ProfileName.ToLower() == profile.ToLower())
                 .OrderBy(x => x.Name);
 
-            foreach (Type type in matchedTypes)
+            foreach (var type in matchedTypes)
             {
+                if (type.FullName == null)
+                    continue;
                 yield return type.Assembly.CreateInstance(type.FullName) as IMigration;
             }
         }

@@ -11,13 +11,23 @@ namespace FluentMigrator.Runner.Generators.Generic
 {
     public abstract class GenericGenerator : GeneratorBase
     {
+        [Obsolete("Use the CompatibilityMode property")]
+        // ReSharper disable once InconsistentNaming
         public CompatabilityMode compatabilityMode;
 
         public GenericGenerator(IColumn column, IQuoter quoter, IDescriptionGenerator descriptionGenerator)
             : base(column, quoter, descriptionGenerator)
         {
-            compatabilityMode = CompatabilityMode.LOOSE;
+            CompatabilityMode = CompatabilityMode.LOOSE;
         }
+
+#pragma warning disable 618
+        public CompatabilityMode CompatabilityMode
+        {
+            get => compatabilityMode;
+            set => compatabilityMode = value;
+        }
+#pragma warning restore 618
 
         public virtual string CreateTable { get { return "CREATE TABLE {0} ({1})"; } }
         public virtual string DropTable { get { return "DROP TABLE {0}"; } }
@@ -61,7 +71,7 @@ namespace FluentMigrator.Runner.Generators.Generic
         /// <returns></returns>
         public override string Generate(CreateTableExpression expression)
         {
-            if (string.IsNullOrEmpty(expression.TableName)) throw new ArgumentNullException("expression", "expression.TableName cannot be empty");
+            if (string.IsNullOrEmpty(expression.TableName)) throw new ArgumentNullException(nameof(expression), @"expression.TableName cannot be empty");
             if (expression.Columns.Count == 0) throw new ArgumentException("You must specifiy at least one column");
 
             string quotedTableName = Quoter.QuoteTableName(expression.TableName, expression.SchemaName);
@@ -195,7 +205,7 @@ namespace FluentMigrator.Runner.Generators.Generic
         public override string Generate(DeleteForeignKeyExpression expression)
         {
             if (expression.ForeignKey.ForeignTable == null)
-                throw new ArgumentNullException("Table name not specified, ensure you have appended the OnTable extension. Format should be Delete.ForeignKey(KeyName).OnTable(TableName)");
+                throw new ArgumentNullException(nameof(expression), @"Table name not specified, ensure you have appended the OnTable extension. Format should be Delete.ForeignKey(KeyName).OnTable(TableName)");
 
             return string.Format(DeleteConstraint, Quoter.QuoteTableName(expression.ForeignKey.ForeignTable, expression.ForeignKey.ForeignTableSchema), Quoter.QuoteColumnName(expression.ForeignKey.Name));
         }
@@ -252,7 +262,7 @@ namespace FluentMigrator.Runner.Generators.Generic
 
         protected string ValidateAdditionalFeatureCompatibility(IEnumerable<KeyValuePair<string, object>> features)
         {
-            if (compatabilityMode == CompatabilityMode.STRICT) {
+            if (CompatabilityMode == CompatabilityMode.STRICT) {
                 List<string> unsupportedFeatures =
                     features.Where(x => !IsAdditionalFeatureSupported(x.Key)).Select(x => x.Key).ToList();
 
@@ -262,7 +272,7 @@ namespace FluentMigrator.Runner.Generators.Generic
                             "The following database specific additional features are not supported in strict mode [{0}]",
                             unsupportedFeatures.Aggregate((x, y) => x + ", " + y));
                     {
-                        return compatabilityMode.HandleCompatabilty(errorMessage);
+                        return CompatabilityMode.HandleCompatabilty(errorMessage);
                     }
                 }
             }
@@ -343,23 +353,23 @@ namespace FluentMigrator.Runner.Generators.Generic
         //All Schema method throw by default as only Sql server 2005 and up supports them.
         public override string Generate(CreateSchemaExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("Schemas are not supported");
+            return CompatabilityMode.HandleCompatabilty("Schemas are not supported");
 
         }
 
         public override string Generate(DeleteSchemaExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("Schemas are not supported");
+            return CompatabilityMode.HandleCompatabilty("Schemas are not supported");
         }
 
         public override string Generate(AlterSchemaExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("Schemas are not supported");
+            return CompatabilityMode.HandleCompatabilty("Schemas are not supported");
         }
 
         public override string Generate(CreateSequenceExpression expression)
         {
-            var result = new StringBuilder(string.Format("CREATE SEQUENCE "));
+            var result = new StringBuilder("CREATE SEQUENCE ");
             var seq = expression.Sequence;
             result.AppendFormat(Quoter.QuoteSequenceName(seq.Name, seq.SchemaName));
 
@@ -398,7 +408,7 @@ namespace FluentMigrator.Runner.Generators.Generic
 
         public override string Generate(DeleteSequenceExpression expression)
         {
-            var result = new StringBuilder(string.Format("DROP SEQUENCE "));
+            var result = new StringBuilder("DROP SEQUENCE ");
             result.AppendFormat(Quoter.QuoteSequenceName(expression.SequenceName, expression.SchemaName));
             return result.ToString();
         }

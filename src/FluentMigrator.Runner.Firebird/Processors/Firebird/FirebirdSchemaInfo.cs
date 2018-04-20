@@ -57,7 +57,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
     public sealed class ColumnInfo
     {
-        private static readonly string query = @"select 
+        private static readonly string query = @"select
                     fields.rdb$field_name as field_name,
                     fields.rdb$relation_name as relation_name,
                     fields.rdb$default_source as default_source,
@@ -68,28 +68,27 @@ namespace FluentMigrator.Runner.Processors.Firebird
                     fieldinfo.rdb$field_type as field_type,
                     fieldinfo.rdb$field_sub_type as field_sub_type,
                     fieldtype.rdb$type_name as field_type_name
-                    
+
                     from rdb$relation_fields as fields
                     left outer join rdb$fields as fieldinfo on (fields.rdb$field_source = fieldinfo.rdb$field_name)
                     left outer join rdb$types as fieldtype on ( (fieldinfo.rdb$field_type = fieldtype.rdb$type) and (fieldtype.rdb$field_name = 'RDB$FIELD_TYPE') )
                     where (lower(fields.rdb$relation_name) = lower('{0}'))
                     ";
 
-        public string Name { get; private set; }
-        public string TableName { get; private set; }
-        public object DefaultValue { get; private set; }
-        public int Position { get; private set; }
+        public string Name { get; }
+        public string TableName { get; }
+        public object DefaultValue { get; }
+        public int Position { get; }
         public DbType? DBType { get { return GetDBType(); } }
         public string CustomType { get { return GetCustomDBType(); } }
-        public bool IsNullable { get; private set; }
-        public int? Size { get; private set; }
-        public int? Precision { get; private set; }
-        public int? CharacterLength { get; private set; }
-        public int? FieldType { get; private set; }
-        public int? FieldSubType { get; private set; }
-        public string FieldTypeName { get; private set; }
+        public bool IsNullable { get; }
+        public int? Precision { get; }
+        public int? CharacterLength { get; }
+        public int? FieldType { get; }
+        public int? FieldSubType { get; }
+        public string FieldTypeName { get; }
 
-        private ColumnInfo(DataRow drColumn, FirebirdProcessor processor)
+        private ColumnInfo(DataRow drColumn)
         {
             Name = AdoHelper.GetStringValue(drColumn["field_name"]).Trim();
             TableName = AdoHelper.GetStringValue(drColumn["relation_name"]).Trim();
@@ -109,7 +108,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             {
                 List<ColumnInfo> rows = new List<ColumnInfo>();
                 foreach (DataRow dr in ds.Tables[0].Rows)
-                    rows.Add(new ColumnInfo(dr, processor));
+                    rows.Add(new ColumnInfo(dr));
                 return rows;
             }
         }
@@ -198,8 +197,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
                 }
                 else
                 {
-                    int res = 0;
-                    if (int.TryParse(value, out res))
+                    if (int.TryParse(value, out var res))
                         return res;
 
                 }
@@ -210,19 +208,19 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
     public sealed class IndexInfo
     {
-        private static readonly string query = @"select 
+        private static readonly string query = @"select
                 rdb$index_name, rdb$relation_name, rdb$unique_flag, rdb$index_type
                 from rdb$indices where rdb$relation_name = '{0}'";
-        private static readonly string singleQuery = @"select 
+        private static readonly string singleQuery = @"select
                 rdb$index_name, rdb$relation_name, rdb$unique_flag, rdb$index_type
                 from rdb$indices where rdb$index_name = '{0}'";
         private static readonly string indexFieldQuery = @"select rdb$field_name from rdb$index_segments where rdb$index_name = '{0}'";
 
-        public string Name { get; private set; }
-        public string TableName { get; private set; }
-        public bool IsUnique { get; private set; }
-        public bool IsAscending { get; private set; }
-        public List<string> Columns { get; private set; }
+        public string Name { get; }
+        public string TableName { get; }
+        public bool IsUnique { get; }
+        public bool IsAscending { get; }
+        public List<string> Columns { get; }
 
 
         private IndexInfo(DataRow drIndex, FirebirdProcessor processor)
@@ -261,22 +259,22 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
     public sealed class ConstraintInfo
     {
-        private static readonly string query = @"select 
+        private static readonly string query = @"select
                 rdb$constraint_name, rdb$constraint_type, rdb$index_name
                 from rdb$relation_constraints where rdb$relation_name = '{0}'";
-        private static readonly string colQuery = @"select 
+        private static readonly string colQuery = @"select
                 rdb$const_name_uq, rdb$update_rule, rdb$delete_rule
                 from rdb$ref_constraints where rdb$constraint_name = '{0}'";
 
-        public string Name { get; private set; }
-        public bool IsPrimaryKey { get; private set; }
-        public bool IsUnique { get; private set; }
-        public bool IsNotNull { get; private set; }
-        public bool IsForeignKey { get; private set; }
-        public string IndexName { get; private set; }
-        public IndexInfo ForeignIndex { get; private set; }
-        public Rule UpdateRule { get; private set; }
-        public Rule DeleteRule { get; private set; }
+        public string Name { get; }
+        public bool IsPrimaryKey { get; }
+        public bool IsUnique { get; }
+        public bool IsNotNull { get; }
+        public bool IsForeignKey { get; }
+        public string IndexName { get; }
+        public IndexInfo ForeignIndex { get; }
+        public Rule UpdateRule { get; }
+        public Rule DeleteRule { get; }
 
         private ConstraintInfo(DataRow drConstraint, FirebirdProcessor processor)
         {
@@ -312,6 +310,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
                     return Rule.SetNull;
                 case "SET DEFAULT":
                     return Rule.SetDefault;
+                // ReSharper disable once RedundantCaseLabel
                 case "RESTRICT":
                 default:
                     return Rule.None;
@@ -333,21 +332,21 @@ namespace FluentMigrator.Runner.Processors.Firebird
     public enum TriggerEvent { Insert, Update, Delete }
     public sealed class TriggerInfo
     {
-        private static readonly string query = @"select 
+        private static readonly string query = @"select
                 rdb$trigger_name, rdb$trigger_sequence, rdb$trigger_type, rdb$trigger_source
                 from rdb$triggers where rdb$relation_name = '{0}'";
 
-        public string Name { get; private set; }
-        public int Sequence { get; private set; }
-        public int Type { get; private set; }
-        public string Body { get; private set; }
+        public string Name { get; }
+        public int Sequence { get; }
+        public int Type { get; }
+        public string Body { get; }
         public bool Before { get { return Type % 2 == 1; } }
         public bool OnInsert { get { return Type == 1 || Type == 2; } }
         public bool OnUpdate { get { return Type == 3 || Type == 4; } }
         public bool OnDelete { get { return Type == 5 || Type == 6; } }
         public TriggerEvent Event { get { return OnInsert ? TriggerEvent.Insert : OnUpdate ? TriggerEvent.Update : TriggerEvent.Delete; } }
 
-        private TriggerInfo(DataRow drTrigger, FirebirdProcessor processor)
+        private TriggerInfo(DataRow drTrigger)
         {
             Name = drTrigger["rdb$trigger_name"].ToString().Trim();
             Sequence = AdoHelper.GetIntValue(drTrigger["rdb$trigger_sequence"]) ?? 0;
@@ -361,7 +360,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             {
                 List<TriggerInfo> rows = new List<TriggerInfo>();
                 foreach (DataRow dr in ds.Tables[0].Rows)
-                    rows.Add(new TriggerInfo(dr, processor));
+                    rows.Add(new TriggerInfo(dr));
                 return rows;
             }
         }
@@ -372,8 +371,8 @@ namespace FluentMigrator.Runner.Processors.Firebird
         private static readonly string query = @"select rdb$generator_name from rdb$generators where rdb$generator_name = '{0}'";
         private static readonly string queryValue = "select gen_id(\"{0}\", 0) as gen_val from rdb$database";
 
-        public string Name { get; private set; }
-        public int CurrentValue{get; private set;}
+        public string Name { get; }
+        public int CurrentValue{get; }
 
         private SequenceInfo(DataRow drSequence, FirebirdProcessor processor)
         {

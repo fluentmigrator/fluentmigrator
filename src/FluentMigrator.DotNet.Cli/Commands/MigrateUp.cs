@@ -14,11 +14,10 @@
 // limitations under the License.
 #endregion
 
-using FluentMigrator.Runner.Initialization;
-
 using McMaster.Extensions.CommandLineUtils;
 
-using Microsoft.Extensions.DependencyInjection;
+// ReSharper disable UnusedMember.Local
+// ReSharper disable UnassignedGetOnlyAutoProperty
 
 namespace FluentMigrator.DotNet.Cli.Commands
 {

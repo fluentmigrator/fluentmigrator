@@ -144,7 +144,7 @@ namespace FluentMigrator.Runner.Generators.Generic
 
         public virtual string FormatEnum(object value)
         {
-            return ValueQuote + value.ToString() + ValueQuote;
+            return ValueQuote + value + ValueQuote;
         }
 
         public virtual string ValueQuote { get { return "'"; } }

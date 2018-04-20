@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -19,7 +19,8 @@
 using System.Linq;
 using FluentMigrator.Runner.Versioning;
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Versioning
 {
@@ -31,7 +32,7 @@ namespace FluentMigrator.Tests.Unit.Versioning
         [SetUp]
         public void SetUp()
         {
-            _versionInfo = new VersionInfo();            
+            _versionInfo = new VersionInfo();
         }
 
         [Test]

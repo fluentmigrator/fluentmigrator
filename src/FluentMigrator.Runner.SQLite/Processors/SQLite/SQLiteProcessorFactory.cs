@@ -22,6 +22,7 @@ using FluentMigrator.Runner.Generators.SQLite;
 
 namespace FluentMigrator.Runner.Processors.SQLite
 {
+    // ReSharper disable once InconsistentNaming
     public class SQLiteProcessorFactory : MigrationProcessorFactory
     {
         private readonly IServiceProvider _serviceProvider;

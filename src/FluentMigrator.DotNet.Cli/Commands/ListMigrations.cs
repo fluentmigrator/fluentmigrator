@@ -16,6 +16,8 @@
 
 using McMaster.Extensions.CommandLineUtils;
 
+// ReSharper disable UnusedMember.Local
+
 namespace FluentMigrator.DotNet.Cli.Commands
 {
     [HelpOption]

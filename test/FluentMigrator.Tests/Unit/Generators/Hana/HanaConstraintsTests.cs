@@ -1,7 +1,8 @@
 using System.Data;
 using FluentMigrator.Runner.Generators.Hana;
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Generators.Hana
 {

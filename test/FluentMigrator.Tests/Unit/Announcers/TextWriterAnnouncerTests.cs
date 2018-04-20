@@ -20,7 +20,8 @@ using System;
 using System.IO;
 using FluentMigrator.Runner.Announcers;
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Announcers
 {

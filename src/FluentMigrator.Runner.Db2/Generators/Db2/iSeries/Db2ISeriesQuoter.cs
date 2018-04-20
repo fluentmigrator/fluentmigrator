@@ -14,8 +14,6 @@
 // limitations under the License.
 #endregion
 
-using System;
-
 namespace FluentMigrator.Runner.Generators.DB2.iSeries
 {
     public class Db2ISeriesQuoter : Db2Quoter

@@ -22,7 +22,6 @@ using System.Linq;
 using System.Text;
 
 using FluentMigrator.Expressions;
-using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Generic;
 
 namespace FluentMigrator.Runner.Generators.Redshift
@@ -60,10 +59,11 @@ namespace FluentMigrator.Runner.Generators.Redshift
             var createStatement = new StringBuilder();
             var tableName = Quoter.Quote(expression.TableName);
             createStatement.AppendFormat("CREATE TABLE {0} ({1})", Quoter.QuoteTableName(expression.TableName, expression.SchemaName), Column.Generate(expression.Columns, tableName));
-            var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatements(expression);
+            var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatements(expression)
+                ?.ToList();
             createStatement.Append(";");
 
-            if (descriptionStatement != null && descriptionStatement.Any())
+            if (descriptionStatement != null && descriptionStatement.Count != 0)
             {
                 createStatement.Append(string.Join(";", descriptionStatement.ToArray()));
                 createStatement.Append(";");
@@ -142,13 +142,13 @@ namespace FluentMigrator.Runner.Generators.Redshift
 
         public override string Generate(CreateIndexExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("Indices not supported");
+            return CompatabilityMode.HandleCompatabilty("Indices not supported");
         }
 
         public override string Generate(DeleteIndexExpression expression)
         {
 
-            return compatabilityMode.HandleCompatabilty("Indices not supported");
+            return CompatabilityMode.HandleCompatabilty("Indices not supported");
         }
 
         public override string Generate(RenameTableExpression expression)
@@ -324,12 +324,12 @@ namespace FluentMigrator.Runner.Generators.Redshift
 
         public override string Generate(CreateSequenceExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("Sequences not supported");
+            return CompatabilityMode.HandleCompatabilty("Sequences not supported");
         }
 
         public override string Generate(DeleteSequenceExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("Sequences not supported");
+            return CompatabilityMode.HandleCompatabilty("Sequences not supported");
         }
     }
 }

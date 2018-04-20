@@ -2,6 +2,7 @@ using FluentMigrator.Runner.Generators.Generic;
 
 namespace FluentMigrator.Runner.Generators.SQLite
 {
+    // ReSharper disable once InconsistentNaming
     public class SQLiteQuoter : GenericQuoter
     {
         public override string FormatSystemMethods(SystemMethods value)

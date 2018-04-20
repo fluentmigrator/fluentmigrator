@@ -59,16 +59,16 @@ namespace FluentMigrator
         {
 #pragma warning disable 612
             var expression = new ExecuteEmbeddedAutoSqlScriptExpression(
-                _embeddedResourceProvider ?? new DefaultEmbeddedResourceProvider(_context.MigrationAssemblies),
+                _embeddedResourceProvider ?? new DefaultEmbeddedResourceProvider(Context.MigrationAssemblies),
                 GetType(),
                 GetDatabaseNames(),
                 MigrationDirection.Up)
             {
-                MigrationAssemblies = _context.MigrationAssemblies,
+                MigrationAssemblies = Context.MigrationAssemblies,
 #pragma warning restore 612
             };
 
-            _context.Expressions.Add(expression);
+            Context.Expressions.Add(expression);
         }
 
         /// <inheritdoc />
@@ -76,22 +76,22 @@ namespace FluentMigrator
         {
 #pragma warning disable 612
             var expression = new ExecuteEmbeddedAutoSqlScriptExpression(
-                _embeddedResourceProvider ?? new DefaultEmbeddedResourceProvider(_context.MigrationAssemblies),
+                _embeddedResourceProvider ?? new DefaultEmbeddedResourceProvider(Context.MigrationAssemblies),
                 GetType(),
                 GetDatabaseNames(),
                 MigrationDirection.Down)
             {
-                MigrationAssemblies = _context.MigrationAssemblies,
+                MigrationAssemblies = Context.MigrationAssemblies,
 #pragma warning restore 612
             };
 
-            _context.Expressions.Add(expression);
+            Context.Expressions.Add(expression);
         }
 
         private IList<string> GetDatabaseNames()
         {
-            var dbNames = new List<string>() { _context.QuerySchema.DatabaseType };
-            dbNames.AddRange(_context.QuerySchema.DatabaseTypeAliases);
+            var dbNames = new List<string>() { Context.QuerySchema.DatabaseType };
+            dbNames.AddRange(Context.QuerySchema.DatabaseTypeAliases);
             return dbNames;
         }
 
@@ -111,6 +111,7 @@ namespace FluentMigrator
             }
 
             [Obsolete]
+            // ReSharper disable once UnusedMember.Local
             public ExecuteEmbeddedAutoSqlScriptExpression(IAssemblyCollection assemblyCollection, Type migrationType, IList<string> databaseNames, MigrationDirection direction)
             {
                 _embeddedResourceProvider = new DefaultEmbeddedResourceProvider(assemblyCollection);
@@ -152,8 +153,15 @@ namespace FluentMigrator
                 var embeddedResourceNameWithAssembly = GetQualifiedResourcePath(resourceNames, AutoNames.ToArray());
                 string sqlText;
 
-                using (var stream = embeddedResourceNameWithAssembly
-                    .assembly.GetManifestResourceStream(embeddedResourceNameWithAssembly.name))
+                var stream = embeddedResourceNameWithAssembly
+                    .assembly.GetManifestResourceStream(embeddedResourceNameWithAssembly.name);
+                if (stream == null)
+                {
+                    throw new InvalidOperationException(
+                        $"The ressource {embeddedResourceNameWithAssembly.name} couldn't be found in {embeddedResourceNameWithAssembly.assembly.FullName}");
+                }
+
+                using (stream)
                 using (var reader = new StreamReader(stream))
                 {
                     sqlText = reader.ReadToEnd();

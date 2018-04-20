@@ -14,9 +14,6 @@
 // limitations under the License.
 #endregion
 
-using System;
-
-using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
 
 namespace FluentMigrator.Console
@@ -27,7 +24,7 @@ namespace FluentMigrator.Console
 
         public override void Error(string message)
         {
-            System.Console.WriteLine("Press enter to continue...");
+            System.Console.WriteLine(@"Press enter to continue...");
             System.Console.ReadLine();
         }
     }

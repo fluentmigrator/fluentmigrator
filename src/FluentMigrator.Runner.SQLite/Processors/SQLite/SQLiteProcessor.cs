@@ -31,6 +31,7 @@ using FluentMigrator.Runner.BatchParser.SpecialTokenSearchers;
 namespace FluentMigrator.Runner.Processors.SQLite
 {
 
+    // ReSharper disable once InconsistentNaming
     public class SQLiteProcessor : GenericProcessorBase
     {
         public override string DatabaseType

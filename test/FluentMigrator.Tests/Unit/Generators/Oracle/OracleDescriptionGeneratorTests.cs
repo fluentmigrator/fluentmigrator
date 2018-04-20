@@ -1,7 +1,8 @@
 ﻿using System.Linq;
 using FluentMigrator.Runner.Generators.Oracle;
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Generators.Oracle
 {
@@ -11,14 +12,14 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         [SetUp]
         public void Setup()
         {
-            descriptionGenerator = new OracleDescriptionGenerator();
+            DescriptionGenerator = new OracleDescriptionGenerator();
         }
 
         [Test]
         public override void GenerateDescriptionStatementsForCreateTableReturnTableDescriptionStatement()
         {
             var createTableExpression = GeneratorTestHelper.GetCreateTableWithTableDescription();
-            var statements = descriptionGenerator.GenerateDescriptionStatements(createTableExpression);
+            var statements = DescriptionGenerator.GenerateDescriptionStatements(createTableExpression);
 
             var result = statements.First();
             result.ShouldBe("COMMENT ON TABLE TestTable1 IS 'TestDescription'");
@@ -28,7 +29,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         public override void GenerateDescriptionStatementsForCreateTableReturnTableDescriptionAndColumnDescriptionsStatements()
         {
             var createTableExpression = GeneratorTestHelper.GetCreateTableWithTableDescriptionAndColumnDescriptions();
-            var statements = descriptionGenerator.GenerateDescriptionStatements(createTableExpression).ToArray();
+            var statements = DescriptionGenerator.GenerateDescriptionStatements(createTableExpression).ToArray();
 
             var result = string.Join(";", statements);
             result.ShouldBe(
@@ -39,7 +40,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         public override void GenerateDescriptionStatementForAlterTableReturnTableDescriptionStatement()
         {
             var alterTableExpression = GeneratorTestHelper.GetAlterTableWithDescriptionExpression();
-            var statement = descriptionGenerator.GenerateDescriptionStatement(alterTableExpression);
+            var statement = DescriptionGenerator.GenerateDescriptionStatement(alterTableExpression);
 
             statement.ShouldBe("COMMENT ON TABLE TestTable1 IS 'TestDescription'");
         }
@@ -48,7 +49,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         public override void GenerateDescriptionStatementForCreateColumnReturnColumnDescriptionStatement()
         {
             var createColumnExpression = GeneratorTestHelper.GetCreateColumnExpressionWithDescription();
-            var statement = descriptionGenerator.GenerateDescriptionStatement(createColumnExpression);
+            var statement = DescriptionGenerator.GenerateDescriptionStatement(createColumnExpression);
 
             statement.ShouldBe("COMMENT ON COLUMN TestTable1.TestColumn1 IS 'TestColumn1Description'");
         }
@@ -57,7 +58,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         public override void GenerateDescriptionStatementForAlterColumnReturnColumnDescriptionStatement()
         {
             var alterColumnExpression = GeneratorTestHelper.GetAlterColumnExpressionWithDescription();
-            var statement = descriptionGenerator.GenerateDescriptionStatement(alterColumnExpression);
+            var statement = DescriptionGenerator.GenerateDescriptionStatement(alterColumnExpression);
 
             statement.ShouldBe("COMMENT ON COLUMN TestTable1.TestColumn1 IS 'TestColumn1Description'");
         }
@@ -67,7 +68,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         {
             var createTableExpression = GeneratorTestHelper.GetCreateTableWithTableDescription();
             createTableExpression.TableDescription = "Test Description with single quote (') character here >> '";
-            var statements = descriptionGenerator.GenerateDescriptionStatements(createTableExpression);
+            var statements = DescriptionGenerator.GenerateDescriptionStatements(createTableExpression);
 
             var result = statements.First();
             result.ShouldBe("COMMENT ON TABLE TestTable1 IS 'Test Description with single quote ('') character here >> '''");

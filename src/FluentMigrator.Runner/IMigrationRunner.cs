@@ -15,7 +15,7 @@
 #endregion
 
 using System;
-using System.Reflection;
+
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Initialization;
 

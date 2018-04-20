@@ -85,82 +85,82 @@ namespace FluentMigrator.Runner.Processors
             Announcer.Sql(sql);
         }
 
-        public void Process(Expressions.CreateSchemaExpression expression)
+        public void Process(CreateSchemaExpression expression)
         {
             Process(Generator.Generate(expression));
         }
 
-        public void Process(Expressions.DeleteSchemaExpression expression)
+        public void Process(DeleteSchemaExpression expression)
         {
             Process(Generator.Generate(expression));
         }
 
-        public void Process(Expressions.AlterTableExpression expression)
+        public void Process(AlterTableExpression expression)
         {
             Process(Generator.Generate(expression));
         }
 
-        public void Process(Expressions.AlterColumnExpression expression)
+        public void Process(AlterColumnExpression expression)
         {
             Process(Generator.Generate(expression));
         }
 
-        public void Process(Expressions.CreateTableExpression expression)
+        public void Process(CreateTableExpression expression)
         {
             Process(Generator.Generate(expression));
         }
 
-        public void Process(Expressions.CreateColumnExpression expression)
+        public void Process(CreateColumnExpression expression)
         {
             Process(Generator.Generate(expression));
         }
 
-        public void Process(Expressions.DeleteTableExpression expression)
+        public void Process(DeleteTableExpression expression)
         {
             Process(Generator.Generate(expression));
         }
 
-        public void Process(Expressions.DeleteColumnExpression expression)
+        public void Process(DeleteColumnExpression expression)
         {
             Process(Generator.Generate(expression));
         }
 
-        public void Process(Expressions.CreateForeignKeyExpression expression)
+        public void Process(CreateForeignKeyExpression expression)
         {
             Process(Generator.Generate(expression));
         }
 
-        public void Process(Expressions.DeleteForeignKeyExpression expression)
+        public void Process(DeleteForeignKeyExpression expression)
         {
             Process(Generator.Generate(expression));
         }
 
-        public void Process(Expressions.CreateIndexExpression expression)
+        public void Process(CreateIndexExpression expression)
         {
             Process(Generator.Generate(expression));
         }
 
-        public void Process(Expressions.DeleteIndexExpression expression)
+        public void Process(DeleteIndexExpression expression)
         {
             Process(Generator.Generate(expression));
         }
 
-        public void Process(Expressions.RenameTableExpression expression)
+        public void Process(RenameTableExpression expression)
         {
             Process(Generator.Generate(expression));
         }
 
-        public void Process(Expressions.RenameColumnExpression expression)
+        public void Process(RenameColumnExpression expression)
         {
             Process(Generator.Generate(expression));
         }
 
-        public void Process(Expressions.InsertDataExpression expression)
+        public void Process(InsertDataExpression expression)
         {
             Process(Generator.Generate(expression));
         }
 
-        public void Process(Expressions.AlterDefaultConstraintExpression expression)
+        public void Process(AlterDefaultConstraintExpression expression)
         {
             Process(Generator.Generate(expression));
         }
@@ -170,42 +170,42 @@ namespace FluentMigrator.Runner.Processors
             Announcer.Say("Performing DB Operation");
         }
 
-        public void Process(Expressions.DeleteDataExpression expression)
+        public void Process(DeleteDataExpression expression)
         {
             Process(Generator.Generate(expression));
         }
 
-        public void Process(Expressions.UpdateDataExpression expression)
+        public void Process(UpdateDataExpression expression)
         {
             Process(Generator.Generate(expression));
         }
 
-        public void Process(Expressions.AlterSchemaExpression expression)
+        public void Process(AlterSchemaExpression expression)
         {
             Process(Generator.Generate(expression));
         }
 
-        public void Process(Expressions.CreateSequenceExpression expression)
+        public void Process(CreateSequenceExpression expression)
         {
             Process(Generator.Generate(expression));
         }
 
-        public void Process(Expressions.DeleteSequenceExpression expression)
+        public void Process(DeleteSequenceExpression expression)
         {
             Process(Generator.Generate(expression));
         }
 
-        public void Process(Expressions.CreateConstraintExpression expression)
+        public void Process(CreateConstraintExpression expression)
         {
             Process(Generator.Generate(expression));
         }
 
-        public void Process(Expressions.DeleteConstraintExpression expression)
+        public void Process(DeleteConstraintExpression expression)
         {
             Process(Generator.Generate(expression));
         }
 
-        public void Process(Expressions.DeleteDefaultConstraintExpression expression)
+        public void Process(DeleteDefaultConstraintExpression expression)
         {
             Process(Generator.Generate(expression));
         }
@@ -245,10 +245,9 @@ namespace FluentMigrator.Runner.Processors
             throw new NotImplementedException("Method is not supported by the connectionless processor");
         }
 
-        public string DatabaseType
-        {
-            get { return Context.Database; }
-        }
+#pragma warning disable 618
+        public string DatabaseType => Context.Database;
+#pragma warning restore 618
 
         public IList<string> DatabaseTypeAliases { get; } = new List<string>();
 

@@ -28,8 +28,8 @@ namespace FluentMigrator.Tests.Helpers
 {
     public class SqlServerTestTable : IDisposable
     {
-        private readonly IQuoter quoter;
-        private readonly string schemaName;
+        private readonly IQuoter _quoter;
+        private readonly string _schemaName;
         private SqlConnection Connection { get; set; }
         private List<string> indexies = new List<string>();
         public string Name { get; set; }
@@ -37,20 +37,20 @@ namespace FluentMigrator.Tests.Helpers
 
         public SqlServerTestTable(SqlServerProcessor processor, string schemaName, params string[] columnDefinitions)
         {
-            this.schemaName = schemaName;
+            _schemaName = schemaName;
             Connection = (SqlConnection)processor.Connection;
             Transaction = (SqlTransaction)processor.Transaction;
-            quoter = processor.Quoter;
+            _quoter = processor.Quoter;
 
             Name = "TestTable";
             Create(processor, columnDefinitions);
         }
         public SqlServerTestTable(string table, SqlServerProcessor processor, string schemaName, params string[] columnDefinitions)
         {
-            this.schemaName = schemaName;
+            _schemaName = schemaName;
             Connection = (SqlConnection)processor.Connection;
             Transaction = (SqlTransaction)processor.Transaction;
-            quoter = processor.Quoter;
+            _quoter = processor.Quoter;
 
             Name = table;
 
@@ -64,13 +64,13 @@ namespace FluentMigrator.Tests.Helpers
 
         public void Create(SqlServerProcessor processor, IEnumerable<string> columnDefinitions)
         {
-            if (!string.IsNullOrEmpty(schemaName) && !processor.SchemaExists(schemaName))
+            if (!string.IsNullOrEmpty(_schemaName) && !processor.SchemaExists(_schemaName))
             {
-                using (var command = new SqlCommand(string.Format("CREATE SCHEMA {0}", quoter.QuoteSchemaName(schemaName)), Connection, Transaction))
+                using (var command = new SqlCommand(string.Format("CREATE SCHEMA {0}", _quoter.QuoteSchemaName(_schemaName)), Connection, Transaction))
                     command.ExecuteNonQuery();
             }
 
-            var quotedObjectName = quoter.QuoteTableName(Name, schemaName);
+            var quotedObjectName = _quoter.QuoteTableName(Name, _schemaName);
 
             var sb = new StringBuilder();
             sb.AppendFormat("CREATE TABLE ");
@@ -92,9 +92,9 @@ namespace FluentMigrator.Tests.Helpers
 
         public void Drop()
         {
-            var quotedSchema = quoter.QuoteSchemaName(schemaName);
+            var quotedSchema = _quoter.QuoteSchemaName(_schemaName);
 
-            var quotedObjectName = quoter.QuoteTableName(Name, schemaName);
+            var quotedObjectName = _quoter.QuoteTableName(Name, _schemaName);
 
             foreach (var quoteIndexName in indexies)
             {
@@ -105,7 +105,7 @@ namespace FluentMigrator.Tests.Helpers
             using (var command = new SqlCommand("DROP TABLE " + quotedObjectName, Connection, Transaction))
                 command.ExecuteNonQuery();
 
-            if (!string.IsNullOrEmpty(schemaName))
+            if (!string.IsNullOrEmpty(_schemaName))
             {
                 using (var command = new SqlCommand(string.Format("DROP SCHEMA {0}", quotedSchema), Connection, Transaction))
                     command.ExecuteNonQuery();
@@ -116,13 +116,13 @@ namespace FluentMigrator.Tests.Helpers
         {
             var indexName = string.Format("idx_{0}", column);
 
-            var quotedObjectName = quoter.QuoteTableName(Name, schemaName);
+            var quotedObjectName = _quoter.QuoteTableName(Name, _schemaName);
 
-            var quotedIndexName = quoter.QuoteIndexName(indexName);
+            var quotedIndexName = _quoter.QuoteIndexName(indexName);
 
             indexies.Add(quotedIndexName);
 
-            using (var command = new SqlCommand(string.Format("CREATE INDEX {0} ON {1} ({2})", quotedIndexName, quotedObjectName, quoter.QuoteColumnName(column)), Connection, Transaction))
+            using (var command = new SqlCommand(string.Format("CREATE INDEX {0} ON {1} ({2})", quotedIndexName, quotedObjectName, _quoter.QuoteColumnName(column)), Connection, Transaction))
                 command.ExecuteNonQuery();
 
             return indexName;
@@ -132,7 +132,7 @@ namespace FluentMigrator.Tests.Helpers
         {
             var defaultConstraintName = string.Format("[DF_{0}_{1}]", Name, column);
             const int defaultValue = 1;
-            using (var command = new SqlCommand(string.Format(" ALTER TABLE {0} ADD CONSTRAINT {1} DEFAULT ({2}) FOR {3}", quoter.QuoteTableName(Name, schemaName), defaultConstraintName, defaultValue, quoter.QuoteColumnName(column)), Connection, Transaction))
+            using (var command = new SqlCommand(string.Format(" ALTER TABLE {0} ADD CONSTRAINT {1} DEFAULT ({2}) FOR {3}", _quoter.QuoteTableName(Name, _schemaName), defaultConstraintName, defaultValue, _quoter.QuoteColumnName(column)), Connection, Transaction))
                 command.ExecuteNonQuery();
         }
     }

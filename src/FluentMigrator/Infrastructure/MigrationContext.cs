@@ -42,10 +42,11 @@ namespace FluentMigrator.Infrastructure
         [Obsolete]
         public MigrationContext([NotNull] IQuerySchema querySchema, [NotNull] IAssemblyCollection migrationAssemblies, object context, string connection)
         {
-            Expressions = new List<IMigrationExpression>();
+            // ReSharper disable VirtualMemberCallInConstructor
             QuerySchema = querySchema;
             MigrationAssemblies = migrationAssemblies;
             ApplicationContext = context;
+            // ReSharper restore VirtualMemberCallInConstructor
             Connection = connection;
             var services = new ServiceCollection();
             services
@@ -63,18 +64,19 @@ namespace FluentMigrator.Infrastructure
         /// <param name="serviceProvider">The service provider</param>
         public MigrationContext([NotNull] IQuerySchema querySchema, object context, string connection, [NotNull] IServiceProvider serviceProvider)
         {
-            Expressions = new List<IMigrationExpression>();
+            // ReSharper disable VirtualMemberCallInConstructor
             QuerySchema = querySchema;
 #pragma warning disable 612
-            MigrationAssemblies = serviceProvider?.GetService<IAssemblyCollection>();
+            MigrationAssemblies = serviceProvider.GetService<IAssemblyCollection>();
 #pragma warning restore 612
             ApplicationContext = context;
+            // ReSharper restore VirtualMemberCallInConstructor
             Connection = connection;
             ServiceProvider = serviceProvider;
         }
 
         /// <inheritdoc />
-        public virtual ICollection<IMigrationExpression> Expressions { get; set; }
+        public virtual ICollection<IMigrationExpression> Expressions { get; set; } = new List<IMigrationExpression>();
 
         /// <inheritdoc />
         public virtual IQuerySchema QuerySchema { get; set; }

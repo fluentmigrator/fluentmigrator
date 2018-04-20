@@ -34,11 +34,13 @@ namespace FluentMigrator.Tests
             {
                 string path1 = AppDomain.CurrentDomain.GetData(DataDirectory) as string;
                 if (string.IsNullOrEmpty(path1))
-                    path1 = AppDomain.CurrentDomain.BaseDirectory ?? Environment.CurrentDirectory;
+                    path1 = AppDomain.CurrentDomain.BaseDirectory;
+                if (string.IsNullOrEmpty(path1))
+                    path1 = Environment.CurrentDirectory;
                 if (string.IsNullOrEmpty(path1))
                     path1 = string.Empty;
                 int length = DataDirectoryMacro.Length;
-                if (inputString.Length > DataDirectoryMacro.Length && 92 == (int)inputString[DataDirectoryMacro.Length])
+                if (inputString.Length > DataDirectoryMacro.Length && 92 == inputString[DataDirectoryMacro.Length])
                     ++length;
                 str = Path.Combine(path1, inputString.Substring(length));
             }
@@ -47,7 +49,7 @@ namespace FluentMigrator.Tests
 
         public static bool ProbeSqlServerCeBehavior()
         {
-            var asm = typeof(System.Data.SqlServerCe.SqlCeConnection).Assembly;
+            var asm = typeof(SqlCeConnection).Assembly;
             var type = asm.GetType("System.Data.SqlServerCe.NativeMethods");
             if (SqlServerCeCanFindItsLibraries(type))
                 return true;

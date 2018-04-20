@@ -8,7 +8,8 @@ using FluentMigrator.Runner.Generators.DB2;
 using FluentMigrator.Runner.Generators.DB2.iSeries;
 
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Generators.Db2
 {

@@ -9,7 +9,7 @@ namespace FluentMigrator.Tests.Helpers
 {
     public class PostgresTestTable : IDisposable
     {
-        private readonly PostgresQuoter quoter = new PostgresQuoter();
+        private readonly PostgresQuoter _quoter = new PostgresQuoter();
         private readonly string _schemaName;
         public NpgsqlConnection Connection { get; private set; }
         public string Name { get; set; }
@@ -28,7 +28,7 @@ namespace FluentMigrator.Tests.Helpers
         {
             _schemaName = schemaName;
 
-            Name = quoter.UnQuote(tableName);
+            Name = _quoter.UnQuote(tableName);
             Init(processor, columnDefinitions);
         }
 
@@ -37,7 +37,7 @@ namespace FluentMigrator.Tests.Helpers
             Connection = (NpgsqlConnection)processor.Connection;
             Transaction = (NpgsqlTransaction)processor.Transaction;
 
-            NameWithSchema = quoter.QuoteTableName(Name, _schemaName);
+            NameWithSchema = _quoter.QuoteTableName(Name, _schemaName);
             Create(columnDefinitions);
         }
 
@@ -86,7 +86,7 @@ namespace FluentMigrator.Tests.Helpers
         public void WithDefaultValueOn(string column)
         {
             const int defaultValue = 1;
-            using (var command = new NpgsqlCommand(string.Format(" ALTER TABLE {0} ALTER {1} SET DEFAULT {2}", quoter.QuoteTableName(Name, _schemaName), quoter.QuoteColumnName(column), defaultValue), Connection, Transaction))
+            using (var command = new NpgsqlCommand(string.Format(" ALTER TABLE {0} ALTER {1} SET DEFAULT {2}", _quoter.QuoteTableName(Name, _schemaName), _quoter.QuoteColumnName(column), defaultValue), Connection, Transaction))
                 command.ExecuteNonQuery();
         }
     }

@@ -1,6 +1,7 @@
 using FluentMigrator.Runner.Generators.Oracle;
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Generators.Oracle
 {

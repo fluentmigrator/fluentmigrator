@@ -21,7 +21,8 @@ using System.Data;
 using FluentMigrator.Runner.Generators.Oracle;
 
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Generators.Oracle
 {
@@ -36,15 +37,15 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             _typeMap = new OracleTypeMap();
         }
 
-        // See https://docs.oracle.com/cd/B28359_01/server.111/b28320/limits001.htm#i287903 
+        // See https://docs.oracle.com/cd/B28359_01/server.111/b28320/limits001.htm#i287903
         // and http://docs.oracle.com/cd/B19306_01/server.102/b14220/datatype.htm#i13446
-        // for limits in Oracle data types. 
+        // for limits in Oracle data types.
         [Test]
         public void AnsiStringDefaultIsVarchar2_255()
         {
             _typeMap.GetTypeMap(DbType.AnsiString, 0, 0).ShouldBe("VARCHAR2(255 CHAR)");
         }
-        
+
         [Test]
         public void AnsiStringOfSizeIsVarchar2OfSize()
         {
@@ -193,7 +194,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void StringOfLengthIsNVarchar2fLength()
+        public void StringOfLengthIsNVarchar2Length()
         {
             _typeMap.GetTypeMap(DbType.String, 4000, 0).ShouldBe("NVARCHAR2(4000)");
         }

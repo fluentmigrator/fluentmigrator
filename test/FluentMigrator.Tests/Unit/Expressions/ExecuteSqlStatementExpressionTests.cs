@@ -21,7 +21,8 @@ using FluentMigrator.Infrastructure;
 using FluentMigrator.Tests.Helpers;
 using Moq;
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Expressions
 {

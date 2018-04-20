@@ -9,7 +9,8 @@ using FluentMigrator.Runner.Processors.MySql;
 using MySql.Data.MySqlClient;
 
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Integration.Processors.MySql
 {

@@ -1,7 +1,7 @@
 ﻿#region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -23,6 +23,7 @@ using System.Text;
 using FluentMigrator.Runner.Processors.SQLite;
 
 namespace FluentMigrator.Tests.Helpers {
+    // ReSharper disable once InconsistentNaming
     public class SQLiteTestTable : IDisposable {
         private readonly string _schemaName;
         private IDbConnection Connection { get; set; }
@@ -31,8 +32,8 @@ namespace FluentMigrator.Tests.Helpers {
 
         public SQLiteTestTable( SQLiteProcessor processor, string schemaName, params string[] columnDefinitions ) {
             _schemaName = schemaName;
-            Connection = ( IDbConnection ) processor.Connection;
-            Transaction = ( IDbTransaction ) processor.Transaction;
+            Connection = processor.Connection;
+            Transaction = processor.Transaction;
 
             Name = "Table" + Guid.NewGuid().ToString( "N" );
             Create( columnDefinitions );

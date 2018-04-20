@@ -11,7 +11,7 @@ namespace FluentMigrator.Runner.Processors.Postgres
 {
     public class PostgresProcessor : GenericProcessorBase
     {
-        readonly PostgresQuoter quoter = new PostgresQuoter();
+        private readonly PostgresQuoter _quoter = new PostgresQuoter();
 
         public override string DatabaseType
         {
@@ -62,7 +62,7 @@ namespace FluentMigrator.Runner.Processors.Postgres
 
         public override DataSet ReadTableData(string schemaName, string tableName)
         {
-            return Read("SELECT * FROM {0}", quoter.QuoteTableName(tableName, schemaName));
+            return Read("SELECT * FROM {0}", _quoter.QuoteTableName(tableName, schemaName));
         }
 
         public override bool DefaultValueExists(string schemaName, string tableName, string columnName, object defaultValue)
@@ -137,12 +137,12 @@ namespace FluentMigrator.Runner.Processors.Postgres
 
         private string FormatToSafeSchemaName(string schemaName)
         {
-            return FormatHelper.FormatSqlEscape(quoter.UnQuoteSchemaName(schemaName));
+            return FormatHelper.FormatSqlEscape(_quoter.UnQuoteSchemaName(schemaName));
         }
 
         private string FormatToSafeName(string sqlName)
         {
-            return FormatHelper.FormatSqlEscape(quoter.UnQuote(sqlName));
+            return FormatHelper.FormatSqlEscape(_quoter.UnQuote(sqlName));
         }
     }
 }

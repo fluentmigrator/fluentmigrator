@@ -16,8 +16,6 @@
 //
 #endregion
 
-using System;
-
 namespace FluentMigrator.Runner.Initialization
 {
     public class DefaultConnectionStringProvider : IConnectionStringProvider
@@ -71,7 +69,7 @@ namespace FluentMigrator.Runner.Initialization
             string database)
         {
             if (string.IsNullOrEmpty(connection))
-                throw new NotImplementedException();
+                throw new System.NotImplementedException();
             return connection;
         }
 #endif

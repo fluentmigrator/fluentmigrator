@@ -31,7 +31,8 @@ using FluentMigrator.Runner.VersionTableInfo;
 using FluentMigrator.Tests.Unit;
 
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Integration
 {

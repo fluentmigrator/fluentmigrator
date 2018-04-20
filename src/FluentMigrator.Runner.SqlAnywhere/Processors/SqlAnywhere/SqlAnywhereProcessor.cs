@@ -23,7 +23,6 @@ using System.Data;
 using System.Data.Common;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure.Extensions;

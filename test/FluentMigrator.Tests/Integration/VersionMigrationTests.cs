@@ -28,7 +28,8 @@ using FluentMigrator.Tests.Unit;
 using Microsoft.Extensions.DependencyInjection;
 
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Integration
 {

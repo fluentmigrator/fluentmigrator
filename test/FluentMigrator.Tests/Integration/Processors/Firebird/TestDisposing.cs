@@ -6,7 +6,8 @@ using FluentMigrator.Runner.Generators.Firebird;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Firebird;
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Integration.Processors.Firebird
 {

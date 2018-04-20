@@ -22,7 +22,8 @@ using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Jet;
 using FluentMigrator.Tests.Helpers;
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Integration.Processors.Jet
 {

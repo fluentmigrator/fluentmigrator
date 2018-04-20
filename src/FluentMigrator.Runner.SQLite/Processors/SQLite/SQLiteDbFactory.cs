@@ -20,6 +20,7 @@ using System;
 
 namespace FluentMigrator.Runner.Processors.SQLite
 {
+    // ReSharper disable once InconsistentNaming
     public class SQLiteDbFactory : ReflectionBasedDbFactory
     {
         private static readonly TestEntry[] _testEntries =

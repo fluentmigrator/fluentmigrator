@@ -6,7 +6,8 @@ using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Tests.Helpers;
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Integration.Processors.Firebird
 {
@@ -55,28 +56,28 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         public override void CallingColumnExistsCanAcceptColumnNameWithSingleQuote()
         {
             var columnNameWithSingleQuote = "\"i'd\"";
-            using (var table = new FirebirdTestTable(Processor, null, string.Format("{0} int", columnNameWithSingleQuote)))
+            using (var table = new FirebirdTestTable(Processor, string.Format("{0} int", columnNameWithSingleQuote)))
                 Processor.ColumnExists(null, table.Name, "\"i'd\"").ShouldBeTrue();
         }
 
         [Test]
         public override void CallingColumnExistsCanAcceptTableNameWithSingleQuote()
         {
-            using (var table = new FirebirdTestTable("\"Test'Table\"", Processor, null, "id int"))
+            using (var table = new FirebirdTestTable("\"Test'Table\"", Processor, "id int"))
                 Processor.ColumnExists(null, table.Name, "ID").ShouldBeTrue();
         }
 
         [Test]
         public override void CallingColumnExistsReturnsFalseIfColumnDoesNotExist()
         {
-            using (var table = new FirebirdTestTable(Processor, null, "id int"))
+            using (var table = new FirebirdTestTable(Processor, "id int"))
                 Processor.ColumnExists(null, table.Name, "DoesNotExist").ShouldBeFalse();
         }
 
         [Test]
         public override void CallingColumnExistsReturnsFalseIfColumnDoesNotExistWithSchema()
         {
-            using (var table = new FirebirdTestTable(Processor, "TestSchema", "id int"))
+            using (var table = new FirebirdTestTable(Processor, "id int"))
                 Processor.ColumnExists("TestSchema", table.Name, "DoesNotExist").ShouldBeFalse();
         }
 
@@ -95,14 +96,14 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [Test]
         public override void CallingColumnExistsReturnsTrueIfColumnExists()
         {
-            using (var table = new FirebirdTestTable(Processor, null, "id int"))
+            using (var table = new FirebirdTestTable(Processor, "id int"))
                 Processor.ColumnExists(null, table.Name, "ID").ShouldBeTrue();
         }
 
         [Test]
         public override void CallingColumnExistsReturnsTrueIfColumnExistsWithSchema()
         {
-            using (var table = new FirebirdTestTable(Processor, "TestSchema", "id int"))
+            using (var table = new FirebirdTestTable(Processor, "id int"))
                 Processor.ColumnExists("TestSchema", table.Name, "ID").ShouldBeTrue();
         }
     }

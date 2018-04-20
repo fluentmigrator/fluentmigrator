@@ -20,7 +20,6 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
@@ -41,16 +40,15 @@ using FluentMigrator.Runner.Processors.Postgres;
 using FluentMigrator.Runner.Processors.SqlAnywhere;
 using FluentMigrator.Runner.Processors.SQLite;
 using FluentMigrator.Runner.Processors.SqlServer;
-using FluentMigrator.SqlAnywhere;
 using FluentMigrator.Tests.Integration.Migrations;
 using FluentMigrator.Tests.Integration.Migrations.Tagged;
 using FluentMigrator.Tests.Unit;
-using FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3;
 
 using Moq;
 
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Integration
 {
@@ -1011,7 +1009,7 @@ namespace FluentMigrator.Tests.Integration
             // Using SqlServer instead of SqlLite as versions not deleted from VersionInfo table when using Sqlite.
             var excludedProcessors = new[] { typeof(SQLiteProcessor), typeof(MySqlProcessor), typeof(PostgresProcessor) };
 
-            var assembly = typeof(User).Assembly;
+            var assembly = typeof(Migrations.Interleaved.Pass3.User).Assembly;
 
             var runnerContext1 = new RunnerContext(new TextWriterAnnouncer(TestContext.Out)) { Namespace = typeof(Migrations.Interleaved.Pass2.User).Namespace };
             var runnerContext2 = new RunnerContext(new TextWriterAnnouncer(TestContext.Out)) { Namespace = typeof(Migrations.Interleaved.Pass3.User).Namespace };
@@ -1056,7 +1054,7 @@ namespace FluentMigrator.Tests.Integration
             // Using SqlServer instead of SqlLite as versions not deleted from VersionInfo table when using Sqlite.
             var excludedProcessors = new[] { typeof(MySqlProcessor), typeof(SQLiteProcessor) };
 
-            var assembly = typeof(User).Assembly;
+            var assembly = typeof(Migrations.Interleaved.Pass3.User).Assembly;
 
             var runnerContext1 = new RunnerContext(new TextWriterAnnouncer(TestContext.Out)) { Namespace = typeof(Migrations.Interleaved.Pass2.User).Namespace };
             var runnerContext2 = new RunnerContext(new TextWriterAnnouncer(TestContext.Out)) { Namespace = typeof(Migrations.Interleaved.Pass3.User).Namespace };
@@ -1096,7 +1094,7 @@ namespace FluentMigrator.Tests.Integration
             caughtException.InvalidMigrations.Count().ShouldBe(1);
             var keyValuePair = caughtException.InvalidMigrations.First();
             keyValuePair.Key.ShouldBe(200909060935);
-            keyValuePair.Value.Migration.ShouldBeOfType<UserEmail>();
+            keyValuePair.Value.Migration.ShouldBeOfType<Migrations.Interleaved.Pass3.UserEmail>();
         }
 
         [Test]

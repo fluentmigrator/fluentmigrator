@@ -30,8 +30,6 @@ using FluentMigrator.Builders.Schema;
 using FluentMigrator.Builders.Update;
 using FluentMigrator.Infrastructure;
 
-using Microsoft.Extensions.DependencyInjection;
-
 namespace FluentMigrator.Builders.IfDatabase
 {
     /// <summary>

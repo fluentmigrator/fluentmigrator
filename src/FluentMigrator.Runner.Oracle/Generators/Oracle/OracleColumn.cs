@@ -46,7 +46,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
                 }
             }
 
-            //alter only returns "Not Null" if IsNullable is explicitly set 
+            //alter only returns "Not Null" if IsNullable is explicitly set
             if (column.IsNullable.HasValue) {
                 return column.IsNullable.Value ? "NULL" : "NOT NULL";
             }

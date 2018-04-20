@@ -43,10 +43,11 @@ namespace FluentMigrator.Runner.Generators.Postgres
                 "CREATE TABLE {0} ({1})",
                 Quoter.QuoteTableName(expression.TableName, expression.SchemaName),
                 Column.Generate(expression.Columns, Quoter.Quote(expression.TableName)));
-            var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatements(expression);
+            var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatements(expression)
+                ?.ToList();
             createStatement.Append(";");
 
-            if (descriptionStatement != null && descriptionStatement.Any())
+            if (descriptionStatement != null && descriptionStatement.Count != 0)
             {
                 createStatement.Append(string.Join(";", descriptionStatement.ToArray()));
                 createStatement.Append(";");

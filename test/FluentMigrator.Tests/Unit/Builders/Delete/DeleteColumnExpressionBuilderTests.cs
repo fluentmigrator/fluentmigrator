@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -40,19 +40,19 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
         }
 
         [Test]
-        public void CallingColumnAddsColumnNameToList() 
+        public void CallingColumnAddsColumnNameToList()
         {
             var expressionMock = new Mock<DeleteColumnExpression>();
             expressionMock.Object.ColumnNames = new List<string> {"Cheese"};
 
             var builder = new DeleteColumnExpressionBuilder(expressionMock.Object);
             builder.Column("Bacon");
-            
+
             Assert.That(expressionMock.Object.ColumnNames.ElementAt(1), Is.EqualTo("Bacon"));
         }
 
         [Test]
-        public void CallingInSchemaSetsSchemaOnExpression() 
+        public void CallingInSchemaSetsSchemaOnExpression()
         {
             var expressionMock = new Mock<DeleteColumnExpression>();
 

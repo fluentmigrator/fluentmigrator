@@ -4,8 +4,10 @@ using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Postgres;
 using FluentMigrator.Tests.Helpers;
 using NUnit.Framework;
-using NUnit.Should;
+
 using Npgsql;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Integration.Processors.Postgres
 {

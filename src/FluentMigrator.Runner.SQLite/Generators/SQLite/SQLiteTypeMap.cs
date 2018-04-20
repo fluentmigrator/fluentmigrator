@@ -22,6 +22,7 @@ using FluentMigrator.Runner.Generators.Base;
 
 namespace FluentMigrator.Runner.Generators.SQLite
 {
+    // ReSharper disable once InconsistentNaming
     internal class SQLiteTypeMap : TypeMapBase
     {
         public const int AnsiStringCapacity = 8000;

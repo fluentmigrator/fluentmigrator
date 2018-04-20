@@ -16,12 +16,8 @@
 //
 #endregion
 
-
-using System;
 using System.Collections.Generic;
-using System.Linq;
 
-using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Model;
 
 namespace FluentMigrator.Runner.Models

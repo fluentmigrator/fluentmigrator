@@ -23,7 +23,8 @@ using System.Text;
 using FluentMigrator.Console;
 
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Runners
 {
@@ -217,7 +218,7 @@ namespace FluentMigrator.Tests.Unit.Runners
                 "/tag", "uk",
                 "/tag", "production");
 
-            var expectedTags = new string[] { "uk", "production" };
+            var expectedTags = new[] { "uk", "production" };
 
             CollectionAssert.AreEquivalent(expectedTags, migratorConsole.RunnerContext.Tags);
         }

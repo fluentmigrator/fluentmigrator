@@ -23,7 +23,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
 
         private static IQuoter GetQuoter(bool useQuotedIdentifiers)
         {
-            return useQuotedIdentifiers ? (IQuoter)new OracleQuoterQuotedIdentifier() : (IQuoter)new OracleQuoter();
+            return useQuotedIdentifiers ? new OracleQuoterQuotedIdentifier() : new OracleQuoter();
         }
 
 
@@ -41,7 +41,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
 
         public override string Generate(CreateSequenceExpression expression)
         {
-            var result = new StringBuilder(string.Format("CREATE SEQUENCE "));
+            var result = new StringBuilder("CREATE SEQUENCE ");
             var seq = expression.Sequence;
             if (string.IsNullOrEmpty(seq.SchemaName))
             {
@@ -110,7 +110,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
             return String.IsNullOrEmpty(schema) ? table : String.Concat(schema,".",table);
         }
 
-         private string innerGenerate(CreateTableExpression expression)
+        private string InnerGenerate(CreateTableExpression expression)
         {
             var tableName = Quoter.QuoteTableName(expression.TableName);
             var schemaName = Quoter.QuoteSchemaName(expression.SchemaName);
@@ -118,16 +118,15 @@ namespace FluentMigrator.Runner.Generators.Oracle
             return string.Format("CREATE TABLE {0} ({1})",ExpandTableName(schemaName,tableName), Column.Generate(expression.Columns, tableName));
         }
 
-
         public override string Generate(CreateTableExpression expression)
         {
             var descriptionStatements = DescriptionGenerator.GenerateDescriptionStatements(expression);
             var statements = descriptionStatements as string[] ?? descriptionStatements.ToArray();
 
             if (!statements.Any())
-                return innerGenerate(expression);
+                return InnerGenerate(expression);
 
-            var wrappedCreateTableStatement = WrapStatementInExecuteImmediateBlock(innerGenerate(expression));
+            var wrappedCreateTableStatement = WrapStatementInExecuteImmediateBlock(InnerGenerate(expression));
             var createTableWithDescriptionsBuilder = new StringBuilder(wrappedCreateTableStatement);
 
             foreach (var descriptionStatement in statements)
