@@ -16,8 +16,16 @@
 
 namespace FluentMigrator.Builders.Create.Index
 {
+    /// <summary>
+    /// The interface to add a column to a non-key column index
+    /// </summary>
     public interface ICreateIndexNonKeyColumnSyntax
     {
+        /// <summary>
+        /// Define the column to add to the non-key column index
+        /// </summary>
+        /// <param name="columnName">The column name</param>
+        /// <returns>The next step</returns>
         ICreateIndexNonKeyColumnSyntax Include(string columnName);
     }
 }

@@ -16,9 +16,19 @@
 
 namespace FluentMigrator
 {
+    /// <summary>
+    /// The constraint type as supported by SQL Anywhere
+    /// </summary>
     public enum SqlAnywhereConstraintType
     {
+        /// <summary>
+        /// The index/unique constraint should be clustered
+        /// </summary>
         Clustered,
+
+        /// <summary>
+        /// The index/unique constraint should not be clustered
+        /// </summary>
         NonClustered
     }
 }

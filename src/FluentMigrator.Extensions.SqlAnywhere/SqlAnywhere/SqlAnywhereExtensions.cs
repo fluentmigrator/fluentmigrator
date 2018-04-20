@@ -21,12 +21,22 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.SqlAnywhere
 {
+    /// <summary>
+    /// Extension methods for SQL Anywhere
+    /// </summary>
     public static partial class SqlAnywhereExtensions
     {
         public const string ConstraintType = "SqlAnywhereConstraintType";
         public const string SchemaPassword = "SqlAnywhereSchemaPassword";
         public const string WithNullsDistinct = "SqlAnywhereNullsDistinct";
 
+        /// <summary>
+        /// Sets the index/unique constraint type
+        /// </summary>
+        /// <param name="expression">The expression</param>
+        /// <param name="type">The constraint type</param>
+        /// <exception cref="InvalidOperationException">Thrown when the <see cref="ISupportAdditionalFeatures"/>
+        /// interface isn't supported by the expression</exception>
         private static void SetConstraintType(ICreateConstraintOptionsSyntax expression, SqlAnywhereConstraintType type)
         {
             if (!(expression is ISupportAdditionalFeatures additionalFeatures))
@@ -35,11 +45,19 @@ namespace FluentMigrator.SqlAnywhere
             additionalFeatures.AdditionalFeatures[ConstraintType] = type;
         }
 
+        /// <summary>
+        /// Set the unique/index constraint type to <see cref="SqlAnywhereConstraintType.Clustered"/>
+        /// </summary>
+        /// <param name="expression">The expression</param>
         public static void Clustered(this ICreateConstraintOptionsSyntax expression)
         {
             SetConstraintType(expression, SqlAnywhereConstraintType.Clustered);
         }
 
+        /// <summary>
+        /// Set the unique/index constraint type to <see cref="SqlAnywhereConstraintType.NonClustered"/>
+        /// </summary>
+        /// <param name="expression">The expression</param>
         public static void NonClustered(this ICreateConstraintOptionsSyntax expression)
         {
             SetConstraintType(expression, SqlAnywhereConstraintType.NonClustered);

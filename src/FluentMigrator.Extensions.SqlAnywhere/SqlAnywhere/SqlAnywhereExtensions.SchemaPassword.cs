@@ -22,8 +22,17 @@ using FluentMigrator.Infrastructure.Extensions;
 
 namespace FluentMigrator.SqlAnywhere
 {
+    /// <summary>
+    /// Extension methods for SQL Anywhere
+    /// </summary>
     public static partial class SqlAnywhereExtensions
     {
+        /// <summary>
+        /// Sets the schema password used during schema creation
+        /// </summary>
+        /// <param name="expression">The schema creation expression</param>
+        /// <param name="password">The password to use</param>
+        /// <returns>The next step</returns>
         public static ICreateSchemaOptionsSyntax Password(this ICreateSchemaOptionsSyntax expression, string password)
         {
             var additionalFeatures = expression as ISupportAdditionalFeatures ??
