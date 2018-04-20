@@ -16,14 +16,13 @@
 //
 #endregion
 
-using System;
 using FluentMigrator.Runner.VersionTableInfo;
 
 namespace FluentMigrator.Runner.Versioning
 {
     public class VersionMigration : Migration
     {
-        private IVersionTableMetaData _versionTableMetaData;
+        private readonly IVersionTableMetaData _versionTableMetaData;
 
         public VersionMigration(IVersionTableMetaData versionTableMetaData)
         {

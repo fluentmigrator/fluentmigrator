@@ -28,15 +28,16 @@ namespace FluentMigrator.Runner.VersionTableInfo
 {
     public class DefaultVersionTableMetaData : IVersionTableMetaData, ISchemaExpression
     {
-        [Obsolete("Use dependency inject")]
+        [Obsolete("Use dependency injectio")]
         public DefaultVersionTableMetaData()
             : this(string.Empty)
         {
         }
 
-        [Obsolete("Use dependency inject")]
+        [Obsolete("Use dependency injection")]
         public DefaultVersionTableMetaData(string schemaName)
         {
+            // ReSharper disable once VirtualMemberCallInConstructor
             SchemaName = schemaName ?? string.Empty;
         }
 
