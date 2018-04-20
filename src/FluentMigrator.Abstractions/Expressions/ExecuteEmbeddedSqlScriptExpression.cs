@@ -16,8 +16,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Design;
-using System.Diagnostics;
 using System.Linq;
 using System.IO;
 using System.Reflection;
@@ -102,8 +100,15 @@ namespace FluentMigrator.Expressions
             var embeddedResourceNameWithAssembly = GetQualifiedResourcePath(resourceNames, SqlScript);
             string sqlText;
 
-            using (var stream = embeddedResourceNameWithAssembly
-                .assembly.GetManifestResourceStream(embeddedResourceNameWithAssembly.name))
+            var stream = embeddedResourceNameWithAssembly
+                .assembly.GetManifestResourceStream(embeddedResourceNameWithAssembly.name);
+            if (stream == null)
+            {
+                throw new InvalidOperationException(
+                    $"The ressource {embeddedResourceNameWithAssembly.name} couldn't be found in {embeddedResourceNameWithAssembly.assembly.FullName}");
+            }
+
+            using (stream)
             using (var reader = new StreamReader(stream))
             {
                 sqlText = reader.ReadToEnd();

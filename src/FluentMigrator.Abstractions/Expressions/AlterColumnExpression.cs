@@ -41,14 +41,7 @@ namespace FluentMigrator.Expressions
         /// Gets or sets the column definition
         /// </summary>
         public virtual ColumnDefinition Column { get; set; }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AlterColumnExpression"/> class.
-        /// </summary>
-        public AlterColumnExpression()
-        {
-            Column = new ColumnDefinition() { ModificationType = ColumnModificationType.Alter };
-        }
+            = new ColumnDefinition() { ModificationType = ColumnModificationType.Alter };
 
         /// <inheritdoc />
         public override void CollectValidationErrors(ICollection<string> errors)
@@ -69,7 +62,8 @@ namespace FluentMigrator.Expressions
         /// <inheritdoc />
         public override string ToString()
         {
-            return base.ToString() + TableName + " " + Column.Name + " " + Column.Type ?? Column.CustomType;
+            var typeName = Column.Type == null ? Column.CustomType : Column.Type.ToString();
+            return base.ToString() + TableName + " " + Column.Name + " " + typeName;
         }
     }
 }

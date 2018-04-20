@@ -73,7 +73,8 @@ namespace FluentMigrator.Expressions
         /// <inheritdoc />
         public override string ToString()
         {
-            return base.ToString() + TableName + " " + Column.Name + " " + Column.Type ?? Column.CustomType;
+            var typeName = Column.Type == null ? Column.CustomType : Column.Type.ToString();
+            return base.ToString() + TableName + " " + Column.Name + " " + typeName;
         }
     }
 }

@@ -18,6 +18,7 @@ namespace FluentMigrator.Expressions
         /// </summary>
         public CreateConstraintExpression(ConstraintType type)
         {
+            // ReSharper disable once VirtualMemberCallInConstructor
             Constraint = new ConstraintDefinition(type);
         }
 
@@ -42,7 +43,7 @@ namespace FluentMigrator.Expressions
             //constraint type is private in ConstraintDefinition
             return new DeleteConstraintExpression(Constraint.IsPrimaryKeyConstraint ? ConstraintType.PrimaryKey : ConstraintType.Unique)
             {
-                Constraint = this.Constraint
+                Constraint = Constraint
             };
         }
 

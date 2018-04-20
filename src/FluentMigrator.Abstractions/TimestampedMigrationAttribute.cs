@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 
 namespace FluentMigrator
 {
@@ -137,72 +138,9 @@ namespace FluentMigrator
 
         private static long DateTimeToFormattedInt(int year, int month, int day, int hour, int minute, int second)
         {
-            if (!IsValidDate(year, month, day))
-            {
-                throw new ArgumentOutOfRangeException(null, "Year, Month, and Day parameters describe an un-representable DateTime.");
-            }
-
-            if (!IsValidTime(hour, minute, second))
-            {
-                throw new ArgumentOutOfRangeException(null, "Hour, Minute, and Second parameters describe an un-representable DateTime.");
-            }
-
-            var yearAsString = Convert.ToString(year).PadLeft(4, '0');
-            var monthAsString = Convert.ToString(month).PadLeft(2, '0');
-            var dayAsString = Convert.ToString(day).PadLeft(2, '0');
-            var hourAsString = Convert.ToString(hour).PadLeft(2, '0');
-            var minuteAsString = Convert.ToString(minute).PadLeft(2, '0');
-            var secondAsString = Convert.ToString(second).PadLeft(2, '0');
-
-            var givenDateTimeAsString = yearAsString + monthAsString + dayAsString + hourAsString + minuteAsString + secondAsString;
-
-            return long.Parse(givenDateTimeAsString);
-        }
-
-        private static int[] GetDaysToMonth(int year)
-        {
-            return DateTime.IsLeapYear(year) ? DaysToMonth366 : DaysToMonth365;
-        }
-
-        private static bool IsValidDate(int year, int month, int day)
-        {
-            if (!IsValidYear(year) || !IsValidMonth(month))
-            {
-                return false;
-            }
-
-            var daysToMonth = GetDaysToMonth(year);
-            return day >= 1 && day <= daysToMonth[month] - daysToMonth[month - 1];
-        }
-
-        private static bool IsValidHour(int hour)
-        {
-            return hour >= 0 && hour < 24;
-        }
-
-        private static bool IsValidMinute(int minute)
-        {
-            return minute >= 0 && minute < 60;
-        }
-
-        private static bool IsValidMonth(int month)
-        {
-            return month >= 1 && month <= 12;
-        }
-
-        private static bool IsValidSecond(int second)
-        {
-            return second >= 0 && second < 60;
-        }
-
-        private static bool IsValidTime(int hour, int minute, int second)
-        {
-            return IsValidHour(hour) && IsValidMinute(minute) && IsValidSecond(second);
-        }
-
-        private static bool IsValidYear(int year)
-        {
-            return year >= 1 && year <= 9999;
+            var dt = new DateTime(year, month, day, hour, minute, second);
+            var timestampAsString = dt.ToString("yyyyMMddHHmmss", CultureInfo.InvariantCulture);
+            return long.Parse(timestampAsString, CultureInfo.InvariantCulture);
         }
     }
 }

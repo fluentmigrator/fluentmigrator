@@ -59,7 +59,7 @@ namespace FluentMigrator.Model
         /// <summary>
         /// Gets or sets the column names
         /// </summary>
-        public virtual ICollection<string> Columns { get; set; }
+        public virtual ICollection<string> Columns { get; set; } = new HashSet<string>();
 
 
         /// <summary>
@@ -68,8 +68,6 @@ namespace FluentMigrator.Model
         public ConstraintDefinition(ConstraintType type)
         {
             constraintType = type;
-
-            Columns = new HashSet<string>();
         }
 
         /// <inheritdoc />
