@@ -1,3 +1,21 @@
+#region License
+//
+// Copyright (c) 2018, Fluent Migrator Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+#endregion
+
 #if NETFRAMEWORK
 using System;
 using System.Configuration;
@@ -12,54 +30,54 @@ namespace FluentMigrator.Runner.Initialization.NetFramework
     /// </summary>
     internal class ConnectionStringManager
     {
-        private readonly IAnnouncer announcer;
-        private readonly string assemblyLocation;
-        private readonly INetConfigManager configManager;
-        private readonly string configPath;
-        private readonly string database;
-        private string configFile;
-        private string connection;
-        private Func<string> machineNameProvider = () => Environment.MachineName;
-        private bool notUsingConfig;
-        private static readonly Regex matchPwd = new Regex("(PWD=|PASSWORD=)([^;]*);", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        private static readonly Regex _matchPwd = new Regex("(PWD=|PASSWORD=)([^;]*);", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        private readonly IAnnouncer _announcer;
+        private readonly string _assemblyLocation;
+        private readonly INetConfigManager _configManager;
+        private readonly string _configPath;
+        private readonly string _database;
+        private string _configFile;
+        private string _connection;
+        private Func<string> _machineNameProvider = () => Environment.MachineName;
+        private bool _notUsingConfig;
 
         public ConnectionStringManager(INetConfigManager configManager, IAnnouncer announcer, string connection, string configPath, string assemblyLocation,
                                        string database)
         {
-            this.connection = connection;
-            this.configPath = configPath;
-            this.database = database;
-            this.assemblyLocation = assemblyLocation;
-            notUsingConfig = true;
-            this.configManager = configManager;
-            this.announcer = announcer;
+            _connection = connection;
+            _configPath = configPath;
+            _database = database;
+            _assemblyLocation = assemblyLocation;
+            _notUsingConfig = true;
+            _configManager = configManager;
+            _announcer = announcer;
         }
 
         public string ConnectionString { get; private set; }
 
         public Func<string> MachineNameProvider
         {
-            get { return machineNameProvider; }
-            set { machineNameProvider = value; }
+            get { return _machineNameProvider; }
+            set { _machineNameProvider = value; }
         }
 
         public void LoadConnectionString()
         {
-            if (notUsingConfig && !string.IsNullOrEmpty(configPath))
-                LoadConnectionStringFromConfigurationFile(configManager.LoadFromFile(configPath));
+            if (_notUsingConfig && !string.IsNullOrEmpty(_configPath))
+                LoadConnectionStringFromConfigurationFile(_configManager.LoadFromFile(_configPath));
 
-            if (notUsingConfig && !String.IsNullOrEmpty(assemblyLocation))
+            if (_notUsingConfig && !String.IsNullOrEmpty(_assemblyLocation))
             {
-                string defaultConfigFile = assemblyLocation;
+                string defaultConfigFile = _assemblyLocation;
 
-                LoadConnectionStringFromConfigurationFile(configManager.LoadFromFile(defaultConfigFile));
+                LoadConnectionStringFromConfigurationFile(_configManager.LoadFromFile(defaultConfigFile));
             }
 
-            if (notUsingConfig)
-                LoadConnectionStringFromConfigurationFile(configManager.LoadFromMachineConfiguration());
+            if (_notUsingConfig)
+                LoadConnectionStringFromConfigurationFile(_configManager.LoadFromMachineConfiguration());
 
-            if (notUsingConfig && !string.IsNullOrEmpty(connection))
-                ConnectionString = connection;
+            if (_notUsingConfig && !string.IsNullOrEmpty(_connection))
+                ConnectionString = _connection;
 
             OutputResults();
         }
@@ -73,10 +91,10 @@ namespace FluentMigrator.Runner.Initialization.NetFramework
 
             ConnectionStringSettings connectionString;
 
-            if (string.IsNullOrEmpty(connection))
+            if (string.IsNullOrEmpty(_connection))
                 connectionString = connections[MachineNameProvider()];
             else
-                connectionString = connections[connection];
+                connectionString = connections[_connection];
 
             ReadConnectionString(connectionString, configurationFile.FilePath);
         }
@@ -85,10 +103,10 @@ namespace FluentMigrator.Runner.Initialization.NetFramework
         {
             if (connectionSetting == null) return;
 
-            connection = connectionSetting.Name;
+            _connection = connectionSetting.Name;
             ConnectionString = connectionSetting.ConnectionString;
-            configFile = configurationFile;
-            notUsingConfig = false;
+            _configFile = configurationFile;
+            _notUsingConfig = false;
         }
 
         private void OutputResults()
@@ -96,9 +114,9 @@ namespace FluentMigrator.Runner.Initialization.NetFramework
             if (string.IsNullOrEmpty(ConnectionString))
                 throw new UndeterminableConnectionException("Unable to resolve any connectionstring using parameters \"/connection\" and \"/configPath\"");
 
-            announcer.Say(notUsingConfig
-                              ? string.Format("Using Database {0} and Connection String {1}", database, matchPwd.Replace(ConnectionString,"$1********;"))
-                              : string.Format("Using Connection {0} from Configuration file {1}", connection, configFile));
+            _announcer.Say(_notUsingConfig
+                              ? string.Format("Using Database {0} and Connection String {1}", _database, _matchPwd.Replace(ConnectionString,"$1********;"))
+                              : string.Format("Using Connection {0} from Configuration file {1}", _connection, _configFile));
         }
     }
 }

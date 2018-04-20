@@ -16,20 +16,19 @@
 //
 #endregion
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
+using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Infrastructure.Extensions;
+using FluentMigrator.Model;
 using FluentMigrator.SqlServer;
 
 namespace FluentMigrator.Runner.Generators.SqlServer
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using FluentMigrator.Expressions;
-    using FluentMigrator.Model;
-
     public class SqlServer2005Generator : SqlServer2000Generator
     {
         private static readonly HashSet<string> _supportedAdditionalFeatures = new HashSet<string>

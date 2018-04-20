@@ -7,6 +7,7 @@ using FluentMigrator.Runner.Generators.Base;
 
 namespace FluentMigrator.Runner.Generators.SQLite
 {
+    // ReSharper disable once InconsistentNaming
     internal class SQLiteColumn : ColumnBase
     {
         public SQLiteColumn()
@@ -38,7 +39,8 @@ namespace FluentMigrator.Runner.Generators.SQLite
         public override bool ShouldPrimaryKeysBeAddedSeparately(IEnumerable<ColumnDefinition> primaryKeyColumns)
         {
             //If there are no identity column then we can add as a separate constrint
-            if (!primaryKeyColumns.Any(x => x.IsIdentity) && primaryKeyColumns.Any(x => x.IsPrimaryKey)) return true;
+            var pkColDefs = primaryKeyColumns.ToList();
+            if (!pkColDefs.Any(x => x.IsIdentity) && pkColDefs.Any(x => x.IsPrimaryKey)) return true;
             return false;
         }
 

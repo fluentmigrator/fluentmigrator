@@ -31,42 +31,42 @@ namespace FluentMigrator.Runner.Generators.DB2
         /// </summary>
         protected override void SetupTypeMaps()
         {
-            this.SetTypeMap(DbType.AnsiStringFixedLength, "CHARACTER(255)");
-            this.SetTypeMap(DbType.AnsiStringFixedLength, "CHARACTER($size)", 255);
-            this.SetTypeMap(DbType.AnsiString, "VARCHAR(255)");
-            this.SetTypeMap(DbType.AnsiString, "VARCHAR($size)", 32704);
-            this.SetTypeMap(DbType.AnsiString, "CLOB(1048576)");
-            this.SetTypeMap(DbType.AnsiString, "CLOB($size)", int.MaxValue);
-            this.SetTypeMap(DbType.Binary, "BINARY(255)");
-            this.SetTypeMap(DbType.Binary, "BINARY($size)", 255);
-            this.SetTypeMap(DbType.Binary, "VARBINARY(8000)");
-            this.SetTypeMap(DbType.Binary, "VARBINARY($size)", 32704);
-            this.SetTypeMap(DbType.Binary, "BLOB(1048576)");
-            this.SetTypeMap(DbType.Binary, "BLOB($size)", 2147483647);
-            this.SetTypeMap(DbType.Boolean, "CHAR(1)");
-            this.SetTypeMap(DbType.Byte, "SMALLINT");
-            this.SetTypeMap(DbType.Time, "TIME");
-            this.SetTypeMap(DbType.Date, "DATE");
-            this.SetTypeMap(DbType.DateTime, "TIMESTAMP");
-            this.SetTypeMap(DbType.DateTime2, "TIMESTAMP");
-            this.SetTypeMap(DbType.Decimal, "NUMERIC(19,5)");
-            this.SetTypeMap(DbType.Decimal, "NUMERIC($size,$precision)", 31);
-            this.SetTypeMap(DbType.Decimal, "DECIMAL(19,5)");
-            this.SetTypeMap(DbType.Decimal, "DECIMAL($size,$precision)", 31);
-            this.SetTypeMap(DbType.Double, "DOUBLE");
-            this.SetTypeMap(DbType.Int16, "SMALLINT");
-            this.SetTypeMap(DbType.Int32, "INT");
-            this.SetTypeMap(DbType.Int32, "INTEGER");
-            this.SetTypeMap(DbType.Int64, "BIGINT");
-            this.SetTypeMap(DbType.Single, "REAL");
-            this.SetTypeMap(DbType.Single, "DECFLOAT", 34);
-            this.SetTypeMap(DbType.StringFixedLength, "GRAPHIC(128)");
-            this.SetTypeMap(DbType.StringFixedLength, "GRAPHIC($size)", 128);
-            this.SetTypeMap(DbType.String, "VARGRAPHIC(8000)");
-            this.SetTypeMap(DbType.String, "VARGRAPHIC($size)", 16352);
-            this.SetTypeMap(DbType.String, "DBCLOB(1048576)");
-            this.SetTypeMap(DbType.String, "DBCLOB($size)", 1073741824);
-            this.SetTypeMap(DbType.Xml, "XML");
+            SetTypeMap(DbType.AnsiStringFixedLength, "CHARACTER(255)");
+            SetTypeMap(DbType.AnsiStringFixedLength, "CHARACTER($size)", 255);
+            SetTypeMap(DbType.AnsiString, "VARCHAR(255)");
+            SetTypeMap(DbType.AnsiString, "VARCHAR($size)", 32704);
+            SetTypeMap(DbType.AnsiString, "CLOB(1048576)");
+            SetTypeMap(DbType.AnsiString, "CLOB($size)", int.MaxValue);
+            SetTypeMap(DbType.Binary, "BINARY(255)");
+            SetTypeMap(DbType.Binary, "BINARY($size)", 255);
+            SetTypeMap(DbType.Binary, "VARBINARY(8000)");
+            SetTypeMap(DbType.Binary, "VARBINARY($size)", 32704);
+            SetTypeMap(DbType.Binary, "BLOB(1048576)");
+            SetTypeMap(DbType.Binary, "BLOB($size)", 2147483647);
+            SetTypeMap(DbType.Boolean, "CHAR(1)");
+            SetTypeMap(DbType.Byte, "SMALLINT");
+            SetTypeMap(DbType.Time, "TIME");
+            SetTypeMap(DbType.Date, "DATE");
+            SetTypeMap(DbType.DateTime, "TIMESTAMP");
+            SetTypeMap(DbType.DateTime2, "TIMESTAMP");
+            SetTypeMap(DbType.Decimal, "NUMERIC(19,5)");
+            SetTypeMap(DbType.Decimal, "NUMERIC($size,$precision)", 31);
+            SetTypeMap(DbType.Decimal, "DECIMAL(19,5)");
+            SetTypeMap(DbType.Decimal, "DECIMAL($size,$precision)", 31);
+            SetTypeMap(DbType.Double, "DOUBLE");
+            SetTypeMap(DbType.Int16, "SMALLINT");
+            SetTypeMap(DbType.Int32, "INT");
+            SetTypeMap(DbType.Int32, "INTEGER");
+            SetTypeMap(DbType.Int64, "BIGINT");
+            SetTypeMap(DbType.Single, "REAL");
+            SetTypeMap(DbType.Single, "DECFLOAT", 34);
+            SetTypeMap(DbType.StringFixedLength, "GRAPHIC(128)");
+            SetTypeMap(DbType.StringFixedLength, "GRAPHIC($size)", 128);
+            SetTypeMap(DbType.String, "VARGRAPHIC(8000)");
+            SetTypeMap(DbType.String, "VARGRAPHIC($size)", 16352);
+            SetTypeMap(DbType.String, "DBCLOB(1048576)");
+            SetTypeMap(DbType.String, "DBCLOB($size)", 1073741824);
+            SetTypeMap(DbType.Xml, "XML");
         }
 
         #endregion

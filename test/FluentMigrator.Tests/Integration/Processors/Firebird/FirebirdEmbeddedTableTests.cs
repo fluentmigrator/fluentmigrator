@@ -1,10 +1,28 @@
+#region License
+//
+// Copyright (c) 2018, Fluent Migrator Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+#endregion
+
 using System;
-using System.Collections.Generic;
 using System.Data;
-using System.IO;
 using System.Linq;
 using System.Reflection;
+
 using FirebirdSql.Data.FirebirdClient;
+
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators.Firebird;
@@ -44,10 +62,17 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         {
             private readonly int _id;
 
-            public AddDataMigration(int id = 1)
+            // ReSharper disable once UnusedMember.Global
+            public AddDataMigration()
+                : this(1)
+            {
+            }
+
+            public AddDataMigration(int id)
             {
                 _id = id;
             }
+
             public override void Up()
             {
                 Insert.IntoTable("TheTable").Row(new { Id = _id, SomeValue = _id });
@@ -86,10 +111,9 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
 
                 using (var connection = new FbConnection(connectionString))
                 {
-                    FirebirdProcessor processor;
-                    var runner = CreateFirebirdEmbeddedRunnerFor(connection, runnerContext, out processor);
+                    var runner = CreateFirebirdEmbeddedRunnerFor(connection, runnerContext, out _);
                     runner.Up(new CreateTableMigration());
-                    runner.Up(new AddDataMigration());
+                    runner.Up(new AddDataMigration(1));
                     //---------------Assert Precondition----------------
                     connection.Open();
                     using (var cmd = new FbCommand("select * from TheTable", connection))
@@ -132,10 +156,9 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
 
                 using (var connection = new FbConnection(connectionString))
                 {
-                    FirebirdProcessor processor;
-                    var runner = CreateFirebirdEmbeddedRunnerFor(connection, runnerContext, out processor);
+                    var runner = CreateFirebirdEmbeddedRunnerFor(connection, runnerContext, out _);
                     runner.Up(new CreateTableMigration());
-                    runner.Up(new AddDataMigration(1));
+                    runner.Up(new AddDataMigration(id: 1));
                     runner.Up(new AddDataMigration(2));
                     runner.Up(new AddDataMigration(3));
                     //---------------Assert Precondition----------------
@@ -566,18 +589,6 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             }
         }
 
-        [Obsolete]
-        private static MigrationRunner ObsoleteCreateFirebirdEmbeddedRunnerFor(FbConnection connection, RunnerContext runnerContext, out FirebirdProcessor processor)
-        {
-            var announcer = new TextWriterAnnouncer(TestContext.Out);
-            announcer.ShowSql = true;
-            var options = FirebirdOptions.AutoCommitBehaviour();
-            processor = new FirebirdProcessor(connection, new FirebirdGenerator(options), announcer,
-                                              new ProcessorOptions(), new FirebirdDbFactory(), options);
-            var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), runnerContext, processor);
-            return runner;
-        }
-
         private static IMigrationRunner CreateFirebirdEmbeddedRunnerFor(FbConnection connection, RunnerContext runnerContext, out FirebirdProcessor processor)
         {
             var announcer = new TextWriterAnnouncer(TestContext.Out);
@@ -635,8 +646,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
 
                 using (var connection = new FbConnection(connectionString))
                 {
-                    FirebirdProcessor processor;
-                    var runner = CreateFirebirdEmbeddedRunnerFor(connection, runnerContext, out processor);
+                    var runner = CreateFirebirdEmbeddedRunnerFor(connection, runnerContext, out _);
                     runner.Up(new MigrationWhichCreatesTableWithTextBlob());
                     //---------------Assert Precondition----------------
                     var fieldName = "TheColumn";
@@ -798,7 +808,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             using (var connection = new FbConnection(connectionString))
             {
                 connection.Open();
-                var keyQuery = String.Format(@"
+                var keyQuery = @"
 SELECT rc.RDB$CONSTRAINT_NAME AS constraint_name,
 i.RDB$RELATION_NAME AS table_name,
 s.RDB$FIELD_NAME AS field_name,
@@ -819,7 +829,7 @@ LEFT JOIN RDB$RELATION_CONSTRAINTS rc2 ON rc2.RDB$CONSTRAINT_NAME = refc.RDB$CON
 LEFT JOIN RDB$INDICES i2 ON i2.RDB$INDEX_NAME = rc2.RDB$INDEX_NAME
 LEFT JOIN RDB$INDEX_SEGMENTS s2 ON i2.RDB$INDEX_NAME = s2.RDB$INDEX_NAME
 WHERE rc.RDB$CONSTRAINT_TYPE = 'FOREIGN KEY'
-ORDER BY s.RDB$FIELD_POSITION", MigrationWhichCreatesTwoRelatedTables.ForeignKeyName);
+ORDER BY s.RDB$FIELD_POSITION";
                 var cmd = connection.CreateCommand();
                 cmd.CommandText = keyQuery;
                 var result = false;
@@ -838,7 +848,10 @@ ORDER BY s.RDB$FIELD_POSITION", MigrationWhichCreatesTwoRelatedTables.ForeignKey
                                 break;
                             }
                         }
-                        catch { }
+                        catch
+                        {
+                            // ignored
+                        }
                     }
                 }
                 connection.Close();

@@ -19,6 +19,7 @@ using System;
 namespace FluentMigrator.Tests.Integration.Migrations.Firebird.Issue817
 {
     [Migration(200)]
+    // ReSharper disable once InconsistentNaming
     public class Migration_v200_AlterTableUsersModifyColumnName : Migration
     {
         public override void Up()

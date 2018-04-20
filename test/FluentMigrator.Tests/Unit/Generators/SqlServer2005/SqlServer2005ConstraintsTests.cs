@@ -7,7 +7,8 @@ using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.SqlServer;
 
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 {

@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -24,18 +24,18 @@ namespace FluentMigrator.Tests.Unit.AssemblyLoader
     [TestFixture]
     public class AssemblyLoaderTests
     {
-        private AssemblyLoaderFactory assemblyLoaderFactory;
+        private AssemblyLoaderFactory _assemblyLoaderFactory;
 
         [SetUp]
         public void Setup()
         {
-            assemblyLoaderFactory = new AssemblyLoaderFactory();
+            _assemblyLoaderFactory = new AssemblyLoaderFactory();
         }
 
         [Test]
         public void ShouldBeAbleToLoadAssemblyByFileName()
         {
-            var assemblyLoader = assemblyLoaderFactory.GetAssemblyLoader(GetType().Assembly.Location);
+            var assemblyLoader = _assemblyLoaderFactory.GetAssemblyLoader(GetType().Assembly.Location);
             Assert.IsInstanceOf(typeof(AssemblyLoaderFromFile), assemblyLoader);
             Assert.AreEqual(GetType().Assembly, assemblyLoader.Load());
         }
@@ -43,7 +43,7 @@ namespace FluentMigrator.Tests.Unit.AssemblyLoader
         [Test]
         public void ShouldBeAbleToLoadAssemblyAssemblyName()
         {
-            var assemblyLoader = assemblyLoaderFactory.GetAssemblyLoader(GetType().Assembly.GetName().Name);
+            var assemblyLoader = _assemblyLoaderFactory.GetAssemblyLoader(GetType().Assembly.GetName().Name);
             Assert.IsInstanceOf(typeof(AssemblyLoaderFromName), assemblyLoader);
             Assert.AreEqual(GetType().Assembly, assemblyLoader.Load());
         }

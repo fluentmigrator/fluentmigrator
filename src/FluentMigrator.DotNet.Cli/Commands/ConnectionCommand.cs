@@ -14,10 +14,11 @@
 // limitations under the License.
 #endregion
 
-using System;
 using System.ComponentModel.DataAnnotations;
 
 using McMaster.Extensions.CommandLineUtils;
+
+// ReSharper disable UnassignedGetOnlyAutoProperty
 
 namespace FluentMigrator.DotNet.Cli.Commands
 {

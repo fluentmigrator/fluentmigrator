@@ -1,7 +1,8 @@
 ﻿using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Postgres;
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Generators.Postgres
 {
@@ -11,15 +12,15 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         [SetUp]
         public void SetUp()
         {
-            quoter = new PostgresQuoter();
+            _quoter = new PostgresQuoter();
         }
 
-        private IQuoter quoter = default(PostgresQuoter);
+        private IQuoter _quoter = default(PostgresQuoter);
 
         [Test]
         public void ByteArrayIsFormattedWithQuotes()
         {
-            quoter.QuoteValue(new byte[] { 0, 254, 13, 18, 125, 17 })
+            _quoter.QuoteValue(new byte[] { 0, 254, 13, 18, 125, 17 })
                 .ShouldBe(@"E'\\x00FE0D127D11'");
         }
     }

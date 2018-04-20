@@ -1,12 +1,12 @@
 #region License
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,7 +23,7 @@ namespace FluentMigrator.Tests.Helpers
 {
     public class HanaTestSequence: IDisposable
     {
-        private readonly HanaQuoter quoter = new HanaQuoter();
+        private readonly HanaQuoter _quoter = new HanaQuoter();
         private readonly string _schemaName;
         private HanaConnection Connection { get; set; }
         public string Name { get; set; }
@@ -33,11 +33,11 @@ namespace FluentMigrator.Tests.Helpers
         public HanaTestSequence(HanaProcessor processor, string schemaName, string sequenceName)
         {
             _schemaName = schemaName;
-            Name = quoter.QuoteSequenceName(sequenceName, null);
+            Name = _quoter.QuoteSequenceName(sequenceName, null);
 
             Connection = (HanaConnection)processor.Connection;
             Transaction = (HanaTransaction)processor.Transaction;
-            NameWithSchema = quoter.QuoteSequenceName(sequenceName, schemaName);
+            NameWithSchema = _quoter.QuoteSequenceName(sequenceName, schemaName);
             Create();
         }
 

@@ -42,7 +42,7 @@ namespace FluentMigrator.Builders.Update
         {
             var expression = new UpdateDataExpression { TableName = tableName };
             _context.Expressions.Add(expression);
-            return new UpdateDataExpressionBuilder(expression, _context);
+            return new UpdateDataExpressionBuilder(expression);
         }
     }
 }

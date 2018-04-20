@@ -4,18 +4,19 @@ using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner;
 using FluentMigrator.Tests.Helpers;
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Expressions
 {
     [TestFixture]
     public class UpdateDataExpressionTests {
-        private UpdateDataExpression expression;
+        private UpdateDataExpression _expression;
 
         [SetUp]
         public void Initialize()
         {
-            expression =
+            _expression =
                 new UpdateDataExpression()
                 {
                     TableName = "ExampleTable",
@@ -31,9 +32,9 @@ namespace FluentMigrator.Tests.Unit.Expressions
         public void NullUpdateTargetCausesErrorMessage()
         {
             // null is the default value, but it might not always be, so I'm codifying it here anyway
-            expression.Where = null;
+            _expression.Where = null;
 
-            var errors = ValidationHelper.CollectErrors(expression);
+            var errors = ValidationHelper.CollectErrors(_expression);
             errors.ShouldContain(ErrorMessages.UpdateDataExpressionMustSpecifyWhereClauseOrAllRows);
         }
 
@@ -41,35 +42,35 @@ namespace FluentMigrator.Tests.Unit.Expressions
         public void EmptyUpdateTargetCausesErrorMessage()
         {
             // The same should be true for an empty list
-            expression.Where = new List<KeyValuePair<string, object>>();
+            _expression.Where = new List<KeyValuePair<string, object>>();
 
-            var errors = ValidationHelper.CollectErrors(expression);
+            var errors = ValidationHelper.CollectErrors(_expression);
             errors.ShouldContain(ErrorMessages.UpdateDataExpressionMustSpecifyWhereClauseOrAllRows);
         }
 
         [Test]
         public void DoesNotRequireWhereConditionWhenIsAllRowsIsSet()
         {
-            expression.IsAllRows = true;
+            _expression.IsAllRows = true;
 
-            var errors = ValidationHelper.CollectErrors(expression);
+            var errors = ValidationHelper.CollectErrors(_expression);
             errors.ShouldNotContain(ErrorMessages.UpdateDataExpressionMustSpecifyWhereClauseOrAllRows);
         }
 
         [Test]
         public void DoesNotAllowWhereConditionWhenIsAllRowsIsSet()
         {
-            expression.IsAllRows = true;
-            expression.Where = new List<KeyValuePair<string, object>> {new KeyValuePair<string, object>("key", "value")};
+            _expression.IsAllRows = true;
+            _expression.Where = new List<KeyValuePair<string, object>> {new KeyValuePair<string, object>("key", "value")};
 
-            var errors = ValidationHelper.CollectErrors(expression);
+            var errors = ValidationHelper.CollectErrors(_expression);
             errors.ShouldContain(ErrorMessages.UpdateDataExpressionMustNotSpecifyBothWhereClauseAndAllRows);
         }
 
         [Test]
         public void WhenDefaultSchemaConventionIsAppliedAndSchemaIsNotSetThenSchemaShouldBeNull()
         {
-            var processed = expression.Apply(ConventionSets.NoSchemaName);
+            var processed = _expression.Apply(ConventionSets.NoSchemaName);
 
             Assert.That(processed.SchemaName, Is.Null);
         }
@@ -77,9 +78,9 @@ namespace FluentMigrator.Tests.Unit.Expressions
         [Test]
         public void WhenDefaultSchemaConventionIsAppliedAndSchemaIsSetThenSchemaShouldNotBeChanged()
         {
-            expression.SchemaName = "testschema";
+            _expression.SchemaName = "testschema";
 
-            var processed = expression.Apply(ConventionSets.WithSchemaName);
+            var processed = _expression.Apply(ConventionSets.WithSchemaName);
 
             Assert.That(processed.SchemaName, Is.EqualTo("testschema"));
         }
@@ -87,7 +88,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         [Test]
         public void WhenDefaultSchemaConventionIsChangedAndSchemaIsNotSetThenSetSchema()
         {
-            var processed = expression.Apply(ConventionSets.WithSchemaName);
+            var processed = _expression.Apply(ConventionSets.WithSchemaName);
 
             Assert.That(processed.SchemaName, Is.EqualTo("testdefault"));
         }

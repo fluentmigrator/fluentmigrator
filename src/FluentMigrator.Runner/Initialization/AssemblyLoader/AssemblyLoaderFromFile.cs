@@ -16,36 +16,34 @@
 //
 #endregion
 
-using System;
 using System.IO;
 using System.Reflection;
 
-using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Infrastructure;
 
 namespace FluentMigrator.Runner.Initialization.AssemblyLoader
 {
     public class AssemblyLoaderFromFile : IAssemblyLoader
     {
-        readonly string name;
+        private readonly string _name;
 
         public AssemblyLoaderFromFile(string name)
         {
-            this.name = name;
+            _name = name;
         }
 
         public Assembly Load()
         {
-            string fileName = this.name;
+            string fileName = _name;
             if (!Path.IsPathRooted(fileName))
             {
-                fileName = Path.Combine(RuntimeHost.Current.BaseDirectory, this.name);
+                fileName = Path.Combine(RuntimeHost.Current.BaseDirectory, _name);
                 if (!File.Exists(fileName))
                 {
-                    fileName = Path.GetFullPath(this.name);
+                    fileName = Path.GetFullPath(_name);
                     if (!File.Exists(fileName))
                     {
-                        fileName = this.name;
+                        fileName = _name;
                     }
                 }
             }

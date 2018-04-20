@@ -35,10 +35,10 @@ namespace FluentMigrator.Runner.Processors.Firebird
         public List<ConstraintInfo> Constraints { get; private set; }
         public List<TriggerInfo> Triggers { get; private set; }
 
-        public string TableName { get; private set; }
+        public string TableName { get; }
         public bool Exists => TableMeta?.Exists ?? false;
-        public FirebirdProcessor Processor { get; private set; }
-        public FirebirdTableDefinition Definition { get; private set; }
+        public FirebirdProcessor Processor { get; }
+        public FirebirdTableDefinition Definition { get; }
         public bool HasPrimaryKey { get { return Definition.Columns.Any(x => x.IsPrimaryKey); } }
 
         public FirebirdTableSchema(string tableName, FirebirdProcessor processor, FirebirdQuoter quoter)
@@ -81,7 +81,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
                     IsNullable = column.IsNullable,
                     Type = column.DBType,
                     Precision = column.Precision ?? 0,
-                    Size = column.Size ?? 0
+                    Size = column.CharacterLength ?? 0
                 };
                 if (colDef.Type == null)
                     colDef.CustomType = column.CustomType;

@@ -47,7 +47,7 @@ namespace FluentMigrator.Runner.Announcers
             write(Environment.NewLine);
         }
 
-        public override void Write(string message, bool isNotSql)
+        public override void Write(string message, bool isNotSql = true)
         {
             write(isNotSql ? string.Format("/* {0} */", message) : message);
             write(Environment.NewLine);

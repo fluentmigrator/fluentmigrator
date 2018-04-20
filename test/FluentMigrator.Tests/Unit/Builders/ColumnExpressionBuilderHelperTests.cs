@@ -164,7 +164,7 @@ namespace FluentMigrator.Tests.Unit.Builders
             contextMock.SetupGet(n => n.Expressions).Returns(addedExpressions);
             builderMock.SetupGet(n => n.Column.ModificationType).Returns(ColumnModificationType.Create);
             builderMock.Setup(n => n.Column.Clone()).Returns(new ColumnDefinition());
-            
+
             var helper = new ColumnExpressionBuilderHelper(builderMock.Object, contextMock.Object);
 
             helper.SetNullable(false);
@@ -181,7 +181,6 @@ namespace FluentMigrator.Tests.Unit.Builders
             throw new NotImplementedException();
         }
 
-        
         [Test]
         public void SetNullable_ToTrue()
         {

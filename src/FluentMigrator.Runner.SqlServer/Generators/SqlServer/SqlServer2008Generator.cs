@@ -64,7 +64,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             if (nullDistinctColumns.Count != 0 && !index.IsUnique)
             {
                 // Should never occur
-                compatabilityMode.HandleCompatabilty("With nulls distinct can only be used for unique indexes");
+                CompatabilityMode.HandleCompatabilty("With nulls distinct can only be used for unique indexes");
                 return string.Empty;
             }
 

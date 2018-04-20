@@ -1,7 +1,8 @@
 using FluentMigrator.Runner.Generators.SqlAnywhere;
 
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
 {

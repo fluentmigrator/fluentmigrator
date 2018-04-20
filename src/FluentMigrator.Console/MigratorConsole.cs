@@ -32,7 +32,7 @@ namespace FluentMigrator.Console
 {
     public class MigratorConsole
     {
-        private readonly ConsoleAnnouncer consoleAnnouncer = new ConsoleAnnouncer();
+        private readonly ConsoleAnnouncer _consoleAnnouncer = new ConsoleAnnouncer();
         public string ApplicationContext;
         public string Connection;
         public string ConnectionStringConfigPath;
@@ -63,7 +63,7 @@ namespace FluentMigrator.Console
 
         public int Run(params string[] args)
         {
-            consoleAnnouncer.Header();
+            _consoleAnnouncer.Header();
 
             try
             {
@@ -211,8 +211,8 @@ namespace FluentMigrator.Console
                 }
                 catch (OptionException e)
                 {
-                    consoleAnnouncer.Error(e);
-                    consoleAnnouncer.Say("Try 'migrate --help' for more information.");
+                    _consoleAnnouncer.Error(e);
+                    _consoleAnnouncer.Say("Try 'migrate --help' for more information.");
                     return 2;
                 }
 
@@ -239,22 +239,22 @@ namespace FluentMigrator.Console
             }
             catch (MissingMigrationsException ex)
             {
-                consoleAnnouncer.Error(ex);
+                _consoleAnnouncer.Error(ex);
                 return 6;
             }
             catch (RunnerException ex)
             {
-                consoleAnnouncer.Error(ex);
+                _consoleAnnouncer.Error(ex);
                 return 5;
             }
             catch (FluentMigratorException ex)
             {
-                consoleAnnouncer.Error(ex);
+                _consoleAnnouncer.Error(ex);
                 return 4;
             }
             catch (Exception ex)
             {
-                consoleAnnouncer.Error(ex);
+                _consoleAnnouncer.Error(ex);
                 return 3;
             }
         }
@@ -276,51 +276,51 @@ namespace FluentMigrator.Console
 
         private void DisplayHelp(OptionSet optionSet, string validationErrorMessage)
         {
-            consoleAnnouncer.Emphasize(validationErrorMessage);
+            _consoleAnnouncer.Emphasize(validationErrorMessage);
             DisplayHelp(optionSet);
         }
 
         private void DisplayHelp(OptionSet p)
         {
-            consoleAnnouncer.Write("Usage:");
-            consoleAnnouncer.Write("  migrate [OPTIONS]");
-            consoleAnnouncer.Write("Example:");
-            consoleAnnouncer.Write("  migrate -a bin\\debug\\MyMigrations.dll -db SqlServer2008 -conn \"SEE_BELOW\" -profile \"Debug\"");
-            consoleAnnouncer.HorizontalRule();
-            consoleAnnouncer.Write("Example Connection Strings:");
-            consoleAnnouncer.Write("  MySql: Data Source=172.0.0.1;Database=Foo;User Id=USERNAME;Password=BLAH");
-            consoleAnnouncer.Write("  Oracle: Server=172.0.0.1;Database=Foo;Uid=USERNAME;Pwd=BLAH");
-            consoleAnnouncer.Write("  SqlLite: Data Source=:memory:");
-            consoleAnnouncer.Write("  SqlServer: server=127.0.0.1;database=Foo;user id=USERNAME;password=BLAH");
-            consoleAnnouncer.Write("             server=.\\SQLExpress;database=Foo;trusted_connection=true");
-            consoleAnnouncer.Write("   ");
-            consoleAnnouncer.Write("OR use a named connection string from the machine.config:");
-            consoleAnnouncer.Write("  migrate -a bin\\debug\\MyMigrations.dll -db SqlServer2008 -conn \"namedConnection\" -profile \"Debug\"");
-            consoleAnnouncer.HorizontalRule();
-            consoleAnnouncer.Write("Options:");
+            _consoleAnnouncer.Write("Usage:");
+            _consoleAnnouncer.Write("  migrate [OPTIONS]");
+            _consoleAnnouncer.Write("Example:");
+            _consoleAnnouncer.Write("  migrate -a bin\\debug\\MyMigrations.dll -db SqlServer2008 -conn \"SEE_BELOW\" -profile \"Debug\"");
+            _consoleAnnouncer.HorizontalRule();
+            _consoleAnnouncer.Write("Example Connection Strings:");
+            _consoleAnnouncer.Write("  MySql: Data Source=172.0.0.1;Database=Foo;User Id=USERNAME;Password=BLAH");
+            _consoleAnnouncer.Write("  Oracle: Server=172.0.0.1;Database=Foo;Uid=USERNAME;Pwd=BLAH");
+            _consoleAnnouncer.Write("  SqlLite: Data Source=:memory:");
+            _consoleAnnouncer.Write("  SqlServer: server=127.0.0.1;database=Foo;user id=USERNAME;password=BLAH");
+            _consoleAnnouncer.Write("             server=.\\SQLExpress;database=Foo;trusted_connection=true");
+            _consoleAnnouncer.Write("   ");
+            _consoleAnnouncer.Write("OR use a named connection string from the machine.config:");
+            _consoleAnnouncer.Write("  migrate -a bin\\debug\\MyMigrations.dll -db SqlServer2008 -conn \"namedConnection\" -profile \"Debug\"");
+            _consoleAnnouncer.HorizontalRule();
+            _consoleAnnouncer.Write("Options:");
             p.WriteOptionDescriptions(System.Console.Out);
         }
 
         private int ExecuteMigrations()
         {
-            consoleAnnouncer.ShowElapsedTime = Verbose;
-            consoleAnnouncer.ShowSql = Verbose;
+            _consoleAnnouncer.ShowElapsedTime = Verbose;
+            _consoleAnnouncer.ShowSql = Verbose;
 
             var announcer = StopOnError
-                ? (IAnnouncer)new CompositeAnnouncer(consoleAnnouncer, new StopOnErrorAnnouncer())
-                : consoleAnnouncer;
+                ? (IAnnouncer)new CompositeAnnouncer(_consoleAnnouncer, new StopOnErrorAnnouncer())
+                : _consoleAnnouncer;
 
             return ExecuteMigrations(announcer);
         }
 
         private int ExecuteMigrations(string outputTo)
         {
-            consoleAnnouncer.ShowElapsedTime = Verbose;
-            consoleAnnouncer.ShowSql = Verbose;
+            _consoleAnnouncer.ShowElapsedTime = Verbose;
+            _consoleAnnouncer.ShowSql = Verbose;
 
             var innerAnnouncer = StopOnError
-                ? (IAnnouncer)new CompositeAnnouncer(consoleAnnouncer, new StopOnErrorAnnouncer())
-                : consoleAnnouncer;
+                ? (IAnnouncer)new CompositeAnnouncer(_consoleAnnouncer, new StopOnErrorAnnouncer())
+                : _consoleAnnouncer;
 
             using (var announcer = new LateInitAnnouncer(innerAnnouncer, ExecutingAgainstMsSql, outputTo))
             {

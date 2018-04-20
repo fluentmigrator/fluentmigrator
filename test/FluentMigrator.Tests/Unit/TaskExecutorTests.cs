@@ -49,7 +49,7 @@ namespace FluentMigrator.Tests.Unit
             runnerContext.SetupGet(x => x.Version).Returns(version);
             runnerContext.SetupGet(x => x.Steps).Returns(() => stepsStore);
             runnerContext.SetupSet(x => x.Steps = It.IsAny<int>()).Callback<int>(v => stepsStore = v);
-            runnerContext.SetupGet(x => x.Targets).Returns(new string[] { GetType().Assembly.Location });
+            runnerContext.SetupGet(x => x.Targets).Returns(new[] { GetType().Assembly.Location });
             runnerContext.SetupGet(x => x.Profile).Returns(profile);
             runnerContext.SetupGet(x => x.Namespace).Returns("FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3");
 
@@ -65,7 +65,7 @@ namespace FluentMigrator.Tests.Unit
             var runnerContext = new Mock<IRunnerContext>();
             runnerContext.SetupGet(x => x.Database).Returns("sqlWRONG");
             runnerContext.SetupGet(x => x.Connection).Returns(IntegrationTestOptions.SqlServer2008.ConnectionString);
-            runnerContext.SetupGet(x => x.Targets).Returns(new string[] { GetType().Assembly.Location });
+            runnerContext.SetupGet(x => x.Targets).Returns(new[] { GetType().Assembly.Location });
             runnerContext.SetupGet(x => x.Announcer).Returns(new Mock<IAnnouncer>().Object);
 
             Assert.Throws<ProcessorFactoryNotFoundException>(() => new TaskExecutor(runnerContext.Object).Execute());
@@ -197,16 +197,16 @@ namespace FluentMigrator.Tests.Unit
 
     internal class FakeTaskExecutor : TaskExecutor
     {
-        private readonly IMigrationRunner runner;
+        private readonly IMigrationRunner _runner;
 
         public FakeTaskExecutor(IRunnerContext runnerContext, IMigrationRunner runner) : base(runnerContext)
         {
-            this.runner = runner;
+            _runner = runner;
         }
 
         protected override void Initialize()
         {
-            Runner = runner;
+            Runner = _runner;
         }
     }
 }

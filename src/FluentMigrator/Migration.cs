@@ -32,7 +32,7 @@ namespace FluentMigrator
         /// </summary>
         public IDeleteExpressionRoot Delete
         {
-            get { return new DeleteExpressionRoot(_context); }
+            get { return new DeleteExpressionRoot(Context); }
         }
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace FluentMigrator
         /// </summary>
         public IExecuteExpressionRoot Execute
         {
-            get { return new ExecuteExpressionRoot(_context); }
+            get { return new ExecuteExpressionRoot(Context); }
         }
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace FluentMigrator
         /// </summary>
         public IUpdateExpressionRoot Update
         {
-            get { return new UpdateExpressionRoot(_context); }
+            get { return new UpdateExpressionRoot(Context); }
         }
     }
 }

@@ -5,7 +5,8 @@ using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Tests.Helpers;
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Integration.Processors.Firebird
 {
@@ -51,7 +52,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [Test]
         public override void CallingTableExistsCanAcceptTableNameWithSingleQuote()
         {
-            using (var table = new FirebirdTestTable("\"Test'Table\"", Processor, null, "id int"))
+            using (var table = new FirebirdTestTable("\"Test'Table\"", Processor, "id int"))
                 Processor.TableExists(null, table.Name).ShouldBeTrue();
         }
 
@@ -70,14 +71,14 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [Test]
         public override void CallingTableExistsReturnsTrueIfTableExists()
         {
-            using (var table = new FirebirdTestTable(Processor, null, "id int"))
+            using (var table = new FirebirdTestTable(Processor, "id int"))
                 Processor.TableExists(null, table.Name).ShouldBeTrue();
         }
 
         [Test]
         public override void CallingTableExistsReturnsTrueIfTableExistsWithSchema()
         {
-            using (var table = new FirebirdTestTable(Processor, "TestSchema", "id int"))
+            using (var table = new FirebirdTestTable(Processor, "id int"))
                 Processor.TableExists("TestSchema", table.Name).ShouldBeTrue();
         }
 

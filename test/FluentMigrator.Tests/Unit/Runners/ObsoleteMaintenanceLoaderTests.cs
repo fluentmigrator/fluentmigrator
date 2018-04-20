@@ -25,7 +25,8 @@ using FluentMigrator.Runner.Infrastructure;
 
 using Moq;
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Runners
 {

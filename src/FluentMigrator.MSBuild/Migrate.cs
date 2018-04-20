@@ -43,16 +43,16 @@ namespace FluentMigrator.MSBuild
         /// </summary>
         public Migrate()
         {
-            AppDomain.CurrentDomain.ResourceResolve += new ResolveEventHandler(CurrentDomain_ResourceResolve);
+            AppDomain.CurrentDomain.ResourceResolve += CurrentDomain_ResourceResolve;
         }
 
         private static Assembly CurrentDomain_ResourceResolve(object sender, ResolveEventArgs args)
         {
-            Console.WriteLine("Could Not Resolve {0}", args.Name);
+            Console.WriteLine(@"Could Not Resolve {0}", args.Name);
             return null;
         }
 
-        private string databaseType;
+        private string _databaseType;
 
         public string ApplicationContext { get; set; }
 
@@ -61,14 +61,14 @@ namespace FluentMigrator.MSBuild
 
         public string ConnectionStringConfigPath { get; set; }
 
-        public string Target { get { return (Targets != null && Targets.Length == 1) ? Targets[0] : string.Empty; } set { Targets = new string[] { value }; } }
+        public string Target { get { return (Targets != null && Targets.Length == 1) ? Targets[0] : string.Empty; } set { Targets = new[] { value }; } }
 
         public string[] Targets { get; set; }
-        public string MigrationAssembly { get { return (Targets != null && Targets.Length == 1) ? Targets[0] : string.Empty; } set { Targets = new string[] {value}; } }
+        public string MigrationAssembly { get { return (Targets != null && Targets.Length == 1) ? Targets[0] : string.Empty; } set { Targets = new[] {value}; } }
 
-        public string Database { get { return databaseType; } set { databaseType = value; } }
+        public string Database { get { return _databaseType; } set { _databaseType = value; } }
 
-        public string DatabaseType { get { return databaseType; } set { databaseType = value; } }
+        public string DatabaseType { get { return _databaseType; } set { _databaseType = value; } }
 
         public bool Verbose { get; set; }
 
@@ -101,7 +101,7 @@ namespace FluentMigrator.MSBuild
         public override bool Execute()
         {
 
-            if (string.IsNullOrEmpty(databaseType))
+            if (string.IsNullOrEmpty(_databaseType))
             {
                 Log.LogError("You must specify a database type. i.e. mysql or sqlserver");
                 return false;
@@ -140,7 +140,7 @@ namespace FluentMigrator.MSBuild
             var runnerContext = new RunnerContext(announcer)
             {
                 ApplicationContext = ApplicationContext,
-                Database = databaseType,
+                Database = _databaseType,
                 Connection = Connection,
                 ConnectionStringConfigPath = ConnectionStringConfigPath,
                 PreviewOnly = PreviewOnly,

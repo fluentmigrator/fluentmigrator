@@ -1,17 +1,38 @@
+#region License
+//
+// Copyright (c) 2018, Fluent Migrator Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+#endregion
+
 using System;
 
 using FluentMigrator.Builders.Create.Table;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Generators.SQLite;
-using FluentMigrator.Runner.Infrastructure;
+
+using Microsoft.Extensions.DependencyInjection;
 
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Generators.SQLite
 {
     [TestFixture]
+    // ReSharper disable once InconsistentNaming
     public class SQLiteTableTests : BaseTableTests
     {
         protected SQLiteGenerator Generator;
@@ -303,7 +324,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         [Test]
         public void Issue804()
         {
-            var context = new MigrationContext(null, null, null, (IServiceProvider)null);
+            var serviceProvider = new ServiceCollection().BuildServiceProvider();
+            var context = new MigrationContext(null, null, null, serviceProvider);
 
             var expression = new CreateTableExpression()
             {

@@ -1,4 +1,22 @@
-﻿using System;
+﻿#region License
+//
+// Copyright (c) 2018, Fluent Migrator Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+#endregion
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,15 +29,15 @@ namespace FluentMigrator.Runner.Generators.Firebird
 {
     public class FirebirdTruncator
     {
-        private readonly bool enabled;
-        private readonly bool packKeyNames;
+        private readonly bool _enabled;
+        private readonly bool _packKeyNames;
 
         public FirebirdTruncator(bool enabled, bool packKeyNames)
         {
-            this.enabled = enabled;
-            this.packKeyNames = packKeyNames;
+            _enabled = enabled;
+            _packKeyNames = packKeyNames;
         }
-        
+
         public void Truncate(CreateSchemaExpression expression) { }
         public void Truncate(AlterSchemaExpression expression) { }
         public void Truncate(DeleteSchemaExpression expression) { }
@@ -51,7 +69,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
             column.Name = Truncate(column.Name);
             column.TableName = Truncate(column.TableName);
             if (column.IsPrimaryKey)
-                column.PrimaryKeyName = packKeyNames ? Pack(column.PrimaryKeyName) : Truncate(column.PrimaryKeyName);
+                column.PrimaryKeyName = _packKeyNames ? Pack(column.PrimaryKeyName) : Truncate(column.PrimaryKeyName);
         }
 
         public void Truncate(CreateColumnExpression expression)
@@ -82,7 +100,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
         public void Truncate(IndexDefinition index)
         {
             index.TableName = Truncate(index.TableName);
-            index.Name = packKeyNames ? Pack(index.Name) : Truncate(index.Name);
+            index.Name = _packKeyNames ? Pack(index.Name) : Truncate(index.Name);
             index.Columns.ToList().ForEach(x => x.Name = Truncate(x.Name));
         }
 
@@ -100,7 +118,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
         public void Truncate(ConstraintDefinition constraint)
         {
             constraint.TableName = Truncate(constraint.TableName);
-            constraint.ConstraintName = packKeyNames ? Pack(constraint.ConstraintName) : Truncate(constraint.ConstraintName);
+            constraint.ConstraintName = _packKeyNames ? Pack(constraint.ConstraintName) : Truncate(constraint.ConstraintName);
             constraint.Columns = TruncateNames(constraint.Columns);
         }
 
@@ -116,7 +134,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
 
         public void Truncate(ForeignKeyDefinition foreignKey)
         {
-            foreignKey.Name = packKeyNames ? Pack(foreignKey.Name) : Truncate(foreignKey.Name);
+            foreignKey.Name = _packKeyNames ? Pack(foreignKey.Name) : Truncate(foreignKey.Name);
             foreignKey.PrimaryTable = Truncate(foreignKey.PrimaryTable);
             foreignKey.PrimaryColumns = TruncateNames(foreignKey.PrimaryColumns);
             foreignKey.ForeignTable = Truncate(foreignKey.ForeignTable);
@@ -148,7 +166,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
         {
             sequence.Name = Truncate(sequence.Name);
         }
-        
+
         public void Truncate(CreateSequenceExpression expression)
         {
             Truncate(expression.Sequence);
@@ -215,8 +233,6 @@ namespace FluentMigrator.Runner.Generators.Firebird
             }
         }
 
-
-        #region Helpers
         public ICollection<string> TruncateNames(ICollection<string> names)
         {
             List<string> ret = new List<string>();
@@ -241,7 +257,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
             {
                 if (name.Length > FirebirdOptions.MaxNameLength)
                 {
-                    if (!enabled)
+                    if (!_enabled)
                         throw new ArgumentException(String.Format("Name too long: {0}", name));
 
                     return name.Substring(0, Math.Min(FirebirdOptions.MaxNameLength, name.Length));
@@ -256,13 +272,13 @@ namespace FluentMigrator.Runner.Generators.Firebird
             {
                 if (name.Length > FirebirdOptions.MaxNameLength)
                 {
-                    if (!enabled)
+                    if (!_enabled)
                         throw new ArgumentException(String.Format("Name too long: {0}", name));
 
-                    byte[] byteHash = MD5.Create().ComputeHash(System.Text.Encoding.ASCII.GetBytes(name));
+                    byte[] byteHash = MD5.Create().ComputeHash(Encoding.ASCII.GetBytes(name));
                     string hash = Convert.ToBase64String(byteHash);
                     StringBuilder sb = new StringBuilder(hash.Length);
-                    int hLength = hash.Length; 
+                    int hLength = hash.Length;
                     for (int i = 0; i < hLength; i++)
                     {
                         char c = hash[i];
@@ -274,8 +290,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
                 }
             }
             return name;
-            
+
         }
-        #endregion
     }
 }

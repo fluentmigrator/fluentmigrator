@@ -12,6 +12,7 @@ namespace FluentMigrator.Runner.Generators.Base
 
         public TypeMapBase()
         {
+            // ReSharper disable once VirtualMemberCallInConstructor
             SetupTypeMaps();
         }
 

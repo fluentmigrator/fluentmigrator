@@ -35,7 +35,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Moq;
 
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 
 namespace FluentMigrator.Tests.Unit
@@ -247,11 +248,7 @@ namespace FluentMigrator.Tests.Unit
             SortedList<long, IMigrationInfo> migrationList = loader.LoadMigrations();
 
             //if this works, there will be at least one migration class because i've included on in this code file
-            var en = migrationList.GetEnumerator();
-            int count = 0;
-            while (en.MoveNext())
-                count++;
-
+            int count = migrationList.Count();
             count.ShouldBeGreaterThan(0);
         }
 
@@ -467,7 +464,7 @@ namespace FluentMigrator.Tests.Unit
                 get { throw new NotImplementedException(); }
             }
 
-            public string ConnectionString { get; private set; }
+            public string ConnectionString { get; } = null;
 
             public void GetUpExpressions(IMigrationContext context)
             {

@@ -2,7 +2,8 @@ using FluentMigrator.Exceptions;
 using FluentMigrator.Runner.Generators.SqlAnywhere;
 
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
 {
@@ -22,16 +23,16 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         public override void CanAlterSchema()
         {
             var expression = GeneratorTestHelper.GetAlterSchemaExpression();
-            var currentCompatabilityMode = Generator.compatabilityMode;
+            var currentCompatabilityMode = Generator.CompatabilityMode;
 
             try
             {
-                Generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
+                Generator.CompatabilityMode = Runner.CompatabilityMode.STRICT;
                 Shouldly.Should.Throw<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
             }
             finally
             {
-                Generator.compatabilityMode = currentCompatabilityMode;
+                Generator.CompatabilityMode = currentCompatabilityMode;
             }
         }
 

@@ -1,12 +1,12 @@
 #region License
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,7 +25,7 @@ namespace FluentMigrator.Tests.Helpers
 {
     public class JetTestTable : IDisposable
     {
-        private readonly JetQuoter quoter = new JetQuoter();
+        private readonly JetQuoter _quoter = new JetQuoter();
         public OleDbConnection Connection { get; private set; }
         public string Name { get; set; }
         public OleDbTransaction Transaction { get; private set; }
@@ -38,7 +38,7 @@ namespace FluentMigrator.Tests.Helpers
 
         public JetTestTable(string tableName, JetProcessor processor, params string[] columnDefinitions)
         {
-            Name = quoter.QuoteTableName(tableName, null);
+            Name = _quoter.QuoteTableName(tableName, null);
             Init(processor, columnDefinitions);
         }
 

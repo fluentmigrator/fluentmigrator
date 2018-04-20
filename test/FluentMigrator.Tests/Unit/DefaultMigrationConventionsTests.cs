@@ -29,7 +29,8 @@ using FluentMigrator.Runner.Processors.SqlServer;
 using Microsoft.Extensions.DependencyInjection;
 
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Unit
 {

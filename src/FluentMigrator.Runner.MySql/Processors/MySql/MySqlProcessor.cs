@@ -171,7 +171,7 @@ namespace FluentMigrator.Runner.Processors.MySql
                 expression.Operation(Connection, null);
         }
 
-        public override void Process(Expressions.RenameColumnExpression expression)
+        public override void Process(RenameColumnExpression expression)
         {
             string columnDefinitionSql = string.Format(@"
 SELECT CONCAT(

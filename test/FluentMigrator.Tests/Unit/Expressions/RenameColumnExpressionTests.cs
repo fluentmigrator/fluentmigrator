@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -22,7 +22,8 @@ using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner;
 using FluentMigrator.Tests.Helpers;
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Expressions
 {
@@ -89,7 +90,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         public void ReverseSetsTableNameOldNameAndNewNameOnGeneratedExpression()
         {
             var expression = new RenameColumnExpression { TableName = "Bacon", OldName = "BaconId", NewName = "ChunkyBaconId" };
-            var reverse = expression.Reverse() as RenameColumnExpression;
+            var reverse = (RenameColumnExpression)expression.Reverse();
 
             reverse.TableName.ShouldBe("Bacon");
             reverse.OldName.ShouldBe("ChunkyBaconId");

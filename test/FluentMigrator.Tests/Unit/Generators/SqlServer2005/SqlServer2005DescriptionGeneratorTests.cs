@@ -1,7 +1,8 @@
 ﻿using System.Linq;
 using FluentMigrator.Runner.Generators.SqlServer;
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 {
@@ -11,14 +12,14 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         [SetUp]
         public void Setup()
         {
-            descriptionGenerator = new SqlServer2005DescriptionGenerator();
+            DescriptionGenerator = new SqlServer2005DescriptionGenerator();
         }
 
         [Test]
         public override void GenerateDescriptionStatementsForCreateTableReturnTableDescriptionStatement()
         {
             var createTableExpression = GeneratorTestHelper.GetCreateTableWithTableDescription();
-            var statements = descriptionGenerator.GenerateDescriptionStatements(createTableExpression);
+            var statements = DescriptionGenerator.GenerateDescriptionStatements(createTableExpression);
 
             var result = statements.First();
             result.ShouldBe("EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'TestDescription', @level0type=N'SCHEMA', @level0name='dbo', @level1type=N'TABLE', @level1name='TestTable1'");
@@ -28,7 +29,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         public override void GenerateDescriptionStatementsForCreateTableReturnTableDescriptionAndColumnDescriptionsStatements()
         {
             var createTableExpression = GeneratorTestHelper.GetCreateTableWithTableDescriptionAndColumnDescriptions();
-            var statements = descriptionGenerator.GenerateDescriptionStatements(createTableExpression).ToArray();
+            var statements = DescriptionGenerator.GenerateDescriptionStatements(createTableExpression).ToArray();
 
             var result = string.Join(";", statements);
             result.ShouldBe("EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'TestDescription', @level0type=N'SCHEMA', @level0name='dbo', @level1type=N'TABLE', @level1name='TestTable1';EXEC sys.sp_addextendedproperty @name = N'MS_Description', @value = N'TestColumn1Description', @level0type = N'SCHEMA', @level0name = 'dbo', @level1type = N'Table', @level1name = 'TestTable1', @level2type = N'Column',  @level2name = 'TestColumn1';EXEC sys.sp_addextendedproperty @name = N'MS_Description', @value = N'TestColumn2Description', @level0type = N'SCHEMA', @level0name = 'dbo', @level1type = N'Table', @level1name = 'TestTable1', @level2type = N'Column',  @level2name = 'TestColumn2'");
@@ -38,7 +39,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         public override void GenerateDescriptionStatementForAlterTableReturnTableDescriptionStatement()
         {
             var alterTableExpression = GeneratorTestHelper.GetAlterTableWithDescriptionExpression();
-            var statement = descriptionGenerator.GenerateDescriptionStatement(alterTableExpression);
+            var statement = DescriptionGenerator.GenerateDescriptionStatement(alterTableExpression);
 
             statement.ShouldBe("IF EXISTS ( SELECT * FROM fn_listextendedproperty(N'MS_Description', N'SCHEMA', N'dbo', N'TABLE', N'TestTable1', NULL, NULL)) EXEC sys.sp_dropextendedproperty @name=N'MS_Description', @level0type=N'SCHEMA', @level0name='dbo', @level1type=N'TABLE', @level1name='TestTable1';EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'TestDescription', @level0type=N'SCHEMA', @level0name='dbo', @level1type=N'TABLE', @level1name='TestTable1'");
         }
@@ -47,7 +48,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         public override void GenerateDescriptionStatementForCreateColumnReturnColumnDescriptionStatement()
         {
             var createColumnExpression = GeneratorTestHelper.GetCreateColumnExpressionWithDescription();
-            var statement = descriptionGenerator.GenerateDescriptionStatement(createColumnExpression);
+            var statement = DescriptionGenerator.GenerateDescriptionStatement(createColumnExpression);
 
             statement.ShouldBe("EXEC sys.sp_addextendedproperty @name = N'MS_Description', @value = N'TestColumn1Description', @level0type = N'SCHEMA', @level0name = 'dbo', @level1type = N'Table', @level1name = 'TestTable1', @level2type = N'Column',  @level2name = 'TestColumn1'");
         }
@@ -56,7 +57,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         public override void GenerateDescriptionStatementForAlterColumnReturnColumnDescriptionStatement()
         {
             var alterColumnExpression = GeneratorTestHelper.GetAlterColumnExpressionWithDescription();
-            var statement = descriptionGenerator.GenerateDescriptionStatement(alterColumnExpression);
+            var statement = DescriptionGenerator.GenerateDescriptionStatement(alterColumnExpression);
 
             statement.ShouldBe("IF EXISTS (SELECT * FROM fn_listextendedproperty(N'MS_Description', N'SCHEMA', N'dbo', N'TABLE', N'TestTable1', N'Column', N'TestColumn1' )) EXEC sys.sp_dropextendedproperty @name=N'MS_Description', @level0type = N'SCHEMA', @level0name = 'dbo', @level1type = N'Table', @level1name = 'TestTable1', @level2type = N'Column',  @level2name = 'TestColumn1';EXEC sys.sp_addextendedproperty @name = N'MS_Description', @value = N'TestColumn1Description', @level0type = N'SCHEMA', @level0name = 'dbo', @level1type = N'Table', @level1name = 'TestTable1', @level2type = N'Column',  @level2name = 'TestColumn1'");
         }

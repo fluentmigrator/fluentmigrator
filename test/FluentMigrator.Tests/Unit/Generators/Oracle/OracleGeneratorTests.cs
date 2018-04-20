@@ -2,7 +2,8 @@
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators.Oracle;
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Generators.Oracle
 {
@@ -50,7 +51,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         [Test]
         public void CanAlterSchemaInStrictMode()
         {
-            Generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
+            Generator.CompatabilityMode = Runner.CompatabilityMode.STRICT;
 
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(new CreateSchemaExpression()));
         }
@@ -58,7 +59,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         [Test]
         public void CanCreateSchemaInStrictMode()
         {
-            Generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
+            Generator.CompatabilityMode = Runner.CompatabilityMode.STRICT;
 
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(new CreateSchemaExpression()));
         }
@@ -66,7 +67,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         [Test]
         public void CanDropSchemaInStrictMode()
         {
-            Generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
+            Generator.CompatabilityMode = Runner.CompatabilityMode.STRICT;
 
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(new DeleteSchemaExpression()));
         }

@@ -19,7 +19,8 @@ using System;
 using FluentMigrator.Runner.Generators.SqlServer;
 
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Generators.SqlServer2012
 {

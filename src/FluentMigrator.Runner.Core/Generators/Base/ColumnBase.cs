@@ -190,15 +190,17 @@ namespace FluentMigrator.Runner.Generators.Base
             //if more than one column is a primary key or the primary key is given a name, then it needs to be added separately
 
             //CAUTION: this must execute before we set the values of primarykey to false; Beware of yield return
-            IEnumerable<ColumnDefinition> primaryKeyColumns = columns.Where(x => x.IsPrimaryKey);
+            var colDefs = columns.ToList();
+            IEnumerable<ColumnDefinition> primaryKeyColumns = colDefs.Where(x => x.IsPrimaryKey);
 
-            if (ShouldPrimaryKeysBeAddedSeparately(primaryKeyColumns))
+            var pkColDefs = primaryKeyColumns.ToList();
+            if (ShouldPrimaryKeysBeAddedSeparately(pkColDefs))
             {
-                primaryKeyString = AddPrimaryKeyConstraint(tableName, primaryKeyColumns);
-                foreach (ColumnDefinition column in columns) { column.IsPrimaryKey = false; }
+                primaryKeyString = AddPrimaryKeyConstraint(tableName, pkColDefs);
+                foreach (ColumnDefinition column in colDefs) { column.IsPrimaryKey = false; }
             }
 
-            return string.Join(", ", columns.Select(x => Generate(x)).ToArray()) + primaryKeyString;
+            return string.Join(", ", colDefs.Select(x => Generate(x)).ToArray()) + primaryKeyString;
         }
 
         public virtual bool ShouldPrimaryKeysBeAddedSeparately(IEnumerable<ColumnDefinition> primaryKeyColumns)
@@ -209,9 +211,10 @@ namespace FluentMigrator.Runner.Generators.Base
 
         public virtual string AddPrimaryKeyConstraint(string tableName, IEnumerable<ColumnDefinition> primaryKeyColumns)
         {
-            string keyColumns = String.Join(", ", primaryKeyColumns.Select(x => Quoter.QuoteColumnName(x.Name)).ToArray());
+            var pkColDefs = primaryKeyColumns.ToList();
+            string keyColumns = String.Join(", ", pkColDefs.Select(x => Quoter.QuoteColumnName(x.Name)).ToArray());
 
-            return String.Format(", {0}PRIMARY KEY ({1})", GetPrimaryKeyConstraintName(primaryKeyColumns, tableName), keyColumns);
+            return String.Format(", {0}PRIMARY KEY ({1})", GetPrimaryKeyConstraintName(pkColDefs, tableName), keyColumns);
         }
 
         /// <summary>

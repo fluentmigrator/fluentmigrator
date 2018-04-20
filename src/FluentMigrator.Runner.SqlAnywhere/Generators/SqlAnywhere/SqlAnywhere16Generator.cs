@@ -212,7 +212,7 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
 
         public override string Generate(AlterSchemaExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("AlterSchema is not supported in SqlAnywhere");
+            return CompatabilityMode.HandleCompatabilty("AlterSchema is not supported in SqlAnywhere");
         }
 
         public override string Generate(CreateSchemaExpression expression)
@@ -227,12 +227,12 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
 
         public override string Generate(CreateSequenceExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("Sequences are not supported in SqlAnywhere");
+            return CompatabilityMode.HandleCompatabilty("Sequences are not supported in SqlAnywhere");
         }
 
         public override string Generate(DeleteSequenceExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("Sequences are not supported in SqlAnywhere");
+            return CompatabilityMode.HandleCompatabilty("Sequences are not supported in SqlAnywhere");
         }
 
         public override string Generate(DeleteDefaultConstraintExpression expression)

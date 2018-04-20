@@ -23,7 +23,8 @@ using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Redshift;
 
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Generators.Redshift
 {

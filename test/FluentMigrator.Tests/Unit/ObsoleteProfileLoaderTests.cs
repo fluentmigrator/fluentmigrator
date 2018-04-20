@@ -26,7 +26,8 @@ using FluentMigrator.Runner.Initialization;
 using Moq;
 
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Unit
 {
@@ -37,15 +38,15 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void BlankProfileDoesntLoadProfiles()
         {
-            var _runnerContextMock = new Mock<IRunnerContext>();
-            var _runnerMock = new Mock<IMigrationRunner>();
-            var _conventionsMock = new Mock<IMigrationRunnerConventions>();
+            var runnerContextMock = new Mock<IRunnerContext>();
+            var runnerMock = new Mock<IMigrationRunner>();
+            var conventionsMock = new Mock<IMigrationRunnerConventions>();
 
-            _runnerContextMock.Setup(x => x.Profile).Returns(string.Empty);
+            runnerContextMock.Setup(x => x.Profile).Returns(string.Empty);
             //_runnerContextMock.VerifyGet(x => x.Profile).Returns(string.Empty);
-            _runnerMock.SetupGet(x => x.MigrationAssemblies).Returns(new SingleAssembly(typeof(MigrationRunnerTests).Assembly));
+            runnerMock.SetupGet(x => x.MigrationAssemblies).Returns(new SingleAssembly(typeof(MigrationRunnerTests).Assembly));
 
-            var profileLoader = new ProfileLoader(_runnerContextMock.Object, _runnerMock.Object, _conventionsMock.Object);
+            var profileLoader = new ProfileLoader(runnerContextMock.Object, runnerMock.Object, conventionsMock.Object);
 
             profileLoader.ApplyProfiles();
 

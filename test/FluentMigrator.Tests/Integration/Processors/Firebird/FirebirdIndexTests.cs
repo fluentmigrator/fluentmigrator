@@ -6,7 +6,8 @@ using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Tests.Helpers;
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Integration.Processors.Firebird
 {
@@ -54,7 +55,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [Test]
         public override void CallingIndexExistsCanAcceptIndexNameWithSingleQuote()
         {
-            using (var table = new FirebirdTestTable(Processor, null, "id int"))
+            using (var table = new FirebirdTestTable(Processor, "id int"))
             {
                 Processor.CheckTable(table.Name);
                 Processor.LockTable(table.Name);
@@ -76,7 +77,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [Test]
         public override void CallingIndexExistsCanAcceptTableNameWithSingleQuote()
         {
-            using (var table = new FirebirdTestTable("\"Test'Table\"", Processor, null, "id int"))
+            using (var table = new FirebirdTestTable("\"Test'Table\"", Processor, "id int"))
             {
                 Processor.CheckTable(table.Name);
                 Processor.LockTable(table.Name);
@@ -98,14 +99,14 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [Test]
         public override void CallingIndexExistsReturnsFalseIfIndexDoesNotExist()
         {
-            using (var table = new FirebirdTestTable(Processor, null, "id int"))
+            using (var table = new FirebirdTestTable(Processor, "id int"))
                 Processor.IndexExists(null, table.Name, "DoesNotExist").ShouldBeFalse();
         }
 
         [Test]
         public override void CallingIndexExistsReturnsFalseIfIndexDoesNotExistWithSchema()
         {
-            using (var table = new FirebirdTestTable(Processor, "TestSchema", "id int"))
+            using (var table = new FirebirdTestTable(Processor, "id int"))
                 Processor.IndexExists("TestSchema", table.Name, "DoesNotExist").ShouldBeFalse();
         }
 
@@ -124,7 +125,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [Test]
         public override void CallingIndexExistsReturnsTrueIfIndexExists()
         {
-            using (var table = new FirebirdTestTable(Processor, null, "id int"))
+            using (var table = new FirebirdTestTable(Processor, "id int"))
             {
                 Processor.CheckTable(table.Name);
                 Processor.LockTable(table.Name);
@@ -146,7 +147,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [Test]
         public override void CallingIndexExistsReturnsTrueIfIndexExistsWithSchema()
         {
-            using (var table = new FirebirdTestTable(Processor, "TestSchema", "id int"))
+            using (var table = new FirebirdTestTable(Processor, "id int"))
             {
                 Processor.CheckTable(table.Name);
                 Processor.LockTable(table.Name);

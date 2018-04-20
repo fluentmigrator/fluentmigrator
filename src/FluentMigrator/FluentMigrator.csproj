@@ -15,7 +15,6 @@
     <ProjectReference Include="..\FluentMigrator.Abstractions\FluentMigrator.Abstractions.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="JetBrains.Annotations" Version="11.1.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
   </ItemGroup>
   <ItemGroup>

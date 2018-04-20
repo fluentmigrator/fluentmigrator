@@ -1,17 +1,15 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+using FluentMigrator.Model;
+using FluentMigrator.Runner.Generators.Generic;
+
 namespace FluentMigrator.Runner.Generators.DB2
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-
-    using FluentMigrator.Model;
-    using FluentMigrator.Runner.Generators.Generic;
-
     public class Db2Generator : GenericGenerator
     {
-        #region Constructors
-
         public Db2Generator()
             : this(new Db2Quoter())
         {
@@ -21,10 +19,6 @@ namespace FluentMigrator.Runner.Generators.DB2
             : base(new Db2Column(quoter), quoter, new EmptyDescriptionGenerator())
         {
         }
-
-        #endregion Constructors
-
-        #region Methods
 
         public override string Generate(Expressions.AlterDefaultConstraintExpression expression)
         {
@@ -62,7 +56,7 @@ namespace FluentMigrator.Runner.Generators.DB2
             builder.AppendFormat("ALTER TABLE {0}", Quoter.QuoteTableName(expression.TableName, expression.SchemaName));
             foreach (var column in expression.ColumnNames)
             {
-                builder.AppendFormat(" DROP COLUMN {0}", this.Quoter.QuoteColumnName(column));
+                builder.AppendFormat(" DROP COLUMN {0}", Quoter.QuoteColumnName(column));
             }
 
             return builder.ToString();
@@ -118,7 +112,7 @@ namespace FluentMigrator.Runner.Generators.DB2
 
             var constraintType = expression.Constraint.IsPrimaryKeyConstraint ? "PRIMARY KEY" : "UNIQUE";
             var quotedNames = expression.Constraint.Columns.Select(q => Quoter.QuoteColumnName(q));
-            var columnList = string.Join(", ", quotedNames.ToArray<string>());
+            var columnList = string.Join(", ", quotedNames.ToArray());
 
             return string.Format(
                 "ALTER TABLE {0} ADD CONSTRAINT {1} {2} ({3})",
@@ -220,7 +214,7 @@ namespace FluentMigrator.Runner.Generators.DB2
 
         public override string Generate(Expressions.RenameColumnExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("This feature not directly supported by most versions of DB2.");
+            return CompatabilityMode.HandleCompatabilty("This feature not directly supported by most versions of DB2.");
         }
 
         public override string Generate(Expressions.InsertDataExpression expression)
@@ -291,15 +285,12 @@ namespace FluentMigrator.Runner.Generators.DB2
             }
             catch (NotSupportedException e)
             {
-                return compatabilityMode.HandleCompatabilty(e.Message);
+                return CompatabilityMode.HandleCompatabilty(e.Message);
             }
         }
-
         public override string Generate(Expressions.AlterSchemaExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("This feature not directly supported by most versions of DB2.");
+            return CompatabilityMode.HandleCompatabilty("This feature not directly supported by most versions of DB2.");
         }
-
-        #endregion Methods
     }
 }

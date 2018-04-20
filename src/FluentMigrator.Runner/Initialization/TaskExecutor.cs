@@ -72,7 +72,8 @@ namespace FluentMigrator.Runner.Initialization
             [NotNull] IRunnerContext runnerContext,
             [CanBeNull] IConnectionStringProvider connectionStringProvider,
             [NotNull] AssemblyLoaderFactory assemblyLoaderFactory,
-            MigrationProcessorFactoryProvider _)
+            // ReSharper disable once UnusedParameter.Local
+            MigrationProcessorFactoryProvider factoryProvider)
             : this(
                 runnerContext,
                 assemblyLoaderFactory,

@@ -27,7 +27,6 @@ using FluentMigrator.Runner;
 using FluentMigrator.Runner.Exceptions;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
-using FluentMigrator.Runner.VersionTableInfo;
 using FluentMigrator.Tests.Integration.Migrations;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -35,7 +34,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Moq;
 
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Unit
 {
@@ -79,7 +79,7 @@ namespace FluentMigrator.Tests.Unit
             _runnerContextMock.SetupGet(x => x.Namespace).Returns("FluentMigrator.Tests.Integration.Migrations");
             _runnerContextMock.SetupGet(x => x.Announcer).Returns(_announcer.Object);
             _runnerContextMock.SetupGet(x => x.StopWatch).Returns(_stopWatch.Object);
-            _runnerContextMock.SetupGet(x => x.Targets).Returns(new string[] { Assembly.GetExecutingAssembly().ToString()});
+            _runnerContextMock.SetupGet(x => x.Targets).Returns(new[] { Assembly.GetExecutingAssembly().ToString()});
             _runnerContextMock.SetupGet(x => x.Connection).Returns(IntegrationTestOptions.SqlServer2008.ConnectionString);
             _runnerContextMock.SetupGet(x => x.Database).Returns("sqlserver");
             _runnerContextMock.SetupGet(x => x.ApplicationContext).Returns(_applicationContext);
@@ -356,7 +356,7 @@ namespace FluentMigrator.Tests.Unit
             long fakeMigrationVersion = 2009010101;
             long fakeMigrationVersion2 = 2009010102;
 
-            var versionInfoTableName = _runner.VersionLoader.VersionTableMetaData.TableName;
+            Assert.NotNull(_runner.VersionLoader.VersionTableMetaData.TableName);
 
             LoadVersionData(fakeMigrationVersion, fakeMigrationVersion2);
 
@@ -374,7 +374,7 @@ namespace FluentMigrator.Tests.Unit
 
             LoadVersionData(fakeMigrationVersion);
 
-            var versionInfoTableName = _runner.VersionLoader.VersionTableMetaData.TableName;
+            Assert.NotNull(_runner.VersionLoader.VersionTableMetaData.TableName);
 
             _runner.Rollback(1);
 
@@ -384,7 +384,7 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void RollbackToVersionZeroShouldDeleteVersionInfoTable()
         {
-            var versionInfoTableName = _runner.VersionLoader.VersionTableMetaData.TableName;
+            Assert.NotNull(_runner.VersionLoader.VersionTableMetaData.TableName);
 
             _runner.RollbackToVersion(0);
 
@@ -556,9 +556,10 @@ namespace FluentMigrator.Tests.Unit
 
             var exception = Assert.Throws<VersionOrderInvalidException>(() => _runner.ValidateVersionOrder());
 
-            exception.InvalidMigrations.Count().ShouldBe(2);
-            exception.InvalidMigrations.Any(p => p.Key == version2);
-            exception.InvalidMigrations.Any(p => p.Key == version3);
+            var invalidMigrations = exception.InvalidMigrations.ToList();
+            invalidMigrations.Count().ShouldBe(2);
+            invalidMigrations.Select(x => x.Key).ShouldContain(version2);
+            invalidMigrations.Select(x => x.Key).ShouldContain(version3);
 
             _fakeVersionLoader.DidRemoveVersionTableGetCalled.ShouldBeFalse();
         }

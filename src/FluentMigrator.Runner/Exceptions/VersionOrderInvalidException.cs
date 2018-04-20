@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using FluentMigrator.Infrastructure;
 
@@ -25,13 +26,19 @@ namespace FluentMigrator.Runner.Exceptions
 {
     public class VersionOrderInvalidException : RunnerException
     {
-        public IEnumerable<KeyValuePair<long, IMigrationInfo>> InvalidMigrations { get; set; }
+        private IReadOnlyCollection<KeyValuePair<long, IMigrationInfo>> _invalidMigrations;
 
-        public IEnumerable<long> InvalidVersions { get; private set; }
+        public IEnumerable<KeyValuePair<long, IMigrationInfo>> InvalidMigrations
+        {
+            get => _invalidMigrations;
+            set => _invalidMigrations = value.ToList();
+        }
+
+        public IEnumerable<long> InvalidVersions => _invalidMigrations.Select(x => x.Key);
 
         public VersionOrderInvalidException(IEnumerable<KeyValuePair<long, IMigrationInfo>> invalidMigrations)
         {
-            InvalidMigrations = invalidMigrations;
+            _invalidMigrations = invalidMigrations.ToList();
         }
 
         public override string Message

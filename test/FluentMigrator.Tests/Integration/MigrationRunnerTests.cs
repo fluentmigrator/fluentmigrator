@@ -48,7 +48,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Moq;
 
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Integration
 {
@@ -1115,8 +1116,6 @@ namespace FluentMigrator.Tests.Integration
             // Using SqlServer instead of SqlLite as versions not deleted from VersionInfo table when using Sqlite.
             var excludedProcessors = new[] { typeof(MySqlProcessor), typeof(SQLiteProcessor) };
 
-            var assembly = typeof(Migrations.Interleaved.Pass3.User).Assembly;
-
             var runnerContext1 = new RunnerContext(new TextWriterAnnouncer(TestContext.Out)) { Namespace = typeof(Migrations.Interleaved.Pass2.User).Namespace };
             var runnerContext2 = new RunnerContext(new TextWriterAnnouncer(TestContext.Out)) { Namespace = typeof(Migrations.Interleaved.Pass3.User).Namespace };
 
@@ -1165,7 +1164,6 @@ namespace FluentMigrator.Tests.Integration
             }
 
             caughtException.ShouldNotBeNull();
-
 
             caughtException.InvalidMigrations.Count().ShouldBe(1);
             var keyValuePair = caughtException.InvalidMigrations.First();

@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
+
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Base;
 
@@ -58,11 +60,12 @@ namespace FluentMigrator.Runner.Generators.Postgres
 
         public override string AddPrimaryKeyConstraint(string tableName, IEnumerable<ColumnDefinition> primaryKeyColumns)
         {
-            string pkName = GetPrimaryKeyConstraintName(primaryKeyColumns, tableName);
+            var columnDefinitions = primaryKeyColumns.ToList();
+            string pkName = GetPrimaryKeyConstraintName(columnDefinitions, tableName);
 
             string cols = string.Empty;
             bool first = true;
-            foreach (var col in primaryKeyColumns)
+            foreach (var col in columnDefinitions)
             {
                 if (first)
                     first = false;

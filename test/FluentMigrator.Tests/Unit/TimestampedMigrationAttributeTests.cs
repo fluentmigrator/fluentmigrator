@@ -32,7 +32,7 @@ namespace FluentMigrator.Tests.Unit
             Action action = () => new TimestampedMigrationAttribute(Year, Month, DayOfMonth, Hour, Minute);
 
             // Act and Assert
-            Assert.That((TestDelegate)action.Invoke, Throws.Nothing);
+            Assert.That(action.Invoke, Throws.Nothing);
         }
 
         [Test]
@@ -42,7 +42,7 @@ namespace FluentMigrator.Tests.Unit
             Action action = () => new TimestampedMigrationAttribute(Year, Month, DayOfMonth, Hour, Minute, Description);
 
             // Act and Assert
-            Assert.That((TestDelegate)action.Invoke, Throws.Nothing);
+            Assert.That(action.Invoke, Throws.Nothing);
         }
 
         [Test]
@@ -134,6 +134,7 @@ namespace FluentMigrator.Tests.Unit
         }
 
         [Test]
+        [Culture("en-us")]
         public void TryingToCreateWithInvalidDayOfMonthResultsInArgumentOutOfRangeException()
         {
             // Arrange
@@ -145,6 +146,7 @@ namespace FluentMigrator.Tests.Unit
         }
 
         [Test]
+        [Culture("en-us")]
         public void TryingToCreateWithInvalidHourResultsInArgumentOutOfRangeException()
         {
             // Arrange
@@ -156,6 +158,7 @@ namespace FluentMigrator.Tests.Unit
         }
 
         [Test]
+        [Culture("en-us")]
         public void TryingToCreateWithInvalidMinuteResultsInArgumentOutOfRangeException()
         {
             // Arrange
@@ -167,6 +170,7 @@ namespace FluentMigrator.Tests.Unit
         }
 
         [Test]
+        [Culture("en-us")]
         public void TryingToCreateWithInvalidMonthResultsInArgumentOutOfRangeException()
         {
             // Arrange
@@ -178,6 +182,7 @@ namespace FluentMigrator.Tests.Unit
         }
 
         [Test]
+        [Culture("en-us")]
         public void TryingToCreateWithInvalidSecondResultsInArgumentOutOfRangeException()
         {
             // Arrange
@@ -189,6 +194,7 @@ namespace FluentMigrator.Tests.Unit
         }
 
         [Test]
+        [Culture("en-us")]
         public void TryingToCreateWithInvalidYearResultsInArgumentOutOfRangeException()
         {
             // Arrange

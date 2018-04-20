@@ -20,7 +20,8 @@ using System.Linq;
 using FluentMigrator.Runner.Generators.Redshift;
 
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Generators.Redshift
 {
@@ -160,7 +161,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
 
             var result = _generator.Generate(expression);
             result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" DROP COLUMN \"TestColumn1\";" +
-                            System.Environment.NewLine +
+                            Environment.NewLine +
                             "ALTER TABLE \"TestSchema\".\"TestTable1\" DROP COLUMN \"TestColumn2\";");
         }
 
@@ -171,7 +172,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
 
             var result = _generator.Generate(expression);
             result.ShouldBe("ALTER TABLE \"public\".\"TestTable1\" DROP COLUMN \"TestColumn1\";" +
-                            System.Environment.NewLine +
+                            Environment.NewLine +
                             "ALTER TABLE \"public\".\"TestTable1\" DROP COLUMN \"TestColumn2\";");
         }
 

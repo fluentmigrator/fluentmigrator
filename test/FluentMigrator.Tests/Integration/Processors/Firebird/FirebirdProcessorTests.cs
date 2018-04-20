@@ -9,7 +9,8 @@ using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Tests.Helpers;
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Integration.Processors.Firebird
 {
@@ -57,7 +58,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [Test]
         public void CanReadData()
         {
-            using (var table = new FirebirdTestTable(Processor, null, "id int"))
+            using (var table = new FirebirdTestTable(Processor, "id int"))
             {
                 Processor.CheckTable(table.Name);
                 AddTestData(table);
@@ -75,7 +76,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [Test]
         public void CanReadTableData()
         {
-            using (var table = new FirebirdTestTable(Processor, null, "id int"))
+            using (var table = new FirebirdTestTable(Processor, "id int"))
             {
                 Processor.CheckTable(table.Name);
                 AddTestData(table);
@@ -108,7 +109,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [Test]
         public void CanReadDataWithSchema()
         {
-            using (var table = new FirebirdTestTable(Processor, "TestSchema", "id int"))
+            using (var table = new FirebirdTestTable(Processor, "id int"))
             {
                 Processor.CheckTable(table.Name);
                 AddTestData(table);
@@ -126,7 +127,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [Test]
         public void CanReadTableDataWithSchema()
         {
-            using (var table = new FirebirdTestTable(Processor, "TestSchema", "id int"))
+            using (var table = new FirebirdTestTable(Processor, "id int"))
             {
                 Processor.CheckTable(table.Name);
                 AddTestData(table);
@@ -145,7 +146,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         public void CanCreateAndDropSequenceWithExistCheck()
         {
             Processor.SequenceExists("", "Sequence").ShouldBeFalse();
-            using (new FirebirdTestTable(Processor, null, "id int"))
+            using (new FirebirdTestTable(Processor, "id int"))
             {
                 Processor.Process(new CreateSequenceExpression
                 {
@@ -154,7 +155,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
 
                 Processor.SequenceExists("", "\"Sequence\"").ShouldBeTrue();
                 Processor.SequenceExists("", "Sequence").ShouldBeTrue();
-                
+
                 Processor.Process(new DeleteSequenceExpression { SequenceName = "Sequence" });
 
                 Processor.SequenceExists("", "\"Sequence\"").ShouldBeFalse();
@@ -165,7 +166,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [Test]
         public void CanAlterSequence()
         {
-            using (new FirebirdTestTable(Processor, null, "id int"))
+            using (new FirebirdTestTable(Processor, "id int"))
             {
                 Processor.Process(new CreateSequenceExpression
                 {
@@ -195,7 +196,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [Test]
         public void CanCreateTrigger()
         {
-            using (var table = new FirebirdTestTable(Processor, null, "id int"))
+            using (var table = new FirebirdTestTable(Processor, "id int"))
             {
                 Processor.Process(Processor.CreateTriggerExpression(table.Name, "TestTrigger", true, TriggerEvent.Insert, "as begin end"));
                 Processor.TriggerExists(String.Empty, table.Name, "TestTrigger").ShouldBeTrue();
@@ -205,7 +206,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [Test]
         public void CanDropTrigger()
         {
-            using (var table = new FirebirdTestTable(Processor, null, "id int"))
+            using (var table = new FirebirdTestTable(Processor, "id int"))
             {
                 Processor.Process(Processor.CreateTriggerExpression(table.Name, "TestTrigger", true, TriggerEvent.Insert, "as begin end"));
                 Processor.TriggerExists(String.Empty, table.Name, "TestTrigger").ShouldBeTrue();
@@ -218,7 +219,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [Test]
         public void IdentityCanCreateIdentityColumn()
         {
-            using (var table = new FirebirdTestTable(Processor, null, "bogus int"))
+            using (var table = new FirebirdTestTable(Processor, "bogus int"))
             {
                 Processor.Process(new CreateColumnExpression
                 {
@@ -234,7 +235,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [Test]
         public void IdentityCanDropIdentityColumn()
         {
-            using (var table = new FirebirdTestTable(Processor, null, "bogus int"))
+            using (var table = new FirebirdTestTable(Processor, "bogus int"))
             {
                 Processor.Process(new CreateColumnExpression
                 {
@@ -259,7 +260,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [Test]
         public void IdentityCanAlterColumnToIdentity()
         {
-            using (var table = new FirebirdTestTable(Processor, null, "bogus int"))
+            using (var table = new FirebirdTestTable(Processor, "bogus int"))
             {
                 Processor.Process(new CreateColumnExpression
                 {
@@ -284,7 +285,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [Test]
         public void IdentityCanAlterColumnToNotIdentity()
         {
-            using (var table = new FirebirdTestTable(Processor, null, "bogus int"))
+            using (var table = new FirebirdTestTable(Processor, "bogus int"))
             {
                 Processor.Process(new CreateColumnExpression
                 {
@@ -309,7 +310,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [Test]
         public void IdentityCanInsert()
         {
-            using (var table = new FirebirdTestTable(Processor, null, "bogus int"))
+            using (var table = new FirebirdTestTable(Processor, "bogus int"))
             {
                 Processor.Process(new CreateColumnExpression
                 {
@@ -330,14 +331,13 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                     ds.Tables[0].Rows[0]["BOGUS"].ShouldBe(0);
                     ds.Tables[0].Rows[0]["id"].ShouldBe(1);
                 }
-                
             }
         }
 
         [Test]
         public void IdentityCanInsertMultiple()
         {
-            using (var table = new FirebirdTestTable(Processor, null, "bogus int"))
+            using (var table = new FirebirdTestTable(Processor, "bogus int"))
             {
                 Processor.Process(new CreateColumnExpression
                 {

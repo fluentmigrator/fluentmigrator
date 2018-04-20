@@ -25,7 +25,8 @@ using FluentMigrator.Runner.Processors.DB2;
 using FluentMigrator.Tests.Helpers;
 
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Integration.Processors.Db2
 {
@@ -78,7 +79,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Db2
         [Test]
         public override void CallingSchemaExistsReturnsTrueIfSchemaExists()
         {
-            using (var table = new Db2TestTable(Processor, "TstSchma", "ID INT"))
+            using (new Db2TestTable(Processor, "TstSchma", "ID INT"))
             {
                 Processor.SchemaExists("TstSchma").ShouldBeTrue();
             }

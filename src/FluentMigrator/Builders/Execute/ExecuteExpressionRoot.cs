@@ -80,7 +80,7 @@ namespace FluentMigrator.Builders.Execute
         /// <inheritdoc />
         public void EmbeddedScript(string embeddedSqlScriptName)
         {
-            var embeddedResourceProvider = _context.ServiceProvider?.GetService<IEmbeddedResourceProvider>();
+            var embeddedResourceProvider = _context.ServiceProvider.GetService<IEmbeddedResourceProvider>();
             if (embeddedResourceProvider == null)
             {
 #pragma warning disable 612
@@ -99,7 +99,7 @@ namespace FluentMigrator.Builders.Execute
         /// <inheritdoc />
         public void EmbeddedScript(string embeddedSqlScriptName, IDictionary<string, string> parameters)
         {
-            var embeddedResourceProvider = _context.ServiceProvider?.GetService<IEmbeddedResourceProvider>();
+            var embeddedResourceProvider = _context.ServiceProvider.GetService<IEmbeddedResourceProvider>();
             ExecuteEmbeddedSqlScriptExpression expression;
             if (embeddedResourceProvider == null)
             {
