@@ -15,6 +15,7 @@
 #endregion
 
 using System;
+using System.Data.Common;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -23,6 +24,8 @@ namespace FluentMigrator.Runner.Processors
 {
     public abstract class MigrationProcessorFactory : IMigrationProcessorFactory
     {
+        public virtual string Name => GetType().Name.Replace("ProcessorFactory", string.Empty);
+
         [Obsolete]
         public abstract IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options);
 
@@ -36,7 +39,5 @@ namespace FluentMigrator.Runner.Processors
         {
             return provider.IndexOf(Name, System.StringComparison.OrdinalIgnoreCase) >= 0;
         }
-
-        public virtual string Name => GetType().Name.Replace("ProcessorFactory", string.Empty);
     }
 }

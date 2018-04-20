@@ -19,10 +19,15 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Data.OleDb;
 using System.Diagnostics;
 
 using FluentMigrator.Expressions;
+
+using JetBrains.Annotations;
+
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.Jet
 {
@@ -32,6 +37,8 @@ namespace FluentMigrator.Runner.Processors.Jet
         private IDbTransaction _transaction;
         public OleDbConnection Connection => (OleDbConnection) _connection;
         public OleDbTransaction Transaction => (OleDbTransaction) _transaction;
+
+        [Obsolete]
         public JetProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options)
             : base(generator, announcer, options)
         {
@@ -42,6 +49,26 @@ namespace FluentMigrator.Runner.Processors.Jet
             ConnectionString = connection.ConnectionString;
         }
 
+        public JetProcessor(
+            [CanBeNull] DbProviderFactory factory,
+            [NotNull] IMigrationGenerator generator,
+            [NotNull] IAnnouncer announcer,
+            [NotNull] IOptions<ProcessorOptions> options)
+            : base(generator, announcer, options.Value)
+        {
+            if (factory != null)
+            {
+                _connection = factory.CreateConnection();
+                Debug.Assert(_connection != null, nameof(_connection) + " != null");
+                _connection.ConnectionString = options.Value.ConnectionString;
+            }
+
+#pragma warning disable 612
+            ConnectionString = options.Value.ConnectionString;
+#pragma warning restore 612
+        }
+
+        [Obsolete]
         public override string ConnectionString { get; }
 
         public override string DatabaseType { get; } = "Jet";

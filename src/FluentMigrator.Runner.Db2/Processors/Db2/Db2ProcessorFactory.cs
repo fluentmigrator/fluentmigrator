@@ -50,6 +50,8 @@ namespace FluentMigrator.Runner.Processors.DB2
         /// <inheritdoc />
         public override IMigrationProcessor Create()
         {
+            if (_serviceProvider == null)
+                return null;
             var factory = new Db2DbFactory(_serviceProvider).Factory;
             var options = _serviceProvider.GetRequiredService<IOptions<ProcessorOptions>>();
             var announcer = _serviceProvider.GetRequiredService<IAnnouncer>();

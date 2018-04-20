@@ -41,10 +41,12 @@ namespace FluentMigrator.Example.Migrator
             var processor = processorFactory.Create(connectionString, announcer, options);
 
             // Configure the runner
+#pragma warning disable 612
             var context = new RunnerContext(announcer)
             {
                 AllowBreakingChange = true,
             };
+#pragma warning restore 612
 
             // Create the migration runner
 #pragma warning disable 612

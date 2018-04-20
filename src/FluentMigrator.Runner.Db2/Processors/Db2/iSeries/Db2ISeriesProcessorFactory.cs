@@ -20,6 +20,9 @@ using System;
 
 using FluentMigrator.Runner.Generators.DB2.iSeries;
 
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+
 namespace FluentMigrator.Runner.Processors.DB2.iSeries
 {
     public class Db2ISeriesProcessorFactory : MigrationProcessorFactory
@@ -36,11 +39,24 @@ namespace FluentMigrator.Runner.Processors.DB2.iSeries
             _serviceProvider = serviceProvider;
         }
 
+        [Obsolete]
         public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
         {
             var factory = new Db2ISeriesDbFactory(_serviceProvider);
             var connection = factory.CreateConnection(connectionString);
             return new Db2ISeriesProcessor(connection, new Db2ISeriesGenerator(), announcer, options, factory);
+        }
+
+        /// <inheritdoc />
+        public override IMigrationProcessor Create()
+        {
+            if (_serviceProvider == null)
+                return null;
+            var factory = new Db2ISeriesDbFactory(_serviceProvider).Factory;
+            var options = _serviceProvider.GetRequiredService<IOptions<ProcessorOptions>>();
+            var announcer = _serviceProvider.GetRequiredService<IAnnouncer>();
+            var generator = new Db2ISeriesGenerator();
+            return new Db2ISeriesProcessor(factory, generator, announcer, options);
         }
     }
 }

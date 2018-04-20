@@ -36,7 +36,10 @@ namespace FluentMigrator.Runner.Processors
         {
         }
 
-        protected internal DbProviderFactory Factory
+        /// <summary>
+        /// Gets the DB provider factory
+        /// </summary>
+        public virtual DbProviderFactory Factory
         {
             get
             {

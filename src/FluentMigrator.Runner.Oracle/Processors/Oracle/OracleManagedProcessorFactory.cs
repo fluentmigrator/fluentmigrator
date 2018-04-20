@@ -20,6 +20,9 @@ using System;
 
 using FluentMigrator.Runner.Generators.Oracle;
 
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+
 namespace FluentMigrator.Runner.Processors.Oracle
 {
     public class OracleManagedProcessorFactory : MigrationProcessorFactory
@@ -37,11 +40,24 @@ namespace FluentMigrator.Runner.Processors.Oracle
             _serviceProvider = serviceProvider;
         }
 
+        [Obsolete]
         public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
         {
             var factory = new OracleManagedDbFactory(_serviceProvider);
             var connection = factory.CreateConnection(connectionString);
             return new OracleProcessor(connection, new OracleGenerator(Quoted(options.ProviderSwitches)), announcer, options, factory);
+        }
+
+        /// <inheritdoc />
+        public override IMigrationProcessor Create()
+        {
+            if (_serviceProvider == null)
+                return null;
+            var factory = new OracleManagedDbFactory(_serviceProvider).Factory;
+            var options = _serviceProvider.GetRequiredService<IOptions<ProcessorOptions>>();
+            var announcer = _serviceProvider.GetRequiredService<IAnnouncer>();
+            var generator = new OracleGenerator(Quoted(options.Value.ProviderSwitches));
+            return new OracleProcessor(factory, generator, announcer, options);
         }
 
         private bool Quoted(string options)

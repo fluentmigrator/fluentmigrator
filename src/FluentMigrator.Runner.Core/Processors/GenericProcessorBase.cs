@@ -154,21 +154,31 @@ namespace FluentMigrator.Runner.Processors
 
         protected virtual IDbCommand CreateCommand(string commandText)
         {
+            return CreateCommand(commandText, Connection, Transaction);
+        }
+
+        protected virtual IDbCommand CreateCommand(string commandText, IDbConnection connection, IDbTransaction transaction)
+        {
             IDbCommand result;
             if (DbProviderFactory != null)
             {
                 result = DbProviderFactory.CreateCommand();
                 Debug.Assert(result != null, nameof(result) + " != null");
-                result.Connection = Connection;
-                if (Transaction != null)
-                    result.Transaction = Transaction;
+                result.Connection = connection;
+                if (transaction != null)
+                    result.Transaction = transaction;
                 result.CommandText = commandText;
             }
             else
             {
 #pragma warning disable 612
-                result = Factory.CreateCommand(commandText, Connection, Transaction, Options);
+                result = Factory.CreateCommand(commandText, connection, transaction, Options);
 #pragma warning restore 612
+            }
+
+            if (Options.Timeout != null)
+            {
+                result.CommandTimeout = (int) Options.Timeout.Value.TotalSeconds;
             }
 
             return result;

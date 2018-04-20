@@ -20,6 +20,9 @@ using System;
 
 using FluentMigrator.Runner.Generators.Hana;
 
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+
 namespace FluentMigrator.Runner.Processors.Hana
 {
     public class HanaProcessorFactory : MigrationProcessorFactory
@@ -36,6 +39,7 @@ namespace FluentMigrator.Runner.Processors.Hana
             _serviceProvider = serviceProvider;
         }
 
+        [Obsolete]
         public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
         {
             var factory = new HanaDbFactory(_serviceProvider);
@@ -43,6 +47,18 @@ namespace FluentMigrator.Runner.Processors.Hana
             var connection = factory.CreateConnection(connectionString);
 
             return new HanaProcessor(connection, new HanaGenerator(), announcer, options, factory);
+        }
+
+        /// <inheritdoc />
+        public override IMigrationProcessor Create()
+        {
+            if (_serviceProvider == null)
+                return null;
+            var factory = new HanaDbFactory(_serviceProvider).Factory;
+            var options = _serviceProvider.GetRequiredService<IOptions<ProcessorOptions>>();
+            var announcer = _serviceProvider.GetRequiredService<IAnnouncer>();
+            var generator = new HanaGenerator();
+            return new HanaProcessor(factory, generator, announcer, options);
         }
     }
 }

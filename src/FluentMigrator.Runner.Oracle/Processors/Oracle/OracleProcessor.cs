@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -27,33 +28,45 @@ using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Oracle;
 using FluentMigrator.Runner.Helpers;
 
+using JetBrains.Annotations;
+
+using Microsoft.Extensions.Options;
+
 
 namespace FluentMigrator.Runner.Processors.Oracle
 {
     public class OracleProcessor : GenericProcessorBase
     {
-        public override string DatabaseType
-        {
-            get { return "Oracle"; }
-        }
-
-        public override IList<string> DatabaseTypeAliases { get; } = new List<string>();
-
-        public OracleProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer,
-            IMigrationProcessorOptions options, IDbFactory factory)
+        [Obsolete]
+        public OracleProcessor(
+            IDbConnection connection,
+            IMigrationGenerator generator,
+            IAnnouncer announcer,
+            IMigrationProcessorOptions options,
+            IDbFactory factory)
             : base(connection, factory, generator, announcer, options)
         {
         }
 
-        public IQuoter Quoter
+        public OracleProcessor(
+            [NotNull] DbProviderFactory factory,
+            [NotNull] IMigrationGenerator generator,
+            [NotNull] IAnnouncer announcer,
+            [NotNull] IOptions<ProcessorOptions> options)
+            : base(factory, generator, announcer, options.Value)
         {
-            get { return ((OracleGenerator) Generator).Quoter; }
         }
+
+        public override string DatabaseType => "Oracle";
+
+        public override IList<string> DatabaseTypeAliases { get; } = new List<string>();
+
+        public IQuoter Quoter => ((OracleGenerator) Generator).Quoter;
 
         public override bool SchemaExists(string schemaName)
         {
             if (schemaName == null)
-                throw new ArgumentNullException("schemaName");
+                throw new ArgumentNullException(nameof(schemaName));
 
             if (schemaName.Length == 0)
                 return false;
@@ -64,7 +77,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
         public override bool TableExists(string schemaName, string tableName)
         {
             if (tableName == null)
-                throw new ArgumentNullException("tableName");
+                throw new ArgumentNullException(nameof(tableName));
 
             if (tableName.Length == 0)
                 return false;
@@ -80,9 +93,9 @@ namespace FluentMigrator.Runner.Processors.Oracle
         public override bool ColumnExists(string schemaName, string tableName, string columnName)
         {
             if (tableName == null)
-                throw new ArgumentNullException("tableName");
+                throw new ArgumentNullException(nameof(tableName));
             if (columnName == null)
-                throw new ArgumentNullException("columnName");
+                throw new ArgumentNullException(nameof(columnName));
 
             if (columnName.Length == 0 || tableName.Length == 0)
                 return false;
@@ -102,9 +115,9 @@ namespace FluentMigrator.Runner.Processors.Oracle
         public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
         {
             if (tableName == null)
-                throw new ArgumentNullException("tableName");
+                throw new ArgumentNullException(nameof(tableName));
             if (constraintName == null)
-                throw new ArgumentNullException("constraintName");
+                throw new ArgumentNullException(nameof(constraintName));
 
             //In Oracle DB constraint name is unique within the schema, so the table name is not used in the query
 
@@ -123,9 +136,9 @@ namespace FluentMigrator.Runner.Processors.Oracle
         public override bool IndexExists(string schemaName, string tableName, string indexName)
         {
             if (tableName == null)
-                throw new ArgumentNullException("tableName");
+                throw new ArgumentNullException(nameof(tableName));
             if (indexName == null)
-                throw new ArgumentNullException("indexName");
+                throw new ArgumentNullException(nameof(indexName));
 
             //In Oracle DB index name is unique within the schema, so the table name is not used in the query
 
@@ -159,12 +172,12 @@ namespace FluentMigrator.Runner.Processors.Oracle
         public override bool Exists(string template, params object[] args)
         {
             if (template == null)
-                throw new ArgumentNullException("template");
+                throw new ArgumentNullException(nameof(template));
 
             EnsureConnectionIsOpen();
 
-            Announcer.Sql(String.Format(template, args));
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction, Options))
+            Announcer.Sql(string.Format(template, args));
+            using (var command = CreateCommand(string.Format(template, args)))
             using (var reader = command.ExecuteReader())
             {
                 return reader.Read();
@@ -174,7 +187,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
         public override DataSet ReadTableData(string schemaName, string tableName)
         {
             if (tableName == null)
-                throw new ArgumentNullException("tableName");
+                throw new ArgumentNullException(nameof(tableName));
 
             if (String.IsNullOrEmpty(schemaName))
                 return Read("SELECT * FROM {0}", Quoter.QuoteTableName(tableName));
@@ -185,11 +198,11 @@ namespace FluentMigrator.Runner.Processors.Oracle
         public override DataSet Read(string template, params object[] args)
         {
             if (template == null)
-                throw new ArgumentNullException("template");
+                throw new ArgumentNullException(nameof(template));
 
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction, Options))
+            using (var command = CreateCommand(string.Format(template, args)))
             using (var reader = command.ExecuteReader())
             {
                 return reader.ReadDataSet();
@@ -200,8 +213,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
         {
             EnsureConnectionIsOpen();
 
-            if (expression.Operation != null)
-                expression.Operation(Connection, null);
+            expression.Operation?.Invoke(Connection, null);
         }
 
         protected override void Process(string sql)
@@ -219,7 +231,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
 
             foreach (var batch in batches)
             {
-                using (var command = Factory.CreateCommand(batch, Connection, Transaction, Options))
+                using (var command = CreateCommand(batch))
                     command.ExecuteNonQuery();
             }
         }
