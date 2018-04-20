@@ -1,8 +1,11 @@
+using System;
+
 namespace FluentMigrator
 {
     /// <summary>
     /// Options for the <see cref="IMigrationProcessor"/>
     /// </summary>
+    [Obsolete]
     public interface IMigrationProcessorOptions
     {
         /// <summary>
