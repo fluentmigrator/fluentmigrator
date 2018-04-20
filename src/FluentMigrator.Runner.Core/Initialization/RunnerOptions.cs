@@ -14,10 +14,6 @@
 // limitations under the License.
 #endregion
 
-using FluentMigrator.Runner.Conventions;
-
-using JetBrains.Annotations;
-
 namespace FluentMigrator.Runner.Initialization
 {
     /// <summary>
@@ -26,9 +22,47 @@ namespace FluentMigrator.Runner.Initialization
     public class RunnerOptions
     {
         /// <summary>
-        /// Gets or sets the convention set
+        /// Gets or sets the task to execute
         /// </summary>
-        [CanBeNull]
-        public IConventionSet ConventionSet { get; set; }
+        public string Task { get; set; }
+
+        /// <summary>
+        /// Gets or sets the target version
+        /// </summary>
+        public long Version { get; set; }
+
+        /// <summary>
+        /// Gets or sets the start version
+        /// </summary>
+        public long StartVersion { get; set; }
+
+        /// <summary>
+        /// Gets or sets the number of versions to apply
+        /// </summary>
+        public int Steps { get; set; }
+
+        /// <summary>
+        /// Gets or sets the profile migrations to apply
+        /// </summary>
+        public string Profile { get; set; }
+
+        /// <summary>
+        /// Gets or sets the tags the migrations must match
+        /// </summary>
+        /// <remarks>All migrations are matched when no tags were specified</remarks>
+        public string[] Tags { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the migration runner is allowed to apply breaking changes
+        /// </summary>
+        public bool AllowBreakingChange { get; set; }
+
+        /// <summary>
+        /// Use one transaction for the whole session
+        /// </summary>
+        /// <remarks>
+        /// The default transaction behavior is to use one transaction per migration.
+        /// </remarks>
+        public bool TransactionPerSession { get; set; }
     }
 }

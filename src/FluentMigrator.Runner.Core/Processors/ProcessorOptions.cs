@@ -1,3 +1,5 @@
+using System;
+
 using FluentMigrator.Runner.Initialization;
 
 namespace FluentMigrator.Runner.Processors
@@ -20,10 +22,13 @@ namespace FluentMigrator.Runner.Processors
         /// Initializes a new instance of the <see cref="ProcessorOptions"/> class.
         /// </summary>
         /// <param name="runnerContext">The runner context to get the values from</param>
+        [Obsolete]
         public ProcessorOptions(IRunnerContext runnerContext)
         {
             PreviewOnly = runnerContext.PreviewOnly;
-            Timeout = runnerContext.Timeout;
+            Timeout = runnerContext.Timeout == null
+                ? null
+                : (TimeSpan?) TimeSpan.FromMilliseconds(runnerContext.Timeout.Value);
             ProviderSwitches = runnerContext.ProviderSwitches;
             ConnectionString = runnerContext.Connection;
         }
@@ -41,11 +46,14 @@ namespace FluentMigrator.Runner.Processors
         /// <summary>
         /// Gets or sets the default command timeout
         /// </summary>
-        public int? Timeout { get; set; }
+        public TimeSpan? Timeout { get; set; }
 
         /// <summary>
         /// Gets or sets the provider switches
         /// </summary>
         public string ProviderSwitches  { get; set; }
+
+        /// <inheritdoc />
+        int? IMigrationProcessorOptions.Timeout => Timeout == null ? null : (int?) Timeout.Value.TotalMilliseconds;
     }
 }

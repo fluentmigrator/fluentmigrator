@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Breaking changes
 
 - [#850](https://github.com/fluentmigrator/fluentmigrator/issues/850): Set minimum .NET Framework version to 4.6.1. Older versions aren't supported anymore.
+- `ProcessorOptions.Timeout` is now of type `System.TimeSpan?`
 
 ### Added
 
@@ -21,6 +22,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - `IMigrationRunnerConventions.GetMigrationInfo`
 - `IProfileLoader.ApplyProfiles()`
 - `IProfileLoader.FindProfilesIn`
+- `IMigrationProcessorOptions`
+- `IRunnerContext` and `RunnerContext`
 
 ## 2.0.2 (2018-04-17)
 

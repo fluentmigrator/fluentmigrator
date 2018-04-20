@@ -17,7 +17,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace FluentMigrator.Runner.Infrastructure
+namespace FluentMigrator.Runner.Initialization
 {
     /// <summary>
     /// Interface for an assembly provider

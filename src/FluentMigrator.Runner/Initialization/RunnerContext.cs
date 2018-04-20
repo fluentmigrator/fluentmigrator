@@ -16,19 +16,14 @@
 //
 #endregion
 
+using System;
 using System.Collections.Generic;
-
-using FluentMigrator.Runner.Announcers;
 
 namespace FluentMigrator.Runner.Initialization
 {
+    [Obsolete]
     public class RunnerContext : IRunnerContext
     {
-        public RunnerContext()
-            : this(new NullAnnouncer())
-        {
-        }
-
         public RunnerContext(IAnnouncer announcer)
         {
             Announcer = announcer;
