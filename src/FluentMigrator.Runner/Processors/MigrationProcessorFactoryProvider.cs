@@ -22,6 +22,7 @@ using System.Reflection;
 using FluentMigrator.Runner.Extensions;
 using FluentMigrator.Runner.Infrastructure;
 using FluentMigrator.Runner.Processors.DB2;
+using FluentMigrator.Runner.Processors.DB2.iSeries;
 using FluentMigrator.Runner.Processors.DotConnectOracle;
 using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Runner.Processors.Hana;
@@ -49,6 +50,7 @@ namespace FluentMigrator.Runner.Processors
             // isn't enough. We MUST have a reference to a type, otherwise the
             // assembly reference gets removed by the C# compiler!
             Register(new Db2ProcessorFactory());
+            Register(new Db2ISeriesProcessorFactory());
             Register(new DotConnectOracleProcessorFactory());
             Register(new FirebirdProcessorFactory());
             Register(new MySql4ProcessorFactory());
