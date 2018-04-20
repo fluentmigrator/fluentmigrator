@@ -16,12 +16,30 @@
 //
 #endregion
 
+using System;
+
+using JetBrains.Annotations;
+
 namespace FluentMigrator.Runner.Processors
 {
     public interface IMigrationProcessorFactory
     {
+        [Obsolete]
         IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options);
 
+        /// <summary>
+        /// Creates a new migration processor
+        /// </summary>
+        /// <returns></returns>
+        [CanBeNull]
+        IMigrationProcessor Create();
+
+        /// <summary>
+        /// Returns a value indicating whether this processor factory can use the given DB provider
+        /// </summary>
+        /// <param name="provider">The DB provider name</param>
+        /// <returns><c>true</c> when this processor factory can use the given DB provider</returns>
+        [Obsolete]
         bool IsForProvider(string provider);
 
         string Name { get; }

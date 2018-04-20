@@ -23,26 +23,59 @@ using System.Data;
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Initialization;
 
+using JetBrains.Annotations;
+
+using Microsoft.Extensions.Options;
+
 namespace FluentMigrator.Runner.Processors
 {
     public class ConnectionlessProcessor: IMigrationProcessor
     {
-        public IMigrationGenerator Generator { get; set; }
-        public IRunnerContext Context { get; set; }
-        public IAnnouncer Announcer { get; set; }
-        public IMigrationProcessorOptions Options {get;set;}
+        [Obsolete]
+        private readonly IMigrationProcessorOptions _legacyOptions;
 
-        public ConnectionlessProcessor(IMigrationGenerator generator, IRunnerContext context, IMigrationProcessorOptions options)
+        [Obsolete]
+        public ConnectionlessProcessor(
+            IMigrationGenerator generator,
+            IRunnerContext context,
+            IMigrationProcessorOptions options)
         {
+            _legacyOptions = options;
+            DatabaseType = context.Database;
             Generator = generator;
-            Context = context;
-            Announcer = Context.Announcer;
-            Options = options;
+            Announcer = context.Announcer;
+            Options = options.GetProcessorOptions(connectionString: null);
         }
 
-        public string ConnectionString
+        public ConnectionlessProcessor(
+            [NotNull] string databaseId,
+            [NotNull] IMigrationGenerator generator,
+            [NotNull] IAnnouncer announcer,
+            [NotNull] ProcessorOptions options)
         {
-            get { return "No connection"; }
+            DatabaseType = databaseId;
+            Generator = generator;
+            Announcer = announcer;
+            Options = options;
+#pragma warning disable 612
+            _legacyOptions = options;
+#pragma warning restore 612
+        }
+
+        [Obsolete]
+        public string ConnectionString => Options.ConnectionString;
+
+        public IMigrationGenerator Generator { get; set; }
+        public IAnnouncer Announcer { get; set; }
+        public ProcessorOptions Options {get; set;}
+
+        [Obsolete]
+        IMigrationProcessorOptions IMigrationProcessor.Options => _legacyOptions;
+
+        /// <inheritdoc />
+        public void Execute(string sql)
+        {
+            Process(sql);
         }
 
         public void Execute(string template, params object[] args)
@@ -246,14 +279,13 @@ namespace FluentMigrator.Runner.Processors
         }
 
 #pragma warning disable 618
-        public string DatabaseType => Context.Database;
+        public string DatabaseType { get; }
 #pragma warning restore 618
 
         public IList<string> DatabaseTypeAliases { get; } = new List<string>();
 
         public void Dispose()
         {
-
         }
     }
 }

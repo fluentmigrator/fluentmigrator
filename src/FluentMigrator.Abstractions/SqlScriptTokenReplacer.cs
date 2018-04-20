@@ -32,10 +32,6 @@ namespace FluentMigrator
         /// <returns>The SQL script with the replaced tokens</returns>
         public static string ReplaceSqlScriptTokens(string sqlText, IDictionary<string, string> parameters)
         {
-            // since all the Processors are using String.Format() in their Execute method
-            //  we need to escape the brackets with double brackets or else it throws an incorrect format error on the String.Format call
-            sqlText = sqlText.Replace("{", "{{").Replace("}", "}}");
-
             // Are parameters set?
             if (parameters != null && parameters.Count != 0)
             {

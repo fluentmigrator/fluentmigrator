@@ -17,6 +17,7 @@
 #endregion
 
 using System;
+using System.Data.Common;
 
 namespace FluentMigrator.Runner.Processors.DB2
 {
@@ -38,5 +39,7 @@ namespace FluentMigrator.Runner.Processors.DB2
             : base(serviceProvider, _testEntries)
         {
         }
+
+        public new DbProviderFactory Factory => base.Factory;
     }
 }

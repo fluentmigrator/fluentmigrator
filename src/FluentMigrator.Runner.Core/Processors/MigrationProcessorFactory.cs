@@ -14,12 +14,24 @@
 // limitations under the License.
 #endregion
 
+using System;
+
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+
 namespace FluentMigrator.Runner.Processors
 {
     public abstract class MigrationProcessorFactory : IMigrationProcessorFactory
     {
+        [Obsolete]
         public abstract IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options);
 
+        public virtual IMigrationProcessor Create()
+        {
+            return null;
+        }
+
+        [Obsolete]
         public virtual bool IsForProvider(string provider)
         {
             return provider.IndexOf(Name, System.StringComparison.OrdinalIgnoreCase) >= 0;

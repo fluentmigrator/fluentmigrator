@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - [#850](https://github.com/fluentmigrator/fluentmigrator/issues/850): Set minimum .NET Framework version to 4.6.1. Older versions aren't supported anymore.
 - `ProcessorOptions.Timeout` is now of type `System.TimeSpan?`
+- `Factory.CreateCommand` is replaced by `Processor.CreateCommand`
 
 ### Added
 

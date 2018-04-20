@@ -24,6 +24,7 @@ using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Infrastructure;
+using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.SqlServer;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -434,7 +435,13 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void GetAutoScriptUpName()
         {
-            var processor = new SqlServerProcessor(new[] { "SqlServer2016", "SqlServer" }, null, null, null, null, null);
+            var processor = new SqlServerProcessor(
+                new[] { "SqlServer2016", "SqlServer" },
+                null,
+                null,
+                null,
+                new ProcessorOptions(),
+                null);
             var context = processor.CreateServices().BuildServiceProvider().GetRequiredService<IMigrationContext>();
             var expr = new AutoScriptMigrationFake();
             expr.GetUpExpressions(context);
@@ -455,7 +462,13 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void GetAutoScriptDownName()
         {
-            var processor = new SqlServerProcessor(new[] { "SqlServer2016", "SqlServer" }, null, null, null, null, null);
+            var processor = new SqlServerProcessor(
+                new[] { "SqlServer2016", "SqlServer" },
+                null,
+                null,
+                null,
+                new ProcessorOptions(),
+                null);
             var context = processor.CreateServices().BuildServiceProvider().GetRequiredService<IMigrationContext>();
             var expr = new AutoScriptMigrationFake();
             expr.GetDownExpressions(context);
@@ -478,7 +491,13 @@ namespace FluentMigrator.Tests.Unit
         [Obsolete]
         public void ObsoleteGetAutoScriptUpName()
         {
-            var querySchema = new SqlServerProcessor(new[] { "SqlServer2016", "SqlServer" }, null, null, null, null, null);
+            var querySchema = new SqlServerProcessor(
+                new[] { "SqlServer2016", "SqlServer" },
+                null,
+                null,
+                null,
+                new ProcessorOptions(),
+                null);
             var context = new MigrationContext(querySchema, null, null, (string)null);
             var expr = new ObsoleteAutoScriptMigrationFake();
             expr.GetUpExpressions(context);
@@ -500,7 +519,13 @@ namespace FluentMigrator.Tests.Unit
         [Obsolete]
         public void ObsoleteGetAutoScriptDownName()
         {
-            var querySchema = new SqlServerProcessor(new[] { "SqlServer2016", "SqlServer" }, null, null, null, null, null);
+            var querySchema = new SqlServerProcessor(
+                new[] { "SqlServer2016", "SqlServer" },
+                null,
+                null,
+                null,
+                new ProcessorOptions(),
+                null);
             var context = new MigrationContext(querySchema, null, null, (string) null);
             var expr = new ObsoleteAutoScriptMigrationFake();
             expr.GetDownExpressions(context);

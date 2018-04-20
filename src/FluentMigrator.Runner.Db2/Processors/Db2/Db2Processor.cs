@@ -16,20 +16,37 @@
 //
 #endregion
 
+using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.DB2;
 using FluentMigrator.Runner.Helpers;
 
+using JetBrains.Annotations;
+
+using Microsoft.Extensions.Options;
+
 namespace FluentMigrator.Runner.Processors.DB2
 {
     public class Db2Processor : GenericProcessorBase
     {
+        [Obsolete]
         public Db2Processor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(connection, factory, generator, announcer, options)
+        {
+            Quoter = new Db2Quoter();
+        }
+
+        public Db2Processor(
+            [NotNull] DbProviderFactory factory,
+            [NotNull] IMigrationGenerator generator,
+            [NotNull] IAnnouncer announcer,
+            [NotNull] IOptions<ProcessorOptions> options)
+            : base(factory, generator, announcer, options.Value)
         {
             Quoter = new Db2Quoter();
         }
@@ -105,7 +122,7 @@ namespace FluentMigrator.Runner.Processors.DB2
         {
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(string.Format(template, args), Connection, Transaction, Options))
+            using (var command = CreateCommand(string.Format(template, args)))
             using (var reader = command.ExecuteReader())
             {
                 return reader.Read();
@@ -148,7 +165,7 @@ namespace FluentMigrator.Runner.Processors.DB2
         {
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(string.Format(template, args), Connection, Transaction, Options))
+            using (var command = CreateCommand(string.Format(template, args)))
             using (var reader = command.ExecuteReader())
             {
                 return reader.ReadDataSet();
@@ -203,7 +220,7 @@ namespace FluentMigrator.Runner.Processors.DB2
 
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(sql, Connection, Transaction, Options))
+            using (var command = CreateCommand(sql))
             {
                 command.ExecuteNonQuery();
             }

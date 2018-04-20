@@ -36,7 +36,7 @@ namespace FluentMigrator.Runner.Processors
         {
         }
 
-        protected DbProviderFactory Factory
+        protected internal DbProviderFactory Factory
         {
             get
             {
@@ -56,8 +56,6 @@ namespace FluentMigrator.Runner.Processors
 
         protected abstract DbProviderFactory CreateFactory();
 
-        #region IDbFactory Members
-
         public IDbConnection CreateConnection(string connectionString)
         {
             var connection = Factory.CreateConnection();
@@ -74,7 +72,5 @@ namespace FluentMigrator.Runner.Processors
             if (transaction != null) command.Transaction = transaction;
             return command;
         }
-
-        #endregion
     }
 }

@@ -28,6 +28,8 @@ using FluentMigrator.Runner.BatchParser;
 using FluentMigrator.Runner.BatchParser.Sources;
 using FluentMigrator.Runner.BatchParser.SpecialTokenSearchers;
 
+using JetBrains.Annotations;
+
 namespace FluentMigrator.Runner.Processors.SQLite
 {
 
@@ -41,7 +43,13 @@ namespace FluentMigrator.Runner.Processors.SQLite
 
         public override IList<string> DatabaseTypeAliases { get; } = new List<string>();
 
-        public SQLiteProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
+        [Obsolete]
+        public SQLiteProcessor(
+            IDbConnection connection,
+            IMigrationGenerator generator,
+            IAnnouncer announcer,
+            [NotNull] IMigrationProcessorOptions options,
+            IDbFactory factory)
             : base(connection, factory, generator, announcer, options)
         {
         }

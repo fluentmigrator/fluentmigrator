@@ -28,6 +28,8 @@ using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Generic;
 using FluentMigrator.Runner.Helpers;
 
+using JetBrains.Annotations;
+
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
     public sealed class SqlServerProcessor : GenericProcessorBase
@@ -46,7 +48,14 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public IQuoter Quoter { get; }
 
-        public SqlServerProcessor(IEnumerable<string> databaseTypes, IDbConnection connection, GenericGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
+        [Obsolete]
+        public SqlServerProcessor(
+            IEnumerable<string> databaseTypes,
+            IDbConnection connection,
+            GenericGenerator generator,
+            IAnnouncer announcer,
+            [NotNull] IMigrationProcessorOptions options,
+            IDbFactory factory)
             : base(connection, factory, generator, announcer, options)
         {
             var dbTypes = databaseTypes.ToList();

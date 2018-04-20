@@ -24,6 +24,7 @@ using System.Linq;
 
 using FluentMigrator.Builders.IfDatabase;
 using FluentMigrator.Infrastructure;
+using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.SQLite;
 
 using Moq;
@@ -198,7 +199,16 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
             // Arrange
             var mock = new Mock<IDbConnection>(MockBehavior.Loose);
             mock.Setup(x => x.State).Returns(ConnectionState.Open);
-            var context = new MigrationContext(processor ?? new SQLiteProcessor(mock.Object, null, null, null, new SQLiteDbFactory()), new SingleAssembly(GetType().Assembly), null, "");
+            var context = new MigrationContext(
+                processor ?? new SQLiteProcessor(
+                    mock.Object,
+                    null,
+                    null,
+                    new ProcessorOptions(),
+                    new SQLiteDbFactory()),
+                new SingleAssembly(GetType().Assembly),
+                null,
+                string.Empty);
 
             var expression = new IfDatabaseExpressionRoot(context, databaseType.ToArray());
 
@@ -222,7 +232,7 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
             // Arrange
             var mock = new Mock<IDbConnection>(MockBehavior.Loose);
             mock.Setup(x => x.State).Returns(ConnectionState.Open);
-            var context = new MigrationContext(new SQLiteProcessor(mock.Object, null, null, null, new SQLiteDbFactory()), new SingleAssembly(GetType().Assembly), null, "");
+            var context = new MigrationContext(new SQLiteProcessor(mock.Object, null, null, new ProcessorOptions(), new SQLiteDbFactory()), new SingleAssembly(GetType().Assembly), null, "");
 
             var expression = new IfDatabaseExpressionRoot(context, databaseTypePredicate);
 

@@ -107,10 +107,7 @@ namespace FluentMigrator.Tests.Helpers
             var columns = string.Join(", ", columnDefinitions);
             sb.AppendFormat("CREATE TABLE {0} ({1})", NameWithSchema, columns);
 
-            using (var command = Factory.CreateCommand(sb.ToString(), Connection, Transaction, Processor.Options))
-            {
-                command.ExecuteNonQuery();
-            }
+            Processor.Execute(sb.ToString());
         }
 
         public void Dispose()
@@ -122,19 +119,12 @@ namespace FluentMigrator.Tests.Helpers
         {
             var tableCommand = string.Format("DROP TABLE {0}", NameWithSchema);
 
-            using (var command = Factory.CreateCommand(tableCommand, Connection, Transaction, Processor.Options))
-            {
-                command.ExecuteNonQuery();
-            }
+            Processor.Execute(tableCommand);
 
             if (!string.IsNullOrEmpty(_schema))
             {
                 var schemaCommand = string.Format("DROP SCHEMA {0} RESTRICT", _quoter.QuoteSchemaName(_schema));
-
-                using (var commandToo = Factory.CreateCommand(schemaCommand, Connection, Transaction, Processor.Options))
-                {
-                    commandToo.ExecuteNonQuery();
-                }
+                Processor.Execute(schemaCommand);
             }
         }
 
@@ -146,10 +136,7 @@ namespace FluentMigrator.Tests.Helpers
                 _quoter.QuoteColumnName(column)
                 );
 
-            using (var command = Factory.CreateCommand(query, Connection, Transaction, Processor.Options))
-            {
-                command.ExecuteNonQuery();
-            }
+            Processor.Execute(query);
         }
 
         public void WithUniqueConstraintOn(string column, string name)
@@ -162,10 +149,7 @@ namespace FluentMigrator.Tests.Helpers
                 _quoter.QuoteColumnName(column)
             );
 
-            using (var command = Factory.CreateCommand(query, Connection, Transaction, Processor.Options))
-            {
-                command.ExecuteNonQuery();
-            }
+            Processor.Execute(query);
         }
 
         public Db2Processor Processor { get; set; }

@@ -24,6 +24,7 @@ using System.Linq;
 
 using FluentMigrator.Builders.IfDatabase;
 using FluentMigrator.Infrastructure;
+using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.SQLite;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -210,8 +211,15 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
                 .AddScoped<IEmbeddedResourceProvider, DefaultEmbeddedResourceProvider>();
 
             var context = new MigrationContext(
-                processor ?? new SQLiteProcessor(mock.Object, generator: null, announcer: null, options: null, new SQLiteDbFactory(serviceProvider: null)),
-                context: null, connection: string.Empty, services.BuildServiceProvider());
+                processor ?? new SQLiteProcessor(
+                    mock.Object,
+                    generator: null,
+                    announcer: null,
+                    new ProcessorOptions(),
+                    new SQLiteDbFactory(serviceProvider: null)),
+                context: null,
+                connection: string.Empty,
+                services.BuildServiceProvider());
 
             var expression = new IfDatabaseExpressionRoot(context, databaseType.ToArray());
 
@@ -244,7 +252,7 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
                 .AddScoped<IEmbeddedResourceProvider, DefaultEmbeddedResourceProvider>();
 
             var context = new MigrationContext(
-                new SQLiteProcessor(mock.Object, generator: null, announcer: null, options: null, new SQLiteDbFactory(serviceProvider: null)),
+                new SQLiteProcessor(mock.Object, generator: null, announcer: null, new ProcessorOptions(), new SQLiteDbFactory(serviceProvider: null)),
                 context: null, connection: string.Empty, services.BuildServiceProvider());
 
             var expression = new IfDatabaseExpressionRoot(context, databaseTypePredicate);

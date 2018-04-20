@@ -28,19 +28,27 @@ namespace FluentMigrator
     /// </summary>
     /// <remarks>
     /// A migration processor generates the SQL statements using a <see cref="IMigrationGenerator"/>
-    /// and executes it using the given <see cref="ConnectionString"/>.
+    /// and executes it using the given connection string.
     /// </remarks>
     public interface IMigrationProcessor : IQuerySchema, IDisposable
     {
         /// <summary>
         /// Gets the migration processor options
         /// </summary>
+        [Obsolete]
         IMigrationProcessorOptions Options { get; }
 
         /// <summary>
         /// Gets the connection string
         /// </summary>
+        [Obsolete]
         string ConnectionString { get; }
+
+        /// <summary>
+        /// Execute an SQL statement (escaping not needed)
+        /// </summary>
+        /// <param name="sql">The SQL statement</param>
+        void Execute(string sql);
 
         /// <summary>
         /// Execute an SQL statement
