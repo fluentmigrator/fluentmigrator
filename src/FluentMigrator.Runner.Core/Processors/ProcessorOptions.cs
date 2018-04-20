@@ -8,7 +8,7 @@ namespace FluentMigrator.Runner.Processors
     /// Options for an <see cref="IMigrationProcessor"/>
     /// </summary>
 #pragma warning disable 612
-    public class ProcessorOptions : IMigrationProcessorOptions
+    public sealed class ProcessorOptions : IMigrationProcessorOptions
 #pragma warning restore 612
     {
         /// <summary>

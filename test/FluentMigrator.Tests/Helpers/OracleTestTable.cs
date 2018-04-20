@@ -44,7 +44,7 @@ namespace FluentMigrator.Tests.Helpers
 
         public OracleTestTable(GenericProcessorBase processor, string schema, params string[] columnDefinitions)
         {
-            Options = new TestMigrationProcessorOptions();
+            Options = new ProcessorOptions() { Timeout = TimeSpan.FromSeconds(30) };
             Connection = processor.Connection;
             Transaction = processor.Transaction;
             Factory = processor.Factory;

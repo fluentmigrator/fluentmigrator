@@ -14,6 +14,7 @@
 // limitations under the License.
 #endregion
 
+using System;
 using System.Data;
 
 using FluentMigrator.Runner.Announcers;
@@ -45,7 +46,12 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
                 Assert.Ignore();
             Factory = dbFactory;
             Connection = Factory.CreateConnection(IntegrationTestOptions.Oracle.ConnectionString);
-            Processor = new OracleProcessor(Connection, new OracleGenerator(), new TextWriterAnnouncer(TestContext.Out), new TestMigrationProcessorOptions(), Factory);
+            Processor = new OracleProcessor(
+                Connection,
+                new OracleGenerator(),
+                new TextWriterAnnouncer(TestContext.Out),
+                new ProcessorOptions() { Timeout = TimeSpan.FromSeconds(30) },
+                Factory);
             Connection.Open();
         }
 
