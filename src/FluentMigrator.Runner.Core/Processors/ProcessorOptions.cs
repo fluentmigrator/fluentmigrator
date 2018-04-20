@@ -28,7 +28,7 @@ namespace FluentMigrator.Runner.Processors
             PreviewOnly = runnerContext.PreviewOnly;
             Timeout = runnerContext.Timeout == null
                 ? null
-                : (TimeSpan?) TimeSpan.FromMilliseconds(runnerContext.Timeout.Value);
+                : (TimeSpan?) TimeSpan.FromSeconds(runnerContext.Timeout.Value);
             ProviderSwitches = runnerContext.ProviderSwitches;
             ConnectionString = runnerContext.Connection;
         }
@@ -54,6 +54,6 @@ namespace FluentMigrator.Runner.Processors
         public string ProviderSwitches  { get; set; }
 
         /// <inheritdoc />
-        int? IMigrationProcessorOptions.Timeout => Timeout == null ? null : (int?) Timeout.Value.TotalMilliseconds;
+        int? IMigrationProcessorOptions.Timeout => Timeout == null ? null : (int?) Timeout.Value.TotalSeconds;
     }
 }

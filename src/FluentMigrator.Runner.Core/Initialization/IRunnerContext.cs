@@ -136,7 +136,7 @@ namespace FluentMigrator.Runner.Initialization
         IStopWatch StopWatch { get; }
 
         /// <summary>
-        /// Gets or sets the default command timeout in milliseconds
+        /// Gets or sets the default command timeout in seconds
         /// </summary>
         int? Timeout { get; set; }
 
