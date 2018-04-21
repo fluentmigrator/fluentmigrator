@@ -96,5 +96,17 @@ namespace FluentMigrator.Runner.Initialization
         /// The default transaction behavior is to use one transaction per migration.
         /// </remarks>
         public bool TransactionPerSession { get; set; }
+
+#pragma warning disable 612
+        /// <summary>
+        /// Gets or sets a value indicating whether no connection should be used
+        /// </summary>
+        /// <remarks>
+        /// The difference between this and <see cref="IMigrationProcessorOptions.PreviewOnly"/> is, that
+        /// the preview-only mode uses the connection to determine the current
+        /// state of the database.
+        /// </remarks>
+        public bool NoConnection { get; set; }
+#pragma warning restore 612
     }
 }

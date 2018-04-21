@@ -32,11 +32,18 @@ using FluentMigrator.Runner.VersionTableInfo;
 using JetBrains.Annotations;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner
 {
     public class MigrationRunner : IMigrationRunner
     {
+        [NotNull]
+        private readonly IAnnouncer _announcer;
+
+        [NotNull]
+        private readonly IStopWatch _stopWatch;
+
         [CanBeNull]
         private readonly IServiceProvider _serviceProvider;
 
@@ -50,12 +57,13 @@ namespace FluentMigrator.Runner
         [Obsolete]
         private readonly IAssemblyCollection _migrationAssemblies;
 
+        [NotNull]
+        private readonly RunnerOptions _options;
+
         private IVersionLoader _currentVersionLoader;
 
         private IProfileLoader _currentProfileLoader;
 
-        private IAnnouncer _announcer;
-        private IStopWatch _stopWatch;
         private bool _alreadyOutputPreviewOnlyModeWarning;
         private readonly MigrationValidator _migrationValidator;
         private readonly MigrationScopeHandler _migrationScopeHandler;
@@ -87,7 +95,9 @@ namespace FluentMigrator.Runner
             set => _migrationScopeHandler.CurrentScope = value;
         }
 
-        public IRunnerContext RunnerContext { get; private set; }
+        [Obsolete]
+        [CanBeNull]
+        public IRunnerContext RunnerContext { get; }
 
         [Obsolete]
         public MigrationRunner(Assembly assembly, IRunnerContext runnerContext, IMigrationProcessor processor)
@@ -103,8 +113,11 @@ namespace FluentMigrator.Runner
         {
             _migrationAssemblies = assemblies;
             _announcer = runnerContext.Announcer;
-            Processor = processor;
             _stopWatch = runnerContext.StopWatch;
+
+            _options = new RunnerOptions(runnerContext);
+
+            Processor = processor;
             RunnerContext = runnerContext;
 
             SilentlyFail = false;
@@ -142,7 +155,8 @@ namespace FluentMigrator.Runner
         }
 
         public MigrationRunner(
-            [NotNull] IRunnerContext runnerContext,
+            [NotNull] IOptions<RunnerOptions> options,
+            [NotNull] IAssemblySource assemblySource,
             [NotNull] IMigrationProcessor processor,
             [NotNull] IVersionTableMetaData versionTableMetaData,
             [NotNull] IMigrationRunnerConventions migrationRunnerConventions,
@@ -151,9 +165,10 @@ namespace FluentMigrator.Runner
             [NotNull] IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
+            _options = options.Value;
             _announcer = runnerContext.Announcer;
-            Processor = processor;
             _stopWatch = runnerContext.StopWatch;
+            Processor = processor;
             RunnerContext = runnerContext;
 
             SilentlyFail = false;
@@ -174,15 +189,15 @@ namespace FluentMigrator.Runner
             ));
             MaintenanceLoader = maintenanceLoader;
 
-            if (runnerContext.NoConnection)
+            if (_options.NoConnection)
             {
                 _versionLoader = new Lazy<IVersionLoader>(
                     () => new ConnectionlessVersionLoader(
                         this,
                         convSet,
                         Conventions,
-                        runnerContext.StartVersion,
-                        runnerContext.Version,
+                        _options.StartVersion,
+                        _options.Version,
                         versionTableMetaData));
             }
             else

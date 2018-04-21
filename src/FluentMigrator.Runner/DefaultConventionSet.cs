@@ -14,19 +14,28 @@
 // limitations under the License.
 #endregion
 
+using System;
 using System.Collections.Generic;
 
 using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Initialization;
 
+using JetBrains.Annotations;
+
 namespace FluentMigrator.Runner
 {
     public class DefaultConventionSet : IConventionSet
     {
-        public DefaultConventionSet(IRunnerContext runnerContext)
+        [Obsolete]
+        public DefaultConventionSet([CanBeNull] IRunnerContext runnerContext)
+            : this(runnerContext?.DefaultSchemaName, runnerContext?.WorkingDirectory)
+        {
+        }
+
+        public DefaultConventionSet([CanBeNull] string defaultSchemaName, [CanBeNull] string workingDirectory)
         {
             var schemaConvention =
-                new DefaultSchemaConvention(new DefaultSchemaNameConvention(runnerContext?.DefaultSchemaName));
+                new DefaultSchemaConvention(new DefaultSchemaNameConvention(defaultSchemaName));
 
             ColumnsConventions = new List<IColumnsConvention>()
             {
@@ -62,7 +71,7 @@ namespace FluentMigrator.Runner
             };
 
             SchemaConvention = schemaConvention;
-            RootPathConvention = new DefaultRootPathConvention(runnerContext?.WorkingDirectory);
+            RootPathConvention = new DefaultRootPathConvention(workingDirectory);
         }
 
         /// <inheritdoc />

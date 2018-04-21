@@ -101,7 +101,11 @@ namespace FluentMigrator.Runner.Initialization
         /// <summary>
         /// Gets or sets a value indicating whether no connection should be used
         /// </summary>
-        [Obsolete("Please use PreviewOnly instead")]
+        /// <remarks>
+        /// The difference between this and <see cref="PreviewOnly"/> is, that
+        /// the preview-only mode uses the connection to determine the current
+        /// state of the database.
+        /// </remarks>
         bool NoConnection { get; set; }
 
         /// <summary>
