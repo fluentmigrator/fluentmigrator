@@ -30,7 +30,9 @@ namespace FluentMigrator.Runner
         [Obsolete]
         IAssemblyCollection MigrationAssemblies { get; }
 
+        [Obsolete]
         IRunnerContext RunnerContext { get; }
+
         void Up(IMigration migration);
         void Down(IMigration migration);
         void MigrateUp();

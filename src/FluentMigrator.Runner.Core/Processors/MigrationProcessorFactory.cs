@@ -37,7 +37,7 @@ namespace FluentMigrator.Runner.Processors
         [Obsolete]
         public virtual bool IsForProvider(string provider)
         {
-            return provider.IndexOf(Name, System.StringComparison.OrdinalIgnoreCase) >= 0;
+            return provider.IndexOf(Name, StringComparison.OrdinalIgnoreCase) >= 0;
         }
     }
 }

@@ -25,7 +25,10 @@ using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Infrastructure;
 
+using JetBrains.Annotations;
+
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner
 {
@@ -34,24 +37,28 @@ namespace FluentMigrator.Runner
     /// </summary>
     public class ProfileLoader : IProfileLoader
     {
+        [NotNull]
+        private readonly IServiceProvider _serviceProvider;
+
         [Obsolete]
         private readonly IMigrationRunner _runner;
 
+        [Obsolete]
         private readonly IMigrationRunnerConventions _conventions;
-        private readonly IServiceProvider _serviceProvider;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProfileLoader"/> class.
         /// </summary>
-        /// <param name="runnerContext">The migration runner context</param>
-        /// <param name="conventions">The migration runner conventions</param>
-        /// <param name="migrations">The migrations</param>
+        /// <param name="options">The runner options</param>
+        /// <param name="source">The profile source</param>
         /// <param name="serviceProvider">The service provider</param>
-        public ProfileLoader(IRunnerContext runnerContext, IMigrationRunnerConventions conventions, IEnumerable<IMigration> migrations, IServiceProvider serviceProvider)
+        public ProfileLoader(
+            [NotNull] IOptions<RunnerOptions> options,
+            [NotNull] IProfileSource source,
+            [NotNull] IServiceProvider serviceProvider)
         {
-            _conventions = conventions;
             _serviceProvider = serviceProvider;
-            Profiles = FindProfilesIn(migrations, runnerContext.Profile).ToList();
+            Profiles = source.GetProfiles(options.Value.Profile).ToList();
         }
 
         /// <summary>
@@ -65,6 +72,7 @@ namespace FluentMigrator.Runner
         {
             _runner = runner;
             _conventions = conventions;
+            _serviceProvider = null;
             Profiles = FindProfilesIn(runner.MigrationAssemblies, runnerContext.Profile).ToList();
         }
 
@@ -120,21 +128,6 @@ namespace FluentMigrator.Runner
             {
                 runner.Up(profile);
             }
-        }
-
-        private IEnumerable<IMigration> FindProfilesIn(IEnumerable<IMigration> migrations, string profile)
-        {
-            if (string.IsNullOrEmpty(profile))
-                return Enumerable.Empty<IMigration>();
-
-            var matchedMigrations =
-                from migration in migrations
-                let type = migration.GetType()
-                where _conventions.TypeIsProfile(type) && string.Equals(type.GetOneAttribute<ProfileAttribute>().ProfileName, profile, StringComparison.OrdinalIgnoreCase)
-                orderby type.Name
-                select migration;
-
-            return matchedMigrations;
         }
     }
 }

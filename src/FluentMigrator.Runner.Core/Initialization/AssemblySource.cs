@@ -20,6 +20,8 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
+using FluentMigrator.Infrastructure;
+
 using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Initialization
@@ -40,6 +42,16 @@ namespace FluentMigrator.Runner.Initialization
         public AssemblySource(IOptions<AssemblySourceOptions> options, IEnumerable<IAssemblyLoadEngine> loadEngines)
         {
             _assemblies = new Lazy<IReadOnlyCollection<Assembly>>(() => LoadAssemblies(options.Value, loadEngines.ToList()));
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AssemblySource"/> class.
+        /// </summary>
+        /// <param name="assemblyCollection">The assembly collection</param>
+        [Obsolete]
+        public AssemblySource(IAssemblyCollection assemblyCollection)
+        {
+            _assemblies= new Lazy<IReadOnlyCollection<Assembly>>(() => assemblyCollection.Assemblies);
         }
 
         /// <inheritdoc />

@@ -26,6 +26,7 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Infrastructure.Extensions;
+using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Exceptions;
 using FluentMigrator.Runner.VersionTableInfo;
 
@@ -50,9 +51,6 @@ namespace FluentMigrator.Runner
         [NotNull]
         private readonly Lazy<IVersionLoader> _versionLoader;
 
-        [NotNull]
-        private readonly Lazy<IProfileLoader> _lazyProfileLoader;
-
         [CanBeNull]
         [Obsolete]
         private readonly IAssemblyCollection _migrationAssemblies;
@@ -62,16 +60,11 @@ namespace FluentMigrator.Runner
 
         private IVersionLoader _currentVersionLoader;
 
-        private IProfileLoader _currentProfileLoader;
-
         private bool _alreadyOutputPreviewOnlyModeWarning;
         private readonly MigrationValidator _migrationValidator;
         private readonly MigrationScopeHandler _migrationScopeHandler;
 
-        public bool TransactionPerSession
-        {
-            get { return RunnerContext.TransactionPerSession; }
-        }
+        public bool TransactionPerSession => _options.TransactionPerSession;
 
         public bool SilentlyFail { get; set; }
 
@@ -79,11 +72,7 @@ namespace FluentMigrator.Runner
 
         public IMigrationInformationLoader MigrationLoader { get; set; }
 
-        public IProfileLoader ProfileLoader
-        {
-            get => _currentProfileLoader ?? _lazyProfileLoader.Value;
-            set => _currentProfileLoader = value;
-        }
+        public IProfileLoader ProfileLoader { get; set; }
 
         public IMaintenanceLoader MaintenanceLoader { get; set; }
         public IMigrationRunnerConventions Conventions { get; private set; }
@@ -132,7 +121,7 @@ namespace FluentMigrator.Runner
             MigrationLoader = new DefaultMigrationInformationLoader(Conventions, _migrationAssemblies,
                                                                     runnerContext.Namespace,
                                                                     runnerContext.NestedNamespaces, runnerContext.Tags);
-            _lazyProfileLoader = new Lazy<IProfileLoader>(() => new ProfileLoader(runnerContext, this, Conventions));
+            ProfileLoader = new ProfileLoader(runnerContext, this, Conventions);
             MaintenanceLoader = new MaintenanceLoader(_migrationAssemblies, runnerContext.Tags, Conventions);
 
             if (runnerContext.NoConnection)
@@ -156,55 +145,34 @@ namespace FluentMigrator.Runner
 
         public MigrationRunner(
             [NotNull] IOptions<RunnerOptions> options,
-            [NotNull] IAssemblySource assemblySource,
+            [NotNull] IProfileLoader profileLoader,
             [NotNull] IMigrationProcessor processor,
-            [NotNull] IVersionTableMetaData versionTableMetaData,
             [NotNull] IMigrationRunnerConventions migrationRunnerConventions,
             [NotNull] IMaintenanceLoader maintenanceLoader,
             [NotNull] IMigrationInformationLoader migrationLoader,
+            [NotNull] IAnnouncer announcer,
+            [NotNull] IStopWatch stopWatch,
+            [NotNull] MigrationScopeHandler scopeHandler,
+            [NotNull] MigrationValidator migrationValidator,
             [NotNull] IServiceProvider serviceProvider)
         {
-            _serviceProvider = serviceProvider;
-            _options = options.Value;
-            _announcer = runnerContext.Announcer;
-            _stopWatch = runnerContext.StopWatch;
-            Processor = processor;
-            RunnerContext = runnerContext;
-
             SilentlyFail = false;
             CaughtExceptions = null;
 
+            Processor = processor;
             Conventions = migrationRunnerConventions;
-
-            var convSet = new DefaultConventionSet(runnerContext);
-
-            _migrationScopeHandler = new MigrationScopeHandler(Processor);
-            _migrationValidator = new MigrationValidator(_announcer, convSet);
-            MigrationLoader = migrationLoader;
-            _lazyProfileLoader = new Lazy<IProfileLoader>(() => new ProfileLoader(
-                runnerContext,
-                migrationRunnerConventions,
-                _serviceProvider.GetRequiredService<IEnumerable<IMigration>>(),
-                _serviceProvider
-            ));
+            ProfileLoader = profileLoader;
             MaintenanceLoader = maintenanceLoader;
+            MigrationLoader = migrationLoader;
 
-            if (_options.NoConnection)
-            {
-                _versionLoader = new Lazy<IVersionLoader>(
-                    () => new ConnectionlessVersionLoader(
-                        this,
-                        convSet,
-                        Conventions,
-                        _options.StartVersion,
-                        _options.Version,
-                        versionTableMetaData));
-            }
-            else
-            {
-                _versionLoader = new Lazy<IVersionLoader>(
-                    () => new VersionLoader(this, convSet, Conventions, versionTableMetaData));
-            }
+            _serviceProvider = serviceProvider;
+            _options = options.Value;
+            _announcer = announcer;
+            _stopWatch = stopWatch;
+
+            _migrationScopeHandler = scopeHandler;
+            _migrationValidator = migrationValidator;
+            _versionLoader = new Lazy<IVersionLoader>(serviceProvider.GetRequiredService<IVersionLoader>);
         }
 
         public IVersionLoader VersionLoader

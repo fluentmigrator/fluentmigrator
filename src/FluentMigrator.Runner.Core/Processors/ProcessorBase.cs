@@ -28,8 +28,10 @@ namespace FluentMigrator.Runner.Processors
 {
     public abstract class ProcessorBase : IMigrationProcessor
     {
+#pragma warning disable 612
         [Obsolete]
         private readonly IMigrationProcessorOptions _legacyOptions;
+#pragma warning restore 612
 
         protected readonly IMigrationGenerator Generator;
         protected readonly IAnnouncer Announcer;
