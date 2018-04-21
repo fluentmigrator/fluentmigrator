@@ -1,9 +1,9 @@
 #region License
 
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
 // Copyright (c) 2010, Nathan Brown
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -19,17 +19,48 @@
 
 #endregion
 
+using System;
+
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
     using Generators.SqlServer;
 
     public class SqlServer2000ProcessorFactory : MigrationProcessorFactory
     {
+        private readonly IServiceProvider _serviceProvider;
+
+        [Obsolete]
+        public SqlServer2000ProcessorFactory()
+            : this(serviceProvider: null)
+        {
+        }
+
+        public SqlServer2000ProcessorFactory(IServiceProvider serviceProvider)
+        {
+            _serviceProvider = serviceProvider;
+        }
+
+        [Obsolete]
         public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
         {
             var factory = new SqlServerDbFactory();
             var connection = factory.CreateConnection(connectionString);
             return new SqlServer2000Processor(connection, new SqlServer2000Generator(), announcer, options, factory);
+        }
+
+        /// <inheritdoc />
+        public override IMigrationProcessor Create()
+        {
+            if (_serviceProvider == null)
+                return null;
+            var factory = new SqlServerDbFactory().Factory;
+            var options = _serviceProvider.GetRequiredService<IOptions<ProcessorOptions>>();
+            var announcer = _serviceProvider.GetRequiredService<IAnnouncer>();
+            var generator = new SqlServer2000Generator();
+            return new SqlServer2000Processor(factory, generator, announcer, options);
         }
     }
 }

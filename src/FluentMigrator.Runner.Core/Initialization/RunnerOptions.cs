@@ -14,6 +14,11 @@
 // limitations under the License.
 #endregion
 
+using System;
+using System.Linq;
+
+using JetBrains.Annotations;
+
 namespace FluentMigrator.Runner.Initialization
 {
     /// <summary>
@@ -22,8 +27,33 @@ namespace FluentMigrator.Runner.Initialization
     public class RunnerOptions
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="RunnerOptions"/> class.
+        /// </summary>
+        public RunnerOptions()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RunnerOptions"/> class.
+        /// </summary>
+        /// <param name="runnerContext">The runner context</param>
+        [Obsolete]
+        public RunnerOptions(IRunnerContext runnerContext)
+        {
+            Task = runnerContext.Task;
+            Version = runnerContext.Version;
+            StartVersion = runnerContext.StartVersion;
+            Steps = runnerContext.Steps;
+            Profile = runnerContext.Profile;
+            Tags = runnerContext.Tags?.ToArray();
+            AllowBreakingChange = runnerContext.AllowBreakingChange;
+            TransactionPerSession = runnerContext.TransactionPerSession;
+        }
+
+        /// <summary>
         /// Gets or sets the task to execute
         /// </summary>
+        [CanBeNull]
         public string Task { get; set; }
 
         /// <summary>
@@ -44,12 +74,14 @@ namespace FluentMigrator.Runner.Initialization
         /// <summary>
         /// Gets or sets the profile migrations to apply
         /// </summary>
+        [CanBeNull]
         public string Profile { get; set; }
 
         /// <summary>
         /// Gets or sets the tags the migrations must match
         /// </summary>
         /// <remarks>All migrations are matched when no tags were specified</remarks>
+        [CanBeNull, ItemNotNull]
         public string[] Tags { get; set; }
 
         /// <summary>

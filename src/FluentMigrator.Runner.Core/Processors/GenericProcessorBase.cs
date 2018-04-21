@@ -84,7 +84,6 @@ namespace FluentMigrator.Runner.Processors
         [Obsolete]
         public override string ConnectionString => _connectionString;
 
-        [CanBeNull]
         public IDbConnection Connection { get; protected set; }
 
         [Obsolete]

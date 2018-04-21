@@ -19,10 +19,15 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators.MySql;
 using FluentMigrator.Runner.Helpers;
+
+using JetBrains.Annotations;
+
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.MySql
 {
@@ -30,15 +35,22 @@ namespace FluentMigrator.Runner.Processors.MySql
     {
         private readonly MySqlQuoter _quoter = new MySqlQuoter();
 
-        public override string DatabaseType
-        {
-            get { return "MySql"; }
-        }
+        public override string DatabaseType => "MySql";
 
         public override IList<string> DatabaseTypeAliases { get; } = new List<string> { "MariaDB" };
 
+        [Obsolete]
         public MySqlProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(connection, factory, generator, announcer, options)
+        {
+        }
+
+        public MySqlProcessor(
+            [NotNull] DbProviderFactory factory,
+            [NotNull] IMigrationGenerator generator,
+            [NotNull] IAnnouncer announcer,
+            [NotNull] IOptions<ProcessorOptions> options)
+            : base(factory, generator, announcer, options.Value)
         {
         }
 
@@ -101,7 +113,7 @@ namespace FluentMigrator.Runner.Processors.MySql
 
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(commandText, Connection, Transaction, Options))
+            using (var command = CreateCommand(commandText))
             {
                 command.ExecuteNonQuery();
             }
@@ -111,7 +123,7 @@ namespace FluentMigrator.Runner.Processors.MySql
         {
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction, Options))
+            using (var command = CreateCommand(string.Format(template, args)))
             {
                 using (var reader = command.ExecuteReader())
                 {
@@ -136,7 +148,7 @@ namespace FluentMigrator.Runner.Processors.MySql
         {
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction, Options))
+            using (var command = CreateCommand(string.Format(template, args)))
             using (var reader = command.ExecuteReader())
             {
                 return reader.ReadDataSet();
@@ -152,7 +164,7 @@ namespace FluentMigrator.Runner.Processors.MySql
 
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(sql, Connection, Transaction, Options))
+            using (var command = CreateCommand(sql))
             {
                 command.ExecuteNonQuery();
             }
@@ -167,8 +179,7 @@ namespace FluentMigrator.Runner.Processors.MySql
 
             EnsureConnectionIsOpen();
 
-            if (expression.Operation != null)
-                expression.Operation(Connection, null);
+            expression.Operation?.Invoke(Connection, null);
         }
 
         public override void Process(RenameColumnExpression expression)

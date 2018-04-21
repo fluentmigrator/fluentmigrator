@@ -24,30 +24,24 @@ using System.Text;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Oracle;
 using FluentMigrator.Runner.Processors;
-using FluentMigrator.Tests.Unit;
 
 namespace FluentMigrator.Tests.Helpers
 {
     public class OracleTestTable : IDisposable
     {
         private readonly IQuoter _quoter = new OracleQuoterQuotedIdentifier();
+        private readonly GenericProcessorBase _processor;
+        private readonly string _schema;
+        private readonly List<string> _constraints = new List<string>();
+        private readonly List<string> _indexies = new List<string>();
 
-        private IMigrationProcessorOptions Options { get; set; }
-        private IDbConnection Connection { get; set; }
-        private IDbTransaction Transaction { get;set; }
-        private IDbFactory Factory { get; set; }
-        private string _schema;
-        private List<string> constraints = new List<string>();
-        private List<string> indexies = new List<string>();
+        private IDbConnection Connection => _processor.Connection;
         public string Name { get; set; }
 
 
         public OracleTestTable(GenericProcessorBase processor, string schema, params string[] columnDefinitions)
         {
-            Options = new ProcessorOptions() { Timeout = TimeSpan.FromSeconds(30) };
-            Connection = processor.Connection;
-            Transaction = processor.Transaction;
-            Factory = processor.Factory;
+            _processor = processor;
             _schema = schema;
 
             if (Connection.State != ConnectionState.Open)
@@ -59,9 +53,7 @@ namespace FluentMigrator.Tests.Helpers
 
         public OracleTestTable(string table, GenericProcessorBase processor, string schema, params string[] columnDefinitions)
         {
-            Connection = processor.Connection;
-            Transaction = processor.Transaction;
-            Factory = processor.Factory;
+            _processor = processor;
             _schema = schema;
 
             if (Connection.State != ConnectionState.Open)
@@ -92,8 +84,7 @@ namespace FluentMigrator.Tests.Helpers
 
             sb.Remove(sb.Length - 2, 2);
 
-            using (var command = Factory.CreateCommand(sb.ToString(), Connection, Transaction, Options))
-                command.ExecuteNonQuery();
+            _processor.Execute(sb.ToString());
         }
 
         private StringBuilder CreateSchemaQuery()
@@ -116,9 +107,8 @@ namespace FluentMigrator.Tests.Helpers
         {
             var sb = new StringBuilder();
             sb.Append(string.Format("ALTER TABLE {0} ADD CONSTRAINT {1} UNIQUE ({2})", _quoter.QuoteTableName(Name), _quoter.QuoteConstraintName(name), _quoter.QuoteColumnName(column)));
-            using (var command = Factory.CreateCommand(sb.ToString(), Connection, Transaction, Options))
-                command.ExecuteNonQuery();
-            constraints.Add(name);
+            _processor.Execute(sb.ToString());
+            _constraints.Add(name);
        }
 
         public void WithIndexOn(string column)
@@ -130,27 +120,29 @@ namespace FluentMigrator.Tests.Helpers
         {
             var sb = new StringBuilder();
             sb.Append(string.Format("CREATE UNIQUE INDEX {0} ON {1} ({2})", _quoter.QuoteIndexName(name), _quoter.QuoteTableName(Name), _quoter.QuoteColumnName(column)));
-            using (var command = Factory.CreateCommand(sb.ToString(), Connection, Transaction, Options))
-                command.ExecuteNonQuery();
-            indexies.Add(name);
+            _processor.Execute(sb.ToString());
+            _indexies.Add(name);
         }
 
         public void Drop()
         {
-            foreach(var constraint in constraints)
+            foreach(var constraint in _constraints)
             {
-                using (var command = Factory.CreateCommand(string.Format( "ALTER TABLE {0} DROP CONSTRAINT {1}", _quoter.QuoteTableName(Name), _quoter.QuoteConstraintName(constraint) ), Connection, Transaction, Options))
-                    command.ExecuteNonQuery();
+                var cmd = string.Format(
+                    "ALTER TABLE {0} DROP CONSTRAINT {1}",
+                    _quoter.QuoteTableName(Name),
+                    _quoter.QuoteConstraintName(constraint));
+                _processor.Execute(cmd);
             }
 
-            foreach (var index in indexies)
+            foreach (var index in _indexies)
             {
-                using (var command = Factory.CreateCommand(string.Format( "DROP INDEX {0}", _quoter.QuoteIndexName( index ) ), Connection, Transaction, Options))
-                    command.ExecuteNonQuery();
+                var cmd = string.Format("DROP INDEX {0}", _quoter.QuoteIndexName(index));
+                _processor.Execute(cmd);
             }
 
-            using (var command = Factory.CreateCommand("DROP TABLE " + _quoter.QuoteTableName(Name), Connection, Transaction, Options))
-                command.ExecuteNonQuery();
+            var dropSql = "DROP TABLE " + _quoter.QuoteTableName(Name);
+            _processor.Execute(dropSql);
         }
     }
 }

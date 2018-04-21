@@ -1,11 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.IO;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators.Postgres;
 using FluentMigrator.Runner.Helpers;
+
+using JetBrains.Annotations;
+
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.Postgres
 {
@@ -13,15 +18,22 @@ namespace FluentMigrator.Runner.Processors.Postgres
     {
         private readonly PostgresQuoter _quoter = new PostgresQuoter();
 
-        public override string DatabaseType
-        {
-            get { return "Postgres"; }
-        }
+        public override string DatabaseType => "Postgres";
 
         public override IList<string> DatabaseTypeAliases { get; } = new List<string> { "PostgreSQL" };
 
+        [Obsolete]
         public PostgresProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(connection, factory, generator, announcer, options)
+        {
+        }
+
+        public PostgresProcessor(
+            [NotNull] DbProviderFactory factory,
+            [NotNull] IMigrationGenerator generator,
+            [NotNull] IAnnouncer announcer,
+            [NotNull] IOptions<ProcessorOptions> options)
+            : base(factory, generator, announcer, options.Value)
         {
         }
 
@@ -75,7 +87,7 @@ namespace FluentMigrator.Runner.Processors.Postgres
         {
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction, Options))
+            using (var command = CreateCommand(String.Format(template, args)))
             using (var reader = command.ExecuteReader())
             {
                 return reader.ReadDataSet();
@@ -86,7 +98,7 @@ namespace FluentMigrator.Runner.Processors.Postgres
         {
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction, Options))
+            using (var command = CreateCommand(String.Format(template, args)))
             using (var reader = command.ExecuteReader())
             {
                 return reader.Read();
@@ -102,7 +114,7 @@ namespace FluentMigrator.Runner.Processors.Postgres
 
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(sql, Connection, Transaction, Options))
+            using (var command = CreateCommand(sql))
             {
                 try
                 {
@@ -131,8 +143,7 @@ namespace FluentMigrator.Runner.Processors.Postgres
 
             EnsureConnectionIsOpen();
 
-            if (expression.Operation != null)
-                expression.Operation(Connection, Transaction);
+            expression.Operation?.Invoke(Connection, Transaction);
         }
 
         private string FormatToSafeSchemaName(string schemaName)

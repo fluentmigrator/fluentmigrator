@@ -30,6 +30,8 @@ using FluentMigrator.Runner.BatchParser.SpecialTokenSearchers;
 
 using JetBrains.Annotations;
 
+using Microsoft.Extensions.Options;
+
 namespace FluentMigrator.Runner.Processors.SQLite
 {
 
@@ -51,6 +53,15 @@ namespace FluentMigrator.Runner.Processors.SQLite
             [NotNull] IMigrationProcessorOptions options,
             IDbFactory factory)
             : base(connection, factory, generator, announcer, options)
+        {
+        }
+
+        public SQLiteProcessor(
+            [NotNull] DbProviderFactory factory,
+            [NotNull] IMigrationGenerator generator,
+            [NotNull] IAnnouncer announcer,
+            [NotNull] IOptions<ProcessorOptions> options)
+            : base(factory, generator, announcer, options.Value)
         {
         }
 
@@ -94,7 +105,7 @@ namespace FluentMigrator.Runner.Processors.SQLite
         {
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction, Options))
+            using (var command = CreateCommand(String.Format(template, args)))
             using (var reader = command.ExecuteReader())
             {
                 try
@@ -129,8 +140,7 @@ namespace FluentMigrator.Runner.Processors.SQLite
 
             EnsureConnectionIsOpen();
 
-            if (expression.Operation != null)
-                expression.Operation(Connection, null);
+            expression.Operation?.Invoke(Connection, null);
         }
 
         protected override void Process(string sql)
@@ -170,7 +180,7 @@ namespace FluentMigrator.Runner.Processors.SQLite
 
         private void ExecuteNonQuery(string sql)
         {
-            using (var command = Factory.CreateCommand(sql, Connection, Transaction, Options))
+            using (var command = CreateCommand(sql))
             {
                 try
                 {
@@ -198,7 +208,7 @@ namespace FluentMigrator.Runner.Processors.SQLite
 
                     if (args.Opaque is GoSearcher.GoSearcherParameters goParams)
                     {
-                        using (var command = Factory.CreateCommand(string.Empty, Connection, Transaction, Options))
+                        using (var command = CreateCommand(string.Empty))
                         {
                             command.CommandText = sqlBatch;
 
@@ -219,7 +229,7 @@ namespace FluentMigrator.Runner.Processors.SQLite
 
                 if (!string.IsNullOrEmpty(sqlBatch))
                 {
-                    using (var command = Factory.CreateCommand(string.Empty, Connection, Transaction, Options))
+                    using (var command = CreateCommand(string.Empty))
                     {
                         command.CommandText = sqlBatch;
                         command.ExecuteNonQuery();
@@ -236,7 +246,7 @@ namespace FluentMigrator.Runner.Processors.SQLite
         {
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction, Options))
+            using (var command = CreateCommand(String.Format(template, args)))
             using (var reader = command.ExecuteReader())
             {
                 return reader.ReadDataSet();

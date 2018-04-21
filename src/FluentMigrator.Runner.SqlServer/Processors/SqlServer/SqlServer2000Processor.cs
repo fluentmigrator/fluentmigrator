@@ -40,6 +40,7 @@ using FluentMigrator.Runner.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.IO;
 
 using FluentMigrator.Expressions;
@@ -47,12 +48,26 @@ using FluentMigrator.Runner.BatchParser;
 using FluentMigrator.Runner.BatchParser.Sources;
 using FluentMigrator.Runner.BatchParser.SpecialTokenSearchers;
 
+using JetBrains.Annotations;
+
+using Microsoft.Extensions.Options;
+
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
     public sealed class SqlServer2000Processor : GenericProcessorBase
     {
+        [Obsolete]
         public SqlServer2000Processor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(connection, factory, generator, announcer, options)
+        {
+        }
+
+        public SqlServer2000Processor(
+            [NotNull] DbProviderFactory factory,
+            [NotNull] IMigrationGenerator generator,
+            [NotNull] IAnnouncer announcer,
+            [NotNull] IOptions<ProcessorOptions> options)
+            : base(factory, generator, announcer, options.Value)
         {
         }
 
@@ -133,7 +148,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         {
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction, Options))
+            using (var command = CreateCommand(String.Format(template, args)))
             using (var reader = command.ExecuteReader())
             {
                 return reader.ReadDataSet();
@@ -144,7 +159,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         {
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction, Options))
+            using (var command = CreateCommand(String.Format(template, args)))
             using (var reader = command.ExecuteReader())
             {
                 return reader.Read();
@@ -191,7 +206,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         private void ExecuteNonQuery(string sql)
         {
-            using (var command = Factory.CreateCommand(sql, Connection, Transaction, Options))
+            using (var command = CreateCommand(sql))
             {
                 try
                 {
@@ -227,7 +242,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
                     if (args.Opaque is GoSearcher.GoSearcherParameters goParams)
                     {
-                        using (var command = Factory.CreateCommand(string.Empty, Connection, Transaction, Options))
+                        using (var command = CreateCommand(string.Empty))
                         {
                             command.CommandText = sqlBatch;
 

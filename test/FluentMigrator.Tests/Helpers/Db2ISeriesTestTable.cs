@@ -21,24 +21,20 @@ using System.Data;
 using System.Text;
 
 using FluentMigrator.Runner.Generators;
-using FluentMigrator.Runner.Generators.DB2;
-using FluentMigrator.Runner.Processors;
-using FluentMigrator.Runner.Processors.DB2;
+using FluentMigrator.Runner.Generators.DB2.iSeries;
+using FluentMigrator.Runner.Processors.DB2.iSeries;
 
 namespace FluentMigrator.Tests.Helpers
 {
     public class Db2ISeriesTestTable : IDisposable
     {
-        private readonly IQuoter _quoter = new Db2Quoter();
+        private readonly IQuoter _quoter = new Db2ISeriesQuoter();
 
-        private string _schema;
+        private readonly string _schema;
 
-        public Db2ISeriesTestTable(Db2Processor processor, string schema, params string[] columnDefinitions)
+        public Db2ISeriesTestTable(Db2ISeriesProcessor processor, string schema, params string[] columnDefinitions)
         {
-            Connection = processor.Connection;
-            Transaction = processor.Transaction;
             Processor = processor;
-            Factory = new Db2DbFactory(serviceProvider: null);
             _schema = schema;
 
             if (Connection.State != ConnectionState.Open)
@@ -49,12 +45,9 @@ namespace FluentMigrator.Tests.Helpers
             Create(columnDefinitions);
         }
 
-        public Db2ISeriesTestTable(string table, Db2Processor processor, string schema, params string[] columnDefinitions)
+        public Db2ISeriesTestTable(string table, Db2ISeriesProcessor processor, string schema, params string[] columnDefinitions)
         {
-            Connection = processor.Connection;
-            Transaction = processor.Transaction;
             Processor = processor;
-            Factory = new Db2DbFactory(serviceProvider: null);
             _schema = schema;
 
             if (Connection.State != ConnectionState.Open)
@@ -77,23 +70,7 @@ namespace FluentMigrator.Tests.Helpers
             set;
         }
 
-        public IDbTransaction Transaction
-        {
-            get;
-            set;
-        }
-
-        private IDbConnection Connection
-        {
-            get;
-            set;
-        }
-
-        private IDbFactory Factory
-        {
-            get;
-            set;
-        }
+        private IDbConnection Connection => Processor.Connection;
 
         public void Create(string[] columnDefinitions)
         {
@@ -152,6 +129,6 @@ namespace FluentMigrator.Tests.Helpers
             Processor.Execute(query);
         }
 
-        public Db2Processor Processor { get; set; }
+        public Db2ISeriesProcessor Processor { get; set; }
     }
 }

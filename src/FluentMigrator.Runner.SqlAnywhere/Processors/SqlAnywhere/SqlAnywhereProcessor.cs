@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
@@ -31,6 +32,10 @@ using FluentMigrator.Runner.BatchParser.Sources;
 using FluentMigrator.Runner.BatchParser.SpecialTokenSearchers;
 using FluentMigrator.Runner.Helpers;
 using FluentMigrator.SqlAnywhere;
+
+using JetBrains.Annotations;
+
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.SqlAnywhere
 {
@@ -49,8 +54,20 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
 
         public override IList<string> DatabaseTypeAliases { get; } = new List<string> { "SqlAnywhere" };
 
+        [Obsolete]
         public SqlAnywhereProcessor(string databaseType, IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(connection, factory, generator, announcer, options)
+        {
+            DatabaseType = databaseType;
+        }
+
+        public SqlAnywhereProcessor(
+            [NotNull] string databaseType,
+            [NotNull] DbProviderFactory factory,
+            [NotNull] IMigrationGenerator generator,
+            [NotNull] IAnnouncer announcer,
+            [NotNull] IOptions<ProcessorOptions> options)
+            : base(factory, generator, announcer, options.Value)
         {
             DatabaseType = databaseType;
         }
@@ -127,7 +144,20 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
             var sql = Generator.Generate(expression);
             string connectionString = ReplaceUserIdAndPasswordInConnectionString(expression.SchemaName, password);
             Announcer.Say("Creating connection for user {0} to create schema.", expression.SchemaName);
-            var connection = Factory.CreateConnection(connectionString);
+            IDbConnection connection;
+            if (DbProviderFactory == null)
+            {
+#pragma warning disable 612
+                connection = Factory.CreateConnection(connectionString);
+#pragma warning restore 612
+            }
+            else
+            {
+                connection = DbProviderFactory.CreateConnection();
+                Debug.Assert(connection != null, nameof(connection) + " != null");
+                connection.ConnectionString = connectionString;
+            }
+
             EnsureConnectionIsOpen(connection);
             Announcer.Say("Beginning out of scope transaction to create schema.");
             var transaction = connection.BeginTransaction();
@@ -153,7 +183,7 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
 
         private string ReplaceUserIdAndPasswordInConnectionString(string userId, string password)
         {
-            var csb = new DbConnectionStringBuilder { ConnectionString = ConnectionString };
+            var csb = new DbConnectionStringBuilder { ConnectionString = Options.ConnectionString };
             var uidKey = new[] { "uid", "userid" }.FirstOrDefault(x => csb.ContainsKey(x)) ?? "uid";
             var pwdKey = new[] { "pwd", "password" }.FirstOrDefault(x => csb.ContainsKey(x)) ?? "pwd";
             csb[uidKey] = userId;
@@ -171,7 +201,7 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
         {
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction, Options))
+            using (var command = CreateCommand(String.Format(template, args)))
             {
                 var result = command.ExecuteScalar();
                 return DBNull.Value != result && Convert.ToInt32(result) != 0;
@@ -187,7 +217,7 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
         {
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction, Options))
+            using (var command = CreateCommand(String.Format(template, args)))
             using (var reader = command.ExecuteReader())
             {
                 return reader.ReadDataSet();
@@ -235,7 +265,7 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
 
         private void ExecuteNonQuery(IDbConnection connection, IDbTransaction transaction, string sql)
         {
-            using (var command = Factory.CreateCommand(sql, connection, transaction, Options))
+            using (var command = CreateCommand(sql, connection, transaction))
             {
                 try
                 {
@@ -270,7 +300,7 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
 
                     if (args.Opaque is GoSearcher.GoSearcherParameters goParams)
                     {
-                        using (var command = Factory.CreateCommand(string.Empty, Connection, Transaction, Options))
+                        using (var command = CreateCommand(string.Empty))
                         {
                             command.CommandText = sqlBatch;
 
@@ -291,7 +321,7 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
 
                 if (!string.IsNullOrEmpty(sqlBatch))
                 {
-                    using (var command = Factory.CreateCommand(string.Empty, Connection, Transaction, Options))
+                    using (var command = CreateCommand(string.Empty))
                     {
                         command.CommandText = sqlBatch;
                         command.ExecuteNonQuery();

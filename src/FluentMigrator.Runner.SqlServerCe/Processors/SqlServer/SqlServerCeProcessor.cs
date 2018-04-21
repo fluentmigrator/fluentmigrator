@@ -18,6 +18,7 @@ using System;
 using System.Data;
 using System.IO;
 using System.Collections.Generic;
+using System.Data.Common;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.BatchParser;
@@ -26,19 +27,30 @@ using FluentMigrator.Runner.BatchParser.Sources;
 using FluentMigrator.Runner.BatchParser.SpecialTokenSearchers;
 using FluentMigrator.Runner.Helpers;
 
+using JetBrains.Annotations;
+
+using Microsoft.Extensions.Options;
+
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
     public sealed class SqlServerCeProcessor : GenericProcessorBase
     {
-        public override string DatabaseType
-        {
-            get { return "SqlServerCe"; }
-        }
+        public override string DatabaseType => "SqlServerCe";
 
         public override IList<string> DatabaseTypeAliases { get; } = new List<string> { "SqlServer" };
 
+        [Obsolete]
         public SqlServerCeProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(connection, factory, generator, announcer, options)
+        {
+        }
+
+        public SqlServerCeProcessor(
+            [NotNull] DbProviderFactory factory,
+            [NotNull] IMigrationGenerator generator,
+            [NotNull] IAnnouncer announcer,
+            [NotNull] IOptions<ProcessorOptions> options)
+            : base(factory, generator, announcer, options.Value)
         {
         }
 
@@ -88,7 +100,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         {
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction, Options))
+            using (var command = CreateCommand(String.Format(template, args)))
             using (var reader = command.ExecuteReader())
             {
                 return reader.Read();
@@ -104,7 +116,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         {
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction, Options))
+            using (var command = CreateCommand(String.Format(template, args)))
             using (var reader = command.ExecuteReader())
             {
                 return reader.ReadDataSet();
@@ -120,7 +132,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(string.Empty, Connection, Transaction, Options))
+            using (var command = CreateCommand(string.Empty))
             {
                 foreach (string statement in SplitIntoSingleStatements(sql))
                 {
@@ -187,8 +199,21 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         {
             EnsureConnectionIsOpen();
 
-            if (expression.Operation != null)
-                expression.Operation(Connection, Transaction);
+            expression.Operation?.Invoke(Connection, Transaction);
+        }
+
+        /// <inheritdoc />
+        protected override IDbCommand CreateCommand(string commandText, IDbConnection connection, IDbTransaction transaction)
+        {
+            var command = base.CreateCommand(commandText, connection, transaction);
+
+            if (command.CommandTimeout != 0)
+            {
+                // SQL Server CE does not support non-zero command timeout values!! :/
+                command.CommandTimeout = 0;
+            }
+
+            return command;
         }
     }
 }

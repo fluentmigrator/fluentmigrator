@@ -20,6 +20,9 @@ using System;
 
 using FluentMigrator.Runner.Generators.Postgres;
 
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+
 namespace FluentMigrator.Runner.Processors.Postgres
 {
     public class PostgresProcessorFactory : MigrationProcessorFactory
@@ -37,11 +40,24 @@ namespace FluentMigrator.Runner.Processors.Postgres
             _serviceProvider = serviceProvider;
         }
 
+        [Obsolete]
         public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
         {
             var factory = new PostgresDbFactory(_serviceProvider);
             var connection = factory.CreateConnection(connectionString);
             return new PostgresProcessor(connection, new PostgresGenerator(), announcer, options, factory);
+        }
+
+        /// <inheritdoc />
+        public override IMigrationProcessor Create()
+        {
+            if (_serviceProvider == null)
+                return null;
+            var factory = new PostgresDbFactory(_serviceProvider).Factory;
+            var options = _serviceProvider.GetRequiredService<IOptions<ProcessorOptions>>();
+            var announcer = _serviceProvider.GetRequiredService<IAnnouncer>();
+            var generator = new PostgresGenerator();
+            return new PostgresProcessor(factory, generator, announcer, options);
         }
     }
 }

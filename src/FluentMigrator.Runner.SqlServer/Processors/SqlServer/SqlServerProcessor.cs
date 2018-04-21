@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.IO;
 using System.Linq;
 
@@ -29,6 +30,8 @@ using FluentMigrator.Runner.Generators.Generic;
 using FluentMigrator.Runner.Helpers;
 
 using JetBrains.Annotations;
+
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
@@ -62,6 +65,20 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             DatabaseType = dbTypes.First();
             DatabaseTypeAliases = dbTypes.Skip(1).ToList();
             Quoter = generator?.Quoter;
+        }
+
+        public SqlServerProcessor(
+            [NotNull, ItemNotNull] IEnumerable<string> databaseTypes,
+            [NotNull] DbProviderFactory factory,
+            [NotNull] GenericGenerator generator,
+            [NotNull] IAnnouncer announcer,
+            [NotNull] IOptions<ProcessorOptions> options)
+            : base(factory, generator, announcer, options.Value)
+        {
+            var dbTypes = databaseTypes.ToList();
+            DatabaseType = dbTypes.First();
+            DatabaseTypeAliases = dbTypes.Skip(1).ToList();
+            Quoter = generator.Quoter;
         }
 
         private static string SafeSchemaName(string schemaName)
@@ -147,7 +164,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         {
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction, Options))
+            using (var command = CreateCommand(String.Format(template, args)))
             {
                 var result = command.ExecuteScalar();
                 return DBNull.Value != result && Convert.ToInt32(result) == 1;
@@ -163,7 +180,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         {
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction, Options))
+            using (var command = CreateCommand(String.Format(template, args)))
             using (var reader = command.ExecuteReader())
             {
                 return reader.ReadDataSet();
@@ -205,7 +222,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         private void ExecuteNonQuery(string sql)
         {
-            using (var command = Factory.CreateCommand(sql, Connection, Transaction, Options))
+            using (var command = CreateCommand(sql))
             {
                 try
                 {
@@ -240,7 +257,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
                     if (args.Opaque is GoSearcher.GoSearcherParameters goParams)
                     {
-                        using (var command = Factory.CreateCommand(string.Empty, Connection, Transaction, Options))
+                        using (var command = CreateCommand(string.Empty))
                         {
                             command.CommandText = sqlBatch;
 
@@ -261,7 +278,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
                 if (!string.IsNullOrEmpty(sqlBatch))
                 {
-                    using (var command = Factory.CreateCommand(string.Empty, Connection, Transaction, Options))
+                    using (var command = CreateCommand(string.Empty))
                     {
                         command.CommandText = sqlBatch;
                         command.ExecuteNonQuery();

@@ -22,7 +22,6 @@ using System.Text;
 
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.DB2;
-using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.DB2;
 
 namespace FluentMigrator.Tests.Helpers
@@ -35,10 +34,7 @@ namespace FluentMigrator.Tests.Helpers
 
         public Db2TestTable(Db2Processor processor, string schema, params string[] columnDefinitions)
         {
-            Connection = processor.Connection;
-            Transaction = processor.Transaction;
             Processor = processor;
-            Factory = new Db2DbFactory(serviceProvider: null);
             _schema = schema;
 
             if (Connection.State != ConnectionState.Open)
@@ -51,10 +47,7 @@ namespace FluentMigrator.Tests.Helpers
 
         public Db2TestTable(string table, Db2Processor processor, string schema, params string[] columnDefinitions)
         {
-            Connection = processor.Connection;
-            Transaction = processor.Transaction;
             Processor = processor;
-            Factory = new Db2DbFactory(serviceProvider: null);
             _schema = schema;
 
             if (Connection.State != ConnectionState.Open)
@@ -75,20 +68,7 @@ namespace FluentMigrator.Tests.Helpers
             get;
         }
 
-        public IDbTransaction Transaction
-        {
-            get;
-        }
-
-        private IDbConnection Connection
-        {
-            get;
-        }
-
-        private IDbFactory Factory
-        {
-            get;
-        }
+        private IDbConnection Connection => Processor.Connection;
 
         public void Create(string[] columnDefinitions)
         {

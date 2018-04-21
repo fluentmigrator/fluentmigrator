@@ -25,14 +25,21 @@ namespace FluentMigrator.Runner.Processors
     public interface IMigrationProcessorFactory
     {
         [Obsolete]
-        IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options);
+        [NotNull]
+        IMigrationProcessor Create(string connectionString, [NotNull] IAnnouncer announcer, [NotNull] IMigrationProcessorOptions options);
 
+#pragma warning disable 612
         /// <summary>
         /// Creates a new migration processor
         /// </summary>
-        /// <returns></returns>
+        /// <returns>
+        /// <c>null</c> when the processor only implements the old-style
+        /// <see cref="Create(string,FluentMigrator.Runner.IAnnouncer,FluentMigrator.IMigrationProcessorOptions)"/>
+        /// call.
+        /// </returns>
         [CanBeNull]
         IMigrationProcessor Create();
+#pragma warning restore 612
 
         /// <summary>
         /// Returns a value indicating whether this processor factory can use the given DB provider
@@ -40,8 +47,9 @@ namespace FluentMigrator.Runner.Processors
         /// <param name="provider">The DB provider name</param>
         /// <returns><c>true</c> when this processor factory can use the given DB provider</returns>
         [Obsolete]
-        bool IsForProvider(string provider);
+        bool IsForProvider([NotNull] string provider);
 
+        [NotNull]
         string Name { get; }
     }
 }

@@ -14,19 +14,50 @@
 // limitations under the License.
 #endregion
 
+using System;
+
 using FluentMigrator.Runner.Generators.SqlAnywhere;
+
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.SqlAnywhere
 {
     public class SqlAnywhere16ProcessorFactory : MigrationProcessorFactory
     {
+        private readonly IServiceProvider _serviceProvider;
+
+        [Obsolete]
+        public SqlAnywhere16ProcessorFactory()
+        {
+        }
+
+        public SqlAnywhere16ProcessorFactory(IServiceProvider serviceProvider)
+        {
+            _serviceProvider = serviceProvider;
+        }
+
+        [Obsolete]
         public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
         {
-            var factory = new SqlAnywhereDbFactory();
+            var factory = new SqlAnywhereDbFactory(_serviceProvider);
             var connection = factory.CreateConnection(connectionString);
             return new SqlAnywhereProcessor("SqlAnywhere16", connection, new SqlAnywhere16Generator(), announcer, options, factory);
         }
 
+        /// <inheritdoc />
+        public override IMigrationProcessor Create()
+        {
+            if (_serviceProvider == null)
+                return null;
+            var factory = new SqlAnywhereDbFactory(_serviceProvider).Factory;
+            var options = _serviceProvider.GetRequiredService<IOptions<ProcessorOptions>>();
+            var announcer = _serviceProvider.GetRequiredService<IAnnouncer>();
+            var generator = new SqlAnywhere16Generator();
+            return new SqlAnywhereProcessor("SqlAnywhere16", factory, generator, announcer, options);
+        }
+
+        [Obsolete]
         public override bool IsForProvider(string provider)
         {
             return provider.ToLower().Contains("ianywhere");
