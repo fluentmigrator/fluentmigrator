@@ -42,14 +42,10 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         [Obsolete]
         public override IDbCommand CreateCommand(string commandText, IDbConnection connection, IDbTransaction transaction, IMigrationProcessorOptions options)
         {
-            var command = base.CreateCommand(commandText, connection, transaction, options);
-
-            if (command.CommandTimeout != 0)
-            {
-                // SQL Server CE does not support non-zero command timeout values!! :/
-                command.CommandTimeout = 0;
-            }
-
+            var command = connection.CreateCommand();
+            command.CommandText = commandText;
+            // SQL Server CE does not support non-zero command timeout values!! :/
+            if (transaction != null) command.Transaction = transaction;
             return command;
         }
     }
