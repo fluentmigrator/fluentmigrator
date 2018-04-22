@@ -28,6 +28,7 @@ using FluentMigrator.Runner.BatchParser.SpecialTokenSearchers;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Generic;
 using FluentMigrator.Runner.Helpers;
+using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
@@ -72,8 +73,9 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             [NotNull] IMigrationGenerator generator,
             [NotNull] IQuoter quoter,
             [NotNull] IAnnouncer announcer,
-            [NotNull] IOptions<ProcessorOptions> options)
-            : base(SqlClientFactory.Instance, generator, announcer, options.Value)
+            [NotNull] IOptions<ProcessorOptions> options,
+            [NotNull] IConnectionStringAccessor connectionStringAccessor)
+            : base(SqlClientFactory.Instance, generator, announcer, options.Value, connectionStringAccessor)
         {
             var dbTypes = databaseTypes.ToList();
             DatabaseType = dbTypes.First();

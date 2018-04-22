@@ -14,26 +14,21 @@
 // limitations under the License.
 #endregion
 
+using FluentMigrator.Runner.VersionTableInfo;
+
 using JetBrains.Annotations;
 
-namespace FluentMigrator.Runner.Processors
+namespace FluentMigrator.Runner.Initialization
 {
     /// <summary>
-    /// This implementation of <see cref="IProcessorAccessor"/> only returns the
-    /// last defined processor service.
+    /// Accessor for the <see cref="IVersionTableMetaData"/>
     /// </summary>
-    public class SingleProcessorAccessor : IProcessorAccessor
+    public interface IVersionTableMetaDataAccessor
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="SingleProcessorAccessor"/> class.
+        /// Gets the version table metadata
         /// </summary>
-        /// <param name="processor">The processor to be returned</param>
-        public SingleProcessorAccessor([NotNull] IMigrationProcessor processor)
-        {
-            Processor = processor;
-        }
-
-        /// <inheritdoc />
-        public IMigrationProcessor Processor { get; }
+        [CanBeNull]
+        IVersionTableMetaData VersionTableMetaData { get; }
     }
 }

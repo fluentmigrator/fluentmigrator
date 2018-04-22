@@ -15,25 +15,25 @@
 #endregion
 
 using System.Collections.Generic;
+using System.Reflection;
 
-using FluentMigrator.Runner.Generators.SqlServer;
-using FluentMigrator.Runner.Initialization;
-
-using JetBrains.Annotations;
-
-using Microsoft.Extensions.Options;
-
-namespace FluentMigrator.Runner.Processors.SqlServer
+namespace FluentMigrator.Runner.Initialization
 {
-    public class SqlServer2016Processor : SqlServerProcessor
+    /// <summary>
+    /// The default implementation of an <see cref="IAssemblySourceItem"/>
+    /// </summary>
+    public class AssemblySourceItem : IAssemblySourceItem
     {
-        /// <inheritdoc />
-        public SqlServer2016Processor(
-            [NotNull] IAnnouncer announcer,
-            [NotNull] IOptions<ProcessorOptions> options,
-            [NotNull] IConnectionStringAccessor connectionStringAccessor)
-            : base(new[] { "SqlServer2016", "SqlServer" }, new SqlServer2016Generator(), new SqlServer2008Quoter(), announcer, options, connectionStringAccessor)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AssemblySourceItem"/> class.
+        /// </summary>
+        /// <param name="assemblies">The assemblies to be returned by <see cref="Assemblies"/></param>
+        public AssemblySourceItem(params Assembly[] assemblies)
         {
+            Assemblies = assemblies;
         }
+
+        /// <inheritdoc />
+        public IEnumerable<Assembly> Assemblies { get; }
     }
 }

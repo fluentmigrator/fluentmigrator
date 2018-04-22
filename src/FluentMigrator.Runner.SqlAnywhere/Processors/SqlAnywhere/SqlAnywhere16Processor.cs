@@ -31,6 +31,7 @@ using FluentMigrator.Runner.BatchParser;
 using FluentMigrator.Runner.BatchParser.Sources;
 using FluentMigrator.Runner.BatchParser.SpecialTokenSearchers;
 using FluentMigrator.Runner.Helpers;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.SqlAnywhere;
 
 using JetBrains.Annotations;
@@ -46,8 +47,9 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
             [NotNull] SqlAnywhereDbFactory factory,
             [NotNull] IMigrationGenerator generator,
             [NotNull] IAnnouncer announcer,
-            [NotNull] IOptions<ProcessorOptions> options)
-            : base("SqlAnywhere16", factory.Factory, generator, announcer, options)
+            [NotNull] IOptions<ProcessorOptions> options,
+            [NotNull] IConnectionStringAccessor connectionStringAccessor)
+            : base("SqlAnywhere16", factory.Factory, generator, announcer, options, connectionStringAccessor)
         {
         }
     }

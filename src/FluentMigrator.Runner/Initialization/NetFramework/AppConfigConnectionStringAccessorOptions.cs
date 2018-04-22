@@ -1,4 +1,4 @@
-#region License
+﻿#region License
 // Copyright (c) 2018, FluentMigrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,26 +15,26 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
 using JetBrains.Annotations;
 
-namespace FluentMigrator.Infrastructure
+namespace FluentMigrator.Runner.Initialization.NetFramework
 {
     /// <summary>
-    /// A compatibility service to get the assembly collection from the found migrations
+    /// Options for the <see cref="AppConfigConnectionStringReader"/>
     /// </summary>
-    [Obsolete("Exists only to simplify the migration to the new FluentMigration version")]
-    public class AssemblyCollectionService : AssemblyCollection
+    public class AppConfigConnectionStringAccessorOptions
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="AssemblyCollectionService"/> class.
+        /// Gets or sets the path where the config file can be found
         /// </summary>
-        /// <param name="migrations">The migrations to get the assemblies for</param>
-        public AssemblyCollectionService([NotNull, ItemNotNull] IEnumerable<IMigration> migrations)
-            : base(migrations.Select(m => m.GetType().Assembly).Distinct())
-        {
-        }
+        [CanBeNull]
+        public string ConnectionStringConfigPath { get; set; }
+
+        /// <summary>
+        /// Gets or sets the machine name
+        /// </summary>
+        [CanBeNull]
+        public string MachineName { get; set; } = Environment.MachineName;
     }
 }

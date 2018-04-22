@@ -32,7 +32,7 @@ namespace FluentMigrator.Runner
         /// </summary>
         /// <param name="builder">The builder to add the SAP SQL Anywhere-specific services to</param>
         /// <returns>The migration runner builder</returns>
-        public static IMigrationRunnerBuilder UseSqlAnywhere(this IMigrationRunnerBuilder builder)
+        public static IMigrationRunnerBuilder AddSqlAnywhere(this IMigrationRunnerBuilder builder)
         {
             builder.Services
                 .AddScoped<SqlAnywhereDbFactory>()

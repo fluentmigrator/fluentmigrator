@@ -24,6 +24,8 @@ using FluentMigrator.Infrastructure;
 using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Runner.Initialization;
 
+using Microsoft.Extensions.Options;
+
 namespace FluentMigrator.Runner
 {
     public class MaintenanceLoader : IMaintenanceLoader
@@ -50,13 +52,13 @@ namespace FluentMigrator.Runner
             );
         }
 
-        public MaintenanceLoader(IEnumerable<IMigration> migrations, IRunnerContext runnerContext, IMigrationRunnerConventions conventions)
+        public MaintenanceLoader(IMigrationSource source, IOptions<RunnerOptions> options, IMigrationRunnerConventions conventions)
         {
-            var tags = runnerContext.Tags?.ToList() ?? new List<string>();
-            var requireTags = tags.Count != 0;
+            var tags = options.Value.Tags ?? new string[0];
+            var requireTags = tags.Length != 0;
 
             _maintenance = (
-                from migration in migrations
+                from migration in source.GetMigrations()
                 let type = migration.GetType()
                 let stage = conventions.GetMaintenanceStage(type)
                 where stage != null

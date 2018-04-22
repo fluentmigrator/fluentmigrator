@@ -32,7 +32,7 @@ namespace FluentMigrator.Runner
         /// </summary>
         /// <param name="builder">The builder to add the SQL Server CE-specific services to</param>
         /// <returns>The migration runner builder</returns>
-        public static IMigrationRunnerBuilder UseSqlServerCe(this IMigrationRunnerBuilder builder)
+        public static IMigrationRunnerBuilder AddSqlServerCe(this IMigrationRunnerBuilder builder)
         {
             builder.Services
                 .AddScoped<SqlServerCeDbFactory>()

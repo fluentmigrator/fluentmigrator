@@ -28,6 +28,7 @@ namespace FluentMigrator.Runner.Processors
     /// <summary>
     /// A processor factory to create SQL statements only (without executing them)
     /// </summary>
+    [Obsolete]
     public class ConnectionlessProcessorFactory : IMigrationProcessorFactory
     {
         [NotNull]
@@ -35,9 +36,6 @@ namespace FluentMigrator.Runner.Processors
 
         [NotNull]
         private readonly string _databaseId;
-
-        [NotNull]
-        private readonly ProcessorOptions _options;
 
         [NotNull]
         private readonly IAnnouncer _announcer;
@@ -55,19 +53,25 @@ namespace FluentMigrator.Runner.Processors
             _generator = generatorAccessor.Generator;
             _databaseId = runnerContext.Database;
             _announcer = runnerContext.Announcer;
-            _options = new ProcessorOptions(runnerContext);
             Name = _generator.GetName();
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ConnectionlessProcessorFactory"/> class.
+        /// </summary>
+        /// <param name="generatorAccessor">Accessor to get the selected generator</param>
+        /// <param name="announcer">The announcer</param>
+        /// <param name="accessorOptions">The processor accessor options</param>
         public ConnectionlessProcessorFactory(
             [NotNull] IGeneratorAccessor generatorAccessor,
-            [NotNull] IOptions<ProcessorOptions> options,
-            [NotNull] IAnnouncer announcer)
+            [NotNull] IAnnouncer announcer,
+            [NotNull] IOptions<SelectingProcessorAccessorOptions> accessorOptions)
         {
             _generator = generatorAccessor.Generator;
-            _options = options.Value;
             _announcer = announcer;
-            Name = _databaseId = _generator.GetName();
+            Name = _databaseId = string.IsNullOrEmpty(accessorOptions.Value.ProcessorId)
+                ? generatorAccessor.Generator.GetName()
+                : accessorOptions.Value.ProcessorId;
         }
 
         /// <inheritdoc />
@@ -75,13 +79,15 @@ namespace FluentMigrator.Runner.Processors
         public IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
         {
             var processorOptions = options.GetProcessorOptions(connectionString);
-            return new ConnectionlessProcessor(_databaseId, _generator, _announcer, processorOptions);
-        }
-
-        /// <inheritdoc />
-        public IMigrationProcessor Create()
-        {
-            return new ConnectionlessProcessor(_databaseId, _generator, _announcer, _options);
+            return new ConnectionlessProcessor(
+                _generator,
+                _announcer,
+                new OptionsWrapper<ProcessorOptions>(processorOptions),
+                new OptionsWrapper<SelectingProcessorAccessorOptions>(
+                    new SelectingProcessorAccessorOptions()
+                    {
+                        ProcessorId = _databaseId,
+                    }));
         }
 
         /// <inheritdoc />

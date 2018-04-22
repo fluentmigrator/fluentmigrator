@@ -38,7 +38,7 @@ namespace FluentMigrator.Runner
         private readonly string[] _tagsToMatch;
 
         [NotNull]
-        private readonly FluentMigrator.Runner.Initialization.IMigrationSource _source;
+        private readonly IMigrationSource _source;
 
         [CanBeNull]
         private SortedList<long, IMigrationInfo> _migrationInfos;
@@ -73,11 +73,11 @@ namespace FluentMigrator.Runner
             Namespace = @namespace;
             LoadNestedNamespaces = loadNestedNamespaces;
             _tagsToMatch = tagsToMatch?.ToArray() ?? Array.Empty<string>();
-            _source = new MigrationSource(new AssemblySource(assemblies), conventions);
+            _source = new MigrationSource(new AssemblySource(() => assemblies), conventions);
         }
 
         public DefaultMigrationInformationLoader(
-            [NotNull] FluentMigrator.Runner.Initialization.IMigrationSource source,
+            [NotNull] IMigrationSource source,
             [NotNull] IOptions<TypeFilterOptions> filterOptions,
             [NotNull] IMigrationRunnerConventions conventions,
             [NotNull] IOptions<RunnerOptions> runnerOptions)
@@ -129,7 +129,7 @@ namespace FluentMigrator.Runner
 
         [NotNull, ItemNotNull]
         private static IEnumerable<IMigrationInfo> FindMigrations(
-            [NotNull] FluentMigrator.Runner.Initialization.IMigrationSource source,
+            [NotNull] IMigrationSource source,
             [NotNull] IMigrationRunnerConventions conventions,
             [CanBeNull] string @namespace,
             bool loadNestedNamespaces,

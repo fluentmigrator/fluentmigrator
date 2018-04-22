@@ -24,6 +24,8 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Initialization;
 
+using Microsoft.Extensions.Options;
+
 namespace FluentMigrator.Runner.VersionTableInfo
 {
     public class DefaultVersionTableMetaData : IVersionTableMetaData, ISchemaExpression
@@ -41,10 +43,12 @@ namespace FluentMigrator.Runner.VersionTableInfo
             SchemaName = schemaName ?? string.Empty;
         }
 
-        public DefaultVersionTableMetaData(IConventionSet conventionSet, IRunnerContext runnerContext)
+        public DefaultVersionTableMetaData(IConventionSet conventionSet, IOptions<RunnerOptions> runnerOptions)
         {
 #pragma warning disable 618
-            ApplicationContext = runnerContext.ApplicationContext;
+#pragma warning disable 612
+            ApplicationContext = runnerOptions.Value.ApplicationContext;
+#pragma warning restore 612
 #pragma warning restore 618
             conventionSet.SchemaConvention?.Apply(this);
         }
@@ -57,7 +61,7 @@ namespace FluentMigrator.Runner.VersionTableInfo
         /// implementing <code>IVersionTableMetaData</code> and before any of properties of <code>IVersionTableMetaData</code>
         /// is called. Properties can use <code>ApplicationContext</code> value to implement context-depending logic.
         /// </remarks>
-        [Obsolete("Use dependency injection to get the IRunnerContext")]
+        [Obsolete("Use dependency injection to get data using your own services")]
         public object ApplicationContext { get; set; }
 
         public virtual string SchemaName { get; set; }

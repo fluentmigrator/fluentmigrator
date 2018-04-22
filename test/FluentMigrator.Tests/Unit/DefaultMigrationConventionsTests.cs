@@ -498,7 +498,7 @@ namespace FluentMigrator.Tests.Unit
                 null,
                 new ProcessorOptions(),
                 null);
-            var context = new MigrationContext(querySchema, null, null, (string)null);
+            var context = new MigrationContext(querySchema, (IAssemblyCollection)null, null, null);
             var expr = new ObsoleteAutoScriptMigrationFake();
             expr.GetUpExpressions(context);
 
@@ -526,7 +526,7 @@ namespace FluentMigrator.Tests.Unit
                 null,
                 new ProcessorOptions(),
                 null);
-            var context = new MigrationContext(querySchema, null, null, (string) null);
+            var context = new MigrationContext(querySchema, (IAssemblyCollection)null, null, null);
             var expr = new ObsoleteAutoScriptMigrationFake();
             expr.GetDownExpressions(context);
 
@@ -561,7 +561,7 @@ namespace FluentMigrator.Tests.Unit
     class AutoScriptMigrationFake : AutoScriptMigration
     {
         public AutoScriptMigrationFake()
-            : base(new DefaultEmbeddedResourceProvider(new IMigration[0]))
+            : base(new DefaultEmbeddedResourceProvider())
         {
         }
     }

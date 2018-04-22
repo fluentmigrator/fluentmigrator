@@ -9,6 +9,7 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Hana;
 using FluentMigrator.Runner.Helpers;
+using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
@@ -28,8 +29,9 @@ namespace FluentMigrator.Runner.Processors.Hana
             [NotNull] HanaDbFactory factory,
             [NotNull] IMigrationGenerator generator,
             [NotNull] IAnnouncer announcer,
-            [NotNull] IOptions<ProcessorOptions> options)
-            : base(factory.Factory, generator, announcer, options.Value)
+            [NotNull] IOptions<ProcessorOptions> options,
+            [NotNull] IConnectionStringAccessor connectionStringAccessor)
+            : base(factory.Factory, generator, announcer, options.Value, connectionStringAccessor)
         {
         }
 

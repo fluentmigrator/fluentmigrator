@@ -42,7 +42,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         [Test]
         public void ErrorIsReturnWhenSqlScriptIsNullOrEmpty()
         {
-            var provider = new DefaultEmbeddedResourceProvider(new IMigration[0]);
+            var provider = new DefaultEmbeddedResourceProvider();
             var expression = new ExecuteEmbeddedSqlScriptExpression(provider) { SqlScript = null };
             var errors = ValidationHelper.CollectErrors(expression);
             errors.ShouldContain(ErrorMessages.SqlScriptCannotBeNullOrEmpty);

@@ -57,16 +57,7 @@ namespace FluentMigrator.Tests.Integration
     [Category("Integration")]
     public class MigrationRunnerTests : IntegrationTestBase
     {
-        private IRunnerContext _runnerContext;
-
-        [SetUp]
-        public void SetUp()
-        {
-            _runnerContext = new RunnerContext(new TextWriterAnnouncer(TestContext.Out))
-            {
-                Namespace = "FluentMigrator.Tests.Integration.Migrations"
-            };
-        }
+        private static readonly string _rootNamespace = "FluentMigrator.Tests.Integration.Migrations";
 
         [Test]
         [Category("Firebird")]
@@ -84,7 +75,7 @@ namespace FluentMigrator.Tests.Integration
             ExecuteWithSupportedProcessors(
                 processor =>
                 {
-                    var serviceProvider = processor.CreateServices().WithRunnerContext(_runnerContext)
+                    var serviceProvider = processor.CreateServices().WithMigrationsIn(_rootNamespace)
                         .BuildServiceProvider();
                     var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
 
@@ -123,7 +114,7 @@ namespace FluentMigrator.Tests.Integration
                 processor.Setup(x => x.Process(It.IsAny<DeleteForeignKeyExpression>())).Throws(new Exception("Error"));
                 processor.Setup(x => x.Options).Returns(processorOptions.Object);
 
-                var serviceProvider = processor.Object.CreateServices().WithRunnerContext(_runnerContext)
+                var serviceProvider = processor.Object.CreateServices().WithMigrationsIn(_rootNamespace)
                     .BuildServiceProvider();
 
                 var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
@@ -161,7 +152,7 @@ namespace FluentMigrator.Tests.Integration
             ExecuteWithSupportedProcessors(
                 processor =>
                 {
-                    var serviceProvider = processor.CreateServices().WithRunnerContext(_runnerContext)
+                    var serviceProvider = processor.CreateServices().WithMigrationsIn(_rootNamespace)
                         .BuildServiceProvider();
                     var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
 
@@ -187,7 +178,7 @@ namespace FluentMigrator.Tests.Integration
             ExecuteWithSupportedProcessors(
                 processor =>
                 {
-                    var serviceProvider = processor.CreateServices().WithRunnerContext(_runnerContext)
+                    var serviceProvider = processor.CreateServices().WithMigrationsIn(_rootNamespace)
                         .BuildServiceProvider();
                     var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
 
@@ -214,7 +205,7 @@ namespace FluentMigrator.Tests.Integration
             ExecuteWithSupportedProcessors(
                 processor =>
                 {
-                    var serviceProvider = processor.CreateServices().WithRunnerContext(_runnerContext)
+                    var serviceProvider = processor.CreateServices().WithMigrationsIn(_rootNamespace)
                         .BuildServiceProvider();
                     var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
 
@@ -243,7 +234,7 @@ namespace FluentMigrator.Tests.Integration
             ExecuteWithSupportedProcessors(
                 processor =>
                 {
-                    var serviceProvider = processor.CreateServices().WithRunnerContext(_runnerContext)
+                    var serviceProvider = processor.CreateServices().WithMigrationsIn(_rootNamespace)
                         .BuildServiceProvider();
                     var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
 
@@ -277,7 +268,7 @@ namespace FluentMigrator.Tests.Integration
             ExecuteWithSupportedProcessors(
                 processor =>
                 {
-                    var serviceProvider = processor.CreateServices().WithRunnerContext(_runnerContext)
+                    var serviceProvider = processor.CreateServices().WithMigrationsIn(_rootNamespace)
                         .BuildServiceProvider();
                     var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
 
@@ -307,7 +298,7 @@ namespace FluentMigrator.Tests.Integration
             ExecuteWithSupportedProcessors(
                 processor =>
                 {
-                    var serviceProvider = processor.CreateServices().WithRunnerContext(_runnerContext)
+                    var serviceProvider = processor.CreateServices().WithMigrationsIn(_rootNamespace)
                         .BuildServiceProvider();
                     var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
 
@@ -341,7 +332,7 @@ namespace FluentMigrator.Tests.Integration
             ExecuteWithSupportedProcessors(
                 processor =>
                 {
-                    var serviceProvider = processor.CreateServices().WithRunnerContext(_runnerContext)
+                    var serviceProvider = processor.CreateServices().WithMigrationsIn(_rootNamespace)
                         .BuildServiceProvider();
                     var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
 
@@ -380,7 +371,7 @@ namespace FluentMigrator.Tests.Integration
             ExecuteWithSupportedProcessors(
                 processor =>
                 {
-                    var serviceProvider = processor.CreateServices().WithRunnerContext(_runnerContext)
+                    var serviceProvider = processor.CreateServices().WithMigrationsIn(_rootNamespace)
                         .BuildServiceProvider();
                     var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
 
@@ -419,7 +410,7 @@ namespace FluentMigrator.Tests.Integration
             ExecuteWithSupportedProcessors(
                 processor =>
                 {
-                    var serviceProvider = processor.CreateServices().WithRunnerContext(_runnerContext)
+                    var serviceProvider = processor.CreateServices().WithMigrationsIn(_rootNamespace)
                         .BuildServiceProvider();
                     var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
 
@@ -460,7 +451,7 @@ namespace FluentMigrator.Tests.Integration
             ExecuteWithSupportedProcessors(
                 processor =>
                 {
-                    var serviceProvider = processor.CreateServices().WithRunnerContext(_runnerContext)
+                    var serviceProvider = processor.CreateServices().WithMigrationsIn(_rootNamespace)
                         .BuildServiceProvider();
                     var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
 
@@ -494,7 +485,7 @@ namespace FluentMigrator.Tests.Integration
             ExecuteWithSupportedProcessors(
                 processor =>
                 {
-                    var serviceProvider = processor.CreateServices().WithRunnerContext(_runnerContext)
+                    var serviceProvider = processor.CreateServices().WithMigrationsIn(_rootNamespace)
                         .BuildServiceProvider();
                     var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
 
@@ -534,7 +525,7 @@ namespace FluentMigrator.Tests.Integration
             ExecuteWithSupportedProcessors(processor =>
             {
                 var serviceProvider = processor.CreateServices()
-                    .WithRunnerContext(_runnerContext)
+                    .WithMigrationsIn(_rootNamespace)
                     .WithMigrationsIn(typeof(TestMigration).Namespace)
                     .BuildServiceProvider();
                 var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
@@ -561,7 +552,7 @@ namespace FluentMigrator.Tests.Integration
             ExecuteWithSupportedProcessors(processor =>
             {
                 var serviceProvider = processor.CreateServices()
-                    .WithRunnerContext(_runnerContext)
+                    .WithMigrationsIn(_rootNamespace)
                     .WithMigrationsIn(typeof(TestMigration).Namespace)
                     .BuildServiceProvider();
                 var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
@@ -761,15 +752,9 @@ namespace FluentMigrator.Tests.Integration
         {
             ExecuteWithSupportedProcessors(processor =>
             {
-                var runnerContext = new RunnerContext(new TextWriterAnnouncer(TestContext.Out))
-                {
-                    Namespace = typeof(TenantATable).Namespace,
-                    Tags = new[] { "TenantA" }
-                };
-
                 var serviceProvider = processor.CreateServices()
-                    .WithRunnerContext(runnerContext)
                     .WithMigrationsIn(typeof(TenantATable).Namespace)
+                    .Configure<RunnerOptions>(opt => opt.Tags = new[] { "TenantA" })
                     .BuildServiceProvider();
 
                 var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
@@ -805,15 +790,9 @@ namespace FluentMigrator.Tests.Integration
         {
             ExecuteWithSupportedProcessors(processor =>
             {
-                var runnerContext = new RunnerContext(new TextWriterAnnouncer(TestContext.Out))
-                {
-                    Namespace = typeof(TenantATable).Namespace,
-                    Tags = new[] { "TenantA", "TenantB" }
-                };
-
                 var serviceProvider = processor.CreateServices()
-                    .WithRunnerContext(runnerContext)
                     .WithMigrationsIn(typeof(TenantATable).Namespace)
+                    .Configure<RunnerOptions>(opt => opt.Tags = new[] { "TenantA", "TenantB" })
                     .BuildServiceProvider();
 
                 var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
@@ -849,15 +828,9 @@ namespace FluentMigrator.Tests.Integration
         {
             ExecuteWithSupportedProcessors(processor =>
             {
-                var runnerContext = new RunnerContext(new TextWriterAnnouncer(TestContext.Out))
-                {
-                    Namespace = typeof(TenantATable).Namespace,
-                    Tags = new[] { "TenantB" }
-                };
-
                 var serviceProvider = processor.CreateServices()
-                    .WithRunnerContext(runnerContext)
                     .WithMigrationsIn(typeof(TenantATable).Namespace)
+                    .Configure<RunnerOptions>(opt => opt.Tags = new[] { "TenantB" })
                     .BuildServiceProvider();
 
                 var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
@@ -891,23 +864,17 @@ namespace FluentMigrator.Tests.Integration
         {
             var migrationsNamespace = typeof(TenantATable).Namespace;
 
-            var runnerContext = new RunnerContext(new TextWriterAnnouncer(TestContext.Out))
-            {
-                Namespace = migrationsNamespace,
-            };
-
             // Excluded SqliteProcessor as it errors on DB cleanup (RollbackToVersion).
             ExecuteWithSupportedProcessors(processor =>
             {
-                runnerContext.Tags = new[] { "TenantA" };
-
-                var serviceProvider = processor.CreateServices()
-                    .WithRunnerContext(runnerContext)
-                    .WithMigrationsIn(typeof(TenantATable).Namespace)
-                    .BuildServiceProvider();
+                var services = processor.CreateServices()
+                    .WithMigrationsIn(migrationsNamespace);
 
                 try
                 {
+                    var serviceProvider = services
+                        .Configure<RunnerOptions>(opt => opt.Tags = new[] { "TenantA" })
+                        .BuildServiceProvider();
                     using (var scope = serviceProvider.CreateScope())
                     {
                         var runner = (MigrationRunner) scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
@@ -919,7 +886,9 @@ namespace FluentMigrator.Tests.Integration
                     processor.TableExists(null, "TenantBTable").ShouldBeFalse();
                     processor.TableExists(null, "TenantAandBTable").ShouldBeTrue();
 
-                    runnerContext.Tags = new[] { "TenantB" };
+                    serviceProvider = services
+                        .Configure<RunnerOptions>(opt => opt.Tags = new[] { "TenantB" })
+                        .BuildServiceProvider();
 
                     using (var scope = serviceProvider.CreateScope())
                     {
@@ -934,7 +903,9 @@ namespace FluentMigrator.Tests.Integration
                 }
                 finally
                 {
-                    runnerContext.Tags = new[] { "TenantA" };
+                    var serviceProvider = services
+                        .Configure<RunnerOptions>(opt => opt.Tags = new[] { "TenantA" })
+                        .BuildServiceProvider();
 
                     using (var scope = serviceProvider.CreateScope())
                     {
@@ -963,15 +934,10 @@ namespace FluentMigrator.Tests.Integration
             try
             {
                 var versionTableMetaData = new TestVersionTableMetaData();
-                var runnerContext = new RunnerContext(announcer)
-                {
-                    Namespace = "FluentMigrator.Tests.Integration.Migrations",
-                    PreviewOnly = true
-                };
 
                 var serviceProvider = processor.CreateServices()
-                    .WithRunnerContext(runnerContext)
-                    .WithMigrationsIn(runnerContext.Namespace)
+                    .WithMigrationsIn("FluentMigrator.Tests.Integration.Migrations")
+                    .Configure<ProcessorOptions>(opt => opt.PreviewOnly = true)
                     .BuildServiceProvider();
 
                 var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
@@ -1022,14 +988,8 @@ namespace FluentMigrator.Tests.Integration
         {
             ExecuteWithSupportedProcessors(processor =>
             {
-                var runnerContext = new RunnerContext(new TextWriterAnnouncer(TestContext.Out))
-                {
-                    Namespace = typeof(TenantATable).Namespace
-                };
-
                 var serviceProvider = processor.CreateServices()
-                    .WithRunnerContext(runnerContext)
-                    .WithMigrationsIn(runnerContext.Namespace)
+                    .WithMigrationsIn(typeof(TenantATable).Namespace)
                     .BuildServiceProvider();
 
                 var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
@@ -1064,24 +1024,22 @@ namespace FluentMigrator.Tests.Integration
             // Using SqlServer instead of SqlLite as versions not deleted from VersionInfo table when using Sqlite.
             var excludedProcessors = new[] { typeof(SQLiteProcessor), typeof(MySqlProcessor), typeof(PostgresProcessor) };
 
-            var runnerContext1 = new RunnerContext(new TextWriterAnnouncer(TestContext.Out)) { Namespace = typeof(Migrations.Interleaved.Pass2.User).Namespace };
-            var runnerContext2 = new RunnerContext(new TextWriterAnnouncer(TestContext.Out)) { Namespace = typeof(Migrations.Interleaved.Pass3.User).Namespace };
+            var namespacePass2 = typeof(Migrations.Interleaved.Pass2.User).Namespace;
+            var namespacePass3 = typeof(Migrations.Interleaved.Pass3.User).Namespace;
 
             try
             {
                 ExecuteWithSupportedProcessors(processor =>
                 {
                     var runner1 = processor.CreateServices()
-                        .WithRunnerContext(runnerContext1)
-                        .WithMigrationsIn(runnerContext1.Namespace)
+                        .WithMigrationsIn(namespacePass2)
                         .BuildServiceProvider()
                         .GetRequiredService<IMigrationRunner>();
 
                     runner1.MigrateUp(3);
 
                     var runner2 = processor.CreateServices()
-                        .WithRunnerContext(runnerContext2)
-                        .WithMigrationsIn(runnerContext2.Namespace)
+                        .WithMigrationsIn(namespacePass3)
                         .BuildServiceProvider()
                         .GetRequiredService<IMigrationRunner>();
 
@@ -1093,8 +1051,7 @@ namespace FluentMigrator.Tests.Integration
                 ExecuteWithSupportedProcessors(processor =>
                 {
                     var runner = processor.CreateServices()
-                        .WithRunnerContext(runnerContext2)
-                        .WithMigrationsIn(runnerContext2.Namespace)
+                        .WithMigrationsIn(namespacePass3)
                         .BuildServiceProvider()
                         .GetRequiredService<IMigrationRunner>();
                     runner.RollbackToVersion(0);
@@ -1116,8 +1073,8 @@ namespace FluentMigrator.Tests.Integration
             // Using SqlServer instead of SqlLite as versions not deleted from VersionInfo table when using Sqlite.
             var excludedProcessors = new[] { typeof(MySqlProcessor), typeof(SQLiteProcessor) };
 
-            var runnerContext1 = new RunnerContext(new TextWriterAnnouncer(TestContext.Out)) { Namespace = typeof(Migrations.Interleaved.Pass2.User).Namespace };
-            var runnerContext2 = new RunnerContext(new TextWriterAnnouncer(TestContext.Out)) { Namespace = typeof(Migrations.Interleaved.Pass3.User).Namespace };
+            var namespacePass2 = typeof(Migrations.Interleaved.Pass2.User).Namespace;
+            var namespacePass3 = typeof(Migrations.Interleaved.Pass3.User).Namespace;
 
             VersionOrderInvalidException caughtException = null;
 
@@ -1126,8 +1083,7 @@ namespace FluentMigrator.Tests.Integration
                 ExecuteWithSupportedProcessors(processor =>
                 {
                     var migrationRunner = processor.CreateServices()
-                        .WithRunnerContext(runnerContext1)
-                        .WithMigrationsIn(runnerContext1.Namespace)
+                        .WithMigrationsIn(namespacePass2)
                         .BuildServiceProvider()
                         .GetRequiredService<IMigrationRunner>();
 
@@ -1137,8 +1093,7 @@ namespace FluentMigrator.Tests.Integration
                 ExecuteWithSupportedProcessors(processor =>
                 {
                     var migrationRunner = processor.CreateServices()
-                        .WithRunnerContext(runnerContext2)
-                        .WithMigrationsIn(runnerContext2.Namespace)
+                        .WithMigrationsIn(namespacePass3)
                         .BuildServiceProvider()
                         .GetRequiredService<IMigrationRunner>();
 
@@ -1154,8 +1109,7 @@ namespace FluentMigrator.Tests.Integration
                 ExecuteWithSupportedProcessors(processor =>
                 {
                     var migrationRunner = processor.CreateServices()
-                        .WithRunnerContext(runnerContext2)
-                        .WithMigrationsIn(runnerContext2.Namespace)
+                        .WithMigrationsIn(namespacePass3)
                         .BuildServiceProvider()
                         .GetRequiredService<IMigrationRunner>();
 
@@ -1185,7 +1139,7 @@ namespace FluentMigrator.Tests.Integration
                     }
 
                     var serviceProvider = processor.CreateServices()
-                        .WithRunnerContext(_runnerContext)
+                        .WithMigrationsIn(_rootNamespace)
                         .BuildServiceProvider();
 
                     var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
@@ -1211,7 +1165,7 @@ namespace FluentMigrator.Tests.Integration
             Action<IMigrationProcessor> action = processor =>
             {
                 var serviceProvider = processor.CreateServices()
-                    .WithRunnerContext(_runnerContext)
+                    .WithMigrationsIn(_rootNamespace)
                     .WithMigrationsIn(typeof(TestMigration).Namespace)
                     .BuildServiceProvider();
 
@@ -1254,7 +1208,7 @@ namespace FluentMigrator.Tests.Integration
                 processor =>
                 {
                     var serviceProvider = processor.CreateServices()
-                        .WithRunnerContext(_runnerContext)
+                        .WithMigrationsIn(_rootNamespace)
                         .WithMigrationsIn(typeof(TestMigration).Namespace)
                         .BuildServiceProvider();
 
@@ -1298,7 +1252,7 @@ namespace FluentMigrator.Tests.Integration
                 processor =>
                 {
                     var serviceProvider = processor.CreateServices()
-                        .WithRunnerContext(_runnerContext)
+                        .WithMigrationsIn(_rootNamespace)
                         .WithMigrationsIn(typeof(TestMigration).Namespace)
                         .BuildServiceProvider();
 
@@ -1338,7 +1292,7 @@ namespace FluentMigrator.Tests.Integration
                 processor =>
                 {
                     var serviceProvider = processor.CreateServices()
-                        .WithRunnerContext(_runnerContext)
+                        .WithMigrationsIn(_rootNamespace)
                         .WithMigrationsIn(typeof(TestMigration).Namespace)
                         .BuildServiceProvider();
 
@@ -1380,7 +1334,7 @@ namespace FluentMigrator.Tests.Integration
                 processor =>
                 {
                     var serviceProvider = processor.CreateServices()
-                        .WithRunnerContext(_runnerContext)
+                        .WithMigrationsIn(_rootNamespace)
                         .WithMigrationsIn(typeof(TestMigration).Namespace)
                         .BuildServiceProvider();
 
@@ -1414,7 +1368,7 @@ namespace FluentMigrator.Tests.Integration
                 processor =>
                 {
                     var serviceProvider = processor.CreateServices()
-                        .WithRunnerContext(_runnerContext)
+                        .WithMigrationsIn(_rootNamespace)
                         .WithMigrationsIn(typeof(TestMigration).Namespace)
                         .BuildServiceProvider();
 
@@ -1457,7 +1411,7 @@ namespace FluentMigrator.Tests.Integration
                 processor =>
                 {
                     var serviceProvider = processor.CreateServices()
-                        .WithRunnerContext(_runnerContext)
+                        .WithMigrationsIn(_rootNamespace)
                         .WithMigrationsIn(typeof(TestMigration).Namespace)
                         .BuildServiceProvider();
 
@@ -1489,7 +1443,7 @@ namespace FluentMigrator.Tests.Integration
                 processor =>
                 {
                     var serviceProvider = processor.CreateServices()
-                        .WithRunnerContext(_runnerContext)
+                        .WithMigrationsIn(_rootNamespace)
                         .WithMigrationsIn(typeof(TestMigration).Namespace)
                         .BuildServiceProvider();
 
@@ -1526,7 +1480,7 @@ namespace FluentMigrator.Tests.Integration
                 processor =>
                 {
                     var serviceProvider = processor.CreateServices()
-                        .WithRunnerContext(_runnerContext)
+                        .WithMigrationsIn(_rootNamespace)
                         .WithMigrationsIn(typeof(TestMigration).Namespace)
                         .BuildServiceProvider();
 
@@ -1571,7 +1525,7 @@ namespace FluentMigrator.Tests.Integration
                 processor =>
                 {
                     var serviceProvider = processor.CreateServices()
-                        .WithRunnerContext(_runnerContext)
+                        .WithMigrationsIn(_rootNamespace)
                         .WithMigrationsIn(typeof(TestMigration).Namespace)
                         .BuildServiceProvider();
 
@@ -1610,7 +1564,7 @@ namespace FluentMigrator.Tests.Integration
                 processor =>
                 {
                     var serviceProvider = processor.CreateServices()
-                        .WithRunnerContext(_runnerContext)
+                        .WithMigrationsIn(_rootNamespace)
                         .WithMigrationsIn(typeof(TestMigration).Namespace)
                         .BuildServiceProvider();
 
@@ -1654,7 +1608,7 @@ namespace FluentMigrator.Tests.Integration
                 processor =>
                 {
                     var serviceProvider = processor.CreateServices()
-                        .WithRunnerContext(_runnerContext)
+                        .WithMigrationsIn(_rootNamespace)
                         .WithMigrationsIn(typeof(TestMigration).Namespace)
                         .BuildServiceProvider();
 
@@ -1693,7 +1647,7 @@ namespace FluentMigrator.Tests.Integration
                 processor =>
                 {
                     var serviceProvider = processor.CreateServices()
-                        .WithRunnerContext(_runnerContext)
+                        .WithMigrationsIn(_rootNamespace)
                         .WithMigrationsIn(typeof(TestMigration).Namespace)
                         .BuildServiceProvider();
 
@@ -1729,7 +1683,7 @@ namespace FluentMigrator.Tests.Integration
                 processor =>
                 {
                     var serviceProvider = processor.CreateServices()
-                        .WithRunnerContext(_runnerContext)
+                        .WithMigrationsIn(_rootNamespace)
                         .WithMigrationsIn(typeof(TestMigration).Namespace)
                         .BuildServiceProvider();
 
@@ -1771,7 +1725,7 @@ namespace FluentMigrator.Tests.Integration
                 processor =>
                 {
                     var serviceProvider = processor.CreateServices()
-                        .WithRunnerContext(_runnerContext)
+                        .WithMigrationsIn(_rootNamespace)
                         .WithMigrationsIn(typeof(TestMigration).Namespace)
                         .BuildServiceProvider();
 
@@ -1786,18 +1740,10 @@ namespace FluentMigrator.Tests.Integration
 
         private MigrationRunner SetupMigrationRunner(IMigrationProcessor processor)
         {
-            var runnerContext = new RunnerContext(new TextWriterAnnouncer(TestContext.Out))
-            {
-                Namespace = "FluentMigrator.Tests.Integration.Migrations",
-                AllowBreakingChange = true,
-            };
-
-            var services = ServiceCollectionExtensions.CreateServiceCollection();
-
-            var serviceProvider = services
-                .AddScoped<IRunnerContext>(sp => runnerContext)
-                .WithMigrationsIn(runnerContext.Namespace)
-                .WithProcessor(processor).BuildServiceProvider();
+            var serviceProvider = processor.CreateServices()
+                .WithMigrationsIn("FluentMigrator.Tests.Integration.Migrations")
+                .Configure<RunnerOptions>(opt => opt.AllowBreakingChange = true)
+                .BuildServiceProvider();
             var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
 
             return runner;

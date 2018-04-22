@@ -19,6 +19,7 @@ using System.Data;
 using System.IO;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Diagnostics;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.BatchParser;
@@ -26,6 +27,7 @@ using FluentMigrator.Runner.BatchParser.RangeSearchers;
 using FluentMigrator.Runner.BatchParser.Sources;
 using FluentMigrator.Runner.BatchParser.SpecialTokenSearchers;
 using FluentMigrator.Runner.Helpers;
+using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
@@ -49,8 +51,9 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             [NotNull] SqlServerCeDbFactory factory,
             [NotNull] IMigrationGenerator generator,
             [NotNull] IAnnouncer announcer,
-            [NotNull] IOptions<ProcessorOptions> options)
-            : base(factory.Factory, generator, announcer, options.Value)
+            [NotNull] IOptions<ProcessorOptions> options,
+            [NotNull] IConnectionStringAccessor connectionStringAccessor)
+            : base(factory.Factory, generator, announcer, options.Value, connectionStringAccessor)
         {
         }
 
@@ -205,15 +208,26 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         /// <inheritdoc />
         protected override IDbCommand CreateCommand(string commandText, IDbConnection connection, IDbTransaction transaction)
         {
-            var command = base.CreateCommand(commandText, connection, transaction);
-
-            if (command.CommandTimeout != 0)
+            IDbCommand result;
+            if (DbProviderFactory != null)
             {
-                // SQL Server CE does not support non-zero command timeout values!! :/
-                command.CommandTimeout = 0;
+                result = DbProviderFactory.CreateCommand();
+                Debug.Assert(result != null, nameof(result) + " != null");
+                result.Connection = connection;
+                if (transaction != null)
+                    result.Transaction = transaction;
+                result.CommandText = commandText;
+            }
+            else
+            {
+#pragma warning disable 612
+                result = Factory.CreateCommand(commandText, connection, transaction, Options);
+#pragma warning restore 612
             }
 
-            return command;
+            // SQL Server CE does not support non-zero command timeout values!! :/
+
+            return result;
         }
     }
 }

@@ -28,6 +28,7 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Firebird;
 using FluentMigrator.Runner.Helpers;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Models;
 
 using JetBrains.Annotations;
@@ -69,8 +70,9 @@ namespace FluentMigrator.Runner.Processors.Firebird
             [NotNull] IMigrationGenerator generator,
             [NotNull] IAnnouncer announcer,
             [NotNull] IOptions<ProcessorOptions> options,
+            [NotNull] IConnectionStringAccessor connectionStringAccessor,
             [NotNull] FirebirdOptions fbOptions)
-            : base(factory.Factory, generator, announcer, options.Value)
+            : base(factory.Factory, generator, announcer, options.Value, connectionStringAccessor)
         {
             if (fbOptions == null)
                 throw new ArgumentNullException(nameof(fbOptions));

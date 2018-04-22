@@ -24,6 +24,7 @@ using System.Data.OleDb;
 using System.Diagnostics;
 
 using FluentMigrator.Expressions;
+using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
@@ -52,7 +53,8 @@ namespace FluentMigrator.Runner.Processors.Jet
         public JetProcessor(
             [NotNull] IMigrationGenerator generator,
             [NotNull] IAnnouncer announcer,
-            [NotNull] IOptions<ProcessorOptions> options)
+            [NotNull] IOptions<ProcessorOptions> options,
+            [NotNull] IConnectionStringAccessor connectionStringAccessor)
             : base(generator, announcer, options.Value)
         {
             var factory = OleDbFactory.Instance;
@@ -60,7 +62,7 @@ namespace FluentMigrator.Runner.Processors.Jet
             {
                 _connection = factory.CreateConnection();
                 Debug.Assert(_connection != null, nameof(_connection) + " != null");
-                _connection.ConnectionString = options.Value.ConnectionString;
+                _connection.ConnectionString = connectionStringAccessor.ConnectionString;
             }
 
 #pragma warning disable 612

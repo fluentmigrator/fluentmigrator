@@ -27,6 +27,7 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Oracle;
 using FluentMigrator.Runner.Helpers;
+using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
@@ -52,8 +53,9 @@ namespace FluentMigrator.Runner.Processors.Oracle
             [NotNull] OracleDbFactory factory,
             [NotNull] IMigrationGenerator generator,
             [NotNull] IAnnouncer announcer,
-            [NotNull] IOptions<ProcessorOptions> options)
-            : base("Oracle", factory, generator, announcer, options)
+            [NotNull] IOptions<ProcessorOptions> options,
+            [NotNull] IConnectionStringAccessor connectionStringAccessor)
+            : base("Oracle", factory, generator, announcer, options, connectionStringAccessor)
         {
         }
     }

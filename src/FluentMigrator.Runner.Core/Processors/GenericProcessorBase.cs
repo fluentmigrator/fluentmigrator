@@ -17,9 +17,13 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Diagnostics;
+using System.Linq;
+
+using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
@@ -58,17 +62,20 @@ namespace FluentMigrator.Runner.Processors
             [CanBeNull] DbProviderFactory factory,
             [NotNull] IMigrationGenerator generator,
             [NotNull] IAnnouncer announcer,
-            [NotNull] ProcessorOptions options)
+            [NotNull] ProcessorOptions options,
+            [NotNull] IConnectionStringAccessor connectionStringAccessor)
             : base(generator, announcer, options)
         {
             DbProviderFactory = factory;
+
+            var connectionString = connectionStringAccessor.ConnectionString;
 
 #pragma warning disable 612
             var legacyFactory = new DbFactoryWrapper(this);
 
             // Prefetch connectionstring as after opening the security info could no longer be present
             // for instance on sql server
-            _connectionString = options.ConnectionString;
+            _connectionString = connectionString;
 
             Factory = legacyFactory;
 #pragma warning restore 612
@@ -77,11 +84,11 @@ namespace FluentMigrator.Runner.Processors
             {
                 Connection = factory.CreateConnection();
                 Debug.Assert(Connection != null, nameof(Connection) + " != null");
-                Connection.ConnectionString = options.ConnectionString;
+                Connection.ConnectionString = connectionString;
             }
         }
 
-        [Obsolete]
+        [Obsolete("Will change from public to protected")]
         public override string ConnectionString => _connectionString;
 
         public IDbConnection Connection { get; protected set; }

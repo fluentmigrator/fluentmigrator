@@ -59,17 +59,21 @@ namespace FluentMigrator.Infrastructure
         /// Initializes a new instance of the <see cref="MigrationContext"/> class.
         /// </summary>
         /// <param name="querySchema">The provider used to query the database</param>
+        /// <param name="serviceProvider">The service provider</param>
         /// <param name="context">The arbitrary application context passed to the task runner</param>
         /// <param name="connection">The database connection</param>
-        /// <param name="serviceProvider">The service provider</param>
-        public MigrationContext([NotNull] IQuerySchema querySchema, object context, string connection, [NotNull] IServiceProvider serviceProvider)
+        public MigrationContext(
+            [NotNull] IQuerySchema querySchema,
+            [NotNull] IServiceProvider serviceProvider,
+            object context,
+            string connection)
         {
             // ReSharper disable VirtualMemberCallInConstructor
             QuerySchema = querySchema;
 #pragma warning disable 612
             MigrationAssemblies = serviceProvider.GetService<IAssemblyCollection>();
-#pragma warning restore 612
             ApplicationContext = context;
+#pragma warning restore 612
             // ReSharper restore VirtualMemberCallInConstructor
             Connection = connection;
             ServiceProvider = serviceProvider;
@@ -86,6 +90,7 @@ namespace FluentMigrator.Infrastructure
         public virtual IAssemblyCollection MigrationAssemblies { get; set; }
 
         /// <inheritdoc />
+        [Obsolete]
         public virtual object ApplicationContext { get; set; }
 
         /// <inheritdoc />

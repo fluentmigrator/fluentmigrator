@@ -32,7 +32,7 @@ namespace FluentMigrator.Runner
         /// </summary>
         /// <param name="builder">The builder to add the MySQL 4-specific services to</param>
         /// <returns>The migration runner builder</returns>
-        public static IMigrationRunnerBuilder UseMySql4(this IMigrationRunnerBuilder builder)
+        public static IMigrationRunnerBuilder AddMySql4(this IMigrationRunnerBuilder builder)
         {
             builder.Services
                 .AddScoped<MySqlDbFactory>()
@@ -46,7 +46,7 @@ namespace FluentMigrator.Runner
         /// </summary>
         /// <param name="builder">The builder to add the MySQL 5-specific services to</param>
         /// <returns>The migration runner builder</returns>
-        public static IMigrationRunnerBuilder UseMySql5(this IMigrationRunnerBuilder builder)
+        public static IMigrationRunnerBuilder AddMySql5(this IMigrationRunnerBuilder builder)
         {
             builder.Services
                 .AddScoped<MySqlDbFactory>()

@@ -18,7 +18,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 
@@ -26,8 +25,8 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Infrastructure.Extensions;
-using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Exceptions;
+using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.VersionTableInfo;
 
 using JetBrains.Annotations;
@@ -51,12 +50,17 @@ namespace FluentMigrator.Runner
         [NotNull]
         private readonly Lazy<IVersionLoader> _versionLoader;
 
-        [CanBeNull]
+        [NotNull]
         [Obsolete]
+#pragma warning disable 612
         private readonly IAssemblyCollection _migrationAssemblies;
+#pragma warning restore 612
 
         [NotNull]
         private readonly RunnerOptions _options;
+
+        [NotNull]
+        private readonly ProcessorOptions _processorOptions;
 
         private IVersionLoader _currentVersionLoader;
 
@@ -75,7 +79,7 @@ namespace FluentMigrator.Runner
         public IProfileLoader ProfileLoader { get; set; }
 
         public IMaintenanceLoader MaintenanceLoader { get; set; }
-        public IMigrationRunnerConventions Conventions { get; private set; }
+        public IMigrationRunnerConventions Conventions { get; }
         public IList<Exception> CaughtExceptions { get; private set; }
 
         public IMigrationScope CurrentScope
@@ -103,8 +107,8 @@ namespace FluentMigrator.Runner
             _migrationAssemblies = assemblies;
             _announcer = runnerContext.Announcer;
             _stopWatch = runnerContext.StopWatch;
-
             _options = new RunnerOptions(runnerContext);
+            _processorOptions = new ProcessorOptions(runnerContext);
 
             Processor = processor;
             RunnerContext = runnerContext;
@@ -112,7 +116,10 @@ namespace FluentMigrator.Runner
             SilentlyFail = false;
             CaughtExceptions = null;
 
-            Conventions = migrationRunnerConventions ?? GetMigrationRunnerConventions();
+            var migrationRunnerConventionsAccessor = new AssemblySourceMigrationRunnerConventionsAccessor(
+                serviceProvider: null,
+                new AssemblySource(() => assemblies));
+            Conventions = migrationRunnerConventions ?? migrationRunnerConventionsAccessor.MigrationRunnerConventions;
 
             var convSet = new DefaultConventionSet(runnerContext);
 
@@ -145,13 +152,15 @@ namespace FluentMigrator.Runner
 
         public MigrationRunner(
             [NotNull] IOptions<RunnerOptions> options,
+            [NotNull] IOptions<ProcessorOptions> processorOptions,
             [NotNull] IProfileLoader profileLoader,
             [NotNull] IMigrationProcessor processor,
-            [NotNull] IMigrationRunnerConventions migrationRunnerConventions,
             [NotNull] IMaintenanceLoader maintenanceLoader,
             [NotNull] IMigrationInformationLoader migrationLoader,
             [NotNull] IAnnouncer announcer,
             [NotNull] IStopWatch stopWatch,
+            [NotNull] IMigrationRunnerConventionsAccessor migrationRunnerConventionsAccessor,
+            [NotNull] IAssemblySource assemblySource,
             [NotNull] MigrationScopeHandler scopeHandler,
             [NotNull] MigrationValidator migrationValidator,
             [NotNull] IServiceProvider serviceProvider)
@@ -160,7 +169,7 @@ namespace FluentMigrator.Runner
             CaughtExceptions = null;
 
             Processor = processor;
-            Conventions = migrationRunnerConventions;
+            Conventions = migrationRunnerConventionsAccessor.MigrationRunnerConventions;
             ProfileLoader = profileLoader;
             MaintenanceLoader = maintenanceLoader;
             MigrationLoader = migrationLoader;
@@ -169,10 +178,17 @@ namespace FluentMigrator.Runner
             _options = options.Value;
             _announcer = announcer;
             _stopWatch = stopWatch;
+            _processorOptions = processorOptions.Value;
 
             _migrationScopeHandler = scopeHandler;
             _migrationValidator = migrationValidator;
             _versionLoader = new Lazy<IVersionLoader>(serviceProvider.GetRequiredService<IVersionLoader>);
+
+#pragma warning disable 612
+#pragma warning disable 618
+            _migrationAssemblies = new AssemblyCollectionService(assemblySource);
+#pragma warning restore 618
+#pragma warning restore 612
         }
 
         public IVersionLoader VersionLoader
@@ -254,13 +270,6 @@ namespace FluentMigrator.Runner
             }
 
             VersionLoader.LoadVersionInfo();
-        }
-
-        [Obsolete]
-        [CanBeNull]
-        private IMigrationRunnerConventions GetMigrationRunnerConventions()
-        {
-            return _migrationAssemblies?.GetMigrationRunnerConventions();
         }
 
         private IEnumerable<IMigrationInfo> GetUpMigrationsToApply(long version)
@@ -358,9 +367,9 @@ namespace FluentMigrator.Runner
 
         public virtual void ApplyMigrationUp(IMigrationInfo migrationInfo, bool useTransaction)
         {
-            if (migrationInfo == null) throw new ArgumentNullException("migrationInfo");
+            if (migrationInfo == null) throw new ArgumentNullException(nameof(migrationInfo));
 
-            if (!_alreadyOutputPreviewOnlyModeWarning && Processor.Options.PreviewOnly)
+            if (!_alreadyOutputPreviewOnlyModeWarning && _processorOptions.PreviewOnly)
             {
                 _announcer.Heading("PREVIEW-ONLY MODE");
                 _alreadyOutputPreviewOnlyModeWarning = true;
@@ -369,7 +378,7 @@ namespace FluentMigrator.Runner
             if (!migrationInfo.IsAttributed() || !VersionLoader.VersionInfo.HasAppliedMigration(migrationInfo.Version))
             {
                 var name = migrationInfo.GetName();
-                _announcer.Heading(string.Format("{0} migrating", name));
+                _announcer.Heading($"{name} migrating");
 
                 _stopWatch.Start();
 
@@ -378,7 +387,7 @@ namespace FluentMigrator.Runner
                     try
                     {
                         if (migrationInfo.IsAttributed() && migrationInfo.IsBreakingChange &&
-                            !RunnerContext.PreviewOnly && !RunnerContext.AllowBreakingChange)
+                            !_processorOptions.PreviewOnly && !_options.AllowBreakingChange)
                         {
                             throw new InvalidOperationException(
                                 string.Format(
@@ -405,7 +414,7 @@ namespace FluentMigrator.Runner
 
                     _stopWatch.Stop();
 
-                    _announcer.Say(string.Format("{0} migrated", name));
+                    _announcer.Say($"{name} migrated");
                     _announcer.ElapsedTime(_stopWatch.ElapsedTime());
                 }
             }
@@ -413,10 +422,10 @@ namespace FluentMigrator.Runner
 
         public virtual void ApplyMigrationDown(IMigrationInfo migrationInfo, bool useTransaction)
         {
-            if (migrationInfo == null) throw new ArgumentNullException("migrationInfo");
+            if (migrationInfo == null) throw new ArgumentNullException(nameof(migrationInfo));
 
             var name = migrationInfo.GetName();
-            _announcer.Heading(string.Format("{0} reverting", name));
+            _announcer.Heading($"{name} reverting");
 
             _stopWatch.Start();
 
@@ -439,7 +448,7 @@ namespace FluentMigrator.Runner
 
                 _stopWatch.Stop();
 
-                _announcer.Say(string.Format("{0} reverted", name));
+                _announcer.Say($"{name} reverted");
                 _announcer.ElapsedTime(_stopWatch.ElapsedTime());
             }
         }
@@ -456,8 +465,8 @@ namespace FluentMigrator.Runner
 
             foreach (long version in VersionLoader.VersionInfo.AppliedMigrations())
             {
-                IMigrationInfo migrationInfo;
-                if (availableMigrations.TryGetValue(version, out migrationInfo)) migrationsToRollback.Add(migrationInfo);
+                if (availableMigrations.TryGetValue(version, out var migrationInfo))
+                    migrationsToRollback.Add(migrationInfo);
             }
 
             using (IMigrationScope scope = _migrationScopeHandler.CreateOrWrapMigrationScope(useAutomaticTransactionManagement && TransactionPerSession))
@@ -500,8 +509,8 @@ namespace FluentMigrator.Runner
 
             foreach (long appliedVersion in VersionLoader.VersionInfo.AppliedMigrations())
             {
-                IMigrationInfo migrationInfo;
-                if (availableMigrations.TryGetValue(appliedVersion, out migrationInfo)) migrationsToRollback.Add(migrationInfo);
+                if (availableMigrations.TryGetValue(appliedVersion, out var migrationInfo))
+                    migrationsToRollback.Add(migrationInfo);
             }
 
             using (IMigrationScope scope = _migrationScopeHandler.CreateOrWrapMigrationScope(useAutomaticTransactionManagement && TransactionPerSession))
@@ -534,10 +543,7 @@ namespace FluentMigrator.Runner
 
         [Obsolete]
         [CanBeNull]
-        public IAssemblyCollection MigrationAssemblies
-        {
-            get { return _migrationAssemblies; }
-        }
+        public IAssemblyCollection MigrationAssemblies => _migrationAssemblies;
 
         public void Up(IMigration migration)
         {
@@ -555,13 +561,14 @@ namespace FluentMigrator.Runner
             if (_serviceProvider == null)
             {
 #pragma warning disable 612
-                Debug.Assert(_migrationAssemblies != null, "_migrationAssemblies != null");
-                context = new MigrationContext(Processor, _migrationAssemblies, RunnerContext.ApplicationContext, Processor.ConnectionString);
+                context = new MigrationContext(Processor, _migrationAssemblies, RunnerContext?.ApplicationContext, Processor.ConnectionString);
 #pragma warning restore 612
             }
             else
             {
-                context = new MigrationContext(Processor, RunnerContext.ApplicationContext, Processor.ConnectionString, _serviceProvider);
+#pragma warning disable 612
+                context = new MigrationContext(Processor, _serviceProvider, _options.ApplicationContext, Processor.ConnectionString);
+#pragma warning restore 612
             }
 
             getExpressions(migration, context);

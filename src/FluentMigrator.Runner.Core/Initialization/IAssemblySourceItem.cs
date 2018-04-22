@@ -15,25 +15,18 @@
 #endregion
 
 using System.Collections.Generic;
+using System.Reflection;
 
-using FluentMigrator.Runner.Initialization;
-
-using JetBrains.Annotations;
-
-using Microsoft.Extensions.Options;
-
-namespace FluentMigrator.Runner.Processors.Oracle
+namespace FluentMigrator.Runner.Initialization
 {
-    public class OracleManagedProcessor : OracleProcessorBase
+    /// <summary>
+    /// Represents an item for the <see cref="AssemblySource"/>
+    /// </summary>
+    public interface IAssemblySourceItem
     {
-        public OracleManagedProcessor(
-            [NotNull] OracleManagedDbFactory factory,
-            [NotNull] IMigrationGenerator generator,
-            [NotNull] IAnnouncer announcer,
-            [NotNull] IOptions<ProcessorOptions> options,
-            [NotNull] IConnectionStringAccessor connectionStringAccessor)
-            : base("OracleManaged", factory, generator, announcer, options, connectionStringAccessor)
-        {
-        }
+        /// <summary>
+        /// Gets all assemblies covered by this item
+        /// </summary>
+        IEnumerable<Assembly> Assemblies { get; }
     }
 }

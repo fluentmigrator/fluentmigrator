@@ -1,6 +1,8 @@
 #if NETFRAMEWORK
 using System.Configuration;
 
+using JetBrains.Annotations;
+
 namespace FluentMigrator.Runner.Initialization.NetFramework
 {
     /// <summary>
@@ -8,8 +10,10 @@ namespace FluentMigrator.Runner.Initialization.NetFramework
     /// </summary>
     internal interface INetConfigManager
     {
+        [NotNull]
         Configuration LoadFromFile(string path);
 
+        [NotNull]
         Configuration LoadFromMachineConfiguration();
     }
 }

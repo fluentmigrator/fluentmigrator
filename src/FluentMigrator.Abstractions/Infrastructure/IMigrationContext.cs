@@ -56,6 +56,7 @@ namespace FluentMigrator.Infrastructure
         /// <summary>
         /// Gets or sets the arbitrary application context passed to the task runner
         /// </summary>
+        [Obsolete]
         object ApplicationContext { get; set; }
 
         /// <summary>

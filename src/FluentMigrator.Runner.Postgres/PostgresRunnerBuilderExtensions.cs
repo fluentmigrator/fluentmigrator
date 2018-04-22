@@ -32,7 +32,7 @@ namespace FluentMigrator.Runner
         /// </summary>
         /// <param name="builder">The builder to add the Postgres-specific services to</param>
         /// <returns>The migration runner builder</returns>
-        public static IMigrationRunnerBuilder UsePostgres(this IMigrationRunnerBuilder builder)
+        public static IMigrationRunnerBuilder AddPostgres(this IMigrationRunnerBuilder builder)
         {
             builder.Services
                 .AddScoped<PostgresDbFactory>()

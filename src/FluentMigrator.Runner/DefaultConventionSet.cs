@@ -26,12 +26,19 @@ namespace FluentMigrator.Runner
 {
     public class DefaultConventionSet : IConventionSet
     {
+        // ReSharper disable once UnusedMember.Global
+        public DefaultConventionSet()
+            : this(defaultSchemaName: null, workingDirectory: null)
+        {
+        }
+
         [Obsolete]
         public DefaultConventionSet([CanBeNull] IRunnerContext runnerContext)
             : this(runnerContext?.DefaultSchemaName, runnerContext?.WorkingDirectory)
         {
         }
 
+        // ReSharper disable once MemberCanBePrivate.Global
         public DefaultConventionSet([CanBeNull] string defaultSchemaName, [CanBeNull] string workingDirectory)
         {
             var schemaConvention =

@@ -86,30 +86,6 @@ namespace FluentMigrator.Runner
         }
 
         /// <summary>
-        /// Search for custom migration runner conventions
-        /// </summary>
-        /// <param name="assemblies">The assemblies to search for</param>
-        /// <returns>The custom or the default migration runner conventions</returns>
-        [Obsolete]
-        public static IMigrationRunnerConventions GetMigrationRunnerConventions(
-            [CanBeNull] this IAssemblyCollection assemblies)
-        {
-            if (assemblies == null)
-                return new MigrationRunnerConventions();
-
-            var matchedType = assemblies
-                .GetExportedTypes()
-                .FirstOrDefault(t => typeof(IMigrationRunnerConventions).IsAssignableFrom(t));
-
-            if (matchedType != null)
-            {
-                return (IMigrationRunnerConventions) Activator.CreateInstance(matchedType);
-            }
-
-            return new MigrationRunnerConventions();
-        }
-
-        /// <summary>
         /// Loads the connection string using the connection string provider for the given assembly
         /// </summary>
         /// <param name="assemblies">The assembly to load the connection string from</param>

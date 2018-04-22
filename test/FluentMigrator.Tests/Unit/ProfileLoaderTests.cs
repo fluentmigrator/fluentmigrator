@@ -37,16 +37,11 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void BlankProfileDoesntLoadProfiles()
         {
-            var runnerContextMock = new Mock<IRunnerContext>();
             var runnerMock = new Mock<IMigrationRunner>();
-            var conventionsMock = new Mock<IMigrationRunnerConventions>();
-
-            runnerContextMock.Setup(x => x.Profile).Returns(string.Empty);
 
             var profileLoader = new ServiceCollection()
-                .ConfigureRunner(rb =>
-                    rb.WithRunnerContext(runnerContextMock.Object).WithRunnerConventions(conventionsMock.Object))
-                .AddScoped<ProfileLoader>()
+                .AddFluentMigratorCore()
+                .Configure<RunnerOptions>(opt => opt.Profile = string.Empty)
                 .WithAllTestMigrations()
                 .BuildServiceProvider()
                 .GetRequiredService<ProfileLoader>();

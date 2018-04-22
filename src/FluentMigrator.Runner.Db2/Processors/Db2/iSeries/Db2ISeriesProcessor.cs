@@ -26,6 +26,7 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.DB2;
 using FluentMigrator.Runner.Helpers;
+using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
@@ -46,8 +47,9 @@ namespace FluentMigrator.Runner.Processors.DB2.iSeries
             [NotNull] Db2ISeriesDbFactory factory,
             [NotNull] IMigrationGenerator generator,
             [NotNull] IAnnouncer announcer,
-            [NotNull] IOptions<ProcessorOptions> options)
-            : base(factory.Factory, generator, announcer, options.Value)
+            [NotNull] IOptions<ProcessorOptions> options,
+            [NotNull] IConnectionStringAccessor connectionStringAccessor)
+            : base(factory.Factory, generator, announcer, options.Value, connectionStringAccessor)
         {
             Quoter = new Db2Quoter();
         }

@@ -33,9 +33,9 @@ namespace FluentMigrator.Runner
         /// </summary>
         /// <param name="builder">The builder to add the Firebird-specific services to</param>
         /// <returns>The migration runner builder</returns>
-        public static IMigrationRunnerBuilder UseFirebird(this IMigrationRunnerBuilder builder)
+        public static IMigrationRunnerBuilder AddFirebird(this IMigrationRunnerBuilder builder)
         {
-            return builder.UseFirebird(FirebirdOptions.AutoCommitBehaviour());
+            return builder.AddFirebird(FirebirdOptions.AutoCommitBehaviour());
         }
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace FluentMigrator.Runner
         /// <param name="builder">The builder to add the Firebird-specific services to</param>
         /// <param name="fbOptions">Firebird options</param>
         /// <returns>The migration runner builder</returns>
-        public static IMigrationRunnerBuilder UseFirebird(this IMigrationRunnerBuilder builder, FirebirdOptions fbOptions)
+        public static IMigrationRunnerBuilder AddFirebird(this IMigrationRunnerBuilder builder, FirebirdOptions fbOptions)
         {
             builder.Services
                 .AddScoped(

@@ -34,7 +34,7 @@ namespace FluentMigrator.Runner
         /// <param name="builder">The builder to add the SQLite-specific services to</param>
         /// <returns>The migration runner builder</returns>
         // ReSharper disable once InconsistentNaming
-        public static IMigrationRunnerBuilder UseSQLite(this IMigrationRunnerBuilder builder)
+        public static IMigrationRunnerBuilder AddSQLite(this IMigrationRunnerBuilder builder)
         {
             builder.Services
                 .AddScoped<SQLiteDbFactory>()

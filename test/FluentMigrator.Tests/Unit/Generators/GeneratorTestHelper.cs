@@ -476,7 +476,7 @@ namespace FluentMigrator.Tests.Unit.Generators
         public static ICollection<IMigrationExpression> GetCreateColumnWithSystemMethodExpression(string schemaName = null)
         {
             var serviceProvider = new ServiceCollection().BuildServiceProvider();
-            var context = new MigrationContext(null, null, null, serviceProvider);
+            var context = new MigrationContext(null, serviceProvider, null, null);
             var expr = new CreateColumnExpression
             {
                 TableName = TestTableName1,

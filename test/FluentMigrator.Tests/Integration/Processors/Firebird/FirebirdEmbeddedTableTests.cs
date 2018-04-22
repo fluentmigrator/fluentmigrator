@@ -103,15 +103,9 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             using (var tempDb = new TemporaryDatabase(IntegrationTestOptions.Firebird, _firebirdLibraryProber))
             {
                 var connectionString = tempDb.ConnectionString;
-
-                var runnerContext = new RunnerContext(new TextWriterAnnouncer(TestContext.Out))
-                {
-                    Namespace = "FluentMigrator.Tests.Integration.Migrations"
-                };
-
                 using (var connection = new FbConnection(connectionString))
                 {
-                    var runner = CreateFirebirdEmbeddedRunnerFor(connection, runnerContext, out _);
+                    var runner = CreateFirebirdEmbeddedRunnerFor(connection, "FluentMigrator.Tests.Integration.Migrations", out _);
                     runner.Up(new CreateTableMigration());
                     runner.Up(new AddDataMigration(1));
                     //---------------Assert Precondition----------------
@@ -148,15 +142,9 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             using (var tempDb = new TemporaryDatabase(IntegrationTestOptions.Firebird, _firebirdLibraryProber))
             {
                 var connectionString = tempDb.ConnectionString;
-
-                var runnerContext = new RunnerContext(new TextWriterAnnouncer(TestContext.Out))
-                {
-                    Namespace = "FluentMigrator.Tests.Integration.Migrations"
-                };
-
                 using (var connection = new FbConnection(connectionString))
                 {
-                    var runner = CreateFirebirdEmbeddedRunnerFor(connection, runnerContext, out _);
+                    var runner = CreateFirebirdEmbeddedRunnerFor(connection, "FluentMigrator.Tests.Integration.Migrations", out _);
                     runner.Up(new CreateTableMigration());
                     runner.Up(new AddDataMigration(id: 1));
                     runner.Up(new AddDataMigration(2));
@@ -215,17 +203,10 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             using (var tempDb = new TemporaryDatabase(IntegrationTestOptions.Firebird, _firebirdLibraryProber))
             {
                 var connectionString = tempDb.ConnectionString;
-
-                var runnerContext = new RunnerContext(new TextWriterAnnouncer(TestContext.Out))
-                                            {
-                                                Namespace = "FluentMigrator.Tests.Integration.Migrations"
-                                            };
-
-
                 using (var connection = new FbConnection(connectionString))
                 {
                     FirebirdProcessor processor;
-                    var runner = CreateFirebirdEmbeddedRunnerFor(connection, runnerContext, out processor);
+                    var runner = CreateFirebirdEmbeddedRunnerFor(connection, "FluentMigrator.Tests.Integration.Migrations", out processor);
                     runner.Up(new CreateTableMigration());
                     runner.Up(new AddDataMigration(1));
                     runner.Up(new AddDataMigration(2));
@@ -276,17 +257,10 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             using (var tempDb = new TemporaryDatabase(IntegrationTestOptions.Firebird, _firebirdLibraryProber))
             {
                 var connectionString = tempDb.ConnectionString;
-
-                var runnerContext = new RunnerContext(new TextWriterAnnouncer(TestContext.Out))
-                                            {
-                                                Namespace = "FluentMigrator.Tests.Integration.Migrations"
-                                            };
-
-
                 using (var connection = new FbConnection(connectionString))
                 {
                     FirebirdProcessor processor;
-                    var runner = CreateFirebirdEmbeddedRunnerFor(connection, runnerContext, out processor);
+                    var runner = CreateFirebirdEmbeddedRunnerFor(connection, "FluentMigrator.Tests.Integration.Migrations", out processor);
                     runner.Up(new CreateTableMigration());
                     runner.Up(new AddDataMigration(1));
                     runner.Up(new AddDataMigration(2));
@@ -349,17 +323,10 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             using (var tempDb = new TemporaryDatabase(IntegrationTestOptions.Firebird, _firebirdLibraryProber))
             {
                 var connectionString = tempDb.ConnectionString;
-
-                var runnerContext = new RunnerContext(new TextWriterAnnouncer(TestContext.Out))
-                                            {
-                                                Namespace = "FluentMigrator.Tests.Integration.Migrations"
-                                            };
-
-
                 using (var connection = new FbConnection(connectionString))
                 {
                     FirebirdProcessor processor;
-                    var runner = CreateFirebirdEmbeddedRunnerFor(connection, runnerContext, out processor);
+                    var runner = CreateFirebirdEmbeddedRunnerFor(connection, "FluentMigrator.Tests.Integration.Migrations", out processor);
                     runner.Up(new CreateTableMigration());
                     runner.Up(new AddDataMigration(1));
                     runner.Up(new AddDataMigration(2));
@@ -410,17 +377,10 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             using (var tempDb = new TemporaryDatabase(IntegrationTestOptions.Firebird, _firebirdLibraryProber))
             {
                 var connectionString = tempDb.ConnectionString;
-
-                var runnerContext = new RunnerContext(new TextWriterAnnouncer(TestContext.Out))
-                                            {
-                                                Namespace = "FluentMigrator.Tests.Integration.Migrations"
-                                            };
-
-
                 using (var connection = new FbConnection(connectionString))
                 {
                     FirebirdProcessor processor;
-                    var runner = CreateFirebirdEmbeddedRunnerFor(connection, runnerContext, out processor);
+                    var runner = CreateFirebirdEmbeddedRunnerFor(connection, "FluentMigrator.Tests.Integration.Migrations", out processor);
                     runner.Up(new CreateTableMigration());
                     runner.Up(new AddDataMigration(1));
                     runner.Up(new AddDataMigration(2));
@@ -456,17 +416,10 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             using (var tempDb = new TemporaryDatabase(IntegrationTestOptions.Firebird, _firebirdLibraryProber))
             {
                 var connectionString = tempDb.ConnectionString;
-
-                var runnerContext = new RunnerContext(new TextWriterAnnouncer(TestContext.Out))
-                                            {
-                                                Namespace = "FluentMigrator.Tests.Integration.Migrations"
-                                            };
-
-
                 using (var connection = new FbConnection(connectionString))
                 {
                     FirebirdProcessor processor;
-                    var runner = CreateFirebirdEmbeddedRunnerFor(connection, runnerContext, out processor);
+                    var runner = CreateFirebirdEmbeddedRunnerFor(connection, "FluentMigrator.Tests.Integration.Migrations", out processor);
                     runner.Up(new CreateTableMigration());
                     runner.Up(new AddDataMigration(1));
                     runner.Up(new AddDataMigration(2));
@@ -511,17 +464,10 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             using (var tempDb = new TemporaryDatabase(IntegrationTestOptions.Firebird, _firebirdLibraryProber))
             {
                 var connectionString = tempDb.ConnectionString;
-
-                var runnerContext = new RunnerContext(new TextWriterAnnouncer(TestContext.Out))
-                                            {
-                                                Namespace = "FluentMigrator.Tests.Integration.Migrations"
-                                            };
-
-
                 using (var connection = new FbConnection(connectionString))
                 {
                     FirebirdProcessor processor;
-                    var runner = CreateFirebirdEmbeddedRunnerFor(connection, runnerContext, out processor);
+                    var runner = CreateFirebirdEmbeddedRunnerFor(connection, "FluentMigrator.Tests.Integration.Migrations", out processor);
                     runner.Up(new CreateTableMigration());
                     runner.Up(new AddDataMigration(1));
                     runner.Up(new AddDataMigration(2));
@@ -589,7 +535,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             }
         }
 
-        private static IMigrationRunner CreateFirebirdEmbeddedRunnerFor(FbConnection connection, RunnerContext runnerContext, out FirebirdProcessor processor)
+        private static IMigrationRunner CreateFirebirdEmbeddedRunnerFor(FbConnection connection, string @namespace, out FirebirdProcessor processor)
         {
             var announcer = new TextWriterAnnouncer(TestContext.Out);
             announcer.ShowSql = true;
@@ -598,8 +544,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                 new ProcessorOptions(), new FirebirdDbFactory(serviceProvider: null), options);
 
             var runner = processor.CreateServices()
-                .WithRunnerContext(runnerContext)
-                .WithMigrationsIn(runnerContext.Namespace)
+                .WithMigrationsIn(@namespace)
                 .BuildServiceProvider()
                 .GetRequiredService<IMigrationRunner>();
 
@@ -637,16 +582,9 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             using (var tempDb = new TemporaryDatabase(IntegrationTestOptions.Firebird, _firebirdLibraryProber))
             {
                 var connectionString = tempDb.ConnectionString;
-
-                var runnerContext = new RunnerContext(new TextWriterAnnouncer(TestContext.Out))
-                                            {
-                                                Namespace = "FluentMigrator.Tests.Integration.Migrations"
-                                            };
-
-
                 using (var connection = new FbConnection(connectionString))
                 {
-                    var runner = CreateFirebirdEmbeddedRunnerFor(connection, runnerContext, out _);
+                    var runner = CreateFirebirdEmbeddedRunnerFor(connection, "FluentMigrator.Tests.Integration.Migrations", out _);
                     runner.Up(new MigrationWhichCreatesTableWithTextBlob());
                     //---------------Assert Precondition----------------
                     var fieldName = "TheColumn";
@@ -750,11 +688,6 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             {
                 var connectionString = tempDb.ConnectionString;
 
-                var runnerContext = new RunnerContext(new TextWriterAnnouncer(TestContext.Out))
-                {
-                    Namespace = "FluentMigrator.Tests.Integration.Migrations"
-                };
-
                 using (var connection = new FbConnection(connectionString))
                 {
                     FirebirdProcessor processor;
@@ -766,8 +699,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                         new ProcessorOptions(), new FirebirdDbFactory(serviceProvider: null), options);
 
                     var runner = processor.CreateServices()
-                        .WithRunnerContext(runnerContext)
-                        .WithMigrationsIn(runnerContext.Namespace)
+                        .WithMigrationsIn("FluentMigrator.Tests.Integration.Migrations")
                         .BuildServiceProvider()
                         .GetRequiredService<IMigrationRunner>();
 
@@ -789,8 +721,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                         new ProcessorOptions(), new FirebirdDbFactory(serviceProvider: null), options);
 
                     var runner = processor.CreateServices()
-                        .WithRunnerContext(runnerContext)
-                        .WithMigrationsIn(runnerContext.Namespace)
+                        .WithMigrationsIn("FluentMigrator.Tests.Integration.Migrations")
                         .BuildServiceProvider()
                         .GetRequiredService<IMigrationRunner>();
 

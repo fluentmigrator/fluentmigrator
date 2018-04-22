@@ -38,20 +38,23 @@ namespace FluentMigrator.Runner.Initialization
         /// </summary>
         /// <param name="options">The options</param>
         /// <param name="loadEngines">The assembly load engines</param>
+        /// <param name="sourceItems">The additional source items</param>
         [CLSCompliant(false)]
-        public AssemblySource(IOptions<AssemblySourceOptions> options, IEnumerable<IAssemblyLoadEngine> loadEngines)
+        public AssemblySource(IOptions<AssemblySourceOptions> options, IEnumerable<IAssemblyLoadEngine> loadEngines, IEnumerable<IAssemblySourceItem> sourceItems)
         {
-            _assemblies = new Lazy<IReadOnlyCollection<Assembly>>(() => LoadAssemblies(options.Value, loadEngines.ToList()));
+            _assemblies = new Lazy<IReadOnlyCollection<Assembly>>(
+                () => LoadAssemblies(options.Value, loadEngines.ToList())
+                    .Union(sourceItems.SelectMany(i => i.Assemblies)).ToList());
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AssemblySource"/> class.
         /// </summary>
-        /// <param name="assemblyCollection">The assembly collection</param>
+        /// <param name="assemblyCollectionFunc">Function to get the assembly collection</param>
         [Obsolete]
-        public AssemblySource(IAssemblyCollection assemblyCollection)
+        public AssemblySource(Func<IAssemblyCollection> assemblyCollectionFunc)
         {
-            _assemblies= new Lazy<IReadOnlyCollection<Assembly>>(() => assemblyCollection.Assemblies);
+            _assemblies = new Lazy<IReadOnlyCollection<Assembly>>(() => assemblyCollectionFunc().Assemblies);
         }
 
         /// <inheritdoc />
@@ -59,8 +62,15 @@ namespace FluentMigrator.Runner.Initialization
 
         private static IReadOnlyCollection<Assembly> LoadAssemblies(AssemblySourceOptions options, IReadOnlyCollection<IAssemblyLoadEngine> loadEngines)
         {
+            var assemblyNames = options.AssemblyNames;
+            if (assemblyNames.Length == 0)
+            {
+                // Replace with current assemblies loaded in AppDomain
+                return Array.Empty<Assembly>();
+            }
+
             var result = new List<Assembly>();
-            foreach (var assemblyName in options.AssemblyNames)
+            foreach (var assemblyName in assemblyNames)
             {
                 var exceptions = new List<Exception>();
                 var added = false;

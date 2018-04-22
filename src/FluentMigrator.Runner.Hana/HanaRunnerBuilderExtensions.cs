@@ -32,7 +32,7 @@ namespace FluentMigrator.Runner
         /// </summary>
         /// <param name="builder">The builder to add the SAP Hana-specific services to</param>
         /// <returns>The migration runner builder</returns>
-        public static IMigrationRunnerBuilder UseHana(this IMigrationRunnerBuilder builder)
+        public static IMigrationRunnerBuilder AddHana(this IMigrationRunnerBuilder builder)
         {
             builder.Services
                 .AddScoped<HanaDbFactory>()

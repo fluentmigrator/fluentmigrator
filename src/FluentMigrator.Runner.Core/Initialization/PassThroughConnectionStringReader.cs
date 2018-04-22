@@ -14,24 +14,31 @@
 // limitations under the License.
 #endregion
 
-namespace FluentMigrator.Runner.Generators
+namespace FluentMigrator.Runner.Initialization
 {
     /// <summary>
-    /// This implementation of <see cref="IGeneratorAccessor"/> only returns the
-    /// last defined generator service.
+    /// A connection string provider that just passes through the given connection string
     /// </summary>
-    public class SingleGeneratorAccessor : IGeneratorAccessor
+    public class PassThroughConnectionStringReader : IConnectionStringReader
     {
+        private readonly string _connectionString;
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="SingleGeneratorAccessor"/> class.
+        /// Initializes a new instance of the <see cref="PassThroughConnectionStringReader"/> class.
         /// </summary>
-        /// <param name="generator">The generator to be returned</param>
-        public SingleGeneratorAccessor(IMigrationGenerator generator)
+        /// <param name="connectionString">The connection string</param>
+        public PassThroughConnectionStringReader(string connectionString)
         {
-            Generator = generator;
+            _connectionString = connectionString;
         }
 
         /// <inheritdoc />
-        public IMigrationGenerator Generator { get; }
+        public int Priority { get; } = 200;
+
+        /// <inheritdoc />
+        public string GetConnectionString(string connectionStringName)
+        {
+            return _connectionString;
+        }
     }
 }

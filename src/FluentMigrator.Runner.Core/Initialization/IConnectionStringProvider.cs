@@ -16,10 +16,15 @@
 //
 #endregion
 
+using System;
+
+using JetBrains.Annotations;
+
 namespace FluentMigrator.Runner.Initialization
 {
     public interface IConnectionStringProvider
     {
+        [CanBeNull]
         string GetConnectionString(IAnnouncer announcer, string connection, string configPath, string assemblyLocation, string database);
     }
 }

@@ -18,15 +18,16 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 
+using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Initialization.AssemblyLoader;
 using FluentMigrator.Runner.Processors;
 
 using JetBrains.Annotations;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Initialization
 {
@@ -34,36 +35,45 @@ namespace FluentMigrator.Runner.Initialization
     public class TaskExecutor
     {
         [NotNull]
-        private readonly IRunnerContext _runnerContext;
+        private readonly IAssemblySource _assemblySource;
 
         [NotNull]
-        private readonly AssemblyLoaderFactory _assemblyLoaderFactory;
+        private readonly IAnnouncer _announcer;
+
+        private readonly RunnerOptions _runnerOptions;
 
         [NotNull, ItemNotNull]
         private readonly Lazy<IServiceProvider> _lazyServiceProvider;
 
         private IReadOnlyCollection<Assembly> _assemblies;
 
+        [Obsolete]
         public TaskExecutor([NotNull] IRunnerContext runnerContext)
         {
-            _runnerContext = runnerContext ?? throw new ArgumentNullException(nameof(runnerContext));
-            _assemblyLoaderFactory = new AssemblyLoaderFactory();
+            var runnerCtxt = runnerContext ?? throw new ArgumentNullException(nameof(runnerContext));
+            _announcer = runnerCtxt.Announcer;
+            _runnerOptions = new RunnerOptions(runnerCtxt);
+            var asmLoaderFactory = new AssemblyLoaderFactory();
+            _assemblySource = new AssemblySource(() => new AssemblyCollection(asmLoaderFactory.GetTargetAssemblies(runnerCtxt.Targets)));
             ConnectionStringProvider = new DefaultConnectionStringProvider();
-            _lazyServiceProvider = new Lazy<IServiceProvider>(() =>
-            {
-                return runnerContext.CreateServices(
-                        (loader, context) => GetTargetAssemblies(),
+            _lazyServiceProvider = new Lazy<IServiceProvider>(
+                () => runnerContext
+                    .CreateServices(
                         ConnectionStringProvider,
-                        _assemblyLoaderFactory)
-                    .BuildServiceProvider(validateScopes: true);
-            });
+                        asmLoaderFactory)
+                    .BuildServiceProvider(validateScopes: true));
         }
 
-        public TaskExecutor([NotNull] IRunnerContext runnerContext, [NotNull] IServiceProvider serviceProvider)
+        public TaskExecutor(
+            [NotNull] IAnnouncer announcer,
+            [NotNull] IAssemblySource assemblySource,
+            [NotNull] IOptions<RunnerOptions> runnerOptions,
+            [NotNull] IServiceProvider serviceProvider)
         {
-            _runnerContext = runnerContext ?? throw new ArgumentNullException(nameof(runnerContext));
+            _announcer = announcer;
+            _assemblySource = assemblySource;
+            _runnerOptions = runnerOptions.Value;
             ConnectionStringProvider = serviceProvider.GetService<IConnectionStringProvider>();
-            _assemblyLoaderFactory = serviceProvider.GetRequiredService<AssemblyLoaderFactory>();
             _lazyServiceProvider = new Lazy<IServiceProvider>(() => serviceProvider);
         }
 
@@ -81,20 +91,23 @@ namespace FluentMigrator.Runner.Initialization
         {
         }
 
+        [Obsolete]
         public TaskExecutor(
             [NotNull] IRunnerContext runnerContext,
             [NotNull] AssemblyLoaderFactory assemblyLoaderFactory,
             [CanBeNull] IConnectionStringProvider connectionStringProvider = null)
         {
-            _runnerContext = runnerContext ?? throw new ArgumentNullException(nameof(runnerContext));
+            var runnerCtxt = runnerContext ?? throw new ArgumentNullException(nameof(runnerContext));
+            _announcer = runnerCtxt.Announcer;
+            _runnerOptions = new RunnerOptions(runnerCtxt);
             ConnectionStringProvider = connectionStringProvider;
-            _assemblyLoaderFactory = assemblyLoaderFactory ?? throw new ArgumentNullException(nameof(assemblyLoaderFactory));
+            var asmLoaderFactory = assemblyLoaderFactory ?? throw new ArgumentNullException(nameof(assemblyLoaderFactory));
+            _assemblySource = new AssemblySource(() => new AssemblyCollection(asmLoaderFactory.GetTargetAssemblies(runnerCtxt.Targets)));
             _lazyServiceProvider = new Lazy<IServiceProvider>(
                 () => runnerContext
                     .CreateServices(
-                        (loader, context) => GetTargetAssemblies(),
                         connectionStringProvider,
-                        _assemblyLoaderFactory)
+                        asmLoaderFactory)
                     .BuildServiceProvider(validateScopes: true));
         }
 
@@ -119,9 +132,10 @@ namespace FluentMigrator.Runner.Initialization
         [NotNull]
         protected IServiceProvider ServiceProvider => _lazyServiceProvider.Value;
 
+        [Obsolete]
         protected virtual IEnumerable<Assembly> GetTargetAssemblies()
         {
-            return _assemblies ?? (_assemblies = _assemblyLoaderFactory.GetTargetAssemblies(_runnerContext.Targets).ToList());
+            return _assemblies ?? (_assemblies = _assemblySource.Assemblies);
         }
 
         /// <summary>
@@ -138,30 +152,30 @@ namespace FluentMigrator.Runner.Initialization
         {
             using (var scope = new RunnerScope(this))
             {
-                switch (_runnerContext.Task)
+                switch (_runnerOptions.Task)
                 {
                     case null:
                     case "":
                     case "migrate":
                     case "migrate:up":
-                        if (_runnerContext.Version != 0)
-                            scope.Runner.MigrateUp(_runnerContext.Version);
+                        if (_runnerOptions.Version != 0)
+                            scope.Runner.MigrateUp(_runnerOptions.Version);
                         else
                             scope.Runner.MigrateUp();
                         break;
                     case "rollback":
-                        if (_runnerContext.Steps == 0)
-                            _runnerContext.Steps = 1;
-                        scope.Runner.Rollback(_runnerContext.Steps);
+                        if (_runnerOptions.Steps == 0)
+                            _runnerOptions.Steps = 1;
+                        scope.Runner.Rollback(_runnerOptions.Steps);
                         break;
                     case "rollback:toversion":
-                        scope.Runner.RollbackToVersion(_runnerContext.Version);
+                        scope.Runner.RollbackToVersion(_runnerOptions.Version);
                         break;
                     case "rollback:all":
                         scope.Runner.RollbackToVersion(0);
                         break;
                     case "migrate:down":
-                        scope.Runner.MigrateDown(_runnerContext.Version);
+                        scope.Runner.MigrateDown(_runnerOptions.Version);
                         break;
                     case "validateversionorder":
                         scope.Runner.ValidateVersionOrder();
@@ -172,7 +186,7 @@ namespace FluentMigrator.Runner.Initialization
                 }
             }
 
-            _runnerContext.Announcer.Say("Task completed.");
+            _announcer.Say("Task completed.");
         }
 
         /// <summary>
@@ -183,14 +197,14 @@ namespace FluentMigrator.Runner.Initialization
         {
             using (var scope = new RunnerScope(this))
             {
-                switch (_runnerContext.Task)
+                switch (_runnerOptions.Task)
                 {
                     case null:
                     case "":
                     case "migrate":
                     case "migrate:up":
-                        if (_runnerContext.Version != 0)
-                            return scope.Runner.HasMigrationsToApplyUp(_runnerContext.Version);
+                        if (_runnerOptions.Version != 0)
+                            return scope.Runner.HasMigrationsToApplyUp(_runnerOptions.Version);
 
                         return scope.Runner.HasMigrationsToApplyUp();
                     case "rollback":
@@ -200,7 +214,7 @@ namespace FluentMigrator.Runner.Initialization
                         return scope.Runner.HasMigrationsToApplyRollback();
                     case "rollback:toversion":
                     case "migrate:down":
-                        return scope.Runner.HasMigrationsToApplyDown(_runnerContext.Version);
+                        return scope.Runner.HasMigrationsToApplyDown(_runnerOptions.Version);
                     default:
                         return false;
                 }

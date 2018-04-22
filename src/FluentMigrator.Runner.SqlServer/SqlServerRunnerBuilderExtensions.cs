@@ -35,7 +35,7 @@ namespace FluentMigrator.Runner
         /// </remarks>
         /// <param name="builder">The builder to add the SQL Server-specific services to</param>
         /// <returns>The migration runner builder</returns>
-        public static IMigrationRunnerBuilder UseSqlServer(this IMigrationRunnerBuilder builder)
+        public static IMigrationRunnerBuilder AddSqlServer(this IMigrationRunnerBuilder builder)
         {
             builder.Services
                 .AddScoped<IMigrationProcessor, SqlServer2016Processor>()
@@ -48,7 +48,7 @@ namespace FluentMigrator.Runner
         /// </summary>
         /// <param name="builder">The builder to add the SQL Server-specific services to</param>
         /// <returns>The migration runner builder</returns>
-        public static IMigrationRunnerBuilder UseSqlServer2000(this IMigrationRunnerBuilder builder)
+        public static IMigrationRunnerBuilder AddSqlServer2000(this IMigrationRunnerBuilder builder)
         {
             builder.Services
                 .AddScoped<IMigrationProcessor, SqlServer2000Processor>()
@@ -61,7 +61,7 @@ namespace FluentMigrator.Runner
         /// </summary>
         /// <param name="builder">The builder to add the SQL Server-specific services to</param>
         /// <returns>The migration runner builder</returns>
-        public static IMigrationRunnerBuilder UseSqlServer2005(this IMigrationRunnerBuilder builder)
+        public static IMigrationRunnerBuilder AddSqlServer2005(this IMigrationRunnerBuilder builder)
         {
             builder.Services
                 .AddScoped<IMigrationProcessor, SqlServer2005Processor>()
@@ -74,7 +74,7 @@ namespace FluentMigrator.Runner
         /// </summary>
         /// <param name="builder">The builder to add the SQL Server-specific services to</param>
         /// <returns>The migration runner builder</returns>
-        public static IMigrationRunnerBuilder UseSqlServer2008(this IMigrationRunnerBuilder builder)
+        public static IMigrationRunnerBuilder AddSqlServer2008(this IMigrationRunnerBuilder builder)
         {
             builder.Services
                 .AddScoped<IMigrationProcessor, SqlServer2008Processor>()
@@ -87,7 +87,7 @@ namespace FluentMigrator.Runner
         /// </summary>
         /// <param name="builder">The builder to add the SQL Server-specific services to</param>
         /// <returns>The migration runner builder</returns>
-        public static IMigrationRunnerBuilder UseSqlServer2012(this IMigrationRunnerBuilder builder)
+        public static IMigrationRunnerBuilder AddSqlServer2012(this IMigrationRunnerBuilder builder)
         {
             builder.Services
                 .AddScoped<IMigrationProcessor, SqlServer2012Processor>()
@@ -100,7 +100,7 @@ namespace FluentMigrator.Runner
         /// </summary>
         /// <param name="builder">The builder to add the SQL Server-specific services to</param>
         /// <returns>The migration runner builder</returns>
-        public static IMigrationRunnerBuilder UseSqlServer2014(this IMigrationRunnerBuilder builder)
+        public static IMigrationRunnerBuilder AddSqlServer2014(this IMigrationRunnerBuilder builder)
         {
             builder.Services
                 .AddScoped<IMigrationProcessor, SqlServer2014Processor>()
@@ -113,7 +113,7 @@ namespace FluentMigrator.Runner
         /// </summary>
         /// <param name="builder">The builder to add the SQL Server-specific services to</param>
         /// <returns>The migration runner builder</returns>
-        public static IMigrationRunnerBuilder UseSqlServer2016(this IMigrationRunnerBuilder builder)
+        public static IMigrationRunnerBuilder AddSqlServer2016(this IMigrationRunnerBuilder builder)
         {
             builder.Services
                 .AddScoped<IMigrationProcessor, SqlServer2016Processor>()

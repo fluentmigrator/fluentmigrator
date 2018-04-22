@@ -17,6 +17,7 @@
 #endregion
 
 using FluentMigrator.Runner;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Runner.Processors.MySql;
 using FluentMigrator.Runner.Processors.SqlAnywhere;
@@ -26,6 +27,7 @@ using FluentMigrator.Runner.VersionTableInfo;
 using FluentMigrator.Tests.Unit;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 using NUnit.Framework;
 
@@ -56,7 +58,9 @@ namespace FluentMigrator.Tests.Integration
                         .BuildServiceProvider();
                     var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
 
-                    IVersionTableMetaData tableMetaData = new DefaultVersionTableMetaData(ConventionSets.NoSchemaName, runner.RunnerContext);
+                    IVersionTableMetaData tableMetaData = new DefaultVersionTableMetaData(
+                        ConventionSets.NoSchemaName,
+                        new OptionsWrapper<RunnerOptions>(new RunnerOptions(runner.RunnerContext)));
 
                     //ensure table doesn't exist
                     if (processor.TableExists(tableMetaData.SchemaName, tableMetaData.TableName))

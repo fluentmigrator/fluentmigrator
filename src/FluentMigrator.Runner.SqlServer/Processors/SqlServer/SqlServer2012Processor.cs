@@ -14,7 +14,10 @@
 // limitations under the License.
 #endregion
 
+using System.Collections.Generic;
+
 using FluentMigrator.Runner.Generators.SqlServer;
+using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
@@ -25,8 +28,11 @@ namespace FluentMigrator.Runner.Processors.SqlServer
     public class SqlServer2012Processor : SqlServerProcessor
     {
         /// <inheritdoc />
-        public SqlServer2012Processor([NotNull] IAnnouncer announcer, [NotNull] IOptions<ProcessorOptions> options)
-            : base(new[] { "SqlServer2012", "SqlServer" }, new SqlServer2012Generator(), new SqlServer2008Quoter(), announcer, options)
+        public SqlServer2012Processor(
+            [NotNull] IAnnouncer announcer,
+            [NotNull] IOptions<ProcessorOptions> options,
+            [NotNull] IConnectionStringAccessor connectionStringAccessor)
+            : base(new[] { "SqlServer2012", "SqlServer" }, new SqlServer2012Generator(), new SqlServer2008Quoter(), announcer, options, connectionStringAccessor)
         {
         }
     }

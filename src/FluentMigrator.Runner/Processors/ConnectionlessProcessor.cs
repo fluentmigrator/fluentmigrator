@@ -31,8 +31,10 @@ namespace FluentMigrator.Runner.Processors
 {
     public class ConnectionlessProcessor: IMigrationProcessor
     {
+#pragma warning disable 612
         [Obsolete]
         private readonly IMigrationProcessorOptions _legacyOptions;
+#pragma warning restore 612
 
         [Obsolete]
         public ConnectionlessProcessor(
@@ -48,22 +50,22 @@ namespace FluentMigrator.Runner.Processors
         }
 
         public ConnectionlessProcessor(
-            [NotNull] string databaseId,
             [NotNull] IMigrationGenerator generator,
             [NotNull] IAnnouncer announcer,
-            [NotNull] ProcessorOptions options)
+            [NotNull] IOptions<ProcessorOptions> options,
+            [NotNull] IOptions<SelectingProcessorAccessorOptions> accessorOptions)
         {
-            DatabaseType = databaseId;
+            DatabaseType = string.IsNullOrEmpty(accessorOptions.Value.ProcessorId) ? generator.GetName() : accessorOptions.Value.ProcessorId;
             Generator = generator;
             Announcer = announcer;
-            Options = options;
+            Options = options.Value;
 #pragma warning disable 612
-            _legacyOptions = options;
+            _legacyOptions = options.Value;
 #pragma warning restore 612
         }
 
-        [Obsolete]
-        public string ConnectionString => Options.ConnectionString;
+        [Obsolete("Will change from public to protected")]
+        public string ConnectionString { get; } = "No connection";
 
         public IMigrationGenerator Generator { get; set; }
         public IAnnouncer Announcer { get; set; }

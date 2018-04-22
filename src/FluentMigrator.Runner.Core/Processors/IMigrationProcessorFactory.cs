@@ -22,6 +22,7 @@ using JetBrains.Annotations;
 
 namespace FluentMigrator.Runner.Processors
 {
+    [Obsolete]
     public interface IMigrationProcessorFactory
     {
         [Obsolete]

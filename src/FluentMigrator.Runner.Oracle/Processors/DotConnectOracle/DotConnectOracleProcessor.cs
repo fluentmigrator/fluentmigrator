@@ -22,6 +22,7 @@ using System.Data;
 using System.Data.Common;
 
 using FluentMigrator.Expressions;
+using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
@@ -48,8 +49,9 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
             [NotNull] DotConnectOracleDbFactory factory,
             [NotNull] IMigrationGenerator generator,
             [NotNull] IAnnouncer announcer,
-            [NotNull] IOptions<ProcessorOptions> options)
-            : base(factory.Factory, generator, announcer, options.Value)
+            [NotNull] IOptions<ProcessorOptions> options,
+            [NotNull] IConnectionStringAccessor connectionStringAccessor)
+            : base(factory.Factory, generator, announcer, options.Value, connectionStringAccessor)
         {
         }
 

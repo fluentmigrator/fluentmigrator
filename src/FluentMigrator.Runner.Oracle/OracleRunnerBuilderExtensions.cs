@@ -33,7 +33,7 @@ namespace FluentMigrator.Runner
         /// </summary>
         /// <param name="builder">The builder to add the Oracle-specific services to</param>
         /// <returns>The migration runner builder</returns>
-        public static IMigrationRunnerBuilder UseOracle(this IMigrationRunnerBuilder builder)
+        public static IMigrationRunnerBuilder AddOracle(this IMigrationRunnerBuilder builder)
         {
             builder.Services
                 .AddScoped<OracleDbFactory>()
@@ -47,7 +47,7 @@ namespace FluentMigrator.Runner
         /// </summary>
         /// <param name="builder">The builder to add the managed Oracle-specific services to</param>
         /// <returns>The migration runner builder</returns>
-        public static IMigrationRunnerBuilder UseOracleManaged(this IMigrationRunnerBuilder builder)
+        public static IMigrationRunnerBuilder AddOracleManaged(this IMigrationRunnerBuilder builder)
         {
             builder.Services
                 .AddScoped<OracleManagedDbFactory>()
@@ -61,7 +61,7 @@ namespace FluentMigrator.Runner
         /// </summary>
         /// <param name="builder">The builder to add the .Connect Oracle-specific services to</param>
         /// <returns>The migration runner builder</returns>
-        public static IMigrationRunnerBuilder UseDotConnectOracle(this IMigrationRunnerBuilder builder)
+        public static IMigrationRunnerBuilder AddDotConnectOracle(this IMigrationRunnerBuilder builder)
         {
             builder.Services
                 .AddScoped<DotConnectOracleDbFactory>()

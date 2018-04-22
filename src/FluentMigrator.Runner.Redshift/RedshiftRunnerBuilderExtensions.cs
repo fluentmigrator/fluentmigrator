@@ -32,7 +32,7 @@ namespace FluentMigrator.Runner
         /// </summary>
         /// <param name="builder">The builder to add the Redshift-specific services to</param>
         /// <returns>The migration runner builder</returns>
-        public static IMigrationRunnerBuilder UseRedshift(this IMigrationRunnerBuilder builder)
+        public static IMigrationRunnerBuilder AddRedshift(this IMigrationRunnerBuilder builder)
         {
             builder.Services
                 .AddScoped<RedshiftDbFactory>()

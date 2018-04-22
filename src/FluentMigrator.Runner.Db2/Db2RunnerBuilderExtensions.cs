@@ -34,7 +34,7 @@ namespace FluentMigrator.Runner
         /// </summary>
         /// <param name="builder">The builder to add the DB2-specific services to</param>
         /// <returns>The migration runner builder</returns>
-        public static IMigrationRunnerBuilder UseDb2(this IMigrationRunnerBuilder builder)
+        public static IMigrationRunnerBuilder AddDb2(this IMigrationRunnerBuilder builder)
         {
             builder.Services
                 .AddScoped<Db2DbFactory>()
@@ -48,7 +48,7 @@ namespace FluentMigrator.Runner
         /// </summary>
         /// <param name="builder">The builder to add the DB2 iSeries-specific services to</param>
         /// <returns>The migration runner builder</returns>
-        public static IMigrationRunnerBuilder UseDb2ISeries(this IMigrationRunnerBuilder builder)
+        public static IMigrationRunnerBuilder AddDb2ISeries(this IMigrationRunnerBuilder builder)
         {
             builder.Services
                 .AddScoped<Db2ISeriesDbFactory>()

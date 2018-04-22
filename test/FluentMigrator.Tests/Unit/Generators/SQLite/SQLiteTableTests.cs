@@ -325,7 +325,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         public void Issue804()
         {
             var serviceProvider = new ServiceCollection().BuildServiceProvider();
-            var context = new MigrationContext(null, null, null, serviceProvider);
+            var context = new MigrationContext(null, serviceProvider, null, null);
 
             var expression = new CreateTableExpression()
             {

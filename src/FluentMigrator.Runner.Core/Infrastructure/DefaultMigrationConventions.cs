@@ -19,9 +19,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 using FluentMigrator.Infrastructure;
-using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Runner.VersionTableInfo;
 
 namespace FluentMigrator.Runner.Infrastructure
@@ -50,7 +50,7 @@ namespace FluentMigrator.Runner.Infrastructure
 
         private static bool TypeIsMigrationImpl(Type type)
         {
-            return typeof(IMigration).IsAssignableFrom(type) && type.HasAttribute<MigrationAttribute>();
+            return typeof(IMigration).IsAssignableFrom(type) && type.GetCustomAttributes<MigrationAttribute>().Any();
         }
 
         private static MigrationStage? GetMaintenanceStageImpl(Type type)
@@ -58,27 +58,27 @@ namespace FluentMigrator.Runner.Infrastructure
             if (!typeof(IMigration).IsAssignableFrom(type))
                 return null;
 
-            var attribute = type.GetOneAttribute<MaintenanceAttribute>();
+            var attribute = type.GetCustomAttribute<MaintenanceAttribute>();
             return attribute?.Stage;
         }
 
         private static bool TypeIsProfileImpl(Type type)
         {
-            return typeof(IMigration).IsAssignableFrom(type) && type.HasAttribute<ProfileAttribute>();
+            return typeof(IMigration).IsAssignableFrom(type) && type.GetCustomAttributes<ProfileAttribute>().Any();
         }
 
         private static bool TypeIsVersionTableMetaDataImpl(Type type)
         {
-            return typeof(IVersionTableMetaData).IsAssignableFrom(type) && type.HasAttribute<VersionTableMetaDataAttribute>();
+            return typeof(IVersionTableMetaData).IsAssignableFrom(type) && type.GetCustomAttributes<VersionTableMetaDataAttribute>().Any();
         }
 
         private static IMigrationInfo GetMigrationInfoForMigrationImpl(IMigration migration)
         {
             var migrationType = migration.GetType();
-            var migrationAttribute = migrationType.GetOneAttribute<MigrationAttribute>();
+            var migrationAttribute = migrationType.GetCustomAttribute<MigrationAttribute>();
             var migrationInfo = new MigrationInfo(migrationAttribute.Version, migrationAttribute.Description, migrationAttribute.TransactionBehavior, migrationAttribute.BreakingChange, () => migration);
 
-            foreach (var traitAttribute in migrationType.GetAllAttributes<MigrationTraitAttribute>())
+            foreach (var traitAttribute in migrationType.GetCustomAttributes<MigrationTraitAttribute>(true))
                 migrationInfo.AddTrait(traitAttribute.Name, traitAttribute.Value);
 
             return migrationInfo;
@@ -92,12 +92,12 @@ namespace FluentMigrator.Runner.Infrastructure
 
         private static bool TypeHasTagsImpl(Type type)
         {
-            return type.GetOneAttribute<TagsAttribute>(true) != null;
+            return type.GetCustomAttributes<TagsAttribute>(true).Any();
         }
 
         private static bool TypeHasMatchingTagsImpl(Type type, IEnumerable<string> tagsToMatch)
         {
-            var tags = type.GetAllAttributes<TagsAttribute>(true).ToList();
+            var tags = type.GetCustomAttributes<TagsAttribute>(true).ToList();
             var matchTagsList = tagsToMatch.ToList();
 
             if (tags.Count != 0 && matchTagsList.Count == 0)

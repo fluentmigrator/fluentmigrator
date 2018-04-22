@@ -27,7 +27,7 @@ namespace FluentMigrator.Infrastructure
     public class MigrationInfo : IMigrationInfo
     {
         private readonly Dictionary<string, object> _traits = new Dictionary<string, object>();
-        private Lazy<IMigration> _lazyMigration;
+        private readonly Lazy<IMigration> _lazyMigration;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MigrationInfo"/> class.

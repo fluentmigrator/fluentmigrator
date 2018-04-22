@@ -14,26 +14,28 @@
 // limitations under the License.
 #endregion
 
-using System.Collections.Generic;
-
-using FluentMigrator.Runner.Initialization;
-
 using JetBrains.Annotations;
 
-using Microsoft.Extensions.Options;
-
-namespace FluentMigrator.Runner.Processors.Oracle
+namespace FluentMigrator.Runner.Initialization
 {
-    public class OracleManagedProcessor : OracleProcessorBase
+    /// <summary>
+    /// Interface to access the connection string
+    /// </summary>
+    public interface IConnectionStringReader
     {
-        public OracleManagedProcessor(
-            [NotNull] OracleManagedDbFactory factory,
-            [NotNull] IMigrationGenerator generator,
-            [NotNull] IAnnouncer announcer,
-            [NotNull] IOptions<ProcessorOptions> options,
-            [NotNull] IConnectionStringAccessor connectionStringAccessor)
-            : base("OracleManaged", factory, generator, announcer, options, connectionStringAccessor)
-        {
-        }
+        /// <summary>
+        /// Gets the priority
+        /// </summary>
+        /// <remarks>
+        /// Higher value means that it gets processed first
+        /// </remarks>
+        int Priority { get; }
+
+        /// <summary>
+        /// Gets the connection string
+        /// </summary>
+        /// <param name="connectionStringOrName">The name of the connection string</param>
+        [CanBeNull]
+        string GetConnectionString(string connectionStringOrName);
     }
 }

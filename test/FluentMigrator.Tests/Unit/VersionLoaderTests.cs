@@ -55,7 +55,7 @@ namespace FluentMigrator.Tests.Unit
                 .AddScoped(_ => runnerContext.Object)
                 .AddScoped(_ => ConventionSets.NoSchemaName)
                 .AddScoped<IMigrationRunnerConventions, MigrationRunnerConventions>()
-                .AddVersionTableMetaData(sp => new[] { asm }.GetVersionTableMetaDataType(sp))
+                .AddSingleton(sp => (IVersionTableMetaData)ActivatorUtilities.CreateInstance(sp, new[] { asm }.GetVersionTableMetaDataType(sp)))
                 .AddScoped<IVersionLoader, VersionLoader>()
                 .BuildServiceProvider();
 
@@ -81,7 +81,7 @@ namespace FluentMigrator.Tests.Unit
                 .AddScoped(_ => runnerContext.Object)
                 .AddScoped(_ => ConventionSets.NoSchemaName)
                 .AddScoped<IMigrationRunnerConventions, MigrationRunnerConventions>()
-                .AddVersionTableMetaData(sp => new[] { asm }.GetVersionTableMetaDataType(sp))
+                .AddSingleton(sp => (IVersionTableMetaData)ActivatorUtilities.CreateInstance(sp, new[] { asm }.GetVersionTableMetaDataType(sp)))
                 .AddScoped<IVersionLoader, VersionLoader>()
                 .BuildServiceProvider();
 
@@ -111,7 +111,7 @@ namespace FluentMigrator.Tests.Unit
                 .AddScoped(_ => runnerContext.Object)
                 .AddScoped(_ => ConventionSets.NoSchemaName)
                 .AddScoped<IMigrationRunnerConventions, MigrationRunnerConventions>()
-                .AddVersionTableMetaData(sp => new[] { asm }.GetVersionTableMetaDataType(sp))
+                .AddSingleton(sp => (IVersionTableMetaData)ActivatorUtilities.CreateInstance(sp, new[] { asm }.GetVersionTableMetaDataType(sp)))
                 .AddScoped<IVersionLoader, VersionLoader>()
                 .BuildServiceProvider();
 
@@ -138,7 +138,7 @@ namespace FluentMigrator.Tests.Unit
                 .AddScoped(_ => runnerContext.Object)
                 .AddScoped(_ => ConventionSets.NoSchemaName)
                 .AddScoped<IMigrationRunnerConventions, MigrationRunnerConventions>()
-                .AddVersionTableMetaData(sp => new[] { asm }.GetVersionTableMetaDataType(sp))
+                .AddSingleton(sp => (IVersionTableMetaData)ActivatorUtilities.CreateInstance(sp, new[] { asm }.GetVersionTableMetaDataType(sp)))
                 .AddScoped<IVersionLoader, VersionLoader>()
                 .BuildServiceProvider();
 
@@ -175,7 +175,7 @@ namespace FluentMigrator.Tests.Unit
                 .AddScoped(_ => runnerContext.Object)
                 .AddScoped(_ => ConventionSets.NoSchemaName)
                 .AddScoped<IMigrationRunnerConventions, MigrationRunnerConventions>()
-                .AddVersionTableMetaData(sp => new[] { asm }.GetVersionTableMetaDataType(sp))
+                .AddSingleton(sp => (IVersionTableMetaData)ActivatorUtilities.CreateInstance(sp, new[] { asm }.GetVersionTableMetaDataType(sp)))
                 .AddScoped<IVersionLoader, VersionLoader>()
                 .BuildServiceProvider();
 
@@ -211,7 +211,7 @@ namespace FluentMigrator.Tests.Unit
                 .AddScoped(_ => runnerContext.Object)
                 .AddScoped(_ => ConventionSets.NoSchemaName)
                 .AddScoped<IMigrationRunnerConventions, MigrationRunnerConventions>()
-                .AddVersionTableMetaData(sp => new[] { asm }.GetVersionTableMetaDataType(sp))
+                .AddSingleton(sp => (IVersionTableMetaData)ActivatorUtilities.CreateInstance(sp, new[] { asm }.GetVersionTableMetaDataType(sp)))
                 .AddScoped<IVersionLoader, VersionLoader>()
                 .BuildServiceProvider();
 
@@ -245,7 +245,7 @@ namespace FluentMigrator.Tests.Unit
                 .AddScoped(_ => runnerContext.Object)
                 .AddScoped(_ => ConventionSets.NoSchemaName)
                 .AddScoped<IMigrationRunnerConventions, MigrationRunnerConventions>()
-                .AddVersionTableMetaData(sp => new[] { asm }.GetVersionTableMetaDataType(sp))
+                .AddSingleton(sp => (IVersionTableMetaData)ActivatorUtilities.CreateInstance(sp, new[] { asm }.GetVersionTableMetaDataType(sp)))
                 .AddScoped<IVersionLoader, VersionLoader>()
                 .BuildServiceProvider();
 
@@ -284,7 +284,7 @@ namespace FluentMigrator.Tests.Unit
                 .AddScoped(_ => runnerContext.Object)
                 .AddScoped(_ => ConventionSets.NoSchemaName)
                 .AddScoped<IMigrationRunnerConventions, MigrationRunnerConventions>()
-                .AddVersionTableMetaData(sp => new[] { asm }.GetVersionTableMetaDataType(sp))
+                .AddSingleton(sp => (IVersionTableMetaData)ActivatorUtilities.CreateInstance(sp, new[] { asm }.GetVersionTableMetaDataType(sp)))
                 .AddScoped<VersionLoader>()
                 .BuildServiceProvider();
 
@@ -313,7 +313,7 @@ namespace FluentMigrator.Tests.Unit
                 .AddScoped(_ => runnerContext.Object)
                 .AddScoped(_ => ConventionSets.NoSchemaName)
                 .AddScoped<IMigrationRunnerConventions, MigrationRunnerConventions>()
-                .AddVersionTableMetaData(sp => new[] { asm }.GetVersionTableMetaDataType(sp))
+                .AddSingleton(sp => (IVersionTableMetaData)ActivatorUtilities.CreateInstance(sp, new[] { asm }.GetVersionTableMetaDataType(sp)))
                 .AddScoped<VersionLoader>()
                 .BuildServiceProvider();
 
@@ -342,7 +342,7 @@ namespace FluentMigrator.Tests.Unit
                 .AddScoped(_ => runnerContext.Object)
                 .AddScoped(_ => ConventionSets.NoSchemaName)
                 .AddScoped<IMigrationRunnerConventions, MigrationRunnerConventions>()
-                .AddVersionTableMetaData(sp => new[] { asm }.GetVersionTableMetaDataType(sp))
+                .AddSingleton(sp => (IVersionTableMetaData)ActivatorUtilities.CreateInstance(sp, new[] { asm }.GetVersionTableMetaDataType(sp)))
                 .AddScoped<VersionLoader>()
                 .BuildServiceProvider();
 
@@ -371,7 +371,7 @@ namespace FluentMigrator.Tests.Unit
                 .AddScoped(_ => runnerContext.Object)
                 .AddScoped(_ => ConventionSets.NoSchemaName)
                 .AddScoped<IMigrationRunnerConventions, MigrationRunnerConventions>()
-                .AddVersionTableMetaData(sp => new[] { asm }.GetVersionTableMetaDataType(sp))
+                .AddSingleton(sp => (IVersionTableMetaData)ActivatorUtilities.CreateInstance(sp, new[] { asm }.GetVersionTableMetaDataType(sp)))
                 .AddScoped<VersionLoader>()
                 .BuildServiceProvider();
 

@@ -184,9 +184,11 @@ namespace FluentMigrator.Builders.IfDatabase
         {
             var result = new MigrationContext(
                 new NullIfDatabaseProcessor(),
+                originalContext.ServiceProvider,
+#pragma warning disable 612
                 originalContext.ApplicationContext,
-                string.Empty,
-                originalContext.ServiceProvider);
+#pragma warning restore 612
+                string.Empty);
             return result;
         }
     }

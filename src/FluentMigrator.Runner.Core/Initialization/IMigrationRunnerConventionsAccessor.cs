@@ -14,26 +14,19 @@
 // limitations under the License.
 #endregion
 
-using System.Collections.Generic;
-
-using FluentMigrator.Runner.Initialization;
-
 using JetBrains.Annotations;
 
-using Microsoft.Extensions.Options;
-
-namespace FluentMigrator.Runner.Processors.Oracle
+namespace FluentMigrator.Runner.Initialization
 {
-    public class OracleManagedProcessor : OracleProcessorBase
+    /// <summary>
+    /// Access to the <see cref="IMigrationRunnerConventions"/>
+    /// </summary>
+    public interface IMigrationRunnerConventionsAccessor
     {
-        public OracleManagedProcessor(
-            [NotNull] OracleManagedDbFactory factory,
-            [NotNull] IMigrationGenerator generator,
-            [NotNull] IAnnouncer announcer,
-            [NotNull] IOptions<ProcessorOptions> options,
-            [NotNull] IConnectionStringAccessor connectionStringAccessor)
-            : base("OracleManaged", factory, generator, announcer, options, connectionStringAccessor)
-        {
-        }
+        /// <summary>
+        /// Get the migration runner conventions
+        /// </summary>
+        [NotNull]
+        IMigrationRunnerConventions MigrationRunnerConventions { get; }
     }
 }

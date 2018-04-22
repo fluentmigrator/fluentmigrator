@@ -48,6 +48,7 @@ namespace FluentMigrator.Runner.Initialization
             Tags = runnerContext.Tags?.ToArray();
             AllowBreakingChange = runnerContext.AllowBreakingChange;
             TransactionPerSession = runnerContext.TransactionPerSession;
+            ApplicationContext = runnerContext.ApplicationContext;
         }
 
         /// <summary>
@@ -96,5 +97,11 @@ namespace FluentMigrator.Runner.Initialization
         /// The default transaction behavior is to use one transaction per migration.
         /// </remarks>
         public bool TransactionPerSession { get; set; }
+
+        /// <summary>
+        /// Gets or sets the arbitrary application context passed to the task runner
+        /// </summary>
+        [Obsolete]
+        public object ApplicationContext { get; set; }
     }
 }

@@ -31,6 +31,7 @@ using FluentMigrator.Runner.BatchParser;
 using FluentMigrator.Runner.BatchParser.Sources;
 using FluentMigrator.Runner.BatchParser.SpecialTokenSearchers;
 using FluentMigrator.Runner.Helpers;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.SqlAnywhere;
 
 using JetBrains.Annotations;
@@ -66,8 +67,9 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
             [NotNull] DbProviderFactory factory,
             [NotNull] IMigrationGenerator generator,
             [NotNull] IAnnouncer announcer,
-            [NotNull] IOptions<ProcessorOptions> options)
-            : base(factory, generator, announcer, options.Value)
+            [NotNull] IOptions<ProcessorOptions> options,
+            [NotNull] IConnectionStringAccessor connectionStringAccessor)
+            : base(factory, generator, announcer, options.Value, connectionStringAccessor)
         {
             DatabaseType = databaseType;
         }
@@ -183,7 +185,9 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
 
         private string ReplaceUserIdAndPasswordInConnectionString(string userId, string password)
         {
-            var csb = new DbConnectionStringBuilder { ConnectionString = Options.ConnectionString };
+#pragma warning disable 618
+            var csb = new DbConnectionStringBuilder { ConnectionString = ConnectionString };
+#pragma warning restore 618
             var uidKey = new[] { "uid", "userid" }.FirstOrDefault(x => csb.ContainsKey(x)) ?? "uid";
             var pwdKey = new[] { "pwd", "password" }.FirstOrDefault(x => csb.ContainsKey(x)) ?? "pwd";
             csb[uidKey] = userId;

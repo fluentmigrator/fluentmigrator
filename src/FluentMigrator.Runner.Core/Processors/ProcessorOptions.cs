@@ -17,8 +17,12 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 using FluentMigrator.Runner.Initialization;
+
+using JetBrains.Annotations;
 
 namespace FluentMigrator.Runner.Processors
 {

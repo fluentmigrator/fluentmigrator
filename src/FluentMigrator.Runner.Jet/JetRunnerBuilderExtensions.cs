@@ -32,7 +32,7 @@ namespace FluentMigrator.Runner
         /// </summary>
         /// <param name="builder">The builder to add the JET engine (Access)-specific services to</param>
         /// <returns>The migration runner builder</returns>
-        public static IMigrationRunnerBuilder UseJet(this IMigrationRunnerBuilder builder)
+        public static IMigrationRunnerBuilder AddJet(this IMigrationRunnerBuilder builder)
         {
             builder.Services
                 .AddScoped<IMigrationProcessor, JetProcessor>()
