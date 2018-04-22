@@ -22,6 +22,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - `IProfileLoader.ApplyProfiles()`
 - `IProfileLoader.FindProfilesIn`
 
+## 2.0.3 (2018-04-22) 
+ 
+### Fixed 
+ 
+- [#858](https://github.com/fluentmigrator/fluentmigrator/issues/858): Don't even try to set the command timeout for SQL Server CE 
+
 ## 2.0.2 (2018-04-17)
 
 ### Fixed
