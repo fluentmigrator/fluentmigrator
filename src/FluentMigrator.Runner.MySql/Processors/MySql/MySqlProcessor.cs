@@ -46,11 +46,11 @@ namespace FluentMigrator.Runner.Processors.MySql
         }
 
         public MySqlProcessor(
-            [NotNull] DbProviderFactory factory,
+            [NotNull] MySqlDbFactory factory,
             [NotNull] IMigrationGenerator generator,
             [NotNull] IAnnouncer announcer,
             [NotNull] IOptions<ProcessorOptions> options)
-            : base(factory, generator, announcer, options.Value)
+            : base(factory.Factory, generator, announcer, options.Value)
         {
         }
 

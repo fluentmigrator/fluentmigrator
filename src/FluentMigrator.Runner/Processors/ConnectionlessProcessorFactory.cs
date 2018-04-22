@@ -49,10 +49,10 @@ namespace FluentMigrator.Runner.Processors
         /// <param name="runnerContext">The runner context</param>
         [Obsolete]
         public ConnectionlessProcessorFactory(
-            [NotNull] IMigrationGeneratorAccessor generatorAccessor,
+            [NotNull] IGeneratorAccessor generatorAccessor,
             [NotNull] IRunnerContext runnerContext)
         {
-            _generator = generatorAccessor.ActiveGenerator;
+            _generator = generatorAccessor.Generator;
             _databaseId = runnerContext.Database;
             _announcer = runnerContext.Announcer;
             _options = new ProcessorOptions(runnerContext);
@@ -60,11 +60,11 @@ namespace FluentMigrator.Runner.Processors
         }
 
         public ConnectionlessProcessorFactory(
-            [NotNull] IMigrationGeneratorAccessor generatorAccessor,
+            [NotNull] IGeneratorAccessor generatorAccessor,
             [NotNull] IOptions<ProcessorOptions> options,
             [NotNull] IAnnouncer announcer)
         {
-            _generator = generatorAccessor.ActiveGenerator;
+            _generator = generatorAccessor.Generator;
             _options = options.Value;
             _announcer = announcer;
             Name = _databaseId = _generator.GetName();

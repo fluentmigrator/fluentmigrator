@@ -21,42 +21,16 @@ using System.Data.OleDb;
 
 using FluentMigrator.Runner.Generators.Jet;
 
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-
 namespace FluentMigrator.Runner.Processors.Jet
 {
+    [Obsolete]
     public class JetProcessorFactory : MigrationProcessorFactory
     {
-        private readonly IServiceProvider _serviceProvider;
-
-        [Obsolete]
-        public JetProcessorFactory()
-        {
-        }
-
-        public JetProcessorFactory(IServiceProvider serviceProvider)
-        {
-            _serviceProvider = serviceProvider;
-        }
-
         [Obsolete]
         public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
         {
             var connection = new OleDbConnection(connectionString);
             return new JetProcessor(connection, new JetGenerator(), announcer, options);
-        }
-
-        /// <inheritdoc />
-        public override IMigrationProcessor Create()
-        {
-            if (_serviceProvider == null)
-                return null;
-            var factory = OleDbFactory.Instance;
-            var options = _serviceProvider.GetRequiredService<IOptions<ProcessorOptions>>();
-            var announcer = _serviceProvider.GetRequiredService<IAnnouncer>();
-            var generator = new JetGenerator();
-            return new JetProcessor(factory, generator, announcer, options);
         }
     }
 }

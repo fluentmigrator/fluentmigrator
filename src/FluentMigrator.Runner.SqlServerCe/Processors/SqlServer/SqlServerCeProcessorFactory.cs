@@ -28,6 +28,7 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
+    [Obsolete]
     public class SqlServerCeProcessorFactory : MigrationProcessorFactory
     {
         private readonly IServiceProvider _serviceProvider;
@@ -49,18 +50,6 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             var factory = new SqlServerCeDbFactory(_serviceProvider);
             var connection = factory.CreateConnection(connectionString);
             return new SqlServerCeProcessor(connection, new SqlServerCeGenerator(), announcer, options, factory);
-        }
-
-        /// <inheritdoc />
-        public override IMigrationProcessor Create()
-        {
-            if (_serviceProvider == null)
-                return null;
-            var factory = new SqlServerCeDbFactory(_serviceProvider).Factory;
-            var options = _serviceProvider.GetRequiredService<IOptions<ProcessorOptions>>();
-            var announcer = _serviceProvider.GetRequiredService<IAnnouncer>();
-            var generator = new SqlServerCeGenerator();
-            return new SqlServerCeProcessor(factory, generator, announcer, options);
         }
     }
 }

@@ -45,11 +45,11 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
         }
 
         public DotConnectOracleProcessor(
-            [NotNull] DbProviderFactory factory,
+            [NotNull] DotConnectOracleDbFactory factory,
             [NotNull] IMigrationGenerator generator,
             [NotNull] IAnnouncer announcer,
             [NotNull] IOptions<ProcessorOptions> options)
-            : base(factory, generator, announcer, options.Value)
+            : base(factory.Factory, generator, announcer, options.Value)
         {
         }
 

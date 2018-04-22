@@ -26,21 +26,10 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
+    [Obsolete]
     public class SqlServer2008ProcessorFactory : MigrationProcessorFactory
     {
         private static readonly string[] _dbTypes = {"SqlServer2008", "SqlServer"};
-        private readonly IServiceProvider _serviceProvider;
-
-        [Obsolete]
-        public SqlServer2008ProcessorFactory()
-            : this(serviceProvider: null)
-        {
-        }
-
-        public SqlServer2008ProcessorFactory(IServiceProvider serviceProvider)
-        {
-            _serviceProvider = serviceProvider;
-        }
 
         [Obsolete]
         public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
@@ -48,18 +37,6 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             var factory = new SqlServerDbFactory();
             var connection = factory.CreateConnection(connectionString);
             return new SqlServerProcessor(_dbTypes, connection, new SqlServer2008Generator(), announcer, options, factory);
-        }
-
-        /// <inheritdoc />
-        public override IMigrationProcessor Create()
-        {
-            if (_serviceProvider == null)
-                return null;
-            var factory = new SqlServerDbFactory().Factory;
-            var options = _serviceProvider.GetRequiredService<IOptions<ProcessorOptions>>();
-            var announcer = _serviceProvider.GetRequiredService<IAnnouncer>();
-            var generator = new SqlServer2008Generator();
-            return new SqlServerProcessor(_dbTypes, factory, generator, announcer, options);
         }
     }
 }

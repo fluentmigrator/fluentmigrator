@@ -25,6 +25,7 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.Redshift
 {
+    [Obsolete]
     public class RedshiftProcessorFactory : MigrationProcessorFactory
     {
         private readonly IServiceProvider _serviceProvider;
@@ -46,18 +47,6 @@ namespace FluentMigrator.Runner.Processors.Redshift
             var factory = new RedshiftDbFactory(_serviceProvider);
             var connection = factory.CreateConnection(connectionString);
             return new RedshiftProcessor(connection, new RedshiftGenerator(), announcer, options, factory);
-        }
-
-        /// <inheritdoc />
-        public override IMigrationProcessor Create()
-        {
-            if (_serviceProvider == null)
-                return null;
-            var factory = new RedshiftDbFactory(_serviceProvider).Factory;
-            var options = _serviceProvider.GetRequiredService<IOptions<ProcessorOptions>>();
-            var announcer = _serviceProvider.GetRequiredService<IAnnouncer>();
-            var generator = new RedshiftGenerator();
-            return new RedshiftProcessor(factory, generator, announcer, options);
         }
     }
 }

@@ -25,6 +25,7 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.Firebird
 {
+    [Obsolete]
     public class FirebirdProcessorFactory : MigrationProcessorFactory
     {
         private readonly IServiceProvider _serviceProvider;
@@ -54,25 +55,6 @@ namespace FluentMigrator.Runner.Processors.Firebird
             var factory = new FirebirdDbFactory(_serviceProvider);
             var connection = factory.CreateConnection(connectionString);
             return new FirebirdProcessor(connection, new FirebirdGenerator(FbOptions), announcer, options, factory, fbOpt);
-        }
-
-        /// <inheritdoc />
-        public override IMigrationProcessor Create()
-        {
-            if (_serviceProvider == null)
-                return null;
-            var options = _serviceProvider.GetRequiredService<IOptions<ProcessorOptions>>();
-            var announcer = _serviceProvider.GetRequiredService<IAnnouncer>();
-            var fbOpt = ((FirebirdOptions) FbOptions.Clone())
-                .ApplyProviderSwitches(options.Value.ProviderSwitches);
-            var factory = new FirebirdDbFactory(_serviceProvider).Factory;
-            var generator = new FirebirdGenerator(FbOptions);
-            return new FirebirdProcessor(
-                factory,
-                generator,
-                announcer,
-                options,
-                new OptionsWrapper<FirebirdOptions>(fbOpt));
         }
     }
 }

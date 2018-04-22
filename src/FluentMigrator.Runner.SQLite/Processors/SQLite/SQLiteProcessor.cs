@@ -57,11 +57,11 @@ namespace FluentMigrator.Runner.Processors.SQLite
         }
 
         public SQLiteProcessor(
-            [NotNull] DbProviderFactory factory,
+            [NotNull] SQLiteDbFactory factory,
             [NotNull] IMigrationGenerator generator,
             [NotNull] IAnnouncer announcer,
             [NotNull] IOptions<ProcessorOptions> options)
-            : base(factory, generator, announcer, options.Value)
+            : base(factory.Factory, generator, announcer, options.Value)
         {
         }
 

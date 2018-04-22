@@ -23,6 +23,7 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.MySql
 {
+    [Obsolete]
     public class MySql4ProcessorFactory : MigrationProcessorFactory
     {
         private readonly IServiceProvider _serviceProvider;
@@ -44,18 +45,6 @@ namespace FluentMigrator.Runner.Processors.MySql
             var factory = new MySqlDbFactory(_serviceProvider);
             var connection = factory.CreateConnection(connectionString);
             return new MySqlProcessor(connection, new MySql4Generator(), announcer, options, factory);
-        }
-
-        /// <inheritdoc />
-        public override IMigrationProcessor Create()
-        {
-            if (_serviceProvider == null)
-                return null;
-            var factory = new MySqlDbFactory(_serviceProvider).Factory;
-            var options = _serviceProvider.GetRequiredService<IOptions<ProcessorOptions>>();
-            var announcer = _serviceProvider.GetRequiredService<IAnnouncer>();
-            var generator = new MySql4Generator();
-            return new MySqlProcessor(factory, generator, announcer, options);
         }
     }
 }

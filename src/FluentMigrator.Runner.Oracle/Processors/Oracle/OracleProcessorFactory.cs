@@ -25,6 +25,7 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.Oracle
 {
+    [Obsolete]
     public class OracleProcessorFactory : MigrationProcessorFactory
     {
         private readonly IServiceProvider _serviceProvider;
@@ -45,25 +46,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
         {
             var factory = new OracleDbFactory(_serviceProvider);
             var connection = factory.CreateConnection(connectionString);
-            return new OracleProcessor(connection, new OracleGenerator(Quoted(options.ProviderSwitches)), announcer, options, factory);
-        }
-
-        /// <inheritdoc />
-        public override IMigrationProcessor Create()
-        {
-            if (_serviceProvider == null)
-                return null;
-            var factory = new OracleManagedDbFactory(_serviceProvider).Factory;
-            var options = _serviceProvider.GetRequiredService<IOptions<ProcessorOptions>>();
-            var announcer = _serviceProvider.GetRequiredService<IAnnouncer>();
-            var generator = new OracleGenerator(Quoted(options.Value.ProviderSwitches));
-            return new OracleProcessor(factory, generator, announcer, options);
-        }
-
-        private bool Quoted(string options)
-        {
-            return !string.IsNullOrEmpty(options)
-                && options.IndexOf("QUOTEDIDENTIFIERS=TRUE", StringComparison.InvariantCultureIgnoreCase) != -1;
+            return new OracleProcessor(connection, new OracleGenerator(ProcessorOptionsExtensions.Quoted(options.ProviderSwitches)), announcer, options, factory);
         }
     }
 }

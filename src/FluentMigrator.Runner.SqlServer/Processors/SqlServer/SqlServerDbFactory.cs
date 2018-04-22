@@ -16,11 +16,13 @@
 //
 #endregion
 
+using System;
 using System.Data.Common;
 using System.Data.SqlClient;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
+    [Obsolete]
     public class SqlServerDbFactory : DbFactoryBase
     {
         public SqlServerDbFactory()

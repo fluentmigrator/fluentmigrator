@@ -46,11 +46,11 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         }
 
         public SqlServerCeProcessor(
-            [NotNull] DbProviderFactory factory,
+            [NotNull] SqlServerCeDbFactory factory,
             [NotNull] IMigrationGenerator generator,
             [NotNull] IAnnouncer announcer,
             [NotNull] IOptions<ProcessorOptions> options)
-            : base(factory, generator, announcer, options.Value)
+            : base(factory.Factory, generator, announcer, options.Value)
         {
         }
 

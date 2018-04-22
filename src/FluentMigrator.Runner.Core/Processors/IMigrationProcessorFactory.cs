@@ -28,19 +28,6 @@ namespace FluentMigrator.Runner.Processors
         [NotNull]
         IMigrationProcessor Create(string connectionString, [NotNull] IAnnouncer announcer, [NotNull] IMigrationProcessorOptions options);
 
-#pragma warning disable 612
-        /// <summary>
-        /// Creates a new migration processor
-        /// </summary>
-        /// <returns>
-        /// <c>null</c> when the processor only implements the old-style
-        /// <see cref="Create(string,FluentMigrator.Runner.IAnnouncer,FluentMigrator.IMigrationProcessorOptions)"/>
-        /// call.
-        /// </returns>
-        [CanBeNull]
-        IMigrationProcessor Create();
-#pragma warning restore 612
-
         /// <summary>
         /// Returns a value indicating whether this processor factory can use the given DB provider
         /// </summary>

@@ -41,6 +41,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Data.SqlClient;
 using System.IO;
 
 using FluentMigrator.Expressions;
@@ -63,11 +64,10 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         }
 
         public SqlServer2000Processor(
-            [NotNull] DbProviderFactory factory,
             [NotNull] IMigrationGenerator generator,
             [NotNull] IAnnouncer announcer,
             [NotNull] IOptions<ProcessorOptions> options)
-            : base(factory, generator, announcer, options.Value)
+            : base(SqlClientFactory.Instance, generator, announcer, options.Value)
         {
         }
 

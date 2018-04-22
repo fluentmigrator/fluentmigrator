@@ -65,18 +65,18 @@ namespace FluentMigrator.Runner.Processors.Firebird
         }
 
         public FirebirdProcessor(
-            [NotNull] DbProviderFactory factory,
+            [NotNull] FirebirdDbFactory factory,
             [NotNull] IMigrationGenerator generator,
             [NotNull] IAnnouncer announcer,
             [NotNull] IOptions<ProcessorOptions> options,
-            [NotNull] IOptions<FirebirdOptions> fbOptions)
-            : base(factory, generator, announcer, options.Value)
+            [NotNull] FirebirdOptions fbOptions)
+            : base(factory.Factory, generator, announcer, options.Value)
         {
             if (fbOptions == null)
                 throw new ArgumentNullException(nameof(fbOptions));
             _firebirdVersionFunc = new Lazy<Version>(GetFirebirdVersion);
-            _quoter = new FirebirdQuoter(fbOptions.Value.ForceQuote);
-            FBOptions = fbOptions.Value;
+            _quoter = new FirebirdQuoter(fbOptions.ForceQuote);
+            FBOptions = fbOptions;
 #pragma warning disable 618
             truncator = new FirebirdTruncator(FBOptions.TruncateLongNames, FBOptions.PackKeyNames);
 #pragma warning restore 618

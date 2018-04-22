@@ -26,8 +26,6 @@ namespace FluentMigrator.Runner.Generators.Hana
 {
     public class HanaGenerator : GenericGenerator
     {
-
-
         public HanaGenerator()
             : base(new HanaColumn(new HanaQuoter()), new HanaQuoter(), new HanaDescriptionGenerator())
         {

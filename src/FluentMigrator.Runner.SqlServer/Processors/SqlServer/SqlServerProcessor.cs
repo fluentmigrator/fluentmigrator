@@ -17,7 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
+using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 
@@ -35,7 +35,7 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
-    public sealed class SqlServerProcessor : GenericProcessorBase
+    public class SqlServerProcessor : GenericProcessorBase
     {
         private const string SqlSchemaExists = "SELECT 1 WHERE EXISTS (SELECT * FROM sys.schemas WHERE NAME = '{0}') ";
         private const string TABLE_EXISTS = "SELECT 1 WHERE EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}')";
@@ -69,16 +69,16 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public SqlServerProcessor(
             [NotNull, ItemNotNull] IEnumerable<string> databaseTypes,
-            [NotNull] DbProviderFactory factory,
-            [NotNull] GenericGenerator generator,
+            [NotNull] IMigrationGenerator generator,
+            [NotNull] IQuoter quoter,
             [NotNull] IAnnouncer announcer,
             [NotNull] IOptions<ProcessorOptions> options)
-            : base(factory, generator, announcer, options.Value)
+            : base(SqlClientFactory.Instance, generator, announcer, options.Value)
         {
             var dbTypes = databaseTypes.ToList();
             DatabaseType = dbTypes.First();
             DatabaseTypeAliases = dbTypes.Skip(1).ToList();
-            Quoter = generator.Quoter;
+            Quoter = quoter;
         }
 
         private static string SafeSchemaName(string schemaName)

@@ -50,12 +50,12 @@ namespace FluentMigrator.Runner.Processors.Jet
         }
 
         public JetProcessor(
-            [CanBeNull] DbProviderFactory factory,
             [NotNull] IMigrationGenerator generator,
             [NotNull] IAnnouncer announcer,
             [NotNull] IOptions<ProcessorOptions> options)
             : base(generator, announcer, options.Value)
         {
+            var factory = OleDbFactory.Instance;
             if (factory != null)
             {
                 _connection = factory.CreateConnection();

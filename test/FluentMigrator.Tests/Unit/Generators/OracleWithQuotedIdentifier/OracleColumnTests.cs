@@ -17,7 +17,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
         [SetUp]
         public void Setup()
         {
-            Generator = new OracleGenerator(useQuotedIdentifiers: true);
+            Generator = new OracleGenerator(new OracleQuoterQuotedIdentifier());
         }
 
         [Test]

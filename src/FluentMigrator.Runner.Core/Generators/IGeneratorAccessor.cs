@@ -1,4 +1,4 @@
-#region License
+﻿#region License
 // Copyright (c) 2018, FluentMigrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,16 +14,23 @@
 // limitations under the License.
 #endregion
 
+using JetBrains.Annotations;
+
 namespace FluentMigrator.Runner.Generators
 {
     /// <summary>
-    /// Interface to access the active migration generator
+    /// Accesses the selected migration generator
     /// </summary>
-    public interface IMigrationGeneratorAccessor
+    /// <remarks>
+    /// This is only different from using <see cref="IMigrationGenerator"/>
+    /// as constructor parameter when multiple databases should be supported.
+    /// </remarks>
+    public interface IGeneratorAccessor
     {
         /// <summary>
-        /// Gets the active migration generator
+        /// Gets the selected migration generator
         /// </summary>
-        IMigrationGenerator ActiveGenerator { get; }
+        [NotNull]
+        IMigrationGenerator Generator { get; }
     }
 }

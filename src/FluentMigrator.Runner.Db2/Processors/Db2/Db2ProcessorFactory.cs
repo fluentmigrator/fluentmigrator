@@ -25,6 +25,7 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.DB2
 {
+    [Obsolete]
     public class Db2ProcessorFactory : MigrationProcessorFactory
     {
         private readonly IServiceProvider _serviceProvider;
@@ -45,18 +46,6 @@ namespace FluentMigrator.Runner.Processors.DB2
             var factory = new Db2DbFactory(_serviceProvider);
             var connection = factory.CreateConnection(connectionString);
             return new Db2Processor(connection, new Db2Generator(new Db2Quoter()), announcer, options, factory);
-        }
-
-        /// <inheritdoc />
-        public override IMigrationProcessor Create()
-        {
-            if (_serviceProvider == null)
-                return null;
-            var factory = new Db2DbFactory(_serviceProvider).Factory;
-            var options = _serviceProvider.GetRequiredService<IOptions<ProcessorOptions>>();
-            var announcer = _serviceProvider.GetRequiredService<IAnnouncer>();
-            var generator = new Db2Generator(new Db2Quoter());
-            return new Db2Processor(factory, generator, announcer, options);
         }
     }
 }

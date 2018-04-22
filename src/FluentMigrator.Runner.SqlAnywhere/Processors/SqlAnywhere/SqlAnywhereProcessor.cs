@@ -39,7 +39,7 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.SqlAnywhere
 {
-    public sealed class SqlAnywhereProcessor : GenericProcessorBase
+    public class SqlAnywhereProcessor : GenericProcessorBase
     {
         //select 1 from sys.syscolumn as c inner join sys.systable as t on t.table_id = c.table_id where t.table_name = '{0}' and c.column_name = '{1}'
         private const string SCHEMA_EXISTS = "SELECT 1 WHERE EXISTS (SELECT * FROM sys.sysuserperm WHERE user_name = '{0}') ";
@@ -354,4 +354,3 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
         }
     }
 }
-

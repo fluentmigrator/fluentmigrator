@@ -43,11 +43,11 @@ namespace FluentMigrator.Runner.Processors.DB2.iSeries
         }
 
         public Db2ISeriesProcessor(
-            [NotNull] DbProviderFactory factory,
+            [NotNull] Db2ISeriesDbFactory factory,
             [NotNull] IMigrationGenerator generator,
             [NotNull] IAnnouncer announcer,
             [NotNull] IOptions<ProcessorOptions> options)
-            : base(factory, generator, announcer, options.Value)
+            : base(factory.Factory, generator, announcer, options.Value)
         {
             Quoter = new Db2Quoter();
         }

@@ -25,6 +25,7 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.DotConnectOracle
 {
+    [Obsolete]
     public class DotConnectOracleProcessorFactory : MigrationProcessorFactory
     {
         private readonly IServiceProvider _serviceProvider;
@@ -46,18 +47,6 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
             var factory = new DotConnectOracleDbFactory(_serviceProvider);
             var connection = factory.CreateConnection(connectionString);
             return new DotConnectOracleProcessor(connection, new OracleGenerator(), announcer, options, factory);
-        }
-
-        /// <inheritdoc />
-        public override IMigrationProcessor Create()
-        {
-            if (_serviceProvider == null)
-                return null;
-            var factory = new DotConnectOracleDbFactory(_serviceProvider).Factory;
-            var options = _serviceProvider.GetRequiredService<IOptions<ProcessorOptions>>();
-            var announcer = _serviceProvider.GetRequiredService<IAnnouncer>();
-            var generator = new OracleGenerator();
-            return new DotConnectOracleProcessor(factory, generator, announcer, options);
         }
     }
 }

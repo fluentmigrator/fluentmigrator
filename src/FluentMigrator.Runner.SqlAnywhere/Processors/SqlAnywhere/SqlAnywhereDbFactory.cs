@@ -28,14 +28,8 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
             new TestEntry("iAnywhere.Data.SQLAnywhere.SAFactory", "iAnywhere.Data.SQLAnywhere.v3.5"),
         };
 
-        [Obsolete]
         public SqlAnywhereDbFactory()
-            : this(serviceProvider: null)
-        {
-        }
-
-        public SqlAnywhereDbFactory(IServiceProvider serviceProvider)
-            : base(serviceProvider, _testEntries)
+            : base(serviceProvider: null, _testEntries)
         {
         }
     }

@@ -47,11 +47,11 @@ namespace FluentMigrator.Runner.Processors.Redshift
         }
 
         public RedshiftProcessor(
-            [NotNull] DbProviderFactory factory,
+            [NotNull] RedshiftDbFactory factory,
             [NotNull] IMigrationGenerator generator,
             [NotNull] IAnnouncer announcer,
             [NotNull] IOptions<ProcessorOptions> options)
-            : base(factory, generator, announcer, options.Value)
+            : base(factory.Factory, generator, announcer, options.Value)
         {
         }
 
