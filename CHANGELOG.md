@@ -22,11 +22,28 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - `IProfileLoader.ApplyProfiles()`
 - `IProfileLoader.FindProfilesIn`
 
-## 2.0.3 (2018-04-22) 
+## 2.0.5 (2018-04-23)
+
+### Added
+
+- net452 build for the console runner to enable usage of the latest MySQL ADO.NET provider
  
-### Fixed 
+### Changed
  
-- [#858](https://github.com/fluentmigrator/fluentmigrator/issues/858): Don't even try to set the command timeout for SQL Server CE 
+- Added more ADO.NET providers for the console
+- The tools are in platform-specific sub-directories again (e.g. `tools/net452/x86/Migrate.exe`)
+
+This has become necessary to enable a better out-of-the-box experience for the migration tool.
+
+## 2.0.4 (2018-04-23)
+
+Unlisted due to unintentional breaking change.
+
+## 2.0.3 (2018-04-22)
+
+### Fixed
+
+- [#858](https://github.com/fluentmigrator/fluentmigrator/issues/858): Don't even try to set the command timeout for SQL Server CE
 
 ## 2.0.2 (2018-04-17)
 
