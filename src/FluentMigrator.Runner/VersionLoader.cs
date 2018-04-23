@@ -59,13 +59,13 @@ namespace FluentMigrator.Runner
         public IMigration VersionDescriptionMigration { get; }
 
         [Obsolete]
-        public VersionLoader(IMigrationRunner runner, Assembly assembly, IConventionSet conventionSet, IMigrationRunnerConventions conventions)
+        internal VersionLoader(IMigrationRunner runner, Assembly assembly, IConventionSet conventionSet, IMigrationRunnerConventions conventions)
             : this(runner, new SingleAssembly(assembly), conventionSet, conventions)
         {
         }
 
         [Obsolete]
-        public VersionLoader(IMigrationRunner runner, IAssemblyCollection assemblies,
+        internal VersionLoader(IMigrationRunner runner, IAssemblyCollection assemblies,
             IConventionSet conventionSet,
             IMigrationRunnerConventions conventions,
             IVersionTableMetaData versionTableMetaData = null)

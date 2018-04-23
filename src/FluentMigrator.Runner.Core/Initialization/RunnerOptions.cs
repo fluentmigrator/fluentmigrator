@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2018, FluentMigrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -49,6 +49,7 @@ namespace FluentMigrator.Runner.Initialization
             AllowBreakingChange = runnerContext.AllowBreakingChange;
             TransactionPerSession = runnerContext.TransactionPerSession;
             ApplicationContext = runnerContext.ApplicationContext;
+            NoConnection = runnerContext.NoConnection;
         }
 
         /// <summary>
@@ -103,5 +104,15 @@ namespace FluentMigrator.Runner.Initialization
         /// </summary>
         [Obsolete]
         public object ApplicationContext { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether no connection should be used
+        /// </summary>
+        /// <remarks>
+        /// The difference between this and PreviewOnly is, that
+        /// the preview-only mode uses the connection to determine the current
+        /// state of the database.
+        /// </remarks>
+        public bool NoConnection { get; set; }
     }
 }

@@ -63,7 +63,7 @@ namespace FluentMigrator.Runner.Initialization
         private static IReadOnlyCollection<Assembly> LoadAssemblies(AssemblySourceOptions options, IReadOnlyCollection<IAssemblyLoadEngine> loadEngines)
         {
             var assemblyNames = options.AssemblyNames;
-            if (assemblyNames.Length == 0)
+            if (assemblyNames == null || assemblyNames.Length == 0)
             {
                 // Replace with current assemblies loaded in AppDomain
                 return Array.Empty<Assembly>();

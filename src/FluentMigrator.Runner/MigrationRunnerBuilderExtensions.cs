@@ -120,7 +120,10 @@ namespace FluentMigrator.Runner
             }
 
             /// <inheritdoc />
-            public IEnumerable<Type> MigrationTypeCandidates => _assemblies.SelectMany(a => a.GetExportedTypes());
+            public IEnumerable<Type> MigrationTypeCandidates => _assemblies
+                .SelectMany(a => a.GetExportedTypes())
+                .Where(t => typeof(IMigration).IsAssignableFrom(t))
+                .Where(t => !t.IsAbstract);
         }
 
         /// <summary>

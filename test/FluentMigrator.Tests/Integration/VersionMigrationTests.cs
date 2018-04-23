@@ -51,16 +51,14 @@ namespace FluentMigrator.Tests.Integration
         public void CanUseVersionInfo()
         {
             ExecuteWithSupportedProcessors(
-                processor =>
+                services => services.WithMigrationsIn("FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3"),
+                (serviceProvider, processor) =>
                 {
-                    var serviceProvider = processor.CreateServices()
-                        .WithMigrationsIn("FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3")
-                        .BuildServiceProvider();
                     var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
 
                     IVersionTableMetaData tableMetaData = new DefaultVersionTableMetaData(
                         ConventionSets.NoSchemaName,
-                        new OptionsWrapper<RunnerOptions>(new RunnerOptions(runner.RunnerContext)));
+                        serviceProvider.GetRequiredService<IOptions<RunnerOptions>>());
 
                     //ensure table doesn't exist
                     if (processor.TableExists(tableMetaData.SchemaName, tableMetaData.TableName))
@@ -77,63 +75,71 @@ namespace FluentMigrator.Tests.Integration
         [Test]
         public void CanUseCustomVersionInfo()
         {
-            ExecuteWithSupportedProcessors(processor =>
-            {
-                var services = processor.CreateServices()
+            ExecuteWithSupportedProcessors(
+                services => services
                     .WithMigrationsIn("FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3")
-                    .AddSingleton<IVersionTableMetaData, TestVersionTableMetaData>();
-                var runner = services.BuildServiceProvider().GetRequiredService<IMigrationRunner>();
+                    .AddSingleton<IVersionTableMetaDataAccessor>(new PassThroughVersionTableMetaDataAccessor(new TestVersionTableMetaData())),
+                (serviceProvider, processor) =>
+                {
+                    var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
 
-                var tableMetaData = new TestVersionTableMetaData();
+                    var tableMetaData = new TestVersionTableMetaData();
 
-                //ensure table doesn't exist
-                if (processor.TableExists(tableMetaData.SchemaName, tableMetaData.TableName))
-                    runner.Down(new VersionMigration(tableMetaData));
+                    //ensure table doesn't exist
+                    if (processor.TableExists(tableMetaData.SchemaName, tableMetaData.TableName))
+                        runner.Down(new VersionMigration(tableMetaData));
 
-                //ensure schema doesn't exist
-                if (processor.SchemaExists(tableMetaData.SchemaName))
-                    runner.Down(new VersionSchemaMigration(tableMetaData));
+                    //ensure schema doesn't exist
+                    if (processor.SchemaExists(tableMetaData.SchemaName))
+                        runner.Down(new VersionSchemaMigration(tableMetaData));
 
-                runner.MigrateUp(200909060930);
+                    runner.MigrateUp(200909060930);
 
-                processor.SchemaExists(tableMetaData.SchemaName).ShouldBeTrue();
-                processor.TableExists(tableMetaData.SchemaName, tableMetaData.TableName).ShouldBeTrue();
+                    processor.SchemaExists(tableMetaData.SchemaName).ShouldBeTrue();
+                    processor.TableExists(tableMetaData.SchemaName, tableMetaData.TableName).ShouldBeTrue();
 
-                runner.RollbackToVersion(0);
+                    runner.RollbackToVersion(0);
 
-                processor.TableExists(tableMetaData.SchemaName, tableMetaData.TableName).ShouldBeFalse();
-                processor.SchemaExists(tableMetaData.SchemaName).ShouldBeFalse();
-            }, true, typeof(SQLiteProcessor), typeof(MySqlProcessor), typeof(FirebirdProcessor), typeof(SqlAnywhereProcessor));
+                    processor.TableExists(tableMetaData.SchemaName, tableMetaData.TableName).ShouldBeFalse();
+                    processor.SchemaExists(tableMetaData.SchemaName).ShouldBeFalse();
+                },
+                true,
+                typeof(SQLiteProcessor),
+                typeof(MySqlProcessor),
+                typeof(FirebirdProcessor),
+                typeof(SqlAnywhereProcessor));
         }
 
         [Test]
         public void CanUseCustomVersionInfoDefaultSchema()
         {
-            ExecuteWithSupportedProcessors(processor =>
-            {
-                var services = processor.CreateServices()
+            ExecuteWithSupportedProcessors(
+                services => services
                     .WithMigrationsIn("FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3")
-                    .AddSingleton<IVersionTableMetaData>(
-                        sp => new TestVersionTableMetaData()
-                        {
-                            SchemaName = null
-                        });
-                var runner = services.BuildServiceProvider().GetRequiredService<IMigrationRunner>();
+                    .AddSingleton<IVersionTableMetaDataAccessor>(
+                        new PassThroughVersionTableMetaDataAccessor(
+                            new TestVersionTableMetaData()
+                            {
+                                SchemaName = null
+                            })),
+                (serviceProvider, processor) =>
+                {
+                    var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
 
-                IVersionTableMetaData tableMetaData = new TestVersionTableMetaData { SchemaName = null };
+                    IVersionTableMetaData tableMetaData = new TestVersionTableMetaData { SchemaName = null };
 
-                //ensure table doesn't exist
-                if (processor.TableExists(tableMetaData.SchemaName, tableMetaData.TableName))
-                    runner.Down(new VersionMigration(tableMetaData));
+                    //ensure table doesn't exist
+                    if (processor.TableExists(tableMetaData.SchemaName, tableMetaData.TableName))
+                        runner.Down(new VersionMigration(tableMetaData));
 
-                runner.MigrateUp(200909060930);
+                    runner.MigrateUp(200909060930);
 
-                processor.TableExists(null, tableMetaData.TableName).ShouldBeTrue();
+                    processor.TableExists(null, tableMetaData.TableName).ShouldBeTrue();
 
-                runner.RollbackToVersion(0);
+                    runner.RollbackToVersion(0);
 
-                processor.TableExists(null, tableMetaData.TableName).ShouldBeFalse();
-            });
+                    processor.TableExists(null, tableMetaData.TableName).ShouldBeFalse();
+                });
         }
     }
 }

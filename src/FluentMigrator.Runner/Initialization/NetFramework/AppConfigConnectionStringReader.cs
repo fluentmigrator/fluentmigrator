@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2018, FluentMigrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -51,7 +51,7 @@ namespace FluentMigrator.Runner.Initialization.NetFramework
         [CanBeNull]
         private ConnectionInfo _connectionInfo;
 
-        internal AppConfigConnectionStringReader(
+        public AppConfigConnectionStringReader(
             [NotNull] INetConfigManager configManager,
             [NotNull] IAssemblySource assemblySource,
             [NotNull] IAnnouncer announcer,
@@ -66,7 +66,7 @@ namespace FluentMigrator.Runner.Initialization.NetFramework
         }
 
         [Obsolete]
-        internal AppConfigConnectionStringReader(
+        public AppConfigConnectionStringReader(
             [NotNull] INetConfigManager configManager,
             [NotNull] string assemblyLocation,
             [NotNull] IAnnouncer announcer,

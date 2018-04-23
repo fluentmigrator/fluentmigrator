@@ -90,8 +90,13 @@ namespace FluentMigrator
 
         private IList<string> GetDatabaseNames()
         {
-            var dbNames = new List<string>() { Context.QuerySchema.DatabaseType };
-            dbNames.AddRange(Context.QuerySchema.DatabaseTypeAliases);
+            var dbNames = new List<string>();
+            if (Context.QuerySchema != null)
+            {
+                dbNames.Add(Context.QuerySchema.DatabaseType);
+                dbNames.AddRange(Context.QuerySchema.DatabaseTypeAliases);
+            }
+
             return dbNames;
         }
 

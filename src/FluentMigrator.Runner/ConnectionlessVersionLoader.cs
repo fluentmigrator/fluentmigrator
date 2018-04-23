@@ -44,7 +44,7 @@ namespace FluentMigrator.Runner
         private bool _versionsLoaded;
 
         [Obsolete]
-        public ConnectionlessVersionLoader(
+        internal ConnectionlessVersionLoader(
             IMigrationRunner runner,
             IAssemblyCollection assemblies,
             IConventionSet conventionSet,

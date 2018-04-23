@@ -37,6 +37,8 @@ using FluentMigrator.Runner.Processors.SqlAnywhere;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
+using MySql.Data.MySqlClient;
+
 using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Integration
@@ -112,7 +114,7 @@ namespace FluentMigrator.Tests.Integration
         }
 
         protected void ExecuteWithSupportedProcessors(
-            Action<IServiceProvider, IMigrationProcessor> testAction,
+            Action<IServiceProvider, ProcessorBase> testAction,
             bool tryRollback = true,
             params Type[] exceptProcessors)
         {
@@ -124,7 +126,7 @@ namespace FluentMigrator.Tests.Integration
 
         protected void ExecuteWithSupportedProcessors(
             Action<IServiceCollection> initAction,
-            Action<IServiceProvider, IMigrationProcessor> testAction,
+            Action<IServiceProvider, ProcessorBase> testAction,
             bool tryRollback = true,
             params Type[] exceptProcessors)
         {
@@ -136,7 +138,7 @@ namespace FluentMigrator.Tests.Integration
         }
 
         protected void ExecuteWithSupportedProcessors(
-            Action<IServiceProvider, IMigrationProcessor> testAction,
+            Action<IServiceProvider, ProcessorBase> testAction,
             bool tryRollback,
             Predicate<Type> isMatch)
         {
@@ -145,7 +147,7 @@ namespace FluentMigrator.Tests.Integration
 
         protected void ExecuteWithSupportedProcessors(
             Action<IServiceCollection> initAction,
-            Action<IServiceProvider, IMigrationProcessor> testAction,
+            Action<IServiceProvider, ProcessorBase> testAction,
             bool tryRollback,
             Predicate<Type> isMatch)
         {
@@ -178,18 +180,18 @@ namespace FluentMigrator.Tests.Integration
 
         protected void ExecuteWithProcessor<TProcessor>(
             Action<IServiceCollection> initAction,
-            Action<IServiceProvider, IMigrationProcessor> testAction,
+            Action<IServiceProvider, TProcessor> testAction,
             bool tryRollback,
             IntegrationTestOptions.DatabaseServerOptions serverOptions)
             where TProcessor : ProcessorBase
         {
-            ExecuteWithProcessor(typeof(TProcessor), initAction, testAction, tryRollback, serverOptions);
+            ExecuteWithProcessor(typeof(TProcessor), initAction, (sp, proc) => testAction(sp, (TProcessor)proc), tryRollback, serverOptions);
         }
 
         protected void ExecuteWithProcessor(
             Type processorType,
             Action<IServiceCollection> initAction,
-            Action<IServiceProvider, IMigrationProcessor> testAction,
+            Action<IServiceProvider, ProcessorBase> testAction,
             bool tryRollback,
             IntegrationTestOptions.DatabaseServerOptions serverOptions)
         {
@@ -212,6 +214,10 @@ namespace FluentMigrator.Tests.Integration
                 .AddScoped<IConnectionStringReader>(
                     _ => new PassThroughConnectionStringReader(serverOptions.ConnectionString));
             initAction?.Invoke(services);
+
+            services
+                .AddScoped(sp => sp.GetRequiredService<IProcessorAccessor>().Processor)
+                .AddScoped(sp => sp.GetRequiredService<IGeneratorAccessor>().Generator);
 
             var serviceProvider = services
                 .BuildServiceProvider(true);
@@ -245,6 +251,12 @@ namespace FluentMigrator.Tests.Integration
                     }
                 }
             }
+        }
+
+        protected static bool LogException(Exception exception)
+        {
+            TestContext.WriteLine(exception);
+            return false;
         }
     }
 }

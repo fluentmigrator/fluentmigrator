@@ -18,9 +18,7 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -29,7 +27,6 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Exceptions;
-using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Firebird;
@@ -39,7 +36,6 @@ using FluentMigrator.Runner.Processors.SqlAnywhere;
 using FluentMigrator.Runner.Processors.SQLite;
 using FluentMigrator.Runner.Processors.SqlServer;
 using FluentMigrator.SqlAnywhere;
-using FluentMigrator.Tests.Integration.Migrations;
 using FluentMigrator.Tests.Integration.Migrations.Tagged;
 using FluentMigrator.Tests.Unit;
 
@@ -103,15 +99,14 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlAnywhere16")]
         public void CanSilentlyFail()
         {
-            var processorOptions = new Mock<IMigrationProcessorOptions>();
-            processorOptions.SetupGet(x => x.PreviewOnly).Returns(false);
-
             var processor = new Mock<IMigrationProcessor>();
             processor.Setup(x => x.Process(It.IsAny<CreateForeignKeyExpression>())).Throws(new Exception("Error"));
             processor.Setup(x => x.Process(It.IsAny<DeleteForeignKeyExpression>())).Throws(new Exception("Error"));
-            processor.Setup(x => x.Options).Returns(processorOptions.Object);
 
-            var serviceProvider = processor.Object.CreateServices().WithMigrationsIn(_rootNamespace)
+            var serviceProvider = ServiceCollectionExtensions.CreateServices()
+                .Configure<ProcessorOptions>(opt => opt.PreviewOnly = false)
+                .WithProcessor(processor)
+                .WithMigrationsIn(_rootNamespace)
                 .BuildServiceProvider();
 
             var runner = (MigrationRunner) serviceProvider.GetRequiredService<IMigrationRunner>();
@@ -149,7 +144,7 @@ namespace FluentMigrator.Tests.Integration
                     runner.Down(new TestForeignKeyNamingConvention());
                     processor.ConstraintExists(null, "Users", "FK_Users_GroupId_Groups_GroupId").ShouldBeFalse();
                 },
-                false,
+                true,
                 typeof(SQLiteProcessor));
         }
 
@@ -606,6 +601,9 @@ namespace FluentMigrator.Tests.Integration
                         runner.VersionLoader.VersionInfo.HasAppliedMigration(1).ShouldBeTrue();
                         processor.TableExists(null, "Users").ShouldBeTrue();
                     }
+                    catch (Exception ex) when (LogException(ex))
+                    {
+                    }
                     finally
                     {
                         runner.RollbackToVersion(0, false);
@@ -705,21 +703,25 @@ namespace FluentMigrator.Tests.Integration
             if (!IntegrationTestOptions.SqlServer2008.IsEnabled)
                 return;
 
-            var connection = new SqlConnection(IntegrationTestOptions.SqlServer2008.ConnectionString);
-            var processor = new SqlServerProcessor(new[] { "SqlServer2008" }, connection, new SqlServer2008Generator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), new SqlServerDbFactory());
+            ExecuteWithProcessor<SqlServer2008Processor>(
+                init => init.WithMigrationsIn(_rootNamespace),
+                (serviceProvider, processor) =>
+                {
+                    var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
+                    runner.MigrateUp();
 
-            MigrationRunner runner = SetupMigrationRunner(processor);
-            runner.MigrateUp();
+                    try
+                    {
+                        processor.WasCommitted.ShouldBeTrue();
 
-            try
-            {
-                processor.WasCommitted.ShouldBeTrue();
-
-            }
-            finally
-            {
-                CleanupTestSqlServerDatabase(connection, processor);
-            }
+                    }
+                    finally
+                    {
+                        CleanupTestSqlServerDatabase(serviceProvider, processor);
+                    }
+                },
+                false,
+                IntegrationTestOptions.SqlServer2008);
         }
 
         [Test]
@@ -729,21 +731,25 @@ namespace FluentMigrator.Tests.Integration
             if (!IntegrationTestOptions.SqlServer2008.IsEnabled)
                 return;
 
-            var connection = new SqlConnection(IntegrationTestOptions.SqlServer2008.ConnectionString);
-            var processor = new SqlServerProcessor(new[] { "SqlServer2008" }, connection, new SqlServer2008Generator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), new SqlServerDbFactory());
+            ExecuteWithProcessor<SqlServer2008Processor>(
+                init => init.WithMigrationsIn(_rootNamespace),
+                (serviceProvider, processor) =>
+                {
+                    var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
+                    runner.MigrateUp(1);
 
-            MigrationRunner runner = SetupMigrationRunner(processor);
-            runner.MigrateUp(1);
+                    try
+                    {
+                        processor.WasCommitted.ShouldBeTrue();
 
-            try
-            {
-                processor.WasCommitted.ShouldBeTrue();
-
-            }
-            finally
-            {
-                CleanupTestSqlServerDatabase(connection, processor);
-            }
+                    }
+                    finally
+                    {
+                        CleanupTestSqlServerDatabase(serviceProvider, processor);
+                    }
+                },
+                false,
+                IntegrationTestOptions.SqlServer2008);
         }
 
         [Test]
@@ -867,56 +873,51 @@ namespace FluentMigrator.Tests.Integration
         {
             var migrationsNamespace = typeof(TenantATable).Namespace;
 
-            // Excluded SqliteProcessor as it errors on DB cleanup (RollbackToVersion).
-            ExecuteWithSupportedProcessors(processor =>
+            try
             {
-                var services = processor.CreateServices()
-                    .WithMigrationsIn(migrationsNamespace);
-
-                try
-                {
-                    var serviceProvider = services
-                        .Configure<RunnerOptions>(opt => opt.Tags = new[] { "TenantA" })
-                        .BuildServiceProvider();
-                    using (var scope = serviceProvider.CreateScope())
+                // Excluded SqliteProcessor as it errors on DB cleanup (RollbackToVersion).
+                ExecuteWithSupportedProcessors(
+                    services => services.WithMigrationsIn(migrationsNamespace).Configure<RunnerOptions>(opt => opt.Tags = new[] { "TenantA" }),
+                    (serviceProvider, processor) =>
                     {
-                        var runner = (MigrationRunner) scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
+                        var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
                         runner.MigrateUp(false);
-                    }
 
-                    processor.TableExists(null, "TenantATable").ShouldBeTrue();
-                    processor.TableExists(null, "NormalTable").ShouldBeTrue();
-                    processor.TableExists(null, "TenantBTable").ShouldBeFalse();
-                    processor.TableExists(null, "TenantAandBTable").ShouldBeTrue();
+                        processor.TableExists(null, "TenantATable").ShouldBeTrue();
+                        processor.TableExists(null, "NormalTable").ShouldBeTrue();
+                        processor.TableExists(null, "TenantBTable").ShouldBeFalse();
+                        processor.TableExists(null, "TenantAandBTable").ShouldBeTrue();
+                    },
+                    false,
+                    typeof(SQLiteProcessor));
 
-                    serviceProvider = services
-                        .Configure<RunnerOptions>(opt => opt.Tags = new[] { "TenantB" })
-                        .BuildServiceProvider();
-
-                    using (var scope = serviceProvider.CreateScope())
+                ExecuteWithSupportedProcessors(
+                    services => services.WithMigrationsIn(migrationsNamespace).Configure<RunnerOptions>(opt => opt.Tags = new[] { "TenantB" }),
+                    (serviceProvider, processor) =>
                     {
-                        var runner = (MigrationRunner)scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
+                        var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
                         runner.MigrateDown(0, false);
-                    }
 
-                    processor.TableExists(null, "TenantATable").ShouldBeTrue();
-                    processor.TableExists(null, "NormalTable").ShouldBeFalse();
-                    processor.TableExists(null, "TenantBTable").ShouldBeFalse();
-                    processor.TableExists(null, "TenantAandBTable").ShouldBeFalse();
-                }
-                finally
-                {
-                    var serviceProvider = services
-                        .Configure<RunnerOptions>(opt => opt.Tags = new[] { "TenantA" })
-                        .BuildServiceProvider();
-
-                    using (var scope = serviceProvider.CreateScope())
+                        processor.TableExists(null, "TenantATable").ShouldBeTrue();
+                        processor.TableExists(null, "NormalTable").ShouldBeFalse();
+                        processor.TableExists(null, "TenantBTable").ShouldBeFalse();
+                        processor.TableExists(null, "TenantAandBTable").ShouldBeFalse();
+                    },
+                    false,
+                    typeof(SQLiteProcessor));
+            }
+            finally
+            {
+                ExecuteWithSupportedProcessors(
+                    services => services.WithMigrationsIn(migrationsNamespace).Configure<RunnerOptions>(opt => opt.Tags = new[] { "TenantA" }),
+                    (serviceProvider, processor) =>
                     {
-                        var runner = (MigrationRunner)scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
+                        var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
                         runner.RollbackToVersion(0, false);
-                    }
-                }
-            }, true, typeof(SQLiteProcessor));
+                    },
+                    false,
+                    typeof(SQLiteProcessor));
+            }
         }
 
         [Test]
@@ -926,54 +927,50 @@ namespace FluentMigrator.Tests.Integration
             if (!IntegrationTestOptions.SqlServer2008.IsEnabled)
                 return;
 
-            var connection = new SqlConnection(IntegrationTestOptions.SqlServer2008.ConnectionString);
-            var processorOptions = new ProcessorOptions { PreviewOnly = true };
-
             var outputSql = new StringWriter();
             var announcer = new TextWriterAnnouncer(outputSql){ ShowSql = true };
 
-            var processor = new SqlServerProcessor(new[] { "SqlServer2008" }, connection, new SqlServer2008Generator(), announcer, processorOptions, new SqlServerDbFactory());
+            ExecuteWithProcessor<SqlServer2008Processor>(
+                services => services.WithMigrationsIn(_rootNamespace).Configure<ProcessorOptions>(opt => opt.PreviewOnly = true).AddSingleton<IAnnouncer>(announcer),
+                (serviceProvider, processor) =>
+                {
+                    try
+                    {
+                        var versionTableMetaData = new TestVersionTableMetaData();
 
-            try
-            {
-                var versionTableMetaData = new TestVersionTableMetaData();
+                        var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
+                        runner.MigrateUp(1, false);
 
-                var serviceProvider = processor.CreateServices()
-                    .WithMigrationsIn("FluentMigrator.Tests.Integration.Migrations")
-                    .Configure<ProcessorOptions>(opt => opt.PreviewOnly = true)
-                    .BuildServiceProvider();
+                        processor.CommitTransaction();
 
-                var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
-                runner.MigrateUp(1, false);
+                        string schemaName = versionTableMetaData.SchemaName;
+                        var schemaAndTableName = $"[{schemaName}].[{TestVersionTableMetaData.TABLENAME}]";
 
-                processor.CommitTransaction();
+                        var outputSqlString = outputSql.ToString();
 
-                string schemaName = versionTableMetaData.SchemaName;
-                var schemaAndTableName = string.Format("[{0}].[{1}]", schemaName, TestVersionTableMetaData.TABLENAME);
+                        var createSchemaMatches = new Regex(Regex.Escape($"CREATE SCHEMA [{schemaName}]"))
+                            .Matches(outputSqlString).Count;
+                        var createTableMatches = new Regex(Regex.Escape("CREATE TABLE " + schemaAndTableName))
+                            .Matches(outputSqlString).Count;
+                        var createIndexMatches = new Regex(Regex.Escape("CREATE UNIQUE CLUSTERED INDEX [" + TestVersionTableMetaData.UNIQUEINDEXNAME + "] ON " + schemaAndTableName))
+                            .Matches(outputSqlString).Count;
+                        var alterTableMatches = new Regex(Regex.Escape("ALTER TABLE " + schemaAndTableName))
+                            .Matches(outputSqlString).Count;
 
-                var outputSqlString = outputSql.ToString();
+                        System.Console.WriteLine(outputSqlString);
 
-                var createSchemaMatches = new Regex(Regex.Escape(string.Format("CREATE SCHEMA [{0}]", schemaName)))
-                    .Matches(outputSqlString).Count;
-                var createTableMatches = new Regex(Regex.Escape("CREATE TABLE " + schemaAndTableName))
-                    .Matches(outputSqlString).Count;
-                var createIndexMatches = new Regex(Regex.Escape("CREATE UNIQUE CLUSTERED INDEX [" + TestVersionTableMetaData.UNIQUEINDEXNAME + "] ON " + schemaAndTableName))
-                    .Matches(outputSqlString).Count;
-                var alterTableMatches = new Regex(Regex.Escape("ALTER TABLE " + schemaAndTableName))
-                    .Matches(outputSqlString).Count;
-
-                System.Console.WriteLine(outputSqlString);
-
-                createSchemaMatches.ShouldBe(1);
-                createTableMatches.ShouldBe(1);
-                alterTableMatches.ShouldBe(2);
-                createIndexMatches.ShouldBe(1);
-
-            }
-            finally
-            {
-                CleanupTestSqlServerDatabase(connection, processor);
-            }
+                        createSchemaMatches.ShouldBe(1);
+                        createTableMatches.ShouldBe(1);
+                        alterTableMatches.ShouldBe(2);
+                        createIndexMatches.ShouldBe(1);
+                    }
+                    finally
+                    {
+                        CleanupTestSqlServerDatabase(serviceProvider, processor);
+                    }
+                },
+                false,
+                IntegrationTestOptions.SqlServer2008);
         }
 
         [Test]
@@ -989,28 +986,26 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlAnywhere16")]
         public void MigrateUpWithTaggedMigrationsShouldNotApplyAnyMigrationsIfNoTagsParameterIsPassedIntoTheRunner()
         {
-            ExecuteWithSupportedProcessors(processor =>
-            {
-                var serviceProvider = processor.CreateServices()
-                    .WithMigrationsIn(typeof(TenantATable).Namespace)
-                    .BuildServiceProvider();
-
-                var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
-
-                try
+            ExecuteWithSupportedProcessors(
+                services => services.WithMigrationsIn(typeof(TenantATable).Namespace),
+                (serviceProvider, processor) =>
                 {
-                    runner.MigrateUp(false);
+                    var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
 
-                    processor.TableExists(null, "TenantATable").ShouldBeFalse();
-                    processor.TableExists(null, "NormalTable").ShouldBeTrue();
-                    processor.TableExists(null, "TenantBTable").ShouldBeFalse();
-                    processor.TableExists(null, "TenantAandBTable").ShouldBeFalse();
-                }
-                finally
-                {
-                    runner.RollbackToVersion(0);
-                }
-            });
+                    try
+                    {
+                        runner.MigrateUp(false);
+
+                        processor.TableExists(null, "TenantATable").ShouldBeFalse();
+                        processor.TableExists(null, "NormalTable").ShouldBeTrue();
+                        processor.TableExists(null, "TenantBTable").ShouldBeFalse();
+                        processor.TableExists(null, "TenantAandBTable").ShouldBeFalse();
+                    }
+                    finally
+                    {
+                        runner.RollbackToVersion(0);
+                    }
+                });
         }
 
         [Test]
@@ -1032,33 +1027,42 @@ namespace FluentMigrator.Tests.Integration
 
             try
             {
-                ExecuteWithSupportedProcessors(processor =>
-                {
-                    var runner1 = processor.CreateServices()
-                        .WithMigrationsIn(namespacePass2)
-                        .BuildServiceProvider()
-                        .GetRequiredService<IMigrationRunner>();
+                ExecuteWithSupportedProcessors(
+                    services => services.WithMigrationsIn(namespacePass2),
+                    (serviceProvider, processor) =>
+                    {
+                        var runner = serviceProvider
+                            .GetRequiredService<IMigrationRunner>();
 
-                    runner1.MigrateUp(3);
+                        runner.MigrateUp(3);
+                    },
+                    tryRollback: false,
+                    excludedProcessors);
 
-                    var runner2 = processor.CreateServices()
-                        .WithMigrationsIn(namespacePass3)
-                        .BuildServiceProvider()
-                        .GetRequiredService<IMigrationRunner>();
+                ExecuteWithSupportedProcessors(
+                    services => services.WithMigrationsIn(namespacePass3),
+                    (serviceProvider, processor) =>
+                    {
+                        var runner = serviceProvider
+                            .GetRequiredService<IMigrationRunner>();
 
-                    Assert.DoesNotThrow(runner2.ValidateVersionOrder);
-                }, false, excludedProcessors);
+                        Assert.DoesNotThrow(runner.ValidateVersionOrder);
+                    },
+                    tryRollback: false,
+                    excludedProcessors);
             }
             finally
             {
-                ExecuteWithSupportedProcessors(processor =>
-                {
-                    var runner = processor.CreateServices()
-                        .WithMigrationsIn(namespacePass3)
-                        .BuildServiceProvider()
-                        .GetRequiredService<IMigrationRunner>();
-                    runner.RollbackToVersion(0);
-                }, true, excludedProcessors);
+                ExecuteWithSupportedProcessors(
+                    services => services.WithMigrationsIn(namespacePass3),
+                    (serviceProvider, processor) =>
+                    {
+                        var runner = serviceProvider
+                            .GetRequiredService<IMigrationRunner>();
+                        runner.RollbackToVersion(0);
+                    },
+                    tryRollback: true,
+                    excludedProcessors);
             }
         }
 
@@ -1083,25 +1087,29 @@ namespace FluentMigrator.Tests.Integration
 
             try
             {
-                ExecuteWithSupportedProcessors(processor =>
-                {
-                    var migrationRunner = processor.CreateServices()
-                        .WithMigrationsIn(namespacePass2)
-                        .BuildServiceProvider()
-                        .GetRequiredService<IMigrationRunner>();
+                ExecuteWithSupportedProcessors(
+                    services => services.WithMigrationsIn(namespacePass2),
+                    (serviceProvider, processor) =>
+                    {
+                        var migrationRunner = serviceProvider
+                            .GetRequiredService<IMigrationRunner>();
 
-                    migrationRunner.MigrateUp();
-                }, false, excludedProcessors);
+                        migrationRunner.MigrateUp();
+                    },
+                    tryRollback: false,
+                    excludedProcessors);
 
-                ExecuteWithSupportedProcessors(processor =>
-                {
-                    var migrationRunner = processor.CreateServices()
-                        .WithMigrationsIn(namespacePass3)
-                        .BuildServiceProvider()
-                        .GetRequiredService<IMigrationRunner>();
+                ExecuteWithSupportedProcessors(
+                    services => services.WithMigrationsIn(namespacePass3),
+                    (serviceProvider, processor) =>
+                    {
+                        var migrationRunner = serviceProvider
+                            .GetRequiredService<IMigrationRunner>();
 
-                    migrationRunner.ValidateVersionOrder();
-                }, false, excludedProcessors);
+                        migrationRunner.ValidateVersionOrder();
+                    },
+                    tryRollback: false,
+                    excludedProcessors);
             }
             catch (VersionOrderInvalidException ex)
             {
@@ -1109,15 +1117,17 @@ namespace FluentMigrator.Tests.Integration
             }
             finally
             {
-                ExecuteWithSupportedProcessors(processor =>
-                {
-                    var migrationRunner = processor.CreateServices()
-                        .WithMigrationsIn(namespacePass3)
-                        .BuildServiceProvider()
-                        .GetRequiredService<IMigrationRunner>();
+                ExecuteWithSupportedProcessors(
+                    services => services.WithMigrationsIn(namespacePass3),
+                    (serviceProvider, processor) =>
+                    {
+                        var migrationRunner = serviceProvider
+                            .GetRequiredService<IMigrationRunner>();
 
-                    migrationRunner.RollbackToVersion(0);
-                }, true, excludedProcessors);
+                        migrationRunner.RollbackToVersion(0);
+                    },
+                    tryRollback: true,
+                    excludedProcessors);
             }
 
             caughtException.ShouldNotBeNull();
@@ -1132,19 +1142,10 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlServer2012")]
         public void CanCreateSequence()
         {
-            ExecuteWithSupportedProcessors(
-                processor =>
+            ExecuteWithProcessor<SqlServer2012Processor>(
+                services => services.WithMigrationsIn(_rootNamespace),
+                (serviceProvider, processor) =>
                 {
-                    if (processor.DatabaseType != "SqlServer2012")
-                    {
-                        Assert.Ignore("A processor of type {0} isn't supported", processor.DatabaseType);
-                        return;
-                    }
-
-                    var serviceProvider = processor.CreateServices()
-                        .WithMigrationsIn(_rootNamespace)
-                        .BuildServiceProvider();
-
                     var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
 
                     runner.Up(new TestCreateSequence());
@@ -1152,7 +1153,9 @@ namespace FluentMigrator.Tests.Integration
 
                     runner.Down(new TestCreateSequence());
                     processor.SequenceExists(null, "TestSequence").ShouldBeFalse();
-                }, true, pt => pt == typeof(SqlServerProcessor));
+                },
+                true,
+                IntegrationTestOptions.SqlServer2012);
         }
 
         [Test]
@@ -1165,13 +1168,8 @@ namespace FluentMigrator.Tests.Integration
                 Assert.Ignore("No processor found for the given action.");
             }
 
-            Action<IMigrationProcessor> action = processor =>
+            void CreateAndDropSequence(IServiceProvider serviceProvider, ProcessorBase processor)
             {
-                var serviceProvider = processor.CreateServices()
-                    .WithMigrationsIn(_rootNamespace)
-                    .WithMigrationsIn(typeof(TestMigration).Namespace)
-                    .BuildServiceProvider();
-
                 var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
 
                 runner.Up(new TestCreateSchema());
@@ -1181,19 +1179,24 @@ namespace FluentMigrator.Tests.Integration
                 runner.Down(new TestCreateSequenceWithSchema());
                 runner.Down(new TestCreateSchema());
                 processor.SequenceExists("TestSchema", "TestSequence").ShouldBeFalse();
-            };
+            }
 
             if (IntegrationTestOptions.SqlServer2012.IsEnabled)
             {
-                ExecuteWithSqlServer2012(
-                    action,
+                ExecuteWithProcessor<SqlServer2012Processor>(
+                    services => services.WithMigrationsIn(_rootNamespace),
+                    (Action<IServiceProvider, ProcessorBase>)CreateAndDropSequence,
                     true,
                     IntegrationTestOptions.SqlServer2012);
             }
 
             if (IntegrationTestOptions.Postgres.IsEnabled)
             {
-                ExecuteWithPostgres(action, true, IntegrationTestOptions.Postgres);
+                ExecuteWithProcessor<PostgresProcessor>(
+                    services => services.WithMigrationsIn(_rootNamespace),
+                    (Action<IServiceProvider, ProcessorBase>)CreateAndDropSequence,
+                    true,
+                    IntegrationTestOptions.Postgres);
             }
         }
 
@@ -1208,13 +1211,9 @@ namespace FluentMigrator.Tests.Integration
         public void CanAlterColumnWithSchema()
         {
             ExecuteWithSupportedProcessors(
-                processor =>
+                services => services.WithMigrationsIn(_rootNamespace),
+                (serviceProvider, processor) =>
                 {
-                    var serviceProvider = processor.CreateServices()
-                        .WithMigrationsIn(_rootNamespace)
-                        .WithMigrationsIn(typeof(TestMigration).Namespace)
-                        .BuildServiceProvider();
-
                     var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
 
                     runner.Up(new TestCreateSchema());
@@ -1222,7 +1221,6 @@ namespace FluentMigrator.Tests.Integration
                     runner.Up(new TestCreateAndDropTableMigrationWithSchema());
                     processor.ColumnExists("TestSchema", "TestTable2", "Name2").ShouldBeTrue();
                     processor.DefaultValueExists("TestSchema", "TestTable", "Name", "Anonymous").ShouldBeTrue();
-
 
                     runner.Up(new TestAlterColumnWithSchema());
                     processor.ColumnExists("TestSchema", "TestTable2", "Name2").ShouldBeTrue();
@@ -1252,13 +1250,9 @@ namespace FluentMigrator.Tests.Integration
         public void CanAlterTableWithSchema()
         {
             ExecuteWithSupportedProcessors(
-                processor =>
+                services => services.WithMigrationsIn(_rootNamespace),
+                (serviceProvider, processor) =>
                 {
-                    var serviceProvider = processor.CreateServices()
-                        .WithMigrationsIn(_rootNamespace)
-                        .WithMigrationsIn(typeof(TestMigration).Namespace)
-                        .BuildServiceProvider();
-
                     var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
 
                     runner.Up(new TestCreateSchema());
@@ -1292,13 +1286,9 @@ namespace FluentMigrator.Tests.Integration
         public void CanAlterTablesSchema()
         {
             ExecuteWithSupportedProcessors(
-                processor =>
+                services => services.WithMigrationsIn(_rootNamespace),
+                (serviceProvider, processor) =>
                 {
-                    var serviceProvider = processor.CreateServices()
-                        .WithMigrationsIn(_rootNamespace)
-                        .WithMigrationsIn(typeof(TestMigration).Namespace)
-                        .BuildServiceProvider();
-
                     var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
 
                     runner.Up(new TestCreateSchema());
@@ -1334,13 +1324,9 @@ namespace FluentMigrator.Tests.Integration
         public void CanCreateUniqueConstraint()
         {
             ExecuteWithSupportedProcessors(
-                processor =>
+                services => services.WithMigrationsIn(_rootNamespace),
+                (serviceProvider, processor) =>
                 {
-                    var serviceProvider = processor.CreateServices()
-                        .WithMigrationsIn(_rootNamespace)
-                        .WithMigrationsIn(typeof(TestMigration).Namespace)
-                        .BuildServiceProvider();
-
                     var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
 
                     runner.Up(new TestCreateAndDropTableMigration());
@@ -1368,13 +1354,9 @@ namespace FluentMigrator.Tests.Integration
         public void CanCreateUniqueConstraintWithSchema()
         {
             ExecuteWithSupportedProcessors(
-                processor =>
+                services => services.WithMigrationsIn(_rootNamespace),
+                (serviceProvider, processor) =>
                 {
-                    var serviceProvider = processor.CreateServices()
-                        .WithMigrationsIn(_rootNamespace)
-                        .WithMigrationsIn(typeof(TestMigration).Namespace)
-                        .BuildServiceProvider();
-
                     var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
 
                     runner.Up(new TestCreateSchema());
@@ -1411,13 +1393,9 @@ namespace FluentMigrator.Tests.Integration
         public void CanInsertData()
         {
             ExecuteWithSupportedProcessors(
-                processor =>
+                services => services.WithMigrationsIn(_rootNamespace),
+                (serviceProvider, processor) =>
                 {
-                    var serviceProvider = processor.CreateServices()
-                        .WithMigrationsIn(_rootNamespace)
-                        .WithMigrationsIn(typeof(TestMigration).Namespace)
-                        .BuildServiceProvider();
-
                     var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
 
                     runner.Up(new TestCreateAndDropTableMigration());
@@ -1443,13 +1421,9 @@ namespace FluentMigrator.Tests.Integration
         public void CanInsertDataWithSchema()
         {
             ExecuteWithSupportedProcessors(
-                processor =>
+                services => services.WithMigrationsIn(_rootNamespace),
+                (serviceProvider, processor) =>
                 {
-                    var serviceProvider = processor.CreateServices()
-                        .WithMigrationsIn(_rootNamespace)
-                        .WithMigrationsIn(typeof(TestMigration).Namespace)
-                        .BuildServiceProvider();
-
                     var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
 
                     runner.Up(new TestCreateSchema());
@@ -1480,13 +1454,9 @@ namespace FluentMigrator.Tests.Integration
         public void CanUpdateData()
         {
             ExecuteWithSupportedProcessors(
-                processor =>
+                services => services.WithMigrationsIn(_rootNamespace),
+                (serviceProvider, processor) =>
                 {
-                    var serviceProvider = processor.CreateServices()
-                        .WithMigrationsIn(_rootNamespace)
-                        .WithMigrationsIn(typeof(TestMigration).Namespace)
-                        .BuildServiceProvider();
-
                     var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
 
                     runner.Up(new TestCreateSchema());
@@ -1525,13 +1495,9 @@ namespace FluentMigrator.Tests.Integration
         public void CanDeleteData()
         {
             ExecuteWithSupportedProcessors(
-                processor =>
+                services => services.WithMigrationsIn(_rootNamespace),
+                (serviceProvider, processor) =>
                 {
-                    var serviceProvider = processor.CreateServices()
-                        .WithMigrationsIn(_rootNamespace)
-                        .WithMigrationsIn(typeof(TestMigration).Namespace)
-                        .BuildServiceProvider();
-
                     var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
 
                     runner.Up(new TestCreateAndDropTableMigration());
@@ -1564,13 +1530,9 @@ namespace FluentMigrator.Tests.Integration
         public void CanDeleteDataWithSchema()
         {
             ExecuteWithSupportedProcessors(
-                processor =>
+                services => services.WithMigrationsIn(_rootNamespace),
+                (serviceProvider, processor) =>
                 {
-                    var serviceProvider = processor.CreateServices()
-                        .WithMigrationsIn(_rootNamespace)
-                        .WithMigrationsIn(typeof(TestMigration).Namespace)
-                        .BuildServiceProvider();
-
                     var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
 
                     runner.Up(new TestCreateSchema());
@@ -1608,13 +1570,9 @@ namespace FluentMigrator.Tests.Integration
         public void CanReverseCreateIndex()
         {
             ExecuteWithSupportedProcessors(
-                processor =>
+                services => services.WithMigrationsIn(_rootNamespace),
+                (serviceProvider, processor) =>
                 {
-                    var serviceProvider = processor.CreateServices()
-                        .WithMigrationsIn(_rootNamespace)
-                        .WithMigrationsIn(typeof(TestMigration).Namespace)
-                        .BuildServiceProvider();
-
                     var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
 
                     runner.Up(new TestCreateSchema());
@@ -1647,13 +1605,9 @@ namespace FluentMigrator.Tests.Integration
         public void CanReverseCreateUniqueConstraint()
         {
             ExecuteWithSupportedProcessors(
-                processor =>
+                services => services.WithMigrationsIn(_rootNamespace),
+                (serviceProvider, processor) =>
                 {
-                    var serviceProvider = processor.CreateServices()
-                        .WithMigrationsIn(_rootNamespace)
-                        .WithMigrationsIn(typeof(TestMigration).Namespace)
-                        .BuildServiceProvider();
-
                     var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
 
                     runner.Up(new TestCreateAndDropTableMigration());
@@ -1683,13 +1637,9 @@ namespace FluentMigrator.Tests.Integration
         public void CanReverseCreateUniqueConstraintWithSchema()
         {
             ExecuteWithSupportedProcessors(
-                processor =>
+                services => services.WithMigrationsIn(_rootNamespace),
+                (serviceProvider, processor) =>
                 {
-                    var serviceProvider = processor.CreateServices()
-                        .WithMigrationsIn(_rootNamespace)
-                        .WithMigrationsIn(typeof(TestMigration).Namespace)
-                        .BuildServiceProvider();
-
                     var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
 
                     runner.Up(new TestCreateSchema());
@@ -1725,13 +1675,9 @@ namespace FluentMigrator.Tests.Integration
         public void CanExecuteSql()
         {
             ExecuteWithSupportedProcessors(
-                processor =>
+                services => services.WithMigrationsIn(_rootNamespace),
+                (serviceProvider, processor) =>
                 {
-                    var serviceProvider = processor.CreateServices()
-                        .WithMigrationsIn(_rootNamespace)
-                        .WithMigrationsIn(typeof(TestMigration).Namespace)
-                        .BuildServiceProvider();
-
                     var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
 
                     runner.Up(new TestExecuteSql());
@@ -1741,22 +1687,18 @@ namespace FluentMigrator.Tests.Integration
                 typeof(FirebirdProcessor));
         }
 
-        private void CleanupTestSqlServerDatabase(SqlConnection connection, SqlServerProcessor origProcessor)
+        private void CleanupTestSqlServerDatabase<TProcessor>(IServiceProvider serviceProvider, TProcessor origProcessor)
+            where TProcessor : SqlServerProcessor
         {
             if (origProcessor.WasCommitted)
             {
-                connection.Close();
+                origProcessor.Connection.Close();
 
-                var dbTypes = new List<string>
+                using (var scope = serviceProvider.CreateScope())
                 {
-                    origProcessor.DatabaseType
-                };
-                dbTypes.AddRange(origProcessor.DatabaseTypeAliases);
-
-                var cleanupProcessor = new SqlServerProcessor(dbTypes, connection, new SqlServer2008Generator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), new SqlServerDbFactory());
-                MigrationRunner cleanupRunner = SetupMigrationRunner(cleanupProcessor);
-                cleanupRunner.RollbackToVersion(0);
-
+                    var cleanupRunner = scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
+                    cleanupRunner.RollbackToVersion(0);
+                }
             }
             else
             {
@@ -1764,7 +1706,6 @@ namespace FluentMigrator.Tests.Integration
             }
         }
     }
-
 
     internal class TestForeignKeyNamingConvention : Migration
     {
@@ -2226,4 +2167,3 @@ namespace FluentMigrator.Tests.Integration
         }
     }
 }
-

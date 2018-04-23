@@ -50,7 +50,7 @@ namespace FluentMigrator.Tests.Unit
 
             var asm = Assembly.GetExecutingAssembly();
 
-            var serviceProvider = new ServiceCollection()
+            var serviceProvider = ServiceCollectionExtensions.CreateServices()
                 .AddScoped(_ => runner.Object)
                 .AddScoped(_ => runnerContext.Object)
                 .AddScoped(_ => ConventionSets.NoSchemaName)
@@ -76,7 +76,7 @@ namespace FluentMigrator.Tests.Unit
 
             var asm = "s".GetType().Assembly;
 
-            var serviceProvider = new ServiceCollection()
+            var serviceProvider = ServiceCollectionExtensions.CreateServices()
                 .AddScoped(_ => runner.Object)
                 .AddScoped(_ => runnerContext.Object)
                 .AddScoped(_ => ConventionSets.NoSchemaName)
@@ -106,7 +106,7 @@ namespace FluentMigrator.Tests.Unit
 
             var asm = Assembly.GetExecutingAssembly();
 
-            var serviceProvider = new ServiceCollection()
+            var serviceProvider = ServiceCollectionExtensions.CreateServices()
                 .AddScoped(_ => runner.Object)
                 .AddScoped(_ => runnerContext.Object)
                 .AddScoped(_ => ConventionSets.NoSchemaName)
@@ -133,7 +133,7 @@ namespace FluentMigrator.Tests.Unit
 
             var asm = Assembly.GetExecutingAssembly();
 
-            var serviceProvider = new ServiceCollection()
+            var serviceProvider = ServiceCollectionExtensions.CreateServices()
                 .AddScoped(_ => runner.Object)
                 .AddScoped(_ => runnerContext.Object)
                 .AddScoped(_ => ConventionSets.NoSchemaName)
@@ -170,7 +170,7 @@ namespace FluentMigrator.Tests.Unit
 
             var asm = Assembly.GetExecutingAssembly();
 
-            var serviceProvider = new ServiceCollection()
+            var serviceProvider = ServiceCollectionExtensions.CreateServices()
                 .AddScoped(_ => runner.Object)
                 .AddScoped(_ => runnerContext.Object)
                 .AddScoped(_ => ConventionSets.NoSchemaName)
@@ -206,7 +206,7 @@ namespace FluentMigrator.Tests.Unit
 
             var asm = Assembly.GetExecutingAssembly();
 
-            var serviceProvider = new ServiceCollection()
+            var serviceProvider = ServiceCollectionExtensions.CreateServices()
                 .AddScoped(_ => runner.Object)
                 .AddScoped(_ => runnerContext.Object)
                 .AddScoped(_ => ConventionSets.NoSchemaName)
@@ -240,7 +240,7 @@ namespace FluentMigrator.Tests.Unit
 
             var asm = Assembly.GetExecutingAssembly();
 
-            var serviceProvider = new ServiceCollection()
+            var serviceProvider = ServiceCollectionExtensions.CreateServices()
                 .AddScoped(_ => runner.Object)
                 .AddScoped(_ => runnerContext.Object)
                 .AddScoped(_ => ConventionSets.NoSchemaName)
@@ -279,7 +279,7 @@ namespace FluentMigrator.Tests.Unit
 
             processor.Setup(p => p.SchemaExists(It.IsAny<string>())).Returns(false);
 
-            var serviceProvider = new ServiceCollection()
+            var serviceProvider = ServiceCollectionExtensions.CreateServices()
                 .AddScoped(_ => runner.Object)
                 .AddScoped(_ => runnerContext.Object)
                 .AddScoped(_ => ConventionSets.NoSchemaName)
@@ -308,7 +308,7 @@ namespace FluentMigrator.Tests.Unit
 
             processor.Setup(p => p.TableExists(new TestVersionTableMetaData().SchemaName, TestVersionTableMetaData.TABLENAME)).Returns(false);
 
-            var serviceProvider = new ServiceCollection()
+            var serviceProvider = ServiceCollectionExtensions.CreateServices()
                 .AddScoped(_ => runner.Object)
                 .AddScoped(_ => runnerContext.Object)
                 .AddScoped(_ => ConventionSets.NoSchemaName)
@@ -337,7 +337,7 @@ namespace FluentMigrator.Tests.Unit
 
             processor.Setup(p => p.ColumnExists(new TestVersionTableMetaData().SchemaName, TestVersionTableMetaData.TABLENAME, TestVersionTableMetaData.APPLIEDONCOLUMNNAME)).Returns(false);
 
-            var serviceProvider = new ServiceCollection()
+            var serviceProvider = ServiceCollectionExtensions.CreateServices()
                 .AddScoped(_ => runner.Object)
                 .AddScoped(_ => runnerContext.Object)
                 .AddScoped(_ => ConventionSets.NoSchemaName)
@@ -366,7 +366,7 @@ namespace FluentMigrator.Tests.Unit
 
             processor.Setup(p => p.ColumnExists(new TestVersionTableMetaData().SchemaName, TestVersionTableMetaData.TABLENAME, TestVersionTableMetaData.APPLIEDONCOLUMNNAME)).Returns(false);
 
-            var serviceProvider = new ServiceCollection()
+            var serviceProvider = ServiceCollectionExtensions.CreateServices()
                 .AddScoped(_ => runner.Object)
                 .AddScoped(_ => runnerContext.Object)
                 .AddScoped(_ => ConventionSets.NoSchemaName)

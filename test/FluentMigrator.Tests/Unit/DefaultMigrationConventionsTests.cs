@@ -24,10 +24,13 @@ using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Infrastructure;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.SqlServer;
 
 using Microsoft.Extensions.DependencyInjection;
+
+using Moq;
 
 using NUnit.Framework;
 
@@ -435,14 +438,14 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void GetAutoScriptUpName()
         {
-            var processor = new SqlServerProcessor(
-                new[] { "SqlServer2016", "SqlServer" },
-                null,
-                null,
-                null,
-                new ProcessorOptions(),
-                null);
-            var context = processor.CreateServices().BuildServiceProvider().GetRequiredService<IMigrationContext>();
+            var processor = new Mock<IMigrationProcessor>();
+            processor.SetupGet(p => p.DatabaseType).Returns("SqlServer2016");
+            processor.SetupGet(p => p.DatabaseTypeAliases).Returns(new[] { "SqlServer" });
+            var serviceProvider = ServiceCollectionExtensions.CreateServices()
+                .WithProcessor(processor)
+                .AddScoped<IConnectionStringReader>(_ => new PassThroughConnectionStringReader("No connection"))
+                .BuildServiceProvider();
+            var context = serviceProvider.GetRequiredService<IMigrationContext>();
             var expr = new AutoScriptMigrationFake();
             expr.GetUpExpressions(context);
 
@@ -462,14 +465,14 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void GetAutoScriptDownName()
         {
-            var processor = new SqlServerProcessor(
-                new[] { "SqlServer2016", "SqlServer" },
-                null,
-                null,
-                null,
-                new ProcessorOptions(),
-                null);
-            var context = processor.CreateServices().BuildServiceProvider().GetRequiredService<IMigrationContext>();
+            var processor = new Mock<IMigrationProcessor>();
+            processor.SetupGet(p => p.DatabaseType).Returns("SqlServer2016");
+            processor.SetupGet(p => p.DatabaseTypeAliases).Returns(new[] { "SqlServer" });
+            var serviceProvider = ServiceCollectionExtensions.CreateServices()
+                .WithProcessor(processor)
+                .AddScoped<IConnectionStringReader>(_ => new PassThroughConnectionStringReader("No connection"))
+                .BuildServiceProvider();
+            var context = serviceProvider.GetRequiredService<IMigrationContext>();
             var expr = new AutoScriptMigrationFake();
             expr.GetDownExpressions(context);
 

@@ -35,7 +35,7 @@ namespace FluentMigrator.Runner
     public class DefaultMigrationInformationLoader : IMigrationInformationLoader
     {
         [NotNull, ItemNotNull]
-        private readonly string[] _tagsToMatch;
+        private readonly IReadOnlyCollection<string> _tagsToMatch;
 
         [NotNull]
         private readonly IMigrationSource _source;
@@ -72,7 +72,7 @@ namespace FluentMigrator.Runner
             Assemblies = assemblies;
             Namespace = @namespace;
             LoadNestedNamespaces = loadNestedNamespaces;
-            _tagsToMatch = tagsToMatch?.ToArray() ?? Array.Empty<string>();
+            _tagsToMatch = tagsToMatch as IReadOnlyCollection<string> ?? tagsToMatch?.ToArray() ?? Array.Empty<string>();
             _source = new MigrationSource(new AssemblySource(() => assemblies), conventions);
         }
 
@@ -109,6 +109,8 @@ namespace FluentMigrator.Runner
         {
             if (_migrationInfos != null)
             {
+                if (_migrationInfos.Count == 0)
+                    throw new MissingMigrationsException();
                 return _migrationInfos;
             }
 
@@ -123,6 +125,9 @@ namespace FluentMigrator.Runner
 
                 _migrationInfos.Add(migrationInfo.Version, migrationInfo);
             }
+
+            if (_migrationInfos.Count == 0)
+                throw new MissingMigrationsException();
 
             return _migrationInfos;
         }
@@ -145,7 +150,7 @@ namespace FluentMigrator.Runner
                 (from migration in migrations
                  let type = migration.GetType()
                  where type.IsInNamespace(@namespace, loadNestedNamespaces)
-                 where conventions.TypeHasMatchingTags(type, tagsToMatch) || (tagsToMatch.Count == 0 && !conventions.TypeHasTags(type))
+                 where conventions.TypeHasMatchingTags(type, tagsToMatch) || (tagsToMatch.Count == 0 && !conventions.TypeHasTags(type)) || !conventions.TypeHasTags(type)
                  select conventions.GetMigrationInfoForMigration(migration));
 
             return migrationInfos.ToList();

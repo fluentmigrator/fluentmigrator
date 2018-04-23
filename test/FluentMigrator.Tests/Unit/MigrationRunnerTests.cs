@@ -26,6 +26,7 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Exceptions;
+using FluentMigrator.Runner.Infrastructure;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Tests.Integration.Migrations;
@@ -79,7 +80,8 @@ namespace FluentMigrator.Tests.Unit
             _migrationLoaderMock.Setup(x => x.LoadMigrations()).Returns(()=> _migrationList);
 
             var connectionString = IntegrationTestOptions.SqlServer2008.ConnectionString;
-            _serviceCollection = _processorMock.Object.CreateServices()
+            _serviceCollection = ServiceCollectionExtensions.CreateServices()
+                .WithProcessor(_processorMock)
                 .AddSingleton(_announcer.Object)
                 .AddSingleton(_stopWatch.Object)
                 .AddSingleton(_assemblySourceMock.Object)
@@ -602,7 +604,7 @@ namespace FluentMigrator.Tests.Unit
             var exception = Assert.Throws<VersionOrderInvalidException>(() => runner.ValidateVersionOrder());
 
             var invalidMigrations = exception.InvalidMigrations.ToList();
-            invalidMigrations.Count().ShouldBe(2);
+            invalidMigrations.Count.ShouldBe(2);
             invalidMigrations.Select(x => x.Key).ShouldContain(version2);
             invalidMigrations.Select(x => x.Key).ShouldContain(version3);
 
@@ -694,10 +696,11 @@ namespace FluentMigrator.Tests.Unit
         public void CanLoadDefaultMigrationConventionsIfNoCustomConventionsAreSpecified()
         {
             var processorMock = new Mock<IMigrationProcessor>(MockBehavior.Loose);
-            var runner = (MigrationRunner) processorMock.Object.CreateServices()
-                .BuildServiceProvider()
-                .GetRequiredService<IMigrationRunner>();
-            Assert.That(runner.Conventions, Is.TypeOf<MigrationRunnerConventions>());
+            var serviceProvider = ServiceCollectionExtensions.CreateServices()
+                .WithProcessor(processorMock)
+                .BuildServiceProvider();
+            var runner = (MigrationRunner) serviceProvider.GetRequiredService<IMigrationRunner>();
+            Assert.That(runner.Conventions, Is.TypeOf<DefaultMigrationRunnerConventions>());
         }
 
         [Test]

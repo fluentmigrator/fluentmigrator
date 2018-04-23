@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2018, FluentMigrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -45,7 +45,7 @@ namespace FluentMigrator.Runner.Initialization
                         return null;
 
                     var matchedType = assemblySource.Assemblies.SelectMany(a => a.GetExportedTypes())
-                        .FirstOrDefault(t => typeof(IMigrationRunnerConventions).IsAssignableFrom(t));
+                        .FirstOrDefault(t => typeof(IVersionTableMetaData).IsAssignableFrom(t));
 
                     if (matchedType != null)
                     {

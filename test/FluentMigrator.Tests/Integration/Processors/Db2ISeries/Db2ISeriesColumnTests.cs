@@ -119,8 +119,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Db2ISeries
             if (!IntegrationTestOptions.Db2.IsEnabled)
                 Assert.Ignore();
 
-            var serivces = new ServiceCollection()
-                .AddFluentMigratorCore()
+            var serivces = ServiceCollectionExtensions.CreateServices()
                 .ConfigureRunner(builder => builder.AddDb2ISeries())
                 .AddScoped<IConnectionStringReader>(
                     _ => new PassThroughConnectionStringReader(IntegrationTestOptions.Db2ISeries.ConnectionString));

@@ -2,8 +2,14 @@ using System;
 using System.Diagnostics;
 using System.Reflection;
 using FirebirdSql.Data.FirebirdClient;
+
+using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Initialization;
+using FluentMigrator.Runner.Processors;
+
+using Microsoft.Extensions.DependencyInjection;
+
 using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Integration.Processors.Firebird.EndToEnd
@@ -48,22 +54,26 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird.EndToEnd
             MakeTask("rollback", migrationsNamespace).Execute();
         }
 
-        protected TaskExecutor MakeTask(string task, string migrationsNamespace, Action<RunnerContext> configureContext = null)
+        protected TaskExecutor MakeTask(string task, string migrationsNamespace, Action<ProcessorOptions> configureOptions = null)
         {
-            var consoleAnnouncer = new TextWriterAnnouncer(TestContext.Out);
+            var consoleAnnouncer = new TextWriterAnnouncer(TestContext.Out) { ShowSql = true };
             var debugAnnouncer = new TextWriterAnnouncer(msg => Debug.WriteLine(msg));
             var announcer = new CompositeAnnouncer(consoleAnnouncer, debugAnnouncer);
-            var runnerContext = new RunnerContext(announcer)
-            {
-                Database = "Firebird",
-                Connection = ConnectionString,
-                Targets = new[] { Assembly.GetExecutingAssembly().Location },
-                Namespace = migrationsNamespace,
-                Task = task
-            };
 
-            configureContext?.Invoke(runnerContext);
-            return new TaskExecutor(runnerContext);
+            var services = new ServiceCollection()
+                .AddFluentMigratorCore()
+                .ConfigureRunner(builder => builder
+                    .WithAnnouncer(new TextWriterAnnouncer(TestContext.Out) { ShowSql = true })
+                    .AddFirebird())
+                .Configure<RunnerOptions>(opt => opt.AllowBreakingChange = true)
+                .AddSingleton<IAnnouncer>(announcer)
+                .AddScoped<IConnectionStringReader>(_ => new PassThroughConnectionStringReader(ConnectionString))
+                .WithMigrationsIn(migrationsNamespace)
+                .Configure<RunnerOptions>(opt => opt.Task = task)
+                .AddScoped<TaskExecutor>();
+
+            var serviceBuilder = services.BuildServiceProvider();
+            return serviceBuilder.GetRequiredService<TaskExecutor>();
         }
 
         protected bool TableExists(string candidate)

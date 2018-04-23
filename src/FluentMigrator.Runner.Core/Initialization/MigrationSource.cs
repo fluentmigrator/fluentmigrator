@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2018, FluentMigrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -74,6 +74,7 @@ namespace FluentMigrator.Runner.Initialization
         {
             var instances =
                 from type in _source.Assemblies.SelectMany(a => a.GetExportedTypes())
+                where !type.IsAbstract && typeof(IMigration).IsAssignableFrom(type)
                 where _conventions.TypeIsMigration(type)
                 select _instanceCache.GetOrAdd(type, CreateInstance);
             return instances;

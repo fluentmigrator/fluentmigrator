@@ -20,6 +20,7 @@ using JetBrains.Annotations;
 
 namespace FluentMigrator.Runner.Initialization.NetFramework
 {
+#pragma warning disable 1584,1711,1572,1581,1580
     /// <summary>
     /// Options for the <see cref="AppConfigConnectionStringReader"/>
     /// </summary>
@@ -37,4 +38,5 @@ namespace FluentMigrator.Runner.Initialization.NetFramework
         [CanBeNull]
         public string MachineName { get; set; } = Environment.MachineName;
     }
+#pragma warning restore 1584,1711,1572,1581,1580
 }

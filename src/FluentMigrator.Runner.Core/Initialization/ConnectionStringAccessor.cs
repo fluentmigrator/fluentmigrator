@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2018, FluentMigrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -39,7 +39,7 @@ namespace FluentMigrator.Runner.Initialization
                 () =>
                 {
                     var result = (from accessor in readers.OrderByDescending(x => x.Priority)
-                                  let cs = accessor.GetConnectionString(ConnectionString)
+                                  let cs = accessor.GetConnectionString(processorOptions.Value.ConnectionString)
                                   where !string.IsNullOrEmpty(cs)
                                   select cs).FirstOrDefault();
                     if (string.IsNullOrEmpty(result))

@@ -58,7 +58,7 @@ namespace FluentMigrator.Tests.Unit.Runners
                 .BuildServiceProvider()
                 .GetRequiredService<MaintenanceLoader>();
 
-            _maintenanceLoaderNoTags = new ServiceCollection()
+            _maintenanceLoaderNoTags = ServiceCollectionExtensions.CreateServices()
                 .AddSingleton<IMigrationRunnerConventionsAccessor>(new PassThroughMigrationRunnerConventionsAccessor(_migrationConventions.Object))
                 .AddScoped<MaintenanceLoader>()
                 .WithAllTestMigrations()

@@ -27,6 +27,8 @@ using JetBrains.Annotations;
 
 using Microsoft.Extensions.DependencyInjection;
 
+using Moq;
+
 using NUnit.Framework;
 
 namespace FluentMigrator.Tests
@@ -42,28 +44,6 @@ namespace FluentMigrator.Tests
                 .ConfigureRunner(builder => builder
                     .WithAnnouncer(new TextWriterAnnouncer(TestContext.Out) { ShowSql = true }))
                 .Configure<RunnerOptions>(opt => opt.AllowBreakingChange = true);
-        }
-
-        [Obsolete]
-        [MethodImpl(MethodImplOptions.NoInlining)]
-        public static IServiceCollection CreateServices(this IMigrationProcessor processor)
-        {
-#pragma warning disable 612
-            var sourceProcOpt = processor.Options;
-            var connectionString = processor.ConnectionString;
-#pragma warning restore 612
-            var procOpt = sourceProcOpt.GetProcessorOptions(connectionString);
-            return CreateServices()
-                .Configure<ProcessorOptions>(
-                    opt =>
-                    {
-                        opt.ConnectionString = procOpt.ConnectionString;
-                        opt.PreviewOnly = procOpt.PreviewOnly;
-                        opt.ProviderSwitches = procOpt.ProviderSwitches;
-                        opt.Timeout = procOpt.Timeout;
-                    })
-                .AddScoped<IConnectionStringReader>(_ => new PassThroughConnectionStringReader(connectionString))
-                .AddScoped(sp => new PassThroughProcessorAccessor(processor));
         }
 
         public static IServiceCollection WithAllTestMigrations(
@@ -87,6 +67,14 @@ namespace FluentMigrator.Tests
                         opt.NestedNamespaces = recursive;
                     })
                 .ConfigureRunner(builder => builder.WithMigrationsIn(Assembly.GetExecutingAssembly()));
+        }
+
+        public static IServiceCollection WithProcessor(
+            [NotNull] this IServiceCollection services,
+            [NotNull] IMock<IMigrationProcessor> processor)
+        {
+            return services
+                .AddScoped<IProcessorAccessor>(_ => new PassThroughProcessorAccessor(processor.Object));
         }
 
         private class PassThroughProcessorAccessor : IProcessorAccessor

@@ -31,6 +31,7 @@ using FluentMigrator.Runner.VersionTableInfo;
 using JetBrains.Annotations;
 
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection
@@ -63,6 +64,10 @@ namespace Microsoft.Extensions.DependencyInjection
 
                 // The default assembly loader factory
                 .AddSingleton<AssemblyLoaderFactory>()
+
+                // Assembly loader engines
+                .AddSingleton<IAssemblyLoadEngine, AssemblyNameLoadEngine>()
+                .AddSingleton<IAssemblyLoadEngine, AssemblyFileLoadEngine>()
 
                 // Defines the assemblies that are used to find migrations, profiles, maintenance code, etc...
                 .AddSingleton<IAssemblySource, AssemblySource>()
@@ -131,8 +136,46 @@ namespace Microsoft.Extensions.DependencyInjection
                 // The connection string accessor that evaluates the readers
                 .AddScoped<IConnectionStringAccessor, ConnectionStringAccessor>()
 
+                .AddScoped<IVersionLoader>(
+                    sp =>
+                    {
+                        var options = sp.GetRequiredService<IOptions<RunnerOptions>>();
+                        var connAccessor = sp.GetRequiredService<IConnectionStringAccessor>();
+                        bool hasConnection;
+                        try
+                        {
+                            hasConnection = !string.IsNullOrEmpty(connAccessor.ConnectionString);
+                        }
+                        catch
+                        {
+                            // Ignore exception
+                            hasConnection = false;
+                        }
+
+                        if (options.Value.NoConnection || !hasConnection)
+                        {
+                            return ActivatorUtilities.CreateInstance<ConnectionlessVersionLoader>(sp);
+                        }
+
+                        return ActivatorUtilities.CreateInstance<VersionLoader>(sp);
+                    })
+
                 // Configure the runner
-                .AddScoped<IMigrationRunner, MigrationRunner>();
+                .AddScoped<IMigrationRunner, MigrationRunner>()
+
+                // Migration context
+                .AddTransient<IMigrationContext>(
+                    sp =>
+                    {
+                        var querySchema = sp.GetRequiredService<IQuerySchema>();
+                        var options = sp.GetRequiredService<IOptions<RunnerOptions>>();
+                        var connectionStringAccessor = sp.GetRequiredService<IConnectionStringAccessor>();
+                        var connectionString = connectionStringAccessor.ConnectionString;
+#pragma warning disable 612
+                        var appContext = options.Value.ApplicationContext;
+#pragma warning restore 612
+                        return new MigrationContext(querySchema, sp, appContext, connectionString);
+                    });
 
             return services;
         }

@@ -18,8 +18,11 @@ using System;
 using System.Diagnostics;
 using System.Reflection;
 
+using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Initialization;
+
+using Microsoft.Extensions.DependencyInjection;
 
 using NUnit.Framework;
 
@@ -56,7 +59,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServer
             }
         }
 
-        private TaskExecutor MakeTask(string task, string migrationsNamespace, Action<RunnerContext> configureContext = null)
+        private TaskExecutor MakeTask(string task, string migrationsNamespace)
         {
             var consoleAnnouncer = new TextWriterAnnouncer(TestContext.Out)
             {
@@ -64,17 +67,17 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServer
             };
             var debugAnnouncer = new TextWriterAnnouncer(msg => Debug.WriteLine(msg));
             var announcer = new CompositeAnnouncer(consoleAnnouncer, debugAnnouncer);
-            var runnerContext = new RunnerContext(announcer)
-            {
-                Database = "SqlServer2016",
-                Connection = IntegrationTestOptions.SqlServer2016.ConnectionString,
-                Targets = new[] { Assembly.GetExecutingAssembly().Location },
-                Namespace = migrationsNamespace,
-                Task = task
-            };
 
-            configureContext?.Invoke(runnerContext);
-            return new TaskExecutor(runnerContext);
+            var services = ServiceCollectionExtensions.CreateServices()
+                .ConfigureRunner(r => r.AddSqlServer2016())
+                .AddSingleton<IAnnouncer>(announcer)
+                .AddScoped<IConnectionStringReader>(_ => new PassThroughConnectionStringReader(IntegrationTestOptions.SqlServer2016.ConnectionString))
+                .WithMigrationsIn(migrationsNamespace)
+                .Configure<RunnerOptions>(opt => opt.Task = task)
+                .AddScoped<TaskExecutor>();
+
+            var serviceBuilder = services.BuildServiceProvider();
+            return serviceBuilder.GetRequiredService<TaskExecutor>();
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 //
 // Copyright (c) 2018, Fluent Migrator Project
 //
@@ -39,12 +39,11 @@ namespace FluentMigrator.Tests.Unit
         {
             var runnerMock = new Mock<IMigrationRunner>();
 
-            var profileLoader = new ServiceCollection()
-                .AddFluentMigratorCore()
+            var profileLoader = (ProfileLoader)ServiceCollectionExtensions.CreateServices()
                 .Configure<RunnerOptions>(opt => opt.Profile = string.Empty)
                 .WithAllTestMigrations()
                 .BuildServiceProvider()
-                .GetRequiredService<ProfileLoader>();
+                .GetRequiredService<IProfileLoader>();
 
             profileLoader.ApplyProfiles(runnerMock.Object);
 

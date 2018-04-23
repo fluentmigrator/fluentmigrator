@@ -14,18 +14,31 @@
 // limitations under the License.
 #endregion
 
-using JetBrains.Annotations;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace FluentMigrator.Runner.Initialization
 {
     /// <summary>
-    /// Options for the assembly loader
+    /// Tries to load the assembly by name
     /// </summary>
-    public class AssemblySourceOptions
+    public class AssemblyNameLoadEngine : IAssemblyLoadEngine
     {
-        /// <summary>
-        /// Gets or sets the assembly names
-        /// </summary>
-        public string[] AssemblyNames { get; set; }
+        /// <inheritdoc />
+        public bool TryLoad(string name, ICollection<Exception> exceptions, out Assembly assembly)
+        {
+            try
+            {
+                assembly = Assembly.Load(name);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                exceptions.Add(ex);
+                assembly = null;
+                return false;
+            }
+        }
     }
 }
