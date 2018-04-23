@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -24,7 +24,7 @@ namespace FluentMigrator.Infrastructure
         Type[] GetExportedTypes();
 
         /// <summary>
-        /// Gets a array of resources defined in each of the assemblies that are 
+        /// Gets a array of resources defined in each of the assemblies that are
         /// contained in this collection, plus which assembly it is defined in.
         /// </summary>
         /// <returns>An array of value pairs of resource name plus assembly.</returns>
@@ -75,7 +75,15 @@ namespace FluentMigrator.Infrastructure
 
         public Type[] GetExportedTypes()
         {
-            return _assembly.GetExportedTypes();
+            try
+            {
+                return _assembly.GetExportedTypes();
+            }
+            catch
+            {
+                // Ignore assemblies that couldn't be loaded
+                return Type.EmptyTypes;
+            }
         }
 
         public Assembly[] Assemblies
@@ -105,7 +113,21 @@ namespace FluentMigrator.Infrastructure
 
         public Type[] GetExportedTypes()
         {
-            return _assemblies.SelectMany(a => a.GetExportedTypes()).ToArray();
+            var result = new List<Type>();
+
+            foreach (var assembly in _assemblies)
+            {
+                try
+                {
+                    result.AddRange(assembly.GetExportedTypes());
+                }
+                catch
+                {
+                    // Ignore assemblies that couldn't be loaded
+                }
+            }
+
+            return result.ToArray();
         }
 
         public Assembly[] Assemblies

@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project>
+  <Import Project="DotNetSdkMono.props" />
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
     <VersionPrefix>2.0.0</VersionPrefix>
@@ -20,7 +21,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)src/GlobalAssemblyInfo.cs" Link="Properties\GlobalAssemblyInfo.cs" />
   </ItemGroup>
 
-  <PropertyGroup Condition="'$(TargetFramework)'=='net40' or '$(TargetFramework)'=='net45' or '$(TargetFramework)'=='net461'">
+  <PropertyGroup Condition="'$(TargetFramework)'=='net40' or '$(TargetFramework)'=='net45' or '$(TargetFramework)'=='net452' or '$(TargetFramework)'=='net461' ">
     <DefineConstants>$(DefineConstants);NETFRAMEWORK</DefineConstants>
   </PropertyGroup>
 

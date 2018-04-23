@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## 2.0.3 (2018-04-22) 
+ 
+### Fixed 
+ 
+- [#858](https://github.com/fluentmigrator/fluentmigrator/issues/858): Don't even try to set the command timeout for SQL Server CE 
+
+## 2.0.2 (2018-04-17)
+
+### Fixed
+
+- [#856](https://github.com/fluentmigrator/fluentmigrator/issues/856): Don't fail when an assembly couldn't be loaded
+- [#848](https://github.com/fluentmigrator/fluentmigrator/pull/848): `MySql4ProcessorFactory` used the `MySql5Generator`
+
 ## 2.0.1 (2018-04-16)
 
 ### Fixed
