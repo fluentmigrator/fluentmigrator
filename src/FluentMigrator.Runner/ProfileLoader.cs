@@ -37,13 +37,15 @@ namespace FluentMigrator.Runner
     /// </summary>
     public class ProfileLoader : IProfileLoader
     {
-        [NotNull]
+        [CanBeNull]
         private readonly IServiceProvider _serviceProvider;
 
         [Obsolete]
+        [CanBeNull]
         private readonly IMigrationRunner _runner;
 
         [Obsolete]
+        [CanBeNull]
         private readonly IMigrationRunnerConventions _conventions;
 
         /// <summary>
@@ -80,7 +82,7 @@ namespace FluentMigrator.Runner
         [Obsolete]
         public IEnumerable<IMigration> FindProfilesIn(IAssemblyCollection assemblies, string profile)
         {
-            if (string.IsNullOrEmpty(profile))
+            if (string.IsNullOrEmpty(profile) || _conventions == null)
                 yield break;
 
             IEnumerable<Type> matchedTypes = assemblies.GetExportedTypes()

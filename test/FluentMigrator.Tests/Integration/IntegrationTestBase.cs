@@ -18,33 +18,24 @@
 
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
 using FirebirdSql.Data.FirebirdClient;
 
-using FluentMigrator.Runner.Announcers;
-using FluentMigrator.Runner.Generators.Postgres;
+using FluentMigrator.Runner;
+using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.MySql;
 using FluentMigrator.Runner.Processors.Postgres;
 using FluentMigrator.Runner.Processors.SQLite;
 using FluentMigrator.Runner.Processors.SqlServer;
-using FluentMigrator.Runner.Generators.SQLite;
-using FluentMigrator.Runner.Generators.SqlServer;
-using FluentMigrator.Runner.Generators.MySql;
 using FluentMigrator.Runner.Processors.Firebird;
-using FluentMigrator.Runner.Generators.Firebird;
-using FluentMigrator.Runner.Generators.SqlAnywhere;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.SqlAnywhere;
 
-using Microsoft.Data.Sqlite;
-
-using MySql.Data.MySqlClient;
-
-using Npgsql;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 using NUnit.Framework;
 
@@ -52,9 +43,7 @@ namespace FluentMigrator.Tests.Integration
 {
     public class IntegrationTestBase
     {
-        private delegate void ExecuteTestDelegate(Action<IMigrationProcessor> test, bool tryRollback, IntegrationTestOptions.DatabaseServerOptions options);
-
-        private readonly List<(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> getOptionsFunc, ExecuteTestDelegate executeTestDelegate)> _processors;
+        private readonly List<(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> getOptionsFunc)> _processors;
 
         private bool _isFirstExecuteForFirebird = true;
 
@@ -62,18 +51,18 @@ namespace FluentMigrator.Tests.Integration
 
         protected IntegrationTestBase()
         {
-            _processors = new List<(Type, Func<IntegrationTestOptions.DatabaseServerOptions>, ExecuteTestDelegate)>
+            _processors = new List<(Type, Func<IntegrationTestOptions.DatabaseServerOptions>)>
             {
-                (typeof(SqlServerProcessor), () => IntegrationTestOptions.SqlServer2005, ExecuteWithSqlServer2005),
-                (typeof(SqlServerProcessor), () => IntegrationTestOptions.SqlServer2008, ExecuteWithSqlServer2008),
-                (typeof(SqlServerProcessor), () => IntegrationTestOptions.SqlServer2012, ExecuteWithSqlServer2012),
-                (typeof(SqlServerProcessor), () => IntegrationTestOptions.SqlServer2014, ExecuteWithSqlServer2014),
-                (typeof(SqlServerProcessor), () => IntegrationTestOptions.SqlServer2016, ExecuteWithSqlServer2016),
-                (typeof(SqlAnywhereProcessor), () => IntegrationTestOptions.SqlAnywhere16, ExecuteWithSqlAnywhere),
-                (typeof(SQLiteProcessor), () => IntegrationTestOptions.SqlLite, ExecuteWithSqlite),
-                (typeof(FirebirdProcessor), () => IntegrationTestOptions.Firebird, ExecuteWithFirebird),
-                (typeof(PostgresProcessor), () => IntegrationTestOptions.Postgres, ExecuteWithPostgres),
-                (typeof(MySqlProcessor), () => IntegrationTestOptions.MySql, ExecuteWithMySql),
+                (typeof(SqlServer2005Processor), () => IntegrationTestOptions.SqlServer2005),
+                (typeof(SqlServer2008Processor), () => IntegrationTestOptions.SqlServer2008),
+                (typeof(SqlServer2012Processor), () => IntegrationTestOptions.SqlServer2012),
+                (typeof(SqlServer2014Processor), () => IntegrationTestOptions.SqlServer2014),
+                (typeof(SqlServer2016Processor), () => IntegrationTestOptions.SqlServer2016),
+                (typeof(SqlAnywhere16Processor), () => IntegrationTestOptions.SqlAnywhere16),
+                (typeof(SQLiteProcessor), () => IntegrationTestOptions.SqlLite),
+                (typeof(FirebirdProcessor), () => IntegrationTestOptions.Firebird),
+                (typeof(PostgresProcessor), () => IntegrationTestOptions.Postgres),
+                (typeof(MySql4Processor), () => IntegrationTestOptions.MySql),
             };
         }
 
@@ -100,14 +89,14 @@ namespace FluentMigrator.Tests.Integration
             }
         }
 
-        protected bool IsAnyServerEnabled(params Type[] exceptProcessors)
+        private bool IsAnyServerEnabled(params Type[] exceptProcessors)
         {
             return IsAnyServerEnabled(procType => !exceptProcessors.Any(p => p.IsAssignableFrom(procType)));
         }
 
-        protected bool IsAnyServerEnabled(Predicate<Type> isMatch)
+        private bool IsAnyServerEnabled(Predicate<Type> isMatch)
         {
-            foreach (var (processorType, getOptionsFunc, _) in _processors)
+            foreach (var (processorType, getOptionsFunc) in _processors)
             {
                 var opt = getOptionsFunc();
                 if (!opt.IsEnabled)
@@ -122,25 +111,43 @@ namespace FluentMigrator.Tests.Integration
             return false;
         }
 
-        public void ExecuteWithSupportedProcessors(Action<IMigrationProcessor> test)
-        {
-            ExecuteWithSupportedProcessors(test, true);
-        }
-
-        public void ExecuteWithSupportedProcessors(Action<IMigrationProcessor> test, Boolean tryRollback)
-        {
-            ExecuteWithSupportedProcessors(test, tryRollback, new Type[] { });
-        }
-
-        public void ExecuteWithSupportedProcessors(Action<IMigrationProcessor> test, Boolean tryRollback, params Type[] exceptProcessors)
+        protected void ExecuteWithSupportedProcessors(
+            Action<IServiceProvider, IMigrationProcessor> testAction,
+            bool tryRollback = true,
+            params Type[] exceptProcessors)
         {
             ExecuteWithSupportedProcessors(
-                test,
+                testAction,
                 tryRollback,
                 procType => !exceptProcessors.Any(p => p.IsAssignableFrom(procType)));
         }
 
-        public void ExecuteWithSupportedProcessors(Action<IMigrationProcessor> test, Boolean tryRollback, Predicate<Type> isMatch)
+        protected void ExecuteWithSupportedProcessors(
+            Action<IServiceCollection> initAction,
+            Action<IServiceProvider, IMigrationProcessor> testAction,
+            bool tryRollback = true,
+            params Type[] exceptProcessors)
+        {
+            ExecuteWithSupportedProcessors(
+                initAction,
+                testAction,
+                tryRollback,
+                procType => !exceptProcessors.Any(p => p.IsAssignableFrom(procType)));
+        }
+
+        protected void ExecuteWithSupportedProcessors(
+            Action<IServiceProvider, IMigrationProcessor> testAction,
+            bool tryRollback,
+            Predicate<Type> isMatch)
+        {
+            ExecuteWithSupportedProcessors(sp => { }, testAction, tryRollback, isMatch);
+        }
+
+        protected void ExecuteWithSupportedProcessors(
+            Action<IServiceCollection> initAction,
+            Action<IServiceProvider, IMigrationProcessor> testAction,
+            bool tryRollback,
+            Predicate<Type> isMatch)
         {
             if (!IsAnyServerEnabled())
             {
@@ -150,7 +157,7 @@ namespace FluentMigrator.Tests.Integration
             }
 
             var executed = false;
-            foreach (var (processorType, getOptionsFunc, executeFunc) in _processors)
+            foreach (var (processorType, getOptionsFunc) in _processors)
             {
                 var opt = getOptionsFunc();
                 if (!opt.IsEnabled)
@@ -160,7 +167,7 @@ namespace FluentMigrator.Tests.Integration
                     continue;
 
                 executed = true;
-                executeFunc(test, tryRollback, opt);
+                ExecuteWithProcessor(processorType, initAction, testAction, tryRollback, opt);
             }
 
             if (!executed)
@@ -169,188 +176,73 @@ namespace FluentMigrator.Tests.Integration
             }
         }
 
-        protected static void ExecuteWithSqlServer2016(Action<IMigrationProcessor> test, bool tryRollback, IntegrationTestOptions.DatabaseServerOptions serverOptions)
+        protected void ExecuteWithProcessor<TProcessor>(
+            Action<IServiceCollection> initAction,
+            Action<IServiceProvider, IMigrationProcessor> testAction,
+            bool tryRollback,
+            IntegrationTestOptions.DatabaseServerOptions serverOptions)
+            where TProcessor : ProcessorBase
         {
-            Debug.Assert(serverOptions.IsEnabled);
-
-            var announcer = new TextWriterAnnouncer(TestContext.Out);
-            announcer.Heading("Testing Migration against MS SQL Server 2016");
-            var generator = new SqlServer2016Generator();
-
-            ExecuteWithSqlServer(new[] { "SqlServer2016" }, serverOptions, announcer, generator, test, tryRollback);
+            ExecuteWithProcessor(typeof(TProcessor), initAction, testAction, tryRollback, serverOptions);
         }
 
-        protected static void ExecuteWithSqlServer2014(Action<IMigrationProcessor> test, bool tryRollback, IntegrationTestOptions.DatabaseServerOptions serverOptions)
+        protected void ExecuteWithProcessor(
+            Type processorType,
+            Action<IServiceCollection> initAction,
+            Action<IServiceProvider, IMigrationProcessor> testAction,
+            bool tryRollback,
+            IntegrationTestOptions.DatabaseServerOptions serverOptions)
         {
-            Debug.Assert(serverOptions.IsEnabled);
+            var services = ServiceCollectionExtensions.CreateServices()
+                .AddAllDatabases()
+                .AddScoped<IProcessorAccessor>(
+                    sp =>
+                    {
+                        var proc = (ProcessorBase) sp.GetRequiredService(processorType);
+                        var opt = sp.GetRequiredService<IOptions<SelectingProcessorAccessorOptions>>();
+                        return new SelectingProcessorAccessor(new[] { proc }, opt);
+                    })
+                .AddScoped<IGeneratorAccessor>(
+                    sp =>
+                    {
+                        var proc = (ProcessorBase) sp.GetRequiredService(processorType);
+                        var opt = sp.GetRequiredService<IOptions<SelectingGeneratorAccessorOptions>>();
+                        return new SelectingGeneratorAccessor(new[] { proc.Generator }, opt);
+                    })
+                .AddScoped<IConnectionStringReader>(
+                    _ => new PassThroughConnectionStringReader(serverOptions.ConnectionString));
+            initAction?.Invoke(services);
 
-            var announcer = new TextWriterAnnouncer(TestContext.Out);
-            announcer.Heading("Testing Migration against MS SQL Server 2014");
-            var generator = new SqlServer2014Generator();
+            var serviceProvider = services
+                .BuildServiceProvider(true);
 
-            ExecuteWithSqlServer(new[] { "SqlServer2014" }, serverOptions, announcer, generator, test, tryRollback);
-        }
-
-        protected static void ExecuteWithSqlServer2012(Action<IMigrationProcessor> test, bool tryRollback, IntegrationTestOptions.DatabaseServerOptions serverOptions)
-        {
-            Debug.Assert(serverOptions.IsEnabled);
-
-            var announcer = new TextWriterAnnouncer(TestContext.Out);
-            announcer.Heading("Testing Migration against MS SQL Server 2012");
-            var generator = new SqlServer2012Generator();
-
-            ExecuteWithSqlServer(new[] { "SqlServer2012" }, serverOptions, announcer, generator, test, tryRollback);
-        }
-
-        protected static void ExecuteWithSqlServer2008(Action<IMigrationProcessor> test, bool tryRollback, IntegrationTestOptions.DatabaseServerOptions serverOptions)
-        {
-            Debug.Assert(serverOptions.IsEnabled);
-
-            var announcer = new TextWriterAnnouncer(TestContext.Out);
-            announcer.Heading("Testing Migration against MS SQL Server 2008");
-            var generator = new SqlServer2008Generator();
-
-            ExecuteWithSqlServer(new[] { "SqlServer2008" }, serverOptions, announcer, generator, test, tryRollback);
-        }
-
-        protected static void ExecuteWithSqlServer2005(Action<IMigrationProcessor> test, bool tryRollback, IntegrationTestOptions.DatabaseServerOptions serverOptions)
-        {
-            Debug.Assert(serverOptions.IsEnabled);
-
-            var announcer = new TextWriterAnnouncer(TestContext.Out);
-            announcer.Heading("Testing Migration against MS SQL Server 2005");
-            var generator = new SqlServer2005Generator();
-
-            ExecuteWithSqlServer(new[] { "SqlServer2005" }, serverOptions, announcer, generator, test, tryRollback);
-        }
-
-        private static void ExecuteWithSqlServer(IEnumerable<string> databaseTypes, IntegrationTestOptions.DatabaseServerOptions serverOptions, TextWriterAnnouncer announcer, SqlServer2005Generator generator, Action<IMigrationProcessor> test, bool tryRollback)
-        {
-            using (var connection = new SqlConnection(serverOptions.ConnectionString))
-            {
-                var processor = new SqlServerProcessor(databaseTypes, connection, generator, announcer, new ProcessorOptions(), new SqlServerDbFactory());
-                test(processor);
-
-                if (tryRollback && !processor.WasCommitted)
-                {
-                    processor.RollbackTransaction();
-                }
-            }
-        }
-
-        protected static void ExecuteWithSqlite(Action<IMigrationProcessor> test, bool tryRollback, IntegrationTestOptions.DatabaseServerOptions serverOptions)
-        {
-            if (!serverOptions.IsEnabled)
-                return;
-
-            var announcer = new TextWriterAnnouncer(TestContext.Out);
-            announcer.Heading("Testing Migration against SQLite");
-
-            var factory = new SQLiteDbFactory(serviceProvider: null);
-            using (var connection = new SqliteConnection(serverOptions.ConnectionString))
-            {
-                var processor = new SQLiteProcessor(connection, new SQLiteGenerator(), announcer, new ProcessorOptions(), factory);
-                test(processor);
-
-                if (tryRollback && !processor.WasCommitted)
-                {
-                    processor.RollbackTransaction();
-                }
-            }
-        }
-
-        protected static void ExecuteWithSqlAnywhere(Action<IMigrationProcessor> test, bool tryRollback, IntegrationTestOptions.DatabaseServerOptions serverOptions)
-        {
-            if (!serverOptions.IsEnabled)
-                return;
-
-            var announcer = new TextWriterAnnouncer(TestContext.Out);
-            announcer.Heading("Testing Migration against Postgres");
-
-            var factory = new SqlAnywhereDbFactory();
-            using (var connection = factory.CreateConnection(serverOptions.ConnectionString))
-            {
-                var processor = new SqlAnywhereProcessor("SqlAnywhere16", connection, new SqlAnywhere16Generator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), factory);
-
-                test(processor);
-
-                if (tryRollback && !processor.WasCommitted)
-                {
-                    processor.RollbackTransaction();
-                }
-            }
-        }
-
-        protected static void ExecuteWithPostgres(Action<IMigrationProcessor> test, bool tryRollback, IntegrationTestOptions.DatabaseServerOptions serverOptions)
-        {
-            if (!serverOptions.IsEnabled)
-                return;
-
-            var announcer = new TextWriterAnnouncer(TestContext.Out);
-            announcer.Heading("Testing Migration against Postgres");
-
-            using (var connection = new NpgsqlConnection(serverOptions.ConnectionString))
-            {
-                var processor = new PostgresProcessor(connection, new PostgresGenerator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), new PostgresDbFactory(serviceProvider: null));
-
-                test(processor);
-
-                if (tryRollback && !processor.WasCommitted)
-                {
-                    processor.RollbackTransaction();
-                }
-            }
-        }
-
-        protected static void ExecuteWithMySql(Action<IMigrationProcessor> test, bool tryRollback, IntegrationTestOptions.DatabaseServerOptions serverOptions)
-        {
-            if (!serverOptions.IsEnabled)
-                return;
-
-            var announcer = new TextWriterAnnouncer(TestContext.Out);
-            announcer.Heading("Testing Migration against MySQL Server");
-
-            using (var connection = new MySqlConnection(serverOptions.ConnectionString))
-            {
-                var processor = new MySqlProcessor(connection, new MySql4Generator(), announcer, new ProcessorOptions(), new MySqlDbFactory(serviceProvider: null));
-                test(processor);
-
-                if (tryRollback && !processor.WasCommitted)
-                {
-                    processor.RollbackTransaction();
-                }
-            }
-        }
-
-        protected void ExecuteWithFirebird(Action<IMigrationProcessor> test, bool tryRollback, IntegrationTestOptions.DatabaseServerOptions serverOptions)
-        {
-            if (!serverOptions.IsEnabled)
-                return;
-
-            var announcer = new TextWriterAnnouncer(TestContext.Out);
-            announcer.ShowSql = true;
-            announcer.Heading("Testing Migration against Firebird Server");
-
-            if (_isFirstExecuteForFirebird)
+            if (processorType == typeof(FirebirdProcessor) && _isFirstExecuteForFirebird)
             {
                 _isFirstExecuteForFirebird = false;
                 FbConnection.CreateDatabase(serverOptions.ConnectionString, true);
             }
 
-            using (var connection = new FbConnection(serverOptions.ConnectionString))
+            using (serviceProvider)
             {
-                var options = FirebirdOptions.AutoCommitBehaviour();
-                var processor = new FirebirdProcessor(connection, new FirebirdGenerator(options), announcer, new ProcessorOptions(), new FirebirdDbFactory(serviceProvider: null), options);
+                using (var scope = serviceProvider.CreateScope())
+                {
+                    var sp = scope.ServiceProvider;
+                    var announcer = sp.GetRequiredService<IAnnouncer>();
 
-                try
-                {
-                    test(processor);
-                }
-                catch (Exception)
-                {
-                    if (tryRollback && !processor.WasCommitted)
-                        processor.RollbackTransaction();
-                    throw;
+                    announcer.Heading($"Testing Migration against {processorType}");
+
+                    var processor = (ProcessorBase) sp.GetRequiredService(processorType);
+                    try
+                    {
+                        testAction(sp, processor);
+                    }
+                    finally
+                    {
+                        if (tryRollback && !processor.WasCommitted)
+                        {
+                            processor.RollbackTransaction();
+                        }
+                    }
                 }
             }
         }

@@ -33,7 +33,7 @@ namespace FluentMigrator.Runner.Processors
         private readonly IMigrationProcessorOptions _legacyOptions;
 #pragma warning restore 612
 
-        protected readonly IMigrationGenerator Generator;
+        protected internal readonly IMigrationGenerator Generator;
         protected readonly IAnnouncer Announcer;
 
         [Obsolete]

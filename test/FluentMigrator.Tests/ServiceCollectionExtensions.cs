@@ -41,13 +41,28 @@ namespace FluentMigrator.Tests
                 .AddSingleton<IAssemblySourceItem>(new AssemblySourceItem(Assembly.GetExecutingAssembly()))
                 .ConfigureRunner(builder => builder
                     .WithAnnouncer(new TextWriterAnnouncer(TestContext.Out) { ShowSql = true }))
-                .Configure<RunnerOptions>(opt => opt.AllowBreakingChange= true);
+                .Configure<RunnerOptions>(opt => opt.AllowBreakingChange = true);
         }
 
+        [Obsolete]
         [MethodImpl(MethodImplOptions.NoInlining)]
         public static IServiceCollection CreateServices(this IMigrationProcessor processor)
         {
+#pragma warning disable 612
+            var sourceProcOpt = processor.Options;
+            var connectionString = processor.ConnectionString;
+#pragma warning restore 612
+            var procOpt = sourceProcOpt.GetProcessorOptions(connectionString);
             return CreateServices()
+                .Configure<ProcessorOptions>(
+                    opt =>
+                    {
+                        opt.ConnectionString = procOpt.ConnectionString;
+                        opt.PreviewOnly = procOpt.PreviewOnly;
+                        opt.ProviderSwitches = procOpt.ProviderSwitches;
+                        opt.Timeout = procOpt.Timeout;
+                    })
+                .AddScoped<IConnectionStringReader>(_ => new PassThroughConnectionStringReader(connectionString))
                 .AddScoped(sp => new PassThroughProcessorAccessor(processor));
         }
 

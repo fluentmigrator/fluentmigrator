@@ -165,11 +165,21 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             return services
                 .AddFluentMigratorCore()
+                .AddAllDatabases()
+                .Configure<SelectingGeneratorAccessorOptions>(opt => opt.GeneratorId = databaseId)
+                .Configure<SelectingProcessorAccessorOptions>(opt => opt.ProcessorId = databaseId);
+        }
 
-                // Use SQL Server as default processor
-                .ConfigureRunner(builder =>
-                {
-                    builder
+        /// <summary>
+        /// Add all database services to the service collection
+        /// </summary>
+        /// <param name="services">The service collection</param>
+        /// <returns>The service collection</returns>
+        internal static IServiceCollection AddAllDatabases(this IServiceCollection services)
+        {
+            return services
+                .ConfigureRunner(
+                    builder => builder
                         .AddDb2()
                         .AddDb2ISeries()
                         .AddDotConnectOracle()
@@ -190,10 +200,7 @@ namespace Microsoft.Extensions.DependencyInjection
                         .AddSqlServer2012()
                         .AddSqlServer2014()
                         .AddSqlServer2016()
-                        .AddSqlServerCe();
-                })
-                .Configure<SelectingGeneratorAccessorOptions>(opt => opt.GeneratorId = databaseId)
-                .Configure<SelectingProcessorAccessorOptions>(opt => opt.ProcessorId = databaseId);
+                        .AddSqlServerCe());
         }
 
         /// <summary>

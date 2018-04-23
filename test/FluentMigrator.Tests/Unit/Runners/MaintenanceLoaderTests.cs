@@ -18,13 +18,13 @@
 
 using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Runner;
-using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Infrastructure;
 using FluentMigrator.Runner.Initialization;
 
 using Microsoft.Extensions.DependencyInjection;
 
 using Moq;
+
 using NUnit.Framework;
 
 using Shouldly;
@@ -36,7 +36,7 @@ namespace FluentMigrator.Tests.Unit.Runners
     {
         public const string Tag1 = "MaintenanceTestTag1";
         public const string Tag2 = "MaintenanceTestTag2";
-        private string[] _tags = {Tag1, Tag2};
+        private readonly string[] _tags = {Tag1, Tag2};
 
         private Mock<IMigrationRunnerConventions> _migrationConventions;
         private MaintenanceLoader _maintenanceLoader;
@@ -50,17 +50,16 @@ namespace FluentMigrator.Tests.Unit.Runners
             _migrationConventions.Setup(x => x.TypeHasTags).Returns(DefaultMigrationRunnerConventions.Instance.TypeHasTags);
             _migrationConventions.Setup(x => x.TypeHasMatchingTags).Returns(DefaultMigrationRunnerConventions.Instance.TypeHasMatchingTags);
 
-            _maintenanceLoader = new ServiceCollection()
-                .ConfigureRunner(b => b.WithRunnerContext(new RunnerContext(new NullAnnouncer()) { Tags = _tags }))
-                .AddScoped(_ => _migrationConventions.Object)
+            _maintenanceLoader = ServiceCollectionExtensions.CreateServices()
+                .Configure<RunnerOptions>(opt => opt.Tags = _tags)
+                .AddSingleton<IMigrationRunnerConventionsAccessor>(new PassThroughMigrationRunnerConventionsAccessor(_migrationConventions.Object))
                 .AddScoped<MaintenanceLoader>()
                 .WithAllTestMigrations()
                 .BuildServiceProvider()
                 .GetRequiredService<MaintenanceLoader>();
 
             _maintenanceLoaderNoTags = new ServiceCollection()
-                .ConfigureRunner(b => b.WithRunnerContext(new RunnerContext(new NullAnnouncer())))
-                .AddScoped(_ => _migrationConventions.Object)
+                .AddSingleton<IMigrationRunnerConventionsAccessor>(new PassThroughMigrationRunnerConventionsAccessor(_migrationConventions.Object))
                 .AddScoped<MaintenanceLoader>()
                 .WithAllTestMigrations()
                 .BuildServiceProvider()

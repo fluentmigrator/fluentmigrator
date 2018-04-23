@@ -43,18 +43,19 @@ namespace FluentMigrator.Tests.Unit
     [TestFixture]
     public class MigrationRunnerTests
     {
-        private MigrationRunner _runner;
         private Mock<IAnnouncer> _announcer;
         private Mock<IStopWatch> _stopWatch;
 
         private Mock<IMigrationProcessor> _processorMock;
         private Mock<IMigrationInformationLoader> _migrationLoaderMock;
         private Mock<IProfileLoader> _profileLoaderMock;
-        private Mock<IRunnerContext> _runnerContextMock;
         private Mock<IAssemblySource> _assemblySourceMock;
+
         private SortedList<long, IMigrationInfo> _migrationList;
         private TestVersionLoader _fakeVersionLoader;
         private int _applicationContext;
+
+        private IServiceCollection _serviceCollection;
 
         [SetUp]
         [MethodImpl(MethodImplOptions.NoInlining)]
@@ -64,7 +65,6 @@ namespace FluentMigrator.Tests.Unit
 
             _applicationContext = new Random().Next();
             _migrationList = new SortedList<long, IMigrationInfo>();
-            _runnerContextMock = new Mock<IRunnerContext>(MockBehavior.Loose);
             _processorMock = new Mock<IMigrationProcessor>(MockBehavior.Loose);
             _migrationLoaderMock = new Mock<IMigrationInformationLoader>(MockBehavior.Loose);
             _profileLoaderMock = new Mock<IProfileLoader>(MockBehavior.Loose);
@@ -73,51 +73,48 @@ namespace FluentMigrator.Tests.Unit
             _stopWatch = new Mock<IStopWatch>();
             _stopWatch.Setup(x => x.Time(It.IsAny<Action>())).Returns(new TimeSpan(1)).Callback((Action a) => a.Invoke());
 
-            _runnerContextMock.SetupGet(x => x.Namespace).Returns("FluentMigrator.Tests.Integration.Migrations");
-            _runnerContextMock.SetupGet(x => x.Announcer).Returns(_announcer.Object);
-            _runnerContextMock.SetupGet(x => x.StopWatch).Returns(_stopWatch.Object);
-            _runnerContextMock.SetupGet(x => x.Targets).Returns(new[] { Assembly.GetExecutingAssembly().ToString()});
-            _runnerContextMock.SetupGet(x => x.Connection).Returns(IntegrationTestOptions.SqlServer2008.ConnectionString);
-            _runnerContextMock.SetupGet(x => x.Database).Returns("sqlserver");
-            _runnerContextMock.SetupGet(x => x.ApplicationContext).Returns(_applicationContext);
-
             _assemblySourceMock = new Mock<IAssemblySource>();
             _assemblySourceMock.SetupGet(x => x.Assemblies).Returns(new[] { asm });
-
-            var options = new ProcessorOptions(_runnerContextMock.Object);
-
-            _processorMock.SetupGet(x => x.Options).Returns(options);
-            _processorMock.SetupGet(x => x.ConnectionString).Returns(IntegrationTestOptions.SqlServer2008.ConnectionString);
 
             _migrationLoaderMock.Setup(x => x.LoadMigrations()).Returns(()=> _migrationList);
 
             var connectionString = IntegrationTestOptions.SqlServer2008.ConnectionString;
-            var servicesProvider = _processorMock.Object.CreateServices()
+            _serviceCollection = _processorMock.Object.CreateServices()
                 .AddSingleton(_announcer.Object)
+                .AddSingleton(_stopWatch.Object)
                 .AddSingleton(_assemblySourceMock.Object)
                 .AddSingleton(_migrationLoaderMock.Object)
                 .AddScoped<IConnectionStringReader>(sp => new PassThroughConnectionStringReader(connectionString))
-                .Configure<RunnerOptions>()
+#pragma warning disable 612
+                .Configure<RunnerOptions>(opt => opt.ApplicationContext = _applicationContext)
+#pragma warning restore 612
                 .Configure<ProcessorOptions>(
                     opt => { opt.ConnectionString = connectionString; })
                 .Configure<AssemblySourceOptions>(opt => opt.AssemblyNames = new []{ asm.FullName })
                 .Configure<TypeFilterOptions>(
                     opt => { opt.Namespace = "FluentMigrator.Tests.Integration.Migrations"; })
-                .ConfigureRunner(builder => builder.WithRunnerConventions(new CustomMigrationConventions()))
+                .ConfigureRunner(builder => builder.WithRunnerConventions(new CustomMigrationConventions()));
+        }
+
+        private MigrationRunner CreateRunner()
+        {
+            var serviceProvider = _serviceCollection
                 .BuildServiceProvider();
 
-            _runner = (MigrationRunner) servicesProvider.GetRequiredService<IMigrationRunner>();
-            _runner.ProfileLoader = _profileLoaderMock.Object;
+            var runner = (MigrationRunner) serviceProvider.GetRequiredService<IMigrationRunner>();
+            runner.ProfileLoader = _profileLoaderMock.Object;
 
-            _fakeVersionLoader = new TestVersionLoader(_runner, _runner.VersionLoader.VersionTableMetaData);
-            _runner.VersionLoader = _fakeVersionLoader;
+            _fakeVersionLoader = new TestVersionLoader(runner, runner.VersionLoader.VersionTableMetaData);
+            runner.VersionLoader = _fakeVersionLoader;
 
-            _processorMock.Setup(x => x.SchemaExists(It.Is<string>(s => s == _runner.VersionLoader.VersionTableMetaData.SchemaName)))
-                          .Returns(true);
+            _processorMock.Setup(x => x.SchemaExists(It.Is<string>(s => s == runner.VersionLoader.VersionTableMetaData.SchemaName)))
+                .Returns(true);
 
-            _processorMock.Setup(x => x.TableExists(It.Is<string>(s => s == _runner.VersionLoader.VersionTableMetaData.SchemaName),
-                                                    It.Is<string>(t => t == _runner.VersionLoader.VersionTableMetaData.TableName)))
-                          .Returns(true);
+            _processorMock.Setup(x => x.TableExists(It.Is<string>(s => s == runner.VersionLoader.VersionTableMetaData.SchemaName),
+                    It.Is<string>(t => t == runner.VersionLoader.VersionTableMetaData.TableName)))
+                .Returns(true);
+
+            return runner;
         }
 
         private void LoadVersionData(params long[] fakeVersions)
@@ -137,33 +134,36 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void ProfilesAreAppliedWhenMigrateUpIsCalledWithNoVersion()
         {
-            _runner.MigrateUp();
-            _profileLoaderMock.Verify(x => x.ApplyProfiles(_runner), Times.Once());
+            var runner = CreateRunner();
+            runner.MigrateUp();
+            _profileLoaderMock.Verify(x => x.ApplyProfiles(runner), Times.Once());
         }
 
         [Test]
         public void ProfilesAreAppliedWhenMigrateUpIsCalledWithVersionParameter()
         {
-            _runner.MigrateUp(2009010101);
-            _profileLoaderMock.Verify(x => x.ApplyProfiles(_runner), Times.Once());
+            var runner = CreateRunner();
+            runner.MigrateUp(2009010101);
+            _profileLoaderMock.Verify(x => x.ApplyProfiles(runner), Times.Once());
         }
 
         [Test]
         public void ProfilesAreAppliedWhenMigrateDownIsCalled()
         {
-            _runner.MigrateDown(2009010101);
-            _profileLoaderMock.Verify(x => x.ApplyProfiles(_runner), Times.Once());
+            var runner = CreateRunner();
+            runner.MigrateDown(2009010101);
+            _profileLoaderMock.Verify(x => x.ApplyProfiles(runner), Times.Once());
         }
 
         /// <summary>Unit test which ensures that the application context is correctly propagated down to each migration class.</summary>
         [Test(Description = "Ensure that the application context is correctly propagated down to each migration class.")]
         public void CanPassApplicationContext()
         {
-            IMigration migration = new TestEmptyMigration();
-            _runner.Up(migration);
+            var runner = CreateRunner();
 
-            Assert.AreEqual(_applicationContext, _runnerContextMock.Object.ApplicationContext, "The runner context does not have the expected application context.");
-            Assert.AreEqual(_applicationContext, _runner.RunnerContext.ApplicationContext, "The MigrationRunner does not have the expected application context.");
+            IMigration migration = new TestEmptyMigration();
+            runner.Up(migration);
+
             Assert.AreEqual(_applicationContext, migration.ApplicationContext, "The migration does not have the expected application context.");
             _announcer.VerifyAll();
         }
@@ -171,8 +171,10 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void CanPassConnectionString()
         {
+            var runner = CreateRunner();
+
             IMigration migration = new TestEmptyMigration();
-            _runner.Up(migration);
+            runner.Up(migration);
 
             Assert.AreEqual(IntegrationTestOptions.SqlServer2008.ConnectionString, migration.ConnectionString, "The migration does not have the expected connection string.");
             _announcer.VerifyAll();
@@ -182,7 +184,8 @@ namespace FluentMigrator.Tests.Unit
         public void CanAnnounceUp()
         {
             _announcer.Setup(x => x.Heading(It.IsRegex(containsAll("Test", "migrating"))));
-            _runner.Up(new TestMigration());
+            var runner = CreateRunner();
+            runner.Up(new TestMigration());
             _announcer.VerifyAll();
         }
 
@@ -190,7 +193,8 @@ namespace FluentMigrator.Tests.Unit
         public void CanAnnounceUpFinish()
         {
             _announcer.Setup(x => x.Say(It.IsRegex(containsAll("Test", "migrated"))));
-            _runner.Up(new TestMigration());
+            var runner = CreateRunner();
+            runner.Up(new TestMigration());
             _announcer.VerifyAll();
         }
 
@@ -198,7 +202,8 @@ namespace FluentMigrator.Tests.Unit
         public void CanAnnounceDown()
         {
             _announcer.Setup(x => x.Heading(It.IsRegex(containsAll("Test", "reverting"))));
-            _runner.Down(new TestMigration());
+            var runner = CreateRunner();
+            runner.Down(new TestMigration());
             _announcer.VerifyAll();
         }
 
@@ -206,7 +211,8 @@ namespace FluentMigrator.Tests.Unit
         public void CanAnnounceDownFinish()
         {
             _announcer.Setup(x => x.Say(It.IsRegex(containsAll("Test", "reverted"))));
-            _runner.Down(new TestMigration());
+            var runner = CreateRunner();
+            runner.Down(new TestMigration());
             _announcer.VerifyAll();
         }
 
@@ -218,7 +224,8 @@ namespace FluentMigrator.Tests.Unit
 
             _stopWatch.Setup(x => x.ElapsedTime()).Returns(ts);
 
-            _runner.Up(new TestMigration());
+            var runner = CreateRunner();
+            runner.Up(new TestMigration());
 
             _announcer.VerifyAll();
         }
@@ -231,7 +238,8 @@ namespace FluentMigrator.Tests.Unit
 
             _stopWatch.Setup(x => x.ElapsedTime()).Returns(ts);
 
-            _runner.Down(new TestMigration());
+            var runner = CreateRunner();
+            runner.Down(new TestMigration());
 
             _announcer.VerifyAll();
         }
@@ -241,7 +249,8 @@ namespace FluentMigrator.Tests.Unit
         {
             _processorMock.Setup(x => x.Process(It.IsAny<CreateTableExpression>())).Throws(new Exception("Oops"));
 
-            var exception = Assert.Throws<Exception>(() => _runner.Up(new TestMigration()));
+            var runner = CreateRunner();
+            var exception = Assert.Throws<Exception>(() => runner.Up(new TestMigration()));
 
             Assert.That(exception.Message, Does.Contain("Oops"));
         }
@@ -253,7 +262,8 @@ namespace FluentMigrator.Tests.Unit
 
             _stopWatch.Setup(x => x.ElapsedTime()).Returns(new TimeSpan(0, 0, 0, 1, 3));
 
-            _runner.Up(new TestMigration());
+            var runner = CreateRunner();
+            runner.Up(new TestMigration());
 
             _announcer.VerifyAll();
         }
@@ -266,7 +276,8 @@ namespace FluentMigrator.Tests.Unit
 
             _stopWatch.Setup(x => x.ElapsedTime()).Returns(ts);
 
-            _runner.Up(new TestMigration());
+            var runner = CreateRunner();
+            runner.Up(new TestMigration());
 
             _announcer.VerifyAll();
         }
@@ -285,7 +296,8 @@ namespace FluentMigrator.Tests.Unit
             _fakeVersionLoader.Versions.Remove(fakeMigrationVersion2);
             _fakeVersionLoader.LoadVersionInfo();
 
-            _runner.HasMigrationsToApplyUp().ShouldBeTrue();
+            var runner = CreateRunner();
+            runner.HasMigrationsToApplyUp().ShouldBeTrue();
         }
 
         [Test]
@@ -295,7 +307,8 @@ namespace FluentMigrator.Tests.Unit
             long fakeMigrationVersion2 = 2009010102;
             LoadVersionData(fakeMigrationVersion1, fakeMigrationVersion2);
 
-            _runner.HasMigrationsToApplyUp().ShouldBeFalse();
+            var runner = CreateRunner();
+            runner.HasMigrationsToApplyUp().ShouldBeFalse();
         }
 
         [Test]
@@ -307,7 +320,8 @@ namespace FluentMigrator.Tests.Unit
             _fakeVersionLoader.Versions.Remove(fakeMigrationVersion2);
             _fakeVersionLoader.LoadVersionInfo();
 
-            _runner.HasMigrationsToApplyUp(fakeMigrationVersion2).ShouldBeTrue();
+            var runner = CreateRunner();
+            runner.HasMigrationsToApplyUp(fakeMigrationVersion2).ShouldBeTrue();
         }
 
         [Test]
@@ -319,7 +333,8 @@ namespace FluentMigrator.Tests.Unit
             _fakeVersionLoader.Versions.Remove(fakeMigrationVersion2);
             _fakeVersionLoader.LoadVersionInfo();
 
-            _runner.HasMigrationsToApplyUp(fakeMigrationVersion1).ShouldBeFalse();
+            var runner = CreateRunner();
+            runner.HasMigrationsToApplyUp(fakeMigrationVersion1).ShouldBeFalse();
         }
 
         [Test]
@@ -328,7 +343,8 @@ namespace FluentMigrator.Tests.Unit
             long fakeMigrationVersion1 = 2009010101;
             LoadVersionData(fakeMigrationVersion1);
 
-            _runner.HasMigrationsToApplyRollback().ShouldBeTrue();
+            var runner = CreateRunner();
+            runner.HasMigrationsToApplyRollback().ShouldBeTrue();
         }
 
         [Test]
@@ -336,7 +352,8 @@ namespace FluentMigrator.Tests.Unit
         {
             LoadVersionData();
 
-            _runner.HasMigrationsToApplyRollback().ShouldBeFalse();
+            var runner = CreateRunner();
+            runner.HasMigrationsToApplyRollback().ShouldBeFalse();
         }
 
 
@@ -349,7 +366,8 @@ namespace FluentMigrator.Tests.Unit
             _fakeVersionLoader.Versions.Remove(fakeMigrationVersion2);
             _fakeVersionLoader.LoadVersionInfo();
 
-            _runner.HasMigrationsToApplyDown(fakeMigrationVersion1).ShouldBeFalse();
+            var runner = CreateRunner();
+            runner.HasMigrationsToApplyDown(fakeMigrationVersion1).ShouldBeFalse();
         }
 
         [Test]
@@ -359,7 +377,8 @@ namespace FluentMigrator.Tests.Unit
             long fakeMigrationVersion2 = 2009010102;
             LoadVersionData(fakeMigrationVersion1, fakeMigrationVersion2);
 
-            _runner.HasMigrationsToApplyDown(fakeMigrationVersion1).ShouldBeTrue();
+            var runner = CreateRunner();
+            runner.HasMigrationsToApplyDown(fakeMigrationVersion1).ShouldBeTrue();
         }
 
         [Test]
@@ -368,12 +387,13 @@ namespace FluentMigrator.Tests.Unit
             long fakeMigrationVersion = 2009010101;
             long fakeMigrationVersion2 = 2009010102;
 
-            Assert.NotNull(_runner.VersionLoader.VersionTableMetaData.TableName);
+            var runner = CreateRunner();
+            Assert.NotNull(runner.VersionLoader.VersionTableMetaData.TableName);
 
             LoadVersionData(fakeMigrationVersion, fakeMigrationVersion2);
 
-            _runner.VersionLoader.LoadVersionInfo();
-            _runner.Rollback(1);
+            runner.VersionLoader.LoadVersionInfo();
+            runner.Rollback(1);
 
             _fakeVersionLoader.DidRemoveVersionTableGetCalled.ShouldBeFalse();
 
@@ -386,9 +406,10 @@ namespace FluentMigrator.Tests.Unit
 
             LoadVersionData(fakeMigrationVersion);
 
-            Assert.NotNull(_runner.VersionLoader.VersionTableMetaData.TableName);
+            var runner = CreateRunner();
+            Assert.NotNull(runner.VersionLoader.VersionTableMetaData.TableName);
 
-            _runner.Rollback(1);
+            runner.Rollback(1);
 
             _fakeVersionLoader.DidRemoveVersionTableGetCalled.ShouldBeTrue();
         }
@@ -396,9 +417,11 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void RollbackToVersionZeroShouldDeleteVersionInfoTable()
         {
-            Assert.NotNull(_runner.VersionLoader.VersionTableMetaData.TableName);
+            var runner = CreateRunner();
 
-            _runner.RollbackToVersion(0);
+            Assert.NotNull(runner.VersionLoader.VersionTableMetaData.TableName);
+
+            runner.RollbackToVersion(0);
 
             _fakeVersionLoader.DidRemoveVersionTableGetCalled.ShouldBeTrue();
 
@@ -407,9 +430,11 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void RollbackToVersionZeroShouldNotCreateVersionInfoTableAfterRemoval()
         {
-            var versionInfoTableName = _runner.VersionLoader.VersionTableMetaData.TableName;
+            var runner = CreateRunner();
 
-            _runner.RollbackToVersion(0);
+            var versionInfoTableName = runner.VersionLoader.VersionTableMetaData.TableName;
+
+            runner.RollbackToVersion(0);
 
             //Should only be called once in setup
             _processorMock.Verify(
@@ -432,7 +457,8 @@ namespace FluentMigrator.Tests.Unit
             _fakeVersionLoader.Versions.Add(fakeMigration2);
             _fakeVersionLoader.LoadVersionInfo();
 
-            _runner.RollbackToVersion(2011010101);
+            var runner = CreateRunner();
+            runner.RollbackToVersion(2011010101);
 
             _fakeVersionLoader.Versions.ShouldContain(fakeMigration1);
             _fakeVersionLoader.Versions.ShouldContain(fakeMigration2);
@@ -452,7 +478,8 @@ namespace FluentMigrator.Tests.Unit
             _migrationList.Remove(fakeMigration2);
             _fakeVersionLoader.LoadVersionInfo();
 
-            _runner.RollbackToVersion(0);
+            var runner = CreateRunner();
+            runner.RollbackToVersion(0);
 
             _fakeVersionLoader.Versions.ShouldContain(fakeMigration1);
             _fakeVersionLoader.Versions.ShouldContain(fakeMigration2);
@@ -471,7 +498,8 @@ namespace FluentMigrator.Tests.Unit
             _fakeVersionLoader.Versions.Add(fakeMigration2);
             _fakeVersionLoader.LoadVersionInfo();
 
-            _runner.Rollback(2);
+            var runner = CreateRunner();
+            runner.Rollback(2);
 
             _fakeVersionLoader.Versions.ShouldNotContain(fakeMigration1);
             _fakeVersionLoader.Versions.ShouldContain(fakeMigration2);
@@ -483,9 +511,11 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void RollbackToVersionShouldLoadVersionInfoIfVersionGreaterThanZero()
         {
-            var versionInfoTableName = _runner.VersionLoader.VersionTableMetaData.TableName;
+            var runner = CreateRunner();
 
-            _runner.RollbackToVersion(1);
+            var versionInfoTableName = runner.VersionLoader.VersionTableMetaData.TableName;
+
+            runner.RollbackToVersion(1);
 
             _fakeVersionLoader.DidRemoveVersionTableGetCalled.ShouldBeFalse();
 
@@ -516,7 +546,8 @@ namespace FluentMigrator.Tests.Unit
             _migrationList.Add(version1,new MigrationInfo(version1, TransactionBehavior.Default, mockMigration1.Object));
             _migrationList.Add(version2, new MigrationInfo(version2, TransactionBehavior.Default, mockMigration2.Object));
 
-            Assert.DoesNotThrow(() => _runner.ValidateVersionOrder());
+            var runner = CreateRunner();
+            Assert.DoesNotThrow(() => runner.ValidateVersionOrder());
 
             _announcer.Verify(a => a.Say("Version ordering valid."));
 
@@ -538,7 +569,8 @@ namespace FluentMigrator.Tests.Unit
             _migrationList.Add(version1, new MigrationInfo(version1, TransactionBehavior.Default, mockMigration1.Object));
             _migrationList.Add(version2, new MigrationInfo(version2, TransactionBehavior.Default, mockMigration2.Object));
 
-            Assert.DoesNotThrow(() => _runner.ValidateVersionOrder());
+            var runner = CreateRunner();
+            Assert.DoesNotThrow(() => runner.ValidateVersionOrder());
 
             _announcer.Verify(a => a.Say("Version ordering valid."));
 
@@ -566,7 +598,8 @@ namespace FluentMigrator.Tests.Unit
             _migrationList.Add(version3, new MigrationInfo(version3, TransactionBehavior.Default, mockMigration3.Object));
             _migrationList.Add(version4, new MigrationInfo(version4, TransactionBehavior.Default, mockMigration4.Object));
 
-            var exception = Assert.Throws<VersionOrderInvalidException>(() => _runner.ValidateVersionOrder());
+            var runner = CreateRunner();
+            var exception = Assert.Throws<VersionOrderInvalidException>(() => runner.ValidateVersionOrder());
 
             var invalidMigrations = exception.InvalidMigrations.ToList();
             invalidMigrations.Count().ShouldBe(2);
@@ -597,7 +630,8 @@ namespace FluentMigrator.Tests.Unit
             _migrationList.Add(version3, new MigrationInfo(version3, TransactionBehavior.Default, mockMigration3.Object));
             _migrationList.Add(version4, new MigrationInfo(version4, TransactionBehavior.Default, true, mockMigration4.Object));
 
-            _runner.ListMigrations();
+            var runner = CreateRunner();
+            runner.ListMigrations();
 
             _announcer.Verify(a => a.Say("2011010101: IMigrationProxy"));
             _announcer.Verify(a => a.Say("2011010102: IMigrationProxy (not applied)"));
@@ -612,7 +646,8 @@ namespace FluentMigrator.Tests.Unit
             var invalidExpression = new UpdateDataExpression {TableName = "Test"};
             invalidMigration.Setup(m => m.GetUpExpressions(It.IsAny<IMigrationContext>())).Callback((IMigrationContext mc) => mc.Expressions.Add(invalidExpression));
 
-            Assert.Throws<InvalidMigrationException>(() => _runner.Up(invalidMigration.Object));
+            var runner = CreateRunner();
+            Assert.Throws<InvalidMigrationException>(() => runner.Up(invalidMigration.Object));
 
             var expectedErrorMessage = ErrorMessages.UpdateDataExpressionMustSpecifyWhereClauseOrAllRows;
             _announcer.Verify(a => a.Error(It.Is<string>(s => s.Contains($"UpdateDataExpression: {expectedErrorMessage}"))));
@@ -625,7 +660,8 @@ namespace FluentMigrator.Tests.Unit
             var invalidExpression = new UpdateDataExpression { TableName = "Test" };
             invalidMigration.Setup(m => m.GetDownExpressions(It.IsAny<IMigrationContext>())).Callback((IMigrationContext mc) => mc.Expressions.Add(invalidExpression));
 
-            Assert.Throws<InvalidMigrationException>(() => _runner.Down(invalidMigration.Object));
+            var runner = CreateRunner();
+            Assert.Throws<InvalidMigrationException>(() => runner.Down(invalidMigration.Object));
 
             var expectedErrorMessage = ErrorMessages.UpdateDataExpressionMustSpecifyWhereClauseOrAllRows;
             _announcer.Verify(a => a.Error(It.Is<string>(s => s.Contains($"UpdateDataExpression: {expectedErrorMessage}"))));
@@ -640,7 +676,8 @@ namespace FluentMigrator.Tests.Unit
             invalidMigration.Setup(m => m.GetUpExpressions(It.IsAny<IMigrationContext>()))
                 .Callback((IMigrationContext mc) => { mc.Expressions.Add(invalidExpression); mc.Expressions.Add(secondInvalidExpression); });
 
-            Assert.Throws<InvalidMigrationException>(() => _runner.Up(invalidMigration.Object));
+            var runner = CreateRunner();
+            Assert.Throws<InvalidMigrationException>(() => runner.Up(invalidMigration.Object));
 
             _announcer.Verify(a => a.Error(It.Is<string>(s => s.Contains($"UpdateDataExpression: {ErrorMessages.UpdateDataExpressionMustSpecifyWhereClauseOrAllRows}"))));
             _announcer.Verify(a => a.Error(It.Is<string>(s => s.Contains($"CreateColumnExpression: {ErrorMessages.TableNameCannotBeNullOrEmpty} {ErrorMessages.ColumnNameCannotBeNullOrEmpty} {ErrorMessages.ColumnTypeMustBeDefined}"))));
@@ -649,35 +686,27 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void CanLoadCustomMigrationConventions()
         {
-            Assert.That(_runner.Conventions, Is.TypeOf<CustomMigrationConventions>());
+            var runner = CreateRunner();
+            Assert.That(runner.Conventions, Is.TypeOf<CustomMigrationConventions>());
         }
 
         [Test]
         public void CanLoadDefaultMigrationConventionsIfNoCustomConventionsAreSpecified()
         {
             var processorMock = new Mock<IMigrationProcessor>(MockBehavior.Loose);
-
-            var options = new ProcessorOptions
-            {
-                PreviewOnly = false
-            };
-
-            processorMock.SetupGet(x => x.Options).Returns(options);
-
             var runner = (MigrationRunner) processorMock.Object.CreateServices()
-                .AddScoped<IMigrationProcessorOptions>(_ => options)
-                .WithRunnerContext(_runnerContextMock.Object)
                 .BuildServiceProvider()
                 .GetRequiredService<IMigrationRunner>();
-
             Assert.That(runner.Conventions, Is.TypeOf<MigrationRunnerConventions>());
         }
 
         [Test]
         public void CanBlockBreakingChangesByDefault()
         {
+            var runner = CreateRunner();
+
             InvalidOperationException ex = Assert.Throws<InvalidOperationException>(() =>
-                _runner.ApplyMigrationUp(
+                runner.ApplyMigrationUp(
                     new MigrationInfo(7, TransactionBehavior.Default, true, new TestBreakingMigration()), true));
 
             Assert.NotNull(ex);
@@ -690,22 +719,27 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void CanRunBreakingChangesIfSpecified()
         {
-            _runnerContextMock.SetupGet(rcm => rcm.AllowBreakingChange).Returns(true);
+            _serviceCollection
+                .Configure<RunnerOptions>(opt => opt.AllowBreakingChange = true);
+
+            var runner = CreateRunner();
 
             Assert.DoesNotThrow(() =>
-                _runner.ApplyMigrationUp(
+                runner.ApplyMigrationUp(
                     new MigrationInfo(7, TransactionBehavior.Default, true, new TestBreakingMigration()), true));
         }
 
         [Test]
         public void CanRunBreakingChangesInPreview()
         {
-            _runnerContextMock.SetupGet(rcm => rcm.PreviewOnly).Returns(true);
+            _serviceCollection
+                .Configure<RunnerOptions>(opt => opt.AllowBreakingChange = true)
+                .Configure<ProcessorOptions>(opt => opt.PreviewOnly = true);
 
-            _runnerContextMock.SetupGet(rcm => rcm.AllowBreakingChange).Returns(true);
+            var runner = CreateRunner();
 
             Assert.DoesNotThrow(() =>
-                _runner.ApplyMigrationUp(
+                runner.ApplyMigrationUp(
                     new MigrationInfo(7, TransactionBehavior.Default, true, new TestBreakingMigration()), true));
         }
 
