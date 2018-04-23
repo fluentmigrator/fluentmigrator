@@ -16,7 +16,6 @@
 
 using FluentMigrator.Runner.Generators.DB2;
 using FluentMigrator.Runner.Generators.DB2.iSeries;
-using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.DB2;
 using FluentMigrator.Runner.Processors.DB2.iSeries;
 
@@ -38,8 +37,11 @@ namespace FluentMigrator.Runner
         {
             builder.Services
                 .AddScoped<Db2DbFactory>()
-                .AddScoped<IMigrationProcessor, Db2Processor>()
-                .AddScoped<IMigrationGenerator, Db2Generator>();
+                .AddScoped<Db2Processor>()
+                .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<Db2Processor>())
+                .AddScoped<Db2Quoter>()
+                .AddScoped<Db2Generator>()
+                .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<Db2Generator>());
             return builder;
         }
 
@@ -52,8 +54,11 @@ namespace FluentMigrator.Runner
         {
             builder.Services
                 .AddScoped<Db2ISeriesDbFactory>()
-                .AddScoped<IMigrationProcessor, Db2ISeriesProcessor>()
-                .AddScoped<IMigrationGenerator, Db2ISeriesGenerator>();
+                .AddScoped<Db2ISeriesProcessor>()
+                .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<Db2ISeriesProcessor>())
+                .AddScoped<Db2ISeriesQuoter>()
+                .AddScoped<Db2ISeriesGenerator>()
+                .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<Db2ISeriesGenerator>());
             return builder;
         }
     }

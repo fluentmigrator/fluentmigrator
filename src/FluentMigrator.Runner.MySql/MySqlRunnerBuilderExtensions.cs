@@ -15,7 +15,6 @@
 #endregion
 
 using FluentMigrator.Runner.Generators.MySql;
-using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.MySql;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -36,8 +35,11 @@ namespace FluentMigrator.Runner
         {
             builder.Services
                 .AddScoped<MySqlDbFactory>()
-                .AddScoped<IMigrationProcessor, MySqlProcessor>()
-                .AddScoped<IMigrationGenerator, MySql4Generator>();
+                .AddScoped<MySql4Processor>()
+                .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<MySql4Processor>())
+                .AddScoped<MySqlQuoter>()
+                .AddScoped<MySql4Generator>()
+                .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<MySql4Generator>());
             return builder;
         }
 
@@ -50,8 +52,11 @@ namespace FluentMigrator.Runner
         {
             builder.Services
                 .AddScoped<MySqlDbFactory>()
-                .AddScoped<IMigrationProcessor, MySqlProcessor>()
-                .AddScoped<IMigrationGenerator, MySql5Generator>();
+                .AddScoped<MySql5Processor>()
+                .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<MySql5Processor>())
+                .AddScoped<MySqlQuoter>()
+                .AddScoped<MySql5Generator>()
+                .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<MySql5Generator>());
             return builder;
         }
     }

@@ -26,10 +26,13 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 {
     public class SqlServerCeGenerator : SqlServer2000Generator
     {
-        private static readonly IQuoter _quoter = new SqlServer2000Quoter();
-
         public SqlServerCeGenerator()
-            : base(new SqlServerCeColumn(new SqlServerCeTypeMap(), _quoter), _quoter, new EmptyDescriptionGenerator())
+            : this(new SqlServer2000Quoter())
+        {
+        }
+
+        public SqlServerCeGenerator(SqlServer2000Quoter quoter)
+            : base(new SqlServerCeColumn(new SqlServerCeTypeMap(), quoter), quoter, new EmptyDescriptionGenerator())
         {
         }
 

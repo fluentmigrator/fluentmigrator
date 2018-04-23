@@ -20,9 +20,6 @@ using System;
 
 using FluentMigrator.Runner.Generators.Redshift;
 
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-
 namespace FluentMigrator.Runner.Processors.Redshift
 {
     [Obsolete]
@@ -46,7 +43,7 @@ namespace FluentMigrator.Runner.Processors.Redshift
         {
             var factory = new RedshiftDbFactory(_serviceProvider);
             var connection = factory.CreateConnection(connectionString);
-            return new RedshiftProcessor(connection, new RedshiftGenerator(), announcer, options, factory);
+            return new RedshiftProcessor(connection, new RedshiftGenerator(new RedshiftQuoter()), announcer, options, factory);
         }
     }
 }

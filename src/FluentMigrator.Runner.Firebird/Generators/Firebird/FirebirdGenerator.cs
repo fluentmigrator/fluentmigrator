@@ -36,12 +36,15 @@ namespace FluentMigrator.Runner.Generators.Firebird
         [Obsolete("Use the Truncator property")]
         protected readonly FirebirdTruncator truncator;
 
-        public FirebirdGenerator()
-            : this(new FirebirdOptions())
+        public FirebirdGenerator([NotNull] FirebirdOptions fbOptions)
+            : this(new FirebirdQuoter(fbOptions.ForceQuote), fbOptions)
         {
         }
 
-        public FirebirdGenerator([NotNull] FirebirdOptions fbOptions) : base(new FirebirdColumn(fbOptions), new FirebirdQuoter(fbOptions.ForceQuote), new EmptyDescriptionGenerator())
+        public FirebirdGenerator(
+            [NotNull] FirebirdQuoter quoter,
+            [NotNull] FirebirdOptions fbOptions)
+            : base(new FirebirdColumn(fbOptions), quoter, new EmptyDescriptionGenerator())
         {
             FBOptions = fbOptions ?? throw new ArgumentNullException(nameof(fbOptions));
 #pragma warning disable 618

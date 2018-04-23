@@ -18,7 +18,6 @@ using System;
 using System.Data;
 using System.IO;
 using System.Collections.Generic;
-using System.Data.Common;
 using System.Diagnostics;
 
 using FluentMigrator.Expressions;
@@ -26,6 +25,7 @@ using FluentMigrator.Runner.BatchParser;
 using FluentMigrator.Runner.BatchParser.RangeSearchers;
 using FluentMigrator.Runner.BatchParser.Sources;
 using FluentMigrator.Runner.BatchParser.SpecialTokenSearchers;
+using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.Runner.Helpers;
 using FluentMigrator.Runner.Initialization;
 
@@ -49,7 +49,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public SqlServerCeProcessor(
             [NotNull] SqlServerCeDbFactory factory,
-            [NotNull] IMigrationGenerator generator,
+            [NotNull] SqlServerCeGenerator generator,
             [NotNull] IAnnouncer announcer,
             [NotNull] IOptions<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor)

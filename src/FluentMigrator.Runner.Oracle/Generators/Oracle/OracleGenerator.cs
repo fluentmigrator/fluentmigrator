@@ -44,18 +44,12 @@ namespace FluentMigrator.Runner.Generators.Oracle
         {
         }
 
-        public OracleGenerator(IOptions<ProcessorOptions> options)
-            : this(GetQuoter(options.Value.IsQuotingForced()))
-        {
-
-        }
-
-        internal OracleGenerator(IQuoter quoter)
+        public OracleGenerator(OracleQuoterBase quoter)
             : base(new OracleColumn(quoter), quoter, new OracleDescriptionGenerator())
         {
         }
 
-        private static IQuoter GetQuoter(bool useQuotedIdentifiers)
+        private static OracleQuoterBase GetQuoter(bool useQuotedIdentifiers)
         {
             return useQuotedIdentifiers ? new OracleQuoterQuotedIdentifier() : new OracleQuoter();
         }

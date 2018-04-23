@@ -19,12 +19,12 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
 using System.Linq;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.DB2;
+using FluentMigrator.Runner.Generators.DB2.iSeries;
 using FluentMigrator.Runner.Helpers;
 using FluentMigrator.Runner.Initialization;
 
@@ -45,13 +45,14 @@ namespace FluentMigrator.Runner.Processors.DB2.iSeries
 
         public Db2ISeriesProcessor(
             [NotNull] Db2ISeriesDbFactory factory,
-            [NotNull] IMigrationGenerator generator,
+            [NotNull] Db2ISeriesGenerator generator,
+            [NotNull] Db2ISeriesQuoter quoter,
             [NotNull] IAnnouncer announcer,
             [NotNull] IOptions<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor)
             : base(factory.Factory, generator, announcer, options.Value, connectionStringAccessor)
         {
-            Quoter = new Db2Quoter();
+            Quoter = quoter;
         }
 
         public override string DatabaseType => "DB2 iSeries";

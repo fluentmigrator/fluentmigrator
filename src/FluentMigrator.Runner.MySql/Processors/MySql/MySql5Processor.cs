@@ -14,24 +14,29 @@
 // limitations under the License.
 #endregion
 
-using FluentMigrator.Runner.Generators.Oracle;
+using FluentMigrator.Runner.Generators.MySql;
 using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
 using Microsoft.Extensions.Options;
 
-namespace FluentMigrator.Runner.Processors.Oracle
+namespace FluentMigrator.Runner.Processors.MySql
 {
-    public class OracleManagedProcessor : OracleProcessorBase
+    public class MySql5Processor : MySqlProcessor
     {
-        public OracleManagedProcessor(
-            [NotNull] OracleManagedDbFactory factory,
-            [NotNull] OracleGenerator generator,
+        /// <inheritdoc />
+        public MySql5Processor(
+            [NotNull] MySqlDbFactory factory,
+            [NotNull] MySql5Generator generator,
             [NotNull] IAnnouncer announcer,
             [NotNull] IOptions<ProcessorOptions> options,
-            [NotNull] IConnectionStringAccessor connectionStringAccessor)
-            : base("OracleManaged", factory, generator, announcer, options, connectionStringAccessor)
+            [NotNull] IConnectionStringAccessor connectionStringAccessor) : base(
+            factory,
+            generator,
+            announcer,
+            options,
+            connectionStringAccessor)
         {
         }
     }

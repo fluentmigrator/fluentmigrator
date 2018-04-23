@@ -32,12 +32,20 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
     public class SqlAnywhere16Generator : GenericGenerator
     {
         public SqlAnywhere16Generator()
-            : base(new SqlAnywhereColumn(new SqlAnywhere16TypeMap()), new SqlAnywhereQuoter(), new EmptyDescriptionGenerator())
+            : this(new SqlAnywhereQuoter())
         {
         }
 
-        protected SqlAnywhere16Generator(IColumn column, IDescriptionGenerator descriptionGenerator)
-            : base(column, new SqlAnywhereQuoter(), descriptionGenerator)
+        public SqlAnywhere16Generator(SqlAnywhereQuoter quoter)
+            : base(new SqlAnywhereColumn(new SqlAnywhere16TypeMap()), quoter, new EmptyDescriptionGenerator())
+        {
+        }
+
+        protected SqlAnywhere16Generator(
+            IColumn column,
+            IDescriptionGenerator descriptionGenerator,
+            IQuoter quoter)
+            : base(column, quoter, descriptionGenerator)
         {
         }
 

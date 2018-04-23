@@ -19,11 +19,11 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
 using System.Data.OleDb;
 using System.Diagnostics;
 
 using FluentMigrator.Expressions;
+using FluentMigrator.Runner.Generators.Jet;
 using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
@@ -51,7 +51,7 @@ namespace FluentMigrator.Runner.Processors.Jet
         }
 
         public JetProcessor(
-            [NotNull] IMigrationGenerator generator,
+            [NotNull] JetGenerator generator,
             [NotNull] IAnnouncer announcer,
             [NotNull] IOptions<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor)

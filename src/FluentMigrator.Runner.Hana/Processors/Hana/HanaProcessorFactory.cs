@@ -20,9 +20,6 @@ using System;
 
 using FluentMigrator.Runner.Generators.Hana;
 
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-
 namespace FluentMigrator.Runner.Processors.Hana
 {
     [Obsolete]
@@ -47,7 +44,7 @@ namespace FluentMigrator.Runner.Processors.Hana
 
             var connection = factory.CreateConnection(connectionString);
 
-            return new HanaProcessor(connection, new HanaGenerator(), announcer, options, factory);
+            return new HanaProcessor(connection, new HanaGenerator(new HanaQuoter()), announcer, options, factory);
         }
     }
 }

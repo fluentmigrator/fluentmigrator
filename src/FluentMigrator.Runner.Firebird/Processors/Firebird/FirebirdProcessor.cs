@@ -19,7 +19,6 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -55,11 +54,9 @@ namespace FluentMigrator.Runner.Processors.Firebird
         public FirebirdProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory, FirebirdOptions fbOptions)
             : base(connection, factory, generator, announcer, options)
         {
-            if (fbOptions == null)
-                throw new ArgumentNullException(nameof(fbOptions));
+            FBOptions = fbOptions ?? throw new ArgumentNullException(nameof(fbOptions));
             _firebirdVersionFunc = new Lazy<Version>(GetFirebirdVersion);
             _quoter = new FirebirdQuoter(fbOptions.ForceQuote);
-            FBOptions = fbOptions;
             truncator = new FirebirdTruncator(FBOptions.TruncateLongNames, FBOptions.PackKeyNames);
             ClearLocks();
             ClearDDLFollowers();
@@ -67,18 +64,17 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
         public FirebirdProcessor(
             [NotNull] FirebirdDbFactory factory,
-            [NotNull] IMigrationGenerator generator,
+            [NotNull] FirebirdGenerator generator,
+            [NotNull] FirebirdQuoter quoter,
             [NotNull] IAnnouncer announcer,
             [NotNull] IOptions<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor,
             [NotNull] FirebirdOptions fbOptions)
             : base(factory.Factory, generator, announcer, options.Value, connectionStringAccessor)
         {
-            if (fbOptions == null)
-                throw new ArgumentNullException(nameof(fbOptions));
+            FBOptions = fbOptions ?? throw new ArgumentNullException(nameof(fbOptions));
             _firebirdVersionFunc = new Lazy<Version>(GetFirebirdVersion);
-            _quoter = new FirebirdQuoter(fbOptions.ForceQuote);
-            FBOptions = fbOptions;
+            _quoter = quoter;
 #pragma warning disable 618
             truncator = new FirebirdTruncator(FBOptions.TruncateLongNames, FBOptions.PackKeyNames);
 #pragma warning restore 618

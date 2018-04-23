@@ -27,7 +27,12 @@ namespace FluentMigrator.Runner.Generators.MySql
     public class MySql4Generator : GenericGenerator
     {
         public MySql4Generator()
-            : base(new MySqlColumn(new MySql4TypeMap(), new MySqlQuoter()), new MySqlQuoter(), new EmptyDescriptionGenerator())
+            : this(new MySqlQuoter())
+        {
+        }
+
+        public MySql4Generator(MySqlQuoter quoter)
+            : base(new MySqlColumn(new MySql4TypeMap(), quoter), quoter, new EmptyDescriptionGenerator())
         {
         }
 

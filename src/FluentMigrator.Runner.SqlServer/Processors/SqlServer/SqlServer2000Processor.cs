@@ -40,7 +40,6 @@ using FluentMigrator.Runner.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
 using System.Data.SqlClient;
 using System.IO;
 
@@ -48,6 +47,7 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Runner.BatchParser;
 using FluentMigrator.Runner.BatchParser.Sources;
 using FluentMigrator.Runner.BatchParser.SpecialTokenSearchers;
+using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
@@ -65,8 +65,8 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         }
 
         public SqlServer2000Processor(
-            [NotNull] IMigrationGenerator generator,
             [NotNull] IAnnouncer announcer,
+            [NotNull] SqlServer2000Generator generator,
             [NotNull] IOptions<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor)
             : base(SqlClientFactory.Instance, generator, announcer, options.Value, connectionStringAccessor)

@@ -20,9 +20,6 @@ using System;
 
 using FluentMigrator.Runner.Generators.Oracle;
 
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-
 namespace FluentMigrator.Runner.Processors.DotConnectOracle
 {
     [Obsolete]

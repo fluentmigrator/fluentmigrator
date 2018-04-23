@@ -6,7 +6,12 @@ namespace FluentMigrator.Runner.Generators.Jet
     public class JetGenerator : GenericGenerator
     {
         public JetGenerator()
-            : base(new JetColumn(), new JetQuoter(), new EmptyDescriptionGenerator())
+            : this(new JetQuoter())
+        {
+        }
+
+        public JetGenerator(JetQuoter quoter)
+            : base(new JetColumn(), quoter, new EmptyDescriptionGenerator())
         {
         }
 

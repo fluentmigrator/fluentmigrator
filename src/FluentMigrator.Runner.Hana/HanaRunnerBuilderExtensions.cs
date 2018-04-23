@@ -15,7 +15,6 @@
 #endregion
 
 using FluentMigrator.Runner.Generators.Hana;
-using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Hana;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -36,8 +35,11 @@ namespace FluentMigrator.Runner
         {
             builder.Services
                 .AddScoped<HanaDbFactory>()
-                .AddScoped<IMigrationProcessor, HanaProcessor>()
-                .AddScoped<IMigrationGenerator, HanaGenerator>();
+                .AddScoped<HanaProcessor>()
+                .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<HanaProcessor>())
+                .AddScoped<HanaQuoter>()
+                .AddScoped<HanaGenerator>()
+                .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<HanaGenerator>());
             return builder;
         }
     }

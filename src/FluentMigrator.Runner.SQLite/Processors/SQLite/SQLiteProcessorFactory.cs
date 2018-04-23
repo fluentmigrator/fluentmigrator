@@ -20,9 +20,6 @@ using System;
 
 using FluentMigrator.Runner.Generators.SQLite;
 
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-
 namespace FluentMigrator.Runner.Processors.SQLite
 {
     // ReSharper disable once InconsistentNaming
@@ -46,7 +43,7 @@ namespace FluentMigrator.Runner.Processors.SQLite
         {
             var factory = new SQLiteDbFactory(_serviceProvider);
             var connection = factory.CreateConnection(connectionString);
-            return new SQLiteProcessor(connection, new SQLiteGenerator(), announcer, options, factory);
+            return new SQLiteProcessor(connection, new SQLiteGenerator(new SQLiteQuoter()), announcer, options, factory);
         }
     }
 }

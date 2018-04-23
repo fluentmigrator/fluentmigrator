@@ -17,16 +17,9 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
-using System.Linq;
-using System.Text.RegularExpressions;
 
-using FluentMigrator.Expressions;
-using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Oracle;
-using FluentMigrator.Runner.Helpers;
 using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
@@ -51,7 +44,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
 
         public OracleProcessor(
             [NotNull] OracleDbFactory factory,
-            [NotNull] IMigrationGenerator generator,
+            [NotNull] OracleGenerator generator,
             [NotNull] IAnnouncer announcer,
             [NotNull] IOptions<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor)

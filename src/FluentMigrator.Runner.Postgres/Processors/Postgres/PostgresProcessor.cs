@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
 using System.IO;
 
 using FluentMigrator.Expressions;
@@ -31,7 +30,7 @@ namespace FluentMigrator.Runner.Processors.Postgres
 
         public PostgresProcessor(
             [NotNull] PostgresDbFactory factory,
-            [NotNull] IMigrationGenerator generator,
+            [NotNull] PostgresGenerator generator,
             [NotNull] IAnnouncer announcer,
             [NotNull] IOptions<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor)

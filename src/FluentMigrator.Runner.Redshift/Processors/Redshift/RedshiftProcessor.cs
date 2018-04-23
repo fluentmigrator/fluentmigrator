@@ -19,7 +19,6 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
 using System.IO;
 
 using FluentMigrator.Expressions;
@@ -49,7 +48,7 @@ namespace FluentMigrator.Runner.Processors.Redshift
 
         public RedshiftProcessor(
             [NotNull] RedshiftDbFactory factory,
-            [NotNull] IMigrationGenerator generator,
+            [NotNull] RedshiftGenerator generator,
             [NotNull] IAnnouncer announcer,
             [NotNull] IOptions<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor)

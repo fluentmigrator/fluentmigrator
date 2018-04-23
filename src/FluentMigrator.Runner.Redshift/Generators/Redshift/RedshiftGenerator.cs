@@ -28,7 +28,13 @@ namespace FluentMigrator.Runner.Generators.Redshift
 {
     public class RedshiftGenerator : GenericGenerator
     {
-        public RedshiftGenerator() : base(new RedshiftColumn(), new RedshiftQuoter(), new RedshiftDescriptionGenerator())
+        public RedshiftGenerator()
+            : this(new RedshiftQuoter())
+        {
+        }
+
+        public RedshiftGenerator(RedshiftQuoter quoter)
+            : base(new RedshiftColumn(), quoter, new RedshiftDescriptionGenerator())
         {
         }
 

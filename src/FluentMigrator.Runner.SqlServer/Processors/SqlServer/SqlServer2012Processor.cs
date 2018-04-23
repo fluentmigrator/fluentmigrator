@@ -14,8 +14,6 @@
 // limitations under the License.
 #endregion
 
-using System.Collections.Generic;
-
 using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.Runner.Initialization;
 
@@ -30,9 +28,11 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         /// <inheritdoc />
         public SqlServer2012Processor(
             [NotNull] IAnnouncer announcer,
+            [NotNull] SqlServer2008Quoter quoter,
+            [NotNull] SqlServer2012Generator generator,
             [NotNull] IOptions<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor)
-            : base(new[] { "SqlServer2012", "SqlServer" }, new SqlServer2012Generator(), new SqlServer2008Quoter(), announcer, options, connectionStringAccessor)
+            : base(new[] { "SqlServer2012", "SqlServer" }, generator, quoter, announcer, options, connectionStringAccessor)
         {
         }
     }

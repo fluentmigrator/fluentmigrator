@@ -15,7 +15,6 @@
 #endregion
 
 using FluentMigrator.Runner.Generators.SqlServer;
-using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.SqlServer;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -36,8 +35,11 @@ namespace FluentMigrator.Runner
         {
             builder.Services
                 .AddScoped<SqlServerCeDbFactory>()
-                .AddScoped<IMigrationProcessor, SqlServerCeProcessor>()
-                .AddScoped<IMigrationGenerator, SqlServerCeGenerator>();
+                .AddScoped<SqlServerCeProcessor>()
+                .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<SqlServerCeProcessor>())
+                .AddScoped<SqlServer2000Generator>()
+                .AddScoped<SqlServerCeGenerator>()
+                .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<SqlServerCeGenerator>());
             return builder;
         }
     }

@@ -27,6 +27,7 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Runner.BatchParser;
 using FluentMigrator.Runner.BatchParser.Sources;
 using FluentMigrator.Runner.BatchParser.SpecialTokenSearchers;
+using FluentMigrator.Runner.Generators.SQLite;
 using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
@@ -59,7 +60,7 @@ namespace FluentMigrator.Runner.Processors.SQLite
 
         public SQLiteProcessor(
             [NotNull] SQLiteDbFactory factory,
-            [NotNull] IMigrationGenerator generator,
+            [NotNull] SQLiteGenerator generator,
             [NotNull] IAnnouncer announcer,
             [NotNull] IOptions<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor)

@@ -15,7 +15,6 @@
 #endregion
 
 using FluentMigrator.Runner.Generators.SQLite;
-using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.SQLite;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -38,8 +37,11 @@ namespace FluentMigrator.Runner
         {
             builder.Services
                 .AddScoped<SQLiteDbFactory>()
-                .AddScoped<IMigrationProcessor, SQLiteProcessor>()
-                .AddScoped<IMigrationGenerator, SQLiteGenerator>();
+                .AddScoped<SQLiteProcessor>()
+                .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<SQLiteProcessor>())
+                .AddScoped<SQLiteQuoter>()
+                .AddScoped<SQLiteGenerator>()
+                .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<SQLiteGenerator>());
             return builder;
         }
     }

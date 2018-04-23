@@ -15,7 +15,6 @@
 #endregion
 
 using FluentMigrator.Runner.Generators.SqlAnywhere;
-using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.SqlAnywhere;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -36,8 +35,11 @@ namespace FluentMigrator.Runner
         {
             builder.Services
                 .AddScoped<SqlAnywhereDbFactory>()
-                .AddScoped<IMigrationProcessor, SqlAnywhere16Processor>()
-                .AddScoped<IMigrationGenerator, SqlAnywhere16Generator>();
+                .AddScoped<SqlAnywhereProcessor>()
+                .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<SqlAnywhereProcessor>())
+                .AddScoped<SqlAnywhereQuoter>()
+                .AddScoped<SqlAnywhere16Generator>()
+                .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<SqlAnywhere16Generator>());
             return builder;
         }
     }

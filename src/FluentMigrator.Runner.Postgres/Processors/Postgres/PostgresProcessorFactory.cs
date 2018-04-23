@@ -20,9 +20,6 @@ using System;
 
 using FluentMigrator.Runner.Generators.Postgres;
 
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-
 namespace FluentMigrator.Runner.Processors.Postgres
 {
     [Obsolete]
@@ -46,7 +43,7 @@ namespace FluentMigrator.Runner.Processors.Postgres
         {
             var factory = new PostgresDbFactory(_serviceProvider);
             var connection = factory.CreateConnection(connectionString);
-            return new PostgresProcessor(connection, new PostgresGenerator(), announcer, options, factory);
+            return new PostgresProcessor(connection, new PostgresGenerator(new PostgresQuoter()), announcer, options, factory);
         }
     }
 }

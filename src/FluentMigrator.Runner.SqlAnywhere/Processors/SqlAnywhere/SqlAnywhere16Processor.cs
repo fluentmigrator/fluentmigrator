@@ -17,22 +17,8 @@
 //
 #endregion
 
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.Common;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-
-using FluentMigrator.Expressions;
-using FluentMigrator.Infrastructure.Extensions;
-using FluentMigrator.Runner.BatchParser;
-using FluentMigrator.Runner.BatchParser.Sources;
-using FluentMigrator.Runner.BatchParser.SpecialTokenSearchers;
-using FluentMigrator.Runner.Helpers;
+using FluentMigrator.Runner.Generators.SqlAnywhere;
 using FluentMigrator.Runner.Initialization;
-using FluentMigrator.SqlAnywhere;
 
 using JetBrains.Annotations;
 
@@ -45,7 +31,7 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
     {
         public SqlAnywhere16Processor(
             [NotNull] SqlAnywhereDbFactory factory,
-            [NotNull] IMigrationGenerator generator,
+            [NotNull] SqlAnywhere16Generator generator,
             [NotNull] IAnnouncer announcer,
             [NotNull] IOptions<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor)

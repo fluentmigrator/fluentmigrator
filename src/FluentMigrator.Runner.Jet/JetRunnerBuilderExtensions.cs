@@ -15,7 +15,6 @@
 #endregion
 
 using FluentMigrator.Runner.Generators.Jet;
-using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Jet;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -35,8 +34,11 @@ namespace FluentMigrator.Runner
         public static IMigrationRunnerBuilder AddJet(this IMigrationRunnerBuilder builder)
         {
             builder.Services
-                .AddScoped<IMigrationProcessor, JetProcessor>()
-                .AddScoped<IMigrationGenerator, JetGenerator>();
+                .AddScoped<JetProcessor>()
+                .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<JetProcessor>())
+                .AddScoped<JetQuoter>()
+                .AddScoped<JetGenerator>()
+                .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<JetGenerator>());
             return builder;
         }
     }

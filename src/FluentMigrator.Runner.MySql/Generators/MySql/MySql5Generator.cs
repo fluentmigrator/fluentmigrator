@@ -19,7 +19,12 @@ namespace FluentMigrator.Runner.Generators.MySql
     public class MySql5Generator : MySql4Generator
     {
         public MySql5Generator()
-            : base(new MySqlColumn(new MySql5TypeMap(), new MySqlQuoter()), new MySqlQuoter(), new EmptyDescriptionGenerator())
+            : this(new MySqlQuoter())
+        {
+        }
+
+        public MySql5Generator(MySqlQuoter quoter)
+            : base(new MySqlColumn(new MySql5TypeMap(), quoter), quoter, new EmptyDescriptionGenerator())
         {
         }
 

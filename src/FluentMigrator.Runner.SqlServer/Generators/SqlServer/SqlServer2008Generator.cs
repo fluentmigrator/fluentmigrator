@@ -33,10 +33,13 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             SqlServerExtensions.IndexColumnNullsDistinct,
         };
 
-        private static readonly IQuoter _quoter = new SqlServer2008Quoter();
-
         public SqlServer2008Generator()
-            : base(new SqlServer2005Column(new SqlServer2008TypeMap(), _quoter), _quoter, new SqlServer2005DescriptionGenerator())
+            : this(new SqlServer2008Quoter())
+        {
+        }
+
+        public SqlServer2008Generator(SqlServer2008Quoter quoter)
+            : base(new SqlServer2005Column(new SqlServer2008TypeMap(), quoter), quoter, new SqlServer2005DescriptionGenerator())
         {
         }
 

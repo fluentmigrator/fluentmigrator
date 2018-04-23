@@ -29,10 +29,13 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 {
     public class SqlServer2000Generator : GenericGenerator
     {
-        private static readonly SqlServer2000Quoter _quoter = new SqlServer2000Quoter();
-
         public SqlServer2000Generator()
-            : this(new SqlServer2000Column(new SqlServer2000TypeMap(), _quoter), _quoter, new EmptyDescriptionGenerator())
+            : this(new SqlServer2000Quoter())
+        {
+        }
+
+        public SqlServer2000Generator(SqlServer2000Quoter quoter)
+            : this(new SqlServer2000Column(new SqlServer2000TypeMap(), quoter), quoter, new EmptyDescriptionGenerator())
         {
         }
 

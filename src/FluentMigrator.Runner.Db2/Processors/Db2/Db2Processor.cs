@@ -19,7 +19,6 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators;
@@ -44,13 +43,14 @@ namespace FluentMigrator.Runner.Processors.DB2
 
         public Db2Processor(
             [NotNull] Db2DbFactory factory,
-            [NotNull] IMigrationGenerator generator,
+            [NotNull] Db2Generator generator,
+            [NotNull] Db2Quoter quoter,
             [NotNull] IAnnouncer announcer,
             [NotNull] IOptions<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor)
             : base(factory.Factory, generator, announcer, options.Value, connectionStringAccessor)
         {
-            Quoter = new Db2Quoter();
+            Quoter = quoter;
         }
 
         public override string DatabaseType => "DB2";

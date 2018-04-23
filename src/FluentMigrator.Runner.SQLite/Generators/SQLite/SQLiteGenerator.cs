@@ -26,7 +26,12 @@ namespace FluentMigrator.Runner.Generators.SQLite
     public class SQLiteGenerator : GenericGenerator
     {
         public SQLiteGenerator()
-            : base(new SQLiteColumn(), new SQLiteQuoter(), new EmptyDescriptionGenerator())
+            : this(new SQLiteQuoter())
+        {
+        }
+
+        public SQLiteGenerator(SQLiteQuoter quoter)
+            : base(new SQLiteColumn(), quoter, new EmptyDescriptionGenerator())
         {
         }
 

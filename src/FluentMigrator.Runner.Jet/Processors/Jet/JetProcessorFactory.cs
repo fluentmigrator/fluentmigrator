@@ -30,7 +30,7 @@ namespace FluentMigrator.Runner.Processors.Jet
         public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
         {
             var connection = new OleDbConnection(connectionString);
-            return new JetProcessor(connection, new JetGenerator(), announcer, options);
+            return new JetProcessor(connection, new JetGenerator(new JetQuoter()), announcer, options);
         }
     }
 }

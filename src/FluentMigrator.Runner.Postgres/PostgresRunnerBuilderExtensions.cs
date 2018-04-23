@@ -15,7 +15,6 @@
 #endregion
 
 using FluentMigrator.Runner.Generators.Postgres;
-using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Postgres;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -36,8 +35,11 @@ namespace FluentMigrator.Runner
         {
             builder.Services
                 .AddScoped<PostgresDbFactory>()
-                .AddScoped<IMigrationProcessor, PostgresProcessor>()
-                .AddScoped<IMigrationGenerator, PostgresGenerator>();
+                .AddScoped<PostgresProcessor>()
+                .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<PostgresProcessor>())
+                .AddScoped<PostgresQuoter>()
+                .AddScoped<PostgresGenerator>()
+                .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<PostgresGenerator>());
             return builder;
         }
     }

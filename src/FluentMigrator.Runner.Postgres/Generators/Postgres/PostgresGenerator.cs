@@ -10,7 +10,13 @@ namespace FluentMigrator.Runner.Generators.Postgres
 {
     public class PostgresGenerator : GenericGenerator
     {
-        public PostgresGenerator() : base(new PostgresColumn(), new PostgresQuoter(), new PostgresDescriptionGenerator())
+        public PostgresGenerator()
+            : this(new PostgresQuoter())
+        {
+        }
+
+        public PostgresGenerator(PostgresQuoter quoter)
+            : base(new PostgresColumn(), quoter, new PostgresDescriptionGenerator())
         {
         }
 

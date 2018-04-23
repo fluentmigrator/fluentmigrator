@@ -54,8 +54,11 @@ namespace FluentMigrator.Runner
                         return ((FirebirdOptions)fbOptions.Clone()).ApplyProviderSwitches(processorOptions.Value.ProviderSwitches);
                     })
                 .AddScoped<FirebirdDbFactory>()
-                .AddScoped<IMigrationProcessor, FirebirdProcessor>()
-                .AddScoped<IMigrationGenerator, FirebirdGenerator>();
+                .AddScoped<FirebirdProcessor>()
+                .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<FirebirdProcessor>())
+                .AddScoped<FirebirdQuoter>()
+                .AddScoped<FirebirdGenerator>()
+                .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<FirebirdGenerator>());
 
             return builder;
         }

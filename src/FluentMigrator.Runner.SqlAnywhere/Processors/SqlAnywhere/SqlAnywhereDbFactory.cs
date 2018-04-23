@@ -14,8 +14,6 @@
 // limitations under the License.
 #endregion
 
-using System;
-
 namespace FluentMigrator.Runner.Processors.SqlAnywhere
 {
     public class SqlAnywhereDbFactory : ReflectionBasedDbFactory

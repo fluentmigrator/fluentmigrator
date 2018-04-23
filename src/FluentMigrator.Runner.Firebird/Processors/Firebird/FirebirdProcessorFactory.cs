@@ -20,7 +20,6 @@ using System;
 
 using FluentMigrator.Runner.Generators.Firebird;
 
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.Firebird

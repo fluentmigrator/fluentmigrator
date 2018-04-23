@@ -20,9 +20,6 @@ using System;
 
 using FluentMigrator.Runner.Generators.DB2;
 
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-
 namespace FluentMigrator.Runner.Processors.DB2
 {
     [Obsolete]

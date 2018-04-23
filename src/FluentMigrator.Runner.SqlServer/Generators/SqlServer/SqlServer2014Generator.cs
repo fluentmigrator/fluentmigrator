@@ -19,6 +19,12 @@ namespace FluentMigrator.Runner.Generators.SqlServer
     public class SqlServer2014Generator : SqlServer2012Generator
     {
         public SqlServer2014Generator()
+            : this(new SqlServer2008Quoter())
+        {
+        }
+
+        public SqlServer2014Generator(SqlServer2008Quoter quoter)
+            : base(quoter)
         {
         }
 

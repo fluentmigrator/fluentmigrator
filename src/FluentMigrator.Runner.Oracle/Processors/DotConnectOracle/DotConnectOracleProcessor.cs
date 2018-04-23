@@ -19,9 +19,9 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
 
 using FluentMigrator.Expressions;
+using FluentMigrator.Runner.Generators.Oracle;
 using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
@@ -47,7 +47,7 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
 
         public DotConnectOracleProcessor(
             [NotNull] DotConnectOracleDbFactory factory,
-            [NotNull] IMigrationGenerator generator,
+            [NotNull] OracleGenerator generator,
             [NotNull] IAnnouncer announcer,
             [NotNull] IOptions<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor)
