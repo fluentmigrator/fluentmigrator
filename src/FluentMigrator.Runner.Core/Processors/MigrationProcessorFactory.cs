@@ -18,6 +18,7 @@ using System;
 
 namespace FluentMigrator.Runner.Processors
 {
+    [Obsolete]
     public abstract class MigrationProcessorFactory : IMigrationProcessorFactory
     {
         public virtual string Name => GetType().Name.Replace("ProcessorFactory", string.Empty);

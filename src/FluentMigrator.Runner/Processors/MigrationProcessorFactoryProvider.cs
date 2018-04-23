@@ -36,6 +36,7 @@ using FluentMigrator.Runner.Processors.SQLite;
 
 namespace FluentMigrator.Runner.Processors
 {
+    [Obsolete]
     public class MigrationProcessorFactoryProvider
     {
         private static readonly object _lock = new object();
