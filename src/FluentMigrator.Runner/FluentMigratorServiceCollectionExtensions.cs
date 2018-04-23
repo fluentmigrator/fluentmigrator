@@ -131,7 +131,6 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddScoped<IConnectionStringReader, AppConfigConnectionStringReader>()
 #endif
 
-                .AddScoped<IConnectionStringReader, PassThroughConnectionStringReader>()
                 .AddScoped<IConnectionStringReader, ConfigurationConnectionStringReader>()
 
                 // The connection string accessor that evaluates the readers
