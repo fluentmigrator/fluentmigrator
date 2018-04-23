@@ -47,7 +47,7 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void CanFindMigrationsInAssembly()
         {
-            var loader = ServiceCollectionExtensions.CreateServiceCollection()
+            var loader = ServiceCollectionExtensions.CreateServices()
                 .WithMigrationsIn("FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass1")
                 .BuildServiceProvider()
                 .GetRequiredService<IMigrationInformationLoader>();
@@ -62,7 +62,7 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void CanFindMigrationsInNamespace()
         {
-            var loader = ServiceCollectionExtensions.CreateServiceCollection()
+            var loader = ServiceCollectionExtensions.CreateServices()
                 .WithMigrationsIn("FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass1")
                 .BuildServiceProvider()
                 .GetRequiredService<IMigrationInformationLoader>();
@@ -75,7 +75,7 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void DefaultBehaviorIsToNotLoadNestedNamespaces()
         {
-            var loader = ServiceCollectionExtensions.CreateServiceCollection()
+            var loader = ServiceCollectionExtensions.CreateServices()
                 .WithMigrationsIn("FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass1")
                 .BuildServiceProvider()
                 .GetRequiredService<IMigrationInformationLoader>();
@@ -90,7 +90,7 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void FindsMigrationsInNestedNamespaceWhenLoadNestedNamespacesEnabled()
         {
-            var loader = ServiceCollectionExtensions.CreateServiceCollection()
+            var loader = ServiceCollectionExtensions.CreateServices()
                 .WithMigrationsIn("FluentMigrator.Tests.Integration.Migrations.Nested", true)
                 .BuildServiceProvider()
                 .GetRequiredService<IMigrationInformationLoader>();
@@ -112,7 +112,7 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void DoesNotFindsMigrationsInNestedNamespaceWhenLoadNestedNamespacesDisabled()
         {
-            var loader = ServiceCollectionExtensions.CreateServiceCollection()
+            var loader = ServiceCollectionExtensions.CreateServices()
                 .WithMigrationsIn("FluentMigrator.Tests.Integration.Migrations.Nested")
                 .BuildServiceProvider()
                 .GetRequiredService<IMigrationInformationLoader>();
@@ -140,13 +140,10 @@ namespace FluentMigrator.Tests.Unit
             conventionsMock.SetupGet(m => m.TypeHasTags).Returns(t => migrationType == t);
             conventionsMock.SetupGet(m => m.TypeHasMatchingTags).Returns((type, tags) => (migrationType == type && tagsToMatch == tags));
 
-            var loader = ServiceCollectionExtensions.CreateServiceCollection()
+            var loader = ServiceCollectionExtensions.CreateServices()
                 .WithMigrationsIn(migrationType.Namespace)
-                .WithRunnerContext(sp => new RunnerContext(sp.GetRequiredService<IAnnouncer>())
-                {
-                    Tags = tagsToMatch,
-                })
-                .WithRunnerConventions(conventionsMock.Object)
+                .Configure<RunnerOptions>(opt => opt.Tags = tagsToMatch)
+                .ConfigureRunner(builder => builder.WithRunnerConventions(conventionsMock.Object))
                 .BuildServiceProvider()
                 .GetRequiredService<IMigrationInformationLoader>();
 
@@ -169,13 +166,10 @@ namespace FluentMigrator.Tests.Unit
             conventionsMock.SetupGet(m => m.TypeHasTags).Returns(t => migrationType == t);
             conventionsMock.SetupGet(m => m.TypeHasMatchingTags).Returns((type, tags) => false);
 
-            var loader = ServiceCollectionExtensions.CreateServiceCollection()
+            var loader = ServiceCollectionExtensions.CreateServices()
                 .WithMigrationsIn(migrationType.Namespace)
-                .WithRunnerContext(sp => new RunnerContext(sp.GetRequiredService<IAnnouncer>())
-                {
-                    Tags = tagsToMatch,
-                })
-                .WithRunnerConventions(conventionsMock.Object)
+                .Configure<RunnerOptions>(opt => opt.Tags = tagsToMatch)
+                .ConfigureRunner(builder => builder.WithRunnerConventions(conventionsMock.Object))
                 .BuildServiceProvider()
                 .GetRequiredService<IMigrationInformationLoader>();
 
@@ -189,7 +183,7 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void HandlesNotFindingMigrations()
         {
-            var loader = ServiceCollectionExtensions.CreateServiceCollection()
+            var loader = ServiceCollectionExtensions.CreateServices()
                 .WithMigrationsIn("FluentMigrator.Tests.Unit.EmptyNamespace")
                 .BuildServiceProvider()
                 .GetRequiredService<IMigrationInformationLoader>();
@@ -199,7 +193,7 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void ShouldThrowExceptionIfDuplicateVersionNumbersAreLoaded()
         {
-            var loader = ServiceCollectionExtensions.CreateServiceCollection()
+            var loader = ServiceCollectionExtensions.CreateServices()
                 .WithMigrationsIn("FluentMigrator.Tests.Unit.DuplicateVersionNumbers")
                 .BuildServiceProvider()
                 .GetRequiredService<IMigrationInformationLoader>();
@@ -209,7 +203,7 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void HandlesMigrationThatDoesNotInheritFromMigrationBaseClass()
         {
-            var loader = ServiceCollectionExtensions.CreateServiceCollection()
+            var loader = ServiceCollectionExtensions.CreateServices()
                 .WithMigrationsIn("FluentMigrator.Tests.Unit.DoesNotInheritFromBaseClass")
                 .BuildServiceProvider()
                 .GetRequiredService<IMigrationInformationLoader>();
@@ -219,7 +213,7 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void ShouldHandleTransactionlessMigrations()
         {
-            var loader = ServiceCollectionExtensions.CreateServiceCollection()
+            var loader = ServiceCollectionExtensions.CreateServices()
                 .WithMigrationsIn("FluentMigrator.Tests.Unit.DoesHandleTransactionLessMigrations")
                 .BuildServiceProvider()
                 .GetRequiredService<IMigrationInformationLoader>();

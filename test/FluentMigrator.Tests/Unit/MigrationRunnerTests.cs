@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
@@ -50,13 +51,17 @@ namespace FluentMigrator.Tests.Unit
         private Mock<IMigrationInformationLoader> _migrationLoaderMock;
         private Mock<IProfileLoader> _profileLoaderMock;
         private Mock<IRunnerContext> _runnerContextMock;
+        private Mock<IAssemblySource> _assemblySourceMock;
         private SortedList<long, IMigrationInfo> _migrationList;
         private TestVersionLoader _fakeVersionLoader;
         private int _applicationContext;
 
         [SetUp]
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public void SetUp()
         {
+            var asm = Assembly.GetExecutingAssembly();
+
             _applicationContext = new Random().Next();
             _migrationList = new SortedList<long, IMigrationInfo>();
             _runnerContextMock = new Mock<IRunnerContext>(MockBehavior.Loose);
@@ -68,14 +73,6 @@ namespace FluentMigrator.Tests.Unit
             _stopWatch = new Mock<IStopWatch>();
             _stopWatch.Setup(x => x.Time(It.IsAny<Action>())).Returns(new TimeSpan(1)).Callback((Action a) => a.Invoke());
 
-            var options = new ProcessorOptions
-                            {
-                                PreviewOnly = false
-                            };
-
-            _processorMock.SetupGet(x => x.Options).Returns(options);
-            _processorMock.SetupGet(x => x.ConnectionString).Returns(IntegrationTestOptions.SqlServer2008.ConnectionString);
-
             _runnerContextMock.SetupGet(x => x.Namespace).Returns("FluentMigrator.Tests.Integration.Migrations");
             _runnerContextMock.SetupGet(x => x.Announcer).Returns(_announcer.Object);
             _runnerContextMock.SetupGet(x => x.StopWatch).Returns(_stopWatch.Object);
@@ -84,14 +81,29 @@ namespace FluentMigrator.Tests.Unit
             _runnerContextMock.SetupGet(x => x.Database).Returns("sqlserver");
             _runnerContextMock.SetupGet(x => x.ApplicationContext).Returns(_applicationContext);
 
+            _assemblySourceMock = new Mock<IAssemblySource>();
+            _assemblySourceMock.SetupGet(x => x.Assemblies).Returns(new[] { asm });
+
+            var options = new ProcessorOptions(_runnerContextMock.Object);
+
+            _processorMock.SetupGet(x => x.Options).Returns(options);
+            _processorMock.SetupGet(x => x.ConnectionString).Returns(IntegrationTestOptions.SqlServer2008.ConnectionString);
+
             _migrationLoaderMock.Setup(x => x.LoadMigrations()).Returns(()=> _migrationList);
 
+            var connectionString = IntegrationTestOptions.SqlServer2008.ConnectionString;
             var servicesProvider = _processorMock.Object.CreateServices()
                 .AddSingleton(_announcer.Object)
-                .WithRunnerContext(_runnerContextMock.Object)
-                .WithMigrations(_ => _migrationList.Values.Select(mi => mi.Migration))
-                .WithRunnerConventions(new CustomMigrationConventions())
-                .AddScoped(_ => _migrationLoaderMock.Object)
+                .AddSingleton(_assemblySourceMock.Object)
+                .AddSingleton(_migrationLoaderMock.Object)
+                .AddScoped<IConnectionStringReader>(sp => new PassThroughConnectionStringReader(connectionString))
+                .Configure<RunnerOptions>()
+                .Configure<ProcessorOptions>(
+                    opt => { opt.ConnectionString = connectionString; })
+                .Configure<AssemblySourceOptions>(opt => opt.AssemblyNames = new []{ asm.FullName })
+                .Configure<TypeFilterOptions>(
+                    opt => { opt.Namespace = "FluentMigrator.Tests.Integration.Migrations"; })
+                .ConfigureRunner(builder => builder.WithRunnerConventions(new CustomMigrationConventions()))
                 .BuildServiceProvider();
 
             _runner = (MigrationRunner) servicesProvider.GetRequiredService<IMigrationRunner>();

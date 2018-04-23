@@ -34,14 +34,20 @@ namespace FluentMigrator.Tests
     public static class ServiceCollectionExtensions
     {
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public static IServiceCollection CreateServices(this IMigrationProcessor processor)
+        public static IServiceCollection CreateServices()
         {
             return new ServiceCollection()
                 .AddFluentMigratorCore()
                 .AddSingleton<IAssemblySourceItem>(new AssemblySourceItem(Assembly.GetExecutingAssembly()))
                 .ConfigureRunner(builder => builder
                     .WithAnnouncer(new TextWriterAnnouncer(TestContext.Out) { ShowSql = true }))
-                .Configure<RunnerOptions>(opt => opt.AllowBreakingChange= true)
+                .Configure<RunnerOptions>(opt => opt.AllowBreakingChange= true);
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public static IServiceCollection CreateServices(this IMigrationProcessor processor)
+        {
+            return CreateServices()
                 .AddScoped(sp => new PassThroughProcessorAccessor(processor));
         }
 
