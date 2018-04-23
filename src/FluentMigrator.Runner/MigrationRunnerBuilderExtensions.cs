@@ -57,7 +57,9 @@ namespace FluentMigrator.Runner
             this IMigrationRunnerBuilder builder,
             IVersionTableMetaData versionTableMetaData)
         {
-            builder.Services.AddSingleton(_ => versionTableMetaData);
+            builder.Services
+                .AddSingleton<IVersionTableMetaDataAccessor>(
+                    new PassThroughVersionTableMetaDataAccessor(versionTableMetaData));
             return builder;
         }
 
@@ -71,7 +73,9 @@ namespace FluentMigrator.Runner
             this IMigrationRunnerBuilder builder,
             IMigrationRunnerConventions conventions)
         {
-            builder.Services.AddScoped(_ => conventions);
+            builder.Services
+                .AddSingleton<IMigrationRunnerConventionsAccessor>(
+                    new PassThroughMigrationRunnerConventionsAccessor(conventions));
             return builder;
         }
 
