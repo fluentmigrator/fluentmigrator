@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 //
 // Copyright (c) 2018, Fluent Migrator Project
 //
@@ -152,7 +152,7 @@ namespace FluentMigrator.Tests.Unit
         }
 
         [Test]
-        [Culture("en-us")]
+        [SetCulture("en-US")]
         public void TryingToCreateWithInvalidDayOfMonthResultsInArgumentOutOfRangeException()
         {
             // Arrange
@@ -164,7 +164,7 @@ namespace FluentMigrator.Tests.Unit
         }
 
         [Test]
-        [Culture("en-us")]
+        [SetCulture("en-US")]
         public void TryingToCreateWithInvalidHourResultsInArgumentOutOfRangeException()
         {
             // Arrange
@@ -176,7 +176,7 @@ namespace FluentMigrator.Tests.Unit
         }
 
         [Test]
-        [Culture("en-us")]
+        [SetCulture("en-US")]
         public void TryingToCreateWithInvalidMinuteResultsInArgumentOutOfRangeException()
         {
             // Arrange
@@ -188,7 +188,7 @@ namespace FluentMigrator.Tests.Unit
         }
 
         [Test]
-        [Culture("en-us")]
+        [SetCulture("en-US")]
         public void TryingToCreateWithInvalidMonthResultsInArgumentOutOfRangeException()
         {
             // Arrange
@@ -200,7 +200,7 @@ namespace FluentMigrator.Tests.Unit
         }
 
         [Test]
-        [Culture("en-us")]
+        [SetCulture("en-US")]
         public void TryingToCreateWithInvalidSecondResultsInArgumentOutOfRangeException()
         {
             // Arrange
@@ -212,7 +212,7 @@ namespace FluentMigrator.Tests.Unit
         }
 
         [Test]
-        [Culture("en-us")]
+        [SetCulture("en-US")]
         public void TryingToCreateWithInvalidYearResultsInArgumentOutOfRangeException()
         {
             // Arrange
