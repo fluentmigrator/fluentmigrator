@@ -55,7 +55,7 @@ namespace FluentMigrator.Tests.Integration
     [TestFixture]
     [Category("Integration")]
     [Obsolete]
-    public class ObsoleteMigrationRunnerTests : IntegrationTestBase
+    public class ObsoleteMigrationRunnerTests : ObsoleteIntegrationTestBase
     {
         private IRunnerContext _runnerContext;
 
