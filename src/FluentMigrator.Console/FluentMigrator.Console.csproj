@@ -46,26 +46,10 @@
       <HintPath>..\..\lib\Hana\ado.net\v3.5\Sap.Data.Hana.v3.5.dll</HintPath>
     </Reference>
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net452' and '$(Platform)' == 'x86' ">
-    <Reference Include="IBM.Data.DB2, Version=9.7.4.4, Culture=neutral, PublicKeyToken=7c307b91aa13d208">
-      <HintPath>..\..\lib\DB2\x86\IBM.Data.DB2.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net452' and '$(Platform)' == 'x64' ">
-    <Reference Include="IBM.Data.DB2">
-      <HintPath>..\..\lib\DB2\amd64\IBM.Data.DB2.dll</HintPath>
-    </Reference>
-  </ItemGroup>
   <ItemGroup Condition=" ('$(TargetFramework)' == 'net45'or '$(TargetFramework)' == 'net452')  and '$(Platform)' == 'x64' ">
     <Reference Include="Sap.Data.Hana.v4.5, Version=2.2.36.0, Culture=neutral, PublicKeyToken=0326b8ea63db4bc4">
       <HintPath>..\..\lib\Hana\ado.net\v4.5\Sap.Data.Hana.v4.5.dll</HintPath>
     </Reference>
-  </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net452' and '$(Platform)' != 'AnyCPU' ">
-    <Content Include="../../lib/DB2/clidriver/**/*.*">
-      <Link>clidriver/%(RecursiveDir)%(Filename)%(Extension)</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <ItemGroup Condition=" '$(Platform)' == 'x64' ">
     <Content Include="../../lib/Hana/*.*">
