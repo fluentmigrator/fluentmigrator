@@ -16,8 +16,6 @@
 
 using System.Collections.Generic;
 
-using FluentMigrator.Infrastructure;
-
 using JetBrains.Annotations;
 
 namespace FluentMigrator.Runner.Initialization

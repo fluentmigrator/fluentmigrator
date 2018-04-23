@@ -23,7 +23,6 @@ using FluentMigrator.Runner.Generators.Oracle;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Oracle;
 using FluentMigrator.Tests.Helpers;
-using FluentMigrator.Tests.Unit;
 
 using NUnit.Framework;
 

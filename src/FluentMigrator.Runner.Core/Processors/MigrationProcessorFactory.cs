@@ -15,10 +15,6 @@
 #endregion
 
 using System;
-using System.Data.Common;
-
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors
 {

@@ -16,8 +16,6 @@
 //
 #endregion
 
-using System;
-
 using JetBrains.Annotations;
 
 namespace FluentMigrator.Runner.Initialization
