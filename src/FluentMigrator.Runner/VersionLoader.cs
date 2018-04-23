@@ -27,6 +27,7 @@ using FluentMigrator.Runner.Versioning;
 using FluentMigrator.Runner.VersionTableInfo;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Conventions;
+using FluentMigrator.Runner.Processors;
 
 using JetBrains.Annotations;
 
@@ -89,14 +90,14 @@ namespace FluentMigrator.Runner
         }
 
         public VersionLoader(
-            [NotNull] IMigrationProcessor processor,
+            [NotNull] IProcessorAccessor processorAccessor,
             [NotNull] IConventionSet conventionSet,
             [NotNull] IMigrationRunnerConventions conventions,
             [NotNull] IVersionTableMetaData versionTableMetaData,
             [NotNull] IMigrationRunner runner)
         {
             _conventionSet = conventionSet;
-            _processor = processor;
+            _processor = processorAccessor.Processor;
 
             Runner = runner;
 

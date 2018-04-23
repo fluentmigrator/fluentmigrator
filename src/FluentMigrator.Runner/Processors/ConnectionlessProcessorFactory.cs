@@ -80,7 +80,7 @@ namespace FluentMigrator.Runner.Processors
         {
             var processorOptions = options.GetProcessorOptions(connectionString);
             return new ConnectionlessProcessor(
-                _generator,
+                new PassThroughGeneratorAccessor(_generator),
                 _announcer,
                 new OptionsWrapper<ProcessorOptions>(processorOptions),
                 new OptionsWrapper<SelectingProcessorAccessorOptions>(
@@ -95,5 +95,16 @@ namespace FluentMigrator.Runner.Processors
 
         /// <inheritdoc />
         public string Name { get; }
+
+        private class PassThroughGeneratorAccessor : IGeneratorAccessor
+        {
+            public PassThroughGeneratorAccessor(IMigrationGenerator generator)
+            {
+                Generator = generator;
+            }
+
+            /// <inheritdoc />
+            public IMigrationGenerator Generator { get; }
+        }
     }
 }

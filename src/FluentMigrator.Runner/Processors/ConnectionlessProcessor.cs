@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 //
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
 //
@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Data;
 
 using FluentMigrator.Expressions;
+using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
@@ -50,11 +51,12 @@ namespace FluentMigrator.Runner.Processors
         }
 
         public ConnectionlessProcessor(
-            [NotNull] IMigrationGenerator generator,
+            [NotNull] IGeneratorAccessor generatorAccessor,
             [NotNull] IAnnouncer announcer,
             [NotNull] IOptions<ProcessorOptions> options,
             [NotNull] IOptions<SelectingProcessorAccessorOptions> accessorOptions)
         {
+            var generator = generatorAccessor.Generator;
             DatabaseType = string.IsNullOrEmpty(accessorOptions.Value.ProcessorId) ? generator.GetName() : accessorOptions.Value.ProcessorId;
             Generator = generator;
             Announcer = announcer;

@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2018, FluentMigrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -35,7 +35,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
     public class OracleProcessorBase : GenericProcessorBase
     {
         [Obsolete]
-        public OracleProcessorBase(
+        protected OracleProcessorBase(
             [NotNull] string databaseType,
             IDbConnection connection,
             IMigrationGenerator generator,
@@ -47,7 +47,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
             DatabaseType = databaseType;
         }
 
-        public OracleProcessorBase(
+        protected OracleProcessorBase(
             [NotNull] string databaseType,
             [NotNull] OracleBaseDbFactory factory,
             [NotNull] IMigrationGenerator generator,

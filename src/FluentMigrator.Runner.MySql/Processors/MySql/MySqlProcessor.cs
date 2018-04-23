@@ -45,7 +45,7 @@ namespace FluentMigrator.Runner.Processors.MySql
         {
         }
 
-        public MySqlProcessor(
+        protected MySqlProcessor(
             [NotNull] MySqlDbFactory factory,
             [NotNull] IMigrationGenerator generator,
             [NotNull] IAnnouncer announcer,

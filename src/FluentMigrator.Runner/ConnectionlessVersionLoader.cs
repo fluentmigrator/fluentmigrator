@@ -24,6 +24,7 @@ using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Initialization;
+using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Versioning;
 using FluentMigrator.Runner.VersionTableInfo;
 
@@ -79,13 +80,13 @@ namespace FluentMigrator.Runner
         }
 
         public ConnectionlessVersionLoader(
-            [NotNull] IMigrationProcessor processor,
+            [NotNull] IProcessorAccessor processorAccessor,
             [NotNull] IMigrationRunnerConventions conventions,
             [NotNull] IOptions<RunnerOptions> runnerOptions,
             [NotNull] IMigrationInformationLoader migrationInformationLoader,
             [NotNull] IVersionTableMetaData versionTableMetaData)
         {
-            _processor = processor;
+            _processor = processorAccessor.Processor;
             _migrationInformationLoader = migrationInformationLoader;
             Conventions = conventions;
             StartVersion = runnerOptions.Value.StartVersion;

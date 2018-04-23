@@ -16,16 +16,18 @@
 
 using System;
 
+using FluentMigrator.Runner.Processors;
+
 namespace FluentMigrator.Runner
 {
     public class TransactionalMigrationScope : TrackingMigrationScope
     {
         private readonly IMigrationProcessor _migrationProcessor;
 
-        public TransactionalMigrationScope(IMigrationProcessor migrationProcessor, Action disposalAction)
+        public TransactionalMigrationScope(IMigrationProcessor processor, Action disposalAction)
             : base(disposalAction)
         {
-            _migrationProcessor = migrationProcessor ?? throw new ArgumentNullException(nameof(migrationProcessor));
+            _migrationProcessor = processor ?? throw new ArgumentNullException(nameof(processor));
             _migrationProcessor.BeginTransaction();
         }
 

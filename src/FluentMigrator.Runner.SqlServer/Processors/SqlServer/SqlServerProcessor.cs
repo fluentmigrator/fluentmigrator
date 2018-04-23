@@ -68,7 +68,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             Quoter = generator?.Quoter;
         }
 
-        public SqlServerProcessor(
+        protected SqlServerProcessor(
             [NotNull, ItemNotNull] IEnumerable<string> databaseTypes,
             [NotNull] IMigrationGenerator generator,
             [NotNull] IQuoter quoter,

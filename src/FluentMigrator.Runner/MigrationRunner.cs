@@ -154,21 +154,20 @@ namespace FluentMigrator.Runner
             [NotNull] IOptions<RunnerOptions> options,
             [NotNull] IOptions<ProcessorOptions> processorOptions,
             [NotNull] IProfileLoader profileLoader,
-            [NotNull] IMigrationProcessor processor,
+            [NotNull] IProcessorAccessor processorAccessor,
             [NotNull] IMaintenanceLoader maintenanceLoader,
             [NotNull] IMigrationInformationLoader migrationLoader,
             [NotNull] IAnnouncer announcer,
             [NotNull] IStopWatch stopWatch,
             [NotNull] IMigrationRunnerConventionsAccessor migrationRunnerConventionsAccessor,
             [NotNull] IAssemblySource assemblySource,
-            [NotNull] MigrationScopeHandler scopeHandler,
             [NotNull] MigrationValidator migrationValidator,
             [NotNull] IServiceProvider serviceProvider)
         {
             SilentlyFail = false;
             CaughtExceptions = null;
 
-            Processor = processor;
+            Processor = processorAccessor.Processor;
             Conventions = migrationRunnerConventionsAccessor.MigrationRunnerConventions;
             ProfileLoader = profileLoader;
             MaintenanceLoader = maintenanceLoader;
@@ -180,7 +179,7 @@ namespace FluentMigrator.Runner
             _stopWatch = stopWatch;
             _processorOptions = processorOptions.Value;
 
-            _migrationScopeHandler = scopeHandler;
+            _migrationScopeHandler = new MigrationScopeHandler(Processor);
             _migrationValidator = migrationValidator;
             _versionLoader = new Lazy<IVersionLoader>(serviceProvider.GetRequiredService<IVersionLoader>);
 

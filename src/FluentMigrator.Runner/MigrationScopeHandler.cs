@@ -18,6 +18,8 @@
 
 using System;
 
+using FluentMigrator.Runner.Processors;
+
 namespace FluentMigrator.Runner
 {
     public class MigrationScopeHandler

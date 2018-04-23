@@ -42,21 +42,12 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void CanLoadCustomVersionTableMetaData()
         {
-            var runnerContext = new Mock<IRunnerContext>();
-
-            var runner = new Mock<IMigrationRunner>();
-            runner.SetupGet(r => r.Processor.Options).Returns(new ProcessorOptions() { Timeout = TimeSpan.FromSeconds(30) });
-            runner.SetupGet(r => r.RunnerContext).Returns(runnerContext.Object);
-
-            var asm = Assembly.GetExecutingAssembly();
-
+            var processor = new Mock<IMigrationProcessor>();
             var serviceProvider = ServiceCollectionExtensions.CreateServices()
-                .AddScoped(_ => runner.Object)
-                .AddScoped(_ => runnerContext.Object)
+                .WithProcessor(processor)
                 .AddScoped(_ => ConventionSets.NoSchemaName)
-                .AddScoped<IMigrationRunnerConventions, MigrationRunnerConventions>()
-                .AddSingleton(sp => (IVersionTableMetaData)ActivatorUtilities.CreateInstance(sp, new[] { asm }.GetVersionTableMetaDataType(sp)))
-                .AddScoped<IVersionLoader, VersionLoader>()
+                .AddScoped<IMigrationRunnerConventionsAccessor>(sp => new PassThroughMigrationRunnerConventionsAccessor(new MigrationRunnerConventions()))
+                .AddScoped<IConnectionStringReader>(_ => new PassThroughConnectionStringReader("No connection"))
                 .BuildServiceProvider();
 
             var loader = serviceProvider.GetRequiredService<IVersionLoader>();

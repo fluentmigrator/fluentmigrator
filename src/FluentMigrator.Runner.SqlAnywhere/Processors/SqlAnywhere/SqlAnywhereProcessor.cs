@@ -62,7 +62,7 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
             DatabaseType = databaseType;
         }
 
-        public SqlAnywhereProcessor(
+        protected SqlAnywhereProcessor(
             [NotNull] string databaseType,
             [NotNull] DbProviderFactory factory,
             [NotNull] IMigrationGenerator generator,

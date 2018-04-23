@@ -109,12 +109,6 @@ namespace Microsoft.Extensions.DependencyInjection
                 // Provide a way to get the migration accessor selected by its options
                 .AddScoped<IProcessorAccessor, SelectingProcessorAccessor>()
 
-                // Provide a way to get the selected migration generator
-                .AddScoped(sp => sp.GetRequiredService<IGeneratorAccessor>().Generator)
-
-                // Provide a way to get the selected migration processor
-                .AddScoped(sp => sp.GetRequiredService<IProcessorAccessor>().Processor)
-
                 // IQuerySchema is the base interface for the IMigrationProcessor
                 .AddScoped<IQuerySchema>(sp => sp.GetRequiredService<IMigrationProcessor>())
 
