@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net40;net45</TargetFrameworks>
+    <TargetFrameworks>net40;net45;net452</TargetFrameworks>
     <AssemblyName>Migrate</AssemblyName>
     <PackageId>FluentMigrator.Console</PackageId>
     <SignAssembly>true</SignAssembly>
@@ -15,7 +15,7 @@
   <ItemGroup>
     <None Include="..\..\FluentMigrator.snk" Link="FluentMigrator.snk" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net40' or '$(TargetFramework)' == 'net45' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net40' or '$(TargetFramework)' == 'net45' or '$(TargetFramework)' == 'net452' ">
     <Reference Include="System.Configuration" />
   </ItemGroup>
   <ItemGroup>
@@ -24,14 +24,19 @@
   <ItemGroup Condition=" '$(TargetFramework)' == 'net40' ">
     <PackageReference Include="Npgsql" Version="2.2.7" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' or '$(TargetFramework)' == 'net452'  ">
     <PackageReference Include="Npgsql" Version="3.2.7" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="5.12.1" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="2.0.1" />
     <PackageReference Include="Oracle.ManagedDataAccess" Version="12.2.1100" />
-    <PackageReference Include="System.Data.SQLite.Core" Version="1.0.108" />
+  </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net40' or '$(TargetFramework)' == 'net45' ">
     <PackageReference Include="MySql.Data" Version="6.8.8" />
+  </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
+    <PackageReference Include="MySql.Data" Version="8.0.11" />
   </ItemGroup>
   <ItemGroup Condition=" '$(Platform)' == 'x86' ">
     <PackageReference Include="Oracle.DataAccess.x86.4" Version="4.112.3" />
@@ -41,20 +46,22 @@
       <HintPath>..\..\lib\Hana\ado.net\v3.5\Sap.Data.Hana.v3.5.dll</HintPath>
     </Reference>
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' and '$(Platform)' == 'x86' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net452' and '$(Platform)' == 'x86' ">
     <Reference Include="IBM.Data.DB2, Version=9.7.4.4, Culture=neutral, PublicKeyToken=7c307b91aa13d208">
       <HintPath>..\..\lib\DB2\x86\IBM.Data.DB2.dll</HintPath>
     </Reference>
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' and '$(Platform)' == 'x64' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net452' and '$(Platform)' == 'x64' ">
     <Reference Include="IBM.Data.DB2">
       <HintPath>..\..\lib\DB2\amd64\IBM.Data.DB2.dll</HintPath>
     </Reference>
+  </ItemGroup>
+  <ItemGroup Condition=" ('$(TargetFramework)' == 'net45'or '$(TargetFramework)' == 'net452')  and '$(Platform)' == 'x64' ">
     <Reference Include="Sap.Data.Hana.v4.5, Version=2.2.36.0, Culture=neutral, PublicKeyToken=0326b8ea63db4bc4">
       <HintPath>..\..\lib\Hana\ado.net\v4.5\Sap.Data.Hana.v4.5.dll</HintPath>
     </Reference>
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' and '$(Platform)' != 'AnyCPU' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net452' and '$(Platform)' != 'AnyCPU' ">
     <Content Include="../../lib/DB2/clidriver/**/*.*">
       <Link>clidriver/%(RecursiveDir)%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
