@@ -14,6 +14,8 @@
 // limitations under the License.
 #endregion
 
+#if NETFRAMEWORK
+
 using System;
 using System.Configuration;
 using System.Linq;
@@ -25,7 +27,6 @@ using JetBrains.Annotations;
 
 using Microsoft.Extensions.Options;
 
-#if NETFRAMEWORK
 namespace FluentMigrator.Runner.Initialization.NetFramework
 {
     /// <summary>
