@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2018, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,7 +25,7 @@ namespace FluentMigrator.Runner.BatchParser.RangeSearchers
         /// Initializes a new instance of the <see cref="PoundSignSingleLineComment"/> class.
         /// </summary>
         public PoundSignSingleLineComment()
-            : base("#")
+            : base("#", true)
         {
         }
     }
