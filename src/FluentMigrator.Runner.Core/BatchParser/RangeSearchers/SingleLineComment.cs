@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2018, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,6 +24,7 @@ namespace FluentMigrator.Runner.BatchParser.RangeSearchers
     /// </summary>
     public class SingleLineComment : IRangeSearcher
     {
+        private readonly bool _onlyAtBeginningOfLine;
         private readonly Regex _startCodeRegex;
 
         /// <summary>
@@ -31,7 +32,18 @@ namespace FluentMigrator.Runner.BatchParser.RangeSearchers
         /// </summary>
         /// <param name="startCode">The start code for the single line comment</param>
         public SingleLineComment(string startCode)
+            : this(startCode, false)
         {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SingleLineComment"/> class.
+        /// </summary>
+        /// <param name="startCode">The start code for the single line comment</param>
+        /// <param name="onlyAtBeginningOfLine">Find the start code only at the beginning of the line</param>
+        public SingleLineComment(string startCode, bool onlyAtBeginningOfLine)
+        {
+            _onlyAtBeginningOfLine = onlyAtBeginningOfLine;
             _startCodeRegex = new Regex(Regex.Escape(startCode), RegexOptions.CultureInvariant | RegexOptions.Compiled);
             StartCodeLength = startCode.Length;
         }
@@ -51,6 +63,14 @@ namespace FluentMigrator.Runner.BatchParser.RangeSearchers
             var match = _startCodeRegex.Match(reader.Line, reader.Index);
             if (!match.Success)
                 return -1;
+
+            if (_onlyAtBeginningOfLine)
+            {
+                var skippedText = reader.Line.Substring(0, match.Index);
+                if (!string.IsNullOrWhiteSpace(skippedText))
+                    return -1;
+            }
+
             return match.Index;
         }
 
