@@ -22,6 +22,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - `IProfileLoader.ApplyProfiles()`
 - `IProfileLoader.FindProfilesIn`
 
+## 2.0.6 (2018-04-24)
+
+### Fixed
+
+- [#859](https://github.com/fluentmigrator/fluentmigrator/issues/859): The pound sign is only recognized when it's only preceeded by whitespace
+
 ## 2.0.5 (2018-04-23)
 
 ### Added
