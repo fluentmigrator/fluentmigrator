@@ -14,6 +14,7 @@
 // limitations under the License.
 #endregion
 
+using FluentMigrator.Runner.BatchParser;
 using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.Runner.Processors.SqlServer;
 
@@ -37,6 +38,7 @@ namespace FluentMigrator.Runner
         public static IMigrationRunnerBuilder AddSqlServer(this IMigrationRunnerBuilder builder)
         {
             builder.Services
+                .AddTransient<SqlServerBatchParser>()
                 .AddScoped<SqlServer2016Processor>()
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<SqlServer2016Processor>())
                 .AddScoped<SqlServer2008Quoter>()
@@ -53,6 +55,7 @@ namespace FluentMigrator.Runner
         public static IMigrationRunnerBuilder AddSqlServer2000(this IMigrationRunnerBuilder builder)
         {
             builder.Services
+                .AddTransient<SqlServerBatchParser>()
                 .AddScoped<SqlServer2000Processor>()
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<SqlServer2000Processor>())
                 .AddScoped<SqlServer2000Quoter>()
@@ -69,6 +72,7 @@ namespace FluentMigrator.Runner
         public static IMigrationRunnerBuilder AddSqlServer2005(this IMigrationRunnerBuilder builder)
         {
             builder.Services
+                .AddTransient<SqlServerBatchParser>()
                 .AddScoped<SqlServer2005Processor>()
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<SqlServer2005Processor>())
                 .AddScoped<SqlServer2005Quoter>()
@@ -85,6 +89,7 @@ namespace FluentMigrator.Runner
         public static IMigrationRunnerBuilder AddSqlServer2008(this IMigrationRunnerBuilder builder)
         {
             builder.Services
+                .AddTransient<SqlServerBatchParser>()
                 .AddScoped<SqlServer2008Processor>()
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<SqlServer2008Processor>())
                 .AddScoped<SqlServer2008Quoter>()
@@ -101,6 +106,7 @@ namespace FluentMigrator.Runner
         public static IMigrationRunnerBuilder AddSqlServer2012(this IMigrationRunnerBuilder builder)
         {
             builder.Services
+                .AddTransient<SqlServerBatchParser>()
                 .AddScoped<SqlServer2012Processor>()
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<SqlServer2012Processor>())
                 .AddScoped<SqlServer2008Quoter>()
@@ -117,6 +123,7 @@ namespace FluentMigrator.Runner
         public static IMigrationRunnerBuilder AddSqlServer2014(this IMigrationRunnerBuilder builder)
         {
             builder.Services
+                .AddTransient<SqlServerBatchParser>()
                 .AddScoped<SqlServer2014Processor>()
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<SqlServer2014Processor>())
                 .AddScoped<SqlServer2008Quoter>()
@@ -133,6 +140,7 @@ namespace FluentMigrator.Runner
         public static IMigrationRunnerBuilder AddSqlServer2016(this IMigrationRunnerBuilder builder)
         {
             builder.Services
+                .AddTransient<SqlServerBatchParser>()
                 .AddScoped<SqlServer2016Processor>()
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<SqlServer2016Processor>())
                 .AddScoped<SqlServer2008Quoter>()

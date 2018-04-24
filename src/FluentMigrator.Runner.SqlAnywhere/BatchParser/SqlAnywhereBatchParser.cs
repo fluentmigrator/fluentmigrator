@@ -14,6 +14,7 @@
 // limitations under the License.
 #endregion
 
+using System;
 using System.Collections.Generic;
 
 using FluentMigrator.Runner.BatchParser.RangeSearchers;
@@ -57,6 +58,20 @@ namespace FluentMigrator.Runner.BatchParser
         /// <param name="newLine">The string used to write a new line sequence</param>
         public SqlAnywhereBatchParser(string newLine = null)
             : base(_rangeSearchers, _specialTokenSearchers, newLine)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SqlAnywhereBatchParser"/> class.
+        /// </summary>
+        /// <param name="rangeSearchers">The range searchers to be used</param>
+        /// <param name="specialTokenSearchers">The special token searchers to be used</param>
+        /// <param name="newLine">The new line sequence to be used for the output</param>
+        protected SqlAnywhereBatchParser(
+            [NotNull, ItemNotNull] IEnumerable<IRangeSearcher> rangeSearchers,
+            [NotNull, ItemNotNull] IEnumerable<ISpecialTokenSearcher> specialTokenSearchers,
+            string newLine = null)
+            : base(rangeSearchers, specialTokenSearchers, newLine)
         {
         }
     }

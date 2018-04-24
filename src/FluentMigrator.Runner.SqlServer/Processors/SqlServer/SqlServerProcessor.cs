@@ -32,12 +32,16 @@ using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
     public class SqlServerProcessor : GenericProcessorBase
     {
+        [CanBeNull]
+        private readonly IServiceProvider _serviceProvider;
+
         private const string SqlSchemaExists = "SELECT 1 WHERE EXISTS (SELECT * FROM sys.schemas WHERE NAME = '{0}') ";
         private const string TABLE_EXISTS = "SELECT 1 WHERE EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}')";
         private const string COLUMN_EXISTS = "SELECT 1 WHERE EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}' AND COLUMN_NAME = '{2}')";
@@ -74,9 +78,11 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             [NotNull] IQuoter quoter,
             [NotNull] IAnnouncer announcer,
             [NotNull] IOptions<ProcessorOptions> options,
-            [NotNull] IConnectionStringAccessor connectionStringAccessor)
+            [NotNull] IConnectionStringAccessor connectionStringAccessor,
+            [NotNull] IServiceProvider serviceProvider)
             : base(SqlClientFactory.Instance, generator, announcer, options.Value, connectionStringAccessor)
         {
+            _serviceProvider = serviceProvider;
             var dbTypes = databaseTypes.ToList();
             DatabaseType = dbTypes.First();
             DatabaseTypeAliases = dbTypes.Skip(1).ToList();
@@ -209,10 +215,10 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             }
         }
 
-        private static bool ContainsGo(string sql)
+        private bool ContainsGo(string sql)
         {
             var containsGo = false;
-            var parser = new SqlServerBatchParser();
+            var parser = _serviceProvider?.GetService<SqlServerBatchParser>() ?? new SqlServerBatchParser();
             parser.SpecialToken += (sender, args) => containsGo = true;
             using (var source = new TextReaderSource(new StringReader(sql), true))
             {
@@ -250,7 +256,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
             try
             {
-                var parser = new SqlServerBatchParser();
+                var parser = _serviceProvider?.GetService<SqlServerBatchParser>() ?? new SqlServerBatchParser();
                 parser.SqlText += (sender, args) => { sqlBatch = args.SqlText.Trim(); };
                 parser.SpecialToken += (sender, args) =>
                 {

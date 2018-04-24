@@ -14,6 +14,7 @@
 // limitations under the License.
 #endregion
 
+using FluentMigrator.Runner.BatchParser;
 using FluentMigrator.Runner.Generators.SqlAnywhere;
 using FluentMigrator.Runner.Processors.SqlAnywhere;
 
@@ -34,6 +35,7 @@ namespace FluentMigrator.Runner
         public static IMigrationRunnerBuilder AddSqlAnywhere(this IMigrationRunnerBuilder builder)
         {
             builder.Services
+                .AddTransient<SqlAnywhereBatchParser>()
                 .AddScoped<SqlAnywhereDbFactory>()
                 .AddScoped<SqlAnywhereProcessor>()
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<SqlAnywhereProcessor>())

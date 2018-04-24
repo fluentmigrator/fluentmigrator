@@ -36,12 +36,16 @@ using FluentMigrator.SqlAnywhere;
 
 using JetBrains.Annotations;
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.SqlAnywhere
 {
     public class SqlAnywhereProcessor : GenericProcessorBase
     {
+        [CanBeNull]
+        private readonly IServiceProvider _serviceProvider;
+
         //select 1 from sys.syscolumn as c inner join sys.systable as t on t.table_id = c.table_id where t.table_name = '{0}' and c.column_name = '{1}'
         private const string SCHEMA_EXISTS = "SELECT 1 WHERE EXISTS (SELECT * FROM sys.sysuserperm WHERE user_name = '{0}') ";
         private const string TABLE_EXISTS = "SELECT 1 WHERE EXISTS (SELECT t.* FROM sys.systable AS t INNER JOIN sys.sysuserperm AS up ON up.user_id = t.creator WHERE up.user_name = '{0}' AND t.table_name = '{1}')";
@@ -68,9 +72,11 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
             [NotNull] IMigrationGenerator generator,
             [NotNull] IAnnouncer announcer,
             [NotNull] IOptions<ProcessorOptions> options,
-            [NotNull] IConnectionStringAccessor connectionStringAccessor)
+            [NotNull] IConnectionStringAccessor connectionStringAccessor,
+            [NotNull] IServiceProvider serviceProvider)
             : base(factory, generator, announcer, options.Value, connectionStringAccessor)
         {
+            _serviceProvider = serviceProvider;
             DatabaseType = databaseType;
         }
 
@@ -248,10 +254,10 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
             }
         }
 
-        private static bool ContainsGo(string sql)
+        private bool ContainsGo(string sql)
         {
             var containsGo = false;
-            var parser = new SqlAnywhereBatchParser();
+            var parser = _serviceProvider?.GetService<SqlAnywhereBatchParser>() ?? new SqlAnywhereBatchParser();
             parser.SpecialToken += (sender, args) => containsGo = true;
             using (var source = new TextReaderSource(new StringReader(sql), true))
             {
@@ -295,7 +301,7 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
 
             try
             {
-                var parser = new SqlAnywhereBatchParser();
+                var parser = _serviceProvider?.GetService<SqlAnywhereBatchParser>() ?? new SqlAnywhereBatchParser();
                 parser.SqlText += (sender, args) => { sqlBatch = args.SqlText.Trim(); };
                 parser.SpecialToken += (sender, args) =>
                 {

@@ -17,6 +17,8 @@
 //
 #endregion
 
+using System;
+
 using FluentMigrator.Runner.Generators.SqlAnywhere;
 using FluentMigrator.Runner.Initialization;
 
@@ -34,8 +36,16 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
             [NotNull] SqlAnywhere16Generator generator,
             [NotNull] IAnnouncer announcer,
             [NotNull] IOptions<ProcessorOptions> options,
-            [NotNull] IConnectionStringAccessor connectionStringAccessor)
-            : base("SqlAnywhere16", factory.Factory, generator, announcer, options, connectionStringAccessor)
+            [NotNull] IConnectionStringAccessor connectionStringAccessor,
+            [NotNull] IServiceProvider serviceProvider)
+            : base(
+                "SqlAnywhere16",
+                factory.Factory,
+                generator,
+                announcer,
+                options,
+                connectionStringAccessor,
+                serviceProvider)
         {
         }
     }

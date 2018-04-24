@@ -14,6 +14,7 @@
 // limitations under the License.
 #endregion
 
+using FluentMigrator.Runner.BatchParser;
 using FluentMigrator.Runner.Generators.SQLite;
 using FluentMigrator.Runner.Processors.SQLite;
 
@@ -36,6 +37,7 @@ namespace FluentMigrator.Runner
         public static IMigrationRunnerBuilder AddSQLite(this IMigrationRunnerBuilder builder)
         {
             builder.Services
+                .AddTransient<SQLiteBatchParser>()
                 .AddScoped<SQLiteDbFactory>()
                 .AddScoped<SQLiteProcessor>()
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<SQLiteProcessor>())

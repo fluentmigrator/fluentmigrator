@@ -32,6 +32,7 @@ using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.SQLite
@@ -40,6 +41,9 @@ namespace FluentMigrator.Runner.Processors.SQLite
     // ReSharper disable once InconsistentNaming
     public class SQLiteProcessor : GenericProcessorBase
     {
+        [CanBeNull]
+        private readonly IServiceProvider _serviceProvider;
+
         public override string DatabaseType
         {
             get { return "SQLite"; }
@@ -63,9 +67,11 @@ namespace FluentMigrator.Runner.Processors.SQLite
             [NotNull] SQLiteGenerator generator,
             [NotNull] IAnnouncer announcer,
             [NotNull] IOptions<ProcessorOptions> options,
-            [NotNull] IConnectionStringAccessor connectionStringAccessor)
+            [NotNull] IConnectionStringAccessor connectionStringAccessor,
+            [NotNull] IServiceProvider serviceProvider)
             : base(factory.Factory, generator, announcer, options.Value, connectionStringAccessor)
         {
+            _serviceProvider = serviceProvider;
         }
 
         public override bool SchemaExists(string schemaName)
@@ -168,10 +174,10 @@ namespace FluentMigrator.Runner.Processors.SQLite
 
         }
 
-        private static bool ContainsGo(string sql)
+        private bool ContainsGo(string sql)
         {
             var containsGo = false;
-            var parser = new SQLiteBatchParser();
+            var parser = _serviceProvider?.GetService<SQLiteBatchParser>() ?? new SQLiteBatchParser();
             parser.SpecialToken += (sender, args) => containsGo = true;
             using (var source = new TextReaderSource(new StringReader(sql), true))
             {
@@ -202,7 +208,7 @@ namespace FluentMigrator.Runner.Processors.SQLite
 
             try
             {
-                var parser = new SQLiteBatchParser();
+                var parser = _serviceProvider?.GetService<SQLiteBatchParser>() ?? new SQLiteBatchParser();
                 parser.SqlText += (sender, args) => { sqlBatch = args.SqlText.Trim(); };
                 parser.SpecialToken += (sender, args) =>
                 {
