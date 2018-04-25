@@ -26,6 +26,7 @@ namespace FluentMigrator.Runner.Initialization
         /// <summary>
         /// Gets or sets the assembly names
         /// </summary>
+        [CanBeNull, ItemNotNull]
         public string[] AssemblyNames { get; set; }
     }
 }

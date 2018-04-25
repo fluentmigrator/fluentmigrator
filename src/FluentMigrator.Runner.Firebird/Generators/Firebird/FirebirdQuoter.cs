@@ -18,10 +18,7 @@ using System;
 using System.Collections.Generic;
 
 using FluentMigrator.Runner.Generators.Generic;
-using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Firebird;
-
-using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Generators.Firebird
 {

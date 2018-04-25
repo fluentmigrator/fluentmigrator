@@ -25,9 +25,6 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Generic;
 using FluentMigrator.Runner.Helpers;
-using FluentMigrator.Runner.Processors;
-
-using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Generators.Oracle
 {

@@ -37,8 +37,6 @@ using FluentMigrator.Runner.Processors.SqlAnywhere;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-using MySql.Data.MySqlClient;
-
 using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Integration
