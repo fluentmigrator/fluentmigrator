@@ -34,7 +34,7 @@ namespace FluentMigrator.Tests.Unit
         private IAnnouncer _announcer;
 
         [Test]
-        public void Error_Should_Error_string_formatted_message()
+        public void ErrorShouldErrorStringFormattedMessage()
         {
             Mock.Get(_announcer).Setup(a => a.Error("Hello Error"));
 
@@ -42,7 +42,7 @@ namespace FluentMigrator.Tests.Unit
         }
 
         [Test]
-        public void Heading_Should_Heading_string_formatted_message()
+        public void HeadingShouldHeadingStringFormattedMessage()
         {
             Mock.Get(_announcer).Setup(a => a.Heading("Hello Heading"));
 
@@ -50,7 +50,7 @@ namespace FluentMigrator.Tests.Unit
         }
 
         [Test]
-        public void Say_Should_Say_string_formatted_message()
+        public void SayShouldSayStringFormattedMessage()
         {
             Mock.Get(_announcer).Setup(a => a.Say("Hello Say"));
 

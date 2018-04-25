@@ -15,8 +15,11 @@
 #endregion
 
 using System;
+using System.Data;
+
 using FluentMigrator.Runner.Generators.Hana;
 using FluentMigrator.Runner.Processors.Hana;
+
 using Sap.Data.Hana;
 
 namespace FluentMigrator.Tests.Helpers
@@ -25,10 +28,10 @@ namespace FluentMigrator.Tests.Helpers
     {
         private readonly HanaQuoter _quoter = new HanaQuoter();
         private readonly string _schemaName;
-        private HanaConnection Connection { get; set; }
+        private HanaConnection Connection { get; }
         public string Name { get; set; }
         public string NameWithSchema { get; set; }
-        private HanaTransaction Transaction { get; set; }
+        private HanaTransaction Transaction { get; }
 
         public HanaTestSequence(HanaProcessor processor, string schemaName, string sequenceName)
         {
@@ -48,13 +51,16 @@ namespace FluentMigrator.Tests.Helpers
 
         public void Create()
         {
+            if (Connection.State != ConnectionState.Open)
+                Connection.Open();
+
             if (!string.IsNullOrEmpty(_schemaName))
             {
-                using (var command = new HanaCommand(string.Format("CREATE SCHEMA \"{0}\";", _schemaName), Connection, Transaction))
+                using (var command = new HanaCommand($"CREATE SCHEMA \"{_schemaName}\";", Connection, Transaction))
                     command.ExecuteNonQuery();
             }
 
-            string createCommand = string.Format("CREATE SEQUENCE {0} INCREMENT BY 2 MINVALUE 0 MAXVALUE 100 START WITH 2 CACHE 10 CYCLE", NameWithSchema);
+            string createCommand = $"CREATE SEQUENCE {NameWithSchema} INCREMENT BY 2 MINVALUE 0 MAXVALUE 100 START WITH 2 CACHE 10 CYCLE";
             using (var command = new HanaCommand(createCommand, Connection, Transaction))
                 command.ExecuteNonQuery();
         }
@@ -66,7 +72,7 @@ namespace FluentMigrator.Tests.Helpers
 
             if (!string.IsNullOrEmpty(_schemaName))
             {
-                using (var command = new HanaCommand(string.Format("DROP SCHEMA \"{0}\"", _schemaName), Connection, Transaction))
+                using (var command = new HanaCommand($"DROP SCHEMA \"{_schemaName}\"", Connection, Transaction))
                     command.ExecuteNonQuery();
             }
         }

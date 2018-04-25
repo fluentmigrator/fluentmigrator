@@ -190,39 +190,6 @@ namespace Microsoft.Extensions.DependencyInjection
         }
 
         /// <summary>
-        /// Add all database services to the service collection
-        /// </summary>
-        /// <param name="services">The service collection</param>
-        /// <returns>The service collection</returns>
-        internal static IServiceCollection AddAllDatabases(this IServiceCollection services)
-        {
-            return services
-                .ConfigureRunner(
-                    builder => builder
-                        .AddDb2()
-                        .AddDb2ISeries()
-                        .AddDotConnectOracle()
-                        .AddFirebird()
-                        .AddHana()
-                        .AddMySql4()
-                        .AddMySql5()
-                        .AddOracle()
-                        .AddOracleManaged()
-                        .AddPostgres()
-                        .AddRedshift()
-                        .AddSqlAnywhere()
-                        .AddSQLite()
-                        .AddSqlServer()
-                        .AddSqlServer2000()
-                        .AddSqlServer2005()
-                        .AddSqlServer2008()
-                        .AddSqlServer2012()
-                        .AddSqlServer2014()
-                        .AddSqlServer2016()
-                        .AddSqlServerCe());
-        }
-
-        /// <summary>
         /// Creates services for a given runner context, connection string provider and assembly loader factory.
         /// </summary>
         /// <param name="runnerContext">The runner context</param>
@@ -274,6 +241,39 @@ namespace Microsoft.Extensions.DependencyInjection
             }
 
             return services;
+        }
+
+        /// <summary>
+        /// Add all database services to the service collection
+        /// </summary>
+        /// <param name="services">The service collection</param>
+        /// <returns>The service collection</returns>
+        private static IServiceCollection AddAllDatabases(this IServiceCollection services)
+        {
+            return services
+                .ConfigureRunner(
+                    builder => builder
+                        .AddDb2()
+                        .AddDb2ISeries()
+                        .AddDotConnectOracle()
+                        .AddFirebird()
+                        .AddHana()
+                        .AddMySql4()
+                        .AddMySql5()
+                        .AddOracle()
+                        .AddOracleManaged()
+                        .AddPostgres()
+                        .AddRedshift()
+                        .AddSqlAnywhere()
+                        .AddSQLite()
+                        .AddSqlServer()
+                        .AddSqlServer2000()
+                        .AddSqlServer2005()
+                        .AddSqlServer2008()
+                        .AddSqlServer2012()
+                        .AddSqlServer2014()
+                        .AddSqlServer2016()
+                        .AddSqlServerCe());
         }
 
         private class MigrationRunnerBuilder : IMigrationRunnerBuilder

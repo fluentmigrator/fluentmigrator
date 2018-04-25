@@ -945,7 +945,7 @@ namespace FluentMigrator.Tests.Integration
                         processor.CommitTransaction();
 
                         string schemaName = versionTableMetaData.SchemaName;
-                        var schemaAndTableName = $"[{schemaName}].[{TestVersionTableMetaData.TABLENAME}]";
+                        var schemaAndTableName = $"[{schemaName}].[{TestVersionTableMetaData.TABLE_NAME}]";
 
                         var outputSqlString = outputSql.ToString();
 
@@ -953,7 +953,7 @@ namespace FluentMigrator.Tests.Integration
                             .Matches(outputSqlString).Count;
                         var createTableMatches = new Regex(Regex.Escape("CREATE TABLE " + schemaAndTableName))
                             .Matches(outputSqlString).Count;
-                        var createIndexMatches = new Regex(Regex.Escape("CREATE UNIQUE CLUSTERED INDEX [" + TestVersionTableMetaData.UNIQUEINDEXNAME + "] ON " + schemaAndTableName))
+                        var createIndexMatches = new Regex(Regex.Escape("CREATE UNIQUE CLUSTERED INDEX [" + TestVersionTableMetaData.UNIQUE_INDEX_NAME + "] ON " + schemaAndTableName))
                             .Matches(outputSqlString).Count;
                         var alterTableMatches = new Regex(Regex.Escape("ALTER TABLE " + schemaAndTableName))
                             .Matches(outputSqlString).Count;

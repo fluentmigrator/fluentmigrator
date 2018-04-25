@@ -1,9 +1,27 @@
+#region License
+//
+// Copyright (c) 2018, Fluent Migrator Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+#endregion
+
 using System;
 using System.Data;
 using System.Linq.Expressions;
+
 using FluentMigrator.Exceptions;
 using FluentMigrator.Runner;
-using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Tests.Integration;
@@ -14,6 +32,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 using Moq;
+
 using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Unit
@@ -39,8 +58,6 @@ namespace FluentMigrator.Tests.Unit
             dataSet.Tables.Add(new DataTable());
             processor.Setup(x => x.ReadTableData(null, It.IsAny<string>())).Returns(dataSet);
 
-            _migrationRunner.SetupGet(x => x.Processor).Returns(processor.Object);
-
             var announcer = new Mock<IAnnouncer>();
             var stopWatch = new Mock<IStopWatch>();
 
@@ -48,6 +65,7 @@ namespace FluentMigrator.Tests.Unit
                 .WithProcessor(processor)
                 .AddSingleton(stopWatch.Object)
                 .AddScoped<IConnectionStringReader>(_ => new PassThroughConnectionStringReader(IntegrationTestOptions.SqlServer2008.ConnectionString))
+                .AddScoped(_ => _migrationRunner.Object)
                 .ConfigureRunner(r => r.WithAnnouncer(announcer.Object))
                 .Configure<SelectingProcessorAccessorOptions>(opt => opt.ProcessorId = "sqlserver2008")
                 .Configure<RunnerOptions>(
@@ -75,7 +93,7 @@ namespace FluentMigrator.Tests.Unit
         public void InvalidProviderNameShouldThrowArgumentException()
         {
             var services = ServiceCollectionExtensions.CreateServices()
-                .AddAllDatabases()
+                .ConfigureRunner(r => r.AddSQLite())
                 .AddScoped<IConnectionStringReader>(_ => new PassThroughConnectionStringReader(IntegrationTestOptions.SqlServer2008.ConnectionString))
                 .Configure<SelectingProcessorAccessorOptions>(opt => opt.ProcessorId = "sqlWRONG")
                 .WithMigrationsIn("FluentMigrator.Tests.Integration.Migrations")
@@ -206,6 +224,7 @@ namespace FluentMigrator.Tests.Unit
             var services = ServiceCollectionExtensions.CreateServices()
                 .WithProcessor(processor)
                 .AddScoped<IConnectionStringReader>(_ => new PassThroughConnectionStringReader(IntegrationTestOptions.SqlServer2008.ConnectionString))
+                .AddScoped(_ => _migrationRunner.Object)
                 .Configure<SelectingProcessorAccessorOptions>(opt => opt.ProcessorId = "sqlserver2008")
                 .Configure<RunnerOptions>(
                     opt =>

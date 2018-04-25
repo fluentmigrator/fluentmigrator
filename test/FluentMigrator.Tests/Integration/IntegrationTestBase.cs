@@ -178,11 +178,22 @@ namespace FluentMigrator.Tests.Integration
                 Assert.Ignore($"The configuration for {processorType.Name} is not enabled.");
 
             var services = ServiceCollectionExtensions.CreateServices()
-                .AddAllDatabases()
+                .ConfigureRunner(
+                    r => r
+                        .AddFirebird()
+                        .AddMySql4()
+                        .AddPostgres()
+                        .AddSQLite()
+                        .AddSqlAnywhere16()
+                        .AddSqlServer2005()
+                        .AddSqlServer2008()
+                        .AddSqlServer2012()
+                        .AddSqlServer2014()
+                        .AddSqlServer2016())
                 .AddScoped<IProcessorAccessor>(
                     sp =>
                     {
-                        var proc = (ProcessorBase) sp.GetRequiredService(processorType);
+                        var proc = (ProcessorBase)sp.GetRequiredService(processorType);
                         var opt = sp.GetRequiredService<IOptions<SelectingProcessorAccessorOptions>>();
                         var opt2 = sp.GetRequiredService<IOptions<SelectingGeneratorAccessorOptions>>();
                         return new SelectingProcessorAccessor(new[] { proc }, opt, opt2);
@@ -190,7 +201,7 @@ namespace FluentMigrator.Tests.Integration
                 .AddScoped<IGeneratorAccessor>(
                     sp =>
                     {
-                        var proc = (ProcessorBase) sp.GetRequiredService(processorType);
+                        var proc = (ProcessorBase)sp.GetRequiredService(processorType);
                         var opt = sp.GetRequiredService<IOptions<SelectingGeneratorAccessorOptions>>();
                         var opt2 = sp.GetRequiredService<IOptions<SelectingProcessorAccessorOptions>>();
                         return new SelectingGeneratorAccessor(new[] { proc.Generator }, opt, opt2);

@@ -18,11 +18,13 @@
 
 using System.Diagnostics;
 
-using FluentMigrator.Runner.Announcers;
+using FluentMigrator.Runner;
 using FluentMigrator.Runner.Generators.DB2.iSeries;
-using FluentMigrator.Runner.Processors;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.DB2.iSeries;
 using FluentMigrator.Tests.Helpers;
+
+using Microsoft.Extensions.DependencyInjection;
 
 using NUnit.Framework;
 
@@ -40,38 +42,9 @@ namespace FluentMigrator.Tests.Integration.Processors.Db2ISeries
             try { EnsureReference(); } catch { /* ignore */ }
         }
 
-        public System.Data.IDbConnection Connection
-        {
-            get; set;
-        }
-
-        public Db2ISeriesProcessor Processor
-        {
-            get; set;
-        }
-
-        public Db2ISeriesQuoter Quoter
-        {
-            get; set;
-        }
-
-        [SetUp]
-        public void SetUp()
-        {
-            if (!IntegrationTestOptions.Db2.IsEnabled)
-                Assert.Ignore();
-            var factory = new Db2ISeriesDbFactory(serviceProvider: null);
-            Connection = factory.CreateConnection(IntegrationTestOptions.Db2.ConnectionString);
-            Quoter = new Db2ISeriesQuoter();
-            Processor = new Db2ISeriesProcessor(Connection, new Db2ISeriesGenerator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), factory);
-            Connection.Open();
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            Processor?.Dispose();
-        }
+        private ServiceProvider ServiceProvider { get; set; }
+        private IServiceScope ServiceScope { get; set; }
+        private Db2ISeriesProcessor Processor { get; set; }
 
         [Test]
         public void CallingColumnExistsReturnsFalseIfColumnExistsInDifferentSchema()
@@ -99,6 +72,38 @@ namespace FluentMigrator.Tests.Integration.Processors.Db2ISeries
             {
                 Processor.TableExists("DNE", table.Name).ShouldBeFalse();
             }
+        }
+
+        [OneTimeSetUp]
+        public void ClassSetUp()
+        {
+            if (!IntegrationTestOptions.Db2ISeries.IsEnabled)
+                Assert.Ignore();
+
+            var serivces = ServiceCollectionExtensions.CreateServices()
+                .ConfigureRunner(builder => builder.AddDb2ISeries())
+                .AddScoped<IConnectionStringReader>(
+                    _ => new PassThroughConnectionStringReader(IntegrationTestOptions.Db2ISeries.ConnectionString));
+            ServiceProvider = serivces.BuildServiceProvider();
+        }
+
+        [OneTimeTearDown]
+        public void ClassTearDown()
+        {
+            ServiceProvider?.Dispose();
+        }
+
+        [SetUp]
+        public void SetUp()
+        {
+            ServiceScope = ServiceProvider.CreateScope();
+            Processor = ServiceScope.ServiceProvider.GetRequiredService<Db2ISeriesProcessor>();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            ServiceScope?.Dispose();
         }
 
         private static void EnsureReference()

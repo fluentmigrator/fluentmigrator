@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Text;
 using FirebirdSql.Data.FirebirdClient;
 using FluentMigrator.Runner.Generators.Firebird;
@@ -21,6 +22,8 @@ namespace FluentMigrator.Tests.Helpers
         public FirebirdTestTable(FirebirdProcessor processor, params string[] columnDefinitions)
         {
             _processor = processor;
+            if (_processor.Connection.State != ConnectionState.Open)
+                _processor.Connection.Open();
             string guid = Guid.NewGuid().ToString("N");
             Name = "Table" + guid.Substring(0, Math.Min(guid.Length, 16));
             Init(columnDefinitions);
@@ -29,6 +32,8 @@ namespace FluentMigrator.Tests.Helpers
         public FirebirdTestTable(string tableName, FirebirdProcessor processor, params string[] columnDefinitions)
         {
             _processor = processor;
+            if (_processor.Connection.State != ConnectionState.Open)
+                _processor.Connection.Open();
             Name = tableName;
             Init(columnDefinitions);
         }
@@ -40,7 +45,7 @@ namespace FluentMigrator.Tests.Helpers
 
         public void Dispose()
         {
-            if (Connection.State == System.Data.ConnectionState.Open && !_processor.WasCommitted)
+            if (Connection.State == ConnectionState.Open && !_processor.WasCommitted)
                 Drop();
         }
 
@@ -77,7 +82,7 @@ namespace FluentMigrator.Tests.Helpers
         {
             _processor.CheckTable(Name);
             var sb = new StringBuilder();
-            sb.AppendFormat("DROP TABLE {0}", _quoter.QuoteTableName(Name, null));
+            sb.AppendFormat("DROP TABLE {0}", _quoter.QuoteTableName(Name));
 
             using (var command = new FbCommand(sb.ToString(), Connection, Transaction))
                 command.ExecuteNonQuery();

@@ -234,7 +234,7 @@ namespace FluentMigrator.Tests.Unit
             runner.SetupGet(r => r.Processor).Returns(processor.Object);
             runner.SetupGet(r => r.RunnerContext).Returns(runnerContext.Object);
 
-            processor.Setup(p => p.TableExists(new TestVersionTableMetaData().SchemaName, TestVersionTableMetaData.TABLENAME)).Returns(false);
+            processor.Setup(p => p.TableExists(new TestVersionTableMetaData().SchemaName, TestVersionTableMetaData.TABLE_NAME)).Returns(false);
 
             var loader = new VersionLoader(runner.Object, asm, ConventionSets.NoSchemaName, conventions);
 
@@ -255,7 +255,7 @@ namespace FluentMigrator.Tests.Unit
             runner.SetupGet(r => r.Processor).Returns(processor.Object);
             runner.SetupGet(r => r.RunnerContext).Returns(runnerContext.Object);
 
-            processor.Setup(p => p.ColumnExists(new TestVersionTableMetaData().SchemaName, TestVersionTableMetaData.TABLENAME, TestVersionTableMetaData.APPLIEDONCOLUMNNAME)).Returns(false);
+            processor.Setup(p => p.ColumnExists(new TestVersionTableMetaData().SchemaName, TestVersionTableMetaData.TABLE_NAME, TestVersionTableMetaData.APPLIED_ON_COLUMN_NAME)).Returns(false);
 
             var loader = new VersionLoader(runner.Object, asm, ConventionSets.NoSchemaName, conventions);
 
@@ -276,7 +276,7 @@ namespace FluentMigrator.Tests.Unit
             runner.SetupGet(r => r.Processor).Returns(processor.Object);
             runner.SetupGet(r => r.RunnerContext).Returns(runnerContext.Object);
 
-            processor.Setup(p => p.ColumnExists(new TestVersionTableMetaData().SchemaName, TestVersionTableMetaData.TABLENAME, TestVersionTableMetaData.APPLIEDONCOLUMNNAME)).Returns(false);
+            processor.Setup(p => p.ColumnExists(new TestVersionTableMetaData().SchemaName, TestVersionTableMetaData.TABLE_NAME, TestVersionTableMetaData.APPLIED_ON_COLUMN_NAME)).Returns(false);
 
             var loader = new VersionLoader(runner.Object, asm, ConventionSets.NoSchemaName, conventions);
 

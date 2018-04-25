@@ -174,35 +174,41 @@ namespace FluentMigrator.MSBuild
             var conventionSet = new DefaultConventionSet(defaultSchemaName: null, WorkingDirectory);
 
             var services = CreateCoreServices()
-                    .AddSingleton<IConventionSet>(conventionSet)
-                    .AddScoped<TaskExecutor>()
-                    .ConfigureRunner(r => r.WithAnnouncer(announcer))
-                    .Configure<SelectingProcessorAccessorOptions>(opt => opt.ProcessorId = DatabaseType)
-                    .Configure<AssemblySourceOptions>(opt => opt.AssemblyNames = Targets)
-                    .Configure<AppConfigConnectionStringAccessorOptions>(
-                        opt => opt.ConnectionStringConfigPath = ConnectionStringConfigPath)
-                    .Configure<RunnerOptions>(
-                        opt =>
-                        {
-                            opt.Task = Task;
-                            opt.Version = Version;
-                            opt.Steps = Steps;
-                            opt.Profile = Profile;
-                            opt.Tags = Tags.ToTags().ToArray();
+                .AddSingleton<IConventionSet>(conventionSet)
+                .AddScoped<TaskExecutor>()
+                .ConfigureRunner(r => r.WithAnnouncer(announcer))
+                .Configure<SelectingProcessorAccessorOptions>(opt => opt.ProcessorId = DatabaseType)
+                .Configure<AssemblySourceOptions>(opt => opt.AssemblyNames = Targets)
+                .Configure<AppConfigConnectionStringAccessorOptions>(
+                    opt => opt.ConnectionStringConfigPath = ConnectionStringConfigPath)
+                .Configure<TypeFilterOptions>(
+                    opt =>
+                    {
+                        opt.Namespace = Namespace;
+                        opt.NestedNamespaces = Nested;
+                    })
+                .Configure<RunnerOptions>(
+                    opt =>
+                    {
+                        opt.Task = Task;
+                        opt.Version = Version;
+                        opt.Steps = Steps;
+                        opt.Profile = Profile;
+                        opt.Tags = Tags.ToTags().ToArray();
 #pragma warning disable 612
-                            opt.ApplicationContext = ApplicationContext;
+                        opt.ApplicationContext = ApplicationContext;
 #pragma warning restore 612
-                            opt.TransactionPerSession = TransactionPerSession;
-                            opt.AllowBreakingChange = AllowBreakingChange;
-                        })
-                    .Configure<ProcessorOptions>(
-                        opt =>
-                        {
-                            opt.ConnectionString = Connection;
-                            opt.PreviewOnly = PreviewOnly;
-                            opt.ProviderSwitches = ProviderSwitches;
-                            opt.Timeout = Timeout == null ? null : (TimeSpan?) TimeSpan.FromSeconds(Timeout.Value);
-                        });
+                        opt.TransactionPerSession = TransactionPerSession;
+                        opt.AllowBreakingChange = AllowBreakingChange;
+                    })
+                .Configure<ProcessorOptions>(
+                    opt =>
+                    {
+                        opt.ConnectionString = Connection;
+                        opt.PreviewOnly = PreviewOnly;
+                        opt.ProviderSwitches = ProviderSwitches;
+                        opt.Timeout = Timeout == null ? null : (TimeSpan?)TimeSpan.FromSeconds(Timeout.Value);
+                    });
 
             using (var serviceProvider = services.BuildServiceProvider(validateScopes: false))
             {

@@ -68,7 +68,8 @@ namespace FluentMigrator.Console
         {
             string dbChoices;
 
-            var services = CreateCoreServices();
+            var services = CreateCoreServices()
+                .AddScoped<IConnectionStringReader>(_ => new PassThroughConnectionStringReader("No connection"));
             using (var sp = services.BuildServiceProvider(validateScopes: false))
             {
                 var processors = sp.GetRequiredService<IEnumerable<IMigrationProcessor>>().ToList();
@@ -355,6 +356,12 @@ namespace FluentMigrator.Console
                 .Configure<AssemblySourceOptions>(opt => opt.AssemblyNames = new[] { TargetAssembly })
                 .Configure<AppConfigConnectionStringAccessorOptions>(
                     opt => opt.ConnectionStringConfigPath = ConnectionStringConfigPath)
+                .Configure<TypeFilterOptions>(
+                    opt =>
+                    {
+                        opt.Namespace = Namespace;
+                        opt.NestedNamespaces = NestedNamespaces;
+                    })
                 .Configure<RunnerOptions>(
                     opt =>
                     {

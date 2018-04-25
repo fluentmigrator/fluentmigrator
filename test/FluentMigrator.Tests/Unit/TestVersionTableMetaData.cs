@@ -29,11 +29,11 @@ namespace FluentMigrator.Tests.Unit
     [VersionTableMetaData]
     public class TestVersionTableMetaData : IVersionTableMetaData
     {
-        public const string TABLENAME = "testVersionTableName";
-        public const string COLUMNNAME = "testColumnName";
-        public const string UNIQUEINDEXNAME = "testUniqueIndexName";
-        public const string DESCRIPTIONCOLUMNNAME = "testDescriptionColumnName";
-        public const string APPLIEDONCOLUMNNAME = "testAppliedOnColumnName";
+        public const string TABLE_NAME = "testVersionTableName";
+        public const string COLUMN_NAME = "testColumnName";
+        public const string UNIQUE_INDEX_NAME = "testUniqueIndexName";
+        public const string DESCRIPTION_COLUMN_NAME = "testDescriptionColumnName";
+        public const string APPLIED_ON_COLUMN_NAME = "testAppliedOnColumnName";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TestVersionTableMetaData"/> class.
@@ -60,30 +60,15 @@ namespace FluentMigrator.Tests.Unit
 
         public string SchemaName { get; set; }
 
-        public string TableName
-        {
-            get { return TABLENAME; }
-        }
+        public string TableName => TABLE_NAME;
 
-        public string ColumnName
-        {
-            get { return COLUMNNAME; }
-        }
+        public string ColumnName => COLUMN_NAME;
 
-        public string UniqueIndexName
-        {
-            get { return UNIQUEINDEXNAME; }
-        }
+        public string UniqueIndexName => UNIQUE_INDEX_NAME;
 
-        public string AppliedOnColumnName
-        {
-            get { return APPLIEDONCOLUMNNAME; }
-        }
+        public string AppliedOnColumnName => APPLIED_ON_COLUMN_NAME;
 
-        public string DescriptionColumnName
-        {
-            get { return DESCRIPTIONCOLUMNNAME; }
-        }
+        public string DescriptionColumnName => DESCRIPTION_COLUMN_NAME;
 
         public bool OwnsSchema { get; set; }
     }

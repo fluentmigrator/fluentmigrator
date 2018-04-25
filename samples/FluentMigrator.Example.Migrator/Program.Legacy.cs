@@ -37,8 +37,8 @@ namespace FluentMigrator.Example.Migrator
             var options = new ProcessorOptions();
 
             // Initialize the DB-specific processor
-            var processorFactory = new SQLiteProcessorFactory(serviceProvider: null);
 #pragma warning disable 612
+            var processorFactory = new SQLiteProcessorFactory(serviceProvider: null);
             var processor = processorFactory.Create(connectionString, announcer, options);
 #pragma warning restore 612
 

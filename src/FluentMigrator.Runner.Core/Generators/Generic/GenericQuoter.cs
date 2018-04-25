@@ -231,7 +231,7 @@ namespace FluentMigrator.Runner.Generators.Generic
         }
 
         /// <inheritdoc />
-        public virtual string QuoteTableName(string tableName, string schemaName)
+        public virtual string QuoteTableName(string tableName, string schemaName = null)
         {
             return CreateSchemaPrefixedQuotedIdentifier(
                 QuoteSchemaName(schemaName),

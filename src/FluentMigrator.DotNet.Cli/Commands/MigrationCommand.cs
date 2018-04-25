@@ -43,5 +43,8 @@ namespace FluentMigrator.DotNet.Cli.Commands
 
         [Option("-t|--tag", Description = "Filters the migrations to be run by tag.")]
         public IEnumerable<string> Tags { get; }
+
+        [Option("-b|--allow-breaking-changes", Description = "Allows execution of migrations marked as breaking changes.")]
+        public bool AllowBreakingChanges { get; }
     }
 }

@@ -39,6 +39,7 @@ namespace FluentMigrator.DotNet.Cli
         public TransactionMode TransactionMode { get; private set; }
         public bool Output { get; private set; }
         public string OutputFileName { get; private set; }
+        public bool AllowBreakingChanges { get; private set; }
 
         public bool ExecutingAgainstMsSql
             => ProcessorType.StartsWith("SqlServer", StringComparison.InvariantCultureIgnoreCase);
@@ -124,6 +125,7 @@ namespace FluentMigrator.DotNet.Cli
             StartVersion = cmd.StartVersion;
             WorkingDirectory = cmd.WorkingDirectory;
             Tags = cmd.Tags?.ToList() ?? new List<string>();
+            AllowBreakingChanges = cmd.AllowBreakingChanges;
             return this;
         }
     }

@@ -32,7 +32,7 @@ namespace FluentMigrator.Runner
         /// </summary>
         /// <param name="builder">The builder to add the SAP SQL Anywhere-specific services to</param>
         /// <returns>The migration runner builder</returns>
-        public static IMigrationRunnerBuilder AddSqlAnywhere(this IMigrationRunnerBuilder builder)
+        public static IMigrationRunnerBuilder AddSqlAnywhere16(this IMigrationRunnerBuilder builder)
         {
             builder.Services
                 .AddTransient<SqlAnywhereBatchParser>()
@@ -43,6 +43,16 @@ namespace FluentMigrator.Runner
                 .AddScoped<SqlAnywhere16Generator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<SqlAnywhere16Generator>());
             return builder;
+        }
+
+        /// <summary>
+        /// Adds SAP SQL Anywhere support for the latest version
+        /// </summary>
+        /// <param name="builder">The builder to add the SAP SQL Anywhere-specific services to</param>
+        /// <returns>The migration runner builder</returns>
+        public static IMigrationRunnerBuilder AddSqlAnywhere(this IMigrationRunnerBuilder builder)
+        {
+            return builder.AddSqlAnywhere16();
         }
     }
 }

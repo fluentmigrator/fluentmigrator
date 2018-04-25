@@ -19,14 +19,14 @@
 using System.IO;
 
 using FluentMigrator.Expressions;
+using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
-using FluentMigrator.Runner.Generators.Hana;
-using FluentMigrator.Runner.Processors;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.Hana;
 
-using NUnit.Framework;
+using Microsoft.Extensions.DependencyInjection;
 
-using Sap.Data.Hana;
+using NUnit.Framework;
 
 using Shouldly;
 
@@ -37,30 +37,10 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
     [Category("Hana")]
     public class HanaProcessorTests
     {
-        public HanaConnection Connection { get; set; }
-        public HanaProcessor Processor { get; set; }
-
-        public StringWriter Output { get; set; }
-
-        [SetUp]
-        public void SetUp()
-        {
-            if (!IntegrationTestOptions.Hana.IsEnabled)
-                Assert.Ignore();
-            Output = new StringWriter();
-            Connection = new HanaConnection(IntegrationTestOptions.Hana.ConnectionString);
-            Processor = new HanaProcessor(Connection, new HanaGenerator(), new TextWriterAnnouncer(Output),
-                new ProcessorOptions() { PreviewOnly = true }, new HanaDbFactory(serviceProvider: null));
-            Connection.Open();
-            Processor.BeginTransaction();
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            Processor?.CommitTransaction();
-            Processor?.Dispose();
-        }
+        private ServiceProvider ServiceProvider { get; set; }
+        private IServiceScope ServiceScope { get; set; }
+        private HanaProcessor Processor { get; set; }
+        private StringWriter Output { get; set; }
 
         [Test]
         public void CallingProcessWithPerformDbOperationExpressionWhenInPreviewOnlyModeWillNotMakeDbChanges()
@@ -95,6 +75,32 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
 
             var fmOutput = Output.ToString();
             Assert.That(fmOutput, Does.Contain("/* Performing DB Operation */"));
+        }
+
+        [SetUp]
+        public void SetUp()
+        {
+            if (!IntegrationTestOptions.Hana.IsEnabled)
+                Assert.Ignore();
+
+            Output = new StringWriter();
+            var serivces = ServiceCollectionExtensions.CreateServices()
+                .ConfigureRunner(builder => builder.AddHana())
+                .AddSingleton<IAnnouncer>(new CompositeAnnouncer(
+                    new TextWriterAnnouncer(Output),
+                    new TextWriterAnnouncer(TestContext.Out) { ShowSql = true }))
+                .AddScoped<IConnectionStringReader>(
+                    _ => new PassThroughConnectionStringReader(IntegrationTestOptions.Hana.ConnectionString));
+            ServiceProvider = serivces.BuildServiceProvider();
+            ServiceScope = ServiceProvider.CreateScope();
+            Processor = ServiceScope.ServiceProvider.GetRequiredService<HanaProcessor>();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            ServiceScope?.Dispose();
+            ServiceProvider?.Dispose();
         }
     }
 }

@@ -242,7 +242,7 @@ namespace FluentMigrator.Tests.Unit
 
             runner.SetupGet(r => r.Processor).Returns(processor.Object);
             processor.Setup(
-                    p => p.TableExists(new TestVersionTableMetaData().SchemaName, TestVersionTableMetaData.TABLENAME))
+                    p => p.TableExists(new TestVersionTableMetaData().SchemaName, TestVersionTableMetaData.TABLE_NAME))
                 .Returns(false);
 
             var serviceProvider = ServiceCollectionExtensions.CreateServices()
@@ -269,7 +269,7 @@ namespace FluentMigrator.Tests.Unit
             var runner = new Mock<IMigrationRunner>();
 
             runner.SetupGet(r => r.Processor).Returns(processor.Object);
-            processor.Setup(p => p.ColumnExists(new TestVersionTableMetaData().SchemaName, TestVersionTableMetaData.TABLENAME, TestVersionTableMetaData.APPLIEDONCOLUMNNAME)).Returns(false);
+            processor.Setup(p => p.ColumnExists(new TestVersionTableMetaData().SchemaName, TestVersionTableMetaData.TABLE_NAME, TestVersionTableMetaData.APPLIED_ON_COLUMN_NAME)).Returns(false);
 
             var serviceProvider = ServiceCollectionExtensions.CreateServices()
                 .WithProcessor(processor)
@@ -295,7 +295,7 @@ namespace FluentMigrator.Tests.Unit
             var runner = new Mock<IMigrationRunner>();
 
             runner.SetupGet(r => r.Processor).Returns(processor.Object);
-            processor.Setup(p => p.ColumnExists(new TestVersionTableMetaData().SchemaName, TestVersionTableMetaData.TABLENAME, TestVersionTableMetaData.APPLIEDONCOLUMNNAME)).Returns(false);
+            processor.Setup(p => p.ColumnExists(new TestVersionTableMetaData().SchemaName, TestVersionTableMetaData.TABLE_NAME, TestVersionTableMetaData.APPLIED_ON_COLUMN_NAME)).Returns(false);
 
             var serviceProvider = ServiceCollectionExtensions.CreateServices()
                 .WithProcessor(processor)

@@ -16,16 +16,16 @@
 //
 #endregion
 
-using FluentMigrator.Runner.Announcers;
+using FluentMigrator.Runner;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Hana;
-using FluentMigrator.Runner.Processors;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.Hana;
 using FluentMigrator.Tests.Helpers;
 
-using NUnit.Framework;
+using Microsoft.Extensions.DependencyInjection;
 
-using Sap.Data.Hana;
+using NUnit.Framework;
 
 using Shouldly;
 
@@ -36,34 +36,16 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
     [Category("Hana")]
     public class HanaColumnTests : BaseColumnTests
     {
-        public HanaConnection Connection { get; set; }
-        public HanaProcessor Processor { get; set; }
-        public IQuoter Quoter { get; set; }
-
-        [SetUp]
-        public void SetUp()
-        {
-            if (!IntegrationTestOptions.Hana.IsEnabled)
-                Assert.Ignore();
-            Connection = new HanaConnection(IntegrationTestOptions.Hana.ConnectionString);
-            Processor = new HanaProcessor(Connection, new HanaGenerator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), new HanaDbFactory(serviceProvider: null));
-            Quoter = new HanaQuoter();
-            Connection.Open();
-            Processor.BeginTransaction();
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            Processor?.RollbackTransaction();
-            Processor?.Dispose();
-        }
+        private ServiceProvider ServiceProvider { get; set; }
+        private IServiceScope ServiceScope { get; set; }
+        private HanaProcessor Processor { get; set; }
+        private IQuoter Quoter { get; set; }
 
         [Test]
         public override void CallingColumnExistsCanAcceptColumnNameWithSingleQuote()
         {
             var columnNameWithSingleQuote = Quoter.Quote("i'd");
-            using (var table = new HanaTestTable(Processor, null, string.Format("{0} int", columnNameWithSingleQuote)))
+            using (var table = new HanaTestTable(Processor, null, $"{columnNameWithSingleQuote} int"))
                 Processor.ColumnExists(null, table.Name, "i'd").ShouldBeTrue();
         }
 
@@ -112,6 +94,39 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
         {
             using (var table = new HanaTestTable(Processor, "test_schema", "id int"))
                 Processor.ColumnExists("test_schema", table.Name, "id").ShouldBeTrue();
+        }
+
+        [OneTimeSetUp]
+        public void ClassSetUp()
+        {
+            if (!IntegrationTestOptions.Hana.IsEnabled)
+                Assert.Ignore();
+
+            var serivces = ServiceCollectionExtensions.CreateServices()
+                .ConfigureRunner(builder => builder.AddHana())
+                .AddScoped<IConnectionStringReader>(
+                    _ => new PassThroughConnectionStringReader(IntegrationTestOptions.Hana.ConnectionString));
+            ServiceProvider = serivces.BuildServiceProvider();
+        }
+
+        [OneTimeTearDown]
+        public void ClassTearDown()
+        {
+            ServiceProvider?.Dispose();
+        }
+
+        [SetUp]
+        public void SetUp()
+        {
+            ServiceScope = ServiceProvider.CreateScope();
+            Processor = ServiceScope.ServiceProvider.GetRequiredService<HanaProcessor>();
+            Quoter = ServiceScope.ServiceProvider.GetRequiredService<HanaQuoter>();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            ServiceScope?.Dispose();
         }
     }
 }

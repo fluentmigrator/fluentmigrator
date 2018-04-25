@@ -83,11 +83,6 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             [NotNull] IServiceProvider serviceProvider)
             : this(databaseTypes, SqlClientFactory.Instance, generator, quoter, announcer, options, connectionStringAccessor, serviceProvider)
         {
-            _serviceProvider = serviceProvider;
-            var dbTypes = databaseTypes.ToList();
-            DatabaseType = dbTypes.First();
-            DatabaseTypeAliases = dbTypes.Skip(1).ToList();
-            Quoter = quoter;
         }
 
         protected SqlServerProcessor(

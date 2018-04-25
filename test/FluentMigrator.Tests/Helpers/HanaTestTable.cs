@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Text;
 
 using FluentMigrator.Runner.Generators;
@@ -40,6 +41,9 @@ namespace FluentMigrator.Tests.Helpers
 
             Connection = (HanaConnection)processor.Connection;
             Transaction = (HanaTransaction)processor.Transaction;
+
+            if (Connection.State != ConnectionState.Open)
+                Connection.Open();
 
             Create(columnDefinitions);
         }
