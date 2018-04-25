@@ -17,12 +17,14 @@
 #endregion
 
 using System;
+using System.Threading;
 
 using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Unit
 {
     [TestFixture]
+    [SetUICulture("en-US")]
     public class TimestampedMigrationAttributeTests
     {
         private const int DayOfMonth = 15;
@@ -152,7 +154,6 @@ namespace FluentMigrator.Tests.Unit
         }
 
         [Test]
-        [SetCulture("en-US")]
         public void TryingToCreateWithInvalidDayOfMonthResultsInArgumentOutOfRangeException()
         {
             // Arrange
@@ -164,7 +165,6 @@ namespace FluentMigrator.Tests.Unit
         }
 
         [Test]
-        [SetCulture("en-US")]
         public void TryingToCreateWithInvalidHourResultsInArgumentOutOfRangeException()
         {
             // Arrange
@@ -176,7 +176,6 @@ namespace FluentMigrator.Tests.Unit
         }
 
         [Test]
-        [SetCulture("en-US")]
         public void TryingToCreateWithInvalidMinuteResultsInArgumentOutOfRangeException()
         {
             // Arrange
@@ -188,7 +187,6 @@ namespace FluentMigrator.Tests.Unit
         }
 
         [Test]
-        [SetCulture("en-US")]
         public void TryingToCreateWithInvalidMonthResultsInArgumentOutOfRangeException()
         {
             // Arrange
@@ -200,7 +198,6 @@ namespace FluentMigrator.Tests.Unit
         }
 
         [Test]
-        [SetCulture("en-US")]
         public void TryingToCreateWithInvalidSecondResultsInArgumentOutOfRangeException()
         {
             // Arrange
@@ -212,7 +209,6 @@ namespace FluentMigrator.Tests.Unit
         }
 
         [Test]
-        [SetCulture("en-US")]
         public void TryingToCreateWithInvalidYearResultsInArgumentOutOfRangeException()
         {
             // Arrange
