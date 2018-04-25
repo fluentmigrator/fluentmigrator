@@ -16,6 +16,7 @@
     <RepositoryType>git</RepositoryType>
     <MinClientVersion>3.5</MinClientVersion>
     <IsPackable>false</IsPackable>
+    <NoWarn>$(NoWarn);3001</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
