@@ -112,17 +112,6 @@ namespace FluentMigrator.Tests.Integration
         }
 
         protected void ExecuteWithSupportedProcessors(
-            Action<IServiceProvider, ProcessorBase> testAction,
-            bool tryRollback = true,
-            params Type[] exceptProcessors)
-        {
-            ExecuteWithSupportedProcessors(
-                testAction,
-                tryRollback,
-                procType => !exceptProcessors.Any(p => p.IsAssignableFrom(procType)));
-        }
-
-        protected void ExecuteWithSupportedProcessors(
             Action<IServiceCollection> initAction,
             Action<IServiceProvider, ProcessorBase> testAction,
             bool tryRollback = true,
@@ -135,15 +124,7 @@ namespace FluentMigrator.Tests.Integration
                 procType => !exceptProcessors.Any(p => p.IsAssignableFrom(procType)));
         }
 
-        protected void ExecuteWithSupportedProcessors(
-            Action<IServiceProvider, ProcessorBase> testAction,
-            bool tryRollback,
-            Predicate<Type> isMatch)
-        {
-            ExecuteWithSupportedProcessors(sp => { }, testAction, tryRollback, isMatch);
-        }
-
-        protected void ExecuteWithSupportedProcessors(
+        private void ExecuteWithSupportedProcessors(
             Action<IServiceCollection> initAction,
             Action<IServiceProvider, ProcessorBase> testAction,
             bool tryRollback,
@@ -186,7 +167,7 @@ namespace FluentMigrator.Tests.Integration
             ExecuteWithProcessor(typeof(TProcessor), initAction, (sp, proc) => testAction(sp, (TProcessor)proc), tryRollback, serverOptions);
         }
 
-        protected void ExecuteWithProcessor(
+        private void ExecuteWithProcessor(
             Type processorType,
             Action<IServiceCollection> initAction,
             Action<IServiceProvider, ProcessorBase> testAction,
@@ -203,14 +184,16 @@ namespace FluentMigrator.Tests.Integration
                     {
                         var proc = (ProcessorBase) sp.GetRequiredService(processorType);
                         var opt = sp.GetRequiredService<IOptions<SelectingProcessorAccessorOptions>>();
-                        return new SelectingProcessorAccessor(new[] { proc }, opt);
+                        var opt2 = sp.GetRequiredService<IOptions<SelectingGeneratorAccessorOptions>>();
+                        return new SelectingProcessorAccessor(new[] { proc }, opt, opt2);
                     })
                 .AddScoped<IGeneratorAccessor>(
                     sp =>
                     {
                         var proc = (ProcessorBase) sp.GetRequiredService(processorType);
                         var opt = sp.GetRequiredService<IOptions<SelectingGeneratorAccessorOptions>>();
-                        return new SelectingGeneratorAccessor(new[] { proc.Generator }, opt);
+                        var opt2 = sp.GetRequiredService<IOptions<SelectingProcessorAccessorOptions>>();
+                        return new SelectingGeneratorAccessor(new[] { proc.Generator }, opt, opt2);
                     })
                 .AddScoped<IConnectionStringReader>(
                     _ => new PassThroughConnectionStringReader(serverOptions.ConnectionString));

@@ -21,13 +21,13 @@ namespace FluentMigrator.Runner.Generators.Generic
             CompatabilityMode = CompatabilityMode.LOOSE;
         }
 
-#pragma warning disable 618
+#pragma warning disable 618, 3005
         public CompatabilityMode CompatabilityMode
         {
             get => compatabilityMode;
             set => compatabilityMode = value;
         }
-#pragma warning restore 618
+#pragma warning restore 618, 3005
 
         public virtual string CreateTable { get { return "CREATE TABLE {0} ({1})"; } }
         public virtual string DropTable { get { return "DROP TABLE {0}"; } }

@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
@@ -80,7 +81,25 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             [NotNull] IOptions<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor,
             [NotNull] IServiceProvider serviceProvider)
-            : base(() => SqlClientFactory.Instance, generator, announcer, options.Value, connectionStringAccessor)
+            : this(databaseTypes, SqlClientFactory.Instance, generator, quoter, announcer, options, connectionStringAccessor, serviceProvider)
+        {
+            _serviceProvider = serviceProvider;
+            var dbTypes = databaseTypes.ToList();
+            DatabaseType = dbTypes.First();
+            DatabaseTypeAliases = dbTypes.Skip(1).ToList();
+            Quoter = quoter;
+        }
+
+        protected SqlServerProcessor(
+            [NotNull, ItemNotNull] IEnumerable<string> databaseTypes,
+            [NotNull] DbProviderFactory factory,
+            [NotNull] IMigrationGenerator generator,
+            [NotNull] IQuoter quoter,
+            [NotNull] IAnnouncer announcer,
+            [NotNull] IOptions<ProcessorOptions> options,
+            [NotNull] IConnectionStringAccessor connectionStringAccessor,
+            [NotNull] IServiceProvider serviceProvider)
+            : base(() => factory, generator, announcer, options.Value, connectionStringAccessor)
         {
             _serviceProvider = serviceProvider;
             var dbTypes = databaseTypes.ToList();
@@ -267,10 +286,8 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
                     if (args.Opaque is GoSearcher.GoSearcherParameters goParams)
                     {
-                        using (var command = CreateCommand(string.Empty))
+                        using (var command = CreateCommand(sqlBatch))
                         {
-                            command.CommandText = sqlBatch;
-
                             for (var i = 0; i != goParams.Count; ++i)
                             {
                                 command.ExecuteNonQuery();
@@ -288,9 +305,8 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
                 if (!string.IsNullOrEmpty(sqlBatch))
                 {
-                    using (var command = CreateCommand(string.Empty))
+                    using (var command = CreateCommand(sqlBatch))
                     {
-                        command.CommandText = sqlBatch;
                         command.ExecuteNonQuery();
                     }
                 }

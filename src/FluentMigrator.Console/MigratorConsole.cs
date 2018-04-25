@@ -18,13 +18,18 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using FluentMigrator.Exceptions;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
+using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Exceptions;
 using FluentMigrator.Runner.Initialization;
+using FluentMigrator.Runner.Initialization.NetFramework;
 using FluentMigrator.Runner.Processors;
+
+using Microsoft.Extensions.DependencyInjection;
 
 using Mono.Options;
 
@@ -59,10 +64,19 @@ namespace FluentMigrator.Console
         public bool AllowBreakingChange;
         public string ProviderSwitches;
 
-        public RunnerContext RunnerContext { get; private set;}
-
         public int Run(params string[] args)
         {
+            string dbChoices;
+
+            var services = CreateCoreServices();
+            using (var sp = services.BuildServiceProvider(validateScopes: false))
+            {
+                var processors = sp.GetRequiredService<IEnumerable<IMigrationProcessor>>().ToList();
+                var procNames = processors.Select(p => p.DatabaseType)
+                    .Union(processors.SelectMany(p => p.DatabaseTypeAliases));
+                dbChoices = string.Join(", ", procNames);
+            }
+
             _consoleAnnouncer.Header();
 
             try
@@ -76,8 +90,7 @@ namespace FluentMigrator.Console
                                             },
                                         {
                                             "provider=|dbType=|db=",
-                                            string.Format("REQUIRED. The kind of database you are migrating against. Available choices are: {0}.",
-                                                          string.Join(", ", MigrationProcessorFactoryProvider.ProcessorTypes)),
+                                            $"REQUIRED. The kind of database you are migrating against. Available choices are: {dbChoices}.",
                                             v => { ProcessorType = v; }
                                             },
                                         {
@@ -328,42 +341,82 @@ namespace FluentMigrator.Console
             }
         }
 
-        private bool ExecutingAgainstMsSql
-        {
-            get
-            {
-                return ProcessorType.StartsWith("SqlServer", StringComparison.InvariantCultureIgnoreCase);
-            }
-        }
+        private bool ExecutingAgainstMsSql => ProcessorType.StartsWith("SqlServer", StringComparison.InvariantCultureIgnoreCase);
 
         private int ExecuteMigrations(IAnnouncer announcer)
         {
-            RunnerContext = new RunnerContext(announcer)
-            {
-                Database = ProcessorType,
-                Connection = Connection,
-                PreviewOnly = PreviewOnly,
-                Targets = new[] {TargetAssembly},
-                Namespace = Namespace,
-                NestedNamespaces = NestedNamespaces,
-                Task = Task,
-                Version = Version,
-                StartVersion = StartVersion,
-                NoConnection = NoConnection,
-                Steps = Steps,
-                WorkingDirectory = WorkingDirectory,
-                Profile = Profile,
-                Timeout = Timeout,
-                ConnectionStringConfigPath = ConnectionStringConfigPath,
-                ApplicationContext = ApplicationContext,
-                Tags = Tags,
-                TransactionPerSession = TransactionPerSession,
-                AllowBreakingChange = AllowBreakingChange,
-                ProviderSwitches = ProviderSwitches,
-            };
+            var conventionSet = new DefaultConventionSet(defaultSchemaName: null, WorkingDirectory);
 
-            new LateInitTaskExecutor(RunnerContext).Execute();
+            var services = CreateCoreServices()
+                .AddSingleton<IConventionSet>(conventionSet)
+                .AddScoped<TaskExecutor, LateInitTaskExecutor>()
+                .ConfigureRunner(r => r.WithAnnouncer(announcer))
+                .Configure<SelectingProcessorAccessorOptions>(opt => opt.ProcessorId = ProcessorType)
+                .Configure<AssemblySourceOptions>(opt => opt.AssemblyNames = new[] { TargetAssembly })
+                .Configure<AppConfigConnectionStringAccessorOptions>(
+                    opt => opt.ConnectionStringConfigPath = ConnectionStringConfigPath)
+                .Configure<RunnerOptions>(
+                    opt =>
+                    {
+                        opt.Task = Task;
+                        opt.Version = Version;
+                        opt.StartVersion = StartVersion;
+                        opt.NoConnection = NoConnection;
+                        opt.Steps = Steps;
+                        opt.Profile = Profile;
+                        opt.Tags = Tags.ToArray();
+#pragma warning disable 612
+                        opt.ApplicationContext = ApplicationContext;
+#pragma warning restore 612
+                        opt.TransactionPerSession = TransactionPerSession;
+                        opt.AllowBreakingChange = AllowBreakingChange;
+                    })
+                .Configure<ProcessorOptions>(
+                    opt =>
+                    {
+                        opt.ConnectionString = Connection;
+                        opt.PreviewOnly = PreviewOnly;
+                        opt.ProviderSwitches = ProviderSwitches;
+                        opt.Timeout = Timeout == null ? null : (TimeSpan?) TimeSpan.FromSeconds(Timeout.Value);
+                    });
+
+            using (var serviceProvider = services.BuildServiceProvider(validateScopes: false))
+            {
+                var executor = serviceProvider.GetRequiredService<TaskExecutor>();
+                executor.Execute();
+            }
+
             return 0;
+        }
+
+        private static IServiceCollection CreateCoreServices()
+        {
+            var services = new ServiceCollection()
+                .AddFluentMigratorCore()
+                .ConfigureRunner(
+                    builder => builder
+                        .AddDb2()
+                        .AddDb2ISeries()
+                        .AddDotConnectOracle()
+                        .AddFirebird()
+                        .AddHana()
+                        .AddMySql4()
+                        .AddMySql5()
+                        .AddOracle()
+                        .AddOracleManaged()
+                        .AddPostgres()
+                        .AddRedshift()
+                        .AddSqlAnywhere()
+                        .AddSQLite()
+                        .AddSqlServer()
+                        .AddSqlServer2000()
+                        .AddSqlServer2005()
+                        .AddSqlServer2008()
+                        .AddSqlServer2012()
+                        .AddSqlServer2014()
+                        .AddSqlServer2016()
+                        .AddSqlServerCe());
+            return services;
         }
     }
 }

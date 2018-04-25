@@ -217,10 +217,8 @@ namespace FluentMigrator.Runner.Processors.SQLite
 
                     if (args.Opaque is GoSearcher.GoSearcherParameters goParams)
                     {
-                        using (var command = CreateCommand(string.Empty))
+                        using (var command = CreateCommand(sqlBatch))
                         {
-                            command.CommandText = sqlBatch;
-
                             for (var i = 0; i != goParams.Count; ++i)
                             {
                                 command.ExecuteNonQuery();
@@ -238,9 +236,8 @@ namespace FluentMigrator.Runner.Processors.SQLite
 
                 if (!string.IsNullOrEmpty(sqlBatch))
                 {
-                    using (var command = CreateCommand(string.Empty))
+                    using (var command = CreateCommand(sqlBatch))
                     {
-                        command.CommandText = sqlBatch;
                         command.ExecuteNonQuery();
                     }
                 }

@@ -21,8 +21,6 @@ using System.Configuration;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-using FluentMigrator.Exceptions;
-
 using JetBrains.Annotations;
 
 using Microsoft.Extensions.Options;

@@ -47,6 +47,19 @@ namespace FluentMigrator.Runner.Initialization
 
         private IReadOnlyCollection<Assembly> _assemblies;
 
+        public TaskExecutor(
+            [NotNull] IAnnouncer announcer,
+            [NotNull] IAssemblySource assemblySource,
+            [NotNull] IOptions<RunnerOptions> runnerOptions,
+            [NotNull] IServiceProvider serviceProvider)
+        {
+            _announcer = announcer;
+            _assemblySource = assemblySource;
+            _runnerOptions = runnerOptions.Value;
+            ConnectionStringProvider = serviceProvider.GetService<IConnectionStringProvider>();
+            _lazyServiceProvider = new Lazy<IServiceProvider>(() => serviceProvider);
+        }
+
         [Obsolete]
         public TaskExecutor([NotNull] IRunnerContext runnerContext)
         {
@@ -62,19 +75,6 @@ namespace FluentMigrator.Runner.Initialization
                         ConnectionStringProvider,
                         asmLoaderFactory)
                     .BuildServiceProvider(validateScopes: true));
-        }
-
-        public TaskExecutor(
-            [NotNull] IAnnouncer announcer,
-            [NotNull] IAssemblySource assemblySource,
-            [NotNull] IOptions<RunnerOptions> runnerOptions,
-            [NotNull] IServiceProvider serviceProvider)
-        {
-            _announcer = announcer;
-            _assemblySource = assemblySource;
-            _runnerOptions = runnerOptions.Value;
-            ConnectionStringProvider = serviceProvider.GetService<IConnectionStringProvider>();
-            _lazyServiceProvider = new Lazy<IServiceProvider>(() => serviceProvider);
         }
 
         [Obsolete("Ony the statically provided factories are accessed")]

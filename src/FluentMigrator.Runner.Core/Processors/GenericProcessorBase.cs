@@ -171,6 +171,10 @@ namespace FluentMigrator.Runner.Processors
         {
             RollbackTransaction();
             EnsureConnectionIsClosed();
+            if ((_connection != null || (_lazyConnection.IsValueCreated && Connection != null)))
+            {
+                Connection.Dispose();
+            }
         }
 
         protected virtual IDbCommand CreateCommand(string commandText)

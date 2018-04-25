@@ -19,7 +19,9 @@ using System;
 using FluentMigrator.Example.Migrations;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
+using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Initialization;
+using FluentMigrator.Runner.Processors;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -39,7 +41,31 @@ namespace FluentMigrator.Example.Migrator
         private static IServiceProvider ConfigureServices(IServiceCollection services, string databaseId, string connectionString)
         {
             services
-                .AddFluentMigrator(databaseId)
+                .AddFluentMigratorCore()
+                .ConfigureRunner(
+                    builder => builder
+                        .AddDb2()
+                        .AddDb2ISeries()
+                        .AddDotConnectOracle()
+                        .AddFirebird()
+                        .AddHana()
+                        .AddMySql4()
+                        .AddMySql5()
+                        .AddOracle()
+                        .AddOracleManaged()
+                        .AddPostgres()
+                        .AddRedshift()
+                        .AddSqlAnywhere()
+                        .AddSQLite()
+                        .AddSqlServer()
+                        .AddSqlServer2000()
+                        .AddSqlServer2005()
+                        .AddSqlServer2008()
+                        .AddSqlServer2012()
+                        .AddSqlServer2014()
+                        .AddSqlServer2016()
+                        .AddSqlServerCe())
+                .Configure<SelectingProcessorAccessorOptions>(opt => opt.ProcessorId = databaseId)
                 .AddScoped<IConnectionStringReader>(sp => new PassThroughConnectionStringReader(connectionString))
                 .ConfigureRunner(
                     builder => builder

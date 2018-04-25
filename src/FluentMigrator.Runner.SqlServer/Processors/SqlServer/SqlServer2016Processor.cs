@@ -15,6 +15,8 @@
 #endregion
 
 using System;
+using System.Data.Common;
+using System.Data.SqlClient;
 
 using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.Runner.Initialization;
@@ -35,7 +37,35 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             [NotNull] IOptions<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor,
             [NotNull] IServiceProvider serviceProvider)
-            : base(new[] { "SqlServer2016", "SqlServer" }, generator, quoter, announcer, options, connectionStringAccessor, serviceProvider)
+            : this(
+                SqlClientFactory.Instance,
+                announcer,
+                quoter,
+                generator,
+                options,
+                connectionStringAccessor,
+                serviceProvider)
+        {
+        }
+
+        /// <inheritdoc />
+        protected SqlServer2016Processor(
+            [NotNull] DbProviderFactory factory,
+            [NotNull] IAnnouncer announcer,
+            [NotNull] SqlServer2008Quoter quoter,
+            [NotNull] SqlServer2016Generator generator,
+            [NotNull] IOptions<ProcessorOptions> options,
+            [NotNull] IConnectionStringAccessor connectionStringAccessor,
+            [NotNull] IServiceProvider serviceProvider)
+            : base(
+                new[] { "SqlServer2016", "SqlServer" },
+                factory,
+                generator,
+                quoter,
+                announcer,
+                options,
+                connectionStringAccessor,
+                serviceProvider)
         {
         }
     }

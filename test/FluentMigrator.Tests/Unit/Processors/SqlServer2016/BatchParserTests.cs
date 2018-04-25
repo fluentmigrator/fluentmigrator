@@ -14,9 +14,23 @@
 // limitations under the License.
 #endregion
 
+using System;
+using System.Data.Common;
+
+using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
+using FluentMigrator.Runner.BatchParser;
 using FluentMigrator.Runner.Generators.SqlServer;
+using FluentMigrator.Runner.Initialization;
+using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.SqlServer;
+
+using JetBrains.Annotations;
+
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+
+using Moq;
 
 using NUnit.Framework;
 
@@ -27,13 +41,32 @@ namespace FluentMigrator.Tests.Unit.Processors.SqlServer2016
     {
         protected override IMigrationProcessor CreateProcessor()
         {
-            return new SqlServerProcessor(
-                new[] { "SqlServer2016" },
-                MockedConnection.Object,
-                new SqlServer2016Generator(),
+            var mockedConnStringReader = new Mock<IConnectionStringReader>();
+            mockedConnStringReader.SetupGet(r => r.Priority).Returns(0);
+            mockedConnStringReader.Setup(r => r.GetConnectionString(It.IsAny<string>())).Returns("server=this");
+
+            var serviceProvider = new ServiceCollection()
+                .AddTransient<SqlServerBatchParser>()
+                .BuildServiceProvider();
+
+            var opt = new OptionsWrapper<ProcessorOptions>(new ProcessorOptions());
+            return new Processor(
+                MockedDbProviderFactory.Object,
                 new NullAnnouncer(),
-                ProcessorOptions,
-                MockedDbFactory.Object);
+                new SqlServer2008Quoter(),
+                new SqlServer2016Generator(),
+                opt,
+                MockedConnectionStringAccessor.Object,
+                serviceProvider);
+        }
+
+        private class Processor : SqlServer2016Processor
+        {
+            /// <inheritdoc />
+            public Processor([NotNull] DbProviderFactory factory, [NotNull] IAnnouncer announcer, [NotNull] SqlServer2008Quoter quoter, [NotNull] SqlServer2016Generator generator, [NotNull] IOptions<ProcessorOptions> options, [NotNull] IConnectionStringAccessor connectionStringAccessor, [NotNull] IServiceProvider serviceProvider)
+                : base(factory, announcer, quoter, generator, options, connectionStringAccessor, serviceProvider)
+            {
+            }
         }
     }
 }

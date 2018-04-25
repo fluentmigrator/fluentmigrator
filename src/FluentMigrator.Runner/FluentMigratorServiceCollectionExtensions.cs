@@ -190,24 +190,6 @@ namespace Microsoft.Extensions.DependencyInjection
         }
 
         /// <summary>
-        /// Adds migration runner (except the DB processor specific) services to the specified <see cref="IServiceCollection"/>.
-        /// </summary>
-        /// <param name="services">The <see cref="IServiceCollection" /> to add services to.</param>
-        /// <param name="databaseId">The ID of the processor/generator to use</param>
-        /// <returns>The updated service collection</returns>
-        [NotNull]
-        public static IServiceCollection AddFluentMigrator(
-            [NotNull] this IServiceCollection services,
-            [NotNull] string databaseId)
-        {
-            return services
-                .AddFluentMigratorCore()
-                .AddAllDatabases()
-                .Configure<SelectingGeneratorAccessorOptions>(opt => opt.GeneratorId = databaseId)
-                .Configure<SelectingProcessorAccessorOptions>(opt => opt.ProcessorId = databaseId);
-        }
-
-        /// <summary>
         /// Add all database services to the service collection
         /// </summary>
         /// <param name="services">The service collection</param>
@@ -264,7 +246,9 @@ namespace Microsoft.Extensions.DependencyInjection
 
             // Configure the migration runner
             services
-                .AddFluentMigrator(runnerContext.Database)
+                .AddFluentMigratorCore()
+                .AddAllDatabases()
+                .Configure<SelectingProcessorAccessorOptions>(opt => opt.ProcessorId = runnerContext.Database)
                 .ConfigureRunner(
                     builder => { builder.WithAnnouncer(runnerContext.Announcer); })
                 .AddSingleton(assemblyLoaderFactory)
