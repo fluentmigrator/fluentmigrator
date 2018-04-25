@@ -80,7 +80,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             [NotNull] IOptions<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor,
             [NotNull] IServiceProvider serviceProvider)
-            : base(SqlClientFactory.Instance, generator, announcer, options.Value, connectionStringAccessor)
+            : base(() => SqlClientFactory.Instance, generator, announcer, options.Value, connectionStringAccessor)
         {
             _serviceProvider = serviceProvider;
             var dbTypes = databaseTypes.ToList();
@@ -108,6 +108,8 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public override void RollbackTransaction()
         {
+            if (Transaction == null)
+                return;
             base.RollbackTransaction();
             Announcer.Sql("ROLLBACK TRANSACTION");
         }

@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2018, FluentMigrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -38,15 +38,20 @@ namespace FluentMigrator.Runner.Generators
             [NotNull, ItemNotNull] IEnumerable<IMigrationGenerator> generators,
             [NotNull] IOptions<SelectingGeneratorAccessorOptions> options)
         {
+            var gens = generators.ToList();
             if (string.IsNullOrEmpty(options.Value.GeneratorId))
             {
                 // No generator selected
-                Generator = generators.Single();
+                if (gens.Count == 0)
+                    throw new InvalidOperationException("No migration generator registerd.");
+                if (gens.Count > 1)
+                    throw new InvalidOperationException("More than one generator registered, but no generator id given. Specify the generator id by configuring SelectingGeneratorAccessorOptions.");
+                Generator = gens.Single();
             }
             else
             {
                 // One of multiple generators
-                Generator = FindGenerator(generators.ToList(), options.Value.GeneratorId);
+                Generator = FindGenerator(gens, options.Value.GeneratorId);
             }
         }
 

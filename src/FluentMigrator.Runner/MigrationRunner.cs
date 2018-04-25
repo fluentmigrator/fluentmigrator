@@ -56,7 +56,7 @@ namespace FluentMigrator.Runner
         private readonly IAssemblyCollection _migrationAssemblies;
 #pragma warning restore 612
 
-        [NotNull]
+        [CanBeNull]
         private readonly RunnerOptions _options;
 
         [NotNull]
@@ -68,7 +68,9 @@ namespace FluentMigrator.Runner
         private readonly MigrationValidator _migrationValidator;
         private readonly MigrationScopeHandler _migrationScopeHandler;
 
-        public bool TransactionPerSession => _options.TransactionPerSession;
+#pragma warning disable 612
+        public bool TransactionPerSession => _options?.TransactionPerSession ?? RunnerContext?.TransactionPerSession ?? false;
+#pragma warning restore 612
 
         public bool SilentlyFail { get; set; }
 
@@ -107,7 +109,6 @@ namespace FluentMigrator.Runner
             _migrationAssemblies = assemblies;
             _announcer = runnerContext.Announcer;
             _stopWatch = runnerContext.StopWatch;
-            _options = new RunnerOptions(runnerContext);
             _processorOptions = new ProcessorOptions(runnerContext);
 
             Processor = processor;
@@ -195,6 +196,11 @@ namespace FluentMigrator.Runner
             get => _currentVersionLoader ?? _versionLoader.Value;
             set => _currentVersionLoader = value;
         }
+
+        private bool AllowBreakingChanges =>
+#pragma warning disable 612
+            _options?.AllowBreakingChange ?? RunnerContext?.AllowBreakingChange ?? false;
+#pragma warning restore 612
 
         public void ApplyProfiles()
         {
@@ -386,7 +392,7 @@ namespace FluentMigrator.Runner
                     try
                     {
                         if (migrationInfo.IsAttributed() && migrationInfo.IsBreakingChange &&
-                            !_processorOptions.PreviewOnly && !_options.AllowBreakingChange)
+                            !_processorOptions.PreviewOnly && !AllowBreakingChanges)
                         {
                             throw new InvalidOperationException(
                                 string.Format(
@@ -565,9 +571,14 @@ namespace FluentMigrator.Runner
             }
             else
             {
+                var connectionStringAccessor = _serviceProvider.GetRequiredService<IConnectionStringAccessor>();
+                context = new MigrationContext(
+                    Processor,
+                    _serviceProvider,
 #pragma warning disable 612
-                context = new MigrationContext(Processor, _serviceProvider, _options.ApplicationContext, Processor.ConnectionString);
+                    _options?.ApplicationContext ?? RunnerContext?.ApplicationContext,
 #pragma warning restore 612
+                    connectionStringAccessor.ConnectionString);
             }
 
             getExpressions(migration, context);

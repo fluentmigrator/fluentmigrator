@@ -39,31 +39,28 @@ namespace FluentMigrator.Tests.Unit.Runners
         private readonly string[] _tags = {Tag1, Tag2};
 
         private Mock<IMigrationRunnerConventions> _migrationConventions;
-        private MaintenanceLoader _maintenanceLoader;
-        private MaintenanceLoader _maintenanceLoaderNoTags;
+        private IMaintenanceLoader _maintenanceLoader;
+        private IMaintenanceLoader _maintenanceLoaderNoTags;
 
         [SetUp]
         public void Setup()
         {
             _migrationConventions = new Mock<IMigrationRunnerConventions>();
             _migrationConventions.Setup(x => x.GetMaintenanceStage).Returns(DefaultMigrationRunnerConventions.Instance.GetMaintenanceStage);
+            _migrationConventions.Setup(x => x.TypeIsMigration).Returns(DefaultMigrationRunnerConventions.Instance.TypeIsMigration);
             _migrationConventions.Setup(x => x.TypeHasTags).Returns(DefaultMigrationRunnerConventions.Instance.TypeHasTags);
             _migrationConventions.Setup(x => x.TypeHasMatchingTags).Returns(DefaultMigrationRunnerConventions.Instance.TypeHasMatchingTags);
 
             _maintenanceLoader = ServiceCollectionExtensions.CreateServices()
                 .Configure<RunnerOptions>(opt => opt.Tags = _tags)
                 .AddSingleton<IMigrationRunnerConventionsAccessor>(new PassThroughMigrationRunnerConventionsAccessor(_migrationConventions.Object))
-                .AddScoped<MaintenanceLoader>()
-                .WithAllTestMigrations()
                 .BuildServiceProvider()
-                .GetRequiredService<MaintenanceLoader>();
+                .GetRequiredService<IMaintenanceLoader>();
 
             _maintenanceLoaderNoTags = ServiceCollectionExtensions.CreateServices()
                 .AddSingleton<IMigrationRunnerConventionsAccessor>(new PassThroughMigrationRunnerConventionsAccessor(_migrationConventions.Object))
-                .AddScoped<MaintenanceLoader>()
-                .WithAllTestMigrations()
                 .BuildServiceProvider()
-                .GetRequiredService<MaintenanceLoader>();
+                .GetRequiredService<IMaintenanceLoader>();
         }
 
         [Test]

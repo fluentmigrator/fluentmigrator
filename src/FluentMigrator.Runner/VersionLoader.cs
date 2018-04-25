@@ -190,7 +190,6 @@ namespace FluentMigrator.Runner
             if (!AlreadyCreatedVersionTable) return;
 
             var dataSet = _processor.ReadTableData(VersionTableMetaData.SchemaName, VersionTableMetaData.TableName);
-
             foreach (DataRow row in dataSet.Tables[0].Rows)
             {
                 _versionInfo.AddAppliedMigration(long.Parse(row[VersionTableMetaData.ColumnName].ToString()));

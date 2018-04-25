@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using FluentMigrator.Exceptions;
 using FluentMigrator.Runner.Processors;
 
 using Microsoft.Extensions.Options;
@@ -46,7 +47,7 @@ namespace FluentMigrator.Runner.Initialization
                     {
                         if (string.IsNullOrEmpty(processorOptions.Value.ConnectionString))
                         {
-                            throw new InvalidOperationException("No connection string specified");
+                            throw new UndeterminableConnectionException("No connection string specified");
                         }
 
                         result = processorOptions.Value.ConnectionString;

@@ -36,14 +36,24 @@ namespace FluentMigrator.Tests
     public static class ServiceCollectionExtensions
     {
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public static IServiceCollection CreateServices()
+        public static IServiceCollection CreateServices(bool addAssemblySource = true)
         {
-            return new ServiceCollection()
-                .AddFluentMigratorCore()
-                .AddSingleton<IAssemblySourceItem>(new AssemblySourceItem(Assembly.GetExecutingAssembly()))
-                .ConfigureRunner(builder => builder
-                    .WithAnnouncer(new TextWriterAnnouncer(TestContext.Out) { ShowSql = true }))
+            var services = new ServiceCollection()
+                .AddFluentMigratorCore();
+
+            if (addAssemblySource)
+            {
+                services
+                    .AddSingleton<IAssemblySourceItem>(new AssemblySourceItem(Assembly.GetExecutingAssembly()));
+            }
+
+            services
+                .ConfigureRunner(
+                    builder => builder
+                        .WithAnnouncer(new TextWriterAnnouncer(TestContext.Out) { ShowSql = true }))
                 .Configure<RunnerOptions>(opt => opt.AllowBreakingChange = true);
+
+            return services;
         }
 
         public static IServiceCollection WithAllTestMigrations(

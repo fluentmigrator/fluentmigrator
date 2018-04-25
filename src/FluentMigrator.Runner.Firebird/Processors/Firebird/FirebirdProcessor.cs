@@ -70,7 +70,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             [NotNull] IOptions<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor,
             [NotNull] FirebirdOptions fbOptions)
-            : base(factory.Factory, generator, announcer, options.Value, connectionStringAccessor)
+            : base(() => factory.Factory, generator, announcer, options.Value, connectionStringAccessor)
         {
             FBOptions = fbOptions ?? throw new ArgumentNullException(nameof(fbOptions));
             _firebirdVersionFunc = new Lazy<Version>(GetFirebirdVersion);

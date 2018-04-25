@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2018, FluentMigrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -36,6 +36,6 @@ namespace FluentMigrator.Runner.Initialization
         /// </summary>
         /// <param name="connectionStringOrName">The name of the connection string</param>
         [CanBeNull]
-        string GetConnectionString(string connectionStringOrName);
+        string GetConnectionString([CanBeNull] string connectionStringOrName);
     }
 }

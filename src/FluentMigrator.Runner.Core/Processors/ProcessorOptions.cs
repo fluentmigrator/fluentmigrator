@@ -43,12 +43,7 @@ namespace FluentMigrator.Runner.Processors
         [Obsolete]
         public ProcessorOptions(IRunnerContext runnerContext)
         {
-            PreviewOnly = runnerContext.PreviewOnly;
-            Timeout = runnerContext.Timeout == null
-                ? null
-                : (TimeSpan?) TimeSpan.FromSeconds(runnerContext.Timeout.Value);
-            ProviderSwitches = runnerContext.ProviderSwitches;
-            ConnectionString = runnerContext.Connection;
+            SetValuesFrom(runnerContext);
         }
 
         /// <summary>
@@ -73,5 +68,20 @@ namespace FluentMigrator.Runner.Processors
 
         /// <inheritdoc />
         int? IMigrationProcessorOptions.Timeout => Timeout == null ? null : (int?) Timeout.Value.TotalSeconds;
+
+        /// <summary>
+        /// Sets the values from the given runner context
+        /// </summary>
+        /// <param name="runnerContext">The runner context</param>
+        [Obsolete]
+        public void SetValuesFrom(IRunnerContext runnerContext)
+        {
+            PreviewOnly = runnerContext.PreviewOnly;
+            Timeout = runnerContext.Timeout == null
+                ? null
+                : (TimeSpan?)TimeSpan.FromSeconds(runnerContext.Timeout.Value);
+            ProviderSwitches = runnerContext.ProviderSwitches;
+            ConnectionString = runnerContext.Connection;
+        }
     }
 }

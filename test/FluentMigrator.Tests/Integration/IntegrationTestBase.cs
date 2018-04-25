@@ -193,6 +193,9 @@ namespace FluentMigrator.Tests.Integration
             bool tryRollback,
             IntegrationTestOptions.DatabaseServerOptions serverOptions)
         {
+            if (!serverOptions.IsEnabled)
+                Assert.Ignore($"The configuration for {processorType.Name} is not enabled.");
+
             var services = ServiceCollectionExtensions.CreateServices()
                 .AddAllDatabases()
                 .AddScoped<IProcessorAccessor>(

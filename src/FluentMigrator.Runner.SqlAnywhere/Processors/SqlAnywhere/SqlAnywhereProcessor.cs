@@ -68,13 +68,13 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
 
         protected SqlAnywhereProcessor(
             [NotNull] string databaseType,
-            [NotNull] DbProviderFactory factory,
+            [NotNull] Func<DbProviderFactory> factoryAccessor,
             [NotNull] IMigrationGenerator generator,
             [NotNull] IAnnouncer announcer,
             [NotNull] IOptions<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor,
             [NotNull] IServiceProvider serviceProvider)
-            : base(factory, generator, announcer, options.Value, connectionStringAccessor)
+            : base(factoryAccessor, generator, announcer, options.Value, connectionStringAccessor)
         {
             _serviceProvider = serviceProvider;
             DatabaseType = databaseType;

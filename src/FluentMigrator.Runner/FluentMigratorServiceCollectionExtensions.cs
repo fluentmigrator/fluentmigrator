@@ -110,7 +110,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddScoped<IProcessorAccessor, SelectingProcessorAccessor>()
 
                 // IQuerySchema is the base interface for the IMigrationProcessor
-                .AddScoped<IQuerySchema>(sp => sp.GetRequiredService<IMigrationProcessor>())
+                .AddScoped<IQuerySchema>(sp => sp.GetRequiredService<IProcessorAccessor>().Processor)
 
                 // The profile loader needed by the migration runner
                 .AddScoped<IProfileLoader, ProfileLoader>()
@@ -275,7 +275,9 @@ namespace Microsoft.Extensions.DependencyInjection
                         opt.NestedNamespaces = runnerContext.NestedNamespaces;
                     })
                 .Configure<AssemblySourceOptions>(opt => opt.AssemblyNames = runnerContext.Targets)
-                .Configure<ProcessorOptions>(opt => opt.ConnectionString = runnerContext.Connection)
+                .Configure<RunnerOptions>(
+                    opt => { opt.SetValuesFrom(runnerContext); })
+                .Configure<ProcessorOptions>(opt => { opt.SetValuesFrom(runnerContext); })
                 .Configure<AppConfigConnectionStringAccessorOptions>(
                     opt => opt.ConnectionStringConfigPath = runnerContext.ConnectionStringConfigPath);
 

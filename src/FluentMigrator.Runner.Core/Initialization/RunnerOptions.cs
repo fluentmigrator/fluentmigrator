@@ -40,16 +40,7 @@ namespace FluentMigrator.Runner.Initialization
         [Obsolete]
         public RunnerOptions(IRunnerContext runnerContext)
         {
-            Task = runnerContext.Task;
-            Version = runnerContext.Version;
-            StartVersion = runnerContext.StartVersion;
-            Steps = runnerContext.Steps;
-            Profile = runnerContext.Profile;
-            Tags = runnerContext.Tags?.ToArray();
-            AllowBreakingChange = runnerContext.AllowBreakingChange;
-            TransactionPerSession = runnerContext.TransactionPerSession;
-            ApplicationContext = runnerContext.ApplicationContext;
-            NoConnection = runnerContext.NoConnection;
+            SetValuesFrom(runnerContext);
         }
 
         /// <summary>
@@ -114,5 +105,24 @@ namespace FluentMigrator.Runner.Initialization
         /// state of the database.
         /// </remarks>
         public bool NoConnection { get; set; }
+
+        /// <summary>
+        /// Sets the values from the given runner context
+        /// </summary>
+        /// <param name="runnerContext">The runner context</param>
+        [Obsolete]
+        public void SetValuesFrom(IRunnerContext runnerContext)
+        {
+            Task = runnerContext.Task;
+            Version = runnerContext.Version;
+            StartVersion = runnerContext.StartVersion;
+            Steps = runnerContext.Steps;
+            Profile = runnerContext.Profile;
+            Tags = runnerContext.Tags?.ToArray();
+            AllowBreakingChange = runnerContext.AllowBreakingChange;
+            TransactionPerSession = runnerContext.TransactionPerSession;
+            ApplicationContext = runnerContext.ApplicationContext;
+            NoConnection = runnerContext.NoConnection;
+        }
     }
 }

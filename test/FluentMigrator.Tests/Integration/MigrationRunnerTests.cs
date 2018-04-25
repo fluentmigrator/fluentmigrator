@@ -105,6 +105,7 @@ namespace FluentMigrator.Tests.Integration
 
             var serviceProvider = ServiceCollectionExtensions.CreateServices()
                 .Configure<ProcessorOptions>(opt => opt.PreviewOnly = false)
+                .AddScoped<IConnectionStringReader>(_ => new PassThroughConnectionStringReader("No connection"))
                 .WithProcessor(processor)
                 .WithMigrationsIn(_rootNamespace)
                 .BuildServiceProvider();

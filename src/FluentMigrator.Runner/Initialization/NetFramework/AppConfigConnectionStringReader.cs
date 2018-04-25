@@ -157,7 +157,10 @@ namespace FluentMigrator.Runner.Initialization.NetFramework
         private void OutputResults(ConnectionInfo info)
         {
             if (info == null)
-                throw new UndeterminableConnectionException("Unable to resolve any connectionstring using parameters \"/connection\" and \"/configPath\"");
+            {
+                _announcer.Error("Unable to resolve any connectionstring using parameters \"/connection\" and \"/configPath\"");
+                return;
+            }
 
             var connectionString = _matchPwd.Replace(info.ConnectionString, "$1********;");
             string message;

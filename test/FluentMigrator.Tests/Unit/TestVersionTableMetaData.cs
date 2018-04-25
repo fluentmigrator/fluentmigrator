@@ -16,8 +16,12 @@
 //
 #endregion
 
+using System;
+
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.VersionTableInfo;
+
+using Microsoft.Extensions.Options;
 
 #pragma warning disable 3005
 namespace FluentMigrator.Tests.Unit
@@ -31,16 +35,25 @@ namespace FluentMigrator.Tests.Unit
         public const string DESCRIPTIONCOLUMNNAME = "testDescriptionColumnName";
         public const string APPLIEDONCOLUMNNAME = "testAppliedOnColumnName";
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TestVersionTableMetaData"/> class.
+        /// </summary>
+        /// <param name="options">The runner options</param>
+        /// <remarks>
+        /// This constructor must come first due to a bug in aspnet/DependencyInjection. An issue is already filed.
+        /// </remarks>
+        public TestVersionTableMetaData(IOptions<RunnerOptions> options)
+            : this()
+        {
+#pragma warning disable 612
+            ApplicationContext = options.Value.ApplicationContext;
+#pragma warning restore 612
+        }
+
         public TestVersionTableMetaData()
         {
             SchemaName = "testSchemaName";
             OwnsSchema = true;
-        }
-
-        public TestVersionTableMetaData(IRunnerContext runnerContext)
-            : this()
-        {
-            ApplicationContext = runnerContext.ApplicationContext;
         }
 
         public object ApplicationContext { get; set; }

@@ -69,7 +69,7 @@ namespace FluentMigrator.Runner.Processors.SQLite
             [NotNull] IOptions<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor,
             [NotNull] IServiceProvider serviceProvider)
-            : base(factory.Factory, generator, announcer, options.Value, connectionStringAccessor)
+            : base(() => factory.Factory, generator, announcer, options.Value, connectionStringAccessor)
         {
             _serviceProvider = serviceProvider;
         }

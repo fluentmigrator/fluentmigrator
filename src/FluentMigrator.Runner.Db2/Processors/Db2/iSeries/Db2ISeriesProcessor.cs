@@ -50,7 +50,7 @@ namespace FluentMigrator.Runner.Processors.DB2.iSeries
             [NotNull] IAnnouncer announcer,
             [NotNull] IOptions<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor)
-            : base(factory.Factory, generator, announcer, options.Value, connectionStringAccessor)
+            : base(() => factory.Factory, generator, announcer, options.Value, connectionStringAccessor)
         {
             Quoter = quoter;
         }

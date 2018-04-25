@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 //
 // Copyright (c) 2018, Fluent Migrator Project
 //
@@ -24,14 +24,13 @@ using FluentMigrator.Runner.VersionTableInfo;
 
 namespace FluentMigrator.Tests.Unit
 {
-    public class TestVersionLoader
-        : IVersionLoader
+    public class TestVersionLoader : IVersionLoader
     {
-        private IVersionTableMetaData versionTableMetaData;
+        private readonly IVersionTableMetaData _versionTableMetaData;
 
         public TestVersionLoader(IMigrationRunner runner, IVersionTableMetaData versionTableMetaData)
         {
-            this.versionTableMetaData = versionTableMetaData;
+            _versionTableMetaData = versionTableMetaData;
             Runner = runner;
             VersionInfo = new VersionInfo();
             Versions = new List<long>();
@@ -48,7 +47,7 @@ namespace FluentMigrator.Tests.Unit
 
         public IVersionTableMetaData GetVersionTableMetaData()
         {
-            return versionTableMetaData;
+            return _versionTableMetaData;
         }
 
         public void LoadVersionInfo()
@@ -90,10 +89,7 @@ namespace FluentMigrator.Tests.Unit
 
         public IVersionInfo VersionInfo { get; set; }
 
-        public IVersionTableMetaData VersionTableMetaData
-        {
-            get { return versionTableMetaData; }
-        }
+        public IVersionTableMetaData VersionTableMetaData => _versionTableMetaData;
 
         public List<long> Versions { get; private set; }
     }

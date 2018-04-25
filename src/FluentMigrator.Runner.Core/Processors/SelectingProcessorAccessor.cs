@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2018, FluentMigrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,6 +17,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+
+using FluentMigrator.Exceptions;
 
 using JetBrains.Annotations;
 
@@ -38,15 +40,20 @@ namespace FluentMigrator.Runner.Processors
             [NotNull, ItemNotNull] IEnumerable<IMigrationProcessor> processors,
             [NotNull] IOptions<SelectingProcessorAccessorOptions> options)
         {
+            var procs = processors.ToList();
             if (string.IsNullOrEmpty(options.Value.ProcessorId))
             {
                 // No generator selected
-                Processor = processors.Single();
+                if (procs.Count == 0)
+                    throw new ProcessorFactoryNotFoundException("No migration processor registered.");
+                if (procs.Count > 1)
+                    throw new ProcessorFactoryNotFoundException("More than one processor registered, but no processor id given. Specify the processor id by configuring SelectingProcessorAccessorOptions.");
+                Processor = procs.Single();
             }
             else
             {
                 // One of multiple generators
-                Processor = FindGenerator(processors.ToList(), options.Value.ProcessorId);
+                Processor = FindGenerator(procs, options.Value.ProcessorId);
             }
         }
 
@@ -74,7 +81,7 @@ namespace FluentMigrator.Runner.Processors
             }
 
             var generatorNames = string.Join(", ", processors.Select(p => p.DatabaseType).Union(processors.SelectMany(p => p.DatabaseTypeAliases)));
-            throw new InvalidOperationException($@"A migration generator with the ID {processorsId} couldn't be found. Available generators are: {generatorNames}");
+            throw new ProcessorFactoryNotFoundException($@"A migration generator with the ID {processorsId} couldn't be found. Available generators are: {generatorNames}");
         }
     }
 }

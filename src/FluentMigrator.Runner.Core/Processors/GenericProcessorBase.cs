@@ -32,6 +32,15 @@ namespace FluentMigrator.Runner.Processors
         [Obsolete]
         private readonly string _connectionString;
 
+        [NotNull, ItemCanBeNull]
+        private readonly Lazy<DbProviderFactory> _dbProviderFactory;
+
+        [NotNull, ItemCanBeNull]
+        private readonly Lazy<IDbConnection> _lazyConnection;
+
+        [CanBeNull]
+        private IDbConnection _connection;
+
         [Obsolete]
         protected GenericProcessorBase(
             IDbConnection connection,
@@ -41,7 +50,7 @@ namespace FluentMigrator.Runner.Processors
             [NotNull] IMigrationProcessorOptions options)
             : base(generator, announcer, options)
         {
-            DbProviderFactory = (factory as DbFactoryBase)?.Factory;
+            _dbProviderFactory = new Lazy<DbProviderFactory>(() => (factory as DbFactoryBase)?.Factory);
 
             // Set the connection string, because it cannot be set by
             // the base class (due to the missing information)
@@ -53,18 +62,18 @@ namespace FluentMigrator.Runner.Processors
 
             Factory = factory;
 
-            Connection = connection;
+            _lazyConnection = new Lazy<IDbConnection>(() => connection);
         }
 
         protected GenericProcessorBase(
-            [CanBeNull] DbProviderFactory factory,
+            [CanBeNull] Func<DbProviderFactory> factoryAccessor,
             [NotNull] IMigrationGenerator generator,
             [NotNull] IAnnouncer announcer,
             [NotNull] ProcessorOptions options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor)
             : base(generator, announcer, options)
         {
-            DbProviderFactory = factory;
+            _dbProviderFactory = new Lazy<DbProviderFactory>(() => factoryAccessor?.Invoke());
 
             var connectionString = connectionStringAccessor.ConnectionString;
 
@@ -78,18 +87,26 @@ namespace FluentMigrator.Runner.Processors
             Factory = legacyFactory;
 #pragma warning restore 612
 
-            if (factory != null)
-            {
-                Connection = factory.CreateConnection();
-                Debug.Assert(Connection != null, nameof(Connection) + " != null");
-                Connection.ConnectionString = connectionString;
-            }
+            _lazyConnection = new Lazy<IDbConnection>(
+                () =>
+                {
+                    if (DbProviderFactory == null)
+                        return null;
+                    Connection = DbProviderFactory.CreateConnection();
+                    Debug.Assert(Connection != null, nameof(Connection) + " != null");
+                    Connection.ConnectionString = connectionString;
+                    return Connection;
+                });
         }
 
         [Obsolete("Will change from public to protected")]
         public override string ConnectionString => _connectionString;
 
-        public IDbConnection Connection { get; protected set; }
+        public IDbConnection Connection
+        {
+            get => _connection ?? _lazyConnection.Value;
+            protected set => _connection = value;
+        }
 
         [Obsolete]
         [NotNull]
@@ -99,7 +116,7 @@ namespace FluentMigrator.Runner.Processors
         public IDbTransaction Transaction { get; protected set; }
 
         [CanBeNull]
-        protected DbProviderFactory DbProviderFactory { get; }
+        protected DbProviderFactory DbProviderFactory => _dbProviderFactory.Value;
 
         protected virtual void EnsureConnectionIsOpen()
         {
@@ -111,7 +128,7 @@ namespace FluentMigrator.Runner.Processors
 
         protected virtual void EnsureConnectionIsClosed()
         {
-            if (Connection != null && Connection.State != ConnectionState.Closed)
+            if ((_connection != null || (_lazyConnection.IsValueCreated && Connection != null)) && Connection.State != ConnectionState.Closed)
             {
                 Connection.Close();
             }

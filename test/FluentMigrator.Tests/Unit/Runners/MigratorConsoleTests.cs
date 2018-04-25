@@ -80,7 +80,9 @@ namespace FluentMigrator.Tests.Unit.Runners
         {
             var sbNonVerbose = new StringBuilder();
             var stringWriterNonVerbose = new StringWriter(sbNonVerbose);
+
             System.Console.SetOut(stringWriterNonVerbose);
+            System.Console.SetError(stringWriterNonVerbose);
 
             new MigratorConsole().Run(
                 "/db", Database,
@@ -111,7 +113,10 @@ namespace FluentMigrator.Tests.Unit.Runners
         {
             var sb = new StringBuilder();
             var stringWriter = new StringWriter(sb);
+
             System.Console.SetOut(stringWriter);
+            System.Console.SetError(stringWriter);
+
             new MigratorConsole().Run(
                 "/db", Database,
                 "/connection", Connection,
@@ -131,6 +136,7 @@ namespace FluentMigrator.Tests.Unit.Runners
             var stringWriter = new StringWriter(sb);
 
             System.Console.SetOut(stringWriter);
+            System.Console.SetError(stringWriter);
 
             new MigratorConsole().Run(
                 "/db", Database,

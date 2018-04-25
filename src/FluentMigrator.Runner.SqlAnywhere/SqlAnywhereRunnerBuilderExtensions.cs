@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2018, FluentMigrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -37,8 +37,8 @@ namespace FluentMigrator.Runner
             builder.Services
                 .AddTransient<SqlAnywhereBatchParser>()
                 .AddScoped<SqlAnywhereDbFactory>()
-                .AddScoped<SqlAnywhereProcessor>()
-                .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<SqlAnywhereProcessor>())
+                .AddScoped<SqlAnywhere16Processor>()
+                .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<SqlAnywhere16Processor>())
                 .AddScoped<SqlAnywhereQuoter>()
                 .AddScoped<SqlAnywhere16Generator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<SqlAnywhere16Generator>());

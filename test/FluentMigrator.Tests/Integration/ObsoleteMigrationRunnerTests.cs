@@ -1098,18 +1098,17 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
-        [Category("SqlServer2012")]
+        [Category("SqlServer2016")]
         public void CanCreateSequence()
         {
-            ExecuteWithSupportedProcessors(
+            if (!IntegrationTestOptions.SqlServer2016.IsEnabled)
+            {
+                Assert.Ignore("No processor found for the given action.");
+            }
+
+            ExecuteWithSqlServer2016(
                 processor =>
                 {
-                    if (processor.DatabaseType != "SqlServer2012")
-                    {
-                        Assert.Ignore("A processor of type {0} isn't supported", processor.DatabaseType);
-                        return;
-                    }
-
                     var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
 
                     runner.Up(new TestCreateSequence());
@@ -1117,7 +1116,9 @@ namespace FluentMigrator.Tests.Integration
 
                     runner.Down(new TestCreateSequence());
                     processor.SequenceExists(null, "TestSequence").ShouldBeFalse();
-                }, true, pt => pt == typeof(SqlServerProcessor));
+                },
+                true,
+                IntegrationTestOptions.SqlServer2016);
         }
 
         [Test]
