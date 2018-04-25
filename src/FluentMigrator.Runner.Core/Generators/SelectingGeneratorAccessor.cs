@@ -18,6 +18,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using FluentMigrator.Runner.Processors;
+
 using JetBrains.Annotations;
 
 using Microsoft.Extensions.Options;
@@ -34,12 +36,19 @@ namespace FluentMigrator.Runner.Generators
         /// </summary>
         /// <param name="generators">The generators to select from</param>
         /// <param name="options">The options used to determine the generator to be returned</param>
+        /// <param name="processorSelectorOptions">The processor selector options</param>
         public SelectingGeneratorAccessor(
             [NotNull, ItemNotNull] IEnumerable<IMigrationGenerator> generators,
-            [NotNull] IOptions<SelectingGeneratorAccessorOptions> options)
+            [NotNull] IOptions<SelectingGeneratorAccessorOptions> options,
+            [NotNull] IOptions<SelectingProcessorAccessorOptions> processorSelectorOptions)
         {
             var gens = generators.ToList();
-            if (string.IsNullOrEmpty(options.Value.GeneratorId))
+
+            var generatorId = string.IsNullOrEmpty(options.Value.GeneratorId)
+                ? processorSelectorOptions.Value.ProcessorId
+                : options.Value.GeneratorId;
+
+            if (string.IsNullOrEmpty(generatorId))
             {
                 // No generator selected
                 if (gens.Count == 0)
@@ -51,7 +60,7 @@ namespace FluentMigrator.Runner.Generators
             else
             {
                 // One of multiple generators
-                Generator = FindGenerator(gens, options.Value.GeneratorId);
+                Generator = FindGenerator(gens, generatorId);
             }
         }
 

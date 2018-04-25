@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using FluentMigrator.Exceptions;
+using FluentMigrator.Runner.Generators;
 
 using JetBrains.Annotations;
 
@@ -35,13 +36,20 @@ namespace FluentMigrator.Runner.Processors
         /// Initializes a new instance of the <see cref="SelectingProcessorAccessor"/> class.
         /// </summary>
         /// <param name="processors">The processors to select from</param>
-        /// <param name="options">The options used to determine the generator to be returned</param>
+        /// <param name="options">The options used to determine the processor to be returned</param>
+        /// <param name="generatorSelectorOptions">The generator selector options</param>
         public SelectingProcessorAccessor(
             [NotNull, ItemNotNull] IEnumerable<IMigrationProcessor> processors,
-            [NotNull] IOptions<SelectingProcessorAccessorOptions> options)
+            [NotNull] IOptions<SelectingProcessorAccessorOptions> options,
+            [NotNull] IOptions<SelectingGeneratorAccessorOptions> generatorSelectorOptions)
         {
             var procs = processors.ToList();
-            if (string.IsNullOrEmpty(options.Value.ProcessorId))
+
+            var processorId = string.IsNullOrEmpty(options.Value.ProcessorId)
+                ? generatorSelectorOptions.Value.GeneratorId
+                : options.Value.ProcessorId;
+
+            if (string.IsNullOrEmpty(processorId))
             {
                 // No generator selected
                 if (procs.Count == 0)
@@ -53,7 +61,7 @@ namespace FluentMigrator.Runner.Processors
             else
             {
                 // One of multiple generators
-                Processor = FindGenerator(procs, options.Value.ProcessorId);
+                Processor = FindGenerator(procs, processorId);
             }
         }
 
