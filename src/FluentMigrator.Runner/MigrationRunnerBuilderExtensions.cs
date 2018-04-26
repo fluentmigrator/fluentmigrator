@@ -21,6 +21,7 @@ using System.Linq;
 using System.Reflection;
 
 using FluentMigrator.Runner.Initialization;
+using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.VersionTableInfo;
 
 using JetBrains.Annotations;
@@ -35,6 +36,62 @@ namespace FluentMigrator.Runner
     [CLSCompliant(false)]
     public static class MigrationRunnerBuilderExtensions
     {
+        /// <summary>
+        /// Sets configuration action for global processor options
+        /// </summary>
+        /// <param name="builder">The runner builder</param>
+        /// <param name="configureAction">The configuration action</param>
+        /// <returns>The runner builder</returns>
+        public static IMigrationRunnerBuilder ConfigureGlobalProcessorOptions(
+            this IMigrationRunnerBuilder builder,
+            Action<ProcessorOptions> configureAction)
+        {
+            builder.Services.Configure(configureAction);
+            return builder;
+        }
+
+        /// <summary>
+        /// Sets the global connection string
+        /// </summary>
+        /// <param name="builder">The runner builder</param>
+        /// <param name="connectionStringOrName">The connection string or name to use</param>
+        /// <returns>The runner builder</returns>
+        public static IMigrationRunnerBuilder WithGlobalConnectionString(
+            this IMigrationRunnerBuilder builder,
+            string connectionStringOrName)
+        {
+            builder.Services.Configure<ProcessorOptions>(opt => opt.ConnectionString = connectionStringOrName);
+            return builder;
+        }
+
+        /// <summary>
+        /// Sets the global command timeout
+        /// </summary>
+        /// <param name="builder">The runner builder</param>
+        /// <param name="commandTimeout">The global command timeout</param>
+        /// <returns>The runner builder</returns>
+        public static IMigrationRunnerBuilder WithGlobalCommandTimeout(
+            this IMigrationRunnerBuilder builder,
+            TimeSpan commandTimeout)
+        {
+            builder.Services.Configure<ProcessorOptions>(opt => opt.Timeout = commandTimeout);
+            return builder;
+        }
+
+        /// <summary>
+        /// Sets the global preview mode
+        /// </summary>
+        /// <param name="builder">The runner builder</param>
+        /// <param name="preview">The global preview mode</param>
+        /// <returns>The runner builder</returns>
+        public static IMigrationRunnerBuilder AsGlobalPreview(
+            this IMigrationRunnerBuilder builder,
+            bool preview = true)
+        {
+            builder.Services.Configure<ProcessorOptions>(opt => opt.PreviewOnly = preview);
+            return builder;
+        }
+
         /// <summary>
         /// Sets the announcer
         /// </summary>
