@@ -6,5 +6,5 @@ mono: latest
 dotnet: 2.1.103
 script:
 - dotnet build ./FluentMigrator.sln
-- dotnet vstest test/FluentMigrator.Tests/bin/Debug/net461/FluentMigrator.Tests.dll
-  --TestCaseFilter:'TestCategory!=NotWorkingOnMono&(TestCategory!=Integration|(TestCategory=Integration&(TestCategory=SQLite)))'
+- dotnet test ./test/FluentMigrator.Tests/FluentMigrator.Tests.csproj
+  --filter 'TestCategory!=NotWorkingOnMono&(TestCategory!=Integration|(TestCategory=Integration&(TestCategory=SQLite)))'
