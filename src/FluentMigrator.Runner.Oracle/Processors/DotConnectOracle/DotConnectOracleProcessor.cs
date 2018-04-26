@@ -21,6 +21,12 @@ using System.Collections.Generic;
 using System.Data;
 
 using FluentMigrator.Expressions;
+using FluentMigrator.Runner.Generators.Oracle;
+using FluentMigrator.Runner.Initialization;
+
+using JetBrains.Annotations;
+
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.DotConnectOracle
 {
@@ -33,15 +39,26 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
 
         public override IList<string> DatabaseTypeAliases { get; } = new List<string>();
 
+        [Obsolete]
         public DotConnectOracleProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, DotConnectOracleDbFactory factory)
             : base(connection, factory, generator, announcer, options)
+        {
+        }
+
+        public DotConnectOracleProcessor(
+            [NotNull] DotConnectOracleDbFactory factory,
+            [NotNull] OracleGenerator generator,
+            [NotNull] IAnnouncer announcer,
+            [NotNull] IOptions<ProcessorOptions> options,
+            [NotNull] IConnectionStringAccessor connectionStringAccessor)
+            : base(() => factory.Factory, generator, announcer, options.Value, connectionStringAccessor)
         {
         }
 
         public override bool SchemaExists(string schemaName)
         {
             if (schemaName == null)
-                throw new ArgumentNullException("schemaName");
+                throw new ArgumentNullException(nameof(schemaName));
 
             if (schemaName.Length == 0)
                 return false;
@@ -52,7 +69,7 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
         public override bool TableExists(string schemaName, string tableName)
         {
             if (tableName == null)
-                throw new ArgumentNullException("tableName");
+                throw new ArgumentNullException(nameof(tableName));
 
             if (tableName.Length == 0)
                 return false;
@@ -66,9 +83,9 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
         public override bool ColumnExists(string schemaName, string tableName, string columnName)
         {
             if (tableName == null)
-                throw new ArgumentNullException("tableName");
+                throw new ArgumentNullException(nameof(tableName));
             if (columnName == null)
-                throw new ArgumentNullException("columnName");
+                throw new ArgumentNullException(nameof(columnName));
 
             if (columnName.Length == 0 || tableName.Length == 0)
                 return false;
@@ -82,16 +99,16 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
         public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
         {
             if (tableName == null)
-                throw new ArgumentNullException("tableName");
+                throw new ArgumentNullException(nameof(tableName));
             if (constraintName == null)
-                throw new ArgumentNullException("constraintName");
+                throw new ArgumentNullException(nameof(constraintName));
 
             //In Oracle DB constraint name is unique within the schema, so the table name is not used in the query
 
             if (constraintName.Length == 0)
                 return false;
 
-            if (String.IsNullOrEmpty(schemaName))
+            if (string.IsNullOrEmpty(schemaName))
                 return Exists("SELECT 1 FROM USER_CONSTRAINTS WHERE CONSTRAINT_NAME = '{0}'", constraintName.ToUpper());
 
             return Exists("SELECT 1 FROM ALL_CONSTRAINTS WHERE OWNER = '{0}' AND CONSTRAINT_NAME = '{1}'", schemaName.ToUpper(), constraintName.ToUpper());
@@ -100,16 +117,16 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
         public override bool IndexExists(string schemaName, string tableName, string indexName)
         {
             if (tableName == null)
-                throw new ArgumentNullException("tableName");
+                throw new ArgumentNullException(nameof(tableName));
             if (indexName == null)
-                throw new ArgumentNullException("indexName");
+                throw new ArgumentNullException(nameof(indexName));
 
             //In Oracle DB index name is unique within the schema, so the table name is not used in the query
 
             if (indexName.Length == 0)
                 return false;
 
-            if (String.IsNullOrEmpty(schemaName))
+            if (string.IsNullOrEmpty(schemaName))
                 return Exists("SELECT 1 FROM USER_INDEXES WHERE INDEX_NAME = '{0}'", indexName.ToUpper());
 
             return Exists("SELECT 1 FROM ALL_INDEXES WHERE OWNER = '{0}' AND INDEX_NAME = '{1}'", schemaName.ToUpper(), indexName.ToUpper());
@@ -128,11 +145,11 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
         public override void Execute(string template, params object[] args)
         {
             if (template == null)
-                throw new ArgumentNullException("template");
+                throw new ArgumentNullException(nameof(template));
 
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction, Options))
+            using (var command = CreateCommand(string.Format(template, args)))
             {
                 command.ExecuteNonQuery();
             }
@@ -141,11 +158,11 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
         public override bool Exists(string template, params object[] args)
         {
             if (template == null)
-                throw new ArgumentNullException("template");
+                throw new ArgumentNullException(nameof(template));
 
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction, Options))
+            using (var command = CreateCommand(string.Format(template, args)))
             using (var reader = command.ExecuteReader())
             {
                 return reader.Read();
@@ -155,9 +172,9 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
         public override DataSet ReadTableData(string schemaName, string tableName)
         {
             if (tableName == null)
-                throw new ArgumentNullException("tableName");
+                throw new ArgumentNullException(nameof(tableName));
 
-            if (String.IsNullOrEmpty(schemaName))
+            if (string.IsNullOrEmpty(schemaName))
                 return Read("SELECT * FROM {0}", tableName.ToUpper());
 
             return Read("SELECT * FROM {0}.{1}", schemaName.ToUpper(), tableName.ToUpper());
@@ -166,11 +183,11 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
         public override DataSet Read(string template, params object[] args)
         {
             if (template == null)
-                throw new ArgumentNullException("template");
+                throw new ArgumentNullException(nameof(template));
 
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction, Options))
+            using (var command = CreateCommand(string.Format(template, args)))
             using (var reader = command.ExecuteReader())
             {
                 return reader.ReadDataSet();
@@ -181,8 +198,7 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
         {
             EnsureConnectionIsOpen();
 
-            if (expression.Operation != null)
-                expression.Operation(Connection, null);
+            expression.Operation?.Invoke(Connection, null);
         }
 
         protected override void Process(string sql)
@@ -194,7 +210,7 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
 
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(sql, Connection, Transaction, Options))
+            using (var command = CreateCommand(sql))
                 command.ExecuteNonQuery();
         }
     }

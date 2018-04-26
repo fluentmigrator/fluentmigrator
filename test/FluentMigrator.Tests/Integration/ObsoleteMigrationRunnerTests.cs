@@ -55,7 +55,7 @@ namespace FluentMigrator.Tests.Integration
     [TestFixture]
     [Category("Integration")]
     [Obsolete]
-    public class ObsoleteMigrationRunnerTests : IntegrationTestBase
+    public class ObsoleteMigrationRunnerTests : ObsoleteIntegrationTestBase
     {
         private IRunnerContext _runnerContext;
 
@@ -928,7 +928,7 @@ namespace FluentMigrator.Tests.Integration
                 processor.CommitTransaction();
 
                 string schemaName = versionTableMetaData.SchemaName;
-                var schemaAndTableName = string.Format("[{0}].[{1}]", schemaName, TestVersionTableMetaData.TABLENAME);
+                var schemaAndTableName = string.Format("[{0}].[{1}]", schemaName, TestVersionTableMetaData.TABLE_NAME);
 
                 var outputSqlString = outputSql.ToString();
 
@@ -936,7 +936,7 @@ namespace FluentMigrator.Tests.Integration
                     .Matches(outputSqlString).Count;
                 var createTableMatches = new Regex(Regex.Escape("CREATE TABLE " + schemaAndTableName))
                     .Matches(outputSqlString).Count;
-                var createIndexMatches = new Regex(Regex.Escape("CREATE UNIQUE CLUSTERED INDEX [" + TestVersionTableMetaData.UNIQUEINDEXNAME + "] ON " + schemaAndTableName))
+                var createIndexMatches = new Regex(Regex.Escape("CREATE UNIQUE CLUSTERED INDEX [" + TestVersionTableMetaData.UNIQUE_INDEX_NAME + "] ON " + schemaAndTableName))
                     .Matches(outputSqlString).Count;
                 var alterTableMatches = new Regex(Regex.Escape("ALTER TABLE " + schemaAndTableName))
                     .Matches(outputSqlString).Count;
@@ -1006,7 +1006,7 @@ namespace FluentMigrator.Tests.Integration
         public void ValidateVersionOrderShouldDoNothingIfUnappliedMigrationVersionIsGreaterThanLatestAppliedMigration()
         {
 
-            // Using SqlServer instead of SqlLite as versions not deleted from VersionInfo table when using Sqlite.
+            // Using SqlServer instead of SQLite as versions not deleted from VersionInfo table when using Sqlite.
             var excludedProcessors = new[] { typeof(SQLiteProcessor), typeof(MySqlProcessor), typeof(PostgresProcessor) };
 
             var assembly = typeof(Migrations.Interleaved.Pass3.User).Assembly;
@@ -1051,7 +1051,7 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlAnywhere16")]
         public void ValidateVersionOrderShouldThrowExceptionIfUnappliedMigrationVersionIsLessThanLatestAppliedMigration()
         {
-            // Using SqlServer instead of SqlLite as versions not deleted from VersionInfo table when using Sqlite.
+            // Using SqlServer instead of SQLite as versions not deleted from VersionInfo table when using Sqlite.
             var excludedProcessors = new[] { typeof(MySqlProcessor), typeof(SQLiteProcessor) };
 
             var assembly = typeof(Migrations.Interleaved.Pass3.User).Assembly;
@@ -1098,18 +1098,17 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
-        [Category("SqlServer2012")]
+        [Category("SqlServer2016")]
         public void CanCreateSequence()
         {
-            ExecuteWithSupportedProcessors(
+            if (!IntegrationTestOptions.SqlServer2016.IsEnabled)
+            {
+                Assert.Ignore("No processor found for the given action.");
+            }
+
+            ExecuteWithSqlServer2016(
                 processor =>
                 {
-                    if (processor.DatabaseType != "SqlServer2012")
-                    {
-                        Assert.Ignore("A processor of type {0} isn't supported", processor.DatabaseType);
-                        return;
-                    }
-
                     var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
 
                     runner.Up(new TestCreateSequence());
@@ -1117,7 +1116,9 @@ namespace FluentMigrator.Tests.Integration
 
                     runner.Down(new TestCreateSequence());
                     processor.SequenceExists(null, "TestSequence").ShouldBeFalse();
-                }, true, pt => pt == typeof(SqlServerProcessor));
+                },
+                true,
+                IntegrationTestOptions.SqlServer2016);
         }
 
         [Test]

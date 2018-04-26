@@ -16,10 +16,16 @@
 //
 #endregion
 
+using System;
 using System.Linq;
 
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Initialization;
+
+using JetBrains.Annotations;
+
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Console
 {
@@ -27,16 +33,21 @@ namespace FluentMigrator.Console
     {
         private readonly IAnnouncer _announcer;
 
-        public LateInitTaskExecutor(IRunnerContext runnerContext)
-            : base(runnerContext)
+        public LateInitTaskExecutor(
+            [NotNull] IAnnouncer announcer,
+            [NotNull] IAssemblySource assemblySource,
+            [NotNull] IOptions<RunnerOptions> runnerOptions,
+            [NotNull] IServiceProvider serviceProvider)
+            : base(announcer, assemblySource, runnerOptions, serviceProvider)
         {
-            _announcer = runnerContext.Announcer;
+            _announcer = announcer;
         }
 
         /// <inheritdoc />
         protected override void Initialize()
         {
-            var targetAssemblies = GetTargetAssemblies().ToList();
+            var assemblySource = ServiceProvider.GetRequiredService<IAssemblySource>();
+            var targetAssemblies = assemblySource.Assemblies.ToList();
             if (targetAssemblies.Count != 0 && _announcer is LateInitAnnouncer announcer && string.IsNullOrEmpty(announcer.OutputTo))
             {
                 var targetAssembly = targetAssemblies.First();

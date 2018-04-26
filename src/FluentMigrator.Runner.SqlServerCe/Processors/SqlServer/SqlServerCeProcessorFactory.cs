@@ -25,6 +25,7 @@ using FluentMigrator.Runner.Generators.SqlServer;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
+    [Obsolete]
     public class SqlServerCeProcessorFactory : MigrationProcessorFactory
     {
         private readonly IServiceProvider _serviceProvider;
@@ -40,11 +41,12 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             _serviceProvider = serviceProvider;
         }
 
+        [Obsolete]
         public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
         {
             var factory = new SqlServerCeDbFactory(_serviceProvider);
             var connection = factory.CreateConnection(connectionString);
-            return new SqlServerCeProcessor(connection, new SqlServerCeGenerator(), announcer, options, factory);
+            return new SqlServerCeProcessor(connection, new SqlServerCeGenerator(new SqlServer2000Quoter()), announcer, options, factory);
         }
     }
 }

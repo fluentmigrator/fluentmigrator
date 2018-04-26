@@ -14,13 +14,15 @@
 // limitations under the License.
 #endregion
 
+using System.Collections.Generic;
 using System.Linq;
-
-using FluentMigrator.Runner.Processors;
 
 using McMaster.Extensions.CommandLineUtils;
 
+using Microsoft.Extensions.DependencyInjection;
+
 // ReSharper disable UnusedMember.Local
+#pragma warning disable RCS1213 // Remove unused member declaration.
 
 namespace FluentMigrator.DotNet.Cli.Commands
 {
@@ -30,7 +32,12 @@ namespace FluentMigrator.DotNet.Cli.Commands
     {
         private int OnExecute(IConsole console)
         {
-            foreach (var processorType in MigrationProcessorFactoryProvider.ProcessorTypes.OrderBy(x => x))
+            var migratorOptions = new MigratorOptions();
+            var serviceProvider = Setup.BuildServiceProvider(migratorOptions, console);
+            var processors = serviceProvider.GetRequiredService<IEnumerable<IMigrationProcessor>>().ToList();
+            var processorIds = processors.Select(p => p.DatabaseType).OrderBy(x => x)
+                .Union(processors.SelectMany(p => p.DatabaseTypeAliases).OrderBy(x => x));
+            foreach (var processorType in processorIds)
             {
                 console.WriteLine(processorType);
             }

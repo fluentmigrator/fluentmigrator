@@ -1,3 +1,21 @@
+#region License
+//
+// Copyright (c) 2018, Fluent Migrator Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,12 +28,17 @@ using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
+using Microsoft.Extensions.Options;
+
 namespace FluentMigrator.Runner
 {
     public class DefaultMigrationInformationLoader : IMigrationInformationLoader
     {
-        [CanBeNull] [ItemNotNull]
-        private readonly IReadOnlyCollection<IMigration> _migrations;
+        [NotNull, ItemNotNull]
+        private readonly IReadOnlyCollection<string> _tagsToMatch;
+
+        [NotNull]
+        private readonly IMigrationSource _source;
 
         [CanBeNull]
         private SortedList<long, IMigrationInfo> _migrationInfos;
@@ -49,19 +72,21 @@ namespace FluentMigrator.Runner
             Assemblies = assemblies;
             Namespace = @namespace;
             LoadNestedNamespaces = loadNestedNamespaces;
-            TagsToMatch = tagsToMatch ?? Enumerable.Empty<string>();
+            _tagsToMatch = tagsToMatch as IReadOnlyCollection<string> ?? tagsToMatch?.ToArray() ?? Array.Empty<string>();
+            _source = new MigrationSource(new AssemblySource(() => assemblies), conventions);
         }
 
         public DefaultMigrationInformationLoader(
-            [NotNull, ItemNotNull] IEnumerable<IMigration> migrations,
+            [NotNull] IMigrationSource source,
+            [NotNull] IOptions<TypeFilterOptions> filterOptions,
             [NotNull] IMigrationRunnerConventions conventions,
-            [NotNull] IRunnerContext runnerContext)
+            [NotNull] IOptions<RunnerOptions> runnerOptions)
         {
-            Namespace = runnerContext.Namespace;
-            LoadNestedNamespaces = runnerContext.NestedNamespaces;
-            _migrations = migrations.ToList();
+            _source = source;
+            Namespace = filterOptions.Value.Namespace;
+            LoadNestedNamespaces = filterOptions.Value.NestedNamespaces;
             Conventions = conventions;
-            TagsToMatch = runnerContext.Tags ?? Enumerable.Empty<string>();
+            _tagsToMatch = runnerOptions.Value.Tags ?? Array.Empty<string>();
         }
 
         [NotNull]
@@ -77,60 +102,45 @@ namespace FluentMigrator.Runner
         public bool LoadNestedNamespaces { get; }
 
         [NotNull, ItemNotNull]
-        public IEnumerable<string> TagsToMatch { get; }
+        [Obsolete]
+        public IEnumerable<string> TagsToMatch => _tagsToMatch;
 
         public SortedList<long, IMigrationInfo> LoadMigrations()
         {
             if (_migrationInfos != null)
             {
+                if (_migrationInfos.Count == 0)
+                    throw new MissingMigrationsException();
                 return _migrationInfos;
             }
 
             _migrationInfos = new SortedList<long, IMigrationInfo>();
-
-#pragma warning disable 612
-            if (Assemblies != null)
+            var migrationInfos = FindMigrations(_source, Conventions, Namespace, LoadNestedNamespaces, _tagsToMatch);
+            foreach (var migrationInfo in migrationInfos)
             {
-                var migrationTypes = FindMigrationTypes(Conventions, Assemblies, Namespace, LoadNestedNamespaces, TagsToMatch);
-                foreach (var migrationType in migrationTypes)
+                if (_migrationInfos.ContainsKey(migrationInfo.Version))
                 {
-                    var migrationInfo = Conventions.GetMigrationInfo(migrationType);
-                    if (_migrationInfos.ContainsKey(migrationInfo.Version))
-                    {
-                        throw new DuplicateMigrationException($"Duplicate migration version {migrationInfo.Version}.");
-                    }
-                    _migrationInfos.Add(migrationInfo.Version, migrationInfo);
+                    throw new DuplicateMigrationException($"Duplicate migration version {migrationInfo.Version}.");
                 }
-#pragma warning restore 612
-            }
-            else if (_migrations != null)
-            {
-                var migrationInfos = FindMigrations(Conventions, _migrations, Namespace, LoadNestedNamespaces, TagsToMatch);
-                foreach (var migrationInfo in migrationInfos)
-                {
-                    if (_migrationInfos.ContainsKey(migrationInfo.Version))
-                    {
-                        throw new DuplicateMigrationException($"Duplicate migration version {migrationInfo.Version}.");
-                    }
 
-                    _migrationInfos.Add(migrationInfo.Version, migrationInfo);
-                }
+                _migrationInfos.Add(migrationInfo.Version, migrationInfo);
             }
-            else
-            {
-                return _migrationInfos;
-            }
+
+            if (_migrationInfos.Count == 0)
+                throw new MissingMigrationsException();
 
             return _migrationInfos;
         }
 
+        [NotNull, ItemNotNull]
         private static IEnumerable<IMigrationInfo> FindMigrations(
-            IMigrationRunnerConventions conventions,
-            IReadOnlyCollection<IMigration> migrations,
-            string @namespace,
+            [NotNull] IMigrationSource source,
+            [NotNull] IMigrationRunnerConventions conventions,
+            [CanBeNull] string @namespace,
             bool loadNestedNamespaces,
-            IEnumerable<string> tagsToMatch)
+            [NotNull, ItemNotNull] IReadOnlyCollection<string> tagsToMatch)
         {
+            var migrations = source.GetMigrations().ToList();
             if (migrations.Count == 0)
             {
                 throw new MissingMigrationsException("No migrations found");
@@ -140,35 +150,10 @@ namespace FluentMigrator.Runner
                 (from migration in migrations
                  let type = migration.GetType()
                  where type.IsInNamespace(@namespace, loadNestedNamespaces)
-                 where conventions.TypeHasMatchingTags(type, tagsToMatch) || !conventions.TypeHasTags(type)
+                 where conventions.TypeHasMatchingTags(type, tagsToMatch) || (tagsToMatch.Count == 0 && !conventions.TypeHasTags(type)) || !conventions.TypeHasTags(type)
                  select conventions.GetMigrationInfoForMigration(migration));
 
             return migrationInfos.ToList();
-        }
-
-        [Obsolete]
-        private static IEnumerable<Type> FindMigrationTypes(
-            IMigrationRunnerConventions conventions,
-            IAssemblyCollection assemblies,
-            string @namespace,
-            bool loadNestedNamespaces,
-            IEnumerable<string> tagsToMatch)
-        {
-            var migrations = assemblies.GetExportedTypes()
-                .FilterByNamespace(@namespace, loadNestedNamespaces)
-                .Where(t => conventions.TypeIsMigration(t))
-                .ToList();
-            if (migrations.Count == 0)
-            {
-                throw new MissingMigrationsException($"No migrations found in the namespace {@namespace}");
-            }
-
-            var tagMatchingMigrations = migrations
-                .Where(t =>
-                    conventions.TypeHasMatchingTags(t, tagsToMatch)
-                 || !conventions.TypeHasTags(t));
-
-            return tagMatchingMigrations;
         }
     }
 }

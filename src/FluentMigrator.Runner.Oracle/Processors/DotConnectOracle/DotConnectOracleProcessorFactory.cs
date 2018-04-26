@@ -22,6 +22,7 @@ using FluentMigrator.Runner.Generators.Oracle;
 
 namespace FluentMigrator.Runner.Processors.DotConnectOracle
 {
+    [Obsolete]
     public class DotConnectOracleProcessorFactory : MigrationProcessorFactory
     {
         private readonly IServiceProvider _serviceProvider;
@@ -37,6 +38,7 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
             _serviceProvider = serviceProvider;
         }
 
+        [Obsolete]
         public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
         {
             var factory = new DotConnectOracleDbFactory(_serviceProvider);

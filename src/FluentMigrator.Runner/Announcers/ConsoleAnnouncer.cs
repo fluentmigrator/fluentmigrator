@@ -18,10 +18,21 @@
 
 using System;
 
+using Microsoft.Extensions.Options;
+
 namespace FluentMigrator.Runner.Announcers
 {
     public class ConsoleAnnouncer : Announcer
     {
+        public ConsoleAnnouncer()
+        {
+        }
+
+        public ConsoleAnnouncer(IOptions<AnnouncerOptions> options)
+            : base(options)
+        {
+        }
+
         public void Header()
         {
             Console.ForegroundColor = ConsoleColor.Green;

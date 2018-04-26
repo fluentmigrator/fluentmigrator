@@ -15,7 +15,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
         [SetUp]
         public void Setup()
         {
-            Generator = new OracleGenerator(useQuotedIdentifiers: true);
+            Generator = new OracleGenerator(new OracleQuoterQuotedIdentifier());
         }
 
         [Test]
@@ -31,7 +31,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
         [Test]
         public void CanAlterSchemaInStrictMode()
         {
-            Generator.CompatabilityMode = Runner.CompatabilityMode.STRICT;
+            Generator.CompatibilityMode = Runner.CompatibilityMode.STRICT;
 
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(new CreateSchemaExpression()));
         }
@@ -39,7 +39,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
         [Test]
         public void CanCreateSchemaInStrictMode()
         {
-            Generator.CompatabilityMode = Runner.CompatabilityMode.STRICT;
+            Generator.CompatibilityMode = Runner.CompatibilityMode.STRICT;
 
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(new CreateSchemaExpression()));
         }
@@ -47,7 +47,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
         [Test]
         public void CanDropSchemaInStrictMode()
         {
-            Generator.CompatabilityMode = Runner.CompatabilityMode.STRICT;
+            Generator.CompatibilityMode = Runner.CompatibilityMode.STRICT;
 
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(new DeleteSchemaExpression()));
         }

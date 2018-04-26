@@ -16,13 +16,16 @@
 
 #endregion
 
+using System;
 using System.Data;
 using System.Data.Common;
 using System.Diagnostics;
 
 namespace FluentMigrator.Runner.Processors
 {
+#pragma warning disable 612
     public abstract class DbFactoryBase : IDbFactory
+#pragma warning restore 612
     {
         private readonly object _lock = new object();
         private volatile DbProviderFactory _factory;
@@ -36,7 +39,10 @@ namespace FluentMigrator.Runner.Processors
         {
         }
 
-        protected DbProviderFactory Factory
+        /// <summary>
+        /// Gets the DB provider factory
+        /// </summary>
+        public virtual DbProviderFactory Factory
         {
             get
             {
@@ -56,8 +62,7 @@ namespace FluentMigrator.Runner.Processors
 
         protected abstract DbProviderFactory CreateFactory();
 
-        #region IDbFactory Members
-
+        [Obsolete]
         public IDbConnection CreateConnection(string connectionString)
         {
             var connection = Factory.CreateConnection();
@@ -66,6 +71,7 @@ namespace FluentMigrator.Runner.Processors
             return connection;
         }
 
+        [Obsolete]
         public virtual IDbCommand CreateCommand(string commandText, IDbConnection connection, IDbTransaction transaction, IMigrationProcessorOptions options)
         {
             var command = connection.CreateCommand();
@@ -74,7 +80,5 @@ namespace FluentMigrator.Runner.Processors
             if (transaction != null) command.Transaction = transaction;
             return command;
         }
-
-        #endregion
     }
 }

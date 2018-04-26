@@ -16,6 +16,8 @@
     <RepositoryType>git</RepositoryType>
     <MinClientVersion>3.5</MinClientVersion>
     <IsPackable>false</IsPackable>
+    <!-- Enable the CS300x warnings when the obsoleted code gets removed -->
+    <NoWarn>$(NoWarn);3001;3002;3005</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

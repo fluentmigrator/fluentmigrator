@@ -14,7 +14,7 @@ namespace FluentMigrator.Tests
         public void Setup()
         {
             _migration = Mock.Of<IMigration>();
-            _migrationValidator = new MigrationValidator(Mock.Of<IAnnouncer>(), new DefaultConventionSet(null));
+            _migrationValidator = new MigrationValidator(Mock.Of<IAnnouncer>(), new DefaultConventionSet());
         }
 
         private MigrationValidator _migrationValidator;
@@ -33,7 +33,7 @@ namespace FluentMigrator.Tests
         }
 
         [Test]
-        public void it_does_not_throw_if_expressions_are_valid()
+        public void ItDoesNotThrowIfExpressionsAreValid()
         {
             Assert.DoesNotThrow(
                 () => _migrationValidator.ApplyConventionsToAndValidateExpressions(_migration
@@ -41,7 +41,7 @@ namespace FluentMigrator.Tests
         }
 
         [Test]
-        public void it_throws_invalid_migration_exception_if_expressions_are_invalid()
+        public void ItThrowsInvalidMigrationExceptionIfExpressionsAreInvalid()
         {
             Assert.Throws<InvalidMigrationException>(
                 () => _migrationValidator.ApplyConventionsToAndValidateExpressions(_migration
@@ -49,7 +49,7 @@ namespace FluentMigrator.Tests
         }
 
         [Test]
-        public void it_throws_invalid_migration_exception_if_expressions_contains_multiple_invalid_of_same_type()
+        public void ItThrowsInvalidMigrationExceptionIfExpressionsContainsMultipleInvalidOfSameType()
         {
             Assert.Throws<InvalidMigrationException>(
                 () => _migrationValidator.ApplyConventionsToAndValidateExpressions(_migration

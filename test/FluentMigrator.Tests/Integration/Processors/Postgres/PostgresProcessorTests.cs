@@ -16,19 +16,22 @@
 //
 #endregion
 
+using System;
 using System.Data;
 using System.IO;
 
 using FluentMigrator.Expressions;
+using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
-using FluentMigrator.Runner.Generators.Postgres;
-using FluentMigrator.Runner.Processors;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.Postgres;
 using FluentMigrator.Tests.Helpers;
 
-using NUnit.Framework;
+using JetBrains.Annotations;
 
-using Npgsql;
+using Microsoft.Extensions.DependencyInjection;
+
+using NUnit.Framework;
 
 using Shouldly;
 
@@ -39,29 +42,9 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
     [Category("Postgres")]
     public class PostgresProcessorTests
     {
-        public NpgsqlConnection Connection { get; set; }
-        public PostgresProcessor Processor { get; set; }
-
-        [SetUp]
-        public void SetUp()
-        {
-            if (!IntegrationTestOptions.Postgres.IsEnabled)
-                Assert.Ignore();
-            Connection = new NpgsqlConnection(IntegrationTestOptions.Postgres.ConnectionString);
-            Processor = new PostgresProcessor(Connection, new PostgresGenerator(),
-                new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), new PostgresDbFactory(serviceProvider: null));
-            Connection.Open();
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            if (Processor == null)
-                return;
-
-            Processor.CommitTransaction();
-            Processor.Dispose();
-        }
+        private ServiceProvider ServiceProvider { get; set; }
+        private IServiceScope ServiceScope { get; set; }
+        private PostgresProcessor Processor { get; set; }
 
         [Test]
         public void CallingColumnExistsReturnsFalseIfColumnExistsInDifferentSchema()
@@ -123,7 +106,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
             {
                 var cmd = table.Connection.CreateCommand();
                 cmd.Transaction = table.Transaction;
-                cmd.CommandText = string.Format("INSERT INTO {0} (id) VALUES ({1})", table.NameWithSchema, i);
+                cmd.CommandText = $"INSERT INTO {table.NameWithSchema} (id) VALUES ({i})";
                 cmd.ExecuteNonQuery();
             }
         }
@@ -166,51 +149,90 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
         {
             var output = new StringWriter();
 
-            var connection = new NpgsqlConnection(IntegrationTestOptions.Postgres.ConnectionString);
-
-            var processor = new PostgresProcessor(
-                connection,
-                new PostgresGenerator(),
-                new TextWriterAnnouncer(output),
-                new ProcessorOptions { PreviewOnly = true },
-                new PostgresDbFactory(serviceProvider: null));
-
-            bool tableExists;
-
-            try
+            var sp = CreateProcessorServices(
+                services => services.ConfigureRunner(
+                    r => r.WithAnnouncer(new TextWriterAnnouncer(output)).AsGlobalPreview()));
+            using (sp)
             {
-                var expression =
-                    new PerformDBOperationExpression
+                using (var scope = sp.CreateScope())
+                {
+                    var processor = scope.ServiceProvider.GetRequiredService<IMigrationProcessor>();
+
+                    bool tableExists;
+
+                    try
                     {
-                        Operation = (con, trans) =>
-                        {
-                            var command = con.CreateCommand();
-                            command.CommandText = "CREATE TABLE processtesttable (test int NULL) ";
-                            command.Transaction = trans;
+                        var expression =
+                            new PerformDBOperationExpression
+                            {
+                                Operation = (con, trans) =>
+                                {
+                                    var command = con.CreateCommand();
+                                    command.CommandText = "CREATE TABLE processtesttable (test int NULL) ";
+                                    command.Transaction = trans;
 
-                            command.ExecuteNonQuery();
-                        }
-                    };
+                                    command.ExecuteNonQuery();
+                                }
+                            };
 
-                processor.BeginTransaction();
-                processor.Process(expression);
+                        processor.BeginTransaction();
+                        processor.Process(expression);
 
-                var com = connection.CreateCommand();
-                com.CommandText = "";
+                        tableExists = processor.TableExists("public", "processtesttable");
+                    }
+                    finally
+                    {
+                        processor.RollbackTransaction();
+                    }
 
-                tableExists = processor.TableExists("public", "processtesttable");
-            }
-            finally
-            {
-                processor.RollbackTransaction();
-            }
-
-            tableExists.ShouldBeFalse();
-            output.ToString().ShouldBe(
-                @"/* Beginning Transaction */
+                    tableExists.ShouldBeFalse();
+                    output.ToString().ShouldBe(
+                        @"/* Beginning Transaction */
 /* Performing DB Operation */
 /* Rolling back transaction */
 ");
+                }
+            }
+        }
+
+        private ServiceProvider CreateProcessorServices([CanBeNull] Action<IServiceCollection> initAction)
+        {
+            if (!IntegrationTestOptions.Postgres.IsEnabled)
+                Assert.Ignore();
+
+            var serivces = ServiceCollectionExtensions.CreateServices()
+                .ConfigureRunner(r => r.AddPostgres())
+                .AddScoped<IConnectionStringReader>(
+                    _ => new PassThroughConnectionStringReader(IntegrationTestOptions.Postgres.ConnectionString));
+
+            initAction?.Invoke(serivces);
+
+            return serivces.BuildServiceProvider();
+        }
+
+        [OneTimeSetUp]
+        public void ClassSetUp()
+        {
+            ServiceProvider = CreateProcessorServices(initAction: null);
+        }
+
+        [OneTimeTearDown]
+        public void ClassTearDown()
+        {
+            ServiceProvider?.Dispose();
+        }
+
+        [SetUp]
+        public void SetUp()
+        {
+            ServiceScope = ServiceProvider.CreateScope();
+            Processor = ServiceScope.ServiceProvider.GetRequiredService<PostgresProcessor>();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            ServiceScope?.Dispose();
         }
     }
 }

@@ -75,14 +75,13 @@ Possible candidates are:
         {
             //resource full name is in format `namespace.resourceName`
             var sqlScriptParts = sqlScriptName.Split('.').Reverse().ToArray();
-            Func<(string name, Assembly assembly), bool> isNameMatch = x =>
-                x.name
-                    .Split('.')
-                    .Reverse()
-                    .Take(sqlScriptParts.Length)
-                    .SequenceEqual(sqlScriptParts, StringComparer.InvariantCultureIgnoreCase);
 
-            return resourceNames.Where(isNameMatch).ToList();
+            bool IsNameMatch((string name, Assembly assembly) x) => x.name.Split('.')
+                .Reverse()
+                .Take(sqlScriptParts.Length)
+                .SequenceEqual(sqlScriptParts, StringComparer.InvariantCultureIgnoreCase);
+
+            return resourceNames.Where(IsNameMatch).ToList();
         }
     }
 }

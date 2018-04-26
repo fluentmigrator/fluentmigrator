@@ -16,15 +16,14 @@
 //
 #endregion
 
-using FluentMigrator.Runner.Announcers;
-using FluentMigrator.Runner.Generators.Hana;
-using FluentMigrator.Runner.Processors;
+using FluentMigrator.Runner;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.Hana;
 using FluentMigrator.Tests.Helpers;
 
-using NUnit.Framework;
+using Microsoft.Extensions.DependencyInjection;
 
-using Sap.Data.Hana;
+using NUnit.Framework;
 
 using Shouldly;
 
@@ -35,27 +34,9 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
     [Category("Hana")]
     public class HanaSequenceTests : BaseSequenceTests
     {
-        public HanaConnection Connection { get; set; }
-        public HanaProcessor Processor { get; set; }
-
-        [SetUp]
-        public void SetUp()
-        {
-            if (!IntegrationTestOptions.Hana.IsEnabled)
-                Assert.Ignore();
-            Connection = new HanaConnection(IntegrationTestOptions.Hana.ConnectionString);
-            Processor = new HanaProcessor(Connection, new HanaGenerator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), new HanaDbFactory(serviceProvider: null));
-            Connection.Open();
-            Processor.BeginTransaction();
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            Processor?.CommitTransaction();
-            Processor?.Dispose();
-        }
-
+        private ServiceProvider ServiceProvider { get; set; }
+        private IServiceScope ServiceScope { get; set; }
+        private HanaProcessor Processor { get; set; }
 
         [Test]
         public override void CallingSequenceExistsReturnsFalseIfSequenceDoesNotExist()
@@ -80,9 +61,38 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
         public override void CallingSequenceExistsReturnsTrueIfSequenceExistsWithSchema()
         {
             Assert.Ignore("Schemas aren't supported by this SAP Hana runner");
+        }
 
-            using (new HanaTestSequence(Processor, "test_schema", "test_sequence"))
-                Processor.SequenceExists("test_schema", "test_sequence").ShouldBeTrue();
+        [OneTimeSetUp]
+        public void ClassSetUp()
+        {
+            if (!IntegrationTestOptions.Hana.IsEnabled)
+                Assert.Ignore();
+
+            var serivces = ServiceCollectionExtensions.CreateServices()
+                .ConfigureRunner(builder => builder.AddHana())
+                .AddScoped<IConnectionStringReader>(
+                    _ => new PassThroughConnectionStringReader(IntegrationTestOptions.Hana.ConnectionString));
+            ServiceProvider = serivces.BuildServiceProvider();
+        }
+
+        [OneTimeTearDown]
+        public void ClassTearDown()
+        {
+            ServiceProvider?.Dispose();
+        }
+
+        [SetUp]
+        public void SetUp()
+        {
+            ServiceScope = ServiceProvider.CreateScope();
+            Processor = ServiceScope.ServiceProvider.GetRequiredService<HanaProcessor>();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            ServiceScope?.Dispose();
         }
     }
 }

@@ -27,6 +27,13 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Runner.BatchParser;
 using FluentMigrator.Runner.BatchParser.Sources;
 using FluentMigrator.Runner.BatchParser.SpecialTokenSearchers;
+using FluentMigrator.Runner.Generators.SQLite;
+using FluentMigrator.Runner.Initialization;
+
+using JetBrains.Annotations;
+
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.SQLite
 {
@@ -34,6 +41,9 @@ namespace FluentMigrator.Runner.Processors.SQLite
     // ReSharper disable once InconsistentNaming
     public class SQLiteProcessor : GenericProcessorBase
     {
+        [CanBeNull]
+        private readonly IServiceProvider _serviceProvider;
+
         public override string DatabaseType
         {
             get { return "SQLite"; }
@@ -41,9 +51,27 @@ namespace FluentMigrator.Runner.Processors.SQLite
 
         public override IList<string> DatabaseTypeAliases { get; } = new List<string>();
 
-        public SQLiteProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
+        [Obsolete]
+        public SQLiteProcessor(
+            IDbConnection connection,
+            IMigrationGenerator generator,
+            IAnnouncer announcer,
+            [NotNull] IMigrationProcessorOptions options,
+            IDbFactory factory)
             : base(connection, factory, generator, announcer, options)
         {
+        }
+
+        public SQLiteProcessor(
+            [NotNull] SQLiteDbFactory factory,
+            [NotNull] SQLiteGenerator generator,
+            [NotNull] IAnnouncer announcer,
+            [NotNull] IOptions<ProcessorOptions> options,
+            [NotNull] IConnectionStringAccessor connectionStringAccessor,
+            [NotNull] IServiceProvider serviceProvider)
+            : base(() => factory.Factory, generator, announcer, options.Value, connectionStringAccessor)
+        {
+            _serviceProvider = serviceProvider;
         }
 
         public override bool SchemaExists(string schemaName)
@@ -59,7 +87,12 @@ namespace FluentMigrator.Runner.Processors.SQLite
         public override bool ColumnExists(string schemaName, string tableName, string columnName)
         {
             var dataSet = Read("PRAGMA table_info([{0}])", tableName);
-            return dataSet.Tables.Count > 0 && dataSet.Tables[0].Select(string.Format("Name='{0}'", columnName.Replace("'", "''"))).Length > 0;
+            if (dataSet.Tables.Count == 0)
+                return false;
+            var table = dataSet.Tables[0];
+            if (!table.Columns.Contains("Name"))
+                return false;
+            return table.Select(string.Format("Name='{0}'", columnName.Replace("'", "''"))).Length > 0;
         }
 
         public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
@@ -86,7 +119,7 @@ namespace FluentMigrator.Runner.Processors.SQLite
         {
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction, Options))
+            using (var command = CreateCommand(String.Format(template, args)))
             using (var reader = command.ExecuteReader())
             {
                 try
@@ -121,8 +154,7 @@ namespace FluentMigrator.Runner.Processors.SQLite
 
             EnsureConnectionIsOpen();
 
-            if (expression.Operation != null)
-                expression.Operation(Connection, null);
+            expression.Operation?.Invoke(Connection, null);
         }
 
         protected override void Process(string sql)
@@ -147,10 +179,10 @@ namespace FluentMigrator.Runner.Processors.SQLite
 
         }
 
-        private static bool ContainsGo(string sql)
+        private bool ContainsGo(string sql)
         {
             var containsGo = false;
-            var parser = new SQLiteBatchParser();
+            var parser = _serviceProvider?.GetService<SQLiteBatchParser>() ?? new SQLiteBatchParser();
             parser.SpecialToken += (sender, args) => containsGo = true;
             using (var source = new TextReaderSource(new StringReader(sql), true))
             {
@@ -162,7 +194,7 @@ namespace FluentMigrator.Runner.Processors.SQLite
 
         private void ExecuteNonQuery(string sql)
         {
-            using (var command = Factory.CreateCommand(sql, Connection, Transaction, Options))
+            using (var command = CreateCommand(sql))
             {
                 try
                 {
@@ -181,7 +213,7 @@ namespace FluentMigrator.Runner.Processors.SQLite
 
             try
             {
-                var parser = new SQLiteBatchParser();
+                var parser = _serviceProvider?.GetService<SQLiteBatchParser>() ?? new SQLiteBatchParser();
                 parser.SqlText += (sender, args) => { sqlBatch = args.SqlText.Trim(); };
                 parser.SpecialToken += (sender, args) =>
                 {
@@ -190,10 +222,8 @@ namespace FluentMigrator.Runner.Processors.SQLite
 
                     if (args.Opaque is GoSearcher.GoSearcherParameters goParams)
                     {
-                        using (var command = Factory.CreateCommand(string.Empty, Connection, Transaction, Options))
+                        using (var command = CreateCommand(sqlBatch))
                         {
-                            command.CommandText = sqlBatch;
-
                             for (var i = 0; i != goParams.Count; ++i)
                             {
                                 command.ExecuteNonQuery();
@@ -211,9 +241,8 @@ namespace FluentMigrator.Runner.Processors.SQLite
 
                 if (!string.IsNullOrEmpty(sqlBatch))
                 {
-                    using (var command = Factory.CreateCommand(string.Empty, Connection, Transaction, Options))
+                    using (var command = CreateCommand(sqlBatch))
                     {
-                        command.CommandText = sqlBatch;
                         command.ExecuteNonQuery();
                     }
                 }
@@ -228,7 +257,7 @@ namespace FluentMigrator.Runner.Processors.SQLite
         {
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction, Options))
+            using (var command = CreateCommand(String.Format(template, args)))
             using (var reader = command.ExecuteReader())
             {
                 return reader.ReadDataSet();

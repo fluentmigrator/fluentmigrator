@@ -57,6 +57,5 @@ namespace FluentMigrator.DotNet.Cli.Commands
 
         [Option("-o|--output=<FILENAME>", CommandOptionType.SingleOrNoValue, Description = "Output generated SQL to a file. Default is no output. A filename may be specified, otherwise [targetAssemblyName].sql is the default.")]
         public (bool, string) Output { get; }
-
     }
 }

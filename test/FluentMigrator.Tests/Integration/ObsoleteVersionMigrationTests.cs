@@ -47,7 +47,7 @@ namespace FluentMigrator.Tests.Integration
     [Category("SqlServer2008")]
     [Category("SqlServer2012")]
     [Category("SqlServer2014")]
-    public class ObsoleteVersionMigrationTests : IntegrationTestBase
+    public class ObsoleteVersionMigrationTests : ObsoleteIntegrationTestBase
     {
         [Test]
         public void CanUseVersionInfo()

@@ -59,5 +59,19 @@ namespace FluentMigrator.Runner.BatchParser
             : base(_rangeSearchers, _specialTokenSearchers, newLine)
         {
         }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SqlAnywhereBatchParser"/> class.
+        /// </summary>
+        /// <param name="rangeSearchers">The range searchers to be used</param>
+        /// <param name="specialTokenSearchers">The special token searchers to be used</param>
+        /// <param name="newLine">The new line sequence to be used for the output</param>
+        protected SqlAnywhereBatchParser(
+            [NotNull, ItemNotNull] IEnumerable<IRangeSearcher> rangeSearchers,
+            [NotNull, ItemNotNull] IEnumerable<ISpecialTokenSearcher> specialTokenSearchers,
+            string newLine = null)
+            : base(rangeSearchers, specialTokenSearchers, newLine)
+        {
+        }
     }
 }

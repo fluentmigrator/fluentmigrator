@@ -47,7 +47,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         public void CanAlterColumnInStrictMode()
         {
             var expression = GeneratorTestHelper.GetRenameColumnExpression();
-            Generator.CompatabilityMode = CompatabilityMode.STRICT;
+            Generator.CompatibilityMode = CompatibilityMode.STRICT;
 
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
@@ -55,7 +55,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         [Test]
         public void CanAlterSchemaInStrictMode()
         {
-            Generator.CompatabilityMode = CompatabilityMode.STRICT;
+            Generator.CompatibilityMode = CompatibilityMode.STRICT;
 
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(new CreateSchemaExpression()));
         }
@@ -63,7 +63,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         [Test]
         public void CanCreateForeignKeyInStrictMode()
         {
-            Generator.CompatabilityMode = CompatabilityMode.STRICT;
+            Generator.CompatibilityMode = CompatibilityMode.STRICT;
 
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(GeneratorTestHelper.GetCreateNamedForeignKeyExpression()));
         }
@@ -71,7 +71,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         [Test]
         public void CanCreateMulitColumnForeignKeyInStrictMode()
         {
-            Generator.CompatabilityMode = CompatabilityMode.STRICT;
+            Generator.CompatibilityMode = CompatibilityMode.STRICT;
 
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(GeneratorTestHelper.GetCreateNamedMultiColumnForeignKeyExpression()));
         }
@@ -79,7 +79,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         [Test]
         public void CanCreateSchemaInStrictMode()
         {
-            Generator.CompatabilityMode = CompatabilityMode.STRICT;
+            Generator.CompatibilityMode = CompatibilityMode.STRICT;
 
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(new CreateSchemaExpression()));
         }
@@ -91,7 +91,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.Columns[0].IsPrimaryKey = true;
             expression.Columns[0].AdditionalFeatures.Add(SqlServerExtensions.IdentitySeed, 3);
             expression.Columns[0].AdditionalFeatures.Add(SqlServerExtensions.IdentityIncrement, 3);
-            Generator.CompatabilityMode = CompatabilityMode.LOOSE;
+            Generator.CompatibilityMode = CompatibilityMode.LOOSE;
 
             var result = Generator.Generate(expression);
             result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, \"TestColumn2\" INTEGER NOT NULL)");
@@ -101,7 +101,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         public void CanDropForeignKeyInStrictMode()
         {
             var expression = GeneratorTestHelper.GetDeleteForeignKeyExpression();
-            Generator.CompatabilityMode = CompatabilityMode.STRICT;
+            Generator.CompatibilityMode = CompatibilityMode.STRICT;
 
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
@@ -109,7 +109,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         [Test]
         public void CanDropSchemaInStrictMode()
         {
-            Generator.CompatabilityMode = CompatabilityMode.STRICT;
+            Generator.CompatibilityMode = CompatibilityMode.STRICT;
 
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(new DeleteSchemaExpression()));
         }
@@ -121,7 +121,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.Columns[0].IsPrimaryKey = true;
             expression.Columns[0].AdditionalFeatures.Add(SqlServerExtensions.IdentitySeed, 3);
             expression.Columns[0].AdditionalFeatures.Add(SqlServerExtensions.IdentityIncrement, 3);
-            Generator.CompatabilityMode = CompatabilityMode.STRICT;
+            Generator.CompatibilityMode = CompatibilityMode.STRICT;
 
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
@@ -148,7 +148,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         [Test]
         public void CanRenameColumnInStrictMode()
         {
-            Generator.CompatabilityMode = CompatabilityMode.STRICT;
+            Generator.CompatibilityMode = CompatibilityMode.STRICT;
 
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(GeneratorTestHelper.GetRenameColumnExpression()));
         }

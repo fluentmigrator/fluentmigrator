@@ -22,6 +22,7 @@ using FluentMigrator.Runner.Generators.Hana;
 
 namespace FluentMigrator.Runner.Processors.Hana
 {
+    [Obsolete]
     public class HanaProcessorFactory : MigrationProcessorFactory
     {
         private readonly IServiceProvider _serviceProvider;
@@ -36,13 +37,14 @@ namespace FluentMigrator.Runner.Processors.Hana
             _serviceProvider = serviceProvider;
         }
 
+        [Obsolete]
         public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
         {
             var factory = new HanaDbFactory(_serviceProvider);
 
             var connection = factory.CreateConnection(connectionString);
 
-            return new HanaProcessor(connection, new HanaGenerator(), announcer, options, factory);
+            return new HanaProcessor(connection, new HanaGenerator(new HanaQuoter()), announcer, options, factory);
         }
     }
 }

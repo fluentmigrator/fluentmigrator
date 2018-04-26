@@ -14,12 +14,9 @@
 // limitations under the License.
 #endregion
 
-using System;
-
 using FluentMigrator.Example.Migrations;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
-using FluentMigrator.Runner.Processors.SQLite;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -29,25 +26,22 @@ namespace FluentMigrator.Example.Migrator
     {
         private static void RunWithServices(string connectionString)
         {
-            var serviceProvider = ConfigureServices(new ServiceCollection(), connectionString);
+            // Initialize the services
+            var serviceProvider = new ServiceCollection()
+                .AddFluentMigratorCore()
+                .ConfigureRunner(
+                    builder => builder
+                        .AddSQLite()
+                        .WithGlobalConnectionString(connectionString)
+                        .WithAnnouncer(new ConsoleAnnouncer() { ShowSql = true })
+                        .WithMigrationsIn(typeof(AddGTDTables).Assembly))
+                .BuildServiceProvider();
+
+            // Instantiate the runner
             var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
 
             // Run the migrations
             runner.MigrateUp();
-        }
-
-        private static IServiceProvider ConfigureServices(IServiceCollection services, string connectionString)
-        {
-            services
-                .AddFluentMigrator<SQLiteProcessorFactory>(
-                    connectionString,
-                    builder => builder
-                        .WithAnnouncer(new ConsoleAnnouncer() { ShowSql = true }));
-
-            services
-                .Scan(sel => sel.FromAssemblyOf<AddGTDTables>().AddClasses(f => f.AssignableTo<IMigration>()).As<IMigration>().WithScopedLifetime());
-
-            return services.BuildServiceProvider();
         }
     }
 }

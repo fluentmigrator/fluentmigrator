@@ -14,13 +14,18 @@
 // limitations under the License.
 #endregion
 
+using System;
 using System.Data;
 using System.Data.OleDb;
-using FluentMigrator.Runner.Announcers;
-using FluentMigrator.Runner.Generators.Jet;
-using FluentMigrator.Runner.Processors;
+using System.IO;
+
+using FluentMigrator.Runner;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.Jet;
 using FluentMigrator.Tests.Helpers;
+
+using Microsoft.Extensions.DependencyInjection;
+
 using NUnit.Framework;
 
 using Shouldly;
@@ -32,17 +37,12 @@ namespace FluentMigrator.Tests.Integration.Processors.Jet
     [Category("Jet")]
     public class JetProcessorTests
     {
-        public OleDbConnection Connection { get; set; }
-        public JetProcessor Processor { get; set; }
-        [SetUp]
-        public void SetUp()
-        {
-            if (!IntegrationTestOptions.Jet.IsEnabled)
-                Assert.Ignore();
-            Connection = new OleDbConnection(IntegrationTestOptions.Jet.ConnectionString);
-            Processor = new JetProcessor(Connection, new JetGenerator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions());
-            Connection.Open();
-        }
+        private string _tempDataDirectory;
+
+        private string DatabaseFilename { get; set; }
+        private ServiceProvider ServiceProvider { get; set; }
+        private IServiceScope ServiceScope { get; set; }
+        private JetProcessor Processor { get; set; }
 
         [Test]
         public void CallingTableExistsReturnsFalseIfTableDoesNotExist()
@@ -115,16 +115,73 @@ namespace FluentMigrator.Tests.Integration.Processors.Jet
             {
                 var cmd = table.Connection.CreateCommand();
                 cmd.Transaction = table.Transaction;
-                cmd.CommandText = string.Format("INSERT INTO {0} (id) VALUES ({1})", table.Name, i);
+                cmd.CommandText = $"INSERT INTO {table.Name} (id) VALUES ({i})";
                 cmd.ExecuteNonQuery();
             }
+        }
+
+        [OneTimeSetUp]
+        public void ClassSetUp()
+        {
+            if (!IntegrationTestOptions.Jet.IsEnabled)
+                Assert.Ignore();
+
+            var serivces = ServiceCollectionExtensions.CreateServices()
+                .ConfigureRunner(builder => builder.AddJet())
+                .AddScoped<IConnectionStringReader>(
+                    _ => new PassThroughConnectionStringReader(IntegrationTestOptions.Jet.ConnectionString));
+            ServiceProvider = serivces.BuildServiceProvider();
+        }
+
+        [OneTimeTearDown]
+        public void ClassTearDown()
+        {
+            ServiceProvider?.Dispose();
+        }
+
+        [SetUp]
+        public void SetUp()
+        {
+            _tempDataDirectory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(_tempDataDirectory);
+            AppDomain.CurrentDomain.SetData("DataDirectory", _tempDataDirectory);
+
+            var csb = new OleDbConnectionStringBuilder(IntegrationTestOptions.Jet.ConnectionString);
+            csb.DataSource = DatabaseFilename = HostUtilities.ReplaceDataDirectory(csb.DataSource);
+
+            RecreateDatabase(csb.ConnectionString);
+
+            ServiceScope = ServiceProvider.CreateScope();
+            Processor = ServiceScope.ServiceProvider.GetRequiredService<JetProcessor>();
         }
 
         [TearDown]
         public void TearDown()
         {
-            Processor?.CommitTransaction();
-            Processor?.Dispose();
+            ServiceScope?.Dispose();
+
+            if (!string.IsNullOrEmpty(_tempDataDirectory) && Directory.Exists(_tempDataDirectory))
+            {
+                try
+                {
+                    Directory.Delete(_tempDataDirectory, true);
+                }
+                catch
+                {
+                    // Ignore exceptions - we need to find out later why this happens
+                }
+            }
+        }
+
+        private void RecreateDatabase(string connString)
+        {
+            if (File.Exists(DatabaseFilename))
+            {
+                File.Delete(DatabaseFilename);
+            }
+
+            var cat = new ADOX.CatalogClass();
+            cat.Create(connString);
         }
     }
 }

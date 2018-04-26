@@ -14,19 +14,24 @@
 // limitations under the License.
 #endregion
 
+using System;
+
 using FluentMigrator.Runner.Generators.SqlAnywhere;
 
 namespace FluentMigrator.Runner.Processors.SqlAnywhere
 {
+    [Obsolete]
     public class SqlAnywhere16ProcessorFactory : MigrationProcessorFactory
     {
+        [Obsolete]
         public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
         {
             var factory = new SqlAnywhereDbFactory();
             var connection = factory.CreateConnection(connectionString);
-            return new SqlAnywhereProcessor("SqlAnywhere16", connection, new SqlAnywhere16Generator(), announcer, options, factory);
+            return new SqlAnywhereProcessor("SqlAnywhere16", connection, new SqlAnywhere16Generator(new SqlAnywhereQuoter()), announcer, options, factory);
         }
 
+        [Obsolete]
         public override bool IsForProvider(string provider)
         {
             return provider.ToLower().Contains("ianywhere");

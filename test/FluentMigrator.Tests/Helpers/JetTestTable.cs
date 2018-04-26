@@ -16,7 +16,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.OleDb;
+using System.IO;
 using System.Text;
 using FluentMigrator.Runner.Generators.Jet;
 using FluentMigrator.Runner.Processors.Jet;
@@ -38,7 +40,7 @@ namespace FluentMigrator.Tests.Helpers
 
         public JetTestTable(string tableName, JetProcessor processor, params string[] columnDefinitions)
         {
-            Name = _quoter.QuoteTableName(tableName, null);
+            Name = _quoter.QuoteTableName(tableName);
             Init(processor, columnDefinitions);
         }
 
@@ -46,6 +48,17 @@ namespace FluentMigrator.Tests.Helpers
         {
             Connection = processor.Connection;
             Transaction = processor.Transaction;
+
+            var csb = new OleDbConnectionStringBuilder(Connection.ConnectionString);
+            var dbFileName = HostUtilities.ReplaceDataDirectory(csb.DataSource);
+            csb.DataSource = dbFileName;
+
+            if (!File.Exists(dbFileName))
+            {
+                var connString = csb.ConnectionString;
+                var cat = new ADOX.CatalogClass();
+                cat.Create(connString);
+            }
 
             Create(columnDefinitions);
         }
@@ -57,6 +70,9 @@ namespace FluentMigrator.Tests.Helpers
 
         public void Create(IEnumerable<string> columnDefinitions)
         {
+            if (Connection.State != ConnectionState.Open)
+                Connection.Open();
+
             var sb = new StringBuilder();
             sb.Append("CREATE TABLE ");
 

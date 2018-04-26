@@ -19,20 +19,45 @@
 using System;
 using System.Linq;
 
+using FluentMigrator.Expressions;
+using FluentMigrator.Runner.Generators.Generic;
+
+using JetBrains.Annotations;
+
+using Microsoft.Extensions.Options;
+
 namespace FluentMigrator.Runner.Generators.MySql
 {
-    using Expressions;
-    using Generic;
-
     public class MySql4Generator : GenericGenerator
     {
         public MySql4Generator()
-            : base(new MySqlColumn(new MySql4TypeMap(), new MySqlQuoter()), new MySqlQuoter(), new EmptyDescriptionGenerator())
+            : this(new MySqlQuoter())
         {
         }
 
-        protected MySql4Generator(IColumn column, IQuoter quoter, IDescriptionGenerator descriptionGenerator)
-            : base(column, quoter, descriptionGenerator)
+        public MySql4Generator(
+            [NotNull] MySqlQuoter quoter)
+            : this(quoter, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()))
+        {
+        }
+
+        public MySql4Generator(
+            [NotNull] MySqlQuoter quoter,
+            [NotNull] IOptions<GeneratorOptions> generatorOptions)
+            : this(
+                new MySqlColumn(new MySql4TypeMap(), quoter),
+                quoter,
+                new EmptyDescriptionGenerator(),
+                generatorOptions)
+        {
+        }
+
+        protected MySql4Generator(
+            [NotNull] IColumn column,
+            [NotNull] IQuoter quoter,
+            [NotNull] IDescriptionGenerator descriptionGenerator,
+            [NotNull] IOptions<GeneratorOptions> generatorOptions)
+            : base(column, quoter, descriptionGenerator, generatorOptions)
         {
         }
 
@@ -91,12 +116,12 @@ namespace FluentMigrator.Runner.Generators.MySql
 
         public override string Generate(CreateSequenceExpression expression)
         {
-            return CompatabilityMode.HandleCompatabilty("Sequences is not supporteed for MySql");
+            return CompatibilityMode.HandleCompatibilty("Sequences is not supporteed for MySql");
         }
 
         public override string Generate(DeleteSequenceExpression expression)
         {
-            return CompatabilityMode.HandleCompatabilty("Sequences is not supporteed for MySql");
+            return CompatibilityMode.HandleCompatibilty("Sequences is not supporteed for MySql");
         }
 
         public override string Generate(DeleteConstraintExpression expression)

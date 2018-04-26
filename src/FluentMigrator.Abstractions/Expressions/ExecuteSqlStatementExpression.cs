@@ -35,10 +35,7 @@ namespace FluentMigrator.Expressions
         /// <inheritdoc />
         public override void ExecuteWith(IMigrationProcessor processor)
         {
-            // since all the Processors are using String.Format() in their Execute method
-            //  we need to escape the brackets with double brackets or else it throws an incorrect format error on the String.Format call
-            var sqlText = SqlStatement.Replace("{", "{{").Replace("}", "}}");
-            processor.Execute(sqlText);
+            processor.Execute(SqlStatement);
         }
 
         /// <inheritdoc />

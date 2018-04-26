@@ -110,6 +110,14 @@
           <source>The {0} method must be called on an object that implements {1}.</source>
           <target state="final">Die Methode {0} darf nur auf einem Objekt aufgerufen werden, dass {1} implementiert.</target>
         </trans-unit>
+        <trans-unit id="ExpressionTableNameMissing" translate="yes" xml:space="preserve">
+          <source>expression.TableName must not be empty</source>
+          <target state="final">expression.TableName darf nicht leer sein</target>
+        </trans-unit>
+        <trans-unit id="ExpressionTableNameMissingWithHints" translate="yes" xml:space="preserve">
+          <source>Table name not specified, ensure you have appended the OnTable extension. Format should be Delete.ForeignKey(KeyName).OnTable(TableName)</source>
+          <target state="final">Der Tabellenname wurde nicht angegeben. Stellen Sie sicher, dass sie die "OnTable"-Erweiterungsmethode aufgerufen haben. Der Aufruf sollte wie folgt aussehen: Delete.ForeignKey(KeyName).OnTable(TableName)</target>
+        </trans-unit>
       </group>
     </body>
   </file>

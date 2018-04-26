@@ -25,6 +25,7 @@ using FluentMigrator.Runner.Processors;
 
 namespace FluentMigrator.Runner.Generators
 {
+    [Obsolete]
     public class MigrationGeneratorFactory
     {
         private static readonly IDictionary<string, IMigrationGenerator> _migrationGenerators;

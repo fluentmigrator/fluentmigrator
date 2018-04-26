@@ -17,8 +17,6 @@
 #endregion
 
 using System;
-using System.Data.Common;
-using System.Reflection;
 
 namespace FluentMigrator.Runner.Processors.Firebird
 {
@@ -39,20 +37,5 @@ namespace FluentMigrator.Runner.Processors.Firebird
             : base(serviceProvider, _entries)
         {
         }
-
-        protected override DbProviderFactory CreateFactory()
-        {
-            var assembly = AppDomain.CurrentDomain.Load("FirebirdSql.Data.FirebirdClient");
-            var type = assembly.GetType("FirebirdSql.Data.FirebirdClient.FirebirdClientFactory");
-            var field = type.GetField("Instance", BindingFlags.Static | BindingFlags.Public);
-
-            if (field == null)
-            {
-                return base.CreateFactory();
-            }
-
-            return (DbProviderFactory)field.GetValue(null);
-        }
-
     }
 }

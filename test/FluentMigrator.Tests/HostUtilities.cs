@@ -20,6 +20,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 
+using NUnit.Framework;
+
 namespace FluentMigrator.Tests
 {
     public static class HostUtilities
@@ -54,7 +56,15 @@ namespace FluentMigrator.Tests
             if (SqlServerCeCanFindItsLibraries(type))
                 return true;
 
-            return SqlServerCeLoadBinaries(type);
+            try
+            {
+                return SqlServerCeLoadBinaries(type);
+            }
+            catch (Exception ex)
+            {
+                TestContext.Out.WriteLine(ex);
+                return false;
+            }
         }
 
         private static bool SqlServerCeLoadBinaries(Type type)
@@ -76,6 +86,11 @@ namespace FluentMigrator.Tests
             }
             catch (TargetInvocationException ex) when (ex.InnerException is SqlCeException sce && sce.NativeError == -1)
             {
+                return false;
+            }
+            catch (Exception ex)
+            {
+                TestContext.Out.WriteLine(ex);
                 return false;
             }
         }

@@ -1,4 +1,5 @@
 using FluentMigrator.Expressions;
+using FluentMigrator.Runner.Processors.SqlServer;
 
 using NUnit.Framework;
 
@@ -12,11 +13,13 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlServer2008")]
         [Category("SqlServer2012")]
         [Category("SqlServer2014")]
+        [Category("SqlServer2016")]
         public void CanCreateAndDeleteTableUsingThePerformDBOperationExpressions()
         {
             if (!IntegrationTestOptions.SqlServer2008.IsEnabled
              && !IntegrationTestOptions.SqlServer2012.IsEnabled
-             && !IntegrationTestOptions.SqlServer2014.IsEnabled)
+             && !IntegrationTestOptions.SqlServer2014.IsEnabled
+             && !IntegrationTestOptions.SqlServer2016.IsEnabled)
             {
                 Assert.Ignore("No processor found for the given action.");
             }
@@ -44,17 +47,38 @@ namespace FluentMigrator.Tests.Integration
 
             if (IntegrationTestOptions.SqlServer2008.IsEnabled)
             {
-                ExecuteWithSqlServer2008(processor => processor.Process(expression), true, IntegrationTestOptions.SqlServer2008);
+                ExecuteWithProcessor<SqlServer2008Processor>(
+                    services => { },
+                    (provider, processor) => processor.Process(expression),
+                    true,
+                    IntegrationTestOptions.SqlServer2008);
             }
 
             if (IntegrationTestOptions.SqlServer2012.IsEnabled)
             {
-                ExecuteWithSqlServer2012(processor => processor.Process(expression), true, IntegrationTestOptions.SqlServer2012);
+                ExecuteWithProcessor<SqlServer2012Processor>(
+                    services => { },
+                    (provider, processor) => processor.Process(expression),
+                    true,
+                    IntegrationTestOptions.SqlServer2012);
             }
 
             if (IntegrationTestOptions.SqlServer2014.IsEnabled)
             {
-                ExecuteWithSqlServer2014(processor => processor.Process(expression), true, IntegrationTestOptions.SqlServer2014);
+                ExecuteWithProcessor<SqlServer2014Processor>(
+                    services => { },
+                    (provider, processor) => processor.Process(expression),
+                    true,
+                    IntegrationTestOptions.SqlServer2014);
+            }
+
+            if (IntegrationTestOptions.SqlServer2016.IsEnabled)
+            {
+                ExecuteWithProcessor<SqlServer2016Processor>(
+                    services => { },
+                    (provider, processor) => processor.Process(expression),
+                    true,
+                    IntegrationTestOptions.SqlServer2016);
             }
         }
     }

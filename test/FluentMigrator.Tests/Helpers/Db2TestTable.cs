@@ -22,7 +22,6 @@ using System.Text;
 
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.DB2;
-using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.DB2;
 
 namespace FluentMigrator.Tests.Helpers
@@ -35,10 +34,7 @@ namespace FluentMigrator.Tests.Helpers
 
         public Db2TestTable(Db2Processor processor, string schema, params string[] columnDefinitions)
         {
-            Connection = processor.Connection;
-            Transaction = processor.Transaction;
             Processor = processor;
-            Factory = new Db2DbFactory(serviceProvider: null);
             _schema = schema;
 
             if (Connection.State != ConnectionState.Open)
@@ -51,10 +47,7 @@ namespace FluentMigrator.Tests.Helpers
 
         public Db2TestTable(string table, Db2Processor processor, string schema, params string[] columnDefinitions)
         {
-            Connection = processor.Connection;
-            Transaction = processor.Transaction;
             Processor = processor;
-            Factory = new Db2DbFactory(serviceProvider: null);
             _schema = schema;
 
             if (Connection.State != ConnectionState.Open)
@@ -75,20 +68,7 @@ namespace FluentMigrator.Tests.Helpers
             get;
         }
 
-        public IDbTransaction Transaction
-        {
-            get;
-        }
-
-        private IDbConnection Connection
-        {
-            get;
-        }
-
-        private IDbFactory Factory
-        {
-            get;
-        }
+        private IDbConnection Connection => Processor.Connection;
 
         public void Create(string[] columnDefinitions)
         {
@@ -102,10 +82,7 @@ namespace FluentMigrator.Tests.Helpers
             var columns = string.Join(", ", columnDefinitions);
             sb.AppendFormat("CREATE TABLE {0} ({1})", NameWithSchema, columns);
 
-            using (var command = Factory.CreateCommand(sb.ToString(), Connection, Transaction, Processor.Options))
-            {
-                command.ExecuteNonQuery();
-            }
+            Processor.Execute(sb.ToString());
         }
 
         public void Dispose()
@@ -116,20 +93,12 @@ namespace FluentMigrator.Tests.Helpers
         public void Drop()
         {
             var tableCommand = string.Format("DROP TABLE {0}", NameWithSchema);
-
-            using (var command = Factory.CreateCommand(tableCommand, Connection, Transaction, Processor.Options))
-            {
-                command.ExecuteNonQuery();
-            }
+            Processor.Execute(tableCommand);
 
             if (!string.IsNullOrEmpty(_schema))
             {
                 var schemaCommand = string.Format("DROP SCHEMA {0} RESTRICT", _quoter.QuoteSchemaName(_schema));
-
-                using (var commandToo = Factory.CreateCommand(schemaCommand, Connection, Transaction, Processor.Options))
-                {
-                    commandToo.ExecuteNonQuery();
-                }
+                Processor.Execute(schemaCommand);
             }
         }
 
@@ -141,10 +110,7 @@ namespace FluentMigrator.Tests.Helpers
                 _quoter.QuoteColumnName(column)
                 );
 
-            using (var command = Factory.CreateCommand(query, Connection, Transaction, Processor.Options))
-            {
-                command.ExecuteNonQuery();
-            }
+            Processor.Execute(query);
         }
 
         public void WithUniqueConstraintOn(string column, string name)
@@ -157,10 +123,7 @@ namespace FluentMigrator.Tests.Helpers
                 _quoter.QuoteColumnName(column)
             );
 
-            using (var command = Factory.CreateCommand(query, Connection, Transaction, Processor.Options))
-            {
-                command.ExecuteNonQuery();
-            }
+            Processor.Execute(query);
         }
 
         public Db2Processor Processor { get; }

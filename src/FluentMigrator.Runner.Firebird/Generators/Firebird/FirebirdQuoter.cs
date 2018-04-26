@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 
 using FluentMigrator.Runner.Generators.Generic;
+using FluentMigrator.Runner.Processors.Firebird;
 
 namespace FluentMigrator.Runner.Generators.Firebird
 {
@@ -58,6 +59,15 @@ namespace FluentMigrator.Runner.Generators.Firebird
             StringComparer.OrdinalIgnoreCase);
 
         private readonly bool _forceQuote;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FirebirdQuoter"/> class.
+        /// </summary>
+        /// <param name="options">The firebird specific options</param>
+        public FirebirdQuoter(FirebirdOptions options)
+            : this(options.ForceQuote)
+        {
+        }
 
         public FirebirdQuoter(bool forceQuote)
         {

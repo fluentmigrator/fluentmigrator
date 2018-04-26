@@ -27,6 +27,7 @@ using FluentMigrator.Runner.Versioning;
 using FluentMigrator.Runner.VersionTableInfo;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Conventions;
+using FluentMigrator.Runner.Processors;
 
 using JetBrains.Annotations;
 
@@ -34,6 +35,9 @@ namespace FluentMigrator.Runner
 {
     public class VersionLoader : IVersionLoader
     {
+        [NotNull]
+        private readonly IMigrationProcessor _processor;
+
         private readonly IConventionSet _conventionSet;
         private bool _versionSchemaMigrationAlreadyRun;
         private bool _versionMigrationAlreadyRun;
@@ -41,13 +45,14 @@ namespace FluentMigrator.Runner
         private bool _versionDescriptionMigrationAlreadyRun;
         private IVersionInfo _versionInfo;
         private IMigrationRunnerConventions Conventions { get; set; }
-        private IMigrationProcessor Processor { get; set; }
 
         [CanBeNull]
         [Obsolete]
         protected IAssemblyCollection Assemblies { get; set; }
 
         public IVersionTableMetaData VersionTableMetaData { get; }
+
+        [NotNull]
         public IMigrationRunner Runner { get; set; }
         public VersionSchemaMigration VersionSchemaMigration { get; }
         public IMigration VersionMigration { get; }
@@ -55,20 +60,21 @@ namespace FluentMigrator.Runner
         public IMigration VersionDescriptionMigration { get; }
 
         [Obsolete]
-        public VersionLoader(IMigrationRunner runner, Assembly assembly, IConventionSet conventionSet, IMigrationRunnerConventions conventions)
+        internal VersionLoader(IMigrationRunner runner, Assembly assembly, IConventionSet conventionSet, IMigrationRunnerConventions conventions)
             : this(runner, new SingleAssembly(assembly), conventionSet, conventions)
         {
         }
 
         [Obsolete]
-        public VersionLoader(IMigrationRunner runner, IAssemblyCollection assemblies,
+        internal VersionLoader(IMigrationRunner runner, IAssemblyCollection assemblies,
             IConventionSet conventionSet,
             IMigrationRunnerConventions conventions,
             IVersionTableMetaData versionTableMetaData = null)
         {
             _conventionSet = conventionSet;
+            _processor = runner.Processor;
+
             Runner = runner;
-            Processor = runner.Processor;
             Assemblies = assemblies;
 
             Conventions = conventions;
@@ -84,14 +90,16 @@ namespace FluentMigrator.Runner
         }
 
         public VersionLoader(
-            [NotNull] IMigrationRunner runner,
+            [NotNull] IProcessorAccessor processorAccessor,
             [NotNull] IConventionSet conventionSet,
             [NotNull] IMigrationRunnerConventions conventions,
-            [NotNull] IVersionTableMetaData versionTableMetaData)
+            [NotNull] IVersionTableMetaData versionTableMetaData,
+            [NotNull] IMigrationRunner runner)
         {
             _conventionSet = conventionSet;
+            _processor = processorAccessor.Processor;
+
             Runner = runner;
-            Processor = runner.Processor;
 
             Conventions = conventions;
             VersionTableMetaData = versionTableMetaData;
@@ -99,10 +107,6 @@ namespace FluentMigrator.Runner
             VersionSchemaMigration = new VersionSchemaMigration(VersionTableMetaData);
             VersionUniqueMigration = new VersionUniqueMigration(VersionTableMetaData);
             VersionDescriptionMigration = new VersionDescriptionMigration(VersionTableMetaData);
-
-#pragma warning disable 618
-            VersionTableMetaData.ApplicationContext = runner.RunnerContext.ApplicationContext;
-#pragma warning restore 618
 
             LoadVersionInfo();
         }
@@ -119,7 +123,7 @@ namespace FluentMigrator.Runner
             dataExpression.TableName = VersionTableMetaData.TableName;
             dataExpression.SchemaName = VersionTableMetaData.SchemaName;
 
-            dataExpression.ExecuteWith(Processor);
+            dataExpression.ExecuteWith(_processor);
         }
 
         [NotNull]
@@ -140,59 +144,20 @@ namespace FluentMigrator.Runner
 
         public IVersionInfo VersionInfo
         {
-            get
-            {
-                return _versionInfo;
-            }
-            set
-            {
-                if (value == null)
-                    throw new ArgumentException("Cannot set VersionInfo to null");
-
-                _versionInfo = value;
-            }
+            get => _versionInfo;
+            set => _versionInfo = value ?? throw new ArgumentException("Cannot set VersionInfo to null");
         }
 
-        public bool AlreadyCreatedVersionSchema
-        {
-            get
-            {
-                return string.IsNullOrEmpty(VersionTableMetaData.SchemaName) ||
-                       Processor.SchemaExists(VersionTableMetaData.SchemaName);
-            }
-        }
+        public bool AlreadyCreatedVersionSchema => string.IsNullOrEmpty(VersionTableMetaData.SchemaName) ||
+            _processor.SchemaExists(VersionTableMetaData.SchemaName);
 
-        public bool AlreadyCreatedVersionTable
-        {
-            get
-            {
-                return Processor.TableExists(VersionTableMetaData.SchemaName, VersionTableMetaData.TableName);
-            }
-        }
+        public bool AlreadyCreatedVersionTable => _processor.TableExists(VersionTableMetaData.SchemaName, VersionTableMetaData.TableName);
 
-        public bool AlreadyMadeVersionUnique
-        {
-            get
-            {
-                return Processor.ColumnExists(VersionTableMetaData.SchemaName, VersionTableMetaData.TableName, VersionTableMetaData.AppliedOnColumnName);
-            }
-        }
+        public bool AlreadyMadeVersionUnique => _processor.ColumnExists(VersionTableMetaData.SchemaName, VersionTableMetaData.TableName, VersionTableMetaData.AppliedOnColumnName);
 
-        public bool AlreadyMadeVersionDescription
-        {
-            get
-            {
-                return Processor.ColumnExists(VersionTableMetaData.SchemaName, VersionTableMetaData.TableName, VersionTableMetaData.DescriptionColumnName);
-            }
-        }
+        public bool AlreadyMadeVersionDescription => _processor.ColumnExists(VersionTableMetaData.SchemaName, VersionTableMetaData.TableName, VersionTableMetaData.DescriptionColumnName);
 
-        public bool OwnsVersionSchema
-        {
-            get
-            {
-                return VersionTableMetaData.OwnsSchema;
-            }
-        }
+        public bool OwnsVersionSchema => VersionTableMetaData.OwnsSchema;
 
         public void LoadVersionInfo()
         {
@@ -224,8 +189,7 @@ namespace FluentMigrator.Runner
 
             if (!AlreadyCreatedVersionTable) return;
 
-            var dataSet = Processor.ReadTableData(VersionTableMetaData.SchemaName, VersionTableMetaData.TableName);
-
+            var dataSet = _processor.ReadTableData(VersionTableMetaData.SchemaName, VersionTableMetaData.TableName);
             foreach (DataRow row in dataSet.Tables[0].Rows)
             {
                 _versionInfo.AddAppliedMigration(long.Parse(row[VersionTableMetaData.ColumnName].ToString()));
@@ -235,12 +199,12 @@ namespace FluentMigrator.Runner
         public void RemoveVersionTable()
         {
             var expression = new DeleteTableExpression { TableName = VersionTableMetaData.TableName, SchemaName = VersionTableMetaData.SchemaName };
-            expression.ExecuteWith(Processor);
+            expression.ExecuteWith(_processor);
 
             if (OwnsVersionSchema && !string.IsNullOrEmpty(VersionTableMetaData.SchemaName))
             {
                 var schemaExpression = new DeleteSchemaExpression { SchemaName = VersionTableMetaData.SchemaName };
-                schemaExpression.ExecuteWith(Processor);
+                schemaExpression.ExecuteWith(_processor);
             }
         }
 
@@ -251,7 +215,7 @@ namespace FluentMigrator.Runner
                                     {
                                         new KeyValuePair<string, object>(VersionTableMetaData.ColumnName, version)
                                     });
-            expression.ExecuteWith(Processor);
+            expression.ExecuteWith(_processor);
         }
 
         [Obsolete]

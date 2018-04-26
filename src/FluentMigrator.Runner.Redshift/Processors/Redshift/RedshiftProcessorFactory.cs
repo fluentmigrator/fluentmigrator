@@ -22,6 +22,7 @@ using FluentMigrator.Runner.Generators.Redshift;
 
 namespace FluentMigrator.Runner.Processors.Redshift
 {
+    [Obsolete]
     public class RedshiftProcessorFactory : MigrationProcessorFactory
     {
         private readonly IServiceProvider _serviceProvider;
@@ -37,11 +38,12 @@ namespace FluentMigrator.Runner.Processors.Redshift
             _serviceProvider = serviceProvider;
         }
 
+        [Obsolete]
         public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
         {
             var factory = new RedshiftDbFactory(_serviceProvider);
             var connection = factory.CreateConnection(connectionString);
-            return new RedshiftProcessor(connection, new RedshiftGenerator(), announcer, options, factory);
+            return new RedshiftProcessor(connection, new RedshiftGenerator(new RedshiftQuoter()), announcer, options, factory);
         }
     }
 }

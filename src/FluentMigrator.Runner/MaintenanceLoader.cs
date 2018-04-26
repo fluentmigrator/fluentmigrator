@@ -24,6 +24,11 @@ using FluentMigrator.Infrastructure;
 using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Runner.Initialization;
 
+using JetBrains.Annotations;
+
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+
 namespace FluentMigrator.Runner
 {
     public class MaintenanceLoader : IMaintenanceLoader
@@ -50,17 +55,23 @@ namespace FluentMigrator.Runner
             );
         }
 
-        public MaintenanceLoader(IEnumerable<IMigration> migrations, IRunnerContext runnerContext, IMigrationRunnerConventions conventions)
+        public MaintenanceLoader(
+            [NotNull] IAssemblySource assemblySource,
+            [NotNull] IOptions<RunnerOptions> options,
+            [NotNull] IMigrationRunnerConventions conventions,
+            [NotNull] IServiceProvider serviceProvider)
         {
-            var tags = runnerContext.Tags?.ToList() ?? new List<string>();
-            var requireTags = tags.Count != 0;
+            var tags = options.Value.Tags ?? new string[0];
+            var requireTags = tags.Length != 0;
+
+            var types = assemblySource.Assemblies.SelectMany(a => a.ExportedTypes).ToList();
 
             _maintenance = (
-                from migration in migrations
-                let type = migration.GetType()
+                from type in types
                 let stage = conventions.GetMaintenanceStage(type)
                 where stage != null
                 where (requireTags && conventions.TypeHasMatchingTags(type, tags)) || (!requireTags && !conventions.TypeHasTags(type))
+                let migration = (IMigration) ActivatorUtilities.CreateInstance(serviceProvider, type)
                 group migration by stage.GetValueOrDefault()
             ).ToDictionary(
                 g => g.Key,

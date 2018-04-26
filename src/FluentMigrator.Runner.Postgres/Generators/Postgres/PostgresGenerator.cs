@@ -6,11 +6,29 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Generic;
 
+using JetBrains.Annotations;
+
+using Microsoft.Extensions.Options;
+
 namespace FluentMigrator.Runner.Generators.Postgres
 {
     public class PostgresGenerator : GenericGenerator
     {
-        public PostgresGenerator() : base(new PostgresColumn(), new PostgresQuoter(), new PostgresDescriptionGenerator())
+        public PostgresGenerator()
+            : this(new PostgresQuoter())
+        {
+        }
+
+        public PostgresGenerator(
+            [NotNull] PostgresQuoter quoter)
+            : this(quoter, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()))
+        {
+        }
+
+        public PostgresGenerator(
+            [NotNull] PostgresQuoter quoter,
+            [NotNull] IOptions<GeneratorOptions> generatorOptions)
+            : base(new PostgresColumn(), quoter, new PostgresDescriptionGenerator(), generatorOptions)
         {
         }
 

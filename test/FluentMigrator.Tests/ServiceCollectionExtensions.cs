@@ -14,21 +14,19 @@
 // limitations under the License.
 #endregion
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
-using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
-using FluentMigrator.Runner.VersionTableInfo;
 
 using JetBrains.Annotations;
 
 using Microsoft.Extensions.DependencyInjection;
+
+using Moq;
 
 using NUnit.Framework;
 
@@ -36,57 +34,25 @@ namespace FluentMigrator.Tests
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection CreateServiceCollection()
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public static IServiceCollection CreateServices(bool addAssemblySource = true)
         {
-            return new ServiceCollection().Reset();
-        }
+            var services = new ServiceCollection()
+                .AddFluentMigratorCore();
 
-        public static IServiceCollection CreateServices(this IMigrationProcessor processor)
-        {
-            return CreateServiceCollection()
-                .WithProcessor(processor);
-        }
+            if (addAssemblySource)
+            {
+                services
+                    .AddSingleton<IAssemblySourceItem>(new AssemblySourceItem(Assembly.GetExecutingAssembly()));
+            }
 
-        public static IServiceCollection Reset(this IServiceCollection services)
-        {
-            services.Clear();
             services
-                // Create the announcer to output the migration messages
-                .AddSingleton<IAnnouncer>(sp => new TextWriterAnnouncer(TestContext.Out) { ShowSql = true })
-
-                // Processor specific options (usually none are needed)
-                .AddScoped<IMigrationProcessorOptions, ProcessorOptions>()
-
-                // Configure the default version table metadata
-                .AddSingleton<IVersionTableMetaData, DefaultVersionTableMetaData>()
-
-                // Configure the loader for migrations that should be executed during maintenance steps
-                .AddScoped<IMaintenanceLoader, MaintenanceLoader>()
-
-                // Configure the migration information loader
-                .AddScoped<IMigrationInformationLoader, DefaultMigrationInformationLoader>()
-
-                // Configure the runner context
-                .AddScoped<IRunnerContext>(sp => new RunnerContext(sp.GetRequiredService<IAnnouncer>())
-                {
-                    AllowBreakingChange = true,
-                })
-
-                // Configure the runner conventions
-                .AddScoped<IMigrationRunnerConventions, MigrationRunnerConventions>()
-
-                // Configure the runner
-                .AddScoped<IMigrationRunner, MigrationRunner>();
+                .ConfigureRunner(
+                    builder => builder
+                        .WithAnnouncer(new TextWriterAnnouncer(TestContext.Out) { ShowSql = true }))
+                .Configure<RunnerOptions>(opt => opt.AllowBreakingChange = true);
 
             return services;
-        }
-
-        public static IServiceCollection WithMigrations(
-            [NotNull] this IServiceCollection services,
-            [NotNull] Func<IServiceProvider, IEnumerable<IMigration>> migrations)
-        {
-            return services
-                .AddScoped(migrations);
         }
 
         public static IServiceCollection WithAllTestMigrations(
@@ -96,66 +62,39 @@ namespace FluentMigrator.Tests
                 .WithMigrationsIn(@namespace: null);
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public static IServiceCollection WithMigrationsIn(
             [NotNull] this IServiceCollection services,
             [CanBeNull] string @namespace,
             bool recursive = false)
         {
-            var allTypes = Assembly.GetExecutingAssembly().GetExportedTypes().ToList();
-            var migrationTypes = allTypes
-                .Where(t => typeof(IMigration).IsAssignableFrom(t))
-                .Where(t => !t.IsAbstract && t.IsClass);
+            return services
+                .Configure<TypeFilterOptions>(
+                    opt =>
+                    {
+                        opt.Namespace = @namespace;
+                        opt.NestedNamespaces = recursive;
+                    })
+                .ConfigureRunner(builder => builder.WithMigrationsIn(Assembly.GetExecutingAssembly()));
+        }
 
-            if (!string.IsNullOrEmpty(@namespace))
+        public static IServiceCollection WithProcessor(
+            [NotNull] this IServiceCollection services,
+            [NotNull] IMock<IMigrationProcessor> processor)
+        {
+            return services
+                .AddScoped<IProcessorAccessor>(_ => new PassThroughProcessorAccessor(processor.Object));
+        }
+
+        private class PassThroughProcessorAccessor : IProcessorAccessor
+        {
+            public PassThroughProcessorAccessor(IMigrationProcessor processor)
             {
-                if (recursive)
-                {
-                    var namespaceWithDot = $"{@namespace}.";
-                    migrationTypes = migrationTypes.Where(t => t.Namespace != null && (t.Namespace == @namespace || t.Namespace.StartsWith(namespaceWithDot)));
-                }
-                else
-                {
-                    migrationTypes = migrationTypes.Where(t => t.Namespace == @namespace);
-                }
+                Processor = processor;
             }
 
-            foreach (var migrationType in migrationTypes)
-            {
-                services = services
-                    .AddScoped(typeof(IMigration), migrationType);
-            }
-
-            return services;
-        }
-
-        public static IServiceCollection WithProcessor(this IServiceCollection services, IMigrationProcessor processor)
-        {
-            return services
-                .AddSingleton(processor)
-                .AddSingleton<IQuerySchema>(_ => processor)
-                .AddScoped<IMigrationContext>(sp =>
-                {
-                    var runnerContext = sp.GetRequiredService<IRunnerContext>();
-                    return new MigrationContext(processor, runnerContext.ApplicationContext, runnerContext.Connection, sp);
-                });
-        }
-
-        public static IServiceCollection WithRunnerContext(this IServiceCollection services, IRunnerContext runnerContext)
-        {
-            return services
-                .AddScoped(sp => runnerContext);
-        }
-
-        public static IServiceCollection WithRunnerContext(this IServiceCollection services, Func<IServiceProvider, IRunnerContext> runnerContextFunc)
-        {
-            return services
-                .AddScoped(runnerContextFunc);
-        }
-
-        public static IServiceCollection WithRunnerConventions(this IServiceCollection services, IMigrationRunnerConventions conventions)
-        {
-            return services
-                .AddScoped(_ => conventions);
+            /// <inheritdoc />
+            public IMigrationProcessor Processor { get; }
         }
     }
 }

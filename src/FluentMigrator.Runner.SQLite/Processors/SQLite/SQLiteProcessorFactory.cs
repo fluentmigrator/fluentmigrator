@@ -23,6 +23,7 @@ using FluentMigrator.Runner.Generators.SQLite;
 namespace FluentMigrator.Runner.Processors.SQLite
 {
     // ReSharper disable once InconsistentNaming
+    [Obsolete]
     public class SQLiteProcessorFactory : MigrationProcessorFactory
     {
         private readonly IServiceProvider _serviceProvider;
@@ -37,11 +38,12 @@ namespace FluentMigrator.Runner.Processors.SQLite
             _serviceProvider = serviceProvider;
         }
 
+        [Obsolete]
         public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
         {
             var factory = new SQLiteDbFactory(_serviceProvider);
             var connection = factory.CreateConnection(connectionString);
-            return new SQLiteProcessor(connection, new SQLiteGenerator(), announcer, options, factory);
+            return new SQLiteProcessor(connection, new SQLiteGenerator(new SQLiteQuoter()), announcer, options, factory);
         }
     }
 }

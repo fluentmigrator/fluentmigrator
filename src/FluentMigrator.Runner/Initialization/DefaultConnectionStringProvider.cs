@@ -16,12 +16,38 @@
 //
 #endregion
 
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+
+using JetBrains.Annotations;
+
+#if NETFRAMEWORK
+using FluentMigrator.Runner.Initialization.NetFramework;
+using Microsoft.Extensions.Options;
+#endif
+
 namespace FluentMigrator.Runner.Initialization
 {
     public class DefaultConnectionStringProvider : IConnectionStringProvider
     {
+        [CanBeNull]
+        [ItemNotNull]
+        private readonly IReadOnlyCollection<IConnectionStringReader> _accessors;
+
         private readonly object _syncRoot = new object();
         private string _connectionString;
+
+        [Obsolete]
+        public DefaultConnectionStringProvider()
+        {
+        }
+
+        public DefaultConnectionStringProvider([NotNull, ItemNotNull] IEnumerable<IConnectionStringReader> accessors)
+        {
+            _accessors = accessors.ToList();
+        }
 
         public string GetConnectionString(IAnnouncer announcer, string connection, string configPath, string assemblyLocation,
             string database)
@@ -32,8 +58,13 @@ namespace FluentMigrator.Runner.Initialization
                 {
                     if (_connectionString == null)
                     {
-                        _connectionString = GetConnectionStringFromManager(announcer, connection, configPath,
-                            assemblyLocation, database);
+                        var accessors = _accessors ?? CreateAccessors(assemblyLocation, announcer, configPath).ToList();
+                        var result = GetConnectionString(accessors, connection, database);
+                        if (string.IsNullOrEmpty(result))
+                            result = connection;
+                        if (string.IsNullOrEmpty(result))
+                            throw new InvalidOperationException("No connection string specified");
+                        return _connectionString = result;
                     }
                 }
             }
@@ -41,37 +72,50 @@ namespace FluentMigrator.Runner.Initialization
             return _connectionString;
         }
 
+        [SuppressMessage("ReSharper", "UnusedParameter.Local", Justification = "Parameters are required for the full .NET Framework")]
+        private static IEnumerable<IConnectionStringReader> CreateAccessors(string assemblyLocation, IAnnouncer announcer, string configPath)
+        {
 #if NETFRAMEWORK
-        private static string GetConnectionStringFromManager(
-            IAnnouncer announcer,
-            string connection,
-            string configPath,
-            string assemblyLocation,
-            string database)
-        {
-            var manager = new NetFramework.ConnectionStringManager(
-                new NetFramework.NetConfigManager(),
-                announcer,
-                connection,
-                configPath,
-                assemblyLocation,
-                database);
+#pragma warning disable 612
+            var options = new AppConfigConnectionStringAccessorOptions()
+            {
+                ConnectionStringConfigPath = configPath,
+            };
 
-            manager.LoadConnectionString();
-            return manager.ConnectionString;
-        }
+            yield return new AppConfigConnectionStringReader(
+                new NetConfigManager(),
+                assemblyLocation,
+                announcer,
+                new OptionsWrapper<AppConfigConnectionStringAccessorOptions>(options));
+#pragma warning restore 612
 #else
-        private static string GetConnectionStringFromManager(
-            IAnnouncer announcer,
-            string connection,
-            string configPath,
-            string assemblyLocation,
-            string database)
-        {
-            if (string.IsNullOrEmpty(connection))
-                throw new System.NotImplementedException();
-            return connection;
-        }
+            yield break;
 #endif
+        }
+
+        private static string GetConnectionString(IReadOnlyCollection<IConnectionStringReader> accessors, string connection, string database)
+        {
+            var result = GetConnectionString(accessors, connection);
+            if (result == null)
+                result = GetConnectionString(accessors, database);
+            if (result == null)
+                result = GetConnectionString(accessors, Environment.MachineName);
+            return result;
+        }
+
+        private static string GetConnectionString(IReadOnlyCollection<IConnectionStringReader> accessors, string connectionStringOrName)
+        {
+            if (string.IsNullOrEmpty(connectionStringOrName))
+                return null;
+
+            foreach (var accessor in accessors.OrderByDescending(x => x.Priority))
+            {
+                var connectionString = accessor.GetConnectionString(connectionStringOrName);
+                if (connectionString != null)
+                    return connectionString;
+            }
+
+            return null;
+        }
     }
 }

@@ -22,6 +22,7 @@ using FluentMigrator.Runner.Generators.Oracle;
 
 namespace FluentMigrator.Runner.Processors.Oracle
 {
+    [Obsolete]
     public class OracleProcessorFactory : MigrationProcessorFactory
     {
         private readonly IServiceProvider _serviceProvider;
@@ -37,17 +38,12 @@ namespace FluentMigrator.Runner.Processors.Oracle
             _serviceProvider = serviceProvider;
         }
 
+        [Obsolete]
         public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
         {
             var factory = new OracleDbFactory(_serviceProvider);
             var connection = factory.CreateConnection(connectionString);
-            return new OracleProcessor(connection, new OracleGenerator(Quoted(options.ProviderSwitches)), announcer, options, factory);
-        }
-
-        private bool Quoted(string options)
-        {
-            return !string.IsNullOrEmpty(options)
-                && options.IndexOf("QUOTEDIDENTIFIERS=TRUE", StringComparison.InvariantCultureIgnoreCase) != -1;
+            return new OracleProcessor(connection, new OracleGenerator(ProcessorOptionsExtensions.Quoted(options.ProviderSwitches)), announcer, options, factory);
         }
     }
 }

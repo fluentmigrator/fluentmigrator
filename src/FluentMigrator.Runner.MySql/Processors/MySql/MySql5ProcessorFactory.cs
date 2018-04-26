@@ -20,6 +20,7 @@ using FluentMigrator.Runner.Generators.MySql;
 
 namespace FluentMigrator.Runner.Processors.MySql
 {
+    [Obsolete]
     public class MySql5ProcessorFactory : MigrationProcessorFactory
     {
         private readonly IServiceProvider _serviceProvider;
@@ -35,11 +36,12 @@ namespace FluentMigrator.Runner.Processors.MySql
             _serviceProvider = serviceProvider;
         }
 
+        [Obsolete]
         public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
         {
             var factory = new MySqlDbFactory(_serviceProvider);
             var connection = factory.CreateConnection(connectionString);
-            return new MySqlProcessor(connection, new MySql5Generator(), announcer, options, factory);
+            return new MySqlProcessor(connection, new MySql5Generator(new MySqlQuoter()), announcer, options, factory);
         }
     }
 }

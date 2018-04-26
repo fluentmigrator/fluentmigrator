@@ -22,10 +22,10 @@ namespace FluentMigrator.Runner
     {
         private readonly IMigrationProcessor _migrationProcessor;
 
-        public TransactionalMigrationScope(IMigrationProcessor migrationProcessor, Action disposalAction)
+        public TransactionalMigrationScope(IMigrationProcessor processor, Action disposalAction)
             : base(disposalAction)
         {
-            _migrationProcessor = migrationProcessor ?? throw new ArgumentNullException(nameof(migrationProcessor));
+            _migrationProcessor = processor ?? throw new ArgumentNullException(nameof(processor));
             _migrationProcessor.BeginTransaction();
         }
 

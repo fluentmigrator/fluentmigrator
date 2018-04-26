@@ -20,7 +20,7 @@ using System;
 
 namespace FluentMigrator.Runner.Processors.Oracle
 {
-    public class OracleManagedDbFactory : ReflectionBasedDbFactory
+    public class OracleManagedDbFactory : OracleBaseDbFactory
     {
         private static readonly TestEntry[] _entries =
         {

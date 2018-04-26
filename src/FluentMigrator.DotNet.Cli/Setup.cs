@@ -22,7 +22,10 @@ using AutoMapper;
 using FluentMigrator.DotNet.Cli.CustomAnnouncers;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
+using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Initialization;
+using FluentMigrator.Runner.Initialization.NetFramework;
+using FluentMigrator.Runner.Processors;
 
 using McMaster.Extensions.CommandLineUtils;
 
@@ -31,7 +34,7 @@ using Microsoft.Extensions.Logging;
 
 namespace FluentMigrator.DotNet.Cli
 {
-    public class Setup
+    public static class Setup
     {
         public static IServiceProvider BuildServiceProvider(MigratorOptions options, IConsole console)
         {
@@ -43,13 +46,83 @@ namespace FluentMigrator.DotNet.Cli
 
         private static IServiceProvider ConfigureServices(IServiceCollection services, MigratorOptions options, IConsole console)
         {
+            var conventionSet = new DefaultConventionSet(defaultSchemaName: null, options.WorkingDirectory);
+
             var mapper = ConfigureMapper();
             services
                 .AddLogging()
                 .AddOptions()
                 .AddSingleton(mapper);
+
+            services
+                .AddFluentMigratorCore()
+                .ConfigureRunner(
+                    builder => builder
+                        .AddDb2()
+                        .AddDb2ISeries()
+                        .AddDotConnectOracle()
+                        .AddFirebird()
+                        .AddHana()
+                        .AddMySql4()
+                        .AddMySql5()
+                        .AddOracle()
+                        .AddOracleManaged()
+                        .AddPostgres()
+                        .AddRedshift()
+                        .AddSqlAnywhere()
+                        .AddSQLite()
+                        .AddSqlServer()
+                        .AddSqlServer2000()
+                        .AddSqlServer2005()
+                        .AddSqlServer2008()
+                        .AddSqlServer2012()
+                        .AddSqlServer2014()
+                        .AddSqlServer2016()
+                        .AddSqlServerCe());
+
+            services
+                .AddSingleton<IConventionSet>(conventionSet)
+                .AddScoped<TaskExecutor, LateInitTaskExecutor>()
+                .Configure<SelectingProcessorAccessorOptions>(opt => opt.ProcessorId = options.ProcessorType)
+                .Configure<AssemblySourceOptions>(opt => opt.AssemblyNames = options.TargetAssemblies.ToArray())
+#pragma warning disable 612
+                .Configure<AppConfigConnectionStringAccessorOptions>(
+                    opt => opt.ConnectionStringConfigPath = options.ConnectionStringConfigPath)
+#pragma warning restore 612
+                .Configure<TypeFilterOptions>(
+                    opt =>
+                    {
+                        opt.Namespace = options.Namespace;
+                        opt.NestedNamespaces = options.NestedNamespaces;
+                    })
+                .Configure<RunnerOptions>(
+                    opt =>
+                    {
+                        opt.Task = options.Task;
+                        opt.Version = options.TargetVersion ?? 0;
+                        opt.StartVersion = options.StartVersion ?? 0;
+                        opt.NoConnection = options.NoConnection;
+                        opt.Steps = options.Steps ?? 1;
+                        opt.Profile = options.Profile;
+                        opt.Tags = options.Tags.ToArray();
+#pragma warning disable 612
+                        opt.ApplicationContext = options.Context;
+#pragma warning restore 612
+                        opt.TransactionPerSession = options.TransactionMode == TransactionMode.Session;
+                        opt.AllowBreakingChange = options.AllowBreakingChanges;
+                    })
+                .Configure<ProcessorOptions>(
+                    opt =>
+                    {
+                        opt.ConnectionString = options.ConnectionString;
+                        opt.PreviewOnly = options.Preview;
+                        opt.ProviderSwitches = options.ProcessorSwitches;
+                        opt.Timeout = options.Timeout == null ? null : (TimeSpan?) TimeSpan.FromSeconds(options.Timeout.Value);
+                    });
+
             services
                 .Configure<MigratorOptions>(mc => mapper.Map(options, mc));
+
             services
                 .Configure<CustomAnnouncerOptions>(
                     cao =>
@@ -57,16 +130,17 @@ namespace FluentMigrator.DotNet.Cli
                         cao.ShowElapsedTime = options.Verbose;
                         cao.ShowSql = options.Verbose;
                     });
+
             services
                 .AddSingleton(console)
                 .AddSingleton<LateInitAnnouncer>()
                 .AddSingleton<LoggingAnnouncer>()
                 .AddSingleton<ParserConsoleAnnouncer>()
                 .AddSingleton(CreateAnnouncer);
-            services
-                .AddSingleton(sp => CreateRunnerContext(sp, options));
+
             services
                 .AddTransient<TaskExecutor, LateInitTaskExecutor>();
+
             return services.BuildServiceProvider();
         }
 
@@ -77,10 +151,7 @@ namespace FluentMigrator.DotNet.Cli
 
         private static IMapper ConfigureMapper()
         {
-            var mapperConfig = new MapperConfiguration(cfg =>
-            {
-                cfg.CreateMap<MigratorOptions, MigratorOptions>();
-            });
+            var mapperConfig = new MapperConfiguration(cfg => cfg.CreateMap<MigratorOptions, MigratorOptions>());
             mapperConfig.AssertConfigurationIsValid();
             return new Mapper(mapperConfig);
         }
@@ -91,33 +162,6 @@ namespace FluentMigrator.DotNet.Cli
             var consoleAnnouncer = serviceProvider.GetRequiredService<ParserConsoleAnnouncer>();
             var lateInitAnnouncer = serviceProvider.GetRequiredService<LateInitAnnouncer>();
             return new CompositeAnnouncer(loggingAnnouncer, consoleAnnouncer, lateInitAnnouncer);
-        }
-
-        private static IRunnerContext CreateRunnerContext(IServiceProvider serviceProvider, MigratorOptions options)
-        {
-            var announcer = serviceProvider.GetRequiredService<IAnnouncer>();
-            return new RunnerContext(announcer)
-            {
-                Task = options.Task,
-                Connection = options.ConnectionString,
-                ConnectionStringConfigPath = options.ConnectionStringConfigPath,
-                Database = options.ProcessorType,
-                ProviderSwitches = options.ProcessorSwitches,
-                NoConnection = options.NoConnection || string.IsNullOrEmpty(options.ConnectionString),
-                Version = options.TargetVersion ?? 0,
-                Targets = options.TargetAssemblies.ToArray(),
-                Steps = options.Steps ?? 1,
-                Namespace = options.Namespace,
-                NestedNamespaces = options.NestedNamespaces,
-                StartVersion = options.StartVersion ?? 0,
-                WorkingDirectory = options.WorkingDirectory,
-                Tags = options.Tags.ToList(),
-                PreviewOnly = options.Preview,
-                Profile = options.Profile,
-                ApplicationContext = options.Context,
-                Timeout = options.Timeout,
-                TransactionPerSession = options.TransactionMode == TransactionMode.Session,
-            };
         }
     }
 }

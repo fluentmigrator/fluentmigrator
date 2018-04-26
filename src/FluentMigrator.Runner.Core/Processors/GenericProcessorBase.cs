@@ -16,36 +16,112 @@
 
 #endregion
 
+using System;
 using System.Data;
+using System.Data.Common;
+using System.Diagnostics;
+
+using FluentMigrator.Runner.Initialization;
+
+using JetBrains.Annotations;
 
 namespace FluentMigrator.Runner.Processors
 {
     public abstract class GenericProcessorBase : ProcessorBase
     {
+        [Obsolete]
         private readonly string _connectionString;
 
-        protected GenericProcessorBase(IDbConnection connection, IDbFactory factory
-                                       , IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options)
+        [NotNull, ItemCanBeNull]
+        private readonly Lazy<DbProviderFactory> _dbProviderFactory;
+
+        [NotNull, ItemCanBeNull]
+        private readonly Lazy<IDbConnection> _lazyConnection;
+
+        [CanBeNull]
+        private IDbConnection _connection;
+
+        [Obsolete]
+        protected GenericProcessorBase(
+            IDbConnection connection,
+            IDbFactory factory,
+            IMigrationGenerator generator,
+            IAnnouncer announcer,
+            [NotNull] IMigrationProcessorOptions options)
             : base(generator, announcer, options)
         {
-            Connection = connection;
+            _dbProviderFactory = new Lazy<DbProviderFactory>(() => (factory as DbFactoryBase)?.Factory);
+
+            // Set the connection string, because it cannot be set by
+            // the base class (due to the missing information)
+            Options.ConnectionString = connection?.ConnectionString;
 
             // Prefetch connectionstring as after opening the security info could no longer be present
             // for instance on sql server
             _connectionString = connection?.ConnectionString;
 
             Factory = factory;
+
+            _lazyConnection = new Lazy<IDbConnection>(() => connection);
         }
 
-        public override string ConnectionString { get { return _connectionString; } }
+        protected GenericProcessorBase(
+            [CanBeNull] Func<DbProviderFactory> factoryAccessor,
+            [NotNull] IMigrationGenerator generator,
+            [NotNull] IAnnouncer announcer,
+            [NotNull] ProcessorOptions options,
+            [NotNull] IConnectionStringAccessor connectionStringAccessor)
+            : base(generator, announcer, options)
+        {
+            _dbProviderFactory = new Lazy<DbProviderFactory>(() => factoryAccessor?.Invoke());
 
-        public IDbConnection Connection { get; protected set; }
+            var connectionString = connectionStringAccessor.ConnectionString;
+
+#pragma warning disable 612
+            var legacyFactory = new DbFactoryWrapper(this);
+
+            // Prefetch connectionstring as after opening the security info could no longer be present
+            // for instance on sql server
+            _connectionString = connectionString;
+
+            Factory = legacyFactory;
+#pragma warning restore 612
+
+            _lazyConnection = new Lazy<IDbConnection>(
+                () =>
+                {
+                    if (DbProviderFactory == null)
+                        return null;
+                    var connection = DbProviderFactory.CreateConnection();
+                    Debug.Assert(connection != null, nameof(Connection) + " != null");
+                    connection.ConnectionString = connectionString;
+                    connection.Open();
+                    return connection;
+                });
+        }
+
+        [Obsolete("Will change from public to protected")]
+        public override string ConnectionString => _connectionString;
+
+        public IDbConnection Connection
+        {
+            get => _connection ?? _lazyConnection.Value;
+            protected set => _connection = value;
+        }
+
+        [Obsolete]
+        [NotNull]
         public IDbFactory Factory { get; protected set; }
+
+        [CanBeNull]
         public IDbTransaction Transaction { get; protected set; }
+
+        [CanBeNull]
+        protected DbProviderFactory DbProviderFactory => _dbProviderFactory.Value;
 
         protected virtual void EnsureConnectionIsOpen()
         {
-            if (Connection.State != ConnectionState.Open)
+            if (Connection != null && Connection.State != ConnectionState.Open)
             {
                 Connection.Open();
             }
@@ -53,7 +129,7 @@ namespace FluentMigrator.Runner.Processors
 
         protected virtual void EnsureConnectionIsClosed()
         {
-            if (Connection.State != ConnectionState.Closed)
+            if ((_connection != null || (_lazyConnection.IsValueCreated && Connection != null)) && Connection.State != ConnectionState.Closed)
             {
                 Connection.Close();
             }
@@ -66,7 +142,8 @@ namespace FluentMigrator.Runner.Processors
             EnsureConnectionIsOpen();
 
             Announcer.Say("Beginning Transaction");
-            Transaction = Connection.BeginTransaction();
+
+            Transaction = Connection?.BeginTransaction();
         }
 
         public override void RollbackTransaction()
@@ -95,6 +172,74 @@ namespace FluentMigrator.Runner.Processors
         {
             RollbackTransaction();
             EnsureConnectionIsClosed();
+            if ((_connection != null || (_lazyConnection.IsValueCreated && Connection != null)))
+            {
+                Connection.Dispose();
+            }
+        }
+
+        protected virtual IDbCommand CreateCommand(string commandText)
+        {
+            return CreateCommand(commandText, Connection, Transaction);
+        }
+
+        protected virtual IDbCommand CreateCommand(string commandText, IDbConnection connection, IDbTransaction transaction)
+        {
+            IDbCommand result;
+            if (DbProviderFactory != null)
+            {
+                result = DbProviderFactory.CreateCommand();
+                Debug.Assert(result != null, nameof(result) + " != null");
+                result.Connection = connection;
+                if (transaction != null)
+                    result.Transaction = transaction;
+                result.CommandText = commandText;
+            }
+            else
+            {
+#pragma warning disable 612
+                result = Factory.CreateCommand(commandText, connection, transaction, Options);
+#pragma warning restore 612
+            }
+
+            if (Options.Timeout != null)
+            {
+                result.CommandTimeout = (int) Options.Timeout.Value.TotalSeconds;
+            }
+
+            return result;
+        }
+
+        [Obsolete]
+        private class DbFactoryWrapper : IDbFactory
+        {
+            private readonly GenericProcessorBase _processor;
+
+            public DbFactoryWrapper(GenericProcessorBase processor)
+            {
+                _processor = processor;
+            }
+
+            /// <inheritdoc />
+            public IDbConnection CreateConnection(string connectionString)
+            {
+                Debug.Assert(_processor.DbProviderFactory != null, "_processor.DbProviderFactory != null");
+                var result = _processor.DbProviderFactory.CreateConnection();
+                Debug.Assert(result != null, nameof(result) + " != null");
+                result.ConnectionString = connectionString;
+                return result;
+            }
+
+            /// <inheritdoc />
+            [Obsolete]
+            public IDbCommand CreateCommand(
+                string commandText,
+                IDbConnection connection,
+                IDbTransaction transaction,
+                IMigrationProcessorOptions options)
+            {
+                return _processor.CreateCommand(commandText);
+            }
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 //
 // Copyright (c) 2018, Fluent Migrator Project
 //
@@ -37,19 +37,13 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void BlankProfileDoesntLoadProfiles()
         {
-            var runnerContextMock = new Mock<IRunnerContext>();
             var runnerMock = new Mock<IMigrationRunner>();
-            var conventionsMock = new Mock<IMigrationRunnerConventions>();
 
-            runnerContextMock.Setup(x => x.Profile).Returns(string.Empty);
-
-            var profileLoader = new ServiceCollection()
-                .ConfigureRunner(rb =>
-                    rb.WithRunnerContext(runnerContextMock.Object).WithRunnerConventions(conventionsMock.Object))
-                .AddScoped<ProfileLoader>()
+            var profileLoader = (ProfileLoader)ServiceCollectionExtensions.CreateServices()
+                .Configure<RunnerOptions>(opt => opt.Profile = string.Empty)
                 .WithAllTestMigrations()
                 .BuildServiceProvider()
-                .GetRequiredService<ProfileLoader>();
+                .GetRequiredService<IProfileLoader>();
 
             profileLoader.ApplyProfiles(runnerMock.Object);
 

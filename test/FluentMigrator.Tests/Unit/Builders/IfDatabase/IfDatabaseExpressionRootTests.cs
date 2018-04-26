@@ -19,12 +19,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 
 using FluentMigrator.Builders.IfDatabase;
 using FluentMigrator.Infrastructure;
-using FluentMigrator.Runner.Processors.SQLite;
+using FluentMigrator.Runner;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -100,8 +99,10 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
         [Test]
         public void WillNotAddExpressionIfProcessorNotMigrationProcessor()
         {
-            var mock = new Mock<IQuerySchema>();
-            var context = ExecuteTestMigration(new List<string>() { "SQLite" }, mock.Object);
+            var mock = new Mock<IMigrationProcessor>();
+            mock.SetupGet(x => x.DatabaseType).Returns("Unknown");
+            mock.SetupGet(x => x.DatabaseTypeAliases).Returns(new List<string>());
+            var context = ExecuteTestMigration(new List<string>() { "SQLite" }, mock);
 
             context.Expressions.Count.ShouldBe(0);
         }
@@ -170,8 +171,9 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
             var unknownProcessorMock = new Mock<IMigrationProcessor>(MockBehavior.Loose);
 
             unknownProcessorMock.SetupGet(x => x.DatabaseType).Returns(databaseTypes.First());
+            unknownProcessorMock.SetupGet(x => x.DatabaseTypeAliases).Returns(new List<string>());
 
-            var context = ExecuteTestMigration(databaseTypes, unknownProcessorMock.Object, m => m.Schema.Table("Foo").Exists());
+            var context = ExecuteTestMigration(databaseTypes, unknownProcessorMock, m => m.Schema.Table("Foo").Exists());
 
             context.Expressions.Count.ShouldBe(0);
 
@@ -186,38 +188,42 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
             context.Expressions.Count.ShouldBeGreaterThan(0);
         }
 
-        private MigrationContext ExecuteTestMigration(params string[] databaseType)
+        private IMigrationContext ExecuteTestMigration(params string[] databaseType)
         {
-            return ExecuteTestMigration(databaseType, (IQuerySchema)null);
+            return ExecuteTestMigration(databaseType, (IMock<IMigrationProcessor>)null);
         }
 
-        private MigrationContext ExecuteTestMigration(IEnumerable<string> databaseType, params Action<IIfDatabaseExpressionRoot>[] fluentEpression)
+        private IMigrationContext ExecuteTestMigration(IEnumerable<string> databaseType, params Action<IIfDatabaseExpressionRoot>[] fluentEpression)
         {
             return ExecuteTestMigration(databaseType, null, fluentEpression);
         }
 
-        private MigrationContext ExecuteTestMigration(IEnumerable<string> databaseType, IQuerySchema processor, params Action<IIfDatabaseExpressionRoot>[] fluentExpression)
+        private IMigrationContext ExecuteTestMigration(IEnumerable<string> databaseType, IMock<IMigrationProcessor> processor, params Action<IIfDatabaseExpressionRoot>[] fluentExpression)
         {
+            // Initialize
+            var services = ServiceCollectionExtensions.CreateServices()
+                .ConfigureRunner(r => r.WithGlobalConnectionString("No connection"));
+            if (processor != null)
+            {
+                services.WithProcessor(processor);
+            }
+            else
+            {
+                services = services.ConfigureRunner(r => r.AddSQLite());
+            }
+
+            var serviceProvider = services
+                .BuildServiceProvider();
+            var context = serviceProvider.GetRequiredService<IMigrationContext>();
+
             // Arrange
-            var mock = new Mock<IDbConnection>(MockBehavior.Loose);
-            mock.Setup(x => x.State).Returns(ConnectionState.Open);
-
-            var services = new ServiceCollection();
-            services
-#pragma warning disable 612
-                .AddScoped(sp => new SingleAssembly(GetType().Assembly))
-#pragma warning restore 612
-                .AddScoped<IEmbeddedResourceProvider, DefaultEmbeddedResourceProvider>();
-
-            var context = new MigrationContext(
-                processor ?? new SQLiteProcessor(mock.Object, generator: null, announcer: null, options: null, new SQLiteDbFactory(serviceProvider: null)),
-                context: null, connection: string.Empty, services.BuildServiceProvider());
-
             var expression = new IfDatabaseExpressionRoot(context, databaseType.ToArray());
 
             // Act
             if (fluentExpression == null || fluentExpression.Length == 0)
+            {
                 expression.Create.Table("Foo").WithColumn("Id").AsInt16();
+            }
             else
             {
                 foreach (var action in fluentExpression)
@@ -230,23 +236,15 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
             return context;
         }
 
-        private MigrationContext ExecuteTestMigration(Predicate<string> databaseTypePredicate, params Action<IIfDatabaseExpressionRoot>[] fluentExpression)
+        private IMigrationContext ExecuteTestMigration(Predicate<string> databaseTypePredicate, params Action<IIfDatabaseExpressionRoot>[] fluentExpression)
         {
+            // Initialize
+            var serviceProvider = ServiceCollectionExtensions.CreateServices()
+                .ConfigureRunner(r => r.AddSQLite().WithGlobalConnectionString("No connection"))
+                .BuildServiceProvider();
+            var context = serviceProvider.GetRequiredService<IMigrationContext>();
+
             // Arrange
-            var mock = new Mock<IDbConnection>(MockBehavior.Loose);
-            mock.Setup(x => x.State).Returns(ConnectionState.Open);
-
-            var services = new ServiceCollection();
-            services
-#pragma warning disable 612
-                .AddScoped(sp => new SingleAssembly(GetType().Assembly))
-#pragma warning restore 612
-                .AddScoped<IEmbeddedResourceProvider, DefaultEmbeddedResourceProvider>();
-
-            var context = new MigrationContext(
-                new SQLiteProcessor(mock.Object, generator: null, announcer: null, options: null, new SQLiteDbFactory(serviceProvider: null)),
-                context: null, connection: string.Empty, services.BuildServiceProvider());
-
             var expression = new IfDatabaseExpressionRoot(context, databaseTypePredicate);
 
             // Act

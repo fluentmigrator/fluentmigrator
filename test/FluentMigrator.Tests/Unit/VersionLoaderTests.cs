@@ -18,7 +18,6 @@
 
 using System;
 using System.Linq;
-using System.Reflection;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner;
@@ -35,48 +34,18 @@ using Shouldly;
 
 namespace FluentMigrator.Tests.Unit
 {
-    public class TestMigrationProcessorOptions : IMigrationProcessorOptions
-    {
-        public bool PreviewOnly
-        {
-            get { return false; }
-        }
-
-        public int? Timeout
-        {
-            get { return 30; }
-        }
-
-        public string ProviderSwitches
-        {
-            get
-            {
-                return string.Empty;
-            }
-        }
-    }
-
     [TestFixture]
     public class VersionLoaderTests
     {
         [Test]
         public void CanLoadCustomVersionTableMetaData()
         {
-            var runnerContext = new Mock<IRunnerContext>();
-
-            var runner = new Mock<IMigrationRunner>();
-            runner.SetupGet(r => r.Processor.Options).Returns(new TestMigrationProcessorOptions());
-            runner.SetupGet(r => r.RunnerContext).Returns(runnerContext.Object);
-
-            var asm = Assembly.GetExecutingAssembly();
-
-            var serviceProvider = new ServiceCollection()
-                .AddScoped(_ => runner.Object)
-                .AddScoped(_ => runnerContext.Object)
+            var processor = new Mock<IMigrationProcessor>();
+            var serviceProvider = ServiceCollectionExtensions.CreateServices()
+                .WithProcessor(processor)
                 .AddScoped(_ => ConventionSets.NoSchemaName)
-                .AddScoped<IMigrationRunnerConventions, MigrationRunnerConventions>()
-                .AddVersionTableMetaData(sp => new[] { asm }.GetVersionTableMetaDataType(sp))
-                .AddScoped<IVersionLoader, VersionLoader>()
+                .AddScoped<IMigrationRunnerConventionsAccessor>(sp => new PassThroughMigrationRunnerConventionsAccessor(new MigrationRunnerConventions()))
+                .AddScoped<IConnectionStringReader>(_ => new PassThroughConnectionStringReader("No connection"))
                 .BuildServiceProvider();
 
             var loader = serviceProvider.GetRequiredService<IVersionLoader>();
@@ -88,21 +57,16 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void CanLoadDefaultVersionTableMetaData()
         {
-            var runnerContext = new Mock<IRunnerContext>();
-
-            var runner = new Mock<IMigrationRunner>();
-            runner.SetupGet(r => r.Processor.Options).Returns(new TestMigrationProcessorOptions());
-            runner.SetupGet(r => r.RunnerContext).Returns(runnerContext.Object);
-
             var asm = "s".GetType().Assembly;
 
-            var serviceProvider = new ServiceCollection()
-                .AddScoped(_ => runner.Object)
-                .AddScoped(_ => runnerContext.Object)
+            var processor = new Mock<IMigrationProcessor>();
+            var serviceProvider = ServiceCollectionExtensions.CreateServices(false)
+                .WithProcessor(processor)
+                .AddSingleton<IAssemblySourceItem>(new AssemblySourceItem(asm))
                 .AddScoped(_ => ConventionSets.NoSchemaName)
-                .AddScoped<IMigrationRunnerConventions, MigrationRunnerConventions>()
-                .AddVersionTableMetaData(sp => new[] { asm }.GetVersionTableMetaDataType(sp))
-                .AddScoped<IVersionLoader, VersionLoader>()
+                .AddScoped<IMigrationRunnerConventionsAccessor>(
+                    _ => new PassThroughMigrationRunnerConventionsAccessor(new MigrationRunnerConventions()))
+                .AddScoped<IConnectionStringReader>(_ => new PassThroughConnectionStringReader("No connection"))
                 .BuildServiceProvider();
 
             var loader = serviceProvider.GetRequiredService<IVersionLoader>();
@@ -117,22 +81,14 @@ namespace FluentMigrator.Tests.Unit
         {
             var applicationContext = "Test context";
 
-            var runnerContext = new Mock<IRunnerContext>();
-            runnerContext.SetupGet(r => r.ApplicationContext).Returns(applicationContext);
-
-            var runner = new Mock<IMigrationRunner>();
-            runner.SetupGet(r => r.Processor.Options).Returns(new TestMigrationProcessorOptions());
-            runner.SetupGet(r => r.RunnerContext).Returns(runnerContext.Object);
-
-            var asm = Assembly.GetExecutingAssembly();
-
-            var serviceProvider = new ServiceCollection()
-                .AddScoped(_ => runner.Object)
-                .AddScoped(_ => runnerContext.Object)
+            var processor = new Mock<IMigrationProcessor>();
+            var serviceProvider = ServiceCollectionExtensions.CreateServices()
+                .WithProcessor(processor)
                 .AddScoped(_ => ConventionSets.NoSchemaName)
-                .AddScoped<IMigrationRunnerConventions, MigrationRunnerConventions>()
-                .AddVersionTableMetaData(sp => new[] { asm }.GetVersionTableMetaDataType(sp))
-                .AddScoped<IVersionLoader, VersionLoader>()
+                .AddScoped<IMigrationRunnerConventionsAccessor>(
+                    _ => new PassThroughMigrationRunnerConventionsAccessor(new MigrationRunnerConventions()))
+                .AddScoped<IConnectionStringReader>(_ => new PassThroughConnectionStringReader("No connection"))
+                .Configure<RunnerOptions>(opt => opt.ApplicationContext = applicationContext)
                 .BuildServiceProvider();
 
             var loader = serviceProvider.GetRequiredService<IVersionLoader>();
@@ -144,22 +100,13 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void DeleteVersionShouldExecuteDeleteDataExpression()
         {
-            var runnerContext = new Mock<IRunnerContext>();
-
             var processor = new Mock<IMigrationProcessor>();
-            var runner = new Mock<IMigrationRunner>();
-            runner.SetupGet(r => r.Processor).Returns(processor.Object);
-            runner.SetupGet(r => r.RunnerContext).Returns(runnerContext.Object);
-
-            var asm = Assembly.GetExecutingAssembly();
-
-            var serviceProvider = new ServiceCollection()
-                .AddScoped(_ => runner.Object)
-                .AddScoped(_ => runnerContext.Object)
+            var serviceProvider = ServiceCollectionExtensions.CreateServices()
+                .WithProcessor(processor)
                 .AddScoped(_ => ConventionSets.NoSchemaName)
-                .AddScoped<IMigrationRunnerConventions, MigrationRunnerConventions>()
-                .AddVersionTableMetaData(sp => new[] { asm }.GetVersionTableMetaDataType(sp))
-                .AddScoped<IVersionLoader, VersionLoader>()
+                .AddScoped<IMigrationRunnerConventionsAccessor>(
+                    _ => new PassThroughMigrationRunnerConventionsAccessor(new MigrationRunnerConventions()))
+                .AddScoped<IConnectionStringReader>(_ => new PassThroughConnectionStringReader("No connection"))
                 .BuildServiceProvider();
 
             var loader = serviceProvider.GetRequiredService<IVersionLoader>();
@@ -182,21 +129,13 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void RemoveVersionTableShouldBehaveAsExpected()
         {
-            var runnerContext = new Mock<IRunnerContext>();
             var processor = new Mock<IMigrationProcessor>();
-            var runner = new Mock<IMigrationRunner>();
-            runner.SetupGet(r => r.Processor).Returns(processor.Object);
-            runner.SetupGet(r => r.RunnerContext).Returns(runnerContext.Object);
-
-            var asm = Assembly.GetExecutingAssembly();
-
-            var serviceProvider = new ServiceCollection()
-                .AddScoped(_ => runner.Object)
-                .AddScoped(_ => runnerContext.Object)
+            var serviceProvider = ServiceCollectionExtensions.CreateServices()
+                .WithProcessor(processor)
                 .AddScoped(_ => ConventionSets.NoSchemaName)
-                .AddScoped<IMigrationRunnerConventions, MigrationRunnerConventions>()
-                .AddVersionTableMetaData(sp => new[] { asm }.GetVersionTableMetaDataType(sp))
-                .AddScoped<IVersionLoader, VersionLoader>()
+                .AddScoped<IMigrationRunnerConventionsAccessor>(
+                    _ => new PassThroughMigrationRunnerConventionsAccessor(new MigrationRunnerConventions()))
+                .AddScoped<IConnectionStringReader>(_ => new PassThroughConnectionStringReader("No connection"))
                 .BuildServiceProvider();
 
             var loader = serviceProvider.GetRequiredService<IVersionLoader>();
@@ -218,21 +157,13 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void RemoveVersionTableShouldNotRemoveSchemaIfItDidNotOwnTheSchema()
         {
-            var runnerContext = new Mock<IRunnerContext>();
             var processor = new Mock<IMigrationProcessor>();
-            var runner = new Mock<IMigrationRunner>();
-            runner.SetupGet(r => r.Processor).Returns(processor.Object);
-            runner.SetupGet(r => r.RunnerContext).Returns(runnerContext.Object);
-
-            var asm = Assembly.GetExecutingAssembly();
-
-            var serviceProvider = new ServiceCollection()
-                .AddScoped(_ => runner.Object)
-                .AddScoped(_ => runnerContext.Object)
+            var serviceProvider = ServiceCollectionExtensions.CreateServices()
+                .WithProcessor(processor)
                 .AddScoped(_ => ConventionSets.NoSchemaName)
-                .AddScoped<IMigrationRunnerConventions, MigrationRunnerConventions>()
-                .AddVersionTableMetaData(sp => new[] { asm }.GetVersionTableMetaDataType(sp))
-                .AddScoped<IVersionLoader, VersionLoader>()
+                .AddScoped<IMigrationRunnerConventionsAccessor>(
+                    _ => new PassThroughMigrationRunnerConventionsAccessor(new MigrationRunnerConventions()))
+                .AddScoped<IConnectionStringReader>(_ => new PassThroughConnectionStringReader("No connection"))
                 .BuildServiceProvider();
 
             var loader = serviceProvider.GetRequiredService<IVersionLoader>();
@@ -252,21 +183,13 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void UpdateVersionShouldExecuteInsertDataExpression()
         {
-            var runnerContext = new Mock<IRunnerContext>();
             var processor = new Mock<IMigrationProcessor>();
-            var runner = new Mock<IMigrationRunner>();
-            runner.SetupGet(r => r.Processor).Returns(processor.Object);
-            runner.SetupGet(r => r.RunnerContext).Returns(runnerContext.Object);
-
-            var asm = Assembly.GetExecutingAssembly();
-
-            var serviceProvider = new ServiceCollection()
-                .AddScoped(_ => runner.Object)
-                .AddScoped(_ => runnerContext.Object)
+            var serviceProvider = ServiceCollectionExtensions.CreateServices()
+                .WithProcessor(processor)
                 .AddScoped(_ => ConventionSets.NoSchemaName)
-                .AddScoped<IMigrationRunnerConventions, MigrationRunnerConventions>()
-                .AddVersionTableMetaData(sp => new[] { asm }.GetVersionTableMetaDataType(sp))
-                .AddScoped<IVersionLoader, VersionLoader>()
+                .AddScoped<IMigrationRunnerConventionsAccessor>(
+                    _ => new PassThroughMigrationRunnerConventionsAccessor(new MigrationRunnerConventions()))
+                .AddScoped<IConnectionStringReader>(_ => new PassThroughConnectionStringReader("No connection"))
                 .BuildServiceProvider();
 
             var loader = serviceProvider.GetRequiredService<IVersionLoader>();
@@ -289,26 +212,22 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void VersionSchemaMigrationOnlyRunOnceEvenIfExistenceChecksReturnFalse()
         {
-            var runnerContext = new Mock<IRunnerContext>();
             var processor = new Mock<IMigrationProcessor>();
             var runner = new Mock<IMigrationRunner>();
-            var asm = Assembly.GetExecutingAssembly();
-
             runner.SetupGet(r => r.Processor).Returns(processor.Object);
-            runner.SetupGet(r => r.RunnerContext).Returns(runnerContext.Object);
-
             processor.Setup(p => p.SchemaExists(It.IsAny<string>())).Returns(false);
 
-            var serviceProvider = new ServiceCollection()
-                .AddScoped(_ => runner.Object)
-                .AddScoped(_ => runnerContext.Object)
+            var serviceProvider = ServiceCollectionExtensions.CreateServices()
+                .WithProcessor(processor)
                 .AddScoped(_ => ConventionSets.NoSchemaName)
-                .AddScoped<IMigrationRunnerConventions, MigrationRunnerConventions>()
-                .AddVersionTableMetaData(sp => new[] { asm }.GetVersionTableMetaDataType(sp))
-                .AddScoped<VersionLoader>()
+                .AddScoped<IMigrationRunnerConventionsAccessor>(
+                    _ => new PassThroughMigrationRunnerConventionsAccessor(new MigrationRunnerConventions()))
+                .AddScoped<IConnectionStringReader>(_ => new PassThroughConnectionStringReader("No connection"))
+                .AddScoped<IVersionLoader, VersionLoader>()
+                .AddScoped(_ => runner.Object)
                 .BuildServiceProvider();
 
-            var loader = serviceProvider.GetRequiredService<VersionLoader>();
+            var loader = (VersionLoader) serviceProvider.GetRequiredService<IVersionLoader>();
 
             loader.LoadVersionInfo();
 
@@ -318,26 +237,25 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void VersionMigrationOnlyRunOnceEvenIfExistenceChecksReturnFalse()
         {
-            var runnerContext = new Mock<IRunnerContext>();
             var processor = new Mock<IMigrationProcessor>();
             var runner = new Mock<IMigrationRunner>();
-            var asm = Assembly.GetExecutingAssembly();
 
             runner.SetupGet(r => r.Processor).Returns(processor.Object);
-            runner.SetupGet(r => r.RunnerContext).Returns(runnerContext.Object);
+            processor.Setup(
+                    p => p.TableExists(new TestVersionTableMetaData().SchemaName, TestVersionTableMetaData.TABLE_NAME))
+                .Returns(false);
 
-            processor.Setup(p => p.TableExists(new TestVersionTableMetaData().SchemaName, TestVersionTableMetaData.TABLENAME)).Returns(false);
-
-            var serviceProvider = new ServiceCollection()
-                .AddScoped(_ => runner.Object)
-                .AddScoped(_ => runnerContext.Object)
+            var serviceProvider = ServiceCollectionExtensions.CreateServices()
+                .WithProcessor(processor)
                 .AddScoped(_ => ConventionSets.NoSchemaName)
-                .AddScoped<IMigrationRunnerConventions, MigrationRunnerConventions>()
-                .AddVersionTableMetaData(sp => new[] { asm }.GetVersionTableMetaDataType(sp))
-                .AddScoped<VersionLoader>()
+                .AddScoped<IMigrationRunnerConventionsAccessor>(
+                    _ => new PassThroughMigrationRunnerConventionsAccessor(new MigrationRunnerConventions()))
+                .AddScoped<IConnectionStringReader>(_ => new PassThroughConnectionStringReader("No connection"))
+                .AddScoped<IVersionLoader, VersionLoader>()
+                .AddScoped(_ => runner.Object)
                 .BuildServiceProvider();
 
-            var loader = serviceProvider.GetRequiredService<VersionLoader>();
+            var loader = (VersionLoader) serviceProvider.GetRequiredService<IVersionLoader>();
 
             loader.LoadVersionInfo();
 
@@ -347,26 +265,23 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void VersionUniqueMigrationOnlyRunOnceEvenIfExistenceChecksReturnFalse()
         {
-            var runnerContext = new Mock<IRunnerContext>();
             var processor = new Mock<IMigrationProcessor>();
             var runner = new Mock<IMigrationRunner>();
-            var asm = Assembly.GetExecutingAssembly();
 
             runner.SetupGet(r => r.Processor).Returns(processor.Object);
-            runner.SetupGet(r => r.RunnerContext).Returns(runnerContext.Object);
+            processor.Setup(p => p.ColumnExists(new TestVersionTableMetaData().SchemaName, TestVersionTableMetaData.TABLE_NAME, TestVersionTableMetaData.APPLIED_ON_COLUMN_NAME)).Returns(false);
 
-            processor.Setup(p => p.ColumnExists(new TestVersionTableMetaData().SchemaName, TestVersionTableMetaData.TABLENAME, TestVersionTableMetaData.APPLIEDONCOLUMNNAME)).Returns(false);
-
-            var serviceProvider = new ServiceCollection()
-                .AddScoped(_ => runner.Object)
-                .AddScoped(_ => runnerContext.Object)
+            var serviceProvider = ServiceCollectionExtensions.CreateServices()
+                .WithProcessor(processor)
                 .AddScoped(_ => ConventionSets.NoSchemaName)
-                .AddScoped<IMigrationRunnerConventions, MigrationRunnerConventions>()
-                .AddVersionTableMetaData(sp => new[] { asm }.GetVersionTableMetaDataType(sp))
-                .AddScoped<VersionLoader>()
+                .AddScoped<IMigrationRunnerConventionsAccessor>(
+                    _ => new PassThroughMigrationRunnerConventionsAccessor(new MigrationRunnerConventions()))
+                .AddScoped<IConnectionStringReader>(_ => new PassThroughConnectionStringReader("No connection"))
+                .AddScoped<IVersionLoader, VersionLoader>()
+                .AddScoped(_ => runner.Object)
                 .BuildServiceProvider();
 
-            var loader = serviceProvider.GetRequiredService<VersionLoader>();
+            var loader = (VersionLoader) serviceProvider.GetRequiredService<IVersionLoader>();
 
             loader.LoadVersionInfo();
 
@@ -376,26 +291,23 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void VersionDescriptionMigrationOnlyRunOnceEvenIfExistenceChecksReturnFalse()
         {
-            var runnerContext = new Mock<IRunnerContext>();
             var processor = new Mock<IMigrationProcessor>();
             var runner = new Mock<IMigrationRunner>();
-            var asm = Assembly.GetExecutingAssembly();
 
             runner.SetupGet(r => r.Processor).Returns(processor.Object);
-            runner.SetupGet(r => r.RunnerContext).Returns(runnerContext.Object);
+            processor.Setup(p => p.ColumnExists(new TestVersionTableMetaData().SchemaName, TestVersionTableMetaData.TABLE_NAME, TestVersionTableMetaData.APPLIED_ON_COLUMN_NAME)).Returns(false);
 
-            processor.Setup(p => p.ColumnExists(new TestVersionTableMetaData().SchemaName, TestVersionTableMetaData.TABLENAME, TestVersionTableMetaData.APPLIEDONCOLUMNNAME)).Returns(false);
-
-            var serviceProvider = new ServiceCollection()
-                .AddScoped(_ => runner.Object)
-                .AddScoped(_ => runnerContext.Object)
+            var serviceProvider = ServiceCollectionExtensions.CreateServices()
+                .WithProcessor(processor)
                 .AddScoped(_ => ConventionSets.NoSchemaName)
-                .AddScoped<IMigrationRunnerConventions, MigrationRunnerConventions>()
-                .AddVersionTableMetaData(sp => new[] { asm }.GetVersionTableMetaDataType(sp))
-                .AddScoped<VersionLoader>()
+                .AddScoped<IMigrationRunnerConventionsAccessor>(
+                    _ => new PassThroughMigrationRunnerConventionsAccessor(new MigrationRunnerConventions()))
+                .AddScoped<IConnectionStringReader>(_ => new PassThroughConnectionStringReader("No connection"))
+                .AddScoped<IVersionLoader, VersionLoader>()
+                .AddScoped(_ => runner.Object)
                 .BuildServiceProvider();
 
-            var loader = serviceProvider.GetRequiredService<VersionLoader>();
+            var loader = (VersionLoader) serviceProvider.GetRequiredService<IVersionLoader>();
 
             loader.LoadVersionInfo();
 

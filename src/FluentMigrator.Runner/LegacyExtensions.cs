@@ -21,7 +21,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Initialization.AssemblyLoader;
 using FluentMigrator.Runner.VersionTableInfo;
@@ -82,30 +81,6 @@ namespace FluentMigrator.Runner
             var runnerConventions = serviceProvider.GetRequiredService<IMigrationRunnerConventions>();
             var runnerContext = serviceProvider.GetRequiredService<IRunnerContext>();
             return assemblies.GetVersionTableMetaDataType(runnerConventions, runnerContext);
-        }
-
-        /// <summary>
-        /// Search for custom migration runner conventions
-        /// </summary>
-        /// <param name="assemblies">The assemblies to search for</param>
-        /// <returns>The custom or the default migration runner conventions</returns>
-        [Obsolete]
-        public static IMigrationRunnerConventions GetMigrationRunnerConventions(
-            [CanBeNull] this IAssemblyCollection assemblies)
-        {
-            if (assemblies == null)
-                return new MigrationRunnerConventions();
-
-            var matchedType = assemblies
-                .GetExportedTypes()
-                .FirstOrDefault(t => typeof(IMigrationRunnerConventions).IsAssignableFrom(t));
-
-            if (matchedType != null)
-            {
-                return (IMigrationRunnerConventions) Activator.CreateInstance(matchedType);
-            }
-
-            return new MigrationRunnerConventions();
         }
 
         /// <summary>
@@ -183,27 +158,6 @@ namespace FluentMigrator.Runner
             }
 
             return result;
-        }
-
-        /// <summary>
-        /// Returns <c>true</c> when the type is probably a FluentMigrator-owned class
-        /// </summary>
-        /// <param name="type">The type to check</param>
-        /// <returns><c>true</c> when the type is probably a FluentMigrator-owned class</returns>
-        public static bool IsFluentMigratorRunnerType(this Type type)
-        {
-            return type.Namespace != null && type.Namespace.StartsWith("FluentMigrator.Runner.", StringComparison.Ordinal);
-        }
-
-        /// <summary>
-        /// Gets the name for a given migration generator instance
-        /// </summary>
-        /// <param name="generator">The migration generator instance to get its name for</param>
-        /// <returns>The name of the migration generator</returns>
-        [NotNull]
-        public static string GetName([NotNull] this IMigrationGenerator generator)
-        {
-            return generator.GetType().Name.Replace("Generator", string.Empty);
         }
     }
 }

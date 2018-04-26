@@ -1,8 +1,11 @@
 using System;
 using System.Linq;
 
+using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.DB2;
 using FluentMigrator.Runner.Generators.DB2.iSeries;
+
+using Microsoft.Extensions.Options;
 
 using NUnit.Framework;
 
@@ -175,7 +178,8 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
         [SetUp]
         public void SetUp()
         {
-            Generator = new Db2Generator(new Db2ISeriesQuoter());
+            var generatorOptions = new OptionsWrapper<GeneratorOptions>(new GeneratorOptions());
+            Generator = new Db2Generator(new Db2ISeriesQuoter(), generatorOptions);
         }
     }
 }

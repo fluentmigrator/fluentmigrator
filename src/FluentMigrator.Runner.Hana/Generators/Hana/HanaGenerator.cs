@@ -22,14 +22,29 @@ using System.Text;
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators.Generic;
 
+using JetBrains.Annotations;
+
+using Microsoft.Extensions.Options;
+
 namespace FluentMigrator.Runner.Generators.Hana
 {
     public class HanaGenerator : GenericGenerator
     {
-
-
         public HanaGenerator()
-            : base(new HanaColumn(new HanaQuoter()), new HanaQuoter(), new HanaDescriptionGenerator())
+            : this(new HanaQuoter())
+        {
+        }
+
+        public HanaGenerator(
+            [NotNull] HanaQuoter quoter)
+            : this(quoter, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()))
+        {
+        }
+
+        public HanaGenerator(
+            [NotNull] HanaQuoter quoter,
+            [NotNull] IOptions<GeneratorOptions> generatorOptions)
+            : base(new HanaColumn(quoter), quoter, new HanaDescriptionGenerator(), generatorOptions)
         {
         }
 
@@ -223,12 +238,12 @@ namespace FluentMigrator.Runner.Generators.Hana
 
         public override string Generate(AlterDefaultConstraintExpression expression)
         {
-            return CompatabilityMode.HandleCompatabilty("Default constraints are not supported");
+            return CompatibilityMode.HandleCompatibilty("Default constraints are not supported");
         }
 
         public override string Generate(DeleteDefaultConstraintExpression expression)
         {
-            return CompatabilityMode.HandleCompatabilty("Default constraints are not supported");
+            return CompatibilityMode.HandleCompatibilty("Default constraints are not supported");
         }
 
         public override string Generate(CreateIndexExpression expression)

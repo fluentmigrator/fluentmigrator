@@ -19,7 +19,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         [Test]
         public void CanAlterSchemaInStrictMode()
         {
-            Generator.CompatabilityMode = Runner.CompatabilityMode.STRICT;
+            Generator.CompatibilityMode = Runner.CompatibilityMode.STRICT;
 
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(new CreateSchemaExpression()));
         }
@@ -27,7 +27,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         [Test]
         public void CanCreateSchemaInStrictMode()
         {
-            Generator.CompatabilityMode = Runner.CompatabilityMode.STRICT;
+            Generator.CompatibilityMode = Runner.CompatibilityMode.STRICT;
 
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(new CreateSchemaExpression()));
         }
@@ -35,7 +35,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         [Test]
         public void CanDropSchemaInStrictMode()
         {
-            Generator.CompatabilityMode = Runner.CompatabilityMode.STRICT;
+            Generator.CompatibilityMode = Runner.CompatibilityMode.STRICT;
 
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(new DeleteSchemaExpression()));
         }
@@ -44,7 +44,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         public void CanRenameColumnInStrictMode()
         {
             var expression = GeneratorTestHelper.GetRenameColumnExpression();
-            Generator.CompatabilityMode = Runner.CompatabilityMode.STRICT;
+            Generator.CompatibilityMode = Runner.CompatibilityMode.STRICT;
 
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
@@ -53,7 +53,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         public void CanRenameTableInStrictMode()
         {
             var expression = GeneratorTestHelper.GetRenameColumnExpression();
-            Generator.CompatabilityMode = Runner.CompatabilityMode.STRICT;
+            Generator.CompatibilityMode = Runner.CompatibilityMode.STRICT;
 
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }

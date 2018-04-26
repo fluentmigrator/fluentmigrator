@@ -30,6 +30,8 @@ using FluentMigrator.SqlServer;
 
 using Microsoft.Extensions.DependencyInjection;
 
+using Moq;
+
 namespace FluentMigrator.Tests.Unit.Generators
 {
     public static class GeneratorTestHelper
@@ -476,7 +478,8 @@ namespace FluentMigrator.Tests.Unit.Generators
         public static ICollection<IMigrationExpression> GetCreateColumnWithSystemMethodExpression(string schemaName = null)
         {
             var serviceProvider = new ServiceCollection().BuildServiceProvider();
-            var context = new MigrationContext(null, null, null, serviceProvider);
+            var querySchema = new Mock<IQuerySchema>();
+            var context = new MigrationContext(querySchema.Object, serviceProvider, null, null);
             var expr = new CreateColumnExpression
             {
                 TableName = TestTableName1,

@@ -18,10 +18,14 @@
 
 using System;
 
+using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.DB2;
+
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.DB2
 {
+    [Obsolete]
     public class Db2ProcessorFactory : MigrationProcessorFactory
     {
         private readonly IServiceProvider _serviceProvider;
@@ -36,11 +40,13 @@ namespace FluentMigrator.Runner.Processors.DB2
             _serviceProvider = serviceProvider;
         }
 
+        [Obsolete]
         public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
         {
             var factory = new Db2DbFactory(_serviceProvider);
             var connection = factory.CreateConnection(connectionString);
-            return new Db2Processor(connection, new Db2Generator(new Db2Quoter()), announcer, options, factory);
+            var generatorOptions = new OptionsWrapper<GeneratorOptions>(new GeneratorOptions());
+            return new Db2Processor(connection, new Db2Generator(new Db2Quoter(), generatorOptions), announcer, options, factory);
         }
     }
 }

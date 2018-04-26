@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
 //
@@ -19,11 +19,13 @@
 using System;
 using System.IO;
 
+using Microsoft.Extensions.Options;
+
 namespace FluentMigrator.Runner.Announcers
 {
     public class TextWriterAnnouncer : Announcer
     {
-        private readonly Action<string> write;
+        private readonly Action<string> _write;
 
         public TextWriterAnnouncer(TextWriter writer)
             : this(writer.Write)
@@ -32,25 +34,32 @@ namespace FluentMigrator.Runner.Announcers
 
         public TextWriterAnnouncer(Action<string> write)
         {
-            this.write = write;
+            _write = write;
+        }
+
+        [CLSCompliant(false)]
+        public TextWriterAnnouncer(IOptions<TextWriterAnnouncerOptions> options)
+            : base(options)
+        {
+            _write = options.Value.WriteDelegate;
         }
 
         public override void Heading(string message)
         {
             base.Heading(string.Format("{0} ", message).PadRight(75, '='));
-            write(Environment.NewLine);
+            _write(Environment.NewLine);
         }
 
         public override void ElapsedTime(TimeSpan timeSpan)
         {
             base.ElapsedTime(timeSpan);
-            write(Environment.NewLine);
+            _write(Environment.NewLine);
         }
 
         public override void Write(string message, bool isNotSql = true)
         {
-            write(isNotSql ? string.Format("/* {0} */", message) : message);
-            write(Environment.NewLine);
+            _write(isNotSql ? string.Format("/* {0} */", message) : message);
+            _write(Environment.NewLine);
         }
     }
 }

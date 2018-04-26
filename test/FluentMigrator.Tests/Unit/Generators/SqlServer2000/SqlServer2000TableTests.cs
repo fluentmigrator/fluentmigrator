@@ -16,8 +16,6 @@
 //
 #endregion
 
-using System;
-
 using FluentMigrator.Builders.Create.Table;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
@@ -25,6 +23,8 @@ using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.SqlServer;
 
 using Microsoft.Extensions.DependencyInjection;
+
+using Moq;
 
 using NUnit.Framework;
 
@@ -52,7 +52,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             };
 
             var serviceProvider = new ServiceCollection().BuildServiceProvider();
-            new CreateTableExpressionBuilder(expression, new MigrationContext(null, null, null, serviceProvider))
+            var querySchema = new Mock<IQuerySchema>();
+            new CreateTableExpressionBuilder(expression, new MigrationContext(querySchema.Object, serviceProvider, null, null))
                 .WithColumn("Id").AsGuid().PrimaryKey().RowGuid();
 
             var result = Generator.Generate(expression);

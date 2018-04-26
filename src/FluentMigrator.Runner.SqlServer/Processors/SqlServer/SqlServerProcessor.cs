@@ -17,6 +17,8 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
+using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 
@@ -27,11 +29,20 @@ using FluentMigrator.Runner.BatchParser.SpecialTokenSearchers;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Generic;
 using FluentMigrator.Runner.Helpers;
+using FluentMigrator.Runner.Initialization;
+
+using JetBrains.Annotations;
+
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
-    public sealed class SqlServerProcessor : GenericProcessorBase
+    public class SqlServerProcessor : GenericProcessorBase
     {
+        [CanBeNull]
+        private readonly IServiceProvider _serviceProvider;
+
         private const string SqlSchemaExists = "SELECT 1 WHERE EXISTS (SELECT * FROM sys.schemas WHERE NAME = '{0}') ";
         private const string TABLE_EXISTS = "SELECT 1 WHERE EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}')";
         private const string COLUMN_EXISTS = "SELECT 1 WHERE EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}' AND COLUMN_NAME = '{2}')";
@@ -46,13 +57,50 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public IQuoter Quoter { get; }
 
-        public SqlServerProcessor(IEnumerable<string> databaseTypes, IDbConnection connection, GenericGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
+        [Obsolete]
+        public SqlServerProcessor(
+            IEnumerable<string> databaseTypes,
+            IDbConnection connection,
+            GenericGenerator generator,
+            IAnnouncer announcer,
+            [NotNull] IMigrationProcessorOptions options,
+            IDbFactory factory)
             : base(connection, factory, generator, announcer, options)
         {
             var dbTypes = databaseTypes.ToList();
             DatabaseType = dbTypes.First();
             DatabaseTypeAliases = dbTypes.Skip(1).ToList();
             Quoter = generator?.Quoter;
+        }
+
+        protected SqlServerProcessor(
+            [NotNull, ItemNotNull] IEnumerable<string> databaseTypes,
+            [NotNull] IMigrationGenerator generator,
+            [NotNull] IQuoter quoter,
+            [NotNull] IAnnouncer announcer,
+            [NotNull] IOptions<ProcessorOptions> options,
+            [NotNull] IConnectionStringAccessor connectionStringAccessor,
+            [NotNull] IServiceProvider serviceProvider)
+            : this(databaseTypes, SqlClientFactory.Instance, generator, quoter, announcer, options, connectionStringAccessor, serviceProvider)
+        {
+        }
+
+        protected SqlServerProcessor(
+            [NotNull, ItemNotNull] IEnumerable<string> databaseTypes,
+            [NotNull] DbProviderFactory factory,
+            [NotNull] IMigrationGenerator generator,
+            [NotNull] IQuoter quoter,
+            [NotNull] IAnnouncer announcer,
+            [NotNull] IOptions<ProcessorOptions> options,
+            [NotNull] IConnectionStringAccessor connectionStringAccessor,
+            [NotNull] IServiceProvider serviceProvider)
+            : base(() => factory, generator, announcer, options.Value, connectionStringAccessor)
+        {
+            _serviceProvider = serviceProvider;
+            var dbTypes = databaseTypes.ToList();
+            DatabaseType = dbTypes.First();
+            DatabaseTypeAliases = dbTypes.Skip(1).ToList();
+            Quoter = quoter;
         }
 
         private static string SafeSchemaName(string schemaName)
@@ -74,6 +122,11 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public override void RollbackTransaction()
         {
+            if (Transaction == null)
+            {
+                return;
+            }
+
             base.RollbackTransaction();
             Announcer.Sql("ROLLBACK TRANSACTION");
         }
@@ -123,7 +176,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public override bool DefaultValueExists(string schemaName, string tableName, string columnName, object defaultValue)
         {
-            string defaultValueAsString = string.Format("%{0}%", FormatHelper.FormatSqlEscape(defaultValue.ToString()));
+            var defaultValueAsString = string.Format("%{0}%", FormatHelper.FormatSqlEscape(defaultValue.ToString()));
             return Exists(DEFAULTVALUE_EXISTS, SafeSchemaName(schemaName),
                 FormatHelper.FormatSqlEscape(tableName),
                 FormatHelper.FormatSqlEscape(columnName), defaultValueAsString);
@@ -138,7 +191,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         {
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction, Options))
+            using (var command = CreateCommand(String.Format(template, args)))
             {
                 var result = command.ExecuteScalar();
                 return DBNull.Value != result && Convert.ToInt32(result) == 1;
@@ -154,7 +207,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         {
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction, Options))
+            using (var command = CreateCommand(String.Format(template, args)))
             using (var reader = command.ExecuteReader())
             {
                 return reader.ReadDataSet();
@@ -166,14 +219,15 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             Announcer.Sql(sql);
 
             if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
+            {
                 return;
+            }
 
             EnsureConnectionIsOpen();
 
             if (ContainsGo(sql))
             {
                 ExecuteBatchNonQuery(sql);
-
             }
             else
             {
@@ -181,10 +235,10 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             }
         }
 
-        private static bool ContainsGo(string sql)
+        private bool ContainsGo(string sql)
         {
             var containsGo = false;
-            var parser = new SqlServerBatchParser();
+            var parser = _serviceProvider?.GetService<SqlServerBatchParser>() ?? new SqlServerBatchParser();
             parser.SpecialToken += (sender, args) => containsGo = true;
             using (var source = new TextReaderSource(new StringReader(sql), true))
             {
@@ -196,7 +250,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         private void ExecuteNonQuery(string sql)
         {
-            using (var command = Factory.CreateCommand(sql, Connection, Transaction, Options))
+            using (var command = CreateCommand(sql))
             {
                 try
                 {
@@ -222,19 +276,19 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
             try
             {
-                var parser = new SqlServerBatchParser();
-                parser.SqlText += (sender, args) => { sqlBatch = args.SqlText.Trim(); };
+                var parser = _serviceProvider?.GetService<SqlServerBatchParser>() ?? new SqlServerBatchParser();
+                parser.SqlText += (sender, args) => sqlBatch = args.SqlText.Trim();
                 parser.SpecialToken += (sender, args) =>
                 {
                     if (string.IsNullOrEmpty(sqlBatch))
+                    {
                         return;
+                    }
 
                     if (args.Opaque is GoSearcher.GoSearcherParameters goParams)
                     {
-                        using (var command = Factory.CreateCommand(string.Empty, Connection, Transaction, Options))
+                        using (var command = CreateCommand(sqlBatch))
                         {
-                            command.CommandText = sqlBatch;
-
                             for (var i = 0; i != goParams.Count; ++i)
                             {
                                 command.ExecuteNonQuery();
@@ -252,9 +306,8 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
                 if (!string.IsNullOrEmpty(sqlBatch))
                 {
-                    using (var command = Factory.CreateCommand(string.Empty, Connection, Transaction, Options))
+                    using (var command = CreateCommand(sqlBatch))
                     {
-                        command.CommandText = sqlBatch;
                         command.ExecuteNonQuery();
                     }
                 }
@@ -277,7 +330,9 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             Announcer.Say("Performing DB Operation");
 
             if (Options.PreviewOnly)
+            {
                 return;
+            }
 
             EnsureConnectionIsOpen();
 

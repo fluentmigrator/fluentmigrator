@@ -18,13 +18,13 @@
 
 using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Runner;
-using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Infrastructure;
 using FluentMigrator.Runner.Initialization;
 
 using Microsoft.Extensions.DependencyInjection;
 
 using Moq;
+
 using NUnit.Framework;
 
 using Shouldly;
@@ -36,35 +36,31 @@ namespace FluentMigrator.Tests.Unit.Runners
     {
         public const string Tag1 = "MaintenanceTestTag1";
         public const string Tag2 = "MaintenanceTestTag2";
-        private string[] _tags = {Tag1, Tag2};
+        private readonly string[] _tags = {Tag1, Tag2};
 
         private Mock<IMigrationRunnerConventions> _migrationConventions;
-        private MaintenanceLoader _maintenanceLoader;
-        private MaintenanceLoader _maintenanceLoaderNoTags;
+        private IMaintenanceLoader _maintenanceLoader;
+        private IMaintenanceLoader _maintenanceLoaderNoTags;
 
         [SetUp]
         public void Setup()
         {
             _migrationConventions = new Mock<IMigrationRunnerConventions>();
             _migrationConventions.Setup(x => x.GetMaintenanceStage).Returns(DefaultMigrationRunnerConventions.Instance.GetMaintenanceStage);
+            _migrationConventions.Setup(x => x.TypeIsMigration).Returns(DefaultMigrationRunnerConventions.Instance.TypeIsMigration);
             _migrationConventions.Setup(x => x.TypeHasTags).Returns(DefaultMigrationRunnerConventions.Instance.TypeHasTags);
             _migrationConventions.Setup(x => x.TypeHasMatchingTags).Returns(DefaultMigrationRunnerConventions.Instance.TypeHasMatchingTags);
 
-            _maintenanceLoader = new ServiceCollection()
-                .ConfigureRunner(b => b.WithRunnerContext(new RunnerContext(new NullAnnouncer()) { Tags = _tags }))
-                .AddScoped(_ => _migrationConventions.Object)
-                .AddScoped<MaintenanceLoader>()
-                .WithAllTestMigrations()
+            _maintenanceLoader = ServiceCollectionExtensions.CreateServices()
+                .Configure<RunnerOptions>(opt => opt.Tags = _tags)
+                .AddSingleton<IMigrationRunnerConventionsAccessor>(new PassThroughMigrationRunnerConventionsAccessor(_migrationConventions.Object))
                 .BuildServiceProvider()
-                .GetRequiredService<MaintenanceLoader>();
+                .GetRequiredService<IMaintenanceLoader>();
 
-            _maintenanceLoaderNoTags = new ServiceCollection()
-                .ConfigureRunner(b => b.WithRunnerContext(new RunnerContext(new NullAnnouncer())))
-                .AddScoped(_ => _migrationConventions.Object)
-                .AddScoped<MaintenanceLoader>()
-                .WithAllTestMigrations()
+            _maintenanceLoaderNoTags = ServiceCollectionExtensions.CreateServices()
+                .AddSingleton<IMigrationRunnerConventionsAccessor>(new PassThroughMigrationRunnerConventionsAccessor(_migrationConventions.Object))
                 .BuildServiceProvider()
-                .GetRequiredService<MaintenanceLoader>();
+                .GetRequiredService<IMaintenanceLoader>();
         }
 
         [Test]

@@ -39,6 +39,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         {
         }
 
+        [Obsolete]
         public override IDbCommand CreateCommand(string commandText, IDbConnection connection, IDbTransaction transaction, IMigrationProcessorOptions options)
         {
             var command = connection.CreateCommand();

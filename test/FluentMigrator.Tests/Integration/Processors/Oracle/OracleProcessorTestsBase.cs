@@ -14,46 +14,28 @@
 // limitations under the License.
 #endregion
 
-using System.Data;
-
-using FluentMigrator.Runner.Announcers;
-using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Oracle;
-using FluentMigrator.Runner.Processors;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.Oracle;
 using FluentMigrator.Tests.Helpers;
-using FluentMigrator.Tests.Unit;
+
+using Microsoft.Extensions.DependencyInjection;
 
 using NUnit.Framework;
 
 using Shouldly;
 
-namespace FluentMigrator.Tests.Integration.Processors.Oracle {
+namespace FluentMigrator.Tests.Integration.Processors.Oracle
+{
     [Category("Integration")]
-    [Category("Oracle")]
     public abstract class OracleProcessorTestsBase
     {
         private const string SchemaName = "test";
-        private IDbConnection Connection { get; set; }
-        private OracleProcessor Processor { get; set; }
-        private IDbFactory Factory { get; set; }
-        private IQuoter Quoter { get { return Processor.Quoter; } }
 
-        protected void SetUp(IDbFactory dbFactory)
-        {
-            if (!IntegrationTestOptions.Oracle.IsEnabled)
-                Assert.Ignore();
-            Factory = dbFactory;
-            Connection = Factory.CreateConnection(IntegrationTestOptions.Oracle.ConnectionString);
-            Processor = new OracleProcessor(Connection, new OracleGenerator(), new TextWriterAnnouncer(TestContext.Out), new TestMigrationProcessorOptions(), Factory);
-            Connection.Open();
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            Processor?.Dispose();
-        }
+        private ServiceProvider ServiceProvider { get; set; }
+        private IServiceScope ServiceScope { get; set; }
+        private OracleProcessorBase Processor { get; set; }
+        private OracleQuoterBase Quoter { get; set; }
 
         [Test]
         public void CallingColumnExistsReturnsFalseIfColumnExistsInDifferentSchema()
@@ -113,13 +95,43 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
         public void TestQuery()
         {
             string sql = "SELECT SYSDATE FROM " + Quoter.QuoteTableName("DUAL");
-            using (var command = Factory.CreateCommand(sql, Processor.Connection, Processor.Transaction, Processor.Options))
-            using (var reader = command.ExecuteReader())
-            {
-                var ds = reader.ReadDataSet();
-                Assert.Greater(ds.Tables.Count, 0);
-                Assert.Greater(ds.Tables[0].Columns.Count, 0);
-            }
+            var ds = Processor.Read(sql);
+            Assert.Greater(ds.Tables.Count, 0);
+            Assert.Greater(ds.Tables[0].Columns.Count, 0);
         }
+
+        [OneTimeSetUp]
+        public void ClassSetUp()
+        {
+            if (!IntegrationTestOptions.Oracle.IsEnabled)
+                Assert.Ignore();
+
+            var serivces = AddOracleServices(ServiceCollectionExtensions.CreateServices())
+                .AddScoped<IConnectionStringReader>(
+                    _ => new PassThroughConnectionStringReader(IntegrationTestOptions.Oracle.ConnectionString));
+            ServiceProvider = serivces.BuildServiceProvider();
+        }
+
+        [OneTimeTearDown]
+        public void ClassTearDown()
+        {
+            ServiceProvider?.Dispose();
+        }
+
+        [SetUp]
+        public void SetUp()
+        {
+            ServiceScope = ServiceProvider.CreateScope();
+            Processor = ServiceScope.ServiceProvider.GetRequiredService<OracleManagedProcessor>();
+            Quoter = ServiceScope.ServiceProvider.GetRequiredService<OracleQuoterBase>();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            ServiceScope?.Dispose();
+        }
+
+        protected abstract IServiceCollection AddOracleServices(IServiceCollection services);
     }
 }

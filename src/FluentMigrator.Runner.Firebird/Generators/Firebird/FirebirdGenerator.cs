@@ -27,6 +27,8 @@ using FluentMigrator.Runner.Processors.Firebird;
 
 using JetBrains.Annotations;
 
+using Microsoft.Extensions.Options;
+
 namespace FluentMigrator.Runner.Generators.Firebird
 {
 
@@ -36,12 +38,24 @@ namespace FluentMigrator.Runner.Generators.Firebird
         [Obsolete("Use the Truncator property")]
         protected readonly FirebirdTruncator truncator;
 
-        public FirebirdGenerator()
-            : this(new FirebirdOptions())
+        public FirebirdGenerator(
+            [NotNull] FirebirdOptions fbOptions)
+            : this(fbOptions, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()))
         {
         }
 
-        public FirebirdGenerator([NotNull] FirebirdOptions fbOptions) : base(new FirebirdColumn(fbOptions), new FirebirdQuoter(fbOptions.ForceQuote), new EmptyDescriptionGenerator())
+        public FirebirdGenerator(
+            [NotNull] FirebirdOptions fbOptions,
+            [NotNull] IOptions<GeneratorOptions> generatorOptions)
+            : this(new FirebirdQuoter(fbOptions.ForceQuote), fbOptions, generatorOptions)
+        {
+        }
+
+        public FirebirdGenerator(
+            [NotNull] FirebirdQuoter quoter,
+            [NotNull] FirebirdOptions fbOptions,
+            [NotNull] IOptions<GeneratorOptions> generatorOptions)
+            : base(new FirebirdColumn(fbOptions), quoter, new EmptyDescriptionGenerator(), generatorOptions)
         {
             FBOptions = fbOptions ?? throw new ArgumentNullException(nameof(fbOptions));
 #pragma warning disable 618
@@ -127,7 +141,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
         public override string Generate(AlterColumnExpression expression)
         {
             Truncator.Truncate(expression);
-            return CompatabilityMode.HandleCompatabilty("Alter column is not supported as expected");
+            return CompatibilityMode.HandleCompatibilty("Alter column is not supported as expected");
         }
 
 
@@ -167,7 +181,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
         public override string Generate(RenameTableExpression expression)
         {
             Truncator.Truncate(expression);
-            return CompatabilityMode.HandleCompatabilty("Rename table is not supported");
+            return CompatibilityMode.HandleCompatibilty("Rename table is not supported");
         }
 
         public override string Generate(CreateColumnExpression expression)

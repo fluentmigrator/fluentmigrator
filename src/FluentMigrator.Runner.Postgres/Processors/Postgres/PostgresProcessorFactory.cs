@@ -22,6 +22,7 @@ using FluentMigrator.Runner.Generators.Postgres;
 
 namespace FluentMigrator.Runner.Processors.Postgres
 {
+    [Obsolete]
     public class PostgresProcessorFactory : MigrationProcessorFactory
     {
         private readonly IServiceProvider _serviceProvider;
@@ -37,11 +38,12 @@ namespace FluentMigrator.Runner.Processors.Postgres
             _serviceProvider = serviceProvider;
         }
 
+        [Obsolete]
         public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
         {
             var factory = new PostgresDbFactory(_serviceProvider);
             var connection = factory.CreateConnection(connectionString);
-            return new PostgresProcessor(connection, new PostgresGenerator(), announcer, options, factory);
+            return new PostgresProcessor(connection, new PostgresGenerator(new PostgresQuoter()), announcer, options, factory);
         }
     }
 }

@@ -27,7 +27,12 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Firebird;
 using FluentMigrator.Runner.Helpers;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Models;
+
+using JetBrains.Annotations;
+
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.Firebird
 {
@@ -45,14 +50,31 @@ namespace FluentMigrator.Runner.Processors.Firebird
         protected List<string> DDLTouchedTables;
         protected Dictionary<string, List<string>> DDLTouchedColumns;
 
+        [Obsolete]
         public FirebirdProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory, FirebirdOptions fbOptions)
             : base(connection, factory, generator, announcer, options)
         {
-            if (fbOptions == null)
-                throw new ArgumentNullException(nameof(fbOptions));
+            FBOptions = fbOptions ?? throw new ArgumentNullException(nameof(fbOptions));
             _firebirdVersionFunc = new Lazy<Version>(GetFirebirdVersion);
             _quoter = new FirebirdQuoter(fbOptions.ForceQuote);
-            FBOptions = fbOptions;
+            truncator = new FirebirdTruncator(FBOptions.TruncateLongNames, FBOptions.PackKeyNames);
+            ClearLocks();
+            ClearDDLFollowers();
+        }
+
+        public FirebirdProcessor(
+            [NotNull] FirebirdDbFactory factory,
+            [NotNull] FirebirdGenerator generator,
+            [NotNull] FirebirdQuoter quoter,
+            [NotNull] IAnnouncer announcer,
+            [NotNull] IOptions<ProcessorOptions> options,
+            [NotNull] IConnectionStringAccessor connectionStringAccessor,
+            [NotNull] FirebirdOptions fbOptions)
+            : base(() => factory.Factory, generator, announcer, options.Value, connectionStringAccessor)
+        {
+            FBOptions = fbOptions ?? throw new ArgumentNullException(nameof(fbOptions));
+            _firebirdVersionFunc = new Lazy<Version>(GetFirebirdVersion);
+            _quoter = quoter;
 #pragma warning disable 618
             truncator = new FirebirdTruncator(FBOptions.TruncateLongNames, FBOptions.PackKeyNames);
 #pragma warning restore 618
@@ -66,12 +88,12 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
         public FirebirdOptions FBOptions { get; }
         public bool IsFirebird3 => _firebirdVersionFunc.Value >= new Version(3, 0);
-        public new IMigrationGenerator Generator { get { return base.Generator; } }
-        public new IAnnouncer Announcer { get { return base.Announcer; } }
+        public new IMigrationGenerator Generator => base.Generator;
+        public new IAnnouncer Announcer => base.Announcer;
 
-#pragma warning disable 612
+#pragma warning disable 618
         public FirebirdTruncator Truncator => truncator;
-#pragma warning restore 612
+#pragma warning restore 618
 
         private Version GetFirebirdVersion()
         {
@@ -150,7 +172,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
             //Announcer.Sql(String.Format(template,args));
 
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction, Options))
+            using (var command = CreateCommand(string.Format(template, args)))
             using (var reader = command.ExecuteReader())
             {
                 return reader.ReadDataSet();
@@ -166,7 +188,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
         {
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction, Options))
+            using (var command = CreateCommand(string.Format(template, args)))
             using (var reader = command.ExecuteReader())
             {
                 return reader.Read();
@@ -293,7 +315,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
                 }
 
                 if (FBOptions.VirtualLock)
-                    throw new InvalidOperationException(String.Format("Table {0} is locked", tableName));
+                    throw new InvalidOperationException(string.Format("Table {0} is locked", tableName));
             }
         }
 
@@ -314,7 +336,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
                 }
 
                 if (FBOptions.VirtualLock)
-                    throw new InvalidOperationException(String.Format("Column {0} in table {1} is locked", columnName, tableName));
+                    throw new InvalidOperationException(string.Format("Column {0} in table {1} is locked", columnName, tableName));
             }
         }
 
@@ -408,7 +430,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             bool identitySequenceExists;
             try
             {
-                identitySequenceExists = SequenceExists(String.Empty, GetSequenceName(expression.TableName, expression.Column.Name));
+                identitySequenceExists = SequenceExists(string.Empty, GetSequenceName(expression.TableName, expression.Column.Name));
             }
             catch (ArgumentException)
             {
@@ -449,7 +471,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             {
                 try
                 {
-                    if (SequenceExists(String.Empty, GetSequenceName(expression.TableName, columnName)))
+                    if (SequenceExists(string.Empty, GetSequenceName(expression.TableName, columnName)))
                     {
                         DeleteSequenceForIdentity(expression.TableName, columnName);
                     }
@@ -499,7 +521,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             CreateTableExpression createNew = new CreateTableExpression()
             {
                 TableName = expression.NewName,
-                SchemaName = String.Empty
+                SchemaName = string.Empty
             };
 
             //copy column definitions (nb: avoid to copy key names, because in firebird they must be globally unique, so let it rename)
@@ -527,7 +549,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             InsertDataExpression data = new InsertDataExpression();
             data.TableName = firebirdTableDef.Name;
             data.SchemaName = firebirdTableDef.SchemaName;
-            using (DataSet ds = ReadTableData(String.Empty, expression.OldName))
+            using (DataSet ds = ReadTableData(string.Empty, expression.OldName))
             {
                 foreach (DataRow dr in ds.Tables[0].Rows)
                 {
@@ -544,7 +566,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             DeleteTableExpression delTable = new DeleteTableExpression()
             {
                 TableName = expression.OldName,
-                SchemaName = String.Empty
+                SchemaName = string.Empty
             };
             Process(delTable);
         }
@@ -726,7 +748,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(sql, Connection, Transaction, Options))
+            using (var command = CreateCommand(sql))
             {
                 try
                 {
@@ -765,12 +787,12 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
         private string GetSequenceName(string tableName, string columnName)
         {
-            return Truncator.Truncate(String.Format("gen_{0}_{1}", tableName, columnName));
+            return Truncator.Truncate($"gen_{tableName}_{columnName}");
         }
 
         private string GetIdentityTriggerName(string tableName, string columnName)
         {
-            return Truncator.Truncate(String.Format("gen_id_{0}_{1}", tableName, columnName));
+            return Truncator.Truncate($"gen_id_{tableName}_{columnName}");
         }
 
         private void CreateSequenceForIdentity(string tableName, string columnName)
@@ -778,7 +800,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             CheckTable(tableName);
             LockTable(tableName);
             string sequenceName = GetSequenceName(tableName, columnName);
-            if (!SequenceExists(String.Empty, sequenceName))
+            if (!SequenceExists(string.Empty, sequenceName))
             {
                 CreateSequenceExpression sequence = new CreateSequenceExpression()
                 {
@@ -788,7 +810,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             }
             string triggerName = GetIdentityTriggerName(tableName, columnName);
             string quotedColumn = _quoter.Quote(columnName);
-            string trigger = String.Format("as begin if (NEW.{0} is NULL) then NEW.{1} = GEN_ID({2}, 1); end", quotedColumn, quotedColumn, _quoter.QuoteSequenceName(sequenceName, string.Empty));
+            string trigger = string.Format("as begin if (NEW.{0} is NULL) then NEW.{1} = GEN_ID({2}, 1); end", quotedColumn, quotedColumn, _quoter.QuoteSequenceName(sequenceName, string.Empty));
 
             PerformDBOperationExpression createTrigger = CreateTriggerExpression(tableName, triggerName, true, TriggerEvent.Insert, trigger);
             Process(createTrigger);
@@ -809,9 +831,9 @@ namespace FluentMigrator.Runner.Processors.Firebird
             }
 
             DeleteSequenceExpression deleteSequence = null;
-            if (SequenceExists(String.Empty, sequenceName))
+            if (SequenceExists(string.Empty, sequenceName))
             {
-                deleteSequence = new DeleteSequenceExpression() { SchemaName = String.Empty, SequenceName = sequenceName };
+                deleteSequence = new DeleteSequenceExpression() { SchemaName = string.Empty, SequenceName = sequenceName };
             }
             string triggerName = GetIdentityTriggerName(tableName, columnName);
             PerformDBOperationExpression deleteTrigger = DeleteTriggerExpression(tableName, triggerName);
@@ -836,7 +858,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             PerformDBOperationExpression createTrigger = new PerformDBOperationExpression();
             createTrigger.Operation = (connection, transaction) =>
             {
-                string triggerSql = String.Format(@"CREATE TRIGGER {0} FOR {1} ACTIVE {2} {3} POSITION 0
+                string triggerSql = string.Format(@"CREATE TRIGGER {0} FOR {1} ACTIVE {2} {3} POSITION 0
                     {4}
                     ", _quoter.Quote(triggerName), _quoter.Quote(tableName),
                      onBefore ? "before" : "after",
@@ -844,7 +866,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
                      triggerBody
                      );
                 Announcer.Sql(triggerSql);
-                using (var cmd = Factory.CreateCommand(triggerSql, connection, transaction, Options))
+                using (var cmd = CreateCommand(triggerSql, connection, transaction))
                 {
                     cmd.ExecuteNonQuery();
                 }
@@ -861,9 +883,9 @@ namespace FluentMigrator.Runner.Processors.Firebird
             PerformDBOperationExpression deleteTrigger = new PerformDBOperationExpression();
             deleteTrigger.Operation = (connection, transaction) =>
             {
-                string triggerSql = String.Format("DROP TRIGGER {0}", _quoter.Quote(triggerName));
+                string triggerSql = string.Format("DROP TRIGGER {0}", _quoter.Quote(triggerName));
                 Announcer.Sql(triggerSql);
-                using (var cmd = Factory.CreateCommand(triggerSql, connection, transaction, Options))
+                using (var cmd = CreateCommand(triggerSql, connection, transaction))
                 {
                     cmd.ExecuteNonQuery();
                 }

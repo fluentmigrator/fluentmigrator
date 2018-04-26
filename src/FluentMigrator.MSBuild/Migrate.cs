@@ -19,14 +19,19 @@
 using System;
 using System.IO;
 using System.Reflection;
+
 using FluentMigrator.Exceptions;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
+using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Extensions;
 using FluentMigrator.Runner.Initialization;
+using FluentMigrator.Runner.Initialization.NetFramework;
+using FluentMigrator.Runner.Processors;
 
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace FluentMigrator.MSBuild
 {
@@ -98,6 +103,10 @@ namespace FluentMigrator.MSBuild
 
         public bool TransactionPerSession { get; set; }
 
+        public bool AllowBreakingChange { get; set; }
+
+        public string ProviderSwitches { get; set; }
+
         public override bool Execute()
         {
 
@@ -135,33 +144,12 @@ namespace FluentMigrator.MSBuild
                 announcer = new CompositeAnnouncer(announcer, fileAnnouncer);
             }
 
-            Log.LogMessage(MessageImportance.Low, "Creating Context");
-
-            var runnerContext = new RunnerContext(announcer)
-            {
-                ApplicationContext = ApplicationContext,
-                Database = _databaseType,
-                Connection = Connection,
-                ConnectionStringConfigPath = ConnectionStringConfigPath,
-                PreviewOnly = PreviewOnly,
-                Targets = Targets,
-                Namespace = Namespace,
-                NestedNamespaces = Nested,
-                Task = Task,
-                Version = Version,
-                Steps = Steps,
-                WorkingDirectory = WorkingDirectory,
-                Profile = Profile,
-                Tags = Tags.ToTags(),
-                Timeout = Timeout,
-                TransactionPerSession = TransactionPerSession
-            };
-
             Log.LogMessage(MessageImportance.Low, "Executing Migration Runner");
             try
             {
-                new TaskExecutor(runnerContext)
-                    .Execute();
+                Log.LogMessage(MessageImportance.Low, "Creating Context");
+
+                ExecuteMigrations(announcer);
             }
             catch (ProcessorFactoryNotFoundException ex)
             {
@@ -175,13 +163,90 @@ namespace FluentMigrator.MSBuild
             }
             finally
             {
-                if (outputWriter != null)
-                {
-                    outputWriter.Dispose();
-                }
+                outputWriter?.Dispose();
             }
 
             return true;
+        }
+
+        private void ExecuteMigrations(IAnnouncer announcer)
+        {
+            var conventionSet = new DefaultConventionSet(defaultSchemaName: null, WorkingDirectory);
+
+            var services = CreateCoreServices()
+                .AddSingleton<IConventionSet>(conventionSet)
+                .AddScoped<TaskExecutor>()
+                .ConfigureRunner(r => r.WithAnnouncer(announcer))
+                .Configure<SelectingProcessorAccessorOptions>(opt => opt.ProcessorId = DatabaseType)
+                .Configure<AssemblySourceOptions>(opt => opt.AssemblyNames = Targets)
+#pragma warning disable 612
+                .Configure<AppConfigConnectionStringAccessorOptions>(
+                    opt => opt.ConnectionStringConfigPath = ConnectionStringConfigPath)
+#pragma warning restore 612
+                .Configure<TypeFilterOptions>(
+                    opt =>
+                    {
+                        opt.Namespace = Namespace;
+                        opt.NestedNamespaces = Nested;
+                    })
+                .Configure<RunnerOptions>(
+                    opt =>
+                    {
+                        opt.Task = Task;
+                        opt.Version = Version;
+                        opt.Steps = Steps;
+                        opt.Profile = Profile;
+                        opt.Tags = Tags.ToTags().ToArray();
+#pragma warning disable 612
+                        opt.ApplicationContext = ApplicationContext;
+#pragma warning restore 612
+                        opt.TransactionPerSession = TransactionPerSession;
+                        opt.AllowBreakingChange = AllowBreakingChange;
+                    })
+                .Configure<ProcessorOptions>(
+                    opt =>
+                    {
+                        opt.ConnectionString = Connection;
+                        opt.PreviewOnly = PreviewOnly;
+                        opt.ProviderSwitches = ProviderSwitches;
+                        opt.Timeout = Timeout == null ? null : (TimeSpan?)TimeSpan.FromSeconds(Timeout.Value);
+                    });
+
+            using (var serviceProvider = services.BuildServiceProvider(validateScopes: false))
+            {
+                var executor = serviceProvider.GetRequiredService<TaskExecutor>();
+                executor.Execute();
+            }
+        }
+
+        private static IServiceCollection CreateCoreServices()
+        {
+            var services = new ServiceCollection()
+                .AddFluentMigratorCore()
+                .ConfigureRunner(
+                    builder => builder
+                        .AddDb2()
+                        .AddDb2ISeries()
+                        .AddDotConnectOracle()
+                        .AddFirebird()
+                        .AddHana()
+                        .AddMySql4()
+                        .AddMySql5()
+                        .AddOracle()
+                        .AddOracleManaged()
+                        .AddPostgres()
+                        .AddRedshift()
+                        .AddSqlAnywhere()
+                        .AddSQLite()
+                        .AddSqlServer()
+                        .AddSqlServer2000()
+                        .AddSqlServer2005()
+                        .AddSqlServer2008()
+                        .AddSqlServer2012()
+                        .AddSqlServer2014()
+                        .AddSqlServer2016()
+                        .AddSqlServerCe());
+            return services;
         }
     }
 }
