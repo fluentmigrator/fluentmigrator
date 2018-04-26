@@ -20,9 +20,9 @@ using System;
 
 namespace FluentMigrator.Console
 {
-    static class Program
+    internal static class Program
     {
-        static int Main(string[] args)
+        private static int Main(string[] args)
         {
             try
             {

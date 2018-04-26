@@ -24,6 +24,10 @@ using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Model;
 using FluentMigrator.SqlServer;
 
+using JetBrains.Annotations;
+
+using Microsoft.Extensions.Options;
+
 namespace FluentMigrator.Runner.Generators.SqlServer
 {
     public class SqlServer2008Generator : SqlServer2005Generator
@@ -38,13 +42,29 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         {
         }
 
-        public SqlServer2008Generator(SqlServer2008Quoter quoter)
-            : base(new SqlServer2005Column(new SqlServer2008TypeMap(), quoter), quoter, new SqlServer2005DescriptionGenerator())
+        public SqlServer2008Generator(
+            [NotNull] SqlServer2008Quoter quoter)
+            : this(quoter, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()))
         {
         }
 
-        protected SqlServer2008Generator(IColumn column, IQuoter quoter, IDescriptionGenerator descriptionGenerator)
-            :base(column, quoter, descriptionGenerator)
+        public SqlServer2008Generator(
+            [NotNull] SqlServer2008Quoter quoter,
+            [NotNull] IOptions<GeneratorOptions> generatorOptions)
+            : this(
+                new SqlServer2005Column(new SqlServer2008TypeMap(), quoter),
+                quoter,
+                new SqlServer2005DescriptionGenerator(),
+                generatorOptions)
+        {
+        }
+
+        protected SqlServer2008Generator(
+            [NotNull] IColumn column,
+            [NotNull] IQuoter quoter,
+            [NotNull] IDescriptionGenerator descriptionGenerator,
+            [NotNull] IOptions<GeneratorOptions> generatorOptions)
+            : base(column, quoter, descriptionGenerator, generatorOptions)
         {
         }
 
@@ -67,7 +87,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             if (nullDistinctColumns.Count != 0 && !index.IsUnique)
             {
                 // Should never occur
-                CompatabilityMode.HandleCompatabilty("With nulls distinct can only be used for unique indexes");
+                CompatibilityMode.HandleCompatibilty("With nulls distinct can only be used for unique indexes");
                 return string.Empty;
             }
 

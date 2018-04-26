@@ -179,8 +179,10 @@ namespace FluentMigrator.MSBuild
                 .ConfigureRunner(r => r.WithAnnouncer(announcer))
                 .Configure<SelectingProcessorAccessorOptions>(opt => opt.ProcessorId = DatabaseType)
                 .Configure<AssemblySourceOptions>(opt => opt.AssemblyNames = Targets)
+#pragma warning disable 612
                 .Configure<AppConfigConnectionStringAccessorOptions>(
                     opt => opt.ConnectionStringConfigPath = ConnectionStringConfigPath)
+#pragma warning restore 612
                 .Configure<TypeFilterOptions>(
                     opt =>
                     {

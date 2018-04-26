@@ -12,19 +12,86 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - [#850](https://github.com/fluentmigrator/fluentmigrator/issues/850): Set minimum .NET Framework version to 4.6.1. Older versions aren't supported anymore.
 - `ProcessorOptions.Timeout` is now of type `System.TimeSpan?`
 - `Factory.CreateCommand` is replaced by `Processor.CreateCommand`
+- The database connection will be opened as soon as its created
 
 ### Added
 
 - [#851](https://github.com/fluentmigrator/fluentmigrator/issues/851): Enable the usage of [Microsoft.Extensions.DependencyInjection](https://github.com/aspnet/DependencyInjection/)
+- [#852](https://github.com/fluentmigrator/fluentmigrator/issues/852): Replace custom configuration mechanisms by using [Microsoft.Extensions.Options](https://github.com/aspnet/Options/)
 
 ### Deprecated
 
-- `IAssemblyCollection`
+- `IAssemblyCollection` and all its implementations
 - `IMigrationRunnerConventions.GetMigrationInfo`
 - `IProfileLoader.ApplyProfiles()`
 - `IProfileLoader.FindProfilesIn`
 - `IMigrationProcessorOptions`
-- `IRunnerContext` and `RunnerContext`
+- `IMigrationProcessorFactory` and all its implementations
+- `IRunnerContext` and `RunnerContext`, replaced by several dedicated options classes:
+  - `RunnerOptions` are the new `RunnerContext` (minus some properties extracted into separate option classes)
+  - `ProcessorOptions` for global processor-specific options 
+  - `GeneratorOptions` to allow setting the compatibility mode
+  - `TypeFilterOptions` for filtering migrations by namespace
+  - `AnnouncerOptions` to enable showing SQL statements and the elapsed time
+  - `SelectingProcessorAccessorOptions` allows selection of a processor by its identifier
+  - `SelectingGeneratorAccessorOptions` allows selection of a generator by its identifier
+  - `AppConfigConnectionStringAccessorOptions` to allow leading the connection strings from the *.config xml file (deprecated, only for transition to `Microsoft.Extensions.Configuration`)
+- `CompatabilityMode` (is now `ComatibilityMode`)
+- `ApplicationContext` in various interfaces/classes
+- `ManifestResourceNameWithAssembly` replaced by `ValueTuple`
+- `IMigrationRunnerConventions.GetMigrationInfo`
+- `MigrationGeneratorFactory`
+- `MigrationProcessorFactoryProvider`
+- `IDbFactory`: Only the implementations will remain
+- Several non-DI constructors
+
+### Additional information
+
+#### Connection string handling
+
+The library assumes that in `ProcessorOptions.ConnectionString` is either a connection string or
+a connection string identifier. This are the steps to load the real connection string.
+
+- Queries all `IConnectionStringReader` implementations
+  - When a connection string is returned by one of the readers, then this
+    connection string will be used
+  - When no connection string is returned, try reading from the next `IConnectionStringReader`
+- When no reader returned a connection string, then return `ProcessorOptions.ConnectionString`
+
+The connection string stored in `ProcessorOptions.ConnectionString` might be overridden
+by registering the `IConnectionStringReader` instance `PassThroughConnectionStringReader`
+as scoped service.
+
+When no connection string could be found, the `SelectingProcessorAccessor` returns
+a `ConnectionlessProcessor` instead of the previously selected processor.
+
+#### Instantiating a migration runner
+
+```c#
+// Initialize the services
+var serviceProvider = new ServiceCollection()
+    .AddFluentMigratorCore()
+    .ConfigureRunner(
+        builder => builder
+            .AddSQLite()
+            .WithGlobalConnectionString(connectionString)
+            .WithAnnouncer(new ConsoleAnnouncer() { ShowSql = true })
+            .WithMigrationsIn(typeof(AddGTDTables).Assembly))
+    .BuildServiceProvider();
+
+// Instantiate the runner
+var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
+
+// Run the migrations
+runner.MigrateUp();
+```
+
+This adds the FluentMigrator services to the service collection and
+configures the runner to use SQLite with the given connection string,
+announcer and migration assembly.
+
+Now you can instantiate the runner using the built service provider and use
+its functions.
 
 ## 2.0.6 (2018-04-24)
 

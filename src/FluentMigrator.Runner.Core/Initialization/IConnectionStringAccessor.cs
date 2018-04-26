@@ -26,7 +26,7 @@ namespace FluentMigrator.Runner.Initialization
         /// <summary>
         /// Gets the connection string
         /// </summary>
-        [NotNull]
+        [CanBeNull]
         string ConnectionString { get; }
     }
 }

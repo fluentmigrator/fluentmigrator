@@ -19,6 +19,10 @@
 
 using System.Text;
 
+using JetBrains.Annotations;
+
+using Microsoft.Extensions.Options;
+
 namespace FluentMigrator.Runner.Generators.SqlServer
 {
     public class SqlServer2012Generator : SqlServer2008Generator
@@ -28,13 +32,25 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         {
         }
 
-        public SqlServer2012Generator(SqlServer2008Quoter quoter)
-            : base(quoter)
+        public SqlServer2012Generator(
+            [NotNull] SqlServer2008Quoter quoter)
+            : base(quoter, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()))
         {
         }
 
-        protected SqlServer2012Generator(IColumn column, IQuoter quoter, IDescriptionGenerator descriptionGenerator)
-            :base(column, quoter, descriptionGenerator)
+        public SqlServer2012Generator(
+            [NotNull] SqlServer2008Quoter quoter,
+            [NotNull] IOptions<GeneratorOptions> generatorOptions)
+            : base(quoter, generatorOptions)
+        {
+        }
+
+        protected SqlServer2012Generator(
+            [NotNull] IColumn column,
+            [NotNull] IQuoter quoter,
+            [NotNull] IDescriptionGenerator descriptionGenerator,
+            [NotNull] IOptions<GeneratorOptions> generatorOptions)
+            : base(column, quoter, descriptionGenerator, generatorOptions)
         {
         }
 

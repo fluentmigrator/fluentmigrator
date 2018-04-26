@@ -30,7 +30,17 @@ namespace FluentMigrator.Runner.VersionTableInfo
 {
     public class DefaultVersionTableMetaData : IVersionTableMetaData, ISchemaExpression
     {
-        [Obsolete("Use dependency injectio")]
+        public DefaultVersionTableMetaData(IConventionSet conventionSet, IOptions<RunnerOptions> runnerOptions)
+        {
+#pragma warning disable 618
+#pragma warning disable 612
+            ApplicationContext = runnerOptions.Value.ApplicationContext;
+#pragma warning restore 612
+#pragma warning restore 618
+            conventionSet.SchemaConvention?.Apply(this);
+        }
+
+        [Obsolete("Use dependency injection")]
         public DefaultVersionTableMetaData()
             : this(string.Empty)
         {
@@ -41,16 +51,6 @@ namespace FluentMigrator.Runner.VersionTableInfo
         {
             // ReSharper disable once VirtualMemberCallInConstructor
             SchemaName = schemaName ?? string.Empty;
-        }
-
-        public DefaultVersionTableMetaData(IConventionSet conventionSet, IOptions<RunnerOptions> runnerOptions)
-        {
-#pragma warning disable 618
-#pragma warning disable 612
-            ApplicationContext = runnerOptions.Value.ApplicationContext;
-#pragma warning restore 612
-#pragma warning restore 618
-            conventionSet.SchemaConvention?.Apply(this);
         }
 
         /// <summary>

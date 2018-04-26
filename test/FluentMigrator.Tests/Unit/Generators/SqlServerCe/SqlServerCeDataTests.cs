@@ -203,7 +203,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
         {
             var expression = GeneratorTestHelper.GetInsertDataExpression();
             expression.AdditionalFeatures.Add(SqlServerExtensions.IdentityInsert, true);
-            Generator.CompatabilityMode = Runner.CompatabilityMode.STRICT;
+            Generator.CompatibilityMode = Runner.CompatibilityMode.STRICT;
 
             var expected = "SET IDENTITY_INSERT [TestTable1] ON;";
             expected += " INSERT INTO [TestTable1] ([Id], [Name], [Website]) SELECT 1, N'Just''in', N'codethinked.com'";

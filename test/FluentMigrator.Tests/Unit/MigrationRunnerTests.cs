@@ -93,10 +93,10 @@ namespace FluentMigrator.Tests.Unit
                 .Configure<RunnerOptions>(opt => opt.ApplicationContext = _applicationContext)
 #pragma warning restore 612
                 .Configure<ProcessorOptions>(
-                    opt => { opt.ConnectionString = connectionString; })
+                    opt => opt.ConnectionString = connectionString)
                 .Configure<AssemblySourceOptions>(opt => opt.AssemblyNames = new []{ asm.FullName })
                 .Configure<TypeFilterOptions>(
-                    opt => { opt.Namespace = "FluentMigrator.Tests.Integration.Migrations"; })
+                    opt => opt.Namespace = "FluentMigrator.Tests.Integration.Migrations")
                 .ConfigureRunner(builder => builder.WithRunnerConventions(new CustomMigrationConventions()));
         }
 
@@ -191,7 +191,7 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void CanAnnounceUp()
         {
-            _announcer.Setup(x => x.Heading(It.IsRegex(containsAll("Test", "migrating"))));
+            _announcer.Setup(x => x.Heading(It.IsRegex(ContainsAll("Test", "migrating"))));
             var runner = CreateRunner();
             runner.Up(new TestMigration());
             _announcer.VerifyAll();
@@ -200,7 +200,7 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void CanAnnounceUpFinish()
         {
-            _announcer.Setup(x => x.Say(It.IsRegex(containsAll("Test", "migrated"))));
+            _announcer.Setup(x => x.Say(It.IsRegex(ContainsAll("Test", "migrated"))));
             var runner = CreateRunner();
             runner.Up(new TestMigration());
             _announcer.VerifyAll();
@@ -209,7 +209,7 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void CanAnnounceDown()
         {
-            _announcer.Setup(x => x.Heading(It.IsRegex(containsAll("Test", "reverting"))));
+            _announcer.Setup(x => x.Heading(It.IsRegex(ContainsAll("Test", "reverting"))));
             var runner = CreateRunner();
             runner.Down(new TestMigration());
             _announcer.VerifyAll();
@@ -218,7 +218,7 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void CanAnnounceDownFinish()
         {
-            _announcer.Setup(x => x.Say(It.IsRegex(containsAll("Test", "reverted"))));
+            _announcer.Setup(x => x.Say(It.IsRegex(ContainsAll("Test", "reverted"))));
             var runner = CreateRunner();
             runner.Down(new TestMigration());
             _announcer.VerifyAll();
@@ -267,7 +267,7 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void CanSayExpression()
         {
-            _announcer.Setup(x => x.Say(It.IsRegex(containsAll("CreateTable"))));
+            _announcer.Setup(x => x.Say(It.IsRegex(ContainsAll("CreateTable"))));
 
             _stopWatch.Setup(x => x.ElapsedTime()).Returns(new TimeSpan(0, 0, 0, 1, 3));
 
@@ -291,7 +291,7 @@ namespace FluentMigrator.Tests.Unit
             _announcer.VerifyAll();
         }
 
-        private string containsAll(params string[] words)
+        private static string ContainsAll(params string[] words)
         {
             return ".*?" + string.Join(".*?", words) + ".*?";
         }
@@ -301,8 +301,8 @@ namespace FluentMigrator.Tests.Unit
         {
             var runner = CreateRunner();
 
-            long fakeMigrationVersion1 = 2009010101;
-            long fakeMigrationVersion2 = 2009010102;
+            const long fakeMigrationVersion1 = 2009010101;
+            const long fakeMigrationVersion2 = 2009010102;
             LoadVersionData(fakeMigrationVersion1, fakeMigrationVersion2);
             _fakeVersionLoader.Versions.Remove(fakeMigrationVersion2);
             _fakeVersionLoader.LoadVersionInfo();
@@ -315,8 +315,8 @@ namespace FluentMigrator.Tests.Unit
         {
             var runner = CreateRunner();
 
-            long fakeMigrationVersion1 = 2009010101;
-            long fakeMigrationVersion2 = 2009010102;
+            const long fakeMigrationVersion1 = 2009010101;
+            const long fakeMigrationVersion2 = 2009010102;
             LoadVersionData(fakeMigrationVersion1, fakeMigrationVersion2);
 
             runner.HasMigrationsToApplyUp().ShouldBeFalse();
@@ -327,8 +327,8 @@ namespace FluentMigrator.Tests.Unit
         {
             var runner = CreateRunner();
 
-            long fakeMigrationVersion1 = 2009010101;
-            long fakeMigrationVersion2 = 2009010102;
+            const long fakeMigrationVersion1 = 2009010101;
+            const long fakeMigrationVersion2 = 2009010102;
             LoadVersionData(fakeMigrationVersion1, fakeMigrationVersion2);
             _fakeVersionLoader.Versions.Remove(fakeMigrationVersion2);
             _fakeVersionLoader.LoadVersionInfo();
@@ -341,8 +341,8 @@ namespace FluentMigrator.Tests.Unit
         {
             var runner = CreateRunner();
 
-            long fakeMigrationVersion1 = 2009010101;
-            long fakeMigrationVersion2 = 2009010102;
+            const long fakeMigrationVersion1 = 2009010101;
+            const long fakeMigrationVersion2 = 2009010102;
             LoadVersionData(fakeMigrationVersion1, fakeMigrationVersion2);
             _fakeVersionLoader.Versions.Remove(fakeMigrationVersion2);
             _fakeVersionLoader.LoadVersionInfo();
@@ -355,7 +355,7 @@ namespace FluentMigrator.Tests.Unit
         {
             var runner = CreateRunner();
 
-            long fakeMigrationVersion1 = 2009010101;
+            const long fakeMigrationVersion1 = 2009010101;
             LoadVersionData(fakeMigrationVersion1);
 
             runner.HasMigrationsToApplyRollback().ShouldBeTrue();
@@ -369,14 +369,13 @@ namespace FluentMigrator.Tests.Unit
             runner.HasMigrationsToApplyRollback().ShouldBeFalse();
         }
 
-
         [Test]
         public void HasMigrationsToApplyDownWhenTheVersionHasNotBeenApplied()
         {
             var runner = CreateRunner();
 
-            long fakeMigrationVersion1 = 2009010101;
-            long fakeMigrationVersion2 = 2009010102;
+            const long fakeMigrationVersion1 = 2009010101;
+            const long fakeMigrationVersion2 = 2009010102;
             LoadVersionData(fakeMigrationVersion1, fakeMigrationVersion2);
             _fakeVersionLoader.Versions.Remove(fakeMigrationVersion2);
             _fakeVersionLoader.LoadVersionInfo();
@@ -389,8 +388,8 @@ namespace FluentMigrator.Tests.Unit
         {
             var runner = CreateRunner();
 
-            long fakeMigrationVersion1 = 2009010101;
-            long fakeMigrationVersion2 = 2009010102;
+            const long fakeMigrationVersion1 = 2009010101;
+            const long fakeMigrationVersion2 = 2009010102;
             LoadVersionData(fakeMigrationVersion1, fakeMigrationVersion2);
 
             runner.HasMigrationsToApplyDown(fakeMigrationVersion1).ShouldBeTrue();
@@ -399,8 +398,8 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void RollbackOnlyOneStepsOfTwoShouldNotDeleteVersionInfoTable()
         {
-            long fakeMigrationVersion = 2009010101;
-            long fakeMigrationVersion2 = 2009010102;
+            const long fakeMigrationVersion = 2009010101;
+            const long fakeMigrationVersion2 = 2009010102;
 
             var runner = CreateRunner();
             Assert.NotNull(runner.VersionLoader.VersionTableMetaData.TableName);
@@ -411,7 +410,6 @@ namespace FluentMigrator.Tests.Unit
             runner.Rollback(1);
 
             _fakeVersionLoader.DidRemoveVersionTableGetCalled.ShouldBeFalse();
-
         }
 
         [Test]
@@ -419,7 +417,7 @@ namespace FluentMigrator.Tests.Unit
         {
             var runner = CreateRunner();
 
-            long fakeMigrationVersion = 2009010101;
+            const long fakeMigrationVersion = 2009010101;
 
             LoadVersionData(fakeMigrationVersion);
 
@@ -440,7 +438,6 @@ namespace FluentMigrator.Tests.Unit
             runner.RollbackToVersion(0);
 
             _fakeVersionLoader.DidRemoveVersionTableGetCalled.ShouldBeTrue();
-
         }
 
         [Test]

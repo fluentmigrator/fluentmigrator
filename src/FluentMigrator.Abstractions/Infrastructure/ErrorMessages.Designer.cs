@@ -115,6 +115,24 @@ namespace FluentMigrator.Infrastructure {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die expression.TableName must not be empty ähnelt.
+        /// </summary>
+        internal static string ExpressionTableNameMissing {
+            get {
+                return ResourceManager.GetString("ExpressionTableNameMissing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Table name not specified, ensure you have appended the OnTable extension. Format should be Delete.ForeignKey(KeyName).OnTable(TableName) ähnelt.
+        /// </summary>
+        internal static string ExpressionTableNameMissingWithHints {
+            get {
+                return ResourceManager.GetString("ExpressionTableNameMissingWithHints", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die The foreign key must have one or more foreign columns. ähnelt.
         /// </summary>
         internal static string ForeignKeyMustHaveOneOrMoreForeignColumns {

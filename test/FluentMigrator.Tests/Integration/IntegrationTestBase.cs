@@ -59,7 +59,7 @@ namespace FluentMigrator.Tests.Integration
                 (typeof(SqlServer2014Processor), () => IntegrationTestOptions.SqlServer2014),
                 (typeof(SqlServer2016Processor), () => IntegrationTestOptions.SqlServer2016),
                 (typeof(SqlAnywhere16Processor), () => IntegrationTestOptions.SqlAnywhere16),
-                (typeof(SQLiteProcessor), () => IntegrationTestOptions.SqlLite),
+                (typeof(SQLiteProcessor), () => IntegrationTestOptions.SQLite),
                 (typeof(FirebirdProcessor), () => IntegrationTestOptions.Firebird),
                 (typeof(PostgresProcessor), () => IntegrationTestOptions.Postgres),
                 (typeof(MySql4Processor), () => IntegrationTestOptions.MySql),
@@ -196,7 +196,7 @@ namespace FluentMigrator.Tests.Integration
                         var proc = (ProcessorBase)sp.GetRequiredService(processorType);
                         var opt = sp.GetRequiredService<IOptions<SelectingProcessorAccessorOptions>>();
                         var opt2 = sp.GetRequiredService<IOptions<SelectingGeneratorAccessorOptions>>();
-                        return new SelectingProcessorAccessor(new[] { proc }, opt, opt2);
+                        return new SelectingProcessorAccessor(new[] { proc }, opt, opt2, sp);
                     })
                 .AddScoped<IGeneratorAccessor>(
                     sp =>

@@ -20,9 +20,11 @@ using System.Linq;
 
 using FluentMigrator.Exceptions;
 using FluentMigrator.Runner.Generators;
+using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors
@@ -38,10 +40,12 @@ namespace FluentMigrator.Runner.Processors
         /// <param name="processors">The processors to select from</param>
         /// <param name="options">The options used to determine the processor to be returned</param>
         /// <param name="generatorSelectorOptions">The generator selector options</param>
+        /// <param name="serviceProvider">The service provider</param>
         public SelectingProcessorAccessor(
             [NotNull, ItemNotNull] IEnumerable<IMigrationProcessor> processors,
             [NotNull] IOptions<SelectingProcessorAccessorOptions> options,
-            [NotNull] IOptions<SelectingGeneratorAccessorOptions> generatorSelectorOptions)
+            [NotNull] IOptions<SelectingGeneratorAccessorOptions> generatorSelectorOptions,
+            [NotNull] IServiceProvider serviceProvider)
         {
             var procs = processors.ToList();
 
@@ -49,6 +53,7 @@ namespace FluentMigrator.Runner.Processors
                 ? generatorSelectorOptions.Value.GeneratorId
                 : options.Value.ProcessorId;
 
+            IMigrationProcessor foundProcessor;
             if (string.IsNullOrEmpty(processorId))
             {
                 // No generator selected
@@ -56,13 +61,35 @@ namespace FluentMigrator.Runner.Processors
                     throw new ProcessorFactoryNotFoundException("No migration processor registered.");
                 if (procs.Count > 1)
                     throw new ProcessorFactoryNotFoundException("More than one processor registered, but no processor id given. Specify the processor id by configuring SelectingProcessorAccessorOptions.");
-                Processor = procs.Single();
+                foundProcessor = procs.Single();
+                //(Processor as ProcessorBase).Generator
             }
             else
             {
                 // One of multiple generators
-                Processor = FindGenerator(procs, processorId);
+                foundProcessor = FindGenerator(procs, processorId);
             }
+
+            // Special handling when no connection string could be found
+            var connectionStringAccessor = serviceProvider.GetRequiredService<IConnectionStringAccessor>();
+            var connectionString = connectionStringAccessor.ConnectionString;
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                if (foundProcessor is ProcessorBase processorBase)
+                {
+                    var databaseIds = new List<string>() { processorBase.DatabaseType };
+                    databaseIds.AddRange(processorBase.DatabaseTypeAliases);
+
+                    var processorOptions = serviceProvider.GetRequiredService<IOptions<ProcessorOptions>>();
+                    foundProcessor = new ConnectionlessProcessor(
+                        new PassThroughGeneratorAccessor(processorBase.Generator),
+                        serviceProvider.GetRequiredService<IAnnouncer>(),
+                        processorOptions,
+                        databaseIds);
+                }
+            }
+
+            Processor = foundProcessor;
         }
 
         /// <inheritdoc />
@@ -90,6 +117,17 @@ namespace FluentMigrator.Runner.Processors
 
             var generatorNames = string.Join(", ", processors.Select(p => p.DatabaseType).Union(processors.SelectMany(p => p.DatabaseTypeAliases)));
             throw new ProcessorFactoryNotFoundException($@"A migration generator with the ID {processorsId} couldn't be found. Available generators are: {generatorNames}");
+        }
+
+        private class PassThroughGeneratorAccessor : IGeneratorAccessor
+        {
+            public PassThroughGeneratorAccessor(IMigrationGenerator generator)
+            {
+                Generator = generator;
+            }
+
+            /// <inheritdoc />
+            public IMigrationGenerator Generator { get; }
         }
     }
 }

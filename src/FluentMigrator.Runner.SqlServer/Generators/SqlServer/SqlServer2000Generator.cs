@@ -25,6 +25,10 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators.Generic;
 using FluentMigrator.SqlServer;
 
+using JetBrains.Annotations;
+
+using Microsoft.Extensions.Options;
+
 namespace FluentMigrator.Runner.Generators.SqlServer
 {
     public class SqlServer2000Generator : GenericGenerator
@@ -34,13 +38,25 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         {
         }
 
-        public SqlServer2000Generator(SqlServer2000Quoter quoter)
-            : this(new SqlServer2000Column(new SqlServer2000TypeMap(), quoter), quoter, new EmptyDescriptionGenerator())
+        public SqlServer2000Generator(
+            [NotNull] SqlServer2000Quoter quoter)
+            : this(quoter, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()))
         {
         }
 
-        protected SqlServer2000Generator(IColumn column, IQuoter quoter, IDescriptionGenerator descriptionGenerator)
-            : base(column, quoter, descriptionGenerator)
+        public SqlServer2000Generator(
+            [NotNull] SqlServer2000Quoter quoter,
+            [NotNull] IOptions<GeneratorOptions> generatorOptions)
+            : this(new SqlServer2000Column(new SqlServer2000TypeMap(), quoter), quoter, new EmptyDescriptionGenerator(), generatorOptions)
+        {
+        }
+
+        protected SqlServer2000Generator(
+            [NotNull] IColumn column,
+            [NotNull] IQuoter quoter,
+            [NotNull] IDescriptionGenerator descriptionGenerator,
+            [NotNull] IOptions<GeneratorOptions> generatorOptions)
+            : base(column, quoter, descriptionGenerator, generatorOptions)
         {
         }
 
@@ -183,12 +199,12 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override string Generate(CreateSequenceExpression expression)
         {
-            return CompatabilityMode.HandleCompatabilty("Sequences are not supported in SqlServer2000");
+            return CompatibilityMode.HandleCompatibilty("Sequences are not supported in SqlServer2000");
         }
 
         public override string Generate(DeleteSequenceExpression expression)
         {
-            return CompatabilityMode.HandleCompatabilty("Sequences are not supported in SqlServer2000");
+            return CompatibilityMode.HandleCompatibilty("Sequences are not supported in SqlServer2000");
         }
 
         public override string Generate(DeleteDefaultConstraintExpression expression)

@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2018, FluentMigrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,16 +14,21 @@
 // limitations under the License.
 #endregion
 
+using System;
+
+using FluentMigrator.Runner.BatchParser;
 using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.Runner.Processors.SqlServer;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace FluentMigrator.Runner
 {
     /// <summary>
     /// Extension methods for <see cref="IMigrationRunnerBuilder"/>
     /// </summary>
+    [CLSCompliant(false)]
     public static class SqlServerCeRunnerBuilderExtensions
     {
         /// <summary>
@@ -33,6 +38,8 @@ namespace FluentMigrator.Runner
         /// <returns>The migration runner builder</returns>
         public static IMigrationRunnerBuilder AddSqlServerCe(this IMigrationRunnerBuilder builder)
         {
+            builder.Services.TryAddScoped<SqlServer2000Quoter>();
+            builder.Services.TryAddTransient<SqlServerBatchParser>();
             builder.Services
                 .AddScoped<SqlServerCeDbFactory>()
                 .AddScoped<SqlServerCeProcessor>()

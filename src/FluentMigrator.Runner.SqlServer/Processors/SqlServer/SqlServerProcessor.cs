@@ -123,7 +123,10 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         public override void RollbackTransaction()
         {
             if (Transaction == null)
+            {
                 return;
+            }
+
             base.RollbackTransaction();
             Announcer.Sql("ROLLBACK TRANSACTION");
         }
@@ -173,7 +176,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public override bool DefaultValueExists(string schemaName, string tableName, string columnName, object defaultValue)
         {
-            string defaultValueAsString = string.Format("%{0}%", FormatHelper.FormatSqlEscape(defaultValue.ToString()));
+            var defaultValueAsString = string.Format("%{0}%", FormatHelper.FormatSqlEscape(defaultValue.ToString()));
             return Exists(DEFAULTVALUE_EXISTS, SafeSchemaName(schemaName),
                 FormatHelper.FormatSqlEscape(tableName),
                 FormatHelper.FormatSqlEscape(columnName), defaultValueAsString);
@@ -216,14 +219,15 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             Announcer.Sql(sql);
 
             if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
+            {
                 return;
+            }
 
             EnsureConnectionIsOpen();
 
             if (ContainsGo(sql))
             {
                 ExecuteBatchNonQuery(sql);
-
             }
             else
             {
@@ -273,11 +277,13 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             try
             {
                 var parser = _serviceProvider?.GetService<SqlServerBatchParser>() ?? new SqlServerBatchParser();
-                parser.SqlText += (sender, args) => { sqlBatch = args.SqlText.Trim(); };
+                parser.SqlText += (sender, args) => sqlBatch = args.SqlText.Trim();
                 parser.SpecialToken += (sender, args) =>
                 {
                     if (string.IsNullOrEmpty(sqlBatch))
+                    {
                         return;
+                    }
 
                     if (args.Opaque is GoSearcher.GoSearcherParameters goParams)
                     {
@@ -324,7 +330,9 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             Announcer.Say("Performing DB Operation");
 
             if (Options.PreviewOnly)
+            {
                 return;
+            }
 
             EnsureConnectionIsOpen();
 

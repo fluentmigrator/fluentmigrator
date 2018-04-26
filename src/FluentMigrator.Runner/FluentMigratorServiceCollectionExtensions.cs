@@ -122,7 +122,9 @@ namespace Microsoft.Extensions.DependencyInjection
                 // The connection string readers
 #if NETFRAMEWORK
                 .AddScoped<INetConfigManager, NetConfigManager>()
+#pragma warning disable 612
                 .AddScoped<IConnectionStringReader, AppConfigConnectionStringReader>()
+#pragma warning restore 612
 #endif
 
                 .AddScoped<IConnectionStringReader, ConfigurationConnectionStringReader>()
@@ -135,17 +137,7 @@ namespace Microsoft.Extensions.DependencyInjection
                     {
                         var options = sp.GetRequiredService<IOptions<RunnerOptions>>();
                         var connAccessor = sp.GetRequiredService<IConnectionStringAccessor>();
-                        bool hasConnection;
-                        try
-                        {
-                            hasConnection = !string.IsNullOrEmpty(connAccessor.ConnectionString);
-                        }
-                        catch
-                        {
-                            // Ignore exception
-                            hasConnection = false;
-                        }
-
+                        var hasConnection = !string.IsNullOrEmpty(connAccessor.ConnectionString);
                         if (options.Value.NoConnection || !hasConnection)
                         {
                             return ActivatorUtilities.CreateInstance<ConnectionlessVersionLoader>(sp);

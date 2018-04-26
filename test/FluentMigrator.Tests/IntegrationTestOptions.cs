@@ -74,7 +74,8 @@ namespace FluentMigrator.Tests
 
         public static DatabaseServerOptions Jet => GetOptions("Jet");
 
-        public static DatabaseServerOptions SqlLite => GetOptions("SQLite");
+        // ReSharper disable once InconsistentNaming
+        public static DatabaseServerOptions SQLite => GetOptions("SQLite");
 
         public static DatabaseServerOptions MySql => GetOptions("MySql");
 

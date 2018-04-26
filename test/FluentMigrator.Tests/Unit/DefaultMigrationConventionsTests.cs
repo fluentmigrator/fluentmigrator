@@ -18,6 +18,7 @@
 
 using System;
 using System.Linq;
+using System.Reflection;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
@@ -501,7 +502,9 @@ namespace FluentMigrator.Tests.Unit
                 null,
                 new ProcessorOptions(),
                 null);
-            var context = new MigrationContext(querySchema, (IAssemblyCollection)null, null, null);
+            var assemblyCollection = new Mock<IAssemblyCollection>();
+            assemblyCollection.SetupGet(c => c.Assemblies).Returns(new Assembly[0]);
+            var context = new MigrationContext(querySchema, assemblyCollection.Object, null, null);
             var expr = new ObsoleteAutoScriptMigrationFake();
             expr.GetUpExpressions(context);
 
@@ -529,7 +532,9 @@ namespace FluentMigrator.Tests.Unit
                 null,
                 new ProcessorOptions(),
                 null);
-            var context = new MigrationContext(querySchema, (IAssemblyCollection)null, null, null);
+            var assemblyCollection = new Mock<IAssemblyCollection>();
+            assemblyCollection.SetupGet(c => c.Assemblies).Returns(new Assembly[0]);
+            var context = new MigrationContext(querySchema, assemblyCollection.Object, null, null);
             var expr = new ObsoleteAutoScriptMigrationFake();
             expr.GetDownExpressions(context);
 

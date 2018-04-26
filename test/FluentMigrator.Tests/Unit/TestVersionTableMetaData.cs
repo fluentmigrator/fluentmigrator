@@ -16,8 +16,6 @@
 //
 #endregion
 
-using System;
-
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.VersionTableInfo;
 

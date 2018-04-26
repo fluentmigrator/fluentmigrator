@@ -16,43 +16,26 @@
 //
 #endregion
 
-using System.Data;
-
-using FluentMigrator.Runner.Announcers;
-using FluentMigrator.Runner.Generators.Oracle;
-using FluentMigrator.Runner.Processors;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.Oracle;
 using FluentMigrator.Tests.Helpers;
+
+using Microsoft.Extensions.DependencyInjection;
 
 using NUnit.Framework;
 
 using Shouldly;
 
-namespace FluentMigrator.Tests.Integration.Processors.Oracle {
+namespace FluentMigrator.Tests.Integration.Processors.Oracle
+{
     [Category("Integration")]
-    [Category("Oracle")]
     public abstract class OracleTableTestsBase : BaseTableTests
     {
         private const string SchemaName = "test";
-        private IDbConnection Connection { get; set; }
-        private OracleProcessor Processor { get; set; }
-        private IDbFactory Factory { get; set; }
 
-        protected void SetUp(IDbFactory dbFactory)
-        {
-            if (!IntegrationTestOptions.Oracle.IsEnabled)
-                Assert.Ignore();
-            Factory = dbFactory;
-            Connection = Factory.CreateConnection(IntegrationTestOptions.Oracle.ConnectionString);
-            Processor = new OracleProcessor(Connection, new OracleGenerator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), Factory);
-            Connection.Open();
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            Processor?.Dispose();
-        }
+        private ServiceProvider ServiceProvider { get; set; }
+        private IServiceScope ServiceScope { get; set; }
+        private OracleProcessorBase Processor { get; set; }
 
         [Test]
         public override void CallingTableExistsCanAcceptTableNameWithSingleQuote()
@@ -86,5 +69,43 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
             using (var table = new OracleTestTable(Processor, SchemaName, "id int"))
                 Processor.TableExists(SchemaName, table.Name).ShouldBeTrue();
         }
+
+        [OneTimeSetUp]
+        public void ClassSetUp()
+        {
+            if (!IntegrationTestOptions.Oracle.IsEnabled)
+                Assert.Ignore();
+
+            var serivces = AddOracleServices(ServiceCollectionExtensions.CreateServices())
+                .AddScoped<IConnectionStringReader>(
+                    _ => new PassThroughConnectionStringReader(IntegrationTestOptions.Oracle.ConnectionString));
+            ServiceProvider = serivces.BuildServiceProvider();
+        }
+
+        [OneTimeTearDown]
+        public void ClassTearDown()
+        {
+            ServiceProvider?.Dispose();
+        }
+
+        [SetUp]
+        public void SetUp()
+        {
+            ServiceScope = ServiceProvider.CreateScope();
+            Processor = ServiceScope.ServiceProvider.GetRequiredService<OracleManagedProcessor>();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            ServiceScope?.Dispose();
+        }
+
+        /// <summary>
+        /// Hook that needs to be implemented to add the Oracle services to the service collection
+        /// </summary>
+        /// <param name="services">The service collection</param>
+        /// <returns>The service collection</returns>
+        protected abstract IServiceCollection AddOracleServices(IServiceCollection services);
     }
 }

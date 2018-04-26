@@ -14,6 +14,10 @@
 // limitations under the License.
 #endregion
 
+using JetBrains.Annotations;
+
+using Microsoft.Extensions.Options;
+
 namespace FluentMigrator.Runner.Generators.SqlServer
 {
     public class SqlServer2014Generator : SqlServer2012Generator
@@ -23,13 +27,25 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         {
         }
 
-        public SqlServer2014Generator(SqlServer2008Quoter quoter)
-            : base(quoter)
+        public SqlServer2014Generator(
+            [NotNull] SqlServer2008Quoter quoter)
+            : base(quoter, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()))
         {
         }
 
-        protected SqlServer2014Generator(IColumn column, IQuoter quoter, IDescriptionGenerator descriptionGenerator)
-            :base(column, quoter, descriptionGenerator)
+        public SqlServer2014Generator(
+            [NotNull] SqlServer2008Quoter quoter,
+            [NotNull] IOptions<GeneratorOptions> generatorOptions)
+            : base(quoter, generatorOptions)
+        {
+        }
+
+        protected SqlServer2014Generator(
+            [NotNull] IColumn column,
+            [NotNull] IQuoter quoter,
+            [NotNull] IDescriptionGenerator descriptionGenerator,
+            [NotNull] IOptions<GeneratorOptions> generatorOptions)
+            : base(column, quoter, descriptionGenerator, generatorOptions)
         {
         }
     }

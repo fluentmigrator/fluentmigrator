@@ -14,6 +14,8 @@
 // limitations under the License.
 #endregion
 
+using Microsoft.Extensions.Options;
+
 namespace FluentMigrator.Runner.Generators.DB2.iSeries
 {
     public class Db2ISeriesGenerator : Db2Generator
@@ -23,8 +25,16 @@ namespace FluentMigrator.Runner.Generators.DB2.iSeries
         {
         }
 
-        public Db2ISeriesGenerator(Db2ISeriesQuoter quoter)
-            : base(quoter)
+        public Db2ISeriesGenerator(
+            Db2ISeriesQuoter quoter)
+            : this(quoter, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()))
+        {
+        }
+
+        public Db2ISeriesGenerator(
+            Db2ISeriesQuoter quoter,
+            IOptions<GeneratorOptions> generatorOptions)
+            : base(quoter, generatorOptions)
         {
         }
     }

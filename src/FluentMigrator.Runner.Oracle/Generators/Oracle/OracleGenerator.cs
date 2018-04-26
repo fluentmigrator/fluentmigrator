@@ -26,23 +26,34 @@ using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Generic;
 using FluentMigrator.Runner.Helpers;
 
+using JetBrains.Annotations;
+
+using Microsoft.Extensions.Options;
+
 namespace FluentMigrator.Runner.Generators.Oracle
 {
     public class OracleGenerator : GenericGenerator
     {
         public OracleGenerator()
-            : this(GetQuoter(false))
+            : this(false)
         {
         }
 
-        [Obsolete]
         public OracleGenerator(bool useQuotedIdentifiers)
             : this(GetQuoter(useQuotedIdentifiers))
         {
         }
 
-        public OracleGenerator(OracleQuoterBase quoter)
-            : base(new OracleColumn(quoter), quoter, new OracleDescriptionGenerator())
+        public OracleGenerator(
+            [NotNull] OracleQuoterBase quoter)
+            : this(quoter, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()))
+        {
+        }
+
+        public OracleGenerator(
+            [NotNull] OracleQuoterBase quoter,
+            [NotNull] IOptions<GeneratorOptions> generatorOptions)
+            : base(new OracleColumn(quoter), quoter, new OracleDescriptionGenerator(), generatorOptions)
         {
         }
 

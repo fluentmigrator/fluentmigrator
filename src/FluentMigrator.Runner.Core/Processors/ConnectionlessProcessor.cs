@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators;
@@ -58,6 +59,23 @@ namespace FluentMigrator.Runner.Processors
         {
             var generator = generatorAccessor.Generator;
             DatabaseType = string.IsNullOrEmpty(accessorOptions.Value.ProcessorId) ? generator.GetName() : accessorOptions.Value.ProcessorId;
+            Generator = generator;
+            Announcer = announcer;
+            Options = options.Value;
+#pragma warning disable 612
+            _legacyOptions = options.Value;
+#pragma warning restore 612
+        }
+
+        public ConnectionlessProcessor(
+            [NotNull] IGeneratorAccessor generatorAccessor,
+            [NotNull] IAnnouncer announcer,
+            [NotNull] IOptions<ProcessorOptions> options,
+            [NotNull] IReadOnlyCollection<string> processorIds)
+        {
+            var generator = generatorAccessor.Generator;
+            DatabaseType = processorIds.FirstOrDefault() ?? generator.GetName();
+            DatabaseTypeAliases = processorIds.Count == 0 ? Array.Empty<string>() : processorIds.Skip(1).ToArray();
             Generator = generator;
             Announcer = announcer;
             Options = options.Value;

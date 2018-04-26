@@ -23,16 +23,16 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         public override void CanAlterSchema()
         {
             var expression = GeneratorTestHelper.GetAlterSchemaExpression();
-            var currentCompatabilityMode = Generator.CompatabilityMode;
+            var currentCompatabilityMode = Generator.CompatibilityMode;
 
             try
             {
-                Generator.CompatabilityMode = Runner.CompatabilityMode.STRICT;
-                Shouldly.Should.Throw<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
+                Generator.CompatibilityMode = Runner.CompatibilityMode.STRICT;
+                Should.Throw<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
             }
             finally
             {
-                Generator.CompatabilityMode = currentCompatabilityMode;
+                Generator.CompatibilityMode = currentCompatabilityMode;
             }
         }
 

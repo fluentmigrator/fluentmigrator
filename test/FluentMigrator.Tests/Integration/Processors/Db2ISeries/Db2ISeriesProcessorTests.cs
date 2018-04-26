@@ -19,7 +19,6 @@
 using System.Diagnostics;
 
 using FluentMigrator.Runner;
-using FluentMigrator.Runner.Generators.DB2.iSeries;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.DB2.iSeries;
 using FluentMigrator.Tests.Helpers;

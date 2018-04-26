@@ -33,6 +33,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
             {
                 throw new ArgumentException("SQLite only supports identity on single integer, primary key coulmns");
             }
+
             return string.Empty;
         }
 
@@ -40,13 +41,15 @@ namespace FluentMigrator.Runner.Generators.SQLite
         {
             //If there are no identity column then we can add as a separate constrint
             var pkColDefs = primaryKeyColumns.ToList();
-            if (!pkColDefs.Any(x => x.IsIdentity) && pkColDefs.Any(x => x.IsPrimaryKey)) return true;
-            return false;
+            return !pkColDefs.Any(x => x.IsIdentity) && pkColDefs.Any(x => x.IsPrimaryKey);
         }
 
         protected override string FormatPrimaryKey(ColumnDefinition column)
         {
-            if (!column.IsPrimaryKey) return string.Empty;
+            if (!column.IsPrimaryKey)
+            {
+                return string.Empty;
+            }
 
             return column.IsIdentity ? "PRIMARY KEY AUTOINCREMENT" : string.Empty;
         }

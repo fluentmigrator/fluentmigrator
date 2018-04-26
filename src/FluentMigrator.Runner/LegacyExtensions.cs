@@ -23,7 +23,6 @@ using System.Reflection;
 
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Initialization.AssemblyLoader;
-using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.VersionTableInfo;
 
 using JetBrains.Annotations;
@@ -159,47 +158,6 @@ namespace FluentMigrator.Runner
             }
 
             return result;
-        }
-
-        /// <summary>
-        /// Returns <c>true</c> when the type is probably a FluentMigrator-owned class
-        /// </summary>
-        /// <param name="type">The type to check</param>
-        /// <returns><c>true</c> when the type is probably a FluentMigrator-owned class</returns>
-        public static bool IsFluentMigratorRunnerType(this Type type)
-        {
-            return type.Namespace != null && type.Namespace.StartsWith("FluentMigrator.Runner.", StringComparison.Ordinal);
-        }
-
-        /// <summary>
-        /// Gets the name for a given migration generator instance
-        /// </summary>
-        /// <param name="generator">The migration generator instance to get its name for</param>
-        /// <returns>The name of the migration generator</returns>
-        [NotNull]
-        public static string GetName([NotNull] this IMigrationGenerator generator)
-        {
-            return generator.GetType().Name.Replace("Generator", string.Empty);
-        }
-
-        /// <summary>
-        /// Gets a <see cref="ProcessorOptions"/> instance for a given <see cref="IMigrationProcessorOptions"/> implementation
-        /// </summary>
-        /// <param name="options">The instance to get the <see cref="ProcessorOptions"/> for</param>
-        /// <param name="connectionString">The connection string</param>
-        /// <returns>The found/created <see cref="ProcessorOptions"/></returns>
-        internal static ProcessorOptions GetProcessorOptions(this IMigrationProcessorOptions options, string connectionString)
-        {
-            if (options == null)
-                return null;
-
-            return options as ProcessorOptions ?? new ProcessorOptions()
-            {
-                ConnectionString = connectionString,
-                PreviewOnly = options.PreviewOnly,
-                ProviderSwitches = options.ProviderSwitches,
-                Timeout = options.Timeout == null ? null : (TimeSpan?) TimeSpan.FromSeconds(options.Timeout.Value),
-            };
         }
     }
 }

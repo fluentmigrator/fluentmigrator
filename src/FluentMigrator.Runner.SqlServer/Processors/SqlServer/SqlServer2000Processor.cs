@@ -110,7 +110,10 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         public override void RollbackTransaction()
         {
             if (Transaction == null)
+            {
                 return;
+            }
+
             base.RollbackTransaction();
             Announcer.Sql("ROLLBACK TRANSACTION");
         }
@@ -198,14 +201,15 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             Announcer.Sql(sql);
 
             if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
+            {
                 return;
+            }
 
             EnsureConnectionIsOpen();
 
             if (ContainsGo(sql))
             {
                 ExecuteBatchNonQuery(sql);
-
             }
             else
             {
@@ -256,11 +260,13 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             try
             {
                 var parser = _serviceProvider?.GetService<SqlServerBatchParser>() ?? new SqlServerBatchParser();
-                parser.SqlText += (sender, args) => { sqlBatch = args.SqlText.Trim(); };
+                parser.SqlText += (sender, args) => sqlBatch = args.SqlText.Trim();
                 parser.SpecialToken += (sender, args) =>
                 {
                     if (string.IsNullOrEmpty(sqlBatch))
+                    {
                         return;
+                    }
 
                     if (args.Opaque is GoSearcher.GoSearcherParameters goParams)
                     {

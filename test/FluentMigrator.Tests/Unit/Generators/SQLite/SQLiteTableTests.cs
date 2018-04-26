@@ -23,6 +23,8 @@ using FluentMigrator.Runner.Generators.SQLite;
 
 using Microsoft.Extensions.DependencyInjection;
 
+using Moq;
+
 using NUnit.Framework;
 
 using Shouldly;
@@ -323,7 +325,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         public void Issue804()
         {
             var serviceProvider = new ServiceCollection().BuildServiceProvider();
-            var context = new MigrationContext(null, serviceProvider, null, null);
+            var querySchema = new Mock<IQuerySchema>();
+            var context = new MigrationContext(querySchema.Object, serviceProvider, null, null);
 
             var expression = new CreateTableExpression()
             {
@@ -335,10 +338,12 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
                 .WithColumn("Id").AsInt32().NotNullable().PrimaryKey().Identity()
                 .WithColumn("FirstName").AsString(30).Nullable()
                 .WithColumn("FamilyName").AsString(50).NotNullable()
-                .WithColumn("Whatever1");
+                .WithColumn("Whatever1").AsString()
+                .WithColumn("Whatever2").AsString(50).Nullable()
+                .WithColumn("Whatever3").AsString();
 
             var result = Generator.Generate(expression);
-
+            result.ShouldBe("CREATE TABLE \"Contact\" (\"Id\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, \"FirstName\" TEXT, \"FamilyName\" TEXT NOT NULL, \"Whatever1\" TEXT NOT NULL, \"Whatever2\" TEXT, \"Whatever3\" TEXT NOT NULL)");
         }
     }
 }

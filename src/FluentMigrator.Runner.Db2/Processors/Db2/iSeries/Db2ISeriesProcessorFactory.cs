@@ -18,7 +18,10 @@
 
 using System;
 
+using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.DB2.iSeries;
+
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.DB2.iSeries
 {
@@ -43,7 +46,8 @@ namespace FluentMigrator.Runner.Processors.DB2.iSeries
             var factory = new Db2ISeriesDbFactory(_serviceProvider);
             var quoter = new Db2ISeriesQuoter();
             var connection = factory.CreateConnection(connectionString);
-            return new Db2ISeriesProcessor(connection, new Db2ISeriesGenerator(quoter), announcer, options, factory);
+            var generatorOptions = new OptionsWrapper<GeneratorOptions>(new GeneratorOptions());
+            return new Db2ISeriesProcessor(connection, new Db2ISeriesGenerator(quoter, generatorOptions), announcer, options, factory);
         }
     }
 }

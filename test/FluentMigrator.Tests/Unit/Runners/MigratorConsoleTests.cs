@@ -156,7 +156,10 @@ namespace FluentMigrator.Tests.Unit.Runners
         public void FileAnnouncerHasOutputToDefaultOutputFile()
         {
             var outputFileName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Target + ".sql");
-            if (File.Exists(outputFileName)) File.Delete(outputFileName);
+            if (File.Exists(outputFileName))
+            {
+                File.Delete(outputFileName);
+            }
 
             Assert.IsFalse(File.Exists(outputFileName));
 
@@ -177,7 +180,10 @@ namespace FluentMigrator.Tests.Unit.Runners
         public void FileAnnouncerHasOutputToSpecifiedOutputFile()
         {
             var outputFileName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "output.sql");
-            if (File.Exists(outputFileName)) File.Delete(outputFileName);
+            if (File.Exists(outputFileName))
+            {
+                File.Delete(outputFileName);
+            }
 
             Assert.IsFalse(File.Exists(outputFileName));
 

@@ -30,6 +30,7 @@ namespace FluentMigrator.Runner.Initialization.NetFramework
     /// <summary>
     /// A <see cref="IConnectionStringReader"/> implementation that uses the app or machine config
     /// </summary>
+    [Obsolete]
     public class AppConfigConnectionStringReader : IConnectionStringReader
     {
         private static readonly Regex _matchPwd = new Regex("(PWD=|PASSWORD=)([^;]*);", RegexOptions.IgnoreCase | RegexOptions.Compiled);

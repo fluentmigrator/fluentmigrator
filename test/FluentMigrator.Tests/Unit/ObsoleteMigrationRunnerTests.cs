@@ -18,7 +18,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 
@@ -167,7 +166,7 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void CanAnnounceUp()
         {
-            _announcer.Setup(x => x.Heading(It.IsRegex(containsAll("Test", "migrating"))));
+            _announcer.Setup(x => x.Heading(It.IsRegex(ContainsAll("Test", "migrating"))));
             _runner.Up(new TestMigration());
             _announcer.VerifyAll();
         }
@@ -175,7 +174,7 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void CanAnnounceUpFinish()
         {
-            _announcer.Setup(x => x.Say(It.IsRegex(containsAll("Test", "migrated"))));
+            _announcer.Setup(x => x.Say(It.IsRegex(ContainsAll("Test", "migrated"))));
             _runner.Up(new TestMigration());
             _announcer.VerifyAll();
         }
@@ -183,7 +182,7 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void CanAnnounceDown()
         {
-            _announcer.Setup(x => x.Heading(It.IsRegex(containsAll("Test", "reverting"))));
+            _announcer.Setup(x => x.Heading(It.IsRegex(ContainsAll("Test", "reverting"))));
             _runner.Down(new TestMigration());
             _announcer.VerifyAll();
         }
@@ -191,7 +190,7 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void CanAnnounceDownFinish()
         {
-            _announcer.Setup(x => x.Say(It.IsRegex(containsAll("Test", "reverted"))));
+            _announcer.Setup(x => x.Say(It.IsRegex(ContainsAll("Test", "reverted"))));
             _runner.Down(new TestMigration());
             _announcer.VerifyAll();
         }
@@ -235,7 +234,7 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void CanSayExpression()
         {
-            _announcer.Setup(x => x.Say(It.IsRegex(containsAll("CreateTable"))));
+            _announcer.Setup(x => x.Say(It.IsRegex(ContainsAll("CreateTable"))));
 
             _stopWatch.Setup(x => x.ElapsedTime()).Returns(new TimeSpan(0, 0, 0, 1, 3));
 
@@ -257,7 +256,7 @@ namespace FluentMigrator.Tests.Unit
             _announcer.VerifyAll();
         }
 
-        private string containsAll(params string[] words)
+        private static string ContainsAll(params string[] words)
         {
             return ".*?" + string.Join(".*?", words) + ".*?";
         }
@@ -266,7 +265,10 @@ namespace FluentMigrator.Tests.Unit
         public void LoadsCorrectCallingAssembly()
         {
             if (_runner.MigrationAssemblies == null)
+            {
                 throw new InvalidOperationException("MigrationAssemblies aren't set");
+            }
+
             var asm = _runner.MigrationAssemblies.Assemblies.Single();
             asm.ShouldBe(Assembly.GetAssembly(typeof(MigrationRunnerTests)));
         }
@@ -274,8 +276,8 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void HasMigrationsToApplyUpWhenThereAreMigrations()
         {
-            long fakeMigrationVersion1 = 2009010101;
-            long fakeMigrationVersion2 = 2009010102;
+            const long fakeMigrationVersion1 = 2009010101;
+            const long fakeMigrationVersion2 = 2009010102;
             LoadVersionData(fakeMigrationVersion1, fakeMigrationVersion2);
             _fakeVersionLoader.Versions.Remove(fakeMigrationVersion2);
             _fakeVersionLoader.LoadVersionInfo();
@@ -286,8 +288,8 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void HasMigrationsToApplyUpWhenThereAreNoNewMigrations()
         {
-            long fakeMigrationVersion1 = 2009010101;
-            long fakeMigrationVersion2 = 2009010102;
+            const long fakeMigrationVersion1 = 2009010101;
+            const long fakeMigrationVersion2 = 2009010102;
             LoadVersionData(fakeMigrationVersion1, fakeMigrationVersion2);
 
             _runner.HasMigrationsToApplyUp().ShouldBeFalse();
@@ -296,8 +298,8 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void HasMigrationsToApplyUpToSpecificVersionWhenTheSpecificHasNotBeenApplied()
         {
-            long fakeMigrationVersion1 = 2009010101;
-            long fakeMigrationVersion2 = 2009010102;
+            const long fakeMigrationVersion1 = 2009010101;
+            const long fakeMigrationVersion2 = 2009010102;
             LoadVersionData(fakeMigrationVersion1, fakeMigrationVersion2);
             _fakeVersionLoader.Versions.Remove(fakeMigrationVersion2);
             _fakeVersionLoader.LoadVersionInfo();
@@ -308,8 +310,8 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void HasMigrationsToApplyUpToSpecificVersionWhenTheSpecificHasBeenApplied()
         {
-            long fakeMigrationVersion1 = 2009010101;
-            long fakeMigrationVersion2 = 2009010102;
+            const long fakeMigrationVersion1 = 2009010101;
+            const long fakeMigrationVersion2 = 2009010102;
             LoadVersionData(fakeMigrationVersion1, fakeMigrationVersion2);
             _fakeVersionLoader.Versions.Remove(fakeMigrationVersion2);
             _fakeVersionLoader.LoadVersionInfo();
@@ -320,7 +322,7 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void HasMigrationsToApplyRollbackWithOneMigrationApplied()
         {
-            long fakeMigrationVersion1 = 2009010101;
+            const long fakeMigrationVersion1 = 2009010101;
             LoadVersionData(fakeMigrationVersion1);
 
             _runner.HasMigrationsToApplyRollback().ShouldBeTrue();
@@ -334,12 +336,11 @@ namespace FluentMigrator.Tests.Unit
             _runner.HasMigrationsToApplyRollback().ShouldBeFalse();
         }
 
-
         [Test]
         public void HasMigrationsToApplyDownWhenTheVersionHasNotBeenApplied()
         {
-            long fakeMigrationVersion1 = 2009010101;
-            long fakeMigrationVersion2 = 2009010102;
+            const long fakeMigrationVersion1 = 2009010101;
+            const long fakeMigrationVersion2 = 2009010102;
             LoadVersionData(fakeMigrationVersion1, fakeMigrationVersion2);
             _fakeVersionLoader.Versions.Remove(fakeMigrationVersion2);
             _fakeVersionLoader.LoadVersionInfo();
@@ -350,8 +351,8 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void HasMigrationsToApplyDownWhenTheVersionHasBeenApplied()
         {
-            long fakeMigrationVersion1 = 2009010101;
-            long fakeMigrationVersion2 = 2009010102;
+            const long fakeMigrationVersion1 = 2009010101;
+            const long fakeMigrationVersion2 = 2009010102;
             LoadVersionData(fakeMigrationVersion1, fakeMigrationVersion2);
 
             _runner.HasMigrationsToApplyDown(fakeMigrationVersion1).ShouldBeTrue();
@@ -360,8 +361,8 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void RollbackOnlyOneStepsOfTwoShouldNotDeleteVersionInfoTable()
         {
-            long fakeMigrationVersion = 2009010101;
-            long fakeMigrationVersion2 = 2009010102;
+            const long fakeMigrationVersion = 2009010101;
+            const long fakeMigrationVersion2 = 2009010102;
 
             Assert.NotNull(_runner.VersionLoader.VersionTableMetaData.TableName);
 
@@ -371,13 +372,12 @@ namespace FluentMigrator.Tests.Unit
             _runner.Rollback(1);
 
             _fakeVersionLoader.DidRemoveVersionTableGetCalled.ShouldBeFalse();
-
         }
 
         [Test]
         public void RollbackLastVersionShouldDeleteVersionInfoTable()
         {
-            long fakeMigrationVersion = 2009010101;
+            const long fakeMigrationVersion = 2009010101;
 
             LoadVersionData(fakeMigrationVersion);
 
@@ -396,7 +396,6 @@ namespace FluentMigrator.Tests.Unit
             _runner.RollbackToVersion(0);
 
             _fakeVersionLoader.DidRemoveVersionTableGetCalled.ShouldBeTrue();
-
         }
 
         [Test]
@@ -564,7 +563,7 @@ namespace FluentMigrator.Tests.Unit
             var exception = Assert.Throws<VersionOrderInvalidException>(() => _runner.ValidateVersionOrder());
 
             var invalidMigrations = exception.InvalidMigrations.ToList();
-            invalidMigrations.Count().ShouldBe(2);
+            invalidMigrations.Count.ShouldBe(2);
             invalidMigrations.Select(x => x.Key).ShouldContain(version2);
             invalidMigrations.Select(x => x.Key).ShouldContain(version3);
 

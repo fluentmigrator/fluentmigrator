@@ -20,6 +20,7 @@ using FluentMigrator.Runner.Processors.DotConnectOracle;
 using FluentMigrator.Runner.Processors.Oracle;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner
@@ -36,9 +37,11 @@ namespace FluentMigrator.Runner
         /// <returns>The migration runner builder</returns>
         public static IMigrationRunnerBuilder AddOracle(this IMigrationRunnerBuilder builder)
         {
+            builder.Services.TryAddScoped<OracleGenerator>();
             builder.Services
                 .AddScoped<OracleDbFactory>()
                 .AddScoped<OracleProcessor>()
+                .AddScoped<OracleProcessorBase>(sp => sp.GetRequiredService<OracleProcessor>())
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<OracleProcessor>())
                 .AddScoped<OracleQuoterBase>(
                     sp =>
@@ -48,7 +51,6 @@ namespace FluentMigrator.Runner
                             return new OracleQuoterQuotedIdentifier();
                         return new OracleQuoter();
                     })
-                .AddScoped<OracleGenerator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<OracleGenerator>());
             return builder;
         }
@@ -60,9 +62,11 @@ namespace FluentMigrator.Runner
         /// <returns>The migration runner builder</returns>
         public static IMigrationRunnerBuilder AddOracleManaged(this IMigrationRunnerBuilder builder)
         {
+            builder.Services.TryAddScoped<OracleGenerator>();
             builder.Services
                 .AddScoped<OracleManagedDbFactory>()
                 .AddScoped<OracleManagedProcessor>()
+                .AddScoped<OracleProcessorBase>(sp => sp.GetRequiredService<OracleManagedProcessor>())
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<OracleManagedProcessor>())
                 .AddScoped<OracleQuoterBase>(
                     sp =>
@@ -72,7 +76,6 @@ namespace FluentMigrator.Runner
                             return new OracleQuoterQuotedIdentifier();
                         return new OracleQuoter();
                     })
-                .AddScoped<OracleGenerator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<OracleGenerator>());
             return builder;
         }
@@ -84,6 +87,7 @@ namespace FluentMigrator.Runner
         /// <returns>The migration runner builder</returns>
         public static IMigrationRunnerBuilder AddDotConnectOracle(this IMigrationRunnerBuilder builder)
         {
+            builder.Services.TryAddScoped<OracleGenerator>();
             builder.Services
                 .AddScoped<DotConnectOracleDbFactory>()
                 .AddScoped<DotConnectOracleProcessor>()
@@ -96,7 +100,6 @@ namespace FluentMigrator.Runner
                             return new OracleQuoterQuotedIdentifier();
                         return new OracleQuoter();
                     })
-                .AddScoped<OracleGenerator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<OracleGenerator>());
             return builder;
         }

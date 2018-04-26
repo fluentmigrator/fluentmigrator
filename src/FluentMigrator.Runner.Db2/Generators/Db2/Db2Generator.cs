@@ -6,6 +6,8 @@ using System.Text;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Generic;
 
+using Microsoft.Extensions.Options;
+
 namespace FluentMigrator.Runner.Generators.DB2
 {
     public class Db2Generator : GenericGenerator
@@ -14,8 +16,19 @@ namespace FluentMigrator.Runner.Generators.DB2
             : this(new Db2Quoter())
         {
         }
-        public Db2Generator(Db2Quoter quoter)
-            : base(new Db2Column(quoter), quoter, new EmptyDescriptionGenerator())
+
+        public Db2Generator(
+            Db2Quoter quoter)
+            : this(
+                quoter,
+                new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()))
+        {
+        }
+
+        public Db2Generator(
+            Db2Quoter quoter,
+            IOptions<GeneratorOptions> generatorOptions)
+            : base(new Db2Column(quoter), quoter, new EmptyDescriptionGenerator(), generatorOptions)
         {
         }
 
@@ -213,7 +226,7 @@ namespace FluentMigrator.Runner.Generators.DB2
 
         public override string Generate(Expressions.RenameColumnExpression expression)
         {
-            return CompatabilityMode.HandleCompatabilty("This feature not directly supported by most versions of DB2.");
+            return CompatibilityMode.HandleCompatibilty("This feature not directly supported by most versions of DB2.");
         }
 
         public override string Generate(Expressions.InsertDataExpression expression)
@@ -284,12 +297,12 @@ namespace FluentMigrator.Runner.Generators.DB2
             }
             catch (NotSupportedException e)
             {
-                return CompatabilityMode.HandleCompatabilty(e.Message);
+                return CompatibilityMode.HandleCompatibilty(e.Message);
             }
         }
         public override string Generate(Expressions.AlterSchemaExpression expression)
         {
-            return CompatabilityMode.HandleCompatabilty("This feature not directly supported by most versions of DB2.");
+            return CompatibilityMode.HandleCompatibilty("This feature not directly supported by most versions of DB2.");
         }
     }
 }

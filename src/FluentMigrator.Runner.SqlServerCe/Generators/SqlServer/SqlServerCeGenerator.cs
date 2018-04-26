@@ -22,6 +22,10 @@ using System.Linq;
 using FluentMigrator.Exceptions;
 using FluentMigrator.Expressions;
 
+using JetBrains.Annotations;
+
+using Microsoft.Extensions.Options;
+
 namespace FluentMigrator.Runner.Generators.SqlServer
 {
     public class SqlServerCeGenerator : SqlServer2000Generator
@@ -32,7 +36,14 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         }
 
         public SqlServerCeGenerator(SqlServer2000Quoter quoter)
-            : base(new SqlServerCeColumn(new SqlServerCeTypeMap(), quoter), quoter, new EmptyDescriptionGenerator())
+            : this(quoter, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()))
+        {
+        }
+
+        public SqlServerCeGenerator(
+            [NotNull] SqlServer2000Quoter quoter,
+            [NotNull] IOptions<GeneratorOptions> generatorOptions)
+            : base(new SqlServerCeColumn(new SqlServerCeTypeMap(), quoter), quoter, new EmptyDescriptionGenerator(), generatorOptions)
         {
         }
 

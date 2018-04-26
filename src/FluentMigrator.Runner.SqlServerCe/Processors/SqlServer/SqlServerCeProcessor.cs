@@ -22,21 +22,23 @@ using System.Diagnostics;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.BatchParser;
-using FluentMigrator.Runner.BatchParser.RangeSearchers;
 using FluentMigrator.Runner.BatchParser.Sources;
-using FluentMigrator.Runner.BatchParser.SpecialTokenSearchers;
 using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.Runner.Helpers;
 using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
     public sealed class SqlServerCeProcessor : GenericProcessorBase
     {
+        [CanBeNull]
+        private readonly IServiceProvider _serviceProvider;
+
         public override string DatabaseType => "SqlServerCe";
 
         public override IList<string> DatabaseTypeAliases { get; } = new List<string> { "SqlServer" };
@@ -52,9 +54,11 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             [NotNull] SqlServerCeGenerator generator,
             [NotNull] IAnnouncer announcer,
             [NotNull] IOptions<ProcessorOptions> options,
-            [NotNull] IConnectionStringAccessor connectionStringAccessor)
+            [NotNull] IConnectionStringAccessor connectionStringAccessor,
+            [NotNull] IServiceProvider serviceProvider)
             : base(() => factory.Factory, generator, announcer, options.Value, connectionStringAccessor)
         {
+            _serviceProvider = serviceProvider;
         }
 
         public override bool SchemaExists(string schemaName)
@@ -163,30 +167,13 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         {
             var sqlStatements = new List<string>();
 
-            // The default range searchers
-            var rangeSearchers = new List<IRangeSearcher>
-            {
-                new MultiLineComment(),
-                new DoubleDashSingleLineComment(),
-                new PoundSignSingleLineComment(),
-                new SqlString(),
-                new SqlServerIdentifier(),
-            };
-
-            // The special token searchers
-            var specialTokenSearchers = new List<ISpecialTokenSearcher>()
-            {
-                new GoSearcher(),
-                new SemicolonSearcher(),
-            };
-
-            var parser = new SqlBatchParser(rangeSearchers, specialTokenSearchers);
+            var parser = _serviceProvider?.GetService<SqlServerBatchParser>() ?? new SqlServerBatchParser();
             parser.SqlText += (sender, args) =>
             {
                 var content = args.SqlText.Trim();
                 if (!string.IsNullOrEmpty(content))
                 {
-                    sqlStatements.Add(content + ";");
+                    sqlStatements.Add(content);
                 }
             };
 

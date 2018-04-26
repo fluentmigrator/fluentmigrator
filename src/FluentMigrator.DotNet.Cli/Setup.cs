@@ -16,7 +16,6 @@
 
 using System;
 using System.Linq;
-using System.Threading;
 
 using AutoMapper;
 
@@ -35,7 +34,7 @@ using Microsoft.Extensions.Logging;
 
 namespace FluentMigrator.DotNet.Cli
 {
-    public class Setup
+    public static class Setup
     {
         public static IServiceProvider BuildServiceProvider(MigratorOptions options, IConsole console)
         {
@@ -86,8 +85,10 @@ namespace FluentMigrator.DotNet.Cli
                 .AddScoped<TaskExecutor, LateInitTaskExecutor>()
                 .Configure<SelectingProcessorAccessorOptions>(opt => opt.ProcessorId = options.ProcessorType)
                 .Configure<AssemblySourceOptions>(opt => opt.AssemblyNames = options.TargetAssemblies.ToArray())
+#pragma warning disable 612
                 .Configure<AppConfigConnectionStringAccessorOptions>(
                     opt => opt.ConnectionStringConfigPath = options.ConnectionStringConfigPath)
+#pragma warning restore 612
                 .Configure<TypeFilterOptions>(
                     opt =>
                     {
@@ -150,10 +151,7 @@ namespace FluentMigrator.DotNet.Cli
 
         private static IMapper ConfigureMapper()
         {
-            var mapperConfig = new MapperConfiguration(cfg =>
-            {
-                cfg.CreateMap<MigratorOptions, MigratorOptions>();
-            });
+            var mapperConfig = new MapperConfiguration(cfg => cfg.CreateMap<MigratorOptions, MigratorOptions>());
             mapperConfig.AssertConfigurationIsValid();
             return new Mapper(mapperConfig);
         }

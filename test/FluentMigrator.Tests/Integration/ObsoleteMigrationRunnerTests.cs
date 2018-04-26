@@ -1006,7 +1006,7 @@ namespace FluentMigrator.Tests.Integration
         public void ValidateVersionOrderShouldDoNothingIfUnappliedMigrationVersionIsGreaterThanLatestAppliedMigration()
         {
 
-            // Using SqlServer instead of SqlLite as versions not deleted from VersionInfo table when using Sqlite.
+            // Using SqlServer instead of SQLite as versions not deleted from VersionInfo table when using Sqlite.
             var excludedProcessors = new[] { typeof(SQLiteProcessor), typeof(MySqlProcessor), typeof(PostgresProcessor) };
 
             var assembly = typeof(Migrations.Interleaved.Pass3.User).Assembly;
@@ -1051,7 +1051,7 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlAnywhere16")]
         public void ValidateVersionOrderShouldThrowExceptionIfUnappliedMigrationVersionIsLessThanLatestAppliedMigration()
         {
-            // Using SqlServer instead of SqlLite as versions not deleted from VersionInfo table when using Sqlite.
+            // Using SqlServer instead of SQLite as versions not deleted from VersionInfo table when using Sqlite.
             var excludedProcessors = new[] { typeof(MySqlProcessor), typeof(SQLiteProcessor) };
 
             var assembly = typeof(Migrations.Interleaved.Pass3.User).Assembly;

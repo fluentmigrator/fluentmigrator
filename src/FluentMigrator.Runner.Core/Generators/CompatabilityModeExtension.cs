@@ -16,12 +16,16 @@
 //
 #endregion
 
+using System;
+
 using FluentMigrator.Exceptions;
 
 namespace FluentMigrator.Runner.Generators
 {
+    [Obsolete]
     public static class CompatabilityModeExtension
     {
+        [Obsolete]
         public static string HandleCompatabilty(this CompatabilityMode mode, string message)
         {
             if (CompatabilityMode.STRICT == mode)

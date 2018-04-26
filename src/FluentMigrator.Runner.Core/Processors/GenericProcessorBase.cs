@@ -92,10 +92,11 @@ namespace FluentMigrator.Runner.Processors
                 {
                     if (DbProviderFactory == null)
                         return null;
-                    Connection = DbProviderFactory.CreateConnection();
-                    Debug.Assert(Connection != null, nameof(Connection) + " != null");
-                    Connection.ConnectionString = connectionString;
-                    return Connection;
+                    var connection = DbProviderFactory.CreateConnection();
+                    Debug.Assert(connection != null, nameof(Connection) + " != null");
+                    connection.ConnectionString = connectionString;
+                    connection.Open();
+                    return connection;
                 });
         }
 

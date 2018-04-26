@@ -16,18 +16,22 @@
 //
 #endregion
 
-using FluentMigrator.Runner.Processors.Oracle;
+using FluentMigrator.Runner;
+
+using Microsoft.Extensions.DependencyInjection;
 
 using NUnit.Framework;
 
-namespace FluentMigrator.Tests.Integration.Processors.Oracle
+namespace FluentMigrator.Tests.Integration.Processors.Oracle.OracleManaged
 {
     [TestFixture]
-    [Category( "Integration" )]
-    public class OracleIndexTests : OracleIndexTestsBase {
-        [SetUp]
-        public void SetUp( ) {
-            base.SetUp( new OracleDbFactory(serviceProvider: null) );
+    [Category("OracleManaged")]
+    public class OracleManagedColumnTests : OracleColumnTestsBase
+    {
+        /// <inheritdoc />
+        protected override IServiceCollection AddOracleServices(IServiceCollection services)
+        {
+            return services.ConfigureRunner(r => r.AddOracleManaged());
         }
     }
 }

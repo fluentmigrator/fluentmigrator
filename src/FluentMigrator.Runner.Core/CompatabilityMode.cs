@@ -16,8 +16,11 @@
 //
 #endregion
 
+using System;
+
 namespace FluentMigrator.Runner
 {
+    [Obsolete("Use CompatibilityMode instead")]
     public enum CompatabilityMode
     {
         STRICT,

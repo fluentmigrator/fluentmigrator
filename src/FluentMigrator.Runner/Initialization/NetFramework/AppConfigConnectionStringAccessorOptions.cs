@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2018, FluentMigrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,8 +22,9 @@ namespace FluentMigrator.Runner.Initialization.NetFramework
 {
 #pragma warning disable 1584,1711,1572,1581,1580
     /// <summary>
-    /// Options for the <see cref="AppConfigConnectionStringReader"/>
+    /// Options for the <c>AppConfigConnectionStringReader</c>
     /// </summary>
+    [Obsolete]
     public class AppConfigConnectionStringAccessorOptions
     {
         /// <summary>

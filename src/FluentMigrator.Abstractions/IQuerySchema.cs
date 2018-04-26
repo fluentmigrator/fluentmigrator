@@ -18,6 +18,8 @@
 
 using System.Collections.Generic;
 
+using JetBrains.Annotations;
+
 namespace FluentMigrator
 {
     /// <summary>
@@ -28,11 +30,13 @@ namespace FluentMigrator
         /// <summary>
         /// Gets the database type
         /// </summary>
+        [NotNull]
         string DatabaseType { get; }
 
         /// <summary>
         /// Gets the database type aliases
         /// </summary>
+        [NotNull, ItemNotNull]
         IList<string> DatabaseTypeAliases { get; }
 
         /// <summary>
@@ -40,7 +44,7 @@ namespace FluentMigrator
         /// </summary>
         /// <param name="schemaName">The schema name</param>
         /// <returns><c>true</c> when it exists</returns>
-        bool SchemaExists(string schemaName);
+        bool SchemaExists([NotNull] string schemaName);
 
         /// <summary>
         /// Tests if the table exists
@@ -48,7 +52,7 @@ namespace FluentMigrator
         /// <param name="schemaName">The schema name</param>
         /// <param name="tableName">The table name</param>
         /// <returns><c>true</c> when it exists</returns>
-        bool TableExists(string schemaName, string tableName);
+        bool TableExists([CanBeNull] string schemaName, [NotNull] string tableName);
 
         /// <summary>
         /// Tests if a column exists
@@ -57,7 +61,7 @@ namespace FluentMigrator
         /// <param name="tableName">The table name</param>
         /// <param name="columnName">The column name</param>
         /// <returns><c>true</c> when it exists</returns>
-        bool ColumnExists(string schemaName, string tableName, string columnName);
+        bool ColumnExists([CanBeNull] string schemaName, [NotNull] string tableName, [NotNull] string columnName);
 
         /// <summary>
         /// Tests if a constraint exists
@@ -66,7 +70,7 @@ namespace FluentMigrator
         /// <param name="tableName">The table name</param>
         /// <param name="constraintName">The constraint name</param>
         /// <returns><c>true</c> when it exists</returns>
-        bool ConstraintExists(string schemaName, string tableName, string constraintName);
+        bool ConstraintExists([CanBeNull] string schemaName, [NotNull] string tableName, [NotNull] string constraintName);
 
         /// <summary>
         /// Tests if an index exists
@@ -75,7 +79,7 @@ namespace FluentMigrator
         /// <param name="tableName">The table name</param>
         /// <param name="indexName">The index name</param>
         /// <returns><c>true</c> when it exists</returns>
-        bool IndexExists(string schemaName, string tableName, string indexName);
+        bool IndexExists([CanBeNull] string schemaName, [NotNull] string tableName, [NotNull] string indexName);
 
         /// <summary>
         /// Tests if a sequence exists
@@ -83,7 +87,7 @@ namespace FluentMigrator
         /// <param name="schemaName">The schema name</param>
         /// <param name="sequenceName">The sequence name</param>
         /// <returns><c>true</c> when it exists</returns>
-        bool SequenceExists(string schemaName, string sequenceName);
+        bool SequenceExists([CanBeNull] string schemaName, [NotNull] string sequenceName);
 
         /// <summary>
         /// Tests if a default value for a column exists
@@ -93,6 +97,6 @@ namespace FluentMigrator
         /// <param name="columnName">The column name</param>
         /// <param name="defaultValue">The default value</param>
         /// <returns><c>true</c> when it exists</returns>
-        bool DefaultValueExists(string schemaName, string tableName, string columnName, object defaultValue);
+        bool DefaultValueExists([CanBeNull] string schemaName, [NotNull] string tableName, [NotNull] string columnName, object defaultValue);
     }
 }

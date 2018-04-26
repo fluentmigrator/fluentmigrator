@@ -76,18 +76,18 @@ namespace FluentMigrator.Runner.Initialization
         private static IEnumerable<IConnectionStringReader> CreateAccessors(string assemblyLocation, IAnnouncer announcer, string configPath)
         {
 #if NETFRAMEWORK
+#pragma warning disable 612
             var options = new AppConfigConnectionStringAccessorOptions()
             {
                 ConnectionStringConfigPath = configPath,
             };
 
-#pragma warning disable 612
             yield return new AppConfigConnectionStringReader(
-#pragma warning restore 612
                 new NetConfigManager(),
                 assemblyLocation,
                 announcer,
                 new OptionsWrapper<AppConfigConnectionStringAccessorOptions>(options));
+#pragma warning restore 612
 #else
             yield break;
 #endif

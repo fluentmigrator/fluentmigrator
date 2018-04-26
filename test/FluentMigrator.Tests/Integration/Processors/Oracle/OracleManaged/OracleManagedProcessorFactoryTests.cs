@@ -16,19 +16,23 @@
 //
 #endregion
 
+using System;
+
 using FluentMigrator.Runner.Processors.Oracle;
 
 using NUnit.Framework;
 
-namespace FluentMigrator.Tests.Integration.Processors.Oracle
+namespace FluentMigrator.Tests.Integration.Processors.Oracle.OracleManaged
 {
     [TestFixture]
-    [Category( "Integration" )]
-    public class OracleProcessorFactoryTests : OracleProcessorFactoryTestsBase {
+    [Category("OracleManaged")]
+    [Obsolete]
+    public class OracleManagedProcessorFactoryTests : OracleProcessorFactoryTestsBase
+    {
         [SetUp]
         public void SetUp()
         {
-            base.SetUp( new OracleProcessorFactory(serviceProvider: null) );
+            base.SetUp(new OracleManagedProcessorFactory(serviceProvider: null));
         }
     }
 }

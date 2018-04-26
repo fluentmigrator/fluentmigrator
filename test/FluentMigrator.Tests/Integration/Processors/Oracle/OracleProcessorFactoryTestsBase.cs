@@ -16,6 +16,8 @@
 //
 #endregion
 
+using System;
+
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators.Oracle;
@@ -24,9 +26,10 @@ using FluentMigrator.Runner.Processors.Oracle;
 
 using NUnit.Framework;
 
-namespace FluentMigrator.Tests.Integration.Processors.Oracle {
-    [Category( "Integration" )]
-    [Category("Oracle")]
+namespace FluentMigrator.Tests.Integration.Processors.Oracle
+{
+    [Category("Integration")]
+    [Obsolete]
     public abstract class OracleProcessorFactoryTestsBase
     {
         private IMigrationProcessorFactory _factory;
@@ -50,7 +53,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
         {
             _options.ProviderSwitches = providerSwitches;
             var processor = _factory.Create(_connectionString, _announcer, _options);
-            Assert.That(((OracleProcessor)processor).Quoter, Is.InstanceOf<OracleQuoter>());
+            Assert.That(((OracleProcessor) processor).Quoter, Is.InstanceOf<OracleQuoter>());
         }
 
         [TestCase("QuotedIdentifiers=true")]
@@ -59,11 +62,12 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
         [TestCase("QuotedIdentifiers=true;somethingelse=1")]
         [TestCase("somethingelse=1;QuotedIdentifiers=true")]
         [TestCase("somethingelse=1;QuotedIdentifiers=true;sometingOther='special thingy'")]
-        public void CreateProcessorWithProviderSwitchIndicatingQuotedShouldUseOracleQuoterQuotedIdentifier(string providerSwitches)
+        public void CreateProcessorWithProviderSwitchIndicatingQuotedShouldUseOracleQuoterQuotedIdentifier(
+            string providerSwitches)
         {
             _options.ProviderSwitches = providerSwitches;
             var processor = _factory.Create(_connectionString, _announcer, _options);
-            Assert.That(((OracleProcessor)processor).Quoter, Is.InstanceOf<OracleQuoterQuotedIdentifier>());
+            Assert.That(((OracleProcessor) processor).Quoter, Is.InstanceOf<OracleQuoterQuotedIdentifier>());
         }
     }
 }

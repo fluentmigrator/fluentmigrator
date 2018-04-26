@@ -28,7 +28,7 @@ namespace FluentMigrator.Runner.Generators.Base
         private readonly ITypeMap _typeMap;
         protected IList<Func<ColumnDefinition, string>> ClauseOrder { get; set; }
 
-        public ColumnBase(ITypeMap typeMap, IQuoter quoter)
+        protected ColumnBase(ITypeMap typeMap, IQuoter quoter)
         {
             _typeMap = typeMap;
             Quoter = quoter;
@@ -52,32 +52,38 @@ namespace FluentMigrator.Runner.Generators.Base
         protected virtual string FormatType(ColumnDefinition column)
         {
             if (!column.Type.HasValue)
+            {
                 return column.CustomType;
+            }
 
             return GetTypeMap(column.Type.Value, column.Size, column.Precision);
         }
 
         protected virtual string FormatNullable(ColumnDefinition column)
         {
-            if (column.IsNullable.HasValue && column.IsNullable.Value) {
+            if (column.IsNullable ?? false)
+            {
                 return string.Empty;
             }
-            else {
-                return "NOT NULL";
-            }
+
+            return "NOT NULL";
         }
 
         protected virtual string FormatDefaultValue(ColumnDefinition column)
         {
             if (column.DefaultValue is ColumnDefinition.UndefinedDefaultValue)
+            {
                 return string.Empty;
+            }
 
             // see if this is for a system method
             if (column.DefaultValue is SystemMethods methods)
             {
-                string method = Quoter.QuoteValue(methods);
+                var method = Quoter.QuoteValue(methods);
                 if (string.IsNullOrEmpty(method))
+                {
                     return string.Empty;
+                }
 
                 return "DEFAULT " + method;
             }
@@ -107,7 +113,7 @@ namespace FluentMigrator.Runner.Generators.Base
 
         public virtual string FormatCascade(string onWhat, Rule rule)
         {
-            string action = "NO ACTION";
+            var action = "NO ACTION";
             switch (rule)
             {
                 case Rule.None:
@@ -138,12 +144,12 @@ namespace FluentMigrator.Runner.Generators.Base
                 throw new ArgumentException("Number of primary columns and secondary columns must be equal");
             }
 
-            string constraintName = string.IsNullOrEmpty(foreignKey.Name)
+            var constraintName = string.IsNullOrEmpty(foreignKey.Name)
                 ? fkNameGeneration(foreignKey)
                 : foreignKey.Name;
 
-            List<string> primaryColumns = new List<string>();
-            List<string> foreignColumns = new List<string>();
+            var primaryColumns = new List<string>();
+            var foreignColumns = new List<string>();
             foreach (var column in foreignKey.PrimaryColumns)
             {
                 primaryColumns.Add(Quoter.QuoteColumnName(column));
@@ -175,9 +181,11 @@ namespace FluentMigrator.Runner.Generators.Base
 
             foreach (var action in ClauseOrder)
             {
-                string clause = action(column);
+                var clause = action(column);
                 if (!string.IsNullOrEmpty(clause))
+                {
                     clauses.Add(clause);
+                }
             }
 
             return string.Join(" ", clauses.ToArray());
@@ -185,19 +193,19 @@ namespace FluentMigrator.Runner.Generators.Base
 
         public virtual string Generate(IEnumerable<ColumnDefinition> columns, string tableName)
         {
-            string primaryKeyString = string.Empty;
+            var primaryKeyString = string.Empty;
 
             //if more than one column is a primary key or the primary key is given a name, then it needs to be added separately
 
             //CAUTION: this must execute before we set the values of primarykey to false; Beware of yield return
             var colDefs = columns.ToList();
-            IEnumerable<ColumnDefinition> primaryKeyColumns = colDefs.Where(x => x.IsPrimaryKey);
+            var primaryKeyColumns = colDefs.Where(x => x.IsPrimaryKey);
 
             var pkColDefs = primaryKeyColumns.ToList();
             if (ShouldPrimaryKeysBeAddedSeparately(pkColDefs))
             {
                 primaryKeyString = AddPrimaryKeyConstraint(tableName, pkColDefs);
-                foreach (ColumnDefinition column in colDefs) { column.IsPrimaryKey = false; }
+                foreach (var column in colDefs) { column.IsPrimaryKey = false; }
             }
 
             return string.Join(", ", colDefs.Select(x => Generate(x)).ToArray()) + primaryKeyString;
@@ -212,7 +220,7 @@ namespace FluentMigrator.Runner.Generators.Base
         public virtual string AddPrimaryKeyConstraint(string tableName, IEnumerable<ColumnDefinition> primaryKeyColumns)
         {
             var pkColDefs = primaryKeyColumns.ToList();
-            string keyColumns = String.Join(", ", pkColDefs.Select(x => Quoter.QuoteColumnName(x.Name)).ToArray());
+            var keyColumns = String.Join(", ", pkColDefs.Select(x => Quoter.QuoteColumnName(x.Name)).ToArray());
 
             return String.Format(", {0}PRIMARY KEY ({1})", GetPrimaryKeyConstraintName(pkColDefs, tableName), keyColumns);
         }
@@ -220,10 +228,12 @@ namespace FluentMigrator.Runner.Generators.Base
         /// <summary>
         /// Gets the name of the primary key constraint. Some Generators may need to override if the constraint name is limited
         /// </summary>
-        /// <returns></returns>
+        /// <param name="primaryKeyColumns">The primary key columns</param>
+        /// <param name="tableName">The table name</param>
+        /// <returns>The constraint clause</returns>
         protected virtual string GetPrimaryKeyConstraintName(IEnumerable<ColumnDefinition> primaryKeyColumns, string tableName)
         {
-            string primaryKeyName = primaryKeyColumns.Select(x => x.PrimaryKeyName).FirstOrDefault();
+            var primaryKeyName = primaryKeyColumns.Select(x => x.PrimaryKeyName).FirstOrDefault();
 
             if (string.IsNullOrEmpty(primaryKeyName))
             {

@@ -25,7 +25,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
             return UnQuote(name);
         }
 
-        public override string QuoteConstraintName(string constraintName, string schemaName)
+        public override string QuoteConstraintName(string constraintName, string schemaName = null)
         {
             return base.QuoteConstraintName(UnQuote(constraintName), UnQuote(schemaName));
         }

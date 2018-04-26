@@ -14,6 +14,10 @@
 // limitations under the License.
 #endregion
 
+using JetBrains.Annotations;
+
+using Microsoft.Extensions.Options;
+
 namespace FluentMigrator.Runner.Generators.MySql
 {
     public class MySql5Generator : MySql4Generator
@@ -23,15 +27,26 @@ namespace FluentMigrator.Runner.Generators.MySql
         {
         }
 
-        public MySql5Generator(MySqlQuoter quoter)
-            : base(new MySqlColumn(new MySql5TypeMap(), quoter), quoter, new EmptyDescriptionGenerator())
+        public MySql5Generator(
+            [NotNull] MySqlQuoter quoter)
+            : this(quoter, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()))
         {
         }
 
-        protected MySql5Generator(IColumn column, IQuoter quoter, IDescriptionGenerator descriptionGenerator)
-            : base(column, quoter, descriptionGenerator)
+        public MySql5Generator(
+            [NotNull] MySqlQuoter quoter,
+            [NotNull] IOptions<GeneratorOptions> generatorOptions)
+            : this(new MySqlColumn(new MySql5TypeMap(), quoter), quoter, new EmptyDescriptionGenerator(), generatorOptions)
         {
         }
 
+        protected MySql5Generator(
+            [NotNull] IColumn column,
+            [NotNull] IQuoter quoter,
+            [NotNull] IDescriptionGenerator descriptionGenerator,
+            [NotNull] IOptions<GeneratorOptions> generatorOptions)
+            : base(column, quoter, descriptionGenerator, generatorOptions)
+        {
+        }
     }
 }

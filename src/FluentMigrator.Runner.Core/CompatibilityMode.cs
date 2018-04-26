@@ -1,4 +1,4 @@
-#region License
+﻿#region License
 //
 // Copyright (c) 2018, Fluent Migrator Project
 //
@@ -16,17 +16,21 @@
 //
 #endregion
 
-using FluentMigrator.Runner.Processors.Oracle;
+namespace FluentMigrator.Runner
+{
+    /// <summary>
+    /// Sets the compatibility mode
+    /// </summary>
+    public enum CompatibilityMode
+    {
+        /// <summary>
+        /// Ensuare that an exception gets thrown when a processor doesn't support a specific feature
+        /// </summary>
+        STRICT,
 
-using NUnit.Framework;
-
-namespace FluentMigrator.Tests.Integration.Processors.Oracle {
-    [TestFixture]
-    [Category("Integration")]
-    public class OracleManagedColumnTests : OracleColumnTestsBase {
-        [SetUp]
-        public void SetUp( ) {
-            base.SetUp( new OracleManagedDbFactory(serviceProvider: null) );
-        }
+        /// <summary>
+        /// Unsupported processor features are ignored
+        /// </summary>
+        LOOSE,
     }
 }
