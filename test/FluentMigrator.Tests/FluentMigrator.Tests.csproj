@@ -75,9 +75,6 @@
   </ItemGroup>
   <ItemGroup Condition=" '$(MSBuildRuntimeType)' == 'Core' or '$(OS)' != 'Windows_NT' ">
     <Compile Remove="Integration\Processors\Jet\**" />
-    <Content Remove="Integration\Processors\Jet\**" />
-    <EmbeddedResource Remove="Integration\Processors\Jet\**" />
-    <None Remove="Integration\Processors\Jet\**" />
     <Compile Remove="Helpers\JetTestTable.cs" />
   </ItemGroup>
   <ItemGroup Condition=" '$(MSBuildRuntimeType)' != 'Core' and '$(OS)' == 'Windows_NT' ">
