@@ -21,8 +21,11 @@ using System.Collections.Generic;
 using System.Data;
 
 using FluentMigrator.Expressions;
+using FluentMigrator.Runner.Announcers;
 
 using JetBrains.Annotations;
+
+using Microsoft.Extensions.Logging;
 
 namespace FluentMigrator.Runner.Processors
 {
@@ -34,7 +37,11 @@ namespace FluentMigrator.Runner.Processors
 #pragma warning restore 612
 
         protected internal readonly IMigrationGenerator Generator;
+
+#pragma warning disable 612
+        [Obsolete]
         protected readonly IAnnouncer Announcer;
+#pragma warning restore 612
 
         [Obsolete]
         protected ProcessorBase(
@@ -44,6 +51,7 @@ namespace FluentMigrator.Runner.Processors
         {
             Generator = generator;
             Announcer = announcer;
+            Logger = new AnnouncerLogger(announcer);
             Options = options as ProcessorOptions ?? new ProcessorOptions()
             {
                 PreviewOnly = options.PreviewOnly,
@@ -54,6 +62,7 @@ namespace FluentMigrator.Runner.Processors
             _legacyOptions = options;
         }
 
+        [Obsolete]
         protected ProcessorBase(
             [NotNull] IMigrationGenerator generator,
             [NotNull] IAnnouncer announcer,
@@ -62,7 +71,26 @@ namespace FluentMigrator.Runner.Processors
             Generator = generator;
             Announcer = announcer;
             Options = options;
+            _legacyOptions = options;
+            Logger = new AnnouncerLogger(announcer);
+        }
+
+        protected ProcessorBase(
+            [NotNull] IMigrationGenerator generator,
+            [NotNull] ILogger logger,
+            [NotNull] ProcessorOptions options)
+        {
+            Generator = generator;
+            Options = options;
+            Logger = logger;
 #pragma warning disable 612
+            Announcer = new LoggerAnnouncer(
+                logger,
+                new AnnouncerOptions()
+                {
+                    ShowSql = true,
+                    ShowElapsedTime = true,
+                });
             _legacyOptions = options;
 #pragma warning restore 612
         }
@@ -78,6 +106,8 @@ namespace FluentMigrator.Runner.Processors
         public abstract IList<string> DatabaseTypeAliases { get; }
 
         public bool WasCommitted { get; protected set; }
+
+        protected ILogger Logger { get; }
 
         [NotNull]
         protected ProcessorOptions Options { get; }

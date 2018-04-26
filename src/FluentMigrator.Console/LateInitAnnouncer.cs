@@ -24,7 +24,8 @@ using FluentMigrator.Runner.Announcers;
 
 namespace FluentMigrator.Console
 {
-    class LateInitAnnouncer : IAnnouncer, IDisposable
+    [Obsolete]
+    internal class LateInitAnnouncer : IAnnouncer, IDisposable
     {
         private readonly bool _executeAgainstMsSql;
         private readonly IAnnouncer _consoleAnnouncer;

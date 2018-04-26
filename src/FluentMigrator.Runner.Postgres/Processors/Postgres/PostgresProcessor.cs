@@ -10,6 +10,7 @@ using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.Postgres
@@ -31,10 +32,10 @@ namespace FluentMigrator.Runner.Processors.Postgres
         public PostgresProcessor(
             [NotNull] PostgresDbFactory factory,
             [NotNull] PostgresGenerator generator,
-            [NotNull] IAnnouncer announcer,
+            [NotNull] ILogger<PostgresProcessor> logger,
             [NotNull] IOptions<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor)
-            : base(() => factory.Factory, generator, announcer, options.Value, connectionStringAccessor)
+            : base(() => factory.Factory, generator, logger, options.Value, connectionStringAccessor)
         {
         }
 
@@ -108,7 +109,7 @@ namespace FluentMigrator.Runner.Processors.Postgres
 
         protected override void Process(string sql)
         {
-            Announcer.Sql(sql);
+            Logger.LogInformation(RunnerEventIds.Sql, sql);
 
             if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
                 return;
@@ -137,7 +138,7 @@ namespace FluentMigrator.Runner.Processors.Postgres
 
         public override void Process(PerformDBOperationExpression expression)
         {
-            Announcer.Say("Performing DB Operation");
+            Logger.LogTrace("Performing DB Operation");
 
             if (Options.PreviewOnly)
                 return;

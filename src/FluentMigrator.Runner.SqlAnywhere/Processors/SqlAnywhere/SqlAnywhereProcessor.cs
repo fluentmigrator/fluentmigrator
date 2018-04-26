@@ -37,6 +37,7 @@ using FluentMigrator.SqlAnywhere;
 using JetBrains.Annotations;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.SqlAnywhere
@@ -70,11 +71,11 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
             [NotNull] string databaseType,
             [NotNull] Func<DbProviderFactory> factoryAccessor,
             [NotNull] IMigrationGenerator generator,
-            [NotNull] IAnnouncer announcer,
+            [NotNull] ILogger logger,
             [NotNull] IOptions<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor,
             [NotNull] IServiceProvider serviceProvider)
-            : base(factoryAccessor, generator, announcer, options.Value, connectionStringAccessor)
+            : base(factoryAccessor, generator, logger, options.Value, connectionStringAccessor)
         {
             _serviceProvider = serviceProvider;
             DatabaseType = databaseType;
@@ -145,13 +146,13 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
             if (!Exists("SELECT count(*) FROM \"dbo\".\"syslogins\" WHERE \"name\"='{0}'", FormatHelper.FormatSqlEscape(expression.SchemaName)))
             {
                 // Try to automatically generate the user
-                Announcer.Say("Creating user {0}.", expression.SchemaName);
+                Logger.LogInformation("Creating user {0}.", expression.SchemaName);
                 Execute("CREATE USER \"{0}\" IDENTIFIED BY \"{1}\"", expression.SchemaName, password);
             }
 
             var sql = Generator.Generate(expression);
             string connectionString = ReplaceUserIdAndPasswordInConnectionString(expression.SchemaName, password);
-            Announcer.Say("Creating connection for user {0} to create schema.", expression.SchemaName);
+            Logger.LogInformation("Creating connection for user {0} to create schema.", expression.SchemaName);
             IDbConnection connection;
             if (DbProviderFactory == null)
             {
@@ -167,19 +168,19 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
             }
 
             EnsureConnectionIsOpen(connection);
-            Announcer.Say("Beginning out of scope transaction to create schema.");
+            Logger.LogInformation("Beginning out of scope transaction to create schema.");
             var transaction = connection.BeginTransaction();
 
             try
             {
                 ExecuteNonQuery(connection, transaction, sql);
                 transaction.Commit();
-                Announcer.Say("Out of scope transaction to create schema committed.");
+                Logger.LogInformation("Out of scope transaction to create schema committed.");
             }
             catch
             {
                 transaction.Rollback();
-                Announcer.Say("Out of scope transaction to create schema rolled back.");
+                Logger.LogInformation("Out of scope transaction to create schema rolled back.");
                 throw;
             }
             finally
@@ -236,7 +237,7 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
 
         protected override void Process(string sql)
         {
-            Announcer.Sql(sql);
+            Logger.LogInformation(RunnerEventIds.Sql, sql);
 
             if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
                 return;
@@ -350,7 +351,7 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
 
         public override void Process(PerformDBOperationExpression expression)
         {
-            Announcer.Say("Performing DB Operation");
+            Logger.LogTrace("Performing DB Operation");
 
             if (Options.PreviewOnly)
                 return;

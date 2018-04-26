@@ -62,6 +62,9 @@ namespace Microsoft.Extensions.DependencyInjection
                 // Add support for options
                 .AddOptions()
 
+                // Add loggins support
+                .AddLogging()
+
                 // The default assembly loader factory
                 .AddSingleton<AssemblyLoaderFactory>()
 

@@ -30,6 +30,7 @@ using FluentMigrator.Runner.Initialization;
 using JetBrains.Annotations;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
@@ -52,11 +53,11 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         public SqlServerCeProcessor(
             [NotNull] SqlServerCeDbFactory factory,
             [NotNull] SqlServerCeGenerator generator,
-            [NotNull] IAnnouncer announcer,
+            [NotNull] ILogger<SqlServerCeProcessor> logger,
             [NotNull] IOptions<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor,
             [NotNull] IServiceProvider serviceProvider)
-            : base(() => factory.Factory, generator, announcer, options.Value, connectionStringAccessor)
+            : base(() => factory.Factory, generator, logger, options.Value, connectionStringAccessor)
         {
             _serviceProvider = serviceProvider;
         }
@@ -132,7 +133,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         protected override void Process(string sql)
         {
-            Announcer.Sql(sql);
+            Logger.LogInformation(RunnerEventIds.Sql, sql);
 
             if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
                 return;

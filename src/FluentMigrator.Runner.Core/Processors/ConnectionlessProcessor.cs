@@ -22,11 +22,13 @@ using System.Data;
 using System.Linq;
 
 using FluentMigrator.Expressions;
+using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors
@@ -53,16 +55,16 @@ namespace FluentMigrator.Runner.Processors
 
         public ConnectionlessProcessor(
             [NotNull] IGeneratorAccessor generatorAccessor,
-            [NotNull] IAnnouncer announcer,
+            [NotNull] ILogger logger,
             [NotNull] IOptions<ProcessorOptions> options,
             [NotNull] IOptions<SelectingProcessorAccessorOptions> accessorOptions)
         {
             var generator = generatorAccessor.Generator;
             DatabaseType = string.IsNullOrEmpty(accessorOptions.Value.ProcessorId) ? generator.GetName() : accessorOptions.Value.ProcessorId;
             Generator = generator;
-            Announcer = announcer;
             Options = options.Value;
 #pragma warning disable 612
+            Announcer = new LoggerAnnouncer(logger, new AnnouncerOptions() { ShowElapsedTime = true, ShowSql = true });
             _legacyOptions = options.Value;
 #pragma warning restore 612
         }

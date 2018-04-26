@@ -27,6 +27,7 @@ using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.MySql
@@ -48,10 +49,10 @@ namespace FluentMigrator.Runner.Processors.MySql
         protected MySqlProcessor(
             [NotNull] MySqlDbFactory factory,
             [NotNull] IMigrationGenerator generator,
-            [NotNull] IAnnouncer announcer,
+            [NotNull] ILogger<MySqlProcessor> logger,
             [NotNull] IOptions<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor)
-            : base(() => factory.Factory, generator, announcer, options.Value, connectionStringAccessor)
+            : base(() => factory.Factory, generator, logger, options.Value, connectionStringAccessor)
         {
         }
 
@@ -105,7 +106,7 @@ namespace FluentMigrator.Runner.Processors.MySql
         public override void Execute(string template, params object[] args)
         {
             var commandText = string.Format(template, args);
-            Announcer.Sql(commandText);
+            Logger.LogInformation(RunnerEventIds.Sql, commandText);
 
             if (Options.PreviewOnly)
             {
@@ -158,7 +159,7 @@ namespace FluentMigrator.Runner.Processors.MySql
 
         protected override void Process(string sql)
         {
-            Announcer.Sql(sql);
+            Logger.LogInformation(RunnerEventIds.Sql, sql);
 
             if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
                 return;
@@ -173,7 +174,7 @@ namespace FluentMigrator.Runner.Processors.MySql
 
         public override void Process(PerformDBOperationExpression expression)
         {
-            Announcer.Say("Performing DB Operation");
+            Logger.LogTrace("Performing DB Operation");
 
             if (Options.PreviewOnly)
                 return;

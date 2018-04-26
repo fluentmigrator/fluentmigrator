@@ -26,16 +26,14 @@ using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.DotConnectOracle
 {
     public class DotConnectOracleProcessor : GenericProcessorBase
     {
-        public override string DatabaseType
-        {
-            get { return "Oracle"; }
-        }
+        public override string DatabaseType => "Oracle";
 
         public override IList<string> DatabaseTypeAliases { get; } = new List<string>();
 
@@ -48,10 +46,10 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
         public DotConnectOracleProcessor(
             [NotNull] DotConnectOracleDbFactory factory,
             [NotNull] OracleGenerator generator,
-            [NotNull] IAnnouncer announcer,
+            [NotNull] ILogger<DotConnectOracleProcessor> logger,
             [NotNull] IOptions<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor)
-            : base(() => factory.Factory, generator, announcer, options.Value, connectionStringAccessor)
+            : base(() => factory.Factory, generator, logger, options.Value, connectionStringAccessor)
         {
         }
 
@@ -203,7 +201,7 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
 
         protected override void Process(string sql)
         {
-            Announcer.Sql(sql);
+            Logger.LogInformation(RunnerEventIds.Sql, sql);
 
             if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
                 return;

@@ -28,6 +28,7 @@ using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.DB2
@@ -45,10 +46,10 @@ namespace FluentMigrator.Runner.Processors.DB2
             [NotNull] Db2DbFactory factory,
             [NotNull] Db2Generator generator,
             [NotNull] Db2Quoter quoter,
-            [NotNull] IAnnouncer announcer,
+            [NotNull] ILogger<Db2Processor> logger,
             [NotNull] IOptions<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor)
-            : base(() => factory.Factory, generator, announcer, options.Value, connectionStringAccessor)
+            : base(() => factory.Factory, generator, logger, options.Value, connectionStringAccessor)
         {
             Quoter = quoter;
         }
@@ -151,7 +152,7 @@ namespace FluentMigrator.Runner.Processors.DB2
 
         public override void Process(PerformDBOperationExpression expression)
         {
-            Announcer.Say("Performing DB Operation");
+            Logger.LogTrace("Performing DB Operation");
 
             if (Options.PreviewOnly)
             {
@@ -213,7 +214,7 @@ namespace FluentMigrator.Runner.Processors.DB2
 
         protected override void Process(string sql)
         {
-            Announcer.Sql(sql);
+            Logger.LogInformation(RunnerEventIds.Sql, sql);
 
             if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
             {

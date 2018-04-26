@@ -17,8 +17,6 @@
 using System;
 using System.Data.Common;
 
-using FluentMigrator.Runner;
-using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.BatchParser;
 using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.Runner.Initialization;
@@ -28,6 +26,7 @@ using FluentMigrator.Runner.Processors.SqlServer;
 using JetBrains.Annotations;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using Moq;
@@ -49,10 +48,12 @@ namespace FluentMigrator.Tests.Unit.Processors.SqlServer2016
                 .AddTransient<SqlServerBatchParser>()
                 .BuildServiceProvider();
 
+            var logger = serviceProvider.GetRequiredService<ILogger<SqlServer2016Processor>>();
+
             var opt = new OptionsWrapper<ProcessorOptions>(new ProcessorOptions());
             return new Processor(
                 MockedDbProviderFactory.Object,
-                new NullAnnouncer(),
+                logger,
                 new SqlServer2008Quoter(),
                 new SqlServer2016Generator(),
                 opt,
@@ -63,8 +64,8 @@ namespace FluentMigrator.Tests.Unit.Processors.SqlServer2016
         private class Processor : SqlServer2016Processor
         {
             /// <inheritdoc />
-            public Processor([NotNull] DbProviderFactory factory, [NotNull] IAnnouncer announcer, [NotNull] SqlServer2008Quoter quoter, [NotNull] SqlServer2016Generator generator, [NotNull] IOptions<ProcessorOptions> options, [NotNull] IConnectionStringAccessor connectionStringAccessor, [NotNull] IServiceProvider serviceProvider)
-                : base(factory, announcer, quoter, generator, options, connectionStringAccessor, serviceProvider)
+            public Processor([NotNull] DbProviderFactory factory, [NotNull] ILogger logger, [NotNull] SqlServer2008Quoter quoter, [NotNull] SqlServer2016Generator generator, [NotNull] IOptions<ProcessorOptions> options, [NotNull] IConnectionStringAccessor connectionStringAccessor, [NotNull] IServiceProvider serviceProvider)
+                : base(factory, logger, quoter, generator, options, connectionStringAccessor, serviceProvider)
             {
             }
         }

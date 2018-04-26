@@ -248,6 +248,7 @@ namespace FluentMigrator.Tests.Integration
             var factory = new SQLiteDbFactory(serviceProvider: null);
             using (var connection = factory.Factory.CreateConnection())
             {
+                Debug.Assert(connection != null, nameof(connection) + " != null");
                 connection.ConnectionString = serverOptions.ConnectionString;
                 connection.Open();
 

@@ -25,6 +25,8 @@ using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
+using Microsoft.Extensions.Logging;
+
 namespace FluentMigrator.Runner.Processors
 {
     public abstract class GenericProcessorBase : ProcessorBase
@@ -68,10 +70,10 @@ namespace FluentMigrator.Runner.Processors
         protected GenericProcessorBase(
             [CanBeNull] Func<DbProviderFactory> factoryAccessor,
             [NotNull] IMigrationGenerator generator,
-            [NotNull] IAnnouncer announcer,
+            [NotNull] ILogger logger,
             [NotNull] ProcessorOptions options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor)
-            : base(generator, announcer, options)
+            : base(generator, logger, options)
         {
             _dbProviderFactory = new Lazy<DbProviderFactory>(() => factoryAccessor?.Invoke());
 

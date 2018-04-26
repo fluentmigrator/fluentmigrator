@@ -935,7 +935,10 @@ namespace FluentMigrator.Tests.Integration
             var announcer = new TextWriterAnnouncer(outputSql){ ShowSql = true };
 
             ExecuteWithProcessor<SqlServer2008Processor>(
-                services => services.WithMigrationsIn(RootNamespace).Configure<ProcessorOptions>(opt => opt.PreviewOnly = true).AddSingleton<IAnnouncer>(announcer),
+                services => services
+                    .WithMigrationsIn(RootNamespace)
+                    .Configure<ProcessorOptions>(opt => opt.PreviewOnly = true)
+                    .AddSingleton<IAnnouncer>(announcer),
                 (serviceProvider, processor) =>
                 {
                     try

@@ -14,7 +14,6 @@
 // limitations under the License.
 #endregion
 
-using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.BatchParser;
 using FluentMigrator.Runner.Generators.SqlAnywhere;
 using FluentMigrator.Runner.Initialization;
@@ -22,6 +21,7 @@ using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.SqlAnywhere;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using Moq;
@@ -43,14 +43,17 @@ namespace FluentMigrator.Tests.Unit.Processors.SqlAnywhere16
             mockedConnStringReader.Setup(r => r.GetConnectionString(It.IsAny<string>())).Returns("server=this");
 
             var serviceProvider = new ServiceCollection()
+                .AddLogging()
                 .AddTransient<SqlAnywhereBatchParser>()
                 .BuildServiceProvider();
+
+            var logger = serviceProvider.GetRequiredService<ILogger<SqlAnywhere16Processor>>();
 
             var opt = new OptionsWrapper<ProcessorOptions>(new ProcessorOptions());
             return new SqlAnywhere16Processor(
                 mockedDbFactory.Object,
                 new SqlAnywhere16Generator(),
-                new NullAnnouncer(),
+                logger,
                 opt,
                 MockedConnectionStringAccessor.Object,
                 serviceProvider);

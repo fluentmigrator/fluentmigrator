@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2018, FluentMigrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,6 +19,7 @@ using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.MySql
@@ -29,12 +30,12 @@ namespace FluentMigrator.Runner.Processors.MySql
         public MySql5Processor(
             [NotNull] MySqlDbFactory factory,
             [NotNull] MySql5Generator generator,
-            [NotNull] IAnnouncer announcer,
+            [NotNull] ILogger<MySql5Processor> logger,
             [NotNull] IOptions<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor) : base(
             factory,
             generator,
-            announcer,
+            logger,
             options,
             connectionStringAccessor)
         {

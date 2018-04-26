@@ -23,6 +23,7 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.DotNet.Cli.CustomAnnouncers
 {
+    [Obsolete]
     public class LoggingAnnouncer : IAnnouncer
     {
         private readonly ILogger<LoggingAnnouncer> _logger;

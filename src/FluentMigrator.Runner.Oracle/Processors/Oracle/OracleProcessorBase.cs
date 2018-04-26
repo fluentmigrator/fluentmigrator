@@ -28,6 +28,7 @@ using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.Oracle
@@ -51,10 +52,10 @@ namespace FluentMigrator.Runner.Processors.Oracle
             [NotNull] string databaseType,
             [NotNull] OracleBaseDbFactory factory,
             [NotNull] IMigrationGenerator generator,
-            [NotNull] IAnnouncer announcer,
+            [NotNull] ILogger logger,
             [NotNull] IOptions<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor)
-            : base(() => factory.Factory, generator, announcer, options.Value, connectionStringAccessor)
+            : base(() => factory.Factory, generator, logger, options.Value, connectionStringAccessor)
         {
             DatabaseType = databaseType;
         }
@@ -178,7 +179,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
 
             EnsureConnectionIsOpen();
 
-            Announcer.Sql(string.Format(template, args));
+            Logger.LogInformation(RunnerEventIds.Sql, template, args);
             using (var command = CreateCommand(string.Format(template, args)))
             using (var reader = command.ExecuteReader())
             {
@@ -220,7 +221,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
 
         protected override void Process(string sql)
         {
-            Announcer.Sql(sql);
+            Logger.LogInformation(RunnerEventIds.Sql, sql);
 
             if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
                 return;

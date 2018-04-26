@@ -16,13 +16,18 @@
 
 #endregion
 
+using System;
+
 using FluentMigrator.Runner;
+
 using Moq;
+
 using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Unit
 {
     [TestFixture]
+    [Obsolete]
     public class AnnouncerExtensionsTests
     {
         [SetUp]

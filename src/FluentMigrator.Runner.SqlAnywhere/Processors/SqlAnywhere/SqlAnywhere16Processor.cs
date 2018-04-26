@@ -24,6 +24,7 @@ using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.SqlAnywhere
@@ -34,7 +35,7 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
         public SqlAnywhere16Processor(
             [NotNull] SqlAnywhereDbFactory factory,
             [NotNull] SqlAnywhere16Generator generator,
-            [NotNull] IAnnouncer announcer,
+            [NotNull] ILogger<SqlAnywhere16Processor> logger,
             [NotNull] IOptions<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor,
             [NotNull] IServiceProvider serviceProvider)
@@ -42,7 +43,7 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
                 "SqlAnywhere16",
                 () => factory.Factory,
                 generator,
-                announcer,
+                logger,
                 options,
                 connectionStringAccessor,
                 serviceProvider)

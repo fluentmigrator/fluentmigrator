@@ -24,6 +24,7 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.DotNet.Cli.CustomAnnouncers
 {
+    [Obsolete]
     public class LateInitAnnouncer : IAnnouncer, IDisposable
     {
         private Lazy<IAnnouncer> _innerAnnouncer;
