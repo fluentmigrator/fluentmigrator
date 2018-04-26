@@ -56,8 +56,12 @@ namespace FluentMigrator.Tests.Helpers
             if (!File.Exists(dbFileName))
             {
                 var connString = csb.ConnectionString;
-                var cat = new ADOX.CatalogClass();
-                cat.Create(connString);
+                var type = Type.GetTypeFromProgID("ADOX.Catalog");
+                if (type != null)
+                {
+                    dynamic cat = Activator.CreateInstance(type);
+                    cat.Create(connString);
+                }
             }
 
             Create(columnDefinitions);

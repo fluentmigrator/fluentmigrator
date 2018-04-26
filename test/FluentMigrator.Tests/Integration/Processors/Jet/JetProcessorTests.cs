@@ -180,8 +180,12 @@ namespace FluentMigrator.Tests.Integration.Processors.Jet
                 File.Delete(DatabaseFilename);
             }
 
-            var cat = new ADOX.CatalogClass();
-            cat.Create(connString);
+            var type = Type.GetTypeFromProgID("ADOX.Catalog");
+            if (type != null)
+            {
+                dynamic cat = Activator.CreateInstance(type);
+                cat.Create(connString);
+            }
         }
     }
 }

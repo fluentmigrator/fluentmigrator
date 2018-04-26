@@ -77,16 +77,6 @@
     <Compile Remove="Integration\Processors\Jet\**" />
     <Compile Remove="Helpers\JetTestTable.cs" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(MSBuildRuntimeType)' != 'Core' and '$(OS)' == 'Windows_NT' ">
-    <COMReference Include="ADOX.dll">
-      <Guid>00000600-0000-0010-8000-00aa006d2ea4</Guid>
-      <VersionMajor>6</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Lcid>0</Lcid>
-      <Isolated>false</Isolated>
-    </COMReference>
-  </ItemGroup>
   <ItemGroup>
     <None Update="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
