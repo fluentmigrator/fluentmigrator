@@ -191,9 +191,9 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
 
         private string ReplaceUserIdAndPasswordInConnectionString(string userId, string password)
         {
-#pragma warning disable 618
+#pragma warning disable 618, 612
             var csb = new DbConnectionStringBuilder { ConnectionString = ConnectionString };
-#pragma warning restore 618
+#pragma warning restore 618, 612
             var uidKey = new[] { "uid", "userid" }.FirstOrDefault(x => csb.ContainsKey(x)) ?? "uid";
             var pwdKey = new[] { "pwd", "password" }.FirstOrDefault(x => csb.ContainsKey(x)) ?? "pwd";
             csb[uidKey] = userId;
