@@ -40,8 +40,6 @@ using FluentMigrator.Runner.Generators.Firebird;
 using FluentMigrator.Runner.Generators.SqlAnywhere;
 using FluentMigrator.Runner.Processors.SqlAnywhere;
 
-using Microsoft.Data.Sqlite;
-
 using MySql.Data.MySqlClient;
 
 using Npgsql;
@@ -248,8 +246,11 @@ namespace FluentMigrator.Tests.Integration
             announcer.Heading("Testing Migration against SQLite");
 
             var factory = new SQLiteDbFactory(serviceProvider: null);
-            using (var connection = new SqliteConnection(serverOptions.ConnectionString))
+            using (var connection = factory.Factory.CreateConnection())
             {
+                connection.ConnectionString = serverOptions.ConnectionString;
+                connection.Open();
+
                 var processor = new SQLiteProcessor(connection, new SQLiteGenerator(), announcer, new ProcessorOptions(), factory);
                 test(processor);
 
