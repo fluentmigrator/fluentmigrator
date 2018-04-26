@@ -42,10 +42,10 @@ namespace FluentMigrator.Runner
         public static IMigrationRunnerBuilder AddSqlServer(this IMigrationRunnerBuilder builder)
         {
             builder.Services.TryAddTransient<SqlServerBatchParser>();
+            builder.Services.TryAddScoped<SqlServer2008Quoter>();
             builder.Services
                 .AddScoped<SqlServer2016Processor>()
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<SqlServer2016Processor>())
-                .AddScoped<SqlServer2008Quoter>()
                 .AddScoped<SqlServer2016Generator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<SqlServer2016Generator>());
             return builder;
@@ -58,8 +58,8 @@ namespace FluentMigrator.Runner
         /// <returns>The migration runner builder</returns>
         public static IMigrationRunnerBuilder AddSqlServer2000(this IMigrationRunnerBuilder builder)
         {
-            builder.Services.TryAddScoped<SqlServer2000Quoter>();
             builder.Services.TryAddTransient<SqlServerBatchParser>();
+            builder.Services.TryAddScoped<SqlServer2000Quoter>();
             builder.Services
                 .AddScoped<SqlServer2000Processor>()
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<SqlServer2000Processor>())
@@ -76,10 +76,10 @@ namespace FluentMigrator.Runner
         public static IMigrationRunnerBuilder AddSqlServer2005(this IMigrationRunnerBuilder builder)
         {
             builder.Services.TryAddTransient<SqlServerBatchParser>();
+            builder.Services.TryAddScoped<SqlServer2005Quoter>();
             builder.Services
                 .AddScoped<SqlServer2005Processor>()
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<SqlServer2005Processor>())
-                .AddScoped<SqlServer2005Quoter>()
                 .AddScoped<SqlServer2005Generator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<SqlServer2005Generator>());
             return builder;
@@ -93,10 +93,10 @@ namespace FluentMigrator.Runner
         public static IMigrationRunnerBuilder AddSqlServer2008(this IMigrationRunnerBuilder builder)
         {
             builder.Services.TryAddTransient<SqlServerBatchParser>();
+            builder.Services.TryAddScoped<SqlServer2008Quoter>();
             builder.Services
                 .AddScoped<SqlServer2008Processor>()
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<SqlServer2008Processor>())
-                .AddScoped<SqlServer2008Quoter>()
                 .AddScoped<SqlServer2008Generator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<SqlServer2008Generator>());
             return builder;
@@ -110,10 +110,10 @@ namespace FluentMigrator.Runner
         public static IMigrationRunnerBuilder AddSqlServer2012(this IMigrationRunnerBuilder builder)
         {
             builder.Services.TryAddTransient<SqlServerBatchParser>();
+            builder.Services.TryAddScoped<SqlServer2008Quoter>();
             builder.Services
                 .AddScoped<SqlServer2012Processor>()
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<SqlServer2012Processor>())
-                .AddScoped<SqlServer2008Quoter>()
                 .AddScoped<SqlServer2012Generator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<SqlServer2012Generator>());
             return builder;
@@ -127,10 +127,10 @@ namespace FluentMigrator.Runner
         public static IMigrationRunnerBuilder AddSqlServer2014(this IMigrationRunnerBuilder builder)
         {
             builder.Services.TryAddTransient<SqlServerBatchParser>();
+            builder.Services.TryAddScoped<SqlServer2008Quoter>();
             builder.Services
                 .AddScoped<SqlServer2014Processor>()
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<SqlServer2014Processor>())
-                .AddScoped<SqlServer2008Quoter>()
                 .AddScoped<SqlServer2014Generator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<SqlServer2014Generator>());
             return builder;
@@ -144,10 +144,10 @@ namespace FluentMigrator.Runner
         public static IMigrationRunnerBuilder AddSqlServer2016(this IMigrationRunnerBuilder builder)
         {
             builder.Services.TryAddTransient<SqlServerBatchParser>();
+            builder.Services.TryAddScoped<SqlServer2008Quoter>();
             builder.Services
                 .AddScoped<SqlServer2016Processor>()
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<SqlServer2016Processor>())
-                .AddScoped<SqlServer2008Quoter>()
                 .AddScoped<SqlServer2016Generator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<SqlServer2016Generator>());
             return builder;

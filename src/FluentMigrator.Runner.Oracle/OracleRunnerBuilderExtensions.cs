@@ -38,19 +38,19 @@ namespace FluentMigrator.Runner
         public static IMigrationRunnerBuilder AddOracle(this IMigrationRunnerBuilder builder)
         {
             builder.Services.TryAddScoped<OracleGenerator>();
+            builder.Services.TryAddScoped<OracleQuoterBase>(
+                sp =>
+                {
+                    var opt = sp.GetRequiredService<IOptions<ProcessorOptions>>();
+                    if (opt.Value.IsQuotingForced())
+                        return new OracleQuoterQuotedIdentifier();
+                    return new OracleQuoter();
+                });
             builder.Services
                 .AddScoped<OracleDbFactory>()
                 .AddScoped<OracleProcessor>()
                 .AddScoped<OracleProcessorBase>(sp => sp.GetRequiredService<OracleProcessor>())
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<OracleProcessor>())
-                .AddScoped<OracleQuoterBase>(
-                    sp =>
-                    {
-                        var opt = sp.GetRequiredService<IOptions<ProcessorOptions>>();
-                        if (opt.Value.IsQuotingForced())
-                            return new OracleQuoterQuotedIdentifier();
-                        return new OracleQuoter();
-                    })
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<OracleGenerator>());
             return builder;
         }
@@ -63,19 +63,19 @@ namespace FluentMigrator.Runner
         public static IMigrationRunnerBuilder AddOracleManaged(this IMigrationRunnerBuilder builder)
         {
             builder.Services.TryAddScoped<OracleGenerator>();
+            builder.Services.TryAddScoped<OracleQuoterBase>(
+                sp =>
+                {
+                    var opt = sp.GetRequiredService<IOptions<ProcessorOptions>>();
+                    if (opt.Value.IsQuotingForced())
+                        return new OracleQuoterQuotedIdentifier();
+                    return new OracleQuoter();
+                });
             builder.Services
                 .AddScoped<OracleManagedDbFactory>()
                 .AddScoped<OracleManagedProcessor>()
                 .AddScoped<OracleProcessorBase>(sp => sp.GetRequiredService<OracleManagedProcessor>())
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<OracleManagedProcessor>())
-                .AddScoped<OracleQuoterBase>(
-                    sp =>
-                    {
-                        var opt = sp.GetRequiredService<IOptions<ProcessorOptions>>();
-                        if (opt.Value.IsQuotingForced())
-                            return new OracleQuoterQuotedIdentifier();
-                        return new OracleQuoter();
-                    })
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<OracleGenerator>());
             return builder;
         }
@@ -88,18 +88,18 @@ namespace FluentMigrator.Runner
         public static IMigrationRunnerBuilder AddDotConnectOracle(this IMigrationRunnerBuilder builder)
         {
             builder.Services.TryAddScoped<OracleGenerator>();
+            builder.Services.TryAddScoped<OracleQuoterBase>(
+                sp =>
+                {
+                    var opt = sp.GetRequiredService<IOptions<ProcessorOptions>>();
+                    if (opt.Value.IsQuotingForced())
+                        return new OracleQuoterQuotedIdentifier();
+                    return new OracleQuoter();
+                });
             builder.Services
                 .AddScoped<DotConnectOracleDbFactory>()
                 .AddScoped<DotConnectOracleProcessor>()
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<DotConnectOracleProcessor>())
-                .AddScoped<OracleQuoterBase>(
-                    sp =>
-                    {
-                        var opt = sp.GetRequiredService<IOptions<ProcessorOptions>>();
-                        if (opt.Value.IsQuotingForced())
-                            return new OracleQuoterQuotedIdentifier();
-                        return new OracleQuoter();
-                    })
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<OracleGenerator>());
             return builder;
         }
