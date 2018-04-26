@@ -14,6 +14,7 @@
 // limitations under the License.
 #endregion
 
+using System;
 using System.Data;
 using System.Data.OleDb;
 using System.IO;
@@ -36,6 +37,9 @@ namespace FluentMigrator.Tests.Integration.Processors.Jet
     [Category("Jet")]
     public class JetProcessorTests
     {
+        private string _tempDataDirectory;
+
+        private string DatabaseFilename { get; set; }
         private ServiceProvider ServiceProvider { get; set; }
         private IServiceScope ServiceScope { get; set; }
         private JetProcessor Processor { get; set; }
@@ -127,17 +131,6 @@ namespace FluentMigrator.Tests.Integration.Processors.Jet
                 .AddScoped<IConnectionStringReader>(
                     _ => new PassThroughConnectionStringReader(IntegrationTestOptions.Jet.ConnectionString));
             ServiceProvider = serivces.BuildServiceProvider();
-
-            var csb = new OleDbConnectionStringBuilder(IntegrationTestOptions.Jet.ConnectionString);
-            var dbFileName = HostUtilities.ReplaceDataDirectory(csb.DataSource);
-            csb.DataSource = dbFileName;
-
-            if (!File.Exists(dbFileName))
-            {
-                var connString = csb.ConnectionString;
-                var cat = new ADOX.CatalogClass();
-                cat.Create(connString);
-            }
         }
 
         [OneTimeTearDown]
@@ -149,6 +142,15 @@ namespace FluentMigrator.Tests.Integration.Processors.Jet
         [SetUp]
         public void SetUp()
         {
+            _tempDataDirectory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(_tempDataDirectory);
+            AppDomain.CurrentDomain.SetData("DataDirectory", _tempDataDirectory);
+
+            var csb = new OleDbConnectionStringBuilder(IntegrationTestOptions.Jet.ConnectionString);
+            csb.DataSource = DatabaseFilename = HostUtilities.ReplaceDataDirectory(csb.DataSource);
+
+            RecreateDatabase(csb.ConnectionString);
+
             ServiceScope = ServiceProvider.CreateScope();
             Processor = ServiceScope.ServiceProvider.GetRequiredService<JetProcessor>();
         }
@@ -157,6 +159,29 @@ namespace FluentMigrator.Tests.Integration.Processors.Jet
         public void TearDown()
         {
             ServiceScope?.Dispose();
+
+            if (!string.IsNullOrEmpty(_tempDataDirectory) && Directory.Exists(_tempDataDirectory))
+            {
+                try
+                {
+                    Directory.Delete(_tempDataDirectory, true);
+                }
+                catch
+                {
+                    // Ignore exceptions - we need to find out later why this happens
+                }
+            }
+        }
+
+        private void RecreateDatabase(string connString)
+        {
+            if (File.Exists(DatabaseFilename))
+            {
+                File.Delete(DatabaseFilename);
+            }
+
+            var cat = new ADOX.CatalogClass();
+            cat.Create(connString);
         }
     }
 }
