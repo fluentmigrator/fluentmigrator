@@ -31,6 +31,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\FluentMigrator.Console\FluentMigrator.Console.csproj" />
+    <ProjectReference Include="..\..\src\FluentMigrator.Runner.Core\FluentMigrator.Runner.Core.csproj" />
     <ProjectReference Include="..\..\src\FluentMigrator.Runner.Db2\FluentMigrator.Runner.Db2.csproj" />
     <ProjectReference Include="..\..\src\FluentMigrator.Runner.Firebird\FluentMigrator.Runner.Firebird.csproj" />
     <ProjectReference Include="..\..\src\FluentMigrator.Runner.Hana\FluentMigrator.Runner.Hana.csproj" />
@@ -42,6 +43,7 @@
     <ProjectReference Include="..\..\src\FluentMigrator.Runner.SQLite\FluentMigrator.Runner.SQLite.csproj" />
     <ProjectReference Include="..\..\src\FluentMigrator.Runner.SqlServerCe\FluentMigrator.Runner.SqlServerCe.csproj" />
     <ProjectReference Include="..\..\src\FluentMigrator.Runner.SqlServer\FluentMigrator.Runner.SqlServer.csproj" />
+    <ProjectReference Include="..\..\src\FluentMigrator.Runner\FluentMigrator.Runner.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="IBM.Data.DB2">
@@ -73,7 +75,13 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup>
+  <ItemGroup Condition=" '$(OS)' != 'Windows_NT' ">
+    <Compile Remove="Unit\Generators\Jet\**" />
+    <Content Remove="Unit\Generators\Jet\**" />
+    <EmbeddedResource Remove="Unit\Generators\Jet\**" />
+    <None Remove="Unit\Generators\Jet\**" />
+  </ItemGroup>
+  <ItemGroup Condition=" '$(OS)' == 'Windows_NT' ">
     <COMReference Include="ADOX.dll">
       <Guid>00000600-0000-0010-8000-00aa006d2ea4</Guid>
       <VersionMajor>6</VersionMajor>
