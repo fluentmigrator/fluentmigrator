@@ -93,6 +93,12 @@ announcer and migration assembly.
 Now you can instantiate the runner using the built service provider and use
 its functions.
 
+## 2.0.7 (2018-04-27)
+
+### Added
+
+- [#856](https://github.com/fluentmigrator/fluentmigrator/pull/865) New constructors to enable passing a custom expression convention set
+
 ## 2.0.6 (2018-04-24)
 
 ### Fixed

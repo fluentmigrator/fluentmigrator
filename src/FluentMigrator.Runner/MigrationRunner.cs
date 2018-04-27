@@ -25,6 +25,7 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Infrastructure.Extensions;
+using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Exceptions;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.VersionTableInfo;
@@ -96,7 +97,13 @@ namespace FluentMigrator.Runner
 
         [Obsolete]
         public MigrationRunner(Assembly assembly, IRunnerContext runnerContext, IMigrationProcessor processor)
-          : this(new SingleAssembly(assembly), runnerContext, processor)
+            : this(assembly, runnerContext, processor, conventionSet: null)
+        {
+        }
+
+        [Obsolete]
+        public MigrationRunner(Assembly assembly, IRunnerContext runnerContext, IMigrationProcessor processor, IConventionSet conventionSet)
+            : this(new SingleAssembly(assembly), runnerContext, processor, versionTableMetaData: null, migrationRunnerConventions: null, conventionSet)
         {
         }
 
@@ -105,6 +112,15 @@ namespace FluentMigrator.Runner
             IAssemblyCollection assemblies, IRunnerContext runnerContext,
             IMigrationProcessor processor, IVersionTableMetaData versionTableMetaData = null,
             IMigrationRunnerConventions migrationRunnerConventions = null)
+            : this(assemblies, runnerContext, processor, versionTableMetaData, migrationRunnerConventions, conventionSet: null)
+        {
+        }
+
+        [Obsolete]
+        public MigrationRunner(
+            IAssemblyCollection assemblies, IRunnerContext runnerContext,
+            IMigrationProcessor processor, IVersionTableMetaData versionTableMetaData,
+            IMigrationRunnerConventions migrationRunnerConventions, IConventionSet conventionSet)
         {
             _migrationAssemblies = assemblies;
             _announcer = runnerContext.Announcer;
@@ -122,7 +138,7 @@ namespace FluentMigrator.Runner
                 new AssemblySource(() => assemblies));
             Conventions = migrationRunnerConventions ?? migrationRunnerConventionsAccessor.MigrationRunnerConventions;
 
-            var convSet = new DefaultConventionSet(runnerContext);
+            var convSet = conventionSet ?? new DefaultConventionSet(runnerContext);
 
             _migrationScopeHandler = new MigrationScopeHandler(Processor);
             _migrationValidator = new MigrationValidator(_announcer, convSet);
@@ -662,7 +678,7 @@ namespace FluentMigrator.Runner
 
             _announcer.Heading("Migrations");
 
-            foreach(var migration in MigrationLoader.LoadMigrations())
+            foreach (var migration in MigrationLoader.LoadMigrations())
             {
                 var migrationName = migration.Value.GetName();
                 var status = GetStatus(migration, currentVersion);
@@ -671,7 +687,7 @@ namespace FluentMigrator.Runner
 
                 var isCurrent = (status & MigrationStatus.AppliedMask) == MigrationStatus.Current;
                 var isBreaking = (status & MigrationStatus.Breaking) == MigrationStatus.Breaking;
-                if(isCurrent || isBreaking)
+                if (isCurrent || isBreaking)
                     _announcer.Emphasize(message);
                 else
                     _announcer.Say(message);
