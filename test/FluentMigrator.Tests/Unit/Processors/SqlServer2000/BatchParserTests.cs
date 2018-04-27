@@ -22,6 +22,7 @@ using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.SqlServer;
+using FluentMigrator.Tests.Logging;
 
 using JetBrains.Annotations;
 
@@ -45,6 +46,8 @@ namespace FluentMigrator.Tests.Unit.Processors.SqlServer2000
             mockedConnStringReader.Setup(r => r.GetConnectionString(It.IsAny<string>())).Returns("server=this");
 
             var serviceProvider = new ServiceCollection()
+                .AddLogging()
+                .AddSingleton<ILoggerProvider, TestLoggerProvider>()
                 .AddTransient<SqlServerBatchParser>()
                 .BuildServiceProvider();
 

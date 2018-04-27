@@ -22,6 +22,7 @@ using System.Data;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Announcers;
+using FluentMigrator.Runner.Logging;
 
 using JetBrains.Annotations;
 
@@ -51,7 +52,7 @@ namespace FluentMigrator.Runner.Processors
         {
             Generator = generator;
             Announcer = announcer;
-            Logger = new AnnouncerLogger(announcer);
+            Logger = new AnnouncerFluentMigratorLogger(announcer);
             Options = options as ProcessorOptions ?? new ProcessorOptions()
             {
                 PreviewOnly = options.PreviewOnly,
@@ -72,7 +73,7 @@ namespace FluentMigrator.Runner.Processors
             Announcer = announcer;
             Options = options;
             _legacyOptions = options;
-            Logger = new AnnouncerLogger(announcer);
+            Logger = new AnnouncerFluentMigratorLogger(announcer);
         }
 
         protected ProcessorBase(
@@ -107,7 +108,7 @@ namespace FluentMigrator.Runner.Processors
 
         public bool WasCommitted { get; protected set; }
 
-        protected ILogger Logger { get; }
+        protected internal ILogger Logger { get; }
 
         [NotNull]
         protected ProcessorOptions Options { get; }

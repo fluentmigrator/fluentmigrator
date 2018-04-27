@@ -16,8 +16,11 @@
 
 #endregion
 
+using System;
+
 namespace FluentMigrator.Runner.Announcers
 {
+    [Obsolete]
     public class NullAnnouncer : Announcer
     {
         public override void Write(string message, bool isNotSql = true)

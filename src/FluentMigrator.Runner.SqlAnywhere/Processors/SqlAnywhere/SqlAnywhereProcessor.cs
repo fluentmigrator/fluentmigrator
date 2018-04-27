@@ -237,7 +237,7 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
 
         protected override void Process(string sql)
         {
-            Logger.LogInformation(RunnerEventIds.Sql, sql);
+            Logger.LogSql(sql);
 
             if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
                 return;

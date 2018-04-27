@@ -143,7 +143,7 @@ namespace FluentMigrator.Runner.Processors
 
             EnsureConnectionIsOpen();
 
-            Announcer.Say("Beginning Transaction");
+            Logger.LogInformation("Beginning Transaction");
 
             Transaction = Connection?.BeginTransaction();
         }
@@ -152,7 +152,7 @@ namespace FluentMigrator.Runner.Processors
         {
             if (Transaction == null) return;
 
-            Announcer.Say("Rolling back transaction");
+            Logger.LogInformation("Rolling back transaction");
             Transaction.Rollback();
             Transaction.Dispose();
             WasCommitted = true;
@@ -163,7 +163,7 @@ namespace FluentMigrator.Runner.Processors
         {
             if (Transaction == null) return;
 
-            Announcer.Say("Committing Transaction");
+            Logger.LogInformation("Committing Transaction");
             Transaction.Commit();
             Transaction.Dispose();
             WasCommitted = true;

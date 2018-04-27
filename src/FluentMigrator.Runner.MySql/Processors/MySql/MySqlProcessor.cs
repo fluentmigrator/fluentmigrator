@@ -106,7 +106,7 @@ namespace FluentMigrator.Runner.Processors.MySql
         public override void Execute(string template, params object[] args)
         {
             var commandText = string.Format(template, args);
-            Logger.LogInformation(RunnerEventIds.Sql, commandText);
+            Logger.LogSql(commandText);
 
             if (Options.PreviewOnly)
             {
@@ -159,7 +159,7 @@ namespace FluentMigrator.Runner.Processors.MySql
 
         protected override void Process(string sql)
         {
-            Logger.LogInformation(RunnerEventIds.Sql, sql);
+            Logger.LogSql(sql);
 
             if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
                 return;

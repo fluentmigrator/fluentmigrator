@@ -1,5 +1,5 @@
-#region License
-// Copyright (c) 2007-2018, FluentMigrator Project
+﻿#region License
+// Copyright (c) 2018, FluentMigrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,18 +14,24 @@
 // limitations under the License.
 #endregion
 
-using FluentMigrator.Runner.Announcers;
+using Microsoft.Extensions.Logging;
 
-namespace FluentMigrator.Console
+namespace FluentMigrator.Tests.Logging
 {
-    public class StopOnErrorAnnouncer : NullAnnouncer
+    /// <summary>
+    /// Provider for <see cref="TestLogger"/>
+    /// </summary>
+    public class TestLoggerProvider : ILoggerProvider
     {
-        public bool StopOnError { get; set; }
-
-        public override void Error(string message)
+        /// <inheritdoc />
+        public ILogger CreateLogger(string categoryName)
         {
-            System.Console.WriteLine(@"Press enter to continue...");
-            System.Console.ReadLine();
+            return new TestLogger();
+        }
+
+        /// <inheritdoc />
+        public void Dispose()
+        {
         }
     }
 }

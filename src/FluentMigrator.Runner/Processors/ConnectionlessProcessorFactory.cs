@@ -16,13 +16,12 @@
 
 using System;
 
-using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Initialization;
+using FluentMigrator.Runner.Logging;
 
 using JetBrains.Annotations;
 
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors
@@ -39,12 +38,6 @@ namespace FluentMigrator.Runner.Processors
         [NotNull]
         private readonly string _databaseId;
 
-        [Obsolete]
-        [NotNull]
-        private readonly IAnnouncer _announcer;
-
-        private readonly ILogger _logger;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ConnectionlessProcessorFactory"/> class.
         /// </summary>
@@ -57,28 +50,7 @@ namespace FluentMigrator.Runner.Processors
         {
             _generator = generatorAccessor.Generator;
             _databaseId = runnerContext.Database;
-            _announcer = runnerContext.Announcer;
-            _logger = new AnnouncerLogger(runnerContext.Announcer);
             Name = _generator.GetName();
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ConnectionlessProcessorFactory"/> class.
-        /// </summary>
-        /// <param name="generatorAccessor">Accessor to get the selected generator</param>
-        /// <param name="logger">The logger</param>
-        /// <param name="accessorOptions">The processor accessor options</param>
-        public ConnectionlessProcessorFactory(
-            [NotNull] IGeneratorAccessor generatorAccessor,
-            [NotNull] ILogger logger,
-            [NotNull] IOptions<SelectingProcessorAccessorOptions> accessorOptions)
-        {
-            _generator = generatorAccessor.Generator;
-            _announcer = new LoggerAnnouncer(logger, AnnouncerOptions.AllEnabled);
-            _logger = logger;
-            Name = _databaseId = string.IsNullOrEmpty(accessorOptions.Value.ProcessorId)
-                ? generatorAccessor.Generator.GetName()
-                : accessorOptions.Value.ProcessorId;
         }
 
         /// <inheritdoc />
@@ -88,7 +60,7 @@ namespace FluentMigrator.Runner.Processors
             var processorOptions = options.GetProcessorOptions(connectionString);
             return new ConnectionlessProcessor(
                 new PassThroughGeneratorAccessor(_generator),
-                new AnnouncerLogger(announcer),
+                new AnnouncerFluentMigratorLogger(announcer),
                 new OptionsWrapper<ProcessorOptions>(processorOptions),
                 new OptionsWrapper<SelectingProcessorAccessorOptions>(
                     new SelectingProcessorAccessorOptions()

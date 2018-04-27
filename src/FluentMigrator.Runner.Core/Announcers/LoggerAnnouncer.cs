@@ -42,7 +42,7 @@ namespace FluentMigrator.Runner.Announcers
         /// <param name="options">The announcer options</param>
         public LoggerAnnouncer([NotNull] ILoggerFactory loggerFactory, [NotNull] IOptions<AnnouncerOptions> options)
         {
-            _logger = loggerFactory.CreateLogger("FluentMigrator.Runner");
+            _logger = loggerFactory.CreateLogger(RunnerEventIds.RunnerCategory);
             _options = options.Value;
         }
 
@@ -60,7 +60,7 @@ namespace FluentMigrator.Runner.Announcers
         /// <inheritdoc />
         public void Heading(string message)
         {
-            _logger.LogInformation(RunnerEventIds.Heading, message);
+            _logger.LogHeader(message);
         }
 
         /// <inheritdoc />
@@ -72,14 +72,14 @@ namespace FluentMigrator.Runner.Announcers
         /// <inheritdoc />
         public void Emphasize(string message)
         {
-            _logger.LogWarning(RunnerEventIds.Emphasize, message);
+            _logger.LogEmphasized(message);
         }
 
         /// <inheritdoc />
         public void Sql(string sql)
         {
             if (_options.ShowSql)
-                _logger.LogInformation(RunnerEventIds.Sql, sql);
+                _logger.LogSql(sql);
         }
 
         /// <inheritdoc />
@@ -87,7 +87,7 @@ namespace FluentMigrator.Runner.Announcers
         {
             if (_options.ShowElapsedTime)
             {
-                _logger.LogInformation($"=> {timeSpan.TotalSeconds}s");
+                _logger.LogElapsedTime(timeSpan);
             }
         }
 

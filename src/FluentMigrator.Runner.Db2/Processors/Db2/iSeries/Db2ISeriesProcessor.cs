@@ -167,7 +167,7 @@ namespace FluentMigrator.Runner.Processors.DB2.iSeries
 
         protected override void Process(string sql)
         {
-            Logger.LogInformation(RunnerEventIds.Sql, sql);
+            Logger.LogSql(sql);
 
             if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
             {

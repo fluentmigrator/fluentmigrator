@@ -23,6 +23,7 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Announcers
 {
+    [Obsolete]
     public class TextWriterAnnouncer : Announcer
     {
         private readonly Action<string> _write;

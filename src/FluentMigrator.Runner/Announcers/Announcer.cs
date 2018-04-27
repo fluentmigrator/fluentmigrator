@@ -22,6 +22,7 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Announcers
 {
+    [Obsolete]
     public abstract class Announcer : IAnnouncer
     {
         public virtual bool ShowSql { get; set; }

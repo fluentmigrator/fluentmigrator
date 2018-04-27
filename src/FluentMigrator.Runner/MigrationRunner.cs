@@ -27,12 +27,14 @@ using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Exceptions;
+using FluentMigrator.Runner.Logging;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.VersionTableInfo;
 
 using JetBrains.Annotations;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner
@@ -40,7 +42,7 @@ namespace FluentMigrator.Runner
     public class MigrationRunner : IMigrationRunner
     {
         [NotNull]
-        private readonly IAnnouncer _announcer;
+        private readonly ILogger _logger;
 
         [NotNull]
         private readonly IStopWatch _stopWatch;
@@ -123,7 +125,7 @@ namespace FluentMigrator.Runner
             IMigrationRunnerConventions migrationRunnerConventions, IConventionSet conventionSet)
         {
             _migrationAssemblies = assemblies;
-            _announcer = runnerContext.Announcer;
+            _logger = new AnnouncerFluentMigratorLogger(runnerContext.Announcer);
             _stopWatch = runnerContext.StopWatch;
             _processorOptions = new ProcessorOptions(runnerContext);
 
@@ -141,7 +143,7 @@ namespace FluentMigrator.Runner
             var convSet = conventionSet ?? new DefaultConventionSet(runnerContext);
 
             _migrationScopeHandler = new MigrationScopeHandler(Processor);
-            _migrationValidator = new MigrationValidator(_announcer, convSet);
+            _migrationValidator = new MigrationValidator(_logger, convSet);
             MigrationLoader = new DefaultMigrationInformationLoader(Conventions, _migrationAssemblies,
                                                                     runnerContext.Namespace,
                                                                     runnerContext.NestedNamespaces, runnerContext.Tags);
@@ -174,7 +176,7 @@ namespace FluentMigrator.Runner
             [NotNull] IProcessorAccessor processorAccessor,
             [NotNull] IMaintenanceLoader maintenanceLoader,
             [NotNull] IMigrationInformationLoader migrationLoader,
-            [NotNull] IAnnouncer announcer,
+            [NotNull] ILogger<MigrationRunner> logger,
             [NotNull] IStopWatch stopWatch,
             [NotNull] IMigrationRunnerConventionsAccessor migrationRunnerConventionsAccessor,
             [NotNull] IAssemblySource assemblySource,
@@ -192,7 +194,7 @@ namespace FluentMigrator.Runner
 
             _serviceProvider = serviceProvider;
             _options = options.Value;
-            _announcer = announcer;
+            _logger = logger;
             _stopWatch = stopWatch;
             _processorOptions = processorOptions.Value;
 
@@ -392,14 +394,14 @@ namespace FluentMigrator.Runner
 
             if (!_alreadyOutputPreviewOnlyModeWarning && _processorOptions.PreviewOnly)
             {
-                _announcer.Heading("PREVIEW-ONLY MODE");
+                _logger.LogHeader("PREVIEW-ONLY MODE");
                 _alreadyOutputPreviewOnlyModeWarning = true;
             }
 
             if (!migrationInfo.IsAttributed() || !VersionLoader.VersionInfo.HasAppliedMigration(migrationInfo.Version))
             {
                 var name = migrationInfo.GetName();
-                _announcer.Heading($"{name} migrating");
+                _logger.LogHeader($"{name} migrating");
 
                 _stopWatch.Start();
 
@@ -435,8 +437,8 @@ namespace FluentMigrator.Runner
 
                     _stopWatch.Stop();
 
-                    _announcer.Say($"{name} migrated");
-                    _announcer.ElapsedTime(_stopWatch.ElapsedTime());
+                    _logger.LogInformation($"{name} migrated");
+                    _logger.LogElapsedTime(_stopWatch.ElapsedTime());
                 }
             }
         }
@@ -446,7 +448,7 @@ namespace FluentMigrator.Runner
             if (migrationInfo == null) throw new ArgumentNullException(nameof(migrationInfo));
 
             var name = migrationInfo.GetName();
-            _announcer.Heading($"{name} reverting");
+            _logger.LogHeader($"{name} reverting");
 
             _stopWatch.Start();
 
@@ -469,8 +471,8 @@ namespace FluentMigrator.Runner
 
                 _stopWatch.Stop();
 
-                _announcer.Say($"{name} reverted");
-                _announcer.ElapsedTime(_stopWatch.ElapsedTime());
+                _logger.LogInformation($"{name} reverted");
+                _logger.LogElapsedTime(_stopWatch.ElapsedTime());
             }
         }
 
@@ -636,7 +638,7 @@ namespace FluentMigrator.Runner
                 }
                 catch (Exception er)
                 {
-                    _announcer.Error(er);
+                    _logger.LogError(er, er.Message);
 
                     //catch the error and move onto the next expression
                     if (SilentlyFail)
@@ -652,14 +654,14 @@ namespace FluentMigrator.Runner
             {
                 var avg = new TimeSpan(insertTicks / insertCount);
                 var msg = string.Format("-> {0} Insert operations completed in {1} taking an average of {2}", insertCount, new TimeSpan(insertTicks), avg);
-                _announcer.Say(msg);
+                _logger.LogInformation(msg);
             }
         }
 
         private void AnnounceTime(string message, Action action)
         {
-            _announcer.Say(message);
-            _announcer.ElapsedTime(_stopWatch.Time(action));
+            _logger.LogInformation(message);
+            _logger.LogElapsedTime(_stopWatch.Time(action));
         }
 
         public void ValidateVersionOrder()
@@ -668,7 +670,7 @@ namespace FluentMigrator.Runner
             if (unappliedVersions.Any())
                 throw new VersionOrderInvalidException(unappliedVersions);
 
-            _announcer.Say("Version ordering valid.");
+            _logger.LogInformation("Version ordering valid.");
         }
 
         public void ListMigrations()
@@ -676,7 +678,7 @@ namespace FluentMigrator.Runner
             var currentVersionInfo = VersionLoader.VersionInfo;
             var currentVersion = currentVersionInfo.Latest();
 
-            _announcer.Heading("Migrations");
+            _logger.LogHeader("Migrations");
 
             foreach (var migration in MigrationLoader.LoadMigrations())
             {
@@ -688,9 +690,9 @@ namespace FluentMigrator.Runner
                 var isCurrent = (status & MigrationStatus.AppliedMask) == MigrationStatus.Current;
                 var isBreaking = (status & MigrationStatus.Breaking) == MigrationStatus.Breaking;
                 if (isCurrent || isBreaking)
-                    _announcer.Emphasize(message);
+                    _logger.LogEmphasized(message);
                 else
-                    _announcer.Say(message);
+                    _logger.LogInformation(message);
             }
         }
 

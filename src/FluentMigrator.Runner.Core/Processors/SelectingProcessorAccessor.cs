@@ -83,7 +83,7 @@ namespace FluentMigrator.Runner.Processors
                     var processorOptions = serviceProvider.GetRequiredService<IOptions<ProcessorOptions>>();
                     foundProcessor = new ConnectionlessProcessor(
                         new PassThroughGeneratorAccessor(processorBase.Generator),
-                        serviceProvider.GetRequiredService<IAnnouncer>(),
+                        processorBase.Logger,
                         processorOptions,
                         databaseIds);
                 }

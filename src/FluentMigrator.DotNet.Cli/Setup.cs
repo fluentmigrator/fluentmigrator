@@ -21,7 +21,6 @@ using AutoMapper;
 
 using FluentMigrator.DotNet.Cli.CustomAnnouncers;
 using FluentMigrator.Runner;
-using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Initialization.NetFramework;
@@ -82,7 +81,7 @@ namespace FluentMigrator.DotNet.Cli
 
             services
                 .AddSingleton<IConventionSet>(conventionSet)
-                .AddScoped<TaskExecutor, LateInitTaskExecutor>()
+                .AddScoped<TaskExecutor>()
                 .Configure<SelectingProcessorAccessorOptions>(opt => opt.ProcessorId = options.ProcessorType)
                 .Configure<AssemblySourceOptions>(opt => opt.AssemblyNames = options.TargetAssemblies.ToArray())
 #pragma warning disable 612
@@ -132,14 +131,7 @@ namespace FluentMigrator.DotNet.Cli
                     });
 
             services
-                .AddSingleton(console)
-                .AddSingleton<LateInitAnnouncer>()
-                .AddSingleton<LoggingAnnouncer>()
-                .AddSingleton<ParserConsoleAnnouncer>()
-                .AddSingleton(CreateAnnouncer);
-
-            services
-                .AddTransient<TaskExecutor, LateInitTaskExecutor>();
+                .AddSingleton(console);
 
             return services.BuildServiceProvider();
         }
@@ -154,14 +146,6 @@ namespace FluentMigrator.DotNet.Cli
             var mapperConfig = new MapperConfiguration(cfg => cfg.CreateMap<MigratorOptions, MigratorOptions>());
             mapperConfig.AssertConfigurationIsValid();
             return new Mapper(mapperConfig);
-        }
-
-        private static IAnnouncer CreateAnnouncer(IServiceProvider serviceProvider)
-        {
-            var loggingAnnouncer = serviceProvider.GetRequiredService<LoggingAnnouncer>();
-            var consoleAnnouncer = serviceProvider.GetRequiredService<ParserConsoleAnnouncer>();
-            var lateInitAnnouncer = serviceProvider.GetRequiredService<LateInitAnnouncer>();
-            return new CompositeAnnouncer(loggingAnnouncer, consoleAnnouncer, lateInitAnnouncer);
         }
     }
 }

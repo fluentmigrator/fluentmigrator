@@ -25,8 +25,11 @@ using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
+using FluentMigrator.Tests.Helpers;
+using FluentMigrator.Tests.Logging;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 using NUnit.Framework;
 
@@ -80,8 +83,8 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird.EndToEnd
 
             var services = new ServiceCollection()
                 .AddFluentMigratorCore()
+                .AddSingleton<ILoggerProvider, TestLoggerProvider>()
                 .ConfigureRunner(builder => builder
-                    .WithAnnouncer(new TextWriterAnnouncer(TestContext.Out) { ShowSql = true })
                     .AddFirebird())
                 .Configure<RunnerOptions>(opt => opt.AllowBreakingChange = true)
                 .AddSingleton<IAnnouncer>(announcer)

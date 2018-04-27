@@ -19,6 +19,7 @@ using System.Diagnostics;
 
 namespace FluentMigrator.Runner.Announcers
 {
+    [Obsolete]
     public class TextWriterAnnouncerOptions : AnnouncerOptions
     {
         public Action<string> WriteDelegate { get; set; } = DefaultWriteHandler;

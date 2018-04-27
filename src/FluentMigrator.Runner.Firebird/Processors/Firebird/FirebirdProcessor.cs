@@ -744,7 +744,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
         protected void InternalProcess(string sql)
         {
-            Logger.LogInformation(RunnerEventIds.Sql, sql);
+            Logger.LogSql(sql);
 
             if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
                 return;
@@ -868,7 +868,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
                      onEvent.ToString().ToLower(),
                      triggerBody
                      );
-                Logger.LogInformation(RunnerEventIds.Sql, triggerSql);
+                Logger.LogSql(triggerSql);
                 using (var cmd = CreateCommand(triggerSql, connection, transaction))
                 {
                     cmd.ExecuteNonQuery();
@@ -887,7 +887,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             deleteTrigger.Operation = (connection, transaction) =>
             {
                 string triggerSql = string.Format("DROP TRIGGER {0}", _quoter.Quote(triggerName));
-                Logger.LogInformation(RunnerEventIds.Sql, triggerSql);
+                Logger.LogSql(triggerSql);
                 using (var cmd = CreateCommand(triggerSql, connection, transaction))
                 {
                     cmd.ExecuteNonQuery();

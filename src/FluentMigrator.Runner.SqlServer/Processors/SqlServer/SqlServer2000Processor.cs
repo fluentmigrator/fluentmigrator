@@ -99,13 +99,13 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         public override void BeginTransaction()
         {
             base.BeginTransaction();
-            Logger.LogInformation(RunnerEventIds.Sql, "BEGIN TRANSACTION");
+            Logger.LogSql("BEGIN TRANSACTION");
         }
 
         public override void CommitTransaction()
         {
             base.CommitTransaction();
-            Logger.LogInformation(RunnerEventIds.Sql, "COMMIT TRANSACTION");
+            Logger.LogSql("COMMIT TRANSACTION");
         }
 
         public override void RollbackTransaction()
@@ -116,7 +116,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             }
 
             base.RollbackTransaction();
-            Logger.LogInformation(RunnerEventIds.Sql, "ROLLBACK TRANSACTION");
+            Logger.LogSql("ROLLBACK TRANSACTION");
         }
 
         public override bool SchemaExists(string schemaName)
@@ -199,7 +199,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         protected override void Process(string sql)
         {
-            Logger.LogInformation(RunnerEventIds.Sql, sql);
+            Logger.LogSql(sql);
 
             if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
             {

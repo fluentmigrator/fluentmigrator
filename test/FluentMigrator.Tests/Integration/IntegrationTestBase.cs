@@ -232,7 +232,7 @@ namespace FluentMigrator.Tests.Integration
                     var loggerFactory = sp.GetRequiredService<ILoggerFactory>();
                     var logger = loggerFactory.CreateLogger(GetType());
 
-                    logger.LogInformation(RunnerEventIds.Heading, $"Testing Migration against {processorType}");
+                    logger.LogHeader($"Testing Migration against {processorType}");
 
                     var processor = (ProcessorBase) sp.GetRequiredService(processorType);
                     try

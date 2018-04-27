@@ -21,28 +21,28 @@ namespace FluentMigrator.Runner
     /// <summary>
     /// The default runner event IDs
     /// </summary>
-    public static class RunnerEventIds
+    internal static class RunnerEventIds
     {
-        public const string DefaultEventName = "FluentMigrator.Runner";
+        public const string RunnerCategory = "FluentMigrator.Runner";
 
         /// <summary>
         /// Gets the event ID for a heading
         /// </summary>
-        public static readonly EventId Heading = new EventId(1000, DefaultEventName);
+        public static readonly EventId Heading = new EventId(1000, RunnerCategory);
 
         /// <summary>
         /// Gets the event ID for an emphasized message
         /// </summary>
-        public static readonly EventId Emphasize = new EventId(1001, DefaultEventName);
+        public static readonly EventId Emphasize = new EventId(1001, RunnerCategory);
 
         /// <summary>
         /// Gets the event ID for elapsed time
         /// </summary>
-        public static readonly EventId ElapsedTime = new EventId(1002, DefaultEventName);
+        public static readonly EventId ElapsedTime = new EventId(1002, RunnerCategory);
 
         /// <summary>
         /// Gets the event ID for an SQL statement
         /// </summary>
-        public static readonly EventId Sql = new EventId(1003, DefaultEventName);
+        public static readonly EventId Sql = new EventId(1003, RunnerCategory);
     }
 }

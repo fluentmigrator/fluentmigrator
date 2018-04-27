@@ -1,0 +1,79 @@
+﻿#region License
+// Copyright (c) 2018, FluentMigrator Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+#endregion
+
+using System.IO;
+using System.Linq;
+using System.Text;
+
+using FluentMigrator.Runner.Initialization;
+
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+
+namespace FluentMigrator.Runner.Logging
+{
+    /// <summary>
+    /// Outputs the SQL statements to a log file
+    /// </summary>
+    public class LogFileFluentMigratorLoggerProvider : ILoggerProvider
+    {
+        private readonly StreamWriter _writer;
+        private readonly SqlTextWriter _sqlWriter;
+        private readonly ILogger _logFileLogger;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LogFileFluentMigratorLoggerProvider"/> class.
+        /// </summary>
+        /// <param name="assemblySource">The assembly source</param>
+        /// <param name="options">The log file logger options</param>
+        public LogFileFluentMigratorLoggerProvider(
+            IAssemblySource assemblySource,
+            IOptions<LogFileFluentMigratorLoggerOptions> options)
+        {
+            var outputFileName = GetOutputFileName(assemblySource, options.Value);
+            _writer = new StreamWriter(outputFileName, false, Encoding.UTF8);
+            _sqlWriter = new SqlTextWriter(_writer);
+            _logFileLogger = new LogFileFluentMigratorLogger(_sqlWriter, options.Value);
+        }
+
+        /// <inheritdoc />
+        public ILogger CreateLogger(string categoryName)
+        {
+            return _logFileLogger;
+        }
+
+        /// <inheritdoc />
+        public void Dispose()
+        {
+            _sqlWriter?.Dispose();
+            _writer?.Dispose();
+        }
+
+        private static string GetOutputFileName(
+            IAssemblySource assemblySource,
+            LogFileFluentMigratorLoggerOptions options)
+        {
+            if (!string.IsNullOrEmpty(options.OutputFileName))
+                return options.OutputFileName;
+
+            if (assemblySource.Assemblies.Count == 0)
+                return "fluentmigrator.sql";
+
+            var assembly = assemblySource.Assemblies.First();
+            return assembly.Location + ".sql";
+        }
+    }
+}

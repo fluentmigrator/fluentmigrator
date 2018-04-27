@@ -24,6 +24,7 @@ using NUnit.Framework;
 namespace FluentMigrator.Tests.Unit.Announcers
 {
     [TestFixture]
+    [Obsolete]
     public class AnnouncerTests
     {
         [SetUp]

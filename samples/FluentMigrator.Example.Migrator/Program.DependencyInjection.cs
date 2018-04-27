@@ -16,9 +16,9 @@
 
 using FluentMigrator.Example.Migrations;
 using FluentMigrator.Runner;
-using FluentMigrator.Runner.Announcers;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace FluentMigrator.Example.Migrator
 {
@@ -28,12 +28,12 @@ namespace FluentMigrator.Example.Migrator
         {
             // Initialize the services
             var serviceProvider = new ServiceCollection()
+                .AddLogging(lb => lb.AddDebug().AddFluentMigratorConsole())
                 .AddFluentMigratorCore()
                 .ConfigureRunner(
                     builder => builder
                         .AddSQLite()
                         .WithGlobalConnectionString(connectionString)
-                        .WithAnnouncer(new ConsoleAnnouncer() { ShowSql = true })
                         .WithMigrationsIn(typeof(AddGTDTables).Assembly))
                 .BuildServiceProvider();
 

@@ -22,14 +22,15 @@ using System.IO;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner;
-using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.Postgres;
 using FluentMigrator.Tests.Helpers;
+using FluentMigrator.Tests.Logging;
 
 using JetBrains.Annotations;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 using NUnit.Framework;
 
@@ -150,8 +151,9 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
             var output = new StringWriter();
 
             var sp = CreateProcessorServices(
-                services => services.ConfigureRunner(
-                    r => r.WithAnnouncer(new TextWriterAnnouncer(output)).AsGlobalPreview()));
+                services => services
+                    .AddSingleton<ILoggerProvider>(new TextWriterLoggerProvider(output))
+                    .ConfigureRunner(r => r.AsGlobalPreview()));
             using (sp)
             {
                 using (var scope = sp.CreateScope())

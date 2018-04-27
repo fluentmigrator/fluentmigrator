@@ -28,10 +28,12 @@ namespace FluentMigrator.Example.Migrator
         private static void RunInLegacyMode(string connectionString)
         {
             // Create the announcer to output the migration messages
+#pragma warning disable 612
             var announcer = new ConsoleAnnouncer()
             {
                 ShowSql = true,
             };
+#pragma warning restore 612
 
             // Processor specific options (usually none are needed)
             var options = new ProcessorOptions();

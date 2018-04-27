@@ -127,7 +127,7 @@ namespace FluentMigrator.Runner.Processors.Hana
 
             var querySql = string.Format(template, args);
 
-            Logger.LogInformation(RunnerEventIds.Sql, $"{querySql};");
+            Logger.LogSql($"{querySql};");
 
             using (var command = CreateCommand(string.Format(template, args)))
             using (var reader = command.ExecuteReader())
@@ -172,7 +172,7 @@ namespace FluentMigrator.Runner.Processors.Hana
 
         protected override void Process(string sql)
         {
-            Logger.LogInformation(RunnerEventIds.Sql, sql);
+            Logger.LogSql(sql);
 
             if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
                 return;

@@ -93,18 +93,6 @@ namespace FluentMigrator.Runner
         }
 
         /// <summary>
-        /// Sets the announcer
-        /// </summary>
-        /// <param name="builder">The runner builder</param>
-        /// <param name="announcer">The announcer to use</param>
-        /// <returns>The runner builder</returns>
-        public static IMigrationRunnerBuilder WithAnnouncer(this IMigrationRunnerBuilder builder, IAnnouncer announcer)
-        {
-            builder.Services.AddSingleton(_ => announcer);
-            return builder;
-        }
-
-        /// <summary>
         /// Sets the version table meta data
         /// </summary>
         /// <param name="builder">The runner builder</param>

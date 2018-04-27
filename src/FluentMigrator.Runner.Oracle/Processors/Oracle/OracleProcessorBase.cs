@@ -179,7 +179,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
 
             EnsureConnectionIsOpen();
 
-            Logger.LogInformation(RunnerEventIds.Sql, template, args);
+            Logger.LogSql(string.Format(template, args));
             using (var command = CreateCommand(string.Format(template, args)))
             using (var reader = command.ExecuteReader())
             {
@@ -221,7 +221,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
 
         protected override void Process(string sql)
         {
-            Logger.LogInformation(RunnerEventIds.Sql, sql);
+            Logger.LogSql(sql);
 
             if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
                 return;

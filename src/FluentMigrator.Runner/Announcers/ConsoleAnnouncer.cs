@@ -22,6 +22,7 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Announcers
 {
+    [Obsolete]
     public class ConsoleAnnouncer : Announcer
     {
         public ConsoleAnnouncer()
