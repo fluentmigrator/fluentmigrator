@@ -23,11 +23,10 @@ using System.Reflection;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
-using FluentMigrator.Runner.Initialization;
-using FluentMigrator.Runner.Versioning;
 using FluentMigrator.Infrastructure.Extensions;
-using FluentMigrator.Model;
+using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Exceptions;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.VersionTableInfo;
 
 namespace FluentMigrator.Runner
@@ -69,15 +68,15 @@ namespace FluentMigrator.Runner
 
         public IRunnerContext RunnerContext { get; private set; }
 
-        public MigrationRunner(Assembly assembly, IRunnerContext runnerContext, IMigrationProcessor processor)
-          : this(new SingleAssembly(assembly), runnerContext, processor)
+        public MigrationRunner(Assembly assembly, IRunnerContext runnerContext, IMigrationProcessor processor, IConventionSet convSet = null)
+          : this(new SingleAssembly(assembly), runnerContext, processor, convSet: convSet)
         {
         }
 
         public MigrationRunner(
             IAssemblyCollection assemblies, IRunnerContext runnerContext,
             IMigrationProcessor processor, IVersionTableMetaData versionTableMetaData = null,
-            IMigrationRunnerConventions migrationRunnerConventions = null)
+            IMigrationRunnerConventions migrationRunnerConventions = null, IConventionSet convSet = null)
         {
             _migrationAssemblies = assemblies;
             _announcer = runnerContext.Announcer;
@@ -90,7 +89,8 @@ namespace FluentMigrator.Runner
 
             Conventions = migrationRunnerConventions ?? GetMigrationRunnerConventions(runnerContext);
 
-            var convSet = new DefaultConventionSet(runnerContext);
+            if (convSet == null)
+                convSet = new DefaultConventionSet(runnerContext);
 
             _migrationScopeHandler = new MigrationScopeHandler(Processor);
             _migrationValidator = new MigrationValidator(_announcer, convSet);
@@ -188,7 +188,7 @@ namespace FluentMigrator.Runner
 
             if (matchedType != null)
             {
-                return (IMigrationRunnerConventions) Activator.CreateInstance(matchedType);
+                return (IMigrationRunnerConventions)Activator.CreateInstance(matchedType);
             }
 
             return new MigrationRunnerConventions();
@@ -561,7 +561,7 @@ namespace FluentMigrator.Runner
 
             _announcer.Heading("Migrations");
 
-            foreach(var migration in MigrationLoader.LoadMigrations())
+            foreach (var migration in MigrationLoader.LoadMigrations())
             {
                 var migrationName = migration.Value.GetName();
                 var status = GetStatus(migration, currentVersion);
@@ -570,7 +570,7 @@ namespace FluentMigrator.Runner
 
                 var isCurrent = (status & MigrationStatus.AppliedMask) == MigrationStatus.Current;
                 var isBreaking = (status & MigrationStatus.Breaking) == MigrationStatus.Breaking;
-                if(isCurrent || isBreaking)
+                if (isCurrent || isBreaking)
                     _announcer.Emphasize(message);
                 else
                     _announcer.Say(message);
