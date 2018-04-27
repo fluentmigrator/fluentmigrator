@@ -68,15 +68,28 @@ namespace FluentMigrator.Runner
 
         public IRunnerContext RunnerContext { get; private set; }
 
-        public MigrationRunner(Assembly assembly, IRunnerContext runnerContext, IMigrationProcessor processor, IConventionSet convSet = null)
-          : this(new SingleAssembly(assembly), runnerContext, processor, convSet: convSet)
+        public MigrationRunner(Assembly assembly, IRunnerContext runnerContext, IMigrationProcessor processor)
+          : this(assembly, runnerContext, processor, conventionSet: null)
+        {
+        }
+
+        public MigrationRunner(Assembly assembly, IRunnerContext runnerContext, IMigrationProcessor processor, IConventionSet conventionSet)
+            : this(new SingleAssembly(assembly), runnerContext, processor, versionTableMetaData: null, migrationRunnerConventions: null, conventionSet)
         {
         }
 
         public MigrationRunner(
             IAssemblyCollection assemblies, IRunnerContext runnerContext,
             IMigrationProcessor processor, IVersionTableMetaData versionTableMetaData = null,
-            IMigrationRunnerConventions migrationRunnerConventions = null, IConventionSet convSet = null)
+            IMigrationRunnerConventions migrationRunnerConventions = null)
+            : this(assemblies, runnerContext, processor, versionTableMetaData, migrationRunnerConventions, conventionSet: null)
+        {
+        }
+
+        public MigrationRunner(
+            IAssemblyCollection assemblies, IRunnerContext runnerContext,
+            IMigrationProcessor processor, IVersionTableMetaData versionTableMetaData,
+            IMigrationRunnerConventions migrationRunnerConventions, IConventionSet conventionSet)
         {
             _migrationAssemblies = assemblies;
             _announcer = runnerContext.Announcer;
@@ -89,8 +102,7 @@ namespace FluentMigrator.Runner
 
             Conventions = migrationRunnerConventions ?? GetMigrationRunnerConventions(runnerContext);
 
-            if (convSet == null)
-                convSet = new DefaultConventionSet(runnerContext);
+            var convSet = conventionSet ?? new DefaultConventionSet(runnerContext);
 
             _migrationScopeHandler = new MigrationScopeHandler(Processor);
             _migrationValidator = new MigrationValidator(_announcer, convSet);
