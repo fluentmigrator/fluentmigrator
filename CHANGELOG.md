@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## 2.0.7 (2018-04-27)
+
+### Added
+
+- [#856](https://github.com/fluentmigrator/fluentmigrator/pull/865) New constructors to enable passing a custom expression convention set
+
 ## 2.0.6 (2018-04-24)
 
 ### Fixed
