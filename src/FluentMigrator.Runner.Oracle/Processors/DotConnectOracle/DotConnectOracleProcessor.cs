@@ -33,7 +33,7 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
 {
     public class DotConnectOracleProcessor : GenericProcessorBase
     {
-        public override string DatabaseType => "Oracle";
+        public override string DatabaseType => "DotConnectOracle";
 
         public override IList<string> DatabaseTypeAliases { get; } = new List<string>();
 
