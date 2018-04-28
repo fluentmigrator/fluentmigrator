@@ -35,6 +35,7 @@ using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.SqlAnywhere;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using NUnit.Framework;
@@ -228,9 +229,10 @@ namespace FluentMigrator.Tests.Integration
                 using (var scope = serviceProvider.CreateScope())
                 {
                     var sp = scope.ServiceProvider;
-                    var announcer = sp.GetRequiredService<IAnnouncer>();
+                    var loggerFactory = sp.GetRequiredService<ILoggerFactory>();
+                    var logger = loggerFactory.CreateLogger(GetType());
 
-                    announcer.Heading($"Testing Migration against {processorType}");
+                    logger.LogHeader($"Testing Migration against {processorType}");
 
                     var processor = (ProcessorBase) sp.GetRequiredService(processorType);
                     try

@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2018, FluentMigrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,6 +19,7 @@ using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.Oracle
@@ -28,10 +29,10 @@ namespace FluentMigrator.Runner.Processors.Oracle
         public OracleManagedProcessor(
             [NotNull] OracleManagedDbFactory factory,
             [NotNull] OracleGenerator generator,
-            [NotNull] IAnnouncer announcer,
+            [NotNull] ILogger<OracleManagedProcessor> logger,
             [NotNull] IOptions<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor)
-            : base("OracleManaged", factory, generator, announcer, options, connectionStringAccessor)
+            : base("OracleManaged", factory, generator, logger, options, connectionStringAccessor)
         {
         }
     }

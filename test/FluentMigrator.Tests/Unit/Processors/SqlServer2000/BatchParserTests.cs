@@ -17,17 +17,17 @@
 using System;
 using System.Data.Common;
 
-using FluentMigrator.Runner;
-using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.BatchParser;
 using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.SqlServer;
+using FluentMigrator.Tests.Logging;
 
 using JetBrains.Annotations;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using Moq;
@@ -46,13 +46,17 @@ namespace FluentMigrator.Tests.Unit.Processors.SqlServer2000
             mockedConnStringReader.Setup(r => r.GetConnectionString(It.IsAny<string>())).Returns("server=this");
 
             var serviceProvider = new ServiceCollection()
+                .AddLogging()
+                .AddSingleton<ILoggerProvider, TestLoggerProvider>()
                 .AddTransient<SqlServerBatchParser>()
                 .BuildServiceProvider();
+
+            var logger = serviceProvider.GetRequiredService<ILogger<SqlServer2000Processor>>();
 
             var opt = new OptionsWrapper<ProcessorOptions>(new ProcessorOptions());
             return new Processor(
                 MockedDbProviderFactory.Object,
-                new NullAnnouncer(),
+                logger,
                 new SqlServer2000Generator(),
                 opt,
                 MockedConnectionStringAccessor.Object,
@@ -62,8 +66,8 @@ namespace FluentMigrator.Tests.Unit.Processors.SqlServer2000
         private class Processor : SqlServer2000Processor
         {
             /// <inheritdoc />
-            public Processor(DbProviderFactory factory, [NotNull] IAnnouncer announcer, [NotNull] SqlServer2000Generator generator, [NotNull] IOptions<ProcessorOptions> options, [NotNull] IConnectionStringAccessor connectionStringAccessor, [NotNull] IServiceProvider serviceProvider)
-                : base(factory, announcer, generator, options, connectionStringAccessor, serviceProvider)
+            public Processor(DbProviderFactory factory, [NotNull] ILogger logger, [NotNull] SqlServer2000Generator generator, [NotNull] IOptions<ProcessorOptions> options, [NotNull] IConnectionStringAccessor connectionStringAccessor, [NotNull] IServiceProvider serviceProvider)
+                : base(factory, logger, generator, options, connectionStringAccessor, serviceProvider)
             {
             }
         }

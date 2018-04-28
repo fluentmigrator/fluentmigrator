@@ -19,18 +19,18 @@ using System;
 using FluentMigrator;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner;
-using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Initialization.AssemblyLoader;
 using FluentMigrator.Runner.Initialization.NetFramework;
+using FluentMigrator.Runner.Logging;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.VersionTableInfo;
 
 using JetBrains.Annotations;
 
-using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 // ReSharper disable once CheckNamespace
@@ -55,12 +55,11 @@ namespace Microsoft.Extensions.DependencyInjection
                 throw new ArgumentNullException(nameof(services));
 
             services
-                // Create the announcer to output the migration messages
-                .TryAddSingleton<IAnnouncer, NullAnnouncer>();
-
-            services
                 // Add support for options
                 .AddOptions()
+
+                // Add loggins support
+                .AddLogging()
 
                 // The default assembly loader factory
                 .AddSingleton<AssemblyLoaderFactory>()
@@ -205,11 +204,10 @@ namespace Microsoft.Extensions.DependencyInjection
 
             // Configure the migration runner
             services
+                .AddLogging(lb => lb.AddProvider(new LegacyFluentMigratorLoggerProvider(runnerContext.Announcer)))
                 .AddFluentMigratorCore()
                 .AddAllDatabases()
                 .Configure<SelectingProcessorAccessorOptions>(opt => opt.ProcessorId = runnerContext.Database)
-                .ConfigureRunner(
-                    builder => { builder.WithAnnouncer(runnerContext.Announcer); })
                 .AddSingleton(assemblyLoaderFactory)
                 .Configure<TypeFilterOptions>(
                     opt =>
@@ -279,6 +277,7 @@ namespace Microsoft.Extensions.DependencyInjection
             public IServiceCollection Services { get; }
         }
 
+        [UsedImplicitly]
         private class ConnectionlessProcessorAccessor : IProcessorAccessor
         {
             public ConnectionlessProcessorAccessor(IServiceProvider serviceProvider)

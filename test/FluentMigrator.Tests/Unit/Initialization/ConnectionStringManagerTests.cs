@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 //
 // Copyright (c) 2018, Fluent Migrator Project
 //
@@ -17,15 +17,22 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
+using System.Linq;
 
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Initialization.NetFramework;
+using FluentMigrator.Tests.Logging;
+
+using Microsoft.Extensions.Logging;
 
 using Moq;
 
 using NUnit.Framework;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Initialization
 {
@@ -35,16 +42,18 @@ namespace FluentMigrator.Tests.Unit.Initialization
         [SetUp]
         public void Setup()
         {
-            _announcerMock = new Mock<IAnnouncer>(MockBehavior.Loose);
-            _announcerMock.Setup(a => a.Say(It.IsAny<string>()));
-
+            _logMessages = new List<string>();
+            var loggerFactory = new LoggerFactory();
+            loggerFactory.AddProvider(new TextLineLoggerProvider(_logMessages, new FluentMigratorLoggerOptions() { ShowElapsedTime = true }));
+            _logger = loggerFactory.CreateLogger<ConnectionStringManager>();
             _configManagerMock = new Mock<INetConfigManager>(MockBehavior.Strict);
         }
 
         private const string TARGET = "FluentMigrator.Tests.dll";
         private const string DATABASE = "sqlserver2008";
         private const string CONNECTION_NAME = "Test.Connection";
-        private Mock<IAnnouncer> _announcerMock;
+        private ICollection<string> _logMessages;
+        private ILogger<ConnectionStringManager> _logger;
         private Mock<INetConfigManager> _configManagerMock;
 
         private static string GetPath(string relative)
@@ -63,7 +72,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
         public void ShouldLoadMachineNameConnectionFromSpecifiedConfigIfNoConnectionNameSpecified()
         {
             string configPath = GetPath("WithConnectionString.config");
-            var sut = new ConnectionStringManager(_configManagerMock.Object, _announcerMock.Object, null, configPath, TARGET, DATABASE);
+            var sut = new ConnectionStringManager(_configManagerMock.Object, _logger, null, configPath, TARGET, DATABASE);
             _configManagerMock.Setup(m => m.LoadFromFile(configPath))
                              .Returns(LoadFromFile(configPath));
             sut.MachineNameProvider = () => "MACHINENAME";
@@ -85,7 +94,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
             _configManagerMock.Setup(x => x.LoadFromMachineConfiguration())
                              .Returns(LoadFromFile(machineConfigPath));
 
-            var sut = new ConnectionStringManager(_configManagerMock.Object, _announcerMock.Object, CONNECTION_NAME, null, TARGET, DATABASE);
+            var sut = new ConnectionStringManager(_configManagerMock.Object, _logger, CONNECTION_NAME, null, TARGET, DATABASE);
             sut.LoadConnectionString();
 
             _configManagerMock.VerifyAll();
@@ -97,7 +106,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
         public void ShouldLoadNamedConnectionFromSpecifiedConfigFile()
         {
             string configPath = GetPath("WithConnectionString.config");
-            var sut = new ConnectionStringManager(_configManagerMock.Object, _announcerMock.Object, CONNECTION_NAME, configPath, TARGET, DATABASE);
+            var sut = new ConnectionStringManager(_configManagerMock.Object, _logger, CONNECTION_NAME, configPath, TARGET, DATABASE);
             _configManagerMock.Setup(m => m.LoadFromFile(configPath))
                              .Returns(LoadFromFile(configPath));
 
@@ -114,7 +123,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
             _configManagerMock.Setup(x => x.LoadFromFile(TARGET))
                              .Returns(LoadFromFile(configPath));
 
-            var sut = new ConnectionStringManager(_configManagerMock.Object, _announcerMock.Object, CONNECTION_NAME, null, TARGET, DATABASE);
+            var sut = new ConnectionStringManager(_configManagerMock.Object, _logger, CONNECTION_NAME, null, TARGET, DATABASE);
 
             sut.LoadConnectionString();
 
@@ -133,13 +142,18 @@ namespace FluentMigrator.Tests.Unit.Initialization
             _configManagerMock.Setup(x => x.LoadFromMachineConfiguration())
                              .Returns(LoadFromFile(machineConfigPath));
 
-            var sut = new ConnectionStringManager(_configManagerMock.Object, _announcerMock.Object,
-                                                  @"server=.\SQLEXPRESS;uid=test;pwd=test;Trusted_Connection=yes;database=FluentMigrator", null, TARGET,
-                                                  DATABASE);
+            var sut = new ConnectionStringManager(
+                _configManagerMock.Object,
+                _logger,
+                @"server=.\SQLEXPRESS;uid=test;pwd=test;Trusted_Connection=yes;database=FluentMigrator",
+                null,
+                TARGET,
+                DATABASE);
 
             sut.LoadConnectionString();
 
-            _announcerMock.Verify(a => a.Say(@"Using Database sqlserver2008 and Connection String server=.\SQLEXPRESS;uid=test;pwd=********;Trusted_Connection=yes;database=FluentMigrator"), Times.Once());
+            var expectedMessage = @"Using Database sqlserver2008 and Connection String server=.\SQLEXPRESS;uid=test;pwd=********;Trusted_Connection=yes;database=FluentMigrator";
+            _logMessages.Count(x => x.Contains(expectedMessage)).ShouldBe(1);
         }
 
         [Test]
@@ -154,7 +168,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
             _configManagerMock.Setup(x => x.LoadFromMachineConfiguration())
                              .Returns(LoadFromFile(machineConfigPath));
 
-            var sut = new ConnectionStringManager(_configManagerMock.Object, _announcerMock.Object, "This is a connection string", null, TARGET, DATABASE);
+            var sut = new ConnectionStringManager(_configManagerMock.Object, _logger, "This is a connection string", null, TARGET, DATABASE);
 
             sut.LoadConnectionString();
 

@@ -29,6 +29,7 @@ using FluentMigrator.Tests.Integration;
 using JetBrains.Annotations;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using Moq;
@@ -58,7 +59,6 @@ namespace FluentMigrator.Tests.Unit
             dataSet.Tables.Add(new DataTable());
             processor.Setup(x => x.ReadTableData(null, It.IsAny<string>())).Returns(dataSet);
 
-            var announcer = new Mock<IAnnouncer>();
             var stopWatch = new Mock<IStopWatch>();
 
             var services = ServiceCollectionExtensions.CreateServices()
@@ -66,7 +66,6 @@ namespace FluentMigrator.Tests.Unit
                 .AddSingleton(stopWatch.Object)
                 .AddScoped<IConnectionStringReader>(_ => new PassThroughConnectionStringReader(IntegrationTestOptions.SqlServer2008.ConnectionString))
                 .AddScoped(_ => _migrationRunner.Object)
-                .ConfigureRunner(r => r.WithAnnouncer(announcer.Object))
                 .Configure<SelectingProcessorAccessorOptions>(opt => opt.ProcessorId = "sqlserver2008")
                 .Configure<RunnerOptions>(
                     opt =>
@@ -246,11 +245,11 @@ namespace FluentMigrator.Tests.Unit
         internal class FakeTaskExecutor : TaskExecutor
         {
             public FakeTaskExecutor(
-                [NotNull] IAnnouncer announcer,
+                [NotNull] ILogger<TaskExecutor> logger,
                 [NotNull] IAssemblySource assemblySource,
                 [NotNull] IOptions<RunnerOptions> runnerOptions,
                 [NotNull] IServiceProvider serviceProvider)
-                : base(announcer, assemblySource, runnerOptions, serviceProvider)
+                : base(logger, assemblySource, runnerOptions, serviceProvider)
             {
             }
         }

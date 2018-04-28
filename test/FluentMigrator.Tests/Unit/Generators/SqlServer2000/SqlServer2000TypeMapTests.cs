@@ -21,7 +21,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
         public class AnsistringTests : SqlServer2000TypeMapTests
         {
             [Test]
-            public void it_maps_ansistring_by_default_to_varchar_255()
+            public void ItMapsAnsistringByDefaultToVarchar255()
             {
                 var template = TypeMap.GetTypeMap(DbType.AnsiString, 0, 0);
 
@@ -32,7 +32,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             [TestCase(1)]
             [TestCase(4000)]
             [TestCase(8000)]
-            public void it_maps_ansistring_with_size_to_varchar_of_size(int size)
+            public void ItMapsAnsistringWithSizeToVarcharOfSize(int size)
             {
                 var template = TypeMap.GetTypeMap(DbType.AnsiString, size, 0);
 
@@ -42,7 +42,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             [Test]
             [TestCase(8001)]
             [TestCase(2147483647)]
-            public void it_maps_ansistring_with_size_above_8000_to_text(int size)
+            public void ItMapsAnsistringWithSizeAbove8000ToText(int size)
             {
                 var template = TypeMap.GetTypeMap(DbType.AnsiString, size, 0);
 
@@ -54,7 +54,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
         public class AnsistringFixedLengthTests : SqlServer2000TypeMapTests
         {
             [Test]
-            public void it_maps_ansistring_fixed_length_by_default_to_char_255()
+            public void ItMapsAnsistringFixedLengthByDefaultToChar255()
             {
                 var template = TypeMap.GetTypeMap(DbType.AnsiStringFixedLength, 0, 0);
 
@@ -65,7 +65,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             [TestCase(1)]
             [TestCase(4000)]
             [TestCase(8000)]
-            public void it_maps_ansistring_fixed_length_with_size_to_char_of_size(int size)
+            public void ItMapsAnsistringFixedLengthWithSizeToCharOfSize(int size)
             {
                 var template = TypeMap.GetTypeMap(DbType.AnsiStringFixedLength, size, 0);
 
@@ -73,7 +73,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             }
 
             [Test]
-            public void it_throws_if_ansistring_fixed_length_has_size_above_8000()
+            public void ItThrowsIfAnsistringFixedLengthHasSizeAbove8000()
             {
                 Should.Throw<NotSupportedException>(
                     () => TypeMap.GetTypeMap(DbType.AnsiStringFixedLength, 8001, 0));
@@ -84,7 +84,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
         public class StringTests : SqlServer2000TypeMapTests
         {
             [Test]
-            public void it_maps_string_by_default_to_nvarchar_255()
+            public void ItMapsStringByDefaultToNvarchar255()
             {
                 var template = TypeMap.GetTypeMap(DbType.String, 0, 0);
 
@@ -94,7 +94,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             [Test]
             [TestCase(1)]
             [TestCase(4000)]
-            public void it_maps_string_with_size_to_nvarchar_of_size(int size)
+            public void ItMapsStringWithSizeToNvarcharOfSize(int size)
             {
                 var template = TypeMap.GetTypeMap(DbType.String, size, 0);
 
@@ -104,7 +104,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             [Test]
             [TestCase(4001)]
             [TestCase(1073741823)]
-            public void it_maps_string_with_size_above_4000_to_ntext(int size)
+            public void ItMapsStringWithSizeAbove4000ToNtext(int size)
             {
                 var template = TypeMap.GetTypeMap(DbType.String, size, 0);
 
@@ -112,7 +112,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             }
 
             [Test]
-            public void it_maps_string_with_size_above_1073741823_to_ntext_to_allow_int_maxvalue_convention()
+            public void ItMapsStringWithSizeAbove1073741823ToNtextToAllowIntMaxvalueConvention()
             {
                 var template = TypeMap.GetTypeMap(DbType.String, int.MaxValue, 0);
 
@@ -124,7 +124,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
         public class StringFixedLengthTests : SqlServer2000TypeMapTests
         {
             [Test]
-            public void it_maps_string_fixed_length_by_default_to_nchar_255()
+            public void ItMapsStringFixedLengthByDefaultToNchar255()
             {
                 var template = TypeMap.GetTypeMap(DbType.StringFixedLength, 0, 0);
 
@@ -135,7 +135,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             [Test]
             [TestCase(1)]
             [TestCase(4000)]
-            public void it_maps_string_fixed_length_with_size_to_nchar_of_size(int size)
+            public void ItMapsStringFixedLengthWithSizeToNcharOfSize(int size)
             {
                 var template = TypeMap.GetTypeMap(DbType.StringFixedLength, size, 0);
 
@@ -143,7 +143,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             }
 
             [Test]
-            public void it_throws_if_string_fixed_length_has_size_above_4000()
+            public void ItThrowsIfStringFixedLengthHasSizeAbove4000()
             {
                 Should.Throw<NotSupportedException>(
                     () => TypeMap.GetTypeMap(DbType.StringFixedLength, 4001, 0));
@@ -154,7 +154,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
         public class BinaryTests : SqlServer2000TypeMapTests
         {
             [Test]
-            public void it_maps_binary_by_default_to_varbinary_8000()
+            public void ItMapsBinaryByDefaultToVarbinary8000()
             {
                 var template = TypeMap.GetTypeMap(DbType.Binary, 0, 0);
 
@@ -165,7 +165,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             [TestCase(1)]
             [TestCase(4000)]
             [TestCase(8000)]
-            public void it_maps_binary_with_size_to_varbinary_of_size(int size)
+            public void ItMapsBinaryWithSizeToVarbinaryOfSize(int size)
             {
                 var template = TypeMap.GetTypeMap(DbType.Binary, size, 0);
 
@@ -175,7 +175,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             [Test]
             [TestCase(8001)]
             [TestCase(int.MaxValue)]
-            public void it_maps_binary_with_size_above_8000_to_image(int size)
+            public void ItMapsBinaryWithSizeAbove8000ToImage(int size)
             {
                 var template = TypeMap.GetTypeMap(DbType.Binary, size, 0);
 
@@ -187,7 +187,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
         public class NumericTests : SqlServer2000TypeMapTests
         {
             [Test]
-            public void it_maps_boolean_to_bit()
+            public void ItMapsBooleanToBit()
             {
                 var template = TypeMap.GetTypeMap(DbType.Boolean, 0, 0);
 
@@ -195,7 +195,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             }
 
             [Test]
-            public void it_maps_byte_to_tinyint()
+            public void ItMapsByteToTinyint()
             {
                 var template = TypeMap.GetTypeMap(DbType.Byte, 0, 0);
 
@@ -203,7 +203,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             }
 
             [Test]
-            public void it_maps_int16_to_smallint()
+            public void ItMapsInt16ToSmallint()
             {
                 var template = TypeMap.GetTypeMap(DbType.Int16, 0, 0);
 
@@ -211,7 +211,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             }
 
             [Test]
-            public void it_maps_int32_to_int()
+            public void ItMapsInt32ToInt()
             {
                 var template = TypeMap.GetTypeMap(DbType.Int32, 0, 0);
 
@@ -219,7 +219,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             }
 
             [Test]
-            public void it_maps_int64_to_bigint()
+            public void ItMapsInt64ToBigint()
             {
                 var template = TypeMap.GetTypeMap(DbType.Int64, 0, 0);
 
@@ -227,7 +227,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             }
 
             [Test]
-            public void it_maps_single_to_real()
+            public void ItMapsSingleToReal()
             {
                 var template = TypeMap.GetTypeMap(DbType.Single, 0, 0);
 
@@ -235,7 +235,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             }
 
             [Test]
-            public void it_maps_double_to_double_precision()
+            public void ItMapsDoubleToDoublePrecision()
             {
                 var template = TypeMap.GetTypeMap(DbType.Double, 0, 0);
 
@@ -243,7 +243,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             }
 
             [Test]
-            public void it_maps_currency_to_money()
+            public void ItMapsCurrencyToMoney()
             {
                 var template = TypeMap.GetTypeMap(DbType.Currency, 0, 0);
 
@@ -251,7 +251,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             }
 
             [Test]
-            public void it_maps_decimal_by_default_to_decimal_19_5()
+            public void ItMapsDecimalByDefaultToDecimal195()
             {
                 var template = TypeMap.GetTypeMap(DbType.Decimal, 0, 0);
 
@@ -262,7 +262,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             [TestCase(1)]
             [TestCase(20)]
             [TestCase(38)]
-            public void it_maps_decimal_with_precision_to_decimal(int precision)
+            public void ItMapsDecimalWithPrecisionToDecimal(int precision)
             {
                 var template = TypeMap.GetTypeMap(DbType.Decimal, precision, 1);
 
@@ -270,7 +270,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             }
 
             [Test]
-            public void it_throws_if_decimal_precision_is_above_38()
+            public void ItThrowsIfDecimalPrecisionIsAbove38()
             {
                 Should.Throw<NotSupportedException>(
                     () => TypeMap.GetTypeMap(DbType.Decimal, 39, 0));
@@ -281,7 +281,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
         public class GuidTests : SqlServer2000TypeMapTests
         {
             [Test]
-            public void it_maps_guid_to_uniqueidentifier()
+            public void ItMapsGUIDToUniqueidentifier()
             {
                 var template = TypeMap.GetTypeMap(DbType.Guid, 0, 0);
 
@@ -293,7 +293,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
         public class DateTimeTests : SqlServer2000TypeMapTests
         {
             [Test]
-            public void it_maps_time_to_datetime()
+            public void ItMapsTimeToDatetime()
             {
                 var template = TypeMap.GetTypeMap(DbType.Time, 0, 0);
 
@@ -301,7 +301,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             }
 
             [Test]
-            public void it_maps_date_to_datetime()
+            public void ItMapsDateToDatetime()
             {
                 var template = TypeMap.GetTypeMap(DbType.Date, 0, 0);
 
@@ -309,7 +309,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             }
 
             [Test]
-            public void it_maps_datetime_to_datetime()
+            public void ItMapsDatetimeToDatetime()
             {
                 var template = TypeMap.GetTypeMap(DbType.DateTime, 0, 0);
 

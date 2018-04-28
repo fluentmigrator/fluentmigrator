@@ -22,11 +22,13 @@ using System.Reflection;
 
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Initialization.AssemblyLoader;
+using FluentMigrator.Runner.Logging;
 using FluentMigrator.Runner.Processors;
 
 using JetBrains.Annotations;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Initialization
@@ -35,10 +37,10 @@ namespace FluentMigrator.Runner.Initialization
     public class TaskExecutor
     {
         [NotNull]
-        private readonly IAssemblySource _assemblySource;
+        private readonly ILogger _logger;
 
         [NotNull]
-        private readonly IAnnouncer _announcer;
+        private readonly IAssemblySource _assemblySource;
 
         private readonly RunnerOptions _runnerOptions;
 
@@ -48,15 +50,17 @@ namespace FluentMigrator.Runner.Initialization
         private IReadOnlyCollection<Assembly> _assemblies;
 
         public TaskExecutor(
-            [NotNull] IAnnouncer announcer,
+            [NotNull] ILogger<TaskExecutor> logger,
             [NotNull] IAssemblySource assemblySource,
             [NotNull] IOptions<RunnerOptions> runnerOptions,
             [NotNull] IServiceProvider serviceProvider)
         {
-            _announcer = announcer;
+            _logger = logger;
             _assemblySource = assemblySource;
             _runnerOptions = runnerOptions.Value;
+#pragma warning disable 612
             ConnectionStringProvider = serviceProvider.GetService<IConnectionStringProvider>();
+#pragma warning restore 612
             _lazyServiceProvider = new Lazy<IServiceProvider>(() => serviceProvider);
         }
 
@@ -64,7 +68,7 @@ namespace FluentMigrator.Runner.Initialization
         public TaskExecutor([NotNull] IRunnerContext runnerContext)
         {
             var runnerCtxt = runnerContext ?? throw new ArgumentNullException(nameof(runnerContext));
-            _announcer = runnerCtxt.Announcer;
+            _logger = new AnnouncerFluentMigratorLogger(runnerCtxt.Announcer);
             _runnerOptions = new RunnerOptions(runnerCtxt);
             var asmLoaderFactory = new AssemblyLoaderFactory();
             _assemblySource = new AssemblySource(() => new AssemblyCollection(asmLoaderFactory.GetTargetAssemblies(runnerCtxt.Targets)));
@@ -98,7 +102,7 @@ namespace FluentMigrator.Runner.Initialization
             [CanBeNull] IConnectionStringProvider connectionStringProvider = null)
         {
             var runnerCtxt = runnerContext ?? throw new ArgumentNullException(nameof(runnerContext));
-            _announcer = runnerCtxt.Announcer;
+            _logger = new AnnouncerFluentMigratorLogger(runnerCtxt.Announcer);
             _runnerOptions = new RunnerOptions(runnerCtxt);
             ConnectionStringProvider = connectionStringProvider;
             var asmLoaderFactory = assemblyLoaderFactory ?? throw new ArgumentNullException(nameof(assemblyLoaderFactory));
@@ -124,6 +128,7 @@ namespace FluentMigrator.Runner.Initialization
         /// Gets the connection string provider
         /// </summary>
         [CanBeNull]
+        [Obsolete]
         protected IConnectionStringProvider ConnectionStringProvider { get; }
 
         /// <summary>
@@ -186,7 +191,7 @@ namespace FluentMigrator.Runner.Initialization
                 }
             }
 
-            _announcer.Say("Task completed.");
+            _logger.LogSay("Task completed.");
         }
 
         /// <summary>

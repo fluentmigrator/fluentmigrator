@@ -620,7 +620,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
         }
 
         [Test]
-        public void IColumnExpressionBuilder_UsesExpressionSchemaAndTableName()
+        public void ColumnExpressionBuilderUsesExpressionSchemaAndTableName()
         {
             var expressionMock = new Mock<AlterColumnExpression>();
             var contextMock = new Mock<IMigrationContext>();
@@ -635,7 +635,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
         }
 
         [Test]
-        public void IColumnExpressionBuilder_UsesExpressionColumn()
+        public void ColumnExpressionBuilderUsesExpressionColumn()
         {
             var expressionMock = new Mock<AlterColumnExpression>();
             var contextMock = new Mock<IMigrationContext>();

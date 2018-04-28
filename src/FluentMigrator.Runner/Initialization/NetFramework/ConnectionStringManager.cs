@@ -20,7 +20,10 @@
 using System;
 using System.Configuration;
 using System.Text.RegularExpressions;
+
 using FluentMigrator.Exceptions;
+
+using Microsoft.Extensions.Logging;
 
 namespace FluentMigrator.Runner.Initialization.NetFramework
 {
@@ -31,7 +34,8 @@ namespace FluentMigrator.Runner.Initialization.NetFramework
     internal class ConnectionStringManager
     {
         private static readonly Regex _matchPwd = new Regex("(PWD=|PASSWORD=)([^;]*);", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-        private readonly IAnnouncer _announcer;
+
+        private readonly ILogger _logger;
         private readonly string _assemblyLocation;
         private readonly INetConfigManager _configManager;
         private readonly string _configPath;
@@ -41,7 +45,7 @@ namespace FluentMigrator.Runner.Initialization.NetFramework
         private Func<string> _machineNameProvider = () => Environment.MachineName;
         private bool _notUsingConfig;
 
-        public ConnectionStringManager(INetConfigManager configManager, IAnnouncer announcer, string connection, string configPath, string assemblyLocation,
+        public ConnectionStringManager(INetConfigManager configManager, ILogger<ConnectionStringManager> logger, string connection, string configPath, string assemblyLocation,
                                        string database)
         {
             _connection = connection;
@@ -50,7 +54,7 @@ namespace FluentMigrator.Runner.Initialization.NetFramework
             _assemblyLocation = assemblyLocation;
             _notUsingConfig = true;
             _configManager = configManager;
-            _announcer = announcer;
+            _logger = logger;
         }
 
         public string ConnectionString { get; private set; }
@@ -114,9 +118,10 @@ namespace FluentMigrator.Runner.Initialization.NetFramework
             if (string.IsNullOrEmpty(ConnectionString))
                 throw new UndeterminableConnectionException("Unable to resolve any connectionstring using parameters \"/connection\" and \"/configPath\"");
 
-            _announcer.Say(_notUsingConfig
-                              ? string.Format("Using Database {0} and Connection String {1}", _database, _matchPwd.Replace(ConnectionString,"$1********;"))
-                              : string.Format("Using Connection {0} from Configuration file {1}", _connection, _configFile));
+            _logger.LogSay(
+                _notUsingConfig
+                    ? $"Using Database {_database} and Connection String {_matchPwd.Replace(ConnectionString, "$1********;")}"
+                    : $"Using Connection {_connection} from Configuration file {_configFile}");
         }
     }
 }

@@ -27,6 +27,7 @@ using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.MySql
@@ -48,10 +49,10 @@ namespace FluentMigrator.Runner.Processors.MySql
         protected MySqlProcessor(
             [NotNull] MySqlDbFactory factory,
             [NotNull] IMigrationGenerator generator,
-            [NotNull] IAnnouncer announcer,
+            [NotNull] ILogger<MySqlProcessor> logger,
             [NotNull] IOptions<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor)
-            : base(() => factory.Factory, generator, announcer, options.Value, connectionStringAccessor)
+            : base(() => factory.Factory, generator, logger, options.Value, connectionStringAccessor)
         {
         }
 
@@ -97,7 +98,7 @@ namespace FluentMigrator.Runner.Processors.MySql
 
         public override bool DefaultValueExists(string schemaName, string tableName, string columnName, object defaultValue)
         {
-            string defaultValueAsString = string.Format("%{0}%", FormatHelper.FormatSqlEscape(defaultValue.ToString()));
+            var defaultValueAsString = string.Format("%{0}%", FormatHelper.FormatSqlEscape(defaultValue.ToString()));
             return Exists("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = SCHEMA() AND TABLE_NAME = '{0}' AND COLUMN_NAME = '{1}' AND COLUMN_DEFAULT LIKE '{2}'",
                FormatHelper.FormatSqlEscape(tableName), FormatHelper.FormatSqlEscape(columnName), defaultValueAsString);
         }
@@ -105,7 +106,7 @@ namespace FluentMigrator.Runner.Processors.MySql
         public override void Execute(string template, params object[] args)
         {
             var commandText = string.Format(template, args);
-            Announcer.Sql(commandText);
+            Logger.LogSql(commandText);
 
             if (Options.PreviewOnly)
             {
@@ -158,10 +159,12 @@ namespace FluentMigrator.Runner.Processors.MySql
 
         protected override void Process(string sql)
         {
-            Announcer.Sql(sql);
+            Logger.LogSql(sql);
 
             if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
+            {
                 return;
+            }
 
             EnsureConnectionIsOpen();
 
@@ -173,10 +176,12 @@ namespace FluentMigrator.Runner.Processors.MySql
 
         public override void Process(PerformDBOperationExpression expression)
         {
-            Announcer.Say("Performing DB Operation");
+            Logger.LogSay("Performing DB Operation");
 
             if (Options.PreviewOnly)
+            {
                 return;
+            }
 
             EnsureConnectionIsOpen();
 
@@ -185,7 +190,7 @@ namespace FluentMigrator.Runner.Processors.MySql
 
         public override void Process(RenameColumnExpression expression)
         {
-            string columnDefinitionSql = string.Format(@"
+            var columnDefinitionSql = string.Format(@"
 SELECT CONCAT(
           CAST(COLUMN_TYPE AS CHAR),
           IF(ISNULL(CHARACTER_SET_NAME),

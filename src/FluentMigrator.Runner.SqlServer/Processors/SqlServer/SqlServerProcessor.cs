@@ -34,6 +34,7 @@ using FluentMigrator.Runner.Initialization;
 using JetBrains.Annotations;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
@@ -77,11 +78,11 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             [NotNull, ItemNotNull] IEnumerable<string> databaseTypes,
             [NotNull] IMigrationGenerator generator,
             [NotNull] IQuoter quoter,
-            [NotNull] IAnnouncer announcer,
+            [NotNull] ILogger logger,
             [NotNull] IOptions<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor,
             [NotNull] IServiceProvider serviceProvider)
-            : this(databaseTypes, SqlClientFactory.Instance, generator, quoter, announcer, options, connectionStringAccessor, serviceProvider)
+            : this(databaseTypes, SqlClientFactory.Instance, generator, quoter, logger, options, connectionStringAccessor, serviceProvider)
         {
         }
 
@@ -90,11 +91,11 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             [NotNull] DbProviderFactory factory,
             [NotNull] IMigrationGenerator generator,
             [NotNull] IQuoter quoter,
-            [NotNull] IAnnouncer announcer,
+            [NotNull] ILogger logger,
             [NotNull] IOptions<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor,
             [NotNull] IServiceProvider serviceProvider)
-            : base(() => factory, generator, announcer, options.Value, connectionStringAccessor)
+            : base(() => factory, generator, logger, options.Value, connectionStringAccessor)
         {
             _serviceProvider = serviceProvider;
             var dbTypes = databaseTypes.ToList();
@@ -111,13 +112,13 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         public override void BeginTransaction()
         {
             base.BeginTransaction();
-            Announcer.Sql("BEGIN TRANSACTION");
+            Logger.LogSql("BEGIN TRANSACTION");
         }
 
         public override void CommitTransaction()
         {
             base.CommitTransaction();
-            Announcer.Sql("COMMIT TRANSACTION");
+            Logger.LogSql("COMMIT TRANSACTION");
         }
 
         public override void RollbackTransaction()
@@ -128,7 +129,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             }
 
             base.RollbackTransaction();
-            Announcer.Sql("ROLLBACK TRANSACTION");
+            Logger.LogSql("ROLLBACK TRANSACTION");
         }
 
         public override bool SchemaExists(string schemaName)
@@ -216,7 +217,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         protected override void Process(string sql)
         {
-            Announcer.Sql(sql);
+            Logger.LogSql(sql);
 
             if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
             {
@@ -327,7 +328,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public override void Process(PerformDBOperationExpression expression)
         {
-            Announcer.Say("Performing DB Operation");
+            Logger.LogSay("Performing DB Operation");
 
             if (Options.PreviewOnly)
             {

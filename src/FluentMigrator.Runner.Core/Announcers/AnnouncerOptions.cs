@@ -16,13 +16,23 @@
 //
 #endregion
 
+using System;
+
 namespace FluentMigrator.Runner.Announcers
 {
     /// <summary>
-    /// Options for the <see cref="Announcer"/>
+    /// Options for the <see cref="IAnnouncer"/>
     /// </summary>
+    [Obsolete]
     public class AnnouncerOptions
     {
+        [Obsolete]
+        public static readonly AnnouncerOptions AllEnabled = new AnnouncerOptions()
+        {
+            ShowElapsedTime = true,
+            ShowSql = true,
+        };
+
         /// <summary>
         /// Gets or sets a value indicating whether SQL statements should be shown
         /// </summary>

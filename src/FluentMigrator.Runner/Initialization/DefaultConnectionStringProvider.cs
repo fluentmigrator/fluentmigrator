@@ -30,6 +30,7 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Initialization
 {
+    [Obsolete]
     public class DefaultConnectionStringProvider : IConnectionStringProvider
     {
         [CanBeNull]

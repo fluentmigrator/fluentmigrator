@@ -32,6 +32,7 @@ using FluentMigrator.Runner.Models;
 
 using JetBrains.Annotations;
 
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.Firebird
@@ -66,11 +67,11 @@ namespace FluentMigrator.Runner.Processors.Firebird
             [NotNull] FirebirdDbFactory factory,
             [NotNull] FirebirdGenerator generator,
             [NotNull] FirebirdQuoter quoter,
-            [NotNull] IAnnouncer announcer,
+            [NotNull] ILogger<FirebirdProcessor> logger,
             [NotNull] IOptions<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor,
             [NotNull] FirebirdOptions fbOptions)
-            : base(() => factory.Factory, generator, announcer, options.Value, connectionStringAccessor)
+            : base(() => factory.Factory, generator, logger, options.Value, connectionStringAccessor)
         {
             FBOptions = fbOptions ?? throw new ArgumentNullException(nameof(fbOptions));
             _firebirdVersionFunc = new Lazy<Version>(GetFirebirdVersion);
@@ -89,6 +90,8 @@ namespace FluentMigrator.Runner.Processors.Firebird
         public FirebirdOptions FBOptions { get; }
         public bool IsFirebird3 => _firebirdVersionFunc.Value >= new Version(3, 0);
         public new IMigrationGenerator Generator => base.Generator;
+
+        [Obsolete]
         public new IAnnouncer Announcer => base.Announcer;
 
 #pragma warning disable 618
@@ -224,7 +227,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
                 return;
             }
 
-            Announcer.Say("Committing and Retaining Transaction");
+            Logger.LogSay("Committing and Retaining Transaction");
 
             CommitTransaction();
             BeginTransaction();
@@ -722,7 +725,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
         public override void Process(PerformDBOperationExpression expression)
         {
-            Announcer.Say("Performing DB Operation");
+            Logger.LogSay("Performing DB Operation");
 
             if (Options.PreviewOnly)
                 return;
@@ -741,7 +744,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
         protected void InternalProcess(string sql)
         {
-            Announcer.Sql(sql);
+            Logger.LogSql(sql);
 
             if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
                 return;
@@ -865,7 +868,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
                      onEvent.ToString().ToLower(),
                      triggerBody
                      );
-                Announcer.Sql(triggerSql);
+                Logger.LogSql(triggerSql);
                 using (var cmd = CreateCommand(triggerSql, connection, transaction))
                 {
                     cmd.ExecuteNonQuery();
@@ -884,7 +887,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             deleteTrigger.Operation = (connection, transaction) =>
             {
                 string triggerSql = string.Format("DROP TRIGGER {0}", _quoter.Quote(triggerName));
-                Announcer.Sql(triggerSql);
+                Logger.LogSql(triggerSql);
                 using (var cmd = CreateCommand(triggerSql, connection, transaction))
                 {
                     cmd.ExecuteNonQuery();

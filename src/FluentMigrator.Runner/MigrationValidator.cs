@@ -6,21 +6,38 @@ using System.Text;
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Exceptions;
+using FluentMigrator.Runner.Logging;
+
+using Microsoft.Extensions.Logging;
 
 namespace FluentMigrator.Runner
 {
     public class MigrationValidator
     {
-        private readonly IAnnouncer _announcer;
+        private readonly ILogger _logger;
         private readonly IConventionSet _conventions;
 
+        internal MigrationValidator(ILogger logger, IConventionSet conventions)
+        {
+            _logger = logger;
+            _conventions = conventions;
+        }
+
+        public MigrationValidator(ILogger<MigrationValidator> logger, IConventionSet conventions)
+        {
+            _logger = logger;
+            _conventions = conventions;
+        }
+
+        [Obsolete]
         public MigrationValidator()
         {
         }
 
+        [Obsolete]
         public MigrationValidator(IAnnouncer announcer, IConventionSet conventions)
         {
-            _announcer = announcer;
+            _logger = new AnnouncerFluentMigratorLogger(announcer);
             _conventions = conventions;
         }
 
@@ -46,7 +63,7 @@ namespace FluentMigrator.Runner
             if (errorMessageBuilder.Length > 0)
             {
                 var errorMessage = errorMessageBuilder.ToString();
-                _announcer.Error("The migration {0} contained the following Validation Error(s): {1}", migration.GetType().Name, errorMessage);
+                _logger?.LogError("The migration {0} contained the following Validation Error(s): {1}", migration.GetType().Name, errorMessage);
                 throw new InvalidMigrationException(migration, errorMessage);
             }
         }

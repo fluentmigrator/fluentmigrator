@@ -23,6 +23,9 @@ using JetBrains.Annotations;
 
 namespace FluentMigrator.Expressions
 {
+    /// <summary>
+    /// Base class that handles execution of scripts stored as embedded resource
+    /// </summary>
     public abstract class ExecuteEmbeddedSqlScriptExpressionBase : ExecuteSqlScriptExpressionBase
     {
         /// <summary>

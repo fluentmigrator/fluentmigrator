@@ -18,17 +18,17 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 
 using FluentMigrator.Runner;
-using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
+using FluentMigrator.Tests.Helpers;
+using FluentMigrator.Tests.Logging;
 
 using JetBrains.Annotations;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 using Moq;
-
-using NUnit.Framework;
 
 namespace FluentMigrator.Tests
 {
@@ -47,9 +47,7 @@ namespace FluentMigrator.Tests
             }
 
             services
-                .ConfigureRunner(
-                    builder => builder
-                        .WithAnnouncer(new TextWriterAnnouncer(TestContext.Out) { ShowSql = true }))
+                .AddSingleton<ILoggerProvider, TestLoggerProvider>()
                 .Configure<RunnerOptions>(opt => opt.AllowBreakingChange = true);
 
             return services;

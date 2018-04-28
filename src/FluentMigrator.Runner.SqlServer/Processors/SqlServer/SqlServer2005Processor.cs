@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2018, FluentMigrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,6 +21,7 @@ using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
@@ -29,13 +30,13 @@ namespace FluentMigrator.Runner.Processors.SqlServer
     {
         /// <inheritdoc />
         public SqlServer2005Processor(
-            [NotNull] IAnnouncer announcer,
+            [NotNull] ILogger<SqlServer2005Processor> logger,
             [NotNull] SqlServer2005Quoter quoter,
             [NotNull] SqlServer2005Generator generator,
             [NotNull] IOptions<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor,
             [NotNull] IServiceProvider serviceProvider)
-            : base(new[] { "SqlServer2005", "SqlServer" }, generator, quoter, announcer, options, connectionStringAccessor, serviceProvider)
+            : base(new[] { "SqlServer2005", "SqlServer" }, generator, quoter, logger, options, connectionStringAccessor, serviceProvider)
         {
         }
     }

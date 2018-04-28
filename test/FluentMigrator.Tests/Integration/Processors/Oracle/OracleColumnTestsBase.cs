@@ -31,7 +31,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle
     [Category("Integration")]
     public abstract class OracleColumnTestsBase : BaseColumnTests
     {
-        private const string SchemaName = "test";
+        private const string SchemaName = "FMTEST";
 
         private ServiceProvider ServiceProvider { get; set; }
         private IServiceScope ServiceScope { get; set; }
@@ -41,28 +41,36 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle
         public override void CallingColumnExistsCanAcceptColumnNameWithSingleQuote()
         {
             using (var table = new OracleTestTable(Processor, null, "\"i'd\" int"))
+            {
                 Processor.ColumnExists(null, table.Name, "i'd").ShouldBeTrue();
+            }
         }
 
         [Test]
         public override void CallingColumnExistsCanAcceptTableNameWithSingleQuote()
         {
             using (var table = new OracleTestTable("Test'Table", Processor, null, "id int"))
+            {
                 Processor.ColumnExists(null, table.Name, "DoesNotExist").ShouldBeFalse();
+            }
         }
 
         [Test]
         public override void CallingColumnExistsReturnsFalseIfColumnDoesNotExist()
         {
             using (var table = new OracleTestTable(Processor, null, "id int"))
+            {
                 Processor.ColumnExists(null, table.Name, "DoesNotExist").ShouldBeFalse();
+            }
         }
 
         [Test]
         public override void CallingColumnExistsReturnsFalseIfColumnDoesNotExistWithSchema()
         {
             using (var table = new OracleTestTable(Processor, SchemaName, "id int"))
+            {
                 Processor.ColumnExists(SchemaName, table.Name, "DoesNotExist").ShouldBeFalse();
+            }
         }
 
         [Test]
@@ -81,21 +89,27 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle
         public override void CallingColumnExistsReturnsTrueIfColumnExists()
         {
             using (var table = new OracleTestTable(Processor, null, "id int"))
+            {
                 Processor.ColumnExists(null, table.Name, "id").ShouldBeTrue();
+            }
         }
 
         [Test]
         public override void CallingColumnExistsReturnsTrueIfColumnExistsWithSchema()
         {
             using (var table = new OracleTestTable(Processor, SchemaName, "id int"))
+            {
                 Processor.ColumnExists(SchemaName, table.Name, "id").ShouldBeTrue();
+            }
         }
 
         [OneTimeSetUp]
         public void ClassSetUp()
         {
             if (!IntegrationTestOptions.Oracle.IsEnabled)
+            {
                 Assert.Ignore();
+            }
 
             var serivces = AddOracleServices(ServiceCollectionExtensions.CreateServices())
                 .AddScoped<IConnectionStringReader>(
@@ -113,7 +127,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle
         public void SetUp()
         {
             ServiceScope = ServiceProvider.CreateScope();
-            Processor = ServiceScope.ServiceProvider.GetRequiredService<OracleManagedProcessor>();
+            Processor = ServiceScope.ServiceProvider.GetRequiredService<OracleProcessorBase>();
         }
 
         [TearDown]

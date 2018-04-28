@@ -23,6 +23,7 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.DotNet.Cli.CustomAnnouncers
 {
+    [Obsolete]
     public class LoggingAnnouncer : IAnnouncer
     {
         private readonly ILogger<LoggingAnnouncer> _logger;
@@ -40,19 +41,17 @@ namespace FluentMigrator.DotNet.Cli.CustomAnnouncers
 
         public void Heading(string message)
         {
-            HorizontalRule();
-            Write(message);
-            HorizontalRule();
+            _logger.LogHeader(message);
         }
 
         public void Say(string message)
         {
-            Write(message);
+            _logger.LogSay(message);
         }
 
         public void Emphasize(string message)
         {
-            Say(string.Format("[+] {0}", message));
+            _logger.LogEmphasized(message);
         }
 
         public void Sql(string sql)
@@ -62,11 +61,11 @@ namespace FluentMigrator.DotNet.Cli.CustomAnnouncers
 
             if (string.IsNullOrEmpty(sql))
             {
-                Write("No SQL statement executed.");
+                _logger.LogSay("No SQL statement executed.");
             }
             else
             {
-                Write(sql, false);
+                _logger.LogSql(sql);
             }
         }
 
@@ -75,7 +74,7 @@ namespace FluentMigrator.DotNet.Cli.CustomAnnouncers
             if (!_options.ShowElapsedTime)
                 return;
 
-            Write(string.Format("=> {0}s", timeSpan.TotalSeconds));
+            _logger.LogElapsedTime(timeSpan);
         }
 
         public void Error(string message)
@@ -90,12 +89,7 @@ namespace FluentMigrator.DotNet.Cli.CustomAnnouncers
 
         public void Write(string message, bool isNotSql = true)
         {
-            _logger.LogInformation(message);
-        }
-
-        private void HorizontalRule()
-        {
-            Write("".PadRight(79, '-'));
+            _logger.LogSay(message);
         }
     }
 }

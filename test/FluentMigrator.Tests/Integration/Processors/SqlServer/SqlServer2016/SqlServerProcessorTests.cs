@@ -21,9 +21,12 @@ using System.IO;
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
+using FluentMigrator.Runner.Logging;
 using FluentMigrator.Tests.Helpers;
+using FluentMigrator.Tests.Logging;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 using NUnit.Framework;
 
@@ -66,8 +69,9 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServer.SqlServer2016
             bool tableExists;
 
             var serviceProvider = CreateProcessorServices(
-                services => services.ConfigureRunner(
-                    r => r.WithAnnouncer(new TextWriterAnnouncer(output)).AsGlobalPreview()));
+                services => services
+                    .AddSingleton<ILoggerProvider>(new SqlScriptFluentMigratorLoggerProvider(output))
+                    .ConfigureRunner(r => r.AsGlobalPreview()));
             using (serviceProvider)
             {
                 using (var scope = serviceProvider.CreateScope())

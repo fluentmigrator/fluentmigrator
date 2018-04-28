@@ -11,13 +11,10 @@
     <Platforms>AnyCPU;x64;x86</Platforms>
     <RuntimeIdentifiers>win7-x86;win7-x64;any</RuntimeIdentifiers>
   </PropertyGroup>
-
   <Import Project="$(MSBuildThisFileDirectory)../../PackageTool.proj" />
-
   <ItemGroup>
     <None Include="..\..\FluentMigrator.snk" Link="FluentMigrator.snk" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\FluentMigrator.Runner\FluentMigrator.Runner.csproj" />
   </ItemGroup>

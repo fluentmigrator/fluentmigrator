@@ -26,6 +26,7 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Announcers
 {
     [TestFixture]
+    [Obsolete]
     public class TextWriterAnnouncerTests
     {
         [SetUp]

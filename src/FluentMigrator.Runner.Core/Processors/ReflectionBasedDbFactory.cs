@@ -45,14 +45,20 @@ namespace FluentMigrator.Runner.Processors
         protected ReflectionBasedDbFactory(params TestEntry[] testEntries)
         {
             if (testEntries.Length == 0)
+            {
                 throw new ArgumentException(@"At least one test entry must be specified", nameof(testEntries));
+            }
+
             _testEntries = testEntries;
         }
 
         protected ReflectionBasedDbFactory(IServiceProvider serviceProvider, params TestEntry[] testEntries)
         {
             if (testEntries.Length == 0)
+            {
                 throw new ArgumentException(@"At least one test entry must be specified", nameof(testEntries));
+            }
+
             _serviceProvider = serviceProvider;
             _testEntries = testEntries;
         }
@@ -60,7 +66,9 @@ namespace FluentMigrator.Runner.Processors
         protected override DbProviderFactory CreateFactory()
         {
             if (_instance != null)
+            {
                 return _instance;
+            }
 
             var exceptions = new List<Exception>();
             if (TryCreateFactory(_serviceProvider, _testEntries, exceptions, out var factory))
@@ -93,13 +101,24 @@ namespace FluentMigrator.Runner.Processors
             foreach (var entry in entries)
             {
                 if (TryCreateFromCurrentDomain(entry, exceptions, out factory))
+                {
                     return true;
+                }
+
                 if (TryCreateFactoryFromRuntimeHost(entry, exceptions, serviceProvider, out factory))
+                {
                     return true;
+                }
+
                 if (TryCreateFromAppDomainPaths(entry, exceptions, out factory))
+                {
                     return true;
+                }
+
                 if (TryCreateFromGac(entry, exceptions, out factory))
+                {
                     return true;
+                }
             }
 
             factory = null;
@@ -117,7 +136,9 @@ namespace FluentMigrator.Runner.Processors
                 {
                     var type = assembly.GetType(entry.DBProviderFactoryTypeName, true);
                     if (TryGetInstance(type, out factory))
+                    {
                         return true;
+                    }
 
                     factory = (DbProviderFactory) Activator.CreateInstance(type);
                     return true;
@@ -190,7 +211,9 @@ namespace FluentMigrator.Runner.Processors
             {
                 var path = Path.Combine(directory, assemblyFileName);
                 if (!alreadyTested.Add(path))
+                {
                     continue;
+                }
 
                 try
                 {
@@ -226,7 +249,9 @@ namespace FluentMigrator.Runner.Processors
                 var assembly = Assembly.Load(asmName);
                 var type = assembly.GetType(entry.DBProviderFactoryTypeName, true);
                 if (TryGetInstance(type, out factory))
+                {
                     return true;
+                }
 
                 factory = (DbProviderFactory) Activator.CreateInstance(type);
                 return true;
@@ -250,7 +275,9 @@ namespace FluentMigrator.Runner.Processors
                 {
                     var type = assembly.GetType(entry.DBProviderFactoryTypeName, true);
                     if (TryGetInstance(type, out factory))
+                    {
                         return true;
+                    }
 
                     factory = (DbProviderFactory) Activator.CreateInstance(type);
                     return true;
@@ -305,13 +332,17 @@ namespace FluentMigrator.Runner.Processors
                 BindingFlags.Static | BindingFlags.Public | BindingFlags.GetField);
 
             if (instanceField != null && TryCastInstance(instanceField.GetValue(null), out factory))
+            {
                 return true;
+            }
 
             var instanceProperty = factoryType.GetProperty(
                 "Instance",
                 BindingFlags.Static | BindingFlags.Public | BindingFlags.GetProperty);
             if (instanceProperty != null && TryCastInstance(instanceProperty.GetValue(null, null), out factory))
+            {
                 return true;
+            }
 
             factory = null;
             return false;
@@ -335,7 +366,9 @@ namespace FluentMigrator.Runner.Processors
                 {
                     assemblyDirectory = Path.GetDirectoryName(assembly.Location);
                     if (assemblyDirectory == null)
+                    {
                         continue;
+                    }
                 }
                 catch
                 {

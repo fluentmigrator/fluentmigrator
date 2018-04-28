@@ -25,8 +25,11 @@ using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
+using FluentMigrator.Tests.Helpers;
+using FluentMigrator.Tests.Logging;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 using NUnit.Framework;
 
@@ -74,17 +77,13 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird.EndToEnd
 
         protected TaskExecutor MakeTask(string task, string migrationsNamespace, Action<ProcessorOptions> configureOptions = null)
         {
-            var consoleAnnouncer = new TextWriterAnnouncer(TestContext.Out) { ShowSql = true };
-            var debugAnnouncer = new TextWriterAnnouncer(msg => Debug.WriteLine(msg));
-            var announcer = new CompositeAnnouncer(consoleAnnouncer, debugAnnouncer);
-
             var services = new ServiceCollection()
                 .AddFluentMigratorCore()
+                .AddLogging(lb => lb.AddDebug())
+                .AddSingleton<ILoggerProvider, TestLoggerProvider>()
                 .ConfigureRunner(builder => builder
-                    .WithAnnouncer(new TextWriterAnnouncer(TestContext.Out) { ShowSql = true })
                     .AddFirebird())
                 .Configure<RunnerOptions>(opt => opt.AllowBreakingChange = true)
-                .AddSingleton<IAnnouncer>(announcer)
                 .AddScoped<IConnectionStringReader>(_ => new PassThroughConnectionStringReader(ConnectionString))
                 .WithMigrationsIn(migrationsNamespace)
                 .Configure<RunnerOptions>(opt => opt.Task = task)

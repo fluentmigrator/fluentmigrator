@@ -21,8 +21,11 @@ using System.Configuration;
 using System.Linq;
 using System.Text.RegularExpressions;
 
+using FluentMigrator.Runner.Logging;
+
 using JetBrains.Annotations;
 
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Initialization.NetFramework
@@ -39,7 +42,7 @@ namespace FluentMigrator.Runner.Initialization.NetFramework
         private readonly INetConfigManager _configManager;
 
         [NotNull]
-        private readonly IAnnouncer _announcer;
+        private readonly ILogger _logger;
 
         [NotNull]
         private readonly AppConfigConnectionStringAccessorOptions _options;
@@ -53,11 +56,11 @@ namespace FluentMigrator.Runner.Initialization.NetFramework
         public AppConfigConnectionStringReader(
             [NotNull] INetConfigManager configManager,
             [NotNull] IAssemblySource assemblySource,
-            [NotNull] IAnnouncer announcer,
+            [NotNull] ILogger<AppConfigConnectionStringReader> logger,
             [NotNull] IOptions<AppConfigConnectionStringAccessorOptions> options)
         {
             _configManager = configManager;
-            _announcer = announcer;
+            _logger = logger;
             _options = options.Value;
             var assemblies = assemblySource.Assemblies;
             var singleAssembly = assemblies.Count == 1 ? assemblies.Single() : null;
@@ -72,7 +75,7 @@ namespace FluentMigrator.Runner.Initialization.NetFramework
             [NotNull] IOptions<AppConfigConnectionStringAccessorOptions> options)
         {
             _configManager = configManager;
-            _announcer = announcer;
+            _logger = new AnnouncerFluentMigratorLogger(announcer);
             _options = options.Value;
             _assemblyLocation = assemblyLocation;
         }
@@ -157,7 +160,7 @@ namespace FluentMigrator.Runner.Initialization.NetFramework
         {
             if (info == null)
             {
-                _announcer.Error("Unable to resolve any connectionstring using parameters \"/connection\" and \"/configPath\"");
+                _logger.LogError("Unable to resolve any connectionstring using parameters \"/connection\" and \"/configPath\"");
                 return;
             }
 
@@ -179,7 +182,7 @@ namespace FluentMigrator.Runner.Initialization.NetFramework
                 message = $"Using connection {info.Name} from configuration file {info.Source}";
             }
 
-            _announcer.Say(message);
+            _logger.LogSay(message);
         }
 
         private class ConnectionInfo

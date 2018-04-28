@@ -24,6 +24,7 @@ using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 
@@ -45,10 +46,10 @@ namespace FluentMigrator.Runner.Processors.Oracle
         public OracleProcessor(
             [NotNull] OracleDbFactory factory,
             [NotNull] OracleGenerator generator,
-            [NotNull] IAnnouncer announcer,
+            [NotNull] ILogger<OracleProcessor> logger,
             [NotNull] IOptions<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor)
-            : base("Oracle", factory, generator, announcer, options, connectionStringAccessor)
+            : base("Oracle", factory, generator, logger, options, connectionStringAccessor)
         {
         }
     }

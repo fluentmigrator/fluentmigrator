@@ -14,14 +14,15 @@
 // limitations under the License.
 #endregion
 
-using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.BatchParser;
 using FluentMigrator.Runner.Generators.SQLite;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.SQLite;
+using FluentMigrator.Tests.Logging;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using Moq;
@@ -43,14 +44,18 @@ namespace FluentMigrator.Tests.Unit.Processors.SQLite
             mockedConnStringReader.Setup(r => r.GetConnectionString(It.IsAny<string>())).Returns("server=this");
 
             var serviceProvider = new ServiceCollection()
+                .AddLogging()
+                .AddSingleton<ILoggerProvider, TestLoggerProvider>()
                 .AddTransient<SQLiteBatchParser>()
                 .BuildServiceProvider();
+
+            var logger = serviceProvider.GetRequiredService<ILogger<SQLiteProcessor>>();
 
             var opt = new OptionsWrapper<ProcessorOptions>(new ProcessorOptions());
             return new SQLiteProcessor(
                 mockedDbFactory.Object,
                 new SQLiteGenerator(),
-                new NullAnnouncer(),
+                logger,
                 opt,
                 MockedConnectionStringAccessor.Object,
                 serviceProvider);

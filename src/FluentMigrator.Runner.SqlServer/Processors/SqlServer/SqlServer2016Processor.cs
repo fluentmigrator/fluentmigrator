@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2018, FluentMigrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,6 +23,7 @@ using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
@@ -31,7 +32,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
     {
         /// <inheritdoc />
         public SqlServer2016Processor(
-            [NotNull] IAnnouncer announcer,
+            [NotNull] ILogger<SqlServer2016Processor> logger,
             [NotNull] SqlServer2008Quoter quoter,
             [NotNull] SqlServer2016Generator generator,
             [NotNull] IOptions<ProcessorOptions> options,
@@ -39,7 +40,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             [NotNull] IServiceProvider serviceProvider)
             : this(
                 SqlClientFactory.Instance,
-                announcer,
+                logger,
                 quoter,
                 generator,
                 options,
@@ -51,7 +52,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         /// <inheritdoc />
         protected SqlServer2016Processor(
             [NotNull] DbProviderFactory factory,
-            [NotNull] IAnnouncer announcer,
+            [NotNull] ILogger logger,
             [NotNull] SqlServer2008Quoter quoter,
             [NotNull] SqlServer2016Generator generator,
             [NotNull] IOptions<ProcessorOptions> options,
@@ -62,7 +63,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
                 factory,
                 generator,
                 quoter,
-                announcer,
+                logger,
                 options,
                 connectionStringAccessor,
                 serviceProvider)

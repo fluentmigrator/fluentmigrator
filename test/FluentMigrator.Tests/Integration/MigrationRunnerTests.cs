@@ -25,9 +25,9 @@ using System.Text.RegularExpressions;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner;
-using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Exceptions;
 using FluentMigrator.Runner.Initialization;
+using FluentMigrator.Runner.Logging;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Runner.Processors.MySql;
@@ -40,6 +40,7 @@ using FluentMigrator.Tests.Integration.Migrations.Tagged;
 using FluentMigrator.Tests.Unit;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 using Moq;
 
@@ -529,7 +530,6 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlServer2012")]
         [Category("SqlServer2014")]
         [Category("SqlServer2016")]
-        [Category("SqlAnywhere16")]
         public void CanLoadVersion()
         {
             ExecuteWithSupportedProcessors(
@@ -540,7 +540,9 @@ namespace FluentMigrator.Tests.Integration
 
                     //runner.Processor.CommitTransaction();
                     runner.VersionLoader.VersionInfo.ShouldNotBeNull();
-                });
+                },
+                true,
+                typeof(SqlAnywhere16Processor));
         }
 
         [Test]
@@ -553,7 +555,6 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlServer2012")]
         [Category("SqlServer2014")]
         [Category("SqlServer2016")]
-        [Category("SqlAnywhere16")]
         public void CanRunMigrations()
         {
             ExecuteWithSupportedProcessors(
@@ -573,7 +574,9 @@ namespace FluentMigrator.Tests.Integration
                     runner.VersionLoader.VersionInfo.Latest().ShouldBe(6);
 
                     runner.RollbackToVersion(0, false);
-                });
+                },
+                true,
+                typeof(SqlAnywhere16Processor));
         }
 
         [Test]
@@ -586,7 +589,6 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlServer2012")]
         [Category("SqlServer2014")]
         [Category("SqlServer2016")]
-        [Category("SqlAnywhere16")]
         public void CanMigrateASpecificVersion()
         {
             ExecuteWithSupportedProcessors(
@@ -608,7 +610,9 @@ namespace FluentMigrator.Tests.Integration
                     {
                         runner.RollbackToVersion(0, false);
                     }
-                });
+                },
+                true,
+                typeof(SqlAnywhere16Processor));
         }
 
         [Test]
@@ -620,7 +624,6 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlServer2012")]
         [Category("SqlServer2014")]
         [Category("SqlServer2016")]
-        [Category("SqlAnywhere16")]
         public void CanMigrateASpecificVersionDown()
         {
             try
@@ -648,7 +651,7 @@ namespace FluentMigrator.Tests.Integration
                         processor.TableExists(null, "Users").ShouldBeFalse();
                     },
                     false,
-                    typeof(SQLiteProcessor));
+                    typeof(SQLiteProcessor), typeof(SqlAnywhere16Processor));
             }
             finally
             {
@@ -659,7 +662,8 @@ namespace FluentMigrator.Tests.Integration
                         var runner = (MigrationRunner) serviceProvider.GetRequiredService<IMigrationRunner>();
                         runner.RollbackToVersion(0, false);
                     },
-                    false);
+                    false,
+                    typeof(SQLiteProcessor), typeof(SqlAnywhere16Processor));
             }
         }
 
@@ -673,7 +677,6 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlServer2012")]
         [Category("SqlServer2014")]
         [Category("SqlServer2016")]
-        [Category("SqlAnywhere16")]
         public void RollbackAllShouldRemoveVersionInfoTable()
         {
             ExecuteWithSupportedProcessors(
@@ -693,7 +696,9 @@ namespace FluentMigrator.Tests.Integration
                     processor.TableExists(
                         runner.VersionLoader.VersionTableMetaData.SchemaName,
                         runner.VersionLoader.VersionTableMetaData.TableName).ShouldBeFalse();
-                });
+                },
+                true,
+                typeof(SqlAnywhere16Processor));
         }
 
         [Test]
@@ -764,7 +769,6 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlServer2012")]
         [Category("SqlServer2014")]
         [Category("SqlServer2016")]
-        [Category("SqlAnywhere16")]
         public void MigrateUpWithTaggedMigrationsShouldOnlyApplyMatchedMigrations()
         {
             ExecuteWithSupportedProcessors(
@@ -787,7 +791,9 @@ namespace FluentMigrator.Tests.Integration
                     {
                         runner.RollbackToVersion(0);
                     }
-                });
+                },
+                true,
+                typeof(SqlAnywhere16Processor));
         }
 
         [Test]
@@ -800,7 +806,6 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlServer2012")]
         [Category("SqlServer2014")]
         [Category("SqlServer2016")]
-        [Category("SqlAnywhere16")]
         public void MigrateUpWithTaggedMigrationsAndUsingMultipleTagsShouldOnlyApplyMatchedMigrations()
         {
             ExecuteWithSupportedProcessors(
@@ -823,7 +828,9 @@ namespace FluentMigrator.Tests.Integration
                     {
                         runner.RollbackToVersion(0);
                     }
-                });
+                },
+                true,
+                typeof(SqlAnywhere16Processor));
         }
 
         [Test]
@@ -836,7 +843,6 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlServer2012")]
         [Category("SqlServer2014")]
         [Category("SqlServer2016")]
-        [Category("SqlAnywhere16")]
         public void MigrateUpWithDifferentTaggedShouldIgnoreConcreteOfTagged()
         {
             ExecuteWithSupportedProcessors(
@@ -858,7 +864,9 @@ namespace FluentMigrator.Tests.Integration
                     {
                         runner.RollbackToVersion(0);
                     }
-                });
+                },
+                true,
+                typeof(SqlAnywhere16Processor));
         }
 
         [Test]
@@ -870,7 +878,6 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlServer2012")]
         [Category("SqlServer2014")]
         [Category("SqlServer2016")]
-        [Category("SqlAnywhere16")]
         public void MigrateDownWithDifferentTagsToMigrateUpShouldApplyMatchedMigrations()
         {
             var migrationsNamespace = typeof(TenantATable).Namespace;
@@ -891,7 +898,7 @@ namespace FluentMigrator.Tests.Integration
                         processor.TableExists(null, "TenantAandBTable").ShouldBeTrue();
                     },
                     false,
-                    typeof(SQLiteProcessor));
+                    typeof(SQLiteProcessor), typeof(SqlAnywhere16Processor));
 
                 ExecuteWithSupportedProcessors(
                     services => services.WithMigrationsIn(migrationsNamespace).Configure<RunnerOptions>(opt => opt.Tags = new[] { "TenantB" }),
@@ -906,7 +913,7 @@ namespace FluentMigrator.Tests.Integration
                         processor.TableExists(null, "TenantAandBTable").ShouldBeFalse();
                     },
                     false,
-                    typeof(SQLiteProcessor));
+                    typeof(SQLiteProcessor), typeof(SqlAnywhere16Processor));
             }
             finally
             {
@@ -918,7 +925,7 @@ namespace FluentMigrator.Tests.Integration
                         runner.RollbackToVersion(0, false);
                     },
                     false,
-                    typeof(SQLiteProcessor));
+                    typeof(SQLiteProcessor), typeof(SqlAnywhere16Processor));
             }
         }
 
@@ -932,10 +939,18 @@ namespace FluentMigrator.Tests.Integration
             }
 
             var outputSql = new StringWriter();
-            var announcer = new TextWriterAnnouncer(outputSql){ ShowSql = true };
+            var provider = new SqlScriptFluentMigratorLoggerProvider(
+                outputSql,
+                new SqlScriptFluentMigratorLoggerOptions()
+                {
+                    ShowSql = true,
+                });
 
             ExecuteWithProcessor<SqlServer2008Processor>(
-                services => services.WithMigrationsIn(RootNamespace).Configure<ProcessorOptions>(opt => opt.PreviewOnly = true).AddSingleton<IAnnouncer>(announcer),
+                services => services
+                    .WithMigrationsIn(RootNamespace)
+                    .Configure<ProcessorOptions>(opt => opt.PreviewOnly = true)
+                    .AddSingleton<ILoggerProvider>(provider),
                 (serviceProvider, processor) =>
                 {
                     try
@@ -987,7 +1002,6 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlServer2012")]
         [Category("SqlServer2014")]
         [Category("SqlServer2016")]
-        [Category("SqlAnywhere16")]
         public void MigrateUpWithTaggedMigrationsShouldNotApplyAnyMigrationsIfNoTagsParameterIsPassedIntoTheRunner()
         {
             ExecuteWithSupportedProcessors(
@@ -1009,7 +1023,9 @@ namespace FluentMigrator.Tests.Integration
                     {
                         runner.RollbackToVersion(0);
                     }
-                });
+                },
+                true,
+                typeof(SqlAnywhere16Processor));
         }
 
         [Test]
@@ -1019,11 +1035,10 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlServer2012")]
         [Category("SqlServer2014")]
         [Category("SqlServer2016")]
-        [Category("SqlAnywhere16")]
         public void ValidateVersionOrderShouldDoNothingIfUnappliedMigrationVersionIsGreaterThanLatestAppliedMigration()
         {
             // Using SqlServer instead of SQLite as versions not deleted from VersionInfo table when using Sqlite.
-            var excludedProcessors = new[] { typeof(SQLiteProcessor), typeof(MySqlProcessor), typeof(PostgresProcessor) };
+            var excludedProcessors = new[] { typeof(SQLiteProcessor), typeof(MySqlProcessor), typeof(PostgresProcessor), typeof(SqlAnywhere16Processor) };
 
             var namespacePass2 = typeof(Migrations.Interleaved.Pass2.User).Namespace;
             var namespacePass3 = typeof(Migrations.Interleaved.Pass3.User).Namespace;
@@ -1077,11 +1092,10 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlServer2012")]
         [Category("SqlServer2014")]
         [Category("SqlServer2016")]
-        [Category("SqlAnywhere16")]
         public void ValidateVersionOrderShouldThrowExceptionIfUnappliedMigrationVersionIsLessThanLatestAppliedMigration()
         {
             // Using SqlServer instead of SQLite as versions not deleted from VersionInfo table when using Sqlite.
-            var excludedProcessors = new[] { typeof(MySqlProcessor), typeof(SQLiteProcessor) };
+            var excludedProcessors = new[] { typeof(MySqlProcessor), typeof(SQLiteProcessor), typeof(SqlAnywhere16Processor) };
 
             var namespacePass2 = typeof(Migrations.Interleaved.Pass2.User).Namespace;
             var namespacePass3 = typeof(Migrations.Interleaved.Pass3.User).Namespace;

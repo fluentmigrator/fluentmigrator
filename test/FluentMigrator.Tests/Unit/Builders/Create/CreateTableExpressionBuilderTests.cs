@@ -555,7 +555,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
         }
 
         [Test]
-        public void IColumnExpressionBuilder_UsesExpressionSchemaAndTableName()
+        public void ColumnExpressionBuilderUsesExpressionSchemaAndTableName()
         {
             var expressionMock = new Mock<CreateTableExpression>();
             var contextMock = new Mock<IMigrationContext>();
@@ -570,7 +570,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
         }
 
         [Test]
-        public void IColumnExpressionBuilder_UsesCurrentColumn()
+        public void ColumnExpressionBuilderUsesCurrentColumn()
         {
             var expressionMock = new Mock<CreateTableExpression>();
             var contextMock = new Mock<IMigrationContext>();

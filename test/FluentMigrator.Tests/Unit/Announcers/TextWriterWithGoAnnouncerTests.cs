@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 //
 // Copyright (c) 2018, Fluent Migrator Project
 //
@@ -28,6 +28,7 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Announcers
 {
     [TestFixture]
+    [Obsolete]
     public class TextWriterWithGoAnnouncerTests
     {
         private StringWriter _stringWriter;

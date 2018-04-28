@@ -23,13 +23,15 @@ using System.IO;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner;
-using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Initialization;
+using FluentMigrator.Runner.Logging;
 using FluentMigrator.Runner.Processors.SQLite;
+using FluentMigrator.Tests.Logging;
 
 using JetBrains.Annotations;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 using Moq;
 
@@ -130,10 +132,9 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
             var output = new StringWriter();
 
             var serviceProvider = CreateProcessorServices(
-                services => services.ConfigureRunner(
-                    r => r
-                        .AsGlobalPreview()
-                        .WithAnnouncer(new TextWriterAnnouncer(output))));
+                services => services
+                    .AddSingleton<ILoggerProvider>(new SqlScriptFluentMigratorLoggerProvider(output))
+                    .ConfigureRunner(r => r.AsGlobalPreview()));
             using (serviceProvider)
             {
                 using (var scope = serviceProvider.CreateScope())
@@ -167,10 +168,10 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
                     }
 
                     tableExists.ShouldBeFalse();
-
-                    Assert.That(output.ToString(), Does.Contain(@"/* Performing DB Operation */"));
                 }
             }
+
+            Assert.That(output.ToString(), Does.Contain(@"/* Performing DB Operation */"));
         }
 
         private ServiceProvider CreateProcessorServices([CanBeNull] Action<IServiceCollection> initAction)

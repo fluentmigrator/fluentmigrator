@@ -16,15 +16,8 @@
 
 using System;
 using System.Data;
-using System.Data.OleDb;
-using System.IO;
 
-using FluentMigrator.Runner;
-using FluentMigrator.Runner.Initialization;
-using FluentMigrator.Runner.Processors.Jet;
 using FluentMigrator.Tests.Helpers;
-
-using Microsoft.Extensions.DependencyInjection;
 
 using NUnit.Framework;
 
@@ -33,17 +26,8 @@ using Shouldly;
 namespace FluentMigrator.Tests.Integration.Processors.Jet
 {
     [TestFixture]
-    [Category("Integration")]
-    [Category("Jet")]
-    public class JetProcessorTests
+    public class JetProcessorTests : JetIntegrationTests
     {
-        private string _tempDataDirectory;
-
-        private string DatabaseFilename { get; set; }
-        private ServiceProvider ServiceProvider { get; set; }
-        private IServiceScope ServiceScope { get; set; }
-        private JetProcessor Processor { get; set; }
-
         [Test]
         public void CallingTableExistsReturnsFalseIfTableDoesNotExist()
         {
@@ -117,74 +101,6 @@ namespace FluentMigrator.Tests.Integration.Processors.Jet
                 cmd.Transaction = table.Transaction;
                 cmd.CommandText = $"INSERT INTO {table.Name} (id) VALUES ({i})";
                 cmd.ExecuteNonQuery();
-            }
-        }
-
-        [OneTimeSetUp]
-        public void ClassSetUp()
-        {
-            if (!IntegrationTestOptions.Jet.IsEnabled)
-                Assert.Ignore();
-
-            var serivces = ServiceCollectionExtensions.CreateServices()
-                .ConfigureRunner(builder => builder.AddJet())
-                .AddScoped<IConnectionStringReader>(
-                    _ => new PassThroughConnectionStringReader(IntegrationTestOptions.Jet.ConnectionString));
-            ServiceProvider = serivces.BuildServiceProvider();
-        }
-
-        [OneTimeTearDown]
-        public void ClassTearDown()
-        {
-            ServiceProvider?.Dispose();
-        }
-
-        [SetUp]
-        public void SetUp()
-        {
-            _tempDataDirectory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
-            Directory.CreateDirectory(_tempDataDirectory);
-            AppDomain.CurrentDomain.SetData("DataDirectory", _tempDataDirectory);
-
-            var csb = new OleDbConnectionStringBuilder(IntegrationTestOptions.Jet.ConnectionString);
-            csb.DataSource = DatabaseFilename = HostUtilities.ReplaceDataDirectory(csb.DataSource);
-
-            RecreateDatabase(csb.ConnectionString);
-
-            ServiceScope = ServiceProvider.CreateScope();
-            Processor = ServiceScope.ServiceProvider.GetRequiredService<JetProcessor>();
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            ServiceScope?.Dispose();
-
-            if (!string.IsNullOrEmpty(_tempDataDirectory) && Directory.Exists(_tempDataDirectory))
-            {
-                try
-                {
-                    Directory.Delete(_tempDataDirectory, true);
-                }
-                catch
-                {
-                    // Ignore exceptions - we need to find out later why this happens
-                }
-            }
-        }
-
-        private void RecreateDatabase(string connString)
-        {
-            if (File.Exists(DatabaseFilename))
-            {
-                File.Delete(DatabaseFilename);
-            }
-
-            var type = Type.GetTypeFromProgID("ADOX.Catalog");
-            if (type != null)
-            {
-                dynamic cat = Activator.CreateInstance(type);
-                cat.Create(connString);
             }
         }
     }

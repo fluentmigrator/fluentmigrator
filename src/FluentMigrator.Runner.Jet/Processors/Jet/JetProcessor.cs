@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 //
 // Copyright (c) 2018, Fluent Migrator Project
 //
@@ -28,6 +28,7 @@ using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.Jet
@@ -52,10 +53,10 @@ namespace FluentMigrator.Runner.Processors.Jet
 
         public JetProcessor(
             [NotNull] JetGenerator generator,
-            [NotNull] IAnnouncer announcer,
+            [NotNull] ILogger<JetProcessor> logger,
             [NotNull] IOptions<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor)
-            : base(generator, announcer, options.Value)
+            : base(generator, logger, options.Value)
         {
             var factory = OleDbFactory.Instance;
             if (factory != null)
@@ -91,7 +92,7 @@ namespace FluentMigrator.Runner.Processors.Jet
 
         public override void Process(PerformDBOperationExpression expression)
         {
-            Announcer.Say("Performing DB Operation");
+            Logger.LogSay("Performing DB Operation");
 
             if (Options.PreviewOnly)
                 return;
@@ -103,7 +104,7 @@ namespace FluentMigrator.Runner.Processors.Jet
 
         protected override void Process(string sql)
         {
-            Announcer.Sql(sql);
+            Logger.LogSql(sql);
 
             if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
                 return;
@@ -243,7 +244,7 @@ namespace FluentMigrator.Runner.Processors.Jet
 
             EnsureConnectionIsOpen();
 
-            Announcer.Say("Beginning Transaction");
+            Logger.LogSay("Beginning Transaction");
             _transaction = _connection.BeginTransaction();
         }
 
@@ -251,7 +252,7 @@ namespace FluentMigrator.Runner.Processors.Jet
         {
             if (_transaction == null) return;
 
-            Announcer.Say("Rolling back transaction");
+            Logger.LogSay("Rolling back transaction");
             _transaction.Rollback();
             WasCommitted = true;
             _transaction = null;
@@ -261,7 +262,7 @@ namespace FluentMigrator.Runner.Processors.Jet
         {
             if (_transaction == null) return;
 
-            Announcer.Say("Committing Transaction");
+            Logger.LogSay("Committing Transaction");
             _transaction.Commit();
             WasCommitted = true;
             _transaction = null;

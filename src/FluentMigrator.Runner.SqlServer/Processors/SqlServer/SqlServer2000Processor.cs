@@ -54,6 +54,7 @@ using FluentMigrator.Runner.Initialization;
 using JetBrains.Annotations;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
@@ -70,23 +71,23 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         }
 
         public SqlServer2000Processor(
-            [NotNull] IAnnouncer announcer,
+            [NotNull] ILogger<SqlServer2000Processor> logger,
             [NotNull] SqlServer2000Generator generator,
             [NotNull] IOptions<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor,
             [NotNull] IServiceProvider serviceProvider)
-            : this(SqlClientFactory.Instance, announcer, generator, options, connectionStringAccessor, serviceProvider)
+            : this(SqlClientFactory.Instance, logger, generator, options, connectionStringAccessor, serviceProvider)
         {
         }
 
         protected SqlServer2000Processor(
             DbProviderFactory factory,
-            [NotNull] IAnnouncer announcer,
+            [NotNull] ILogger logger,
             [NotNull] SqlServer2000Generator generator,
             [NotNull] IOptions<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor,
             [NotNull] IServiceProvider serviceProvider)
-            : base(() => factory, generator, announcer, options.Value, connectionStringAccessor)
+            : base(() => factory, generator, logger, options.Value, connectionStringAccessor)
         {
             _serviceProvider = serviceProvider;
         }
@@ -98,13 +99,13 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         public override void BeginTransaction()
         {
             base.BeginTransaction();
-            Announcer.Sql("BEGIN TRANSACTION");
+            Logger.LogSql("BEGIN TRANSACTION");
         }
 
         public override void CommitTransaction()
         {
             base.CommitTransaction();
-            Announcer.Sql("COMMIT TRANSACTION");
+            Logger.LogSql("COMMIT TRANSACTION");
         }
 
         public override void RollbackTransaction()
@@ -115,7 +116,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             }
 
             base.RollbackTransaction();
-            Announcer.Sql("ROLLBACK TRANSACTION");
+            Logger.LogSql("ROLLBACK TRANSACTION");
         }
 
         public override bool SchemaExists(string schemaName)
@@ -198,7 +199,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         protected override void Process(string sql)
         {
-            Announcer.Sql(sql);
+            Logger.LogSql(sql);
 
             if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
             {

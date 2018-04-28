@@ -18,6 +18,7 @@ using System;
 
 namespace FluentMigrator.Runner
 {
+    [Obsolete]
     public interface IAnnouncer
     {
         void Heading(string message);

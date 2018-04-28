@@ -18,6 +18,7 @@ using System;
 
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Initialization;
+using FluentMigrator.Runner.Logging;
 
 using JetBrains.Annotations;
 
@@ -37,9 +38,6 @@ namespace FluentMigrator.Runner.Processors
         [NotNull]
         private readonly string _databaseId;
 
-        [NotNull]
-        private readonly IAnnouncer _announcer;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ConnectionlessProcessorFactory"/> class.
         /// </summary>
@@ -52,26 +50,7 @@ namespace FluentMigrator.Runner.Processors
         {
             _generator = generatorAccessor.Generator;
             _databaseId = runnerContext.Database;
-            _announcer = runnerContext.Announcer;
             Name = _generator.GetName();
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ConnectionlessProcessorFactory"/> class.
-        /// </summary>
-        /// <param name="generatorAccessor">Accessor to get the selected generator</param>
-        /// <param name="announcer">The announcer</param>
-        /// <param name="accessorOptions">The processor accessor options</param>
-        public ConnectionlessProcessorFactory(
-            [NotNull] IGeneratorAccessor generatorAccessor,
-            [NotNull] IAnnouncer announcer,
-            [NotNull] IOptions<SelectingProcessorAccessorOptions> accessorOptions)
-        {
-            _generator = generatorAccessor.Generator;
-            _announcer = announcer;
-            Name = _databaseId = string.IsNullOrEmpty(accessorOptions.Value.ProcessorId)
-                ? generatorAccessor.Generator.GetName()
-                : accessorOptions.Value.ProcessorId;
         }
 
         /// <inheritdoc />
@@ -81,7 +60,7 @@ namespace FluentMigrator.Runner.Processors
             var processorOptions = options.GetProcessorOptions(connectionString);
             return new ConnectionlessProcessor(
                 new PassThroughGeneratorAccessor(_generator),
-                _announcer,
+                new AnnouncerFluentMigratorLogger(announcer),
                 new OptionsWrapper<ProcessorOptions>(processorOptions),
                 new OptionsWrapper<SelectingProcessorAccessorOptions>(
                     new SelectingProcessorAccessorOptions()

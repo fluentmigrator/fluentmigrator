@@ -17,21 +17,21 @@
 #endregion
 
 using System;
-using System.IO;
 using System.Reflection;
 
 using FluentMigrator.Exceptions;
 using FluentMigrator.Runner;
-using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Extensions;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Initialization.NetFramework;
+using FluentMigrator.Runner.Logging;
 using FluentMigrator.Runner.Processors;
 
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace FluentMigrator.MSBuild
 {
@@ -107,6 +107,8 @@ namespace FluentMigrator.MSBuild
 
         public string ProviderSwitches { get; set; }
 
+        private bool ExecutingAgainstMsSql => _databaseType.StartsWith("SqlServer", StringComparison.InvariantCultureIgnoreCase);
+
         public override bool Execute()
         {
 
@@ -122,34 +124,12 @@ namespace FluentMigrator.MSBuild
                 return false;
             }
 
-            IAnnouncer announcer = new ConsoleAnnouncer
-            {
-                ShowElapsedTime = Verbose,
-                ShowSql = Verbose
-            };
-
-            StreamWriter outputWriter = null;
-            if (Output)
-            {
-                if (string.IsNullOrEmpty(OutputFilename))
-                    OutputFilename = Path.GetFileName(Target) + ".sql";
-
-                outputWriter = new StreamWriter(OutputFilename);
-                var fileAnnouncer = new TextWriterAnnouncer(outputWriter)
-                {
-                    ShowElapsedTime = false,
-                    ShowSql = true
-                };
-
-                announcer = new CompositeAnnouncer(announcer, fileAnnouncer);
-            }
-
             Log.LogMessage(MessageImportance.Low, "Executing Migration Runner");
             try
             {
                 Log.LogMessage(MessageImportance.Low, "Creating Context");
 
-                ExecuteMigrations(announcer);
+                ExecuteMigrations();
             }
             catch (ProcessorFactoryNotFoundException ex)
             {
@@ -161,22 +141,18 @@ namespace FluentMigrator.MSBuild
                 Log.LogError("While executing migrations the following error was encountered: {0}, {1}", ex.Message, ex.StackTrace);
                 return false;
             }
-            finally
-            {
-                outputWriter?.Dispose();
-            }
 
             return true;
         }
 
-        private void ExecuteMigrations(IAnnouncer announcer)
+        private void ExecuteMigrations()
         {
             var conventionSet = new DefaultConventionSet(defaultSchemaName: null, WorkingDirectory);
 
             var services = CreateCoreServices()
                 .AddSingleton<IConventionSet>(conventionSet)
                 .AddScoped<TaskExecutor>()
-                .ConfigureRunner(r => r.WithAnnouncer(announcer))
+                .AddSingleton<ILoggerProvider, FluentMigratorConsoleLoggerProvider>()
                 .Configure<SelectingProcessorAccessorOptions>(opt => opt.ProcessorId = DatabaseType)
                 .Configure<AssemblySourceOptions>(opt => opt.AssemblyNames = Targets)
 #pragma warning disable 612
@@ -211,6 +187,19 @@ namespace FluentMigrator.MSBuild
                         opt.ProviderSwitches = ProviderSwitches;
                         opt.Timeout = Timeout == null ? null : (TimeSpan?)TimeSpan.FromSeconds(Timeout.Value);
                     });
+
+            if (Output)
+            {
+                services
+                    .Configure<LogFileFluentMigratorLoggerOptions>(
+                        opt =>
+                        {
+                            opt.ShowSql = true;
+                            opt.OutputFileName = OutputFilename;
+                            opt.OutputGoBetweenStatements = ExecutingAgainstMsSql;
+                        })
+                    .AddSingleton<ILoggerProvider, LogFileFluentMigratorLoggerProvider>();
+            }
 
             using (var serviceProvider = services.BuildServiceProvider(validateScopes: false))
             {

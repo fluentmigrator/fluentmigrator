@@ -1,3 +1,21 @@
+#region License
+//
+// Copyright (c) 2018, Fluent Migrator Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+#endregion
+
 using System;
 using System.Data;
 
@@ -28,7 +46,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
             var expression = GeneratorTestHelper.GetAlterDefaultConstraintExpression();
             expression.DefaultValue = SystemMethods.CurrentUser;
 
-            string expected = "ALTER TABLE [dbo].[TestTable1] ALTER [TestColumn1] DROP DEFAULT;" + Environment.NewLine +
+            var expected = "ALTER TABLE [dbo].[TestTable1] ALTER [TestColumn1] DROP DEFAULT;" + Environment.NewLine +
             "-- create alter table command to create new default constraint as string and run it" + Environment.NewLine +
             "ALTER TABLE [dbo].[TestTable1] ALTER [TestColumn1] DEFAULT CURRENT USER;";
 
@@ -42,7 +60,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
             var expression = GeneratorTestHelper.GetAlterDefaultConstraintExpression();
             expression.DefaultValue = SystemMethods.CurrentDateTime;
 
-            string expected = "ALTER TABLE [dbo].[TestTable1] ALTER [TestColumn1] DROP DEFAULT;" + Environment.NewLine +
+            var expected = "ALTER TABLE [dbo].[TestTable1] ALTER [TestColumn1] DROP DEFAULT;" + Environment.NewLine +
             "-- create alter table command to create new default constraint as string and run it" + Environment.NewLine +
             "ALTER TABLE [dbo].[TestTable1] ALTER [TestColumn1] DEFAULT CURRENT TIMESTAMP;";
 
@@ -56,7 +74,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
             var expression = GeneratorTestHelper.GetAlterDefaultConstraintExpression();
             expression.DefaultValue = SystemMethods.CurrentUTCDateTime;
 
-            string expected = "ALTER TABLE [dbo].[TestTable1] ALTER [TestColumn1] DROP DEFAULT;" + Environment.NewLine +
+            var expected = "ALTER TABLE [dbo].[TestTable1] ALTER [TestColumn1] DROP DEFAULT;" + Environment.NewLine +
                         "-- create alter table command to create new default constraint as string and run it" + Environment.NewLine +
                         "ALTER TABLE [dbo].[TestTable1] ALTER [TestColumn1] DEFAULT CURRENT UTC TIMESTAMP;";
 
@@ -70,7 +88,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
             var expression = GeneratorTestHelper.GetAlterDefaultConstraintExpression();
             expression.DefaultValue = SystemMethods.NewGuid;
 
-            string expected = "ALTER TABLE [dbo].[TestTable1] ALTER [TestColumn1] DROP DEFAULT;" + Environment.NewLine +
+            var expected = "ALTER TABLE [dbo].[TestTable1] ALTER [TestColumn1] DROP DEFAULT;" + Environment.NewLine +
             "-- create alter table command to create new default constraint as string and run it" + Environment.NewLine +
             "ALTER TABLE [dbo].[TestTable1] ALTER [TestColumn1] DEFAULT NEWID();";
 
@@ -84,7 +102,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
             var expression = GeneratorTestHelper.GetAlterDefaultConstraintExpression();
             expression.DefaultValue = "TestString";
 
-            string expected = "ALTER TABLE [dbo].[TestTable1] ALTER [TestColumn1] DROP DEFAULT;" + Environment.NewLine +
+            var expected = "ALTER TABLE [dbo].[TestTable1] ALTER [TestColumn1] DROP DEFAULT;" + Environment.NewLine +
             "-- create alter table command to create new default constraint as string and run it" + Environment.NewLine +
             "ALTER TABLE [dbo].[TestTable1] ALTER [TestColumn1] DEFAULT N'TestString';";
 

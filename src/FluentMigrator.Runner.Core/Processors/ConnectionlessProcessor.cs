@@ -22,17 +22,21 @@ using System.Data;
 using System.Linq;
 
 using FluentMigrator.Expressions;
+using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Initialization;
+using FluentMigrator.Runner.Logging;
 
 using JetBrains.Annotations;
 
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors
 {
     public class ConnectionlessProcessor: IMigrationProcessor
     {
+        [NotNull] private readonly ILogger _logger;
 #pragma warning disable 612
         [Obsolete]
         private readonly IMigrationProcessorOptions _legacyOptions;
@@ -44,6 +48,7 @@ namespace FluentMigrator.Runner.Processors
             IRunnerContext context,
             IMigrationProcessorOptions options)
         {
+            _logger = new AnnouncerFluentMigratorLogger(context.Announcer);
             _legacyOptions = options;
             DatabaseType = context.Database;
             Generator = generator;
@@ -53,33 +58,35 @@ namespace FluentMigrator.Runner.Processors
 
         public ConnectionlessProcessor(
             [NotNull] IGeneratorAccessor generatorAccessor,
-            [NotNull] IAnnouncer announcer,
+            [NotNull] ILogger logger,
             [NotNull] IOptions<ProcessorOptions> options,
             [NotNull] IOptions<SelectingProcessorAccessorOptions> accessorOptions)
         {
+            _logger = logger;
             var generator = generatorAccessor.Generator;
             DatabaseType = string.IsNullOrEmpty(accessorOptions.Value.ProcessorId) ? generator.GetName() : accessorOptions.Value.ProcessorId;
             Generator = generator;
-            Announcer = announcer;
             Options = options.Value;
 #pragma warning disable 612
+            Announcer = new LoggerAnnouncer(logger, new AnnouncerOptions() { ShowElapsedTime = true, ShowSql = true });
             _legacyOptions = options.Value;
 #pragma warning restore 612
         }
 
         public ConnectionlessProcessor(
             [NotNull] IGeneratorAccessor generatorAccessor,
-            [NotNull] IAnnouncer announcer,
+            [NotNull] ILogger logger,
             [NotNull] IOptions<ProcessorOptions> options,
             [NotNull] IReadOnlyCollection<string> processorIds)
         {
+            _logger = logger;
             var generator = generatorAccessor.Generator;
             DatabaseType = processorIds.FirstOrDefault() ?? generator.GetName();
             DatabaseTypeAliases = processorIds.Count == 0 ? Array.Empty<string>() : processorIds.Skip(1).ToArray();
             Generator = generator;
-            Announcer = announcer;
             Options = options.Value;
 #pragma warning disable 612
+            Announcer = new LoggerAnnouncer(logger, AnnouncerOptions.AllEnabled);
             _legacyOptions = options.Value;
 #pragma warning restore 612
         }
@@ -88,6 +95,8 @@ namespace FluentMigrator.Runner.Processors
         public string ConnectionString { get; } = "No connection";
 
         public IMigrationGenerator Generator { get; set; }
+
+        [Obsolete]
         public IAnnouncer Announcer { get; set; }
         public ProcessorOptions Options {get; set;}
 
@@ -137,7 +146,7 @@ namespace FluentMigrator.Runner.Processors
 
         protected void Process(string sql)
         {
-            Announcer.Sql(sql);
+            _logger.LogSql(sql);
         }
 
         public void Process(CreateSchemaExpression expression)
@@ -222,7 +231,7 @@ namespace FluentMigrator.Runner.Processors
 
         public void Process(PerformDBOperationExpression expression)
         {
-            Announcer.Say("Performing DB Operation");
+            _logger.LogSay("Performing DB Operation");
         }
 
         public void Process(DeleteDataExpression expression)

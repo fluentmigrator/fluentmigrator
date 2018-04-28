@@ -28,6 +28,7 @@ using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.Redshift
@@ -49,10 +50,10 @@ namespace FluentMigrator.Runner.Processors.Redshift
         public RedshiftProcessor(
             [NotNull] RedshiftDbFactory factory,
             [NotNull] RedshiftGenerator generator,
-            [NotNull] IAnnouncer announcer,
+            [NotNull] ILogger<RedshiftProcessor> logger,
             [NotNull] IOptions<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor)
-            : base(() => factory.Factory, generator, announcer, options.Value, connectionStringAccessor)
+            : base(() => factory.Factory, generator, logger, options.Value, connectionStringAccessor)
         {
         }
 
@@ -120,7 +121,7 @@ namespace FluentMigrator.Runner.Processors.Redshift
 
         protected override void Process(string sql)
         {
-            Announcer.Sql(sql);
+            Logger.LogSql(sql);
 
             if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
                 return;
@@ -149,7 +150,7 @@ namespace FluentMigrator.Runner.Processors.Redshift
 
         public override void Process(PerformDBOperationExpression expression)
         {
-            Announcer.Say("Performing DB Operation");
+            Logger.LogSay("Performing DB Operation");
 
             if (Options.PreviewOnly)
                 return;

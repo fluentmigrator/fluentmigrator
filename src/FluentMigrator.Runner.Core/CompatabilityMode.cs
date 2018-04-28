@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 //
 // Copyright (c) 2018, Fluent Migrator Project
 //
@@ -20,10 +20,20 @@ using System;
 
 namespace FluentMigrator.Runner
 {
+    /// <summary>
+    /// The old compatibility mode
+    /// </summary>
     [Obsolete("Use CompatibilityMode instead")]
     public enum CompatabilityMode
     {
+        /// <summary>
+        /// Ensuare that an exception gets thrown when a processor doesn't support a specific feature
+        /// </summary>
         STRICT,
+
+        /// <summary>
+        /// Unsupported processor features are ignored
+        /// </summary>
         LOOSE,
     }
 }

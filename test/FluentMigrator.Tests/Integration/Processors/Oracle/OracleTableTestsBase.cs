@@ -31,7 +31,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle
     [Category("Integration")]
     public abstract class OracleTableTestsBase : BaseTableTests
     {
-        private const string SchemaName = "test";
+        private const string SchemaName = "FMTEST";
 
         private ServiceProvider ServiceProvider { get; set; }
         private IServiceScope ServiceScope { get; set; }
@@ -41,7 +41,9 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle
         public override void CallingTableExistsCanAcceptTableNameWithSingleQuote()
         {
             using (var table = new OracleTestTable("Test'Table", Processor, null, "id int"))
+            {
                 Processor.TableExists(null, table.Name).ShouldBeTrue();
+            }
         }
 
         [Test]
@@ -60,21 +62,27 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle
         public override void CallingTableExistsReturnsTrueIfTableExists()
         {
             using (var table = new OracleTestTable(Processor, null, "id int"))
+            {
                 Processor.TableExists(null, table.Name).ShouldBeTrue();
+            }
         }
 
         [Test]
         public override void CallingTableExistsReturnsTrueIfTableExistsWithSchema()
         {
             using (var table = new OracleTestTable(Processor, SchemaName, "id int"))
+            {
                 Processor.TableExists(SchemaName, table.Name).ShouldBeTrue();
+            }
         }
 
         [OneTimeSetUp]
         public void ClassSetUp()
         {
             if (!IntegrationTestOptions.Oracle.IsEnabled)
+            {
                 Assert.Ignore();
+            }
 
             var serivces = AddOracleServices(ServiceCollectionExtensions.CreateServices())
                 .AddScoped<IConnectionStringReader>(
@@ -92,7 +100,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle
         public void SetUp()
         {
             ServiceScope = ServiceProvider.CreateScope();
-            Processor = ServiceScope.ServiceProvider.GetRequiredService<OracleManagedProcessor>();
+            Processor = ServiceScope.ServiceProvider.GetRequiredService<OracleProcessorBase>();
         }
 
         [TearDown]

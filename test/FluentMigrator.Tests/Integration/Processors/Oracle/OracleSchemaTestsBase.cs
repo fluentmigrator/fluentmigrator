@@ -30,7 +30,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle
     [Category("Integration")]
     public abstract class OracleSchemaTestsBase : BaseSchemaTests
     {
-        private const string SchemaName = "test";
+        private const string SchemaName = "FMTEST";
 
         private ServiceProvider ServiceProvider { get; set; }
         private IServiceScope ServiceScope { get; set; }
@@ -52,7 +52,9 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle
         public void ClassSetUp()
         {
             if (!IntegrationTestOptions.Oracle.IsEnabled)
+            {
                 Assert.Ignore();
+            }
 
             var serivces = AddOracleServices(ServiceCollectionExtensions.CreateServices())
                 .AddScoped<IConnectionStringReader>(
@@ -70,7 +72,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle
         public void SetUp()
         {
             ServiceScope = ServiceProvider.CreateScope();
-            Processor = ServiceScope.ServiceProvider.GetRequiredService<OracleManagedProcessor>();
+            Processor = ServiceScope.ServiceProvider.GetRequiredService<OracleProcessorBase>();
         }
 
         [TearDown]
