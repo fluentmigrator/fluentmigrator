@@ -1,12 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <ToolCommandName>dotnet-fm</ToolCommandName>
+    <PackAsTool>true</PackAsTool>
     <OutputType>Exe</OutputType>
-    <AssemblyName>dotnet-fm</AssemblyName>
-    <PackageId>FluentMigrator.DotNet.Cli</PackageId>
     <DefineConstants>NOT_CLS_COMPLIANT;$(DefineConstants)</DefineConstants>
     <Description>.NET Core CLI tool for FluentMigrator</Description>
-    <PackageType>DotnetCliTool</PackageType>
   </PropertyGroup>
   <Import Project="$(MSBuildThisFileDirectory)../../PackageTool.proj" />
   <ItemGroup>
