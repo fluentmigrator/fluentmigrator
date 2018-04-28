@@ -11,17 +11,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - [#850](https://github.com/fluentmigrator/fluentmigrator/issues/850): Set minimum .NET Framework version to 4.6.1. Older versions aren't supported anymore.
 - `ProcessorOptions.Timeout` is now of type `System.TimeSpan?`
-- `Factory.CreateCommand` is replaced by `Processor.CreateCommand`
-- The database connection will be opened as soon as its created
 
 ### Added
 
 - [#851](https://github.com/fluentmigrator/fluentmigrator/issues/851): Enable the usage of [Microsoft.Extensions.DependencyInjection](https://github.com/aspnet/DependencyInjection/)
 - [#852](https://github.com/fluentmigrator/fluentmigrator/issues/852): Replace custom configuration mechanisms by using [Microsoft.Extensions.Options](https://github.com/aspnet/Options/)
+- [#853](https://github.com/fluentmigrator/fluentmigrator/issues/853): Replace the announcer with Microsoft.Extensions.Logging
 
 ### Deprecated
 
 - `IAssemblyCollection` and all its implementations
+- `IAnnouncer` and all its implementations
 - `IMigrationRunnerConventions.GetMigrationInfo`
 - `IProfileLoader.ApplyProfiles()`
 - `IProfileLoader.FindProfilesIn`
@@ -70,12 +70,12 @@ a `ConnectionlessProcessor` instead of the previously selected processor.
 ```c#
 // Initialize the services
 var serviceProvider = new ServiceCollection()
+    .AddLogging(lb => lb.AddFluentMigratorConsole())
     .AddFluentMigratorCore()
     .ConfigureRunner(
         builder => builder
             .AddSQLite()
             .WithGlobalConnectionString(connectionString)
-            .WithAnnouncer(new ConsoleAnnouncer() { ShowSql = true })
             .WithMigrationsIn(typeof(AddGTDTables).Assembly))
     .BuildServiceProvider();
 
