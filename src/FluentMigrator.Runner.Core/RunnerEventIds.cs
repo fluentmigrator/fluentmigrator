@@ -21,7 +21,7 @@ namespace FluentMigrator.Runner
     /// <summary>
     /// The default runner event IDs
     /// </summary>
-    internal static class RunnerEventIds
+    public static class RunnerEventIds
     {
         public const string RunnerCategory = "FluentMigrator.Runner";
 
@@ -44,5 +44,10 @@ namespace FluentMigrator.Runner
         /// Gets the event ID for an SQL statement
         /// </summary>
         public static readonly EventId Sql = new EventId(1003, RunnerCategory);
+
+        /// <summary>
+        /// Gets the event ID for an informational message
+        /// </summary>
+        public static readonly EventId Say = new EventId(1004, RunnerCategory);
     }
 }

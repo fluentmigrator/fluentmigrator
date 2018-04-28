@@ -182,7 +182,7 @@ namespace FluentMigrator.Runner.Initialization.NetFramework
                 message = $"Using connection {info.Name} from configuration file {info.Source}";
             }
 
-            _logger.LogInformation(message);
+            _logger.LogSay(message);
         }
 
         private class ConnectionInfo

@@ -23,6 +23,7 @@ using System.IO;
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Initialization;
+using FluentMigrator.Runner.Logging;
 using FluentMigrator.Runner.Processors.Postgres;
 using FluentMigrator.Tests.Helpers;
 using FluentMigrator.Tests.Logging;
@@ -152,7 +153,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
 
             var sp = CreateProcessorServices(
                 services => services
-                    .AddSingleton<ILoggerProvider>(new TextWriterLoggerProvider(output))
+                    .AddSingleton<ILoggerProvider>(new SqlScriptFluentMigratorLoggerProvider(output))
                     .ConfigureRunner(r => r.AsGlobalPreview()));
             using (sp)
             {

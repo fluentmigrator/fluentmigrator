@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2018, FluentMigrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -43,7 +43,10 @@ namespace FluentMigrator.Runner
                 {
                     var opt = sp.GetRequiredService<IOptions<ProcessorOptions>>();
                     if (opt.Value.IsQuotingForced())
+                    {
                         return new OracleQuoterQuotedIdentifier();
+                    }
+
                     return new OracleQuoter();
                 });
             builder.Services
@@ -68,7 +71,10 @@ namespace FluentMigrator.Runner
                 {
                     var opt = sp.GetRequiredService<IOptions<ProcessorOptions>>();
                     if (opt.Value.IsQuotingForced())
+                    {
                         return new OracleQuoterQuotedIdentifier();
+                    }
+
                     return new OracleQuoter();
                 });
             builder.Services
@@ -93,7 +99,10 @@ namespace FluentMigrator.Runner
                 {
                     var opt = sp.GetRequiredService<IOptions<ProcessorOptions>>();
                     if (opt.Value.IsQuotingForced())
+                    {
                         return new OracleQuoterQuotedIdentifier();
+                    }
+
                     return new OracleQuoter();
                 });
             builder.Services

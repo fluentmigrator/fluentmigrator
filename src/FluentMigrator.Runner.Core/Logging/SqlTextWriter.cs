@@ -25,8 +25,6 @@ namespace FluentMigrator.Runner.Logging
     internal class SqlTextWriter : TextWriter
     {
         private readonly TextWriter _innerWriter;
-        private bool _commentStarted = false;
-        private bool _hadEmptyLine = true;
 
         public SqlTextWriter(TextWriter innerWriter)
         {
@@ -41,62 +39,21 @@ namespace FluentMigrator.Runner.Logging
         {
             if (!string.IsNullOrEmpty(value))
             {
-                if (!_commentStarted)
-                {
-                    if (!_hadEmptyLine)
-                    {
-                        _innerWriter.WriteLine();
-                        _hadEmptyLine = true;
-                    }
-
-                    _innerWriter.WriteLine("/**");
-                }
-
-                _innerWriter.WriteLine($" * {value}");
+                _innerWriter.WriteLine($"/* {value} */");
             }
-            else if (_commentStarted)
-            {
-                _innerWriter.WriteLine(" *");
-            }
-            else if (!_hadEmptyLine)
+            else
             {
                 _innerWriter.WriteLine();
-                _hadEmptyLine = true;
             }
-        }
 
-        /// <inheritdoc />
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                CloseComment(false);
-            }
+            _innerWriter.Flush();
         }
 
         public void WriteLineDirect(string message)
         {
-            if (_commentStarted)
-            {
-                CloseComment();
-            }
-
             _innerWriter.WriteLine(message);
-        }
 
-        private void CloseComment(bool addEmptyLine = true)
-        {
-            if (!_commentStarted)
-                return;
-
-            _innerWriter.WriteLine(" */");
-
-            if (addEmptyLine)
-            {
-                _innerWriter.WriteLine();
-            }
-
-            _hadEmptyLine = addEmptyLine;
+            _innerWriter.Flush();
         }
     }
 }

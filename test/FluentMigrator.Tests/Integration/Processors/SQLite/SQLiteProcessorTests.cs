@@ -24,6 +24,7 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Initialization;
+using FluentMigrator.Runner.Logging;
 using FluentMigrator.Runner.Processors.SQLite;
 using FluentMigrator.Tests.Logging;
 
@@ -132,7 +133,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
 
             var serviceProvider = CreateProcessorServices(
                 services => services
-                    .AddSingleton<ILoggerProvider>(new TextWriterLoggerProvider(output))
+                    .AddSingleton<ILoggerProvider>(new SqlScriptFluentMigratorLoggerProvider(output))
                     .ConfigureRunner(r => r.AsGlobalPreview()));
             using (serviceProvider)
             {
@@ -167,10 +168,10 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
                     }
 
                     tableExists.ShouldBeFalse();
-
-                    Assert.That(output.ToString(), Does.Contain(@"/* Performing DB Operation */"));
                 }
             }
+
+            Assert.That(output.ToString(), Does.Contain(@"/* Performing DB Operation */"));
         }
 
         private ServiceProvider CreateProcessorServices([CanBeNull] Action<IServiceCollection> initAction)

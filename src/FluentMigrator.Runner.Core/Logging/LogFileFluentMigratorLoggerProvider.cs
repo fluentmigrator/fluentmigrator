@@ -20,7 +20,6 @@ using System.Text;
 
 using FluentMigrator.Runner.Initialization;
 
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Logging
@@ -28,12 +27,8 @@ namespace FluentMigrator.Runner.Logging
     /// <summary>
     /// Outputs the SQL statements to a log file
     /// </summary>
-    public class LogFileFluentMigratorLoggerProvider : ILoggerProvider
+    public class LogFileFluentMigratorLoggerProvider : SqlScriptFluentMigratorLoggerProvider
     {
-        private readonly StreamWriter _writer;
-        private readonly SqlTextWriter _sqlWriter;
-        private readonly ILogger _logFileLogger;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="LogFileFluentMigratorLoggerProvider"/> class.
         /// </summary>
@@ -42,24 +37,8 @@ namespace FluentMigrator.Runner.Logging
         public LogFileFluentMigratorLoggerProvider(
             IAssemblySource assemblySource,
             IOptions<LogFileFluentMigratorLoggerOptions> options)
+            : base(new StreamWriter(GetOutputFileName(assemblySource, options.Value), false, Encoding.UTF8), options.Value)
         {
-            var outputFileName = GetOutputFileName(assemblySource, options.Value);
-            _writer = new StreamWriter(outputFileName, false, Encoding.UTF8);
-            _sqlWriter = new SqlTextWriter(_writer);
-            _logFileLogger = new LogFileFluentMigratorLogger(_sqlWriter, options.Value);
-        }
-
-        /// <inheritdoc />
-        public ILogger CreateLogger(string categoryName)
-        {
-            return _logFileLogger;
-        }
-
-        /// <inheritdoc />
-        public void Dispose()
-        {
-            _sqlWriter?.Dispose();
-            _writer?.Dispose();
         }
 
         private static string GetOutputFileName(

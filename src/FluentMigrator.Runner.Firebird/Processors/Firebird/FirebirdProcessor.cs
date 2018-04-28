@@ -227,7 +227,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
                 return;
             }
 
-            Logger.LogTrace("Committing and Retaining Transaction");
+            Logger.LogSay("Committing and Retaining Transaction");
 
             CommitTransaction();
             BeginTransaction();
@@ -725,7 +725,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
         public override void Process(PerformDBOperationExpression expression)
         {
-            Logger.LogTrace("Performing DB Operation");
+            Logger.LogSay("Performing DB Operation");
 
             if (Options.PreviewOnly)
                 return;

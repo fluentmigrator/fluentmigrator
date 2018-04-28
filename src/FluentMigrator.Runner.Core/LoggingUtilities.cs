@@ -68,6 +68,16 @@ namespace FluentMigrator.Runner
         }
 
         /// <summary>
+        /// Log an informational message
+        /// </summary>
+        /// <param name="logger">The logger</param>
+        /// <param name="message">The message</param>
+        public static void LogSay(this ILogger logger, string message)
+        {
+            logger.LogInformation(RunnerEventIds.Say, message);
+        }
+
+        /// <summary>
         /// Writes a horizontal ruler to the given <paramref name="writer"/>
         /// </summary>
         /// <param name="writer">The <see cref="TextWriter"/> to write the text to</param>

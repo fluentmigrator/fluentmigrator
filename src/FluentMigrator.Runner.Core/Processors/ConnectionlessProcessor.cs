@@ -231,7 +231,7 @@ namespace FluentMigrator.Runner.Processors
 
         public void Process(PerformDBOperationExpression expression)
         {
-            _logger.LogTrace("Performing DB Operation");
+            _logger.LogSay("Performing DB Operation");
         }
 
         public void Process(DeleteDataExpression expression)

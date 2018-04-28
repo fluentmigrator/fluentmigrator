@@ -21,6 +21,7 @@ using System.IO;
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
+using FluentMigrator.Runner.Logging;
 using FluentMigrator.Tests.Helpers;
 using FluentMigrator.Tests.Logging;
 
@@ -69,7 +70,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServer.SqlServer2016
 
             var serviceProvider = CreateProcessorServices(
                 services => services
-                    .AddSingleton<ILoggerProvider>(new TextWriterLoggerProvider(output))
+                    .AddSingleton<ILoggerProvider>(new SqlScriptFluentMigratorLoggerProvider(output))
                     .ConfigureRunner(r => r.AsGlobalPreview()));
             using (serviceProvider)
             {

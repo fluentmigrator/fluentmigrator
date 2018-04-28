@@ -120,7 +120,7 @@ namespace FluentMigrator.Runner.Processors.DB2.iSeries
 
         public override void Process(PerformDBOperationExpression expression)
         {
-            Logger.LogTrace("Performing DB Operation");
+            Logger.LogSay("Performing DB Operation");
 
             if (Options.PreviewOnly)
             {

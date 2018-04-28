@@ -30,7 +30,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle
     [Category("Integration")]
     public abstract class OracleProcessorTestsBase
     {
-        private const string SchemaName = "test";
+        private const string SchemaName = "FMTEST";
 
         private ServiceProvider ServiceProvider { get; set; }
         private IServiceScope ServiceScope { get; set; }
@@ -41,7 +41,9 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle
         public void CallingColumnExistsReturnsFalseIfColumnExistsInDifferentSchema()
         {
             using (var table = new OracleTestTable(Processor, SchemaName, "id int"))
+            {
                 Processor.ColumnExists("testschema", table.Name, "ID").ShouldBeFalse();
+            }
         }
 
         [Test]
@@ -58,7 +60,9 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle
         public void CallingTableExistsReturnsFalseIfTableExistsInDifferentSchema()
         {
             using (var table = new OracleTestTable(Processor, SchemaName, "id int"))
+            {
                 Processor.TableExists("testschema", table.Name).ShouldBeFalse();
+            }
         }
 
         [Test]
@@ -66,7 +70,9 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle
         {
             //the ColumnExisits() function is'nt case sensitive
             using (var table = new OracleTestTable(Processor, null, "id int"))
+            {
                 Processor.ColumnExists(null, table.Name, "Id").ShouldBeTrue();
+            }
         }
 
         [Test]
@@ -94,7 +100,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle
         [Test]
         public void TestQuery()
         {
-            string sql = "SELECT SYSDATE FROM " + Quoter.QuoteTableName("DUAL");
+            var sql = "SELECT SYSDATE FROM " + Quoter.QuoteTableName("DUAL");
             var ds = Processor.Read(sql);
             Assert.Greater(ds.Tables.Count, 0);
             Assert.Greater(ds.Tables[0].Columns.Count, 0);
@@ -104,7 +110,9 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle
         public void ClassSetUp()
         {
             if (!IntegrationTestOptions.Oracle.IsEnabled)
+            {
                 Assert.Ignore();
+            }
 
             var serivces = AddOracleServices(ServiceCollectionExtensions.CreateServices())
                 .AddScoped<IConnectionStringReader>(
@@ -122,7 +130,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle
         public void SetUp()
         {
             ServiceScope = ServiceProvider.CreateScope();
-            Processor = ServiceScope.ServiceProvider.GetRequiredService<OracleManagedProcessor>();
+            Processor = ServiceScope.ServiceProvider.GetRequiredService<OracleProcessorBase>();
             Quoter = ServiceScope.ServiceProvider.GetRequiredService<OracleQuoterBase>();
         }
 

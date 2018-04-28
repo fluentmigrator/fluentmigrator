@@ -22,6 +22,7 @@ using System.Data;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
@@ -31,6 +32,7 @@ using FluentMigrator.Runner.Infrastructure;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Tests.Integration.Migrations;
+using FluentMigrator.Tests.Logging;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -46,8 +48,6 @@ namespace FluentMigrator.Tests.Unit
     [TestFixture]
     public class MigrationRunnerTests
     {
-        private Mock<ILoggerFactory> _loggerFactoryMock;
-        private Mock<ILogger> _loggerMock;
         private Mock<IStopWatch> _stopWatch;
 
         private Mock<IMigrationProcessor> _processorMock;
@@ -55,6 +55,7 @@ namespace FluentMigrator.Tests.Unit
         private Mock<IProfileLoader> _profileLoaderMock;
         private Mock<IAssemblySource> _assemblySourceMock;
 
+        private ICollection<string> _logMessages;
         private SortedList<long, IMigrationInfo> _migrationList;
         private TestVersionLoader _fakeVersionLoader;
         private int _applicationContext;
@@ -73,11 +74,7 @@ namespace FluentMigrator.Tests.Unit
             _migrationLoaderMock = new Mock<IMigrationInformationLoader>(MockBehavior.Loose);
             _profileLoaderMock = new Mock<IProfileLoader>(MockBehavior.Loose);
 
-            _loggerFactoryMock = new Mock<ILoggerFactory>();
-            _loggerMock = new Mock<ILogger>();
             _stopWatch = new Mock<IStopWatch>();
-
-            _loggerFactoryMock.Setup(f => f.CreateLogger(It.IsAny<string>())).Returns(_loggerMock.Object);
             _stopWatch.Setup(x => x.Time(It.IsAny<Action>())).Returns(new TimeSpan(1)).Callback((Action a) => a.Invoke());
 
             _assemblySourceMock = new Mock<IAssemblySource>();
@@ -85,10 +82,11 @@ namespace FluentMigrator.Tests.Unit
 
             _migrationLoaderMock.Setup(x => x.LoadMigrations()).Returns(()=> _migrationList);
 
+            _logMessages = new List<string>();
             var connectionString = IntegrationTestOptions.SqlServer2008.ConnectionString;
             _serviceCollection = ServiceCollectionExtensions.CreateServices()
                 .WithProcessor(_processorMock)
-                .AddSingleton(_loggerFactoryMock.Object)
+                .AddSingleton<ILoggerProvider>(new TextLineLoggerProvider(_logMessages, new FluentMigratorLoggerOptions() { ShowElapsedTime = true }))
                 .AddSingleton(_stopWatch.Object)
                 .AddSingleton(_assemblySourceMock.Object)
                 .AddSingleton(_migrationLoaderMock.Object)
@@ -178,7 +176,6 @@ namespace FluentMigrator.Tests.Unit
             runner.Up(migration);
 
             Assert.AreEqual(_applicationContext, migration.ApplicationContext, "The migration does not have the expected application context.");
-            _loggerMock.VerifyAll();
         }
 
         [Test]
@@ -190,71 +187,64 @@ namespace FluentMigrator.Tests.Unit
             runner.Up(migration);
 
             Assert.AreEqual(IntegrationTestOptions.SqlServer2008.ConnectionString, migration.ConnectionString, "The migration does not have the expected connection string.");
-            _loggerMock.VerifyAll();
         }
 
         [Test]
         public void CanAnnounceUp()
         {
-            _loggerMock.Setup(x => x.LogHeader(It.IsRegex(ContainsAll("Test", "migrating"))));
             var runner = CreateRunner();
             runner.Up(new TestMigration());
-            _loggerMock.VerifyAll();
+            _logMessages.ShouldContain(l => LineContainsAll(l, "Test", "migrating"));
         }
 
         [Test]
         public void CanAnnounceUpFinish()
         {
-            _loggerMock.Setup(x => x.LogInformation(It.IsRegex(ContainsAll("Test", "migrated"))));
             var runner = CreateRunner();
             runner.Up(new TestMigration());
-            _loggerMock.VerifyAll();
+            _logMessages.ShouldContain(l => LineContainsAll(l, "Test", "migrated"));
         }
 
         [Test]
         public void CanAnnounceDown()
         {
-            _loggerMock.Setup(x => x.LogHeader(It.IsRegex(ContainsAll("Test", "reverting"))));
             var runner = CreateRunner();
             runner.Down(new TestMigration());
-            _loggerMock.VerifyAll();
+            _logMessages.ShouldContain(l => LineContainsAll(l, "Test", "reverting"));
         }
 
         [Test]
         public void CanAnnounceDownFinish()
         {
-            _loggerMock.Setup(x => x.LogInformation(It.IsRegex(ContainsAll("Test", "reverted"))));
             var runner = CreateRunner();
             runner.Down(new TestMigration());
-            _loggerMock.VerifyAll();
+            _logMessages.ShouldContain(l => LineContainsAll(l, "Test", "reverted"));
         }
 
         [Test]
         public void CanAnnounceUpElapsedTime()
         {
             var ts = new TimeSpan(0, 0, 0, 1, 3);
-            _loggerMock.Setup(x => x.LogElapsedTime(It.Is<TimeSpan>(y => y == ts)));
 
             _stopWatch.Setup(x => x.ElapsedTime()).Returns(ts);
 
             var runner = CreateRunner();
             runner.Up(new TestMigration());
 
-            _loggerMock.VerifyAll();
+            _logMessages.ShouldContain(l => l.Equals($"=> {ts.TotalSeconds}s"));
         }
 
         [Test]
         public void CanAnnounceDownElapsedTime()
         {
             var ts = new TimeSpan(0, 0, 0, 1, 3);
-            _loggerMock.Setup(x => x.LogElapsedTime(It.Is<TimeSpan>(y => y == ts)));
 
             _stopWatch.Setup(x => x.ElapsedTime()).Returns(ts);
 
             var runner = CreateRunner();
             runner.Down(new TestMigration());
 
-            _loggerMock.VerifyAll();
+            _logMessages.ShouldContain(l => l.Equals($"=> {ts.TotalSeconds}s"));
         }
 
         [Test]
@@ -272,33 +262,25 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void CanSayExpression()
         {
-            _loggerMock.Setup(x => x.LogInformation(It.IsRegex(ContainsAll("CreateTable"))));
-
             _stopWatch.Setup(x => x.ElapsedTime()).Returns(new TimeSpan(0, 0, 0, 1, 3));
 
             var runner = CreateRunner();
             runner.Up(new TestMigration());
 
-            _loggerMock.VerifyAll();
+            _logMessages.ShouldContain(l => LineContainsAll(l, "CreateTable"));
         }
 
         [Test]
         public void CanTimeExpression()
         {
             var ts = new TimeSpan(0, 0, 0, 1, 3);
-            _loggerMock.Setup(x => x.LogElapsedTime(It.Is<TimeSpan>(y => y == ts)));
 
             _stopWatch.Setup(x => x.ElapsedTime()).Returns(ts);
 
             var runner = CreateRunner();
             runner.Up(new TestMigration());
 
-            _loggerMock.VerifyAll();
-        }
-
-        private static string ContainsAll(params string[] words)
-        {
-            return ".*?" + string.Join(".*?", words) + ".*?";
+            _logMessages.ShouldContain(l => l.Equals($"=> {ts.TotalSeconds}s"));
         }
 
         [Test]
@@ -568,7 +550,7 @@ namespace FluentMigrator.Tests.Unit
 
             Assert.DoesNotThrow(() => runner.ValidateVersionOrder());
 
-            _loggerMock.Verify(a => a.Log(It.IsAny<LogLevel>(), It.IsAny<EventId>(), "Version ordering valid.", null, It.IsAny<Func<string, Exception, string>>()));
+            _logMessages.ShouldContain(l => LineContainsAll(l, "Version ordering valid."));
 
             _fakeVersionLoader.DidRemoveVersionTableGetCalled.ShouldBeFalse();
         }
@@ -591,7 +573,7 @@ namespace FluentMigrator.Tests.Unit
 
             Assert.DoesNotThrow(() => runner.ValidateVersionOrder());
 
-            _loggerMock.Verify(a => a.LogInformation("Version ordering valid."));
+            _logMessages.ShouldContain(l => LineContainsAll(l, "Version ordering valid."));
 
             _fakeVersionLoader.DidRemoveVersionTableGetCalled.ShouldBeFalse();
         }
@@ -654,10 +636,10 @@ namespace FluentMigrator.Tests.Unit
 
             runner.ListMigrations();
 
-            _loggerMock.Verify(a => a.LogInformation("2011010101: IMigrationProxy"));
-            _loggerMock.Verify(a => a.LogInformation("2011010102: IMigrationProxy (not applied)"));
-            _loggerMock.Verify(a => a.LogEmphasized("2011010103: IMigrationProxy (current)"));
-            _loggerMock.Verify(a => a.LogEmphasized("2011010104: IMigrationProxy (not applied, BREAKING)"));
+            _logMessages.ShouldContain(l => LineContainsAll(l, "2011010101: IMigrationProxy"));
+            _logMessages.ShouldContain(l => LineContainsAll(l, "2011010102: IMigrationProxy (not applied)"));
+            _logMessages.ShouldContain(l => LineContainsAll(l, "2011010103: IMigrationProxy (current)"));
+            _logMessages.ShouldContain(l => LineContainsAll(l, "2011010104: IMigrationProxy (not applied, BREAKING)"));
         }
 
         [Test]
@@ -671,7 +653,7 @@ namespace FluentMigrator.Tests.Unit
             Assert.Throws<InvalidMigrationException>(() => runner.Up(invalidMigration.Object));
 
             var expectedErrorMessage = ErrorMessages.UpdateDataExpressionMustSpecifyWhereClauseOrAllRows;
-            _loggerMock.Verify(a => a.LogError(It.Is<string>(s => s.Contains($"UpdateDataExpression: {expectedErrorMessage}"))));
+            _logMessages.ShouldContain(l => LineContainsAll(l, $"UpdateDataExpression: {expectedErrorMessage}"));
         }
 
         [Test]
@@ -685,7 +667,7 @@ namespace FluentMigrator.Tests.Unit
             Assert.Throws<InvalidMigrationException>(() => runner.Down(invalidMigration.Object));
 
             var expectedErrorMessage = ErrorMessages.UpdateDataExpressionMustSpecifyWhereClauseOrAllRows;
-            _loggerMock.Verify(a => a.LogError(It.Is<string>(s => s.Contains($"UpdateDataExpression: {expectedErrorMessage}"))));
+            _logMessages.ShouldContain(l => LineContainsAll(l, $"UpdateDataExpression: {expectedErrorMessage}"));
         }
 
         [Test]
@@ -700,8 +682,8 @@ namespace FluentMigrator.Tests.Unit
             var runner = CreateRunner();
             Assert.Throws<InvalidMigrationException>(() => runner.Up(invalidMigration.Object));
 
-            _loggerMock.Verify(a => a.LogError(It.Is<string>(s => s.Contains($"UpdateDataExpression: {ErrorMessages.UpdateDataExpressionMustSpecifyWhereClauseOrAllRows}"))));
-            _loggerMock.Verify(a => a.LogError(It.Is<string>(s => s.Contains($"CreateColumnExpression: {ErrorMessages.TableNameCannotBeNullOrEmpty} {ErrorMessages.ColumnNameCannotBeNullOrEmpty} {ErrorMessages.ColumnTypeMustBeDefined}"))));
+            _logMessages.ShouldContain(l => LineContainsAll(l, $"UpdateDataExpression: {ErrorMessages.UpdateDataExpressionMustSpecifyWhereClauseOrAllRows}"));
+            _logMessages.ShouldContain(l => LineContainsAll(l, $"CreateColumnExpression: {ErrorMessages.TableNameCannotBeNullOrEmpty} {ErrorMessages.ColumnNameCannotBeNullOrEmpty} {ErrorMessages.ColumnTypeMustBeDefined}"));
         }
 
         [Test]
@@ -763,6 +745,12 @@ namespace FluentMigrator.Tests.Unit
             Assert.DoesNotThrow(() =>
                 runner.ApplyMigrationUp(
                     new MigrationInfo(7, TransactionBehavior.Default, true, new TestBreakingMigration()), true));
+        }
+
+        private static bool LineContainsAll(string line, params string[] words)
+        {
+            var pattern = string.Join(".*?", words.Select(Regex.Escape));
+            return Regex.IsMatch(line, pattern);
         }
 
         public class CustomMigrationConventions : MigrationRunnerConventions

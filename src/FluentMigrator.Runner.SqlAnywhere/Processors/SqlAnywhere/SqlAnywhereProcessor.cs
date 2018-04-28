@@ -146,13 +146,13 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
             if (!Exists("SELECT count(*) FROM \"dbo\".\"syslogins\" WHERE \"name\"='{0}'", FormatHelper.FormatSqlEscape(expression.SchemaName)))
             {
                 // Try to automatically generate the user
-                Logger.LogInformation("Creating user {0}.", expression.SchemaName);
+                Logger.LogSay($"Creating user {expression.SchemaName}.");
                 Execute("CREATE USER \"{0}\" IDENTIFIED BY \"{1}\"", expression.SchemaName, password);
             }
 
             var sql = Generator.Generate(expression);
             string connectionString = ReplaceUserIdAndPasswordInConnectionString(expression.SchemaName, password);
-            Logger.LogInformation("Creating connection for user {0} to create schema.", expression.SchemaName);
+            Logger.LogSay($"Creating connection for user {expression.SchemaName} to create schema.");
             IDbConnection connection;
             if (DbProviderFactory == null)
             {
@@ -168,19 +168,19 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
             }
 
             EnsureConnectionIsOpen(connection);
-            Logger.LogInformation("Beginning out of scope transaction to create schema.");
+            Logger.LogSay("Beginning out of scope transaction to create schema.");
             var transaction = connection.BeginTransaction();
 
             try
             {
                 ExecuteNonQuery(connection, transaction, sql);
                 transaction.Commit();
-                Logger.LogInformation("Out of scope transaction to create schema committed.");
+                Logger.LogSay("Out of scope transaction to create schema committed.");
             }
             catch
             {
                 transaction.Rollback();
-                Logger.LogInformation("Out of scope transaction to create schema rolled back.");
+                Logger.LogSay("Out of scope transaction to create schema rolled back.");
                 throw;
             }
             finally
@@ -351,7 +351,7 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
 
         public override void Process(PerformDBOperationExpression expression)
         {
-            Logger.LogTrace("Performing DB Operation");
+            Logger.LogSay("Performing DB Operation");
 
             if (Options.PreviewOnly)
                 return;

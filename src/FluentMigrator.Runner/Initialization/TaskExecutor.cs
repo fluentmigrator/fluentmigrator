@@ -191,7 +191,7 @@ namespace FluentMigrator.Runner.Initialization
                 }
             }
 
-            _logger.LogInformation("Task completed.");
+            _logger.LogSay("Task completed.");
         }
 
         /// <summary>

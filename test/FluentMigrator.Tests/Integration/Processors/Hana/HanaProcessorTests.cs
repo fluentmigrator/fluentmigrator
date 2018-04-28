@@ -20,11 +20,12 @@ using System.IO;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner;
-using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Initialization;
+using FluentMigrator.Runner.Logging;
 using FluentMigrator.Runner.Processors.Hana;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 using NUnit.Framework;
 
@@ -45,31 +46,22 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
         [Test]
         public void CallingProcessWithPerformDbOperationExpressionWhenInPreviewOnlyModeWillNotMakeDbChanges()
         {
-            bool tableExists;
-
-            try
-            {
-                var expression =
-                    new PerformDBOperationExpression
+            var expression =
+                new PerformDBOperationExpression
+                {
+                    Operation = (con, trans) =>
                     {
-                        Operation = (con, trans) =>
-                        {
-                            var command = con.CreateCommand();
-                            command.CommandText = "CREATE TABLE ProcessTestTable (test int NULL) ";
-                            command.Transaction = trans;
+                        var command = con.CreateCommand();
+                        command.CommandText = "CREATE TABLE ProcessTestTable (test int NULL) ";
+                        command.Transaction = trans;
 
-                            command.ExecuteNonQuery();
-                        }
-                    };
+                        command.ExecuteNonQuery();
+                    }
+                };
 
-                Processor.Process(expression);
+            Processor.Process(expression);
 
-                tableExists = Processor.TableExists("", "ProcessTestTable");
-            }
-            finally
-            {
-                Processor.RollbackTransaction();
-            }
+            var tableExists = Processor.TableExists("", "ProcessTestTable");
 
             tableExists.ShouldBeFalse();
 
@@ -85,10 +77,8 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
 
             Output = new StringWriter();
             var serivces = ServiceCollectionExtensions.CreateServices()
-                .ConfigureRunner(builder => builder.AddHana())
-                .AddSingleton<IAnnouncer>(new CompositeAnnouncer(
-                    new TextWriterAnnouncer(Output),
-                    new TextWriterAnnouncer(TestContext.Out) { ShowSql = true }))
+                .ConfigureRunner(builder => builder.AddHana().AsGlobalPreview())
+                .AddSingleton<ILoggerProvider>(new SqlScriptFluentMigratorLoggerProvider(Output))
                 .AddScoped<IConnectionStringReader>(
                     _ => new PassThroughConnectionStringReader(IntegrationTestOptions.Hana.ConnectionString));
             ServiceProvider = serivces.BuildServiceProvider();

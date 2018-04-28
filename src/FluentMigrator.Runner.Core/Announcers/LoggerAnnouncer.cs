@@ -66,7 +66,7 @@ namespace FluentMigrator.Runner.Announcers
         /// <inheritdoc />
         public void Say(string message)
         {
-            _logger.LogInformation(message);
+            _logger.LogSay(message);
         }
 
         /// <inheritdoc />

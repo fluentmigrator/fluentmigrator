@@ -92,7 +92,7 @@ namespace FluentMigrator.Runner.Processors.Jet
 
         public override void Process(PerformDBOperationExpression expression)
         {
-            Logger.LogTrace("Performing DB Operation");
+            Logger.LogSay("Performing DB Operation");
 
             if (Options.PreviewOnly)
                 return;
@@ -244,7 +244,7 @@ namespace FluentMigrator.Runner.Processors.Jet
 
             EnsureConnectionIsOpen();
 
-            Logger.LogTrace("Beginning Transaction");
+            Logger.LogSay("Beginning Transaction");
             _transaction = _connection.BeginTransaction();
         }
 
@@ -252,7 +252,7 @@ namespace FluentMigrator.Runner.Processors.Jet
         {
             if (_transaction == null) return;
 
-            Logger.LogTrace("Rolling back transaction");
+            Logger.LogSay("Rolling back transaction");
             _transaction.Rollback();
             WasCommitted = true;
             _transaction = null;
@@ -262,7 +262,7 @@ namespace FluentMigrator.Runner.Processors.Jet
         {
             if (_transaction == null) return;
 
-            Logger.LogTrace("Committing Transaction");
+            Logger.LogSay("Committing Transaction");
             _transaction.Commit();
             WasCommitted = true;
             _transaction = null;

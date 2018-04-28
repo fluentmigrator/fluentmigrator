@@ -49,6 +49,12 @@ namespace FluentMigrator.Tests
             return str;
         }
 
+        public static bool TryGetJetCatalogType(out Type jetCatalogType)
+        {
+            jetCatalogType = Type.GetTypeFromProgID("ADOX.Catalog", false);
+            return jetCatalogType != null;
+        }
+
         public static bool ProbeSqlServerCeBehavior()
         {
             var asm = typeof(SqlCeConnection).Assembly;

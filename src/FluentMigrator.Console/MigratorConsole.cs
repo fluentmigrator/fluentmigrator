@@ -75,8 +75,7 @@ namespace FluentMigrator.Console
             using (var sp = services.BuildServiceProvider(validateScopes: false))
             {
                 var processors = sp.GetRequiredService<IEnumerable<IMigrationProcessor>>().ToList();
-                var procNames = processors.Select(p => p.DatabaseType)
-                    .Union(processors.SelectMany(p => p.DatabaseTypeAliases));
+                var procNames = processors.Select(p => p.DatabaseType);
                 dbChoices = string.Join(", ", procNames);
             }
 
@@ -227,7 +226,9 @@ namespace FluentMigrator.Console
                 }
 
                 if (string.IsNullOrEmpty(Task))
+                {
                     Task = "migrate";
+                }
 
                 if (!ValidateArguments(optionSet))
                 {

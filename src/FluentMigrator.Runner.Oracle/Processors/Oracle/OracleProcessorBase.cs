@@ -69,10 +69,14 @@ namespace FluentMigrator.Runner.Processors.Oracle
         public override bool SchemaExists(string schemaName)
         {
             if (schemaName == null)
+            {
                 throw new ArgumentNullException(nameof(schemaName));
+            }
 
             if (schemaName.Length == 0)
+            {
                 return false;
+            }
 
             return Exists("SELECT 1 FROM ALL_USERS WHERE USERNAME = '{0}'", schemaName.ToUpper());
         }
@@ -80,14 +84,20 @@ namespace FluentMigrator.Runner.Processors.Oracle
         public override bool TableExists(string schemaName, string tableName)
         {
             if (tableName == null)
+            {
                 throw new ArgumentNullException(nameof(tableName));
+            }
 
             if (tableName.Length == 0)
+            {
                 return false;
+            }
 
             if (string.IsNullOrEmpty(schemaName))
+            {
                 return Exists("SELECT 1 FROM USER_TABLES WHERE upper(TABLE_NAME) = '{0}'",
                     FormatHelper.FormatSqlEscape(tableName.ToUpper()));
+            }
 
             return Exists("SELECT 1 FROM ALL_TABLES WHERE upper(OWNER) = '{0}' AND upper(TABLE_NAME) = '{1}'",
                 schemaName.ToUpper(), FormatHelper.FormatSqlEscape(tableName.ToUpper()));
@@ -96,18 +106,27 @@ namespace FluentMigrator.Runner.Processors.Oracle
         public override bool ColumnExists(string schemaName, string tableName, string columnName)
         {
             if (tableName == null)
+            {
                 throw new ArgumentNullException(nameof(tableName));
+            }
+
             if (columnName == null)
+            {
                 throw new ArgumentNullException(nameof(columnName));
+            }
 
             if (columnName.Length == 0 || tableName.Length == 0)
+            {
                 return false;
+            }
 
             if (string.IsNullOrEmpty(schemaName))
+            {
                 return Exists(
                     "SELECT 1 FROM USER_TAB_COLUMNS WHERE upper(TABLE_NAME) = '{0}' AND upper(COLUMN_NAME) = '{1}'",
                     FormatHelper.FormatSqlEscape(tableName.ToUpper()),
                     FormatHelper.FormatSqlEscape(columnName.ToUpper()));
+            }
 
             return Exists(
                 "SELECT 1 FROM ALL_TAB_COLUMNS WHERE upper(OWNER) = '{0}' AND upper(TABLE_NAME) = '{1}' AND upper(COLUMN_NAME) = '{2}'",
@@ -118,18 +137,27 @@ namespace FluentMigrator.Runner.Processors.Oracle
         public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
         {
             if (tableName == null)
+            {
                 throw new ArgumentNullException(nameof(tableName));
+            }
+
             if (constraintName == null)
+            {
                 throw new ArgumentNullException(nameof(constraintName));
+            }
 
             //In Oracle DB constraint name is unique within the schema, so the table name is not used in the query
 
             if (constraintName.Length == 0)
+            {
                 return false;
+            }
 
             if (String.IsNullOrEmpty(schemaName))
+            {
                 return Exists("SELECT 1 FROM USER_CONSTRAINTS WHERE upper(CONSTRAINT_NAME) = '{0}'",
                     FormatHelper.FormatSqlEscape(constraintName.ToUpper()));
+            }
 
             return Exists("SELECT 1 FROM ALL_CONSTRAINTS WHERE upper(OWNER) = '{0}' AND upper(CONSTRAINT_NAME) = '{1}'",
                 schemaName.ToUpper(),
@@ -139,18 +167,27 @@ namespace FluentMigrator.Runner.Processors.Oracle
         public override bool IndexExists(string schemaName, string tableName, string indexName)
         {
             if (tableName == null)
+            {
                 throw new ArgumentNullException(nameof(tableName));
+            }
+
             if (indexName == null)
+            {
                 throw new ArgumentNullException(nameof(indexName));
+            }
 
             //In Oracle DB index name is unique within the schema, so the table name is not used in the query
 
             if (indexName.Length == 0)
+            {
                 return false;
+            }
 
             if (String.IsNullOrEmpty(schemaName))
+            {
                 return Exists("SELECT 1 FROM USER_INDEXES WHERE upper(INDEX_NAME) = '{0}'",
                     FormatHelper.FormatSqlEscape(indexName.ToUpper()));
+            }
 
             return Exists("SELECT 1 FROM ALL_INDEXES WHERE upper(OWNER) = '{0}' AND upper(INDEX_NAME) = '{1}'",
                 schemaName.ToUpper(), FormatHelper.FormatSqlEscape(indexName.ToUpper()));
@@ -175,7 +212,9 @@ namespace FluentMigrator.Runner.Processors.Oracle
         public override bool Exists(string template, params object[] args)
         {
             if (template == null)
+            {
                 throw new ArgumentNullException(nameof(template));
+            }
 
             EnsureConnectionIsOpen();
 
@@ -190,10 +229,14 @@ namespace FluentMigrator.Runner.Processors.Oracle
         public override DataSet ReadTableData(string schemaName, string tableName)
         {
             if (tableName == null)
+            {
                 throw new ArgumentNullException(nameof(tableName));
+            }
 
             if (String.IsNullOrEmpty(schemaName))
+            {
                 return Read("SELECT * FROM {0}", Quoter.QuoteTableName(tableName));
+            }
 
             return Read("SELECT * FROM {0}.{1}", Quoter.QuoteSchemaName(schemaName), Quoter.QuoteTableName(tableName));
         }
@@ -201,7 +244,9 @@ namespace FluentMigrator.Runner.Processors.Oracle
         public override DataSet Read(string template, params object[] args)
         {
             if (template == null)
+            {
                 throw new ArgumentNullException(nameof(template));
+            }
 
             EnsureConnectionIsOpen();
 
@@ -224,7 +269,9 @@ namespace FluentMigrator.Runner.Processors.Oracle
             Logger.LogSql(sql);
 
             if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
+            {
                 return;
+            }
 
             EnsureConnectionIsOpen();
 
@@ -235,7 +282,9 @@ namespace FluentMigrator.Runner.Processors.Oracle
             foreach (var batch in batches)
             {
                 using (var command = CreateCommand(batch))
+                {
                     command.ExecuteNonQuery();
+                }
             }
         }
     }

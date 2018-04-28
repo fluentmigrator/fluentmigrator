@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2018, FluentMigrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,19 +14,24 @@
 // limitations under the License.
 #endregion
 
-using JetBrains.Annotations;
-
 namespace FluentMigrator.Runner.Logging
 {
     /// <summary>
-    /// The configuration for a <see cref="LogFileFluentMigratorLoggerProvider"/>
+    /// The configuration for a <see cref="SqlScriptFluentMigratorLoggerProvider"/>
     /// </summary>
-    public class LogFileFluentMigratorLoggerOptions : SqlScriptFluentMigratorLoggerOptions
+    public class SqlScriptFluentMigratorLoggerOptions : FluentMigratorLoggerOptions
     {
         /// <summary>
-        /// Gets or sets the full path to the output file name
+        /// Initializes a new instance of the <see cref="SqlScriptFluentMigratorLoggerOptions"/> class.
         /// </summary>
-        [CanBeNull]
-        public string OutputFileName { get; set; }
+        public SqlScriptFluentMigratorLoggerOptions()
+        {
+            ShowSql = true;
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether a GO statement should be output between the SQL statements
+        /// </summary>
+        public bool OutputGoBetweenStatements { get; set; }
     }
 }

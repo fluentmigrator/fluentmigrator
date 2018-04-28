@@ -20,10 +20,10 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
     {
         private static readonly TestEntry[] _testEntries =
         {
-            new TestEntry("iAnywhere.Data.SQLAnywhere.SAFactory", "iAnywhere.Data.SQLAnywhere.v4.5"),
-            new TestEntry("iAnywhere.Data.SQLAnywhere.SAFactory", "iAnywhere.Data.SQLAnywhere.EF6"),
-            new TestEntry("iAnywhere.Data.SQLAnywhere.SAFactory", "iAnywhere.Data.SQLAnywhere.v4.0"),
-            new TestEntry("iAnywhere.Data.SQLAnywhere.SAFactory", "iAnywhere.Data.SQLAnywhere.v3.5"),
+            new TestEntry("Sap.Data.SQLAnywhere.v4.5", "Sap.Data.SQLAnywhere.SAFactory"),
+            new TestEntry("Sap.Data.SQLAnywhere.EF6", "Sap.Data.SQLAnywhere.SAFactory"),
+            new TestEntry("iAnywhere.Data.SQLAnywhere.v4.5", "iAnywhere.Data.SQLAnywhere.SAFactory"),
+            new TestEntry("iAnywhere.Data.SQLAnywhere.EF6", "iAnywhere.Data.SQLAnywhere.SAFactory"),
         };
 
         public SqlAnywhereDbFactory()

@@ -437,7 +437,7 @@ namespace FluentMigrator.Runner
 
                     _stopWatch.Stop();
 
-                    _logger.LogInformation($"{name} migrated");
+                    _logger.LogSay($"{name} migrated");
                     _logger.LogElapsedTime(_stopWatch.ElapsedTime());
                 }
             }
@@ -471,7 +471,7 @@ namespace FluentMigrator.Runner
 
                 _stopWatch.Stop();
 
-                _logger.LogInformation($"{name} reverted");
+                _logger.LogSay($"{name} reverted");
                 _logger.LogElapsedTime(_stopWatch.ElapsedTime());
             }
         }
@@ -654,13 +654,13 @@ namespace FluentMigrator.Runner
             {
                 var avg = new TimeSpan(insertTicks / insertCount);
                 var msg = string.Format("-> {0} Insert operations completed in {1} taking an average of {2}", insertCount, new TimeSpan(insertTicks), avg);
-                _logger.LogInformation(msg);
+                _logger.LogSay(msg);
             }
         }
 
         private void AnnounceTime(string message, Action action)
         {
-            _logger.LogInformation(message);
+            _logger.LogSay(message);
             _logger.LogElapsedTime(_stopWatch.Time(action));
         }
 
@@ -670,7 +670,7 @@ namespace FluentMigrator.Runner
             if (unappliedVersions.Any())
                 throw new VersionOrderInvalidException(unappliedVersions);
 
-            _logger.LogInformation("Version ordering valid.");
+            _logger.LogSay("Version ordering valid.");
         }
 
         public void ListMigrations()
@@ -692,7 +692,7 @@ namespace FluentMigrator.Runner
                 if (isCurrent || isBreaking)
                     _logger.LogEmphasized(message);
                 else
-                    _logger.LogInformation(message);
+                    _logger.LogSay(message);
             }
         }
 

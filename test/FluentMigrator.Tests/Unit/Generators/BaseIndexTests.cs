@@ -1,5 +1,9 @@
-﻿namespace FluentMigrator.Tests.Unit.Generators
+using NUnit.Framework;
+
+namespace FluentMigrator.Tests.Unit.Generators
 {
+    [Category("Generator")]
+    [Category("Index")]
     public abstract class BaseIndexTests
     {
         public abstract void CanCreateIndexWithCustomSchema();

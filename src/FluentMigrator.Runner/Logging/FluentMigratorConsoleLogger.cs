@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2018, FluentMigrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -51,7 +51,20 @@ namespace FluentMigrator.Runner.Logging
         /// <inheritdoc />
         protected override void WriteSql(string sql)
         {
-            Console.WriteLine(string.IsNullOrEmpty(sql) ? "No SQL statement executed." : sql);
+            if (string.IsNullOrEmpty(sql))
+            {
+                WriteEmptySql();
+            }
+            else
+            {
+                Console.WriteLine(sql);
+            }
+        }
+
+        /// <inheritdoc />
+        protected override void WriteEmptySql()
+        {
+            Console.WriteLine(@"No SQL statement executed.");
         }
 
         /// <inheritdoc />

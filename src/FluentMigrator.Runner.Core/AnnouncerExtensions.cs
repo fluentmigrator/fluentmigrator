@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
 //
@@ -20,21 +20,42 @@ using System;
 
 namespace FluentMigrator.Runner
 {
+    /// <summary>
+    /// Extension methods for an <see cref="IAnnouncer"/>
+    /// </summary>
     [Obsolete]
     public static class AnnouncerExtensions
     {
+        /// <summary>
+        /// Writes a formatted heading message
+        /// </summary>
+        /// <param name="announcer">The announcer used to write the message</param>
+        /// <param name="message">The message to format</param>
+        /// <param name="args">The arguments</param>
         [Obsolete]
         public static void Heading(this IAnnouncer announcer, string message, params object[] args)
         {
             announcer.Heading(string.Format(message, args));
         }
 
+        /// <summary>
+        /// Writes a formatted message
+        /// </summary>
+        /// <param name="announcer">The announcer used to write the message</param>
+        /// <param name="message">The message to format</param>
+        /// <param name="args">The arguments</param>
         [Obsolete]
         public static void Say(this IAnnouncer announcer, string message, params object[] args)
         {
             announcer.Say(string.Format(message, args));
         }
 
+        /// <summary>
+        /// Writes a formatted error message
+        /// </summary>
+        /// <param name="announcer">The announcer used to write the message</param>
+        /// <param name="message">The message to format</param>
+        /// <param name="args">The arguments</param>
         [Obsolete]
         public static void Error(this IAnnouncer announcer, string message, params object[] args)
         {

@@ -118,7 +118,7 @@ namespace FluentMigrator.Runner.Initialization.NetFramework
             if (string.IsNullOrEmpty(ConnectionString))
                 throw new UndeterminableConnectionException("Unable to resolve any connectionstring using parameters \"/connection\" and \"/configPath\"");
 
-            _logger.LogInformation(
+            _logger.LogSay(
                 _notUsingConfig
                     ? $"Using Database {_database} and Connection String {_matchPwd.Replace(ConnectionString, "$1********;")}"
                     : $"Using Connection {_connection} from Configuration file {_configFile}");

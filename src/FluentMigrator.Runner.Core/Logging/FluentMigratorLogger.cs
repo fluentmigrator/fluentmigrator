@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2018, FluentMigrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -39,9 +39,6 @@ namespace FluentMigrator.Runner.Logging
         /// <inheritdoc />
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
         {
-            if (eventId.Name != RunnerEventIds.RunnerCategory)
-                return;
-
             switch (logLevel)
             {
                 case LogLevel.Error:
@@ -58,7 +55,11 @@ namespace FluentMigrator.Runner.Logging
 
                     break;
                 case LogLevel.Warning:
-                    WriteEmphasize(formatter(state, exception));
+                    if (eventId.Name == RunnerEventIds.RunnerCategory)
+                    {
+                        WriteEmphasize(formatter(state, exception));
+                    }
+
                     break;
                 case LogLevel.Information:
                     if (eventId.Name == RunnerEventIds.RunnerCategory)
@@ -66,7 +67,17 @@ namespace FluentMigrator.Runner.Logging
                         if (eventId.Id == RunnerEventIds.Sql.Id)
                         {
                             if (_options.ShowSql)
-                                WriteSql(formatter(state, exception));
+                            {
+                                var sql = formatter(state, exception);
+                                if (string.IsNullOrEmpty(sql))
+                                {
+                                    WriteEmptySql();
+                                }
+                                else
+                                {
+                                    WriteSql(sql);
+                                }
+                            }
                         }
                         else if (eventId.Id == RunnerEventIds.Emphasize.Id)
                         {
@@ -81,7 +92,9 @@ namespace FluentMigrator.Runner.Logging
                             if (typeof(TState) == typeof(TimeSpan))
                             {
                                 if (_options.ShowElapsedTime)
-                                    WriteElapsedTime((TimeSpan) (object) state);
+                                {
+                                    WriteElapsedTime((TimeSpan)(object)state);
+                                }
                             }
                         }
                         else
@@ -139,6 +152,11 @@ namespace FluentMigrator.Runner.Logging
         /// </summary>
         /// <param name="sql">The SQL statement</param>
         protected abstract void WriteSql(string sql);
+
+        /// <summary>
+        /// Called when an attempt was made to write an empty SQL statement
+        /// </summary>
+        protected abstract void WriteEmptySql();
 
         /// <summary>
         /// Writes the elapsed time

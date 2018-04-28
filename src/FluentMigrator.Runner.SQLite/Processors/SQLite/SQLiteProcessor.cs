@@ -148,7 +148,7 @@ namespace FluentMigrator.Runner.Processors.SQLite
 
         public override void Process(PerformDBOperationExpression expression)
         {
-            Logger.LogTrace("Performing DB Operation");
+            Logger.LogSay("Performing DB Operation");
 
             if (Options.PreviewOnly)
                 return;

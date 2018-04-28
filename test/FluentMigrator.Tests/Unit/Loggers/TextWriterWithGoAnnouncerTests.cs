@@ -19,36 +19,44 @@
 using System;
 using System.IO;
 
-using FluentMigrator.Runner.Announcers;
+using FluentMigrator.Runner;
+using FluentMigrator.Runner.Logging;
+
+using Microsoft.Extensions.Logging;
 
 using NUnit.Framework;
 
 using Shouldly;
 
-namespace FluentMigrator.Tests.Unit.Announcers
+namespace FluentMigrator.Tests.Unit.Loggers
 {
     [TestFixture]
-    [Obsolete]
     public class TextWriterWithGoAnnouncerTests
     {
+        private ILoggerFactory _loggerFactory;
+
+        private ILogger _logger;
+
+        private SqlScriptFluentMigratorLoggerOptions _options;
+
         private StringWriter _stringWriter;
-        private TextWriterWithGoAnnouncer _announcer;
+
+        private string Output => _stringWriter.ToString();
 
         [SetUp]
-        public void TestSetup()
+        public void SetUp()
         {
             _stringWriter = new StringWriter();
-            _announcer = new TextWriterWithGoAnnouncer(_stringWriter)
-            {
-                ShowElapsedTime = true,
-                ShowSql = true
-            };
+            _options = new SqlScriptFluentMigratorLoggerOptions() { OutputGoBetweenStatements = true };
+            _loggerFactory = new LoggerFactory();
+            _loggerFactory.AddProvider(new SqlScriptFluentMigratorLoggerProvider(_stringWriter, _options));
+            _logger = _loggerFactory.CreateLogger("Test");
         }
 
         [Test]
         public void Adds_Go_StatementAfterSqlAnouncement()
         {
-            _announcer.Sql("DELETE Blah");
+            _logger.LogSql("DELETE Blah");
             Output.ShouldBe("DELETE Blah" + Environment.NewLine +
                 "GO" + Environment.NewLine);
         }
@@ -56,22 +64,17 @@ namespace FluentMigrator.Tests.Unit.Announcers
         [Test]
         public void Sql_Should_Not_Write_When_Show_Sql_Is_False()
         {
-            _announcer.ShowSql = false;
+            _options.ShowSql = false;
 
-            _announcer.Sql("SQL");
+            _logger.LogSql("SQL");
             Output.ShouldBe(String.Empty);
         }
 
         [Test]
         public void Sql_Should_Not_Write_Go_When_Sql_Is_Empty()
         {
-            _announcer.Sql("");
+            _logger.LogSql("");
             Assert.IsFalse(Output.Contains("GO"));
-        }
-
-        public string Output
-        {
-            get { return _stringWriter.GetStringBuilder().ToString(); }
         }
     }
 }

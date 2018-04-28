@@ -69,6 +69,12 @@ namespace FluentMigrator.Runner.Logging
         }
 
         /// <inheritdoc />
+        protected override void WriteEmptySql()
+        {
+            _announcer.Sql(string.Empty);
+        }
+
+        /// <inheritdoc />
         protected override void WriteElapsedTime(TimeSpan timeSpan)
         {
             _announcer.ElapsedTime(timeSpan);
