@@ -22,9 +22,13 @@ using FluentMigrator.Runner.VersionTableInfo;
 using JetBrains.Annotations;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Initialization
 {
+    /// <summary>
+    /// Scans the given source assemblies and returns a found <see cref="IVersionTableMetaData"/> implementation
+    /// </summary>
     public class AssemblySourceVersionTableMetaDataAccessor : IVersionTableMetaDataAccessor
     {
         private readonly Lazy<IVersionTableMetaData> _lazyValue;
@@ -32,12 +36,15 @@ namespace FluentMigrator.Runner.Initialization
         /// <summary>
         /// Initializes a new instance of the <see cref="AssemblySourceVersionTableMetaDataAccessor"/> class.
         /// </summary>
+        /// <param name="typeFilterOptions">The type filter options</param>
         /// <param name="serviceProvider">The service provider used to instantiate the found <see cref="IVersionTableMetaData"/> implementation</param>
         /// <param name="assemblySource">The assemblies used to search for the <see cref="IVersionTableMetaData"/> implementation</param>
         public AssemblySourceVersionTableMetaDataAccessor(
+            [NotNull] IOptions<TypeFilterOptions> typeFilterOptions,
             [CanBeNull] IServiceProvider serviceProvider,
             [CanBeNull] IAssemblySource assemblySource = null)
         {
+            var filterOptions = typeFilterOptions.Value;
             _lazyValue = new Lazy<IVersionTableMetaData>(
                 () =>
                 {
@@ -45,6 +52,8 @@ namespace FluentMigrator.Runner.Initialization
                         return null;
 
                     var matchedType = assemblySource.Assemblies.SelectMany(a => a.GetExportedTypes())
+                        .Where(t => t.IsInNamespace(filterOptions.Namespace, filterOptions.NestedNamespaces))
+                        .Where(t => !t.IsAbstract && t.IsClass)
                         .FirstOrDefault(t => typeof(IVersionTableMetaData).IsAssignableFrom(t));
 
                     if (matchedType != null)
