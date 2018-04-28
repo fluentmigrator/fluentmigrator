@@ -35,8 +35,7 @@ namespace FluentMigrator.DotNet.Cli.Commands
             var migratorOptions = new MigratorOptions();
             var serviceProvider = Setup.BuildServiceProvider(migratorOptions, console);
             var processors = serviceProvider.GetRequiredService<IEnumerable<IMigrationProcessor>>().ToList();
-            var processorIds = processors.Select(p => p.DatabaseType).OrderBy(x => x)
-                .Union(processors.SelectMany(p => p.DatabaseTypeAliases).OrderBy(x => x));
+            var processorIds = processors.Select(p => p.DatabaseType).OrderBy(x => x);
             foreach (var processorType in processorIds)
             {
                 console.WriteLine(processorType);
