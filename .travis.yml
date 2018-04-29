@@ -19,5 +19,5 @@ script:
 - dotnet pack ./FluentMigrator.sln --version-suffix "$VERSION_SUFFIX" -c "Release" -o "$TRAVIS_BUILD_DIR/output"
 - dotnet test ./test/FluentMigrator.Tests/FluentMigrator.Tests.csproj --filter 'TestCategory!=NotWorkingOnMono&(TestCategory!=Integration|(TestCategory=Integration&(TestCategory=SQLite)))'
 after_success:
-- '[[ "$TRAVIS_PULL_REQUEST" == "false" && "$TRAVIS_BRANCH" == release/* ]] && ./myget-upload.sh'
-# - '[[ "$TRAVIS_PULL_REQUEST" == "false" && "$TRAVIS_TAG" != "" ]] && ./nuget-upload.sh'
+- '[[ "$TRAVIS_PULL_REQUEST" == "false" && ("$TRAVIS_BRANCH" == release/* || "$TRAVIS_BRANCH" == develop) ]] && ./myget-upload.sh'
+- '[[ "$TRAVIS_PULL_REQUEST" == "false" && $TRAVIS_TAG =~ ^v[[:digit:]]+(\.[[:digit:]]+)+$ ]] && ./nuget-upload.sh'
