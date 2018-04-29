@@ -39,7 +39,6 @@ namespace FluentMigrator.Runner.Initialization
         /// <param name="options">The options</param>
         /// <param name="loadEngines">The assembly load engines</param>
         /// <param name="sourceItems">The additional source items</param>
-        [CLSCompliant(false)]
         public AssemblySource(IOptions<AssemblySourceOptions> options, IEnumerable<IAssemblyLoadEngine> loadEngines, IEnumerable<IAssemblySourceItem> sourceItems)
         {
             _assemblies = new Lazy<IReadOnlyCollection<Assembly>>(

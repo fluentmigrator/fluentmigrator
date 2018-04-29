@@ -34,7 +34,6 @@ namespace FluentMigrator.Runner.Announcers
             : base(write)
         { }
 
-        [CLSCompliant(false)]
         public  TextWriterWithGoAnnouncer(IOptions<TextWriterAnnouncerOptions> options)
             : base(options)
         { }

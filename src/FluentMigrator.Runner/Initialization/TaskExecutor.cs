@@ -33,7 +33,6 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Initialization
 {
-    [CLSCompliant(false)]
     public class TaskExecutor
     {
         [NotNull]

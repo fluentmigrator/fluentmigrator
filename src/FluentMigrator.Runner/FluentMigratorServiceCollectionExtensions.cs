@@ -39,7 +39,6 @@ namespace Microsoft.Extensions.DependencyInjection
     /// <summary>
     /// Extension methods for setting up the migration runner services in an <see cref="IServiceCollection"/>.
     /// </summary>
-    [CLSCompliant(false)]
     public static class FluentMigratorServiceCollectionExtensions
     {
         /// <summary>

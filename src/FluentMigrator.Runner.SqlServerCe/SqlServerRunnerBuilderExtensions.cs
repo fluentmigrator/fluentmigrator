@@ -28,7 +28,6 @@ namespace FluentMigrator.Runner
     /// <summary>
     /// Extension methods for <see cref="IMigrationRunnerBuilder"/>
     /// </summary>
-    [CLSCompliant(false)]
     public static class SqlServerCeRunnerBuilderExtensions
     {
         /// <summary>

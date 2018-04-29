@@ -23,7 +23,6 @@ namespace FluentMigrator.Runner
     /// <summary>
     /// An interface for configuring migration runner services
     /// </summary>
-    [CLSCompliant(false)]
     public interface IMigrationRunnerBuilder
     {
         /// <summary>

@@ -32,7 +32,6 @@ namespace FluentMigrator.Runner.Announcers
         {
         }
 
-        [CLSCompliant(false)]
         protected Announcer(IOptions<AnnouncerOptions> options)
         {
             // ReSharper disable VirtualMemberCallInConstructor

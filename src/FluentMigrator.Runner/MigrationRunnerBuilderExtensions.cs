@@ -33,7 +33,6 @@ namespace FluentMigrator.Runner
     /// <summary>
     /// Extension methods for the <see cref="IMigrationRunnerBuilder"/> interface
     /// </summary>
-    [CLSCompliant(false)]
     public static class MigrationRunnerBuilderExtensions
     {
         /// <summary>

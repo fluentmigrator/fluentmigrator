@@ -35,7 +35,6 @@ using Microsoft.Extensions.Logging;
 
 namespace FluentMigrator.MSBuild
 {
-    [CLSCompliant(false)]
     public class Migrate :
 #if NETFRAMEWORK
         AppDomainIsolatedTask

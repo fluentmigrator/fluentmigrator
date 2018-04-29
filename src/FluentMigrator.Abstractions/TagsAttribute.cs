@@ -5,8 +5,7 @@ namespace FluentMigrator
     ///<summary>
     /// Used to filter which migrations are run.
     ///</summary>
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = true)]
-    [CLSCompliant(false)]
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
     public class TagsAttribute : Attribute
     {
         /// <summary>
@@ -24,7 +23,6 @@ namespace FluentMigrator
         /// </summary>
         /// <param name="behavior">The behavior of the runner when evaluating <paramref name="tagNames"/>.</param>
         /// <param name="tagNames">The names of the tags that are evaluated by the runner.</param>
-        [CLSCompliant(false)]
         public TagsAttribute(TagBehavior behavior, params string[] tagNames)
         {
             Behavior = behavior;
@@ -35,7 +33,6 @@ namespace FluentMigrator
         /// Initializes a new instance of the <see cref="TagsAttribute" /> class.
         /// </summary>
         /// <param name="tagNames">The names of the tags that are evaluated by the runner.</param>
-        [CLSCompliant(false)]
         public TagsAttribute(params string[] tagNames)
             : this(TagBehavior.RequireAll, tagNames)
         {

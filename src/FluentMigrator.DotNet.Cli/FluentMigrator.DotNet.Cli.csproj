@@ -4,7 +4,6 @@
     <ToolCommandName>dotnet-fm</ToolCommandName>
     <PackAsTool>true</PackAsTool>
     <OutputType>Exe</OutputType>
-    <DefineConstants>NOT_CLS_COMPLIANT;$(DefineConstants)</DefineConstants>
     <Description>.NET Core CLI tool for FluentMigrator</Description>
   </PropertyGroup>
   <Import Project="$(MSBuildThisFileDirectory)../../PackageTool.proj" />
