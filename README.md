@@ -44,19 +44,12 @@ The build is based on the .NET Core tooling.
 
 ## Prerequisites
 
-* .NET Core 2.1
+* .NET Core 2.1 preview 2
 
-### Windows
+## Building
 
 ```
 dotnet build FluentMigrator.sln
-```
-
-### Linux
-
-```
-dotnet restore
-msbuild ./FluentMigrator.sln
 ```
 
 ## Testing
@@ -70,21 +63,13 @@ dotnet test test\FluentMigrator.Tests\FluentMigrator.Tests.csproj --filter "Test
 ### Linux
 
 ```
-dotnet vstest test/FluentMigrator.Tests/bin/Debug/net471/FluentMigrator.Tests.dll --TestCaseFilter:'TestCategory!=Integration&TestCategory!=NotWorkingOnMono'
+dotnet test test\FluentMigrator.Tests\FluentMigrator.Tests.csproj --filter "TestCategory!=Integration&TestCategory!=NotWorkingOnMono"
 ```
 
 ## Creating the nuget packages
 
-### Windows
-
 ```
 dotnet pack .\FluentMigrator.sln --output "C:\fluentmigrator\output"
-```
-
-### Linux
-
-```
-msbuild ./FluentMigrator.sln /v:m /t:Pack /p:PackageOutputPath="/tmp/fluentmigrator/output"
 ```
 
 # Powered by
