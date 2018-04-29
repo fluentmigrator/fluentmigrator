@@ -16,7 +16,7 @@ before_script:
 - echo Using VersionSuffix=$VERSION_SUFFIX
 - chmod a+x ./*.sh
 script:
-- dotnet pack ./FluentMigrator.sln --version-suffix "$VERSION_SUFFIX" -c "Release" -o "$TRAVIS_BUILD_DIR/output"
+- dotnet pack ./FluentMigrator.sln --version-suffix "$VERSION_SUFFIX" -c "Release" -o "$TRAVIS_BUILD_DIR/output" -p:SourceLinkCreate=true
 - dotnet test ./test/FluentMigrator.Tests/FluentMigrator.Tests.csproj --filter 'TestCategory!=NotWorkingOnMono&(TestCategory!=Integration|(TestCategory=Integration&(TestCategory=SQLite)))'
 after_success:
 - '[[ "$TRAVIS_PULL_REQUEST" == "false" && ("$TRAVIS_BRANCH" == release/* || "$TRAVIS_BRANCH" == develop) ]] && ./myget-upload.sh'
