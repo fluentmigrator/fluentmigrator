@@ -4,7 +4,20 @@ sudo: false
 solution: FluentMigrator.sln
 mono: latest
 dotnet: 2.1.300-preview2-008533
+git:
+  depth: false
+env:
+  global:
+  - secure: LBwjIieB3lGAb21LFO75eW42F3gm4Af+Wd/y37gbAJC9WXLO6i4aLOIDjaheq9wZEWAjsjLrG9aDf2YgCoiboGLhIVVS2CUEcLL8v9A8fdwG0MMdNbJ+HiwOCro97lZywT32yQ6dDzTf2xcUWufQ2YhQXBE52Ym6hMjkm5iaWnY=
+  - secure: SB15HtRpZMuVKKzQ1jGyFqAFb+Dvd1JfB2s7yTp5hd95XSKJ3kS/yTB3edlEpCLi9KZlllBnf7OqoOhUz5QlAjpIRV8VuUUy1YZmMG8V6gTgU0xdWkDUnw83fuDyHlyfQwg+J5UrsDYKq5S+zisqxn4+L792mqAvqJMo25x8rlM=
+before_script:
+- nuget install GitVersion.CommandLine -Version 4.0.0-beta0012 -Prerelease
+- export VERSION_SUFFIX=$(mono GitVersion.CommandLine.4.0.0-beta0012/tools/GitVersion.exe /showvariable PreReleaseTag)
+- echo Using VersionSuffix=$VERSION_SUFFIX
+- chmod a+x ./*.sh
 script:
-- dotnet build ./FluentMigrator.sln
-- dotnet test ./test/FluentMigrator.Tests/FluentMigrator.Tests.csproj
-  --filter 'TestCategory!=NotWorkingOnMono&(TestCategory!=Integration|(TestCategory=Integration&(TestCategory=SQLite)))'
+- dotnet pack ./FluentMigrator.sln --version-suffix "$(VERSION_SUFFIX)" -c "Release" -o "$TRAVIS_BUILD_DIR/output"
+- dotnet test ./test/FluentMigrator.Tests/FluentMigrator.Tests.csproj --filter 'TestCategory!=NotWorkingOnMono&(TestCategory!=Integration|(TestCategory=Integration&(TestCategory=SQLite)))'
+after_success:
+- '[[ "$TRAVIS_PULL_REQUEST" == "false" && "$TRAVIS_BRANCH" == release/* ]] && ./myget-upload.sh'
+# - '[[ "$TRAVIS_PULL_REQUEST" == "false" && "$TRAVIS_TAG" != "" ]] && ./nuget-upload.sh'
