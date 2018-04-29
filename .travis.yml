@@ -3,7 +3,7 @@ dist: trusty
 sudo: false
 solution: FluentMigrator.sln
 mono: latest
-dotnet: 2.1.103
+dotnet: 2.1.300-preview2-008533
 script:
 - dotnet build ./FluentMigrator.sln
 - dotnet test ./test/FluentMigrator.Tests/FluentMigrator.Tests.csproj
