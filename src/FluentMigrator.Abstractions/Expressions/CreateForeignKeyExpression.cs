@@ -20,22 +20,17 @@ using System.Collections.Generic;
 using System.Linq;
 
 using FluentMigrator.Model;
+using FluentMigrator.Validation;
 
 namespace FluentMigrator.Expressions
 {
     /// <summary>
     /// Expression to create a foreign key
     /// </summary>
-    public class CreateForeignKeyExpression : MigrationExpressionBase, IForeignKeyExpression
+    public class CreateForeignKeyExpression : MigrationExpressionBase, IForeignKeyExpression, IValidationChildren
     {
         /// <inheritdoc />
         public virtual ForeignKeyDefinition ForeignKey { get; set; } = new ForeignKeyDefinition();
-
-        /// <inheritdoc />
-        public override void CollectValidationErrors(ICollection<string> errors)
-        {
-            ForeignKey.CollectValidationErrors(errors);
-        }
 
         /// <inheritdoc />
         public override void ExecuteWith(IMigrationProcessor processor)
@@ -59,6 +54,12 @@ namespace FluentMigrator.Expressions
                                 string.Join(", ", ForeignKey.ForeignColumns.ToArray()),
                                 ForeignKey.PrimaryTable,
                                 string.Join(", ", ForeignKey.PrimaryColumns.ToArray()));
+        }
+
+        /// <inheritdoc />
+        IEnumerable<object> IValidationChildren.Children
+        {
+            get { yield return ForeignKey; }
         }
     }
 }

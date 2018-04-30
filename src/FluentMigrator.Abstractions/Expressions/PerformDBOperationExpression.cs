@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Data;
 
 using FluentMigrator.Infrastructure;
@@ -29,22 +30,16 @@ namespace FluentMigrator.Expressions
     /// </summary>
     public class PerformDBOperationExpression : MigrationExpressionBase
     {
+        /// <summary>
+        /// Gets or sets the operation to be executed for a given database connection
+        /// </summary>
+        [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.OperationCannotBeNull))]
+        public Action<IDbConnection, IDbTransaction> Operation { get; set; }
+
         /// <inheritdoc />
         public override void ExecuteWith(IMigrationProcessor processor)
         {
             processor.Process(this);
         }
-
-        /// <inheritdoc />
-        public override void CollectValidationErrors(ICollection<string> errors)
-        {
-            if (Operation == null)
-                errors.Add(ErrorMessages.OperationCannotBeNull);
-        }
-
-        /// <summary>
-        /// Gets or sets the operation to be executed for a given database connection
-        /// </summary>
-        public Action<IDbConnection, IDbTransaction> Operation { get; set; }
     }
 }

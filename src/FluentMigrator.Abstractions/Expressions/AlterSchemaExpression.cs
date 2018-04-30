@@ -18,6 +18,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+
 using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Expressions
@@ -35,21 +37,14 @@ namespace FluentMigrator.Expressions
         /// <summary>
         /// Gets or sets the table name
         /// </summary>
+        [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.TableNameCannotBeNullOrEmpty))]
         public virtual string TableName { get; set; }
 
         /// <summary>
         /// Gets or sets the destination schema name
         /// </summary>
+        [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.DestinationSchemaCannotBeNull))]
         public virtual string DestinationSchemaName { get; set; }
-
-        /// <inheritdoc />
-        public override void CollectValidationErrors(ICollection<string> errors)
-        {
-            if (String.IsNullOrEmpty(TableName))
-                errors.Add(ErrorMessages.TableNameCannotBeNullOrEmpty);
-            if (String.IsNullOrEmpty(DestinationSchemaName))
-                errors.Add(ErrorMessages.DestinationSchemaCannotBeNull);
-        }
 
         /// <inheritdoc />
         public override void ExecuteWith(IMigrationProcessor processor)

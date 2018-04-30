@@ -43,7 +43,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         [Test]
         public void ErrorIsReturnedWhenTableNameIsEmptyString()
         {
-            var expression = new DeleteColumnExpression { TableName = String.Empty };
+            var expression = new DeleteColumnExpression { TableName = string.Empty };
             var errors = ValidationHelper.CollectErrors(expression);
             errors.ShouldContain(ErrorMessages.TableNameCannotBeNullOrEmpty);
         }
@@ -59,7 +59,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         [Test]
         public void ErrorIsReturnedWhenColumnNameIsNull()
         {
-            var expression = new DeleteColumnExpression { ColumnNames = {null} };
+            var expression = new DeleteColumnExpression { TableName = "Table", ColumnNames = {null} };
             var errors = ValidationHelper.CollectErrors(expression);
             errors.ShouldContain(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
         }
@@ -67,7 +67,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         [Test]
         public void ErrorIsReturnedWhenColumnNameIsEmptyString()
         {
-            var expression = new DeleteColumnExpression { ColumnNames = {String.Empty} };
+            var expression = new DeleteColumnExpression { TableName = "Table", ColumnNames = {String.Empty} };
             var errors = ValidationHelper.CollectErrors(expression);
             errors.ShouldContain(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
         }
@@ -75,7 +75,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         [Test]
         public void ErrorIsReturnedWhenColumnIsSpecifiedMultipleTimes()
         {
-            var expression = new DeleteColumnExpression { ColumnNames = { "Bacon", "Bacon" } };
+            var expression = new DeleteColumnExpression { TableName = "Table", ColumnNames = { "Bacon", "Bacon" } };
             var errors = ValidationHelper.CollectErrors(expression);
             errors.ShouldContain(ErrorMessages.ColumnNamesMustBeUnique);
         }
@@ -83,7 +83,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         [Test]
         public void ErrorIsNotReturnedWhenColumnNameIsNotNullEmptyString()
         {
-            var expression = new DeleteColumnExpression { ColumnNames = {"Bacon"} };
+            var expression = new DeleteColumnExpression { TableName = "Table", ColumnNames = {"Bacon"} };
             var errors = ValidationHelper.CollectErrors(expression);
             errors.ShouldNotContain(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
         }

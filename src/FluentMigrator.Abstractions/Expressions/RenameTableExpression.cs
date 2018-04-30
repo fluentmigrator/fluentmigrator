@@ -18,6 +18,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+
 using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Expressions
@@ -33,22 +35,14 @@ namespace FluentMigrator.Expressions
         /// <summary>
         /// Gets or sets the old table name
         /// </summary>
+        [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.OldTableNameCannotBeNullOrEmpty))]
         public virtual string OldName { get; set; }
 
         /// <summary>
         /// Gets or sets the new table name
         /// </summary>
+        [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.NewTableNameCannotBeNullOrEmpty))]
         public virtual string NewName { get; set; }
-
-        /// <inheritdoc />
-        public override void CollectValidationErrors(ICollection<string> errors)
-        {
-            if (String.IsNullOrEmpty(OldName))
-                errors.Add(ErrorMessages.OldTableNameCannotBeNullOrEmpty);
-
-            if (String.IsNullOrEmpty(NewName))
-                errors.Add(ErrorMessages.NewTableNameCannotBeNullOrEmpty);
-        }
 
         /// <inheritdoc />
         public override void ExecuteWith(IMigrationProcessor processor)

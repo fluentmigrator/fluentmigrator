@@ -2,13 +2,14 @@ using System.Collections.Generic;
 
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
+using FluentMigrator.Validation;
 
 namespace FluentMigrator.Expressions
 {
     /// <summary>
     /// The expression to create a constraint
     /// </summary>
-    public class CreateConstraintExpression : MigrationExpressionBase, ISupportAdditionalFeatures, IConstraintExpression
+    public class CreateConstraintExpression : MigrationExpressionBase, ISupportAdditionalFeatures, IConstraintExpression, IValidationChildren
     {
         /// <inheritdoc />
         public virtual ConstraintDefinition Constraint { get; set; }
@@ -32,12 +33,6 @@ namespace FluentMigrator.Expressions
         }
 
         /// <inheritdoc />
-        public override void CollectValidationErrors(ICollection<string> errors)
-        {
-            Constraint.CollectValidationErrors(errors);
-        }
-
-        /// <inheritdoc />
         public override IMigrationExpression Reverse()
         {
             //constraint type is private in ConstraintDefinition
@@ -51,6 +46,12 @@ namespace FluentMigrator.Expressions
         public override string ToString()
         {
             return base.ToString() + Constraint.ConstraintName;
+        }
+
+        /// <inheritdoc />
+        IEnumerable<object> IValidationChildren.Children
+        {
+            get { yield return Constraint; }
         }
     }
 }

@@ -683,7 +683,7 @@ namespace FluentMigrator.Tests.Unit
             Assert.Throws<InvalidMigrationException>(() => runner.Up(invalidMigration.Object));
 
             _logMessages.ShouldContain(l => LineContainsAll(l, $"UpdateDataExpression: {ErrorMessages.UpdateDataExpressionMustSpecifyWhereClauseOrAllRows}"));
-            _logMessages.ShouldContain(l => LineContainsAll(l, $"CreateColumnExpression: {ErrorMessages.TableNameCannotBeNullOrEmpty} {ErrorMessages.ColumnNameCannotBeNullOrEmpty} {ErrorMessages.ColumnTypeMustBeDefined}"));
+            _logMessages.ShouldContain(l => LineContainsAll(l, $"CreateColumnExpression: {ErrorMessages.TableNameCannotBeNullOrEmpty}"));
         }
 
         [Test]

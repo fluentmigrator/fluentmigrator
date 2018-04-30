@@ -18,33 +18,25 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
+using FluentMigrator.Validation;
 
 namespace FluentMigrator.Expressions
 {
     /// <summary>
     /// Expression to delete an index
     /// </summary>
-    public class DeleteIndexExpression : MigrationExpressionBase, ISupportAdditionalFeatures, IIndexExpression
+    public class DeleteIndexExpression : MigrationExpressionBase, ISupportAdditionalFeatures, IIndexExpression, IValidatableObject
     {
         /// <inheritdoc />
         public virtual IndexDefinition Index { get; set; } = new IndexDefinition();
 
         /// <inheritdoc />
         public IDictionary<string, object> AdditionalFeatures => Index.AdditionalFeatures;
-
-        /// <inheritdoc />
-        public override void CollectValidationErrors(ICollection<string> errors)
-        {
-            if (String.IsNullOrEmpty(Index.Name))
-                errors.Add(ErrorMessages.IndexNameCannotBeNullOrEmpty);
-
-            if (String.IsNullOrEmpty(Index.TableName))
-                errors.Add(ErrorMessages.TableNameCannotBeNullOrEmpty);
-        }
 
         /// <inheritdoc />
         public override void ExecuteWith(IMigrationProcessor processor)
@@ -56,6 +48,20 @@ namespace FluentMigrator.Expressions
         public override string ToString()
         {
             return base.ToString() + Index.TableName + " (" + string.Join(", ", Index.Columns.Select(x => x.Name).ToArray()) + ")";
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (string.IsNullOrEmpty(Index.Name))
+            {
+                yield return new ValidationResult(ErrorMessages.IndexNameCannotBeNullOrEmpty);
+            }
+
+            if (string.IsNullOrEmpty(Index.TableName))
+            {
+                yield return new ValidationResult(ErrorMessages.TableNameCannotBeNullOrEmpty);
+            }
         }
     }
 }

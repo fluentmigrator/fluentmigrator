@@ -18,6 +18,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 using System.Linq;
@@ -27,25 +29,10 @@ namespace FluentMigrator.Expressions
     /// <summary>
     /// Expression to delete a foreign key
     /// </summary>
-    public class DeleteForeignKeyExpression : MigrationExpressionBase, IForeignKeyExpression
+    public class DeleteForeignKeyExpression : MigrationExpressionBase, IForeignKeyExpression, IValidatableObject
     {
         /// <inheritdoc />
         public virtual ForeignKeyDefinition ForeignKey { get; set; } = new ForeignKeyDefinition();
-
-        /// <inheritdoc />
-        public override void CollectValidationErrors(ICollection<string> errors)
-        {
-            if (ForeignKey.ForeignColumns.Count > 0)
-                ForeignKey.CollectValidationErrors(errors);
-            else
-            {
-                if (String.IsNullOrEmpty(ForeignKey.Name))
-                    errors.Add(ErrorMessages.ForeignKeyNameCannotBeNullOrEmpty);
-
-                if (String.IsNullOrEmpty(ForeignKey.ForeignTable))
-                    errors.Add(ErrorMessages.ForeignTableNameCannotBeNullOrEmpty);
-            }
-        }
 
         /// <inheritdoc />
         public override void ExecuteWith(IMigrationProcessor processor)
@@ -93,6 +80,33 @@ namespace FluentMigrator.Expressions
             return base.ToString() + ForeignKey.Name + " "
                 + ForeignKey.ForeignTable + " (" + string.Join(", ", ForeignKey.ForeignColumns.ToArray()) + ") "
                 + ForeignKey.PrimaryTable + " (" + string.Join(", ", ForeignKey.PrimaryColumns.ToArray()) + ")";
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            var results = new List<ValidationResult>();
+
+            if (ForeignKey.ForeignColumns.Count > 0)
+            {
+                var ctxt = new ValidationContext(ForeignKey, validationContext.Items);
+                ctxt.InitializeServiceProvider(validationContext.GetService);
+                ValidationUtilities.TryCollectResults(ctxt, ForeignKey, results);
+            }
+            else
+            {
+                if (string.IsNullOrEmpty(ForeignKey.Name))
+                {
+                    results.Add(new ValidationResult(ErrorMessages.ForeignKeyNameCannotBeNullOrEmpty));
+                }
+
+                if (string.IsNullOrEmpty(ForeignKey.ForeignTable))
+                {
+                    results.Add(new ValidationResult(ErrorMessages.ForeignTableNameCannotBeNullOrEmpty));
+                }
+            }
+
+            return results;
         }
     }
 }

@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 using FluentMigrator.Infrastructure;
 
@@ -34,27 +35,20 @@ namespace FluentMigrator.Expressions
         /// <summary>
         /// Gets or sets the name of the table
         /// </summary>
+        [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.TableNameCannotBeNullOrEmpty))]
         public virtual string TableName { get; set; }
 
         /// <summary>
         /// Gets or sets the old column name
         /// </summary>
+        [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.OldColumnNameCannotBeNullOrEmpty))]
         public virtual string OldName { get; set; }
 
         /// <summary>
         /// Gets or sets the new column name
         /// </summary>
+        [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.NewColumnNameCannotBeNullOrEmpty))]
         public virtual string NewName { get; set; }
-
-        /// <inheritdoc />
-        public override void CollectValidationErrors(ICollection<string> errors)
-        {
-            if (String.IsNullOrEmpty(OldName))
-                errors.Add(ErrorMessages.OldColumnNameCannotBeNullOrEmpty);
-
-            if (String.IsNullOrEmpty(NewName))
-                errors.Add(ErrorMessages.NewColumnNameCannotBeNullOrEmpty);
-        }
 
         /// <inheritdoc />
         public override void ExecuteWith(IMigrationProcessor processor)

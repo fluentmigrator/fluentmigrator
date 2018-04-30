@@ -18,6 +18,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+
 using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Expressions
@@ -30,19 +32,13 @@ namespace FluentMigrator.Expressions
         /// <summary>
         /// Gets or sets the SQL statement to be executed
         /// </summary>
+        [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.SqlStatementCannotBeNullOrEmpty))]
         public virtual string SqlStatement { get; set; }
 
         /// <inheritdoc />
         public override void ExecuteWith(IMigrationProcessor processor)
         {
             processor.Execute(SqlStatement);
-        }
-
-        /// <inheritdoc />
-        public override void CollectValidationErrors(ICollection<string> errors)
-        {
-            if (String.IsNullOrEmpty(SqlStatement))
-                errors.Add(ErrorMessages.SqlStatementCannotBeNullOrEmpty);
         }
 
         /// <inheritdoc />

@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using FluentMigrator.Infrastructure;
 
@@ -26,7 +27,7 @@ namespace FluentMigrator.Expressions
     /// <summary>
     /// Expression to delete a column
     /// </summary>
-    public class DeleteColumnExpression : MigrationExpressionBase, ISchemaExpression
+    public class DeleteColumnExpression : MigrationExpressionBase, ISchemaExpression, IValidatableObject
     {
         /// <inheritdoc />
         public virtual string SchemaName { get; set; }
@@ -34,25 +35,13 @@ namespace FluentMigrator.Expressions
         /// <summary>
         /// Gets or sets a table name
         /// </summary>
+        [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.TableNameCannotBeNullOrEmpty))]
         public virtual string TableName { get; set; }
 
         /// <summary>
         /// Gets or sets the column names
         /// </summary>
         public ICollection<string> ColumnNames { get; set; } = new List<string>();
-
-        /// <inheritdoc />
-        public override void CollectValidationErrors(ICollection<string> errors)
-        {
-            if (String.IsNullOrEmpty(TableName))
-                errors.Add(ErrorMessages.TableNameCannotBeNullOrEmpty);
-
-            if (ColumnNames == null || !ColumnNames.Any() || ColumnNames.Any(string.IsNullOrEmpty))
-                errors.Add(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
-
-            if (ColumnNames != null && ColumnNames.GroupBy(x => x).Any(x => x.Count() > 1))
-                errors.Add(ErrorMessages.ColumnNamesMustBeUnique);
-        }
 
         /// <inheritdoc />
         public override void ExecuteWith(IMigrationProcessor processor)
@@ -64,6 +53,20 @@ namespace FluentMigrator.Expressions
         public override string ToString()
         {
             return base.ToString() + TableName + " " + ColumnNames.Aggregate((a, b) => a + ", " + b);
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (ColumnNames == null || !ColumnNames.Any() || ColumnNames.Any(string.IsNullOrEmpty))
+            {
+                yield return new ValidationResult(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
+            }
+
+            if (ColumnNames != null && ColumnNames.GroupBy(x => x).Any(x => x.Count() > 1))
+            {
+                yield return new ValidationResult(ErrorMessages.ColumnNamesMustBeUnique);
+            }
         }
     }
 }

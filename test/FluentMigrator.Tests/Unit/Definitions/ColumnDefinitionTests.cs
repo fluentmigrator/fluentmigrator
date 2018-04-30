@@ -59,7 +59,7 @@ namespace FluentMigrator.Tests.Unit.Definitions
         [Test]
         public void ErrorIsReturnedWhenColumnTypeIsNotSet()
         {
-            var column = new ColumnDefinition { Type = null };
+            var column = new ColumnDefinition { Name = "Column", Type = null };
             var errors = ValidationHelper.CollectErrors(column);
             errors.ShouldContain(ErrorMessages.ColumnTypeMustBeDefined);
         }
@@ -67,7 +67,7 @@ namespace FluentMigrator.Tests.Unit.Definitions
         [Test]
         public void ErrorIsNotReturnedWhenColumnTypeIsSet()
         {
-            var column = new ColumnDefinition { Type = DbType.String };
+            var column = new ColumnDefinition { Name = "Column", Type = DbType.String };
             var errors = ValidationHelper.CollectErrors(column);
             errors.ShouldNotContain(ErrorMessages.ColumnTypeMustBeDefined);
         }

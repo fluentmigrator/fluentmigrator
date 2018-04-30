@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -17,20 +17,25 @@
 #endregion
 
 using System.Collections.Generic;
-using FluentMigrator.Infrastructure;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace FluentMigrator.Tests.Helpers
 {
     public static class ValidationHelper
     {
-        public static ICollection<string> CollectErrors(params ICanBeValidated[] items)
+        public static ICollection<string> CollectErrors(params object[] items)
         {
-            var collection = new List<string>();
+            var result = new List<ValidationResult>();
+            foreach (var item in items)
+            {
+                var context = new ValidationContext(item);
+                ValidationUtilities.TryCollectResults(context, item, result);
+            }
 
-            foreach (ICanBeValidated item in items)
-                item.CollectValidationErrors(collection);
-
-            return collection;
+            return result
+                .Where(x => x != ValidationResult.Success)
+                .Select(x => x.ErrorMessage).ToList();
         }
     }
 }

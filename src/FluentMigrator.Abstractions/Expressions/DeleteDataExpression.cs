@@ -16,7 +16,13 @@
 //
 #endregion
 
+using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+
 using FluentMigrator.Model;
 
 namespace FluentMigrator.Expressions
@@ -32,6 +38,7 @@ namespace FluentMigrator.Expressions
         /// <summary>
         /// Gets or sets the table name
         /// </summary>
+        [Required]
         public string TableName { get; set; }
 
         /// <summary>
@@ -45,8 +52,10 @@ namespace FluentMigrator.Expressions
         public List<DeletionDataDefinition> Rows { get; } = new List<DeletionDataDefinition>();
 
         /// <inheritdoc />
+        [Obsolete("Use the System.ComponentModel.DataAnnotations.Validator instead")]
         public void CollectValidationErrors(ICollection<string> errors)
         {
+            this.CollectErrors(errors);
         }
 
         /// <inheritdoc />

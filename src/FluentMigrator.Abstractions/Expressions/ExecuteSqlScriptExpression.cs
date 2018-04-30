@@ -17,6 +17,7 @@
 #endregion
 
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 
 using FluentMigrator.Infrastructure;
@@ -35,6 +36,7 @@ namespace FluentMigrator.Expressions
         /// <summary>
         /// Gets or sets the SQL script to be executed
         /// </summary>
+        [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.SqlScriptCannotBeNullOrEmpty))]
         public string SqlScript
         {
             get => _sqlScript;
@@ -71,13 +73,6 @@ namespace FluentMigrator.Expressions
         }
 
         /// <inheritdoc />
-        public override void CollectValidationErrors(ICollection<string> errors)
-        {
-            if (string.IsNullOrEmpty(SqlScript))
-                errors.Add(ErrorMessages.SqlScriptCannotBeNullOrEmpty);
-        }
-
-        /// <inheritdoc />
         public override string ToString()
         {
             return base.ToString() + SqlScript;
@@ -85,7 +80,7 @@ namespace FluentMigrator.Expressions
 
         private void UpdateSqlScript()
         {
-            if (!string.IsNullOrEmpty(_rootPath))
+            if (!string.IsNullOrEmpty(_rootPath) && !string.IsNullOrEmpty(_unchangedSqlScript))
             {
                 _sqlScript = Path.Combine(_rootPath, _unchangedSqlScript);
             }

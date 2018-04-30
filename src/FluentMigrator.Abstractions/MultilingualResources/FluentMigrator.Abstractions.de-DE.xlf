@@ -96,7 +96,7 @@
         </trans-unit>
         <trans-unit id="TableNameCannotBeNullOrEmpty" translate="yes" xml:space="preserve">
           <source>The table's name cannot be null or an empty string.</source>
-          <target state="final">Der abellenname darf nicht null oder leer sein.</target>
+          <target state="final">Der Tabellenname darf nicht null oder leer sein.</target>
         </trans-unit>
         <trans-unit id="UpdateDataExpressionMustNotSpecifyBothWhereClauseAndAllRows" translate="yes" xml:space="preserve">
           <source>Update statement specifies both a .Where() condition and that .AllRows() should be targeted. Specify one or the other, but not both.</source>

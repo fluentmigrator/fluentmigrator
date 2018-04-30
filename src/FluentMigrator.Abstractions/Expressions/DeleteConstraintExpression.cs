@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 
@@ -7,7 +9,7 @@ namespace FluentMigrator.Expressions
     /// <summary>
     /// Expression to delete a constraint
     /// </summary>
-    public class DeleteConstraintExpression : MigrationExpressionBase, ISupportAdditionalFeatures, IConstraintExpression
+    public class DeleteConstraintExpression : MigrationExpressionBase, ISupportAdditionalFeatures, IConstraintExpression, IValidatableObject
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="DeleteConstraintExpression"/> class.
@@ -39,11 +41,11 @@ namespace FluentMigrator.Expressions
         }
 
         /// <inheritdoc />
-        public override void CollectValidationErrors(ICollection<string> errors)
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             if (string.IsNullOrEmpty(Constraint.TableName))
             {
-                errors.Add(ErrorMessages.TableNameCannotBeNullOrEmpty);
+                yield return new ValidationResult(ErrorMessages.TableNameCannotBeNullOrEmpty);
             }
         }
     }

@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.IO;
 using System.Reflection;
@@ -65,6 +66,7 @@ namespace FluentMigrator.Expressions
         /// <summary>
         /// Gets or sets the SQL script name
         /// </summary>
+        [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.SqlScriptCannotBeNullOrEmpty))]
         public string SqlScript { get; set; }
 
         /// <summary>
@@ -115,13 +117,6 @@ namespace FluentMigrator.Expressions
             }
 
             Execute(processor, sqlText);
-        }
-
-        /// <inheritdoc />
-        public override void CollectValidationErrors(ICollection<string> errors)
-        {
-            if (string.IsNullOrEmpty(SqlScript))
-                errors.Add(ErrorMessages.SqlScriptCannotBeNullOrEmpty);
         }
 
         /// <inheritdoc />

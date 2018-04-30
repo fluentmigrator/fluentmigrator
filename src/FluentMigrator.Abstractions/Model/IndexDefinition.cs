@@ -18,23 +18,33 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Infrastructure.Extensions;
+using FluentMigrator.Validation;
 
 namespace FluentMigrator.Model
 {
     /// <summary>
     /// The index definition
     /// </summary>
-    public class IndexDefinition : ICloneable, ICanBeValidated, ISupportAdditionalFeatures
+    public class IndexDefinition
+        : ICloneable,
+#pragma warning disable 618
+          ICanBeValidated,
+#pragma warning restore 618
+          ISupportAdditionalFeatures,
+          IValidatableObject,
+          IValidationChildren
     {
         private readonly IDictionary<string, object> _additionalFeatures = new Dictionary<string, object>();
 
         /// <summary>
         /// Gets or sets the index name
         /// </summary>
+        [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.IndexNameCannotBeNullOrEmpty))]
         public virtual string Name { get; set; }
 
         /// <summary>
@@ -45,6 +55,7 @@ namespace FluentMigrator.Model
         /// <summary>
         /// Gets or sets the table name
         /// </summary>
+        [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.TableNameCannotBeNullOrEmpty))]
         public virtual string TableName { get; set; }
 
         /// <summary>
@@ -66,22 +77,10 @@ namespace FluentMigrator.Model
         public virtual IDictionary<string, object> AdditionalFeatures => _additionalFeatures;
 
         /// <inheritdoc />
+        [Obsolete("Use the System.ComponentModel.DataAnnotations.Validator instead")]
         public virtual void CollectValidationErrors(ICollection<string> errors)
         {
-            if (String.IsNullOrEmpty(Name))
-                errors.Add(ErrorMessages.IndexNameCannotBeNullOrEmpty);
-
-            if (String.IsNullOrEmpty(TableName))
-                errors.Add(ErrorMessages.TableNameCannotBeNullOrEmpty);
-
-            if (Columns.Count == 0)
-                errors.Add(ErrorMessages.IndexMustHaveOneOrMoreColumns);
-
-            foreach (IndexColumnDefinition column in Columns)
-                column.CollectValidationErrors(errors);
-
-            foreach (var additionalFeature in _additionalFeatures.Select(x => x.Value).OfType<ICanBeValidated>())
-                additionalFeature.CollectValidationErrors(errors);
+            this.CollectErrors(errors);
         }
 
         /// <inheritdoc />
@@ -101,5 +100,17 @@ namespace FluentMigrator.Model
 
             return result;
         }
+
+        /// <inheritdoc />
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (Columns.Count == 0)
+            {
+                yield return new ValidationResult(ErrorMessages.IndexMustHaveOneOrMoreColumns);
+            }
+        }
+
+        /// <inheritdoc />
+        IEnumerable<object> IValidationChildren.Children => Columns;
     }
 }

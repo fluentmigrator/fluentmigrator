@@ -82,8 +82,10 @@ namespace FluentMigrator.Builders.Delete.Index
         /// <param name="columnNames">The column names</param>
         public void OnColumns(params string[] columnNames)
         {
-            foreach (string columnName in columnNames)
+            foreach (var columnName in columnNames)
+            {
                 Expression.Index.Columns.Add(new IndexColumnDefinition { Name = columnName });
+            }
         }
 
         /// <inheritdoc />
