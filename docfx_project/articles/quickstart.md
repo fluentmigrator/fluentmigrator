@@ -1,5 +1,6 @@
 ---
-uid: quickstart
+uid: quickstart.md
+title: Starting with FluentMigrator
 ---
 
 # Creating a project
@@ -30,7 +31,7 @@ dotnet add package Microsoft.Data.Sqlite
 
 Create a file called `20180430_AddLogTable.cs` with the following contents:
 
-[!code-cs[20180430121800_AddLogTable.cs](quickstart/Program.cs "Your first migration")]
+[!code-cs[20180430121800_AddLogTable.cs](quickstart/20180430121800_AddLogTable.cs "Your first migration")]
 
 This will create a table named `Log` with the columns `Id`, and `Text`.
 
@@ -41,7 +42,7 @@ You have two options to execute your migration:
 * Using an in-process runner (preferred)
 * Using an out-of-process runner (for some corporate requirements)
 
-## In-Process (preferred)
+## [In-Process (preferred)](#tab/runner-in-process)
 
 Change your `Program.cs` to the following code:
 
@@ -50,7 +51,24 @@ Change your `Program.cs` to the following code:
 As you can see, instantiating the migration runner (in `UpdateDatabase`) becomes
 very simple and updating the database is straight-forward.
 
-## Out-of-process (for some corporate requirements)
+## [Out-of-process (for some corporate requirements)](#tab/runner-dotnet-fm)
 
-You need at least the .NET Core 2.1 preview 2 SDK for this step.
+> [!IMPORTANT]
+> You need at least the .NET Core 2.1 preview 2 SDK for this tool.
 
+Install the `dotnet-fm` tool:
+
+```bash
+dotnet tool install -g FluentMigrator.DotNet.Cli
+```
+
+Execute the migration:
+
+```bash
+dotnet fm migrate -p sqlite -c "Data Source=test.db" -a ".\bin\Debug\netcoreapp2.1\test.dll"
+```
+
+> [!TIP]
+> You probably have to replace `netcoreapp2.1` with the correct target framework. You can find it in the `csproj` file, XML element `TargetFramework`.
+
+***

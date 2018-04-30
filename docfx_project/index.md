@@ -4,4 +4,16 @@ Fluent Migrator is a migration framework for .NET much like Ruby on Rails Migrat
 
 # How to use it
 
-* [Quickstart](xref:quickstart)
+* [Quickstart](xref:quickstart.md)
+
+# Current Release
+
+* [Release Notes](https://github.com/fluentmigrator/fluentmigrator/releases)
+
+For the [current release](https://github.com/fluentmigrator/fluentmigrator/releases/latest) these are the supported databases:
+
+[!include[Supported databases](snippets/supported-databases.md)]
+
+# More Information on FluentMigrator
+
+* Sean Chambers on the [Herding Code podcast](http://herdingcode.com/herding-code-70)

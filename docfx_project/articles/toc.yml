@@ -1,2 +1,20 @@
 - name: Introduction
   href: intro.md
+- name: Quickstart
+  href: quickstart.md
+- name: Migrations
+  href: migration-example.md
+- name: Fluent Interface
+  href: fluent-interface.md
+- name: Profiles
+  href: profiles.md
+- name: Migration Runners
+  href: migration-runners.md
+- name: More Features
+  items:
+  - name: SQL Server Extensions
+    href: xref:sql-server-extensions.md
+- name: Advanced Topics
+  items:
+  - name: Supporting multiple database types
+    href: multi-db-support.md
