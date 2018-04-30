@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Data;
 
 using FluentMigrator.Infrastructure;
@@ -27,16 +28,23 @@ namespace FluentMigrator.Model
     /// <summary>
     /// The foreign key definition
     /// </summary>
-    public class ForeignKeyDefinition : ICloneable, ICanBeValidated
+    public class ForeignKeyDefinition
+        : ICloneable,
+#pragma warning disable 618
+          ICanBeValidated,
+#pragma warning restore 618
+          IValidatableObject
     {
         /// <summary>
         /// Gets or sets a foreign key name
         /// </summary>
+        [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.ForeignKeyNameCannotBeNullOrEmpty))]
         public virtual string Name { get; set; }
 
         /// <summary>
         /// Gets or sets the foreign key table
         /// </summary>
+        [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.ForeignTableNameCannotBeNullOrEmpty))]
         public virtual string ForeignTable { get; set; }
 
         /// <summary>
@@ -47,6 +55,7 @@ namespace FluentMigrator.Model
         /// <summary>
         /// Gets or sets the primary table
         /// </summary>
+        [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.PrimaryTableNameCannotBeNullOrEmpty))]
         public virtual string PrimaryTable { get; set; }
 
         /// <summary>
@@ -75,22 +84,10 @@ namespace FluentMigrator.Model
         public virtual ICollection<string> PrimaryColumns { get; set; } = new List<string>();
 
         /// <inheritdoc />
+        [Obsolete("Use the System.ComponentModel.DataAnnotations.Validator instead")]
         public virtual void CollectValidationErrors(ICollection<string> errors)
         {
-            if (String.IsNullOrEmpty(Name))
-                errors.Add(ErrorMessages.ForeignKeyNameCannotBeNullOrEmpty);
-
-            if (String.IsNullOrEmpty(ForeignTable))
-                errors.Add(ErrorMessages.ForeignTableNameCannotBeNullOrEmpty);
-
-            if (String.IsNullOrEmpty(PrimaryTable))
-                errors.Add(ErrorMessages.PrimaryTableNameCannotBeNullOrEmpty);
-
-            if (ForeignColumns.Count == 0)
-                errors.Add(ErrorMessages.ForeignKeyMustHaveOneOrMoreForeignColumns);
-
-            if (PrimaryColumns.Count == 0)
-                errors.Add(ErrorMessages.ForeignKeyMustHaveOneOrMorePrimaryColumns);
+            this.CollectErrors(errors);
         }
 
         /// <inheritdoc />
@@ -117,6 +114,20 @@ namespace FluentMigrator.Model
         public bool HasForeignAndPrimaryColumnsDefined()
         {
             return ForeignColumns.Count > 0 && PrimaryColumns.Count > 0;
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (ForeignColumns.Count == 0)
+            {
+                yield return new ValidationResult(ErrorMessages.ForeignKeyMustHaveOneOrMoreForeignColumns);
+            }
+
+            if (PrimaryColumns.Count == 0)
+            {
+                yield return new ValidationResult(ErrorMessages.ForeignKeyMustHaveOneOrMorePrimaryColumns);
+            }
         }
     }
 }

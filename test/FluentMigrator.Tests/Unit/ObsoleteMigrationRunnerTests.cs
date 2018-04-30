@@ -637,7 +637,7 @@ namespace FluentMigrator.Tests.Unit
             Assert.Throws<InvalidMigrationException>(() => _runner.Up(invalidMigration.Object));
 
             _announcer.Verify(a => a.Error(It.Is<string>(s => s.Contains($"UpdateDataExpression: {ErrorMessages.UpdateDataExpressionMustSpecifyWhereClauseOrAllRows}"))));
-            _announcer.Verify(a => a.Error(It.Is<string>(s => s.Contains($"CreateColumnExpression: {ErrorMessages.TableNameCannotBeNullOrEmpty} {ErrorMessages.ColumnNameCannotBeNullOrEmpty} {ErrorMessages.ColumnTypeMustBeDefined}"))));
+            _announcer.Verify(a => a.Error(It.Is<string>(s => s.Contains($"CreateColumnExpression: {ErrorMessages.TableNameCannotBeNullOrEmpty}"))));
         }
 
         [Test]

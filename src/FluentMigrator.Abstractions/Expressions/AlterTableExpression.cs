@@ -17,6 +17,8 @@
 #endregion
 
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+
 using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Expressions
@@ -33,19 +35,13 @@ namespace FluentMigrator.Expressions
         /// <summary>
         /// Gets or sets the table name
         /// </summary>
+        [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.TableNameCannotBeNullOrEmpty))]
         public virtual string TableName { get; set; }
 
         /// <summary>
         /// Gets or sets the table description
         /// </summary>
         public virtual string TableDescription { get; set; }
-
-        /// <inheritdoc />
-        public override void CollectValidationErrors(ICollection<string> errors)
-        {
-            if (string.IsNullOrEmpty(TableName))
-                errors.Add(ErrorMessages.TableNameCannotBeNullOrEmpty);
-        }
 
         /// <inheritdoc />
         public override void ExecuteWith(IMigrationProcessor processor)

@@ -79,7 +79,7 @@
     <value>Die SQL-Anweisung darf nicht null oder leer sein.</value>
   </data>
   <data name="TableNameCannotBeNullOrEmpty" xml:space="preserve">
-    <value>Der abellenname darf nicht null oder leer sein.</value>
+    <value>Der Tabellenname darf nicht null oder leer sein.</value>
   </data>
   <data name="UpdateDataExpressionMustNotSpecifyBothWhereClauseAndAllRows" xml:space="preserve">
     <value>Die Update-Anweisung spezifiziert sowohl eine .Where()-Bedingung und auch, dass .AllRows() als Ziel gewählt werden sollen. Nur eines von beiden darf angegeben werden.</value>

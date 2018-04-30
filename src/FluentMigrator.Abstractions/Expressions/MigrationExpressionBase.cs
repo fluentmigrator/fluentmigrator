@@ -18,6 +18,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+
+using FluentMigrator.Validation;
 
 namespace FluentMigrator.Expressions
 {
@@ -30,12 +34,16 @@ namespace FluentMigrator.Expressions
         public abstract void ExecuteWith(IMigrationProcessor processor);
 
         /// <inheritdoc />
-        public abstract void CollectValidationErrors(ICollection<string> errors);
+        [Obsolete("Use the System.ComponentModel.DataAnnotations.Validator instead")]
+        public virtual void CollectValidationErrors(ICollection<string> errors)
+        {
+            this.CollectErrors(errors);
+        }
 
         /// <inheritdoc />
         public virtual IMigrationExpression Reverse()
         {
-            throw new NotSupportedException(String.Format("The {0} cannot be automatically reversed", GetType().Name));
+            throw new NotSupportedException($"The {GetType().Name} cannot be automatically reversed");
         }
 
         /// <inheritdoc />

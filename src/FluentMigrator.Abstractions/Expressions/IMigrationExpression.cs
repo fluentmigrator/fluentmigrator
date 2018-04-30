@@ -16,6 +16,8 @@
 //
 #endregion
 
+using System.ComponentModel;
+
 using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Expressions
@@ -23,7 +25,9 @@ namespace FluentMigrator.Expressions
     /// <summary>
     /// The interface for a migration expression
     /// </summary>
+#pragma warning disable 618
     public interface IMigrationExpression : ICanBeValidated
+#pragma warning restore 618
     {
         /// <summary>
         /// Execute the expression with the given <paramref name="processor"/>

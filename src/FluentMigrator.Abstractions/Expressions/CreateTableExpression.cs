@@ -17,20 +17,24 @@
 #endregion
 
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
+using FluentMigrator.Validation;
 
 namespace FluentMigrator.Expressions
 {
     /// <summary>
     /// Expression to create a table
     /// </summary>
-    public class CreateTableExpression : MigrationExpressionBase, ISchemaExpression, IColumnsExpression
+    public class CreateTableExpression : MigrationExpressionBase, ISchemaExpression, IColumnsExpression, IValidationChildren
     {
         /// <inheritdoc />
         public virtual string SchemaName { get; set; }
 
         /// <inheritdoc />
+        [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.TableNameCannotBeNullOrEmpty))]
         public virtual string TableName { get; set; }
 
         /// <summary>
@@ -45,16 +49,6 @@ namespace FluentMigrator.Expressions
 
         /// <inheritdoc />
         IEnumerable<ColumnDefinition> IColumnsExpression.Columns => Columns;
-
-        /// <inheritdoc />
-        public override void CollectValidationErrors(ICollection<string> errors)
-        {
-            if (string.IsNullOrEmpty(TableName))
-                errors.Add(ErrorMessages.TableNameCannotBeNullOrEmpty);
-
-            foreach (var column in Columns)
-                column.CollectValidationErrors(errors);
-        }
 
         /// <inheritdoc />
         public override void ExecuteWith(IMigrationProcessor processor)
@@ -77,5 +71,8 @@ namespace FluentMigrator.Expressions
         {
             return base.ToString() + TableName;
         }
+
+        /// <inheritdoc />
+        IEnumerable<object> IValidationChildren.Children => Columns;
     }
 }

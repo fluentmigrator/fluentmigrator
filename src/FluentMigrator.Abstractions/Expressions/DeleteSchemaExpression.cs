@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 using FluentMigrator.Infrastructure;
 
@@ -31,14 +32,8 @@ namespace FluentMigrator.Expressions
         /// <summary>
         /// Gets or sets a schema name
         /// </summary>
+        [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.SchemaNameCannotBeNullOrEmpty))]
         public virtual string SchemaName { get; set; }
-
-        /// <inheritdoc />
-        public override void CollectValidationErrors(ICollection<string> errors)
-        {
-            if (String.IsNullOrEmpty(SchemaName))
-                errors.Add(ErrorMessages.SchemaNameCannotBeNullOrEmpty);
-        }
 
         /// <inheritdoc />
         public override void ExecuteWith(IMigrationProcessor processor)

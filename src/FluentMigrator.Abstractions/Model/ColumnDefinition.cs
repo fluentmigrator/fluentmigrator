@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Data;
 
 using FluentMigrator.Infrastructure;
@@ -27,11 +28,18 @@ namespace FluentMigrator.Model
     /// <summary>
     /// The column definition
     /// </summary>
-    public class ColumnDefinition : ICloneable, ICanBeValidated, ISupportAdditionalFeatures
+    public class ColumnDefinition
+        : ICloneable,
+#pragma warning disable 618
+          ICanBeValidated,
+#pragma warning restore 618
+          ISupportAdditionalFeatures,
+          IValidatableObject
     {
         /// <summary>
         /// Gets or sets the column definition name
         /// </summary>
+        [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.ColumnNameCannotBeNullOrEmpty))]
         public virtual string Name { get; set; }
 
         /// <summary>
@@ -126,13 +134,10 @@ namespace FluentMigrator.Model
         public virtual ForeignKeyDefinition ForeignKey { get; set; }
 
         /// <inheritdoc />
+        [Obsolete("Use the System.ComponentModel.DataAnnotations.Validator instead")]
         public virtual void CollectValidationErrors(ICollection<string> errors)
         {
-            if (String.IsNullOrEmpty(Name))
-                errors.Add(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
-
-            if (Type == null && CustomType == null)
-                errors.Add(ErrorMessages.ColumnTypeMustBeDefined);
+            this.CollectErrors(errors);
         }
 
         /// <inheritdoc />
@@ -150,5 +155,14 @@ namespace FluentMigrator.Model
 
         /// <inheritdoc />
         public IDictionary<string, object> AdditionalFeatures { get; } = new Dictionary<string, object>();
+
+        /// <inheritdoc />
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (Type == null && CustomType == null)
+            {
+                yield return new ValidationResult(ErrorMessages.ColumnTypeMustBeDefined);
+            }
+        }
     }
 }

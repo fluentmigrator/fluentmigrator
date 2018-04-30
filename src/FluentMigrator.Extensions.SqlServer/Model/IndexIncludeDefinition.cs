@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -18,18 +18,25 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+
 using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Model
 {
-    public class IndexIncludeDefinition : ICloneable, ICanBeValidated
+    public class IndexIncludeDefinition
+        : ICloneable,
+#pragma warning disable 618
+          ICanBeValidated
+#pragma warning restore 618
     {
+        [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.ColumnNameCannotBeNullOrEmpty))]
         public virtual string Name { get; set; }
 
+        [Obsolete("Use the System.ComponentModel.DataAnnotations.Validator instead")]
         public virtual void CollectValidationErrors(ICollection<string> errors)
         {
-            if (String.IsNullOrEmpty(Name))
-                errors.Add(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
+            this.CollectErrors(errors);
         }
 
         public object Clone()

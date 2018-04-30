@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 using FluentMigrator.Infrastructure;
 
@@ -26,11 +27,16 @@ namespace FluentMigrator.Model
     /// <summary>
     /// The sequence definition
     /// </summary>
-    public class SequenceDefinition: ICloneable, ICanBeValidated
+    public class SequenceDefinition
+        : ICloneable,
+#pragma warning disable 618
+          ICanBeValidated
+#pragma warning restore 618
     {
         /// <summary>
         /// Gets or sets the sequence name
         /// </summary>
+        [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.SequenceNameCannotBeNullOrEmpty))]
         public virtual string Name { get; set; }
 
         /// <summary>
@@ -88,10 +94,10 @@ namespace FluentMigrator.Model
         }
 
         /// <inheritdoc />
+        [Obsolete("Use the System.ComponentModel.DataAnnotations.Validator instead")]
         public void CollectValidationErrors(ICollection<string> errors)
         {
-            if (String.IsNullOrEmpty(Name))
-                errors.Add(ErrorMessages.SequenceNameCannotBeNullOrEmpty);
+            this.CollectErrors(errors);
         }
     }
 }

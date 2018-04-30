@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Infrastructure.Extensions;
@@ -27,19 +28,25 @@ namespace FluentMigrator.Model
     /// <summary>
     /// The constraint definition
     /// </summary>
-    public class ConstraintDefinition : ICloneable, ICanBeValidated, ISupportAdditionalFeatures
+    public class ConstraintDefinition
+        : ICloneable,
+#pragma warning disable 618
+          ICanBeValidated,
+#pragma warning restore 618
+          ISupportAdditionalFeatures,
+          IValidatableObject
     {
-        private ConstraintType constraintType;
+        private readonly ConstraintType _constraintType;
 
         /// <summary>
         /// Gets a value indicating whether the constraint is a primary key constraint
         /// </summary>
-        public bool IsPrimaryKeyConstraint { get { return ConstraintType.PrimaryKey == constraintType; } }
+        public bool IsPrimaryKeyConstraint => ConstraintType.PrimaryKey == _constraintType;
 
         /// <summary>
         /// Gets a value indicating whether the constraint is a unique constraint
         /// </summary>
-        public bool IsUniqueConstraint { get { return ConstraintType.Unique == constraintType; } }
+        public bool IsUniqueConstraint => ConstraintType.Unique == _constraintType;
 
         /// <summary>
         /// Gets or sets the schema name
@@ -54,6 +61,7 @@ namespace FluentMigrator.Model
         /// <summary>
         /// Gets or sets the table name
         /// </summary>
+        [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.TableNameCannotBeNullOrEmpty))]
         public virtual string TableName { get; set; }
 
         /// <summary>
@@ -67,7 +75,7 @@ namespace FluentMigrator.Model
         /// </summary>
         public ConstraintDefinition(ConstraintType type)
         {
-            constraintType = type;
+            _constraintType = type;
         }
 
         /// <inheritdoc />
@@ -76,7 +84,7 @@ namespace FluentMigrator.Model
         /// <inheritdoc />
         public object Clone()
         {
-            var result = new ConstraintDefinition(constraintType)
+            var result = new ConstraintDefinition(_constraintType)
             {
                 Columns = Columns,
                 ConstraintName = ConstraintName,
@@ -89,16 +97,18 @@ namespace FluentMigrator.Model
         }
 
         /// <inheritdoc />
+        [Obsolete("Use the System.ComponentModel.DataAnnotations.Validator instead")]
         public void CollectValidationErrors(ICollection<string> errors)
         {
-            if (string.IsNullOrEmpty(TableName))
-            {
-                errors.Add(ErrorMessages.TableNameCannotBeNullOrEmpty);
-            }
+            this.CollectErrors(errors);
+        }
 
+        /// <inheritdoc />
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
             if (0 == Columns.Count)
             {
-                errors.Add(ErrorMessages.ConstraintMustHaveAtLeastOneColumn);
+                yield return new ValidationResult(ErrorMessages.ConstraintMustHaveAtLeastOneColumn);
             }
         }
     }

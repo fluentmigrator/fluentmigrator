@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+
 using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Expressions
@@ -7,8 +9,9 @@ namespace FluentMigrator.Expressions
     /// <summary>
     /// Expression to alter default constraints
     /// </summary>
-    public class AlterDefaultConstraintExpression : MigrationExpressionBase,
-        ISchemaExpression
+    public class AlterDefaultConstraintExpression
+        : MigrationExpressionBase,
+          ISchemaExpression
     {
         /// <inheritdoc />
         public virtual string SchemaName { get; set; }
@@ -16,30 +19,20 @@ namespace FluentMigrator.Expressions
         /// <summary>
         /// Gets or sets the table name
         /// </summary>
+        [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.TableNameCannotBeNullOrEmpty))]
         public virtual string TableName { get; set; }
 
         /// <summary>
         /// Gets or sets the column name
         /// </summary>
+        [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.ColumnNameCannotBeNullOrEmpty))]
         public virtual string ColumnName { get; set; }
 
         /// <summary>
         /// Gets or sets the default value
         /// </summary>
+        [Required(AllowEmptyStrings = true, ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.DefaultValueCannotBeNull))]
         public virtual object DefaultValue { get; set; }
-
-        /// <inheritdoc />
-        public override void CollectValidationErrors(ICollection<string> errors)
-        {
-            if (String.IsNullOrEmpty(TableName))
-                errors.Add(ErrorMessages.TableNameCannotBeNullOrEmpty);
-
-            if (String.IsNullOrEmpty(ColumnName))
-                errors.Add(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
-
-            if(DefaultValue == null)
-                errors.Add(ErrorMessages.DefaultValueCannotBeNull);
-        }
 
         /// <inheritdoc />
         public override void ExecuteWith(IMigrationProcessor processor)

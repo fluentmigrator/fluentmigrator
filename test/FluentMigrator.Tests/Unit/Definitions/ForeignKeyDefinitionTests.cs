@@ -100,7 +100,7 @@ namespace FluentMigrator.Tests.Unit.Definitions
         [Test]
         public void ErrorIsReturnedWhenForeignColumnsIsEmpty()
         {
-            var column = new ForeignKeyDefinition { ForeignColumns = new string[0] };
+            var column = new ForeignKeyDefinition { Name = "FkName", ForeignTable = "FkTable", ForeignColumns = new string[0], PrimaryTable = "PkTable" };
             var errors = ValidationHelper.CollectErrors(column);
             errors.ShouldContain(ErrorMessages.ForeignKeyMustHaveOneOrMoreForeignColumns);
         }
@@ -116,7 +116,7 @@ namespace FluentMigrator.Tests.Unit.Definitions
         [Test]
         public void ErrorIsReturnedWhenPrimaryColumnsIsEmpty()
         {
-            var column = new ForeignKeyDefinition { PrimaryColumns = new string[0] };
+            var column = new ForeignKeyDefinition { Name = "FkName", ForeignTable = "FkTable", PrimaryTable = "PkTable", PrimaryColumns = new string[0] };
             var errors = ValidationHelper.CollectErrors(column);
             errors.ShouldContain(ErrorMessages.ForeignKeyMustHaveOneOrMorePrimaryColumns);
         }

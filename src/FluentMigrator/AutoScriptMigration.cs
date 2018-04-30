@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -102,7 +103,8 @@ namespace FluentMigrator
 
         private sealed class ExecuteEmbeddedAutoSqlScriptExpression :
             ExecuteEmbeddedSqlScriptExpressionBase,
-            IAutoNameExpression
+            IAutoNameExpression,
+            IValidatableObject
         {
             [NotNull]
             private readonly IEmbeddedResourceProvider _embeddedResourceProvider;
@@ -176,10 +178,10 @@ namespace FluentMigrator
             }
 
             /// <inheritdoc />
-            public override void CollectValidationErrors(ICollection<string> errors)
+            public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
             {
                 if (AutoNames.Count == 0)
-                    errors.Add(ErrorMessages.SqlScriptCannotBeNullOrEmpty);
+                    yield return new ValidationResult(ErrorMessages.SqlScriptCannotBeNullOrEmpty);
             }
         }
     }
