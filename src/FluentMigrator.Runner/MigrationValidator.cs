@@ -1,9 +1,27 @@
+#region License
+//
+// Copyright (c) 2018, Fluent Migrator Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
+
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Exceptions;
@@ -24,38 +42,40 @@ namespace FluentMigrator.Runner
         [CanBeNull]
         private readonly IConventionSet _conventions;
 
-        [CanBeNull]
-        private readonly IServiceProvider _serviceProvider;
+        [NotNull]
+        private readonly IMigrationExpressionValidator _validator;
 
         internal MigrationValidator(
             [NotNull] ILogger logger,
             [NotNull] IConventionSet conventions,
-            [NotNull] IServiceProvider serviceProvider)
+            [CanBeNull] IMigrationExpressionValidator validator = null)
         {
             _logger = logger;
             _conventions = conventions;
-            _serviceProvider = serviceProvider;
+            _validator = validator ?? new DefaultMigrationExpressionValidator(serviceProvider: null);
         }
 
         // ReSharper disable once UnusedMember.Global
         public MigrationValidator(
             [NotNull] ILogger<MigrationValidator> logger,
             [NotNull] IConventionSet conventions,
-            [NotNull] IServiceProvider serviceProvider)
+            [CanBeNull] IMigrationExpressionValidator validator = null)
         {
             _logger = logger;
             _conventions = conventions;
-            _serviceProvider = serviceProvider;
+            _validator = validator ?? new DefaultMigrationExpressionValidator(serviceProvider: null);
         }
 
         [Obsolete]
         public MigrationValidator()
         {
+            _validator = new DefaultMigrationExpressionValidator(null);
         }
 
         [Obsolete]
         public MigrationValidator(IAnnouncer announcer, IConventionSet conventions)
         {
+            _validator = new DefaultMigrationExpressionValidator(null);
             _logger = new AnnouncerFluentMigratorLogger(announcer);
             _conventions = conventions;
         }
@@ -73,13 +93,9 @@ namespace FluentMigrator.Runner
             foreach (var expression in expressions.Apply(_conventions))
             {
                 var errors = new Collection<string>();
-                var validationErrors = new Collection<ValidationResult>();
-                if (!ValidateExpression(expression, validationErrors, _serviceProvider))
+                foreach (var result in _validator.Validate(expression))
                 {
-                    foreach (var result in validationErrors.Where(r => r != ValidationResult.Success))
-                    {
-                        errors.Add(result.ErrorMessage);
-                    }
+                    errors.Add(result.ErrorMessage);
                 }
 
                 if (errors.Count > 0)
@@ -94,19 +110,6 @@ namespace FluentMigrator.Runner
                 _logger?.LogError("The migration {0} contained the following Validation Error(s): {1}", migration.GetType().Name, errorMessage);
                 throw new InvalidMigrationException(migration, errorMessage);
             }
-        }
-
-        private static bool ValidateExpression(IMigrationExpression expression, ICollection<ValidationResult> validationResults, IServiceProvider serviceProvider)
-        {
-            var items = new Dictionary<object, object>();
-
-            var context = new ValidationContext(expression, items);
-            if (serviceProvider != null)
-            {
-                context.InitializeServiceProvider(serviceProvider.GetService);
-            }
-
-            return ValidationUtilities.TryCollectResults(context, expression, validationResults);
         }
 
         private void AppendError(StringBuilder builder, string expressionType, string errors)

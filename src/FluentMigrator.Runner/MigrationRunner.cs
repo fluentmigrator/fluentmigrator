@@ -146,7 +146,7 @@ namespace FluentMigrator.Runner
             var convSet = conventionSet ?? new DefaultConventionSet(runnerContext);
 
             _migrationScopeHandler = new MigrationScopeHandler(Processor);
-            _migrationValidator = new MigrationValidator(_logger, convSet, serviceProvider: null);
+            _migrationValidator = new MigrationValidator(_logger, convSet);
             MigrationLoader = new DefaultMigrationInformationLoader(Conventions, _migrationAssemblies,
                                                                     runnerContext.Namespace,
                                                                     runnerContext.NestedNamespaces, runnerContext.Tags);

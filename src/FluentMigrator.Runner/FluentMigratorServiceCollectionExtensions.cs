@@ -27,6 +27,7 @@ using FluentMigrator.Runner.Initialization.NetFramework;
 using FluentMigrator.Runner.Logging;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.VersionTableInfo;
+using FluentMigrator.Validation;
 
 using JetBrains.Annotations;
 
@@ -114,6 +115,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddScoped<IProfileLoader, ProfileLoader>()
 
                 // Some services especially for the migration runner implementation
+                .AddScoped<IMigrationExpressionValidator, DefaultMigrationExpressionValidator>()
                 .AddScoped<MigrationValidator>()
                 .AddScoped<MigrationScopeHandler>()
 
