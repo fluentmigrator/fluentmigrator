@@ -19,7 +19,6 @@ using System.Linq;
 
 using AutoMapper;
 
-using FluentMigrator.DotNet.Cli.CustomAnnouncers;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Initialization;
@@ -49,7 +48,7 @@ namespace FluentMigrator.DotNet.Cli
 
             var mapper = ConfigureMapper();
             services
-                .AddLogging()
+                .AddLogging(lb => lb.AddDebug().AddFluentMigratorConsole())
                 .AddOptions()
                 .AddSingleton(mapper);
 
@@ -123,11 +122,11 @@ namespace FluentMigrator.DotNet.Cli
                 .Configure<MigratorOptions>(mc => mapper.Map(options, mc));
 
             services
-                .Configure<CustomAnnouncerOptions>(
-                    cao =>
+                .Configure<FluentMigratorLoggerOptions>(
+                    opt =>
                     {
-                        cao.ShowElapsedTime = options.Verbose;
-                        cao.ShowSql = options.Verbose;
+                        opt.ShowElapsedTime = options.Verbose;
+                        opt.ShowSql = options.Verbose;
                     });
 
             services
@@ -138,7 +137,8 @@ namespace FluentMigrator.DotNet.Cli
 
         private static void Configure(ILoggerFactory loggerFactory)
         {
-            loggerFactory.AddDebug(LogLevel.Trace);
+            loggerFactory
+                .AddDebug(LogLevel.Trace);
         }
 
         private static IMapper ConfigureMapper()
