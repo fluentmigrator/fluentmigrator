@@ -26,7 +26,6 @@ using FluentMigrator.Runner;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Logging;
 using FluentMigrator.Runner.Processors.SQLite;
-using FluentMigrator.Tests.Logging;
 
 using JetBrains.Annotations;
 

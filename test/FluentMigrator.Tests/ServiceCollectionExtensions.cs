@@ -20,7 +20,6 @@ using System.Runtime.CompilerServices;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
-using FluentMigrator.Tests.Helpers;
 using FluentMigrator.Tests.Logging;
 
 using JetBrains.Annotations;

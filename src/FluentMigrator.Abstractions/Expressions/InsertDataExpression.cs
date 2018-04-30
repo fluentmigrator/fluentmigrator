@@ -19,7 +19,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;

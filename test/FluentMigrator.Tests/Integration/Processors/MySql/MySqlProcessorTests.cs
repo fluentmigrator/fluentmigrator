@@ -3,7 +3,6 @@ using System.IO;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner;
-using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.MySql;
 using FluentMigrator.Tests.Logging;

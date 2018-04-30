@@ -16,8 +16,6 @@
 //
 #endregion
 
-using System.ComponentModel;
-
 using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Expressions

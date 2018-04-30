@@ -26,7 +26,6 @@ using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Logging;
 using FluentMigrator.Runner.Processors.Postgres;
 using FluentMigrator.Tests.Helpers;
-using FluentMigrator.Tests.Logging;
 
 using JetBrains.Annotations;
 

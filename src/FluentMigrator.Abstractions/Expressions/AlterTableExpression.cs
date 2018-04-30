@@ -16,7 +16,6 @@
 //
 #endregion
 
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 using FluentMigrator.Infrastructure;

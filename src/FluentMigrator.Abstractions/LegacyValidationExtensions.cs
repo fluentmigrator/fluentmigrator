@@ -20,7 +20,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
 using FluentMigrator.Infrastructure;
-using FluentMigrator.Validation;
 
 namespace FluentMigrator
 {

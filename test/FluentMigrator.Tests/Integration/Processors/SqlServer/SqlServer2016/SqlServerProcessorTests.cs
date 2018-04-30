@@ -20,10 +20,8 @@ using System.IO;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner;
-using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Logging;
 using FluentMigrator.Tests.Helpers;
-using FluentMigrator.Tests.Logging;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

@@ -14,8 +14,6 @@
 // limitations under the License.
 #endregion
 
-using System;
-
 using FluentMigrator.Runner.BatchParser;
 using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.Runner.Processors.SqlServer;
