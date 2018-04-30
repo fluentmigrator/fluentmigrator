@@ -69,6 +69,7 @@ namespace FluentMigrator.Builders
         public TNext AsBinary()
         {
             Column.Type = DbType.Binary;
+            Column.Size = null;
             return (TNext)(object)this;
         }
 
@@ -273,13 +274,10 @@ namespace FluentMigrator.Builders
             return (TNext)(object)this;
         }
 
-        private void SetColumnAsString(DbType dbType, int size = -100, string collationName = "")
+        private void SetColumnAsString(DbType dbType, int? size = null, string collationName = "")
         {
             Column.Type = dbType;
-            if (size != -100)
-            {
-                Column.Size = size;
-            }
+            Column.Size = size;
 
             if (!string.IsNullOrEmpty(collationName))
             {

@@ -80,8 +80,8 @@ namespace FluentMigrator.Runner.Processors.Firebird
                     DefaultValue = column.DefaultValue == DBNull.Value ? new ColumnDefinition.UndefinedDefaultValue() : column.DefaultValue,
                     IsNullable = column.IsNullable,
                     Type = column.DBType,
-                    Precision = column.Precision ?? 0,
-                    Size = column.CharacterLength ?? 0
+                    Precision = column.Precision,
+                    Size = column.CharacterLength
                 };
                 if (colDef.Type == null)
                     colDef.CustomType = column.CustomType;

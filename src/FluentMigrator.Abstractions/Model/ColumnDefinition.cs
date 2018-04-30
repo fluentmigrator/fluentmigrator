@@ -50,12 +50,12 @@ namespace FluentMigrator.Model
         /// <summary>
         /// Gets or sets the column type size (read: precision or length)
         /// </summary>
-        public virtual int Size { get; set; }
+        public virtual int? Size { get; set; }
 
         /// <summary>
         /// Gets or sets the column type precision (read: scale)
         /// </summary>
-        public virtual int Precision { get; set; }
+        public virtual int? Precision { get; set; }
 
         /// <summary>
         /// Gets or sets a database specific custom column type

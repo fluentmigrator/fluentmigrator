@@ -27,6 +27,9 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Generators.Oracle
 {
     [TestFixture]
+    [Category("Oracle")]
+    [Category("Generator")]
+    [Category("TypeMap")]
     public class OracleTypeMapTests
     {
         private OracleTypeMap _typeMap;
@@ -43,172 +46,172 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         [Test]
         public void AnsiStringDefaultIsVarchar2_255()
         {
-            _typeMap.GetTypeMap(DbType.AnsiString, 0, 0).ShouldBe("VARCHAR2(255 CHAR)");
+            _typeMap.GetTypeMap(DbType.AnsiString, size: null, precision: null).ShouldBe("VARCHAR2(255 CHAR)");
         }
 
         [Test]
         public void AnsiStringOfSizeIsVarchar2OfSize()
         {
-            _typeMap.GetTypeMap(DbType.AnsiString, 4000, 0).ShouldBe("VARCHAR2(4000 CHAR)");
+            _typeMap.GetTypeMap(DbType.AnsiString, size: 4000, precision: null).ShouldBe("VARCHAR2(4000 CHAR)");
         }
 
         [Test]
         public void AnsiStringOver4000IsClob()
         {
-            _typeMap.GetTypeMap(DbType.AnsiString, 4001, 0).ShouldBe("CLOB");
+            _typeMap.GetTypeMap(DbType.AnsiString, size: 4001, precision: null).ShouldBe("CLOB");
         }
 
         [Test]
         public void AnsiStringFixedDefaultIsChar_255()
         {
-            _typeMap.GetTypeMap(DbType.AnsiStringFixedLength, 0, 0).ShouldBe("CHAR(255 CHAR)");
+            _typeMap.GetTypeMap(DbType.AnsiStringFixedLength, size: null, precision: null).ShouldBe("CHAR(255 CHAR)");
         }
 
         [Test]
         public void AnsiStringFixedOfSizeIsCharOfSize()
         {
-            _typeMap.GetTypeMap(DbType.AnsiStringFixedLength, 2000, 0).ShouldBe("CHAR(2000 CHAR)");
+            _typeMap.GetTypeMap(DbType.AnsiStringFixedLength, size: 2000, precision: null).ShouldBe("CHAR(2000 CHAR)");
         }
 
 
         [Test]
         public void BinaryDefaultIsRaw_2000()
         {
-            _typeMap.GetTypeMap(DbType.Binary, 0, 0).ShouldBe("RAW(2000)");
+            _typeMap.GetTypeMap(DbType.Binary, size: null, precision: null).ShouldBe("RAW(2000)");
         }
 
         [Test]
         public void BinaryOfSizeIsRawOfSize()
         {
-            _typeMap.GetTypeMap(DbType.Binary, 2000, 0).ShouldBe("RAW(2000)");
+            _typeMap.GetTypeMap(DbType.Binary, size: 2000, precision: null).ShouldBe("RAW(2000)");
         }
 
 
         [Test]
         public void BinaryOver2000IsBlob()
         {
-            _typeMap.GetTypeMap(DbType.Binary, 2001, 0).ShouldBe("BLOB");
+            _typeMap.GetTypeMap(DbType.Binary, size: 2001, precision: null).ShouldBe("BLOB");
         }
 
         [Test]
         public void BooleanIsNumber()
         {
-            _typeMap.GetTypeMap(DbType.Boolean, 0, 0).ShouldBe("NUMBER(1,0)");
+            _typeMap.GetTypeMap(DbType.Boolean, size: null, precision: null).ShouldBe("NUMBER(1,0)");
         }
 
         [Test]
         public void ByteIsNumber()
         {
-            _typeMap.GetTypeMap(DbType.Byte, 0, 0).ShouldBe("NUMBER(3,0)");
+            _typeMap.GetTypeMap(DbType.Byte, size: null, precision: null).ShouldBe("NUMBER(3,0)");
         }
 
         [Test]
         public void CurrencyIsNumber()
         {
-            _typeMap.GetTypeMap(DbType.Currency, 0, 0).ShouldBe("NUMBER(19,4)");
+            _typeMap.GetTypeMap(DbType.Currency, size: null, precision: null).ShouldBe("NUMBER(19,4)");
         }
 
         [Test]
         public void DateIsDate()
         {
-            _typeMap.GetTypeMap(DbType.Date, 0, 0).ShouldBe("DATE");
+            _typeMap.GetTypeMap(DbType.Date, size: null, precision: null).ShouldBe("DATE");
         }
 
         [Test]
         public void DateTimeIsTimestamp()
         {
-            _typeMap.GetTypeMap(DbType.DateTime, 0, 0).ShouldBe("TIMESTAMP(4)");
+            _typeMap.GetTypeMap(DbType.DateTime, size: null, precision: null).ShouldBe("TIMESTAMP(4)");
         }
 
         [Test]
         public void DateTimeOffsetIsTimestampWithTimeZone()
         {
-            _typeMap.GetTypeMap(DbType.DateTimeOffset, 0, 0).ShouldBe("TIMESTAMP(4) WITH TIME ZONE");
+            _typeMap.GetTypeMap(DbType.DateTimeOffset, size: null, precision: null).ShouldBe("TIMESTAMP(4) WITH TIME ZONE");
         }
 
         [Test]
         public void DecimalDefaultIsNumber()
         {
-            _typeMap.GetTypeMap(DbType.Decimal, 0, 0).ShouldBe("NUMBER(19,5)");
+            _typeMap.GetTypeMap(DbType.Decimal, size: null, precision: null).ShouldBe("NUMBER(19,5)");
         }
 
         [Test]
         public void DecimalOfPrecisionIsNumberWithPrecision()
         {
-            _typeMap.GetTypeMap(DbType.Decimal, 8, 3).ShouldBe("NUMBER(8,3)");
+            _typeMap.GetTypeMap(DbType.Decimal, (int?)8, precision: 3).ShouldBe("NUMBER(8,3)");
         }
 
         [Test]
         public void DoubleIsDouble()
         {
-            _typeMap.GetTypeMap(DbType.Double, 0, 0).ShouldBe("DOUBLE PRECISION");
+            _typeMap.GetTypeMap(DbType.Double, size: null, precision: null).ShouldBe("DOUBLE PRECISION");
         }
 
         [Test]
         public void GuidIsRaw()
         {
-            _typeMap.GetTypeMap(DbType.Guid, 0, 0).ShouldBe("RAW(16)");
+            _typeMap.GetTypeMap(DbType.Guid, size: null, precision: null).ShouldBe("RAW(16)");
         }
 
         [Test]
         public void Int16IsNumber()
         {
-            _typeMap.GetTypeMap(DbType.Int16, 0, 0).ShouldBe("NUMBER(5,0)");
+            _typeMap.GetTypeMap(DbType.Int16, size: null, precision: null).ShouldBe("NUMBER(5,0)");
         }
 
         [Test]
         public void In32IsNumber()
         {
-            _typeMap.GetTypeMap(DbType.Int32, 0, 0).ShouldBe("NUMBER(10,0)");
+            _typeMap.GetTypeMap(DbType.Int32, size: null, precision: null).ShouldBe("NUMBER(10,0)");
         }
 
         [Test]
         public void Int64IsNumber()
         {
-            _typeMap.GetTypeMap(DbType.Int64, 0, 0).ShouldBe("NUMBER(19,0)");
+            _typeMap.GetTypeMap(DbType.Int64, size: null, precision: null).ShouldBe("NUMBER(19,0)");
         }
 
         [Test]
         public void SingleIsFloat()
         {
-            _typeMap.GetTypeMap(DbType.Single, 0, 0).ShouldBe("FLOAT(24)");
+            _typeMap.GetTypeMap(DbType.Single, size: null, precision: null).ShouldBe("FLOAT(24)");
         }
 
         [Test]
         public void StringFixedLengthDefaultIsNChar_255()
         {
-            _typeMap.GetTypeMap(DbType.StringFixedLength, 0, 0).ShouldBe("NCHAR(255)");
+            _typeMap.GetTypeMap(DbType.StringFixedLength, size: null, precision: null).ShouldBe("NCHAR(255)");
         }
 
         [Test]
         public void StringFixedLengthOfSizeIsNCharOfSize()
         {
-            _typeMap.GetTypeMap(DbType.StringFixedLength, 2000, 0).ShouldBe("NCHAR(2000)");
+            _typeMap.GetTypeMap(DbType.StringFixedLength, size: 2000, precision: null).ShouldBe("NCHAR(2000)");
         }
 
 
         [Test]
         public void StringDefaultIsNVarchar2_255()
         {
-            _typeMap.GetTypeMap(DbType.String, 0, 0).ShouldBe("NVARCHAR2(255)");
+            _typeMap.GetTypeMap(DbType.String, size: null, precision: null).ShouldBe("NVARCHAR2(255)");
         }
 
         [Test]
         public void StringOfLengthIsNVarchar2Length()
         {
-            _typeMap.GetTypeMap(DbType.String, 4000, 0).ShouldBe("NVARCHAR2(4000)");
+            _typeMap.GetTypeMap(DbType.String, size: 4000, precision: null).ShouldBe("NVARCHAR2(4000)");
         }
 
         [Test]
         public void TimeIsDate()
         {
-            _typeMap.GetTypeMap(DbType.Time, 0, 0).ShouldBe("DATE");
+            _typeMap.GetTypeMap(DbType.Time, size: null, precision: null).ShouldBe("DATE");
         }
 
         [Test]
         public void XmlIsXmltype()
         {
-            _typeMap.GetTypeMap(DbType.Xml, 0, 0).ShouldBe("XMLTYPE");
+            _typeMap.GetTypeMap(DbType.Xml, size: null, precision: null).ShouldBe("XMLTYPE");
         }
     }
 }

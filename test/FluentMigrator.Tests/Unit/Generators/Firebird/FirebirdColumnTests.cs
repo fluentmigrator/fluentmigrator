@@ -177,7 +177,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         public virtual void CanCreateDefaultString()
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
-            expression.Column.Size = 0;
+            expression.Column.Size = null;
 
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 VARCHAR(255) NOT NULL");

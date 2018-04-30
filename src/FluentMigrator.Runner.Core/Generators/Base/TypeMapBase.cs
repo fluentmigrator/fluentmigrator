@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 
 namespace FluentMigrator.Runner.Generators.Base
 {
@@ -10,7 +11,7 @@ namespace FluentMigrator.Runner.Generators.Base
         private const string SizePlaceholder = "$size";
         protected const string PrecisionPlaceholder = "$precision";
 
-        public TypeMapBase()
+        protected TypeMapBase()
         {
             // ReSharper disable once VirtualMemberCallInConstructor
             SetupTypeMaps();
@@ -21,7 +22,7 @@ namespace FluentMigrator.Runner.Generators.Base
         protected void SetTypeMap(DbType type, string template)
         {
             EnsureHasList(type);
-            _templates[type][0] = template;
+            _templates[type][-1] = template;
         }
 
         protected void SetTypeMap(DbType type, string template, int maxSize)
@@ -30,24 +31,33 @@ namespace FluentMigrator.Runner.Generators.Base
             _templates[type][maxSize] = template;
         }
 
-        public virtual string GetTypeMap(DbType type, int size, int precision)
+        /// <inheritdoc />
+        public virtual string GetTypeMap(DbType type, int? size, int? precision)
         {
             if (!_templates.ContainsKey(type))
-                throw new NotSupportedException(String.Format("Unsupported DbType '{0}'", type));
+                throw new NotSupportedException($"Unsupported DbType '{type}'");
 
-            if (size == 0)
-                return ReplacePlaceholders(_templates[type][0], size, precision);
+            if (size == null)
+                return ReplacePlaceholders(_templates[type][-1], size: 0, precision);
 
-            foreach (KeyValuePair<int, string> entry in _templates[type])
+            var sizeValue = size.Value;
+            foreach (var entry in _templates[type])
             {
                 int capacity = entry.Key;
                 string template = entry.Value;
 
-                if (size <= capacity)
-                    return ReplacePlaceholders(template, size, precision);
+                if (sizeValue <= capacity)
+                    return ReplacePlaceholders(template, sizeValue, precision);
             }
 
-            throw new NotSupportedException(String.Format("Unsupported DbType '{0}'", type));
+            throw new NotSupportedException($"Unsupported DbType '{type}'");
+        }
+
+        /// <inheritdoc />
+        [Obsolete]
+        public virtual string GetTypeMap(DbType type, int size, int precision)
+        {
+            return GetTypeMap(type, (int?)size, precision);
         }
 
         private void EnsureHasList(DbType type)
@@ -56,10 +66,19 @@ namespace FluentMigrator.Runner.Generators.Base
                 _templates.Add(type, new SortedList<int, string>());
         }
 
-        private string ReplacePlaceholders(string value, int size, int precision)
+        private string ReplacePlaceholders(string value, int? size, int? precision)
         {
-            return value.Replace(SizePlaceholder, size.ToString())
-                .Replace(PrecisionPlaceholder, precision.ToString());
+            if (size != null)
+            {
+                value = value.Replace(SizePlaceholder, size.Value.ToString(CultureInfo.InvariantCulture));
+            }
+
+            if (precision != null)
+            {
+                value = value.Replace(PrecisionPlaceholder, precision.Value.ToString(CultureInfo.InvariantCulture));
+            }
+
+            return value;
         }
 
     }

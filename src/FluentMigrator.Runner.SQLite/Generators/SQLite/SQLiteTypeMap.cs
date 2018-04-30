@@ -62,9 +62,9 @@ namespace FluentMigrator.Runner.Generators.SQLite
             SetTypeMap(DbType.Guid, "UNIQUEIDENTIFIER");
         }
 
-        public override string GetTypeMap(DbType type, int size, int precision)
+        public override string GetTypeMap(DbType type, int? size, int? precision)
         {
-            return base.GetTypeMap(type, 0, 0);
+            return base.GetTypeMap(type, size: null, precision: null);
         }
     }
 }

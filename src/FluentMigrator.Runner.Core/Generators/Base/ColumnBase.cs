@@ -39,7 +39,13 @@ namespace FluentMigrator.Runner.Generators.Base
 
         protected IQuoter Quoter { get; }
 
+        [Obsolete]
         protected string GetTypeMap(DbType value, int size, int precision)
+        {
+            return _typeMap.GetTypeMap(value, size, precision);
+        }
+
+        protected string GetTypeMap(DbType value, int? size, int? precision)
         {
             return _typeMap.GetTypeMap(value, size, precision);
         }
