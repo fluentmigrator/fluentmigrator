@@ -15,11 +15,11 @@ before_script:
 - nuget install docfx.console -ExcludeVersion
 - export GITVERSION_TOOL="mono GitVersion.CommandLine/tools/GitVersion.exe"
 - export DOCFX_TOOL="mono docfx.console/tools/docfx.exe"
-- export VERSION_SUFFIX=$($GITVERSION_TOOL /showvariable PreReleaseTag)
-- echo Using VersionSuffix=$VERSION_SUFFIX
+- export VERSION=$($GITVERSION_TOOL /showvariable SemVer)
+- echo Using Version=$VERSION
 - chmod a+x ./*.sh
 script:
-- dotnet pack ./FluentMigrator.sln --version-suffix "$VERSION_SUFFIX" -c "Release" -o "$TRAVIS_BUILD_DIR/output" -p:SourceLinkCreate=true
+- dotnet pack ./FluentMigrator.sln -c "Release" -o "$TRAVIS_BUILD_DIR/output" -p:SourceLinkCreate=true "-p:Version=$VERSION"
 - dotnet test ./test/FluentMigrator.Tests/FluentMigrator.Tests.csproj --filter 'TestCategory!=NotWorkingOnMono&(TestCategory!=Integration|(TestCategory=Integration&(TestCategory=SQLite)))'
 - $DOCFX_TOOL metadata docfx_project/docfx.json
 - $DOCFX_TOOL build docfx_project/docfx.json
