@@ -91,10 +91,13 @@ namespace FluentMigrator.Runner.Generators.Firebird
         {
             switch (value)
             {
+                case SystemMethods.NewSequentialId:
                 case SystemMethods.NewGuid:
                     return "gen_uuid()";
                 case SystemMethods.CurrentDateTime:
                     return "CURRENT_TIMESTAMP";
+                case SystemMethods.CurrentUser:
+                    return "CURRENT_USER";
             }
 
             return base.FormatSystemMethods(value);
