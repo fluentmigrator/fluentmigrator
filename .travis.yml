@@ -26,3 +26,13 @@ script:
 after_success:
 - '[[ "$TRAVIS_PULL_REQUEST" == "false" && ("$TRAVIS_BRANCH" == release/* || "$TRAVIS_BRANCH" == develop) ]] && ./myget-upload.sh'
 - '[[ "$TRAVIS_PULL_REQUEST" == "false" && $TRAVIS_TAG =~ ^v[[:digit:]]+(\.[[:digit:]]+)+$ ]] && ./nuget-upload.sh'
+deploy:
+  provider: pages
+  skip-cleanup: true
+  github-token: $GITHUB_TOKEN
+  repo: fluentmigrator/fluentmigrator.github.io
+  target-branch: master
+  local-dir: docfx_project/_site
+  keep-history: true
+  on:
+    branch: feature/docfx
