@@ -204,7 +204,7 @@ The [IAnnouncer](xref:FluentMigrator.Runner.IAnnouncer) interface (and its imple
 
 ### Logger registration
 
-You can comfortably register the default [FluentMigratorConsoleLogger](FluentMigrator.Runner.Logging.FluentMigratorConsoleLogger):
+You can comfortably register the default [FluentMigratorConsoleLogger](xref:FluentMigrator.Runner.Logging.FluentMigratorConsoleLogger):
 
 ```cs
 var serviceProvider = new ServiceCollection()
@@ -253,11 +253,11 @@ var serviceProvider = new ServiceCollection()
 
 This function was replaced by [IMigrationRunnerConventions.GetMigrationInfoForMigration](xref:FluentMigrator.Runner.IMigrationRunnerConventions.GetMigrationInfoForMigration), because the instantiation will be done using the dependency injection framework.
 
-## [IProfileLoader.ApplyProfiles()](xref:FluentMigrator.Runner.IProfileLoader.ApplyProfiles)
+## [IProfileLoader.ApplyProfiles](xref:FluentMigrator.Runner.IProfileLoader.ApplyProfiles)
 
-This function was replaced by [IProfileLoader.ApplyProfiles(IMigrationRunner)](xref:FluentMigrator.Runner.IProfileLoader.ApplyProfiles(IMigrationRunner)) to avoid circular dependencies.
+This function was replaced by [IProfileLoader.ApplyProfiles(IMigrationRunner)](xref:FluentMigrator.Runner.IProfileLoader.ApplyProfiles(FluentMigrator.Runner.IMigrationRunner)) to avoid circular dependencies.
 
-## [IProfileLoader.FindProfilesIn(IAssemblyCollection, String)](xref:FluentMigrator.Runner.IProfileLoader.FindProfilesIn(IAssemblyCollection, String))
+## [IProfileLoader.FindProfilesIn(IAssemblyCollection, String)](xref:FluentMigrator.Runner.IProfileLoader.FindProfilesIn(FluentMigrator.Infrastructure.IAssemblyCollection,System.String))
 
 This function is not used anymore.
 
@@ -354,7 +354,7 @@ This class was overkill.
 
 This isn't needed anymore, because all factories must be added dynamically using the [ConfigureRunner](xref:Microsoft.Extensions.DependencyInjection.FluentMigratorServiceCollectionExtensions.ConfigureRunner(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{FluentMigrator.Runner.IMigrationRunnerBuilder})) extension method.
 
-<a href="factory-example">Example:</a>
+<a id="factory-example"></a>Example:
 
 ```cs
 var serviceProvider = new ServiceCollection()
