@@ -295,8 +295,8 @@ This properties of this interface/class were refactored into several classes.
 
 ### Properties moved into [TypeFilterOptions](xref:FluentMigrator.Runner.Initialization.TypeFilterOptions)
 
-[Namespace](xref:FluentMigrator.Runner.Initialization.TypeFilterOptions.Namespace)
-[NestedNamespaces](xref:FluentMigrator.Runner.Initialization.TypeFilterOptions.NestedNamespaces)
+* [Namespace](xref:FluentMigrator.Runner.Initialization.TypeFilterOptions.Namespace)
+* [NestedNamespaces](xref:FluentMigrator.Runner.Initialization.TypeFilterOptions.NestedNamespaces)
 
 ### Properties moved into [AppConfigConnectionStringAccessorOptions](xref:FluentMigrator.Runner.Initialization.NetFramework.AppConfigConnectionStringAccessorOptions)
 
@@ -305,15 +305,15 @@ This properties of this interface/class were refactored into several classes.
 > Provide access to an [IConfiguration](xref:Microsoft.Extensions.Configuration.IConfiguration) service.
 > The FluentMigrator library will use it to call the [GetConnectionString](xref:Microsoft.Extensions.Configuration.ConfigurationExtensions.GetConnectionString(Microsoft.Extensions.Configuration.IConfiguration,System.String)) extension method.
 
-* [ConnectionStringPath -> ConnectionStringConfigPath](xref:FluentMigrator.Runner.Initialization.NetFramework.AppConfigConnectionStringAccessorOptions.ConnectionStringConfigPath)
+* [ConnectionStringPath ➔ ConnectionStringConfigPath](xref:FluentMigrator.Runner.Initialization.NetFramework.AppConfigConnectionStringAccessorOptions.ConnectionStringConfigPath)
 
 ### Properties moved into [SelectingProcessorAccessorOptions](xref:FluentMigrator.Runner.Processors.SelectingProcessorAccessorOptions)
 
-* [Database -> ProcessorId](xref:FluentMigrator.Runner.Processors.SelectingProcessorAccessorOptions.ProcessorId)
+* [Database ➔ ProcessorId](xref:FluentMigrator.Runner.Processors.SelectingProcessorAccessorOptions.ProcessorId)
 
 ### Properties moved into [AssemblySourceOptions](xref:FluentMigrator.Runner.Initialization.AssemblySourceOptions)
 
-* [Targets -> AssemblyNames](xref:FluentMigrator.Runner.Initialization.AssemblySourceOptions.AssemblyNames)
+* [Targets ➔ AssemblyNames](xref:FluentMigrator.Runner.Initialization.AssemblySourceOptions.AssemblyNames)
 
 ### Properties with no direct replacement
 
