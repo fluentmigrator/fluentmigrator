@@ -16,7 +16,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - [#851](https://github.com/fluentmigrator/fluentmigrator/issues/851): Enable the usage of [Microsoft.Extensions.DependencyInjection](https://github.com/aspnet/DependencyInjection/)
 - [#852](https://github.com/fluentmigrator/fluentmigrator/issues/852): Replace custom configuration mechanisms by using [Microsoft.Extensions.Options](https://github.com/aspnet/Options/)
-- [#853](https://github.com/fluentmigrator/fluentmigrator/issues/853): Replace the announcer with Microsoft.Extensions.Logging
+- [#853](https://github.com/fluentmigrator/fluentmigrator/issues/853): Replace the announcer with [Microsoft.Extensions.Logging](https://github.com/aspnet/Logging/)
+- Support for loading connection strings using a provided `IConfiguration` service ([Microsoft.Extensions.Configuration](https://github.com/aspnet/Configuration/))
+- [#822](https://github.com/fluentmigrator/fluentmigrator/issues/822): `IMigrationExpressionValidator` for custom migration expression validation
 
 ### Deprecated
 
@@ -39,9 +41,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - `CompatabilityMode` (is now `ComatibilityMode`)
 - `ApplicationContext` in various interfaces/classes
 - `ManifestResourceNameWithAssembly` replaced by `ValueTuple`
-- `IMigrationRunnerConventions.GetMigrationInfo`
 - `MigrationGeneratorFactory`
 - `MigrationProcessorFactoryProvider`
+- `ITypeMap.GetTypeMap(DbType, int, int)`
 - `IDbFactory`: Only the implementations will remain
 - Several non-DI constructors
 
