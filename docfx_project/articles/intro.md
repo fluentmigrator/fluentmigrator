@@ -23,6 +23,7 @@ FluentMigrator.DotNet.Cli | The .NET Core 2.1 executable that integrates into th
 
 # More Features
 
+* [Database functions as default value](xref:db-functions)
 * [Microsoft SQL Server specific extensions](xref:sql-server-extensions.md)
 
 # Advanced Features and Techniques of FluentMigrator

@@ -6,6 +6,12 @@ Fluent Migrator is a migration framework for .NET much like Ruby on Rails Migrat
 
 * [Quickstart](xref:quickstart.md)
 
+# What does it look like?
+
+This is an example of a database-agnostic migration:
+
+[!code-cs[20180430121800_AddLogTable.cs](articles/quickstart/20180430121800_AddLogTable.cs "Your first migration")]
+
 # Current Release
 
 * [Release Notes](https://github.com/fluentmigrator/fluentmigrator/releases)

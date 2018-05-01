@@ -48,7 +48,7 @@ Change your `Program.cs` to the following code:
 
 [!code-cs[Program.cs](quickstart/Program.cs "Migrating the database")]
 
-As you can see, instantiating the migration runner (in `UpdateDatabase`) becomes
+As you can see, instantiating the [migration runner](xref:FluentMigrator.Runner.IMigrationRunner) (in `UpdateDatabase`) becomes
 very simple and updating the database is straight-forward.
 
 ## [Out-of-process (for some corporate requirements)](#tab/runner-dotnet-fm)
