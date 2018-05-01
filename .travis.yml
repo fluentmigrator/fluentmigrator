@@ -15,7 +15,7 @@ before_script:
 - nuget install docfx.console -ExcludeVersion
 - export GITVERSION_TOOL="mono GitVersion.CommandLine/tools/GitVersion.exe"
 - export DOCFX_TOOL="mono docfx.console/tools/docfx.exe"
-- export VERSION_SUFFIX=$($GITVERION_TOOL /showvariable PreReleaseTag)
+- export VERSION_SUFFIX=$($GITVERSION_TOOL /showvariable PreReleaseTag)
 - echo Using VersionSuffix=$VERSION_SUFFIX
 - chmod a+x ./*.sh
 script:
