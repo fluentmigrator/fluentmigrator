@@ -40,3 +40,7 @@
   items:
   - name: "ApplicationContext: Passing parameters to Migrations"
     href: xref:app-context
+- name: Upgrade guides
+  items:
+  - name: 2.x to 3.0
+    href: xref:upgrade-guide-2.0-to-3.0
