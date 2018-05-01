@@ -34,6 +34,12 @@ FluentMigrator.DotNet.Cli | The .NET Core 2.1 executable that integrates into th
 
 * [Release Notes](https://github.com/fluentmigrator/fluentmigrator/releases)
 
+# Upgrade guides
+
+* [2.x to 3.0](xref:upgrade-guide-2.0-to-3.0)
+
+# Supported databases
+
 For the [current release](https://github.com/fluentmigrator/fluentmigrator/releases/latest) these are the supported databases:
 
 [!include[Supported databases](../snippets/supported-databases.md)]
