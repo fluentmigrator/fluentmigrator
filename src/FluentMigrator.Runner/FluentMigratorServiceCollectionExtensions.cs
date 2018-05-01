@@ -149,6 +149,9 @@ namespace Microsoft.Extensions.DependencyInjection
                 // Configure the runner
                 .AddScoped<IMigrationRunner, MigrationRunner>()
 
+                // Configure the task executor
+                .AddScoped<TaskExecutor>()
+
                 // Migration context
                 .AddTransient<IMigrationContext>(
                     sp =>

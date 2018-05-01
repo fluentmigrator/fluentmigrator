@@ -56,8 +56,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana.EndToEnd
                     opt => { opt.Task = task; })
                 .Configure<TypeFilterOptions>(opt =>  opt.Namespace = migrationsNamespace)
                 .AddScoped<IConnectionStringReader>(
-                    _ => new PassThroughConnectionStringReader(IntegrationTestOptions.Hana.ConnectionString))
-                .AddScoped<TaskExecutor>();
+                    _ => new PassThroughConnectionStringReader(IntegrationTestOptions.Hana.ConnectionString));
             return serivces.BuildServiceProvider(false);
         }
 

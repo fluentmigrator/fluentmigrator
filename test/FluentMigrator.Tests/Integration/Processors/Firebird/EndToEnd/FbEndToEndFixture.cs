@@ -83,8 +83,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird.EndToEnd
                 .Configure<RunnerOptions>(opt => opt.AllowBreakingChange = true)
                 .AddScoped<IConnectionStringReader>(_ => new PassThroughConnectionStringReader(ConnectionString))
                 .WithMigrationsIn(migrationsNamespace)
-                .Configure<RunnerOptions>(opt => opt.Task = task)
-                .AddScoped<TaskExecutor>();
+                .Configure<RunnerOptions>(opt => opt.Task = task);
 
             var serviceBuilder = services.BuildServiceProvider();
             return serviceBuilder.GetRequiredService<TaskExecutor>();

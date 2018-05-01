@@ -80,7 +80,6 @@ namespace FluentMigrator.DotNet.Cli
 
             services
                 .AddSingleton<IConventionSet>(conventionSet)
-                .AddScoped<TaskExecutor>()
                 .Configure<SelectingProcessorAccessorOptions>(opt => opt.ProcessorId = options.ProcessorType)
                 .Configure<AssemblySourceOptions>(opt => opt.AssemblyNames = options.TargetAssemblies.ToArray())
 #pragma warning disable 612

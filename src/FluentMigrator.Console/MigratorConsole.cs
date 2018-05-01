@@ -323,7 +323,6 @@ namespace FluentMigrator.Console
                         opt.ShowSql = Verbose;
                     })
                 .AddSingleton<IConventionSet>(conventionSet)
-                .AddScoped<TaskExecutor>()
                 .Configure<SelectingProcessorAccessorOptions>(opt => opt.ProcessorId = ProcessorType)
                 .Configure<AssemblySourceOptions>(opt => opt.AssemblyNames = new[] { TargetAssembly })
 #pragma warning disable 612

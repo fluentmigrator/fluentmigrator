@@ -35,7 +35,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServer.SqlServer2016
             try
             {
                 Execute(
-                    services => services.AddScoped<TaskExecutor>()
+                    services => services
                         .Configure<RunnerOptions>(opt => opt.Task = "migrate")
                         .WithMigrationsIn(typeof(Migrations.SqlServer.Issue715.Migration150).Namespace),
                     sp =>

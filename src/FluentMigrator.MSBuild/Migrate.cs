@@ -150,7 +150,6 @@ namespace FluentMigrator.MSBuild
 
             var services = CreateCoreServices()
                 .AddSingleton<IConventionSet>(conventionSet)
-                .AddScoped<TaskExecutor>()
                 .AddSingleton<ILoggerProvider, FluentMigratorConsoleLoggerProvider>()
                 .Configure<SelectingProcessorAccessorOptions>(opt => opt.ProcessorId = DatabaseType)
                 .Configure<AssemblySourceOptions>(opt => opt.AssemblyNames = Targets)
