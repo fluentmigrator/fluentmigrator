@@ -1,0 +1,42 @@
+- name: Introduction
+  href: intro.md
+- name: Quickstart
+  href: quickstart.md
+- name: Migrations
+  href: migration-example.md
+- name: Fluent Interface
+  href: fluent-interface.md
+- name: Profiles
+  href: profiles.md
+- name: Migration Runners
+  href: migration-runners.md
+- name: More Features
+  items:
+  - name: Database functions as default value
+    href: xref:db-functions
+  - name: SQL Server Extensions
+    href: xref:sql-server-extensions.md
+  - name: Using raw SQL
+    href: xref:raw-sql
+  - name: Auto-reversing migrations
+    href: xref:migration-auto-reversing
+  - name: Transaction modes for the migration runner
+    href: xref:migration-transaction-behavior
+- name: Advanced Topics
+  items:
+  - name: Supporting multiple database types
+    href: multi-db-support.md
+  - name: Filter migrations run based on Tags
+    href: xref:migration-filter-tags
+  - name: Enforcing migration version numbering rules
+    href: xref:migration-attribute-custom
+  - name: Create custom metadata for the VersionInfo table
+    href: xref:version-table-metadata
+- name: Migration runners
+  items:
+  - name: Console
+    href: xref:runner-console
+- name: Obsolete Features
+  items:
+  - name: "ApplicationContext: Passing parameters to Migrations"
+    href: xref:app-context
