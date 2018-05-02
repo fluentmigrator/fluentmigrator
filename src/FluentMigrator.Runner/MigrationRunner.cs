@@ -83,7 +83,7 @@ namespace FluentMigrator.Runner
         /// <param name="runnerContext">The runner context</param>
         /// <param name="processor">The migration processor</param>
         [Obsolete]
-        public MigrationRunner(Assembly assembly, IRunnerContext runnerContext, IMigrationProcessor processor)
+        public MigrationRunner([NotNull] Assembly assembly, [NotNull] IRunnerContext runnerContext, [NotNull] IMigrationProcessor processor)
             : this(assembly, runnerContext, processor, conventionSet: null)
         {
         }
@@ -96,7 +96,7 @@ namespace FluentMigrator.Runner
         /// <param name="processor">The migration processor</param>
         /// <param name="conventionSet">The expression convention set</param>
         [Obsolete]
-        public MigrationRunner(Assembly assembly, IRunnerContext runnerContext, IMigrationProcessor processor, IConventionSet conventionSet)
+        public MigrationRunner([NotNull] Assembly assembly, [NotNull] IRunnerContext runnerContext, [NotNull] IMigrationProcessor processor, [CanBeNull] IConventionSet conventionSet)
             : this(new SingleAssembly(assembly), runnerContext, processor, versionTableMetaData: null, migrationRunnerConventions: null, conventionSet)
         {
         }
@@ -111,9 +111,9 @@ namespace FluentMigrator.Runner
         /// <param name="migrationRunnerConventions">The custom migration runner conventions</param>
         [Obsolete]
         public MigrationRunner(
-            IAssemblyCollection assemblies, IRunnerContext runnerContext,
-            IMigrationProcessor processor, IVersionTableMetaData versionTableMetaData = null,
-            IMigrationRunnerConventions migrationRunnerConventions = null)
+            [NotNull] IAssemblyCollection assemblies, [NotNull] IRunnerContext runnerContext,
+            [NotNull] IMigrationProcessor processor, IVersionTableMetaData versionTableMetaData = null,
+            [CanBeNull] IMigrationRunnerConventions migrationRunnerConventions = null)
             : this(assemblies, runnerContext, processor, versionTableMetaData, migrationRunnerConventions, conventionSet: null)
         {
         }
@@ -129,9 +129,9 @@ namespace FluentMigrator.Runner
         /// <param name="conventionSet">The expression convention set</param>
         [Obsolete]
         public MigrationRunner(
-            IAssemblyCollection assemblies, IRunnerContext runnerContext,
-            IMigrationProcessor processor, IVersionTableMetaData versionTableMetaData,
-            IMigrationRunnerConventions migrationRunnerConventions, IConventionSet conventionSet)
+            [NotNull] IAssemblyCollection assemblies, [NotNull] IRunnerContext runnerContext,
+            [NotNull] IMigrationProcessor processor, [CanBeNull] IVersionTableMetaData versionTableMetaData,
+            [CanBeNull] IMigrationRunnerConventions migrationRunnerConventions, [CanBeNull] IConventionSet conventionSet)
         {
             _migrationAssemblies = assemblies;
             _logger = new AnnouncerFluentMigratorLogger(runnerContext.Announcer);
@@ -164,14 +164,13 @@ namespace FluentMigrator.Runner
                         _migrationAssemblies,
                         convSet,
                         Conventions,
-                        runnerContext.StartVersion,
-                        runnerContext.Version,
+                        runnerContext,
                         versionTableMetaData));
             }
             else
             {
                 _versionLoader = new Lazy<IVersionLoader>(
-                    () => new VersionLoader(this, _migrationAssemblies, convSet, Conventions, versionTableMetaData));
+                    () => new VersionLoader(this, _migrationAssemblies, convSet, Conventions, runnerContext, versionTableMetaData));
             }
         }
 

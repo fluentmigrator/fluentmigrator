@@ -260,7 +260,7 @@ namespace FluentMigrator.Runner.Initialization
             {
                 if (_hasCustomRunner)
                 {
-                    Runner.Processor?.Dispose();
+                    Runner.Processor.Dispose();
                 }
                 else
                 {

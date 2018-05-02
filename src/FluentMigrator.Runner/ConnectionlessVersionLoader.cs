@@ -50,7 +50,7 @@ namespace FluentMigrator.Runner
             IAssemblyCollection assemblies,
             IConventionSet conventionSet,
             IMigrationRunnerConventions conventions,
-            long startVersion, long targetVersion,
+            IRunnerContext runnerContext,
             IVersionTableMetaData versionTableMetaData = null)
         {
             _migrationInformationLoader = runner.MigrationLoader;
@@ -59,13 +59,13 @@ namespace FluentMigrator.Runner
             Runner = runner;
             Assemblies = assemblies;
             Conventions = conventions;
-            StartVersion = startVersion;
-            TargetVersion = targetVersion;
+            StartVersion = runnerContext.StartVersion;
+            TargetVersion = runnerContext.Version;
 
             VersionInfo = new VersionInfo();
             VersionTableMetaData = versionTableMetaData ??
                 (IVersionTableMetaData)Activator.CreateInstance(assemblies.Assemblies.GetVersionTableMetaDataType(
-                    Conventions, runner.RunnerContext));
+                    Conventions, runnerContext));
             VersionMigration = new VersionMigration(VersionTableMetaData);
             VersionSchemaMigration = new VersionSchemaMigration(VersionTableMetaData);
             VersionUniqueMigration = new VersionUniqueMigration(VersionTableMetaData);

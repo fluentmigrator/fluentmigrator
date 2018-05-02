@@ -49,7 +49,7 @@ namespace FluentMigrator.Tests.Unit
 
             var conventions = new MigrationRunnerConventions();
             var asm = Assembly.GetExecutingAssembly();
-            var loader = new VersionLoader(runner.Object, asm, ConventionSets.NoSchemaName, conventions);
+            var loader = new VersionLoader(runner.Object, asm, ConventionSets.NoSchemaName, conventions, runnerContext.Object);
 
             var versionTableMetaData = loader.GetVersionTableMetaData();
             versionTableMetaData.ShouldBeOfType<TestVersionTableMetaData>();
@@ -66,7 +66,7 @@ namespace FluentMigrator.Tests.Unit
 
             var conventions = new MigrationRunnerConventions();
             var asm = "s".GetType().Assembly;
-            var loader = new VersionLoader(runner.Object, asm, ConventionSets.NoSchemaName, conventions);
+            var loader = new VersionLoader(runner.Object, asm, ConventionSets.NoSchemaName, conventions, runnerContext.Object);
 
             var versionTableMetaData = loader.GetVersionTableMetaData();
             versionTableMetaData.ShouldBeOfType<DefaultVersionTableMetaData>();
@@ -86,7 +86,7 @@ namespace FluentMigrator.Tests.Unit
 
             var conventions = new MigrationRunnerConventions();
             var asm = Assembly.GetExecutingAssembly();
-            var loader = new VersionLoader(runner.Object, asm, ConventionSets.NoSchemaName, conventions);
+            var loader = new VersionLoader(runner.Object, asm, ConventionSets.NoSchemaName, conventions, runnerContext.Object);
 
             var versionTableMetaData = loader.GetVersionTableMetaData();
             versionTableMetaData.ApplicationContext.ShouldBe(applicationContext);
@@ -104,7 +104,7 @@ namespace FluentMigrator.Tests.Unit
 
             var conventions = new MigrationRunnerConventions();
             var asm = Assembly.GetExecutingAssembly();
-            var loader = new VersionLoader(runner.Object, asm, ConventionSets.NoSchemaName, conventions);
+            var loader = new VersionLoader(runner.Object, asm, ConventionSets.NoSchemaName, conventions, runnerContext.Object);
 
             processor.Setup(p => p.Process(It.Is<DeleteDataExpression>(expression =>
                                                                        expression.SchemaName == loader.VersionTableMetaData.SchemaName
@@ -132,7 +132,7 @@ namespace FluentMigrator.Tests.Unit
 
             var conventions = new MigrationRunnerConventions();
             var asm = Assembly.GetExecutingAssembly();
-            var loader = new VersionLoader(runner.Object, asm, ConventionSets.NoSchemaName, conventions);
+            var loader = new VersionLoader(runner.Object, asm, ConventionSets.NoSchemaName, conventions, runnerContext.Object);
 
             processor.Setup(p => p.Process(It.Is<DeleteTableExpression>(expression =>
                                                                         expression.SchemaName == loader.VersionTableMetaData.SchemaName
@@ -159,7 +159,7 @@ namespace FluentMigrator.Tests.Unit
 
             var conventions = new MigrationRunnerConventions();
             var asm = Assembly.GetExecutingAssembly();
-            var loader = new VersionLoader(runner.Object, asm, ConventionSets.NoSchemaName, conventions);
+            var loader = new VersionLoader(runner.Object, asm, ConventionSets.NoSchemaName, conventions, runnerContext.Object);
 
             ((TestVersionTableMetaData) loader.VersionTableMetaData).OwnsSchema = false;
 
@@ -184,7 +184,7 @@ namespace FluentMigrator.Tests.Unit
 
             var conventions = new MigrationRunnerConventions();
             var asm = Assembly.GetExecutingAssembly();
-            var loader = new VersionLoader(runner.Object, asm, ConventionSets.NoSchemaName, conventions);
+            var loader = new VersionLoader(runner.Object, asm, ConventionSets.NoSchemaName, conventions, runnerContext.Object);
 
             processor.Setup(p => p.Process(It.Is<InsertDataExpression>(expression =>
                                                                        expression.SchemaName == loader.VersionTableMetaData.SchemaName
@@ -215,7 +215,7 @@ namespace FluentMigrator.Tests.Unit
 
             processor.Setup(p => p.SchemaExists(It.IsAny<string>())).Returns(false);
 
-            var loader = new VersionLoader(runner.Object, asm, ConventionSets.NoSchemaName, conventions);
+            var loader = new VersionLoader(runner.Object, asm, ConventionSets.NoSchemaName, conventions, runnerContext.Object);
 
             loader.LoadVersionInfo();
 
@@ -236,7 +236,7 @@ namespace FluentMigrator.Tests.Unit
 
             processor.Setup(p => p.TableExists(new TestVersionTableMetaData().SchemaName, TestVersionTableMetaData.TABLE_NAME)).Returns(false);
 
-            var loader = new VersionLoader(runner.Object, asm, ConventionSets.NoSchemaName, conventions);
+            var loader = new VersionLoader(runner.Object, asm, ConventionSets.NoSchemaName, conventions, runnerContext.Object);
 
             loader.LoadVersionInfo();
 
@@ -257,7 +257,7 @@ namespace FluentMigrator.Tests.Unit
 
             processor.Setup(p => p.ColumnExists(new TestVersionTableMetaData().SchemaName, TestVersionTableMetaData.TABLE_NAME, TestVersionTableMetaData.APPLIED_ON_COLUMN_NAME)).Returns(false);
 
-            var loader = new VersionLoader(runner.Object, asm, ConventionSets.NoSchemaName, conventions);
+            var loader = new VersionLoader(runner.Object, asm, ConventionSets.NoSchemaName, conventions, runnerContext.Object);
 
             loader.LoadVersionInfo();
 
@@ -278,7 +278,7 @@ namespace FluentMigrator.Tests.Unit
 
             processor.Setup(p => p.ColumnExists(new TestVersionTableMetaData().SchemaName, TestVersionTableMetaData.TABLE_NAME, TestVersionTableMetaData.APPLIED_ON_COLUMN_NAME)).Returns(false);
 
-            var loader = new VersionLoader(runner.Object, asm, ConventionSets.NoSchemaName, conventions);
+            var loader = new VersionLoader(runner.Object, asm, ConventionSets.NoSchemaName, conventions, runnerContext.Object);
 
             loader.LoadVersionInfo();
 
