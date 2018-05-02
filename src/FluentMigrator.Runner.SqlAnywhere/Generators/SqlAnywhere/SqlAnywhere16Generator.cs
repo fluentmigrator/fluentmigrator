@@ -164,7 +164,7 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
             builder.Append(String.Format("-- create alter table command to create new default constraint as string and run it" + Environment.NewLine + "ALTER TABLE {0} ALTER {1} DEFAULT {2};",
                 Quoter.QuoteTableName(expression.TableName, expression.SchemaName),
                 Quoter.QuoteColumnName(expression.ColumnName),
-                Quoter.QuoteValue(expression.DefaultValue)));
+                SqlAnywhereColumn.FormatDefaultValue(expression.DefaultValue, Quoter)));
 
             return builder.ToString();
         }

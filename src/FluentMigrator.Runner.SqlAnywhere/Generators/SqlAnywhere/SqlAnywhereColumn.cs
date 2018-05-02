@@ -75,12 +75,12 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
             return "DEFAULT AUTOINCREMENT";
         }
 
-        public string FormatDefaultValue(object defaultValue)
+        public static string FormatDefaultValue(object defaultValue, IQuoter quoter)
         {
             if (DefaultValueIsSqlFunction(defaultValue))
                 return defaultValue.ToString();
 
-            return Quoter.QuoteValue(defaultValue);
+            return quoter.QuoteValue(defaultValue);
         }
 
         public static string GetDefaultConstraintName(string tableName, string columnName)
