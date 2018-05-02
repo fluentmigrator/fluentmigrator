@@ -15,6 +15,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
         {
         }
 
+        /// <inheritdoc />
         public override string Generate(IEnumerable<ColumnDefinition> columns, string tableName)
         {
             var colDefs = columns.ToList();
@@ -25,6 +26,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
             return base.Generate(colDefs, tableName) + string.Concat(foreignKeyClauses);
         }
 
+        /// <inheritdoc />
         protected override string FormatIdentity(ColumnDefinition column)
         {
             //SQLite only supports the concept of Identity in combination with a single primary key
@@ -37,6 +39,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
             return string.Empty;
         }
 
+        /// <inheritdoc />
         public override bool ShouldPrimaryKeysBeAddedSeparately(IEnumerable<ColumnDefinition> primaryKeyColumns)
         {
             //If there are no identity column then we can add as a separate constrint
@@ -44,6 +47,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
             return !pkColDefs.Any(x => x.IsIdentity) && pkColDefs.Any(x => x.IsPrimaryKey);
         }
 
+        /// <inheritdoc />
         protected override string FormatPrimaryKey(ColumnDefinition column)
         {
             if (!column.IsPrimaryKey)

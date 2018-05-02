@@ -53,11 +53,13 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return string.Join(", ", clauses.ToArray());
         }
 
+        /// <inheritdoc />
         protected override string FormatIdentity(ColumnDefinition column)
         {
             return string.Empty;
         }
 
+        /// <inheritdoc />
         public override string AddPrimaryKeyConstraint(string tableName, IEnumerable<ColumnDefinition> primaryKeyColumns)
         {
             var columnDefinitions = primaryKeyColumns.ToList();
@@ -80,6 +82,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return string.Format(", {0}PRIMARY KEY ({1})", pkName, cols);
         }
 
+        /// <inheritdoc />
         protected override string FormatType(ColumnDefinition column)
         {
             if (column.IsIdentity)

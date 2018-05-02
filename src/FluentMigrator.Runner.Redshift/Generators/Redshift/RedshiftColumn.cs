@@ -70,11 +70,13 @@ namespace FluentMigrator.Runner.Generators.Redshift
             return string.Join(", ", clauses.ToArray());
         }
 
+        /// <inheritdoc />
         protected override string FormatIdentity(ColumnDefinition column)
         {
             return string.Empty;
         }
 
+        /// <inheritdoc />
         public override string AddPrimaryKeyConstraint(string tableName, IEnumerable<ColumnDefinition> primaryKeyColumns)
         {
             var pkColDef = primaryKeyColumns.ToList();

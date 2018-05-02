@@ -25,6 +25,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
             }
         }
 
+        /// <inheritdoc />
         protected override string FormatIdentity(ColumnDefinition column)
         {
             if (column.IsIdentity)
@@ -34,6 +35,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
             return string.Empty;
         }
 
+        /// <inheritdoc />
         protected override string FormatNullable(ColumnDefinition column)
         {
             //Creates always return Not Null unless is nullable is true
@@ -56,6 +58,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
 
         }
 
+        /// <inheritdoc />
         protected override string GetPrimaryKeyConstraintName(IEnumerable<ColumnDefinition> primaryKeyColumns, string tableName)
         {
             if (primaryKeyColumns == null)

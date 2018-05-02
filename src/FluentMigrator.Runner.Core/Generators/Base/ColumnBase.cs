@@ -23,11 +23,19 @@ using FluentMigrator.Model;
 
 namespace FluentMigrator.Runner.Generators.Base
 {
+    /// <summary>
+    /// The base class for column definitions
+    /// </summary>
     public abstract class ColumnBase : IColumn
     {
         private readonly ITypeMap _typeMap;
         protected IList<Func<ColumnDefinition, string>> ClauseOrder { get; set; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ColumnBase"/> class.
+        /// </summary>
+        /// <param name="typeMap">The type map</param>
+        /// <param name="quoter">The quoter</param>
         protected ColumnBase(ITypeMap typeMap, IQuoter quoter)
         {
             _typeMap = typeMap;
@@ -37,6 +45,9 @@ namespace FluentMigrator.Runner.Generators.Base
 
         public virtual string ForeignKeyConstraint => "{0}FOREIGN KEY ({1}) REFERENCES {2} ({3}){4}{5}";
 
+        /// <summary>
+        /// Gets the quoter
+        /// </summary>
         protected IQuoter Quoter { get; }
 
         [Obsolete]
@@ -111,10 +122,8 @@ namespace FluentMigrator.Runner.Generators.Base
             {
                 return "COLLATE " + column.CollationName;
             }
-            else
-            {
-                return string.Empty;
-            }
+
+            return string.Empty;
         }
 
         public virtual string FormatCascade(string onWhat, Rule rule)

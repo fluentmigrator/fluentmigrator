@@ -40,6 +40,7 @@ namespace FluentMigrator.Runner.Generators.MySql
                 : string.Format("COMMENT {0}", Quoter.QuoteValue(column.ColumnDescription));
         }
 
+        /// <inheritdoc />
         protected override string FormatIdentity(ColumnDefinition column)
         {
             return column.IsIdentity ? "AUTO_INCREMENT" : string.Empty;
