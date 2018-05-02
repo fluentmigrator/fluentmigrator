@@ -45,3 +45,5 @@
 - name: Guides
   href: guides/toc.yml
   topicHref: guides/overview.md
+- name: Glossary
+  href: xref:glossary

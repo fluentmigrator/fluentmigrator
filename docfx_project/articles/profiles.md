@@ -29,4 +29,4 @@ public class CreateDevSeedData : Migration
 }
 ```
 
-Now that you have migrations and profiles defined, you can use [Migration Runners](migration-runners.md)  to apply changes to your database.
+Now that you have migrations and profiles defined, you can use [Migration Runners](migration-runners.md) to apply changes to your database.

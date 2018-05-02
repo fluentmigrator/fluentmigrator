@@ -20,10 +20,33 @@ using System;
 
 namespace FluentMigrator.Runner
 {
+    /// <summary>
+    /// A migration scope that encapsulates database changes in a transaction
+    /// </summary>
     public interface IMigrationScope : IDisposable
     {
+        /// <summary>
+        /// Gets a value indicating whether the migration scope is active?
+        /// </summary>
+        /// <remarks>
+        /// A migration scope is considered active when it is the outmost scope.
+        /// </remarks>
         bool IsActive { get; }
+
+        /// <summary>
+        /// Marks the scope as complete.
+        /// </summary>
+        /// <remarks>
+        /// This usually involves the commit a transaction.
+        /// </remarks>
         void Complete();
+
+        /// <summary>
+        /// Marks the scope as cancelled.
+        /// </summary>
+        /// <remarks>
+        /// This usually involves the rollback of a transaction.
+        /// </remarks>
         void Cancel();
     }
 }

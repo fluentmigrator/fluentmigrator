@@ -16,8 +16,18 @@
 
 namespace FluentMigrator.Runner
 {
+    /// <summary>
+    /// Manually start a migration scope
+    /// </summary>
+    /// <remarks>
+    /// This is handles nested scopes gracefully.
+    /// </remarks>
     public interface IMigrationScopeStarter
     {
+        /// <summary>
+        /// Starts a new migration scope
+        /// </summary>
+        /// <returns>A new migration scope</returns>
         IMigrationScope BeginScope();
     }
 }

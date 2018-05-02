@@ -496,3 +496,7 @@ The implementations will remain, but the interface will be gone.
 ## `ICanBeValidated`
 
 The library now uses `System.ComponentModel.DataAnnotations` for validation - for example the `[Required]` attribute for expression fields that are - one might've guessed it - required.
+
+## `MigrationRunner.MaintenanceLoader` is read-only
+
+Don't set the maintenance loader directly. Just register your own as a service.

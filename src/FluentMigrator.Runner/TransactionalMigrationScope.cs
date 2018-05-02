@@ -18,10 +18,18 @@ using System;
 
 namespace FluentMigrator.Runner
 {
+    /// <summary>
+    /// A migration scope encapsulating migrations in a transaction
+    /// </summary>
     public class TransactionalMigrationScope : TrackingMigrationScope
     {
         private readonly IMigrationProcessor _migrationProcessor;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TransactionalMigrationScope"/> class.
+        /// </summary>
+        /// <param name="processor">The migration processor</param>
+        /// <param name="disposalAction">Called after the scope was cancelled</param>
         public TransactionalMigrationScope(IMigrationProcessor processor, Action disposalAction)
             : base(disposalAction)
         {
@@ -29,11 +37,13 @@ namespace FluentMigrator.Runner
             _migrationProcessor.BeginTransaction();
         }
 
+        /// <inheritdoc />
         protected override void DoComplete()
         {
             _migrationProcessor.CommitTransaction();
         }
 
+        /// <inheritdoc />
         protected override void DoCancel()
         {
             _migrationProcessor.RollbackTransaction();

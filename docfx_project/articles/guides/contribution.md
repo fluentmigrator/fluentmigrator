@@ -71,6 +71,10 @@ When you run the unit tests, the integration tests for PostgreSQL are run as wel
 dotnet pack ./FluentMigrator.sln --output "absolute-path-to-output-directory"
 ```
 
+# ReSharper/Rider specific support
+
+There is a new template `ctorc` which creates a StyleCop-compatible constructor summary.
+
 # Code style
 
 Please use an editor that supports the [.editorconfig](https://raw.githubusercontent.com/fluentmigrator/fluentmigrator/master/.editorconfig)
