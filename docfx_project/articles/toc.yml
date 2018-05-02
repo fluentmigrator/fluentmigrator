@@ -2,14 +2,16 @@
   href: intro.md
 - name: Quickstart
   href: quickstart.md
-- name: Migrations
-  href: migration-example.md
-- name: Fluent Interface
-  href: fluent-interface.md
-- name: Profiles
-  href: profiles.md
-- name: Migration Runners
-  href: migration-runners.md
+- name: Basics
+  items:
+  - name: Migrations
+    href: migration-example.md
+  - name: Fluent Interface
+    href: fluent-interface.md
+  - name: Profiles
+    href: profiles.md
+  - name: Migration Runners
+    href: migration-runners.md
 - name: More Features
   items:
   - name: Database functions as default value
@@ -40,7 +42,6 @@
   items:
   - name: "ApplicationContext: Passing parameters to Migrations"
     href: xref:app-context
-- name: Upgrade guides
-  items:
-  - name: 2.x to 3.0
-    href: xref:upgrade-guide-2.0-to-3.0
+- name: Guides
+  href: guides/toc.yml
+  topicHref: guides/overview.md

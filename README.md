@@ -4,9 +4,11 @@ Fluent Migrator is a migration framework for .NET much like Ruby on Rails Migrat
 
 # News
 
-Finally, version 2.0.0 is released!
+3.0.0 is released and goes full "dependency injection".
+We also have a new [documentation website](https://fluentmigrator.github.io)!
 
 Please read the [changelog](https://github.com/fluentmigrator/fluentmigrator/blob/master/CHANGELOG.md)
+or the upgrade guide for further information: [2.x to 3.0](https://fluentmigrator.github.io/articles/guides/upgrades/guide-2.0-to-3.0.html?tabs=di).
 
 # Packages
 
@@ -22,7 +24,7 @@ while the CI builds are stored on [MyGet](https://www.myget.org/feed/Packages/fl
 
 |                           |         | 
 |---------------------------|---------|
-| **Documentation**         | [https://github.com/fluentmigrator/fluentmigrator/wiki](https://github.com/fluentmigrator/fluentmigrator/wiki) |
+| **Documentation**         | [On our GitHub pages](https://fluentmigrator.github.io) |
 | **Discussions**           | [![Gitter](https://img.shields.io/gitter/room/FluentMigrator/fluentmigrator.svg)](https://gitter.im/FluentMigrator/fluentmigrator) |
 | **Bug/Feature Tracking**  | [![GitHub issues](https://img.shields.io/github/issues/fluentmigrator/fluentmigrator.svg)](https://github.com/fluentmigrator/fluentmigrator/issues) |
 
@@ -37,40 +39,6 @@ Travis CI    | [![Travis](https://img.shields.io/travis/fluentmigrator/fluentmig
 The TeamCity build is generously hosted and run on the [JetBrains TeamCity](https://teamcity.jetbrains.com) infrastructure.
 
 Our Linux build is hosted on Travis CI.
-
-# Building FluentMigrator
-
-The build is based on the .NET Core tooling.
-
-## Prerequisites
-
-* .NET Core 2.1 preview 2
-
-## Building
-
-```
-dotnet build FluentMigrator.sln
-```
-
-## Testing
-
-### Windows
-
-```
-dotnet test test\FluentMigrator.Tests\FluentMigrator.Tests.csproj --filter "TestCategory!=Integration"
-```
-
-### Linux
-
-```
-dotnet test test\FluentMigrator.Tests\FluentMigrator.Tests.csproj --filter "TestCategory!=Integration&TestCategory!=NotWorkingOnMono"
-```
-
-## Creating the nuget packages
-
-```
-dotnet pack .\FluentMigrator.sln --output "C:\fluentmigrator\output"
-```
 
 # Powered by
 

@@ -48,21 +48,22 @@ The `dotnet-fm` tool is now a global tool and therefore requires the .NET Core 2
 
 ## Connection string handling changes
 
-The library assumes that in `ProcessorOptions.ConnectionString` is either a connection string or
-a connection string identifier. This are the steps to load the real connection string.
+The library assumes that in [ProcessorOptions.ConnectionString](xref:FluentMigrator.Runner.Processors.ProcessorOptions.ConnectionString)
+is either a connection string or a connection string identifier.
+This are the steps to load the real connection string.
 
-- Queries all `IConnectionStringReader` implementations
+- Queries all [IConnectionStringReader](xref:FluentMigrator.Runner.Initialization.IConnectionStringReader) implementations
   - When a connection string is returned by one of the readers, then this
     connection string will be used
-  - When no connection string is returned, try reading from the next `IConnectionStringReader`
-- When no reader returned a connection string, then return `ProcessorOptions.ConnectionString`
+  - When no connection string is returned, try reading from the next [IConnectionStringReader](xref:FluentMigrator.Runner.Initialization.IConnectionStringReader)
+- When no reader returned a connection string, then return [ProcessorOptions.ConnectionString](xref:FluentMigrator.Runner.Processors.ProcessorOptions.ConnectionString)
 
-The connection string stored in `ProcessorOptions.ConnectionString` might be overridden
-by registering the `IConnectionStringReader` instance `PassThroughConnectionStringReader`
+The connection string stored in [ProcessorOptions.ConnectionString](xref:FluentMigrator.Runner.Processors.ProcessorOptions.ConnectionString) might be overridden
+by registering the [IConnectionStringReader](xref:FluentMigrator.Runner.Initialization.IConnectionStringReader) instance `PassThroughConnectionStringReader`
 as scoped service.
 
-When no connection string could be found, the `SelectingProcessorAccessor` returns
-a `ConnectionlessProcessor` instead of the previously selected processor.
+When no connection string could be found, the [SelectingProcessorAccessor](xref:FluentMigrator.Runner.Processors.SelectingProcessorAccessor) returns
+a [ConnectionlessProcessor](xref:FluentMigrator.Runner.Processors.ConnectionlessProcessor) instead of the previously selected processor.
 
 ## Custom migration expression validation
 
@@ -209,6 +210,37 @@ You can comfortably register the default [FluentMigratorConsoleLogger](xref:Flue
 ```cs
 var serviceProvider = new ServiceCollection()
     .AddLogging(lb => lb.AddFluentMigratorConsole())
+    .BuildServiceProvider();
+```
+
+### Configuring the logger output
+
+> [!WARNING]
+> Loggers derived from [FluentMigratorLogger](xref:FluentMigrator.Runner.Logging.FluentMigratorLogger) may
+> use other logger option classes!
+
+#### Enabling output of elapsed time
+
+```cs
+var serviceProvider = new ServiceCollection()
+    .AddLogging(lb => lb.AddFluentMigratorConsole())
+    .Configure<FluentMigratorLoggerOptions>(cfg => {
+        cfg.ShowElapsedTime = true;
+    })
+    .BuildServiceProvider();
+```
+
+#### Enabling output of SQL
+
+> [!IMPORTANT]
+> Logging the SQL messages might be a security risk. Don't store sensitive data unhashed/unencrypted!
+
+```cs
+var serviceProvider = new ServiceCollection()
+    .AddLogging(lb => lb.AddFluentMigratorConsole())
+    .Configure<FluentMigratorLoggerOptions>(cfg => {
+        cfg.ShowSql = true;
+    })
     .BuildServiceProvider();
 ```
 
@@ -373,11 +405,85 @@ var serviceProvider = new ServiceCollection()
     .BuildServiceProvider();
 ```
 
+### Selecting the database
+
+The key is the [IProcessorAccessor](xref:FluentMigrator.Runner.Processors.IProcessorAccessor) service and its
+default implementation [SelectingProcessorAccessor](xref:FluentMigrator.Runner.Processors.SelectingProcessorAccessor),
+which is configured using the [SelectingProcessorAccessorOptions](xref:FluentMigrator.Runner.Processors.SelectingProcessorAccessorOptions).
+
+> [!INFO]
+> When the [SelectingProcessorAccessorOptions](xref:FluentMigrator.Runner.Processors.SelectingProcessorAccessorOptions) aren't configured,
+> then the value from the [SelectingGeneratorAccessorOptions](xref:FluentMigrator.Runner.Generators.SelectingGeneratorAccessorOptions)
+> is used.
+
+> [!INFO]
+> When neiter a processor nor generator ID was specified, then the added processor
+> will be used - but only where there is only one! When no processor or more than
+> one was specified, then an exception gets thrown.
+
+```cs
+var serviceProvider = new ServiceCollection()
+    // Registration of all FluentMigrator-specific services
+    .AddFluentMigratorCore()
+    // Configure the runner
+    .ConfigureRunner(
+        builder => builder
+            // Add database support
+            .AddSQLite()
+            .AddSqlServer2008()
+            .AddFirebird()
+            /* TODO: More configuration */
+    )
+    .Configure<SelectingProcessorAccessorOptions>(cfg => {
+        // Selects SQLite from the set of supported databases
+        cfg.ProcessorId = "sqlite";
+    })
+    /* TODO: Add more services */
+    .BuildServiceProvider();
+```
+
 ## `MigrationProcessorFactoryProvider`
 
 This isn't needed anymore, because all processor factory providers must be added dynamically using the [ConfigureRunner](xref:Microsoft.Extensions.DependencyInjection.FluentMigratorServiceCollectionExtensions.ConfigureRunner(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{FluentMigrator.Runner.IMigrationRunnerBuilder})) extension method.
 
 You can find an example [above](#factory-example).
+
+### Selecting the database
+
+The key is the [IGeneratorAccessor](xref:FluentMigrator.Runner.Generators.IGeneratorAccessor) service and its
+default implementation [SelectingGeneratorAccessor](xref:FluentMigrator.Runner.Generators.SelectingGeneratorAccessor),
+which is configured using the [SelectingGeneratorAccessorOptions](xref:FluentMigrator.Runner.Generators.SelectingGeneratorAccessorOptions).
+
+> [!INFO]
+> When the [SelectingGeneratorAccessorOptions](xref:FluentMigrator.Runner.Generators.SelectingGeneratorAccessorOptions) aren't configured,
+> then the value from the [SelectingProcessorAccessorOptions](xref:FluentMigrator.Runner.Processors.SelectingProcessorAccessorOptions)
+> is used.
+
+> [!INFO]
+> When neiter a generator nor processor ID was specified, then the added generator
+> will be used - but only where there is only one! When no generator or more than
+> one was specified, then an exception gets thrown.
+
+```cs
+var serviceProvider = new ServiceCollection()
+    // Registration of all FluentMigrator-specific services
+    .AddFluentMigratorCore()
+    // Configure the runner
+    .ConfigureRunner(
+        builder => builder
+            // Add database support
+            .AddSQLite()
+            .AddSqlServer2008()
+            .AddFirebird()
+            /* TODO: More configuration */
+    )
+    .Configure<SelectingGeneratorAccessorOptions>(cfg => {
+        // Selects SQLite from the set of supported databases
+        cfg.GeneratorId = "sqlite";
+    })
+    /* TODO: Add more services */
+    .BuildServiceProvider();
+```
 
 ## `ITypeMap.GetTypeMap(DbType, int, int)`
 
