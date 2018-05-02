@@ -123,7 +123,7 @@ namespace FluentMigrator.Runner.Generators.Base
         /// <returns>The formatted (not) null constraint</returns>
         protected virtual string FormatNullable(ColumnDefinition column)
         {
-            if (column.IsNullable ?? false)
+            if (column.IsNullable == true)
             {
                 return string.Empty;
             }

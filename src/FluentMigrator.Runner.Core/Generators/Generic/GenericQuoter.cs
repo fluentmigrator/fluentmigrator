@@ -16,6 +16,8 @@
 
 using System.Globalization;
 
+using JetBrains.Annotations;
+
 namespace FluentMigrator.Runner.Generators.Generic
 {
     using System;
@@ -179,7 +181,8 @@ namespace FluentMigrator.Runner.Generators.Generic
             return (name.StartsWith(OpenQuote) && name.EndsWith(CloseQuote));
         }
 
-        protected virtual bool ShouldQuote(string name)
+        [ContractAnnotation("name:null => false")]
+        protected virtual bool ShouldQuote([CanBeNull] string name)
         {
             return (!string.IsNullOrEmpty(OpenQuote) || !string.IsNullOrEmpty(CloseQuote)) && !string.IsNullOrEmpty(name);
         }
