@@ -18,18 +18,69 @@
 
 namespace FluentMigrator.Runner
 {
+    /// <summary>
+    /// Manages the version table and the stored versions
+    /// </summary>
     public interface IVersionLoader
     {
+        /// <summary>
+        /// Gets a value indicating whether the schema for the version table has been created (or already exited)
+        /// </summary>
         bool AlreadyCreatedVersionSchema { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether the version table has been created (or already exited)
+        /// </summary>
         bool AlreadyCreatedVersionTable { get; }
+
+        /// <summary>
+        /// Deletes a version from the version table
+        /// </summary>
+        /// <param name="version">The version to delete from the version table</param>
         void DeleteVersion(long version);
+
+        /// <summary>
+        /// Get the version table metadata
+        /// </summary>
+        /// <returns>The version table metadata</returns>
         VersionTableInfo.IVersionTableMetaData GetVersionTableMetaData();
+
+        /// <summary>
+        /// Loads all version data stored in the version table
+        /// </summary>
         void LoadVersionInfo();
+
+        /// <summary>
+        /// Removes the version table
+        /// </summary>
         void RemoveVersionTable();
+
+        /// <summary>
+        /// The runner this version loader belongs to
+        /// </summary>
         IMigrationRunner Runner { get; set; }
+
+        /// <summary>
+        /// Adds the version information
+        /// </summary>
+        /// <param name="version">The version number</param>
         void UpdateVersionInfo(long version);
+
+        /// <summary>
+        /// Adds the version information
+        /// </summary>
+        /// <param name="version">The version number</param>
+        /// <param name="description">The version description</param>
         void UpdateVersionInfo(long version, string description);
+
+        /// <summary>
+        /// Gets an interface to query/update the status of migrations
+        /// </summary>
         Versioning.IVersionInfo VersionInfo { get; set; }
+
+        /// <summary>
+        /// Gets the version table meta data
+        /// </summary>
         VersionTableInfo.IVersionTableMetaData VersionTableMetaData { get; }
     }
 }
