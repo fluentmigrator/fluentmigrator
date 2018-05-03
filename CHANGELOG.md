@@ -15,6 +15,7 @@ The new documentation is online on [https://fluentmigrator.github.io](https://fl
 - `ProcessorOptions.Timeout` is now of type `System.TimeSpan?`
 - `MigrationRunner.MaintenanceLoader` is now read-only
 - `MigrationRunner.CaughtExceptions` returns now a `IReadOnlyList`
+- `dotnet-fm` is now a global tool and requires at least the .NET Core tooling 2.1-preview2
 
 ### Added
 
