@@ -484,7 +484,7 @@ namespace FluentMigrator.Tests.Unit.Generators
             {
                 TableName = TestTableName1,
                 SchemaName = schemaName,
-                Column = new ColumnDefinition { Name = TestColumnName1, Type = DbType.String, Size = 5 }
+                Column = new ColumnDefinition { Name = TestColumnName1, Type = DbType.DateTime }
             };
             context.Expressions.Add(expr);
             var builder = new CreateColumnExpressionBuilder(expr, context);

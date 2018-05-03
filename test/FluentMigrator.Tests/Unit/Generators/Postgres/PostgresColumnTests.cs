@@ -84,7 +84,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             var expressions = GeneratorTestHelper.GetCreateColumnWithSystemMethodExpression("TestSchema");
             var result = string.Join(Environment.NewLine, expressions.Select(x => (string)Generator.Generate((dynamic)x)));
             result.ShouldBe(
-                @"ALTER TABLE ""TestSchema"".""TestTable1"" ADD ""TestColumn1"" varchar(5);" + Environment.NewLine +
+                @"ALTER TABLE ""TestSchema"".""TestTable1"" ADD ""TestColumn1"" timestamp;" + Environment.NewLine +
                 @"UPDATE ""TestSchema"".""TestTable1"" SET ""TestColumn1"" = now() WHERE 1 = 1;");
         }
 
@@ -94,7 +94,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             var expressions = GeneratorTestHelper.GetCreateColumnWithSystemMethodExpression();
             var result = string.Join(Environment.NewLine, expressions.Select(x => (string)Generator.Generate((dynamic)x)));
             result.ShouldBe(
-                @"ALTER TABLE ""public"".""TestTable1"" ADD ""TestColumn1"" varchar(5);" + Environment.NewLine +
+                @"ALTER TABLE ""public"".""TestTable1"" ADD ""TestColumn1"" timestamp;" + Environment.NewLine +
                 @"UPDATE ""public"".""TestTable1"" SET ""TestColumn1"" = now() WHERE 1 = 1;");
         }
 

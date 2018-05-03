@@ -81,7 +81,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
             var expressions = GeneratorTestHelper.GetCreateColumnWithSystemMethodExpression("TestSchema");
             var result = string.Join(Environment.NewLine, expressions.Select(x => (string)Generator.Generate((dynamic)x)));
             result.ShouldBe(
-                @"ALTER TABLE ""TestSchema"".""TestTable1"" ADD ""TestColumn1"" NVARCHAR2(5)" + Environment.NewLine +
+                @"ALTER TABLE ""TestSchema"".""TestTable1"" ADD ""TestColumn1"" TIMESTAMP(4)" + Environment.NewLine +
                 @"UPDATE ""TestSchema"".""TestTable1"" SET ""TestColumn1"" = LOCALTIMESTAMP WHERE 1 = 1");
         }
 
@@ -91,7 +91,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
             var expressions = GeneratorTestHelper.GetCreateColumnWithSystemMethodExpression();
             var result = string.Join(Environment.NewLine, expressions.Select(x => (string)Generator.Generate((dynamic)x)));
             result.ShouldBe(
-                @"ALTER TABLE ""TestTable1"" ADD ""TestColumn1"" NVARCHAR2(5)" + Environment.NewLine +
+                @"ALTER TABLE ""TestTable1"" ADD ""TestColumn1"" TIMESTAMP(4)" + Environment.NewLine +
                 @"UPDATE ""TestTable1"" SET ""TestColumn1"" = LOCALTIMESTAMP WHERE 1 = 1");
         }
 

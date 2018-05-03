@@ -103,7 +103,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             var expressions = GeneratorTestHelper.GetCreateColumnWithSystemMethodExpression("TestSchema");
             var result = string.Join(Environment.NewLine, expressions.Select(x => (string)Generator.Generate((dynamic)x)));
             result.ShouldBe(
-                @"ALTER TABLE ""TestTable1"" ADD (""TestColumn1"" NVARCHAR(5) NULL);" + Environment.NewLine +
+                @"ALTER TABLE ""TestTable1"" ADD (""TestColumn1"" DATETIME NULL);" + Environment.NewLine +
                 @"UPDATE ""TestTable1"" SET ""TestColumn1"" = CURRENT_TIMESTAMP WHERE 1 = 1;");
         }
 
@@ -113,7 +113,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             var expressions = GeneratorTestHelper.GetCreateColumnWithSystemMethodExpression();
             var result = string.Join(Environment.NewLine, expressions.Select(x => (string)Generator.Generate((dynamic)x)));
             result.ShouldBe(
-                @"ALTER TABLE ""TestTable1"" ADD (""TestColumn1"" NVARCHAR(5) NULL);" + Environment.NewLine +
+                @"ALTER TABLE ""TestTable1"" ADD (""TestColumn1"" DATETIME NULL);" + Environment.NewLine +
                 @"UPDATE ""TestTable1"" SET ""TestColumn1"" = CURRENT_TIMESTAMP WHERE 1 = 1;");
         }
 

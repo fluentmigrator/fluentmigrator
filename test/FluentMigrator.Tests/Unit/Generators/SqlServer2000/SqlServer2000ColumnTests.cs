@@ -83,7 +83,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             var expressions = GeneratorTestHelper.GetCreateColumnWithSystemMethodExpression("TestSchema");
             var result = string.Join(Environment.NewLine, expressions.Select(x => (string)Generator.Generate((dynamic)x)));
             result.ShouldBe(
-                @"ALTER TABLE [TestTable1] ADD [TestColumn1] NVARCHAR(5)" + Environment.NewLine +
+                @"ALTER TABLE [TestTable1] ADD [TestColumn1] DATETIME" + Environment.NewLine +
                 "UPDATE [TestTable1] SET [TestColumn1] = GETDATE() WHERE 1 = 1");
         }
 
@@ -93,7 +93,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             var expressions = GeneratorTestHelper.GetCreateColumnWithSystemMethodExpression();
             var result = string.Join(Environment.NewLine, expressions.Select(x => (string)Generator.Generate((dynamic)x)));
             result.ShouldBe(
-                @"ALTER TABLE [TestTable1] ADD [TestColumn1] NVARCHAR(5)" + Environment.NewLine +
+                @"ALTER TABLE [TestTable1] ADD [TestColumn1] DATETIME" + Environment.NewLine +
                 "UPDATE [TestTable1] SET [TestColumn1] = GETDATE() WHERE 1 = 1");
         }
 
