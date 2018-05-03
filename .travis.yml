@@ -21,6 +21,11 @@ before_script:
 script:
 - dotnet pack ./FluentMigrator.sln -c "Release" -o "$TRAVIS_BUILD_DIR/output" -p:SourceLinkCreate=true "-p:Version=$VERSION"
 - dotnet test ./test/FluentMigrator.Tests/FluentMigrator.Tests.csproj --filter 'TestCategory!=NotWorkingOnMono&(TestCategory!=Integration|(TestCategory=Integration&(TestCategory=SQLite)))'
+- dotnet publish src/FluentMigrator.Console/FluentMigrator.Console.csproj -c Release -r win7-x86 -o "$TRAVIS_BUILD_DIR/publish/tools/net461/x86" -p:Platform=x86 -p:TargetFramework=net461
+- dotnet publish src/FluentMigrator.Console/FluentMigrator.Console.csproj -c Release -r win7-x64 -o "$TRAVIS_BUILD_DIR/publish/tools/net461/x64" -p:Platform=x64 -p:TargetFramework=net461
+- dotnet publish src/FluentMigrator.Console/FluentMigrator.Console.csproj -c Release -r any -o "$TRAVIS_BUILD_DIR/publish/tools/net461/any" -p:Platform=AnyCPU -p:TargetFramework=net461
+- nuget pack publish/FluentMigrator.Console.nuspec -OutputDirectory "$TRAVIS_BUILD_DIR/output" -Version "$VERSION" -Properties Configuration=Release
+- nuget pack publish/FluentMigrator.Tools.nuspec -OutputDirectory "$TRAVIS_BUILD_DIR/output" -Version "$VERSION" -Properties Configuration=Release
 - $DOCFX_TOOL metadata docfx_project/docfx.json
 - $DOCFX_TOOL build docfx_project/docfx.json
 after_success:
