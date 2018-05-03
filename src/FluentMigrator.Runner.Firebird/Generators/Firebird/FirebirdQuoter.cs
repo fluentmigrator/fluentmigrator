@@ -76,6 +76,8 @@ namespace FluentMigrator.Runner.Generators.Firebird
 
         protected override bool ShouldQuote(string name)
         {
+            if (string.IsNullOrEmpty(name))
+                return false;
             if (_forceQuote)
                 return true;
             if (_keywords.Contains(name))
