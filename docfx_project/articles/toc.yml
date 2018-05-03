@@ -38,6 +38,8 @@
   items:
   - name: Console
     href: xref:runner-console
+  - name: dotnet-fm
+    href: xref:dotnet-fm
 - name: Obsolete Features
   items:
   - name: "ApplicationContext: Passing parameters to Migrations"
