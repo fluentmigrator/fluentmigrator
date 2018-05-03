@@ -18,6 +18,6 @@ In addition to forward migration support, FluentMigrator also supports different
 	</metadata>
 	<files>
 		<file src="_._" target="content"/>
-		<file src="tools\" target="tools\"/>
+		<file src="tools/" />
 	</files>
 </package>
