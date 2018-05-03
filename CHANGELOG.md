@@ -22,6 +22,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Support for loading connection strings using a provided `IConfiguration` service ([Microsoft.Extensions.Configuration](https://github.com/aspnet/Configuration/))
 - [#822](https://github.com/fluentmigrator/fluentmigrator/issues/822): `IMigrationExpressionValidator` for custom migration expression validation
 
+### Fixed
+
+- [#767](https://github.com/fluentmigrator/fluentmigrator/issues/767): Append `NULL` constraint for custom types for PostgreSQL and SQL Server
+
 ### Deprecated
 
 - `IAssemblyCollection` and all its implementations
