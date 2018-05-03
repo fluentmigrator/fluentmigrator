@@ -40,9 +40,6 @@ namespace FluentMigrator.DotNet.Cli
         public string OutputFileName { get; private set; }
         public bool AllowBreakingChanges { get; private set; }
 
-        public bool ExecutingAgainstMsSql
-            => ProcessorType.StartsWith("SqlServer", StringComparison.InvariantCultureIgnoreCase);
-
         public static MigratorOptions CreateListMigrations(ListMigrations cmd)
         {
             var result = new MigratorOptions("listmigrations")
