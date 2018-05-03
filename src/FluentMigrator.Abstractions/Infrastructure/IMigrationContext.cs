@@ -45,23 +45,5 @@ namespace FluentMigrator.Infrastructure
         /// Gets the <see cref="IQuerySchema"/> to access the database
         /// </summary>
         IQuerySchema QuerySchema { get; }
-
-        /// <summary>
-        /// Gets or sets the collection of migration assemblies
-        /// </summary>
-        [Obsolete]
-        [CanBeNull]
-        IAssemblyCollection MigrationAssemblies { get; set; }
-
-        /// <summary>
-        /// Gets or sets the arbitrary application context passed to the task runner
-        /// </summary>
-        [Obsolete]
-        object ApplicationContext { get; set; }
-
-        /// <summary>
-        /// Gets or sets the connection string
-        /// </summary>
-        string Connection { get; set; }
     }
 }

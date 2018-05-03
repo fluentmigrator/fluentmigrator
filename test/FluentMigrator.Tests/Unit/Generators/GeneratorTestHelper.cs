@@ -478,7 +478,7 @@ namespace FluentMigrator.Tests.Unit.Generators
         {
             var serviceProvider = new ServiceCollection().BuildServiceProvider();
             var querySchema = new Mock<IQuerySchema>();
-            var context = new MigrationContext(querySchema.Object, serviceProvider, null, null);
+            var context = new MigrationContext(querySchema.Object, serviceProvider);
             var expr = new CreateColumnExpression
             {
                 TableName = TestTableName1,

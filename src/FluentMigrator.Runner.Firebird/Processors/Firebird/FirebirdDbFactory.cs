@@ -27,12 +27,6 @@ namespace FluentMigrator.Runner.Processors.Firebird
             new TestEntry("FirebirdSql.Data.FirebirdClient", "FirebirdSql.Data.FirebirdClient.FirebirdClientFactory"),
         };
 
-        [Obsolete]
-        public FirebirdDbFactory()
-            : this(null)
-        {
-        }
-
         public FirebirdDbFactory(IServiceProvider serviceProvider)
             : base(serviceProvider, _entries)
         {

@@ -285,7 +285,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             [TestCase(38)]
             public void ItMapsDecimalWithPrecisionToDecimal(int precision)
             {
-                var template = TypeMap.GetTypeMap(DbType.Decimal, (int?)precision, 1);
+                var template = TypeMap.GetTypeMap(DbType.Decimal, precision, 1);
 
                 template.ShouldBe($"DECIMAL({precision},1)");
             }

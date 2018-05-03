@@ -289,7 +289,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
             [TestCase(38)]
             public void ItMapsDecimalWithPrecisionToDecimal(int precision)
             {
-                var template = TypeMap.GetTypeMap(DbType.Decimal, (int?)precision, precision: 1);
+                var template = TypeMap.GetTypeMap(DbType.Decimal, precision, precision: 1);
 
                 template.ShouldBe($"DECIMAL({precision},1)");
             }
@@ -315,7 +315,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
             [TestCase(38)]
             public void ItMapsVarnumericWithPrecisionToNumeric(int precision)
             {
-                var template = TypeMap.GetTypeMap(DbType.VarNumeric, (int?)precision, 1);
+                var template = TypeMap.GetTypeMap(DbType.VarNumeric, precision, 1);
 
                 template.ShouldBe($"NUMERIC({precision},1)");
             }

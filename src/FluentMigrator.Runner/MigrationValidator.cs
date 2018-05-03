@@ -25,7 +25,6 @@ using System.Text;
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Exceptions;
-using FluentMigrator.Runner.Logging;
 using FluentMigrator.Validation;
 
 using JetBrains.Annotations;
@@ -36,26 +35,15 @@ namespace FluentMigrator.Runner
 {
     public class MigrationValidator
     {
-        [CanBeNull]
+        [NotNull]
         private readonly ILogger _logger;
 
-        [CanBeNull]
+        [NotNull]
         private readonly IConventionSet _conventions;
 
         [NotNull]
         private readonly IMigrationExpressionValidator _validator;
 
-        internal MigrationValidator(
-            [NotNull] ILogger logger,
-            [NotNull] IConventionSet conventions,
-            [CanBeNull] IMigrationExpressionValidator validator = null)
-        {
-            _logger = logger;
-            _conventions = conventions;
-            _validator = validator ?? new DefaultMigrationExpressionValidator(serviceProvider: null);
-        }
-
-        // ReSharper disable once UnusedMember.Global
         public MigrationValidator(
             [NotNull] ILogger<MigrationValidator> logger,
             [NotNull] IConventionSet conventions,
@@ -64,20 +52,6 @@ namespace FluentMigrator.Runner
             _logger = logger;
             _conventions = conventions;
             _validator = validator ?? new DefaultMigrationExpressionValidator(serviceProvider: null);
-        }
-
-        [Obsolete]
-        public MigrationValidator()
-        {
-            _validator = new DefaultMigrationExpressionValidator(null);
-        }
-
-        [Obsolete]
-        public MigrationValidator(IAnnouncer announcer, IConventionSet conventions)
-        {
-            _validator = new DefaultMigrationExpressionValidator(null);
-            _logger = new AnnouncerFluentMigratorLogger(announcer);
-            _conventions = conventions;
         }
 
         /// <summary>
@@ -107,7 +81,7 @@ namespace FluentMigrator.Runner
             if (errorMessageBuilder.Length > 0)
             {
                 var errorMessage = errorMessageBuilder.ToString();
-                _logger?.LogError("The migration {0} contained the following Validation Error(s): {1}", migration.GetType().Name, errorMessage);
+                _logger.LogError("The migration {0} contained the following Validation Error(s): {1}", migration.GetType().Name, errorMessage);
                 throw new InvalidMigrationException(migration, errorMessage);
             }
         }

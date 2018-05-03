@@ -94,20 +94,5 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
             var result = Generator.Generate(expression);
             result.ShouldBe("INSERT INTO [dbo].[TestTable] ([NonUnicodeStringValue]) VALUES ('NonUnicodeString')");
         }
-
-        [Test]
-        [Obsolete]
-        public void ExplicitUnicodeQuotesCorrectly()
-        {
-            var expression = new InsertDataExpression {TableName = "TestTable"};
-            expression.Rows.Add(new InsertionDataDefinition
-                                    {
-                                        new KeyValuePair<string, object>("UnicodeStringValue", new ExplicitUnicodeString("UnicodeString")),
-                                        new KeyValuePair<string, object>("StringValue", "String")
-                                    });
-
-            var result = Generator.Generate(expression);
-            result.ShouldBe("INSERT INTO [dbo].[TestTable] ([UnicodeStringValue], [StringValue]) VALUES (N'UnicodeString', N'String')");
-        }
     }
 }

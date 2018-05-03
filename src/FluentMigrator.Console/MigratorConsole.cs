@@ -25,7 +25,6 @@ using FluentMigrator.Runner;
 using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Exceptions;
 using FluentMigrator.Runner.Initialization;
-using FluentMigrator.Runner.Initialization.NetFramework;
 using FluentMigrator.Runner.Logging;
 using FluentMigrator.Runner.Processors;
 
@@ -325,10 +324,6 @@ namespace FluentMigrator.Console
                 .AddSingleton<IConventionSet>(conventionSet)
                 .Configure<SelectingProcessorAccessorOptions>(opt => opt.ProcessorId = ProcessorType)
                 .Configure<AssemblySourceOptions>(opt => opt.AssemblyNames = new[] { TargetAssembly })
-#pragma warning disable 612
-                .Configure<AppConfigConnectionStringAccessorOptions>(
-                    opt => opt.ConnectionStringConfigPath = ConnectionStringConfigPath)
-#pragma warning restore 612
                 .Configure<TypeFilterOptions>(
                     opt =>
                     {
@@ -345,9 +340,6 @@ namespace FluentMigrator.Console
                         opt.Steps = Steps;
                         opt.Profile = Profile;
                         opt.Tags = Tags.ToArray();
-#pragma warning disable 612
-                        opt.ApplicationContext = ApplicationContext;
-#pragma warning restore 612
                         opt.TransactionPerSession = TransactionPerSession;
                         opt.AllowBreakingChange = AllowBreakingChange;
                     })

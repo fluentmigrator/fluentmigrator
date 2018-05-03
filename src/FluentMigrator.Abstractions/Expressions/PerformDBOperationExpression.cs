@@ -18,7 +18,7 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
-using System.Data;
+using System.Data.Common;
 
 using FluentMigrator.Infrastructure;
 
@@ -33,7 +33,7 @@ namespace FluentMigrator.Expressions
         /// Gets or sets the operation to be executed for a given database connection
         /// </summary>
         [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.OperationCannotBeNull))]
-        public Action<IDbConnection, IDbTransaction> Operation { get; set; }
+        public Action<DbConnection, DbTransaction> Operation { get; set; }
 
         /// <inheritdoc />
         public override void ExecuteWith(IMigrationProcessor processor)

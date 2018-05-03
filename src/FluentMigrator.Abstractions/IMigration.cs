@@ -26,16 +26,6 @@ namespace FluentMigrator
     public interface IMigration
     {
         /// <summary>
-        /// Gets the arbitrary application context passed to the task runner
-        /// </summary>
-        object ApplicationContext { get; }
-
-        /// <summary>
-        /// Gets the connection string passed to the task runner
-        /// </summary>
-        string ConnectionString { get; }
-
-        /// <summary>
         /// Collects all Up migration expressions in the <paramref name="context"/>.
         /// </summary>
         /// <param name="context">The context to use while collecting the Up migration expressions</param>

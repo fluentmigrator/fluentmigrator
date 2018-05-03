@@ -73,19 +73,6 @@ namespace FluentMigrator.Runner.Generators.Base
         /// <param name="size">The size (or precision)</param>
         /// <param name="precision">The precision (or scale)</param>
         /// <returns>The formatted column type</returns>
-        [Obsolete]
-        protected string GetTypeMap(DbType value, int size, int precision)
-        {
-            return _typeMap.GetTypeMap(value, size, precision);
-        }
-
-        /// <summary>
-        /// Gets the formatted type from the type map
-        /// </summary>
-        /// <param name="value">The database type</param>
-        /// <param name="size">The size (or precision)</param>
-        /// <param name="precision">The precision (or scale)</param>
-        /// <returns>The formatted column type</returns>
         protected string GetTypeMap(DbType value, int? size, int? precision)
         {
             return _typeMap.GetTypeMap(value, size, precision);

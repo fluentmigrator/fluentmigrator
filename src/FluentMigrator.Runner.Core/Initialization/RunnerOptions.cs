@@ -27,23 +27,6 @@ namespace FluentMigrator.Runner.Initialization
     public class RunnerOptions
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="RunnerOptions"/> class.
-        /// </summary>
-        public RunnerOptions()
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="RunnerOptions"/> class.
-        /// </summary>
-        /// <param name="runnerContext">The runner context</param>
-        [Obsolete]
-        public RunnerOptions(IRunnerContext runnerContext)
-        {
-            SetValuesFrom(runnerContext);
-        }
-
-        /// <summary>
         /// Gets or sets the task to execute
         /// </summary>
         [CanBeNull]
@@ -91,12 +74,6 @@ namespace FluentMigrator.Runner.Initialization
         public bool TransactionPerSession { get; set; }
 
         /// <summary>
-        /// Gets or sets the arbitrary application context passed to the task runner
-        /// </summary>
-        [Obsolete]
-        public object ApplicationContext { get; set; }
-
-        /// <summary>
         /// Gets or sets a value indicating whether no connection should be used
         /// </summary>
         /// <remarks>
@@ -105,24 +82,5 @@ namespace FluentMigrator.Runner.Initialization
         /// state of the database.
         /// </remarks>
         public bool NoConnection { get; set; }
-
-        /// <summary>
-        /// Sets the values from the given runner context
-        /// </summary>
-        /// <param name="runnerContext">The runner context</param>
-        [Obsolete]
-        public void SetValuesFrom(IRunnerContext runnerContext)
-        {
-            Task = runnerContext.Task;
-            Version = runnerContext.Version;
-            StartVersion = runnerContext.StartVersion;
-            Steps = runnerContext.Steps;
-            Profile = runnerContext.Profile;
-            Tags = runnerContext.Tags?.ToArray();
-            AllowBreakingChange = runnerContext.AllowBreakingChange;
-            TransactionPerSession = runnerContext.TransactionPerSession;
-            ApplicationContext = runnerContext.ApplicationContext;
-            NoConnection = runnerContext.NoConnection;
-        }
     }
 }

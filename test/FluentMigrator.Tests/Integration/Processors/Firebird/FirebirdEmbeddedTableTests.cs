@@ -18,15 +18,11 @@
 
 using System;
 using System.Linq;
-using System.Reflection;
 
 using FirebirdSql.Data.FirebirdClient;
 
 using FluentMigrator.Runner;
-using FluentMigrator.Runner.Announcers;
-using FluentMigrator.Runner.Generators.Firebird;
 using FluentMigrator.Runner.Initialization;
-using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Firebird;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -410,51 +406,6 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                     tableName = "TheNewTable";
                     AssertThatFieldHasCorrectTypeAndSubType(fieldName, tableName, processor, expectedFieldType, expectedFieldSubType);
                 }
-            }
-        }
-
-        [Test]
-        [Obsolete]
-        public void ObsoleteAlterTable_MigrationRequiresAutomaticDelete_AndProcessorHasUndoDisabled_ShouldNotThrow()
-        {
-            using (var tempDb = new TemporaryDatabase(IntegrationTestOptions.Firebird, _firebirdLibraryProber))
-            {
-                var connectionString = tempDb.ConnectionString;
-
-                var runnerContext = new RunnerContext(new TextWriterAnnouncer(TestContext.Out))
-                {
-                    Namespace = "FluentMigrator.Tests.Integration.Migrations"
-                };
-
-                using (var connection = new FbConnection(connectionString))
-                {
-                    var announcer = new TextWriterAnnouncer(TestContext.Out) { ShowSql = true };
-                    var options = FirebirdOptions.AutoCommitBehaviour();
-                    options.TruncateLongNames = false;
-                    var processor = new FirebirdProcessor(connection, new FirebirdGenerator(options), announcer,
-                        new ProcessorOptions(), new FirebirdDbFactory(), options);
-                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), runnerContext, processor);
-                    runner.Up(new MigrationWhichCreatesTwoRelatedTables());
-                    processor.CommitTransaction();
-                    FbConnection.ClearPool(connection);
-                }
-
-                //---------------Assert Precondition----------------
-                Assert.IsTrue(ForeignKeyExists(connectionString, MigrationWhichCreatesTwoRelatedTables.ForeignKeyName),
-                    "Foreign key does not exist after first migration");
-                using (var connection = new FbConnection(connectionString))
-                {
-                    var announcer = new TextWriterAnnouncer(TestContext.Out) { ShowSql = true };
-                    var options = FirebirdOptions.AutoCommitBehaviour();
-                    var processor = new FirebirdProcessor(connection, new FirebirdGenerator(options), announcer,
-                        new ProcessorOptions(), new FirebirdDbFactory(), options);
-                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), runnerContext, processor);
-                    runner.Up(new MigrationWhichAltersTableWithFK());
-                    processor.CommitTransaction();
-                }
-
-                Assert.IsTrue(ForeignKeyExists(connectionString, MigrationWhichCreatesTwoRelatedTables.ForeignKeyName),
-                    "Foreign key does not exist after second migration");
             }
         }
 

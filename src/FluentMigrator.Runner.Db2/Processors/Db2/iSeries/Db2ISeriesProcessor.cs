@@ -37,13 +37,6 @@ namespace FluentMigrator.Runner.Processors.DB2.iSeries
 {
     public class Db2ISeriesProcessor : GenericProcessorBase
     {
-        [Obsolete]
-        public Db2ISeriesProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
-            : base(connection, factory, generator, announcer, options)
-        {
-            Quoter = new Db2Quoter();
-        }
-
         public Db2ISeriesProcessor(
             [NotNull] Db2ISeriesDbFactory factory,
             [NotNull] Db2ISeriesGenerator generator,
@@ -60,11 +53,7 @@ namespace FluentMigrator.Runner.Processors.DB2.iSeries
 
         public override IList<string> DatabaseTypeAliases { get; } = new List<string> { "IBM DB2 iSeries", "DB2" };
 
-        public IQuoter Quoter
-        {
-            get;
-            set;
-        }
+        public IQuoter Quoter { get; }
 
         public override bool ColumnExists(string schemaName, string tableName, string columnName)
         {

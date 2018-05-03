@@ -30,9 +30,6 @@ namespace FluentMigrator.Model
     /// </summary>
     public class ColumnDefinition
         : ICloneable,
-#pragma warning disable 618
-          ICanBeValidated,
-#pragma warning restore 618
           ISupportAdditionalFeatures,
           IValidatableObject
     {
@@ -132,13 +129,6 @@ namespace FluentMigrator.Model
         /// called on a column.
         /// </remarks>
         public virtual ForeignKeyDefinition ForeignKey { get; set; }
-
-        /// <inheritdoc />
-        [Obsolete("Use the System.ComponentModel.DataAnnotations.Validator instead")]
-        public virtual void CollectValidationErrors(ICollection<string> errors)
-        {
-            this.CollectErrors(errors);
-        }
 
         /// <inheritdoc />
         public virtual object Clone()

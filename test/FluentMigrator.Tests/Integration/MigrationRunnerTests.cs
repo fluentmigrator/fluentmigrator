@@ -35,6 +35,7 @@ using FluentMigrator.Runner.Processors.Postgres;
 using FluentMigrator.Runner.Processors.SqlAnywhere;
 using FluentMigrator.Runner.Processors.SQLite;
 using FluentMigrator.Runner.Processors.SqlServer;
+using FluentMigrator.Runner.VersionTableInfo;
 using FluentMigrator.SqlAnywhere;
 using FluentMigrator.Tests.Integration.Migrations.Tagged;
 using FluentMigrator.Tests.Unit;
@@ -950,7 +951,8 @@ namespace FluentMigrator.Tests.Integration
                 services => services
                     .WithMigrationsIn(RootNamespace)
                     .Configure<ProcessorOptions>(opt => opt.PreviewOnly = true)
-                    .AddSingleton<ILoggerProvider>(provider),
+                    .AddSingleton<ILoggerProvider>(provider)
+                    .AddSingleton<IVersionTableMetaData, TestVersionTableMetaData>(),
                 (serviceProvider, processor) =>
                 {
                     try

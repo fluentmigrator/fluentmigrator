@@ -17,68 +17,24 @@
 #endregion
 
 using System;
-using System.Data;
 using System.Data.Common;
-using System.Diagnostics;
 
 namespace FluentMigrator.Runner.Processors
 {
-#pragma warning disable 612
-    public abstract class DbFactoryBase : IDbFactory
-#pragma warning restore 612
+    public abstract class DbFactoryBase
     {
-        private readonly object _lock = new object();
-        private volatile DbProviderFactory _factory;
-
-        protected DbFactoryBase(DbProviderFactory factory)
-        {
-            _factory = factory;
-        }
+        private readonly Lazy<DbProviderFactory> _lazyFactory;
 
         protected DbFactoryBase()
         {
+            _lazyFactory = new Lazy<DbProviderFactory>(CreateFactory);
         }
 
         /// <summary>
         /// Gets the DB provider factory
         /// </summary>
-        public virtual DbProviderFactory Factory
-        {
-            get
-            {
-                if (_factory == null)
-                {
-                    lock (_lock)
-                    {
-                        if (_factory == null)
-                        {
-                            _factory = CreateFactory();
-                        }
-                    }
-                }
-                return _factory;
-            }
-        }
+        public virtual DbProviderFactory Factory => _lazyFactory.Value;
 
         protected abstract DbProviderFactory CreateFactory();
-
-        [Obsolete]
-        public IDbConnection CreateConnection(string connectionString)
-        {
-            var connection = Factory.CreateConnection();
-            Debug.Assert(connection != null, nameof(connection) + " != null");
-            connection.ConnectionString = connectionString;
-            return connection;
-        }
-
-        [Obsolete]
-        public virtual IDbCommand CreateCommand(string commandText, IDbConnection connection, IDbTransaction transaction, IMigrationProcessorOptions options)
-        {
-            var command = connection.CreateCommand();
-            command.CommandText = commandText;
-            if (options?.Timeout != null) command.CommandTimeout = options.Timeout.Value;
-            if (transaction != null) command.Transaction = transaction;
-            return command;
-        }
     }
 }

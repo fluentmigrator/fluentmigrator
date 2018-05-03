@@ -20,25 +20,29 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
-
-using FluentMigrator.Runner.Infrastructure.Hosts;
 
 namespace FluentMigrator.Runner.Infrastructure
 {
     public static class RuntimeHost
     {
-        private static readonly string[] _noNames = new string[0];
-
 #if NETFRAMEWORK
-        private static readonly IHostAbstraction _currentHost = new NetFrameworkHost();
+        public static string BaseDirectory = AppDomain.CurrentDomain.BaseDirectory;
 #else
-        private static readonly IHostAbstraction _currentHost = new NetCoreHost();
+        public static string BaseDirectory = AppContext.BaseDirectory;
 #endif
 
-        public static IHostAbstraction Current => _currentHost;
+        public static IEnumerable<AssemblyName> FindAssemblies(string name)
+        {
+            foreach (var assemblyName in FindAssemblies())
+            {
+                if (string.Equals(assemblyName.Name, name, StringComparison.OrdinalIgnoreCase))
+                    yield return assemblyName;
+            }
+        }
 
-        public static IEnumerable<AssemblyName> FindAssemblies()
+        private static IEnumerable<AssemblyName> FindAssemblies()
         {
             foreach (var fullGacDirectory in GetFullGacDirectories())
             {
@@ -50,15 +54,6 @@ namespace FluentMigrator.Runner.Infrastructure
                         yield return asmName;
                     }
                 }
-            }
-        }
-
-        public static IEnumerable<AssemblyName> FindAssemblies(string name)
-        {
-            foreach (var assemblyName in FindAssemblies())
-            {
-                if (string.Equals(assemblyName.Name, name, StringComparison.OrdinalIgnoreCase))
-                    yield return assemblyName;
             }
         }
 
@@ -120,16 +115,16 @@ namespace FluentMigrator.Runner.Infrastructure
             var asmPath = typeof(Int32).Assembly.Location;
             var isMono = asmPath.Contains("/mono/");
             if (!isMono)
-                return _noNames;
+                return Enumerable.Empty<string>();
 
             var frameworkDir = Path.GetDirectoryName(asmPath);
             var frameworkBaseDir = Path.GetDirectoryName(frameworkDir);
             if (frameworkBaseDir == null)
-                return _noNames;
+                return Enumerable.Empty<string>();
 
             var gacDir = Path.Combine(frameworkBaseDir, "gac");
             if (!Directory.Exists(gacDir))
-                return _noNames;
+                return Enumerable.Empty<string>();
 
             return new[] { gacDir };
         }

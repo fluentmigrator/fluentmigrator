@@ -39,9 +39,6 @@ namespace FluentMigrator.Runner.Infrastructure
         public Func<Type, MigrationStage?> GetMaintenanceStage => GetMaintenanceStageImpl;
         public Func<Type, bool> TypeIsVersionTableMetaData => TypeIsVersionTableMetaDataImpl;
 
-        [Obsolete]
-        public Func<Type, IMigrationInfo> GetMigrationInfo => GetMigrationInfoForImpl;
-
         /// <inheritdoc />
         public Func<IMigration, IMigrationInfo> GetMigrationInfoForMigration => GetMigrationInfoForMigrationImpl;
 
@@ -82,12 +79,6 @@ namespace FluentMigrator.Runner.Infrastructure
                 migrationInfo.AddTrait(traitAttribute.Name, traitAttribute.Value);
 
             return migrationInfo;
-        }
-
-        private IMigrationInfo GetMigrationInfoForImpl(Type migrationType)
-        {
-            var migration = (IMigration) Activator.CreateInstance(migrationType);
-            return GetMigrationInfoForMigration(migration);
         }
 
         private static bool TypeHasTagsImpl(Type type)

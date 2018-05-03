@@ -57,8 +57,7 @@ namespace FluentMigrator.Tests.Integration
                     var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
 
                     IVersionTableMetaData tableMetaData = new DefaultVersionTableMetaData(
-                        ConventionSets.NoSchemaName,
-                        serviceProvider.GetRequiredService<IOptions<RunnerOptions>>());
+                        ConventionSets.NoSchemaName);
 
                     //ensure table doesn't exist
                     if (processor.TableExists(tableMetaData.SchemaName, tableMetaData.TableName))

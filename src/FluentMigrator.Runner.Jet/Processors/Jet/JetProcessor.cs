@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Data.OleDb;
 using System.Diagnostics;
 
@@ -35,21 +36,10 @@ namespace FluentMigrator.Runner.Processors.Jet
 {
     public class JetProcessor : ProcessorBase
     {
-        private readonly IDbConnection _connection;
-        private IDbTransaction _transaction;
+        private readonly DbConnection _connection;
+        private DbTransaction _transaction;
         public OleDbConnection Connection => (OleDbConnection) _connection;
         public OleDbTransaction Transaction => (OleDbTransaction) _transaction;
-
-        [Obsolete]
-        public JetProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options)
-            : base(generator, announcer, options)
-        {
-            _connection = connection;
-
-            // Prefetch connectionstring as after opening the security info could no longer be present
-            // for instance on sql server
-            ConnectionString = connection.ConnectionString;
-        }
 
         public JetProcessor(
             [NotNull] JetGenerator generator,
@@ -65,14 +55,7 @@ namespace FluentMigrator.Runner.Processors.Jet
                 Debug.Assert(_connection != null, nameof(_connection) + " != null");
                 _connection.ConnectionString = connectionStringAccessor.ConnectionString;
             }
-
-#pragma warning disable 612
-            ConnectionString = options.Value.ConnectionString;
-#pragma warning restore 612
         }
-
-        [Obsolete]
-        public override string ConnectionString { get; }
 
         public override string DatabaseType { get; } = "Jet";
 

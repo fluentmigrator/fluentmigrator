@@ -47,6 +47,8 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
         [CanBeNull]
         private readonly IServiceProvider _serviceProvider;
 
+        private readonly string _connectionString;
+
         //select 1 from sys.syscolumn as c inner join sys.systable as t on t.table_id = c.table_id where t.table_name = '{0}' and c.column_name = '{1}'
         private const string SCHEMA_EXISTS = "SELECT 1 WHERE EXISTS (SELECT * FROM sys.sysuserperm WHERE user_name = '{0}') ";
         private const string TABLE_EXISTS = "SELECT 1 WHERE EXISTS (SELECT t.* FROM sys.systable AS t INNER JOIN sys.sysuserperm AS up ON up.user_id = t.creator WHERE up.user_name = '{0}' AND t.table_name = '{1}')";
@@ -55,17 +57,6 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
         private const string INDEX_EXISTS = "SELECT 1 WHERE EXISTS (SELECT i.* FROM sys.sysindex AS i INNER JOIN sys.systable AS t ON t.table_id = i.table_id INNER JOIN sys.sysuserperm AS up ON up.user_id = t.creator WHERE i.index_name = '{0}' AND up.user_name = '{1}' AND t.table_name = '{2}')";
         private const string SEQUENCES_EXISTS = "SELECT 1 WHERE EXISTS (SELECT s.* FROM sys.syssequence AS s INNER JOIN sys.sysuserperm AS up ON up.user_id = s.owner WHERE up.user_name = '{0}' AND s.sequence_name = '{1}' )";
         private const string DEFAULTVALUE_EXISTS = "SELECT 1 WHERE EXISTS (SELECT c.* FROM sys.syscolumn AS c INNER JOIN sys.systable AS t ON t.table_id = c.table_id INNER JOIN sys.sysuserperm AS up ON up.user_id = t.creator WHERE up.user_name = '{0}' AND t.table_name = '{1}' AND c.column_name = '{2}' AND c.default LIKE '{3}')";
-
-        public override string DatabaseType { get; }
-
-        public override IList<string> DatabaseTypeAliases { get; } = new List<string> { "SqlAnywhere" };
-
-        [Obsolete]
-        public SqlAnywhereProcessor(string databaseType, IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
-            : base(connection, factory, generator, announcer, options)
-        {
-            DatabaseType = databaseType;
-        }
 
         protected SqlAnywhereProcessor(
             [NotNull] string databaseType,
@@ -77,9 +68,14 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
             [NotNull] IServiceProvider serviceProvider)
             : base(factoryAccessor, generator, logger, options.Value, connectionStringAccessor)
         {
+            _connectionString = connectionStringAccessor.ConnectionString;
             _serviceProvider = serviceProvider;
             DatabaseType = databaseType;
         }
+
+        public override string DatabaseType { get; }
+
+        public override IList<string> DatabaseTypeAliases { get; } = new List<string> { "SqlAnywhere" };
 
         private static string SafeSchemaName(string schemaName)
         {
@@ -153,19 +149,9 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
             var sql = Generator.Generate(expression);
             string connectionString = ReplaceUserIdAndPasswordInConnectionString(expression.SchemaName, password);
             Logger.LogSay($"Creating connection for user {expression.SchemaName} to create schema.");
-            IDbConnection connection;
-            if (DbProviderFactory == null)
-            {
-#pragma warning disable 612
-                connection = Factory.CreateConnection(connectionString);
-#pragma warning restore 612
-            }
-            else
-            {
-                connection = DbProviderFactory.CreateConnection();
-                Debug.Assert(connection != null, nameof(connection) + " != null");
-                connection.ConnectionString = connectionString;
-            }
+            var connection = DbProviderFactory.CreateConnection();
+            Debug.Assert(connection != null, nameof(connection) + " != null");
+            connection.ConnectionString = connectionString;
 
             EnsureConnectionIsOpen(connection);
             Logger.LogSay("Beginning out of scope transaction to create schema.");
@@ -185,16 +171,14 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
             }
             finally
             {
-                transaction?.Dispose();
+                transaction.Dispose();
                 connection.Dispose();
             }
         }
 
         private string ReplaceUserIdAndPasswordInConnectionString(string userId, string password)
         {
-#pragma warning disable 618, 612
-            var csb = new DbConnectionStringBuilder { ConnectionString = ConnectionString };
-#pragma warning restore 618, 612
+            var csb = new DbConnectionStringBuilder { ConnectionString = _connectionString };
             var uidKey = new[] { "uid", "userid" }.FirstOrDefault(x => csb.ContainsKey(x)) ?? "uid";
             var pwdKey = new[] { "pwd", "password" }.FirstOrDefault(x => csb.ContainsKey(x)) ?? "pwd";
             csb[uidKey] = userId;
@@ -268,13 +252,13 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
             return containsGo;
         }
 
-        private void EnsureConnectionIsOpen(IDbConnection connection)
+        private void EnsureConnectionIsOpen(DbConnection connection)
         {
             if (connection.State != ConnectionState.Open)
                 connection.Open();
         }
 
-        private void ExecuteNonQuery(IDbConnection connection, IDbTransaction transaction, string sql)
+        private void ExecuteNonQuery(DbConnection connection, DbTransaction transaction, string sql)
         {
             using (var command = CreateCommand(sql, connection, transaction))
             {

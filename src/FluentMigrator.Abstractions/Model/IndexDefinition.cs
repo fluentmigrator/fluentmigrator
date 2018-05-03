@@ -32,9 +32,6 @@ namespace FluentMigrator.Model
     /// </summary>
     public class IndexDefinition
         : ICloneable,
-#pragma warning disable 618
-          ICanBeValidated,
-#pragma warning restore 618
           ISupportAdditionalFeatures,
           IValidatableObject,
           IValidationChildren
@@ -75,13 +72,6 @@ namespace FluentMigrator.Model
 
         /// <inheritdoc />
         public virtual IDictionary<string, object> AdditionalFeatures => _additionalFeatures;
-
-        /// <inheritdoc />
-        [Obsolete("Use the System.ComponentModel.DataAnnotations.Validator instead")]
-        public virtual void CollectValidationErrors(ICollection<string> errors)
-        {
-            this.CollectErrors(errors);
-        }
 
         /// <inheritdoc />
         public object Clone()

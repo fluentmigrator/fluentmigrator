@@ -32,9 +32,6 @@ namespace FluentMigrator.Runner.Generators.Generic
                 case null:
                 case DBNull _:
                     return FormatNull();
-#pragma warning disable 618
-                case ExplicitUnicodeString _:
-#pragma warning restore 618
                 case string _:
                     return FormatNationalString(value.ToString());
                 case NonUnicodeString _:

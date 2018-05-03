@@ -17,7 +17,6 @@
 #endregion
 
 using System;
-using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -69,7 +68,7 @@ namespace FluentMigrator.Tests.Unit
 
             var migrationList = loader.LoadMigrations();
             migrationList.Select(x => x.Value.Migration.GetType()).ShouldNotContain(typeof(VersionedMigration));
-            migrationList.Count().ShouldBeGreaterThan(0);
+            migrationList.Count.ShouldBeGreaterThan(0);
         }
 
         [Test]
@@ -207,7 +206,7 @@ namespace FluentMigrator.Tests.Unit
                 .WithMigrationsIn("FluentMigrator.Tests.Unit.DoesNotInheritFromBaseClass")
                 .BuildServiceProvider()
                 .GetRequiredService<IMigrationInformationLoader>();
-            Assert.That(loader.LoadMigrations().Count(), Is.EqualTo(1));
+            Assert.That(loader.LoadMigrations().Count, Is.EqualTo(1));
         }
 
         [Test]
@@ -220,185 +219,7 @@ namespace FluentMigrator.Tests.Unit
 
             var list = loader.LoadMigrations().ToList();
 
-            list.Count().ShouldBe(2);
-
-            list[0].Value.Migration.GetType().ShouldBe(typeof(DoesHandleTransactionLessMigrations.MigrationThatIsTransactionLess));
-            list[0].Value.TransactionBehavior.ShouldBe(TransactionBehavior.None);
-            list[0].Value.Version.ShouldBe(1);
-
-            list[1].Value.Migration.GetType().ShouldBe(typeof(DoesHandleTransactionLessMigrations.MigrationThatIsNotTransactionLess));
-            list[1].Value.TransactionBehavior.ShouldBe(TransactionBehavior.Default);
-            list[1].Value.Version.ShouldBe(2);
-        }
-
-        [Test]
-        [Obsolete]
-        public void ObsoleteCanFindMigrationsInAssembly()
-        {
-            var conventions = new MigrationRunnerConventions();
-            var asm = Assembly.GetExecutingAssembly();
-            var loader = new DefaultMigrationInformationLoader( conventions, asm, "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass1", null);
-
-            SortedList<long, IMigrationInfo> migrationList = loader.LoadMigrations();
-
-            //if this works, there will be at least one migration class because i've included on in this code file
-            int count = migrationList.Count();
-            count.ShouldBeGreaterThan(0);
-        }
-
-        [Test]
-        [Obsolete]
-        public void ObsoleteCanFindMigrationsInNamespace()
-        {
-            var conventions = new MigrationRunnerConventions();
-            var asm = Assembly.GetExecutingAssembly();
-            var loader = new DefaultMigrationInformationLoader(conventions, asm, "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass1", null);
-
-            var migrationList = loader.LoadMigrations();
-            migrationList.Select(x => x.Value.Migration.GetType()).ShouldNotContain(typeof(VersionedMigration));
-            migrationList.Count().ShouldBeGreaterThan(0);
-        }
-
-        [Test]
-        [Obsolete]
-        public void ObsoleteDefaultBehaviorIsToNotLoadNestedNamespaces()
-        {
-            var conventions = new MigrationRunnerConventions();
-            var asm = Assembly.GetExecutingAssembly();
-            var loader = new DefaultMigrationInformationLoader(conventions, asm, "FluentMigrator.Tests.Integration.Migrations.Nested", null);
-
-            loader.LoadNestedNamespaces.ShouldBe(false);
-        }
-
-        [Test]
-        [Obsolete]
-        public void ObsoleteFindsMigrationsInNestedNamespaceWhenLoadNestedNamespacesEnabled()
-        {
-            var conventions = new MigrationRunnerConventions();
-            var asm = Assembly.GetExecutingAssembly();
-            var loader = new DefaultMigrationInformationLoader(conventions, asm, "FluentMigrator.Tests.Integration.Migrations.Nested", true, null);
-
-            List<Type> expected = new List<Type>
-                                      {
-                typeof(Integration.Migrations.Nested.NotGrouped),
-                typeof(Integration.Migrations.Nested.Group1.FromGroup1),
-                typeof(Integration.Migrations.Nested.Group1.AnotherFromGroup1),
-                typeof(Integration.Migrations.Nested.Group2.FromGroup2),
-            };
-
-            var migrationList = loader.LoadMigrations();
-            List<Type> actual = migrationList.Select(m => m.Value.Migration.GetType()).ToList();
-
-            CollectionAssert.AreEquivalent(expected, actual);
-        }
-
-        [Test]
-        [Obsolete]
-        public void ObsoleteDoesNotFindsMigrationsInNestedNamespaceWhenLoadNestedNamespacesDisabled()
-        {
-            var conventions = new MigrationRunnerConventions();
-            var asm = Assembly.GetExecutingAssembly();
-            var loader = new DefaultMigrationInformationLoader(conventions, asm, "FluentMigrator.Tests.Integration.Migrations.Nested", false, null);
-
-            List<Type> expected = new List<Type>
-                                      {
-                typeof(Integration.Migrations.Nested.NotGrouped),
-            };
-
-            var migrationList = loader.LoadMigrations();
-            List<Type> actual = migrationList.Select(m => m.Value.Migration.GetType()).ToList();
-
-            CollectionAssert.AreEquivalent(expected, actual);
-        }
-
-        [Test]
-        [Obsolete]
-        public void ObsoleteDoesFindMigrationsThatHaveMatchingTags()
-        {
-            var asm = Assembly.GetExecutingAssembly();
-            var migrationType = typeof(TaggedMigraion);
-            var tagsToMatch = new[] { "UK", "Production" };
-
-            var conventionsMock = new Mock<IMigrationRunnerConventions>();
-            conventionsMock.SetupGet(m => m.GetMigrationInfoForMigration).Returns(DefaultMigrationRunnerConventions.Instance.GetMigrationInfoForMigration);
-            conventionsMock.SetupGet(m => m.TypeIsMigration).Returns(t => true);
-            conventionsMock.SetupGet(m => m.TypeHasTags).Returns(t => migrationType == t);
-            conventionsMock.SetupGet(m => m.TypeHasMatchingTags).Returns((type, tags) => (migrationType == type && tagsToMatch == tags));
-
-            var loader = new DefaultMigrationInformationLoader(conventionsMock.Object, asm, migrationType.Namespace, tagsToMatch);
-
-            var expected = new List<Type> { typeof(UntaggedMigration), migrationType };
-
-            var actual = loader.LoadMigrations().Select(m => m.Value.Migration.GetType()).ToList();
-
-            CollectionAssert.AreEquivalent(expected, actual);
-        }
-
-        [Test]
-        [Obsolete]
-        public void ObsoleteDoesNotFindMigrationsThatDoNotHaveMatchingTags()
-        {
-            var asm = Assembly.GetExecutingAssembly();
-            var migrationType = typeof(TaggedMigraion);
-            var tagsToMatch = new[] { "UK", "Production" };
-
-            var conventionsMock = new Mock<IMigrationRunnerConventions>();
-            conventionsMock.SetupGet(m => m.GetMigrationInfoForMigration).Returns(DefaultMigrationRunnerConventions.Instance.GetMigrationInfoForMigration);
-            conventionsMock.SetupGet(m => m.TypeIsMigration).Returns(t => true);
-            conventionsMock.SetupGet(m => m.TypeHasTags).Returns(t => migrationType == t);
-            conventionsMock.SetupGet(m => m.TypeHasMatchingTags).Returns((type, tags) => false);
-
-            var loader = new DefaultMigrationInformationLoader(conventionsMock.Object, asm, migrationType.Namespace, tagsToMatch);
-
-            var expected = new List<Type> { typeof(UntaggedMigration) };
-
-            var actual = loader.LoadMigrations().Select(m => m.Value.Migration.GetType()).ToList();
-
-            CollectionAssert.AreEquivalent(expected, actual);
-        }
-
-        [Test]
-        [Obsolete]
-        public void ObsoleteHandlesNotFindingMigrations()
-        {
-            var conventions = new MigrationRunnerConventions();
-            var asm = Assembly.GetExecutingAssembly();
-            var loader = new DefaultMigrationInformationLoader(conventions, asm, "FluentMigrator.Tests.Unit.EmptyNamespace", null);
-            Assert.Throws<MissingMigrationsException>(() => loader.LoadMigrations());
-        }
-
-        [Test]
-        [Obsolete]
-        public void ObsoleteShouldThrowExceptionIfDuplicateVersionNumbersAreLoaded()
-        {
-            var conventions = new MigrationRunnerConventions();
-            var asm = Assembly.GetExecutingAssembly();
-            var migrationLoader = new DefaultMigrationInformationLoader(conventions, asm, "FluentMigrator.Tests.Unit.DuplicateVersionNumbers", null);
-            Assert.Throws<DuplicateMigrationException>(() => migrationLoader.LoadMigrations());
-        }
-
-        [Test]
-        [Obsolete]
-        public void ObsoleteHandlesMigrationThatDoesNotInheritFromMigrationBaseClass()
-        {
-            var conventions = new MigrationRunnerConventions();
-            var asm = Assembly.GetExecutingAssembly();
-            var loader = new DefaultMigrationInformationLoader(conventions, asm, "FluentMigrator.Tests.Unit.DoesNotInheritFromBaseClass", null);
-
-            Assert.That(loader.LoadMigrations().Count(), Is.EqualTo(1));
-        }
-
-        [Test]
-        [Obsolete]
-        public void ObsoleteShouldHandleTransactionlessMigrations()
-        {
-            var conventions = new MigrationRunnerConventions();
-            var asm = Assembly.GetExecutingAssembly();
-            var loader = new DefaultMigrationInformationLoader(conventions, asm, "FluentMigrator.Tests.Unit.DoesHandleTransactionLessMigrations", null);
-
-            var list = loader.LoadMigrations().ToList();
-
-            list.Count().ShouldBe(2);
+            list.Count.ShouldBe(2);
 
             list[0].Value.Migration.GetType().ShouldBe(typeof(DoesHandleTransactionLessMigrations.MigrationThatIsTransactionLess));
             list[0].Value.TransactionBehavior.ShouldBe(TransactionBehavior.None);
@@ -452,14 +273,6 @@ namespace FluentMigrator.Tests.Unit
         [Migration(1)]
         public class MigrationThatDoesNotInheritFromMigrationBaseClass : IMigration
         {
-            /// <summary>The arbitrary application context passed to the task runner.</summary>
-            public object ApplicationContext
-            {
-                get { throw new NotImplementedException(); }
-            }
-
-            public string ConnectionString { get; } = null;
-
             public void GetUpExpressions(IMigrationContext context)
             {
                 throw new NotImplementedException();

@@ -27,12 +27,6 @@ namespace FluentMigrator.Runner.Processors.Oracle
             new TestEntry("Oracle.ManagedDataAccess", "Oracle.ManagedDataAccess.Client.OracleClientFactory"),
         };
 
-        [Obsolete]
-        public OracleManagedDbFactory()
-            : this(serviceProvider: null)
-        {
-        }
-
         public OracleManagedDbFactory(IServiceProvider serviceProvider)
             : base(serviceProvider, _entries)
         {

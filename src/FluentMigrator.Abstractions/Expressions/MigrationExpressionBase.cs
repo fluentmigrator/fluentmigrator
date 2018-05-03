@@ -30,13 +30,6 @@ namespace FluentMigrator.Expressions
         public abstract void ExecuteWith(IMigrationProcessor processor);
 
         /// <inheritdoc />
-        [Obsolete("Use the System.ComponentModel.DataAnnotations.Validator instead")]
-        public virtual void CollectValidationErrors(ICollection<string> errors)
-        {
-            this.CollectErrors(errors);
-        }
-
-        /// <inheritdoc />
         public virtual IMigrationExpression Reverse()
         {
             throw new NotSupportedException($"The {GetType().Name} cannot be automatically reversed");

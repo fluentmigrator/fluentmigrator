@@ -48,13 +48,6 @@ namespace FluentMigrator.Expressions
         public List<InsertionDataDefinition> Rows { get; } = new List<InsertionDataDefinition>();
 
         /// <inheritdoc />
-        [Obsolete("Use the System.ComponentModel.DataAnnotations.Validator instead")]
-        public void CollectValidationErrors(ICollection<string> errors)
-        {
-            this.CollectErrors(errors);
-        }
-
-        /// <inheritdoc />
         public void ExecuteWith(IMigrationProcessor processor)
         {
             processor.Process(this);
@@ -64,10 +57,10 @@ namespace FluentMigrator.Expressions
         public IMigrationExpression Reverse()
         {
             var expression = new DeleteDataExpression
-                                {
-                                    SchemaName = SchemaName,
-                                    TableName = TableName
-                                };
+            {
+                SchemaName = SchemaName,
+                TableName = TableName
+            };
 
             foreach (var row in Rows)
             {

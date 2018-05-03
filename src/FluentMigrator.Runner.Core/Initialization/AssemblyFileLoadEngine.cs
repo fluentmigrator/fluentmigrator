@@ -31,10 +31,10 @@ namespace FluentMigrator.Runner.Initialization
         /// <inheritdoc />
         public bool TryLoad(string name, ICollection<Exception> exceptions, out Assembly assembly)
         {
-            string fileName = name;
+            var fileName = name;
             if (!Path.IsPathRooted(fileName))
             {
-                fileName = Path.Combine(RuntimeHost.Current.BaseDirectory, name);
+                fileName = Path.Combine(RuntimeHost.BaseDirectory, name);
                 if (!File.Exists(fileName))
                 {
                     fileName = Path.GetFullPath(name);

@@ -43,12 +43,6 @@ namespace FluentMigrator.Builders.Delete.Index
         {
         }
 
-        /// <summary>
-        /// Gets or sets the current column
-        /// </summary>
-        [Obsolete("Unused by the Fluent Migrator infrastructure")]
-        public IndexColumnDefinition CurrentColumn { get; set; }
-
         /// <inheritdoc />
         public IDictionary<string, object> AdditionalFeatures => Expression.AdditionalFeatures;
 

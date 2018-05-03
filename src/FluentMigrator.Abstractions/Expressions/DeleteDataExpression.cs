@@ -49,13 +49,6 @@ namespace FluentMigrator.Expressions
         public List<DeletionDataDefinition> Rows { get; } = new List<DeletionDataDefinition>();
 
         /// <inheritdoc />
-        [Obsolete("Use the System.ComponentModel.DataAnnotations.Validator instead")]
-        public void CollectValidationErrors(ICollection<string> errors)
-        {
-            this.CollectErrors(errors);
-        }
-
-        /// <inheritdoc />
         public void ExecuteWith(IMigrationProcessor processor)
         {
             processor.Process(this);

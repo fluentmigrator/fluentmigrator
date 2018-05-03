@@ -33,28 +33,11 @@ namespace FluentMigrator.Tests.Unit
         public const string DESCRIPTION_COLUMN_NAME = "testDescriptionColumnName";
         public const string APPLIED_ON_COLUMN_NAME = "testAppliedOnColumnName";
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TestVersionTableMetaData"/> class.
-        /// </summary>
-        /// <param name="options">The runner options</param>
-        /// <remarks>
-        /// This constructor must come first due to a bug in aspnet/DependencyInjection. An issue is already filed.
-        /// </remarks>
-        public TestVersionTableMetaData(IOptions<RunnerOptions> options)
-            : this()
-        {
-#pragma warning disable 612
-            ApplicationContext = options.Value.ApplicationContext;
-#pragma warning restore 612
-        }
-
         public TestVersionTableMetaData()
         {
             SchemaName = "testSchemaName";
             OwnsSchema = true;
         }
-
-        public object ApplicationContext { get; set; }
 
         public string SchemaName { get; set; }
 

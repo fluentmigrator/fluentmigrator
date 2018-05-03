@@ -58,7 +58,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 
             var serviceProvider = new ServiceCollection().BuildServiceProvider();
             var querySchema = new Mock<IQuerySchema>();
-            new CreateTableExpressionBuilder(expression, new MigrationContext(querySchema.Object, serviceProvider, null, null))
+            new CreateTableExpressionBuilder(expression, new MigrationContext(querySchema.Object, serviceProvider))
                 .WithColumn("Id").AsGuid().PrimaryKey().RowGuid();
 
             var result = Generator.Generate(expression);

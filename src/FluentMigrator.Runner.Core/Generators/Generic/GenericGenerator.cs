@@ -14,12 +14,6 @@ namespace FluentMigrator.Runner.Generators.Generic
 {
     public abstract class GenericGenerator : GeneratorBase
     {
-        [Obsolete("Use the CompatibilityMode property")]
-        // ReSharper disable once InconsistentNaming
-#pragma warning disable 618
-        public CompatabilityMode compatabilityMode;
-#pragma warning restore 618
-
         protected GenericGenerator(
             IColumn column,
             IQuoter quoter,
@@ -30,13 +24,7 @@ namespace FluentMigrator.Runner.Generators.Generic
             CompatibilityMode = generatorOptions.Value.CompatibilityMode ?? CompatibilityMode.LOOSE;
         }
 
-#pragma warning disable 618, 3005
-        public CompatibilityMode CompatibilityMode
-        {
-            get => (CompatibilityMode) compatabilityMode;
-            set => compatabilityMode = (CompatabilityMode) value;
-        }
-#pragma warning restore 618, 3005
+        public CompatibilityMode CompatibilityMode { get; set; }
 
         public virtual string CreateTable { get { return "CREATE TABLE {0} ({1})"; } }
         public virtual string DropTable { get { return "DROP TABLE {0}"; } }

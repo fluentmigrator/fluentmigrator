@@ -39,10 +39,6 @@ namespace FluentMigrator.Runner.Processors.Firebird
 {
     public class FirebirdProcessor : GenericProcessorBase
     {
-        // ReSharper disable once InconsistentNaming
-        [Obsolete("Use the Truncator property")]
-        protected readonly FirebirdTruncator truncator;
-
         private readonly Lazy<Version> _firebirdVersionFunc;
         private readonly FirebirdQuoter _quoter;
 
@@ -50,18 +46,6 @@ namespace FluentMigrator.Runner.Processors.Firebird
         protected Dictionary<string, List<string>> DDLCreatedColumns;
         protected List<string> DDLTouchedTables;
         protected Dictionary<string, List<string>> DDLTouchedColumns;
-
-        [Obsolete]
-        public FirebirdProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory, FirebirdOptions fbOptions)
-            : base(connection, factory, generator, announcer, options)
-        {
-            FBOptions = fbOptions ?? throw new ArgumentNullException(nameof(fbOptions));
-            _firebirdVersionFunc = new Lazy<Version>(GetFirebirdVersion);
-            _quoter = new FirebirdQuoter(fbOptions.ForceQuote);
-            truncator = new FirebirdTruncator(FBOptions.TruncateLongNames, FBOptions.PackKeyNames);
-            ClearLocks();
-            ClearDDLFollowers();
-        }
 
         public FirebirdProcessor(
             [NotNull] FirebirdDbFactory factory,
@@ -74,11 +58,9 @@ namespace FluentMigrator.Runner.Processors.Firebird
             : base(() => factory.Factory, generator, logger, options.Value, connectionStringAccessor)
         {
             FBOptions = fbOptions ?? throw new ArgumentNullException(nameof(fbOptions));
+            Truncator =  new FirebirdTruncator(FBOptions.TruncateLongNames, FBOptions.PackKeyNames);
             _firebirdVersionFunc = new Lazy<Version>(GetFirebirdVersion);
             _quoter = quoter;
-#pragma warning disable 618
-            truncator = new FirebirdTruncator(FBOptions.TruncateLongNames, FBOptions.PackKeyNames);
-#pragma warning restore 618
             ClearLocks();
             ClearDDLFollowers();
         }
@@ -91,12 +73,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
         public bool IsFirebird3 => _firebirdVersionFunc.Value >= new Version(3, 0);
         public new IMigrationGenerator Generator => base.Generator;
 
-        [Obsolete]
-        public new IAnnouncer Announcer => base.Announcer;
-
-#pragma warning disable 618
-        public FirebirdTruncator Truncator => truncator;
-#pragma warning restore 618
+        public FirebirdTruncator Truncator { get; }
 
         private Version GetFirebirdVersion()
         {

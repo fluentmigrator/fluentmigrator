@@ -28,25 +28,9 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             new TestEntry("System.Data.SqlServerCe", "System.Data.SqlServerCe.SqlCeProviderFactory"),
         };
 
-        [Obsolete]
-        public SqlServerCeDbFactory()
-            : this(null)
-        {
-        }
-
         public SqlServerCeDbFactory(IServiceProvider serviceProvider)
             : base(serviceProvider, _entries)
         {
-        }
-
-        [Obsolete]
-        public override IDbCommand CreateCommand(string commandText, IDbConnection connection, IDbTransaction transaction, IMigrationProcessorOptions options)
-        {
-            var command = connection.CreateCommand();
-            command.CommandText = commandText;
-            // SQL Server CE does not support non-zero command timeout values!! :/
-            if (transaction != null) command.Transaction = transaction;
-            return command;
         }
     }
 }

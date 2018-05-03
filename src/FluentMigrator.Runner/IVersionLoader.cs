@@ -56,11 +56,6 @@ namespace FluentMigrator.Runner
         void RemoveVersionTable();
 
         /// <summary>
-        /// The runner this version loader belongs to
-        /// </summary>
-        IMigrationRunner Runner { get; set; }
-
-        /// <summary>
         /// Adds the version information
         /// </summary>
         /// <param name="version">The version number</param>

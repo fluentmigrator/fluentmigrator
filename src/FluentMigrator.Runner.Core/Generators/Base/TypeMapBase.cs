@@ -53,13 +53,6 @@ namespace FluentMigrator.Runner.Generators.Base
             throw new NotSupportedException($"Unsupported DbType '{type}'");
         }
 
-        /// <inheritdoc />
-        [Obsolete]
-        public virtual string GetTypeMap(DbType type, int size, int precision)
-        {
-            return GetTypeMap(type, (int?)size, precision);
-        }
-
         private void EnsureHasList(DbType type)
         {
             if (!_templates.ContainsKey(type))

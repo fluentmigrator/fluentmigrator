@@ -33,28 +33,12 @@ namespace FluentMigrator
     /// </summary>
     public abstract class MigrationBase : IMigration
     {
-        /// <summary>
-        /// Gets or sets the migration context
-        /// </summary>
-        [Obsolete("Use the Context property instead")]
-        // ReSharper disable once InconsistentNaming
-        // ReSharper disable once MemberCanBePrivate.Global
-        internal IMigrationContext _context;
-
         private readonly object _mutex = new object();
-
-        /// <inheritdoc />
-        public object ApplicationContext { get; protected set; }
-
-        /// <inheritdoc />
-        public string ConnectionString { get; protected set; }
 
         /// <summary>
         /// Gets the migration context
         /// </summary>
-#pragma warning disable 618
-        internal IMigrationContext Context => _context ?? throw new InvalidOperationException("The context is not set");
-#pragma warning restore 618
+        internal IMigrationContext Context { get; private set; }
 
         /// <summary>
         /// Collect the UP migration expressions
@@ -71,17 +55,15 @@ namespace FluentMigrator
         {
             lock (_mutex)
             {
-#pragma warning disable 618
-                _context = context;
-#pragma warning restore 618
-#pragma warning disable 612
-                ApplicationContext = context.ApplicationContext;
-#pragma warning restore 612
-                ConnectionString = context.Connection;
-                Up();
-#pragma warning disable 618
-                _context = null;
-#pragma warning restore 618
+                Context = context;
+                try
+                {
+                    Up();
+                }
+                finally
+                {
+                    Context = null;
+                }
             }
         }
 
@@ -90,17 +72,15 @@ namespace FluentMigrator
         {
             lock (_mutex)
             {
-#pragma warning disable 618
-                _context = context;
-#pragma warning restore 618
-#pragma warning disable 612
-                ApplicationContext = context.ApplicationContext;
-#pragma warning restore 612
-                ConnectionString = context.Connection;
-                Down();
-#pragma warning disable 618
-                _context = null;
-#pragma warning restore 618
+                Context = context;
+                try
+                {
+                    Down();
+                }
+                finally
+                {
+                    Context = null;
+                }
             }
         }
 

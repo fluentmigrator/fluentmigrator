@@ -17,13 +17,6 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
-using System.Reflection;
-
-using FluentMigrator.Infrastructure;
-using FluentMigrator.Runner.Initialization.AssemblyLoader;
-using FluentMigrator.Runner.Logging;
-using FluentMigrator.Runner.Processors;
 
 using JetBrains.Annotations;
 
@@ -38,80 +31,19 @@ namespace FluentMigrator.Runner.Initialization
         [NotNull]
         private readonly ILogger _logger;
 
-        [NotNull]
-        private readonly IAssemblySource _assemblySource;
-
         private readonly RunnerOptions _runnerOptions;
 
         [NotNull, ItemNotNull]
         private readonly Lazy<IServiceProvider> _lazyServiceProvider;
 
-        private IReadOnlyCollection<Assembly> _assemblies;
-
         public TaskExecutor(
             [NotNull] ILogger<TaskExecutor> logger,
-            [NotNull] IAssemblySource assemblySource,
             [NotNull] IOptions<RunnerOptions> runnerOptions,
             [NotNull] IServiceProvider serviceProvider)
         {
             _logger = logger;
-            _assemblySource = assemblySource;
             _runnerOptions = runnerOptions.Value;
-#pragma warning disable 612
-            ConnectionStringProvider = serviceProvider.GetService<IConnectionStringProvider>();
-#pragma warning restore 612
             _lazyServiceProvider = new Lazy<IServiceProvider>(() => serviceProvider);
-        }
-
-        [Obsolete]
-        public TaskExecutor([NotNull] IRunnerContext runnerContext)
-        {
-            var runnerCtxt = runnerContext ?? throw new ArgumentNullException(nameof(runnerContext));
-            _logger = new AnnouncerFluentMigratorLogger(runnerCtxt.Announcer);
-            _runnerOptions = new RunnerOptions(runnerCtxt);
-            var asmLoaderFactory = new AssemblyLoaderFactory();
-            _assemblySource = new AssemblySource(() => new AssemblyCollection(asmLoaderFactory.GetTargetAssemblies(runnerCtxt.Targets)));
-            ConnectionStringProvider = new DefaultConnectionStringProvider();
-            _lazyServiceProvider = new Lazy<IServiceProvider>(
-                () => runnerContext
-                    .CreateServices(
-                        ConnectionStringProvider,
-                        asmLoaderFactory)
-                    .BuildServiceProvider(validateScopes: true));
-        }
-
-        [Obsolete("Ony the statically provided factories are accessed")]
-        public TaskExecutor(
-            [NotNull] IRunnerContext runnerContext,
-            [CanBeNull] IConnectionStringProvider connectionStringProvider,
-            [NotNull] AssemblyLoaderFactory assemblyLoaderFactory,
-            // ReSharper disable once UnusedParameter.Local
-            MigrationProcessorFactoryProvider factoryProvider)
-            : this(
-                runnerContext,
-                assemblyLoaderFactory,
-                connectionStringProvider)
-        {
-        }
-
-        [Obsolete]
-        public TaskExecutor(
-            [NotNull] IRunnerContext runnerContext,
-            [NotNull] AssemblyLoaderFactory assemblyLoaderFactory,
-            [CanBeNull] IConnectionStringProvider connectionStringProvider = null)
-        {
-            var runnerCtxt = runnerContext ?? throw new ArgumentNullException(nameof(runnerContext));
-            _logger = new AnnouncerFluentMigratorLogger(runnerCtxt.Announcer);
-            _runnerOptions = new RunnerOptions(runnerCtxt);
-            ConnectionStringProvider = connectionStringProvider;
-            var asmLoaderFactory = assemblyLoaderFactory ?? throw new ArgumentNullException(nameof(assemblyLoaderFactory));
-            _assemblySource = new AssemblySource(() => new AssemblyCollection(asmLoaderFactory.GetTargetAssemblies(runnerCtxt.Targets)));
-            _lazyServiceProvider = new Lazy<IServiceProvider>(
-                () => runnerContext
-                    .CreateServices(
-                        connectionStringProvider,
-                        asmLoaderFactory)
-                    .BuildServiceProvider(validateScopes: true));
         }
 
         /// <summary>
@@ -124,23 +56,10 @@ namespace FluentMigrator.Runner.Initialization
         protected IMigrationRunner Runner { get; set; }
 
         /// <summary>
-        /// Gets the connection string provider
-        /// </summary>
-        [CanBeNull]
-        [Obsolete]
-        protected IConnectionStringProvider ConnectionStringProvider { get; }
-
-        /// <summary>
         /// Gets the service provider used to instantiate all migration services
         /// </summary>
         [NotNull]
         protected IServiceProvider ServiceProvider => _lazyServiceProvider.Value;
-
-        [Obsolete]
-        protected virtual IEnumerable<Assembly> GetTargetAssemblies()
-        {
-            return _assemblies ?? (_assemblies = _assemblySource.Assemblies);
-        }
 
         /// <summary>
         /// Will be called durin the runner scope intialization

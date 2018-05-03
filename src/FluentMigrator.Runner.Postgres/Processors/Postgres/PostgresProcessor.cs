@@ -23,12 +23,6 @@ namespace FluentMigrator.Runner.Processors.Postgres
 
         public override IList<string> DatabaseTypeAliases { get; } = new List<string> { "PostgreSQL" };
 
-        [Obsolete]
-        public PostgresProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
-            : base(connection, factory, generator, announcer, options)
-        {
-        }
-
         public PostgresProcessor(
             [NotNull] PostgresDbFactory factory,
             [NotNull] PostgresGenerator generator,

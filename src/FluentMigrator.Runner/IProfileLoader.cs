@@ -29,30 +29,9 @@ namespace FluentMigrator.Runner
     public interface IProfileLoader
     {
         /// <summary>
-        /// Gets a value indicating whether this instance allows a call to <see cref="ApplyProfiles()"/>
-        /// </summary>
-        [Obsolete]
-        bool SupportsParameterlessApplyProfile { get; }
-
-        /// <summary>
-        /// Apply all loaded profiles
-        /// </summary>
-        [Obsolete]
-        void ApplyProfiles();
-
-        /// <summary>
         /// Apply all loaded profiles with the given runner
         /// </summary>
         /// <param name="runner">The migration ruinner</param>
         void ApplyProfiles([NotNull] IMigrationRunner runner);
-
-        /// <summary>
-        /// Find all profile name tagged migrations in the given assembly collection
-        /// </summary>
-        /// <param name="assemblies">The assemblies to load the profile tagged migrations from</param>
-        /// <param name="profile">The profile name to search the migrations for</param>
-        /// <returns>The found migrations</returns>
-        [Obsolete]
-        IEnumerable<IMigration> FindProfilesIn(IAssemblyCollection assemblies, string profile);
     }
 }

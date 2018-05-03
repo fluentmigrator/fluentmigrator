@@ -18,6 +18,7 @@ using System;
 using System.Data;
 using System.IO;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Diagnostics;
 
 using FluentMigrator.Expressions;
@@ -43,12 +44,6 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         public override string DatabaseType => "SqlServerCe";
 
         public override IList<string> DatabaseTypeAliases { get; } = new List<string> { "SqlServer" };
-
-        [Obsolete]
-        public SqlServerCeProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
-            : base(connection, factory, generator, announcer, options)
-        {
-        }
 
         public SqlServerCeProcessor(
             [NotNull] SqlServerCeDbFactory factory,
@@ -194,24 +189,14 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         }
 
         /// <inheritdoc />
-        protected override IDbCommand CreateCommand(string commandText, IDbConnection connection, IDbTransaction transaction)
+        protected override DbCommand CreateCommand(string commandText, DbConnection connection, DbTransaction transaction)
         {
-            IDbCommand result;
-            if (DbProviderFactory != null)
-            {
-                result = DbProviderFactory.CreateCommand();
-                Debug.Assert(result != null, nameof(result) + " != null");
-                result.Connection = connection;
-                if (transaction != null)
-                    result.Transaction = transaction;
-                result.CommandText = commandText;
-            }
-            else
-            {
-#pragma warning disable 612
-                result = Factory.CreateCommand(commandText, connection, transaction, Options);
-#pragma warning restore 612
-            }
+            var result = DbProviderFactory.CreateCommand();
+            Debug.Assert(result != null, nameof(result) + " != null");
+            result.Connection = connection;
+            if (transaction != null)
+                result.Transaction = transaction;
+            result.CommandText = commandText;
 
             // SQL Server CE does not support non-zero command timeout values!! :/
 

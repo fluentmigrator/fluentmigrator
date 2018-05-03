@@ -20,9 +20,7 @@ using System;
 using System.Collections.Generic;
 
 using FluentMigrator.Expressions;
-using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
-using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Versioning;
@@ -43,41 +41,6 @@ namespace FluentMigrator.Runner
         private readonly IMigrationInformationLoader _migrationInformationLoader;
 
         private bool _versionsLoaded;
-
-        [Obsolete]
-        internal ConnectionlessVersionLoader(
-            IMigrationRunner runner,
-            IAssemblyCollection assemblies,
-            IConventionSet conventionSet,
-            IMigrationRunnerConventions conventions,
-            IRunnerContext runnerContext,
-            IVersionTableMetaData versionTableMetaData = null)
-        {
-            _migrationInformationLoader = runner.MigrationLoader;
-            _processor = runner.Processor;
-
-            Runner = runner;
-            Assemblies = assemblies;
-            Conventions = conventions;
-            StartVersion = runnerContext.StartVersion;
-            TargetVersion = runnerContext.Version;
-
-            VersionInfo = new VersionInfo();
-            VersionTableMetaData = versionTableMetaData ??
-                (IVersionTableMetaData)Activator.CreateInstance(assemblies.Assemblies.GetVersionTableMetaDataType(
-                    Conventions, runnerContext));
-            VersionMigration = new VersionMigration(VersionTableMetaData);
-            VersionSchemaMigration = new VersionSchemaMigration(VersionTableMetaData);
-            VersionUniqueMigration = new VersionUniqueMigration(VersionTableMetaData);
-            VersionDescriptionMigration = new VersionDescriptionMigration(VersionTableMetaData);
-
-            if (VersionTableMetaData is DefaultVersionTableMetaData defaultMetaData)
-            {
-                conventionSet.SchemaConvention?.Apply(defaultMetaData);
-            }
-
-            LoadVersionInfo();
-        }
 
         public ConnectionlessVersionLoader(
             [NotNull] IProcessorAccessor processorAccessor,
@@ -102,10 +65,6 @@ namespace FluentMigrator.Runner
             LoadVersionInfo();
         }
 
-        [Obsolete]
-        [CanBeNull]
-        protected IAssemblyCollection Assemblies { get; set; }
-
         public IMigrationRunnerConventions Conventions { get; set; }
         public long StartVersion { get; set; }
         public long TargetVersion { get; set; }
@@ -114,9 +73,6 @@ namespace FluentMigrator.Runner
         public IMigration VersionUniqueMigration { get; }
         public IMigration VersionDescriptionMigration { get; }
 
-        [Obsolete]
-        [CanBeNull]
-        public IMigrationRunner Runner { get; set; }
         public IVersionInfo VersionInfo { get; set; }
         public IVersionTableMetaData VersionTableMetaData { get; set; }
 

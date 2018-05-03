@@ -21,8 +21,6 @@ using System.Collections.Generic;
 using System.Data;
 
 using FluentMigrator.Expressions;
-using FluentMigrator.Runner.Announcers;
-using FluentMigrator.Runner.Logging;
 
 using JetBrains.Annotations;
 
@@ -32,49 +30,7 @@ namespace FluentMigrator.Runner.Processors
 {
     public abstract class ProcessorBase : IMigrationProcessor
     {
-#pragma warning disable 612
-        [Obsolete]
-        private readonly IMigrationProcessorOptions _legacyOptions;
-#pragma warning restore 612
-
         protected internal readonly IMigrationGenerator Generator;
-
-#pragma warning disable 612
-        [Obsolete]
-        protected readonly IAnnouncer Announcer;
-#pragma warning restore 612
-
-        [Obsolete]
-        protected ProcessorBase(
-            IMigrationGenerator generator,
-            IAnnouncer announcer,
-            [NotNull] IMigrationProcessorOptions options)
-        {
-            Generator = generator;
-            Announcer = announcer;
-            Logger = new AnnouncerFluentMigratorLogger(announcer);
-            Options = options as ProcessorOptions ?? new ProcessorOptions()
-            {
-                PreviewOnly = options.PreviewOnly,
-                ProviderSwitches = options.ProviderSwitches,
-                Timeout = options.Timeout == null ? null : (TimeSpan?) TimeSpan.FromSeconds(options.Timeout.Value),
-            };
-
-            _legacyOptions = options;
-        }
-
-        [Obsolete]
-        protected ProcessorBase(
-            [NotNull] IMigrationGenerator generator,
-            [NotNull] IAnnouncer announcer,
-            [NotNull] ProcessorOptions options)
-        {
-            Generator = generator;
-            Announcer = announcer;
-            Options = options;
-            _legacyOptions = options;
-            Logger = new AnnouncerFluentMigratorLogger(announcer);
-        }
 
         protected ProcessorBase(
             [NotNull] IMigrationGenerator generator,
@@ -84,23 +40,7 @@ namespace FluentMigrator.Runner.Processors
             Generator = generator;
             Options = options;
             Logger = logger;
-#pragma warning disable 612
-            Announcer = new LoggerAnnouncer(
-                logger,
-                new AnnouncerOptions()
-                {
-                    ShowSql = true,
-                    ShowElapsedTime = true,
-                });
-            _legacyOptions = options;
-#pragma warning restore 612
         }
-
-        [Obsolete]
-        IMigrationProcessorOptions IMigrationProcessor.Options => _legacyOptions;
-
-        [Obsolete]
-        public abstract string ConnectionString { get; }
 
         public abstract string DatabaseType { get; }
 

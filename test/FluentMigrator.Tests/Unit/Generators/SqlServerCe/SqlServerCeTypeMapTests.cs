@@ -264,7 +264,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             [TestCase(38)]
             public void ItMapsDecimalWithPrecisionToDecimal(int precision)
             {
-                var template = TypeMap.GetTypeMap(DbType.Decimal, (int?) precision, precision: 1);
+                var template = TypeMap.GetTypeMap(DbType.Decimal, precision, precision: 1);
 
                 template.ShouldBe($"NUMERIC({precision},1)");
             }

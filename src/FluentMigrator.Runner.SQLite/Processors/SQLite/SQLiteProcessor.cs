@@ -45,24 +45,6 @@ namespace FluentMigrator.Runner.Processors.SQLite
         [CanBeNull]
         private readonly IServiceProvider _serviceProvider;
 
-        public override string DatabaseType
-        {
-            get { return "SQLite"; }
-        }
-
-        public override IList<string> DatabaseTypeAliases { get; } = new List<string>();
-
-        [Obsolete]
-        public SQLiteProcessor(
-            IDbConnection connection,
-            IMigrationGenerator generator,
-            IAnnouncer announcer,
-            [NotNull] IMigrationProcessorOptions options,
-            IDbFactory factory)
-            : base(connection, factory, generator, announcer, options)
-        {
-        }
-
         public SQLiteProcessor(
             [NotNull] SQLiteDbFactory factory,
             [NotNull] SQLiteGenerator generator,
@@ -74,6 +56,10 @@ namespace FluentMigrator.Runner.Processors.SQLite
         {
             _serviceProvider = serviceProvider;
         }
+
+        public override string DatabaseType => "SQLite";
+
+        public override IList<string> DatabaseTypeAliases { get; } = new List<string>();
 
         public override bool SchemaExists(string schemaName)
         {

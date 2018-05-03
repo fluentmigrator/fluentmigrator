@@ -16,6 +16,7 @@
 //
 #endregion
 
+using System;
 using System.IO;
 using System.Reflection;
 
@@ -37,7 +38,7 @@ namespace FluentMigrator.Runner.Initialization.AssemblyLoader
             string fileName = _name;
             if (!Path.IsPathRooted(fileName))
             {
-                fileName = Path.Combine(RuntimeHost.Current.BaseDirectory, _name);
+                fileName = Path.Combine(RuntimeHost.BaseDirectory, _name);
                 if (!File.Exists(fileName))
                 {
                     fileName = Path.GetFullPath(_name);

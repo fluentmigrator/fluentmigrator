@@ -32,17 +32,6 @@ namespace FluentMigrator.Runner.Processors.Oracle
 {
     public class OracleProcessor : OracleProcessorBase
     {
-        [Obsolete]
-        public OracleProcessor(
-            IDbConnection connection,
-            IMigrationGenerator generator,
-            IAnnouncer announcer,
-            IMigrationProcessorOptions options,
-            IDbFactory factory)
-            : base("Oracle", connection, generator, announcer, options, factory)
-        {
-        }
-
         public OracleProcessor(
             [NotNull] OracleDbFactory factory,
             [NotNull] OracleGenerator generator,

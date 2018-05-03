@@ -19,15 +19,11 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Reflection;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Versioning;
 using FluentMigrator.Runner.VersionTableInfo;
-using FluentMigrator.Infrastructure;
-using FluentMigrator.Runner.Conventions;
-using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
 
 using JetBrains.Annotations;
@@ -39,17 +35,11 @@ namespace FluentMigrator.Runner
         [NotNull]
         private readonly IMigrationProcessor _processor;
 
-        private readonly IConventionSet _conventionSet;
         private bool _versionSchemaMigrationAlreadyRun;
         private bool _versionMigrationAlreadyRun;
         private bool _versionUniqueMigrationAlreadyRun;
         private bool _versionDescriptionMigrationAlreadyRun;
         private IVersionInfo _versionInfo;
-        private IMigrationRunnerConventions Conventions { get; set; }
-
-        [CanBeNull]
-        [Obsolete]
-        protected IAssemblyCollection Assemblies { get; set; }
 
         public IVersionTableMetaData VersionTableMetaData { get; }
 
@@ -60,55 +50,15 @@ namespace FluentMigrator.Runner
         public IMigration VersionUniqueMigration { get; }
         public IMigration VersionDescriptionMigration { get; }
 
-        [Obsolete]
-        internal VersionLoader(
-            [NotNull] IMigrationRunner runner,
-            [NotNull] Assembly assembly,
-            [NotNull] IConventionSet conventionSet,
-            [NotNull] IMigrationRunnerConventions conventions,
-            [NotNull] IRunnerContext runnerContext)
-            : this(runner, new SingleAssembly(assembly), conventionSet, conventions, runnerContext)
-        {
-        }
-
-        [Obsolete]
-        internal VersionLoader(IMigrationRunner runner, IAssemblyCollection assemblies,
-            [NotNull] IConventionSet conventionSet,
-            [NotNull] IMigrationRunnerConventions conventions,
-            [NotNull] IRunnerContext runnerContext,
-            [CanBeNull] IVersionTableMetaData versionTableMetaData = null)
-        {
-            _conventionSet = conventionSet;
-            _processor = runner.Processor;
-
-            Runner = runner;
-            Assemblies = assemblies;
-
-            Conventions = conventions;
-            VersionTableMetaData = versionTableMetaData ?? CreateVersionTableMetaData(runnerContext);
-            VersionMigration = new VersionMigration(VersionTableMetaData);
-            VersionSchemaMigration = new VersionSchemaMigration(VersionTableMetaData);
-            VersionUniqueMigration = new VersionUniqueMigration(VersionTableMetaData);
-            VersionDescriptionMigration = new VersionDescriptionMigration(VersionTableMetaData);
-
-            VersionTableMetaData.ApplicationContext = runnerContext.ApplicationContext;
-
-            LoadVersionInfo();
-        }
-
         public VersionLoader(
             [NotNull] IProcessorAccessor processorAccessor,
-            [NotNull] IConventionSet conventionSet,
-            [NotNull] IMigrationRunnerConventions conventions,
             [NotNull] IVersionTableMetaData versionTableMetaData,
             [NotNull] IMigrationRunner runner)
         {
-            _conventionSet = conventionSet;
             _processor = processorAccessor.Processor;
 
             Runner = runner;
 
-            Conventions = conventions;
             VersionTableMetaData = versionTableMetaData;
             VersionMigration = new VersionMigration(VersionTableMetaData);
             VersionSchemaMigration = new VersionSchemaMigration(VersionTableMetaData);
@@ -223,22 +173,6 @@ namespace FluentMigrator.Runner
                                         new KeyValuePair<string, object>(VersionTableMetaData.ColumnName, version)
                                     });
             expression.ExecuteWith(_processor);
-        }
-
-        [Obsolete]
-        [NotNull]
-        private IVersionTableMetaData CreateVersionTableMetaData(IRunnerContext runnerContext)
-        {
-            var type = Assemblies?.Assemblies.GetVersionTableMetaDataType(Conventions, runnerContext)
-             ?? typeof(DefaultVersionTableMetaData);
-
-            var instance = (IVersionTableMetaData) Activator.CreateInstance(type);
-            if (instance is ISchemaExpression schemaExpression)
-            {
-                _conventionSet.SchemaConvention?.Apply(schemaExpression);
-            }
-
-            return instance;
         }
     }
 }

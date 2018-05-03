@@ -178,6 +178,12 @@ namespace FluentMigrator.Tests.Integration
             if (!serverOptions.IsEnabled)
                 Assert.Ignore($"The configuration for {processorType.Name} is not enabled.");
 
+            if (processorType == typeof(FirebirdProcessor) && _isFirstExecuteForFirebird)
+            {
+                _isFirstExecuteForFirebird = false;
+                FbConnection.CreateDatabase(serverOptions.ConnectionString, true);
+            }
+
             var services = ServiceCollectionExtensions.CreateServices()
                 .ConfigureRunner(
                     r => r
@@ -208,7 +214,10 @@ namespace FluentMigrator.Tests.Integration
                         return new SelectingGeneratorAccessor(new[] { proc.Generator }, opt, opt2);
                     })
                 .AddScoped<IConnectionStringReader>(
-                    _ => new PassThroughConnectionStringReader(serverOptions.ConnectionString));
+                    _ =>
+                    {
+                        return new PassThroughConnectionStringReader(serverOptions.ConnectionString);
+                    });
             initAction?.Invoke(services);
 
             services
@@ -217,12 +226,6 @@ namespace FluentMigrator.Tests.Integration
 
             var serviceProvider = services
                 .BuildServiceProvider(true);
-
-            if (processorType == typeof(FirebirdProcessor) && _isFirstExecuteForFirebird)
-            {
-                _isFirstExecuteForFirebird = false;
-                FbConnection.CreateDatabase(serverOptions.ConnectionString, true);
-            }
 
             using (serviceProvider)
             {

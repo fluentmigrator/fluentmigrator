@@ -16,9 +16,6 @@
 
 using System;
 
-using FluentMigrator.Infrastructure;
-using FluentMigrator.Runner.Initialization;
-
 using JetBrains.Annotations;
 
 namespace FluentMigrator.Runner
@@ -39,20 +36,6 @@ namespace FluentMigrator.Runner
         /// </summary>
         [NotNull]
         IMigrationInformationLoader MigrationLoader { get; }
-
-        /// <summary>
-        /// Gets the assemblies searched for migrations, profile migrations, etc...
-        /// </summary>
-        [Obsolete]
-        [CanBeNull]
-        IAssemblyCollection MigrationAssemblies { get; }
-
-        /// <summary>
-        /// Gets the runner context
-        /// </summary>
-        [Obsolete]
-        [CanBeNull]
-        IRunnerContext RunnerContext { get; }
 
         /// <summary>
         /// Executes an <c>Up</c> migration

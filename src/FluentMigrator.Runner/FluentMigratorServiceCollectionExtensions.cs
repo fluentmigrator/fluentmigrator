@@ -23,15 +23,12 @@ using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Initialization.AssemblyLoader;
-using FluentMigrator.Runner.Initialization.NetFramework;
-using FluentMigrator.Runner.Logging;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.VersionTableInfo;
 using FluentMigrator.Validation;
 
 using JetBrains.Annotations;
 
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 // ReSharper disable once CheckNamespace
@@ -120,13 +117,6 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddScoped<MigrationScopeHandler>()
 
                 // The connection string readers
-#if NETFRAMEWORK
-                .AddScoped<INetConfigManager, NetConfigManager>()
-#pragma warning disable 612
-                .AddScoped<IConnectionStringReader, AppConfigConnectionStringReader>()
-#pragma warning restore 612
-#endif
-
                 .AddScoped<IConnectionStringReader, ConfigurationConnectionStringReader>()
 
                 // The connection string accessor that evaluates the readers
@@ -153,18 +143,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddScoped<TaskExecutor>()
 
                 // Migration context
-                .AddTransient<IMigrationContext>(
-                    sp =>
-                    {
-                        var querySchema = sp.GetRequiredService<IQuerySchema>();
-                        var options = sp.GetRequiredService<IOptions<RunnerOptions>>();
-                        var connectionStringAccessor = sp.GetRequiredService<IConnectionStringAccessor>();
-                        var connectionString = connectionStringAccessor.ConnectionString;
-#pragma warning disable 612
-                        var appContext = options.Value.ApplicationContext;
-#pragma warning restore 612
-                        return new MigrationContext(querySchema, sp, appContext, connectionString);
-                    });
+                .AddTransient<IMigrationContext, MigrationContext>();
 
             return services;
         }
@@ -182,92 +161,6 @@ namespace Microsoft.Extensions.DependencyInjection
             var builder = new MigrationRunnerBuilder(services);
             configure.Invoke(builder);
             return services;
-        }
-
-        /// <summary>
-        /// Creates services for a given runner context, connection string provider and assembly loader factory.
-        /// </summary>
-        /// <param name="runnerContext">The runner context</param>
-        /// <param name="connectionStringProvider">The connection string provider</param>
-        /// <param name="defaultAssemblyLoaderFactory">The assembly loader factory</param>
-        /// <returns>The new service collection</returns>
-        [NotNull]
-        [Obsolete]
-        internal static IServiceCollection CreateServices(
-            [NotNull] this IRunnerContext runnerContext,
-            [CanBeNull] IConnectionStringProvider connectionStringProvider,
-            [CanBeNull] AssemblyLoaderFactory defaultAssemblyLoaderFactory = null)
-        {
-            var services = new ServiceCollection();
-            var assemblyLoaderFactory = defaultAssemblyLoaderFactory ?? new AssemblyLoaderFactory();
-
-            if (!runnerContext.NoConnection && connectionStringProvider == null)
-            {
-                runnerContext.NoConnection = true;
-            }
-
-            // Configure the migration runner
-            services
-                .AddLogging(lb => lb.AddProvider(new LegacyFluentMigratorLoggerProvider(runnerContext.Announcer)))
-                .AddFluentMigratorCore()
-                .AddAllDatabases()
-                .Configure<SelectingProcessorAccessorOptions>(opt => opt.ProcessorId = runnerContext.Database)
-                .AddSingleton(assemblyLoaderFactory)
-                .Configure<TypeFilterOptions>(
-                    opt =>
-                    {
-                        opt.Namespace = runnerContext.Namespace;
-                        opt.NestedNamespaces = runnerContext.NestedNamespaces;
-                    })
-                .Configure<AssemblySourceOptions>(opt => opt.AssemblyNames = runnerContext.Targets)
-                .Configure<RunnerOptions>(
-                    opt => { opt.SetValuesFrom(runnerContext); })
-                .Configure<ProcessorOptions>(opt => { opt.SetValuesFrom(runnerContext); })
-                .Configure<AppConfigConnectionStringAccessorOptions>(
-                    opt => opt.ConnectionStringConfigPath = runnerContext.ConnectionStringConfigPath);
-
-            // Configure the processor
-            if (runnerContext.NoConnection)
-            {
-                // Always return the connectionless processor
-                services
-                    .AddScoped<IProcessorAccessor, ConnectionlessProcessorAccessor>();
-            }
-
-            return services;
-        }
-
-        /// <summary>
-        /// Add all database services to the service collection
-        /// </summary>
-        /// <param name="services">The service collection</param>
-        /// <returns>The service collection</returns>
-        private static IServiceCollection AddAllDatabases(this IServiceCollection services)
-        {
-            return services
-                .ConfigureRunner(
-                    builder => builder
-                        .AddDb2()
-                        .AddDb2ISeries()
-                        .AddDotConnectOracle()
-                        .AddFirebird()
-                        .AddHana()
-                        .AddMySql4()
-                        .AddMySql5()
-                        .AddOracle()
-                        .AddOracleManaged()
-                        .AddPostgres()
-                        .AddRedshift()
-                        .AddSqlAnywhere()
-                        .AddSQLite()
-                        .AddSqlServer()
-                        .AddSqlServer2000()
-                        .AddSqlServer2005()
-                        .AddSqlServer2008()
-                        .AddSqlServer2012()
-                        .AddSqlServer2014()
-                        .AddSqlServer2016()
-                        .AddSqlServerCe());
         }
 
         private class MigrationRunnerBuilder : IMigrationRunnerBuilder

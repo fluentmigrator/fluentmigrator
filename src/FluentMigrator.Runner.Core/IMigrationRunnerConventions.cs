@@ -33,9 +33,6 @@ namespace FluentMigrator.Runner
 
         Func<Type, bool> TypeIsVersionTableMetaData { get; }
 
-        [Obsolete]
-        Func<Type, IMigrationInfo> GetMigrationInfo { get; }
-
         /// <summary>
         /// Create an <see cref="IMigrationInfo"/> instance for a given <see cref="IMigration"/>
         /// </summary>

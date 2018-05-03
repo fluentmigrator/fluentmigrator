@@ -1,4 +1,4 @@
-#region License
+﻿#region License
 // Copyright (c) 2018, FluentMigrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,30 +14,24 @@
 // limitations under the License.
 #endregion
 
-using System;
-
 using JetBrains.Annotations;
 
-namespace FluentMigrator.Runner.Initialization.NetFramework
+namespace FluentMigrator.Runner
 {
-#pragma warning disable 1584,1711,1572,1581,1580
     /// <summary>
-    /// Options for the <c>AppConfigConnectionStringReader</c>
+    /// Extension methods for <see cref="IMigrationGenerator"/>
     /// </summary>
-    [Obsolete]
-    public class AppConfigConnectionStringAccessorOptions
+    public static class GeneratorExtensions
     {
         /// <summary>
-        /// Gets or sets the path where the config file can be found
+        /// Gets the name for a given migration generator instance
         /// </summary>
-        [CanBeNull]
-        public string ConnectionStringConfigPath { get; set; }
-
-        /// <summary>
-        /// Gets or sets the machine name
-        /// </summary>
-        [CanBeNull]
-        public string MachineName { get; set; } = Environment.MachineName;
+        /// <param name="generator">The migration generator instance to get its name for</param>
+        /// <returns>The name of the migration generator</returns>
+        [NotNull]
+        public static string GetName([NotNull] this IMigrationGenerator generator)
+        {
+            return generator.GetType().Name.Replace("Generator", string.Empty);
+        }
     }
-#pragma warning restore 1584,1711,1572,1581,1580
 }

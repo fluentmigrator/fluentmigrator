@@ -22,10 +22,7 @@ using System.Data;
 using System.Linq;
 
 using FluentMigrator.Expressions;
-using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators;
-using FluentMigrator.Runner.Initialization;
-using FluentMigrator.Runner.Logging;
 
 using JetBrains.Annotations;
 
@@ -36,25 +33,8 @@ namespace FluentMigrator.Runner.Processors
 {
     public class ConnectionlessProcessor: IMigrationProcessor
     {
-        [NotNull] private readonly ILogger _logger;
-#pragma warning disable 612
-        [Obsolete]
-        private readonly IMigrationProcessorOptions _legacyOptions;
-#pragma warning restore 612
-
-        [Obsolete]
-        public ConnectionlessProcessor(
-            IMigrationGenerator generator,
-            IRunnerContext context,
-            IMigrationProcessorOptions options)
-        {
-            _logger = new AnnouncerFluentMigratorLogger(context.Announcer);
-            _legacyOptions = options;
-            DatabaseType = context.Database;
-            Generator = generator;
-            Announcer = context.Announcer;
-            Options = options.GetProcessorOptions(connectionString: null);
-        }
+        [NotNull]
+        private readonly ILogger _logger;
 
         public ConnectionlessProcessor(
             [NotNull] IGeneratorAccessor generatorAccessor,
@@ -67,10 +47,6 @@ namespace FluentMigrator.Runner.Processors
             DatabaseType = string.IsNullOrEmpty(accessorOptions.Value.ProcessorId) ? generator.GetName() : accessorOptions.Value.ProcessorId;
             Generator = generator;
             Options = options.Value;
-#pragma warning disable 612
-            Announcer = new LoggerAnnouncer(logger, new AnnouncerOptions() { ShowElapsedTime = true, ShowSql = true });
-            _legacyOptions = options.Value;
-#pragma warning restore 612
         }
 
         public ConnectionlessProcessor(
@@ -85,23 +61,11 @@ namespace FluentMigrator.Runner.Processors
             DatabaseTypeAliases = processorIds.Count == 0 ? Array.Empty<string>() : processorIds.Skip(1).ToArray();
             Generator = generator;
             Options = options.Value;
-#pragma warning disable 612
-            Announcer = new LoggerAnnouncer(logger, AnnouncerOptions.AllEnabled);
-            _legacyOptions = options.Value;
-#pragma warning restore 612
         }
 
-        [Obsolete("Will change from public to protected")]
-        public string ConnectionString { get; } = "No connection";
+        public IMigrationGenerator Generator { get; }
 
-        public IMigrationGenerator Generator { get; set; }
-
-        [Obsolete]
-        public IAnnouncer Announcer { get; set; }
-        public ProcessorOptions Options {get; set;}
-
-        [Obsolete]
-        IMigrationProcessorOptions IMigrationProcessor.Options => _legacyOptions;
+        public ProcessorOptions Options {get; }
 
         /// <inheritdoc />
         public void Execute(string sql)
@@ -309,9 +273,7 @@ namespace FluentMigrator.Runner.Processors
             throw new NotImplementedException("Method is not supported by the connectionless processor");
         }
 
-#pragma warning disable 618
         public string DatabaseType { get; }
-#pragma warning restore 618
 
         public IList<string> DatabaseTypeAliases { get; } = new List<string>();
 

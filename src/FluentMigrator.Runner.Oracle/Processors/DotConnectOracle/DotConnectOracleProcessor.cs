@@ -37,12 +37,6 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
 
         public override IList<string> DatabaseTypeAliases { get; } = new List<string>();
 
-        [Obsolete]
-        public DotConnectOracleProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, DotConnectOracleDbFactory factory)
-            : base(connection, factory, generator, announcer, options)
-        {
-        }
-
         public DotConnectOracleProcessor(
             [NotNull] DotConnectOracleDbFactory factory,
             [NotNull] OracleGenerator generator,

@@ -36,7 +36,7 @@ namespace FluentMigrator.Tests.Unit.Processors.SQLite
     {
         protected override IMigrationProcessor CreateProcessor()
         {
-            var mockedDbFactory = new Mock<SQLiteDbFactory>();
+            var mockedDbFactory = new Mock<SQLiteDbFactory>(null);
             mockedDbFactory.SetupGet(conn => conn.Factory).Returns(MockedDbProviderFactory.Object);
 
             var mockedConnStringReader = new Mock<IConnectionStringReader>();

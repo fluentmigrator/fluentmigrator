@@ -28,10 +28,7 @@ namespace FluentMigrator.Model
     /// The sequence definition
     /// </summary>
     public class SequenceDefinition
-        : ICloneable,
-#pragma warning disable 618
-          ICanBeValidated
-#pragma warning restore 618
+        : ICloneable
     {
         /// <summary>
         /// Gets or sets the sequence name
@@ -81,23 +78,16 @@ namespace FluentMigrator.Model
         public object Clone()
         {
             return new SequenceDefinition
-                   {
-                           Name = Name,
-                           SchemaName = SchemaName,
-                           Increment = Increment,
-                           MinValue = MinValue,
-                           MaxValue = MaxValue,
-                           StartWith = StartWith,
-                           Cache = Cache,
-                           Cycle = Cycle
-                   };
-        }
-
-        /// <inheritdoc />
-        [Obsolete("Use the System.ComponentModel.DataAnnotations.Validator instead")]
-        public void CollectValidationErrors(ICollection<string> errors)
-        {
-            this.CollectErrors(errors);
+            {
+                Name = Name,
+                SchemaName = SchemaName,
+                Increment = Increment,
+                MinValue = MinValue,
+                MaxValue = MaxValue,
+                StartWith = StartWith,
+                Cache = Cache,
+                Cycle = Cycle
+            };
         }
     }
 }

@@ -34,10 +34,6 @@ namespace FluentMigrator.Runner.Generators.Firebird
 
     public class FirebirdGenerator : GenericGenerator
     {
-        // ReSharper disable once InconsistentNaming
-        [Obsolete("Use the Truncator property")]
-        protected readonly FirebirdTruncator truncator;
-
         public FirebirdGenerator(
             [NotNull] FirebirdOptions fbOptions)
             : this(fbOptions, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()))
@@ -58,9 +54,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
             : base(new FirebirdColumn(fbOptions), quoter, new EmptyDescriptionGenerator(), generatorOptions)
         {
             FBOptions = fbOptions ?? throw new ArgumentNullException(nameof(fbOptions));
-#pragma warning disable 618
-            truncator = new FirebirdTruncator(FBOptions.TruncateLongNames, FBOptions.PackKeyNames);
-#pragma warning restore 618
+            Truncator = new FirebirdTruncator(FBOptions.TruncateLongNames, FBOptions.PackKeyNames);
         }
 
         //It's kind of a hack to mess with system tables, but this is the cleanest and time-tested method to alter the nullable constraint.
@@ -81,9 +75,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
 
         protected FirebirdOptions FBOptions { get; }
 
-#pragma warning disable 618
-        public FirebirdTruncator Truncator => truncator;
-#pragma warning restore 618
+        public FirebirdTruncator Truncator { get; }
 
         public override string Generate(AlterDefaultConstraintExpression expression)
         {

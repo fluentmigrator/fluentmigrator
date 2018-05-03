@@ -19,13 +19,18 @@
 using System;
 using System.IO;
 
+using FluentMigrator.Example.Migrations;
+using FluentMigrator.Runner;
+
 using Microsoft.Data.Sqlite;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace FluentMigrator.Example.Migrator
 {
-    internal static partial class Program
+    internal static class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
             // Configure the DB connection
             var dbFileName = Path.Combine(AppContext.BaseDirectory, "test.db");
@@ -35,19 +40,22 @@ namespace FluentMigrator.Example.Migrator
                 Mode = SqliteOpenMode.ReadWriteCreate
             };
 
-            // The poor mans command line parser
-            var useLegacyMode = args.Length > 0 && args[0] == "--mode=legacy";
+            // Initialize the services
+            var serviceProvider = new ServiceCollection()
+                .AddLogging(lb => lb.AddDebug().AddFluentMigratorConsole())
+                .AddFluentMigratorCore()
+                .ConfigureRunner(
+                    builder => builder
+                        .AddSQLite()
+                        .WithGlobalConnectionString(csb.ConnectionString)
+                        .WithMigrationsIn(typeof(AddGTDTables).Assembly))
+                .BuildServiceProvider();
 
-            if (!useLegacyMode)
-            {
-                Console.WriteLine(@"Using dependency injection");
-                RunWithServices(csb.ConnectionString);
-            }
-            else
-            {
-                Console.WriteLine(@"Using legacy mode");
-                RunInLegacyMode(csb.ConnectionString);
-            }
+            // Instantiate the runner
+            var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
+
+            // Run the migrations
+            runner.MigrateUp();
         }
     }
 }

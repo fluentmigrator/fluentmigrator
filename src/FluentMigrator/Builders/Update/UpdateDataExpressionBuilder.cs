@@ -41,18 +41,6 @@ namespace FluentMigrator.Builders.Update
             _expression = expression;
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="UpdateDataExpressionBuilder"/> class.
-        /// </summary>
-        /// <param name="expression">The underlying expression</param>
-        /// <param name="context">The migration context</param>
-        [Obsolete]
-        // ReSharper disable once UnusedParameter.Local
-        public UpdateDataExpressionBuilder(UpdateDataExpression expression, IMigrationContext context)
-        {
-            _expression = expression;
-        }
-
         /// <inheritdoc />
         public IUpdateSetSyntax InSchema(string schemaName)
         {

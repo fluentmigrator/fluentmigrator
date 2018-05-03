@@ -19,7 +19,6 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
@@ -42,13 +41,8 @@ namespace FluentMigrator
     /// </remarks>
     public abstract class AutoScriptMigration : MigrationBase
     {
-        [CanBeNull]
+        [NotNull]
         private readonly IEmbeddedResourceProvider _embeddedResourceProvider;
-
-        [Obsolete]
-        protected AutoScriptMigration()
-        {
-        }
 
         protected AutoScriptMigration([NotNull] IEmbeddedResourceProvider embeddedResourceProvider)
         {
@@ -58,16 +52,11 @@ namespace FluentMigrator
         /// <inheritdoc />
         public sealed override void Up()
         {
-#pragma warning disable 612
             var expression = new ExecuteEmbeddedAutoSqlScriptExpression(
-                _embeddedResourceProvider ?? new DefaultEmbeddedResourceProvider(Context.MigrationAssemblies),
+                _embeddedResourceProvider,
                 GetType(),
                 GetDatabaseNames(),
-                MigrationDirection.Up)
-            {
-                MigrationAssemblies = Context.MigrationAssemblies,
-#pragma warning restore 612
-            };
+                MigrationDirection.Up);
 
             Context.Expressions.Add(expression);
         }
@@ -75,16 +64,11 @@ namespace FluentMigrator
         /// <inheritdoc />
         public sealed override void Down()
         {
-#pragma warning disable 612
             var expression = new ExecuteEmbeddedAutoSqlScriptExpression(
-                _embeddedResourceProvider ?? new DefaultEmbeddedResourceProvider(Context.MigrationAssemblies),
+                _embeddedResourceProvider,
                 GetType(),
                 GetDatabaseNames(),
-                MigrationDirection.Down)
-            {
-                MigrationAssemblies = Context.MigrationAssemblies,
-#pragma warning restore 612
-            };
+                MigrationDirection.Down);
 
             Context.Expressions.Add(expression);
         }
@@ -117,45 +101,16 @@ namespace FluentMigrator
                 Direction = direction;
             }
 
-            [Obsolete]
-            // ReSharper disable once UnusedMember.Local
-            public ExecuteEmbeddedAutoSqlScriptExpression(IAssemblyCollection assemblyCollection, Type migrationType, IList<string> databaseNames, MigrationDirection direction)
-            {
-                _embeddedResourceProvider = new DefaultEmbeddedResourceProvider(assemblyCollection);
-                MigrationType = migrationType;
-                DatabaseNames = databaseNames;
-                Direction = direction;
-            }
-
             public IList<string> AutoNames { get; set; }
             public AutoNameContext AutoNameContext { get; } = AutoNameContext.EmbeddedResource;
             public Type MigrationType { get; }
             public IList<string> DatabaseNames { get; }
             public MigrationDirection Direction { get; }
 
-            /// <summary>
-            /// Gets or sets the migration assemblies
-            /// </summary>
-            [Obsolete]
-            [CanBeNull]
-            public IAssemblyCollection MigrationAssemblies { get; set; }
-
             /// <inheritdoc />
             public override void ExecuteWith(IMigrationProcessor processor)
             {
-                IReadOnlyCollection<(string name, Assembly Assembly)> resourceNames;
-#pragma warning disable 612
-                if (MigrationAssemblies != null)
-                {
-                    resourceNames = MigrationAssemblies.GetManifestResourceNames()
-                        .Select(item => (name: item.Name, assembly: item.Assembly))
-                        .ToList();
-#pragma warning restore 612
-                }
-                else
-                {
-                    resourceNames = _embeddedResourceProvider.GetEmbeddedResources().ToList();
-                }
+                var resourceNames = _embeddedResourceProvider.GetEmbeddedResources().ToList();
 
                 var embeddedResourceNameWithAssembly = GetQualifiedResourcePath(resourceNames, AutoNames.ToArray());
                 string sqlText;

@@ -27,12 +27,6 @@ namespace FluentMigrator.Runner.Processors.Oracle
             new TestEntry("Oracle.DataAccess", "Oracle.DataAccess.Client.OracleClientFactory"),
         };
 
-        [Obsolete]
-        public OracleDbFactory()
-            : this(serviceProvider: null)
-        {
-        }
-
         public OracleDbFactory(IServiceProvider serviceProvider)
             : base(serviceProvider, _testEntries)
         {

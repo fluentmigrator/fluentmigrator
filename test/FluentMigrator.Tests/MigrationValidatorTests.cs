@@ -34,7 +34,7 @@ namespace FluentMigrator.Tests
         public void Setup()
         {
             _migration = Mock.Of<IMigration>();
-            _migrationValidator = new MigrationValidator(Mock.Of<ILogger>(), new DefaultConventionSet());
+            _migrationValidator = new MigrationValidator(Mock.Of<ILogger<MigrationValidator>>(), new DefaultConventionSet());
         }
 
         private MigrationValidator _migrationValidator;

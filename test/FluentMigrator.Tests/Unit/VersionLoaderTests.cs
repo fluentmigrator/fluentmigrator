@@ -76,28 +76,6 @@ namespace FluentMigrator.Tests.Unit
         }
 
         [Test]
-        [Obsolete]
-        public void CanSetupApplicationContext()
-        {
-            var applicationContext = "Test context";
-
-            var processor = new Mock<IMigrationProcessor>();
-            var serviceProvider = ServiceCollectionExtensions.CreateServices()
-                .WithProcessor(processor)
-                .AddScoped(_ => ConventionSets.NoSchemaName)
-                .AddScoped<IMigrationRunnerConventionsAccessor>(
-                    _ => new PassThroughMigrationRunnerConventionsAccessor(new MigrationRunnerConventions()))
-                .AddScoped<IConnectionStringReader>(_ => new PassThroughConnectionStringReader("No connection"))
-                .Configure<RunnerOptions>(opt => opt.ApplicationContext = applicationContext)
-                .BuildServiceProvider();
-
-            var loader = serviceProvider.GetRequiredService<IVersionLoader>();
-
-            var versionTableMetaData = loader.GetVersionTableMetaData();
-            versionTableMetaData.ApplicationContext.ShouldBe(applicationContext);
-        }
-
-        [Test]
         public void DeleteVersionShouldExecuteDeleteDataExpression()
         {
             var processor = new Mock<IMigrationProcessor>();

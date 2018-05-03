@@ -27,12 +27,6 @@ namespace FluentMigrator.Runner.Processors.Redshift
             new TestEntry("Npgsql", "Npgsql.NpgsqlFactory"),
         };
 
-        [Obsolete]
-        public RedshiftDbFactory()
-            : this(null)
-        {
-        }
-
         public RedshiftDbFactory(IServiceProvider serviceProvider)
             : base(serviceProvider, _entries)
         {

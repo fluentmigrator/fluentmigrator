@@ -25,12 +25,6 @@ namespace FluentMigrator.Runner.Processors.MySql
             new TestEntry("MySql.Data", "MySql.Data.MySqlClient.MySqlClientFactory"),
         };
 
-        [Obsolete]
-        public MySqlDbFactory()
-            : this(serviceProvider: null)
-        {
-        }
-
         public MySqlDbFactory(IServiceProvider serviceProvider)
             : base(serviceProvider, _entries)
         {

@@ -114,9 +114,6 @@ namespace FluentMigrator.DotNet.Cli
                         opt.Steps = options.Steps ?? 1;
                         opt.Profile = options.Profile;
                         opt.Tags = options.Tags.ToArray();
-#pragma warning disable 612
-                        opt.ApplicationContext = options.Context;
-#pragma warning restore 612
                         opt.TransactionPerSession = options.TransactionMode == TransactionMode.Session;
                         opt.AllowBreakingChange = options.AllowBreakingChanges;
                     })

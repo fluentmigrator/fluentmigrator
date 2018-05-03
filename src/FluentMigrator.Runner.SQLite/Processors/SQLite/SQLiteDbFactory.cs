@@ -30,12 +30,6 @@ namespace FluentMigrator.Runner.Processors.SQLite
             new TestEntry("Microsoft.Data.Sqlite", "Microsoft.Data.Sqlite.SqliteFactory"),
         };
 
-        [Obsolete]
-        public SQLiteDbFactory()
-            : base(_testEntries)
-        {
-        }
-
         public SQLiteDbFactory(IServiceProvider serviceProvider)
             : base(serviceProvider, _testEntries)
         {

@@ -55,20 +55,6 @@ namespace FluentMigrator.Runner.Initialization
             _serviceProvider = serviceProvider;
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ProfileSource"/> class.
-        /// </summary>
-        /// <param name="source">The assembly source</param>
-        /// <param name="conventions">The migration runner conventios</param>
-        [Obsolete]
-        public MigrationSource(
-            [NotNull] IAssemblySource source,
-            [NotNull] IMigrationRunnerConventions conventions)
-        {
-            _source = source;
-            _conventions = conventions;
-        }
-
         /// <inheritdoc />
         public IEnumerable<IMigration> GetMigrations()
         {

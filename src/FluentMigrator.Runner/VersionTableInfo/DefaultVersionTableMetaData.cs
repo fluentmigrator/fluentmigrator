@@ -30,39 +30,10 @@ namespace FluentMigrator.Runner.VersionTableInfo
 {
     public class DefaultVersionTableMetaData : IVersionTableMetaData, ISchemaExpression
     {
-        public DefaultVersionTableMetaData(IConventionSet conventionSet, IOptions<RunnerOptions> runnerOptions)
+        public DefaultVersionTableMetaData(IConventionSet conventionSet)
         {
-#pragma warning disable 618
-#pragma warning disable 612
-            ApplicationContext = runnerOptions.Value.ApplicationContext;
-#pragma warning restore 612
-#pragma warning restore 618
             conventionSet.SchemaConvention?.Apply(this);
         }
-
-        [Obsolete("Use dependency injection")]
-        public DefaultVersionTableMetaData()
-            : this(string.Empty)
-        {
-        }
-
-        [Obsolete("Use dependency injection")]
-        public DefaultVersionTableMetaData(string schemaName)
-        {
-            // ReSharper disable once VirtualMemberCallInConstructor
-            SchemaName = schemaName ?? string.Empty;
-        }
-
-        /// <summary>
-        /// Provides access to <code>ApplicationContext</code> object.
-        /// </summary>
-        /// <remarks>
-        /// ApplicationContext value is set by FluentMigrator immediately after instantiation of a class
-        /// implementing <code>IVersionTableMetaData</code> and before any of properties of <code>IVersionTableMetaData</code>
-        /// is called. Properties can use <code>ApplicationContext</code> value to implement context-depending logic.
-        /// </remarks>
-        [Obsolete("Use dependency injection to get data using your own services")]
-        public object ApplicationContext { get; set; }
 
         public virtual string SchemaName { get; set; }
 

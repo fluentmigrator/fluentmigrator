@@ -30,9 +30,6 @@ namespace FluentMigrator.Model
     /// </summary>
     public class ForeignKeyDefinition
         : ICloneable,
-#pragma warning disable 618
-          ICanBeValidated,
-#pragma warning restore 618
           IValidatableObject
     {
         /// <summary>
@@ -82,13 +79,6 @@ namespace FluentMigrator.Model
         /// Gets or sets the primary key column names
         /// </summary>
         public virtual ICollection<string> PrimaryColumns { get; set; } = new List<string>();
-
-        /// <inheritdoc />
-        [Obsolete("Use the System.ComponentModel.DataAnnotations.Validator instead")]
-        public virtual void CollectValidationErrors(ICollection<string> errors)
-        {
-            this.CollectErrors(errors);
-        }
 
         /// <inheritdoc />
         public object Clone()
