@@ -57,16 +57,13 @@ namespace FluentMigrator.MSBuild
 
         private string _databaseType;
 
-        public string ApplicationContext { get; set; }
-
         [Required]
         public string Connection { get; set; }
-
-        public string ConnectionStringConfigPath { get; set; }
 
         public string Target { get { return (Targets != null && Targets.Length == 1) ? Targets[0] : string.Empty; } set { Targets = new[] { value }; } }
 
         public string[] Targets { get; set; }
+
         public string MigrationAssembly { get { return (Targets != null && Targets.Length == 1) ? Targets[0] : string.Empty; } set { Targets = new[] {value}; } }
 
         public string Database { get { return _databaseType; } set { _databaseType = value; } }
@@ -148,6 +145,12 @@ namespace FluentMigrator.MSBuild
             var conventionSet = new DefaultConventionSet(defaultSchemaName: null, WorkingDirectory);
 
             var services = CreateCoreServices()
+                .Configure<FluentMigratorLoggerOptions>(
+                    opt =>
+                    {
+                        opt.ShowElapsedTime = Verbose;
+                        opt.ShowSql = Verbose;
+                    })
                 .AddSingleton<IConventionSet>(conventionSet)
                 .AddSingleton<ILoggerProvider, FluentMigratorConsoleLoggerProvider>()
                 .Configure<SelectingProcessorAccessorOptions>(opt => opt.ProcessorId = DatabaseType)

@@ -39,9 +39,7 @@ namespace FluentMigrator.Console
 {
     public class MigratorConsole
     {
-        public string ApplicationContext;
         public string Connection;
-        public string ConnectionStringConfigPath;
         public string Namespace;
         public bool NestedNamespaces;
         public bool Output;
@@ -98,13 +96,6 @@ namespace FluentMigrator.Console
                         "connectionString=|connection=|conn=|c=",
                         "The name of the connection string (falls back to machine name) or the connection string itself to the server and database you want to execute your migrations against.",
                         v => { Connection = v; }
-                    },
-                    {
-                        "connectionStringConfigPath=|configPath=",
-                        string.Format(
-                            "The path of the machine.config where the connection string named by connectionString" +
-                            " is found. If not specified, it defaults to the machine.config used by the currently running CLR version"),
-                        v => { ConnectionStringConfigPath = v; }
                     },
                     {
                         "namespace=|ns=",
@@ -175,11 +166,6 @@ namespace FluentMigrator.Console
                         "profile=",
                         "The profile to run after executing migrations.",
                         v => { Profile = v; }
-                    },
-                    {
-                        "context=",
-                        "Set ApplicationContext to the given string.",
-                        v => { ApplicationContext = v; }
                     },
                     {
                         "timeout=",
