@@ -27,6 +27,17 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             ClauseOrder.Add(FormatRowGuid);
         }
 
+        /// <inheritdoc />
+        protected override string FormatNullable(ColumnDefinition column)
+        {
+            if (column.IsNullable == true && column.Type == null && !string.IsNullOrEmpty(column.CustomType))
+            {
+                return "NULL";
+            }
+
+            return base.FormatNullable(column);
+        }
+
         /// <summary>
         /// Add <c>ROWGUIDCOL</c> when <see cref="SqlServerExtensions.RowGuidColumn"/> is set.
         /// </summary>

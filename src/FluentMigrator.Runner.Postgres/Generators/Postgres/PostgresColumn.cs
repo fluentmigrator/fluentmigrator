@@ -72,6 +72,17 @@ namespace FluentMigrator.Runner.Generators.Postgres
         }
 
         /// <inheritdoc />
+        protected override string FormatNullable(ColumnDefinition column)
+        {
+            if (column.IsNullable == true && column.Type == null && !string.IsNullOrEmpty(column.CustomType))
+            {
+                return "NULL";
+            }
+
+            return base.FormatNullable(column);
+        }
+
+        /// <inheritdoc />
         protected override string FormatIdentity(ColumnDefinition column)
         {
             return string.Empty;

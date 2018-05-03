@@ -21,6 +21,25 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
+        public override void CanCreateNullableColumnWithCustomDomainTypeAndCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateColumnExpressionWithNullableCustomType();
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE TestSchema.TestTable1 ADD TestColumn1 MyDomainType");
+        }
+
+        [Test]
+        public override void CanCreateNullableColumnWithCustomDomainTypeAndDefaultSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateColumnExpressionWithNullableCustomType();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 MyDomainType");
+        }
+
+        [Test]
         public override void CanAlterColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetAlterColumnExpression();

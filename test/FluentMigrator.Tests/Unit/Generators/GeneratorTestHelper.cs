@@ -36,7 +36,6 @@ namespace FluentMigrator.Tests.Unit.Generators
 {
     public static class GeneratorTestHelper
     {
-
         public static string TestTableName1 = "TestTable1";
         public static string TestTableName2 = "TestTable2";
         public static string TestColumnName1 = "TestColumn1";
@@ -547,6 +546,20 @@ namespace FluentMigrator.Tests.Unit.Generators
             expression.Column.Size = 20;
             expression.Column.IsNullable = false;
             expression.Column.ModificationType = ColumnModificationType.Alter;
+
+            return expression;
+        }
+
+        public static CreateColumnExpression GetCreateColumnExpressionWithNullableCustomType()
+        {
+            var expression = new CreateColumnExpression();
+            expression.TableName = TestTableName1;
+
+            expression.Column = new ColumnDefinition();
+            expression.Column.Name = TestColumnName1;
+            expression.Column.IsNullable = true;
+            expression.Column.CustomType = "MyDomainType";
+            expression.Column.ModificationType = ColumnModificationType.Create;
 
             return expression;
         }

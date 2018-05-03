@@ -40,5 +40,7 @@ namespace FluentMigrator.Tests.Unit.Generators
         public abstract void CanDropMultipleColumnsWithDefaultSchema();
         public abstract void CanRenameColumnWithCustomSchema();
         public abstract void CanRenameColumnWithDefaultSchema();
+        public abstract void CanCreateNullableColumnWithCustomDomainTypeAndCustomSchema();
+        public abstract void CanCreateNullableColumnWithCustomDomainTypeAndDefaultSchema();
     }
 }
