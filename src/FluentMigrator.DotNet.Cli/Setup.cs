@@ -22,6 +22,7 @@ using AutoMapper;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Initialization;
+using FluentMigrator.Runner.Logging;
 using FluentMigrator.Runner.Processors;
 
 using McMaster.Extensions.CommandLineUtils;
@@ -45,11 +46,27 @@ namespace FluentMigrator.DotNet.Cli
         {
             var conventionSet = new DefaultConventionSet(defaultSchemaName: null, options.WorkingDirectory);
 
+            var targetIsSqlServer = !string.IsNullOrEmpty(options.ProcessorType)
+             && options.ProcessorType.StartsWith("sqlserver", StringComparison.OrdinalIgnoreCase);
+
             var mapper = ConfigureMapper();
             services
                 .AddLogging(lb => lb.AddFluentMigratorConsole())
                 .AddOptions()
                 .AddSingleton(mapper);
+
+            if (options.Output)
+            {
+                services
+                    .AddSingleton<ILoggerProvider, LogFileFluentMigratorLoggerProvider>()
+                    .Configure<LogFileFluentMigratorLoggerOptions>(
+                        opt =>
+                        {
+                            opt.OutputFileName = options.OutputFileName;
+                            opt.OutputGoBetweenStatements = targetIsSqlServer;
+                            opt.ShowSql = true;
+                        });
+            }
 
             services
                 .AddFluentMigratorCore()
