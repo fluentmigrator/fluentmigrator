@@ -22,7 +22,6 @@ using AutoMapper;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Initialization;
-using FluentMigrator.Runner.Initialization.NetFramework;
 using FluentMigrator.Runner.Processors;
 
 using McMaster.Extensions.CommandLineUtils;
@@ -48,7 +47,7 @@ namespace FluentMigrator.DotNet.Cli
 
             var mapper = ConfigureMapper();
             services
-                .AddLogging(lb => lb.AddDebug().AddFluentMigratorConsole())
+                .AddLogging(lb => lb.AddFluentMigratorConsole())
                 .AddOptions()
                 .AddSingleton(mapper);
 
@@ -82,10 +81,6 @@ namespace FluentMigrator.DotNet.Cli
                 .AddSingleton<IConventionSet>(conventionSet)
                 .Configure<SelectingProcessorAccessorOptions>(opt => opt.ProcessorId = options.ProcessorType)
                 .Configure<AssemblySourceOptions>(opt => opt.AssemblyNames = options.TargetAssemblies.ToArray())
-#pragma warning disable 612
-                .Configure<AppConfigConnectionStringAccessorOptions>(
-                    opt => opt.ConnectionStringConfigPath = options.ConnectionStringConfigPath)
-#pragma warning restore 612
                 .Configure<TypeFilterOptions>(
                     opt =>
                     {

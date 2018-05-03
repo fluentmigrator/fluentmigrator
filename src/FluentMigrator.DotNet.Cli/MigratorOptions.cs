@@ -28,7 +28,6 @@ namespace FluentMigrator.DotNet.Cli
         public bool NestedNamespaces { get; private set; }
         public long? StartVersion { get; private set; }
         public bool NoConnection { get; private set; }
-        public string ConnectionStringConfigPath { get; private set; }
         public string WorkingDirectory { get; private set; }
         public IEnumerable<string> Tags { get; private set; }
         public bool Preview { get; private set; }
@@ -104,7 +103,6 @@ namespace FluentMigrator.DotNet.Cli
         private MigratorOptions Init(ConnectionCommand cmd)
         {
             ConnectionString = cmd.ConnectionString;
-            ConnectionStringConfigPath = cmd.ConnectionStringConfigPath;
             NoConnection = cmd.NoConnection;
             ProcessorType = cmd.ProcessorType;
             ProcessorSwitches = cmd.ProcessorSwitches;
