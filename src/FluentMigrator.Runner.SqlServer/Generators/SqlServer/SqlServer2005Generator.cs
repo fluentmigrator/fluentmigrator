@@ -40,6 +40,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             SqlServerExtensions.IncludesList,
             SqlServerExtensions.OnlineIndex,
             SqlServerExtensions.RowGuidColumn,
+            SqlServerExtensions.SchemaAuthorization,
         };
 
         public SqlServer2005Generator()
@@ -74,6 +75,8 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         }
 
         public override string AddColumn { get { return "ALTER TABLE {0} ADD {1}"; } }
+
+        public override string CreateSchema { get { return "CREATE SCHEMA {0}{1}"; } }
 
         public override string CreateIndex { get { return "CREATE {0}{1}INDEX {2} ON {3} ({4}{5}{6}){7}"; } }
         public override string DropIndex { get { return "DROP INDEX {0} ON {1}{2}"; } }
@@ -287,7 +290,17 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override string Generate(CreateSchemaExpression expression)
         {
-            return String.Format(CreateSchema, Quoter.QuoteSchemaName(expression.SchemaName));
+            string authFragment;
+            if (expression.AdditionalFeatures.TryGetValue(SqlServerExtensions.SchemaAuthorization, out var authorization))
+            {
+                authFragment = $" AUTHORIZATION {Quoter.QuoteSchemaName((string) authorization)}";
+            }
+            else
+            {
+                authFragment = string.Empty;
+            }
+
+            return string.Format(CreateSchema, Quoter.QuoteSchemaName(expression.SchemaName), authFragment);
         }
 
         public override string Generate(DeleteSchemaExpression expression)
