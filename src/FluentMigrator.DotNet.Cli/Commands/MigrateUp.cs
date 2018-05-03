@@ -27,7 +27,7 @@ namespace FluentMigrator.DotNet.Cli.Commands
     {
         public Migrate Parent { get; }
 
-        [Option("-t|-target <TARGET_VERSION>", Description = "The specific version to migrate.")]
+        [Option("-t|--target <TARGET_VERSION>", Description = "The specific version to migrate.")]
         public long? TargetVersion { get; }
 
         private int OnExecute(IConsole console)
