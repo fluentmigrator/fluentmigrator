@@ -25,7 +25,7 @@
     - When `RequireAll` attributes exist and all `RequireAll` flagged `TagsAttribute`s are in the specified list of tags, then the migration gets used
     - When `RequireAny` attribute exists and at least one `RequireAny` flagged `TagsAttribute` is in the specified list of tags, then the migration gets used
     - A match for `RequireAll` skips the check for ´RequireAny`
-  
+
 ## Migration Traits
 
 - Specified by `MigrationTraitAttribute`
