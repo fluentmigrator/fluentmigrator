@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -26,6 +26,8 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Builders.Schema
 {
     [TestFixture]
+    [Category("Builder")]
+    [Category("RootSchema")]
     public class SchemaExpressionRootTest
     {
         private Mock<IQuerySchema> _querySchemaMock;

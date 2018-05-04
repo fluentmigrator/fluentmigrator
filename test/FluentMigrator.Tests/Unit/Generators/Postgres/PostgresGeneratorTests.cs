@@ -16,12 +16,13 @@
 //
 #endregion
 
-using System;
 using System.Collections.Generic;
 using System.Data;
+
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Postgres;
+
 using NUnit.Framework;
 
 using Shouldly;
@@ -29,6 +30,8 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Generators.Postgres
 {
     [TestFixture]
+    [Category("Generator")]
+    [Category("Postgres")]
     public class PostgresGeneratorTests
     {
         protected PostgresGenerator Generator;

@@ -36,6 +36,8 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
 {
     [TestFixture]
+    [Category("Builder")]
+    [Category("IfDatabase")]
     public class IfDatabaseExpressionRootTests
     {
         [Test]

@@ -31,6 +31,8 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Expressions
 {
     [TestFixture]
+    [Category("Expression")]
+    [Category("CreateConstraint")]
     public class CreateConstraintExpressionTests
     {
         [Test]

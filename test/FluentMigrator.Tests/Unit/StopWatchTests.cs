@@ -17,7 +17,9 @@
 #endregion
 
 using System;
+
 using FluentMigrator.Runner;
+
 using NUnit.Framework;
 
 using Shouldly;
@@ -25,6 +27,7 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit
 {
     [TestFixture]
+    [Category("StopWatch")]
     public class StopWatchTests
     {
         [Test]

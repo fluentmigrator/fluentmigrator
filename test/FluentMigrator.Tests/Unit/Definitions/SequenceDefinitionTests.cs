@@ -23,6 +23,8 @@ using NUnit.Framework;
 namespace FluentMigrator.Tests.Unit.Definitions
 {
     [TestFixture]
+    [Category("Definition")]
+    [Category("Sequence")]
     public class SequenceDefinitionTests
     {
         [Test]

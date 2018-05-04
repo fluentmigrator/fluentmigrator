@@ -25,6 +25,7 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Versioning
 {
     [TestFixture]
+    [Category("Versioning")]
     public class VersionInfoTests
     {
         private VersionInfo _versionInfo;

@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 //
 // Copyright (c) 2018, Fluent Migrator Project
 //
@@ -17,15 +17,20 @@
 #endregion
 
 using System.Collections.Generic;
-using NUnit.Framework;
-using FluentMigrator.Expressions;
-using Moq;
-using FluentMigrator.Infrastructure;
+
 using FluentMigrator.Builders.Delete;
+using FluentMigrator.Expressions;
+using FluentMigrator.Infrastructure;
+
+using Moq;
+
+using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Unit.Builders.Delete
 {
     [TestFixture]
+    [Category("Builder")]
+    [Category("DeleteConstraint")]
     public class DeleteConstraintTest
     {
         [Test]

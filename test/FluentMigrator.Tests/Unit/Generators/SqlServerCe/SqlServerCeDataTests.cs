@@ -26,6 +26,7 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
 {
     [TestFixture]
+    [Category("SqlServerCe")]
     public class SqlServerCeDataTests : BaseDataTests
     {
         protected SqlServerCeGenerator Generator;

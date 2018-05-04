@@ -46,6 +46,8 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit
 {
     [TestFixture]
+    [Category("Runner")]
+    [Category("MigrationRunner")]
     public class MigrationRunnerTests
     {
         private Mock<IStopWatch> _stopWatch;

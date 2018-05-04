@@ -17,10 +17,12 @@
 #endregion
 
 using System;
+
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner;
 using FluentMigrator.Tests.Helpers;
+
 using NUnit.Framework;
 
 using Shouldly;
@@ -28,6 +30,8 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Expressions
 {
     [TestFixture]
+    [Category("Expression")]
+    [Category("RenameTable")]
     public class RenameTableExpressionTests
     {
         [Test]

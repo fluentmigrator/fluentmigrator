@@ -23,11 +23,13 @@ using FluentMigrator.Runner.Exceptions;
 using Microsoft.Extensions.Logging;
 
 using Moq;
+
 using NUnit.Framework;
 
 namespace FluentMigrator.Tests
 {
     [TestFixture]
+    [Category("Validation")]
     public class MigrationValidatorTests
     {
         [SetUp]

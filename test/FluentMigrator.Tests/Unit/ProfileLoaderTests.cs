@@ -32,6 +32,7 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit
 {
     [TestFixture]
+    [Category("Profile")]
     public class ProfileLoaderTests
     {
         [Test]

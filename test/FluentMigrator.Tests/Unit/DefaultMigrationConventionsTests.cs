@@ -16,9 +16,7 @@
 //
 #endregion
 
-using System;
 using System.Linq;
-using System.Reflection;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
@@ -26,8 +24,6 @@ using FluentMigrator.Model;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Infrastructure;
 using FluentMigrator.Runner.Initialization;
-using FluentMigrator.Runner.Processors;
-using FluentMigrator.Runner.Processors.SqlServer;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -40,6 +36,7 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit
 {
     [TestFixture]
+    [Category("ConventionSet")]
     public class DefaultMigrationConventionsTests
     {
         private static readonly IMigrationRunnerConventions _default = DefaultMigrationRunnerConventions.Instance;

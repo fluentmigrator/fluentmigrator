@@ -42,6 +42,7 @@ using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Integration
 {
+    [Category("Integration")]
     public class IntegrationTestBase
     {
         private readonly List<(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> getOptionsFunc)> _processors;

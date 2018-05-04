@@ -27,6 +27,7 @@ using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Unit.BatchParser
 {
+    [Category("BatchParser")]
     public class RangeSearcherTests
     {
         [TestCase(typeof(AnsiSqlIdentifier), 1, 1)]

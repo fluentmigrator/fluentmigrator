@@ -35,6 +35,9 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Generators.GenericGenerator
 {
     [TestFixture]
+    [Category("Generator")]
+    [Category("Quoter")]
+    [Category("Generic")]
     public class ConstantFormatterTests
     {
         [SetUp]

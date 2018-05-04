@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 //
 // Copyright (c) 2018, Fluent Migrator Project
 //
@@ -26,6 +26,8 @@ using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Generators
 {
+    [Category("Generator")]
+    [Category("Description")]
     public abstract class BaseDescriptionGeneratorTests
     {
         protected IDescriptionGenerator DescriptionGenerator { get; set; }

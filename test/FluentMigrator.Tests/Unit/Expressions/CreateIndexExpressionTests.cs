@@ -31,6 +31,8 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Expressions
 {
     [TestFixture]
+    [Category("Expression")]
+    [Category("CreateIndex")]
     public class CreateIndexExpressionTests
     {
         [Test]

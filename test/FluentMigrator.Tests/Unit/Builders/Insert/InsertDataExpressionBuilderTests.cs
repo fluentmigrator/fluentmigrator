@@ -29,6 +29,8 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Builders.Insert
 {
     [TestFixture]
+    [Category("Builder")]
+    [Category("InsertData")]
     public class InsertDataExpressionBuilderTests
     {
         [Test]

@@ -19,6 +19,7 @@
 
 using System;
 using System.Linq;
+
 using FluentMigrator.Exceptions;
 using FluentMigrator.Expressions;
 

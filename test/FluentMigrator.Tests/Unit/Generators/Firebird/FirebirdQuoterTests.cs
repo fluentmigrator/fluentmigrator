@@ -1,5 +1,25 @@
+#region License
+//
+// Copyright (c) 2018, Fluent Migrator Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+#endregion
+
 using System;
+
 using FluentMigrator.Runner.Generators.Firebird;
+
 using NUnit.Framework;
 
 using Shouldly;
@@ -7,10 +27,12 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Generators.Firebird
 {
     [TestFixture]
+    [Category("Generator")]
+    [Category("Quoter")]
+    [Category("Firebird")]
     public class FirebirdQuoterTests
     {
-        private static readonly string[] _fbKeywords = new[]
-        {
+        private static readonly string[] _fbKeywords = {
             "!<", "^<", "^=", "^>", ",", ":=", "!=", "!>", "(", ")", "<", "<=", "<>", "=", ">", ">=", "||", "~<", "~=", "~>",
             "ABS", "ACCENT", "ACOS", "ACTION", "ACTIVE", "ADD", "ADMIN", "AFTER", "ALL", "ALTER", "ALWAYS", "AND", "ANY",
             "AS", "ASC", "ASCENDING", "ASCII_CHAR", "ASCII_VAL", "ASIN", "AT", "ATAN", "ATAN2", "AUTO", "AUTONOMOUS", "AVG",
@@ -43,7 +65,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             "WRITE", "YEAR", "YEARDAY"
         };
 
-        [Test, TestCaseSource("_fbKeywords")]
+        [Test, TestCaseSource(nameof(_fbKeywords))]
         public void Quote_ArgIsFirebirdKeyword_ArgShouldBeQuoted(string quoteArg)
         {
             var actual = new FirebirdQuoter(false).Quote(quoteArg);

@@ -17,6 +17,7 @@
 #endregion
 
 using System;
+
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner;
@@ -29,6 +30,8 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Expressions
 {
     [TestFixture]
+    [Category("Expression")]
+    [Category("DeleteSequence")]
     public class DeleteSequenceExpressionTests
     {
         [Test]

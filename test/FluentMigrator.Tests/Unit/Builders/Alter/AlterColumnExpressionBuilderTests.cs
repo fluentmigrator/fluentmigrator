@@ -37,6 +37,8 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Builders.Alter
 {
     [TestFixture]
+    [Category("Builder")]
+    [Category("AlterColumn")]
     public class AlterColumnExpressionBuilderTests
     {
         private void VerifyColumnProperty(Action<ColumnDefinition> columnExpression, Action<AlterColumnExpressionBuilder> callToTest)

@@ -14,7 +14,6 @@
 // limitations under the License.
 #endregion
 
-using System;
 using System.Collections.Generic;
 using System.Data;
 
@@ -29,6 +28,7 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Generators.Redshift
 {
     [TestFixture]
+    [Category("Redshift")]
     public sealed class RedshiftGeneratorTests
     {
         private RedshiftGenerator _generator;

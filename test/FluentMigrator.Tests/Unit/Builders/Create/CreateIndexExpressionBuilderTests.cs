@@ -30,6 +30,8 @@ using NUnit.Framework;
 namespace FluentMigrator.Tests.Unit.Builders.Create
 {
     [TestFixture]
+    [Category("Builder")]
+    [Category("CreateIndex")]
     public class CreateIndexExpressionBuilderTests
     {
         [Test]

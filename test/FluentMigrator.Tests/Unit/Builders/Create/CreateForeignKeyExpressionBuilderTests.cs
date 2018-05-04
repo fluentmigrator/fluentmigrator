@@ -18,15 +18,20 @@
 
 using System.Collections.Generic;
 using System.Data;
+
 using FluentMigrator.Builders.Create.ForeignKey;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
+
 using Moq;
+
 using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Unit.Builders.Create
 {
     [TestFixture]
+    [Category("Builder")]
+    [Category("CreateForeignKey")]
     public class CreateForeignKeyExpressionBuilderTests
     {
         [Test]

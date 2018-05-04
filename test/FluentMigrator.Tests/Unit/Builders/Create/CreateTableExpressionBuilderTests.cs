@@ -37,6 +37,8 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Builders.Create
 {
     [TestFixture]
+    [Category("Builder")]
+    [Category("CreateTable")]
     public class CreateTableExpressionBuilderTests
     {
         [Test]

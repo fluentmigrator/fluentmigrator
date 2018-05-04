@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2007-2018, FluentMigrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,6 +23,7 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Generators.Redshift
 {
     [TestFixture]
+    [Category("Redshift")]
     public sealed class RedshiftDataTests : BaseDataTests
     {
         private RedshiftGenerator _generator;

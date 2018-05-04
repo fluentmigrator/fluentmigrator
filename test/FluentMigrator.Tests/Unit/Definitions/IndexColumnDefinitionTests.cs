@@ -31,6 +31,7 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Definitions
 {
     [TestFixture]
+    [Category("Definition")]
     public class IndexColumnDefinitionTests
     {
         [Test]

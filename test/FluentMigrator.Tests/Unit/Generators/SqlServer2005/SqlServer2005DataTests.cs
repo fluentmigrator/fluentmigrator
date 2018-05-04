@@ -26,6 +26,7 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 {
     [TestFixture]
+    [Category("SqlServer2005")]
     public class SqlServer2005DataTests : BaseDataTests
     {
         protected SqlServer2005Generator Generator;

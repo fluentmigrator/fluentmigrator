@@ -29,6 +29,7 @@ using FluentMigrator.Model;
 using FluentMigrator.SqlServer;
 
 using Moq;
+
 using NUnit.Framework;
 
 using Shouldly;
@@ -36,6 +37,8 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Builders.Create
 {
     [TestFixture]
+    [Category("Builder")]
+    [Category("CreateColumn")]
     public class CreateColumnExpressionBuilderTests
     {
         [Test]

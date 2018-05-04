@@ -31,6 +31,8 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Definitions
 {
     [TestFixture]
+    [Category("Definition")]
+    [Category("ForeignKey")]
     public class ForeignKeyDefinitionTests
     {
         [Test]

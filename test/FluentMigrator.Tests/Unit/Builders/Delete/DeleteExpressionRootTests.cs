@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -18,12 +18,15 @@
 
 using System.Collections.Generic;
 using System.Linq;
+
 using FluentMigrator.Builders.Delete;
 using FluentMigrator.Builders.Delete.Column;
 using FluentMigrator.Builders.Delete.ForeignKey;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
+
 using Moq;
+
 using NUnit.Framework;
 
 using Shouldly;
@@ -31,6 +34,8 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Builders.Delete
 {
     [TestFixture]
+    [Category("Builder")]
+    [Category("RootDelete")]
     public class DeleteExpressionRootTests
     {
         [Test]

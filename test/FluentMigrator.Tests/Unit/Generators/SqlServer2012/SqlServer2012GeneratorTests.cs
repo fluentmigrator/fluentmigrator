@@ -27,6 +27,8 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Generators.SqlServer2012
 {
     [TestFixture]
+    [Category("Generator")]
+    [Category("SqlServer2012")]
     public class SqlServer2012GeneratorTests
     {
         protected SqlServer2012Generator Generator;

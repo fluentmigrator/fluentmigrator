@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
 //
@@ -26,6 +26,7 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit
 {
     [TestFixture]
+    [Category("MigrationInfo")]
     public class MigrationInfoTests
     {
         [SetUp]

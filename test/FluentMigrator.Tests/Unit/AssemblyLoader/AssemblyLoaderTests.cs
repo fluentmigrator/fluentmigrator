@@ -17,11 +17,13 @@
 #endregion
 
 using FluentMigrator.Runner.Initialization.AssemblyLoader;
+
 using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Unit.AssemblyLoader
 {
     [TestFixture]
+    [Category("AssemblyLoader")]
     public class AssemblyLoaderTests
     {
         private AssemblyLoaderFactory _assemblyLoaderFactory;
