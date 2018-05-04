@@ -18,6 +18,7 @@
 
 using FluentMigrator.Builders.Delete;
 using FluentMigrator.Builders.Execute;
+using FluentMigrator.Builders.Insert;
 using FluentMigrator.Builders.Update;
 
 namespace FluentMigrator
@@ -28,14 +29,6 @@ namespace FluentMigrator
     public abstract class Migration : MigrationBase
     {
         /// <summary>
-        /// Gets the starting point for data deletions
-        /// </summary>
-        public IDeleteExpressionRoot Delete
-        {
-            get { return new DeleteExpressionRoot(Context); }
-        }
-
-        /// <summary>
         /// Gets the starting point for SQL execution
         /// </summary>
         public IExecuteExpressionRoot Execute
@@ -44,11 +37,27 @@ namespace FluentMigrator
         }
 
         /// <summary>
+        /// Gets the starting point for data insertion
+        /// </summary>
+        public IInsertExpressionRoot Insert
+        {
+            get { return new InsertExpressionRoot(Context); }
+        }
+
+        /// <summary>
         /// Gets the starting point for data updates
         /// </summary>
         public IUpdateExpressionRoot Update
         {
             get { return new UpdateExpressionRoot(Context); }
+        }
+
+        /// <summary>
+        /// Gets the starting point for data deletions
+        /// </summary>
+        public IDeleteExpressionRoot Delete
+        {
+            get { return new DeleteExpressionRoot(Context); }
         }
     }
 }

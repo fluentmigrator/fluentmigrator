@@ -21,7 +21,6 @@ using System;
 using FluentMigrator.Builders.Alter;
 using FluentMigrator.Builders.Create;
 using FluentMigrator.Builders.IfDatabase;
-using FluentMigrator.Builders.Insert;
 using FluentMigrator.Builders.Rename;
 using FluentMigrator.Builders.Schema;
 using FluentMigrator.Infrastructure;
@@ -106,14 +105,6 @@ namespace FluentMigrator
         public IRenameExpressionRoot Rename
         {
             get { return new RenameExpressionRoot(Context); }
-        }
-
-        /// <summary>
-        /// Gets the starting point for data insertion
-        /// </summary>
-        public IInsertExpressionRoot Insert
-        {
-            get { return new InsertExpressionRoot(Context); }
         }
 
         /// <summary>
