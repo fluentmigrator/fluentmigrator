@@ -20,8 +20,6 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
-using FluentMigrator.Infrastructure;
-
 using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Initialization

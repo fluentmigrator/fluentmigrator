@@ -17,7 +17,6 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
 
 namespace FluentMigrator.Expressions
 {

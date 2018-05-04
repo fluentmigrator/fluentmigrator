@@ -16,10 +16,7 @@
 //
 #endregion
 
-using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.VersionTableInfo;
-
-using Microsoft.Extensions.Options;
 
 #pragma warning disable 3005
 namespace FluentMigrator.Tests.Unit

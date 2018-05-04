@@ -14,11 +14,6 @@
 // limitations under the License.
 #endregion
 
-using System;
-using System.Collections.Generic;
-
-using FluentMigrator.Infrastructure;
-
 using JetBrains.Annotations;
 
 namespace FluentMigrator.Runner

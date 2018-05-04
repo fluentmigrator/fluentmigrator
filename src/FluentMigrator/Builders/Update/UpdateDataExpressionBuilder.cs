@@ -16,11 +16,9 @@
 //
 #endregion
 
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using FluentMigrator.Expressions;
-using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Update
 {

@@ -17,7 +17,6 @@
 #endregion
 
 using System;
-using System.Data;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {

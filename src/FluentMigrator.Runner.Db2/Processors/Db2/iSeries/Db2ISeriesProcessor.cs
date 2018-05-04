@@ -16,14 +16,12 @@
 //
 #endregion
 
-using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators;
-using FluentMigrator.Runner.Generators.DB2;
 using FluentMigrator.Runner.Generators.DB2.iSeries;
 using FluentMigrator.Runner.Helpers;
 using FluentMigrator.Runner.Initialization;

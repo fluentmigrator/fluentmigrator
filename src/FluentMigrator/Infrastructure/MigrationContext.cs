@@ -23,8 +23,6 @@ using FluentMigrator.Expressions;
 
 using JetBrains.Annotations;
 
-using Microsoft.Extensions.DependencyInjection;
-
 namespace FluentMigrator.Infrastructure
 {
     /// <summary>

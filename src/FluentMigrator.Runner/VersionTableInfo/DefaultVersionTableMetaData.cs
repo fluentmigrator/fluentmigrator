@@ -18,13 +18,8 @@
 
 #endregion
 
-using System;
-
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Conventions;
-using FluentMigrator.Runner.Initialization;
-
-using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.VersionTableInfo
 {

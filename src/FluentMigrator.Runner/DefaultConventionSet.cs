@@ -14,11 +14,9 @@
 // limitations under the License.
 #endregion
 
-using System;
 using System.Collections.Generic;
 
 using FluentMigrator.Runner.Conventions;
-using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 

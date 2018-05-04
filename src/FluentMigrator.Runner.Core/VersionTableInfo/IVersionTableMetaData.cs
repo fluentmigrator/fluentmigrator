@@ -16,8 +16,6 @@
 //
 #endregion
 
-using System;
-
 namespace FluentMigrator.Runner.VersionTableInfo
 {
     public interface IVersionTableMetaData

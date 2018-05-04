@@ -16,9 +16,6 @@
 //
 #endregion
 
-using System;
-using System.Data;
-
 using FluentMigrator.Runner.Generators.Oracle;
 using FluentMigrator.Runner.Initialization;
 

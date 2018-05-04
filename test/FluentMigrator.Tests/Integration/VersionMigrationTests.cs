@@ -27,7 +27,6 @@ using FluentMigrator.Runner.VersionTableInfo;
 using FluentMigrator.Tests.Unit;
 
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 
 using NUnit.Framework;
 
