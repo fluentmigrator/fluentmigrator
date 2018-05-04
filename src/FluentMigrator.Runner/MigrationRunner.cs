@@ -46,7 +46,7 @@ namespace FluentMigrator.Runner
         [NotNull]
         private readonly IStopWatch _stopWatch;
 
-        [CanBeNull]
+        [NotNull]
         private readonly IServiceProvider _serviceProvider;
 
         [NotNull]

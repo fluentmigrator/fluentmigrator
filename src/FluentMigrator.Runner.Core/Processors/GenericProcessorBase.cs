@@ -31,21 +31,21 @@ namespace FluentMigrator.Runner.Processors
 {
     public abstract class GenericProcessorBase : ProcessorBase
     {
-        [NotNull, ItemCanBeNull]
+        [NotNull, ItemNotNull]
         private readonly Lazy<DbProviderFactory> _dbProviderFactory;
 
-        [NotNull, ItemCanBeNull]
+        [NotNull, ItemNotNull]
         private readonly Lazy<DbConnection> _lazyConnection;
 
         protected GenericProcessorBase(
-            [CanBeNull] Func<DbProviderFactory> factoryAccessor,
+            [NotNull] Func<DbProviderFactory> factoryAccessor,
             [NotNull] IMigrationGenerator generator,
             [NotNull] ILogger logger,
             [NotNull] ProcessorOptions options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor)
             : base(generator, logger, options)
         {
-            _dbProviderFactory = new Lazy<DbProviderFactory>(() => factoryAccessor?.Invoke());
+            _dbProviderFactory = new Lazy<DbProviderFactory>(factoryAccessor);
 
             var connectionString = connectionStringAccessor.ConnectionString;
 
