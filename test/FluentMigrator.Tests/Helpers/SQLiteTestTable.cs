@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 //
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
 //
@@ -18,7 +18,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Data;
+using System.Data.Common;
 using System.Text;
 using FluentMigrator.Runner.Processors.SQLite;
 
@@ -26,9 +26,10 @@ namespace FluentMigrator.Tests.Helpers {
     // ReSharper disable once InconsistentNaming
     public class SQLiteTestTable : IDisposable {
         private readonly string _schemaName;
-        private IDbConnection Connection { get; set; }
+        private DbConnection Connection { get; set; }
+        private DbTransaction Transaction { get; set; }
+
         public string Name { get; set; }
-        private IDbTransaction Transaction { get; set; }
 
         public SQLiteTestTable( SQLiteProcessor processor, string schemaName, params string[] columnDefinitions ) {
             _schemaName = schemaName;

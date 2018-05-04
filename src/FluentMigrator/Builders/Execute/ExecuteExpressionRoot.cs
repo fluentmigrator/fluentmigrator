@@ -18,8 +18,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Diagnostics;
+using System.Data.Common;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
@@ -71,7 +70,7 @@ namespace FluentMigrator.Builders.Execute
         }
 
         /// <inheritdoc />
-        public void WithConnection(Action<IDbConnection, IDbTransaction> operation)
+        public void WithConnection(Action<DbConnection, DbTransaction> operation)
         {
             var expression = new PerformDBOperationExpression { Operation = operation };
             _context.Expressions.Add(expression);

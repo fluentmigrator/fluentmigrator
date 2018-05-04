@@ -18,6 +18,7 @@
 
 using System;
 using System.Data;
+using System.Data.Common;
 using System.Text;
 
 using FluentMigrator.Runner.Generators;
@@ -70,7 +71,7 @@ namespace FluentMigrator.Tests.Helpers
             set;
         }
 
-        private IDbConnection Connection => Processor.Connection;
+        private DbConnection Connection => Processor.Connection;
 
         public void Create(string[] columnDefinitions)
         {

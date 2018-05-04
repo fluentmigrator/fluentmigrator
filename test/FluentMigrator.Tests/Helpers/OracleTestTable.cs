@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Text;
 
 using FluentMigrator.Runner.Generators;
@@ -35,7 +36,7 @@ namespace FluentMigrator.Tests.Helpers
         private readonly List<string> _constraints = new List<string>();
         private readonly List<string> _indexies = new List<string>();
 
-        private IDbConnection Connection => _processor.Connection;
+        private DbConnection Connection => _processor.Connection;
         public string Name { get; set; }
 
 
