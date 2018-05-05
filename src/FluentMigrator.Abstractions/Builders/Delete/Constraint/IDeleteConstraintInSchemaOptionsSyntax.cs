@@ -26,6 +26,6 @@ namespace FluentMigrator.Builders.Delete.Constraint
         /// </summary>
         /// <param name="schemaName">The schema name</param>
         /// <returns>The next step</returns>
-        IDeleteConstraintInSchemaOptionsSyntax InSchema(string schemaName);
+        IDeleteConstraintColumnSyntax InSchema(string schemaName);
     }
 }

@@ -52,7 +52,7 @@ namespace FluentMigrator.Builders.Delete.Constraint
         }
 
         /// <inheritdoc />
-        public IDeleteConstraintInSchemaOptionsSyntax InSchema(string schemaName)
+        public IDeleteConstraintColumnSyntax InSchema(string schemaName)
         {
             Expression.Constraint.SchemaName = schemaName;
             return this;
