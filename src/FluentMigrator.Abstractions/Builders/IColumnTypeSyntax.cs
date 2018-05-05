@@ -114,6 +114,13 @@ namespace FluentMigrator.Builders
         TNext AsDateTimeOffset();
 
         /// <summary>
+        /// Defines the column type as <see cref="DateTimeOffset"/>
+        /// </summary>
+        /// <param name="precision">The number of digits for the fraction of a second</param>
+        /// <returns>The next step</returns>
+        TNext AsDateTimeOffset(int precision);
+
+        /// <summary>
         /// Defines the column type as <see cref="decimal"/>
         /// </summary>
         /// <returns>The next step</returns>
