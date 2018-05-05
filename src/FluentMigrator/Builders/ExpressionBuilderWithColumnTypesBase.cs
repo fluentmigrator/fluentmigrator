@@ -131,6 +131,14 @@ namespace FluentMigrator.Builders
         }
 
         /// <inheritdoc />
+        public TNext AsDateTimeOffset(int precision)
+        {
+            Column.Type = DbType.DateTimeOffset;
+            Column.Size = precision;
+            return (TNext)(object)this;
+        }
+
+        /// <inheritdoc />
         public TNext AsDecimal()
         {
             Column.Type = DbType.Decimal;
