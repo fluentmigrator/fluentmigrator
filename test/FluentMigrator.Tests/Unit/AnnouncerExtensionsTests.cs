@@ -1,13 +1,13 @@
 ﻿#region License
 
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,46 +16,50 @@
 
 #endregion
 
+using System;
+
 using FluentMigrator.Runner;
+
 using Moq;
+
 using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Unit
 {
     [TestFixture]
+    [Obsolete]
     public class AnnouncerExtensionsTests
     {
-        
         [SetUp]
         public void Setup()
         {
-            announcer = new Mock<IAnnouncer>(MockBehavior.Strict).Object;
+            _announcer = new Mock<IAnnouncer>(MockBehavior.Strict).Object;
         }
 
-        private IAnnouncer announcer;
+        private IAnnouncer _announcer;
 
         [Test]
-        public void Error_Should_Error_string_formatted_message()
+        public void ErrorShouldErrorStringFormattedMessage()
         {
-            Mock.Get(announcer).Setup(a => a.Error("Hello Error"));
+            Mock.Get(_announcer).Setup(a => a.Error("Hello Error"));
 
-            announcer.Error("Hello {0}", "Error");
-        }
-
-        [Test]
-        public void Heading_Should_Heading_string_formatted_message()
-        {
-            Mock.Get(announcer).Setup(a => a.Heading("Hello Heading"));
-
-            announcer.Heading("Hello {0}", "Heading");
+            _announcer.Error("Hello {0}", "Error");
         }
 
         [Test]
-        public void Say_Should_Say_string_formatted_message()
+        public void HeadingShouldHeadingStringFormattedMessage()
         {
-            Mock.Get(announcer).Setup(a => a.Say("Hello Say"));
+            Mock.Get(_announcer).Setup(a => a.Heading("Hello Heading"));
 
-            announcer.Say("Hello {0}", "Say");
+            _announcer.Heading("Hello {0}", "Heading");
+        }
+
+        [Test]
+        public void SayShouldSayStringFormattedMessage()
+        {
+            Mock.Get(_announcer).Setup(a => a.Say("Hello Say"));
+
+            _announcer.Say("Hello {0}", "Say");
         }
     }
 }

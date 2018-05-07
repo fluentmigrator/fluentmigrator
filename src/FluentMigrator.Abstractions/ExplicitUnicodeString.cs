@@ -38,6 +38,7 @@ namespace FluentMigrator
             Text = text;
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return Text;

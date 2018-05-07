@@ -16,6 +16,9 @@
 
 using McMaster.Extensions.CommandLineUtils;
 
+// ReSharper disable UnusedMember.Local
+// ReSharper disable UnassignedGetOnlyAutoProperty
+
 namespace FluentMigrator.DotNet.Cli.Commands
 {
     [HelpOption]

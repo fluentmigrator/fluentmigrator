@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -20,6 +20,9 @@ using System.Collections.Generic;
 
 namespace FluentMigrator.Model
 {
+    /// <summary>
+    /// A list of column name/value pairs used for DELETE conditions
+    /// </summary>
     public class DeletionDataDefinition : List<KeyValuePair<string, object>>
     {
     }

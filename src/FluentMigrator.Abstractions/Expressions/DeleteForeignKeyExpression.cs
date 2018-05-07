@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -16,37 +16,30 @@
 //
 #endregion
 
-using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 using System.Linq;
 
 namespace FluentMigrator.Expressions
 {
-    public class DeleteForeignKeyExpression : MigrationExpressionBase, IForeignKeyExpression
+    /// <summary>
+    /// Expression to delete a foreign key
+    /// </summary>
+    public class DeleteForeignKeyExpression : MigrationExpressionBase, IForeignKeyExpression, IValidatableObject
     {
+        /// <inheritdoc />
         public virtual ForeignKeyDefinition ForeignKey { get; set; } = new ForeignKeyDefinition();
 
-        public override void CollectValidationErrors(ICollection<string> errors)
-        {
-            if (ForeignKey.ForeignColumns.Count > 0)
-                ForeignKey.CollectValidationErrors(errors);
-            else
-            {
-                if (String.IsNullOrEmpty(ForeignKey.Name))
-                    errors.Add(ErrorMessages.ForeignKeyNameCannotBeNullOrEmpty);
-
-                if (String.IsNullOrEmpty(ForeignKey.ForeignTable))
-                    errors.Add(ErrorMessages.ForeignTableNameCannotBeNullOrEmpty);
-            }
-        }
-
+        /// <inheritdoc />
         public override void ExecuteWith(IMigrationProcessor processor)
         {
             processor.Process(this);
         }
 
+        /// <inheritdoc />
         public override IMigrationExpression Reverse()
         {
             // there are 2 types of delete FK statements
@@ -80,11 +73,39 @@ namespace FluentMigrator.Expressions
             return new CreateForeignKeyExpression { ForeignKey = reverseForeignKey };
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return base.ToString() + ForeignKey.Name + " "
                 + ForeignKey.ForeignTable + " (" + string.Join(", ", ForeignKey.ForeignColumns.ToArray()) + ") "
                 + ForeignKey.PrimaryTable + " (" + string.Join(", ", ForeignKey.PrimaryColumns.ToArray()) + ")";
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            var results = new List<ValidationResult>();
+
+            if (ForeignKey.ForeignColumns.Count > 0)
+            {
+                var ctxt = new ValidationContext(ForeignKey, validationContext.Items);
+                ctxt.InitializeServiceProvider(validationContext.GetService);
+                ValidationUtilities.TryCollectResults(ctxt, ForeignKey, results);
+            }
+            else
+            {
+                if (string.IsNullOrEmpty(ForeignKey.Name))
+                {
+                    results.Add(new ValidationResult(ErrorMessages.ForeignKeyNameCannotBeNullOrEmpty));
+                }
+
+                if (string.IsNullOrEmpty(ForeignKey.ForeignTable))
+                {
+                    results.Add(new ValidationResult(ErrorMessages.ForeignTableNameCannotBeNullOrEmpty));
+                }
+            }
+
+            return results;
         }
     }
 }

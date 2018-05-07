@@ -9,6 +9,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         {
         }
 
+        /// <inheritdoc />
         protected override string FormatNullable(ColumnDefinition column)
         {
             if (column.IsNullable.GetValueOrDefault())

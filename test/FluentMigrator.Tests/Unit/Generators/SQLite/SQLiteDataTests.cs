@@ -19,11 +19,13 @@ using FluentMigrator.Runner.Generators.SQLite;
 using FluentMigrator.SqlServer;
 
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Generators.SQLite
 {
     [TestFixture]
+    // ReSharper disable once InconsistentNaming
     public class SQLiteDataTests : BaseDataTests
     {
         protected SQLiteGenerator Generator;
@@ -186,7 +188,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         {
             var expression = GeneratorTestHelper.GetInsertDataExpression();
             expression.AdditionalFeatures.Add(SqlServerExtensions.IdentityInsert, true);
-            Generator.compatabilityMode = Runner.CompatabilityMode.LOOSE;
+            Generator.CompatibilityMode = Runner.CompatibilityMode.LOOSE;
 
             var expected = "INSERT INTO \"TestTable1\" (\"Id\", \"Name\", \"Website\") VALUES (1, 'Just''in', 'codethinked.com');";
             expected += " INSERT INTO \"TestTable1\" (\"Id\", \"Name\", \"Website\") VALUES (2, 'Na\\te', 'kohari.org')";
@@ -200,7 +202,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         {
             var expression = GeneratorTestHelper.GetInsertDataExpression();
             expression.AdditionalFeatures.Add(SqlServerExtensions.IdentityInsert, true);
-            Generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
+            Generator.CompatibilityMode = Runner.CompatibilityMode.STRICT;
 
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }

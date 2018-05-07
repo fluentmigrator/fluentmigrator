@@ -24,19 +24,36 @@ using System.IO;
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators.Redshift;
 using FluentMigrator.Runner.Helpers;
+using FluentMigrator.Runner.Initialization;
+
+using JetBrains.Annotations;
+
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.Redshift
 {
     public class RedshiftProcessor : GenericProcessorBase
     {
-        readonly RedshiftQuoter quoter = new RedshiftQuoter();
+        private readonly RedshiftQuoter _quoter = new RedshiftQuoter();
 
         public override string DatabaseType => "Redshift";
 
         public override IList<string> DatabaseTypeAliases { get; } = new List<string>();
 
+        [Obsolete]
         public RedshiftProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(connection, factory, generator, announcer, options)
+        {
+        }
+
+        public RedshiftProcessor(
+            [NotNull] RedshiftDbFactory factory,
+            [NotNull] RedshiftGenerator generator,
+            [NotNull] ILogger<RedshiftProcessor> logger,
+            [NotNull] IOptions<ProcessorOptions> options,
+            [NotNull] IConnectionStringAccessor connectionStringAccessor)
+            : base(() => factory.Factory, generator, logger, options.Value, connectionStringAccessor)
         {
         }
 
@@ -71,7 +88,7 @@ namespace FluentMigrator.Runner.Processors.Redshift
 
         public override DataSet ReadTableData(string schemaName, string tableName)
         {
-            return Read("SELECT * FROM {0}", quoter.QuoteTableName(tableName, schemaName));
+            return Read("SELECT * FROM {0}", _quoter.QuoteTableName(tableName, schemaName));
         }
 
         public override bool DefaultValueExists(string schemaName, string tableName, string columnName, object defaultValue)
@@ -84,7 +101,7 @@ namespace FluentMigrator.Runner.Processors.Redshift
         {
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction, Options))
+            using (var command = CreateCommand(String.Format(template, args)))
             using (var reader = command.ExecuteReader())
             {
                 return reader.ReadDataSet();
@@ -95,7 +112,7 @@ namespace FluentMigrator.Runner.Processors.Redshift
         {
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction, Options))
+            using (var command = CreateCommand(String.Format(template, args)))
             using (var reader = command.ExecuteReader())
             {
                 return reader.Read();
@@ -104,14 +121,14 @@ namespace FluentMigrator.Runner.Processors.Redshift
 
         protected override void Process(string sql)
         {
-            Announcer.Sql(sql);
+            Logger.LogSql(sql);
 
             if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
                 return;
 
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(sql, Connection, Transaction, Options))
+            using (var command = CreateCommand(sql))
             {
                 try
                 {
@@ -133,25 +150,24 @@ namespace FluentMigrator.Runner.Processors.Redshift
 
         public override void Process(PerformDBOperationExpression expression)
         {
-            Announcer.Say("Performing DB Operation");
+            Logger.LogSay("Performing DB Operation");
 
             if (Options.PreviewOnly)
                 return;
 
             EnsureConnectionIsOpen();
 
-            if (expression.Operation != null)
-                expression.Operation(Connection, Transaction);
+            expression.Operation?.Invoke(Connection, Transaction);
         }
 
         private string FormatToSafeSchemaName(string schemaName)
         {
-            return FormatHelper.FormatSqlEscape(quoter.UnQuoteSchemaName(schemaName));
+            return FormatHelper.FormatSqlEscape(_quoter.UnQuoteSchemaName(schemaName));
         }
 
         private string FormatToSafeName(string sqlName)
         {
-            return FormatHelper.FormatSqlEscape(quoter.UnQuote(sqlName));
+            return FormatHelper.FormatSqlEscape(_quoter.UnQuote(sqlName));
         }
     }
 }

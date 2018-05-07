@@ -1,27 +1,26 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <ToolCommandName>dotnet-fm</ToolCommandName>
+    <PackAsTool>true</PackAsTool>
     <OutputType>Exe</OutputType>
-    <AssemblyName>dotnet-fm</AssemblyName>
-    <PackageId>FluentMigrator.DotNet.Cli</PackageId>
-    <DefineConstants>NOT_CLS_COMPLIANT;$(DefineConstants)</DefineConstants>
     <Description>.NET Core CLI tool for FluentMigrator</Description>
-    <PackageType>DotnetCliTool</PackageType>
   </PropertyGroup>
-
   <Import Project="$(MSBuildThisFileDirectory)../../PackageTool.proj" />
-
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="6.2.2" />
-    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.2.0" />
+    <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="5.12.1" />
+    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.2.1" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="2.0.1" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="2.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="2.0.1" />
+    <PackageReference Include="MySql.Data" Version="8.0.11" />
+    <PackageReference Include="Npgsql" Version="3.2.7" />
+    <PackageReference Include="Oracle.ManagedDataAccess" Version="12.2.1100" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\FluentMigrator.Runner\FluentMigrator.Runner.csproj" />
   </ItemGroup>
-
 </Project>

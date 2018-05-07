@@ -6,6 +6,7 @@
 		<authors>Josh Coffman, Tom Marien, Mark Junker</authors>
 		<summary>!!!OBSOLETE!!! Please use FluentMigrator.Console instead</summary>
 		<description>!!!OBSOLETE!!! Please use FluentMigrator.Console instead</description>
+		<iconUrl>https://github.com/fluentmigrator/fluentmigrator/raw/develop/docs/logo.png</iconUrl>
 		<language>en-US</language>
 		<projectUrl>https://github.com/fluentmigrator/fluentmigrator/wiki/</projectUrl>
 		<licenseUrl>https://github.com/fluentmigrator/fluentmigrator/blob/master/LICENSE.txt</licenseUrl>
@@ -16,6 +17,6 @@
 	</metadata>
 	<files>
 		<file src="_._" target="content"/>
-		<file src="tools\" target="tools\"/>
+		<file src="tools/" />
 	</files>
 </package>

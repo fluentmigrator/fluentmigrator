@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -16,27 +16,30 @@
 //
 #endregion
 
-using System;
-using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+
 using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Expressions
 {
+    /// <summary>
+    /// Expression to delete a schema
+    /// </summary>
     public class DeleteSchemaExpression : MigrationExpressionBase
     {
+        /// <summary>
+        /// Gets or sets a schema name
+        /// </summary>
+        [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.SchemaNameCannotBeNullOrEmpty))]
         public virtual string SchemaName { get; set; }
 
-        public override void CollectValidationErrors(ICollection<string> errors)
-        {
-            if (String.IsNullOrEmpty(SchemaName))
-                errors.Add(ErrorMessages.SchemaNameCannotBeNullOrEmpty);
-        }
-
+        /// <inheritdoc />
         public override void ExecuteWith(IMigrationProcessor processor)
         {
             processor.Process(this);
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return base.ToString() + SchemaName;

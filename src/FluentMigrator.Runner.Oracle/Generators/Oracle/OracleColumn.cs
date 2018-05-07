@@ -25,6 +25,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
             }
         }
 
+        /// <inheritdoc />
         protected override string FormatIdentity(ColumnDefinition column)
         {
             if (column.IsIdentity)
@@ -34,6 +35,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
             return string.Empty;
         }
 
+        /// <inheritdoc />
         protected override string FormatNullable(ColumnDefinition column)
         {
             //Creates always return Not Null unless is nullable is true
@@ -46,7 +48,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
                 }
             }
 
-            //alter only returns "Not Null" if IsNullable is explicitly set 
+            //alter only returns "Not Null" if IsNullable is explicitly set
             if (column.IsNullable.HasValue) {
                 return column.IsNullable.Value ? "NULL" : "NOT NULL";
             }
@@ -56,6 +58,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
 
         }
 
+        /// <inheritdoc />
         protected override string GetPrimaryKeyConstraintName(IEnumerable<ColumnDefinition> primaryKeyColumns, string tableName)
         {
             if (primaryKeyColumns == null)

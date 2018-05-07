@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -22,21 +22,33 @@ using FluentMigrator.Builders.Update;
 
 namespace FluentMigrator
 {
+    /// <summary>
+    /// The base migration class for custom SQL queries and data updates/deletions
+    /// </summary>
     public abstract class Migration : MigrationBase
     {
+        /// <summary>
+        /// Gets the starting point for data deletions
+        /// </summary>
         public IDeleteExpressionRoot Delete
         {
-            get { return new DeleteExpressionRoot(_context); }
+            get { return new DeleteExpressionRoot(Context); }
         }
 
+        /// <summary>
+        /// Gets the starting point for SQL execution
+        /// </summary>
         public IExecuteExpressionRoot Execute
         {
-            get { return new ExecuteExpressionRoot(_context); }
+            get { return new ExecuteExpressionRoot(Context); }
         }
 
+        /// <summary>
+        /// Gets the starting point for data updates
+        /// </summary>
         public IUpdateExpressionRoot Update
         {
-            get { return new UpdateExpressionRoot(_context); }
+            get { return new UpdateExpressionRoot(Context); }
         }
     }
 }

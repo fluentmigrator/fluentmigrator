@@ -1,4 +1,21 @@
-using System;
+#region License
+//
+// Copyright (c) 2018, Fluent Migrator Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+#endregion
+
 using System.Collections.Generic;
 using System.Linq;
 
@@ -28,7 +45,6 @@ namespace FluentMigrator.DotNet.Cli
         public bool NestedNamespaces { get; private set; }
         public long? StartVersion { get; private set; }
         public bool NoConnection { get; private set; }
-        public string ConnectionStringConfigPath { get; private set; }
         public string WorkingDirectory { get; private set; }
         public IEnumerable<string> Tags { get; private set; }
         public bool Preview { get; private set; }
@@ -39,9 +55,7 @@ namespace FluentMigrator.DotNet.Cli
         public TransactionMode TransactionMode { get; private set; }
         public bool Output { get; private set; }
         public string OutputFileName { get; private set; }
-
-        public bool ExecutingAgainstMsSql
-            => ProcessorType.StartsWith("SqlServer", StringComparison.InvariantCultureIgnoreCase);
+        public bool AllowBreakingChanges { get; private set; }
 
         public static MigratorOptions CreateListMigrations(ListMigrations cmd)
         {
@@ -103,7 +117,6 @@ namespace FluentMigrator.DotNet.Cli
         private MigratorOptions Init(ConnectionCommand cmd)
         {
             ConnectionString = cmd.ConnectionString;
-            ConnectionStringConfigPath = cmd.ConnectionStringConfigPath;
             NoConnection = cmd.NoConnection;
             ProcessorType = cmd.ProcessorType;
             ProcessorSwitches = cmd.ProcessorSwitches;
@@ -123,7 +136,8 @@ namespace FluentMigrator.DotNet.Cli
             NestedNamespaces = cmd.NestedNamespaces;
             StartVersion = cmd.StartVersion;
             WorkingDirectory = cmd.WorkingDirectory;
-            Tags = cmd.Tags.ToList();
+            Tags = cmd.Tags?.ToList() ?? new List<string>();
+            AllowBreakingChanges = cmd.AllowBreakingChanges;
             return this;
         }
     }

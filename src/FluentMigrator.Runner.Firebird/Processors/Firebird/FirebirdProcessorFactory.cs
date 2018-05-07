@@ -20,23 +20,38 @@ using System;
 
 using FluentMigrator.Runner.Generators.Firebird;
 
+using Microsoft.Extensions.Options;
+
 namespace FluentMigrator.Runner.Processors.Firebird
 {
+    [Obsolete]
     public class FirebirdProcessorFactory : MigrationProcessorFactory
     {
-        public FirebirdOptions FbOptions { get; set; }
+        private readonly IServiceProvider _serviceProvider;
 
+        [Obsolete]
         public FirebirdProcessorFactory() : this(FirebirdOptions.AutoCommitBehaviour()) { }
+
+        [Obsolete]
         public FirebirdProcessorFactory(FirebirdOptions fbOptions)
+            : this(serviceProvider: null, new OptionsWrapper<FirebirdOptions>(fbOptions))
         {
-            FbOptions = fbOptions ?? throw new ArgumentNullException(nameof(fbOptions));
         }
 
+        public FirebirdProcessorFactory(IServiceProvider serviceProvider, IOptions<FirebirdOptions> fbOptions = null)
+        {
+            _serviceProvider = serviceProvider;
+            FbOptions = fbOptions?.Value ?? FirebirdOptions.AutoCommitBehaviour();
+        }
+
+        public FirebirdOptions FbOptions { get; set; }
+
+        [Obsolete]
         public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
         {
             var fbOpt = ((FirebirdOptions) FbOptions.Clone())
                 .ApplyProviderSwitches(options.ProviderSwitches);
-            var factory = new FirebirdDbFactory();
+            var factory = new FirebirdDbFactory(_serviceProvider);
             var connection = factory.CreateConnection(connectionString);
             return new FirebirdProcessor(connection, new FirebirdGenerator(FbOptions), announcer, options, factory, fbOpt);
         }

@@ -20,17 +20,19 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
-using System.Linq;
+
+using FluentMigrator.Builders;
 using FluentMigrator.Builders.Create.Table;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
-using FluentMigrator.Runner.Extensions;
-using Moq;
-using NUnit.Framework;
-using NUnit.Should;
-using FluentMigrator.Builders;
 using FluentMigrator.SqlServer;
+
+using Moq;
+
+using NUnit.Framework;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Builders.Create
 {
@@ -553,7 +555,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
         }
 
         [Test]
-        public void IColumnExpressionBuilder_UsesExpressionSchemaAndTableName()
+        public void ColumnExpressionBuilderUsesExpressionSchemaAndTableName()
         {
             var expressionMock = new Mock<CreateTableExpression>();
             var contextMock = new Mock<IMigrationContext>();
@@ -568,7 +570,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
         }
 
         [Test]
-        public void IColumnExpressionBuilder_UsesCurrentColumn()
+        public void ColumnExpressionBuilderUsesCurrentColumn()
         {
             var expressionMock = new Mock<CreateTableExpression>();
             var contextMock = new Mock<IMigrationContext>();

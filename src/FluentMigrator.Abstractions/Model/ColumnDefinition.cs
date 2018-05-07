@@ -18,35 +18,108 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Data;
 
 using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Model
 {
-    public class ColumnDefinition : ICloneable, ICanBeValidated, ISupportAdditionalFeatures
+    /// <summary>
+    /// The column definition
+    /// </summary>
+    public class ColumnDefinition
+        : ICloneable,
+#pragma warning disable 618
+          ICanBeValidated,
+#pragma warning restore 618
+          ISupportAdditionalFeatures,
+          IValidatableObject
     {
-        public ColumnDefinition()
-        {
-            DefaultValue = new UndefinedDefaultValue();
-        }
-
+        /// <summary>
+        /// Gets or sets the column definition name
+        /// </summary>
+        [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.ColumnNameCannotBeNullOrEmpty))]
         public virtual string Name { get; set; }
+
+        /// <summary>
+        /// Gets or sets the column type
+        /// </summary>
         public virtual DbType? Type { get; set; }
-        public virtual int Size { get; set; }
-        public virtual int Precision { get; set; }
+
+        /// <summary>
+        /// Gets or sets the column type size (read: precision or length)
+        /// </summary>
+        public virtual int? Size { get; set; }
+
+        /// <summary>
+        /// Gets or sets the column type precision (read: scale)
+        /// </summary>
+        public virtual int? Precision { get; set; }
+
+        /// <summary>
+        /// Gets or sets a database specific custom column type
+        /// </summary>
         public virtual string CustomType { get; set; }
-        public virtual object DefaultValue { get; set; }
+
+        /// <summary>
+        /// Gets or sets the columns default value
+        /// </summary>
+        public virtual object DefaultValue { get; set; } = new UndefinedDefaultValue();
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this column is a foreign key
+        /// </summary>
         public virtual bool IsForeignKey { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this column gets its value using an identity definition
+        /// </summary>
         public virtual bool IsIdentity { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating that this column is indexed
+        /// </summary>
         public virtual bool IsIndexed { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this column is a primary key
+        /// </summary>
         public virtual bool IsPrimaryKey { get; set; }
+
+        /// <summary>
+        /// Gets or sets the primary key constraint name
+        /// </summary>
         public virtual string PrimaryKeyName { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this column is nullable
+        /// </summary>
         public virtual bool? IsNullable { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this column must be unique
+        /// </summary>
         public virtual bool IsUnique { get; set; }
+
+        /// <summary>
+        /// Gets or sets the columns table name
+        /// </summary>
         public virtual string TableName { get; set; }
+
+        /// <summary>
+        /// Gets or sets if the column definition results in a CREATE or an ALTER SQL statement
+        /// </summary>
         public virtual ColumnModificationType ModificationType { get; set; }
+
+        /// <summary>
+        /// Gets or sets the column description
+        /// </summary>
         public virtual string ColumnDescription { get; set; }
+
+        /// <summary>
+        /// Gets or sets the collation name if the column has a string or ansi string type
+        /// </summary>
         public virtual string CollationName { get; set; }
 
         /// <summary>
@@ -60,24 +133,36 @@ namespace FluentMigrator.Model
         /// </remarks>
         public virtual ForeignKeyDefinition ForeignKey { get; set; }
 
+        /// <inheritdoc />
+        [Obsolete("Use the System.ComponentModel.DataAnnotations.Validator instead")]
         public virtual void CollectValidationErrors(ICollection<string> errors)
         {
-            if (String.IsNullOrEmpty(Name))
-                errors.Add(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
-
-            if (Type == null && CustomType == null)
-                errors.Add(ErrorMessages.ColumnTypeMustBeDefined);
+            this.CollectErrors(errors);
         }
 
+        /// <inheritdoc />
         public virtual object Clone()
         {
             return MemberwiseClone();
         }
 
-        public class UndefinedDefaultValue
+        /// <summary>
+        /// Instances of this class are used to specify an undefined default value
+        /// </summary>
+        public sealed class UndefinedDefaultValue
         {
         }
 
+        /// <inheritdoc />
         public IDictionary<string, object> AdditionalFeatures { get; } = new Dictionary<string, object>();
+
+        /// <inheritdoc />
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (Type == null && CustomType == null)
+            {
+                yield return new ValidationResult(ErrorMessages.ColumnTypeMustBeDefined);
+            }
+        }
     }
 }

@@ -21,6 +21,9 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.SqlAnywhere
 {
+    /// <summary>
+    /// Extension methods for SQL Anywhere
+    /// </summary>
     public static partial class SqlAnywhereExtensions
     {
         /// <summary>

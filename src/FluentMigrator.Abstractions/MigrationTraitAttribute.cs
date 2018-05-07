@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -20,21 +20,40 @@ using System;
 
 namespace FluentMigrator
 {
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
+    /// <summary>
+    /// A trait for a migration
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     public class MigrationTraitAttribute : Attribute
     {
-        public string Name { get; private set; }
-        public object Value { get; private set; }
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MigrationTraitAttribute"/> class.
+        /// </summary>
+        /// <param name="name"></param>
         public MigrationTraitAttribute(string name)
+            : this(name, null)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MigrationTraitAttribute"/> class.
+        /// </summary>
+        /// <param name="name">The trait name</param>
+        /// <param name="value">The trait value</param>
+        public MigrationTraitAttribute(string name, object value)
         {
             Name = name;
-        }
-
-        public MigrationTraitAttribute(string name, object value)
-            : this(name)
-        {
             Value = value;
         }
+
+        /// <summary>
+        /// Gets the trait name
+        /// </summary>
+        public string Name { get; }
+
+        /// <summary>
+        /// Gets the trait value
+        /// </summary>
+        public object Value { get; }
     }
 }

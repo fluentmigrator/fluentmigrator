@@ -2,14 +2,24 @@ using System;
 
 namespace FluentMigrator
 {
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
+    /// <summary>
+    /// Defines a profile for a migration
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     public class ProfileAttribute : Attribute
     {
-        public string ProfileName { get; private set; }
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ProfileAttribute"/> class.
+        /// </summary>
+        /// <param name="profileName">The profile name</param>
         public ProfileAttribute(string profileName)
         {
             ProfileName = profileName;
         }
+
+        /// <summary>
+        /// Gets the profile name
+        /// </summary>
+        public string ProfileName { get; }
     }
 }

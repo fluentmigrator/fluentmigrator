@@ -16,19 +16,26 @@
 //
 #endregion
 
-using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 
 using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Expressions
 {
-    public class ExecuteSqlScriptExpression : MigrationExpressionBase, IFileSystemExpression
+    /// <summary>
+    /// Expression to execute SQL scripts
+    /// </summary>
+    public class ExecuteSqlScriptExpression : ExecuteSqlScriptExpressionBase, IFileSystemExpression
     {
         private string _rootPath;
         private string _sqlScript;
         private string _unchangedSqlScript;
 
+        /// <summary>
+        /// Gets or sets the SQL script to be executed
+        /// </summary>
+        [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.SqlScriptCannotBeNullOrEmpty))]
         public string SqlScript
         {
             get => _sqlScript;
@@ -39,6 +46,9 @@ namespace FluentMigrator.Expressions
             }
         }
 
+        /// <summary>
+        /// Gets or sets the root path where the SQL script file should be loaded from
+        /// </summary>
         public string RootPath
         {
             get => _rootPath;
@@ -49,11 +59,7 @@ namespace FluentMigrator.Expressions
             }
         }
 
-        /// <summary>
-        /// Gets or sets parameters to be replaced before script execution
-        /// </summary>
-        public IDictionary<string, string> Parameters { get; set; }
-
+        /// <inheritdoc />
         public override void ExecuteWith(IMigrationProcessor processor)
         {
             string sqlText;
@@ -62,17 +68,10 @@ namespace FluentMigrator.Expressions
                 sqlText = reader.ReadToEnd();
             }
 
-            sqlText = SqlScriptTokenReplacer.ReplaceSqlScriptTokens(sqlText, Parameters);
-
-            processor.Execute(sqlText);
+            Execute(processor, sqlText);
         }
 
-        public override void CollectValidationErrors(ICollection<string> errors)
-        {
-            if (string.IsNullOrEmpty(SqlScript))
-                errors.Add(ErrorMessages.SqlScriptCannotBeNullOrEmpty);
-        }
-
+        /// <inheritdoc />
         public override string ToString()
         {
             return base.ToString() + SqlScript;
@@ -80,7 +79,7 @@ namespace FluentMigrator.Expressions
 
         private void UpdateSqlScript()
         {
-            if (!string.IsNullOrEmpty(_rootPath))
+            if (!string.IsNullOrEmpty(_rootPath) && !string.IsNullOrEmpty(_unchangedSqlScript))
             {
                 _sqlScript = Path.Combine(_rootPath, _unchangedSqlScript);
             }

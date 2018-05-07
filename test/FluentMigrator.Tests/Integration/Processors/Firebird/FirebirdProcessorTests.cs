@@ -1,15 +1,36 @@
+#region License
+//
+// Copyright (c) 2018, Fluent Migrator Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+#endregion
+
 using System;
 using System.Data;
-using FirebirdSql.Data.FirebirdClient;
+
 using FluentMigrator.Expressions;
-using FluentMigrator.Runner.Announcers;
-using FluentMigrator.Runner.Generators;
+using FluentMigrator.Runner;
 using FluentMigrator.Runner.Generators.Firebird;
-using FluentMigrator.Runner.Processors;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Tests.Helpers;
+
+using Microsoft.Extensions.DependencyInjection;
+
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Integration.Processors.Firebird
 {
@@ -21,43 +42,15 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         private readonly FirebirdLibraryProber _prober = new FirebirdLibraryProber();
         private TemporaryDatabase _temporaryDatabase;
 
-        public FbConnection Connection { get; set; }
-        public FirebirdProcessor Processor { get; set; }
-        public IQuoter Quoter { get; set; }
-
-        [SetUp]
-        public void SetUp()
-        {
-            if (!IntegrationTestOptions.Firebird.IsEnabled)
-                Assert.Ignore();
-            _temporaryDatabase = new TemporaryDatabase(
-                IntegrationTestOptions.Firebird,
-                _prober);
-            Connection = new FbConnection(_temporaryDatabase.ConnectionString);
-            var options = FirebirdOptions.AutoCommitBehaviour();
-            Processor = new FirebirdProcessor(Connection, new FirebirdGenerator(options), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), new FirebirdDbFactory(), options);
-            Quoter = new FirebirdQuoter(false);
-            Connection.Open();
-            Processor.BeginTransaction();
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            if (Processor == null)
-                return;
-
-            if (!Processor.WasCommitted)
-                Processor.CommitTransaction();
-            Connection.Close();
-
-            FbDatabase.DropDatabase(_temporaryDatabase.ConnectionString);
-        }
+        private ServiceProvider ServiceProvider { get; set; }
+        private IServiceScope ServiceScope { get; set; }
+        private FirebirdProcessor Processor { get; set; }
+        private FirebirdQuoter Quoter {get; set; }
 
         [Test]
         public void CanReadData()
         {
-            using (var table = new FirebirdTestTable(Processor, null, "id int"))
+            using (var table = new FirebirdTestTable(Processor, "id int"))
             {
                 Processor.CheckTable(table.Name);
                 AddTestData(table);
@@ -75,7 +68,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [Test]
         public void CanReadTableData()
         {
-            using (var table = new FirebirdTestTable(Processor, null, "id int"))
+            using (var table = new FirebirdTestTable(Processor, "id int"))
             {
                 Processor.CheckTable(table.Name);
                 AddTestData(table);
@@ -92,6 +85,9 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
 
         private void AddTestData(FirebirdTestTable table)
         {
+            if (table.Connection.State != ConnectionState.Open)
+                table.Connection.Open();
+
             for (int i = 0; i < 3; i++)
             {
                 using (var cmd = table.Connection.CreateCommand())
@@ -108,7 +104,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [Test]
         public void CanReadDataWithSchema()
         {
-            using (var table = new FirebirdTestTable(Processor, "TestSchema", "id int"))
+            using (var table = new FirebirdTestTable(Processor, "id int"))
             {
                 Processor.CheckTable(table.Name);
                 AddTestData(table);
@@ -126,7 +122,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [Test]
         public void CanReadTableDataWithSchema()
         {
-            using (var table = new FirebirdTestTable(Processor, "TestSchema", "id int"))
+            using (var table = new FirebirdTestTable(Processor, "id int"))
             {
                 Processor.CheckTable(table.Name);
                 AddTestData(table);
@@ -145,7 +141,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         public void CanCreateAndDropSequenceWithExistCheck()
         {
             Processor.SequenceExists("", "Sequence").ShouldBeFalse();
-            using (new FirebirdTestTable(Processor, null, "id int"))
+            using (new FirebirdTestTable(Processor, "id int"))
             {
                 Processor.Process(new CreateSequenceExpression
                 {
@@ -154,7 +150,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
 
                 Processor.SequenceExists("", "\"Sequence\"").ShouldBeTrue();
                 Processor.SequenceExists("", "Sequence").ShouldBeTrue();
-                
+
                 Processor.Process(new DeleteSequenceExpression { SequenceName = "Sequence" });
 
                 Processor.SequenceExists("", "\"Sequence\"").ShouldBeFalse();
@@ -165,7 +161,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [Test]
         public void CanAlterSequence()
         {
-            using (new FirebirdTestTable(Processor, null, "id int"))
+            using (new FirebirdTestTable(Processor, "id int"))
             {
                 Processor.Process(new CreateSequenceExpression
                 {
@@ -195,7 +191,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [Test]
         public void CanCreateTrigger()
         {
-            using (var table = new FirebirdTestTable(Processor, null, "id int"))
+            using (var table = new FirebirdTestTable(Processor, "id int"))
             {
                 Processor.Process(Processor.CreateTriggerExpression(table.Name, "TestTrigger", true, TriggerEvent.Insert, "as begin end"));
                 Processor.TriggerExists(String.Empty, table.Name, "TestTrigger").ShouldBeTrue();
@@ -205,7 +201,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [Test]
         public void CanDropTrigger()
         {
-            using (var table = new FirebirdTestTable(Processor, null, "id int"))
+            using (var table = new FirebirdTestTable(Processor, "id int"))
             {
                 Processor.Process(Processor.CreateTriggerExpression(table.Name, "TestTrigger", true, TriggerEvent.Insert, "as begin end"));
                 Processor.TriggerExists(String.Empty, table.Name, "TestTrigger").ShouldBeTrue();
@@ -218,7 +214,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [Test]
         public void IdentityCanCreateIdentityColumn()
         {
-            using (var table = new FirebirdTestTable(Processor, null, "bogus int"))
+            using (var table = new FirebirdTestTable(Processor, "bogus int"))
             {
                 Processor.Process(new CreateColumnExpression
                 {
@@ -234,7 +230,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [Test]
         public void IdentityCanDropIdentityColumn()
         {
-            using (var table = new FirebirdTestTable(Processor, null, "bogus int"))
+            using (var table = new FirebirdTestTable(Processor, "bogus int"))
             {
                 Processor.Process(new CreateColumnExpression
                 {
@@ -259,7 +255,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [Test]
         public void IdentityCanAlterColumnToIdentity()
         {
-            using (var table = new FirebirdTestTable(Processor, null, "bogus int"))
+            using (var table = new FirebirdTestTable(Processor, "bogus int"))
             {
                 Processor.Process(new CreateColumnExpression
                 {
@@ -284,7 +280,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [Test]
         public void IdentityCanAlterColumnToNotIdentity()
         {
-            using (var table = new FirebirdTestTable(Processor, null, "bogus int"))
+            using (var table = new FirebirdTestTable(Processor, "bogus int"))
             {
                 Processor.Process(new CreateColumnExpression
                 {
@@ -309,7 +305,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [Test]
         public void IdentityCanInsert()
         {
-            using (var table = new FirebirdTestTable(Processor, null, "bogus int"))
+            using (var table = new FirebirdTestTable(Processor, "bogus int"))
             {
                 Processor.Process(new CreateColumnExpression
                 {
@@ -330,14 +326,13 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                     ds.Tables[0].Rows[0]["BOGUS"].ShouldBe(0);
                     ds.Tables[0].Rows[0]["id"].ShouldBe(1);
                 }
-                
             }
         }
 
         [Test]
         public void IdentityCanInsertMultiple()
         {
-            using (var table = new FirebirdTestTable(Processor, null, "bogus int"))
+            using (var table = new FirebirdTestTable(Processor, "bogus int"))
             {
                 Processor.Process(new CreateColumnExpression
                 {
@@ -372,6 +367,38 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             }
         }
 
+        [SetUp]
+        public void SetUp()
+        {
+            if (!IntegrationTestOptions.Firebird.IsEnabled)
+                Assert.Ignore();
 
+            _temporaryDatabase = new TemporaryDatabase(
+                IntegrationTestOptions.Firebird,
+                _prober);
+
+            var serivces = ServiceCollectionExtensions.CreateServices()
+                .ConfigureRunner(builder => builder.AddFirebird())
+                .AddScoped<IConnectionStringReader>(
+                    _ => new PassThroughConnectionStringReader(_temporaryDatabase.ConnectionString));
+
+            ServiceProvider = serivces.BuildServiceProvider();
+            ServiceScope = ServiceProvider.CreateScope();
+            Processor = ServiceScope.ServiceProvider.GetRequiredService<FirebirdProcessor>();
+            Quoter = ServiceScope.ServiceProvider.GetRequiredService<FirebirdQuoter>();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            ServiceScope?.Dispose();
+            ServiceProvider?.Dispose();
+            if (_temporaryDatabase != null)
+            {
+                var connString = _temporaryDatabase.ConnectionString;
+                _temporaryDatabase = null;
+                FbDatabase.DropDatabase(connString);
+            }
+        }
     }
 }

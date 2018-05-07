@@ -20,6 +20,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 
+using NUnit.Framework;
+
 namespace FluentMigrator.Tests
 {
     public static class HostUtilities
@@ -34,25 +36,41 @@ namespace FluentMigrator.Tests
             {
                 string path1 = AppDomain.CurrentDomain.GetData(DataDirectory) as string;
                 if (string.IsNullOrEmpty(path1))
-                    path1 = AppDomain.CurrentDomain.BaseDirectory ?? Environment.CurrentDirectory;
+                    path1 = AppDomain.CurrentDomain.BaseDirectory;
+                if (string.IsNullOrEmpty(path1))
+                    path1 = Environment.CurrentDirectory;
                 if (string.IsNullOrEmpty(path1))
                     path1 = string.Empty;
                 int length = DataDirectoryMacro.Length;
-                if (inputString.Length > DataDirectoryMacro.Length && 92 == (int)inputString[DataDirectoryMacro.Length])
+                if (inputString.Length > DataDirectoryMacro.Length && 92 == inputString[DataDirectoryMacro.Length])
                     ++length;
                 str = Path.Combine(path1, inputString.Substring(length));
             }
             return str;
         }
 
+        public static bool TryGetJetCatalogType(out Type jetCatalogType)
+        {
+            jetCatalogType = Type.GetTypeFromProgID("ADOX.Catalog", false);
+            return jetCatalogType != null;
+        }
+
         public static bool ProbeSqlServerCeBehavior()
         {
-            var asm = typeof(System.Data.SqlServerCe.SqlCeConnection).Assembly;
+            var asm = typeof(SqlCeConnection).Assembly;
             var type = asm.GetType("System.Data.SqlServerCe.NativeMethods");
             if (SqlServerCeCanFindItsLibraries(type))
                 return true;
 
-            return SqlServerCeLoadBinaries(type);
+            try
+            {
+                return SqlServerCeLoadBinaries(type);
+            }
+            catch (Exception ex)
+            {
+                TestContext.Out.WriteLine(ex);
+                return false;
+            }
         }
 
         private static bool SqlServerCeLoadBinaries(Type type)
@@ -74,6 +92,11 @@ namespace FluentMigrator.Tests
             }
             catch (TargetInvocationException ex) when (ex.InnerException is SqlCeException sce && sce.NativeError == -1)
             {
+                return false;
+            }
+            catch (Exception ex)
+            {
+                TestContext.Out.WriteLine(ex);
                 return false;
             }
         }

@@ -1,10 +1,29 @@
+#region License
+//
+// Copyright (c) 2018, Fluent Migrator Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+#endregion
+
 using System;
 using System.Linq;
 
 using FluentMigrator.Runner.Generators.Firebird;
 using FluentMigrator.Runner.Processors.Firebird;
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Generators.Firebird
 {
@@ -17,6 +36,25 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         public void Setup()
         {
             Generator = new FirebirdGenerator(FirebirdOptions.StandardBehaviour());
+        }
+
+        [Test]
+        public override void CanCreateNullableColumnWithCustomDomainTypeAndCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateColumnExpressionWithNullableCustomType();
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 MyDomainType");
+        }
+
+        [Test]
+        public override void CanCreateNullableColumnWithCustomDomainTypeAndDefaultSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateColumnExpressionWithNullableCustomType();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 MyDomainType");
         }
 
         [Test]
@@ -82,7 +120,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             var expressions = GeneratorTestHelper.GetCreateColumnWithSystemMethodExpression("TestSchema");
             var result = string.Join(Environment.NewLine, expressions.Select(x => (string)Generator.Generate((dynamic)x)));
             result.ShouldBe(
-                @"ALTER TABLE TestTable1 ADD TestColumn1 VARCHAR(5)" + Environment.NewLine +
+                @"ALTER TABLE TestTable1 ADD TestColumn1 TIMESTAMP" + Environment.NewLine +
                 @"UPDATE TestTable1 SET TestColumn1 = CURRENT_TIMESTAMP WHERE 1 = 1");
         }
 
@@ -92,7 +130,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             var expressions = GeneratorTestHelper.GetCreateColumnWithSystemMethodExpression();
             var result = string.Join(Environment.NewLine, expressions.Select(x => (string)Generator.Generate((dynamic)x)));
             result.ShouldBe(
-                @"ALTER TABLE TestTable1 ADD TestColumn1 VARCHAR(5)" + Environment.NewLine +
+                @"ALTER TABLE TestTable1 ADD TestColumn1 TIMESTAMP" + Environment.NewLine +
                 @"UPDATE TestTable1 SET TestColumn1 = CURRENT_TIMESTAMP WHERE 1 = 1");
         }
 
@@ -176,7 +214,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         public virtual void CanCreateDefaultString()
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
-            expression.Column.Size = 0;
+            expression.Column.Size = null;
 
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 VARCHAR(255) NOT NULL");

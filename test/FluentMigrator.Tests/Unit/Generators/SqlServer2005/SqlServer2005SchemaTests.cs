@@ -1,6 +1,10 @@
-﻿using FluentMigrator.Runner.Generators.SqlServer;
+using FluentMigrator.Builders.Create.Schema;
+using FluentMigrator.Runner.Generators.SqlServer;
+using FluentMigrator.SqlServer;
+
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 {
@@ -40,6 +44,17 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 
             var result = Generator.Generate(expression);
             result.ShouldBe("DROP SCHEMA [TestSchema]");
+        }
+
+        [Test]
+        public void CanCreateSchemaWithAuthorization()
+        {
+            var expression = GeneratorTestHelper.GetCreateSchemaExpression();
+            var builder = new CreateSchemaExpressionBuilder(expression);
+            builder.Authorization("dbo");
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE SCHEMA [TestSchema] AUTHORIZATION [dbo]");
         }
     }
 }

@@ -16,9 +16,11 @@
 //
 #endregion
 
-
 namespace FluentMigrator.Builders.Alter.Table
 {
+    /// <summary>
+    /// Define the column type
+    /// </summary>
     public interface IAlterTableColumnAsTypeSyntax : IColumnTypeSyntax<IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax>
     {
     }

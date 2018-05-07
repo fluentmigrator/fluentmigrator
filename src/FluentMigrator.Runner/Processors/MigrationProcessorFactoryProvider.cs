@@ -19,10 +19,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Extensions;
 using FluentMigrator.Runner.Infrastructure;
 using FluentMigrator.Runner.Processors.DB2;
+using FluentMigrator.Runner.Processors.DB2.iSeries;
 using FluentMigrator.Runner.Processors.DotConnectOracle;
 using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Runner.Processors.Hana;
@@ -36,11 +36,13 @@ using FluentMigrator.Runner.Processors.SQLite;
 
 namespace FluentMigrator.Runner.Processors
 {
+    [Obsolete]
     public class MigrationProcessorFactoryProvider
     {
         private static readonly object _lock = new object();
         private static IDictionary<string, IMigrationProcessorFactory> _migrationProcessorFactories;
 
+        [Obsolete]
         static MigrationProcessorFactoryProvider()
         {
             // Register all available processor factories. The library usually tries
@@ -49,6 +51,7 @@ namespace FluentMigrator.Runner.Processors
             // isn't enough. We MUST have a reference to a type, otherwise the
             // assembly reference gets removed by the C# compiler!
             Register(new Db2ProcessorFactory());
+            Register(new Db2ISeriesProcessorFactory());
             Register(new DotConnectOracleProcessorFactory());
             Register(new FirebirdProcessorFactory());
             Register(new MySql4ProcessorFactory());
@@ -72,6 +75,11 @@ namespace FluentMigrator.Runner.Processors
 #if NETFRAMEWORK
             Register(new Jet.JetProcessorFactory());
 #endif
+        }
+
+        [Obsolete("Ony the statically provided factories are accessed")]
+        public MigrationProcessorFactoryProvider()
+        {
         }
 
         private static IDictionary<string, IMigrationProcessorFactory> MigrationProcessorFactories
@@ -104,6 +112,7 @@ namespace FluentMigrator.Runner.Processors
         public static IEnumerable<string> ProcessorTypes
             => MigrationProcessorFactories.Keys;
 
+        [Obsolete("Ony the statically provided factories are accessed")]
         public virtual IMigrationProcessorFactory GetFactory(string name)
         {
             if (MigrationProcessorFactories.TryGetValue(name, out var result))
@@ -111,6 +120,7 @@ namespace FluentMigrator.Runner.Processors
             return null;
         }
 
+        [Obsolete]
         public string ListAvailableProcessorTypes()
         {
             return string.Join(", ", MigrationProcessorFactories.Keys.ToArray());

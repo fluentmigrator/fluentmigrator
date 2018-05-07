@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -23,8 +23,10 @@ using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 using FluentMigrator.Runner;
 using FluentMigrator.Tests.Helpers;
+
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Definitions
 {
@@ -98,7 +100,7 @@ namespace FluentMigrator.Tests.Unit.Definitions
         [Test]
         public void ErrorIsReturnedWhenForeignColumnsIsEmpty()
         {
-            var column = new ForeignKeyDefinition { ForeignColumns = new string[0] };
+            var column = new ForeignKeyDefinition { Name = "FkName", ForeignTable = "FkTable", ForeignColumns = new string[0], PrimaryTable = "PkTable" };
             var errors = ValidationHelper.CollectErrors(column);
             errors.ShouldContain(ErrorMessages.ForeignKeyMustHaveOneOrMoreForeignColumns);
         }
@@ -114,7 +116,7 @@ namespace FluentMigrator.Tests.Unit.Definitions
         [Test]
         public void ErrorIsReturnedWhenPrimaryColumnsIsEmpty()
         {
-            var column = new ForeignKeyDefinition { PrimaryColumns = new string[0] };
+            var column = new ForeignKeyDefinition { Name = "FkName", ForeignTable = "FkTable", PrimaryTable = "PkTable", PrimaryColumns = new string[0] };
             var errors = ValidationHelper.CollectErrors(column);
             errors.ShouldContain(ErrorMessages.ForeignKeyMustHaveOneOrMorePrimaryColumns);
         }

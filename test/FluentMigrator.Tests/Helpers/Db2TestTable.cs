@@ -1,99 +1,74 @@
+#region License
+//
+// Copyright (c) 2018, Fluent Migrator Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+#endregion
+
+using System;
+using System.Data;
+using System.Text;
+
 using FluentMigrator.Runner.Generators;
+using FluentMigrator.Runner.Generators.DB2;
+using FluentMigrator.Runner.Processors.DB2;
 
 namespace FluentMigrator.Tests.Helpers
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Data;
-    using System.Linq;
-    using System.Text;
-
-    using FluentMigrator.Runner.Generators.DB2;
-    using FluentMigrator.Runner.Processors;
-    using FluentMigrator.Runner.Processors.DB2;
-
     public class Db2TestTable : IDisposable
     {
-        #region Fields
+        private readonly IQuoter _quoter = new Db2Quoter();
 
-        private readonly IQuoter quoter = new Db2Quoter();
-
-        private List<string> constraints = new List<string>();
-        private string _schema;
-
-        #endregion Fields
-
-        #region Constructors
+        private readonly string _schema;
 
         public Db2TestTable(Db2Processor processor, string schema, params string[] columnDefinitions)
         {
-            Connection = processor.Connection;
-            Transaction = processor.Transaction;
             Processor = processor;
-            Factory = new Db2DbFactory();
             _schema = schema;
 
             if (Connection.State != ConnectionState.Open)
                 Connection.Open();
 
             Name = "TestTable";
-            NameWithSchema = quoter.QuoteTableName(Name, _schema);
+            NameWithSchema = _quoter.QuoteTableName(Name, _schema);
             Create(columnDefinitions);
         }
 
         public Db2TestTable(string table, Db2Processor processor, string schema, params string[] columnDefinitions)
         {
-            Connection = processor.Connection;
-            Transaction = processor.Transaction;
             Processor = processor;
-            Factory = new Db2DbFactory();
             _schema = schema;
 
             if (Connection.State != ConnectionState.Open)
                 Connection.Open();
 
-            Name = quoter.UnQuote(table);
-            NameWithSchema = quoter.QuoteTableName(Name, _schema);
+            Name = _quoter.UnQuote(table);
+            NameWithSchema = _quoter.QuoteTableName(Name, _schema);
             Create(columnDefinitions);
         }
-
-        #endregion Constructors
-
-        #region Properties
 
         public string Name
         {
             get;
-            set;
         }
 
         public string NameWithSchema
         {
             get;
-            set;
         }
 
-        public IDbTransaction Transaction
-        {
-            get;
-            set;
-        }
-
-        private IDbConnection Connection
-        {
-            get;
-            set;
-        }
-
-        private IDbFactory Factory
-        {
-            get;
-            set;
-        }
-
-        #endregion Properties
-
-        #region Methods
+        private IDbConnection Connection => Processor.Connection;
 
         public void Create(string[] columnDefinitions)
         {
@@ -101,16 +76,13 @@ namespace FluentMigrator.Tests.Helpers
 
             if (!string.IsNullOrEmpty(_schema))
             {
-                sb.AppendFormat("CREATE SCHEMA {0};", quoter.QuoteSchemaName(_schema));
+                sb.AppendFormat("CREATE SCHEMA {0};", _quoter.QuoteSchemaName(_schema));
             }
 
             var columns = string.Join(", ", columnDefinitions);
             sb.AppendFormat("CREATE TABLE {0} ({1})", NameWithSchema, columns);
 
-            using (var command = Factory.CreateCommand(sb.ToString(), Connection, Transaction, Processor.Options))
-            {
-                command.ExecuteNonQuery();
-            }
+            Processor.Execute(sb.ToString());
         }
 
         public void Dispose()
@@ -121,55 +93,39 @@ namespace FluentMigrator.Tests.Helpers
         public void Drop()
         {
             var tableCommand = string.Format("DROP TABLE {0}", NameWithSchema);
-
-            using (var command = Factory.CreateCommand(tableCommand, Connection, Transaction, Processor.Options))
-            {
-                command.ExecuteNonQuery();
-            }
+            Processor.Execute(tableCommand);
 
             if (!string.IsNullOrEmpty(_schema))
             {
-                var schemaCommand = string.Format("DROP SCHEMA {0} RESTRICT", quoter.QuoteSchemaName(_schema));
-
-                using (var commandToo = Factory.CreateCommand(schemaCommand, Connection, Transaction, Processor.Options))
-                {
-                    commandToo.ExecuteNonQuery();
-                }
+                var schemaCommand = string.Format("DROP SCHEMA {0} RESTRICT", _quoter.QuoteSchemaName(_schema));
+                Processor.Execute(schemaCommand);
             }
         }
 
         public void WithIndexOn(string column, string name)
         {
             var query = string.Format("CREATE UNIQUE INDEX {0} ON {1} ({2})",
-                quoter.QuoteIndexName(name, _schema),
+                _quoter.QuoteIndexName(name, _schema),
                 NameWithSchema,
-                quoter.QuoteColumnName(column)
+                _quoter.QuoteColumnName(column)
                 );
 
-            using (var command = Factory.CreateCommand(query, Connection, Transaction, Processor.Options))
-            {
-                command.ExecuteNonQuery();
-            }
+            Processor.Execute(query);
         }
 
         public void WithUniqueConstraintOn(string column, string name)
         {
-            var constraintName = quoter.QuoteConstraintName(name, _schema);
+            var constraintName = _quoter.QuoteConstraintName(name, _schema);
 
             var query = string.Format("ALTER TABLE {0} ADD CONSTRAINT {1} UNIQUE ({2})",
                 NameWithSchema,
                 constraintName,
-                quoter.QuoteColumnName(column)
+                _quoter.QuoteColumnName(column)
             );
 
-            using (var command = Factory.CreateCommand(query, Connection, Transaction, Processor.Options))
-            {
-                command.ExecuteNonQuery();
-            }
+            Processor.Execute(query);
         }
 
-        #endregion Methods
-
-        public Db2Processor Processor { get; set; }
+        public Db2Processor Processor { get; }
     }
 }

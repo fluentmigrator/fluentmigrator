@@ -28,6 +28,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
             SetTypeMap(DbType.DateTime2, "DATETIME2");
             SetTypeMap(DbType.DateTimeOffset, "DATETIMEOFFSET");
+            SetTypeMap(DbType.DateTimeOffset, "DATETIMEOFFSET($size)", maxSize: 7);
             SetTypeMap(DbType.Date, "DATE");
             SetTypeMap(DbType.Time, "TIME");
         }

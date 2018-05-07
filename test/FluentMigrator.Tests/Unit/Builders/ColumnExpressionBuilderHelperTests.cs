@@ -1,4 +1,4 @@
-﻿using FluentMigrator.Builders;
+using FluentMigrator.Builders;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
@@ -7,6 +7,8 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+
+using JetBrains.Annotations;
 
 namespace FluentMigrator.Tests.Unit.Builders
 {
@@ -164,7 +166,7 @@ namespace FluentMigrator.Tests.Unit.Builders
             contextMock.SetupGet(n => n.Expressions).Returns(addedExpressions);
             builderMock.SetupGet(n => n.Column.ModificationType).Returns(ColumnModificationType.Create);
             builderMock.Setup(n => n.Column.Clone()).Returns(new ColumnDefinition());
-            
+
             var helper = new ColumnExpressionBuilderHelper(builderMock.Object, contextMock.Object);
 
             helper.SetNullable(false);
@@ -174,14 +176,15 @@ namespace FluentMigrator.Tests.Unit.Builders
             builderMock.VerifySet(n => n.Column.IsNullable = true);
         }
 
+/*
         //Will this ever happen?  It should handle it, but need to test that if users goes
         // .Nullable().SetExistingRowsTo(5).NotNullable() it will be handled.
         public void SetExistingRows_SettingNullableRemovesAlterColumn()
         {
             throw new NotImplementedException();
         }
+*/
 
-        
         [Test]
         public void SetNullable_ToTrue()
         {
@@ -260,17 +263,19 @@ namespace FluentMigrator.Tests.Unit.Builders
             VerifyColumnModification(h => h.Indexed(null), c => c.IsIndexed = true);
         }
 
-        private void VerifyColumnModification(Action<ColumnExpressionBuilderHelper> helperCall, Action<ColumnDefinition> expectedAction)
+        private void VerifyColumnModification(
+            [NotNull] Action<ColumnExpressionBuilderHelper> helperCall,
+            [NotNull] Action<ColumnDefinition> expectedAction)
         {
             var builderMock = new Mock<IColumnExpressionBuilder>();
             var contextMock = new Mock<IMigrationContext>();
             builderMock.SetupGet(n => n.Column.ModificationType).Returns(ColumnModificationType.Create);
+            contextMock.SetupProperty(c => c.Expressions, new List<IMigrationExpression>());
 
             var helper = new ColumnExpressionBuilderHelper(builderMock.Object, contextMock.Object);
+            helperCall.Invoke(helper);
 
-            helper.SetNullable(false);
-
-            builderMock.VerifySet(n => n.Column.IsNullable = false);
+            builderMock.VerifySet(n => expectedAction(n.Column));
         }
     }
 }

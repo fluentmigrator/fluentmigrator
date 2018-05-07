@@ -17,31 +17,24 @@
 #endregion
 
 using System;
-using System.IO;
 using System.Reflection;
+
 using FluentMigrator.Exceptions;
 using FluentMigrator.Runner;
-using FluentMigrator.Runner.Announcers;
+using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Extensions;
 using FluentMigrator.Runner.Initialization;
+using FluentMigrator.Runner.Initialization.NetFramework;
+using FluentMigrator.Runner.Logging;
 using FluentMigrator.Runner.Processors;
-using FluentMigrator.Runner.Processors.DB2;
-using FluentMigrator.Runner.Processors.DotConnectOracle;
-using FluentMigrator.Runner.Processors.Firebird;
-using FluentMigrator.Runner.Processors.MySql;
-using FluentMigrator.Runner.Processors.Oracle;
-using FluentMigrator.Runner.Processors.Postgres;
-using FluentMigrator.Runner.Processors.SqlServer;
-using FluentMigrator.Runner.Processors.SQLite;
 
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
-
-using Processors = FluentMigrator.Runner.Processors;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace FluentMigrator.MSBuild
 {
-    [CLSCompliant(false)]
     public class Migrate :
 #if NETFRAMEWORK
         AppDomainIsolatedTask
@@ -54,16 +47,16 @@ namespace FluentMigrator.MSBuild
         /// </summary>
         public Migrate()
         {
-            AppDomain.CurrentDomain.ResourceResolve += new ResolveEventHandler(CurrentDomain_ResourceResolve);
+            AppDomain.CurrentDomain.ResourceResolve += CurrentDomain_ResourceResolve;
         }
 
         private static Assembly CurrentDomain_ResourceResolve(object sender, ResolveEventArgs args)
         {
-            Console.WriteLine("Could Not Resolve {0}", args.Name);
+            Console.WriteLine(@"Could Not Resolve {0}", args.Name);
             return null;
         }
 
-        private string databaseType;
+        private string _databaseType;
 
         public string ApplicationContext { get; set; }
 
@@ -72,14 +65,14 @@ namespace FluentMigrator.MSBuild
 
         public string ConnectionStringConfigPath { get; set; }
 
-        public string Target { get { return (Targets != null && Targets.Length == 1) ? Targets[0] : string.Empty; } set { Targets = new string[] { value }; } }
+        public string Target { get { return (Targets != null && Targets.Length == 1) ? Targets[0] : string.Empty; } set { Targets = new[] { value }; } }
 
         public string[] Targets { get; set; }
-        public string MigrationAssembly { get { return (Targets != null && Targets.Length == 1) ? Targets[0] : string.Empty; } set { Targets = new string[] {value}; } }
+        public string MigrationAssembly { get { return (Targets != null && Targets.Length == 1) ? Targets[0] : string.Empty; } set { Targets = new[] {value}; } }
 
-        public string Database { get { return databaseType; } set { databaseType = value; } }
+        public string Database { get { return _databaseType; } set { _databaseType = value; } }
 
-        public string DatabaseType { get { return databaseType; } set { databaseType = value; } }
+        public string DatabaseType { get { return _databaseType; } set { _databaseType = value; } }
 
         public bool Verbose { get; set; }
 
@@ -109,10 +102,16 @@ namespace FluentMigrator.MSBuild
 
         public bool TransactionPerSession { get; set; }
 
+        public bool AllowBreakingChange { get; set; }
+
+        public string ProviderSwitches { get; set; }
+
+        private bool ExecutingAgainstMsSql => _databaseType.StartsWith("SqlServer", StringComparison.InvariantCultureIgnoreCase);
+
         public override bool Execute()
         {
 
-            if (string.IsNullOrEmpty(databaseType))
+            if (string.IsNullOrEmpty(_databaseType))
             {
                 Log.LogError("You must specify a database type. i.e. mysql or sqlserver");
                 return false;
@@ -124,54 +123,12 @@ namespace FluentMigrator.MSBuild
                 return false;
             }
 
-            IAnnouncer announcer = new ConsoleAnnouncer
-            {
-                ShowElapsedTime = Verbose,
-                ShowSql = Verbose
-            };
-
-            StreamWriter outputWriter = null;
-            if (Output)
-            {
-                if (string.IsNullOrEmpty(OutputFilename))
-                    OutputFilename = Path.GetFileName(Target) + ".sql";
-
-                outputWriter = new StreamWriter(OutputFilename);
-                var fileAnnouncer = new TextWriterAnnouncer(outputWriter)
-                {
-                    ShowElapsedTime = false,
-                    ShowSql = true
-                };
-
-                announcer = new CompositeAnnouncer(announcer, fileAnnouncer);
-            }
-
-            Log.LogMessage(MessageImportance.Low, "Creating Context");
-
-            var runnerContext = new RunnerContext(announcer)
-            {
-                ApplicationContext = ApplicationContext,
-                Database = databaseType,
-                Connection = Connection,
-                ConnectionStringConfigPath = ConnectionStringConfigPath,
-                Targets = Targets,
-                PreviewOnly = PreviewOnly,
-                Namespace = Namespace,
-                NestedNamespaces = Nested,
-                Task = Task,
-                Version = Version,
-                Steps = Steps,
-                WorkingDirectory = WorkingDirectory,
-                Profile = Profile,
-                Tags = Tags.ToTags(),
-                Timeout = Timeout,
-                TransactionPerSession = TransactionPerSession
-            };
-
             Log.LogMessage(MessageImportance.Low, "Executing Migration Runner");
             try
             {
-                new TaskExecutor(runnerContext).Execute();
+                Log.LogMessage(MessageImportance.Low, "Creating Context");
+
+                ExecuteMigrations();
             }
             catch (ProcessorFactoryNotFoundException ex)
             {
@@ -183,15 +140,100 @@ namespace FluentMigrator.MSBuild
                 Log.LogError("While executing migrations the following error was encountered: {0}, {1}", ex.Message, ex.StackTrace);
                 return false;
             }
-            finally
-            {
-                if (outputWriter != null)
-                {
-                    outputWriter.Dispose();
-                }
-            }
 
             return true;
+        }
+
+        private void ExecuteMigrations()
+        {
+            var conventionSet = new DefaultConventionSet(defaultSchemaName: null, WorkingDirectory);
+
+            var services = CreateCoreServices()
+                .AddSingleton<IConventionSet>(conventionSet)
+                .AddSingleton<ILoggerProvider, FluentMigratorConsoleLoggerProvider>()
+                .Configure<SelectingProcessorAccessorOptions>(opt => opt.ProcessorId = DatabaseType)
+                .Configure<AssemblySourceOptions>(opt => opt.AssemblyNames = Targets)
+#pragma warning disable 612
+                .Configure<AppConfigConnectionStringAccessorOptions>(
+                    opt => opt.ConnectionStringConfigPath = ConnectionStringConfigPath)
+#pragma warning restore 612
+                .Configure<TypeFilterOptions>(
+                    opt =>
+                    {
+                        opt.Namespace = Namespace;
+                        opt.NestedNamespaces = Nested;
+                    })
+                .Configure<RunnerOptions>(
+                    opt =>
+                    {
+                        opt.Task = Task;
+                        opt.Version = Version;
+                        opt.Steps = Steps;
+                        opt.Profile = Profile;
+                        opt.Tags = Tags.ToTags().ToArray();
+#pragma warning disable 612
+                        opt.ApplicationContext = ApplicationContext;
+#pragma warning restore 612
+                        opt.TransactionPerSession = TransactionPerSession;
+                        opt.AllowBreakingChange = AllowBreakingChange;
+                    })
+                .Configure<ProcessorOptions>(
+                    opt =>
+                    {
+                        opt.ConnectionString = Connection;
+                        opt.PreviewOnly = PreviewOnly;
+                        opt.ProviderSwitches = ProviderSwitches;
+                        opt.Timeout = Timeout == null ? null : (TimeSpan?)TimeSpan.FromSeconds(Timeout.Value);
+                    });
+
+            if (Output)
+            {
+                services
+                    .Configure<LogFileFluentMigratorLoggerOptions>(
+                        opt =>
+                        {
+                            opt.ShowSql = true;
+                            opt.OutputFileName = OutputFilename;
+                            opt.OutputGoBetweenStatements = ExecutingAgainstMsSql;
+                        })
+                    .AddSingleton<ILoggerProvider, LogFileFluentMigratorLoggerProvider>();
+            }
+
+            using (var serviceProvider = services.BuildServiceProvider(validateScopes: false))
+            {
+                var executor = serviceProvider.GetRequiredService<TaskExecutor>();
+                executor.Execute();
+            }
+        }
+
+        private static IServiceCollection CreateCoreServices()
+        {
+            var services = new ServiceCollection()
+                .AddFluentMigratorCore()
+                .ConfigureRunner(
+                    builder => builder
+                        .AddDb2()
+                        .AddDb2ISeries()
+                        .AddDotConnectOracle()
+                        .AddFirebird()
+                        .AddHana()
+                        .AddMySql4()
+                        .AddMySql5()
+                        .AddOracle()
+                        .AddOracleManaged()
+                        .AddPostgres()
+                        .AddRedshift()
+                        .AddSqlAnywhere()
+                        .AddSQLite()
+                        .AddSqlServer()
+                        .AddSqlServer2000()
+                        .AddSqlServer2005()
+                        .AddSqlServer2008()
+                        .AddSqlServer2012()
+                        .AddSqlServer2014()
+                        .AddSqlServer2016()
+                        .AddSqlServerCe());
+            return services;
         }
     }
 }

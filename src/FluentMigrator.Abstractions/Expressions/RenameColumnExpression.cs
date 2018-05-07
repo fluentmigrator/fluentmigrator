@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -16,38 +16,51 @@
 //
 #endregion
 
-using System;
-using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+
 using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Expressions
 {
+    /// <summary>
+    /// Expression to rename a column
+    /// </summary>
     public class RenameColumnExpression : MigrationExpressionBase, ISchemaExpression
     {
+        /// <inheritdoc />
         public virtual string SchemaName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the name of the table
+        /// </summary>
+        [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.TableNameCannotBeNullOrEmpty))]
         public virtual string TableName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the old column name
+        /// </summary>
+        [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.OldColumnNameCannotBeNullOrEmpty))]
         public virtual string OldName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the new column name
+        /// </summary>
+        [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.NewColumnNameCannotBeNullOrEmpty))]
         public virtual string NewName { get; set; }
 
-        public override void CollectValidationErrors(ICollection<string> errors)
-        {
-            if (String.IsNullOrEmpty(OldName))
-                errors.Add(ErrorMessages.OldColumnNameCannotBeNullOrEmpty);
-
-            if (String.IsNullOrEmpty(NewName))
-                errors.Add(ErrorMessages.NewColumnNameCannotBeNullOrEmpty);
-        }
-
+        /// <inheritdoc />
         public override void ExecuteWith(IMigrationProcessor processor)
         {
             processor.Process(this);
         }
 
+        /// <inheritdoc />
         public override IMigrationExpression Reverse()
         {
             return new RenameColumnExpression { SchemaName = SchemaName, TableName = TableName, OldName = NewName, NewName = OldName };
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return base.ToString() + TableName + " " + OldName + " to " + NewName;

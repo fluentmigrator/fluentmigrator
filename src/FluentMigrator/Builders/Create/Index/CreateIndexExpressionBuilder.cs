@@ -24,6 +24,9 @@ using FluentMigrator.Model;
 
 namespace FluentMigrator.Builders.Create.Index
 {
+    /// <summary>
+    /// An expression builder for a <see cref="CreateIndexExpression"/>
+    /// </summary>
     public class CreateIndexExpressionBuilder : ExpressionBuilderBase<CreateIndexExpression>,
         ICreateIndexForTableSyntax,
         ICreateIndexOnColumnOrInSchemaSyntax,
@@ -33,21 +36,31 @@ namespace FluentMigrator.Builders.Create.Index
         ICreateIndexColumnUniqueOptionsSyntax,
         ICreateIndexMoreColumnOptionsSyntax
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CreateIndexExpressionBuilder"/> class.
+        /// </summary>
+        /// <param name="expression">The underlying expression</param>
         public CreateIndexExpressionBuilder(CreateIndexExpression expression)
             : base(expression)
         {
         }
 
+        /// <inheritdoc />
         public IDictionary<string, object> AdditionalFeatures => Expression.Index.AdditionalFeatures;
 
+        /// <summary>
+        /// Gets or sets the current index column definition
+        /// </summary>
         public IndexColumnDefinition CurrentColumn { get; set; }
 
+        /// <inheritdoc />
         public ICreateIndexOnColumnOrInSchemaSyntax OnTable(string tableName)
         {
             Expression.Index.TableName = tableName;
             return this;
         }
 
+        /// <inheritdoc />
         public ICreateIndexColumnOptionsSyntax OnColumn(string columnName)
         {
             CurrentColumn = new IndexColumnDefinition { Name = columnName };
@@ -55,47 +68,55 @@ namespace FluentMigrator.Builders.Create.Index
             return this;
         }
 
+        /// <inheritdoc />
         public ICreateIndexOptionsSyntax WithOptions()
         {
             return this;
         }
 
+        /// <inheritdoc />
         public ICreateIndexOnColumnSyntax InSchema(string schemaName)
         {
             Expression.Index.SchemaName = schemaName;
             return this;
         }
 
+        /// <inheritdoc />
         public ICreateIndexMoreColumnOptionsSyntax Ascending()
         {
             CurrentColumn.Direction = Direction.Ascending;
             return this;
         }
 
+        /// <inheritdoc />
         public ICreateIndexMoreColumnOptionsSyntax Descending()
         {
             CurrentColumn.Direction = Direction.Descending;
             return this;
         }
 
+        /// <inheritdoc />
         public ICreateIndexColumnUniqueOptionsSyntax Unique()
         {
             Expression.Index.IsUnique = true;
             return this;
         }
 
+        /// <inheritdoc />
         ICreateIndexOnColumnSyntax ICreateIndexOptionsSyntax.Unique()
         {
             Expression.Index.IsUnique = true;
             return this;
         }
 
+        /// <inheritdoc />
         public ICreateIndexOnColumnSyntax NonClustered()
         {
             Expression.Index.IsClustered = false;
             return this;
         }
 
+        /// <inheritdoc />
         public ICreateIndexOnColumnSyntax Clustered()
         {
             Expression.Index.IsClustered = true;

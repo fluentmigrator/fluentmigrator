@@ -1,16 +1,36 @@
+#region License
+//
+// Copyright (c) 2018, Fluent Migrator Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+#endregion
+
 using System;
-using System.Collections.Generic;
-using System.Data;
-using System.IO;
 using System.Linq;
 using System.Reflection;
+
 using FirebirdSql.Data.FirebirdClient;
+
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators.Firebird;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Firebird;
+
+using Microsoft.Extensions.DependencyInjection;
+
 using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Integration.Processors.Firebird
@@ -22,81 +42,31 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
     {
         private readonly FirebirdLibraryProber _firebirdLibraryProber = new FirebirdLibraryProber();
 
-        public class CreateTableMigration : Migration
-        {
-            public override void Up()
-            {
-                Create.Table("TheTable")
-                    .WithColumn("Id").AsInt32().PrimaryKey()
-                    .WithColumn("Name").AsString(100).Nullable()
-                    .WithColumn("SomeValue").AsInt32().Nullable();
-            }
-
-            public override void Down()
-            {
-            }
-        }
-
-        public class AddDataMigration : Migration
-        {
-            private readonly int _id;
-
-            public AddDataMigration(int id = 1)
-            {
-                _id = id;
-            }
-            public override void Up()
-            {
-                Insert.IntoTable("TheTable").Row(new { Id = _id, SomeValue = _id });
-            }
-
-            public override void Down()
-            {
-                Delete.FromTable("TheTable").Row(new { Id = _id });
-            }
-        }
-
-        public class RenameTableMigration : Migration
-        {
-            public override void Up()
-            {
-                Rename.Table("TheTable").To("TheNewTable");
-            }
-
-            public override void Down()
-            {
-            }
-        }
-
         [Test]
         public void RenameTable_WhenOriginalTableExistsAndContainsDataWithNulls_ShouldNotThrowException()
         {
             //---------------Set up test pack-------------------
             using (var tempDb = new TemporaryDatabase(IntegrationTestOptions.Firebird, _firebirdLibraryProber))
             {
-                var connectionString = tempDb.ConnectionString;
-
-                var runnerContext = new RunnerContext(new TextWriterAnnouncer(TestContext.Out))
+                using (var serviceProvider = CreateServiceProvider(tempDb.ConnectionString, "FluentMigrator.Tests.Integration.Migrations"))
                 {
-                    Namespace = "FluentMigrator.Tests.Integration.Migrations"
-                };
-
-                using (var connection = new FbConnection(connectionString))
-                {
-                    FirebirdProcessor processor;
-                    var runner = CreateFirebirdEmbeddedRunnerFor(connection, runnerContext, out processor);
+                    var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
                     runner.Up(new CreateTableMigration());
-                    runner.Up(new AddDataMigration());
+                    runner.Up(new AddDataMigration(1));
+
                     //---------------Assert Precondition----------------
-                    connection.Open();
-                    using (var cmd = new FbCommand("select * from TheTable", connection))
-                    {
-                        using (var reader = cmd.ExecuteReader())
-                        {
-                            Assert.IsTrue(reader.Read());
-                            Assert.IsInstanceOf<DBNull>(reader["Name"]);
-                        }
-                    }
+                    var processor = serviceProvider.GetRequiredService<IMigrationProcessor>();
+                    var result = processor.Read("select * from TheTable");
+
+                    Assert.That(result.Tables.Count, Is.GreaterThan(0));
+                    var table = result.Tables[0];
+
+                    Assert.That(table.Rows.Count, Is.GreaterThan(0));
+                    var row = table.Rows[0];
+
+                    Assert.IsTrue(table.Columns.Contains("Name"));
+                    Assert.That(row["Name"], Is.InstanceOf<DBNull>());
+
                     //---------------Execute Test ----------------------
                     Exception thrown = null;
                     try
@@ -120,31 +90,17 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             //---------------Set up test pack-------------------
             using (var tempDb = new TemporaryDatabase(IntegrationTestOptions.Firebird, _firebirdLibraryProber))
             {
-                var connectionString = tempDb.ConnectionString;
-
-                var runnerContext = new RunnerContext(new TextWriterAnnouncer(TestContext.Out))
+                using (var serviceProvider = CreateServiceProvider(tempDb.ConnectionString, "FluentMigrator.Tests.Integration.Migrations"))
                 {
-                    Namespace = "FluentMigrator.Tests.Integration.Migrations"
-                };
-
-                using (var connection = new FbConnection(connectionString))
-                {
-                    FirebirdProcessor processor;
-                    var runner = CreateFirebirdEmbeddedRunnerFor(connection, runnerContext, out processor);
+                    var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
                     runner.Up(new CreateTableMigration());
-                    runner.Up(new AddDataMigration(1));
+                    runner.Up(new AddDataMigration(id: 1));
                     runner.Up(new AddDataMigration(2));
                     runner.Up(new AddDataMigration(3));
                     //---------------Assert Precondition----------------
-                    connection.Open();
-                    using (var cmd = new FbCommand("select count(*) as TheCount from TheTable", connection))
-                    {
-                        using (var reader = cmd.ExecuteReader())
-                        {
-                            Assert.IsTrue(reader.Read());
-                            Assert.AreEqual(3, Convert.ToInt32(reader["TheCount"]));
-                        }
-                    }
+                    var processor = serviceProvider.GetRequiredService<IMigrationProcessor>();
+                    Assert.That(CountRowsWith("select count(*) as TheCount from TheTable", processor), Is.EqualTo(3));
+
                     //---------------Execute Test ----------------------
                     Exception thrown = null;
                     try
@@ -164,12 +120,13 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
 
         private class DeleteDataMigration : Migration
         {
-            private int[] _ids;
+            private readonly int[] _ids;
 
             public DeleteDataMigration(params int[] forIds)
             {
                 _ids = forIds;
             }
+
             public override void Up()
             {
                 var start = Delete.FromTable("TheTable").Row(new { Id = _ids.First() });
@@ -188,48 +145,27 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             //---------------Set up test pack-------------------
             using (var tempDb = new TemporaryDatabase(IntegrationTestOptions.Firebird, _firebirdLibraryProber))
             {
-                var connectionString = tempDb.ConnectionString;
-
-                var runnerContext = new RunnerContext(new TextWriterAnnouncer(TestContext.Out))
-                                            {
-                                                Namespace = "FluentMigrator.Tests.Integration.Migrations"
-                                            };
-
-
-                using (var connection = new FbConnection(connectionString))
+                using (var serviceProvider = CreateServiceProvider(tempDb.ConnectionString, "FluentMigrator.Tests.Integration.Migrations"))
                 {
-                    FirebirdProcessor processor;
-                    var runner = CreateFirebirdEmbeddedRunnerFor(connection, runnerContext, out processor);
+                    var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
                     runner.Up(new CreateTableMigration());
                     runner.Up(new AddDataMigration(1));
                     runner.Up(new AddDataMigration(2));
                     runner.Up(new AddDataMigration(3));
+
                     //---------------Assert Precondition----------------
-                    connection.Open();
                     const string countSql = "select count(*) as TheCount from TheTable";
-                    using (var cmd = new FbCommand(countSql, connection))
-                    {
-                        using (var reader = cmd.ExecuteReader())
-                        {
-                            Assert.IsTrue(reader.Read());
-                            Assert.AreEqual(3, Convert.ToInt32(reader["TheCount"]));
-                        }
-                    }
+                    var processor = serviceProvider.GetRequiredService<FirebirdProcessor>();
+                    Assert.That(CountRowsWith(countSql, processor), Is.EqualTo(3));
+
                     //---------------Execute Test ----------------------
                     Exception thrown = null;
                     try
                     {
                         runner.Up(new DeleteDataMigration(1));
                         processor.CommitTransaction();
-                        using (var cmd = new FbCommand(countSql, connection))
-                        {
-                            connection.Open();
-                            using (var reader = cmd.ExecuteReader())
-                            {
-                                Assert.IsTrue(reader.Read());
-                                Assert.AreEqual(2, Convert.ToInt32(reader["TheCount"]));
-                            }
-                        }
+
+                        Assert.That(CountRowsWith(countSql, processor), Is.EqualTo(2));
                     }
                     catch (Exception ex)
                     {
@@ -249,48 +185,26 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             //---------------Set up test pack-------------------
             using (var tempDb = new TemporaryDatabase(IntegrationTestOptions.Firebird, _firebirdLibraryProber))
             {
-                var connectionString = tempDb.ConnectionString;
-
-                var runnerContext = new RunnerContext(new TextWriterAnnouncer(TestContext.Out))
-                                            {
-                                                Namespace = "FluentMigrator.Tests.Integration.Migrations"
-                                            };
-
-
-                using (var connection = new FbConnection(connectionString))
+                using (var serviceProvider = CreateServiceProvider(tempDb.ConnectionString, "FluentMigrator.Tests.Integration.Migrations"))
                 {
-                    FirebirdProcessor processor;
-                    var runner = CreateFirebirdEmbeddedRunnerFor(connection, runnerContext, out processor);
+                    var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
                     runner.Up(new CreateTableMigration());
                     runner.Up(new AddDataMigration(1));
                     runner.Up(new AddDataMigration(2));
                     runner.Up(new AddDataMigration(3));
                     //---------------Assert Precondition----------------
-                    connection.Open();
                     const string countSql = "select count(*) as TheCount from TheTable";
-                    using (var cmd = new FbCommand(countSql, connection))
-                    {
-                        using (var reader = cmd.ExecuteReader())
-                        {
-                            Assert.IsTrue(reader.Read());
-                            Assert.AreEqual(3, Convert.ToInt32(reader["TheCount"]));
-                        }
-                    }
+                    var processor = serviceProvider.GetRequiredService<FirebirdProcessor>();
+                    Assert.That(CountRowsWith(countSql, processor), Is.EqualTo(3));
+
                     //---------------Execute Test ----------------------
                     Exception thrown = null;
                     try
                     {
                         runner.Up(new DeleteDataMigration(1, 2));
                         processor.CommitTransaction();
-                        using (var cmd = new FbCommand(countSql, connection))
-                        {
-                            connection.Open();
-                            using (var reader = cmd.ExecuteReader())
-                            {
-                                Assert.IsTrue(reader.Read());
-                                Assert.AreEqual(1, Convert.ToInt32(reader["TheCount"]));
-                            }
-                        }
+
+                        Assert.That(CountRowsWith(countSql, processor), Is.EqualTo(1));
                     }
                     catch (Exception ex)
                     {
@@ -322,48 +236,26 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             //---------------Set up test pack-------------------
             using (var tempDb = new TemporaryDatabase(IntegrationTestOptions.Firebird, _firebirdLibraryProber))
             {
-                var connectionString = tempDb.ConnectionString;
-
-                var runnerContext = new RunnerContext(new TextWriterAnnouncer(TestContext.Out))
-                                            {
-                                                Namespace = "FluentMigrator.Tests.Integration.Migrations"
-                                            };
-
-
-                using (var connection = new FbConnection(connectionString))
+                using (var serviceProvider = CreateServiceProvider(tempDb.ConnectionString, "FluentMigrator.Tests.Integration.Migrations"))
                 {
-                    FirebirdProcessor processor;
-                    var runner = CreateFirebirdEmbeddedRunnerFor(connection, runnerContext, out processor);
+                    var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
                     runner.Up(new CreateTableMigration());
                     runner.Up(new AddDataMigration(1));
                     runner.Up(new AddDataMigration(2));
                     runner.Up(new AddDataMigration(3));
                     //---------------Assert Precondition----------------
-                    connection.Open();
                     const string countSql = "select count(*) as TheCount from TheTable";
-                    using (var cmd = new FbCommand(countSql, connection))
-                    {
-                        using (var reader = cmd.ExecuteReader())
-                        {
-                            Assert.IsTrue(reader.Read());
-                            Assert.AreEqual(3, Convert.ToInt32(reader["TheCount"]));
-                        }
-                    }
+                    var processor = serviceProvider.GetRequiredService<FirebirdProcessor>();
+                    Assert.That(CountRowsWith(countSql, processor), Is.EqualTo(3));
+
                     //---------------Execute Test ----------------------
                     Exception thrown = null;
                     try
                     {
                         runner.Up(new DeleteAllRowsMigration());
                         processor.CommitTransaction();
-                        using (var cmd = new FbCommand(countSql, connection))
-                        {
-                            connection.Open();
-                            using (var reader = cmd.ExecuteReader())
-                            {
-                                Assert.IsTrue(reader.Read());
-                                Assert.AreEqual(0, Convert.ToInt32(reader["TheCount"]));
-                            }
-                        }
+
+                        Assert.That(CountRowsWith(countSql, processor), Is.EqualTo(0));
                     }
                     catch (Exception ex)
                     {
@@ -383,33 +275,26 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             //---------------Set up test pack-------------------
             using (var tempDb = new TemporaryDatabase(IntegrationTestOptions.Firebird, _firebirdLibraryProber))
             {
-                var connectionString = tempDb.ConnectionString;
-
-                var runnerContext = new RunnerContext(new TextWriterAnnouncer(TestContext.Out))
-                                            {
-                                                Namespace = "FluentMigrator.Tests.Integration.Migrations"
-                                            };
-
-
-                using (var connection = new FbConnection(connectionString))
+                using (var serviceProvider = CreateServiceProvider(tempDb.ConnectionString, "FluentMigrator.Tests.Integration.Migrations"))
                 {
-                    FirebirdProcessor processor;
-                    var runner = CreateFirebirdEmbeddedRunnerFor(connection, runnerContext, out processor);
+                    var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
                     runner.Up(new CreateTableMigration());
                     runner.Up(new AddDataMigration(1));
                     runner.Up(new AddDataMigration(2));
                     runner.Up(new AddDataMigration(3));
                     //---------------Assert Precondition----------------
-                    connection.Open();
                     const string countSql = "select count(*) as TheCount from TheTable where Id = {0}";
-                    Assert.AreEqual(1, CountRowsWith(countSql, 1, connection));
+                    var processor = serviceProvider.GetRequiredService<FirebirdProcessor>();
+                    Assert.That(CountRowsWith(countSql, processor, 1), Is.EqualTo(1));
+
                     //---------------Execute Test ----------------------
                     Exception thrown = null;
                     try
                     {
                         runner.Up(new UpdateMigration(4, 1));
                         processor.CommitTransaction();
-                        Assert.AreEqual(1, CountRowsWith(countSql, 4, connection));
+
+                        Assert.That(CountRowsWith(countSql, processor, 4), Is.EqualTo(1));
                     }
                     catch (Exception ex)
                     {
@@ -429,33 +314,18 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             //---------------Set up test pack-------------------
             using (var tempDb = new TemporaryDatabase(IntegrationTestOptions.Firebird, _firebirdLibraryProber))
             {
-                var connectionString = tempDb.ConnectionString;
-
-                var runnerContext = new RunnerContext(new TextWriterAnnouncer(TestContext.Out))
-                                            {
-                                                Namespace = "FluentMigrator.Tests.Integration.Migrations"
-                                            };
-
-
-                using (var connection = new FbConnection(connectionString))
+                using (var serviceProvider = CreateServiceProvider(tempDb.ConnectionString, "FluentMigrator.Tests.Integration.Migrations"))
                 {
-                    FirebirdProcessor processor;
-                    var runner = CreateFirebirdEmbeddedRunnerFor(connection, runnerContext, out processor);
+                    var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
                     runner.Up(new CreateTableMigration());
                     runner.Up(new AddDataMigration(1));
                     runner.Up(new AddDataMigration(2));
                     runner.Up(new AddDataMigration(3));
                     //---------------Assert Precondition----------------
-                    connection.Open();
                     const string countSql = "select count(*) as TheCount from TheTable where Id = {0}";
-                    using (var cmd = new FbCommand(String.Format(countSql, 1), connection))
-                    {
-                        using (var reader = cmd.ExecuteReader())
-                        {
-                            Assert.IsTrue(reader.Read());
-                            Assert.AreEqual(1, Convert.ToInt32(reader["TheCount"]));
-                        }
-                    }
+                    var processor = serviceProvider.GetRequiredService<FirebirdProcessor>();
+                    Assert.That(CountRowsWith(countSql, processor, 1), Is.EqualTo(1));
+
                     //---------------Execute Test ----------------------
                     Exception thrown = null;
                     try
@@ -463,8 +333,8 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                         runner.Up(new UpdateMigration(4, 1));
                         runner.Up(new UpdateMigration(5, 2));
                         processor.CommitTransaction();
-                        Assert.AreEqual(1, CountRowsWith(countSql, 4, connection));
-                        Assert.AreEqual(1, CountRowsWith(countSql, 5, connection));
+                        Assert.That(CountRowsWith(countSql, processor, 4), Is.EqualTo(1));
+                        Assert.That(CountRowsWith(countSql, processor, 5), Is.EqualTo(1));
                     }
                     catch (Exception ex)
                     {
@@ -484,35 +354,27 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             //---------------Set up test pack-------------------
             using (var tempDb = new TemporaryDatabase(IntegrationTestOptions.Firebird, _firebirdLibraryProber))
             {
-                var connectionString = tempDb.ConnectionString;
-
-                var runnerContext = new RunnerContext(new TextWriterAnnouncer(TestContext.Out))
-                                            {
-                                                Namespace = "FluentMigrator.Tests.Integration.Migrations"
-                                            };
-
-
-                using (var connection = new FbConnection(connectionString))
+                using (var serviceProvider = CreateServiceProvider(tempDb.ConnectionString, "FluentMigrator.Tests.Integration.Migrations"))
                 {
-                    FirebirdProcessor processor;
-                    var runner = CreateFirebirdEmbeddedRunnerFor(connection, runnerContext, out processor);
+                    var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
                     runner.Up(new CreateTableMigration());
                     runner.Up(new AddDataMigration(1));
                     runner.Up(new AddDataMigration(2));
                     runner.Up(new AddDataMigration(3));
                     //---------------Assert Precondition----------------
-                    connection.Open();
                     const string countSql = "select count(*) as TheCount from TheTable where SomeValue = {0}";
-                    Assert.AreEqual(1, CountRowsWith(countSql, 1, connection));
-                    Assert.AreEqual(1, CountRowsWith(countSql, 2, connection));
-                    Assert.AreEqual(1, CountRowsWith(countSql, 3, connection));
+                    var processor = serviceProvider.GetRequiredService<FirebirdProcessor>();
+                    Assert.That(CountRowsWith(countSql, processor, 1), Is.EqualTo(1));
+                    Assert.That(CountRowsWith(countSql, processor, 2), Is.EqualTo(1));
+                    Assert.That(CountRowsWith(countSql, processor, 3), Is.EqualTo(1));
+
                     //---------------Execute Test ----------------------
                     Exception thrown = null;
                     try
                     {
                         runner.Up(new UpdateMigration(4));
                         processor.CommitTransaction();
-                        Assert.AreEqual(3, CountRowsWith(countSql, 4, connection));
+                        Assert.That(CountRowsWith(countSql, processor, 4), Is.EqualTo(3));
                     }
                     catch (Exception ex)
                     {
@@ -526,52 +388,204 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             }
         }
 
-        private static int CountRowsWith(string countSql, int toCheck, FbConnection connection)
+        [Test]
+        public void RenamingTable_WhenTableHasTextBlobs_ShouldCreateNewTableWithTextBlobsNotBinaryBlobs()
         {
-            using (var cmd = new FbCommand(string.Format(countSql, toCheck), connection))
+            using (var tempDb = new TemporaryDatabase(IntegrationTestOptions.Firebird, _firebirdLibraryProber))
             {
-                if (connection.State != ConnectionState.Open)
-                    connection.Open();
-                using (var reader = cmd.ExecuteReader())
+                using (var serviceProvider = CreateServiceProvider(tempDb.ConnectionString, "FluentMigrator.Tests.Integration.Migrations"))
                 {
-                    Assert.IsTrue(reader.Read());
-                    return Convert.ToInt32(reader["TheCount"]);
+                    var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
+                    runner.Up(new MigrationWhichCreatesTableWithTextBlob());
+                    //---------------Assert Precondition----------------
+                    var fieldName = "TheColumn";
+                    var tableName = "TheTable";
+                    var expectedFieldType = 261;
+                    var expectedFieldSubType = 1;
+                    var processor = serviceProvider.GetRequiredService<FirebirdProcessor>();
+                    AssertThatFieldHasCorrectTypeAndSubType(fieldName, tableName, processor, expectedFieldType, expectedFieldSubType);
+                    //---------------Execute Test ----------------------
+                    runner.Up(new MigrationWhichRenamesTableWithTextBlob());
+                    //---------------Test Result -----------------------
+                    tableName = "TheNewTable";
+                    AssertThatFieldHasCorrectTypeAndSubType(fieldName, tableName, processor, expectedFieldType, expectedFieldSubType);
                 }
             }
         }
 
-        private class UpdateMigration : Migration
+        [Test]
+        [Obsolete]
+        public void ObsoleteAlterTable_MigrationRequiresAutomaticDelete_AndProcessorHasUndoDisabled_ShouldNotThrow()
         {
-            private int? _from;
-            private int _to;
+            using (var tempDb = new TemporaryDatabase(IntegrationTestOptions.Firebird, _firebirdLibraryProber))
+            {
+                var connectionString = tempDb.ConnectionString;
 
-            public UpdateMigration(int to, int? from = null)
-            {
-                _from = from;
-                _to = to;
-            }
-            public override void Up()
-            {
-                if (_from.HasValue)
-                    Update.Table("TheTable").Set(new { Id = _to, Name = "foo" }).Where(new { Id = _from.Value });
-                else
-                    Update.Table("TheTable").Set(new { SomeValue = _to }).AllRows();
-            }
+                var runnerContext = new RunnerContext(new TextWriterAnnouncer(TestContext.Out))
+                {
+                    Namespace = "FluentMigrator.Tests.Integration.Migrations"
+                };
 
-            public override void Down()
-            {
+                using (var connection = new FbConnection(connectionString))
+                {
+                    var announcer = new TextWriterAnnouncer(TestContext.Out) { ShowSql = true };
+                    var options = FirebirdOptions.AutoCommitBehaviour();
+                    options.TruncateLongNames = false;
+                    var processor = new FirebirdProcessor(connection, new FirebirdGenerator(options), announcer,
+                        new ProcessorOptions(), new FirebirdDbFactory(), options);
+                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), runnerContext, processor);
+                    runner.Up(new MigrationWhichCreatesTwoRelatedTables());
+                    processor.CommitTransaction();
+                    FbConnection.ClearPool(connection);
+                }
+
+                //---------------Assert Precondition----------------
+                Assert.IsTrue(ForeignKeyExists(connectionString, MigrationWhichCreatesTwoRelatedTables.ForeignKeyName),
+                    "Foreign key does not exist after first migration");
+                using (var connection = new FbConnection(connectionString))
+                {
+                    var announcer = new TextWriterAnnouncer(TestContext.Out) { ShowSql = true };
+                    var options = FirebirdOptions.AutoCommitBehaviour();
+                    var processor = new FirebirdProcessor(connection, new FirebirdGenerator(options), announcer,
+                        new ProcessorOptions(), new FirebirdDbFactory(), options);
+                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), runnerContext, processor);
+                    runner.Up(new MigrationWhichAltersTableWithFK());
+                    processor.CommitTransaction();
+                }
+
+                Assert.IsTrue(ForeignKeyExists(connectionString, MigrationWhichCreatesTwoRelatedTables.ForeignKeyName),
+                    "Foreign key does not exist after second migration");
             }
         }
 
-        private static MigrationRunner CreateFirebirdEmbeddedRunnerFor(FbConnection connection, RunnerContext runnerContext, out FirebirdProcessor processor)
+        [Test]
+        public void AlterTable_MigrationRequiresAutomaticDelete_AndProcessorHasUndoDisabled_ShouldNotThrow()
         {
-            var announcer = new TextWriterAnnouncer(TestContext.Out);
-            announcer.ShowSql = true;
-            var options = FirebirdOptions.AutoCommitBehaviour();
-            processor = new FirebirdProcessor(connection, new FirebirdGenerator(options), announcer,
-                new ProcessorOptions(), new FirebirdDbFactory(), options);
-            var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), runnerContext, processor);
-            return runner;
+            using (var tempDb = new TemporaryDatabase(IntegrationTestOptions.Firebird, _firebirdLibraryProber))
+            {
+                using (var serviceProvider = CreateServiceProvider(tempDb.ConnectionString, "FluentMigrator.Tests.Integration.Migrations"))
+                {
+                    var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
+                    var processor = serviceProvider.GetRequiredService<FirebirdProcessor>();
+                    runner.Up(new MigrationWhichCreatesTwoRelatedTables());
+                    processor.CommitTransaction();
+                    FbConnection.ClearPool((FbConnection)processor.Connection);
+                }
+
+                //---------------Assert Precondition----------------
+                Assert.IsTrue(ForeignKeyExists(tempDb.ConnectionString, MigrationWhichCreatesTwoRelatedTables.ForeignKeyName),
+                    "Foreign key does not exist after first migration");
+                using (var serviceProvider = CreateServiceProvider(tempDb.ConnectionString, "FluentMigrator.Tests.Integration.Migrations"))
+                {
+                    var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
+                    var processor = serviceProvider.GetRequiredService<FirebirdProcessor>();
+                    runner.Up(new MigrationWhichAltersTableWithFK());
+                    processor.CommitTransaction();
+                }
+
+                Assert.IsTrue(ForeignKeyExists(tempDb.ConnectionString, MigrationWhichCreatesTwoRelatedTables.ForeignKeyName),
+                    "Foreign key does not exist after second migration");
+            }
+        }
+
+        private static void AssertThatFieldHasCorrectTypeAndSubType(string fieldName, string tableName, IMigrationProcessor processor,
+            int expectedFieldType, int expectedFieldSubType)
+        {
+            var sql =
+                "select RDB$FIELD_TYPE fieldType, RDB$FIELD_SUB_TYPE subType from RDB$RELATION_FIELDS rf " +
+                "inner join RDB$FIELDS f on rf.RDB$FIELD_SOURCE = f.RDB$FIELD_NAME where rf.RDB$FIELD_NAME = '" +
+                fieldName.ToUpper() + "' " +
+                "and rf.RDB$RELATION_NAME = '" + tableName.ToUpper() + "'";
+            var result = processor.Read(sql);
+            Assert.That(result.Tables.Count, Is.GreaterThan(0), "Unable to query schema for table '" + tableName + "'");
+            var table = result.Tables[0];
+
+            Assert.That(table.Rows.Count, Is.GreaterThan(0), "Unable to query schema for table '" + tableName + "'");
+            var row = table.Rows[0];
+            var fieldType = row["fieldType"];
+            var fieldSubType = row["subType"];
+            Assert.AreEqual(expectedFieldType, fieldType, "Field type mismatch");
+            Assert.AreEqual(expectedFieldSubType, fieldSubType, "Field subtype mismatch");
+        }
+
+        private static int CountRowsWith(string countSql, IMigrationProcessor processor, params object[] args)
+        {
+            var result = processor.Read(countSql, args);
+
+            Assert.That(result.Tables.Count, Is.GreaterThan(0));
+            var table = result.Tables[0];
+
+            Assert.That(table.Rows.Count, Is.GreaterThan(0));
+            var row = table.Rows[0];
+
+            Assert.IsTrue(table.Columns.Contains("TheCount"));
+            return Convert.ToInt32(row["TheCount"]);
+        }
+
+        private ServiceProvider CreateServiceProvider(string connectionString, string @namespace)
+        {
+            return ServiceCollectionExtensions.CreateServices()
+                .ConfigureRunner(cfg => cfg.AddFirebird())
+                .AddScoped<IConnectionStringReader>(_ => new PassThroughConnectionStringReader(connectionString))
+                .WithMigrationsIn(@namespace)
+                .BuildServiceProvider();
+        }
+
+        private bool ForeignKeyExists(string connectionString, string withName)
+        {
+            using (var connection = new FbConnection(connectionString))
+            {
+                connection.Open();
+                var keyQuery = @"
+SELECT rc.RDB$CONSTRAINT_NAME AS constraint_name,
+i.RDB$RELATION_NAME AS table_name,
+s.RDB$FIELD_NAME AS field_name,
+i.RDB$DESCRIPTION AS description,
+rc.RDB$DEFERRABLE AS is_deferrable,
+rc.RDB$INITIALLY_DEFERRED AS is_deferred,
+refc.RDB$UPDATE_RULE AS on_update,
+refc.RDB$DELETE_RULE AS on_delete,
+refc.RDB$MATCH_OPTION AS match_type,
+i2.RDB$RELATION_NAME AS references_table,
+s2.RDB$FIELD_NAME AS references_field,
+(s.RDB$FIELD_POSITION + 1) AS field_position
+FROM RDB$INDEX_SEGMENTS s
+LEFT JOIN RDB$INDICES i ON i.RDB$INDEX_NAME = s.RDB$INDEX_NAME
+LEFT JOIN RDB$RELATION_CONSTRAINTS rc ON rc.RDB$INDEX_NAME = s.RDB$INDEX_NAME
+LEFT JOIN RDB$REF_CONSTRAINTS refc ON rc.RDB$CONSTRAINT_NAME = refc.RDB$CONSTRAINT_NAME
+LEFT JOIN RDB$RELATION_CONSTRAINTS rc2 ON rc2.RDB$CONSTRAINT_NAME = refc.RDB$CONST_NAME_UQ
+LEFT JOIN RDB$INDICES i2 ON i2.RDB$INDEX_NAME = rc2.RDB$INDEX_NAME
+LEFT JOIN RDB$INDEX_SEGMENTS s2 ON i2.RDB$INDEX_NAME = s2.RDB$INDEX_NAME
+WHERE rc.RDB$CONSTRAINT_TYPE = 'FOREIGN KEY'
+ORDER BY s.RDB$FIELD_POSITION";
+                var cmd = connection.CreateCommand();
+                cmd.CommandText = keyQuery;
+                var result = false;
+                using (var rdr = cmd.ExecuteReader())
+                {
+                    while (rdr.Read())
+                    {
+                        try
+                        {
+                            var constraintName = rdr["CONSTRAINT_NAME"];
+                            if (constraintName == null) continue;
+                            if (constraintName is DBNull) continue;
+                            if (constraintName.ToString().Trim() == withName.ToUpper())
+                            {
+                                result = true;
+                                break;
+                            }
+                        }
+                        catch
+                        {
+                            // ignored
+                        }
+                    }
+                }
+                connection.Close();
+                FbConnection.ClearPool(connection);
+                return result;
+            }
         }
 
         public class MigrationWhichCreatesTableWithTextBlob : Migration
@@ -596,39 +610,6 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
 
             public override void Down()
             {
-            }
-        }
-
-        [Test]
-        public void RenamingTable_WhenTableHasTextBlobs_ShouldCreateNewTableWithTextBlobsNotBinaryBlobs()
-        {
-            using (var tempDb = new TemporaryDatabase(IntegrationTestOptions.Firebird, _firebirdLibraryProber))
-            {
-                var connectionString = tempDb.ConnectionString;
-
-                var runnerContext = new RunnerContext(new TextWriterAnnouncer(TestContext.Out))
-                                            {
-                                                Namespace = "FluentMigrator.Tests.Integration.Migrations"
-                                            };
-
-
-                using (var connection = new FbConnection(connectionString))
-                {
-                    FirebirdProcessor processor;
-                    var runner = CreateFirebirdEmbeddedRunnerFor(connection, runnerContext, out processor);
-                    runner.Up(new MigrationWhichCreatesTableWithTextBlob());
-                    //---------------Assert Precondition----------------
-                    var fieldName = "TheColumn";
-                    var tableName = "TheTable";
-                    var expectedFieldType = 261;
-                    var expectedFieldSubType = 1;
-                    AssertThatFieldHasCorrectTypeAndSubType(fieldName, tableName, connection, expectedFieldType, expectedFieldSubType);
-                    //---------------Execute Test ----------------------
-                    runner.Up(new MigrationWhichRenamesTableWithTextBlob());
-                    //---------------Test Result -----------------------
-                    tableName = "TheNewTable";
-                    AssertThatFieldHasCorrectTypeAndSubType(fieldName, tableName, connection, expectedFieldType, expectedFieldSubType);
-                }
             }
         }
 
@@ -663,139 +644,81 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             }
         }
 
-
-
-        [Test]
-        public void AlterTable_MigrationRequiresAutomaticDelete_AndProcessorHasUndoDisabled_ShouldNotThrow()
+        private class UpdateMigration : Migration
         {
-            using (var tempDb = new TemporaryDatabase(IntegrationTestOptions.Firebird, _firebirdLibraryProber))
+            private readonly int? _from;
+
+            private readonly int _to;
+
+            public UpdateMigration(int to, int? from = null)
             {
-                var connectionString = tempDb.ConnectionString;
+                _from = from;
+                _to = to;
+            }
+            public override void Up()
+            {
+                if (_from.HasValue)
+                    Update.Table("TheTable").Set(new { Id = _to, Name = "foo" }).Where(new { Id = _from.Value });
+                else
+                    Update.Table("TheTable").Set(new { SomeValue = _to }).AllRows();
+            }
 
-                var runnerContext = new RunnerContext(new TextWriterAnnouncer(TestContext.Out))
-                {
-                    Namespace = "FluentMigrator.Tests.Integration.Migrations"
-                };
-
-                using (var connection = new FbConnection(connectionString))
-                {
-                    FirebirdProcessor processor;
-                    var announcer = new TextWriterAnnouncer(TestContext.Out);
-                    announcer.ShowSql = true;
-                    var options = FirebirdOptions.AutoCommitBehaviour();
-                    options.TruncateLongNames = false;
-                    processor = new FirebirdProcessor(connection, new FirebirdGenerator(options), announcer,
-                        new ProcessorOptions(), new FirebirdDbFactory(), options);
-                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), runnerContext, processor);
-                    runner.Up(new MigrationWhichCreatesTwoRelatedTables());
-                    processor.CommitTransaction();
-                    FbConnection.ClearPool(connection);
-                }
-
-                //---------------Assert Precondition----------------
-                Assert.IsTrue(ForeignKeyExists(connectionString, MigrationWhichCreatesTwoRelatedTables.ForeignKeyName),
-                    "Foreign key does not exist after first migration");
-                using (var connection = new FbConnection(connectionString))
-                {
-                    FirebirdProcessor processor;
-                    var announcer = new TextWriterAnnouncer(TestContext.Out);
-                    announcer.ShowSql = true;
-                    var options = FirebirdOptions.AutoCommitBehaviour();
-                    processor = new FirebirdProcessor(connection, new FirebirdGenerator(options), announcer,
-                        new ProcessorOptions(), new FirebirdDbFactory(), options);
-                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), runnerContext, processor);
-                    runner.Up(new MigrationWhichAltersTableWithFK());
-                    processor.CommitTransaction();
-                }
-
-                Assert.IsTrue(ForeignKeyExists(connectionString, MigrationWhichCreatesTwoRelatedTables.ForeignKeyName),
-                    "Foreign key does not exist after second migration");
+            public override void Down()
+            {
             }
         }
 
-        private bool ForeignKeyExists(string connectionString, string withName)
+        public class CreateTableMigration : Migration
         {
-            using (var connection = new FbConnection(connectionString))
+            public override void Up()
             {
-                connection.Open();
-                var keyQuery = String.Format(@"
-SELECT rc.RDB$CONSTRAINT_NAME AS constraint_name,
-i.RDB$RELATION_NAME AS table_name,
-s.RDB$FIELD_NAME AS field_name,
-i.RDB$DESCRIPTION AS description,
-rc.RDB$DEFERRABLE AS is_deferrable,
-rc.RDB$INITIALLY_DEFERRED AS is_deferred,
-refc.RDB$UPDATE_RULE AS on_update,
-refc.RDB$DELETE_RULE AS on_delete,
-refc.RDB$MATCH_OPTION AS match_type,
-i2.RDB$RELATION_NAME AS references_table,
-s2.RDB$FIELD_NAME AS references_field,
-(s.RDB$FIELD_POSITION + 1) AS field_position
-FROM RDB$INDEX_SEGMENTS s
-LEFT JOIN RDB$INDICES i ON i.RDB$INDEX_NAME = s.RDB$INDEX_NAME
-LEFT JOIN RDB$RELATION_CONSTRAINTS rc ON rc.RDB$INDEX_NAME = s.RDB$INDEX_NAME
-LEFT JOIN RDB$REF_CONSTRAINTS refc ON rc.RDB$CONSTRAINT_NAME = refc.RDB$CONSTRAINT_NAME
-LEFT JOIN RDB$RELATION_CONSTRAINTS rc2 ON rc2.RDB$CONSTRAINT_NAME = refc.RDB$CONST_NAME_UQ
-LEFT JOIN RDB$INDICES i2 ON i2.RDB$INDEX_NAME = rc2.RDB$INDEX_NAME
-LEFT JOIN RDB$INDEX_SEGMENTS s2 ON i2.RDB$INDEX_NAME = s2.RDB$INDEX_NAME
-WHERE rc.RDB$CONSTRAINT_TYPE = 'FOREIGN KEY'
-ORDER BY s.RDB$FIELD_POSITION", MigrationWhichCreatesTwoRelatedTables.ForeignKeyName);
-                var cmd = connection.CreateCommand();
-                cmd.CommandText = keyQuery;
-                var result = false;
-                using (var rdr = cmd.ExecuteReader())
-                {
-                    while (rdr.Read())
-                    {
-                        try
-                        {
-                            var constraintName = rdr["CONSTRAINT_NAME"];
-                            if (constraintName == null) continue;
-                            if (constraintName is DBNull) continue;
-                            if (constraintName.ToString().Trim() == withName.ToUpper())
-                            {
-                                result = true;
-                                break;
-                            }
-                        }
-                        catch { }
-                    }
-                }
-                connection.Close();
-                FbConnection.ClearPool(connection);
-                return result;
+                Create.Table("TheTable")
+                    .WithColumn("Id").AsInt32().PrimaryKey()
+                    .WithColumn("Name").AsString(100).Nullable()
+                    .WithColumn("SomeValue").AsInt32().Nullable();
+            }
+
+            public override void Down()
+            {
             }
         }
 
-        private static void AssertThatFieldHasCorrectTypeAndSubType(string fieldName, string tableName, FbConnection connection,
-            int expectedFieldType, int expectedFieldSubType)
+        public class AddDataMigration : Migration
         {
-            connection.Open();
-            var sql =
-                "select RDB$FIELD_TYPE fieldType, RDB$FIELD_SUB_TYPE subType from RDB$RELATION_FIELDS rf " +
-                "inner join RDB$FIELDS f on rf.RDB$FIELD_SOURCE = f.RDB$FIELD_NAME where rf.RDB$FIELD_NAME = '" +
-                fieldName.ToUpper() + "' " +
-                "and rf.RDB$RELATION_NAME = '" + tableName.ToUpper() + "'";
-            using (var cmd = new FbCommand(sql, connection))
+            private readonly int _id;
+
+            // ReSharper disable once UnusedMember.Global
+            public AddDataMigration()
+                : this(1)
             {
-                using (var reader = cmd.ExecuteReader())
-                {
-                    Assert.IsTrue(reader.Read(), "Unable to query schema for table '" + tableName + "'");
-                    var fieldType = reader["fieldType"];
-                    var fieldSubType = reader["subType"];
-                    Assert.AreEqual(expectedFieldType, fieldType, "Field type mismatch");
-                    Assert.AreEqual(expectedFieldSubType, fieldSubType, "Field subtype mismatch");
-                }
+            }
+
+            public AddDataMigration(int id)
+            {
+                _id = id;
+            }
+
+            public override void Up()
+            {
+                Insert.IntoTable("TheTable").Row(new { Id = _id, SomeValue = _id });
+            }
+
+            public override void Down()
+            {
+                Delete.FromTable("TheTable").Row(new { Id = _id });
             }
         }
-    }
 
-    public class PlatformUnsupportedException : Exception
-    {
-        public PlatformID PlatFormID { get; private set; }
-        public PlatformUnsupportedException(PlatformID platformID): base("The current platform is not supported: " + platformID.ToString())
+        public class RenameTableMigration : Migration
         {
-            PlatFormID = platformID;
+            public override void Up()
+            {
+                Rename.Table("TheTable").To("TheNewTable");
+            }
+
+            public override void Down()
+            {
+            }
         }
     }
 }

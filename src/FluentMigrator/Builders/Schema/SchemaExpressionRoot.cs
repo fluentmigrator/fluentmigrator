@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -22,20 +22,29 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Schema
 {
+    /// <summary>
+    /// The implementation of the <see cref="ISchemaExpressionRoot"/> interface.
+    /// </summary>
     public class SchemaExpressionRoot : ISchemaExpressionRoot
     {
         private readonly IMigrationContext _context;
 
+        /// <summary>
+        /// ctorc
+        /// </summary>
+        /// <param name="context">The migration context</param>
         public SchemaExpressionRoot(IMigrationContext context)
         {
             _context = context;
         }
 
+        /// <inheritdoc />
         public ISchemaTableSyntax Table(string tableName)
         {
             return new SchemaTableQuery(_context, null, tableName);
         }
 
+        /// <inheritdoc />
         public ISchemaSchemaSyntax Schema(string schemaName)
         {
             return new SchemaSchemaQuery(_context, schemaName);

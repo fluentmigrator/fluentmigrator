@@ -3,7 +3,7 @@
   <Import Project="DotNetSdkMono.props" />
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
-    <VersionPrefix>2.0.0</VersionPrefix>
+    <VersionPrefix>3.0.0</VersionPrefix>
     <Product>FluentMigrator</Product>
     <Copyright>Sean Chambers and the FluentMigrator project 2008-2018</Copyright>
     <Company>FluentMigrator Project</Company>
@@ -11,17 +11,24 @@
     <PackageProjectUrl>https://github.com/fluentmigrator/fluentmigrator/wiki</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/fluentmigrator/fluentmigrator/blob/master/LICENSE.txt</PackageLicenseUrl>
     <PackageReleaseNotes>https://github.com/fluentmigrator/fluentmigrator/releases</PackageReleaseNotes>
+    <PackageIconUrl>https://github.com/fluentmigrator/fluentmigrator/raw/develop/docs/logo.png</PackageIconUrl>
     <RepositoryUrl>https://github.com/fluentmigrator/fluentmigrator.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <MinClientVersion>3.5</MinClientVersion>
     <IsPackable>false</IsPackable>
+    <!-- Enable the CS300x warnings when the obsoleted code gets removed -->
+    <NoWarn>$(NoWarn);CS3001;CS3002;CS3003;CS3005;NU5105;NU1701</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)src/GlobalAssemblyInfo.cs" Link="Properties\GlobalAssemblyInfo.cs" />
   </ItemGroup>
 
-  <PropertyGroup Condition="'$(TargetFramework)'=='net40' or '$(TargetFramework)'=='net45' or '$(TargetFramework)'=='net452' or '$(TargetFramework)'=='net461' ">
+  <ItemGroup>
+    <PackageReference Include="JetBrains.Annotations" Version="11.1.0" PrivateAssets="All" />
+  </ItemGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)'=='net461'">
     <DefineConstants>$(DefineConstants);NETFRAMEWORK</DefineConstants>
   </PropertyGroup>
 

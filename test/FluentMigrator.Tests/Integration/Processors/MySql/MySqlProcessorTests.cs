@@ -1,15 +1,20 @@
+using System;
 using System.IO;
 
 using FluentMigrator.Expressions;
-using FluentMigrator.Runner.Announcers;
-using FluentMigrator.Runner.Generators.MySql;
-using FluentMigrator.Runner.Processors;
+using FluentMigrator.Runner;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.MySql;
+using FluentMigrator.Tests.Logging;
 
-using MySql.Data.MySqlClient;
+using JetBrains.Annotations;
+
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Integration.Processors.MySql
 {
@@ -18,66 +23,53 @@ namespace FluentMigrator.Tests.Integration.Processors.MySql
     [Category("MySql")]
     public class MySqlProcessorTests
     {
-        protected MySqlProcessor Processor;
-
-        protected MySqlConnection Connection;
-
-        [SetUp]
-        public void SetUp()
-        {
-            if (!IntegrationTestOptions.MySql.IsEnabled)
-                Assert.Ignore();
-            Connection = new MySqlConnection(IntegrationTestOptions.MySql.ConnectionString);
-            Processor = new MySqlProcessor(Connection, new MySql4Generator(),
-                new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), new MySqlDbFactory());
-            Connection.Open();
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            Processor?.Dispose();
-        }
+        private ServiceProvider ServiceProvider { get; set; }
+        private IServiceScope ServiceScope { get; set; }
+        private MySql4Processor Processor { get; set; }
 
         [Test]
         public void CallingProcessWithPerformDBOperationExpressionWhenInPreviewOnlyModeWillNotMakeDbChanges()
         {
             var output = new StringWriter();
 
-            var connection = new MySqlConnection(IntegrationTestOptions.MySql.ConnectionString);
+            var sp = CreateProcessorServices(sc => sc
+                .AddSingleton<ILoggerProvider>(new TextWriterLoggerProvider(output))
+                .ConfigureRunner(r => r.AsGlobalPreview()));
 
-            var processor = SetupMySqlProcessorWithPreviewOnly(output, connection);
-
-            bool tableExists;
-
-            try
+            using (sp)
             {
-                var expression =
-                    new PerformDBOperationExpression
+                using (var scope = sp.CreateScope())
+                {
+                    var processor = scope.ServiceProvider.GetRequiredService<IMigrationProcessor>();
+                    bool tableExists;
+
+                    try
                     {
-                        Operation = (con, trans) =>
-                        {
-                            var command = con.CreateCommand();
-                            command.CommandText = "CREATE TABLE processtesttable (test int NULL) ";
-                            command.Transaction = trans;
+                        var expression =
+                            new PerformDBOperationExpression
+                            {
+                                Operation = (con, trans) =>
+                                {
+                                    var command = con.CreateCommand();
+                                    command.CommandText = "CREATE TABLE processtesttable (test int NULL) ";
+                                    command.Transaction = trans;
 
-                            command.ExecuteNonQuery();
-                        }
-                    };
+                                    command.ExecuteNonQuery();
+                                }
+                            };
 
-                processor.Process(expression);
+                        processor.Process(expression);
 
-                var com = connection.CreateCommand();
-                com.CommandText = "";
+                        tableExists = processor.TableExists("", "processtesttable");
+                    }
+                    finally
+                    {
+                        processor.RollbackTransaction();
+                    }
 
-                tableExists = processor.TableExists("", "processtesttable");
+                    tableExists.ShouldBeFalse();
+                }
             }
-            finally
-            {
-                processor.RollbackTransaction();
-            }
-
-            tableExists.ShouldBeFalse();
         }
 
         [Test]
@@ -85,24 +77,31 @@ namespace FluentMigrator.Tests.Integration.Processors.MySql
         {
             var output = new StringWriter();
 
-            var connection = new MySqlConnection(IntegrationTestOptions.MySql.ConnectionString);
+            var sp = CreateProcessorServices(sc => sc
+                .AddSingleton<ILoggerProvider>(new TextWriterLoggerProvider(output))
+                .ConfigureRunner(r => r.AsGlobalPreview()));
 
-            var processor = SetupMySqlProcessorWithPreviewOnly(output, connection);
-
-            bool tableExists;
-
-            try
+            using (sp)
             {
-                processor.Execute("CREATE TABLE processtesttable (test int NULL) ");
+                using (var scope = sp.CreateScope())
+                {
+                    var processor = scope.ServiceProvider.GetRequiredService<IMigrationProcessor>();
+                    bool tableExists;
 
-                tableExists = processor.TableExists("", "processtesttable");
-            }
-            finally
-            {
-                processor.RollbackTransaction();
-            }
+                    try
+                    {
+                        processor.Execute("CREATE TABLE processtesttable (test int NULL) ");
 
-            tableExists.ShouldBeFalse();
+                        tableExists = processor.TableExists("", "processtesttable");
+                    }
+                    finally
+                    {
+                        processor.RollbackTransaction();
+                    }
+
+                    tableExists.ShouldBeFalse();
+                }
+            }
         }
 
         [Test]
@@ -133,16 +132,42 @@ namespace FluentMigrator.Tests.Integration.Processors.MySql
             }
         }
 
-        private static MySqlProcessor SetupMySqlProcessorWithPreviewOnly(StringWriter output,
-            MySqlConnection connection)
+        private static ServiceProvider CreateProcessorServices([CanBeNull] Action<IServiceCollection> initAction)
         {
-            var processor = new MySqlProcessor(
-                connection,
-                new MySql4Generator(),
-                new TextWriterAnnouncer(output),
-                new ProcessorOptions { PreviewOnly = true },
-                new MySqlDbFactory());
-            return processor;
+            if (!IntegrationTestOptions.MySql.IsEnabled)
+                Assert.Ignore();
+
+            var serivces = ServiceCollectionExtensions.CreateServices()
+                .ConfigureRunner(builder => builder.AddMySql4())
+                .AddScoped<IConnectionStringReader>(
+                    _ => new PassThroughConnectionStringReader(IntegrationTestOptions.MySql.ConnectionString));
+            initAction?.Invoke(serivces);
+            return serivces.BuildServiceProvider();
+        }
+
+        [OneTimeSetUp]
+        public void ClassSetUp()
+        {
+            ServiceProvider = CreateProcessorServices(null);
+        }
+
+        [OneTimeTearDown]
+        public void ClassTearDown()
+        {
+            ServiceProvider?.Dispose();
+        }
+
+        [SetUp]
+        public void SetUp()
+        {
+            ServiceScope = ServiceProvider.CreateScope();
+            Processor = ServiceScope.ServiceProvider.GetRequiredService<MySql4Processor>();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            ServiceScope?.Dispose();
         }
     }
 }

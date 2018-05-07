@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -19,7 +19,8 @@
 using System;
 using FluentMigrator.Runner;
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Unit
 {
@@ -30,13 +31,13 @@ namespace FluentMigrator.Tests.Unit
         public void CanGetTheElapsedTime()
         {
             var watch = new StopWatch();
-            
+
             StopWatch.TimeNow = () => new DateTime(2009, 9, 6, 15, 53, 0, 0);
 
             watch.Start();
-            
+
             StopWatch.TimeNow = () => new DateTime(2009, 9, 6, 15, 53, 0, 5);
-            
+
             watch.Stop();
 
             watch.ElapsedTime().Milliseconds.ShouldBe(5);

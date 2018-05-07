@@ -16,31 +16,51 @@
 //
 #endregion
 
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 
 namespace FluentMigrator.Expressions
 {
+    /// <summary>
+    /// Expression to insert data
+    /// </summary>
     public class InsertDataExpression : IMigrationExpression, ISupportAdditionalFeatures, ISchemaExpression
     {
+        /// <inheritdoc />
         public string SchemaName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the table name
+        /// </summary>
+        [Required]
         public string TableName { get; set; }
 
+        /// <inheritdoc />
         public IDictionary<string, object> AdditionalFeatures { get; } = new Dictionary<string, object>();
 
+        /// <summary>
+        /// Gets the rows to be inserted
+        /// </summary>
         public List<InsertionDataDefinition> Rows { get; } = new List<InsertionDataDefinition>();
 
+        /// <inheritdoc />
+        [Obsolete("Use the System.ComponentModel.DataAnnotations.Validator instead")]
         public void CollectValidationErrors(ICollection<string> errors)
         {
+            this.CollectErrors(errors);
         }
 
+        /// <inheritdoc />
         public void ExecuteWith(IMigrationProcessor processor)
         {
             processor.Process(this);
         }
 
+        /// <inheritdoc />
         public IMigrationExpression Reverse()
         {
             var expression = new DeleteDataExpression

@@ -1,12 +1,29 @@
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators.Generic;
 
+using JetBrains.Annotations;
+
+using Microsoft.Extensions.Options;
+
 namespace FluentMigrator.Runner.Generators.Jet
 {
     public class JetGenerator : GenericGenerator
     {
         public JetGenerator()
-            : base(new JetColumn(), new JetQuoter(), new EmptyDescriptionGenerator())
+            : this(new JetQuoter())
+        {
+        }
+
+        public JetGenerator(
+            [NotNull] JetQuoter quoter)
+            : this(quoter, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()))
+        {
+        }
+
+        public JetGenerator(
+            [NotNull] JetQuoter quoter,
+            [NotNull] IOptions<GeneratorOptions> generatorOptions)
+            : base(new JetColumn(), quoter, new EmptyDescriptionGenerator(), generatorOptions)
         {
         }
 
@@ -14,32 +31,32 @@ namespace FluentMigrator.Runner.Generators.Jet
 
         public override string Generate(RenameTableExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("Renaming of tables is not supported for Jet");
+            return CompatibilityMode.HandleCompatibilty("Renaming of tables is not supported for Jet");
         }
 
         public override string Generate(RenameColumnExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("Renaming of columns is not supported for Jet");
+            return CompatibilityMode.HandleCompatibilty("Renaming of columns is not supported for Jet");
         }
 
         public override string Generate(AlterDefaultConstraintExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("Altering of default constraints is not supported for Jet");
+            return CompatibilityMode.HandleCompatibilty("Altering of default constraints is not supported for Jet");
         }
 
         public override string Generate(CreateSequenceExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("Sequences are not supported for Jet");
+            return CompatibilityMode.HandleCompatibilty("Sequences are not supported for Jet");
         }
 
         public override string Generate(DeleteSequenceExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("Sequences are not supported for Jet");
+            return CompatibilityMode.HandleCompatibilty("Sequences are not supported for Jet");
         }
 
         public override string Generate(DeleteDefaultConstraintExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("Default constraints are not supported");
+            return CompatibilityMode.HandleCompatibilty("Default constraints are not supported");
         }
     }
 }

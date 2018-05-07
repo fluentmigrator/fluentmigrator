@@ -18,49 +18,72 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Infrastructure.Extensions;
+using FluentMigrator.Validation;
 
 namespace FluentMigrator.Model
 {
-    public class IndexDefinition : ICloneable, ICanBeValidated, ISupportAdditionalFeatures
+    /// <summary>
+    /// The index definition
+    /// </summary>
+    public class IndexDefinition
+        : ICloneable,
+#pragma warning disable 618
+          ICanBeValidated,
+#pragma warning restore 618
+          ISupportAdditionalFeatures,
+          IValidatableObject,
+          IValidationChildren
     {
         private readonly IDictionary<string, object> _additionalFeatures = new Dictionary<string, object>();
 
+        /// <summary>
+        /// Gets or sets the index name
+        /// </summary>
+        [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.IndexNameCannotBeNullOrEmpty))]
         public virtual string Name { get; set; }
+
+        /// <summary>
+        /// Gets or sets the schema name
+        /// </summary>
         public virtual string SchemaName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the table name
+        /// </summary>
+        [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.TableNameCannotBeNullOrEmpty))]
         public virtual string TableName { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whteher the index only allows unique values
+        /// </summary>
         public virtual bool IsUnique { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the index is clustered
+        /// </summary>
         public bool IsClustered { get; set; }
-        public virtual ICollection<IndexColumnDefinition> Columns { get; set; }
 
-        public IndexDefinition()
-        {
-            Columns = new List<IndexColumnDefinition>();
-        }
+        /// <summary>
+        /// Gets or sets a collection of index column definitions
+        /// </summary>
+        public virtual ICollection<IndexColumnDefinition> Columns { get; set; } = new List<IndexColumnDefinition>();
 
+        /// <inheritdoc />
         public virtual IDictionary<string, object> AdditionalFeatures => _additionalFeatures;
 
+        /// <inheritdoc />
+        [Obsolete("Use the System.ComponentModel.DataAnnotations.Validator instead")]
         public virtual void CollectValidationErrors(ICollection<string> errors)
         {
-            if (String.IsNullOrEmpty(Name))
-                errors.Add(ErrorMessages.IndexNameCannotBeNullOrEmpty);
-
-            if (String.IsNullOrEmpty(TableName))
-                errors.Add(ErrorMessages.TableNameCannotBeNullOrEmpty);
-
-            if (Columns.Count == 0)
-                errors.Add(ErrorMessages.IndexMustHaveOneOrMoreColumns);
-
-            foreach (IndexColumnDefinition column in Columns)
-                column.CollectValidationErrors(errors);
-
-            foreach (var additionalFeature in _additionalFeatures.Select(x => x.Value).OfType<ICanBeValidated>())
-                additionalFeature.CollectValidationErrors(errors);
+            this.CollectErrors(errors);
         }
 
+        /// <inheritdoc />
         public object Clone()
         {
             var result = new IndexDefinition
@@ -77,5 +100,17 @@ namespace FluentMigrator.Model
 
             return result;
         }
+
+        /// <inheritdoc />
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (Columns.Count == 0)
+            {
+                yield return new ValidationResult(ErrorMessages.IndexMustHaveOneOrMoreColumns);
+            }
+        }
+
+        /// <inheritdoc />
+        IEnumerable<object> IValidationChildren.Children => Columns;
     }
 }

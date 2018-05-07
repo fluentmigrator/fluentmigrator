@@ -1,25 +1,44 @@
-﻿using FluentMigrator.Runner.Announcers;
-using NUnit.Framework;
-using NUnit.Should;
+#region License
+//
+// Copyright (c) 2018, Fluent Migrator Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+#endregion
+
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
+
+using FluentMigrator.Runner.Announcers;
+
+using NUnit.Framework;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Announcers
 {
     [TestFixture]
+    [Obsolete]
     public class TextWriterWithGoAnnouncerTests
     {
         private StringWriter _stringWriter;
-        private TextWriterWithGoAnnouncer announcer;
+        private TextWriterWithGoAnnouncer _announcer;
 
         [SetUp]
         public void TestSetup()
         {
             _stringWriter = new StringWriter();
-            announcer = new TextWriterWithGoAnnouncer(_stringWriter)
+            _announcer = new TextWriterWithGoAnnouncer(_stringWriter)
             {
                 ShowElapsedTime = true,
                 ShowSql = true
@@ -29,24 +48,24 @@ namespace FluentMigrator.Tests.Unit.Announcers
         [Test]
         public void Adds_Go_StatementAfterSqlAnouncement()
         {
-            announcer.Sql("DELETE Blah");
-            Output.ShouldBe("DELETE Blah" + Environment.NewLine + 
+            _announcer.Sql("DELETE Blah");
+            Output.ShouldBe("DELETE Blah" + Environment.NewLine +
                 "GO" + Environment.NewLine);
         }
 
         [Test]
         public void Sql_Should_Not_Write_When_Show_Sql_Is_False()
         {
-            announcer.ShowSql = false;
+            _announcer.ShowSql = false;
 
-            announcer.Sql("SQL");
+            _announcer.Sql("SQL");
             Output.ShouldBe(String.Empty);
         }
 
         [Test]
         public void Sql_Should_Not_Write_Go_When_Sql_Is_Empty()
         {
-            announcer.Sql("");
+            _announcer.Sql("");
             Assert.IsFalse(Output.Contains("GO"));
         }
 

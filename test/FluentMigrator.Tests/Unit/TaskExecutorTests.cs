@@ -1,11 +1,39 @@
+#region License
+//
+// Copyright (c) 2018, Fluent Migrator Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+#endregion
+
 using System;
 using System.Data;
 using System.Linq.Expressions;
+
 using FluentMigrator.Exceptions;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Initialization;
+using FluentMigrator.Runner.Processors;
 using FluentMigrator.Tests.Integration;
+
+using JetBrains.Annotations;
+
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+
 using Moq;
+
 using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Unit
@@ -13,17 +41,13 @@ namespace FluentMigrator.Tests.Unit
     [TestFixture]
     public class TaskExecutorTests : IntegrationTestBase
     {
-        #region Setup/Teardown
+        private Mock<IMigrationRunner> _migrationRunner;
 
         [SetUp]
         public void SetUp()
         {
             _migrationRunner = new Mock<IMigrationRunner>();
         }
-
-        #endregion
-
-        private Mock<IMigrationRunner> _migrationRunner;
 
         private void Verify(Expression<Action<IMigrationRunner>> func, string task, long version, int steps)
         {
@@ -35,25 +59,30 @@ namespace FluentMigrator.Tests.Unit
             dataSet.Tables.Add(new DataTable());
             processor.Setup(x => x.ReadTableData(null, It.IsAny<string>())).Returns(dataSet);
 
-            _migrationRunner.SetupGet(x => x.Processor).Returns(processor.Object);
-
-            var stepsStore = steps;
-            var announcer = new Mock<IAnnouncer>();
             var stopWatch = new Mock<IStopWatch>();
-            var runnerContext = new Mock<IRunnerContext>();
-            runnerContext.SetupGet(x => x.Announcer).Returns(announcer.Object);
-            runnerContext.SetupGet(x => x.StopWatch).Returns(stopWatch.Object);
-            runnerContext.SetupGet(x => x.Database).Returns("sqlserver2008");
-            runnerContext.SetupGet(x => x.Connection).Returns(IntegrationTestOptions.SqlServer2008.ConnectionString);
-            runnerContext.SetupGet(x => x.Task).Returns(task);
-            runnerContext.SetupGet(x => x.Version).Returns(version);
-            runnerContext.SetupGet(x => x.Steps).Returns(() => stepsStore);
-            runnerContext.SetupSet(x => x.Steps = It.IsAny<int>()).Callback<int>(v => stepsStore = v);
-            runnerContext.SetupGet(x => x.Targets).Returns(new string[] { GetType().Assembly.Location });
-            runnerContext.SetupGet(x => x.Profile).Returns(profile);
-            runnerContext.SetupGet(x => x.Namespace).Returns("FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3");
 
-            var taskExecutor = new FakeTaskExecutor(runnerContext.Object, _migrationRunner.Object);
+            var services = ServiceCollectionExtensions.CreateServices()
+                .WithProcessor(processor)
+                .AddSingleton(stopWatch.Object)
+                .AddScoped<IConnectionStringReader>(_ => new PassThroughConnectionStringReader(IntegrationTestOptions.SqlServer2008.ConnectionString))
+                .AddScoped(_ => _migrationRunner.Object)
+                .Configure<SelectingProcessorAccessorOptions>(opt => opt.ProcessorId = "sqlserver2008")
+                .Configure<RunnerOptions>(
+                    opt =>
+                    {
+                        opt.Task = task;
+                        opt.Version = version;
+                        opt.Steps = steps;
+                        opt.Profile = profile;
+                    })
+                .WithMigrationsIn("FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3")
+                .AddScoped<TaskExecutor, FakeTaskExecutor>();
+
+            var serviceProvider = services
+                .BuildServiceProvider();
+
+            var taskExecutor = serviceProvider.GetRequiredService<TaskExecutor>();
+
             taskExecutor.Execute();
 
             _migrationRunner.VerifyAll();
@@ -62,13 +91,18 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void InvalidProviderNameShouldThrowArgumentException()
         {
-            var runnerContext = new Mock<IRunnerContext>();
-            runnerContext.SetupGet(x => x.Database).Returns("sqlWRONG");
-            runnerContext.SetupGet(x => x.Connection).Returns(IntegrationTestOptions.SqlServer2008.ConnectionString);
-            runnerContext.SetupGet(x => x.Targets).Returns(new string[] { GetType().Assembly.Location });
-            runnerContext.SetupGet(x => x.Announcer).Returns(new Mock<IAnnouncer>().Object);
+            var services = ServiceCollectionExtensions.CreateServices()
+                .ConfigureRunner(r => r.AddSQLite())
+                .AddScoped<IConnectionStringReader>(_ => new PassThroughConnectionStringReader(IntegrationTestOptions.SqlServer2008.ConnectionString))
+                .Configure<SelectingProcessorAccessorOptions>(opt => opt.ProcessorId = "sqlWRONG")
+                .WithMigrationsIn("FluentMigrator.Tests.Integration.Migrations")
+                .AddScoped<TaskExecutor, FakeTaskExecutor>();
 
-            Assert.Throws<ProcessorFactoryNotFoundException>(() => new TaskExecutor(runnerContext.Object).Execute());
+            var serviceProvider = services
+                .BuildServiceProvider();
+
+            var taskExecutor = serviceProvider.GetRequiredService<TaskExecutor>();
+            Assert.Throws<ProcessorFactoryNotFoundException>(() => taskExecutor.Execute());
         }
 
         [Test]
@@ -186,27 +220,38 @@ namespace FluentMigrator.Tests.Unit
             processor.Setup(x => x.ReadTableData(null, It.IsAny<string>())).Returns(dataSet);
             _migrationRunner.SetupGet(x => x.Processor).Returns(processor.Object);
 
-            var runnerContext = new Mock<IRunnerContext>();
-            runnerContext.SetupGet(x => x.Task).Returns(task);
-            runnerContext.SetupGet(rc => rc.Version).Returns(version);
-            var taskExecutor = new FakeTaskExecutor(runnerContext.Object, _migrationRunner.Object);
+            var services = ServiceCollectionExtensions.CreateServices()
+                .WithProcessor(processor)
+                .AddScoped<IConnectionStringReader>(_ => new PassThroughConnectionStringReader(IntegrationTestOptions.SqlServer2008.ConnectionString))
+                .AddScoped(_ => _migrationRunner.Object)
+                .Configure<SelectingProcessorAccessorOptions>(opt => opt.ProcessorId = "sqlserver2008")
+                .Configure<RunnerOptions>(
+                    opt =>
+                    {
+                        opt.Task = task;
+                        opt.Version = version;
+                    })
+                .WithMigrationsIn("FluentMigrator.Tests.Integration.Migrations")
+                .AddScoped<TaskExecutor, FakeTaskExecutor>();
+
+            var serviceProvider = services
+                .BuildServiceProvider();
+
+            var taskExecutor = serviceProvider.GetRequiredService<TaskExecutor>();
             taskExecutor.HasMigrationsToApply();
             _migrationRunner.Verify(func, Times.Once());
         }
-    }
 
-    internal class FakeTaskExecutor : TaskExecutor
-    {
-        private readonly IMigrationRunner runner;
-
-        public FakeTaskExecutor(IRunnerContext runnerContext, IMigrationRunner runner) : base(runnerContext)
+        internal class FakeTaskExecutor : TaskExecutor
         {
-            this.runner = runner;
-        }
-
-        protected override void Initialize()
-        {
-            Runner = runner;
+            public FakeTaskExecutor(
+                [NotNull] ILogger<TaskExecutor> logger,
+                [NotNull] IAssemblySource assemblySource,
+                [NotNull] IOptions<RunnerOptions> runnerOptions,
+                [NotNull] IServiceProvider serviceProvider)
+                : base(logger, assemblySource, runnerOptions, serviceProvider)
+            {
+            }
         }
     }
 }

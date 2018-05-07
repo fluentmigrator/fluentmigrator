@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -22,12 +22,20 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator
 {
+    /// <summary>
+    /// A migration base class that will automatically generate the down expressions
+    /// </summary>
+    /// <remarks>
+    /// This only works for some expressions like CREATE TABLE, but not for DROP TABLE.
+    /// </remarks>
     public abstract class AutoReversingMigration : MigrationBase
     {
+        /// <inheritdoc />
         public sealed override void Down()
         {
         }
 
+        /// <inheritdoc />
         public override void GetDownExpressions(IMigrationContext context)
         {
             GetUpExpressions(context);

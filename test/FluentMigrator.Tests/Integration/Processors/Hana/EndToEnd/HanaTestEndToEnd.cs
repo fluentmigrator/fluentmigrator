@@ -15,17 +15,14 @@
 #endregion
 
 using System;
-using System.Reflection;
 
-using FluentMigrator.Runner.Announcers;
-using FluentMigrator.Runner.Generators.Hana;
+using FluentMigrator.Runner;
 using FluentMigrator.Runner.Initialization;
-using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Hana;
 
-using NUnit.Framework;
+using Microsoft.Extensions.DependencyInjection;
 
-using Sap.Data.Hana;
+using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Integration.Processors.Hana.EndToEnd
 {
@@ -35,46 +32,60 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana.EndToEnd
     {
         protected void Migrate(string migrationsNamespace)
         {
-            MakeTask("migrate", migrationsNamespace).Execute();
+            using (var serviceProvider = CreateTaskServices("migrate", migrationsNamespace))
+            {
+                var executor = serviceProvider.GetRequiredService<TaskExecutor>();
+                executor.Execute();
+            }
         }
 
         protected void Rollback(string migrationsNamespace)
         {
-            MakeTask("rollback", migrationsNamespace).Execute();
+            using (var serviceProvider = CreateTaskServices("rollback", migrationsNamespace))
+            {
+                var executor = serviceProvider.GetRequiredService<TaskExecutor>();
+                executor.Execute();
+            }
         }
 
-        protected TaskExecutor MakeTask(string task, string migrationsNamespace)
+        protected ServiceProvider CreateTaskServices(string task, string migrationsNamespace)
         {
-            var announcer = new TextWriterAnnouncer(TestContext.Out);
-            var runnerContext = new RunnerContext(announcer)
-            {
-                Database = "Hana",
-                Connection = IntegrationTestOptions.Hana.ConnectionString,
-                Targets = new[] { Assembly.GetExecutingAssembly().Location },
-                Namespace = migrationsNamespace,
-                Task = task
-            };
-            return new TaskExecutor(runnerContext);
+            var serivces = ServiceCollectionExtensions.CreateServices()
+                .ConfigureRunner(builder => builder.AddHana())
+                .Configure<RunnerOptions>(
+                    opt => { opt.Task = task; })
+                .Configure<TypeFilterOptions>(opt =>  opt.Namespace = migrationsNamespace)
+                .AddScoped<IConnectionStringReader>(
+                    _ => new PassThroughConnectionStringReader(IntegrationTestOptions.Hana.ConnectionString));
+            return serivces.BuildServiceProvider(false);
         }
 
         protected class ScopedConnection : IDisposable
         {
-            public HanaConnection Connection { get; set; }
+            public HanaProcessor Processor { get; }
+            public IServiceScope ServiceScope { get; }
 
-            public HanaProcessor Processor { get; set; }
+            private ServiceProvider ServiceProvider { get; }
 
             public ScopedConnection()
             {
-                Connection = new HanaConnection(IntegrationTestOptions.Hana.ConnectionString);
-                Processor = new HanaProcessor(Connection, new HanaGenerator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), new HanaDbFactory());
-                Connection.Open();
-                Processor.BeginTransaction();
+                if (!IntegrationTestOptions.Hana.IsEnabled)
+                    Assert.Ignore();
+
+                var serivces = ServiceCollectionExtensions.CreateServices()
+                    .ConfigureRunner(builder => builder.AddHana())
+                    .AddScoped<IConnectionStringReader>(
+                        _ => new PassThroughConnectionStringReader(IntegrationTestOptions.Hana.ConnectionString))
+                    .AddScoped<TaskExecutor>();
+                ServiceProvider = serivces.BuildServiceProvider();
+                ServiceScope = ServiceProvider.CreateScope();
+                Processor = ServiceScope.ServiceProvider.GetRequiredService<HanaProcessor>();
             }
 
             public void Dispose()
             {
-                Processor?.CommitTransaction();
-                Processor?.Dispose();
+                ServiceScope?.Dispose();
+                ServiceProvider?.Dispose();
             }
         }
     }

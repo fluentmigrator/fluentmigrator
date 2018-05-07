@@ -74,7 +74,8 @@ namespace FluentMigrator.Tests
 
         public static DatabaseServerOptions Jet => GetOptions("Jet");
 
-        public static DatabaseServerOptions SqlLite => GetOptions("SQLite");
+        // ReSharper disable once InconsistentNaming
+        public static DatabaseServerOptions SQLite => GetOptions("SQLite");
 
         public static DatabaseServerOptions MySql => GetOptions("MySql");
 
@@ -85,6 +86,8 @@ namespace FluentMigrator.Tests
         public static DatabaseServerOptions Oracle => GetOptions("Oracle");
 
         public static DatabaseServerOptions Db2 => Environment.Is64BitProcess ? GetOptions("Db2") : DatabaseServerOptions.Empty;
+
+        public static DatabaseServerOptions Db2ISeries => GetOptions("Db2ISeries");
 
         public static DatabaseServerOptions Hana => Environment.Is64BitProcess ? GetOptions("Hana") : DatabaseServerOptions.Empty;
 

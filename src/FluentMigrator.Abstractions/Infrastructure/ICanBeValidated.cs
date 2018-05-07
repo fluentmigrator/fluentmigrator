@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -16,12 +16,22 @@
 //
 #endregion
 
+using System;
 using System.Collections.Generic;
 
 namespace FluentMigrator.Infrastructure
 {
+    /// <summary>
+    /// Interface definition for validation
+    /// </summary>
+    [Obsolete("Check for IValidatableObject and use it")]
     public interface ICanBeValidated
     {
+        /// <summary>
+        /// Collect validation errors
+        /// </summary>
+        /// <param name="errors">The collection of error messages</param>
+        [Obsolete("Check for IValidatableObject and use it")]
         void CollectValidationErrors(ICollection<string> errors);
     }
 }

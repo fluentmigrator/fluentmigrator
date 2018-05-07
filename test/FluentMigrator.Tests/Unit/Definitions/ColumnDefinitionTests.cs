@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -18,11 +18,14 @@
 
 using System;
 using System.Data;
+
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 using FluentMigrator.Tests.Helpers;
+
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Definitions
 {
@@ -56,15 +59,15 @@ namespace FluentMigrator.Tests.Unit.Definitions
         [Test]
         public void ErrorIsReturnedWhenColumnTypeIsNotSet()
         {
-            var column = new ColumnDefinition { Type = null };
+            var column = new ColumnDefinition { Name = "Column", Type = null };
             var errors = ValidationHelper.CollectErrors(column);
-            errors.Contains(ErrorMessages.ColumnTypeMustBeDefined);
+            errors.ShouldContain(ErrorMessages.ColumnTypeMustBeDefined);
         }
 
         [Test]
         public void ErrorIsNotReturnedWhenColumnTypeIsSet()
         {
-            var column = new ColumnDefinition { Type = DbType.String };
+            var column = new ColumnDefinition { Name = "Column", Type = DbType.String };
             var errors = ValidationHelper.CollectErrors(column);
             errors.ShouldNotContain(ErrorMessages.ColumnTypeMustBeDefined);
         }

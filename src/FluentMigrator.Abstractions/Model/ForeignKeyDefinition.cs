@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -18,42 +18,79 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Data;
 
 using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Model
 {
-    public class ForeignKeyDefinition : ICloneable, ICanBeValidated
+    /// <summary>
+    /// The foreign key definition
+    /// </summary>
+    public class ForeignKeyDefinition
+        : ICloneable,
+#pragma warning disable 618
+          ICanBeValidated,
+#pragma warning restore 618
+          IValidatableObject
     {
+        /// <summary>
+        /// Gets or sets a foreign key name
+        /// </summary>
+        [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.ForeignKeyNameCannotBeNullOrEmpty))]
         public virtual string Name { get; set; }
+
+        /// <summary>
+        /// Gets or sets the foreign key table
+        /// </summary>
+        [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.ForeignTableNameCannotBeNullOrEmpty))]
         public virtual string ForeignTable { get; set; }
+
+        /// <summary>
+        /// Gets or sets the foreign keys table schema
+        /// </summary>
         public virtual string ForeignTableSchema { get; set; }
+
+        /// <summary>
+        /// Gets or sets the primary table
+        /// </summary>
+        [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.PrimaryTableNameCannotBeNullOrEmpty))]
         public virtual string PrimaryTable { get; set; }
+
+        /// <summary>
+        /// Gets or sets the primary table schema
+        /// </summary>
         public virtual string PrimaryTableSchema { get; set; }
+
+        /// <summary>
+        /// Gets or sets the rule for a cascading DELETE
+        /// </summary>
         public virtual Rule OnDelete { get; set; }
+
+        /// <summary>
+        /// Gets or sets the rule for a cascading UPDATE
+        /// </summary>
         public virtual Rule OnUpdate { get; set; }
+
+        /// <summary>
+        /// GEts or sets the foreign key column names
+        /// </summary>
         public virtual ICollection<string> ForeignColumns { get; set; } = new List<string>();
+
+        /// <summary>
+        /// Gets or sets the primary key column names
+        /// </summary>
         public virtual ICollection<string> PrimaryColumns { get; set; } = new List<string>();
 
+        /// <inheritdoc />
+        [Obsolete("Use the System.ComponentModel.DataAnnotations.Validator instead")]
         public virtual void CollectValidationErrors(ICollection<string> errors)
         {
-            if (String.IsNullOrEmpty(Name))
-                errors.Add(ErrorMessages.ForeignKeyNameCannotBeNullOrEmpty);
-
-            if (String.IsNullOrEmpty(ForeignTable))
-                errors.Add(ErrorMessages.ForeignTableNameCannotBeNullOrEmpty);
-
-            if (String.IsNullOrEmpty(PrimaryTable))
-                errors.Add(ErrorMessages.PrimaryTableNameCannotBeNullOrEmpty);
-
-            if (ForeignColumns.Count == 0)
-                errors.Add(ErrorMessages.ForeignKeyMustHaveOneOrMoreForeignColumns);
-
-            if (PrimaryColumns.Count == 0)
-                errors.Add(ErrorMessages.ForeignKeyMustHaveOneOrMorePrimaryColumns);
+            this.CollectErrors(errors);
         }
 
+        /// <inheritdoc />
         public object Clone()
         {
             return new ForeignKeyDefinition
@@ -70,9 +107,27 @@ namespace FluentMigrator.Model
             };
         }
 
+        /// <summary>
+        /// Gets a value indicating whether primary and foreign key columns are defined
+        /// </summary>
+        /// <returns></returns>
         public bool HasForeignAndPrimaryColumnsDefined()
         {
             return ForeignColumns.Count > 0 && PrimaryColumns.Count > 0;
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (ForeignColumns.Count == 0)
+            {
+                yield return new ValidationResult(ErrorMessages.ForeignKeyMustHaveOneOrMoreForeignColumns);
+            }
+
+            if (PrimaryColumns.Count == 0)
+            {
+                yield return new ValidationResult(ErrorMessages.ForeignKeyMustHaveOneOrMorePrimaryColumns);
+            }
         }
     }
 }

@@ -14,17 +14,22 @@
 // limitations under the License.
 #endregion
 
+using System;
+
 namespace FluentMigrator.Runner.Processors
 {
+    [Obsolete]
     public abstract class MigrationProcessorFactory : IMigrationProcessorFactory
     {
+        public virtual string Name => GetType().Name.Replace("ProcessorFactory", string.Empty);
+
+        [Obsolete]
         public abstract IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options);
 
+        [Obsolete]
         public virtual bool IsForProvider(string provider)
         {
-            return provider.IndexOf(Name, System.StringComparison.OrdinalIgnoreCase) >= 0;
+            return provider.IndexOf(Name, StringComparison.OrdinalIgnoreCase) >= 0;
         }
-
-        public virtual string Name => GetType().Name.Replace("ProcessorFactory", string.Empty);
     }
 }

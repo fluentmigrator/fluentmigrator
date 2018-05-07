@@ -8,27 +8,38 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Hana;
 using FluentMigrator.Runner.Helpers;
+using FluentMigrator.Runner.Initialization;
+
+using JetBrains.Annotations;
+
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.Hana
 {
     public class HanaProcessor : GenericProcessorBase
     {
-        public override string DatabaseType
-        {
-            get { return "Hana"; }
-        }
-
-        public override IList<string> DatabaseTypeAliases { get; } = new List<string>();
-
+        [Obsolete]
         public HanaProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(connection, factory, generator, announcer, options)
         {
         }
 
-        public IQuoter Quoter
+        public HanaProcessor(
+            [NotNull] HanaDbFactory factory,
+            [NotNull] HanaGenerator generator,
+            [NotNull] ILogger<HanaProcessor> logger,
+            [NotNull] IOptions<ProcessorOptions> options,
+            [NotNull] IConnectionStringAccessor connectionStringAccessor)
+            : base(() => factory.Factory, generator, logger, options.Value, connectionStringAccessor)
         {
-            get { return ((HanaGenerator)Generator).Quoter; }
         }
+
+        public override string DatabaseType => "Hana";
+
+        public override IList<string> DatabaseTypeAliases { get; } = new List<string>();
+
+        public IQuoter Quoter => ((HanaGenerator)Generator).Quoter;
 
         public override bool SchemaExists(string schemaName)
         {
@@ -38,7 +49,7 @@ namespace FluentMigrator.Runner.Processors.Hana
         public override bool TableExists(string schemaName, string tableName)
         {
             if (string.IsNullOrEmpty(tableName))
-                throw new ArgumentNullException("tableName");
+                throw new ArgumentNullException(nameof(tableName));
 
             return Exists(
                 "SELECT 1 FROM TABLES WHERE SCHEMA_NAME = CURRENT_SCHEMA AND TABLE_NAME = '{0}'",
@@ -48,9 +59,9 @@ namespace FluentMigrator.Runner.Processors.Hana
         public override bool ColumnExists(string schemaName, string tableName, string columnName)
         {
             if (tableName == null)
-                throw new ArgumentNullException("tableName");
+                throw new ArgumentNullException(nameof(tableName));
             if (columnName == null)
-                throw new ArgumentNullException("columnName");
+                throw new ArgumentNullException(nameof(columnName));
 
             return Exists("SELECT 1 FROM TABLE_COLUMNS WHERE SCHEMA_NAME = CURRENT_SCHEMA AND upper(TABLE_NAME) = '{0}' AND upper(COLUMN_NAME) = '{1}'",
                 FormatHelper.FormatSqlEscape(Quoter.UnQuote(tableName).ToUpper()),
@@ -60,9 +71,9 @@ namespace FluentMigrator.Runner.Processors.Hana
         public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
         {
             if (tableName == null)
-                throw new ArgumentNullException("tableName");
+                throw new ArgumentNullException(nameof(tableName));
             if (constraintName == null)
-                throw new ArgumentNullException("constraintName");
+                throw new ArgumentNullException(nameof(constraintName));
 
             if (constraintName.Length == 0)
                 return false;
@@ -74,9 +85,9 @@ namespace FluentMigrator.Runner.Processors.Hana
         public override bool IndexExists(string schemaName, string tableName, string indexName)
         {
             if (tableName == null)
-                throw new ArgumentNullException("tableName");
+                throw new ArgumentNullException(nameof(tableName));
             if (indexName == null)
-                throw new ArgumentNullException("indexName");
+                throw new ArgumentNullException(nameof(indexName));
 
             if (indexName.Length == 0)
                 return false;
@@ -88,7 +99,7 @@ namespace FluentMigrator.Runner.Processors.Hana
         public override bool SequenceExists(string schemaName, string sequenceName)
         {
             if (sequenceName == null)
-                throw new ArgumentNullException("sequenceName");
+                throw new ArgumentNullException(nameof(sequenceName));
 
             if (string.IsNullOrEmpty(sequenceName))
                 return false;
@@ -110,15 +121,15 @@ namespace FluentMigrator.Runner.Processors.Hana
         public override bool Exists(string template, params object[] args)
         {
             if (template == null)
-                throw new ArgumentNullException("template");
+                throw new ArgumentNullException(nameof(template));
 
             EnsureConnectionIsOpen();
 
-            var querySql = String.Format(template, args);
+            var querySql = string.Format(template, args);
 
-            Announcer.Sql(string.Format("{0};", querySql));
+            Logger.LogSql($"{querySql};");
 
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction, Options))
+            using (var command = CreateCommand(string.Format(template, args)))
             using (var reader = command.ExecuteReader())
             {
                 return reader.Read();
@@ -128,7 +139,7 @@ namespace FluentMigrator.Runner.Processors.Hana
         public override DataSet ReadTableData(string schemaName, string tableName)
         {
             if (tableName == null)
-                throw new ArgumentNullException("tableName");
+                throw new ArgumentNullException(nameof(tableName));
 
             return Read("SELECT * FROM {0}", Quoter.QuoteTableName(tableName, schemaName));
         }
@@ -136,11 +147,11 @@ namespace FluentMigrator.Runner.Processors.Hana
         public override DataSet Read(string template, params object[] args)
         {
             if (template == null)
-                throw new ArgumentNullException("template");
+                throw new ArgumentNullException(nameof(template));
 
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction, Options))
+            using (var command = CreateCommand(string.Format(template, args)))
             using (var reader = command.ExecuteReader())
             {
                 return reader.ReadDataSet();
@@ -149,20 +160,19 @@ namespace FluentMigrator.Runner.Processors.Hana
 
         public override void Process(PerformDBOperationExpression expression)
         {
-            Announcer.Say("Performing DB Operation");
+            Logger.LogSay("Performing DB Operation");
 
             if (Options.PreviewOnly)
                 return;
 
             EnsureConnectionIsOpen();
 
-            if (expression.Operation != null)
-                expression.Operation(Connection, null);
+            expression.Operation?.Invoke(Connection, null);
         }
 
         protected override void Process(string sql)
         {
-            Announcer.Sql(sql);
+            Logger.LogSql(sql);
 
             if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
                 return;
@@ -179,7 +189,7 @@ namespace FluentMigrator.Runner.Processors.Hana
                     ? batch.Remove(batch.Length - 1)
                     : batch;
 
-                using (var command = Factory.CreateCommand(batchCommand, Connection, Transaction, Options))
+                using (var command = CreateCommand(batchCommand))
                     command.ExecuteNonQuery();
             }
         }

@@ -20,8 +20,15 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Schema.Constraint
 {
+    /// <summary>
+    /// Query a constraints existence
+    /// </summary>
     public interface ISchemaConstraintSyntax : IFluentSyntax
     {
+        /// <summary>
+        /// Returns <c>true</c> when a constraint exists
+        /// </summary>
+        /// <returns><c>true</c> when a constraint exists</returns>
         bool Exists();
     }
 }

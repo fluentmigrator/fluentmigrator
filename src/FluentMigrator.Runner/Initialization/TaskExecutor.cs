@@ -20,112 +20,177 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-using FluentMigrator.Exceptions;
 using FluentMigrator.Infrastructure;
-using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Initialization.AssemblyLoader;
+using FluentMigrator.Runner.Logging;
 using FluentMigrator.Runner.Processors;
+
+using JetBrains.Annotations;
+
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Initialization
 {
     public class TaskExecutor
     {
-        protected IMigrationRunner Runner { get; set; }
-        private IRunnerContext RunnerContext { get; set; }
+        [NotNull]
+        private readonly ILogger _logger;
 
-        private AssemblyLoaderFactory AssemblyLoaderFactory { get; set; }
-        private MigrationProcessorFactoryProvider ProcessorFactoryProvider { get; set; }
+        [NotNull]
+        private readonly IAssemblySource _assemblySource;
 
-        public TaskExecutor(IRunnerContext runnerContext)
-            : this(runnerContext, new DefaultConnectionStringProvider(), new AssemblyLoaderFactory(), new MigrationProcessorFactoryProvider())
+        private readonly RunnerOptions _runnerOptions;
+
+        [NotNull, ItemNotNull]
+        private readonly Lazy<IServiceProvider> _lazyServiceProvider;
+
+        private IReadOnlyCollection<Assembly> _assemblies;
+
+        public TaskExecutor(
+            [NotNull] ILogger<TaskExecutor> logger,
+            [NotNull] IAssemblySource assemblySource,
+            [NotNull] IOptions<RunnerOptions> runnerOptions,
+            [NotNull] IServiceProvider serviceProvider)
+        {
+            _logger = logger;
+            _assemblySource = assemblySource;
+            _runnerOptions = runnerOptions.Value;
+#pragma warning disable 612
+            ConnectionStringProvider = serviceProvider.GetService<IConnectionStringProvider>();
+#pragma warning restore 612
+            _lazyServiceProvider = new Lazy<IServiceProvider>(() => serviceProvider);
+        }
+
+        [Obsolete]
+        public TaskExecutor([NotNull] IRunnerContext runnerContext)
+        {
+            var runnerCtxt = runnerContext ?? throw new ArgumentNullException(nameof(runnerContext));
+            _logger = new AnnouncerFluentMigratorLogger(runnerCtxt.Announcer);
+            _runnerOptions = new RunnerOptions(runnerCtxt);
+            var asmLoaderFactory = new AssemblyLoaderFactory();
+            _assemblySource = new AssemblySource(() => new AssemblyCollection(asmLoaderFactory.GetTargetAssemblies(runnerCtxt.Targets)));
+            ConnectionStringProvider = new DefaultConnectionStringProvider();
+            _lazyServiceProvider = new Lazy<IServiceProvider>(
+                () => runnerContext
+                    .CreateServices(
+                        ConnectionStringProvider,
+                        asmLoaderFactory)
+                    .BuildServiceProvider(validateScopes: true));
+        }
+
+        [Obsolete("Ony the statically provided factories are accessed")]
+        public TaskExecutor(
+            [NotNull] IRunnerContext runnerContext,
+            [CanBeNull] IConnectionStringProvider connectionStringProvider,
+            [NotNull] AssemblyLoaderFactory assemblyLoaderFactory,
+            // ReSharper disable once UnusedParameter.Local
+            MigrationProcessorFactoryProvider factoryProvider)
+            : this(
+                runnerContext,
+                assemblyLoaderFactory,
+                connectionStringProvider)
         {
         }
 
-        public TaskExecutor(IRunnerContext runnerContext, IConnectionStringProvider connectionStringProvider, AssemblyLoaderFactory assemblyLoaderFactory, MigrationProcessorFactoryProvider processorFactoryProvider)
+        [Obsolete]
+        public TaskExecutor(
+            [NotNull] IRunnerContext runnerContext,
+            [NotNull] AssemblyLoaderFactory assemblyLoaderFactory,
+            [CanBeNull] IConnectionStringProvider connectionStringProvider = null)
         {
-            if (runnerContext == null) throw new ArgumentNullException("runnerContext");
-            if (assemblyLoaderFactory == null) throw new ArgumentNullException("assemblyLoaderFactory");
-
-            RunnerContext = runnerContext;
+            var runnerCtxt = runnerContext ?? throw new ArgumentNullException(nameof(runnerContext));
+            _logger = new AnnouncerFluentMigratorLogger(runnerCtxt.Announcer);
+            _runnerOptions = new RunnerOptions(runnerCtxt);
             ConnectionStringProvider = connectionStringProvider;
-            AssemblyLoaderFactory = assemblyLoaderFactory;
-            ProcessorFactoryProvider = processorFactoryProvider;
+            var asmLoaderFactory = assemblyLoaderFactory ?? throw new ArgumentNullException(nameof(assemblyLoaderFactory));
+            _assemblySource = new AssemblySource(() => new AssemblyCollection(asmLoaderFactory.GetTargetAssemblies(runnerCtxt.Targets)));
+            _lazyServiceProvider = new Lazy<IServiceProvider>(
+                () => runnerContext
+                    .CreateServices(
+                        connectionStringProvider,
+                        asmLoaderFactory)
+                    .BuildServiceProvider(validateScopes: true));
         }
 
+        /// <summary>
+        /// Gets the current migration runner
+        /// </summary>
+        /// <remarks>
+        /// This will only be set during a migration operation
+        /// </remarks>
+        [CanBeNull]
+        protected IMigrationRunner Runner { get; set; }
+
+        /// <summary>
+        /// Gets the connection string provider
+        /// </summary>
+        [CanBeNull]
+        [Obsolete]
         protected IConnectionStringProvider ConnectionStringProvider { get; }
 
+        /// <summary>
+        /// Gets the service provider used to instantiate all migration services
+        /// </summary>
+        [NotNull]
+        protected IServiceProvider ServiceProvider => _lazyServiceProvider.Value;
+
+        [Obsolete]
         protected virtual IEnumerable<Assembly> GetTargetAssemblies()
         {
-            var assemblies = new HashSet<Assembly>();
-
-            foreach (var target in RunnerContext.Targets)
-            {
-                var assembly = AssemblyLoaderFactory.GetAssemblyLoader(target).Load();
-
-                if (assemblies.Add(assembly))
-                {
-                    yield return assembly;
-                }
-            }
+            return _assemblies ?? (_assemblies = _assemblySource.Assemblies);
         }
 
+        /// <summary>
+        /// Will be called durin the runner scope intialization
+        /// </summary>
+        /// <remarks>
+        /// The <see cref="Runner"/> isn't initialized yet.
+        /// </remarks>
         protected virtual void Initialize()
         {
-            var assemblies = GetTargetAssemblies();
-
-            var assemblyCollection = new AssemblyCollection(assemblies);
-
-            if (!RunnerContext.NoConnection && ConnectionStringProvider == null)
-            {
-                RunnerContext.NoConnection = true;
-            }
-
-            var processor = RunnerContext.NoConnection? InitializeConnectionlessProcessor():InitializeProcessor(assemblyCollection);
-
-            Runner = new MigrationRunner(assemblyCollection, RunnerContext, processor);
         }
 
         public void Execute()
         {
-            Initialize();
-
-            try
+            using (var scope = new RunnerScope(this))
             {
-                switch (RunnerContext.Task)
+                switch (_runnerOptions.Task)
                 {
                     case null:
                     case "":
                     case "migrate":
                     case "migrate:up":
-                        if (RunnerContext.Version != 0)
-                            Runner.MigrateUp(RunnerContext.Version);
+                        if (_runnerOptions.Version != 0)
+                            scope.Runner.MigrateUp(_runnerOptions.Version);
                         else
-                            Runner.MigrateUp();
+                            scope.Runner.MigrateUp();
                         break;
                     case "rollback":
-                        if (RunnerContext.Steps == 0)
-                            RunnerContext.Steps = 1;
-                        Runner.Rollback(RunnerContext.Steps);
+                        if (_runnerOptions.Steps == 0)
+                            _runnerOptions.Steps = 1;
+                        scope.Runner.Rollback(_runnerOptions.Steps);
                         break;
                     case "rollback:toversion":
-                        Runner.RollbackToVersion(RunnerContext.Version);
+                        scope.Runner.RollbackToVersion(_runnerOptions.Version);
                         break;
                     case "rollback:all":
-                        Runner.RollbackToVersion(0);
+                        scope.Runner.RollbackToVersion(0);
                         break;
                     case "migrate:down":
-                        Runner.MigrateDown(RunnerContext.Version);
+                        scope.Runner.MigrateDown(_runnerOptions.Version);
                         break;
                     case "validateversionorder":
-                        Runner.ValidateVersionOrder();
+                        scope.Runner.ValidateVersionOrder();
                         break;
                     case "listmigrations":
-                        Runner.ListMigrations();
+                        scope.Runner.ListMigrations();
                         break;
                 }
             }
-            finally { Runner.Processor.Dispose(); }
-            RunnerContext.Announcer.Say("Task completed.");
+
+            _logger.LogSay("Task completed.");
         }
 
         /// <summary>
@@ -134,88 +199,75 @@ namespace FluentMigrator.Runner.Initialization
         /// </summary>
         public bool HasMigrationsToApply()
         {
-            Initialize();
-
-            try
+            using (var scope = new RunnerScope(this))
             {
-                switch (RunnerContext.Task)
+                switch (_runnerOptions.Task)
                 {
                     case null:
                     case "":
                     case "migrate":
                     case "migrate:up":
-                        if (RunnerContext.Version != 0)
-                            return Runner.HasMigrationsToApplyUp(RunnerContext.Version);
+                        if (_runnerOptions.Version != 0)
+                            return scope.Runner.HasMigrationsToApplyUp(_runnerOptions.Version);
 
-                        return Runner.HasMigrationsToApplyUp();
+                        return scope.Runner.HasMigrationsToApplyUp();
                     case "rollback":
                     case "rollback:all":
                         // Number of steps doesn't matter as long as there's at least
                         // one migration applied (at least that one will be rolled back)
-                        return Runner.HasMigrationsToApplyRollback();
+                        return scope.Runner.HasMigrationsToApplyRollback();
                     case "rollback:toversion":
                     case "migrate:down":
-                        return Runner.HasMigrationsToApplyDown(RunnerContext.Version);
+                        return scope.Runner.HasMigrationsToApplyDown(_runnerOptions.Version);
                     default:
                         return false;
                 }
             }
-            finally
+        }
+
+        private class RunnerScope : IDisposable
+        {
+            [NotNull]
+            private readonly TaskExecutor _executor;
+
+            [CanBeNull]
+            private readonly IServiceScope _serviceScope;
+
+            private readonly bool _hasCustomRunner;
+
+            public RunnerScope([NotNull] TaskExecutor executor)
             {
-                Runner.Processor.Dispose();
+                _executor = executor;
+
+                executor.Initialize();
+
+                if (executor.Runner != null)
+                {
+                    Runner = executor.Runner;
+                    _hasCustomRunner = true;
+                }
+                else
+                {
+                    var serviceScope = executor.ServiceProvider.CreateScope();
+                    _serviceScope = serviceScope;
+                    _executor.Runner = Runner = serviceScope.ServiceProvider.GetRequiredService<IMigrationRunner>();
+                }
             }
-        }
 
-        private IMigrationProcessor InitializeConnectionlessProcessor()
-        {
-            var options = new ProcessorOptions
+            public IMigrationRunner Runner { get; }
+
+            public void Dispose()
             {
-                PreviewOnly = RunnerContext.PreviewOnly,
-                Timeout = RunnerContext.Timeout,
-                ProviderSwitches = RunnerContext.ProviderSwitches
-            };
-
-            var generatorFactory = new MigrationGeneratorFactory();
-            var generator = generatorFactory.GetGenerator(RunnerContext.Database);
-            if (generator == null)
-                throw new ProcessorFactoryNotFoundException(string.Format("The provider or dbtype parameter is incorrect. Available choices are {0}: ", generatorFactory.ListAvailableGeneratorTypes()));
-
-            var processor = new ConnectionlessProcessor(generator, RunnerContext, options);
-
-            return processor;
-        }
-
-        private IMigrationProcessor InitializeProcessor(IAssemblyCollection assemblyCollection)
-        {
-            var connectionString = LoadConnectionString(assemblyCollection);
-            var processorFactory = ProcessorFactoryProvider.GetFactory(RunnerContext.Database);
-
-            if (processorFactory == null)
-                throw new ProcessorFactoryNotFoundException(string.Format("The provider or dbtype parameter is incorrect. Available choices are {0}: ", ProcessorFactoryProvider.ListAvailableProcessorTypes()));
-
-            var processor = processorFactory.Create(connectionString, RunnerContext.Announcer, new ProcessorOptions
-            {
-                PreviewOnly = RunnerContext.PreviewOnly,
-                Timeout = RunnerContext.Timeout,
-                ProviderSwitches = RunnerContext.ProviderSwitches
-            });
-
-            return processor;
-        }
-
-        private string LoadConnectionString(IAssemblyCollection assemblyCollection)
-        {
-            var singleAssembly = (assemblyCollection != null && assemblyCollection.Assemblies != null && assemblyCollection.Assemblies.Length == 1) ? assemblyCollection.Assemblies[0] : null;
-            var singleAssemblyLocation = singleAssembly != null ? singleAssembly.Location : string.Empty;
-
-            var connectionString = ConnectionStringProvider.GetConnectionString(
-                RunnerContext.Announcer,
-                RunnerContext.Connection,
-                RunnerContext.ConnectionStringConfigPath,
-                singleAssemblyLocation,
-                RunnerContext.Database);
-
-            return connectionString;
+                if (_hasCustomRunner)
+                {
+                    Runner.Processor.Dispose();
+                }
+                else
+                {
+                    _executor.Runner = null;
+                    _serviceScope?.Dispose();
+                }
+            }
         }
     }
 }

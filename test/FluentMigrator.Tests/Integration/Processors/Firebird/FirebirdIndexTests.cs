@@ -1,12 +1,35 @@
-using FirebirdSql.Data.FirebirdClient;
-using FluentMigrator.Runner.Announcers;
+#region License
+//
+// Copyright (c) 2018, Fluent Migrator Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+#endregion
+
+using System.Data;
+
+using FluentMigrator.Runner;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Firebird;
-using FluentMigrator.Runner.Processors;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Tests.Helpers;
+
+using Microsoft.Extensions.DependencyInjection;
+
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Integration.Processors.Firebird
 {
@@ -18,52 +41,27 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         private readonly FirebirdLibraryProber _prober = new FirebirdLibraryProber();
         private TemporaryDatabase _temporaryDatabase;
 
-        public FbConnection Connection { get; set; }
-        public FirebirdProcessor Processor { get; set; }
-        public IQuoter Quoter { get; set; }
-
-        [SetUp]
-        public void SetUp()
-        {
-            if (!IntegrationTestOptions.Firebird.IsEnabled)
-                Assert.Ignore();
-            _temporaryDatabase = new TemporaryDatabase(
-                IntegrationTestOptions.Firebird,
-                _prober);
-            Connection = new FbConnection(_temporaryDatabase.ConnectionString);
-            var options = FirebirdOptions.AutoCommitBehaviour();
-            Processor = new FirebirdProcessor(Connection, new FirebirdGenerator(options), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), new FirebirdDbFactory(), options);
-            Quoter = new FirebirdQuoter(false);
-            Connection.Open();
-            Processor.BeginTransaction();
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            if (Processor == null)
-                return;
-
-            if (!Processor.WasCommitted)
-                Processor.CommitTransaction();
-            Connection.Close();
-
-            FbDatabase.DropDatabase(_temporaryDatabase.ConnectionString);
-        }
+        private ServiceProvider ServiceProvider { get; set; }
+        private IServiceScope ServiceScope { get; set; }
+        private FirebirdProcessor Processor { get; set; }
+        private IQuoter Quoter { get; set; }
 
         [Test]
         public override void CallingIndexExistsCanAcceptIndexNameWithSingleQuote()
         {
-            using (var table = new FirebirdTestTable(Processor, null, "id int"))
+            using (var table = new FirebirdTestTable(Processor, "id int"))
             {
                 Processor.CheckTable(table.Name);
                 Processor.LockTable(table.Name);
-                var idxName = string.Format("\"id'x_{0}\"", table.Name);
+                var idxName = $"\"id'x_{table.Name}\"";
+
+                if (table.Connection.State != ConnectionState.Open)
+                    table.Connection.Open();
 
                 using (var cmd = table.Connection.CreateCommand())
                 {
                     cmd.Transaction = table.Transaction;
-                    cmd.CommandText = string.Format("CREATE INDEX {0} ON {1} (id)", idxName, table.Name);
+                    cmd.CommandText = $"CREATE INDEX {idxName} ON {table.Name} (id)";
                     cmd.ExecuteNonQuery();
                 }
 
@@ -76,16 +74,19 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [Test]
         public override void CallingIndexExistsCanAcceptTableNameWithSingleQuote()
         {
-            using (var table = new FirebirdTestTable("\"Test'Table\"", Processor, null, "id int"))
+            using (var table = new FirebirdTestTable("\"Test'Table\"", Processor, "id int"))
             {
                 Processor.CheckTable(table.Name);
                 Processor.LockTable(table.Name);
                 var idxName = "\"idx_Test'Table\"";
 
+                if (table.Connection.State != ConnectionState.Open)
+                    table.Connection.Open();
+
                 using (var cmd = table.Connection.CreateCommand())
                 {
                     cmd.Transaction = table.Transaction;
-                    cmd.CommandText = string.Format("CREATE INDEX {0} ON {1} (id)", idxName, table.Name);
+                    cmd.CommandText = $"CREATE INDEX {idxName} ON {table.Name} (id)";
                     cmd.ExecuteNonQuery();
                 }
 
@@ -98,14 +99,14 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [Test]
         public override void CallingIndexExistsReturnsFalseIfIndexDoesNotExist()
         {
-            using (var table = new FirebirdTestTable(Processor, null, "id int"))
+            using (var table = new FirebirdTestTable(Processor, "id int"))
                 Processor.IndexExists(null, table.Name, "DoesNotExist").ShouldBeFalse();
         }
 
         [Test]
         public override void CallingIndexExistsReturnsFalseIfIndexDoesNotExistWithSchema()
         {
-            using (var table = new FirebirdTestTable(Processor, "TestSchema", "id int"))
+            using (var table = new FirebirdTestTable(Processor, "id int"))
                 Processor.IndexExists("TestSchema", table.Name, "DoesNotExist").ShouldBeFalse();
         }
 
@@ -124,16 +125,19 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [Test]
         public override void CallingIndexExistsReturnsTrueIfIndexExists()
         {
-            using (var table = new FirebirdTestTable(Processor, null, "id int"))
+            using (var table = new FirebirdTestTable(Processor, "id int"))
             {
                 Processor.CheckTable(table.Name);
                 Processor.LockTable(table.Name);
-                var idxName = string.Format("idx_{0}", table.Name);
+                var idxName = $"idx_{table.Name}";
+
+                if (table.Connection.State != ConnectionState.Open)
+                    table.Connection.Open();
 
                 using (var cmd = table.Connection.CreateCommand())
                 {
                     cmd.Transaction = table.Transaction;
-                    cmd.CommandText = string.Format("CREATE INDEX {0} ON {1} (id)", Quoter.QuoteIndexName(idxName), Quoter.QuoteTableName(table.Name));
+                    cmd.CommandText = $"CREATE INDEX {Quoter.QuoteIndexName(idxName)} ON {Quoter.QuoteTableName(table.Name)} (id)";
                     cmd.ExecuteNonQuery();
                 }
 
@@ -146,22 +150,59 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [Test]
         public override void CallingIndexExistsReturnsTrueIfIndexExistsWithSchema()
         {
-            using (var table = new FirebirdTestTable(Processor, "TestSchema", "id int"))
+            using (var table = new FirebirdTestTable(Processor, "id int"))
             {
                 Processor.CheckTable(table.Name);
                 Processor.LockTable(table.Name);
-                var idxName = string.Format("idx_{0}", table.Name);
+                var idxName = $"idx_{table.Name}";
+
+                if (table.Connection.State != ConnectionState.Open)
+                    table.Connection.Open();
 
                 using (var cmd = table.Connection.CreateCommand())
                 {
                     cmd.Transaction = table.Transaction;
-                    cmd.CommandText = string.Format("CREATE INDEX {0} ON {1} (id)", Quoter.QuoteIndexName(idxName), Quoter.QuoteTableName(table.Name));
+                    cmd.CommandText = $"CREATE INDEX {Quoter.QuoteIndexName(idxName)} ON {Quoter.QuoteTableName(table.Name)} (id)";
                     cmd.ExecuteNonQuery();
                 }
 
                 Processor.AutoCommit();
 
                 Processor.IndexExists("TestSchema", table.Name, idxName).ShouldBeTrue();
+            }
+        }
+
+        [SetUp]
+        public void SetUp()
+        {
+            if (!IntegrationTestOptions.Firebird.IsEnabled)
+                Assert.Ignore();
+
+            _temporaryDatabase = new TemporaryDatabase(
+                IntegrationTestOptions.Firebird,
+                _prober);
+
+            var serivces = ServiceCollectionExtensions.CreateServices()
+                .ConfigureRunner(builder => builder.AddFirebird())
+                .AddScoped<IConnectionStringReader>(
+                    _ => new PassThroughConnectionStringReader(_temporaryDatabase.ConnectionString));
+
+            ServiceProvider = serivces.BuildServiceProvider();
+            ServiceScope = ServiceProvider.CreateScope();
+            Processor = ServiceScope.ServiceProvider.GetRequiredService<FirebirdProcessor>();
+            Quoter = ServiceScope.ServiceProvider.GetRequiredService<FirebirdQuoter>();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            ServiceScope?.Dispose();
+            ServiceProvider?.Dispose();
+            if (_temporaryDatabase != null)
+            {
+                var connString = _temporaryDatabase.ConnectionString;
+                _temporaryDatabase = null;
+                FbDatabase.DropDatabase(connString);
             }
         }
     }

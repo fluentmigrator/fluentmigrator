@@ -1,29 +1,65 @@
+#region License
+//
+// Copyright (c) 2018, Fluent Migrator Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Generic;
 using FluentMigrator.Runner.Helpers;
+
+using JetBrains.Annotations;
+
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Generators.Oracle
 {
     public class OracleGenerator : GenericGenerator
     {
         public OracleGenerator()
-            : base(new OracleColumn(new OracleQuoter()), new OracleQuoter(), new OracleDescriptionGenerator())
+            : this(false)
         {
         }
 
         public OracleGenerator(bool useQuotedIdentifiers)
-            : base(new OracleColumn(GetQuoter(useQuotedIdentifiers)), GetQuoter(useQuotedIdentifiers), new OracleDescriptionGenerator())
+            : this(GetQuoter(useQuotedIdentifiers))
         {
         }
 
-        private static IQuoter GetQuoter(bool useQuotedIdentifiers)
+        public OracleGenerator(
+            [NotNull] OracleQuoterBase quoter)
+            : this(quoter, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()))
         {
-            return useQuotedIdentifiers ? (IQuoter)new OracleQuoterQuotedIdentifier() : (IQuoter)new OracleQuoter();
+        }
+
+        public OracleGenerator(
+            [NotNull] OracleQuoterBase quoter,
+            [NotNull] IOptions<GeneratorOptions> generatorOptions)
+            : base(new OracleColumn(quoter), quoter, new OracleDescriptionGenerator(), generatorOptions)
+        {
+        }
+
+        private static OracleQuoterBase GetQuoter(bool useQuotedIdentifiers)
+        {
+            return useQuotedIdentifiers ? new OracleQuoterQuotedIdentifier() : new OracleQuoter();
         }
 
 
@@ -41,7 +77,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
 
         public override string Generate(CreateSequenceExpression expression)
         {
-            var result = new StringBuilder(string.Format("CREATE SEQUENCE "));
+            var result = new StringBuilder("CREATE SEQUENCE ");
             var seq = expression.Sequence;
             if (string.IsNullOrEmpty(seq.SchemaName))
             {
@@ -110,7 +146,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
             return String.IsNullOrEmpty(schema) ? table : String.Concat(schema,".",table);
         }
 
-         private string innerGenerate(CreateTableExpression expression)
+        private string InnerGenerate(CreateTableExpression expression)
         {
             var tableName = Quoter.QuoteTableName(expression.TableName);
             var schemaName = Quoter.QuoteSchemaName(expression.SchemaName);
@@ -118,16 +154,15 @@ namespace FluentMigrator.Runner.Generators.Oracle
             return string.Format("CREATE TABLE {0} ({1})",ExpandTableName(schemaName,tableName), Column.Generate(expression.Columns, tableName));
         }
 
-
         public override string Generate(CreateTableExpression expression)
         {
             var descriptionStatements = DescriptionGenerator.GenerateDescriptionStatements(expression);
             var statements = descriptionStatements as string[] ?? descriptionStatements.ToArray();
 
             if (!statements.Any())
-                return innerGenerate(expression);
+                return InnerGenerate(expression);
 
-            var wrappedCreateTableStatement = WrapStatementInExecuteImmediateBlock(innerGenerate(expression));
+            var wrappedCreateTableStatement = WrapStatementInExecuteImmediateBlock(InnerGenerate(expression));
             var createTableWithDescriptionsBuilder = new StringBuilder(wrappedCreateTableStatement);
 
             foreach (var descriptionStatement in statements)

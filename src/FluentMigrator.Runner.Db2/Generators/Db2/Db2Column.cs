@@ -1,4 +1,24 @@
+#region License
+//
+// Copyright (c) 2018, Fluent Migrator Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+#endregion
+
 using FluentMigrator.Infrastructure.Extensions;
+using FluentMigrator.Model;
+using FluentMigrator.Runner.Generators.Base;
 
 namespace FluentMigrator.Runner.Generators.DB2
 {
@@ -8,32 +28,19 @@ namespace FluentMigrator.Runner.Generators.DB2
     using System.Linq;
     using System.Text;
 
-    using FluentMigrator.Model;
-    using FluentMigrator.Runner.Generators.Base;
-
     internal class Db2Column : ColumnBase
     {
-        #region Constructors
-
         public Db2Column(IQuoter quoter)
             : base(new Db2TypeMap(), quoter)
         {
-            this.ClauseOrder = new List<Func<ColumnDefinition, string>> { FormatString, FormatType, this.FormatCCSID, this.FormatNullable, this.FormatDefaultValue, this.FormatIdentity };
-            this.AlterClauseOrder = new List<Func<ColumnDefinition, string>> { FormatType, this.FormatCCSID, this.FormatNullable, this.FormatDefaultValue, this.FormatIdentity };
+            ClauseOrder = new List<Func<ColumnDefinition, string>> { FormatString, FormatType, FormatCCSID, FormatNullable, FormatDefaultValue, FormatIdentity };
+            AlterClauseOrder = new List<Func<ColumnDefinition, string>> { FormatType, FormatCCSID, FormatNullable, FormatDefaultValue, FormatIdentity };
         }
-
-        #endregion Constructors
-
-        #region Properties
 
         public List<Func<ColumnDefinition, string>> AlterClauseOrder
         {
             get; set;
         }
-
-        #endregion Properties
-
-        #region Methods
 
         public string FormatAlterDefaultValue(string column, object defaultValue)
         {
@@ -123,7 +130,5 @@ namespace FluentMigrator.Runner.Generators.DB2
 
             return "NOT NULL";
         }
-
-        #endregion Methods
     }
 }

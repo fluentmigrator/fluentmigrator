@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 //
 // Copyright (c) 2018, Fluent Migrator Project
 //
@@ -16,17 +16,34 @@
 //
 #endregion
 
+using System;
+
 using FluentMigrator.Runner.Generators.Redshift;
 
 namespace FluentMigrator.Runner.Processors.Redshift
 {
+    [Obsolete]
     public class RedshiftProcessorFactory : MigrationProcessorFactory
     {
+        private readonly IServiceProvider _serviceProvider;
+
+        [Obsolete]
+        public RedshiftProcessorFactory()
+            : this(serviceProvider: null)
+        {
+        }
+
+        public RedshiftProcessorFactory(IServiceProvider serviceProvider)
+        {
+            _serviceProvider = serviceProvider;
+        }
+
+        [Obsolete]
         public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
         {
-            var factory = new RedshiftDbFactory();
+            var factory = new RedshiftDbFactory(_serviceProvider);
             var connection = factory.CreateConnection(connectionString);
-            return new RedshiftProcessor(connection, new RedshiftGenerator(), announcer, options, factory);
+            return new RedshiftProcessor(connection, new RedshiftGenerator(new RedshiftQuoter()), announcer, options, factory);
         }
     }
 }

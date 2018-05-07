@@ -19,7 +19,8 @@ using System.Linq;
 using FluentMigrator.Runner.Generators.Redshift;
 
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Generators.Redshift
 {
@@ -29,14 +30,14 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
         [SetUp]
         public void Setup()
         {
-            descriptionGenerator = new RedshiftDescriptionGenerator();
+            DescriptionGenerator = new RedshiftDescriptionGenerator();
         }
 
         [Test]
         public override void GenerateDescriptionStatementsForCreateTableReturnTableDescriptionStatement()
         {
             var createTableExpression = GeneratorTestHelper.GetCreateTableWithTableDescription();
-            var statements = descriptionGenerator.GenerateDescriptionStatements(createTableExpression);
+            var statements = DescriptionGenerator.GenerateDescriptionStatements(createTableExpression);
 
             var result = statements.First();
             result.ShouldBe("COMMENT ON TABLE \"public\".\"TestTable1\" IS 'TestDescription';");
@@ -47,7 +48,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
             GenerateDescriptionStatementsForCreateTableReturnTableDescriptionAndColumnDescriptionsStatements()
         {
             var createTableExpression = GeneratorTestHelper.GetCreateTableWithTableDescriptionAndColumnDescriptions();
-            var statements = descriptionGenerator.GenerateDescriptionStatements(createTableExpression).ToArray();
+            var statements = DescriptionGenerator.GenerateDescriptionStatements(createTableExpression).ToArray();
 
             var result = string.Join(string.Empty, statements);
             result.ShouldBe(
@@ -58,7 +59,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
         public override void GenerateDescriptionStatementForAlterTableReturnTableDescriptionStatement()
         {
             var alterTableExpression = GeneratorTestHelper.GetAlterTableWithDescriptionExpression();
-            var statement = descriptionGenerator.GenerateDescriptionStatement(alterTableExpression);
+            var statement = DescriptionGenerator.GenerateDescriptionStatement(alterTableExpression);
 
             statement.ShouldBe("COMMENT ON TABLE \"public\".\"TestTable1\" IS 'TestDescription';");
         }
@@ -67,7 +68,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
         public override void GenerateDescriptionStatementForCreateColumnReturnColumnDescriptionStatement()
         {
             var createColumnExpression = GeneratorTestHelper.GetCreateColumnExpressionWithDescription();
-            var statement = descriptionGenerator.GenerateDescriptionStatement(createColumnExpression);
+            var statement = DescriptionGenerator.GenerateDescriptionStatement(createColumnExpression);
 
             statement.ShouldBe("COMMENT ON COLUMN \"public\".\"TestTable1\".\"TestColumn1\" IS 'TestColumn1Description';");
         }
@@ -76,7 +77,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
         public override void GenerateDescriptionStatementForAlterColumnReturnColumnDescriptionStatement()
         {
             var alterColumnExpression = GeneratorTestHelper.GetAlterColumnExpressionWithDescription();
-            var statement = descriptionGenerator.GenerateDescriptionStatement(alterColumnExpression);
+            var statement = DescriptionGenerator.GenerateDescriptionStatement(alterColumnExpression);
 
             statement.ShouldBe("COMMENT ON COLUMN \"public\".\"TestTable1\".\"TestColumn1\" IS 'TestColumn1Description';");
         }

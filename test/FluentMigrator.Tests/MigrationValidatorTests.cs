@@ -1,6 +1,26 @@
+#region License
+//
+// Copyright (c) 2018, Fluent Migrator Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+#endregion
+
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Exceptions;
+
+using Microsoft.Extensions.Logging;
 
 using Moq;
 using NUnit.Framework;
@@ -13,12 +33,13 @@ namespace FluentMigrator.Tests
         [SetUp]
         public void Setup()
         {
-            migration = Mock.Of<IMigration>();
-            migrationValidator = new MigrationValidator(Mock.Of<IAnnouncer>(), new DefaultConventionSet(null));
+            _migration = Mock.Of<IMigration>();
+            _migrationValidator = new MigrationValidator(Mock.Of<ILogger>(), new DefaultConventionSet());
         }
 
-        private MigrationValidator migrationValidator;
-        private IMigration migration;
+        private MigrationValidator _migrationValidator;
+
+        private IMigration _migration;
 
         private IMigrationExpression BuildInvalidExpression()
         {
@@ -27,33 +48,35 @@ namespace FluentMigrator.Tests
 
         private IMigrationExpression BuildValidExpression()
         {
-            var expression = new CreateTableExpression();
-            expression.TableName = "Foo";
+            var expression = new CreateTableExpression { TableName = "Foo" };
             return expression;
         }
 
         [Test]
-        public void it_does_not_throw_if_expressions_are_valid()
+        public void ItDoesNotThrowIfExpressionsAreValid()
         {
             Assert.DoesNotThrow(
-                () => migrationValidator.ApplyConventionsToAndValidateExpressions(migration
-                                                                                  , new[] {BuildValidExpression()}));
+                () => _migrationValidator.ApplyConventionsToAndValidateExpressions(
+                    _migration,
+                    new[] { BuildValidExpression() }));
         }
 
         [Test]
-        public void it_throws_invalid_migration_exception_if_expressions_are_invalid()
+        public void ItThrowsInvalidMigrationExceptionIfExpressionsAreInvalid()
         {
             Assert.Throws<InvalidMigrationException>(
-                () => migrationValidator.ApplyConventionsToAndValidateExpressions(migration
-                                                                                  , new[] {BuildInvalidExpression()}));
+                () => _migrationValidator.ApplyConventionsToAndValidateExpressions(
+                    _migration,
+                    new[] { BuildInvalidExpression() }));
         }
 
         [Test]
-        public void it_throws_invalid_migration_exception_if_expressions_contains_multiple_invalid_of_same_type()
+        public void ItThrowsInvalidMigrationExceptionIfExpressionsContainsMultipleInvalidOfSameType()
         {
             Assert.Throws<InvalidMigrationException>(
-                () => migrationValidator.ApplyConventionsToAndValidateExpressions(migration
-                                                                                  , new[] {BuildInvalidExpression(), BuildInvalidExpression()}));
+                () => _migrationValidator.ApplyConventionsToAndValidateExpressions(
+                    _migration,
+                    new[] { BuildInvalidExpression(), BuildInvalidExpression() }));
         }
     }
 }

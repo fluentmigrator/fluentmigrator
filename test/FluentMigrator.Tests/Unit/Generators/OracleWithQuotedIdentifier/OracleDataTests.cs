@@ -1,7 +1,8 @@
 using System;
 using FluentMigrator.Runner.Generators.Oracle;
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
 {
@@ -13,7 +14,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
         [SetUp]
         public void Setup()
         {
-            Generator = new OracleGenerator(useQuotedIdentifiers: true);
+            Generator = new OracleGenerator(new OracleQuoterQuotedIdentifier());
         }
 
         [Test]

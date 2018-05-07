@@ -1,29 +1,36 @@
-using System;
-using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+
 using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Expressions
 {
+    /// <summary>
+    /// Expression to delete constraints
+    /// </summary>
     public class DeleteDefaultConstraintExpression : MigrationExpressionBase, ISchemaExpression
     {
+        /// <inheritdoc />
         public virtual string SchemaName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the table name
+        /// </summary>
+        [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.TableNameCannotBeNullOrEmpty))]
         public virtual string TableName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the column name
+        /// </summary>
+        [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.ColumnNameCannotBeNullOrEmpty))]
         public virtual string ColumnName { get; set; }
 
+        /// <inheritdoc />
         public override void ExecuteWith(IMigrationProcessor processor)
         {
             processor.Process(this);
         }
 
-        public override void CollectValidationErrors(ICollection<string> errors)
-        {
-            if (String.IsNullOrEmpty(TableName))
-                errors.Add(ErrorMessages.TableNameCannotBeNullOrEmpty);
-
-            if (String.IsNullOrEmpty(ColumnName))
-                errors.Add(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
-        }
-
+        /// <inheritdoc />
         public override string ToString()
         {
             return base.ToString() +

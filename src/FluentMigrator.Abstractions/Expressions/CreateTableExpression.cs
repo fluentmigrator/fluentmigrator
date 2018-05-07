@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -17,34 +17,46 @@
 #endregion
 
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
+using FluentMigrator.Validation;
 
 namespace FluentMigrator.Expressions
 {
-    public class CreateTableExpression : MigrationExpressionBase, ISchemaExpression, IColumnsExpression
+    /// <summary>
+    /// Expression to create a table
+    /// </summary>
+    public class CreateTableExpression : MigrationExpressionBase, ISchemaExpression, IColumnsExpression, IValidationChildren
     {
+        /// <inheritdoc />
         public virtual string SchemaName { get; set; }
+
+        /// <inheritdoc />
+        [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.TableNameCannotBeNullOrEmpty))]
         public virtual string TableName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the column definitions
+        /// </summary>
         public virtual IList<ColumnDefinition> Columns { get; set; } = new List<ColumnDefinition>();
+
+        /// <summary>
+        /// Gets or sets the table description
+        /// </summary>
         public virtual string TableDescription { get; set; }
 
+        /// <inheritdoc />
         IEnumerable<ColumnDefinition> IColumnsExpression.Columns => Columns;
 
-        public override void CollectValidationErrors(ICollection<string> errors)
-        {
-            if (string.IsNullOrEmpty(TableName))
-                errors.Add(ErrorMessages.TableNameCannotBeNullOrEmpty);
-
-            foreach (var column in Columns)
-                column.CollectValidationErrors(errors);
-        }
-
+        /// <inheritdoc />
         public override void ExecuteWith(IMigrationProcessor processor)
         {
             processor.Process(this);
         }
 
+        /// <inheritdoc />
         public override IMigrationExpression Reverse()
         {
             return new DeleteTableExpression
@@ -54,9 +66,13 @@ namespace FluentMigrator.Expressions
                     };
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return base.ToString() + TableName;
         }
+
+        /// <inheritdoc />
+        IEnumerable<object> IValidationChildren.Children => Columns;
     }
 }

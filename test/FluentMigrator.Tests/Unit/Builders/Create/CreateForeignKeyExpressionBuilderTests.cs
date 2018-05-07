@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -138,7 +138,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
         }
 
         [TestCase(Rule.Cascade), TestCase(Rule.SetDefault), TestCase(Rule.SetNull), TestCase(Rule.None)]
-        public void CallingOnUpdateSetsOnUpdateToSpecifiedRule(Rule rule) 
+        public void CallingOnUpdateSetsOnUpdateToSpecifiedRule(Rule rule)
         {
             var expression = new CreateForeignKeyExpression();
             var builder = new CreateForeignKeyExpressionBuilder(expression);
@@ -148,7 +148,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
         }
 
         [TestCase(Rule.Cascade), TestCase(Rule.SetDefault), TestCase(Rule.SetNull), TestCase(Rule.None)]
-        public void CallingOnDeleteSetsOnDeleteToSpecifiedRule(Rule rule) 
+        public void CallingOnDeleteSetsOnDeleteToSpecifiedRule(Rule rule)
         {
             var expression = new CreateForeignKeyExpression();
             var builder = new CreateForeignKeyExpressionBuilder(expression);
@@ -158,7 +158,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
         }
 
         [TestCase(Rule.Cascade), TestCase(Rule.SetDefault), TestCase(Rule.SetNull), TestCase(Rule.None)]
-        public void CallingOnDeleteOrUpdateSetsBothOnDeleteAndOnUpdateToSpecifiedRule(Rule rule) 
+        public void CallingOnDeleteOrUpdateSetsBothOnDeleteAndOnUpdateToSpecifiedRule(Rule rule)
         {
             var expression = new CreateForeignKeyExpression();
             var builder = new CreateForeignKeyExpressionBuilder(expression);

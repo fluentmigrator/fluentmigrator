@@ -1,20 +1,22 @@
 ﻿using NUnit.Framework;
-using NUnit.Should;
+
 using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Runner.Generators.Firebird;
 using FluentMigrator.Expressions;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Generators.Firebird
 {
     [TestFixture]
     public class FirebirdGeneratorTests
     {
-        protected FirebirdGenerator generator;
+        protected FirebirdGenerator Generator { get; set; }
 
         [SetUp]
         public void Setup()
         {
-            generator = new FirebirdGenerator(FirebirdOptions.StandardBehaviour());
+            Generator = new FirebirdGenerator(FirebirdOptions.StandardBehaviour());
         }
 
         [Test]
@@ -35,7 +37,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
                 }
             };
 
-            var result = generator.GenerateAlterSequence(expression.Sequence);
+            var result = Generator.GenerateAlterSequence(expression.Sequence);
             result.ShouldBe("ALTER SEQUENCE \"Sequence\" RESTART WITH 2");
         }
     }

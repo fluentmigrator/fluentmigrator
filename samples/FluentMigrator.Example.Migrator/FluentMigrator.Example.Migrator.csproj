@@ -4,11 +4,11 @@
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <Description>Example project that shows how to execute migrations</Description>
   </PropertyGroup>
-
   <Import Project="$(MSBuildThisFileDirectory)../../Global.proj" />
-
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.Sqlite" Version="2.0.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="2.0.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\FluentMigrator.Runner\FluentMigrator.Runner.csproj" />

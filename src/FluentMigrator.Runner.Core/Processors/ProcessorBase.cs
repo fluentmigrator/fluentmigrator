@@ -16,19 +16,90 @@
 //
 #endregion
 
+using System;
 using System.Collections.Generic;
 using System.Data;
 
 using FluentMigrator.Expressions;
+using FluentMigrator.Runner.Announcers;
+using FluentMigrator.Runner.Logging;
+
+using JetBrains.Annotations;
+
+using Microsoft.Extensions.Logging;
 
 namespace FluentMigrator.Runner.Processors
 {
     public abstract class ProcessorBase : IMigrationProcessor
     {
-        protected readonly IMigrationGenerator Generator;
-        protected readonly IAnnouncer Announcer;
-        public IMigrationProcessorOptions Options { get; }
+#pragma warning disable 612
+        [Obsolete]
+        private readonly IMigrationProcessorOptions _legacyOptions;
+#pragma warning restore 612
 
+        protected internal readonly IMigrationGenerator Generator;
+
+#pragma warning disable 612
+        [Obsolete]
+        protected readonly IAnnouncer Announcer;
+#pragma warning restore 612
+
+        [Obsolete]
+        protected ProcessorBase(
+            IMigrationGenerator generator,
+            IAnnouncer announcer,
+            [NotNull] IMigrationProcessorOptions options)
+        {
+            Generator = generator;
+            Announcer = announcer;
+            Logger = new AnnouncerFluentMigratorLogger(announcer);
+            Options = options as ProcessorOptions ?? new ProcessorOptions()
+            {
+                PreviewOnly = options.PreviewOnly,
+                ProviderSwitches = options.ProviderSwitches,
+                Timeout = options.Timeout == null ? null : (TimeSpan?) TimeSpan.FromSeconds(options.Timeout.Value),
+            };
+
+            _legacyOptions = options;
+        }
+
+        [Obsolete]
+        protected ProcessorBase(
+            [NotNull] IMigrationGenerator generator,
+            [NotNull] IAnnouncer announcer,
+            [NotNull] ProcessorOptions options)
+        {
+            Generator = generator;
+            Announcer = announcer;
+            Options = options;
+            _legacyOptions = options;
+            Logger = new AnnouncerFluentMigratorLogger(announcer);
+        }
+
+        protected ProcessorBase(
+            [NotNull] IMigrationGenerator generator,
+            [NotNull] ILogger logger,
+            [NotNull] ProcessorOptions options)
+        {
+            Generator = generator;
+            Options = options;
+            Logger = logger;
+#pragma warning disable 612
+            Announcer = new LoggerAnnouncer(
+                logger,
+                new AnnouncerOptions()
+                {
+                    ShowSql = true,
+                    ShowElapsedTime = true,
+                });
+            _legacyOptions = options;
+#pragma warning restore 612
+        }
+
+        [Obsolete]
+        IMigrationProcessorOptions IMigrationProcessor.Options => _legacyOptions;
+
+        [Obsolete]
         public abstract string ConnectionString { get; }
 
         public abstract string DatabaseType { get; }
@@ -37,12 +108,10 @@ namespace FluentMigrator.Runner.Processors
 
         public bool WasCommitted { get; protected set; }
 
-        protected ProcessorBase(IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options)
-        {
-            Generator = generator;
-            Announcer = announcer;
-            Options = options;
-        }
+        protected internal ILogger Logger { get; }
+
+        [NotNull]
+        protected ProcessorOptions Options { get; }
 
         public virtual void Process(CreateSchemaExpression expression)
         {
@@ -185,6 +254,12 @@ namespace FluentMigrator.Runner.Processors
         public abstract DataSet Read(string template, params object[] args);
 
         public abstract bool Exists(string template, params object[] args);
+
+        /// <inheritdoc />
+        public virtual void Execute(string sql)
+        {
+            Execute(sql.Replace("{", "{{").Replace("}", "}}"), Array.Empty<object>());
+        }
 
         public abstract void Execute(string template, params object[] args);
 

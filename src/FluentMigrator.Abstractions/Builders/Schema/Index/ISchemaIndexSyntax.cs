@@ -20,8 +20,15 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Schema.Index
 {
+    /// <summary>
+    /// Query an index' existence
+    /// </summary>
     public interface ISchemaIndexSyntax : IFluentSyntax
     {
+        /// <summary>
+        /// Returns <c>true</c> when the index exists
+        /// </summary>
+        /// <returns><c>true</c> when the index exists</returns>
         bool Exists();
     }
 }

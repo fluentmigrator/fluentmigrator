@@ -1,30 +1,54 @@
+#region License
+//
+// Copyright (c) 2018, Fluent Migrator Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+#endregion
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+using FluentMigrator.Model;
+using FluentMigrator.Runner.Generators.Generic;
+
+using Microsoft.Extensions.Options;
+
 namespace FluentMigrator.Runner.Generators.DB2
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-
-    using FluentMigrator.Model;
-    using FluentMigrator.Runner.Generators.Generic;
-
     public class Db2Generator : GenericGenerator
     {
-        #region Constructors
-
         public Db2Generator()
             : this(new Db2Quoter())
         {
         }
 
-        public Db2Generator(IQuoter quoter)
-            : base(new Db2Column(quoter), quoter, new EmptyDescriptionGenerator())
+        public Db2Generator(
+            Db2Quoter quoter)
+            : this(
+                quoter,
+                new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()))
         {
         }
 
-        #endregion Constructors
-
-        #region Methods
+        public Db2Generator(
+            Db2Quoter quoter,
+            IOptions<GeneratorOptions> generatorOptions)
+            : base(new Db2Column(quoter), quoter, new EmptyDescriptionGenerator(), generatorOptions)
+        {
+        }
 
         public override string Generate(Expressions.AlterDefaultConstraintExpression expression)
         {
@@ -62,7 +86,7 @@ namespace FluentMigrator.Runner.Generators.DB2
             builder.AppendFormat("ALTER TABLE {0}", Quoter.QuoteTableName(expression.TableName, expression.SchemaName));
             foreach (var column in expression.ColumnNames)
             {
-                builder.AppendFormat(" DROP COLUMN {0}", this.Quoter.QuoteColumnName(column));
+                builder.AppendFormat(" DROP COLUMN {0}", Quoter.QuoteColumnName(column));
             }
 
             return builder.ToString();
@@ -118,7 +142,7 @@ namespace FluentMigrator.Runner.Generators.DB2
 
             var constraintType = expression.Constraint.IsPrimaryKeyConstraint ? "PRIMARY KEY" : "UNIQUE";
             var quotedNames = expression.Constraint.Columns.Select(q => Quoter.QuoteColumnName(q));
-            var columnList = string.Join(", ", quotedNames.ToArray<string>());
+            var columnList = string.Join(", ", quotedNames.ToArray());
 
             return string.Format(
                 "ALTER TABLE {0} ADD CONSTRAINT {1} {2} ({3})",
@@ -220,7 +244,7 @@ namespace FluentMigrator.Runner.Generators.DB2
 
         public override string Generate(Expressions.RenameColumnExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("This feature not directly supported by most versions of DB2.");
+            return CompatibilityMode.HandleCompatibilty("This feature not directly supported by most versions of DB2.");
         }
 
         public override string Generate(Expressions.InsertDataExpression expression)
@@ -291,15 +315,12 @@ namespace FluentMigrator.Runner.Generators.DB2
             }
             catch (NotSupportedException e)
             {
-                return compatabilityMode.HandleCompatabilty(e.Message);
+                return CompatibilityMode.HandleCompatibilty(e.Message);
             }
         }
-
         public override string Generate(Expressions.AlterSchemaExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("This feature not directly supported by most versions of DB2.");
+            return CompatibilityMode.HandleCompatibilty("This feature not directly supported by most versions of DB2.");
         }
-
-        #endregion Methods
     }
 }

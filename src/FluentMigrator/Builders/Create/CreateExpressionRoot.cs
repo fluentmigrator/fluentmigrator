@@ -29,15 +29,23 @@ using FluentMigrator.Model;
 
 namespace FluentMigrator.Builders.Create
 {
+    /// <summary>
+    /// The <see cref="ICreateExpressionRoot"/> implementation
+    /// </summary>
     public class CreateExpressionRoot : ICreateExpressionRoot
     {
         private readonly IMigrationContext _context;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CreateExpressionRoot"/> class.
+        /// </summary>
+        /// <param name="context">The migration context</param>
         public CreateExpressionRoot(IMigrationContext context)
         {
             _context = context;
         }
 
+        /// <inheritdoc />
         public ICreateSchemaOptionsSyntax Schema(string schemaName)
         {
             var expression = new CreateSchemaExpression { SchemaName = schemaName };
@@ -45,6 +53,7 @@ namespace FluentMigrator.Builders.Create
             return new CreateSchemaExpressionBuilder(expression);
         }
 
+        /// <inheritdoc />
         public ICreateTableWithColumnOrSchemaOrDescriptionSyntax Table(string tableName)
         {
             var expression = new CreateTableExpression { TableName = tableName };
@@ -52,6 +61,7 @@ namespace FluentMigrator.Builders.Create
             return new CreateTableExpressionBuilder(expression, _context);
         }
 
+        /// <inheritdoc />
         public ICreateColumnOnTableSyntax Column(string columnName)
         {
             var expression = new CreateColumnExpression { Column = { Name = columnName } };
@@ -59,6 +69,7 @@ namespace FluentMigrator.Builders.Create
             return new CreateColumnExpressionBuilder(expression, _context);
         }
 
+        /// <inheritdoc />
         public ICreateForeignKeyFromTableSyntax ForeignKey()
         {
             var expression = new CreateForeignKeyExpression();
@@ -66,6 +77,7 @@ namespace FluentMigrator.Builders.Create
             return new CreateForeignKeyExpressionBuilder(expression);
         }
 
+        /// <inheritdoc />
         public ICreateForeignKeyFromTableSyntax ForeignKey(string foreignKeyName)
         {
             var expression = new CreateForeignKeyExpression { ForeignKey = { Name = foreignKeyName } };
@@ -73,6 +85,7 @@ namespace FluentMigrator.Builders.Create
             return new CreateForeignKeyExpressionBuilder(expression);
         }
 
+        /// <inheritdoc />
         public ICreateIndexForTableSyntax Index()
         {
             var expression = new CreateIndexExpression();
@@ -80,6 +93,7 @@ namespace FluentMigrator.Builders.Create
             return new CreateIndexExpressionBuilder(expression);
         }
 
+        /// <inheritdoc />
         public ICreateIndexForTableSyntax Index(string indexName)
         {
             var expression = new CreateIndexExpression { Index = { Name = indexName } };
@@ -87,6 +101,7 @@ namespace FluentMigrator.Builders.Create
             return new CreateIndexExpressionBuilder(expression);
         }
 
+        /// <inheritdoc />
         public ICreateSequenceInSchemaSyntax Sequence(string sequenceName)
         {
             var expression = new CreateSequenceExpression { Sequence = { Name = sequenceName } };
@@ -94,6 +109,7 @@ namespace FluentMigrator.Builders.Create
             return new CreateSequenceExpressionBuilder(expression);
         }
 
+        /// <inheritdoc />
         public ICreateConstraintOnTableSyntax UniqueConstraint()
         {
             var expression = new CreateConstraintExpression(ConstraintType.Unique);
@@ -101,7 +117,8 @@ namespace FluentMigrator.Builders.Create
             return new CreateConstraintExpressionBuilder(expression);
         }
 
-        public Constraint.ICreateConstraintOnTableSyntax UniqueConstraint(string constraintName)
+        /// <inheritdoc />
+        public ICreateConstraintOnTableSyntax UniqueConstraint(string constraintName)
         {
             var expression = new CreateConstraintExpression(ConstraintType.Unique);
             expression.Constraint.ConstraintName = constraintName;
@@ -109,14 +126,16 @@ namespace FluentMigrator.Builders.Create
             return new CreateConstraintExpressionBuilder(expression);
         }
 
-        public Constraint.ICreateConstraintOnTableSyntax PrimaryKey()
+        /// <inheritdoc />
+        public ICreateConstraintOnTableSyntax PrimaryKey()
         {
             var expression = new CreateConstraintExpression(ConstraintType.PrimaryKey);
             _context.Expressions.Add(expression);
             return new CreateConstraintExpressionBuilder(expression);
         }
 
-        public Constraint.ICreateConstraintOnTableSyntax PrimaryKey(string primaryKeyName)
+        /// <inheritdoc />
+        public ICreateConstraintOnTableSyntax PrimaryKey(string primaryKeyName)
         {
             var expression = new CreateConstraintExpression(ConstraintType.PrimaryKey);
             expression.Constraint.ConstraintName = primaryKeyName;

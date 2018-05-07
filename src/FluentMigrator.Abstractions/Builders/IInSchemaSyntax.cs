@@ -20,8 +20,15 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders
 {
+    /// <summary>
+    /// Defines the schema
+    /// </summary>
     public interface IInSchemaSyntax : IFluentSyntax
     {
+        /// <summary>
+        /// Specifies the schema
+        /// </summary>
+        /// <param name="schemaName">The schema name</param>
         void InSchema(string schemaName);
     }
 }

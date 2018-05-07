@@ -16,10 +16,7 @@
 //
 #endregion
 
-using System.Reflection;
-
 using FluentMigrator.Runner;
-using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Runner.Processors.MySql;
@@ -29,8 +26,12 @@ using FluentMigrator.Runner.Versioning;
 using FluentMigrator.Runner.VersionTableInfo;
 using FluentMigrator.Tests.Unit;
 
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Integration
 {
@@ -49,11 +50,15 @@ namespace FluentMigrator.Tests.Integration
         [Test]
         public void CanUseVersionInfo()
         {
-            ExecuteWithSupportedProcessors(processor =>
+            ExecuteWithSupportedProcessors(
+                services => services.WithMigrationsIn("FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3"),
+                (serviceProvider, processor) =>
                 {
-                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), new RunnerContext(new TextWriterAnnouncer(TestContext.Out)) { Namespace = "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3" }, processor);
+                    var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
 
-                    IVersionTableMetaData tableMetaData = new DefaultVersionTableMetaData();
+                    IVersionTableMetaData tableMetaData = new DefaultVersionTableMetaData(
+                        ConventionSets.NoSchemaName,
+                        serviceProvider.GetRequiredService<IOptions<RunnerOptions>>());
 
                     //ensure table doesn't exist
                     if (processor.TableExists(tableMetaData.SchemaName, tableMetaData.TableName))
@@ -70,55 +75,71 @@ namespace FluentMigrator.Tests.Integration
         [Test]
         public void CanUseCustomVersionInfo()
         {
-            ExecuteWithSupportedProcessors(processor =>
-            {
-                var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), new RunnerContext(new TextWriterAnnouncer(TestContext.Out)) { Namespace = "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3" }, processor);
+            ExecuteWithSupportedProcessors(
+                services => services
+                    .WithMigrationsIn("FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3")
+                    .AddSingleton<IVersionTableMetaDataAccessor>(new PassThroughVersionTableMetaDataAccessor(new TestVersionTableMetaData())),
+                (serviceProvider, processor) =>
+                {
+                    var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
 
-                var tableMetaData = new TestVersionTableMetaData();
+                    var tableMetaData = new TestVersionTableMetaData();
 
-                //ensure table doesn't exist
-                if (processor.TableExists(tableMetaData.SchemaName, tableMetaData.TableName))
-                    runner.Down(new VersionMigration(tableMetaData));
+                    //ensure table doesn't exist
+                    if (processor.TableExists(tableMetaData.SchemaName, tableMetaData.TableName))
+                        runner.Down(new VersionMigration(tableMetaData));
 
-                //ensure schema doesn't exist
-                if (processor.SchemaExists(tableMetaData.SchemaName))
-                    runner.Down(new VersionSchemaMigration(tableMetaData));
+                    //ensure schema doesn't exist
+                    if (processor.SchemaExists(tableMetaData.SchemaName))
+                        runner.Down(new VersionSchemaMigration(tableMetaData));
 
+                    runner.MigrateUp(200909060930);
 
-                runner.Up(new VersionSchemaMigration(tableMetaData));
-                processor.SchemaExists(tableMetaData.SchemaName).ShouldBeTrue();
+                    processor.SchemaExists(tableMetaData.SchemaName).ShouldBeTrue();
+                    processor.TableExists(tableMetaData.SchemaName, tableMetaData.TableName).ShouldBeTrue();
 
-                runner.Up(new VersionMigration(tableMetaData));
-                processor.TableExists(tableMetaData.SchemaName, tableMetaData.TableName).ShouldBeTrue();
+                    runner.RollbackToVersion(0);
 
-                runner.Down(new VersionMigration(tableMetaData));
-                processor.TableExists(tableMetaData.SchemaName, tableMetaData.TableName).ShouldBeFalse();
-
-                runner.Down(new VersionSchemaMigration(tableMetaData));
-                processor.SchemaExists(tableMetaData.SchemaName).ShouldBeFalse();
-            }, true, typeof(SQLiteProcessor), typeof(MySqlProcessor), typeof(FirebirdProcessor), typeof(SqlAnywhereProcessor));
+                    processor.TableExists(tableMetaData.SchemaName, tableMetaData.TableName).ShouldBeFalse();
+                    processor.SchemaExists(tableMetaData.SchemaName).ShouldBeFalse();
+                },
+                true,
+                typeof(SQLiteProcessor),
+                typeof(MySqlProcessor),
+                typeof(FirebirdProcessor),
+                typeof(SqlAnywhereProcessor));
         }
 
         [Test]
         public void CanUseCustomVersionInfoDefaultSchema()
         {
-            ExecuteWithSupportedProcessors(processor =>
-            {
-                var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), new RunnerContext(new TextWriterAnnouncer(TestContext.Out)) { Namespace = "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3" }, processor);
+            ExecuteWithSupportedProcessors(
+                services => services
+                    .WithMigrationsIn("FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3")
+                    .AddSingleton<IVersionTableMetaDataAccessor>(
+                        new PassThroughVersionTableMetaDataAccessor(
+                            new TestVersionTableMetaData()
+                            {
+                                SchemaName = null
+                            })),
+                (serviceProvider, processor) =>
+                {
+                    var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
 
-                IVersionTableMetaData tableMetaData = new TestVersionTableMetaData { SchemaName = null };
+                    IVersionTableMetaData tableMetaData = new TestVersionTableMetaData { SchemaName = null };
 
+                    //ensure table doesn't exist
+                    if (processor.TableExists(tableMetaData.SchemaName, tableMetaData.TableName))
+                        runner.Down(new VersionMigration(tableMetaData));
 
-                //ensure table doesn't exist
-                if (processor.TableExists(tableMetaData.SchemaName, tableMetaData.TableName))
-                    runner.Down(new VersionMigration(tableMetaData));
+                    runner.MigrateUp(200909060930);
 
-                runner.Up(new VersionMigration(tableMetaData));
-                processor.TableExists(null, tableMetaData.TableName).ShouldBeTrue();
+                    processor.TableExists(null, tableMetaData.TableName).ShouldBeTrue();
 
-                runner.Down(new VersionMigration(tableMetaData));
-                processor.TableExists(null, tableMetaData.TableName).ShouldBeFalse();
-            });
+                    runner.RollbackToVersion(0);
+
+                    processor.TableExists(null, tableMetaData.TableName).ShouldBeFalse();
+                });
         }
     }
 }

@@ -79,7 +79,7 @@
     <value>Die SQL-Anweisung darf nicht null oder leer sein.</value>
   </data>
   <data name="TableNameCannotBeNullOrEmpty" xml:space="preserve">
-    <value>Der abellenname darf nicht null oder leer sein.</value>
+    <value>Der Tabellenname darf nicht null oder leer sein.</value>
   </data>
   <data name="UpdateDataExpressionMustNotSpecifyBothWhereClauseAndAllRows" xml:space="preserve">
     <value>Die Update-Anweisung spezifiziert sowohl eine .Where()-Bedingung und auch, dass .AllRows() als Ziel gewählt werden sollen. Nur eines von beiden darf angegeben werden.</value>
@@ -89,5 +89,11 @@
   </data>
   <data name="MethodXMustBeCalledOnObjectImplementingY" xml:space="preserve">
     <value>Die Methode {0} darf nur auf einem Objekt aufgerufen werden, dass {1} implementiert.</value>
+  </data>
+  <data name="ExpressionTableNameMissing" xml:space="preserve">
+    <value>expression.TableName darf nicht leer sein</value>
+  </data>
+  <data name="ExpressionTableNameMissingWithHints" xml:space="preserve">
+    <value>Der Tabellenname wurde nicht angegeben. Stellen Sie sicher, dass sie die "OnTable"-Erweiterungsmethode aufgerufen haben. Der Aufruf sollte wie folgt aussehen: Delete.ForeignKey(KeyName).OnTable(TableName)</value>
   </data>
 </root>

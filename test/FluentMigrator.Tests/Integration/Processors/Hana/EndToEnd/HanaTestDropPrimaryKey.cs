@@ -14,16 +14,7 @@
 // limitations under the License.
 #endregion
 
-using System;
-
-using FluentMigrator.Runner.Announcers;
-using FluentMigrator.Runner.Generators.Hana;
-using FluentMigrator.Runner.Processors;
-using FluentMigrator.Runner.Processors.Hana;
-
 using NUnit.Framework;
-
-using Sap.Data.Hana;
 
 namespace FluentMigrator.Tests.Integration.Processors.Hana.EndToEnd
 {
@@ -53,7 +44,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana.EndToEnd
                 foreach (var tableName in tableNames)
                 {
                     if (sc.Processor.TableExists(null, tableName))
-                        sc.Processor.Execute(string.Format("DROP TABLE \"{0}\"", tableName));
+                        sc.Processor.Execute("DROP TABLE \"{0}\"", tableName);
                 }
             }
         }

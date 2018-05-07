@@ -1,3 +1,21 @@
+#region License
+//
+// Copyright (c) 2018, Fluent Migrator Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+#endregion
+
 using FluentMigrator.Runner.Helpers;
 
 #region License
@@ -22,20 +40,56 @@ using FluentMigrator.Runner.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
+using System.Data.SqlClient;
 using System.IO;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.BatchParser;
 using FluentMigrator.Runner.BatchParser.Sources;
 using FluentMigrator.Runner.BatchParser.SpecialTokenSearchers;
+using FluentMigrator.Runner.Generators.SqlServer;
+using FluentMigrator.Runner.Initialization;
+
+using JetBrains.Annotations;
+
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
-    public sealed class SqlServer2000Processor : GenericProcessorBase
+    public class SqlServer2000Processor : GenericProcessorBase
     {
+        [CanBeNull]
+        private readonly IServiceProvider _serviceProvider;
+
+        [Obsolete]
         public SqlServer2000Processor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(connection, factory, generator, announcer, options)
         {
+        }
+
+        public SqlServer2000Processor(
+            [NotNull] ILogger<SqlServer2000Processor> logger,
+            [NotNull] SqlServer2000Generator generator,
+            [NotNull] IOptions<ProcessorOptions> options,
+            [NotNull] IConnectionStringAccessor connectionStringAccessor,
+            [NotNull] IServiceProvider serviceProvider)
+            : this(SqlClientFactory.Instance, logger, generator, options, connectionStringAccessor, serviceProvider)
+        {
+        }
+
+        protected SqlServer2000Processor(
+            DbProviderFactory factory,
+            [NotNull] ILogger logger,
+            [NotNull] SqlServer2000Generator generator,
+            [NotNull] IOptions<ProcessorOptions> options,
+            [NotNull] IConnectionStringAccessor connectionStringAccessor,
+            [NotNull] IServiceProvider serviceProvider)
+            : base(() => factory, generator, logger, options.Value, connectionStringAccessor)
+        {
+            _serviceProvider = serviceProvider;
         }
 
         public override string DatabaseType => "SqlServer2000";
@@ -45,19 +99,24 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         public override void BeginTransaction()
         {
             base.BeginTransaction();
-            Announcer.Sql("BEGIN TRANSACTION");
+            Logger.LogSql("BEGIN TRANSACTION");
         }
 
         public override void CommitTransaction()
         {
             base.CommitTransaction();
-            Announcer.Sql("COMMIT TRANSACTION");
+            Logger.LogSql("COMMIT TRANSACTION");
         }
 
         public override void RollbackTransaction()
         {
+            if (Transaction == null)
+            {
+                return;
+            }
+
             base.RollbackTransaction();
-            Announcer.Sql("ROLLBACK TRANSACTION");
+            Logger.LogSql("ROLLBACK TRANSACTION");
         }
 
         public override bool SchemaExists(string schemaName)
@@ -115,7 +174,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         {
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction, Options))
+            using (var command = CreateCommand(String.Format(template, args)))
             using (var reader = command.ExecuteReader())
             {
                 return reader.ReadDataSet();
@@ -126,7 +185,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         {
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction, Options))
+            using (var command = CreateCommand(String.Format(template, args)))
             using (var reader = command.ExecuteReader())
             {
                 return reader.Read();
@@ -140,17 +199,18 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         protected override void Process(string sql)
         {
-            Announcer.Sql(sql);
+            Logger.LogSql(sql);
 
             if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
+            {
                 return;
+            }
 
             EnsureConnectionIsOpen();
 
             if (ContainsGo(sql))
             {
                 ExecuteBatchNonQuery(sql);
-
             }
             else
             {
@@ -158,10 +218,10 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             }
         }
 
-        private static bool ContainsGo(string sql)
+        private bool ContainsGo(string sql)
         {
             var containsGo = false;
-            var parser = new SqlServerBatchParser();
+            var parser = _serviceProvider?.GetService<SqlServerBatchParser>() ?? new SqlServerBatchParser();
             parser.SpecialToken += (sender, args) => containsGo = true;
             using (var source = new TextReaderSource(new StringReader(sql), true))
             {
@@ -173,7 +233,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         private void ExecuteNonQuery(string sql)
         {
-            using (var command = Factory.CreateCommand(sql, Connection, Transaction, Options))
+            using (var command = CreateCommand(sql))
             {
                 try
                 {
@@ -200,19 +260,19 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
             try
             {
-                var parser = new SqlServerBatchParser();
-                parser.SqlText += (sender, args) => { sqlBatch = args.SqlText.Trim(); };
+                var parser = _serviceProvider?.GetService<SqlServerBatchParser>() ?? new SqlServerBatchParser();
+                parser.SqlText += (sender, args) => sqlBatch = args.SqlText.Trim();
                 parser.SpecialToken += (sender, args) =>
                 {
                     if (string.IsNullOrEmpty(sqlBatch))
+                    {
                         return;
+                    }
 
                     if (args.Opaque is GoSearcher.GoSearcherParameters goParams)
                     {
-                        using (var command = Factory.CreateCommand(string.Empty, Connection, Transaction, Options))
+                        using (var command = CreateCommand(sqlBatch))
                         {
-                            command.CommandText = sqlBatch;
-
                             for (var i = 0; i != goParams.Count; ++i)
                             {
                                 command.ExecuteNonQuery();

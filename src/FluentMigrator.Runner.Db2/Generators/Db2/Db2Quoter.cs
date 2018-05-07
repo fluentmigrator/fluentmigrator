@@ -31,6 +31,8 @@ namespace FluentMigrator.Runner.Generators.DB2
 
         protected override bool ShouldQuote(string name)
         {
+            if (string.IsNullOrEmpty(name))
+                return false;
             // Quotes are only included if the name contains a special character, in order to preserve case insensitivity where possible.
             return name.IndexOfAny(SpecialChars) != -1;
         }

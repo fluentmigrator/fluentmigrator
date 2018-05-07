@@ -1,12 +1,32 @@
-using FluentMigrator.Runner.Announcers;
-using FluentMigrator.Runner.Generators;
+#region License
+//
+// Copyright (c) 2018, Fluent Migrator Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+#endregion
+
+using FluentMigrator.Runner;
 using FluentMigrator.Runner.Generators.Postgres;
-using FluentMigrator.Runner.Processors;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.Postgres;
 using FluentMigrator.Tests.Helpers;
+
+using Microsoft.Extensions.DependencyInjection;
+
 using NUnit.Framework;
-using NUnit.Should;
-using Npgsql;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Integration.Processors.Postgres
 {
@@ -15,30 +35,10 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
     [Category("Postgres")]
     public class PostgresSchemaExtensionsTests : BaseSchemaExtensionsTests
     {
-        public NpgsqlConnection Connection { get; set; }
-        public PostgresProcessor Processor { get; set; }
-        public IQuoter Quoter { get; set; }
-
-        [SetUp]
-        public void SetUp()
-        {
-            if (!IntegrationTestOptions.Postgres.IsEnabled)
-                Assert.Ignore();
-            Connection = new NpgsqlConnection(IntegrationTestOptions.Postgres.ConnectionString);
-            Processor = new PostgresProcessor(Connection, new PostgresGenerator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), new PostgresDbFactory());
-            Quoter = new PostgresQuoter();
-            Connection.Open();
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            if (Processor == null)
-                return;
-
-            Processor.CommitTransaction();
-            Processor.Dispose();
-        }
+        private ServiceProvider ServiceProvider { get; set; }
+        private IServiceScope ServiceScope { get; set; }
+        private PostgresProcessor Processor { get; set; }
+        private PostgresQuoter Quoter { get; set; }
 
         [Test]
         public override void CallingColumnExistsCanAcceptSchemaNameWithSingleQuote()
@@ -59,11 +59,11 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
         {
             using (var table = new PostgresTestTable(Processor, "Test'Schema", "id int"))
             {
-                var idxName = string.Format("\"idx_{0}\"", Quoter.UnQuote(table.Name));
+                var idxName = $"\"idx_{Quoter.UnQuote(table.Name)}\"";
 
                 var cmd = table.Connection.CreateCommand();
                 cmd.Transaction = table.Transaction;
-                cmd.CommandText = string.Format("CREATE INDEX {0} ON {1} (id)", idxName, table.NameWithSchema);
+                cmd.CommandText = $"CREATE INDEX {idxName} ON {table.NameWithSchema} (id)";
                 cmd.ExecuteNonQuery();
 
                 Processor.IndexExists("Test'Schema", table.Name, idxName).ShouldBeTrue();
@@ -92,6 +92,39 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
                 table.WithDefaultValueOn("id");
                 Processor.DefaultValueExists("test'schema", table.Name, "id", 1).ShouldBeTrue();
             }
+        }
+
+        [OneTimeSetUp]
+        public void ClassSetUp()
+        {
+            if (!IntegrationTestOptions.Postgres.IsEnabled)
+                Assert.Ignore();
+
+            var serivces = ServiceCollectionExtensions.CreateServices()
+                .ConfigureRunner(r => r.AddPostgres())
+                .AddScoped<IConnectionStringReader>(
+                    _ => new PassThroughConnectionStringReader(IntegrationTestOptions.Postgres.ConnectionString));
+            ServiceProvider = serivces.BuildServiceProvider();
+        }
+
+        [OneTimeTearDown]
+        public void ClassTearDown()
+        {
+            ServiceProvider?.Dispose();
+        }
+
+        [SetUp]
+        public void SetUp()
+        {
+            ServiceScope = ServiceProvider.CreateScope();
+            Processor = ServiceScope.ServiceProvider.GetRequiredService<PostgresProcessor>();
+            Quoter = ServiceScope.ServiceProvider.GetRequiredService<PostgresQuoter>();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            ServiceScope?.Dispose();
         }
     }
 }

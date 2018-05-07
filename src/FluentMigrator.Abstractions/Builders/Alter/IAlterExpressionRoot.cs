@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -22,10 +22,23 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Alter
 {
+    /// <summary>
+    /// The root expression interface for the alterations
+    /// </summary>
     public interface IAlterExpressionRoot : IFluentSyntax
     {
-        //void Schema(string schemaName);
+        /// <summary>
+        /// Alter the table or its columns/options
+        /// </summary>
+        /// <param name="tableName">The table name</param>
+        /// <returns>The interface for the modifications</returns>
         IAlterTableAddColumnOrAlterColumnOrSchemaOrDescriptionSyntax Table(string tableName);
+
+        /// <summary>
+        /// Alter the column for a given table
+        /// </summary>
+        /// <param name="columnName">The column name</param>
+        /// <returns>The interface to specify the table</returns>
         IAlterColumnOnTableSyntax Column(string columnName);
     }
 }

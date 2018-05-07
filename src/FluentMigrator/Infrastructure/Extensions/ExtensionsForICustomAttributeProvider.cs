@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -17,47 +17,85 @@
 #endregion
 
 using System;
+using System.Linq;
 using System.Reflection;
 
 namespace FluentMigrator.Infrastructure.Extensions
 {
+    /// <summary>
+    /// Extension methods for <see cref="ICustomAttributeProvider"/>
+    /// </summary>
     public static class ExtensionsForICustomAttributeProvider
     {
+        /// <summary>
+        /// Get the first attribute of exactly the given type
+        /// </summary>
+        /// <typeparam name="T">The attribute type to search for</typeparam>
+        /// <param name="member">The <see cref="ICustomAttributeProvider"/></param>
+        /// <returns>The found attribute or <c>null</c></returns>
         public static T GetOneAttribute<T>(this ICustomAttributeProvider member)
             where T : Attribute
         {
             return member.GetOneAttribute<T>(false);
         }
 
+        /// <summary>
+        /// Get the first attribute of the given type
+        /// </summary>
+        /// <typeparam name="T">The attribute type to search for</typeparam>
+        /// <param name="member">The <see cref="ICustomAttributeProvider"/></param>
+        /// <param name="inherit"><c>true</c> when attributes derived form <typeparamref name="T"/> should be returned too</param>
+        /// <returns>The found attribute or <c>null</c></returns>
         public static T GetOneAttribute<T>(this ICustomAttributeProvider member, bool inherit)
             where T : Attribute
         {
-            T[] attributes = member.GetCustomAttributes(typeof(T), inherit) as T[];
-
-            if ((attributes == null) || (attributes.Length == 0))
-                return null;
-            else
-                return attributes[0];
+            return member.GetCustomAttributes(typeof(T), inherit).OfType<T>().FirstOrDefault();
         }
 
+        /// <summary>
+        /// Get all attributes of exactly the given type
+        /// </summary>
+        /// <typeparam name="T">The attribute type to search for</typeparam>
+        /// <param name="member">The <see cref="ICustomAttributeProvider"/></param>
+        /// <returns>The found attributes</returns>
         public static T[] GetAllAttributes<T>(this ICustomAttributeProvider member)
             where T : Attribute
         {
             return member.GetAllAttributes<T>(false);
         }
 
+        /// <summary>
+        /// Get all attributes of the given type
+        /// </summary>
+        /// <typeparam name="T">The attribute type to search for</typeparam>
+        /// <param name="member">The <see cref="ICustomAttributeProvider"/></param>
+        /// <param name="inherit"><c>true</c> when attributes derived form <typeparamref name="T"/> should be returned too</param>
+        /// <returns>The found attributes</returns>
         public static T[] GetAllAttributes<T>(this ICustomAttributeProvider member, bool inherit)
             where T : Attribute
         {
-            return member.GetCustomAttributes(typeof(T), inherit) as T[];
+            return member.GetCustomAttributes(typeof(T), inherit).OfType<T>().ToArray();
         }
 
+        /// <summary>
+        /// Returns a value indicating whether the custom attribute provider contains the given attribute
+        /// </summary>
+        /// <typeparam name="T">The attribute type to search for</typeparam>
+        /// <param name="member">The <see cref="ICustomAttributeProvider"/></param>
+        /// <returns><c>true</c> when an attribute with the given type could be found</returns>
         public static bool HasAttribute<T>(this ICustomAttributeProvider member)
             where T : Attribute
         {
             return member.HasAttribute<T>(false);
         }
 
+        /// <summary>
+        /// Returns a value indicating whether the custom attribute provider contains the given attribute
+        /// </summary>
+        /// <typeparam name="T">The attribute type to search for</typeparam>
+        /// <param name="member">The <see cref="ICustomAttributeProvider"/></param>
+        /// <param name="inherit"><c>true</c> when attributes derived form <typeparamref name="T"/> should be returned too</param>
+        /// <returns><c>true</c> when an attribute with the given type could be found</returns>
         public static bool HasAttribute<T>(this ICustomAttributeProvider member, bool inherit)
             where T : Attribute
         {

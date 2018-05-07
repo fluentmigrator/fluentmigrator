@@ -30,29 +30,48 @@ namespace FluentMigrator.Runner.Processors
 
     public class ReflectionBasedDbFactory : DbFactoryBase
     {
+        private readonly IServiceProvider _serviceProvider;
         private readonly TestEntry[] _testEntries;
 
         private DbProviderFactory _instance;
 
+        [Obsolete]
         public ReflectionBasedDbFactory(string assemblyName, string dbProviderFactoryTypeName)
             : this(new TestEntry(assemblyName, dbProviderFactoryTypeName))
         {
         }
 
+        [Obsolete]
         protected ReflectionBasedDbFactory(params TestEntry[] testEntries)
         {
             if (testEntries.Length == 0)
+            {
                 throw new ArgumentException(@"At least one test entry must be specified", nameof(testEntries));
+            }
+
+            _testEntries = testEntries;
+        }
+
+        protected ReflectionBasedDbFactory(IServiceProvider serviceProvider, params TestEntry[] testEntries)
+        {
+            if (testEntries.Length == 0)
+            {
+                throw new ArgumentException(@"At least one test entry must be specified", nameof(testEntries));
+            }
+
+            _serviceProvider = serviceProvider;
             _testEntries = testEntries;
         }
 
         protected override DbProviderFactory CreateFactory()
         {
             if (_instance != null)
+            {
                 return _instance;
+            }
 
             var exceptions = new List<Exception>();
-            if (TryCreateFactory(_testEntries, exceptions, out var factory))
+            if (TryCreateFactory(_serviceProvider, _testEntries, exceptions, out var factory))
             {
                 _instance = factory;
                 return factory;
@@ -64,18 +83,42 @@ namespace FluentMigrator.Runner.Processors
             throw new AggregateException($"Unable to load the driver. Attempted to load: {assemblyNames}, with {fullExceptionOutput}", exceptions);
         }
 
-        protected static bool TryCreateFactory(IEnumerable<TestEntry> entries, ICollection<Exception> exceptions, out DbProviderFactory factory)
+        [Obsolete]
+        protected static bool TryCreateFactory(
+            [NotNull, ItemNotNull] IEnumerable<TestEntry> entries,
+            [NotNull, ItemNotNull] ICollection<Exception> exceptions,
+            out DbProviderFactory factory)
+        {
+            return TryCreateFactory(serviceProvider: null, entries, exceptions, out factory);
+        }
+
+        protected static bool TryCreateFactory(
+            [CanBeNull] IServiceProvider serviceProvider,
+            [NotNull, ItemNotNull] IEnumerable<TestEntry> entries,
+            [NotNull, ItemNotNull] ICollection<Exception> exceptions,
+            out DbProviderFactory factory)
         {
             foreach (var entry in entries)
             {
                 if (TryCreateFromCurrentDomain(entry, exceptions, out factory))
+                {
                     return true;
-                if (TryCreateFactoryFromRuntimeHost(entry, exceptions, out factory))
+                }
+
+                if (TryCreateFactoryFromRuntimeHost(entry, exceptions, serviceProvider, out factory))
+                {
                     return true;
+                }
+
                 if (TryCreateFromAppDomainPaths(entry, exceptions, out factory))
+                {
                     return true;
+                }
+
                 if (TryCreateFromGac(entry, exceptions, out factory))
+                {
                     return true;
+                }
             }
 
             factory = null;
@@ -83,8 +126,8 @@ namespace FluentMigrator.Runner.Processors
         }
 
         protected static bool TryCreateFromAppDomainPaths(
-            TestEntry entry,
-            ICollection<Exception> exceptions,
+            [NotNull] TestEntry entry,
+            [NotNull, ItemNotNull] ICollection<Exception> exceptions,
             out DbProviderFactory factory)
         {
             if (TryLoadAssemblyFromAppDomainDirectories(entry.AssemblyName, exceptions, out var assembly))
@@ -93,7 +136,9 @@ namespace FluentMigrator.Runner.Processors
                 {
                     var type = assembly.GetType(entry.DBProviderFactoryTypeName, true);
                     if (TryGetInstance(type, out factory))
+                    {
                         return true;
+                    }
 
                     factory = (DbProviderFactory) Activator.CreateInstance(type);
                     return true;
@@ -109,12 +154,25 @@ namespace FluentMigrator.Runner.Processors
             return false;
         }
 
-        protected static bool TryCreateFactoryFromRuntimeHost(TestEntry entry, ICollection<Exception> exceptions, out DbProviderFactory factory)
+        [Obsolete]
+        protected static bool TryCreateFactoryFromRuntimeHost(
+            [NotNull] TestEntry entry,
+            [NotNull, ItemNotNull] ICollection<Exception> exceptions,
+            out DbProviderFactory factory)
+        {
+            return TryCreateFactoryFromRuntimeHost(entry, exceptions, serviceProvider: null, out factory);
+        }
+
+        protected static bool TryCreateFactoryFromRuntimeHost(
+            [NotNull] TestEntry entry,
+            [NotNull, ItemNotNull] ICollection<Exception> exceptions,
+            [CanBeNull] IServiceProvider serviceProvider,
+            out DbProviderFactory factory)
         {
             try
             {
-                factory = (DbProviderFactory) RuntimeHost.Current.CreateInstance(
-                    serviceProvider: null,
+                factory = (DbProviderFactory)RuntimeHost.Current.CreateInstance(
+                    serviceProvider,
                     entry.AssemblyName,
                     entry.DBProviderFactoryTypeName);
                 return true;
@@ -129,77 +187,9 @@ namespace FluentMigrator.Runner.Processors
             return TryCreateFromCurrentDomain(entry, exceptions, out factory);
         }
 
-        private static bool TryCreateFromGac(TestEntry entry, ICollection<Exception> exceptions, out DbProviderFactory factory)
-        {
-            var asmNames = FindAssembliesInGac(entry.AssemblyName);
-            var asmName = asmNames.OrderByDescending(n => n.Version).FirstOrDefault();
-
-            if (asmName == null)
-            {
-                factory = null;
-                return false;
-            }
-
-            try
-            {
-                var assembly = Assembly.Load(asmName);
-                var type = assembly.GetType(entry.DBProviderFactoryTypeName, true);
-                if (TryGetInstance(type, out factory))
-                    return true;
-
-                factory = (DbProviderFactory) Activator.CreateInstance(type);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                exceptions.Add(ex);
-                factory = null;
-                return false;
-            }
-        }
-
-        private static bool TryCreateFromCurrentDomain(TestEntry entry, ICollection<Exception> exceptions, out DbProviderFactory factory)
-        {
-            if (TryLoadAssemblyFromCurrentDomain(entry.AssemblyName, exceptions, out var assembly))
-            {
-                try
-                {
-                    var type = assembly.GetType(entry.DBProviderFactoryTypeName, true);
-                    if (TryGetInstance(type, out factory))
-                        return true;
-
-                    factory = (DbProviderFactory) Activator.CreateInstance(type);
-                    return true;
-                }
-                catch (Exception ex)
-                {
-                    // Ignore
-                    exceptions.Add(ex);
-                }
-            }
-
-            factory = null;
-            return false;
-        }
-
-        private static bool TryLoadAssemblyFromCurrentDomain(string assemblyName, ICollection<Exception> exceptions, out Assembly assembly)
-        {
-            try
-            {
-                assembly = AppDomain.CurrentDomain.Load(new AssemblyName(assemblyName));
-                return true;
-            }
-            catch (Exception ex)
-            {
-                exceptions.Add(ex);
-                assembly = null;
-                return false;
-            }
-        }
-
         protected static bool TryLoadAssemblyFromAppDomainDirectories(
-            string assemblyName,
-            ICollection<Exception> exceptions,
+            [NotNull] string assemblyName,
+            [NotNull, ItemNotNull] ICollection<Exception> exceptions,
             out Assembly assembly)
         {
             return TryLoadAssemblyFromDirectories(
@@ -209,7 +199,11 @@ namespace FluentMigrator.Runner.Processors
                 out assembly);
         }
 
-        protected static bool TryLoadAssemblyFromDirectories(IEnumerable<string> directories, string assemblyName, ICollection<Exception> exceptions, out Assembly assembly)
+        protected static bool TryLoadAssemblyFromDirectories(
+            [NotNull, ItemNotNull] IEnumerable<string> directories,
+            [NotNull] string assemblyName,
+            [NotNull, ItemNotNull] ICollection<Exception> exceptions,
+            out Assembly assembly)
         {
             var alreadyTested = new HashSet<string>(StringComparer.InvariantCulture);
             var assemblyFileName = $"{assemblyName}.dll";
@@ -217,7 +211,9 @@ namespace FluentMigrator.Runner.Processors
             {
                 var path = Path.Combine(directory, assemblyFileName);
                 if (!alreadyTested.Add(path))
+                {
                     continue;
+                }
 
                 try
                 {
@@ -234,7 +230,89 @@ namespace FluentMigrator.Runner.Processors
             return false;
         }
 
-        private static IEnumerable<AssemblyName> FindAssembliesInGac(params string[] names)
+        private static bool TryCreateFromGac(
+            [NotNull] TestEntry entry,
+            [NotNull, ItemNotNull] ICollection<Exception> exceptions,
+            out DbProviderFactory factory)
+        {
+            var asmNames = FindAssembliesInGac(entry.AssemblyName);
+            var asmName = asmNames.OrderByDescending(n => n.Version).FirstOrDefault();
+
+            if (asmName == null)
+            {
+                factory = null;
+                return false;
+            }
+
+            try
+            {
+                var assembly = Assembly.Load(asmName);
+                var type = assembly.GetType(entry.DBProviderFactoryTypeName, true);
+                if (TryGetInstance(type, out factory))
+                {
+                    return true;
+                }
+
+                factory = (DbProviderFactory) Activator.CreateInstance(type);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                exceptions.Add(ex);
+                factory = null;
+                return false;
+            }
+        }
+
+        private static bool TryCreateFromCurrentDomain(
+            [NotNull] TestEntry entry,
+            [NotNull, ItemNotNull] ICollection<Exception> exceptions,
+            out DbProviderFactory factory)
+        {
+            if (TryLoadAssemblyFromCurrentDomain(entry.AssemblyName, exceptions, out var assembly))
+            {
+                try
+                {
+                    var type = assembly.GetType(entry.DBProviderFactoryTypeName, true);
+                    if (TryGetInstance(type, out factory))
+                    {
+                        return true;
+                    }
+
+                    factory = (DbProviderFactory) Activator.CreateInstance(type);
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    // Ignore
+                    exceptions.Add(ex);
+                }
+            }
+
+            factory = null;
+            return false;
+        }
+
+        private static bool TryLoadAssemblyFromCurrentDomain(
+            [NotNull] string assemblyName,
+            [NotNull, ItemNotNull] ICollection<Exception> exceptions,
+            out Assembly assembly)
+        {
+            try
+            {
+                assembly = AppDomain.CurrentDomain.Load(new AssemblyName(assemblyName));
+                return true;
+            }
+            catch (Exception ex)
+            {
+                exceptions.Add(ex);
+                assembly = null;
+                return false;
+            }
+        }
+
+        [NotNull, ItemNotNull]
+        private static IEnumerable<AssemblyName> FindAssembliesInGac([NotNull, ItemNotNull] params string[] names)
         {
             foreach (var name in names)
             {
@@ -245,26 +323,34 @@ namespace FluentMigrator.Runner.Processors
             }
         }
 
-        private static bool TryGetInstance(Type factoryType, out DbProviderFactory factory)
+        private static bool TryGetInstance(
+            [NotNull] Type factoryType,
+            out DbProviderFactory factory)
         {
             var instanceField = factoryType.GetField(
                 "Instance",
                 BindingFlags.Static | BindingFlags.Public | BindingFlags.GetField);
 
             if (instanceField != null && TryCastInstance(instanceField.GetValue(null), out factory))
+            {
                 return true;
+            }
 
             var instanceProperty = factoryType.GetProperty(
                 "Instance",
                 BindingFlags.Static | BindingFlags.Public | BindingFlags.GetProperty);
             if (instanceProperty != null && TryCastInstance(instanceProperty.GetValue(null, null), out factory))
+            {
                 return true;
+            }
 
             factory = null;
             return false;
         }
 
-        private static bool TryCastInstance(object value, out DbProviderFactory factory)
+        private static bool TryCastInstance(
+            [NotNull] object value,
+            out DbProviderFactory factory)
         {
             factory = value as DbProviderFactory;
             return factory != null;
@@ -280,7 +366,9 @@ namespace FluentMigrator.Runner.Processors
                 {
                     assemblyDirectory = Path.GetDirectoryName(assembly.Location);
                     if (assemblyDirectory == null)
+                    {
                         continue;
+                    }
                 }
                 catch
                 {
@@ -294,13 +382,18 @@ namespace FluentMigrator.Runner.Processors
 
         protected class TestEntry
         {
-            public TestEntry(string assemblyName, string dbProviderFactoryTypeName)
+            public TestEntry(
+                [NotNull] string assemblyName,
+                [NotNull] string dbProviderFactoryTypeName)
             {
                 AssemblyName = assemblyName;
                 DBProviderFactoryTypeName = dbProviderFactoryTypeName;
             }
 
+            [NotNull]
             public string AssemblyName { get; }
+
+            [NotNull]
             public string DBProviderFactoryTypeName { get; }
         }
     }

@@ -4,20 +4,39 @@ using System.Linq;
 using System.Text;
 
 using FluentMigrator.Expressions;
+using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Base;
+
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Generators.Generic
 {
     public abstract class GenericGenerator : GeneratorBase
     {
+        [Obsolete("Use the CompatibilityMode property")]
+        // ReSharper disable once InconsistentNaming
+#pragma warning disable 618
         public CompatabilityMode compatabilityMode;
+#pragma warning restore 618
 
-        public GenericGenerator(IColumn column, IQuoter quoter, IDescriptionGenerator descriptionGenerator)
+        protected GenericGenerator(
+            IColumn column,
+            IQuoter quoter,
+            IDescriptionGenerator descriptionGenerator,
+            IOptions<GeneratorOptions> generatorOptions)
             : base(column, quoter, descriptionGenerator)
         {
-            compatabilityMode = CompatabilityMode.LOOSE;
+            CompatibilityMode = generatorOptions.Value.CompatibilityMode ?? CompatibilityMode.LOOSE;
         }
+
+#pragma warning disable 618, 3005
+        public CompatibilityMode CompatibilityMode
+        {
+            get => (CompatibilityMode) compatabilityMode;
+            set => compatabilityMode = (CompatabilityMode) value;
+        }
+#pragma warning restore 618, 3005
 
         public virtual string CreateTable { get { return "CREATE TABLE {0} ({1})"; } }
         public virtual string DropTable { get { return "DROP TABLE {0}"; } }
@@ -61,13 +80,23 @@ namespace FluentMigrator.Runner.Generators.Generic
         /// <returns></returns>
         public override string Generate(CreateTableExpression expression)
         {
-            if (string.IsNullOrEmpty(expression.TableName)) throw new ArgumentNullException("expression", "expression.TableName cannot be empty");
-            if (expression.Columns.Count == 0) throw new ArgumentException("You must specifiy at least one column");
+            if (string.IsNullOrEmpty(expression.TableName))
+            {
+                throw new ArgumentNullException(nameof(expression), ErrorMessages.ExpressionTableNameMissing);
+            }
 
-            string quotedTableName = Quoter.QuoteTableName(expression.TableName, expression.SchemaName);
+            if (expression.Columns.Count == 0)
+            {
+                throw new ArgumentException("You must specifiy at least one column");
+            }
 
-            string errors = ValidateAdditionalFeatureCompatibility(expression.Columns.SelectMany(x => x.AdditionalFeatures));
-            if (!string.IsNullOrEmpty(errors)) return errors;
+            var quotedTableName = Quoter.QuoteTableName(expression.TableName, expression.SchemaName);
+
+            var errors = ValidateAdditionalFeatureCompatibility(expression.Columns.SelectMany(x => x.AdditionalFeatures));
+            if (!string.IsNullOrEmpty(errors))
+            {
+                return errors;
+            }
 
             return string.Format(CreateTable, quotedTableName, Column.Generate(expression.Columns, quotedTableName));
         }
@@ -84,25 +113,30 @@ namespace FluentMigrator.Runner.Generators.Generic
 
         public override string Generate(CreateColumnExpression expression)
         {
-            string errors = ValidateAdditionalFeatureCompatibility(expression.Column.AdditionalFeatures);
-            if (!string.IsNullOrEmpty(errors)) return errors;
+            var errors = ValidateAdditionalFeatureCompatibility(expression.Column.AdditionalFeatures);
+            if (!string.IsNullOrEmpty(errors))
+            {
+                return errors;
+            }
 
             return String.Format(AddColumn, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), Column.Generate(expression.Column));
         }
 
-
         public override string Generate(AlterColumnExpression expression)
         {
-            string errors = ValidateAdditionalFeatureCompatibility(expression.Column.AdditionalFeatures);
-            if (!string.IsNullOrEmpty(errors)) return errors;
+            var errors = ValidateAdditionalFeatureCompatibility(expression.Column.AdditionalFeatures);
+            if (!string.IsNullOrEmpty(errors))
+            {
+                return errors;
+            }
 
             return String.Format(AlterColumn, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), Column.Generate(expression.Column));
         }
 
         public override string Generate(DeleteColumnExpression expression)
         {
-            StringBuilder builder = new StringBuilder();
-            foreach (string columnName in expression.ColumnNames)
+            var builder = new StringBuilder();
+            foreach (var columnName in expression.ColumnNames)
             {
                 if (expression.ColumnNames.First() != columnName)
                 {
@@ -125,12 +159,10 @@ namespace FluentMigrator.Runner.Generators.Generic
 
         public override string Generate(CreateIndexExpression expression)
         {
-
-            string[] indexColumns = new string[expression.Index.Columns.Count];
+            var indexColumns = new string[expression.Index.Columns.Count];
             IndexColumnDefinition columnDef;
 
-
-            for (int i = 0; i < expression.Index.Columns.Count; i++)
+            for (var i = 0; i < expression.Index.Columns.Count; i++)
             {
                 columnDef = expression.Index.Columns.ElementAt(i);
                 if (columnDef.Direction == Direction.Ascending)
@@ -166,12 +198,11 @@ namespace FluentMigrator.Runner.Generators.Generic
 
         public override string Generate(CreateConstraintExpression expression)
         {
-
             var constraintType = (expression.Constraint.IsPrimaryKeyConstraint) ? "PRIMARY KEY" : "UNIQUE";
 
-            string[] columns = new string[expression.Constraint.Columns.Count];
+            var columns = new string[expression.Constraint.Columns.Count];
 
-            for (int i = 0; i < expression.Constraint.Columns.Count; i++)
+            for (var i = 0; i < expression.Constraint.Columns.Count; i++)
             {
                 columns[i] = Quoter.QuoteColumnName(expression.Constraint.Columns.ElementAt(i));
             }
@@ -195,15 +226,20 @@ namespace FluentMigrator.Runner.Generators.Generic
         public override string Generate(DeleteForeignKeyExpression expression)
         {
             if (expression.ForeignKey.ForeignTable == null)
-                throw new ArgumentNullException("Table name not specified, ensure you have appended the OnTable extension. Format should be Delete.ForeignKey(KeyName).OnTable(TableName)");
+            {
+                throw new ArgumentNullException(nameof(expression), ErrorMessages.ExpressionTableNameMissingWithHints);
+            }
 
             return string.Format(DeleteConstraint, Quoter.QuoteTableName(expression.ForeignKey.ForeignTable, expression.ForeignKey.ForeignTableSchema), Quoter.QuoteColumnName(expression.ForeignKey.Name));
         }
 
         public override string Generate(InsertDataExpression expression)
         {
-            string errors = ValidateAdditionalFeatureCompatibility(expression.AdditionalFeatures);
-            if (!string.IsNullOrEmpty(errors)) return errors;
+            var errors = ValidateAdditionalFeatureCompatibility(expression.AdditionalFeatures);
+            if (!string.IsNullOrEmpty(errors))
+            {
+                return errors;
+            }
 
             var output = new StringBuilder();
             foreach (var pair in GenerateColumnNamesAndValues(expression))
@@ -252,17 +288,17 @@ namespace FluentMigrator.Runner.Generators.Generic
 
         protected string ValidateAdditionalFeatureCompatibility(IEnumerable<KeyValuePair<string, object>> features)
         {
-            if (compatabilityMode == CompatabilityMode.STRICT) {
-                List<string> unsupportedFeatures =
+            if (CompatibilityMode == CompatibilityMode.STRICT) {
+                var unsupportedFeatures =
                     features.Where(x => !IsAdditionalFeatureSupported(x.Key)).Select(x => x.Key).ToList();
 
-                if (unsupportedFeatures.Any()) {
-                    string errorMessage =
+                if (unsupportedFeatures.Count > 0) {
+                    var errorMessage =
                         string.Format(
                             "The following database specific additional features are not supported in strict mode [{0}]",
                             unsupportedFeatures.Aggregate((x, y) => x + ", " + y));
                     {
-                        return compatabilityMode.HandleCompatabilty(errorMessage);
+                        return CompatibilityMode.HandleCompatibilty(errorMessage);
                     }
                 }
             }
@@ -271,9 +307,8 @@ namespace FluentMigrator.Runner.Generators.Generic
 
         public override string Generate(UpdateDataExpression expression)
         {
-
-            List<string> updateItems = new List<string>();
-            List<string> whereClauses = new List<string>();
+            var updateItems = new List<string>();
+            var whereClauses = new List<string>();
 
             foreach (var item in expression.Set)
             {
@@ -299,7 +334,6 @@ namespace FluentMigrator.Runner.Generators.Generic
         public override string Generate(DeleteDataExpression expression)
         {
             var deleteItems = new List<string>();
-
 
             if (expression.IsAllRows)
             {
@@ -339,27 +373,25 @@ namespace FluentMigrator.Runner.Generators.Generic
             return output.ToString();
         }
 
-
         //All Schema method throw by default as only Sql server 2005 and up supports them.
         public override string Generate(CreateSchemaExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("Schemas are not supported");
-
+            return CompatibilityMode.HandleCompatibilty("Schemas are not supported");
         }
 
         public override string Generate(DeleteSchemaExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("Schemas are not supported");
+            return CompatibilityMode.HandleCompatibilty("Schemas are not supported");
         }
 
         public override string Generate(AlterSchemaExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("Schemas are not supported");
+            return CompatibilityMode.HandleCompatibilty("Schemas are not supported");
         }
 
         public override string Generate(CreateSequenceExpression expression)
         {
-            var result = new StringBuilder(string.Format("CREATE SEQUENCE "));
+            var result = new StringBuilder("CREATE SEQUENCE ");
             var seq = expression.Sequence;
             result.AppendFormat(Quoter.QuoteSequenceName(seq.Name, seq.SchemaName));
 
@@ -398,7 +430,7 @@ namespace FluentMigrator.Runner.Generators.Generic
 
         public override string Generate(DeleteSequenceExpression expression)
         {
-            var result = new StringBuilder(string.Format("DROP SEQUENCE "));
+            var result = new StringBuilder("DROP SEQUENCE ");
             result.AppendFormat(Quoter.QuoteSequenceName(expression.SequenceName, expression.SchemaName));
             return result.ToString();
         }

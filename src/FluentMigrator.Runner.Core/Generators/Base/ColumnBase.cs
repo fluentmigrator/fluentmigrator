@@ -23,61 +23,134 @@ using FluentMigrator.Model;
 
 namespace FluentMigrator.Runner.Generators.Base
 {
+    /// <summary>
+    /// The base class for column definitions
+    /// </summary>
     public abstract class ColumnBase : IColumn
     {
         private readonly ITypeMap _typeMap;
+
+        /// <summary>
+        /// Gets or sets the clause order
+        /// </summary>
         protected IList<Func<ColumnDefinition, string>> ClauseOrder { get; set; }
 
-        public ColumnBase(ITypeMap typeMap, IQuoter quoter)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ColumnBase"/> class.
+        /// </summary>
+        /// <param name="typeMap">The type map</param>
+        /// <param name="quoter">The quoter</param>
+        protected ColumnBase(ITypeMap typeMap, IQuoter quoter)
         {
             _typeMap = typeMap;
             Quoter = quoter;
-            ClauseOrder = new List<Func<ColumnDefinition, string>> { FormatString, FormatType, FormatCollation, FormatNullable, FormatDefaultValue, FormatPrimaryKey, FormatIdentity };
+            ClauseOrder = new List<Func<ColumnDefinition, string>>
+            {
+                FormatString,
+                FormatType,
+                FormatCollation,
+                FormatNullable,
+                FormatDefaultValue,
+                FormatPrimaryKey,
+                FormatIdentity
+            };
         }
 
+        /// <summary>
+        /// The default foreign key constraint format
+        /// </summary>
         public virtual string ForeignKeyConstraint => "{0}FOREIGN KEY ({1}) REFERENCES {2} ({3}){4}{5}";
 
+        /// <summary>
+        /// Gets the quoter
+        /// </summary>
         protected IQuoter Quoter { get; }
 
+        /// <summary>
+        /// Gets the formatted type from the type map
+        /// </summary>
+        /// <param name="value">The database type</param>
+        /// <param name="size">The size (or precision)</param>
+        /// <param name="precision">The precision (or scale)</param>
+        /// <returns>The formatted column type</returns>
+        [Obsolete]
         protected string GetTypeMap(DbType value, int size, int precision)
         {
             return _typeMap.GetTypeMap(value, size, precision);
         }
 
+        /// <summary>
+        /// Gets the formatted type from the type map
+        /// </summary>
+        /// <param name="value">The database type</param>
+        /// <param name="size">The size (or precision)</param>
+        /// <param name="precision">The precision (or scale)</param>
+        /// <returns>The formatted column type</returns>
+        protected string GetTypeMap(DbType value, int? size, int? precision)
+        {
+            return _typeMap.GetTypeMap(value, size, precision);
+        }
+
+        /// <summary>
+        /// Formats the column name
+        /// </summary>
+        /// <param name="column">The column defintiion</param>
+        /// <returns>The (probably) quoted column name</returns>
         public virtual string FormatString(ColumnDefinition column)
         {
             return Quoter.QuoteColumnName(column.Name);
         }
 
+        /// <summary>
+        /// Formats the column type
+        /// </summary>
+        /// <param name="column">The column definition</param>
+        /// <returns>The formatted column type</returns>
         protected virtual string FormatType(ColumnDefinition column)
         {
             if (!column.Type.HasValue)
+            {
                 return column.CustomType;
+            }
 
             return GetTypeMap(column.Type.Value, column.Size, column.Precision);
         }
 
+        /// <summary>
+        /// Formats the (not) null constraint
+        /// </summary>
+        /// <param name="column">The column definition</param>
+        /// <returns>The formatted (not) null constraint</returns>
         protected virtual string FormatNullable(ColumnDefinition column)
         {
-            if (column.IsNullable.HasValue && column.IsNullable.Value) {
+            if (column.IsNullable == true)
+            {
                 return string.Empty;
             }
-            else {
-                return "NOT NULL";
-            }
+
+            return "NOT NULL";
         }
 
+        /// <summary>
+        /// Formats the column default value
+        /// </summary>
+        /// <param name="column">The column definition</param>
+        /// <returns>The formatted column default value</returns>
         protected virtual string FormatDefaultValue(ColumnDefinition column)
         {
             if (column.DefaultValue is ColumnDefinition.UndefinedDefaultValue)
+            {
                 return string.Empty;
+            }
 
             // see if this is for a system method
             if (column.DefaultValue is SystemMethods methods)
             {
-                string method = Quoter.QuoteValue(methods);
+                var method = Quoter.QuoteValue(methods);
                 if (string.IsNullOrEmpty(method))
+                {
                     return string.Empty;
+                }
 
                 return "DEFAULT " + method;
             }
@@ -85,29 +158,43 @@ namespace FluentMigrator.Runner.Generators.Base
             return "DEFAULT " + Quoter.QuoteValue(column.DefaultValue);
         }
 
+        /// <summary>
+        /// Formats the identity SQL fragment
+        /// </summary>
+        /// <param name="column">The column definition</param>
+        /// <returns>The formatted identity SQL fragment</returns>
         protected abstract string FormatIdentity(ColumnDefinition column);
 
+        /// <summary>
+        /// Formats the primary key constraint directly attached to the column
+        /// </summary>
+        /// <param name="column">The column definition</param>
+        /// <returns>The primary key constraint SQL fragment</returns>
         protected virtual string FormatPrimaryKey(ColumnDefinition column)
         {
             //Most Generators allow for adding primary keys as a constrint
             return string.Empty;
         }
 
+        /// <summary>
+        /// Formats the collation of a text column
+        /// </summary>
+        /// <param name="column">The column definition</param>
+        /// <returns>The SQL fragment</returns>
         protected virtual string FormatCollation(ColumnDefinition column)
         {
             if (!string.IsNullOrEmpty(column.CollationName))
             {
                 return "COLLATE " + column.CollationName;
             }
-            else
-            {
-                return string.Empty;
-            }
+
+            return string.Empty;
         }
 
+        /// <inheritdoc />
         public virtual string FormatCascade(string onWhat, Rule rule)
         {
-            string action = "NO ACTION";
+            var action = "NO ACTION";
             switch (rule)
             {
                 case Rule.None:
@@ -126,11 +213,13 @@ namespace FluentMigrator.Runner.Generators.Base
             return string.Format(" ON {0} {1}", onWhat, action);
         }
 
+        /// <inheritdoc />
         public virtual string GenerateForeignKeyName(ForeignKeyDefinition foreignKey)
         {
             return string.Format("FK_{0}_{1}", foreignKey.PrimaryTable.Substring(0, 5), foreignKey.ForeignTable.Substring(0, 5));
         }
 
+        /// <inheritdoc />
         public virtual string FormatForeignKey(ForeignKeyDefinition foreignKey, Func<ForeignKeyDefinition, string> fkNameGeneration)
         {
             if (foreignKey.PrimaryColumns.Count != foreignKey.ForeignColumns.Count)
@@ -138,12 +227,12 @@ namespace FluentMigrator.Runner.Generators.Base
                 throw new ArgumentException("Number of primary columns and secondary columns must be equal");
             }
 
-            string constraintName = string.IsNullOrEmpty(foreignKey.Name)
+            var constraintName = string.IsNullOrEmpty(foreignKey.Name)
                 ? fkNameGeneration(foreignKey)
                 : foreignKey.Name;
 
-            List<string> primaryColumns = new List<string>();
-            List<string> foreignColumns = new List<string>();
+            var primaryColumns = new List<string>();
+            var foreignColumns = new List<string>();
             foreach (var column in foreignKey.PrimaryColumns)
             {
                 primaryColumns.Add(Quoter.QuoteColumnName(column));
@@ -169,58 +258,78 @@ namespace FluentMigrator.Runner.Generators.Base
             );
         }
 
+        /// <inheritdoc />
         public virtual string Generate(ColumnDefinition column)
         {
             var clauses = new List<string>();
 
             foreach (var action in ClauseOrder)
             {
-                string clause = action(column);
+                var clause = action(column);
                 if (!string.IsNullOrEmpty(clause))
+                {
                     clauses.Add(clause);
+                }
             }
 
             return string.Join(" ", clauses.ToArray());
         }
 
+        /// <inheritdoc />
         public virtual string Generate(IEnumerable<ColumnDefinition> columns, string tableName)
         {
-            string primaryKeyString = string.Empty;
+            var primaryKeyString = string.Empty;
 
             //if more than one column is a primary key or the primary key is given a name, then it needs to be added separately
 
             //CAUTION: this must execute before we set the values of primarykey to false; Beware of yield return
-            IEnumerable<ColumnDefinition> primaryKeyColumns = columns.Where(x => x.IsPrimaryKey);
+            var colDefs = columns.ToList();
+            var primaryKeyColumns = colDefs.Where(x => x.IsPrimaryKey);
 
-            if (ShouldPrimaryKeysBeAddedSeparately(primaryKeyColumns))
+            var pkColDefs = primaryKeyColumns.ToList();
+            if (ShouldPrimaryKeysBeAddedSeparately(pkColDefs))
             {
-                primaryKeyString = AddPrimaryKeyConstraint(tableName, primaryKeyColumns);
-                foreach (ColumnDefinition column in columns) { column.IsPrimaryKey = false; }
+                primaryKeyString = AddPrimaryKeyConstraint(tableName, pkColDefs);
+                foreach (var column in colDefs) { column.IsPrimaryKey = false; }
             }
 
-            return string.Join(", ", columns.Select(x => Generate(x)).ToArray()) + primaryKeyString;
+            return string.Join(", ", colDefs.Select(x => Generate(x)).ToArray()) + primaryKeyString;
         }
 
+        /// <summary>
+        /// Returns a value indicating whether the primary key constraint should be added separately
+        /// </summary>
+        /// <param name="primaryKeyColumns">The primary key column defintions</param>
+        /// <returns><c>true</c> when the primary key constraint should be added separately</returns>
         public virtual bool ShouldPrimaryKeysBeAddedSeparately(IEnumerable<ColumnDefinition> primaryKeyColumns)
         {
             //By default always try to add primary keys as a separate constraint if any exist
             return primaryKeyColumns.Any(x => x.IsPrimaryKey);
         }
 
+        /// <summary>
+        /// Creates the primary key constraint SQL fragment
+        /// </summary>
+        /// <param name="tableName">The table name</param>
+        /// <param name="primaryKeyColumns">The primary key column defintions</param>
+        /// <returns>The SQL fragment</returns>
         public virtual string AddPrimaryKeyConstraint(string tableName, IEnumerable<ColumnDefinition> primaryKeyColumns)
         {
-            string keyColumns = String.Join(", ", primaryKeyColumns.Select(x => Quoter.QuoteColumnName(x.Name)).ToArray());
+            var pkColDefs = primaryKeyColumns.ToList();
+            var keyColumns = String.Join(", ", pkColDefs.Select(x => Quoter.QuoteColumnName(x.Name)).ToArray());
 
-            return String.Format(", {0}PRIMARY KEY ({1})", GetPrimaryKeyConstraintName(primaryKeyColumns, tableName), keyColumns);
+            return String.Format(", {0}PRIMARY KEY ({1})", GetPrimaryKeyConstraintName(pkColDefs, tableName), keyColumns);
         }
 
         /// <summary>
         /// Gets the name of the primary key constraint. Some Generators may need to override if the constraint name is limited
         /// </summary>
-        /// <returns></returns>
+        /// <param name="primaryKeyColumns">The primary key columns</param>
+        /// <param name="tableName">The table name</param>
+        /// <returns>The constraint clause</returns>
         protected virtual string GetPrimaryKeyConstraintName(IEnumerable<ColumnDefinition> primaryKeyColumns, string tableName)
         {
-            string primaryKeyName = primaryKeyColumns.Select(x => x.PrimaryKeyName).FirstOrDefault();
+            var primaryKeyName = primaryKeyColumns.Select(x => x.PrimaryKeyName).FirstOrDefault();
 
             if (string.IsNullOrEmpty(primaryKeyName))
             {

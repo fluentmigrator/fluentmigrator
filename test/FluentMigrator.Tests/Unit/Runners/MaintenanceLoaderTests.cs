@@ -16,14 +16,18 @@
 //
 #endregion
 
-using FluentMigrator.Infrastructure;
 using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Infrastructure;
+using FluentMigrator.Runner.Initialization;
+
+using Microsoft.Extensions.DependencyInjection;
 
 using Moq;
+
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Runners
 {
@@ -32,22 +36,31 @@ namespace FluentMigrator.Tests.Unit.Runners
     {
         public const string Tag1 = "MaintenanceTestTag1";
         public const string Tag2 = "MaintenanceTestTag2";
-        private string[] _tags = {Tag1, Tag2};
+        private readonly string[] _tags = {Tag1, Tag2};
 
         private Mock<IMigrationRunnerConventions> _migrationConventions;
-        private MaintenanceLoader _maintenanceLoader;
-        private MaintenanceLoader _maintenanceLoaderNoTags;
+        private IMaintenanceLoader _maintenanceLoader;
+        private IMaintenanceLoader _maintenanceLoaderNoTags;
 
         [SetUp]
         public void Setup()
         {
             _migrationConventions = new Mock<IMigrationRunnerConventions>();
             _migrationConventions.Setup(x => x.GetMaintenanceStage).Returns(DefaultMigrationRunnerConventions.Instance.GetMaintenanceStage);
+            _migrationConventions.Setup(x => x.TypeIsMigration).Returns(DefaultMigrationRunnerConventions.Instance.TypeIsMigration);
             _migrationConventions.Setup(x => x.TypeHasTags).Returns(DefaultMigrationRunnerConventions.Instance.TypeHasTags);
             _migrationConventions.Setup(x => x.TypeHasMatchingTags).Returns(DefaultMigrationRunnerConventions.Instance.TypeHasMatchingTags);
 
-            _maintenanceLoader = new MaintenanceLoader(new SingleAssembly(GetType().Assembly), _tags, _migrationConventions.Object);
-            _maintenanceLoaderNoTags = new MaintenanceLoader(new SingleAssembly(GetType().Assembly), null, _migrationConventions.Object);
+            _maintenanceLoader = ServiceCollectionExtensions.CreateServices()
+                .Configure<RunnerOptions>(opt => opt.Tags = _tags)
+                .AddSingleton<IMigrationRunnerConventionsAccessor>(new PassThroughMigrationRunnerConventionsAccessor(_migrationConventions.Object))
+                .BuildServiceProvider()
+                .GetRequiredService<IMaintenanceLoader>();
+
+            _maintenanceLoaderNoTags = ServiceCollectionExtensions.CreateServices()
+                .AddSingleton<IMigrationRunnerConventionsAccessor>(new PassThroughMigrationRunnerConventionsAccessor(_migrationConventions.Object))
+                .BuildServiceProvider()
+                .GetRequiredService<IMaintenanceLoader>();
         }
 
         [Test]
@@ -62,7 +75,7 @@ namespace FluentMigrator.Tests.Unit.Runners
                 migrationInfo.Migration.ShouldNotBeNull();
 
                 // The NoTag maintenance should not be found in the tagged maintenanceLoader because it wants tagged classes
-                Assert.IsFalse(migrationInfo.Migration.GetType().Equals(typeof(MaintenanceBeforeEachNoTag)));
+                Assert.AreNotSame(typeof(MaintenanceBeforeEachNoTag), migrationInfo.Migration.GetType());
 
                 var maintenanceAttribute = migrationInfo.Migration.GetType().GetOneAttribute<MaintenanceAttribute>();
                 maintenanceAttribute.ShouldNotBeNull();
@@ -82,7 +95,7 @@ namespace FluentMigrator.Tests.Unit.Runners
                 migrationInfo.Migration.ShouldNotBeNull();
 
                 // The NoTag maintenance should not be found in the tagged maintenanceLoader because it wants tagged classes
-                Assert.IsFalse(migrationInfo.Migration.GetType().Equals(typeof(MaintenanceBeforeEachNoTag)));
+                Assert.AreNotSame(typeof(MaintenanceBeforeEachNoTag), migrationInfo.Migration.GetType());
 
                 DefaultMigrationRunnerConventions.Instance.TypeHasMatchingTags(migrationInfo.Migration.GetType(), _tags)
                     .ShouldBeTrue();
@@ -130,7 +143,7 @@ namespace FluentMigrator.Tests.Unit.Runners
                 migrationInfo.Migration.ShouldNotBeNull();
 
                 // Both notag maintenance and tagged maintenance should be found in the notag maintenanceLoader because he doesn't care about tags
-                if (migrationInfo.Migration.GetType().Equals(typeof(MaintenanceBeforeEachNoTag)))
+                if (migrationInfo.Migration.GetType() == typeof(MaintenanceBeforeEachNoTag))
                 {
                     foundNoTag = true;
                 }

@@ -4,7 +4,8 @@ using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.MySql;
 
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Generators.MySql4
 {
@@ -22,7 +23,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
         [Test]
         public void CanAlterSchemaInStrictMode()
         {
-            Generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
+            Generator.CompatibilityMode = Runner.CompatibilityMode.STRICT;
 
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(new CreateSchemaExpression()));
         }
@@ -30,7 +31,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
         [Test]
         public void CanCreateSchemaInStrictMode()
         {
-            Generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
+            Generator.CompatibilityMode = Runner.CompatibilityMode.STRICT;
 
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(new CreateSchemaExpression()));
         }
@@ -38,7 +39,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
         [Test]
         public void CanDropSchemaInStrictMode()
         {
-            Generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
+            Generator.CompatibilityMode = Runner.CompatibilityMode.STRICT;
 
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(new DeleteSchemaExpression()));
         }

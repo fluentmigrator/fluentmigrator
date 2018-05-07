@@ -13,6 +13,7 @@ namespace FluentMigrator.Runner.Generators.Jet
 
         }
 
+        /// <inheritdoc />
         protected override string FormatType(ColumnDefinition column)
         {
             if (column.IsIdentity)
@@ -28,6 +29,7 @@ namespace FluentMigrator.Runner.Generators.Jet
             return base.FormatType(column);
         }
 
+        /// <inheritdoc />
         protected override string FormatIdentity(ColumnDefinition column)
         {
             //Identity type is handled by FormatType

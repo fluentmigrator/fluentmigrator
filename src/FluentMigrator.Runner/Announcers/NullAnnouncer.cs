@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
 //
@@ -16,11 +16,14 @@
 
 #endregion
 
+using System;
+
 namespace FluentMigrator.Runner.Announcers
 {
+    [Obsolete]
     public class NullAnnouncer : Announcer
     {
-        public override void Write(string message, bool isNotSql)
+        public override void Write(string message, bool isNotSql = true)
         {
         }
     }

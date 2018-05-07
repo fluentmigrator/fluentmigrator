@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -18,8 +18,16 @@
 
 namespace FluentMigrator.Builders.Rename.Table
 {
+    /// <summary>
+    /// Specify the new table name or schema of the table to rename
+    /// </summary>
     public interface IRenameTableToOrInSchemaSyntax : IRenameTableToSyntax
     {
+        /// <summary>
+        /// Specify the tables schema name
+        /// </summary>
+        /// <param name="schemaName">The schema name</param>
+        /// <returns>The next step</returns>
         IRenameTableToSyntax InSchema(string schemaName);
     }
 }

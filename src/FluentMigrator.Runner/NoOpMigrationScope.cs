@@ -16,18 +16,25 @@
 
 namespace FluentMigrator.Runner
 {
+    /// <summary>
+    /// A "no-operation" migration scope
+    /// </summary>
     public class NoOpMigrationScope : IMigrationScope
     {
+        /// <inheritdoc />
         public void Dispose()
         {
         }
 
+        /// <inheritdoc />
         public bool IsActive => false;
 
+        /// <inheritdoc />
         public void Complete()
         {
         }
 
+        /// <inheritdoc />
         public void Cancel()
         {
         }

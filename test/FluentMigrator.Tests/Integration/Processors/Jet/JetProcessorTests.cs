@@ -15,34 +15,18 @@
 #endregion
 
 using System.Data;
-using System.Data.OleDb;
-using FluentMigrator.Runner.Announcers;
-using FluentMigrator.Runner.Generators.Jet;
-using FluentMigrator.Runner.Processors;
-using FluentMigrator.Runner.Processors.Jet;
+
 using FluentMigrator.Tests.Helpers;
+
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Integration.Processors.Jet
 {
     [TestFixture]
-    [Category("Integration")]
-    [Category("Jet")]
-    public class JetProcessorTests
+    public class JetProcessorTests : JetIntegrationTests
     {
-        public OleDbConnection Connection { get; set; }
-        public JetProcessor Processor { get; set; }
-        [SetUp]
-        public void SetUp()
-        {
-            if (!IntegrationTestOptions.Jet.IsEnabled)
-                Assert.Ignore();
-            Connection = new OleDbConnection(IntegrationTestOptions.Jet.ConnectionString);
-            Processor = new JetProcessor(Connection, new JetGenerator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions());
-            Connection.Open();
-        }
-
         [Test]
         public void CallingTableExistsReturnsFalseIfTableDoesNotExist()
         {
@@ -114,16 +98,9 @@ namespace FluentMigrator.Tests.Integration.Processors.Jet
             {
                 var cmd = table.Connection.CreateCommand();
                 cmd.Transaction = table.Transaction;
-                cmd.CommandText = string.Format("INSERT INTO {0} (id) VALUES ({1})", table.Name, i);
+                cmd.CommandText = $"INSERT INTO {table.Name} (id) VALUES ({i})";
                 cmd.ExecuteNonQuery();
             }
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            Processor?.CommitTransaction();
-            Processor?.Dispose();
         }
     }
 }

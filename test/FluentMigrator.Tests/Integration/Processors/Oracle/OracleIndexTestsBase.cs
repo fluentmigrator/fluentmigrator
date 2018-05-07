@@ -1,42 +1,41 @@
-using System.Data;
-using System.Linq;
-using System.Collections.Generic;
-using System;
+#region License
+//
+// Copyright (c) 2018, Fluent Migrator Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+#endregion
 
-using FluentMigrator.Runner.Announcers;
-using FluentMigrator.Runner.Generators.Oracle;
-using FluentMigrator.Runner.Processors;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.Oracle;
 using FluentMigrator.Tests.Helpers;
 
-using NUnit.Framework;
-using NUnit.Should;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace FluentMigrator.Tests.Integration.Processors.Oracle {
+using NUnit.Framework;
+
+using Shouldly;
+
+namespace FluentMigrator.Tests.Integration.Processors.Oracle
+{
     [Category("Integration")]
-    [Category("Oracle")]
     public abstract class OracleIndexTestsBase : BaseIndexTests
     {
-        private const string SchemaName = "test";
-        private IDbConnection Connection { get; set; }
-        private OracleProcessor Processor { get; set; }
-        private IDbFactory Factory { get; set; }
+        private const string SchemaName = "FMTEST";
 
-        protected void SetUp(IDbFactory dbFactory)
-        {
-            if (!IntegrationTestOptions.Oracle.IsEnabled)
-                Assert.Ignore();
-            this.Factory = dbFactory;
-            this.Connection = this.Factory.CreateConnection(IntegrationTestOptions.Oracle.ConnectionString);
-            this.Processor = new OracleProcessor(this.Connection, new OracleGenerator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), this.Factory);
-            this.Connection.Open();
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            this.Processor?.Dispose();
-        }
+        private ServiceProvider ServiceProvider { get; set; }
+        private IServiceScope ServiceScope { get; set; }
+        private OracleProcessorBase Processor { get; set; }
 
         [Test]
         public override void CallingIndexExistsCanAcceptIndexNameWithSingleQuote()
@@ -44,7 +43,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
             using (var table = new OracleTestTable(Processor, null, "id int"))
             {
                 table.WithIndexOn("ID", "UI'id");
-                this.Processor.IndexExists(null, table.Name, "UI'id").ShouldBeTrue();
+                Processor.IndexExists(null, table.Name, "UI'id").ShouldBeTrue();
             }
         }
 
@@ -54,7 +53,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
             using (var table = new OracleTestTable("Test'Table", Processor, null, "id int"))
             {
                 table.WithIndexOn("ID");
-                this.Processor.IndexExists(null, table.Name, "UI_id").ShouldBeTrue();
+                Processor.IndexExists(null, table.Name, "UI_id").ShouldBeTrue();
             }
         }
 
@@ -64,7 +63,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
             using (var table = new OracleTestTable(Processor, null, "id int"))
             {
                 table.WithIndexOn("ID");
-                this.Processor.IndexExists(null, table.Name, "DoesNotExist").ShouldBeFalse();
+                Processor.IndexExists(null, table.Name, "DoesNotExist").ShouldBeFalse();
             }
         }
 
@@ -74,20 +73,20 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
             using (var table = new OracleTestTable(Processor, SchemaName, "id int"))
             {
                 table.WithIndexOn("ID");
-                this.Processor.IndexExists(SchemaName, table.Name, "DoesNotExist").ShouldBeFalse();
+                Processor.IndexExists(SchemaName, table.Name, "DoesNotExist").ShouldBeFalse();
             }
         }
 
         [Test]
         public override void CallingIndexExistsReturnsFalseIfTableDoesNotExist()
         {
-            this.Processor.IndexExists(null, "DoesNotExist", "DoesNotExist").ShouldBeFalse();
+            Processor.IndexExists(null, "DoesNotExist", "DoesNotExist").ShouldBeFalse();
         }
 
         [Test]
         public override void CallingIndexExistsReturnsFalseIfTableDoesNotExistWithSchema()
         {
-            this.Processor.IndexExists(SchemaName, "DoesNotExist", "DoesNotExist").ShouldBeFalse();
+            Processor.IndexExists(SchemaName, "DoesNotExist", "DoesNotExist").ShouldBeFalse();
         }
 
         [Test]
@@ -96,7 +95,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
             using (var table = new OracleTestTable(Processor, null, "id int"))
             {
                 table.WithIndexOn("ID");
-                this.Processor.IndexExists(null, table.Name, "UI_id").ShouldBeTrue();
+                Processor.IndexExists(null, table.Name, "UI_id").ShouldBeTrue();
             }
         }
 
@@ -106,8 +105,43 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
             using (var table = new OracleTestTable(Processor, SchemaName, "id int"))
             {
                 table.WithIndexOn("ID");
-                this.Processor.IndexExists(SchemaName, table.Name, "UI_id").ShouldBeTrue();
+                Processor.IndexExists(SchemaName, table.Name, "UI_id").ShouldBeTrue();
             }
         }
+
+        [OneTimeSetUp]
+        public void ClassSetUp()
+        {
+            if (!IntegrationTestOptions.Oracle.IsEnabled)
+            {
+                Assert.Ignore();
+            }
+
+            var serivces = AddOracleServices(ServiceCollectionExtensions.CreateServices())
+                .AddScoped<IConnectionStringReader>(
+                    _ => new PassThroughConnectionStringReader(IntegrationTestOptions.Oracle.ConnectionString));
+            ServiceProvider = serivces.BuildServiceProvider();
+        }
+
+        [OneTimeTearDown]
+        public void ClassTearDown()
+        {
+            ServiceProvider?.Dispose();
+        }
+
+        [SetUp]
+        public void SetUp()
+        {
+            ServiceScope = ServiceProvider.CreateScope();
+            Processor = ServiceScope.ServiceProvider.GetRequiredService<OracleProcessorBase>();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            ServiceScope?.Dispose();
+        }
+
+        protected abstract IServiceCollection AddOracleServices(IServiceCollection services);
     }
 }

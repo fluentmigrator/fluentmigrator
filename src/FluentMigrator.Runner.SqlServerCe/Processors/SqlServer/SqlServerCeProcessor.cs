@@ -14,53 +14,52 @@
 // limitations under the License.
 #endregion
 
-using FluentMigrator.Runner.Helpers;
-
-#region License
-//
-// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// Copyright (c) 2010, Nathan Brown
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
-#endregion
-
 using System;
 using System.Data;
 using System.IO;
-using System.Text;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.BatchParser;
-using FluentMigrator.Runner.BatchParser.RangeSearchers;
 using FluentMigrator.Runner.BatchParser.Sources;
-using FluentMigrator.Runner.BatchParser.SpecialTokenSearchers;
+using FluentMigrator.Runner.Generators.SqlServer;
+using FluentMigrator.Runner.Helpers;
+using FluentMigrator.Runner.Initialization;
+
+using JetBrains.Annotations;
+
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
     public sealed class SqlServerCeProcessor : GenericProcessorBase
     {
-        public override string DatabaseType
-        {
-            get { return "SqlServerCe"; }
-        }
+        [CanBeNull]
+        private readonly IServiceProvider _serviceProvider;
+
+        public override string DatabaseType => "SqlServerCe";
 
         public override IList<string> DatabaseTypeAliases { get; } = new List<string> { "SqlServer" };
 
+        [Obsolete]
         public SqlServerCeProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(connection, factory, generator, announcer, options)
         {
+        }
+
+        public SqlServerCeProcessor(
+            [NotNull] SqlServerCeDbFactory factory,
+            [NotNull] SqlServerCeGenerator generator,
+            [NotNull] ILogger<SqlServerCeProcessor> logger,
+            [NotNull] IOptions<ProcessorOptions> options,
+            [NotNull] IConnectionStringAccessor connectionStringAccessor,
+            [NotNull] IServiceProvider serviceProvider)
+            : base(() => factory.Factory, generator, logger, options.Value, connectionStringAccessor)
+        {
+            _serviceProvider = serviceProvider;
         }
 
         public override bool SchemaExists(string schemaName)
@@ -109,7 +108,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         {
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction, Options))
+            using (var command = CreateCommand(String.Format(template, args)))
             using (var reader = command.ExecuteReader())
             {
                 return reader.Read();
@@ -125,7 +124,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         {
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction, Options))
+            using (var command = CreateCommand(String.Format(template, args)))
             using (var reader = command.ExecuteReader())
             {
                 return reader.ReadDataSet();
@@ -134,14 +133,14 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         protected override void Process(string sql)
         {
-            Announcer.Sql(sql);
+            Logger.LogSql(sql);
 
             if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
                 return;
 
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(string.Empty, Connection, Transaction, Options))
+            using (var command = CreateCommand(string.Empty))
             {
                 foreach (string statement in SplitIntoSingleStatements(sql))
                 {
@@ -169,30 +168,13 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         {
             var sqlStatements = new List<string>();
 
-            // The default range searchers
-            var rangeSearchers = new List<IRangeSearcher>
-            {
-                new MultiLineComment(),
-                new DoubleDashSingleLineComment(),
-                new PoundSignSingleLineComment(),
-                new SqlString(),
-                new SqlServerIdentifier(),
-            };
-
-            // The special token searchers
-            var specialTokenSearchers = new List<ISpecialTokenSearcher>()
-            {
-                new GoSearcher(),
-                new SemicolonSearcher(),
-            };
-
-            var parser = new SqlBatchParser(rangeSearchers, specialTokenSearchers);
+            var parser = _serviceProvider?.GetService<SqlServerBatchParser>() ?? new SqlServerBatchParser();
             parser.SqlText += (sender, args) =>
             {
                 var content = args.SqlText.Trim();
                 if (!string.IsNullOrEmpty(content))
                 {
-                    sqlStatements.Add(content + ";");
+                    sqlStatements.Add(content);
                 }
             };
 
@@ -208,8 +190,32 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         {
             EnsureConnectionIsOpen();
 
-            if (expression.Operation != null)
-                expression.Operation(Connection, Transaction);
+            expression.Operation?.Invoke(Connection, Transaction);
+        }
+
+        /// <inheritdoc />
+        protected override IDbCommand CreateCommand(string commandText, IDbConnection connection, IDbTransaction transaction)
+        {
+            IDbCommand result;
+            if (DbProviderFactory != null)
+            {
+                result = DbProviderFactory.CreateCommand();
+                Debug.Assert(result != null, nameof(result) + " != null");
+                result.Connection = connection;
+                if (transaction != null)
+                    result.Transaction = transaction;
+                result.CommandText = commandText;
+            }
+            else
+            {
+#pragma warning disable 612
+                result = Factory.CreateCommand(commandText, connection, transaction, Options);
+#pragma warning restore 612
+            }
+
+            // SQL Server CE does not support non-zero command timeout values!! :/
+
+            return result;
         }
     }
 }

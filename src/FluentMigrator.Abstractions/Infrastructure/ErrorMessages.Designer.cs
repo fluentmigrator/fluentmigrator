@@ -22,7 +22,7 @@ namespace FluentMigrator.Infrastructure {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class ErrorMessages {
+    public class ErrorMessages {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace FluentMigrator.Infrastructure {
         ///   Gibt die zwischengespeicherte ResourceManager-Instanz zurück, die von dieser Klasse verwendet wird.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("FluentMigrator.Infrastructure.ErrorMessages", typeof(ErrorMessages).Assembly);
@@ -51,7 +51,7 @@ namespace FluentMigrator.Infrastructure {
         ///   Ressourcenzuordnungen, die diese stark typisierte Ressourcenklasse verwenden.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,7 +63,7 @@ namespace FluentMigrator.Infrastructure {
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die The column&apos;s name cannot be null or an empty string. ähnelt.
         /// </summary>
-        internal static string ColumnNameCannotBeNullOrEmpty {
+        public static string ColumnNameCannotBeNullOrEmpty {
             get {
                 return ResourceManager.GetString("ColumnNameCannotBeNullOrEmpty", resourceCulture);
             }
@@ -72,7 +72,7 @@ namespace FluentMigrator.Infrastructure {
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Column names must be unique. ähnelt.
         /// </summary>
-        internal static string ColumnNamesMustBeUnique {
+        public static string ColumnNamesMustBeUnique {
             get {
                 return ResourceManager.GetString("ColumnNamesMustBeUnique", resourceCulture);
             }
@@ -81,7 +81,7 @@ namespace FluentMigrator.Infrastructure {
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die The column does not have a type defined. ähnelt.
         /// </summary>
-        internal static string ColumnTypeMustBeDefined {
+        public static string ColumnTypeMustBeDefined {
             get {
                 return ResourceManager.GetString("ColumnTypeMustBeDefined", resourceCulture);
             }
@@ -90,7 +90,7 @@ namespace FluentMigrator.Infrastructure {
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die The constraint must have at least one column specified. ähnelt.
         /// </summary>
-        internal static string ConstraintMustHaveAtLeastOneColumn {
+        public static string ConstraintMustHaveAtLeastOneColumn {
             get {
                 return ResourceManager.GetString("ConstraintMustHaveAtLeastOneColumn", resourceCulture);
             }
@@ -99,7 +99,7 @@ namespace FluentMigrator.Infrastructure {
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die The default value cannot be null. ähnelt.
         /// </summary>
-        internal static string DefaultValueCannotBeNull {
+        public static string DefaultValueCannotBeNull {
             get {
                 return ResourceManager.GetString("DefaultValueCannotBeNull", resourceCulture);
             }
@@ -108,16 +108,34 @@ namespace FluentMigrator.Infrastructure {
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die The destination schema&apos;s name cannot be null or an empty string. ähnelt.
         /// </summary>
-        internal static string DestinationSchemaCannotBeNull {
+        public static string DestinationSchemaCannotBeNull {
             get {
                 return ResourceManager.GetString("DestinationSchemaCannotBeNull", resourceCulture);
             }
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die expression.TableName must not be empty ähnelt.
+        /// </summary>
+        public static string ExpressionTableNameMissing {
+            get {
+                return ResourceManager.GetString("ExpressionTableNameMissing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Table name not specified, ensure you have appended the OnTable extension. Format should be Delete.ForeignKey(KeyName).OnTable(TableName) ähnelt.
+        /// </summary>
+        public static string ExpressionTableNameMissingWithHints {
+            get {
+                return ResourceManager.GetString("ExpressionTableNameMissingWithHints", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die The foreign key must have one or more foreign columns. ähnelt.
         /// </summary>
-        internal static string ForeignKeyMustHaveOneOrMoreForeignColumns {
+        public static string ForeignKeyMustHaveOneOrMoreForeignColumns {
             get {
                 return ResourceManager.GetString("ForeignKeyMustHaveOneOrMoreForeignColumns", resourceCulture);
             }
@@ -126,7 +144,7 @@ namespace FluentMigrator.Infrastructure {
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die The foreign key must have one or more primary columns. ähnelt.
         /// </summary>
-        internal static string ForeignKeyMustHaveOneOrMorePrimaryColumns {
+        public static string ForeignKeyMustHaveOneOrMorePrimaryColumns {
             get {
                 return ResourceManager.GetString("ForeignKeyMustHaveOneOrMorePrimaryColumns", resourceCulture);
             }
@@ -135,7 +153,7 @@ namespace FluentMigrator.Infrastructure {
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die The foreign key&apos;s name cannot be null or an empty string. ähnelt.
         /// </summary>
-        internal static string ForeignKeyNameCannotBeNullOrEmpty {
+        public static string ForeignKeyNameCannotBeNullOrEmpty {
             get {
                 return ResourceManager.GetString("ForeignKeyNameCannotBeNullOrEmpty", resourceCulture);
             }
@@ -144,7 +162,7 @@ namespace FluentMigrator.Infrastructure {
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die The foreign table name cannot be null or empty. ähnelt.
         /// </summary>
-        internal static string ForeignTableNameCannotBeNullOrEmpty {
+        public static string ForeignTableNameCannotBeNullOrEmpty {
             get {
                 return ResourceManager.GetString("ForeignTableNameCannotBeNullOrEmpty", resourceCulture);
             }
@@ -153,7 +171,7 @@ namespace FluentMigrator.Infrastructure {
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die The index must have one or more columns. ähnelt.
         /// </summary>
-        internal static string IndexMustHaveOneOrMoreColumns {
+        public static string IndexMustHaveOneOrMoreColumns {
             get {
                 return ResourceManager.GetString("IndexMustHaveOneOrMoreColumns", resourceCulture);
             }
@@ -162,7 +180,7 @@ namespace FluentMigrator.Infrastructure {
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die The index&apos;s name cannot be null or an empty string. ähnelt.
         /// </summary>
-        internal static string IndexNameCannotBeNullOrEmpty {
+        public static string IndexNameCannotBeNullOrEmpty {
             get {
                 return ResourceManager.GetString("IndexNameCannotBeNullOrEmpty", resourceCulture);
             }
@@ -171,7 +189,7 @@ namespace FluentMigrator.Infrastructure {
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die The {0} method must be called on an object that implements {1}. ähnelt.
         /// </summary>
-        internal static string MethodXMustBeCalledOnObjectImplementingY {
+        public static string MethodXMustBeCalledOnObjectImplementingY {
             get {
                 return ResourceManager.GetString("MethodXMustBeCalledOnObjectImplementingY", resourceCulture);
             }
@@ -180,7 +198,7 @@ namespace FluentMigrator.Infrastructure {
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die The new column name cannot be null or empty. ähnelt.
         /// </summary>
-        internal static string NewColumnNameCannotBeNullOrEmpty {
+        public static string NewColumnNameCannotBeNullOrEmpty {
             get {
                 return ResourceManager.GetString("NewColumnNameCannotBeNullOrEmpty", resourceCulture);
             }
@@ -189,7 +207,7 @@ namespace FluentMigrator.Infrastructure {
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die The new table name cannot be null or empty. ähnelt.
         /// </summary>
-        internal static string NewTableNameCannotBeNullOrEmpty {
+        public static string NewTableNameCannotBeNullOrEmpty {
             get {
                 return ResourceManager.GetString("NewTableNameCannotBeNullOrEmpty", resourceCulture);
             }
@@ -198,7 +216,7 @@ namespace FluentMigrator.Infrastructure {
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die The old column name cannot be null or empty. ähnelt.
         /// </summary>
-        internal static string OldColumnNameCannotBeNullOrEmpty {
+        public static string OldColumnNameCannotBeNullOrEmpty {
             get {
                 return ResourceManager.GetString("OldColumnNameCannotBeNullOrEmpty", resourceCulture);
             }
@@ -207,7 +225,7 @@ namespace FluentMigrator.Infrastructure {
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die The old table name cannot be null or empty. ähnelt.
         /// </summary>
-        internal static string OldTableNameCannotBeNullOrEmpty {
+        public static string OldTableNameCannotBeNullOrEmpty {
             get {
                 return ResourceManager.GetString("OldTableNameCannotBeNullOrEmpty", resourceCulture);
             }
@@ -216,7 +234,7 @@ namespace FluentMigrator.Infrastructure {
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die The operation to be performed using the database connection cannot be null. ähnelt.
         /// </summary>
-        internal static string OperationCannotBeNull {
+        public static string OperationCannotBeNull {
             get {
                 return ResourceManager.GetString("OperationCannotBeNull", resourceCulture);
             }
@@ -225,7 +243,7 @@ namespace FluentMigrator.Infrastructure {
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die The primary table name cannot be null or empty. ähnelt.
         /// </summary>
-        internal static string PrimaryTableNameCannotBeNullOrEmpty {
+        public static string PrimaryTableNameCannotBeNullOrEmpty {
             get {
                 return ResourceManager.GetString("PrimaryTableNameCannotBeNullOrEmpty", resourceCulture);
             }
@@ -234,7 +252,7 @@ namespace FluentMigrator.Infrastructure {
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die The schema&apos;s name cannot be null or an empty string. ähnelt.
         /// </summary>
-        internal static string SchemaNameCannotBeNullOrEmpty {
+        public static string SchemaNameCannotBeNullOrEmpty {
             get {
                 return ResourceManager.GetString("SchemaNameCannotBeNullOrEmpty", resourceCulture);
             }
@@ -243,7 +261,7 @@ namespace FluentMigrator.Infrastructure {
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die The sequence&apos;s name cannot be null or an empty string. ähnelt.
         /// </summary>
-        internal static string SequenceNameCannotBeNullOrEmpty {
+        public static string SequenceNameCannotBeNullOrEmpty {
             get {
                 return ResourceManager.GetString("SequenceNameCannotBeNullOrEmpty", resourceCulture);
             }
@@ -252,7 +270,7 @@ namespace FluentMigrator.Infrastructure {
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die The sql script cannot be null or an empty string. ähnelt.
         /// </summary>
-        internal static string SqlScriptCannotBeNullOrEmpty {
+        public static string SqlScriptCannotBeNullOrEmpty {
             get {
                 return ResourceManager.GetString("SqlScriptCannotBeNullOrEmpty", resourceCulture);
             }
@@ -261,7 +279,7 @@ namespace FluentMigrator.Infrastructure {
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die The sql statement cannot be null or an empty string. ähnelt.
         /// </summary>
-        internal static string SqlStatementCannotBeNullOrEmpty {
+        public static string SqlStatementCannotBeNullOrEmpty {
             get {
                 return ResourceManager.GetString("SqlStatementCannotBeNullOrEmpty", resourceCulture);
             }
@@ -270,7 +288,7 @@ namespace FluentMigrator.Infrastructure {
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die The table&apos;s name cannot be null or an empty string. ähnelt.
         /// </summary>
-        internal static string TableNameCannotBeNullOrEmpty {
+        public static string TableNameCannotBeNullOrEmpty {
             get {
                 return ResourceManager.GetString("TableNameCannotBeNullOrEmpty", resourceCulture);
             }
@@ -279,7 +297,7 @@ namespace FluentMigrator.Infrastructure {
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Update statement specifies both a .Where() condition and that .AllRows() should be targeted. Specify one or the other, but not both. ähnelt.
         /// </summary>
-        internal static string UpdateDataExpressionMustNotSpecifyBothWhereClauseAndAllRows {
+        public static string UpdateDataExpressionMustNotSpecifyBothWhereClauseAndAllRows {
             get {
                 return ResourceManager.GetString("UpdateDataExpressionMustNotSpecifyBothWhereClauseAndAllRows", resourceCulture);
             }
@@ -288,7 +306,7 @@ namespace FluentMigrator.Infrastructure {
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Update statement is missing a condition. Specify one by calling .Where() or target all rows by calling .AllRows(). ähnelt.
         /// </summary>
-        internal static string UpdateDataExpressionMustSpecifyWhereClauseOrAllRows {
+        public static string UpdateDataExpressionMustSpecifyWhereClauseOrAllRows {
             get {
                 return ResourceManager.GetString("UpdateDataExpressionMustSpecifyWhereClauseOrAllRows", resourceCulture);
             }

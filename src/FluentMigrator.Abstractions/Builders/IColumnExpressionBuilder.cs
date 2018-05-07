@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 //
 // Copyright (c) 2018, Fluent Migrator Project
 //
@@ -21,13 +21,24 @@ using FluentMigrator.Model;
 
 namespace FluentMigrator.Builders
 {
-   /// <summary>
-   /// Describes common attributes for expression builders which have a current table/column.
-   /// </summary>
-   public interface IColumnExpressionBuilder : IFluentSyntax
-   {
-      string SchemaName { get; }
-      string TableName { get; }
-      ColumnDefinition Column { get; }
-   }
+    /// <summary>
+    /// Describes common attributes for expression builders which have a current table/column.
+    /// </summary>
+    public interface IColumnExpressionBuilder : IFluentSyntax
+    {
+        /// <summary>
+        /// Gets the schema name
+        /// </summary>
+        string SchemaName { get; }
+
+        /// <summary>
+        /// Gets the table name
+        /// </summary>
+        string TableName { get; }
+
+        /// <summary>
+        /// Gets the current column definition
+        /// </summary>
+        ColumnDefinition Column { get; }
+    }
 }

@@ -16,7 +16,10 @@
 //
 #endregion
 
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.VersionTableInfo;
+
+using Microsoft.Extensions.Options;
 
 #pragma warning disable 3005
 namespace FluentMigrator.Tests.Unit
@@ -24,11 +27,26 @@ namespace FluentMigrator.Tests.Unit
     [VersionTableMetaData]
     public class TestVersionTableMetaData : IVersionTableMetaData
     {
-        public const string TABLENAME = "testVersionTableName";
-        public const string COLUMNNAME = "testColumnName";
-        public const string UNIQUEINDEXNAME = "testUniqueIndexName";
-        public const string DESCRIPTIONCOLUMNNAME = "testDescriptionColumnName";
-        public const string APPLIEDONCOLUMNNAME = "testAppliedOnColumnName";
+        public const string TABLE_NAME = "testVersionTableName";
+        public const string COLUMN_NAME = "testColumnName";
+        public const string UNIQUE_INDEX_NAME = "testUniqueIndexName";
+        public const string DESCRIPTION_COLUMN_NAME = "testDescriptionColumnName";
+        public const string APPLIED_ON_COLUMN_NAME = "testAppliedOnColumnName";
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TestVersionTableMetaData"/> class.
+        /// </summary>
+        /// <param name="options">The runner options</param>
+        /// <remarks>
+        /// This constructor must come first due to a bug in aspnet/DependencyInjection. An issue is already filed.
+        /// </remarks>
+        public TestVersionTableMetaData(IOptions<RunnerOptions> options)
+            : this()
+        {
+#pragma warning disable 612
+            ApplicationContext = options.Value.ApplicationContext;
+#pragma warning restore 612
+        }
 
         public TestVersionTableMetaData()
         {
@@ -40,30 +58,15 @@ namespace FluentMigrator.Tests.Unit
 
         public string SchemaName { get; set; }
 
-        public string TableName
-        {
-            get { return TABLENAME; }
-        }
+        public string TableName => TABLE_NAME;
 
-        public string ColumnName
-        {
-            get { return COLUMNNAME; }
-        }
+        public string ColumnName => COLUMN_NAME;
 
-        public string UniqueIndexName
-        {
-            get { return UNIQUEINDEXNAME; }
-        }
+        public string UniqueIndexName => UNIQUE_INDEX_NAME;
 
-        public string AppliedOnColumnName
-        {
-            get { return APPLIEDONCOLUMNNAME; }
-        }
+        public string AppliedOnColumnName => APPLIED_ON_COLUMN_NAME;
 
-        public string DescriptionColumnName
-        {
-            get { return DESCRIPTIONCOLUMNNAME; }
-        }
+        public string DescriptionColumnName => DESCRIPTION_COLUMN_NAME;
 
         public bool OwnsSchema { get; set; }
     }

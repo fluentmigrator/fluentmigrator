@@ -16,20 +16,23 @@
 //
 #endregion
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
+using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Infrastructure.Extensions;
+using FluentMigrator.Model;
 using FluentMigrator.SqlServer;
+
+using JetBrains.Annotations;
+
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Generators.SqlServer
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using FluentMigrator.Expressions;
-    using FluentMigrator.Model;
-
     public class SqlServer2005Generator : SqlServer2000Generator
     {
         private static readonly HashSet<string> _supportedAdditionalFeatures = new HashSet<string>
@@ -37,21 +40,43 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             SqlServerExtensions.IncludesList,
             SqlServerExtensions.OnlineIndex,
             SqlServerExtensions.RowGuidColumn,
+            SqlServerExtensions.SchemaAuthorization,
         };
 
-        private static readonly IQuoter _quoter = new SqlServer2005Quoter();
-
         public SqlServer2005Generator()
-            : base(new SqlServer2005Column(new SqlServer2005TypeMap(), _quoter), _quoter, new SqlServer2005DescriptionGenerator())
+            : this(new SqlServer2005Quoter())
         {
         }
 
-        protected SqlServer2005Generator(IColumn column, IQuoter quoter, IDescriptionGenerator descriptionGenerator)
-            : base(column, quoter, descriptionGenerator)
+        public SqlServer2005Generator(
+            [NotNull] SqlServer2005Quoter quoter)
+            : this(quoter, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()))
+        {
+        }
+
+        public SqlServer2005Generator(
+            [NotNull] SqlServer2005Quoter quoter,
+            [NotNull] IOptions<GeneratorOptions> generatorOptions)
+            : this(
+                new SqlServer2005Column(new SqlServer2005TypeMap(), quoter),
+                quoter,
+                new SqlServer2005DescriptionGenerator(),
+                generatorOptions)
+        {
+        }
+
+        protected SqlServer2005Generator(
+            [NotNull] IColumn column,
+            [NotNull] IQuoter quoter,
+            [NotNull] IDescriptionGenerator descriptionGenerator,
+            [NotNull] IOptions<GeneratorOptions> generatorOptions)
+            : base(column, quoter, descriptionGenerator, generatorOptions)
         {
         }
 
         public override string AddColumn { get { return "ALTER TABLE {0} ADD {1}"; } }
+
+        public override string CreateSchema { get { return "CREATE SCHEMA {0}{1}"; } }
 
         public override string CreateIndex { get { return "CREATE {0}{1}INDEX {2} ON {3} ({4}{5}{6}){7}"; } }
         public override string DropIndex { get { return "DROP INDEX {0} ON {1}{2}"; } }
@@ -265,7 +290,17 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override string Generate(CreateSchemaExpression expression)
         {
-            return String.Format(CreateSchema, Quoter.QuoteSchemaName(expression.SchemaName));
+            string authFragment;
+            if (expression.AdditionalFeatures.TryGetValue(SqlServerExtensions.SchemaAuthorization, out var authorization))
+            {
+                authFragment = $" AUTHORIZATION {Quoter.QuoteSchemaName((string) authorization)}";
+            }
+            else
+            {
+                authFragment = string.Empty;
+            }
+
+            return string.Format(CreateSchema, Quoter.QuoteSchemaName(expression.SchemaName), authFragment);
         }
 
         public override string Generate(DeleteSchemaExpression expression)

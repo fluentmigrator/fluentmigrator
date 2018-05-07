@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2007-2018, FluentMigrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,8 +18,14 @@ using FluentMigrator.Model;
 
 namespace FluentMigrator.Builders.Create.Index
 {
+    /// <summary>
+    /// Extension point for unique column options
+    /// </summary>
     public interface ICreateIndexColumnUniqueOptionsSyntax : ICreateIndexOnColumnSyntax
     {
+        /// <summary>
+        /// Access to the current index column definition
+        /// </summary>
         IndexColumnDefinition CurrentColumn { get; }
     }
 }

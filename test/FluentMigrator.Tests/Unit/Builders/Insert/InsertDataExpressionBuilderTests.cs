@@ -23,7 +23,8 @@ using FluentMigrator.Expressions;
 using FluentMigrator.SqlServer;
 
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Builders.Insert
 {
@@ -82,7 +83,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Insert
             builder.WithIdentityInsert();
 
             expression.AdditionalFeatures.ShouldContain(
-                new System.Collections.Generic.KeyValuePair<string, object>(SqlServerExtensions.IdentityInsert, true));
+                new KeyValuePair<string, object>(SqlServerExtensions.IdentityInsert, true));
         }
 
         [Test]
@@ -93,7 +94,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Insert
             builder.WithIdentityInsert().WithIdentityInsert();
 
             expression.AdditionalFeatures.ShouldContain(
-                new System.Collections.Generic.KeyValuePair<string, object>(SqlServerExtensions.IdentityInsert, true));
+                new KeyValuePair<string, object>(SqlServerExtensions.IdentityInsert, true));
         }
     }
 }

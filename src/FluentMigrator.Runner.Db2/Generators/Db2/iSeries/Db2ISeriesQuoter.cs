@@ -14,13 +14,11 @@
 // limitations under the License.
 #endregion
 
-using System;
-
 namespace FluentMigrator.Runner.Generators.DB2.iSeries
 {
     public class Db2ISeriesQuoter : Db2Quoter
     {
-        public override string QuoteConstraintName(string constraintName, string schemaName)
+        public override string QuoteConstraintName(string constraintName, string schemaName = null)
         {
             return CreateSchemaPrefixedQuotedIdentifier(
                 QuoteSchemaName(schemaName),

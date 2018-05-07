@@ -1,12 +1,12 @@
 #region License
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -15,29 +15,32 @@
 #endregion
 
 using System;
+using System.Data;
+
 using FluentMigrator.Runner.Generators.Hana;
 using FluentMigrator.Runner.Processors.Hana;
+
 using Sap.Data.Hana;
 
 namespace FluentMigrator.Tests.Helpers
 {
     public class HanaTestSequence: IDisposable
     {
-        private readonly HanaQuoter quoter = new HanaQuoter();
+        private readonly HanaQuoter _quoter = new HanaQuoter();
         private readonly string _schemaName;
-        private HanaConnection Connection { get; set; }
+        private HanaConnection Connection { get; }
         public string Name { get; set; }
         public string NameWithSchema { get; set; }
-        private HanaTransaction Transaction { get; set; }
+        private HanaTransaction Transaction { get; }
 
         public HanaTestSequence(HanaProcessor processor, string schemaName, string sequenceName)
         {
             _schemaName = schemaName;
-            Name = quoter.QuoteSequenceName(sequenceName, null);
+            Name = _quoter.QuoteSequenceName(sequenceName, null);
 
             Connection = (HanaConnection)processor.Connection;
             Transaction = (HanaTransaction)processor.Transaction;
-            NameWithSchema = quoter.QuoteSequenceName(sequenceName, schemaName);
+            NameWithSchema = _quoter.QuoteSequenceName(sequenceName, schemaName);
             Create();
         }
 
@@ -48,13 +51,16 @@ namespace FluentMigrator.Tests.Helpers
 
         public void Create()
         {
+            if (Connection.State != ConnectionState.Open)
+                Connection.Open();
+
             if (!string.IsNullOrEmpty(_schemaName))
             {
-                using (var command = new HanaCommand(string.Format("CREATE SCHEMA \"{0}\";", _schemaName), Connection, Transaction))
+                using (var command = new HanaCommand($"CREATE SCHEMA \"{_schemaName}\";", Connection, Transaction))
                     command.ExecuteNonQuery();
             }
 
-            string createCommand = string.Format("CREATE SEQUENCE {0} INCREMENT BY 2 MINVALUE 0 MAXVALUE 100 START WITH 2 CACHE 10 CYCLE", NameWithSchema);
+            string createCommand = $"CREATE SEQUENCE {NameWithSchema} INCREMENT BY 2 MINVALUE 0 MAXVALUE 100 START WITH 2 CACHE 10 CYCLE";
             using (var command = new HanaCommand(createCommand, Connection, Transaction))
                 command.ExecuteNonQuery();
         }
@@ -66,7 +72,7 @@ namespace FluentMigrator.Tests.Helpers
 
             if (!string.IsNullOrEmpty(_schemaName))
             {
-                using (var command = new HanaCommand(string.Format("DROP SCHEMA \"{0}\"", _schemaName), Connection, Transaction))
+                using (var command = new HanaCommand($"DROP SCHEMA \"{_schemaName}\"", Connection, Transaction))
                     command.ExecuteNonQuery();
             }
         }

@@ -1,7 +1,7 @@
-﻿#region License
-// 
+#region License
+//
 // Copyright (c) 2007-2014, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -18,8 +18,16 @@
 
 namespace FluentMigrator.Builders.Create.Table
 {
+    /// <summary>
+    /// Define table schema, a new column or set the tables description
+    /// </summary>
     public interface ICreateTableWithColumnOrSchemaOrDescriptionSyntax : ICreateTableWithColumnOrSchemaSyntax
     {
+        /// <summary>
+        /// Set the tables description
+        /// </summary>
+        /// <param name="description">The description</param>
+        /// <returns>Define the table schema or a new column</returns>
         ICreateTableWithColumnOrSchemaSyntax WithDescription(string description);
     }
 }

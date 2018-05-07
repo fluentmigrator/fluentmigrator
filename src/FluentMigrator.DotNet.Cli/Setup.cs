@@ -19,18 +19,11 @@ using System.Linq;
 
 using AutoMapper;
 
-using FluentMigrator.DotNet.Cli.CustomAnnouncers;
 using FluentMigrator.Runner;
-using FluentMigrator.Runner.Announcers;
+using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Initialization;
-using FluentMigrator.Runner.Processors.DB2;
-using FluentMigrator.Runner.Processors.DotConnectOracle;
-using FluentMigrator.Runner.Processors.Firebird;
-using FluentMigrator.Runner.Processors.MySql;
-using FluentMigrator.Runner.Processors.Oracle;
-using FluentMigrator.Runner.Processors.Postgres;
-using FluentMigrator.Runner.Processors.SqlServer;
-using FluentMigrator.Runner.Processors.SQLite;
+using FluentMigrator.Runner.Logging;
+using FluentMigrator.Runner.Processors;
 
 using McMaster.Extensions.CommandLineUtils;
 
@@ -39,9 +32,9 @@ using Microsoft.Extensions.Logging;
 
 namespace FluentMigrator.DotNet.Cli
 {
-    public class Setup
+    public static class Setup
     {
-        public IServiceProvider BuildServiceProvider(MigratorOptions options, IConsole console)
+        public static IServiceProvider BuildServiceProvider(MigratorOptions options, IConsole console)
         {
             var serviceCollection = new ServiceCollection();
             var serviceProvider = ConfigureServices(serviceCollection, options, console);
@@ -49,101 +42,121 @@ namespace FluentMigrator.DotNet.Cli
             return serviceProvider;
         }
 
-        private IServiceProvider ConfigureServices(IServiceCollection services, MigratorOptions options, IConsole console)
+        private static IServiceProvider ConfigureServices(IServiceCollection services, MigratorOptions options, IConsole console)
         {
+            var conventionSet = new DefaultConventionSet(defaultSchemaName: null, options.WorkingDirectory);
+
+            var targetIsSqlServer = !string.IsNullOrEmpty(options.ProcessorType)
+             && options.ProcessorType.StartsWith("sqlserver", StringComparison.OrdinalIgnoreCase);
+
             var mapper = ConfigureMapper();
             services
-                .AddLogging()
+                .AddLogging(lb => lb.AddFluentMigratorConsole())
                 .AddOptions()
-                .AddSingleton(mapper)
-                .AddProcessorFactory<Db2ProcessorFactory>()
-                .AddProcessorFactory<DotConnectOracleProcessorFactory>()
-                .AddProcessorFactory<FirebirdProcessorFactory>()
-                .AddProcessorFactory<MySql4ProcessorFactory>()
-                .AddProcessorFactory<MySql5ProcessorFactory>()
-                .AddProcessorFactory<OracleManagedProcessorFactory>()
-                .AddProcessorFactory<OracleProcessorFactory>()
-                .AddProcessorFactory<PostgresProcessorFactory>()
-                .AddProcessorFactory<SQLiteProcessorFactory>()
-                .AddProcessorFactory<SqlServer2000ProcessorFactory>()
-                .AddProcessorFactory<SqlServer2005ProcessorFactory>()
-                .AddProcessorFactory<SqlServer2008ProcessorFactory>()
-                .AddProcessorFactory<SqlServer2012ProcessorFactory>()
-                .AddProcessorFactory<SqlServer2014ProcessorFactory>()
-                .AddProcessorFactory<SqlServerProcessorFactory>()
-                .AddProcessorFactory<SqlServerCeProcessorFactory>();
+                .AddSingleton(mapper);
+
+            if (options.Output)
+            {
+                services
+                    .AddSingleton<ILoggerProvider, LogFileFluentMigratorLoggerProvider>()
+                    .Configure<LogFileFluentMigratorLoggerOptions>(
+                        opt =>
+                        {
+                            opt.OutputFileName = options.OutputFileName;
+                            opt.OutputGoBetweenStatements = targetIsSqlServer;
+                            opt.ShowSql = true;
+                        });
+            }
+
+            services
+                .AddFluentMigratorCore()
+                .ConfigureRunner(
+                    builder => builder
+                        .AddDb2()
+                        .AddDb2ISeries()
+                        .AddDotConnectOracle()
+                        .AddFirebird()
+                        .AddHana()
+                        .AddMySql4()
+                        .AddMySql5()
+                        .AddOracle()
+                        .AddOracleManaged()
+                        .AddPostgres()
+                        .AddRedshift()
+                        .AddSqlAnywhere()
+                        .AddSQLite()
+                        .AddSqlServer()
+                        .AddSqlServer2000()
+                        .AddSqlServer2005()
+                        .AddSqlServer2008()
+                        .AddSqlServer2012()
+                        .AddSqlServer2014()
+                        .AddSqlServer2016()
+                        .AddSqlServerCe());
+
+            services
+                .AddSingleton<IConventionSet>(conventionSet)
+                .Configure<SelectingProcessorAccessorOptions>(opt => opt.ProcessorId = options.ProcessorType)
+                .Configure<AssemblySourceOptions>(opt => opt.AssemblyNames = options.TargetAssemblies.ToArray())
+                .Configure<TypeFilterOptions>(
+                    opt =>
+                    {
+                        opt.Namespace = options.Namespace;
+                        opt.NestedNamespaces = options.NestedNamespaces;
+                    })
+                .Configure<RunnerOptions>(
+                    opt =>
+                    {
+                        opt.Task = options.Task;
+                        opt.Version = options.TargetVersion ?? 0;
+                        opt.StartVersion = options.StartVersion ?? 0;
+                        opt.NoConnection = options.NoConnection;
+                        opt.Steps = options.Steps ?? 1;
+                        opt.Profile = options.Profile;
+                        opt.Tags = options.Tags.ToArray();
+#pragma warning disable 612
+                        opt.ApplicationContext = options.Context;
+#pragma warning restore 612
+                        opt.TransactionPerSession = options.TransactionMode == TransactionMode.Session;
+                        opt.AllowBreakingChange = options.AllowBreakingChanges;
+                    })
+                .Configure<ProcessorOptions>(
+                    opt =>
+                    {
+                        opt.ConnectionString = options.ConnectionString;
+                        opt.PreviewOnly = options.Preview;
+                        opt.ProviderSwitches = options.ProcessorSwitches;
+                        opt.Timeout = options.Timeout == null ? null : (TimeSpan?) TimeSpan.FromSeconds(options.Timeout.Value);
+                    });
+
             services
                 .Configure<MigratorOptions>(mc => mapper.Map(options, mc));
+
             services
-                .Configure<CustomAnnouncerOptions>(
-                    cao =>
+                .Configure<FluentMigratorLoggerOptions>(
+                    opt =>
                     {
-                        cao.ShowElapsedTime = options.Verbose;
-                        cao.ShowSql = options.Verbose;
+                        opt.ShowElapsedTime = options.Verbose;
+                        opt.ShowSql = options.Verbose;
                     });
+
             services
-                .AddSingleton(console)
-                .AddSingleton<LateInitAnnouncer>()
-                .AddSingleton<LoggingAnnouncer>()
-                .AddSingleton<ParserConsoleAnnouncer>()
-                .AddSingleton(sp => CreateAnnouncer(sp, options));
-            services
-                .AddSingleton(sp => CreateRunnerContext(sp, options));
-            services
-                .AddTransient<IStopWatch, StopWatch>();
-            services
-                .AddTransient<TaskExecutor, LateInitTaskExecutor>();
+                .AddSingleton(console);
+
             return services.BuildServiceProvider();
         }
 
-        private void Configure(ILoggerFactory loggerFactory)
+        private static void Configure(ILoggerFactory loggerFactory)
         {
-            loggerFactory.AddDebug(LogLevel.Trace);
+            loggerFactory
+                .AddDebug(LogLevel.Trace);
         }
 
-        private IMapper ConfigureMapper()
+        private static IMapper ConfigureMapper()
         {
-            var mapperConfig = new MapperConfiguration(cfg =>
-            {
-                cfg.CreateMap<MigratorOptions, MigratorOptions>();
-            });
+            var mapperConfig = new MapperConfiguration(cfg => cfg.CreateMap<MigratorOptions, MigratorOptions>());
             mapperConfig.AssertConfigurationIsValid();
             return new Mapper(mapperConfig);
-        }
-
-        private IAnnouncer CreateAnnouncer(IServiceProvider serviceProvider, MigratorOptions options)
-        {
-            var loggingAnnouncer = serviceProvider.GetRequiredService<LoggingAnnouncer>();
-            var consoleAnnouncer = serviceProvider.GetRequiredService<ParserConsoleAnnouncer>();
-            var lateInitAnnouncer = serviceProvider.GetRequiredService<LateInitAnnouncer>();
-            return new CompositeAnnouncer(loggingAnnouncer, consoleAnnouncer, lateInitAnnouncer);
-        }
-
-        private IRunnerContext CreateRunnerContext(IServiceProvider serviceProvider, MigratorOptions options)
-        {
-            var announcer = serviceProvider.GetRequiredService<IAnnouncer>();
-            return new RunnerContext(announcer)
-            {
-                Task = options.Task,
-                Connection = options.ConnectionString,
-                ConnectionStringConfigPath = options.ConnectionStringConfigPath,
-                Database = options.ProcessorType,
-                ProviderSwitches = options.ProcessorSwitches,
-                NoConnection = options.NoConnection || string.IsNullOrEmpty(options.ConnectionString),
-                Version = options.TargetVersion ?? 0,
-                Targets = options.TargetAssemblies.ToArray(),
-                Steps = options.Steps ?? 1,
-                Namespace = options.Namespace,
-                NestedNamespaces = options.NestedNamespaces,
-                StartVersion = options.StartVersion ?? 0,
-                WorkingDirectory = options.WorkingDirectory,
-                Tags = options.Tags.ToList(),
-                PreviewOnly = options.Preview,
-                Profile = options.Profile,
-                ApplicationContext = options.Context,
-                Timeout = options.Timeout,
-                TransactionPerSession = options.TransactionMode == TransactionMode.Session,
-            };
         }
     }
 }

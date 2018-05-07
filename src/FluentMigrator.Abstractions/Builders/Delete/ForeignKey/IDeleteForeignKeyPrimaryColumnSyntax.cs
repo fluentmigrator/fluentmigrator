@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -20,9 +20,21 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Delete.ForeignKey
 {
+    /// <summary>
+    /// Specify the columns of the primary table
+    /// </summary>
     public interface IDeleteForeignKeyPrimaryColumnSyntax : IFluentSyntax
     {
+        /// <summary>
+        /// Specify the primary table column
+        /// </summary>
+        /// <param name="column">The column name</param>
         void PrimaryColumn(string column);
+
+        /// <summary>
+        /// Specify the primary table columns
+        /// </summary>
+        /// <param name="columns">The column names</param>
         void PrimaryColumns(params string[] columns);
     }
 }

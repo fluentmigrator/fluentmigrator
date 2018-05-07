@@ -1,10 +1,29 @@
+#region License
+//
+// Copyright (c) 2018, Fluent Migrator Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+#endregion
+
 using System;
 using System.Linq;
 
 using FluentMigrator.Exceptions;
 using FluentMigrator.Runner.Generators.Oracle;
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
 {
@@ -16,7 +35,26 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
         [SetUp]
         public void Setup()
         {
-            Generator = new OracleGenerator(useQuotedIdentifiers: true);
+            Generator = new OracleGenerator(new OracleQuoterQuotedIdentifier());
+        }
+
+        [Test]
+        public override void CanCreateNullableColumnWithCustomDomainTypeAndCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateColumnExpressionWithNullableCustomType();
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ADD \"TestColumn1\" MyDomainType");
+        }
+
+        [Test]
+        public override void CanCreateNullableColumnWithCustomDomainTypeAndDefaultSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateColumnExpressionWithNullableCustomType();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD \"TestColumn1\" MyDomainType");
         }
 
         [Test]
@@ -80,7 +118,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
             var expressions = GeneratorTestHelper.GetCreateColumnWithSystemMethodExpression("TestSchema");
             var result = string.Join(Environment.NewLine, expressions.Select(x => (string)Generator.Generate((dynamic)x)));
             result.ShouldBe(
-                @"ALTER TABLE ""TestSchema"".""TestTable1"" ADD ""TestColumn1"" NVARCHAR2(5)" + Environment.NewLine +
+                @"ALTER TABLE ""TestSchema"".""TestTable1"" ADD ""TestColumn1"" TIMESTAMP(4)" + Environment.NewLine +
                 @"UPDATE ""TestSchema"".""TestTable1"" SET ""TestColumn1"" = LOCALTIMESTAMP WHERE 1 = 1");
         }
 
@@ -90,7 +128,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
             var expressions = GeneratorTestHelper.GetCreateColumnWithSystemMethodExpression();
             var result = string.Join(Environment.NewLine, expressions.Select(x => (string)Generator.Generate((dynamic)x)));
             result.ShouldBe(
-                @"ALTER TABLE ""TestTable1"" ADD ""TestColumn1"" NVARCHAR2(5)" + Environment.NewLine +
+                @"ALTER TABLE ""TestTable1"" ADD ""TestColumn1"" TIMESTAMP(4)" + Environment.NewLine +
                 @"UPDATE ""TestTable1"" SET ""TestColumn1"" = LOCALTIMESTAMP WHERE 1 = 1");
         }
 

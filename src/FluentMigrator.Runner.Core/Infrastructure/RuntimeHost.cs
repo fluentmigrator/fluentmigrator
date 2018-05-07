@@ -123,7 +123,11 @@ namespace FluentMigrator.Runner.Infrastructure
                 return _noNames;
 
             var frameworkDir = Path.GetDirectoryName(asmPath);
-            var gacDir = Path.Combine(Path.GetDirectoryName(frameworkDir), "gac");
+            var frameworkBaseDir = Path.GetDirectoryName(frameworkDir);
+            if (frameworkBaseDir == null)
+                return _noNames;
+
+            var gacDir = Path.Combine(frameworkBaseDir, "gac");
             if (!Directory.Exists(gacDir))
                 return _noNames;
 

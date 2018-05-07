@@ -16,6 +16,7 @@
 //
 #endregion
 
+using System;
 using System.Collections.Generic;
 using System.Data;
 
@@ -23,15 +24,34 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.DB2;
 using FluentMigrator.Runner.Helpers;
+using FluentMigrator.Runner.Initialization;
+
+using JetBrains.Annotations;
+
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.DB2
 {
     public class Db2Processor : GenericProcessorBase
     {
+        [Obsolete]
         public Db2Processor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(connection, factory, generator, announcer, options)
         {
             Quoter = new Db2Quoter();
+        }
+
+        public Db2Processor(
+            [NotNull] Db2DbFactory factory,
+            [NotNull] Db2Generator generator,
+            [NotNull] Db2Quoter quoter,
+            [NotNull] ILogger<Db2Processor> logger,
+            [NotNull] IOptions<ProcessorOptions> options,
+            [NotNull] IConnectionStringAccessor connectionStringAccessor)
+            : base(() => factory.Factory, generator, logger, options.Value, connectionStringAccessor)
+        {
+            Quoter = quoter;
         }
 
         public override string DatabaseType => "DB2";
@@ -105,7 +125,7 @@ namespace FluentMigrator.Runner.Processors.DB2
         {
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(string.Format(template, args), Connection, Transaction, Options))
+            using (var command = CreateCommand(string.Format(template, args)))
             using (var reader = command.ExecuteReader())
             {
                 return reader.Read();
@@ -132,7 +152,7 @@ namespace FluentMigrator.Runner.Processors.DB2
 
         public override void Process(PerformDBOperationExpression expression)
         {
-            Announcer.Say("Performing DB Operation");
+            Logger.LogSay("Performing DB Operation");
 
             if (Options.PreviewOnly)
             {
@@ -148,7 +168,7 @@ namespace FluentMigrator.Runner.Processors.DB2
         {
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(string.Format(template, args), Connection, Transaction, Options))
+            using (var command = CreateCommand(string.Format(template, args)))
             using (var reader = command.ExecuteReader())
             {
                 return reader.ReadDataSet();
@@ -194,7 +214,7 @@ namespace FluentMigrator.Runner.Processors.DB2
 
         protected override void Process(string sql)
         {
-            Announcer.Sql(sql);
+            Logger.LogSql(sql);
 
             if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
             {
@@ -203,7 +223,7 @@ namespace FluentMigrator.Runner.Processors.DB2
 
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(sql, Connection, Transaction, Options))
+            using (var command = CreateCommand(sql))
             {
                 command.ExecuteNonQuery();
             }

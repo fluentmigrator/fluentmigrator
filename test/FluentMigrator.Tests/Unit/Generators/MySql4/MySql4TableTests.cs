@@ -3,7 +3,8 @@ using System;
 using FluentMigrator.Runner.Generators.MySql;
 
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Generators.MySql4
 {

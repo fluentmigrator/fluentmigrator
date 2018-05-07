@@ -19,6 +19,7 @@ using McMaster.Extensions.CommandLineUtils;
 namespace FluentMigrator.DotNet.Cli.Commands
 {
     [HelpOption(Description = "Execute FluentMigrator actions")]
+    [Command("dotnet-fm", Description = "The external FluentMigrator runner that integrates into the .NET Core CLI tooling")]
     [Subcommand("migrate", typeof(Migrate))]
     [Subcommand("rollback", typeof(Rollback))]
     [Subcommand("validate", typeof(Validate))]

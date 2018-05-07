@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 
 using FluentMigrator.Runner.Generators.Generic;
+using FluentMigrator.Runner.Processors.Firebird;
 
 namespace FluentMigrator.Runner.Generators.Firebird
 {
@@ -59,6 +60,15 @@ namespace FluentMigrator.Runner.Generators.Firebird
 
         private readonly bool _forceQuote;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FirebirdQuoter"/> class.
+        /// </summary>
+        /// <param name="options">The firebird specific options</param>
+        public FirebirdQuoter(FirebirdOptions options)
+            : this(options.ForceQuote)
+        {
+        }
+
         public FirebirdQuoter(bool forceQuote)
         {
             _forceQuote = forceQuote;
@@ -66,6 +76,8 @@ namespace FluentMigrator.Runner.Generators.Firebird
 
         protected override bool ShouldQuote(string name)
         {
+            if (string.IsNullOrEmpty(name))
+                return false;
             if (_forceQuote)
                 return true;
             if (_keywords.Contains(name))
@@ -81,10 +93,13 @@ namespace FluentMigrator.Runner.Generators.Firebird
         {
             switch (value)
             {
+                case SystemMethods.NewSequentialId:
                 case SystemMethods.NewGuid:
                     return "gen_uuid()";
                 case SystemMethods.CurrentDateTime:
                     return "CURRENT_TIMESTAMP";
+                case SystemMethods.CurrentUser:
+                    return "CURRENT_USER";
             }
 
             return base.FormatSystemMethods(value);

@@ -27,17 +27,38 @@ using FluentMigrator.Runner.Generators.Generic;
 using FluentMigrator.Model;
 using FluentMigrator.SqlAnywhere;
 
+using JetBrains.Annotations;
+
+using Microsoft.Extensions.Options;
+
 namespace FluentMigrator.Runner.Generators.SqlAnywhere
 {
     public class SqlAnywhere16Generator : GenericGenerator
     {
         public SqlAnywhere16Generator()
-            : base(new SqlAnywhereColumn(new SqlAnywhere16TypeMap()), new SqlAnywhereQuoter(), new EmptyDescriptionGenerator())
+            : this(new SqlAnywhereQuoter())
         {
         }
 
-        protected SqlAnywhere16Generator(IColumn column, IDescriptionGenerator descriptionGenerator)
-            : base(column, new SqlAnywhereQuoter(), descriptionGenerator)
+        public SqlAnywhere16Generator(
+            [NotNull] SqlAnywhereQuoter quoter)
+            : this(quoter, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()))
+        {
+        }
+
+        public SqlAnywhere16Generator(
+            [NotNull] SqlAnywhereQuoter quoter,
+            [NotNull] IOptions<GeneratorOptions> generatorOptions)
+            : this(new SqlAnywhereColumn(new SqlAnywhere16TypeMap()), quoter, new EmptyDescriptionGenerator(), generatorOptions)
+        {
+        }
+
+        protected SqlAnywhere16Generator(
+            [NotNull] IColumn column,
+            [NotNull] IQuoter quoter,
+            [NotNull] IDescriptionGenerator descriptionGenerator,
+            [NotNull] IOptions<GeneratorOptions> generatorOptions)
+            : base(column, quoter, descriptionGenerator, generatorOptions)
         {
         }
 
@@ -143,7 +164,7 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
             builder.Append(String.Format("-- create alter table command to create new default constraint as string and run it" + Environment.NewLine + "ALTER TABLE {0} ALTER {1} DEFAULT {2};",
                 Quoter.QuoteTableName(expression.TableName, expression.SchemaName),
                 Quoter.QuoteColumnName(expression.ColumnName),
-                Quoter.QuoteValue(expression.DefaultValue)));
+                SqlAnywhereColumn.FormatDefaultValue(expression.DefaultValue, Quoter)));
 
             return builder.ToString();
         }
@@ -212,7 +233,7 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
 
         public override string Generate(AlterSchemaExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("AlterSchema is not supported in SqlAnywhere");
+            return CompatibilityMode.HandleCompatibilty("AlterSchema is not supported in SqlAnywhere");
         }
 
         public override string Generate(CreateSchemaExpression expression)
@@ -227,12 +248,12 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
 
         public override string Generate(CreateSequenceExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("Sequences are not supported in SqlAnywhere");
+            return CompatibilityMode.HandleCompatibilty("Sequences are not supported in SqlAnywhere");
         }
 
         public override string Generate(DeleteSequenceExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("Sequences are not supported in SqlAnywhere");
+            return CompatibilityMode.HandleCompatibilty("Sequences are not supported in SqlAnywhere");
         }
 
         public override string Generate(DeleteDefaultConstraintExpression expression)

@@ -28,6 +28,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         {
         }
 
+        /// <inheritdoc />
         protected override string FormatDefaultValue(ColumnDefinition column)
         {
             if (DefaultValueIsSqlFunction(column.DefaultValue))
@@ -46,6 +47,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             return defaultValue is string && defaultValue.ToString().EndsWith("()");
         }
 
+        /// <inheritdoc />
         protected override string FormatIdentity(ColumnDefinition column)
         {
             return column.IsIdentity ? GetIdentityString(column) : string.Empty;

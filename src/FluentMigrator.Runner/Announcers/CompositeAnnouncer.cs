@@ -21,6 +21,7 @@ using System.Collections.Generic;
 
 namespace FluentMigrator.Runner.Announcers
 {
+    [Obsolete]
     public class CompositeAnnouncer : IAnnouncer
     {
         public CompositeAnnouncer(params IAnnouncer[] announcers)

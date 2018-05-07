@@ -14,9 +14,18 @@
 // limitations under the License.
 #endregion
 
-using FluentMigrator.Runner.Announcers;
+using FluentMigrator.Runner.BatchParser;
 using FluentMigrator.Runner.Generators.SQLite;
+using FluentMigrator.Runner.Initialization;
+using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.SQLite;
+using FluentMigrator.Tests.Logging;
+
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+
+using Moq;
 
 using NUnit.Framework;
 
@@ -27,12 +36,29 @@ namespace FluentMigrator.Tests.Unit.Processors.SQLite
     {
         protected override IMigrationProcessor CreateProcessor()
         {
+            var mockedDbFactory = new Mock<SQLiteDbFactory>();
+            mockedDbFactory.SetupGet(conn => conn.Factory).Returns(MockedDbProviderFactory.Object);
+
+            var mockedConnStringReader = new Mock<IConnectionStringReader>();
+            mockedConnStringReader.SetupGet(r => r.Priority).Returns(0);
+            mockedConnStringReader.Setup(r => r.GetConnectionString(It.IsAny<string>())).Returns("server=this");
+
+            var serviceProvider = new ServiceCollection()
+                .AddLogging()
+                .AddSingleton<ILoggerProvider, TestLoggerProvider>()
+                .AddTransient<SQLiteBatchParser>()
+                .BuildServiceProvider();
+
+            var logger = serviceProvider.GetRequiredService<ILogger<SQLiteProcessor>>();
+
+            var opt = new OptionsWrapper<ProcessorOptions>(new ProcessorOptions());
             return new SQLiteProcessor(
-                MockedConnection.Object,
+                mockedDbFactory.Object,
                 new SQLiteGenerator(),
-                new NullAnnouncer(),
-                ProcessorOptions,
-                MockedDbFactory.Object);
+                logger,
+                opt,
+                MockedConnectionStringAccessor.Object,
+                serviceProvider);
         }
     }
 }

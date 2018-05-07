@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2018, FluentMigrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,12 +22,18 @@ using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Runner.Conventions
 {
+    /// <summary>
+    /// The default implementation of a <see cref="IAutoNameConvention"/>
+    /// </summary>
     public class DefaultAutoNameConvention : IAutoNameConvention
     {
+        /// <inheritdoc />
         public IAutoNameExpression Apply(IAutoNameExpression expression)
         {
             if (expression.AutoNameContext != AutoNameContext.EmbeddedResource)
+            {
                 return expression;
+            }
 
             var dbTypeNames = new List<string>(expression.DatabaseNames) { "Generic" };
             if (expression.Direction == MigrationDirection.Up)

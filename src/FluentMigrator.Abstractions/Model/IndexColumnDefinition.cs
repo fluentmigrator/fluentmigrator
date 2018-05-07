@@ -18,24 +18,45 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Infrastructure.Extensions;
 
 namespace FluentMigrator.Model
 {
-    public class IndexColumnDefinition : ICloneable, ICanBeValidated, ISupportAdditionalFeatures
+    /// <summary>
+    /// Index column definition
+    /// </summary>
+    public class IndexColumnDefinition
+        : ICloneable,
+#pragma warning disable 618
+          ICanBeValidated,
+#pragma warning restore 618
+          ISupportAdditionalFeatures
     {
+        /// <summary>
+        /// Gets or sets the column name
+        /// </summary>
+        [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.ColumnNameCannotBeNullOrEmpty))]
         public virtual string Name { get; set; }
+
+        /// <summary>
+        /// Gets or sets the sort direction of the index column
+        /// </summary>
         public virtual Direction Direction { get; set; }
 
+        /// <inheritdoc />
         public virtual IDictionary<string, object> AdditionalFeatures { get; } = new Dictionary<string, object>();
 
+        /// <inheritdoc />
+        [Obsolete("Use the System.ComponentModel.DataAnnotations.Validator instead")]
         public virtual void CollectValidationErrors(ICollection<string> errors)
         {
-            if (String.IsNullOrEmpty(Name))
-                errors.Add(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
+            this.CollectErrors(errors);
         }
 
+        /// <inheritdoc />
         public object Clone()
         {
             var result = new IndexColumnDefinition()

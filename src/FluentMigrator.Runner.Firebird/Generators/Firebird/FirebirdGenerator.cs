@@ -1,29 +1,66 @@
+#region License
+//
+// Copyright (c) 2018, Fluent Migrator Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+#endregion
+
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Generic;
 using FluentMigrator.Runner.Processors.Firebird;
+
+using JetBrains.Annotations;
+
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Generators.Firebird
 {
 
     public class FirebirdGenerator : GenericGenerator
     {
+        // ReSharper disable once InconsistentNaming
+        [Obsolete("Use the Truncator property")]
         protected readonly FirebirdTruncator truncator;
-        protected Processors.Firebird.FirebirdOptions FBOptions { get; private set; }
 
-        public FirebirdGenerator()
-            : this(new FirebirdOptions())
+        public FirebirdGenerator(
+            [NotNull] FirebirdOptions fbOptions)
+            : this(fbOptions, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()))
         {
         }
 
-        public FirebirdGenerator(Processors.Firebird.FirebirdOptions fbOptions) : base(new FirebirdColumn(fbOptions), new FirebirdQuoter(fbOptions.ForceQuote), new EmptyDescriptionGenerator())
+        public FirebirdGenerator(
+            [NotNull] FirebirdOptions fbOptions,
+            [NotNull] IOptions<GeneratorOptions> generatorOptions)
+            : this(new FirebirdQuoter(fbOptions.ForceQuote), fbOptions, generatorOptions)
+        {
+        }
+
+        public FirebirdGenerator(
+            [NotNull] FirebirdQuoter quoter,
+            [NotNull] FirebirdOptions fbOptions,
+            [NotNull] IOptions<GeneratorOptions> generatorOptions)
+            : base(new FirebirdColumn(fbOptions), quoter, new EmptyDescriptionGenerator(), generatorOptions)
         {
             FBOptions = fbOptions ?? throw new ArgumentNullException(nameof(fbOptions));
+#pragma warning disable 618
             truncator = new FirebirdTruncator(FBOptions.TruncateLongNames, FBOptions.PackKeyNames);
+#pragma warning restore 618
         }
 
         //It's kind of a hack to mess with system tables, but this is the cleanest and time-tested method to alter the nullable constraint.
@@ -38,15 +75,19 @@ namespace FluentMigrator.Runner.Generators.Firebird
 
         public string AlterColumnSetType { get { return "ALTER TABLE {0} ALTER COLUMN {1} TYPE {2}"; } }
 
-        #region SQL Generation overrides
-
         public override string AddColumn { get { return "ALTER TABLE {0} ADD {1}"; } }
         public override string DropColumn { get { return "ALTER TABLE {0} DROP {1}"; } }
         public override string RenameColumn { get { return "ALTER TABLE {0} ALTER COLUMN {1} TO {2}"; } }
 
+        protected FirebirdOptions FBOptions { get; }
+
+#pragma warning disable 618
+        public FirebirdTruncator Truncator => truncator;
+#pragma warning restore 618
+
         public override string Generate(AlterDefaultConstraintExpression expression)
         {
-            truncator.Truncate(expression);
+            Truncator.Truncate(expression);
             return String.Format("ALTER TABLE {0} ALTER COLUMN {1} SET DEFAULT {2}",
                 Quoter.QuoteTableName(expression.TableName),
                 Quoter.QuoteColumnName(expression.ColumnName),
@@ -56,7 +97,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
 
         public override string Generate(DeleteDefaultConstraintExpression expression)
         {
-            truncator.Truncate(expression);
+            Truncator.Truncate(expression);
             return String.Format("ALTER TABLE {0} ALTER COLUMN {1} DROP DEFAULT",
                 Quoter.QuoteTableName(expression.TableName),
                 Quoter.QuoteColumnName(expression.ColumnName)
@@ -72,7 +113,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
             //
             // Assuming the first column's direction for the index's direction.
 
-            truncator.Truncate(expression);
+            Truncator.Truncate(expression);
 
             StringBuilder indexColumns = new StringBuilder("");
             Direction indexDirection = Direction.Ascending;
@@ -94,140 +135,130 @@ namespace FluentMigrator.Runner.Generators.Firebird
                 , indexDirection == Direction.Ascending ? "ASC " : "DESC "
                 , Quoter.QuoteIndexName(expression.Index.Name)
                 , Quoter.QuoteTableName(expression.Index.TableName)
-                , indexColumns.ToString());
+                , indexColumns);
         }
 
         public override string Generate(AlterColumnExpression expression)
         {
-            truncator.Truncate(expression);
-            return compatabilityMode.HandleCompatabilty("Alter column is not supported as expected");
+            Truncator.Truncate(expression);
+            return CompatibilityMode.HandleCompatibilty("Alter column is not supported as expected");
         }
 
 
         public override string Generate(CreateSequenceExpression expression)
         {
-            truncator.Truncate(expression);
+            Truncator.Truncate(expression);
             return String.Format("CREATE SEQUENCE {0}", Quoter.QuoteSequenceName(expression.Sequence.Name));
         }
 
         public override string Generate(DeleteSequenceExpression expression)
         {
-            truncator.Truncate(expression);
+            Truncator.Truncate(expression);
             return String.Format("DROP SEQUENCE {0}", Quoter.QuoteSequenceName(expression.SequenceName));
         }
 
         public string GenerateAlterSequence(SequenceDefinition sequence)
         {
-            truncator.Truncate(sequence);
+            Truncator.Truncate(sequence);
             if (sequence.StartWith != null)
                 return String.Format("ALTER SEQUENCE {0} RESTART WITH {1}", Quoter.QuoteSequenceName(sequence.Name), sequence.StartWith.ToString());
 
             return String.Empty;
         }
 
-        #endregion
-
-
-        #region Name truncation overrides
-
         public override string Generate(CreateTableExpression expression)
         {
-            truncator.Truncate(expression);
+            Truncator.Truncate(expression);
             return base.Generate(expression);
         }
 
         public override string Generate(DeleteTableExpression expression)
         {
-            truncator.Truncate(expression);
+            Truncator.Truncate(expression);
             return base.Generate(expression);
         }
 
         public override string Generate(RenameTableExpression expression)
         {
-            truncator.Truncate(expression);
-            return compatabilityMode.HandleCompatabilty("Rename table is not supported");
+            Truncator.Truncate(expression);
+            return CompatibilityMode.HandleCompatibilty("Rename table is not supported");
         }
 
         public override string Generate(CreateColumnExpression expression)
         {
-            truncator.Truncate(expression);
+            Truncator.Truncate(expression);
             return base.Generate(expression);
         }
 
         public override string Generate(DeleteColumnExpression expression)
         {
-            truncator.Truncate(expression);
+            Truncator.Truncate(expression);
             return base.Generate(expression);
         }
 
         public override string Generate(RenameColumnExpression expression)
         {
-            truncator.Truncate(expression);
+            Truncator.Truncate(expression);
             return base.Generate(expression);
         }
 
         public override string Generate(DeleteIndexExpression expression)
         {
-            truncator.Truncate(expression);
+            Truncator.Truncate(expression);
             return base.Generate(expression);
         }
 
         public override string Generate(CreateConstraintExpression expression)
         {
-            truncator.Truncate(expression);
+            Truncator.Truncate(expression);
             return base.Generate(expression);
         }
 
         public override string Generate(DeleteConstraintExpression expression)
         {
-            truncator.Truncate(expression);
+            Truncator.Truncate(expression);
             return base.Generate(expression);
         }
 
         public override string Generate(CreateForeignKeyExpression expression)
         {
-            truncator.Truncate(expression);
+            Truncator.Truncate(expression);
             return base.Generate(expression);
         }
 
         public override string GenerateForeignKeyName(ForeignKeyDefinition foreignKey)
         {
-            truncator.Truncate(foreignKey);
-            return truncator.Truncate(base.GenerateForeignKeyName(foreignKey));
+            Truncator.Truncate(foreignKey);
+            return Truncator.Truncate(base.GenerateForeignKeyName(foreignKey));
         }
 
         public override string Generate(DeleteForeignKeyExpression expression)
         {
-            truncator.Truncate(expression);
+            Truncator.Truncate(expression);
             return base.Generate(expression);
         }
 
         public override string Generate(InsertDataExpression expression)
         {
-            truncator.Truncate(expression);
+            Truncator.Truncate(expression);
             return base.Generate(expression);
         }
 
         public override string Generate(UpdateDataExpression expression)
         {
-            truncator.Truncate(expression);
+            Truncator.Truncate(expression);
             return base.Generate(expression);
         }
 
         public override string Generate(DeleteDataExpression expression)
         {
-            truncator.Truncate(expression);
+            Truncator.Truncate(expression);
             return base.Generate(expression);
         }
 
-        #endregion
-
-
-        #region Alter column generators
-
         public virtual string GenerateSetNullPre3(string tableName, ColumnDefinition column)
         {
-            truncator.Truncate(column);
+            Truncator.Truncate(column);
             return String.Format(AlterColumnSetNullablePre3,
                 !column.IsNullable.HasValue || !column.IsNullable.Value  ? "1" : "NULL",
                 Quoter.QuoteValue(tableName),
@@ -237,7 +268,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
 
         public virtual string GenerateSetNull3(string tableName, ColumnDefinition column)
         {
-            truncator.Truncate(column);
+            Truncator.Truncate(column);
             var dropSet = !column.IsNullable.HasValue ? "DROP" : "SET";
             var nullable = column.IsNullable.GetValueOrDefault() ? "NULL" : "NOT NULL";
             return String.Format(AlterColumnSetNullable3,
@@ -250,18 +281,13 @@ namespace FluentMigrator.Runner.Generators.Firebird
 
         public virtual string GenerateSetType(string tableName, ColumnDefinition column)
         {
-            truncator.Truncate(column);
+            Truncator.Truncate(column);
             return String.Format(AlterColumnSetType,
                 Quoter.QuoteTableName(tableName),
                 Quoter.QuoteColumnName(column.Name),
-                (Column as FirebirdColumn).GenerateForTypeAlter(column)
+                ((FirebirdColumn) Column).GenerateForTypeAlter(column)
                 );
         }
-
-        #endregion
-
-
-        #region Helpers
 
         public static bool ColumnTypesMatch(ColumnDefinition col1, ColumnDefinition col2)
         {
@@ -282,8 +308,5 @@ namespace FluentMigrator.Runner.Generators.Firebird
             string col2Value = column.GenerateForDefaultAlter(col2);
             return col1Value != col2Value;
         }
-
-        #endregion
-
     }
 }

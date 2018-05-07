@@ -14,10 +14,11 @@
 // limitations under the License.
 #endregion
 
-using System;
 using System.ComponentModel.DataAnnotations;
 
 using McMaster.Extensions.CommandLineUtils;
+
+// ReSharper disable UnassignedGetOnlyAutoProperty
 
 namespace FluentMigrator.DotNet.Cli.Commands
 {
@@ -25,9 +26,6 @@ namespace FluentMigrator.DotNet.Cli.Commands
     {
         [Option("-c|--connection <CONNECTION_STRING_OR_NAME>", Description = "The name of the connection string (falls back to machine name) or the connection string itself to the server and database you want to execute your migrations against.")]
         public string ConnectionString { get; }
-
-        [Option("--config-path", Description = "The path of the machine.config where the connection string named by --connection is found. If not specified, it defaults to the machine.config used by the currently running CLR version")]
-        public string ConnectionStringConfigPath { get; }
 
         [Option("--no-connection", Description = "Indicates that migrations will be generated without consulting a target database. Should only be used when generating an output file.")]
         public bool NoConnection { get; }
@@ -56,6 +54,5 @@ namespace FluentMigrator.DotNet.Cli.Commands
 
         [Option("-o|--output=<FILENAME>", CommandOptionType.SingleOrNoValue, Description = "Output generated SQL to a file. Default is no output. A filename may be specified, otherwise [targetAssemblyName].sql is the default.")]
         public (bool, string) Output { get; }
-
     }
 }

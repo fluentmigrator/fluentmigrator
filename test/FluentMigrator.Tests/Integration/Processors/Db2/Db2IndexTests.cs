@@ -18,14 +18,16 @@
 
 using System.Diagnostics;
 
-using FluentMigrator.Runner.Announcers;
-using FluentMigrator.Runner.Generators.DB2;
-using FluentMigrator.Runner.Processors;
+using FluentMigrator.Runner;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.DB2;
 using FluentMigrator.Tests.Helpers;
 
+using Microsoft.Extensions.DependencyInjection;
+
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Integration.Processors.Db2
 {
@@ -39,31 +41,9 @@ namespace FluentMigrator.Tests.Integration.Processors.Db2
             try { EnsureReference(); } catch { /* ignore */ }
         }
 
-        #region Properties
-
-        public System.Data.IDbConnection Connection
-        {
-            get; set;
-        }
-
-        public Db2DbFactory Factory
-        {
-            get; set;
-        }
-
-        public Db2Processor Processor
-        {
-            get; set;
-        }
-
-        public Db2Quoter Quoter
-        {
-            get; set;
-        }
-
-        #endregion Properties
-
-        #region Methods
+        private ServiceProvider ServiceProvider { get; set; }
+        private IServiceScope ServiceScope { get; set; }
+        private Db2Processor Processor { get; set; }
 
         [Test]
         public override void CallingIndexExistsCanAcceptIndexNameWithSingleQuote()
@@ -135,22 +115,36 @@ namespace FluentMigrator.Tests.Integration.Processors.Db2
             }
         }
 
-        [SetUp]
-        public void SetUp()
+        [OneTimeSetUp]
+        public void ClassSetUp()
         {
             if (!IntegrationTestOptions.Db2.IsEnabled)
                 Assert.Ignore();
-            Factory = new Db2DbFactory();
-            Connection = Factory.CreateConnection(IntegrationTestOptions.Db2.ConnectionString);
-            Quoter = new Db2Quoter();
-            Processor = new Db2Processor(Connection, new Db2Generator(Quoter), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), Factory);
-            Connection.Open();
+
+            var serivces = ServiceCollectionExtensions.CreateServices()
+                .ConfigureRunner(builder => builder.AddDb2())
+                .AddScoped<IConnectionStringReader>(
+                    _ => new PassThroughConnectionStringReader(IntegrationTestOptions.Db2.ConnectionString));
+            ServiceProvider = serivces.BuildServiceProvider();
+        }
+
+        [OneTimeTearDown]
+        public void ClassTearDown()
+        {
+            ServiceProvider?.Dispose();
+        }
+
+        [SetUp]
+        public void SetUp()
+        {
+            ServiceScope = ServiceProvider.CreateScope();
+            Processor = ServiceScope.ServiceProvider.GetRequiredService<Db2Processor>();
         }
 
         [TearDown]
         public void TearDown()
         {
-            Processor?.Dispose();
+            ServiceScope?.Dispose();
         }
 
         private static void EnsureReference()
@@ -158,7 +152,5 @@ namespace FluentMigrator.Tests.Integration.Processors.Db2
             // This is here to avoid the removal of the referenced assembly
             Debug.WriteLine(typeof(IBM.Data.DB2.DB2Factory));
         }
-
-        #endregion Methods
     }
 }

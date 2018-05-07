@@ -14,51 +14,36 @@
 // limitations under the License.
 #endregion
 
-using System.Data;
-
-using FluentMigrator.Runner.Announcers;
-using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Oracle;
-using FluentMigrator.Runner.Processors;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.Oracle;
 using FluentMigrator.Tests.Helpers;
-using FluentMigrator.Tests.Unit;
+
+using Microsoft.Extensions.DependencyInjection;
 
 using NUnit.Framework;
-using NUnit.Should;
 
-namespace FluentMigrator.Tests.Integration.Processors.Oracle {
+using Shouldly;
+
+namespace FluentMigrator.Tests.Integration.Processors.Oracle
+{
     [Category("Integration")]
-    [Category("Oracle")]
     public abstract class OracleProcessorTestsBase
     {
-        private const string SchemaName = "test";
-        private IDbConnection Connection { get; set; }
-        private OracleProcessor Processor { get; set; }
-        private IDbFactory Factory { get; set; }
-        private IQuoter Quoter { get { return this.Processor.Quoter; } }
+        private const string SchemaName = "FMTEST";
 
-        protected void SetUp(IDbFactory dbFactory)
-        {
-            if (!IntegrationTestOptions.Oracle.IsEnabled)
-                Assert.Ignore();
-            this.Factory = dbFactory;
-            this.Connection = this.Factory.CreateConnection(IntegrationTestOptions.Oracle.ConnectionString);
-            this.Processor = new OracleProcessor(this.Connection, new OracleGenerator(), new TextWriterAnnouncer(TestContext.Out), new TestMigrationProcessorOptions(), this.Factory);
-            this.Connection.Open();
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            this.Processor?.Dispose();
-        }
+        private ServiceProvider ServiceProvider { get; set; }
+        private IServiceScope ServiceScope { get; set; }
+        private OracleProcessorBase Processor { get; set; }
+        private OracleQuoterBase Quoter { get; set; }
 
         [Test]
         public void CallingColumnExistsReturnsFalseIfColumnExistsInDifferentSchema()
         {
             using (var table = new OracleTestTable(Processor, SchemaName, "id int"))
-                this.Processor.ColumnExists("testschema", table.Name, "ID").ShouldBeFalse();
+            {
+                Processor.ColumnExists("testschema", table.Name, "ID").ShouldBeFalse();
+            }
         }
 
         [Test]
@@ -67,7 +52,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
             using (var table = new OracleTestTable(Processor, SchemaName, "id int"))
             {
                 table.WithUniqueConstraintOn("ID");
-                this.Processor.ConstraintExists("testschema", table.Name, "UC_id").ShouldBeFalse();
+                Processor.ConstraintExists("testschema", table.Name, "UC_id").ShouldBeFalse();
             }
         }
 
@@ -75,7 +60,9 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
         public void CallingTableExistsReturnsFalseIfTableExistsInDifferentSchema()
         {
             using (var table = new OracleTestTable(Processor, SchemaName, "id int"))
-                this.Processor.TableExists("testschema", table.Name).ShouldBeFalse();
+            {
+                Processor.TableExists("testschema", table.Name).ShouldBeFalse();
+            }
         }
 
         [Test]
@@ -83,7 +70,9 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
         {
             //the ColumnExisits() function is'nt case sensitive
             using (var table = new OracleTestTable(Processor, null, "id int"))
-                this.Processor.ColumnExists(null, table.Name, "Id").ShouldBeTrue();
+            {
+                Processor.ColumnExists(null, table.Name, "Id").ShouldBeTrue();
+            }
         }
 
         [Test]
@@ -93,7 +82,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
             using (var table = new OracleTestTable(Processor, null, "id int"))
             {
                 table.WithUniqueConstraintOn("ID", "uc_id");
-                this.Processor.ConstraintExists(null, table.Name, "Uc_Id").ShouldBeTrue();
+                Processor.ConstraintExists(null, table.Name, "Uc_Id").ShouldBeTrue();
             }
         }
 
@@ -104,21 +93,53 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
             using (var table = new OracleTestTable(Processor, null, "id int"))
             {
                 table.WithIndexOn("ID", "ui_id");
-                this.Processor.IndexExists(null, table.Name, "Ui_Id").ShouldBeTrue();
+                Processor.IndexExists(null, table.Name, "Ui_Id").ShouldBeTrue();
             }
         }
 
         [Test]
         public void TestQuery()
         {
-            string sql = "SELECT SYSDATE FROM " + this.Quoter.QuoteTableName("DUAL");
-            using (var command = this.Factory.CreateCommand(sql, Processor.Connection, Processor.Transaction, Processor.Options))
-            using (var reader = command.ExecuteReader())
-            {
-                var ds = reader.ReadDataSet();
-                Assert.Greater(ds.Tables.Count, 0);
-                Assert.Greater(ds.Tables[0].Columns.Count, 0);
-            }
+            var sql = "SELECT SYSDATE FROM " + Quoter.QuoteTableName("DUAL");
+            var ds = Processor.Read(sql);
+            Assert.Greater(ds.Tables.Count, 0);
+            Assert.Greater(ds.Tables[0].Columns.Count, 0);
         }
+
+        [OneTimeSetUp]
+        public void ClassSetUp()
+        {
+            if (!IntegrationTestOptions.Oracle.IsEnabled)
+            {
+                Assert.Ignore();
+            }
+
+            var serivces = AddOracleServices(ServiceCollectionExtensions.CreateServices())
+                .AddScoped<IConnectionStringReader>(
+                    _ => new PassThroughConnectionStringReader(IntegrationTestOptions.Oracle.ConnectionString));
+            ServiceProvider = serivces.BuildServiceProvider();
+        }
+
+        [OneTimeTearDown]
+        public void ClassTearDown()
+        {
+            ServiceProvider?.Dispose();
+        }
+
+        [SetUp]
+        public void SetUp()
+        {
+            ServiceScope = ServiceProvider.CreateScope();
+            Processor = ServiceScope.ServiceProvider.GetRequiredService<OracleProcessorBase>();
+            Quoter = ServiceScope.ServiceProvider.GetRequiredService<OracleQuoterBase>();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            ServiceScope?.Dispose();
+        }
+
+        protected abstract IServiceCollection AddOracleServices(IServiceCollection services);
     }
 }

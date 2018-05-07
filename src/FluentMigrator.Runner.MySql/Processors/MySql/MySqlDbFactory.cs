@@ -15,14 +15,24 @@
 #endregion
 
 using System;
-using System.Data;
 
 namespace FluentMigrator.Runner.Processors.MySql
 {
     public class MySqlDbFactory : ReflectionBasedDbFactory
     {
+        private static readonly TestEntry[] _entries =
+        {
+            new TestEntry("MySql.Data", "MySql.Data.MySqlClient.MySqlClientFactory"),
+        };
+
+        [Obsolete]
         public MySqlDbFactory()
-            : base("MySql.Data", "MySql.Data.MySqlClient.MySqlClientFactory")
+            : this(serviceProvider: null)
+        {
+        }
+
+        public MySqlDbFactory(IServiceProvider serviceProvider)
+            : base(serviceProvider, _entries)
         {
         }
     }

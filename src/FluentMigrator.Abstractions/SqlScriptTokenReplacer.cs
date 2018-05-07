@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2018, FluentMigrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,14 +19,19 @@ using System.Text.RegularExpressions;
 
 namespace FluentMigrator
 {
+    /// <summary>
+    /// Function to replace token in an SQL script
+    /// </summary>
     public static class SqlScriptTokenReplacer
     {
+        /// <summary>
+        /// Replace tokens in an SQL script
+        /// </summary>
+        /// <param name="sqlText">The SQL script where the tokens will be replaced</param>
+        /// <param name="parameters">The tokens to be replaced</param>
+        /// <returns>The SQL script with the replaced tokens</returns>
         public static string ReplaceSqlScriptTokens(string sqlText, IDictionary<string, string> parameters)
         {
-            // since all the Processors are using String.Format() in their Execute method
-            //  we need to escape the brackets with double brackets or else it throws an incorrect format error on the String.Format call
-            sqlText = sqlText.Replace("{", "{{").Replace("}", "}}");
-
             // Are parameters set?
             if (parameters != null && parameters.Count != 0)
             {

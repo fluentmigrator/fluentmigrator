@@ -18,24 +18,32 @@ using System;
 
 namespace FluentMigrator.Runner
 {
+    /// <inheritdoc />
     public class TrackingMigrationScope : IMigrationScope
     {
         private readonly Action _disposalAction;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TrackingMigrationScope"/> class.
+        /// </summary>
+        /// <param name="disposalAction">Called after the scope was cancelled</param>
         public TrackingMigrationScope(Action disposalAction)
         {
             _disposalAction = disposalAction;
             IsActive = true;
         }
 
+        /// <inheritdoc />
         public void Dispose()
         {
             Cancel();
             _disposalAction?.Invoke();
         }
 
+        /// <inheritdoc />
         public virtual bool IsActive { get; private set; }
 
+        /// <inheritdoc />
         public void Complete()
         {
             if (!IsActive) return;
@@ -43,6 +51,7 @@ namespace FluentMigrator.Runner
             IsActive = false;
         }
 
+        /// <inheritdoc />
         public void Cancel()
         {
             if (!IsActive) return;
@@ -50,10 +59,16 @@ namespace FluentMigrator.Runner
             IsActive = false;
         }
 
+        /// <summary>
+        /// Called when <see cref="Complete"/> was called and the scope was active
+        /// </summary>
         protected virtual void DoComplete()
         {
         }
 
+        /// <summary>
+        /// Called when <see cref="Cancel"/> was called and the scope was active
+        /// </summary>
         protected virtual void DoCancel()
         {
         }

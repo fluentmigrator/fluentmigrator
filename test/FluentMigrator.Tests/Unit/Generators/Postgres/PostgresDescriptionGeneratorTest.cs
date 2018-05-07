@@ -1,7 +1,8 @@
 using System.Linq;
 using FluentMigrator.Runner.Generators.Postgres;
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Generators.Postgres
 {
@@ -11,14 +12,14 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         [SetUp]
         public void Setup()
         {
-            descriptionGenerator = new PostgresDescriptionGenerator();
+            DescriptionGenerator = new PostgresDescriptionGenerator();
         }
 
         [Test]
         public override void GenerateDescriptionStatementsForCreateTableReturnTableDescriptionStatement()
         {
             var createTableExpression = GeneratorTestHelper.GetCreateTableWithTableDescription();
-            var statements = descriptionGenerator.GenerateDescriptionStatements(createTableExpression);
+            var statements = DescriptionGenerator.GenerateDescriptionStatements(createTableExpression);
 
             var result = statements.First();
             result.ShouldBe( "COMMENT ON TABLE \"public\".\"TestTable1\" IS 'TestDescription';" );
@@ -28,7 +29,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         public override void GenerateDescriptionStatementsForCreateTableReturnTableDescriptionAndColumnDescriptionsStatements()
         {
             var createTableExpression = GeneratorTestHelper.GetCreateTableWithTableDescriptionAndColumnDescriptions();
-            var statements = descriptionGenerator.GenerateDescriptionStatements(createTableExpression).ToArray();
+            var statements = DescriptionGenerator.GenerateDescriptionStatements(createTableExpression).ToArray();
 
             var result = string.Join("", statements);
             result.ShouldBe( "COMMENT ON TABLE \"public\".\"TestTable1\" IS 'TestDescription';COMMENT ON COLUMN \"public\".\"TestTable1\".\"TestColumn1\" IS 'TestColumn1Description';COMMENT ON COLUMN \"public\".\"TestTable1\".\"TestColumn2\" IS 'TestColumn2Description';" );
@@ -38,7 +39,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         public override void GenerateDescriptionStatementForAlterTableReturnTableDescriptionStatement()
         {
             var alterTableExpression = GeneratorTestHelper.GetAlterTableWithDescriptionExpression();
-            var statement = descriptionGenerator.GenerateDescriptionStatement(alterTableExpression);
+            var statement = DescriptionGenerator.GenerateDescriptionStatement(alterTableExpression);
 
             statement.ShouldBe( "COMMENT ON TABLE \"public\".\"TestTable1\" IS 'TestDescription';" );
         }
@@ -47,7 +48,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         public override void GenerateDescriptionStatementForCreateColumnReturnColumnDescriptionStatement()
         {
             var createColumnExpression = GeneratorTestHelper.GetCreateColumnExpressionWithDescription();
-            var statement = descriptionGenerator.GenerateDescriptionStatement(createColumnExpression);
+            var statement = DescriptionGenerator.GenerateDescriptionStatement(createColumnExpression);
 
             statement.ShouldBe( "COMMENT ON COLUMN \"public\".\"TestTable1\".\"TestColumn1\" IS 'TestColumn1Description';" );
         }
@@ -56,7 +57,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         public override void GenerateDescriptionStatementForAlterColumnReturnColumnDescriptionStatement()
         {
             var alterColumnExpression = GeneratorTestHelper.GetAlterColumnExpressionWithDescription();
-            var statement = descriptionGenerator.GenerateDescriptionStatement(alterColumnExpression);
+            var statement = DescriptionGenerator.GenerateDescriptionStatement(alterColumnExpression);
 
             statement.ShouldBe( "COMMENT ON COLUMN \"public\".\"TestTable1\".\"TestColumn1\" IS 'TestColumn1Description';" );
         }

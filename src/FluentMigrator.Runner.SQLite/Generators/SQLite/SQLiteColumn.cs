@@ -7,6 +7,7 @@ using FluentMigrator.Runner.Generators.Base;
 
 namespace FluentMigrator.Runner.Generators.SQLite
 {
+    // ReSharper disable once InconsistentNaming
     internal class SQLiteColumn : ColumnBase
     {
         public SQLiteColumn()
@@ -14,6 +15,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
         {
         }
 
+        /// <inheritdoc />
         public override string Generate(IEnumerable<ColumnDefinition> columns, string tableName)
         {
             var colDefs = columns.ToList();
@@ -24,6 +26,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
             return base.Generate(colDefs, tableName) + string.Concat(foreignKeyClauses);
         }
 
+        /// <inheritdoc />
         protected override string FormatIdentity(ColumnDefinition column)
         {
             //SQLite only supports the concept of Identity in combination with a single primary key
@@ -32,19 +35,25 @@ namespace FluentMigrator.Runner.Generators.SQLite
             {
                 throw new ArgumentException("SQLite only supports identity on single integer, primary key coulmns");
             }
+
             return string.Empty;
         }
 
+        /// <inheritdoc />
         public override bool ShouldPrimaryKeysBeAddedSeparately(IEnumerable<ColumnDefinition> primaryKeyColumns)
         {
             //If there are no identity column then we can add as a separate constrint
-            if (!primaryKeyColumns.Any(x => x.IsIdentity) && primaryKeyColumns.Any(x => x.IsPrimaryKey)) return true;
-            return false;
+            var pkColDefs = primaryKeyColumns.ToList();
+            return !pkColDefs.Any(x => x.IsIdentity) && pkColDefs.Any(x => x.IsPrimaryKey);
         }
 
+        /// <inheritdoc />
         protected override string FormatPrimaryKey(ColumnDefinition column)
         {
-            if (!column.IsPrimaryKey) return string.Empty;
+            if (!column.IsPrimaryKey)
+            {
+                return string.Empty;
+            }
 
             return column.IsIdentity ? "PRIMARY KEY AUTOINCREMENT" : string.Empty;
         }

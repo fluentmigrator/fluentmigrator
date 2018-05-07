@@ -18,6 +18,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 using FluentMigrator.Builders.Alter;
@@ -121,6 +122,7 @@ namespace FluentMigrator.Builders.IfDatabase
             get { return new ExecuteExpressionRoot(_context); }
         }
 
+        /// <inheritdoc />
         public ISchemaExpressionRoot Schema
         {
             get { return new SchemaExpressionRoot(_context); }
@@ -134,6 +136,7 @@ namespace FluentMigrator.Builders.IfDatabase
             get { return new UpdateExpressionRoot(_context); }
         }
 
+        /// <inheritdoc />
         public void Delegate(Action delegation)
         {
             if (_context.QuerySchema is NullIfDatabaseProcessor)
@@ -154,9 +157,12 @@ namespace FluentMigrator.Builders.IfDatabase
         {
             if (context.QuerySchema is IMigrationProcessor mp)
             {
-                var currentDatabaseType = mp.DatabaseType;
+                var processorDbTypes = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { mp.DatabaseType };
+                foreach (var databaseType in mp.DatabaseTypeAliases)
+                    processorDbTypes.Add(databaseType);
+
                 return databaseTypes
-                    .Any(db => currentDatabaseType.StartsWith(db, StringComparison.InvariantCultureIgnoreCase));
+                    .Any(db => processorDbTypes.Contains(db));
             }
 
             return false;
@@ -182,8 +188,10 @@ namespace FluentMigrator.Builders.IfDatabase
         {
             var result = new MigrationContext(
                 new NullIfDatabaseProcessor(),
-                originalContext.MigrationAssemblies,
+                originalContext.ServiceProvider,
+#pragma warning disable 612
                 originalContext.ApplicationContext,
+#pragma warning restore 612
                 string.Empty);
             return result;
         }

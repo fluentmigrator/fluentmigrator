@@ -1,7 +1,8 @@
 ﻿using FluentMigrator.Builders.Delete.DefaultConstraint;
 using FluentMigrator.Expressions;
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Builders.Delete
 {
@@ -11,32 +12,32 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
         [SetUp]
         public void Setup()
         {
-            expression = new DeleteDefaultConstraintExpression();
-            builder = new DeleteDefaultConstraintExpressionBuilder(expression);
+            _expression = new DeleteDefaultConstraintExpression();
+            _builder = new DeleteDefaultConstraintExpressionBuilder(_expression);
         }
 
-        private DeleteDefaultConstraintExpressionBuilder builder;
-        private DeleteDefaultConstraintExpression expression;
+        private DeleteDefaultConstraintExpressionBuilder _builder;
+        private DeleteDefaultConstraintExpression _expression;
 
         [Test]
         public void OnColumnShouldSetColumnNameOnExpression()
         {
-            builder.OnColumn("column");
-            expression.ColumnName.ShouldBe("column");
+            _builder.OnColumn("column");
+            _expression.ColumnName.ShouldBe("column");
         }
 
         [Test]
         public void OnSchemaShouldSetSchemaNameOnExpression()
         {
-            builder.InSchema("Shema");
-            expression.SchemaName.ShouldBe("Shema");
+            _builder.InSchema("Shema");
+            _expression.SchemaName.ShouldBe("Shema");
         }
 
         [Test]
         public void OnTableShouldSetTableNameOnExpression()
         {
-            builder.OnTable("ThaTable");
-            expression.TableName.ShouldBe("ThaTable");
+            _builder.OnTable("ThaTable");
+            _expression.TableName.ShouldBe("ThaTable");
         }
     }
 }

@@ -16,10 +16,12 @@
 
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 
-using FluentMigrator.Runner.Processors;
+using FluentMigrator.Runner.Initialization;
 
 using Moq;
+using Moq.Protected;
 
 using NUnit.Framework;
 
@@ -28,37 +30,49 @@ namespace FluentMigrator.Tests.Unit.Processors
     [Category("BatchParser")]
     public abstract class ProcessorBatchParserTestsBase
     {
-        protected static IMigrationProcessorOptions ProcessorOptions { get; } = new ProcessorOptions();
-        protected List<Mock<IDbCommand>> MockedCommands { get; set; }
-        protected Mock<IDbConnection> MockedConnection { get; set; }
-        protected Mock<IDbFactory> MockedDbFactory { get; set; }
+        private const string ConnectionString = "server=this";
+
         private ConnectionState _connectionState;
+
+        protected Mock<DbConnection> MockedConnection { get; private set; }
+        protected Mock<DbProviderFactory> MockedDbProviderFactory { get; private set; }
+        protected Mock<IConnectionStringAccessor> MockedConnectionStringAccessor { get; private set; }
+        private List<Mock<DbCommand>> MockedCommands { get; set; }
 
         [SetUp]
         public void SetUp()
         {
-            MockedCommands = new List<Mock<IDbCommand>>();
             _connectionState = ConnectionState.Closed;
-            MockedConnection = new Mock<IDbConnection>(MockBehavior.Strict);
+
+            MockedCommands = new List<Mock<DbCommand>>();
+            MockedConnection = new Mock<DbConnection>();
+            MockedDbProviderFactory = new Mock<DbProviderFactory>();
+            MockedConnectionStringAccessor = new Mock<IConnectionStringAccessor>();
+
             MockedConnection.SetupGet(conn => conn.State).Returns(() => _connectionState);
             MockedConnection.Setup(conn => conn.Open()).Callback(() => _connectionState = ConnectionState.Open);
             MockedConnection.Setup(conn => conn.Close()).Callback(() => _connectionState = ConnectionState.Closed);
-            MockedConnection.SetupGet(conn => conn.ConnectionString).Returns("server=this");
-            MockedDbFactory = new Mock<IDbFactory>();
-            MockedDbFactory.Setup(factory => factory.CreateCommand(
-                    It.IsAny<string>(), MockedConnection.Object,
-                    null, ProcessorOptions))
-                .Returns((string commandText, IDbConnection connection, IDbTransaction transaction, IMigrationProcessorOptions _) =>
-                {
-                    var commandMock = new Mock<IDbCommand>(MockBehavior.Strict);
-                    commandMock.SetupProperty(cmd => cmd.CommandText, commandText);
-                    commandMock.SetupGet(cmd => cmd.Connection).Returns(connection);
-                    commandMock.SetupGet(cmd => cmd.Transaction).Returns(transaction);
-                    commandMock.Setup(cmd => cmd.ExecuteNonQuery()).Returns(1);
-                    commandMock.Setup(cmd => cmd.Dispose());
-                    MockedCommands.Add(commandMock);
-                    return commandMock.Object;
-                });
+            MockedConnection.SetupProperty(conn => conn.ConnectionString);
+            MockedConnection.Protected().Setup("Dispose", ItExpr.IsAny<bool>());
+
+            MockedConnectionStringAccessor.SetupGet(a => a.ConnectionString).Returns(ConnectionString);
+
+            MockedDbProviderFactory.Setup(factory => factory.CreateConnection())
+                .Returns(MockedConnection.Object);
+
+            MockedDbProviderFactory.Setup(factory => factory.CreateCommand())
+                .Returns(
+                    () =>
+                    {
+                        var commandMock = new Mock<DbCommand>()
+                            .SetupProperty(cmd => cmd.CommandText);
+                        commandMock.Setup(cmd => cmd.ExecuteNonQuery()).Returns(1);
+                        commandMock.Protected().SetupGet<DbConnection>("DbConnection").Returns(MockedConnection.Object);
+                        commandMock.Protected().SetupSet<DbConnection>("DbConnection", ItExpr.Is<DbConnection>(v => v == MockedConnection.Object));
+                        commandMock.Protected().Setup("Dispose", ItExpr.IsAny<bool>());
+                        MockedCommands.Add(commandMock);
+                        return commandMock.Object;
+                    });
         }
 
         [TearDown]
@@ -69,124 +83,159 @@ namespace FluentMigrator.Tests.Unit.Processors
                 mockedCommand.VerifyNoOtherCalls();
             }
 
-            MockedDbFactory.VerifyNoOtherCalls();
+            MockedDbProviderFactory.VerifyNoOtherCalls();
         }
 
         [Test]
         public void TestOneCommandForMultipleLines()
         {
-            var processor = CreateProcessor();
-
             var command = "SELECT 1\nSELECT 2";
-            processor.Execute(command);
+            using (var processor = CreateProcessor())
+            {
+                processor.Execute(command);
+            }
+
+            MockedDbProviderFactory.Verify(factory => factory.CreateConnection());
 
             foreach (var mockedCommand in MockedCommands)
             {
+                MockedDbProviderFactory.Verify(factory => factory.CreateCommand());
+                mockedCommand.VerifySet(cmd => cmd.Connection = MockedConnection.Object);
+                mockedCommand.VerifySet(cmd => cmd.CommandText = command);
                 mockedCommand.Verify(cmd => cmd.ExecuteNonQuery());
-                mockedCommand.Verify(cmd => cmd.Dispose());
+                mockedCommand.Protected().Verify("Dispose", Times.Exactly(1), ItExpr.IsAny<bool>());
             }
 
-            MockedDbFactory.Verify(factory => factory.CreateCommand(command, MockedConnection.Object, null, ProcessorOptions));
+            MockedConnection.Protected().Verify("Dispose", Times.Exactly(1), ItExpr.IsAny<bool>());
         }
 
         [Test]
         public void TestThatTwoCommandsGetSeparatedByGo()
         {
-            var processor = CreateProcessor();
+            using (var processor = CreateProcessor())
+            {
+                processor.Execute("SELECT 1\nGO\nSELECT 2");
+            }
 
-            processor.Execute("SELECT 1\nGO\nSELECT 2");
+            MockedDbProviderFactory.Verify(factory => factory.CreateConnection());
 
             for (int index = 0; index < MockedCommands.Count; index++)
             {
                 var command = $"SELECT {index + 1}";
                 var mockedCommand = MockedCommands[index];
+                MockedDbProviderFactory.Verify(factory => factory.CreateCommand());
+                mockedCommand.VerifySet(cmd => cmd.Connection = MockedConnection.Object);
                 mockedCommand.VerifySet(cmd => cmd.CommandText = command);
                 mockedCommand.Verify(cmd => cmd.ExecuteNonQuery());
-                mockedCommand.Verify(cmd => cmd.Dispose());
+                mockedCommand.Protected().Verify("Dispose", Times.Exactly(1), ItExpr.IsAny<bool>());
             }
 
-            MockedDbFactory.Verify(factory => factory.CreateCommand(string.Empty, MockedConnection.Object, null, ProcessorOptions));
-            MockedDbFactory.Verify(factory => factory.CreateCommand(string.Empty, MockedConnection.Object, null, ProcessorOptions));
+            MockedConnection.Protected().Verify("Dispose", Times.Exactly(1), ItExpr.IsAny<bool>());
         }
 
         [Test]
         public void TestThatTwoCommandsAreNotSeparatedByGoInComment()
         {
-            var processor = CreateProcessor();
-
             var command = "SELECT 1\n /* GO */\nSELECT 2";
-            processor.Execute(command);
 
-            for (int index = 0; index < MockedCommands.Count; index++)
+            using (var processor = CreateProcessor())
             {
-                var mockedCommand = MockedCommands[index];
-                mockedCommand.Verify(cmd => cmd.ExecuteNonQuery());
-                mockedCommand.Verify(cmd => cmd.Dispose());
+                processor.Execute(command);
             }
 
-            MockedDbFactory.Verify(factory => factory.CreateCommand(command, MockedConnection.Object, null, ProcessorOptions));
+            MockedDbProviderFactory.Verify(factory => factory.CreateConnection());
+
+            foreach (var mockedCommand in MockedCommands)
+            {
+                MockedDbProviderFactory.Verify(factory => factory.CreateCommand());
+                mockedCommand.VerifySet(cmd => cmd.Connection = MockedConnection.Object);
+                mockedCommand.VerifySet(cmd => cmd.CommandText = command);
+                mockedCommand.Verify(cmd => cmd.ExecuteNonQuery());
+                mockedCommand.Protected().Verify("Dispose", Times.Exactly(1), ItExpr.IsAny<bool>());
+            }
+
+            MockedConnection.Protected().Verify("Dispose", Times.Exactly(1), ItExpr.IsAny<bool>());
         }
 
         [Test]
         public void TestThatTwoCommandsAreNotSeparatedByGoInString()
         {
-            var processor = CreateProcessor();
-
             var command = "SELECT '\nGO\n'\nSELECT 2";
-            processor.Execute(command);
 
-            for (int index = 0; index < MockedCommands.Count; index++)
+            using (var processor = CreateProcessor())
             {
-                var mockedCommand = MockedCommands[index];
-                mockedCommand.Verify(cmd => cmd.ExecuteNonQuery());
-                mockedCommand.Verify(cmd => cmd.Dispose());
+                processor.Execute(command);
             }
 
-            MockedDbFactory.Verify(factory => factory.CreateCommand(command, MockedConnection.Object, null, ProcessorOptions));
+            MockedDbProviderFactory.Verify(factory => factory.CreateConnection());
+
+            foreach (var mockedCommand in MockedCommands)
+            {
+                MockedDbProviderFactory.Verify(factory => factory.CreateCommand());
+                mockedCommand.VerifySet(cmd => cmd.Connection = MockedConnection.Object);
+                mockedCommand.VerifySet(cmd => cmd.CommandText = command);
+                mockedCommand.Verify(cmd => cmd.ExecuteNonQuery());
+                mockedCommand.Protected().Verify("Dispose", Times.Exactly(1), ItExpr.IsAny<bool>());
+            }
+
+            MockedConnection.Protected().Verify("Dispose", Times.Exactly(1), ItExpr.IsAny<bool>());
         }
 
         [Test]
         public void Issue442()
         {
-            var processor = CreateProcessor();
-
             var command = "SELECT '\n\n\n';\nSELECT 2;";
-            processor.Execute(command);
 
-            for (int index = 0; index < MockedCommands.Count; index++)
+            using (var processor = CreateProcessor())
             {
-                var mockedCommand = MockedCommands[index];
-                mockedCommand.Verify(cmd => cmd.ExecuteNonQuery());
-                mockedCommand.Verify(cmd => cmd.Dispose());
+                processor.Execute(command);
             }
 
-            MockedDbFactory.Verify(factory => factory.CreateCommand(command, MockedConnection.Object, null, ProcessorOptions));
+            MockedDbProviderFactory.Verify(factory => factory.CreateConnection());
+
+            foreach (var mockedCommand in MockedCommands)
+            {
+                MockedDbProviderFactory.Verify(factory => factory.CreateCommand());
+                mockedCommand.VerifySet(cmd => cmd.Connection = MockedConnection.Object);
+                mockedCommand.VerifySet(cmd => cmd.CommandText = command);
+                mockedCommand.Verify(cmd => cmd.ExecuteNonQuery());
+                mockedCommand.Protected().Verify("Dispose", Times.Exactly(1), ItExpr.IsAny<bool>());
+            }
+
+            MockedConnection.Protected().Verify("Dispose", Times.Exactly(1), ItExpr.IsAny<bool>());
         }
 
         [Test]
         public void Issue842()
         {
-            var processor = CreateProcessor();
-
             var command = @"insert into MyTable (Id, Data)\nvalues (42, 'This is a list of games played by people\n\nDooM\nPokemon GO\nPotato-o-matic');";
-            processor.Execute(command);
 
-            for (int index = 0; index < MockedCommands.Count; index++)
+            using (var processor = CreateProcessor())
             {
-                var mockedCommand = MockedCommands[index];
-                mockedCommand.Verify(cmd => cmd.ExecuteNonQuery());
-                mockedCommand.Verify(cmd => cmd.Dispose());
+                processor.Execute(command);
             }
 
-            MockedDbFactory.Verify(factory => factory.CreateCommand(command, MockedConnection.Object, null, ProcessorOptions));
+            MockedDbProviderFactory.Verify(factory => factory.CreateConnection());
+
+            foreach (var mockedCommand in MockedCommands)
+            {
+                MockedDbProviderFactory.Verify(factory => factory.CreateCommand());
+                mockedCommand.VerifySet(cmd => cmd.Connection = MockedConnection.Object);
+                mockedCommand.VerifySet(cmd => cmd.CommandText = command);
+                mockedCommand.Verify(cmd => cmd.ExecuteNonQuery());
+                mockedCommand.Protected().Verify("Dispose", Times.Exactly(1), ItExpr.IsAny<bool>());
+            }
+
+            MockedConnection.Protected().Verify("Dispose", Times.Exactly(1), ItExpr.IsAny<bool>());
         }
 
         [Test]
         public void TestThatGoWithRunCount()
         {
-            var processor = CreateProcessor();
-
-            processor.Execute("SELECT 1\nGO 3\nSELECT 2\nGO\nSELECT 3\nGO 2");
+            using (var processor = CreateProcessor())
+            {
+                processor.Execute("SELECT 1\nGO 3\nSELECT 2\nGO\nSELECT 3\nGO 2");
+            }
 
             var expected = new (string command, int count)[]
             {
@@ -197,16 +246,20 @@ namespace FluentMigrator.Tests.Unit.Processors
 
             Assert.AreEqual(expected.Length, MockedCommands.Count);
 
+            MockedDbProviderFactory.Verify(factory => factory.CreateConnection());
+
             for (var index = 0; index < MockedCommands.Count; index++)
             {
                 var (command, count) = expected[index];
                 var mockedCommand = MockedCommands[index];
+                MockedDbProviderFactory.Verify(factory => factory.CreateCommand());
+                mockedCommand.VerifySet(cmd => cmd.Connection = MockedConnection.Object);
                 mockedCommand.VerifySet(cmd => cmd.CommandText = command);
                 mockedCommand.Verify(cmd => cmd.ExecuteNonQuery(), Times.Exactly(count));
-                mockedCommand.Verify(cmd => cmd.Dispose());
-
-                MockedDbFactory.Verify(factory => factory.CreateCommand(string.Empty, MockedConnection.Object, null, ProcessorOptions));
+                mockedCommand.Protected().Verify("Dispose", Times.Exactly(1), ItExpr.IsAny<bool>());
             }
+
+            MockedConnection.Protected().Verify("Dispose", Times.Exactly(1), ItExpr.IsAny<bool>());
         }
 
         protected abstract IMigrationProcessor CreateProcessor();

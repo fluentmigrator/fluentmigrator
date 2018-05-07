@@ -28,18 +28,18 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
             ClauseOrder.Insert(ClauseOrder.Count - 2, FormatUniqueConstraint);
         }
 
+        /// <inheritdoc />
         protected override string FormatNullable(ColumnDefinition column)
         {
             if (column.IsNullable.HasValue && column.IsNullable.Value)
             {
                 return "NULL";
             }
-            else
-            {
-                return "NOT NULL";
-            }
+
+            return "NOT NULL";
         }
 
+        /// <inheritdoc />
         protected override string FormatDefaultValue(ColumnDefinition column)
         {
             if (DefaultValueIsSqlFunction(column.DefaultValue))
@@ -64,6 +64,7 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
             return column.IsUnique ? "UNIQUE" : string.Empty;
         }
 
+        /// <inheritdoc />
         protected override string FormatIdentity(ColumnDefinition column)
         {
             return column.IsIdentity ? GetIdentityString() : string.Empty;
@@ -74,12 +75,12 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
             return "DEFAULT AUTOINCREMENT";
         }
 
-        public string FormatDefaultValue(object defaultValue)
+        public static string FormatDefaultValue(object defaultValue, IQuoter quoter)
         {
             if (DefaultValueIsSqlFunction(defaultValue))
                 return defaultValue.ToString();
 
-            return Quoter.QuoteValue(defaultValue);
+            return quoter.QuoteValue(defaultValue);
         }
 
         public static string GetDefaultConstraintName(string tableName, string columnName)

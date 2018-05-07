@@ -16,36 +16,56 @@
 //
 #endregion
 
-using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+
 using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Expressions
 {
-    public class UpdateDataExpression : MigrationExpressionBase, ISchemaExpression
+    /// <summary>
+    /// Expression to update data
+    /// </summary>
+    public class UpdateDataExpression : MigrationExpressionBase, ISchemaExpression, IValidatableObject
     {
+        /// <inheritdoc />
         public string SchemaName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the table name
+        /// </summary>
+        [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.TableNameCannotBeNullOrEmpty))]
         public string TableName { get; set; }
 
+        /// <summary>
+        /// Gets or sets the values to be set
+        /// </summary>
         public List<KeyValuePair<string, object>> Set { get; set; }
+
+        /// <summary>
+        /// Gets or sets the condition column/value pairs
+        /// </summary>
         public List<KeyValuePair<string, object>> Where { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether all rows should be updated
+        /// </summary>
         public bool IsAllRows { get; set; }
 
-        public override void CollectValidationErrors(ICollection<string> errors)
-        {
-            if (String.IsNullOrEmpty(TableName))
-                errors.Add(ErrorMessages.TableNameCannotBeNullOrEmpty);
-
-            if (!IsAllRows && (Where == null || Where.Count == 0))
-                errors.Add(ErrorMessages.UpdateDataExpressionMustSpecifyWhereClauseOrAllRows);
-
-            if (IsAllRows && Where != null && Where.Count > 0)
-                errors.Add(ErrorMessages.UpdateDataExpressionMustNotSpecifyBothWhereClauseAndAllRows);
-        }
-
+        /// <inheritdoc />
         public override void ExecuteWith(IMigrationProcessor processor)
         {
             processor.Process(this);
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (!IsAllRows && (Where == null || Where.Count == 0))
+                yield return new ValidationResult(ErrorMessages.UpdateDataExpressionMustSpecifyWhereClauseOrAllRows);
+
+            if (IsAllRows && Where != null && Where.Count > 0)
+                yield return new ValidationResult(ErrorMessages.UpdateDataExpressionMustNotSpecifyBothWhereClauseAndAllRows);
         }
     }
 }

@@ -1,16 +1,53 @@
+#region License
+//
+// Copyright (c) 2018, Fluent Migrator Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Generic;
+
+using JetBrains.Annotations;
+
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Generators.Postgres
 {
     public class PostgresGenerator : GenericGenerator
     {
-        public PostgresGenerator() : base(new PostgresColumn(), new PostgresQuoter(), new PostgresDescriptionGenerator())
+        public PostgresGenerator()
+            : this(new PostgresQuoter())
+        {
+        }
+
+        public PostgresGenerator(
+            [NotNull] PostgresQuoter quoter)
+            : this(quoter, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()))
+        {
+        }
+
+        public PostgresGenerator(
+            [NotNull] PostgresQuoter quoter,
+            [NotNull] IOptions<GeneratorOptions> generatorOptions)
+            : base(new PostgresColumn(), quoter, new PostgresDescriptionGenerator(), generatorOptions)
         {
         }
 
@@ -43,10 +80,11 @@ namespace FluentMigrator.Runner.Generators.Postgres
                 "CREATE TABLE {0} ({1})",
                 Quoter.QuoteTableName(expression.TableName, expression.SchemaName),
                 Column.Generate(expression.Columns, Quoter.Quote(expression.TableName)));
-            var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatements(expression);
+            var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatements(expression)
+                ?.ToList();
             createStatement.Append(";");
 
-            if (descriptionStatement != null && descriptionStatement.Any())
+            if (descriptionStatement != null && descriptionStatement.Count != 0)
             {
                 createStatement.Append(string.Join(";", descriptionStatement.ToArray()));
                 createStatement.Append(";");

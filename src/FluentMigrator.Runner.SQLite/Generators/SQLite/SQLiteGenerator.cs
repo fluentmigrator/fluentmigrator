@@ -20,12 +20,30 @@
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators.Generic;
 
+using JetBrains.Annotations;
+
+using Microsoft.Extensions.Options;
+
 namespace FluentMigrator.Runner.Generators.SQLite
 {
+    // ReSharper disable once InconsistentNaming
     public class SQLiteGenerator : GenericGenerator
     {
         public SQLiteGenerator()
-            : base(new SQLiteColumn(), new SQLiteQuoter(), new EmptyDescriptionGenerator())
+            : this(new SQLiteQuoter())
+        {
+        }
+
+        public SQLiteGenerator(
+            [NotNull] SQLiteQuoter quoter)
+            : this(quoter, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()))
+        {
+        }
+
+        public SQLiteGenerator(
+            [NotNull] SQLiteQuoter quoter,
+            [NotNull] IOptions<GeneratorOptions> generatorOptions)
+            : base(new SQLiteColumn(), quoter, new EmptyDescriptionGenerator(), generatorOptions)
         {
         }
 
@@ -33,57 +51,57 @@ namespace FluentMigrator.Runner.Generators.SQLite
 
         public override string Generate(AlterColumnExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("SQLite does not support alter column");
+            return CompatibilityMode.HandleCompatibilty("SQLite does not support alter column");
         }
 
         public override string Generate(RenameColumnExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("SQLite does not support renaming of columns");
+            return CompatibilityMode.HandleCompatibilty("SQLite does not support renaming of columns");
         }
 
         public override string Generate(DeleteColumnExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("SQLite does not support deleting of columns");
+            return CompatibilityMode.HandleCompatibilty("SQLite does not support deleting of columns");
         }
 
         public override string Generate(AlterDefaultConstraintExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("SQLite does not support altering of default constraints");
+            return CompatibilityMode.HandleCompatibilty("SQLite does not support altering of default constraints");
         }
 
         public override string Generate(CreateForeignKeyExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("Foreign keys are not supported in SQLite");
+            return CompatibilityMode.HandleCompatibilty("Foreign keys are not supported in SQLite");
         }
 
         public override string Generate(DeleteForeignKeyExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("Foreign keys are not supported in SQLite");
+            return CompatibilityMode.HandleCompatibilty("Foreign keys are not supported in SQLite");
         }
 
         public override string Generate(CreateSequenceExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("Sequences are not supported in SQLite");
+            return CompatibilityMode.HandleCompatibilty("Sequences are not supported in SQLite");
         }
 
         public override string Generate(DeleteSequenceExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("Sequences are not supported in SQLite");
+            return CompatibilityMode.HandleCompatibilty("Sequences are not supported in SQLite");
         }
 
         public override string Generate(DeleteDefaultConstraintExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("Default constraints are not supported");
+            return CompatibilityMode.HandleCompatibilty("Default constraints are not supported");
         }
 
         public override string Generate(CreateConstraintExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("Constraints are not supported");
+            return CompatibilityMode.HandleCompatibilty("Constraints are not supported");
         }
 
         public override string Generate(DeleteConstraintExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("Constraints are not supported");
+            return CompatibilityMode.HandleCompatibilty("Constraints are not supported");
         }
     }
 }

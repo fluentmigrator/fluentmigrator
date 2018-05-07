@@ -21,34 +21,43 @@ using System.Linq;
 
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
+using FluentMigrator.Validation;
 
 namespace FluentMigrator.Expressions
 {
-    public class CreateIndexExpression : MigrationExpressionBase, ISupportAdditionalFeatures, IIndexExpression
+    /// <summary>
+    /// Expression to create an index
+    /// </summary>
+    public class CreateIndexExpression : MigrationExpressionBase, ISupportAdditionalFeatures, IIndexExpression, IValidationChildren
     {
+        /// <inheritdoc />
         public virtual IndexDefinition Index { get; set; } = new IndexDefinition();
 
+        /// <inheritdoc />
         public IDictionary<string, object> AdditionalFeatures => Index.AdditionalFeatures;
 
-        public override void CollectValidationErrors(ICollection<string> errors)
-        {
-            Index.CollectValidationErrors(errors);
-        }
-
+        /// <inheritdoc />
         public override void ExecuteWith(IMigrationProcessor processor)
         {
             processor.Process(this);
         }
 
+        /// <inheritdoc />
         public override IMigrationExpression Reverse()
         {
             return new DeleteIndexExpression { Index = Index.Clone() as IndexDefinition };
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return base.ToString() + Index.TableName + " (" + string.Join(", ", Index.Columns.Select(x => x.Name).ToArray()) + ")";
         }
 
+        /// <inheritdoc />
+        IEnumerable<object> IValidationChildren.Children
+        {
+            get { yield return Index; }
+        }
     }
 }

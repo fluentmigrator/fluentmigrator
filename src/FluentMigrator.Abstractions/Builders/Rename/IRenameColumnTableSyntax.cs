@@ -21,8 +21,16 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Rename
 {
+    /// <summary>
+    /// Specify the table (or its column) to be renamed
+    /// </summary>
     public interface IRenameColumnTableSyntax : IFluentSyntax
     {
+        /// <summary>
+        /// Specify the name of the table (or its column) to be renamed
+        /// </summary>
+        /// <param name="tableName">The table name</param>
+        /// <returns>The next step</returns>
         IRenameColumnToOrInSchemaSyntax OnTable(string tableName);
     }
 }

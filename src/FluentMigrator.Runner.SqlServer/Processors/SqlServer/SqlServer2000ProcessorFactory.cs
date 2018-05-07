@@ -1,9 +1,9 @@
 #region License
 
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
 // Copyright (c) 2010, Nathan Brown
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -19,17 +19,21 @@
 
 #endregion
 
+using System;
+
+using FluentMigrator.Runner.Generators.SqlServer;
+
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
-    using Generators.SqlServer;
-
+    [Obsolete]
     public class SqlServer2000ProcessorFactory : MigrationProcessorFactory
     {
+        [Obsolete]
         public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
         {
             var factory = new SqlServerDbFactory();
             var connection = factory.CreateConnection(connectionString);
-            return new SqlServer2000Processor(connection, new SqlServer2000Generator(), announcer, options, factory);
+            return new SqlServer2000Processor(connection, new SqlServer2000Generator(new SqlServer2000Quoter()), announcer, options, factory);
         }
     }
 }

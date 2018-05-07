@@ -16,117 +16,101 @@
 //
 #endregion
 
+using System;
 using System.Data;
 using System.IO;
-using FluentMigrator.Builders.Execute;
+
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
-using FluentMigrator.Runner.Announcers;
-using FluentMigrator.Runner.Generators.SQLite;
-using FluentMigrator.Runner.Processors;
+using FluentMigrator.Runner;
+using FluentMigrator.Runner.Initialization;
+using FluentMigrator.Runner.Logging;
 using FluentMigrator.Runner.Processors.SQLite;
+
+using JetBrains.Annotations;
+
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+
 using Moq;
+
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Integration.Processors.SQLite
 {
     [TestFixture]
     [Category("Integration")]
     [Category("SQLite")]
+    // ReSharper disable once InconsistentNaming
     public class SQLiteProcessorTests
     {
-        private IDbFactory _dbFactory;
-        private IDbConnection _connection;
-        private SQLiteProcessor _processor;
-        private Mock<ColumnDefinition> column;
-        private IDbCommand _command;
-        private string columnName;
-        private string tableName;
-        private string tableNameThanMustBeEscaped;
+        private Mock<ColumnDefinition> _column;
+        private string _columnName;
+        private string _tableName;
+        private string _tableNameThatMustBeEscaped;
 
-        [SetUp]
-        public void SetUp()
-        {
-            // This connection used in the tests
-            _dbFactory = new SQLiteDbFactory();
-            _connection = _dbFactory.CreateConnection(IntegrationTestOptions.SqlLite.ConnectionString);
-            _connection.Open();
-            _command = _connection.CreateCommand();
-
-            // SUT
-            _processor = new SQLiteProcessor(_connection, new SQLiteGenerator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), _dbFactory);
-
-            column = new Mock<ColumnDefinition>();
-            tableName = "NewTable";
-            tableNameThanMustBeEscaped = "123NewTable";
-            columnName = "ColumnName";
-            column.SetupGet(c => c.Name).Returns(columnName);
-            column.SetupGet(c => c.IsNullable).Returns(true);
-            column.SetupGet(c => c.Type).Returns(DbType.Int32);
-        }
+        private ServiceProvider ServiceProvider { get; set; }
+        private IServiceScope ServiceScope { get; set; }
+        private SQLiteProcessor Processor { get; set; }
 
         [Test]
         public void CanDefaultAutoIncrementColumnTypeToInteger()
         {
             var column = new ColumnDefinition
-                             {
-                                 Name = "Id",
-                                 IsIdentity = true,
-                                 IsPrimaryKey = true,
-                                 Type = DbType.Int64,
-                                 IsNullable = false
-                             };
+            {
+                Name = "Id",
+                IsIdentity = true,
+                IsPrimaryKey = true,
+                Type = DbType.Int64,
+                IsNullable = false
+            };
 
-            var expression = new CreateTableExpression { TableName = tableName };
+            var expression = new CreateTableExpression { TableName = _tableName };
             expression.Columns.Add(column);
 
-            using (_command)
-            {
-                _processor.Process(expression);
-                _command.CommandText = string.Format("SELECT name FROM sqlite_master WHERE type='table' and name='{0}'", tableName);
-                _command.ExecuteReader().Read().ShouldBeTrue();
-            }
+            Processor.Process(expression);
+            Processor.TableExists(null, _tableName).ShouldBeTrue();
+            Processor.ColumnExists(null, _tableName, "Id").ShouldBeTrue();
         }
 
         [Test]
         public void CanCreateTableExpression()
         {
-            var expression = new CreateTableExpression { TableName = tableName };
-            expression.Columns.Add(column.Object);
+            var expression = new CreateTableExpression { TableName = _tableName };
+            expression.Columns.Add(_column.Object);
 
-            using (_command)
-            {
-                _processor.Process(expression);
-                _command.CommandText = string.Format("SELECT name FROM sqlite_master WHERE type='table' and name='{0}'", tableName);
-                _command.ExecuteReader().Read().ShouldBeTrue();
-            }
+            Processor.Process(expression);
+            Processor.TableExists(null, _tableName).ShouldBeTrue();
+            Processor.ColumnExists(null, _tableName, _columnName).ShouldBeTrue();
         }
 
         [Test]
         public void IsEscapingTableNameCorrectlyOnTableCreate()
         {
-            var expression = new CreateTableExpression { TableName = tableNameThanMustBeEscaped };
-            expression.Columns.Add(column.Object);
-            _processor.Process(expression);
+            var expression = new CreateTableExpression { TableName = _tableNameThatMustBeEscaped };
+            expression.Columns.Add(_column.Object);
+
+            Processor.Process(expression);
         }
 
         [Test]
         public void IsEscapingTableNameCorrectlyOnReadTableData()
         {
-            var expression = new CreateTableExpression { TableName = tableNameThanMustBeEscaped };
-            expression.Columns.Add(column.Object);
-            _processor.Process(expression);
-            _processor.ReadTableData(null, tableNameThanMustBeEscaped).Tables.Count.ShouldBe(1);
+            var expression = new CreateTableExpression { TableName = _tableNameThatMustBeEscaped };
+            expression.Columns.Add(_column.Object);
+            Processor.Process(expression);
+            Processor.ReadTableData(null, _tableNameThatMustBeEscaped).Tables.Count.ShouldBe(1);
         }
 
         [Test]
         public void IsEscapingTableNameCorrectlyOnTableExists()
         {
-            var expression = new CreateTableExpression { TableName = tableNameThanMustBeEscaped };
-            expression.Columns.Add(column.Object);
-            _processor.Process(expression);
-            _processor.TableExists(null, tableNameThanMustBeEscaped).ShouldBeTrue();
+            var expression = new CreateTableExpression { TableName = _tableNameThatMustBeEscaped };
+            expression.Columns.Add(_column.Object);
+            Processor.Process(expression);
+            Processor.TableExists(null, _tableNameThatMustBeEscaped).ShouldBeTrue();
         }
 
         [Test]
@@ -134,10 +118,11 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
         {
             const string columnName = "123ColumnName";
 
-            var expression = new CreateTableExpression { TableName = tableNameThanMustBeEscaped };
+            var expression = new CreateTableExpression { TableName = _tableNameThatMustBeEscaped };
             expression.Columns.Add(new ColumnDefinition() { Name = "123ColumnName", Type = DbType.AnsiString, IsNullable = true });
-            _processor.Process(expression);
-            _processor.ColumnExists(null, tableNameThanMustBeEscaped, columnName).ShouldBeTrue();
+
+            Processor.Process(expression);
+            Processor.ColumnExists(null, _tableNameThatMustBeEscaped, columnName).ShouldBeTrue();
         }
 
         [Test]
@@ -145,45 +130,95 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
         {
             var output = new StringWriter();
 
-            var connection = _dbFactory.CreateConnection(IntegrationTestOptions.SqlLite.ConnectionString);
-
-            var processor = new SQLiteProcessor(
-                connection,
-                new SQLiteGenerator(),
-                new TextWriterAnnouncer(output),
-                new ProcessorOptions { PreviewOnly = true },
-                new SQLiteDbFactory());
-
-            bool tableExists;
-
-            try
+            var serviceProvider = CreateProcessorServices(
+                services => services
+                    .AddSingleton<ILoggerProvider>(new SqlScriptFluentMigratorLoggerProvider(output))
+                    .ConfigureRunner(r => r.AsGlobalPreview()));
+            using (serviceProvider)
             {
-                var expression =
-                    new PerformDBOperationExpression
+                using (var scope = serviceProvider.CreateScope())
+                {
+                    var processor = scope.ServiceProvider.GetRequiredService<IMigrationProcessor>();
+
+                    bool tableExists;
+
+                    try
                     {
-                        Operation = (con, trans) =>
-                        {
-                            var command = con.CreateCommand();
-                            command.CommandText = "CREATE TABLE ProcessTestTable (test int NULL) ";
-                            command.Transaction = trans;
+                        var expression =
+                            new PerformDBOperationExpression
+                            {
+                                Operation = (con, trans) =>
+                                {
+                                    var command = con.CreateCommand();
+                                    command.CommandText = "CREATE TABLE ProcessTestTable (test int NULL) ";
+                                    command.Transaction = trans;
 
-                            command.ExecuteNonQuery();
-                        }
-                    };
+                                    command.ExecuteNonQuery();
+                                }
+                            };
 
-                processor.Process(expression);
+                        processor.Process(expression);
 
-                tableExists = processor.TableExists("", "ProcessTestTable");
+                        tableExists = processor.TableExists("", "ProcessTestTable");
+                    }
+                    finally
+                    {
+                        processor.RollbackTransaction();
+                    }
+
+                    tableExists.ShouldBeFalse();
+                }
             }
-            finally
-            {
-                processor.RollbackTransaction();
-
-            }
-
-            tableExists.ShouldBeFalse();
 
             Assert.That(output.ToString(), Does.Contain(@"/* Performing DB Operation */"));
+        }
+
+        private ServiceProvider CreateProcessorServices([CanBeNull] Action<IServiceCollection> initAction)
+        {
+            if (!IntegrationTestOptions.SQLite.IsEnabled)
+                Assert.Ignore();
+
+            var serivces = ServiceCollectionExtensions.CreateServices()
+                .ConfigureRunner(r => r.AddSQLite())
+                .AddScoped<IConnectionStringReader>(
+                    _ => new PassThroughConnectionStringReader(IntegrationTestOptions.SQLite.ConnectionString));
+
+            initAction?.Invoke(serivces);
+
+            return serivces.BuildServiceProvider();
+        }
+
+        [OneTimeSetUp]
+        public void ClassSetUp()
+        {
+            ServiceProvider = CreateProcessorServices(initAction: null);
+
+            _column = new Mock<ColumnDefinition>();
+            _tableName = "NewTable";
+            _tableNameThatMustBeEscaped = "123NewTable";
+            _columnName = "ColumnName";
+            _column.SetupGet(c => c.Name).Returns(_columnName);
+            _column.SetupGet(c => c.IsNullable).Returns(true);
+            _column.SetupGet(c => c.Type).Returns(DbType.Int32);
+        }
+
+        [OneTimeTearDown]
+        public void ClassTearDown()
+        {
+            ServiceProvider?.Dispose();
+        }
+
+        [SetUp]
+        public void SetUp()
+        {
+            ServiceScope = ServiceProvider.CreateScope();
+            Processor = ServiceScope.ServiceProvider.GetRequiredService<SQLiteProcessor>();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            ServiceScope?.Dispose();
         }
     }
 }

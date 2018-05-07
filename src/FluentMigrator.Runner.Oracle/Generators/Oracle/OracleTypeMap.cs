@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -23,9 +23,9 @@ namespace FluentMigrator.Runner.Generators.Oracle
 {
     public class OracleTypeMap : TypeMapBase
     {
-        // See https://docs.oracle.com/cd/B28359_01/server.111/b28320/limits001.htm#i287903 
+        // See https://docs.oracle.com/cd/B28359_01/server.111/b28320/limits001.htm#i287903
         // and http://docs.oracle.com/cd/B19306_01/server.102/b14220/datatype.htm#i13446
-        // for limits in Oracle data types. 
+        // for limits in Oracle data types.
         public const int AnsiStringCapacity = 4000;
         public const int AnsiTextCapacity = int.MaxValue;
         public const int BlobCapacity = int.MaxValue;

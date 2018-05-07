@@ -17,26 +17,34 @@
 using System.Collections.Generic;
 
 using FluentMigrator.Model;
+using FluentMigrator.Validation;
 
 namespace FluentMigrator.Expressions
 {
-    public class CreateSequenceExpression : MigrationExpressionBase, ISequenceExpression
+    /// <summary>
+    /// Expression to crate a sequence
+    /// </summary>
+    public class CreateSequenceExpression : MigrationExpressionBase, ISequenceExpression, IValidationChildren
     {
+        /// <inheritdoc />
         public virtual SequenceDefinition Sequence { get; set; } = new SequenceDefinition();
 
+        /// <inheritdoc />
         public override void ExecuteWith(IMigrationProcessor processor)
         {
             processor.Process(this);
         }
 
-        public override void CollectValidationErrors(ICollection<string> errors)
-        {
-            Sequence.CollectValidationErrors(errors);
-        }
-
+        /// <inheritdoc />
         public override string ToString()
         {
             return base.ToString() + Sequence.Name;
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<object> Children
+        {
+            get { yield return Sequence; }
         }
     }
 }

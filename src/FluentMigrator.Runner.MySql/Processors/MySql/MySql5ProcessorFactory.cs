@@ -14,17 +14,34 @@
 // limitations under the License.
 #endregion
 
+using System;
+
 using FluentMigrator.Runner.Generators.MySql;
 
 namespace FluentMigrator.Runner.Processors.MySql
 {
+    [Obsolete]
     public class MySql5ProcessorFactory : MigrationProcessorFactory
     {
+        private readonly IServiceProvider _serviceProvider;
+
+        [Obsolete]
+        public MySql5ProcessorFactory()
+            : this(serviceProvider: null)
+        {
+        }
+
+        public MySql5ProcessorFactory(IServiceProvider serviceProvider)
+        {
+            _serviceProvider = serviceProvider;
+        }
+
+        [Obsolete]
         public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
         {
-            var factory = new MySqlDbFactory();
+            var factory = new MySqlDbFactory(_serviceProvider);
             var connection = factory.CreateConnection(connectionString);
-            return new MySqlProcessor(connection, new MySql5Generator(), announcer, options, factory);
+            return new MySqlProcessor(connection, new MySql5Generator(new MySqlQuoter()), announcer, options, factory);
         }
     }
 }

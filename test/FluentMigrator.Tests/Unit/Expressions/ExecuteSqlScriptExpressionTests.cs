@@ -19,15 +19,17 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner;
 using FluentMigrator.Tests.Helpers;
+
 using Moq;
+
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Expressions
 {

@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -21,15 +21,23 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Insert
 {
+    /// <summary>
+    /// The implementation of the <see cref="IInsertExpressionRoot"/> interface.
+    /// </summary>
     public class InsertExpressionRoot : IInsertExpressionRoot
     {
         private readonly IMigrationContext _context;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="InsertExpressionRoot"/> class.
+        /// </summary>
+        /// <param name="context">The migration context</param>
         public InsertExpressionRoot(IMigrationContext context)
         {
             _context = context;
         }
 
+        /// <inheritdoc />
         public IInsertDataOrInSchemaSyntax IntoTable(string tableName)
         {
             var expression = new InsertDataExpression { TableName = tableName };

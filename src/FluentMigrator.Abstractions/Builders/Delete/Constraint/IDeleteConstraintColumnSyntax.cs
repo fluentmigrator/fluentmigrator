@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2007-2018, FluentMigrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,9 +18,21 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Delete.Constraint
 {
+    /// <summary>
+    /// Delete a constraint column
+    /// </summary>
     public interface IDeleteConstraintColumnSyntax : IFluentSyntax
     {
+        /// <summary>
+        /// The name of the column to delete
+        /// </summary>
+        /// <param name="columnName">The column name</param>
         void Column(string columnName);
+
+        /// <summary>
+        /// The names of the columns to delete
+        /// </summary>
+        /// <param name="columnNames">The column names</param>
         void Columns(params string[] columnNames);
     }
 }

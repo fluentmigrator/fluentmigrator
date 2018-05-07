@@ -23,7 +23,8 @@ using System.Text;
 using FluentMigrator.Console;
 
 using NUnit.Framework;
-using NUnit.Should;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Runners
 {
@@ -79,7 +80,9 @@ namespace FluentMigrator.Tests.Unit.Runners
         {
             var sbNonVerbose = new StringBuilder();
             var stringWriterNonVerbose = new StringWriter(sbNonVerbose);
+
             System.Console.SetOut(stringWriterNonVerbose);
+            System.Console.SetError(stringWriterNonVerbose);
 
             new MigratorConsole().Run(
                 "/db", Database,
@@ -110,7 +113,10 @@ namespace FluentMigrator.Tests.Unit.Runners
         {
             var sb = new StringBuilder();
             var stringWriter = new StringWriter(sb);
+
             System.Console.SetOut(stringWriter);
+            System.Console.SetError(stringWriter);
+
             new MigratorConsole().Run(
                 "/db", Database,
                 "/connection", Connection,
@@ -130,6 +136,7 @@ namespace FluentMigrator.Tests.Unit.Runners
             var stringWriter = new StringWriter(sb);
 
             System.Console.SetOut(stringWriter);
+            System.Console.SetError(stringWriter);
 
             new MigratorConsole().Run(
                 "/db", Database,
@@ -149,7 +156,10 @@ namespace FluentMigrator.Tests.Unit.Runners
         public void FileAnnouncerHasOutputToDefaultOutputFile()
         {
             var outputFileName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Target + ".sql");
-            if (File.Exists(outputFileName)) File.Delete(outputFileName);
+            if (File.Exists(outputFileName))
+            {
+                File.Delete(outputFileName);
+            }
 
             Assert.IsFalse(File.Exists(outputFileName));
 
@@ -170,7 +180,10 @@ namespace FluentMigrator.Tests.Unit.Runners
         public void FileAnnouncerHasOutputToSpecifiedOutputFile()
         {
             var outputFileName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "output.sql");
-            if (File.Exists(outputFileName)) File.Delete(outputFileName);
+            if (File.Exists(outputFileName))
+            {
+                File.Delete(outputFileName);
+            }
 
             Assert.IsFalse(File.Exists(outputFileName));
 
@@ -217,9 +230,9 @@ namespace FluentMigrator.Tests.Unit.Runners
                 "/tag", "uk",
                 "/tag", "production");
 
-            var expectedTags = new string[] { "uk", "production" };
+            var expectedTags = new[] { "uk", "production" };
 
-            CollectionAssert.AreEquivalent(expectedTags, migratorConsole.RunnerContext.Tags);
+            CollectionAssert.AreEquivalent(expectedTags, migratorConsole.Tags);
         }
 
         [Test]
@@ -234,7 +247,6 @@ namespace FluentMigrator.Tests.Unit.Runners
                 "/tps");
 
             console.TransactionPerSession.ShouldBeTrue();
-            console.RunnerContext.TransactionPerSession.ShouldBeTrue();
         }
 
         [Test]
@@ -249,7 +261,6 @@ namespace FluentMigrator.Tests.Unit.Runners
                 "/transaction-per-session");
 
             console.TransactionPerSession.ShouldBeTrue();
-            console.RunnerContext.TransactionPerSession.ShouldBeTrue();
         }
 
         [Test]
@@ -268,7 +279,7 @@ namespace FluentMigrator.Tests.Unit.Runners
 
             const string expectedProviderSwitces = "QuotedIdentifiers=true";
 
-            CollectionAssert.AreEquivalent(expectedProviderSwitces, migratorConsole.RunnerContext.ProviderSwitches);
+            CollectionAssert.AreEquivalent(expectedProviderSwitces, migratorConsole.ProviderSwitches);
         }
     }
 }

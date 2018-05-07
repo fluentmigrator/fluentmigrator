@@ -22,6 +22,7 @@ using FluentMigrator.Runner.Generators.Base;
 
 namespace FluentMigrator.Runner.Generators.SQLite
 {
+    // ReSharper disable once InconsistentNaming
     internal class SQLiteTypeMap : TypeMapBase
     {
         public const int AnsiStringCapacity = 8000;
@@ -61,9 +62,9 @@ namespace FluentMigrator.Runner.Generators.SQLite
             SetTypeMap(DbType.Guid, "UNIQUEIDENTIFIER");
         }
 
-        public override string GetTypeMap(DbType type, int size, int precision)
+        public override string GetTypeMap(DbType type, int? size, int? precision)
         {
-            return base.GetTypeMap(type, 0, 0);
+            return base.GetTypeMap(type, size: null, precision: null);
         }
     }
 }

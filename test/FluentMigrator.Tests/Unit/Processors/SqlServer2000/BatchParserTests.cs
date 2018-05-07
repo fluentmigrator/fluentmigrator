@@ -14,9 +14,23 @@
 // limitations under the License.
 #endregion
 
-using FluentMigrator.Runner.Announcers;
+using System;
+using System.Data.Common;
+
+using FluentMigrator.Runner.BatchParser;
 using FluentMigrator.Runner.Generators.SqlServer;
+using FluentMigrator.Runner.Initialization;
+using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.SqlServer;
+using FluentMigrator.Tests.Logging;
+
+using JetBrains.Annotations;
+
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+
+using Moq;
 
 using NUnit.Framework;
 
@@ -27,12 +41,35 @@ namespace FluentMigrator.Tests.Unit.Processors.SqlServer2000
     {
         protected override IMigrationProcessor CreateProcessor()
         {
-            return new SqlServer2000Processor(
-                MockedConnection.Object,
+            var mockedConnStringReader = new Mock<IConnectionStringReader>();
+            mockedConnStringReader.SetupGet(r => r.Priority).Returns(0);
+            mockedConnStringReader.Setup(r => r.GetConnectionString(It.IsAny<string>())).Returns("server=this");
+
+            var serviceProvider = new ServiceCollection()
+                .AddLogging()
+                .AddSingleton<ILoggerProvider, TestLoggerProvider>()
+                .AddTransient<SqlServerBatchParser>()
+                .BuildServiceProvider();
+
+            var logger = serviceProvider.GetRequiredService<ILogger<SqlServer2000Processor>>();
+
+            var opt = new OptionsWrapper<ProcessorOptions>(new ProcessorOptions());
+            return new Processor(
+                MockedDbProviderFactory.Object,
+                logger,
                 new SqlServer2000Generator(),
-                new NullAnnouncer(),
-                ProcessorOptions,
-                MockedDbFactory.Object);
+                opt,
+                MockedConnectionStringAccessor.Object,
+                serviceProvider);
+        }
+
+        private class Processor : SqlServer2000Processor
+        {
+            /// <inheritdoc />
+            public Processor(DbProviderFactory factory, [NotNull] ILogger logger, [NotNull] SqlServer2000Generator generator, [NotNull] IOptions<ProcessorOptions> options, [NotNull] IConnectionStringAccessor connectionStringAccessor, [NotNull] IServiceProvider serviceProvider)
+                : base(factory, logger, generator, options, connectionStringAccessor, serviceProvider)
+            {
+            }
         }
     }
 }

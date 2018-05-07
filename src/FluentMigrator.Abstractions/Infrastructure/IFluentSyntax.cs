@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -21,18 +21,41 @@ using System.ComponentModel;
 
 namespace FluentMigrator.Infrastructure
 {
+    /// <summary>
+    /// The base interface for the fluent API
+    /// </summary>
+    /// <remarks>
+    /// This is just here to suppress the default members of <see cref="object"/>
+    /// </remarks>
     [EditorBrowsable(EditorBrowsableState.Never)]
     public interface IFluentSyntax
     {
+        /// <summary>
+        /// Gets the objects type
+        /// </summary>
+        /// <returns>The objects type</returns>
         [EditorBrowsable(EditorBrowsableState.Never)]
         Type GetType();
 
+        /// <summary>
+        /// Gets the objects hash code
+        /// </summary>
+        /// <returns>The objects hash code</returns>
         [EditorBrowsable(EditorBrowsableState.Never)]
         int GetHashCode();
 
+        /// <summary>
+        /// Gets the objects string representation
+        /// </summary>
+        /// <returns>The objects string representation</returns>
         [EditorBrowsable(EditorBrowsableState.Never)]
         string ToString();
 
+        /// <summary>
+        /// Compares if two objects of the same type are equal
+        /// </summary>
+        /// <param name="other">The object this one should be compared to</param>
+        /// <returns><c>true</c> when both objects are equal</returns>
         [EditorBrowsable(EditorBrowsableState.Never)]
         bool Equals(object other);
     }

@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -16,42 +16,56 @@
 //
 #endregion
 
-using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
+using FluentMigrator.Validation;
 
 namespace FluentMigrator.Expressions
 {
-    public class AlterColumnExpression : MigrationExpressionBase,
-        ISchemaExpression
+    /// <summary>
+    /// The implementation of interfaces to alter a column
+    /// </summary>
+    public class AlterColumnExpression
+        : MigrationExpressionBase,
+          ISchemaExpression,
+          IValidationChildren
     {
+        /// <inheritdoc />
         public virtual string SchemaName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the table name
+        /// </summary>
+        [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.TableNameCannotBeNullOrEmpty))]
         public virtual string TableName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the column definition
+        /// </summary>
         public virtual ColumnDefinition Column { get; set; }
+            = new ColumnDefinition() { ModificationType = ColumnModificationType.Alter };
 
-        public AlterColumnExpression()
-        {
-            Column = new ColumnDefinition() { ModificationType = ColumnModificationType.Alter };
-        }
-
-        public override void CollectValidationErrors(ICollection<string> errors)
-        {
-            if (String.IsNullOrEmpty(TableName))
-                errors.Add(ErrorMessages.TableNameCannotBeNullOrEmpty);
-
-            Column.CollectValidationErrors(errors);
-        }
-
+        /// <inheritdoc />
         public override void ExecuteWith(IMigrationProcessor processor)
         {
             Column.TableName = TableName;
             processor.Process(this);
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
-            return base.ToString() + TableName + " " + Column.Name + " " + Column.Type ?? Column.CustomType;
+            var typeName = Column.Type == null ? Column.CustomType : Column.Type.ToString();
+            return base.ToString() + TableName + " " + Column.Name + " " + typeName;
+        }
+
+        /// <inheritdoc />
+        IEnumerable<object> IValidationChildren.Children
+        {
+            get { yield return Column; }
         }
     }
 }

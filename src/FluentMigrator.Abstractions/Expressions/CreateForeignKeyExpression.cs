@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -18,29 +18,33 @@
 
 using System.Collections.Generic;
 using System.Linq;
+
 using FluentMigrator.Model;
+using FluentMigrator.Validation;
 
 namespace FluentMigrator.Expressions
 {
-    public class CreateForeignKeyExpression : MigrationExpressionBase, IForeignKeyExpression
+    /// <summary>
+    /// Expression to create a foreign key
+    /// </summary>
+    public class CreateForeignKeyExpression : MigrationExpressionBase, IForeignKeyExpression, IValidationChildren
     {
+        /// <inheritdoc />
         public virtual ForeignKeyDefinition ForeignKey { get; set; } = new ForeignKeyDefinition();
 
-        public override void CollectValidationErrors(ICollection<string> errors)
-        {
-            ForeignKey.CollectValidationErrors(errors);
-        }
-
+        /// <inheritdoc />
         public override void ExecuteWith(IMigrationProcessor processor)
         {
             processor.Process(this);
         }
 
+        /// <inheritdoc />
         public override IMigrationExpression Reverse()
         {
             return new DeleteForeignKeyExpression { ForeignKey = ForeignKey.Clone() as ForeignKeyDefinition };
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return base.ToString() +
@@ -50,6 +54,12 @@ namespace FluentMigrator.Expressions
                                 string.Join(", ", ForeignKey.ForeignColumns.ToArray()),
                                 ForeignKey.PrimaryTable,
                                 string.Join(", ", ForeignKey.PrimaryColumns.ToArray()));
+        }
+
+        /// <inheritdoc />
+        IEnumerable<object> IValidationChildren.Children
+        {
+            get { yield return ForeignKey; }
         }
     }
 }

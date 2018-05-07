@@ -16,55 +16,62 @@
 
 #endregion
 
+using System;
 using System.Data;
 using System.Data.Common;
 using System.Diagnostics;
 
 namespace FluentMigrator.Runner.Processors
 {
+#pragma warning disable 612
     public abstract class DbFactoryBase : IDbFactory
+#pragma warning restore 612
     {
-        private readonly object @lock = new object();
-        private volatile DbProviderFactory factory;
+        private readonly object _lock = new object();
+        private volatile DbProviderFactory _factory;
 
         protected DbFactoryBase(DbProviderFactory factory)
         {
-            this.factory = factory;
+            _factory = factory;
         }
 
         protected DbFactoryBase()
         {
         }
 
-        protected DbProviderFactory Factory
+        /// <summary>
+        /// Gets the DB provider factory
+        /// </summary>
+        public virtual DbProviderFactory Factory
         {
             get
             {
-                if (factory == null)
+                if (_factory == null)
                 {
-                    lock (@lock)
+                    lock (_lock)
                     {
-                        if (factory == null)
+                        if (_factory == null)
                         {
-                            factory = CreateFactory();
+                            _factory = CreateFactory();
                         }
                     }
                 }
-                return factory;
+                return _factory;
             }
         }
 
         protected abstract DbProviderFactory CreateFactory();
 
-        #region IDbFactory Members
-
+        [Obsolete]
         public IDbConnection CreateConnection(string connectionString)
         {
             var connection = Factory.CreateConnection();
+            Debug.Assert(connection != null, nameof(connection) + " != null");
             connection.ConnectionString = connectionString;
             return connection;
         }
 
+        [Obsolete]
         public virtual IDbCommand CreateCommand(string commandText, IDbConnection connection, IDbTransaction transaction, IMigrationProcessorOptions options)
         {
             var command = connection.CreateCommand();
@@ -73,7 +80,5 @@ namespace FluentMigrator.Runner.Processors
             if (transaction != null) command.Transaction = transaction;
             return command;
         }
-
-        #endregion
     }
 }

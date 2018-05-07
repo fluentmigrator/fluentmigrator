@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -16,30 +16,30 @@
 //
 #endregion
 
-using System;
-using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+
 using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Expressions
 {
+    /// <summary>
+    /// Expression to execute an SQL statement
+    /// </summary>
     public class ExecuteSqlStatementExpression : MigrationExpressionBase
     {
+        /// <summary>
+        /// Gets or sets the SQL statement to be executed
+        /// </summary>
+        [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.SqlStatementCannotBeNullOrEmpty))]
         public virtual string SqlStatement { get; set; }
 
+        /// <inheritdoc />
         public override void ExecuteWith(IMigrationProcessor processor)
         {
-            // since all the Processors are using String.Format() in their Execute method
-            //  we need to escape the brackets with double brackets or else it throws an incorrect format error on the String.Format call
-            var sqlText = SqlStatement.Replace("{", "{{").Replace("}", "}}");
-            processor.Execute(sqlText);
+            processor.Execute(SqlStatement);
         }
 
-        public override void CollectValidationErrors(ICollection<string> errors)
-        {
-            if (String.IsNullOrEmpty(SqlStatement))
-                errors.Add(ErrorMessages.SqlStatementCannotBeNullOrEmpty);
-        }
-
+        /// <inheritdoc />
         public override string ToString()
         {
             return base.ToString() + SqlStatement;

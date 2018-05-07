@@ -18,38 +18,82 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Conventions;
+using FluentMigrator.Runner.Initialization;
+using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Versioning;
 using FluentMigrator.Runner.VersionTableInfo;
+
+using JetBrains.Annotations;
+
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner
 {
     public class ConnectionlessVersionLoader : IVersionLoader
     {
-        private readonly IConventionSet _conventionSet;
+        [NotNull]
+        private readonly IMigrationProcessor _processor;
+
+        [NotNull]
+        private readonly IMigrationInformationLoader _migrationInformationLoader;
+
         private bool _versionsLoaded;
 
-        public ConnectionlessVersionLoader(IMigrationRunner runner, IAssemblyCollection assemblies,
+        [Obsolete]
+        internal ConnectionlessVersionLoader(
+            IMigrationRunner runner,
+            IAssemblyCollection assemblies,
             IConventionSet conventionSet,
-            IMigrationRunnerConventions conventions, long startVersion, long targetVersion,
+            IMigrationRunnerConventions conventions,
+            IRunnerContext runnerContext,
             IVersionTableMetaData versionTableMetaData = null)
         {
-            _conventionSet = conventionSet;
+            _migrationInformationLoader = runner.MigrationLoader;
+            _processor = runner.Processor;
+
             Runner = runner;
             Assemblies = assemblies;
             Conventions = conventions;
-            StartVersion = startVersion;
-            TargetVersion = targetVersion;
-
-            Processor = Runner.Processor;
+            StartVersion = runnerContext.StartVersion;
+            TargetVersion = runnerContext.Version;
 
             VersionInfo = new VersionInfo();
-            VersionTableMetaData = versionTableMetaData ?? GetVersionTableMetaData();
+            VersionTableMetaData = versionTableMetaData ??
+                (IVersionTableMetaData)Activator.CreateInstance(assemblies.Assemblies.GetVersionTableMetaDataType(
+                    Conventions, runnerContext));
+            VersionMigration = new VersionMigration(VersionTableMetaData);
+            VersionSchemaMigration = new VersionSchemaMigration(VersionTableMetaData);
+            VersionUniqueMigration = new VersionUniqueMigration(VersionTableMetaData);
+            VersionDescriptionMigration = new VersionDescriptionMigration(VersionTableMetaData);
+
+            if (VersionTableMetaData is DefaultVersionTableMetaData defaultMetaData)
+            {
+                conventionSet.SchemaConvention?.Apply(defaultMetaData);
+            }
+
+            LoadVersionInfo();
+        }
+
+        public ConnectionlessVersionLoader(
+            [NotNull] IProcessorAccessor processorAccessor,
+            [NotNull] IMigrationRunnerConventions conventions,
+            [NotNull] IOptions<RunnerOptions> runnerOptions,
+            [NotNull] IMigrationInformationLoader migrationInformationLoader,
+            [NotNull] IVersionTableMetaData versionTableMetaData)
+        {
+            _processor = processorAccessor.Processor;
+            _migrationInformationLoader = migrationInformationLoader;
+            Conventions = conventions;
+            StartVersion = runnerOptions.Value.StartVersion;
+            TargetVersion = runnerOptions.Value.Version;
+
+            VersionInfo = new VersionInfo();
+            VersionTableMetaData = versionTableMetaData;
             VersionMigration = new VersionMigration(VersionTableMetaData);
             VersionSchemaMigration = new VersionSchemaMigration(VersionTableMetaData);
             VersionUniqueMigration = new VersionUniqueMigration(VersionTableMetaData);
@@ -58,8 +102,10 @@ namespace FluentMigrator.Runner
             LoadVersionInfo();
         }
 
-        private IMigrationProcessor Processor { get; set; }
+        [Obsolete]
+        [CanBeNull]
         protected IAssemblyCollection Assemblies { get; set; }
+
         public IMigrationRunnerConventions Conventions { get; set; }
         public long StartVersion { get; set; }
         public long TargetVersion { get; set; }
@@ -67,6 +113,9 @@ namespace FluentMigrator.Runner
         public IMigration VersionMigration { get; }
         public IMigration VersionUniqueMigration { get; }
         public IMigration VersionDescriptionMigration { get; }
+
+        [Obsolete]
+        [CanBeNull]
         public IMigrationRunner Runner { get; set; }
         public IVersionInfo VersionInfo { get; set; }
         public IVersionTableMetaData VersionTableMetaData { get; set; }
@@ -76,13 +125,13 @@ namespace FluentMigrator.Runner
             get
             {
                 return string.IsNullOrEmpty(VersionTableMetaData.SchemaName) ||
-                       Processor.SchemaExists(VersionTableMetaData.SchemaName);
+                       _processor.SchemaExists(VersionTableMetaData.SchemaName);
             }
         }
 
         public bool AlreadyCreatedVersionTable
         {
-            get { return Processor.TableExists(VersionTableMetaData.SchemaName, VersionTableMetaData.TableName); }
+            get { return _processor.TableExists(VersionTableMetaData.SchemaName, VersionTableMetaData.TableName); }
         }
 
         public void DeleteVersion(long version)
@@ -92,23 +141,12 @@ namespace FluentMigrator.Runner
             {
                 new KeyValuePair<string, object>(VersionTableMetaData.ColumnName, version)
             });
-            expression.ExecuteWith(Processor);
+            expression.ExecuteWith(_processor);
         }
 
         public IVersionTableMetaData GetVersionTableMetaData()
         {
-            var matchedType = Assemblies.GetExportedTypes()
-                .FilterByNamespace(Runner.RunnerContext.Namespace, Runner.RunnerContext.NestedNamespaces)
-                .FirstOrDefault(t => Conventions.TypeIsVersionTableMetaData(t));
-
-            if (matchedType == null)
-            {
-                var result = new DefaultVersionTableMetaData();
-                _conventionSet.SchemaConvention?.Apply(result);
-                return result;
-            }
-
-            return (IVersionTableMetaData) Activator.CreateInstance(matchedType);
+            return VersionTableMetaData;
         }
 
         public void LoadVersionInfo()
@@ -118,7 +156,7 @@ namespace FluentMigrator.Runner
                 return;
             }
 
-            foreach (var migration in Runner.MigrationLoader.LoadMigrations())
+            foreach (var migration in _migrationInformationLoader.LoadMigrations())
             {
                 if (migration.Key < StartVersion)
                 {
@@ -132,12 +170,12 @@ namespace FluentMigrator.Runner
         public void RemoveVersionTable()
         {
             var expression = new DeleteTableExpression {TableName = VersionTableMetaData.TableName, SchemaName = VersionTableMetaData.SchemaName};
-            expression.ExecuteWith(Processor);
+            expression.ExecuteWith(_processor);
 
             if (!string.IsNullOrEmpty(VersionTableMetaData.SchemaName))
             {
                 var schemaExpression = new DeleteSchemaExpression {SchemaName = VersionTableMetaData.SchemaName};
-                schemaExpression.ExecuteWith(Processor);
+                schemaExpression.ExecuteWith(_processor);
             }
         }
 
@@ -153,7 +191,7 @@ namespace FluentMigrator.Runner
             dataExpression.TableName = VersionTableMetaData.TableName;
             dataExpression.SchemaName = VersionTableMetaData.SchemaName;
 
-            dataExpression.ExecuteWith(Processor);
+            dataExpression.ExecuteWith(_processor);
         }
 
         protected virtual InsertionDataDefinition CreateVersionInfoInsertionData(long version, string description)

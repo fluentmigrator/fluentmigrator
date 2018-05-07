@@ -1,3 +1,21 @@
+#region License
+//
+// Copyright (c) 2018, Fluent Migrator Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -8,14 +26,16 @@ using FluentMigrator.Infrastructure;
 using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner;
-using FluentMigrator.Runner.Extensions;
 using FluentMigrator.SqlServer;
+
+using Microsoft.Extensions.DependencyInjection;
+
+using Moq;
 
 namespace FluentMigrator.Tests.Unit.Generators
 {
     public static class GeneratorTestHelper
     {
-
         public static string TestTableName1 = "TestTable1";
         public static string TestTableName2 = "TestTable2";
         public static string TestColumnName1 = "TestColumn1";
@@ -456,12 +476,14 @@ namespace FluentMigrator.Tests.Unit.Generators
 
         public static ICollection<IMigrationExpression> GetCreateColumnWithSystemMethodExpression(string schemaName = null)
         {
-            var context = new MigrationContext(null, null, null, null);
+            var serviceProvider = new ServiceCollection().BuildServiceProvider();
+            var querySchema = new Mock<IQuerySchema>();
+            var context = new MigrationContext(querySchema.Object, serviceProvider, null, null);
             var expr = new CreateColumnExpression
             {
                 TableName = TestTableName1,
                 SchemaName = schemaName,
-                Column = new ColumnDefinition { Name = TestColumnName1, Type = DbType.String, Size = 5 }
+                Column = new ColumnDefinition { Name = TestColumnName1, Type = DbType.DateTime }
             };
             context.Expressions.Add(expr);
             var builder = new CreateColumnExpressionBuilder(expr, context);
@@ -524,6 +546,20 @@ namespace FluentMigrator.Tests.Unit.Generators
             expression.Column.Size = 20;
             expression.Column.IsNullable = false;
             expression.Column.ModificationType = ColumnModificationType.Alter;
+
+            return expression;
+        }
+
+        public static CreateColumnExpression GetCreateColumnExpressionWithNullableCustomType()
+        {
+            var expression = new CreateColumnExpression();
+            expression.TableName = TestTableName1;
+
+            expression.Column = new ColumnDefinition();
+            expression.Column.Name = TestColumnName1;
+            expression.Column.IsNullable = true;
+            expression.Column.CustomType = "MyDomainType";
+            expression.Column.ModificationType = ColumnModificationType.Create;
 
             return expression;
         }

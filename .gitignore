@@ -270,3 +270,9 @@ GitVersion\.CommandLine\.*/
 
 PublishProfiles/
 launchSettings.json
+
+# docfx
+
+/**/DROP/
+/**/TEMP/
+_site

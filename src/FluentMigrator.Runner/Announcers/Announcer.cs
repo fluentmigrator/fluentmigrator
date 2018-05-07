@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
 //
@@ -18,12 +18,27 @@
 
 using System;
 
+using Microsoft.Extensions.Options;
+
 namespace FluentMigrator.Runner.Announcers
 {
+    [Obsolete]
     public abstract class Announcer : IAnnouncer
     {
         public virtual bool ShowSql { get; set; }
         public virtual bool ShowElapsedTime { get; set; }
+
+        protected Announcer()
+        {
+        }
+
+        protected Announcer(IOptions<AnnouncerOptions> options)
+        {
+            // ReSharper disable VirtualMemberCallInConstructor
+            ShowSql = options.Value.ShowSql;
+            ShowElapsedTime = options.Value.ShowElapsedTime;
+            // ReSharper restore VirtualMemberCallInConstructor
+        }
 
         public virtual void Heading(string message)
         {
