@@ -1,7 +1,6 @@
 language: csharp
 dist: trusty
 sudo: false
-solution: FluentMigrator.sln
 mono: latest
 dotnet: 2.1.300-preview2-008533
 git:
