@@ -6,7 +6,7 @@
     <OutputType>Exe</OutputType>
     <Description>.NET Core CLI tool for FluentMigrator</Description>
   </PropertyGroup>
-  <Import Project="$(MSBuildThisFileDirectory)../../PackageTool.proj" />
+  <Import Project="$(MSBuildThisFileDirectory)../../PackageTool.props" />
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="6.2.2" />
     <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="5.12.1" />

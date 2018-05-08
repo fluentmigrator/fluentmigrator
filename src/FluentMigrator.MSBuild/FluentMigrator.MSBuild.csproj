@@ -3,7 +3,7 @@
     <TargetFrameworks>net461;netstandard2.0</TargetFrameworks>
     <Description>MSBuild runner for FluentMigrator</Description>
   </PropertyGroup>
-  <Import Project="$(MSBuildThisFileDirectory)../../PackageTool.proj" />
+  <Import Project="$(MSBuildThisFileDirectory)../../PackageTool.props" />
   <ItemGroup>
     <None Include="build/**/*.targets">
       <PackagePath>build/%(RecursiveDir)%(Filename)%(Extension)</PackagePath>
