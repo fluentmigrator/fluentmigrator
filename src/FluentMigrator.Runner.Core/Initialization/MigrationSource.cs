@@ -25,6 +25,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace FluentMigrator.Runner.Initialization
 {
+    /// <summary>
+    /// The default implementation of <see cref="IMigrationSource"/>
+    /// </summary>
     public class MigrationSource : IMigrationSource
     {
         [NotNull]

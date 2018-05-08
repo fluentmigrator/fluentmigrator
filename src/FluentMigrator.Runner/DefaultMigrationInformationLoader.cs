@@ -31,6 +31,9 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner
 {
+    /// <summary>
+    /// Default implementation of a <see cref="IMigrationInformationLoader"/>
+    /// </summary>
     public class DefaultMigrationInformationLoader : IMigrationInformationLoader
     {
         [NotNull, ItemNotNull]
@@ -42,6 +45,13 @@ namespace FluentMigrator.Runner
         [CanBeNull]
         private SortedList<long, IMigrationInfo> _migrationInfos;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DefaultMigrationInformationLoader"/> class.
+        /// </summary>
+        /// <param name="source">The configured source of <see cref="IMigration"/> instances</param>
+        /// <param name="filterOptions">The filter options</param>
+        /// <param name="conventions">The conventions used to validate tags and creating <see cref="IMigrationInfo"/> instances</param>
+        /// <param name="runnerOptions">The runner options</param>
         public DefaultMigrationInformationLoader(
             [NotNull] IMigrationSource source,
             [NotNull] IOptionsSnapshot<TypeFilterOptions> filterOptions,
@@ -55,14 +65,25 @@ namespace FluentMigrator.Runner
             _tagsToMatch = runnerOptions.Value.Tags ?? Array.Empty<string>();
         }
 
+        /// <summary>
+        /// Gets the migration runner conventions
+        /// </summary>
         [NotNull]
         public IMigrationRunnerConventions Conventions { get; }
 
+        /// <summary>
+        /// Gets the namespace used to filter the <see cref="IMigration"/> instances
+        /// </summary>
         [CanBeNull]
         public string Namespace { get; }
 
+        /// <summary>
+        /// Gets a value indicating whether all <see cref="IMigration"/> instances that
+        /// are in a child namespace of <see cref="Namespace"/> should be used
+        /// </summary>
         public bool LoadNestedNamespaces { get; }
 
+        /// <inheritdoc />
         public SortedList<long, IMigrationInfo> LoadMigrations()
         {
             if (_migrationInfos != null)

@@ -20,8 +20,15 @@ using JetBrains.Annotations;
 
 namespace FluentMigrator.Runner.Initialization
 {
+    /// <summary>
+    /// An interface to get all migrations (unfiltered)
+    /// </summary>
     public interface IMigrationSource
     {
+        /// <summary>
+        /// Returns all found (unfiltered) <see cref="IMigration"/> instances.
+        /// </summary>
+        /// <returns></returns>
         [NotNull, ItemNotNull]
         IEnumerable<IMigration> GetMigrations();
     }

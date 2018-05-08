@@ -26,8 +26,16 @@ using JetBrains.Annotations;
 
 namespace FluentMigrator.Runner
 {
+    /// <summary>
+    /// Interfaces that provides access to <see cref="IMigrationInfo"/> instances
+    /// for every <see cref="IMigration"/> instance (filtered)
+    /// </summary>
     public interface IMigrationInformationLoader
     {
+        /// <summary>
+        /// Gets all found (and filtered) <see cref="IMigrationInfo"/> instances
+        /// </summary>
+        /// <returns>The found (and filtered) <see cref="IMigrationInfo"/> instances</returns>
         [NotNull]
         SortedList<long, IMigrationInfo> LoadMigrations();
     }
