@@ -132,7 +132,7 @@ namespace FluentMigrator.Runner.Initialization.NetFramework
         {
             var connections = configurationFile.ConnectionStrings.ConnectionStrings;
 
-            if (string.IsNullOrEmpty(connectionStringName) || connections == null || connections.Count <= 0)
+            if (connections == null || connections.Count <= 0)
                 return null;
 
             ConnectionStringSettings connectionString;
