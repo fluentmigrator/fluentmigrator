@@ -16,6 +16,7 @@
 //
 #endregion
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
@@ -99,10 +100,12 @@ namespace FluentMigrator.Tests.Unit.Initialization
                         Assert.AreEqual("Data Source=:memory:", accessor.ConnectionString);
                     }
 
-                    customConfig.ProcessorOptions.ConnectionString = "Data Source=test.db";
-                    SaveConfigFile(jsonFileName, customConfig);
-
-                    Thread.Sleep(millisecondsTimeout: 250);
+                    EnsureReloadedConfiguration(config,
+                        () =>
+                        {
+                            customConfig.ProcessorOptions.ConnectionString = "Data Source=test.db";
+                            SaveConfigFile(jsonFileName, customConfig);
+                        });
 
                     using (var scope = serviceProvider.CreateScope())
                     {
@@ -212,10 +215,12 @@ namespace FluentMigrator.Tests.Unit.Initialization
                         Assert.AreEqual("Data Source=:memory:", accessor.ConnectionString);
                     }
 
-                    customConfig.ConnectionStrings["SQLite"] = "Data Source=test.db";
-                    SaveConfigFile(jsonFileName, customConfig);
-
-                    Thread.Sleep(millisecondsTimeout: 250);
+                    EnsureReloadedConfiguration(config,
+                        () =>
+                        {
+                            customConfig.ConnectionStrings["SQLite"] = "Data Source=test.db";
+                            SaveConfigFile(jsonFileName, customConfig);
+                        });
 
                     using (var scope = serviceProvider.CreateScope())
                     {
@@ -276,10 +281,12 @@ namespace FluentMigrator.Tests.Unit.Initialization
                         Assert.AreEqual("Data Source=:memory:", accessor.ConnectionString);
                     }
 
-                    customConfig.ProcessorSelectorOptions.ProcessorId = "SqlAnywhere16";
-                    SaveConfigFile(jsonFileName, customConfig);
-
-                    Thread.Sleep(millisecondsTimeout: 250);
+                    EnsureReloadedConfiguration(config,
+                        () =>
+                        {
+                            customConfig.ProcessorSelectorOptions.ProcessorId = "SqlAnywhere16";
+                            SaveConfigFile(jsonFileName, customConfig);
+                        });
 
                     using (var scope = serviceProvider.CreateScope())
                     {
@@ -307,6 +314,31 @@ namespace FluentMigrator.Tests.Unit.Initialization
                 {
                     serializer.Serialize(writer, config);
                     writer.Flush();
+                }
+            }
+        }
+
+        private static void EnsureReloadedConfiguration(IConfigurationRoot configuration, Action configChangeAction)
+        {
+            using (var sem = new SemaphoreSlim(initialCount: 0))
+            {
+                void ReleaseSemaphoreOnCallback(object state)
+                {
+                    sem.Release();
+                }
+
+                var reloadToken = configuration.GetReloadToken();
+                using (reloadToken.RegisterChangeCallback(ReleaseSemaphoreOnCallback, state: null))
+                {
+                    // Make the configuration file changes
+                    configChangeAction();
+
+                    // Wait for the change to invoke the callback above
+                    if (!sem.Wait(TimeSpan.FromMilliseconds(value: 250)))
+                    {
+                        // Manually reload the configuration (needed on our Travis CI build server)
+                        configuration.Reload();
+                    }
                 }
             }
         }
