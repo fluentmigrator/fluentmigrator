@@ -324,6 +324,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
             {
                 void ReleaseSemaphoreOnCallback(object state)
                 {
+                    // ReSharper disable once AccessToDisposedClosure
                     sem.Release();
                 }
 
