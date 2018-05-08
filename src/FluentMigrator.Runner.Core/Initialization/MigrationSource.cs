@@ -33,7 +33,7 @@ namespace FluentMigrator.Runner.Initialization
         [NotNull]
         private readonly IMigrationRunnerConventions _conventions;
 
-        [CanBeNull]
+        [NotNull]
         private readonly IServiceProvider _serviceProvider;
 
         [NotNull]
@@ -98,11 +98,6 @@ namespace FluentMigrator.Runner.Initialization
 
         private IMigration CreateInstance(Type type)
         {
-            if (_serviceProvider == null)
-            {
-                return (IMigration)Activator.CreateInstance(type);
-            }
-
             return (IMigration)ActivatorUtilities.CreateInstance(_serviceProvider, type);
         }
     }
