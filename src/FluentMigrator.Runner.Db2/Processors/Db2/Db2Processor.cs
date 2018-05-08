@@ -47,7 +47,7 @@ namespace FluentMigrator.Runner.Processors.DB2
             [NotNull] Db2Generator generator,
             [NotNull] Db2Quoter quoter,
             [NotNull] ILogger<Db2Processor> logger,
-            [NotNull] IOptions<ProcessorOptions> options,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor)
             : base(() => factory.Factory, generator, logger, options.Value, connectionStringAccessor)
         {

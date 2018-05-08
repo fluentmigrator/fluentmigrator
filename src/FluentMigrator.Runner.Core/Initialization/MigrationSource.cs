@@ -39,6 +39,28 @@ namespace FluentMigrator.Runner.Initialization
         [NotNull]
         private readonly ConcurrentDictionary<Type, IMigration> _instanceCache = new ConcurrentDictionary<Type, IMigration>();
 
+        [NotNull, ItemNotNull]
+        private readonly IEnumerable<IMigrationSourceItem> _sourceItems;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ProfileSource"/> class.
+        /// </summary>
+        /// <param name="source">The assembly source</param>
+        /// <param name="conventions">The migration runner conventios</param>
+        /// <param name="serviceProvider">The service provider</param>
+        /// <param name="sourceItems">The additional migration source items</param>
+        public MigrationSource(
+            [NotNull] IAssemblySource source,
+            [NotNull] IMigrationRunnerConventions conventions,
+            [NotNull] IServiceProvider serviceProvider,
+            [NotNull, ItemNotNull] IEnumerable<IMigrationSourceItem> sourceItems)
+        {
+            _source = source;
+            _conventions = conventions;
+            _serviceProvider = serviceProvider;
+            _sourceItems = sourceItems;
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ProfileSource"/> class.
         /// </summary>
@@ -53,6 +75,7 @@ namespace FluentMigrator.Runner.Initialization
             _source = source;
             _conventions = conventions;
             _serviceProvider = serviceProvider;
+            _sourceItems = Enumerable.Empty<IMigrationSourceItem>();
         }
 
         /// <summary>
@@ -67,17 +90,25 @@ namespace FluentMigrator.Runner.Initialization
         {
             _source = source;
             _conventions = conventions;
+            _sourceItems = Enumerable.Empty<IMigrationSourceItem>();
         }
 
         /// <inheritdoc />
         public IEnumerable<IMigration> GetMigrations()
         {
             var instances =
-                from type in _source.Assemblies.SelectMany(a => a.GetExportedTypes())
+                from type in GetMigrationTypeCandidates()
                 where !type.IsAbstract && typeof(IMigration).IsAssignableFrom(type)
                 where _conventions.TypeIsMigration(type)
                 select _instanceCache.GetOrAdd(type, CreateInstance);
             return instances;
+        }
+
+        private IEnumerable<Type> GetMigrationTypeCandidates()
+        {
+            return _source
+                .Assemblies.SelectMany(a => a.GetExportedTypes())
+                .Union(_sourceItems.SelectMany(i => i.MigrationTypeCandidates));
         }
 
         private IMigration CreateInstance(Type type)

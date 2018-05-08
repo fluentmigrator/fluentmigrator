@@ -191,7 +191,7 @@ namespace FluentMigrator.Runner
         /// <param name="serviceProvider">The service provider</param>
         public MigrationRunner(
             [NotNull] IOptions<RunnerOptions> options,
-            [NotNull] IOptions<ProcessorOptions> processorOptions,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> processorOptions,
             [NotNull] IProfileLoader profileLoader,
             [NotNull] IProcessorAccessor processorAccessor,
             [NotNull] IMaintenanceLoader maintenanceLoader,

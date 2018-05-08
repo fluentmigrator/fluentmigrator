@@ -15,9 +15,6 @@
 #endregion
 
 using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 
 using FluentMigrator.Runner.Initialization;
@@ -102,8 +99,8 @@ namespace FluentMigrator.Runner
             IVersionTableMetaData versionTableMetaData)
         {
             builder.Services
-                .AddSingleton<IVersionTableMetaDataAccessor>(
-                    new PassThroughVersionTableMetaDataAccessor(versionTableMetaData));
+                .AddScoped<IVersionTableMetaDataAccessor>(
+                    _ => new PassThroughVersionTableMetaDataAccessor(versionTableMetaData));
             return builder;
         }
 
@@ -134,89 +131,8 @@ namespace FluentMigrator.Runner
             [NotNull, ItemNotNull] params Assembly[] assemblies)
         {
             builder.Services
-                .AddSingleton<IMigrationSourceItem>(new AssemblyMigrationSourceItem(assemblies))
-                .AddSingleton<IMigrationSource, MigrationSourceFromItems>();
+                .AddSingleton<IMigrationSourceItem>(new AssemblyMigrationSourceItem(assemblies));
             return builder;
-        }
-
-        /// <summary>
-        /// Interface to get the candidate types for <see cref="MigrationSourceFromItems"/>
-        /// </summary>
-        private interface IMigrationSourceItem
-        {
-            IEnumerable<Type> MigrationTypeCandidates { get; }
-        }
-
-        /// <summary>
-        /// Implementation of <see cref="IMigrationSourceItem"/> that accepts a collection of assemnblies
-        /// </summary>
-        private class AssemblyMigrationSourceItem : IMigrationSourceItem
-        {
-            private readonly IReadOnlyCollection<Assembly> _assemblies;
-
-            /// <summary>
-            /// Initializes a new instance of the <see cref="AssemblyMigrationSourceItem"/> class.
-            /// </summary>
-            /// <param name="assemblies">The assemblies to get the canididate types from</param>
-            public AssemblyMigrationSourceItem(IReadOnlyCollection<Assembly> assemblies)
-            {
-                _assemblies = assemblies;
-            }
-
-            /// <inheritdoc />
-            public IEnumerable<Type> MigrationTypeCandidates => _assemblies
-                .SelectMany(a => a.GetExportedTypes())
-                .Where(t => typeof(IMigration).IsAssignableFrom(t))
-                .Where(t => !t.IsAbstract);
-        }
-
-        /// <summary>
-        /// Custom implementation of <see cref="IMigrationSource"/> that works on <see cref="IMigrationSourceItem"/> elements
-        /// </summary>
-        private class MigrationSourceFromItems : IMigrationSource
-        {
-            [NotNull]
-            private readonly IServiceProvider _serviceProvider;
-
-            [NotNull]
-            private readonly IMigrationRunnerConventions _conventions;
-
-            [NotNull]
-            [ItemNotNull]
-            private readonly IReadOnlyCollection<IMigrationSourceItem> _sourceItems;
-
-            [NotNull]
-            private readonly ConcurrentDictionary<Type, IMigration> _instanceCache = new ConcurrentDictionary<Type, IMigration>();
-
-            /// <summary>
-            /// Initializes a new instance of the <see cref="MigrationSourceFromItems"/> class.
-            /// </summary>
-            /// <param name="serviceProvider">The service provider</param>
-            /// <param name="conventions">The runner conventions</param>
-            /// <param name="sourceItems">The items to get the candidate types from</param>
-            public MigrationSourceFromItems(
-                [NotNull] IServiceProvider serviceProvider,
-                [NotNull] IMigrationRunnerConventions conventions,
-                [NotNull, ItemNotNull] IEnumerable<IMigrationSourceItem> sourceItems)
-            {
-                _serviceProvider = serviceProvider;
-                _conventions = conventions;
-                _sourceItems = sourceItems.ToList();
-            }
-
-            /// <inheritdoc />
-            public IEnumerable<IMigration> GetMigrations()
-            {
-                var migrationTypes = from type in _sourceItems.SelectMany(i => i.MigrationTypeCandidates)
-                                     where _conventions.TypeIsMigration(type)
-                                     select _instanceCache.GetOrAdd(type, CreateInstance);
-                return migrationTypes;
-            }
-
-            private IMigration CreateInstance(Type type)
-            {
-                return (IMigration)ActivatorUtilities.CreateInstance(_serviceProvider, type);
-            }
         }
     }
 }

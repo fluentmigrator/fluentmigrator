@@ -33,7 +33,7 @@ namespace FluentMigrator.Runner.Processors.Postgres
             [NotNull] PostgresDbFactory factory,
             [NotNull] PostgresGenerator generator,
             [NotNull] ILogger<PostgresProcessor> logger,
-            [NotNull] IOptions<ProcessorOptions> options,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor)
             : base(() => factory.Factory, generator, logger, options.Value, connectionStringAccessor)
         {

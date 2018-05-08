@@ -78,7 +78,7 @@ namespace FluentMigrator.Runner
 
         public DefaultMigrationInformationLoader(
             [NotNull] IMigrationSource source,
-            [NotNull] IOptions<TypeFilterOptions> filterOptions,
+            [NotNull] IOptionsSnapshot<TypeFilterOptions> filterOptions,
             [NotNull] IMigrationRunnerConventions conventions,
             [NotNull] IOptions<RunnerOptions> runnerOptions)
         {

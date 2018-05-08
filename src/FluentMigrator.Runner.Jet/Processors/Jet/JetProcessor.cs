@@ -54,7 +54,7 @@ namespace FluentMigrator.Runner.Processors.Jet
         public JetProcessor(
             [NotNull] JetGenerator generator,
             [NotNull] ILogger<JetProcessor> logger,
-            [NotNull] IOptions<ProcessorOptions> options,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor)
             : base(generator, logger, options.Value)
         {

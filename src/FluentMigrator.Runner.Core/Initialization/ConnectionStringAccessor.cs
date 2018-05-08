@@ -31,21 +31,32 @@ namespace FluentMigrator.Runner.Initialization
     {
         private readonly Lazy<string> _lazyData;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ConnectionStringAccessor"/> class.
+        /// </summary>
+        /// <param name="processorOptions">The processor options containing the connection string or name</param>
+        /// <param name="processorSelectorOptions">The selected processor (its ID is used as connection string name)</param>
+        /// <param name="readers">The registered connection string readers</param>
         public ConnectionStringAccessor(
-            IOptions<ProcessorOptions> processorOptions,
+            IOptionsSnapshot<ProcessorOptions> processorOptions,
+            IOptionsSnapshot<SelectingProcessorAccessorOptions> processorSelectorOptions,
             IEnumerable<IConnectionStringReader> readers)
         {
             _lazyData = new Lazy<string>(
                 () =>
                 {
+                    var connectionStringOrName =
+                        string.IsNullOrEmpty(processorOptions.Value.ConnectionString)
+                            ? processorSelectorOptions.Value.ProcessorId
+                            : processorOptions.Value.ConnectionString;
                     var result = (from accessor in readers.OrderByDescending(x => x.Priority)
-                                  let cs = accessor.GetConnectionString(processorOptions.Value.ConnectionString)
+                                  let cs = accessor.GetConnectionString(connectionStringOrName)
                                   where !string.IsNullOrEmpty(cs)
                                   select cs).FirstOrDefault();
 
                     if (string.IsNullOrEmpty(result))
                     {
-                        result = processorOptions.Value.ConnectionString;
+                        result = connectionStringOrName;
                     }
 
                     return result;

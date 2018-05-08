@@ -61,7 +61,7 @@ namespace FluentMigrator.Runner.Processors
             return new ConnectionlessProcessor(
                 new PassThroughGeneratorAccessor(_generator),
                 new AnnouncerFluentMigratorLogger(announcer),
-                new OptionsWrapper<ProcessorOptions>(processorOptions),
+                new ProcessorOptionsSnapshot(processorOptions),
                 new OptionsWrapper<SelectingProcessorAccessorOptions>(
                     new SelectingProcessorAccessorOptions()
                     {
@@ -84,6 +84,21 @@ namespace FluentMigrator.Runner.Processors
 
             /// <inheritdoc />
             public IMigrationGenerator Generator { get; }
+        }
+
+        private class ProcessorOptionsSnapshot : IOptionsSnapshot<ProcessorOptions>
+        {
+            public ProcessorOptionsSnapshot(ProcessorOptions options)
+            {
+                Value = options;
+            }
+
+            public ProcessorOptions Value { get; }
+
+            public ProcessorOptions Get(string name)
+            {
+                return Value;
+            }
         }
     }
 }

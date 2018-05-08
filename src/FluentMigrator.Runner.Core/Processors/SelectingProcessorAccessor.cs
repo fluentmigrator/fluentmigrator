@@ -43,8 +43,8 @@ namespace FluentMigrator.Runner.Processors
         /// <param name="serviceProvider">The service provider</param>
         public SelectingProcessorAccessor(
             [NotNull, ItemNotNull] IEnumerable<IMigrationProcessor> processors,
-            [NotNull] IOptions<SelectingProcessorAccessorOptions> options,
-            [NotNull] IOptions<SelectingGeneratorAccessorOptions> generatorSelectorOptions,
+            [NotNull] IOptionsSnapshot<SelectingProcessorAccessorOptions> options,
+            [NotNull] IOptionsSnapshot<SelectingGeneratorAccessorOptions> generatorSelectorOptions,
             [NotNull] IServiceProvider serviceProvider)
         {
             var procs = processors.ToList();
@@ -80,7 +80,7 @@ namespace FluentMigrator.Runner.Processors
                     var databaseIds = new List<string>() { processorBase.DatabaseType };
                     databaseIds.AddRange(processorBase.DatabaseTypeAliases);
 
-                    var processorOptions = serviceProvider.GetRequiredService<IOptions<ProcessorOptions>>();
+                    var processorOptions = serviceProvider.GetRequiredService<IOptionsSnapshot<ProcessorOptions>>();
                     foundProcessor = new ConnectionlessProcessor(
                         new PassThroughGeneratorAccessor(processorBase.Generator),
                         processorBase.Logger,

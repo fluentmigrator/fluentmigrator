@@ -79,7 +79,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             [NotNull] IMigrationGenerator generator,
             [NotNull] IQuoter quoter,
             [NotNull] ILogger logger,
-            [NotNull] IOptions<ProcessorOptions> options,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor,
             [NotNull] IServiceProvider serviceProvider)
             : this(databaseTypes, SqlClientFactory.Instance, generator, quoter, logger, options, connectionStringAccessor, serviceProvider)
@@ -92,7 +92,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             [NotNull] IMigrationGenerator generator,
             [NotNull] IQuoter quoter,
             [NotNull] ILogger logger,
-            [NotNull] IOptions<ProcessorOptions> options,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor,
             [NotNull] IServiceProvider serviceProvider)
             : base(() => factory, generator, logger, options.Value, connectionStringAccessor)

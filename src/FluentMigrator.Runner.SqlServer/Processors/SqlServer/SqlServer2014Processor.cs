@@ -33,7 +33,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             [NotNull] ILogger<SqlServer2014Processor> logger,
             [NotNull] SqlServer2008Quoter quoter,
             [NotNull] SqlServer2014Generator generator,
-            [NotNull] IOptions<ProcessorOptions> options,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor,
             [NotNull] IServiceProvider serviceProvider)
             : base(new[] { "SqlServer2014", "SqlServer" }, generator, quoter, logger, options, connectionStringAccessor, serviceProvider)

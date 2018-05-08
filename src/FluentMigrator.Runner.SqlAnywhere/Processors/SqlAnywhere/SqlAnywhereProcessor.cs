@@ -72,7 +72,7 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
             [NotNull] Func<DbProviderFactory> factoryAccessor,
             [NotNull] IMigrationGenerator generator,
             [NotNull] ILogger logger,
-            [NotNull] IOptions<ProcessorOptions> options,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor,
             [NotNull] IServiceProvider serviceProvider)
             : base(factoryAccessor, generator, logger, options.Value, connectionStringAccessor)
