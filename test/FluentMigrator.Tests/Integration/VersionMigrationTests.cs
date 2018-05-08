@@ -76,7 +76,7 @@ namespace FluentMigrator.Tests.Integration
             ExecuteWithSupportedProcessors(
                 services => services
                     .WithMigrationsIn("FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3")
-                    .AddSingleton<IVersionTableMetaDataAccessor>(new PassThroughVersionTableMetaDataAccessor(new TestVersionTableMetaData())),
+                    .AddScoped<IVersionTableMetaDataAccessor>(_ => new PassThroughVersionTableMetaDataAccessor(new TestVersionTableMetaData())),
                 (serviceProvider, processor) =>
                 {
                     var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
@@ -114,8 +114,8 @@ namespace FluentMigrator.Tests.Integration
             ExecuteWithSupportedProcessors(
                 services => services
                     .WithMigrationsIn("FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3")
-                    .AddSingleton<IVersionTableMetaDataAccessor>(
-                        new PassThroughVersionTableMetaDataAccessor(
+                    .AddScoped<IVersionTableMetaDataAccessor>(
+                        _ => new PassThroughVersionTableMetaDataAccessor(
                             new TestVersionTableMetaData()
                             {
                                 SchemaName = null

@@ -202,16 +202,16 @@ namespace FluentMigrator.Tests.Integration
                     sp =>
                     {
                         var proc = (ProcessorBase)sp.GetRequiredService(processorType);
-                        var opt = sp.GetRequiredService<IOptions<SelectingProcessorAccessorOptions>>();
-                        var opt2 = sp.GetRequiredService<IOptions<SelectingGeneratorAccessorOptions>>();
+                        var opt = sp.GetRequiredService<IOptionsSnapshot<SelectingProcessorAccessorOptions>>();
+                        var opt2 = sp.GetRequiredService<IOptionsSnapshot<SelectingGeneratorAccessorOptions>>();
                         return new SelectingProcessorAccessor(new[] { proc }, opt, opt2, sp);
                     })
                 .AddScoped<IGeneratorAccessor>(
                     sp =>
                     {
                         var proc = (ProcessorBase)sp.GetRequiredService(processorType);
-                        var opt = sp.GetRequiredService<IOptions<SelectingGeneratorAccessorOptions>>();
-                        var opt2 = sp.GetRequiredService<IOptions<SelectingProcessorAccessorOptions>>();
+                        var opt = sp.GetRequiredService<IOptionsSnapshot<SelectingGeneratorAccessorOptions>>();
+                        var opt2 = sp.GetRequiredService<IOptionsSnapshot<SelectingProcessorAccessorOptions>>();
                         return new SelectingGeneratorAccessor(new[] { proc.Generator }, opt, opt2);
                     })
                 .AddScoped<IConnectionStringReader>(

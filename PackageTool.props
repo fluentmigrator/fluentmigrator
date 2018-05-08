@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project>
 
-  <Import Project="$(MSBuildThisFileDirectory)Global.proj" />
+  <Import Project="$(MSBuildThisFileDirectory)Global.props" />
 
   <PropertyGroup>
     <IsPackable>true</IsPackable>

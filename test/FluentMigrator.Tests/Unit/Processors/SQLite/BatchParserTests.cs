@@ -14,6 +14,8 @@
 // limitations under the License.
 #endregion
 
+using System.Linq;
+
 using FluentMigrator.Runner.BatchParser;
 using FluentMigrator.Runner.Generators.SQLite;
 using FluentMigrator.Runner.Initialization;
@@ -51,7 +53,9 @@ namespace FluentMigrator.Tests.Unit.Processors.SQLite
 
             var logger = serviceProvider.GetRequiredService<ILogger<SQLiteProcessor>>();
 
-            var opt = new OptionsWrapper<ProcessorOptions>(new ProcessorOptions());
+            var opt = new OptionsManager<ProcessorOptions>(new OptionsFactory<ProcessorOptions>(
+                Enumerable.Empty<IConfigureOptions<ProcessorOptions>>(),
+                Enumerable.Empty<IPostConfigureOptions<ProcessorOptions>>()));
             return new SQLiteProcessor(
                 mockedDbFactory.Object,
                 new SQLiteGenerator(),

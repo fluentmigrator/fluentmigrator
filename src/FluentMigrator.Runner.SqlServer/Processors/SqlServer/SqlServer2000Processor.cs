@@ -67,7 +67,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         public SqlServer2000Processor(
             [NotNull] ILogger<SqlServer2000Processor> logger,
             [NotNull] SqlServer2000Generator generator,
-            [NotNull] IOptions<ProcessorOptions> options,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor,
             [NotNull] IServiceProvider serviceProvider)
             : this(SqlClientFactory.Instance, logger, generator, options, connectionStringAccessor, serviceProvider)
@@ -78,7 +78,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             DbProviderFactory factory,
             [NotNull] ILogger logger,
             [NotNull] SqlServer2000Generator generator,
-            [NotNull] IOptions<ProcessorOptions> options,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor,
             [NotNull] IServiceProvider serviceProvider)
             : base(() => factory, generator, logger, options.Value, connectionStringAccessor)

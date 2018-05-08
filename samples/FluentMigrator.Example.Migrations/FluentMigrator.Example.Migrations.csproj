@@ -4,7 +4,7 @@
     <Description>Assembly containing migrations for the example project</Description>
   </PropertyGroup>
 
-  <Import Project="$(MSBuildThisFileDirectory)../../Global.proj" />
+  <Import Project="$(MSBuildThisFileDirectory)../../Global.props" />
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\FluentMigrator\FluentMigrator.csproj" />

@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2018, FluentMigrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -50,7 +50,7 @@ namespace FluentMigrator.Runner
                 .AddScoped(
                     sp =>
                     {
-                        var processorOptions = sp.GetRequiredService<IOptions<ProcessorOptions>>();
+                        var processorOptions = sp.GetRequiredService<IOptionsSnapshot<ProcessorOptions>>();
                         return ((FirebirdOptions)fbOptions.Clone()).ApplyProviderSwitches(processorOptions.Value.ProviderSwitches);
                     })
                 .AddScoped<FirebirdDbFactory>()

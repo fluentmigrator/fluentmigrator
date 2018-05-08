@@ -33,7 +33,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
             [NotNull] OracleDbFactory factory,
             [NotNull] OracleGenerator generator,
             [NotNull] ILogger<OracleProcessor> logger,
-            [NotNull] IOptions<ProcessorOptions> options,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor)
             : base("Oracle", factory, generator, logger, options, connectionStringAccessor)
         {

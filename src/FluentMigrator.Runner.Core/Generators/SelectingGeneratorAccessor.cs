@@ -39,8 +39,8 @@ namespace FluentMigrator.Runner.Generators
         /// <param name="processorSelectorOptions">The processor selector options</param>
         public SelectingGeneratorAccessor(
             [NotNull, ItemNotNull] IEnumerable<IMigrationGenerator> generators,
-            [NotNull] IOptions<SelectingGeneratorAccessorOptions> options,
-            [NotNull] IOptions<SelectingProcessorAccessorOptions> processorSelectorOptions)
+            [NotNull] IOptionsSnapshot<SelectingGeneratorAccessorOptions> options,
+            [NotNull] IOptionsSnapshot<SelectingProcessorAccessorOptions> processorSelectorOptions)
         {
             var gens = generators.ToList();
 

@@ -6,7 +6,7 @@
     <UserSecretsId>FluentMigrator.Tests</UserSecretsId>
     <DebugType>full</DebugType>
   </PropertyGroup>
-  <Import Project="$(MSBuildThisFileDirectory)../../Global.proj" />
+  <Import Project="$(MSBuildThisFileDirectory)../../Global.props" />
   <ItemGroup>
     <EmbeddedResource Include="EmbeddedResources/**/*.sql" />
     <None Include="..\..\FluentMigrator.snk" Link="FluentMigrator.snk" />
@@ -18,6 +18,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="2.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="2.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="2.0.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.7.0" />
     <PackageReference Include="Moq" Version="4.8.2" />
     <PackageReference Include="MySql.Data" Version="8.0.11" />

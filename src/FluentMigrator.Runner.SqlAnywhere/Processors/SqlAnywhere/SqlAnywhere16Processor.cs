@@ -36,7 +36,7 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
             [NotNull] SqlAnywhereDbFactory factory,
             [NotNull] SqlAnywhere16Generator generator,
             [NotNull] ILogger<SqlAnywhere16Processor> logger,
-            [NotNull] IOptions<ProcessorOptions> options,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor,
             [NotNull] IServiceProvider serviceProvider)
             : base(

@@ -5,6 +5,44 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- [#877](https://github.com/fluentmigrator/fluentmigrator/issues/877): Connection specific information should be resolved as scoped
+
+### Details
+
+#### Issue #877
+
+##### Supported scenario
+
+This allows the reconfiguration of the connection string/used database at run-time.
+
+##### Applies to
+
+- Connection string
+- Processor/generator selection
+- Type filters
+
+##### Changes
+
+The following option classes are now resolved using `IOptionSnapshot<T>`:
+
+- `ProcessorOptions`
+- `SelectingProcessorAccessorOptions`
+- `SelectingGeneratorAccessorOptions`
+- `TypeFilterOptions`
+
+The following services are now scoped instead of singleton:
+
+- `IVersionTableMetaDataAccessor`
+- `IVersionTableMetaData`
+- `IMigrationSource`
+- `IMigrationInformationLoader`
+
+The `MigrationSource` now consumes all registered `IMigrationSourceItem` instances.
+
 ## 3.0.0
 
 The new documentation is online on [https://fluentmigrator.github.io](https://fluentmigrator.github.io).

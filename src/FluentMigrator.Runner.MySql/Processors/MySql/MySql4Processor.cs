@@ -31,7 +31,7 @@ namespace FluentMigrator.Runner.Processors.MySql
             [NotNull] MySqlDbFactory factory,
             [NotNull] MySql4Generator generator,
             [NotNull] ILogger<MySql4Processor> logger,
-            [NotNull] IOptions<ProcessorOptions> options,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor) : base(
             factory,
             generator,

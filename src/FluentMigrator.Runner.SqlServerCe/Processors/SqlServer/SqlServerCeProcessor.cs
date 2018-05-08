@@ -49,7 +49,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             [NotNull] SqlServerCeDbFactory factory,
             [NotNull] SqlServerCeGenerator generator,
             [NotNull] ILogger<SqlServerCeProcessor> logger,
-            [NotNull] IOptions<ProcessorOptions> options,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor,
             [NotNull] IServiceProvider serviceProvider)
             : base(() => factory.Factory, generator, logger, options.Value, connectionStringAccessor)

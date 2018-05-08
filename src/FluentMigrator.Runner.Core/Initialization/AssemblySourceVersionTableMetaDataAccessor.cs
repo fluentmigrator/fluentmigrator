@@ -40,7 +40,7 @@ namespace FluentMigrator.Runner.Initialization
         /// <param name="serviceProvider">The service provider used to instantiate the found <see cref="IVersionTableMetaData"/> implementation</param>
         /// <param name="assemblySource">The assemblies used to search for the <see cref="IVersionTableMetaData"/> implementation</param>
         public AssemblySourceVersionTableMetaDataAccessor(
-            [NotNull] IOptions<TypeFilterOptions> typeFilterOptions,
+            [NotNull] IOptionsSnapshot<TypeFilterOptions> typeFilterOptions,
             [CanBeNull] IServiceProvider serviceProvider,
             [CanBeNull] IAssemblySource assemblySource = null)
         {

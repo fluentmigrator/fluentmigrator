@@ -43,7 +43,7 @@ namespace FluentMigrator.Runner.Processors.MySql
             [NotNull] MySqlDbFactory factory,
             [NotNull] IMigrationGenerator generator,
             [NotNull] ILogger<MySqlProcessor> logger,
-            [NotNull] IOptions<ProcessorOptions> options,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor)
             : base(() => factory.Factory, generator, logger, options.Value, connectionStringAccessor)
         {

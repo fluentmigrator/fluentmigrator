@@ -11,7 +11,7 @@
     <Platforms>AnyCPU;x64;x86</Platforms>
     <RuntimeIdentifiers>win7-x86;win7-x64;any</RuntimeIdentifiers>
   </PropertyGroup>
-  <Import Project="$(MSBuildThisFileDirectory)../../PackageTool.proj" />
+  <Import Project="$(MSBuildThisFileDirectory)../../PackageTool.props" />
   <ItemGroup>
     <None Include="..\..\FluentMigrator.snk" Link="FluentMigrator.snk" />
   </ItemGroup>

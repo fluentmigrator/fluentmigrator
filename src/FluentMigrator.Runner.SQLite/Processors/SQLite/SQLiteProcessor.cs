@@ -49,7 +49,7 @@ namespace FluentMigrator.Runner.Processors.SQLite
             [NotNull] SQLiteDbFactory factory,
             [NotNull] SQLiteGenerator generator,
             [NotNull] ILogger<SQLiteProcessor> logger,
-            [NotNull] IOptions<ProcessorOptions> options,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor,
             [NotNull] IServiceProvider serviceProvider)
             : base(() => factory.Factory, generator, logger, options.Value, connectionStringAccessor)
