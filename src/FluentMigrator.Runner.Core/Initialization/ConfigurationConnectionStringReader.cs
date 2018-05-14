@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2018, FluentMigrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,6 +21,10 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace FluentMigrator.Runner.Initialization
 {
+    /// <summary>
+    /// Implementation of <see cref="IConnectionStringReader"/> that interprets tries to
+    /// get the connection string from an <see cref="IConfiguration"/> or <see cref="IConfigurationRoot"/>.
+    /// </summary>
     public class ConfigurationConnectionStringReader : IConnectionStringReader
     {
         private readonly IServiceProvider _serviceProvider;
@@ -38,15 +42,13 @@ namespace FluentMigrator.Runner.Initialization
         public int Priority { get; } = 100;
 
         /// <inheritdoc />
-        public string GetConnectionString(string connectionStringName)
+        public string GetConnectionString(string connectionStringOrName)
         {
             if (_serviceProvider == null)
                 return null;
-            var cfg = _serviceProvider.GetService<IConfigurationRoot>()
-             ?? _serviceProvider.GetService<IConfiguration>();
-            if (cfg == null)
-                return null;
-            return cfg.GetConnectionString(connectionStringName) ?? cfg.GetConnectionString(connectionStringName);
+            var cfgRoot = _serviceProvider.GetService<IConfigurationRoot>();
+            var cfg = _serviceProvider.GetService<IConfiguration>();
+            return cfg?.GetConnectionString(connectionStringOrName) ?? cfgRoot?.GetConnectionString(connectionStringOrName);
         }
     }
 }
