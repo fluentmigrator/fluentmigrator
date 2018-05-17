@@ -313,8 +313,8 @@ namespace FluentMigrator.Tests.Unit.Initialization
             {
                 using (var scope = serviceProvider.CreateScope())
                 {
-                    var source = scope.ServiceProvider.GetRequiredService<IMigrationSource>();
-                    var migrations = source.GetMigrations().OfType<MigrationWithScopedService>().ToList();
+                    var source = scope.ServiceProvider.GetRequiredService<IFilteringMigrationSource>();
+                    var migrations = source.GetMigrations(t => t == typeof(MigrationWithScopedService)).ToList();
                     Assert.AreEqual(1, migrations.Count);
                 }
             }

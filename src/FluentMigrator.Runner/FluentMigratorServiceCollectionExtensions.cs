@@ -92,6 +92,9 @@ namespace Microsoft.Extensions.DependencyInjection
 
                 // Source for migrations
                 .AddScoped<IMigrationSource, MigrationSource>()
+                .AddScoped(
+                    sp => sp.GetRequiredService<IMigrationSource>() as IFilteringMigrationSource
+                     ?? ActivatorUtilities.CreateInstance<MigrationSource>(sp))
 
                 // Configure the accessor for the version table metadata
                 .AddScoped<IVersionTableMetaDataAccessor, AssemblySourceVersionTableMetaDataAccessor>()
