@@ -7,9 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Added
+
+- New `IFilteringMigrationSource` to avoid unnecessary instantiations
+
 ### Changed
 
 - [#877](https://github.com/fluentmigrator/fluentmigrator/issues/877): Connection specific information should be resolved as scoped
+- Now tries to query the `IConfigurationRoot` if `IConfiguration` couldn't be found
 
 ### Details
 
