@@ -22,18 +22,16 @@ using JetBrains.Annotations;
 namespace FluentMigrator.Runner.Initialization
 {
     /// <summary>
-    /// The source for all types implementing <see cref="IMigration"/> and having the <see cref="MigrationAttribute"/>
+    /// This is a specialization of <see cref="IMigrationSource"/> that allows filtering the types beforehand
     /// </summary>
-    [Obsolete("Use IFilteringMigrationSource to get optimal performance")]
-    public interface IMigrationSource
+    public interface IFilteringMigrationSource : IMigrationSource
     {
         /// <summary>
-        /// Returns the instances for all found types implementing <see cref="IMigration"/> and having
-        /// the <see cref="MigrationAttribute"/>
+        /// Returns the instances for all found types implementing <see cref="IMigration"/>
         /// </summary>
-        /// <returns>the instances for all found types implementing <see cref="IMigration"/> and having
-        /// the <see cref="MigrationAttribute"/></returns>
+        /// <param name="predicate">The predicate used to select the types to instantiate</param>
+        /// <returns>the instances for all found types implementing <see cref="IMigration"/></returns>
         [NotNull, ItemNotNull]
-        IEnumerable<IMigration> GetMigrations();
+        IEnumerable<IMigration> GetMigrations(Func<Type, bool> predicate);
     }
 }

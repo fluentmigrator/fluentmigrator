@@ -19,10 +19,12 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
+using FluentMigrator.Tests.Unit.Initialization.Migrations;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -298,6 +300,23 @@ namespace FluentMigrator.Tests.Unit.Initialization
             finally
             {
                 File.Delete(jsonFileName);
+            }
+        }
+
+        [Test]
+        public void CanUseMigrationWithScopedService()
+        {
+            using (var serviceProvider = ServiceCollectionExtensions
+                .CreateServices(true)
+                .Configure<ProcessorOptions>(opt => opt.ConnectionString = "something")
+                .BuildServiceProvider(validateScopes: true))
+            {
+                using (var scope = serviceProvider.CreateScope())
+                {
+                    var source = scope.ServiceProvider.GetRequiredService<IFilteringMigrationSource>();
+                    var migrations = source.GetMigrations(t => t == typeof(MigrationWithScopedService)).ToList();
+                    Assert.AreEqual(1, migrations.Count);
+                }
             }
         }
 

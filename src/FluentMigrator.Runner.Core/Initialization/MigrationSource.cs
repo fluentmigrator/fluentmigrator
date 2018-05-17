@@ -26,9 +26,9 @@ using Microsoft.Extensions.DependencyInjection;
 namespace FluentMigrator.Runner.Initialization
 {
     /// <summary>
-    /// The default implementation of <see cref="IMigrationSource"/>
+    /// The default implementation of <see cref="IFilteringMigrationSource"/>
     /// </summary>
-    public class MigrationSource : IMigrationSource
+    public class MigrationSource : IFilteringMigrationSource
     {
         [NotNull]
         private readonly IAssemblySource _source;
@@ -84,10 +84,16 @@ namespace FluentMigrator.Runner.Initialization
         /// <inheritdoc />
         public IEnumerable<IMigration> GetMigrations()
         {
+            return GetMigrations(_conventions.TypeIsMigration);
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<IMigration> GetMigrations(Func<Type, bool> predicate)
+        {
             var instances =
                 from type in GetMigrationTypeCandidates()
                 where !type.IsAbstract && typeof(IMigration).IsAssignableFrom(type)
-                where _conventions.TypeIsMigration(type)
+                where predicate == null || predicate(type)
                 select _instanceCache.GetOrAdd(type, CreateInstance);
             return instances;
         }

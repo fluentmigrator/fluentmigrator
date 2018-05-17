@@ -119,20 +119,39 @@ namespace FluentMigrator.Runner
             bool loadNestedNamespaces,
             [NotNull, ItemNotNull] IReadOnlyCollection<string> tagsToMatch)
         {
-            var migrations = source.GetMigrations().ToList();
+            bool IsMatchingMigration(Type type)
+            {
+                if (!type.IsInNamespace(@namespace, loadNestedNamespaces))
+                    return false;
+                return conventions.TypeHasMatchingTags(type, tagsToMatch)
+                 || (tagsToMatch.Count == 0 && !conventions.TypeHasTags(type))
+                 || !conventions.TypeHasTags(type);
+            }
+
+            IReadOnlyCollection<IMigration> migrations;
+
+            if (source is IFilteringMigrationSource filteringSource)
+            {
+                migrations = filteringSource.GetMigrations(IsMatchingMigration).ToList();
+            }
+            else
+            {
+                migrations =
+                    (from migration in source.GetMigrations()
+                     where IsMatchingMigration(migration.GetType())
+                     select migration).ToList();
+            }
+
             if (migrations.Count == 0)
             {
                 throw new MissingMigrationsException("No migrations found");
             }
 
-            var migrationInfos =
-                (from migration in migrations
-                 let type = migration.GetType()
-                 where type.IsInNamespace(@namespace, loadNestedNamespaces)
-                 where conventions.TypeHasMatchingTags(type, tagsToMatch) || (tagsToMatch.Count == 0 && !conventions.TypeHasTags(type)) || !conventions.TypeHasTags(type)
-                 select conventions.GetMigrationInfoForMigration(migration));
+            var migrationInfos = migrations
+                .Select(conventions.GetMigrationInfoForMigration)
+                .ToList();
 
-            return migrationInfos.ToList();
+            return migrationInfos;
         }
     }
 }

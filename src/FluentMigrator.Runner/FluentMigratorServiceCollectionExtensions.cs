@@ -88,7 +88,10 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddSingleton<IStopWatch, StopWatch>()
 
                 // Source for migrations
-                .AddSingleton<IMigrationSource, MigrationSource>()
+                .AddScoped<IMigrationSource, MigrationSource>()
+                .AddScoped(
+                    sp => sp.GetRequiredService<IMigrationSource>() as IFilteringMigrationSource
+                     ?? ActivatorUtilities.CreateInstance<MigrationSource>(sp))
 
                 // Configure the accessor for the version table metadata
                 .AddScoped<IVersionTableMetaDataAccessor, AssemblySourceVersionTableMetaDataAccessor>()
