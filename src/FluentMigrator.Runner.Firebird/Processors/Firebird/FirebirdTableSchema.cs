@@ -49,7 +49,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             Definition = new FirebirdTableDefinition()
             {
                 Name = tableName,
-                SchemaName = String.Empty
+                SchemaName = string.Empty
             };
             Load();
         }

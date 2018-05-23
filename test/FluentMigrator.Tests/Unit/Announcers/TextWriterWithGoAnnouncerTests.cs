@@ -59,7 +59,7 @@ namespace FluentMigrator.Tests.Unit.Announcers
             _announcer.ShowSql = false;
 
             _announcer.Sql("SQL");
-            Output.ShouldBe(String.Empty);
+            Output.ShouldBe(string.Empty);
         }
 
         [Test]

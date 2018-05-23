@@ -70,7 +70,7 @@ namespace FluentMigrator.Runner.Initialization.NetFramework
             if (_notUsingConfig && !string.IsNullOrEmpty(_configPath))
                 LoadConnectionStringFromConfigurationFile(_configManager.LoadFromFile(_configPath));
 
-            if (_notUsingConfig && !String.IsNullOrEmpty(_assemblyLocation))
+            if (_notUsingConfig && !string.IsNullOrEmpty(_assemblyLocation))
             {
                 string defaultConfigFile = _assemblyLocation;
 

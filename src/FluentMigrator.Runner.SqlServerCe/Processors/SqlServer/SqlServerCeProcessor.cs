@@ -101,14 +101,14 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public override void Execute(string template, params object[] args)
         {
-            Process(String.Format(template, args));
+            Process(string.Format(template, args));
         }
 
         public override bool Exists(string template, params object[] args)
         {
             EnsureConnectionIsOpen();
 
-            using (var command = CreateCommand(String.Format(template, args)))
+            using (var command = CreateCommand(string.Format(template, args)))
             using (var reader = command.ExecuteReader())
             {
                 return reader.Read();
@@ -124,7 +124,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         {
             EnsureConnectionIsOpen();
 
-            using (var command = CreateCommand(String.Format(template, args)))
+            using (var command = CreateCommand(string.Format(template, args)))
             using (var reader = command.ExecuteReader())
             {
                 return reader.ReadDataSet();

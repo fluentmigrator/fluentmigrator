@@ -89,7 +89,7 @@ namespace FluentMigrator.Runner.Processors.Postgres
         {
             EnsureConnectionIsOpen();
 
-            using (var command = CreateCommand(String.Format(template, args)))
+            using (var command = CreateCommand(string.Format(template, args)))
             using (var reader = command.ExecuteReader())
             {
                 return reader.ReadDataSet();
@@ -100,7 +100,7 @@ namespace FluentMigrator.Runner.Processors.Postgres
         {
             EnsureConnectionIsOpen();
 
-            using (var command = CreateCommand(String.Format(template, args)))
+            using (var command = CreateCommand(string.Format(template, args)))
             using (var reader = command.ExecuteReader())
             {
                 return reader.Read();
