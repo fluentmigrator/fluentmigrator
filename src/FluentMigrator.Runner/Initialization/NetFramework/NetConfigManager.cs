@@ -28,7 +28,7 @@ namespace FluentMigrator.Runner.Initialization.NetFramework
     {
         public Configuration LoadFromFile(string path)
         {
-            if (String.IsNullOrEmpty(path) || !File.Exists(path))
+            if (string.IsNullOrEmpty(path) || !File.Exists(path))
                 throw new ArgumentException(@"Specified configuration file path does not exist", nameof(path));
 
             string configFile = path.Trim();

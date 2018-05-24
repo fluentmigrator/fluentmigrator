@@ -53,7 +53,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
                 return column.IsNullable.Value ? "NULL" : "NOT NULL";
             }
             else {
-                return String.Empty;
+                return string.Empty;
             }
 
         }

@@ -88,7 +88,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
         public override string Generate(AlterDefaultConstraintExpression expression)
         {
             Truncator.Truncate(expression);
-            return String.Format("ALTER TABLE {0} ALTER COLUMN {1} SET DEFAULT {2}",
+            return string.Format("ALTER TABLE {0} ALTER COLUMN {1} SET DEFAULT {2}",
                 Quoter.QuoteTableName(expression.TableName),
                 Quoter.QuoteColumnName(expression.ColumnName),
                 Quoter.QuoteValue(expression.DefaultValue)
@@ -98,7 +98,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
         public override string Generate(DeleteDefaultConstraintExpression expression)
         {
             Truncator.Truncate(expression);
-            return String.Format("ALTER TABLE {0} ALTER COLUMN {1} DROP DEFAULT",
+            return string.Format("ALTER TABLE {0} ALTER COLUMN {1} DROP DEFAULT",
                 Quoter.QuoteTableName(expression.TableName),
                 Quoter.QuoteColumnName(expression.ColumnName)
                 );
@@ -130,7 +130,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
 
             }
 
-            return String.Format(CreateIndex
+            return string.Format(CreateIndex
                 , GetUniqueString(expression)
                 , indexDirection == Direction.Ascending ? "ASC " : "DESC "
                 , Quoter.QuoteIndexName(expression.Index.Name)
@@ -148,22 +148,22 @@ namespace FluentMigrator.Runner.Generators.Firebird
         public override string Generate(CreateSequenceExpression expression)
         {
             Truncator.Truncate(expression);
-            return String.Format("CREATE SEQUENCE {0}", Quoter.QuoteSequenceName(expression.Sequence.Name));
+            return string.Format("CREATE SEQUENCE {0}", Quoter.QuoteSequenceName(expression.Sequence.Name));
         }
 
         public override string Generate(DeleteSequenceExpression expression)
         {
             Truncator.Truncate(expression);
-            return String.Format("DROP SEQUENCE {0}", Quoter.QuoteSequenceName(expression.SequenceName));
+            return string.Format("DROP SEQUENCE {0}", Quoter.QuoteSequenceName(expression.SequenceName));
         }
 
         public string GenerateAlterSequence(SequenceDefinition sequence)
         {
             Truncator.Truncate(sequence);
             if (sequence.StartWith != null)
-                return String.Format("ALTER SEQUENCE {0} RESTART WITH {1}", Quoter.QuoteSequenceName(sequence.Name), sequence.StartWith.ToString());
+                return string.Format("ALTER SEQUENCE {0} RESTART WITH {1}", Quoter.QuoteSequenceName(sequence.Name), sequence.StartWith.ToString());
 
-            return String.Empty;
+            return string.Empty;
         }
 
         public override string Generate(CreateTableExpression expression)
@@ -259,7 +259,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
         public virtual string GenerateSetNullPre3(string tableName, ColumnDefinition column)
         {
             Truncator.Truncate(column);
-            return String.Format(AlterColumnSetNullablePre3,
+            return string.Format(AlterColumnSetNullablePre3,
                 !column.IsNullable.HasValue || !column.IsNullable.Value  ? "1" : "NULL",
                 Quoter.QuoteValue(tableName),
                 Quoter.QuoteValue(column.Name)
@@ -271,7 +271,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
             Truncator.Truncate(column);
             var dropSet = !column.IsNullable.HasValue ? "DROP" : "SET";
             var nullable = column.IsNullable.GetValueOrDefault() ? "NULL" : "NOT NULL";
-            return String.Format(AlterColumnSetNullable3,
+            return string.Format(AlterColumnSetNullable3,
                 Quoter.QuoteTableName(tableName),
                 Quoter.QuoteColumnName(column.Name),
                 dropSet,
@@ -282,7 +282,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
         public virtual string GenerateSetType(string tableName, ColumnDefinition column)
         {
             Truncator.Truncate(column);
-            return String.Format(AlterColumnSetType,
+            return string.Format(AlterColumnSetType,
                 Quoter.QuoteTableName(tableName),
                 Quoter.QuoteColumnName(column.Name),
                 ((FirebirdColumn) Column).GenerateForTypeAlter(column)

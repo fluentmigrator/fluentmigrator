@@ -138,7 +138,7 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
 
             var constraintClustering = GetConstraintClusteringString(expression);
 
-            string columns = String.Join(", ", expression.Constraint.Columns.Select(x => Quoter.QuoteColumnName(x)).ToArray());
+            string columns = string.Join(", ", expression.Constraint.Columns.Select(x => Quoter.QuoteColumnName(x)).ToArray());
 
             string schemaTableName = Quoter.QuoteTableName(expression.Constraint.TableName, expression.Constraint.SchemaName);
 
@@ -161,7 +161,7 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
             }) + ";";
             builder.AppendLine(deleteDefault);
 
-            builder.Append(String.Format("-- create alter table command to create new default constraint as string and run it" + Environment.NewLine + "ALTER TABLE {0} ALTER {1} DEFAULT {2};",
+            builder.Append(string.Format("-- create alter table command to create new default constraint as string and run it" + Environment.NewLine + "ALTER TABLE {0} ALTER {1} DEFAULT {2};",
                 Quoter.QuoteTableName(expression.TableName, expression.SchemaName),
                 Quoter.QuoteColumnName(expression.ColumnName),
                 SqlAnywhereColumn.FormatDefaultValue(expression.DefaultValue, Quoter)));
@@ -192,9 +192,9 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
                 CreateForeignKeyConstraint,
                 Quoter.QuoteTableName(expression.ForeignKey.ForeignTable, expression.ForeignKey.ForeignTableSchema),
                 Quoter.QuoteColumnName(expression.ForeignKey.Name),
-                String.Join(", ", foreignColumns.ToArray()),
+                string.Join(", ", foreignColumns.ToArray()),
                 Quoter.QuoteTableName(expression.ForeignKey.PrimaryTable, expression.ForeignKey.PrimaryTableSchema),
-                String.Join(", ", primaryColumns.ToArray()),
+                string.Join(", ", primaryColumns.ToArray()),
                 Column.FormatCascade("DELETE", expression.ForeignKey.OnDelete),
                 Column.FormatCascade("UPDATE", expression.ForeignKey.OnUpdate)
                 );
@@ -217,7 +217,7 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
                 }
             }
 
-            return String.Format(CreateIndex
+            return string.Format(CreateIndex
                 , GetUniqueString(expression)
                 , GetClusterTypeString(expression)
                 , Quoter.QuoteIndexName(expression.Index.Name)
@@ -228,7 +228,7 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
 
         public override string Generate(DeleteIndexExpression expression)
         {
-            return String.Format(DropIndex, Quoter.QuoteTableName(expression.Index.TableName, expression.Index.SchemaName), Quoter.QuoteIndexName(expression.Index.Name));
+            return string.Format(DropIndex, Quoter.QuoteTableName(expression.Index.TableName, expression.Index.SchemaName), Quoter.QuoteIndexName(expression.Index.Name));
         }
 
         public override string Generate(AlterSchemaExpression expression)
@@ -238,12 +238,12 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
 
         public override string Generate(CreateSchemaExpression expression)
         {
-            return String.Format(CreateSchema, Quoter.QuoteSchemaName(expression.SchemaName));
+            return string.Format(CreateSchema, Quoter.QuoteSchemaName(expression.SchemaName));
         }
 
         public override string Generate(DeleteSchemaExpression expression)
         {
-            return String.Format(DropSchema, Quoter.QuoteSchemaName(expression.SchemaName));
+            return string.Format(DropSchema, Quoter.QuoteSchemaName(expression.SchemaName));
         }
 
         public override string Generate(CreateSequenceExpression expression)
@@ -260,7 +260,7 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
         {
             string sql = "ALTER TABLE {0} ALTER {1} DROP DEFAULT";
             string schemaAndTable = Quoter.QuoteTableName(expression.TableName, expression.SchemaName);
-            return String.Format(sql, schemaAndTable, Quoter.QuoteColumnName(expression.ColumnName));
+            return string.Format(sql, schemaAndTable, Quoter.QuoteColumnName(expression.ColumnName));
         }
 
         public override bool IsAdditionalFeatureSupported(string feature)

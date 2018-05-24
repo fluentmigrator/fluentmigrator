@@ -250,9 +250,9 @@ namespace FluentMigrator.Runner.Generators.Base
             return string.Format(
                 ForeignKeyConstraint,
                 constraintClause,
-                String.Join(", ", foreignColumns.ToArray()),
+                string.Join(", ", foreignColumns.ToArray()),
                 Quoter.QuoteTableName(foreignKey.PrimaryTable, foreignKey.PrimaryTableSchema),
-                String.Join(", ", primaryColumns.ToArray()),
+                string.Join(", ", primaryColumns.ToArray()),
                 FormatCascade("DELETE", foreignKey.OnDelete),
                 FormatCascade("UPDATE", foreignKey.OnUpdate)
             );
@@ -316,9 +316,9 @@ namespace FluentMigrator.Runner.Generators.Base
         public virtual string AddPrimaryKeyConstraint(string tableName, IEnumerable<ColumnDefinition> primaryKeyColumns)
         {
             var pkColDefs = primaryKeyColumns.ToList();
-            var keyColumns = String.Join(", ", pkColDefs.Select(x => Quoter.QuoteColumnName(x.Name)).ToArray());
+            var keyColumns = string.Join(", ", pkColDefs.Select(x => Quoter.QuoteColumnName(x.Name)).ToArray());
 
-            return String.Format(", {0}PRIMARY KEY ({1})", GetPrimaryKeyConstraintName(pkColDefs, tableName), keyColumns);
+            return string.Format(", {0}PRIMARY KEY ({1})", GetPrimaryKeyConstraintName(pkColDefs, tableName), keyColumns);
         }
 
         /// <summary>

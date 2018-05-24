@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2018, FluentMigrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,7 +30,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
 
         public override string FromTimeSpan(TimeSpan value)
         {
-            return String.Format("{0}{1} {2}:{3}:{4}.{5}{0}"
+            return string.Format("{0}{1} {2}:{3}:{4}.{5}{0}"
                 , ValueQuote
                 , value.Days
                 , value.Hours
