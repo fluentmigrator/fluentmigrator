@@ -44,7 +44,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         [Test]
         public void ErrorIsReturnedWhenTableNameIsEmptyString()
         {
-            var expression = new AlterSchemaExpression { TableName = String.Empty };
+            var expression = new AlterSchemaExpression { TableName = string.Empty };
             var errors = ValidationHelper.CollectErrors(expression);
             errors.ShouldContain(ErrorMessages.TableNameCannotBeNullOrEmpty);
         }
@@ -68,7 +68,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         [Test]
         public void ErrorIsReturnedWhenDestinationSchemaNameIsEmptyString()
         {
-            var expression = new AlterSchemaExpression { DestinationSchemaName = String.Empty };
+            var expression = new AlterSchemaExpression { DestinationSchemaName = string.Empty };
             var errors = ValidationHelper.CollectErrors(expression);
             errors.ShouldContain(ErrorMessages.DestinationSchemaCannotBeNull);
         }

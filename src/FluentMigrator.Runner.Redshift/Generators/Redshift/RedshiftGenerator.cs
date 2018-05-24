@@ -117,7 +117,7 @@ namespace FluentMigrator.Runner.Generators.Redshift
 
         public override string Generate(DeleteTableExpression expression)
         {
-            return String.Format("DROP TABLE {0};", Quoter.QuoteTableName(expression.TableName, expression.SchemaName));
+            return string.Format("DROP TABLE {0};", Quoter.QuoteTableName(expression.TableName, expression.SchemaName));
         }
 
         public override string Generate(DeleteColumnExpression expression)
@@ -208,7 +208,7 @@ namespace FluentMigrator.Runner.Generators.Redshift
 
         public override string Generate(AlterDefaultConstraintExpression expression)
         {
-            return String.Format(
+            return string.Format(
                 "ALTER TABLE {0} ALTER {1} DROP DEFAULT, ALTER {1} {2};",
                 Quoter.QuoteTableName(expression.TableName, expression.SchemaName),
                 Quoter.QuoteColumnName(expression.ColumnName),
@@ -227,7 +227,7 @@ namespace FluentMigrator.Runner.Generators.Redshift
             {
                 foreach (var row in expression.Rows)
                 {
-                    var where = String.Empty;
+                    var where = string.Empty;
                     var i = 0;
 
                     foreach (var item in row)
@@ -238,7 +238,7 @@ namespace FluentMigrator.Runner.Generators.Redshift
                         }
 
                         var op = item.Value == null || item.Value == DBNull.Value ? "IS" : "=";
-                        where += String.Format("{0} {1} {2}", Quoter.QuoteColumnName(item.Key), op, Quoter.QuoteValue(item.Value));
+                        where += string.Format("{0} {1} {2}", Quoter.QuoteColumnName(item.Key), op, Quoter.QuoteValue(item.Value));
                         i++;
                     }
 
@@ -273,7 +273,7 @@ namespace FluentMigrator.Runner.Generators.Redshift
                 }
             }
 
-            return String.Format(
+            return string.Format(
                 "UPDATE {0} SET {1} WHERE {2};",
                 Quoter.QuoteTableName(expression.TableName, expression.SchemaName),
                 string.Join(", ", updateItems.ToArray()),
@@ -317,7 +317,7 @@ namespace FluentMigrator.Runner.Generators.Redshift
                 Quoter.QuoteTableName(expression.Constraint.TableName, expression.Constraint.SchemaName),
                 Quoter.QuoteConstraintName(expression.Constraint.ConstraintName),
                 constraintType,
-                String.Join(", ", columns));
+                string.Join(", ", columns));
         }
 
         protected string GetColumnList(IEnumerable<string> columns)

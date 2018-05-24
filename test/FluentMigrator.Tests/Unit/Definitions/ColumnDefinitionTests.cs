@@ -45,7 +45,7 @@ namespace FluentMigrator.Tests.Unit.Definitions
         [Test]
         public void ErrorIsReturnedWhenColumnNameIsEmptyString()
         {
-            var column = new ColumnDefinition { Name = String.Empty };
+            var column = new ColumnDefinition { Name = string.Empty };
             var errors = ValidationHelper.CollectErrors(column);
             errors.ShouldContain(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
         }

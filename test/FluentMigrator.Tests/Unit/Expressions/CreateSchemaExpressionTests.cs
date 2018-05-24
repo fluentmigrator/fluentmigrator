@@ -36,7 +36,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         [Test]
         public void ErrorIsReturnedWhenSchemaNameIsEmptyString()
         {
-            var expression = new CreateSchemaExpression { SchemaName = String.Empty };
+            var expression = new CreateSchemaExpression { SchemaName = string.Empty };
 
             var errors = ValidationHelper.CollectErrors(expression);
             errors.ShouldContain(ErrorMessages.SchemaNameCannotBeNullOrEmpty);

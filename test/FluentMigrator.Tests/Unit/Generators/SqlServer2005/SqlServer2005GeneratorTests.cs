@@ -143,7 +143,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             var expression = GeneratorTestHelper.GetCreateTableExpression();
             expression.SchemaName = "TestSchema";
             expression.Columns[0].Type = DbType.String;
-            expression.Columns[0].Size = Int32.MaxValue;
+            expression.Columns[0].Size = int.MaxValue;
 
             var result = Generator.Generate(expression);
             result.ShouldBe("CREATE TABLE [TestSchema].[TestTable1] ([TestColumn1] NVARCHAR(MAX) NOT NULL, [TestColumn2] INT NOT NULL)");
@@ -154,7 +154,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
             expression.Columns[0].Type = DbType.String;
-            expression.Columns[0].Size = Int32.MaxValue;
+            expression.Columns[0].Size = int.MaxValue;
 
             var result = Generator.Generate(expression);
             result.ShouldBe("CREATE TABLE [dbo].[TestTable1] ([TestColumn1] NVARCHAR(MAX) NOT NULL, [TestColumn2] INT NOT NULL)");

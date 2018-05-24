@@ -175,9 +175,9 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                 CreateForeignKeyConstraint,
                 Quoter.QuoteTableName(expression.ForeignKey.ForeignTable, expression.ForeignKey.ForeignTableSchema),
                 Quoter.QuoteColumnName(expression.ForeignKey.Name),
-                String.Join(", ", foreignColumns.ToArray()),
+                string.Join(", ", foreignColumns.ToArray()),
                 Quoter.QuoteTableName(expression.ForeignKey.PrimaryTable, expression.ForeignKey.PrimaryTableSchema),
-                String.Join(", ", primaryColumns.ToArray()),
+                string.Join(", ", primaryColumns.ToArray()),
                 Column.FormatCascade("DELETE", expression.ForeignKey.OnDelete),
                 Column.FormatCascade("UPDATE", expression.ForeignKey.OnUpdate)
                 );
@@ -225,9 +225,9 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                 GetClusterTypeString(expression),
                 Quoter.QuoteIndexName(expression.Index.Name),
                 Quoter.QuoteTableName(expression.Index.TableName, expression.Index.SchemaName),
-                String.Join(", ", indexColumns),
+                string.Join(", ", indexColumns),
                 GetIncludeString(expression),
-                String.Join(", ", indexIncludes),
+                string.Join(", ", indexIncludes),
                 withPart);
 
             return result;
@@ -305,7 +305,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override string Generate(DeleteSchemaExpression expression)
         {
-            return String.Format(DropSchema, Quoter.QuoteSchemaName(expression.SchemaName));
+            return string.Format(DropSchema, Quoter.QuoteSchemaName(expression.SchemaName));
         }
 
         public override string Generate(AlterSchemaExpression expression)

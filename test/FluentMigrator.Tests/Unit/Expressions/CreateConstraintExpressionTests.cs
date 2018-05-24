@@ -43,7 +43,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
                                      Constraint =
                                          {
                                              TableName =
-                                                 String.Empty
+                                                 string.Empty
                                          }
                                  };
 

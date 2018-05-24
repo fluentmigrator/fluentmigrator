@@ -112,7 +112,7 @@ namespace FluentMigrator.Runner.Infrastructure
                 return GetFullGacDirectoriesOnWindows(winDir);
             }
 
-            var asmPath = typeof(Int32).Assembly.Location;
+            var asmPath = typeof(int).Assembly.Location;
             var isMono = asmPath.Contains("/mono/");
             if (!isMono)
                 return Enumerable.Empty<string>();

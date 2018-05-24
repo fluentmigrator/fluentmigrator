@@ -171,7 +171,7 @@ namespace FluentMigrator.Runner.Generators.Generic
         /// <inheritdoc />
         public virtual bool IsQuoted(string name)
         {
-            if (String.IsNullOrEmpty(name)) return false;
+            if (string.IsNullOrEmpty(name)) return false;
             //This can return true incorrectly in some cases edge cases.
             //If a string say [myname]] is passed in this is not correctly quote for MSSQL but this function will
             //return true.

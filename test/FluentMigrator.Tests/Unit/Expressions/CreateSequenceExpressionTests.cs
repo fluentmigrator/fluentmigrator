@@ -38,7 +38,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         [Test]
         public void ErrorIsReturnedWhenSequenceNameIsEmptyString()
         {
-            var expression = new CreateSequenceExpression { Sequence = new SequenceDefinition { Name = String.Empty } };
+            var expression = new CreateSequenceExpression { Sequence = new SequenceDefinition { Name = string.Empty } };
 
             var errors = ValidationHelper.CollectErrors(expression);
             errors.ShouldContain(ErrorMessages.SequenceNameCannotBeNullOrEmpty);

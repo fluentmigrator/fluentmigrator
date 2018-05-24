@@ -52,7 +52,7 @@ namespace FluentMigrator.Tests.Unit.Definitions
         [Test]
         public void ErrorIsReturnedWhenColumnNameIsEmptyString()
         {
-            var column = new IndexColumnDefinition { Name = String.Empty };
+            var column = new IndexColumnDefinition { Name = string.Empty };
             var errors = ValidationHelper.CollectErrors(column);
             errors.ShouldContain(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
         }
@@ -76,7 +76,7 @@ namespace FluentMigrator.Tests.Unit.Definitions
         [Test]
         public void ErrorIsReturnedWhenIncludeNameIsEmptyString()
         {
-            var column = new IndexIncludeDefinition { Name = String.Empty };
+            var column = new IndexIncludeDefinition { Name = string.Empty };
             var errors = ValidationHelper.CollectErrors(column);
             errors.ShouldContain(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
         }

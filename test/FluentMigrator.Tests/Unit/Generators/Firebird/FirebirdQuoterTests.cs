@@ -69,7 +69,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         public void Quote_ArgIsFirebirdKeyword_ArgShouldBeQuoted(string quoteArg)
         {
             var actual = new FirebirdQuoter(false).Quote(quoteArg);
-            var expected = String.Format("\"{0}\"", quoteArg);
+            var expected = string.Format("\"{0}\"", quoteArg);
             actual.ShouldBe(expected);
         }
 
@@ -109,7 +109,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         {
             var argInLowerCase = quoteArg.ToLower();
             var actual = new FirebirdQuoter(false).Quote(argInLowerCase);
-            var expected = String.Format("\"{0}\"", argInLowerCase);
+            var expected = string.Format("\"{0}\"", argInLowerCase);
             actual.ShouldBe(expected);
         }
     }

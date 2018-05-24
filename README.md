@@ -27,22 +27,13 @@ while the CI builds are stored on [MyGet](https://www.myget.org/feed/Packages/fl
 | **Documentation**         | [On our GitHub pages](https://fluentmigrator.github.io) |
 | **Discussions**           | [![Gitter](https://img.shields.io/gitter/room/FluentMigrator/fluentmigrator.svg)](https://gitter.im/FluentMigrator/fluentmigrator) |
 | **Bug/Feature Tracking**  | [![GitHub issues](https://img.shields.io/github/issues/fluentmigrator/fluentmigrator.svg)](https://github.com/fluentmigrator/fluentmigrator/issues) |
-
-# Build Status
-
-Build-Server | Status
--------------|----------
-TeamCity     | [![TeamCity (full build status)](https://img.shields.io/teamcity/http/teamcity.jetbrains.com/e/FluentMigrator_MasterAndPullRequests.svg)](https://teamcity.jetbrains.com/viewType.html?buildTypeId=FluentMigrator_MasterAndPullRequests&guest=1)
-Travis CI    | [![Travis](https://img.shields.io/travis/fluentmigrator/fluentmigrator.svg)](https://travis-ci.org/fluentmigrator/fluentmigrator)
-
-
-The TeamCity build is generously hosted and run on the [JetBrains TeamCity](https://teamcity.jetbrains.com) infrastructure.
-
-Our Linux build is hosted on Travis CI.
+| **Build server**          | [![Travis](https://img.shields.io/travis/fluentmigrator/fluentmigrator.svg)](https://travis-ci.org/fluentmigrator/fluentmigrator) |
 
 # Powered by
 
 ![ReSharper](http://www.jetbrains.com/img/logos/logo_resharper_small.gif)
+
+<a href="https://travis-ci.com"><img src="https://travis-ci.com/images/logos/TravisCI-Full-Color.png" alt="Travis CI"  width="20%" /></a>
 
 # Contributors
 

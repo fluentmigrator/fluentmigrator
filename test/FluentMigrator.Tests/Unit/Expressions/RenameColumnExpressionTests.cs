@@ -45,7 +45,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         [Test]
         public void ErrorIsReturnedWhenOldNameIsEmptyString()
         {
-            var expression = new RenameColumnExpression { OldName = String.Empty };
+            var expression = new RenameColumnExpression { OldName = string.Empty };
             var errors = ValidationHelper.CollectErrors(expression);
             errors.ShouldContain(ErrorMessages.OldColumnNameCannotBeNullOrEmpty);
         }
@@ -69,7 +69,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         [Test]
         public void ErrorIsReturnedWhenNewNameIsEmptyString()
         {
-            var expression = new RenameColumnExpression { NewName = String.Empty };
+            var expression = new RenameColumnExpression { NewName = string.Empty };
             var errors = ValidationHelper.CollectErrors(expression);
             errors.ShouldContain(ErrorMessages.NewColumnNameCannotBeNullOrEmpty);
         }

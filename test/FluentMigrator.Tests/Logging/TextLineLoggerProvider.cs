@@ -152,7 +152,7 @@ namespace FluentMigrator.Tests.Logging
                         {
                             for (var i = 0; i < emptyLinesCount; i++)
                             {
-                                _lines.Add(String.Empty);
+                                _lines.Add(string.Empty);
                             }
 
                             _lines.Add(line);
@@ -164,7 +164,7 @@ namespace FluentMigrator.Tests.Logging
                 {
                     for (int i = 1; i < emptyLinesCount; i++)
                     {
-                        _lines.Add(String.Empty);
+                        _lines.Add(string.Empty);
                     }
                 }
             }

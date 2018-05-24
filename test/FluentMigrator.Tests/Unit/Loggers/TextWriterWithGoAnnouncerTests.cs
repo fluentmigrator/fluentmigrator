@@ -68,7 +68,7 @@ namespace FluentMigrator.Tests.Unit.Loggers
             _options.ShowSql = false;
 
             _logger.LogSql("SQL");
-            Output.ShouldBe(String.Empty);
+            Output.ShouldBe(string.Empty);
         }
 
         [Test]
