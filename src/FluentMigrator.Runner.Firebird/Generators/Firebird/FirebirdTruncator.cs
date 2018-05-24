@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 //
 // Copyright (c) 2018, Fluent Migrator Project
 //
@@ -253,12 +253,12 @@ namespace FluentMigrator.Runner.Generators.Firebird
 
         public string Truncate(string name)
         {
-            if (!String.IsNullOrEmpty(name))
+            if (!string.IsNullOrEmpty(name))
             {
                 if (name.Length > FirebirdOptions.MaxNameLength)
                 {
                     if (!_enabled)
-                        throw new ArgumentException(String.Format("Name too long: {0}", name));
+                        throw new ArgumentException(string.Format("Name too long: {0}", name));
 
                     return name.Substring(0, Math.Min(FirebirdOptions.MaxNameLength, name.Length));
                 }
@@ -268,12 +268,12 @@ namespace FluentMigrator.Runner.Generators.Firebird
 
         public string Pack(string name)
         {
-            if (!String.IsNullOrEmpty(name))
+            if (!string.IsNullOrEmpty(name))
             {
                 if (name.Length > FirebirdOptions.MaxNameLength)
                 {
                     if (!_enabled)
-                        throw new ArgumentException(String.Format("Name too long: {0}", name));
+                        throw new ArgumentException(string.Format("Name too long: {0}", name));
 
                     byte[] byteHash = MD5.Create().ComputeHash(Encoding.ASCII.GetBytes(name));
                     string hash = Convert.ToBase64String(byteHash);
@@ -286,7 +286,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
                             sb.Append(c);
                     }
                     hash = sb.ToString();
-                    return String.Format("fk_{0}", hash.Substring(0, Math.Min(28, hash.Length)));
+                    return string.Format("fk_{0}", hash.Substring(0, Math.Min(28, hash.Length)));
                 }
             }
             return name;

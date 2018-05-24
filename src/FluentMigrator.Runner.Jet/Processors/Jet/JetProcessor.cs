@@ -134,7 +134,7 @@ namespace FluentMigrator.Runner.Processors.Jet
             EnsureConnectionIsOpen();
 
             var ds = new DataSet();
-            using (var command = new OleDbCommand(String.Format(template, args), Connection, Transaction))
+            using (var command = new OleDbCommand(string.Format(template, args), Connection, Transaction))
             using (var adapter = new OleDbDataAdapter(command))
             {
                 adapter.Fill(ds);
@@ -146,7 +146,7 @@ namespace FluentMigrator.Runner.Processors.Jet
         {
             EnsureConnectionIsOpen();
 
-            using (var command = new OleDbCommand(String.Format(template, args), Connection, Transaction))
+            using (var command = new OleDbCommand(string.Format(template, args), Connection, Transaction))
             using (var reader = command.ExecuteReader())
             {
                 Debug.Assert(reader != null, nameof(reader) + " != null");
@@ -161,7 +161,7 @@ namespace FluentMigrator.Runner.Processors.Jet
 
         public override void Execute(string template, params object[] args)
         {
-            Process(String.Format(template, args));
+            Process(string.Format(template, args));
         }
 
         public override bool SchemaExists(string tableName)

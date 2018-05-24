@@ -177,7 +177,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
                 return DBNull.Value;
 
             string src = val.ToString().Trim();
-            if (String.IsNullOrEmpty(src))
+            if (string.IsNullOrEmpty(src))
                 return DBNull.Value;
 
             if (src.StartsWith("DEFAULT ", StringComparison.InvariantCultureIgnoreCase))
@@ -202,7 +202,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
                 }
             }
-            throw new NotSupportedException(String.Format("Can't parse default value {0}", src));
+            throw new NotSupportedException(string.Format("Can't parse default value {0}", src));
         }
     }
 

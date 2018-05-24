@@ -38,7 +38,7 @@ namespace FluentMigrator.Runner.Generators.Hana
 
             return column.IsNullable.HasValue
                 ? (column.IsNullable.Value ? "NULL" : "NOT NULL")
-                : String.Empty;
+                : string.Empty;
         }
 
         protected override string GetPrimaryKeyConstraintName(IEnumerable<ColumnDefinition> primaryKeyColumns, string tableName)
@@ -68,9 +68,9 @@ namespace FluentMigrator.Runner.Generators.Hana
 
         public override string AddPrimaryKeyConstraint(string tableName, IEnumerable<ColumnDefinition> primaryKeyColumns)
         {
-            var keyColumns = String.Join(", ", primaryKeyColumns.Select(x => Quoter.QuoteColumnName(x.Name)).ToArray());
+            var keyColumns = string.Join(", ", primaryKeyColumns.Select(x => Quoter.QuoteColumnName(x.Name)).ToArray());
 
-            return String.Format(", PRIMARY KEY ({0})", keyColumns);
+            return string.Format(", PRIMARY KEY ({0})", keyColumns);
         }
     }
 }

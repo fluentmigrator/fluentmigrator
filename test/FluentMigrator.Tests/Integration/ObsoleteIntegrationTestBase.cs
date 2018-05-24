@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 //
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
 //
@@ -126,12 +126,12 @@ namespace FluentMigrator.Tests.Integration
             ExecuteWithSupportedProcessors(test, true);
         }
 
-        public void ExecuteWithSupportedProcessors(Action<IMigrationProcessor> test, Boolean tryRollback)
+        public void ExecuteWithSupportedProcessors(Action<IMigrationProcessor> test, bool tryRollback)
         {
             ExecuteWithSupportedProcessors(test, tryRollback, new Type[] { });
         }
 
-        public void ExecuteWithSupportedProcessors(Action<IMigrationProcessor> test, Boolean tryRollback, params Type[] exceptProcessors)
+        public void ExecuteWithSupportedProcessors(Action<IMigrationProcessor> test, bool tryRollback, params Type[] exceptProcessors)
         {
             ExecuteWithSupportedProcessors(
                 test,
@@ -139,7 +139,7 @@ namespace FluentMigrator.Tests.Integration
                 procType => !exceptProcessors.Any(p => p.IsAssignableFrom(procType)));
         }
 
-        public void ExecuteWithSupportedProcessors(Action<IMigrationProcessor> test, Boolean tryRollback, Predicate<Type> isMatch)
+        public void ExecuteWithSupportedProcessors(Action<IMigrationProcessor> test, bool tryRollback, Predicate<Type> isMatch)
         {
             if (!IsAnyServerEnabled())
             {

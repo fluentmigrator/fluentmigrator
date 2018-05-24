@@ -72,7 +72,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
         }
         public override string Generate(DeleteTableExpression expression)
         {
-            return String.Format(DropTable, ExpandTableName(Quoter.QuoteTableName(expression.SchemaName),Quoter.QuoteTableName(expression.TableName)));
+            return string.Format(DropTable, ExpandTableName(Quoter.QuoteTableName(expression.SchemaName),Quoter.QuoteTableName(expression.TableName)));
         }
 
         public override string Generate(CreateSequenceExpression expression)
@@ -143,7 +143,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
 
         private string ExpandTableName(string schema, string table)
         {
-            return String.IsNullOrEmpty(schema) ? table : String.Concat(schema,".",table);
+            return string.IsNullOrEmpty(schema) ? table : string.Concat(schema,".",table);
         }
 
         private string InnerGenerate(CreateTableExpression expression)
@@ -233,16 +233,16 @@ namespace FluentMigrator.Runner.Generators.Oracle
                     columnValues.Add(Quoter.QuoteValue(item.Value));
                 }
 
-                string columns = String.Join(", ", columnNames.ToArray());
-                string values = String.Join(", ", columnValues.ToArray());
-                insertStrings.Add(String.Format(InsertData, ExpandTableName(Quoter.QuoteSchemaName(expression.SchemaName), Quoter.QuoteTableName(expression.TableName)), columns, values));
+                string columns = string.Join(", ", columnNames.ToArray());
+                string values = string.Join(", ", columnValues.ToArray());
+                insertStrings.Add(string.Format(InsertData, ExpandTableName(Quoter.QuoteSchemaName(expression.SchemaName), Quoter.QuoteTableName(expression.TableName)), columns, values));
             }
-            return "INSERT ALL " + String.Join(" ", insertStrings.ToArray()) + " SELECT 1 FROM DUAL";
+            return "INSERT ALL " + string.Join(" ", insertStrings.ToArray()) + " SELECT 1 FROM DUAL";
         }
 
         public override string Generate(AlterDefaultConstraintExpression expression)
         {
-            return String.Format(AlterColumn, Quoter.QuoteTableName(expression.TableName), Column.Generate(new ColumnDefinition
+            return string.Format(AlterColumn, Quoter.QuoteTableName(expression.TableName), Column.Generate(new ColumnDefinition
             {
                 ModificationType = ColumnModificationType.Alter,
                 Name = expression.ColumnName,

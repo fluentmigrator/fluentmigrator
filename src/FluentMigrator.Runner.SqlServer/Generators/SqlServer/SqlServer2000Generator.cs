@@ -94,7 +94,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
             var constraintClustering = GetConstraintClusteringString(expression);
 
-            string columns = String.Join(", ", expression.Constraint.Columns.Select(x => Quoter.QuoteColumnName(x)).ToArray());
+            string columns = string.Join(", ", expression.Constraint.Columns.Select(x => Quoter.QuoteColumnName(x)).ToArray());
 
             return string.Format(CreateConstraint,
                 Quoter.QuoteTableName(expression.Constraint.TableName, expression.Constraint.SchemaName),
@@ -147,7 +147,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
             builder.AppendLine();
 
-            builder.AppendLine(String.Format("-- now we can finally drop column" + Environment.NewLine + "ALTER TABLE {0} DROP COLUMN {1};",
+            builder.AppendLine(string.Format("-- now we can finally drop column" + Environment.NewLine + "ALTER TABLE {0} DROP COLUMN {1};",
                                          Quoter.QuoteTableName(expression.TableName, expression.SchemaName),
                                          Quoter.QuoteColumnName(columnName)));
         }
@@ -226,7 +226,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                 "SET @sql = N'ALTER TABLE {0} DROP CONSTRAINT ' + QUOTENAME(@default);" + Environment.NewLine +
                 "EXEC sp_executesql @sql;";
 
-            return String.Format(sql, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), expression.ColumnName);
+            return string.Format(sql, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), expression.ColumnName);
         }
 
         public override bool IsAdditionalFeatureSupported(string feature)

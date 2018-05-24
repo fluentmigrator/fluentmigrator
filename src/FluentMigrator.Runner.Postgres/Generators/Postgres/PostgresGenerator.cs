@@ -123,7 +123,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
 
         public override string Generate(DeleteTableExpression expression)
         {
-            return String.Format("DROP TABLE {0};", Quoter.QuoteTableName(expression.TableName, expression.SchemaName));
+            return string.Format("DROP TABLE {0};", Quoter.QuoteTableName(expression.TableName, expression.SchemaName));
         }
 
         public override string Generate(DeleteColumnExpression expression)
@@ -184,7 +184,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
             }
             result.Append(");");
 
-            return String.Format(result.ToString(), Quoter.QuoteIndexName(expression.Index.Name), Quoter.QuoteTableName(expression.Index.TableName, expression.Index.SchemaName));
+            return string.Format(result.ToString(), Quoter.QuoteIndexName(expression.Index.Name), Quoter.QuoteTableName(expression.Index.TableName, expression.Index.SchemaName));
 
             /*
             var idx = String.Format(result.ToString(), expression.Index.Name, Quoter.QuoteSchemaName(expression.Index.SchemaName), expression.Index.TableName);
@@ -242,7 +242,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
 
         public override string Generate(AlterDefaultConstraintExpression expression)
         {
-            return String.Format(
+            return string.Format(
                 "ALTER TABLE {0} ALTER {1} DROP DEFAULT, ALTER {1} {2};",
                 Quoter.QuoteTableName(expression.TableName, expression.SchemaName),
                 Quoter.QuoteColumnName(expression.ColumnName),
@@ -261,7 +261,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
             {
                 foreach (var row in expression.Rows)
                 {
-                    var where = String.Empty;
+                    var where = string.Empty;
                     var i = 0;
 
                     foreach (var item in row)
@@ -272,7 +272,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
                         }
 
                         var op = item.Value == null || item.Value == DBNull.Value ? "IS" : "=";
-                        where += String.Format("{0} {1} {2}", Quoter.QuoteColumnName(item.Key), op, Quoter.QuoteValue(item.Value));
+                        where += string.Format("{0} {1} {2}", Quoter.QuoteColumnName(item.Key), op, Quoter.QuoteValue(item.Value));
                         i++;
                     }
 
@@ -307,11 +307,11 @@ namespace FluentMigrator.Runner.Generators.Postgres
                 }
             }
 
-            return String.Format(
+            return string.Format(
                 "UPDATE {0} SET {1} WHERE {2};",
                 Quoter.QuoteTableName(expression.TableName, expression.SchemaName),
-                String.Join(", ", updateItems.ToArray()),
-                String.Join(" AND ", whereClauses.ToArray()));
+                string.Join(", ", updateItems.ToArray()),
+                string.Join(" AND ", whereClauses.ToArray()));
         }
 
         public override string Generate(AlterSchemaExpression expression)
@@ -370,12 +370,12 @@ namespace FluentMigrator.Runner.Generators.Postgres
 
         public override string Generate(CreateSequenceExpression expression)
         {
-            return String.Format("{0};", base.Generate(expression));
+            return string.Format("{0};", base.Generate(expression));
         }
 
         public override string Generate(DeleteSequenceExpression expression)
         {
-            return String.Format("{0};", base.Generate(expression));
+            return string.Format("{0};", base.Generate(expression));
         }
     }
 }

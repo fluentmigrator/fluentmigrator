@@ -68,7 +68,7 @@ namespace FluentMigrator.Tests.Unit.Definitions
         [Test]
         public void ErrorIsReturnedWhenForeignTableNameIsEmptyString()
         {
-            var column = new ForeignKeyDefinition { ForeignTable = String.Empty };
+            var column = new ForeignKeyDefinition { ForeignTable = string.Empty };
             var errors = ValidationHelper.CollectErrors(column);
             errors.ShouldContain(ErrorMessages.ForeignTableNameCannotBeNullOrEmpty);
         }
@@ -84,7 +84,7 @@ namespace FluentMigrator.Tests.Unit.Definitions
         [Test]
         public void ErrorIsReturnedWhenPrimaryTableNameIsEmptyString()
         {
-            var column = new ForeignKeyDefinition { PrimaryTable = String.Empty };
+            var column = new ForeignKeyDefinition { PrimaryTable = string.Empty };
             var errors = ValidationHelper.CollectErrors(column);
             errors.ShouldContain(ErrorMessages.PrimaryTableNameCannotBeNullOrEmpty);
         }

@@ -258,7 +258,7 @@ namespace FluentMigrator.Tests.Unit.Generators.GenericGenerator
         public void ShouldHandleDecimalToStringConversionInAnyCulture()
         {
             ChangeCulture();
-            _quoter.QuoteValue(new Decimal(123.4d)).ShouldBe("123.4");
+            _quoter.QuoteValue(new decimal(123.4d)).ShouldBe("123.4");
             RestoreCulture();
         }
 
