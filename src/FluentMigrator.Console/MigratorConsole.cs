@@ -39,29 +39,29 @@ namespace FluentMigrator.Console
 {
     public class MigratorConsole
     {
-        public string Connection;
-        public string Namespace;
-        public bool NestedNamespaces;
-        public bool Output;
-        public string OutputFilename;
-        public bool PreviewOnly;
-        public string ProcessorType;
-        public string Profile;
-        public bool ShowHelp;
-        public int Steps;
-        public List<string> Tags = new List<string>();
-        public string TargetAssembly;
-        public string Task;
-        public int? Timeout;
-        public bool Verbose;
-        public bool StopOnError;
-        public long Version;
-        public long StartVersion;
-        public bool NoConnection;
-        public string WorkingDirectory;
-        public bool TransactionPerSession;
-        public bool AllowBreakingChange;
-        public string ProviderSwitches;
+        public string Connection { get; set; }
+        public string Namespace { get; set; }
+        public bool NestedNamespaces { get; set; }
+        public bool Output { get; set; }
+        public string OutputFilename { get; set; }
+        public bool PreviewOnly { get; set; }
+        public string ProcessorType { get; set; }
+        public string Profile { get; set; }
+        public bool ShowHelp { get; set; }
+        public int Steps { get; set; }
+        public List<string> Tags { get; } = new List<string>();
+        public string TargetAssembly { get; set; }
+        public string Task { get; set; }
+        public int? Timeout { get; set; }
+        public bool Verbose { get; set; }
+        public bool StopOnError { get; set; }
+        public long Version { get; set; }
+        public long StartVersion { get; set; }
+        public bool NoConnection { get; set; }
+        public string WorkingDirectory { get; set; }
+        public bool TransactionPerSession { get; set; }
+        public bool AllowBreakingChange { get; set; }
+        public string ProviderSwitches { get; set; }
 
         public int Run(params string[] args)
         {
