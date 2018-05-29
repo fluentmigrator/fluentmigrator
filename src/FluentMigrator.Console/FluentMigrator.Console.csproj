@@ -24,7 +24,7 @@
   <ItemGroup>
     <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="5.12.1" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="2.0.1" />
-    <PackageReference Include="Oracle.ManagedDataAccess" Version="12.2.1100" />
+    <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="2.12.0-beta2" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
     <PackageReference Include="MySql.Data" Version="8.0.11" />
