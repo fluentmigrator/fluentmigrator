@@ -20,13 +20,15 @@ script:
 - nuget pack publish/FluentMigrator.Console.nuspec -OutputDirectory "$TRAVIS_BUILD_DIR/output" -Version "$VERSION" -Properties Configuration=Release
 deploy: 
 - provider: script 
+  skip_cleanup: true
   script: bash ./myget-upload.sh 
   on: 
-    condition: '"$TRAVIS_PULL_REQUEST" == "false" && ("$TRAVIS_BRANCH" == release/* || "$TRAVIS_BRANCH" == develop)'
+    condition: "$TRAVIS_BRANCH" == release/* || "$TRAVIS_BRANCH" == develop
     all_branches: true
 - provider: script 
+  skip_cleanup: true
   script: bash ./nuget-upload.sh 
   on: 
-    condition: '"$TRAVIS_PULL_REQUEST" == "false" && $TRAVIS_TAG =~ ^v[[:digit:]]+(\.[[:digit:]]+)+$'
+    condition: $TRAVIS_TAG =~ ^v[[:digit:]]+(\.[[:digit:]]+)+$
     tags: true
     branch: master
