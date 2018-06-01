@@ -80,9 +80,6 @@ namespace Microsoft.Extensions.DependencyInjection
                 // The default set of conventions to be applied to migration expressions
                 .AddSingleton<IConventionSet, DefaultConventionSet>()
 
-                // Source for profiles
-                .AddSingleton<IProfileSource, ProfileSource>()
-
                 // Configure the runner conventions
                 .AddSingleton<IMigrationRunnerConventionsAccessor, AssemblySourceMigrationRunnerConventionsAccessor>()
                 .AddSingleton(sp => sp.GetRequiredService<IMigrationRunnerConventionsAccessor>().MigrationRunnerConventions)
@@ -97,6 +94,9 @@ namespace Microsoft.Extensions.DependencyInjection
                     sp => sp.GetRequiredService<IMigrationSource>() as IFilteringMigrationSource
                      ?? ActivatorUtilities.CreateInstance<MigrationSource>(sp))
 #pragma warning restore 618
+
+                // Source for profiles
+                .AddScoped<IProfileSource, ProfileSource>()
 
                 // Configure the accessor for the version table metadata
                 .AddScoped<IVersionTableMetaDataAccessor, AssemblySourceVersionTableMetaDataAccessor>()
