@@ -43,16 +43,19 @@ namespace FluentMigrator
     public abstract class AutoScriptMigration : MigrationBase
     {
         [CanBeNull]
-        private readonly IEmbeddedResourceProvider _embeddedResourceProvider;
+        private readonly IReadOnlyCollection<IEmbeddedResourceProvider> _embeddedResourceProviders;
+
+        [CanBeNull]
+        private IReadOnlyCollection<IEmbeddedResourceProvider> _providers;
 
         [Obsolete]
         protected AutoScriptMigration()
         {
         }
 
-        protected AutoScriptMigration([NotNull] IEmbeddedResourceProvider embeddedResourceProvider)
+        protected AutoScriptMigration([NotNull] IEnumerable<IEmbeddedResourceProvider> embeddedResourceProviders)
         {
-            _embeddedResourceProvider = embeddedResourceProvider;
+            _embeddedResourceProviders = embeddedResourceProviders.ToList();
         }
 
         /// <inheritdoc />
@@ -60,7 +63,7 @@ namespace FluentMigrator
         {
 #pragma warning disable 612
             var expression = new ExecuteEmbeddedAutoSqlScriptExpression(
-                _embeddedResourceProvider ?? new DefaultEmbeddedResourceProvider(Context.MigrationAssemblies),
+                GetProviders(),
                 GetType(),
                 GetDatabaseNames(),
                 MigrationDirection.Up)
@@ -77,7 +80,7 @@ namespace FluentMigrator
         {
 #pragma warning disable 612
             var expression = new ExecuteEmbeddedAutoSqlScriptExpression(
-                _embeddedResourceProvider ?? new DefaultEmbeddedResourceProvider(Context.MigrationAssemblies),
+                GetProviders(),
                 GetType(),
                 GetDatabaseNames(),
                 MigrationDirection.Down)
@@ -101,17 +104,38 @@ namespace FluentMigrator
             return dbNames;
         }
 
+        [NotNull]
+        private IReadOnlyCollection<IEmbeddedResourceProvider> GetProviders()
+        {
+            if (_providers != null)
+                return _providers;
+
+            if (_embeddedResourceProviders != null)
+            {
+                return _providers = _embeddedResourceProviders;
+            }
+
+            var providers = new List<IEmbeddedResourceProvider>
+            {
+#pragma warning disable 612
+                new DefaultEmbeddedResourceProvider(Context.MigrationAssemblies)
+#pragma warning restore 612
+            };
+
+            return _providers = providers;
+        }
+
         private sealed class ExecuteEmbeddedAutoSqlScriptExpression :
             ExecuteEmbeddedSqlScriptExpressionBase,
             IAutoNameExpression,
             IValidatableObject
         {
             [NotNull]
-            private readonly IEmbeddedResourceProvider _embeddedResourceProvider;
+            private readonly IReadOnlyCollection<IEmbeddedResourceProvider> _embeddedResourceProviders;
 
-            public ExecuteEmbeddedAutoSqlScriptExpression([NotNull] IEmbeddedResourceProvider embeddedResourceProvider, Type migrationType, IList<string> databaseNames, MigrationDirection direction)
+            public ExecuteEmbeddedAutoSqlScriptExpression([NotNull] IEnumerable<IEmbeddedResourceProvider> embeddedResourceProviders, Type migrationType, IList<string> databaseNames, MigrationDirection direction)
             {
-                _embeddedResourceProvider = embeddedResourceProvider;
+                _embeddedResourceProviders = embeddedResourceProviders.ToList();
                 MigrationType = migrationType;
                 DatabaseNames = databaseNames;
                 Direction = direction;
@@ -121,7 +145,11 @@ namespace FluentMigrator
             // ReSharper disable once UnusedMember.Local
             public ExecuteEmbeddedAutoSqlScriptExpression(IAssemblyCollection assemblyCollection, Type migrationType, IList<string> databaseNames, MigrationDirection direction)
             {
-                _embeddedResourceProvider = new DefaultEmbeddedResourceProvider(assemblyCollection);
+                _embeddedResourceProviders = new[]
+                {
+                    new DefaultEmbeddedResourceProvider(assemblyCollection),
+                };
+
                 MigrationType = migrationType;
                 DatabaseNames = databaseNames;
                 Direction = direction;
@@ -154,7 +182,10 @@ namespace FluentMigrator
                 }
                 else
                 {
-                    resourceNames = _embeddedResourceProvider.GetEmbeddedResources().ToList();
+                    resourceNames = _embeddedResourceProviders
+                        .SelectMany(x => x.GetEmbeddedResources())
+                        .Distinct()
+                        .ToList();
                 }
 
                 var embeddedResourceNameWithAssembly = GetQualifiedResourcePath(resourceNames, AutoNames.ToArray());

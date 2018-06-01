@@ -33,7 +33,7 @@ namespace FluentMigrator.Expressions
     public sealed class ExecuteEmbeddedSqlScriptExpression : ExecuteEmbeddedSqlScriptExpressionBase
     {
         [CanBeNull]
-        private readonly IEmbeddedResourceProvider _embeddedResourceProvider;
+        private readonly IReadOnlyCollection<IEmbeddedResourceProvider> _embeddedResourceProviders;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ExecuteEmbeddedSqlScriptExpression"/> class.
@@ -46,10 +46,10 @@ namespace FluentMigrator.Expressions
         /// <summary>
         /// Initializes a new instance of the <see cref="ExecuteEmbeddedSqlScriptExpression"/> class.
         /// </summary>
-        /// <param name="embeddedResourceProvider">The embedded resource provider</param>
-        public ExecuteEmbeddedSqlScriptExpression([NotNull] IEmbeddedResourceProvider embeddedResourceProvider)
+        /// <param name="embeddedResourceProviders">The embedded resource providers</param>
+        public ExecuteEmbeddedSqlScriptExpression([NotNull] IEnumerable<IEmbeddedResourceProvider> embeddedResourceProviders)
         {
-            _embeddedResourceProvider = embeddedResourceProvider;
+            _embeddedResourceProviders = embeddedResourceProviders.ToList();
         }
 
         /// <summary>
@@ -60,7 +60,10 @@ namespace FluentMigrator.Expressions
         public ExecuteEmbeddedSqlScriptExpression([NotNull] IAssemblyCollection assemblyCollection)
         {
             MigrationAssemblies = assemblyCollection;
-            _embeddedResourceProvider = new DefaultEmbeddedResourceProvider(assemblyCollection);
+            _embeddedResourceProviders = new IEmbeddedResourceProvider[]
+            {
+                new DefaultEmbeddedResourceProvider(assemblyCollection),
+            };
         }
 
         /// <summary>
@@ -88,9 +91,12 @@ namespace FluentMigrator.Expressions
                     .ToList();
 #pragma warning restore 612
             }
-            else if (_embeddedResourceProvider != null)
+            else if (_embeddedResourceProviders != null)
             {
-                resourceNames = _embeddedResourceProvider.GetEmbeddedResources().ToList();
+                resourceNames = _embeddedResourceProviders
+                    .SelectMany(x => x.GetEmbeddedResources())
+                    .Distinct()
+                    .ToList();
             }
             else
             {

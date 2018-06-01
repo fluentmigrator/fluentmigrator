@@ -15,10 +15,10 @@
 #endregion
 
 using System;
-using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 
+using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.VersionTableInfo;
@@ -151,30 +151,6 @@ namespace FluentMigrator.Runner
             return new ScanInBuilder(builder, sourceItem);
         }
 
-        /// <summary>
-        /// Interface to store the current source item
-        /// </summary>
-        public interface IScanIn
-        {
-            /// <summary>
-            /// Gets the current assembly source item
-            /// </summary>
-            [EditorBrowsable(EditorBrowsableState.Never)]
-            IAssemblySourceItem SourceItem { get; }
-        }
-
-        public interface IScanInBuilder : IMigrationRunnerBuilder, IScanIn
-        {
-            IScanInForBuilder For { get; }
-        }
-
-        public interface IScanInForBuilder : IScanIn
-        {
-            IScanInBuilder Migrations();
-            IScanInBuilder VersionTableMetaData();
-            IMigrationRunnerBuilder All();
-        }
-
         private class ScanInBuilder : IScanInBuilder, IScanInForBuilder
         {
             private readonly IMigrationRunnerBuilder _builder;
@@ -216,6 +192,18 @@ namespace FluentMigrator.Runner
                 Services.AddSingleton(sourceItem);
             }
 
+            private ScanInBuilder(
+                IMigrationRunnerBuilder builder,
+                IAssemblySourceItem currentSourceItem,
+                IEmbeddedResourceProvider sourceItem)
+            {
+                _builder = builder;
+                SourceItem = currentSourceItem;
+
+                _builder.DanglingAssemblySourceItem = null;
+                Services.AddSingleton(sourceItem);
+            }
+
             /// <inheritdoc />
             public IServiceCollection Services => _builder.Services;
 
@@ -243,6 +231,13 @@ namespace FluentMigrator.Runner
             public IScanInBuilder VersionTableMetaData()
             {
                 var sourceItem = new AssemblyVersionTableMetaDataSourceItem(SourceItem.Assemblies.ToArray());
+                return new ScanInBuilder(_builder, SourceItem, sourceItem);
+            }
+
+            /// <inheritdoc />
+            public IScanInBuilder EmbeddedResources()
+            {
+                var sourceItem = new DefaultEmbeddedResourceProvider(SourceItem.Assemblies.ToArray());
                 return new ScanInBuilder(_builder, SourceItem, sourceItem);
             }
 

@@ -43,7 +43,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         public void ErrorIsReturnWhenSqlScriptIsNullOrEmpty()
         {
             var provider = new DefaultEmbeddedResourceProvider();
-            var expression = new ExecuteEmbeddedSqlScriptExpression(provider) { SqlScript = null };
+            var expression = new ExecuteEmbeddedSqlScriptExpression(new[] { provider }) { SqlScript = null };
             var errors = ValidationHelper.CollectErrors(expression);
             errors.ShouldContain(ErrorMessages.SqlScriptCannotBeNullOrEmpty);
         }
@@ -52,7 +52,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         public void ExecutesTheStatement()
         {
             var provider = new DefaultEmbeddedResourceProvider(Assembly.GetExecutingAssembly());
-            var expression = new ExecuteEmbeddedSqlScriptExpression(provider) { SqlScript = TestSqlScript };
+            var expression = new ExecuteEmbeddedSqlScriptExpression(new[] { provider }) { SqlScript = TestSqlScript };
 
             var processor = new Mock<IMigrationProcessor>();
             processor.Setup(x => x.Execute(ScriptContents)).Verifiable();
@@ -66,7 +66,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         {
             const string scriptContentsWithParameters = "TEST SCRIPT ParameterValue $(escaped_parameter) $(missing_parameter)";
             var provider = new DefaultEmbeddedResourceProvider(Assembly.GetExecutingAssembly());
-            var expression = new ExecuteEmbeddedSqlScriptExpression(provider)
+            var expression = new ExecuteEmbeddedSqlScriptExpression(new[] { provider })
             {
                 SqlScript = "EmbeddedTestScriptWithParameters.sql",
                 Parameters = new Dictionary<string, string> { { "parameter", "ParameterValue" } }
@@ -83,7 +83,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         public void ResourceFinderIsCaseInsensitive()
         {
             var provider = new DefaultEmbeddedResourceProvider(Assembly.GetExecutingAssembly());
-            var expression = new ExecuteEmbeddedSqlScriptExpression(provider) { SqlScript = TestSqlScript.ToUpper() };
+            var expression = new ExecuteEmbeddedSqlScriptExpression(new[] { provider }) { SqlScript = TestSqlScript.ToUpper() };
             var processor = new Mock<IMigrationProcessor>();
             processor.Setup(x => x.Execute(ScriptContents)).Verifiable();
 
@@ -95,7 +95,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         public void ResourceFinderFindFileWithFullName()
         {
             var provider = new DefaultEmbeddedResourceProvider(Assembly.GetExecutingAssembly());
-            var expression = new ExecuteEmbeddedSqlScriptExpression(provider) { SqlScript = "InitialSchema.sql" };
+            var expression = new ExecuteEmbeddedSqlScriptExpression(new[] { provider }) { SqlScript = "InitialSchema.sql" };
             var processor = new Mock<IMigrationProcessor>();
             processor.Setup(x => x.Execute("InitialSchema")).Verifiable();
 
@@ -107,7 +107,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         public void ResourceFinderFindFileWithFullNameAndNamespace()
         {
             var provider = new DefaultEmbeddedResourceProvider(Assembly.GetExecutingAssembly());
-            var expression = new ExecuteEmbeddedSqlScriptExpression(provider) { SqlScript = "FluentMigrator.Tests.EmbeddedResources.InitialSchema.sql" };
+            var expression = new ExecuteEmbeddedSqlScriptExpression(new[] { provider }) { SqlScript = "FluentMigrator.Tests.EmbeddedResources.InitialSchema.sql" };
             var processor = new Mock<IMigrationProcessor>();
             processor.Setup(x => x.Execute("InitialSchema")).Verifiable();
 
@@ -119,7 +119,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         public void ResourceFinderFindThrowsExceptionIfFoundMoreThenOneResource()
         {
             var provider = new DefaultEmbeddedResourceProvider(Assembly.GetExecutingAssembly());
-            var expression = new ExecuteEmbeddedSqlScriptExpression(provider) { SqlScript = "NotUniqueResource.sql" };
+            var expression = new ExecuteEmbeddedSqlScriptExpression(new[] { provider }) { SqlScript = "NotUniqueResource.sql" };
             var processor = new Mock<IMigrationProcessor>();
 
             Assert.Throws<InvalidOperationException>(() => expression.ExecuteWith(processor.Object));
