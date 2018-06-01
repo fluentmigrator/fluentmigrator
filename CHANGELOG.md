@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 
 - New `IFilteringMigrationSource` to avoid unnecessary instantiations
+- New `IVersionTableMetaDataSourceItem` to specify multiple places to search for version table metadata
+- New configuration for types from assemblies (see below)
 
 ### Changed
 
@@ -17,6 +19,35 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Now tries to query the `IConfigurationRoot` if `IConfiguration` couldn't be found
 
 ### Details
+
+#### New configuration options
+
+```c#
+var services = new ServiceCollection()
+    .AddFluentMigratorCore()
+    .ConfigureRunner(rb => rb
+        .AddSQLite()
+        .ScanIn(typeof(YourType).Assembly);
+        // There is a fluent interface to configure the targets for ScanIn
+```
+
+Configurations for `ScanIn(assemblies)`:
+
+```text
+--+-------------------------------------------+->
+  |                                           ^
+  |                                           |
+  +- For -+- All() ---------------------------+
+  ^       |                                   ^
+  |       |                                   |
+  |       +- Migrations() ------------+-->+-->+
+  |       |                           ^   |
+  |       |                           |   |
+  |       +- VersionTableMetaData() --+   |
+  |                                       |
+  |                                       v
+  +<--------------------------------------+
+```
 
 #### Issue #877
 
@@ -84,7 +115,7 @@ The new documentation is online on [https://fluentmigrator.github.io](https://fl
 - `IMigrationProcessorFactory` and all its implementations
 - `IRunnerContext` and `RunnerContext`, replaced by several dedicated options classes:
   - `RunnerOptions` are the new `RunnerContext` (minus some properties extracted into separate option classes)
-  - `ProcessorOptions` for global processor-specific options 
+  - `ProcessorOptions` for global processor-specific options
   - `GeneratorOptions` to allow setting the compatibility mode
   - `TypeFilterOptions` for filtering migrations by namespace
   - `AnnouncerOptions` to enable showing SQL statements and the elapsed time
@@ -165,9 +196,9 @@ its functions.
 ### Added
 
 - net452 build for the console runner to enable usage of the latest MySQL ADO.NET provider
- 
+
 ### Changed
- 
+
 - Added more ADO.NET providers for the console
 - The tools are in platform-specific sub-directories again (e.g. `tools/net452/x86/Migrate.exe`)
 

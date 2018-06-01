@@ -15,6 +15,8 @@
 #endregion
 
 using System;
+using System.ComponentModel;
+using System.Linq;
 using System.Reflection;
 
 using FluentMigrator.Runner.Initialization;
@@ -133,6 +135,124 @@ namespace FluentMigrator.Runner
             builder.Services
                 .AddSingleton<IMigrationSourceItem>(new AssemblyMigrationSourceItem(assemblies));
             return builder;
+        }
+
+        /// <summary>
+        /// Scans for types in the given assemblies
+        /// </summary>
+        /// <param name="builder">The runner builder</param>
+        /// <param name="assemblies">The assemblies to scan</param>
+        /// <returns>The next step</returns>
+        public static IScanInBuilder ScanIn(
+            this IMigrationRunnerBuilder builder,
+            [NotNull, ItemNotNull] params Assembly[] assemblies)
+        {
+            var sourceItem = new AssemblySourceItem(assemblies);
+            return new ScanInBuilder(builder, sourceItem);
+        }
+
+        /// <summary>
+        /// Interface to store the current source item
+        /// </summary>
+        public interface IScanIn
+        {
+            /// <summary>
+            /// Gets the current assembly source item
+            /// </summary>
+            [EditorBrowsable(EditorBrowsableState.Never)]
+            IAssemblySourceItem SourceItem { get; }
+        }
+
+        public interface IScanInBuilder : IMigrationRunnerBuilder, IScanIn
+        {
+            IScanInForBuilder For { get; }
+        }
+
+        public interface IScanInForBuilder : IScanIn
+        {
+            IScanInBuilder Migrations();
+            IScanInBuilder VersionTableMetaData();
+            IMigrationRunnerBuilder All();
+        }
+
+        private class ScanInBuilder : IScanInBuilder, IScanInForBuilder
+        {
+            private readonly IMigrationRunnerBuilder _builder;
+
+            public ScanInBuilder(IMigrationRunnerBuilder builder, IAssemblySourceItem currentSourceItem)
+            {
+                if (builder.DanglingAssemblySourceItem != null)
+                {
+                    builder.Services
+                        .AddSingleton(builder.DanglingAssemblySourceItem);
+                }
+
+                _builder = builder;
+                _builder.DanglingAssemblySourceItem = currentSourceItem;
+                SourceItem = currentSourceItem;
+            }
+
+            private ScanInBuilder(
+                IMigrationRunnerBuilder builder,
+                IAssemblySourceItem currentSourceItem,
+                IMigrationSourceItem sourceItem)
+            {
+                _builder = builder;
+                SourceItem = currentSourceItem;
+
+                _builder.DanglingAssemblySourceItem = null;
+                Services.AddSingleton(sourceItem);
+            }
+
+            private ScanInBuilder(
+                IMigrationRunnerBuilder builder,
+                IAssemblySourceItem currentSourceItem,
+                IVersionTableMetaDataSourceItem sourceItem)
+            {
+                _builder = builder;
+                SourceItem = currentSourceItem;
+
+                _builder.DanglingAssemblySourceItem = null;
+                Services.AddSingleton(sourceItem);
+            }
+
+            /// <inheritdoc />
+            public IServiceCollection Services => _builder.Services;
+
+            /// <inheritdoc />
+            public IAssemblySourceItem DanglingAssemblySourceItem
+            {
+                get => _builder.DanglingAssemblySourceItem;
+                set => _builder.DanglingAssemblySourceItem = value;
+            }
+
+            /// <inheritdoc />
+            public IAssemblySourceItem SourceItem { get; }
+
+            /// <inheritdoc />
+            public IScanInForBuilder For => this;
+
+            /// <inheritdoc />
+            public IScanInBuilder Migrations()
+            {
+                var sourceItem = new AssemblyMigrationSourceItem(SourceItem.Assemblies.ToList());
+                return new ScanInBuilder(_builder, SourceItem, sourceItem);
+            }
+
+            /// <inheritdoc />
+            public IScanInBuilder VersionTableMetaData()
+            {
+                var sourceItem = new AssemblyVersionTableMetaDataSourceItem(SourceItem.Assemblies.ToArray());
+                return new ScanInBuilder(_builder, SourceItem, sourceItem);
+            }
+
+            /// <inheritdoc />
+            public IMigrationRunnerBuilder All()
+            {
+                Services.AddSingleton(SourceItem);
+                _builder.DanglingAssemblySourceItem = null;
+                return _builder;
+            }
         }
     }
 }

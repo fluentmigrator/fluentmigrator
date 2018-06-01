@@ -184,6 +184,13 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             var builder = new MigrationRunnerBuilder(services);
             configure.Invoke(builder);
+
+            if (builder.DanglingAssemblySourceItem != null)
+            {
+                builder.Services
+                    .AddSingleton(builder.DanglingAssemblySourceItem);
+            }
+
             return services;
         }
 
@@ -278,10 +285,14 @@ namespace Microsoft.Extensions.DependencyInjection
             public MigrationRunnerBuilder(IServiceCollection services)
             {
                 Services = services;
+                DanglingAssemblySourceItem = null;
             }
 
             /// <inheritdoc />
             public IServiceCollection Services { get; }
+
+            /// <inheritdoc />
+            public IAssemblySourceItem DanglingAssemblySourceItem { get; set; }
         }
 
         [UsedImplicitly]

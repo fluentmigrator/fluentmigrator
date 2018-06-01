@@ -14,6 +14,12 @@
 // limitations under the License.
 #endregion
 
+using System.ComponentModel;
+
+using FluentMigrator.Runner.Initialization;
+
+using JetBrains.Annotations;
+
 using Microsoft.Extensions.DependencyInjection;
 
 namespace FluentMigrator.Runner
@@ -26,6 +32,14 @@ namespace FluentMigrator.Runner
         /// <summary>
         /// Gets the <see cref="IServiceCollection"/> where the migration runner services are configured
         /// </summary>
+        [NotNull]
         IServiceCollection Services { get; }
+
+        /// <summary>
+        /// Gets the dangling assembly source item (when no usage was specified)
+        /// </summary>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [CanBeNull]
+        IAssemblySourceItem DanglingAssemblySourceItem { get; set; }
     }
 }
