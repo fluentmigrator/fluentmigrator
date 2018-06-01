@@ -20,6 +20,7 @@ using System;
 
 namespace FluentMigrator.Console
 {
+    [Microsoft.FSharp.Core.Sealed]
     internal static class Program
     {
         private static int Main(string[] args)
