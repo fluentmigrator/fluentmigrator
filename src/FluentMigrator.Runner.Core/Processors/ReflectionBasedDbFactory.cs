@@ -98,23 +98,34 @@ namespace FluentMigrator.Runner.Processors
             [NotNull, ItemNotNull] ICollection<Exception> exceptions,
             out DbProviderFactory factory)
         {
-            foreach (var entry in entries)
+            var entriesCollection = entries.ToList();
+
+            foreach (var entry in entriesCollection)
             {
                 if (TryCreateFromCurrentDomain(entry, exceptions, out factory))
                 {
                     return true;
                 }
+            }
 
+            foreach (var entry in entriesCollection)
+            {
                 if (TryCreateFactoryFromRuntimeHost(entry, exceptions, serviceProvider, out factory))
                 {
                     return true;
                 }
+            }
 
+            foreach (var entry in entriesCollection)
+            {
                 if (TryCreateFromAppDomainPaths(entry, exceptions, out factory))
                 {
                     return true;
                 }
+            }
 
+            foreach (var entry in entriesCollection)
+            {
                 if (TryCreateFromGac(entry, exceptions, out factory))
                 {
                     return true;
