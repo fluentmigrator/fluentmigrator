@@ -1,4 +1,4 @@
-#region License
+﻿#region License
 // Copyright (c) 2018, FluentMigrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,25 +14,16 @@
 // limitations under the License.
 #endregion
 
-using System;
-using System.Collections.Generic;
-
-using JetBrains.Annotations;
-#pragma warning disable 618
-
 namespace FluentMigrator.Runner.Initialization
 {
     /// <summary>
-    /// This is a specialization of <see cref="IMigrationSource"/> that allows filtering the types beforehand
+    /// Interface to define how the scanned assemblies are used
     /// </summary>
-    public interface IFilteringMigrationSource : IMigrationSource
+    public interface IScanInBuilder : IMigrationRunnerBuilder, IScanIn
     {
         /// <summary>
-        /// Returns the instances for all found types implementing <see cref="IMigration"/>
+        /// Gets the next step
         /// </summary>
-        /// <param name="predicate">The predicate used to select the types to instantiate</param>
-        /// <returns>the instances for all found types implementing <see cref="IMigration"/></returns>
-        [NotNull, ItemNotNull]
-        IEnumerable<IMigration> GetMigrations(Func<Type, bool> predicate);
+        IScanInForBuilder For { get; }
     }
 }

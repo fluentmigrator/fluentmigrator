@@ -17,7 +17,6 @@
 //
 #endregion
 
-using System;
 using System.Linq;
 
 using FluentMigrator.Exceptions;

@@ -42,18 +42,18 @@ namespace FluentMigrator
     public abstract class AutoScriptMigration : MigrationBase
     {
         [NotNull]
-        private readonly IEmbeddedResourceProvider _embeddedResourceProvider;
+        private readonly IReadOnlyCollection<IEmbeddedResourceProvider> _embeddedResourceProviders;
 
-        protected AutoScriptMigration([NotNull] IEmbeddedResourceProvider embeddedResourceProvider)
+        protected AutoScriptMigration([NotNull] IEnumerable<IEmbeddedResourceProvider> embeddedResourceProviders)
         {
-            _embeddedResourceProvider = embeddedResourceProvider;
+            _embeddedResourceProviders = embeddedResourceProviders.ToList();
         }
 
         /// <inheritdoc />
         public sealed override void Up()
         {
             var expression = new ExecuteEmbeddedAutoSqlScriptExpression(
-                _embeddedResourceProvider,
+                _embeddedResourceProviders,
                 GetType(),
                 GetDatabaseNames(),
                 MigrationDirection.Up);
@@ -65,7 +65,7 @@ namespace FluentMigrator
         public sealed override void Down()
         {
             var expression = new ExecuteEmbeddedAutoSqlScriptExpression(
-                _embeddedResourceProvider,
+                _embeddedResourceProviders,
                 GetType(),
                 GetDatabaseNames(),
                 MigrationDirection.Down);
@@ -91,11 +91,11 @@ namespace FluentMigrator
             IValidatableObject
         {
             [NotNull]
-            private readonly IEmbeddedResourceProvider _embeddedResourceProvider;
+            private readonly IReadOnlyCollection<IEmbeddedResourceProvider> _embeddedResourceProviders;
 
-            public ExecuteEmbeddedAutoSqlScriptExpression([NotNull] IEmbeddedResourceProvider embeddedResourceProvider, Type migrationType, IList<string> databaseNames, MigrationDirection direction)
+            public ExecuteEmbeddedAutoSqlScriptExpression([NotNull] IEnumerable<IEmbeddedResourceProvider> embeddedResourceProviders, Type migrationType, IList<string> databaseNames, MigrationDirection direction)
             {
-                _embeddedResourceProvider = embeddedResourceProvider;
+                _embeddedResourceProviders = embeddedResourceProviders.ToList();
                 MigrationType = migrationType;
                 DatabaseNames = databaseNames;
                 Direction = direction;
@@ -110,7 +110,7 @@ namespace FluentMigrator
             /// <inheritdoc />
             public override void ExecuteWith(IMigrationProcessor processor)
             {
-                var resourceNames = _embeddedResourceProvider.GetEmbeddedResources().ToList();
+                var resourceNames = _embeddedResourceProviders.SelectMany(p => p.GetEmbeddedResources()).Distinct().ToList();
 
                 var embeddedResourceNameWithAssembly = GetQualifiedResourcePath(resourceNames, AutoNames.ToArray());
                 string sqlText;

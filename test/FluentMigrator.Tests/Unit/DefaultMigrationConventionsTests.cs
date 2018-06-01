@@ -463,7 +463,7 @@ namespace FluentMigrator.Tests.Unit
     class AutoScriptMigrationFake : AutoScriptMigration
     {
         public AutoScriptMigrationFake()
-            : base(new DefaultEmbeddedResourceProvider())
+            : base(new[] { new DefaultEmbeddedResourceProvider() })
         {
         }
     }

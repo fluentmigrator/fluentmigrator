@@ -16,8 +16,6 @@
 //
 #endregion
 
-using System;
-
 using FluentMigrator.Runner.Generators.Firebird;
 
 using NUnit.Framework;

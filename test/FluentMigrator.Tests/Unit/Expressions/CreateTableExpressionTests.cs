@@ -16,8 +16,6 @@
 //
 #endregion
 
-using System;
-
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner;

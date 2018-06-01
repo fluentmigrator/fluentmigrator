@@ -1,4 +1,4 @@
-#region License
+﻿#region License
 // Copyright (c) 2018, FluentMigrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,30 +16,17 @@
 
 using System.ComponentModel;
 
-using FluentMigrator.Runner.Initialization;
-
-using JetBrains.Annotations;
-
-using Microsoft.Extensions.DependencyInjection;
-
-namespace FluentMigrator.Runner
+namespace FluentMigrator.Runner.Initialization
 {
     /// <summary>
-    /// An interface for configuring migration runner services
+    /// Interface to store the current source item
     /// </summary>
-    public interface IMigrationRunnerBuilder
+    public interface IScanIn
     {
         /// <summary>
-        /// Gets the <see cref="IServiceCollection"/> where the migration runner services are configured
-        /// </summary>
-        [NotNull]
-        IServiceCollection Services { get; }
-
-        /// <summary>
-        /// Gets the dangling assembly source item (when no usage was specified)
+        /// Gets the current assembly source item
         /// </summary>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        [CanBeNull]
-        IAssemblySourceItem DanglingAssemblySourceItem { get; set; }
+        IAssemblySourceItem SourceItem { get; }
     }
 }

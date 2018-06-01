@@ -40,7 +40,9 @@ namespace FluentMigrator.Runner
         private readonly IReadOnlyCollection<string> _tagsToMatch;
 
         [NotNull]
+#pragma warning disable 618
         private readonly IMigrationSource _source;
+#pragma warning restore 618
 
         [CanBeNull]
         private SortedList<long, IMigrationInfo> _migrationInfos;
@@ -53,7 +55,9 @@ namespace FluentMigrator.Runner
         /// <param name="conventions">The conventions used to validate tags and creating <see cref="IMigrationInfo"/> instances</param>
         /// <param name="runnerOptions">The runner options</param>
         public DefaultMigrationInformationLoader(
+#pragma warning disable 618
             [NotNull] IMigrationSource source,
+#pragma warning restore 618
             [NotNull] IOptionsSnapshot<TypeFilterOptions> filterOptions,
             [NotNull] IMigrationRunnerConventions conventions,
             [NotNull] IOptions<RunnerOptions> runnerOptions)
@@ -113,7 +117,9 @@ namespace FluentMigrator.Runner
 
         [NotNull, ItemNotNull]
         private static IEnumerable<IMigrationInfo> FindMigrations(
+#pragma warning disable 618
             [NotNull] IMigrationSource source,
+#pragma warning restore 618
             [NotNull] IMigrationRunnerConventions conventions,
             [CanBeNull] string @namespace,
             bool loadNestedNamespaces,

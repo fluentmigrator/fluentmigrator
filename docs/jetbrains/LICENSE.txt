@@ -1,0 +1,24 @@
+DO’s
+----
+
+* Do use the logos to link to JetBrains website: https://www.jetbrains.com
+* Do use the logos to advertise that your product has built-in integration with a JetBrains product
+* Do use the graphics in printed or online materials, but respect the minimum size of the logo: 7.5mm in print and 50px on screen/digital.
+
+
+Don’ts
+------
+
+* Don’t change the colors of the logos
+* Don’t change the aspect ratio of the logos when resizing
+* Don’t crop the logos
+* Don’t use the black square without the beam or the product name
+* Don’t add any text on the logo 
+* Don’t sell our logos
+
+If in doubt, please contact marketing@jetbrains.com
+
+--
+
+Thank you!
+The JetBrains Team

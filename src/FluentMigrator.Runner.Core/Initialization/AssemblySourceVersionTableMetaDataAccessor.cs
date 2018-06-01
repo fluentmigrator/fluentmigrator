@@ -15,6 +15,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 using FluentMigrator.Runner.VersionTableInfo;
@@ -37,10 +38,12 @@ namespace FluentMigrator.Runner.Initialization
         /// Initializes a new instance of the <see cref="AssemblySourceVersionTableMetaDataAccessor"/> class.
         /// </summary>
         /// <param name="typeFilterOptions">The type filter options</param>
+        /// <param name="sources">The sources to get type candidates</param>
         /// <param name="serviceProvider">The service provider used to instantiate the found <see cref="IVersionTableMetaData"/> implementation</param>
         /// <param name="assemblySource">The assemblies used to search for the <see cref="IVersionTableMetaData"/> implementation</param>
         public AssemblySourceVersionTableMetaDataAccessor(
             [NotNull] IOptionsSnapshot<TypeFilterOptions> typeFilterOptions,
+            [NotNull, ItemNotNull] IEnumerable<IVersionTableMetaDataSourceItem> sources,
             [CanBeNull] IServiceProvider serviceProvider,
             [CanBeNull] IAssemblySource assemblySource = null)
         {
@@ -48,13 +51,14 @@ namespace FluentMigrator.Runner.Initialization
             _lazyValue = new Lazy<IVersionTableMetaData>(
                 () =>
                 {
-                    if (assemblySource == null)
-                        return null;
+                    bool IsValidType(Type t)
+                    {
+                        return t.IsInNamespace(filterOptions.Namespace, filterOptions.NestedNamespaces);
+                    }
 
-                    var matchedType = assemblySource.Assemblies.SelectMany(a => a.GetExportedTypes())
-                        .Where(t => t.IsInNamespace(filterOptions.Namespace, filterOptions.NestedNamespaces))
-                        .Where(t => !t.IsAbstract && t.IsClass)
-                        .FirstOrDefault(t => typeof(IVersionTableMetaData).IsAssignableFrom(t));
+                    var matchedType = sources.SelectMany(source => source.GetCandidates(IsValidType))
+                        .Union(GetAssemblyTypes(assemblySource, IsValidType))
+                        .FirstOrDefault();
 
                     if (matchedType != null)
                     {
@@ -69,5 +73,15 @@ namespace FluentMigrator.Runner.Initialization
 
         /// <inheritdoc />
         public IVersionTableMetaData VersionTableMetaData => _lazyValue.Value;
+
+        private static IEnumerable<Type> GetAssemblyTypes([CanBeNull] IAssemblySource assemblySource, [NotNull] Predicate<Type> predicate)
+        {
+            if (assemblySource == null)
+                return Enumerable.Empty<Type>();
+            return assemblySource.Assemblies.SelectMany(a => a.GetExportedTypes())
+                .Where(t => !t.IsAbstract && t.IsClass)
+                .Where(t => typeof(IVersionTableMetaData).IsAssignableFrom(t))
+                .Where(t => predicate(t));
+        }
     }
 }

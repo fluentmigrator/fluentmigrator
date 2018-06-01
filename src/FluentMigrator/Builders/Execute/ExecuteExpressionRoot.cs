@@ -79,16 +79,16 @@ namespace FluentMigrator.Builders.Execute
         /// <inheritdoc />
         public void EmbeddedScript(string embeddedSqlScriptName)
         {
-            var embeddedResourceProvider = _context.ServiceProvider.GetRequiredService<IEmbeddedResourceProvider>();
-            var expression = new ExecuteEmbeddedSqlScriptExpression(embeddedResourceProvider) { SqlScript = embeddedSqlScriptName };
+            var embeddedResourceProviders = _context.ServiceProvider.GetRequiredService<IEnumerable<IEmbeddedResourceProvider>>();
+            var expression = new ExecuteEmbeddedSqlScriptExpression(embeddedResourceProviders) { SqlScript = embeddedSqlScriptName };
             _context.Expressions.Add(expression);
         }
 
         /// <inheritdoc />
         public void EmbeddedScript(string embeddedSqlScriptName, IDictionary<string, string> parameters)
         {
-            var embeddedResourceProvider = _context.ServiceProvider.GetRequiredService<IEmbeddedResourceProvider>();
-            var expression = new ExecuteEmbeddedSqlScriptExpression(embeddedResourceProvider)
+            var embeddedResourceProviders = _context.ServiceProvider.GetRequiredService<IEnumerable<IEmbeddedResourceProvider>>();
+            var expression = new ExecuteEmbeddedSqlScriptExpression(embeddedResourceProviders)
             {
                 SqlScript = embeddedSqlScriptName,
                 Parameters = parameters,

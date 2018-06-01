@@ -15,6 +15,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.IO;
@@ -31,15 +32,15 @@ namespace FluentMigrator.Expressions
     public sealed class ExecuteEmbeddedSqlScriptExpression : ExecuteEmbeddedSqlScriptExpressionBase
     {
         [NotNull]
-        private readonly IEmbeddedResourceProvider _embeddedResourceProvider;
+        private readonly IReadOnlyCollection<IEmbeddedResourceProvider> _embeddedResourceProviders;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ExecuteEmbeddedSqlScriptExpression"/> class.
         /// </summary>
-        /// <param name="embeddedResourceProvider">The embedded resource provider</param>
-        public ExecuteEmbeddedSqlScriptExpression([NotNull] IEmbeddedResourceProvider embeddedResourceProvider)
+        /// <param name="embeddedResourceProviders">The embedded resource providers</param>
+        public ExecuteEmbeddedSqlScriptExpression([NotNull] IEnumerable<IEmbeddedResourceProvider> embeddedResourceProviders)
         {
-            _embeddedResourceProvider = embeddedResourceProvider;
+            _embeddedResourceProviders = embeddedResourceProviders.ToList();
         }
 
         /// <summary>
@@ -51,7 +52,7 @@ namespace FluentMigrator.Expressions
         /// <inheritdoc />
         public override void ExecuteWith(IMigrationProcessor processor)
         {
-            var resourceNames = _embeddedResourceProvider.GetEmbeddedResources().ToList();
+            var resourceNames = _embeddedResourceProviders.SelectMany(p => p.GetEmbeddedResources()).Distinct().ToList();
             var embeddedResourceNameWithAssembly = GetQualifiedResourcePath(resourceNames, SqlScript);
             string sqlText;
 

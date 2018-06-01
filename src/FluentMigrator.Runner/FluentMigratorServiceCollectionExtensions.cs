@@ -77,9 +77,6 @@ namespace Microsoft.Extensions.DependencyInjection
                 // The default set of conventions to be applied to migration expressions
                 .AddSingleton<IConventionSet, DefaultConventionSet>()
 
-                // Source for profiles
-                .AddSingleton<IProfileSource, ProfileSource>()
-
                 // Configure the runner conventions
                 .AddSingleton<IMigrationRunnerConventionsAccessor, AssemblySourceMigrationRunnerConventionsAccessor>()
                 .AddSingleton(sp => sp.GetRequiredService<IMigrationRunnerConventionsAccessor>().MigrationRunnerConventions)
@@ -88,10 +85,15 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddSingleton<IStopWatch, StopWatch>()
 
                 // Source for migrations
+#pragma warning disable 618
                 .AddScoped<IMigrationSource, MigrationSource>()
                 .AddScoped(
                     sp => sp.GetRequiredService<IMigrationSource>() as IFilteringMigrationSource
                      ?? ActivatorUtilities.CreateInstance<MigrationSource>(sp))
+#pragma warning restore 618
+
+                // Source for profiles
+                .AddScoped<IProfileSource, ProfileSource>()
 
                 // Configure the accessor for the version table metadata
                 .AddScoped<IVersionTableMetaDataAccessor, AssemblySourceVersionTableMetaDataAccessor>()
@@ -163,6 +165,13 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             var builder = new MigrationRunnerBuilder(services);
             configure.Invoke(builder);
+
+            if (builder.DanglingAssemblySourceItem != null)
+            {
+                builder.Services
+                    .AddSingleton(builder.DanglingAssemblySourceItem);
+            }
+
             return services;
         }
 
@@ -171,10 +180,14 @@ namespace Microsoft.Extensions.DependencyInjection
             public MigrationRunnerBuilder(IServiceCollection services)
             {
                 Services = services;
+                DanglingAssemblySourceItem = null;
             }
 
             /// <inheritdoc />
             public IServiceCollection Services { get; }
+
+            /// <inheritdoc />
+            public IAssemblySourceItem DanglingAssemblySourceItem { get; set; }
         }
 
         [UsedImplicitly]
