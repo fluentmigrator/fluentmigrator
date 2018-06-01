@@ -23,12 +23,12 @@ deploy:
   skip_cleanup: true
   script: bash ./myget-upload.sh 
   on: 
-    condition: "$TRAVIS_BRANCH" == release/* || "$TRAVIS_BRANCH" == develop
+    condition: '"$TRAVIS_BRANCH" == release/* || "$TRAVIS_BRANCH" == develop'
     all_branches: true
 - provider: script 
   skip_cleanup: true
   script: bash ./nuget-upload.sh 
   on: 
-    condition: $TRAVIS_TAG =~ ^v[[:digit:]]+(\.[[:digit:]]+)+$
+    condition: '$TRAVIS_TAG =~ ^v[[:digit:]]+(\.[[:digit:]]+)+$'
     tags: true
     branch: master
