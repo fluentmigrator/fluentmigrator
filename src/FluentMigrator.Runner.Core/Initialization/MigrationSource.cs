@@ -25,6 +25,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace FluentMigrator.Runner.Initialization
 {
+    /// <summary>
+    /// The default implementation of a <see cref="IFilteringMigrationSource"/>.
+    /// </summary>
     public class MigrationSource : IFilteringMigrationSource
     {
         [NotNull]
@@ -59,23 +62,6 @@ namespace FluentMigrator.Runner.Initialization
             _conventions = conventions;
             _serviceProvider = serviceProvider;
             _sourceItems = sourceItems;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ProfileSource"/> class.
-        /// </summary>
-        /// <param name="source">The assembly source</param>
-        /// <param name="conventions">The migration runner conventios</param>
-        /// <param name="serviceProvider">The service provider</param>
-        public MigrationSource(
-            [NotNull] IAssemblySource source,
-            [NotNull] IMigrationRunnerConventions conventions,
-            [NotNull] IServiceProvider serviceProvider)
-        {
-            _source = source;
-            _conventions = conventions;
-            _serviceProvider = serviceProvider;
-            _sourceItems = Enumerable.Empty<IMigrationSourceItem>();
         }
 
         /// <summary>
