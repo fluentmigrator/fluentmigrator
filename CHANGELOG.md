@@ -5,20 +5,43 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## 3.1.0
 
 ### Added
 
 - New `IFilteringMigrationSource` to avoid unnecessary instantiations
 - New `IVersionTableMetaDataSourceItem` to specify multiple places to search for version table metadata
+- `dotnet-fm` and `Migrate.exe` are now referencing `FSharp.Core` which should ease the problems with F# (issue #883).
 - New configuration for types from assemblies (see below)
 
 ### Changed
 
 - [#877](https://github.com/fluentmigrator/fluentmigrator/issues/877): Connection specific information should be resolved as scoped
-- Now tries to query the `IConfigurationRoot` if `IConfiguration` couldn't be found
+- [#884](https://github.com/fluentmigrator/fluentmigrator/issues/884): Embedded script cannot be found in assemblies on .NET Core
+- [#888](https://github.com/fluentmigrator/fluentmigrator/issues/888): VersionTable not changed after upgrading to 3.0
+- Query `IConfigurationRoot` for the connection string if `IConfiguration` couldn't be found
+
+### Fixed
+
+- [#886](https://github.com/fluentmigrator/fluentmigrator/issues/886): Using profiles in 3.x versions
+- [#892](https://github.com/fluentmigrator/fluentmigrator/issues/892): Nullable types are not supported in MSBuild runner
+- [#890](https://github.com/fluentmigrator/fluentmigrator/issues/890): OracleManaged Migrations fail with runtime Exceptions
 
 ### Details
+
+#### `dotnet-fm` now uses the Oracle beta ADO.NET driver
+
+Oracle plans to release a non-beta version of the driver in Q3, but
+it's the only Oracle driver that works under Linux/MacOS. The console
+tool (`Migrate.exe`) is more Windows-centric and will therefore keep
+using the standard Oracle ADO.NET library. The `dotnet-fm` is mostly
+used on non-Windows platforms and is therefore predestinated to use
+the new beta driver.
+
+The statement from Oracle can be found on the
+[Oracle website](http://www.oracle.com/technetwork/topics/dotnet/tech-info/odpnet-dotnet-ef-core-sod-4395108.pdf).
+
+The console tool will switch to the new driver when it becomes stable.
 
 #### New configuration options
 
@@ -27,7 +50,7 @@ var services = new ServiceCollection()
     .AddFluentMigratorCore()
     .ConfigureRunner(rb => rb
         .AddSQLite()
-        .ScanIn(typeof(YourType).Assembly);
+        .ScanIn(typeof(YourType).Assembly));
         // There is a fluent interface to configure the targets for ScanIn
 ```
 
@@ -44,12 +67,28 @@ Configurations for `ScanIn(assemblies)`:
   |       |                           ^   |
   |       |                           |   |
   |       +- VersionTableMetaData() --+   |
+  |       |                           ^   |
+  |       |                           |   |
+  |       +- EmbeddedResources() -----+   |
   |                                       |
   |                                       v
   +<--------------------------------------+
 ```
 
-#### Issue #877
+Example:
+
+```c#
+var services = new ServiceCollection()
+    .AddFluentMigratorCore()
+    .ConfigureRunner(rb => rb
+        .AddSQLite()
+        .ScanIn(typeof(YourType).Assembly)
+            .For.Migrations()
+            .For.EmbeddedResources());
+        // There is a fluent interface to configure the targets for ScanIn
+```
+
+#### Dependency injection changes (issue #877)
 
 ##### Supported scenario
 
