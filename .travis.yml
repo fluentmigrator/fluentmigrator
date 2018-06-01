@@ -19,6 +19,12 @@ script:
 - dotnet publish src/FluentMigrator.Console/FluentMigrator.Console.csproj -c Release -r any -o "$TRAVIS_BUILD_DIR/publish/tools/net461/any" -p:Platform=AnyCPU -p:TargetFramework=net461
 - nuget pack publish/FluentMigrator.Console.nuspec -OutputDirectory "$TRAVIS_BUILD_DIR/output" -Version "$VERSION" -Properties Configuration=Release
 - nuget pack publish/FluentMigrator.Tools.nuspec -OutputDirectory "$TRAVIS_BUILD_DIR/output" -Version "$VERSION" -Properties Configuration=Release
-after_success:
-- '[[ "$TRAVIS_PULL_REQUEST" == "false" && ("$TRAVIS_BRANCH" == release/* || "$TRAVIS_BRANCH" == develop) ]] && ./myget-upload.sh'
-- '[[ "$TRAVIS_PULL_REQUEST" == "false" && $TRAVIS_TAG =~ ^v[[:digit:]]+(\.[[:digit:]]+)+$ ]] && ./nuget-upload.sh'
+deploy:
+- provider: script
+  script: bash ./myget-upload.sh
+  on:
+    condition: '[[ "$TRAVIS_PULL_REQUEST" == "false" && ("$TRAVIS_BRANCH" == release/* || "$TRAVIS_BRANCH" == develop) ]]'
+- provider: script
+  script: bash ./nuget-upload.sh
+  on:
+    condition: '[[ "$TRAVIS_PULL_REQUEST" == "false" && $TRAVIS_TAG =~ ^v[[:digit:]]+(\.[[:digit:]]+)+$ ]]'
