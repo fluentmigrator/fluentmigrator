@@ -41,7 +41,7 @@ namespace FluentMigrator.Runner
             builder.Services.TryAddScoped<OracleQuoterBase>(
                 sp =>
                 {
-                    var opt = sp.GetRequiredService<IOptions<ProcessorOptions>>();
+                    var opt = sp.GetRequiredService<IOptionsSnapshot<ProcessorOptions>>();
                     if (opt.Value.IsQuotingForced())
                     {
                         return new OracleQuoterQuotedIdentifier();
@@ -69,7 +69,7 @@ namespace FluentMigrator.Runner
             builder.Services.TryAddScoped<OracleQuoterBase>(
                 sp =>
                 {
-                    var opt = sp.GetRequiredService<IOptions<ProcessorOptions>>();
+                    var opt = sp.GetRequiredService<IOptionsSnapshot<ProcessorOptions>>();
                     if (opt.Value.IsQuotingForced())
                     {
                         return new OracleQuoterQuotedIdentifier();
@@ -97,7 +97,7 @@ namespace FluentMigrator.Runner
             builder.Services.TryAddScoped<OracleQuoterBase>(
                 sp =>
                 {
-                    var opt = sp.GetRequiredService<IOptions<ProcessorOptions>>();
+                    var opt = sp.GetRequiredService<IOptionsSnapshot<ProcessorOptions>>();
                     if (opt.Value.IsQuotingForced())
                     {
                         return new OracleQuoterQuotedIdentifier();

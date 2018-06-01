@@ -14,14 +14,25 @@
 // limitations under the License.
 #endregion
 
+using System;
 using System.Collections.Generic;
 
 using JetBrains.Annotations;
 
 namespace FluentMigrator.Runner.Initialization
 {
+    /// <summary>
+    /// The source for all types implementing <see cref="IMigration"/> and having the <see cref="MigrationAttribute"/>
+    /// </summary>
+    [Obsolete("Use IFilteringMigrationSource to get optimal performance")]
     public interface IMigrationSource
     {
+        /// <summary>
+        /// Returns the instances for all found types implementing <see cref="IMigration"/> and having
+        /// the <see cref="MigrationAttribute"/>
+        /// </summary>
+        /// <returns>the instances for all found types implementing <see cref="IMigration"/> and having
+        /// the <see cref="MigrationAttribute"/></returns>
         [NotNull, ItemNotNull]
         IEnumerable<IMigration> GetMigrations();
     }

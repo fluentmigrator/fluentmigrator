@@ -22,7 +22,7 @@ while the CI builds are stored on [MyGet](https://www.myget.org/feed/Packages/fl
 
 # Project Info
 
-|                           |         | 
+|                           |         |
 |---------------------------|---------|
 | **Documentation**         | [On our GitHub pages](https://fluentmigrator.github.io) |
 | **Discussions**           | [![Gitter](https://img.shields.io/gitter/room/FluentMigrator/fluentmigrator.svg)](https://gitter.im/FluentMigrator/fluentmigrator) |
@@ -31,7 +31,10 @@ while the CI builds are stored on [MyGet](https://www.myget.org/feed/Packages/fl
 
 # Powered by
 
-![ReSharper](http://www.jetbrains.com/img/logos/logo_resharper_small.gif)
+<span>
+<a href="https://www.jetbrains.com"><img src="https://raw.githubusercontent.com/fluentmigrator/fluentmigrator/master/docs/jetbrains/jetbrains.png" alt="JetBrains"  width="15%" /></a>
+<a href="https://www.jetbrains.com/resharper"><img src="https://raw.githubusercontent.com/fluentmigrator/fluentmigrator/master/docs/jetbrains/logo.png" alt="ReSharper"  width="15%" /></a>
+</span>
 
 <a href="https://travis-ci.com"><img src="https://travis-ci.com/images/logos/TravisCI-Full-Color.png" alt="Travis CI"  width="20%" /></a>
 

@@ -53,7 +53,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
             [NotNull] OracleBaseDbFactory factory,
             [NotNull] IMigrationGenerator generator,
             [NotNull] ILogger logger,
-            [NotNull] IOptions<ProcessorOptions> options,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor)
             : base(() => factory.Factory, generator, logger, options.Value, connectionStringAccessor)
         {
@@ -153,7 +153,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
                 return false;
             }
 
-            if (String.IsNullOrEmpty(schemaName))
+            if (string.IsNullOrEmpty(schemaName))
             {
                 return Exists("SELECT 1 FROM USER_CONSTRAINTS WHERE upper(CONSTRAINT_NAME) = '{0}'",
                     FormatHelper.FormatSqlEscape(constraintName.ToUpper()));
@@ -183,7 +183,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
                 return false;
             }
 
-            if (String.IsNullOrEmpty(schemaName))
+            if (string.IsNullOrEmpty(schemaName))
             {
                 return Exists("SELECT 1 FROM USER_INDEXES WHERE upper(INDEX_NAME) = '{0}'",
                     FormatHelper.FormatSqlEscape(indexName.ToUpper()));
@@ -233,7 +233,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
                 throw new ArgumentNullException(nameof(tableName));
             }
 
-            if (String.IsNullOrEmpty(schemaName))
+            if (string.IsNullOrEmpty(schemaName))
             {
                 return Read("SELECT * FROM {0}", Quoter.QuoteTableName(tableName));
             }

@@ -16,6 +16,7 @@
 
 using System;
 using System.Data.Common;
+using System.Linq;
 
 using FluentMigrator.Runner.BatchParser;
 using FluentMigrator.Runner.Generators.SqlServer;
@@ -53,7 +54,9 @@ namespace FluentMigrator.Tests.Unit.Processors.SqlServer2000
 
             var logger = serviceProvider.GetRequiredService<ILogger<SqlServer2000Processor>>();
 
-            var opt = new OptionsWrapper<ProcessorOptions>(new ProcessorOptions());
+            var opt = new OptionsManager<ProcessorOptions>(new OptionsFactory<ProcessorOptions>(
+                Enumerable.Empty<IConfigureOptions<ProcessorOptions>>(),
+                Enumerable.Empty<IPostConfigureOptions<ProcessorOptions>>()));
             return new Processor(
                 MockedDbProviderFactory.Object,
                 logger,
@@ -66,7 +69,7 @@ namespace FluentMigrator.Tests.Unit.Processors.SqlServer2000
         private class Processor : SqlServer2000Processor
         {
             /// <inheritdoc />
-            public Processor(DbProviderFactory factory, [NotNull] ILogger logger, [NotNull] SqlServer2000Generator generator, [NotNull] IOptions<ProcessorOptions> options, [NotNull] IConnectionStringAccessor connectionStringAccessor, [NotNull] IServiceProvider serviceProvider)
+            public Processor(DbProviderFactory factory, [NotNull] ILogger logger, [NotNull] SqlServer2000Generator generator, [NotNull] IOptionsSnapshot<ProcessorOptions> options, [NotNull] IConnectionStringAccessor connectionStringAccessor, [NotNull] IServiceProvider serviceProvider)
                 : base(factory, logger, generator, options, connectionStringAccessor, serviceProvider)
             {
             }

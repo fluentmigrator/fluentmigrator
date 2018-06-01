@@ -130,7 +130,7 @@ namespace FluentMigrator.Tests.Unit.Loggers
         [Test]
         public void Sql_Should_Write_When_Show_Sql_Is_True_And_Sql_Is_Empty()
         {
-            var sql = String.Empty;
+            var sql = string.Empty;
 
             _options.ShowSql = true;
 

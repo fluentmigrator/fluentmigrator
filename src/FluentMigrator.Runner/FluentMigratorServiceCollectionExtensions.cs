@@ -71,29 +71,14 @@ namespace Microsoft.Extensions.DependencyInjection
                 // Defines the assemblies that are used to find migrations, profiles, maintenance code, etc...
                 .AddSingleton<IAssemblySource, AssemblySource>()
 
-                // Configure the accessor for the version table metadata
-                .AddSingleton<IVersionTableMetaDataAccessor, AssemblySourceVersionTableMetaDataAccessor>()
-
                 // Configure the loader for migrations that should be executed during maintenance steps
                 .AddSingleton<IMaintenanceLoader, MaintenanceLoader>()
-
-                // Configure the default version table metadata
-                .AddSingleton(sp => sp.GetRequiredService<IVersionTableMetaDataAccessor>().VersionTableMetaData ?? ActivatorUtilities.CreateInstance<DefaultVersionTableMetaData>(sp))
 
                 // Add the default embedded resource provider
                 .AddSingleton<IEmbeddedResourceProvider>(sp => new DefaultEmbeddedResourceProvider(sp.GetRequiredService<IAssemblySource>().Assemblies))
 
-                // Source for migrations
-                .AddSingleton<IMigrationSource, MigrationSource>()
-
                 // The default set of conventions to be applied to migration expressions
                 .AddSingleton<IConventionSet, DefaultConventionSet>()
-
-                // Source for profiles
-                .AddSingleton<IProfileSource, ProfileSource>()
-
-                // Configure the migration information loader
-                .AddSingleton<IMigrationInformationLoader, DefaultMigrationInformationLoader>()
 
                 // Configure the runner conventions
                 .AddSingleton<IMigrationRunnerConventionsAccessor, AssemblySourceMigrationRunnerConventionsAccessor>()
@@ -101,6 +86,26 @@ namespace Microsoft.Extensions.DependencyInjection
 
                 // The IStopWatch implementation used to show query timing
                 .AddSingleton<IStopWatch, StopWatch>()
+
+                // Source for migrations
+#pragma warning disable 618
+                .AddScoped<IMigrationSource, MigrationSource>()
+                .AddScoped(
+                    sp => sp.GetRequiredService<IMigrationSource>() as IFilteringMigrationSource
+                     ?? ActivatorUtilities.CreateInstance<MigrationSource>(sp))
+#pragma warning restore 618
+
+                // Source for profiles
+                .AddScoped<IProfileSource, ProfileSource>()
+
+                // Configure the accessor for the version table metadata
+                .AddScoped<IVersionTableMetaDataAccessor, AssemblySourceVersionTableMetaDataAccessor>()
+
+                // Configure the default version table metadata
+                .AddScoped(sp => sp.GetRequiredService<IVersionTableMetaDataAccessor>().VersionTableMetaData ?? ActivatorUtilities.CreateInstance<DefaultVersionTableMetaData>(sp))
+
+                // Configure the migration information loader
+                .AddScoped<IMigrationInformationLoader, DefaultMigrationInformationLoader>()
 
                 // Provide a way to get the migration generator selected by its options
                 .AddScoped<IGeneratorAccessor, SelectingGeneratorAccessor>()
@@ -181,6 +186,13 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             var builder = new MigrationRunnerBuilder(services);
             configure.Invoke(builder);
+
+            if (builder.DanglingAssemblySourceItem != null)
+            {
+                builder.Services
+                    .AddSingleton(builder.DanglingAssemblySourceItem);
+            }
+
             return services;
         }
 
@@ -275,10 +287,14 @@ namespace Microsoft.Extensions.DependencyInjection
             public MigrationRunnerBuilder(IServiceCollection services)
             {
                 Services = services;
+                DanglingAssemblySourceItem = null;
             }
 
             /// <inheritdoc />
             public IServiceCollection Services { get; }
+
+            /// <inheritdoc />
+            public IAssemblySourceItem DanglingAssemblySourceItem { get; set; }
         }
 
         [UsedImplicitly]

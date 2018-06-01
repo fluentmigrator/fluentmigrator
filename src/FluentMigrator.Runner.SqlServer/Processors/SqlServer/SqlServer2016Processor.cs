@@ -35,7 +35,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             [NotNull] ILogger<SqlServer2016Processor> logger,
             [NotNull] SqlServer2008Quoter quoter,
             [NotNull] SqlServer2016Generator generator,
-            [NotNull] IOptions<ProcessorOptions> options,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor,
             [NotNull] IServiceProvider serviceProvider)
             : this(
@@ -55,7 +55,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             [NotNull] ILogger logger,
             [NotNull] SqlServer2008Quoter quoter,
             [NotNull] SqlServer2016Generator generator,
-            [NotNull] IOptions<ProcessorOptions> options,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor,
             [NotNull] IServiceProvider serviceProvider)
             : base(

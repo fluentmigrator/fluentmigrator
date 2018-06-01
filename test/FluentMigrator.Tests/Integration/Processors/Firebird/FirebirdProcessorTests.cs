@@ -16,7 +16,6 @@
 //
 #endregion
 
-using System;
 using System.Data;
 
 using FluentMigrator.Expressions;
@@ -177,7 +176,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
 
                 Processor.Process(new DeleteSequenceExpression { SequenceName = "Sequence" });
 
-                Processor.SequenceExists(String.Empty, "\"Sequence\"").ShouldBeFalse();
+                Processor.SequenceExists(string.Empty, "\"Sequence\"").ShouldBeFalse();
                 Processor.SequenceExists("", "Sequence").ShouldBeFalse();
             }
         }
@@ -194,7 +193,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             using (var table = new FirebirdTestTable(Processor, "id int"))
             {
                 Processor.Process(Processor.CreateTriggerExpression(table.Name, "TestTrigger", true, TriggerEvent.Insert, "as begin end"));
-                Processor.TriggerExists(String.Empty, table.Name, "TestTrigger").ShouldBeTrue();
+                Processor.TriggerExists(string.Empty, table.Name, "TestTrigger").ShouldBeTrue();
             }
         }
 
@@ -204,10 +203,10 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             using (var table = new FirebirdTestTable(Processor, "id int"))
             {
                 Processor.Process(Processor.CreateTriggerExpression(table.Name, "TestTrigger", true, TriggerEvent.Insert, "as begin end"));
-                Processor.TriggerExists(String.Empty, table.Name, "TestTrigger").ShouldBeTrue();
+                Processor.TriggerExists(string.Empty, table.Name, "TestTrigger").ShouldBeTrue();
 
                 Processor.Process(Processor.DeleteTriggerExpression(table.Name, "TestTrigger"));
-                Processor.TriggerExists(String.Empty, table.Name, "TestTrigger").ShouldBeFalse();
+                Processor.TriggerExists(string.Empty, table.Name, "TestTrigger").ShouldBeFalse();
             }
         }
 
@@ -221,9 +220,9 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                     TableName = table.Name,
                     Column = { Name = "id", IsIdentity = true, Type = DbType.Int64 }
                 });
-                Processor.ColumnExists(String.Empty, table.Name, "id").ShouldBeTrue();
-                Processor.SequenceExists(String.Empty, String.Format("gen_{0}_id", table.Name)).ShouldBeTrue();
-                Processor.TriggerExists(String.Empty, table.Name, String.Format("gen_id_{0}_id", table.Name)).ShouldBeTrue();
+                Processor.ColumnExists(string.Empty, table.Name, "id").ShouldBeTrue();
+                Processor.SequenceExists(string.Empty, string.Format("gen_{0}_id", table.Name)).ShouldBeTrue();
+                Processor.TriggerExists(string.Empty, table.Name, string.Format("gen_id_{0}_id", table.Name)).ShouldBeTrue();
             }
         }
 
@@ -237,18 +236,18 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                     TableName = table.Name,
                     Column = { Name = "id", IsIdentity = true, Type = DbType.Int64 }
                 });
-                Processor.ColumnExists(String.Empty, table.Name, "id").ShouldBeTrue();
-                Processor.SequenceExists(String.Empty, String.Format("gen_{0}_id", table.Name)).ShouldBeTrue();
-                Processor.TriggerExists(String.Empty, table.Name, String.Format("gen_id_{0}_id", table.Name)).ShouldBeTrue();
+                Processor.ColumnExists(string.Empty, table.Name, "id").ShouldBeTrue();
+                Processor.SequenceExists(string.Empty, string.Format("gen_{0}_id", table.Name)).ShouldBeTrue();
+                Processor.TriggerExists(string.Empty, table.Name, string.Format("gen_id_{0}_id", table.Name)).ShouldBeTrue();
 
                 Processor.Process(new DeleteColumnExpression
                 {
                     TableName = table.Name,
                     ColumnNames = { "id" }
                 });
-                Processor.ColumnExists(String.Empty, table.Name, "id").ShouldBeFalse();
-                Processor.SequenceExists(String.Empty, String.Format("gen_{0}_id", table.Name)).ShouldBeFalse();
-                Processor.TriggerExists(String.Empty, table.Name, String.Format("gen_id_{0}_id", table.Name)).ShouldBeFalse();
+                Processor.ColumnExists(string.Empty, table.Name, "id").ShouldBeFalse();
+                Processor.SequenceExists(string.Empty, string.Format("gen_{0}_id", table.Name)).ShouldBeFalse();
+                Processor.TriggerExists(string.Empty, table.Name, string.Format("gen_id_{0}_id", table.Name)).ShouldBeFalse();
             }
         }
 
@@ -262,18 +261,18 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                     TableName = table.Name,
                     Column = { Name = "id", IsIdentity = false, Type = DbType.Int64 }
                 });
-                Processor.ColumnExists(String.Empty, table.Name, "id").ShouldBeTrue();
-                Processor.SequenceExists(String.Empty, String.Format("gen_{0}_id", table.Name)).ShouldBeFalse();
-                Processor.TriggerExists(String.Empty, table.Name, String.Format("gen_id_{0}_id", table.Name)).ShouldBeFalse();
+                Processor.ColumnExists(string.Empty, table.Name, "id").ShouldBeTrue();
+                Processor.SequenceExists(string.Empty, string.Format("gen_{0}_id", table.Name)).ShouldBeFalse();
+                Processor.TriggerExists(string.Empty, table.Name, string.Format("gen_id_{0}_id", table.Name)).ShouldBeFalse();
 
                 Processor.Process(new AlterColumnExpression
                 {
                     TableName = table.Name,
                     Column = { Name = "id", IsIdentity = true, Type = DbType.Int64 }
                 });
-                Processor.ColumnExists(String.Empty, table.Name, "id").ShouldBeTrue();
-                Processor.SequenceExists(String.Empty, String.Format("gen_{0}_id", table.Name)).ShouldBeTrue();
-                Processor.TriggerExists(String.Empty, table.Name, String.Format("gen_id_{0}_id", table.Name)).ShouldBeTrue();
+                Processor.ColumnExists(string.Empty, table.Name, "id").ShouldBeTrue();
+                Processor.SequenceExists(string.Empty, string.Format("gen_{0}_id", table.Name)).ShouldBeTrue();
+                Processor.TriggerExists(string.Empty, table.Name, string.Format("gen_id_{0}_id", table.Name)).ShouldBeTrue();
             }
         }
 
@@ -287,18 +286,18 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                     TableName = table.Name,
                     Column = { Name = "id", IsIdentity = true, Type = DbType.Int64 }
                 });
-                Processor.ColumnExists(String.Empty, table.Name, "id").ShouldBeTrue();
-                Processor.SequenceExists(String.Empty, String.Format("gen_{0}_id", table.Name)).ShouldBeTrue();
-                Processor.TriggerExists(String.Empty, table.Name, String.Format("gen_id_{0}_id", table.Name)).ShouldBeTrue();
+                Processor.ColumnExists(string.Empty, table.Name, "id").ShouldBeTrue();
+                Processor.SequenceExists(string.Empty, string.Format("gen_{0}_id", table.Name)).ShouldBeTrue();
+                Processor.TriggerExists(string.Empty, table.Name, string.Format("gen_id_{0}_id", table.Name)).ShouldBeTrue();
 
                 Processor.Process(new AlterColumnExpression
                 {
                     TableName = table.Name,
                     Column = { Name = "id", IsIdentity = false, Type = DbType.Int64 }
                 });
-                Processor.ColumnExists(String.Empty, table.Name, "id").ShouldBeTrue();
-                Processor.SequenceExists(String.Empty, String.Format("gen_{0}_id", table.Name)).ShouldBeFalse();
-                Processor.TriggerExists(String.Empty, table.Name, String.Format("gen_id_{0}_id", table.Name)).ShouldBeFalse();
+                Processor.ColumnExists(string.Empty, table.Name, "id").ShouldBeTrue();
+                Processor.SequenceExists(string.Empty, string.Format("gen_{0}_id", table.Name)).ShouldBeFalse();
+                Processor.TriggerExists(string.Empty, table.Name, string.Format("gen_id_{0}_id", table.Name)).ShouldBeFalse();
             }
         }
 
@@ -319,7 +318,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                 insert.Rows.Add(item);
                 Processor.Process(insert);
 
-                using (DataSet ds = Processor.ReadTableData(String.Empty, table.Name))
+                using (DataSet ds = Processor.ReadTableData(string.Empty, table.Name))
                 {
                     ds.Tables.Count.ShouldBe(1);
                     ds.Tables[0].Rows.Count.ShouldBe(1);
@@ -352,7 +351,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                 Processor.Process(insert);
                 Processor.Process(insert);
 
-                using (DataSet ds = Processor.ReadTableData(String.Empty, table.Name))
+                using (DataSet ds = Processor.ReadTableData(string.Empty, table.Name))
                 {
                     ds.Tables.Count.ShouldBe(1);
                     ds.Tables[0].Rows.Count.ShouldBe(5);

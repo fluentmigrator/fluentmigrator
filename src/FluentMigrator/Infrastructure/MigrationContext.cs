@@ -52,7 +52,7 @@ namespace FluentMigrator.Infrastructure
             services
                 .AddScoped(sp => migrationAssemblies)
                 .AddScoped<IEmbeddedResourceProvider, DefaultEmbeddedResourceProvider>();
-            ServiceProvider = services.BuildServiceProvider();
+            ServiceProvider = services.BuildServiceProvider(validateScopes: false);
         }
 
         /// <summary>

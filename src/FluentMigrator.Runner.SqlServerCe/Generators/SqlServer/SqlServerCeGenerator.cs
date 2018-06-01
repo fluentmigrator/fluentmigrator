@@ -17,7 +17,6 @@
 //
 #endregion
 
-using System;
 using System.Linq;
 using FluentMigrator.Exceptions;
 using FluentMigrator.Expressions;
@@ -66,7 +65,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override string Generate(RenameTableExpression expression)
         {
-            return String.Format("sp_rename {0}, {1}", Quoter.QuoteValue(expression.OldName), Quoter.QuoteValue(expression.NewName));
+            return string.Format("sp_rename {0}, {1}", Quoter.QuoteValue(expression.OldName), Quoter.QuoteValue(expression.NewName));
         }
 
         public override string Generate(RenameColumnExpression expression)
@@ -99,12 +98,12 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
             // Limited functionality in CE, for now will just drop the column.. no DECLARE support!
             const string sql = @"ALTER TABLE {0} DROP COLUMN {1};";
-            return String.Format(sql, Quoter.QuoteTableName(expression.TableName), Quoter.QuoteColumnName(expression.ColumnNames.ElementAt(0)));
+            return string.Format(sql, Quoter.QuoteTableName(expression.TableName), Quoter.QuoteColumnName(expression.ColumnNames.ElementAt(0)));
         }
 
         public override string Generate(DeleteIndexExpression expression)
         {
-            return String.Format("DROP INDEX {0}.{1}", Quoter.QuoteTableName(expression.Index.TableName), Quoter.QuoteIndexName(expression.Index.Name));
+            return string.Format("DROP INDEX {0}.{1}", Quoter.QuoteTableName(expression.Index.TableName), Quoter.QuoteIndexName(expression.Index.Name));
         }
 
         public override string Generate(AlterDefaultConstraintExpression expression)
@@ -125,7 +124,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             var columnNamesValues = GenerateColumnNamesAndValues(expression);
             var selectStrings = columnNamesValues.Select(kv => "SELECT " + kv.Value);
 
-            var sql = String.Format(InsertData, Quoter.QuoteTableName(expression.TableName), columnNamesValues.FirstOrDefault().Key, String.Join(" UNION ALL ", selectStrings.ToArray()));
+            var sql = string.Format(InsertData, Quoter.QuoteTableName(expression.TableName), columnNamesValues.FirstOrDefault().Key, string.Join(" UNION ALL ", selectStrings.ToArray()));
 
             if (IsUsingIdentityInsert(expression))
             {

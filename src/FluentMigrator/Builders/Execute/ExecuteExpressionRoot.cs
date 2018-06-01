@@ -80,8 +80,8 @@ namespace FluentMigrator.Builders.Execute
         /// <inheritdoc />
         public void EmbeddedScript(string embeddedSqlScriptName)
         {
-            var embeddedResourceProvider = _context.ServiceProvider.GetService<IEmbeddedResourceProvider>();
-            if (embeddedResourceProvider == null)
+            var embeddedResourceProviders = _context.ServiceProvider.GetService<IEnumerable<IEmbeddedResourceProvider>>();
+            if (embeddedResourceProviders == null)
             {
 #pragma warning disable 612
                 Debug.Assert(_context.MigrationAssemblies != null, "_context.MigrationAssemblies != null");
@@ -91,7 +91,7 @@ namespace FluentMigrator.Builders.Execute
             }
             else
             {
-                var expression = new ExecuteEmbeddedSqlScriptExpression(embeddedResourceProvider) { SqlScript = embeddedSqlScriptName };
+                var expression = new ExecuteEmbeddedSqlScriptExpression(embeddedResourceProviders) { SqlScript = embeddedSqlScriptName };
                 _context.Expressions.Add(expression);
             }
         }
@@ -99,9 +99,9 @@ namespace FluentMigrator.Builders.Execute
         /// <inheritdoc />
         public void EmbeddedScript(string embeddedSqlScriptName, IDictionary<string, string> parameters)
         {
-            var embeddedResourceProvider = _context.ServiceProvider.GetService<IEmbeddedResourceProvider>();
+            var embeddedResourceProviders = _context.ServiceProvider.GetService<IEnumerable<IEmbeddedResourceProvider>>();
             ExecuteEmbeddedSqlScriptExpression expression;
-            if (embeddedResourceProvider == null)
+            if (embeddedResourceProviders == null)
             {
 #pragma warning disable 612
                 Debug.Assert(_context.MigrationAssemblies != null, "_context.MigrationAssemblies != null");
@@ -114,7 +114,7 @@ namespace FluentMigrator.Builders.Execute
             }
             else
             {
-                expression = new ExecuteEmbeddedSqlScriptExpression(embeddedResourceProvider)
+                expression = new ExecuteEmbeddedSqlScriptExpression(embeddedResourceProviders)
                 {
                     SqlScript = embeddedSqlScriptName,
                     Parameters = parameters,

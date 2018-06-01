@@ -29,7 +29,7 @@ namespace FluentMigrator.Runner.Processors.Hana
             [NotNull] HanaDbFactory factory,
             [NotNull] HanaGenerator generator,
             [NotNull] ILogger<HanaProcessor> logger,
-            [NotNull] IOptions<ProcessorOptions> options,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor)
             : base(() => factory.Factory, generator, logger, options.Value, connectionStringAccessor)
         {

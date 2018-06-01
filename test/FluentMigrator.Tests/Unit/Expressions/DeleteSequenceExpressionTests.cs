@@ -16,7 +16,6 @@
 //
 #endregion
 
-using System;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner;
@@ -34,7 +33,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         [Test]
         public void ErrorIsReturnedWhenSequenceNameIsEmptyString()
         {
-            var expression = new DeleteSequenceExpression { SequenceName = String.Empty };
+            var expression = new DeleteSequenceExpression { SequenceName = string.Empty };
 
             var errors = ValidationHelper.CollectErrors(expression);
             errors.ShouldContain(ErrorMessages.SequenceNameCannotBeNullOrEmpty);

@@ -15,11 +15,10 @@
 #endregion
 
 using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
+using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.VersionTableInfo;
@@ -102,8 +101,8 @@ namespace FluentMigrator.Runner
             IVersionTableMetaData versionTableMetaData)
         {
             builder.Services
-                .AddSingleton<IVersionTableMetaDataAccessor>(
-                    new PassThroughVersionTableMetaDataAccessor(versionTableMetaData));
+                .AddScoped<IVersionTableMetaDataAccessor>(
+                    _ => new PassThroughVersionTableMetaDataAccessor(versionTableMetaData));
             return builder;
         }
 
@@ -134,88 +133,120 @@ namespace FluentMigrator.Runner
             [NotNull, ItemNotNull] params Assembly[] assemblies)
         {
             builder.Services
-                .AddSingleton<IMigrationSourceItem>(new AssemblyMigrationSourceItem(assemblies))
-                .AddSingleton<IMigrationSource, MigrationSourceFromItems>();
+                .AddSingleton<IMigrationSourceItem>(new AssemblyMigrationSourceItem(assemblies));
             return builder;
         }
 
         /// <summary>
-        /// Interface to get the candidate types for <see cref="MigrationSourceFromItems"/>
+        /// Scans for types in the given assemblies
         /// </summary>
-        private interface IMigrationSourceItem
+        /// <param name="builder">The runner builder</param>
+        /// <param name="assemblies">The assemblies to scan</param>
+        /// <returns>The next step</returns>
+        public static IScanInBuilder ScanIn(
+            this IMigrationRunnerBuilder builder,
+            [NotNull, ItemNotNull] params Assembly[] assemblies)
         {
-            IEnumerable<Type> MigrationTypeCandidates { get; }
+            var sourceItem = new AssemblySourceItem(assemblies);
+            return new ScanInBuilder(builder, sourceItem);
         }
 
-        /// <summary>
-        /// Implementation of <see cref="IMigrationSourceItem"/> that accepts a collection of assemnblies
-        /// </summary>
-        private class AssemblyMigrationSourceItem : IMigrationSourceItem
+        private class ScanInBuilder : IScanInBuilder, IScanInForBuilder
         {
-            private readonly IReadOnlyCollection<Assembly> _assemblies;
+            private readonly IMigrationRunnerBuilder _builder;
 
-            /// <summary>
-            /// Initializes a new instance of the <see cref="AssemblyMigrationSourceItem"/> class.
-            /// </summary>
-            /// <param name="assemblies">The assemblies to get the canididate types from</param>
-            public AssemblyMigrationSourceItem(IReadOnlyCollection<Assembly> assemblies)
+            public ScanInBuilder(IMigrationRunnerBuilder builder, IAssemblySourceItem currentSourceItem)
             {
-                _assemblies = assemblies;
+                if (builder.DanglingAssemblySourceItem != null)
+                {
+                    builder.Services
+                        .AddSingleton(builder.DanglingAssemblySourceItem);
+                }
+
+                _builder = builder;
+                _builder.DanglingAssemblySourceItem = currentSourceItem;
+                SourceItem = currentSourceItem;
+            }
+
+            private ScanInBuilder(
+                IMigrationRunnerBuilder builder,
+                IAssemblySourceItem currentSourceItem,
+                IMigrationSourceItem sourceItem)
+            {
+                _builder = builder;
+                SourceItem = currentSourceItem;
+
+                _builder.DanglingAssemblySourceItem = null;
+                Services.AddSingleton(sourceItem);
+            }
+
+            private ScanInBuilder(
+                IMigrationRunnerBuilder builder,
+                IAssemblySourceItem currentSourceItem,
+                IVersionTableMetaDataSourceItem sourceItem)
+            {
+                _builder = builder;
+                SourceItem = currentSourceItem;
+
+                _builder.DanglingAssemblySourceItem = null;
+                Services.AddSingleton(sourceItem);
+            }
+
+            private ScanInBuilder(
+                IMigrationRunnerBuilder builder,
+                IAssemblySourceItem currentSourceItem,
+                IEmbeddedResourceProvider sourceItem)
+            {
+                _builder = builder;
+                SourceItem = currentSourceItem;
+
+                _builder.DanglingAssemblySourceItem = null;
+                Services.AddSingleton(sourceItem);
             }
 
             /// <inheritdoc />
-            public IEnumerable<Type> MigrationTypeCandidates => _assemblies
-                .SelectMany(a => a.GetExportedTypes())
-                .Where(t => typeof(IMigration).IsAssignableFrom(t))
-                .Where(t => !t.IsAbstract);
-        }
+            public IServiceCollection Services => _builder.Services;
 
-        /// <summary>
-        /// Custom implementation of <see cref="IMigrationSource"/> that works on <see cref="IMigrationSourceItem"/> elements
-        /// </summary>
-        private class MigrationSourceFromItems : IMigrationSource
-        {
-            [NotNull]
-            private readonly IServiceProvider _serviceProvider;
-
-            [NotNull]
-            private readonly IMigrationRunnerConventions _conventions;
-
-            [NotNull]
-            [ItemNotNull]
-            private readonly IReadOnlyCollection<IMigrationSourceItem> _sourceItems;
-
-            [NotNull]
-            private readonly ConcurrentDictionary<Type, IMigration> _instanceCache = new ConcurrentDictionary<Type, IMigration>();
-
-            /// <summary>
-            /// Initializes a new instance of the <see cref="MigrationSourceFromItems"/> class.
-            /// </summary>
-            /// <param name="serviceProvider">The service provider</param>
-            /// <param name="conventions">The runner conventions</param>
-            /// <param name="sourceItems">The items to get the candidate types from</param>
-            public MigrationSourceFromItems(
-                [NotNull] IServiceProvider serviceProvider,
-                [NotNull] IMigrationRunnerConventions conventions,
-                [NotNull, ItemNotNull] IEnumerable<IMigrationSourceItem> sourceItems)
+            /// <inheritdoc />
+            public IAssemblySourceItem DanglingAssemblySourceItem
             {
-                _serviceProvider = serviceProvider;
-                _conventions = conventions;
-                _sourceItems = sourceItems.ToList();
+                get => _builder.DanglingAssemblySourceItem;
+                set => _builder.DanglingAssemblySourceItem = value;
             }
 
             /// <inheritdoc />
-            public IEnumerable<IMigration> GetMigrations()
+            public IAssemblySourceItem SourceItem { get; }
+
+            /// <inheritdoc />
+            public IScanInForBuilder For => this;
+
+            /// <inheritdoc />
+            public IScanInBuilder Migrations()
             {
-                var migrationTypes = from type in _sourceItems.SelectMany(i => i.MigrationTypeCandidates)
-                                     where _conventions.TypeIsMigration(type)
-                                     select _instanceCache.GetOrAdd(type, CreateInstance);
-                return migrationTypes;
+                var sourceItem = new AssemblyMigrationSourceItem(SourceItem.Assemblies.ToList());
+                return new ScanInBuilder(_builder, SourceItem, sourceItem);
             }
 
-            private IMigration CreateInstance(Type type)
+            /// <inheritdoc />
+            public IScanInBuilder VersionTableMetaData()
             {
-                return (IMigration)ActivatorUtilities.CreateInstance(_serviceProvider, type);
+                var sourceItem = new AssemblyVersionTableMetaDataSourceItem(SourceItem.Assemblies.ToArray());
+                return new ScanInBuilder(_builder, SourceItem, sourceItem);
+            }
+
+            /// <inheritdoc />
+            public IScanInBuilder EmbeddedResources()
+            {
+                var sourceItem = new DefaultEmbeddedResourceProvider(SourceItem.Assemblies.ToArray());
+                return new ScanInBuilder(_builder, SourceItem, sourceItem);
+            }
+
+            /// <inheritdoc />
+            public IMigrationRunnerBuilder All()
+            {
+                Services.AddSingleton(SourceItem);
+                _builder.DanglingAssemblySourceItem = null;
+                return _builder;
             }
         }
     }

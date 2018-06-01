@@ -16,8 +16,6 @@
 //
 #endregion
 
-using System;
-
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
@@ -41,7 +39,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
                                      Constraint =
                                          {
                                              TableName =
-                                                 String.Empty
+                                                 string.Empty
                                          }
                                  };
 

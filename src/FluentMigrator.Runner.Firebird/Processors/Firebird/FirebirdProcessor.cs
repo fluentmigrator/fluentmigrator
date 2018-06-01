@@ -68,7 +68,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             [NotNull] FirebirdGenerator generator,
             [NotNull] FirebirdQuoter quoter,
             [NotNull] ILogger<FirebirdProcessor> logger,
-            [NotNull] IOptions<ProcessorOptions> options,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor,
             [NotNull] FirebirdOptions fbOptions)
             : base(() => factory.Factory, generator, logger, options.Value, connectionStringAccessor)

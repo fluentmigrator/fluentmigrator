@@ -72,9 +72,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FluentMigrator", "src\Fluen
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "packaging", "packaging", "{A9B5BE31-4940-4092-A0A7-79C3F73B4584}"
 	ProjectSection(SolutionItems) = preProject
-		Global.proj = Global.proj
-		PackageLibrary.proj = PackageLibrary.proj
-		PackageTool.proj = PackageTool.proj
+		Global.props = Global.props
+		PackageLibrary.props = PackageLibrary.props
+		PackageTool.props = PackageTool.props
 	EndProjectSection
 EndProject
 Global
@@ -125,8 +125,8 @@ Global
 		{49EEA395-BF7E-470C-8302-802C455C478F}.Release|x86.Build.0 = Release|Any CPU
 		{706A4E07-6F35-4043-994E-3A9A9C957588}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{706A4E07-6F35-4043-994E-3A9A9C957588}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{706A4E07-6F35-4043-994E-3A9A9C957588}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{706A4E07-6F35-4043-994E-3A9A9C957588}.Debug|x64.Build.0 = Debug|Any CPU
+		{706A4E07-6F35-4043-994E-3A9A9C957588}.Debug|x64.ActiveCfg = Debug|x64
+		{706A4E07-6F35-4043-994E-3A9A9C957588}.Debug|x64.Build.0 = Debug|x64
 		{706A4E07-6F35-4043-994E-3A9A9C957588}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{706A4E07-6F35-4043-994E-3A9A9C957588}.Debug|x86.Build.0 = Debug|Any CPU
 		{706A4E07-6F35-4043-994E-3A9A9C957588}.Release|Any CPU.ActiveCfg = Release|Any CPU

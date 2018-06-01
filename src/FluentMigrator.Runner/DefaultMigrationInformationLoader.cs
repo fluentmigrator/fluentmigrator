@@ -38,7 +38,9 @@ namespace FluentMigrator.Runner
         private readonly IReadOnlyCollection<string> _tagsToMatch;
 
         [NotNull]
+#pragma warning disable 618
         private readonly IMigrationSource _source;
+#pragma warning restore 618
 
         [CanBeNull]
         private SortedList<long, IMigrationInfo> _migrationInfos;
@@ -77,8 +79,10 @@ namespace FluentMigrator.Runner
         }
 
         public DefaultMigrationInformationLoader(
+#pragma warning disable 618
             [NotNull] IMigrationSource source,
-            [NotNull] IOptions<TypeFilterOptions> filterOptions,
+#pragma warning restore 618
+            [NotNull] IOptionsSnapshot<TypeFilterOptions> filterOptions,
             [NotNull] IMigrationRunnerConventions conventions,
             [NotNull] IOptions<RunnerOptions> runnerOptions)
         {
@@ -134,26 +138,47 @@ namespace FluentMigrator.Runner
 
         [NotNull, ItemNotNull]
         private static IEnumerable<IMigrationInfo> FindMigrations(
+#pragma warning disable 618
             [NotNull] IMigrationSource source,
+#pragma warning restore 618
             [NotNull] IMigrationRunnerConventions conventions,
             [CanBeNull] string @namespace,
             bool loadNestedNamespaces,
             [NotNull, ItemNotNull] IReadOnlyCollection<string> tagsToMatch)
         {
-            var migrations = source.GetMigrations().ToList();
+            bool IsMatchingMigration(Type type)
+            {
+                if (!type.IsInNamespace(@namespace, loadNestedNamespaces))
+                    return false;
+                return conventions.TypeHasMatchingTags(type, tagsToMatch)
+                 || (tagsToMatch.Count == 0 && !conventions.TypeHasTags(type))
+                 || !conventions.TypeHasTags(type);
+            }
+
+            IReadOnlyCollection<IMigration> migrations;
+
+            if (source is IFilteringMigrationSource filteringSource)
+            {
+                migrations = filteringSource.GetMigrations(IsMatchingMigration).ToList();
+            }
+            else
+            {
+                migrations =
+                    (from migration in source.GetMigrations()
+                     where IsMatchingMigration(migration.GetType())
+                     select migration).ToList();
+            }
+
             if (migrations.Count == 0)
             {
                 throw new MissingMigrationsException("No migrations found");
             }
 
-            var migrationInfos =
-                (from migration in migrations
-                 let type = migration.GetType()
-                 where type.IsInNamespace(@namespace, loadNestedNamespaces)
-                 where conventions.TypeHasMatchingTags(type, tagsToMatch) || (tagsToMatch.Count == 0 && !conventions.TypeHasTags(type)) || !conventions.TypeHasTags(type)
-                 select conventions.GetMigrationInfoForMigration(migration));
+            var migrationInfos = migrations
+                .Select(conventions.GetMigrationInfoForMigration)
+                .ToList();
 
-            return migrationInfos.ToList();
+            return migrationInfos;
         }
     }
 }

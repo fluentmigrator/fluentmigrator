@@ -22,7 +22,8 @@ using McMaster.Extensions.CommandLineUtils;
 
 namespace FluentMigrator.DotNet.Cli
 {
-    public class Program
+    [Microsoft.FSharp.Core.Sealed]
+    public static class Program
     {
         static Program()
         {

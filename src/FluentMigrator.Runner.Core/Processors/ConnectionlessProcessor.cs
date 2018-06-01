@@ -59,7 +59,7 @@ namespace FluentMigrator.Runner.Processors
         public ConnectionlessProcessor(
             [NotNull] IGeneratorAccessor generatorAccessor,
             [NotNull] ILogger logger,
-            [NotNull] IOptions<ProcessorOptions> options,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> options,
             [NotNull] IOptions<SelectingProcessorAccessorOptions> accessorOptions)
         {
             _logger = logger;
@@ -76,7 +76,7 @@ namespace FluentMigrator.Runner.Processors
         public ConnectionlessProcessor(
             [NotNull] IGeneratorAccessor generatorAccessor,
             [NotNull] ILogger logger,
-            [NotNull] IOptions<ProcessorOptions> options,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> options,
             [NotNull] IReadOnlyCollection<string> processorIds)
         {
             _logger = logger;

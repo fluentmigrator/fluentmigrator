@@ -119,7 +119,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(System.String.Format("INSERT INTO TestSchema.TestTable1 (guid) VALUES ('{0}')", GeneratorTestHelper.TestGuid));
+            result.ShouldBe(string.Format("INSERT INTO TestSchema.TestTable1 (guid) VALUES ('{0}')", GeneratorTestHelper.TestGuid));
         }
 
         [Test]
@@ -128,7 +128,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             var expression = GeneratorTestHelper.GetInsertGUIDExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(System.String.Format("INSERT INTO TestTable1 (guid) VALUES ('{0}')", GeneratorTestHelper.TestGuid));
+            result.ShouldBe(string.Format("INSERT INTO TestTable1 (guid) VALUES ('{0}')", GeneratorTestHelper.TestGuid));
         }
 
         [Test]

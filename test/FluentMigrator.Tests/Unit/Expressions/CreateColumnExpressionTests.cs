@@ -16,7 +16,6 @@
 //
 #endregion
 
-using System;
 using System.Data;
 using System.Linq;
 
@@ -53,7 +52,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         [Test]
         public void ErrorIsReturnedWhenOldNameIsEmptyString()
         {
-            var expression = new CreateColumnExpression { TableName = String.Empty };
+            var expression = new CreateColumnExpression { TableName = string.Empty };
             var errors = ValidationHelper.CollectErrors(expression);
             errors.ShouldContain(ErrorMessages.TableNameCannotBeNullOrEmpty);
         }

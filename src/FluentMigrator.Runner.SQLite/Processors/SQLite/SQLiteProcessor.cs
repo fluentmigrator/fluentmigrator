@@ -67,7 +67,7 @@ namespace FluentMigrator.Runner.Processors.SQLite
             [NotNull] SQLiteDbFactory factory,
             [NotNull] SQLiteGenerator generator,
             [NotNull] ILogger<SQLiteProcessor> logger,
-            [NotNull] IOptions<ProcessorOptions> options,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor,
             [NotNull] IServiceProvider serviceProvider)
             : base(() => factory.Factory, generator, logger, options.Value, connectionStringAccessor)
@@ -113,14 +113,14 @@ namespace FluentMigrator.Runner.Processors.SQLite
 
         public override void Execute(string template, params object[] args)
         {
-            Process(String.Format(template, args));
+            Process(string.Format(template, args));
         }
 
         public override bool Exists(string template, params object[] args)
         {
             EnsureConnectionIsOpen();
 
-            using (var command = CreateCommand(String.Format(template, args)))
+            using (var command = CreateCommand(string.Format(template, args)))
             using (var reader = command.ExecuteReader())
             {
                 try
@@ -258,7 +258,7 @@ namespace FluentMigrator.Runner.Processors.SQLite
         {
             EnsureConnectionIsOpen();
 
-            using (var command = CreateCommand(String.Format(template, args)))
+            using (var command = CreateCommand(string.Format(template, args)))
             using (var reader = command.ExecuteReader())
             {
                 return reader.ReadDataSet();

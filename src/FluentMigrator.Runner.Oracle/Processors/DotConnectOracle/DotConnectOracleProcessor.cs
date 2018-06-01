@@ -47,7 +47,7 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
             [NotNull] DotConnectOracleDbFactory factory,
             [NotNull] OracleGenerator generator,
             [NotNull] ILogger<DotConnectOracleProcessor> logger,
-            [NotNull] IOptions<ProcessorOptions> options,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor)
             : base(() => factory.Factory, generator, logger, options.Value, connectionStringAccessor)
         {
