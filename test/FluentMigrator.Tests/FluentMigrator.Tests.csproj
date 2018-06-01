@@ -5,6 +5,7 @@
     <AssemblyOriginatorKeyFile>..\..\FluentMigrator.snk</AssemblyOriginatorKeyFile>
     <UserSecretsId>FluentMigrator.Tests</UserSecretsId>
     <DebugType>full</DebugType>
+    <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
   <Import Project="$(MSBuildThisFileDirectory)../../Global.props" />
   <ItemGroup>
