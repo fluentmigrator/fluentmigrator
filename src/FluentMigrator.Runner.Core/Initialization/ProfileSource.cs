@@ -17,12 +17,9 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 
 using JetBrains.Annotations;
-
-using Microsoft.Extensions.DependencyInjection;
 
 namespace FluentMigrator.Runner.Initialization
 {
@@ -32,7 +29,7 @@ namespace FluentMigrator.Runner.Initialization
     public class ProfileSource : IProfileSource
     {
         [NotNull]
-        private readonly IAssemblySource _source;
+        private readonly IFilteringMigrationSource _source;
 
         [NotNull]
         private readonly IMigrationRunnerConventions _conventions;
@@ -50,7 +47,7 @@ namespace FluentMigrator.Runner.Initialization
         /// <param name="conventions">The migration runner conventios</param>
         /// <param name="serviceProvider">The service provider</param>
         public ProfileSource(
-            [NotNull] IAssemblySource source,
+            [NotNull] IFilteringMigrationSource source,
             [NotNull] IMigrationRunnerConventions conventions,
             [NotNull] IServiceProvider serviceProvider)
         {
@@ -60,14 +57,15 @@ namespace FluentMigrator.Runner.Initialization
         }
 
         /// <inheritdoc />
-        public IEnumerable<IMigration> GetProfiles(string profile)
+        public IEnumerable<IMigration> GetProfiles(string profile) =>
+            _source.GetMigrations(t => IsSelectedProfile(t, profile));
+
+        private bool IsSelectedProfile(Type type, string profile)
         {
-            var instances = from type in _source.Assemblies.SelectMany(a => a.GetExportedTypes())
-                            where _conventions.TypeIsProfile(type)
-                            let profileAttribute = type.GetCustomAttribute<ProfileAttribute>()
-                            where string.IsNullOrEmpty(profile) || string.Equals(profileAttribute.ProfileName, profile)
-                            select _instanceCache.GetOrAdd(type, t => (IMigration)ActivatorUtilities.CreateInstance(_serviceProvider, t));
-            return instances;
+            if (!_conventions.TypeIsProfile(type))
+                return false;
+            var profileAttribute = type.GetCustomAttribute<ProfileAttribute>();
+            return string.IsNullOrEmpty(profile) || string.Equals(profileAttribute.ProfileName, profile);
         }
     }
 }
