@@ -58,6 +58,8 @@ namespace FluentMigrator.MSBuild
 
         private string _databaseType;
 
+        private int? _timeout;
+
         public string ApplicationContext { get; set; }
 
         [Required]
@@ -88,7 +90,11 @@ namespace FluentMigrator.MSBuild
 
         public string WorkingDirectory { get; set; }
 
-        public int? Timeout { get; set; }
+        public int Timeout
+        {
+            get => _timeout ?? 0;
+            set => _timeout = value;
+        }
 
         public string Profile { get; set; }
 
@@ -183,7 +189,7 @@ namespace FluentMigrator.MSBuild
                         opt.ConnectionString = Connection;
                         opt.PreviewOnly = PreviewOnly;
                         opt.ProviderSwitches = ProviderSwitches;
-                        opt.Timeout = Timeout == null ? null : (TimeSpan?)TimeSpan.FromSeconds(Timeout.Value);
+                        opt.Timeout = _timeout == null ? null : (TimeSpan?)TimeSpan.FromSeconds(_timeout.Value);
                     });
 
             if (Output)
