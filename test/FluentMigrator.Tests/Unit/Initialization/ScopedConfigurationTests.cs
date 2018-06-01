@@ -307,7 +307,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
         public void CanUseMigrationWithScopedService()
         {
             using (var serviceProvider = ServiceCollectionExtensions
-                .CreateServices(true)
+                .CreateServices()
                 .Configure<ProcessorOptions>(opt => opt.ConnectionString = "something")
                 .BuildServiceProvider(validateScopes: true))
             {
@@ -343,6 +343,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
             {
                 void ReleaseSemaphoreOnCallback(object state)
                 {
+                    // ReSharper disable once AccessToDisposedClosure
                     sem.Release();
                 }
 

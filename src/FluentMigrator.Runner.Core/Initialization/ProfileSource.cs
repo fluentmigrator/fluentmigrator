@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2018, FluentMigrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +15,6 @@
 #endregion
 
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -34,26 +33,17 @@ namespace FluentMigrator.Runner.Initialization
         [NotNull]
         private readonly IMigrationRunnerConventions _conventions;
 
-        [NotNull]
-        private readonly IServiceProvider _serviceProvider;
-
-        [NotNull]
-        private readonly ConcurrentDictionary<Type, IMigration> _instanceCache = new ConcurrentDictionary<Type, IMigration>();
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ProfileSource"/> class.
         /// </summary>
         /// <param name="source">The assembly source</param>
         /// <param name="conventions">The migration runner conventios</param>
-        /// <param name="serviceProvider">The service provider</param>
         public ProfileSource(
             [NotNull] IFilteringMigrationSource source,
-            [NotNull] IMigrationRunnerConventions conventions,
-            [NotNull] IServiceProvider serviceProvider)
+            [NotNull] IMigrationRunnerConventions conventions)
         {
             _source = source;
             _conventions = conventions;
-            _serviceProvider = serviceProvider;
         }
 
         /// <inheritdoc />

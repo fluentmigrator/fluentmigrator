@@ -91,10 +91,12 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddSingleton<IStopWatch, StopWatch>()
 
                 // Source for migrations
+#pragma warning disable 618
                 .AddScoped<IMigrationSource, MigrationSource>()
                 .AddScoped(
                     sp => sp.GetRequiredService<IMigrationSource>() as IFilteringMigrationSource
                      ?? ActivatorUtilities.CreateInstance<MigrationSource>(sp))
+#pragma warning restore 618
 
                 // Configure the accessor for the version table metadata
                 .AddScoped<IVersionTableMetaDataAccessor, AssemblySourceVersionTableMetaDataAccessor>()

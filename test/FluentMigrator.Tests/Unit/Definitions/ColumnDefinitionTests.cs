@@ -16,7 +16,6 @@
 //
 #endregion
 
-using System;
 using System.Data;
 
 using FluentMigrator.Infrastructure;

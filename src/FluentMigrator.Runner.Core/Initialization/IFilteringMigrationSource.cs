@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2018, FluentMigrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 
 using JetBrains.Annotations;
+#pragma warning disable 618
 
 namespace FluentMigrator.Runner.Initialization
 {
