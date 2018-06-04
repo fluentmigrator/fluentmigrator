@@ -17,12 +17,16 @@
 #endregion
 
 using System;
-using System.IO;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 using FluentMigrator.Example.Migrations;
 using FluentMigrator.Runner;
+using FluentMigrator.Runner.Processors;
 
-using Microsoft.Data.Sqlite;
+using McMaster.Extensions.CommandLineUtils;
+
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -30,25 +34,54 @@ namespace FluentMigrator.Example.Migrator
 {
     internal static class Program
     {
-        static void Main()
-        {
-            // Configure the DB connection
-            var dbFileName = Path.Combine(AppContext.BaseDirectory, "test.db");
-            var csb = new SqliteConnectionStringBuilder
-            {
-                DataSource = dbFileName,
-                Mode = SqliteOpenMode.ReadWriteCreate
-            };
+        private static IReadOnlyDictionary<string, DatabaseConfiguration> DefaultConfigurations =
+            typeof(DefaultDatabaseConfigurations).GetRuntimeFields()
+                .Where(x => x.FieldType == typeof(DatabaseConfiguration))
+                .ToDictionary(
+                    x => x.Name,
+                    x => (DatabaseConfiguration) x.GetValue(obj: null),
+                    StringComparer.OrdinalIgnoreCase);
 
+        static int Main(string[] args)
+        {
+            var app = new CommandLineApplication();
+
+            var help = app.HelpOption();
+            var processor = app.Option(
+                "-d|--dialect <DIALECT>",
+                $"The database dialect ({string.Join(",", DefaultConfigurations.Keys)})",
+                CommandOptionType.SingleValue);
+            var connectionString = app.Option(
+                "-c|--connection <CONNECTION-STRING>",
+                $"The connection string to connect to the database",
+                CommandOptionType.SingleValue);
+
+            app.OnExecute(
+                () =>
+                {
+                    var dbConfig = CreateDatabaseConfiguration(processor, connectionString);
+                    return ExecuteMigration(dbConfig);
+                });
+
+            return app.Execute(args);
+        }
+
+        private static int ExecuteMigration(DatabaseConfiguration dbConfig)
+        {
             // Initialize the services
             var serviceProvider = new ServiceCollection()
                 .AddLogging(lb => lb.AddDebug().AddFluentMigratorConsole())
                 .AddFluentMigratorCore()
                 .ConfigureRunner(
                     builder => builder
+#if NET461
+                        .AddJet()
+#endif
                         .AddSQLite()
-                        .WithGlobalConnectionString(csb.ConnectionString)
+                        .WithGlobalConnectionString(dbConfig.ConnectionString)
                         .WithMigrationsIn(typeof(AddGTDTables).Assembly))
+                .Configure<SelectingProcessorAccessorOptions>(
+                    opt => opt.ProcessorId = dbConfig.ProcessorId)
                 .BuildServiceProvider();
 
             // Instantiate the runner
@@ -56,6 +89,45 @@ namespace FluentMigrator.Example.Migrator
 
             // Run the migrations
             runner.MigrateUp();
+
+            return 0;
+        }
+
+        private static DatabaseConfiguration CreateDatabaseConfiguration(
+            CommandOption processor,
+            CommandOption connectionString)
+        {
+            if (processor.HasValue())
+            {
+                var processorId = processor.Value();
+                if (connectionString.HasValue())
+                {
+                    return new DatabaseConfiguration
+                    {
+                        ProcessorId = processorId,
+                        ConnectionString = connectionString.Value(),
+                    };
+                }
+
+                if (!DefaultConfigurations.TryGetValue(processorId, out var result))
+                {
+                    throw new InvalidOperationException(
+                        $"No default configuration for dialect {processorId} available");
+                }
+
+                return result;
+            }
+
+            if (connectionString.HasValue())
+            {
+                return new DatabaseConfiguration()
+                {
+                    ProcessorId = "sqlite",
+                    ConnectionString = connectionString.Value(),
+                };
+            }
+
+            return DefaultDatabaseConfigurations.Sqlite;
         }
     }
 }

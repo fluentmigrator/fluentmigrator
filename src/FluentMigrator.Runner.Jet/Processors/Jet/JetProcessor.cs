@@ -36,10 +36,10 @@ namespace FluentMigrator.Runner.Processors.Jet
 {
     public class JetProcessor : ProcessorBase
     {
-        private readonly DbConnection _connection;
-        private DbTransaction _transaction;
-        public OleDbConnection Connection => (OleDbConnection) _connection;
-        public OleDbTransaction Transaction => (OleDbTransaction) _transaction;
+        private readonly Lazy<OleDbConnection> _connection;
+        private OleDbTransaction _transaction;
+        public OleDbConnection Connection => _connection.Value;
+        public OleDbTransaction Transaction => _transaction;
 
         public JetProcessor(
             [NotNull] JetGenerator generator,
@@ -49,11 +49,17 @@ namespace FluentMigrator.Runner.Processors.Jet
             : base(generator, logger, options.Value)
         {
             var factory = OleDbFactory.Instance;
+            var connectionString = connectionStringAccessor.ConnectionString ?? options.Value.ConnectionString;
             if (factory != null)
             {
-                _connection = factory.CreateConnection();
-                Debug.Assert(_connection != null, nameof(_connection) + " != null");
-                _connection.ConnectionString = connectionStringAccessor.ConnectionString;
+                _connection = new Lazy<OleDbConnection>(
+                    () =>
+                    {
+                        var conn = (OleDbConnection) factory.CreateConnection();
+                        Debug.Assert(conn != null, nameof(conn) + " != null");
+                        conn.ConnectionString = connectionString;
+                        return conn;
+                    });
             }
         }
 
@@ -63,14 +69,14 @@ namespace FluentMigrator.Runner.Processors.Jet
 
         protected void EnsureConnectionIsOpen()
         {
-            if (_connection.State != ConnectionState.Open)
-                _connection.Open();
+            if (Connection.State != ConnectionState.Open)
+                Connection.Open();
         }
 
         protected void EnsureConnectionIsClosed()
         {
-            if (_connection.State != ConnectionState.Closed)
-                _connection.Close();
+            if (Connection.State != ConnectionState.Closed)
+                Connection.Close();
         }
 
         public override void Process(PerformDBOperationExpression expression)
@@ -82,7 +88,7 @@ namespace FluentMigrator.Runner.Processors.Jet
 
             EnsureConnectionIsOpen();
 
-            expression.Operation?.Invoke(_connection, _transaction);
+            expression.Operation?.Invoke(Connection, _transaction);
         }
 
         protected override void Process(string sql)
@@ -228,7 +234,7 @@ namespace FluentMigrator.Runner.Processors.Jet
             EnsureConnectionIsOpen();
 
             Logger.LogSay("Beginning Transaction");
-            _transaction = _connection.BeginTransaction();
+            _transaction = Connection.BeginTransaction();
         }
 
         public override void RollbackTransaction()
