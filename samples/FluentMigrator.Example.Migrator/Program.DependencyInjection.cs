@@ -34,7 +34,7 @@ namespace FluentMigrator.Example.Migrator
                     builder => builder
                         .AddSQLite()
                         .WithGlobalConnectionString(connectionString)
-                        .WithMigrationsIn(typeof(AddGTDTables).Assembly))
+                        .ScanIn(typeof(AddGTDTables).Assembly).For.Migrations())
                 .BuildServiceProvider();
 
             // Instantiate the runner
