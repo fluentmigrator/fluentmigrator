@@ -17,37 +17,103 @@
 #endregion
 
 using System;
-using System.IO;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
-using Microsoft.Data.Sqlite;
+using McMaster.Extensions.CommandLineUtils;
 
 namespace FluentMigrator.Example.Migrator
 {
     internal static partial class Program
     {
-        static void Main(string[] args)
+        private static IReadOnlyDictionary<string, DatabaseConfiguration> DefaultConfigurations =
+            typeof(DefaultDatabaseConfigurations).GetRuntimeFields()
+                .Where(x => x.FieldType == typeof(DatabaseConfiguration))
+                .ToDictionary(
+                    x => x.Name,
+                    x => (DatabaseConfiguration) x.GetValue(obj: null),
+                    StringComparer.OrdinalIgnoreCase);
+
+        static int Main(string[] args)
         {
-            // Configure the DB connection
-            var dbFileName = Path.Combine(AppContext.BaseDirectory, "test.db");
-            var csb = new SqliteConnectionStringBuilder
-            {
-                DataSource = dbFileName,
-                Mode = SqliteOpenMode.ReadWriteCreate
-            };
+            var app = new CommandLineApplication();
 
-            // The poor mans command line parser
-            var useLegacyMode = args.Length > 0 && args[0] == "--mode=legacy";
+            var help = app.HelpOption();
+            var mode = app.Option<MigrationMode>(
+                "-m|--mode <MODE>",
+                "The mode of the application (legacy or di)",
+                CommandOptionType.SingleValue);
+            var processor = app.Option(
+                "-d|--dialect <DIALECT>",
+                $"The database dialect ({string.Join(",", DefaultConfigurations.Keys)})",
+                CommandOptionType.SingleValue);
+            var connectionString = app.Option(
+                "-c|--connection <CONNECTION-STRING>",
+                $"The connection string to connect to the database",
+                CommandOptionType.SingleValue);
 
-            if (!useLegacyMode)
+            app.OnExecute(
+                () =>
+                {
+                    var selectedMode = mode.HasValue() ? mode.ParsedValue : MigrationMode.DI;
+                    var dbConfig = CreateDatabaseConfiguration(processor, connectionString);
+                    switch (selectedMode)
+                    {
+                        case MigrationMode.Legacy:
+                            Console.WriteLine(@"Using legacy mode");
+                            RunInLegacyMode(dbConfig);
+                            break;
+                        case MigrationMode.DI:
+                            Console.WriteLine(@"Using dependency injection");
+                            RunWithServices(dbConfig);
+                            break;
+                    }
+
+                    return 0;
+                });
+
+            return app.Execute(args);
+        }
+
+        private static DatabaseConfiguration CreateDatabaseConfiguration(CommandOption processor, CommandOption connectionString)
+        {
+            if (processor.HasValue())
             {
-                Console.WriteLine(@"Using dependency injection");
-                RunWithServices(csb.ConnectionString);
+                var processorId = processor.Value();
+                if (connectionString.HasValue())
+                {
+                    return new DatabaseConfiguration
+                    {
+                        ProcessorId = processorId,
+                        ConnectionString = connectionString.Value(),
+                    };
+                }
+
+                if (!DefaultConfigurations.TryGetValue(processorId, out var result))
+                {
+                    throw new InvalidOperationException($"No default configuration for dialect {processorId} available");
+                }
+
+                return result;
             }
-            else
+
+            if (connectionString.HasValue())
             {
-                Console.WriteLine(@"Using legacy mode");
-                RunInLegacyMode(csb.ConnectionString);
+                return new DatabaseConfiguration()
+                {
+                    ProcessorId = "sqlite",
+                    ConnectionString = connectionString.Value(),
+                };
             }
+
+            return DefaultDatabaseConfigurations.Sqlite;
+        }
+
+        private enum MigrationMode
+        {
+            Legacy,
+            DI,
         }
     }
 }

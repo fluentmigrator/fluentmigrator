@@ -14,18 +14,20 @@
 // limitations under the License.
 #endregion
 
+using System;
+using System.Linq;
+
 using FluentMigrator.Example.Migrations;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
-using FluentMigrator.Runner.Processors.SQLite;
 
 namespace FluentMigrator.Example.Migrator
 {
     internal static partial class Program
     {
-        private static void RunInLegacyMode(string connectionString)
+        private static void RunInLegacyMode(DatabaseConfiguration dbConfig)
         {
             // Create the announcer to output the migration messages
 #pragma warning disable 612
@@ -36,12 +38,17 @@ namespace FluentMigrator.Example.Migrator
 #pragma warning restore 612
 
             // Processor specific options (usually none are needed)
-            var options = new ProcessorOptions();
+            var options = new ProcessorOptions()
+            {
+                ConnectionString = dbConfig.ConnectionString,
+            };
 
             // Initialize the DB-specific processor
 #pragma warning disable 612
-            var processorFactory = new SQLiteProcessorFactory(serviceProvider: null);
-            var processor = processorFactory.Create(connectionString, announcer, options);
+            var processor = MigrationProcessorFactoryProvider
+                .RegisteredFactories.Single(
+                    x => string.Equals(x.Name, dbConfig.ProcessorId, StringComparison.OrdinalIgnoreCase))
+                .Create(dbConfig.ConnectionString, announcer, options);
 #pragma warning restore 612
 
             // Configure the runner

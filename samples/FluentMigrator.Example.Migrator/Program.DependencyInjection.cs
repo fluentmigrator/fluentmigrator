@@ -16,6 +16,7 @@
 
 using FluentMigrator.Example.Migrations;
 using FluentMigrator.Runner;
+using FluentMigrator.Runner.Processors;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -24,7 +25,7 @@ namespace FluentMigrator.Example.Migrator
 {
     internal static partial class Program
     {
-        private static void RunWithServices(string connectionString)
+        private static void RunWithServices(DatabaseConfiguration dbConfig)
         {
             // Initialize the services
             var serviceProvider = new ServiceCollection()
@@ -32,9 +33,14 @@ namespace FluentMigrator.Example.Migrator
                 .AddFluentMigratorCore()
                 .ConfigureRunner(
                     builder => builder
+#if NETFRAMEWORK
+                        .AddJet()
+#endif
                         .AddSQLite()
-                        .WithGlobalConnectionString(connectionString)
+                        .WithGlobalConnectionString(dbConfig.ConnectionString)
                         .ScanIn(typeof(AddGTDTables).Assembly).For.Migrations())
+                .Configure<SelectingProcessorAccessorOptions>(
+                    opt => opt.ProcessorId = dbConfig.ProcessorId)
                 .BuildServiceProvider();
 
             // Instantiate the runner
