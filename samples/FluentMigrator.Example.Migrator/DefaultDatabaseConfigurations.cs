@@ -15,7 +15,9 @@
 #endregion
 
 using System;
+#if NETFRAMEWORK
 using System.Data.OleDb;
+#endif
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 

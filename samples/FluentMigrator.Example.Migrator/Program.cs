@@ -46,7 +46,7 @@ namespace FluentMigrator.Example.Migrator
         {
             var app = new CommandLineApplication();
 
-            var help = app.HelpOption();
+            app.HelpOption();
             var processor = app.Option(
                 "-d|--dialect <DIALECT>",
                 $"The database dialect ({string.Join(",", DefaultConfigurations.Keys)})",
@@ -74,7 +74,7 @@ namespace FluentMigrator.Example.Migrator
                 .AddFluentMigratorCore()
                 .ConfigureRunner(
                     builder => builder
-#if NET461
+#if NETFRAMEWORK
                         .AddJet()
 #endif
                         .AddSQLite()
