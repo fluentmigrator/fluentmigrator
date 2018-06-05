@@ -79,7 +79,7 @@ namespace FluentMigrator.Example.Migrator
 #endif
                         .AddSQLite()
                         .WithGlobalConnectionString(dbConfig.ConnectionString)
-                        .WithMigrationsIn(typeof(AddGTDTables).Assembly))
+                        .ScanIn(typeof(AddGTDTables).Assembly).For.Migrations())
                 .Configure<SelectingProcessorAccessorOptions>(
                     opt => opt.ProcessorId = dbConfig.ProcessorId)
                 .BuildServiceProvider();
