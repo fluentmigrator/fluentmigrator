@@ -948,6 +948,7 @@ namespace FluentMigrator.Tests.Integration
 
             ExecuteWithProcessor<SqlServer2008Processor>(
                 services => services
+                    .ConfigureRunner(rb => rb.WithVersionTable(new TestVersionTableMetaData()))
                     .WithMigrationsIn(RootNamespace)
                     .Configure<ProcessorOptions>(opt => opt.PreviewOnly = true)
                     .AddSingleton<ILoggerProvider>(provider),
