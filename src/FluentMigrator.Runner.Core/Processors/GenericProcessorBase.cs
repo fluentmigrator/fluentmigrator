@@ -43,6 +43,8 @@ namespace FluentMigrator.Runner.Processors
         [CanBeNull]
         private IDbConnection _connection;
 
+        private bool _disposed = false;
+
         [Obsolete]
         protected GenericProcessorBase(
             IDbConnection connection,
@@ -172,6 +174,11 @@ namespace FluentMigrator.Runner.Processors
 
         protected override void Dispose(bool isDisposing)
         {
+            if (!isDisposing || _disposed)
+                return;
+
+            _disposed = true;
+
             RollbackTransaction();
             EnsureConnectionIsClosed();
             if ((_connection != null || (_lazyConnection.IsValueCreated && Connection != null)))

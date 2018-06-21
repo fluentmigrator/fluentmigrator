@@ -39,6 +39,7 @@ namespace FluentMigrator.Runner.Processors.Jet
         private OleDbTransaction _transaction;
         public OleDbConnection Connection => _connection.Value;
         public OleDbTransaction Transaction => _transaction;
+        private bool _disposed = false;
 
         [Obsolete]
         public JetProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options)
@@ -276,6 +277,11 @@ namespace FluentMigrator.Runner.Processors.Jet
 
         protected override void Dispose(bool isDisposing)
         {
+            if (!isDisposing || _disposed)
+                return;
+
+            _disposed = true;
+
             RollbackTransaction();
             EnsureConnectionIsClosed();
         }
