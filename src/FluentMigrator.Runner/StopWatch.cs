@@ -22,7 +22,7 @@ namespace FluentMigrator.Runner
 {
     public class StopWatch : IStopWatch
     {
-        public static Func<DateTime> TimeNow = () => DateTime.Now;
+        public static Func<DateTime> TimeNow { get; set; } = () => DateTime.Now;
 
         private DateTime _startTime;
         private DateTime _endTime;

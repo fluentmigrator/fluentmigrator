@@ -28,9 +28,9 @@ namespace FluentMigrator.Runner.Infrastructure
     public static class RuntimeHost
     {
 #if NETFRAMEWORK
-        public static string BaseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+        public static string BaseDirectory { get; set; } = AppDomain.CurrentDomain.BaseDirectory;
 #else
-        public static string BaseDirectory = AppContext.BaseDirectory;
+        public static string BaseDirectory { get; set; } = AppContext.BaseDirectory;
 #endif
 
         public static IEnumerable<AssemblyName> FindAssemblies(string name)
