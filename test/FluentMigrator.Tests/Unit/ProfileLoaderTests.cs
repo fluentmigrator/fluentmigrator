@@ -20,7 +20,7 @@ using System.Linq;
 
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Initialization;
-
+using FluentMigrator.Tests.Integration;
 using Microsoft.Extensions.DependencyInjection;
 
 using Moq;
@@ -41,7 +41,7 @@ namespace FluentMigrator.Tests.Unit
 
             var profileLoader = (ProfileLoader)ServiceCollectionExtensions.CreateServices()
                 .Configure<RunnerOptions>(opt => opt.Profile = string.Empty)
-                .WithAllTestMigrations()
+                .WithMigrationsIn(typeof(IntegrationTestBase).Namespace, true)
                 .BuildServiceProvider()
                 .GetRequiredService<IProfileLoader>();
 
