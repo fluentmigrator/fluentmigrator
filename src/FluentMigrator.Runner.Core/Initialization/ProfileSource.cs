@@ -55,7 +55,7 @@ namespace FluentMigrator.Runner.Initialization
             if (!_conventions.TypeIsProfile(type))
                 return false;
             var profileAttribute = type.GetCustomAttribute<ProfileAttribute>();
-            return string.IsNullOrEmpty(profile) || string.Equals(profileAttribute.ProfileName, profile);
+            return !string.IsNullOrEmpty(profile) && string.Equals(profileAttribute.ProfileName, profile);
         }
     }
 }
