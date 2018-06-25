@@ -52,13 +52,6 @@ namespace FluentMigrator.Tests
             return services;
         }
 
-        public static IServiceCollection WithAllTestMigrations(
-            [NotNull] this IServiceCollection services)
-        {
-            return services
-                .WithMigrationsIn(@namespace: null);
-        }
-
         [MethodImpl(MethodImplOptions.NoInlining)]
         public static IServiceCollection WithMigrationsIn(
             [NotNull] this IServiceCollection services,

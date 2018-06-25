@@ -37,6 +37,8 @@ namespace FluentMigrator.Runner.Processors
         [NotNull, ItemNotNull]
         private readonly Lazy<DbConnection> _lazyConnection;
 
+        private bool _disposed = false;
+
         protected GenericProcessorBase(
             [NotNull] Func<DbProviderFactory> factoryAccessor,
             [NotNull] IMigrationGenerator generator,
@@ -120,6 +122,11 @@ namespace FluentMigrator.Runner.Processors
 
         protected override void Dispose(bool isDisposing)
         {
+            if (!isDisposing || _disposed)
+                return;
+
+            _disposed = true;
+
             RollbackTransaction();
             EnsureConnectionIsClosed();
             if (_lazyConnection.IsValueCreated)

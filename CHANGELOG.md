@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## 3.1.3
+
+### Fixed
+
+- Migration loader doesn't try to load profiles anymore (fixes #904)
+
+## 3.1.2
+
+### Fixed
+
+- Avoid duplicate Dispose calls (fixes #901)
+
+## 3.1.1
+
+### Fixed
+
+- The FluentMigrator.Console package doesn't depend on the FluentMigrator package, because it's already included
+
 ## 3.1.0
 
 ### Added

@@ -129,6 +129,8 @@ namespace FluentMigrator.Runner
             {
                 if (!type.IsInNamespace(@namespace, loadNestedNamespaces))
                     return false;
+                if (!conventions.TypeIsMigration(type))
+                    return false;
                 return conventions.TypeHasMatchingTags(type, tagsToMatch)
                  || (tagsToMatch.Count == 0 && !conventions.TypeHasTags(type))
                  || !conventions.TypeHasTags(type);
