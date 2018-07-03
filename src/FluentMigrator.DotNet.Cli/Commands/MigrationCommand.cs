@@ -46,5 +46,8 @@ namespace FluentMigrator.DotNet.Cli.Commands
 
         [Option("-b|--allow-breaking-changes", Description = "Allows execution of migrations marked as breaking changes.")]
         public bool AllowBreakingChanges { get; }
+
+        [Option("--default-schema-name", Description = "Set default Schema Name for VersionInfo table")]
+        public string SchemaName { get; internal set; } = null;
     }
 }
