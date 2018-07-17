@@ -28,6 +28,7 @@ namespace FluentMigrator.Tests.IssueTests.GH0904
     [TestFixture]
     [Category("Issue")]
     [Category("GH-0904")]
+    [Category("SQLite")]
     public class Fixture
     {
         private string _sqliteDbFileName;

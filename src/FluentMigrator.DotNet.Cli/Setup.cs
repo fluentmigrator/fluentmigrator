@@ -44,7 +44,7 @@ namespace FluentMigrator.DotNet.Cli
 
         private static IServiceProvider ConfigureServices(IServiceCollection services, MigratorOptions options, IConsole console)
         {
-            var conventionSet = new DefaultConventionSet(defaultSchemaName: null, options.WorkingDirectory);
+            var conventionSet = new DefaultConventionSet(defaultSchemaName: options.SchemaName, options.WorkingDirectory);
 
             var targetIsSqlServer = !string.IsNullOrEmpty(options.ProcessorType)
              && options.ProcessorType.StartsWith("sqlserver", StringComparison.OrdinalIgnoreCase);

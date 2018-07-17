@@ -56,6 +56,7 @@ namespace FluentMigrator.DotNet.Cli
         public bool Output { get; private set; }
         public string OutputFileName { get; private set; }
         public bool AllowBreakingChanges { get; private set; }
+        public string SchemaName { get; private set; }
 
         public static MigratorOptions CreateListMigrations(ListMigrations cmd)
         {
@@ -138,6 +139,7 @@ namespace FluentMigrator.DotNet.Cli
             WorkingDirectory = cmd.WorkingDirectory;
             Tags = cmd.Tags?.ToList() ?? new List<string>();
             AllowBreakingChanges = cmd.AllowBreakingChanges;
+            SchemaName = cmd.SchemaName;
             return this;
         }
     }
