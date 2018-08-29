@@ -26,6 +26,7 @@ using FluentMigrator.Runner.VersionTableInfo;
 using JetBrains.Annotations;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner
 {
@@ -59,6 +60,27 @@ namespace FluentMigrator.Runner
             string connectionStringOrName)
         {
             builder.Services.Configure<ProcessorOptions>(opt => opt.ConnectionString = connectionStringOrName);
+            return builder;
+        }
+
+        /// <summary>
+        /// Sets the global connection string
+        /// </summary>
+        /// <param name="builder">The runner builder</param>
+        /// <param name="configureConnectionString">The function that creates the connection string.</param>
+        /// <returns>The runner builder</returns>
+        public static IMigrationRunnerBuilder WithGlobalConnectionString(
+            this IMigrationRunnerBuilder builder, Func<IServiceProvider, string> configureConnectionString)
+        {
+            builder.Services
+                .AddSingleton<IConfigureOptions<ProcessorOptions>>(
+                    s =>
+                    {
+                        return new ConfigureNamedOptions<ProcessorOptions>(
+                            Options.DefaultName,
+                            opt => opt.ConnectionString = configureConnectionString(s));
+                    });
+
             return builder;
         }
 
