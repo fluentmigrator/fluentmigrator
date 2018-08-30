@@ -68,7 +68,7 @@ namespace FluentMigrator.Runner
         /// Register Oracle processor dependencies
         /// </summary>
         /// <param name="builder">The builder to add the Oracle-specific services to</param>
-        private static IMigrationRunnerBuilder RegisterOracleProcessor(IMigrationRunnerBuilder builder)
+        private static void RegisterOracleProcessor(IMigrationRunnerBuilder builder)
         {
             RegisterOracleQuoter(builder);
 
@@ -77,15 +77,13 @@ namespace FluentMigrator.Runner
                 .AddScoped<OracleProcessor>()
                 .AddScoped<OracleProcessorBase>(sp => sp.GetRequiredService<OracleProcessor>())
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<OracleProcessor>());
-
-            return builder;
         }
 
         /// <summary>
         /// Register Oracle managed processor dependencies
         /// </summary>
         /// <param name="builder">The builder to add the Oracle-specific services to</param>
-        private static IMigrationRunnerBuilder RegisterOracleManagedProcessor(IMigrationRunnerBuilder builder)
+        private static void RegisterOracleManagedProcessor(IMigrationRunnerBuilder builder)
         {
             RegisterOracleQuoter(builder);
 
@@ -94,15 +92,13 @@ namespace FluentMigrator.Runner
                 .AddScoped<OracleManagedProcessor>()
                 .AddScoped<OracleProcessorBase>(sp => sp.GetRequiredService<OracleManagedProcessor>())
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<OracleManagedProcessor>());
-
-            return builder;
         }
 
         /// <summary>
         /// Register dotConnection Oracle processor dependencies
         /// </summary>
         /// <param name="builder">The builder to add the Oracle-specific services to</param>
-        private static IMigrationRunnerBuilder RegisterDotConnectOracleProcessor(IMigrationRunnerBuilder builder)
+        private static void RegisterDotConnectOracleProcessor(IMigrationRunnerBuilder builder)
         {
             RegisterOracleQuoter(builder);
 
@@ -110,8 +106,6 @@ namespace FluentMigrator.Runner
                 .AddScoped<DotConnectOracleDbFactory>()
                 .AddScoped<DotConnectOracleProcessor>()
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<DotConnectOracleProcessor>());
-
-            return builder;
         }
 
         /// <summary>

@@ -24,18 +24,122 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Oracle
 {
-    public static partial class OracleExtensions
+    public static class OracleExtensions
     {
-        public const string IdentityGeneration = "OracleIdentityGeneration";
-        public const string IdentityStartWith = "OracleIdentityStartWith";
-        public const string IdentityIncrementBy = "OracleIdentityIncrementBy";
-        public const string IdentityMinValue = "OracleIdentityMinValue";
-        public const string IdentityMaxValue = "OracleIdentityMaxValue";
+        public static string IdentityGeneration => "OracleIdentityGeneration";
+        public static string IdentityStartWith => "OracleIdentityStartWith";
+        public static string IdentityIncrementBy => "OracleIdentityIncrementBy";
+        public static string IdentityMinValue => "OracleIdentityMinValue";
+        public static string IdentityMaxValue => "OracleIdentityMaxValue";
 
         private static string UnsupportedMethodMessage(object methodName, string interfaceName)
         {
             var msg = string.Format(ErrorMessages.MethodXMustBeCalledOnObjectImplementingY, methodName, interfaceName);
             return msg;
+        }
+
+        /// <summary>
+        /// Makes a column an Identity column using the specified generation type.
+        /// </summary>
+        /// <param name="expression">Column on which to apply the identity.</param>
+        /// <param name="generation">The generation type</param>
+        /// <returns></returns>
+        public static TNext Identity<TNext, TNextFk>(
+            this IColumnOptionSyntax<TNext, TNextFk> expression,
+            OracleGenerationType generation)
+            where TNext : IFluentSyntax where TNextFk : IFluentSyntax
+        {
+            var castColumn = GetColumn(expression);
+            return SetIdentity(expression, generation, startWith: null, incrementBy: null, minValue: null, maxValue: null, castColumn);
+        }
+
+        /// <summary>
+        /// Makes a column an Identity column using the specified generation type, seed and increment values.
+        /// </summary>
+        /// <param name="expression">Column on which to apply the identity.</param>
+        /// <param name="generation">The generation type</param>
+        /// <param name="startWith">Starting value of the identity.</param>
+        /// <param name="incrementBy">Increment value of the identity.</param>
+        /// <returns></returns>
+        public static TNext Identity<TNext, TNextFk>(
+            this IColumnOptionSyntax<TNext, TNextFk> expression,
+            OracleGenerationType generation,
+            int startWith,
+            int incrementBy)
+            where TNext : IFluentSyntax where TNextFk : IFluentSyntax
+        {
+            var castColumn = GetColumn(expression);
+            return SetIdentity(expression, generation, startWith, incrementBy, minValue: null, maxValue: null, castColumn);
+        }
+
+        /// <summary>
+        /// Makes a column an Identity column using the specified generation type, seed and increment values with bigint support.
+        /// </summary>
+        /// <param name="expression">Column on which to apply the identity.</param>
+        /// <param name="generation">The generation type</param>
+        /// <param name="startWith">Starting value of the identity.</param>
+        /// <param name="incrementBy">Increment value of the identity.</param>
+        /// <returns></returns>
+        public static TNext Identity<TNext, TNextFk>(
+            this IColumnOptionSyntax<TNext, TNextFk> expression,
+            OracleGenerationType generation,
+            long startWith,
+            int incrementBy)
+            where TNext : IFluentSyntax where TNextFk : IFluentSyntax
+        {
+            var castColumn = GetColumn(expression);
+            return SetIdentity(expression, generation, startWith, incrementBy, minValue: null, maxValue: null, castColumn);
+        }
+
+        /// <summary>
+        /// Makes a column an Identity column using the specified generation type, startWith, increment, minValue and maxValue with bigint support.
+        /// </summary>
+        /// <param name="expression">Column on which to apply the identity.</param>
+        /// <param name="generation">The generation type</param>
+        /// <param name="startWith">Starting value of the identity.</param>
+        /// <param name="incrementBy">Increment value of the identity.</param>
+        /// <param name="minValue">Min value of the identity.</param>
+        /// <param name="maxValue">Max value of the identity.</param>
+        /// <returns></returns>
+        public static TNext Identity<TNext, TNextFk>(
+            this IColumnOptionSyntax<TNext, TNextFk> expression,
+            OracleGenerationType generation,
+            long startWith,
+            int incrementBy,
+            long minValue,
+            long maxValue)
+            where TNext : IFluentSyntax where TNextFk : IFluentSyntax
+        {
+            var castColumn = GetColumn(expression);
+            return SetIdentity(expression, generation, startWith, incrementBy, minValue, maxValue, castColumn);
+        }
+
+        private static TNext SetIdentity<TNext, TNextFk>(
+            IColumnOptionSyntax<TNext, TNextFk> expression,
+            OracleGenerationType generation,
+            object startWith,
+            int? incrementBy,
+            long? minValue,
+            long? maxValue,
+            ISupportAdditionalFeatures castColumn)
+            where TNext : IFluentSyntax where TNextFk : IFluentSyntax
+        {
+            castColumn.AdditionalFeatures[IdentityGeneration] = generation;
+            castColumn.AdditionalFeatures[IdentityStartWith] = startWith;
+            castColumn.AdditionalFeatures[IdentityIncrementBy] = incrementBy;
+            castColumn.AdditionalFeatures[IdentityMinValue] = minValue;
+            castColumn.AdditionalFeatures[IdentityMaxValue] = maxValue;
+            return expression.Identity();
+        }
+
+        private static ISupportAdditionalFeatures GetColumn<TNext, TNextFk>(IColumnOptionSyntax<TNext, TNextFk> expression) where TNext : IFluentSyntax where TNextFk : IFluentSyntax
+        {
+            if (expression is IColumnExpressionBuilder cast1)
+            {
+                return cast1.Column;
+            }
+
+            throw new InvalidOperationException(UnsupportedMethodMessage(nameof(IdentityGeneration), nameof(IColumnExpressionBuilder)));
         }
     }
 }
