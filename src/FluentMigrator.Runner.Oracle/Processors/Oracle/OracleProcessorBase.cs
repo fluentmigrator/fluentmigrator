@@ -246,6 +246,13 @@ namespace FluentMigrator.Runner.Processors.Oracle
 
         public override void Process(PerformDBOperationExpression expression)
         {
+            Logger.LogSay("Performing DB Operation");
+
+            if (Options.PreviewOnly)
+            {
+                return;
+            }
+
             EnsureConnectionIsOpen();
 
             expression.Operation?.Invoke(Connection, null);
