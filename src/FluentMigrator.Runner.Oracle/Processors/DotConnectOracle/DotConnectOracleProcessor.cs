@@ -139,9 +139,18 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
             if (template == null)
                 throw new ArgumentNullException(nameof(template));
 
+            var sql = string.Format(template, args);
+
+            Logger.LogSql(sql);
+
+            if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
+            {
+                return;
+            }
+
             EnsureConnectionIsOpen();
 
-            using (var command = CreateCommand(string.Format(template, args)))
+            using (var command = CreateCommand(sql))
             {
                 command.ExecuteNonQuery();
             }
