@@ -136,24 +136,7 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
 
         public override void Execute(string template, params object[] args)
         {
-            if (template == null)
-                throw new ArgumentNullException(nameof(template));
-
-            var sql = string.Format(template, args);
-
-            Logger.LogSql(sql);
-
-            if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
-            {
-                return;
-            }
-
-            EnsureConnectionIsOpen();
-
-            using (var command = CreateCommand(sql))
-            {
-                command.ExecuteNonQuery();
-            }
+            Process(string.Format(template, args));
         }
 
         public override bool Exists(string template, params object[] args)
