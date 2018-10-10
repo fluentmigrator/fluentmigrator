@@ -44,5 +44,10 @@ namespace FluentMigrator.Runner.Processors
         /// Gets or sets the provider switches
         /// </summary>
         public string ProviderSwitches  { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the comments should be stripped
+        /// </summary>
+        public bool StripComments { get; set; }
     }
 }

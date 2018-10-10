@@ -157,9 +157,29 @@ namespace FluentMigrator.Runner.Generators.Oracle
             get { return "INTO {0} ({1}) VALUES ({2})"; }
         }
 
-        private string ExpandTableName(string schema, string table)
+        private static string ExpandTableName(string schema, string table)
         {
             return string.IsNullOrEmpty(schema) ? table : string.Concat(schema,".",table);
+        }
+
+        private static string WrapStatementInExecuteImmediateBlock(string statement)
+        {
+            if (string.IsNullOrEmpty(statement))
+            {
+                return string.Empty;
+            }
+
+            return string.Format("EXECUTE IMMEDIATE '{0}';", FormatHelper.FormatSqlEscape(statement));
+        }
+
+        private static string WrapInBlock(string sql)
+        {
+            if (string.IsNullOrEmpty(sql))
+            {
+                return string.Empty;
+            }
+
+            return string.Format("BEGIN {0} END;", sql);
         }
 
         private string InnerGenerate(CreateTableExpression expression)
@@ -170,13 +190,20 @@ namespace FluentMigrator.Runner.Generators.Oracle
             return string.Format("CREATE TABLE {0} ({1})",ExpandTableName(schemaName,tableName), Column.Generate(expression.Columns, tableName));
         }
 
+        protected override StringBuilder AppendSqlStatementEndToken(StringBuilder stringBuilder)
+        {
+            return stringBuilder.AppendLine().AppendLine(";");
+        }
+
         public override string Generate(CreateTableExpression expression)
         {
             var descriptionStatements = DescriptionGenerator.GenerateDescriptionStatements(expression);
             var statements = descriptionStatements as string[] ?? descriptionStatements.ToArray();
 
             if (!statements.Any())
+            {
                 return InnerGenerate(expression);
+            }
 
             var wrappedCreateTableStatement = WrapStatementInExecuteImmediateBlock(InnerGenerate(expression));
             var createTableWithDescriptionsBuilder = new StringBuilder(wrappedCreateTableStatement);
@@ -198,7 +225,9 @@ namespace FluentMigrator.Runner.Generators.Oracle
             var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatement(expression);
 
             if (string.IsNullOrEmpty(descriptionStatement))
+            {
                 return base.Generate(expression);
+            }
 
             return descriptionStatement;
         }
@@ -282,27 +311,6 @@ namespace FluentMigrator.Runner.Generators.Oracle
             var quotedIndex = Quoter.QuoteIndexName(expression.Index.Name);
             var indexName = string.IsNullOrEmpty(quotedSchema) ? quotedIndex : $"{quotedSchema}.{quotedIndex}";
             return string.Format("DROP INDEX {0}", indexName);
-        }
-
-        protected override StringBuilder AppendSqlStatementEndToken(StringBuilder stringBuilder)
-        {
-            return stringBuilder.AppendLine().AppendLine(";");
-        }
-
-        private string WrapStatementInExecuteImmediateBlock(string statement)
-        {
-            if (string.IsNullOrEmpty(statement))
-                return string.Empty;
-
-            return string.Format("EXECUTE IMMEDIATE '{0}';", FormatHelper.FormatSqlEscape(statement));
-        }
-
-        private string WrapInBlock(string sql)
-        {
-            if (string.IsNullOrEmpty(sql))
-                return string.Empty;
-
-            return string.Format("BEGIN {0} END;", sql);
         }
     }
 }
