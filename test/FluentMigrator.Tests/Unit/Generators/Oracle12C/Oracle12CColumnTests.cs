@@ -16,14 +16,17 @@
 //
 #endregion
 
-using FluentMigrator.Exceptions;
 using FluentMigrator.Runner.Generators.Oracle;
+using FluentMigrator.Tests.Unit.Generators.Oracle;
+
 using NUnit.Framework;
 
-namespace FluentMigrator.Tests.Unit.Generators.Oracle
+using Shouldly;
+
+namespace FluentMigrator.Tests.Unit.Generators.Oracle12C
 {
     [TestFixture]
-    public class OracleColumnTests : OracleBaseColumnTests<OracleGenerator>
+    public class Oracle12CColumnTests : OracleBaseColumnTests<Oracle12CGenerator>
     {
         [Test]
         public override void CanCreateAutoIncrementColumnWithCustomSchema()
@@ -31,7 +34,8 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             var expression = GeneratorTestHelper.GetAlterColumnAddAutoIncrementExpression();
             expression.SchemaName = "TestSchema";
 
-            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE TestSchema.TestTable1 MODIFY TestColumn1 NUMBER(10,0) GENERATED ALWAYS AS IDENTITY ");
         }
 
         [Test]
@@ -39,7 +43,8 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         {
             var expression = GeneratorTestHelper.GetAlterColumnAddAutoIncrementExpression();
 
-            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE TestTable1 MODIFY TestColumn1 NUMBER(10,0) GENERATED ALWAYS AS IDENTITY ");
         }
     }
 }

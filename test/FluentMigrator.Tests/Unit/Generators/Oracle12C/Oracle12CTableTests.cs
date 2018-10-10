@@ -16,14 +16,17 @@
 //
 #endregion
 
-using FluentMigrator.Exceptions;
 using FluentMigrator.Runner.Generators.Oracle;
+using FluentMigrator.Tests.Unit.Generators.Oracle;
+
 using NUnit.Framework;
 
-namespace FluentMigrator.Tests.Unit.Generators.Oracle
+using Shouldly;
+
+namespace FluentMigrator.Tests.Unit.Generators.Oracle12C
 {
     [TestFixture]
-    public class OracleTableTests : OracleBaseTableTests<OracleGenerator>
+    public class Oracle12CTableTests : OracleBaseTableTests<Oracle12CGenerator>
     {
         [Test]
         public override void CanCreateTableWithIdentityWithCustomSchema()
@@ -31,13 +34,17 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();
             expression.SchemaName = "TestSchema";
 
-            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE TestSchema.TestTable1 (TestColumn1 NUMBER(10,0) GENERATED ALWAYS AS IDENTITY , TestColumn2 NUMBER(10,0) NOT NULL)");
         }
 
         [Test]
         public override void CanCreateTableWithIdentityWithDefaultSchema()
         {
-            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression()));
+            var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 NUMBER(10,0) GENERATED ALWAYS AS IDENTITY , TestColumn2 NUMBER(10,0) NOT NULL)");
         }
     }
 }
