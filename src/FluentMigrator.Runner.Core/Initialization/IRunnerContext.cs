@@ -195,5 +195,10 @@ namespace FluentMigrator.Runner.Initialization
         /// The default schema name must be set using the <see cref="IConventionSet.SchemaConvention"/>
         /// </remarks>
         string DefaultSchemaName { get;set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the comments should be stripped
+        /// </summary>
+        bool StripComments { get; set; }
     }
 }

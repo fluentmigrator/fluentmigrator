@@ -60,5 +60,7 @@ namespace FluentMigrator.Runner.Initialization
 
         /// <inheritdoc />
         public string DefaultSchemaName { get; set; }
+
+        public bool StripComments { get; set; }
     }
 }

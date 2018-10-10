@@ -237,7 +237,7 @@ namespace FluentMigrator.Runner.Processors.SQLite
 
                 using (var source = new TextReaderSource(new StringReader(sql), true))
                 {
-                    parser.Process(source, stripComments: true);
+                    parser.Process(source, stripComments: Options.StripComments);
                 }
 
                 if (!string.IsNullOrEmpty(sqlBatch))

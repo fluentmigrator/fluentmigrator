@@ -77,6 +77,20 @@ namespace FluentMigrator.Runner
         }
 
         /// <summary>
+        /// Sets the global strip comment
+        /// </summary>
+        /// <param name="builder">The runner builder</param>
+        /// <param name="stripComments">The global strip comments</param>
+        /// <returns>The runner builder</returns>
+        public static IMigrationRunnerBuilder WithGlobalStripComments(
+            this IMigrationRunnerBuilder builder,
+            bool stripComments)
+        {
+            builder.Services.Configure<ProcessorOptions>(opt => opt.StripComments = stripComments);
+            return builder;
+        }
+
+        /// <summary>
         /// Sets the global preview mode
         /// </summary>
         /// <param name="builder">The runner builder</param>
