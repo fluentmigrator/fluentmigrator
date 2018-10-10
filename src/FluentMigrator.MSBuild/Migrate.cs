@@ -108,6 +108,8 @@ namespace FluentMigrator.MSBuild
 
         public string ProviderSwitches { get; set; }
 
+        public bool StripComments { get; set; } = true;
+
         private bool ExecutingAgainstMsSql => _databaseType.StartsWith("SqlServer", StringComparison.InvariantCultureIgnoreCase);
 
         public override bool Execute()
@@ -184,6 +186,7 @@ namespace FluentMigrator.MSBuild
                         opt.ConnectionString = Connection;
                         opt.PreviewOnly = PreviewOnly;
                         opt.ProviderSwitches = ProviderSwitches;
+                        opt.StripComments = StripComments;
                         opt.Timeout = _timeout == null ? null : (TimeSpan?)TimeSpan.FromSeconds(_timeout.Value);
                     });
 

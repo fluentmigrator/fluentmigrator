@@ -123,6 +123,7 @@ namespace FluentMigrator.DotNet.Cli
                         opt.ConnectionString = options.ConnectionString;
                         opt.PreviewOnly = options.Preview;
                         opt.ProviderSwitches = options.ProcessorSwitches;
+                        opt.StripComments = options.StripComments;
                         opt.Timeout = options.Timeout == null ? null : (TimeSpan?) TimeSpan.FromSeconds(options.Timeout.Value);
                     });
 
