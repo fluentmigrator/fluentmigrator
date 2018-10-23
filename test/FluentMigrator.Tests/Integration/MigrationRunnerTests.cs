@@ -31,7 +31,10 @@ using FluentMigrator.Runner.Logging;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Runner.Processors.MySql;
+using FluentMigrator.Runner.Processors.Oracle;
 using FluentMigrator.Runner.Processors.Postgres;
+using FluentMigrator.Runner.Processors.Redshift;
+using FluentMigrator.Runner.Processors.Snowflake;
 using FluentMigrator.Runner.Processors.SqlAnywhere;
 using FluentMigrator.Runner.Processors.SQLite;
 using FluentMigrator.Runner.Processors.SqlServer;
@@ -85,7 +88,9 @@ namespace FluentMigrator.Tests.Integration
 
                     runner.Down(new TestCreateAndDropTableMigration());
                     processor.TableExists(null, "TestTable").ShouldBeFalse();
-                });
+                },
+                true,
+                typeof(SnowflakeProcessor) /* Snowflake does not have default schema. */);
         }
 
         [Test]
@@ -93,6 +98,7 @@ namespace FluentMigrator.Tests.Integration
         [Category("MySql")]
         [Category("SQLite")]
         [Category("Postgres")]
+        [Category("Snowflake")]
         [Category("SqlServer2005")]
         [Category("SqlServer2008")]
         [Category("SqlServer2012")]
@@ -148,12 +154,14 @@ namespace FluentMigrator.Tests.Integration
                     processor.ConstraintExists(null, "Users", "FK_Users_GroupId_Groups_GroupId").ShouldBeFalse();
                 },
                 true,
-                typeof(SQLiteProcessor));
+                typeof(SQLiteProcessor),
+                typeof(SnowflakeProcessor) /* Snowflake does not have default schema. */);
         }
 
         [Test]
         [Category("MySql")]
         [Category("Postgres")]
+        [Category("Snowflake")]
         [Category("SqlServer2005")]
         [Category("SqlServer2008")]
         [Category("SqlServer2012")]
@@ -204,7 +212,9 @@ namespace FluentMigrator.Tests.Integration
                     runner.Down(new TestIndexNamingConvention());
                     processor.IndexExists(null, "Users", "IX_Users_GroupId").ShouldBeFalse();
                     processor.TableExists(null, "Users").ShouldBeFalse();
-                });
+                },
+                true,
+                typeof(SnowflakeProcessor) /* Snowflake does not have default schema. */);
         }
 
         [Test]
@@ -236,7 +246,8 @@ namespace FluentMigrator.Tests.Integration
                     processor.TableExists(null, "Users").ShouldBeFalse();
                 },
                 false,
-                typeof(SQLiteProcessor));
+                typeof(SQLiteProcessor),
+                typeof(SnowflakeProcessor) /* Snowflake does not have default schema. */);
         }
 
         [Test]
@@ -265,7 +276,9 @@ namespace FluentMigrator.Tests.Integration
                     runner.Down(new TestIndexNamingConventionWithSchema());
                     processor.IndexExists("TestSchema", "Users", "IX_Users_GroupId").ShouldBeFalse();
                     processor.TableExists("TestSchema", "Users").ShouldBeFalse();
-                });
+                },
+                true,
+                typeof(SnowflakeProcessor) /* Snowflake does not support indices. */);
         }
 
         [Test]
@@ -300,7 +313,9 @@ namespace FluentMigrator.Tests.Integration
                     processor.IndexExists(null, "TestTable", "IX_TestTable_Name").ShouldBeFalse();
 
                     //processor.CommitTransaction();
-                });
+                },
+                true,
+                typeof(SnowflakeProcessor) /* Snowflake does not support indices. */);
         }
 
         [Test]
@@ -339,7 +354,8 @@ namespace FluentMigrator.Tests.Integration
                 },
                 false,
                 typeof(SQLiteProcessor),
-                typeof(FirebirdProcessor));
+                typeof(FirebirdProcessor),
+                typeof(SnowflakeProcessor) /* Snowflake does not support indices. */);
         }
 
         [Test]
@@ -376,7 +392,9 @@ namespace FluentMigrator.Tests.Integration
                     processor.TableExists(null, "TestTable2").ShouldBeFalse();
 
                     //processor.CommitTransaction();
-                });
+                },
+                true,
+                typeof(SnowflakeProcessor) /* Snowflake does not have default schema. */);
         }
 
         [Test]
@@ -417,7 +435,9 @@ namespace FluentMigrator.Tests.Integration
                     runner.Down(new TestCreateSchema());
 
                     //processor.CommitTransaction();
-                });
+                },
+                true,
+                typeof(SnowflakeProcessor) /* This test fails with Snowflake because special characters are used in table name and identifier quoting is disabled. */);
         }
 
         [Test]
@@ -453,7 +473,8 @@ namespace FluentMigrator.Tests.Integration
                     processor.ColumnExists(null, "TestTable2", "Name").ShouldBeFalse();
                 },
                 true,
-                typeof(SQLiteProcessor));
+                typeof(SQLiteProcessor),
+                typeof(SnowflakeProcessor) /* Snowflake does not have default schema. */);
         }
 
         [Test]
@@ -493,7 +514,8 @@ namespace FluentMigrator.Tests.Integration
                 },
                 true,
                 typeof(SQLiteProcessor),
-                typeof(FirebirdProcessor));
+                typeof(FirebirdProcessor),
+                typeof(SnowflakeProcessor) /* This test fails with Snowflake because special characters are used in column name and identifier quoting is disabled. */);
         }
 
         [Test]
@@ -501,6 +523,7 @@ namespace FluentMigrator.Tests.Integration
         [Category("MySql")]
         [Category("SQLite")]
         [Category("Postgres")]
+        [Category("Snowflake")]
         [Category("SqlServer2005")]
         [Category("SqlServer2008")]
         [Category("SqlServer2012")]
@@ -543,7 +566,39 @@ namespace FluentMigrator.Tests.Integration
                     runner.VersionLoader.VersionInfo.ShouldNotBeNull();
                 },
                 true,
-                typeof(SqlAnywhere16Processor));
+                typeof(SqlAnywhere16Processor),
+                typeof(SnowflakeProcessor));
+        }
+
+        [Test]
+        [Category("Snowflake")]
+        [Category("SqlServer2016")]
+        public void CanLoadVersionCustomTable()
+        {
+            ExecuteWithSupportedProcessors(
+                services => services.ConfigureRunner(rb => rb.WithVersionTable(new TestVersionTableMetaData())).WithMigrationsIn(RootNamespace),
+                (serviceProvider, _) =>
+                {
+                    var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
+
+                    //runner.Processor.CommitTransaction();
+                    runner.VersionLoader.VersionInfo.ShouldNotBeNull();
+                },
+                true,
+                typeof(FirebirdProcessor),
+                typeof(MySqlProcessor),
+                typeof(MySql4Processor),
+                typeof(MySql5Processor),
+                typeof(OracleProcessor),
+                typeof(RedshiftProcessor),
+                typeof(SQLiteProcessor),
+                typeof(SqlServer2000Processor),
+                typeof(SqlServer2005Processor),
+                typeof(SqlServer2008Processor),
+                typeof(SqlServer2014Processor),
+                typeof(SqlServer2012Processor),
+                typeof(SqlAnywhere16Processor),
+                typeof(SqlAnywhereProcessor));
         }
 
         [Test]
@@ -577,7 +632,8 @@ namespace FluentMigrator.Tests.Integration
                     runner.RollbackToVersion(0, false);
                 },
                 true,
-                typeof(SqlAnywhere16Processor));
+                typeof(SqlAnywhere16Processor),
+                typeof(SnowflakeProcessor) /* (Some of) the migrations do not specify schema which is a requirement of Snowflake db. */);
         }
 
         [Test]
@@ -613,7 +669,8 @@ namespace FluentMigrator.Tests.Integration
                     }
                 },
                 true,
-                typeof(SqlAnywhere16Processor));
+                typeof(SqlAnywhere16Processor),
+                typeof(SnowflakeProcessor) /* The migrations do not specify schema, which is required by Snowflake. */);
         }
 
         [Test]
@@ -627,6 +684,13 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlServer2016")]
         public void CanMigrateASpecificVersionDown()
         {
+            var excludedProcessors = new[]
+            {
+                typeof(SQLiteProcessor),
+                typeof(SqlAnywhere16Processor),
+                typeof(SnowflakeProcessor) /* The migrations do not specify schema, which is required by Snowflake. */
+            };
+
             try
             {
                 ExecuteWithSupportedProcessors(
@@ -652,7 +716,7 @@ namespace FluentMigrator.Tests.Integration
                         processor.TableExists(null, "Users").ShouldBeFalse();
                     },
                     false,
-                    typeof(SQLiteProcessor), typeof(SqlAnywhere16Processor));
+                    excludedProcessors);
             }
             finally
             {
@@ -664,7 +728,7 @@ namespace FluentMigrator.Tests.Integration
                         runner.RollbackToVersion(0, false);
                     },
                     false,
-                    typeof(SQLiteProcessor), typeof(SqlAnywhere16Processor));
+                    excludedProcessors);
             }
         }
 
@@ -699,7 +763,8 @@ namespace FluentMigrator.Tests.Integration
                         runner.VersionLoader.VersionTableMetaData.TableName).ShouldBeFalse();
                 },
                 true,
-                typeof(SqlAnywhere16Processor));
+                typeof(SqlAnywhere16Processor),
+                typeof(SnowflakeProcessor) /* Snowflake does not have default schema. */);
         }
 
         [Test]
@@ -794,7 +859,8 @@ namespace FluentMigrator.Tests.Integration
                     }
                 },
                 true,
-                typeof(SqlAnywhere16Processor));
+                typeof(SqlAnywhere16Processor),
+                typeof(SnowflakeProcessor) /* Snowflake does not have default schema. */);
         }
 
         [Test]
@@ -831,7 +897,8 @@ namespace FluentMigrator.Tests.Integration
                     }
                 },
                 true,
-                typeof(SqlAnywhere16Processor));
+                typeof(SqlAnywhere16Processor),
+                typeof(SnowflakeProcessor) /* Snowflake does not have default schema. */);
         }
 
         [Test]
@@ -867,7 +934,8 @@ namespace FluentMigrator.Tests.Integration
                     }
                 },
                 true,
-                typeof(SqlAnywhere16Processor));
+                typeof(SqlAnywhere16Processor),
+                typeof(SnowflakeProcessor) /* Snowflake does not have default schema. */);
         }
 
         [Test]
@@ -882,6 +950,12 @@ namespace FluentMigrator.Tests.Integration
         public void MigrateDownWithDifferentTagsToMigrateUpShouldApplyMatchedMigrations()
         {
             var migrationsNamespace = typeof(TenantATable).Namespace;
+            var excludedProcessors = new[]
+            {
+                typeof(SQLiteProcessor),
+                typeof(SqlAnywhere16Processor),
+                typeof(SnowflakeProcessor) /* Snowflake does not have default schema. */
+            };
 
             try
             {
@@ -899,7 +973,7 @@ namespace FluentMigrator.Tests.Integration
                         processor.TableExists(null, "TenantAandBTable").ShouldBeTrue();
                     },
                     false,
-                    typeof(SQLiteProcessor), typeof(SqlAnywhere16Processor));
+                    excludedProcessors);
 
                 ExecuteWithSupportedProcessors(
                     services => services.WithMigrationsIn(migrationsNamespace).Configure<RunnerOptions>(opt => opt.Tags = new[] { "TenantB" }),
@@ -914,7 +988,7 @@ namespace FluentMigrator.Tests.Integration
                         processor.TableExists(null, "TenantAandBTable").ShouldBeFalse();
                     },
                     false,
-                    typeof(SQLiteProcessor), typeof(SqlAnywhere16Processor));
+                    excludedProcessors);
             }
             finally
             {
@@ -926,7 +1000,7 @@ namespace FluentMigrator.Tests.Integration
                         runner.RollbackToVersion(0, false);
                     },
                     false,
-                    typeof(SQLiteProcessor), typeof(SqlAnywhere16Processor));
+                    excludedProcessors);
             }
         }
 
@@ -1028,7 +1102,8 @@ namespace FluentMigrator.Tests.Integration
                     }
                 },
                 true,
-                typeof(SqlAnywhere16Processor));
+                typeof(SqlAnywhere16Processor),
+                typeof(SnowflakeProcessor) /* Snowflake does not have default schema. */);
         }
 
         [Test]
@@ -1041,7 +1116,14 @@ namespace FluentMigrator.Tests.Integration
         public void ValidateVersionOrderShouldDoNothingIfUnappliedMigrationVersionIsGreaterThanLatestAppliedMigration()
         {
             // Using SqlServer instead of SQLite as versions not deleted from VersionInfo table when using Sqlite.
-            var excludedProcessors = new[] { typeof(SQLiteProcessor), typeof(MySqlProcessor), typeof(PostgresProcessor), typeof(SqlAnywhere16Processor) };
+            var excludedProcessors = new[]
+            {
+                typeof(SQLiteProcessor),
+                typeof(MySqlProcessor),
+                typeof(PostgresProcessor),
+                typeof(SnowflakeProcessor), /* This test uses default schema which is not supported by Snowflake. */
+                typeof(SqlAnywhere16Processor) 
+            };
 
             var namespacePass2 = typeof(Migrations.Interleaved.Pass2.User).Namespace;
             var namespacePass3 = typeof(Migrations.Interleaved.Pass3.User).Namespace;
@@ -1098,7 +1180,13 @@ namespace FluentMigrator.Tests.Integration
         public void ValidateVersionOrderShouldThrowExceptionIfUnappliedMigrationVersionIsLessThanLatestAppliedMigration()
         {
             // Using SqlServer instead of SQLite as versions not deleted from VersionInfo table when using Sqlite.
-            var excludedProcessors = new[] { typeof(MySqlProcessor), typeof(SQLiteProcessor), typeof(SqlAnywhere16Processor) };
+            var excludedProcessors = new[]
+            {
+                typeof(MySqlProcessor),
+                typeof(SQLiteProcessor),
+                typeof(SqlAnywhere16Processor),
+                typeof(SnowflakeProcessor), /* This test uses default schema which is not supported by Snowflake. */
+            };
 
             var namespacePass2 = typeof(Migrations.Interleaved.Pass2.User).Namespace;
             var namespacePass3 = typeof(Migrations.Interleaved.Pass3.User).Namespace;
@@ -1180,44 +1268,39 @@ namespace FluentMigrator.Tests.Integration
 
         [Test]
         [Category("Postgres")]
+        [Category("Snowflake")]
         [Category("SqlServer2012")]
         public void CanCreateSequenceWithSchema()
         {
-            if (!IntegrationTestOptions.SqlServer2012.IsEnabled && !IntegrationTestOptions.Postgres.IsEnabled)
-            {
-                Assert.Ignore("No processor found for the given action.");
-            }
+            ExecuteWithSupportedProcessors(
+                services => services.WithMigrationsIn(RootNamespace),
+                (serviceProvider, processor) =>
+                {
+                    var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
 
-            void CreateAndDropSequence(IServiceProvider serviceProvider, ProcessorBase processor)
-            {
-                var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
+                    runner.Up(new TestCreateSchema());
+                    runner.Up(new TestCreateSequenceWithSchema());
+                    processor.SequenceExists("TestSchema", "TestSequence").ShouldBeTrue();
 
-                runner.Up(new TestCreateSchema());
-                runner.Up(new TestCreateSequenceWithSchema());
-                processor.SequenceExists("TestSchema", "TestSequence").ShouldBeTrue();
-
-                runner.Down(new TestCreateSequenceWithSchema());
-                runner.Down(new TestCreateSchema());
-                processor.SequenceExists("TestSchema", "TestSequence").ShouldBeFalse();
-            }
-
-            if (IntegrationTestOptions.SqlServer2012.IsEnabled)
-            {
-                ExecuteWithProcessor<SqlServer2012Processor>(
-                    services => services.WithMigrationsIn(RootNamespace),
-                    (Action<IServiceProvider, ProcessorBase>)CreateAndDropSequence,
-                    true,
-                    IntegrationTestOptions.SqlServer2012);
-            }
-
-            if (IntegrationTestOptions.Postgres.IsEnabled)
-            {
-                ExecuteWithProcessor<PostgresProcessor>(
-                    services => services.WithMigrationsIn(RootNamespace),
-                    (Action<IServiceProvider, ProcessorBase>)CreateAndDropSequence,
-                    true,
-                    IntegrationTestOptions.Postgres);
-            }
+                    runner.Down(new TestCreateSequenceWithSchema());
+                    runner.Down(new TestCreateSchema());
+                    processor.SequenceExists("TestSchema", "TestSequence").ShouldBeFalse();
+                },
+                true,
+                typeof(FirebirdProcessor),
+                typeof(MySqlProcessor),
+                typeof(MySql4Processor),
+                typeof(MySql5Processor),
+                typeof(OracleProcessor),
+                typeof(RedshiftProcessor),
+                typeof(SQLiteProcessor),
+                typeof(SqlServer2000Processor),
+                typeof(SqlServer2005Processor),
+                typeof(SqlServer2008Processor),
+                typeof(SqlServer2014Processor),
+                typeof(SqlServer2016Processor),
+                typeof(SqlAnywhere16Processor),
+                typeof(SqlAnywhereProcessor));
         }
 
         [Test]
@@ -1255,12 +1338,14 @@ namespace FluentMigrator.Tests.Integration
                 true,
                 typeof(SQLiteProcessor),
                 typeof(FirebirdProcessor),
-                typeof(SqlAnywhereProcessor));
+                typeof(SqlAnywhereProcessor),
+                typeof(SnowflakeProcessor) /* Snowflake does not support decreasing varchar column length! */);
         }
 
         [Test]
         [Category("MySql")]
         [Category("Postgres")]
+        [Category("Snowflake")]
         [Category("SqlServer2005")]
         [Category("SqlServer2008")]
         [Category("SqlServer2012")]
@@ -1298,6 +1383,7 @@ namespace FluentMigrator.Tests.Integration
         [Test]
         [Category("MySql")]
         [Category("Postgres")]
+        [Category("Snowflake")]
         [Category("SqlServer2005")]
         [Category("SqlServer2008")]
         [Category("SqlServer2012")]
@@ -1359,12 +1445,17 @@ namespace FluentMigrator.Tests.Integration
                     processor.ConstraintExists(null, "TestTable2", "TestUnique").ShouldBeFalse();
 
                     runner.Down(new TestCreateAndDropTableMigration());
-                }, true, typeof(SQLiteProcessor), typeof(SqlAnywhereProcessor));
+                },
+                true,
+                typeof(SQLiteProcessor),
+                typeof(SqlAnywhereProcessor),
+                typeof(SnowflakeProcessor) /* Snowflake does not have default schema. */);
         }
 
         [Test]
         [Category("MySql")]
         [Category("Postgres")]
+        [Category("Snowflake")]
         [Category("SqlServer2005")]
         [Category("SqlServer2008")]
         [Category("SqlServer2012")]
@@ -1425,12 +1516,14 @@ namespace FluentMigrator.Tests.Integration
                     runner.Down(new TestCreateAndDropTableMigration());
                 },
                 true,
-                typeof(SQLiteProcessor));
+                typeof(SQLiteProcessor),
+                typeof(SnowflakeProcessor) /* Snowflake does not have default schema. */);
         }
 
         [Test]
         [Category("MySql")]
         [Category("Postgres")]
+        [Category("Snowflake")]
         [Category("SqlServer2005")]
         [Category("SqlServer2008")]
         [Category("SqlServer2012")]
@@ -1464,6 +1557,7 @@ namespace FluentMigrator.Tests.Integration
         [Test]
         [Category("MySql")]
         [Category("Postgres")]
+        [Category("Snowflake")]
         [Category("SqlServer2005")]
         [Category("SqlServer2008")]
         [Category("SqlServer2012")]
@@ -1533,12 +1627,14 @@ namespace FluentMigrator.Tests.Integration
                     runner.Down(new TestCreateAndDropTableMigration());
                 },
                 true,
-                typeof(SQLiteProcessor));
+                typeof(SQLiteProcessor),
+                typeof(SnowflakeProcessor) /* Snowflake does not have default schema. */);
         }
 
         [Test]
         [Category("MySql")]
         [Category("Postgres")]
+        [Category("Snowflake")]
         [Category("SqlServer2005")]
         [Category("SqlServer2008")]
         [Category("SqlServer2012")]
@@ -1608,7 +1704,8 @@ namespace FluentMigrator.Tests.Integration
                     runner.Down(new TestCreateSchema());
                 },
                 true,
-                typeof(SQLiteProcessor));
+                typeof(SQLiteProcessor),
+                typeof(SnowflakeProcessor) /* Snowflake does not support indices. */);
         }
 
         [Test]
@@ -1640,13 +1737,15 @@ namespace FluentMigrator.Tests.Integration
                 },
                 true,
                 typeof(SQLiteProcessor),
-                typeof(SqlAnywhereProcessor));
+                typeof(SqlAnywhereProcessor),
+                typeof(SnowflakeProcessor) /* Snowflake does not have default schema. */);
         }
 
         [Test]
         [Category("Firebird")]
         [Category("MySql")]
         [Category("Postgres")]
+        [Category("Snowflake")]
         [Category("SqlServer2005")]
         [Category("SqlServer2008")]
         [Category("SqlServer2012")]
@@ -1683,6 +1782,7 @@ namespace FluentMigrator.Tests.Integration
         [Category("MySql")]
         [Category("SQLite")]
         [Category("Postgres")]
+        [Category("Snowflake")]
         [Category("SqlServer2005")]
         [Category("SqlServer2008")]
         [Category("SqlServer2012")]

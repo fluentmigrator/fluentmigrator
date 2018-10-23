@@ -33,7 +33,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
             //see: http://www.sqlite.org/syntaxdiagrams.html#column-constraint syntax details
             if (column.IsIdentity && !column.IsPrimaryKey && column.Type != DbType.Int32)
             {
-                throw new ArgumentException("SQLite only supports identity on single integer, primary key coulmns");
+                throw new ArgumentException("SQLite only supports identity on single integer, primary key columns");
             }
 
             return string.Empty;
