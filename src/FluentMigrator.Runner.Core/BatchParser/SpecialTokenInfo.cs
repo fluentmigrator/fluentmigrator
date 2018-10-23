@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2018, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -35,11 +35,29 @@ namespace FluentMigrator.Runner.BatchParser
         /// than the <paramref name="token"/> itself. This is usually the case when the token should be the only text on the line,
         /// but is instead surrounded by whitespace.
         /// </remarks>
-        public SpecialTokenInfo(int index, int length, [NotNull] string token, object opaque = null)
+        public SpecialTokenInfo(int index, int length, [NotNull] string token, object opaque = null) : this(index, length, token, false, opaque)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SpecialTokenInfo"/> class.
+        /// </summary>
+        /// <param name="index">The index to the first character that is assigned to the <paramref name="token"/></param>
+        /// <param name="length">The content length that is assigned to the <paramref name="token"/></param>
+        /// <param name="token">The found token</param>
+        /// <param name="includeTokenInMatch">Whether to include the token in the result (used by SearchStatus)</param>
+        /// <param name="opaque">An opaque (token specific) value</param>
+        /// <remarks>
+        /// The <paramref name="index"/> may not point to the real token text and the <paramref name="length"/> might be longer
+        /// than the <paramref name="token"/> itself. This is usually the case when the token should be the only text on the line,
+        /// but is instead surrounded by whitespace.
+        /// </remarks>
+        public SpecialTokenInfo(int index, int length, [NotNull] string token, bool includeTokenInMatch, object opaque = null)
         {
             Index = index;
             Length = length;
             Token = token;
+            IncludeTokenInMatch = includeTokenInMatch;
             Opaque = opaque;
         }
 
@@ -64,5 +82,11 @@ namespace FluentMigrator.Runner.BatchParser
         /// </summary>
         [CanBeNull]
         public object Opaque { get; }
+
+        /// <summary>
+        /// Gets whether the <see cref="Token"/> should be included in the match
+        /// </summary>
+        [CanBeNull]
+        public bool IncludeTokenInMatch { get; }
     }
 }
