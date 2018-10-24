@@ -31,7 +31,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
     {
         public OracleProcessor(
             [NotNull] OracleDbFactory factory,
-            [NotNull] OracleGenerator generator,
+            [NotNull] IOracleGenerator generator,
             [NotNull] ILogger<OracleProcessor> logger,
             [NotNull] IOptionsSnapshot<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor)

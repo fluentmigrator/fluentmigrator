@@ -28,7 +28,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
     {
         public OracleManagedProcessor(
             [NotNull] OracleManagedDbFactory factory,
-            [NotNull] OracleGenerator generator,
+            [NotNull] IOracleGenerator generator,
             [NotNull] ILogger<OracleManagedProcessor> logger,
             [NotNull] IOptionsSnapshot<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor)

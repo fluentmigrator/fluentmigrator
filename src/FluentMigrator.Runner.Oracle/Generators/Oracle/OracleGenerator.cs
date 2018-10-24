@@ -31,7 +31,7 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Generators.Oracle
 {
-    public class OracleGenerator : GenericGenerator
+    public class OracleGenerator : GenericGenerator, IOracleGenerator
     {
         public OracleGenerator()
             : this(false)

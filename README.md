@@ -15,7 +15,7 @@ or the upgrade guide for further information: [2.x to 3.0](https://fluentmigrato
 Source              | Status
 --------------------|----------
 NuGet (Releases)    | [![NuGet](https://img.shields.io/nuget/v/FluentMigrator.svg)](https://www.nuget.org/packages/FluentMigrator/)
-MyGet (Prerelease)  | [![MyGet](https://img.shields.io/myget/fluent-migrator/vpre/FluentMigrator.svg)](https://www.myget.org/feed/Packages/fluent-migrator)
+MyGet (Prerelease)  | [![MyGet](https://img.shields.io/myget/fluent-migrator/vpre/FluentMigrator.svg)](https://www.myget.org/gallery/fluent-migrator)
 
 The releases are stored on [nuget.org](https://nuget.org)
 while the CI builds are stored on [MyGet](https://www.myget.org/feed/Packages/fluent-migrator).
