@@ -45,7 +45,7 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
 
         public DotConnectOracleProcessor(
             [NotNull] DotConnectOracleDbFactory factory,
-            [NotNull] OracleGenerator generator,
+            [NotNull] IOracleGenerator generator,
             [NotNull] ILogger<DotConnectOracleProcessor> logger,
             [NotNull] IOptionsSnapshot<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor)

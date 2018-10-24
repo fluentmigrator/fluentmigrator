@@ -20,7 +20,7 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Generators.Oracle
 {
-    public class Oracle12CGenerator : OracleGenerator
+    public class Oracle12CGenerator : OracleGenerator, IOracle12CGenerator
     {
         public Oracle12CGenerator()
             : this(false)
