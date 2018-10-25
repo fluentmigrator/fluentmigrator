@@ -25,6 +25,8 @@ namespace FluentMigrator.Runner.Generators.Oracle
 {
     internal class Oracle12CColumn : OracleColumn
     {
+        protected override int OracleObjectNameMaxLength => 128;
+
         /// <inheritdoc />
         public Oracle12CColumn(IQuoter quoter) : base(quoter)
         {
