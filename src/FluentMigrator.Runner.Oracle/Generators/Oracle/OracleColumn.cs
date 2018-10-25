@@ -25,7 +25,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
 {
     internal class OracleColumn : ColumnBase
     {
-        private const int OracleObjectNameMaxLength = 30;
+        protected virtual int OracleObjectNameMaxLength => 30;
 
         public OracleColumn(IQuoter quoter)
             : base(new OracleTypeMap(), quoter)
