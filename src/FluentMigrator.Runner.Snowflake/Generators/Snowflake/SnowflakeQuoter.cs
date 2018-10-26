@@ -97,9 +97,9 @@ namespace FluentMigrator.Runner.Generators.Snowflake
                     return "CONVERT_TIMEZONE('UTC',CURRENT_TIMESTAMP())";
                 case SystemMethods.CurrentUser:
                     return "CURRENT_USER()";
+                default:
+                    return base.FormatSystemMethods(value);
             }
-
-            return base.FormatSystemMethods(value);
         }
     }
 }

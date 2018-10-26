@@ -26,6 +26,9 @@ namespace FluentMigrator.Runner.BatchParser
         };
 
         /// <inheritdoc />
-        public SnowflakeBatchParser(string newLine = null) : base(_rangeSearchers, _specialTokenSearchers, newLine) { }
+        public SnowflakeBatchParser() : this(null) { }
+
+        /// <inheritdoc />
+        public SnowflakeBatchParser(string newLine) : base(_rangeSearchers, _specialTokenSearchers, newLine) { }
     }
 }

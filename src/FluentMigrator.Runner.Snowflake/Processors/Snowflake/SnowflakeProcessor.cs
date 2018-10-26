@@ -157,7 +157,7 @@ namespace FluentMigrator.Runner.Processors.Snowflake
                         message.WriteLine(sql);
                         message.WriteLine("The error was {0}", ex.Message);
 
-                        throw new Exception(message.ToString(), ex);
+                        throw new ApplicationException(message.ToString(), ex);
                     }
                 }
             }

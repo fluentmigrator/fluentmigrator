@@ -38,7 +38,9 @@ namespace FluentMigrator.Runner.Generators.Snowflake
         protected override string GenerateTableDescription(string schemaName, string tableName, string tableDescription)
         {
             if (string.IsNullOrEmpty(tableDescription))
+            {
                 return string.Empty;
+            }
 
             return string.Format(TableDescriptionTemplate, Quoter.QuoteTableName(tableName, schemaName), tableDescription.Replace("'", "''"));
         }
@@ -48,7 +50,9 @@ namespace FluentMigrator.Runner.Generators.Snowflake
             string schemaName, string tableName, string columnName, string columnDescription)
         {
             if (string.IsNullOrEmpty(columnDescription))
+            {
                 return string.Empty;
+            }
 
             return string.Format(
                 ColumnDescriptionTemplate,

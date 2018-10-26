@@ -24,7 +24,7 @@ namespace FluentMigrator.Runner.Generators.Snowflake
 {
     public class SnowflakeTypeMap : TypeMapBase
     {
-        public const int UnicodeStringCapacity = 4194304;
+        public static readonly int UnicodeStringCapacity = 4194304;
         private const int DecimalCapacity = 38;
         private const int BinaryCapacity = 8388608;
 

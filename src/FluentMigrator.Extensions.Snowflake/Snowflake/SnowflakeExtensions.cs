@@ -20,8 +20,8 @@ namespace FluentMigrator.Snowflake
 {
     public static partial class SnowflakeExtensions
     {
-        public const string IdentitySeed = "SnowflakeIdentitySeed";
-        public const string IdentityIncrement = "SnowflakeIdentityIncrement";
+        public static readonly string IdentitySeed = "SnowflakeIdentitySeed";
+        public static readonly string IdentityIncrement = "SnowflakeIdentityIncrement";
 
         private static string UnsupportedMethodMessage(object methodName, string interfaceName)
         {
