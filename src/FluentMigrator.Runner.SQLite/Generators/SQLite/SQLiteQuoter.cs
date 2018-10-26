@@ -25,7 +25,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
 
         protected override string FormatByteArray(byte[] value)
         {
-            var hex = new System.Text.StringBuilder((value.Length * 2) + 2);
+            var hex = new System.Text.StringBuilder((value.Length * 2) + 3);
             hex.Append("X'");
             foreach (var b in value)
             {
