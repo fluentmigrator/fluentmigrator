@@ -35,6 +35,7 @@ namespace FluentMigrator.SqlServer
         public const string RowGuidColumn = "SqlServerRowGuidColumn";
         public const string IndexColumnNullsDistinct = "SqlServerIndexColumnNullsDistinct";
         public const string SchemaAuthorization = "SqlServerSchemaAuthorization";
+        public const string SparseColumn = "SqlServerSparseColumn";
 
         /// <summary>
         /// Inserts data using Sql Server's IDENTITY INSERT feature.
@@ -72,6 +73,14 @@ namespace FluentMigrator.SqlServer
             var columnExpression = expression as IColumnExpressionBuilder ??
                 throw new InvalidOperationException(UnsupportedMethodMessage(nameof(RowGuid), nameof(IColumnExpressionBuilder)));
             columnExpression.Column.AdditionalFeatures[RowGuidColumn] = true;
+            return expression;
+        }
+
+        public static ICreateTableColumnOptionOrWithColumnSyntax Sparse(this ICreateTableColumnOptionOrWithColumnSyntax expression)
+        {
+            var columnExpression = expression as IColumnExpressionBuilder ??
+                throw new InvalidOperationException(UnsupportedMethodMessage(nameof(Sparse), nameof(IColumnExpressionBuilder)));
+            columnExpression.Column.AdditionalFeatures[SparseColumn] = true;
             return expression;
         }
 
