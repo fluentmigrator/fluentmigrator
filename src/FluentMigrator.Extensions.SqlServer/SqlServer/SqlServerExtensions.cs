@@ -26,16 +26,16 @@ namespace FluentMigrator.SqlServer
 {
     public static partial class SqlServerExtensions
     {
-        public const string IdentityInsert = "SqlServerIdentityInsert";
-        public const string IdentitySeed = "SqlServerIdentitySeed";
-        public const string IdentityIncrement = "SqlServerIdentityIncrement";
-        public const string ConstraintType = "SqlServerConstraintType";
-        public const string IncludesList = "SqlServerIncludes";
-        public const string OnlineIndex = "SqlServerOnlineIndex";
-        public const string RowGuidColumn = "SqlServerRowGuidColumn";
-        public const string IndexColumnNullsDistinct = "SqlServerIndexColumnNullsDistinct";
-        public const string SchemaAuthorization = "SqlServerSchemaAuthorization";
-        public const string SparseColumn = "SqlServerSparseColumn";
+        public static readonly string IdentityInsert = "SqlServerIdentityInsert";
+        public static readonly string IdentitySeed = "SqlServerIdentitySeed";
+        public static readonly string IdentityIncrement = "SqlServerIdentityIncrement";
+        public static readonly string ConstraintType = "SqlServerConstraintType";
+        public static readonly string IncludesList = "SqlServerIncludes";
+        public static readonly string OnlineIndex = "SqlServerOnlineIndex";
+        public static readonly string RowGuidColumn = "SqlServerRowGuidColumn";
+        public static readonly string IndexColumnNullsDistinct = "SqlServerIndexColumnNullsDistinct";
+        public static readonly string SchemaAuthorization = "SqlServerSchemaAuthorization";
+        public static readonly string SparseColumn = "SqlServerSparseColumn";
 
         /// <summary>
         /// Inserts data using Sql Server's IDENTITY INSERT feature.
