@@ -52,7 +52,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             [NotNull] SqlServer2008Quoter quoter,
             [NotNull] IOptions<GeneratorOptions> generatorOptions)
             : this(
-                new SqlServer2005Column(new SqlServer2008TypeMap(), quoter),
+                new SqlServer2008Column(new SqlServer2008TypeMap(), quoter),
                 quoter,
                 new SqlServer2005DescriptionGenerator(),
                 generatorOptions)
