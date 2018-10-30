@@ -407,7 +407,8 @@ namespace FluentMigrator.Console
                         .AddSqlServer2012()
                         .AddSqlServer2014()
                         .AddSqlServer2016()
-                        .AddSqlServerCe());
+                        .AddSqlServerCe()
+                        .AddSnowflake());
             return services;
         }
     }

@@ -11,6 +11,7 @@
     <PackageReference Include="AutoMapper" Version="6.2.2" />
     <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="5.12.1" />
     <PackageReference Include="FSharp.Core" Version="4.3.4" />
+    <PackageReference Include="log4net" Version="2.0.8" />
     <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.2.1" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="2.0.1" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
@@ -18,10 +19,12 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="2.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="2.0.1" />
     <PackageReference Include="MySql.Data" Version="8.0.11" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="Npgsql" Version="3.2.7" />
     <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="2.12.0-beta2" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\FluentMigrator.Runner.Snowflake\FluentMigrator.Runner.Snowflake.csproj" />
     <ProjectReference Include="..\FluentMigrator.Runner\FluentMigrator.Runner.csproj" />
     <ProjectReference Include="..\FluentMigrator.Runner.Db2\FluentMigrator.Runner.Db2.csproj" />
     <ProjectReference Include="..\FluentMigrator.Runner.Firebird\FluentMigrator.Runner.Firebird.csproj" />
@@ -34,5 +37,10 @@
     <ProjectReference Include="..\FluentMigrator.Runner.SqlServer\FluentMigrator.Runner.SqlServer.csproj" />
     <ProjectReference Include="..\FluentMigrator.Runner.SqlServerCe\FluentMigrator.Runner.SqlServerCe.csproj" />
     <ProjectReference Include="..\FluentMigrator.Runner.Hana\FluentMigrator.Runner.Hana.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Snowflake.Data">
+      <HintPath>..\..\lib\Snowflake\netstandard2.0\Snowflake.Data.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>

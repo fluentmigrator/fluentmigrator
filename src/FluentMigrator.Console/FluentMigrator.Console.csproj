@@ -16,6 +16,7 @@
     <None Include="..\..\FluentMigrator.snk" Link="FluentMigrator.snk" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\FluentMigrator.Runner.Snowflake\FluentMigrator.Runner.Snowflake.csproj" />
     <ProjectReference Include="..\FluentMigrator.Runner\FluentMigrator.Runner.csproj" />
     <ProjectReference Include="..\FluentMigrator.Runner.Db2\FluentMigrator.Runner.Db2.csproj" />
     <ProjectReference Include="..\FluentMigrator.Runner.Firebird\FluentMigrator.Runner.Firebird.csproj" />
@@ -53,5 +54,16 @@
       <Link>%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="log4net">
+      <HintPath>..\..\lib\Snowflake\net46\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\lib\Snowflake\net46\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Snowflake.Data">
+      <HintPath>..\..\lib\Snowflake\net46\Snowflake.Data.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>
