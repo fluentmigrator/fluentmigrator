@@ -56,14 +56,9 @@ namespace FluentMigrator.Runner.Generators.SQLite
                 return string.Empty;
             }
 
-            switch (column.Type)
+            if (column.Type == DbType.Int32 || column.Type == DbType.UInt32)
             {
-                case DbType.Int32:
-                case DbType.UInt32:
-                    primaryKey += " AUTOINCREMENT";
-                    break;
-                default:
-                    break;
+                primaryKey += " AUTOINCREMENT";
             }
 
             return column.IsIdentity ? primaryKey : string.Empty;
