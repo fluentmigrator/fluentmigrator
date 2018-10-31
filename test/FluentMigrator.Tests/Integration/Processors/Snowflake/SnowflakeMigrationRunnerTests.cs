@@ -807,8 +807,8 @@ namespace FluentMigrator.Tests.Integration.Processors.Snowflake
     {
         public override void Up()
         {
-            // Decreasing lenght is not allowed in Snowflake, so just changing to synonymous type.
-            Alter.Column("Name2").OnTable("TestTable2").InSchema(SnowflakeMigrationRunnerTests.TestSchema).AsCustom("nvarchar(10)").Nullable();
+            // Decreasing length is not allowed in Snowflake, so just changing to synonymous type & changing nullability.
+            Alter.Column("Name2").OnTable("TestTable2").InSchema(SnowflakeMigrationRunnerTests.TestSchema).AsCustom("nvarchar(10)").NotNullable();
         }
 
         public override void Down()

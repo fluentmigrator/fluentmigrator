@@ -15,6 +15,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Text;
 
 using FluentMigrator.Exceptions;
@@ -52,6 +53,9 @@ namespace FluentMigrator.Runner.Generators.Snowflake
         protected SnowflakeOptions SfOptions { get; }
 
         /// <inheritdoc />
+        public override string AlterColumn => "ALTER TABLE {0} ALTER {1}";
+
+        /// <inheritdoc />
         public override string Generate(AlterDefaultConstraintExpression expression)
         {
             throw new DatabaseOperationNotSupportedException("Snowflake database does not support adding or changing default constraint after column has been created.");
@@ -83,7 +87,13 @@ namespace FluentMigrator.Runner.Generators.Snowflake
                 throw new DatabaseOperationNotSupportedException("Snowflake database does not support adding or changing default constraint after column has been created.");
             }
 
-            return base.Generate(expression);
+            var errors = ValidateAdditionalFeatureCompatibility(expression.Column.AdditionalFeatures);
+            if (!string.IsNullOrEmpty(errors))
+            {
+                return errors;
+            }
+
+            return string.Format(AlterColumn, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), ((SnowflakeColumn)Column).GenerateAlterColumn(expression.Column));
         }
 
         /// <inheritdoc />

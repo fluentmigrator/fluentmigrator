@@ -14,6 +14,10 @@
 // limitations under the License.
 #endregion
 
+using System;
+using System.Collections.Generic;
+
+using FluentMigrator.Exceptions;
 using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Base;
@@ -26,12 +30,43 @@ namespace FluentMigrator.Runner.Generators.Snowflake
 {
     internal class SnowflakeColumn : ColumnBase
     {
-        public SnowflakeColumn([NotNull] SnowflakeOptions sfOptions) : base(new SnowflakeTypeMap(), new SnowflakeQuoter(sfOptions.QuoteIdentifiers)) { }
+        public SnowflakeColumn([NotNull] SnowflakeOptions sfOptions) : base(
+            new SnowflakeTypeMap(),
+            new SnowflakeQuoter(sfOptions.QuoteIdentifiers))
+        {
+        }
+
+
+        public string GenerateAlterColumn(ColumnDefinition column)
+        {
+            var clauses = new List<string>();
+            var dropOrSet = column.IsNullable ?? false ? "DROP" : "SET";
+            var setNullableClause = $"COLUMN {FormatString(column)} {dropOrSet} NOT NULL";
+            clauses.Add(setNullableClause);
+            var typeClause = $"COLUMN {FormatString(column)} {FormatType(column)}";
+            clauses.Add(typeClause);
+            var commentClause = $"COLUMN {FormatString(column)} COMMENT '{column.ColumnDescription ?? string.Empty}'";
+            clauses.Add(commentClause);
+
+            return string.Join(", ", clauses);
+        }
+
 
         /// <inheritdoc />
         protected override string FormatIdentity(ColumnDefinition column)
         {
             return column.IsIdentity ? GetIdentityString(column) : string.Empty;
+        }
+
+        /// <inheritdoc />
+        protected override string FormatCollation(ColumnDefinition column)
+        {
+            if (!string.IsNullOrEmpty(column.CollationName))
+            {
+                throw new DatabaseOperationNotSupportedException("Snowflake database does not support collation.");
+            }
+
+            return string.Empty;
         }
 
         private static string GetIdentityString(ColumnDefinition column)

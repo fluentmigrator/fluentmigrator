@@ -68,7 +68,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Snowflake
             else
             {
                 // Creating a table with single quote in schema name is a bad idea if identifier quoting is disabled.
-                var ex = Assert.Throws<Exception>(() => TableCreationFunc());
+                var ex = Assert.Throws<ApplicationException>(() => TableCreationFunc());
                 Assert.That(ex.Message.StartsWith("An error occured executing the following sql"));
             }
         }
@@ -86,7 +86,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Snowflake
             else
             {
                 // Creating a table with single quote in schema name is a bad idea if identifier quoting is disabled.
-                var ex = Assert.Throws<Exception>(() => TableCreationFunc());
+                var ex = Assert.Throws<ApplicationException>(() => TableCreationFunc());
                 Assert.That(ex.Message.StartsWith("An error occured executing the following sql"));
             }
         }
@@ -110,7 +110,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Snowflake
             else
             {
                 // Creating a table with single quote in schema name is a bad idea if identifier quoting is disabled.
-                var ex = Assert.Throws<Exception>(() => TableCreationFunc());
+                var ex = Assert.Throws<ApplicationException>(() => TableCreationFunc());
                 Assert.That(ex.Message.StartsWith("An error occured executing the following sql"));
             }
         }
@@ -128,7 +128,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Snowflake
             else
             {
                 // Creating a table with single quote in schema name is a bad idea if identifier quoting is disabled.
-                var ex = Assert.Throws<Exception>(() => TableCreationFunc());
+                var ex = Assert.Throws<ApplicationException>(() => TableCreationFunc());
                 Assert.That(ex.Message.StartsWith("An error occured executing the following sql"));
             }
         }
@@ -150,7 +150,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Snowflake
             else
             {
                 // Creating a table with single quote in schema name is a bad idea if identifier quoting is disabled.
-                var ex = Assert.Throws<Exception>(() => TableCreationFunc());
+                var ex = Assert.Throws<ApplicationException>(() => TableCreationFunc());
                 Assert.That(ex.Message.StartsWith("An error occured executing the following sql"));
             }
         }

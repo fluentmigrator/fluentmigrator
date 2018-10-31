@@ -19,6 +19,7 @@
 using System;
 using System.Linq;
 
+using FluentMigrator.Exceptions;
 using FluentMigrator.Runner.Generators.Snowflake;
 using FluentMigrator.Runner.Processors.Snowflake;
 
@@ -72,7 +73,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"ALTER TABLE ""TestSchema"".""TestTable1"" ALTER COLUMN ""TestColumn1"" VARCHAR(20) NOT NULL", _quotingEnabled);
+            result.ShouldBe(@"ALTER TABLE ""TestSchema"".""TestTable1"" ALTER COLUMN ""TestColumn1"" SET NOT NULL, COLUMN ""TestColumn1"" VARCHAR(20), COLUMN ""TestColumn1"" COMMENT ''", _quotingEnabled);
         }
 
         [Test]
@@ -90,7 +91,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"ALTER TABLE ""TestSchema"".""TestTable1"" ALTER COLUMN ""TestColumn1"" NUMBER NOT NULL IDENTITY(1,1)", _quotingEnabled);
+            result.ShouldBe(@"ALTER TABLE ""TestSchema"".""TestTable1"" ALTER COLUMN ""TestColumn1"" SET NOT NULL, COLUMN ""TestColumn1"" NUMBER, COLUMN ""TestColumn1"" COMMENT ''", _quotingEnabled);
         }
 
         [Test]
@@ -207,6 +208,18 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         {
             var expression = GeneratorTestHelper.GetRenameColumnExpression();
             Assert.Throws<ArgumentException>(() => Generator.Generate(expression));
+        }
+
+
+        [Test]
+        public void CollationNotSupported()
+        {
+            var expression = GeneratorTestHelper.GetCreateColumnExpression();
+            expression.SchemaName = "TestSchema";
+            expression.Column.CollationName = "Finnish_Swedish_CI_AS";
+
+            var ex = Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
+            Assert.AreEqual("Snowflake database does not support collation.", ex.Message);
         }
     }
 }
