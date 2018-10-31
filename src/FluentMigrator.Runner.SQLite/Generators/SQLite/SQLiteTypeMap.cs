@@ -36,14 +36,14 @@ namespace FluentMigrator.Runner.Generators.SQLite
         protected override void SetupTypeMaps()
         {
             SetTypeMap(DbType.Binary, "BLOB");
-            SetTypeMap(DbType.Byte, "INTEGER");
-            SetTypeMap(DbType.Int16, "INTEGER");
+            SetTypeMap(DbType.Byte, "TINYINT UNSIGNED");
+            SetTypeMap(DbType.Int16, "SMALLINT");
             SetTypeMap(DbType.Int32, "INTEGER");
-            SetTypeMap(DbType.Int64, "INTEGER");
-            SetTypeMap(DbType.SByte, "INTEGER");
-            SetTypeMap(DbType.UInt16, "INTEGER");
+            SetTypeMap(DbType.Int64, "BIGINT");
+            SetTypeMap(DbType.SByte, "TINYINT");
+            SetTypeMap(DbType.UInt16, "SMALLINT UNSIGNED");
             SetTypeMap(DbType.UInt32, "INTEGER");
-            SetTypeMap(DbType.UInt64, "INTEGER");
+            SetTypeMap(DbType.UInt64, "BIGINT UNSIGNED");
             SetTypeMap(DbType.Currency, "NUMERIC");
             SetTypeMap(DbType.Decimal, "NUMERIC");
             SetTypeMap(DbType.Double, "NUMERIC");
@@ -58,7 +58,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
             SetTypeMap(DbType.DateTime, "DATETIME");
             SetTypeMap(DbType.DateTime2, "DATETIME");
             SetTypeMap(DbType.Time, "DATETIME");
-            SetTypeMap(DbType.Boolean, "INTEGER");
+            SetTypeMap(DbType.Boolean, "TINYINT");
             SetTypeMap(DbType.Guid, "UNIQUEIDENTIFIER");
         }
 
