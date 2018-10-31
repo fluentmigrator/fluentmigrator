@@ -62,6 +62,8 @@ namespace FluentMigrator.Runner.Generators.SQLite
                 case DbType.UInt32:
                     primaryKey += " AUTOINCREMENT";
                     break;
+                default:
+                    break;
             }
 
             return column.IsIdentity ? primaryKey : string.Empty;
