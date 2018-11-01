@@ -18,7 +18,7 @@ namespace FluentMigrator.Tests.Helpers
         {
             Processor = processor;
             _quoter = Processor.Quoter;
-            _schema = schema ?? throw new ArgumentNullException(nameof(schema));
+            _schema = schema;
 
             Name = _quoter.UnQuote(table);
             NameWithSchema = _quoter.QuoteTableName(Name, _schema);
@@ -38,7 +38,10 @@ namespace FluentMigrator.Tests.Helpers
         public void Create(string[] columnDefinitions)
         {
             var sb = new StringBuilder();
-            sb.AppendFormat("CREATE SCHEMA {0};", _quoter.QuoteSchemaName(_schema));
+            if (!string.IsNullOrEmpty(_schema))
+            {
+                sb.AppendFormat("CREATE SCHEMA {0};", _quoter.QuoteSchemaName(_schema));
+            }
 
             var columns = string.Join(", ", columnDefinitions);
             sb.AppendFormat("CREATE TABLE {0} ({1})", NameWithSchema, columns);

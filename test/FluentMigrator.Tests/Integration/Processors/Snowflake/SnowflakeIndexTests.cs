@@ -69,7 +69,8 @@ namespace FluentMigrator.Tests.Integration.Processors.Snowflake
         [Test]
         public override void CallingIndexExistsReturnsFalseIfIndexDoesNotExist()
         {
-            Assert.Ignore("No default schema support.");
+            using (var table = new SnowflakeTestTable(Processor, null, $"{Quoter.Quote("id")} int"))
+                Processor.IndexExists(null, table.Name, "DoesNotExist").ShouldBeFalse();
         }
 
         [Test]
@@ -82,7 +83,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Snowflake
         [Test]
         public override void CallingIndexExistsReturnsFalseIfTableDoesNotExist()
         {
-            Assert.Ignore("No default schema support.");
+            Processor.IndexExists(null, "DoesNotExist", "DoesNotExist").ShouldBeFalse();
         }
 
         [Test]
@@ -94,7 +95,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Snowflake
         [Test]
         public override void CallingIndexExistsReturnsTrueIfIndexExists()
         {
-            Assert.Ignore("No default schema support.");
+            Assert.Ignore("No index support.");
         }
 
         [Test]

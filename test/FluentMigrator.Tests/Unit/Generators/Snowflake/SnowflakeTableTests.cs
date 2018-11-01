@@ -41,6 +41,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
     {
         protected SnowflakeGenerator Generator;
         private readonly bool _quotingEnabled;
+        private const string TestSchema = "TestSchema";
 
         public SnowflakeTableTests(bool quotingEnabled)
         {
@@ -54,35 +55,17 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             Generator = new SnowflakeGenerator(sfOptions);
         }
 
-        /*
-        [Test]
-        public void CanCreateTableWithIgnoredRowGuidCol()
-        {
-            var expression = new CreateTableExpression
-            {
-                TableName = "TestTable1",
-            };
-
-            var serviceProvider = new ServiceCollection().BuildServiceProvider();
-            var querySchema = new Mock<IQuerySchema>();
-            new CreateTableExpressionBuilder(expression, new MigrationContext(querySchema.Object, serviceProvider))
-                .WithColumn("Id").AsGuid().PrimaryKey();
-
-            var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE [dbo].[TestTable1] ([Id] UNIQUEIDENTIFIER NOT NULL ROWGUIDCOL, PRIMARY KEY ([Id]))", _quotingEnabled);
-        } */
-
         [Test]
         public override void CanCreateTableWithCustomColumnTypeWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
-            expression.SchemaName = "TestSchema";
+            expression.SchemaName = TestSchema;
             expression.Columns[0].IsPrimaryKey = true;
             expression.Columns[1].Type = null;
             expression.Columns[1].CustomType = "timestamp";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"CREATE TABLE ""TestSchema"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL, ""TestColumn2"" timestamp NOT NULL, PRIMARY KEY (""TestColumn1""))", _quotingEnabled);
+            result.ShouldBe($@"CREATE TABLE ""{TestSchema}"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL, ""TestColumn2"" timestamp NOT NULL, PRIMARY KEY (""TestColumn1""))", _quotingEnabled);
         }
 
         [Test]
@@ -91,38 +74,40 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             var expression = GeneratorTestHelper.GetCreateTableExpression();
             expression.Columns[0].IsPrimaryKey = true;
             expression.Columns[1].Type = null;
-            expression.Columns[1].CustomType = "[timestamp]";
+            expression.Columns[1].CustomType = "timestamp";
 
-            Assert.Throws<ArgumentException>(() => Generator.Generate(expression));
+            var result = Generator.Generate(expression);
+            result.ShouldBe(@"CREATE TABLE ""PUBLIC"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL, ""TestColumn2"" timestamp NOT NULL, PRIMARY KEY (""TestColumn1""))", _quotingEnabled);
         }
 
         [Test]
         public override void CanCreateTableWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
-            expression.SchemaName = "TestSchema";
+            expression.SchemaName = TestSchema;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"CREATE TABLE ""TestSchema"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL, ""TestColumn2"" NUMBER NOT NULL)", _quotingEnabled);
+            result.ShouldBe($@"CREATE TABLE ""{TestSchema}"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL, ""TestColumn2"" NUMBER NOT NULL)", _quotingEnabled);
         }
 
         [Test]
         public override void CanCreateTableWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
-            Assert.Throws<ArgumentException>(() => Generator.Generate(expression));
+            var result = Generator.Generate(expression);
+            result.ShouldBe(@"CREATE TABLE ""PUBLIC"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL, ""TestColumn2"" NUMBER NOT NULL)", _quotingEnabled);
         }
 
         [Test]
         public override void CanCreateTableWithDefaultValueExplicitlySetToNullWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
-            expression.SchemaName = "TestSchema";
+            expression.SchemaName = TestSchema;
             expression.Columns[0].DefaultValue = null;
             expression.Columns[0].TableName = expression.TableName;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"CREATE TABLE ""TestSchema"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL DEFAULT NULL, ""TestColumn2"" NUMBER NOT NULL)", _quotingEnabled);
+            result.ShouldBe($@"CREATE TABLE ""{TestSchema}"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL DEFAULT NULL, ""TestColumn2"" NUMBER NOT NULL)", _quotingEnabled);
         }
 
         [Test]
@@ -132,103 +117,109 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             expression.Columns[0].DefaultValue = null;
             expression.Columns[0].TableName = expression.TableName;
 
-            Assert.Throws<ArgumentException>(() => Generator.Generate(expression));
+            var result = Generator.Generate(expression);
+            result.ShouldBe($@"CREATE TABLE ""PUBLIC"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL DEFAULT NULL, ""TestColumn2"" NUMBER NOT NULL)", _quotingEnabled);
         }
 
         [Test]
         public override void CanCreateTableWithDefaultValueWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithDefaultValue();
-            expression.SchemaName = "TestSchema";
+            expression.SchemaName = TestSchema;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"CREATE TABLE ""TestSchema"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL DEFAULT 'Default', ""TestColumn2"" NUMBER NOT NULL DEFAULT 0)", _quotingEnabled);
+            result.ShouldBe($@"CREATE TABLE ""{TestSchema}"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL DEFAULT 'Default', ""TestColumn2"" NUMBER NOT NULL DEFAULT 0)", _quotingEnabled);
         }
 
         [Test]
         public override void CanCreateTableWithDefaultValueWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithDefaultValue();
-            Assert.Throws<ArgumentException>(() => Generator.Generate(expression));
+            var result = Generator.Generate(expression);
+            result.ShouldBe(@"CREATE TABLE ""PUBLIC"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL DEFAULT 'Default', ""TestColumn2"" NUMBER NOT NULL DEFAULT 0)", _quotingEnabled);
         }
 
         [Test]
         public override void CanCreateTableWithIdentityWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();
-            expression.SchemaName = "TestSchema";
+            expression.SchemaName = TestSchema;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"CREATE TABLE ""TestSchema"".""TestTable1"" (""TestColumn1"" NUMBER NOT NULL IDENTITY(1,1), ""TestColumn2"" NUMBER NOT NULL)", _quotingEnabled);
+            result.ShouldBe($@"CREATE TABLE ""{TestSchema}"".""TestTable1"" (""TestColumn1"" NUMBER NOT NULL IDENTITY(1,1), ""TestColumn2"" NUMBER NOT NULL)", _quotingEnabled);
         }
 
         [Test]
         public override void CanCreateTableWithIdentityWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();
-            Assert.Throws<ArgumentException>(() => Generator.Generate(expression));
-        }
-
-        [Test]
-        public override void CanCreateTableWithMultiColumnPrimaryKeyWithDefaultSchema()
-        {
-            var expression = GeneratorTestHelper.GetCreateTableWithMultiColumnPrimaryKeyExpression();
-            Assert.Throws<ArgumentException>(() => Generator.Generate(expression));
+            var result = Generator.Generate(expression);
+            result.ShouldBe(@"CREATE TABLE ""PUBLIC"".""TestTable1"" (""TestColumn1"" NUMBER NOT NULL IDENTITY(1,1), ""TestColumn2"" NUMBER NOT NULL)", _quotingEnabled);
         }
 
         [Test]
         public override void CanCreateTableWithMultiColumnPrimaryKeyWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumnPrimaryKeyExpression();
-            expression.SchemaName = "TestSchema";
+            expression.SchemaName = TestSchema;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"CREATE TABLE ""TestSchema"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL, ""TestColumn2"" NUMBER NOT NULL, PRIMARY KEY (""TestColumn1"", ""TestColumn2""))", _quotingEnabled);
+            result.ShouldBe($@"CREATE TABLE ""{TestSchema}"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL, ""TestColumn2"" NUMBER NOT NULL, PRIMARY KEY (""TestColumn1"", ""TestColumn2""))", _quotingEnabled);
+        }
+
+        [Test]
+        public override void CanCreateTableWithMultiColumnPrimaryKeyWithDefaultSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableWithMultiColumnPrimaryKeyExpression();
+            var result = Generator.Generate(expression);
+            result.ShouldBe(@"CREATE TABLE ""PUBLIC"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL, ""TestColumn2"" NUMBER NOT NULL, PRIMARY KEY (""TestColumn1"", ""TestColumn2""))", _quotingEnabled);
         }
 
         [Test]
         public override void CanCreateTableWithNamedMultiColumnPrimaryKeyWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithNamedMultiColumnPrimaryKeyExpression();
-            expression.SchemaName = "TestSchema";
+            expression.SchemaName = TestSchema;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"CREATE TABLE ""TestSchema"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL, ""TestColumn2"" NUMBER NOT NULL, CONSTRAINT ""TestKey"" PRIMARY KEY (""TestColumn1"", ""TestColumn2""))", _quotingEnabled);
+            result.ShouldBe($@"CREATE TABLE ""{TestSchema}"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL, ""TestColumn2"" NUMBER NOT NULL, CONSTRAINT ""TestKey"" PRIMARY KEY (""TestColumn1"", ""TestColumn2""))", _quotingEnabled);
         }
 
         [Test]
         public override void CanCreateTableWithNamedMultiColumnPrimaryKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithNamedMultiColumnPrimaryKeyExpression();
-            Assert.Throws<ArgumentException>(() => Generator.Generate(expression));
+            var result = Generator.Generate(expression);
+            result.ShouldBe(@"CREATE TABLE ""PUBLIC"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL, ""TestColumn2"" NUMBER NOT NULL, CONSTRAINT ""TestKey"" PRIMARY KEY (""TestColumn1"", ""TestColumn2""))", _quotingEnabled);
         }
 
         [Test]
         public override void CanCreateTableWithNamedPrimaryKeyWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithNamedPrimaryKeyExpression();
-            expression.SchemaName = "TestSchema";
+            expression.SchemaName = TestSchema;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"CREATE TABLE ""TestSchema"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL, ""TestColumn2"" NUMBER NOT NULL, CONSTRAINT ""TestKey"" PRIMARY KEY (""TestColumn1""))", _quotingEnabled);
+            result.ShouldBe($@"CREATE TABLE ""{TestSchema}"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL, ""TestColumn2"" NUMBER NOT NULL, CONSTRAINT ""TestKey"" PRIMARY KEY (""TestColumn1""))", _quotingEnabled);
         }
 
         [Test]
         public override void CanCreateTableWithNamedPrimaryKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithNamedPrimaryKeyExpression();
-            Assert.Throws<ArgumentException>(() => Generator.Generate(expression));
+            var result = Generator.Generate(expression);
+            result.ShouldBe(@"CREATE TABLE ""PUBLIC"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL, ""TestColumn2"" NUMBER NOT NULL, CONSTRAINT ""TestKey"" PRIMARY KEY (""TestColumn1""))", _quotingEnabled);
         }
 
         [Test]
         public override void CanCreateTableWithNullableFieldWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
-            expression.SchemaName = "TestSchema";
+            expression.SchemaName = TestSchema;
             expression.Columns[0].IsNullable = true;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"CREATE TABLE ""TestSchema"".""TestTable1"" (""TestColumn1"" VARCHAR, ""TestColumn2"" NUMBER NOT NULL)", _quotingEnabled);
+            result.ShouldBe($@"CREATE TABLE ""{TestSchema}"".""TestTable1"" (""TestColumn1"" VARCHAR, ""TestColumn2"" NUMBER NOT NULL)", _quotingEnabled);
         }
 
         [Test]
@@ -236,24 +227,26 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
             expression.Columns[0].IsNullable = true;
-            Assert.Throws<ArgumentException>(() => Generator.Generate(expression));
+            var result = Generator.Generate(expression);
+            result.ShouldBe(@"CREATE TABLE ""PUBLIC"".""TestTable1"" (""TestColumn1"" VARCHAR, ""TestColumn2"" NUMBER NOT NULL)", _quotingEnabled);
         }
 
         [Test]
         public override void CanCreateTableWithPrimaryKeyWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithPrimaryKeyExpression();
-            expression.SchemaName = "TestSchema";
+            expression.SchemaName = TestSchema;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"CREATE TABLE ""TestSchema"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL, ""TestColumn2"" NUMBER NOT NULL, PRIMARY KEY (""TestColumn1""))", _quotingEnabled);
+            result.ShouldBe($@"CREATE TABLE ""{TestSchema}"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL, ""TestColumn2"" NUMBER NOT NULL, PRIMARY KEY (""TestColumn1""))", _quotingEnabled);
         }
 
         [Test]
         public override void CanCreateTableWithPrimaryKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithPrimaryKeyExpression();
-            Assert.Throws<ArgumentException>(() => Generator.Generate(expression));
+            var result = Generator.Generate(expression);
+            result.ShouldBe($@"CREATE TABLE ""PUBLIC"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL, ""TestColumn2"" NUMBER NOT NULL, PRIMARY KEY (""TestColumn1""))", _quotingEnabled);
         }
 
         [Test]
@@ -270,8 +263,11 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             var createForeignKeyExpression = migrationContext.Expressions.OfType<CreateForeignKeyExpression>().First();
 
             var processed = createForeignKeyExpression.Apply(ConventionSets.NoSchemaName);
-            Assert.Throws<ArgumentException>(() => Generator.Generate(createTableExpression));
-            Assert.Throws<ArgumentException>(() => Generator.Generate(processed));
+
+            var createTableResult = Generator.Generate(createTableExpression);
+            var createForeignKeyResult = Generator.Generate(createForeignKeyExpression);
+            createTableResult.ShouldBe(@"CREATE TABLE ""PUBLIC"".""FooTable"" (""FooColumn"" NUMBER NOT NULL)", _quotingEnabled);
+            createForeignKeyResult.ShouldBe(@"ALTER TABLE ""PUBLIC"".""FooTable"" ADD CONSTRAINT ""FK_FooTable_FooColumn_BarTable_BarColumn"" FOREIGN KEY (""FooColumn"") REFERENCES ""PUBLIC"".""BarTable"" (""BarColumn"")", _quotingEnabled);
         }
 
         [Test]
@@ -297,34 +293,36 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         public override void CanDropTableWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteTableExpression();
-            expression.SchemaName = "TestSchema";
+            expression.SchemaName = TestSchema;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"DROP TABLE ""TestSchema"".""TestTable1""", _quotingEnabled);
+            result.ShouldBe($@"DROP TABLE ""{TestSchema}"".""TestTable1""", _quotingEnabled);
         }
 
         [Test]
         public override void CanDropTableWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteTableExpression();
-            Assert.Throws<ArgumentException>(() => Generator.Generate(expression));
+            var result = Generator.Generate(expression);
+            result.ShouldBe(@"DROP TABLE ""PUBLIC"".""TestTable1""", _quotingEnabled);
         }
 
         [Test]
         public override void CanRenameTableWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetRenameTableExpression();
-            expression.SchemaName = "TestSchema";
+            expression.SchemaName = TestSchema;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"ALTER TABLE ""TestSchema"".""TestTable1"" RENAME TO ""TestSchema"".""TestTable2""", _quotingEnabled);
+            result.ShouldBe($@"ALTER TABLE ""{TestSchema}"".""TestTable1"" RENAME TO ""{TestSchema}"".""TestTable2""", _quotingEnabled);
         }
 
         [Test]
         public override void CanRenameTableWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetRenameTableExpression();
-            Assert.Throws<ArgumentException>(() => Generator.Generate(expression));
+            var result = Generator.Generate(expression);
+            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" RENAME TO ""PUBLIC"".""TestTable2""", _quotingEnabled);
         }
     }
 }

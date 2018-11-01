@@ -41,6 +41,7 @@ namespace FluentMigrator.Tests.Integration
     [Category("MySql")]
     [Category("SQLite")]
     [Category("Postgres")]
+    [Category("Snowflake")]
     [Category("SqlServer2005")]
     [Category("SqlServer2008")]
     [Category("SqlServer2012")]
@@ -68,9 +69,7 @@ namespace FluentMigrator.Tests.Integration
 
                     runner.Down(new VersionMigration(tableMetaData));
                     processor.TableExists(tableMetaData.SchemaName, tableMetaData.TableName).ShouldBeFalse();
-                },
-                true,
-                typeof(SnowflakeProcessor) /* Snowflake does not support default schema. */);
+                });
         }
 
         [Test]
@@ -108,8 +107,7 @@ namespace FluentMigrator.Tests.Integration
                 typeof(SQLiteProcessor),
                 typeof(MySqlProcessor),
                 typeof(FirebirdProcessor),
-                typeof(SqlAnywhereProcessor),
-                typeof(SnowflakeProcessor) /* Snowflake does not support default schema. */);
+                typeof(SqlAnywhereProcessor));
         }
 
         [Test]
@@ -141,9 +139,7 @@ namespace FluentMigrator.Tests.Integration
                     runner.RollbackToVersion(0);
 
                     processor.TableExists(null, tableMetaData.TableName).ShouldBeFalse();
-                },
-                true,
-                typeof(SnowflakeProcessor) /* Snowflake does not support default schema. */);
+                });
         }
     }
 }

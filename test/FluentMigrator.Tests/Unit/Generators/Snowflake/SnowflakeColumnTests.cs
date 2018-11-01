@@ -62,7 +62,8 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         public override void CanCreateNullableColumnWithCustomDomainTypeAndDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpressionWithNullableCustomType();
-            Assert.Throws<ArgumentException>(() => Generator.Generate(expression));
+            var result = Generator.Generate(expression);
+            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ADD COLUMN ""TestColumn1"" MyDomainType", _quotingEnabled);
         }
 
         [Test]
@@ -79,9 +80,9 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         [Test]
         public override void CanAlterColumnWithDefaultSchema()
         {
-            //TODO: This will fail if there are any keys attached
             var expression = GeneratorTestHelper.GetAlterColumnExpression();
-            Assert.Throws<ArgumentException>(() => Generator.Generate(expression));
+            var result = Generator.Generate(expression);
+            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ALTER COLUMN ""TestColumn1"" SET NOT NULL, COLUMN ""TestColumn1"" VARCHAR(20), COLUMN ""TestColumn1"" COMMENT ''", _quotingEnabled);
         }
 
         [Test]
@@ -98,7 +99,8 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         public override void CanCreateAutoIncrementColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetAlterColumnAddAutoIncrementExpression();
-            Assert.Throws<ArgumentException>(() => Generator.Generate(expression));
+            var result = Generator.Generate(expression);
+            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ALTER COLUMN ""TestColumn1"" SET NOT NULL, COLUMN ""TestColumn1"" NUMBER, COLUMN ""TestColumn1"" COMMENT ''", _quotingEnabled);
         }
 
         [Test]
@@ -115,7 +117,8 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         public override void CanCreateColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
-            Assert.Throws<ArgumentException>(() => Generator.Generate(expression));
+            var result = Generator.Generate(expression);
+            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ADD COLUMN ""TestColumn1"" VARCHAR(5) NOT NULL", _quotingEnabled);
         }
 
         [Test]
@@ -132,10 +135,10 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         public override void CanCreateColumnWithSystemMethodAndDefaultSchema()
         {
             var expressions = GeneratorTestHelper.GetCreateColumnWithSystemMethodExpression();
-            foreach (var e in expressions)
-            {
-                Assert.Throws<ArgumentException>(() => Generator.Generate((dynamic) e));
-            }
+            var result = expressions.Select(x => (string)Generator.Generate((dynamic)x));
+            result.ShouldBe(new[] {
+                @"ALTER TABLE ""PUBLIC"".""TestTable1"" ADD COLUMN ""TestColumn1"" TIMESTAMP_NTZ",
+                @"UPDATE ""PUBLIC"".""TestTable1"" SET ""TestColumn1"" = CURRENT_TIMESTAMP() WHERE 1 = 1" }, _quotingEnabled);
         }
 
         [Test]
@@ -152,7 +155,8 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         public override void CanCreateDecimalColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateDecimalColumnExpression();
-            Assert.Throws<ArgumentException>(() => Generator.Generate(expression));
+            var result = Generator.Generate(expression);
+            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ADD COLUMN ""TestColumn1"" NUMBER(19,2) NOT NULL", _quotingEnabled);
         }
 
         [Test]
@@ -171,7 +175,8 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         {
             //This does not work if it is a primary key
             var expression = GeneratorTestHelper.GetDeleteColumnExpression();
-            Assert.Throws<ArgumentException>(() => Generator.Generate(expression));
+            var result = Generator.Generate(expression);
+            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" DROP COLUMN ""TestColumn1""", _quotingEnabled);
         }
 
         [Test]
@@ -190,7 +195,8 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         {
             //This does not work if it is a primary key
             var expression = GeneratorTestHelper.GetDeleteColumnExpression(new [] { "TestColumn1", "TestColumn2" });
-            Assert.Throws<ArgumentException>(() => Generator.Generate(expression));
+            var result = Generator.Generate(expression);
+            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" DROP COLUMN ""TestColumn1""; ALTER TABLE ""PUBLIC"".""TestTable1"" DROP COLUMN ""TestColumn2""", _quotingEnabled);
         }
 
         [Test]
@@ -207,7 +213,8 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         public override void CanRenameColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetRenameColumnExpression();
-            Assert.Throws<ArgumentException>(() => Generator.Generate(expression));
+            var result = Generator.Generate(expression);
+            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" RENAME COLUMN ""TestColumn1"" TO ""TestColumn2""", _quotingEnabled);
         }
 
 

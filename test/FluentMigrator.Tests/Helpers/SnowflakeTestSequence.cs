@@ -34,7 +34,7 @@ namespace FluentMigrator.Tests.Helpers
         {
             Processor = processor;
             _quoter = Processor.Quoter;
-            _schema = schema ?? throw new ArgumentNullException(nameof(schema));
+            _schema = schema;
 
             if (Connection.State != ConnectionState.Open)
                 Connection.Open();
@@ -57,7 +57,10 @@ namespace FluentMigrator.Tests.Helpers
 
         public void Create()
         {
-            Processor.Execute($"CREATE SCHEMA {_quoter.QuoteSchemaName(_schema)}");
+            if (!string.IsNullOrEmpty(_schema))
+            {
+                Processor.Execute($"CREATE SCHEMA {_quoter.QuoteSchemaName(_schema)}");
+            }
 
             var createCommand =
                 $"CREATE SEQUENCE {_quoter.QuoteSchemaName(_schema)}.{_quoter.Quote(Name)} START 2 INCREMENT BY 2";
@@ -67,7 +70,10 @@ namespace FluentMigrator.Tests.Helpers
         public void Drop()
         {
             Processor.Execute($"DROP SEQUENCE {_quoter.QuoteSchemaName(_schema)}.{_quoter.Quote(Name)}");
-            Processor.Execute($"DROP SCHEMA {_quoter.QuoteSchemaName(_schema)}");
+            if (!string.IsNullOrEmpty(_schema))
+            {
+                Processor.Execute($"DROP SCHEMA {_quoter.QuoteSchemaName(_schema)}");
+            }
         }
     }
 }

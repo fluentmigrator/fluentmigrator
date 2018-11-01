@@ -64,13 +64,10 @@ namespace FluentMigrator.Runner.Generators.Snowflake
         /// <inheritdoc />
         public override string QuoteSchemaName(string schemaName)
         {
-            if (string.IsNullOrWhiteSpace(schemaName))
-            {
-                throw new ArgumentException("Snowflake database does not have default schema, please specify schema.");
-            }
-
-            return base.QuoteSchemaName(schemaName);
+            return base.QuoteSchemaName(schemaName ?? DefaultSchemaName);
         }
+
+        public string DefaultSchemaName => "PUBLIC";
 
         /// <inheritdoc />
         public override string FormatDateTime(DateTime value)

@@ -56,7 +56,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Snowflake
         [Test]
         public override void CallingSequenceExistsReturnsFalseIfSequenceDoesNotExist()
         {
-            Assert.Ignore("No default schema support.");
+            Processor.SequenceExists(null, "DoesNotExist").ShouldBeFalse();
         }
 
         [Test]
@@ -68,7 +68,8 @@ namespace FluentMigrator.Tests.Integration.Processors.Snowflake
         [Test]
         public override void CallingSequenceExistsReturnsTrueIfSequenceExists()
         {
-            Assert.Ignore("No default schema support.");
+            using (new SnowflakeTestSequence(Processor, null, "test_sequence"))
+                Processor.SequenceExists(null, "test_sequence").ShouldBeTrue();
         }
 
         [Test]

@@ -97,7 +97,8 @@ namespace FluentMigrator.Tests.Integration.Processors.Snowflake
         [Test]
         public override void CallingColumnExistsReturnsFalseIfColumnDoesNotExist()
         {
-            Assert.Ignore("No default schema support.");
+            using (var table = new SnowflakeTestTable(Processor, null, $"{Quoter.Quote("id")} int"))
+                Processor.ColumnExists(null, table.Name, "DoesNotExist").ShouldBeFalse();
         }
 
         [Test]
@@ -110,7 +111,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Snowflake
         [Test]
         public override void CallingColumnExistsReturnsFalseIfTableDoesNotExist()
         {
-            Assert.Ignore("No default schema support.");
+            Processor.ColumnExists(null, "DoesNotExist", "DoesNotExist").ShouldBeFalse();
         }
 
         [Test]
@@ -122,7 +123,8 @@ namespace FluentMigrator.Tests.Integration.Processors.Snowflake
         [Test]
         public override void CallingColumnExistsReturnsTrueIfColumnExists()
         {
-            Assert.Ignore("No default schema support.");
+            using (var table = new SnowflakeTestTable(Processor, null, $"{Quoter.Quote("id")} int"))
+                Processor.ColumnExists(null, table.Name, "id").ShouldBeTrue();
         }
 
         [Test]

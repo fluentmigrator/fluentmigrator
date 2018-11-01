@@ -163,6 +163,12 @@ namespace FluentMigrator.Runner.Processors.Snowflake
             }
         }
 
+        private string FormatSnowflakeMetadataQuerySchemaName(string schema)
+        {
+            schema = schema ?? Quoter.DefaultSchemaName;
+            return FormatHelper.FormatSqlEscape(_quoteIdentifiers ? schema : schema.ToUpperInvariant());
+        }
+
         private string FormatSnowflakeMetadataQueryIdentifier(string identifier)
         {
             return FormatHelper.FormatSqlEscape(_quoteIdentifiers ? identifier : identifier.ToUpperInvariant());
@@ -199,7 +205,7 @@ namespace FluentMigrator.Runner.Processors.Snowflake
         /// <inheritdoc />
         public override bool SchemaExists(string schemaName)
         {
-            return Exists("SELECT 1 WHERE EXISTS (SELECT * FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '{0}')", FormatSnowflakeMetadataQueryIdentifier(schemaName));
+            return Exists("SELECT 1 WHERE EXISTS (SELECT * FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '{0}')", FormatSnowflakeMetadataQuerySchemaName(schemaName));
         }
 
         /// <inheritdoc />
@@ -207,7 +213,7 @@ namespace FluentMigrator.Runner.Processors.Snowflake
         {
             return Exists(
                 "SELECT 1 WHERE EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}' AND TABLE_TYPE = 'BASE TABLE')",
-                FormatSnowflakeMetadataQueryIdentifier(schemaName),
+                FormatSnowflakeMetadataQuerySchemaName(schemaName),
                 FormatSnowflakeMetadataQueryIdentifier(tableName));
         }
 
@@ -216,7 +222,7 @@ namespace FluentMigrator.Runner.Processors.Snowflake
         {
             return Exists(
                 "SELECT 1 WHERE EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}' AND COLUMN_NAME = '{2}')",
-                FormatSnowflakeMetadataQueryIdentifier(schemaName),
+                FormatSnowflakeMetadataQuerySchemaName(schemaName),
                 FormatSnowflakeMetadataQueryIdentifier(tableName),
                 FormatSnowflakeMetadataQueryIdentifier(columnName));
         }
@@ -226,7 +232,7 @@ namespace FluentMigrator.Runner.Processors.Snowflake
         {
             return Exists(
                 "SELECT 1 WHERE EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE CONSTRAINT_CATALOG = CURRENT_DATABASE() AND TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}' AND CONSTRAINT_NAME = '{2}')",
-                FormatSnowflakeMetadataQueryIdentifier(schemaName),
+                FormatSnowflakeMetadataQuerySchemaName(schemaName),
                 FormatSnowflakeMetadataQueryIdentifier(tableName),
                 FormatSnowflakeMetadataQueryIdentifier(constraintName));
         }
@@ -242,7 +248,7 @@ namespace FluentMigrator.Runner.Processors.Snowflake
         {
             return Exists(
                 "SELECT 1 WHERE EXISTS (SELECT * FROM INFORMATION_SCHEMA.SEQUENCES WHERE SEQUENCE_SCHEMA = '{0}' AND SEQUENCE_NAME = '{1}')",
-                FormatSnowflakeMetadataQueryIdentifier(schemaName),
+                FormatSnowflakeMetadataQuerySchemaName(schemaName),
                 FormatSnowflakeMetadataQueryIdentifier(sequenceName));
         }
 
@@ -252,7 +258,7 @@ namespace FluentMigrator.Runner.Processors.Snowflake
             var defaultValueAsString = $"%{FormatHelper.FormatSqlEscape(defaultValue.ToString())}%";
             return Exists(
                 "SELECT 1 WHERE EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}' AND COLUMN_NAME = '{2}' AND COLUMN_DEFAULT LIKE '{3}')",
-                FormatSnowflakeMetadataQueryIdentifier(schemaName),
+                FormatSnowflakeMetadataQuerySchemaName(schemaName),
                 FormatSnowflakeMetadataQueryIdentifier(tableName),
                 FormatSnowflakeMetadataQueryIdentifier(columnName),
                 defaultValueAsString);

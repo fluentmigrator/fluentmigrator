@@ -96,7 +96,8 @@ namespace FluentMigrator.Tests.Integration.Processors.Snowflake
         [Test]
         public override void CallingConstraintExistsReturnsFalseIfConstraintDoesNotExist()
         {
-            Assert.Ignore("No default schema support.");
+            using (var table = new SnowflakeTestTable(Processor, null, $"{Quoter.Quote("id")} int"))
+                Processor.ConstraintExists(null, table.Name, "DoesNotExist").ShouldBeFalse();
         }
 
         [Test]
@@ -109,7 +110,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Snowflake
         [Test]
         public override void CallingConstraintExistsReturnsFalseIfTableDoesNotExist()
         {
-            Assert.Ignore("No default schema support.");
+            Processor.ConstraintExists(null, "DoesNotExist", "DoesNotExist").ShouldBeFalse();
         }
 
         [Test]
@@ -121,7 +122,9 @@ namespace FluentMigrator.Tests.Integration.Processors.Snowflake
         [Test]
         public override void CallingConstraintExistsReturnsTrueIfConstraintExists()
         {
-            Assert.Ignore("No default schema support.");
+            // Snowflake does not support check constraints, trying with PK instead.
+            using (var table = new SnowflakeTestTable(Processor, null, $"{Quoter.Quote("id")} int", $"{Quoter.Quote("wibble")} int CONSTRAINT {Quoter.Quote("c1")} PRIMARY KEY"))
+                Processor.ConstraintExists(null, table.Name, "c1").ShouldBeTrue();
         }
 
         [Test]

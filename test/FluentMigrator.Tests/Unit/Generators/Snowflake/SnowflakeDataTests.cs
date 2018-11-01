@@ -33,6 +33,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
     {
         protected SnowflakeGenerator Generator;
         private readonly bool _quotingEnabled;
+        private const string TestSchema = "TestSchema";
 
         public SnowflakeDataTests(bool quotingEnabled)
         {
@@ -50,68 +51,72 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         public override void CanDeleteDataForAllRowsWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteDataAllRowsExpression();
-            expression.SchemaName = "TestSchema";
+            expression.SchemaName = TestSchema;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"DELETE FROM ""TestSchema"".""TestTable1"" WHERE 1 = 1", _quotingEnabled);
+            result.ShouldBe($@"DELETE FROM ""{TestSchema}"".""TestTable1"" WHERE 1 = 1", _quotingEnabled);
         }
 
         [Test]
         public override void CanDeleteDataForAllRowsWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteDataAllRowsExpression();
-            Assert.Throws<ArgumentException>(() => Generator.Generate(expression));
+            var result = Generator.Generate(expression);
+            result.ShouldBe(@"DELETE FROM ""PUBLIC"".""TestTable1"" WHERE 1 = 1", _quotingEnabled);
         }
 
         [Test]
         public override void CanDeleteDataForMultipleRowsWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteDataMultipleRowsExpression();
-            expression.SchemaName = "TestSchema";
+            expression.SchemaName = TestSchema;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"DELETE FROM ""TestSchema"".""TestTable1"" WHERE ""Name"" = 'Just''in' AND ""Website"" IS NULL; DELETE FROM ""TestSchema"".""TestTable1"" WHERE ""Website"" = 'github.com'", _quotingEnabled);
+            result.ShouldBe($@"DELETE FROM ""{TestSchema}"".""TestTable1"" WHERE ""Name"" = 'Just''in' AND ""Website"" IS NULL; DELETE FROM ""{TestSchema}"".""TestTable1"" WHERE ""Website"" = 'github.com'", _quotingEnabled);
         }
 
         [Test]
         public override void CanDeleteDataForMultipleRowsWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteDataMultipleRowsExpression();
-            Assert.Throws<ArgumentException>(() => Generator.Generate(expression));
+            var result = Generator.Generate(expression);
+            result.ShouldBe(@"DELETE FROM ""PUBLIC"".""TestTable1"" WHERE ""Name"" = 'Just''in' AND ""Website"" IS NULL; DELETE FROM ""PUBLIC"".""TestTable1"" WHERE ""Website"" = 'github.com'", _quotingEnabled);
         }
 
         [Test]
         public override void CanDeleteDataWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteDataExpression();
-            expression.SchemaName = "TestSchema";
+            expression.SchemaName = TestSchema;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"DELETE FROM ""TestSchema"".""TestTable1"" WHERE ""Name"" = 'Just''in' AND ""Website"" IS NULL", _quotingEnabled);
+            result.ShouldBe($@"DELETE FROM ""{TestSchema}"".""TestTable1"" WHERE ""Name"" = 'Just''in' AND ""Website"" IS NULL", _quotingEnabled);
         }
 
         [Test]
         public override void CanDeleteDataWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteDataExpression();
-            Assert.Throws<ArgumentException>(() => Generator.Generate(expression));
+            var result = Generator.Generate(expression);
+            result.ShouldBe(@"DELETE FROM ""PUBLIC"".""TestTable1"" WHERE ""Name"" = 'Just''in' AND ""Website"" IS NULL", _quotingEnabled);
         }
 
         [Test]
         public override void CanDeleteDataWithDbNullCriteria()
         {
             var expression = GeneratorTestHelper.GetDeleteDataExpressionWithDbNullValue();
-            Assert.Throws<ArgumentException>(() => Generator.Generate(expression));
+            var result = Generator.Generate(expression);
+            result.ShouldBe(@"DELETE FROM ""PUBLIC"".""TestTable1"" WHERE ""Name"" = 'Just''in' AND ""Website"" IS NULL", _quotingEnabled);
         }
 
         [Test]
         public override void CanInsertDataWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetInsertDataExpression();
-            expression.SchemaName = "TestSchema";
+            expression.SchemaName = TestSchema;
 
-            var expected = @"INSERT INTO ""TestSchema"".""TestTable1"" (""Id"", ""Name"", ""Website"") VALUES (1, 'Just''in', 'codethinked.com');";
-            expected += @" INSERT INTO ""TestSchema"".""TestTable1"" (""Id"", ""Name"", ""Website"") VALUES (2, 'Na\te', 'kohari.org')";
+            var expected = $@"INSERT INTO ""{TestSchema}"".""TestTable1"" (""Id"", ""Name"", ""Website"") VALUES (1, 'Just''in', 'codethinked.com');";
+            expected += $@" INSERT INTO ""{TestSchema}"".""TestTable1"" (""Id"", ""Name"", ""Website"") VALUES (2, 'Na\te', 'kohari.org')";
 
             var result = Generator.Generate(expression);
             result.ShouldBe(expected, _quotingEnabled);
@@ -121,65 +126,73 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         public override void CanInsertDataWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetInsertDataExpression();
-            Assert.Throws<ArgumentException>(() => Generator.Generate(expression));
+            var expected = $@"INSERT INTO ""PUBLIC"".""TestTable1"" (""Id"", ""Name"", ""Website"") VALUES (1, 'Just''in', 'codethinked.com');";
+            expected += $@" INSERT INTO ""PUBLIC"".""TestTable1"" (""Id"", ""Name"", ""Website"") VALUES (2, 'Na\te', 'kohari.org')";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe(expected, _quotingEnabled);
         }
 
         [Test]
         public override void CanInsertGuidDataWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetInsertGUIDExpression();
-            expression.SchemaName = "TestSchema";
+            expression.SchemaName = TestSchema;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe($@"INSERT INTO ""TestSchema"".""TestTable1"" (""guid"") VALUES ('{GeneratorTestHelper.TestGuid}')", _quotingEnabled);
+            result.ShouldBe($@"INSERT INTO ""{TestSchema}"".""TestTable1"" (""guid"") VALUES ('{GeneratorTestHelper.TestGuid}')", _quotingEnabled);
         }
 
         [Test]
         public override void CanInsertGuidDataWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetInsertGUIDExpression();
-            Assert.Throws<ArgumentException>(() => Generator.Generate(expression));
+            var result = Generator.Generate(expression);
+            result.ShouldBe($@"INSERT INTO ""PUBLIC"".""TestTable1"" (""guid"") VALUES ('{GeneratorTestHelper.TestGuid}')", _quotingEnabled);
         }
 
         [Test]
         public override void CanUpdateDataForAllDataWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpressionWithAllRows();
-            expression.SchemaName = "TestSchema";
+            expression.SchemaName = TestSchema;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"UPDATE ""TestSchema"".""TestTable1"" SET ""Name"" = 'Just''in', ""Age"" = 25 WHERE 1 = 1", _quotingEnabled);
+            result.ShouldBe($@"UPDATE ""{TestSchema}"".""TestTable1"" SET ""Name"" = 'Just''in', ""Age"" = 25 WHERE 1 = 1", _quotingEnabled);
         }
 
         [Test]
         public override void CanUpdateDataForAllDataWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpressionWithAllRows();
-            Assert.Throws<ArgumentException>(() => Generator.Generate(expression));
+            var result = Generator.Generate(expression);
+            result.ShouldBe(@"UPDATE ""PUBLIC"".""TestTable1"" SET ""Name"" = 'Just''in', ""Age"" = 25 WHERE 1 = 1", _quotingEnabled);
         }
 
         [Test]
         public override void CanUpdateDataWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpression();
-            expression.SchemaName = "TestSchema";
+            expression.SchemaName = TestSchema;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"UPDATE ""TestSchema"".""TestTable1"" SET ""Name"" = 'Just''in', ""Age"" = 25 WHERE ""Id"" = 9 AND ""Homepage"" IS NULL", _quotingEnabled);
+            result.ShouldBe($@"UPDATE ""{TestSchema}"".""TestTable1"" SET ""Name"" = 'Just''in', ""Age"" = 25 WHERE ""Id"" = 9 AND ""Homepage"" IS NULL", _quotingEnabled);
         }
 
         [Test]
         public override void CanUpdateDataWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpression();
-            Assert.Throws<ArgumentException>(() => Generator.Generate(expression));
+            var result = Generator.Generate(expression);
+            result.ShouldBe(@"UPDATE ""PUBLIC"".""TestTable1"" SET ""Name"" = 'Just''in', ""Age"" = 25 WHERE ""Id"" = 9 AND ""Homepage"" IS NULL", _quotingEnabled);
         }
 
         [Test]
         public override void CanUpdateDataWithDbNullCriteria()
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpressionWithDbNullValue();
-            Assert.Throws<ArgumentException>(() => Generator.Generate(expression));
+            var result = Generator.Generate(expression);
+            result.ShouldBe(@"UPDATE ""PUBLIC"".""TestTable1"" SET ""Name"" = 'Just''in', ""Age"" = 25 WHERE ""Id"" = 9 AND ""Homepage"" IS NULL", _quotingEnabled);
         }
     }
 }
