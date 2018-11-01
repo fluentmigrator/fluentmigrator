@@ -50,7 +50,7 @@ namespace FluentMigrator.Runner.BatchParser
         /// than the <paramref name="token"/> itself. This is usually the case when the token should be the only text on the line,
         /// but is instead surrounded by whitespace.
         /// </remarks>
-        public SpecialTokenInfo(int index, int length, [NotNull] string token, object opaque = null) : this(index, length, token, false, opaque)
+        public SpecialTokenInfo(int index, int length, [NotNull] string token, object opaque) : this(index, length, token, false, opaque)
         {
         }
 
