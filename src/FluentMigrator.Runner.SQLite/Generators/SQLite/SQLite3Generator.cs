@@ -27,23 +27,23 @@ using Microsoft.Extensions.Options;
 namespace FluentMigrator.Runner.Generators.SQLite
 {
     // ReSharper disable once InconsistentNaming
-    public class SQLiteGenerator : GenericGenerator
+    public class SQLite3Generator : GenericGenerator
     {
-        public SQLiteGenerator()
-            : this(new SQLiteQuoter())
+        public SQLite3Generator()
+            : this(new SQLite3Quoter())
         {
         }
 
-        public SQLiteGenerator(
-            [NotNull] SQLiteQuoter quoter)
+        public SQLite3Generator(
+            [NotNull] SQLite3Quoter quoter)
             : this(quoter, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()))
         {
         }
 
-        public SQLiteGenerator(
-            [NotNull] SQLiteQuoter quoter,
+        public SQLite3Generator(
+            [NotNull] SQLite3Quoter quoter,
             [NotNull] IOptions<GeneratorOptions> generatorOptions)
-            : base(new SQLiteColumn(), quoter, new EmptyDescriptionGenerator(), generatorOptions)
+            : base(new SQLite3Column(), quoter, new EmptyDescriptionGenerator(), generatorOptions)
         {
         }
 

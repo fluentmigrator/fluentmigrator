@@ -61,7 +61,8 @@ namespace FluentMigrator.Tests.Integration
                 (typeof(SqlServer2014Processor), () => IntegrationTestOptions.SqlServer2014),
                 (typeof(SqlServer2016Processor), () => IntegrationTestOptions.SqlServer2016),
                 (typeof(SqlAnywhere16Processor), () => IntegrationTestOptions.SqlAnywhere16),
-                (typeof(SQLiteProcessor), () => IntegrationTestOptions.SQLite),
+                (typeof(SQLite2Processor), () => IntegrationTestOptions.SQLite2),
+                (typeof(SQLite3Processor), () => IntegrationTestOptions.SQLite3),
                 (typeof(FirebirdProcessor), () => IntegrationTestOptions.Firebird),
                 (typeof(PostgresProcessor), () => IntegrationTestOptions.Postgres),
                 (typeof(MySql4Processor), () => IntegrationTestOptions.MySql),
@@ -191,7 +192,8 @@ namespace FluentMigrator.Tests.Integration
                         .AddFirebird()
                         .AddMySql4()
                         .AddPostgres()
-                        .AddSQLite()
+                        .AddSQLite2()
+                        .AddSQLite3()
                         .AddSqlAnywhere16()
                         .AddSqlServer2005()
                         .AddSqlServer2008()

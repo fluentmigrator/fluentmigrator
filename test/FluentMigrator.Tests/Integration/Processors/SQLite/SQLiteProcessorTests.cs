@@ -42,7 +42,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
 {
     [TestFixture]
     [Category("Integration")]
-    [Category("SQLite")]
+    [Category("SQLite3")]
     // ReSharper disable once InconsistentNaming
     public class SQLiteProcessorTests
     {
@@ -53,7 +53,28 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
 
         private ServiceProvider ServiceProvider { get; set; }
         private IServiceScope ServiceScope { get; set; }
-        private SQLiteProcessor Processor { get; set; }
+        private SQLite3Processor Processor { get; set; }
+
+        [Test]
+        public void SQLite3Int64KeyShouldBeBigint()
+        {
+            var column = new ColumnDefinition
+            {
+                Name = "Id",
+                IsIdentity = true,
+                IsPrimaryKey = true,
+                Type = DbType.Int64,
+                IsNullable = false
+            };
+
+            var expression = new CreateTableExpression { TableName = _tableName };
+            expression.Columns.Add(column);
+
+            Processor.Process(expression);
+            Processor.TableExists(null, _tableName).ShouldBeTrue();
+            Processor.ColumnExists(null, _tableName, "Id").ShouldBeTrue();
+            Processor.GetColumnType(null, _tableName, "Id").ShouldBe("BIGINT");
+        }
 
         [Test]
         public void CanDefaultAutoIncrementColumnTypeToInteger()
@@ -175,13 +196,13 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
 
         private ServiceProvider CreateProcessorServices([CanBeNull] Action<IServiceCollection> initAction)
         {
-            if (!IntegrationTestOptions.SQLite.IsEnabled)
+            if (!IntegrationTestOptions.SQLite3.IsEnabled)
                 Assert.Ignore();
 
             var serivces = ServiceCollectionExtensions.CreateServices()
-                .ConfigureRunner(r => r.AddSQLite())
+                .ConfigureRunner(r => r.AddSQLite3())
                 .AddScoped<IConnectionStringReader>(
-                    _ => new PassThroughConnectionStringReader(IntegrationTestOptions.SQLite.ConnectionString));
+                    _ => new PassThroughConnectionStringReader(IntegrationTestOptions.SQLite3.ConnectionString));
 
             initAction?.Invoke(serivces);
 
@@ -212,7 +233,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
         public void SetUp()
         {
             ServiceScope = ServiceProvider.CreateScope();
-            Processor = ServiceScope.ServiceProvider.GetRequiredService<SQLiteProcessor>();
+            Processor = ServiceScope.ServiceProvider.GetRequiredService<SQLite3Processor>();
         }
 
         [TearDown]

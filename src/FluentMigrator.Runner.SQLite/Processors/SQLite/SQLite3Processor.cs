@@ -40,15 +40,15 @@ namespace FluentMigrator.Runner.Processors.SQLite
 {
 
     // ReSharper disable once InconsistentNaming
-    public class SQLiteProcessor : GenericProcessorBase
+    public class SQLite3Processor : GenericProcessorBase
     {
         [CanBeNull]
         private readonly IServiceProvider _serviceProvider;
 
-        public SQLiteProcessor(
+        public SQLite3Processor(
             [NotNull] SQLiteDbFactory factory,
-            [NotNull] SQLiteGenerator generator,
-            [NotNull] ILogger<SQLiteProcessor> logger,
+            [NotNull] SQLite3Generator generator,
+            [NotNull] ILogger<SQLite3Processor> logger,
             [NotNull] IOptionsSnapshot<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor,
             [NotNull] IServiceProvider serviceProvider)
@@ -57,7 +57,7 @@ namespace FluentMigrator.Runner.Processors.SQLite
             _serviceProvider = serviceProvider;
         }
 
-        public override string DatabaseType => "SQLite";
+        public override string DatabaseType => "SQLite3";
 
         public override IList<string> DatabaseTypeAliases { get; } = new List<string>();
 
@@ -73,13 +73,8 @@ namespace FluentMigrator.Runner.Processors.SQLite
 
         public override bool ColumnExists(string schemaName, string tableName, string columnName)
         {
-            var dataSet = Read("PRAGMA table_info([{0}])", tableName);
-            if (dataSet.Tables.Count == 0)
-                return false;
-            var table = dataSet.Tables[0];
-            if (!table.Columns.Contains("Name"))
-                return false;
-            return table.Select(string.Format("Name='{0}'", columnName.Replace("'", "''"))).Length > 0;
+            var column = Read($"SELECT COUNT(*) AS Count FROM pragma_table_info('{tableName}') WHERE name IS '{columnName}'").Tables[0].Rows[0]["Count"].ToString();
+            return int.Parse(column) == 1;
         }
 
         public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
@@ -249,6 +244,12 @@ namespace FluentMigrator.Runner.Processors.SQLite
             {
                 return reader.ReadDataSet();
             }
+        }
+
+        public string GetColumnType(string schemaName, string tableName, string columnName)
+        {
+            var dataSet = Read($"SELECT type FROM pragma_table_info('{tableName}') WHERE name IS '{columnName}'");
+            return dataSet?.Tables[0]?.Rows[0]["type"].ToString();
         }
     }
 }

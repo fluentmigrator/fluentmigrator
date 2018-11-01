@@ -33,7 +33,7 @@ using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Unit.Processors.SQLite
 {
-    [Category("SQLite")]
+    [Category("SQLite3")]
     public class BatchParserTests : ProcessorBatchParserTestsBase
     {
         protected override IMigrationProcessor CreateProcessor()
@@ -51,14 +51,14 @@ namespace FluentMigrator.Tests.Unit.Processors.SQLite
                 .AddTransient<SQLiteBatchParser>()
                 .BuildServiceProvider();
 
-            var logger = serviceProvider.GetRequiredService<ILogger<SQLiteProcessor>>();
+            var logger = serviceProvider.GetRequiredService<ILogger<SQLite3Processor>>();
 
             var opt = new OptionsManager<ProcessorOptions>(new OptionsFactory<ProcessorOptions>(
                 Enumerable.Empty<IConfigureOptions<ProcessorOptions>>(),
                 Enumerable.Empty<IPostConfigureOptions<ProcessorOptions>>()));
-            return new SQLiteProcessor(
+            return new SQLite3Processor(
                 mockedDbFactory.Object,
-                new SQLiteGenerator(),
+                new SQLite3Generator(),
                 logger,
                 opt,
                 MockedConnectionStringAccessor.Object,

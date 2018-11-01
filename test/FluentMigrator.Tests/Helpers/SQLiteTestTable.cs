@@ -31,7 +31,7 @@ namespace FluentMigrator.Tests.Helpers {
 
         public string Name { get; set; }
 
-        public SQLiteTestTable( SQLiteProcessor processor, string schemaName, params string[] columnDefinitions ) {
+        public SQLiteTestTable( SQLite3Processor processor, string schemaName, params string[] columnDefinitions ) {
             _schemaName = schemaName;
             Connection = processor.Connection;
             Transaction = processor.Transaction;

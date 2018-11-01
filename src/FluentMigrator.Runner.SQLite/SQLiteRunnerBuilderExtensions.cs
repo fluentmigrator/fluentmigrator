@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2018, FluentMigrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -39,11 +39,50 @@ namespace FluentMigrator.Runner
             builder.Services
                 .AddTransient<SQLiteBatchParser>()
                 .AddScoped<SQLiteDbFactory>()
-                .AddScoped<SQLiteProcessor>()
-                .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<SQLiteProcessor>())
-                .AddScoped<SQLiteQuoter>()
-                .AddScoped<SQLiteGenerator>()
-                .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<SQLiteGenerator>());
+                .AddScoped<SQLite3Processor>()
+                .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<SQLite3Processor>())
+                .AddScoped<SQLite3Quoter>()
+                .AddScoped<SQLite3Generator>()
+                .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<SQLite3Generator>());
+            return builder;
+        }
+
+        /// <summary>
+        /// Adds SQLite2 support
+        /// </summary>
+        /// <param name="builder">The builder to add the SQLite-specific services to</param>
+        /// <returns>The migration runner builder</returns>
+        // ReSharper disable once InconsistentNaming
+        public static IMigrationRunnerBuilder AddSQLite2(this IMigrationRunnerBuilder builder)
+        {
+            builder.Services
+                .AddTransient<SQLiteBatchParser>()
+                .AddScoped<SQLiteDbFactory>()
+                .AddScoped<SQLite2Processor>()
+                .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<SQLite2Processor>())
+                .AddScoped<SQLite2Quoter>()
+                .AddScoped<SQLite2Generator>()
+                .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<SQLite2Generator>());
+            return builder;
+        }
+
+
+        /// <summary>
+        /// Adds SQLite3 support
+        /// </summary>
+        /// <param name="builder">The builder to add the SQLite-specific services to</param>
+        /// <returns>The migration runner builder</returns>
+        // ReSharper disable once InconsistentNaming
+        public static IMigrationRunnerBuilder AddSQLite3(this IMigrationRunnerBuilder builder)
+        {
+            builder.Services
+                .AddTransient<SQLiteBatchParser>()
+                .AddScoped<SQLiteDbFactory>()
+                .AddScoped<SQLite3Processor>()
+                .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<SQLite3Processor>())
+                .AddScoped<SQLite3Quoter>()
+                .AddScoped<SQLite3Generator>()
+                .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<SQLite3Generator>());
             return builder;
         }
     }

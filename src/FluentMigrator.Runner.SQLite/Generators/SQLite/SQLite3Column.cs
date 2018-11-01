@@ -8,10 +8,10 @@ using FluentMigrator.Runner.Generators.Base;
 namespace FluentMigrator.Runner.Generators.SQLite
 {
     // ReSharper disable once InconsistentNaming
-    internal class SQLiteColumn : ColumnBase
+    internal class SQLite3Column : ColumnBase
     {
-        public SQLiteColumn()
-            : base(new SQLiteTypeMap(), new SQLiteQuoter())
+        public SQLite3Column()
+            : base(new SQLite3TypeMap(), new SQLite3Quoter())
         {
         }
 
@@ -50,12 +50,18 @@ namespace FluentMigrator.Runner.Generators.SQLite
         /// <inheritdoc />
         protected override string FormatPrimaryKey(ColumnDefinition column)
         {
+            var primaryKey = "PRIMARY KEY";
             if (!column.IsPrimaryKey)
             {
                 return string.Empty;
             }
 
-            return column.IsIdentity ? "PRIMARY KEY AUTOINCREMENT" : string.Empty;
+            if (column.Type == DbType.Int32 || column.Type == DbType.UInt32)
+            {
+                primaryKey += " AUTOINCREMENT";
+            }
+
+            return column.IsIdentity ? primaryKey : string.Empty;
         }
     }
 }

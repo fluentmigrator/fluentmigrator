@@ -102,7 +102,7 @@ namespace FluentMigrator.Tests.Integration
                     processor.SchemaExists(tableMetaData.SchemaName).ShouldBeFalse();
                 },
                 true,
-                typeof(SQLiteProcessor),
+                typeof(SQLite3Processor),
                 typeof(MySqlProcessor),
                 typeof(FirebirdProcessor),
                 typeof(SqlAnywhereProcessor));

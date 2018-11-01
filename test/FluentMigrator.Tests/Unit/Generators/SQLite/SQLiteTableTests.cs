@@ -35,12 +35,12 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
     // ReSharper disable once InconsistentNaming
     public class SQLiteTableTests : BaseTableTests
     {
-        protected SQLiteGenerator Generator;
+        protected SQLite3Generator Generator;
 
         [SetUp]
         public void Setup()
         {
-            Generator = new SQLiteGenerator();
+            Generator = new SQLite3Generator();
         }
 
         [Test]

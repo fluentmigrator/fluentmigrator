@@ -37,12 +37,12 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
     // ReSharper disable once InconsistentNaming
     public class SQLiteGeneratorTests
     {
-        protected SQLiteGenerator Generator;
+        protected SQLite3Generator Generator;
 
         [SetUp]
         public void Setup()
         {
-            Generator = new SQLiteGenerator();
+            Generator = new SQLite3Generator();
         }
 
         [Test]
