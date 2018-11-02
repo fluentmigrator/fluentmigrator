@@ -16,7 +16,6 @@
     <PackageReference Include="Autofac" Version="4.8.1" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="4.2.2" />
     <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="5.12.1" />
-    <PackageReference Include="log4net" Version="2.0.8" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="2.0.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.0.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="2.0.1" />
@@ -26,13 +25,13 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.7.0" />
     <PackageReference Include="Moq" Version="4.8.2" />
     <PackageReference Include="MySql.Data" Version="8.0.11" />
-    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="Npgsql" Version="3.2.7" />
     <PackageReference Include="NUnit" Version="3.10.1" />
     <PackageReference Include="NUnit.Console" Version="3.8.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.10.0" />
     <PackageReference Include="Sap.Data.SQLAnywhere" Version="17.0.7.3399" />
     <PackageReference Include="Shouldly" Version="3.0.0" />
+    <PackageReference Include="Snowflake.Data" Version="1.0.5" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\FluentMigrator.Console\FluentMigrator.Console.csproj" />
@@ -56,9 +55,6 @@
     </Reference>
     <Reference Include="Sap.Data.Hana.v4.5">
       <HintPath>..\..\lib\Hana\ado.net\v4.5\Sap.Data.Hana.v4.5.dll</HintPath>
-    </Reference>
-    <Reference Include="Snowflake.Data">
-      <HintPath>..\..\lib\Snowflake\net46\Snowflake.Data.dll</HintPath>
     </Reference>
     <Reference Include="System.Data.SqlServerCe">
       <Private>True</Private>
