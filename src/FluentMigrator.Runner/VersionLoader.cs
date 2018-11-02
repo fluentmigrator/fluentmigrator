@@ -147,9 +147,23 @@ namespace FluentMigrator.Runner
             if (!AlreadyCreatedVersionTable) return;
 
             var dataSet = _processor.ReadTableData(VersionTableMetaData.SchemaName, VersionTableMetaData.TableName);
-            foreach (DataRow row in dataSet.Tables[0].Rows)
+            var dataTable = dataSet.Tables[0];
+
+            // Ignore case when looking for correct column.
+            foreach (DataColumn col in dataTable.Columns)
             {
-                _versionInfo.AddAppliedMigration(long.Parse(row[VersionTableMetaData.ColumnName].ToString()));
+                if (string.Equals(
+                    col.ToString(),
+                    VersionTableMetaData.ColumnName,
+                    StringComparison.InvariantCultureIgnoreCase))
+                {
+                    foreach (DataRow row in dataTable.Rows)
+                    {
+                        _versionInfo.AddAppliedMigration(long.Parse(row[col].ToString()));
+                    }
+
+                    break;
+                }
             }
         }
 
