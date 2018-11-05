@@ -23,6 +23,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
+using FluentMigrator.Builders.Delete.Table;
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Exceptions;
@@ -656,6 +657,8 @@ namespace FluentMigrator.Tests.Integration
                     var runner = (MigrationRunner) serviceProvider.GetRequiredService<IMigrationRunner>();
                     try
                     {
+                        RemoveMigration1(processor);
+
                         runner.MigrateUp(1, false);
 
                         runner.VersionLoader.VersionInfo.HasAppliedMigration(1).ShouldBeTrue();
@@ -1122,7 +1125,7 @@ namespace FluentMigrator.Tests.Integration
                 typeof(SQLiteProcessor),
                 typeof(MySqlProcessor),
                 typeof(PostgresProcessor),
-                typeof(SqlAnywhere16Processor) 
+                typeof(SqlAnywhere16Processor)
             };
 
             var namespacePass2 = typeof(Migrations.Interleaved.Pass2.User).Namespace;
@@ -1816,6 +1819,20 @@ namespace FluentMigrator.Tests.Integration
                     runner.Down(new TestExecuteSql());
                 }, true,
                 typeof(FirebirdProcessor));
+        }
+
+        private void RemoveMigration1(ProcessorBase processor)
+        {
+            var tablesToRemove = new[] { "Users", "Groups" };
+            foreach (var tableName in tablesToRemove)
+            {
+                if (processor.TableExists(null, tableName))
+                {
+                    var dropTableSql = processor.Generator.Generate(
+                        new DeleteTableExpression() { TableName = tableName });
+                    processor.Execute(dropTableSql);
+                }
+            }
         }
 
         private void CleanupTestSqlServerDatabase<TProcessor>(IServiceProvider serviceProvider, TProcessor origProcessor)
