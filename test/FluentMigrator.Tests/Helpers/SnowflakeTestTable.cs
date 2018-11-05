@@ -20,7 +20,7 @@ namespace FluentMigrator.Tests.Helpers
             _quoter = Processor.Quoter;
             _schema = schema;
 
-            Name = _quoter.UnQuote(table);
+            Name = _quoter.UnQuote(table) + "_" + Guid.NewGuid().GetHashCode().ToString("X8");
             NameWithSchema = _quoter.QuoteTableName(Name, _schema);
             Create(columnDefinitions);
         }
