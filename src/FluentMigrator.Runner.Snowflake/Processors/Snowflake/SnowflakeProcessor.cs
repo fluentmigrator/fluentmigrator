@@ -136,7 +136,7 @@ namespace FluentMigrator.Runner.Processors.Snowflake
                     message.WriteLine(string.IsNullOrEmpty(sqlBatch) ? sql : sqlBatch);
                     message.WriteLine("The error was {0}", ex.Message);
 
-                    throw new Exception(message.ToString(), ex);
+                    throw new SnowflakeException(message.ToString(), ex);
                 }
             }
         }
@@ -157,7 +157,7 @@ namespace FluentMigrator.Runner.Processors.Snowflake
                         message.WriteLine(sql);
                         message.WriteLine("The error was {0}", ex.Message);
 
-                        throw new ApplicationException(message.ToString(), ex);
+                        throw new SnowflakeException(message.ToString(), ex);
                     }
                 }
             }
