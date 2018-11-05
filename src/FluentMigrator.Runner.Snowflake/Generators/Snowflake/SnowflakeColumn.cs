@@ -14,7 +14,6 @@
 // limitations under the License.
 #endregion
 
-using System;
 using System.Collections.Generic;
 
 using FluentMigrator.Exceptions;
@@ -36,8 +35,7 @@ namespace FluentMigrator.Runner.Generators.Snowflake
         {
         }
 
-
-        public string GenerateAlterColumn(ColumnDefinition column)
+        internal string GenerateAlterColumn(ColumnDefinition column)
         {
             var clauses = new List<string>();
             var dropOrSet = column.IsNullable ?? false ? "DROP" : "SET";
@@ -50,7 +48,6 @@ namespace FluentMigrator.Runner.Generators.Snowflake
 
             return string.Join(", ", clauses);
         }
-
 
         /// <inheritdoc />
         protected override string FormatIdentity(ColumnDefinition column)

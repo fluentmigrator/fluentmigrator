@@ -14,7 +14,6 @@
 // limitations under the License.
 #endregion
 
-using System;
 using System.Text;
 
 using FluentMigrator.Exceptions;
@@ -46,10 +45,7 @@ namespace FluentMigrator.Runner.Generators.Snowflake
             [NotNull] IOptions<GeneratorOptions> generatorOptions)
             : base(new SnowflakeColumn(sfOptions), quoter, new SnowflakeDescriptionGenerator(quoter), generatorOptions)
         {
-            SfOptions = sfOptions ?? throw new ArgumentNullException(nameof(sfOptions));
         }
-
-        protected SnowflakeOptions SfOptions { get; }
 
         /// <inheritdoc />
         public override string AlterColumn => "ALTER TABLE {0} ALTER {1}";

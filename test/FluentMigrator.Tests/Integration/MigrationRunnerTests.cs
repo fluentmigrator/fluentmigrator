@@ -23,7 +23,6 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-using FluentMigrator.Builders.Delete.Table;
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Exceptions;
@@ -1823,8 +1822,7 @@ namespace FluentMigrator.Tests.Integration
 
         private void RemoveMigration1(ProcessorBase processor)
         {
-            var tablesToRemove = new[] { "Users", "Groups" };
-            foreach (var tableName in tablesToRemove)
+            foreach (var tableName in new[] { "Users", "Groups" })
             {
                 if (processor.TableExists(null, tableName))
                 {

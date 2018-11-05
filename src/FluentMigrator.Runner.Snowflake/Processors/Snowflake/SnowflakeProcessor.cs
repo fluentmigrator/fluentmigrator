@@ -165,8 +165,8 @@ namespace FluentMigrator.Runner.Processors.Snowflake
 
         private string FormatSnowflakeMetadataQuerySchemaName(string schema)
         {
-            schema = schema ?? Quoter.DefaultSchemaName;
-            return FormatHelper.FormatSqlEscape(_quoteIdentifiers ? schema : schema.ToUpperInvariant());
+            var dbSchema = schema ?? Quoter.DefaultSchemaName;
+            return FormatHelper.FormatSqlEscape(_quoteIdentifiers ? dbSchema : dbSchema.ToUpperInvariant());
         }
 
         private string FormatSnowflakeMetadataQueryIdentifier(string identifier)
