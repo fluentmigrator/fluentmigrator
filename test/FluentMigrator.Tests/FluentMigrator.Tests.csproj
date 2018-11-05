@@ -78,10 +78,6 @@
       <Link>%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="../../lib/Snowflake/*.*">
-      <Link>%(Filename)%(Extension)</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <ItemGroup Condition=" '$(MSBuildRuntimeType)' == 'Core' or '$(OS)' != 'Windows_NT' ">
     <Compile Remove="Integration\Processors\Jet\**" />
