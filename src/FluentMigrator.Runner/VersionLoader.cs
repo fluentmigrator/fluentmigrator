@@ -147,9 +147,28 @@ namespace FluentMigrator.Runner
             if (!AlreadyCreatedVersionTable) return;
 
             var dataSet = _processor.ReadTableData(VersionTableMetaData.SchemaName, VersionTableMetaData.TableName);
-            foreach (DataRow row in dataSet.Tables[0].Rows)
+            var dataTable = dataSet.Tables[0];
+            var versionColumnIndex = dataTable.Columns.IndexOf(VersionTableMetaData.ColumnName);
+
+            // Find out correct column by case insensitive matching if column was not found. Setting dataTable.caseSensitive = false does not help for some reason.
+            if (versionColumnIndex < 0)
             {
-                _versionInfo.AddAppliedMigration(long.Parse(row[VersionTableMetaData.ColumnName].ToString()));
+                foreach (DataColumn column in dataTable.Columns)
+                {
+                    if (string.Equals(
+                        column.ToString(),
+                        VersionTableMetaData.ColumnName,
+                        StringComparison.OrdinalIgnoreCase))
+                    {
+                        versionColumnIndex = dataTable.Columns.IndexOf(column);
+                        break;
+                    }
+                }
+            }
+
+            foreach (DataRow row in dataTable.Rows)
+            {
+                _versionInfo.AddAppliedMigration(long.Parse(row[versionColumnIndex].ToString()));
             }
         }
 

@@ -16,6 +16,7 @@
     <None Include="..\..\FluentMigrator.snk" Link="FluentMigrator.snk" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\FluentMigrator.Runner.Snowflake\FluentMigrator.Runner.Snowflake.csproj" />
     <ProjectReference Include="..\FluentMigrator.Runner\FluentMigrator.Runner.csproj" />
     <ProjectReference Include="..\FluentMigrator.Runner.Db2\FluentMigrator.Runner.Db2.csproj" />
     <ProjectReference Include="..\FluentMigrator.Runner.Firebird\FluentMigrator.Runner.Firebird.csproj" />
@@ -39,6 +40,7 @@
     <PackageReference Include="Microsoft.Data.Sqlite" Version="2.0.1" />
     <PackageReference Include="Oracle.ManagedDataAccess" Version="12.2.1100" />
     <PackageReference Include="MySql.Data" Version="8.0.11" />
+    <PackageReference Include="Snowflake.Data" Version="1.0.5" />
   </ItemGroup>
   <ItemGroup Condition=" '$(Platform)' == 'x86' ">
     <PackageReference Include="Oracle.DataAccess.x86.4" Version="4.112.3" />
@@ -53,5 +55,13 @@
       <Link>%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\lib\Snowflake\net46\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Snowflake.Data">
+      <HintPath>..\..\lib\Snowflake\net46\Snowflake.Data.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>
