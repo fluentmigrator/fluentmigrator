@@ -1,5 +1,7 @@
 using System.Linq;
 using FluentMigrator.Runner.Generators.Postgres;
+using FluentMigrator.Runner.Processors.Postgres;
+
 using NUnit.Framework;
 
 using Shouldly;
@@ -12,7 +14,8 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         [SetUp]
         public void Setup()
         {
-            DescriptionGenerator = new PostgresDescriptionGenerator();
+            var quoter = new PostgresQuoter(new PostgresOptions());
+            DescriptionGenerator = new PostgresDescriptionGenerator(quoter);
         }
 
         [Test]
@@ -22,7 +25,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             var statements = DescriptionGenerator.GenerateDescriptionStatements(createTableExpression);
 
             var result = statements.First();
-            result.ShouldBe( "COMMENT ON TABLE \"public\".\"TestTable1\" IS 'TestDescription';" );
+            result.ShouldBe("COMMENT ON TABLE \"public\".\"TestTable1\" IS 'TestDescription';");
         }
 
         [Test]
@@ -32,7 +35,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             var statements = DescriptionGenerator.GenerateDescriptionStatements(createTableExpression).ToArray();
 
             var result = string.Join("", statements);
-            result.ShouldBe( "COMMENT ON TABLE \"public\".\"TestTable1\" IS 'TestDescription';COMMENT ON COLUMN \"public\".\"TestTable1\".\"TestColumn1\" IS 'TestColumn1Description';COMMENT ON COLUMN \"public\".\"TestTable1\".\"TestColumn2\" IS 'TestColumn2Description';" );
+            result.ShouldBe("COMMENT ON TABLE \"public\".\"TestTable1\" IS 'TestDescription';COMMENT ON COLUMN \"public\".\"TestTable1\".\"TestColumn1\" IS 'TestColumn1Description';COMMENT ON COLUMN \"public\".\"TestTable1\".\"TestColumn2\" IS 'TestColumn2Description';");
         }
 
         [Test]
@@ -41,7 +44,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             var alterTableExpression = GeneratorTestHelper.GetAlterTableWithDescriptionExpression();
             var statement = DescriptionGenerator.GenerateDescriptionStatement(alterTableExpression);
 
-            statement.ShouldBe( "COMMENT ON TABLE \"public\".\"TestTable1\" IS 'TestDescription';" );
+            statement.ShouldBe("COMMENT ON TABLE \"public\".\"TestTable1\" IS 'TestDescription';");
         }
 
         [Test]
@@ -50,7 +53,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             var createColumnExpression = GeneratorTestHelper.GetCreateColumnExpressionWithDescription();
             var statement = DescriptionGenerator.GenerateDescriptionStatement(createColumnExpression);
 
-            statement.ShouldBe( "COMMENT ON COLUMN \"public\".\"TestTable1\".\"TestColumn1\" IS 'TestColumn1Description';" );
+            statement.ShouldBe("COMMENT ON COLUMN \"public\".\"TestTable1\".\"TestColumn1\" IS 'TestColumn1Description';");
         }
 
         [Test]
@@ -59,7 +62,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             var alterColumnExpression = GeneratorTestHelper.GetAlterColumnExpressionWithDescription();
             var statement = DescriptionGenerator.GenerateDescriptionStatement(alterColumnExpression);
 
-            statement.ShouldBe( "COMMENT ON COLUMN \"public\".\"TestTable1\".\"TestColumn1\" IS 'TestColumn1Description';" );
+            statement.ShouldBe("COMMENT ON COLUMN \"public\".\"TestTable1\".\"TestColumn1\" IS 'TestColumn1Description';");
         }
     }
 }

@@ -23,19 +23,22 @@ using System.Linq;
 
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Base;
+using FluentMigrator.Runner.Processors.Postgres;
+
+using JetBrains.Annotations;
 
 namespace FluentMigrator.Runner.Generators.Postgres
 {
     internal class PostgresColumn : ColumnBase
     {
-        public PostgresColumn() : base(new PostgresTypeMap(), new PostgresQuoter())
+        public PostgresColumn([NotNull] PostgresQuoter quoter) : base(new PostgresTypeMap(), quoter)
         {
             AlterClauseOrder = new List<Func<ColumnDefinition, string>> { FormatAlterType, FormatAlterNullable };
         }
 
         public string FormatAlterDefaultValue(string column, object defaultValue)
         {
-            string formatDefaultValue = FormatDefaultValue(new ColumnDefinition { Name = column, DefaultValue = defaultValue});
+            string formatDefaultValue = FormatDefaultValue(new ColumnDefinition { Name = column, DefaultValue = defaultValue });
 
             return string.Format("SET {0}", formatDefaultValue);
         }
