@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2018, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -38,7 +38,6 @@ namespace FluentMigrator.Runner.BatchParser
         {
             new MultiLineComment(),
             new DoubleDashSingleLineComment(),
-            new PoundSignSingleLineComment(),
             new SqlServerIdentifier(),
             new SqlString(),
         };
