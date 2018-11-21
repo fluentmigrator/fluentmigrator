@@ -9,7 +9,7 @@ namespace FluentMigrator.Tests.Helpers
 {
     public class PostgresTestTable : IDisposable
     {
-        private readonly PostgresQuoter _quoter = new PostgresQuoter();
+        private readonly PostgresQuoter _quoter = new PostgresQuoter(new PostgresOptions());
         private readonly string _schemaName;
         public NpgsqlConnection Connection { get; private set; }
         public string Name { get; set; }

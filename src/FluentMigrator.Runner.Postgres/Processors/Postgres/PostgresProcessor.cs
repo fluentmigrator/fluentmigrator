@@ -17,16 +17,23 @@ namespace FluentMigrator.Runner.Processors.Postgres
 {
     public class PostgresProcessor : GenericProcessorBase
     {
-        private readonly PostgresQuoter _quoter = new PostgresQuoter();
+        private readonly PostgresQuoter _quoter;
 
         public override string DatabaseType => "Postgres";
 
         public override IList<string> DatabaseTypeAliases { get; } = new List<string> { "PostgreSQL" };
 
         [Obsolete]
-        public PostgresProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
+        public PostgresProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory,
+            [NotNull] PostgresOptions pgOptions)
             : base(connection, factory, generator, announcer, options)
         {
+            if (pgOptions == null)
+            {
+                throw new ArgumentNullException(nameof(pgOptions));
+            }
+
+            _quoter = new PostgresQuoter(pgOptions);
         }
 
         public PostgresProcessor(
@@ -34,9 +41,16 @@ namespace FluentMigrator.Runner.Processors.Postgres
             [NotNull] PostgresGenerator generator,
             [NotNull] ILogger<PostgresProcessor> logger,
             [NotNull] IOptionsSnapshot<ProcessorOptions> options,
-            [NotNull] IConnectionStringAccessor connectionStringAccessor)
+            [NotNull] IConnectionStringAccessor connectionStringAccessor,
+            [NotNull] PostgresOptions pgOptions)
             : base(() => factory.Factory, generator, logger, options.Value, connectionStringAccessor)
         {
+            if (pgOptions == null)
+            {
+                throw new ArgumentNullException(nameof(pgOptions));
+            }
+
+            _quoter = new PostgresQuoter(pgOptions);
         }
 
         public override void Execute(string template, params object[] args)
@@ -150,12 +164,24 @@ namespace FluentMigrator.Runner.Processors.Postgres
 
         private string FormatToSafeSchemaName(string schemaName)
         {
-            return FormatHelper.FormatSqlEscape(_quoter.UnQuoteSchemaName(schemaName));
+            var schemaNameCased = schemaName;
+            if (!_quoter.Options.ForceQuote)
+            {
+                schemaNameCased = schemaName?.ToLowerInvariant();
+            }
+
+            return FormatHelper.FormatSqlEscape(_quoter.UnQuoteSchemaName(schemaNameCased));
         }
 
         private string FormatToSafeName(string sqlName)
         {
-            return FormatHelper.FormatSqlEscape(_quoter.UnQuote(sqlName));
+            var sqlNameCased = sqlName;
+            if (!_quoter.Options.ForceQuote)
+            {
+                sqlNameCased = sqlName?.ToLowerInvariant();
+            }
+
+            return FormatHelper.FormatSqlEscape(_quoter.UnQuote(sqlNameCased));
         }
     }
 }

@@ -18,6 +18,8 @@
 
 using FluentMigrator.Runner.Generators.Generic;
 
+using JetBrains.Annotations;
+
 namespace FluentMigrator.Runner.Generators.Postgres
 {
     /// <summary>
@@ -26,17 +28,12 @@ namespace FluentMigrator.Runner.Generators.Postgres
     /// </summary>
     public class PostgresDescriptionGenerator : GenericDescriptionGenerator
     {
-        private readonly IQuoter _quoter;
-
-        public PostgresDescriptionGenerator()
+        public PostgresDescriptionGenerator([NotNull] PostgresQuoter quoter)
         {
-            _quoter = new PostgresQuoter();
+            Quoter = quoter;
         }
 
-        protected IQuoter Quoter
-        {
-            get { return _quoter; }
-        }
+        protected IQuoter Quoter { get; }
 
         #region Constants
 

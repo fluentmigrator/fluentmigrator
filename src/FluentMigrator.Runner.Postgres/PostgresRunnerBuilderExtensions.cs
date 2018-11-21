@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2018, FluentMigrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,9 +15,11 @@
 #endregion
 
 using FluentMigrator.Runner.Generators.Postgres;
+using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Postgres;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner
 {
@@ -34,6 +36,12 @@ namespace FluentMigrator.Runner
         public static IMigrationRunnerBuilder AddPostgres(this IMigrationRunnerBuilder builder)
         {
             builder.Services
+                .AddScoped(
+                    sp =>
+                    {
+                        var processorOptions = sp.GetRequiredService<IOptionsSnapshot<ProcessorOptions>>();
+                        return PostgresOptions.ParseProviderSwitches(processorOptions.Value.ProviderSwitches);
+                    })
                 .AddScoped<PostgresDbFactory>()
                 .AddScoped<PostgresProcessor>()
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<PostgresProcessor>())
