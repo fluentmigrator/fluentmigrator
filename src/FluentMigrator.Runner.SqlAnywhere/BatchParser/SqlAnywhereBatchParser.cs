@@ -38,7 +38,7 @@ namespace FluentMigrator.Runner.BatchParser
         {
             new MultiLineComment(),
             new DoubleDashSingleLineComment(),
-            new PoundSignSingleLineComment(),
+            new DoubleSlashSingleLineComment(),
             new SqlString(),
             new AnsiSqlIdentifier(),
             new SqlServerIdentifier(),
