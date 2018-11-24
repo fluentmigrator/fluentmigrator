@@ -41,7 +41,7 @@ namespace FluentMigrator.Runner
         public IMigrationScope CreateOrWrapMigrationScope(bool transactional = true)
         {
             //prevent connection from being opened when --no-connection is specified in preview mode
-            if (_processor.Options.PreviewOnly)
+            if (_processor?.Options != null && _processor.Options.PreviewOnly)
             {
                 return new NoOpMigrationScope();
             }
