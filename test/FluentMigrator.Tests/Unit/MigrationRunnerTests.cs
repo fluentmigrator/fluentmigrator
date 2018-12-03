@@ -721,6 +721,15 @@ namespace FluentMigrator.Tests.Unit
                     new MigrationInfo(7, TransactionBehavior.Default, true, new TestBreakingMigration()), true));
         }
 
+        [Test]
+        public void TestLoadVersionInfoIfRequired()
+        {
+            var runner = CreateRunner();
+
+            runner.LoadVersionInfoIfRequired().ShouldBeTrue();
+            runner.LoadVersionInfoIfRequired().ShouldBeFalse();
+        }
+
         private static bool LineContainsAll(string line, params string[] words)
         {
             var pattern = string.Join(".*?", words.Select(Regex.Escape));

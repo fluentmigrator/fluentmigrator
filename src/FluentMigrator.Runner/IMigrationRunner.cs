@@ -108,5 +108,11 @@ namespace FluentMigrator.Runner
         /// </summary>
         /// <returns><c>true</c> when there are migrations available for a rollback</returns>
         bool HasMigrationsToApplyRollback();
+
+        /// <summary>
+        /// Creates the required version info database tables
+        /// </summary>
+        /// <returns><c>true</c> if the table had to be created or <c>false</c> when it already existed</returns>
+        bool LoadVersionInfoIfRequired();
     }
 }
