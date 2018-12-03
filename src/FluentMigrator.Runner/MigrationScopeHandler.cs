@@ -34,12 +34,18 @@ namespace FluentMigrator.Runner
         public IMigrationScope BeginScope()
         {
             GuardAgainstActiveMigrationScope();
-            CurrentScope = new TransactionalMigrationScope(_processor, ()=> CurrentScope = null);
+            CurrentScope = new TransactionalMigrationScope(_processor, () => CurrentScope = null);
             return CurrentScope;
         }
 
         public IMigrationScope CreateOrWrapMigrationScope(bool transactional = true)
         {
+            //prevent connection from being opened when --no-connection is specified in preview mode
+            if (_processor?.Options != null && _processor.Options.PreviewOnly)
+            {
+                return new NoOpMigrationScope();
+            }
+
             if (HasActiveMigrationScope) return new NoOpMigrationScope();
             if (transactional) return BeginScope();
             return new NoOpMigrationScope();
