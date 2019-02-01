@@ -41,7 +41,7 @@ namespace FluentMigrator.Runner
             [NotNull] IMigrationRunnerConventions conventions,
             [NotNull] IServiceProvider serviceProvider)
         {
-            var tagsList = tags.ToArray();
+            var tagsList = options.Value.Tags ?? new string[0];
 
             var types = assemblySource.Assemblies.SelectMany(a => a.ExportedTypes).ToList();
 
