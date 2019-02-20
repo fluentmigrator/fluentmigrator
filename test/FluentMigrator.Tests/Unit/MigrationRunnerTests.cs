@@ -32,6 +32,9 @@ using FluentMigrator.Runner.Infrastructure;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Tests.Integration.Migrations;
+using FluentMigrator.Tests.Integration.Migrations.Constrained.Constraints;
+using FluentMigrator.Tests.Integration.Migrations.Constrained.ConstraintsMultiple;
+using FluentMigrator.Tests.Integration.Migrations.Constrained.ConstraintsSuccess;
 using FluentMigrator.Tests.Logging;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -745,6 +748,51 @@ namespace FluentMigrator.Tests.Unit
             Assert.DoesNotThrow(() =>
                 runner.ApplyMigrationUp(
                     new MigrationInfo(7, TransactionBehavior.Default, true, new TestBreakingMigration()), true));
+        }
+
+        [Test]
+        public void DoesRunMigrationsThatMeetConstraints()
+        {
+            _migrationList.Clear();
+            _migrationList.Add(1, new MigrationInfo(1, TransactionBehavior.Default, new Step1Migration()));
+            _migrationList.Add(2, new MigrationInfo(2, TransactionBehavior.Default, new Step2Migration()));
+            _migrationList.Add(3, new MigrationInfo(3, TransactionBehavior.Default, new Step2Migration2()));
+            var runner = CreateRunner();
+            runner.MigrateUp();
+            Assert.AreEqual(1, runner.VersionLoader.VersionInfo.Latest());
+        }
+
+        [Test]
+        public void DoesRunMigrationsThatDoMeetConstraints()
+        {
+            _migrationList.Clear();
+            _migrationList.Add(1, new MigrationInfo(1, TransactionBehavior.Default, new Step1Migration()));
+            _migrationList.Add(2, new MigrationInfo(2, TransactionBehavior.Default, new Step2Migration()));
+            _migrationList.Add(3, new MigrationInfo(3, TransactionBehavior.Default, new Step2Migration2()));
+            var runner = CreateRunner();
+            runner.MigrateUp();
+            runner.MigrateUp(); // run migrations second time, this time satisfying constraints
+            Assert.AreEqual(3, runner.VersionLoader.VersionInfo.Latest());
+        }
+
+        [Test]
+        public void MultipleConstraintsEachNeedsToReturnTrue()
+        {
+            _migrationList.Clear();
+            _migrationList.Add(1, new MigrationInfo(1, TransactionBehavior.Default, new MultipleConstraintsMigration()));
+            var runner = CreateRunner();
+            runner.MigrateUp();
+            Assert.AreEqual(0, runner.VersionLoader.VersionInfo.Latest());
+        }
+
+        [Test]
+        public void DoesRunMigrationWithPositiveConstraint()
+        {
+            _migrationList.Clear();
+            _migrationList.Add(1, new MigrationInfo(1, TransactionBehavior.Default, new ConstrainedMigrationSuccess()));
+            var runner = CreateRunner();
+            runner.MigrateUp();
+            Assert.AreEqual(1, runner.VersionLoader.VersionInfo.Latest());
         }
 
         private static bool LineContainsAll(string line, params string[] words)
