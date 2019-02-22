@@ -26,6 +26,10 @@ namespace FluentMigrator.Runner.Constraints
     {
         private readonly Func<MigrationConstraintContext, bool> _predicate;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MigrationConstraintAttribute"/> class.
+        /// </summary>
+        /// <param name="predicate">Predicate that determines whether this migration should be run in given context <see cref="MigrationConstraintAttribute"/>.</param>
         public MigrationConstraintAttribute(Func<MigrationConstraintContext, bool> predicate)
         {
             _predicate = predicate ?? throw new ArgumentNullException("predicate", "Predicate must not be null");
@@ -33,7 +37,7 @@ namespace FluentMigrator.Runner.Constraints
         /// <summary>
         /// Determines whether the migration having this attribute should be run under given <paramref name="context">migration context</paramref>.
         /// </summary>
-        /// <param name="context"></param>
+        /// <param name="context">Contextual information that can be used to determine whether this migration should be run.</param>
         /// <returns>True if migration should be run under given <paramref name="context">migration context</paramref>.</returns>
         public bool ShouldRun(MigrationConstraintContext context)
         {

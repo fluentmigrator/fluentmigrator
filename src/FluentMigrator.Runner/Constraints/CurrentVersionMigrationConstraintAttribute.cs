@@ -22,6 +22,9 @@ namespace FluentMigrator.Runner.Constraints
     /// </summary>
     public class CurrentVersionMigrationConstraintAttribute : MigrationConstraintAttribute
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CurrentVersionMigrationConstraintAttribute"/> class.
+        /// </summary>
         /// <param name="minimumVersionToRunAgainst">The schema must equal or greater to this value for this migration to be run.</param>
         public CurrentVersionMigrationConstraintAttribute(long minimumVersionToRunAgainst)
             : base(ctx => ctx.VersionInfo.Latest() >= minimumVersionToRunAgainst) {

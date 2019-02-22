@@ -20,9 +20,19 @@ using FluentMigrator.Runner.Versioning;
 
 namespace FluentMigrator.Runner.Constraints
 {
+    /// <summary>
+    /// Contextual information about the context in which runner will determinate whether a constrained Migration should be run.
+    /// </summary>
+    /// <seealso cref="MigrationConstraintAttribute"/>
     public class MigrationConstraintContext
     {
+        /// <summary>
+        /// Runner options under which current migration run is started
+        /// </summary>
         public RunnerOptions RunnerOptions { get; set; }
+        /// <summary>
+        /// Provides information about the current state of target database
+        /// </summary>
         public IVersionInfo VersionInfo { get; set; }
     }
 }
