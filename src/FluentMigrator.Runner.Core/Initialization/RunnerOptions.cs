@@ -57,6 +57,8 @@ namespace FluentMigrator.Runner.Initialization
         /// <summary>
         /// Gets or sets the start version
         /// </summary>
+        /// <remarks>This will be used only if <see cref="NoConnection"/> is set to true.
+        /// Otherwise current state of target database will determine which migrations are needed.</remarks>
         public long StartVersion { get; set; }
 
         /// <summary>
