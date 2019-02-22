@@ -36,6 +36,7 @@ using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using FluentMigrator.Runner.Constraints;
 
 namespace FluentMigrator.Runner
 {
@@ -392,18 +393,29 @@ namespace FluentMigrator.Runner
             var migrations = MigrationLoader.LoadMigrations();
 
             return from pair in migrations
-                   where IsMigrationStepNeededForUpMigration(pair.Key, version)
+                   where IsMigrationStepNeededForUpMigration(pair.Value, version)
                    select pair.Value;
         }
 
-        private bool IsMigrationStepNeededForUpMigration(long versionOfMigration, long targetVersion)
+        private bool IsMigrationStepNeededForUpMigration(IMigrationInfo migration, long targetVersion)
         {
-            if (versionOfMigration <= targetVersion && !VersionLoader.VersionInfo.HasAppliedMigration(versionOfMigration))
+            bool MeetsMigrationConstraints(Type migrationType)
+            {
+                return migrationType.GetCustomAttributes().OfType<MigrationConstraintAttribute>()
+                    .All(a => a.ShouldRun(new MigrationConstraintContext
+                {
+                    RunnerOptions = _options,
+                    VersionInfo = VersionLoader.VersionInfo
+                }));
+            }
+
+            if (migration.Version <= targetVersion
+                && !VersionLoader.VersionInfo.HasAppliedMigration(migration.Version)
+                && MeetsMigrationConstraints(migration.Migration.GetType()))
             {
                 return true;
             }
             return false;
-
         }
 
         /// <inheritdoc />
