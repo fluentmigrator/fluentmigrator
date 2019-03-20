@@ -2,11 +2,19 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Description>Assembly containing migrations for the example project</Description>
+    <!-- By default, *.cs files will be automatically included as compile items,
+    but *.sql files will be automatically included as None items.  This disables that behavior. -->
+    <EnableDefaultNoneItems>false</EnableDefaultNoneItems>
   </PropertyGroup>
 
   <Import Project="$(MSBuildThisFileDirectory)../../Global.props" />
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\FluentMigrator\FluentMigrator.csproj" />
+  </ItemGroup>
+  <!-- Automatically include all *.sql files as embedded resources
+  for use with Migration.Execute.EmbeddedScript(string EmbeddedSqlScriptName) -->
+  <ItemGroup>
+    <EmbeddedResource Include="**/*.sql" />
   </ItemGroup>
 </Project>
