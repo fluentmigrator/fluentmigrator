@@ -65,6 +65,7 @@ namespace FluentMigrator.Console
         public bool TransactionPerSession;
         public bool AllowBreakingChange;
         public string ProviderSwitches;
+        public bool StripComments;
 
         public int Run(params string[] args)
         {
@@ -196,6 +197,11 @@ namespace FluentMigrator.Console
                         "providerswitches=",
                         "Provider specific switches",
                         v => { ProviderSwitches = v; }
+                    },
+                    {
+                        "strip|strip-comments",
+                        "Strip comments from the SQL scripts. Default is true.",
+                        v => { StripComments = v != null; }
                     },
                     {
                         "help|h|?",
@@ -357,6 +363,7 @@ namespace FluentMigrator.Console
                         opt.ConnectionString = Connection;
                         opt.PreviewOnly = PreviewOnly;
                         opt.ProviderSwitches = ProviderSwitches;
+                        opt.StripComments = StripComments;
                         opt.Timeout = Timeout == null ? null : (TimeSpan?) TimeSpan.FromSeconds(Timeout.Value);
                     });
 

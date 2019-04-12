@@ -86,6 +86,7 @@ namespace FluentMigrator.Runner.Processors
                 ? null
                 : (TimeSpan?)TimeSpan.FromSeconds(runnerContext.Timeout.Value);
             ProviderSwitches = runnerContext.ProviderSwitches;
+            StripComments = runnerContext.StripComments;
             ConnectionString = runnerContext.Connection;
             StripComments = runnerContext.StripComments;
         }

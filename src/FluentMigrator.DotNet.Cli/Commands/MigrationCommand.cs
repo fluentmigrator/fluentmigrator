@@ -49,5 +49,8 @@ namespace FluentMigrator.DotNet.Cli.Commands
 
         [Option("--default-schema-name", Description = "Set default Schema Name for VersionInfo table")]
         public string SchemaName { get; internal set; } = null;
+
+        [Option("--strip", Description = "Strip comments from the SQL scripts. Default is true.")]
+        public bool StripComments { get; set; } = true;
     }
 }
