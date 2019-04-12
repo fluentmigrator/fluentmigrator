@@ -216,7 +216,7 @@ namespace FluentMigrator.Runner
             _stopWatch = stopWatch;
             _processorOptions = processorOptions.Value;
 
-            _migrationScopeHandler = new MigrationScopeHandler(Processor);
+            _migrationScopeHandler = new MigrationScopeHandler(Processor, processorOptions.Value);
             _migrationValidator = migrationValidator;
             _versionLoader = new Lazy<IVersionLoader>(serviceProvider.GetRequiredService<IVersionLoader>);
 

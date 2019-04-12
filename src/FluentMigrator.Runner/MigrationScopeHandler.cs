@@ -18,15 +18,26 @@
 
 using System;
 
+using FluentMigrator.Runner.Processors;
+
 namespace FluentMigrator.Runner
 {
     public class MigrationScopeHandler
     {
         private readonly IMigrationProcessor _processor;
+        private readonly bool _previewOnly;
 
+        [Obsolete]
         public MigrationScopeHandler(IMigrationProcessor processor)
         {
             _processor = processor;
+            _previewOnly = processor.Options?.PreviewOnly ?? false;
+        }
+
+        public MigrationScopeHandler(IMigrationProcessor processor, ProcessorOptions processorOptions)
+        {
+            _processor = processor;
+            _previewOnly = processorOptions.PreviewOnly;
         }
 
         public IMigrationScope CurrentScope { get; set; }
@@ -40,8 +51,8 @@ namespace FluentMigrator.Runner
 
         public IMigrationScope CreateOrWrapMigrationScope(bool transactional = true)
         {
-            //prevent connection from being opened when --no-connection is specified in preview mode
-            if (_processor?.Options != null && _processor.Options.PreviewOnly)
+            // Prevent connection from being opened when --no-connection is specified in preview mode
+            if (_previewOnly)
             {
                 return new NoOpMigrationScope();
             }
