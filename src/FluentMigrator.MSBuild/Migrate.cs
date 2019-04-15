@@ -118,6 +118,8 @@ namespace FluentMigrator.MSBuild
 
         public bool IncludeUntaggedMigrations { get; set; } = true;
 
+        public string DefaultSchemaName { get; set; }
+
         private bool ExecutingAgainstMsSql => _databaseType.StartsWith("SqlServer", StringComparison.InvariantCultureIgnoreCase);
 
         public override bool Execute()
@@ -158,7 +160,7 @@ namespace FluentMigrator.MSBuild
 
         private void ExecuteMigrations()
         {
-            var conventionSet = new DefaultConventionSet(defaultSchemaName: null, WorkingDirectory);
+            var conventionSet = new DefaultConventionSet(DefaultSchemaName, WorkingDirectory);
 
             var services = CreateCoreServices()
                 .AddSingleton<IConventionSet>(conventionSet)

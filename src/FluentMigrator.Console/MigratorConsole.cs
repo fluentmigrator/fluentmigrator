@@ -68,6 +68,7 @@ namespace FluentMigrator.Console
         public bool AllowBreakingChange;
         public string ProviderSwitches;
         public bool StripComments;
+        public string DefaultSchemaName { get; set; }
 
         public int Run(params string[] args)
         {
@@ -267,6 +268,11 @@ namespace FluentMigrator.Console
                         "Allows execution of migrations marked as breaking changes.",
                         v => { AllowBreakingChange = v != null; }
                     },
+                    {
+                        "default-schema-name",
+                        "Set default schema name for the VersionInfo table and the migrations.",
+                        v => { DefaultSchemaName = v; }
+                    },
                 };
 
                 try
@@ -368,7 +374,7 @@ namespace FluentMigrator.Console
 
         private int ExecuteMigrations()
         {
-            var conventionSet = new DefaultConventionSet(defaultSchemaName: null, WorkingDirectory);
+            var conventionSet = new DefaultConventionSet(DefaultSchemaName, WorkingDirectory);
 
             var services = CreateCoreServices()
                 .Configure<FluentMigratorLoggerOptions>(
