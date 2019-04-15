@@ -19,6 +19,7 @@ using System.Linq;
 using System.Reflection;
 
 using FluentMigrator.Infrastructure;
+using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.VersionTableInfo;
@@ -231,6 +232,18 @@ namespace FluentMigrator.Runner
             private ScanInBuilder(
                 IMigrationRunnerBuilder builder,
                 IAssemblySourceItem currentSourceItem,
+                ITypeSourceItem<IConventionSet> sourceItem)
+            {
+                _builder = builder;
+                SourceItem = currentSourceItem;
+
+                _builder.DanglingAssemblySourceItem = null;
+                Services.AddSingleton(sourceItem);
+            }
+
+            private ScanInBuilder(
+                IMigrationRunnerBuilder builder,
+                IAssemblySourceItem currentSourceItem,
                 IEmbeddedResourceProvider sourceItem)
             {
                 _builder = builder;
@@ -267,6 +280,13 @@ namespace FluentMigrator.Runner
             public IScanInBuilder VersionTableMetaData()
             {
                 var sourceItem = new AssemblyVersionTableMetaDataSourceItem(SourceItem.Assemblies.ToArray());
+                return new ScanInBuilder(_builder, SourceItem, sourceItem);
+            }
+
+            /// <inheritdoc />
+            public IScanInBuilder ConventionSet()
+            {
+                var sourceItem = new AssemblySourceItem<IConventionSet>(SourceItem.Assemblies.ToArray());
                 return new ScanInBuilder(_builder, SourceItem, sourceItem);
             }
 

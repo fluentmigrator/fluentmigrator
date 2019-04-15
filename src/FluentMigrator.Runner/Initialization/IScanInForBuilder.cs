@@ -14,6 +14,8 @@
 // limitations under the License.
 #endregion
 
+using FluentMigrator.Runner.Conventions;
+
 namespace FluentMigrator.Runner.Initialization
 {
     /// <summary>
@@ -32,6 +34,12 @@ namespace FluentMigrator.Runner.Initialization
         /// </summary>
         /// <returns>The next step</returns>
         IScanInBuilder VersionTableMetaData();
+
+        /// <summary>
+        /// Use the scanned assemblies to search for types implementing <see cref="IConventionSet"/>
+        /// </summary>
+        /// <returns></returns>
+        IScanInBuilder ConventionSet();
 
         /// <summary>
         /// Use the scanned assemblies for embedded resources
