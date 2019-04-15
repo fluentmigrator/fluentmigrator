@@ -29,6 +29,13 @@ while the CI builds are stored on [MyGet](https://www.myget.org/feed/Packages/fl
 | **Bug/Feature Tracking**  | [![GitHub issues](https://img.shields.io/github/issues/fluentmigrator/fluentmigrator.svg)](https://github.com/fluentmigrator/fluentmigrator/issues) |
 | **Build server**          | [![Travis](https://img.shields.io/travis/fluentmigrator/fluentmigrator.svg)](https://travis-ci.org/fluentmigrator/fluentmigrator) |
 
+# Prerequisites
+
+| Tool                              | Consequences when not installed |
+|-----------------------------------|---------------------------------|
+| [Multilingual App Toolkit Editor](https://developer.microsoft.com/en-us/windows/develop/multilingual-app-toolkit) | You're unable to create translations. |
+| [Multilingual App Toolkit Extension (VS2017+)](https://marketplace.visualstudio.com/items?itemName=MultilingualAppToolkit.MultilingualAppToolkit-18308) | You get a compilation warning and the changed translation doesn't get compiled. |
+
 # Powered by
 
 <span>
