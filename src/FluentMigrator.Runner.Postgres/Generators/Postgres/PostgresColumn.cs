@@ -31,7 +31,20 @@ namespace FluentMigrator.Runner.Generators.Postgres
 {
     internal class PostgresColumn : ColumnBase
     {
-        public PostgresColumn([NotNull] PostgresQuoter quoter) : base(new PostgresTypeMap(), quoter)
+        [Obsolete]
+        public PostgresColumn([NotNull] PostgresQuoter quoter)
+            : this(quoter, new PostgresTypeMap())
+        {
+            AlterClauseOrder = new List<Func<ColumnDefinition, string>> { FormatAlterType, FormatAlterNullable };
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PostgresColumn"/> class.
+        /// </summary>
+        /// <param name="quoter">The Postgres quoter.</param>
+        /// <param name="typeMap">The Postgres type map.</param>
+        public PostgresColumn([NotNull] PostgresQuoter quoter, ITypeMap typeMap)
+            : base(typeMap, quoter)
         {
             AlterClauseOrder = new List<Func<ColumnDefinition, string>> { FormatAlterType, FormatAlterNullable };
         }

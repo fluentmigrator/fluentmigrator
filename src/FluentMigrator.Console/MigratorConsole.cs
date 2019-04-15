@@ -476,6 +476,7 @@ namespace FluentMigrator.Console
                         .AddOracleManaged()
                         .AddOracle12CManaged()
                         .AddPostgres()
+                        .AddPostgres92()
                         .AddRedshift()
                         .AddSqlAnywhere()
                         .AddSQLite()

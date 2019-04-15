@@ -42,7 +42,15 @@ namespace FluentMigrator.Runner.Generators.Postgres
         public PostgresGenerator(
             [NotNull] PostgresQuoter quoter,
             [NotNull] IOptions<GeneratorOptions> generatorOptions)
-            : base(new PostgresColumn(quoter), quoter, new PostgresDescriptionGenerator(quoter), generatorOptions)
+            : base(new PostgresColumn(quoter, new PostgresTypeMap()), quoter, new PostgresDescriptionGenerator(quoter), generatorOptions)
+        {
+        }
+
+        protected PostgresGenerator(
+            [NotNull] PostgresQuoter quoter,
+            [NotNull] IOptions<GeneratorOptions> generatorOptions,
+            ITypeMap typeMap)
+            : base(new PostgresColumn(quoter, typeMap), quoter, new PostgresDescriptionGenerator(quoter), generatorOptions)
         {
         }
 

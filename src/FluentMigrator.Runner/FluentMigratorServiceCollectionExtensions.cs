@@ -272,6 +272,7 @@ namespace Microsoft.Extensions.DependencyInjection
                         .AddOracleManaged()
                         .AddOracle12CManaged()
                         .AddPostgres()
+                        .AddPostgres92()
                         .AddRedshift()
                         .AddSqlAnywhere()
                         .AddSQLite()

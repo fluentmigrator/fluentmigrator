@@ -242,6 +242,7 @@ namespace FluentMigrator.MSBuild
                         .AddOracleManaged()
                         .AddOracle12CManaged()
                         .AddPostgres()
+                        .AddPostgres92()
                         .AddRedshift()
                         .AddSqlAnywhere()
                         .AddSQLite()
