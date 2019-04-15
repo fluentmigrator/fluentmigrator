@@ -109,6 +109,16 @@ namespace FluentMigrator.Runner.Initialization
         public bool NoConnection { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether untagged maintenance items should always be loaded/executed.
+        /// </summary>
+        public bool IncludeUntaggedMaintenances { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether untagged migrations should always be loaded/executed.
+        /// </summary>
+        public bool IncludeUntaggedMigrations { get; set; } = true;
+
+        /// <summary>
         /// Sets the values from the given runner context
         /// </summary>
         /// <param name="runnerContext">The runner context</param>

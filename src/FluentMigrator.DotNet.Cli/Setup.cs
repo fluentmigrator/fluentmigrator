@@ -122,6 +122,8 @@ namespace FluentMigrator.DotNet.Cli
 #pragma warning restore 612
                         opt.TransactionPerSession = options.TransactionMode == TransactionMode.Session;
                         opt.AllowBreakingChange = options.AllowBreakingChanges;
+                        opt.IncludeUntaggedMigrations = options.IncludeUntaggedMigrations;
+                        opt.IncludeUntaggedMaintenances = options.IncludeUntaggedMaintenances;
                     })
                 .Configure<ProcessorOptions>(
                     opt =>

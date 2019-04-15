@@ -53,6 +53,8 @@ namespace FluentMigrator.Console
         public bool ShowHelp;
         public int Steps;
         public List<string> Tags = new List<string>();
+        public bool IncludeUntaggedMaintenances;
+        public bool IncludeUntaggedMigrations = true;
         public string TargetAssembly;
         public string Task;
         public int? Timeout;
@@ -192,6 +194,53 @@ namespace FluentMigrator.Console
                         "tag=",
                         "Filters the migrations to be run by tag.",
                         v => { Tags.Add(v); }
+                    },
+                    {
+                        "include-untagged:",
+                        "Include untagged migrations and/or maintenance objects.",
+                        v =>
+                        {
+                            if (string.IsNullOrEmpty(v))
+                            {
+                                IncludeUntaggedMigrations = IncludeUntaggedMaintenances = true;
+                            }
+                            else
+                            {
+                                var items = v.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                                    .Select(x => x.ToLowerInvariant().Trim())
+                                    .Where(x => !string.IsNullOrEmpty(x))
+                                    .Select(
+                                        x =>
+                                        {
+                                            var hasOption = x.EndsWith("+") || x.EndsWith("-");
+                                            var enable = !x.EndsWith("-");
+                                            var name = hasOption ? x.Substring(0, x.Length - 1) : x;
+                                            return new
+                                            {
+                                                FullName = x,
+                                                ShortName = name.Substring(Math.Min(2, name.Length)),
+                                                Enable = enable,
+                                            };
+                                        });
+                                foreach (var item in items)
+                                {
+                                    switch (item.ShortName)
+                                    {
+                                        case "ma":
+                                            IncludeUntaggedMaintenances = item.Enable;
+                                            break;
+                                        case "mi":
+                                            IncludeUntaggedMigrations = item.Enable;
+                                            break;
+                                        default:
+                                            throw new ArgumentOutOfRangeException(
+                                                $"The argument {item.FullName} is not supported. "
+                                              + "Valid values are: ma, maintenance, mi, migrations with an optional '+' or '-' at the end to enable or disable the option. "
+                                              + "Multiple values may be given when separated by a comma.");
+                                    }
+                                }
+                            }
+                        }
                     },
                     {
                         "providerswitches=",
@@ -356,6 +405,8 @@ namespace FluentMigrator.Console
 #pragma warning restore 612
                         opt.TransactionPerSession = TransactionPerSession;
                         opt.AllowBreakingChange = AllowBreakingChange;
+                        opt.IncludeUntaggedMaintenances = IncludeUntaggedMaintenances;
+                        opt.IncludeUntaggedMigrations = IncludeUntaggedMigrations;
                     })
                 .Configure<ProcessorOptions>(
                     opt =>

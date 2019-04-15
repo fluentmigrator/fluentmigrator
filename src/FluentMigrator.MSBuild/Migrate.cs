@@ -114,6 +114,10 @@ namespace FluentMigrator.MSBuild
 
         public bool StripComments { get; set; } = true;
 
+        public bool IncludeUntaggedMaintenances { get; set; }
+
+        public bool IncludeUntaggedMigrations { get; set; } = true;
+
         private bool ExecutingAgainstMsSql => _databaseType.StartsWith("SqlServer", StringComparison.InvariantCultureIgnoreCase);
 
         public override bool Execute()
@@ -184,6 +188,8 @@ namespace FluentMigrator.MSBuild
 #pragma warning restore 612
                         opt.TransactionPerSession = TransactionPerSession;
                         opt.AllowBreakingChange = AllowBreakingChange;
+                        opt.IncludeUntaggedMigrations = IncludeUntaggedMigrations;
+                        opt.IncludeUntaggedMaintenances = IncludeUntaggedMaintenances;
                     })
                 .Configure<ProcessorOptions>(
                     opt =>

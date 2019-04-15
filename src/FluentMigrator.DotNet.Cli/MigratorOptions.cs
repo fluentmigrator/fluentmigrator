@@ -58,6 +58,8 @@ namespace FluentMigrator.DotNet.Cli
         public bool AllowBreakingChanges { get; private set; }
         public string SchemaName { get; private set; }
         public bool StripComments { get; private set; }
+        public bool IncludeUntaggedMaintenances { get; private set; }
+        public bool IncludeUntaggedMigrations { get; private set; } = true;
 
         public static MigratorOptions CreateListMigrations(ListMigrations cmd)
         {
@@ -142,6 +144,8 @@ namespace FluentMigrator.DotNet.Cli
             Tags = cmd.Tags?.ToList() ?? new List<string>();
             AllowBreakingChanges = cmd.AllowBreakingChanges;
             SchemaName = cmd.SchemaName;
+            IncludeUntaggedMigrations = cmd.IncludeUntaggedMigrations;
+            IncludeUntaggedMaintenances = cmd.IncludeUntaggedMaintenances;
             return this;
         }
     }

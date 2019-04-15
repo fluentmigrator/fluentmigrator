@@ -39,14 +39,13 @@ namespace FluentMigrator.Runner
         public MaintenanceLoader(IAssemblyCollection assemblyCollection, IEnumerable<string> tags, IMigrationRunnerConventions conventions)
         {
             var tagsList = tags?.ToArray() ?? new string[0];
-            var requireTags = tagsList.Length != 0;
 
             _maintenance = (
                 from a in assemblyCollection.Assemblies
                     from type in a.GetExportedTypes()
                     let stage = conventions.GetMaintenanceStage(type)
                     where stage != null
-                where (requireTags && conventions.TypeHasMatchingTags(type, tagsList)) || (!requireTags && !conventions.TypeHasTags(type))
+                where conventions.HasRequestedTags(type, tagsList, false)
                 let migration = (IMigration)Activator.CreateInstance(type)
                 group migration by stage.GetValueOrDefault()
             ).ToDictionary(
@@ -69,7 +68,7 @@ namespace FluentMigrator.Runner
                 from type in types
                 let stage = conventions.GetMaintenanceStage(type)
                 where stage != null
-                where !conventions.TypeHasTags(type) || tagsList.Length > 0 && conventions.TypeHasMatchingTags(type, tagsList)
+                where conventions.HasRequestedTags(type, tagsList, options.Value.IncludeUntaggedMaintenances)
                 let migration = (IMigration) ActivatorUtilities.CreateInstance(serviceProvider, type)
                 group migration by stage.GetValueOrDefault()
             ).ToDictionary(

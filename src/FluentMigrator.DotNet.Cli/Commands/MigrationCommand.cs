@@ -52,5 +52,11 @@ namespace FluentMigrator.DotNet.Cli.Commands
 
         [Option("--strip", Description = "Strip comments from the SQL scripts. Default is true.")]
         public bool StripComments { get; set; } = true;
+
+        [Option("--include-untagged-migrations", Description = "Include untagged migrations.")]
+        public bool IncludeUntaggedMigrations { get; set; } = true;
+
+        [Option("--include-untagged-maintenances", Description = "Include untagged maintenances.")]
+        public bool IncludeUntaggedMaintenances { get; set; }
     }
 }
