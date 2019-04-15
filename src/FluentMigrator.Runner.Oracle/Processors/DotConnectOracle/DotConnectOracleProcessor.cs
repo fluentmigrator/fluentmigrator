@@ -195,7 +195,7 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
 
             EnsureConnectionIsOpen();
 
-            expression.Operation?.Invoke(Connection, null);
+            expression.Operation?.Invoke(Connection, Transaction);
         }
 
         protected override void Process(string sql)
