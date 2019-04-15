@@ -108,7 +108,11 @@ namespace FluentMigrator.MSBuild
 
         public string ProviderSwitches { get; set; }
 
-        public bool StripComments { get; set; } = true;
+        public bool StripComments { get; set; }
+
+        public bool IncludeUntaggedMaintenances { get; set; }
+
+        public bool IncludeUntaggedMigrations { get; set; } = true;
 
         private bool ExecutingAgainstMsSql => _databaseType.StartsWith("SqlServer", StringComparison.InvariantCultureIgnoreCase);
 
@@ -179,6 +183,8 @@ namespace FluentMigrator.MSBuild
                         opt.Tags = Tags.ToTags().ToArray();
                         opt.TransactionPerSession = TransactionPerSession;
                         opt.AllowBreakingChange = AllowBreakingChange;
+                        opt.IncludeUntaggedMigrations = IncludeUntaggedMigrations;
+                        opt.IncludeUntaggedMaintenances = IncludeUntaggedMaintenances;
                     })
                 .Configure<ProcessorOptions>(
                     opt =>

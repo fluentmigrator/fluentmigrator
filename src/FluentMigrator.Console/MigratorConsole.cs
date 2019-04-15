@@ -50,6 +50,8 @@ namespace FluentMigrator.Console
         public bool ShowHelp { get; set; }
         public int Steps { get; set; }
         public List<string> Tags { get; } = new List<string>();
+        public bool IncludeUntaggedMaintenances { get; set; }
+        public bool IncludeUntaggedMigrations { get; set; } = true;
         public string TargetAssembly { get; set; }
         public string Task { get; set; }
         public int? Timeout { get; set; }
@@ -62,7 +64,7 @@ namespace FluentMigrator.Console
         public bool TransactionPerSession { get; set; }
         public bool AllowBreakingChange { get; set; }
         public string ProviderSwitches { get; set; }
-        public bool StripComments { get; set; } = true;
+        public bool StripComments { get; set; }
 
         public int Run(params string[] args)
         {
@@ -177,6 +179,53 @@ namespace FluentMigrator.Console
                         "tag=",
                         "Filters the migrations to be run by tag.",
                         v => { Tags.Add(v); }
+                    },
+                    {
+                        "include-untagged:",
+                        "Include untagged migrations and/or maintenance objects.",
+                        v =>
+                        {
+                            if (string.IsNullOrEmpty(v))
+                            {
+                                IncludeUntaggedMigrations = IncludeUntaggedMaintenances = true;
+                            }
+                            else
+                            {
+                                var items = v.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                                    .Select(x => x.ToLowerInvariant().Trim())
+                                    .Where(x => !string.IsNullOrEmpty(x))
+                                    .Select(
+                                        x =>
+                                        {
+                                            var hasOption = x.EndsWith("+") || x.EndsWith("-");
+                                            var enable = !x.EndsWith("-");
+                                            var name = hasOption ? x.Substring(0, x.Length - 1) : x;
+                                            return new
+                                            {
+                                                FullName = x,
+                                                ShortName = name.Substring(Math.Min(2, name.Length)),
+                                                Enable = enable,
+                                            };
+                                        });
+                                foreach (var item in items)
+                                {
+                                    switch (item.ShortName)
+                                    {
+                                        case "ma":
+                                            IncludeUntaggedMaintenances = item.Enable;
+                                            break;
+                                        case "mi":
+                                            IncludeUntaggedMigrations = item.Enable;
+                                            break;
+                                        default:
+                                            throw new ArgumentOutOfRangeException(
+                                                $"The argument {item.FullName} is not supported. "
+                                              + "Valid values are: ma, maintenance, mi, migrations with an optional '+' or '-' at the end to enable or disable the option. "
+                                              + "Multiple values may be given when separated by a comma.");
+                                    }
+                                }
+                            }
+                        }
                     },
                     {
                         "providerswitches=",
@@ -334,6 +383,8 @@ namespace FluentMigrator.Console
                         opt.Tags = Tags.ToArray();
                         opt.TransactionPerSession = TransactionPerSession;
                         opt.AllowBreakingChange = AllowBreakingChange;
+                        opt.IncludeUntaggedMaintenances = IncludeUntaggedMaintenances;
+                        opt.IncludeUntaggedMigrations = IncludeUntaggedMigrations;
                     })
                 .Configure<ProcessorOptions>(
                     opt =>

@@ -49,7 +49,7 @@ namespace FluentMigrator.Runner
                 from type in types
                 let stage = conventions.GetMaintenanceStage(type)
                 where stage != null
-                where !conventions.TypeHasTags(type) || tagsList.Length > 0 && conventions.TypeHasMatchingTags(type, tagsList)
+                where conventions.HasRequestedTags(type, tagsList, options.Value.IncludeUntaggedMaintenances)
                 let migration = (IMigration) ActivatorUtilities.CreateInstance(serviceProvider, type)
                 group migration by stage.GetValueOrDefault()
             ).ToDictionary(

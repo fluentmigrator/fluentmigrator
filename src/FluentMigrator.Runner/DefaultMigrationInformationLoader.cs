@@ -37,7 +37,9 @@ namespace FluentMigrator.Runner
     public class DefaultMigrationInformationLoader : IMigrationInformationLoader
     {
         [NotNull, ItemNotNull]
-        private readonly IReadOnlyCollection<string> _tagsToMatch;
+        private readonly string[] _tagsToMatch;
+
+        private readonly bool _includeUntaggedMigrations;
 
         [NotNull]
 #pragma warning disable 618
@@ -67,6 +69,7 @@ namespace FluentMigrator.Runner
             LoadNestedNamespaces = filterOptions.Value.NestedNamespaces;
             Conventions = conventions;
             _tagsToMatch = runnerOptions.Value.Tags ?? Array.Empty<string>();
+            _includeUntaggedMigrations = runnerOptions.Value.IncludeUntaggedMigrations;
         }
 
         /// <summary>
@@ -98,7 +101,13 @@ namespace FluentMigrator.Runner
             }
 
             _migrationInfos = new SortedList<long, IMigrationInfo>();
-            var migrationInfos = FindMigrations(_source, Conventions, Namespace, LoadNestedNamespaces, _tagsToMatch);
+            var migrationInfos = FindMigrations(
+                _source,
+                Conventions,
+                Namespace,
+                LoadNestedNamespaces,
+                _tagsToMatch,
+                _includeUntaggedMigrations);
             foreach (var migrationInfo in migrationInfos)
             {
                 if (_migrationInfos.ContainsKey(migrationInfo.Version))
@@ -123,7 +132,8 @@ namespace FluentMigrator.Runner
             [NotNull] IMigrationRunnerConventions conventions,
             [CanBeNull] string @namespace,
             bool loadNestedNamespaces,
-            [NotNull, ItemNotNull] IReadOnlyCollection<string> tagsToMatch)
+            [NotNull, ItemNotNull] string[] tagsToMatch,
+            bool includeUntagged)
         {
             bool IsMatchingMigration(Type type)
             {
@@ -131,9 +141,7 @@ namespace FluentMigrator.Runner
                     return false;
                 if (!conventions.TypeIsMigration(type))
                     return false;
-                return conventions.TypeHasMatchingTags(type, tagsToMatch)
-                 || (tagsToMatch.Count == 0 && !conventions.TypeHasTags(type))
-                 || !conventions.TypeHasTags(type);
+                return conventions.HasRequestedTags(type, tagsToMatch, includeUntagged);
             }
 
             IReadOnlyCollection<IMigration> migrations;

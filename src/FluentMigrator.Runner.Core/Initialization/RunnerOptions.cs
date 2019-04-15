@@ -79,5 +79,15 @@ namespace FluentMigrator.Runner.Initialization
         /// state of the database.
         /// </remarks>
         public bool NoConnection { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether untagged maintenance items should always be loaded/executed.
+        /// </summary>
+        public bool IncludeUntaggedMaintenances { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether untagged migrations should always be loaded/executed.
+        /// </summary>
+        public bool IncludeUntaggedMigrations { get; set; } = true;
     }
 }

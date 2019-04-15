@@ -120,6 +120,8 @@ namespace FluentMigrator.DotNet.Cli
                         opt.Tags = options.Tags.ToArray();
                         opt.TransactionPerSession = options.TransactionMode == TransactionMode.Session;
                         opt.AllowBreakingChange = options.AllowBreakingChanges;
+                        opt.IncludeUntaggedMigrations = options.IncludeUntaggedMigrations;
+                        opt.IncludeUntaggedMaintenances = options.IncludeUntaggedMaintenances;
                     })
                 .Configure<ProcessorOptions>(
                     opt =>
