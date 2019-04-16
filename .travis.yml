@@ -5,6 +5,10 @@ mono: latest
 dotnet: 2.1.505
 git:
   depth: false
+before_install:
+- lsb_release -a
+- echo $LC_ALL
+- echo $LANG
 before_script:
 - nuget install GitVersion.CommandLine -Version 4.0.0-beta0012 -Prerelease -ExcludeVersion
 - export GITVERSION_TOOL="mono GitVersion.CommandLine/tools/GitVersion.exe"
