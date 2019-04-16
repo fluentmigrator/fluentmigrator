@@ -50,11 +50,11 @@ namespace FluentMigrator.DotNet.Cli.Commands
         [Option("--default-schema-name", Description = "Set default schema name for VersionInfo table and the migrations.")]
         public string SchemaName { get; internal set; } = null;
 
-        [Option("--strip", Description = "Strip comments from the SQL scripts. Default is true.")]
-        public bool StripComments { get; set; } = true;
+        [Option("--strip", "Strip comments from the SQL scripts. Default is true.", CommandOptionType.SingleOrNoValue)]
+        public (bool hasValue, bool? value) StripComments { get; set; }
 
-        [Option("--include-untagged-migrations", Description = "Include untagged migrations.")]
-        public bool IncludeUntaggedMigrations { get; set; } = true;
+        [Option("--include-untagged-migrations", "Include untagged migrations.", CommandOptionType.SingleOrNoValue)]
+        public (bool hasValue, bool? value) IncludeUntaggedMigrations { get; set; }
 
         [Option("--include-untagged-maintenances", Description = "Include untagged maintenances.")]
         public bool IncludeUntaggedMaintenances { get; set; }

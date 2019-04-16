@@ -129,7 +129,7 @@ namespace FluentMigrator.DotNet.Cli
             Profile = cmd.Profile;
             Context = cmd.Context;
             Timeout = cmd.Timeout;
-            StripComments = cmd.StripComments;
+            StripComments = !cmd.StripComments.hasValue || (cmd.StripComments.value ?? true);
             (Output, OutputFileName) = cmd.Output;
             return Init((MigrationCommand)cmd);
         }
@@ -144,7 +144,7 @@ namespace FluentMigrator.DotNet.Cli
             Tags = cmd.Tags?.ToList() ?? new List<string>();
             AllowBreakingChanges = cmd.AllowBreakingChanges;
             SchemaName = cmd.SchemaName;
-            IncludeUntaggedMigrations = cmd.IncludeUntaggedMigrations;
+            IncludeUntaggedMigrations = !cmd.IncludeUntaggedMigrations.hasValue || (cmd.IncludeUntaggedMigrations.value ?? true);
             IncludeUntaggedMaintenances = cmd.IncludeUntaggedMaintenances;
             return this;
         }
