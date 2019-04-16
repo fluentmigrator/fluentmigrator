@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\FluentMigrator\FluentMigrator.csproj" />
+    <ProjectReference Include="..\..\src\FluentMigrator.Runner\FluentMigrator.Runner.csproj" />
   </ItemGroup>
   <!-- Automatically include all *.sql files as embedded resources
   for use with Migration.Execute.EmbeddedScript(string EmbeddedSqlScriptName) -->
