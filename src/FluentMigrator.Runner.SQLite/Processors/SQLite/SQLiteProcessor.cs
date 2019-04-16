@@ -160,17 +160,50 @@ namespace FluentMigrator.Runner.Processors.SQLite
 
         protected override void Process(string sql)
         {
-            Logger.LogSql(sql);
-
-            if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
+            if (string.IsNullOrEmpty(sql))
                 return;
+
+            if (Options.PreviewOnly)
+            {
+                ExecuteBatchNonQuery(
+                    sql,
+                    (sqlBatch) =>
+                    {
+                        Logger.LogSql(sqlBatch);
+                    },
+                    (sqlBatch, goCount) =>
+                    {
+                        Logger.LogSql(sqlBatch);
+                        Logger.LogSql($"GO {goCount}");
+                    });
+                return;
+            }
+
+            Logger.LogSql(sql);
 
             EnsureConnectionIsOpen();
 
             if (ContainsGo(sql))
             {
-                ExecuteBatchNonQuery(sql);
-
+                ExecuteBatchNonQuery(
+                    sql,
+                    (sqlBatch) =>
+                    {
+                        using (var command = CreateCommand(sqlBatch))
+                        {
+                            command.ExecuteNonQuery();
+                        }
+                    },
+                    (sqlBatch, goCount) =>
+                    {
+                        using (var command = CreateCommand(sqlBatch))
+                        {
+                            for (var i = 0; i != goCount; ++i)
+                            {
+                                command.ExecuteNonQuery();
+                            }
+                        }
+                    });
             }
             else
             {
@@ -208,7 +241,7 @@ namespace FluentMigrator.Runner.Processors.SQLite
             }
         }
 
-        private void ExecuteBatchNonQuery(string sql)
+        private void ExecuteBatchNonQuery(string sql, Action<string> executeBatch, Action<string, int> executeGo)
         {
             string sqlBatch = string.Empty;
 
@@ -223,13 +256,7 @@ namespace FluentMigrator.Runner.Processors.SQLite
 
                     if (args.Opaque is GoSearcher.GoSearcherParameters goParams)
                     {
-                        using (var command = CreateCommand(sqlBatch))
-                        {
-                            for (var i = 0; i != goParams.Count; ++i)
-                            {
-                                command.ExecuteNonQuery();
-                            }
-                        }
+                        executeGo(sqlBatch, goParams.Count);
                     }
 
                     sqlBatch = null;
@@ -242,10 +269,7 @@ namespace FluentMigrator.Runner.Processors.SQLite
 
                 if (!string.IsNullOrEmpty(sqlBatch))
                 {
-                    using (var command = CreateCommand(sqlBatch))
-                    {
-                        command.ExecuteNonQuery();
-                    }
+                    executeBatch(sqlBatch);
                 }
             }
             catch (DbException ex)
