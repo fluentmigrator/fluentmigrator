@@ -22,8 +22,8 @@ using McMaster.Extensions.CommandLineUtils;
 namespace FluentMigrator.DotNet.Cli.Commands
 {
     [HelpOption]
-    [Command(Description = "Validations")]
-    [Subcommand("versions", typeof(ValidateVersionOrder))]
+    [Command("validate", Description = "Validations")]
+    [Subcommand(typeof(ValidateVersionOrder))]
     public class Validate
     {
         private int OnExecute(CommandLineApplication app, IConsole console)

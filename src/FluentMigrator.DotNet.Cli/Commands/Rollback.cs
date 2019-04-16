@@ -22,10 +22,10 @@ using McMaster.Extensions.CommandLineUtils;
 namespace FluentMigrator.DotNet.Cli.Commands
 {
     [HelpOption]
-    [Command(Description = "Rollback last migration")]
-    [Subcommand("by", typeof(RollbackBy))]
-    [Subcommand("to", typeof(RollbackTo))]
-    [Subcommand("all", typeof(RollbackAll))]
+    [Command("rollback", Description = "Rollback last migration")]
+    [Subcommand(typeof(RollbackBy))]
+    [Subcommand(typeof(RollbackTo))]
+    [Subcommand(typeof(RollbackAll))]
     public class Rollback : ConnectionCommand
     {
         [Option("-m|--transaction-mode <MODE>", Description = "Overrides the transaction behavior of migrations, so that all migrations to be executed will run in one transaction.")]

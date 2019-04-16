@@ -27,7 +27,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace FluentMigrator.DotNet.Cli.Commands
 {
     [HelpOption]
-    [Command(Description = "List processors")]
+    [Command("processors", Description = "List processors")]
     public class ListProcessors
     {
         private int OnExecute(IConsole console)

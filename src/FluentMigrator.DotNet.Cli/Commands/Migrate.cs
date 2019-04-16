@@ -22,9 +22,9 @@ using McMaster.Extensions.CommandLineUtils;
 namespace FluentMigrator.DotNet.Cli.Commands
 {
     [HelpOption]
-    [Command(Description = "Apply migrations")]
-    [Subcommand("up", typeof(MigrateUp))]
-    [Subcommand("down", typeof(MigrateDown))]
+    [Command("migrate", Description = "Apply migrations")]
+    [Subcommand(typeof(MigrateUp))]
+    [Subcommand(typeof(MigrateDown))]
     public class Migrate : ConnectionCommand
     {
         [Option("-m|--transaction-mode <MODE>", Description = "Overrides the transaction behavior of migrations, so that all migrations to be executed will run in one transaction.")]
