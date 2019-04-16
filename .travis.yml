@@ -2,7 +2,7 @@ language: csharp
 dist: xenial
 sudo: false
 mono: latest
-dotnet: latest
+dotnet: 2.1.505
 git:
   depth: false
 before_script:
