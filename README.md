@@ -48,3 +48,7 @@ while the CI builds are stored on [MyGet](https://www.myget.org/feed/Packages/fl
 # Contributors
 
 A [long list](https://github.com/fluentmigrator/fluentmigrator/blob/master/CONTRIBUTORS.md) of everyone that has contributed to FluentMigrator. Thanks for all the Pull Requests!
+
+# Contributing
+
+Please see our guide on [how to contribute](https://fluentmigrator.github.io/articles/guides/contribution.html)
