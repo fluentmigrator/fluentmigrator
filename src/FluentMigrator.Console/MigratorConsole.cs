@@ -67,7 +67,7 @@ namespace FluentMigrator.Console
         public bool TransactionPerSession;
         public bool AllowBreakingChange;
         public string ProviderSwitches;
-        public bool StripComments;
+        public bool StripComments = true;
         public string DefaultSchemaName { get; set; }
 
         public int Run(params string[] args)
