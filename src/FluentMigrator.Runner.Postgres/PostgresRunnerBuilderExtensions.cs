@@ -18,6 +18,7 @@ using FluentMigrator.Runner.Generators.Postgres;
 using FluentMigrator.Runner.Generators.Postgres92;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Postgres;
+using FluentMigrator.Runner.Processors.Postgres92;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -37,6 +38,8 @@ namespace FluentMigrator.Runner
         public static IMigrationRunnerBuilder AddPostgres(this IMigrationRunnerBuilder builder)
         {
             builder.Services
+                .AddScoped<PostgresProcessor>()
+                .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<PostgresProcessor>())
                 .AddScoped<PostgresGenerator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<PostgresGenerator>());
             return builder.AddCommonPostgresServices();
@@ -50,6 +53,8 @@ namespace FluentMigrator.Runner
         public static IMigrationRunnerBuilder AddPostgres92(this IMigrationRunnerBuilder builder)
         {
             builder.Services
+                .AddScoped<Postgres92Processor>()
+                .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<Postgres92Processor>())
                 .AddScoped<Postgres92Generator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<Postgres92Generator>());
             return builder.AddCommonPostgresServices();
@@ -70,8 +75,6 @@ namespace FluentMigrator.Runner
                         return PostgresOptions.ParseProviderSwitches(processorOptions.Value.ProviderSwitches);
                     })
                 .AddScoped<PostgresDbFactory>()
-                .AddScoped<PostgresProcessor>()
-                .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<PostgresProcessor>())
                 .AddScoped<PostgresQuoter>();
             return builder;
         }

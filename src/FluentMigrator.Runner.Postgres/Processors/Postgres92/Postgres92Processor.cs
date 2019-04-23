@@ -17,8 +17,6 @@
 #endregion
 
 using System.Collections.Generic;
-using System.Globalization;
-using System.Threading;
 
 using FluentMigrator.Runner.Generators.Postgres92;
 using FluentMigrator.Runner.Initialization;
