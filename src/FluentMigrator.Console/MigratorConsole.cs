@@ -72,6 +72,7 @@ namespace FluentMigrator.Console
 
         public int Run(params string[] args)
         {
+            var dbChoicesList = new List<string>();
             string dbChoices;
 
             var services = CreateCoreServices()
@@ -79,9 +80,14 @@ namespace FluentMigrator.Console
             using (var sp = services.BuildServiceProvider(validateScopes: false))
             {
                 var processors = sp.GetRequiredService<IEnumerable<IMigrationProcessor>>().ToList();
-                var procNames = processors.Select(p => p.DatabaseType);
-                dbChoices = string.Join(", ", procNames);
+                dbChoicesList.AddRange(processors.Select(p => p.DatabaseType));
             }
+
+            dbChoices = string.Join(
+                ", ",
+                dbChoicesList
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .OrderBy(x => x, StringComparer.OrdinalIgnoreCase));
 
             System.Console.Out.WriteHeader();
 
