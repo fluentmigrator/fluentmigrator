@@ -52,3 +52,12 @@ A [long list](https://github.com/fluentmigrator/fluentmigrator/blob/master/CONTR
 # Contributing
 
 Please see our guide on [how to contribute](https://fluentmigrator.github.io/articles/guides/contribution.html)
+
+# Third Party Contributions / FluentMigrator Ecosystem
+
+FluentMigrator has an actively developed and maintained ecosystem thanks to third party contributions. The following table summarizes some contributions (but are not endorsed):
+
+| GitHub/BitBucket | NuGet Package | Description |
+| ---------------- | ------------- | ----------- |
+| [EasyMigrator](https://bitbucket.org/quentin-starin/easymigrator/wiki/Home) | [EasyMigrator.FluentMigrator](https://www.nuget.org/packages/EasyMigrator.FluentMigrator) | EasyMigrator allows you to specify database schema using simple POCOs with minimally attributed fields to represent columns. EasyMigrator's core can be adapted to sit on top of various migration libraries. |
+| [FluentMigrator-Generator](https://github.com/ritterim/fluentmigrator-generator) | [FluentMigrator.Generator](https://www.nuget.org/packages/FluentMigrator.Generator/) | Adds a command to the package manager console to generate migrations for FluentMigrator. |
