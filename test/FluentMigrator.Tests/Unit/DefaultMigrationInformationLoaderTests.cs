@@ -82,7 +82,7 @@ namespace FluentMigrator.Tests.Unit
 
             Assert.IsInstanceOf<DefaultMigrationInformationLoader>(loader);
 
-            var defaultLoader = (DefaultMigrationInformationLoader) loader;
+            var defaultLoader = (DefaultMigrationInformationLoader)loader;
 
             defaultLoader.LoadNestedNamespaces.ShouldBe(false);
         }
@@ -131,7 +131,7 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void DoesFindMigrationsThatHaveMatchingTags()
         {
-            var migrationType = typeof(TaggedMigraion);
+            var migrationType = typeof(TaggedMigration);
             var tagsToMatch = new[] { "UK", "Production" };
 
             var conventionsMock = new Mock<IMigrationRunnerConventions>();
@@ -157,7 +157,7 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void DoesNotFindMigrationsThatDoNotHaveMatchingTags()
         {
-            var migrationType = typeof(TaggedMigraion);
+            var migrationType = typeof(TaggedMigration);
             var tagsToMatch = new[] { "UK", "Production" };
 
             var conventionsMock = new Mock<IMigrationRunnerConventions>();
@@ -237,7 +237,7 @@ namespace FluentMigrator.Tests.Unit
         {
             var conventions = new MigrationRunnerConventions();
             var asm = Assembly.GetExecutingAssembly();
-            var loader = new DefaultMigrationInformationLoader( conventions, asm, "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass1", null);
+            var loader = new DefaultMigrationInformationLoader(conventions, asm, "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass1", null);
 
             SortedList<long, IMigrationInfo> migrationList = loader.LoadMigrations();
 
@@ -316,7 +316,7 @@ namespace FluentMigrator.Tests.Unit
         public void ObsoleteDoesFindMigrationsThatHaveMatchingTags()
         {
             var asm = Assembly.GetExecutingAssembly();
-            var migrationType = typeof(TaggedMigraion);
+            var migrationType = typeof(TaggedMigration);
             var tagsToMatch = new[] { "UK", "Production" };
 
             var conventionsMock = new Mock<IMigrationRunnerConventions>();
@@ -339,7 +339,7 @@ namespace FluentMigrator.Tests.Unit
         public void ObsoleteDoesNotFindMigrationsThatDoNotHaveMatchingTags()
         {
             var asm = Assembly.GetExecutingAssembly();
-            var migrationType = typeof(TaggedMigraion);
+            var migrationType = typeof(TaggedMigration);
             var tagsToMatch = new[] { "UK", "Production" };
 
             var conventionsMock = new Mock<IMigrationRunnerConventions>();
@@ -495,7 +495,7 @@ namespace FluentMigrator.Tests.Unit
     {
         [Tags("UK", "IE", "QA", "Production")]
         [Migration(123)]
-        public class TaggedMigraion : Migration
+        public class TaggedMigration : Migration
         {
             public override void Up() { }
 

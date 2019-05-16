@@ -5,7 +5,7 @@ namespace FluentMigrator
     ///<summary>
     /// Used to filter which migrations are run.
     ///</summary>
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface, AllowMultiple = true)]
     public class TagsAttribute : Attribute
     {
         /// <summary>
