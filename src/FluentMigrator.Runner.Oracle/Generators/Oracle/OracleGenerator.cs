@@ -126,7 +126,14 @@ namespace FluentMigrator.Runner.Generators.Oracle
 
             if (seq.Cache.HasValue)
             {
-                result.AppendFormat(" CACHE {0}", seq.Cache);
+                if(seq.Cache == 1)
+                {
+                    result.Append(" NOCACHE");
+                }
+                else
+                {
+                    result.AppendFormat(" CACHE {0}", seq.Cache);
+                }
             }
 
             if (seq.Cycle)

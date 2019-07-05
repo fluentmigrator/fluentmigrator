@@ -1,4 +1,4 @@
-﻿using FluentMigrator.Runner.Generators.Oracle;
+using FluentMigrator.Runner.Generators.Oracle;
 using NUnit.Framework;
 
 using Shouldly;
@@ -33,6 +33,16 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
 
             var result = Generator.Generate(expression);
             result.ShouldBe("CREATE SEQUENCE Sequence INCREMENT BY 2 MINVALUE 0 MAXVALUE 100 START WITH 2 CACHE 10 CYCLE");
+        }
+
+        [Test]
+        public void CanCreateSequenceWithNocacheSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateSequenceExpression();
+            expression.Sequence.Cache = 1;
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE SEQUENCE Sequence INCREMENT BY 2 MINVALUE 0 MAXVALUE 100 START WITH 2 NOCACHE CYCLE");
         }
 
         [Test]
