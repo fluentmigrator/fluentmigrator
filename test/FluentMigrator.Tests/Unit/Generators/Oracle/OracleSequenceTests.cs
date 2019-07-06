@@ -50,7 +50,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanCreateSequenceWithCacheOneSchema()
+        public void CanNotCreateSequenceWithCacheOneSchema()
         {
             var expression = GeneratorTestHelper.GetCreateSequenceExpression();
             expression.Sequence.Cache = 1;
