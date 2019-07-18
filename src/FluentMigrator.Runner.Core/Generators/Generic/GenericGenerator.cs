@@ -157,6 +157,7 @@ namespace FluentMigrator.Runner.Generators.Generic
                 );
         }
 
+        /// <inheritdoc />
         public override string Generate(CreateIndexExpression expression)
         {
             var indexColumns = new string[expression.Index.Columns.Count];
