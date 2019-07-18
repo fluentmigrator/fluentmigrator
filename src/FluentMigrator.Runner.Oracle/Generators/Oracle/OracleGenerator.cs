@@ -124,9 +124,18 @@ namespace FluentMigrator.Runner.Generators.Oracle
                 result.AppendFormat(" START WITH {0}", seq.StartWith);
             }
 
+            const long MINIMUM_CACHE_VALUE = 2;
             if (seq.Cache.HasValue)
             {
+                if (seq.Cache.Value < MINIMUM_CACHE_VALUE)
+                {
+                    return CompatibilityMode.HandleCompatibilty("Oracle does not support Cache value equal to 1; if you intended to disable caching, set Cache to null. For information on Oracle limitations, see: https://docs.oracle.com/en/database/oracle/oracle-database/18/sqlrf/CREATE-SEQUENCE.html#GUID-E9C78A8C-615A-4757-B2A8-5E6EFB130571__GUID-7E390BE1-2F6C-4E5A-9D5C-5A2567D636FB");
+                }
                 result.AppendFormat(" CACHE {0}", seq.Cache);
+            }
+            else
+            {
+                result.Append(" NOCACHE");
             }
 
             if (seq.Cycle)
