@@ -157,6 +157,7 @@ namespace FluentMigrator.Runner.Generators.Generic
                 );
         }
 
+        /// <inheritdoc />
         public override string Generate(CreateIndexExpression expression)
         {
             var indexColumns = new string[expression.Index.Columns.Count];
@@ -415,9 +416,18 @@ namespace FluentMigrator.Runner.Generators.Generic
                 result.AppendFormat(" START WITH {0}", seq.StartWith);
             }
 
+            const long MINIMUM_CACHE_VALUE = 2;
             if (seq.Cache.HasValue)
             {
+                if (seq.Cache.Value < MINIMUM_CACHE_VALUE)
+                {
+                    return CompatibilityMode.HandleCompatibilty("Cache size must be greater than 1; if you intended to disable caching, set Cache to null.");
+                }
                 result.AppendFormat(" CACHE {0}", seq.Cache);
+            }
+            else
+            {
+                result.Append(" NO CACHE");
             }
 
             if (seq.Cycle)
