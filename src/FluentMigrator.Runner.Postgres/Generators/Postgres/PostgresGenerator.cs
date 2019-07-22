@@ -380,7 +380,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
 
             if (seq.Increment.HasValue)
             {
-                result.AppendFormat(" INCREMENT {0}", seq.Increment);
+                result.AppendFormat(" INCREMENT BY {0}", seq.Increment);
             }
 
             if (seq.MinValue.HasValue)
