@@ -32,6 +32,7 @@ using FluentMigrator.Runner.Processors.SQLite;
 using FluentMigrator.Runner.Processors.SqlServer;
 using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Runner.Initialization;
+using FluentMigrator.Runner.Processors.Snowflake;
 using FluentMigrator.Runner.Processors.SqlAnywhere;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -65,6 +66,7 @@ namespace FluentMigrator.Tests.Integration
                 (typeof(FirebirdProcessor), () => IntegrationTestOptions.Firebird),
                 (typeof(PostgresProcessor), () => IntegrationTestOptions.Postgres),
                 (typeof(MySql4Processor), () => IntegrationTestOptions.MySql),
+                (typeof(SnowflakeProcessor), () => IntegrationTestOptions.Snowflake)
             };
         }
 
@@ -197,7 +199,8 @@ namespace FluentMigrator.Tests.Integration
                         .AddSqlServer2008()
                         .AddSqlServer2012()
                         .AddSqlServer2014()
-                        .AddSqlServer2016())
+                        .AddSqlServer2016()
+                        .AddSnowflake())
                 .AddScoped<IProcessorAccessor>(
                     sp =>
                     {

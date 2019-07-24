@@ -96,4 +96,7 @@
   <data name="ExpressionTableNameMissingWithHints" xml:space="preserve">
     <value>Der Tabellenname wurde nicht angegeben. Stellen Sie sicher, dass sie die "OnTable"-Erweiterungsmethode aufgerufen haben. Der Aufruf sollte wie folgt aussehen: Delete.ForeignKey(KeyName).OnTable(TableName)</value>
   </data>
+  <data name="VersionColumnNotFound" xml:space="preserve">
+    <value>Die Versionsspalte {0} konnte nicht gefunden werden. Verfügbare Spaltennamen sind:</value>
+  </data>
 </root>

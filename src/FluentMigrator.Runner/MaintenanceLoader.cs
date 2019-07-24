@@ -41,8 +41,7 @@ namespace FluentMigrator.Runner
             [NotNull] IMigrationRunnerConventions conventions,
             [NotNull] IServiceProvider serviceProvider)
         {
-            var tags = options.Value.Tags ?? new string[0];
-            var requireTags = tags.Length != 0;
+            var tagsList = options.Value.Tags ?? new string[0];
 
             var types = assemblySource.Assemblies.SelectMany(a => a.ExportedTypes).ToList();
 
@@ -50,7 +49,7 @@ namespace FluentMigrator.Runner
                 from type in types
                 let stage = conventions.GetMaintenanceStage(type)
                 where stage != null
-                where (requireTags && conventions.TypeHasMatchingTags(type, tags)) || (!requireTags && !conventions.TypeHasTags(type))
+                where !conventions.TypeHasTags(type) || tagsList.Length > 0 && conventions.TypeHasMatchingTags(type, tagsList)
                 let migration = (IMigration) ActivatorUtilities.CreateInstance(serviceProvider, type)
                 group migration by stage.GetValueOrDefault()
             ).ToDictionary(

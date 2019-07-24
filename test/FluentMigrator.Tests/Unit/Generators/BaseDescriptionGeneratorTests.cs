@@ -75,7 +75,7 @@ namespace FluentMigrator.Tests.Unit.Generators
         }
 
         [Test]
-        public void GenerateDescriptionStatementsHaveSingleStatementForDescriptionOnCreate()
+        public virtual void GenerateDescriptionStatementsHaveSingleStatementForDescriptionOnCreate()
         {
             var createTableExpression = GeneratorTestHelper.GetCreateTableWithTableDescription();
             var result = DescriptionGenerator.GenerateDescriptionStatements(createTableExpression);

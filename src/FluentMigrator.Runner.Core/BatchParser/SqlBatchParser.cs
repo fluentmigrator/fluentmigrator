@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2018, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -71,7 +71,7 @@ namespace FluentMigrator.Runner.BatchParser
         /// <param name="stripComments"><c>true</c> when the comments should be stripped</param>
         public void Process(ITextSource source, bool stripComments = false)
         {
-            var output = new StringWriter()
+            var output = new StringWriter
             {
                 NewLine = _newLine,
             };
@@ -90,7 +90,7 @@ namespace FluentMigrator.Runner.BatchParser
                 var sqlText = output.ToString();
                 OnSqlText(new SqlTextEventArgs(sqlText));
                 OnSpecialToken(evt);
-                output = new StringWriter();
+                output = new StringWriter { NewLine = _newLine };
             };
 
             var reader = source.CreateReader();

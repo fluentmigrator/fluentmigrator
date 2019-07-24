@@ -201,4 +201,7 @@
     <data name="ExpressionTableNameMissingWithHints" xml:space="preserve">
     <value>Table name not specified, ensure you have appended the OnTable extension. Format should be Delete.ForeignKey(KeyName).OnTable(TableName)</value>
   </data>
+    <data name="VersionColumnNotFound" xml:space="preserve">
+    <value>The version column {0} couldn't be found. Available column names are:</value>
+  </data>
 </root>

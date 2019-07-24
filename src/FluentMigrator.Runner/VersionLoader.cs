@@ -19,8 +19,10 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Text;
 
 using FluentMigrator.Expressions;
+using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Versioning;
 using FluentMigrator.Runner.VersionTableInfo;
@@ -144,12 +146,55 @@ namespace FluentMigrator.Runner
 
             _versionInfo = new VersionInfo();
 
-            if (!AlreadyCreatedVersionTable) return;
+            if (!AlreadyCreatedVersionTable)
+            {
+                return;
+            }
 
             var dataSet = _processor.ReadTableData(VersionTableMetaData.SchemaName, VersionTableMetaData.TableName);
-            foreach (DataRow row in dataSet.Tables[0].Rows)
+            var dataTable = dataSet.Tables[0];
+
+            if (dataTable.Rows.Count == 0)
             {
-                _versionInfo.AddAppliedMigration(long.Parse(row[VersionTableMetaData.ColumnName].ToString()));
+                return;
+            }
+
+            var versionColumnIndex = dataTable.Columns.IndexOf(VersionTableMetaData.ColumnName);
+
+            // Find out correct column by case insensitive matching if column was not found. Setting dataTable.caseSensitive = false does not help for some reason.
+            if (versionColumnIndex == -1)
+            {
+                foreach (DataColumn column in dataTable.Columns)
+                {
+                    if (string.Equals(
+                        column.ColumnName,
+                        VersionTableMetaData.ColumnName,
+                        StringComparison.OrdinalIgnoreCase))
+                    {
+                        versionColumnIndex = dataTable.Columns.IndexOf(column);
+                        break;
+                    }
+                }
+            }
+
+            if (versionColumnIndex == -1)
+            {
+                // The version column couldn't be found.
+                var message = new StringBuilder()
+                    .AppendFormat(
+                        ErrorMessages.VersionColumnNotFound,
+                        VersionTableMetaData.ColumnName);
+                foreach (DataColumn dataColumn in dataTable.Columns)
+                {
+                    message.AppendLine().AppendFormat("- {0}", dataColumn.ColumnName);
+                }
+
+                throw new InvalidOperationException(message.ToString());
+            }
+
+            foreach (DataRow row in dataTable.Rows)
+            {
+                _versionInfo.AddAppliedMigration(long.Parse(row[versionColumnIndex].ToString()));
             }
         }
 

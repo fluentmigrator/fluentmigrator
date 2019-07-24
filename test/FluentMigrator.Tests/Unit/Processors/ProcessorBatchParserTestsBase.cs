@@ -37,7 +37,7 @@ namespace FluentMigrator.Tests.Unit.Processors
         protected Mock<DbConnection> MockedConnection { get; private set; }
         protected Mock<DbProviderFactory> MockedDbProviderFactory { get; private set; }
         protected Mock<IConnectionStringAccessor> MockedConnectionStringAccessor { get; private set; }
-        private List<Mock<DbCommand>> MockedCommands { get; set; }
+        protected List<Mock<DbCommand>> MockedCommands { get; private set; }
 
         [SetUp]
         public void SetUp()
@@ -110,7 +110,7 @@ namespace FluentMigrator.Tests.Unit.Processors
         }
 
         [Test]
-        public void TestThatTwoCommandsGetSeparatedByGo()
+        public virtual void TestThatTwoCommandsGetSeparatedByGo()
         {
             using (var processor = CreateProcessor())
             {
@@ -182,7 +182,7 @@ namespace FluentMigrator.Tests.Unit.Processors
         }
 
         [Test]
-        public void Issue442()
+        public virtual void Issue442()
         {
             var command = "SELECT '\n\n\n';\nSELECT 2;";
 
@@ -230,7 +230,7 @@ namespace FluentMigrator.Tests.Unit.Processors
         }
 
         [Test]
-        public void TestThatGoWithRunCount()
+        public virtual void TestThatGoWithRunCount()
         {
             using (var processor = CreateProcessor())
             {
