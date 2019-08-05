@@ -1,11 +1,11 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project>
   <Import Project="DotNetSdkMono.props" />
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
     <VersionPrefix>4.0.0</VersionPrefix>
     <Product>FluentMigrator</Product>
-    <Copyright>Sean Chambers and the FluentMigrator project 2008-2018</Copyright>
+    <Copyright>Sean Chambers and the FluentMigrator project 2008-2019</Copyright>
     <Company>FluentMigrator Project</Company>
     <Authors>Sean Chambers;Josh Coffman;Tom Marien;Mark Junker</Authors>
     <PackageProjectUrl>https://github.com/fluentmigrator/fluentmigrator/wiki</PackageProjectUrl>
