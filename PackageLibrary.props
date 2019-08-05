@@ -4,7 +4,7 @@
   <Import Project="$(MSBuildThisFileDirectory)Global.props" />
 
   <PropertyGroup>
-    <NoWarn Condition=" '$(Configuration)' != 'Release' ">$(NoWarn);1591</NoWarn>
+    <NoWarn>$(NoWarn);1591</NoWarn>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
     <DebugType Condition=" '$(Configuration)' == 'Release' ">portable</DebugType> <!-- Required for EmbedSources -->
     <DebugType Condition=" '$(Configuration)' == 'Debug' ">full</DebugType> <!-- Required for EmbedSources -->

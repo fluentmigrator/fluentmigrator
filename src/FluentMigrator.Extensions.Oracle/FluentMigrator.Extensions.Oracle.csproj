@@ -7,9 +7,6 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\FluentMigrator.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)'=='Release'">
-    <noWarn>1591</noWarn>
-  </PropertyGroup>
   <Import Project="$(MSBuildThisFileDirectory)../../PackageLibrary.props" />
   <ItemGroup>
     <None Include="..\..\FluentMigrator.snk" Link="FluentMigrator.snk" />
