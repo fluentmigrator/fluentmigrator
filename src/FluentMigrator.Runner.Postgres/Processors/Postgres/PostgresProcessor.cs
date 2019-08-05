@@ -1,3 +1,21 @@
+#region License
+//
+// Copyright (c) 2018, Fluent Migrator Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -17,7 +35,7 @@ namespace FluentMigrator.Runner.Processors.Postgres
 {
     public class PostgresProcessor : GenericProcessorBase
     {
-        private readonly PostgresQuoter _quoter = new PostgresQuoter();
+        private readonly PostgresQuoter _quoter;
 
         public override string DatabaseType => "Postgres";
 
@@ -28,9 +46,16 @@ namespace FluentMigrator.Runner.Processors.Postgres
             [NotNull] PostgresGenerator generator,
             [NotNull] ILogger<PostgresProcessor> logger,
             [NotNull] IOptionsSnapshot<ProcessorOptions> options,
-            [NotNull] IConnectionStringAccessor connectionStringAccessor)
+            [NotNull] IConnectionStringAccessor connectionStringAccessor,
+            [NotNull] PostgresOptions pgOptions)
             : base(() => factory.Factory, generator, logger, options.Value, connectionStringAccessor)
         {
+            if (pgOptions == null)
+            {
+                throw new ArgumentNullException(nameof(pgOptions));
+            }
+
+            _quoter = new PostgresQuoter(pgOptions);
         }
 
         public override void Execute(string template, params object[] args)
@@ -144,12 +169,24 @@ namespace FluentMigrator.Runner.Processors.Postgres
 
         private string FormatToSafeSchemaName(string schemaName)
         {
-            return FormatHelper.FormatSqlEscape(_quoter.UnQuoteSchemaName(schemaName));
+            var schemaNameCased = schemaName;
+            if (!_quoter.Options.ForceQuote)
+            {
+                schemaNameCased = schemaName?.ToLowerInvariant();
+            }
+
+            return FormatHelper.FormatSqlEscape(_quoter.UnQuoteSchemaName(schemaNameCased));
         }
 
         private string FormatToSafeName(string sqlName)
         {
-            return FormatHelper.FormatSqlEscape(_quoter.UnQuote(sqlName));
+            var sqlNameCased = sqlName;
+            if (!_quoter.Options.ForceQuote)
+            {
+                sqlNameCased = sqlName?.ToLowerInvariant();
+            }
+
+            return FormatHelper.FormatSqlEscape(_quoter.UnQuote(sqlNameCased));
         }
     }
 }

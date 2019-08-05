@@ -14,6 +14,8 @@
 // limitations under the License.
 #endregion
 
+using System.Collections.Generic;
+
 using FluentMigrator.Runner.Generators.MySql;
 using FluentMigrator.Runner.Initialization;
 
@@ -40,5 +42,15 @@ namespace FluentMigrator.Runner.Processors.MySql
             connectionStringAccessor)
         {
         }
+
+        /// <inheritdoc />
+        public override string DatabaseType => "MySql4";
+
+        /// <inheritdoc />
+        public override IList<string> DatabaseTypeAliases { get; } = new List<string>()
+        {
+            "MySQL",
+            "MySQL 4"
+        };
     }
 }

@@ -16,6 +16,7 @@
 //
 #endregion
 
+using FluentMigrator.Exceptions;
 using FluentMigrator.Runner.Generators.Hana;
 
 using NUnit.Framework;
@@ -33,7 +34,10 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
         [SetUp]
         public void Setup()
         {
-            Generator = new HanaGenerator();
+            Generator = new HanaGenerator()
+            {
+                CompatibilityMode = Runner.CompatibilityMode.STRICT,
+            };
         }
 
         [Test]
@@ -53,6 +57,28 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
 
             var result = Generator.Generate(expression);
             result.ShouldBe("CREATE SEQUENCE \"Sequence\" INCREMENT BY 2 MINVALUE 0 MAXVALUE 100 START WITH 2 CACHE 10 CYCLE;");
+        }
+
+        [Test]
+        public void CanCreateSequenceWithNocache()
+        {
+            var expression = GeneratorTestHelper.GetCreateSequenceExpression();
+            expression.Sequence.Cache = null;
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE SEQUENCE \"Sequence\" INCREMENT BY 2 MINVALUE 0 MAXVALUE 100 START WITH 2 NO CACHE CYCLE;");
+        }
+
+        [Test]
+        public void CanNotCreateSequenceWithCacheOne()
+        {
+            var expression = GeneratorTestHelper.GetCreateSequenceExpression();
+            expression.Sequence.Cache = 1;
+
+            Should.Throw<DatabaseOperationNotSupportedException>(
+                () => Generator.Generate(expression),
+                "Cache size must be greater than 1; if you intended to disable caching, set Cache to null."
+            );
         }
 
         [Test]

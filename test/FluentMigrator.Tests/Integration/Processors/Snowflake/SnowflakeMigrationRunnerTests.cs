@@ -52,6 +52,16 @@ namespace FluentMigrator.Tests.Integration.Processors.Snowflake
             _quotingEnabled = quotingEnabled;
         }
 
+
+        [OneTimeSetUp]
+        public void ClassSetUp()
+        {
+            if (!IntegrationTestOptions.Snowflake.IsEnabled)
+            {
+                Assert.Ignore("Snowflake integration tests are disabled.");
+            }
+        }
+
         private void ExecuteWithProcessor(
             Action<IServiceCollection> initAction,
             Action<IServiceProvider, ProcessorBase> testAction,

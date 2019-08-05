@@ -57,6 +57,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
             SetTypeMap(DbType.String, "varchar($size)", PostgresMaxVarcharSize);
             SetTypeMap(DbType.String, "text", int.MaxValue);
             SetTypeMap(DbType.Time, "time");
+            SetTypeMap(DbType.Xml, "xml");
         }
     }
 }

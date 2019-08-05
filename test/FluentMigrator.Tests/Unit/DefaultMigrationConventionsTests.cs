@@ -160,7 +160,7 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void GetMaintenanceStageReturnsCorrectStage()
         {
-            _default.GetMaintenanceStage(typeof (MaintenanceAfterEach))
+            _default.GetMaintenanceStage(typeof(MaintenanceAfterEach))
                 .ShouldBe(MigrationStage.AfterEach);
         }
 
@@ -228,7 +228,7 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void TypeHasTagsReturnTrueIfBaseTypeDoesHaveTagsAttribute()
         {
-            _default.TypeHasTags(typeof(ConcretehasTagAttribute))
+            _default.TypeHasTags(typeof(ConcreteHasTagAttribute))
                 .ShouldBeTrue();
         }
 
@@ -318,7 +318,7 @@ namespace FluentMigrator.Tests.Unit
             [Category("Tagging")]
             public void WhenBaseTypeHasTagsThenConcreteTypeReturnsTrue()
             {
-                _default.TypeHasMatchingTags(typeof(ConcretehasTagAttribute), new[] { "UK" })
+                _default.TypeHasMatchingTags(typeof(ConcreteHasTagAttribute), new[] { "UK" })
                     .ShouldBeTrue();
             }
 
@@ -393,6 +393,102 @@ namespace FluentMigrator.Tests.Unit
             public void WhenTypeHasMultipleTagsWithMultipleTagNamesAndOneHasBehaviorOfAnyWithoutAnyMatchingTagNamesAndOtherHasBehaviorOfAllWithTagNamesMatchingThenReturnTrue()
             {
                 _default.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndAllBehaviorAndProductionAndStagingAndAnyBehaviorInTwoTagsAttributes), new[] { "BE", "UK" })
+                    .ShouldBeTrue();
+            }
+
+            [Test]
+            [Category("Tagging")]
+            public void WhenBaseInterfaceHasTagsThenConcreteTypeReturnsTrue()
+            {
+                _default.TypeHasMatchingTags(typeof(TaggedMigrationBySingleInterfaceTaggedWithUk), new[] { "UK" })
+                    .ShouldBeTrue();
+            }
+
+            [Test]
+            [Category("Tagging")]
+            public void WhenBaseInterfacesHaveTagsThenConcreteTypeReturnsTrue()
+            {
+                _default.TypeHasMatchingTags(typeof(TaggedMigrationByMultipleInterfacesTaggedWithUsAndNy), new[] { "US" })
+                    .ShouldBeTrue();
+
+                _default.TypeHasMatchingTags(typeof(TaggedMigrationByMultipleInterfacesTaggedWithUsAndNy), new[] { "NY" })
+                    .ShouldBeTrue();
+
+                _default.TypeHasMatchingTags(typeof(TaggedMigrationByMultipleInterfacesTaggedWithUsAndNy), new[] { "US", "NY" })
+                    .ShouldBeTrue();
+            }
+
+            [Test]
+            [Category("Tagging")]
+            public void WhenBaseInterfaceInheritsTagsThenConcreteTypeReturnsTrue()
+            {
+                _default.TypeHasMatchingTags(typeof(TaggedMigrationByCompositeInterfaceTaggedWithDev), new[] { "DEV" })
+                    .ShouldBeTrue();
+            }
+
+            [Test]
+            [Category("Tagging")]
+            public void WhenBaseTypesAndInterfacesHaveTagsThenConcreteTypeReturnsTrue()
+            {
+                _default.TypeHasMatchingTags(typeof(TaggedMigrationByCompositeInheritanceTaggedWithBetaAndQa), new[] { "Beta" })
+                    .ShouldBeTrue();
+
+                _default.TypeHasMatchingTags(typeof(TaggedMigrationByCompositeInheritanceTaggedWithBetaAndQa), new[] { "QA" })
+                    .ShouldBeTrue();
+
+                _default.TypeHasMatchingTags(typeof(TaggedMigrationByCompositeInheritanceTaggedWithBetaAndQa), new[] { "Beta", "QA" })
+                    .ShouldBeTrue();
+            }
+
+            [Test]
+            [Category("Tagging")]
+            public void WhenAttributionAndBaseTypesAndInterfacesHaveTagsThenConcreteTypeReturnsTrue()
+            {
+                _default.TypeHasMatchingTags(typeof(TaggedMigrationByAttributionAndCompositeInheritanceTaggedWithStagingAndBetaAndDev), new[] { "Staging" })
+                    .ShouldBeTrue();
+
+                _default.TypeHasMatchingTags(typeof(TaggedMigrationByAttributionAndCompositeInheritanceTaggedWithStagingAndBetaAndDev), new[] { "Beta" })
+                    .ShouldBeTrue();
+
+                _default.TypeHasMatchingTags(typeof(TaggedMigrationByAttributionAndCompositeInheritanceTaggedWithStagingAndBetaAndDev), new[] { "DEV" })
+                    .ShouldBeTrue();
+
+                _default.TypeHasMatchingTags(typeof(TaggedMigrationByAttributionAndCompositeInheritanceTaggedWithStagingAndBetaAndDev), new[] { "Staging", "Beta" })
+                    .ShouldBeTrue();
+
+                _default.TypeHasMatchingTags(typeof(TaggedMigrationByAttributionAndCompositeInheritanceTaggedWithStagingAndBetaAndDev), new[] { "Staging", "DEV" })
+                    .ShouldBeTrue();
+
+                _default.TypeHasMatchingTags(typeof(TaggedMigrationByAttributionAndCompositeInheritanceTaggedWithStagingAndBetaAndDev), new[] { "Beta", "DEV" })
+                    .ShouldBeTrue();
+
+                _default.TypeHasMatchingTags(typeof(TaggedMigrationByAttributionAndCompositeInheritanceTaggedWithStagingAndBetaAndDev), new[] { "Staging", "Beta", "DEV" })
+                    .ShouldBeTrue();
+            }
+
+            [Test]
+            [Category("Tagging")]
+            public void WhenBaseInterfacesHaveOverlappingTagsThenConcreteTypeReturnsTrue()
+            {
+                _default.TypeHasMatchingTags(typeof(TaggedMigrationByCompositeOverlappingTagsTaggedWithCaAndNvOnceAndTxTwice), new[] { "CA" })
+                    .ShouldBeTrue();
+
+                _default.TypeHasMatchingTags(typeof(TaggedMigrationByCompositeOverlappingTagsTaggedWithCaAndNvOnceAndTxTwice), new[] { "NV" })
+                    .ShouldBeTrue();
+
+                _default.TypeHasMatchingTags(typeof(TaggedMigrationByCompositeOverlappingTagsTaggedWithCaAndNvOnceAndTxTwice), new[] { "TX" })
+                    .ShouldBeTrue();
+
+                _default.TypeHasMatchingTags(typeof(TaggedMigrationByCompositeOverlappingTagsTaggedWithCaAndNvOnceAndTxTwice), new[] { "CA", "NV" })
+                    .ShouldBeTrue();
+
+                _default.TypeHasMatchingTags(typeof(TaggedMigrationByCompositeOverlappingTagsTaggedWithCaAndNvOnceAndTxTwice), new[] { "CA", "TX" })
+                    .ShouldBeTrue();
+
+                _default.TypeHasMatchingTags(typeof(TaggedMigrationByCompositeOverlappingTagsTaggedWithCaAndNvOnceAndTxTwice), new[] { "NV", "TX" })
+                    .ShouldBeTrue();
+
+                _default.TypeHasMatchingTags(typeof(TaggedMigrationByCompositeOverlappingTagsTaggedWithCaAndNvOnceAndTxTwice), new[] { "CA", "NV", "TX" })
                     .ShouldBeTrue();
             }
         }
@@ -490,7 +586,7 @@ namespace FluentMigrator.Tests.Unit
     {
     }
 
-    [Tags(TagBehavior.RequireAll,"BE", "UK", "Staging")]
+    [Tags(TagBehavior.RequireAll, "BE", "UK", "Staging")]
     [Tags(TagBehavior.RequireAny, "Staging", "Production")]
     public class TaggedWithBeAndUkAndAllBehaviorAndProductionAndStagingAndAnyBehaviorInTwoTagsAttributes
     {
@@ -523,14 +619,12 @@ namespace FluentMigrator.Tests.Unit
     public abstract class BaseHasTagAttribute : Migration
     { }
 
-    public class ConcretehasTagAttribute : BaseHasTagAttribute
+    public class ConcreteHasTagAttribute : BaseHasTagAttribute
     {
-        public override void Up(){}
+        public override void Up() { }
 
-        public override void Down(){}
+        public override void Down() { }
     }
-
-
 
     [Migration(123, TransactionBehavior.None)]
     [MigrationTrait("key", "test")]
@@ -552,4 +646,51 @@ namespace FluentMigrator.Tests.Unit
         public override void Up() { }
         public override void Down() { }
     }
+
+    // tagged interfaces for multiple inheritance of tags
+    [Tags("UK", "US")]
+    internal interface ITaggedMigrationAppliesToCountries { }
+
+    [Tags("UAT")]
+    internal interface ITaggedMigrationAppliesToUatEnvironment { }
+
+    [Tags("DEV", "QA")]
+    internal interface ITaggedMigrationAppliesToLowerEnvironments { }
+
+    internal interface ITaggedMigrationAppliesToNonProductionEnvironments : ITaggedMigrationAppliesToLowerEnvironments, ITaggedMigrationAppliesToUatEnvironment
+    {
+    }
+
+    [Tags("CA", "NY")]
+    internal interface ITaggedMigrationAppliesToFeature1 { }
+
+    [Tags("NV", "TX")]
+    internal interface ITaggedMigrationAppliesToFeature2 { }
+
+    [Tags("CA", "TX")]
+    internal interface ITaggedMigrationAppliesToFeature3 { }
+
+    // migrations by inheritance
+    internal class UntaggedConcreteMigration : Migration
+    {
+        public override void Up() { }
+
+        public override void Down() { }
+    }
+
+    [Tags("Beta")]
+    internal class TaggedMigrationAppliesToBetaEnvironment : UntaggedConcreteMigration { }
+
+    internal class TaggedMigrationBySingleInterfaceTaggedWithUk : UntaggedConcreteMigration, ITaggedMigrationAppliesToCountries { }
+
+    internal class TaggedMigrationByMultipleInterfacesTaggedWithUsAndNy : UntaggedConcreteMigration, ITaggedMigrationAppliesToCountries, ITaggedMigrationAppliesToFeature1 { }
+
+    internal class TaggedMigrationByCompositeInterfaceTaggedWithDev : UntaggedConcreteMigration, ITaggedMigrationAppliesToNonProductionEnvironments { }
+
+    internal class TaggedMigrationByCompositeInheritanceTaggedWithBetaAndQa : TaggedMigrationAppliesToBetaEnvironment, ITaggedMigrationAppliesToNonProductionEnvironments { }
+
+    [Tags("Staging")]
+    internal class TaggedMigrationByAttributionAndCompositeInheritanceTaggedWithStagingAndBetaAndDev : TaggedMigrationAppliesToBetaEnvironment, ITaggedMigrationAppliesToNonProductionEnvironments { }
+
+    internal class TaggedMigrationByCompositeOverlappingTagsTaggedWithCaAndNvOnceAndTxTwice : UntaggedConcreteMigration, ITaggedMigrationAppliesToFeature2, ITaggedMigrationAppliesToFeature3 { }
 }

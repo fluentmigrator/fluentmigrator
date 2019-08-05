@@ -22,5 +22,18 @@ namespace FluentMigrator.Runner.Generators.SQLite
         {
             return string.Empty;
         }
+
+        protected override string FormatByteArray(byte[] value)
+        {
+            var hex = new System.Text.StringBuilder((value.Length * 2) + 3);
+            hex.Append("X'");
+            foreach (var b in value)
+            {
+                hex.AppendFormat("{0:x2}", b);
+            }
+            hex.Append("'");
+
+            return hex.ToString();
+        }
     }
 }

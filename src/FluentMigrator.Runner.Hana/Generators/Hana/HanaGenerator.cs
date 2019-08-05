@@ -92,9 +92,18 @@ namespace FluentMigrator.Runner.Generators.Hana
                 result.AppendFormat(" START WITH {0}", seq.StartWith);
             }
 
+            const long MINIMUM_CACHE_VALUE = 2;
             if (seq.Cache.HasValue)
             {
+                if (seq.Cache.Value < MINIMUM_CACHE_VALUE)
+                {
+                    return CompatibilityMode.HandleCompatibilty("Cache size must be greater than 1; if you intended to disable caching, set Cache to null.");
+                }
                 result.AppendFormat(" CACHE {0}", seq.Cache);
+            }
+            else
+            {
+                result.Append(" NO CACHE");
             }
 
             if (seq.Cycle)

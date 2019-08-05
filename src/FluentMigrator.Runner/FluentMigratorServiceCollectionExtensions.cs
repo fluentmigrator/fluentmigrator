@@ -74,9 +74,6 @@ namespace Microsoft.Extensions.DependencyInjection
                 // Add the default embedded resource provider
                 .AddSingleton<IEmbeddedResourceProvider>(sp => new DefaultEmbeddedResourceProvider(sp.GetRequiredService<IAssemblySource>().Assemblies))
 
-                // The default set of conventions to be applied to migration expressions
-                .AddSingleton<IConventionSet, DefaultConventionSet>()
-
                 // Configure the runner conventions
                 .AddSingleton<IMigrationRunnerConventionsAccessor, AssemblySourceMigrationRunnerConventionsAccessor>()
                 .AddSingleton(sp => sp.GetRequiredService<IMigrationRunnerConventionsAccessor>().MigrationRunnerConventions)
@@ -94,6 +91,12 @@ namespace Microsoft.Extensions.DependencyInjection
 
                 // Source for profiles
                 .AddScoped<IProfileSource, ProfileSource>()
+
+                // Configure the accessor for the convention set
+                .AddScoped<IConventionSetAccessor, AssemblySourceConventionSetAccessor>()
+
+                // The default set of conventions to be applied to migration expressions
+                .AddScoped(sp => sp.GetRequiredService<IConventionSetAccessor>().GetConventionSet() ?? ActivatorUtilities.CreateInstance<DefaultConventionSet>(sp))
 
                 // Configure the accessor for the version table metadata
                 .AddScoped<IVersionTableMetaDataAccessor, AssemblySourceVersionTableMetaDataAccessor>()

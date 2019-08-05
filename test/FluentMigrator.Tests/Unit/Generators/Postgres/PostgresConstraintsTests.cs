@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 //
 // Copyright (c) 2018, Fluent Migrator Project
 //
@@ -18,6 +18,8 @@
 
 using System.Data;
 using FluentMigrator.Runner.Generators.Postgres;
+using FluentMigrator.Runner.Processors.Postgres;
+
 using NUnit.Framework;
 
 using Shouldly;
@@ -32,7 +34,8 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         [SetUp]
         public void Setup()
         {
-            Generator = new PostgresGenerator();
+            var quoter = new PostgresQuoter(new PostgresOptions());
+            Generator = new PostgresGenerator(quoter);
         }
 
         [Test]

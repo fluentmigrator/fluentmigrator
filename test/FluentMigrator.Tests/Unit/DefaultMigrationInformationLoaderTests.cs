@@ -82,7 +82,7 @@ namespace FluentMigrator.Tests.Unit
 
             Assert.IsInstanceOf<DefaultMigrationInformationLoader>(loader);
 
-            var defaultLoader = (DefaultMigrationInformationLoader) loader;
+            var defaultLoader = (DefaultMigrationInformationLoader)loader;
 
             defaultLoader.LoadNestedNamespaces.ShouldBe(false);
         }
@@ -131,7 +131,7 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void DoesFindMigrationsThatHaveMatchingTags()
         {
-            var migrationType = typeof(TaggedMigraion);
+            var migrationType = typeof(TaggedMigration);
             var tagsToMatch = new[] { "UK", "Production" };
 
             var conventionsMock = new Mock<IMigrationRunnerConventions>();
@@ -157,7 +157,7 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void DoesNotFindMigrationsThatDoNotHaveMatchingTags()
         {
-            var migrationType = typeof(TaggedMigraion);
+            var migrationType = typeof(TaggedMigration);
             var tagsToMatch = new[] { "UK", "Production" };
 
             var conventionsMock = new Mock<IMigrationRunnerConventions>();
@@ -309,7 +309,7 @@ namespace FluentMigrator.Tests.Unit
     {
         [Tags("UK", "IE", "QA", "Production")]
         [Migration(123)]
-        public class TaggedMigraion : Migration
+        public class TaggedMigration : Migration
         {
             public override void Up() { }
 

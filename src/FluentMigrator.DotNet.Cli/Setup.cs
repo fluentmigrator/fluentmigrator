@@ -85,6 +85,7 @@ namespace FluentMigrator.DotNet.Cli
                         .AddOracleManaged()
                         .AddOracle12CManaged()
                         .AddPostgres()
+                        .AddPostgres92()
                         .AddRedshift()
                         .AddSqlAnywhere()
                         .AddSQLite()

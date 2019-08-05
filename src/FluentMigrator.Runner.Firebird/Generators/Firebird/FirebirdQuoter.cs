@@ -80,7 +80,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
                 return false;
             if (_forceQuote)
                 return true;
-            if (_keywords.Contains(name))
+            if (_keywords.Contains(name.ToUpperInvariant()))
                 return true;
             if (name.StartsWith("_"))
                 return true;

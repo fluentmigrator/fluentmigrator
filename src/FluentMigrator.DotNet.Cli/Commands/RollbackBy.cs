@@ -24,7 +24,7 @@ using McMaster.Extensions.CommandLineUtils;
 namespace FluentMigrator.DotNet.Cli.Commands
 {
     [HelpOption]
-    [Command("Rollback migrations")]
+    [Command("by", Description = "Rollback migrations")]
     public class RollbackBy : BaseCommand
     {
         public Rollback Parent { get; }

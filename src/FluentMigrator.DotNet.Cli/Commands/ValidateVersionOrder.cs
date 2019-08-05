@@ -21,7 +21,7 @@ using McMaster.Extensions.CommandLineUtils;
 namespace FluentMigrator.DotNet.Cli.Commands
 {
     [HelpOption]
-    [Command("Validate the order of applied migrations")]
+    [Command("versions", Description = "Validate the order of applied migrations")]
     public class ValidateVersionOrder : ConnectionCommand
     {
         private int OnExecute(IConsole console)

@@ -108,11 +108,13 @@ namespace FluentMigrator.MSBuild
 
         public string ProviderSwitches { get; set; }
 
-        public bool StripComments { get; set; }
+        public bool StripComments { get; set; } = true;
 
         public bool IncludeUntaggedMaintenances { get; set; }
 
         public bool IncludeUntaggedMigrations { get; set; } = true;
+
+        public string DefaultSchemaName { get; set; }
 
         private bool ExecutingAgainstMsSql => _databaseType.StartsWith("SqlServer", StringComparison.InvariantCultureIgnoreCase);
 
@@ -154,7 +156,7 @@ namespace FluentMigrator.MSBuild
 
         private void ExecuteMigrations()
         {
-            var conventionSet = new DefaultConventionSet(defaultSchemaName: null, WorkingDirectory);
+            var conventionSet = new DefaultConventionSet(DefaultSchemaName, WorkingDirectory);
 
             var services = CreateCoreServices()
                 .Configure<FluentMigratorLoggerOptions>(
@@ -235,6 +237,7 @@ namespace FluentMigrator.MSBuild
                         .AddOracleManaged()
                         .AddOracle12CManaged()
                         .AddPostgres()
+                        .AddPostgres92()
                         .AddRedshift()
                         .AddSqlAnywhere()
                         .AddSQLite()

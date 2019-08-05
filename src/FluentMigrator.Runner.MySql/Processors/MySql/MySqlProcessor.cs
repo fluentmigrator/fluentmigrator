@@ -178,7 +178,7 @@ namespace FluentMigrator.Runner.Processors.MySql
 
             EnsureConnectionIsOpen();
 
-            expression.Operation?.Invoke(Connection, null);
+            expression.Operation?.Invoke(Connection, Transaction);
         }
 
         public override void Process(RenameColumnExpression expression)

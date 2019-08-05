@@ -22,6 +22,7 @@ using System.Data;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Postgres;
+using FluentMigrator.Runner.Processors.Postgres;
 
 using NUnit.Framework;
 
@@ -39,7 +40,8 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         [SetUp]
         public void Setup()
         {
-            Generator = new PostgresGenerator();
+            var quoter = new PostgresQuoter(new PostgresOptions());
+            Generator = new PostgresGenerator(quoter);
         }
 
         [Test]
@@ -112,7 +114,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         [Test]
         public void NonUnicodeQuotesCorrectly()
         {
-            var expression = new InsertDataExpression {TableName = "TestTable"};
+            var expression = new InsertDataExpression { TableName = "TestTable" };
             expression.Rows.Add(new InsertionDataDefinition
                                     {
                                         new KeyValuePair<string, object>("NormalString", "Just'in"),

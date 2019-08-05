@@ -21,9 +21,9 @@ using Npgsql;
 
 namespace FluentMigrator.Tests.Helpers
 {
-    public class PostgresTestSequence: IDisposable
+    public class PostgresTestSequence : IDisposable
     {
-        private readonly PostgresQuoter _quoter = new PostgresQuoter();
+        private readonly PostgresQuoter _quoter = new PostgresQuoter(new PostgresOptions());
         private readonly string _schemaName;
         private NpgsqlConnection Connection { get; set; }
         public string Name { get; set; }

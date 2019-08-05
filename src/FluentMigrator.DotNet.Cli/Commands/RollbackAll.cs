@@ -22,7 +22,7 @@ using McMaster.Extensions.CommandLineUtils;
 namespace FluentMigrator.DotNet.Cli.Commands
 {
     [HelpOption]
-    [Command("Rollback all migrations")]
+    [Command("all", Description = "Rollback all migrations")]
     public class RollbackAll : BaseCommand
     {
         public Rollback Parent { get; }

@@ -17,6 +17,7 @@
 #endregion
 
 using FluentMigrator.Runner.Generators.Postgres;
+using FluentMigrator.Runner.Processors.Postgres;
 
 using NUnit.Framework;
 
@@ -33,7 +34,8 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         [SetUp]
         public void Setup()
         {
-            Generator = new PostgresGenerator();
+            var quoter = new PostgresQuoter(new PostgresOptions());
+            Generator = new PostgresGenerator(quoter);
         }
 
         [Test]

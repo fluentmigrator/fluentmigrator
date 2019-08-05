@@ -14,14 +14,50 @@
 // limitations under the License.
 #endregion
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
 
 using FluentMigrator.Runner.Generators.Generic;
+using FluentMigrator.Runner.Processors.Postgres;
 
 namespace FluentMigrator.Runner.Generators.Postgres
 {
     public class PostgresQuoter : GenericQuoter
     {
+        public PostgresQuoter(PostgresOptions options)
+        {
+            Options = options ?? new PostgresOptions();
+        }
+
+        /// <summary>
+        /// https://www.postgresql.org/docs/current/sql-keywords-appendix.html
+        /// <para>select * from pg_get_keywords() where catcode != 'U'</para>
+        /// </summary>
+        private static readonly HashSet<string> _keywords = new HashSet<string>(
+            new[] { "all",  "analyse",  "analyze",  "and",  "any",  "array",  "as",  "asc",  "asymmetric",  "authorization",
+                "between",  "bigint",  "binary", "bit",  "boolean",  "both", "case",  "cast",  "char",  "character", "check",
+                "coalesce", "collate", "collation", "column", "concurrently", "constraint", "create", "cross", "current_catalog",
+                "current_date", "current_role", "current_schema", "current_time", "current_timestamp", "current_user", "dec",
+                "decimal", "default", "deferrable", "desc", "distinct", "do", "else", "end", "except", "exists", "extract", "FALSE",
+                "fetch", "float", "for", "foreign", "freeze", "from", "full", "grant", "greatest", "group", "grouping", "having", "ilike",
+                "in", "initially", "inner", "inout", "int", "integer", "intersect", "interval", "into", "is", "isnull", "join", "lateral",
+                "leading", "least", "left", "like", "limit", "localtime", "localtimestamp", "national", "natural", "nchar", "none",
+                "not", "notnull", "null", "nullif", "numeric", "offset", "on", "only", "or", "order", "out", "outer", "overlaps", "overlay",
+                "placing", "position", "precision", "primary", "real", "references", "returning", "right", "row", "select", "session_user",
+                "setof", "similar", "smallint", "some", "substring", "symmetric", "table", "tablesample", "then", "time", "timestamp", "to",
+                "trailing", "treat", "trim", "TRUE", "union", "unique", "user", "using", "values", "varchar", "variadic", "verbose", "when",
+                "where", "window", "with", "xmlattributes", "xmlconcat", "xmlelement", "xmlexists", "xmlforest", "xmlnamespaces", "xmlparse",
+                "xmlpi", "xmlroot", "xmlserialize", "xmltable" }, StringComparer.OrdinalIgnoreCase);
+
+        public PostgresOptions Options { get; }
+
+        /// <inheritdoc />
+        protected override bool ShouldQuote(string name)
+        {
+            return Options.ForceQuote ? base.ShouldQuote(name) : _keywords.Contains(name);
+        }
+
         public override string FormatBool(bool value) { return value ? "true" : "false"; }
 
         public override string QuoteSchemaName(string schemaName)

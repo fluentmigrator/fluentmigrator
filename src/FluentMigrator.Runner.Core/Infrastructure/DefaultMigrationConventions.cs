@@ -83,12 +83,25 @@ namespace FluentMigrator.Runner.Infrastructure
 
         private static bool TypeHasTagsImpl(Type type)
         {
-            return type.GetCustomAttributes<TagsAttribute>(true).Any();
+            return GetInheritedCustomAttributes<TagsAttribute>(type).Any();
+        }
+
+        private static IEnumerable<T> GetInheritedCustomAttributes<T>(Type type)
+        {
+            var attributeType = typeof(T);
+
+            return type
+                .GetCustomAttributes(attributeType, true)
+                .Union(
+                    type.GetInterfaces()
+                        .SelectMany(interfaceType => interfaceType.GetCustomAttributes(attributeType, true)))
+                .Distinct()
+                .Cast<T>();
         }
 
         private static bool TypeHasMatchingTagsImpl(Type type, IEnumerable<string> tagsToMatch)
         {
-            var tags = type.GetCustomAttributes<TagsAttribute>(true).ToList();
+            var tags = GetInheritedCustomAttributes<TagsAttribute>(type).ToList();
             var matchTagsList = tagsToMatch.ToList();
 
             if (tags.Count != 0 && matchTagsList.Count == 0)
