@@ -22,6 +22,7 @@ Details: https://github.com/fluentmigrator/fluentmigrator/releases
     <RepositoryType>git</RepositoryType>
     <MinClientVersion>3.5</MinClientVersion>
     <IsPackable>false</IsPackable>
+    <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
     <!-- Enable the CS300x warnings when the obsoleted code gets removed -->
     <NoWarn>$(NoWarn);CS3001;CS3002;CS3003;CS3005;NU5105;NU1701</NoWarn>
   </PropertyGroup>
