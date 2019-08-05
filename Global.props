@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project>
   <Import Project="DotNetSdkMono.props" />
   <PropertyGroup>
@@ -9,7 +9,7 @@
     <Company>FluentMigrator Project</Company>
     <Authors>Sean Chambers;Josh Coffman;Tom Marien;Mark Junker</Authors>
     <PackageProjectUrl>https://github.com/fluentmigrator/fluentmigrator/wiki</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/fluentmigrator/fluentmigrator/blob/master/LICENSE.txt</PackageLicenseUrl>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageReleaseNotes>Use of standard dependency injection, configuration and logging libraries.
 Simplification of in-process runner configuration and instantiation.
 dotnet-fm is now a global .NET Core 2.1 tool.
