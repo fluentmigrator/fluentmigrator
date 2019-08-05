@@ -8,19 +8,19 @@
   </PropertyGroup>
   <Import Project="$(MSBuildThisFileDirectory)../../PackageTool.props" />
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="8.0.0" />
-    <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="5.12.1" />
+    <PackageReference Include="AutoMapper" Version="8.1.1" />
+    <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="6.7.0" />
     <PackageReference Include="FSharp.Core" Version="4.6.2" />
     <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="2.3.4" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="2.0.1" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="2.2.6" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="2.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="2.0.1" />
-    <PackageReference Include="MySql.Data" Version="8.0.11" />
-    <PackageReference Include="Npgsql" Version="3.2.7" />
-    <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="2.18.6" />
-    <PackageReference Include="Snowflake.Data" Version="1.0.5" />
+    <PackageReference Include="MySql.Data" Version="8.0.17" />
+    <PackageReference Include="Npgsql" Version="4.0.8" />
+    <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="2.19.31" />
+    <PackageReference Include="Snowflake.Data" Version="1.0.12" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FluentMigrator.Runner.Snowflake\FluentMigrator.Runner.Snowflake.csproj" />

@@ -31,7 +31,7 @@ Details: https://github.com/fluentmigrator/fluentmigrator/releases
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="JetBrains.Annotations" Version="11.1.0" PrivateAssets="All" />
+    <PackageReference Include="JetBrains.Annotations" Version="2019.1.3" PrivateAssets="All" />
   </ItemGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)'=='net461'">

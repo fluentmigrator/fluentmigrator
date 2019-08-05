@@ -6,7 +6,7 @@ dotnet: 2.2
 git:
   depth: false
 before_script:
-- nuget install GitVersion.CommandLine -Version 4.0.0-beta0012 -Prerelease -ExcludeVersion
+- nuget install GitVersion.CommandLine -Version 5.0.0 -ExcludeVersion
 - export GITVERSION_TOOL="mono GitVersion.CommandLine/tools/GitVersion.exe"
 - export VERSION=$($GITVERSION_TOOL /showvariable SemVer)
 - echo Using Version=$VERSION

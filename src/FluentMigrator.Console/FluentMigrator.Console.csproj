@@ -34,13 +34,13 @@
     <ProjectReference Include="..\FluentMigrator.Runner.Jet\FluentMigrator.Runner.Jet.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Npgsql" Version="3.2.7" />
-    <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="5.12.1" />
+    <PackageReference Include="Npgsql" Version="4.0.8" />
+    <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="6.7.0" />
     <PackageReference Include="FSharp.Core" Version="4.6.2" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="2.0.1" />
-    <PackageReference Include="Oracle.ManagedDataAccess" Version="12.2.1100" />
-    <PackageReference Include="MySql.Data" Version="8.0.11" />
-    <PackageReference Include="Snowflake.Data" Version="1.0.5" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="2.2.6" />
+    <PackageReference Include="Oracle.ManagedDataAccess" Version="19.3.1" />
+    <PackageReference Include="MySql.Data" Version="8.0.17" />
+    <PackageReference Include="Snowflake.Data" Version="1.0.12" />
   </ItemGroup>
   <ItemGroup Condition=" '$(Platform)' == 'x86' ">
     <PackageReference Include="Oracle.DataAccess.x86.4" Version="4.112.3" />
