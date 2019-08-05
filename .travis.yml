@@ -1,5 +1,5 @@
 language: csharp
-dist: xenial
+dist: bionic
 sudo: false
 mono: latest
 dotnet: 2.2
