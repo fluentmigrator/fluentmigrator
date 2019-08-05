@@ -18,8 +18,8 @@ script:
 - dotnet publish src/FluentMigrator.Console/FluentMigrator.Console.csproj -c Release -r win7-x64 -o "$TRAVIS_BUILD_DIR/publish/tools/net461/x64" -p:Platform=x64 -p:TargetFramework=net461
 - dotnet publish src/FluentMigrator.Console/FluentMigrator.Console.csproj -c Release -r any -o "$TRAVIS_BUILD_DIR/publish/tools/net461/any" -p:Platform=AnyCPU -p:TargetFramework=net461
 - nuget pack publish/FluentMigrator.Console.nuspec -OutputDirectory "$TRAVIS_BUILD_DIR/output" -Version "$VERSION" -Properties "Configuration=Release;NoWarn=NU5100"
-deploy: 
-- provider: script 
+deploy:
+- provider: script
   skip_cleanup: true
   script: bash ./myget-upload.sh
   on:
