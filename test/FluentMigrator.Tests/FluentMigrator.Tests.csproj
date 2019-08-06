@@ -6,6 +6,7 @@
     <UserSecretsId>FluentMigrator.Tests</UserSecretsId>
     <DebugType>full</DebugType>
     <Platforms>AnyCPU;x64</Platforms>
+    <NoWarn>$(NoWarn);CS8002</NoWarn>
   </PropertyGroup>
   <Import Project="$(MSBuildThisFileDirectory)../../Global.props" />
   <ItemGroup>
