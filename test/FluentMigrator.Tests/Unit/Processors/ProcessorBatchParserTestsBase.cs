@@ -45,9 +45,9 @@ namespace FluentMigrator.Tests.Unit.Processors
             _connectionState = ConnectionState.Closed;
 
             MockedCommands = new List<Mock<DbCommand>>();
-            MockedConnection = new Mock<DbConnection>();
-            MockedDbProviderFactory = new Mock<DbProviderFactory>();
-            MockedConnectionStringAccessor = new Mock<IConnectionStringAccessor>();
+            MockedConnection = new Mock<DbConnection>(MockBehavior.Strict);
+            MockedDbProviderFactory = new Mock<DbProviderFactory>(MockBehavior.Strict);
+            MockedConnectionStringAccessor = new Mock<IConnectionStringAccessor>(MockBehavior.Strict);
 
             MockedConnection.SetupGet(conn => conn.State).Returns(() => _connectionState);
             MockedConnection.Setup(conn => conn.Open()).Callback(() => _connectionState = ConnectionState.Open);
@@ -64,7 +64,7 @@ namespace FluentMigrator.Tests.Unit.Processors
                 .Returns(
                     () =>
                     {
-                        var commandMock = new Mock<DbCommand>()
+                        var commandMock = new Mock<DbCommand>(MockBehavior.Strict)
                             .SetupProperty(cmd => cmd.CommandText);
                         commandMock.Setup(cmd => cmd.ExecuteNonQuery()).Returns(1);
                         commandMock.Protected().SetupGet<DbConnection>("DbConnection").Returns(MockedConnection.Object);
@@ -73,17 +73,6 @@ namespace FluentMigrator.Tests.Unit.Processors
                         MockedCommands.Add(commandMock);
                         return commandMock.Object;
                     });
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            foreach (var mockedCommand in MockedCommands)
-            {
-                mockedCommand.VerifyNoOtherCalls();
-            }
-
-            MockedDbProviderFactory.VerifyNoOtherCalls();
         }
 
         [Test]
