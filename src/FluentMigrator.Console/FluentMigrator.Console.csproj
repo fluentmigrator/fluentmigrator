@@ -67,12 +67,4 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\..\lib\Snowflake\net46\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="Snowflake.Data">
-      <HintPath>..\..\lib\Snowflake\net46\Snowflake.Data.dll</HintPath>
-    </Reference>
-  </ItemGroup>
 </Project>
