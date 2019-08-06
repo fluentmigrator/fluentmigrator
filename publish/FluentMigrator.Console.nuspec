@@ -10,7 +10,7 @@ In addition to forward migration support, FluentMigrator also supports different
 		<iconUrl>https://github.com/fluentmigrator/fluentmigrator/raw/develop/docs/logo.png</iconUrl>
 		<language>en-US</language>
 		<projectUrl>https://github.com/fluentmigrator/fluentmigrator/wiki/</projectUrl>
-		<licenseUrl>https://github.com/fluentmigrator/fluentmigrator/blob/master/LICENSE.txt</licenseUrl>
+		<license type="expression">Apache-2.0</license>
 		<releaseNotes>https://github.com/fluentmigrator/fluentmigrator/releases</releaseNotes>
 	</metadata>
 	<files>
