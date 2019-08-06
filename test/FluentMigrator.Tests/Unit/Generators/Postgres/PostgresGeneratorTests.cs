@@ -119,7 +119,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             var expression = new CreateColumnExpression { Column = columnDefinition, TableName = tableName };
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"public\".\"NewTable\" ADD \"NewColumn\" varchar(5) NOT NULL DEFAULT current_timestamp();");
+            result.ShouldBe("ALTER TABLE \"public\".\"NewTable\" ADD \"NewColumn\" varchar(5) NOT NULL DEFAULT current_timestamp;");
         }
 
         [Test]
