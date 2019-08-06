@@ -112,6 +112,17 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
+        public void CanUseSystemMethodCurrentDateTimeOffsetAsADefaultValueForAColumn()
+        {
+            const string tableName = "NewTable";
+            var columnDefinition = new ColumnDefinition { Name = "NewColumn", Size = 5, Type = DbType.String, DefaultValue = SystemMethods.CurrentDateTimeOffset };
+            var expression = new CreateColumnExpression { Column = columnDefinition, TableName = tableName };
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE \"public\".\"NewTable\" ADD \"NewColumn\" varchar(5) NOT NULL DEFAULT current_timestamp();");
+        }
+
+        [Test]
         public void NonUnicodeQuotesCorrectly()
         {
             var expression = new InsertDataExpression { TableName = "TestTable" };
