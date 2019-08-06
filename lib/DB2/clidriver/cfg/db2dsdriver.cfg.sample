@@ -16,6 +16,12 @@
          <acr>
             <parameter name="enableACR" value="true"/>
          </acr>
+         <specialregisters>
+            <parameter name="CURRENT DEGREE" value="'ANY'"/>
+         </specialregisters>
+         <sessionglobalvariables>
+            <parameter name="global_var1" value="abc"/>
+         </sessionglobalvariables>
       </database>
       <!-- Local IPC connection -->
       <database name="name3" host="localhost" port="0">
@@ -25,8 +31,19 @@
    </databases>
    <parameters>
       <parameter name="GlobalParam" value="Value"/>
-      <!-- Client configuration for Optim Performance Manager Extended Insight (OPM EI) and Optim Configuration Manager (OCM)-->
-      <!-- <parameter name="connectionSupervisorLibrary" value="/home/pureQuery/pqcmx"/> -->
-      <!-- <parameter name="connectionSupervisorProperties" value="controllerURL=server1.net1.com:65000,httpControllerURL=http://ibmdatacmserver:12206,cmxUUID=myuuid"/> -->
+      <!-- cmxControllerAccessPolicy : Indicates the impact of DSM or OCM on client applications
+      Supported values
+      0 : If DSM or OCM server is unreachable, do not allow the application to start.
+      1 : If DSM or OCM server is unreachable, allow the application to start only if a cached profile for the application is available.
+      2 : If DSM or OCM server is unreachable, allow the application to start.
+      3 : Even if DSM or OCM is reachable, allow the application to ignore the DSM or OCM server.
+      4 : Even if DSM or OCM is reachable, do not poll for control directives, but send client statistics when available. -->
+      <!-- DSM and OCM users : Remove comments from the line below and put in the appropriate values for DSM_OCM_hostname and DSM_OCM_port -->
+      <!--<parameter name="connectionSupervisorProperties" value="httpControllerURL=http://DSM_OCM_hostname:DSM_OCM_port, cmxControllerAccessPolicy=2"/>-->
+
+
+      <!-- OPM users : Remove comments from the line below and put in the appropriate values for OPM_hostname and EIPort -->
+      <!--<parameter name="connectionSupervisorProperties" value="controllerURL=OPM_hostname:EIPort "/>-->
+ 
    </parameters>
 </configuration>
