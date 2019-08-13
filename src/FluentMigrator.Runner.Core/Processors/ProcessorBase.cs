@@ -28,10 +28,19 @@ using Microsoft.Extensions.Logging;
 
 namespace FluentMigrator.Runner.Processors
 {
+    /// <summary>
+    /// Minimalist base class for a processor.
+    /// </summary>
     public abstract class ProcessorBase : IMigrationProcessor
     {
         protected internal readonly IMigrationGenerator Generator;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ProcessorBase"/> class.
+        /// </summary>
+        /// <param name="generator">The migration generator.</param>
+        /// <param name="logger">The logger.</param>
+        /// <param name="options">The options.</param>
         protected ProcessorBase(
             [NotNull] IMigrationGenerator generator,
             [NotNull] ILogger logger,
@@ -42,14 +51,29 @@ namespace FluentMigrator.Runner.Processors
             Logger = logger;
         }
 
+        /// <summary>
+        /// Gets the default database type identifier.
+        /// </summary>
         public abstract string DatabaseType { get; }
 
+        /// <summary>
+        /// Gets the database type aliases.
+        /// </summary>
         public abstract IList<string> DatabaseTypeAliases { get; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether a transaction was committed or rolled back.
+        /// </summary>
         public bool WasCommitted { get; protected set; }
 
+        /// <summary>
+        /// Gets the logger.
+        /// </summary>
         protected internal ILogger Logger { get; }
 
+        /// <summary>
+        /// Gets the processor options.
+        /// </summary>
         [NotNull]
         protected ProcessorOptions Options { get; }
 
