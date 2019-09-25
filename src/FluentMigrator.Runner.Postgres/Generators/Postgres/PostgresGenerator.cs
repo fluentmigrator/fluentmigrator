@@ -374,7 +374,50 @@ namespace FluentMigrator.Runner.Generators.Postgres
 
         public override string Generate(CreateSequenceExpression expression)
         {
-            return string.Format("{0};", base.Generate(expression));
+            var result = new StringBuilder("CREATE SEQUENCE ");
+            var seq = expression.Sequence;
+            result.AppendFormat(Quoter.QuoteSequenceName(seq.Name, seq.SchemaName));
+
+            if (seq.Increment.HasValue)
+            {
+                result.AppendFormat(" INCREMENT BY {0}", seq.Increment);
+            }
+
+            if (seq.MinValue.HasValue)
+            {
+                result.AppendFormat(" MINVALUE {0}", seq.MinValue);
+            }
+
+            if (seq.MaxValue.HasValue)
+            {
+                result.AppendFormat(" MAXVALUE {0}", seq.MaxValue);
+            }
+
+            if (seq.StartWith.HasValue)
+            {
+                result.AppendFormat(" START WITH {0}", seq.StartWith);
+            }
+
+            const long MINIMUM_CACHE_VALUE = 2;
+            if (seq.Cache.HasValue)
+            {
+                if (seq.Cache.Value < MINIMUM_CACHE_VALUE)
+                {
+                    return CompatibilityMode.HandleCompatibilty("Cache size must be greater than 1; if you intended to disable caching, set Cache to null.");
+                }
+                result.AppendFormat(" CACHE {0}", seq.Cache);
+            }
+            else
+            {
+                result.Append(" CACHE 1");
+            }
+
+            if (seq.Cycle)
+            {
+                result.Append(" CYCLE");
+            }
+
+            return string.Format("{0};", result.ToString());
         }
 
         public override string Generate(DeleteSequenceExpression expression)

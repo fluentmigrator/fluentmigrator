@@ -23,6 +23,7 @@ namespace FluentMigrator.Runner.Processors.MySql
         private static readonly TestEntry[] _entries =
         {
             new TestEntry("MySql.Data", "MySql.Data.MySqlClient.MySqlClientFactory"),
+            new TestEntry("MySqlConnector", "MySql.Data.MySqlClient.MySqlClientFactory"),
         };
 
         [Obsolete]

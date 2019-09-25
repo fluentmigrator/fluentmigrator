@@ -1,3 +1,4 @@
+using FluentMigrator.Exceptions;
 using FluentMigrator.Runner.Generators.Postgres;
 using FluentMigrator.Runner.Processors.Postgres;
 
@@ -16,7 +17,10 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         public void Setup()
         {
             var quoter = new PostgresQuoter(new PostgresOptions());
-            Generator = new PostgresGenerator(quoter);
+            Generator = new PostgresGenerator(quoter)
+            {
+                CompatibilityMode = Runner.CompatibilityMode.STRICT,
+            };
         }
 
         [Test]
@@ -26,7 +30,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             expression.Sequence.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE SEQUENCE \"TestSchema\".\"Sequence\" INCREMENT 2 MINVALUE 0 MAXVALUE 100 START WITH 2 CACHE 10 CYCLE;");
+            result.ShouldBe("CREATE SEQUENCE \"TestSchema\".\"Sequence\" INCREMENT BY 2 MINVALUE 0 MAXVALUE 100 START WITH 2 CACHE 10 CYCLE;");
         }
 
         [Test]
@@ -35,7 +39,29 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             var expression = GeneratorTestHelper.GetCreateSequenceExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE SEQUENCE \"Sequence\" INCREMENT 2 MINVALUE 0 MAXVALUE 100 START WITH 2 CACHE 10 CYCLE;");
+            result.ShouldBe("CREATE SEQUENCE \"Sequence\" INCREMENT BY 2 MINVALUE 0 MAXVALUE 100 START WITH 2 CACHE 10 CYCLE;");
+        }
+
+        [Test]
+        public void CanCreateSequenceWithNocache()
+        {
+            var expression = GeneratorTestHelper.GetCreateSequenceExpression();
+            expression.Sequence.Cache = null;
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE SEQUENCE \"Sequence\" INCREMENT BY 2 MINVALUE 0 MAXVALUE 100 START WITH 2 CACHE 1 CYCLE;");
+        }
+
+        [Test]
+        public void CanNotCreateSequenceWithCacheOne()
+        {
+            var expression = GeneratorTestHelper.GetCreateSequenceExpression();
+            expression.Sequence.Cache = 1;
+
+            Should.Throw<DatabaseOperationNotSupportedException>(
+                () => Generator.Generate(expression),
+                "Cache size must be greater than 1; if you intended to disable caching, set Cache to null."
+            );
         }
 
         [Test]
