@@ -17,6 +17,14 @@ variables:
 steps:
 - task: NuGetToolInstaller@1
 
+- task: SonarCloudPrepare@1
+  inputs:
+    SonarCloud: 'SonarCloud'
+    organization: 'bigyellowhammer-github'
+    scannerMode: 'MSBuild'
+    projectKey: 'BigYellowHammer_fluentmigrator'
+    projectVersion: '3.2.1'
+
 - task: NuGetCommand@2
   inputs:
     restoreSolution: '$(solution)'
@@ -32,3 +40,9 @@ steps:
   inputs:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
+
+- task: SonarCloudAnalyze@1
+
+- task: SonarCloudPublish@1
+  inputs:
+    pollingTimeoutSec: '300'

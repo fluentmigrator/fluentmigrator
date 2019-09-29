@@ -1,5 +1,8 @@
-﻿namespace FluentMigrator.Runner
+namespace FluentMigrator.Runner
 {
+    /// <summary>
+    /// Handler for <see cref="IMigrationScope"/>
+    /// </summary>
     public interface IMigrationScopeHandler
     {
         IMigrationScope CurrentScope { get; set; }
