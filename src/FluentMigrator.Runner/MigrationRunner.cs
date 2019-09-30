@@ -134,7 +134,7 @@ namespace FluentMigrator.Runner
             [NotNull] IAssemblyCollection assemblies, [NotNull] IRunnerContext runnerContext,
             [NotNull] IMigrationProcessor processor, [CanBeNull] IVersionTableMetaData versionTableMetaData,
             [CanBeNull] IMigrationRunnerConventions migrationRunnerConventions, [CanBeNull] IConventionSet conventionSet,
-            [CanBeNull] IMigrationScopeHandler migrationScopeHandler)
+            [CanBeNull] IMigrationScopeHandler migrationScopeHandler = null)
         {
             _migrationAssemblies = assemblies;
             _logger = new AnnouncerFluentMigratorLogger(runnerContext.Announcer);
@@ -206,7 +206,7 @@ namespace FluentMigrator.Runner
             [NotNull] IAssemblySource assemblySource,
             [NotNull] MigrationValidator migrationValidator,
             [NotNull] IServiceProvider serviceProvider,
-            [CanBeNull] IMigrationScopeHandler migrationScopeHandler)
+            [CanBeNull] IMigrationScopeHandler migrationScopeHandler = null)
         {
             Processor = processorAccessor.Processor;
             Conventions = migrationRunnerConventionsAccessor.MigrationRunnerConventions;
