@@ -58,7 +58,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
                 options.Add($"START WITH: {startWith.Value:D}");
             }
 
-            var incrementBy = column.GetAdditionalFeature(OracleExtensions.IdentityIncrementBy, (long?)null);
+            var incrementBy = column.GetAdditionalFeature(OracleExtensions.IdentityIncrementBy, (int?)null);
             if (incrementBy != null)
             {
                 options.Add($"INCREMENT BY: {incrementBy.Value:D}");

@@ -117,7 +117,7 @@ namespace FluentMigrator.Oracle
         private static TNext SetIdentity<TNext, TNextFk>(
             IColumnOptionSyntax<TNext, TNextFk> expression,
             OracleGenerationType generation,
-            object startWith,
+            long? startWith,
             int? incrementBy,
             long? minValue,
             long? maxValue,
