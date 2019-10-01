@@ -185,7 +185,10 @@ namespace FluentMigrator.Runner.Processors
         /// <param name="connection">The connection.</param>
         /// <param name="transaction">The current transaction.</param>
         /// <returns>The new DB command.</returns>
-        protected virtual DbCommand CreateCommand(string commandText, DbConnection connection, DbTransaction transaction)
+        protected virtual DbCommand CreateCommand(
+            string commandText,
+            DbConnection connection,
+            DbTransaction transaction)
         {
             var result = DbProviderFactory.CreateCommand();
             Debug.Assert(result != null, nameof(result) + " != null");
@@ -196,22 +199,10 @@ namespace FluentMigrator.Runner.Processors
 
             if (Options.Timeout != null)
             {
-                result.CommandTimeout = (int)Options.Timeout.Value.TotalSeconds;
+                result.CommandTimeout = (int) Options.Timeout.Value.TotalSeconds;
             }
 
             return result;
-        }
-
-        /// <summary>
-        /// Call all connection interceptors with the given <paramref name="interceptorCall"/>.
-        /// </summary>
-        /// <param name="interceptorCall">The call to be made with the interceptors.</param>
-        protected void CallConnectionInterceptors(Action<IConnectionInterceptor> interceptorCall)
-        {
-            foreach (var connectionInterceptor in _connectionInterceptors)
-            {
-                interceptorCall(connectionInterceptor);
-            }
         }
     }
 }
