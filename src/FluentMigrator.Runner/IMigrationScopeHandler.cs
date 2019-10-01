@@ -6,9 +6,9 @@ namespace FluentMigrator.Runner
     public interface IMigrationScopeHandler
     {
         /// <summary>
-        /// Gets of sets migration scope for the runner
+        /// Gets  migration scope for the runner
         /// </summary>
-        IMigrationScope CurrentScope { get; set; }
+        IMigrationScope CurrentScope { get; }
 
         /// <summary>
         /// Creates new migration scope

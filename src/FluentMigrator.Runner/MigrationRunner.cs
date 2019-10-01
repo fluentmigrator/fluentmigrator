@@ -275,7 +275,6 @@ namespace FluentMigrator.Runner
         public IMigrationScope CurrentScope
         {
             get => _migrationScopeHandler.CurrentScope;
-            set => _migrationScopeHandler.CurrentScope = value;
         }
 
         /// <inheritdoc />

@@ -40,7 +40,7 @@ namespace FluentMigrator.Runner
             _previewOnly = processorOptions.PreviewOnly;
         }
 
-        public IMigrationScope CurrentScope { get; set; }
+        public IMigrationScope CurrentScope { get; private set; }
 
         public IMigrationScope BeginScope()
         {
