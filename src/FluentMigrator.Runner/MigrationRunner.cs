@@ -192,6 +192,51 @@ namespace FluentMigrator.Runner
         /// <param name="assemblySource">The assemblies to scan for migrations, etc...</param>
         /// <param name="migrationValidator">The validator for migrations</param>
         /// <param name="serviceProvider">The service provider</param>
+        public MigrationRunner(
+            [NotNull] IOptions<RunnerOptions> options,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> processorOptions,
+            [NotNull] IProfileLoader profileLoader,
+            [NotNull] IProcessorAccessor processorAccessor,
+            [NotNull] IMaintenanceLoader maintenanceLoader,
+            [NotNull] IMigrationInformationLoader migrationLoader,
+            [NotNull] ILogger<MigrationRunner> logger,
+            [NotNull] IStopWatch stopWatch,
+            [NotNull] IMigrationRunnerConventionsAccessor migrationRunnerConventionsAccessor,
+            [NotNull] IAssemblySource assemblySource,
+            [NotNull] MigrationValidator migrationValidator,
+            [NotNull] IServiceProvider serviceProvider)
+            : this(
+                options,
+                processorOptions,
+                profileLoader,
+                processorAccessor,
+                maintenanceLoader,
+                migrationLoader,
+                logger,
+                stopWatch,
+                migrationRunnerConventionsAccessor,
+                assemblySource,
+                migrationValidator,
+                serviceProvider,
+                migrationScopeHandler: null)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MigrationRunner"/> class.
+        /// </summary>
+        /// <param name="options">The migration runner options</param>
+        /// <param name="processorOptions">The migration processor options</param>
+        /// <param name="profileLoader">The profile loader</param>
+        /// <param name="processorAccessor">The migration processor accessor</param>
+        /// <param name="maintenanceLoader">The maintenance loader</param>
+        /// <param name="migrationLoader">The migration loader</param>
+        /// <param name="logger">The logger</param>
+        /// <param name="stopWatch">The stopwatch</param>
+        /// <param name="migrationRunnerConventionsAccessor">The accessor for migration runner conventions</param>
+        /// <param name="assemblySource">The assemblies to scan for migrations, etc...</param>
+        /// <param name="migrationValidator">The validator for migrations</param>
+        /// <param name="serviceProvider">The service provider</param>
         /// <param name="migrationScopeHandler">THe migration scope handler</param>
         public MigrationRunner(
             [NotNull] IOptions<RunnerOptions> options,
@@ -206,7 +251,7 @@ namespace FluentMigrator.Runner
             [NotNull] IAssemblySource assemblySource,
             [NotNull] MigrationValidator migrationValidator,
             [NotNull] IServiceProvider serviceProvider,
-            [CanBeNull] IMigrationScopeHandler migrationScopeHandler = null)
+            [CanBeNull] IMigrationScopeHandler migrationScopeHandler)
         {
             Processor = processorAccessor.Processor;
             Conventions = migrationRunnerConventionsAccessor.MigrationRunnerConventions;
