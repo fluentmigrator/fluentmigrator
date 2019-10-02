@@ -3,7 +3,7 @@ namespace FluentMigrator.Runner
     /// <summary>
     /// Handler for <see cref="IMigrationScope"/>
     /// </summary>
-    public interface IMigrationScopeHandler
+    public interface IMigrationScopeManager
     {
         /// <summary>
         /// Gets migration scope for the runner

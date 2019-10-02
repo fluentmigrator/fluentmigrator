@@ -22,7 +22,7 @@ using FluentMigrator.Runner.Processors;
 
 namespace FluentMigrator.Runner
 {
-    public class MigrationScopeHandler : IMigrationScopeHandler
+    public class MigrationScopeHandler : IMigrationScopeManager
     {
         private readonly IMigrationProcessor _processor;
         private readonly bool _previewOnly;

@@ -57,7 +57,7 @@ namespace FluentMigrator.Tests.Unit
         private Mock<IMigrationInformationLoader> _migrationLoaderMock;
         private Mock<IProfileLoader> _profileLoaderMock;
         private Mock<IAssemblySource> _assemblySourceMock;
-        private Mock<IMigrationScopeHandler> _migrationScopeHandlerMock;
+        private Mock<IMigrationScopeManager> _migrationScopeHandlerMock;
 
         private ICollection<string> _logMessages;
         private SortedList<long, IMigrationInfo> _migrationList;
@@ -77,7 +77,7 @@ namespace FluentMigrator.Tests.Unit
             _processorMock = new Mock<IMigrationProcessor>(MockBehavior.Loose);
             _migrationLoaderMock = new Mock<IMigrationInformationLoader>(MockBehavior.Loose);
             _profileLoaderMock = new Mock<IProfileLoader>(MockBehavior.Loose);
-            _migrationScopeHandlerMock = new Mock<IMigrationScopeHandler>(MockBehavior.Loose);
+            _migrationScopeHandlerMock = new Mock<IMigrationScopeManager>(MockBehavior.Loose);
             _migrationScopeHandlerMock.Setup(x => x.CreateOrWrapMigrationScope(It.IsAny<bool>())).Returns(new NoOpMigrationScope());
 
             _stopWatch = new Mock<IStopWatch>();
@@ -756,7 +756,7 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void CanLoadCustomMigrationScopeHandler()
         {
-            _serviceCollection.AddScoped<IMigrationScopeHandler>(scoped => { return _migrationScopeHandlerMock.Object; });
+            _serviceCollection.AddScoped<IMigrationScopeManager>(scoped => { return _migrationScopeHandlerMock.Object; });
             var runner = CreateRunner();
             runner.BeginScope();
             _migrationScopeHandlerMock.Verify(x => x.BeginScope(), Times.Once());
@@ -767,7 +767,7 @@ namespace FluentMigrator.Tests.Unit
         {
             var runner = CreateRunner();
             BindingFlags bindFlags = BindingFlags.Instance | BindingFlags.NonPublic;
-            FieldInfo field = typeof(MigrationRunner).GetField("_migrationScopeHandler", bindFlags);
+            FieldInfo field = typeof(MigrationRunner).GetField("_migrationScopeManager", bindFlags);
             Assert.That(field.GetValue(runner), Is.TypeOf<MigrationScopeHandler>());
         }
 
