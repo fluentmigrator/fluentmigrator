@@ -55,31 +55,31 @@ namespace FluentMigrator.Runner.Generators.Oracle
             var startWith = column.GetAdditionalFeature(OracleExtensions.IdentityStartWith, (long?)null);
             if (startWith != null)
             {
-                options.Add($"START WITH: {startWith.Value:D}");
+                options.Add($"START WITH {startWith.Value:D}");
             }
 
             var incrementBy = column.GetAdditionalFeature(OracleExtensions.IdentityIncrementBy, (int?)null);
             if (incrementBy != null)
             {
-                options.Add($"INCREMENT BY: {incrementBy.Value:D}");
+                options.Add($"INCREMENT BY {incrementBy.Value:D}");
             }
 
             var minValue = column.GetAdditionalFeature(OracleExtensions.IdentityMinValue, (long?)null);
             if (minValue != null)
             {
-                options.Add($"MIN_VALUE: {minValue.Value:D}");
+                options.Add($"MINVALUE {minValue.Value:D}");
             }
 
             var maxValue = column.GetAdditionalFeature(OracleExtensions.IdentityMaxValue, (long?)null);
             if (maxValue != null)
             {
-                options.Add($"MAX_VALUE: {maxValue.Value:D}");
+                options.Add($"MAXVALUE {maxValue.Value:D}");
             }
 
             var optionsString = "";
             if (options.Count > 0)
             {
-                optionsString = $"({string.Join(", ", options)})";
+                optionsString = $"({string.Join(" ", options)})";
             }
 
             return $"GENERATED {generationType} AS IDENTITY {optionsString}";
