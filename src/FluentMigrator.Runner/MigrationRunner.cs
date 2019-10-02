@@ -315,11 +315,24 @@ namespace FluentMigrator.Runner
         public IMigrationRunnerConventions Conventions { get; }
 
         /// <summary>
-        /// Gets the currently active migration scope
+        /// Gets or sets the currently active migration scope.
+        /// Setter for <see cref="IMigrationScopeHandler"/> was removed. Setter for this property will throw exception when custom migration scope handler is used
         /// </summary>
+        /// <exception cref="NotSupportedException">Thrown when custom <see cref="IMigrationScopeHandler"/> implementation is used</exception>
         public IMigrationScope CurrentScope
         {
             get => _migrationScopeHandler.CurrentScope;
+            set
+            {
+                if (_migrationScopeHandler is MigrationScopeHandler msh)
+                {
+                    msh.CurrentScope = value;
+                }
+                else
+                {
+                    throw new NotSupportedException();
+                }
+            }
         }
 
         /// <inheritdoc />
