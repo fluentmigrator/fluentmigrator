@@ -69,7 +69,7 @@ namespace FluentMigrator.Runner
         [NotNull]
         private readonly ProcessorOptions _processorOptions;
         private readonly MigrationValidator _migrationValidator;
-        private readonly MigrationScopeHandler _migrationScopeHandler;
+        private readonly IMigrationScopeManager _migrationScopeManager;
 
         private IVersionLoader _currentVersionLoader;
 
@@ -98,7 +98,7 @@ namespace FluentMigrator.Runner
         /// <param name="conventionSet">The expression convention set</param>
         [Obsolete]
         public MigrationRunner([NotNull] Assembly assembly, [NotNull] IRunnerContext runnerContext, [NotNull] IMigrationProcessor processor, [CanBeNull] IConventionSet conventionSet)
-            : this(new SingleAssembly(assembly), runnerContext, processor, versionTableMetaData: null, migrationRunnerConventions: null, conventionSet)
+            : this(new SingleAssembly(assembly), runnerContext, processor, versionTableMetaData: null, migrationRunnerConventions: null, conventionSet, migrationScopeHandler: null)
         {
         }
 
@@ -115,7 +115,7 @@ namespace FluentMigrator.Runner
             [NotNull] IAssemblyCollection assemblies, [NotNull] IRunnerContext runnerContext,
             [NotNull] IMigrationProcessor processor, IVersionTableMetaData versionTableMetaData = null,
             [CanBeNull] IMigrationRunnerConventions migrationRunnerConventions = null)
-            : this(assemblies, runnerContext, processor, versionTableMetaData, migrationRunnerConventions, conventionSet: null)
+            : this(assemblies, runnerContext, processor, versionTableMetaData, migrationRunnerConventions, conventionSet: null, migrationScopeHandler: null)
         {
         }
 
@@ -128,11 +128,13 @@ namespace FluentMigrator.Runner
         /// <param name="versionTableMetaData">The version table metadata</param>
         /// <param name="migrationRunnerConventions">The custom migration runner conventions</param>
         /// <param name="conventionSet">The expression convention set</param>
+        /// <param name="migrationScopeHandler">The migration scope handler</param>
         [Obsolete]
         public MigrationRunner(
             [NotNull] IAssemblyCollection assemblies, [NotNull] IRunnerContext runnerContext,
             [NotNull] IMigrationProcessor processor, [CanBeNull] IVersionTableMetaData versionTableMetaData,
-            [CanBeNull] IMigrationRunnerConventions migrationRunnerConventions, [CanBeNull] IConventionSet conventionSet)
+            [CanBeNull] IMigrationRunnerConventions migrationRunnerConventions, [CanBeNull] IConventionSet conventionSet,
+            [CanBeNull] IMigrationScopeManager migrationScopeHandler = null)
         {
             _migrationAssemblies = assemblies;
             _logger = new AnnouncerFluentMigratorLogger(runnerContext.Announcer);
@@ -149,7 +151,7 @@ namespace FluentMigrator.Runner
 
             var convSet = conventionSet ?? new DefaultConventionSet(runnerContext);
 
-            _migrationScopeHandler = new MigrationScopeHandler(Processor);
+            _migrationScopeManager = migrationScopeHandler ?? new MigrationScopeHandler(Processor);
             _migrationValidator = new MigrationValidator(_logger, convSet);
             MigrationLoader = new DefaultMigrationInformationLoader(Conventions, _migrationAssemblies,
                                                                     runnerContext.Namespace,
@@ -203,6 +205,53 @@ namespace FluentMigrator.Runner
             [NotNull] IAssemblySource assemblySource,
             [NotNull] MigrationValidator migrationValidator,
             [NotNull] IServiceProvider serviceProvider)
+            : this(
+                options,
+                processorOptions,
+                profileLoader,
+                processorAccessor,
+                maintenanceLoader,
+                migrationLoader,
+                logger,
+                stopWatch,
+                migrationRunnerConventionsAccessor,
+                assemblySource,
+                migrationValidator,
+                serviceProvider,
+                migrationScopeHandler: null)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MigrationRunner"/> class.
+        /// </summary>
+        /// <param name="options">The migration runner options</param>
+        /// <param name="processorOptions">The migration processor options</param>
+        /// <param name="profileLoader">The profile loader</param>
+        /// <param name="processorAccessor">The migration processor accessor</param>
+        /// <param name="maintenanceLoader">The maintenance loader</param>
+        /// <param name="migrationLoader">The migration loader</param>
+        /// <param name="logger">The logger</param>
+        /// <param name="stopWatch">The stopwatch</param>
+        /// <param name="migrationRunnerConventionsAccessor">The accessor for migration runner conventions</param>
+        /// <param name="assemblySource">The assemblies to scan for migrations, etc...</param>
+        /// <param name="migrationValidator">The validator for migrations</param>
+        /// <param name="serviceProvider">The service provider</param>
+        /// <param name="migrationScopeHandler">THe migration scope handler</param>
+        public MigrationRunner(
+            [NotNull] IOptions<RunnerOptions> options,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> processorOptions,
+            [NotNull] IProfileLoader profileLoader,
+            [NotNull] IProcessorAccessor processorAccessor,
+            [NotNull] IMaintenanceLoader maintenanceLoader,
+            [NotNull] IMigrationInformationLoader migrationLoader,
+            [NotNull] ILogger<MigrationRunner> logger,
+            [NotNull] IStopWatch stopWatch,
+            [NotNull] IMigrationRunnerConventionsAccessor migrationRunnerConventionsAccessor,
+            [NotNull] IAssemblySource assemblySource,
+            [NotNull] MigrationValidator migrationValidator,
+            [NotNull] IServiceProvider serviceProvider,
+            [CanBeNull] IMigrationScopeManager migrationScopeHandler)
         {
             Processor = processorAccessor.Processor;
             Conventions = migrationRunnerConventionsAccessor.MigrationRunnerConventions;
@@ -216,7 +265,7 @@ namespace FluentMigrator.Runner
             _stopWatch = stopWatch;
             _processorOptions = processorOptions.Value;
 
-            _migrationScopeHandler = new MigrationScopeHandler(Processor, processorOptions.Value);
+            _migrationScopeManager = migrationScopeHandler ?? new MigrationScopeHandler(Processor, processorOptions.Value);
             _migrationValidator = migrationValidator;
             _versionLoader = new Lazy<IVersionLoader>(serviceProvider.GetRequiredService<IVersionLoader>);
 
@@ -266,12 +315,24 @@ namespace FluentMigrator.Runner
         public IMigrationRunnerConventions Conventions { get; }
 
         /// <summary>
-        /// Gets the currently active migration scope
+        /// Gets or sets the currently active migration scope.
+        /// Setter for <see cref="IMigrationScopeManager"/> was removed. Setter for this property will throw exception when custom migration scope handler is used
         /// </summary>
+        /// <exception cref="NotSupportedException">Thrown when custom <see cref="IMigrationScopeManager"/> implementation is used</exception>
         public IMigrationScope CurrentScope
         {
-            get => _migrationScopeHandler.CurrentScope;
-            set => _migrationScopeHandler.CurrentScope = value;
+            get => _migrationScopeManager.CurrentScope;
+            set
+            {
+                if (_migrationScopeManager is MigrationScopeHandler msh)
+                {
+                    msh.CurrentScope = value;
+                }
+                else
+                {
+                    throw new NotSupportedException();
+                }
+            }
         }
 
         /// <inheritdoc />
@@ -353,7 +414,7 @@ namespace FluentMigrator.Runner
         {
             var migrationInfos = GetUpMigrationsToApply(targetVersion);
 
-            using (IMigrationScope scope = _migrationScopeHandler.CreateOrWrapMigrationScope(useAutomaticTransactionManagement && TransactionPerSession))
+            using (IMigrationScope scope = _migrationScopeManager.CreateOrWrapMigrationScope(useAutomaticTransactionManagement && TransactionPerSession))
             {
                 try
                 {
@@ -433,7 +494,7 @@ namespace FluentMigrator.Runner
         {
             var migrationInfos = GetDownMigrationsToApply(targetVersion);
 
-            using (IMigrationScope scope = _migrationScopeHandler.CreateOrWrapMigrationScope(useAutomaticTransactionManagement && TransactionPerSession))
+            using (IMigrationScope scope = _migrationScopeManager.CreateOrWrapMigrationScope(useAutomaticTransactionManagement && TransactionPerSession))
             {
                 try
                 {
@@ -530,7 +591,7 @@ namespace FluentMigrator.Runner
 
                 _stopWatch.Start();
 
-                using (var scope = _migrationScopeHandler.CreateOrWrapMigrationScope(useTransaction))
+                using (var scope = _migrationScopeManager.CreateOrWrapMigrationScope(useTransaction))
                 {
                     try
                     {
@@ -587,7 +648,7 @@ namespace FluentMigrator.Runner
 
             _stopWatch.Start();
 
-            using (var scope = _migrationScopeHandler.CreateOrWrapMigrationScope(useTransaction))
+            using (var scope = _migrationScopeManager.CreateOrWrapMigrationScope(useTransaction))
             {
                 try
                 {
@@ -640,7 +701,7 @@ namespace FluentMigrator.Runner
                 }
             }
 
-            using (var scope = _migrationScopeHandler.CreateOrWrapMigrationScope(useAutomaticTransactionManagement && TransactionPerSession))
+            using (var scope = _migrationScopeManager.CreateOrWrapMigrationScope(useAutomaticTransactionManagement && TransactionPerSession))
             {
                 try
                 {
@@ -694,7 +755,7 @@ namespace FluentMigrator.Runner
                 }
             }
 
-            using (IMigrationScope scope = _migrationScopeHandler.CreateOrWrapMigrationScope(useAutomaticTransactionManagement && TransactionPerSession))
+            using (IMigrationScope scope = _migrationScopeManager.CreateOrWrapMigrationScope(useAutomaticTransactionManagement && TransactionPerSession))
             {
                 try
                 {
@@ -922,7 +983,7 @@ namespace FluentMigrator.Runner
         /// <inheritdoc />
         public IMigrationScope BeginScope()
         {
-            return _migrationScopeHandler.BeginScope();
+            return _migrationScopeManager.BeginScope();
         }
 
         [Flags]
