@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <TargetFrameworks>netcoreapp2.2;netcoreapp3.0</TargetFrameworks>
     <ToolCommandName>dotnet-fm</ToolCommandName>
     <PackAsTool>true</PackAsTool>
     <OutputType>Exe</OutputType>
