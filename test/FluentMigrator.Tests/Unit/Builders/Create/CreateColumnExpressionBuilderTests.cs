@@ -396,7 +396,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             columnMock.Object.AdditionalFeatures.ShouldContain(
                 new KeyValuePair<string, object>(OracleExtensions.IdentityGeneration, OracleGenerationType.Always));
             columnMock.Object.AdditionalFeatures.ShouldContain(
-                new KeyValuePair<string, object>(OracleExtensions.IdentityStartWith, 0));
+                new KeyValuePair<string, object>(OracleExtensions.IdentityStartWith, 0L));
             columnMock.Object.AdditionalFeatures.ShouldContain(
                 new KeyValuePair<string, object>(OracleExtensions.IdentityIncrementBy, 1));
             columnMock.Object.AdditionalFeatures.ShouldContain(
