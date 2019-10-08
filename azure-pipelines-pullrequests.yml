@@ -1,0 +1,60 @@
+# ASP.NET Core (.NET Framework)
+# Build and test ASP.NET Core projects targeting the full .NET Framework.
+# Add steps that publish symbols, save build artifacts, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
+
+pr:
+  branches:
+    include:
+    - '*'  # must quote since "*" is a YAML reserved character; we want a string
+
+pool:
+  vmImage: 'windows-latest'
+
+variables:
+  solution: '**/FluentMigrator.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+
+steps:
+- task: NuGetToolInstaller@1
+
+- task: GitVersion@5
+  displayName: 'GitVersion'
+  inputs:
+    runtime: 'core'
+    updateAssemblyInfo: false
+
+- script: echo %Action%%BuildVersion%
+  displayName: 'Set build version'
+  env:
+    Action: '##vso[build.updatebuildnumber]'
+    BuildVersion: $(GitVersion.NuGetVersionV2)
+
+- script: echo "##vso[task.setvariable variable=assemblyVersion]$(GitVersion.AssemblySemVer)
+- script: echo "##vso[task.setvariable variable=assemblyFileVersion]$(GitVersion.MajorMinorPatch).0
+- script: echo "The build number is:" $(build.buildNumber)
+- script: echo "Assembly version is:" $(assemblyVersion)
+- script: echo "Assembly file version is:" $(assemblyFileVersion)
+
+- task: NuGetCommand@2
+  inputs:
+    restoreSolution: '$(solution)'
+
+- task: VSBuild@1
+  inputs:
+    solution: '$(solution)'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+    msbuildArgs: '/p:Version="$(assemblyVersion)" /p:AssemblyFileVersion="$(assemblyFileVersion)" /p:AssemblyInformationalVersion="$(build.buildNumber)"'
+
+- task: VSTest@2
+  inputs:
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
