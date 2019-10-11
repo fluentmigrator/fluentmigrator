@@ -78,7 +78,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override string CreateSchema { get { return "CREATE SCHEMA {0}{1}"; } }
 
-        public override string CreateIndex { get { return "CREATE {0}{1}INDEX {2} ON {3} ({4}{5}{6}){7}"; } }
+        public override string CreateIndex { get { return "CREATE {0}{1}INDEX {2} ON {3} ({4}){5}{6}{7}"; } }
         public override string DropIndex { get { return "DROP INDEX {0} ON {1}{2}"; } }
 
         public override string IdentityInsert { get { return "SET IDENTITY_INSERT {0} {1}"; } }
@@ -88,7 +88,24 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         public virtual string GetIncludeString(CreateIndexExpression column)
         {
             var includes = column.GetAdditionalFeature<IList<IndexIncludeDefinition>>(SqlServerExtensions.IncludesList);
-            return includes?.Count > 0 ? ") INCLUDE (" : string.Empty;
+
+            string[] indexIncludes = new string[includes?.Count ?? 0];
+
+            if (includes != null)
+            {
+                for (int i = 0; i != includes.Count; i++)
+                {
+                    var includeDef = includes[i];
+                    indexIncludes[i] = Quoter.QuoteColumnName(includeDef.Name);
+                }
+            }
+
+            return includes?.Count > 0 ? " INCLUDE (" + string.Join(", ", indexIncludes) + ")" : string.Empty;
+        }
+
+        public virtual string GetFilterString(CreateIndexExpression createIndexExpression)
+        {
+            return string.Empty;
         }
 
         public virtual string GetWithOptions(ISupportAdditionalFeatures expression)
@@ -202,18 +219,6 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                 }
             }
 
-            var includes = expression.Index.GetAdditionalFeature<IList<IndexIncludeDefinition>>(SqlServerExtensions.IncludesList);
-            string[] indexIncludes = new string[includes?.Count ?? 0];
-
-            if (includes != null)
-            {
-                for (int i = 0; i != includes.Count; i++)
-                {
-                    var includeDef = includes[i];
-                    indexIncludes[i] = Quoter.QuoteColumnName(includeDef.Name);
-                }
-            }
-
             var withParts = GetWithOptions(expression);
             var withPart = !string.IsNullOrEmpty(withParts)
                 ? $" WITH ({withParts})"
@@ -226,8 +231,8 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                 Quoter.QuoteIndexName(expression.Index.Name),
                 Quoter.QuoteTableName(expression.Index.TableName, expression.Index.SchemaName),
                 string.Join(", ", indexColumns),
+                GetFilterString(expression),
                 GetIncludeString(expression),
-                string.Join(", ", indexIncludes),
                 withPart);
 
             return result;
@@ -293,7 +298,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             string authFragment;
             if (expression.AdditionalFeatures.TryGetValue(SqlServerExtensions.SchemaAuthorization, out var authorization))
             {
-                authFragment = $" AUTHORIZATION {Quoter.QuoteSchemaName((string) authorization)}";
+                authFragment = $" AUTHORIZATION {Quoter.QuoteSchemaName((string)authorization)}";
             }
             else
             {
