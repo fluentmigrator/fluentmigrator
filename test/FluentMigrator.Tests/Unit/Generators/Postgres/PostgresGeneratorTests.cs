@@ -57,7 +57,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
-        public void CanCreateAutoIncrementColumnForInt64()
+        public virtual void CanCreateAutoIncrementColumnForInt64()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();
             expression.Columns[0].Type = DbType.Int64;

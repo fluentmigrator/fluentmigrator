@@ -14,21 +14,9 @@
 // limitations under the License.
 #endregion
 
-using FluentMigrator.Runner.Generators.Postgres;
-
-using JetBrains.Annotations;
-
-using Microsoft.Extensions.Options;
-
-namespace FluentMigrator.Runner.Generators.Postgres92
+namespace FluentMigrator.Runner.Generators.Postgres
 {
-    public class Postgres92Generator : PostgresGenerator, IPostgres92Generator
+    public interface IPostgresGenerator : IMigrationGenerator
     {
-        public Postgres92Generator(
-            [NotNull] PostgresQuoter quoter,
-            [NotNull] IOptions<GeneratorOptions> generatorOptions)
-            : base(quoter, generatorOptions, new Postgres92TypeMap())
-        {
-        }
     }
 }

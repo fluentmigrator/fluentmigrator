@@ -16,19 +16,9 @@
 
 using FluentMigrator.Runner.Generators.Postgres;
 
-using JetBrains.Annotations;
-
-using Microsoft.Extensions.Options;
-
 namespace FluentMigrator.Runner.Generators.Postgres92
 {
-    public class Postgres92Generator : PostgresGenerator, IPostgres92Generator
+    public interface IPostgres92Generator : IPostgresGenerator
     {
-        public Postgres92Generator(
-            [NotNull] PostgresQuoter quoter,
-            [NotNull] IOptions<GeneratorOptions> generatorOptions)
-            : base(quoter, generatorOptions, new Postgres92TypeMap())
-        {
-        }
     }
 }

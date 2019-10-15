@@ -1,5 +1,5 @@
 #region License
-// Copyright (c) 2019, FluentMigrator Project
+// Copyright (c) 2007-2019, FluentMigrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,21 +14,11 @@
 // limitations under the License.
 #endregion
 
-using FluentMigrator.Runner.Generators.Postgres;
-
-using JetBrains.Annotations;
-
-using Microsoft.Extensions.Options;
-
-namespace FluentMigrator.Runner.Generators.Postgres92
+namespace FluentMigrator
 {
-    public class Postgres92Generator : PostgresGenerator, IPostgres92Generator
+    public enum PostgresGenerationType
     {
-        public Postgres92Generator(
-            [NotNull] PostgresQuoter quoter,
-            [NotNull] IOptions<GeneratorOptions> generatorOptions)
-            : base(quoter, generatorOptions, new Postgres92TypeMap())
-        {
-        }
+        Always,
+        ByDefault
     }
 }

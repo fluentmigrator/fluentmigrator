@@ -71,6 +71,23 @@ namespace FluentMigrator.Runner.Processors.Postgres
             _quoter = new PostgresQuoter(pgOptions);
         }
 
+        public PostgresProcessor(
+            [NotNull] PostgresDbFactory factory,
+            [NotNull] IPostgresGenerator generator,
+            [NotNull] ILogger<PostgresProcessor> logger,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> options,
+            [NotNull] IConnectionStringAccessor connectionStringAccessor,
+            [NotNull] PostgresOptions pgOptions)
+            : base(() => factory.Factory, generator, logger, options.Value, connectionStringAccessor)
+        {
+            if (pgOptions == null)
+            {
+                throw new ArgumentNullException(nameof(pgOptions));
+            }
+
+            _quoter = new PostgresQuoter(pgOptions);
+        }
+
         public override void Execute(string template, params object[] args)
         {
             Process(string.Format(template, args));

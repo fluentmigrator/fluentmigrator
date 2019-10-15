@@ -1,6 +1,6 @@
 #region License
 //
-// Copyright (c) 2018, Fluent Migrator Project
+// Copyright (c) 2019, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Generators.Postgres
 {
-    public class PostgresGenerator : GenericGenerator
+    public class PostgresGenerator : GenericGenerator, IPostgresGenerator
     {
         public PostgresGenerator(
             [NotNull] PostgresQuoter quoter)
@@ -51,6 +51,14 @@ namespace FluentMigrator.Runner.Generators.Postgres
             [NotNull] IOptions<GeneratorOptions> generatorOptions,
             ITypeMap typeMap)
             : base(new PostgresColumn(quoter, typeMap), quoter, new PostgresDescriptionGenerator(quoter), generatorOptions)
+        {
+        }
+
+        protected PostgresGenerator(
+            [NotNull] PostgresQuoter quoter,
+            [NotNull] IOptions<GeneratorOptions> generatorOptions,
+            IColumn column)
+            : base(column, quoter, new PostgresDescriptionGenerator(quoter), generatorOptions)
         {
         }
 

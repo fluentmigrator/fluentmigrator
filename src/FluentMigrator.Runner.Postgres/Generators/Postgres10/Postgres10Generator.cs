@@ -15,19 +15,34 @@
 #endregion
 
 using FluentMigrator.Runner.Generators.Postgres;
+using FluentMigrator.Runner.Generators.Postgres92;
 
 using JetBrains.Annotations;
 
 using Microsoft.Extensions.Options;
 
-namespace FluentMigrator.Runner.Generators.Postgres92
+namespace FluentMigrator.Runner.Generators.Postgres10
 {
-    public class Postgres92Generator : PostgresGenerator, IPostgres92Generator
+    public class Postgres10Generator : PostgresGenerator, IPostgres10Generator
     {
-        public Postgres92Generator(
+        public Postgres10Generator(
+            [NotNull] PostgresQuoter quoter)
+            : this(quoter, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()))
+        {
+        }
+
+        public Postgres10Generator(
             [NotNull] PostgresQuoter quoter,
             [NotNull] IOptions<GeneratorOptions> generatorOptions)
-            : base(quoter, generatorOptions, new Postgres92TypeMap())
+            : base(quoter, generatorOptions, new Postgres10Column(quoter, new Postgres92TypeMap()))
+        {
+        }
+
+        protected Postgres10Generator(
+            [NotNull] PostgresQuoter quoter,
+            [NotNull] IOptions<GeneratorOptions> generatorOptions,
+            ITypeMap typeMap)
+            : base(quoter, generatorOptions, new Postgres10Column(quoter, typeMap))
         {
         }
     }

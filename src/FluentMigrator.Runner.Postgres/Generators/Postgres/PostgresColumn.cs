@@ -74,7 +74,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
 
         protected IList<Func<ColumnDefinition, string>> AlterClauseOrder { get; set; }
 
-        public string GenerateAlterClauses(ColumnDefinition column)
+        public virtual string GenerateAlterClauses(ColumnDefinition column)
         {
             var clauses = new List<string>();
             foreach (var action in AlterClauseOrder)
