@@ -18,12 +18,12 @@
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net461'">
     <PackageReference Include="Microsoft.Build.Utilities.Core">
-      <Version>14.3.0</Version>
+      <Version>16.3.0</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
     <PackageReference Include="Microsoft.Build.Utilities.Core">
-      <Version>15.6.85</Version>
+      <Version>16.3.0</Version>
     </PackageReference>
   </ItemGroup>
 </Project>
