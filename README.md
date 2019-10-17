@@ -28,6 +28,7 @@ while the CI builds are stored on [MyGet](https://www.myget.org/feed/Packages/fl
 | **Discussions**           | [![Gitter](https://img.shields.io/gitter/room/FluentMigrator/fluentmigrator.svg)](https://gitter.im/FluentMigrator/fluentmigrator) |
 | **Bug/Feature Tracking**  | [![GitHub issues](https://img.shields.io/github/issues/fluentmigrator/fluentmigrator.svg)](https://github.com/fluentmigrator/fluentmigrator/issues) |
 | **Build server**          | [![Travis](https://img.shields.io/travis/fluentmigrator/fluentmigrator.svg)](https://travis-ci.org/fluentmigrator/fluentmigrator) |
+| **Build server (new)**    | [![AzureDevOps](https://img.shields.io/azure-devops/build/fluentmigrator/22b31067-b424-416b-b89f-682210a37a55/1)](https://dev.azure.com/fluentmigrator/fluentmigrator/_build?definitionId=1) |
 
 # Prerequisites
 
