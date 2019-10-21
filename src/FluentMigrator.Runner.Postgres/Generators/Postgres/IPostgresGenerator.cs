@@ -16,6 +16,9 @@
 
 namespace FluentMigrator.Runner.Generators.Postgres
 {
+    /// <summary>
+    /// Specific contract for PostgreSQL features handling
+    /// </summary>
     public interface IPostgresGenerator : IMigrationGenerator
     {
     }

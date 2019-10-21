@@ -17,15 +17,18 @@
 using System;
 
 using FluentMigrator.Builders;
-using FluentMigrator.Builders.Create.Constraint;
-using FluentMigrator.Builders.Create.Table;
-using FluentMigrator.Builders.Insert;
 using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Postgres
 {
+    /// <summary>
+    /// Feature extension for PostgreSQL
+    /// </summary>
     public static class PostgresExtensions
     {
+        /// <summary>
+        /// Column identity generation ability for PostgreSQL 10 and/or above
+        /// </summary>
         public static string IdentityGeneration => "PostgresIdentityGeneration";
 
         private static string UnsupportedMethodMessage(object methodName, string interfaceName)
