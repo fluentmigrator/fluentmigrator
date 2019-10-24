@@ -95,7 +95,7 @@ namespace FluentMigrator.Runner.Initialization
         /// <summary>
         /// Gets or sets the arbitrary application context passed to the task runner
         /// </summary>
-        [Obsolete]
+        [Obsolete("Use dependency injection to access 'application state'.")]
         public object ApplicationContext { get; set; }
 
         /// <summary>

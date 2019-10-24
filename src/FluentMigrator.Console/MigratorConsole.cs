@@ -40,6 +40,7 @@ namespace FluentMigrator.Console
 {
     public class MigratorConsole
     {
+        [Obsolete("Use dependency injection to access 'application state'.")]
         public string ApplicationContext;
         public string Connection;
         public string ConnectionStringConfigPath;

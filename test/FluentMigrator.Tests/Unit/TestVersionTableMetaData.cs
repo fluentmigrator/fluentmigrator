@@ -16,6 +16,8 @@
 //
 #endregion
 
+using System;
+
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.VersionTableInfo;
 
@@ -54,6 +56,7 @@ namespace FluentMigrator.Tests.Unit
             OwnsSchema = true;
         }
 
+        [Obsolete("Use dependency injection to access 'application state'.")]
         public object ApplicationContext { get; set; }
 
         public string SchemaName { get; set; }

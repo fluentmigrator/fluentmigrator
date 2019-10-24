@@ -76,7 +76,7 @@ namespace FluentMigrator.Tests.Unit
         }
 
         [Test]
-        [Obsolete]
+        [Obsolete("Use dependency injection to access 'application state'.")]
         public void CanSetupApplicationContext()
         {
             var applicationContext = "Test context";
