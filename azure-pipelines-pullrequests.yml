@@ -21,23 +21,14 @@ variables:
 steps:
 - task: NuGetToolInstaller@1
 
-- task: GitVersion@5
-  displayName: 'GitVersion'
+- task: UseGitVersion@5
+  displayName: 'UseGitVersion (preview)'
   inputs:
-    runtime: 'core'
+    versionSpec: '5.x'
+    includePrerelease: true
     updateAssemblyInfo: false
-
-- script: echo %Action%%BuildVersion%
-  displayName: 'Set build version'
   env:
-    Action: '##vso[build.updatebuildnumber]'
-    BuildVersion: $(GitVersion.NuGetVersionV2)
-
-- script: echo "##vso[task.setvariable variable=assemblyVersion]$(GitVersion.AssemblySemVer)
-- script: echo "##vso[task.setvariable variable=assemblyFileVersion]$(GitVersion.MajorMinorPatch).0
-- script: echo "The build number is:" $(build.buildNumber)
-- script: echo "Assembly version is:" $(assemblyVersion)
-- script: echo "Assembly file version is:" $(assemblyFileVersion)
+      BUILD_BUILDNUMBER: $(GitVersion.NuGetVersionV2)
 
 - task: NuGetCommand@2
   inputs:
@@ -48,7 +39,7 @@ steps:
     solution: '$(solution)'
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
-    msbuildArgs: '/p:Version="$(assemblyVersion)" /p:AssemblyFileVersion="$(assemblyFileVersion)" /p:AssemblyInformationalVersion="$(build.buildNumber)"'
+    msbuildArgs: '/p:Version="$(build.buildNumber)"'
 
 - task: VSTest@2
   inputs:
