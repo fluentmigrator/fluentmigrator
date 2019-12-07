@@ -23,13 +23,9 @@ namespace FluentMigrator.DotNet.Cli.Commands
 {
     [HelpOption]
     [Command("migrate", Description = "Apply migrations")]
-    [Subcommand(typeof(MigrateUp))]
-    [Subcommand(typeof(MigrateDown))]
+    [Subcommand(typeof(MigrateUp), typeof(MigrateDown))]
     public class Migrate : ConnectionCommand
     {
-        [Option("-m|--transaction-mode <MODE>", Description = "Overrides the transaction behavior of migrations, so that all migrations to be executed will run in one transaction.")]
-        public TransactionMode TransactionMode { get; }
-
         private int OnExecute(IConsole console)
         {
             var options = MigratorOptions.CreateMigrateUp(this);

@@ -27,11 +27,11 @@ namespace FluentMigrator.DotNet.Cli.Commands
     [Command("to", Description = "Rollback migrations up to a given version")]
     public class RollbackTo : BaseCommand
     {
-        public Rollback Parent { get; }
+        public Rollback Parent { get; set; }
 
         [Argument(0, "version", "The target version to rollback to.")]
         [Required]
-        public long Version { get; }
+        public long Version { get; set; }
 
         private int OnExecute(IConsole console)
         {
