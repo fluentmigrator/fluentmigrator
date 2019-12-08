@@ -1,0 +1,9 @@
+bin\
+obj\
+.git*
+.cicd
+.dockerignore
+Dockerfile*
+reports
+logs\
+.vs
