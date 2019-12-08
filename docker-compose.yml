@@ -1,0 +1,59 @@
+version: '3.4'
+
+services:
+  # MySQL 5.6
+  mysql-5-6:
+    container_name: mysql-5-6
+    image: mysql:5.6
+    restart: always
+    environment: 
+      MYSQL_DATABASE: 'FluentMigrator'
+      MYSQL_USER: 'fluentmigrator'
+      MYSQL_PASSWORD: 'fluentmigrator'
+      MYSQL_ROOT_PASSWORD: 'root'
+    ports: 
+      - 3306:3306
+    networks: 
+      - fluentmigrator
+  
+  # MySQL 5.7
+  mysql-5-7:
+    container_name: mysql-5-7
+    image: mysql:5.7
+    restart: always
+    environment: 
+      MYSQL_DATABASE: 'FluentMigrator'
+      MYSQL_USER: 'fluentmigrator'
+      MYSQL_PASSWORD: 'fluentmigrator'
+      MYSQL_ROOT_PASSWORD: 'root'
+    ports: 
+      - 3307:3306
+    networks: 
+      - fluentmigrator
+  
+  # MariaDB 10.4
+  mariadb-10-4:
+    container_name: mariadb-10-4
+    image: mariadb:10.4
+    environment: 
+      MYSQL_DATABASE: 'FluentMigrator'
+      MYSQL_USER: 'fluentmigrator'
+      MYSQL_PASSWORD: 'fluentmigrator'
+      MYSQL_ROOT_PASSWORD: 'root'
+    ports:
+      - 3406:3306
+    networks: 
+      - fluentmigrator
+
+  # Sql Server 200
+  sql-server-2000:
+    container_name: sql-server-2000
+    image: rsmoorthy/sql2000
+    ports: 
+      - 1033:1433
+    networks: 
+      - fluentmigrator
+
+networks: 
+  fluentmigrator:
+    driver: bridge

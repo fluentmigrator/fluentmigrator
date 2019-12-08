@@ -79,6 +79,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "packaging", "packaging", "{
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentMigrator.Extensions.Oracle", "src\FluentMigrator.Extensions.Oracle\FluentMigrator.Extensions.Oracle.csproj", "{56103516-EDEA-494F-A3FA-0CCDB5348453}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentMigrator.IntegrationTests", "test\FluentMigrator.IntegrationTests\FluentMigrator.IntegrationTests.csproj", "{3D15620B-0C33-4D46-B798-7A5655D8B802}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -389,6 +391,18 @@ Global
 		{56103516-EDEA-494F-A3FA-0CCDB5348453}.Release|x64.Build.0 = Release|Any CPU
 		{56103516-EDEA-494F-A3FA-0CCDB5348453}.Release|x86.ActiveCfg = Release|Any CPU
 		{56103516-EDEA-494F-A3FA-0CCDB5348453}.Release|x86.Build.0 = Release|Any CPU
+		{3D15620B-0C33-4D46-B798-7A5655D8B802}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D15620B-0C33-4D46-B798-7A5655D8B802}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D15620B-0C33-4D46-B798-7A5655D8B802}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3D15620B-0C33-4D46-B798-7A5655D8B802}.Debug|x64.Build.0 = Debug|Any CPU
+		{3D15620B-0C33-4D46-B798-7A5655D8B802}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3D15620B-0C33-4D46-B798-7A5655D8B802}.Debug|x86.Build.0 = Debug|Any CPU
+		{3D15620B-0C33-4D46-B798-7A5655D8B802}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D15620B-0C33-4D46-B798-7A5655D8B802}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D15620B-0C33-4D46-B798-7A5655D8B802}.Release|x64.ActiveCfg = Release|Any CPU
+		{3D15620B-0C33-4D46-B798-7A5655D8B802}.Release|x64.Build.0 = Release|Any CPU
+		{3D15620B-0C33-4D46-B798-7A5655D8B802}.Release|x86.ActiveCfg = Release|Any CPU
+		{3D15620B-0C33-4D46-B798-7A5655D8B802}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -422,6 +436,7 @@ Global
 		{9485E0CB-384C-4B28-AE97-5C34367D2CA9} = {16DED0B3-1401-43AD-9402-3DC90918FFD7}
 		{A9B5BE31-4940-4092-A0A7-79C3F73B4584} = {2AC15906-580E-4530-A860-6BA6301CAD2E}
 		{56103516-EDEA-494F-A3FA-0CCDB5348453} = {16DED0B3-1401-43AD-9402-3DC90918FFD7}
+		{3D15620B-0C33-4D46-B798-7A5655D8B802} = {CE354F3F-F5B9-4723-A5A1-26B37E949103}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {722C9D0D-FAB6-4CCE-9A4A-56E24235A9E0}
