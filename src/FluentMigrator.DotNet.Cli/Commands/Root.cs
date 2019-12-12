@@ -26,7 +26,7 @@ namespace FluentMigrator.DotNet.Cli.Commands
         protected int OnExecute(CommandLineApplication app, IConsole console)
         {
             console.Error.WriteLine("You must specify a subcommand.");
-            app.ShowHelp();        
+            app.ShowHelp();
             return 1;
         }
     }

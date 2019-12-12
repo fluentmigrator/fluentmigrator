@@ -26,7 +26,7 @@ namespace FluentMigrator.DotNet.Cli.Commands
     public class RollbackAll : BaseCommand
     {
         public Rollback Parent { get; set; }
-        
+
         private int OnExecute(IConsole console)
         {
             var options = MigratorOptions.CreateRollbackAll(this);
