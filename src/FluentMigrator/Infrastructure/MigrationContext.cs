@@ -90,7 +90,7 @@ namespace FluentMigrator.Infrastructure
         public virtual IAssemblyCollection MigrationAssemblies { get; set; }
 
         /// <inheritdoc />
-        [Obsolete]
+        [Obsolete("Use dependency injection to access 'application state'.")]
         public virtual object ApplicationContext { get; set; }
 
         /// <inheritdoc />

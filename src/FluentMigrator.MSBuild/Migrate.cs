@@ -60,6 +60,7 @@ namespace FluentMigrator.MSBuild
 
         private int? _timeout;
 
+        [Obsolete("Use dependency injection to access 'application state'.")]
         public string ApplicationContext { get; set; }
 
         [Required]

@@ -56,6 +56,7 @@ namespace FluentMigrator.Runner.Initialization
         public IStopWatch StopWatch { get; } = new StopWatch();
 
         /// <inheritdoc />
+        [Obsolete("Use dependency injection to access 'application state'.")]
         public object ApplicationContext { get; set; }
 
         /// <inheritdoc />
