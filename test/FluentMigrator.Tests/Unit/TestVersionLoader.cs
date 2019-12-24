@@ -93,7 +93,6 @@ namespace FluentMigrator.Tests.Unit
 
         public List<long> Versions { get; private set; }
 
-        /// <inheritdoc />
         public void Dispose()
         {
             Runner?.Dispose();
