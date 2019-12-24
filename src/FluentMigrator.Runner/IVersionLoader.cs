@@ -16,12 +16,14 @@
 //
 #endregion
 
+using System;
+
 namespace FluentMigrator.Runner
 {
     /// <summary>
     /// Manages the version table and the stored versions
     /// </summary>
-    public interface IVersionLoader
+    public interface IVersionLoader : IDisposable
     {
         /// <summary>
         /// Gets a value indicating whether the schema for the version table has been created (or already exited)

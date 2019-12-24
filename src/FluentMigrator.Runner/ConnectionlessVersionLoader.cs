@@ -203,5 +203,10 @@ namespace FluentMigrator.Runner
                 new KeyValuePair<string, object>(VersionTableMetaData.DescriptionColumnName, description)
             };
         }
+
+        public void Dispose()
+        {
+            _processor.Dispose();
+        }
     }
 }

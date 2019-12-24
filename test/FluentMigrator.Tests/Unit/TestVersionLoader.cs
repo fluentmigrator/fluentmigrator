@@ -92,5 +92,11 @@ namespace FluentMigrator.Tests.Unit
         public IVersionTableMetaData VersionTableMetaData => _versionTableMetaData;
 
         public List<long> Versions { get; private set; }
+
+        /// <inheritdoc />
+        public void Dispose()
+        {
+            Runner?.Dispose();
+        }
     }
 }

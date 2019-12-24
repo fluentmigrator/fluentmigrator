@@ -26,7 +26,7 @@ namespace FluentMigrator.Runner
     /// <summary>
     /// The migration runner
     /// </summary>
-    public interface IMigrationRunner : IMigrationScopeStarter
+    public interface IMigrationRunner : IMigrationScopeStarter, IDisposable
     {
         /// <summary>
         /// Gets the migration processor used by this runner

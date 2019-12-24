@@ -995,5 +995,11 @@ namespace FluentMigrator.Runner
             AppliedMask = 3,
             Breaking = 4,
         }
+
+        public void Dispose()
+        {
+            _currentVersionLoader?.Dispose();
+            Processor.Dispose();
+        }
     }
 }

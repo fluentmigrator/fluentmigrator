@@ -240,5 +240,10 @@ namespace FluentMigrator.Runner
 
             return instance;
         }
+
+        public void Dispose()
+        {
+            _processor.Dispose();
+        }
     }
 }
