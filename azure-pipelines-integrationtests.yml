@@ -1,10 +1,15 @@
 # Just a temporary pipeline to start running integration tests using Docker
+trigger:
+  branches:
+    include:
+    - feature/integration-tests
+
+pr: none
 
 pool:
-    vmImage: 'ubuntu-latest'
-  
-  steps:
+  vmImage: 'ubuntu-latest'
+
+steps:
   - script: |
       docker-compose up
     displayName: 'Run integration tests'
-  
