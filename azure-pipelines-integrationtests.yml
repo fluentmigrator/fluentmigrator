@@ -13,10 +13,9 @@ steps:
   #- script: |
   #    docker-compose up
   #  displayName: 'Run integration tests'
-
 - task: DockerCompose@0
   inputs:
     containerregistrytype: 'Container Registry'
     dockerComposeFile: '**/docker-compose.yml'
-    action: 'Run a Docker Compose command'
-    dockerComposeCommand: 'up'
+    action: 'Run a specific service'
+    serviceName: 'fluentmigrator-test'
