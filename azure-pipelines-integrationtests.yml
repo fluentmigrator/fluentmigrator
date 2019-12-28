@@ -18,4 +18,5 @@ steps:
   inputs:
     containerregistrytype: 'Container Registry'
     dockerComposeFile: '**/docker-compose.yml'
-    action: 'Run services'
+    action: 'Run a Docker Compose command'
+    dockerComposeCommand: 'up'
