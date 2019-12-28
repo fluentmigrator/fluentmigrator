@@ -7,7 +7,7 @@ services:
     build: 
       context: .
       dockerfile: ./Dockerfile
-    entrypoint: [ "./scripts/wait-for-mysql.sh", "mysql-5-6:3306", "--", "dotnet", "test", "./test/FluentMigrator.IntegrationTests", "--no-build", "-v=normal" ]    
+    entrypoint: [ "./scripts/wait-for-mysql.sh", "mysql-5-6:3307", "--", "dotnet", "test", "./test/FluentMigrator.IntegrationTests", "--no-build", "-v=normal" ]    
     environment: 
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT}
     depends_on:
@@ -29,7 +29,7 @@ services:
       MYSQL_PASSWORD: 'fluentmigrator'
       MYSQL_ROOT_PASSWORD: 'root'
     ports: 
-      - 3306:3306
+      - 3307:3306
     networks: 
       - fluentmigrator
   
