@@ -17,5 +17,5 @@ steps:
   inputs:
     containerregistrytype: 'Container Registry'
     dockerComposeFile: '**/docker-compose.yml'
-    action: 'Run a specific service'
-    serviceName: 'fluentmigrator-test'
+    action: 'Run a Docker Compose command'
+    dockerComposeCommand: 'test'
