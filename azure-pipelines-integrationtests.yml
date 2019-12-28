@@ -10,6 +10,12 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
-  - script: |
-      docker-compose up
-    displayName: 'Run integration tests'
+  #- script: |
+  #    docker-compose up
+  #  displayName: 'Run integration tests'
+
+- task: DockerCompose@0
+  inputs:
+    containerregistrytype: 'Container Registry'
+    dockerComposeFile: '**/docker-compose.yml'
+    action: 'Run services'
