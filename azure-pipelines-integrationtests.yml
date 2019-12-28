@@ -1,0 +1,10 @@
+# Just a temporary pipeline to start running integration tests using Docker
+
+pool:
+    vmImage: 'ubuntu-latest'
+  
+  steps:
+  - script: |
+      docker-compose up
+    displayName: 'Run integration tests'
+  
