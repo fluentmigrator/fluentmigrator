@@ -29,6 +29,7 @@ namespace FluentMigrator.Tests.Unit.Runners
 {
     [TestFixture]
     [Obsolete]
+    [Ignore("Obsolete Test Class. MigrationProcessorFactory no longer support all database drivers")]
     public class MigrationProcessorFactoryProviderTests
     {
         private MigrationProcessorFactoryProvider _migrationProcessorFactoryProvider;

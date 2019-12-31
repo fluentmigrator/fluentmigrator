@@ -12,20 +12,6 @@
   <ItemGroup>
     <ProjectReference Include="..\FluentMigrator.Runner.Core\FluentMigrator.Runner.Core.csproj" />
     <ProjectReference Include="..\FluentMigrator\FluentMigrator.csproj" />
-    <ProjectReference Include="..\FluentMigrator.Runner.Db2\FluentMigrator.Runner.Db2.csproj" />
-    <ProjectReference Include="..\FluentMigrator.Runner.Firebird\FluentMigrator.Runner.Firebird.csproj" />
-    <ProjectReference Include="..\FluentMigrator.Runner.MySql\FluentMigrator.Runner.MySql.csproj" />
-    <ProjectReference Include="..\FluentMigrator.Runner.Oracle\FluentMigrator.Runner.Oracle.csproj" />
-    <ProjectReference Include="..\FluentMigrator.Runner.Postgres\FluentMigrator.Runner.Postgres.csproj" />
-    <ProjectReference Include="..\FluentMigrator.Runner.Redshift\FluentMigrator.Runner.Redshift.csproj" />
-    <ProjectReference Include="..\FluentMigrator.Runner.SqlAnywhere\FluentMigrator.Runner.SqlAnywhere.csproj" />
-    <ProjectReference Include="..\FluentMigrator.Runner.SQLite\FluentMigrator.Runner.SQLite.csproj" />
-    <ProjectReference Include="..\FluentMigrator.Runner.SqlServer\FluentMigrator.Runner.SqlServer.csproj" />
-    <ProjectReference Include="..\FluentMigrator.Runner.SqlServerCe\FluentMigrator.Runner.SqlServerCe.csproj" />
-    <ProjectReference Include="..\FluentMigrator.Runner.Hana\FluentMigrator.Runner.Hana.csproj" />
-  </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
-    <ProjectReference Include="..\FluentMigrator.Runner.Jet\FluentMigrator.Runner.Jet.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\FluentMigrator.snk" Link="FluentMigrator.snk" />

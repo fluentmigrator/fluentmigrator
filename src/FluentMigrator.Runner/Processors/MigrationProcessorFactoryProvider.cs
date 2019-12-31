@@ -18,21 +18,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-
 using FluentMigrator.Runner.Extensions;
 using FluentMigrator.Runner.Infrastructure;
-using FluentMigrator.Runner.Processors.DB2;
-using FluentMigrator.Runner.Processors.DB2.iSeries;
-using FluentMigrator.Runner.Processors.DotConnectOracle;
-using FluentMigrator.Runner.Processors.Firebird;
-using FluentMigrator.Runner.Processors.Hana;
-using FluentMigrator.Runner.Processors.MySql;
-using FluentMigrator.Runner.Processors.Oracle;
-using FluentMigrator.Runner.Processors.Postgres;
-using FluentMigrator.Runner.Processors.Redshift;
-using FluentMigrator.Runner.Processors.SqlAnywhere;
-using FluentMigrator.Runner.Processors.SqlServer;
-using FluentMigrator.Runner.Processors.SQLite;
 
 namespace FluentMigrator.Runner.Processors
 {
@@ -41,41 +28,6 @@ namespace FluentMigrator.Runner.Processors
     {
         private static readonly object _lock = new object();
         private static IDictionary<string, IMigrationProcessorFactory> _migrationProcessorFactories;
-
-        [Obsolete]
-        static MigrationProcessorFactoryProvider()
-        {
-            // Register all available processor factories. The library usually tries
-            // to find all provider factories by scanning all referenced assemblies,
-            // but this fails if we don't have any reference. Adding the package
-            // isn't enough. We MUST have a reference to a type, otherwise the
-            // assembly reference gets removed by the C# compiler!
-            Register(new Db2ProcessorFactory());
-            Register(new Db2ISeriesProcessorFactory());
-            Register(new DotConnectOracleProcessorFactory());
-            Register(new FirebirdProcessorFactory());
-            Register(new MySql4ProcessorFactory());
-            Register(new MySql5ProcessorFactory());
-            Register(new OracleManagedProcessorFactory());
-            Register(new OracleProcessorFactory());
-            Register(new PostgresProcessorFactory());
-            Register(new SQLiteProcessorFactory());
-            Register(new SqlServer2000ProcessorFactory());
-            Register(new SqlServer2005ProcessorFactory());
-            Register(new SqlServer2008ProcessorFactory());
-            Register(new SqlServer2012ProcessorFactory());
-            Register(new SqlServer2014ProcessorFactory());
-            Register(new SqlServer2016ProcessorFactory());
-            Register(new SqlServerProcessorFactory());
-            Register(new SqlServerCeProcessorFactory());
-            Register(new SqlAnywhere16ProcessorFactory());
-            Register(new HanaProcessorFactory());
-            Register(new RedshiftProcessorFactory());
-
-#if NETFRAMEWORK
-            Register(new Jet.JetProcessorFactory());
-#endif
-        }
 
         [Obsolete("Ony the statically provided factories are accessed")]
         public MigrationProcessorFactoryProvider()

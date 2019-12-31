@@ -25,5 +25,9 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\FluentMigrator.Runner\FluentMigrator.Runner.csproj" />
     <ProjectReference Include="..\FluentMigrator.Example.Migrations\FluentMigrator.Example.Migrations.csproj" />
+    <ProjectReference Include="..\..\src\FluentMigrator.Runner.SQLite\FluentMigrator.Runner.SQLite.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
+    <ProjectReference Include="..\..\src\FluentMigrator.Runner.Jet\FluentMigrator.Runner.Jet.csproj" />
   </ItemGroup>
 </Project>
