@@ -12,13 +12,13 @@ or the upgrade guide for further information: [2.x to 3.0](https://fluentmigrato
 
 # Packages
 
-Source              | Status
---------------------|----------
-NuGet (Releases)    | [![NuGet](https://img.shields.io/nuget/v/FluentMigrator.svg)](https://www.nuget.org/packages/FluentMigrator/)
-MyGet (Prerelease)  | [![MyGet](https://img.shields.io/myget/fluent-migrator/vpre/FluentMigrator.svg)](https://www.myget.org/gallery/fluent-migrator)
+Package Source      | Status   | Source Code Tree
+--------------------|----------|-----------------
+NuGet (Releases)    | [![NuGet](https://img.shields.io/nuget/v/FluentMigrator.svg)](https://www.nuget.org/packages/FluentMigrator/) | [master](https://github.com/fluentmigrator/fluentmigrator/tree/master)
+MyGet (Prerelease)  | [![MyGet](https://img.shields.io/myget/fluent-migrator/vpre/FluentMigrator.svg)](https://www.myget.org/gallery/fluent-migrator) | [develop](https://github.com/fluentmigrator/fluentmigrator/tree/develop)
 
 The releases are stored on [nuget.org](https://nuget.org)
-while the CI builds are stored on [MyGet](https://www.myget.org/feed/Packages/fluent-migrator).
+while the CI builds are stored on [MyGet](https://www.myget.org/feed/Packages/fluent-migrator). :warning: The MyGet repo is currently read-only.
 
 # Project Info
 
