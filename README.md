@@ -18,7 +18,9 @@ NuGet (Releases)    | [![NuGet](https://img.shields.io/nuget/v/FluentMigrator.sv
 MyGet (Prerelease)  | [![MyGet](https://img.shields.io/myget/fluent-migrator/vpre/FluentMigrator.svg)](https://www.myget.org/gallery/fluent-migrator) | [develop](https://github.com/fluentmigrator/fluentmigrator/tree/develop)
 
 The releases are stored on [nuget.org](https://nuget.org)
-while the CI builds are stored on [MyGet](https://www.myget.org/feed/Packages/fluent-migrator). :warning: The MyGet repo is currently read-only due to a change in MyGet policy for open source projects.  We're looking into this.
+while the CI builds are stored on [MyGet](https://www.myget.org/feed/Packages/fluent-migrator).
+
+:warning: The MyGet repo is currently read-only due to a change in MyGet policy for open source projects.  We're looking into this.
 
 # Project Info
 
