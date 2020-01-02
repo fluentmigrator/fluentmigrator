@@ -50,12 +50,18 @@ namespace FluentMigrator.Runner.Generators.SQLite
         /// <inheritdoc />
         protected override string FormatPrimaryKey(ColumnDefinition column)
         {
+            var primaryKey = "PRIMARY KEY";
             if (!column.IsPrimaryKey)
             {
                 return string.Empty;
             }
 
-            return column.IsIdentity ? "PRIMARY KEY AUTOINCREMENT" : string.Empty;
+            if (column.Type == DbType.Int32 || column.Type == DbType.UInt32)
+            {
+                primaryKey += " AUTOINCREMENT";
+            }
+
+            return column.IsIdentity ? primaryKey : string.Empty;
         }
     }
 }
