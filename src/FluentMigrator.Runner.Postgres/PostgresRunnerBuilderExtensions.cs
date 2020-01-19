@@ -60,6 +60,22 @@ namespace FluentMigrator.Runner
             return builder.AddCommonPostgresServices();
         }
 
+
+        /// <summary>
+        /// Adds Postgres 10.0 support
+        /// </summary>
+        /// <param name="builder">The builder to add the Postgres-specific services to</param>
+        /// <returns>The migration runner builder</returns>
+        public static IMigrationRunnerBuilder AddPostgres100(this IMigrationRunnerBuilder builder)
+        {
+            builder.Services
+                .AddScoped<Postgres100Processor>()
+                .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<Postgres100Processor>())
+                .AddScoped<Postgres100Generator>()
+                .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<Postgres100Generator>());
+            return builder.AddCommonPostgresServices();
+        }
+
         /// <summary>
         /// Add common Postgres services.
         /// </summary>

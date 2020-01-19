@@ -54,6 +54,14 @@ namespace FluentMigrator.Runner.Generators.Postgres
         {
         }
 
+        protected PostgresGenerator(
+            [NotNull] IColumn column,
+            [NotNull] PostgresQuoter quoter,
+            [NotNull] IOptions<GeneratorOptions> generatorOptions)
+            : base(column, quoter, new PostgresDescriptionGenerator(quoter), generatorOptions)
+        {
+        }
+
         public override string Generate(AlterTableExpression expression)
         {
             var alterStatement = new StringBuilder();
