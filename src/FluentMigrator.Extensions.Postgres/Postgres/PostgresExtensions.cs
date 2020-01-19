@@ -17,18 +17,97 @@
 using System;
 
 using FluentMigrator.Builders;
+using FluentMigrator.Builders.Alter.Column;
 using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Postgres
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <remarks> Given:
+    /// MigrationBase m = null;
+    ///
+    /// These are valid calls:
+    /// m.Alter.Column("").OnTable("").AsInt16().AddIdentity(PostgresGenerationType.Always);
+    /// m.Alter.Column("").OnTable("").AsInt16().SetIdentity(PostgresGenerationType.Always);
+    /// m.Alter.Column("").OnTable("").AsInt16().DropIdentity(true);
+    /// m.Alter.Column("").OnTable("").AsInt16().Identity();
+    /// m.Alter.Column("").OnTable("").AsInt16().Identity(PostgresGenerationType.Always);  //Ideally would like to stop this, forcing use of AddIdentity instead, but can't
+    /// m.Alter.Table("").AddColumn("").AsInt16().Identity(PostgresGenerationType.Always);
+    /// m.Alter.Table("").AlterColumn("").AsInt16().Identity(PostgresGenerationType.Always);
+    /// 
+    /// These are not possible:
+    /// m.Alter.Table("").AddColumn("").AsInt16().AddIdentity(PostgresGenerationType.Always);
+    /// m.Alter.Table("").AddColumn("").AsInt16().SetIdentity(PostgresGenerationType.Always);
+    /// m.Alter.Table("").AddColumn("").AsInt16().DropIdentity(PostgresGenerationType.Always);
+    /// m.Alter.Table("").AlterColumn("").AsInt16().AddIdentity(PostgresGenerationType.Always);  //Ideally would like to have these 3, but can't distinguish between return type AddColumn and AlterColumn at compiletime
+    /// m.Alter.Table("").AlterColumn("").AsInt16().SetIdentity(PostgresGenerationType.Always);
+    /// m.Alter.Table("").AlterColumn("").AsInt16().DropIdentity(false);
+    /// </remarks>
     public static class PostgresExtensions
     {
         public static string IdentityGeneration => "PostgresIdentityGeneration";
+        public static string IdentityModificationType => "PostgresIdentityModificationType";
 
+        /// <summary>
+        /// Sets the column's identity generation attribute.  To change or remove an existing one, use Alter.Column instead of Alter.Table.AlterColumn
+        /// </summary>
+        /// <typeparam name="TNext"></typeparam>
+        /// <typeparam name="TNextFk"></typeparam>
+        /// <param name="expression"></param>
+        /// <param name="generation"></param>
+        /// <returns>The next step</returns>
         public static TNext Identity<TNext, TNextFk>(this IColumnOptionSyntax<TNext, TNextFk> expression, PostgresGenerationType generation)
             where TNext : IFluentSyntax
             where TNextFk : IFluentSyntax
-            => SetIdentity(expression, generation, GetColumn(expression));
+            => SetIdentity(expression, generation, PostgresIdentityModificationType.Add, GetColumn(expression));
+
+        /// <summary>
+        /// Drops an existing identity on the column
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <param name="ifExists">If true and the column is not an identity column, no error is thrown.  In this case a notice is issued instead.</param>
+        /// <returns>The next step</returns>
+        /// <remarks>Deliberate choice to extend IAlterColumnOptionSyntax rather than IColumnOptionSyntax&lt;TNext, TNextFk&gt;
+        /// in order to prevent using these methods when adding a column to the table, since it makes no sense.  It does mean
+        /// the syntax migration.Alter.Table("tableName").AlterColumn("columnName") cannot be used since no distinction is made
+        /// between the the return types of AddColumn or AlterColumn on the IAlterTableColumnAsTypeSyntax interface which is inconvenient
+        /// but helps prevent misuse.
+        /// </remarks>
+        public static IAlterColumnOptionSyntax DropIdentity(this IAlterColumnOptionSyntax expression, bool ifExists)
+            => SetIdentity(expression, null, ifExists ? PostgresIdentityModificationType.DropIfExists : PostgresIdentityModificationType.Drop, GetColumn(expression));
+
+        /// <summary>
+        /// Adds a generated identity to the column
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <param name="generation"></param>
+        /// <returns>The next step</returns>
+        /// <remarks>This is an equivalent to Alter.Table.AlterColumn.Identity(PostgresGenerationType)
+        /// Deliberate choice to extend IAlterColumnOptionSyntax rather than IColumnOptionSyntax&lt;TNext, TNextFk&gt;
+        /// in order to prevent using these methods when adding a column to the table, since it makes no sense.  It does mean
+        /// the syntax migration.Alter.Table("tableName").AlterColumn("columnName") cannot be used since no distinction is made
+        /// between the the return types of AddColumn or AlterColumn on the IAlterTableColumnAsTypeSyntax interface which is inconvenient
+        /// but helps prevent misuse.
+        /// </remarks>
+        public static IAlterColumnOptionSyntax AddIdentity(this IAlterColumnOptionSyntax expression, PostgresGenerationType generation)
+            => SetIdentity(expression, generation, PostgresIdentityModificationType.Add, GetColumn(expression));
+
+        /// <summary>
+        /// Alters the strategy for an existing generated identity on the column
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <param name="generation"></param>
+        /// <returns>The next step</returns>
+        /// <remarks>Deliberate choice to extend IAlterColumnOptionSyntax rather than IColumnOptionSyntax&lt;TNext, TNextFk&gt;
+        /// in order to prevent using these methods when adding a column to the table, since it makes no sense.  It does mean
+        /// the syntax migration.Alter.Table("tableName").AlterColumn("columnName") cannot be used since no distinction is made
+        /// between the the return types of AddColumn or AlterColumn on the IAlterTableColumnAsTypeSyntax interface which is inconvenient
+        /// but helps prevent misuse.
+        /// </remarks>
+        public static IAlterColumnOptionSyntax SetIdentity(this IAlterColumnOptionSyntax expression, PostgresGenerationType generation)
+            => SetIdentity(expression, generation, PostgresIdentityModificationType.Set, GetColumn(expression));
 
         private static ISupportAdditionalFeatures GetColumn<TNext, TNextFk>(IColumnOptionSyntax<TNext, TNextFk> expression)
             where TNext : IFluentSyntax
@@ -41,11 +120,15 @@ namespace FluentMigrator.Postgres
             throw new InvalidOperationException(UnsupportedMethodMessage("IdentityGeneration", nameof(IColumnExpressionBuilder)));
         }
 
-        private static TNext SetIdentity<TNext, TNextFk>(IColumnOptionSyntax<TNext, TNextFk> expression, PostgresGenerationType generation, ISupportAdditionalFeatures castColumn)
+        private static TNext SetIdentity<TNext, TNextFk>(IColumnOptionSyntax<TNext, TNextFk> expression, PostgresGenerationType? generation, PostgresIdentityModificationType modificationType, ISupportAdditionalFeatures castColumn)
             where TNext : IFluentSyntax
             where TNextFk : IFluentSyntax
         {
-            castColumn.AdditionalFeatures[IdentityGeneration] = generation;
+            if (generation.HasValue)
+                castColumn.AdditionalFeatures[IdentityGeneration] = generation;
+
+            castColumn.AdditionalFeatures[IdentityModificationType] = modificationType;
+
             return expression.Identity();
         }
 

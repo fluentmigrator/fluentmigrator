@@ -15,6 +15,7 @@
 #endregion
 
 using JetBrains.Annotations;
+
 using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Generators.Postgres

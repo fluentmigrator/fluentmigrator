@@ -27,6 +27,7 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 using FluentMigrator.Oracle;
+using FluentMigrator.Postgres;
 using FluentMigrator.SqlServer;
 
 using Moq;
@@ -629,6 +630,24 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             builder.OnDeleteOrUpdate(rule);
             Assert.That(builder.CurrentForeignKey.OnUpdate, Is.EqualTo(rule));
             Assert.That(builder.CurrentForeignKey.OnDelete, Is.EqualTo(rule));
+        }
+
+        [Test]
+        public void CallingPostgresGeneratedIdentitySetsAdditionalProperties()
+        {
+            var contextMock = new Mock<IMigrationContext>();
+
+            var columnMock = new Mock<ColumnDefinition>();
+            columnMock.SetupGet(x => x.Name).Returns("BaconId");
+
+            var expressionMock = new Mock<CreateColumnExpression>();
+            expressionMock.SetupGet(x => x.Column).Returns(columnMock.Object);
+
+            var builder = new CreateColumnExpressionBuilder(expressionMock.Object, contextMock.Object);
+            builder.Identity(PostgresGenerationType.Always);
+
+            columnMock.Object.AdditionalFeatures.ShouldContain(
+                new KeyValuePair<string, object>(PostgresExtensions.IdentityGeneration, PostgresGenerationType.Always));
         }
 
         [Test]
