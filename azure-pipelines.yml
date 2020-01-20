@@ -87,9 +87,6 @@ steps:
 
 - script: nuget.exe pack $(Build.ArtifactStagingDirectory)/publish/FluentMigrator.Console.nuspec -NonInteractive -OutputDirectory $(Build.ArtifactStagingDirectory) -version $(build.buildNumber)
   displayName: NuGet pack FluentMigrator.Console
-  
-- script: nuget.exe pack $(Build.ArtifactStagingDirectory)/publish/FluentMigrator.Tools.nuspec -NonInteractive -OutputDirectory $(Build.ArtifactStagingDirectory) -version $(build.buildNumber)
-  displayName: NuGet pack FluentMigrator.Tools
 
 - task: PublishBuildArtifacts@1
   inputs:
