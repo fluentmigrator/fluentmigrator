@@ -141,7 +141,7 @@ namespace FluentMigrator.Runner
                 {
                     foreach (var innerException in aggregateException.InnerExceptions)
                     {
-                        writer.WriteExceptionMessage(innerException.Message, level)
+                        writer.WriteExceptionMessage(innerException.Message, level);
                     }
                 }
                 else
