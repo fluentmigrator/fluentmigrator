@@ -5,12 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## 3.2.1
+
+- Stripping comments can be disabled (which will become the default in 4.x, Issue #956, PR #925)
+
 ## 3.2.0 (Comments are here to stay)
 
 ### New
 
 - Runner: Default schema name can be set (PR #907)
-- Stripping comments can be disabled (which will become the default in 4.x, Issue #956, PR #925)
 - `WithGlobalConnectionString` accepting a lambda for lazy connection string query (PR #919)
 - New Oracle 12c support
   - Identity generator options (PR #921)
