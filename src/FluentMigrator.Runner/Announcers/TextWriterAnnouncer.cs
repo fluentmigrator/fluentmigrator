@@ -23,7 +23,7 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Announcers
 {
-    [Obsolete]
+    [Obsolete("Use DependencyInjection extension method chain instead: .AddLogging(lb => lb.AddDebug().AddFluentMigratorConsole())")]
     public class TextWriterAnnouncer : Announcer
     {
         private readonly Action<string> _write;
