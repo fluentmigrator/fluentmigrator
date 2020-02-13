@@ -7,13 +7,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## 3.2.1
 
-- Stripping comments can be disabled (which will become the default in 4.x, Issue #956, PR #925)
+- Stripping comments can be disabled in _dotnet-fm_ runner. Default is true, will become false in 4.x (#956)
 
 ## 3.2.0 (Comments are here to stay)
 
 ### New
 
 - Runner: Default schema name can be set (PR #907)
+- Stripping comments can be disabled (which will become the default in 4.x, Issue #956, PR #925)
 - `WithGlobalConnectionString` accepting a lambda for lazy connection string query (PR #919)
 - New Oracle 12c support
   - Identity generator options (PR #921)
