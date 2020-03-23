@@ -15,6 +15,8 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 using FluentMigrator.Runner.Generators.Generic;
 
@@ -22,6 +24,31 @@ namespace FluentMigrator.Runner.Generators.Oracle
 {
     public class OracleQuoterBase : GenericQuoter
     {
+        private const int MaxStringLength = 3900;
+
+        private static IEnumerable<string> SplitBy(string str, int chunkLength)
+        {
+            if (string.IsNullOrEmpty(str))
+            {
+                throw new ArgumentException();
+            }
+
+            if (chunkLength < 1)
+            {
+                throw new ArgumentException();
+            }
+
+            for (var i = 0; i < str.Length; i += chunkLength)
+            {
+                if (chunkLength + i > str.Length)
+                {
+                    chunkLength = str.Length - i;
+                }
+
+                yield return str.Substring(i, chunkLength);
+            }
+        }
+
         public override string FormatDateTime(DateTime value)
         {
             var result = string.Format("to_date({0}{1}{0}, {0}yyyy-mm-dd hh24:mi:ss{0})", ValueQuote, value.ToString("yyyy-MM-dd HH:mm:ss")); //ISO 8601 DATETIME FORMAT (EXCEPT 'T' CHAR)
@@ -62,6 +89,39 @@ namespace FluentMigrator.Runner.Generators.Oracle
             }
 
             return base.FormatSystemMethods(value);
+        }
+
+        private static string FormatString(string value, string oracleFunction, Func<string, string> formatter)
+        {
+            if (value.Length < MaxStringLength)
+            {
+                return formatter(value);
+            }
+
+            var chunks = SplitBy(value, MaxStringLength)
+                .Select(v => $"{oracleFunction}({formatter(v)})");
+
+            return string.Join(" || ", chunks);
+        }
+
+        public override string FormatAnsiString(string value)
+        {
+            if (value.Length < MaxStringLength)
+            {
+                return base.FormatAnsiString(value);
+            }
+
+            return FormatString(value, "TO_CLOB", base.FormatAnsiString);
+        }
+
+        public override string FormatNationalString(string value)
+        {
+            if (value.Length < MaxStringLength)
+            {
+                return base.FormatAnsiString(value);
+            }
+
+            return FormatString(value, "TO_NCLOB", base.FormatNationalString);
         }
     }
 }
