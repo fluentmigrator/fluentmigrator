@@ -17,8 +17,11 @@
 #endregion
 
 using System;
+using System.Data;
 using System.Linq;
 
+using FluentMigrator.Expressions;
+using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.MySql;
 using NUnit.Framework;
 
@@ -245,6 +248,15 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
 
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE `TestTable1` ADD COLUMN `TestColumn1` VARCHAR(5) NOT NULL COMMENT 'TestColumn1Description'");
+        }
+
+        [Test]
+        public void CanCreateColumnWithBinaryIntMax()
+        {
+            var column = new ColumnDefinition { Name = GeneratorTestHelper.TestColumnName1, Type = DbType.Binary, Size = int.MaxValue };
+            var expression = new CreateColumnExpression { TableName = GeneratorTestHelper.TestTableName1, Column = column };
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE `TestTable1` ADD COLUMN `TestColumn1` LONGBLOB NOT NULL");
         }
     }
 }

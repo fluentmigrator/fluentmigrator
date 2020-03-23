@@ -185,7 +185,7 @@ namespace FluentMigrator.Runner.Processors.MySql
 
             EnsureConnectionIsOpen();
 
-            expression.Operation?.Invoke(Connection, null);
+            expression.Operation?.Invoke(Connection, Transaction);
         }
 
         public override void Process(RenameColumnExpression expression)
@@ -203,7 +203,7 @@ SELECT CONCAT(
           IF(IS_NULLABLE = 'NO', 'NOT NULL ', ''),
           IF(IS_NULLABLE = 'NO' AND COLUMN_DEFAULT IS NULL,
              '',
-             CONCAT('DEFAULT ', QUOTE(COLUMN_DEFAULT), ' ')),
+             CONCAT('DEFAULT ', IF(COLUMN_DEFAULT = 'NULL', 'NULL', QUOTE(COLUMN_DEFAULT)), ' ')),
           IF(COLUMN_COMMENT = '', '', CONCAT('COMMENT ', QUOTE(COLUMN_COMMENT), ' ')),
           UPPER(extra))
   FROM INFORMATION_SCHEMA.COLUMNS

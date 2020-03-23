@@ -75,13 +75,17 @@ namespace FluentMigrator.DotNet.Cli
                         .AddDb2()
                         .AddDb2ISeries()
                         .AddDotConnectOracle()
+                        .AddDotConnectOracle12C()
                         .AddFirebird()
                         .AddHana()
                         .AddMySql4()
                         .AddMySql5()
                         .AddOracle()
+                        .AddOracle12C()
                         .AddOracleManaged()
+                        .AddOracle12CManaged()
                         .AddPostgres()
+                        .AddPostgres92()
                         .AddRedshift()
                         .AddSqlAnywhere()
                         .AddSQLite()
@@ -119,6 +123,8 @@ namespace FluentMigrator.DotNet.Cli
 #pragma warning restore 612
                         opt.TransactionPerSession = options.TransactionMode == TransactionMode.Session;
                         opt.AllowBreakingChange = options.AllowBreakingChanges;
+                        opt.IncludeUntaggedMigrations = options.IncludeUntaggedMigrations;
+                        opt.IncludeUntaggedMaintenances = options.IncludeUntaggedMaintenances;
                     })
                 .Configure<ProcessorOptions>(
                     opt =>
@@ -126,6 +132,7 @@ namespace FluentMigrator.DotNet.Cli
                         opt.ConnectionString = options.ConnectionString;
                         opt.PreviewOnly = options.Preview;
                         opt.ProviderSwitches = options.ProcessorSwitches;
+                        opt.StripComments = options.StripComments;
                         opt.Timeout = options.Timeout == null ? null : (TimeSpan?) TimeSpan.FromSeconds(options.Timeout.Value);
                     });
 

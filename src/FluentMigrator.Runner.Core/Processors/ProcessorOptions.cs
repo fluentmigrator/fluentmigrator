@@ -66,6 +66,11 @@ namespace FluentMigrator.Runner.Processors
         /// </summary>
         public string ProviderSwitches  { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether the comments should be stripped
+        /// </summary>
+        public bool StripComments { get; set; }
+
         /// <inheritdoc />
         int? IMigrationProcessorOptions.Timeout => Timeout == null ? null : (int?) Timeout.Value.TotalSeconds;
 
@@ -81,7 +86,9 @@ namespace FluentMigrator.Runner.Processors
                 ? null
                 : (TimeSpan?)TimeSpan.FromSeconds(runnerContext.Timeout.Value);
             ProviderSwitches = runnerContext.ProviderSwitches;
+            StripComments = runnerContext.StripComments;
             ConnectionString = runnerContext.Connection;
+            StripComments = runnerContext.StripComments;
         }
     }
 }

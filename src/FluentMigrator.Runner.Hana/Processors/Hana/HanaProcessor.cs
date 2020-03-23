@@ -167,7 +167,7 @@ namespace FluentMigrator.Runner.Processors.Hana
 
             EnsureConnectionIsOpen();
 
-            expression.Operation?.Invoke(Connection, null);
+            expression.Operation?.Invoke(Connection, Transaction);
         }
 
         protected override void Process(string sql)

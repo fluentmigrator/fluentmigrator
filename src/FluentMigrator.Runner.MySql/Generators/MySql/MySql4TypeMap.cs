@@ -43,6 +43,7 @@ namespace FluentMigrator.Runner.Generators.MySql
             SetTypeMap(DbType.AnsiString, "MEDIUMTEXT", MediumTextCapacity);
             SetTypeMap(DbType.AnsiString, "LONGTEXT", LongTextCapacity);
             SetTypeMap(DbType.Binary, "LONGBLOB");
+            SetTypeMap(DbType.Binary, "LONGBLOB", int.MaxValue);
             SetTypeMap(DbType.Binary, "TINYBLOB", AnsiTinyStringCapacity);
             SetTypeMap(DbType.Binary, "BLOB", TextCapacity);
             SetTypeMap(DbType.Binary, "MEDIUMBLOB", MediumTextCapacity);

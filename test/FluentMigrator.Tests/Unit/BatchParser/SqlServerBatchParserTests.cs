@@ -232,8 +232,8 @@ namespace FluentMigrator.Tests.Unit.BatchParser
         }
 
         [TestCase("-- blah\nqweqwe", "\nqweqwe\n")]
-        [TestCase("# blah\nqweqwe", "\nqweqwe\n")]
         [TestCase("qwe # blah\nqweqwe", "qwe # blah\nqweqwe\n")]
+        [TestCase("# blah\nqweqwe", "# blah\nqweqwe\n")] // #'s do not indicate comments. Leave as is
         public void TestSqlStrippedSingleLineCommentAndSqlWithoutGo(string input, string expected)
         {
             var output = new List<string>();

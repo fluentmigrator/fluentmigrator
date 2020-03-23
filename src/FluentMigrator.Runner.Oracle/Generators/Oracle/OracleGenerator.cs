@@ -31,7 +31,7 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Generators.Oracle
 {
-    public class OracleGenerator : GenericGenerator
+    public class OracleGenerator : GenericGenerator, IOracleGenerator
     {
         public OracleGenerator()
             : this(false)
@@ -124,9 +124,18 @@ namespace FluentMigrator.Runner.Generators.Oracle
                 result.AppendFormat(" START WITH {0}", seq.StartWith);
             }
 
+            const long MINIMUM_CACHE_VALUE = 2;
             if (seq.Cache.HasValue)
             {
+                if (seq.Cache.Value < MINIMUM_CACHE_VALUE)
+                {
+                    return CompatibilityMode.HandleCompatibilty("Oracle does not support Cache value equal to 1; if you intended to disable caching, set Cache to null. For information on Oracle limitations, see: https://docs.oracle.com/en/database/oracle/oracle-database/18/sqlrf/CREATE-SEQUENCE.html#GUID-E9C78A8C-615A-4757-B2A8-5E6EFB130571__GUID-7E390BE1-2F6C-4E5A-9D5C-5A2567D636FB");
+                }
                 result.AppendFormat(" CACHE {0}", seq.Cache);
+            }
+            else
+            {
+                result.Append(" NOCACHE");
             }
 
             if (seq.Cycle)
@@ -157,9 +166,29 @@ namespace FluentMigrator.Runner.Generators.Oracle
             get { return "INTO {0} ({1}) VALUES ({2})"; }
         }
 
-        private string ExpandTableName(string schema, string table)
+        private static string ExpandTableName(string schema, string table)
         {
             return string.IsNullOrEmpty(schema) ? table : string.Concat(schema,".",table);
+        }
+
+        private static string WrapStatementInExecuteImmediateBlock(string statement)
+        {
+            if (string.IsNullOrEmpty(statement))
+            {
+                return string.Empty;
+            }
+
+            return string.Format("EXECUTE IMMEDIATE '{0}';", FormatHelper.FormatSqlEscape(statement));
+        }
+
+        private static string WrapInBlock(string sql)
+        {
+            if (string.IsNullOrEmpty(sql))
+            {
+                return string.Empty;
+            }
+
+            return string.Format("BEGIN {0} END;", sql);
         }
 
         private string InnerGenerate(CreateTableExpression expression)
@@ -170,13 +199,20 @@ namespace FluentMigrator.Runner.Generators.Oracle
             return string.Format("CREATE TABLE {0} ({1})",ExpandTableName(schemaName,tableName), Column.Generate(expression.Columns, tableName));
         }
 
+        protected override StringBuilder AppendSqlStatementEndToken(StringBuilder stringBuilder)
+        {
+            return stringBuilder.AppendLine().AppendLine(";");
+        }
+
         public override string Generate(CreateTableExpression expression)
         {
             var descriptionStatements = DescriptionGenerator.GenerateDescriptionStatements(expression);
             var statements = descriptionStatements as string[] ?? descriptionStatements.ToArray();
 
             if (!statements.Any())
+            {
                 return InnerGenerate(expression);
+            }
 
             var wrappedCreateTableStatement = WrapStatementInExecuteImmediateBlock(InnerGenerate(expression));
             var createTableWithDescriptionsBuilder = new StringBuilder(wrappedCreateTableStatement);
@@ -198,7 +234,9 @@ namespace FluentMigrator.Runner.Generators.Oracle
             var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatement(expression);
 
             if (string.IsNullOrEmpty(descriptionStatement))
+            {
                 return base.Generate(expression);
+            }
 
             return descriptionStatement;
         }
@@ -282,27 +320,6 @@ namespace FluentMigrator.Runner.Generators.Oracle
             var quotedIndex = Quoter.QuoteIndexName(expression.Index.Name);
             var indexName = string.IsNullOrEmpty(quotedSchema) ? quotedIndex : $"{quotedSchema}.{quotedIndex}";
             return string.Format("DROP INDEX {0}", indexName);
-        }
-
-        protected override StringBuilder AppendSqlStatementEndToken(StringBuilder stringBuilder)
-        {
-            return stringBuilder.AppendLine().AppendLine(";");
-        }
-
-        private string WrapStatementInExecuteImmediateBlock(string statement)
-        {
-            if (string.IsNullOrEmpty(statement))
-                return string.Empty;
-
-            return string.Format("EXECUTE IMMEDIATE '{0}';", FormatHelper.FormatSqlEscape(statement));
-        }
-
-        private string WrapInBlock(string sql)
-        {
-            if (string.IsNullOrEmpty(sql))
-                return string.Empty;
-
-            return string.Format("BEGIN {0} END;", sql);
         }
     }
 }

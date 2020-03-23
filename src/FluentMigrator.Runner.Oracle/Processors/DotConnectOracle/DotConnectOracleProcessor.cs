@@ -45,7 +45,7 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
 
         public DotConnectOracleProcessor(
             [NotNull] DotConnectOracleDbFactory factory,
-            [NotNull] OracleGenerator generator,
+            [NotNull] IOracleGenerator generator,
             [NotNull] ILogger<DotConnectOracleProcessor> logger,
             [NotNull] IOptionsSnapshot<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor)
@@ -142,15 +142,7 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
 
         public override void Execute(string template, params object[] args)
         {
-            if (template == null)
-                throw new ArgumentNullException(nameof(template));
-
-            EnsureConnectionIsOpen();
-
-            using (var command = CreateCommand(string.Format(template, args)))
-            {
-                command.ExecuteNonQuery();
-            }
+            Process(string.Format(template, args));
         }
 
         public override bool Exists(string template, params object[] args)
@@ -194,9 +186,16 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
 
         public override void Process(PerformDBOperationExpression expression)
         {
+            Logger.LogSay("Performing DB Operation");
+
+            if (Options.PreviewOnly)
+            {
+                return;
+            }
+
             EnsureConnectionIsOpen();
 
-            expression.Operation?.Invoke(Connection, null);
+            expression.Operation?.Invoke(Connection, Transaction);
         }
 
         protected override void Process(string sql)

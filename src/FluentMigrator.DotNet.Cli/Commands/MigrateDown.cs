@@ -22,7 +22,7 @@ using McMaster.Extensions.CommandLineUtils;
 namespace FluentMigrator.DotNet.Cli.Commands
 {
     [HelpOption]
-    [Command(Description = "Revert migrations")]
+    [Command("down", Description = "Revert migrations")]
     public class MigrateDown : BaseCommand
     {
         public Migrate Parent { get; }

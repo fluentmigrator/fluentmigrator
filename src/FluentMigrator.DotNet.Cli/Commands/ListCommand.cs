@@ -21,9 +21,9 @@ using McMaster.Extensions.CommandLineUtils;
 namespace FluentMigrator.DotNet.Cli.Commands
 {
     [HelpOption]
-    [Command(Description = "List stuff")]
-    [Subcommand("migrations", typeof(ListMigrations))]
-    [Subcommand("processors", typeof(ListProcessors))]
+    [Command("list", Description = "List stuff")]
+    [Subcommand(typeof(ListMigrations))]
+    [Subcommand(typeof(ListProcessors))]
     public class ListCommand
     {
         private int OnExecute(CommandLineApplication app, IConsole console)

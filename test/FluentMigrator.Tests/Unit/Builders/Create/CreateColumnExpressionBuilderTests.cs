@@ -26,6 +26,7 @@ using FluentMigrator.Builders.Create.Column;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
+using FluentMigrator.Oracle;
 using FluentMigrator.SqlServer;
 
 using Moq;
@@ -376,6 +377,84 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
                 new KeyValuePair<string, object>(SqlServerExtensions.IdentitySeed, long.MaxValue));
             columnMock.Object.AdditionalFeatures.ShouldContain(
                 new KeyValuePair<string, object>(SqlServerExtensions.IdentityIncrement, 44));
+        }
+
+        [Test]
+        public void CallingGeneratedIdentitySetsAdditionalProperties()
+        {
+            var contextMock = new Mock<IMigrationContext>();
+
+            var columnMock = new Mock<ColumnDefinition>();
+            columnMock.SetupGet(x => x.Name).Returns("BaconId");
+
+            var expressionMock = new Mock<CreateColumnExpression>();
+            expressionMock.SetupGet(x => x.Column).Returns(columnMock.Object);
+
+            var builder = new CreateColumnExpressionBuilder(expressionMock.Object, contextMock.Object);
+            builder.Identity(OracleGenerationType.Always, startWith: 0, incrementBy: 1);
+
+            columnMock.Object.AdditionalFeatures.ShouldContain(
+                new KeyValuePair<string, object>(OracleExtensions.IdentityGeneration, OracleGenerationType.Always));
+            columnMock.Object.AdditionalFeatures.ShouldContain(
+                new KeyValuePair<string, object>(OracleExtensions.IdentityStartWith, 0L));
+            columnMock.Object.AdditionalFeatures.ShouldContain(
+                new KeyValuePair<string, object>(OracleExtensions.IdentityIncrementBy, 1));
+            columnMock.Object.AdditionalFeatures.ShouldContain(
+                new KeyValuePair<string, object>(OracleExtensions.IdentityMinValue, null));
+            columnMock.Object.AdditionalFeatures.ShouldContain(
+                new KeyValuePair<string, object>(OracleExtensions.IdentityMaxValue, null));
+        }
+
+        [Test]
+        public void CallingGeneratedLongIdentitySetsAdditionalProperties()
+        {
+            var contextMock = new Mock<IMigrationContext>();
+
+            var columnMock = new Mock<ColumnDefinition>();
+            columnMock.SetupGet(x => x.Name).Returns("BaconId");
+
+            var expressionMock = new Mock<CreateColumnExpression>();
+            expressionMock.SetupGet(x => x.Column).Returns(columnMock.Object);
+
+            var builder = new CreateColumnExpressionBuilder(expressionMock.Object, contextMock.Object);
+            builder.Identity(OracleGenerationType.Always, startWith: 0L, incrementBy: 1);
+
+            columnMock.Object.AdditionalFeatures.ShouldContain(
+                new KeyValuePair<string, object>(OracleExtensions.IdentityGeneration, OracleGenerationType.Always));
+            columnMock.Object.AdditionalFeatures.ShouldContain(
+                new KeyValuePair<string, object>(OracleExtensions.IdentityStartWith, 0L));
+            columnMock.Object.AdditionalFeatures.ShouldContain(
+                new KeyValuePair<string, object>(OracleExtensions.IdentityIncrementBy, 1));
+            columnMock.Object.AdditionalFeatures.ShouldContain(
+                new KeyValuePair<string, object>(OracleExtensions.IdentityMinValue, null));
+            columnMock.Object.AdditionalFeatures.ShouldContain(
+                new KeyValuePair<string, object>(OracleExtensions.IdentityMaxValue, null));
+        }
+
+        [Test]
+        public void CallingGeneratedIdentityMinMaxSetsAdditionalProperties()
+        {
+            var contextMock = new Mock<IMigrationContext>();
+
+            var columnMock = new Mock<ColumnDefinition>();
+            columnMock.SetupGet(x => x.Name).Returns("BaconId");
+
+            var expressionMock = new Mock<CreateColumnExpression>();
+            expressionMock.SetupGet(x => x.Column).Returns(columnMock.Object);
+
+            var builder = new CreateColumnExpressionBuilder(expressionMock.Object, contextMock.Object);
+            builder.Identity(OracleGenerationType.Always, startWith: 0, incrementBy: 1, minValue: 0, long.MaxValue);
+
+            columnMock.Object.AdditionalFeatures.ShouldContain(
+                new KeyValuePair<string, object>(OracleExtensions.IdentityGeneration, OracleGenerationType.Always));
+            columnMock.Object.AdditionalFeatures.ShouldContain(
+                new KeyValuePair<string, object>(OracleExtensions.IdentityStartWith, 0L));
+            columnMock.Object.AdditionalFeatures.ShouldContain(
+                new KeyValuePair<string, object>(OracleExtensions.IdentityIncrementBy, 1));
+            columnMock.Object.AdditionalFeatures.ShouldContain(
+                new KeyValuePair<string, object>(OracleExtensions.IdentityMinValue, 0L));
+            columnMock.Object.AdditionalFeatures.ShouldContain(
+                new KeyValuePair<string, object>(OracleExtensions.IdentityMaxValue, long.MaxValue));
         }
 
         [Test]

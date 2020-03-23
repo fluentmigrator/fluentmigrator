@@ -16,6 +16,7 @@
 //
 #endregion
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -50,6 +51,8 @@ namespace FluentMigrator.DotNet.Cli
         public bool Preview { get; private set; }
         public bool Verbose { get; private set; }
         public string Profile { get; private set; }
+
+        [Obsolete("Use dependency injection to access 'application state'.")]
         public string Context { get; private set; }
         public int? Timeout { get; private set; }
         public TransactionMode TransactionMode { get; private set; }
@@ -57,6 +60,9 @@ namespace FluentMigrator.DotNet.Cli
         public string OutputFileName { get; private set; }
         public bool AllowBreakingChanges { get; private set; }
         public string SchemaName { get; private set; }
+        public bool StripComments { get; private set; }
+        public bool IncludeUntaggedMaintenances { get; private set; }
+        public bool IncludeUntaggedMigrations { get; private set; } = true;
 
         public static MigratorOptions CreateListMigrations(ListMigrations cmd)
         {
@@ -126,6 +132,7 @@ namespace FluentMigrator.DotNet.Cli
             Profile = cmd.Profile;
             Context = cmd.Context;
             Timeout = cmd.Timeout;
+            StripComments = !cmd.StripComments.hasValue || (cmd.StripComments.value ?? true);
             (Output, OutputFileName) = cmd.Output;
             return Init((MigrationCommand)cmd);
         }
@@ -140,6 +147,8 @@ namespace FluentMigrator.DotNet.Cli
             Tags = cmd.Tags?.ToList() ?? new List<string>();
             AllowBreakingChanges = cmd.AllowBreakingChanges;
             SchemaName = cmd.SchemaName;
+            IncludeUntaggedMigrations = !cmd.IncludeUntaggedMigrations.hasValue || (cmd.IncludeUntaggedMigrations.value ?? true);
+            IncludeUntaggedMaintenances = cmd.IncludeUntaggedMaintenances;
             return this;
         }
     }

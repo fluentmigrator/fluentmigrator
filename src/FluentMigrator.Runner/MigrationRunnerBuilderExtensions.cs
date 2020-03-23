@@ -19,6 +19,7 @@ using System.Linq;
 using System.Reflection;
 
 using FluentMigrator.Infrastructure;
+using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.VersionTableInfo;
@@ -26,6 +27,7 @@ using FluentMigrator.Runner.VersionTableInfo;
 using JetBrains.Annotations;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner
 {
@@ -63,6 +65,27 @@ namespace FluentMigrator.Runner
         }
 
         /// <summary>
+        /// Sets the global connection string
+        /// </summary>
+        /// <param name="builder">The runner builder</param>
+        /// <param name="configureConnectionString">The function that creates the connection string.</param>
+        /// <returns>The runner builder</returns>
+        public static IMigrationRunnerBuilder WithGlobalConnectionString(
+            this IMigrationRunnerBuilder builder, Func<IServiceProvider, string> configureConnectionString)
+        {
+            builder.Services
+                .AddSingleton<IConfigureOptions<ProcessorOptions>>(
+                    s =>
+                    {
+                        return new ConfigureNamedOptions<ProcessorOptions>(
+                            Options.DefaultName,
+                            opt => opt.ConnectionString = configureConnectionString(s));
+                    });
+
+            return builder;
+        }
+
+        /// <summary>
         /// Sets the global command timeout
         /// </summary>
         /// <param name="builder">The runner builder</param>
@@ -73,6 +96,20 @@ namespace FluentMigrator.Runner
             TimeSpan commandTimeout)
         {
             builder.Services.Configure<ProcessorOptions>(opt => opt.Timeout = commandTimeout);
+            return builder;
+        }
+
+        /// <summary>
+        /// Sets the global strip comment
+        /// </summary>
+        /// <param name="builder">The runner builder</param>
+        /// <param name="stripComments">The global strip comments</param>
+        /// <returns>The runner builder</returns>
+        public static IMigrationRunnerBuilder WithGlobalStripComments(
+            this IMigrationRunnerBuilder builder,
+            bool stripComments)
+        {
+            builder.Services.Configure<ProcessorOptions>(opt => opt.StripComments = stripComments);
             return builder;
         }
 
@@ -195,6 +232,18 @@ namespace FluentMigrator.Runner
             private ScanInBuilder(
                 IMigrationRunnerBuilder builder,
                 IAssemblySourceItem currentSourceItem,
+                ITypeSourceItem<IConventionSet> sourceItem)
+            {
+                _builder = builder;
+                SourceItem = currentSourceItem;
+
+                _builder.DanglingAssemblySourceItem = null;
+                Services.AddSingleton(sourceItem);
+            }
+
+            private ScanInBuilder(
+                IMigrationRunnerBuilder builder,
+                IAssemblySourceItem currentSourceItem,
                 IEmbeddedResourceProvider sourceItem)
             {
                 _builder = builder;
@@ -231,6 +280,13 @@ namespace FluentMigrator.Runner
             public IScanInBuilder VersionTableMetaData()
             {
                 var sourceItem = new AssemblyVersionTableMetaDataSourceItem(SourceItem.Assemblies.ToArray());
+                return new ScanInBuilder(_builder, SourceItem, sourceItem);
+            }
+
+            /// <inheritdoc />
+            public IScanInBuilder ConventionSet()
+            {
+                var sourceItem = new AssemblySourceItem<IConventionSet>(SourceItem.Assemblies.ToArray());
                 return new ScanInBuilder(_builder, SourceItem, sourceItem);
             }
 

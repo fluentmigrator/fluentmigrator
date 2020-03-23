@@ -5,6 +5,67 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## 3.2.1
+
+- Stripping comments can be disabled in _dotnet-fm_ runner. Default is true, will become false in 4.x (#956)
+
+## 3.2.0 (Comments are here to stay)
+
+### New
+
+- Runner: Default schema name can be set (PR #907)
+- Stripping comments can be disabled (which will become the default in 4.x, Issue #956, PR #925)
+- `WithGlobalConnectionString` accepting a lambda for lazy connection string query (PR #919)
+- New Oracle 12c support
+  - Identity generator options (PR #921)
+	- Maximum name length increased to 128 (PR #940)
+- Disable quoted names for PostgreSQL (Issue #958, PR #961)
+	- Implemented by setting `PostgresOptions.ForceQuote` to `false`
+	- Can be set with the provider option `Force Quote=false`
+	- Default behaviour is `Force Quote=true`
+- PostgreSQL: Added XML type (Issue #950, PR #995)
+- Migration conditions (Issue #838, PR #990)
+  - New attribute: `CurrentVersionMigrationConstraint` to ensure that this
+	  migration only gets run when the database version is greater or equal
+		than the given number. This allows some kind of migrations that will only
+		be executed when a conversion is necessary.
+- Allow loading of maintenances without tags (Issue #983, PR #984)
+- SQL Server 2008: SPARSE column option (PR #946)
+- `IConventionSet` loaded from given assemblies (Issue #916)
+
+### Documentation
+
+- Clarification remark for `RunnerOptions.StartVersion` (PR #992)
+
+### Fixes
+
+- Oracle: Fixed preview mode (PR #920, #926)
+- SQL Server CE: Fixed preview mode (PR #920, #926)
+- SQLite: Fixed byte array parameters (PR #943)
+- SQL Anywhere uses `//` instead of `#` for comments (Issue #859)
+- SQL Server: Don't use `#` for comments (Issue #859)
+- SQLite: Don't use `#` for comments (Issue #859)
+- PostgreSQL: Description generator now works with set default schema name. (Issue #971, #1000, PR #999)
+- Don't open transaction for preview (Issue #957)
+- Transaction is now always passed to `Execute.WithConnection` delegate (Issue #1001)
+
+### Contributors
+
+- Alegrowin
+- coryalbert
+- dfaruque
+- EBMSPTYLTD
+- elken
+- groogiam
+- hansehe
+- igitur
+- Jogge
+- jzabroski
+- PhenX
+- poimis
+- TerraVenil
+- zamoa
+
 ## 3.1.3
 
 ### Fixed

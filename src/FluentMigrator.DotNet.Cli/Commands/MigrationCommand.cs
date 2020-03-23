@@ -47,7 +47,16 @@ namespace FluentMigrator.DotNet.Cli.Commands
         [Option("-b|--allow-breaking-changes", Description = "Allows execution of migrations marked as breaking changes.")]
         public bool AllowBreakingChanges { get; }
 
-        [Option("--default-schema-name", Description = "Set default Schema Name for VersionInfo table")]
+        [Option("--default-schema-name", Description = "Set default schema name for VersionInfo table and the migrations.")]
         public string SchemaName { get; internal set; } = null;
+
+        [Option("--strip", "Strip comments from the SQL scripts. Default is true.", CommandOptionType.SingleOrNoValue)]
+        public (bool hasValue, bool? value) StripComments { get; set; }
+
+        [Option("--include-untagged-migrations", "Include untagged migrations.", CommandOptionType.SingleOrNoValue)]
+        public (bool hasValue, bool? value) IncludeUntaggedMigrations { get; set; }
+
+        [Option("--include-untagged-maintenances", Description = "Include untagged maintenances.")]
+        public bool IncludeUntaggedMaintenances { get; set; }
     }
 }

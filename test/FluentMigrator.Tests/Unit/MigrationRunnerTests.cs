@@ -32,6 +32,9 @@ using FluentMigrator.Runner.Infrastructure;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Tests.Integration.Migrations;
+using FluentMigrator.Tests.Integration.Migrations.Constrained.Constraints;
+using FluentMigrator.Tests.Integration.Migrations.Constrained.ConstraintsMultiple;
+using FluentMigrator.Tests.Integration.Migrations.Constrained.ConstraintsSuccess;
 using FluentMigrator.Tests.Logging;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -54,6 +57,7 @@ namespace FluentMigrator.Tests.Unit
         private Mock<IMigrationInformationLoader> _migrationLoaderMock;
         private Mock<IProfileLoader> _profileLoaderMock;
         private Mock<IAssemblySource> _assemblySourceMock;
+        private Mock<IMigrationScopeManager> _migrationScopeHandlerMock;
 
         private ICollection<string> _logMessages;
         private SortedList<long, IMigrationInfo> _migrationList;
@@ -73,6 +77,8 @@ namespace FluentMigrator.Tests.Unit
             _processorMock = new Mock<IMigrationProcessor>(MockBehavior.Loose);
             _migrationLoaderMock = new Mock<IMigrationInformationLoader>(MockBehavior.Loose);
             _profileLoaderMock = new Mock<IProfileLoader>(MockBehavior.Loose);
+            _migrationScopeHandlerMock = new Mock<IMigrationScopeManager>(MockBehavior.Loose);
+            _migrationScopeHandlerMock.Setup(x => x.CreateOrWrapMigrationScope(It.IsAny<bool>())).Returns(new NoOpMigrationScope());
 
             _stopWatch = new Mock<IStopWatch>();
             _stopWatch.Setup(x => x.Time(It.IsAny<Action>())).Returns(new TimeSpan(1)).Callback((Action a) => a.Invoke());
@@ -745,6 +751,69 @@ namespace FluentMigrator.Tests.Unit
             Assert.DoesNotThrow(() =>
                 runner.ApplyMigrationUp(
                     new MigrationInfo(7, TransactionBehavior.Default, true, new TestBreakingMigration()), true));
+        }
+
+        [Test]
+        public void CanLoadCustomMigrationScopeHandler()
+        {
+            _serviceCollection.AddScoped<IMigrationScopeManager>(scoped => { return _migrationScopeHandlerMock.Object; });
+            var runner = CreateRunner();
+            runner.BeginScope();
+            _migrationScopeHandlerMock.Verify(x => x.BeginScope(), Times.Once());
+        }
+
+        [Test]
+        public void CanLoadDefaultMigrationScopeHandlerIfNoCustomHandlerIsSpecified()
+        {
+            var runner = CreateRunner();
+            BindingFlags bindFlags = BindingFlags.Instance | BindingFlags.NonPublic;
+            FieldInfo field = typeof(MigrationRunner).GetField("_migrationScopeManager", bindFlags);
+            Assert.That(field.GetValue(runner), Is.TypeOf<MigrationScopeHandler>());
+        }
+
+        [Test]
+        public void DoesRunMigrationsThatMeetConstraints()
+        {
+            _migrationList.Clear();
+            _migrationList.Add(1, new MigrationInfo(1, TransactionBehavior.Default, new Step1Migration()));
+            _migrationList.Add(2, new MigrationInfo(2, TransactionBehavior.Default, new Step2Migration()));
+            _migrationList.Add(3, new MigrationInfo(3, TransactionBehavior.Default, new Step2Migration2()));
+            var runner = CreateRunner();
+            runner.MigrateUp();
+            Assert.AreEqual(1, runner.VersionLoader.VersionInfo.Latest());
+        }
+
+        [Test]
+        public void DoesRunMigrationsThatDoMeetConstraints()
+        {
+            _migrationList.Clear();
+            _migrationList.Add(1, new MigrationInfo(1, TransactionBehavior.Default, new Step1Migration()));
+            _migrationList.Add(2, new MigrationInfo(2, TransactionBehavior.Default, new Step2Migration()));
+            _migrationList.Add(3, new MigrationInfo(3, TransactionBehavior.Default, new Step2Migration2()));
+            var runner = CreateRunner();
+            runner.MigrateUp();
+            runner.MigrateUp(); // run migrations second time, this time satisfying constraints
+            Assert.AreEqual(3, runner.VersionLoader.VersionInfo.Latest());
+        }
+
+        [Test]
+        public void MultipleConstraintsEachNeedsToReturnTrue()
+        {
+            _migrationList.Clear();
+            _migrationList.Add(1, new MigrationInfo(1, TransactionBehavior.Default, new MultipleConstraintsMigration()));
+            var runner = CreateRunner();
+            runner.MigrateUp();
+            Assert.AreEqual(0, runner.VersionLoader.VersionInfo.Latest());
+        }
+
+        [Test]
+        public void DoesRunMigrationWithPositiveConstraint()
+        {
+            _migrationList.Clear();
+            _migrationList.Add(1, new MigrationInfo(1, TransactionBehavior.Default, new ConstrainedMigrationSuccess()));
+            var runner = CreateRunner();
+            runner.MigrateUp();
+            Assert.AreEqual(1, runner.VersionLoader.VersionInfo.Latest());
         }
 
         private static bool LineContainsAll(string line, params string[] words)

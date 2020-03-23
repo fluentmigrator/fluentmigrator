@@ -40,6 +40,7 @@ namespace FluentMigrator.Console
 {
     public class MigratorConsole
     {
+        [Obsolete("Use dependency injection to access 'application state'.")]
         public string ApplicationContext;
         public string Connection;
         public string ConnectionStringConfigPath;
@@ -53,6 +54,8 @@ namespace FluentMigrator.Console
         public bool ShowHelp;
         public int Steps;
         public List<string> Tags = new List<string>();
+        public bool IncludeUntaggedMaintenances;
+        public bool IncludeUntaggedMigrations = true;
         public string TargetAssembly;
         public string Task;
         public int? Timeout;
@@ -65,9 +68,12 @@ namespace FluentMigrator.Console
         public bool TransactionPerSession;
         public bool AllowBreakingChange;
         public string ProviderSwitches;
+        public bool StripComments = true;
+        public string DefaultSchemaName { get; set; }
 
         public int Run(params string[] args)
         {
+            var dbChoicesList = new List<string>();
             string dbChoices;
 
             var services = CreateCoreServices()
@@ -75,9 +81,14 @@ namespace FluentMigrator.Console
             using (var sp = services.BuildServiceProvider(validateScopes: false))
             {
                 var processors = sp.GetRequiredService<IEnumerable<IMigrationProcessor>>().ToList();
-                var procNames = processors.Select(p => p.DatabaseType);
-                dbChoices = string.Join(", ", procNames);
+                dbChoicesList.AddRange(processors.Select(p => p.DatabaseType));
             }
+
+            dbChoices = string.Join(
+                ", ",
+                dbChoicesList
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .OrderBy(x => x, StringComparer.OrdinalIgnoreCase));
 
             System.Console.Out.WriteHeader();
 
@@ -193,9 +204,61 @@ namespace FluentMigrator.Console
                         v => { Tags.Add(v); }
                     },
                     {
+                        "include-untagged:",
+                        "Include untagged migrations and/or maintenance objects.",
+                        v =>
+                        {
+                            if (string.IsNullOrEmpty(v))
+                            {
+                                IncludeUntaggedMigrations = IncludeUntaggedMaintenances = true;
+                            }
+                            else
+                            {
+                                var items = v.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                                    .Select(x => x.ToLowerInvariant().Trim())
+                                    .Where(x => !string.IsNullOrEmpty(x))
+                                    .Select(
+                                        x =>
+                                        {
+                                            var hasOption = x.EndsWith("+") || x.EndsWith("-");
+                                            var enable = !x.EndsWith("-");
+                                            var name = hasOption ? x.Substring(0, x.Length - 1) : x;
+                                            return new
+                                            {
+                                                FullName = x,
+                                                ShortName = name.Substring(Math.Min(2, name.Length)),
+                                                Enable = enable,
+                                            };
+                                        });
+                                foreach (var item in items)
+                                {
+                                    switch (item.ShortName)
+                                    {
+                                        case "ma":
+                                            IncludeUntaggedMaintenances = item.Enable;
+                                            break;
+                                        case "mi":
+                                            IncludeUntaggedMigrations = item.Enable;
+                                            break;
+                                        default:
+                                            throw new ArgumentOutOfRangeException(
+                                                $"The argument {item.FullName} is not supported. "
+                                              + "Valid values are: ma, maintenance, mi, migrations with an optional '+' or '-' at the end to enable or disable the option. "
+                                              + "Multiple values may be given when separated by a comma.");
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    {
                         "providerswitches=",
                         "Provider specific switches",
                         v => { ProviderSwitches = v; }
+                    },
+                    {
+                        "strip|strip-comments",
+                        "Strip comments from the SQL scripts. Default is true.",
+                        v => { StripComments = v != null; }
                     },
                     {
                         "help|h|?",
@@ -211,6 +274,11 @@ namespace FluentMigrator.Console
                         "allow-breaking-changes|abc",
                         "Allows execution of migrations marked as breaking changes.",
                         v => { AllowBreakingChange = v != null; }
+                    },
+                    {
+                        "default-schema-name=",
+                        "Set default schema name for the VersionInfo table and the migrations.",
+                        v => { DefaultSchemaName = v; }
                     },
                 };
 
@@ -313,7 +381,7 @@ namespace FluentMigrator.Console
 
         private int ExecuteMigrations()
         {
-            var conventionSet = new DefaultConventionSet(defaultSchemaName: null, WorkingDirectory);
+            var conventionSet = new DefaultConventionSet(DefaultSchemaName, WorkingDirectory);
 
             var services = CreateCoreServices()
                 .Configure<FluentMigratorLoggerOptions>(
@@ -350,6 +418,8 @@ namespace FluentMigrator.Console
 #pragma warning restore 612
                         opt.TransactionPerSession = TransactionPerSession;
                         opt.AllowBreakingChange = AllowBreakingChange;
+                        opt.IncludeUntaggedMaintenances = IncludeUntaggedMaintenances;
+                        opt.IncludeUntaggedMigrations = IncludeUntaggedMigrations;
                     })
                 .Configure<ProcessorOptions>(
                     opt =>
@@ -357,6 +427,7 @@ namespace FluentMigrator.Console
                         opt.ConnectionString = Connection;
                         opt.PreviewOnly = PreviewOnly;
                         opt.ProviderSwitches = ProviderSwitches;
+                        opt.StripComments = StripComments;
                         opt.Timeout = Timeout == null ? null : (TimeSpan?) TimeSpan.FromSeconds(Timeout.Value);
                     });
 
@@ -402,13 +473,17 @@ namespace FluentMigrator.Console
                         .AddDb2()
                         .AddDb2ISeries()
                         .AddDotConnectOracle()
+                        .AddDotConnectOracle12C()
                         .AddFirebird()
                         .AddHana()
                         .AddMySql4()
                         .AddMySql5()
                         .AddOracle()
+                        .AddOracle12C()
                         .AddOracleManaged()
+                        .AddOracle12CManaged()
                         .AddPostgres()
+                        .AddPostgres92()
                         .AddRedshift()
                         .AddSqlAnywhere()
                         .AddSQLite()

@@ -1,6 +1,6 @@
-# FluentMigrator [![(License)](https://img.shields.io/github/license/fluentmigrator/fluentmigrator.svg)](https://github.com/fluentmigrator/fluentmigrator/blob/master/LICENSE.txt)
+# FluentMigrator [![(License)](https://img.shields.io/github/license/fluentmigrator/fluentmigrator.svg)](https://github.com/fluentmigrator/fluentmigrator/blob/master/LICENSE.txt) [![Fluent-Migrator tag on Stack Overflow](https://img.shields.io/badge/stackoverflow-fluentmigrator-orange.svg)](https://stackoverflow.com/questions/tagged/fluent-migrator) [![NuGet downloads](https://img.shields.io/nuget/dt/FluentMigrator.svg)](https://www.nuget.org/packages/FluentMigrator/)
 
-Fluent Migrator is a migration framework for .NET much like Ruby on Rails Migrations. Migrations are a structured way to alter your database schema and are an alternative to creating lots of sql scripts that have to be run manually by every developer involved. Migrations solve the problem of evolving a database schema for multiple databases (for example, the developer's local database, the test database and the production database). Database schema changes are described in classes written in C# that can be checked into a version control system.
+[Fluent Migrator](https://github.com/fluentmigrator/fluentmigrator) is a migration framework for .NET much like Ruby on Rails Migrations. Migrations are a structured way to alter your database schema and are an alternative to creating lots of sql scripts that have to be run manually by every developer involved. Migrations solve the problem of evolving a database schema for multiple databases (for example, the developer's local database, the test database and the production database). Database schema changes are described in classes written in C# that can be checked into a version control system.
 
 # News
 
@@ -12,13 +12,15 @@ or the upgrade guide for further information: [2.x to 3.0](https://fluentmigrato
 
 # Packages
 
-Source              | Status
---------------------|----------
-NuGet (Releases)    | [![NuGet](https://img.shields.io/nuget/v/FluentMigrator.svg)](https://www.nuget.org/packages/FluentMigrator/)
-MyGet (Prerelease)  | [![MyGet](https://img.shields.io/myget/fluent-migrator/vpre/FluentMigrator.svg)](https://www.myget.org/feed/Packages/fluent-migrator)
+Package Source      | Status   | Source Code Tree
+--------------------|----------|-----------------
+NuGet (Releases)    | [![NuGet](https://img.shields.io/nuget/v/FluentMigrator.svg)](https://www.nuget.org/packages/FluentMigrator/) | [master](https://github.com/fluentmigrator/fluentmigrator/tree/master)
+MyGet (Prerelease)  | [![MyGet](https://img.shields.io/myget/fluent-migrator/vpre/FluentMigrator.svg)](https://www.myget.org/gallery/fluent-migrator) | [develop](https://github.com/fluentmigrator/fluentmigrator/tree/develop)
 
 The releases are stored on [nuget.org](https://nuget.org)
 while the CI builds are stored on [MyGet](https://www.myget.org/feed/Packages/fluent-migrator).
+
+:warning: The MyGet repo is currently read-only due to a change in MyGet policy for open source projects.  We're looking into this.
 
 # Project Info
 
@@ -27,7 +29,17 @@ while the CI builds are stored on [MyGet](https://www.myget.org/feed/Packages/fl
 | **Documentation**         | [On our GitHub pages](https://fluentmigrator.github.io) |
 | **Discussions**           | [![Gitter](https://img.shields.io/gitter/room/FluentMigrator/fluentmigrator.svg)](https://gitter.im/FluentMigrator/fluentmigrator) |
 | **Bug/Feature Tracking**  | [![GitHub issues](https://img.shields.io/github/issues/fluentmigrator/fluentmigrator.svg)](https://github.com/fluentmigrator/fluentmigrator/issues) |
-| **Build server**          | [![Travis](https://img.shields.io/travis/fluentmigrator/fluentmigrator.svg)](https://travis-ci.org/fluentmigrator/fluentmigrator) |
+| **Build server (old)**          | [![Travis](https://img.shields.io/travis/fluentmigrator/fluentmigrator.svg)](https://travis-ci.org/fluentmigrator/fluentmigrator) |
+| **Build server (new)**    | [![AzureDevOps](https://img.shields.io/azure-devops/build/fluentmigrator/22b31067-b424-416b-b89f-682210a37a55/1)](https://dev.azure.com/fluentmigrator/fluentmigrator/_build?definitionId=1) |
+
+:warning: We are currently migrating from TravisCI to AzureDevOps.
+
+# Prerequisites
+
+| Tool                              | Consequences when not installed |
+|-----------------------------------|---------------------------------|
+| [Multilingual App Toolkit Editor](https://developer.microsoft.com/en-us/windows/develop/multilingual-app-toolkit) | You're unable to create translations. |
+| [Multilingual App Toolkit Extension (VS2017+)](https://marketplace.visualstudio.com/items?itemName=MultilingualAppToolkit.MultilingualAppToolkit-18308) | You get a compilation warning and the changed translation doesn't get compiled. |
 
 # Powered by
 
@@ -41,3 +53,18 @@ while the CI builds are stored on [MyGet](https://www.myget.org/feed/Packages/fl
 # Contributors
 
 A [long list](https://github.com/fluentmigrator/fluentmigrator/blob/master/CONTRIBUTORS.md) of everyone that has contributed to FluentMigrator. Thanks for all the Pull Requests!
+
+# Contributing
+
+Please see our guide on [how to contribute](https://fluentmigrator.github.io/articles/guides/contribution.html)
+
+# Third Party Contributions / FluentMigrator Ecosystem
+
+FluentMigrator has an actively developed and maintained ecosystem thanks to third party contributions. The following table summarizes some contributions (but are not endorsed):
+
+| GitHub/BitBucket | NuGet Package | Description |
+| ---------------- | ------------- | ----------- |
+| [EasyMigrator](https://bitbucket.org/quentin-starin/easymigrator/wiki/Home) | [EasyMigrator.FluentMigrator](https://www.nuget.org/packages/EasyMigrator.FluentMigrator) | EasyMigrator allows you to specify database schema using simple POCOs with minimally attributed fields to represent columns. EasyMigrator's core can be adapted to sit on top of various migration libraries. |
+| [FluentMigrator-Generator](https://github.com/ritterim/fluentmigrator-generator) | [FluentMigrator.Generator](https://www.nuget.org/packages/FluentMigrator.Generator/) | Adds a command to the package manager console to generate migrations for FluentMigrator. |
+| [AspNetBoilerplate](https://github.com/aspnetboilerplate/aspnetboilerplate) | [Abp.FluentMigrator](https://www.nuget.org/packages/Abp.FluentMigrator) | Adds fluent extensions specific to the entity model used by the ASP.NET Boilerplate architecture |
+| [Alt.FluentMigrator.VStudio](https://github.com/crimcol/Alt.FluentMigrator.VStudio) | [Alt.FluentMigrator.VStudio](https://www.nuget.org/packages/Alt.FluentMigrator.VStudio/) | Adds set of commands for Package Manager console:<br> - Add-FluentMigration<br> - Update-FluentDatabase<br> - Rollback-FluentDatabase |

@@ -21,7 +21,7 @@ using McMaster.Extensions.CommandLineUtils;
 namespace FluentMigrator.DotNet.Cli.Commands
 {
     [HelpOption]
-    [Command(Description = "List migrations")]
+    [Command("migrations", Description = "List migrations")]
     public class ListMigrations : ConnectionCommand
     {
         private int OnExecute(IConsole console)
