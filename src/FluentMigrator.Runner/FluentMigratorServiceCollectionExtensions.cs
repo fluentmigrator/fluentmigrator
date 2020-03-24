@@ -15,15 +15,7 @@
 #endregion
 
 
-using System;
-using FluentMigrator.Runner.Initialization;
-using FluentMigrator.Runner.Initialization.AssemblyLoader;
-using FluentMigrator.Runner.Initialization.NetFramework;
-using FluentMigrator.Runner.Logging;
-using FluentMigrator.Runner.Processors;
-using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace FluentMigrator.Runner
 {
