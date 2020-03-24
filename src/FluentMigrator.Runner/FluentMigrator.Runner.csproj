@@ -10,6 +10,38 @@
     <Reference Include="System.Configuration" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Remove="Announcers\**" />
+    <Compile Remove="Constraints\**" />
+    <Compile Remove="Exceptions\**" />
+    <Compile Remove="Extensions\**" />
+    <Compile Remove="Generators\**" />
+    <Compile Remove="Initialization\**" />
+    <Compile Remove="Logging\**" />
+    <Compile Remove="Processors\**" />
+    <Compile Remove="Versioning\**" />
+    <Compile Remove="VersionTableInfo\**" />
+    <EmbeddedResource Remove="Announcers\**" />
+    <EmbeddedResource Remove="Constraints\**" />
+    <EmbeddedResource Remove="Exceptions\**" />
+    <EmbeddedResource Remove="Extensions\**" />
+    <EmbeddedResource Remove="Generators\**" />
+    <EmbeddedResource Remove="Initialization\**" />
+    <EmbeddedResource Remove="Logging\**" />
+    <EmbeddedResource Remove="Processors\**" />
+    <EmbeddedResource Remove="Versioning\**" />
+    <EmbeddedResource Remove="VersionTableInfo\**" />
+    <None Remove="Announcers\**" />
+    <None Remove="Constraints\**" />
+    <None Remove="Exceptions\**" />
+    <None Remove="Extensions\**" />
+    <None Remove="Generators\**" />
+    <None Remove="Initialization\**" />
+    <None Remove="Logging\**" />
+    <None Remove="Processors\**" />
+    <None Remove="Versioning\**" />
+    <None Remove="VersionTableInfo\**" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\FluentMigrator.Runner.Core\FluentMigrator.Runner.Core.csproj" />
     <ProjectReference Include="..\FluentMigrator\FluentMigrator.csproj" />
     <ProjectReference Include="..\FluentMigrator.Runner.Db2\FluentMigrator.Runner.Db2.csproj" />
@@ -33,18 +65,5 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="2.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.0.1" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Announcers\" />
-    <Folder Include="Constraints\" />
-    <Folder Include="Exceptions\" />
-    <Folder Include="Extensions\" />
-    <Folder Include="Generators\" />
-    <Folder Include="Initialization\AssemblyLoader\" />
-    <Folder Include="Initialization\NetFramework\" />
-    <Folder Include="Logging\" />
-    <Folder Include="Processors\" />
-    <Folder Include="Versioning\" />
-    <Folder Include="VersionTableInfo\" />
   </ItemGroup>
 </Project>

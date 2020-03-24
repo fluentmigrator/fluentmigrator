@@ -44,41 +44,6 @@ namespace FluentMigrator.Runner
 
         private bool _versionsLoaded;
 
-        [Obsolete]
-        internal ConnectionlessVersionLoader(
-            IMigrationRunner runner,
-            IAssemblyCollection assemblies,
-            IConventionSet conventionSet,
-            IMigrationRunnerConventions conventions,
-            IRunnerContext runnerContext,
-            IVersionTableMetaData versionTableMetaData = null)
-        {
-            _migrationInformationLoader = runner.MigrationLoader;
-            _processor = runner.Processor;
-
-            Runner = runner;
-            Assemblies = assemblies;
-            Conventions = conventions;
-            StartVersion = runnerContext.StartVersion;
-            TargetVersion = runnerContext.Version;
-
-            VersionInfo = new VersionInfo();
-            VersionTableMetaData = versionTableMetaData ??
-                (IVersionTableMetaData)Activator.CreateInstance(assemblies.Assemblies.GetVersionTableMetaDataType(
-                    Conventions, runnerContext));
-            VersionMigration = new VersionMigration(VersionTableMetaData);
-            VersionSchemaMigration = new VersionSchemaMigration(VersionTableMetaData);
-            VersionUniqueMigration = new VersionUniqueMigration(VersionTableMetaData);
-            VersionDescriptionMigration = new VersionDescriptionMigration(VersionTableMetaData);
-
-            if (VersionTableMetaData is DefaultVersionTableMetaData defaultMetaData)
-            {
-                conventionSet.SchemaConvention?.Apply(defaultMetaData);
-            }
-
-            LoadVersionInfo();
-        }
-
         public ConnectionlessVersionLoader(
             [NotNull] IProcessorAccessor processorAccessor,
             [NotNull] IMigrationRunnerConventions conventions,

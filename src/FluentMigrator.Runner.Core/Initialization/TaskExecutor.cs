@@ -63,57 +63,7 @@ namespace FluentMigrator.Runner.Initialization
             _lazyServiceProvider = new Lazy<IServiceProvider>(() => serviceProvider);
         }
 
-        [Obsolete]
-        public TaskExecutor([NotNull] IRunnerContext runnerContext)
-        {
-            var runnerCtxt = runnerContext ?? throw new ArgumentNullException(nameof(runnerContext));
-            _logger = new AnnouncerFluentMigratorLogger(runnerCtxt.Announcer);
-            _runnerOptions = new RunnerOptions(runnerCtxt);
-            var asmLoaderFactory = new AssemblyLoaderFactory();
-            _assemblySource = new AssemblySource(() => new AssemblyCollection(asmLoaderFactory.GetTargetAssemblies(runnerCtxt.Targets)));
-            ConnectionStringProvider = new DefaultConnectionStringProvider();
-            _lazyServiceProvider = new Lazy<IServiceProvider>(
-                () => runnerContext
-                    .CreateServices(
-                        ConnectionStringProvider,
-                        asmLoaderFactory)
-                    .BuildServiceProvider(validateScopes: true));
-        }
-
-        [Obsolete("Ony the statically provided factories are accessed")]
-        public TaskExecutor(
-            [NotNull] IRunnerContext runnerContext,
-            [CanBeNull] IConnectionStringProvider connectionStringProvider,
-            [NotNull] AssemblyLoaderFactory assemblyLoaderFactory,
-            // ReSharper disable once UnusedParameter.Local
-            MigrationProcessorFactoryProvider factoryProvider)
-            : this(
-                runnerContext,
-                assemblyLoaderFactory,
-                connectionStringProvider)
-        {
-        }
-
-        [Obsolete]
-        public TaskExecutor(
-            [NotNull] IRunnerContext runnerContext,
-            [NotNull] AssemblyLoaderFactory assemblyLoaderFactory,
-            [CanBeNull] IConnectionStringProvider connectionStringProvider = null)
-        {
-            var runnerCtxt = runnerContext ?? throw new ArgumentNullException(nameof(runnerContext));
-            _logger = new AnnouncerFluentMigratorLogger(runnerCtxt.Announcer);
-            _runnerOptions = new RunnerOptions(runnerCtxt);
-            ConnectionStringProvider = connectionStringProvider;
-            var asmLoaderFactory = assemblyLoaderFactory ?? throw new ArgumentNullException(nameof(assemblyLoaderFactory));
-            _assemblySource = new AssemblySource(() => new AssemblyCollection(asmLoaderFactory.GetTargetAssemblies(runnerCtxt.Targets)));
-            _lazyServiceProvider = new Lazy<IServiceProvider>(
-                () => runnerContext
-                    .CreateServices(
-                        connectionStringProvider,
-                        asmLoaderFactory)
-                    .BuildServiceProvider(validateScopes: true));
-        }
-
+      
         /// <summary>
         /// Gets the current migration runner
         /// </summary>
