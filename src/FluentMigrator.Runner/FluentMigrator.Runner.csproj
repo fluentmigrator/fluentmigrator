@@ -34,4 +34,17 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="2.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.0.1" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Announcers\" />
+    <Folder Include="Constraints\" />
+    <Folder Include="Exceptions\" />
+    <Folder Include="Extensions\" />
+    <Folder Include="Generators\" />
+    <Folder Include="Initialization\AssemblyLoader\" />
+    <Folder Include="Initialization\NetFramework\" />
+    <Folder Include="Logging\" />
+    <Folder Include="Processors\" />
+    <Folder Include="Versioning\" />
+    <Folder Include="VersionTableInfo\" />
+  </ItemGroup>
 </Project>
