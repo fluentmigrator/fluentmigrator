@@ -67,12 +67,8 @@ namespace FluentMigrator.Tests.Unit.Initialization
             Assert.AreEqual(null, expr.SchemaName);
         }
 
-        /// <summary>Demonstrate that AddFluentMigratorCore() always registers a class to handle
-        /// IConventionSet; even when one has already been registered in the services collection.
-        /// Because the ServiceCollection is LIFO, the last one registered is the one that gets
-        /// used.</summary>
         [Test]
-        public void RegisterOnlyOneConventionSet()
+        public void RegisterOnlyOneConventionSetIfRegisteredBeforeAddCall()
         {
             const string schemaName = "RegTestSchemaA";
 
@@ -83,6 +79,8 @@ namespace FluentMigrator.Tests.Unit.Initialization
                     defaultSchemaName: schemaName,
                     workingDirectory: null
                 ));
+
+            // The AddFluentMigratorCore should not register a 2nd IConventionSet
 
             services
                 .AddFluentMigratorCore()
