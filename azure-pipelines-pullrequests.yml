@@ -24,7 +24,7 @@ steps:
 - task: UseGitVersion@5
   displayName: 'UseGitVersion (preview)'
   inputs:
-    versionSpec: '5.x'
+    versionSpec: '5.1.3'
     includePrerelease: true
     updateAssemblyInfo: false
   env:
