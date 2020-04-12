@@ -31,6 +31,7 @@ using FluentMigrator.Validation;
 
 using JetBrains.Annotations;
 
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -99,8 +100,12 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddScoped<IConventionSetAccessor, AssemblySourceConventionSetAccessor>()
 
                 // The default set of conventions to be applied to migration expressions
-                .AddScoped(sp => sp.GetRequiredService<IConventionSetAccessor>().GetConventionSet() ?? ActivatorUtilities.CreateInstance<DefaultConventionSet>(sp))
+                .TryAddScoped(sp =>
+                    sp.GetRequiredService<IConventionSetAccessor>().GetConventionSet()
+                    ?? ActivatorUtilities.CreateInstance<DefaultConventionSet>(sp)
+                    );
 
+            services
                 // Configure the accessor for the version table metadata
                 .AddScoped<IVersionTableMetaDataAccessor, AssemblySourceVersionTableMetaDataAccessor>()
 
