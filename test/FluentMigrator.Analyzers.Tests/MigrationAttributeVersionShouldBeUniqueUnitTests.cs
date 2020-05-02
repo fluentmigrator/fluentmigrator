@@ -1,14 +1,15 @@
 using System.Threading.Tasks;
-using Xunit;
-using Verify = Microsoft.CodeAnalysis.CSharp.CodeFix.Testing.MSTest.CodeFixVerifier<
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Verify = Microsoft.CodeAnalysis.CSharp.Testing.MSTest.CodeFixVerifier<
     FluentMigrator.Analyzers.MigrationAttributeVersionShouldBeUniqueAnalyzer,
     FluentMigrator.Analyzers.MigrationAttributeVersionShouldBeUniqueCodeFixProvider>;
 
 namespace FluentMigrator.Analyzers.Tests
 {
+    [TestClass]
     public class MigrationAttributeVersionShouldBeUniqueUnitTests
     {
-        [Fact]
+        [TestMethod]
         public async Task Doesnt_Warns_On_Unique_Migration_Version()
         {
             var test = @"
@@ -21,11 +22,11 @@ namespace FluentMigrator.Analyzers.Tests
         {   
         }
     }";
-
-            await Verify.VerifyCSharpDiagnosticAsync(test);
+            var expected = Verify.Diagnostic();
+            await Verify.VerifyAnalyzerAsync(test, expected);
         }
 
-        [Fact]
+        [TestMethod]
         public async Task Warns_On_Duplicate_Migration_Version()
         {
             var test = @"
@@ -47,7 +48,7 @@ namespace FluentMigrator.Analyzers.Tests
             var fixtest = @"";
 
             var expected = Verify.Diagnostic(nameof(MigrationAttributeVersionShouldBeUniqueAnalyzer)).WithLocation(11, 15).WithArguments("TypeName");
-            await Verify.VerifyCSharpFixAsync(test, expected, fixtest);
+            await Verify.VerifyCodeFixAsync(test, expected, fixtest);
         }
     }
 }
