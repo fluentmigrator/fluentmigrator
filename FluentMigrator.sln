@@ -80,9 +80,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FluentMigrator.Extensions.Oracle", "src\FluentMigrator.Extensions.Oracle\FluentMigrator.Extensions.Oracle.csproj", "{56103516-EDEA-494F-A3FA-0CCDB5348453}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "analyzers", "analyzers", "{0AE6885C-028C-4073-A71C-E6DB7E7E87BA}"
-	ProjectSection(SolutionItems) = preProject
-		src\FluentMigrator.Analyzers\FluentMigrator.Analyzers.csproj = src\FluentMigrator.Analyzers\FluentMigrator.Analyzers.csproj
-	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FluentMigrator.Analyzers", "src\FluentMigrator.Analyzers\FluentMigrator.Analyzers.csproj", "{B37BDF3B-ECCE-4B78-9F2D-C7A952AA748F}"
 EndProject
