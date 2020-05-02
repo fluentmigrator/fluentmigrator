@@ -64,27 +64,27 @@ namespace FluentMigrator.Analyzers {
         /// <summary>
         ///   Looks up a localized string similar to Migration version isn&apos;t unique.
         /// </summary>
-        internal static string MigrationAttributeVersionShouldBeUniqueDescription {
+        internal static string MigrationAttributeVersionShouldBeUniqueAnalyzerDescription {
             get {
-                return ResourceManager.GetString("MigrationAttributeVersionShouldBeUniqueDescription", resourceCulture);
+                return ResourceManager.GetString("MigrationAttributeVersionShouldBeUniqueAnalyzerDescription", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Migration attributes on &apos;{0}&apos; having conflicting version of {1}.
         /// </summary>
-        internal static string MigrationAttributeVersionShouldBeUniqueMessageFormat {
+        internal static string MigrationAttributeVersionShouldBeUniqueAnalyzerMessageFormat {
             get {
-                return ResourceManager.GetString("MigrationAttributeVersionShouldBeUniqueMessageFormat", resourceCulture);
+                return ResourceManager.GetString("MigrationAttributeVersionShouldBeUniqueAnalyzerMessageFormat", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Migration version isn&apos;t unique.
         /// </summary>
-        internal static string MigrationAttributeVersionShouldBeUniqueTitle {
+        internal static string MigrationAttributeVersionShouldBeUniqueAnalyzerTitle {
             get {
-                return ResourceManager.GetString("MigrationAttributeVersionShouldBeUniqueTitle", resourceCulture);
+                return ResourceManager.GetString("MigrationAttributeVersionShouldBeUniqueAnalyzerTitle", resourceCulture);
             }
         }
     }

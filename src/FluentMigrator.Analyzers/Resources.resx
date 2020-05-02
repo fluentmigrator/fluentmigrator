@@ -117,13 +117,13 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="MigrationAttributeVersionShouldBeUniqueDescription" xml:space="preserve">
+  <data name="MigrationAttributeVersionShouldBeUniqueAnalyzerDescription" xml:space="preserve">
     <value>Migration version isn't unique</value>
   </data>
-  <data name="MigrationAttributeVersionShouldBeUniqueMessageFormat" xml:space="preserve">
+  <data name="MigrationAttributeVersionShouldBeUniqueAnalyzerMessageFormat" xml:space="preserve">
     <value>Migration attributes on '{0}' having conflicting version of {1}</value>
   </data>
-  <data name="MigrationAttributeVersionShouldBeUniqueTitle" xml:space="preserve">
+  <data name="MigrationAttributeVersionShouldBeUniqueAnalyzerTitle" xml:space="preserve">
     <value>Migration version isn't unique</value>
   </data>
 </root>
