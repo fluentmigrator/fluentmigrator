@@ -35,6 +35,13 @@ namespace FluentMigrator.Builders.Execute
         void Sql(string sqlStatement);
 
         /// <summary>
+        /// Executes an SQL statement
+        /// </summary>
+        /// <param name="sqlStatement">The SQL statement to execute</param>
+        /// <param name="description">Description for this SQL statement for logging purposes</param>
+        void Sql(string sqlStatement, string description);
+
+        /// <summary>
         /// Executes an SQL script loaded from the given file
         /// </summary>
         /// <param name="pathToSqlScript">The file to read the SQL script from</param>

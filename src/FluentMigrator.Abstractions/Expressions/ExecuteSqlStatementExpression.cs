@@ -33,6 +33,11 @@ namespace FluentMigrator.Expressions
         [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.SqlStatementCannotBeNullOrEmpty))]
         public virtual string SqlStatement { get; set; }
 
+        /// <summary>
+        /// Gets or sets the description for this SQL statement
+        /// </summary>
+        public virtual string Description { get; set; }
+
         /// <inheritdoc />
         public override void ExecuteWith(IMigrationProcessor processor)
         {
@@ -42,7 +47,7 @@ namespace FluentMigrator.Expressions
         /// <inheritdoc />
         public override string ToString()
         {
-            return base.ToString() + SqlStatement;
+            return base.ToString() + (Description ?? SqlStatement);
         }
     }
 }
