@@ -1,15 +1,14 @@
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Verify = Microsoft.CodeAnalysis.CSharp.Testing.MSTest.CodeFixVerifier<
+using NUnit.Framework;
+using Verify = Microsoft.CodeAnalysis.CSharp.Testing.NUnit.CodeFixVerifier<
     FluentMigrator.Analyzers.MigrationAttributeVersionShouldBeUniqueAnalyzer,
     FluentMigrator.Analyzers.MigrationAttributeVersionShouldBeUniqueCodeFixProvider>;
 
 namespace FluentMigrator.Analyzers.Tests
 {
-    [TestClass]
     public class MigrationAttributeVersionShouldBeUniqueUnitTests
     {
-        [TestMethod]
+        [Test]
         public async Task Doesnt_Warns_On_Unique_Migration_Version()
         {
             var test = @"
@@ -26,7 +25,7 @@ namespace FluentMigrator.Analyzers.Tests
             await Verify.VerifyAnalyzerAsync(test, expected);
         }
 
-        [TestMethod]
+        [Test]
         public async Task Warns_On_Duplicate_Migration_Version()
         {
             var test = @"
