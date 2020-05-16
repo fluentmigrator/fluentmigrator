@@ -24,9 +24,10 @@ namespace FluentMigrator.Runner.Generators.Oracle
 {
     public class OracleQuoterBase : GenericQuoter
     {
-        private const int MaxStringLength = 3900;
+        // http://www.dba-oracle.com/t_ora_01704_string_literal_too_long.htm
+        public const int MaxStringLength = 4000;
 
-        private static IEnumerable<string> SplitBy(string str, int chunkLength)
+        public static IEnumerable<string> SplitBy(string str, int chunkLength)
         {
             if (string.IsNullOrEmpty(str))
             {
@@ -38,14 +39,27 @@ namespace FluentMigrator.Runner.Generators.Oracle
                 throw new ArgumentException();
             }
 
-            for (var i = 0; i < str.Length; i += chunkLength)
+            var strLength = str.Length;
+
+            for (var i = 0; i < strLength; i += chunkLength)
             {
-                if (chunkLength + i > str.Length)
+                if (chunkLength + i > strLength)
                 {
-                    chunkLength = str.Length - i;
+                    chunkLength = strLength - i;
                 }
 
-                yield return str.Substring(i, chunkLength);
+                var substr = str.Substring(i, chunkLength);
+
+                // Count quotes and reduce chunk length to this number, because they will be doubled
+                var quoteCount = substr.Count(f => f == '\'');
+
+                if (quoteCount > 0)
+                {
+                    substr = str.Substring(i, chunkLength - quoteCount);
+                    i -= quoteCount;
+                }
+
+                yield return substr;
             }
         }
 
