@@ -21,6 +21,7 @@ using System;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 
 using FluentMigrator.Expressions;
@@ -1701,6 +1702,59 @@ namespace FluentMigrator.Tests.Integration
                 typeof(FirebirdProcessor));
         }
 
+        [Test]
+        [Category("MySql")]
+        [Category("SQLite")]
+        [Category("Postgres")]
+        [Category("SqlServer2005")]
+        [Category("SqlServer2008")]
+        [Category("SqlServer2012")]
+        [Category("SqlServer2014")]
+        [Category("SqlServer2016")]
+        [Category("SqlAnywhere16")]
+        public void CanSaveSqlStatementWithDescription()
+        {
+            var outputSql = new StringBuilder();
+           
+            var provider = new SqlScriptFluentMigratorLoggerProvider(
+                new StringWriter(outputSql),
+                new SqlScriptFluentMigratorLoggerOptions()
+                {
+                    ShowSql = true,
+                });
+
+            ExecuteWithSupportedProcessors(
+                services =>
+                {
+                    // Clear sql output between each processor execution
+                    outputSql.Clear();
+
+                    services
+                        .ConfigureRunner(rb => rb.WithVersionTable(new TestVersionTableMetaData()))
+                        .WithMigrationsIn(RootNamespace)
+                        .Configure<ProcessorOptions>(opt => opt.PreviewOnly = true)
+                        .AddSingleton<ILoggerProvider>(provider);
+                },
+                (serviceProvider, processor) =>
+                {
+                    var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
+
+                    runner.Up(new TestExecuteSqlDescription());
+                    runner.Down(new TestExecuteSqlDescription());
+                    processor.CommitTransaction();
+                    var outputSqlString = outputSql.ToString();
+                    var selectUpMatches = new Regex("SELECT 1 FROM FOO")
+                            .Matches(outputSqlString).Count;
+
+                    var selectDownMatches = new Regex("SELECT 2 FROM BAR")
+                            .Matches(outputSqlString).Count;
+
+                    selectUpMatches.ShouldBe(1);
+                    selectDownMatches.ShouldBe(1);
+                },
+                false);
+        }
+
         private void CleanupTestSqlServerDatabase<TProcessor>(IServiceProvider serviceProvider, TProcessor origProcessor)
             where TProcessor : SqlServerProcessor
         {
@@ -2163,6 +2217,19 @@ namespace FluentMigrator.Tests.Integration
         public override void Up()
         {
             Create.UniqueConstraint("TestUnique").OnTable("TestTable2").WithSchema("TestSchema").Column("Name");
+        }
+    }
+
+    internal class TestExecuteSqlDescription : Migration
+    {
+        public override void Up()
+        {
+            Execute.Sql("SELECT 1 FROM FOO", "Description Up");
+        }
+
+        public override void Down()
+        {
+            Execute.Sql("SELECT 2 FROM BAR", "Description Down");
         }
     }
 
