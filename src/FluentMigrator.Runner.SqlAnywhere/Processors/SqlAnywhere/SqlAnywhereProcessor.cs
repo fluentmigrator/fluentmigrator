@@ -100,7 +100,7 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                Logger.LogError(e, "There was an exception checking if table {Table} in {Schema} exists", tableName, schemaName);
             }
             return false;
         }
