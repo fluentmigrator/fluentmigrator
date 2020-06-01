@@ -50,9 +50,9 @@ namespace FluentMigrator.MSBuild
             AppDomain.CurrentDomain.ResourceResolve += CurrentDomain_ResourceResolve;
         }
 
-        private static Assembly CurrentDomain_ResourceResolve(object sender, ResolveEventArgs args)
+        private Assembly CurrentDomain_ResourceResolve(object sender, ResolveEventArgs args)
         {
-            Console.WriteLine(@"Could Not Resolve {0}", args.Name);
+            Log.LogWarning(@"Could Not Resolve {0}", args.Name);
             return null;
         }
 
