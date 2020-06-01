@@ -52,6 +52,13 @@ namespace FluentMigrator.Builders.Execute
         }
 
         /// <inheritdoc />
+        public void Sql(string sqlStatement, string description)
+        {
+            var expression = new ExecuteSqlStatementExpression { SqlStatement = sqlStatement, Description = description };
+            _context.Expressions.Add(expression);
+        }
+
+        /// <inheritdoc />
         public void Script(string pathToSqlScript, IDictionary<string, string> parameters)
         {
             var expression = new ExecuteSqlScriptExpression

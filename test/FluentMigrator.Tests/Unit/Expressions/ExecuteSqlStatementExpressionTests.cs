@@ -55,5 +55,12 @@ namespace FluentMigrator.Tests.Unit.Expressions
             var expression = new ExecuteSqlStatementExpression() { SqlStatement = "INSERT INTO BLAH" };
             expression.ToString().ShouldBe("ExecuteSqlStatement INSERT INTO BLAH");
         }
+
+        [Test]
+        public void ToStringCanUseDescription()
+        {
+            var expression = new ExecuteSqlStatementExpression() { SqlStatement = "INSERT INTO BLAH", Description = "FOOBAR" };
+            expression.ToString().ShouldBe("ExecuteSqlStatement FOOBAR");
+        }
     }
 }
