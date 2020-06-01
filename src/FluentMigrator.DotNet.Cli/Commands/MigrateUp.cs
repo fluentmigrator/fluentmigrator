@@ -25,10 +25,10 @@ namespace FluentMigrator.DotNet.Cli.Commands
     [Command("up", Description = "Apply migrations")]
     public class MigrateUp : BaseCommand
     {
-        public Migrate Parent { get; }
+        public Migrate Parent { get; set; }
 
         [Option("-t|--target <TARGET_VERSION>", Description = "The specific version to migrate.")]
-        public long? TargetVersion { get; }
+        public long? TargetVersion { get; set; }
 
         private int OnExecute(IConsole console)
         {

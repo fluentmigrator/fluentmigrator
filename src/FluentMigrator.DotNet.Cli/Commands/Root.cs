@@ -20,10 +20,7 @@ namespace FluentMigrator.DotNet.Cli.Commands
 {
     [HelpOption(Description = "Execute FluentMigrator actions")]
     [Command("dotnet-fm", Description = "The external FluentMigrator runner that integrates into the .NET Core CLI tooling")]
-    [Subcommand(typeof(Migrate))]
-    [Subcommand(typeof(Rollback))]
-    [Subcommand(typeof(Validate))]
-    [Subcommand(typeof(ListCommand))]
+    [Subcommand(typeof(Migrate), typeof(Rollback), typeof(Validate), typeof(ListCommand))]
     public class Root
     {
         protected int OnExecute(CommandLineApplication app, IConsole console)
