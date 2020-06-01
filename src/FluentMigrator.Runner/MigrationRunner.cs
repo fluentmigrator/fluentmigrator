@@ -643,6 +643,12 @@ namespace FluentMigrator.Runner
                 throw new ArgumentNullException(nameof(migrationInfo));
             }
 
+            if (!_alreadyOutputPreviewOnlyModeWarning && _processorOptions.PreviewOnly)
+            {
+                _logger.LogHeader("PREVIEW-ONLY MODE");
+                _alreadyOutputPreviewOnlyModeWarning = true;
+            }
+
             var name = migrationInfo.GetName();
             _logger.LogHeader($"{name} reverting");
 
