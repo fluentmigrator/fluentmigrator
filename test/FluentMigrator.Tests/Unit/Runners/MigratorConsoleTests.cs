@@ -130,7 +130,7 @@ namespace FluentMigrator.Tests.Unit.Runners
         }
 
         [Test]
-        public void ConsoleAnnouncerHasOutputEvenIfMarkedAsPreviewOnly()
+        public void ConsoleAnnouncerHasOutputEvenIfMarkedAsPreviewOnlyMigrateUp()
         {
             var sb = new StringBuilder();
             var stringWriter = new StringWriter(sb);
@@ -145,6 +145,30 @@ namespace FluentMigrator.Tests.Unit.Runners
                 "/namespace", "FluentMigrator.Tests.Unit.Runners.Migrations",
                 "/verbose", "true",
                 "/task", "migrate:up",
+                "/preview");
+
+            var output = sb.ToString();
+            Assert.That(output.Contains("PREVIEW-ONLY MODE"));
+            Assert.AreNotEqual(0, output.Length);
+        }
+
+        [Test]
+        public void ConsoleAnnouncerHasOutputEvenIfMarkedAsPreviewOnlyMigrateDown()
+        {
+            var sb = new StringBuilder();
+            var stringWriter = new StringWriter(sb);
+
+            System.Console.SetOut(stringWriter);
+            System.Console.SetError(stringWriter);
+
+            new MigratorConsole().Run(
+                "/db", Database,
+                "/connection", Connection,
+                "/target", Target,
+                "/namespace", "FluentMigrator.Tests.Unit.Runners.Migrations",
+                "/verbose", "true",
+                "/task", "migrate:down",
+                "/version", "2",
                 "/preview");
 
             var output = sb.ToString();
