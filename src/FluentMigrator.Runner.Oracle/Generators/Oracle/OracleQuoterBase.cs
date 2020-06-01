@@ -15,6 +15,8 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 using FluentMigrator.Runner.Generators.Generic;
 
@@ -22,6 +24,45 @@ namespace FluentMigrator.Runner.Generators.Oracle
 {
     public class OracleQuoterBase : GenericQuoter
     {
+        // http://www.dba-oracle.com/t_ora_01704_string_literal_too_long.htm
+        public const int MaxStringLength = 4000;
+
+        public static IEnumerable<string> SplitBy(string str, int chunkLength)
+        {
+            if (string.IsNullOrEmpty(str))
+            {
+                throw new ArgumentException();
+            }
+
+            if (chunkLength < 1)
+            {
+                throw new ArgumentException();
+            }
+
+            var strLength = str.Length;
+
+            for (var i = 0; i < strLength; i += chunkLength)
+            {
+                if (chunkLength + i > strLength)
+                {
+                    chunkLength = strLength - i;
+                }
+
+                var substr = str.Substring(i, chunkLength);
+
+                // Count quotes and reduce chunk length to this number, because they will be doubled
+                var quoteCount = substr.Count(f => f == '\'');
+
+                if (quoteCount > 0)
+                {
+                    substr = str.Substring(i, chunkLength - quoteCount);
+                    i -= quoteCount;
+                }
+
+                yield return substr;
+            }
+        }
+
         public override string FormatDateTime(DateTime value)
         {
             var result = string.Format("to_date({0}{1}{0}, {0}yyyy-mm-dd hh24:mi:ss{0})", ValueQuote, value.ToString("yyyy-MM-dd HH:mm:ss")); //ISO 8601 DATETIME FORMAT (EXCEPT 'T' CHAR)
@@ -62,6 +103,39 @@ namespace FluentMigrator.Runner.Generators.Oracle
             }
 
             return base.FormatSystemMethods(value);
+        }
+
+        private static string FormatString(string value, string oracleFunction, Func<string, string> formatter)
+        {
+            if (value.Length < MaxStringLength)
+            {
+                return formatter(value);
+            }
+
+            var chunks = SplitBy(value, MaxStringLength)
+                .Select(v => $"{oracleFunction}({formatter(v)})");
+
+            return string.Join(" || ", chunks);
+        }
+
+        public override string FormatAnsiString(string value)
+        {
+            if (value.Length < MaxStringLength)
+            {
+                return base.FormatAnsiString(value);
+            }
+
+            return FormatString(value, "TO_CLOB", base.FormatAnsiString);
+        }
+
+        public override string FormatNationalString(string value)
+        {
+            if (value.Length < MaxStringLength)
+            {
+                return base.FormatAnsiString(value);
+            }
+
+            return FormatString(value, "TO_NCLOB", base.FormatNationalString);
         }
     }
 }
