@@ -255,5 +255,23 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
             var result = _generator.Generate(expression);
             result.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC, [TestColumn2] DESC) WHERE [TestColumn1] IS NOT NULL AND [TestColumn2] IS NOT NULL");
         }
+
+        [Test]
+        public void CanCreateIndexWithFilter()
+        {
+            var expression = GeneratorTestHelper.GetCreateIndexExpression();
+            new CreateIndexExpressionBuilder(expression).Filter("TestColumn2 IS NULL");
+            var result = _generator.Generate(expression);
+            result.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) WHERE TestColumn2 IS NULL");
+        }
+
+        [Test]
+        public void CanCreateIndexWithCompression()
+        {
+            var expression = GeneratorTestHelper.GetCreateIndexExpression();
+            new CreateIndexExpressionBuilder(expression).WithDataCompression(DataCompressionType.Page);
+            var result = _generator.Generate(expression);
+            result.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) WITH (DATA_COMPRESSION = PAGE)");
+        }
     }
 }
