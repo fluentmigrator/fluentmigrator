@@ -143,7 +143,7 @@ namespace FluentMigrator.Tests.Unit.Runners
                 "/connection", Connection,
                 "/target", Target,
                 "/namespace", "FluentMigrator.Tests.Unit.Runners.Migrations",
-                "/verbose",
+                "/verbose", "true",
                 "/task", "migrate:up",
                 "/preview");
 
