@@ -14,6 +14,8 @@
 // limitations under the License.
 #endregion
 
+using System.Linq;
+
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Conventions;
@@ -63,6 +65,95 @@ namespace FluentMigrator.Tests.Unit.Initialization
             ISchemaExpression expr = new CreateTableExpression();
             conventionSet.SchemaConvention.Apply(expr);
             Assert.AreEqual(null, expr.SchemaName);
+        }
+
+        [Test]
+        public void RegisterOnlyOneConventionSetIfRegisteredBeforeAddCall()
+        {
+            const string schemaName = "RegTestSchemaA";
+
+            var services = new ServiceCollection();
+
+            services.AddScoped<IConventionSet>(provider =>
+                new DefaultConventionSet(
+                    defaultSchemaName: schemaName,
+                    workingDirectory: null
+                ));
+
+            // The AddFluentMigratorCore should not register a 2nd IConventionSet
+
+            services
+                .AddFluentMigratorCore()
+                .ConfigureRunner(rb => rb
+                    .AddSQLite()
+                    .ScanIn(this.GetType().Assembly).For.Migrations()
+                );
+
+            var serviceProvider = services.BuildServiceProvider(false);
+
+            var conventionSets = serviceProvider.GetServices<IConventionSet>();
+
+            Assert.AreEqual(1, conventionSets.Count());
+        }
+
+        [Test]
+        public void GetCorrectSchemaFromCustomConventionSetIfRegisteredBeforeAddCall()
+        {
+            const string schemaName = "RegTestSchemaA";
+
+            var services = new ServiceCollection();
+
+            // register our IConventionSet before the call to AddFluentMigratorCore()
+            services.AddScoped<IConventionSet>(provider =>
+                new DefaultConventionSet(
+                    defaultSchemaName: schemaName,
+                    workingDirectory: null
+                ));
+
+            services
+                .AddFluentMigratorCore()
+                .ConfigureRunner(rb => rb
+                    .AddSQLite()
+                    .ScanIn(this.GetType().Assembly).For.Migrations()
+                );
+
+            var serviceProvider = services.BuildServiceProvider(false);
+
+            var conventionSet = serviceProvider.GetRequiredService<IConventionSet>();
+            ISchemaExpression expr = new CreateTableExpression();
+            conventionSet.SchemaConvention.Apply(expr);
+
+            Assert.AreEqual(schemaName, expr.SchemaName);
+        }
+
+        [Test]
+        public void GetCorrectSchemaFromCustomConventionSetIfRegisteredAfterAddCall()
+        {
+            const string schemaName = "RegTestSchemaA";
+
+            var services = new ServiceCollection();
+
+            services
+                .AddFluentMigratorCore()
+                .ConfigureRunner(rb => rb
+                    .AddSQLite()
+                    .ScanIn(this.GetType().Assembly).For.Migrations()
+                );
+
+            // register our IConventionSet after the call to AddFluentMigratorCore()
+            services.AddScoped<IConventionSet>(provider =>
+                new DefaultConventionSet(
+                    defaultSchemaName: schemaName,
+                    workingDirectory: null
+                ));
+
+            var serviceProvider = services.BuildServiceProvider(false);
+
+            var conventionSet = serviceProvider.GetRequiredService<IConventionSet>();
+            ISchemaExpression expr = new CreateTableExpression();
+            conventionSet.SchemaConvention.Apply(expr);
+
+            Assert.AreEqual(schemaName, expr.SchemaName);
         }
 
         // ReSharper disable once UnusedMember.Global

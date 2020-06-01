@@ -14,6 +14,7 @@
 // limitations under the License.
 #endregion
 
+using System;
 using System.ComponentModel.DataAnnotations;
 
 using McMaster.Extensions.CommandLineUtils;
@@ -50,7 +51,8 @@ namespace FluentMigrator.DotNet.Cli.Commands
         public string Profile { get; set; }
 
         [Option("--context <CONTEXT>", Description = "Set ApplicationContext to the given string.")]
-        public string Context { get; set; }
+        [Obsolete("Use dependency injection to access 'application state'.")]
+        public string Context { get; }
 
         [Option("--timeout <TIMEOUT_SEC>", Description = "Overrides the default database command timeout of 30 seconds.")]
         public int Timeout { get; set; }

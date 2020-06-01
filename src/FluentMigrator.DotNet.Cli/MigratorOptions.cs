@@ -16,6 +16,7 @@
 //
 #endregion
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -50,6 +51,8 @@ namespace FluentMigrator.DotNet.Cli
         public bool Preview { get; private set; }
         public bool Verbose { get; private set; }
         public string Profile { get; private set; }
+
+        [Obsolete("Use dependency injection to access 'application state'.")]
         public string Context { get; private set; }
         public int? Timeout { get; private set; }
         public TransactionMode TransactionMode { get; private set; }
