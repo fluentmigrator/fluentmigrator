@@ -9,7 +9,7 @@ At the heart of a flexible framework that allows for DI are three components:
 2. Component that instantiates the types
 3. Component that returns the types
 
-Levels two and three are basically combine-able - there's usually not a lot of benefit to creating the type and returning it separately.
+Levels two and three are basically combine-able - there's usually not a lot of benefit to creating the instance and returning it separately.
 
 In FluentMigrator, as we'll see in my table constructed below, sometimes components 1 and 2 are combined, and sometimes 3 is a standalone component.  More often than not, components 2 and 3 are combined.
 
