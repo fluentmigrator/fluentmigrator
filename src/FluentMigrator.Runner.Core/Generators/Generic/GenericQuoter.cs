@@ -224,13 +224,17 @@ namespace FluentMigrator.Runner.Generators.Generic
         /// <inheritdoc />
         public virtual string QuoteConstraintName(string constraintName, string schemaName = null)
         {
-            return IsQuoted(constraintName) ? constraintName : Quote(constraintName);
+            return CreateSchemaPrefixedQuotedIdentifier(
+                QuoteSchemaName(schemaName),
+                IsQuoted(constraintName) ? constraintName : Quote(constraintName));
         }
 
         /// <inheritdoc />
         public virtual string QuoteIndexName(string indexName, string schemaName)
         {
-            return IsQuoted(indexName) ? indexName : Quote(indexName);
+            return CreateSchemaPrefixedQuotedIdentifier(
+                QuoteSchemaName(schemaName),
+                IsQuoted(indexName) ? indexName : Quote(indexName));
         }
 
         /// <inheritdoc />

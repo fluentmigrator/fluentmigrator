@@ -160,12 +160,12 @@ namespace FluentMigrator.Runner.Generators.Generic
         /// <inheritdoc />
         public override string Generate(CreateIndexExpression expression)
         {
-            var indexColumns = new string[expression.Index.Columns.Count];
-            IndexColumnDefinition columnDef;
+            var index = expression.Index;
+            var indexColumns = new string[index.Columns.Count];
 
-            for (var i = 0; i < expression.Index.Columns.Count; i++)
+            for (var i = 0; i < index.Columns.Count; i++)
             {
-                columnDef = expression.Index.Columns.ElementAt(i);
+                var columnDef = index.Columns.ElementAt(i);
                 if (columnDef.Direction == Direction.Ascending)
                 {
                     indexColumns[i] = Quoter.QuoteColumnName(columnDef.Name) + " ASC";
@@ -179,14 +179,15 @@ namespace FluentMigrator.Runner.Generators.Generic
             return string.Format(CreateIndex
                 , GetUniqueString(expression)
                 , GetClusterTypeString(expression)
-                , Quoter.QuoteIndexName(expression.Index.Name)
-                , Quoter.QuoteTableName(expression.Index.TableName, expression.Index.SchemaName)
+                , Quoter.QuoteIndexName(index.Name, index.SchemaName)
+                , Quoter.QuoteTableName(index.TableName, index.SchemaName)
                 , string.Join(", ", indexColumns));
         }
 
         public override string Generate(DeleteIndexExpression expression)
         {
-            return string.Format(DropIndex, Quoter.QuoteIndexName(expression.Index.Name), Quoter.QuoteTableName(expression.Index.TableName, expression.Index.SchemaName));
+            var index = expression.Index;
+            return string.Format(DropIndex, Quoter.QuoteIndexName(index.Name, index.SchemaName), Quoter.QuoteTableName(index.TableName, index.SchemaName));
         }
 
         public override string Generate(CreateForeignKeyExpression expression)
@@ -199,17 +200,18 @@ namespace FluentMigrator.Runner.Generators.Generic
 
         public override string Generate(CreateConstraintExpression expression)
         {
-            var constraintType = (expression.Constraint.IsPrimaryKeyConstraint) ? "PRIMARY KEY" : "UNIQUE";
+            var constraint = expression.Constraint;
+            var constraintType = constraint.IsPrimaryKeyConstraint ? "PRIMARY KEY" : "UNIQUE";
 
-            var columns = new string[expression.Constraint.Columns.Count];
+            var columns = new string[constraint.Columns.Count];
 
-            for (var i = 0; i < expression.Constraint.Columns.Count; i++)
+            for (var i = 0; i < constraint.Columns.Count; i++)
             {
-                columns[i] = Quoter.QuoteColumnName(expression.Constraint.Columns.ElementAt(i));
+                columns[i] = Quoter.QuoteColumnName(constraint.Columns.ElementAt(i));
             }
 
-            return string.Format(CreateConstraint, Quoter.QuoteTableName(expression.Constraint.TableName, expression.Constraint.SchemaName),
-                Quoter.QuoteConstraintName(expression.Constraint.ConstraintName),
+            return string.Format(CreateConstraint, Quoter.QuoteTableName(constraint.TableName, constraint.SchemaName),
+                Quoter.QuoteConstraintName(constraint.ConstraintName, constraint.SchemaName),
                 constraintType,
                 string.Join(", ", columns));
         }
