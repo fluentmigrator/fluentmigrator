@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2020, FluentMigrator Project
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -42,7 +42,7 @@ namespace FluentMigrator.Tests.Logging
         public void Write_exception_with_inner_exception() =>
             _writer.WriteException(new Exception("ex", new Exception("inner")));
 
-        [Test, Ignore("Infinite loop occurs")]
+        [Test]
         public void Write_aggregate_exception_of_two_exceptions_with_no_inner_exceptions() =>
             _writer.WriteException(new AggregateException(new List<Exception>
             {
@@ -50,7 +50,7 @@ namespace FluentMigrator.Tests.Logging
                 new Exception("ex2")
             }));
 
-        [Test, Ignore("Infinite loop occurs")]
+        [Test]
         public void Write_aggregate_exception_of_two_exceptions_each_with_inner_exceptions() =>
             _writer.WriteException(new AggregateException(new List<Exception>
             {
@@ -58,7 +58,7 @@ namespace FluentMigrator.Tests.Logging
                 new Exception("ex2", new Exception("innerEx2"))
             }));
 
-        [Test, Ignore("Infinite loop occurs")]
+        [Test]
         public void Write_aggregate_exception_of_two_exceptions_each_with_inner_exceptions_one_of_which_is_an_aggregate() =>
             _writer.WriteException(new AggregateException(new List<Exception>
             {
