@@ -27,6 +27,8 @@ namespace FluentMigrator.Runner.Generators.Oracle
         // http://www.dba-oracle.com/t_ora_01704_string_literal_too_long.htm
         public const int MaxStringLength = 4000;
 
+        public static readonly char[] EscapeCharacters = new[] { '\'', '\t', '\r', '\n' };
+
         public static IEnumerable<string> SplitBy(string str, int chunkLength)
         {
             if (string.IsNullOrEmpty(str))
@@ -50,13 +52,13 @@ namespace FluentMigrator.Runner.Generators.Oracle
 
                 var substr = str.Substring(i, chunkLength);
 
-                // Count quotes and reduce chunk length to this number, because they will be doubled
-                var quoteCount = substr.Count(f => f == '\'');
+                // Count escape characters to reduce chunk length to this number, because they will be doubled
+                var escapeCharCount = substr.Count(f => EscapeCharacters.Contains(f));
 
-                if (quoteCount > 0)
+                if (escapeCharCount > 0)
                 {
-                    substr = str.Substring(i, chunkLength - quoteCount);
-                    i -= quoteCount;
+                    substr = str.Substring(i, chunkLength - escapeCharCount);
+                    i -= escapeCharCount;
                 }
 
                 yield return substr;
