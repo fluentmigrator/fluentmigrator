@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 using FluentMigrator.Runner.Generators.Generic;
 
@@ -29,40 +30,31 @@ namespace FluentMigrator.Runner.Generators.Oracle
 
         public static readonly char[] EscapeCharacters = new[] { '\'', '\t', '\r', '\n' };
 
-        public static IEnumerable<string> SplitBy(string str, int chunkLength)
+        public static IEnumerable<string> SplitBy(string str, int maxChunkLength)
         {
             if (string.IsNullOrEmpty(str))
-            {
-                throw new ArgumentException();
-            }
+                throw new ArgumentNullException(nameof(str));
 
-            if (chunkLength < 1)
-            {
-                throw new ArgumentException();
-            }
+            // Having escape characters the chunk length less than 2 does not make a sense.
+            if (maxChunkLength < 2)
+                throw new ArgumentException($"'{nameof(maxChunkLength)}' must be greater than 1.");
 
-            var strLength = str.Length;
+            var chunk = new StringBuilder();
+            var chunkLength = 0;
 
-            for (var i = 0; i < strLength; i += chunkLength)
+            foreach (var ch in str)
             {
-                if (chunkLength + i > strLength)
+                // Every escape character will give us two characters in the final query
+                chunkLength += EscapeCharacters.Contains(ch) ? 2 : 1;
+                if (chunkLength > maxChunkLength)
                 {
-                    chunkLength = strLength - i;
+                    yield return chunk.ToString();
+                    chunk.Clear();
+                    chunkLength = 0;
                 }
-
-                var substr = str.Substring(i, chunkLength);
-
-                // Count escape characters to reduce chunk length to this number, because they will be doubled
-                var escapeCharCount = substr.Count(f => EscapeCharacters.Contains(f));
-
-                if (escapeCharCount > 0)
-                {
-                    substr = str.Substring(i, chunkLength - escapeCharCount);
-                    i -= escapeCharCount;
-                }
-
-                yield return substr;
+                chunk.Append(ch);
             }
+            yield return chunk.ToString();
         }
 
         public override string FormatDateTime(DateTime value)
