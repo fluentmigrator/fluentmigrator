@@ -26,7 +26,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
     public class OracleQuoterBase : GenericQuoter
     {
         // http://www.dba-oracle.com/t_ora_01704_string_literal_too_long.htm
-        public const int MaxStringLength = 4000;
+        public const int MaxChunkLength = 3900;
 
         public static readonly char[] EscapeCharacters = new[] { '\'', '\t', '\r', '\n' };
 
@@ -101,12 +101,12 @@ namespace FluentMigrator.Runner.Generators.Oracle
 
         private static string FormatString(string value, string oracleFunction, Func<string, string> formatter)
         {
-            if (value.Length < MaxStringLength)
+            if (value.Length < MaxChunkLength)
             {
                 return formatter(value);
             }
 
-            var chunks = SplitBy(value, MaxStringLength)
+            var chunks = SplitBy(value, MaxChunkLength)
                 .Select(v => $"{oracleFunction}({formatter(v)})");
 
             return string.Join(" || ", chunks);
@@ -114,7 +114,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
 
         public override string FormatAnsiString(string value)
         {
-            if (value.Length < MaxStringLength)
+            if (value.Length < MaxChunkLength)
             {
                 return base.FormatAnsiString(value);
             }
@@ -124,7 +124,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
 
         public override string FormatNationalString(string value)
         {
-            if (value.Length < MaxStringLength)
+            if (value.Length < MaxChunkLength)
             {
                 return base.FormatAnsiString(value);
             }
