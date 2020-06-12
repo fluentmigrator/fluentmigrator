@@ -29,10 +29,7 @@ while the CI builds are stored on [MyGet](https://www.myget.org/feed/Packages/fl
 | **Documentation**         | [On our GitHub pages](https://fluentmigrator.github.io) |
 | **Discussions**           | [![Gitter](https://img.shields.io/gitter/room/FluentMigrator/fluentmigrator.svg)](https://gitter.im/FluentMigrator/fluentmigrator) |
 | **Bug/Feature Tracking**  | [![GitHub issues](https://img.shields.io/github/issues/fluentmigrator/fluentmigrator.svg)](https://github.com/fluentmigrator/fluentmigrator/issues) |
-| **Build server (old)**          | [![Travis](https://img.shields.io/travis/fluentmigrator/fluentmigrator.svg)](https://travis-ci.org/fluentmigrator/fluentmigrator) |
 | **Build server (new)**    | [![AzureDevOps](https://img.shields.io/azure-devops/build/fluentmigrator/22b31067-b424-416b-b89f-682210a37a55/1)](https://dev.azure.com/fluentmigrator/fluentmigrator/_build?definitionId=1) |
-
-:warning: We are currently migrating from TravisCI to AzureDevOps.
 
 # Prerequisites
 
@@ -48,7 +45,7 @@ while the CI builds are stored on [MyGet](https://www.myget.org/feed/Packages/fl
 <a href="https://www.jetbrains.com/resharper"><img src="https://raw.githubusercontent.com/fluentmigrator/fluentmigrator/master/docs/jetbrains/logo.png" alt="ReSharper"  width="15%" /></a>
 </span>
 
-<a href="https://travis-ci.com"><img src="https://travis-ci.com/images/logos/TravisCI-Full-Color.png" alt="Travis CI"  width="20%" /></a>
+<a href="https://azure.microsoft.com/en-us/services/devops/"><img src="https://azurecomcdn.azureedge.net/cvt-2b18021399b1b3aa2c405a40ce4e9b89f162d9e5b3d6df838d13aae49f3608ea/images/shared/services/devops/pipelines-icon-80.png" alt="Azure DevOps"  width="20%" /></a>
 
 # Contributors
 
