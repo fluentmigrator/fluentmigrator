@@ -23,7 +23,7 @@ using FluentMigrator.Infrastructure;
 namespace FluentMigrator.Postgres
 {
     /// <summary>
-    /// 
+    /// Feature extensions for PostgreSQL
     /// </summary>
     /// <remarks> Given:
     /// MigrationBase m = null;
@@ -47,7 +47,13 @@ namespace FluentMigrator.Postgres
     /// </remarks>
     public static class PostgresExtensions
     {
+        /// <summary>
+        /// Column identity generation ability for PostgreSQL 10 and above
+        /// </summary>
         public static string IdentityGeneration => "PostgresIdentityGeneration";
+        /// <summary>
+        /// Column identity modification type for PostgreSQL 10 and above
+        /// </summary>
         public static string IdentityModificationType => "PostgresIdentityModificationType";
 
         /// <summary>

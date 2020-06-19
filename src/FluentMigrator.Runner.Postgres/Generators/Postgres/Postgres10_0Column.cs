@@ -22,9 +22,9 @@ using FluentMigrator.Postgres;
 
 namespace FluentMigrator.Runner.Generators.Postgres
 {
-    class Postgres100Column : PostgresColumn
+    class Postgres10_0Column : PostgresColumn
     {
-        public Postgres100Column(PostgresQuoter quoter, ITypeMap typeMap)
+        public Postgres10_0Column(PostgresQuoter quoter, ITypeMap typeMap)
             : base(quoter, typeMap)
         {
             AlterClauseOrder.Add(FormatAlterIdentity);

@@ -16,9 +16,18 @@
 
 namespace FluentMigrator
 {
+    /// <summary>
+    /// Default value generation strategy (Identity) types. The clauses ALWAYS and BY DEFAULT determine how the sequence value is given precedence over a user-specified value in an INSERT statement.
+    /// </summary>
     public enum PostgresGenerationType
     {
+        /// <summary>
+        /// A user-specified value is only accepted if the INSERT statement specifies OVERRIDING SYSTEM VALUE.
+        /// </summary>
         Always,
+        /// <summary>
+        /// The user-specified value takes precedence.
+        /// </summary>
         ByDefault,
     }
 }

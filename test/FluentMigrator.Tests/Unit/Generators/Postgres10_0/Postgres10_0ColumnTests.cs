@@ -24,17 +24,17 @@ using NUnit.Framework;
 
 using Shouldly;
 
-namespace FluentMigrator.Tests.Unit.Generators.Postgres100
+namespace FluentMigrator.Tests.Unit.Generators.Postgres10_0
 {
     [TestFixture]
     [Category("Generator")]
     [Category("Postgres")]
-    public class Postgres100ColumnTests : PostgresBaseColumnTests<Postgres100Generator>
+    public class Postgres10_0ColumnTests : PostgresBaseColumnTests<Postgres10_0Generator>
     {
-        protected override Postgres100Generator ConstructGenerator()
+        protected override Postgres10_0Generator ConstructGenerator()
         {
             var quoter = new PostgresQuoter(new PostgresOptions());
-            return new Postgres100Generator(quoter);
+            return new Postgres10_0Generator(quoter);
         }
 
         [Test]

@@ -20,20 +20,20 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Generators.Postgres
 {
-    public class Postgres100Generator : PostgresGenerator
+    public class Postgres10_0Generator : PostgresGenerator
     {
-        public Postgres100Generator([NotNull] PostgresQuoter quoter)
+        public Postgres10_0Generator([NotNull] PostgresQuoter quoter)
             : this(quoter, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()))
         {
         }
 
-        public Postgres100Generator([NotNull] PostgresQuoter quoter, [NotNull] IOptions<GeneratorOptions> generatorOptions)
-            : base(new Postgres100Column(quoter, new Postgres92.Postgres92TypeMap()), quoter, generatorOptions)
+        public Postgres10_0Generator([NotNull] PostgresQuoter quoter, [NotNull] IOptions<GeneratorOptions> generatorOptions)
+            : base(new Postgres10_0Column(quoter, new Postgres92.Postgres92TypeMap()), quoter, generatorOptions)
         {
         }
 
-        protected Postgres100Generator([NotNull] PostgresQuoter quoter, [NotNull] IOptions<GeneratorOptions> generatorOptions, [NotNull] ITypeMap typeMap)
-            : base(new Postgres100Column(quoter, typeMap), quoter, generatorOptions)
+        protected Postgres10_0Generator([NotNull] PostgresQuoter quoter, [NotNull] IOptions<GeneratorOptions> generatorOptions, [NotNull] ITypeMap typeMap)
+            : base(new Postgres10_0Column(quoter, typeMap), quoter, generatorOptions)
         {
         }
     }

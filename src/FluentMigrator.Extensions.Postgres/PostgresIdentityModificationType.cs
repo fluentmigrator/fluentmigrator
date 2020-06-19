@@ -16,11 +16,26 @@
 
 namespace FluentMigrator
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public enum PostgresIdentityModificationType
     {
+        /// <summary>
+        /// 
+        /// </summary>
         Add,
+        /// <summary>
+        /// 
+        /// </summary>
         Set,
+        /// <summary>
+        /// 
+        /// </summary>
         Drop,
+        /// <summary>
+        /// 
+        /// </summary>
         DropIfExists,
     }
 }

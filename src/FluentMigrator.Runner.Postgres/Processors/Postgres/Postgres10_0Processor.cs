@@ -24,11 +24,11 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.Postgres
 {
-    class Postgres100Processor : PostgresProcessor
+    class Postgres10_0Processor : PostgresProcessor
     {
-        public Postgres100Processor(
+        public Postgres10_0Processor(
             [NotNull] PostgresDbFactory factory,
-            [NotNull] Postgres100Generator generator,
+            [NotNull] Postgres10_0Generator generator,
             [NotNull] ILogger<PostgresProcessor> logger,
             [NotNull] IOptionsSnapshot<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor,
