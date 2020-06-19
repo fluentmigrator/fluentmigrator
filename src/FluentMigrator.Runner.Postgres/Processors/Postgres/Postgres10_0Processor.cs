@@ -14,6 +14,8 @@
 // limitations under the License.
 #endregion
 
+using System.Collections.Generic;
+
 using FluentMigrator.Runner.Generators.Postgres;
 using FluentMigrator.Runner.Initialization;
 
@@ -36,5 +38,10 @@ namespace FluentMigrator.Runner.Processors.Postgres
             : base(factory, generator, logger, options, connectionStringAccessor, pgOptions)
         {
         }
+
+        public override string DatabaseType => "PostgreSQL10_0";
+
+        public override IList<string> DatabaseTypeAliases { get; } = new List<string> { "PostgreSQL" };
+
     }
 }
