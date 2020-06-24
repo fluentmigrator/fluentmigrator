@@ -531,7 +531,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 
         public static AlterColumnExpression GetAlterColumnAddAutoIncrementExpression()
         {
-            ColumnDefinition column = new ColumnDefinition { Name = TestColumnName1, IsIdentity = true, IsPrimaryKey = true, Type = DbType.Int32 };
+            ColumnDefinition column = new ColumnDefinition { Name = TestColumnName1, IsIdentity = true, IsPrimaryKey = true, Type = DbType.Int32, ModificationType = ColumnModificationType.Alter };
             return new AlterColumnExpression { TableName = TestTableName1, Column = column };
         }
 

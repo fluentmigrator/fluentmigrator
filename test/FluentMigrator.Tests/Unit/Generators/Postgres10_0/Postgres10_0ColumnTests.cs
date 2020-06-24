@@ -18,22 +18,23 @@
 
 using FluentMigrator.Runner.Generators.Postgres;
 using FluentMigrator.Runner.Processors.Postgres;
+using FluentMigrator.Tests.Unit.Generators.Postgres;
 
 using NUnit.Framework;
 
 using Shouldly;
 
-namespace FluentMigrator.Tests.Unit.Generators.Postgres
+namespace FluentMigrator.Tests.Unit.Generators.Postgres10_0
 {
     [TestFixture]
     [Category("Generator")]
     [Category("Postgres")]
-    public class PostgresColumnTests : PostgresBaseColumnTests<PostgresGenerator>
+    public class Postgres10_0ColumnTests : PostgresBaseColumnTests<Postgres10_0Generator>
     {
-        protected override PostgresGenerator ConstructGenerator()
+        protected override Postgres10_0Generator ConstructGenerator()
         {
             var quoter = new PostgresQuoter(new PostgresOptions());
-            return new PostgresGenerator(quoter);
+            return new Postgres10_0Generator(quoter);
         }
 
         [Test]
@@ -43,7 +44,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ALTER \"TestColumn1\" TYPE serial;");
+            result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ALTER \"TestColumn1\" TYPE integer, ALTER \"TestColumn1\" ADD GENERATED ALWAYS AS IDENTITY;");
         }
 
         [Test]
@@ -52,7 +53,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             var expression = GeneratorTestHelper.GetAlterColumnAddAutoIncrementExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"public\".\"TestTable1\" ALTER \"TestColumn1\" TYPE serial;");
+            result.ShouldBe("ALTER TABLE \"public\".\"TestTable1\" ALTER \"TestColumn1\" TYPE integer, ALTER \"TestColumn1\" ADD GENERATED ALWAYS AS IDENTITY;");
         }
 
         [Test]
@@ -62,7 +63,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" serial NOT NULL, \"TestColumn2\" integer NOT NULL);");
+            result.ShouldBe("CREATE TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" integer NOT NULL GENERATED ALWAYS AS IDENTITY, \"TestColumn2\" integer NOT NULL);");
         }
 
         [Test]
@@ -71,7 +72,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"public\".\"TestTable1\" (\"TestColumn1\" serial NOT NULL, \"TestColumn2\" integer NOT NULL);");
+            result.ShouldBe("CREATE TABLE \"public\".\"TestTable1\" (\"TestColumn1\" integer NOT NULL GENERATED ALWAYS AS IDENTITY, \"TestColumn2\" integer NOT NULL);");
         }
 
         [Test]
@@ -81,7 +82,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ADD \"TestColumn1\" serial NOT NULL;");
+            result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ADD \"TestColumn1\" integer NOT NULL GENERATED ALWAYS AS IDENTITY;");
         }
 
         [Test]
@@ -90,7 +91,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             var expression = GeneratorTestHelper.GetAlterTableAutoIncrementColumnExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"public\".\"TestTable1\" ADD \"TestColumn1\" serial NOT NULL;");
+            result.ShouldBe("ALTER TABLE \"public\".\"TestTable1\" ADD \"TestColumn1\" integer NOT NULL GENERATED ALWAYS AS IDENTITY;");
         }
     }
 }

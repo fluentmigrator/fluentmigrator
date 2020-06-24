@@ -23,7 +23,6 @@ using System.Linq;
 
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Base;
-using FluentMigrator.Runner.Processors.Postgres;
 
 using JetBrains.Annotations;
 
@@ -137,6 +136,11 @@ namespace FluentMigrator.Runner.Generators.Postgres
                 return "serial";
             }
 
+            return ColumnBaseFormatType(column);
+        }
+
+        protected string ColumnBaseFormatType(ColumnDefinition column)
+        {
             return base.FormatType(column);
         }
 

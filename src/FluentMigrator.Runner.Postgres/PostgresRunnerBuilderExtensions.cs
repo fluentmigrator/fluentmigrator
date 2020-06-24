@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2018, FluentMigrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -57,6 +57,22 @@ namespace FluentMigrator.Runner
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<Postgres92Processor>())
                 .AddScoped<Postgres92Generator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<Postgres92Generator>());
+            return builder.AddCommonPostgresServices();
+        }
+
+
+        /// <summary>
+        /// Adds Postgres 10.0 support
+        /// </summary>
+        /// <param name="builder">The builder to add the Postgres-specific services to</param>
+        /// <returns>The migration runner builder</returns>
+        public static IMigrationRunnerBuilder AddPostgres10_0(this IMigrationRunnerBuilder builder)
+        {
+            builder.Services
+                .AddScoped<Postgres10_0Processor>()
+                .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<Postgres10_0Processor>())
+                .AddScoped<Postgres10_0Generator>()
+                .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<Postgres10_0Generator>());
             return builder.AddCommonPostgresServices();
         }
 
