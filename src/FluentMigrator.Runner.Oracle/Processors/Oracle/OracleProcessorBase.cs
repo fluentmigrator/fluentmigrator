@@ -195,7 +195,14 @@ namespace FluentMigrator.Runner.Processors.Oracle
 
         public override bool SequenceExists(string schemaName, string sequenceName)
         {
-            return false;
+            if (string.IsNullOrEmpty(schemaName))
+            {
+                return Exists("SELECT 1 FROM ALL_SEQUENCES WHERE upper(SEQUENCE_NAME) = '{0}'",
+                    FormatHelper.FormatSqlEscape(sequenceName.ToUpper()));
+            }
+
+            return Exists("SELECT 1 FROM ALL_SEQUENCES WHERE upper(SEQUENCE_OWNER) = '{0}' AND upper(SEQUENCE_NAME) = '{1}'",
+                schemaName.ToUpper(), FormatHelper.FormatSqlEscape(sequenceName.ToUpper()));
         }
 
         public override bool DefaultValueExists(string schemaName, string tableName, string columnName,
