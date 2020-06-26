@@ -296,7 +296,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
 
         public override string Generate(AlterDefaultConstraintExpression expression)
         {
-            return string.Format(AlterColumn, Quoter.QuoteTableName(expression.TableName), Column.Generate(new ColumnDefinition
+            return string.Format(AlterColumn, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), Column.Generate(new ColumnDefinition
             {
                 ModificationType = ColumnModificationType.Alter,
                 Name = expression.ColumnName,
@@ -308,6 +308,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
         {
             return Generate(new AlterDefaultConstraintExpression
             {
+                SchemaName = expression.SchemaName,
                 TableName = expression.TableName,
                 ColumnName = expression.ColumnName,
                 DefaultValue = null

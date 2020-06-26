@@ -450,13 +450,84 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
         }
 
         [Test]
-        public void CanRemoveDefaultConstraint()
+        public void CanAlterDefaultConstraintForCustomSchemaWithValueAsDefault()
         {
-            var expression = GeneratorTestHelper.GetDeleteDefaultConstraintExpression();
+            var expression = GeneratorTestHelper.GetAlterDefaultConstraintExpression();
+            expression.SchemaName = "USER";
 
             var result = Generator.Generate(expression);
 
-            result.ShouldBe("ALTER TABLE \"TestTable1\" MODIFY \"TestColumn1\" DEFAULT NULL");
+            result.ShouldBe("ALTER TABLE \"USER\".\"TestTable1\" MODIFY \"TestColumn1\" DEFAULT 1");
+        }
+
+        [Test]
+        public void CanAlterDefaultConstraintForCustomSchemaWithStringValueAsDefault()
+        {
+            var expression = GeneratorTestHelper.GetAlterDefaultConstraintExpression();
+            expression.DefaultValue = "1";
+            expression.SchemaName = "USER";
+
+            var result = Generator.Generate(expression);
+
+            result.ShouldBe("ALTER TABLE \"USER\".\"TestTable1\" MODIFY \"TestColumn1\" DEFAULT '1'");
+        }
+
+        [Test]
+        public void CanAlterDefaultConstraintForCustomSchemaWithDefaultSystemMethodNewGuid()
+        {
+            var expression = GeneratorTestHelper.GetAlterDefaultConstraintExpression();
+            expression.DefaultValue = SystemMethods.NewGuid;
+            expression.SchemaName = "USER";
+
+            var result = Generator.Generate(expression);
+
+            result.ShouldBe("ALTER TABLE \"USER\".\"TestTable1\" MODIFY \"TestColumn1\" DEFAULT sys_guid()");
+        }
+
+        [Test]
+        public void CanAlterDefaultConstraintForCustomSchemaWithDefaultSystemMethodCurrentDateTime()
+        {
+            var expression = GeneratorTestHelper.GetAlterDefaultConstraintExpression();
+            expression.DefaultValue = SystemMethods.CurrentDateTime;
+            expression.SchemaName = "USER";
+
+            var result = Generator.Generate(expression);
+
+            result.ShouldBe("ALTER TABLE \"USER\".\"TestTable1\" MODIFY \"TestColumn1\" DEFAULT LOCALTIMESTAMP");
+        }
+
+        [Test]
+        public void CanAlterDefaultConstraintForCustomSchemaWithDefaultSystemMethodCurrentUser()
+        {
+            var expression = GeneratorTestHelper.GetAlterDefaultConstraintExpression();
+            expression.DefaultValue = SystemMethods.CurrentUser;
+            expression.SchemaName = "USER";
+
+            var result = Generator.Generate(expression);
+
+            result.ShouldBe("ALTER TABLE \"USER\".\"TestTable1\" MODIFY \"TestColumn1\" DEFAULT USER");
+        }
+
+        [Test]
+        public void CanRemoveDefaultConstraint()
+        {
+            var expression = GeneratorTestHelper.GetDeleteDefaultConstraintExpression();
+            expression.SchemaName = "USER";
+
+            var result = Generator.Generate(expression);
+
+            result.ShouldBe("ALTER TABLE \"USER\".\"TestTable1\" MODIFY \"TestColumn1\" DEFAULT NULL");
+        }
+
+        [Test]
+        public void CanRemoveDefaultConstraintWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetDeleteDefaultConstraintExpression();
+            expression.SchemaName = "USER";
+
+            var result = Generator.Generate(expression);
+
+            result.ShouldBe("ALTER TABLE \"USER\".\"TestTable1\" MODIFY \"TestColumn1\" DEFAULT NULL");
         }
     }
 }
