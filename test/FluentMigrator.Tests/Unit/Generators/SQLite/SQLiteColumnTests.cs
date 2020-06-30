@@ -31,6 +31,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
     public class SQLiteColumnTests : BaseColumnTests
     {
         protected SQLiteGenerator Generator;
+        private SQLiteQuoter quoter = new SQLiteQuoter();
 
         [SetUp]
         public void Setup()
@@ -190,7 +191,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetDeleteColumnExpression(new [] { "TestColumn1", "TestColumn2" });
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            result.ShouldBe($"ALTER TABLE {quoter.QuoteTableName("TestTable1")} "
+              + $"RENAME COLUMN {quoter.QuoteColumnName("TestColumn1")} TO {quoter.QuoteColumnName("TestColumn2")}");
         }
 
         [Test]
@@ -200,7 +202,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestSchema.TestTable1 RENAME COLUMN TestColumn1 TO TestColumn2");
+            result.ShouldBe($"ALTER TABLE {quoter.QuoteTableName("TestTable1")} "
+              + $"RENAME COLUMN {quoter.QuoteColumnName("TestColumn1")} TO {quoter.QuoteColumnName("TestColumn2")}");
         }
 
         [Test]
@@ -209,7 +212,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetRenameColumnExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestTable1 RENAME COLUMN TestColumn1 TO TestColumn2");
+            result.ShouldBe($"ALTER TABLE \"TestTable1\" RENAME COLUMN \"TestColumn1\" TO \"TestColumn2\"");
         }
     }
 }
