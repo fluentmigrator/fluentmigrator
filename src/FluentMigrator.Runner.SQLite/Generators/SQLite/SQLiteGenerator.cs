@@ -57,6 +57,11 @@ namespace FluentMigrator.Runner.Generators.SQLite
 
         public override string Generate(RenameColumnExpression expression)
         {
+            if (CompatibilityMode == CompatibilityMode.STRICT)
+            {
+                return CompatibilityMode.HandleCompatibilty("SQLite does not support renaming of columns");
+            }
+
             return string.Format(
                 RenameColumn,
                 Quoter.QuoteTableName(expression.TableName, expression.SchemaName),
