@@ -48,6 +48,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
         }
 
         public override string RenameTable { get { return "ALTER TABLE {0} RENAME TO {1}"; } }
+        public override string RenameColumn { get { return "ALTER TABLE {0} RENAME COLUMN {1} TO {2}"; } }
 
         public override string Generate(AlterColumnExpression expression)
         {
@@ -56,7 +57,12 @@ namespace FluentMigrator.Runner.Generators.SQLite
 
         public override string Generate(RenameColumnExpression expression)
         {
-            return CompatibilityMode.HandleCompatibilty("SQLite does not support renaming of columns");
+            return string.Format(
+                RenameColumn,
+                Quoter.QuoteTableName(expression.TableName, expression.SchemaName),
+                Quoter.QuoteColumnName(expression.OldName),
+                Quoter.QuoteColumnName(expression.NewName)
+            );
         }
 
         public override string Generate(DeleteColumnExpression expression)
