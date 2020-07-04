@@ -211,7 +211,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetRenameColumnExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe($"ALTER TABLE {quoter.QuoteTableName("TestTable1")} RENAME COLUMN {quoter.QuoteColumnName("TestColumn1")} TO {quoter.QuoteColumnName("TestColumn2")} ");
+            result.ShouldBe($"ALTER TABLE {quoter.QuoteTableName("TestTable1")} RENAME COLUMN {quoter.QuoteColumnName("TestColumn1")} TO {quoter.QuoteColumnName("TestColumn2")}");
         }
     }
 }
