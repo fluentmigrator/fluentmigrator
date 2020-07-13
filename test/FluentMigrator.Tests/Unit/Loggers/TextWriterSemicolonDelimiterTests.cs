@@ -30,7 +30,7 @@ using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Loggers
 {
-    public class TextWriterSemicolonDelimiter
+    public class TextWriterSemicolonDelimiterTests
     {
         private StringWriter stringWriter;
         private SqlScriptFluentMigratorLoggerOptions options;
