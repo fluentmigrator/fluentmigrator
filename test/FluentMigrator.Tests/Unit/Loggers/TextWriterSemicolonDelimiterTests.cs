@@ -55,7 +55,7 @@ namespace FluentMigrator.Tests.Unit.Loggers
         }
 
         [Test]
-        public void WhenDisabledSqlShouldHaveSemicolonDelimiter()
+        public void WhenDisabledSqlShouldNotHaveSemicolonDelimiter()
         {
             options = new SqlScriptFluentMigratorLoggerOptions() { OutputSemicolonDelimiter = false };
             loggerFactory = new LoggerFactory();
