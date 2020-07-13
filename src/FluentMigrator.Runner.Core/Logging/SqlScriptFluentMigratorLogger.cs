@@ -87,6 +87,8 @@ namespace FluentMigrator.Runner.Logging
             }
             else
             {
+                if (_options.OutputSemicolonDelimiter)
+                    sql += ";";
                 _writer.WriteLineDirect(sql);
                 if (_options.OutputGoBetweenStatements)
                     _writer.WriteLineDirect("GO");
