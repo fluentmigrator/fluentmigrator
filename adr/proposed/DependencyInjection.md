@@ -37,8 +37,9 @@ Should something be a parameter (static value) or injectable (factory that can r
 | 7.   | Trait as **Migration Filter**        | `MigrationTraitAttribute`                        | _not injectable_                                  | _not injectable_                             |
 | 8.   | Constraints as **Migration Filter**  | `MigrationConstraintAttribute`                   |                                                   |                                              |
 | 9.   | Journaling (Version Table Metadata)  | `IVersionTableMetaData`                          | `AssemblyVersionTableMetaDataSourceItem`          | `AssemblySourceVersionTableMetaDataAccessor` |
-| 10.  | Mapping FM Types to DB Types         | `ITypeMap`                                       |                                                   |                                              |
-| 11.  | Connection strings                   | string                                           | `IConnectionStringReader`                         | `IConnectionStringAccessor`                  |
+| 10.  | Logging as **ILoggerProvider**       | `ILoggerProvider`                                | MS DI `IServiceCollection`                        | MS DI `IServiceCollection.Configure`         |
+| 11.  | Mapping FM Types to DB Types         | `ITypeMap`                                       |                                                   |                                              |
+| 12.  | Connection strings                   | string                                           | `IConnectionStringReader`                         | `IConnectionStringAccessor`                  |
 
 
 1. Migration Runner. See also:
