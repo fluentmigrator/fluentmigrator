@@ -88,6 +88,8 @@ namespace FluentMigrator.Runner.Generators.Postgres
 
         protected override string FormatType(ColumnDefinition column)
         {
+            FormatTypeValidator(column);
+
             //rather than base.FormatType, which will use serials for identities, we go instead to ColumnBase.FormatType, exposed via base.ColumnBaseFormatType
             return base.ColumnBaseFormatType(column);
         }

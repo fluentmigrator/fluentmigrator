@@ -195,6 +195,15 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("ALTER TABLE \"public\".\"TestTable1\" RENAME COLUMN \"TestColumn1\" TO \"TestColumn2\";");
         }
 
+        [Test]
+        public void CannotCreateColumnWithDateTimeOffsetPrecisionOutOfRange()
+        {
+            var expression = GeneratorTestHelper.GetCreateColumnExpressionWithDateTimeOffsetType();
+            expression.Column.Precision = 7;
+
+            Should.Throw(() => Generator.Generate(expression), typeof(ArgumentOutOfRangeException));
+        }
+
         public abstract void CanCreateTableWithIdentityWithCustomSchema();
         public abstract void CanCreateTableWithIdentityWithDefaultSchema();
         public abstract void CanCreateColumnWithAutoIncrementAndCustomSchema();

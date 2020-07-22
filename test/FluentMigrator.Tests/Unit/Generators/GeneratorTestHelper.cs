@@ -550,6 +550,20 @@ namespace FluentMigrator.Tests.Unit.Generators
             return expression;
         }
 
+        public static CreateColumnExpression GetCreateColumnExpressionWithDateTimeOffsetType()
+        {
+            var expression = new CreateColumnExpression();
+            expression.TableName = TestTableName1;
+
+            expression.Column = new ColumnDefinition();
+            expression.Column.Name = TestColumnName1;
+            expression.Column.IsNullable = true;
+            expression.Column.Type = DbType.DateTimeOffset;
+            expression.Column.ModificationType = ColumnModificationType.Create;
+
+            return expression;
+        }
+
         public static CreateColumnExpression GetCreateColumnExpressionWithNullableCustomType()
         {
             var expression = new CreateColumnExpression();

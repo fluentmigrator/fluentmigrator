@@ -126,15 +126,27 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return string.Format(", {0}PRIMARY KEY ({1})", pkName, cols);
         }
 
+        protected void FormatTypeValidator(ColumnDefinition column)
+        {
+            if (column.Type == DbType.DateTimeOffset && (column.Precision < 0 || column.Precision > 6))
+            {
+                throw new ArgumentOutOfRangeException($"Postgres {nameof(DbType.DateTimeOffset)} data type 'timestamp[(p)]' with time zone' supports allowed range from 0 to 6. " +
+                    $"See: https://www.postgresql.org/docs/12/datatype-datetime.html");
+            }
+        }
+
         /// <inheritdoc />
         protected override string FormatType(ColumnDefinition column)
         {
+            FormatTypeValidator(column);
+
             if (column.IsIdentity)
             {
                 if (column.Type == DbType.Int64)
                     return "bigserial";
                 return "serial";
             }
+            
 
             return ColumnBaseFormatType(column);
         }
