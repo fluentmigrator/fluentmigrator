@@ -117,8 +117,14 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         {
             var filter = createIndexExpression.Index.GetAdditionalFeature<string>(SqlServerExtensions.IndexFilter);
 
-            if (!createIndexExpression.Index.IsClustered && !string.IsNullOrWhiteSpace(filter))
+            
+            if (!string.IsNullOrWhiteSpace(filter))
             {
+                if (createIndexExpression.Index.IsClustered)
+                    throw new System.Exception("Filtered indexes are nonclustered indexes that have the additon of a WHERE clause. " +
+                        "SQL Server does not support clustered filtered indexes. " +
+                        "Create a non-clustered index with include columns instead to create a non-clustered covering index.");
+
                 return " WHERE " + filter;
             }
 

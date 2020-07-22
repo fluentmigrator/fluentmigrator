@@ -231,8 +231,8 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                 Quoter.QuoteIndexName(expression.Index.Name),
                 Quoter.QuoteTableName(expression.Index.TableName, expression.Index.SchemaName),
                 string.Join(", ", indexColumns),
-                GetFilterString(expression),
                 GetIncludeString(expression),
+                GetFilterString(expression),
                 withPart);
 
             return result;

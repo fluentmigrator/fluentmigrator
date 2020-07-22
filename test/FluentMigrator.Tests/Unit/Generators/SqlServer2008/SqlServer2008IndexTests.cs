@@ -266,6 +266,15 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
         }
 
         [Test]
+        public void CanCreateIndexWithIncludedColumnAndFilter()
+        {
+            var expression = GeneratorTestHelper.GetCreateIndexExpression();
+            var x = new CreateIndexExpressionBuilder(expression).Filter("TestColumn2 IS NULL").Include("TestColumn3");
+            var result = _generator.Generate(expression);
+            result.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) INCLUDE ([TestColumn3]) WHERE TestColumn2 IS NULL");
+        }
+
+        [Test]
         public void CanCreateIndexWithCompression()
         {
             var expression = GeneratorTestHelper.GetCreateIndexExpression();
