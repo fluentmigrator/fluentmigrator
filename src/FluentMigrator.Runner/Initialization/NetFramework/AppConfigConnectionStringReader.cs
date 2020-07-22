@@ -19,7 +19,6 @@
 using System;
 using System.Configuration;
 using System.Linq;
-using System.Text.RegularExpressions;
 
 using FluentMigrator.Runner.Logging;
 
@@ -36,7 +35,8 @@ namespace FluentMigrator.Runner.Initialization.NetFramework
     [Obsolete]
     public class AppConfigConnectionStringReader : IConnectionStringReader
     {
-        private static readonly Regex _matchPwd = new Regex("(PWD=|PASSWORD=)([^;]*);", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        [NotNull]
+        private readonly IPasswordMaskUtility _passwordMaskUtility = new PasswordMaskUtility();
 
         [NotNull]
         private readonly INetConfigManager _configManager;
@@ -164,7 +164,7 @@ namespace FluentMigrator.Runner.Initialization.NetFramework
                 return;
             }
 
-            var connectionString = _matchPwd.Replace(info.ConnectionString, "$1********;");
+            var connectionString = _passwordMaskUtility.ApplyMask(info.ConnectionString);
             string message;
             if (string.IsNullOrEmpty(info.Source))
             {
