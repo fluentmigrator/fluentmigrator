@@ -33,5 +33,10 @@ namespace FluentMigrator.Runner.Logging
         /// Gets or sets a value indicating whether a GO statement should be output between the SQL statements
         /// </summary>
         public bool OutputGoBetweenStatements { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether a semicolon (;) delimiter should be output on end the SQL statements
+        /// </summary>
+        public bool OutputSemicolonDelimiter { get; set; }
     }
 }

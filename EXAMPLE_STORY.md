@@ -10,9 +10,9 @@ In these examples, the benefits aren't super clear. The user and action are supe
 
 > “As a Spotify user, I would like new songs to be added to the top of the playlist.”
 > 
-> _Specifying the policy enacted by the mechanism; conflicts with story 3.
+> _Specifying the policy enacted by the mechanism; conflicts with story 3._
 > 
-> Can it be enhanced by specifying what the benefits are?_ (Yes.)
+> _Can it be enhanced by specifying what the benefits are?_ (Yes.)
 
 > “As a Spotify user, I would like new songs to be added to the top of the Playlist, so that when I'm talking to friends on Facebook Messenger and they mention a song I should listen to, I can immediately listen to it without losing my playlist.”
 > 
