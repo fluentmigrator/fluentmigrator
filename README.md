@@ -15,12 +15,12 @@ or the upgrade guide for further information: [2.x to 3.0](https://fluentmigrato
 Package Source      | Status   | Source Code Tree
 --------------------|----------|-----------------
 NuGet (Releases)    | [![NuGet](https://img.shields.io/nuget/v/FluentMigrator.svg)](https://www.nuget.org/packages/FluentMigrator/) | [master](https://github.com/fluentmigrator/fluentmigrator/tree/master)
-MyGet (Prerelease)  | [![MyGet](https://img.shields.io/myget/fluent-migrator/vpre/FluentMigrator.svg)](https://www.myget.org/gallery/fluent-migrator) | [develop](https://github.com/fluentmigrator/fluentmigrator/tree/develop)
+Azure Artifacts (Prerelease)  | [![Azure Artifacts](https://feeds.dev.azure.com/fluentmigrator/22b31067-b424-416b-b89f-682210a37a55/_apis/public/Packaging/Feeds/55481ff8-c55e-44b4-ad6e-b6638cc22c2b/Packages/d298bf9a-9246-4834-a1ad-a056e046513a/Badge)](https://dev.azure.com/fluentmigrator/fluentmigrator/_packaging?_a=feed&feed=fluentmigrator) | [develop](https://github.com/fluentmigrator/fluentmigrator/tree/develop)
 
 The releases are stored on [nuget.org](https://nuget.org)
-while the CI builds are stored on [MyGet](https://www.myget.org/feed/Packages/fluent-migrator).
+while the CI builds are stored on [Azure Artifacts](https://dev.azure.com/fluentmigrator/fluentmigrator/_packaging?_a=feed&feed=fluentmigrator).
 
-:warning: The MyGet repo is currently read-only due to a change in MyGet policy for open source projects.  We're looking into this.
+:warning: The badge for the Azure Artifacts feed won't display prereleases.  [We're looking into this](https://github.com/fluentmigrator/fluentmigrator/issues/1180#issuecomment-662884030). We've recently migrated from MyGet to Azure Artifacts, ref [this notice](https://github.com/fluentmigrator/fluentmigrator/issues/1183).
 
 # Project Info
 
