@@ -185,6 +185,7 @@ namespace FluentMigrator.Runner.Processors.MySql
 
             EnsureConnectionIsOpen();
 
+            // MySqlConnector requires the transaction to be set explicitly on the command, and it cannot be nested.
             expression.Operation?.Invoke(Connection, Transaction);
         }
 
