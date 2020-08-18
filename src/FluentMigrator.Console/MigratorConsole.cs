@@ -48,6 +48,7 @@ namespace FluentMigrator.Console
         public bool NestedNamespaces;
         public bool Output;
         public string OutputFilename;
+        public bool OutputSemicolonDelimiter = false;
         public bool PreviewOnly;
         public string ProcessorType;
         public string Profile;
@@ -132,6 +133,11 @@ namespace FluentMigrator.Console
                         "output|out|o",
                         "Output generated SQL to a file. Default is no output. Use outputFilename to control the filename, otherwise [assemblyname].sql is the default.",
                         v => { Output = v != null; }
+                    },
+                    {
+                        "outputSemicolonDelimiter|outsemdel|osd",
+                        "Whether each command should be delimited with a semicolon.",
+                        v => { OutputSemicolonDelimiter = v != null; }
                     },
                     {
                         "outputFilename=|outfile=|of=",
@@ -451,6 +457,7 @@ namespace FluentMigrator.Console
                             opt.ShowSql = true;
                             opt.OutputFileName = OutputFilename;
                             opt.OutputGoBetweenStatements = ExecutingAgainstMsSql;
+                            opt.OutputSemicolonDelimiter = OutputSemicolonDelimiter;
                         })
                     .AddSingleton<ILoggerProvider, LogFileFluentMigratorLoggerProvider>();
             }
