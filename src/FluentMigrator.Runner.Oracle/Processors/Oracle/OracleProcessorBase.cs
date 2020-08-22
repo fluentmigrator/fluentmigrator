@@ -197,7 +197,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
         {
             if (string.IsNullOrEmpty(schemaName))
             {
-                return Exists("SELECT 1 FROM ALL_SEQUENCES WHERE upper(SEQUENCE_NAME) = '{0}'",
+                return Exists("SELECT 1 FROM USER_SEQUENCES WHERE upper(SEQUENCE_NAME) = '{0}'",
                     FormatHelper.FormatSqlEscape(sequenceName.ToUpper()));
             }
 
