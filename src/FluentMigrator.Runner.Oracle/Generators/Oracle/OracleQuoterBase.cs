@@ -63,6 +63,11 @@ namespace FluentMigrator.Runner.Generators.Oracle
             return result;
         }
 
+        public override string QuoteIndexName(string indexName, string schemaName)
+        {
+            return CreateSchemaPrefixedQuotedIdentifier(QuoteSchemaName(schemaName), IsQuoted(indexName) ? indexName : Quote(indexName));
+        }
+
         public override string FromTimeSpan(TimeSpan value)
         {
             return string.Format("{0}{1} {2}:{3}:{4}.{5}{0}"

@@ -271,6 +271,26 @@ namespace FluentMigrator.Runner.Generators.Oracle
             return WrapInBlock(alterColumnWithDescriptionBuilder.ToString());
         }
 
+        public override string Generate(CreateIndexExpression expression)
+        {
+            var indexColumns = new string[expression.Index.Columns.Count];
+
+            for (var i = 0; i < expression.Index.Columns.Count; i++)
+            {
+                var columnDef = expression.Index.Columns.ElementAt(i);
+
+                var direction = columnDef.Direction == Direction.Ascending ? "ASC" : "DESC";
+                indexColumns[i] = $"{Quoter.QuoteColumnName(columnDef.Name)} {direction}";
+            }
+
+            return string.Format(CreateIndex
+                , GetUniqueString(expression)
+                , GetClusterTypeString(expression)
+                , Quoter.QuoteIndexName(expression.Index.Name, expression.Index.SchemaName)
+                , Quoter.QuoteTableName(expression.Index.TableName, expression.Index.SchemaName)
+                , string.Join(", ", indexColumns));
+        }
+
         public override string Generate(InsertDataExpression expression)
         {
             var columnNames = new List<string>();
