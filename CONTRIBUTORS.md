@@ -79,3 +79,4 @@ You can also see contributors via https://github.com/fluentmigrator/fluentmigrat
 * [daniellee](https://github.com/daniellee) (Daniel Lee)
 * [tommarien](https://github.com/tommarien) (Tom Marien)
 * [schambers](https://github.com/schambers) (Sean Chambers)
+* [igitur](https://github.com/igitur) (Francois Botha)

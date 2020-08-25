@@ -23,7 +23,4 @@
   <ItemGroup>
     <Folder Include="BatchParser" />
   </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="3.1.5" />
-  </ItemGroup>
 </Project>
