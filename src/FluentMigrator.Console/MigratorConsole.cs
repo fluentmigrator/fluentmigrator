@@ -263,7 +263,7 @@ namespace FluentMigrator.Console
                     },
                     {
                         "strip|strip-comments",
-                        "Strip comments from the SQL scripts. Default is true.",
+                        "Strip comments from the SQL scripts. Default is true. To disable, use --strip- or --strip-comments-",
                         v => { StripComments = v != null; }
                     },
                     {
@@ -368,6 +368,10 @@ namespace FluentMigrator.Console
             System.Console.WriteLine(@"  migrate [OPTIONS]");
             System.Console.WriteLine(@"Example:");
             System.Console.WriteLine(@"  migrate -a bin\debug\MyMigrations.dll -db SqlServer2008 -conn ""SEE_BELOW"" -profile ""Debug""");
+            System.Console.WriteLine(@"   ");
+            System.Console.WriteLine(@"Boolean options/flags (those without '=' or ':' in the option format string)");
+            System.Console.WriteLine(@"are explicitly enabled if they are followed with '+', and explicitly");
+            System.Console.WriteLine(@"disabled if they are followed with '-'.");
             System.Console.Out.WriteHorizontalRuler();
             System.Console.WriteLine(@"Example Connection Strings:");
             System.Console.WriteLine(@"  MySql: Data Source=172.0.0.1;Database=Foo;User Id=USERNAME;Password=BLAH");
