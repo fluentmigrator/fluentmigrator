@@ -48,7 +48,4 @@
       <HintPath>..\..\lib\SQLServerCE4\System.Data.SqlServerCe.dll</HintPath>
     </Reference>
   </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="3.1.5" />
-  </ItemGroup>
 </Project>
