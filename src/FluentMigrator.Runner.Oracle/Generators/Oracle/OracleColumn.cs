@@ -78,9 +78,9 @@ namespace FluentMigrator.Runner.Generators.Oracle
         protected override string GetPrimaryKeyConstraintName(IEnumerable<ColumnDefinition> primaryKeyColumns, string tableName)
         {
             if (primaryKeyColumns == null)
-                throw new ArgumentNullException("primaryKeyColumns");
+                throw new ArgumentNullException(nameof(primaryKeyColumns));
             if (tableName == null)
-                throw new ArgumentNullException("tableName");
+                throw new ArgumentNullException(nameof(tableName));
 
             var primaryKeyName = primaryKeyColumns.First().PrimaryKeyName;
 
