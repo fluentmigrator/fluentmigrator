@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2018, FluentMigrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -48,7 +48,7 @@ namespace FluentMigrator.Runner.Initialization
         IScanInBuilder EmbeddedResources();
 
         /// <summary>
-        /// Use the scanned assemblies for everything (migrationes, etc...)
+        /// Use the scanned assemblies for everything (migrations, etc...)
         /// </summary>
         /// <returns>The next step</returns>
         IMigrationRunnerBuilder All();
