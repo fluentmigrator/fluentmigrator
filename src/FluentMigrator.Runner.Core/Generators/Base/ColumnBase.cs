@@ -94,7 +94,7 @@ namespace FluentMigrator.Runner.Generators.Base
         /// <summary>
         /// Formats the column name
         /// </summary>
-        /// <param name="column">The column defintiion</param>
+        /// <param name="column">The column definition</param>
         /// <returns>The (probably) quoted column name</returns>
         public virtual string FormatString(ColumnDefinition column)
         {
@@ -311,7 +311,7 @@ namespace FluentMigrator.Runner.Generators.Base
         /// Creates the primary key constraint SQL fragment
         /// </summary>
         /// <param name="tableName">The table name</param>
-        /// <param name="primaryKeyColumns">The primary key column defintions</param>
+        /// <param name="primaryKeyColumns">The primary key column definitions</param>
         /// <returns>The SQL fragment</returns>
         public virtual string AddPrimaryKeyConstraint(string tableName, IEnumerable<ColumnDefinition> primaryKeyColumns)
         {

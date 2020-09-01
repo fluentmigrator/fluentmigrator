@@ -19,7 +19,7 @@
 namespace FluentMigrator.Builders.Create.Constraint
 {
     /// <summary>
-    /// Specify the constraint table schmea or the columns
+    /// Specify the constraint table schema or the columns
     /// </summary>
     public interface ICreateConstraintWithSchemaOrColumnSyntax : ICreateConstraintColumnsSyntax,
         ICreateConstraintWithSchemaSyntax

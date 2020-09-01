@@ -28,8 +28,8 @@ namespace FluentMigrator.Infrastructure
         /// <summary>
         /// Initializes a new instance of the <see cref="ManifestResourceNameWithAssembly"/> class.
         /// </summary>
-        /// <param name="name">The ressource name</param>
-        /// <param name="assembly">The assembly this ressource name belongs to</param>
+        /// <param name="name">The resource name</param>
+        /// <param name="assembly">The assembly this resource name belongs to</param>
         public ManifestResourceNameWithAssembly(string name, Assembly assembly)
         {
             Name = name;
@@ -37,12 +37,12 @@ namespace FluentMigrator.Infrastructure
         }
 
         /// <summary>
-        /// Gets the assembly the ressource <see cref="Name"/> belongs to
+        /// Gets the assembly the resource <see cref="Name"/> belongs to
         /// </summary>
         public Assembly Assembly { get; }
 
         /// <summary>
-        /// Gets the ressource name
+        /// Gets the resource name
         /// </summary>
         public string Name { get; }
     }

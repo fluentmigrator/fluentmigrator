@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 //
 // Copyright (c) 2018, Fluent Migrator Project
 //
@@ -24,7 +24,7 @@ namespace FluentMigrator.Runner
     public enum CompatibilityMode
     {
         /// <summary>
-        /// Ensuare that an exception gets thrown when a processor doesn't support a specific feature
+        /// Ensure that an exception gets thrown when a processor doesn't support a specific feature
         /// </summary>
         STRICT,
 

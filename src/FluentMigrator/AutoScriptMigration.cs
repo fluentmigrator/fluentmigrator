@@ -196,7 +196,7 @@ namespace FluentMigrator
                 if (stream == null)
                 {
                     throw new InvalidOperationException(
-                        $"The ressource {embeddedResourceNameWithAssembly.name} couldn't be found in {embeddedResourceNameWithAssembly.assembly.FullName}");
+                        $"The resource {embeddedResourceNameWithAssembly.name} couldn't be found in {embeddedResourceNameWithAssembly.assembly.FullName}");
                 }
 
                 using (stream)
