@@ -68,7 +68,7 @@ namespace FluentMigrator.Runner.Initialization
         /// Initializes a new instance of the <see cref="ProfileSource"/> class.
         /// </summary>
         /// <param name="source">The assembly source</param>
-        /// <param name="conventions">The migration runner conventios</param>
+        /// <param name="conventions">The migration runner conventions</param>
         [Obsolete]
         public MigrationSource(
             [NotNull] IAssemblySource source,

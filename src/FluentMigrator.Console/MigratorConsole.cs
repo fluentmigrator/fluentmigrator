@@ -181,7 +181,7 @@ namespace FluentMigrator.Console
                     },
                     {
                         "stopOnError=",
-                        "Pauses migration execution until the user input if any error occured. Default is false.",
+                        "Pauses migration execution until the user input if any error occurred. Default is false.",
                         v => { StopOnError = v != null; }
                     },
                     {

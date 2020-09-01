@@ -43,7 +43,7 @@ namespace FluentMigrator.Runner
         /// <summary>
         /// Apply all loaded profiles with the given runner
         /// </summary>
-        /// <param name="runner">The migration ruinner</param>
+        /// <param name="runner">The migration runner</param>
         void ApplyProfiles([NotNull] IMigrationRunner runner);
 
         /// <summary>

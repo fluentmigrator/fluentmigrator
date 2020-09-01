@@ -49,7 +49,7 @@ namespace FluentMigrator.Runner.Generators
                 }
                 catch (Exception)
                 {
-                    //can't add generators that require construtor parameters
+                    //can't add generators that require constructor parameters
                 }
             }
 

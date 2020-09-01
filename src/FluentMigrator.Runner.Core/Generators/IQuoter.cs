@@ -65,7 +65,7 @@ namespace FluentMigrator.Runner.Generators
         /// <summary>
         /// Quotes a constraint name
         /// </summary>
-        string QuoteConstraintName(string contraintName, string schemaName = null);
+        string QuoteConstraintName(string constraintName, string schemaName = null);
 
         /// <summary>
         /// Quotes a Sequence name

@@ -143,7 +143,7 @@ namespace FluentMigrator.Runner.Initialization
         }
 
         /// <summary>
-        /// Will be called durin the runner scope intialization
+        /// Will be called during the runner scope initialization
         /// </summary>
         /// <remarks>
         /// The <see cref="Runner"/> isn't initialized yet.
