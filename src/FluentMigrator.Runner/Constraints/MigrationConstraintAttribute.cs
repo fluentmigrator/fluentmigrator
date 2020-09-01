@@ -32,7 +32,7 @@ namespace FluentMigrator.Runner.Constraints
         /// <param name="predicate">Predicate that determines whether this migration should be run in given context <see cref="MigrationConstraintAttribute"/>.</param>
         public MigrationConstraintAttribute(Func<MigrationConstraintContext, bool> predicate)
         {
-            _predicate = predicate ?? throw new ArgumentNullException("predicate", "Predicate must not be null");
+            _predicate = predicate ?? throw new ArgumentNullException(nameof(predicate), "Predicate must not be null");
         }
         /// <summary>
         /// Determines whether the migration having this attribute should be run under given <paramref name="context">migration context</paramref>.
