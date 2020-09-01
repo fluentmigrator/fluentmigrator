@@ -27,7 +27,7 @@ namespace FluentMigrator.Runner
     public enum CompatabilityMode
     {
         /// <summary>
-        /// Ensuare that an exception gets thrown when a processor doesn't support a specific feature
+        /// Ensure that an exception gets thrown when a processor doesn't support a specific feature
         /// </summary>
         STRICT,
 

@@ -22,7 +22,7 @@ using System.Collections.Generic;
 namespace FluentMigrator.Builders.IfDatabase
 {
     /// <summary>
-    /// Provides a null implmentation of a procesor that does not do any work
+    /// Provides a null implementation of a processor that does not do any work
     /// </summary>
     public class NullIfDatabaseProcessor : IQuerySchema
     {

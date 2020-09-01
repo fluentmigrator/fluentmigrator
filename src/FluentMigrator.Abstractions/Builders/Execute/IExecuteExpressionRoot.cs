@@ -61,13 +61,13 @@ namespace FluentMigrator.Builders.Execute
         void WithConnection(Action<IDbConnection, IDbTransaction> operation);
 
         /// <summary>
-        /// Executes an SQL script loaded from an embedded ressource
+        /// Executes an SQL script loaded from an embedded resource
         /// </summary>
         /// <param name="embeddedSqlScriptName">The name of the embedded SQL script (partial matches allowed)</param>
         void EmbeddedScript(string embeddedSqlScriptName);
 
         /// <summary>
-        /// Executes an SQL script loaded from an embedded ressource
+        /// Executes an SQL script loaded from an embedded resource
         /// </summary>
         /// <param name="embeddedSqlScriptName">The name of the embedded SQL script (partial matches allowed)</param>
         /// <param name="parameters">The parameters to be replaced in the SQL script</param>

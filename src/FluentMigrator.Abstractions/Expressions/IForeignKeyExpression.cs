@@ -24,7 +24,7 @@ namespace FluentMigrator.Expressions
     public interface IForeignKeyExpression
     {
         /// <summary>
-        /// Gets the foreign key defintion
+        /// Gets the foreign key definition
         /// </summary>
         ForeignKeyDefinition ForeignKey { get; }
     }

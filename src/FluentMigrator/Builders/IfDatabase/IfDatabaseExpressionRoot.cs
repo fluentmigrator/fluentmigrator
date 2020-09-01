@@ -34,7 +34,7 @@ using FluentMigrator.Infrastructure;
 namespace FluentMigrator.Builders.IfDatabase
 {
     /// <summary>
-    /// Allows for conditional inclusion of expresions based on the migration context
+    /// Allows for conditional inclusion of expressions based on the migration context
     /// </summary>
     public class IfDatabaseExpressionRoot : IIfDatabaseExpressionRoot
     {
