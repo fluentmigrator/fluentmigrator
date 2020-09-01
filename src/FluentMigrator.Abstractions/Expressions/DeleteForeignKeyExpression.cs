@@ -88,9 +88,9 @@ namespace FluentMigrator.Expressions
 
             if (ForeignKey.ForeignColumns.Count > 0)
             {
-                var ctxt = new ValidationContext(ForeignKey, validationContext.Items);
-                ctxt.InitializeServiceProvider(validationContext.GetService);
-                ValidationUtilities.TryCollectResults(ctxt, ForeignKey, results);
+                var context = new ValidationContext(ForeignKey, validationContext.Items);
+                context.InitializeServiceProvider(validationContext.GetService);
+                ValidationUtilities.TryCollectResults(context, ForeignKey, results);
             }
             else
             {
