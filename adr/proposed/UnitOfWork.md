@@ -68,6 +68,7 @@ The Unit of Work needs to know what objects it should keep track of.  Martin des
 
 However, a third possibility is that the objects don't know anything about the Unit of Work.
 
+```
 .------------------------.
 |                        |
 | IUnitOfWork            |
@@ -79,7 +80,7 @@ However, a third possibility is that the objects don't know anything about the U
 | IUnitOfWorkParticipant |
 |                        |
 '------------------------'
-
+```
 
 ```c#
 public interface IUnitOfWorkParticipant
