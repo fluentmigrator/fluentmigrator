@@ -43,7 +43,8 @@ namespace FluentMigrator.Runner.Processors.SQLite
         {
             var factory = new SQLiteDbFactory(_serviceProvider);
             var connection = factory.CreateConnection(connectionString);
-            return new SQLiteProcessor(connection, new SQLiteGenerator(new SQLiteQuoter()), announcer, options, factory);
+            var quoter = new SQLiteQuoter();
+            return new SQLiteProcessor(connection, new SQLiteGenerator(quoter), announcer, options, factory, quoter);
         }
     }
 }
