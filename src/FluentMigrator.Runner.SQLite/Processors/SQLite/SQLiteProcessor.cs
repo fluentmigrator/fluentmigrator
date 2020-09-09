@@ -44,6 +44,8 @@ namespace FluentMigrator.Runner.Processors.SQLite
     {
         [CanBeNull]
         private readonly IServiceProvider _serviceProvider;
+        [NotNull]
+        private readonly SQLiteQuoter _quoter;
 
         public override string DatabaseType
         {
@@ -58,9 +60,11 @@ namespace FluentMigrator.Runner.Processors.SQLite
             IMigrationGenerator generator,
             IAnnouncer announcer,
             [NotNull] IMigrationProcessorOptions options,
-            IDbFactory factory)
+            IDbFactory factory,
+            [NotNull] SQLiteQuoter quoter)
             : base(connection, factory, generator, announcer, options)
         {
+            _quoter = quoter;
         }
 
         public SQLiteProcessor(
@@ -69,10 +73,12 @@ namespace FluentMigrator.Runner.Processors.SQLite
             [NotNull] ILogger<SQLiteProcessor> logger,
             [NotNull] IOptionsSnapshot<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor,
-            [NotNull] IServiceProvider serviceProvider)
+            [NotNull] IServiceProvider serviceProvider,
+            [NotNull] SQLiteQuoter quoter)
             : base(() => factory.Factory, generator, logger, options.Value, connectionStringAccessor)
         {
             _serviceProvider = serviceProvider;
+            _quoter = quoter;
         }
 
         public override bool SchemaExists(string schemaName)
@@ -82,18 +88,18 @@ namespace FluentMigrator.Runner.Processors.SQLite
 
         public override bool TableExists(string schemaName, string tableName)
         {
-            return Exists("select count(*) from sqlite_master where name=\"{0}\" and type='table'", tableName);
+            return Exists("select count(*) from sqlite_master where name={0} and type='table'", _quoter.QuoteValue(tableName));
         }
 
         public override bool ColumnExists(string schemaName, string tableName, string columnName)
         {
-            var dataSet = Read("PRAGMA table_info([{0}])", tableName);
+            var dataSet = Read("PRAGMA table_info({0})", _quoter.QuoteValue(tableName));
             if (dataSet.Tables.Count == 0)
                 return false;
             var table = dataSet.Tables[0];
             if (!table.Columns.Contains("Name"))
                 return false;
-            return table.Select(string.Format("Name='{0}'", columnName.Replace("'", "''"))).Length > 0;
+            return table.Select(string.Format("Name={0}", _quoter.QuoteValue(columnName))).Length > 0;
         }
 
         public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
@@ -103,7 +109,7 @@ namespace FluentMigrator.Runner.Processors.SQLite
 
         public override bool IndexExists(string schemaName, string tableName, string indexName)
         {
-            return Exists("select count(*) from sqlite_master where name='{0}' and tbl_name='{1}' and type='index'", indexName, tableName);
+            return Exists("select count(*) from sqlite_master where name={0} and tbl_name={1} and type='index'", _quoter.QuoteValue(indexName), _quoter.QuoteValue(tableName));
         }
 
         public override bool SequenceExists(string schemaName, string sequenceName)
@@ -138,7 +144,7 @@ namespace FluentMigrator.Runner.Processors.SQLite
 
         public override DataSet ReadTableData(string schemaName, string tableName)
         {
-            return Read("select * from [{0}]", tableName);
+            return Read("select * from {0}", _quoter.QuoteTableName(tableName));
         }
 
         public override bool DefaultValueExists(string schemaName, string tableName, string columnName, object defaultValue)

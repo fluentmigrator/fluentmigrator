@@ -252,7 +252,7 @@ namespace FluentMigrator.Tests.Integration
                 connection.ConnectionString = serverOptions.ConnectionString;
                 connection.Open();
 
-                var processor = new SQLiteProcessor(connection, new SQLiteGenerator(), announcer, new ProcessorOptions(), factory);
+                var processor = new SQLiteProcessor(connection, new SQLiteGenerator(), announcer, new ProcessorOptions(), factory, new SQLiteQuoter());
                 test(processor);
 
                 if (tryRollback && !processor.WasCommitted)
