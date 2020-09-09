@@ -82,7 +82,7 @@ namespace FluentMigrator.Runner.Processors.SQLite
 
         public override bool TableExists(string schemaName, string tableName)
         {
-            return Exists("select count(*) from sqlite_master where name='{0}' and type='table'", tableName);
+            return Exists("select count(*) from sqlite_master where name='{0}' and type='table'", tableName.Replace("'", "''"));
         }
 
         public override bool ColumnExists(string schemaName, string tableName, string columnName)
