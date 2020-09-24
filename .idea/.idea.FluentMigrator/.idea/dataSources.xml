@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
+    <data-source source="LOCAL" name="mssql-2019" uuid="9687b005-645a-4ad6-92aa-af88a98d7b3c">
+      <driver-ref>sqlserver.ms</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</jdbc-driver>
+      <jdbc-url>jdbc:sqlserver://localhost:1439</jdbc-url>
+    </data-source>
+    <data-source source="LOCAL" name="mssql-2017" uuid="9f701756-717d-4d2a-b51f-4a4772f15c8f">
+      <driver-ref>sqlserver.ms</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</jdbc-driver>
+      <jdbc-url>jdbc:sqlserver://localhost:1437</jdbc-url>
+    </data-source>
+    <data-source source="LOCAL" name="oracle-11g" uuid="f33ea131-1568-4f89-9961-720655043cda">
+      <driver-ref>oracle</driver-ref>
+      <synchronize>true</synchronize>
+      <auto-commit>false</auto-commit>
+      <jdbc-driver>oracle.jdbc.OracleDriver</jdbc-driver>
+      <jdbc-url>jdbc:oracle:thin:@localhost:1521:XE</jdbc-url>
+    </data-source>
+    <data-source source="LOCAL" name="mysql-latest" uuid="811d3f8f-0d3c-4563-88e8-cf5a14b7e093">
+      <driver-ref>mysql.8</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:mysql://127.0.0.1:3306</jdbc-url>
+    </data-source>
+    <data-source source="LOCAL" name="postgres-latest" uuid="fe17ab35-e717-4982-9446-e32a90843134">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://localhost:5432/FluentMigrator</jdbc-url>
+    </data-source>
+    <data-source source="LOCAL" name="firebird" uuid="108c701c-f28d-4fd7-8fca-1976d185bbec">
+      <synchronize>true</synchronize>
+      <configured-by-url>true</configured-by-url>
+      <jdbc-driver>org.firebirdsql.jdbc.FBDriver</jdbc-driver>
+      <jdbc-url>jdbc:firebirdsql:localhost/3050:/firebird/data/FluentMigrator</jdbc-url>
+    </data-source>
+    <data-source source="LOCAL" name="db2" uuid="8a1c666b-fd5f-412b-ae07-88340d881e1b">
+      <driver-ref>db2.11</driver-ref>
+      <jdbc-driver>com.ibm.db2.jcc.DB2Driver</jdbc-driver>
+      <jdbc-url>jdbc:db2://localhost:50000/fmtest</jdbc-url>
+    </data-source>
+  </component>
+</project>

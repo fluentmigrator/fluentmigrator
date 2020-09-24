@@ -1,0 +1,31 @@
+﻿<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="oracle-11g" type="docker-deploy" factoryName="docker-image" server-name="Docker">
+    <deployment type="docker-image">
+      <settings>
+        <option name="imageTag" value="wnameless/oracle-xe-11g-r2:latest" />
+        <option name="command" value="" />
+        <option name="containerName" value="oracle-11g" />
+        <option name="entrypoint" value="" />
+        <option name="portBindings">
+          <list>
+            <DockerPortBindingImpl>
+              <option name="containerPort" value="1521" />
+              <option name="hostPort" value="1521" />
+            </DockerPortBindingImpl>
+          </list>
+        </option>
+        <option name="commandLineOptions" value="" />
+        <option name="volumeBindings">
+          <list>
+            <DockerVolumeBindingImpl>
+              <option name="containerPath" value="/docker-entrypoint-initdb.d" />
+              <option name="hostPath" value="$PROJECT_DIR$/test/FluentMigrator.Tests/Docker/oracle-11g" />
+              <option name="readOnly" value="true" />
+            </DockerVolumeBindingImpl>
+          </list>
+        </option>
+      </settings>
+    </deployment>
+    <method v="2" />
+  </configuration>
+</component>

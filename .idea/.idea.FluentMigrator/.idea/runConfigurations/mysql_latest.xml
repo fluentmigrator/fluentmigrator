@@ -1,0 +1,51 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="mysql-latest" type="docker-deploy" factoryName="docker-image" server-name="Docker">
+    <deployment type="docker-image">
+      <settings>
+        <option name="imageTag" value="mysql" />
+        <option name="command" value="" />
+        <option name="containerName" value="mysql-latest" />
+        <option name="entrypoint" value="" />
+        <option name="envVars">
+          <list>
+            <DockerEnvVarImpl>
+              <option name="name" value="MYSQL_ROOT_PASSWORD" />
+              <option name="value" value="root" />
+            </DockerEnvVarImpl>
+            <DockerEnvVarImpl>
+              <option name="name" value="MYSQL_USER" />
+              <option name="value" value="FMTEST" />
+            </DockerEnvVarImpl>
+            <DockerEnvVarImpl>
+              <option name="name" value="MYSQL_PASSWORD" />
+              <option name="value" value="FMTEST" />
+            </DockerEnvVarImpl>
+            <DockerEnvVarImpl>
+              <option name="name" value="MYSQL_DATABASE" />
+              <option name="value" value="FluentMigrator" />
+            </DockerEnvVarImpl>
+          </list>
+        </option>
+        <option name="portBindings">
+          <list>
+            <DockerPortBindingImpl>
+              <option name="containerPort" value="3306" />
+              <option name="hostPort" value="3306" />
+            </DockerPortBindingImpl>
+          </list>
+        </option>
+        <option name="commandLineOptions" value="" />
+        <option name="volumeBindings">
+          <list>
+            <DockerVolumeBindingImpl>
+              <option name="containerPath" value="/docker-entrypoint-initdb.d/" />
+              <option name="hostPath" value="$PROJECT_DIR$/../fluentmigrator\test\FluentMigrator.Tests\Docker\oracle-11g" />
+              <option name="readOnly" value="true" />
+            </DockerVolumeBindingImpl>
+          </list>
+        </option>
+      </settings>
+    </deployment>
+    <method v="2" />
+  </configuration>
+</component>

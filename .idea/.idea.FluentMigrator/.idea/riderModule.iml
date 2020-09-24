@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="RIDER_MODULE" version="4">
+  <component name="NewModuleRootManager">
+    <content url="file://$USER_HOME$/.nuget/packages/nunit3testadapter/3.13.0/build/net35/NUnit3.TestAdapter.dll" />
+    <content url="file://$USER_HOME$/.nuget/packages/nunit3testadapter/3.13.0/build/net35/NUnit3.TestAdapter.pdb" />
+    <content url="file://$USER_HOME$/.nuget/packages/nunit3testadapter/3.13.0/build/net35/nunit.engine.api.dll" />
+    <content url="file://$USER_HOME$/.nuget/packages/nunit3testadapter/3.13.0/build/net35/nunit.engine.dll" />
+    <content url="file://$USER_HOME$/.nuget/packages/sqlitepclraw.lib.e_sqlite3/2.0.2/runtimes" />
+    <content url="file://$MODULE_DIR$/../.." />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>

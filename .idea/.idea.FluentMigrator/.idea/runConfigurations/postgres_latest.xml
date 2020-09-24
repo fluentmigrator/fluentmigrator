@@ -1,0 +1,38 @@
+﻿<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="postgres-latest" type="docker-deploy" factoryName="docker-image" server-name="Docker">
+    <deployment type="docker-image">
+      <settings>
+        <option name="imageTag" value="postgres" />
+        <option name="command" value="" />
+        <option name="containerName" value="postgres-latest" />
+        <option name="entrypoint" value="" />
+        <option name="envVars">
+          <list>
+            <DockerEnvVarImpl>
+              <option name="name" value="POSTGRES_USER" />
+              <option name="value" value="FMTEST" />
+            </DockerEnvVarImpl>
+            <DockerEnvVarImpl>
+              <option name="name" value="POSTGRES_PASSWORD" />
+              <option name="value" value="FMTEST" />
+            </DockerEnvVarImpl>
+            <DockerEnvVarImpl>
+              <option name="name" value="POSTGRES_DB" />
+              <option name="value" value="FluentMigrator" />
+            </DockerEnvVarImpl>
+          </list>
+        </option>
+        <option name="portBindings">
+          <list>
+            <DockerPortBindingImpl>
+              <option name="containerPort" value="5432" />
+              <option name="hostPort" value="5432" />
+            </DockerPortBindingImpl>
+          </list>
+        </option>
+        <option name="commandLineOptions" value="" />
+      </settings>
+    </deployment>
+    <method v="2" />
+  </configuration>
+</component>
