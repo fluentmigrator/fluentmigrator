@@ -25,7 +25,7 @@
               <option name="value" value="fmtest" />
             </DockerEnvVarImpl>
             <DockerEnvVarImpl>
-              <option name="name" value="PERSISTENT_HOME1" />
+              <option name="name" value="PERSISTENT_HOME" />
               <option name="value" value="false" />
             </DockerEnvVarImpl>
           </list>
@@ -39,14 +39,6 @@
           </list>
         </option>
         <option name="commandLineOptions" value="" />
-        <option name="volumeBindings">
-          <list>
-            <DockerVolumeBindingImpl>
-              <option name="containerPath" value="/database" />
-              <option name="hostPath" value="D:\Dev\fluentmigrator\test\FluentMigrator.Tests\Docker\db2" />
-            </DockerVolumeBindingImpl>
-          </list>
-        </option>
       </settings>
     </deployment>
     <method v="2" />
