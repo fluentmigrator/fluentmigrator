@@ -77,7 +77,7 @@ namespace FluentMigrator.Runner
         }
 
         /// <summary>
-        /// Adds Postgres 10.0 support
+        /// Adds Postgres 11.0 support
         /// </summary>
         /// <param name="builder">The builder to add the Postgres-specific services to</param>
         /// <returns>The migration runner builder</returns>
