@@ -94,8 +94,9 @@ namespace FluentMigrator.Runner.Generators.Postgres
                 result.Append(column.Direction == Direction.Ascending ? " ASC" : " DESC");
             }
 
-            result.Append(");")
-                .Append(GetIncludeString(expression));
+            result.Append(")")
+                .Append(GetIncludeString(expression))
+                .Append(";");
 
             return string.Format(result.ToString(), Quoter.QuoteIndexName(expression.Index.Name), Quoter.QuoteTableName(expression.Index.TableName, expression.Index.SchemaName));
         }
