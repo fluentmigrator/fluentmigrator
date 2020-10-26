@@ -45,7 +45,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
         {
         }
 
-        public virtual string GetIncludeString(CreateIndexExpression column)
+        protected override string GetIncludeString(CreateIndexExpression column)
         {
             var includes = column.GetAdditionalFeature<IList<PostgresIndexIncludeDefinition>>(PostgresExtensions.IncludesList);
 
@@ -67,38 +67,6 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return result
                 .Append(")")
                 .ToString();
-        }
-
-        /// <inheritdoc />
-        public override string Generate(CreateIndexExpression expression)
-        {
-            var result = new StringBuilder("CREATE");
-            if (expression.Index.IsUnique)
-                result.Append(" UNIQUE");
-
-            result.Append(" INDEX {0} ON {1} (");
-
-            var first = true;
-            foreach (var column in expression.Index.Columns)
-            {
-                if (first)
-                {
-                    first = false;
-                }
-                else
-                {
-                    result.Append(",");
-                }
-
-                result.Append(Quoter.QuoteColumnName(column.Name));
-                result.Append(column.Direction == Direction.Ascending ? " ASC" : " DESC");
-            }
-
-            result.Append(")")
-                .Append(GetIncludeString(expression))
-                .Append(";");
-
-            return string.Format(result.ToString(), Quoter.QuoteIndexName(expression.Index.Name), Quoter.QuoteTableName(expression.Index.TableName, expression.Index.SchemaName));
         }
     }
 }
