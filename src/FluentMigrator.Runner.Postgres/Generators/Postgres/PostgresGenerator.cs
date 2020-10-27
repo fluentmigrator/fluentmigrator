@@ -195,6 +195,17 @@ namespace FluentMigrator.Runner.Generators.Postgres
             throw new NotSupportedException("The current version doesn't support include index. Please use Postgres 11.");
         }
 
+        protected virtual string GetUsingAlgorithm(CreateIndexExpression column)
+        {
+            var algorithm = column.GetAdditionalFeature<PostgresIndexAlgorithmDefinition>(PostgresExtensions.IndexAlgorithm);
+            if (algorithm == null)
+            {
+                return string.Empty;
+            }
+
+            return $" USING {algorithm.Algorithm.ToString().ToLower()}";
+        }
+
         public override string Generate(CreateIndexExpression expression)
         {
             var result = new StringBuilder("CREATE");
@@ -225,6 +236,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
             }
 
             result.Append(")")
+                .Append(GetUsingAlgorithm(expression))
                 .Append(GetIncludeString(expression))
                 .Append(";");
 

@@ -49,6 +49,7 @@ namespace FluentMigrator.Postgres
     {
 
         public const string IncludesList = "PostgresIncludes";
+        public const string IndexAlgorithm = "PostgresIndexAlgorithm";
 
         /// <summary>
         /// Column identity generation ability for PostgreSQL 10 and above
