@@ -22,7 +22,9 @@ using System.Linq;
 using System.Text;
 
 using FluentMigrator.Expressions;
+using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Model;
+using FluentMigrator.Postgres;
 using FluentMigrator.Runner.Generators.Generic;
 
 using JetBrains.Annotations;
@@ -180,39 +182,53 @@ namespace FluentMigrator.Runner.Generators.Postgres
                 Quoter.Quote(expression.ForeignKey.Name));
         }
 
+
+        protected virtual string GetIncludeString(CreateIndexExpression column)
+        {
+            var includes = column.GetAdditionalFeature<IList<PostgresIndexIncludeDefinition>>(PostgresExtensions.IncludesList);
+
+            if (includes == null || includes.Count == 0)
+            {
+                return string.Empty;
+            }
+
+            throw new NotSupportedException("The current version doesn't support include index. Please use Postgres 11.");
+        }
+
         public override string Generate(CreateIndexExpression expression)
         {
             var result = new StringBuilder("CREATE");
-            if (expression.Index.IsUnique)
-                result.Append(" UNIQUE");
 
-            result.Append(" INDEX {0} ON {1} (");
+            if (expression.Index.IsUnique)
+            {
+                result.Append(" UNIQUE");
+            }
+
+            result.AppendFormat(" INDEX {0} ON {1} (",
+                Quoter.QuoteIndexName(expression.Index.Name),
+                Quoter.QuoteTableName(expression.Index.TableName, expression.Index.SchemaName));
 
             var first = true;
             foreach (var column in expression.Index.Columns)
             {
                 if (first)
+                {
                     first = false;
+                }
                 else
+                {
                     result.Append(",");
+                }
 
                 result.Append(Quoter.QuoteColumnName(column.Name));
                 result.Append(column.Direction == Direction.Ascending ? " ASC" : " DESC");
             }
-            result.Append(");");
 
-            return string.Format(result.ToString(), Quoter.QuoteIndexName(expression.Index.Name), Quoter.QuoteTableName(expression.Index.TableName, expression.Index.SchemaName));
+            result.Append(")")
+                .Append(GetIncludeString(expression))
+                .Append(";");
 
-            /*
-            var idx = String.Format(result.ToString(), expression.Index.Name, Quoter.QuoteSchemaName(expression.Index.SchemaName), expression.Index.TableName);
-            if (!expression.Index.IsClustered)
-                return idx;
-
-             // Clustered indexes in Postgres do not cluster updates/inserts to the table after the initial cluster operation is applied.
-             // To keep the clustered index up to date run CLUSTER TableName periodically
-
-            return string.Format("{0}; CLUSTER {1}\"{2}\" ON \"{3}\"", idx, Quoter.QuoteSchemaName(expression.Index.SchemaName), expression.Index.TableName, expression.Index.Name);
-             */
+            return result.ToString();
         }
 
         public override string Generate(DeleteIndexExpression expression)

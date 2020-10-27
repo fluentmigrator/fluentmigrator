@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using FluentMigrator.Builders.Create.Index;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
+using FluentMigrator.Postgres;
 using FluentMigrator.SqlServer;
 
 using Moq;
@@ -112,9 +113,33 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             expressionMock.SetupGet(e => e.Index).Returns(indexMock.Object);
 
             ICreateIndexOnColumnOrInSchemaSyntax builder = new CreateIndexExpressionBuilder(expressionMock.Object);
-            builder.Include("BaconId");
+            SqlServerExtensions.Include(builder, "BaconId");
 
             collectionMock.Verify(x => x.Add(It.Is<IndexIncludeDefinition>(c => c.Name.Equals("BaconId"))));
+            indexMock.VerifyGet(x => x.AdditionalFeatures);
+            expressionMock.VerifyGet(e => e.Index);
+        }
+
+        [Test]
+        public void CallingIncludeAddsNewIncludeToExpressionInPostgres()
+        {
+            var collectionMock = new Mock<IList<PostgresIndexIncludeDefinition>>();
+
+            var additionalFeatures = new Dictionary<string, object>()
+            {
+                [PostgresExtensions.IncludesList] = collectionMock.Object
+            };
+
+            var indexMock = new Mock<IndexDefinition>();
+            indexMock.Setup(x => x.AdditionalFeatures).Returns(additionalFeatures);
+
+            var expressionMock = new Mock<CreateIndexExpression>();
+            expressionMock.SetupGet(e => e.Index).Returns(indexMock.Object);
+
+            ICreateIndexOnColumnOrInSchemaSyntax builder = new CreateIndexExpressionBuilder(expressionMock.Object);
+            PostgresExtensions.Include(builder, "BaconId");
+
+            collectionMock.Verify(x => x.Add(It.Is<PostgresIndexIncludeDefinition>(c => c.Name.Equals("BaconId"))));
             indexMock.VerifyGet(x => x.AdditionalFeatures);
             expressionMock.VerifyGet(e => e.Index);
         }
