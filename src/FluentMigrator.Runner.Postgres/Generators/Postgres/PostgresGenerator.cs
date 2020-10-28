@@ -203,7 +203,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
                 return string.Empty;
             }
 
-            return $" USING {algorithm.Algorithm.ToString().ToLower()}";
+            return $" USING {algorithm.Algorithm.ToString().ToUpper()}";
         }
 
         public override string Generate(CreateIndexExpression expression)

@@ -145,7 +145,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             expressionMock.VerifyGet(e => e.Index);
         }
 
-[TestCase(PostgresIndexAlgorithm.Brin)]
+        [TestCase(PostgresIndexAlgorithm.Brin)]
         [TestCase(PostgresIndexAlgorithm.BTree)]
         [TestCase(PostgresIndexAlgorithm.Hash)]
         [TestCase(PostgresIndexAlgorithm.Gin)]
@@ -191,7 +191,6 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
                 default:
                     throw new ArgumentOutOfRangeException(nameof(algorithm), algorithm, null);
             }
-
 
             collectionMock.VerifySet(x => x.Algorithm = algorithm);
             indexMock.VerifyGet(x => x.AdditionalFeatures);
