@@ -119,13 +119,13 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("DROP INDEX \"public\".\"TestIndex\";");
         }
 
-        [TestCase(PostgresIndexAlgorithm.Brin)]
-        [TestCase(PostgresIndexAlgorithm.BTree)]
-        [TestCase(PostgresIndexAlgorithm.Gin)]
-        [TestCase(PostgresIndexAlgorithm.Gist)]
-        [TestCase(PostgresIndexAlgorithm.Hash)]
-        [TestCase(PostgresIndexAlgorithm.Spgist)]
-        public void CanCreateIndexUsingHashAlgorithm(PostgresIndexAlgorithm algorithm)
+        [TestCase(Algorithm.Brin)]
+        [TestCase(Algorithm.BTree)]
+        [TestCase(Algorithm.Gin)]
+        [TestCase(Algorithm.Gist)]
+        [TestCase(Algorithm.Hash)]
+        [TestCase(Algorithm.Spgist)]
+        public void CanCreateIndexUsingIndexAlgorithm(Algorithm algorithm)
         {
             var expression = GetCreateIndexExpression(algorithm);
 
@@ -133,7 +133,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe($"CREATE INDEX \"TestIndex\" ON \"public\".\"TestTable1\" USING {algorithm.ToString().ToUpper()} (\"TestColumn1\" ASC);");
         }
 
-        private static CreateIndexExpression GetCreateIndexExpression(PostgresIndexAlgorithm algorithm)
+        private static CreateIndexExpression GetCreateIndexExpression(Algorithm algorithm)
         {
             var expression = new CreateIndexExpression
             {

@@ -29,7 +29,7 @@ namespace FluentMigrator.Model
 #pragma warning restore 618
     {
         [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.ColumnNameCannotBeNullOrEmpty))]
-        public virtual PostgresIndexAlgorithm Algorithm { get; set; }
+        public virtual Algorithm Algorithm { get; set; }
 
         [Obsolete("Use the System.ComponentModel.DataAnnotations.Validator instead")]
         public virtual void CollectValidationErrors(ICollection<string> errors)
@@ -43,7 +43,7 @@ namespace FluentMigrator.Model
         }
     }
 
-    public enum PostgresIndexAlgorithm
+    public enum Algorithm
     {
         BTree,
         Hash,

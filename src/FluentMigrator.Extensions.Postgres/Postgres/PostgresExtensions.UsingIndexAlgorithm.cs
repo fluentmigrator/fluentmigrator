@@ -27,91 +27,105 @@ namespace FluentMigrator.Postgres
 {
     public static partial class PostgresExtensions
     {
-        public static ICreateIndexOptionsSyntax UsingBTreeAlgorithm(this ICreateIndexOptionsSyntax expression)
+        public static ICreateIndexOptionsSyntax UsingBTree(this ICreateIndexOptionsSyntax expression)
         {
             var additionalFeatures = expression as ISupportAdditionalFeatures;
-            additionalFeatures.UsingIndexAlgorithm(PostgresIndexAlgorithm.BTree);
+            additionalFeatures.Using(Algorithm.BTree);
             return expression;
         }
 
-        public static ICreateIndexNonKeyColumnSyntax UsingBTreeAlgorithm(this ICreateIndexOnColumnSyntax expression)
+        public static ICreateIndexNonKeyColumnSyntax UsingBTree(this ICreateIndexOnColumnSyntax expression)
         {
             var additionalFeatures = expression as ISupportAdditionalFeatures;
-            additionalFeatures.UsingIndexAlgorithm(PostgresIndexAlgorithm.BTree);
+            additionalFeatures.Using(Algorithm.BTree);
             return new CreateIndexExpressionNonKeyBuilder(expression, additionalFeatures);
         }
 
-        public static ICreateIndexOptionsSyntax UsingHashAlgorithm(this ICreateIndexOptionsSyntax expression)
+        public static ICreateIndexOptionsSyntax UsingHash(this ICreateIndexOptionsSyntax expression)
         {
             var additionalFeatures = expression as ISupportAdditionalFeatures;
-            additionalFeatures.UsingIndexAlgorithm(PostgresIndexAlgorithm.Hash);
+            additionalFeatures.Using(Algorithm.Hash);
             return expression;
         }
 
-        public static ICreateIndexNonKeyColumnSyntax UsingHashAlgorithm(this ICreateIndexOnColumnSyntax expression)
+        public static ICreateIndexNonKeyColumnSyntax UsingHash(this ICreateIndexOnColumnSyntax expression)
         {
             var additionalFeatures = expression as ISupportAdditionalFeatures;
-            additionalFeatures.UsingIndexAlgorithm(PostgresIndexAlgorithm.Hash);
+            additionalFeatures.Using(Algorithm.Hash);
             return new CreateIndexExpressionNonKeyBuilder(expression, additionalFeatures);
         }
 
-        public static ICreateIndexOptionsSyntax UsingGistAlgorithm(this ICreateIndexOptionsSyntax expression)
+        public static ICreateIndexOptionsSyntax UsingGist(this ICreateIndexOptionsSyntax expression)
         {
             var additionalFeatures = expression as ISupportAdditionalFeatures;
-            additionalFeatures.UsingIndexAlgorithm(PostgresIndexAlgorithm.Gist);
+            additionalFeatures.Using(Algorithm.Gist);
             return expression;
         }
 
-        public static ICreateIndexNonKeyColumnSyntax UsingGistAlgorithm(this ICreateIndexOnColumnSyntax expression)
+        public static ICreateIndexNonKeyColumnSyntax UsingGist(this ICreateIndexOnColumnSyntax expression)
         {
             var additionalFeatures = expression as ISupportAdditionalFeatures;
-            additionalFeatures.UsingIndexAlgorithm(PostgresIndexAlgorithm.Gist);
+            additionalFeatures.Using(Algorithm.Gist);
             return new CreateIndexExpressionNonKeyBuilder(expression, additionalFeatures);
         }
 
-        public static ICreateIndexOptionsSyntax UsingSpgistAlgorithm(this ICreateIndexOptionsSyntax expression)
+        public static ICreateIndexOptionsSyntax UsingSpgist(this ICreateIndexOptionsSyntax expression)
         {
             var additionalFeatures = expression as ISupportAdditionalFeatures;
-            additionalFeatures.UsingIndexAlgorithm(PostgresIndexAlgorithm.Spgist);
+            additionalFeatures.Using(Algorithm.Spgist);
             return expression;
         }
 
-        public static ICreateIndexNonKeyColumnSyntax UsingSpgistAlgorithm(this ICreateIndexOnColumnSyntax expression)
+        public static ICreateIndexNonKeyColumnSyntax UsingSpgist(this ICreateIndexOnColumnSyntax expression)
         {
             var additionalFeatures = expression as ISupportAdditionalFeatures;
-            additionalFeatures.UsingIndexAlgorithm(PostgresIndexAlgorithm.Spgist);
+            additionalFeatures.Using(Algorithm.Spgist);
             return new CreateIndexExpressionNonKeyBuilder(expression, additionalFeatures);
         }
 
-        public static ICreateIndexOptionsSyntax UsingGinAlgorithm(this ICreateIndexOptionsSyntax expression)
+        public static ICreateIndexOptionsSyntax UsingGin(this ICreateIndexOptionsSyntax expression)
         {
             var additionalFeatures = expression as ISupportAdditionalFeatures;
-            additionalFeatures.UsingIndexAlgorithm(PostgresIndexAlgorithm.Gin);
+            additionalFeatures.Using(Algorithm.Gin);
             return expression;
         }
 
-        public static ICreateIndexNonKeyColumnSyntax UsingGinAlgorithm(this ICreateIndexOnColumnSyntax expression)
+        public static ICreateIndexNonKeyColumnSyntax UsingGin(this ICreateIndexOnColumnSyntax expression)
         {
             var additionalFeatures = expression as ISupportAdditionalFeatures;
-            additionalFeatures.UsingIndexAlgorithm(PostgresIndexAlgorithm.Gin);
+            additionalFeatures.Using(Algorithm.Gin);
             return new CreateIndexExpressionNonKeyBuilder(expression, additionalFeatures);
         }
 
-        public static ICreateIndexOptionsSyntax UsingBrinAlgorithm(this ICreateIndexOptionsSyntax expression)
+        public static ICreateIndexOptionsSyntax UsingBrin(this ICreateIndexOptionsSyntax expression)
         {
             var additionalFeatures = expression as ISupportAdditionalFeatures;
-            additionalFeatures.UsingIndexAlgorithm(PostgresIndexAlgorithm.Brin);
+            additionalFeatures.Using(Algorithm.Brin);
             return expression;
         }
 
-        public static ICreateIndexNonKeyColumnSyntax UsingBrinAlgorithm(this ICreateIndexOnColumnSyntax expression)
+        public static ICreateIndexNonKeyColumnSyntax UsingBrin(this ICreateIndexOnColumnSyntax expression)
         {
             var additionalFeatures = expression as ISupportAdditionalFeatures;
-            additionalFeatures.UsingIndexAlgorithm(PostgresIndexAlgorithm.Brin);
+            additionalFeatures.Using(Algorithm.Brin);
             return new CreateIndexExpressionNonKeyBuilder(expression, additionalFeatures);
         }
 
-        internal static void UsingIndexAlgorithm(this ISupportAdditionalFeatures additionalFeatures, PostgresIndexAlgorithm algorithm)
+        public static ICreateIndexOptionsSyntax Using(this ICreateIndexOptionsSyntax expression, Algorithm algorithm)
+        {
+            var additionalFeatures = expression as ISupportAdditionalFeatures;
+            additionalFeatures.Using(algorithm);
+            return expression;
+        }
+
+        public static ICreateIndexNonKeyColumnSyntax Using(this ICreateIndexOnColumnSyntax expression, Algorithm algorithm)
+        {
+            var additionalFeatures = expression as ISupportAdditionalFeatures;
+            additionalFeatures.Using(algorithm);
+            return new CreateIndexExpressionNonKeyBuilder(expression, additionalFeatures);
+        }
+
+        public static void Using(this ISupportAdditionalFeatures additionalFeatures, Algorithm algorithm)
         {
             if (additionalFeatures == null)
             {

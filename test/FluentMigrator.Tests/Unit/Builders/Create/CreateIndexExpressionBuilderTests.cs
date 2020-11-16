@@ -145,13 +145,13 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             expressionMock.VerifyGet(e => e.Index);
         }
 
-        [TestCase(PostgresIndexAlgorithm.Brin)]
-        [TestCase(PostgresIndexAlgorithm.BTree)]
-        [TestCase(PostgresIndexAlgorithm.Hash)]
-        [TestCase(PostgresIndexAlgorithm.Gin)]
-        [TestCase(PostgresIndexAlgorithm.Gist)]
-        [TestCase(PostgresIndexAlgorithm.Spgist)]
-        public void CallingUsingIndexAlgorithmToExpressionInPostgres(PostgresIndexAlgorithm algorithm)
+        [TestCase(Algorithm.Brin)]
+        [TestCase(Algorithm.BTree)]
+        [TestCase(Algorithm.Hash)]
+        [TestCase(Algorithm.Gin)]
+        [TestCase(Algorithm.Gist)]
+        [TestCase(Algorithm.Spgist)]
+        public void CallingUsingIndexAlgorithmToExpressionInPostgres(Algorithm algorithm)
         {
             var collectionMock = new Mock<PostgresIndexAlgorithmDefinition>();
 
@@ -170,23 +170,23 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 
             switch (algorithm)
             {
-                case PostgresIndexAlgorithm.BTree:
-                    PostgresExtensions.UsingBTreeAlgorithm(builder);
+                case Algorithm.BTree:
+                    PostgresExtensions.UsingBTree(builder);
                     break;
-                case PostgresIndexAlgorithm.Hash:
-                    PostgresExtensions.UsingHashAlgorithm(builder);
+                case Algorithm.Hash:
+                    PostgresExtensions.UsingHash(builder);
                     break;
-                case PostgresIndexAlgorithm.Gist:
-                    PostgresExtensions.UsingGistAlgorithm(builder);
+                case Algorithm.Gist:
+                    PostgresExtensions.UsingGist(builder);
                     break;
-                case PostgresIndexAlgorithm.Spgist:
-                    PostgresExtensions.UsingSpgistAlgorithm(builder);
+                case Algorithm.Spgist:
+                    PostgresExtensions.UsingSpgist(builder);
                     break;
-                case PostgresIndexAlgorithm.Gin:
-                    PostgresExtensions.UsingGinAlgorithm(builder);
+                case Algorithm.Gin:
+                    PostgresExtensions.UsingGin(builder);
                     break;
-                case PostgresIndexAlgorithm.Brin:
-                    PostgresExtensions.UsingBrinAlgorithm(builder);
+                case Algorithm.Brin:
+                    PostgresExtensions.UsingBrin(builder);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(algorithm), algorithm, null);
