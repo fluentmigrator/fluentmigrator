@@ -24,7 +24,7 @@ namespace FluentMigrator.Runner.Processors.MySql
         {
             new TestEntry("MySql.Data", "MySql.Data.MySqlClient.MySqlClientFactory"),
             new TestEntry("MySqlConnector", "MySql.Data.MySqlClient.MySqlClientFactory"),
-            new TestEntry("MySqlConnector", "MySqlConnector.MySqlConnectorFactory")
+            new TestEntry("MySqlConnector", "MySqlConnector.MySqlConnectorFactory"),
         };
 
         [Obsolete]
