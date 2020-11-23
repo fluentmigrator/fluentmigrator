@@ -1,5 +1,10 @@
+using FluentMigrator.Expressions;
+using FluentMigrator.Infrastructure.Extensions;
+using FluentMigrator.Model;
+using FluentMigrator.Postgres;
 using FluentMigrator.Runner.Generators.Postgres;
 using FluentMigrator.Runner.Processors.Postgres;
+using FluentMigrator.SqlServer;
 
 using NUnit.Framework;
 
@@ -112,6 +117,39 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
 
             var result = Generator.Generate(expression);
             result.ShouldBe("DROP INDEX \"public\".\"TestIndex\";");
+        }
+
+        [TestCase(Algorithm.Brin)]
+        [TestCase(Algorithm.BTree)]
+        [TestCase(Algorithm.Gin)]
+        [TestCase(Algorithm.Gist)]
+        [TestCase(Algorithm.Hash)]
+        [TestCase(Algorithm.Spgist)]
+        public void CanCreateIndexUsingIndexAlgorithm(Algorithm algorithm)
+        {
+            var expression = GetCreateIndexExpression(algorithm);
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe($"CREATE INDEX \"TestIndex\" ON \"public\".\"TestTable1\" USING {algorithm.ToString().ToUpper()} (\"TestColumn1\" ASC);");
+        }
+
+        private static CreateIndexExpression GetCreateIndexExpression(Algorithm algorithm)
+        {
+            var expression = new CreateIndexExpression
+            {
+                Index =
+                {
+                    Name = GeneratorTestHelper.TestIndexName,
+                    TableName = GeneratorTestHelper.TestTableName1
+                }
+            };
+
+            expression.Index.Columns.Add(new IndexColumnDefinition { Direction = Direction.Ascending, Name = GeneratorTestHelper.TestColumnName1 });
+
+            var definition = expression.Index.GetAdditionalFeature(PostgresExtensions.IndexAlgorithm, () => new PostgresIndexAlgorithmDefinition());
+            definition.Algorithm = algorithm;
+
+            return expression;
         }
     }
 }

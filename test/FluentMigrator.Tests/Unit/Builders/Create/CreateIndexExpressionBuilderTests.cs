@@ -16,6 +16,7 @@
 //
 #endregion
 
+using System;
 using System.Collections.Generic;
 
 using FluentMigrator.Builders.Create.Index;
@@ -140,6 +141,58 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             PostgresExtensions.Include(builder, "BaconId");
 
             collectionMock.Verify(x => x.Add(It.Is<PostgresIndexIncludeDefinition>(c => c.Name.Equals("BaconId"))));
+            indexMock.VerifyGet(x => x.AdditionalFeatures);
+            expressionMock.VerifyGet(e => e.Index);
+        }
+
+        [TestCase(Algorithm.Brin)]
+        [TestCase(Algorithm.BTree)]
+        [TestCase(Algorithm.Hash)]
+        [TestCase(Algorithm.Gin)]
+        [TestCase(Algorithm.Gist)]
+        [TestCase(Algorithm.Spgist)]
+        public void CallingUsingIndexAlgorithmToExpressionInPostgres(Algorithm algorithm)
+        {
+            var collectionMock = new Mock<PostgresIndexAlgorithmDefinition>();
+
+            var additionalFeatures = new Dictionary<string, object>()
+            {
+                [PostgresExtensions.IndexAlgorithm] = collectionMock.Object
+            };
+
+            var indexMock = new Mock<IndexDefinition>();
+            indexMock.Setup(x => x.AdditionalFeatures).Returns(additionalFeatures);
+
+            var expressionMock = new Mock<CreateIndexExpression>();
+            expressionMock.SetupGet(e => e.Index).Returns(indexMock.Object);
+
+            ICreateIndexOnColumnOrInSchemaSyntax builder = new CreateIndexExpressionBuilder(expressionMock.Object);
+
+            switch (algorithm)
+            {
+                case Algorithm.BTree:
+                    PostgresExtensions.UsingBTree(builder);
+                    break;
+                case Algorithm.Hash:
+                    PostgresExtensions.UsingHash(builder);
+                    break;
+                case Algorithm.Gist:
+                    PostgresExtensions.UsingGist(builder);
+                    break;
+                case Algorithm.Spgist:
+                    PostgresExtensions.UsingSpgist(builder);
+                    break;
+                case Algorithm.Gin:
+                    PostgresExtensions.UsingGin(builder);
+                    break;
+                case Algorithm.Brin:
+                    PostgresExtensions.UsingBrin(builder);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(algorithm), algorithm, null);
+            }
+
+            collectionMock.VerifySet(x => x.Algorithm = algorithm);
             indexMock.VerifyGet(x => x.AdditionalFeatures);
             expressionMock.VerifyGet(e => e.Index);
         }

@@ -195,6 +195,17 @@ namespace FluentMigrator.Runner.Generators.Postgres
             throw new NotSupportedException("The current version doesn't support include index. Please use Postgres 11.");
         }
 
+        protected virtual string GetUsingAlgorithm(CreateIndexExpression expression)
+        {
+            var algorithm = expression.GetAdditionalFeature<PostgresIndexAlgorithmDefinition>(PostgresExtensions.IndexAlgorithm);
+            if (algorithm == null)
+            {
+                return string.Empty;
+            }
+
+            return $" USING {algorithm.Algorithm.ToString().ToUpper()}";
+        }
+
         public override string Generate(CreateIndexExpression expression)
         {
             var result = new StringBuilder("CREATE");
@@ -204,9 +215,10 @@ namespace FluentMigrator.Runner.Generators.Postgres
                 result.Append(" UNIQUE");
             }
 
-            result.AppendFormat(" INDEX {0} ON {1} (",
+            result.AppendFormat(" INDEX {0} ON {1}{2} (",
                 Quoter.QuoteIndexName(expression.Index.Name),
-                Quoter.QuoteTableName(expression.Index.TableName, expression.Index.SchemaName));
+                Quoter.QuoteTableName(expression.Index.TableName, expression.Index.SchemaName),
+                GetUsingAlgorithm(expression));
 
             var first = true;
             foreach (var column in expression.Index.Columns)
