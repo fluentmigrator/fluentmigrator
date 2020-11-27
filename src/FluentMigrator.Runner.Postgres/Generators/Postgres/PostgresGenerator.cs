@@ -220,14 +220,14 @@ namespace FluentMigrator.Runner.Generators.Postgres
 
         protected virtual string GetAsOnly(CreateIndexExpression expression)
         {
-            var asConcurrently = expression.GetAdditionalFeature<PostgresIndexOnlyDefinition>(PostgresExtensions.Concurrently);
+            var asOnly = expression.GetAdditionalFeature<PostgresIndexOnlyDefinition>(PostgresExtensions.Only);
 
-            if (asConcurrently == null || !asConcurrently.IsOnly)
+            if (asOnly == null || !asOnly.IsOnly)
             {
                 return string.Empty;
             }
 
-            throw new NotSupportedException("The current version doesn't support include index. Please use Postgres 11 or higher.");
+            throw new NotSupportedException("The current version doesn't support ONLY. Please use Postgres 11 or higher.");
         }
 
         public override string Generate(CreateIndexExpression expression)

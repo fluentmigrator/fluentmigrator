@@ -29,28 +29,28 @@ namespace FluentMigrator.Postgres
         public static ICreateIndexOptionsSyntax AsOnly(this ICreateIndexOptionsSyntax expression)
         {
             var additionalFeatures = expression as ISupportAdditionalFeatures;
-            additionalFeatures.AsConcurrently(true);
+            additionalFeatures.AsOnly(true);
             return expression;
         }
 
         public static ICreateIndexNonKeyColumnSyntax AsOnly(this ICreateIndexOnColumnSyntax expression)
         {
             var additionalFeatures = expression as ISupportAdditionalFeatures;
-            additionalFeatures.AsConcurrently(true);
+            additionalFeatures.AsOnly(true);
             return new CreateIndexExpressionNonKeyBuilder(expression, additionalFeatures);
         }
 
         public static ICreateIndexOptionsSyntax AsOnly(this ICreateIndexOptionsSyntax expression, bool isOnly)
         {
             var additionalFeatures = expression as ISupportAdditionalFeatures;
-            additionalFeatures.AsConcurrently(isOnly);
+            additionalFeatures.AsOnly(isOnly);
             return expression;
         }
 
         public static ICreateIndexNonKeyColumnSyntax AsOnly(this ICreateIndexOnColumnSyntax expression, bool isOnly)
         {
             var additionalFeatures = expression as ISupportAdditionalFeatures;
-            additionalFeatures.AsConcurrently(isOnly);
+            additionalFeatures.AsOnly(isOnly);
             return new CreateIndexExpressionNonKeyBuilder(expression, additionalFeatures);
         }
 
@@ -61,8 +61,8 @@ namespace FluentMigrator.Postgres
                 throw new InvalidOperationException(UnsupportedMethodMessage(nameof(Include), nameof(ISupportAdditionalFeatures)));
             }
 
-            var asConcurrently = additionalFeatures.GetAdditionalFeature(Concurrently, () => new PostgresIndexOnlyDefinition());
-            asConcurrently.IsOnly = isOnly;
+            var asOnly = additionalFeatures.GetAdditionalFeature(Only, () => new PostgresIndexOnlyDefinition());
+            asOnly.IsOnly = isOnly;
         }
     }
 }

@@ -196,5 +196,73 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             indexMock.VerifyGet(x => x.AdditionalFeatures);
             expressionMock.VerifyGet(e => e.Index);
         }
+
+        [TestCase(arguments: true)]
+        [TestCase(arguments: false)]
+        [TestCase(arguments: null)]
+        public void CallingUsingAsConcurrentlyToExpressionInPostgres(bool? isConcurrently)
+        {
+            var collectionMock = new Mock<PostgresIndexConcurrentlyDefinition>();
+
+            var additionalFeatures = new Dictionary<string, object>()
+            {
+                [PostgresExtensions.Concurrently] = collectionMock.Object
+            };
+
+            var indexMock = new Mock<IndexDefinition>();
+            indexMock.Setup(x => x.AdditionalFeatures).Returns(additionalFeatures);
+
+            var expressionMock = new Mock<CreateIndexExpression>();
+            expressionMock.SetupGet(e => e.Index).Returns(indexMock.Object);
+
+            ICreateIndexOnColumnOrInSchemaSyntax builder = new CreateIndexExpressionBuilder(expressionMock.Object);
+
+            if (isConcurrently == null)
+            {
+                PostgresExtensions.AsConcurrently(builder);
+            }
+            else
+            {
+                PostgresExtensions.AsConcurrently(builder, isConcurrently.Value);
+            }
+
+            collectionMock.VerifySet(x => x.IsConcurrently = isConcurrently ?? true);
+            indexMock.VerifyGet(x => x.AdditionalFeatures);
+            expressionMock.VerifyGet(e => e.Index);
+        }
+
+        [TestCase(arguments: true)]
+        [TestCase(arguments: false)]
+        [TestCase(arguments: null)]
+        public void CallingUsingAsOnlyToExpressionInPostgres(bool? isOnly)
+        {
+            var collectionMock = new Mock<PostgresIndexOnlyDefinition>();
+
+            var additionalFeatures = new Dictionary<string, object>()
+            {
+                [PostgresExtensions.Only] = collectionMock.Object
+            };
+
+            var indexMock = new Mock<IndexDefinition>();
+            indexMock.Setup(x => x.AdditionalFeatures).Returns(additionalFeatures);
+
+            var expressionMock = new Mock<CreateIndexExpression>();
+            expressionMock.SetupGet(e => e.Index).Returns(indexMock.Object);
+
+            ICreateIndexOnColumnOrInSchemaSyntax builder = new CreateIndexExpressionBuilder(expressionMock.Object);
+
+            if (isOnly == null)
+            {
+                PostgresExtensions.AsOnly(builder);
+            }
+            else
+            {
+                PostgresExtensions.AsOnly(builder, isOnly.Value);
+            }
+
+            collectionMock.VerifySet(x => x.IsOnly = isOnly ?? true);
+            indexMock.VerifyGet(x => x.AdditionalFeatures);
+            expressionMock.VerifyGet(e => e.Index);
+        }
     }
 }
