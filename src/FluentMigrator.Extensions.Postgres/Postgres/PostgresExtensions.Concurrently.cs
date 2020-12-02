@@ -33,11 +33,11 @@ namespace FluentMigrator.Postgres
             return expression;
         }
 
-        public static ICreateIndexNonKeyColumnSyntax AsConcurrently(this ICreateIndexOnColumnSyntax expression)
+        public static ICreateIndexOnColumnSyntax AsConcurrently(this ICreateIndexOnColumnSyntax expression)
         {
             var additionalFeatures = expression as ISupportAdditionalFeatures;
             additionalFeatures.AsConcurrently(true);
-            return new CreateIndexExpressionNonKeyBuilder(expression, additionalFeatures);
+            return expression;
         }
 
         public static ICreateIndexOptionsSyntax AsConcurrently(this ICreateIndexOptionsSyntax expression, bool isConcurrently)
@@ -47,11 +47,11 @@ namespace FluentMigrator.Postgres
             return expression;
         }
 
-        public static ICreateIndexNonKeyColumnSyntax AsConcurrently(this ICreateIndexOnColumnSyntax expression, bool isConcurrently)
+        public static ICreateIndexOnColumnSyntax AsConcurrently(this ICreateIndexOnColumnSyntax expression, bool isConcurrently)
         {
             var additionalFeatures = expression as ISupportAdditionalFeatures;
             additionalFeatures.AsConcurrently(isConcurrently);
-            return new CreateIndexExpressionNonKeyBuilder(expression, additionalFeatures);
+            return expression;
         }
 
         internal static void AsConcurrently(this ISupportAdditionalFeatures additionalFeatures, bool isConcurrently)

@@ -33,11 +33,11 @@ namespace FluentMigrator.Postgres
             return expression;
         }
 
-        public static ICreateIndexNonKeyColumnSyntax AsOnly(this ICreateIndexOnColumnSyntax expression)
+        public static ICreateIndexOnColumnSyntax AsOnly(this ICreateIndexOnColumnSyntax expression)
         {
             var additionalFeatures = expression as ISupportAdditionalFeatures;
             additionalFeatures.AsOnly(true);
-            return new CreateIndexExpressionNonKeyBuilder(expression, additionalFeatures);
+            return expression;
         }
 
         public static ICreateIndexOptionsSyntax AsOnly(this ICreateIndexOptionsSyntax expression, bool isOnly)
