@@ -25,15 +25,16 @@ namespace FluentMigrator.Tests.Integration.Migrations.Postgres
         public override void Up()
         {
             Create.Table("Test")
-                .WithColumn("Id").AsInt32().Identity().PrimaryKey()
+                .WithColumn("Id").AsInt32().Identity().PrimaryKey().Unique()
                 .WithColumn("Name").AsString(200).NotNullable()
                 .WithColumn("ExternalId").AsGuid().NotNullable();
 
             Create.Index("IX_TEST_INDEX_Only")
                 .OnTable("Test")
-                .AsConcurrently()
-                .AsOnly()
                 .OnColumn("ExternalId").Ascending()
+                .WithOptions()
+                .AsOnly()
+                .AsConcurrently()
                 .Include("Name");
         }
 

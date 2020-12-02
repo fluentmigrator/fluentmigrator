@@ -217,13 +217,14 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 
             ICreateIndexOnColumnOrInSchemaSyntax builder = new CreateIndexExpressionBuilder(expressionMock.Object);
 
+
             if (isConcurrently == null)
             {
-                PostgresExtensions.AsConcurrently(builder);
+                builder.WithOptions().AsConcurrently();
             }
             else
             {
-                PostgresExtensions.AsConcurrently(builder, isConcurrently.Value);
+                builder.WithOptions().AsConcurrently(isConcurrently.Value);
             }
 
             collectionMock.VerifySet(x => x.IsConcurrently = isConcurrently ?? true);
@@ -253,11 +254,11 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 
             if (isOnly == null)
             {
-                PostgresExtensions.AsOnly(builder);
+                builder.WithOptions().AsOnly();
             }
             else
             {
-                PostgresExtensions.AsOnly(builder, isOnly.Value);
+                builder.WithOptions().AsOnly(isOnly.Value);
             }
 
             collectionMock.VerifySet(x => x.IsOnly = isOnly ?? true);

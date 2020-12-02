@@ -33,21 +33,7 @@ namespace FluentMigrator.Postgres
             return expression;
         }
 
-        public static ICreateIndexOnColumnSyntax AsConcurrently(this ICreateIndexOnColumnSyntax expression)
-        {
-            var additionalFeatures = expression as ISupportAdditionalFeatures;
-            additionalFeatures.AsConcurrently(true);
-            return expression;
-        }
-
         public static ICreateIndexOptionsSyntax AsConcurrently(this ICreateIndexOptionsSyntax expression, bool isConcurrently)
-        {
-            var additionalFeatures = expression as ISupportAdditionalFeatures;
-            additionalFeatures.AsConcurrently(isConcurrently);
-            return expression;
-        }
-
-        public static ICreateIndexOnColumnSyntax AsConcurrently(this ICreateIndexOnColumnSyntax expression, bool isConcurrently)
         {
             var additionalFeatures = expression as ISupportAdditionalFeatures;
             additionalFeatures.AsConcurrently(isConcurrently);
