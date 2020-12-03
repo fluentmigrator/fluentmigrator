@@ -23,7 +23,6 @@ using FluentMigrator.Builders.Create.Index;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Postgres;
-using FluentMigrator.SqlServer;
 
 using Moq;
 
@@ -104,7 +103,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 
             var additionalFeatures = new Dictionary<string, object>()
             {
-                [SqlServerExtensions.IncludesList] = collectionMock.Object
+                [PostgresExtensions.IncludesList] = collectionMock.Object
             };
 
             var indexMock = new Mock<IndexDefinition>();
@@ -114,7 +113,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             expressionMock.SetupGet(e => e.Index).Returns(indexMock.Object);
 
             ICreateIndexOnColumnOrInSchemaSyntax builder = new CreateIndexExpressionBuilder(expressionMock.Object);
-            SqlServerExtensions.Include(builder, "BaconId");
+            PostgresExtensions.Include(builder, "BaconId");
 
             collectionMock.Verify(x => x.Add(It.Is<IndexIncludeDefinition>(c => c.Name.Equals("BaconId"))));
             indexMock.VerifyGet(x => x.AdditionalFeatures);
@@ -171,22 +170,22 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             switch (algorithm)
             {
                 case Algorithm.BTree:
-                    PostgresExtensions.UsingBTree(builder);
+                    builder.WithOptions().UsingBTree();
                     break;
                 case Algorithm.Hash:
-                    PostgresExtensions.UsingHash(builder);
+                    builder.WithOptions().UsingHash();
                     break;
                 case Algorithm.Gist:
-                    PostgresExtensions.UsingGist(builder);
+                    builder.WithOptions().UsingGist();
                     break;
                 case Algorithm.Spgist:
-                    PostgresExtensions.UsingSpgist(builder);
+                    builder.WithOptions().UsingSpgist();
                     break;
                 case Algorithm.Gin:
-                    PostgresExtensions.UsingGin(builder);
+                    builder.WithOptions().UsingGin();
                     break;
                 case Algorithm.Brin:
-                    PostgresExtensions.UsingBrin(builder);
+                    builder.WithOptions().UsingBrin();
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(algorithm), algorithm, null);
@@ -195,6 +194,29 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             collectionMock.VerifySet(x => x.Algorithm = algorithm);
             indexMock.VerifyGet(x => x.AdditionalFeatures);
             expressionMock.VerifyGet(e => e.Index);
+        }
+
+        [Test]
+        public void CalliFilterExpressingInPostgres()
+        {
+            var additionalFeatures = new Dictionary<string, object>()
+            {
+                [PostgresExtensions.IndexFilter] = ""
+            };
+
+            var indexMock = new Mock<IndexDefinition>();
+            indexMock.Setup(x => x.AdditionalFeatures).Returns(additionalFeatures);
+
+            var expressionMock = new Mock<CreateIndexExpression>();
+            expressionMock.SetupGet(e => e.Index).Returns(indexMock.Object);
+
+            ICreateIndexOnColumnOrInSchemaSyntax builder = new CreateIndexExpressionBuilder(expressionMock.Object);
+
+            builder.WithOptions().Filter("someColumn = 'test'F");
+            indexMock.VerifyGet(x => x.AdditionalFeatures);
+            expressionMock.VerifyGet(e => e.Index);
+
+            Assert.AreEqual("someColumn = 'test'", additionalFeatures[PostgresExtensions.IndexFilter]);
         }
     }
 }

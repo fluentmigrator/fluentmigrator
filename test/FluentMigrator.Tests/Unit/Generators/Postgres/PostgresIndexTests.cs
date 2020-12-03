@@ -1,10 +1,11 @@
+using System;
+
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Model;
 using FluentMigrator.Postgres;
 using FluentMigrator.Runner.Generators.Postgres;
 using FluentMigrator.Runner.Processors.Postgres;
-using FluentMigrator.SqlServer;
 
 using NUnit.Framework;
 
@@ -127,13 +128,30 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         [TestCase(Algorithm.Spgist)]
         public void CanCreateIndexUsingIndexAlgorithm(Algorithm algorithm)
         {
-            var expression = GetCreateIndexExpression(algorithm);
+            var expression = GetCreateIndexWithExpression(x =>
+            {
+                var definition = x.Index.GetAdditionalFeature(PostgresExtensions.IndexAlgorithm, () => new PostgresIndexAlgorithmDefinition());
+                definition.Algorithm = algorithm;
+            });
+
 
             var result = Generator.Generate(expression);
             result.ShouldBe($"CREATE INDEX \"TestIndex\" ON \"public\".\"TestTable1\" USING {algorithm.ToString().ToUpper()} (\"TestColumn1\" ASC);");
         }
 
-        private static CreateIndexExpression GetCreateIndexExpression(Algorithm algorithm)
+        [Test]
+        public void CanCreateIndexWithFilter()
+        {
+            var expression = GetCreateIndexWithExpression(x =>
+            {
+                x.Index.GetAdditionalFeature(PostgresExtensions.IndexFilter, () => "\"TestColumn1\" > 100");
+            });
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE INDEX \"TestIndex\" ON \"public\".\"TestTable1\" (\"TestColumn1\" ASC) WHERE \"TestColumn1\" > 100;");
+        }
+
+        private static CreateIndexExpression GetCreateIndexWithExpression(Action<CreateIndexExpression> additionalFeature)
         {
             var expression = new CreateIndexExpression
             {
@@ -146,8 +164,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
 
             expression.Index.Columns.Add(new IndexColumnDefinition { Direction = Direction.Ascending, Name = GeneratorTestHelper.TestColumnName1 });
 
-            var definition = expression.Index.GetAdditionalFeature(PostgresExtensions.IndexAlgorithm, () => new PostgresIndexAlgorithmDefinition());
-            definition.Algorithm = algorithm;
+            additionalFeature(expression);
 
             return expression;
         }
