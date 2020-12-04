@@ -24,6 +24,12 @@ namespace FluentMigrator.Postgres
     {
         public const string IndexFilter = "PostgresIndexFilter";
 
+        /// <summary>
+        /// The constraint expression for a partial index.
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <param name="filter">The constraint expression</param>
+        /// <returns>The next step</returns>
         public static ICreateIndexOptionsSyntax Filter(this ICreateIndexOptionsSyntax expression, string filter)
         {
             var additionalFeatures = expression as ISupportAdditionalFeatures;
