@@ -26,6 +26,11 @@ namespace FluentMigrator.Postgres
 {
     public static partial class PostgresExtensions
     {
+        /// <summary>
+        /// Indicates not to recurse creating indexes on partitions, if the table is partitioned.
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <returns>The next step</returns>
         public static ICreateIndexOptionsSyntax AsOnly(this ICreateIndexOptionsSyntax expression)
         {
             var additionalFeatures = expression as ISupportAdditionalFeatures;
@@ -33,6 +38,12 @@ namespace FluentMigrator.Postgres
             return expression;
         }
 
+        /// <summary>
+        /// Indicates not to recurse creating indexes on partitions, if the table is partitioned.
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <param name="isOnly">if should or shouldn't be only</param>
+        /// <returns>The next step</returns>
         public static ICreateIndexOptionsSyntax AsOnly(this ICreateIndexOptionsSyntax expression, bool isOnly)
         {
             var additionalFeatures = expression as ISupportAdditionalFeatures;

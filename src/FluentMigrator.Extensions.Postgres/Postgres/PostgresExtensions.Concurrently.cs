@@ -26,6 +26,19 @@ namespace FluentMigrator.Postgres
 {
     public static partial class PostgresExtensions
     {
+        /// <summary>
+        /// When this option is used, PostgreSQL will build the index without taking any locks that prevent concurrent inserts, updates, or deletes on the table
+        /// Whereas a standard index build locks out writes (but not reads) on the table until it's done.
+        /// There are several caveats to be aware of when using this option
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <returns>The next step</returns>
+        /// <remarks>
+        /// To use this feature is necessary mark the migration to not use transaction.
+        /// sample:
+        /// [Migration(1, TransactionBehavior.None)]
+        /// public class SomeMigration : Migration
+        /// </remarks>
         public static ICreateIndexOptionsSyntax AsConcurrently(this ICreateIndexOptionsSyntax expression)
         {
             var additionalFeatures = expression as ISupportAdditionalFeatures;
@@ -33,6 +46,20 @@ namespace FluentMigrator.Postgres
             return expression;
         }
 
+        /// <summary>
+        /// When this option is used, PostgreSQL will build the index without taking any locks that prevent concurrent inserts, updates, or deletes on the table
+        /// Whereas a standard index build locks out writes (but not reads) on the table until it's done.
+        /// There are several caveats to be aware of when using this option
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <param name="isConcurrently">if should or shouldn't be concurrently</param>
+        /// <returns>The next step</returns>
+        /// <remarks>
+        /// To use this feature is necessary mark the migration to not use transaction.
+        /// sample:
+        /// [Migration(1, TransactionBehavior.None)]
+        /// public class SomeMigration : Migration
+        /// </remarks>
         public static ICreateIndexOptionsSyntax AsConcurrently(this ICreateIndexOptionsSyntax expression, bool isConcurrently)
         {
             var additionalFeatures = expression as ISupportAdditionalFeatures;
