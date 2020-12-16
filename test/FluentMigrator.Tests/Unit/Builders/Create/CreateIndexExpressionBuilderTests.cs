@@ -197,7 +197,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
         }
 
         [Test]
-        public void CalliFilterExpressingInPostgres()
+        public void CallingFilterExpressingInPostgres()
         {
             var additionalFeatures = new Dictionary<string, object>()
             {
