@@ -206,6 +206,17 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return $" USING {algorithm.Algorithm.ToString().ToUpper()}";
         }
 
+        protected virtual string GetFilter(CreateIndexExpression expression)
+        {
+            var filter = expression.Index.GetAdditionalFeature<string>(PostgresExtensions.IndexFilter);
+            if (!string.IsNullOrWhiteSpace(filter))
+            {
+                return " WHERE " + filter;
+            }
+
+            return string.Empty;
+        }
+
         protected virtual string GetAsConcurrently(CreateIndexExpression expression)
         {
             var asConcurrently = expression.GetAdditionalFeature<PostgresIndexConcurrentlyDefinition>(PostgresExtensions.Concurrently);
@@ -264,6 +275,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
 
             result.Append(")")
                 .Append(GetIncludeString(expression))
+                .Append(GetFilter(expression))
                 .Append(";");
 
             return result.ToString();

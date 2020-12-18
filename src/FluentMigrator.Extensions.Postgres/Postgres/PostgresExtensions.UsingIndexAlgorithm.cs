@@ -34,25 +34,11 @@ namespace FluentMigrator.Postgres
             return expression;
         }
 
-        public static ICreateIndexNonKeyColumnSyntax UsingBTree(this ICreateIndexOnColumnSyntax expression)
-        {
-            var additionalFeatures = expression as ISupportAdditionalFeatures;
-            additionalFeatures.Using(Algorithm.BTree);
-            return new CreateIndexExpressionNonKeyBuilder(expression, additionalFeatures);
-        }
-
         public static ICreateIndexOptionsSyntax UsingHash(this ICreateIndexOptionsSyntax expression)
         {
             var additionalFeatures = expression as ISupportAdditionalFeatures;
             additionalFeatures.Using(Algorithm.Hash);
             return expression;
-        }
-
-        public static ICreateIndexNonKeyColumnSyntax UsingHash(this ICreateIndexOnColumnSyntax expression)
-        {
-            var additionalFeatures = expression as ISupportAdditionalFeatures;
-            additionalFeatures.Using(Algorithm.Hash);
-            return new CreateIndexExpressionNonKeyBuilder(expression, additionalFeatures);
         }
 
         public static ICreateIndexOptionsSyntax UsingGist(this ICreateIndexOptionsSyntax expression)
@@ -62,25 +48,11 @@ namespace FluentMigrator.Postgres
             return expression;
         }
 
-        public static ICreateIndexNonKeyColumnSyntax UsingGist(this ICreateIndexOnColumnSyntax expression)
-        {
-            var additionalFeatures = expression as ISupportAdditionalFeatures;
-            additionalFeatures.Using(Algorithm.Gist);
-            return new CreateIndexExpressionNonKeyBuilder(expression, additionalFeatures);
-        }
-
         public static ICreateIndexOptionsSyntax UsingSpgist(this ICreateIndexOptionsSyntax expression)
         {
             var additionalFeatures = expression as ISupportAdditionalFeatures;
             additionalFeatures.Using(Algorithm.Spgist);
             return expression;
-        }
-
-        public static ICreateIndexNonKeyColumnSyntax UsingSpgist(this ICreateIndexOnColumnSyntax expression)
-        {
-            var additionalFeatures = expression as ISupportAdditionalFeatures;
-            additionalFeatures.Using(Algorithm.Spgist);
-            return new CreateIndexExpressionNonKeyBuilder(expression, additionalFeatures);
         }
 
         public static ICreateIndexOptionsSyntax UsingGin(this ICreateIndexOptionsSyntax expression)
@@ -90,13 +62,6 @@ namespace FluentMigrator.Postgres
             return expression;
         }
 
-        public static ICreateIndexNonKeyColumnSyntax UsingGin(this ICreateIndexOnColumnSyntax expression)
-        {
-            var additionalFeatures = expression as ISupportAdditionalFeatures;
-            additionalFeatures.Using(Algorithm.Gin);
-            return new CreateIndexExpressionNonKeyBuilder(expression, additionalFeatures);
-        }
-
         public static ICreateIndexOptionsSyntax UsingBrin(this ICreateIndexOptionsSyntax expression)
         {
             var additionalFeatures = expression as ISupportAdditionalFeatures;
@@ -104,25 +69,11 @@ namespace FluentMigrator.Postgres
             return expression;
         }
 
-        public static ICreateIndexNonKeyColumnSyntax UsingBrin(this ICreateIndexOnColumnSyntax expression)
-        {
-            var additionalFeatures = expression as ISupportAdditionalFeatures;
-            additionalFeatures.Using(Algorithm.Brin);
-            return new CreateIndexExpressionNonKeyBuilder(expression, additionalFeatures);
-        }
-
         public static ICreateIndexOptionsSyntax Using(this ICreateIndexOptionsSyntax expression, Algorithm algorithm)
         {
             var additionalFeatures = expression as ISupportAdditionalFeatures;
             additionalFeatures.Using(algorithm);
             return expression;
-        }
-
-        public static ICreateIndexNonKeyColumnSyntax Using(this ICreateIndexOnColumnSyntax expression, Algorithm algorithm)
-        {
-            var additionalFeatures = expression as ISupportAdditionalFeatures;
-            additionalFeatures.Using(algorithm);
-            return new CreateIndexExpressionNonKeyBuilder(expression, additionalFeatures);
         }
 
         public static void Using(this ISupportAdditionalFeatures additionalFeatures, Algorithm algorithm)
