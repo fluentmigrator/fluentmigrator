@@ -22,7 +22,12 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         public void Setup()
         {
             var quoter = new PostgresQuoter(new PostgresOptions());
-            Generator = new PostgresGenerator(quoter);
+            Generator = CreateGenerator(quoter);
+        }
+
+        protected virtual PostgresGenerator CreateGenerator(PostgresQuoter quoter)
+        {
+            return new PostgresGenerator(quoter);
         }
 
         [Test]
@@ -165,6 +170,45 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             expression.Index.Columns.Add(new IndexColumnDefinition { Direction = Direction.Ascending, Name = GeneratorTestHelper.TestColumnName1 });
 
             additionalFeature(expression);
+
+            return expression;
+        }
+
+        [Test]
+        public void CanCreateIndexAsConcurrently()
+        {
+            var expression = GetCreateIndexExpression(true, false);
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe($"CREATE INDEX CONCURRENTLY \"TestIndex\" ON \"public\".\"TestTable1\" (\"TestColumn1\" ASC);");
+        }
+
+        [Test]
+        public virtual void CanCreateIndexAsOnly()
+        {
+            var expression = GetCreateIndexExpression(false, true);
+
+            Assert.Throws<NotSupportedException>(() => Generator.Generate(expression));
+        }
+
+        protected static CreateIndexExpression GetCreateIndexExpression(bool isConcurrently, bool isOnly)
+        {
+            var expression = new CreateIndexExpression
+            {
+                Index =
+                {
+                    Name = GeneratorTestHelper.TestIndexName,
+                    TableName = GeneratorTestHelper.TestTableName1
+                }
+            };
+
+            expression.Index.Columns.Add(new IndexColumnDefinition { Direction = Direction.Ascending, Name = GeneratorTestHelper.TestColumnName1 });
+
+            var definitionIsConcurrently = expression.Index.GetAdditionalFeature(PostgresExtensions.Concurrently, () => new PostgresIndexConcurrentlyDefinition());
+            definitionIsConcurrently.IsConcurrently = isConcurrently;
+
+            var definitionIsOnly = expression.Index.GetAdditionalFeature(PostgresExtensions.Only, () => new PostgresIndexOnlyDefinition());
+            definitionIsOnly.IsOnly = isOnly;
 
             return expression;
         }

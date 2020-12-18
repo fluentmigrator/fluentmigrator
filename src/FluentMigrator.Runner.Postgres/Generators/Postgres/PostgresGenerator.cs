@@ -217,6 +217,29 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return string.Empty;
         }
 
+        protected virtual string GetAsConcurrently(CreateIndexExpression expression)
+        {
+            var asConcurrently = expression.GetAdditionalFeature<PostgresIndexConcurrentlyDefinition>(PostgresExtensions.Concurrently);
+
+            if (asConcurrently == null || !asConcurrently.IsConcurrently)
+            {
+                return string.Empty;
+            }
+
+            return " CONCURRENTLY";
+        }
+
+        protected virtual string GetAsOnly(CreateIndexExpression expression)
+        {
+            var asOnly = expression.GetAdditionalFeature<PostgresIndexOnlyDefinition>(PostgresExtensions.Only);
+
+            if (asOnly == null || !asOnly.IsOnly)
+            {
+                return string.Empty;
+            }
+
+            throw new NotSupportedException("The current version doesn't support ONLY. Please use Postgres 11 or higher.");
+        }
 
         public override string Generate(CreateIndexExpression expression)
         {
@@ -227,8 +250,10 @@ namespace FluentMigrator.Runner.Generators.Postgres
                 result.Append(" UNIQUE");
             }
 
-            result.AppendFormat(" INDEX {0} ON {1}{2} (",
+            result.AppendFormat(" INDEX{0} {1} ON{2} {3}{4} (",
+                GetAsConcurrently(expression),
                 Quoter.QuoteIndexName(expression.Index.Name),
+                GetAsOnly(expression),
                 Quoter.QuoteTableName(expression.Index.TableName, expression.Index.SchemaName),
                 GetUsingAlgorithm(expression));
 
