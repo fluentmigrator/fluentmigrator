@@ -68,5 +68,18 @@ namespace FluentMigrator.Runner.Generators.Postgres
                 .Append(")")
                 .ToString();
         }
+
+        /// <inheritdoc />
+        protected override string GetAsOnly(CreateIndexExpression expression)
+        {
+            var asOnly = expression.GetAdditionalFeature<PostgresIndexOnlyDefinition>(PostgresExtensions.Only);
+
+            if (asOnly == null || !asOnly.IsOnly)
+            {
+                return string.Empty;
+            }
+
+            return " ONLY";
+        }
     }
 }
