@@ -181,8 +181,8 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             var expression = GetCreateIndexWithExpression(
                 x =>
                 {
-                    var definitionIsOnly = x.Index.GetAdditionalFeature(PostgresExtensions.Only, () => new PostgresIndexOnlyDefinition());
-                    definitionIsOnly.IsOnly = false;
+                    var definitionIsOnly = x.Index.GetAdditionalFeature(PostgresExtensions.Concurrently, () => new PostgresIndexConcurrentlyDefinition());
+                    definitionIsOnly.IsConcurrently = true;
                 });
 
             var result = Generator.Generate(expression);
