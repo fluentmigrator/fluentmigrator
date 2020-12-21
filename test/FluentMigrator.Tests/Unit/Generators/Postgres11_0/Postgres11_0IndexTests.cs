@@ -1,3 +1,6 @@
+using FluentMigrator.Infrastructure.Extensions;
+using FluentMigrator.Model;
+using FluentMigrator.Postgres;
 using FluentMigrator.Runner.Generators.Postgres;
 using FluentMigrator.Tests.Unit.Generators.Postgres;
 
@@ -19,7 +22,12 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres11_0
         [Test]
         public override void CanCreateIndexAsOnly()
         {
-            var expression = GetCreateIndexExpression(false, true);
+            var expression = GetCreateIndexWithExpression(
+                x =>
+                {
+                    var definitionIsOnly = x.Index.GetAdditionalFeature(PostgresExtensions.Only, () => new PostgresIndexOnlyDefinition());
+                    definitionIsOnly.IsOnly = true;
+                });;
 
             var result = Generator.Generate(expression);
             result.ShouldBe($"CREATE INDEX \"TestIndex\" ON ONLY \"public\".\"TestTable1\" (\"TestColumn1\" ASC);");

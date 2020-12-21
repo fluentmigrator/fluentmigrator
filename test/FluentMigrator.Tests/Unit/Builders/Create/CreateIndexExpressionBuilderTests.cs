@@ -288,5 +288,68 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             indexMock.VerifyGet(x => x.AdditionalFeatures);
             expressionMock.VerifyGet(e => e.Index);
         }
+
+        [TestCase(NullSort.First)]
+        [TestCase(NullSort.First)]
+        public void CallingNullsFirstOrLastToExpressionInPostgres(NullSort sort)
+        {
+            var collectionMock = new Mock<PostgresIndexNullsSort>();
+
+            var additionalFeatures = new Dictionary<string, object>()
+            {
+                [PostgresExtensions.NullsSort] = collectionMock.Object
+            };
+
+            var indexMock = new Mock<IndexDefinition>();
+            indexMock.Setup(x => x.AdditionalFeatures).Returns(additionalFeatures);
+
+            var expressionMock = new Mock<CreateIndexExpression>();
+            expressionMock.SetupGet(e => e.Index).Returns(indexMock.Object);
+
+            var builder = new CreateIndexExpressionBuilder(expressionMock.Object);
+
+
+            switch (sort)
+            {
+                case NullSort.First:
+                    builder.NullsFirst();
+                    break;
+                case NullSort.Last:
+                    builder.NullsLast();
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(sort), sort, null);
+            }
+
+            collectionMock.VerifySet(x => x.Sort = sort);
+            indexMock.VerifyGet(x => x.AdditionalFeatures);
+            expressionMock.VerifyGet(e => e.Index);
+        }
+
+        [TestCase(NullSort.First)]
+        [TestCase(NullSort.First)]
+        public void CallingNullsToExpressionInPostgres(NullSort sort)
+        {
+            var collectionMock = new Mock<PostgresIndexNullsSort>();
+
+            var additionalFeatures = new Dictionary<string, object>()
+            {
+                [PostgresExtensions.NullsSort] = collectionMock.Object
+            };
+
+            var indexMock = new Mock<IndexDefinition>();
+            indexMock.Setup(x => x.AdditionalFeatures).Returns(additionalFeatures);
+
+            var expressionMock = new Mock<CreateIndexExpression>();
+            expressionMock.SetupGet(e => e.Index).Returns(indexMock.Object);
+
+            var builder = new CreateIndexExpressionBuilder(expressionMock.Object);
+
+            builder.Nulls(sort);
+
+            collectionMock.VerifySet(x => x.Sort = sort);
+            indexMock.VerifyGet(x => x.AdditionalFeatures);
+            expressionMock.VerifyGet(e => e.Index);
+        }
     }
 }
