@@ -34,7 +34,7 @@ namespace FluentMigrator.Postgres
         /// <returns>The <see cref="ICreateIndexMoreColumnOptionsSyntax"/></returns>
         public static ICreateIndexMoreColumnOptionsSyntax NullsFirst(this ICreateIndexMoreColumnOptionsSyntax expression)
         {
-            var additionalFeatures = expression as ISupportAdditionalFeatures;
+            var additionalFeatures = expression.CurrentColumn as ISupportAdditionalFeatures;
             additionalFeatures.Nulls(NullSort.First);
             return expression;
         }
@@ -47,7 +47,7 @@ namespace FluentMigrator.Postgres
 
         public static ICreateIndexMoreColumnOptionsSyntax NullsLast(this ICreateIndexMoreColumnOptionsSyntax expression)
         {
-            var additionalFeatures = expression as ISupportAdditionalFeatures;
+            var additionalFeatures = expression.CurrentColumn as ISupportAdditionalFeatures;
             additionalFeatures.Nulls(NullSort.Last);
             return expression;
         }

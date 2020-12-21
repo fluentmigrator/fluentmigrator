@@ -301,12 +301,16 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             };
 
             var indexMock = new Mock<IndexDefinition>();
-            indexMock.Setup(x => x.AdditionalFeatures).Returns(additionalFeatures);
+            var indexCurrentColumnMock = new Mock<IndexColumnDefinition>();
+            indexCurrentColumnMock.Setup(x => x.AdditionalFeatures).Returns(additionalFeatures);
 
             var expressionMock = new Mock<CreateIndexExpression>();
             expressionMock.SetupGet(e => e.Index).Returns(indexMock.Object);
 
-            var builder = new CreateIndexExpressionBuilder(expressionMock.Object);
+            var builder = new CreateIndexExpressionBuilder(expressionMock.Object)
+            {
+                CurrentColumn = indexCurrentColumnMock.Object
+            };
 
 
             switch (sort)
@@ -322,8 +326,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             }
 
             collectionMock.VerifySet(x => x.Sort = sort);
-            indexMock.VerifyGet(x => x.AdditionalFeatures);
-            expressionMock.VerifyGet(e => e.Index);
+            indexCurrentColumnMock.VerifyGet(x => x.AdditionalFeatures);
         }
 
         [TestCase(NullSort.First)]
