@@ -195,15 +195,15 @@ namespace FluentMigrator.Runner.Generators.Postgres
             throw new NotSupportedException("The current version doesn't support include index. Please use Postgres 11.");
         }
 
-        protected virtual string GetUsingAlgorithm(CreateIndexExpression expression)
+        protected virtual Algorithm GetIndexMethod(CreateIndexExpression expression)
         {
             var algorithm = expression.GetAdditionalFeature<PostgresIndexAlgorithmDefinition>(PostgresExtensions.IndexAlgorithm);
             if (algorithm == null)
             {
-                return string.Empty;
+                return Algorithm.BTree;
             }
 
-            return $" USING {algorithm.Algorithm.ToString().ToUpper()}";
+            return algorithm.Algorithm;
         }
 
         protected virtual string GetFilter(CreateIndexExpression expression)
@@ -250,12 +250,14 @@ namespace FluentMigrator.Runner.Generators.Postgres
                 result.Append(" UNIQUE");
             }
 
+            var indexMethod = GetIndexMethod(expression);
+
             result.AppendFormat(" INDEX{0} {1} ON{2} {3}{4} (",
                 GetAsConcurrently(expression),
                 Quoter.QuoteIndexName(expression.Index.Name),
                 GetAsOnly(expression),
                 Quoter.QuoteTableName(expression.Index.TableName, expression.Index.SchemaName),
-                GetUsingAlgorithm(expression));
+                $" USING {indexMethod.ToString().ToUpper()}");
 
             var first = true;
             foreach (var column in expression.Index.Columns)
@@ -270,6 +272,18 @@ namespace FluentMigrator.Runner.Generators.Postgres
                 }
 
                 result.Append(Quoter.QuoteColumnName(column.Name));
+
+                switch (indexMethod)
+                {
+                    // Doesn't support ASC/DESC neither nulls sorts
+                    case Algorithm.Spgist:
+                    case Algorithm.Gist:
+                    case Algorithm.Gin:
+                    case Algorithm.Brin:
+                    case Algorithm.Hash:
+                        continue;
+                }
+
                 result.Append(column.Direction == Direction.Ascending ? " ASC" : " DESC");
             }
 
