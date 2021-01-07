@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure.Extensions;
@@ -156,7 +157,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("CREATE INDEX \"TestIndex\" ON \"public\".\"TestTable1\" (\"TestColumn1\" ASC) WHERE \"TestColumn1\" > 100;");
         }
 
-        private static CreateIndexExpression GetCreateIndexWithExpression(Action<CreateIndexExpression> additionalFeature)
+        protected static CreateIndexExpression GetCreateIndexWithExpression(Action<CreateIndexExpression> additionalFeature)
         {
             var expression = new CreateIndexExpression
             {
@@ -177,40 +178,44 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         [Test]
         public void CanCreateIndexAsConcurrently()
         {
-            var expression = GetCreateIndexExpression(true, false);
+            var expression = GetCreateIndexWithExpression(
+                x =>
+                {
+                    var definitionIsOnly = x.Index.GetAdditionalFeature(PostgresExtensions.Concurrently, () => new PostgresIndexConcurrentlyDefinition());
+                    definitionIsOnly.IsConcurrently = true;
+                });
 
             var result = Generator.Generate(expression);
-            result.ShouldBe($"CREATE INDEX CONCURRENTLY \"TestIndex\" ON \"public\".\"TestTable1\" (\"TestColumn1\" ASC);");
+            result.ShouldBe("CREATE INDEX CONCURRENTLY \"TestIndex\" ON \"public\".\"TestTable1\" (\"TestColumn1\" ASC);");
         }
 
         [Test]
         public virtual void CanCreateIndexAsOnly()
         {
-            var expression = GetCreateIndexExpression(false, true);
+            var expression = GetCreateIndexWithExpression(
+                x =>
+                {
+                    var definitionIsOnly = x.Index.GetAdditionalFeature(PostgresExtensions.Only, () => new PostgresIndexOnlyDefinition());
+                    definitionIsOnly.IsOnly = true;
+                });
 
             Assert.Throws<NotSupportedException>(() => Generator.Generate(expression));
         }
 
-        protected static CreateIndexExpression GetCreateIndexExpression(bool isConcurrently, bool isOnly)
+        [TestCase(NullSort.First)]
+        [TestCase(NullSort.Last)]
+        public void CanCreateIndexWithNulls(NullSort sort)
         {
-            var expression = new CreateIndexExpression
+            var expression = GetCreateIndexWithExpression(x =>
             {
-                Index =
-                {
-                    Name = GeneratorTestHelper.TestIndexName,
-                    TableName = GeneratorTestHelper.TestTableName1
-                }
-            };
+                x.Index.Columns.First().GetAdditionalFeature(
+                    PostgresExtensions.NullsSort,
+                    () => new PostgresIndexNullsSort { Sort = sort });
+            });
 
-            expression.Index.Columns.Add(new IndexColumnDefinition { Direction = Direction.Ascending, Name = GeneratorTestHelper.TestColumnName1 });
-
-            var definitionIsConcurrently = expression.Index.GetAdditionalFeature(PostgresExtensions.Concurrently, () => new PostgresIndexConcurrentlyDefinition());
-            definitionIsConcurrently.IsConcurrently = isConcurrently;
-
-            var definitionIsOnly = expression.Index.GetAdditionalFeature(PostgresExtensions.Only, () => new PostgresIndexOnlyDefinition());
-            definitionIsOnly.IsOnly = isOnly;
-
-            return expression;
+            var result = Generator.Generate(expression);
+            result.ShouldBe($"CREATE INDEX \"TestIndex\" ON \"public\".\"TestTable1\" (\"TestColumn1\" ASC NULLS {sort.ToString().ToUpper()});");
         }
+
     }
 }

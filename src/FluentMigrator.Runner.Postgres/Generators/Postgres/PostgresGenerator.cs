@@ -241,6 +241,22 @@ namespace FluentMigrator.Runner.Generators.Postgres
             throw new NotSupportedException("The current version doesn't support ONLY. Please use Postgres 11 or higher.");
         }
 
+        protected virtual string GetNullsSort(IndexColumnDefinition column)
+        {
+            var sort = column.GetAdditionalFeature<PostgresIndexNullsSort>(PostgresExtensions.NullsSort);
+            if (sort == null)
+            {
+                return string.Empty;
+            }
+
+            if (sort.Sort == NullSort.First)
+            {
+                return " NULLS FIRST";
+            }
+
+            return " NULLS LAST";
+        }
+
         public override string Generate(CreateIndexExpression expression)
         {
             var result = new StringBuilder("CREATE");
@@ -269,8 +285,9 @@ namespace FluentMigrator.Runner.Generators.Postgres
                     result.Append(",");
                 }
 
-                result.Append(Quoter.QuoteColumnName(column.Name));
-                result.Append(column.Direction == Direction.Ascending ? " ASC" : " DESC");
+                result.Append(Quoter.QuoteColumnName(column.Name))
+                    .Append(column.Direction == Direction.Ascending ? " ASC" : " DESC")
+                    .Append(GetNullsSort(column));
             }
 
             result.Append(")")
