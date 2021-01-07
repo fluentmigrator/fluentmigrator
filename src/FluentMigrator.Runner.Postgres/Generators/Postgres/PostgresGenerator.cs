@@ -257,7 +257,8 @@ namespace FluentMigrator.Runner.Generators.Postgres
                 Quoter.QuoteIndexName(expression.Index.Name),
                 GetAsOnly(expression),
                 Quoter.QuoteTableName(expression.Index.TableName, expression.Index.SchemaName),
-                $" USING {indexMethod.ToString().ToUpper()}");
+                // B-Tree is default index method
+                indexMethod == Algorithm.BTree ? string.Empty : $" USING {indexMethod.ToString().ToUpper()}");
 
             var first = true;
             foreach (var column in expression.Index.Columns)
