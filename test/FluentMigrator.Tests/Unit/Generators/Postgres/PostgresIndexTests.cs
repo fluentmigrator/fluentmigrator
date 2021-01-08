@@ -126,8 +126,8 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("DROP INDEX \"public\".\"TestIndex\";");
         }
 
+        // This index method doesn't support ASC/DES neither NULLS sort
         [TestCase(Algorithm.Brin)]
-        [TestCase(Algorithm.BTree)]
         [TestCase(Algorithm.Gin)]
         [TestCase(Algorithm.Gist)]
         [TestCase(Algorithm.Hash)]
@@ -142,7 +142,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
 
 
             var result = Generator.Generate(expression);
-            result.ShouldBe($"CREATE INDEX \"TestIndex\" ON \"public\".\"TestTable1\" USING {algorithm.ToString().ToUpper()} (\"TestColumn1\" ASC);");
+            result.ShouldBe($"CREATE INDEX \"TestIndex\" ON \"public\".\"TestTable1\" USING {algorithm.ToString().ToUpper()} (\"TestColumn1\");");
         }
 
         [Test]
