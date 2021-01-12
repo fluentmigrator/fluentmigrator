@@ -257,6 +257,46 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return " NULLS LAST";
         }
 
+        protected virtual string GetWithIndexStoreParameters(CreateIndexExpression column)
+        {
+            var parameters = GetIndexStorageParameters(column);
+            if (parameters.Count == 0)
+            {
+                return string.Empty;
+            }
+
+            return $" WITH ( {string.Join(",", parameters)} )";
+        }
+
+        protected virtual ICollection<string> GetIndexStorageParameters(CreateIndexExpression expression)
+        {
+            var parameters = new List<string>();
+
+            var fillFactor = expression.Index.GetAdditionalFeature<int?>(PostgresExtensions.IndexFillFactor);
+            if (fillFactor != null)
+            {
+                parameters.Add($"FILLFACTOR = {fillFactor}");
+            }
+
+            var fastUpdate = expression.Index.GetAdditionalFeature<bool?>(PostgresExtensions.IndexFastUpdate);
+            if (fastUpdate != null)
+            {
+                parameters.Add($"FASTUPDATE = {ToOnOff(fastUpdate.Value)}");
+            }
+
+            return parameters;
+        }
+
+        protected static string ToOnOff(bool value)
+        {
+            if (value)
+            {
+                return "ON";
+            }
+
+            return "OFF";
+        }
+
         public override string Generate(CreateIndexExpression expression)
         {
             var result = new StringBuilder("CREATE");
@@ -307,6 +347,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
 
             result.Append(")")
                 .Append(GetIncludeString(expression))
+                .Append(GetWithIndexStoreParameters(expression))
                 .Append(GetFilter(expression))
                 .Append(";");
 
