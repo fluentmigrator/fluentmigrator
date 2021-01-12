@@ -28,7 +28,7 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Generators.Postgres
 {
-    public class Postgres11_0Generator : PostgresGenerator
+    public class Postgres11_0Generator : Postgres10_0Generator
     {
         public Postgres11_0Generator([NotNull] PostgresQuoter quoter)
             : this(quoter, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()))
@@ -36,12 +36,20 @@ namespace FluentMigrator.Runner.Generators.Postgres
         }
 
         public Postgres11_0Generator([NotNull] PostgresQuoter quoter, [NotNull] IOptions<GeneratorOptions> generatorOptions)
-            : base(new Postgres11_0Column(quoter, new Postgres92.Postgres92TypeMap()), quoter, generatorOptions)
+            : base(new Postgres10_0Column(quoter, new Postgres92.Postgres92TypeMap()), quoter, generatorOptions)
         {
         }
 
         protected Postgres11_0Generator([NotNull] PostgresQuoter quoter, [NotNull] IOptions<GeneratorOptions> generatorOptions, [NotNull] ITypeMap typeMap)
             : base(new Postgres10_0Column(quoter, typeMap), quoter, generatorOptions)
+        {
+        }
+
+        protected Postgres11_0Generator(
+            [NotNull] IColumn column,
+            [NotNull] PostgresQuoter quoter,
+            [NotNull] IOptions<GeneratorOptions> generatorOptions)
+            : base(column, quoter, generatorOptions)
         {
         }
 
@@ -80,6 +88,20 @@ namespace FluentMigrator.Runner.Generators.Postgres
             }
 
             return " ONLY";
+        }
+
+        /// <inheritdoc />
+        protected override ICollection<string> GetIndexStorageParameters(CreateIndexExpression expression)
+        {
+            var parameters = base.GetIndexStorageParameters(expression);
+
+            var cleanup = expression.Index.GetAdditionalFeature<float?>(PostgresExtensions.IndexVacuumCleanupIndexScaleFactor);
+            if (cleanup.HasValue)
+            {
+                parameters.Add($"VACUUM_CLEANUP_INDEX_SCALE_FACTOR = {cleanup.Value.ToString().ToUpper()}");
+            }
+
+            return parameters;
         }
     }
 }

@@ -43,23 +43,6 @@ namespace FluentMigrator.Postgres
 
         #region B-Tree
         
-        public const string IndexDeduplicateItems = "PostgresBTreeDeduplicateItems";
-
-        /// <summary>
-        /// Exclusive for B-Tree index. A duplicate is a leaf page tuple (a tuple that points to a table row) where all indexed key columns have values that match corresponding column values from at least one other leaf page tuple in
-        /// the same index. Duplicate tuples are quite common in practice. B-Tree indexes can use a special, space-efficient representation for duplicates when an optional technique is enabled: deduplication.
-        /// For more information about it see: https://www.postgresql.org/docs/current/btree-implementation.html#BTREE-DEDUPLICATION
-        /// </summary>
-        /// <param name="expression"></param>
-        /// <param name="deduplicateItems">Set to ON or OFF to enable or disable the optimization</param>
-        /// <returns>The next step</returns>
-        public static ICreateIndexOptionsSyntax DeduplicateItems(this ICreateIndexOptionsSyntax expression, bool deduplicateItems)
-        {
-            var additionalFeatures = expression as ISupportAdditionalFeatures;
-            additionalFeatures.SetAdditionalFeature(IndexDeduplicateItems, deduplicateItems);
-            return expression;
-        }
-
         public const string IndexVacuumCleanupIndexScaleFactor = "PostgresBTreeVacuumCleanupIndexScaleFactor";
 
         /// <summary>
@@ -69,7 +52,7 @@ namespace FluentMigrator.Postgres
         /// <param name="expression"></param>
         /// <param name="point">The value can range from 0 to 10000000000. When vacuum_cleanup_index_scale_factor is set to 0, index scans are never skipped during VACUUM cleanup. The default value is 0.1</param>
         /// <returns>The next step</returns>
-        public static ICreateIndexOptionsSyntax VacuumCleanupIndexScaleFactor(this ICreateIndexOptionsSyntax expression, float point)
+        public static ICreateIndexOptionsSyntax WithVacuumCleanupIndexScaleFactor(this ICreateIndexOptionsSyntax expression, float point)
         {
             var additionalFeatures = expression as ISupportAdditionalFeatures;
             additionalFeatures.SetAdditionalFeature(IndexVacuumCleanupIndexScaleFactor, point);

@@ -265,7 +265,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
                 return string.Empty;
             }
 
-            return $" WITH ( {string.Join(",", parameters)} )";
+            return $" WITH ( {string.Join(", ", parameters)} )";
         }
 
         protected virtual ICollection<string> GetIndexStorageParameters(CreateIndexExpression expression)

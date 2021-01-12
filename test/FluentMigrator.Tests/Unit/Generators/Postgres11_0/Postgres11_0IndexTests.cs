@@ -32,5 +32,17 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres11_0
             var result = Generator.Generate(expression);
             result.ShouldBe($"CREATE INDEX \"TestIndex\" ON ONLY \"public\".\"TestTable1\" (\"TestColumn1\" ASC);");
         }
+
+        [Test]
+        public void CanCreateIndexWithVacuumCleanupIndexScaleFactor()
+        {
+            var expression = GetCreateIndexWithExpression(x =>
+            {
+                x.Index.GetAdditionalFeature(PostgresExtensions.IndexVacuumCleanupIndexScaleFactor, () => (float)0.1);
+            });
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe($"CREATE INDEX \"TestIndex\" ON \"public\".\"TestTable1\" (\"TestColumn1\" ASC) WITH ( VACUUM_CLEANUP_INDEX_SCALE_FACTOR = 0.1 );");
+        }
     }
 }

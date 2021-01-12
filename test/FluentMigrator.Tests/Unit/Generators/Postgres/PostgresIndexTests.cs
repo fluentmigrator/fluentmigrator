@@ -217,5 +217,31 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe($"CREATE INDEX \"TestIndex\" ON \"public\".\"TestTable1\" (\"TestColumn1\" ASC NULLS {sort.ToString().ToUpper()});");
         }
 
+        [Test]
+        public void CanCreateIndexWithFillfactor()
+        {
+            var expression = GetCreateIndexWithExpression(x =>
+            {
+                x.Index.GetAdditionalFeature(PostgresExtensions.IndexFillFactor, () => 90);
+            });
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe($"CREATE INDEX \"TestIndex\" ON \"public\".\"TestTable1\" (\"TestColumn1\" ASC) WITH ( FILLFACTOR = 90 );");
+        }
+
+        [TestCase(true)]
+        [TestCase(false)]
+        public void CanCreateIndexWithFastUpdate(bool fastUpdate)
+        {
+            var expression = GetCreateIndexWithExpression(x =>
+            {
+                x.Index.GetAdditionalFeature(PostgresExtensions.IndexFastUpdate, () => fastUpdate);
+            });
+
+
+            var onOff = fastUpdate ? "ON" : "OFF";
+            var result = Generator.Generate(expression);
+            result.ShouldBe($"CREATE INDEX \"TestIndex\" ON \"public\".\"TestTable1\" (\"TestColumn1\" ASC) WITH ( FASTUPDATE = {onOff} );");
+        }
     }
 }

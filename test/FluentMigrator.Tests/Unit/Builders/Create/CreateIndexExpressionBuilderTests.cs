@@ -217,8 +217,6 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             expressionMock.VerifyGet(e => e.Index);
 
             Assert.AreEqual("someColumn = 'test'", additionalFeatures[PostgresExtensions.IndexFilter]);
-
-
         }
 
         [TestCase(arguments: true)]
@@ -353,6 +351,150 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             collectionMock.VerifySet(x => x.Sort = sort);
             indexMock.VerifyGet(x => x.AdditionalFeatures);
             expressionMock.VerifyGet(e => e.Index);
+        }
+
+        [Test]
+        public void CallingWithFillfactorInPostgres()
+        {
+            var additionalFeatures = new Dictionary<string, object>();
+
+            var indexMock = new Mock<IndexDefinition>();
+            indexMock.Setup(x => x.AdditionalFeatures).Returns(additionalFeatures);
+
+            var expressionMock = new Mock<CreateIndexExpression>();
+            expressionMock.SetupGet(e => e.Index).Returns(indexMock.Object);
+
+            ICreateIndexOnColumnOrInSchemaSyntax builder = new CreateIndexExpressionBuilder(expressionMock.Object);
+
+            builder.WithOptions().WithFillfactor(90);
+            indexMock.VerifyGet(x => x.AdditionalFeatures);
+            expressionMock.VerifyGet(e => e.Index);
+
+            Assert.AreEqual(90, additionalFeatures[PostgresExtensions.IndexFillFactor]);
+        }
+
+        [Test]
+        public void CallingWithVacuumCleanupIndexScaleFactorInPostgres()
+        {
+            var additionalFeatures = new Dictionary<string, object>();
+
+            var indexMock = new Mock<IndexDefinition>();
+            indexMock.Setup(x => x.AdditionalFeatures).Returns(additionalFeatures);
+
+            var expressionMock = new Mock<CreateIndexExpression>();
+            expressionMock.SetupGet(e => e.Index).Returns(indexMock.Object);
+
+            ICreateIndexOnColumnOrInSchemaSyntax builder = new CreateIndexExpressionBuilder(expressionMock.Object);
+
+            builder.WithOptions().WithVacuumCleanupIndexScaleFactor(90);
+            indexMock.VerifyGet(x => x.AdditionalFeatures);
+            expressionMock.VerifyGet(e => e.Index);
+
+            Assert.AreEqual(90, additionalFeatures[PostgresExtensions.IndexVacuumCleanupIndexScaleFactor]);
+        }
+
+        [TestCase(GistBuffering.Auto)]
+        [TestCase(GistBuffering.On)]
+        [TestCase(GistBuffering.Off)]
+        public void CallingWithBufferingInPostgres(GistBuffering buffering)
+        {
+            var additionalFeatures = new Dictionary<string, object>();
+
+            var indexMock = new Mock<IndexDefinition>();
+            indexMock.Setup(x => x.AdditionalFeatures).Returns(additionalFeatures);
+
+            var expressionMock = new Mock<CreateIndexExpression>();
+            expressionMock.SetupGet(e => e.Index).Returns(indexMock.Object);
+
+            ICreateIndexOnColumnOrInSchemaSyntax builder = new CreateIndexExpressionBuilder(expressionMock.Object);
+
+            builder.WithOptions().WithBuffering(buffering);
+            indexMock.VerifyGet(x => x.AdditionalFeatures);
+            expressionMock.VerifyGet(e => e.Index);
+
+            Assert.AreEqual(buffering, additionalFeatures[PostgresExtensions.IndexBuffering]);
+        }
+
+        [TestCase(true)]
+        [TestCase(false)]
+        public void CallingWithFastUpdateInPostgres(bool fastUpdate)
+        {
+            var additionalFeatures = new Dictionary<string, object>();
+
+            var indexMock = new Mock<IndexDefinition>();
+            indexMock.Setup(x => x.AdditionalFeatures).Returns(additionalFeatures);
+
+            var expressionMock = new Mock<CreateIndexExpression>();
+            expressionMock.SetupGet(e => e.Index).Returns(indexMock.Object);
+
+            ICreateIndexOnColumnOrInSchemaSyntax builder = new CreateIndexExpressionBuilder(expressionMock.Object);
+
+            builder.WithOptions().WithFastUpdate(fastUpdate);
+            indexMock.VerifyGet(x => x.AdditionalFeatures);
+            expressionMock.VerifyGet(e => e.Index);
+
+            Assert.AreEqual(fastUpdate, additionalFeatures[PostgresExtensions.IndexFastUpdate]);
+        }
+
+        [Test]
+        public void CallingWithGinPendingListLimitInPostgres()
+        {
+            var additionalFeatures = new Dictionary<string, object>();
+
+            var indexMock = new Mock<IndexDefinition>();
+            indexMock.Setup(x => x.AdditionalFeatures).Returns(additionalFeatures);
+
+            var expressionMock = new Mock<CreateIndexExpression>();
+            expressionMock.SetupGet(e => e.Index).Returns(indexMock.Object);
+
+            ICreateIndexOnColumnOrInSchemaSyntax builder = new CreateIndexExpressionBuilder(expressionMock.Object);
+
+            builder.WithOptions().WithGinPendingListLimit(90);
+            indexMock.VerifyGet(x => x.AdditionalFeatures);
+            expressionMock.VerifyGet(e => e.Index);
+
+            Assert.AreEqual(90, additionalFeatures[PostgresExtensions.IndexGinPendingListLimit]);
+        }
+
+        [Test]
+        public void CallingWithPagesPerRangeInPostgres()
+        {
+            var additionalFeatures = new Dictionary<string, object>();
+
+            var indexMock = new Mock<IndexDefinition>();
+            indexMock.Setup(x => x.AdditionalFeatures).Returns(additionalFeatures);
+
+            var expressionMock = new Mock<CreateIndexExpression>();
+            expressionMock.SetupGet(e => e.Index).Returns(indexMock.Object);
+
+            ICreateIndexOnColumnOrInSchemaSyntax builder = new CreateIndexExpressionBuilder(expressionMock.Object);
+
+            builder.WithOptions().WithPagesPerRange(90);
+            indexMock.VerifyGet(x => x.AdditionalFeatures);
+            expressionMock.VerifyGet(e => e.Index);
+
+            Assert.AreEqual(90, additionalFeatures[PostgresExtensions.IndexPagesPerRange]);
+        }
+
+        [TestCase(true)]
+        [TestCase(false)]
+        public void CallingWithAutosummarizeInPostgres(bool autosummarize)
+        {
+            var additionalFeatures = new Dictionary<string, object>();
+
+            var indexMock = new Mock<IndexDefinition>();
+            indexMock.Setup(x => x.AdditionalFeatures).Returns(additionalFeatures);
+
+            var expressionMock = new Mock<CreateIndexExpression>();
+            expressionMock.SetupGet(e => e.Index).Returns(indexMock.Object);
+
+            ICreateIndexOnColumnOrInSchemaSyntax builder = new CreateIndexExpressionBuilder(expressionMock.Object);
+
+            builder.WithOptions().WithAutosummarize(autosummarize);
+            indexMock.VerifyGet(x => x.AdditionalFeatures);
+            expressionMock.VerifyGet(e => e.Index);
+
+            Assert.AreEqual(autosummarize, additionalFeatures[PostgresExtensions.IndexAutosummarize]);
         }
     }
 }

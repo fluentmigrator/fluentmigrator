@@ -43,6 +43,14 @@ namespace FluentMigrator.Runner.Generators.Postgres
         {
         }
 
+        protected Postgres10_0Generator(
+            [NotNull] IColumn column,
+            [NotNull] PostgresQuoter quoter,
+            [NotNull] IOptions<GeneratorOptions> generatorOptions)
+            : base(column, quoter, generatorOptions)
+        {
+        }
+
         /// <inheritdoc />
         protected override ICollection<string> GetIndexStorageParameters(CreateIndexExpression expression)
         {
@@ -67,9 +75,9 @@ namespace FluentMigrator.Runner.Generators.Postgres
             }
 
             var autosummarize = expression.Index.GetAdditionalFeature<bool?>(PostgresExtensions.IndexAutosummarize);
-            if (autosummarize.HasValue && autosummarize.Value)
+            if (autosummarize.HasValue)
             {
-                parameters.Add("AUTOSUMMARIZE");
+                parameters.Add($"AUTOSUMMARIZE = {ToOnOff(autosummarize.Value)}");
             }
 
             return parameters;
