@@ -2,7 +2,7 @@ using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Model;
 using FluentMigrator.Postgres;
 using FluentMigrator.Runner.Generators.Postgres;
-using FluentMigrator.Tests.Unit.Generators.Postgres;
+using FluentMigrator.Tests.Unit.Generators.Postgres10_0;
 
 using NUnit.Framework;
 
@@ -11,7 +11,7 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Generators.Postgres11_0
 {
     [TestFixture]
-    public class Postgres11_0IndexTests : PostgresIndexTests
+    public class Postgres11_0IndexTests : Postgres10_0IndexTests
     {
         /// <inheritdoc />
         protected override PostgresGenerator CreateGenerator(PostgresQuoter quoter)
@@ -34,7 +34,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres11_0
         }
 
         [Test]
-        public void CanCreateIndexWithVacuumCleanupIndexScaleFactor()
+        public override void CanCreateIndexWithVacuumCleanupIndexScaleFactor()
         {
             var expression = GetCreateIndexWithExpression(x =>
             {

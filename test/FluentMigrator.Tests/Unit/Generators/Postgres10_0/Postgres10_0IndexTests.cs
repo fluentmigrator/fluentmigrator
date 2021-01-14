@@ -22,7 +22,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres10_0
         [TestCase(GistBuffering.Auto)]
         [TestCase(GistBuffering.On)]
         [TestCase(GistBuffering.Off)]
-        public void CanCreateIndexWithBuffering(GistBuffering buffering)
+        public override void CanCreateIndexWithBuffering(GistBuffering buffering)
         {
             var expression = GetCreateIndexWithExpression(x =>
             {
@@ -34,7 +34,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres10_0
         }
 
         [Test]
-        public void CanCreateIndexWithGinPendingListLimit()
+        public override void CanCreateIndexWithGinPendingListLimit()
         {
             var expression = GetCreateIndexWithExpression(x =>
             {
@@ -46,7 +46,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres10_0
         }
 
         [Test]
-        public void CanCreateIndexWithPagesPerRange()
+        public override void CanCreateIndexWithPagesPerRange()
         {
             var expression = GetCreateIndexWithExpression(x =>
             {
@@ -59,7 +59,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres10_0
 
         [TestCase(true)]
         [TestCase(false)]
-        public void CanCreateIndexWithAutosummarize(bool autosummarize)
+        public override void CanCreateIndexWithAutosummarize(bool autosummarize)
         {
             var expression = GetCreateIndexWithExpression(x =>
             {

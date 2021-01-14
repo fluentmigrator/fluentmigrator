@@ -257,44 +257,84 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return " NULLS LAST";
         }
 
-        protected virtual string GetWithIndexStoreParameters(CreateIndexExpression column)
+        protected virtual string GetWithIndexStorageParameters(CreateIndexExpression expression)
         {
-            var parameters = GetIndexStorageParameters(column);
+            var allow = GetAllowIndexStorageParameters();
+            var parameters = new List<string>();
+
+            var fillFactor = GetIndexStorageParameters<int?>(PostgresExtensions.IndexFillFactor, "FillFactor");
+            if (fillFactor.HasValue)
+            {
+                parameters.Add($"FILLFACTOR = {fillFactor}");
+            }
+
+            var fastUpdate = GetIndexStorageParameters<bool?>( PostgresExtensions.IndexFastUpdate, "FastUpdate");
+            if (fastUpdate.HasValue)
+            {
+                parameters.Add($"FASTUPDATE = {ToOnOff(fastUpdate.Value)}");
+            }
+
+            // Postgres 10 or Higher
+            var buffering = GetIndexStorageParameters<GistBuffering?>(PostgresExtensions.IndexBuffering, "Buffering");
+            if (buffering.HasValue)
+            {
+                parameters.Add($"BUFFERING = {buffering.Value.ToString().ToUpper()}");
+            }
+
+            var pendingList = GetIndexStorageParameters<long?>(PostgresExtensions.IndexGinPendingListLimit, "GinPendingListLimit");
+            if (pendingList.HasValue)
+            {
+                parameters.Add($"GIN_PENDING_LIST_LIMIT = {pendingList}");
+            }
+
+            var perRangePage = GetIndexStorageParameters<int?>(PostgresExtensions.IndexPagesPerRange, "PagesPerRange");
+            if (perRangePage.HasValue)
+            {
+                parameters.Add($"PAGES_PER_RANGE = {perRangePage}");
+            }
+
+            var autosummarize = GetIndexStorageParameters<bool?>(PostgresExtensions.IndexAutosummarize, "Autosummarize");
+            if (autosummarize.HasValue)
+            {
+                parameters.Add($"AUTOSUMMARIZE = {ToOnOff(autosummarize.Value)}");
+            }
+
+            // Postgres 11 or Higher
+            var cleanup = GetIndexStorageParameters<float?>(PostgresExtensions.IndexVacuumCleanupIndexScaleFactor, "VacuumCleanupIndexScaleFactor");
+            if (cleanup.HasValue)
+            {
+                parameters.Add($"VACUUM_CLEANUP_INDEX_SCALE_FACTOR = {cleanup.Value.ToString().ToUpper()}");
+            }
+
             if (parameters.Count == 0)
             {
                 return string.Empty;
             }
 
             return $" WITH ( {string.Join(", ", parameters)} )";
+
+            string ToOnOff(bool value) => value ? "ON" : "OFF";
+
+            T GetIndexStorageParameters<T>(string indexStorageParameter, string indexStorageParameterName)
+            {
+                var parameter = expression.Index.GetAdditionalFeature<T>(indexStorageParameter);
+
+                if (parameter != null && !allow.Contains(indexStorageParameter))
+                {
+                    throw new NotSupportedException($"{indexStorageParameterName} index storage not supported. Please use a new version of Postgres");
+                }
+
+                return parameter;
+            }
         }
 
-        protected virtual ICollection<string> GetIndexStorageParameters(CreateIndexExpression expression)
+        protected virtual HashSet<string> GetAllowIndexStorageParameters()
         {
-            var parameters = new List<string>();
-
-            var fillFactor = expression.Index.GetAdditionalFeature<int?>(PostgresExtensions.IndexFillFactor);
-            if (fillFactor != null)
+            return new HashSet<string>(StringComparer.InvariantCultureIgnoreCase)
             {
-                parameters.Add($"FILLFACTOR = {fillFactor}");
-            }
-
-            var fastUpdate = expression.Index.GetAdditionalFeature<bool?>(PostgresExtensions.IndexFastUpdate);
-            if (fastUpdate != null)
-            {
-                parameters.Add($"FASTUPDATE = {ToOnOff(fastUpdate.Value)}");
-            }
-
-            return parameters;
-        }
-
-        protected static string ToOnOff(bool value)
-        {
-            if (value)
-            {
-                return "ON";
-            }
-
-            return "OFF";
+                PostgresExtensions.IndexFillFactor,
+                PostgresExtensions.IndexFastUpdate
+            };
         }
 
         public override string Generate(CreateIndexExpression expression)
@@ -347,7 +387,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
 
             result.Append(")")
                 .Append(GetIncludeString(expression))
-                .Append(GetWithIndexStoreParameters(expression))
+                .Append(GetWithIndexStorageParameters(expression))
                 .Append(GetFilter(expression))
                 .Append(";");
 

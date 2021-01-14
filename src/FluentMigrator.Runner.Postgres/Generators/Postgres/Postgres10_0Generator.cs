@@ -16,8 +16,6 @@
 
 using System.Collections.Generic;
 
-using FluentMigrator.Expressions;
-using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Postgres;
 
 using JetBrains.Annotations;
@@ -52,35 +50,16 @@ namespace FluentMigrator.Runner.Generators.Postgres
         }
 
         /// <inheritdoc />
-        protected override ICollection<string> GetIndexStorageParameters(CreateIndexExpression expression)
+        protected override HashSet<string> GetAllowIndexStorageParameters()
         {
-            var parameters = base.GetIndexStorageParameters(expression);
+            var allow = base.GetAllowIndexStorageParameters();
 
-            var buffering = expression.Index.GetAdditionalFeature<GistBuffering?>(PostgresExtensions.IndexBuffering);
-            if (buffering.HasValue)
-            {
-                parameters.Add($"BUFFERING = {buffering.Value.ToString().ToUpper()}");
-            }
+            allow.Add(PostgresExtensions.IndexBuffering);
+            allow.Add(PostgresExtensions.IndexGinPendingListLimit);
+            allow.Add(PostgresExtensions.IndexPagesPerRange);
+            allow.Add(PostgresExtensions.IndexAutosummarize);
 
-            var pendingList = expression.Index.GetAdditionalFeature<long?>(PostgresExtensions.IndexGinPendingListLimit);
-            if (pendingList.HasValue)
-            {
-                parameters.Add($"GIN_PENDING_LIST_LIMIT = {pendingList}");
-            }
-
-            var perRangePage = expression.Index.GetAdditionalFeature<int?>(PostgresExtensions.IndexPagesPerRange);
-            if (perRangePage.HasValue)
-            {
-                parameters.Add($"PAGES_PER_RANGE = {perRangePage}");
-            }
-
-            var autosummarize = expression.Index.GetAdditionalFeature<bool?>(PostgresExtensions.IndexAutosummarize);
-            if (autosummarize.HasValue)
-            {
-                parameters.Add($"AUTOSUMMARIZE = {ToOnOff(autosummarize.Value)}");
-            }
-
-            return parameters;
+            return allow;
         }
     }
 }

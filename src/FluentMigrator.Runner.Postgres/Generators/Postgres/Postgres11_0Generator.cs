@@ -90,18 +90,15 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return " ONLY";
         }
 
+
         /// <inheritdoc />
-        protected override ICollection<string> GetIndexStorageParameters(CreateIndexExpression expression)
+        protected override HashSet<string> GetAllowIndexStorageParameters()
         {
-            var parameters = base.GetIndexStorageParameters(expression);
+            var allow =  base.GetAllowIndexStorageParameters();
 
-            var cleanup = expression.Index.GetAdditionalFeature<float?>(PostgresExtensions.IndexVacuumCleanupIndexScaleFactor);
-            if (cleanup.HasValue)
-            {
-                parameters.Add($"VACUUM_CLEANUP_INDEX_SCALE_FACTOR = {cleanup.Value.ToString().ToUpper()}");
-            }
+            allow.Add(PostgresExtensions.IndexVacuumCleanupIndexScaleFactor);
 
-            return parameters;
+            return allow;
         }
     }
 }
