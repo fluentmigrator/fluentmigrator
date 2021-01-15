@@ -53,6 +53,12 @@ namespace FluentMigrator.Postgres
         public const string Concurrently = "PostgresConcurrently";
         public const string Only = "PostgresOnly";
 
+        public const string IndexFillFactor = "PostgresFillFactor";
+        public const string IndexVacuumCleanupIndexScaleFactor = "PostgresBTreeVacuumCleanupIndexScaleFactor";
+        public const string IndexFastUpdate = "PostgresGinFastUpdate";
+        public const string IndexGinPendingListLimit = "PostgresGinPendingListLimit";
+        public const string IndexBuffering = "PostgresGiSTBuffering";
+
         /// <summary>
         /// Column identity generation ability for PostgreSQL 10 and above
         /// </summary>

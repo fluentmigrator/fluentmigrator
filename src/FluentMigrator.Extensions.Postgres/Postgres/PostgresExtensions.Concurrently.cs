@@ -16,7 +16,6 @@
 
 using System;
 
-using FluentMigrator.Builder.Create.Index;
 using FluentMigrator.Builders.Create.Index;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Infrastructure.Extensions;

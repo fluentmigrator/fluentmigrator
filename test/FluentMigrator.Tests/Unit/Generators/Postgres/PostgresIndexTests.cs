@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 
+using FluentMigrator.Builder.Create.Index;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Model;

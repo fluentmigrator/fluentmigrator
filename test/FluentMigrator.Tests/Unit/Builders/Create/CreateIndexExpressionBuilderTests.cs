@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 
+using FluentMigrator.Builder.Create.Index;
 using FluentMigrator.Builders.Create.Index;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
@@ -366,7 +367,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 
             ICreateIndexOnColumnOrInSchemaSyntax builder = new CreateIndexExpressionBuilder(expressionMock.Object);
 
-            builder.WithOptions().WithFillfactor(90);
+            builder.WithOptions().Fillfactor(90);
             indexMock.VerifyGet(x => x.AdditionalFeatures);
             expressionMock.VerifyGet(e => e.Index);
 
@@ -386,7 +387,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 
             ICreateIndexOnColumnOrInSchemaSyntax builder = new CreateIndexExpressionBuilder(expressionMock.Object);
 
-            builder.WithOptions().WithVacuumCleanupIndexScaleFactor(90);
+            builder.WithOptions().UsingBTree().VacuumCleanupIndexScaleFactor(90);
             indexMock.VerifyGet(x => x.AdditionalFeatures);
             expressionMock.VerifyGet(e => e.Index);
 
@@ -408,7 +409,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 
             ICreateIndexOnColumnOrInSchemaSyntax builder = new CreateIndexExpressionBuilder(expressionMock.Object);
 
-            builder.WithOptions().WithBuffering(buffering);
+            builder.WithOptions().UsingGist().Buffering(buffering);
             indexMock.VerifyGet(x => x.AdditionalFeatures);
             expressionMock.VerifyGet(e => e.Index);
 
@@ -429,7 +430,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 
             ICreateIndexOnColumnOrInSchemaSyntax builder = new CreateIndexExpressionBuilder(expressionMock.Object);
 
-            builder.WithOptions().WithFastUpdate(fastUpdate);
+            builder.WithOptions().UsingGin().FastUpdate(fastUpdate);
             indexMock.VerifyGet(x => x.AdditionalFeatures);
             expressionMock.VerifyGet(e => e.Index);
 
@@ -449,7 +450,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 
             ICreateIndexOnColumnOrInSchemaSyntax builder = new CreateIndexExpressionBuilder(expressionMock.Object);
 
-            builder.WithOptions().WithGinPendingListLimit(90);
+            builder.WithOptions().UsingGin().PendingListLimit(90);
             indexMock.VerifyGet(x => x.AdditionalFeatures);
             expressionMock.VerifyGet(e => e.Index);
 
@@ -469,7 +470,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 
             ICreateIndexOnColumnOrInSchemaSyntax builder = new CreateIndexExpressionBuilder(expressionMock.Object);
 
-            builder.WithOptions().WithPagesPerRange(90);
+            builder.WithOptions().UsingBrin().PagesPerRange(90);
             indexMock.VerifyGet(x => x.AdditionalFeatures);
             expressionMock.VerifyGet(e => e.Index);
 
@@ -490,7 +491,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 
             ICreateIndexOnColumnOrInSchemaSyntax builder = new CreateIndexExpressionBuilder(expressionMock.Object);
 
-            builder.WithOptions().WithAutosummarize(autosummarize);
+            builder.WithOptions().UsingBrin().Autosummarize(autosummarize);
             indexMock.VerifyGet(x => x.AdditionalFeatures);
             expressionMock.VerifyGet(e => e.Index);
 

@@ -15,7 +15,6 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
 
 using FluentMigrator.Builder.Create.Index;
 using FluentMigrator.Builders.Create.Index;
@@ -27,53 +26,99 @@ namespace FluentMigrator.Postgres
 {
     public static partial class PostgresExtensions
     {
-        public static ICreateIndexOptionsSyntax UsingBTree(this ICreateIndexOptionsSyntax expression)
+        public static ICreateBTreeIndexOptionsSyntax UsingBTree(this ICreateIndexOptionsSyntax expression)
         {
+            if (expression is ICreateIndexMethodOptionsSyntax)
+            {
+                throw new InvalidOperationException("Only can have one index method.");
+            }
+
             var additionalFeatures = expression as ISupportAdditionalFeatures;
             additionalFeatures.Using(Algorithm.BTree);
-            return expression;
+            return new CreateBTreeIndexOptionsSyntax(expression);
         }
 
-        public static ICreateIndexOptionsSyntax UsingHash(this ICreateIndexOptionsSyntax expression)
+        public static ICreateHashIndexOptionSyntax UsingHash(this ICreateIndexOptionsSyntax expression)
         {
+            if (expression is ICreateIndexMethodOptionsSyntax)
+            {
+                throw new InvalidOperationException("Only can have one index method.");
+            }
+
             var additionalFeatures = expression as ISupportAdditionalFeatures;
             additionalFeatures.Using(Algorithm.Hash);
-            return expression;
+            return new CreateHashIndexOptionSyntax(expression);
         }
 
-        public static ICreateIndexOptionsSyntax UsingGist(this ICreateIndexOptionsSyntax expression)
+        public static ICreateGiSTIndexOptionsSyntax UsingGist(this ICreateIndexOptionsSyntax expression)
         {
+            if (expression is ICreateIndexMethodOptionsSyntax)
+            {
+                throw new InvalidOperationException("Only can have one index method.");
+            }
+
             var additionalFeatures = expression as ISupportAdditionalFeatures;
             additionalFeatures.Using(Algorithm.Gist);
-            return expression;
+            return new CreateGistIndexOptionsSyntax(expression);
         }
 
-        public static ICreateIndexOptionsSyntax UsingSpgist(this ICreateIndexOptionsSyntax expression)
+        public static ICreateSpgistIndexOptionsSyntax UsingSpgist(this ICreateIndexOptionsSyntax expression)
         {
+            if (expression is ICreateIndexMethodOptionsSyntax)
+            {
+                throw new InvalidOperationException("Only can have one index method.");
+            }
+
             var additionalFeatures = expression as ISupportAdditionalFeatures;
             additionalFeatures.Using(Algorithm.Spgist);
-            return expression;
+            return new CreateSpgistIndexOptionsSyntax(expression);
         }
 
-        public static ICreateIndexOptionsSyntax UsingGin(this ICreateIndexOptionsSyntax expression)
+        public static ICreateGinIndexOptionsSyntax UsingGin(this ICreateIndexOptionsSyntax expression)
         {
+            if (expression is ICreateIndexMethodOptionsSyntax)
+            {
+                throw new InvalidOperationException("Only can have one index method.");
+            }
+
             var additionalFeatures = expression as ISupportAdditionalFeatures;
             additionalFeatures.Using(Algorithm.Gin);
-            return expression;
+            return new CreateGinIndexOptionsSyntax(expression);
         }
 
-        public static ICreateIndexOptionsSyntax UsingBrin(this ICreateIndexOptionsSyntax expression)
+        public static ICreateBrinIndexOptionsSyntax UsingBrin(this ICreateIndexOptionsSyntax expression)
         {
             var additionalFeatures = expression as ISupportAdditionalFeatures;
             additionalFeatures.Using(Algorithm.Brin);
-            return expression;
+            return new CreateBrinIndexOptionsSyntax(expression);
         }
 
-        public static ICreateIndexOptionsSyntax Using(this ICreateIndexOptionsSyntax expression, Algorithm algorithm)
+        public static ICreateIndexMethodOptionsSyntax Using(this ICreateIndexOptionsSyntax expression, Algorithm algorithm)
         {
+            if (expression is ICreateIndexMethodOptionsSyntax)
+            {
+                throw new InvalidOperationException("Only can have one index method.");
+            }
+
             var additionalFeatures = expression as ISupportAdditionalFeatures;
             additionalFeatures.Using(algorithm);
-            return expression;
+            switch (algorithm)
+            {
+                case Algorithm.BTree:
+                    return new CreateBTreeIndexOptionsSyntax(expression);
+                case Algorithm.Hash:
+                    return new CreateHashIndexOptionSyntax(expression);
+                case Algorithm.Gist:
+                    return new CreateGistIndexOptionsSyntax(expression);
+                case Algorithm.Spgist:
+                    return new CreateSpgistIndexOptionsSyntax(expression);
+                case Algorithm.Gin:
+                    return new CreateGinIndexOptionsSyntax(expression);
+                case Algorithm.Brin:
+                    return new CreateBrinIndexOptionsSyntax(expression);
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(algorithm), algorithm, null);
+            }
         }
 
         public static void Using(this ISupportAdditionalFeatures additionalFeatures, Algorithm algorithm)

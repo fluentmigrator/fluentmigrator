@@ -1,3 +1,4 @@
+using FluentMigrator.Builder.Create.Index;
 using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Model;
 using FluentMigrator.Postgres;
