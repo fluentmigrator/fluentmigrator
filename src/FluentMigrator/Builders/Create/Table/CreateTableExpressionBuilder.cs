@@ -16,11 +16,14 @@
 
 #endregion
 
+using System;
 using System.Data;
+using System.Linq.Expressions;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
+using FluentMigrator.Infrastructure.Extensions;
 
 namespace FluentMigrator.Builders.Create.Table
 {
@@ -76,6 +79,16 @@ namespace FluentMigrator.Builders.Create.Table
             Expression.Columns.Add(column);
             CurrentColumn = column;
             return this;
+        }
+
+        /// <summary>
+        /// Defines a column using class property
+        /// </summary>
+        /// <param name="expression">Expression to define column</param>
+        public ICreateTableColumnAsTypeSyntax WithColumn<T>(Expression<Func<T, Object>> expression)
+        {
+            var nameColumn = expression.GetMemberName();
+            return WithColumn(nameColumn);
         }
 
         /// <inheritdoc />

@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
 
 using FluentMigrator.Builders;
@@ -544,6 +545,44 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
         }
 
         [Test]
+        public void CallingWithColumnAddsNewColumnToExpressionFunc()
+        {
+            const string name = "LastName";
+
+            var collectionMock = new Mock<IList<ColumnDefinition>>();
+
+            var expressionMock = new Mock<CreateTableExpression>();
+            expressionMock.SetupGet(e => e.Columns).Returns(collectionMock.Object);
+
+            var contextMock = new Mock<IMigrationContext>();
+
+            var builder = new CreateTableExpressionBuilder(expressionMock.Object, contextMock.Object);
+            builder.WithColumn<ModelToCreateTableFake>(x => x.LastName);
+
+            collectionMock.Verify(x => x.Add(It.Is<ColumnDefinition>(c => c.Name.Equals(name))));
+            expressionMock.VerifyGet(e => e.Columns);
+        }
+
+        [Test]
+        public void CallingWithColumnAddsNewColumnToExpressionFuncWithAlias()
+        {
+            const string name = "PrivateAddress";
+
+            var collectionMock = new Mock<IList<ColumnDefinition>>();
+
+            var expressionMock = new Mock<CreateTableExpression>();
+            expressionMock.SetupGet(e => e.Columns).Returns(collectionMock.Object);
+
+            var contextMock = new Mock<IMigrationContext>();
+
+            var builder = new CreateTableExpressionBuilder(expressionMock.Object, contextMock.Object);
+            builder.WithColumn<ModelToCreateTableFake>(x => x.Address);
+
+            collectionMock.Verify(x => x.Add(It.Is<ColumnDefinition>(c => c.Name.Equals(name))));
+            expressionMock.VerifyGet(e => e.Columns);
+        }
+
+        [Test]
         public void ColumnHelperSetOnCreation()
         {
             var expressionMock = new Mock<CreateTableExpression>();
@@ -663,5 +702,12 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 
             columnMock.VerifySet(c => c.Precision = expected);
         }
+    }
+
+    internal class ModelToCreateTableFake
+    {
+        public string LastName { get; set; }
+        [Column("PrivateAddress")]
+        public string Address { get; set; }
     }
 }
