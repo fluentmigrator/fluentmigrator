@@ -285,7 +285,7 @@ namespace FluentMigrator.Runner.Processors
 
         protected abstract void Dispose(bool isDisposing);
 
-        protected virtual int ReThrowWithSql(Exception ex, string sql)
+        protected virtual void ReThrowWithSql(Exception ex, string sql)
         {
             using (var message = new StringWriter())
             {
