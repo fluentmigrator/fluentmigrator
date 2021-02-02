@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 
+using FluentMigrator.Builder.Create.Index;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Model;
@@ -217,5 +218,89 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe($"CREATE INDEX \"TestIndex\" ON \"public\".\"TestTable1\" (\"TestColumn1\" ASC NULLS {sort.ToString().ToUpper()});");
         }
 
+        [Test]
+        public void CanCreateIndexWithFillfactor()
+        {
+            var expression = GetCreateIndexWithExpression(x =>
+            {
+                x.Index.GetAdditionalFeature(PostgresExtensions.IndexFillFactor, () => 90);
+            });
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe($"CREATE INDEX \"TestIndex\" ON \"public\".\"TestTable1\" (\"TestColumn1\" ASC) WITH ( FILLFACTOR = 90 );");
+        }
+
+        [TestCase(true)]
+        [TestCase(false)]
+        public void CanCreateIndexWithFastUpdate(bool fastUpdate)
+        {
+            var expression = GetCreateIndexWithExpression(x =>
+            {
+                x.Index.GetAdditionalFeature(PostgresExtensions.IndexFastUpdate, () => fastUpdate);
+            });
+
+
+            var onOff = fastUpdate ? "ON" : "OFF";
+            var result = Generator.Generate(expression);
+            result.ShouldBe($"CREATE INDEX \"TestIndex\" ON \"public\".\"TestTable1\" (\"TestColumn1\" ASC) WITH ( FASTUPDATE = {onOff} );");
+        }
+
+        [Test]
+        public virtual void CanCreateIndexWithVacuumCleanupIndexScaleFactor()
+        {
+            var expression = GetCreateIndexWithExpression(x =>
+            {
+                x.Index.GetAdditionalFeature(PostgresExtensions.IndexVacuumCleanupIndexScaleFactor, () => (float)0.1);
+            });
+
+            Assert.Throws<NotSupportedException>(() => Generator.Generate(expression));
+        }
+
+        [TestCase(GistBuffering.Auto)]
+        [TestCase(GistBuffering.On)]
+        [TestCase(GistBuffering.Off)]
+        public virtual void CanCreateIndexWithBuffering(GistBuffering buffering)
+        {
+            var expression = GetCreateIndexWithExpression(x =>
+            {
+                x.Index.GetAdditionalFeature(PostgresExtensions.IndexBuffering, () => buffering);
+            });
+
+            Assert.Throws<NotSupportedException>(() => Generator.Generate(expression));
+        }
+
+        [Test]
+        public virtual void CanCreateIndexWithGinPendingListLimit()
+        {
+            var expression = GetCreateIndexWithExpression(x =>
+            {
+                x.Index.GetAdditionalFeature(PostgresExtensions.IndexGinPendingListLimit, () => (long)128);
+            });
+
+            Assert.Throws<NotSupportedException>(() => Generator.Generate(expression));
+        }
+
+        [Test]
+        public virtual void CanCreateIndexWithPagesPerRange()
+        {
+            var expression = GetCreateIndexWithExpression(x =>
+            {
+                x.Index.GetAdditionalFeature(PostgresExtensions.IndexPagesPerRange, () => 128);
+            });
+
+            Assert.Throws<NotSupportedException>(() => Generator.Generate(expression));
+        }
+
+        [TestCase(true)]
+        [TestCase(false)]
+        public virtual void CanCreateIndexWithAutosummarize(bool autosummarize)
+        {
+            var expression = GetCreateIndexWithExpression(x =>
+            {
+                x.Index.GetAdditionalFeature(PostgresExtensions.IndexAutosummarize, () => autosummarize);
+            });
+
+            Assert.Throws<NotSupportedException>(() => Generator.Generate(expression));
+        }
     }
 }
