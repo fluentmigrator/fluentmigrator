@@ -297,7 +297,14 @@ namespace FluentMigrator.Runner.Processors.Oracle
             {
                 using (var command = CreateCommand(batch))
                 {
-                    command.ExecuteNonQuery();
+                    try
+                    {
+                        command.ExecuteNonQuery();
+                    }
+                    catch (Exception ex)
+                    {
+                        ReThrowWithSql(ex, batch);
+                    }
                 }
             }
         }

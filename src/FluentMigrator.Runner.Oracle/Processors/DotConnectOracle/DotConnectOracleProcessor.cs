@@ -208,7 +208,16 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
             EnsureConnectionIsOpen();
 
             using (var command = CreateCommand(sql))
-                command.ExecuteNonQuery();
+            {
+                try
+                {
+                    command.ExecuteNonQuery();
+                }
+                catch (Exception ex)
+                {
+                    ReThrowWithSql(ex, sql);
+                }
+            }
         }
     }
 }

@@ -261,11 +261,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
                 {
                     using (var message = new StringWriter())
                     {
-                        message.WriteLine("An error occured executing the following sql:");
-                        message.WriteLine(sql);
-                        message.WriteLine("The error was {0}", ex.Message);
-
-                        throw new Exception(message.ToString(), ex);
+                        ReThrowWithSql(ex, sql);
                     }
                 }
             }
@@ -315,14 +311,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             }
             catch (Exception ex)
             {
-                using (var message = new StringWriter())
-                {
-                    message.WriteLine("An error occured executing the following sql:");
-                    message.WriteLine(string.IsNullOrEmpty(sqlBatch) ? sql : sqlBatch);
-                    message.WriteLine("The error was {0}", ex.Message);
-
-                    throw new Exception(message.ToString(), ex);
-                }
+                ReThrowWithSql(ex, string.IsNullOrEmpty(sqlBatch) ? sql : sqlBatch);
             }
         }
 

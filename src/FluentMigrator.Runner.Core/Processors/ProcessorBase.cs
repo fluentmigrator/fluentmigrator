@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Announcers;
@@ -283,5 +284,17 @@ namespace FluentMigrator.Runner.Processors
         }
 
         protected abstract void Dispose(bool isDisposing);
+
+        protected virtual void ReThrowWithSql(Exception ex, string sql)
+        {
+            using (var message = new StringWriter())
+            {
+                message.WriteLine("An error occured executing the following sql:");
+                message.WriteLine(sql);
+                message.WriteLine("The error was {0}", ex.Message);
+
+                throw new Exception(message.ToString(), ex);
+            }
+        }
     }
 }
