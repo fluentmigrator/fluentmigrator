@@ -31,7 +31,7 @@ namespace FluentMigrator.Builder.Create.Index
         /// <inheritdoc />
         public ICreateHashIndexOptionSyntax Fillfactor(int fillfactor)
         {
-            Fillfactor(fillfactor);
+            base.Fillfactor(fillfactor);
             return this;
         }
     }

@@ -36,7 +36,7 @@ namespace FluentMigrator.Builder.Create.Index
         /// <inheritdoc />
         public ICreateBrinIndexOptionsSyntax Fillfactor(int fillfactor)
         {
-            Fillfactor(fillfactor);
+            base.Fillfactor(fillfactor);
             return this;
         }
 
