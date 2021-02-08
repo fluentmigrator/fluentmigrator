@@ -399,8 +399,8 @@ namespace FluentMigrator.Runner.Generators.Postgres
 
             result.Append(")")
                 .Append(GetIncludeString(expression))
-                .Append(GetTablespace(expression))
                 .Append(GetWithIndexStorageParameters(expression))
+                .Append(GetTablespace(expression))
                 .Append(GetFilter(expression))
                 .Append(";");
 
