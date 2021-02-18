@@ -58,5 +58,8 @@ namespace FluentMigrator.DotNet.Cli.Commands
 
         [Option("--include-untagged-maintenances", Description = "Include untagged maintenances.")]
         public bool IncludeUntaggedMaintenances { get; }
+
+        [Option("--allowDirtyAssemblies", Description = "Allows dirty assemblies.")]
+        public bool AllowDirtyAssemblies { get; }
     }
 }
