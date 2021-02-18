@@ -54,6 +54,7 @@ steps:
   inputs:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
+    diagnosticsEnabled: true
 
 - task: CmdLine@2
   inputs:
