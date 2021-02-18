@@ -102,7 +102,7 @@ namespace FluentMigrator.DotNet.Cli
             // we might still produce the right exe with proper references
 
             // we warn the user about that, in case some Super User want to be aware of that
-            Console.WriteLine($"// Wrong assembly binding redirects for {simpleName}, loading it from disk anyway.");
+            Console.WriteLine($"// Wrong assembly binding redirects for {simpleName}, loading it from disk anyway. {guessedPath}");
 
             return Assembly.LoadFrom(guessedPath);
         }
