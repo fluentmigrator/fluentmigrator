@@ -41,7 +41,10 @@ namespace FluentMigrator.DotNet.Cli
         {
             if (args.Contains("--allowDirtyAssemblies"))
             {
-                DirtyAssemblyResolveHelper.Create();
+                using (DirtyAssemblyResolveHelper.Create())
+                {
+                    return CommandLineApplication.Execute<Root>(args);
+                }
             }
             return CommandLineApplication.Execute<Root>(args);
         }
