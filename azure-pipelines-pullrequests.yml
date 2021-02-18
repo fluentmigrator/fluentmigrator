@@ -45,6 +45,7 @@ steps:
   inputs:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
+    diagnosticsEnabled: true
 
 - task: PublishBuildArtifacts@1
   inputs:
