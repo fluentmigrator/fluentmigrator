@@ -34,9 +34,9 @@ namespace FluentMigrator.Builder.Create.Index
         public const string IndexPagesPerRange = "PostgresBrinPagesPerRange";
 
         /// <inheritdoc />
-        public ICreateBrinIndexOptionsSyntax Fillfactor(int fillfactor)
+        public new ICreateBrinIndexOptionsSyntax Fillfactor(int fillfactor)
         {
-            Fillfactor(fillfactor);
+            base.Fillfactor(fillfactor);
             return this;
         }
 

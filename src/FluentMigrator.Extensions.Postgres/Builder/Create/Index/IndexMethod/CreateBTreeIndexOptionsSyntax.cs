@@ -32,9 +32,9 @@ namespace FluentMigrator.Builder.Create.Index
         }
 
         /// <inheritdoc />
-        public ICreateBTreeIndexOptionsSyntax Fillfactor(int fillfactor)
+        public new ICreateBTreeIndexOptionsSyntax Fillfactor(int fillfactor)
         {
-            Fillfactor(fillfactor);
+            base.Fillfactor(fillfactor);
             return this;
         }
 
