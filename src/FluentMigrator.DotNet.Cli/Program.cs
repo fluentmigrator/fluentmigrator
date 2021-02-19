@@ -51,6 +51,12 @@ namespace FluentMigrator.DotNet.Cli
     }
 
     /// <summary>
+    /// Temporary workaround for
+    /// https://github.com/fluentmigrator/fluentmigrator/issues/1406
+    ///
+    /// taken mostly from
+    /// https://github.com/dotnet/BenchmarkDotNet/blob/852bb8cd9c2ac2530866dc53723c5f2ce3d411fa/src/BenchmarkDotNet/Helpers/DirtyAssemblyResolveHelper.cs#L18
+    /// 
     /// Sometimes NuGet/VS/other tool does not generate the right assembly binding redirects
     /// or just for any other magical reasons
     /// our users get FileNotFoundException when trying to run their benchmarks
@@ -61,7 +67,6 @@ namespace FluentMigrator.DotNet.Cli
     ///
     /// If one day we can remove it, the person doing that should celebrate!!
     /// </summary>
-    // ReSharper disable once CheckNamespace I did it on purpose to show that it MUST not touch any BenchmarkDotNet stuff
     internal class DirtyAssemblyResolveHelper : IDisposable
     {
         internal static IDisposable Create() => new DirtyAssemblyResolveHelper();
@@ -85,8 +90,11 @@ namespace FluentMigrator.DotNet.Cli
 
             // Create the list of assembly paths consisting of runtime assemblies
             var paths = new List<string>(runtimeAssemblies);
+
+            // Since we search by simple name, there should hopefully be one file
             string guessedPath = paths.FirstOrDefault();
 
+            // If there wasn't a runtime file check the app directory for the file 
             if (guessedPath == null)
             {
                 guessedPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"{simpleName}.dll");
