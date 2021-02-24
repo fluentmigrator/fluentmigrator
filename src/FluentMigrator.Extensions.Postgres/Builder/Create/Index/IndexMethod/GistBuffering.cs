@@ -16,10 +16,24 @@
 
 namespace FluentMigrator.Builder.Create.Index
 {
+    /// <summary>
+    /// The buffering options
+    /// </summary>
     public enum GistBuffering
     {
+        /// <summary>
+        /// It is initially disabled, but turned on on-the-fly.
+        /// </summary>
+        Auto,
+
+        /// <summary>
+        /// Enabled buffering
+        /// </summary>
         On,
-        Off,
-        Auto
+
+        /// <summary>
+        /// Disabled buffering
+        /// </summary>
+        Off
     }
 }

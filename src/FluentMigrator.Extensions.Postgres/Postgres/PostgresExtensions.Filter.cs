@@ -26,6 +26,7 @@ namespace FluentMigrator.Postgres
 
         /// <summary>
         /// The constraint expression for a partial index.
+        /// For more information about partial index see: https://www.postgresql.org/docs/current/indexes-partial.html
         /// </summary>
         /// <param name="expression"></param>
         /// <param name="filter">The constraint expression</param>
