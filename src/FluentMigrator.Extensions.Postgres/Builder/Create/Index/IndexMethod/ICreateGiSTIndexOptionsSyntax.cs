@@ -27,10 +27,12 @@ namespace FluentMigrator.Builder.Create.Index
         new ICreateGiSTIndexOptionsSyntax Fillfactor(int fillfactor);
 
         /// <summary>
-        /// Building large GiST indexes by simply inserting all the tuples tends to be slow, because if the index tuples are scattered across the index and the index is large enough to not fit in cache, the insertions need to perform a lot of random I/O.
+        /// Building large GiST indexes by simply inserting all the tuples tends to be slow, because if the index
+        /// tuples are scattered across the index and the index is large enough to not fit in cache, the insertions need
+        /// to perform a lot of random I/O.
         /// For more information about it see: https://www.postgresql.org/docs/current/gist-implementation.html#GIST-BUFFERING-BUILD
         /// </summary>
-        /// <param name="buffering">The buffering value.</param>
+        /// <param name="buffering">The <see cref="GistBuffering"/> value.</param>
         /// <returns>The next step</returns>
         ICreateGiSTIndexOptionsSyntax Buffering(GistBuffering buffering);
     }

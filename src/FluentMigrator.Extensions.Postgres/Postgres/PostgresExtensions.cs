@@ -58,6 +58,8 @@ namespace FluentMigrator.Postgres
         public const string IndexFastUpdate = "PostgresGinFastUpdate";
         public const string IndexGinPendingListLimit = "PostgresGinPendingListLimit";
         public const string IndexBuffering = "PostgresGiSTBuffering";
+        public const string IndexPagesPerRange = "PostgresBrinPagesPerRange";
+        public const string IndexAutosummarize = "PostgresBrinautosummarize";
 
         /// <summary>
         /// Column identity generation ability for PostgreSQL 10 and above

@@ -23,7 +23,6 @@ namespace FluentMigrator.Postgres
 {
     public static partial class PostgresExtensions
     {
-
         /// <summary>
         /// The fillfactor for an index is a percentage that determines how full the index method will try to pack index pages.
         /// </summary>
@@ -44,38 +43,5 @@ namespace FluentMigrator.Postgres
             return expression.UsingBTree()
                 .Fillfactor(fillfactor) as ICreateBTreeIndexOptionsSyntax;
         }
-
-        #region BRIN
-        public const string IndexPagesPerRange = "PostgresBrinPagesPerRange";
-
-        /// <summary>
-        /// Exclusive for BRIN index. Defines the number of table blocks that make up one block range for each entry of a BRIN index.
-        /// For more information about it see: https://www.postgresql.org/docs/current/brin-intro.html
-        /// </summary>
-        /// <param name="expression"></param>
-        /// <param name="range">The page per range</param>
-        /// <returns>The next step</returns>
-        public static ICreateIndexOptionsSyntax PagesPerRange(this ICreateIndexOptionsSyntax expression, int range)
-        {
-            var additionalFeatures = expression as ISupportAdditionalFeatures;
-            additionalFeatures.SetAdditionalFeature(IndexPagesPerRange, range);
-            return expression;
-        }
-
-        public const string IndexAutosummarize = "PostgresBrinautosummarize";
-
-        /// <summary>
-        /// Exclusive for BRIN index. Defines whether a summarization run is invoked for the previous page range whenever an insertion is detected on the next one.
-        /// </summary>
-        /// <param name="expression"></param>
-        /// <param name="autosummarize">True to enable fast autosummarize or false to disable.</param>
-        /// <returns>The next step</returns>
-        public static ICreateIndexOptionsSyntax Autosummarize(this ICreateIndexOptionsSyntax expression, bool autosummarize)
-        {
-            var additionalFeatures = expression as ISupportAdditionalFeatures;
-            additionalFeatures.SetAdditionalFeature(IndexAutosummarize, autosummarize);
-            return expression;
-        }
-        #endregion
     }
 }
