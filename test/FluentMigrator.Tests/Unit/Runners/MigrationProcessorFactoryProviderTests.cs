@@ -96,13 +96,6 @@ namespace FluentMigrator.Tests.Unit.Runners
         }
 
         [Test]
-        public void CanRetrieveSqlServerCeFactoryWithArgumentString()
-        {
-            IMigrationProcessorFactory factory = _migrationProcessorFactoryProvider.GetFactory("SqlServerCe");
-            Assert.IsTrue(factory.GetType() == typeof(SqlServerCeProcessorFactory));
-        }
-
-        [Test]
         public void CanRetrieveOracleFactoryWithArgumentString()
         {
             Assert.IsInstanceOf<OracleProcessorFactory>(_migrationProcessorFactoryProvider.GetFactory("Oracle"));

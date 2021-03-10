@@ -22,7 +22,6 @@ using System.Threading;
 
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Generic;
-using FluentMigrator.Runner.Generators.Jet;
 using FluentMigrator.Runner.Generators.MySql;
 using FluentMigrator.Runner.Generators.Oracle;
 using FluentMigrator.Runner.Generators.SqlServer;
@@ -214,15 +213,6 @@ namespace FluentMigrator.Tests.Unit.Generators.GenericGenerator
         {
             _quoter.QuoteValue(null)
                 .ShouldBe("NULL");
-        }
-
-        [Test]
-        public void ShouldEscapeJetObjectNames()
-        {
-            //This will throw and error on the Jet Engine if special characters are used.
-            //We do nothing.
-            JetQuoter quoter = new JetQuoter();
-            quoter.Quote("[Table]Name").ShouldBe("[[Table]Name]");
         }
 
         [Test]

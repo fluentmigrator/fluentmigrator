@@ -67,14 +67,9 @@ namespace FluentMigrator.Runner.Processors
             Register(new SqlServer2014ProcessorFactory());
             Register(new SqlServer2016ProcessorFactory());
             Register(new SqlServerProcessorFactory());
-            Register(new SqlServerCeProcessorFactory());
             Register(new SqlAnywhere16ProcessorFactory());
             Register(new HanaProcessorFactory());
             Register(new RedshiftProcessorFactory());
-
-#if NETFRAMEWORK
-            Register(new Jet.JetProcessorFactory());
-#endif
         }
 
         [Obsolete("Ony the statically provided factories are accessed")]

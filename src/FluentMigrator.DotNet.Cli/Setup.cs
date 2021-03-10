@@ -97,8 +97,7 @@ namespace FluentMigrator.DotNet.Cli
                         .AddSqlServer2008()
                         .AddSqlServer2012()
                         .AddSqlServer2014()
-                        .AddSqlServer2016()
-                        .AddSqlServerCe());
+                        .AddSqlServer2016());
 
             services
                 .AddSingleton<IConventionSet>(conventionSet)
