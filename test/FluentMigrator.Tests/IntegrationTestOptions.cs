@@ -68,12 +68,6 @@ namespace FluentMigrator.Tests
 
         public static DatabaseServerOptions SqlServer2016 => GetOptions("SqlServer2016");
 
-        public static DatabaseServerOptions SqlServerCe => GetOptions("SqlServerCe");
-
-        public static DatabaseServerOptions SqlAnywhere16 => GetOptions("SqlAnywhere16").GetOptionsForPlatform();
-
-        public static DatabaseServerOptions Jet => GetOptions("Jet");
-
         // ReSharper disable once InconsistentNaming
         public static DatabaseServerOptions SQLite => GetOptions("SQLite");
 

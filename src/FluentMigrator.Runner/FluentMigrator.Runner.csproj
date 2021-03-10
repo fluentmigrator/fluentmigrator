@@ -18,7 +18,6 @@
     <ProjectReference Include="..\FluentMigrator.Runner.Oracle\FluentMigrator.Runner.Oracle.csproj" />
     <ProjectReference Include="..\FluentMigrator.Runner.Postgres\FluentMigrator.Runner.Postgres.csproj" />
     <ProjectReference Include="..\FluentMigrator.Runner.Redshift\FluentMigrator.Runner.Redshift.csproj" />
-    <ProjectReference Include="..\FluentMigrator.Runner.SqlAnywhere\FluentMigrator.Runner.SqlAnywhere.csproj" />
     <ProjectReference Include="..\FluentMigrator.Runner.SQLite\FluentMigrator.Runner.SQLite.csproj" />
     <ProjectReference Include="..\FluentMigrator.Runner.SqlServer\FluentMigrator.Runner.SqlServer.csproj" />
     <ProjectReference Include="..\FluentMigrator.Runner.Hana\FluentMigrator.Runner.Hana.csproj" />

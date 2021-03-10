@@ -29,7 +29,6 @@
     <PackageReference Include="NUnit" Version="3.12.0" />
     <PackageReference Include="NUnit.Console" Version="3.11.1" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
-    <PackageReference Include="Sap.Data.SQLAnywhere" Version="17.0.7.3399" />
     <PackageReference Include="Shouldly" Version="3.0.2" />
   </ItemGroup>
   <ItemGroup>
@@ -38,13 +37,11 @@
     <ProjectReference Include="..\..\src\FluentMigrator.Runner.Db2\FluentMigrator.Runner.Db2.csproj" />
     <ProjectReference Include="..\..\src\FluentMigrator.Runner.Firebird\FluentMigrator.Runner.Firebird.csproj" />
     <ProjectReference Include="..\..\src\FluentMigrator.Runner.Hana\FluentMigrator.Runner.Hana.csproj" />
-    <ProjectReference Include="..\..\src\FluentMigrator.Runner.Jet\FluentMigrator.Runner.Jet.csproj" />
     <ProjectReference Include="..\..\src\FluentMigrator.Runner.MySql\FluentMigrator.Runner.MySql.csproj" />
     <ProjectReference Include="..\..\src\FluentMigrator.Runner.Oracle\FluentMigrator.Runner.Oracle.csproj" />
     <ProjectReference Include="..\..\src\FluentMigrator.Runner.Postgres\FluentMigrator.Runner.Postgres.csproj" />
     <ProjectReference Include="..\..\src\FluentMigrator.Runner.Redshift\FluentMigrator.Runner.Redshift.csproj" />
     <ProjectReference Include="..\..\src\FluentMigrator.Runner.SQLite\FluentMigrator.Runner.SQLite.csproj" />
-    <ProjectReference Include="..\..\src\FluentMigrator.Runner.SqlServerCe\FluentMigrator.Runner.SqlServerCe.csproj" />
     <ProjectReference Include="..\..\src\FluentMigrator.Runner.SqlServer\FluentMigrator.Runner.SqlServer.csproj" />
   </ItemGroup>
   <ItemGroup>
@@ -54,20 +51,8 @@
     <Reference Include="Sap.Data.Hana.v4.5">
       <HintPath>..\..\lib\Hana\ado.net\v4.5\Sap.Data.Hana.v4.5.dll</HintPath>
     </Reference>
-    <Reference Include="System.Data.SqlServerCe">
-      <Private>True</Private>
-      <HintPath>..\..\lib\SQLServerCE4\System.Data.SqlServerCe.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="../../lib/SQLServerCE4/amd64/**/*.*">
-      <Link>amd64/%(RecursiveDir)%(Filename)%(Extension)</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="../../lib/SQLServerCE4/x86/**/*.*">
-      <Link>x86/%(RecursiveDir)%(Filename)%(Extension)</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="../../lib/DB2/clidriver/**/*.*">
       <Link>clidriver/%(RecursiveDir)%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -76,10 +61,6 @@
       <Link>%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-  <ItemGroup Condition=" '$(MSBuildRuntimeType)' == 'Core' or '$(OS)' != 'Windows_NT' ">
-    <Compile Remove="Integration\Processors\Jet\**" />
-    <Compile Remove="Helpers\JetTestTable.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Update="appsettings.json">

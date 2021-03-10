@@ -89,7 +89,6 @@ namespace FluentMigrator.DotNet.Cli
                         .AddPostgres10_0()
                         .AddPostgres11_0()
                         .AddRedshift()
-                        .AddSqlAnywhere()
                         .AddSQLite()
                         .AddSqlServer()
                         .AddSqlServer2000()

@@ -252,8 +252,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
                     },
                     ConnectionStrings = new Dictionary<string, string>()
                     {
-                        ["SQLite"] = "Data Source=:memory:",
-                        ["SQLAnywhere16"] = "Data Source=test.db",
+                        ["SQLite"] = "Data Source=:memory:"
                     }
                 };
 

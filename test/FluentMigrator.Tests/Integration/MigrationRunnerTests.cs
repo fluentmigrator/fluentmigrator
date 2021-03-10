@@ -33,10 +33,8 @@ using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Runner.Processors.MySql;
 using FluentMigrator.Runner.Processors.Postgres;
-using FluentMigrator.Runner.Processors.SqlAnywhere;
 using FluentMigrator.Runner.Processors.SQLite;
 using FluentMigrator.Runner.Processors.SqlServer;
-using FluentMigrator.SqlAnywhere;
 using FluentMigrator.Tests.Integration.Migrations.Tagged;
 using FluentMigrator.Tests.Unit;
 
@@ -67,7 +65,6 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlServer2012")]
         [Category("SqlServer2014")]
         [Category("SqlServer2016")]
-        [Category("SqlAnywhere16")]
         public void CanRunMigration()
         {
             ExecuteWithSupportedProcessors(
@@ -98,7 +95,6 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlServer2012")]
         [Category("SqlServer2014")]
         [Category("SqlServer2016")]
-        [Category("SqlAnywhere16")]
         public void CanSilentlyFail()
         {
             var processor = new Mock<IMigrationProcessor>();
@@ -132,7 +128,6 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlServer2012")]
         [Category("SqlServer2014")]
         [Category("SqlServer2016")]
-        [Category("SqlAnywhere16")]
         public void CanApplyForeignKeyConvention()
         {
             ExecuteWithSupportedProcessors(
@@ -159,7 +154,6 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlServer2012")]
         [Category("SqlServer2014")]
         [Category("SqlServer2016")]
-        [Category("SqlAnywhere16")]
         public void CanApplyForeignKeyConventionWithSchema()
         {
             ExecuteWithSupportedProcessors(
@@ -188,7 +182,6 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlServer2012")]
         [Category("SqlServer2014")]
         [Category("SqlServer2016")]
-        [Category("SqlAnywhere16")]
         public void CanApplyIndexConvention()
         {
             ExecuteWithSupportedProcessors(
@@ -216,7 +209,6 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlServer2012")]
         [Category("SqlServer2014")]
         [Category("SqlServer2016")]
-        [Category("SqlAnywhere16")]
         public void CanApplyUniqueConvention()
         {
             ExecuteWithSupportedProcessors(
@@ -249,7 +241,6 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlServer2012")]
         [Category("SqlServer2014")]
         [Category("SqlServer2016")]
-        [Category("SqlAnywhere16")]
         public void CanApplyIndexConventionWithSchema()
         {
             ExecuteWithSupportedProcessors(
@@ -278,7 +269,6 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlServer2012")]
         [Category("SqlServer2014")]
         [Category("SqlServer2016")]
-        [Category("SqlAnywhere16")]
         public void CanCreateAndDropIndex()
         {
             ExecuteWithSupportedProcessors(
@@ -311,7 +301,6 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlServer2012")]
         [Category("SqlServer2014")]
         [Category("SqlServer2016")]
-        [Category("SqlAnywhere16")]
         public void CanCreateAndDropIndexWithSchema()
         {
             ExecuteWithSupportedProcessors(
@@ -352,7 +341,6 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlServer2012")]
         [Category("SqlServer2014")]
         [Category("SqlServer2016")]
-        [Category("SqlAnywhere16")]
         public void CanRenameTable()
         {
             ExecuteWithSupportedProcessors(
@@ -389,7 +377,6 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlServer2012")]
         [Category("SqlServer2014")]
         [Category("SqlServer2016")]
-        [Category("SqlAnywhere16")]
         public void CanRenameTableWithSchema()
         {
             ExecuteWithSupportedProcessors(
@@ -429,7 +416,6 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlServer2012")]
         [Category("SqlServer2014")]
         [Category("SqlServer2016")]
-        [Category("SqlAnywhere16")]
         public void CanRenameColumn()
         {
             ExecuteWithSupportedProcessors(
@@ -464,7 +450,6 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlServer2012")]
         [Category("SqlServer2014")]
         [Category("SqlServer2016")]
-        [Category("SqlAnywhere16")]
         public void CanRenameColumnWithSchema()
         {
             ExecuteWithSupportedProcessors(
@@ -506,7 +491,6 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlServer2012")]
         [Category("SqlServer2014")]
         [Category("SqlServer2016")]
-        [Category("SqlAnywhere16")]
         public void CanLoadMigrations()
         {
             ExecuteWithSupportedProcessors(
@@ -530,7 +514,6 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlServer2008")]
         [Category("SqlServer2012")]
         [Category("SqlServer2014")]
-        [Category("SqlServer2016")]
         public void CanLoadVersion()
         {
             ExecuteWithSupportedProcessors(
@@ -542,8 +525,7 @@ namespace FluentMigrator.Tests.Integration
                     //runner.Processor.CommitTransaction();
                     runner.VersionLoader.VersionInfo.ShouldNotBeNull();
                 },
-                true,
-                typeof(SqlAnywhere16Processor));
+                true);
         }
 
         [Test]
@@ -576,8 +558,7 @@ namespace FluentMigrator.Tests.Integration
 
                     runner.RollbackToVersion(0, false);
                 },
-                true,
-                typeof(SqlAnywhere16Processor));
+                true);
         }
 
         [Test]
@@ -612,8 +593,7 @@ namespace FluentMigrator.Tests.Integration
                         runner.RollbackToVersion(0, false);
                     }
                 },
-                true,
-                typeof(SqlAnywhere16Processor));
+                true);
         }
 
         [Test]
@@ -652,7 +632,7 @@ namespace FluentMigrator.Tests.Integration
                         processor.TableExists(null, "Users").ShouldBeFalse();
                     },
                     false,
-                    typeof(SQLiteProcessor), typeof(SqlAnywhere16Processor));
+                    typeof(SQLiteProcessor));
             }
             finally
             {
@@ -664,7 +644,7 @@ namespace FluentMigrator.Tests.Integration
                         runner.RollbackToVersion(0, false);
                     },
                     false,
-                    typeof(SQLiteProcessor), typeof(SqlAnywhere16Processor));
+                    typeof(SQLiteProcessor));
             }
         }
 
@@ -698,8 +678,7 @@ namespace FluentMigrator.Tests.Integration
                         runner.VersionLoader.VersionTableMetaData.SchemaName,
                         runner.VersionLoader.VersionTableMetaData.TableName).ShouldBeFalse();
                 },
-                true,
-                typeof(SqlAnywhere16Processor));
+                true);
         }
 
         [Test]
@@ -793,8 +772,7 @@ namespace FluentMigrator.Tests.Integration
                         runner.RollbackToVersion(0);
                     }
                 },
-                true,
-                typeof(SqlAnywhere16Processor));
+                true);
         }
 
         [Test]
@@ -830,8 +808,7 @@ namespace FluentMigrator.Tests.Integration
                         runner.RollbackToVersion(0);
                     }
                 },
-                true,
-                typeof(SqlAnywhere16Processor));
+                true);
         }
 
         [Test]
@@ -866,8 +843,7 @@ namespace FluentMigrator.Tests.Integration
                         runner.RollbackToVersion(0);
                     }
                 },
-                true,
-                typeof(SqlAnywhere16Processor));
+                true);
         }
 
         [Test]
@@ -899,7 +875,7 @@ namespace FluentMigrator.Tests.Integration
                         processor.TableExists(null, "TenantAandBTable").ShouldBeTrue();
                     },
                     false,
-                    typeof(SQLiteProcessor), typeof(SqlAnywhere16Processor));
+                    typeof(SQLiteProcessor));
 
                 ExecuteWithSupportedProcessors(
                     services => services.WithMigrationsIn(migrationsNamespace).Configure<RunnerOptions>(opt => opt.Tags = new[] { "TenantB" }),
@@ -914,7 +890,7 @@ namespace FluentMigrator.Tests.Integration
                         processor.TableExists(null, "TenantAandBTable").ShouldBeFalse();
                     },
                     false,
-                    typeof(SQLiteProcessor), typeof(SqlAnywhere16Processor));
+                    typeof(SQLiteProcessor));
             }
             finally
             {
@@ -926,7 +902,7 @@ namespace FluentMigrator.Tests.Integration
                         runner.RollbackToVersion(0, false);
                     },
                     false,
-                    typeof(SQLiteProcessor), typeof(SqlAnywhere16Processor));
+                    typeof(SQLiteProcessor));
             }
         }
 
@@ -1026,8 +1002,7 @@ namespace FluentMigrator.Tests.Integration
                         runner.RollbackToVersion(0);
                     }
                 },
-                true,
-                typeof(SqlAnywhere16Processor));
+                true);
         }
 
         [Test]
@@ -1040,7 +1015,7 @@ namespace FluentMigrator.Tests.Integration
         public void ValidateVersionOrderShouldDoNothingIfUnappliedMigrationVersionIsGreaterThanLatestAppliedMigration()
         {
             // Using SqlServer instead of SQLite as versions not deleted from VersionInfo table when using Sqlite.
-            var excludedProcessors = new[] { typeof(SQLiteProcessor), typeof(MySqlProcessor), typeof(PostgresProcessor), typeof(SqlAnywhere16Processor) };
+            var excludedProcessors = new[] { typeof(SQLiteProcessor), typeof(MySqlProcessor), typeof(PostgresProcessor) };
 
             var namespacePass2 = typeof(Migrations.Interleaved.Pass2.User).Namespace;
             var namespacePass3 = typeof(Migrations.Interleaved.Pass3.User).Namespace;
@@ -1097,7 +1072,7 @@ namespace FluentMigrator.Tests.Integration
         public void ValidateVersionOrderShouldThrowExceptionIfUnappliedMigrationVersionIsLessThanLatestAppliedMigration()
         {
             // Using SqlServer instead of SQLite as versions not deleted from VersionInfo table when using Sqlite.
-            var excludedProcessors = new[] { typeof(MySqlProcessor), typeof(SQLiteProcessor), typeof(SqlAnywhere16Processor) };
+            var excludedProcessors = new[] { typeof(MySqlProcessor), typeof(SQLiteProcessor) };
 
             var namespacePass2 = typeof(Migrations.Interleaved.Pass2.User).Namespace;
             var namespacePass3 = typeof(Migrations.Interleaved.Pass3.User).Namespace;
@@ -1253,8 +1228,7 @@ namespace FluentMigrator.Tests.Integration
                 },
                 true,
                 typeof(SQLiteProcessor),
-                typeof(FirebirdProcessor),
-                typeof(SqlAnywhereProcessor));
+                typeof(FirebirdProcessor));
         }
 
         [Test]
@@ -1265,7 +1239,6 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlServer2012")]
         [Category("SqlServer2014")]
         [Category("SqlServer2016")]
-        [Category("SqlAnywhere16")]
         public void CanAlterTableWithSchema()
         {
             ExecuteWithSupportedProcessors(
@@ -1327,8 +1300,7 @@ namespace FluentMigrator.Tests.Integration
                 },
                 true,
                 typeof(SQLiteProcessor),
-                typeof(FirebirdProcessor),
-                typeof(SqlAnywhereProcessor));
+                typeof(FirebirdProcessor));
         }
 
         [Test]
@@ -1358,7 +1330,7 @@ namespace FluentMigrator.Tests.Integration
                     processor.ConstraintExists(null, "TestTable2", "TestUnique").ShouldBeFalse();
 
                     runner.Down(new TestCreateAndDropTableMigration());
-                }, true, typeof(SQLiteProcessor), typeof(SqlAnywhereProcessor));
+                }, true, typeof(SQLiteProcessor));
         }
 
         [Test]
@@ -1394,8 +1366,7 @@ namespace FluentMigrator.Tests.Integration
                 },
                 true,
                 typeof(SQLiteProcessor),
-                typeof(FirebirdProcessor),
-                typeof(SqlAnywhereProcessor));
+                typeof(FirebirdProcessor));
         }
 
         [Test]
@@ -1407,7 +1378,6 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlServer2012")]
         [Category("SqlServer2014")]
         [Category("SqlServer2016")]
-        [Category("SqlAnywhere16")]
         public void CanInsertData()
         {
             ExecuteWithSupportedProcessors(
@@ -1423,8 +1393,7 @@ namespace FluentMigrator.Tests.Integration
 
                     runner.Down(new TestCreateAndDropTableMigration());
                 },
-                true,
-                typeof(SQLiteProcessor));
+                true);
         }
 
         [Test]
@@ -1435,7 +1404,6 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlServer2012")]
         [Category("SqlServer2014")]
         [Category("SqlServer2016")]
-        [Category("SqlAnywhere16")]
         public void CanInsertDataWithSchema()
         {
             ExecuteWithSupportedProcessors(
@@ -1468,7 +1436,7 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlServer2012")]
         [Category("SqlServer2014")]
         [Category("SqlServer2016")]
-        [Category("SqlAnywhere16")]
+
         public void CanUpdateData()
         {
             ExecuteWithSupportedProcessors(
@@ -1509,7 +1477,6 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlServer2012")]
         [Category("SqlServer2014")]
         [Category("SqlServer2016")]
-        [Category("SqlAnywhere16")]
         public void CanDeleteData()
         {
             ExecuteWithSupportedProcessors(
@@ -1543,7 +1510,6 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlServer2012")]
         [Category("SqlServer2014")]
         [Category("SqlServer2016")]
-        [Category("SqlAnywhere16")]
         public void CanDeleteDataWithSchema()
         {
             ExecuteWithSupportedProcessors(
@@ -1583,7 +1549,6 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlServer2012")]
         [Category("SqlServer2014")]
         [Category("SqlServer2016")]
-        [Category("SqlAnywhere16")]
         public void CanReverseCreateIndex()
         {
             ExecuteWithSupportedProcessors(
@@ -1638,8 +1603,7 @@ namespace FluentMigrator.Tests.Integration
                     runner.Down(new TestCreateAndDropTableMigration());
                 },
                 true,
-                typeof(SQLiteProcessor),
-                typeof(SqlAnywhereProcessor));
+                typeof(SQLiteProcessor));
         }
 
         [Test]
@@ -1674,8 +1638,7 @@ namespace FluentMigrator.Tests.Integration
                     runner.Down(new TestCreateSchema());
                 },
                 true,
-                typeof(SQLiteProcessor),
-                typeof(SqlAnywhereProcessor));
+                typeof(SQLiteProcessor));
         }
 
         [Test]
@@ -1687,7 +1650,6 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlServer2012")]
         [Category("SqlServer2014")]
         [Category("SqlServer2016")]
-        [Category("SqlAnywhere16")]
         public void CanExecuteSql()
         {
             ExecuteWithSupportedProcessors(
@@ -1711,11 +1673,10 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlServer2012")]
         [Category("SqlServer2014")]
         [Category("SqlServer2016")]
-        [Category("SqlAnywhere16")]
         public void CanSaveSqlStatementWithDescription()
         {
             var outputSql = new StringBuilder();
-           
+
             var provider = new SqlScriptFluentMigratorLoggerProvider(
                 new StringWriter(outputSql),
                 new SqlScriptFluentMigratorLoggerOptions()
@@ -1933,8 +1894,6 @@ namespace FluentMigrator.Tests.Integration
         public override void Up()
         {
             var createSchemaExpr = Create.Schema("TestSchema");
-            IfDatabase(t => t.StartsWith("SqlAnywhere"))
-                .Delegate(() => createSchemaExpr.Password("TestSchemaPassword"));
             Create.Table("Users")
                 .InSchema("TestSchema")
                 .WithColumn("UserId").AsInt32().Identity().PrimaryKey()
@@ -1963,8 +1922,6 @@ namespace FluentMigrator.Tests.Integration
         public override void Up()
         {
             var createSchemaExpr = Create.Schema("TestSchema");
-            IfDatabase(t => t.StartsWith("SqlAnywhere"))
-                .Delegate(() => createSchemaExpr.Password("TestSchemaPassword"));
 
             Create.Table("Users")
                 .InSchema("TestSchema")
@@ -2052,8 +2009,6 @@ namespace FluentMigrator.Tests.Integration
         public override void Up()
         {
             var createSchemaExpr = Create.Schema("TestSchema");
-            IfDatabase(t => t.StartsWith("SqlAnywhere"))
-                .Delegate(() => createSchemaExpr.Password("TestSchemaPassword"));
         }
 
         public override void Down()
@@ -2119,8 +2074,6 @@ namespace FluentMigrator.Tests.Integration
         public override void Up()
         {
             var createSchemaExpr = Create.Schema("NewSchema");
-            IfDatabase(t => t.StartsWith("SqlAnywhere"))
-                .Delegate(() => createSchemaExpr.Password("NewSchemaPassword"));
             Alter.Table("TestTable").InSchema("TestSchema").ToSchema("NewSchema");
         }
 
