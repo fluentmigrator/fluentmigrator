@@ -285,7 +285,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
                     EnsureReloadedConfiguration(config,
                         () =>
                         {
-                            customConfig.ProcessorSelectorOptions.ProcessorId = "SqlAnywhere16";
+                            customConfig.ConnectionStrings["SQLite"] = "Data Source=test.db";
                             SaveConfigFile(jsonFileName, customConfig);
                         });
 

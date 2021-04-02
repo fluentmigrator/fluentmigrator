@@ -29,6 +29,7 @@ using McMaster.Extensions.CommandLineUtils;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Console;
 
 namespace FluentMigrator.DotNet.Cli
 {
@@ -155,8 +156,9 @@ namespace FluentMigrator.DotNet.Cli
 
         private static void Configure(ILoggerFactory loggerFactory)
         {
-            loggerFactory
-                .AddDebug(LogLevel.Trace);
+            // loggerFactory
+            //     .AddFluentMigratorConsole()
+            //     .AddDebug(LogLevel.Trace);
         }
 
         private static IMapper ConfigureMapper()

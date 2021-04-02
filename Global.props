@@ -3,7 +3,7 @@
   <Import Project="DotNetSdkMono.props" />
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
-    <VersionPrefix>3.0.0</VersionPrefix>
+    <VersionPrefix>4.0.0</VersionPrefix>
     <Product>FluentMigrator</Product>
     <Copyright>Sean Chambers and the FluentMigrator project 2008-2018</Copyright>
     <Company>FluentMigrator Project</Company>
@@ -12,8 +12,7 @@
     <PackageLicenseUrl>https://github.com/fluentmigrator/fluentmigrator/blob/master/LICENSE.txt</PackageLicenseUrl>
     <PackageReleaseNotes>Use of standard dependency injection, configuration and logging libraries.
 Simplification of in-process runner configuration and instantiation.
-dotnet-fm is now a global .NET Core 2.1 tool.
-Minimum .NET Framework version is 4.6.1.
+dotnet-fm is now a global .NET Core 6.0 tool.
 
 Details: https://github.com/fluentmigrator/fluentmigrator/releases
     </PackageReleaseNotes>
@@ -31,11 +30,7 @@ Details: https://github.com/fluentmigrator/fluentmigrator/releases
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="JetBrains.Annotations" Version="11.1.0" PrivateAssets="All" />
+    <PackageReference Include="JetBrains.Annotations" Version="2020.3.0" PrivateAssets="All" />
   </ItemGroup>
-
-  <PropertyGroup Condition="'$(TargetFramework)'=='net461'">
-    <DefineConstants>$(DefineConstants);NETFRAMEWORK</DefineConstants>
-  </PropertyGroup>
 
 </Project>

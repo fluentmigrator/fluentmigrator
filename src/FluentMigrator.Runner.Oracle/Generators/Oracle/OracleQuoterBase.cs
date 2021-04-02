@@ -46,7 +46,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
             {
                 // Every escape character will give us two characters in the final query
                 chunkLength += EscapeCharacters.Contains(ch) ? 2 : 1;
-                if (chunkLength > maxChunkLength)
+                if (chunkLength >= maxChunkLength)
                 {
                     yield return chunk.ToString();
                     chunk.Clear();

@@ -45,7 +45,7 @@ namespace FluentMigrator.Runner.Initialization
         {
         }
 
-        public DefaultConnectionStringProvider([NotNull, ItemNotNull] IEnumerable<IConnectionStringReader> accessors)
+        public DefaultConnectionStringProvider([JetBrains.Annotations.NotNull, ItemNotNull] IEnumerable<IConnectionStringReader> accessors)
         {
             _accessors = accessors.ToList();
         }

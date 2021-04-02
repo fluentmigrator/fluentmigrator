@@ -76,7 +76,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             [NotNull] IOptionsSnapshot<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor,
             [NotNull] IServiceProvider serviceProvider)
-            : this(SqlClientFactory.Instance, logger, generator, options, connectionStringAccessor, serviceProvider)
+            : this(SqlClientFactory.Instance , logger, generator, options, connectionStringAccessor, serviceProvider)
         {
         }
 
