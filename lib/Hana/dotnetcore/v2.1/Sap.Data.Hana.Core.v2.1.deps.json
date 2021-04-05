@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v2.1",
+    "signature": "da39a3ee5e6b4b0d3255bfef95601890afd80709"
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v2.1": {
+      "Sap.Data.Hana.Core.v2.1/2.4.171.0": {
+        "runtime": {
+          "Sap.Data.Hana.Core.v2.1.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Sap.Data.Hana.Core.v2.1/2.4.171.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
