@@ -51,9 +51,6 @@
     <Reference Include="IBM.Data.DB2">
       <HintPath>..\..\lib\DB2\amd64\IBM.Data.DB2.dll</HintPath>
     </Reference>
-    <Reference Include="Sap.Data.Hana.Core.v2.1">
-      <HintPath>..\..\lib\Hana\dotnetcore\v2.1\Sap.Data.Hana.Core.v2.1.dll</HintPath>
-    </Reference>
     <Reference Include="Sap.Data.Hana.v4.5">
       <HintPath>..\..\lib\Hana\ado.net\v4.5\Sap.Data.Hana.v4.5.dll</HintPath>
     </Reference>

@@ -1868,7 +1868,7 @@ conn.Open();</code>
   </returns>
         </member>
         <member name="P:Sap.Data.Hana.HanaConnection.DbProviderFactory">
-            <!-- Badly formed XML file "d:\703\w\4g8beev6pt\gen\out\happy-make-build\ntamd64-msvc2010-release\Interfaces\ADO.NET\Managed\v4.5\tmp\Edm.xml" cannot be included -->
+            <!-- Badly formed XML file "d:\701\w\6wm73j6wuw\gen\out\happy-make-build\ntamd64-msvc2010-release\Interfaces\ADO.NET\Managed\v4.5\tmp\Edm.xml" cannot be included -->
         </member>
         <member name="T:Sap.Data.Hana.HanaCredential">
             <summary>
@@ -3512,7 +3512,7 @@ DbConnection conn = factory.CreateConnection();</code>
         </returns><seealso cref="T:Sap.Data.Hana.HanaConnectionStringBuilder"/>
         </member>
         <member name="M:Sap.Data.Hana.HanaFactory.System#IServiceProvider#GetService(System.Type)">
-            <!-- Badly formed XML file "d:\703\w\4g8beev6pt\gen\out\happy-make-build\ntamd64-msvc2010-release\Interfaces\ADO.NET\Managed\v4.5\tmp\Edm.xml" cannot be included -->
+            <!-- Badly formed XML file "d:\701\w\6wm73j6wuw\gen\out\happy-make-build\ntamd64-msvc2010-release\Interfaces\ADO.NET\Managed\v4.5\tmp\Edm.xml" cannot be included -->
         </member>
         <member name="P:Sap.Data.Hana.HanaFactory.CanCreateDataSourceEnumerator">
             <summary>
@@ -4051,7 +4051,7 @@ parm.Value = HanaDefault.Value;</code>
             <para>Returns a HanaPermission object that is configured according to the attribute properties.</para>
         </summary>
         </member>
-        <member name="T:Sap.Data.Hana.PInvokeMethods">
+        <member name="T:Sap.Data.Hana.PInvokeMethods64">
             @internal
         </member>
         <member name="T:Sap.Data.Hana.HanaRes">

@@ -56,7 +56,7 @@ namespace FluentMigrator.Tests.Helpers
 
             if (!string.IsNullOrEmpty(_schemaName))
             {
-                using (var command = new HanaCommand($"CREATE SCHEMA \"{_schemaName}\";", Connection, Transaction))
+                using (var command =  new Sap.Data.Hana.HanaCommand($"CREATE SCHEMA \"{_schemaName}\";", Connection, Transaction))
                     command.ExecuteNonQuery();
             }
 
