@@ -462,6 +462,12 @@ namespace FluentMigrator.Tests.Unit.Generators
             return new CreateColumnExpression { TableName = TestTableName1, Column = column };
         }
 
+        public static CreateColumnExpression GetCreateBooleanColumnExpression()
+        {
+            ColumnDefinition column = new ColumnDefinition { Name = TestColumnName1, Type = DbType.Boolean, };
+            return new CreateColumnExpression { TableName = TestTableName1, Column = column };
+        }
+
         public static CreateColumnExpression GetCreateCurrencyColumnExpression()
         {
             ColumnDefinition column = new ColumnDefinition { Name = TestColumnName1, Type = DbType.Currency };
