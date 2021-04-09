@@ -56,6 +56,12 @@ namespace FluentMigrator.Tests.Unit.Generators
             return expression;
         }
 
+        public static CreateColumnExpression GetCreateBooleanColumnExpression()
+        {
+            ColumnDefinition column = new ColumnDefinition { Name = TestColumnName1, Type = DbType.Boolean, };
+            return new CreateColumnExpression { TableName = TestTableName1, Column = column };
+        }
+
         public static CreateTableExpression GetCreateTableWithDefaultValue()
         {
             CreateTableExpression expression = new CreateTableExpression() { TableName = TestTableName1, };
@@ -394,8 +400,8 @@ namespace FluentMigrator.Tests.Unit.Generators
 
         public static InsertDataExpression GetInsertGUIDExpression(Guid guid)
         {
-            var expression = new InsertDataExpression {TableName = TestTableName1};
-            expression.Rows.Add(new InsertionDataDefinition {new KeyValuePair<string, object>("guid", guid)});
+            var expression = new InsertDataExpression { TableName = TestTableName1 };
+            expression.Rows.Add(new InsertionDataDefinition { new KeyValuePair<string, object>("guid", guid) });
 
             return expression;
         }
@@ -518,7 +524,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 
         public static AlterTableExpression GetAlterTable()
         {
-            return new AlterTableExpression() {TableName = TestTableName1 };
+            return new AlterTableExpression() { TableName = TestTableName1 };
         }
 
         public static RenameTableExpression GetRenameTableExpression()
@@ -792,11 +798,11 @@ namespace FluentMigrator.Tests.Unit.Generators
         public static AlterDefaultConstraintExpression GetAlterDefaultConstraintExpression()
         {
             var expression = new AlterDefaultConstraintExpression
-                                 {
-                                     ColumnName = TestColumnName1,
-                                     DefaultValue = 1,
-                                     TableName = TestTableName1
-                                 };
+            {
+                ColumnName = TestColumnName1,
+                DefaultValue = 1,
+                TableName = TestTableName1
+            };
             return expression;
         }
 
