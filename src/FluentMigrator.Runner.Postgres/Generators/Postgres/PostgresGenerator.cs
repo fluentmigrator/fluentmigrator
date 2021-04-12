@@ -258,6 +258,17 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return " NULLS LAST";
         }
 
+        protected virtual string GetTablespace(CreateIndexExpression expression)
+        {
+            var tablespace = expression.Index.GetAdditionalFeature<string>(PostgresExtensions.IndexTablespace);
+            if (!string.IsNullOrWhiteSpace(tablespace))
+            {
+                return " TABLESPACE " + tablespace;
+            }
+
+            return string.Empty;
+        }
+
         protected virtual string GetWithIndexStorageParameters(CreateIndexExpression expression)
         {
             var allow = GetAllowIndexStorageParameters();
@@ -383,12 +394,13 @@ namespace FluentMigrator.Runner.Generators.Postgres
                 }
 
                 result.Append(column.Direction == Direction.Ascending ? " ASC" : " DESC")
-                .Append(GetNullsSort(column));
+                    .Append(GetNullsSort(column));
             }
 
             result.Append(")")
                 .Append(GetIncludeString(expression))
                 .Append(GetWithIndexStorageParameters(expression))
+                .Append(GetTablespace(expression))
                 .Append(GetFilter(expression))
                 .Append(";");
 

@@ -302,5 +302,17 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
 
             Assert.Throws<NotSupportedException>(() => Generator.Generate(expression));
         }
+
+        [Test]
+        public void CanCreateIndexWithTablespace()
+        {
+            var expression = GetCreateIndexWithExpression(x =>
+            {
+                x.Index.GetAdditionalFeature(PostgresExtensions.IndexTablespace, () => "indexspace");
+            });
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE INDEX \"TestIndex\" ON \"public\".\"TestTable1\" (\"TestColumn1\" ASC) TABLESPACE indexspace;");
+        }
     }
 }
