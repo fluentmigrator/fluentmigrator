@@ -319,7 +319,7 @@ namespace FluentMigrator.Tests.Integration
             if (_isFirstExecuteForFirebird)
             {
                 _isFirstExecuteForFirebird = false;
-                FbConnection.CreateDatabase(serverOptions.ConnectionString, true);
+                FbConnection.CreateDatabase(serverOptions.ConnectionString);
             }
 
             using (var connection = new FbConnection(serverOptions.ConnectionString))

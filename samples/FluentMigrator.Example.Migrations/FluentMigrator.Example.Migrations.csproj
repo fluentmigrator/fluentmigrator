@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <Description>Assembly containing migrations for the example project</Description>
     <!-- By default, *.cs files will be automatically included as compile items,
     but *.sql files will be automatically included as None items.  This disables that behavior. -->
