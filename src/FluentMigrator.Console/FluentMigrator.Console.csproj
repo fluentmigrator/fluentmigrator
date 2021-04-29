@@ -24,7 +24,7 @@
     <PackageReference Include="FSharp.Core" Version="4.6.2" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="3.1.5" />
     <PackageReference Include="Oracle.ManagedDataAccess" Version="12.2.1100" />
-    <PackageReference Include="MySql.Data" Version="8.0.11" />
+    <PackageReference Include="MySql.Data" Version="8.0.24" />
   </ItemGroup>
   <ItemGroup Condition=" '$(Platform)' == 'x86' ">
     <PackageReference Include="Oracle.DataAccess.x86.4" Version="4.112.3" />
