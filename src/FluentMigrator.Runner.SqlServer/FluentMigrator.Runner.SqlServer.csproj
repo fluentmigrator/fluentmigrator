@@ -15,9 +15,9 @@
     <ProjectReference Include="..\FluentMigrator.Extensions.SqlServer\FluentMigrator.Extensions.SqlServer.csproj" />
     <ProjectReference Include="..\FluentMigrator.Runner.Core\FluentMigrator.Runner.Core.csproj" />
   </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-    <PackageReference Include="System.Data.SqlClient">
-      <Version>4.4.3</Version>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.SqlClient">
+      <Version>2.1.2</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
