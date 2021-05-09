@@ -5,14 +5,18 @@ using System.Text;
 
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Hana;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.Hana;
+
+using Microsoft.Extensions.Options;
+
 using Sap.Data.Hana;
 
 namespace FluentMigrator.Tests.Helpers
 {
     public class HanaTestTable : IDisposable
     {
-        private readonly IQuoter _quoter = new HanaQuoter();
+        private readonly IQuoter _quoter = new HanaQuoter(new OptionsWrapper<QuoterOptions>(new QuoterOptions()));
         private readonly string _schemaName;
         public HanaConnection Connection { get; private set; }
         public string Name { get; set; }

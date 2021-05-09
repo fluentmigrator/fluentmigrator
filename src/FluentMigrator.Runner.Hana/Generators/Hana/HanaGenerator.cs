@@ -21,6 +21,7 @@ using System.Text;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators.Generic;
+using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
@@ -31,7 +32,7 @@ namespace FluentMigrator.Runner.Generators.Hana
     public class HanaGenerator : GenericGenerator
     {
         public HanaGenerator()
-            : this(new HanaQuoter())
+            : this(new HanaQuoter(new OptionsWrapper<QuoterOptions>(new QuoterOptions())))
         {
         }
 

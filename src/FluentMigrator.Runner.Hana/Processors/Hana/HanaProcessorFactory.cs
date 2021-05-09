@@ -19,6 +19,9 @@
 using System;
 
 using FluentMigrator.Runner.Generators.Hana;
+using FluentMigrator.Runner.Initialization;
+
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.Hana
 {
@@ -43,8 +46,9 @@ namespace FluentMigrator.Runner.Processors.Hana
             var factory = new HanaDbFactory(_serviceProvider);
 
             var connection = factory.CreateConnection(connectionString);
+            var quoterOptions = new OptionsWrapper<QuoterOptions>(new QuoterOptions());
 
-            return new HanaProcessor(connection, new HanaGenerator(new HanaQuoter()), announcer, options, factory);
+            return new HanaProcessor(connection, new HanaGenerator(new HanaQuoter(quoterOptions)), announcer, options, factory);
         }
     }
 }

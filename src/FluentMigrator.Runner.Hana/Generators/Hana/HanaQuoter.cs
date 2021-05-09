@@ -15,11 +15,19 @@
 #endregion
 
 using FluentMigrator.Runner.Generators.Generic;
+using FluentMigrator.Runner.Initialization;
+
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Generators.Hana
 {
     public class HanaQuoter : GenericQuoter
     {
+        public HanaQuoter(IOptions<QuoterOptions> options)
+            : base(options)
+        {
+        }
+
         public override string FormatNationalString(string value)
         {
             return $"N{FormatAnsiString(value)}";

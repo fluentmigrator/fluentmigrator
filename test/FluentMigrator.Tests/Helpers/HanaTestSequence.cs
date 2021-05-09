@@ -18,7 +18,10 @@ using System;
 using System.Data;
 
 using FluentMigrator.Runner.Generators.Hana;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.Hana;
+
+using Microsoft.Extensions.Options;
 
 using Sap.Data.Hana;
 
@@ -26,7 +29,7 @@ namespace FluentMigrator.Tests.Helpers
 {
     public class HanaTestSequence: IDisposable
     {
-        private readonly HanaQuoter _quoter = new HanaQuoter();
+        private readonly HanaQuoter _quoter = new HanaQuoter(new OptionsWrapper<QuoterOptions>(new QuoterOptions()));
         private readonly string _schemaName;
         private HanaConnection Connection { get; }
         public string Name { get; set; }
