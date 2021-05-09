@@ -45,11 +45,10 @@ namespace FluentMigrator.Runner.Processors.DB2.iSeries
         public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
         {
             var factory = new Db2ISeriesDbFactory(_serviceProvider);
-            var quoterOptions = new OptionsWrapper<QuoterOptions>(new QuoterOptions());
-            var quoter = new Db2ISeriesQuoter(quoterOptions);
+            var quoter = new Db2ISeriesQuoter(new OptionsWrapper<QuoterOptions>(new QuoterOptions()));
             var connection = factory.CreateConnection(connectionString);
             var generatorOptions = new OptionsWrapper<GeneratorOptions>(new GeneratorOptions());
-            return new Db2ISeriesProcessor(connection, new Db2ISeriesGenerator(quoter, generatorOptions), announcer, options, factory, quoterOptions);
+            return new Db2ISeriesProcessor(connection, new Db2ISeriesGenerator(quoter, generatorOptions), announcer, options, factory);
         }
     }
 }
