@@ -27,6 +27,7 @@ using FluentMigrator.Runner.Generators.MySql;
 using FluentMigrator.Runner.Generators.Oracle;
 using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.Runner.Generators.SQLite;
+using FluentMigrator.Runner.Initialization;
 
 using NUnit.Framework;
 
@@ -37,14 +38,13 @@ namespace FluentMigrator.Tests.Unit.Generators.GenericGenerator
     [TestFixture]
     public class ConstantFormatterTests
     {
-        [SetUp]
-        public void SetUp()
-        {
-            _quoter = new GenericQuoter();
-        }
-
-        private IQuoter _quoter;
         private readonly CultureInfo _currentCulture = Thread.CurrentThread.CurrentCulture;
+
+        private static IQuoter CreateFixture(QuoterOptions options = null)
+        {
+            options = options ?? new QuoterOptions();
+            return new GenericQuoter(options);
+        }
 
         private void RestoreCulture()
         {
@@ -74,74 +74,74 @@ namespace FluentMigrator.Tests.Unit.Generators.GenericGenerator
         [Test]
         public void CanEscapeAString()
         {
-            _quoter.Quote("Test\"String").ShouldBe("\"Test\"\"String\"");
+            CreateFixture().Quote("Test\"String").ShouldBe("\"Test\"\"String\"");
         }
 
         [Test]
         public void CanHandleAnAlreadyQuotedColumnName()
         {
-            _quoter.QuoteColumnName("\"ColumnName\"").ShouldBe("\"ColumnName\"");
+            CreateFixture().QuoteColumnName("\"ColumnName\"").ShouldBe("\"ColumnName\"");
         }
 
         [Test]
         public void CanHandleAnAlreadyQuotedSchemaName()
         {
-            _quoter.QuoteColumnName("\"SchemaName\"").ShouldBe("\"SchemaName\"");
+            CreateFixture().QuoteColumnName("\"SchemaName\"").ShouldBe("\"SchemaName\"");
         }
 
         [Test]
         public void CanHandleAnAlreadyQuotedTableName()
         {
-            _quoter.QuoteColumnName("\"TableName\"").ShouldBe("\"TableName\"");
+            CreateFixture().QuoteColumnName("\"TableName\"").ShouldBe("\"TableName\"");
         }
 
         [Test]
         public void CanHandleAnUnQuotedColumnName()
         {
-            _quoter.QuoteColumnName("ColumnName").ShouldBe("\"ColumnName\"");
+            CreateFixture().QuoteColumnName("ColumnName").ShouldBe("\"ColumnName\"");
         }
 
         [Test]
         public void CanHandleAnUnQuotedSchemaName()
         {
-            _quoter.QuoteColumnName("SchemaName").ShouldBe("\"SchemaName\"");
+            CreateFixture().QuoteColumnName("SchemaName").ShouldBe("\"SchemaName\"");
         }
 
         [Test]
         public void CanHandleAnUnQuotedTableName()
         {
-            _quoter.QuoteColumnName("TableName").ShouldBe("\"TableName\"");
+            CreateFixture().QuoteColumnName("TableName").ShouldBe("\"TableName\"");
         }
 
         [Test]
         public void CanQuoteAString()
         {
-            _quoter.Quote("TestString").ShouldBe("\"TestString\"");
+            CreateFixture().Quote("TestString").ShouldBe("\"TestString\"");
         }
 
         [Test]
         public void CanRecogniseAQuotedString()
         {
-            _quoter.IsQuoted("\"QuotedString\"").ShouldBeTrue();
+            CreateFixture().IsQuoted("\"QuotedString\"").ShouldBeTrue();
         }
 
         [Test]
         public void CanRecogniseAnUnQuotedString()
         {
-            _quoter.IsQuoted("UnQuotedString").ShouldBeFalse();
+            CreateFixture().IsQuoted("UnQuotedString").ShouldBeFalse();
         }
 
         [Test]
         public void CharIsFormattedWithQuotes()
         {
-            _quoter.QuoteValue('A')
+            CreateFixture().QuoteValue('A')
                 .ShouldBe("'A'");
         }
 
         [Test]
         public void CustomTypeIsBare()
         {
-            _quoter.QuoteValue(new CustomClass())
+            CreateFixture().QuoteValue(new CustomClass())
                 .ShouldBe("CustomClass");
         }
 
@@ -150,7 +150,7 @@ namespace FluentMigrator.Tests.Unit.Generators.GenericGenerator
         {
             ChangeCulture();
             DateTime date = new DateTime(2010, 1, 2, 18, 4, 5, 123);
-            _quoter.QuoteValue(date)
+            CreateFixture().QuoteValue(date)
                 .ShouldBe("'2010-01-02T18:04:05'");
         }
 
@@ -159,7 +159,7 @@ namespace FluentMigrator.Tests.Unit.Generators.GenericGenerator
         {
             Thread.CurrentThread.CurrentCulture = new CultureInfo("it-IT");
             DateTime date = new DateTime(2010, 1, 2, 18, 4, 5, 123);
-            _quoter.QuoteValue(date)
+            CreateFixture().QuoteValue(date)
                 .ShouldBe("'2010-01-02T18:04:05'");
         }
 
@@ -168,7 +168,7 @@ namespace FluentMigrator.Tests.Unit.Generators.GenericGenerator
         {
             ChangeCulture();
             DateTimeOffset date = new DateTimeOffset(2010, 1, 2, 18, 4, 5, 123, TimeSpan.FromHours(-4));
-            _quoter.QuoteValue(date).ShouldBe("'2010-01-02T18:04:05-04:00'");
+            CreateFixture().QuoteValue(date).ShouldBe("'2010-01-02T18:04:05-04:00'");
         }
 
         [Test]
@@ -176,21 +176,21 @@ namespace FluentMigrator.Tests.Unit.Generators.GenericGenerator
         {
             Thread.CurrentThread.CurrentCulture = new CultureInfo("it-IT");
             DateTimeOffset date = new DateTimeOffset(2010, 1, 2, 18, 4, 5, 123, TimeSpan.FromHours(-4));
-            _quoter.QuoteValue(date)
+            CreateFixture().QuoteValue(date)
                 .ShouldBe("'2010-01-02T18:04:05-04:00'");
         }
 
         [Test]
         public void EnumIsFormattedAsString()
         {
-            _quoter.QuoteValue(Foo.Bar)
+            CreateFixture().QuoteValue(Foo.Bar)
                 .ShouldBe("'Bar'");
         }
 
         [Test]
         public void FalseIsFormattedAsZero()
         {
-            _quoter.QuoteValue(false)
+            CreateFixture().QuoteValue(false)
                 .ShouldBe("0");
         }
 
@@ -198,21 +198,21 @@ namespace FluentMigrator.Tests.Unit.Generators.GenericGenerator
         public void GuidIsFormattedWithQuotes()
         {
             Guid guid = new Guid("00000000-0000-0000-0000-000000000000");
-            _quoter.QuoteValue(guid)
+            CreateFixture().QuoteValue(guid)
                 .ShouldBe("'00000000-0000-0000-0000-000000000000'");
         }
 
         [Test]
         public void Int32IsBare()
         {
-            _quoter.QuoteValue(1234)
+            CreateFixture().QuoteValue(1234)
                 .ShouldBe("1234");
         }
 
         [Test]
         public void NullIsFormattedAsLiteral()
         {
-            _quoter.QuoteValue(null)
+            CreateFixture().QuoteValue(null)
                 .ShouldBe("NULL");
         }
 
@@ -258,7 +258,7 @@ namespace FluentMigrator.Tests.Unit.Generators.GenericGenerator
         public void ShouldHandleDecimalToStringConversionInAnyCulture()
         {
             ChangeCulture();
-            _quoter.QuoteValue(new decimal(123.4d)).ShouldBe("123.4");
+            CreateFixture().QuoteValue(new decimal(123.4d)).ShouldBe("123.4");
             RestoreCulture();
         }
 
@@ -266,7 +266,7 @@ namespace FluentMigrator.Tests.Unit.Generators.GenericGenerator
         public void ShouldHandleDoubleToStringConversionInAnyCulture()
         {
             ChangeCulture();
-            _quoter.QuoteValue(123.4d).ShouldBe("123.4");
+            CreateFixture().QuoteValue(123.4d).ShouldBe("123.4");
             RestoreCulture();
         }
 
@@ -274,69 +274,69 @@ namespace FluentMigrator.Tests.Unit.Generators.GenericGenerator
         public void ShouldHandleFloatToStringConversionInAnyCulture()
         {
             ChangeCulture();
-            _quoter.QuoteValue(123.4f).ShouldBe("123.4");
+            CreateFixture().QuoteValue(123.4f).ShouldBe("123.4");
             RestoreCulture();
         }
 
         [Test]
         public void StringIsFormattedWithQuotes()
         {
-            _quoter.QuoteValue("value")
+            CreateFixture().QuoteValue("value")
                 .ShouldBe("'value'");
         }
 
         [Test]
         public void StringWithQuoteIsFormattedWithDoubleQuote()
         {
-            _quoter.QuoteValue("val'ue")
+            CreateFixture().QuoteValue("val'ue")
                 .ShouldBe("'val''ue'");
         }
 
         [Test]
         public void TrueIsFormattedAsOne()
         {
-            _quoter.QuoteValue(true)
+            CreateFixture().QuoteValue(true)
                 .ShouldBe("1");
         }
 
         [Test]
         public void ByteArrayIsFormattedWithQuotes()
         {
-            _quoter.QuoteValue(new byte[] { 0, 254, 13, 18, 125, 17 })
+            CreateFixture().QuoteValue(new byte[] { 0, 254, 13, 18, 125, 17 })
                 .ShouldBe("0x00fe0d127d11");
         }
 
         [Test]
         public void TimeSpanIsFormattedQuotes()
         {
-            _quoter.QuoteValue(new TimeSpan(2, 13, 65))
+            CreateFixture().QuoteValue(new TimeSpan(2, 13, 65))
                 .ShouldBe("'02:14:05'");
         }
 
         [Test]
         public void NonUnicodeStringIsFormattedAsNormalString()
         {
-            _quoter.QuoteValue(new NonUnicodeString("Test String")).ShouldBe("'Test String'");
+            CreateFixture().QuoteValue(new NonUnicodeString("Test String")).ShouldBe("'Test String'");
         }
 
         [Test]
         public void NonUnicodeStringIsFormattedAsNormalStringQuotes()
         {
-            _quoter.QuoteValue(new NonUnicodeString("Test ' String")).ShouldBe("'Test '' String'");
+            CreateFixture().QuoteValue(new NonUnicodeString("Test ' String")).ShouldBe("'Test '' String'");
         }
 
         [Test]
         [Obsolete]
         public void ExplicitUnicodeStringIsFormattedAsNormalString()
         {
-            _quoter.QuoteValue(new ExplicitUnicodeString("Test String")).ShouldBe("'Test String'");
+            CreateFixture().QuoteValue(new ExplicitUnicodeString("Test String")).ShouldBe("'Test String'");
         }
 
         [Test]
         [Obsolete]
         public void ExplicitUnicodeStringIsFormattedAsNormalStringQuotes()
         {
-            _quoter.QuoteValue(new ExplicitUnicodeString("Test ' String")).ShouldBe("'Test '' String'");
+            CreateFixture().QuoteValue(new ExplicitUnicodeString("Test ' String")).ShouldBe("'Test '' String'");
         }
     }
 }
