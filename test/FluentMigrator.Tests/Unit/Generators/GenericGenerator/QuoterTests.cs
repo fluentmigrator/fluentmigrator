@@ -40,11 +40,8 @@ namespace FluentMigrator.Tests.Unit.Generators.GenericGenerator
     {
         private readonly CultureInfo _currentCulture = Thread.CurrentThread.CurrentCulture;
 
-        private static IQuoter CreateFixture(QuoterOptions options = null)
-        {
-            options = options ?? new QuoterOptions();
-            return new GenericQuoter(options);
-        }
+        private static IQuoter CreateFixture(QuoterOptions options = null) =>
+            new GenericQuoter(options);
 
         private void RestoreCulture()
         {

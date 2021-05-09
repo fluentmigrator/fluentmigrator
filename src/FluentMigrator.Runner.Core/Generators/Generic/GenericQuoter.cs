@@ -26,11 +26,11 @@ namespace FluentMigrator.Runner.Generators.Generic
 
     public class GenericQuoter : IQuoter
     {
-        private readonly QuoterOptions _quoterOptions;
+        private readonly QuoterOptions _options;
 
-        public GenericQuoter(QuoterOptions quoterOptions = null)
+        public GenericQuoter([CanBeNull] QuoterOptions options)
         {
-            _quoterOptions = quoterOptions;
+            _options = options ?? new QuoterOptions();
         }
 
         /// <inheritdoc />
@@ -155,7 +155,7 @@ namespace FluentMigrator.Runner.Generators.Generic
 
         public virtual string FormatEnum(object value)
         {
-            if (_quoterOptions.EnumAsString)
+            if (_options.EnumAsString)
                 return ValueQuote + value + ValueQuote;
 
             var underlyingType = Enum.GetUnderlyingType(value.GetType());
