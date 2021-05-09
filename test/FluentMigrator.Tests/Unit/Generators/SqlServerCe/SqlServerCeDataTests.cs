@@ -224,14 +224,15 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
         {
             var expression = GeneratorTestHelper.GetInsertDataExpression();
             expression.AdditionalFeatures.Add(SqlServerExtensions.IdentityInsert, true);
-            CreateFixture().CompatibilityMode = Runner.CompatibilityMode.STRICT;
+            var fixture = CreateFixture();
+            fixture.CompatibilityMode = Runner.CompatibilityMode.STRICT;
 
             var expected = "SET IDENTITY_INSERT [TestTable1] ON;";
             expected += " INSERT INTO [TestTable1] ([Id], [Name], [Website]) SELECT 1, N'Just''in', N'codethinked.com'";
             expected += @" UNION ALL SELECT 2, N'Na\te', N'kohari.org';";
             expected += " SET IDENTITY_INSERT [TestTable1] OFF";
 
-            var result = CreateFixture().Generate(expression);
+            var result = fixture.Generate(expression);
             result.ShouldBe(expected);
         }
 
