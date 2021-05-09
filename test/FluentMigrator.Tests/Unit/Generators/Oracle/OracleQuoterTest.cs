@@ -2,6 +2,9 @@ using System;
 
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Oracle;
+using FluentMigrator.Runner.Initialization;
+
+using Microsoft.Extensions.Options;
 
 using NUnit.Framework;
 
@@ -43,7 +46,7 @@ Mrow stare out cat door then go back inside, run outside as soon as door open or
         [SetUp]
         public void SetUp()
         {
-            _quoter = new OracleQuoter();
+            _quoter = new OracleQuoter(new OptionsWrapper<QuoterOptions>(new QuoterOptions()));
         }
 
         [Test]

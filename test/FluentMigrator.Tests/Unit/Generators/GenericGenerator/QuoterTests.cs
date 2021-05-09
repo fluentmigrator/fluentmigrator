@@ -45,6 +45,9 @@ namespace FluentMigrator.Tests.Unit.Generators.GenericGenerator
         private static IQuoter CreateFixture(QuoterOptions options = null) =>
             new GenericQuoter(new OptionsWrapper<QuoterOptions>(options));
 
+        private static IOptions<QuoterOptions> DefaultOptions =>
+            new OptionsWrapper<QuoterOptions>(new QuoterOptions());
+
         private void RestoreCulture()
         {
             Thread.CurrentThread.CurrentCulture = _currentCulture;
@@ -231,14 +234,14 @@ namespace FluentMigrator.Tests.Unit.Generators.GenericGenerator
         {
             //This will throw and error on the Jet Engine if special characters are used.
             //We do nothing.
-            JetQuoter quoter = new JetQuoter(new OptionsWrapper<QuoterOptions>(new QuoterOptions()));
+            JetQuoter quoter = new JetQuoter(DefaultOptions);
             quoter.Quote("[Table]Name").ShouldBe("[[Table]Name]");
         }
 
         [Test]
         public void ShouldEscapeMySqlObjectNames()
         {
-            MySqlQuoter quoter = new MySqlQuoter(new OptionsWrapper<QuoterOptions>(new QuoterOptions()));
+            MySqlQuoter quoter = new MySqlQuoter(DefaultOptions);
             quoter.Quote("`Table`Name").ShouldBe("```Table``Name`");
         }
 
@@ -246,14 +249,14 @@ namespace FluentMigrator.Tests.Unit.Generators.GenericGenerator
         public void ShouldEscapeOracleObjectNames()
         {
             //Do Nothing at the moment due to case sensitivity issues with oracle
-            OracleQuoterQuotedIdentifier quoter = new OracleQuoterQuotedIdentifier();
+            OracleQuoterQuotedIdentifier quoter = new OracleQuoterQuotedIdentifier(DefaultOptions);
             quoter.Quote("Table\"Name").ShouldBe("\"Table\"\"Name\"");
         }
 
         [Test]
         public void ShouldEscapeSqlServerObjectNames()
         {
-            SqlServer2000Quoter quoter = new SqlServer2000Quoter(new OptionsWrapper<QuoterOptions>(new QuoterOptions()));
+            SqlServer2000Quoter quoter = new SqlServer2000Quoter(DefaultOptions);
             quoter.Quote("[Table]Name").ShouldBe("[[Table]]Name]");
         }
 

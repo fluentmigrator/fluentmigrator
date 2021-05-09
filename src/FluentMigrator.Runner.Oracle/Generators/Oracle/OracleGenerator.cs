@@ -24,6 +24,7 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Generic;
 using FluentMigrator.Runner.Helpers;
+using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
@@ -39,7 +40,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
         }
 
         public OracleGenerator(bool useQuotedIdentifiers)
-            : this(GetQuoter(useQuotedIdentifiers))
+            : this(GetQuoter(useQuotedIdentifiers, new OptionsWrapper<QuoterOptions>(new QuoterOptions())))
         {
         }
 
@@ -73,9 +74,9 @@ namespace FluentMigrator.Runner.Generators.Oracle
         {
         }
 
-        protected static OracleQuoterBase GetQuoter(bool useQuotedIdentifiers)
+        protected static OracleQuoterBase GetQuoter(bool useQuotedIdentifiers, IOptions<QuoterOptions> options)
         {
-            return useQuotedIdentifiers ? new OracleQuoterQuotedIdentifier() : new OracleQuoter();
+            return useQuotedIdentifiers ? new OracleQuoterQuotedIdentifier(options) : new OracleQuoter(options);
         }
 
 

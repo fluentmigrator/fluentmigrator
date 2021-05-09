@@ -18,6 +18,10 @@
 
 using System.Data;
 using FluentMigrator.Runner.Generators.Oracle;
+using FluentMigrator.Runner.Initialization;
+
+using Microsoft.Extensions.Options;
+
 using NUnit.Framework;
 
 using Shouldly;
@@ -32,7 +36,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
         [SetUp]
         public void Setup()
         {
-            Generator = new OracleGenerator(new OracleQuoterQuotedIdentifier());
+            Generator = new OracleGenerator(new OracleQuoterQuotedIdentifier(new OptionsWrapper<QuoterOptions>(new QuoterOptions())));
         }
 
         [Test]

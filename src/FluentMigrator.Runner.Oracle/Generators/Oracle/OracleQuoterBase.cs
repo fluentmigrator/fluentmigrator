@@ -20,6 +20,9 @@ using System.Linq;
 using System.Text;
 
 using FluentMigrator.Runner.Generators.Generic;
+using FluentMigrator.Runner.Initialization;
+
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Generators.Oracle
 {
@@ -29,6 +32,11 @@ namespace FluentMigrator.Runner.Generators.Oracle
         public const int MaxChunkLength = 3900;
 
         public static readonly char[] EscapeCharacters = new[] { '\'', '\t', '\r', '\n' };
+
+        public OracleQuoterBase(IOptions<QuoterOptions> options)
+            : base(options)
+        {
+        }
 
         public static IEnumerable<string> SplitBy(string str, int maxChunkLength)
         {

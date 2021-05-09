@@ -16,9 +16,17 @@
 //
 #endregion
 
+using FluentMigrator.Runner.Initialization;
+
+using Microsoft.Extensions.Options;
+
 namespace FluentMigrator.Runner.Generators.Oracle
 {
     public class OracleQuoterQuotedIdentifier : OracleQuoterBase
     {
+        public OracleQuoterQuotedIdentifier(IOptions<QuoterOptions> options)
+            : base(options)
+        {
+        }
     }
 }

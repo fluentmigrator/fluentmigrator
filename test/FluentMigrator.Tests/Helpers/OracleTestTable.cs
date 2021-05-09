@@ -23,13 +23,16 @@ using System.Text;
 
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Oracle;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
+
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Tests.Helpers
 {
     public class OracleTestTable : IDisposable
     {
-        private readonly IQuoter _quoter = new OracleQuoterQuotedIdentifier();
+        private readonly IQuoter _quoter = new OracleQuoterQuotedIdentifier(new OptionsWrapper<QuoterOptions>(new QuoterOptions()));
         private readonly GenericProcessorBase _processor;
         private readonly string _schema;
         private readonly List<string> _constraints = new List<string>();

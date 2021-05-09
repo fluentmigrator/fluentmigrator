@@ -14,6 +14,8 @@
 // limitations under the License.
 #endregion
 
+using FluentMigrator.Runner.Initialization;
+
 using JetBrains.Annotations;
 
 using Microsoft.Extensions.Options;
@@ -28,7 +30,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
         }
 
         public Oracle12CGenerator(bool useQuotedIdentifiers)
-            : this(GetQuoter(useQuotedIdentifiers))
+            : this(GetQuoter(useQuotedIdentifiers, new OptionsWrapper<QuoterOptions>(new QuoterOptions())))
         {
         }
 

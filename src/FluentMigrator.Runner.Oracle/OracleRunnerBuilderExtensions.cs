@@ -15,6 +15,7 @@
 #endregion
 
 using FluentMigrator.Runner.Generators.Oracle;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.DotConnectOracle;
 using FluentMigrator.Runner.Processors.Oracle;
@@ -40,9 +41,10 @@ namespace FluentMigrator.Runner
                 sp =>
                 {
                     var opt = sp.GetRequiredService<IOptionsSnapshot<ProcessorOptions>>();
+                    var quoterOptions = sp.GetRequiredService<IOptions<QuoterOptions>>();
                     return opt.Value.IsQuotingForced() ?
-                        new OracleQuoterQuotedIdentifier() :
-                        new OracleQuoter();
+                        new OracleQuoterQuotedIdentifier(quoterOptions) :
+                        new OracleQuoter(quoterOptions);
                 });
         }
 

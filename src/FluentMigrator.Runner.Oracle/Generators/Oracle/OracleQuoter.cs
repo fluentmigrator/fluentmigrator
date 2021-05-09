@@ -16,10 +16,19 @@
 //
 #endregion
 
+using FluentMigrator.Runner.Initialization;
+
+using Microsoft.Extensions.Options;
+
 namespace FluentMigrator.Runner.Generators.Oracle
 {
     public class OracleQuoter : OracleQuoterQuotedIdentifier
     {
+        public OracleQuoter(IOptions<QuoterOptions> options)
+            : base(options)
+        {
+        }
+
         public override string Quote(string name)
         {
             return UnQuote(name);
