@@ -54,7 +54,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
                 .ApplyProviderSwitches(options.ProviderSwitches);
             var factory = new FirebirdDbFactory(_serviceProvider);
             var connection = factory.CreateConnection(connectionString);
-            return new FirebirdProcessor(connection, new FirebirdGenerator(FbOptions), announcer, options, factory, fbOpt);
+            return new FirebirdProcessor(connection, new FirebirdGenerator(FbOptions, new OptionsWrapper<QuoterOptions>(quoterOptions)), announcer, options, factory, fbOpt, quoterOptions);
         }
     }
 }

@@ -1,5 +1,9 @@
 using FluentMigrator.Runner.Generators.Firebird;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.Firebird;
+
+using Microsoft.Extensions.Options;
+
 using NUnit.Framework;
 
 using Shouldly;
@@ -9,13 +13,8 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
     [TestFixture]
     public class FirebirdDataTests : BaseDataTests
     {
-        protected FirebirdGenerator Generator;
-
-        [SetUp]
-        public void Setup()
-        {
-            Generator = new FirebirdGenerator(FirebirdOptions.StandardBehaviour());
-        }
+        private static FirebirdGenerator CreateFixture(QuoterOptions options = null) =>
+            new FirebirdGenerator(FirebirdOptions.StandardBehaviour(), new OptionsWrapper<QuoterOptions>(options));
 
         [Test]
         public override void CanDeleteDataForAllRowsWithCustomSchema()
@@ -23,7 +22,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             var expression = GeneratorTestHelper.GetDeleteDataAllRowsExpression();
             expression.SchemaName = "TestSchema";
 
-            var result = Generator.Generate(expression);
+            var result = CreateFixture().Generate(expression);
             result.ShouldBe("DELETE FROM TestTable1 WHERE 1 = 1");
         }
 
@@ -32,7 +31,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         {
             var expression = GeneratorTestHelper.GetDeleteDataAllRowsExpression();
 
-            var result = Generator.Generate(expression);
+            var result = CreateFixture().Generate(expression);
             result.ShouldBe("DELETE FROM TestTable1 WHERE 1 = 1");
 
         }
@@ -43,7 +42,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             var expression = GeneratorTestHelper.GetDeleteDataMultipleRowsExpression();
             expression.SchemaName = "TestSchema";
 
-            var result = Generator.Generate(expression);
+            var result = CreateFixture().Generate(expression);
             result.ShouldBe("DELETE FROM TestTable1 WHERE Name = 'Just''in' AND Website IS NULL; DELETE FROM TestTable1 WHERE Website = 'github.com'");
         }
 
@@ -52,7 +51,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         {
             var expression = GeneratorTestHelper.GetDeleteDataMultipleRowsExpression();
 
-            var result = Generator.Generate(expression);
+            var result = CreateFixture().Generate(expression);
             result.ShouldBe("DELETE FROM TestTable1 WHERE Name = 'Just''in' AND Website IS NULL; DELETE FROM TestTable1 WHERE Website = 'github.com'");
         }
 
@@ -62,7 +61,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             var expression = GeneratorTestHelper.GetDeleteDataExpression();
             expression.SchemaName = "TestSchema";
 
-            var result = Generator.Generate(expression);
+            var result = CreateFixture().Generate(expression);
             result.ShouldBe("DELETE FROM TestTable1 WHERE Name = 'Just''in' AND Website IS NULL");
         }
 
@@ -71,7 +70,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         {
             var expression = GeneratorTestHelper.GetDeleteDataExpression();
 
-            var result = Generator.Generate(expression);
+            var result = CreateFixture().Generate(expression);
             result.ShouldBe("DELETE FROM TestTable1 WHERE Name = 'Just''in' AND Website IS NULL");
         }
 
@@ -79,7 +78,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         public override void CanDeleteDataWithDbNullCriteria()
         {
             var expression = GeneratorTestHelper.GetDeleteDataExpressionWithDbNullValue();
-            var result = Generator.Generate(expression);
+            var result = CreateFixture().Generate(expression);
             result.ShouldBe("DELETE FROM TestTable1 WHERE Name = 'Just''in' AND Website IS NULL");
         }
 
@@ -92,7 +91,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             var expected = "INSERT INTO TestTable1 (Id, Name, Website) VALUES (1, 'Just''in', 'codethinked.com');";
             expected += " INSERT INTO TestTable1 (Id, Name, Website) VALUES (2, 'Na\\te', 'kohari.org')";
 
-            var result = Generator.Generate(expression);
+            var result = CreateFixture().Generate(expression);
             result.ShouldBe(expected);
         }
 
@@ -104,7 +103,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             var expected = "INSERT INTO TestTable1 (Id, Name, Website) VALUES (1, 'Just''in', 'codethinked.com');";
             expected += " INSERT INTO TestTable1 (Id, Name, Website) VALUES (2, 'Na\\te', 'kohari.org')";
 
-            var result = Generator.Generate(expression);
+            var result = CreateFixture().Generate(expression);
             result.ShouldBe(expected);
         }
 
@@ -114,7 +113,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             var expression = GeneratorTestHelper.GetInsertGUIDExpression();
             expression.SchemaName = "TestSchema";
 
-            var result = Generator.Generate(expression);
+            var result = CreateFixture().Generate(expression);
             result.ShouldBe(string.Format("INSERT INTO TestTable1 (guid) VALUES ('{0}')", GeneratorTestHelper.TestGuid));
         }
 
@@ -123,8 +122,31 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         {
             var expression = GeneratorTestHelper.GetInsertGUIDExpression();
 
-            var result = Generator.Generate(expression);
+            var result = CreateFixture().Generate(expression);
             result.ShouldBe(string.Format("INSERT INTO TestTable1 (guid) VALUES ('{0}')", GeneratorTestHelper.TestGuid));
+        }
+
+        [Test]
+        public override void CanInsertEnumAsString()
+        {
+            var expression = GeneratorTestHelper.GetInsertEnumExpression();
+
+            var result = CreateFixture().Generate(expression);
+            result.ShouldBe("INSERT INTO TestTable1 (enum) VALUES ('Boo')");
+        }
+
+        [Test]
+        public override void CanInsertEnumAsUnderlyingType()
+        {
+            var options = new QuoterOptions
+            {
+                EnumAsUnderlyingType = true
+            };
+
+            var expression = GeneratorTestHelper.GetInsertEnumExpression();
+
+            var result = CreateFixture(options).Generate(expression);
+            result.ShouldBe("INSERT INTO TestTable1 (enum) VALUES (2)");
         }
 
         [Test]
@@ -133,7 +155,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             var expression = GeneratorTestHelper.GetUpdateDataExpressionWithAllRows();
             expression.SchemaName = "TestSchema";
 
-            var result = Generator.Generate(expression);
+            var result = CreateFixture().Generate(expression);
             result.ShouldBe("UPDATE TestTable1 SET Name = 'Just''in', Age = 25 WHERE 1 = 1");
         }
 
@@ -142,7 +164,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpressionWithAllRows();
 
-            var result = Generator.Generate(expression);
+            var result = CreateFixture().Generate(expression);
             result.ShouldBe("UPDATE TestTable1 SET Name = 'Just''in', Age = 25 WHERE 1 = 1");
         }
 
@@ -152,7 +174,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             var expression = GeneratorTestHelper.GetUpdateDataExpression();
             expression.SchemaName = "TestSchema";
 
-            var result = Generator.Generate(expression);
+            var result = CreateFixture().Generate(expression);
             result.ShouldBe("UPDATE TestTable1 SET Name = 'Just''in', Age = 25 WHERE Id = 9 AND Homepage IS NULL");
         }
 
@@ -161,7 +183,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpression();
 
-            var result = Generator.Generate(expression);
+            var result = CreateFixture().Generate(expression);
             result.ShouldBe("UPDATE TestTable1 SET Name = 'Just''in', Age = 25 WHERE Id = 9 AND Homepage IS NULL");
         }
 
@@ -170,7 +192,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpressionWithDbNullValue();
 
-            var result = Generator.Generate(expression);
+            var result = CreateFixture().Generate(expression);
             result.ShouldBe("UPDATE TestTable1 SET Name = 'Just''in', Age = 25 WHERE Id = 9 AND Homepage IS NULL");
         }
     }

@@ -17,6 +17,8 @@
 #endregion
 
 using FluentMigrator.Runner.Generators.Firebird;
+using FluentMigrator.Runner.Initialization;
+
 using NUnit.Framework;
 
 using Shouldly;
@@ -63,7 +65,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         [Test, TestCaseSource("_fbKeywords")]
         public void Quote_ArgIsFirebirdKeyword_ArgShouldBeQuoted(string quoteArg)
         {
-            var actual = new FirebirdQuoter(false).Quote(quoteArg);
+            var actual = new FirebirdQuoter(false, new QuoterOptions()).Quote(quoteArg);
             var expected = string.Format("\"{0}\"", quoteArg);
             actual.ShouldBe(expected);
         }
@@ -72,7 +74,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         [TestCase("silly")]
         public void Quote_ArgIsNotAKeyWord_ArgShouldNotBeQuoted(string quoteArg)
         {
-            var actual = new FirebirdQuoter(false).Quote(quoteArg);
+            var actual = new FirebirdQuoter(false, new QuoterOptions()).Quote(quoteArg);
             actual.ShouldBe(quoteArg);
         }
 
@@ -80,7 +82,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         [TestCase("silly")]
         public void Quote_ArgIsNotAKeyWordButQuoteForced_ArgMustBeQuoted(string quoteArg)
         {
-            var actual = new FirebirdQuoter(true).Quote(quoteArg);
+            var actual = new FirebirdQuoter(true, new QuoterOptions()).Quote(quoteArg);
             var expected = $"\"{quoteArg}\"";
             actual.ShouldBe(expected);
         }
@@ -88,14 +90,14 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         [TestCase("_test")]
         public void Quote_ArgBeginsWithUnderscore_ArgShouldBeQuoted(string quoteArg)
         {
-            var actual = new FirebirdQuoter(false).Quote(quoteArg);
+            var actual = new FirebirdQuoter(false, new QuoterOptions()).Quote(quoteArg);
             actual.ShouldBe(string.Format("\"{0}\"", quoteArg));
         }
 
         [Test, SetCulture("tr-TR")]
         public void Quote_PassesTurkishTest()
         {
-            var actual = new FirebirdQuoter(false).Quote("similar");
+            var actual = new FirebirdQuoter(false, new QuoterOptions()).Quote("similar");
             actual.ShouldBe("\"similar\"");
         }
 
@@ -103,7 +105,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         public void Quote_ArgIsKeywordInLowercase_ArgShouldBeQuoted(string quoteArg)
         {
             var argInLowerCase = quoteArg.ToLower();
-            var actual = new FirebirdQuoter(false).Quote(argInLowerCase);
+            var actual = new FirebirdQuoter(false, new QuoterOptions()).Quote(argInLowerCase);
             var expected = string.Format("\"{0}\"", argInLowerCase);
             actual.ShouldBe(expected);
         }

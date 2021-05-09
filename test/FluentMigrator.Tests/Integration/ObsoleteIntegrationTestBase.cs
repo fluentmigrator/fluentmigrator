@@ -37,9 +37,11 @@ using FluentMigrator.Runner.Generators.MySql;
 using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Runner.Generators.Firebird;
 using FluentMigrator.Runner.Generators.SqlAnywhere;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.SqlAnywhere;
 
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Options;
 
 using MySql.Data.MySqlClient;
 
@@ -351,7 +353,8 @@ namespace FluentMigrator.Tests.Integration
             using (var connection = new FbConnection(serverOptions.ConnectionString))
             {
                 var options = FirebirdOptions.AutoCommitBehaviour();
-                var processor = new FirebirdProcessor(connection, new FirebirdGenerator(options), announcer, new ProcessorOptions(), new FirebirdDbFactory(serviceProvider: null), options);
+                var quoterOptions = new QuoterOptions();
+                var processor = new FirebirdProcessor(connection, new FirebirdGenerator(options, new OptionsWrapper<QuoterOptions>(quoterOptions)), announcer, new ProcessorOptions(), new FirebirdDbFactory(serviceProvider: null), options, quoterOptions);
 
                 try
                 {

@@ -18,7 +18,10 @@ using System;
 using System.Collections.Generic;
 
 using FluentMigrator.Runner.Generators.Generic;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.Firebird;
+
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Generators.Firebird
 {
@@ -64,12 +67,16 @@ namespace FluentMigrator.Runner.Generators.Firebird
         /// Initializes a new instance of the <see cref="FirebirdQuoter"/> class.
         /// </summary>
         /// <param name="options">The firebird specific options</param>
-        public FirebirdQuoter(FirebirdOptions options)
-            : this(options.ForceQuote)
+        /// <param name="quoterOptions">Options how SQL text is handled</param>
+        public FirebirdQuoter(
+            FirebirdOptions options,
+            IOptions<QuoterOptions> quoterOptions)
+            : this(options.ForceQuote, quoterOptions.Value)
         {
         }
 
-        public FirebirdQuoter(bool forceQuote)
+        public FirebirdQuoter(bool forceQuote, QuoterOptions options)
+            : base(options)
         {
             _forceQuote = forceQuote;
         }

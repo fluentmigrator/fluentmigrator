@@ -4,13 +4,14 @@ using System.Data;
 using System.Text;
 using FirebirdSql.Data.FirebirdClient;
 using FluentMigrator.Runner.Generators.Firebird;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.Firebird;
 
 namespace FluentMigrator.Tests.Helpers
 {
     public class FirebirdTestTable : IDisposable
     {
-        private readonly FirebirdQuoter _quoter = new FirebirdQuoter(false);
+        private readonly FirebirdQuoter _quoter = new FirebirdQuoter(false, new QuoterOptions());
         private readonly FirebirdProcessor _processor;
 
         public FbConnection Connection => (FbConnection)_processor.Connection;
