@@ -18,10 +18,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         }
 
         [Obsolete]
-        public override IMigrationProcessor Create(
-            string connectionString,
-            IAnnouncer announcer,
-            IMigrationProcessorOptions options)
+        public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
         {
             var factory = new SqlServerDbFactory();
             var connection = factory.CreateConnection(connectionString);
