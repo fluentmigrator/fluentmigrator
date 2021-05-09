@@ -30,9 +30,9 @@ namespace FluentMigrator.Runner.Generators.Generic
     {
         private readonly QuoterOptions _options;
 
-        public GenericQuoter([CanBeNull] IOptions<QuoterOptions> options = null)
+        public GenericQuoter(IOptions<QuoterOptions> options)
         {
-            _options = options?.Value ?? new QuoterOptions();
+            _options = options.Value ?? new QuoterOptions();
         }
 
         /// <inheritdoc />
