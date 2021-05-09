@@ -75,7 +75,9 @@ namespace FluentMigrator.Runner.Generators.Firebird
         {
         }
 
-        public FirebirdQuoter(bool forceQuote, IOptions<QuoterOptions> options)
+        public FirebirdQuoter(
+            bool forceQuote,
+            IOptions<QuoterOptions> options)
             : base(options)
         {
             _forceQuote = forceQuote;
