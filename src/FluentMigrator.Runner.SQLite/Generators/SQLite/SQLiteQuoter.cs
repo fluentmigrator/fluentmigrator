@@ -1,10 +1,18 @@
 using FluentMigrator.Runner.Generators.Generic;
+using FluentMigrator.Runner.Initialization;
+
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Generators.SQLite
 {
     // ReSharper disable once InconsistentNaming
     public class SQLiteQuoter : GenericQuoter
     {
+        public SQLiteQuoter(IOptions<QuoterOptions> options)
+            : base(options)
+        {
+        }
+
         public override string FormatSystemMethods(SystemMethods value)
         {
             switch (value)

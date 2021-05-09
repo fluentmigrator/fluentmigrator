@@ -19,6 +19,7 @@
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators.Generic;
+using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
@@ -30,7 +31,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
     public class SQLiteGenerator : GenericGenerator
     {
         public SQLiteGenerator()
-            : this(new SQLiteQuoter())
+            : this(new SQLiteQuoter(new OptionsWrapper<QuoterOptions>(new QuoterOptions())))
         {
         }
 
@@ -43,7 +44,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
         public SQLiteGenerator(
             [NotNull] SQLiteQuoter quoter,
             [NotNull] IOptions<GeneratorOptions> generatorOptions)
-            : base(new SQLiteColumn(), quoter, new EmptyDescriptionGenerator(), generatorOptions)
+            : base(new SQLiteColumn(quoter), quoter, new EmptyDescriptionGenerator(), generatorOptions)
         {
         }
 

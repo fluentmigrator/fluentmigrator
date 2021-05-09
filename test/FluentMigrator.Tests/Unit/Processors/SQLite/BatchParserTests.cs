@@ -52,6 +52,7 @@ namespace FluentMigrator.Tests.Unit.Processors.SQLite
                 .BuildServiceProvider();
 
             var logger = serviceProvider.GetRequiredService<ILogger<SQLiteProcessor>>();
+            var quoterOptions = new OptionsWrapper<QuoterOptions>(new QuoterOptions());
 
             var opt = new OptionsManager<ProcessorOptions>(new OptionsFactory<ProcessorOptions>(
                 Enumerable.Empty<IConfigureOptions<ProcessorOptions>>(),
@@ -63,7 +64,7 @@ namespace FluentMigrator.Tests.Unit.Processors.SQLite
                 opt,
                 MockedConnectionStringAccessor.Object,
                 serviceProvider,
-                new SQLiteQuoter());
+                new SQLiteQuoter(quoterOptions));
         }
     }
 }

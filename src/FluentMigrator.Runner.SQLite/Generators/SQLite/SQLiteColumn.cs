@@ -10,8 +10,8 @@ namespace FluentMigrator.Runner.Generators.SQLite
     // ReSharper disable once InconsistentNaming
     internal class SQLiteColumn : ColumnBase
     {
-        public SQLiteColumn()
-            : base(new SQLiteTypeMap(), new SQLiteQuoter())
+        public SQLiteColumn(SQLiteQuoter quoter)
+            : base(new SQLiteTypeMap(), quoter)
         {
         }
 

@@ -20,6 +20,10 @@ using System;
 using System.Linq;
 
 using FluentMigrator.Runner.Generators.SQLite;
+using FluentMigrator.Runner.Initialization;
+
+using Microsoft.Extensions.Options;
+
 using NUnit.Framework;
 
 using Shouldly;
@@ -31,7 +35,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
     public class SQLiteColumnTests : BaseColumnTests
     {
         protected SQLiteGenerator Generator;
-        private SQLiteQuoter quoter = new SQLiteQuoter();
+        private SQLiteQuoter quoter = new SQLiteQuoter(new OptionsWrapper<QuoterOptions>(new QuoterOptions()));
 
         [SetUp]
         public void Setup()

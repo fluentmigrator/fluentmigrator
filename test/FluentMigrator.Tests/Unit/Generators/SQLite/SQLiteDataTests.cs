@@ -19,6 +19,8 @@ using FluentMigrator.Runner.Generators.SQLite;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.SqlServer;
 
+using Microsoft.Extensions.Options;
+
 using NUnit.Framework;
 
 using Shouldly;
@@ -30,7 +32,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
     public class SQLiteDataTests : BaseDataTests
     {
         private static SQLiteGenerator CreateFixture(QuoterOptions options = null) =>
-            new SQLiteGenerator();
+            new SQLiteGenerator(new SQLiteQuoter(new OptionsWrapper<QuoterOptions>(options)));
 
         [Test]
         public override void CanDeleteDataForAllRowsWithCustomSchema()

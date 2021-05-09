@@ -19,6 +19,9 @@
 using System;
 
 using FluentMigrator.Runner.Generators.SQLite;
+using FluentMigrator.Runner.Initialization;
+
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.SQLite
 {
@@ -43,7 +46,8 @@ namespace FluentMigrator.Runner.Processors.SQLite
         {
             var factory = new SQLiteDbFactory(_serviceProvider);
             var connection = factory.CreateConnection(connectionString);
-            var quoter = new SQLiteQuoter();
+            var quoterOptions = new OptionsWrapper<QuoterOptions>(new QuoterOptions());
+            var quoter = new SQLiteQuoter(quoterOptions);
             return new SQLiteProcessor(connection, new SQLiteGenerator(quoter), announcer, options, factory, quoter);
         }
     }

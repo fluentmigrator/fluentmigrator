@@ -263,7 +263,7 @@ namespace FluentMigrator.Tests.Unit.Generators.GenericGenerator
         [Test]
         public void ShouldEscapeSqliteObjectNames()
         {
-            SQLiteQuoter quoter = new SQLiteQuoter();
+            SQLiteQuoter quoter = new SQLiteQuoter(DefaultOptions);
             quoter.Quote("Table\"Name").ShouldBe("\"Table\"\"Name\"");
         }
 
