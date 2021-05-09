@@ -1,5 +1,6 @@
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators.Generic;
+using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
@@ -10,7 +11,7 @@ namespace FluentMigrator.Runner.Generators.Jet
     public class JetGenerator : GenericGenerator
     {
         public JetGenerator()
-            : this(new JetQuoter())
+            : this(new JetQuoter(new OptionsWrapper<QuoterOptions>(new QuoterOptions())))
         {
         }
 
@@ -23,7 +24,7 @@ namespace FluentMigrator.Runner.Generators.Jet
         public JetGenerator(
             [NotNull] JetQuoter quoter,
             [NotNull] IOptions<GeneratorOptions> generatorOptions)
-            : base(new JetColumn(), quoter, new EmptyDescriptionGenerator(), generatorOptions)
+            : base(new JetColumn(quoter), quoter, new EmptyDescriptionGenerator(), generatorOptions)
         {
         }
 

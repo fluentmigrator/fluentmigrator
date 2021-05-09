@@ -1,10 +1,18 @@
 using System;
 using FluentMigrator.Runner.Generators.Generic;
+using FluentMigrator.Runner.Initialization;
+
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Generators.Jet
 {
     public class JetQuoter : GenericQuoter
     {
+        public JetQuoter(IOptions<QuoterOptions> options)
+            : base(options)
+        {
+        }
+
         public override string OpenQuote { get { return "["; } }
 
         public override string CloseQuote { get { return "]"; } }

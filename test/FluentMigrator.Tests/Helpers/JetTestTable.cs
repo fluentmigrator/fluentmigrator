@@ -21,13 +21,16 @@ using System.Data.OleDb;
 using System.IO;
 using System.Text;
 using FluentMigrator.Runner.Generators.Jet;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.Jet;
+
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Tests.Helpers
 {
     public class JetTestTable : IDisposable
     {
-        private readonly JetQuoter _quoter = new JetQuoter();
+        private readonly JetQuoter _quoter = new JetQuoter(new OptionsWrapper<QuoterOptions>(new QuoterOptions()));
         public OleDbConnection Connection { get; private set; }
         public string Name { get; set; }
         public OleDbTransaction Transaction { get; private set; }

@@ -1,5 +1,6 @@
 using System;
 using System.Data;
+
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Base;
 
@@ -7,8 +8,8 @@ namespace FluentMigrator.Runner.Generators.Jet
 {
     internal class JetColumn : ColumnBase
     {
-        public JetColumn()
-            : base(new JetTypeMap(), new JetQuoter())
+        public JetColumn(JetQuoter quoter)
+            : base(new JetTypeMap(), quoter)
         {
 
         }

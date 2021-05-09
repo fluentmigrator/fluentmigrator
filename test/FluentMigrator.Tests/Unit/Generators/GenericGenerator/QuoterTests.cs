@@ -231,7 +231,7 @@ namespace FluentMigrator.Tests.Unit.Generators.GenericGenerator
         {
             //This will throw and error on the Jet Engine if special characters are used.
             //We do nothing.
-            JetQuoter quoter = new JetQuoter();
+            JetQuoter quoter = new JetQuoter(new OptionsWrapper<QuoterOptions>(new QuoterOptions()));
             quoter.Quote("[Table]Name").ShouldBe("[[Table]Name]");
         }
 

@@ -20,6 +20,9 @@ using System;
 using System.Data.OleDb;
 
 using FluentMigrator.Runner.Generators.Jet;
+using FluentMigrator.Runner.Initialization;
+
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.Jet
 {
@@ -30,7 +33,8 @@ namespace FluentMigrator.Runner.Processors.Jet
         public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
         {
             var connection = new OleDbConnection(connectionString);
-            return new JetProcessor(connection, new JetGenerator(new JetQuoter()), announcer, options);
+            var quoterOptions = new OptionsWrapper<QuoterOptions>(new QuoterOptions());
+            return new JetProcessor(connection, new JetGenerator(new JetQuoter(quoterOptions)), announcer, options);
         }
     }
 }
