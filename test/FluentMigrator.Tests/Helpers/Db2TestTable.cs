@@ -22,13 +22,14 @@ using System.Text;
 
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.DB2;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.DB2;
 
 namespace FluentMigrator.Tests.Helpers
 {
     public class Db2TestTable : IDisposable
     {
-        private readonly IQuoter _quoter = new Db2Quoter();
+        private readonly IQuoter _quoter = new Db2Quoter(new QuoterOptions());
 
         private readonly string _schema;
 

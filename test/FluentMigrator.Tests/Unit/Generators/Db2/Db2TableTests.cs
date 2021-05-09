@@ -1,5 +1,6 @@
 using FluentMigrator.Runner.Generators.DB2;
 using FluentMigrator.Runner.Generators.DB2.iSeries;
+using FluentMigrator.Runner.Initialization;
 
 using NUnit.Framework;
 
@@ -15,7 +16,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
         [SetUp]
         public void Setup()
         {
-            Generator = new Db2Generator(new Db2ISeriesQuoter());
+            Generator = new Db2Generator(new Db2ISeriesQuoter(new QuoterOptions()));
         }
 
         [Test]

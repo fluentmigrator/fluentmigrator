@@ -28,7 +28,7 @@ namespace FluentMigrator.Runner.Generators.Generic
     {
         private readonly QuoterOptions _options;
 
-        public GenericQuoter([CanBeNull] QuoterOptions options)
+        public GenericQuoter([CanBeNull] QuoterOptions options = null)
         {
             _options = options ?? new QuoterOptions();
         }
@@ -155,11 +155,13 @@ namespace FluentMigrator.Runner.Generators.Generic
 
         public virtual string FormatEnum(object value)
         {
-            if (_options.EnumAsString)
-                return ValueQuote + value + ValueQuote;
+            if (_options.EnumAsUnderlyingType)
+            {
+                var underlyingType = Enum.GetUnderlyingType(value.GetType());
+                return Convert.ChangeType(value, underlyingType).ToString();
+            }
 
-            var underlyingType = Enum.GetUnderlyingType(value.GetType());
-            return Convert.ChangeType(value, underlyingType).ToString();
+            return ValueQuote + value + ValueQuote;
         }
 
         public virtual string ValueQuote { get { return "'"; } }

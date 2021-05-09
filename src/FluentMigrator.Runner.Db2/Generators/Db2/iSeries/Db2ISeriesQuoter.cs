@@ -14,10 +14,24 @@
 // limitations under the License.
 #endregion
 
+using FluentMigrator.Runner.Initialization;
+
+using Microsoft.Extensions.Options;
+
 namespace FluentMigrator.Runner.Generators.DB2.iSeries
 {
     public class Db2ISeriesQuoter : Db2Quoter
     {
+        public Db2ISeriesQuoter(IOptions<QuoterOptions> options)
+            : base(options)
+        {
+        }
+
+        public Db2ISeriesQuoter(QuoterOptions options)
+            : base(options)
+        {
+        }
+
         public override string QuoteConstraintName(string constraintName, string schemaName = null)
         {
             return CreateSchemaPrefixedQuotedIdentifier(

@@ -188,7 +188,7 @@ namespace FluentMigrator.Tests.Unit.Generators.GenericGenerator
         {
             var options = new QuoterOptions
             {
-                EnumAsString = false
+                EnumAsUnderlyingType = true
             };
 
             CreateFixture(options).QuoteValue(Foo.Baz)

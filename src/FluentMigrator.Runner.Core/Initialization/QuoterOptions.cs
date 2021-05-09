@@ -25,9 +25,9 @@ namespace FluentMigrator.Runner.Initialization
     {
         /// <summary>
         /// Gets or sets the value indicating how enum values are handled.<br/>
-        /// If <see langword="true"/> enums are converted to a string, if <see langword="false"/> enums are converted to the underlying numeric type.<br/>
-        /// Default value: <see langword="true"/>.
+        /// If <see langword="true"/> enums are converted to the underlying numeric type, if <see langword="false"/> enums are converted to  a string.<br/>
+        /// Default value: <see langword="false"/>.
         /// </summary>
-        public bool EnumAsString { get; set; } = true;
+        public bool EnumAsUnderlyingType { get; set; }
     }
 }

@@ -23,6 +23,7 @@ using System.Text;
 
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Generic;
+using FluentMigrator.Runner.Initialization;
 
 using Microsoft.Extensions.Options;
 
@@ -31,7 +32,7 @@ namespace FluentMigrator.Runner.Generators.DB2
     public class Db2Generator : GenericGenerator
     {
         public Db2Generator()
-            : this(new Db2Quoter())
+            : this(new Db2Quoter(new QuoterOptions()))
         {
         }
 

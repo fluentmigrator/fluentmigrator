@@ -17,12 +17,25 @@
 using System;
 
 using FluentMigrator.Runner.Generators.Generic;
+using FluentMigrator.Runner.Initialization;
+
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Generators.DB2
 {
     public class Db2Quoter : GenericQuoter
     {
         public readonly char[] SpecialChars = "\"%'()*+|,{}-./:;<=>?^[]".ToCharArray();
+
+        public Db2Quoter(IOptions<QuoterOptions> options)
+            : base(options.Value)
+        {
+        }
+
+        public Db2Quoter(QuoterOptions options)
+            : base(options)
+        {
+        }
 
         public override string FormatDateTime(DateTime value)
         {

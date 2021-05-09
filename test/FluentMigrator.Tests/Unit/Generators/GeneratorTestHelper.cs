@@ -48,6 +48,11 @@ namespace FluentMigrator.Tests.Unit.Generators
         public static string TestColumnCollationName = "Latin1_General_CS_AS";
         public static Guid TestGuid = Guid.NewGuid();
 
+        public enum Foo
+        {
+            Boo = 2
+        }
+
         public static CreateTableExpression GetCreateTableExpression()
         {
             CreateTableExpression expression = new CreateTableExpression() { TableName = TestTableName1, };
@@ -402,6 +407,14 @@ namespace FluentMigrator.Tests.Unit.Generators
         {
             var expression = new InsertDataExpression { TableName = TestTableName1 };
             expression.Rows.Add(new InsertionDataDefinition { new KeyValuePair<string, object>("guid", guid) });
+
+            return expression;
+        }
+
+        public static InsertDataExpression GetInsertEnumExpression()
+        {
+            var expression = new InsertDataExpression { TableName = TestTableName1 };
+            expression.Rows.Add(new InsertionDataDefinition { new KeyValuePair<string, object>("enum", Foo.Boo) });
 
             return expression;
         }
