@@ -298,9 +298,10 @@ namespace FluentMigrator.Tests.Integration
             using (var connection = new NpgsqlConnection(serverOptions.ConnectionString))
             {
                 var pgOptions = new PostgresOptions();
+                var quoterOptions = new OptionsWrapper<QuoterOptions>(new QuoterOptions());
                 var processor = new PostgresProcessor(
                     connection,
-                    new PostgresGenerator(new PostgresQuoter(pgOptions)),
+                    new PostgresGenerator(new PostgresQuoter(quoterOptions, pgOptions)),
                     new TextWriterAnnouncer(TestContext.Out),
                     new ProcessorOptions(),
                     new PostgresDbFactory(serviceProvider: null),

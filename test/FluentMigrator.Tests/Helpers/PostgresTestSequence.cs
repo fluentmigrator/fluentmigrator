@@ -16,14 +16,18 @@
 
 using System;
 using FluentMigrator.Runner.Generators.Postgres;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.Postgres;
+
+using Microsoft.Extensions.Options;
+
 using Npgsql;
 
 namespace FluentMigrator.Tests.Helpers
 {
     public class PostgresTestSequence : IDisposable
     {
-        private readonly PostgresQuoter _quoter = new PostgresQuoter(new PostgresOptions());
+        private readonly PostgresQuoter _quoter = new PostgresQuoter(new OptionsWrapper<QuoterOptions>(new QuoterOptions()), new PostgresOptions());
         private readonly string _schemaName;
         private NpgsqlConnection Connection { get; set; }
         public string Name { get; set; }

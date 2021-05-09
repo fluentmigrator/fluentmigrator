@@ -34,8 +34,9 @@ namespace FluentMigrator.Runner.Processors.Postgres
             [NotNull] ILogger<PostgresProcessor> logger,
             [NotNull] IOptionsSnapshot<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor,
-            [NotNull] PostgresOptions pgOptions)
-            : base(factory, generator, logger, options, connectionStringAccessor, pgOptions)
+            [NotNull] PostgresOptions pgOptions,
+            [NotNull] IOptions<QuoterOptions> quoterOptions)
+            : base(factory, generator, logger, options, connectionStringAccessor, pgOptions, quoterOptions)
         {
         }
 

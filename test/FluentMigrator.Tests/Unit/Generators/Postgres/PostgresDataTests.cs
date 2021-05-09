@@ -1,5 +1,8 @@
 using FluentMigrator.Runner.Generators.Postgres;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.Postgres;
+
+using Microsoft.Extensions.Options;
 
 using NUnit.Framework;
 
@@ -10,13 +13,10 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
     [TestFixture]
     public class PostgresDataTests : BaseDataTests
     {
-        protected PostgresGenerator Generator;
-
-        [SetUp]
-        public void Setup()
+        private static PostgresGenerator CreateFixture(QuoterOptions options = null)
         {
-            var quoter = new PostgresQuoter(new PostgresOptions());
-            Generator = new PostgresGenerator(quoter);
+            var quoter = new PostgresQuoter(new OptionsWrapper<QuoterOptions>(options), new PostgresOptions());
+            return new PostgresGenerator(quoter);
         }
 
         [Test]
@@ -25,7 +25,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             var expression = GeneratorTestHelper.GetDeleteDataAllRowsExpression();
             expression.SchemaName = "TestSchema";
 
-            var result = Generator.Generate(expression);
+            var result = CreateFixture().Generate(expression);
             result.ShouldBe("DELETE FROM \"TestSchema\".\"TestTable1\";");
         }
 
@@ -34,7 +34,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         {
             var expression = GeneratorTestHelper.GetDeleteDataAllRowsExpression();
 
-            var result = Generator.Generate(expression);
+            var result = CreateFixture().Generate(expression);
             result.ShouldBe("DELETE FROM \"public\".\"TestTable1\";");
         }
 
@@ -44,7 +44,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             var expression = GeneratorTestHelper.GetDeleteDataMultipleRowsExpression();
             expression.SchemaName = "TestSchema";
 
-            var result = Generator.Generate(expression);
+            var result = CreateFixture().Generate(expression);
             result.ShouldBe("DELETE FROM \"TestSchema\".\"TestTable1\" WHERE \"Name\" = 'Just''in' AND \"Website\" IS NULL;DELETE FROM \"TestSchema\".\"TestTable1\" WHERE \"Website\" = 'github.com';");
         }
 
@@ -53,7 +53,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         {
             var expression = GeneratorTestHelper.GetDeleteDataMultipleRowsExpression();
 
-            var result = Generator.Generate(expression);
+            var result = CreateFixture().Generate(expression);
             result.ShouldBe("DELETE FROM \"public\".\"TestTable1\" WHERE \"Name\" = 'Just''in' AND \"Website\" IS NULL;DELETE FROM \"public\".\"TestTable1\" WHERE \"Website\" = 'github.com';");
         }
 
@@ -63,7 +63,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             var expression = GeneratorTestHelper.GetDeleteDataExpression();
             expression.SchemaName = "TestSchema";
 
-            var result = Generator.Generate(expression);
+            var result = CreateFixture().Generate(expression);
             result.ShouldBe("DELETE FROM \"TestSchema\".\"TestTable1\" WHERE \"Name\" = 'Just''in' AND \"Website\" IS NULL;");
         }
 
@@ -72,7 +72,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         {
             var expression = GeneratorTestHelper.GetDeleteDataExpression();
 
-            var result = Generator.Generate(expression);
+            var result = CreateFixture().Generate(expression);
             result.ShouldBe("DELETE FROM \"public\".\"TestTable1\" WHERE \"Name\" = 'Just''in' AND \"Website\" IS NULL;");
         }
 
@@ -80,7 +80,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         public override void CanDeleteDataWithDbNullCriteria()
         {
             var expression = GeneratorTestHelper.GetDeleteDataExpressionWithDbNullValue();
-            var result = Generator.Generate(expression);
+            var result = CreateFixture().Generate(expression);
             result.ShouldBe("DELETE FROM \"public\".\"TestTable1\" WHERE \"Name\" = 'Just''in' AND \"Website\" IS NULL;");
         }
 
@@ -93,7 +93,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             var expected = "INSERT INTO \"TestSchema\".\"TestTable1\" (\"Id\",\"Name\",\"Website\") VALUES (1,'Just''in','codethinked.com');";
             expected += "INSERT INTO \"TestSchema\".\"TestTable1\" (\"Id\",\"Name\",\"Website\") VALUES (2,'Na\\te','kohari.org');";
 
-            var result = Generator.Generate(expression);
+            var result = CreateFixture().Generate(expression);
             result.ShouldBe(expected);
         }
 
@@ -105,7 +105,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             var expected = "INSERT INTO \"public\".\"TestTable1\" (\"Id\",\"Name\",\"Website\") VALUES (1,'Just''in','codethinked.com');";
             expected += "INSERT INTO \"public\".\"TestTable1\" (\"Id\",\"Name\",\"Website\") VALUES (2,'Na\\te','kohari.org');";
 
-            var result = Generator.Generate(expression);
+            var result = CreateFixture().Generate(expression);
             result.ShouldBe(expected);
         }
 
@@ -115,7 +115,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             var expression = GeneratorTestHelper.GetInsertGUIDExpression();
             expression.SchemaName = "TestSchema";
 
-            var result = Generator.Generate(expression);
+            var result = CreateFixture().Generate(expression);
             result.ShouldBe(string.Format("INSERT INTO \"TestSchema\".\"TestTable1\" (\"guid\") VALUES ('{0}');", GeneratorTestHelper.TestGuid));
         }
 
@@ -124,8 +124,31 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         {
             var expression = GeneratorTestHelper.GetInsertGUIDExpression();
 
-            var result = Generator.Generate(expression);
+            var result = CreateFixture().Generate(expression);
             result.ShouldBe(string.Format("INSERT INTO \"public\".\"TestTable1\" (\"guid\") VALUES ('{0}');", GeneratorTestHelper.TestGuid));
+        }
+
+        [Test]
+        public override void CanInsertEnumAsString()
+        {
+            var expression = GeneratorTestHelper.GetInsertEnumExpression();
+
+            var result = CreateFixture().Generate(expression);
+            result.ShouldBe("INSERT INTO \"public\".\"TestTable1\" (\"enum\") VALUES ('Boo');");
+        }
+
+        [Test]
+        public override void CanInsertEnumAsUnderlyingType()
+        {
+            var options = new QuoterOptions
+            {
+                EnumAsUnderlyingType = true
+            };
+
+            var expression = GeneratorTestHelper.GetInsertEnumExpression();
+
+            var result = CreateFixture(options).Generate(expression);
+            result.ShouldBe("INSERT INTO \"public\".\"TestTable1\" (\"enum\") VALUES (2);");
         }
 
         [Test]
@@ -134,7 +157,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             var expression = GeneratorTestHelper.GetUpdateDataExpressionWithAllRows();
             expression.SchemaName = "TestSchema";
 
-            var result = Generator.Generate(expression);
+            var result = CreateFixture().Generate(expression);
             result.ShouldBe("UPDATE \"TestSchema\".\"TestTable1\" SET \"Name\" = 'Just''in', \"Age\" = 25 WHERE 1 = 1;");
         }
 
@@ -143,7 +166,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpressionWithAllRows();
 
-            var result = Generator.Generate(expression);
+            var result = CreateFixture().Generate(expression);
             result.ShouldBe("UPDATE \"public\".\"TestTable1\" SET \"Name\" = 'Just''in', \"Age\" = 25 WHERE 1 = 1;");
         }
 
@@ -153,7 +176,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             var expression = GeneratorTestHelper.GetUpdateDataExpression();
             expression.SchemaName = "TestSchema";
 
-            var result = Generator.Generate(expression);
+            var result = CreateFixture().Generate(expression);
             result.ShouldBe("UPDATE \"TestSchema\".\"TestTable1\" SET \"Name\" = 'Just''in', \"Age\" = 25 WHERE \"Id\" = 9 AND \"Homepage\" IS NULL;");
         }
 
@@ -162,7 +185,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpression();
 
-            var result = Generator.Generate(expression);
+            var result = CreateFixture().Generate(expression);
             result.ShouldBe("UPDATE \"public\".\"TestTable1\" SET \"Name\" = 'Just''in', \"Age\" = 25 WHERE \"Id\" = 9 AND \"Homepage\" IS NULL;");
         }
 
@@ -171,7 +194,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpressionWithDbNullValue();
 
-            var result = Generator.Generate(expression);
+            var result = CreateFixture().Generate(expression);
             result.ShouldBe("UPDATE \"public\".\"TestTable1\" SET \"Name\" = 'Just''in', \"Age\" = 25 WHERE \"Id\" = 9 AND \"Homepage\" IS NULL;");
         }
     }

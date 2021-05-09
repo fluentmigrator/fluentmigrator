@@ -21,6 +21,8 @@ using System;
 using FluentMigrator.Runner.Generators.Postgres;
 using FluentMigrator.Runner.Initialization;
 
+using Microsoft.Extensions.Options;
+
 namespace FluentMigrator.Runner.Processors.Postgres
 {
     [Obsolete]
@@ -43,9 +45,10 @@ namespace FluentMigrator.Runner.Processors.Postgres
         public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
         {
             var optionsParsed = PostgresOptions.ParseProviderSwitches(options.ProviderSwitches);
+            var quoterOptions = new OptionsWrapper<QuoterOptions>(new QuoterOptions());
             var factory = new PostgresDbFactory(_serviceProvider);
             var connection = factory.CreateConnection(connectionString);
-            return new PostgresProcessor(connection, new PostgresGenerator(new PostgresQuoter(optionsParsed)), announcer, options, factory, optionsParsed);
+            return new PostgresProcessor(connection, new PostgresGenerator(new PostgresQuoter(quoterOptions, optionsParsed)), announcer, options, factory, optionsParsed);
         }
     }
 }

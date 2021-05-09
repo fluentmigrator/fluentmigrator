@@ -1,6 +1,9 @@
 using FluentMigrator.Exceptions;
 using FluentMigrator.Runner.Generators.Postgres;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.Postgres;
+
+using Microsoft.Extensions.Options;
 
 using NUnit.Framework;
 
@@ -16,7 +19,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         [SetUp]
         public void Setup()
         {
-            var quoter = new PostgresQuoter(new PostgresOptions());
+            var quoter = new PostgresQuoter(new OptionsWrapper<QuoterOptions>(new QuoterOptions()), new PostgresOptions());
             Generator = new PostgresGenerator(quoter)
             {
                 CompatibilityMode = Runner.CompatibilityMode.STRICT,

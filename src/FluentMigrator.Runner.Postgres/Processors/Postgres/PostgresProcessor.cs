@@ -50,7 +50,7 @@ namespace FluentMigrator.Runner.Processors.Postgres
                 throw new ArgumentNullException(nameof(pgOptions));
             }
 
-            _quoter = new PostgresQuoter(pgOptions);
+            _quoter = new PostgresQuoter(new OptionsWrapper<QuoterOptions>(new QuoterOptions()), pgOptions);
         }
 
         public PostgresProcessor(
@@ -59,7 +59,8 @@ namespace FluentMigrator.Runner.Processors.Postgres
             [NotNull] ILogger<PostgresProcessor> logger,
             [NotNull] IOptionsSnapshot<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor,
-            [NotNull] PostgresOptions pgOptions)
+            [NotNull] PostgresOptions pgOptions,
+            [NotNull] IOptions<QuoterOptions> quoterOptions)
             : base(() => factory.Factory, generator, logger, options.Value, connectionStringAccessor)
         {
             if (pgOptions == null)
@@ -67,7 +68,7 @@ namespace FluentMigrator.Runner.Processors.Postgres
                 throw new ArgumentNullException(nameof(pgOptions));
             }
 
-            _quoter = new PostgresQuoter(pgOptions);
+            _quoter = new PostgresQuoter(quoterOptions, pgOptions);
         }
 
         public override void Execute(string template, params object[] args)

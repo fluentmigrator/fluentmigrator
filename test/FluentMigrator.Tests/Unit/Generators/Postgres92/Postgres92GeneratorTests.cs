@@ -21,6 +21,7 @@ using System.Data;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Postgres;
 using FluentMigrator.Runner.Generators.Postgres92;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.Postgres;
 
 using Microsoft.Extensions.Options;
@@ -39,7 +40,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres92
         [SetUp]
         public void Setup()
         {
-            var quoter = new PostgresQuoter(new PostgresOptions());
+            var quoter = new PostgresQuoter(new OptionsWrapper<QuoterOptions>(new QuoterOptions()), new PostgresOptions());
             Generator = new Postgres92Generator(quoter, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()));
         }
 

@@ -19,13 +19,19 @@ using System.Collections.Generic;
 using System.Linq;
 
 using FluentMigrator.Runner.Generators.Generic;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.Postgres;
+
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Generators.Postgres
 {
     public class PostgresQuoter : GenericQuoter
     {
-        public PostgresQuoter(PostgresOptions options)
+        public PostgresQuoter(
+            IOptions<QuoterOptions> quoterOptions,
+            PostgresOptions options)
+            : base(quoterOptions)
         {
             Options = options ?? new PostgresOptions();
         }

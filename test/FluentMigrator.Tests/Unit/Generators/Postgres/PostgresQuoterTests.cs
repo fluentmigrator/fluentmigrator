@@ -1,6 +1,9 @@
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Postgres;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.Postgres;
+
+using Microsoft.Extensions.Options;
 
 using NUnit.Framework;
 
@@ -14,10 +17,12 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         [SetUp]
         public void SetUp()
         {
-            _quoter = new PostgresQuoter(new PostgresOptions());
+            _quoterOptions = new OptionsWrapper<QuoterOptions>(new QuoterOptions());
+            _quoter = new PostgresQuoter(_quoterOptions, new PostgresOptions());
         }
 
         private IQuoter _quoter = default(PostgresQuoter);
+        private IOptions<QuoterOptions> _quoterOptions;
 
         [Test]
         public void ByteArrayIsFormattedWithQuotes()
@@ -29,14 +34,14 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         [Test]
         public void DisableForceQuoteRemovesQuotes()
         {
-            _quoter = new PostgresQuoter(new PostgresOptions() { ForceQuote = false });
+            _quoter = new PostgresQuoter(_quoterOptions, new PostgresOptions() { ForceQuote = false });
             _quoter.Quote("TableName").ShouldBe("TableName");
         }
 
         [Test]
         public void DisableForceQuoteQuotesReservedKeyword()
         {
-            _quoter = new PostgresQuoter(new PostgresOptions() { ForceQuote = false });
+            _quoter = new PostgresQuoter(_quoterOptions, new PostgresOptions() { ForceQuote = false });
 
             _quoter.Quote("between").ShouldBe(@"""between""");
             _quoter.Quote("BETWEEN").ShouldBe(@"""BETWEEN""");

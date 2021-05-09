@@ -1,6 +1,9 @@
 using System.Linq;
 using FluentMigrator.Runner.Generators.Postgres;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.Postgres;
+
+using Microsoft.Extensions.Options;
 
 using NUnit.Framework;
 
@@ -14,7 +17,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         [SetUp]
         public void Setup()
         {
-            var quoter = new PostgresQuoter(new PostgresOptions());
+            var quoter = new PostgresQuoter(new OptionsWrapper<QuoterOptions>(new QuoterOptions()), new PostgresOptions());
             DescriptionGenerator = new PostgresDescriptionGenerator(quoter);
         }
 

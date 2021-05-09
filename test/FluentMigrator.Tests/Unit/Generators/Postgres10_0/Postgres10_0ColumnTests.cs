@@ -17,8 +17,11 @@
 #endregion
 
 using FluentMigrator.Runner.Generators.Postgres;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.Postgres;
 using FluentMigrator.Tests.Unit.Generators.Postgres;
+
+using Microsoft.Extensions.Options;
 
 using NUnit.Framework;
 
@@ -33,7 +36,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres10_0
     {
         protected override Postgres10_0Generator ConstructGenerator()
         {
-            var quoter = new PostgresQuoter(new PostgresOptions());
+            var quoter = new PostgresQuoter(new OptionsWrapper<QuoterOptions>(new QuoterOptions()), new PostgresOptions());
             return new Postgres10_0Generator(quoter);
         }
 
