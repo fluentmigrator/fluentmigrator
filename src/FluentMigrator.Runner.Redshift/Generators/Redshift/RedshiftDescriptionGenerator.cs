@@ -26,7 +26,7 @@ namespace FluentMigrator.Runner.Generators.Redshift
     /// </summary>
     public class RedshiftDescriptionGenerator : GenericDescriptionGenerator
     {
-        private readonly RedshiftQuoter _quoter;
+        private readonly IQuoter _quoter;
 
         public RedshiftDescriptionGenerator(RedshiftQuoter quoter)
         {
