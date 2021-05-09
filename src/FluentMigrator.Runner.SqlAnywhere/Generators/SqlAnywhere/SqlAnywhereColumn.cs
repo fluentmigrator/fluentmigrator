@@ -21,8 +21,8 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
 {
     internal class SqlAnywhereColumn : ColumnBase
     {
-        public SqlAnywhereColumn(ITypeMap typeMap)
-            : base(typeMap, new SqlAnywhereQuoter())
+        public SqlAnywhereColumn(ITypeMap typeMap, SqlAnywhereQuoter quoter)
+            : base(typeMap, quoter)
         {
             // Add UNIQUE before IDENTITY and after PRIMARY KEY
             ClauseOrder.Insert(ClauseOrder.Count - 2, FormatUniqueConstraint);

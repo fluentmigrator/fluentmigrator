@@ -17,6 +17,9 @@
 using System;
 
 using FluentMigrator.Runner.Generators.SqlAnywhere;
+using FluentMigrator.Runner.Initialization;
+
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.SqlAnywhere
 {
@@ -28,7 +31,8 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
         {
             var factory = new SqlAnywhereDbFactory();
             var connection = factory.CreateConnection(connectionString);
-            return new SqlAnywhereProcessor("SqlAnywhere16", connection, new SqlAnywhere16Generator(new SqlAnywhereQuoter()), announcer, options, factory);
+            var quoterOptions = new OptionsWrapper<QuoterOptions>(new QuoterOptions());
+            return new SqlAnywhereProcessor("SqlAnywhere16", connection, new SqlAnywhere16Generator(new SqlAnywhereQuoter(quoterOptions)), announcer, options, factory);
         }
 
         [Obsolete]

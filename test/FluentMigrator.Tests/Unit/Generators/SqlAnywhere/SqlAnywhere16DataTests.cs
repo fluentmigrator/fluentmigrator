@@ -17,6 +17,9 @@
 #endregion
 
 using FluentMigrator.Runner.Generators.SqlAnywhere;
+using FluentMigrator.Runner.Initialization;
+
+using Microsoft.Extensions.Options;
 
 using NUnit.Framework;
 
@@ -29,13 +32,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
     [Category("SqlAnywhere16")]
     public class SqlAnywhere16DataTests : BaseDataTests
     {
-        protected SqlAnywhere16Generator Generator;
-
-        [SetUp]
-        public void Setup()
-        {
-            Generator = new SqlAnywhere16Generator();
-        }
+        private static SqlAnywhere16Generator CreateFixture(QuoterOptions options = null) =>
+            new SqlAnywhere16Generator(new SqlAnywhereQuoter(new OptionsWrapper<QuoterOptions>(options)));
 
         [Test]
         [Category("Delete")]
@@ -44,7 +42,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
             var expression = GeneratorTestHelper.GetDeleteDataAllRowsExpression();
             expression.SchemaName = "TestSchema";
 
-            var result = Generator.Generate(expression);
+            var result = CreateFixture().Generate(expression);
             result.ShouldBe("DELETE FROM [TestSchema].[TestTable1] WHERE 1 = 1");
         }
 
@@ -54,7 +52,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         {
             var expression = GeneratorTestHelper.GetDeleteDataAllRowsExpression();
 
-            var result = Generator.Generate(expression);
+            var result = CreateFixture().Generate(expression);
             result.ShouldBe("DELETE FROM [dbo].[TestTable1] WHERE 1 = 1");
         }
 
@@ -65,7 +63,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
             var expression = GeneratorTestHelper.GetDeleteDataMultipleRowsExpression();
             expression.SchemaName = "TestSchema";
 
-            var result = Generator.Generate(expression);
+            var result = CreateFixture().Generate(expression);
             result.ShouldBe("DELETE FROM [TestSchema].[TestTable1] WHERE [Name] = N'Just''in' AND [Website] IS NULL; DELETE FROM [TestSchema].[TestTable1] WHERE [Website] = N'github.com'");
         }
 
@@ -75,7 +73,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         {
             var expression = GeneratorTestHelper.GetDeleteDataMultipleRowsExpression();
 
-            var result = Generator.Generate(expression);
+            var result = CreateFixture().Generate(expression);
             result.ShouldBe("DELETE FROM [dbo].[TestTable1] WHERE [Name] = N'Just''in' AND [Website] IS NULL; DELETE FROM [dbo].[TestTable1] WHERE [Website] = N'github.com'");
         }
 
@@ -86,7 +84,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
             var expression = GeneratorTestHelper.GetDeleteDataExpression();
             expression.SchemaName = "TestSchema";
 
-            var result = Generator.Generate(expression);
+            var result = CreateFixture().Generate(expression);
             result.ShouldBe("DELETE FROM [TestSchema].[TestTable1] WHERE [Name] = N'Just''in' AND [Website] IS NULL");
         }
 
@@ -96,14 +94,14 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         {
             var expression = GeneratorTestHelper.GetDeleteDataExpression();
 
-            var result = Generator.Generate(expression);
+            var result = CreateFixture().Generate(expression);
             result.ShouldBe("DELETE FROM [dbo].[TestTable1] WHERE [Name] = N'Just''in' AND [Website] IS NULL");
         }
 
         public override void CanDeleteDataWithDbNullCriteria()
         {
             var expression = GeneratorTestHelper.GetDeleteDataExpressionWithDbNullValue();
-            var result = Generator.Generate(expression);
+            var result = CreateFixture().Generate(expression);
             result.ShouldBe("DELETE FROM [dbo].[TestTable1] WHERE [Name] = N'Just''in' AND [Website] IS NULL");
         }
 
@@ -117,7 +115,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
             var expected = "INSERT INTO [TestSchema].[TestTable1] ([Id], [Name], [Website]) VALUES (1, N'Just''in', N'codethinked.com');";
             expected += @" INSERT INTO [TestSchema].[TestTable1] ([Id], [Name], [Website]) VALUES (2, N'Na\te', N'kohari.org')";
 
-            var result = Generator.Generate(expression);
+            var result = CreateFixture().Generate(expression);
             result.ShouldBe(expected);
         }
 
@@ -130,7 +128,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
             var expected = "INSERT INTO [dbo].[TestTable1] ([Id], [Name], [Website]) VALUES (1, N'Just''in', N'codethinked.com');";
             expected += @" INSERT INTO [dbo].[TestTable1] ([Id], [Name], [Website]) VALUES (2, N'Na\te', N'kohari.org')";
 
-            var result = Generator.Generate(expression);
+            var result = CreateFixture().Generate(expression);
             result.ShouldBe(expected);
         }
 
@@ -141,7 +139,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
             var expression = GeneratorTestHelper.GetInsertGUIDExpression();
             expression.SchemaName = "TestSchema";
 
-            var result = Generator.Generate(expression);
+            var result = CreateFixture().Generate(expression);
             result.ShouldBe(string.Format("INSERT INTO [TestSchema].[TestTable1] ([guid]) VALUES ('{0}')", GeneratorTestHelper.TestGuid.ToString()));
         }
 
@@ -151,8 +149,31 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         {
             var expression = GeneratorTestHelper.GetInsertGUIDExpression();
 
-            var result = Generator.Generate(expression);
+            var result = CreateFixture().Generate(expression);
             result.ShouldBe(string.Format("INSERT INTO [dbo].[TestTable1] ([guid]) VALUES ('{0}')", GeneratorTestHelper.TestGuid.ToString()));
+        }
+
+        [Test]
+        public override void CanInsertEnumAsString()
+        {
+            var expression = GeneratorTestHelper.GetInsertEnumExpression();
+
+            var result = CreateFixture().Generate(expression);
+            result.ShouldBe("INSERT INTO [dbo].[TestTable1] ([enum]) VALUES ('Boo')");
+        }
+
+        [Test]
+        public override void CanInsertEnumAsUnderlyingType()
+        {
+            var options = new QuoterOptions
+            {
+                EnumAsUnderlyingType = true
+            };
+
+            var expression = GeneratorTestHelper.GetInsertEnumExpression();
+
+            var result = CreateFixture(options).Generate(expression);
+            result.ShouldBe("INSERT INTO [dbo].[TestTable1] ([enum]) VALUES (2)");
         }
 
         [Test]
@@ -162,7 +183,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
             var expression = GeneratorTestHelper.GetUpdateDataExpressionWithAllRows();
             expression.SchemaName = "TestSchema";
 
-            var result = Generator.Generate(expression);
+            var result = CreateFixture().Generate(expression);
             result.ShouldBe("UPDATE [TestSchema].[TestTable1] SET [Name] = N'Just''in', [Age] = 25 WHERE 1 = 1");
         }
 
@@ -172,7 +193,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpressionWithAllRows();
 
-            var result = Generator.Generate(expression);
+            var result = CreateFixture().Generate(expression);
             result.ShouldBe("UPDATE [dbo].[TestTable1] SET [Name] = N'Just''in', [Age] = 25 WHERE 1 = 1");
         }
 
@@ -183,7 +204,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
             var expression = GeneratorTestHelper.GetUpdateDataExpression();
             expression.SchemaName = "TestSchema";
 
-            var result = Generator.Generate(expression);
+            var result = CreateFixture().Generate(expression);
             result.ShouldBe("UPDATE [TestSchema].[TestTable1] SET [Name] = N'Just''in', [Age] = 25 WHERE [Id] = 9 AND [Homepage] IS NULL");
         }
 
@@ -193,7 +214,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpression();
 
-            var result = Generator.Generate(expression);
+            var result = CreateFixture().Generate(expression);
             result.ShouldBe("UPDATE [dbo].[TestTable1] SET [Name] = N'Just''in', [Age] = 25 WHERE [Id] = 9 AND [Homepage] IS NULL");
         }
 
@@ -203,7 +224,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpressionWithDbNullValue();
 
-            var result = Generator.Generate(expression);
+            var result = CreateFixture().Generate(expression);
             result.ShouldBe("UPDATE [dbo].[TestTable1] SET [Name] = N'Just''in', [Age] = 25 WHERE [Id] = 9 AND [Homepage] IS NULL");
         }
     }

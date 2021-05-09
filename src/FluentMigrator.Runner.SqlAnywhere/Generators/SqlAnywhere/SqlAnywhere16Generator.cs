@@ -25,6 +25,7 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Runner.Generators.Generic;
 using FluentMigrator.Model;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.SqlAnywhere;
 
 using JetBrains.Annotations;
@@ -36,7 +37,7 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
     public class SqlAnywhere16Generator : GenericGenerator
     {
         public SqlAnywhere16Generator()
-            : this(new SqlAnywhereQuoter())
+            : this(new SqlAnywhereQuoter(new OptionsWrapper<QuoterOptions>(new QuoterOptions())))
         {
         }
 
@@ -49,7 +50,7 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
         public SqlAnywhere16Generator(
             [NotNull] SqlAnywhereQuoter quoter,
             [NotNull] IOptions<GeneratorOptions> generatorOptions)
-            : this(new SqlAnywhereColumn(new SqlAnywhere16TypeMap()), quoter, new EmptyDescriptionGenerator(), generatorOptions)
+            : this(new SqlAnywhereColumn(new SqlAnywhere16TypeMap(), quoter), quoter, new EmptyDescriptionGenerator(), generatorOptions)
         {
         }
 
