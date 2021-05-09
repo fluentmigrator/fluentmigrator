@@ -17,6 +17,7 @@
 using System;
 
 using FluentMigrator.Runner.Generators.MySql;
+using FluentMigrator.Runner.Initialization;
 
 namespace FluentMigrator.Runner.Processors.MySql
 {
@@ -37,7 +38,7 @@ namespace FluentMigrator.Runner.Processors.MySql
         }
 
         [Obsolete]
-        public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
+        public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options, QuoterOptions quoterOptions = null)
         {
             var factory = new MySqlDbFactory(_serviceProvider);
             var connection = factory.CreateConnection(connectionString);

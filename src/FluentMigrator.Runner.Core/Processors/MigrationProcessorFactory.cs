@@ -16,6 +16,8 @@
 
 using System;
 
+using FluentMigrator.Runner.Initialization;
+
 namespace FluentMigrator.Runner.Processors
 {
     [Obsolete]
@@ -24,7 +26,7 @@ namespace FluentMigrator.Runner.Processors
         public virtual string Name => GetType().Name.Replace("ProcessorFactory", string.Empty);
 
         [Obsolete]
-        public abstract IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options);
+        public abstract IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options, QuoterOptions quoterOptions = null);
 
         [Obsolete]
         public virtual bool IsForProvider(string provider)

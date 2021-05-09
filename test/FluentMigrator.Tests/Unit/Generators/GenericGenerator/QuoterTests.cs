@@ -251,7 +251,7 @@ namespace FluentMigrator.Tests.Unit.Generators.GenericGenerator
         [Test]
         public void ShouldEscapeSqlServerObjectNames()
         {
-            SqlServer2000Quoter quoter = new SqlServer2000Quoter();
+            SqlServer2000Quoter quoter = new SqlServer2000Quoter(new QuoterOptions());
             quoter.Quote("[Table]Name").ShouldBe("[[Table]]Name]");
         }
 

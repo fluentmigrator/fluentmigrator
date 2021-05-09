@@ -19,6 +19,7 @@
 using System;
 
 using FluentMigrator.Runner.Generators.Postgres;
+using FluentMigrator.Runner.Initialization;
 
 namespace FluentMigrator.Runner.Processors.Postgres
 {
@@ -39,7 +40,7 @@ namespace FluentMigrator.Runner.Processors.Postgres
         }
 
         [Obsolete]
-        public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
+        public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options, QuoterOptions quoterOptions = null)
         {
             var optionsParsed = PostgresOptions.ParseProviderSwitches(options.ProviderSwitches);
             var factory = new PostgresDbFactory(_serviceProvider);

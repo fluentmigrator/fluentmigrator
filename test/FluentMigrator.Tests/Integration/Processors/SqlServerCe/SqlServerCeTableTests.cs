@@ -26,6 +26,7 @@ using FluentMigrator.Runner.Processors.SqlServer;
 using FluentMigrator.Tests.Helpers;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 using NUnit.Framework;
 
@@ -44,11 +45,12 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
         private ServiceProvider ServiceProvider { get; set; }
         private IServiceScope ServiceScope { get; set; }
         private SqlServerCeProcessor Processor { get; set; }
+        private QuoterOptions QuoterOptions { get; set; }
 
         [Test]
         public override void CallingTableExistsCanAcceptTableNameWithSingleQuote()
         {
-            using (var table = new SqlServerCeTestTable("Test'Table", Processor, "id int"))
+            using (var table = new SqlServerCeTestTable("Test'Table", Processor, QuoterOptions, "id int"))
                 Processor.TableExists("NOTUSED", table.Name).ShouldBeTrue();
         }
 
@@ -67,14 +69,14 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
         [Test]
         public override void CallingTableExistsReturnsTrueIfTableExists()
         {
-            using (var table = new SqlServerCeTestTable(Processor, "id int"))
+            using (var table = new SqlServerCeTestTable(Processor, QuoterOptions, "id int"))
                 Processor.TableExists(null, table.Name).ShouldBeTrue();
         }
 
         [Test]
         public override void CallingTableExistsReturnsTrueIfTableExistsWithSchema()
         {
-            using (var table = new SqlServerCeTestTable(Processor, "id int"))
+            using (var table = new SqlServerCeTestTable(Processor, QuoterOptions, "id int"))
                 Processor.TableExists("NOTUSED", table.Name).ShouldBeTrue();
         }
 
@@ -115,6 +117,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
 
             ServiceScope = ServiceProvider.CreateScope();
             Processor = ServiceScope.ServiceProvider.GetRequiredService<SqlServerCeProcessor>();
+            QuoterOptions = ServiceScope.ServiceProvider.GetRequiredService<IOptions<QuoterOptions>>().Value;
         }
 
         [TearDown]

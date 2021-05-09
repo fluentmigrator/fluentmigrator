@@ -19,6 +19,7 @@
 using System;
 
 using FluentMigrator.Runner.Generators.Hana;
+using FluentMigrator.Runner.Initialization;
 
 namespace FluentMigrator.Runner.Processors.Hana
 {
@@ -38,7 +39,7 @@ namespace FluentMigrator.Runner.Processors.Hana
         }
 
         [Obsolete]
-        public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
+        public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options, QuoterOptions quoterOptions = null)
         {
             var factory = new HanaDbFactory(_serviceProvider);
 

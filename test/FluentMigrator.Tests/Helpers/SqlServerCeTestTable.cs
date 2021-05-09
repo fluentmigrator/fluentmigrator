@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.Runner.Generators;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.SqlServer;
 
 namespace FluentMigrator.Tests.Helpers
@@ -17,19 +18,19 @@ namespace FluentMigrator.Tests.Helpers
         private List<string> constraints = new List<string>();
         private List<string> indexies = new List<string>();
 
-        public SqlServerCeTestTable(string table, SqlServerCeProcessor processor, params string[] columnDefinitions)
+        public SqlServerCeTestTable(string table, SqlServerCeProcessor processor, QuoterOptions quoterOptions, params string[] columnDefinitions)
         {
             Connection = (SqlCeConnection)processor.Connection;
-            Quoter = new SqlServer2000Quoter();
+            Quoter = new SqlServer2000Quoter(quoterOptions);
 
             Name = table;
             Create(columnDefinitions);
         }
 
-        public SqlServerCeTestTable(SqlServerCeProcessor processor, params string[] columnDefinitions)
+        public SqlServerCeTestTable(SqlServerCeProcessor processor, QuoterOptions quoterOptions, params string[] columnDefinitions)
         {
             Connection = (SqlCeConnection)processor.Connection;
-            Quoter = new SqlServer2000Quoter();
+            Quoter = new SqlServer2000Quoter(quoterOptions);
 
             Name = "TestTable";
             Create(columnDefinitions);

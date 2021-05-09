@@ -14,10 +14,24 @@
 // limitations under the License.
 #endregion
 
+using FluentMigrator.Runner.Initialization;
+
+using Microsoft.Extensions.Options;
+
 namespace FluentMigrator.Runner.Generators.SqlServer
 {
     public class SqlServer2008Quoter : SqlServer2005Quoter
     {
+        public SqlServer2008Quoter(IOptions<QuoterOptions> options)
+            : base(options.Value)
+        {
+        }
+
+        public SqlServer2008Quoter(QuoterOptions options)
+            : base(options)
+        {
+        }
+
         public override string FormatSystemMethods(SystemMethods value)
         {
             switch (value)

@@ -19,6 +19,7 @@
 using System;
 
 using FluentMigrator.Runner.Generators.Firebird;
+using FluentMigrator.Runner.Initialization;
 
 using Microsoft.Extensions.Options;
 
@@ -47,7 +48,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
         public FirebirdOptions FbOptions { get; set; }
 
         [Obsolete]
-        public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
+        public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options, QuoterOptions quoterOptions = null)
         {
             var fbOpt = ((FirebirdOptions) FbOptions.Clone())
                 .ApplyProviderSwitches(options.ProviderSwitches);

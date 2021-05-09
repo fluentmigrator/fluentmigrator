@@ -26,6 +26,7 @@ using FluentMigrator.Runner.Processors.SqlServer;
 using FluentMigrator.Tests.Helpers;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 using NUnit.Framework;
 
@@ -44,11 +45,12 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
         private ServiceProvider ServiceProvider { get; set; }
         private IServiceScope ServiceScope { get; set; }
         private SqlServerCeProcessor Processor { get; set; }
+        private QuoterOptions QuoterOptions { get; set; }
 
         [Test]
         public override void CallingIndexExistsCanAcceptIndexNameWithSingleQuote()
         {
-            using (var table = new SqlServerCeTestTable(Processor, "id int"))
+            using (var table = new SqlServerCeTestTable(Processor, QuoterOptions, "id int"))
             {
                 table.WithIndexOn("id", "UI'id");
                 Processor.IndexExists("NOTUSED", table.Name, "UI'id").ShouldBeTrue();
@@ -58,7 +60,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
         [Test]
         public override void CallingIndexExistsCanAcceptTableNameWithSingleQuote()
         {
-            using (var table = new SqlServerCeTestTable("Test'Table", Processor, "id int"))
+            using (var table = new SqlServerCeTestTable("Test'Table", Processor, QuoterOptions, "id int"))
             {
                 table.WithIndexOn("id");
                 Processor.IndexExists("NOTUSED", table.Name, "UI_id").ShouldBeTrue();
@@ -68,7 +70,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
         [Test]
         public override void CallingIndexExistsReturnsFalseIfIndexDoesNotExist()
         {
-            using (var table = new SqlServerCeTestTable(Processor, "id int"))
+            using (var table = new SqlServerCeTestTable(Processor, QuoterOptions, "id int"))
             {
                 table.WithIndexOn("id");
                 Processor.IndexExists(null, table.Name, "DoesNotExist").ShouldBeFalse();
@@ -78,7 +80,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
         [Test]
         public override void CallingIndexExistsReturnsFalseIfIndexDoesNotExistWithSchema()
         {
-            using (var table = new SqlServerCeTestTable(Processor, "id int"))
+            using (var table = new SqlServerCeTestTable(Processor, QuoterOptions, "id int"))
             {
                 table.WithIndexOn("id");
                 Processor.IndexExists("NOTUSED", table.Name, "DoesNotExist").ShouldBeFalse();
@@ -101,7 +103,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
         [Test]
         public override void CallingIndexExistsReturnsTrueIfIndexExists()
         {
-            using (var table = new SqlServerCeTestTable(Processor, "id int"))
+            using (var table = new SqlServerCeTestTable(Processor, QuoterOptions, "id int"))
             {
                 table.WithIndexOn("id");
                 Processor.IndexExists(null, table.Name, "UI_id").ShouldBeTrue();
@@ -111,7 +113,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
         [Test]
         public override void CallingIndexExistsReturnsTrueIfIndexExistsWithSchema()
         {
-            using (var table = new SqlServerCeTestTable(Processor, "id int"))
+            using (var table = new SqlServerCeTestTable(Processor, QuoterOptions, "id int"))
             {
                 table.WithIndexOn("id");
                 Processor.IndexExists("NOTUSED", table.Name, "UI_id").ShouldBeTrue();
@@ -155,6 +157,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
 
             ServiceScope = ServiceProvider.CreateScope();
             Processor = ServiceScope.ServiceProvider.GetRequiredService<SqlServerCeProcessor>();
+            QuoterOptions = ServiceScope.ServiceProvider.GetRequiredService<IOptions<QuoterOptions>>().Value;
         }
 
         [TearDown]

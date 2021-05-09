@@ -21,6 +21,7 @@ using System;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators.Oracle;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Oracle;
 
@@ -55,7 +56,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle
         public void CreateProcessorWithNoProviderSwitchesShouldUseOracleQuoter(string providerSwitches)
         {
             _options.ProviderSwitches = providerSwitches;
-            var processor = _factory.Create(_connectionString, _announcer, _options);
+            var processor = _factory.Create(_connectionString, _announcer, _options, new QuoterOptions());
             Assert.That(((OracleProcessor) processor).Quoter, Is.InstanceOf<OracleQuoter>());
         }
 
@@ -69,7 +70,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle
             string providerSwitches)
         {
             _options.ProviderSwitches = providerSwitches;
-            var processor = _factory.Create(_connectionString, _announcer, _options);
+            var processor = _factory.Create(_connectionString, _announcer, _options, new QuoterOptions());
             Assert.That(((OracleProcessor) processor).Quoter, Is.InstanceOf<OracleQuoterQuotedIdentifier>());
         }
     }

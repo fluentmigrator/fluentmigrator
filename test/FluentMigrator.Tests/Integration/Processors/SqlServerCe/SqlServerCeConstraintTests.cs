@@ -26,6 +26,7 @@ using FluentMigrator.Runner.Processors.SqlServer;
 using FluentMigrator.Tests.Helpers;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 using NUnit.Framework;
 
@@ -44,11 +45,12 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
         private ServiceProvider ServiceProvider { get; set; }
         private IServiceScope ServiceScope { get; set; }
         private SqlServerCeProcessor Processor { get; set; }
+        private QuoterOptions QuoterOptions { get; set; }
 
         [Test]
         public override void CallingConstraintExistsCanAcceptConstraintNameWithSingleQuote()
         {
-            using (var table = new SqlServerCeTestTable(Processor, "id int"))
+            using (var table = new SqlServerCeTestTable(Processor, QuoterOptions, "id int"))
             {
                 table.WithUniqueConstraintOn("id", "UC'id");
                 Processor.ConstraintExists("NOTUSED", table.Name, "UC'id").ShouldBeTrue();
@@ -58,7 +60,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
         [Test]
         public override void CallingConstraintExistsCanAcceptTableNameWithSingleQuote()
         {
-            using (var table = new SqlServerCeTestTable("Test'Table", Processor, "id int"))
+            using (var table = new SqlServerCeTestTable("Test'Table", Processor, QuoterOptions, "id int"))
             {
                 table.WithUniqueConstraintOn("id");
                 Processor.ConstraintExists("NOTUSED", table.Name, "UC_id").ShouldBeTrue();
@@ -68,7 +70,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
         [Test]
         public override void CallingConstraintExistsReturnsFalseIfConstraintDoesNotExist()
         {
-            using (var table = new SqlServerCeTestTable(Processor, "id int"))
+            using (var table = new SqlServerCeTestTable(Processor, QuoterOptions, "id int"))
             {
                 table.WithUniqueConstraintOn("id");
                 Processor.ConstraintExists(null, table.Name, "DoesNotExist").ShouldBeFalse();
@@ -78,7 +80,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
         [Test]
         public override void CallingConstraintExistsReturnsFalseIfConstraintDoesNotExistWithSchema()
         {
-            using (var table = new SqlServerCeTestTable(Processor, "id int"))
+            using (var table = new SqlServerCeTestTable(Processor, QuoterOptions, "id int"))
             {
                 table.WithUniqueConstraintOn("id");
                 Processor.ConstraintExists("NotUsed", table.Name, "DoesNotExist").ShouldBeFalse();
@@ -100,7 +102,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
         [Test]
         public override void CallingConstraintExistsReturnsTrueIfConstraintExists()
         {
-            using (var table = new SqlServerCeTestTable(Processor, "id int"))
+            using (var table = new SqlServerCeTestTable(Processor, QuoterOptions, "id int"))
             {
                 table.WithUniqueConstraintOn("id");
                 Processor.ConstraintExists(null, table.Name, "UC_id").ShouldBeTrue();
@@ -111,7 +113,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
         [Test]
         public override void CallingConstraintExistsReturnsTrueIfConstraintExistsWithSchema()
         {
-            using (var table = new SqlServerCeTestTable(Processor, "id int"))
+            using (var table = new SqlServerCeTestTable(Processor, QuoterOptions, "id int"))
             {
                 table.WithUniqueConstraintOn("id");
                 Processor.ConstraintExists("NOTUSED", table.Name, "UC_id").ShouldBeTrue();
@@ -155,6 +157,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
 
             ServiceScope = ServiceProvider.CreateScope();
             Processor = ServiceScope.ServiceProvider.GetRequiredService<SqlServerCeProcessor>();
+            QuoterOptions = ServiceScope.ServiceProvider.GetRequiredService<IOptions<QuoterOptions>>().Value;
         }
 
         [TearDown]

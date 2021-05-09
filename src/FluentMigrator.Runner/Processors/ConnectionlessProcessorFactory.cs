@@ -55,7 +55,7 @@ namespace FluentMigrator.Runner.Processors
 
         /// <inheritdoc />
         [Obsolete]
-        public IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
+        public IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options, QuoterOptions quoterOptions = null)
         {
             var processorOptions = options.GetProcessorOptions(connectionString);
             return new ConnectionlessProcessor(

@@ -19,6 +19,7 @@
 using System;
 
 using FluentMigrator.Runner.Generators.SQLite;
+using FluentMigrator.Runner.Initialization;
 
 namespace FluentMigrator.Runner.Processors.SQLite
 {
@@ -39,7 +40,7 @@ namespace FluentMigrator.Runner.Processors.SQLite
         }
 
         [Obsolete]
-        public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
+        public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options, QuoterOptions quoterOptions = null)
         {
             var factory = new SQLiteDbFactory(_serviceProvider);
             var connection = factory.CreateConnection(connectionString);

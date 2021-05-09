@@ -20,6 +20,7 @@
 using System.Linq;
 using FluentMigrator.Exceptions;
 using FluentMigrator.Expressions;
+using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
@@ -30,7 +31,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
     public class SqlServerCeGenerator : SqlServer2000Generator
     {
         public SqlServerCeGenerator()
-            : this(new SqlServer2000Quoter())
+            : this(new SqlServer2000Quoter(new QuoterOptions()))
         {
         }
 

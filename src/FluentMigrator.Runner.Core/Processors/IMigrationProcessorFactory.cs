@@ -18,6 +18,8 @@
 
 using System;
 
+using FluentMigrator.Runner.Initialization;
+
 using JetBrains.Annotations;
 
 namespace FluentMigrator.Runner.Processors
@@ -27,7 +29,7 @@ namespace FluentMigrator.Runner.Processors
     {
         [Obsolete]
         [NotNull]
-        IMigrationProcessor Create(string connectionString, [NotNull] IAnnouncer announcer, [NotNull] IMigrationProcessorOptions options);
+        IMigrationProcessor Create(string connectionString, [NotNull] IAnnouncer announcer, [NotNull] IMigrationProcessorOptions options, [CanBeNull] QuoterOptions quoterOptions = null);
 
         /// <summary>
         /// Returns a value indicating whether this processor factory can use the given DB provider

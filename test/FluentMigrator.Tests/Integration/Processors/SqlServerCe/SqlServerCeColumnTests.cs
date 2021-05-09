@@ -27,6 +27,7 @@ using FluentMigrator.Runner.Processors.SqlServer;
 using FluentMigrator.Tests.Helpers;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 using NUnit.Framework;
 
@@ -46,11 +47,12 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
         private IServiceScope ServiceScope { get; set; }
         private SqlServerCeProcessor Processor { get; set; }
         private SqlServer2000Quoter Quoter { get; set; }
+        private QuoterOptions QuoterOptions { get; set; }
 
         [Test]
         public override void CallingColumnExistsCanAcceptColumnNameWithSingleQuote()
         {
-            using (var table = new SqlServerCeTestTable(Processor, Quoter.QuoteColumnName("i'd") + " int"))
+            using (var table = new SqlServerCeTestTable(Processor, QuoterOptions, Quoter.QuoteColumnName("i'd") + " int"))
             {
                 Processor.ColumnExists("NOTUSED", table.Name, "i'd").ShouldBeTrue();
             }
@@ -59,7 +61,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
         [Test]
         public override void CallingColumnExistsCanAcceptTableNameWithSingleQuote()
         {
-            using (var table = new SqlServerCeTestTable("Test'Table", Processor, Quoter.QuoteColumnName("id") + " int"))
+            using (var table = new SqlServerCeTestTable("Test'Table", Processor, QuoterOptions, Quoter.QuoteColumnName("id") + " int"))
             {
                 Processor.ColumnExists("NOTUSED", table.Name, "id").ShouldBeTrue();
             }
@@ -68,7 +70,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
         [Test]
         public override void CallingColumnExistsReturnsFalseIfColumnDoesNotExist()
         {
-            using (var table = new SqlServerCeTestTable(Processor, "id int"))
+            using (var table = new SqlServerCeTestTable(Processor, QuoterOptions, "id int"))
             {
                 Processor.ColumnExists(null, table.Name, "DoesNotExist").ShouldBeFalse();
             }
@@ -77,7 +79,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
         [Test]
         public override void CallingColumnExistsReturnsFalseIfColumnDoesNotExistWithSchema()
         {
-            using (var table = new SqlServerCeTestTable(Processor, "id int"))
+            using (var table = new SqlServerCeTestTable(Processor, QuoterOptions, "id int"))
             {
                 Processor.ColumnExists("NOTUSED", table.Name, "DoesNotExist").ShouldBeFalse();
             }
@@ -98,7 +100,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
         [Test]
         public override void CallingColumnExistsReturnsTrueIfColumnExists()
         {
-            using (var table = new SqlServerCeTestTable(Processor, Quoter.QuoteColumnName("id") + " int"))
+            using (var table = new SqlServerCeTestTable(Processor, QuoterOptions, Quoter.QuoteColumnName("id") + " int"))
             {
                 Processor.ColumnExists(null, table.Name, "id").ShouldBeTrue();
             }
@@ -107,7 +109,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
         [Test]
         public override void CallingColumnExistsReturnsTrueIfColumnExistsWithSchema()
         {
-            using (var table = new SqlServerCeTestTable(Processor, Quoter.QuoteColumnName("id") + " int"))
+            using (var table = new SqlServerCeTestTable(Processor, QuoterOptions, Quoter.QuoteColumnName("id") + " int"))
             {
                 Processor.ColumnExists("NOTUSED", table.Name, "id").ShouldBeTrue();
             }
@@ -153,6 +155,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
             ServiceScope = ServiceProvider.CreateScope();
             Processor = ServiceScope.ServiceProvider.GetRequiredService<SqlServerCeProcessor>();
             Quoter = ServiceScope.ServiceProvider.GetRequiredService<SqlServer2000Quoter>();
+            QuoterOptions = ServiceScope.ServiceProvider.GetRequiredService<IOptions<QuoterOptions>>().Value;
         }
 
         [TearDown]

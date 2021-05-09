@@ -17,6 +17,7 @@
 using System;
 
 using FluentMigrator.Runner.Generators.SqlAnywhere;
+using FluentMigrator.Runner.Initialization;
 
 namespace FluentMigrator.Runner.Processors.SqlAnywhere
 {
@@ -24,7 +25,7 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
     public class SqlAnywhere16ProcessorFactory : MigrationProcessorFactory
     {
         [Obsolete]
-        public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
+        public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options, QuoterOptions quoterOptions = null)
         {
             var factory = new SqlAnywhereDbFactory();
             var connection = factory.CreateConnection(connectionString);

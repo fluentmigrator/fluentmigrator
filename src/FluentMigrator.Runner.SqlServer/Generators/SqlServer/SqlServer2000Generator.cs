@@ -23,6 +23,7 @@ using System.Text;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators.Generic;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.SqlServer;
 
 using JetBrains.Annotations;
@@ -34,7 +35,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
     public class SqlServer2000Generator : GenericGenerator
     {
         public SqlServer2000Generator()
-            : this(new SqlServer2000Quoter())
+            : this(new SqlServer2000Quoter(new QuoterOptions()))
         {
         }
 

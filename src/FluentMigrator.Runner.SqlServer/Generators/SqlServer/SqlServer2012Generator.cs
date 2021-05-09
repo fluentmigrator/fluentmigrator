@@ -19,6 +19,8 @@
 
 using System.Text;
 
+using FluentMigrator.Runner.Initialization;
+
 using JetBrains.Annotations;
 
 using Microsoft.Extensions.Options;
@@ -28,7 +30,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
     public class SqlServer2012Generator : SqlServer2008Generator
     {
         public SqlServer2012Generator()
-            : this(new SqlServer2008Quoter())
+            : this(new SqlServer2008Quoter(new QuoterOptions()))
         {
         }
 

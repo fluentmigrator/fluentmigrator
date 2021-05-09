@@ -17,6 +17,7 @@
 using System;
 
 using FluentMigrator.Runner.Generators.SqlServer;
+using FluentMigrator.Runner.Initialization;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
@@ -26,11 +27,11 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         private static readonly string[] _dbTypes = {"SqlServer2016", "SqlServer"};
 
         [Obsolete]
-        public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
+        public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options, QuoterOptions quoterOptions = null)
         {
             var factory = new SqlServerDbFactory();
             var connection = factory.CreateConnection(connectionString);
-            return new SqlServerProcessor(_dbTypes, connection, new SqlServer2016Generator(new SqlServer2008Quoter()), announcer, options, factory);
+            return new SqlServerProcessor(_dbTypes, connection, new SqlServer2016Generator(new SqlServer2008Quoter(quoterOptions)), announcer, options, factory);
         }
     }
 }

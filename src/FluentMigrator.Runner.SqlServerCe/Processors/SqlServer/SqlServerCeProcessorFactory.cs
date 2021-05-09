@@ -22,6 +22,7 @@
 using System;
 
 using FluentMigrator.Runner.Generators.SqlServer;
+using FluentMigrator.Runner.Initialization;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
@@ -42,11 +43,11 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         }
 
         [Obsolete]
-        public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
+        public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options, QuoterOptions quoterOptions = null)
         {
             var factory = new SqlServerCeDbFactory(_serviceProvider);
             var connection = factory.CreateConnection(connectionString);
-            return new SqlServerCeProcessor(connection, new SqlServerCeGenerator(new SqlServer2000Quoter()), announcer, options, factory);
+            return new SqlServerCeProcessor(connection, new SqlServerCeGenerator(new SqlServer2000Quoter(quoterOptions)), announcer, options, factory);
         }
     }
 }

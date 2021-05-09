@@ -25,6 +25,7 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Model;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.SqlServer;
 
 using JetBrains.Annotations;
@@ -44,7 +45,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         };
 
         public SqlServer2005Generator()
-            : this(new SqlServer2005Quoter())
+            : this(new SqlServer2005Quoter(new QuoterOptions()))
         {
         }
 
