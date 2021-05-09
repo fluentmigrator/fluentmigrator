@@ -59,7 +59,6 @@ namespace FluentMigrator.Tests.Unit.Generators.GenericGenerator
         private enum Foo
         {
             Bar,
-            // ReSharper disable once UnusedMember.Local
             Baz
         }
 
@@ -185,6 +184,18 @@ namespace FluentMigrator.Tests.Unit.Generators.GenericGenerator
         {
             CreateFixture().QuoteValue(Foo.Bar)
                 .ShouldBe("'Bar'");
+        }
+
+        [Test]
+        public void EnumIsFormatterAsUnterlyingType()
+        {
+            var options = new QuoterOptions
+            {
+                EnumAsString = false
+            };
+
+            CreateFixture(options).QuoteValue(Foo.Baz)
+                .ShouldBe("1");
         }
 
         [Test]

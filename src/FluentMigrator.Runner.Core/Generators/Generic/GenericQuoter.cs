@@ -16,6 +16,8 @@
 
 using System.Globalization;
 
+using FluentMigrator.Runner.Initialization;
+
 using JetBrains.Annotations;
 
 namespace FluentMigrator.Runner.Generators.Generic
@@ -24,6 +26,13 @@ namespace FluentMigrator.Runner.Generators.Generic
 
     public class GenericQuoter : IQuoter
     {
+        private readonly QuoterOptions _quoterOptions;
+
+        public GenericQuoter(QuoterOptions quoterOptions = null)
+        {
+            _quoterOptions = quoterOptions;
+        }
+
         /// <inheritdoc />
         public virtual string QuoteValue(object value)
         {
@@ -146,7 +155,11 @@ namespace FluentMigrator.Runner.Generators.Generic
 
         public virtual string FormatEnum(object value)
         {
-            return ValueQuote + value + ValueQuote;
+            if (_quoterOptions.EnumAsString)
+                return ValueQuote + value + ValueQuote;
+
+            var underlyingType = Enum.GetUnderlyingType(value.GetType());
+            return Convert.ChangeType(value, underlyingType).ToString();
         }
 
         public virtual string ValueQuote { get { return "'"; } }
