@@ -31,7 +31,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
     public class SqlServerCeGenerator : SqlServer2000Generator
     {
         public SqlServerCeGenerator()
-            : this(new SqlServer2000Quoter(new QuoterOptions()))
+            : this(new SqlServer2000Quoter(new OptionsWrapper<QuoterOptions>(new QuoterOptions())))
         {
         }
 

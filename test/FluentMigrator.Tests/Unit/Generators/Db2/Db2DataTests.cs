@@ -14,9 +14,10 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
     [TestFixture]
     public class Db2DataTests : BaseDataTests
     {
-        private static Db2Generator CreateFixture(QuoterOptions quoterOptions = null)
+        private static Db2Generator CreateFixture(QuoterOptions options = null)
         {
             var generatorOptions = new OptionsWrapper<GeneratorOptions>(new GeneratorOptions());
+            var quoterOptions = new OptionsWrapper<QuoterOptions>(options);
             return new Db2Generator(new Db2ISeriesQuoter(quoterOptions), generatorOptions);
         }
 

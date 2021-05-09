@@ -26,7 +26,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
         public void Setup()
         {
             var generatorOptions = new OptionsWrapper<GeneratorOptions>(new GeneratorOptions());
-            Generator = new Db2Generator(new Db2ISeriesQuoter(new QuoterOptions()), generatorOptions);
+            Generator = new Db2Generator(new Db2ISeriesQuoter(new OptionsWrapper<QuoterOptions>(new QuoterOptions())), generatorOptions);
         }
 
         [Test]

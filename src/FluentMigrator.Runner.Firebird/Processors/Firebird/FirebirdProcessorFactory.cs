@@ -48,13 +48,14 @@ namespace FluentMigrator.Runner.Processors.Firebird
         public FirebirdOptions FbOptions { get; set; }
 
         [Obsolete]
-        public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options, QuoterOptions quoterOptions = null)
+        public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
         {
             var fbOpt = ((FirebirdOptions) FbOptions.Clone())
                 .ApplyProviderSwitches(options.ProviderSwitches);
             var factory = new FirebirdDbFactory(_serviceProvider);
             var connection = factory.CreateConnection(connectionString);
-            return new FirebirdProcessor(connection, new FirebirdGenerator(FbOptions, new OptionsWrapper<QuoterOptions>(quoterOptions)), announcer, options, factory, fbOpt, quoterOptions);
+            var quoterOptions = new OptionsWrapper<QuoterOptions>(new QuoterOptions());
+            return new FirebirdProcessor(connection, new FirebirdGenerator(FbOptions, quoterOptions), announcer, options, factory, fbOpt, quoterOptions);
         }
     }
 }

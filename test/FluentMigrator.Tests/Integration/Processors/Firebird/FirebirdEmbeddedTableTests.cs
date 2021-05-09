@@ -432,8 +432,8 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                     var announcer = new TextWriterAnnouncer(TestContext.Out) { ShowSql = true };
                     var options = FirebirdOptions.AutoCommitBehaviour();
                     options.TruncateLongNames = false;
-                    var quoterOptions = new QuoterOptions();
-                    var processor = new FirebirdProcessor(connection, new FirebirdGenerator(options, new OptionsWrapper<QuoterOptions>(quoterOptions)), announcer,
+                    var quoterOptions = new OptionsWrapper<QuoterOptions>(new QuoterOptions());
+                    var processor = new FirebirdProcessor(connection, new FirebirdGenerator(options, quoterOptions), announcer,
                         new ProcessorOptions(), new FirebirdDbFactory(), options, quoterOptions);
                     var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), runnerContext, processor);
                     runner.Up(new MigrationWhichCreatesTwoRelatedTables());
@@ -448,8 +448,8 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                 {
                     var announcer = new TextWriterAnnouncer(TestContext.Out) { ShowSql = true };
                     var options = FirebirdOptions.AutoCommitBehaviour();
-                    var quoterOptions = new QuoterOptions();
-                    var processor = new FirebirdProcessor(connection, new FirebirdGenerator(options, new OptionsWrapper<QuoterOptions>(quoterOptions)), announcer,
+                    var quoterOptions = new OptionsWrapper<QuoterOptions>(new QuoterOptions());
+                    var processor = new FirebirdProcessor(connection, new FirebirdGenerator(options, quoterOptions), announcer,
                         new ProcessorOptions(), new FirebirdDbFactory(), options, quoterOptions);
                     var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), runnerContext, processor);
                     runner.Up(new MigrationWhichAltersTableWithFK());

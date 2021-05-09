@@ -29,6 +29,8 @@ using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.Runner.Generators.SQLite;
 using FluentMigrator.Runner.Initialization;
 
+using Microsoft.Extensions.Options;
+
 using NUnit.Framework;
 
 using Shouldly;
@@ -41,7 +43,7 @@ namespace FluentMigrator.Tests.Unit.Generators.GenericGenerator
         private readonly CultureInfo _currentCulture = Thread.CurrentThread.CurrentCulture;
 
         private static IQuoter CreateFixture(QuoterOptions options = null) =>
-            new GenericQuoter(options);
+            new GenericQuoter(new OptionsWrapper<QuoterOptions>(options));
 
         private void RestoreCulture()
         {
@@ -251,7 +253,7 @@ namespace FluentMigrator.Tests.Unit.Generators.GenericGenerator
         [Test]
         public void ShouldEscapeSqlServerObjectNames()
         {
-            SqlServer2000Quoter quoter = new SqlServer2000Quoter(new QuoterOptions());
+            SqlServer2000Quoter quoter = new SqlServer2000Quoter(new OptionsWrapper<QuoterOptions>(new QuoterOptions()));
             quoter.Quote("[Table]Name").ShouldBe("[[Table]]Name]");
         }
 

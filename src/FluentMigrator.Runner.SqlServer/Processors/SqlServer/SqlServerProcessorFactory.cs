@@ -3,6 +3,8 @@ using System;
 using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.Runner.Initialization;
 
+using Microsoft.Extensions.Options;
+
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
     [Obsolete]
@@ -16,10 +18,14 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         }
 
         [Obsolete]
-        public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options, QuoterOptions quoterOptions = null)
+        public override IMigrationProcessor Create(
+            string connectionString,
+            IAnnouncer announcer,
+            IMigrationProcessorOptions options)
         {
             var factory = new SqlServerDbFactory();
             var connection = factory.CreateConnection(connectionString);
+            var quoterOptions = new OptionsWrapper<QuoterOptions>(new QuoterOptions());
             return new SqlServerProcessor(_dbTypes, connection, new SqlServer2016Generator(new SqlServer2008Quoter(quoterOptions)), announcer, options, factory);
         }
 

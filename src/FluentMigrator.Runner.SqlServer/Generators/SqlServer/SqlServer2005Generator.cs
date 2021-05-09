@@ -45,7 +45,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         };
 
         public SqlServer2005Generator()
-            : this(new SqlServer2005Quoter(new QuoterOptions()))
+            : this(new SqlServer2005Quoter(new OptionsWrapper<QuoterOptions>(new QuoterOptions())))
         {
         }
 

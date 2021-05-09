@@ -7,6 +7,8 @@ using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.SqlServer;
 
+using Microsoft.Extensions.Options;
+
 namespace FluentMigrator.Tests.Helpers
 {
 
@@ -21,7 +23,7 @@ namespace FluentMigrator.Tests.Helpers
         public SqlServerCeTestTable(string table, SqlServerCeProcessor processor, QuoterOptions quoterOptions, params string[] columnDefinitions)
         {
             Connection = (SqlCeConnection)processor.Connection;
-            Quoter = new SqlServer2000Quoter(quoterOptions);
+            Quoter = new SqlServer2000Quoter(new OptionsWrapper<QuoterOptions>(quoterOptions));
 
             Name = table;
             Create(columnDefinitions);
@@ -30,7 +32,7 @@ namespace FluentMigrator.Tests.Helpers
         public SqlServerCeTestTable(SqlServerCeProcessor processor, QuoterOptions quoterOptions, params string[] columnDefinitions)
         {
             Connection = (SqlCeConnection)processor.Connection;
-            Quoter = new SqlServer2000Quoter(quoterOptions);
+            Quoter = new SqlServer2000Quoter(new OptionsWrapper<QuoterOptions>(quoterOptions));
 
             Name = "TestTable";
             Create(columnDefinitions);

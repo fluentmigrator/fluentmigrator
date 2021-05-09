@@ -40,7 +40,7 @@ namespace FluentMigrator.Runner.Processors.Postgres
         }
 
         [Obsolete]
-        public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options, QuoterOptions quoterOptions = null)
+        public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
         {
             var optionsParsed = PostgresOptions.ParseProviderSwitches(options.ProviderSwitches);
             var factory = new PostgresDbFactory(_serviceProvider);

@@ -32,7 +32,7 @@ namespace FluentMigrator.Runner.Generators.DB2
     public class Db2Generator : GenericGenerator
     {
         public Db2Generator()
-            : this(new Db2Quoter(new QuoterOptions()))
+            : this(new Db2Quoter(new OptionsWrapper<QuoterOptions>(new QuoterOptions())))
         {
         }
 

@@ -51,7 +51,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
         protected Dictionary<string, List<string>> DDLTouchedColumns;
 
         [Obsolete]
-        public FirebirdProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory, FirebirdOptions fbOptions, QuoterOptions quoterOptions)
+        public FirebirdProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory, FirebirdOptions fbOptions, IOptions<QuoterOptions> quoterOptions)
             : base(connection, factory, generator, announcer, options)
         {
             FBOptions = fbOptions ?? throw new ArgumentNullException(nameof(fbOptions));

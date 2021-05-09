@@ -20,6 +20,8 @@ using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.SqlServer;
 
+using Microsoft.Extensions.Options;
+
 using NUnit.Framework;
 
 using Shouldly;
@@ -30,7 +32,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
     public class SqlServerCeDataTests : BaseDataTests
     {
         private static SqlServerCeGenerator CreateFixture(QuoterOptions options = null) =>
-            new SqlServerCeGenerator(new SqlServer2000Quoter(options));
+            new SqlServerCeGenerator(new SqlServer2000Quoter(new OptionsWrapper<QuoterOptions>(options)));
 
         [Test]
         public override void CanDeleteDataForAllRowsWithCustomSchema()

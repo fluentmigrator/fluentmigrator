@@ -60,7 +60,7 @@ namespace FluentMigrator.Tests.Unit.Processors.SqlServer2016
             return new Processor(
                 MockedDbProviderFactory.Object,
                 logger,
-                new SqlServer2008Quoter(new QuoterOptions()),
+                new SqlServer2008Quoter(new OptionsWrapper<QuoterOptions>(new QuoterOptions())),
                 new SqlServer2016Generator(),
                 opt,
                 MockedConnectionStringAccessor.Object,

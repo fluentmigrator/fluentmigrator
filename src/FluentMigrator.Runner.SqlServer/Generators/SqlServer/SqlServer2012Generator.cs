@@ -30,7 +30,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
     public class SqlServer2012Generator : SqlServer2008Generator
     {
         public SqlServer2012Generator()
-            : this(new SqlServer2008Quoter(new QuoterOptions()))
+            : this(new SqlServer2008Quoter(new OptionsWrapper<QuoterOptions>(new QuoterOptions())))
         {
         }
 

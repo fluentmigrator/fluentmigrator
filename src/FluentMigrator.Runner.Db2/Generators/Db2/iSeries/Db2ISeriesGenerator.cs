@@ -23,7 +23,7 @@ namespace FluentMigrator.Runner.Generators.DB2.iSeries
     public class Db2ISeriesGenerator : Db2Generator
     {
         public Db2ISeriesGenerator()
-            : this(new Db2ISeriesQuoter(new QuoterOptions()))
+            : this(new Db2ISeriesQuoter(new OptionsWrapper<QuoterOptions>(new QuoterOptions())))
         {
         }
 

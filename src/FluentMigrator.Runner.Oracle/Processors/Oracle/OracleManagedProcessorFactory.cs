@@ -19,7 +19,6 @@
 using System;
 
 using FluentMigrator.Runner.Generators.Oracle;
-using FluentMigrator.Runner.Initialization;
 
 namespace FluentMigrator.Runner.Processors.Oracle
 {
@@ -40,7 +39,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
         }
 
         [Obsolete]
-        public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options, QuoterOptions quoterOptions = null)
+        public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
         {
             var factory = new OracleManagedDbFactory(_serviceProvider);
             var connection = factory.CreateConnection(connectionString);

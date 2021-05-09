@@ -40,7 +40,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         };
 
         public SqlServer2008Generator()
-            : this(new SqlServer2008Quoter(new QuoterOptions()))
+            : this(new SqlServer2008Quoter(new OptionsWrapper<QuoterOptions>(new QuoterOptions())))
         {
         }
 

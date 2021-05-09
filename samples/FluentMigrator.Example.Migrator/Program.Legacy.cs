@@ -48,7 +48,7 @@ namespace FluentMigrator.Example.Migrator
             var processor = MigrationProcessorFactoryProvider
                 .RegisteredFactories.Single(
                     x => string.Equals(x.Name, dbConfig.ProcessorId, StringComparison.OrdinalIgnoreCase))
-                .Create(dbConfig.ConnectionString, announcer, options, new QuoterOptions());
+                .Create(dbConfig.ConnectionString, announcer, options);
 #pragma warning restore 612
 
             // Configure the runner

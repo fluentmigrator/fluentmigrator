@@ -19,7 +19,6 @@
 using System;
 
 using FluentMigrator.Runner.Generators.Redshift;
-using FluentMigrator.Runner.Initialization;
 
 namespace FluentMigrator.Runner.Processors.Redshift
 {
@@ -40,7 +39,7 @@ namespace FluentMigrator.Runner.Processors.Redshift
         }
 
         [Obsolete]
-        public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options, QuoterOptions quoterOptions = null)
+        public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
         {
             var factory = new RedshiftDbFactory(_serviceProvider);
             var connection = factory.CreateConnection(connectionString);

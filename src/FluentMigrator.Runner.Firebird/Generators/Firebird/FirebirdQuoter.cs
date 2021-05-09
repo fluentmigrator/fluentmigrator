@@ -71,11 +71,11 @@ namespace FluentMigrator.Runner.Generators.Firebird
         public FirebirdQuoter(
             FirebirdOptions options,
             IOptions<QuoterOptions> quoterOptions)
-            : this(options.ForceQuote, quoterOptions.Value)
+            : this(options.ForceQuote, quoterOptions)
         {
         }
 
-        public FirebirdQuoter(bool forceQuote, QuoterOptions options)
+        public FirebirdQuoter(bool forceQuote, IOptions<QuoterOptions> options)
             : base(options)
         {
             _forceQuote = forceQuote;

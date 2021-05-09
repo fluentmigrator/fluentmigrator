@@ -27,11 +27,6 @@ namespace FluentMigrator.Runner.Generators.DB2.iSeries
         {
         }
 
-        public Db2ISeriesQuoter(QuoterOptions options)
-            : base(options)
-        {
-        }
-
         public override string QuoteConstraintName(string constraintName, string schemaName = null)
         {
             return CreateSchemaPrefixedQuotedIdentifier(

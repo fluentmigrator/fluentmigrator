@@ -25,11 +25,13 @@ using FluentMigrator.Runner.Generators.DB2;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.DB2;
 
+using Microsoft.Extensions.Options;
+
 namespace FluentMigrator.Tests.Helpers
 {
     public class Db2TestTable : IDisposable
     {
-        private readonly IQuoter _quoter = new Db2Quoter(new QuoterOptions());
+        private readonly IQuoter _quoter = new Db2Quoter(new OptionsWrapper<QuoterOptions>(new QuoterOptions()));
 
         private readonly string _schema;
 

@@ -25,11 +25,6 @@ namespace FluentMigrator.Runner.Generators.SqlServer
     public class SqlServer2005Quoter : SqlServer2000Quoter
     {
         public SqlServer2005Quoter(IOptions<QuoterOptions> options)
-            : base(options.Value)
-        {
-        }
-
-        public SqlServer2005Quoter(QuoterOptions options)
             : base(options)
         {
         }

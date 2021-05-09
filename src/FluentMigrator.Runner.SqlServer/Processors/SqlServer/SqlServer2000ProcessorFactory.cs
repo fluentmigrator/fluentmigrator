@@ -32,10 +32,11 @@ namespace FluentMigrator.Runner.Processors.SqlServer
     public class SqlServer2000ProcessorFactory : MigrationProcessorFactory
     {
         [Obsolete]
-        public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options, QuoterOptions quoterOptions = null)
+        public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
         {
             var factory = new SqlServerDbFactory();
             var connection = factory.CreateConnection(connectionString);
+            var quoterOptions = new OptionsWrapper<QuoterOptions>(new QuoterOptions());
             return new SqlServer2000Processor(connection, new SqlServer2000Generator(new SqlServer2000Quoter(quoterOptions)), announcer, options, factory);
         }
     }

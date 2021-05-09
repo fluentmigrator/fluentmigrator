@@ -20,6 +20,8 @@ using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
+using Microsoft.Extensions.Options;
+
 namespace FluentMigrator.Runner.Generators.Generic
 {
     using System;
@@ -28,9 +30,9 @@ namespace FluentMigrator.Runner.Generators.Generic
     {
         private readonly QuoterOptions _options;
 
-        public GenericQuoter([CanBeNull] QuoterOptions options = null)
+        public GenericQuoter([CanBeNull] IOptions<QuoterOptions> options = null)
         {
-            _options = options ?? new QuoterOptions();
+            _options = options?.Value ?? new QuoterOptions();
         }
 
         /// <inheritdoc />

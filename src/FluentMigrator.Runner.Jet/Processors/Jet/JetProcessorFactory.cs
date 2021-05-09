@@ -20,7 +20,6 @@ using System;
 using System.Data.OleDb;
 
 using FluentMigrator.Runner.Generators.Jet;
-using FluentMigrator.Runner.Initialization;
 
 namespace FluentMigrator.Runner.Processors.Jet
 {
@@ -28,7 +27,7 @@ namespace FluentMigrator.Runner.Processors.Jet
     public class JetProcessorFactory : MigrationProcessorFactory
     {
         [Obsolete]
-        public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options, QuoterOptions quoterOptions = null)
+        public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
         {
             var connection = new OleDbConnection(connectionString);
             return new JetProcessor(connection, new JetGenerator(new JetQuoter()), announcer, options);

@@ -26,11 +26,6 @@ namespace FluentMigrator.Runner.Generators.SqlServer
     public class SqlServer2000Quoter : GenericQuoter
     {
         public SqlServer2000Quoter(IOptions<QuoterOptions> options)
-            : base(options.Value)
-        {
-        }
-
-        public SqlServer2000Quoter(QuoterOptions options)
             : base(options)
         {
         }

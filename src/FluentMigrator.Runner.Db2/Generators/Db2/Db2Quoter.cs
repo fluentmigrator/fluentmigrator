@@ -28,11 +28,6 @@ namespace FluentMigrator.Runner.Generators.DB2
         public readonly char[] SpecialChars = "\"%'()*+|,{}-./:;<=>?^[]".ToCharArray();
 
         public Db2Quoter(IOptions<QuoterOptions> options)
-            : base(options.Value)
-        {
-        }
-
-        public Db2Quoter(QuoterOptions options)
             : base(options)
         {
         }

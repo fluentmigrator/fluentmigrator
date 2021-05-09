@@ -35,7 +35,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
     public class SqlServer2000Generator : GenericGenerator
     {
         public SqlServer2000Generator()
-            : this(new SqlServer2000Quoter(new QuoterOptions()))
+            : this(new SqlServer2000Quoter(new OptionsWrapper<QuoterOptions>(new QuoterOptions())))
         {
         }
 
