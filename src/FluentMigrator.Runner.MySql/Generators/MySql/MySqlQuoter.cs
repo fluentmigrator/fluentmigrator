@@ -15,11 +15,19 @@
 #endregion
 
 using FluentMigrator.Runner.Generators.Generic;
+using FluentMigrator.Runner.Initialization;
+
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Generators.MySql
 {
     public class MySqlQuoter : GenericQuoter
     {
+        public MySqlQuoter(IOptions<QuoterOptions> options)
+            : base(options)
+        {
+        }
+
         public override string OpenQuote { get { return "`"; } }
 
         public override string CloseQuote { get { return "`"; } }

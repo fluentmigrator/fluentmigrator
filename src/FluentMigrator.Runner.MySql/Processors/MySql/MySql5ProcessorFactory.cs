@@ -17,6 +17,9 @@
 using System;
 
 using FluentMigrator.Runner.Generators.MySql;
+using FluentMigrator.Runner.Initialization;
+
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.MySql
 {
@@ -41,7 +44,8 @@ namespace FluentMigrator.Runner.Processors.MySql
         {
             var factory = new MySqlDbFactory(_serviceProvider);
             var connection = factory.CreateConnection(connectionString);
-            return new MySqlProcessor(connection, new MySql5Generator(new MySqlQuoter()), announcer, options, factory);
+            var quoterOptions = new OptionsWrapper<QuoterOptions>(new QuoterOptions());
+            return new MySqlProcessor(connection, new MySql5Generator(new MySqlQuoter(quoterOptions)), announcer, options, factory);
         }
     }
 }

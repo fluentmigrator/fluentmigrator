@@ -14,6 +14,8 @@
 // limitations under the License.
 #endregion
 
+using FluentMigrator.Runner.Initialization;
+
 using JetBrains.Annotations;
 
 using Microsoft.Extensions.Options;
@@ -23,7 +25,7 @@ namespace FluentMigrator.Runner.Generators.MySql
     public class MySql5Generator : MySql4Generator
     {
         public MySql5Generator()
-            : this(new MySqlQuoter())
+            : this(new MySqlQuoter(new OptionsWrapper<QuoterOptions>(new QuoterOptions())))
         {
         }
 

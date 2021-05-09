@@ -21,6 +21,7 @@ using System.Linq;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators.Generic;
+using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
@@ -31,7 +32,7 @@ namespace FluentMigrator.Runner.Generators.MySql
     public class MySql4Generator : GenericGenerator
     {
         public MySql4Generator()
-            : this(new MySqlQuoter())
+            : this(new MySqlQuoter(new OptionsWrapper<QuoterOptions>(new QuoterOptions())))
         {
         }
 

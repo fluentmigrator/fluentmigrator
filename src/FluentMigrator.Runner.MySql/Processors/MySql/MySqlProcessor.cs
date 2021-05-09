@@ -34,7 +34,7 @@ namespace FluentMigrator.Runner.Processors.MySql
 {
     public class MySqlProcessor : GenericProcessorBase
     {
-        private readonly MySqlQuoter _quoter = new MySqlQuoter();
+        private readonly MySqlQuoter _quoter = new MySqlQuoter(new OptionsWrapper<QuoterOptions>(new QuoterOptions()));
 
         public override string DatabaseType => "MySql";
 

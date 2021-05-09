@@ -238,7 +238,7 @@ namespace FluentMigrator.Tests.Unit.Generators.GenericGenerator
         [Test]
         public void ShouldEscapeMySqlObjectNames()
         {
-            MySqlQuoter quoter = new MySqlQuoter();
+            MySqlQuoter quoter = new MySqlQuoter(new OptionsWrapper<QuoterOptions>(new QuoterOptions()));
             quoter.Quote("`Table`Name").ShouldBe("```Table``Name`");
         }
 

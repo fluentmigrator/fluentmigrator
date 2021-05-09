@@ -20,6 +20,9 @@ using System;
 
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.MySql;
+using FluentMigrator.Runner.Initialization;
+
+using Microsoft.Extensions.Options;
 
 using NUnit.Framework;
 
@@ -35,7 +38,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
         [SetUp]
         public void SetUp()
         {
-            _quoter = new MySqlQuoter();
+            _quoter = new MySqlQuoter(new OptionsWrapper<QuoterOptions>(new QuoterOptions()));
         }
 
         [Test]
