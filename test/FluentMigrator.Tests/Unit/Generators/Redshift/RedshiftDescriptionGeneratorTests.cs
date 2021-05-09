@@ -17,6 +17,9 @@
 using System.Linq;
 
 using FluentMigrator.Runner.Generators.Redshift;
+using FluentMigrator.Runner.Initialization;
+
+using Microsoft.Extensions.Options;
 
 using NUnit.Framework;
 
@@ -30,7 +33,8 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
         [SetUp]
         public void Setup()
         {
-            DescriptionGenerator = new RedshiftDescriptionGenerator();
+            var quoter = new RedshiftQuoter(new OptionsWrapper<QuoterOptions>(new QuoterOptions()));
+            DescriptionGenerator = new RedshiftDescriptionGenerator(quoter);
         }
 
         [Test]

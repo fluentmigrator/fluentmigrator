@@ -35,7 +35,7 @@ namespace FluentMigrator.Runner.Processors.Redshift
 {
     public class RedshiftProcessor : GenericProcessorBase
     {
-        private readonly RedshiftQuoter _quoter = new RedshiftQuoter();
+        private readonly RedshiftQuoter _quoter;
 
         public override string DatabaseType => "Redshift";
 
@@ -45,9 +45,11 @@ namespace FluentMigrator.Runner.Processors.Redshift
         public RedshiftProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(connection, factory, generator, announcer, options)
         {
+            _quoter = new RedshiftQuoter(new OptionsWrapper<QuoterOptions>(new QuoterOptions()));
         }
 
         public RedshiftProcessor(
+            [NotNull] RedshiftQuoter quoter,
             [NotNull] RedshiftDbFactory factory,
             [NotNull] RedshiftGenerator generator,
             [NotNull] ILogger<RedshiftProcessor> logger,
@@ -55,6 +57,7 @@ namespace FluentMigrator.Runner.Processors.Redshift
             [NotNull] IConnectionStringAccessor connectionStringAccessor)
             : base(() => factory.Factory, generator, logger, options.Value, connectionStringAccessor)
         {
+            _quoter = quoter;
         }
 
         public override void Execute(string template, params object[] args)

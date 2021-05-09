@@ -27,7 +27,7 @@ namespace FluentMigrator.Runner.Generators.Redshift
 {
     internal class RedshiftColumn : ColumnBase
     {
-        public RedshiftColumn() : base(new RedshiftTypeMap(), new RedshiftQuoter())
+        public RedshiftColumn(RedshiftQuoter quoter) : base(new RedshiftTypeMap(), quoter)
         {
             AlterClauseOrder = new List<Func<ColumnDefinition, string>> { FormatAlterType, FormatAlterNullable };
         }

@@ -23,6 +23,7 @@ using System.Text;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators.Generic;
+using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
@@ -33,7 +34,7 @@ namespace FluentMigrator.Runner.Generators.Redshift
     public class RedshiftGenerator : GenericGenerator
     {
         public RedshiftGenerator()
-            : this(new RedshiftQuoter())
+            : this(new RedshiftQuoter(new OptionsWrapper<QuoterOptions>(new QuoterOptions())))
         {
         }
 
@@ -46,7 +47,7 @@ namespace FluentMigrator.Runner.Generators.Redshift
         public RedshiftGenerator(
             [NotNull] RedshiftQuoter quoter,
             [NotNull] IOptions<GeneratorOptions> generatorOptions)
-            : base(new RedshiftColumn(), quoter, new RedshiftDescriptionGenerator(), generatorOptions)
+            : base(new RedshiftColumn(quoter), quoter, new RedshiftDescriptionGenerator(quoter), generatorOptions)
         {
         }
 
