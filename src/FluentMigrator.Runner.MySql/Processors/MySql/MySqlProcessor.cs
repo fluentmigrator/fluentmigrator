@@ -34,7 +34,7 @@ namespace FluentMigrator.Runner.Processors.MySql
 {
     public class MySqlProcessor : GenericProcessorBase
     {
-        private readonly MySqlQuoter _quoter = new MySqlQuoter(new OptionsWrapper<QuoterOptions>(new QuoterOptions()));
+        private readonly MySqlQuoter _quoter;
 
         public override string DatabaseType => "MySql";
 
@@ -44,9 +44,11 @@ namespace FluentMigrator.Runner.Processors.MySql
         public MySqlProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(connection, factory, generator, announcer, options)
         {
+            _quoter = new MySqlQuoter(new OptionsWrapper<QuoterOptions>(new QuoterOptions()));
         }
 
         protected MySqlProcessor(
+            [NotNull] MySqlQuoter quoter,
             [NotNull] MySqlDbFactory factory,
             [NotNull] IMigrationGenerator generator,
             [NotNull] ILogger<MySqlProcessor> logger,
@@ -54,6 +56,7 @@ namespace FluentMigrator.Runner.Processors.MySql
             [NotNull] IConnectionStringAccessor connectionStringAccessor)
             : base(() => factory.Factory, generator, logger, options.Value, connectionStringAccessor)
         {
+            _quoter = quoter;
         }
 
         public override bool SchemaExists(string schemaName)
