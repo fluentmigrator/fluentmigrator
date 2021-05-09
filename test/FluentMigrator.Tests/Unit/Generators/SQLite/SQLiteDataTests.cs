@@ -144,6 +144,29 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         }
 
         [Test]
+        public override void CanInsertEnumAsString()
+        {
+            var expression = GeneratorTestHelper.GetInsertEnumExpression();
+
+            var result = CreateFixture().Generate(expression);
+            result.ShouldBe("INSERT INTO \"TestTable1\" (\"enum\") VALUES ('Boo')");
+        }
+
+        [Test]
+        public override void CanInsertEnumAsUnderlyingType()
+        {
+            var options = new QuoterOptions
+            {
+                EnumAsUnderlyingType = true
+            };
+
+            var expression = GeneratorTestHelper.GetInsertEnumExpression();
+
+            var result = CreateFixture(options).Generate(expression);
+            result.ShouldBe("INSERT INTO \"TestTable1\" (\"enum\") VALUES (2)");
+        }
+
+        [Test]
         public override void CanUpdateDataForAllDataWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpressionWithAllRows();

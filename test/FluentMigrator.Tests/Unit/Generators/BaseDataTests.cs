@@ -34,8 +34,8 @@ namespace FluentMigrator.Tests.Unit.Generators
         public abstract void CanInsertDataWithDefaultSchema();
         public abstract void CanInsertGuidDataWithCustomSchema();
         public abstract void CanInsertGuidDataWithDefaultSchema();
-        public virtual void CanInsertEnumAsString() {}
-        public virtual void CanInsertEnumAsUnderlyingType() {}
+        public abstract void CanInsertEnumAsString();
+        public abstract void CanInsertEnumAsUnderlyingType();
         public abstract void CanUpdateDataForAllDataWithCustomSchema();
         public abstract void CanUpdateDataForAllDataWithDefaultSchema();
         public abstract void CanUpdateDataWithCustomSchema();

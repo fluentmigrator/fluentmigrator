@@ -164,7 +164,7 @@ namespace FluentMigrator.Runner
         /// </summary>
         /// <param name="builder"></param>
         /// <param name="configureOptions"></param>
-        /// <returns></returns>
+        /// <returns>The runner builder</returns>
         public static IMigrationRunnerBuilder WithQuoterConventions(
             this IMigrationRunnerBuilder builder,
             Action<QuoterOptions> configureOptions)
