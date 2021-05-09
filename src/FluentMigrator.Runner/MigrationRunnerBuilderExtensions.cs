@@ -160,6 +160,22 @@ namespace FluentMigrator.Runner
         }
 
         /// <summary>
+        /// Add the migration quoter conventions
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <param name="configureOptions"></param>
+        /// <returns></returns>
+        public static IMigrationRunnerBuilder WithQuoterConventions(
+            this IMigrationRunnerBuilder builder,
+            Action<QuoterOptions> configureOptions)
+        {
+            builder.Services
+                .Configure(configureOptions);
+
+            return builder;
+        }
+
+        /// <summary>
         /// Adds the migrations
         /// </summary>
         /// <param name="builder">The runner builder</param>
