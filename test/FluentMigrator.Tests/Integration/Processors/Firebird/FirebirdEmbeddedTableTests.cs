@@ -30,7 +30,6 @@ using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Firebird;
 
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 
 using NUnit.Framework;
 
@@ -432,9 +431,8 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                     var announcer = new TextWriterAnnouncer(TestContext.Out) { ShowSql = true };
                     var options = FirebirdOptions.AutoCommitBehaviour();
                     options.TruncateLongNames = false;
-                    var quoterOptions = new OptionsWrapper<QuoterOptions>(new QuoterOptions());
-                    var processor = new FirebirdProcessor(connection, new FirebirdGenerator(options, quoterOptions), announcer,
-                        new ProcessorOptions(), new FirebirdDbFactory(), options, quoterOptions);
+                    var processor = new FirebirdProcessor(connection, new FirebirdGenerator(options), announcer,
+                        new ProcessorOptions(), new FirebirdDbFactory(), options);
                     var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), runnerContext, processor);
                     runner.Up(new MigrationWhichCreatesTwoRelatedTables());
                     processor.CommitTransaction();
@@ -448,9 +446,8 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                 {
                     var announcer = new TextWriterAnnouncer(TestContext.Out) { ShowSql = true };
                     var options = FirebirdOptions.AutoCommitBehaviour();
-                    var quoterOptions = new OptionsWrapper<QuoterOptions>(new QuoterOptions());
-                    var processor = new FirebirdProcessor(connection, new FirebirdGenerator(options, quoterOptions), announcer,
-                        new ProcessorOptions(), new FirebirdDbFactory(), options, quoterOptions);
+                    var processor = new FirebirdProcessor(connection, new FirebirdGenerator(options), announcer,
+                        new ProcessorOptions(), new FirebirdDbFactory(), options);
                     var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), runnerContext, processor);
                     runner.Up(new MigrationWhichAltersTableWithFK());
                     processor.CommitTransaction();

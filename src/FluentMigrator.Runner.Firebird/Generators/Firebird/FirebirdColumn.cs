@@ -22,18 +22,15 @@ using System.Linq;
 
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Base;
-using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.Firebird;
 
 using JetBrains.Annotations;
-
-using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Generators.Firebird
 {
     internal class FirebirdColumn : ColumnBase
     {
-        public FirebirdColumn([NotNull] FirebirdOptions fbOptions, IOptions<QuoterOptions> quoterOptions) : base(new FirebirdTypeMap(), new FirebirdQuoter(fbOptions.ForceQuote, quoterOptions))
+        public FirebirdColumn([NotNull] FirebirdOptions fbOptions, FirebirdQuoter quoter) : base(new FirebirdTypeMap(), quoter)
         {
             FBOptions = fbOptions;
 

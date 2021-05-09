@@ -40,26 +40,23 @@ namespace FluentMigrator.Runner.Generators.Firebird
         protected readonly FirebirdTruncator truncator;
 
         public FirebirdGenerator(
-            [NotNull] FirebirdOptions fbOptions,
-            [NotNull] IOptions<QuoterOptions> quoterOptions)
-            : this(fbOptions, quoterOptions, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()))
+            [NotNull] FirebirdOptions fbOptions)
+            : this(fbOptions,new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()))
         {
         }
 
         public FirebirdGenerator(
             [NotNull] FirebirdOptions fbOptions,
-            [NotNull] IOptions<QuoterOptions> quoterOptions,
             [NotNull] IOptions<GeneratorOptions> generatorOptions)
-            : this(new FirebirdQuoter(fbOptions, quoterOptions), fbOptions, quoterOptions, generatorOptions)
+            : this(new FirebirdQuoter(fbOptions, new OptionsWrapper<QuoterOptions>(new QuoterOptions())), fbOptions, generatorOptions)
         {
         }
 
         public FirebirdGenerator(
             [NotNull] FirebirdQuoter quoter,
             [NotNull] FirebirdOptions fbOptions,
-            [NotNull] IOptions<QuoterOptions> quoterOptions,
             [NotNull] IOptions<GeneratorOptions> generatorOptions)
-            : base(new FirebirdColumn(fbOptions, quoterOptions), quoter, new EmptyDescriptionGenerator(), generatorOptions)
+            : base(new FirebirdColumn(fbOptions, quoter), quoter, new EmptyDescriptionGenerator(), generatorOptions)
         {
             FBOptions = fbOptions ?? throw new ArgumentNullException(nameof(fbOptions));
 #pragma warning disable 618
@@ -295,7 +292,8 @@ namespace FluentMigrator.Runner.Generators.Firebird
 
         public static bool ColumnTypesMatch(ColumnDefinition col1, ColumnDefinition col2)
         {
-            FirebirdColumn column = new FirebirdColumn(new FirebirdOptions(), new OptionsWrapper<QuoterOptions>(new QuoterOptions()));
+            var fbOptions = new FirebirdOptions();
+            FirebirdColumn column = new FirebirdColumn(fbOptions, new FirebirdQuoter(fbOptions, new OptionsWrapper<QuoterOptions>(new QuoterOptions())));
             string colDef1 = column.GenerateForTypeAlter(col1);
             string colDef2 = column.GenerateForTypeAlter(col2);
             return colDef1 == colDef2;
@@ -307,7 +305,9 @@ namespace FluentMigrator.Runner.Generators.Firebird
                 return true;
             if (col1.DefaultValue is ColumnDefinition.UndefinedDefaultValue || col2.DefaultValue is ColumnDefinition.UndefinedDefaultValue)
                 return true;
-            FirebirdColumn column = new FirebirdColumn(new FirebirdOptions(), new OptionsWrapper<QuoterOptions>(new QuoterOptions()));
+
+            var fbOptions = new FirebirdOptions();
+            FirebirdColumn column = new FirebirdColumn(fbOptions, new FirebirdQuoter(fbOptions, new OptionsWrapper<QuoterOptions>(new QuoterOptions())));
             string col1Value = column.GenerateForDefaultAlter(col1);
             string col2Value = column.GenerateForDefaultAlter(col2);
             return col1Value != col2Value;

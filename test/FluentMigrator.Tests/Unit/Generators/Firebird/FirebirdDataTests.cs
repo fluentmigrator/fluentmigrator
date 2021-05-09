@@ -1,3 +1,4 @@
+using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Firebird;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.Firebird;
@@ -13,8 +14,15 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
     [TestFixture]
     public class FirebirdDataTests : BaseDataTests
     {
-        private static FirebirdGenerator CreateFixture(QuoterOptions options = null) =>
-            new FirebirdGenerator(FirebirdOptions.StandardBehaviour(), new OptionsWrapper<QuoterOptions>(options));
+        private static FirebirdGenerator CreateFixture(QuoterOptions options = null)
+        {
+            var fbOptions = FirebirdOptions.StandardBehaviour();
+
+            return new FirebirdGenerator(
+                new FirebirdQuoter(fbOptions, new OptionsWrapper<QuoterOptions>(options)),
+                FirebirdOptions.StandardBehaviour(),
+                new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()));
+        }
 
         [Test]
         public override void CanDeleteDataForAllRowsWithCustomSchema()

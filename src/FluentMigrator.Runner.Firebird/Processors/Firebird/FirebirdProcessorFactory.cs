@@ -19,7 +19,6 @@
 using System;
 
 using FluentMigrator.Runner.Generators.Firebird;
-using FluentMigrator.Runner.Initialization;
 
 using Microsoft.Extensions.Options;
 
@@ -54,8 +53,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
                 .ApplyProviderSwitches(options.ProviderSwitches);
             var factory = new FirebirdDbFactory(_serviceProvider);
             var connection = factory.CreateConnection(connectionString);
-            var quoterOptions = new OptionsWrapper<QuoterOptions>(new QuoterOptions());
-            return new FirebirdProcessor(connection, new FirebirdGenerator(FbOptions, quoterOptions), announcer, options, factory, fbOpt, quoterOptions);
+            return new FirebirdProcessor(connection, new FirebirdGenerator(FbOptions), announcer, options, factory, fbOpt);
         }
     }
 }

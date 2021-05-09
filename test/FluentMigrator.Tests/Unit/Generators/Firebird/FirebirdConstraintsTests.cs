@@ -1,9 +1,7 @@
 using System.Data;
-using FluentMigrator.Runner.Generators.Firebird;
-using FluentMigrator.Runner.Initialization;
-using FluentMigrator.Runner.Processors.Firebird;
 
-using Microsoft.Extensions.Options;
+using FluentMigrator.Runner.Generators.Firebird;
+using FluentMigrator.Runner.Processors.Firebird;
 
 using NUnit.Framework;
 
@@ -19,7 +17,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         [SetUp]
         public void Setup()
         {
-            Generator = new FirebirdGenerator(FirebirdOptions.StandardBehaviour(), new OptionsWrapper<QuoterOptions>(new QuoterOptions()));
+            Generator = new FirebirdGenerator(FirebirdOptions.StandardBehaviour());
         }
 
         [Test]

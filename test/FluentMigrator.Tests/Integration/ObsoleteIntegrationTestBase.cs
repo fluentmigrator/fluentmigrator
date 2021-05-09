@@ -355,8 +355,7 @@ namespace FluentMigrator.Tests.Integration
             using (var connection = new FbConnection(serverOptions.ConnectionString))
             {
                 var options = FirebirdOptions.AutoCommitBehaviour();
-                var quoterOptions = new OptionsWrapper<QuoterOptions>(new QuoterOptions());
-                var processor = new FirebirdProcessor(connection, new FirebirdGenerator(options, quoterOptions), announcer, new ProcessorOptions(), new FirebirdDbFactory(serviceProvider: null), options, quoterOptions);
+                var processor = new FirebirdProcessor(connection, new FirebirdGenerator(options), announcer, new ProcessorOptions(), new FirebirdDbFactory(serviceProvider: null), options);
 
                 try
                 {
