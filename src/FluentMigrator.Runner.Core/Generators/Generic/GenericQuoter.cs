@@ -30,6 +30,12 @@ namespace FluentMigrator.Runner.Generators.Generic
     {
         private readonly QuoterOptions _options;
 
+        [Obsolete]
+        public GenericQuoter()
+            : this(new OptionsWrapper<QuoterOptions>(new QuoterOptions()))
+        {
+        }
+
         public GenericQuoter(IOptions<QuoterOptions> options)
         {
             _options = options.Value ?? new QuoterOptions();
@@ -88,7 +94,7 @@ namespace FluentMigrator.Runner.Generators.Generic
 
         protected virtual string FormatByteArray(byte[] value)
         {
-            var hex = new System.Text.StringBuilder((value.Length * 2)+2);
+            var hex = new System.Text.StringBuilder((value.Length * 2) + 2);
             hex.Append("0x");
             foreach (byte b in value)
                 hex.AppendFormat("{0:x2}", b);
@@ -147,7 +153,7 @@ namespace FluentMigrator.Runner.Generators.Generic
 
         public virtual string FormatDateTime(DateTime value)
         {
-            return ValueQuote + (value).ToString("yyyy-MM-ddTHH:mm:ss",CultureInfo.InvariantCulture) + ValueQuote;
+            return ValueQuote + (value).ToString("yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture) + ValueQuote;
         }
 
         public virtual string FormatDateTimeOffset(DateTimeOffset value)

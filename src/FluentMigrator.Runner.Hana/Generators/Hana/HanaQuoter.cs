@@ -14,6 +14,8 @@
 // limitations under the License.
 #endregion
 
+using System;
+
 using FluentMigrator.Runner.Generators.Generic;
 using FluentMigrator.Runner.Initialization;
 
@@ -23,6 +25,11 @@ namespace FluentMigrator.Runner.Generators.Hana
 {
     public class HanaQuoter : GenericQuoter
     {
+        [Obsolete]
+        public HanaQuoter()
+        {
+        }
+
         public HanaQuoter(IOptions<QuoterOptions> options)
             : base(options)
         {

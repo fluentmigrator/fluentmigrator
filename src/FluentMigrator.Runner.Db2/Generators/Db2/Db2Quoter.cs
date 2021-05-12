@@ -27,6 +27,11 @@ namespace FluentMigrator.Runner.Generators.DB2
     {
         public readonly char[] SpecialChars = "\"%'()*+|,{}-./:;<=>?^[]".ToCharArray();
 
+        [Obsolete]
+        public Db2Quoter()
+        {
+        }
+
         public Db2Quoter(IOptions<QuoterOptions> options)
             : base(options)
         {

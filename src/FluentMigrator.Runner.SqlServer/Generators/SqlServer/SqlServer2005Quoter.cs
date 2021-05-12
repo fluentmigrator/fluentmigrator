@@ -16,6 +16,8 @@
 //
 #endregion
 
+using System;
+
 using FluentMigrator.Runner.Initialization;
 
 using Microsoft.Extensions.Options;
@@ -24,6 +26,11 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 {
     public class SqlServer2005Quoter : SqlServer2000Quoter
     {
+        [Obsolete]
+        public SqlServer2005Quoter()
+        {
+        }
+
         public SqlServer2005Quoter(IOptions<QuoterOptions> options)
             : base(options)
         {

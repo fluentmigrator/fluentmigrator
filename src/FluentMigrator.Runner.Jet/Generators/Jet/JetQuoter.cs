@@ -8,6 +8,11 @@ namespace FluentMigrator.Runner.Generators.Jet
 {
     public class JetQuoter : GenericQuoter
     {
+        [Obsolete]
+        public JetQuoter()
+        {
+        }
+
         public JetQuoter(IOptions<QuoterOptions> options)
             : base(options)
         {

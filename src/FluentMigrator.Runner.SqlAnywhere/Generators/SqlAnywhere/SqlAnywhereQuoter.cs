@@ -14,6 +14,8 @@
 // limitations under the License.
 #endregion
 
+using System;
+
 using FluentMigrator.Runner.Generators.Generic;
 using FluentMigrator.Runner.Initialization;
 
@@ -23,6 +25,11 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
 {
     public class SqlAnywhereQuoter : GenericQuoter
     {
+        [Obsolete]
+        public SqlAnywhereQuoter()
+        {
+        }
+
         public SqlAnywhereQuoter(IOptions<QuoterOptions> options)
             : base(options)
         {

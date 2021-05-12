@@ -33,6 +33,11 @@ namespace FluentMigrator.Runner.Generators.Oracle
 
         public static readonly char[] EscapeCharacters = new[] { '\'', '\t', '\r', '\n' };
 
+        [Obsolete]
+        public OracleQuoterBase()
+        {
+        }
+
         public OracleQuoterBase(IOptions<QuoterOptions> options)
             : base(options)
         {

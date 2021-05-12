@@ -16,6 +16,7 @@
 //
 #endregion
 
+using System;
 using System.Linq;
 
 using FluentMigrator.Runner.Generators.Generic;
@@ -27,6 +28,11 @@ namespace FluentMigrator.Runner.Generators.Redshift
 {
     public class RedshiftQuoter : GenericQuoter
     {
+        [Obsolete]
+        public RedshiftQuoter()
+        {
+        }
+
         public RedshiftQuoter(IOptions<QuoterOptions> options)
             : base(options)
         {

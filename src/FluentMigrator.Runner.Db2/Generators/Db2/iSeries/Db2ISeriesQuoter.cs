@@ -14,6 +14,8 @@
 // limitations under the License.
 #endregion
 
+using System;
+
 using FluentMigrator.Runner.Initialization;
 
 using Microsoft.Extensions.Options;
@@ -22,6 +24,11 @@ namespace FluentMigrator.Runner.Generators.DB2.iSeries
 {
     public class Db2ISeriesQuoter : Db2Quoter
     {
+        [Obsolete]
+        public Db2ISeriesQuoter()
+        {
+        }
+
         public Db2ISeriesQuoter(IOptions<QuoterOptions> options)
             : base(options)
         {

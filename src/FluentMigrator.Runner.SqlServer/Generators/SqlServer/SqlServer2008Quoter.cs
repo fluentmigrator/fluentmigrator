@@ -14,6 +14,8 @@
 // limitations under the License.
 #endregion
 
+using System;
+
 using FluentMigrator.Runner.Initialization;
 
 using Microsoft.Extensions.Options;
@@ -22,6 +24,11 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 {
     public class SqlServer2008Quoter : SqlServer2005Quoter
     {
+        [Obsolete]
+        public SqlServer2008Quoter()
+        {
+        }
+
         public SqlServer2008Quoter(IOptions<QuoterOptions> options)
             : base(options)
         {
