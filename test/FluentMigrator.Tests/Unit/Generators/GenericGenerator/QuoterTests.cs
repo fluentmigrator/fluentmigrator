@@ -189,7 +189,7 @@ namespace FluentMigrator.Tests.Unit.Generators.GenericGenerator
         }
 
         [Test]
-        public void EnumIsFormatterAsUnterlyingType()
+        public void EnumIsFormattedAsUnderlyingType()
         {
             var options = new QuoterOptions
             {
