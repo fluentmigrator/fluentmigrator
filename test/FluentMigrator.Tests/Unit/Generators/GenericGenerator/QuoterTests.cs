@@ -42,6 +42,9 @@ namespace FluentMigrator.Tests.Unit.Generators.GenericGenerator
     {
         private readonly CultureInfo _currentCulture = Thread.CurrentThread.CurrentCulture;
 
+        [DatapointSource]
+        public readonly bool[] BoolValues = { true, false };
+
         private static IQuoter CreateFixture(QuoterOptions options = null) =>
             new GenericQuoter(new OptionsWrapper<QuoterOptions>(options));
 
@@ -72,10 +75,15 @@ namespace FluentMigrator.Tests.Unit.Generators.GenericGenerator
             }
         }
 
-        [Test]
-        public void CanEscapeAString()
+        [Theory]
+        public void CanEscapeAString(bool enumAsUnderlyingType)
         {
-            CreateFixture().Quote("Test\"String").ShouldBe("\"Test\"\"String\"");
+            var quoterOptions = new QuoterOptions
+            {
+                EnumAsUnderlyingType = enumAsUnderlyingType
+            };
+
+            CreateFixture(quoterOptions).Quote("Test\"String").ShouldBe("\"Test\"\"String\"");
         }
 
         [Test]
