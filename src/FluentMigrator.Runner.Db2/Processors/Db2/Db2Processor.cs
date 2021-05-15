@@ -36,10 +36,10 @@ namespace FluentMigrator.Runner.Processors.DB2
     public class Db2Processor : GenericProcessorBase
     {
         [Obsolete]
-        public Db2Processor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory, IOptions<QuoterOptions> quoterOptions)
+        public Db2Processor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(connection, factory, generator, announcer, options)
         {
-            Quoter = new Db2Quoter(quoterOptions);
+            Quoter = new Db2Quoter(new OptionsWrapper<QuoterOptions>(new QuoterOptions()));
         }
 
         public Db2Processor(

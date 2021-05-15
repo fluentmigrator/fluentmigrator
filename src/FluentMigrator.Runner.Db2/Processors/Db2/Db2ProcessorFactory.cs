@@ -48,7 +48,7 @@ namespace FluentMigrator.Runner.Processors.DB2
             var connection = factory.CreateConnection(connectionString);
             var generatorOptions = new OptionsWrapper<GeneratorOptions>(new GeneratorOptions());
             var quoterOptions = new OptionsWrapper<QuoterOptions>(new QuoterOptions());
-            return new Db2Processor(connection, new Db2Generator(new Db2Quoter(quoterOptions), generatorOptions), announcer, options, factory, quoterOptions);
+            return new Db2Processor(connection, new Db2Generator(new Db2Quoter(quoterOptions), generatorOptions), announcer, options, factory);
         }
     }
 }
