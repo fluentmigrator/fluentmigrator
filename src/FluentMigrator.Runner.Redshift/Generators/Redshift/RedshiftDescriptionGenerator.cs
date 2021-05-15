@@ -16,6 +16,8 @@
 //
 #endregion
 
+using System;
+
 using FluentMigrator.Runner.Generators.Generic;
 
 namespace FluentMigrator.Runner.Generators.Redshift
@@ -27,6 +29,12 @@ namespace FluentMigrator.Runner.Generators.Redshift
     public class RedshiftDescriptionGenerator : GenericDescriptionGenerator
     {
         private readonly IQuoter _quoter;
+
+        [Obsolete]
+        public RedshiftDescriptionGenerator()
+            : this(new RedshiftQuoter())
+        {
+        }
 
         public RedshiftDescriptionGenerator(RedshiftQuoter quoter)
         {
