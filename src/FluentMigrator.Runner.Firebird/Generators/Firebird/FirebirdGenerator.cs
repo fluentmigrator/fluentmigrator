@@ -48,7 +48,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
         public FirebirdGenerator(
             [NotNull] FirebirdOptions fbOptions,
             [NotNull] IOptions<GeneratorOptions> generatorOptions)
-            : this(new FirebirdQuoter(fbOptions, new OptionsWrapper<QuoterOptions>(new QuoterOptions())), fbOptions, generatorOptions)
+            : this(new FirebirdQuoter(fbOptions.ForceQuote, new OptionsWrapper<QuoterOptions>(new QuoterOptions())), fbOptions, generatorOptions)
         {
         }
 
