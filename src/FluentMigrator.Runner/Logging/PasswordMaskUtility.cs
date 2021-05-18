@@ -4,7 +4,7 @@ namespace FluentMigrator.Runner.Logging
 {
     public class PasswordMaskUtility : IPasswordMaskUtility
     {
-        private static readonly Regex _matchPwd = new Regex("(?<Prefix>.*)(?<Key>PWD=|PASSWORD=)(?<OptionalValue>((?<None>(;|;$|$))|(?<Value>(([^;]+$|[^;]+)))(?<ValueTerminator>$|;)))(?<Postfix>.*)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        private static readonly Regex _matchPwd = new Regex("(?<Prefix>.*)(?<Key>PWD\\s*=\\s*|PASSWORD\\s*=\\s*)(?<OptionalValue>((?<None>(;|;$|$))|(?<Value>(([^;]+$|[^;]+)))(?<ValueTerminator>$|;)))(?<Postfix>.*)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         public string ApplyMask(string connectionString)
         {
