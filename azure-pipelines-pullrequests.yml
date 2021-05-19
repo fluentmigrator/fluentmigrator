@@ -11,7 +11,7 @@ pr:
     - '*'  # must quote since "*" is a YAML reserved character; we want a string
 
 pool:
-  vmImage: 'windows-latest'
+  vmImage: 'ubuntu-latest'
 
 variables:
   solution: '**/FluentMigrator.sln'
@@ -19,8 +19,6 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
-- task: NuGetToolInstaller@1
-
 - task: UseGitVersion@5
   displayName: 'UseGitVersion (preview)'
   inputs:
@@ -30,25 +28,33 @@ steps:
   env:
       BUILD_BUILDNUMBER: $(GitVersion.NuGetVersionV2)
 
-- task: NuGetCommand@2
+- task: UseDotNet@2
+  displayName: 'Install .NET SDK'
   inputs:
-    restoreSolution: '$(solution)'
+    version: '6.0.x'
+    includePreviewVersions: true # Required for preview versions
 
-- task: VSBuild@1
+- task: DotNetCoreCLI@2
+  displayName: Restore
   inputs:
-    solution: '$(solution)'
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
-    msbuildArgs: '/p:Version="$(build.buildNumber)"'
+     command: restore
+     projects: '**/*.csproj'
 
-- task: VSTest@2
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet build -c $(buildConfiguration) -p:Version=$(build.buildNumber)'
   inputs:
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
-    diagnosticsEnabled: true
+    command: 'build'
+    arguments: '-c $(buildConfiguration) -p:Version=$(build.buildNumber)'
 
-- task: PublishBuildArtifacts@1
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet test -c $(buildConfiguration) -l trx -v diagnostic'
   inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: 'drop'
-    publishLocation: 'Container'
+    command: test
+    projects: '**/test/*.csproj'
+    arguments: '-c $(buildConfiguration) -l trx -v diagnostic'
+
+ - task: PublishBuildArtifacts@1
+   inputs:
+     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+     ArtifactName: 'drop'
+     publishLocation: 'Container'
