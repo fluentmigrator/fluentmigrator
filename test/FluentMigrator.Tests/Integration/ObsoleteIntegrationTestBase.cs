@@ -18,7 +18,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -37,6 +36,8 @@ using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.Runner.Generators.MySql;
 using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Runner.Generators.Firebird;
+
+using Microsoft.Data.SqlClient;
 
 using MySql.Data.MySqlClient;
 

@@ -1,0 +1,22 @@
+version: 2
+updates:
+- package-ecosystem: nuget
+  directory: "/"
+  schedule:
+    interval: daily
+  open-pull-requests-limit: 10
+  reviewers:
+  - jzabroski
+  ignore:
+  - dependency-name: Moq
+    versions:
+    - 4.16.0
+  - dependency-name: Oracle.ManagedDataAccess
+    versions:
+    - 19.10.1
+  - dependency-name: Microsoft.Build.Utilities.Core
+    versions:
+    - 16.8.0
+  - dependency-name: FSharp.Core
+    versions:
+    - 5.0.0
