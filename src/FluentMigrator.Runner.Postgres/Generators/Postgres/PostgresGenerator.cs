@@ -133,7 +133,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
         public override string Generate(CreateColumnExpression expression)
         {
             var createStatement = new StringBuilder();
-            createStatement.AppendFormat(base.Generate(expression));
+            createStatement.Append(base.Generate(expression));
 
             var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatement(expression);
             if (!string.IsNullOrEmpty(descriptionStatement))

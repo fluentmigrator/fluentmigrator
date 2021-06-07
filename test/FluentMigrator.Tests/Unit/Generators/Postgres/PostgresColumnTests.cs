@@ -16,6 +16,10 @@
 //
 #endregion
 
+using System.Data;
+
+using FluentMigrator.Expressions;
+using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Postgres;
 using FluentMigrator.Runner.Processors.Postgres;
 
@@ -91,6 +95,17 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
 
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE \"public\".\"TestTable1\" ADD \"TestColumn1\" serial NOT NULL;");
+        }
+
+        [Test]
+        public void CanCreateJsonColumnWithDefaultSchema()
+        {
+            var column = new ColumnDefinition { Name = "TestColumn1", DefaultValue = "{}", CustomType = "json"};
+            var expression =  new CreateColumnExpression { TableName = "TestTable1", Column = column };
+
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE \"public\".\"TestTable1\" ADD \"TestColumn1\" json NOT NULL DEFAULT '{}';");
         }
     }
 }
