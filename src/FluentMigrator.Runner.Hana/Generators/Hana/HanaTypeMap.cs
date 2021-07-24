@@ -43,7 +43,7 @@ namespace FluentMigrator.Runner.Generators.Hana
             SetTypeMap(DbType.Binary, "BLOB");
             SetTypeMap(DbType.Binary, "VARBINARY($size)", ImageCapacity);
             SetTypeMap(DbType.Object, "BLOB");
-            SetTypeMap(DbType.Boolean, "TINYINT");
+            SetTypeMap(DbType.Boolean, "BOOLEAN");
             SetTypeMap(DbType.Byte, "TINYINT");
             SetTypeMap(DbType.Currency, "MONEY");
             SetTypeMap(DbType.Date, "DATETIME");

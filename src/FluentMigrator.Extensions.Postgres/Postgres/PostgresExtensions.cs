@@ -36,7 +36,7 @@ namespace FluentMigrator.Postgres
     /// m.Alter.Column("").OnTable("").AsInt16().Identity(PostgresGenerationType.Always);  //Ideally would like to stop this, forcing use of AddIdentity instead, but can't
     /// m.Alter.Table("").AddColumn("").AsInt16().Identity(PostgresGenerationType.Always);
     /// m.Alter.Table("").AlterColumn("").AsInt16().Identity(PostgresGenerationType.Always);
-    /// 
+    ///
     /// These are not possible:
     /// m.Alter.Table("").AddColumn("").AsInt16().AddIdentity(PostgresGenerationType.Always);
     /// m.Alter.Table("").AddColumn("").AsInt16().SetIdentity(PostgresGenerationType.Always);
@@ -45,8 +45,22 @@ namespace FluentMigrator.Postgres
     /// m.Alter.Table("").AlterColumn("").AsInt16().SetIdentity(PostgresGenerationType.Always);
     /// m.Alter.Table("").AlterColumn("").AsInt16().DropIdentity(false);
     /// </remarks>
-    public static class PostgresExtensions
+    public static partial class PostgresExtensions
     {
+
+        public const string IncludesList = "PostgresIncludes";
+        public const string IndexAlgorithm = "PostgresIndexAlgorithm";
+        public const string Concurrently = "PostgresConcurrently";
+        public const string Only = "PostgresOnly";
+
+        public const string IndexFillFactor = "PostgresFillFactor";
+        public const string IndexVacuumCleanupIndexScaleFactor = "PostgresBTreeVacuumCleanupIndexScaleFactor";
+        public const string IndexFastUpdate = "PostgresGinFastUpdate";
+        public const string IndexGinPendingListLimit = "PostgresGinPendingListLimit";
+        public const string IndexBuffering = "PostgresGiSTBuffering";
+        public const string IndexPagesPerRange = "PostgresBrinPagesPerRange";
+        public const string IndexAutosummarize = "PostgresBrinautosummarize";
+
         /// <summary>
         /// Column identity generation ability for PostgreSQL 10 and above
         /// </summary>

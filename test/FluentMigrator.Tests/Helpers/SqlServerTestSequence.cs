@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,8 +15,9 @@
 #endregion
 
 using System;
-using System.Data.SqlClient;
 using FluentMigrator.Runner.Processors.SqlServer;
+
+using Microsoft.Data.SqlClient;
 
 namespace FluentMigrator.Tests.Helpers
 {

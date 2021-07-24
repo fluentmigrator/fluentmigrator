@@ -16,13 +16,13 @@
 
 using System;
 using System.Data;
-using System.Data.SqlClient;
 using System.Linq;
 
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.VersionTableInfo;
 
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.DependencyInjection;
 
 using NUnit.Framework;

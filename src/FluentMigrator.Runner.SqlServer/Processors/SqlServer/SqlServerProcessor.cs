@@ -18,7 +18,6 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 
@@ -33,6 +32,7 @@ using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -261,11 +261,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
                 {
                     using (var message = new StringWriter())
                     {
-                        message.WriteLine("An error occured executing the following sql:");
-                        message.WriteLine(sql);
-                        message.WriteLine("The error was {0}", ex.Message);
-
-                        throw new Exception(message.ToString(), ex);
+                        ReThrowWithSql(ex, sql);
                     }
                 }
             }
@@ -315,14 +311,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             }
             catch (Exception ex)
             {
-                using (var message = new StringWriter())
-                {
-                    message.WriteLine("An error occured executing the following sql:");
-                    message.WriteLine(string.IsNullOrEmpty(sqlBatch) ? sql : sqlBatch);
-                    message.WriteLine("The error was {0}", ex.Message);
-
-                    throw new Exception(message.ToString(), ex);
-                }
+                ReThrowWithSql(ex, string.IsNullOrEmpty(sqlBatch) ? sql : sqlBatch);
             }
         }
 

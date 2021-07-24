@@ -21,8 +21,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+using FluentMigrator.Builder.Create.Index;
 using FluentMigrator.Expressions;
+using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Model;
+using FluentMigrator.Postgres;
 using FluentMigrator.Runner.Generators.Generic;
 
 using JetBrains.Annotations;
@@ -130,7 +133,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
         public override string Generate(CreateColumnExpression expression)
         {
             var createStatement = new StringBuilder();
-            createStatement.AppendFormat(base.Generate(expression));
+            createStatement.Append(base.Generate(expression));
 
             var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatement(expression);
             if (!string.IsNullOrEmpty(descriptionStatement))
@@ -180,39 +183,228 @@ namespace FluentMigrator.Runner.Generators.Postgres
                 Quoter.Quote(expression.ForeignKey.Name));
         }
 
+
+        protected virtual string GetIncludeString(CreateIndexExpression column)
+        {
+            var includes = column.GetAdditionalFeature<IList<PostgresIndexIncludeDefinition>>(PostgresExtensions.IncludesList);
+
+            if (includes == null || includes.Count == 0)
+            {
+                return string.Empty;
+            }
+
+            throw new NotSupportedException("The current version doesn't support include index. Please use Postgres 11.");
+        }
+
+        protected virtual Algorithm GetIndexMethod(CreateIndexExpression expression)
+        {
+            var algorithm = expression.GetAdditionalFeature<PostgresIndexAlgorithmDefinition>(PostgresExtensions.IndexAlgorithm);
+            if (algorithm == null)
+            {
+                return Algorithm.BTree;
+            }
+
+            return algorithm.Algorithm;
+        }
+
+        protected virtual string GetFilter(CreateIndexExpression expression)
+        {
+            var filter = expression.Index.GetAdditionalFeature<string>(PostgresExtensions.IndexFilter);
+            if (!string.IsNullOrWhiteSpace(filter))
+            {
+                return " WHERE " + filter;
+            }
+
+            return string.Empty;
+        }
+
+        protected virtual string GetAsConcurrently(CreateIndexExpression expression)
+        {
+            var asConcurrently = expression.GetAdditionalFeature<PostgresIndexConcurrentlyDefinition>(PostgresExtensions.Concurrently);
+
+            if (asConcurrently == null || !asConcurrently.IsConcurrently)
+            {
+                return string.Empty;
+            }
+
+            return " CONCURRENTLY";
+        }
+
+        protected virtual string GetAsOnly(CreateIndexExpression expression)
+        {
+            var asOnly = expression.GetAdditionalFeature<PostgresIndexOnlyDefinition>(PostgresExtensions.Only);
+
+            if (asOnly == null || !asOnly.IsOnly)
+            {
+                return string.Empty;
+            }
+
+            throw new NotSupportedException("The current version doesn't support ONLY. Please use Postgres 11 or higher.");
+        }
+
+        protected virtual string GetNullsSort(IndexColumnDefinition column)
+        {
+            var sort = column.GetAdditionalFeature<PostgresIndexNullsSort>(PostgresExtensions.NullsSort);
+            if (sort == null)
+            {
+                return string.Empty;
+            }
+
+            if (sort.Sort == NullSort.First)
+            {
+                return " NULLS FIRST";
+            }
+
+            return " NULLS LAST";
+        }
+
+        protected virtual string GetTablespace(CreateIndexExpression expression)
+        {
+            var tablespace = expression.Index.GetAdditionalFeature<string>(PostgresExtensions.IndexTablespace);
+            if (!string.IsNullOrWhiteSpace(tablespace))
+            {
+                return " TABLESPACE " + tablespace;
+            }
+
+            return string.Empty;
+        }
+
+        protected virtual string GetWithIndexStorageParameters(CreateIndexExpression expression)
+        {
+            var allow = GetAllowIndexStorageParameters();
+            var parameters = new List<string>();
+
+            var fillFactor = GetIndexStorageParameters<int?>(PostgresExtensions.IndexFillFactor, "FillFactor");
+            if (fillFactor.HasValue)
+            {
+                parameters.Add($"FILLFACTOR = {fillFactor}");
+            }
+
+            var fastUpdate = GetIndexStorageParameters<bool?>( PostgresExtensions.IndexFastUpdate, "FastUpdate");
+            if (fastUpdate.HasValue)
+            {
+                parameters.Add($"FASTUPDATE = {ToOnOff(fastUpdate.Value)}");
+            }
+
+            // Postgres 10 or Higher
+            var buffering = GetIndexStorageParameters<GistBuffering?>(PostgresExtensions.IndexBuffering, "Buffering");
+            if (buffering.HasValue)
+            {
+                parameters.Add($"BUFFERING = {buffering.Value.ToString().ToUpper()}");
+            }
+
+            var pendingList = GetIndexStorageParameters<long?>(PostgresExtensions.IndexGinPendingListLimit, "GinPendingListLimit");
+            if (pendingList.HasValue)
+            {
+                parameters.Add($"GIN_PENDING_LIST_LIMIT = {pendingList}");
+            }
+
+            var perRangePage = GetIndexStorageParameters<int?>(PostgresExtensions.IndexPagesPerRange, "PagesPerRange");
+            if (perRangePage.HasValue)
+            {
+                parameters.Add($"PAGES_PER_RANGE = {perRangePage}");
+            }
+
+            var autosummarize = GetIndexStorageParameters<bool?>(PostgresExtensions.IndexAutosummarize, "Autosummarize");
+            if (autosummarize.HasValue)
+            {
+                parameters.Add($"AUTOSUMMARIZE = {ToOnOff(autosummarize.Value)}");
+            }
+
+            // Postgres 11 or Higher
+            var cleanup = GetIndexStorageParameters<float?>(PostgresExtensions.IndexVacuumCleanupIndexScaleFactor, "VacuumCleanupIndexScaleFactor");
+            if (cleanup.HasValue)
+            {
+                parameters.Add($"VACUUM_CLEANUP_INDEX_SCALE_FACTOR = {cleanup.Value.ToString().ToUpper()}");
+            }
+
+            if (parameters.Count == 0)
+            {
+                return string.Empty;
+            }
+
+            return $" WITH ( {string.Join(", ", parameters)} )";
+
+            string ToOnOff(bool value) => value ? "ON" : "OFF";
+
+            T GetIndexStorageParameters<T>(string indexStorageParameter, string indexStorageParameterName)
+            {
+                var parameter = expression.Index.GetAdditionalFeature<T>(indexStorageParameter);
+
+                if (parameter != null && !allow.Contains(indexStorageParameter))
+                {
+                    throw new NotSupportedException($"{indexStorageParameterName} index storage not supported. Please use a new version of Postgres");
+                }
+
+                return parameter;
+            }
+        }
+
+        protected virtual HashSet<string> GetAllowIndexStorageParameters()
+        {
+            return new HashSet<string>(StringComparer.InvariantCultureIgnoreCase)
+            {
+                PostgresExtensions.IndexFillFactor,
+                PostgresExtensions.IndexFastUpdate
+            };
+        }
+
         public override string Generate(CreateIndexExpression expression)
         {
             var result = new StringBuilder("CREATE");
-            if (expression.Index.IsUnique)
-                result.Append(" UNIQUE");
 
-            result.Append(" INDEX {0} ON {1} (");
+            if (expression.Index.IsUnique)
+            {
+                result.Append(" UNIQUE");
+            }
+
+            var indexMethod = GetIndexMethod(expression);
+
+            result.AppendFormat(" INDEX{0} {1} ON{2} {3}{4} (",
+                GetAsConcurrently(expression),
+                Quoter.QuoteIndexName(expression.Index.Name),
+                GetAsOnly(expression),
+                Quoter.QuoteTableName(expression.Index.TableName, expression.Index.SchemaName),
+                // B-Tree is default index method
+                indexMethod == Algorithm.BTree ? string.Empty : $" USING {indexMethod.ToString().ToUpper()}");
 
             var first = true;
             foreach (var column in expression.Index.Columns)
             {
                 if (first)
+                {
                     first = false;
+                }
                 else
+                {
                     result.Append(",");
+                }
 
                 result.Append(Quoter.QuoteColumnName(column.Name));
-                result.Append(column.Direction == Direction.Ascending ? " ASC" : " DESC");
+
+                switch (indexMethod)
+                {
+                    // Doesn't support ASC/DESC neither nulls sorts
+                    case Algorithm.Spgist:
+                    case Algorithm.Gist:
+                    case Algorithm.Gin:
+                    case Algorithm.Brin:
+                    case Algorithm.Hash:
+                        continue;
+                }
+
+                result.Append(column.Direction == Direction.Ascending ? " ASC" : " DESC")
+                    .Append(GetNullsSort(column));
             }
-            result.Append(");");
 
-            return string.Format(result.ToString(), Quoter.QuoteIndexName(expression.Index.Name), Quoter.QuoteTableName(expression.Index.TableName, expression.Index.SchemaName));
+            result.Append(")")
+                .Append(GetIncludeString(expression))
+                .Append(GetWithIndexStorageParameters(expression))
+                .Append(GetTablespace(expression))
+                .Append(GetFilter(expression))
+                .Append(";");
 
-            /*
-            var idx = String.Format(result.ToString(), expression.Index.Name, Quoter.QuoteSchemaName(expression.Index.SchemaName), expression.Index.TableName);
-            if (!expression.Index.IsClustered)
-                return idx;
-
-             // Clustered indexes in Postgres do not cluster updates/inserts to the table after the initial cluster operation is applied.
-             // To keep the clustered index up to date run CLUSTER TableName periodically
-
-            return string.Format("{0}; CLUSTER {1}\"{2}\" ON \"{3}\"", idx, Quoter.QuoteSchemaName(expression.Index.SchemaName), expression.Index.TableName, expression.Index.Name);
-             */
+            return result.ToString();
         }
 
         public override string Generate(DeleteIndexExpression expression)

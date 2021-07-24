@@ -18,11 +18,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Text;
 
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Processors.SqlServer;
+
+using Microsoft.Data.SqlClient;
 
 namespace FluentMigrator.Tests.Helpers
 {
