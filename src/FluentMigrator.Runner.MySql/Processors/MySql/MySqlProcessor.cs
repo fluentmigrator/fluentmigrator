@@ -208,7 +208,7 @@ SELECT CONCAT(
           IF(COLUMN_COMMENT = '', '', CONCAT('COMMENT ', QUOTE(COLUMN_COMMENT), ' ')),
           UPPER(extra))
   FROM INFORMATION_SCHEMA.COLUMNS
- WHERE TABLE_NAME = '{0}' AND COLUMN_NAME = '{1}'", FormatHelper.FormatSqlEscape(expression.TableName), FormatHelper.FormatSqlEscape(expression.OldName));
+ WHERE TABLE_NAME = '{0}' AND COLUMN_NAME = '{1}' AND TABLE_SCHEMA = database()", FormatHelper.FormatSqlEscape(expression.TableName), FormatHelper.FormatSqlEscape(expression.OldName));
 
             var fieldValue = Read(columnDefinitionSql).Tables[0].Rows[0][0];
             var columnDefinition = fieldValue as string;
