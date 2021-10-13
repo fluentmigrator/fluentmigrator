@@ -431,6 +431,11 @@ namespace FluentMigrator.Runner.Generators.Postgres
 
         public override string Generate(InsertDataExpression expression)
         {
+            var overridingSystemValue = expression.GetAdditionalFeature<bool>(PostgresExtensions.OverridingSystemValue);
+            var insertSyntax = overridingSystemValue
+                ? "INSERT INTO {0} ({1}) OVERRIDING SYSTEM VALUE VALUES ({2});"
+                : "INSERT INTO {0} ({1}) VALUES ({2});";
+
             var result = new StringBuilder();
             foreach (var row in expression.Rows)
             {
@@ -444,7 +449,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
 
                 var columns = GetColumnList(columnNames);
                 var data = GetDataList(columnData);
-                result.AppendFormat("INSERT INTO {0} ({1}) VALUES ({2});", Quoter.QuoteTableName(expression.TableName, expression.SchemaName), columns, data);
+                result.AppendFormat(insertSyntax, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), columns, data);
             }
             return result.ToString();
         }
