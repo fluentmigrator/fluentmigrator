@@ -20,6 +20,7 @@ using System.Collections.Generic;
 
 using FluentMigrator.Builders.Insert;
 using FluentMigrator.Expressions;
+using FluentMigrator.Postgres;
 using FluentMigrator.SqlServer;
 
 using NUnit.Framework;
@@ -95,6 +96,28 @@ namespace FluentMigrator.Tests.Unit.Builders.Insert
 
             expression.AdditionalFeatures.ShouldContain(
                 new KeyValuePair<string, object>(SqlServerExtensions.IdentityInsert, true));
+        }
+
+        [Test]
+        public void PostgresOverridingSystemValueAddsCorrectAdditionalFeature()
+        {
+            var expression = new InsertDataExpression();
+            var builder = new InsertDataExpressionBuilder(expression);
+            builder.WithOverridingSystemValue();
+
+            expression.AdditionalFeatures.ShouldContain(
+                new KeyValuePair<string, object>(PostgresExtensions.OverridingSystemValue, value: true));
+        }
+
+        [Test]
+        public void PostgresOverridingSystemValueCalledTwiceAddsCorrectAdditionalFeature()
+        {
+            var expression = new InsertDataExpression();
+            var builder = new InsertDataExpressionBuilder(expression);
+            builder.WithOverridingSystemValue().WithOverridingSystemValue();
+
+            expression.AdditionalFeatures.ShouldContain(
+                new KeyValuePair<string, object>(PostgresExtensions.OverridingSystemValue, value: true));
         }
     }
 }

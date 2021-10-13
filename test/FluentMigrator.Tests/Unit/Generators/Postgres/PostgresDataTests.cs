@@ -1,3 +1,4 @@
+using FluentMigrator.Postgres;
 using FluentMigrator.Runner.Generators.Postgres;
 using FluentMigrator.Runner.Processors.Postgres;
 
@@ -126,6 +127,19 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
 
             var result = Generator.Generate(expression);
             result.ShouldBe(string.Format("INSERT INTO \"public\".\"TestTable1\" (\"guid\") VALUES ('{0}');", GeneratorTestHelper.TestGuid));
+        }
+
+        [Test]
+        public void CanInsertWithOverridingSystemValue()
+        {
+            var expression = GeneratorTestHelper.GetInsertDataExpression();
+            expression.AdditionalFeatures[PostgresExtensions.OverridingSystemValue] = true;
+
+            var expected = "INSERT INTO \"public\".\"TestTable1\" (\"Id\",\"Name\",\"Website\") OVERRIDING SYSTEM VALUE VALUES (1,'Just''in','codethinked.com');";
+            expected += "INSERT INTO \"public\".\"TestTable1\" (\"Id\",\"Name\",\"Website\") OVERRIDING SYSTEM VALUE VALUES (2,'Na\\te','kohari.org');";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe(expected);
         }
 
         [Test]
