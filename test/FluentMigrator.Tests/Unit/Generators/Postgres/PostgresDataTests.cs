@@ -1,3 +1,5 @@
+using System;
+
 using FluentMigrator.Postgres;
 using FluentMigrator.Runner.Generators.Postgres;
 using FluentMigrator.Runner.Processors.Postgres;
@@ -17,7 +19,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         public void Setup()
         {
             var quoter = new PostgresQuoter(new PostgresOptions());
-            Generator = new PostgresGenerator(quoter);
+            Generator = CreateGenerator(quoter);
         }
 
         [Test]
@@ -130,29 +132,21 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
-        public void CanInsertWithOverridingSystemValue()
+        public virtual void CanInsertWithOverridingSystemValue()
         {
             var expression = GeneratorTestHelper.GetInsertDataExpression();
             expression.AdditionalFeatures[PostgresExtensions.OverridingIdentityValues] = PostgresOverridingIdentityValuesType.System;
 
-            var expected = "INSERT INTO \"public\".\"TestTable1\" (\"Id\",\"Name\",\"Website\") OVERRIDING SYSTEM VALUE VALUES (1,'Just''in','codethinked.com');";
-            expected += "INSERT INTO \"public\".\"TestTable1\" (\"Id\",\"Name\",\"Website\") OVERRIDING SYSTEM VALUE VALUES (2,'Na\\te','kohari.org');";
-
-            var result = Generator.Generate(expression);
-            result.ShouldBe(expected);
+            Should.Throw<NotSupportedException>(() => Generator.Generate(expression));
         }
 
         [Test]
-        public void CanInsertWithOverridingUserValue()
+        public virtual void CanInsertWithOverridingUserValue()
         {
             var expression = GeneratorTestHelper.GetInsertDataExpression();
             expression.AdditionalFeatures[PostgresExtensions.OverridingIdentityValues] = PostgresOverridingIdentityValuesType.User;
 
-            var expected = "INSERT INTO \"public\".\"TestTable1\" (\"Id\",\"Name\",\"Website\") OVERRIDING USER VALUE VALUES (1,'Just''in','codethinked.com');";
-            expected += "INSERT INTO \"public\".\"TestTable1\" (\"Id\",\"Name\",\"Website\") OVERRIDING USER VALUE VALUES (2,'Na\\te','kohari.org');";
-
-            var result = Generator.Generate(expression);
-            result.ShouldBe(expected);
+            Should.Throw<NotSupportedException>(() => Generator.Generate(expression));
         }
 
         [Test]
@@ -200,6 +194,11 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
 
             var result = Generator.Generate(expression);
             result.ShouldBe("UPDATE \"public\".\"TestTable1\" SET \"Name\" = 'Just''in', \"Age\" = 25 WHERE \"Id\" = 9 AND \"Homepage\" IS NULL;");
+        }
+
+        protected virtual PostgresGenerator CreateGenerator(PostgresQuoter quoter)
+        {
+            return new PostgresGenerator(quoter);
         }
     }
 }

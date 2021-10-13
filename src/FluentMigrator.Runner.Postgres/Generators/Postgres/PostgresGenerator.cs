@@ -431,19 +431,6 @@ namespace FluentMigrator.Runner.Generators.Postgres
 
         public override string Generate(InsertDataExpression expression)
         {
-            var insertSyntaxTemplate = "INSERT INTO {0} ({1}) VALUES ({2});";
-
-            if (expression.AdditionalFeatures.ContainsKey(PostgresExtensions.OverridingIdentityValues))
-            {
-                var overridingIdentityValues =
-                    expression.GetAdditionalFeature<PostgresOverridingIdentityValuesType>(
-                        PostgresExtensions.OverridingIdentityValues);
-                var overridingIdentityValuesClause = overridingIdentityValues == PostgresOverridingIdentityValuesType.User
-                    ? "OVERRIDING USER VALUE"
-                    : "OVERRIDING SYSTEM VALUE";
-                insertSyntaxTemplate = "INSERT INTO {0} ({1}) " + overridingIdentityValuesClause + " VALUES ({2});";
-            }
-
             var result = new StringBuilder();
             foreach (var row in expression.Rows)
             {
@@ -457,7 +444,11 @@ namespace FluentMigrator.Runner.Generators.Postgres
 
                 var columns = GetColumnList(columnNames);
                 var data = GetDataList(columnData);
-                result.AppendFormat(insertSyntaxTemplate, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), columns, data);
+                result.AppendFormat("INSERT INTO {0} ({1}){3} VALUES ({2});",
+                    Quoter.QuoteTableName(expression.TableName, expression.SchemaName),
+                    columns,
+                    data,
+                    GetOverridingIdentityValuesString(expression));
             }
             return result.ToString();
         }
@@ -641,6 +632,16 @@ namespace FluentMigrator.Runner.Generators.Postgres
         public override string Generate(DeleteSequenceExpression expression)
         {
             return string.Format("{0};", base.Generate(expression));
+        }
+
+        protected virtual string GetOverridingIdentityValuesString(InsertDataExpression expression)
+        {
+            if (!expression.AdditionalFeatures.ContainsKey(PostgresExtensions.OverridingIdentityValues))
+            {
+                return string.Empty;
+            }
+
+            throw new NotSupportedException("The current version doesn't support OVERRIDING {SYSTEM|USER} VALUE. Please use Postgres 10+.");
         }
     }
 }
