@@ -133,10 +133,23 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         public void CanInsertWithOverridingSystemValue()
         {
             var expression = GeneratorTestHelper.GetInsertDataExpression();
-            expression.AdditionalFeatures[PostgresExtensions.OverridingSystemValue] = true;
+            expression.AdditionalFeatures[PostgresExtensions.OverridingIdentityValues] = PostgresOverridingIdentityValuesType.System;
 
             var expected = "INSERT INTO \"public\".\"TestTable1\" (\"Id\",\"Name\",\"Website\") OVERRIDING SYSTEM VALUE VALUES (1,'Just''in','codethinked.com');";
             expected += "INSERT INTO \"public\".\"TestTable1\" (\"Id\",\"Name\",\"Website\") OVERRIDING SYSTEM VALUE VALUES (2,'Na\\te','kohari.org');";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe(expected);
+        }
+
+        [Test]
+        public void CanInsertWithOverridingUserValue()
+        {
+            var expression = GeneratorTestHelper.GetInsertDataExpression();
+            expression.AdditionalFeatures[PostgresExtensions.OverridingIdentityValues] = PostgresOverridingIdentityValuesType.User;
+
+            var expected = "INSERT INTO \"public\".\"TestTable1\" (\"Id\",\"Name\",\"Website\") OVERRIDING USER VALUE VALUES (1,'Just''in','codethinked.com');";
+            expected += "INSERT INTO \"public\".\"TestTable1\" (\"Id\",\"Name\",\"Website\") OVERRIDING USER VALUE VALUES (2,'Na\\te','kohari.org');";
 
             var result = Generator.Generate(expression);
             result.ShouldBe(expected);

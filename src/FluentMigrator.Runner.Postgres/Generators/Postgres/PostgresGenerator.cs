@@ -431,10 +431,18 @@ namespace FluentMigrator.Runner.Generators.Postgres
 
         public override string Generate(InsertDataExpression expression)
         {
-            var overridingSystemValue = expression.GetAdditionalFeature<bool>(PostgresExtensions.OverridingSystemValue);
-            var insertSyntax = overridingSystemValue
-                ? "INSERT INTO {0} ({1}) OVERRIDING SYSTEM VALUE VALUES ({2});"
-                : "INSERT INTO {0} ({1}) VALUES ({2});";
+            var insertSyntaxTemplate = "INSERT INTO {0} ({1}) VALUES ({2});";
+
+            if (expression.AdditionalFeatures.ContainsKey(PostgresExtensions.OverridingIdentityValues))
+            {
+                var overridingIdentityValues =
+                    expression.GetAdditionalFeature<PostgresOverridingIdentityValuesType>(
+                        PostgresExtensions.OverridingIdentityValues);
+                var overridingIdentityValuesClause = overridingIdentityValues == PostgresOverridingIdentityValuesType.User
+                    ? "OVERRIDING USER VALUE"
+                    : "OVERRIDING SYSTEM VALUE";
+                insertSyntaxTemplate = "INSERT INTO {0} ({1}) " + overridingIdentityValuesClause + " VALUES ({2});";
+            }
 
             var result = new StringBuilder();
             foreach (var row in expression.Rows)
@@ -449,7 +457,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
 
                 var columns = GetColumnList(columnNames);
                 var data = GetDataList(columnData);
-                result.AppendFormat(insertSyntax, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), columns, data);
+                result.AppendFormat(insertSyntaxTemplate, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), columns, data);
             }
             return result.ToString();
         }
