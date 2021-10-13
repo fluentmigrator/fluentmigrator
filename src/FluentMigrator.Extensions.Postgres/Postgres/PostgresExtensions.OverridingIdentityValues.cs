@@ -24,7 +24,7 @@ namespace FluentMigrator.Postgres
 {
     public static partial class PostgresExtensions
     {
-        public const string OverridingIdentityValues = "PostgresOverridingSystemValue";
+        public const string OverridingIdentityValues = "PostgresOverridingIdentityValues";
 
         /// <summary>
         /// Adds an OVERRIDING SYSTEM VALUE clause in the current <see cref="IInsertDataSyntax"/> expression.
