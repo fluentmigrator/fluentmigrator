@@ -20,6 +20,7 @@ using System.Collections.Generic;
 
 using FluentMigrator.Builders.Insert;
 using FluentMigrator.Expressions;
+using FluentMigrator.Postgres;
 using FluentMigrator.SqlServer;
 
 using NUnit.Framework;
@@ -95,6 +96,82 @@ namespace FluentMigrator.Tests.Unit.Builders.Insert
 
             expression.AdditionalFeatures.ShouldContain(
                 new KeyValuePair<string, object>(SqlServerExtensions.IdentityInsert, true));
+        }
+
+        [Test]
+        public void PostgresOverridingSystemValueAddsCorrectAdditionalFeature()
+        {
+            var expression = new InsertDataExpression();
+            var builder = new InsertDataExpressionBuilder(expression);
+            builder.WithOverridingSystemValue();
+
+            expression.AdditionalFeatures.ShouldContain(
+                new KeyValuePair<string, object>(
+                    PostgresExtensions.OverridingIdentityValues,
+                    PostgresOverridingIdentityValuesType.System));
+        }
+
+        [Test]
+        public void PostgresOverridingSystemValueCalledTwiceAddsCorrectAdditionalFeature()
+        {
+            var expression = new InsertDataExpression();
+            var builder = new InsertDataExpressionBuilder(expression);
+            builder.WithOverridingSystemValue().WithOverridingSystemValue();
+
+            expression.AdditionalFeatures.ShouldContain(
+                new KeyValuePair<string, object>(
+                    PostgresExtensions.OverridingIdentityValues,
+                    PostgresOverridingIdentityValuesType.System));
+        }
+
+        [Test]
+        public void PostgresOverridingUserValueAddsCorrectAdditionalFeature()
+        {
+            var expression = new InsertDataExpression();
+            var builder = new InsertDataExpressionBuilder(expression);
+            builder.WithOverridingUserValue();
+
+            expression.AdditionalFeatures.ShouldContain(
+                new KeyValuePair<string, object>(
+                    PostgresExtensions.OverridingIdentityValues,
+                    PostgresOverridingIdentityValuesType.User));
+        }
+
+        [Test]
+        public void PostgresOverridingUserValueCalledTwiceAddsCorrectAdditionalFeature()
+        {
+            var expression = new InsertDataExpression();
+            var builder = new InsertDataExpressionBuilder(expression);
+            builder.WithOverridingUserValue().WithOverridingUserValue();
+
+            expression.AdditionalFeatures.ShouldContain(
+                new KeyValuePair<string, object>(
+                    PostgresExtensions.OverridingIdentityValues,
+                    PostgresOverridingIdentityValuesType.User));
+        }
+
+        [Test]
+        public void PostgresOverridingIdentityValuesCalledWithDifferentTypeAddsCorrectAdditionalFeature()
+        {
+            // If both WithOverridingSystemValue() and WithOverridingUserValue() are called on the same expression,
+            // then the latest value should be set in the additional features
+
+            var expressionForUserValue = new InsertDataExpression();
+            var builderForUserValue = new InsertDataExpressionBuilder(expressionForUserValue);
+            builderForUserValue.WithOverridingSystemValue().WithOverridingUserValue();
+
+            var expressionForSystemValue = new InsertDataExpression();
+            var builderForSystemValue = new InsertDataExpressionBuilder(expressionForSystemValue);
+            builderForSystemValue.WithOverridingUserValue().WithOverridingSystemValue();
+
+            expressionForUserValue.AdditionalFeatures.ShouldContain(
+                new KeyValuePair<string, object>(
+                    PostgresExtensions.OverridingIdentityValues,
+                    PostgresOverridingIdentityValuesType.User));
+            expressionForSystemValue.AdditionalFeatures.ShouldContain(
+                new KeyValuePair<string, object>(
+                    PostgresExtensions.OverridingIdentityValues,
+                    PostgresOverridingIdentityValuesType.System));
         }
     }
 }

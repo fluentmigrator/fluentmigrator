@@ -16,6 +16,8 @@
 
 using System.Collections.Generic;
 
+using FluentMigrator.Expressions;
+using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Postgres;
 
 using JetBrains.Annotations;
@@ -60,6 +62,22 @@ namespace FluentMigrator.Runner.Generators.Postgres
             allow.Add(PostgresExtensions.IndexAutosummarize);
 
             return allow;
+        }
+
+        /// <inheritdoc />
+        protected override string GetOverridingIdentityValuesString(InsertDataExpression expression)
+        {
+            if (!expression.AdditionalFeatures.ContainsKey(PostgresExtensions.OverridingIdentityValues))
+            {
+                return string.Empty;
+            }
+
+            var overridingIdentityValues =
+                expression.GetAdditionalFeature<PostgresOverridingIdentityValuesType>(
+                    PostgresExtensions.OverridingIdentityValues);
+
+            return string.Format(" OVERRIDING {0} VALUE",
+                overridingIdentityValues == PostgresOverridingIdentityValuesType.User ? "USER" : "SYSTEM");
         }
     }
 }

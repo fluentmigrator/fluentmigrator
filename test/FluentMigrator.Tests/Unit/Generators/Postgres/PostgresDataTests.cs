@@ -1,3 +1,6 @@
+using System;
+
+using FluentMigrator.Postgres;
 using FluentMigrator.Runner.Generators.Postgres;
 using FluentMigrator.Runner.Processors.Postgres;
 
@@ -16,7 +19,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         public void Setup()
         {
             var quoter = new PostgresQuoter(new PostgresOptions());
-            Generator = new PostgresGenerator(quoter);
+            Generator = CreateGenerator(quoter);
         }
 
         [Test]
@@ -129,6 +132,24 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
+        public virtual void CanInsertWithOverridingSystemValue()
+        {
+            var expression = GeneratorTestHelper.GetInsertDataExpression();
+            expression.AdditionalFeatures[PostgresExtensions.OverridingIdentityValues] = PostgresOverridingIdentityValuesType.System;
+
+            Should.Throw<NotSupportedException>(() => Generator.Generate(expression));
+        }
+
+        [Test]
+        public virtual void CanInsertWithOverridingUserValue()
+        {
+            var expression = GeneratorTestHelper.GetInsertDataExpression();
+            expression.AdditionalFeatures[PostgresExtensions.OverridingIdentityValues] = PostgresOverridingIdentityValuesType.User;
+
+            Should.Throw<NotSupportedException>(() => Generator.Generate(expression));
+        }
+
+        [Test]
         public override void CanUpdateDataForAllDataWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpressionWithAllRows();
@@ -173,6 +194,11 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
 
             var result = Generator.Generate(expression);
             result.ShouldBe("UPDATE \"public\".\"TestTable1\" SET \"Name\" = 'Just''in', \"Age\" = 25 WHERE \"Id\" = 9 AND \"Homepage\" IS NULL;");
+        }
+
+        protected virtual PostgresGenerator CreateGenerator(PostgresQuoter quoter)
+        {
+            return new PostgresGenerator(quoter);
         }
     }
 }

@@ -444,7 +444,11 @@ namespace FluentMigrator.Runner.Generators.Postgres
 
                 var columns = GetColumnList(columnNames);
                 var data = GetDataList(columnData);
-                result.AppendFormat("INSERT INTO {0} ({1}) VALUES ({2});", Quoter.QuoteTableName(expression.TableName, expression.SchemaName), columns, data);
+                result.AppendFormat("INSERT INTO {0} ({1}){3} VALUES ({2});",
+                    Quoter.QuoteTableName(expression.TableName, expression.SchemaName),
+                    columns,
+                    data,
+                    GetOverridingIdentityValuesString(expression));
             }
             return result.ToString();
         }
@@ -628,6 +632,16 @@ namespace FluentMigrator.Runner.Generators.Postgres
         public override string Generate(DeleteSequenceExpression expression)
         {
             return string.Format("{0};", base.Generate(expression));
+        }
+
+        protected virtual string GetOverridingIdentityValuesString(InsertDataExpression expression)
+        {
+            if (!expression.AdditionalFeatures.ContainsKey(PostgresExtensions.OverridingIdentityValues))
+            {
+                return string.Empty;
+            }
+
+            throw new NotSupportedException("The current version doesn't support OVERRIDING {SYSTEM|USER} VALUE. Please use Postgres 10+.");
         }
     }
 }
