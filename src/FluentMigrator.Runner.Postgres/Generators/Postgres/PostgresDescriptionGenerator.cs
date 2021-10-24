@@ -64,7 +64,6 @@ namespace FluentMigrator.Runner.Generators.Postgres
 
             return string.Format(
                 ColumnDescriptionTemplate,
-                descriptionName,
                 GetFullTableName(schemaName, tableName),
                 Quoter.QuoteColumnName(columnName),
                 columnDescription.Replace("'", "''"));

@@ -17,6 +17,7 @@
 #endregion
 
 using System.Collections.Generic;
+using System.Linq;
 
 namespace FluentMigrator.Runner.Generators.Generic
 {
@@ -91,6 +92,9 @@ namespace FluentMigrator.Runner.Generators.Generic
                 var newDescriptionStatement = GenerateColumnDescription(description.Key, expression.SchemaName, expression.TableName, expression.Column.Name, description.Value);
                 descriptionsList.Add(newDescriptionStatement);
             }
+
+            if (descriptionsList.Count == 1)
+                return descriptionsList.First();
 
             return string.Join("\r\n", descriptionsList);
         }

@@ -56,7 +56,6 @@ namespace FluentMigrator.Runner.Generators.Oracle
 
             return string.Format(
                 ColumnDescriptionTemplate,
-                descriptionName,
                 GetFullTableName(schemaName, tableName),
                 columnName,
                 columnDescription.Replace("'", "''"));

@@ -69,7 +69,6 @@ namespace FluentMigrator.Runner.Generators.Redshift
 
             return string.Format(
                 ColumnDescriptionTemplate,
-                descriptionName, 
                 GetFullTableName(schemaName, tableName),
                 Quoter.QuoteColumnName(columnName),
                 columnDescription.Replace("'", "''"));
