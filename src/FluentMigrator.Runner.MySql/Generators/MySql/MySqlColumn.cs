@@ -44,7 +44,12 @@ namespace FluentMigrator.Runner.Generators.MySql
             if (column.ColumnDescriptions.Count == 0)
                 return string.Empty;
 
-            return string.Format("COMMENT {0}", Quoter.QuoteValue(column.ColumnDescriptions.First().Value));
+            var possibleDescription = column.ColumnDescriptions.First();
+
+            if (string.IsNullOrWhiteSpace(possibleDescription.Value))
+                return string.Empty;
+
+            return string.Format("COMMENT {0}", Quoter.QuoteValue(possibleDescription.Value));
         }
 
         /// <inheritdoc />
