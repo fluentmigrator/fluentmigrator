@@ -35,7 +35,6 @@ namespace FluentMigrator.Runner.Generators.Hana
 
             return string.Format(
                 ColumnDescriptionTemplate,
-                descriptionName,
                 GetFullTableName(schemaName, tableName),
                 columnName,
                 columnDescription);
