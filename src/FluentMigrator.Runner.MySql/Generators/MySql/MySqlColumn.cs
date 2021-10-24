@@ -38,7 +38,7 @@ namespace FluentMigrator.Runner.Generators.MySql
         protected string FormatDescription(ColumnDefinition column)
         {
             if (column.ColumnDescriptions.Count > 1)
-                throw new InvalidOperationException("Only one comment is allowed for the column " + column.Name);
+                throw new InvalidOperationException("Only one description is allowed for the column " + column.Name);
 
             if (column.ColumnDescriptions.Count == 0)
                 return string.Empty;
