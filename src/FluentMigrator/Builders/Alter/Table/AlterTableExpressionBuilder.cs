@@ -176,9 +176,8 @@ namespace FluentMigrator.Builders.Alter.Table
             if (string.IsNullOrWhiteSpace(propertyName))
                 throw new ArgumentException("Cannot be the empty string.", "description");
 
-            var isPresent = CurrentColumn.ColumnDescriptions.Keys.Count(i => i.Equals(propertyName)) > 0;
-            if (isPresent)
-                throw new InvalidOperationException("The given propertyName is already present in the columnDescription list");
+            if (CurrentColumn.ColumnDescriptions.Keys.Count(i => i.Equals(propertyName)) > 0)
+                throw new InvalidOperationException("The given propertyName is already present in the columnDescription list.");
 
             CurrentColumn.ColumnDescriptions.Add(propertyName, description);
             return this;

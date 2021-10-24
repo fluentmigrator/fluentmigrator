@@ -114,9 +114,8 @@ namespace FluentMigrator.Builders.Alter.Column
             if (string.IsNullOrWhiteSpace(propertyName))
                 throw new ArgumentException("Cannot be the empty string.", "description");
 
-            var isPresent = Expression.Column.ColumnDescriptions.Keys.Count(i => i.Equals(propertyName)) > 0;
-            if(isPresent)
-                throw new InvalidOperationException("The given propertyName is already present in the columnDescription list");
+            if(Expression.Column.ColumnDescriptions.Keys.Count(i => i.Equals(propertyName)) > 0)
+                throw new InvalidOperationException("The given propertyName is already present in the columnDescription list.");
 
             Expression.Column.ColumnDescriptions.Add(propertyName, description);
             return this;
