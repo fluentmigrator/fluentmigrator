@@ -14,6 +14,7 @@
 // limitations under the License.
 #endregion
 
+using System;
 using System.Linq;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Base;
@@ -36,9 +37,13 @@ namespace FluentMigrator.Runner.Generators.MySql
 
         protected string FormatDescription(ColumnDefinition column)
         {
-            return column.ColumnDescriptions.Count == 0
-                ? string.Empty
-                : string.Format("COMMENT {0}", Quoter.QuoteValue(column.ColumnDescriptions.First().Value));
+            if (column.ColumnDescriptions.Count > 1)
+                throw new InvalidOperationException("Only one comment is allowed for the column " + column.Name);
+
+            if (column.ColumnDescriptions.Count == 0)
+                return string.Empty;
+
+            return string.Format("COMMENT {0}", Quoter.QuoteValue(column.ColumnDescriptions.First().Value));
         }
 
         /// <inheritdoc />
