@@ -16,7 +16,9 @@
 
 #endregion
 
+using System;
 using System.Data;
+using System.Linq;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
@@ -102,6 +104,16 @@ namespace FluentMigrator.Builders.Create.Column
         /// <inheritdoc />
         public ICreateColumnOptionSyntax WithColumnAdditionalDescription(string propertyName, string description)
         {
+            if (string.IsNullOrWhiteSpace(propertyName))
+                throw new ArgumentException("Cannot be the empty string.", "propertyName");
+
+            if (string.IsNullOrWhiteSpace(propertyName))
+                throw new ArgumentException("Cannot be the empty string.", "description");
+
+            var isPresent = Expression.Column.ColumnDescriptions.Keys.Count(i => i.Equals(propertyName)) > 0;
+            if (isPresent)
+                throw new InvalidOperationException("The given propertyName is already present in the columnDescription list");
+
             Expression.Column.ColumnDescriptions.Add(propertyName, description);
             return this;
         }
