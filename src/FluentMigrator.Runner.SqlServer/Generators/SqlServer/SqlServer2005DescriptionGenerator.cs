@@ -70,7 +70,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                 descriptionsList.Add(newDescriptionStatement);
             }
 
-            var joined = string.Join("\r\n", descriptionsList);
+            var joined = string.Join(";\r\n", descriptionsList);
 
             return string.Join(";", new[] { removalStatement, joined });
         }
