@@ -102,7 +102,14 @@ namespace FluentMigrator.Builders.Create.Table
         /// <inheritdoc />
         public ICreateTableColumnOptionOrWithColumnSyntax WithColumnDescription(string description)
         {
-            CurrentColumn.ColumnDescription = description;
+            CurrentColumn.ColumnDescriptions.Add("Description", description);
+            return this;
+        }
+
+        /// <inheritdoc />
+        public ICreateTableColumnOptionOrWithColumnSyntax WithColumnAdditionalDescription(string propertyName, string description)
+        {
+            CurrentColumn.ColumnDescriptions.Add(propertyName, description);
             return this;
         }
 

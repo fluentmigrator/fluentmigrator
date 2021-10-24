@@ -99,7 +99,14 @@ namespace FluentMigrator.Builders.Alter.Column
         /// <inheritdoc />
         public IAlterColumnOptionSyntax WithColumnDescription(string description)
         {
-            Expression.Column.ColumnDescription = description;
+            Expression.Column.ColumnDescriptions.Add("Description",description);
+            return this;
+        }
+
+        /// <inheritdoc />
+        public IAlterColumnOptionSyntax WithColumnAdditionalDescription(string propertyName, string description)
+        {
+            Expression.Column.ColumnDescriptions.Add(propertyName, description);
             return this;
         }
 

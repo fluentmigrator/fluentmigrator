@@ -57,13 +57,14 @@ namespace FluentMigrator.Runner.Generators.Postgres
         }
 
         protected override string GenerateColumnDescription(
-            string schemaName, string tableName, string columnName, string columnDescription)
+            string descriptionName, string schemaName, string tableName, string columnName, string columnDescription)
         {
             if (string.IsNullOrEmpty(columnDescription))
                 return string.Empty;
 
             return string.Format(
                 ColumnDescriptionTemplate,
+                descriptionName,
                 GetFullTableName(schemaName, tableName),
                 Quoter.QuoteColumnName(columnName),
                 columnDescription.Replace("'", "''"));

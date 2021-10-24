@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 //
 // Copyright (c) 2018, Fluent Migrator Project
 //
@@ -49,13 +49,14 @@ namespace FluentMigrator.Runner.Generators.Oracle
         }
 
         protected override string GenerateColumnDescription(
-            string schemaName, string tableName, string columnName, string columnDescription)
+            string descriptionName, string schemaName, string tableName, string columnName, string columnDescription)
         {
             if (string.IsNullOrEmpty(columnDescription))
                 return string.Empty;
 
             return string.Format(
                 ColumnDescriptionTemplate,
+                descriptionName,
                 GetFullTableName(schemaName, tableName),
                 columnName,
                 columnDescription.Replace("'", "''"));

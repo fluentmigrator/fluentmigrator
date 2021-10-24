@@ -161,7 +161,14 @@ namespace FluentMigrator.Builders.Alter.Table
         /// <inheritdoc />
         public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax WithColumnDescription(string description)
         {
-            CurrentColumn.ColumnDescription = description;
+            CurrentColumn.ColumnDescriptions.Add("Description", description);
+            return this;
+        }
+
+        /// <inheritdoc />
+        public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax WithColumnAdditionalDescription(string propertyName, string description)
+        {
+            CurrentColumn.ColumnDescriptions.Add(propertyName, description);
             return this;
         }
 

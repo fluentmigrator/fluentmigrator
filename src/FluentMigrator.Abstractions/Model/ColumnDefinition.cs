@@ -115,7 +115,7 @@ namespace FluentMigrator.Model
         /// <summary>
         /// Gets or sets the column description
         /// </summary>
-        public virtual string ColumnDescription { get; set; }
+        public virtual Dictionary<string, string> ColumnDescriptions { get; set; } = new Dictionary<string, string>();
 
         /// <summary>
         /// Gets or sets the collation name if the column has a string or ansi string type

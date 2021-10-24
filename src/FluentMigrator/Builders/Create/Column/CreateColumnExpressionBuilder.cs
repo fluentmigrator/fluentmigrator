@@ -95,7 +95,14 @@ namespace FluentMigrator.Builders.Create.Column
         /// <inheritdoc />
         public ICreateColumnOptionSyntax WithColumnDescription(string description)
         {
-            Expression.Column.ColumnDescription = description;
+            Expression.Column.ColumnDescriptions.Add("Description", description);
+            return this;
+        }
+
+        /// <inheritdoc />
+        public ICreateColumnOptionSyntax WithColumnAdditionalDescription(string propertyName, string description)
+        {
+            Expression.Column.ColumnDescriptions.Add(propertyName, description);
             return this;
         }
 
