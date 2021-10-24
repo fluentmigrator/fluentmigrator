@@ -15,6 +15,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 using FluentMigrator.Model;
@@ -38,18 +39,17 @@ namespace FluentMigrator.Runner.Generators.MySql
 
         protected string FormatDescription(ColumnDefinition column)
         {
-            if (column.ColumnDescriptions.Count > 1)
-                throw new InvalidOperationException("Only one description is allowed for the column " + column.Name);
-
             if (column.ColumnDescriptions.Count == 0)
                 return string.Empty;
 
-            var possibleDescription = column.ColumnDescriptions.First();
+            var descriptionsList = new List<string>();
+            foreach( var descriptionItem in column.ColumnDescriptions)
+            {
+                descriptionsList.Add(descriptionItem.Key + ":" + descriptionItem.Value);
+            }
+            var joined = string.Join("\r\n", descriptionsList);
 
-            if (string.IsNullOrWhiteSpace(possibleDescription.Value))
-                return string.Empty;
-
-            return string.Format("COMMENT {0}", Quoter.QuoteValue(possibleDescription.Value));
+            return string.Format("COMMENT {0}", Quoter.QuoteValue(joined));
         }
 
         /// <inheritdoc />
