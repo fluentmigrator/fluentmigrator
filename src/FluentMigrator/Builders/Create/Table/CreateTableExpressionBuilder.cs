@@ -118,7 +118,7 @@ namespace FluentMigrator.Builders.Create.Table
                 throw new ArgumentException("Cannot be the empty string.", "description");
 
             if (CurrentColumn.ColumnDescriptions.Keys.Count(i => i.Equals(descriptionName)) > 0)
-                throw new InvalidOperationException("The given propertyName is already present in the columnDescription list.");
+                throw new InvalidOperationException("The given descriptionName is already present in the columnDescription list.");
 
             CurrentColumn.ColumnDescriptions.Add(descriptionName, description);
             return this;
