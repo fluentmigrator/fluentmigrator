@@ -78,6 +78,9 @@ namespace FluentMigrator.Runner.Generators.Generic
                 descriptionsList.Add(newDescriptionStatement);
             }
 
+            if (descriptionsList.Count == 1)
+                return descriptionsList.First();
+
             return string.Join("\r\n", descriptionsList);
         }
 
