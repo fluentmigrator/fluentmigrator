@@ -16,6 +16,7 @@
 
 using System;
 using System.Linq;
+
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Base;
 
