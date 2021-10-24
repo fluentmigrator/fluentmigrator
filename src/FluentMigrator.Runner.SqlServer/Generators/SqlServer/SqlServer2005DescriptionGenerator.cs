@@ -30,7 +30,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         private const string TableDescriptionTemplate =
             "EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'{0}', @level0type=N'SCHEMA', @level0name='{1}', @level1type=N'TABLE', @level1name='{2}'";
         private const string ColumnDescriptionTemplate =
-           "EXEC sys.sp_addextendedproperty @name = N'MS_{0}', @value = N'{1}', @level0type = N'SCHEMA', @level0name = '{2}', @level1type = N'Table', @level1name = '{3}', @level2type = N'Column',  @level2name = '{4}'";
+            "EXEC sys.sp_addextendedproperty @name = N'MS_{0}', @value = N'{1}', @level0type = N'SCHEMA', @level0name = '{2}', @level1type = N'Table', @level1name = '{3}', @level2type = N'Column',  @level2name = '{4}'";
         private const string RemoveTableDescriptionTemplate = "EXEC sys.sp_dropextendedproperty @name=N'MS_Description', @level0type=N'SCHEMA', @level0name='{0}', @level1type=N'TABLE', @level1name='{1}'";
         private const string RemoveColumnDescriptionTemplate = "EXEC sys.sp_dropextendedproperty @name=N'MS_Description', @level0type = N'SCHEMA', @level0name = '{0}', @level1type = N'Table', @level1name = '{1}', @level2type = N'Column',  @level2name = '{2}'";
         private const string TableDescriptionVerificationTemplate = "IF EXISTS ( SELECT * FROM fn_listextendedproperty(N'MS_Description', N'SCHEMA', N'{0}', N'TABLE', N'{1}', NULL, NULL))";
