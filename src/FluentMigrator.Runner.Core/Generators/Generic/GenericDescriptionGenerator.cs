@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 //
 // Copyright (c) 2018, Fluent Migrator Project
 //
@@ -17,6 +17,7 @@
 #endregion
 
 using System.Collections.Generic;
+using System.Linq;
 
 namespace FluentMigrator.Runner.Generators.Generic
 {
@@ -28,7 +29,7 @@ namespace FluentMigrator.Runner.Generators.Generic
         protected abstract string GenerateTableDescription(
             string schemaName, string tableName, string tableDescription);
         protected abstract string GenerateColumnDescription(
-            string schemaName, string tableName, string columnName, string columnDescription);
+            string descriptionName, string schemaName, string tableName, string columnName, string columnDescription);
 
         public virtual IEnumerable<string> GenerateDescriptionStatements(Expressions.CreateTableExpression expression)
         {
@@ -39,14 +40,18 @@ namespace FluentMigrator.Runner.Generators.Generic
 
             foreach (var column in expression.Columns)
             {
-                if (string.IsNullOrEmpty(column.ColumnDescription))
+                if (column.ColumnDescriptions.Count == 0)
                     continue;
 
-                statements.Add(GenerateColumnDescription(
+                foreach (var description in column.ColumnDescriptions)
+                {
+                    statements.Add(GenerateColumnDescription(
+                    description.Key,
                     expression.SchemaName,
                     expression.TableName,
                     column.Name,
-                    column.ColumnDescription));
+                    description.Value));
+                }
             }
 
             return statements;
@@ -63,19 +68,38 @@ namespace FluentMigrator.Runner.Generators.Generic
 
         public virtual string GenerateDescriptionStatement(Expressions.CreateColumnExpression expression)
         {
-            if (string.IsNullOrEmpty(expression.Column.ColumnDescription))
+            if (expression.Column.ColumnDescriptions.Count == 0)
                 return string.Empty;
 
-            return GenerateColumnDescription(
-                expression.SchemaName, expression.TableName, expression.Column.Name, expression.Column.ColumnDescription);
+            var descriptionsList = new List<string>();
+            foreach (var description in expression.Column.ColumnDescriptions)
+            {
+                var newDescriptionStatement = GenerateColumnDescription(description.Key, expression.SchemaName, expression.TableName, expression.Column.Name, description.Value);
+                descriptionsList.Add(newDescriptionStatement);
+            }
+
+            if (descriptionsList.Count == 1)
+                return descriptionsList.First();
+
+            return string.Join("\r\n", descriptionsList);
         }
 
         public virtual string GenerateDescriptionStatement(Expressions.AlterColumnExpression expression)
         {
-            if (string.IsNullOrEmpty(expression.Column.ColumnDescription))
+            if (expression.Column.ColumnDescriptions.Count == 0)
                 return string.Empty;
 
-            return GenerateColumnDescription(expression.SchemaName, expression.TableName, expression.Column.Name, expression.Column.ColumnDescription);
+            var descriptionsList = new List<string>();
+            foreach (var description in expression.Column.ColumnDescriptions)
+            {
+                var newDescriptionStatement = GenerateColumnDescription(description.Key, expression.SchemaName, expression.TableName, expression.Column.Name, description.Value);
+                descriptionsList.Add(newDescriptionStatement);
+            }
+
+            if (descriptionsList.Count == 1)
+                return descriptionsList.First();
+
+            return string.Join("\r\n", descriptionsList);
         }
     }
 }

@@ -14,6 +14,8 @@
 // limitations under the License.
 #endregion
 
+using System.Collections.Generic;
+
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Base;
 
@@ -35,9 +37,17 @@ namespace FluentMigrator.Runner.Generators.MySql
 
         protected string FormatDescription(ColumnDefinition column)
         {
-            return string.IsNullOrEmpty(column.ColumnDescription)
-                ? string.Empty
-                : string.Format("COMMENT {0}", Quoter.QuoteValue(column.ColumnDescription));
+            if (column.ColumnDescriptions.Count == 0)
+                return string.Empty;
+
+            var descriptionsList = new List<string>();
+            foreach (var descriptionItem in column.ColumnDescriptions)
+            {
+                descriptionsList.Add(descriptionItem.Key + ":" + descriptionItem.Value);
+            }
+            var joined = string.Join("\r\n", descriptionsList);
+
+            return string.Format("COMMENT {0}", Quoter.QuoteValue(joined));
         }
 
         /// <inheritdoc />

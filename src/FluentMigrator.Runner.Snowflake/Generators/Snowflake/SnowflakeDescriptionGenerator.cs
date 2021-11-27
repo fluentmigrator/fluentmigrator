@@ -47,7 +47,7 @@ namespace FluentMigrator.Runner.Generators.Snowflake
 
         /// <inheritdoc />
         protected override string GenerateColumnDescription(
-            string schemaName, string tableName, string columnName, string columnDescription)
+            string descriptionName, string schemaName, string tableName, string columnName, string columnDescription)
         {
             if (string.IsNullOrEmpty(columnDescription))
             {

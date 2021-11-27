@@ -110,9 +110,9 @@ namespace FluentMigrator.Model
         public virtual ColumnModificationType ModificationType { get; set; }
 
         /// <summary>
-        /// Gets or sets the column description
+        /// Gets or sets the column descriptions
         /// </summary>
-        public virtual string ColumnDescription { get; set; }
+        public virtual Dictionary<string, string> ColumnDescriptions { get; set; } = new Dictionary<string, string>();
 
         /// <summary>
         /// Gets or sets the collation name if the column has a string or ansi string type

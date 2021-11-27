@@ -16,7 +16,9 @@
 
 #endregion
 
+using System;
 using System.Data;
+using System.Linq;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
@@ -99,7 +101,23 @@ namespace FluentMigrator.Builders.Alter.Column
         /// <inheritdoc />
         public IAlterColumnOptionSyntax WithColumnDescription(string description)
         {
-            Expression.Column.ColumnDescription = description;
+            Expression.Column.ColumnDescriptions.Add("Description", description);
+            return this;
+        }
+
+        /// <inheritdoc />
+        public IAlterColumnOptionSyntax WithColumnAdditionalDescription(string descriptionName, string description)
+        {
+            if (string.IsNullOrWhiteSpace(descriptionName))
+                throw new ArgumentException("Cannot be the empty string.", "descriptionName");
+
+            if (string.IsNullOrWhiteSpace(description))
+                throw new ArgumentException("Cannot be the empty string.", "description");
+
+            if (Expression.Column.ColumnDescriptions.Keys.Count(i => i.Equals(descriptionName)) > 0)
+                throw new InvalidOperationException("The given descriptionName is already present in the columnDescription list.");
+
+            Expression.Column.ColumnDescriptions.Add(descriptionName, description);
             return this;
         }
 

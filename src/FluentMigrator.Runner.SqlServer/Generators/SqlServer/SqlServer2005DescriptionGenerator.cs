@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 //
 // Copyright (c) 2018, Fluent Migrator Project
 //
@@ -16,6 +16,8 @@
 //
 #endregion
 
+using System.Collections.Generic;
+
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators.Generic;
 
@@ -28,7 +30,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         private const string TableDescriptionTemplate =
             "EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'{0}', @level0type=N'SCHEMA', @level0name='{1}', @level1type=N'TABLE', @level1name='{2}'";
         private const string ColumnDescriptionTemplate =
-            "EXEC sys.sp_addextendedproperty @name = N'MS_Description', @value = N'{0}', @level0type = N'SCHEMA', @level0name = '{1}', @level1type = N'Table', @level1name = '{2}', @level2type = N'Column',  @level2name = '{3}'";
+            "EXEC sys.sp_addextendedproperty @name = N'MS_{0}', @value = N'{1}', @level0type = N'SCHEMA', @level0name = '{2}', @level1type = N'Table', @level1name = '{3}', @level2type = N'Column',  @level2name = '{4}'";
         private const string RemoveTableDescriptionTemplate = "EXEC sys.sp_dropextendedproperty @name=N'MS_Description', @level0type=N'SCHEMA', @level0name='{0}', @level1type=N'TABLE', @level1name='{1}'";
         private const string RemoveColumnDescriptionTemplate = "EXEC sys.sp_dropextendedproperty @name=N'MS_Description', @level0type = N'SCHEMA', @level0name = '{0}', @level1type = N'Table', @level1name = '{1}', @level2type = N'Column',  @level2name = '{2}'";
         private const string TableDescriptionVerificationTemplate = "IF EXISTS ( SELECT * FROM fn_listextendedproperty(N'MS_Description', N'SCHEMA', N'{0}', N'TABLE', N'{1}', NULL, NULL))";
@@ -53,7 +55,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override string GenerateDescriptionStatement(AlterColumnExpression expression)
         {
-            if (string.IsNullOrEmpty(expression.Column.ColumnDescription))
+            if (expression.Column.ColumnDescriptions.Count == 0)
                 return string.Empty;
 
             var formattedSchemaName = FormatSchemaName(expression.SchemaName);
@@ -61,9 +63,17 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             // For this, we need to remove the extended property first if exists (or implement verification and use sp_updateextendedproperty)
             var columnVerificationStatement = string.Format(ColumnDescriptionVerificationTemplate, formattedSchemaName, expression.TableName, expression.Column.Name);
             var removalStatement = string.Format("{0} {1}", columnVerificationStatement, GenerateColumnDescriptionRemoval(formattedSchemaName, expression.TableName, expression.Column.Name));
-            var newDescriptionStatement = GenerateColumnDescription(formattedSchemaName, expression.TableName, expression.Column.Name, expression.Column.ColumnDescription);
 
-            return string.Join(";", new[] { removalStatement, newDescriptionStatement });
+            var descriptionsList = new List<string>();
+            foreach (var description in expression.Column.ColumnDescriptions)
+            {
+                var newDescriptionStatement = GenerateColumnDescription(description.Key, formattedSchemaName, expression.TableName, expression.Column.Name, description.Value);
+                descriptionsList.Add(newDescriptionStatement);
+            }
+
+            var joined = string.Join(";\r\n", descriptionsList);
+
+            return string.Join(";", new[] { removalStatement, joined });
         }
 
         protected override string GenerateTableDescription(string schemaName, string tableName, string tableDescription)
@@ -79,14 +89,14 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                 tableName);
         }
 
-        protected override string GenerateColumnDescription(string schemaName, string tableName, string columnName, string columnDescription)
+        protected override string GenerateColumnDescription(string descriptionName, string schemaName, string tableName, string columnName, string columnDescription)
         {
             if (string.IsNullOrEmpty(columnDescription))
                 return string.Empty;
 
             var formattedSchemaName = FormatSchemaName(schemaName);
 
-            return string.Format(ColumnDescriptionTemplate, columnDescription.Replace("'", "''"), formattedSchemaName, tableName, columnName);
+            return string.Format(ColumnDescriptionTemplate, descriptionName, columnDescription.Replace("'", "''"), formattedSchemaName, tableName, columnName);
         }
 
         private string GenerateTableDescriptionRemoval(string schemaName, string tableName)

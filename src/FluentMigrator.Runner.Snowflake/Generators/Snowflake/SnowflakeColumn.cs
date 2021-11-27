@@ -15,6 +15,7 @@
 #endregion
 
 using System.Collections.Generic;
+using System.Linq;
 
 using FluentMigrator.Exceptions;
 using FluentMigrator.Infrastructure.Extensions;
@@ -43,8 +44,34 @@ namespace FluentMigrator.Runner.Generators.Snowflake
             clauses.Add(setNullableClause);
             var typeClause = $"COLUMN {FormatString(column)} {FormatType(column)}";
             clauses.Add(typeClause);
-            var commentClause = $"COLUMN {FormatString(column)} COMMENT '{column.ColumnDescription ?? string.Empty}'";
-            clauses.Add(commentClause);
+            var commentClause = string.Empty;
+            if (column.ColumnDescriptions.Values.Count == 0)
+            {
+                commentClause = $"COLUMN {FormatString(column)} COMMENT ''";
+            }
+            else
+            {
+                var descriptionsList = new List<string>();
+                foreach (var description in column.ColumnDescriptions)
+                {
+                    var newDescriptionStatement = description.Key + ":" + description.Value;
+                    descriptionsList.Add(newDescriptionStatement);
+                }
+
+                var multipleComments = string.Empty;
+                if (descriptionsList.Count == 1)
+                {
+                    multipleComments = descriptionsList.First();
+                }
+                else
+                {
+                    multipleComments = string.Join("\r\n", descriptionsList);
+                }
+                     
+
+                commentClause = $"COLUMN {FormatString(column)} COMMENT '" + multipleComments + "'";
+            }
+            clauses.Add(commentClause); 
 
             return string.Join(", ", clauses);
         }

@@ -238,7 +238,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
             var expression = GeneratorTestHelper.GetAlterColumnExpressionWithDescription();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE `TestTable1` MODIFY COLUMN `TestColumn1` VARCHAR(20) NOT NULL COMMENT 'TestColumn1Description'");
+            result.ShouldBe("ALTER TABLE `TestTable1` MODIFY COLUMN `TestColumn1` VARCHAR(20) NOT NULL COMMENT 'Description:TestColumn1Description'");
         }
 
         [Test]
@@ -247,7 +247,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
             var expression = GeneratorTestHelper.GetCreateColumnExpressionWithDescription();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE `TestTable1` ADD COLUMN `TestColumn1` VARCHAR(5) NOT NULL COMMENT 'TestColumn1Description'");
+            result.ShouldBe("ALTER TABLE `TestTable1` ADD COLUMN `TestColumn1` VARCHAR(5) NOT NULL COMMENT 'Description:TestColumn1Description'");
         }
 
         [Test]
