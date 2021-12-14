@@ -61,7 +61,7 @@ FluentMigrator has an actively developed and maintained ecosystem thanks to thir
 
 | GitHub/BitBucket | NuGet Package | Description |
 | ---------------- | ------------- | ----------- |
-| [EasyMigrator](https://bitbucket.org/quentin-starin/easymigrator/wiki/Home) | [EasyMigrator.FluentMigrator](https://www.nuget.org/packages/EasyMigrator.FluentMigrator) | EasyMigrator allows you to specify database schema using simple POCOs with minimally attributed fields to represent columns. EasyMigrator's core can be adapted to sit on top of various migration libraries. |
+| [EasyMigrator](https://github.com/qstarin/EasyMigrator) | [EasyMigrator.FluentMigrator](https://www.nuget.org/packages/EasyMigrator.FluentMigrator) | EasyMigrator allows you to specify database schema using simple POCOs with minimally attributed fields to represent columns. EasyMigrator's core can be adapted to sit on top of various migration libraries. |
 | [FluentMigrator-Generator](https://github.com/ritterim/fluentmigrator-generator) | [FluentMigrator.Generator](https://www.nuget.org/packages/FluentMigrator.Generator/) | Adds a command to the package manager console to generate migrations for FluentMigrator. |
 | [AspNetBoilerplate](https://github.com/aspnetboilerplate/aspnetboilerplate) | [Abp.FluentMigrator](https://www.nuget.org/packages/Abp.FluentMigrator) | Adds fluent extensions specific to the entity model used by the ASP.NET Boilerplate architecture |
 | [Alt.FluentMigrator.VStudio](https://github.com/crimcol/Alt.FluentMigrator.VStudio) | [Alt.FluentMigrator.VStudio](https://www.nuget.org/packages/Alt.FluentMigrator.VStudio/) | Adds set of commands for Package Manager console:<br> - Add-FluentMigration<br> - Update-FluentDatabase<br> - Rollback-FluentDatabase |
