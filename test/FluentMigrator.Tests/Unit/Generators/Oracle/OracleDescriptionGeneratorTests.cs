@@ -74,7 +74,6 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             statement.ShouldBe("COMMENT ON COLUMN TestTable1.TestColumn1 IS 'Description:TestColumn1Description"+Environment.NewLine+
                 "AdditionalColumnDescriptionKey1:AdditionalColumnDescriptionValue1'");
         }
-
         
         [Test]
         public override void GenerateDescriptionStatementForAlterColumnReturnColumnDescriptionStatement()

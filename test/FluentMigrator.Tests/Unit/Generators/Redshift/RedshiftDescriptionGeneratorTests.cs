@@ -107,7 +107,6 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
             statement.ShouldBe("COMMENT ON COLUMN \"public\".\"TestTable1\".\"TestColumn1\" IS 'Description:TestColumn1Description';");
         }
 
-
         [Test]
         public override void GenerateDescriptionStatementForAlterColumnReturnColumnDescriptionStatementWithAdditionalDescriptions()
         {

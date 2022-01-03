@@ -48,7 +48,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
                 "AdditionalColumnDescriptionKey2:AdditionalColumnDescriptionValue2', @level0type = N'SCHEMA', @level0name = 'dbo', @level1type = N'Table', @level1name = 'TestTable1', @level2type = N'Column',  @level2name = 'TestColumn2'");
         }
         
-
         [Test]
         public override void GenerateDescriptionStatementForAlterTableReturnTableDescriptionStatement()
         {
