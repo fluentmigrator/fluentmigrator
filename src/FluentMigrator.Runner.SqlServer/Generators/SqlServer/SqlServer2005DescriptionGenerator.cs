@@ -67,7 +67,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
             var initialDescriptionSatetement = string.Join(";", new[] { removalStatement, newDescriptionStatement });
 
-            if (expression.Column.AdditionalColumnDescription.Count == 0)
+            if (expression.Column.AdditionalColumnDescriptions.Count == 0)
                 return initialDescriptionSatetement;
 
             var descriptionsList = new List<string>
@@ -75,7 +75,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                 initialDescriptionSatetement
             };
 
-            foreach (var description in expression.Column.AdditionalColumnDescription)
+            foreach (var description in expression.Column.AdditionalColumnDescriptions)
             {
                 // For this, we need to remove the extended property first if exists (or implement verification and use sp_updateextendedproperty)
                 columnVerificationStatement = string.Format(ColumnDescriptionVerificationTemplate, description.Key, formattedSchemaName, expression.TableName, expression.Column.Name);

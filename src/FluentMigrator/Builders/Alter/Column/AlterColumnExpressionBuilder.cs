@@ -117,10 +117,10 @@ namespace FluentMigrator.Builders.Alter.Column
             if (string.IsNullOrWhiteSpace(description))
                 throw new ArgumentException("Cannot be the empty string.", "description");
 
-            if (Expression.Column.AdditionalColumnDescription.Keys.Count(i => i.Equals(descriptionName)) > 0)
+            if (Expression.Column.AdditionalColumnDescriptions.Keys.Count(i => i.Equals(descriptionName)) > 0)
                 throw new InvalidOperationException("The given descriptionName is already present in the columnDescription list.");
 
-            Expression.Column.AdditionalColumnDescription.Add(descriptionName, description);
+            Expression.Column.AdditionalColumnDescriptions.Add(descriptionName, description);
             return this;
         }
 

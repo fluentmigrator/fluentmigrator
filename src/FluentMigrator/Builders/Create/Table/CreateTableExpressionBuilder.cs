@@ -120,10 +120,10 @@ namespace FluentMigrator.Builders.Create.Table
             if (string.IsNullOrWhiteSpace(description))
                 throw new ArgumentException("Cannot be the empty string.", "description");
 
-            if (CurrentColumn.AdditionalColumnDescription.Keys.Count(i => i.Equals(descriptionName)) > 0)
+            if (CurrentColumn.AdditionalColumnDescriptions.Keys.Count(i => i.Equals(descriptionName)) > 0)
                 throw new InvalidOperationException("The given descriptionName is already present in the columnDescription list.");
 
-            CurrentColumn.AdditionalColumnDescription.Add(descriptionName, description);
+            CurrentColumn.AdditionalColumnDescriptions.Add(descriptionName, description);
             return this;
         }
 

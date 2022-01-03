@@ -164,14 +164,14 @@ namespace FluentMigrator.Tests.Unit.Generators
                 IsNullable = true,
                 Type = DbType.String,
                 ColumnDescription = TestColumn1Description,
-                AdditionalColumnDescription = TestAdditionalColumnDescriptions1
+                AdditionalColumnDescriptions = TestAdditionalColumnDescriptions1
             });
             expression.Columns.Add(new ColumnDefinition
             {
                 Name = TestColumnName2,
                 Type = DbType.Int32,
                 ColumnDescription = TestColumn2Description,
-                AdditionalColumnDescription = TestAdditionalColumnDescriptions2
+                AdditionalColumnDescriptions = TestAdditionalColumnDescriptions2
             });
 
             return expression;
@@ -539,7 +539,7 @@ namespace FluentMigrator.Tests.Unit.Generators
         {
             CreateColumnExpression columnExpression = GetCreateColumnExpression();
             columnExpression.Column.ColumnDescription = TestColumn1Description;
-            columnExpression.Column.AdditionalColumnDescription = TestAdditionalColumnDescriptions1;
+            columnExpression.Column.AdditionalColumnDescriptions = TestAdditionalColumnDescriptions1;
             return columnExpression;
         }
 
@@ -634,7 +634,7 @@ namespace FluentMigrator.Tests.Unit.Generators
         {
             var columnExpression = GetAlterColumnExpression();
             columnExpression.Column.ColumnDescription = TestColumn1Description;
-            columnExpression.Column.AdditionalColumnDescription = TestAdditionalColumnDescriptions1;
+            columnExpression.Column.AdditionalColumnDescriptions = TestAdditionalColumnDescriptions1;
             return columnExpression;
         }
 

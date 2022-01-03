@@ -120,7 +120,7 @@ namespace FluentMigrator.Model
         /// <summary>
         /// Gets or sets any additional column descriptions
         /// </summary>
-        public virtual Dictionary<string, string> AdditionalColumnDescription { get; set; } = new Dictionary<string, string>();
+        public virtual Dictionary<string, string> AdditionalColumnDescriptions { get; set; } = new Dictionary<string, string>();
 
         /// <summary>
         /// Gets or sets the collation name if the column has a string or ansi string type

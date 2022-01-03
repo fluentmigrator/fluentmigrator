@@ -41,14 +41,14 @@ namespace FluentMigrator.Runner.Generators.MySql
             if (string.IsNullOrEmpty(column.ColumnDescription))
                 return string.Empty;
 
-            if (column.AdditionalColumnDescription.Count == 0)
+            if (column.AdditionalColumnDescriptions.Count == 0)
                 return string.Format("COMMENT {0}", Quoter.QuoteValue("Description:"+column.ColumnDescription));
 
             var descriptionsList = new List<string>
             {
                 string.Format("Description:" + column.ColumnDescription)
             };
-            descriptionsList.AddRange(from descriptionItem in column.AdditionalColumnDescription
+            descriptionsList.AddRange(from descriptionItem in column.AdditionalColumnDescriptions
                                       select descriptionItem.Key + ":" + descriptionItem.Value);
             return string.Format("COMMENT {0}", Quoter.QuoteValue(string.Join("\r\n", descriptionsList)));
         }
