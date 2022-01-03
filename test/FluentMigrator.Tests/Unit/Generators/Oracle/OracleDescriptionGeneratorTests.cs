@@ -1,4 +1,5 @@
-﻿using System.Linq;
+using System;
+using System.Linq;
 using FluentMigrator.Runner.Generators.Oracle;
 using NUnit.Framework;
 
@@ -36,6 +37,16 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
                 "COMMENT ON TABLE TestTable1 IS 'TestDescription';COMMENT ON COLUMN TestTable1.TestColumn1 IS 'TestColumn1Description';COMMENT ON COLUMN TestTable1.TestColumn2 IS 'TestColumn2Description'");
         }
 
+        public override void GenerateDescriptionStatementsForCreateTableReturnTableDescriptionAndColumnDescriptionsWithAdditionalDescriptionsStatements()
+        {
+            var createTableExpression = GeneratorTestHelper.GetCreateTableWithTableDescriptionAndColumnDescriptionsAndAdditionalDescriptions();
+            var statements = DescriptionGenerator.GenerateDescriptionStatements(createTableExpression).ToArray();
+
+            var result = string.Join(";", statements);
+            result.ShouldBe(
+                "COMMENT ON TABLE TestTable1 IS 'TestDescription';COMMENT ON COLUMN TestTable1.TestColumn1 IS 'TestColumn1Description';COMMENT ON COLUMN TestTable1.TestColumn2 IS 'TestColumn2Description'");
+        }
+
         [Test]
         public override void GenerateDescriptionStatementForAlterTableReturnTableDescriptionStatement()
         {
@@ -55,12 +66,33 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
+        public override void GenerateDescriptionStatementForCreateColumnReturnColumnDescriptionStatementWithAdditionalDescriptions()
+        {
+            var createColumnExpression = GeneratorTestHelper.GetCreateColumnExpressionWithDescriptionWithAdditionalDescriptions();
+            var statement = DescriptionGenerator.GenerateDescriptionStatement(createColumnExpression);
+
+            statement.ShouldBe("COMMENT ON COLUMN TestTable1.TestColumn1 IS 'Description:TestColumn1Description"+Environment.NewLine+
+                "AdditionalColumnDescriptionKey1:AdditionalColumnDescriptionValue1'");
+        }
+
+        
+        [Test]
         public override void GenerateDescriptionStatementForAlterColumnReturnColumnDescriptionStatement()
         {
             var alterColumnExpression = GeneratorTestHelper.GetAlterColumnExpressionWithDescription();
             var statement = DescriptionGenerator.GenerateDescriptionStatement(alterColumnExpression);
 
             statement.ShouldBe("COMMENT ON COLUMN TestTable1.TestColumn1 IS 'TestColumn1Description'");
+        }
+
+        [Test]
+        public override void GenerateDescriptionStatementForAlterColumnReturnColumnDescriptionStatementWithAdditionalDescriptions()
+        {
+            var alterColumnExpression = GeneratorTestHelper.GetAlterColumnExpressionWithDescriptionWithAdditionalDescriptions();
+            var statement = DescriptionGenerator.GenerateDescriptionStatement(alterColumnExpression);
+
+            statement.ShouldBe("COMMENT ON COLUMN TestTable1.TestColumn1 IS 'Description:TestColumn1Description"+ Environment.NewLine +
+                "AdditionalColumnDescriptionKey1:AdditionalColumnDescriptionValue1'");
         }
 
         [Test]

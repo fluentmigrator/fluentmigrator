@@ -1,4 +1,6 @@
-﻿using FluentMigrator.Exceptions;
+using System;
+
+using FluentMigrator.Exceptions;
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators.Oracle;
 using NUnit.Framework;
@@ -93,6 +95,18 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
+        public void CanCreateTableWithDescriptionAndColumnDescriptionWithAdditionalDescriptions()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableWithTableDescriptionAndColumnDescriptionsAndAdditionalDescriptions();
+
+            var result = Generator.Generate(expression);
+
+            result.ShouldBe("BEGIN EXECUTE IMMEDIATE 'CREATE TABLE TestTable1 (TestColumn1 NVARCHAR2(255), TestColumn2 NUMBER(10,0) NOT NULL)';EXECUTE IMMEDIATE 'COMMENT ON TABLE TestTable1 IS ''TestDescription''';EXECUTE IMMEDIATE 'COMMENT ON COLUMN TestTable1.TestColumn1 IS ''Description:TestColumn1Description" + Environment.NewLine +
+                "AdditionalColumnDescriptionKey1:AdditionalColumnDescriptionValue1''';EXECUTE IMMEDIATE 'COMMENT ON COLUMN TestTable1.TestColumn2 IS ''Description:TestColumn2Description" + Environment.NewLine +
+                "AdditionalColumnDescriptionKey2:AdditionalColumnDescriptionValue2'''; END;");
+        }
+        
+        [Test]
         public void CanAlterTableWithDescription()
         {
             var expression = GeneratorTestHelper.GetAlterTableWithDescriptionExpression();
@@ -123,6 +137,17 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
+        public void CanCreateColumnWithDescriptionWithAdditionalDescriptions()
+        {
+            var expression = GeneratorTestHelper.GetCreateColumnExpressionWithDescriptionWithAdditionalDescriptions();
+
+            var result = Generator.Generate(expression);
+
+            result.ShouldBe("BEGIN EXECUTE IMMEDIATE 'ALTER TABLE TestTable1 ADD TestColumn1 NVARCHAR2(5) NOT NULL';EXECUTE IMMEDIATE 'COMMENT ON COLUMN TestTable1.TestColumn1 IS ''Description:TestColumn1Description"+Environment.NewLine+
+                "AdditionalColumnDescriptionKey1:AdditionalColumnDescriptionValue1'''; END;");
+        }
+
+        [Test]
         public void CanCreateColumnWithoutDescription()
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
@@ -140,6 +165,17 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             var result = Generator.Generate(expression);
 
             result.ShouldBe("BEGIN EXECUTE IMMEDIATE 'ALTER TABLE TestTable1 MODIFY TestColumn1 NVARCHAR2(20) NOT NULL';EXECUTE IMMEDIATE 'COMMENT ON COLUMN TestTable1.TestColumn1 IS ''TestColumn1Description'''; END;");
+        }
+
+        [Test]
+        public void CanAlterColumnWithDescriptionWithAdditionalDescriptions()
+        {
+            var expression = GeneratorTestHelper.GetAlterColumnExpressionWithDescriptionWithAdditionalDescriptions();
+
+            var result = Generator.Generate(expression);
+
+            result.ShouldBe("BEGIN EXECUTE IMMEDIATE 'ALTER TABLE TestTable1 MODIFY TestColumn1 NVARCHAR2(20) NOT NULL';EXECUTE IMMEDIATE 'COMMENT ON COLUMN TestTable1.TestColumn1 IS ''Description:TestColumn1Description"+Environment.NewLine+
+                "AdditionalColumnDescriptionKey1:AdditionalColumnDescriptionValue1'''; END;");
         }
 
         [Test]

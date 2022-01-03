@@ -46,6 +46,15 @@ namespace FluentMigrator.Tests.Unit.Generators
         public static string TestColumn1Description = "TestColumn1Description";
         public static string TestColumn2Description = "TestColumn2Description";
         public static string TestColumnCollationName = "Latin1_General_CS_AS";
+        public static Dictionary<string, string> TestAdditionalColumnDescriptions1 = new Dictionary<string, string> ()
+        {
+            {"AdditionalColumnDescriptionKey1", "AdditionalColumnDescriptionValue1" }
+        };
+        public static Dictionary<string, string> TestAdditionalColumnDescriptions2 = new Dictionary<string, string>()
+        {
+            {"AdditionalColumnDescriptionKey2", "AdditionalColumnDescriptionValue2" }
+        };
+
         public static Guid TestGuid = Guid.NewGuid();
 
         public static CreateTableExpression GetCreateTableExpression()
@@ -141,6 +150,28 @@ namespace FluentMigrator.Tests.Unit.Generators
                 Name = TestColumnName2,
                 Type = DbType.Int32,
                 ColumnDescription = TestColumn2Description
+            });
+
+            return expression;
+        }
+
+        public static CreateTableExpression GetCreateTableWithTableDescriptionAndColumnDescriptionsAndAdditionalDescriptions()
+        {
+            var expression = new CreateTableExpression { TableName = TestTableName1, TableDescription = TestTableDescription };
+            expression.Columns.Add(new ColumnDefinition
+            {
+                Name = TestColumnName1,
+                IsNullable = true,
+                Type = DbType.String,
+                ColumnDescription = TestColumn1Description,
+                AdditionalColumnDescription = TestAdditionalColumnDescriptions1
+            });
+            expression.Columns.Add(new ColumnDefinition
+            {
+                Name = TestColumnName2,
+                Type = DbType.Int32,
+                ColumnDescription = TestColumn2Description,
+                AdditionalColumnDescription = TestAdditionalColumnDescriptions2
             });
 
             return expression;
@@ -504,6 +535,14 @@ namespace FluentMigrator.Tests.Unit.Generators
             return columnExpression;
         }
 
+        public static CreateColumnExpression GetCreateColumnExpressionWithDescriptionWithAdditionalDescriptions()
+        {
+            CreateColumnExpression columnExpression = GetCreateColumnExpression();
+            columnExpression.Column.ColumnDescription = TestColumn1Description;
+            columnExpression.Column.AdditionalColumnDescription = TestAdditionalColumnDescriptions1;
+            return columnExpression;
+        }
+
         public static CreateColumnExpression GetCreateColumnExpressionWithCollation()
         {
             CreateColumnExpression columnExpression = GetCreateColumnExpression();
@@ -588,6 +627,14 @@ namespace FluentMigrator.Tests.Unit.Generators
         {
             var columnExpression = GetAlterColumnExpression();
             columnExpression.Column.ColumnDescription = TestColumn1Description;
+            return columnExpression;
+        }
+
+        public static AlterColumnExpression GetAlterColumnExpressionWithDescriptionWithAdditionalDescriptions()
+        {
+            var columnExpression = GetAlterColumnExpression();
+            columnExpression.Column.ColumnDescription = TestColumn1Description;
+            columnExpression.Column.AdditionalColumnDescription = TestAdditionalColumnDescriptions1;
             return columnExpression;
         }
 

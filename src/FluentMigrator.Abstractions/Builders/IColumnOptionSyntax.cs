@@ -51,6 +51,14 @@ namespace FluentMigrator.Builders
         TNext WithColumnDescription(string description);
 
         /// <summary>
+        /// Sets any columns description
+        /// </summary>
+        /// <param name="descriptionName">The descriptionName</param>
+        /// <param name="description">The description</param>
+        /// <returns>The next step</returns>
+        TNext WithColumnAdditionalDescription(string descriptionName, string description);
+
+        /// <summary>
         /// Sets the columns identity configuration
         /// </summary>
         /// <returns>The next step</returns>

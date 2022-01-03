@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 //
 // Copyright (c) 2018, Fluent Migrator Project
 //
@@ -32,9 +32,12 @@ namespace FluentMigrator.Tests.Unit.Generators
 
         public abstract void GenerateDescriptionStatementsForCreateTableReturnTableDescriptionStatement();
         public abstract void GenerateDescriptionStatementsForCreateTableReturnTableDescriptionAndColumnDescriptionsStatements();
+        public abstract void GenerateDescriptionStatementsForCreateTableReturnTableDescriptionAndColumnDescriptionsWithAdditionalDescriptionsStatements();
         public abstract void GenerateDescriptionStatementForAlterTableReturnTableDescriptionStatement();
         public abstract void GenerateDescriptionStatementForCreateColumnReturnColumnDescriptionStatement();
+        public abstract void GenerateDescriptionStatementForCreateColumnReturnColumnDescriptionStatementWithAdditionalDescriptions();
         public abstract void GenerateDescriptionStatementForAlterColumnReturnColumnDescriptionStatement();
+        public abstract void GenerateDescriptionStatementForAlterColumnReturnColumnDescriptionStatementWithAdditionalDescriptions();
 
         [Test]
         public void GenerateDescriptionStatementsReturnEmptyForNoDescriptionsOnCreateTable()
