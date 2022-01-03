@@ -34,7 +34,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
 
             var result = string.Join(";", statements);
             result.ShouldBe(
-                "COMMENT ON TABLE TestTable1 IS 'TestDescription';COMMENT ON COLUMN TestTable1.TestColumn1 IS 'TestColumn1Description';COMMENT ON COLUMN TestTable1.TestColumn2 IS 'TestColumn2Description'");
+                "COMMENT ON TABLE TestTable1 IS 'TestDescription';COMMENT ON COLUMN TestTable1.TestColumn1 IS 'Description:TestColumn1Description';COMMENT ON COLUMN TestTable1.TestColumn2 IS 'Description:TestColumn2Description'");
         }
 
         public override void GenerateDescriptionStatementsForCreateTableReturnTableDescriptionAndColumnDescriptionsWithAdditionalDescriptionsStatements()
@@ -62,7 +62,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             var createColumnExpression = GeneratorTestHelper.GetCreateColumnExpressionWithDescription();
             var statement = DescriptionGenerator.GenerateDescriptionStatement(createColumnExpression);
 
-            statement.ShouldBe("COMMENT ON COLUMN TestTable1.TestColumn1 IS 'TestColumn1Description'");
+            statement.ShouldBe("COMMENT ON COLUMN TestTable1.TestColumn1 IS 'Description:TestColumn1Description'");
         }
 
         [Test]
@@ -82,7 +82,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             var alterColumnExpression = GeneratorTestHelper.GetAlterColumnExpressionWithDescription();
             var statement = DescriptionGenerator.GenerateDescriptionStatement(alterColumnExpression);
 
-            statement.ShouldBe("COMMENT ON COLUMN TestTable1.TestColumn1 IS 'TestColumn1Description'");
+            statement.ShouldBe("COMMENT ON COLUMN TestTable1.TestColumn1 IS 'Description:TestColumn1Description'");
         }
 
         [Test]
