@@ -17,6 +17,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 
@@ -183,6 +184,32 @@ namespace FluentMigrator.Builders.Alter.Table
                 throw new InvalidOperationException("The given descriptionName is already present in the columnDescription list.");
 
             CurrentColumn.AdditionalColumnDescriptions.Add(descriptionName, description);
+            return this;
+        }
+
+        /// <inheritdoc />
+        public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax WithColumnAdditionalDescriptions(Dictionary<string, string> columnDescriptions)
+        {
+            if (columnDescriptions == null)
+                throw new ArgumentException("Cannot be null.", "columnDescriptions");
+
+            if (!columnDescriptions.Any())
+                throw new ArgumentException("Cannot be empty.", "columnDescriptions");
+
+            if (CurrentColumn.AdditionalColumnDescriptions.Keys.Count(i => i.Equals("Description")) > 0)
+                throw new InvalidOperationException("The given descriptionName is already present in the columnDescription list.");
+
+            var isPresent = false;
+            foreach (var newDescription in from newDescription in columnDescriptions
+                                           where !isPresent
+                                           select newDescription)
+            {
+                isPresent = CurrentColumn.AdditionalColumnDescriptions.Keys.Count(i => i.Equals(newDescription.Key)) > 0;
+            }
+
+            if (isPresent)
+                throw new ArgumentException("At least one of new keys provided is already present in the columnDescription list.", "description");
+
             return this;
         }
 
