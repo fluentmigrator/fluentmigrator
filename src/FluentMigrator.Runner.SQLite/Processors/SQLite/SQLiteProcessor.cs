@@ -93,7 +93,7 @@ namespace FluentMigrator.Runner.Processors.SQLite
 
         public override bool ColumnExists(string schemaName, string tableName, string columnName)
         {
-            return Exists("select count(*) from sqlite_master AS t, pragma_table_info(t.name) AS c where t.type = 'table' AND t.name = {0} and c.name = {1}", _quoter.QuoteValue(tableName), _quoter.QuoteValue(columnName));
+            return Exists("select count(*) from sqlite_master AS t, pragma_table_info(t.name) AS c where t.type = 'table' AND t.name = {0} AND c.name = {1}", _quoter.QuoteValue(tableName), _quoter.QuoteValue(columnName));
         }
 
         public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
