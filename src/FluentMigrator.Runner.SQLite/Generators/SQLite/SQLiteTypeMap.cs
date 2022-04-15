@@ -44,22 +44,22 @@ namespace FluentMigrator.Runner.Generators.SQLite
             SetTypeMap(DbType.UInt16, "INTEGER");
             SetTypeMap(DbType.UInt32, "INTEGER");
             SetTypeMap(DbType.UInt64, "INTEGER");
-            SetTypeMap(DbType.Currency, "NUMERIC");
-            SetTypeMap(DbType.Decimal, "NUMERIC");
-            SetTypeMap(DbType.Double, "NUMERIC");
-            SetTypeMap(DbType.Single, "NUMERIC");
-            SetTypeMap(DbType.VarNumeric, "NUMERIC");
+            SetTypeMap(DbType.Currency, "TEXT");
+            SetTypeMap(DbType.Decimal, "TEXT");
+            SetTypeMap(DbType.Double, "REAL");
+            SetTypeMap(DbType.Single, "REAL");
+            SetTypeMap(DbType.VarNumeric, "TEXT");
             SetTypeMap(DbType.AnsiString, "TEXT");
             SetTypeMap(DbType.String, "TEXT");
             SetTypeMap(DbType.AnsiStringFixedLength, "TEXT");
             SetTypeMap(DbType.StringFixedLength, "TEXT");
 
-            SetTypeMap(DbType.Date, "DATETIME");
-            SetTypeMap(DbType.DateTime, "DATETIME");
-            SetTypeMap(DbType.DateTime2, "DATETIME");
-            SetTypeMap(DbType.Time, "DATETIME");
+            SetTypeMap(DbType.Date, "TEXT");
+            SetTypeMap(DbType.DateTime, "TEXT");
+            SetTypeMap(DbType.DateTime2, "TEXT");
+            SetTypeMap(DbType.Time, "TEXT");
             SetTypeMap(DbType.Boolean, "INTEGER");
-            SetTypeMap(DbType.Guid, "UNIQUEIDENTIFIER");
+            SetTypeMap(DbType.Guid, "TEXT");
         }
 
         public override string GetTypeMap(DbType type, int? size, int? precision)
