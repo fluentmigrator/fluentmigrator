@@ -29,14 +29,19 @@ namespace FluentMigrator.Runner.Generators.SQLite
         /// <inheritdoc />
         protected override string FormatIdentity(ColumnDefinition column)
         {
-            // SQLite only supports the concept of Identity in combination with a single integer primary key
-            // see: http://www.sqlite.org/syntaxdiagrams.html#column-constraint syntax details
-            if (column.IsIdentity && !column.IsPrimaryKey && (!column.Type.HasValue || GetTypeMap(column.Type.Value, null, null) != "INTEGER"))
+            if (column.IsIdentity)
             {
-                throw new ArgumentException("SQLite only supports identity on a single integer, primary key coulmns");
+                // SQLite only supports the concept of Identity in combination with a single integer primary key
+                // see: http://www.sqlite.org/syntaxdiagrams.html#column-constraint syntax details
+                if (!column.IsPrimaryKey && (!column.Type.HasValue || GetTypeMap(column.Type.Value, null, null) != "INTEGER"))
+                {
+                    throw new ArgumentException("SQLite only supports identity on a single integer, primary key coulmns");
+                }
+
+                return "AUTOINCREMENT";
             }
 
-            return "AUTOINCREMENT";
+            return string.Empty;
         }
 
         /// <inheritdoc />
@@ -50,12 +55,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
         /// <inheritdoc />
         protected override string FormatPrimaryKey(ColumnDefinition column)
         {
-            if (!column.IsPrimaryKey)
-            {
-                return string.Empty;
-            }
-
-            return column.IsIdentity ? "PRIMARY KEY AUTOINCREMENT" : string.Empty;
+            return column.IsPrimaryKey ? "PRIMARY KEY" : string.Empty;
         }
     }
 }
