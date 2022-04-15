@@ -29,14 +29,14 @@ namespace FluentMigrator.Runner.Generators.SQLite
         /// <inheritdoc />
         protected override string FormatIdentity(ColumnDefinition column)
         {
-            //SQLite only supports the concept of Identity in combination with a single primary key
-            //see: http://www.sqlite.org/syntaxdiagrams.html#column-constraint syntax details
-            if (column.IsIdentity && !column.IsPrimaryKey && column.Type != DbType.Int32)
+            // SQLite only supports the concept of Identity in combination with a single integer primary key
+            // see: http://www.sqlite.org/syntaxdiagrams.html#column-constraint syntax details
+            if (column.IsIdentity && !column.IsPrimaryKey && (!column.Type.HasValue || GetTypeMap(column.Type.Value, null, null) != "INTEGER"))
             {
-                throw new ArgumentException("SQLite only supports identity on single integer, primary key coulmns");
+                throw new ArgumentException("SQLite only supports identity on a single integer, primary key coulmns");
             }
 
-            return string.Empty;
+            return "AUTOINCREMENT";
         }
 
         /// <inheritdoc />
