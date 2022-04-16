@@ -163,7 +163,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-
             result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" DROP COLUMN \"TestColumn1\"");
         }
 
@@ -173,7 +172,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetDeleteColumnExpression();
 
             var result = Generator.Generate(expression);
-
             result.ShouldBe("ALTER TABLE \"TestTable1\" DROP COLUMN \"TestColumn1\"");
         }
 
@@ -184,7 +182,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-
             result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" DROP COLUMN \"TestColumn1\"; ALTER TABLE \"TestSchema\".\"TestTable1\" DROP COLUMN \"TestColumn2\"");
         }
 
@@ -194,7 +191,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetDeleteColumnExpression(new [] { "TestColumn1", "TestColumn2" });
 
             var result = Generator.Generate(expression);
-
             result.ShouldBe("ALTER TABLE \"TestTable1\" DROP COLUMN \"TestColumn1\"; ALTER TABLE \"TestTable1\" DROP COLUMN \"TestColumn2\"");
         }
 
@@ -216,6 +212,27 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
 
             var result = Generator.Generate(expression);
             result.ShouldBe($"ALTER TABLE {quoter.QuoteTableName("TestTable1")} RENAME COLUMN {quoter.QuoteColumnName("TestColumn1")} TO {quoter.QuoteColumnName("TestColumn2")}");
+        }
+
+        [Test]
+        public virtual void CanCreateUniqueColumnWithDefaultSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateColumnExpression();
+            expression.Column.IsUnique = true;
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD COLUMN \"TestColumn1\" TEXT NOT NULL UNIQUE");
+        }
+
+        [Test]
+        public virtual void CanCreateUniqueColumnWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateColumnExpression();
+            expression.Column.IsUnique = true;
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ADD COLUMN \"TestColumn1\" TEXT NOT NULL UNIQUE");
         }
     }
 }

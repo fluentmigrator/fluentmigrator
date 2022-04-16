@@ -13,6 +13,8 @@ namespace FluentMigrator.Runner.Generators.SQLite
         public SQLiteColumn()
             : base(new SQLiteTypeMap(), new SQLiteQuoter())
         {
+            // Add UNIQUE before IDENTITY and after PRIMARY KEY
+            ClauseOrder.Insert(ClauseOrder.Count - 2, FormatUniqueConstraint);
         }
 
         /// <inheritdoc />
@@ -22,8 +24,15 @@ namespace FluentMigrator.Runner.Generators.SQLite
             var foreignKeyColumns = colDefs.Where(x => x.IsForeignKey && x.ForeignKey != null);
             var foreignKeyClauses = foreignKeyColumns
                 .Select(x => ", " + FormatForeignKey(x.ForeignKey, GenerateForeignKeyName));
+
             // Append foreign key definitions after all column definitions and the primary key definition
             return base.Generate(colDefs, tableName) + string.Concat(foreignKeyClauses);
+        }
+
+        protected virtual string FormatUniqueConstraint(ColumnDefinition column)
+        {
+            // Define unique constraints on columns in addition to creating a unique index
+            return column.IsUnique ? "UNIQUE" : string.Empty;
         }
 
         /// <inheritdoc />

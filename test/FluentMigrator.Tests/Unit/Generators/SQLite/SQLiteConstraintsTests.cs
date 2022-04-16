@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 //
 // Copyright (c) 2018, Fluent Migrator Project
 //
@@ -121,7 +121,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.Constraint.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            result.ShouldBe("CREATE UNIQUE INDEX \"TestSchema\".\"IX_TestTable1_TestColumn1_TestColumn2\" ON \"TestTable1\" (\"TestColumn1\" ASC, \"TestColumn2\" ASC)");
         }
 
         [Test]
@@ -130,7 +130,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetCreateMultiColumnUniqueConstraintExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            result.ShouldBe("CREATE UNIQUE INDEX \"IX_TestTable1_TestColumn1_TestColumn2\" ON \"TestTable1\" (\"TestColumn1\" ASC, \"TestColumn2\" ASC)");
         }
 
         [Test]
@@ -250,7 +250,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.Constraint.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            result.ShouldBe("CREATE UNIQUE INDEX \"TestSchema\".\"TESTUNIQUECONSTRAINT\" ON \"TestTable1\" (\"TestColumn1\" ASC, \"TestColumn2\" ASC)");
         }
 
         [Test]
@@ -259,7 +259,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetCreateNamedMultiColumnUniqueConstraintExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            result.ShouldBe("CREATE UNIQUE INDEX \"TESTUNIQUECONSTRAINT\" ON \"TestTable1\" (\"TestColumn1\" ASC, \"TestColumn2\" ASC)");
         }
 
         [Test]
@@ -288,7 +288,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.Constraint.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            result.ShouldBe("CREATE UNIQUE INDEX \"TestSchema\".\"TESTUNIQUECONSTRAINT\" ON \"TestTable1\" (\"TestColumn1\" ASC)");
         }
 
         [Test]
@@ -297,7 +297,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetCreateNamedUniqueConstraintExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            result.ShouldBe("CREATE UNIQUE INDEX \"TESTUNIQUECONSTRAINT\" ON \"TestTable1\" (\"TestColumn1\" ASC)");
         }
 
         [Test]
@@ -326,7 +326,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.Constraint.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            result.ShouldBe("CREATE UNIQUE INDEX \"TestSchema\".\"IX_TestTable1_TestColumn1\" ON \"TestTable1\" (\"TestColumn1\" ASC)");
         }
 
         [Test]
@@ -335,7 +335,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetCreateUniqueConstraintExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            result.ShouldBe("CREATE UNIQUE INDEX \"IX_TestTable1_TestColumn1\" ON \"TestTable1\" (\"TestColumn1\" ASC)");
         }
 
         [Test]
@@ -383,7 +383,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.Constraint.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            result.ShouldBe("DROP INDEX \"TestSchema\".\"TESTUNIQUECONSTRAINT\"");
         }
 
         [Test]
@@ -392,7 +392,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetDeleteUniqueConstraintExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            result.ShouldBe("DROP INDEX \"TESTUNIQUECONSTRAINT\"");
         }
     }
 }

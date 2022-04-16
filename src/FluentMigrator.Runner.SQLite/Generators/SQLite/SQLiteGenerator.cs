@@ -18,6 +18,7 @@
 #endregion
 
 using System.Linq;
+using System.Text.RegularExpressions;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
@@ -133,12 +134,33 @@ namespace FluentMigrator.Runner.Generators.SQLite
 
         public override string Generate(CreateConstraintExpression expression)
         {
-            return CompatibilityMode.HandleCompatibilty("Constraints are not supported");
+            if (!expression.Constraint.IsUniqueConstraint)
+                return CompatibilityMode.HandleCompatibilty("Only UNIQUE constraints are supported");
+
+            // Convert the constraint into a UNIQUE index
+            var idx = new CreateIndexExpression();
+            idx.Index.Name = Regex.Replace(expression.Constraint.ConstraintName, "^UC_", "IX_");
+            idx.Index.TableName = expression.Constraint.TableName;
+            idx.Index.SchemaName = expression.Constraint.SchemaName;
+            idx.Index.IsUnique = true;
+
+            foreach (var col in expression.Constraint.Columns)
+                idx.Index.Columns.Add(new IndexColumnDefinition { Name = col });
+
+            return Generate(idx);
         }
 
         public override string Generate(DeleteConstraintExpression expression)
         {
-            return CompatibilityMode.HandleCompatibilty("Constraints are not supported");
+            if (!expression.Constraint.IsUniqueConstraint)
+                return CompatibilityMode.HandleCompatibilty("Only UNIQUE constraints are supported");
+
+            // Convert the constraint into a drop UNIQUE index
+            var idx = new DeleteIndexExpression();
+            idx.Index.Name = Regex.Replace(expression.Constraint.ConstraintName, "^UC_", "IX_");
+            idx.Index.SchemaName = expression.Constraint.SchemaName;
+
+            return Generate(idx);
         }
     }
 }
