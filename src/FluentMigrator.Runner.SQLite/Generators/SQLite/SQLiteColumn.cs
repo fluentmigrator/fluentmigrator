@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Base;
@@ -44,7 +43,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
                 // see: http://www.sqlite.org/syntaxdiagrams.html#column-constraint syntax details
                 if (!column.IsPrimaryKey && (!column.Type.HasValue || GetTypeMap(column.Type.Value, null, null) != "INTEGER"))
                 {
-                    throw new ArgumentException("SQLite only supports identity on a single integer, primary key coulmns");
+                    throw new ArgumentException("SQLite only supports identity on a single integer, primary key coulmn");
                 }
 
                 return "AUTOINCREMENT";
@@ -54,17 +53,17 @@ namespace FluentMigrator.Runner.Generators.SQLite
         }
 
         /// <inheritdoc />
+        protected override string FormatPrimaryKey(ColumnDefinition column)
+        {
+            return column.IsPrimaryKey ? "PRIMARY KEY" : string.Empty;
+        }
+
+        /// <inheritdoc />
         public override bool ShouldPrimaryKeysBeAddedSeparately(IEnumerable<ColumnDefinition> primaryKeyColumns)
         {
             //If there are no identity column then we can add as a separate constrint
             var pkColDefs = primaryKeyColumns.ToList();
             return !pkColDefs.Any(x => x.IsIdentity) && pkColDefs.Any(x => x.IsPrimaryKey);
-        }
-
-        /// <inheritdoc />
-        protected override string FormatPrimaryKey(ColumnDefinition column)
-        {
-            return column.IsPrimaryKey ? "PRIMARY KEY" : string.Empty;
         }
     }
 }

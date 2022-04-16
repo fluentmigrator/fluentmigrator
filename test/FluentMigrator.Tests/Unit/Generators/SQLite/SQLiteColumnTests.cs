@@ -19,6 +19,7 @@
 using System;
 using System.Linq;
 
+using FluentMigrator.Exceptions;
 using FluentMigrator.Runner.Generators.SQLite;
 using NUnit.Framework;
 
@@ -64,8 +65,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetAlterColumnExpression();
             expression.SchemaName = "TestSchema";
 
-            var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
 
         [Test]
@@ -73,8 +73,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         {
             var expression = GeneratorTestHelper.GetAlterColumnExpression();
 
-            var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
 
         [Test]
