@@ -17,7 +17,10 @@
 //
 #endregion
 
+using System.Linq;
+
 using FluentMigrator.Expressions;
+using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Generic;
 
 using JetBrains.Annotations;
@@ -31,21 +34,18 @@ namespace FluentMigrator.Runner.Generators.SQLite
     {
         public SQLiteGenerator()
             : this(new SQLiteQuoter())
-        {
-        }
+        { }
 
         public SQLiteGenerator(
             [NotNull] SQLiteQuoter quoter)
             : this(quoter, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()))
-        {
-        }
+        { }
 
         public SQLiteGenerator(
             [NotNull] SQLiteQuoter quoter,
             [NotNull] IOptions<GeneratorOptions> generatorOptions)
             : base(new SQLiteColumn(), quoter, new EmptyDescriptionGenerator(), generatorOptions)
-        {
-        }
+        { }
 
         public override string RenameTable { get { return "ALTER TABLE {0} RENAME TO {1}"; } }
         public override string RenameColumn { get { return "ALTER TABLE {0} RENAME COLUMN {1} TO {2}"; } }
@@ -70,9 +70,35 @@ namespace FluentMigrator.Runner.Generators.SQLite
             );
         }
 
-        public override string Generate(DeleteColumnExpression expression)
+        public override string Generate(CreateIndexExpression expression)
         {
-            return CompatibilityMode.HandleCompatibilty("SQLite does not support deleting of columns");
+            var indexColumns = new string[expression.Index.Columns.Count];
+            IndexColumnDefinition columnDef;
+
+            for (var i = 0; i < expression.Index.Columns.Count; i++)
+            {
+                columnDef = expression.Index.Columns.ElementAt(i);
+                if (columnDef.Direction == Direction.Ascending)
+                {
+                    indexColumns[i] = Quoter.QuoteColumnName(columnDef.Name) + " ASC";
+                }
+                else
+                {
+                    indexColumns[i] = Quoter.QuoteColumnName(columnDef.Name) + " DESC";
+                }
+            }
+
+            return string.Format(CreateIndex
+                , GetUniqueString(expression)
+                , GetClusterTypeString(expression)
+                , Quoter.QuoteIndexName(expression.Index.Name, expression.Index.SchemaName)
+                , Quoter.QuoteTableName(expression.Index.TableName)
+                , string.Join(", ", indexColumns));
+        }
+
+        public override string Generate(DeleteIndexExpression expression)
+        {
+            return string.Format(DropIndex, Quoter.QuoteIndexName(expression.Index.Name, expression.Index.SchemaName));
         }
 
         public override string Generate(AlterDefaultConstraintExpression expression)
