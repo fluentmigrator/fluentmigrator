@@ -35,18 +35,21 @@ namespace FluentMigrator.Runner.Generators.SQLite
     {
         public SQLiteGenerator()
             : this(new SQLiteQuoter())
-        { }
+        {
+        }
 
         public SQLiteGenerator(
             [NotNull] SQLiteQuoter quoter)
             : this(quoter, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()))
-        { }
+        {
+        }
 
         public SQLiteGenerator(
             [NotNull] SQLiteQuoter quoter,
             [NotNull] IOptions<GeneratorOptions> generatorOptions)
             : base(new SQLiteColumn(), quoter, new EmptyDescriptionGenerator(), generatorOptions)
-        { }
+        {
+        }
 
         public override string RenameTable { get { return "ALTER TABLE {0} RENAME TO {1}"; } }
         public override string RenameColumn { get { return "ALTER TABLE {0} RENAME COLUMN {1} TO {2}"; } }
