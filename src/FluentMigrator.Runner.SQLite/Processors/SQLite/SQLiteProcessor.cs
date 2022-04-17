@@ -88,12 +88,17 @@ namespace FluentMigrator.Runner.Processors.SQLite
 
         public override bool TableExists(string schemaName, string tableName)
         {
-            return Exists("select count(*) from sqlite_master where name={0} and type='table'", _quoter.QuoteValue(tableName));
+            return Exists("select count(*) from {1}sqlite_master where name={0} and type='table'",
+                _quoter.QuoteValue(tableName),
+                !string.IsNullOrWhiteSpace(schemaName) ? _quoter.QuoteValue(schemaName) + "." : string.Empty);
         }
 
         public override bool ColumnExists(string schemaName, string tableName, string columnName)
         {
-            return Exists("select count(*) from sqlite_master AS t, pragma_table_info(t.name) AS c where t.type = 'table' AND t.name = {0} AND c.name = {1}", _quoter.QuoteValue(tableName), _quoter.QuoteValue(columnName));
+            return Exists("select count(*) from {2}sqlite_master AS t, {2}pragma_table_info(t.name) AS c where t.type = 'table' AND t.name = {0} AND c.name = {1}",
+                _quoter.QuoteValue(tableName),
+                _quoter.QuoteValue(columnName),
+                !string.IsNullOrWhiteSpace(schemaName) ? _quoter.QuoteValue(schemaName) + "." : string.Empty);
         }
 
         public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
@@ -103,7 +108,10 @@ namespace FluentMigrator.Runner.Processors.SQLite
 
         public override bool IndexExists(string schemaName, string tableName, string indexName)
         {
-            return Exists("select count(*) from sqlite_master where name={0} and tbl_name={1} and type='index'", _quoter.QuoteValue(indexName), _quoter.QuoteValue(tableName));
+            return Exists("select count(*) from {2}sqlite_master where name={0} and tbl_name={1} and type='index'",
+                _quoter.QuoteValue(indexName),
+                _quoter.QuoteValue(tableName),
+                !string.IsNullOrWhiteSpace(schemaName) ? _quoter.QuoteValue(schemaName) + "." : string.Empty);
         }
 
         public override bool SequenceExists(string schemaName, string sequenceName)
@@ -138,7 +146,7 @@ namespace FluentMigrator.Runner.Processors.SQLite
 
         public override DataSet ReadTableData(string schemaName, string tableName)
         {
-            return Read("select * from {0}", _quoter.QuoteTableName(tableName));
+            return Read("select * from {0}", _quoter.QuoteTableName(tableName, schemaName));
         }
 
         public override bool DefaultValueExists(string schemaName, string tableName, string columnName, object defaultValue)
