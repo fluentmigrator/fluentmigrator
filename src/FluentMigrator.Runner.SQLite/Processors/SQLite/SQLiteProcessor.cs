@@ -103,7 +103,10 @@ namespace FluentMigrator.Runner.Processors.SQLite
 
         public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
         {
-            return false;
+            return Exists("select count(*) from {2}sqlite_master where name={0} and tbl_name={1} and type='index' and sql LIKE 'CREATE UNIQUE INDEX %'",
+                   _quoter.QuoteValue(constraintName),
+                   _quoter.QuoteValue(tableName),
+                   !string.IsNullOrWhiteSpace(schemaName) ? _quoter.QuoteValue(schemaName) + "." : string.Empty);
         }
 
         public override bool IndexExists(string schemaName, string tableName, string indexName)

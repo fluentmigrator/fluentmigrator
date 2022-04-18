@@ -22,7 +22,15 @@ namespace FluentMigrator.Runner.Generators.SQLite
             var colDefs = columns.ToList();
             var foreignKeyColumns = colDefs.Where(x => x.IsForeignKey && x.ForeignKey != null);
             var foreignKeyClauses = foreignKeyColumns
-                .Select(x => ", " + FormatForeignKey(x.ForeignKey, GenerateForeignKeyName));
+                .Select(x => ", " + FormatForeignKey(x.ForeignKey, GenerateForeignKeyName))
+                .ToList();
+
+            // As we generate FKs as part of the create table statement we need a way to prevent
+            // these FK's from creating FK constraints (which SQLite doesn't support) so we prefix
+            // the FK name and ignore anything in the "CreateConstraint" handler that has this name prefix
+            foreach (var fk in foreignKeyColumns) {
+                fk.ForeignKey.Name = "$$IGNORE$$_" + fk.ForeignKey.Name;
+            }
 
             // Append foreign key definitions after all column definitions and the primary key definition
             return base.Generate(colDefs, tableName) + string.Concat(foreignKeyClauses);
@@ -37,6 +45,18 @@ namespace FluentMigrator.Runner.Generators.SQLite
         {
             // Define unique constraints on columns in addition to creating a unique index
             return column.IsUnique ? "UNIQUE" : string.Empty;
+        }
+
+        /// <inheritdoc />
+        public override string FormatForeignKey(ForeignKeyDefinition foreignKey, Func<ForeignKeyDefinition, string> fkNameGeneration)
+        {
+            var fk2 = (ForeignKeyDefinition)foreignKey.Clone();
+
+            // SQLite FK's most be within the same schema as the FK itself
+            // so we'll remove the schema from the FK definition
+            fk2.PrimaryTableSchema = string.Empty;
+
+            return base.FormatForeignKey(fk2, fkNameGeneration);
         }
 
         /// <inheritdoc />

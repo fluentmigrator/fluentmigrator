@@ -234,9 +234,7 @@ namespace FluentMigrator.Tests.Integration
                     processor.ConstraintExists(null, "Users", "UC_Users_GroupId").ShouldBeFalse();
                     processor.ConstraintExists(null, "Users", "UC_Users_AccountId").ShouldBeFalse();
                     processor.TableExists(null, "Users").ShouldBeFalse();
-                },
-                false,
-                typeof(SQLiteProcessor));
+                });
         }
 
         [Test]
@@ -338,7 +336,6 @@ namespace FluentMigrator.Tests.Integration
                     //processor.CommitTransaction();
                 },
                 false,
-                typeof(SQLiteProcessor),
                 typeof(FirebirdProcessor));
         }
 
@@ -451,9 +448,7 @@ namespace FluentMigrator.Tests.Integration
 
                     runner.Down(new TestCreateAndDropTableMigration());
                     processor.ColumnExists(null, "TestTable2", "Name").ShouldBeFalse();
-                },
-                true,
-                typeof(SQLiteProcessor));
+                });
         }
 
         [Test]
@@ -492,7 +487,6 @@ namespace FluentMigrator.Tests.Integration
                     runner.Down(new TestCreateSchema());
                 },
                 true,
-                typeof(SQLiteProcessor),
                 typeof(FirebirdProcessor));
         }
 
@@ -629,6 +623,10 @@ namespace FluentMigrator.Tests.Integration
         {
             try
             {
+                // Can't currently test SQLite as we are using in-memory mode
+                // which I believe gets reset on each scope and so assertions
+                // outside scopes fail
+
                 ExecuteWithSupportedProcessors(
                     services => services.WithMigrationsIn(RootNamespace),
                     (serviceProvider, processor) =>
@@ -652,7 +650,8 @@ namespace FluentMigrator.Tests.Integration
                         processor.TableExists(null, "Users").ShouldBeFalse();
                     },
                     false,
-                    typeof(SQLiteProcessor), typeof(SqlAnywhere16Processor));
+                    typeof(SQLiteProcessor),
+                    typeof(SqlAnywhere16Processor));
             }
             finally
             {
@@ -664,7 +663,7 @@ namespace FluentMigrator.Tests.Integration
                         runner.RollbackToVersion(0, false);
                     },
                     false,
-                    typeof(SQLiteProcessor), typeof(SqlAnywhere16Processor));
+                    typeof(SqlAnywhere16Processor));
             }
         }
 
@@ -885,7 +884,10 @@ namespace FluentMigrator.Tests.Integration
 
             try
             {
-                // Excluded SqliteProcessor as it errors on DB cleanup (RollbackToVersion).
+                // Excluded SqliteProcessor as it errors on DB cleanup (RollbackToVersion)
+                // which I believe is because we are using it in in-memory mode and so
+                // the exception causes it to reset
+
                 ExecuteWithSupportedProcessors(
                     services => services.WithMigrationsIn(migrationsNamespace).Configure<RunnerOptions>(opt => opt.Tags = new[] { "TenantA" }),
                     (serviceProvider, processor) =>
@@ -1358,7 +1360,7 @@ namespace FluentMigrator.Tests.Integration
                     processor.ConstraintExists(null, "TestTable2", "TestUnique").ShouldBeFalse();
 
                     runner.Down(new TestCreateAndDropTableMigration());
-                }, true, typeof(SQLiteProcessor), typeof(SqlAnywhereProcessor));
+                }, true, typeof(SqlAnywhereProcessor));
         }
 
         [Test]
@@ -1393,7 +1395,6 @@ namespace FluentMigrator.Tests.Integration
                     runner.Down(new TestCreateSchema());
                 },
                 true,
-                typeof(SQLiteProcessor),
                 typeof(FirebirdProcessor),
                 typeof(SqlAnywhereProcessor));
         }
@@ -1422,9 +1423,7 @@ namespace FluentMigrator.Tests.Integration
                     ds.Tables[0].Rows[0][1].ShouldBe("Test");
 
                     runner.Down(new TestCreateAndDropTableMigration());
-                },
-                true,
-                typeof(SQLiteProcessor));
+                });
         }
 
         [Test]
@@ -1456,7 +1455,6 @@ namespace FluentMigrator.Tests.Integration
                     runner.Down(new TestCreateSchema());
                 },
                 true,
-                typeof(SQLiteProcessor),
                 typeof(FirebirdProcessor));
         }
 
@@ -1496,7 +1494,6 @@ namespace FluentMigrator.Tests.Integration
                     runner.Down(new TestCreateSchema());
                 },
                 true,
-                typeof(SQLiteProcessor),
                 typeof(FirebirdProcessor));
         }
 
@@ -1530,9 +1527,7 @@ namespace FluentMigrator.Tests.Integration
                     downDs.Tables[0].Rows[0][1].ShouldBe("Test");
 
                     runner.Down(new TestCreateAndDropTableMigration());
-                },
-                true,
-                typeof(SQLiteProcessor));
+                });
         }
 
         [Test]
@@ -1570,7 +1565,6 @@ namespace FluentMigrator.Tests.Integration
                     runner.Down(new TestCreateSchema());
                 },
                 true,
-                typeof(SQLiteProcessor),
                 typeof(FirebirdProcessor));
         }
 
@@ -1605,9 +1599,7 @@ namespace FluentMigrator.Tests.Integration
                     runner.Down(new TestCreateAndDropTableMigrationWithSchema());
 
                     runner.Down(new TestCreateSchema());
-                },
-                true,
-                typeof(SQLiteProcessor));
+                });
         }
 
         [Test]
@@ -1638,7 +1630,6 @@ namespace FluentMigrator.Tests.Integration
                     runner.Down(new TestCreateAndDropTableMigration());
                 },
                 true,
-                typeof(SQLiteProcessor),
                 typeof(SqlAnywhereProcessor));
         }
 
@@ -1674,7 +1665,6 @@ namespace FluentMigrator.Tests.Integration
                     runner.Down(new TestCreateSchema());
                 },
                 true,
-                typeof(SQLiteProcessor),
                 typeof(SqlAnywhereProcessor));
         }
 
@@ -1871,6 +1861,11 @@ namespace FluentMigrator.Tests.Integration
     {
         public override void Up()
         {
+            // NB: SQLite only supports FK's defined in the create statement so
+            // we ensure this is the only approach used so that SQLite can
+            // successfully tested. At time of implementing, the FK constraint
+            // wasn't explicitly used by any tests and so should affect anything.
+
             Create.Table("TestTable")
                 .WithColumn("Id").AsInt32().NotNullable().PrimaryKey().Identity()
                 .WithColumn("Name").AsString(255).NotNullable().WithDefaultValue("Anonymous");
@@ -1878,16 +1873,12 @@ namespace FluentMigrator.Tests.Integration
             Create.Table("TestTable2")
                 .WithColumn("Id").AsInt32().NotNullable().PrimaryKey().Identity()
                 .WithColumn("Name").AsString(255).Nullable()
-                .WithColumn("TestTableId").AsInt32().NotNullable();
+                .WithColumn("TestTableId").AsInt32().NotNullable().ForeignKey("fk_TestTable2_TestTableId_TestTable_Id", "TestTable", "Id");
 
             Create.Index("ix_Name").OnTable("TestTable2").OnColumn("Name").Ascending()
                 .WithOptions().NonClustered();
 
             Create.Column("Name2").OnTable("TestTable2").AsBoolean().Nullable();
-
-            Create.ForeignKey("fk_TestTable2_TestTableId_TestTable_Id")
-                .FromTable("TestTable2").ForeignColumn("TestTableId")
-                .ToTable("TestTable").PrimaryColumn("Id");
 
             Insert.IntoTable("TestTable").Row(new { Name = "Test" });
         }
@@ -1962,9 +1953,14 @@ namespace FluentMigrator.Tests.Integration
     {
         public override void Up()
         {
-            var createSchemaExpr = Create.Schema("TestSchema");
+            // SQLite doesn't support creating schemas so for non SQLite DB's we'll create
+            // the schema, but for SQLite we'll attach a temp DB with the schema alias
+            var createSchemaExpr = IfDatabase(t => t != "SQLite").Create.Schema("TestSchema");
+
             IfDatabase(t => t.StartsWith("SqlAnywhere"))
                 .Delegate(() => createSchemaExpr.Password("TestSchemaPassword"));
+
+            IfDatabase("SQLite").Execute.Sql("ATTACH DATABASE '' AS \"TestSchema\"");
 
             Create.Table("Users")
                 .InSchema("TestSchema")
@@ -1980,7 +1976,11 @@ namespace FluentMigrator.Tests.Integration
         {
             Delete.Index("IX_Users_GroupId").OnTable("Users").InSchema("TestSchema").OnColumn("GroupId");
             Delete.Table("Users").InSchema("TestSchema");
-            Delete.Schema("TestSchema");
+            IfDatabase(t => t != "SQLite").Delete.Schema("TestSchema");
+
+            // Can't actually detatch SQLite DB here as migrations run in a transaction
+            // and you can't detach a database whilst in a transaction
+            // IfDatabase("SQLite").Execute.Sql("DETACH DATABASE \"TestSchema\"");
         }
     }
 
@@ -1988,6 +1988,11 @@ namespace FluentMigrator.Tests.Integration
     {
         public override void Up()
         {
+            // NB: SQLite only supports FK's defined in the create statement so
+            // we ensure this is the only approach used so that SQLite can
+            // successfully tested. At time of implementing, the FK constraint
+            // wasn't explicitly used by any tests and so should affect anything.
+
             Create.Table("TestTable")
                 .InSchema("TestSchema")
                 .WithColumn("Id").AsInt32().NotNullable().PrimaryKey().Identity()
@@ -1997,16 +2002,12 @@ namespace FluentMigrator.Tests.Integration
                 .InSchema("TestSchema")
                 .WithColumn("Id").AsInt32().NotNullable().PrimaryKey().Identity()
                 .WithColumn("Name").AsString(255).Nullable()
-                .WithColumn("TestTableId").AsInt32().NotNullable();
+                .WithColumn("TestTableId").AsInt32().NotNullable().ForeignKey("fk_TestTable2_TestTableId_TestTable_Id", "TestSchema", "TestTable", "Id");
 
             Create.Index("ix_Name").OnTable("TestTable2").InSchema("TestSchema").OnColumn("Name").Ascending()
                 .WithOptions().NonClustered();
 
             Create.Column("Name2").OnTable("TestTable2").InSchema("TestSchema").AsString(10).Nullable();
-
-            Create.ForeignKey("fk_TestTable2_TestTableId_TestTable_Id")
-                .FromTable("TestTable2").InSchema("TestSchema").ForeignColumn("TestTableId")
-                .ToTable("TestTable").InSchema("TestSchema").PrimaryColumn("Id");
 
             Insert.IntoTable("TestTable").InSchema("TestSchema").Row(new { Name = "Test" });
         }
@@ -2051,14 +2052,23 @@ namespace FluentMigrator.Tests.Integration
     {
         public override void Up()
         {
-            var createSchemaExpr = Create.Schema("TestSchema");
+            // SQLite doesn't support creating schemas so for non SQLite DB's we'll create
+            // the schema, but for SQLite we'll attach a temp DB with the schema alias
+            var createSchemaExpr = IfDatabase(t => t != "SQLite").Create.Schema("TestSchema");
+
             IfDatabase(t => t.StartsWith("SqlAnywhere"))
                 .Delegate(() => createSchemaExpr.Password("TestSchemaPassword"));
+
+            IfDatabase("SQLite").Execute.Sql("ATTACH DATABASE '' AS \"TestSchema\"");
         }
 
         public override void Down()
         {
-            Delete.Schema("TestSchema");
+            IfDatabase(t => t != "SQLite").Delete.Schema("TestSchema");
+
+            // Can't actually detatch SQLite DB here as migrations run in a transaction
+            // and you can't detach a database whilst in a transaction
+            // IfDatabase("SQLite").Execute.Sql("DETACH DATABASE \"TestSchema\"");
         }
     }
 

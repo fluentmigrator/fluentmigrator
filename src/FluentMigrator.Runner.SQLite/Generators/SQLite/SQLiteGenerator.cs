@@ -18,7 +18,6 @@
 #endregion
 
 using System.Linq;
-using System.Text.RegularExpressions;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
@@ -66,6 +65,11 @@ namespace FluentMigrator.Runner.Generators.SQLite
 
         public override string Generate(CreateForeignKeyExpression expression)
         {
+            // If a FK name starts with $$IGNORE$$_ then it means it was handled by the CREATE TABLE
+            // routine and we know it's been handled so we should just not bother erroring.
+            if (expression.ForeignKey.Name.StartsWith("$$IGNORE$$_"))
+                return string.Empty;
+
             return CompatibilityMode.HandleCompatibilty("Foreign keys are not supported in SQLite");
         }
 
@@ -96,7 +100,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
 
             // Convert the constraint into a UNIQUE index
             var idx = new CreateIndexExpression();
-            idx.Index.Name = Regex.Replace(expression.Constraint.ConstraintName, "^UC_", "IX_");
+            idx.Index.Name = expression.Constraint.ConstraintName;
             idx.Index.TableName = expression.Constraint.TableName;
             idx.Index.SchemaName = expression.Constraint.SchemaName;
             idx.Index.IsUnique = true;
@@ -114,7 +118,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
 
             // Convert the constraint into a drop UNIQUE index
             var idx = new DeleteIndexExpression();
-            idx.Index.Name = Regex.Replace(expression.Constraint.ConstraintName, "^UC_", "IX_");
+            idx.Index.Name = expression.Constraint.ConstraintName;
             idx.Index.SchemaName = expression.Constraint.SchemaName;
 
             return Generate(idx);
