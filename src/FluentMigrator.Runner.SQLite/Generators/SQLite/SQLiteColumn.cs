@@ -28,6 +28,11 @@ namespace FluentMigrator.Runner.Generators.SQLite
             return base.Generate(colDefs, tableName) + string.Concat(foreignKeyClauses);
         }
 
+        /// <summary>
+        /// Formats the unique SQL fragment
+        /// </summary>
+        /// <param name="column">The column definition</param>
+        /// <returns>The formatted unique SQL fragment</returns>
         protected virtual string FormatUniqueConstraint(ColumnDefinition column)
         {
             // Define unique constraints on columns in addition to creating a unique index
