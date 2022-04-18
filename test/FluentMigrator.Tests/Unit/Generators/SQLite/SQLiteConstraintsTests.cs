@@ -115,7 +115,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.Constraint.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE INDEX \"TestSchema\".\"IX_TestTable1_TestColumn1_TestColumn2\" ON \"TestTable1\" (\"TestColumn1\" ASC, \"TestColumn2\" ASC)");
+            result.ShouldBe("CREATE UNIQUE INDEX \"TestSchema\".\"UC_TestTable1_TestColumn1_TestColumn2\" ON \"TestTable1\" (\"TestColumn1\" ASC, \"TestColumn2\" ASC)");
         }
 
         [Test]
@@ -124,7 +124,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetCreateMultiColumnUniqueConstraintExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE INDEX \"IX_TestTable1_TestColumn1_TestColumn2\" ON \"TestTable1\" (\"TestColumn1\" ASC, \"TestColumn2\" ASC)");
+            result.ShouldBe("CREATE UNIQUE INDEX \"UC_TestTable1_TestColumn1_TestColumn2\" ON \"TestTable1\" (\"TestColumn1\" ASC, \"TestColumn2\" ASC)");
         }
 
         [Test]
@@ -305,7 +305,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.Constraint.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE INDEX \"TestSchema\".\"IX_TestTable1_TestColumn1\" ON \"TestTable1\" (\"TestColumn1\" ASC)");
+            result.ShouldBe("CREATE UNIQUE INDEX \"TestSchema\".\"UC_TestTable1_TestColumn1\" ON \"TestTable1\" (\"TestColumn1\" ASC)");
         }
 
         [Test]
@@ -314,7 +314,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetCreateUniqueConstraintExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE INDEX \"IX_TestTable1_TestColumn1\" ON \"TestTable1\" (\"TestColumn1\" ASC)");
+            result.ShouldBe("CREATE UNIQUE INDEX \"UC_TestTable1_TestColumn1\" ON \"TestTable1\" (\"TestColumn1\" ASC)");
         }
 
         [Test]
