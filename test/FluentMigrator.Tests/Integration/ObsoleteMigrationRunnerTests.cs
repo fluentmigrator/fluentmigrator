@@ -868,7 +868,6 @@ namespace FluentMigrator.Tests.Integration
                 Namespace = migrationsNamespace,
             };
 
-            // Excluded SqliteProcessor as it errors on DB cleanup (RollbackToVersion).
             ExecuteWithSupportedProcessors(processor =>
             {
                 try
@@ -897,7 +896,7 @@ namespace FluentMigrator.Tests.Integration
 
                     new MigrationRunner(assembly, runnerContext, processor).RollbackToVersion(0, false);
                 }
-            }, true, typeof(SQLiteProcessor));
+            });
         }
 
         [Test]
@@ -1008,9 +1007,7 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlAnywhere16")]
         public void ValidateVersionOrderShouldDoNothingIfUnappliedMigrationVersionIsGreaterThanLatestAppliedMigration()
         {
-
-            // Using SqlServer instead of SQLite as versions not deleted from VersionInfo table when using Sqlite.
-            var excludedProcessors = new[] { typeof(SQLiteProcessor), typeof(MySqlProcessor), typeof(PostgresProcessor) };
+            var excludedProcessors = new[] { typeof(MySqlProcessor), typeof(PostgresProcessor) };
 
             var assembly = typeof(Migrations.Interleaved.Pass3.User).Assembly;
 
@@ -1054,8 +1051,7 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlAnywhere16")]
         public void ValidateVersionOrderShouldThrowExceptionIfUnappliedMigrationVersionIsLessThanLatestAppliedMigration()
         {
-            // Using SqlServer instead of SQLite as versions not deleted from VersionInfo table when using Sqlite.
-            var excludedProcessors = new[] { typeof(MySqlProcessor), typeof(SQLiteProcessor) };
+            var excludedProcessors = new[] { typeof(MySqlProcessor) };
 
             var assembly = typeof(Migrations.Interleaved.Pass3.User).Assembly;
 

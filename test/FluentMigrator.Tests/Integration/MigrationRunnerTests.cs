@@ -650,7 +650,6 @@ namespace FluentMigrator.Tests.Integration
                         processor.TableExists(null, "Users").ShouldBeFalse();
                     },
                     false,
-                    typeof(SQLiteProcessor),
                     typeof(SqlAnywhere16Processor));
             }
             finally
@@ -884,10 +883,6 @@ namespace FluentMigrator.Tests.Integration
 
             try
             {
-                // Excluded SqliteProcessor as it errors on DB cleanup (RollbackToVersion)
-                // which I believe is because we are using it in in-memory mode and so
-                // the exception causes it to reset
-
                 ExecuteWithSupportedProcessors(
                     services => services.WithMigrationsIn(migrationsNamespace).Configure<RunnerOptions>(opt => opt.Tags = new[] { "TenantA" }),
                     (serviceProvider, processor) =>
@@ -901,7 +896,7 @@ namespace FluentMigrator.Tests.Integration
                         processor.TableExists(null, "TenantAandBTable").ShouldBeTrue();
                     },
                     false,
-                    typeof(SQLiteProcessor), typeof(SqlAnywhere16Processor));
+                    typeof(SqlAnywhere16Processor));
 
                 ExecuteWithSupportedProcessors(
                     services => services.WithMigrationsIn(migrationsNamespace).Configure<RunnerOptions>(opt => opt.Tags = new[] { "TenantB" }),
@@ -916,7 +911,7 @@ namespace FluentMigrator.Tests.Integration
                         processor.TableExists(null, "TenantAandBTable").ShouldBeFalse();
                     },
                     false,
-                    typeof(SQLiteProcessor), typeof(SqlAnywhere16Processor));
+                    typeof(SqlAnywhere16Processor));
             }
             finally
             {
@@ -928,7 +923,7 @@ namespace FluentMigrator.Tests.Integration
                         runner.RollbackToVersion(0, false);
                     },
                     false,
-                    typeof(SQLiteProcessor), typeof(SqlAnywhere16Processor));
+                    typeof(SqlAnywhere16Processor));
             }
         }
 
@@ -1041,8 +1036,7 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlServer2016")]
         public void ValidateVersionOrderShouldDoNothingIfUnappliedMigrationVersionIsGreaterThanLatestAppliedMigration()
         {
-            // Using SqlServer instead of SQLite as versions not deleted from VersionInfo table when using Sqlite.
-            var excludedProcessors = new[] { typeof(SQLiteProcessor), typeof(MySqlProcessor), typeof(PostgresProcessor), typeof(SqlAnywhere16Processor) };
+            var excludedProcessors = new[] { typeof(MySqlProcessor), typeof(PostgresProcessor), typeof(SqlAnywhere16Processor) };
 
             var namespacePass2 = typeof(Migrations.Interleaved.Pass2.User).Namespace;
             var namespacePass3 = typeof(Migrations.Interleaved.Pass3.User).Namespace;
@@ -1098,8 +1092,7 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlServer2016")]
         public void ValidateVersionOrderShouldThrowExceptionIfUnappliedMigrationVersionIsLessThanLatestAppliedMigration()
         {
-            // Using SqlServer instead of SQLite as versions not deleted from VersionInfo table when using Sqlite.
-            var excludedProcessors = new[] { typeof(MySqlProcessor), typeof(SQLiteProcessor), typeof(SqlAnywhere16Processor) };
+            var excludedProcessors = new[] { typeof(MySqlProcessor), typeof(SqlAnywhere16Processor) };
 
             var namespacePass2 = typeof(Migrations.Interleaved.Pass2.User).Namespace;
             var namespacePass3 = typeof(Migrations.Interleaved.Pass3.User).Namespace;

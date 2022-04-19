@@ -50,6 +50,8 @@ namespace FluentMigrator.Tests.Integration
 
         private string _tempDataDirectory;
 
+        private string _sqliteDbPath = null;
+
         protected IntegrationTestBase()
         {
             _processors = new List<(Type, Func<IntegrationTestOptions.DatabaseServerOptions>)>
@@ -88,6 +90,18 @@ namespace FluentMigrator.Tests.Integration
             {
                 Directory.Delete(_tempDataDirectory, true);
             }
+        }
+
+        [SetUp]
+        public void SetUpSqlite()
+        {
+            _sqliteDbPath = Path.Combine(_tempDataDirectory, Guid.NewGuid().ToString("N") + ".db");
+        }
+
+        [TearDown]
+        public void TearDownSqlite()
+        {
+            _sqliteDbPath = null;
         }
 
         private bool IsAnyServerEnabled(params Type[] exceptProcessors)
@@ -178,6 +192,11 @@ namespace FluentMigrator.Tests.Integration
             if (!serverOptions.IsEnabled)
                 Assert.Ignore($"The configuration for {processorType.Name} is not enabled.");
 
+            var connectionString = serverOptions.ConnectionString;
+
+            if (processorType == typeof(SQLiteProcessor))
+                connectionString = $"Data Source={ _sqliteDbPath };Pooling=false;";
+
             var services = ServiceCollectionExtensions.CreateServices()
                 .ConfigureRunner(
                     r => r
@@ -208,7 +227,7 @@ namespace FluentMigrator.Tests.Integration
                         return new SelectingGeneratorAccessor(new[] { proc.Generator }, opt, opt2);
                     })
                 .AddScoped<IConnectionStringReader>(
-                    _ => new PassThroughConnectionStringReader(serverOptions.ConnectionString));
+                    _ => new PassThroughConnectionStringReader(connectionString));
             initAction?.Invoke(services);
 
             services
@@ -218,10 +237,12 @@ namespace FluentMigrator.Tests.Integration
             var serviceProvider = services
                 .BuildServiceProvider(true);
 
+
+
             if (processorType == typeof(FirebirdProcessor) && _isFirstExecuteForFirebird)
             {
                 _isFirstExecuteForFirebird = false;
-                FbConnection.CreateDatabase(serverOptions.ConnectionString, true);
+                FbConnection.CreateDatabase(connectionString, true);
             }
 
             using (serviceProvider)
