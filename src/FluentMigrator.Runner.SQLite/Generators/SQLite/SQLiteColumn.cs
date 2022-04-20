@@ -86,7 +86,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
         /// <inheritdoc />
         public override bool ShouldPrimaryKeysBeAddedSeparately(IEnumerable<ColumnDefinition> primaryKeyColumns)
         {
-            //If there are no identity column then we can add as a separate constrint
+            // If there are no identity column then we can add as a separate constraint
             var pkColDefs = primaryKeyColumns.ToList();
             return !pkColDefs.Any(x => x.IsIdentity) && pkColDefs.Any(x => x.IsPrimaryKey);
         }
