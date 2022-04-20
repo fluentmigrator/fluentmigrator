@@ -1850,7 +1850,7 @@ namespace FluentMigrator.Tests.Integration
     {
         public override void Up()
         {
-            // NB: SQLite only supports FK's defined in the create statement so
+            // SQLite only supports FK's defined in the create statement so
             // we ensure this is the only approach used so that SQLite can
             // successfully tested. At time of implementing, the FK constraint
             // wasn't explicitly used by any tests and so should affect anything.
@@ -1977,7 +1977,7 @@ namespace FluentMigrator.Tests.Integration
     {
         public override void Up()
         {
-            // NB: SQLite only supports FK's defined in the create statement so
+            // SQLite only supports FK's defined in the create statement so
             // we ensure this is the only approach used so that SQLite can
             // successfully tested. At time of implementing, the FK constraint
             // wasn't explicitly used by any tests and so should affect anything.
