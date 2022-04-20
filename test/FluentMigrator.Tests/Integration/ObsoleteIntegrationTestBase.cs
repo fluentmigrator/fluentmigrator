@@ -60,8 +60,6 @@ namespace FluentMigrator.Tests.Integration
 
         private string _tempDataDirectory;
 
-        private static string _sqliteDbPath = null;
-
         protected ObsoleteIntegrationTestBase()
         {
             _processors = new List<(Type, Func<IntegrationTestOptions.DatabaseServerOptions>, ExecuteTestDelegate)>
@@ -100,18 +98,6 @@ namespace FluentMigrator.Tests.Integration
             {
                 Directory.Delete(_tempDataDirectory, true);
             }
-        }
-
-        [SetUp]
-        public void SetUpSqlite()
-        {
-            _sqliteDbPath = Path.Combine(_tempDataDirectory, Guid.NewGuid().ToString("N") + ".db");
-        }
-
-        [TearDown]
-        public void TearDownSqlite()
-        {
-            _sqliteDbPath = null;
         }
 
         protected bool IsAnyServerEnabled(params Type[] exceptProcessors)
@@ -172,8 +158,6 @@ namespace FluentMigrator.Tests.Integration
 
                 if (!isMatch(processorType))
                     continue;
-
-                opt.ReplaceConnectionStringDataDirectory(_tempDataDirectory);
 
                 executed = true;
                 executeFunc(test, tryRollback, opt);
@@ -266,7 +250,7 @@ namespace FluentMigrator.Tests.Integration
             using (var connection = factory.Factory.CreateConnection())
             {
                 Debug.Assert(connection != null, nameof(connection) + " != null");
-                connection.ConnectionString = $"Data Source={ _sqliteDbPath };Pooling=false;";
+                connection.ConnectionString = serverOptions.ConnectionString;
                 connection.Open();
 
                 using (var processor = new SQLiteProcessor(connection, new SQLiteGenerator(), announcer, new ProcessorOptions(), factory, new SQLiteQuoter()))

@@ -178,8 +178,6 @@ namespace FluentMigrator.Tests.Integration
             if (!serverOptions.IsEnabled)
                 Assert.Ignore($"The configuration for {processorType.Name} is not enabled.");
 
-            serverOptions = serverOptions.ReplaceConnectionStringDataDirectory(_tempDataDirectory);
-
             var services = ServiceCollectionExtensions.CreateServices()
                 .ConfigureRunner(
                     r => r

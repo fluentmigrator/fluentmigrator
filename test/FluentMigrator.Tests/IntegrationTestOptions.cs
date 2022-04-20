@@ -78,7 +78,7 @@ namespace FluentMigrator.Tests
         public static DatabaseServerOptions Jet => GetOptions(ProcessorId.Jet);
 
         // ReSharper disable once InconsistentNaming
-        public static DatabaseServerOptions SQLite => GetOptions(ProcessorId.SQLite);
+        public static DatabaseServerOptions SQLite => GetOptions(ProcessorId.SQLite).ReplaceConnectionStringDataDirectory();
 
         public static DatabaseServerOptions MySql => GetOptions(ProcessorId.MySql);
 
@@ -98,6 +98,7 @@ namespace FluentMigrator.Tests
         {
             private ISet<string> _supportedPlatforms;
             private string _supportedPlatformsValue;
+            private string _originalConnectionString;
 
             public static DatabaseServerOptions Empty { get; } = new DatabaseServerOptions() { IsEnabled = false };
 
@@ -134,6 +135,17 @@ namespace FluentMigrator.Tests
                     return this;
                 return Empty;
             }
+
+            public DatabaseServerOptions ReplaceConnectionStringDataDirectory()
+            {
+                if (string.IsNullOrWhiteSpace(_originalConnectionString))
+                    _originalConnectionString = ConnectionString;
+
+                ConnectionString = _originalConnectionString
+                    .Replace("|DataDirectory|", AppDomain.CurrentDomain.GetData("DataDirectory")?.ToString());
+
+                return this;
+            }
         }
 
         private static DatabaseServerOptions GetOptions(string key)
@@ -141,20 +153,6 @@ namespace FluentMigrator.Tests
             if (DatabaseServers.TryGetValue(key, out var options))
                 return options;
             return DatabaseServerOptions.Empty;
-        }
-    }
-
-    public static class DatabaseServerOptionsExtensions
-    {
-        public static DatabaseServerOptions ReplaceConnectionStringDataDirectory(this DatabaseServerOptions dbOpts, string tempDir)
-        {
-            var newDbOpts = new DatabaseServerOptions
-            {
-                ConnectionString = dbOpts.ConnectionString.Replace("|DataDirectory|", tempDir),
-                IsEnabled = dbOpts.IsEnabled,
-            };
-
-            return newDbOpts;
         }
     }
 }
