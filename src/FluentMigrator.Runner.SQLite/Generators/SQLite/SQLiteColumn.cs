@@ -52,7 +52,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
         {
             var fk2 = (ForeignKeyDefinition)foreignKey.Clone();
 
-            // SQLite FK's most be within the same schema as the FK itself
+            // SQLite FK's must be within the same schema as the FK itself
             // so we'll remove the schema from the FK definition
             fk2.PrimaryTableSchema = string.Empty;
 
@@ -68,7 +68,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
                 // see: http://www.sqlite.org/syntaxdiagrams.html#column-constraint syntax details
                 if (!column.IsPrimaryKey && (!column.Type.HasValue || GetTypeMap(column.Type.Value, null, null) != "INTEGER"))
                 {
-                    throw new ArgumentException("SQLite only supports identity on a single integer, primary key coulmn");
+                    throw new ArgumentException("SQLite only supports identity on a single integer, primary key column");
                 }
 
                 return "AUTOINCREMENT";
