@@ -44,13 +44,13 @@ namespace FluentMigrator.Runner.Processors.MySql
         }
 
         /// <inheritdoc />
-        public override string DatabaseType => "MySql5";
+        public override string DatabaseType => ProcessorId.MySql5;
 
         /// <inheritdoc />
         public override IList<string> DatabaseTypeAliases { get; } = new List<string>()
         {
-            "MariaDB",
-            "MySQL",
+            ProcessorId.MariaDB,
+            ProcessorId.MySql,
             "MySQL 5"
         };
     }

@@ -14,6 +14,7 @@
   <ItemGroup>
     <ProjectReference Include="..\FluentMigrator.Extensions.SqlServer\FluentMigrator.Extensions.SqlServer.csproj" />
     <ProjectReference Include="..\FluentMigrator.Runner.Core\FluentMigrator.Runner.Core.csproj" />
+    <ProjectReference Include="..\FluentMigrator\FluentMigrator.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.SqlClient">

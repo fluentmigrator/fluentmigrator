@@ -40,9 +40,9 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         [CanBeNull]
         private readonly IServiceProvider _serviceProvider;
 
-        public override string DatabaseType => "SqlServerCe";
+        public override string DatabaseType => ProcessorId.SqlServerCe;
 
-        public override IList<string> DatabaseTypeAliases { get; } = new List<string> { "SqlServer" };
+        public override IList<string> DatabaseTypeAliases { get; } = new List<string> { ProcessorId.SqlServer };
 
         [Obsolete]
         public SqlServerCeProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)

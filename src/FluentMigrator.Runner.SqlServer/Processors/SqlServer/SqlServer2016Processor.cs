@@ -59,7 +59,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             [NotNull] IConnectionStringAccessor connectionStringAccessor,
             [NotNull] IServiceProvider serviceProvider)
             : base(
-                new[] { "SqlServer2016", "SqlServer" },
+                new[] { ProcessorId.SqlServer2016, ProcessorId.SqlServer },
                 factory,
                 generator,
                 quoter,

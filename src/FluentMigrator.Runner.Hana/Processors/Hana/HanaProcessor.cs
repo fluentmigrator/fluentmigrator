@@ -35,7 +35,7 @@ namespace FluentMigrator.Runner.Processors.Hana
         {
         }
 
-        public override string DatabaseType => "Hana";
+        public override string DatabaseType => ProcessorId.Hana;
 
         public override IList<string> DatabaseTypeAliases { get; } = new List<string>();
 

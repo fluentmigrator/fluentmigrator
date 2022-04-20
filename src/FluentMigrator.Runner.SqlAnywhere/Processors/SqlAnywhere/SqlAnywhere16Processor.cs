@@ -40,7 +40,7 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
             [NotNull] IConnectionStringAccessor connectionStringAccessor,
             [NotNull] IServiceProvider serviceProvider)
             : base(
-                "SqlAnywhere16",
+                ProcessorId.SqlAnywhere16,
                 () => factory.Factory,
                 generator,
                 logger,

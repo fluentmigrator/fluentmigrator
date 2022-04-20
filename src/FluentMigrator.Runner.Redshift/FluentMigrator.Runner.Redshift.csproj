@@ -13,5 +13,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FluentMigrator.Runner.Core\FluentMigrator.Runner.Core.csproj" />
+    <ProjectReference Include="..\FluentMigrator\FluentMigrator.csproj" />
   </ItemGroup>
 </Project>

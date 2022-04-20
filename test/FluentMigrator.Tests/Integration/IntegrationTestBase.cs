@@ -218,6 +218,8 @@ namespace FluentMigrator.Tests.Integration
             var serviceProvider = services
                 .BuildServiceProvider(true);
 
+
+
             if (processorType == typeof(FirebirdProcessor) && _isFirstExecuteForFirebird)
             {
                 _isFirstExecuteForFirebird = false;

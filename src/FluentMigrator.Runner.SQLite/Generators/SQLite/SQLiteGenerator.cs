@@ -17,7 +17,10 @@
 //
 #endregion
 
+using System.Linq;
+
 using FluentMigrator.Expressions;
+using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Generic;
 
 using JetBrains.Annotations;
@@ -45,34 +48,14 @@ namespace FluentMigrator.Runner.Generators.SQLite
             [NotNull] IOptions<GeneratorOptions> generatorOptions)
             : base(new SQLiteColumn(), quoter, new EmptyDescriptionGenerator(), generatorOptions)
         {
+            CompatibilityMode = generatorOptions.Value.CompatibilityMode ?? CompatibilityMode.STRICT;
         }
 
         public override string RenameTable { get { return "ALTER TABLE {0} RENAME TO {1}"; } }
-        public override string RenameColumn { get { return "ALTER TABLE {0} RENAME COLUMN {1} TO {2}"; } }
 
         public override string Generate(AlterColumnExpression expression)
         {
             return CompatibilityMode.HandleCompatibilty("SQLite does not support alter column");
-        }
-
-        public override string Generate(RenameColumnExpression expression)
-        {
-            if (CompatibilityMode == CompatibilityMode.STRICT)
-            {
-                return CompatibilityMode.HandleCompatibilty("SQLite does not support renaming of columns");
-            }
-
-            return string.Format(
-                RenameColumn,
-                Quoter.QuoteTableName(expression.TableName, expression.SchemaName),
-                Quoter.QuoteColumnName(expression.OldName),
-                Quoter.QuoteColumnName(expression.NewName)
-            );
-        }
-
-        public override string Generate(DeleteColumnExpression expression)
-        {
-            return CompatibilityMode.HandleCompatibilty("SQLite does not support deleting of columns");
         }
 
         public override string Generate(AlterDefaultConstraintExpression expression)
@@ -82,6 +65,11 @@ namespace FluentMigrator.Runner.Generators.SQLite
 
         public override string Generate(CreateForeignKeyExpression expression)
         {
+            // If a FK name starts with $$IGNORE$$_ then it means it was handled by the CREATE TABLE
+            // routine and we know it's been handled so we should just not bother erroring.
+            if (expression.ForeignKey.Name.StartsWith("$$IGNORE$$_"))
+                return string.Empty;
+
             return CompatibilityMode.HandleCompatibilty("Foreign keys are not supported in SQLite");
         }
 
@@ -102,17 +90,73 @@ namespace FluentMigrator.Runner.Generators.SQLite
 
         public override string Generate(DeleteDefaultConstraintExpression expression)
         {
-            return CompatibilityMode.HandleCompatibilty("Default constraints are not supported");
+            return CompatibilityMode.HandleCompatibilty("Default constraints are not supported in SQLite");
         }
 
         public override string Generate(CreateConstraintExpression expression)
         {
-            return CompatibilityMode.HandleCompatibilty("Constraints are not supported");
+            if (!expression.Constraint.IsUniqueConstraint)
+                return CompatibilityMode.HandleCompatibilty("Only UNIQUE constraints are supported in SQLite");
+
+            // Convert the constraint into a UNIQUE index
+            var idx = new CreateIndexExpression();
+            idx.Index.Name = expression.Constraint.ConstraintName;
+            idx.Index.TableName = expression.Constraint.TableName;
+            idx.Index.SchemaName = expression.Constraint.SchemaName;
+            idx.Index.IsUnique = true;
+
+            foreach (var col in expression.Constraint.Columns)
+                idx.Index.Columns.Add(new IndexColumnDefinition { Name = col });
+
+            return Generate(idx);
         }
 
         public override string Generate(DeleteConstraintExpression expression)
         {
-            return CompatibilityMode.HandleCompatibilty("Constraints are not supported");
+            if (!expression.Constraint.IsUniqueConstraint)
+                return CompatibilityMode.HandleCompatibilty("Only UNIQUE constraints are supported in SQLite");
+
+            // Convert the constraint into a drop UNIQUE index
+            var idx = new DeleteIndexExpression();
+            idx.Index.Name = expression.Constraint.ConstraintName;
+            idx.Index.SchemaName = expression.Constraint.SchemaName;
+
+            return Generate(idx);
+        }
+
+        public override string Generate(CreateIndexExpression expression)
+        {
+            // SQLite prefixes the index name, rather than the table name with the schema
+
+            var indexColumns = new string[expression.Index.Columns.Count];
+            IndexColumnDefinition columnDef;
+
+            for (var i = 0; i < expression.Index.Columns.Count; i++)
+            {
+                columnDef = expression.Index.Columns.ElementAt(i);
+                if (columnDef.Direction == Direction.Ascending)
+                {
+                    indexColumns[i] = Quoter.QuoteColumnName(columnDef.Name) + " ASC";
+                }
+                else
+                {
+                    indexColumns[i] = Quoter.QuoteColumnName(columnDef.Name) + " DESC";
+                }
+            }
+
+            return string.Format(CreateIndex
+                , GetUniqueString(expression)
+                , GetClusterTypeString(expression)
+                , Quoter.QuoteIndexName(expression.Index.Name, expression.Index.SchemaName)
+                , Quoter.QuoteTableName(expression.Index.TableName)
+                , string.Join(", ", indexColumns));
+        }
+
+        public override string Generate(DeleteIndexExpression expression)
+        {
+            // SQLite prefixes the index name, rather than the table name with the schema
+
+            return string.Format(DropIndex, Quoter.QuoteIndexName(expression.Index.Name, expression.Index.SchemaName));
         }
     }
 }

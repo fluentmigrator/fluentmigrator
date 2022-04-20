@@ -36,7 +36,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             [NotNull] IOptionsSnapshot<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor,
             [NotNull] IServiceProvider serviceProvider)
-            : base(new[] { "SqlServer2005", "SqlServer" }, generator, quoter, logger, options, connectionStringAccessor, serviceProvider)
+            : base(new[] { ProcessorId.SqlServer2005, ProcessorId.SqlServer }, generator, quoter, logger, options, connectionStringAccessor, serviceProvider)
         {
         }
     }

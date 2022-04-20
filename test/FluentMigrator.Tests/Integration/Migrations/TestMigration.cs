@@ -25,9 +25,14 @@ namespace FluentMigrator.Tests.Integration.Migrations
     {
         public override void Up()
         {
+            // SQLite only supports FK's defined in the create statement so
+            // we ensure this is the only approach used so that SQLite can
+            // successfully tested. At time of implementing, the FK constraint
+            // wasn't explicitly used by any tests and so should affect anything.
+
             Create.Table("Users")
                 .WithColumn("UserId").AsInt32().Identity().PrimaryKey()
-                .WithColumn("GroupId").AsInt32().NotNullable()
+                .WithColumn("GroupId").AsInt32().NotNullable().ForeignKey("Groups", "GroupId")
                 .WithColumn("UserName").AsString(32).NotNullable()
                 .WithColumn("Password").AsString(32).NotNullable();
 
@@ -36,12 +41,6 @@ namespace FluentMigrator.Tests.Integration.Migrations
                 .WithColumn("Name").AsString(32).NotNullable();
 
             Create.Column("Foo").OnTable("Users").AsInt16().Indexed().WithDefaultValue(1);
-
-            //commenting out the FK so it passes the sqlite tests
-            Create.ForeignKey()
-                .FromTable("Users").ForeignColumn("GroupId")
-                .ToTable("Groups").PrimaryColumn("GroupId");
-            //Create.ForeignKey("FK_Foo").FromTable("Users").ForeignColumn("GroupId").ToTable("Groups").PrimaryColumn("GroupId");
 
             Create.Table("Foo")
                 .WithColumn("Fizz").AsString(32);

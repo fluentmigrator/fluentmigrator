@@ -45,7 +45,7 @@ namespace FluentMigrator.Example.Migrator
 
             return new DatabaseConfiguration()
             {
-                ProcessorId = "sqlite",
+                ProcessorId = ProcessorId.SQLite,
                 ConnectionString = csb.ConnectionString,
             };
         }

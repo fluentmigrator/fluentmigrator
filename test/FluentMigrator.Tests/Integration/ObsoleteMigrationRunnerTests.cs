@@ -242,9 +242,7 @@ namespace FluentMigrator.Tests.Integration
                     processor.ConstraintExists(null, "Users", "UC_Users_GroupId").ShouldBeFalse();
                     processor.ConstraintExists(null, "Users", "UC_Users_AccountId").ShouldBeFalse();
                     processor.TableExists(null, "Users").ShouldBeFalse();
-                },
-                false,
-                typeof(SQLiteProcessor));
+                });
         }
 
         [Test]
@@ -341,7 +339,9 @@ namespace FluentMigrator.Tests.Integration
 
                     runner.Down(new TestCreateSchema());
                     //processor.CommitTransaction();
-                }, false, new[] { typeof(SQLiteProcessor), typeof(FirebirdProcessor) });
+                },
+                false,
+                typeof(FirebirdProcessor));
         }
 
         [Test]
@@ -451,7 +451,7 @@ namespace FluentMigrator.Tests.Integration
 
                     runner.Down(new TestCreateAndDropTableMigration());
                     processor.ColumnExists(null, "TestTable2", "Name").ShouldBeFalse();
-                }, true, typeof(SQLiteProcessor));
+                });
         }
 
         [Test]
@@ -487,7 +487,9 @@ namespace FluentMigrator.Tests.Integration
                     processor.ColumnExists("TestSchema", "TestTable2", "Name").ShouldBeFalse();
 
                     runner.Down(new TestCreateSchema());
-                }, true, typeof(SQLiteProcessor), typeof(FirebirdProcessor));
+                },
+                true,
+                typeof(FirebirdProcessor));
         }
 
         [Test]
@@ -633,7 +635,7 @@ namespace FluentMigrator.Tests.Integration
                     testRunner.MigrateDown(0, false);
                     testRunner.VersionLoader.VersionInfo.HasAppliedMigration(1).ShouldBeFalse();
                     processor.TableExists(null, "Users").ShouldBeFalse();
-                }, false, typeof(SQLiteProcessor));
+                }, false);
             }
             finally
             {
@@ -866,7 +868,6 @@ namespace FluentMigrator.Tests.Integration
                 Namespace = migrationsNamespace,
             };
 
-            // Excluded SqliteProcessor as it errors on DB cleanup (RollbackToVersion).
             ExecuteWithSupportedProcessors(processor =>
             {
                 try
@@ -895,7 +896,7 @@ namespace FluentMigrator.Tests.Integration
 
                     new MigrationRunner(assembly, runnerContext, processor).RollbackToVersion(0, false);
                 }
-            }, true, typeof(SQLiteProcessor));
+            });
         }
 
         [Test]
@@ -1006,9 +1007,7 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlAnywhere16")]
         public void ValidateVersionOrderShouldDoNothingIfUnappliedMigrationVersionIsGreaterThanLatestAppliedMigration()
         {
-
-            // Using SqlServer instead of SQLite as versions not deleted from VersionInfo table when using Sqlite.
-            var excludedProcessors = new[] { typeof(SQLiteProcessor), typeof(MySqlProcessor), typeof(PostgresProcessor) };
+            var excludedProcessors = new[] { typeof(MySqlProcessor), typeof(PostgresProcessor) };
 
             var assembly = typeof(Migrations.Interleaved.Pass3.User).Assembly;
 
@@ -1052,8 +1051,7 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlAnywhere16")]
         public void ValidateVersionOrderShouldThrowExceptionIfUnappliedMigrationVersionIsLessThanLatestAppliedMigration()
         {
-            // Using SqlServer instead of SQLite as versions not deleted from VersionInfo table when using Sqlite.
-            var excludedProcessors = new[] { typeof(MySqlProcessor), typeof(SQLiteProcessor) };
+            var excludedProcessors = new[] { typeof(MySqlProcessor) };
 
             var assembly = typeof(Migrations.Interleaved.Pass3.User).Assembly;
 
@@ -1285,7 +1283,9 @@ namespace FluentMigrator.Tests.Integration
 
                     runner.Down(new TestCreateAndDropTableMigration());
 
-                }, true, typeof(SQLiteProcessor), typeof(SqlAnywhereProcessor));
+                },
+                true,
+                typeof(SqlAnywhereProcessor));
         }
 
         [Test]
@@ -1317,7 +1317,10 @@ namespace FluentMigrator.Tests.Integration
                     runner.Down(new TestCreateAndDropTableMigrationWithSchema());
 
                     runner.Down(new TestCreateSchema());
-                }, true, new[] { typeof(SQLiteProcessor), typeof(FirebirdProcessor), typeof(SqlAnywhereProcessor) });
+                },
+                true,
+                typeof(FirebirdProcessor),
+                typeof(SqlAnywhereProcessor));
         }
 
         [Test]
@@ -1344,7 +1347,7 @@ namespace FluentMigrator.Tests.Integration
 
                     runner.Down(new TestCreateAndDropTableMigration());
 
-                }, true, new[] { typeof(SQLiteProcessor) });
+                });
         }
 
         [Test]
@@ -1373,7 +1376,9 @@ namespace FluentMigrator.Tests.Integration
                     runner.Down(new TestCreateAndDropTableMigrationWithSchema());
 
                     runner.Down(new TestCreateSchema());
-                }, true, new[] { typeof(SQLiteProcessor), typeof(FirebirdProcessor) });
+                },
+                true,
+                typeof(FirebirdProcessor));
         }
 
         [Test]
@@ -1409,7 +1414,9 @@ namespace FluentMigrator.Tests.Integration
                     runner.Down(new TestCreateAndDropTableMigrationWithSchema());
 
                     runner.Down(new TestCreateSchema());
-                }, true, new[] { typeof(SQLiteProcessor), typeof(FirebirdProcessor) });
+                },
+                true,
+                typeof(FirebirdProcessor));
         }
 
         [Test]
@@ -1442,7 +1449,7 @@ namespace FluentMigrator.Tests.Integration
 
                     runner.Down(new TestCreateAndDropTableMigration());
 
-                }, true, new[] { typeof(SQLiteProcessor) });
+                });
         }
 
         [Test]
@@ -1477,7 +1484,9 @@ namespace FluentMigrator.Tests.Integration
                     runner.Down(new TestCreateAndDropTableMigrationWithSchema());
 
                     runner.Down(new TestCreateSchema());
-                }, true, new[] { typeof(SQLiteProcessor), typeof(FirebirdProcessor) });
+                },
+                true,
+                typeof(FirebirdProcessor));
         }
 
         [Test]
@@ -1510,7 +1519,7 @@ namespace FluentMigrator.Tests.Integration
                     runner.Down(new TestCreateAndDropTableMigrationWithSchema());
 
                     runner.Down(new TestCreateSchema());
-                }, true, new[] { typeof(SQLiteProcessor) });
+                });
         }
 
         [Test]
@@ -1539,7 +1548,9 @@ namespace FluentMigrator.Tests.Integration
 
                     runner.Down(new TestCreateAndDropTableMigration());
 
-                }, true, new[] { typeof(SQLiteProcessor), typeof(SqlAnywhereProcessor) });
+                },
+                true,
+                typeof(SqlAnywhereProcessor));
         }
 
         [Test]
@@ -1572,7 +1583,9 @@ namespace FluentMigrator.Tests.Integration
 
                     runner.Down(new TestCreateSchema());
 
-                }, true, new[] { typeof(SQLiteProcessor), typeof(SqlAnywhereProcessor) });
+                },
+                true,
+                typeof(SqlAnywhereProcessor));
         }
 
         [Test]

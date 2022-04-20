@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 //
 // Copyright (c) 2018, Fluent Migrator Project
 //
@@ -17,6 +17,8 @@
 #endregion
 
 using System.Data;
+
+using FluentMigrator.Exceptions;
 using FluentMigrator.Runner.Generators.SQLite;
 using NUnit.Framework;
 
@@ -42,8 +44,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
             expression.ForeignKey.ForeignTableSchema = "TestSchema";
 
-            var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
 
         [Test]
@@ -51,8 +52,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         {
             var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
 
-            var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
 
         [Test]
@@ -61,8 +61,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
             expression.ForeignKey.ForeignTableSchema = "TestSchema";
 
-            var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
 
         [Test]
@@ -72,8 +71,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.ForeignKey.ForeignTableSchema = "TestSchema";
             expression.ForeignKey.PrimaryTableSchema = "TestSchema";
 
-            var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
 
         [Test]
@@ -81,8 +79,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnForeignKeyExpression();
 
-            var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
 
         [Test]
@@ -91,8 +88,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetCreateMultiColumnForeignKeyExpression();
             expression.ForeignKey.ForeignTableSchema = "TestSchema";
 
-            var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
 
         [Test]
@@ -101,8 +97,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetCreateMultiColumnPrimaryKeyExpression();
             expression.Constraint.SchemaName = "TestSchema";
 
-            var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
 
         [Test]
@@ -110,8 +105,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnPrimaryKeyExpression();
 
-            var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
 
         [Test]
@@ -121,7 +115,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.Constraint.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            result.ShouldBe("CREATE UNIQUE INDEX \"TestSchema\".\"UC_TestTable1_TestColumn1_TestColumn2\" ON \"TestTable1\" (\"TestColumn1\" ASC, \"TestColumn2\" ASC)");
         }
 
         [Test]
@@ -130,7 +124,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetCreateMultiColumnUniqueConstraintExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            result.ShouldBe("CREATE UNIQUE INDEX \"UC_TestTable1_TestColumn1_TestColumn2\" ON \"TestTable1\" (\"TestColumn1\" ASC, \"TestColumn2\" ASC)");
         }
 
         [Test]
@@ -140,8 +134,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.ForeignKey.ForeignTableSchema = "TestSchema";
             expression.ForeignKey.PrimaryTableSchema = "TestSchema";
 
-            var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
 
         [Test]
@@ -149,8 +142,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         {
             var expression = GeneratorTestHelper.GetCreateNamedForeignKeyExpression();
 
-            var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
 
         [Test]
@@ -159,8 +151,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetCreateNamedForeignKeyExpression();
             expression.ForeignKey.ForeignTableSchema = "TestSchema";
 
-            var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
 
         [Test]
@@ -170,8 +161,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.ForeignKey.OnDelete = Rule.Cascade;
             expression.ForeignKey.OnUpdate = Rule.SetDefault;
 
-            var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
 
         [TestCase(Rule.SetDefault, "SET DEFAULT"), TestCase(Rule.SetNull, "SET NULL"), TestCase(Rule.Cascade, "CASCADE")]
@@ -180,8 +170,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetCreateNamedForeignKeyExpression();
             expression.ForeignKey.OnDelete = rule;
 
-            var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
 
         [TestCase(Rule.SetDefault, "SET DEFAULT"), TestCase(Rule.SetNull, "SET NULL"), TestCase(Rule.Cascade, "CASCADE")]
@@ -190,8 +179,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetCreateNamedForeignKeyExpression();
             expression.ForeignKey.OnUpdate = rule;
 
-            var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
 
         [Test]
@@ -201,8 +189,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.ForeignKey.ForeignTableSchema = "TestSchema";
             expression.ForeignKey.PrimaryTableSchema = "TestSchema";
 
-            var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
 
         [Test]
@@ -210,8 +197,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         {
             var expression = GeneratorTestHelper.GetCreateNamedMultiColumnForeignKeyExpression();
 
-            var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
 
         [Test]
@@ -220,8 +206,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetCreateNamedMultiColumnForeignKeyExpression();
             expression.ForeignKey.ForeignTableSchema = "TestSchema";
 
-            var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
 
         [Test]
@@ -230,8 +215,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetCreateNamedMultiColumnPrimaryKeyExpression();
             expression.Constraint.SchemaName = "TestSchema";
 
-            var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
 
         [Test]
@@ -239,8 +223,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         {
             var expression = GeneratorTestHelper.GetCreateNamedMultiColumnPrimaryKeyExpression();
 
-            var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
 
         [Test]
@@ -250,7 +233,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.Constraint.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            result.ShouldBe("CREATE UNIQUE INDEX \"TestSchema\".\"TESTUNIQUECONSTRAINT\" ON \"TestTable1\" (\"TestColumn1\" ASC, \"TestColumn2\" ASC)");
         }
 
         [Test]
@@ -259,7 +242,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetCreateNamedMultiColumnUniqueConstraintExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            result.ShouldBe("CREATE UNIQUE INDEX \"TESTUNIQUECONSTRAINT\" ON \"TestTable1\" (\"TestColumn1\" ASC, \"TestColumn2\" ASC)");
         }
 
         [Test]
@@ -268,8 +251,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetCreateNamedPrimaryKeyExpression();
             expression.Constraint.SchemaName = "TestSchema";
 
-            var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
 
         [Test]
@@ -277,8 +259,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         {
             var expression = GeneratorTestHelper.GetCreateNamedPrimaryKeyExpression();
 
-            var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
 
         [Test]
@@ -288,7 +269,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.Constraint.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            result.ShouldBe("CREATE UNIQUE INDEX \"TestSchema\".\"TESTUNIQUECONSTRAINT\" ON \"TestTable1\" (\"TestColumn1\" ASC)");
         }
 
         [Test]
@@ -297,7 +278,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetCreateNamedUniqueConstraintExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            result.ShouldBe("CREATE UNIQUE INDEX \"TESTUNIQUECONSTRAINT\" ON \"TestTable1\" (\"TestColumn1\" ASC)");
         }
 
         [Test]
@@ -306,8 +287,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetCreatePrimaryKeyExpression();
             expression.Constraint.SchemaName = "TestSchema";
 
-            var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
 
         [Test]
@@ -315,8 +295,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         {
             var expression = GeneratorTestHelper.GetCreatePrimaryKeyExpression();
 
-            var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
 
         [Test]
@@ -326,7 +305,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.Constraint.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            result.ShouldBe("CREATE UNIQUE INDEX \"TestSchema\".\"UC_TestTable1_TestColumn1\" ON \"TestTable1\" (\"TestColumn1\" ASC)");
         }
 
         [Test]
@@ -335,7 +314,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetCreateUniqueConstraintExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            result.ShouldBe("CREATE UNIQUE INDEX \"UC_TestTable1_TestColumn1\" ON \"TestTable1\" (\"TestColumn1\" ASC)");
         }
 
         [Test]
@@ -344,8 +323,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetDeleteForeignKeyExpression();
             expression.ForeignKey.ForeignTableSchema = "TestSchema";
 
-            var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
 
         [Test]
@@ -353,8 +331,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         {
             var expression = GeneratorTestHelper.GetDeleteForeignKeyExpression();
 
-            var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
 
         [Test]
@@ -363,8 +340,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetDeletePrimaryKeyExpression();
             expression.Constraint.SchemaName = "TestSchema";
 
-            var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
 
         [Test]
@@ -372,8 +348,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         {
             var expression = GeneratorTestHelper.GetDeletePrimaryKeyExpression();
 
-            var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
 
         [Test]
@@ -383,7 +358,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.Constraint.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            result.ShouldBe("DROP INDEX \"TestSchema\".\"TESTUNIQUECONSTRAINT\"");
         }
 
         [Test]
@@ -392,7 +367,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetDeleteUniqueConstraintExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            result.ShouldBe("DROP INDEX \"TESTUNIQUECONSTRAINT\"");
         }
     }
 }

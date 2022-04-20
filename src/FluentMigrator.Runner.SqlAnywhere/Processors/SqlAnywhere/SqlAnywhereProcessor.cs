@@ -58,7 +58,7 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
 
         public override string DatabaseType { get; }
 
-        public override IList<string> DatabaseTypeAliases { get; } = new List<string> { "SqlAnywhere" };
+        public override IList<string> DatabaseTypeAliases { get; } = new List<string> { ProcessorId.SqlAnywhere };
 
         [Obsolete]
         public SqlAnywhereProcessor(string databaseType, IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
