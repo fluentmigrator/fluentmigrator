@@ -623,10 +623,6 @@ namespace FluentMigrator.Tests.Integration
         {
             try
             {
-                // Can't currently test SQLite as we are using in-memory mode
-                // which I believe gets reset on each scope and so assertions
-                // outside scopes fail
-
                 ExecuteWithSupportedProcessors(
                     services => services.WithMigrationsIn(RootNamespace),
                     (serviceProvider, processor) =>
