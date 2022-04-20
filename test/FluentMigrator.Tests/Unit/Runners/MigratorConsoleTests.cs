@@ -31,7 +31,7 @@ namespace FluentMigrator.Tests.Unit.Runners
     [TestFixture]
     public class MigratorConsoleTests
     {
-        private const string Database = "SQLite";
+        private const string Database = ProcessorId.SQLite;
         private const string Connection = "Data Source=:memory:";
         private const string Target = "FluentMigrator.Tests.dll";
 

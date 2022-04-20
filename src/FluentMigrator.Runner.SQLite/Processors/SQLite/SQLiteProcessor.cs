@@ -47,10 +47,7 @@ namespace FluentMigrator.Runner.Processors.SQLite
         [NotNull]
         private readonly SQLiteQuoter _quoter;
 
-        public override string DatabaseType
-        {
-            get { return "SQLite"; }
-        }
+        public override string DatabaseType => ProcessorId.SQLite;
 
         public override IList<string> DatabaseTypeAliases { get; } = new List<string>();
 

@@ -1944,12 +1944,12 @@ namespace FluentMigrator.Tests.Integration
         {
             // SQLite doesn't support creating schemas so for non SQLite DB's we'll create
             // the schema, but for SQLite we'll attach a temp DB with the schema alias
-            var createSchemaExpr = IfDatabase(t => t != "SQLite").Create.Schema("TestSchema");
+            var createSchemaExpr = IfDatabase(t => t != ProcessorId.SQLite).Create.Schema("TestSchema");
 
-            IfDatabase(t => t.StartsWith("SqlAnywhere"))
+            IfDatabase(t => t.StartsWith(ProcessorId.SqlAnywhere))
                 .Delegate(() => createSchemaExpr.Password("TestSchemaPassword"));
 
-            IfDatabase("SQLite").Execute.Sql("ATTACH DATABASE '' AS \"TestSchema\"");
+            IfDatabase(ProcessorId.SQLite).Execute.Sql("ATTACH DATABASE '' AS \"TestSchema\"");
 
             Create.Table("Users")
                 .InSchema("TestSchema")
@@ -1965,11 +1965,11 @@ namespace FluentMigrator.Tests.Integration
         {
             Delete.Index("IX_Users_GroupId").OnTable("Users").InSchema("TestSchema").OnColumn("GroupId");
             Delete.Table("Users").InSchema("TestSchema");
-            IfDatabase(t => t != "SQLite").Delete.Schema("TestSchema");
+            IfDatabase(t => t != ProcessorId.SQLite).Delete.Schema("TestSchema");
 
             // Can't actually detatch SQLite DB here as migrations run in a transaction
             // and you can't detach a database whilst in a transaction
-            // IfDatabase("SQLite").Execute.Sql("DETACH DATABASE \"TestSchema\"");
+            // IfDatabase(ProcessorId.SQLite).Execute.Sql("DETACH DATABASE \"TestSchema\"");
         }
     }
 
@@ -2043,21 +2043,21 @@ namespace FluentMigrator.Tests.Integration
         {
             // SQLite doesn't support creating schemas so for non SQLite DB's we'll create
             // the schema, but for SQLite we'll attach a temp DB with the schema alias
-            var createSchemaExpr = IfDatabase(t => t != "SQLite").Create.Schema("TestSchema");
+            var createSchemaExpr = IfDatabase(t => t != ProcessorId.SQLite).Create.Schema("TestSchema");
 
-            IfDatabase(t => t.StartsWith("SqlAnywhere"))
+            IfDatabase(t => t.StartsWith(ProcessorId.SqlAnywhere))
                 .Delegate(() => createSchemaExpr.Password("TestSchemaPassword"));
 
-            IfDatabase("SQLite").Execute.Sql("ATTACH DATABASE '' AS \"TestSchema\"");
+            IfDatabase(ProcessorId.SQLite).Execute.Sql("ATTACH DATABASE '' AS \"TestSchema\"");
         }
 
         public override void Down()
         {
-            IfDatabase(t => t != "SQLite").Delete.Schema("TestSchema");
+            IfDatabase(t => t != ProcessorId.SQLite).Delete.Schema("TestSchema");
 
             // Can't actually detatch SQLite DB here as migrations run in a transaction
             // and you can't detach a database whilst in a transaction
-            // IfDatabase("SQLite").Execute.Sql("DETACH DATABASE \"TestSchema\"");
+            // IfDatabase(ProcessorId.SQLite).Execute.Sql("DETACH DATABASE \"TestSchema\"");
         }
     }
 

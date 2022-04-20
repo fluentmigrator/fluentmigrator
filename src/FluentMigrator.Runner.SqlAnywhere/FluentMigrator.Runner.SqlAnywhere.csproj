@@ -14,6 +14,7 @@
   <ItemGroup>
     <ProjectReference Include="..\FluentMigrator.Extensions.SqlAnywhere\FluentMigrator.Extensions.SqlAnywhere.csproj" />
     <ProjectReference Include="..\FluentMigrator.Runner.Core\FluentMigrator.Runner.Core.csproj" />
+    <ProjectReference Include="..\FluentMigrator\FluentMigrator.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Generators\" />

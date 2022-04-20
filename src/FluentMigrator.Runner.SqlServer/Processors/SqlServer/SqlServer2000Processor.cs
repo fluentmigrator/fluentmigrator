@@ -92,9 +92,9 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             _serviceProvider = serviceProvider;
         }
 
-        public override string DatabaseType => "SqlServer2000";
+        public override string DatabaseType => ProcessorId.SqlServer2000;
 
-        public override IList<string> DatabaseTypeAliases { get; } = new List<string>() { "SqlServer" };
+        public override IList<string> DatabaseTypeAliases { get; } = new List<string>() { ProcessorId.SqlServer };
 
         public override void BeginTransaction()
         {

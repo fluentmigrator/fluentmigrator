@@ -39,7 +39,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
             IAnnouncer announcer,
             IMigrationProcessorOptions options,
             IDbFactory factory)
-            : base("Oracle", connection, generator, announcer, options, factory)
+            : base(ProcessorId.Oracle, connection, generator, announcer, options, factory)
         {
         }
 
@@ -49,7 +49,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
             [NotNull] ILogger<OracleProcessor> logger,
             [NotNull] IOptionsSnapshot<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor)
-            : base("Oracle", factory, generator, logger, options, connectionStringAccessor)
+            : base(ProcessorId.Oracle, factory, generator, logger, options, connectionStringAccessor)
         {
         }
     }
