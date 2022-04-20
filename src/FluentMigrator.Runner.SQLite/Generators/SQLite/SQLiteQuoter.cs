@@ -20,7 +20,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
 
         public override string QuoteSchemaName(string schemaName)
         {
-            // SQLite doesn't support Schemas in the same sense as traditional SQL Server does,
+            // SQLite doesn't support Schemas in the same sense as other SQL databases (e.g. SQL Server) does,
             // instead it allows multiple databases to be attached to the current DB connection
             // and those attached DB's have an `alias` that can be used as a prefix similar to schemas.
             // As this is nearest paradigm in FM, we'll allow schemas to be defined and generate the
