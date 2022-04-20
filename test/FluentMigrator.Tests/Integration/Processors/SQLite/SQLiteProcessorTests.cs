@@ -181,7 +181,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
             var serivces = ServiceCollectionExtensions.CreateServices()
                 .ConfigureRunner(r => r.AddSQLite())
                 .AddScoped<IConnectionStringReader>(
-                    _ => new PassThroughConnectionStringReader(IntegrationTestOptions.SQLite.ConnectionString));
+                    _ => new PassThroughConnectionStringReader("Data Source=:memory:;Pooling=False;")); // Just use in-memory DB
 
             initAction?.Invoke(serivces);
 

@@ -173,6 +173,8 @@ namespace FluentMigrator.Tests.Integration
                 if (!isMatch(processorType))
                     continue;
 
+                opt.ReplaceConnectionStringDataDirectory(_tempDataDirectory);
+
                 executed = true;
                 executeFunc(test, tryRollback, opt);
             }

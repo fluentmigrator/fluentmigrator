@@ -16,12 +16,15 @@
 
 using System;
 using System.Collections.Generic;
+using System.Data.OleDb;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 
 using Microsoft.Extensions.Configuration;
+
+using static FluentMigrator.Tests.IntegrationTestOptions;
 
 namespace FluentMigrator.Tests
 {
@@ -138,6 +141,20 @@ namespace FluentMigrator.Tests
             if (DatabaseServers.TryGetValue(key, out var options))
                 return options;
             return DatabaseServerOptions.Empty;
+        }
+    }
+
+    public static class DatabaseServerOptionsExtensions
+    {
+        public static DatabaseServerOptions ReplaceConnectionStringDataDirectory(this DatabaseServerOptions dbOpts, string tempDir)
+        {
+            var newDbOpts = new DatabaseServerOptions
+            {
+                ConnectionString = dbOpts.ConnectionString.Replace("|DataDirectory|", tempDir),
+                IsEnabled = dbOpts.IsEnabled,
+            };
+
+            return newDbOpts;
         }
     }
 }
