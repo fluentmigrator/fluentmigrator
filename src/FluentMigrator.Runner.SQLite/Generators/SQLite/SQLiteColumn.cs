@@ -68,7 +68,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
                 // see: http://www.sqlite.org/syntaxdiagrams.html#column-constraint syntax details
                 if (!column.IsPrimaryKey && (!column.Type.HasValue || GetTypeMap(column.Type.Value, null, null) != "INTEGER"))
                 {
-                    throw new ArgumentException("SQLite only supports identity on a single integer, primary key column");
+                    throw new ArgumentException($"Cannot create identity constraint on column {column.Name}. SQLite only supports identity on a single integer, primary key column.");
                 }
 
                 return "AUTOINCREMENT";
