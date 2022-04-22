@@ -1,3 +1,5 @@
+using System;
+
 using FluentMigrator.Runner.Generators.MySql;
 
 using NUnit.Framework;
@@ -61,7 +63,17 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql5
             var expression = GeneratorTestHelper.GetAlterColumnExpressionWithDescription();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE `TestTable1` MODIFY COLUMN `TestColumn1` NVARCHAR(20) NOT NULL COMMENT 'TestColumn1Description'");
+            result.ShouldBe("ALTER TABLE `TestTable1` MODIFY COLUMN `TestColumn1` NVARCHAR(20) NOT NULL COMMENT 'Description:TestColumn1Description'");
+        }
+
+        [Test]
+        public void CanAlterColumnWithDescriptionWithAdditionalDescriptions()
+        {
+            var expression = GeneratorTestHelper.GetAlterColumnExpressionWithDescriptionWithAdditionalDescriptions();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE `TestTable1` MODIFY COLUMN `TestColumn1` NVARCHAR(20) NOT NULL COMMENT 'Description:TestColumn1Description" + Environment.NewLine +
+                            "AdditionalColumnDescriptionKey1:AdditionalColumnDescriptionValue1'");
         }
 
         [Test]
@@ -70,7 +82,17 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql5
             var expression = GeneratorTestHelper.GetCreateColumnExpressionWithDescription();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE `TestTable1` ADD COLUMN `TestColumn1` NVARCHAR(5) NOT NULL COMMENT 'TestColumn1Description'");
+            result.ShouldBe("ALTER TABLE `TestTable1` ADD COLUMN `TestColumn1` NVARCHAR(5) NOT NULL COMMENT 'Description:TestColumn1Description'");
+        }
+
+        [Test]
+        public void CanCreateColumnWithDescriptionWithAdditionalDescriptions()
+        {
+            var expression = GeneratorTestHelper.GetCreateColumnExpressionWithDescriptionWithAdditionalDescriptions();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE `TestTable1` ADD COLUMN `TestColumn1` NVARCHAR(5) NOT NULL COMMENT 'Description:TestColumn1Description" + Environment.NewLine +
+                            "AdditionalColumnDescriptionKey1:AdditionalColumnDescriptionValue1'");
         }
     }
 }

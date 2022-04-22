@@ -16,7 +16,10 @@
 
 #endregion
 
+using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
@@ -106,6 +109,50 @@ namespace FluentMigrator.Builders.Create.Table
             return this;
         }
 
+        /// <inheritdoc />
+        public ICreateTableColumnOptionOrWithColumnSyntax WithColumnAdditionalDescription(string descriptionName, string description)
+        {
+            if (string.IsNullOrWhiteSpace(descriptionName))
+                throw new ArgumentException("Cannot be the empty string.", "descriptionName");
+
+            if (description.Equals("Description"))
+                throw new InvalidOperationException("The given descriptionName is already used as a keyword to create a description, please choose another descriptionName.");
+
+            if (string.IsNullOrWhiteSpace(description))
+                throw new ArgumentException("Cannot be the empty string.", "description");
+
+            if (CurrentColumn.AdditionalColumnDescriptions.Keys.Count(i => i.Equals(descriptionName)) > 0)
+                throw new InvalidOperationException("The given descriptionName is already present in the columnDescription list.");
+
+            CurrentColumn.AdditionalColumnDescriptions.Add(descriptionName, description);
+            return this;
+        }
+
+        /// <inheritdoc />
+        public ICreateTableColumnOptionOrWithColumnSyntax WithColumnAdditionalDescriptions(Dictionary<string, string> columnDescriptions)
+        {
+            if (columnDescriptions == null)
+                throw new ArgumentException("Cannot be null.", "columnDescriptions");
+
+            if (!columnDescriptions.Any())
+                throw new ArgumentException("Cannot be empty.", "columnDescriptions");
+
+            if (CurrentColumn.AdditionalColumnDescriptions.Keys.Count(i => i.Equals("Description")) > 0)
+                throw new InvalidOperationException("The given descriptionName is already present in the columnDescription list.");
+
+            var isPresent = false;
+            foreach (var newDescription in from newDescription in columnDescriptions
+                                           where !isPresent
+                                           select newDescription)
+            {
+                isPresent = CurrentColumn.AdditionalColumnDescriptions.Keys.Count(i => i.Equals(newDescription.Key)) > 0;
+            }
+
+            if (isPresent)
+                throw new ArgumentException("At least one of new keys provided is already present in the columnDescription list.", "description");
+
+            return this;
+        }
         /// <inheritdoc />
         public ICreateTableColumnOptionOrWithColumnSyntax Identity()
         {

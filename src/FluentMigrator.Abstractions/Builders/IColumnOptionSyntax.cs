@@ -16,6 +16,8 @@
 //
 #endregion
 
+using System.Collections.Generic;
+
 using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders
@@ -49,6 +51,21 @@ namespace FluentMigrator.Builders
         /// <param name="description">The description</param>
         /// <returns>The next step</returns>
         TNext WithColumnDescription(string description);
+
+        /// <summary>
+        /// Sets any additional column descriptions using a pair of name and description content
+        /// </summary>
+        /// <param name="descriptionName">The descriptionName</param>
+        /// <param name="description">The description</param>
+        /// <returns>The next step</returns>
+        TNext WithColumnAdditionalDescription(string descriptionName, string description);
+
+        /// <summary>
+        /// Sets any additional column descriptions using a Dictionary containing multiple pairs of name and description content
+        /// </summary>
+        /// <param name="columnDescriptions">The columnDescriptions list</param>
+        /// <returns>The next step</returns>
+        TNext WithColumnAdditionalDescriptions(Dictionary<string,string> columnDescriptions);
 
         /// <summary>
         /// Sets the columns identity configuration
