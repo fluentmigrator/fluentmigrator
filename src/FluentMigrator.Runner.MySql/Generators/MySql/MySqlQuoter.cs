@@ -44,7 +44,7 @@ namespace FluentMigrator.Runner.Generators.MySql
             {
                 case SystemMethods.NewGuid:
                 case SystemMethods.NewSequentialId:
-                    return "(SELECT UUID())";
+                    return "(UUID())";
                 case SystemMethods.CurrentDateTime:
                     return "CURRENT_TIMESTAMP";
                 case SystemMethods.CurrentUTCDateTime:
