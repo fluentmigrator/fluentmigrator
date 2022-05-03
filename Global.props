@@ -13,7 +13,7 @@
     <PackageReleaseNotes>Use of standard dependency injection, configuration and logging libraries.
 Simplification of in-process runner configuration and instantiation.
 dotnet-fm is now a global .NET Core 2.1 tool.
-Minimum .NET Framework version is 4.6.1.
+Minimum .NET Framework version is 4.6.2, see https://aka.ms/msbuild/developerpacks for more information.
 
 Details: https://github.com/fluentmigrator/fluentmigrator/releases
     </PackageReleaseNotes>
@@ -34,7 +34,7 @@ Details: https://github.com/fluentmigrator/fluentmigrator/releases
     <PackageReference Include="JetBrains.Annotations" Version="11.1.0" PrivateAssets="All" />
   </ItemGroup>
 
-  <PropertyGroup Condition="'$(TargetFramework)'=='net461'">
+  <PropertyGroup Condition="'$(TargetFramework)'=='net462'">
     <DefineConstants>$(DefineConstants);NETFRAMEWORK</DefineConstants>
   </PropertyGroup>
 
