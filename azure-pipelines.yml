@@ -65,7 +65,7 @@ steps:
     command: 'publish'
     publishWebProjects: false
     projects: 'src/FluentMigrator.Console/FluentMigrator.Console.csproj'
-    arguments: '-c $(buildConfiguration) -r win7-x86 -o "$(Build.ArtifactStagingDirectory)/publish/tools/net461/x86" -p:Platform=x86 -p:TargetFramework=net461 -p:Version=$(build.buildNumber)'
+    arguments: '-c $(buildConfiguration) -r win7-x86 -o "$(Build.ArtifactStagingDirectory)/publish/tools/net462/x86" -p:Platform=x86 -p:TargetFramework=net462 -p:Version=$(build.buildNumber)'
     zipAfterPublish: false
     modifyOutputPath: false
 
@@ -74,7 +74,7 @@ steps:
     command: 'publish'
     publishWebProjects: false
     projects: 'src/FluentMigrator.Console/FluentMigrator.Console.csproj'
-    arguments: '-c $(buildConfiguration) -r win7-x64 -o "$(Build.ArtifactStagingDirectory)/publish/tools/net461/x64" -p:Platform=x64 -p:TargetFramework=net461 -p:Version=$(build.buildNumber)'
+    arguments: '-c $(buildConfiguration) -r win7-x64 -o "$(Build.ArtifactStagingDirectory)/publish/tools/net462/x64" -p:Platform=x64 -p:TargetFramework=net462 -p:Version=$(build.buildNumber)'
     zipAfterPublish: false
     modifyOutputPath: false
 
@@ -83,7 +83,7 @@ steps:
     command: 'publish'
     publishWebProjects: false
     projects: 'src/FluentMigrator.Console/FluentMigrator.Console.csproj'
-    arguments: '-c $(buildConfiguration) -r any -o "$(Build.ArtifactStagingDirectory)/publish/tools/net461/any" -p:Platform=AnyCpu -p:TargetFramework=net461 -p:Version=$(build.buildNumber)'
+    arguments: '-c $(buildConfiguration) -r any -o "$(Build.ArtifactStagingDirectory)/publish/tools/net462/any" -p:Platform=AnyCpu -p:TargetFramework=net462 -p:Version=$(build.buildNumber)'
     zipAfterPublish: false
     modifyOutputPath: false
 
