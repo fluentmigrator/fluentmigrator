@@ -16,7 +16,7 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="2.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="2.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="6.0.0" />
     <PackageReference Include="MySql.Data" Version="8.0.28" />
     <PackageReference Include="Npgsql" Version="3.2.7" />
     <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="2.19.60" />
