@@ -77,8 +77,8 @@ namespace FluentMigrator.Runner.Initialization
                 () => runnerContext
                     .CreateServices(
                         ConnectionStringProvider,
-                        asmLoaderFactory)
-                    .ConfigureRunner(cfg => configureRunner?.Invoke(cfg))
+                        asmLoaderFactory,
+                        configureRunner)
                     .BuildServiceProvider(validateScopes: true));
         }
 
@@ -113,8 +113,8 @@ namespace FluentMigrator.Runner.Initialization
                 () => runnerContext
                     .CreateServices(
                         connectionStringProvider,
-                        asmLoaderFactory)
-                    .ConfigureRunner(cfg => configureRunner?.Invoke(cfg))
+                        asmLoaderFactory,
+                        configureRunner)
                     .BuildServiceProvider(validateScopes: true));
         }
 
