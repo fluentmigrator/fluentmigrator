@@ -16,6 +16,7 @@
 
 using FluentMigrator.Runner.BatchParser;
 using FluentMigrator.Runner.Generators.SqlAnywhere;
+using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.SqlAnywhere;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -42,6 +43,9 @@ namespace FluentMigrator.Runner
                 .AddScoped<SqlAnywhereQuoter>()
                 .AddScoped<SqlAnywhere16Generator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<SqlAnywhere16Generator>());
+
+            MigrationProcessorFactoryProvider.Register(new SqlAnywhere16ProcessorFactory());
+
             return builder;
         }
 

@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2018, FluentMigrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,6 +15,7 @@
 #endregion
 
 using FluentMigrator.Runner.Generators.Jet;
+using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Jet;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -39,6 +40,9 @@ namespace FluentMigrator.Runner
                 .AddScoped<JetQuoter>()
                 .AddScoped<JetGenerator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<JetGenerator>());
+
+            MigrationProcessorFactoryProvider.Register(new JetProcessorFactory());
+
             return builder;
         }
     }

@@ -64,7 +64,8 @@ namespace FluentMigrator.Runner.Initialization
         }
 
         [Obsolete]
-        public TaskExecutor([NotNull] IRunnerContext runnerContext)
+        public TaskExecutor([NotNull] IRunnerContext runnerContext,
+            [CanBeNull] Action<IMigrationRunnerBuilder> configureRunner = null)
         {
             var runnerCtxt = runnerContext ?? throw new ArgumentNullException(nameof(runnerContext));
             _logger = new AnnouncerFluentMigratorLogger(runnerCtxt.Announcer);
@@ -77,6 +78,7 @@ namespace FluentMigrator.Runner.Initialization
                     .CreateServices(
                         ConnectionStringProvider,
                         asmLoaderFactory)
+                    .ConfigureRunner(cfg => configureRunner?.Invoke(cfg))
                     .BuildServiceProvider(validateScopes: true));
         }
 
@@ -98,7 +100,8 @@ namespace FluentMigrator.Runner.Initialization
         public TaskExecutor(
             [NotNull] IRunnerContext runnerContext,
             [NotNull] AssemblyLoaderFactory assemblyLoaderFactory,
-            [CanBeNull] IConnectionStringProvider connectionStringProvider = null)
+            [CanBeNull] IConnectionStringProvider connectionStringProvider = null,
+            [CanBeNull] Action<IMigrationRunnerBuilder> configureRunner = null)
         {
             var runnerCtxt = runnerContext ?? throw new ArgumentNullException(nameof(runnerContext));
             _logger = new AnnouncerFluentMigratorLogger(runnerCtxt.Announcer);
@@ -111,6 +114,7 @@ namespace FluentMigrator.Runner.Initialization
                     .CreateServices(
                         connectionStringProvider,
                         asmLoaderFactory)
+                    .ConfigureRunner(cfg => configureRunner?.Invoke(cfg))
                     .BuildServiceProvider(validateScopes: true));
         }
 

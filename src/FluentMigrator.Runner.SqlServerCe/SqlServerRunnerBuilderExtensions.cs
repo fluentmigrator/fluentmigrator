@@ -16,6 +16,7 @@
 
 using FluentMigrator.Runner.BatchParser;
 using FluentMigrator.Runner.Generators.SqlServer;
+using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.SqlServer;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -44,6 +45,9 @@ namespace FluentMigrator.Runner
                 .AddScoped<SqlServer2000Generator>()
                 .AddScoped<SqlServerCeGenerator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<SqlServerCeGenerator>());
+
+            MigrationProcessorFactoryProvider.Register(new SqlServerCeProcessorFactory());
+
             return builder;
         }
     }

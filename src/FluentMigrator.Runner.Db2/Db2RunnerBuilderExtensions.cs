@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2018, FluentMigrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,6 +16,7 @@
 
 using FluentMigrator.Runner.Generators.DB2;
 using FluentMigrator.Runner.Generators.DB2.iSeries;
+using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.DB2;
 using FluentMigrator.Runner.Processors.DB2.iSeries;
 
@@ -42,6 +43,9 @@ namespace FluentMigrator.Runner
                 .AddScoped<Db2Quoter>()
                 .AddScoped<Db2Generator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<Db2Generator>());
+
+            MigrationProcessorFactoryProvider.Register(new Db2ProcessorFactory());
+
             return builder;
         }
 
@@ -59,6 +63,9 @@ namespace FluentMigrator.Runner
                 .AddScoped<Db2ISeriesQuoter>()
                 .AddScoped<Db2ISeriesGenerator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<Db2ISeriesGenerator>());
+
+            MigrationProcessorFactoryProvider.Register(new Db2ISeriesProcessorFactory());
+
             return builder;
         }
     }
