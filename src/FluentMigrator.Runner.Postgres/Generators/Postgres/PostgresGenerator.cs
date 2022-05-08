@@ -36,6 +36,11 @@ namespace FluentMigrator.Runner.Generators.Postgres
 {
     public class PostgresGenerator : GenericGenerator
     {
+        private static readonly HashSet<string> _supportedAdditionalFeatures = new HashSet<string>
+        {
+            PostgresExtensions.IndexColumnNullsDistinct,
+        };
+
         public PostgresGenerator(
             [NotNull] PostgresQuoter quoter)
             : this(quoter, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()))
@@ -64,6 +69,11 @@ namespace FluentMigrator.Runner.Generators.Postgres
             : base(column, quoter, new PostgresDescriptionGenerator(quoter), generatorOptions)
         {
         }
+
+        /// <inheritdoc />
+        public override bool IsAdditionalFeatureSupported(string feature) =>
+            _supportedAdditionalFeatures.Contains(feature)
+         || base.IsAdditionalFeatureSupported(feature);
 
         public override string CreateTable { get { return "CREATE TABLE {0} ({1})"; } }
         public override string DropTable { get { return "DROP TABLE {0};"; } }
@@ -217,6 +227,33 @@ namespace FluentMigrator.Runner.Generators.Postgres
 
             return string.Empty;
         }
+
+        public virtual string GetWithNullsDistinctString(IndexDefinition index)
+        {
+            bool? GetNullsDistinct(IndexColumnDefinition column)
+                => column.GetAdditionalFeature(PostgresExtensions.IndexColumnNullsDistinct, (bool?)null);
+
+            var indexNullsDistinct = index.GetAdditionalFeature(PostgresExtensions.IndexColumnNullsDistinct, (bool?)null);
+
+            var nullDistinctColumns = index.Columns.Where(c => indexNullsDistinct != null || GetNullsDistinct(c) != null).ToList();
+            if (nullDistinctColumns.Count != 0 && !index.IsUnique)
+            {
+                // Should never occur
+                CompatibilityMode.HandleCompatibilty("With nulls distinct can only be used for unique indexes");
+                return string.Empty;
+            }
+
+            // The "Nulls (not) distinct" value of the column
+            // takes higher precedence than the value of the index
+            // itself.
+            var conditions = nullDistinctColumns
+                .Where(x => (GetNullsDistinct(x) ?? indexNullsDistinct ?? true) == false)
+                .Select(c => $"{Quoter.QuoteColumnName(c.Name)} IS NOT NULL");
+
+            var condition = string.Join(" AND ", conditions);
+            return condition.Length == 0 ? string.Empty : $" WHERE {condition}";
+        }
+
 
         protected virtual string GetAsConcurrently(CreateIndexExpression expression)
         {
@@ -402,6 +439,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
                 .Append(GetWithIndexStorageParameters(expression))
                 .Append(GetTablespace(expression))
                 .Append(GetFilter(expression))
+                .Append(GetWithNullsDistinctString(expression.Index))
                 .Append(";");
 
             return result.ToString();
