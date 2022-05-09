@@ -60,6 +60,7 @@ namespace FluentMigrator.Postgres
         public const string IndexBuffering = "PostgresGiSTBuffering";
         public const string IndexPagesPerRange = "PostgresBrinPagesPerRange";
         public const string IndexAutosummarize = "PostgresBrinautosummarize";
+        public const string IndexColumnNullsDistinct = "PostgresIndexColumnNullsDistinct";
 
         /// <summary>
         /// Column identity generation ability for PostgreSQL 10 and above
