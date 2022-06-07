@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2018, FluentMigrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,6 +15,7 @@
 #endregion
 
 using FluentMigrator.Runner.Generators.MySql;
+using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.MySql;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -41,6 +42,9 @@ namespace FluentMigrator.Runner
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<MySql4Processor>())
                 .AddScoped<MySql4Generator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<MySql4Generator>());
+
+            MigrationProcessorFactoryProvider.Register(new MySql4ProcessorFactory());
+
             return builder;
         }
 
@@ -58,6 +62,9 @@ namespace FluentMigrator.Runner
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<MySql5Processor>())
                 .AddScoped<MySql5Generator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<MySql5Generator>());
+
+            MigrationProcessorFactoryProvider.Register(new MySql5ProcessorFactory());
+
             return builder;
         }
     }

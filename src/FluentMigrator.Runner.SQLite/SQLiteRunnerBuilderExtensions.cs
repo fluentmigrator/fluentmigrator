@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2018, FluentMigrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,6 +16,7 @@
 
 using FluentMigrator.Runner.BatchParser;
 using FluentMigrator.Runner.Generators.SQLite;
+using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.SQLite;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -44,6 +45,9 @@ namespace FluentMigrator.Runner
                 .AddScoped<SQLiteQuoter>()
                 .AddScoped<SQLiteGenerator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<SQLiteGenerator>());
+
+            MigrationProcessorFactoryProvider.Register(new SQLiteProcessorFactory());
+
             return builder;
         }
     }

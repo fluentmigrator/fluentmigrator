@@ -72,7 +72,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             DatabaseType = dbTypes.First();
             DatabaseTypeAliases = dbTypes.Skip(1).ToList();
             Quoter = generator?.Quoter;
-        }
+        } 
 
         protected SqlServerProcessor(
             [NotNull, ItemNotNull] IEnumerable<string> databaseTypes,

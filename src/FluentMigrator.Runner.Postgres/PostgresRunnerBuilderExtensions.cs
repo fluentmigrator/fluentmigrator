@@ -42,6 +42,9 @@ namespace FluentMigrator.Runner
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<PostgresProcessor>())
                 .AddScoped<PostgresGenerator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<PostgresGenerator>());
+
+            MigrationProcessorFactoryProvider.Register(new PostgresProcessorFactory());
+
             return builder.AddCommonPostgresServices();
         }
 
@@ -57,6 +60,9 @@ namespace FluentMigrator.Runner
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<Postgres92Processor>())
                 .AddScoped<Postgres92Generator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<Postgres92Generator>());
+
+            MigrationProcessorFactoryProvider.Register(new PostgresProcessorFactory());
+
             return builder.AddCommonPostgresServices();
         }
 

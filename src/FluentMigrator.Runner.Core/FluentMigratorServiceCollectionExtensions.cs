@@ -210,13 +210,15 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="runnerContext">The runner context</param>
         /// <param name="connectionStringProvider">The connection string provider</param>
         /// <param name="defaultAssemblyLoaderFactory">The assembly loader factory</param>
+        /// <param name="configureRunner">The runner builder config deletage</param>
         /// <returns>The new service collection</returns>
         [NotNull]
         [Obsolete]
         internal static IServiceCollection CreateServices(
             [NotNull] this IRunnerContext runnerContext,
             [CanBeNull] IConnectionStringProvider connectionStringProvider,
-            [CanBeNull] AssemblyLoaderFactory defaultAssemblyLoaderFactory = null)
+            [CanBeNull] AssemblyLoaderFactory defaultAssemblyLoaderFactory = null,
+            [CanBeNull] Action<IMigrationRunnerBuilder> configureRunner = null)
         {
             var services = new ServiceCollection();
             var assemblyLoaderFactory = defaultAssemblyLoaderFactory ?? new AssemblyLoaderFactory();
@@ -230,7 +232,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services
                 .AddLogging(lb => lb.AddProvider(new LegacyFluentMigratorLoggerProvider(runnerContext.Announcer)))
                 .AddFluentMigratorCore()
-                .AddAllDatabases()
+                .ConfigureRunner(c => configureRunner?.Invoke(c))
                 .Configure<SelectingProcessorAccessorOptions>(opt => opt.ProcessorId = runnerContext.Database)
                 .AddSingleton(assemblyLoaderFactory)
                 .Configure<TypeFilterOptions>(
@@ -255,43 +257,6 @@ namespace Microsoft.Extensions.DependencyInjection
             }
 
             return services;
-        }
-
-        /// <summary>
-        /// Add all database services to the service collection
-        /// </summary>
-        /// <param name="services">The service collection</param>
-        /// <returns>The service collection</returns>
-        private static IServiceCollection AddAllDatabases(this IServiceCollection services)
-        {
-            return services
-                .ConfigureRunner(
-                    builder => builder
-                        .AddDb2()
-                        .AddDb2ISeries()
-                        .AddDotConnectOracle()
-                        .AddDotConnectOracle12C()
-                        .AddFirebird()
-                        .AddHana()
-                        .AddMySql4()
-                        .AddMySql5()
-                        .AddOracle()
-                        .AddOracle12C()
-                        .AddOracleManaged()
-                        .AddOracle12CManaged()
-                        .AddPostgres()
-                        .AddPostgres92()
-                        .AddRedshift()
-                        .AddSqlAnywhere()
-                        .AddSQLite()
-                        .AddSqlServer()
-                        .AddSqlServer2000()
-                        .AddSqlServer2005()
-                        .AddSqlServer2008()
-                        .AddSqlServer2012()
-                        .AddSqlServer2014()
-                        .AddSqlServer2016()
-                        .AddSqlServerCe());
         }
 
         private class MigrationRunnerBuilder : IMigrationRunnerBuilder
