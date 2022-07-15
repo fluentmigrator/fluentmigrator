@@ -26,12 +26,12 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.Postgres
 {
-    class Postgres11_0Processor : PostgresProcessor
+    public class Postgres11_0Processor : PostgresProcessor
     {
         public Postgres11_0Processor(
             [NotNull] PostgresDbFactory factory,
             [NotNull] Postgres11_0Generator generator,
-            [NotNull] ILogger<PostgresProcessor> logger,
+            [NotNull] ILogger<Postgres11_0Processor> logger,
             [NotNull] IOptionsSnapshot<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor,
             [NotNull] PostgresOptions pgOptions)
