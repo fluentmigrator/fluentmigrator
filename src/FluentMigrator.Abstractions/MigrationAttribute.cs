@@ -20,12 +20,15 @@
 
 using System;
 
+using JetBrains.Annotations;
+
 namespace FluentMigrator
 {
     /// <summary>
     /// Attribute for a migration
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
+    [MeansImplicitUse]
     public class MigrationAttribute : Attribute
     {
         /// <summary>
