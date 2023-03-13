@@ -87,7 +87,7 @@ namespace FluentMigrator.Runner.Generators.Generic
 
             if (expression.Columns.Count == 0)
             {
-                throw new ArgumentException("You must specifiy at least one column");
+                throw new ArgumentException("You must specify at least one column");
             }
 
             var quotedTableName = Quoter.QuoteTableName(expression.TableName, expression.SchemaName);
