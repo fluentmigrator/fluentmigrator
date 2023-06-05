@@ -68,7 +68,7 @@ namespace FluentMigrator.Runner.Generators.MySql
         public override string Generate(CreateTableExpression expression)
         {
             if (string.IsNullOrEmpty(expression.TableName)) throw new ArgumentNullException(nameof(expression), @"expression.TableName cannot be empty");
-            if (expression.Columns.Count == 0) throw new ArgumentException("You must specifiy at least one column");
+            if (expression.Columns.Count == 0) throw new ArgumentException("You must specify at least one column");
 
             string errors = ValidateAdditionalFeatureCompatibility(expression.Columns.SelectMany(x => x.AdditionalFeatures));
             if (!string.IsNullOrEmpty(errors)) return errors;
