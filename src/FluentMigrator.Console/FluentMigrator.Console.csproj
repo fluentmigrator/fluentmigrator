@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net462</TargetFrameworks>
+    <TargetFrameworks>net48</TargetFrameworks>
     <AssemblyName>Migrate</AssemblyName>
     <PackageId>FluentMigrator.Console</PackageId>
     <SignAssembly>true</SignAssembly>
@@ -30,7 +30,7 @@
   <ItemGroup Condition=" '$(Platform)' == 'x86' ">
     <PackageReference Include="Oracle.DataAccess.x86.4" Version="4.112.3" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net462' and '$(Platform)' == 'x64' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net48' and '$(Platform)' == 'x64' ">
     <Reference Include="Sap.Data.Hana.v4.5, Version=2.2.36.0, Culture=neutral, PublicKeyToken=0326b8ea63db4bc4">
       <HintPath>..\..\lib\Hana\ado.net\v4.5\Sap.Data.Hana.v4.5.dll</HintPath>
     </Reference>
@@ -40,5 +40,8 @@
       <Link>%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Update="JetBrains.Annotations" Version="2023.2.0" />
   </ItemGroup>
 </Project>

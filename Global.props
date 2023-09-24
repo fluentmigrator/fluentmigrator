@@ -34,7 +34,7 @@ Details: https://github.com/fluentmigrator/fluentmigrator/releases
     <PackageReference Include="JetBrains.Annotations" Version="11.1.0" PrivateAssets="All" />
   </ItemGroup>
 
-  <PropertyGroup Condition="'$(TargetFramework)'=='net462'">
+  <PropertyGroup Condition="'$(TargetFramework)'=='net48'">
     <DefineConstants>$(DefineConstants);NETFRAMEWORK</DefineConstants>
   </PropertyGroup>
 

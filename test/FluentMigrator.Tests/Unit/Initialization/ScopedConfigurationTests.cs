@@ -44,7 +44,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
         {
             var config = new ConfigurationBuilder()
                 .AddInMemoryCollection(
-                    new Dictionary<string, string>()
+                    new Dictionary<string, string>
                     {
                         ["ProcessorOptions:ConnectionString"] = "Data Source=:memory:"
                     })
@@ -246,14 +246,13 @@ namespace FluentMigrator.Tests.Unit.Initialization
             {
                 var customConfig = new CustomConfig()
                 {
-                    ProcessorSelectorOptions = new SelectingProcessorAccessorOptions()
+                    ProcessorSelectorOptions = new SelectingProcessorAccessorOptions
                     {
                         ProcessorId = "SQLite",
                     },
-                    ConnectionStrings = new Dictionary<string, string>()
+                    ConnectionStrings = new Dictionary<string, string>
                     {
                         ["SQLite"] = "Data Source=:memory:",
-                        ["SQLAnywhere16"] = "Data Source=test.db",
                     }
                 };
 
@@ -286,7 +285,8 @@ namespace FluentMigrator.Tests.Unit.Initialization
                     EnsureReloadedConfiguration(config,
                         () =>
                         {
-                            customConfig.ProcessorSelectorOptions.ProcessorId = "SqlAnywhere16";
+                            customConfig.ConnectionStrings.Remove("SQLite");
+                            customConfig.ConnectionStrings.Add("SQLite", "Data Source=test.db");
                             SaveConfigFile(jsonFileName, customConfig);
                         });
 
@@ -322,7 +322,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
 
         private static void SaveConfigFile(string jsonFileName, CustomConfig config)
         {
-            var serializer = new JsonSerializer()
+            var serializer = new JsonSerializer
             {
                 NullValueHandling = NullValueHandling.Ignore,
             };

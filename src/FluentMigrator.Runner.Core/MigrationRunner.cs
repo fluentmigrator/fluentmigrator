@@ -439,7 +439,7 @@ namespace FluentMigrator.Runner
                 {
                     if (scope.IsActive)
                     {
-                        scope.Cancel();  // SQLAnywhere needs explicit call to rollback transaction
+                        scope.Cancel(); // Some Database Providers needs explicit call to rollback transaction
                     }
 
                     throw;
@@ -511,7 +511,7 @@ namespace FluentMigrator.Runner
                 {
                     if (scope.IsActive)
                     {
-                        scope.Cancel();  // SQLAnywhere needs explicit call to rollback transaction
+                        scope.Cancel(); // Some Database Providers needs explicit call to rollback transaction
                     }
 
                     throw;
@@ -617,7 +617,7 @@ namespace FluentMigrator.Runner
                     {
                         if (useTransaction && scope.IsActive)
                         {
-                            scope.Cancel();  // SQLAnywhere needs explicit call to rollback transaction
+                            scope.Cancel(); // Some Database Providers needs explicit call to rollback transaction
                         }
 
                         throw;
@@ -670,7 +670,7 @@ namespace FluentMigrator.Runner
                 {
                     if (useTransaction && scope.IsActive)
                     {
-                        scope.Cancel();  // SQLAnywhere needs explicit call to rollback transaction
+                        scope.Cancel(); // Some Database Providers needs explicit call to rollback transaction
                     }
 
                     throw;
@@ -722,7 +722,7 @@ namespace FluentMigrator.Runner
                 {
                     if (scope.IsActive)
                     {
-                        scope.Cancel();  // SQLAnywhere needs explicit call to rollback transaction
+                        scope.Cancel(); // Some Database Providers needs explicit call to rollback transaction
                     }
 
                     throw;
@@ -781,7 +781,7 @@ namespace FluentMigrator.Runner
                 {
                     if (scope.IsActive)
                     {
-                        scope.Cancel();  // SQLAnywhere needs explicit call to rollback transaction
+                        scope.Cancel(); // Some Database Providers needs explicit call to rollback transaction
                     }
 
                     throw;

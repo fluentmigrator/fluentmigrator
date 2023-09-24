@@ -36,8 +36,6 @@ using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.Runner.Generators.MySql;
 using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Runner.Generators.Firebird;
-using FluentMigrator.Runner.Generators.SqlAnywhere;
-using FluentMigrator.Runner.Processors.SqlAnywhere;
 
 using Microsoft.Data.SqlClient;
 
@@ -69,7 +67,6 @@ namespace FluentMigrator.Tests.Integration
                 (typeof(SqlServerProcessor), () => IntegrationTestOptions.SqlServer2012, ExecuteWithSqlServer2012),
                 (typeof(SqlServerProcessor), () => IntegrationTestOptions.SqlServer2014, ExecuteWithSqlServer2014),
                 (typeof(SqlServerProcessor), () => IntegrationTestOptions.SqlServer2016, ExecuteWithSqlServer2016),
-                (typeof(SqlAnywhereProcessor), () => IntegrationTestOptions.SqlAnywhere16, ExecuteWithSqlAnywhere),
                 (typeof(SQLiteProcessor), () => IntegrationTestOptions.SQLite, ExecuteWithSqlite),
                 (typeof(FirebirdProcessor), () => IntegrationTestOptions.Firebird, ExecuteWithFirebird),
                 (typeof(PostgresProcessor), () => IntegrationTestOptions.Postgres, ExecuteWithPostgres),
@@ -261,28 +258,6 @@ namespace FluentMigrator.Tests.Integration
                     {
                         processor.RollbackTransaction();
                     }
-                }
-            }
-        }
-
-        protected static void ExecuteWithSqlAnywhere(Action<IMigrationProcessor> test, bool tryRollback, IntegrationTestOptions.DatabaseServerOptions serverOptions)
-        {
-            if (!serverOptions.IsEnabled)
-                return;
-
-            var announcer = new TextWriterAnnouncer(TestContext.Out);
-            announcer.Heading("Testing Migration against Postgres");
-
-            var factory = new SqlAnywhereDbFactory();
-            using (var connection = factory.CreateConnection(serverOptions.ConnectionString))
-            {
-                var processor = new SqlAnywhereProcessor("SqlAnywhere16", connection, new SqlAnywhere16Generator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), factory);
-
-                test(processor);
-
-                if (tryRollback && !processor.WasCommitted)
-                {
-                    processor.RollbackTransaction();
                 }
             }
         }

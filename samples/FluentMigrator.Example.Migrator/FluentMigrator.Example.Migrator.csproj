@@ -1,12 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">net462;netcoreapp2.0</TargetFrameworks>
-    <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' ">netcoreapp2.0</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' == 'Windows_NT' ">net48;net6.0</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(OS)' != 'Windows_NT' ">net6.0</TargetFrameworks>
     <Description>Example project that shows how to execute migrations</Description>
   </PropertyGroup>
   <Import Project="../../Global.props" />
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net462' and '$(OS)' == 'Windows_NT' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net48' and '$(OS)' == 'Windows_NT' ">
     <COMReference Include="ADOX.dll">
       <Guid>00000600-0000-0010-8000-00aa006d2ea4</Guid>
       <VersionMajor>6</VersionMajor>
@@ -26,5 +26,8 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\FluentMigrator.Runner\FluentMigrator.Runner.csproj" />
     <ProjectReference Include="..\FluentMigrator.Example.Migrations\FluentMigrator.Example.Migrations.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Update="JetBrains.Annotations" Version="2023.2.0" />
   </ItemGroup>
 </Project>

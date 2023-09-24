@@ -32,7 +32,6 @@ using FluentMigrator.Runner.Processors.SQLite;
 using FluentMigrator.Runner.Processors.SqlServer;
 using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Runner.Initialization;
-using FluentMigrator.Runner.Processors.SqlAnywhere;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -59,7 +58,6 @@ namespace FluentMigrator.Tests.Integration
                 (typeof(SqlServer2012Processor), () => IntegrationTestOptions.SqlServer2012),
                 (typeof(SqlServer2014Processor), () => IntegrationTestOptions.SqlServer2014),
                 (typeof(SqlServer2016Processor), () => IntegrationTestOptions.SqlServer2016),
-                (typeof(SqlAnywhere16Processor), () => IntegrationTestOptions.SqlAnywhere16),
                 (typeof(SQLiteProcessor), () => IntegrationTestOptions.SQLite),
                 (typeof(FirebirdProcessor), () => IntegrationTestOptions.Firebird),
                 (typeof(PostgresProcessor), () => IntegrationTestOptions.Postgres),
@@ -185,7 +183,6 @@ namespace FluentMigrator.Tests.Integration
                         .AddMySql4()
                         .AddPostgres()
                         .AddSQLite()
-                        .AddSqlAnywhere16()
                         .AddSqlServer2005()
                         .AddSqlServer2008()
                         .AddSqlServer2012()

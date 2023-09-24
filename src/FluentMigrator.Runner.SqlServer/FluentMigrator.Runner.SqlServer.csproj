@@ -24,4 +24,7 @@
   <ItemGroup>
     <Folder Include="BatchParser" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Update="JetBrains.Annotations" Version="2023.2.0" />
+  </ItemGroup>
 </Project>

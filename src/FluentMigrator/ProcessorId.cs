@@ -19,8 +19,6 @@ namespace FluentMigrator
         public const string PostgreSQL10_0 = nameof(PostgreSQL10_0);
         public const string PostgreSQL11_0 = nameof(PostgreSQL11_0);
         public const string Redshift = nameof(Redshift);
-        public const string SqlAnywhere = nameof(SqlAnywhere);
-        public const string SqlAnywhere16 = nameof(SqlAnywhere16);
         public const string SQLite = nameof(SQLite);
         public const string SqlServer = nameof(SqlServer);
         public const string SqlServer2000 = nameof(SqlServer2000);

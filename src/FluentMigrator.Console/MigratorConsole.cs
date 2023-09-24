@@ -496,7 +496,6 @@ namespace FluentMigrator.Console
                         .AddPostgres()
                         .AddPostgres92()
                         .AddRedshift()
-                        .AddSqlAnywhere()
                         .AddSQLite()
                         .AddSqlServer()
                         .AddSqlServer2000()

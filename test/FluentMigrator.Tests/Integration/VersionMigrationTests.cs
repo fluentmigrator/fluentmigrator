@@ -20,7 +20,6 @@ using FluentMigrator.Runner;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Runner.Processors.MySql;
-using FluentMigrator.Runner.Processors.SqlAnywhere;
 using FluentMigrator.Runner.Processors.SQLite;
 using FluentMigrator.Runner.Versioning;
 using FluentMigrator.Runner.VersionTableInfo;
@@ -106,8 +105,7 @@ namespace FluentMigrator.Tests.Integration
                 true,
                 typeof(SQLiteProcessor),
                 typeof(MySqlProcessor),
-                typeof(FirebirdProcessor),
-                typeof(SqlAnywhereProcessor));
+                typeof(FirebirdProcessor));
         }
 
         [Test]
