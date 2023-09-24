@@ -71,8 +71,6 @@ namespace FluentMigrator.Tests
 
         public static DatabaseServerOptions SqlServer2016 => GetOptions(ProcessorId.SqlServer2016);
 
-        public static DatabaseServerOptions SqlServerCe => GetOptions(ProcessorId.SqlServerCe);
-
         public static DatabaseServerOptions Jet => GetOptions(ProcessorId.Jet);
 
         // ReSharper disable once InconsistentNaming

@@ -24,7 +24,6 @@
       <Value>src\FluentMigrator.Runner.SqlAnywhere\FluentMigrator.Runner.SqlAnywhere.csproj:netstandard2.0</Value>
       <Value>src\FluentMigrator.Runner.SQLite\FluentMigrator.Runner.SQLite.csproj:netstandard2.0</Value>
       <Value>src\FluentMigrator.Runner.SqlServer\FluentMigrator.Runner.SqlServer.csproj:netstandard2.0</Value>
-      <Value>src\FluentMigrator.Runner.SqlServerCe\FluentMigrator.Runner.SqlServerCe.csproj:netstandard2.0</Value>
     </MetricsExclusionList>
     <SolutionConfigured>True</SolutionConfigured>
   </Settings>

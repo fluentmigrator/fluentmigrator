@@ -16,7 +16,6 @@
     <ProjectReference Include="..\FluentMigrator.Runner.Redshift\FluentMigrator.Runner.Redshift.csproj" />
     <ProjectReference Include="..\FluentMigrator.Runner.SQLite\FluentMigrator.Runner.SQLite.csproj" />
     <ProjectReference Include="..\FluentMigrator.Runner.SqlServer\FluentMigrator.Runner.SqlServer.csproj" />
-    <ProjectReference Include="..\FluentMigrator.Runner.SqlServerCe\FluentMigrator.Runner.SqlServerCe.csproj" />
     <ProjectReference Include="..\FluentMigrator.Runner.Hana\FluentMigrator.Runner.Hana.csproj" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net48' ">
