@@ -33,7 +33,7 @@ steps:
 - task: gitversion/setup@0
   displayName: 'Install GitVersion (using GitTools 0.10.2.23031113 or later)'
   inputs:
-    versionSpec: '5.1.3'
+    versionSpec: '5.5'
     includePrerelease: true
 
 - task: gitversion/execute@0
