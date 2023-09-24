@@ -77,6 +77,19 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FluentMigrator.Extensions.O
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FluentMigrator.Extensions.Postgres", "src\FluentMigrator.Extensions.Postgres\FluentMigrator.Extensions.Postgres.csproj", "{68CA06A0-6BB8-464D-9D7C-2B09B4FAF768}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{B3796E78-F32D-4A28-87C0-76E18A39B9C1}"
+	ProjectSection(SolutionItems) = preProject
+		azure-pipelines-pullrequests.yml = azure-pipelines-pullrequests.yml
+		azure-pipelines.yml = azure-pipelines.yml
+		Directory.Build.props = Directory.Build.props
+		DotNetSdkMono.props = DotNetSdkMono.props
+		FluentMigrator.snk = FluentMigrator.snk
+		FluentMigrator.v3.ncrunchsolution = FluentMigrator.v3.ncrunchsolution
+		GitVersion.yml = GitVersion.yml
+		nuget-upload.sh = nuget-upload.sh
+		nuget.config = nuget.config
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
