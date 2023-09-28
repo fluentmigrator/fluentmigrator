@@ -8,7 +8,7 @@ trigger: none
 pr:
   branches:
     include:
-    - '*'  # must quote since "*" is a YAML reserved character; we want a string
+      - '*'  # must quote since "*" is a YAML reserved character; we want a string
 
 pool:
   vmImage: 'windows-latest'
@@ -18,37 +18,77 @@ variables:
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
 
-steps:
-- task: NuGetToolInstaller@1
+stages:
+  - stage: Build on Windows
+    jobs:
+      - job: 'Build on Windows'
+        pool:
+          vmImage: 'windows-latest'
+        steps:
+          - task: NuGetToolInstaller@1
 
-- task: UseGitVersion@5
-  displayName: 'UseGitVersion (preview)'
-  inputs:
-    versionSpec: '5.1.3'
-    includePrerelease: true
-    updateAssemblyInfo: false
-  env:
-      BUILD_BUILDNUMBER: $(GitVersion.NuGetVersionV2)
+          - task: UseDotNet@2
+            inputs:
+              version: '7.x'
 
-- task: NuGetCommand@2
-  inputs:
-    restoreSolution: '$(solution)'
+          - task: UseGitVersion@5
+            displayName: 'UseGitVersion (preview)'
+            inputs:
+              versionSpec: '5.12'
+              includePrerelease: true
+              updateAssemblyInfo: false
+            env:
+              BUILD_BUILDNUMBER: $(GitVersion.NuGetVersionV2)
 
-- task: VSBuild@1
-  inputs:
-    solution: '$(solution)'
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
-    msbuildArgs: '/p:Version="$(build.buildNumber)"'
+          - task: NuGetCommand@2
+            inputs:
+              restoreSolution: '$(solution)'
 
-- task: VSTest@2
-  inputs:
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
-    diagnosticsEnabled: true
+          - task: VSBuild@1
+            inputs:
+              solution: '$(solution)'
+              platform: '$(buildPlatform)'
+            configuration: '$(buildConfiguration)'
+            msbuildArgs: '/p:Version="$(build.buildNumber)"'
 
-- task: PublishBuildArtifacts@1
-  inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: 'drop'
-    publishLocation: 'Container'
+          - task: VSTest@2
+            inputs:
+              platform: '$(buildPlatform)'
+              configuration: '$(buildConfiguration)'
+              diagnosticsEnabled: true
+
+  - stage: Build on Ubuntu
+    dependsOn: []
+    jobs:
+      - job: 'Build on Ubuntu'
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - task: UseDotNet@2
+            inputs:
+              version: '7.x'
+
+          - task: UseGitVersion@5
+            displayName: 'UseGitVersion (preview)'
+            inputs:
+              versionSpec: '5.12'
+              includePrerelease: true
+              updateAssemblyInfo: false
+            env:
+              BUILD_BUILDNUMBER: $(GitVersion.NuGetVersionV2)
+
+          - task: DotNetCoreCLI@2
+            inputs:
+              command: 'restore'
+
+          - task: DotNetCoreCLI@1
+            inputs:
+              command: 'build'
+              project: '$(solution)'
+              configuration: '$(buildConfiguration)'
+              buildProperties: 'Version="$(build.buildNumber)"'
+
+          - task: DotNetCoreCLI@2
+            inputs:
+              project: '$(solution)'
+              configuration: '$(buildConfiguration)'

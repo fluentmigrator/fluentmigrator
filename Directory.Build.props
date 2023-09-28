@@ -1,5 +1,14 @@
 <Project>
- <PropertyGroup>
-   <Deterministic>true</Deterministic>
- </PropertyGroup>
+    <PropertyGroup>
+        <Deterministic>true</Deterministic>
+        <RepositoryUrl>https://github.com/fluentmigrator/fluentmigrator/</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
 </Project>
