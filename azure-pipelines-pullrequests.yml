@@ -21,6 +21,10 @@ variables:
 steps:
 - task: NuGetToolInstaller@1
 
+- task: UseDotNet@2
+  inputs:
+    version: '3.1.x'
+
 - task: UseGitVersion@5
   displayName: 'UseGitVersion (preview)'
   inputs:
