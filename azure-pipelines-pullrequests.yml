@@ -23,12 +23,12 @@ steps:
 
 - task: UseDotNet@2
   inputs:
-    version: '3.1.x'
+    version: '6.x'
 
 - task: UseGitVersion@5
   displayName: 'UseGitVersion (preview)'
   inputs:
-    versionSpec: '5.1.3'
+    versionSpec: '5.12.0'
     includePrerelease: true
     updateAssemblyInfo: false
   env:
