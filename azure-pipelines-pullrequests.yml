@@ -23,7 +23,7 @@ steps:
 
 - task: UseDotNet@2
   inputs:
-    version: '6.x'
+    version: '7.x'
 
 - task: UseGitVersion@5
   displayName: 'UseGitVersion (preview)'
