@@ -39,6 +39,7 @@ namespace FluentMigrator.Runner.Processors.Hana
         {
             yield return new TestEntry("Sap.Data.Hana", "Sap.Data.Hana.HanaFactory");
             yield return new TestEntry("Sap.Data.Hana.v4.5", "Sap.Data.Hana.HanaFactory");
+            yield return new TestEntry("Sap.Data.Hana.Core.v2.1", "Sap.Data.Hana.HanaFactory");
         }
     }
 }

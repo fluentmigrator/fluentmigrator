@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net48</TargetFramework>
+    <TargetFrameworks>net48;net6.0</TargetFrameworks>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\FluentMigrator.snk</AssemblyOriginatorKeyFile>
     <UserSecretsId>FluentMigrator.Tests</UserSecretsId>
@@ -47,15 +47,13 @@
     <ProjectReference Include="..\..\src\FluentMigrator.Runner.SQLite\FluentMigrator.Runner.SQLite.csproj" />
     <ProjectReference Include="..\..\src\FluentMigrator.Runner.SqlServer\FluentMigrator.Runner.SqlServer.csproj" />
   </ItemGroup>
-  <ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
     <Reference Include="IBM.Data.DB2">
       <HintPath>..\..\lib\DB2\amd64\IBM.Data.DB2.dll</HintPath>
     </Reference>
     <Reference Include="Sap.Data.Hana.v4.5">
       <HintPath>..\..\lib\Hana\ado.net\v4.5\Sap.Data.Hana.v4.5.dll</HintPath>
     </Reference>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="../../lib/DB2/clidriver/**/*.*">
       <Link>clidriver/%(RecursiveDir)%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -64,10 +62,17 @@
       <Link>%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-  <ItemGroup Condition=" '$(MSBuildRuntimeType)' == 'Core' or '$(OS)' != 'Windows_NT' ">
     <Compile Remove="Integration\Processors\Jet\**" />
     <Compile Remove="Helpers\JetTestTable.cs" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net6.0' and '$(OS)' == 'Windows_NT' ">
+    <PackageReference Include="IBM.Data.DB2.Core" Version="3.1.0.600" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net6.0' and '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' ">
+    <PackageReference Include="IBM.Data.DB2.Core-lnx" Version="3.1.0.500" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net6.0' and '$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' ">
+    <PackageReference Include="IBM.Data.DB2.Core-osx" Version="3.1.0.500" />
   </ItemGroup>
   <ItemGroup>
     <None Update="appsettings.json">

@@ -16,6 +16,8 @@
 //
 #endregion
 
+#if NETFRAMEWORK
+
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Hana;
@@ -130,3 +132,4 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
         }
     }
 }
+#endif

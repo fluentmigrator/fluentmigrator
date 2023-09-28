@@ -21,8 +21,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
-using JetBrains.Annotations;
-
 #if NETFRAMEWORK
 using FluentMigrator.Runner.Initialization.NetFramework;
 using Microsoft.Extensions.Options;
@@ -33,8 +31,8 @@ namespace FluentMigrator.Runner.Initialization
     [Obsolete]
     public class DefaultConnectionStringProvider : IConnectionStringProvider
     {
-        [CanBeNull]
-        [ItemNotNull]
+        [JetBrains.Annotations.CanBeNull]
+        [JetBrains.Annotations.ItemCanBeNull]
         private readonly IReadOnlyCollection<IConnectionStringReader> _accessors;
 
         private readonly object _syncRoot = new object();
@@ -45,7 +43,13 @@ namespace FluentMigrator.Runner.Initialization
         {
         }
 
-        public DefaultConnectionStringProvider([NotNull, ItemNotNull] IEnumerable<IConnectionStringReader> accessors)
+        public DefaultConnectionStringProvider([
+            JetBrains.Annotations.NotNull,
+            JetBrains.Annotations.ItemNotNull
+            #if NET6
+            , System.Diagnostics.CodeAnalysis.NotNull
+            #endif
+        ] IEnumerable<IConnectionStringReader> accessors)
         {
             _accessors = accessors.ToList();
         }

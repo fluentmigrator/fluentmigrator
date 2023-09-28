@@ -14,6 +14,8 @@
 // limitations under the License.
 #endregion
 
+#if NETFRAMEWORK
+
 using System;
 using System.Data.OleDb;
 using System.IO;
@@ -127,3 +129,5 @@ namespace FluentMigrator.Tests.Integration.Processors.Jet
         }
     }
 }
+
+#endif

@@ -1,3 +1,4 @@
+
 #region License
 //
 // Copyright (c) 2018, Fluent Migrator Project
@@ -16,6 +17,7 @@
 //
 #endregion
 
+#if NETFRAMEWORK
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -176,3 +178,4 @@ namespace FluentMigrator.Tests.Unit.Initialization
         }
     }
 }
+#endif

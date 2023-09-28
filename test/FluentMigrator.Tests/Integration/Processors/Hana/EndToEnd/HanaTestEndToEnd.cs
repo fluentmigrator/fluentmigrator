@@ -14,6 +14,7 @@
 // limitations under the License.
 #endregion
 
+#if NETFRAMEWORK
 using System;
 
 using FluentMigrator.Runner;
@@ -90,3 +91,4 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana.EndToEnd
         }
     }
 }
+#endif

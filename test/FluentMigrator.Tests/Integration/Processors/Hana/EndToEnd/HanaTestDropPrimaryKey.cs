@@ -14,6 +14,7 @@
 // limitations under the License.
 #endregion
 
+#if NETFRAMEWORK
 using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Integration.Processors.Hana.EndToEnd
@@ -78,3 +79,4 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana.EndToEnd
         }
     }
 }
+#endif

@@ -119,7 +119,12 @@ namespace FluentMigrator.Tests.Integration.Processors.Db2
         private static void EnsureReference()
         {
             // This is here to avoid the removal of the referenced assembly
+#if NETFRAMEWORK
             Debug.WriteLine(typeof(IBM.Data.DB2.DB2Factory));
+#else
+            Debug.Write(typeof(IBM.Data.DB2.Core.DB2Factory));
+#endif
+
         }
     }
 }

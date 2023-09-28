@@ -16,6 +16,7 @@
 //
 #endregion
 
+#if NETFRAMEWORK
 using System.IO;
 
 using FluentMigrator.Expressions;
@@ -94,3 +95,4 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
         }
     }
 }
+#endif
