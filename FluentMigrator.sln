@@ -86,6 +86,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{B3796E78
 		GitVersion.yml = GitVersion.yml
 		nuget-upload.sh = nuget-upload.sh
 		nuget.config = nuget.config
+		Global.props = Global.props
 	EndProjectSection
 EndProject
 Global

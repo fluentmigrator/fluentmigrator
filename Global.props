@@ -17,9 +17,6 @@ Minimum .NET Framework version is 4.6.2, see https://aka.ms/msbuild/developerpac
 
 Details: https://github.com/fluentmigrator/fluentmigrator/releases
     </PackageReleaseNotes>
-    <PackageIconUrl>https://github.com/fluentmigrator/fluentmigrator/raw/develop/docs/logo.png</PackageIconUrl>
-    <RepositoryUrl>https://github.com/fluentmigrator/fluentmigrator.git</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
     <MinClientVersion>3.5</MinClientVersion>
     <IsPackable>false</IsPackable>
     <!-- Enable the CS300x warnings when the obsoleted code gets removed -->
@@ -30,12 +27,7 @@ Details: https://github.com/fluentmigrator/fluentmigrator/releases
     <Compile Include="$(MSBuildThisFileDirectory)src/GlobalAssemblyInfo.cs" Link="Properties\GlobalAssemblyInfo.cs" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="JetBrains.Annotations" Version="11.1.0" PrivateAssets="All" />
-  </ItemGroup>
-
   <PropertyGroup Condition="'$(TargetFramework)'=='net48'">
     <DefineConstants>$(DefineConstants);NETFRAMEWORK</DefineConstants>
   </PropertyGroup>
-
 </Project>

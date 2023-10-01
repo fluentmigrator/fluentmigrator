@@ -31,15 +31,6 @@ stages:
             inputs:
               version: '7.x'
 
-          - task: UseGitVersion@5
-            displayName: 'UseGitVersion (preview)'
-            inputs:
-              versionSpec: '5.12'
-              includePrerelease: true
-              updateAssemblyInfo: false
-            env:
-              BUILD_BUILDNUMBER: $(GitVersion.NuGetVersionV2)
-
           - task: NuGetCommand@2
             inputs:
               restoreSolution: '$(solution)'
@@ -49,7 +40,6 @@ stages:
               solution: '$(solution)'
               platform: '$(buildPlatform)'
             configuration: '$(buildConfiguration)'
-            msbuildArgs: '/p:Version="$(build.buildNumber)"'
 
           - task: VSTest@2
             inputs:
@@ -68,15 +58,6 @@ stages:
             inputs:
               version: '7.x'
 
-          - task: UseGitVersion@5
-            displayName: 'UseGitVersion (preview)'
-            inputs:
-              versionSpec: '5.12'
-              includePrerelease: true
-              updateAssemblyInfo: false
-            env:
-              BUILD_BUILDNUMBER: $(GitVersion.NuGetVersionV2)
-
           - task: DotNetCoreCLI@2
             inputs:
               command: 'restore'
@@ -86,9 +67,9 @@ stages:
               command: 'build'
               project: '$(solution)'
               configuration: '$(buildConfiguration)'
-              buildProperties: 'Version="$(build.buildNumber)"'
 
           - task: DotNetCoreCLI@2
             inputs:
+              command: 'test'
               project: '$(solution)'
               configuration: '$(buildConfiguration)'
