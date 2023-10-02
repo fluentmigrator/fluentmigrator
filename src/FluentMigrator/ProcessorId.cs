@@ -6,11 +6,12 @@ namespace FluentMigrator
         public const string Db2ISeries = nameof(Db2ISeries);
         public const string Firebird = nameof(Firebird);
         public const string Hana = nameof(Hana);
-        public const string Jet = nameof(Jet); 
+        public const string Jet = nameof(Jet);
         public const string MariaDB = nameof(MariaDB);
-        public const string MySql = nameof(MySql); 
+        public const string MySql = nameof(MySql);
         public const string MySql4 = nameof(MySql4);
         public const string MySql5 = nameof(MySql5);
+        public const string MySql8 = nameof(MySql8);
         public const string Oracle = nameof(Oracle);
         public const string OracleManaged = nameof(OracleManaged);
         public const string Oracle12c = nameof(Oracle12c);

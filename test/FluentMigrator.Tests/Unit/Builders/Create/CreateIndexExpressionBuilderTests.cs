@@ -23,6 +23,7 @@ using FluentMigrator.Builder.Create.Index;
 using FluentMigrator.Builders.Create.Index;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
+using FluentMigrator.MySql;
 using FluentMigrator.Postgres;
 
 using Moq;
@@ -171,10 +172,10 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             switch (algorithm)
             {
                 case Algorithm.BTree:
-                    builder.WithOptions().UsingBTree();
+                    PostgresExtensions.UsingBTree(builder.WithOptions());
                     break;
                 case Algorithm.Hash:
-                    builder.WithOptions().UsingHash();
+                    PostgresExtensions.UsingHash(builder.WithOptions());
                     break;
                 case Algorithm.Gist:
                     builder.WithOptions().UsingGist();
@@ -289,7 +290,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
         }
 
         [TestCase(NullSort.First)]
-        [TestCase(NullSort.First)]
+        [TestCase(NullSort.Last)]
         public void CallingNullsFirstOrLastToExpressionInPostgres(NullSort sort)
         {
             var collectionMock = new Mock<PostgresIndexNullsSort>();
@@ -329,7 +330,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
         }
 
         [TestCase(NullSort.First)]
-        [TestCase(NullSort.First)]
+        [TestCase(NullSort.Last)]
         public void CallingNullsToExpressionInPostgres(NullSort sort)
         {
             var collectionMock = new Mock<PostgresIndexNullsSort>();
@@ -387,7 +388,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 
             ICreateIndexOnColumnOrInSchemaSyntax builder = new CreateIndexExpressionBuilder(expressionMock.Object);
 
-            builder.WithOptions().UsingBTree().VacuumCleanupIndexScaleFactor(90);
+            PostgresExtensions.UsingBTree(builder.WithOptions()).VacuumCleanupIndexScaleFactor(90);
             indexMock.VerifyGet(x => x.AdditionalFeatures);
             expressionMock.VerifyGet(e => e.Index);
 
@@ -519,6 +520,42 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             expressionMock.VerifyGet(e => e.Index);
 
             Assert.AreEqual("indexspace", additionalFeatures[PostgresExtensions.IndexTablespace]);
+        }
+
+        [TestCase(IndexType.BTree)]
+        [TestCase(IndexType.Hash)]
+        public void CallingUsingIndexTypeToExpressionInMySql(IndexType indexType)
+        {
+            var collectionMock = new Mock<MySqlIndexTypeDefinition>();
+
+            var additionalFeatures = new Dictionary<string, object>()
+            {
+                [MySqlExtensions.IndexType] = collectionMock.Object
+            };
+
+            var indexMock = new Mock<IndexDefinition>();
+            indexMock.Setup(x => x.AdditionalFeatures).Returns(additionalFeatures);
+
+            var expressionMock = new Mock<CreateIndexExpression>();
+            expressionMock.SetupGet(e => e.Index).Returns(indexMock.Object);
+
+            ICreateIndexOnColumnOrInSchemaSyntax builder = new CreateIndexExpressionBuilder(expressionMock.Object);
+
+            switch (indexType)
+            {
+                case IndexType.BTree:
+                    MySqlExtensions.UsingBTree(builder.WithOptions());
+                    break;
+                case IndexType.Hash:
+                    MySqlExtensions.UsingHash(builder.WithOptions());
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(indexType), indexType, null);
+            }
+
+            collectionMock.VerifySet(x => x.IndexType = indexType);
+            indexMock.VerifyGet(x => x.AdditionalFeatures);
+            expressionMock.VerifyGet(e => e.Index);
         }
     }
 }

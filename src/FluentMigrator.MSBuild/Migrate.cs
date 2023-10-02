@@ -238,6 +238,7 @@ namespace FluentMigrator.MSBuild
                         .AddHana()
                         .AddMySql4()
                         .AddMySql5()
+                        .AddMySql8()
                         .AddOracle()
                         .AddOracle12C()
                         .AddOracleManaged()

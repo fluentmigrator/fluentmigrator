@@ -67,5 +67,25 @@ namespace FluentMigrator.Runner
 
             return builder;
         }
+
+        /// <summary>
+        /// Adds MySQL 5 support
+        /// </summary>
+        /// <param name="builder">The builder to add the MySQL 5-specific services to</param>
+        /// <returns>The migration runner builder</returns>
+        public static IMigrationRunnerBuilder AddMySql8(this IMigrationRunnerBuilder builder)
+        {
+            builder.Services.TryAddScoped<MySqlDbFactory>();
+            builder.Services.TryAddScoped<MySqlQuoter>();
+            builder.Services
+                .AddScoped<MySql8Processor>()
+                .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<MySql8Processor>())
+                .AddScoped<MySql8Generator>()
+                .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<MySql8Generator>());
+
+            MigrationProcessorFactoryProvider.Register(new MySql8ProcessorFactory());
+
+            return builder;
+        }
     }
 }
