@@ -1,12 +1,53 @@
 <Project>
+    <Import Project="DotNetSdkMono.props"/>
     <PropertyGroup>
-        <AppTargetFrameworks>net48;netstandard2.0;net6.0</AppTargetFrameworks>
+        <LibTargetFrameworks>net48;netstandard2.0;net6.0</LibTargetFrameworks>
+        <VersionPrefix>4.0.0</VersionPrefix>
+        <LangVersion>latest</LangVersion>
+        <Product>FluentMigrator</Product>
+
+        <Copyright>Sean Chambers and the FluentMigrator project 2008-2022</Copyright>
+        <Company>FluentMigrator Project</Company>
+        <Authors>Sean Chambers;Josh Coffman;Tom Marien;Mark Junker</Authors>
+        <Description>FluentMigrator is a database migration framework for .NET written in C#. The basic idea is that you can create migrations which are simply classes that derive from the Migration base class and have a Migration attribute with a unique version number attached to them. Upon executing FluentMigrator, you tell it which version to migrate to and it will run all necessary migrations in order to bring your database up to that version. In addition to forward migration support, FluentMigrator also supports different ways to execute the migrations along with selective migrations called profiles and executing arbitrary SQL.</Description>
+
         <Deterministic>true</Deterministic>
+
+        <MinClientVersion>3.5</MinClientVersion>
+
+        <NoWarn>$(NoWarn);CS3001;CS3002;CS3003;CS3005;NU5105;NU1701</NoWarn>
+
+        <IsPackable>false</IsPackable>
+
+        <PackageReleaseNotes>Use of standard dependency injection, configuration and logging libraries.
+            Simplification of in-process runner configuration and instantiation.
+            dotnet-fm is now a global .NET 2.1 tool.
+            Minimum .NET Framework version is 4.6.2, see https://aka.ms/msbuild/developerpacks for more information.
+
+            Details: https://github.com/fluentmigrator/fluentmigrator/releases
+        </PackageReleaseNotes>
+
+        <PackageProjectUrl>https://github.com/fluentmigrator/fluentmigrator</PackageProjectUrl>
         <RepositoryUrl>https://github.com/fluentmigrator/fluentmigrator/</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <LangVersion>latest</LangVersion>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageIcon>logo.png</PackageIcon>
+
+        <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+
+        <!-- Optional: Publish the repository URL in the built .nupkg (in the NuSpec <Repository> element) -->
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+
+        <!-- Optional: Embed source files that are not tracked by the source control manager in the PDB -->
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+
+        <!-- Optional: Build symbol package (.snupkg) to distribute the PDB containing Source Link -->
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(TargetFramework)'=='net48'">
+        <DefineConstants>$(DefineConstants);NETFRAMEWORK</DefineConstants>
     </PropertyGroup>
 
     <ItemGroup>

@@ -6,15 +6,15 @@
   <PropertyGroup>
     <NoWarn Condition=" '$(Configuration)' != 'Release' ">$(NoWarn);1591</NoWarn>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
-    <DebugType Condition=" '$(Configuration)' == 'Release' ">portable</DebugType> <!-- Required for EmbedSources -->
-    <DebugType Condition=" '$(Configuration)' == 'Debug' ">full</DebugType> <!-- Required for EmbedSources -->
+<!--    <DebugType Condition=" '$(Configuration)' == 'Release' ">portable</DebugType> &lt;!&ndash; Required for EmbedSources &ndash;&gt;-->
+<!--    <DebugType Condition=" '$(Configuration)' == 'Debug' ">full</DebugType> &lt;!&ndash; Required for EmbedSources &ndash;&gt;-->
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 
-  <ItemGroup Condition=" '$(Configuration)' == 'Release' ">
-    <PackageReference Include="SourceLink.Create.CommandLine" Version="2.8.0" PrivateAssets="All" />
-    <PackageReference Include="SourceLink.Embed.AllSourceFiles" Version="2.8.0" PrivateAssets="all" />
-    <PackageReference Include="SourceLink.Copy.PdbFiles" Version="2.8.0" PrivateAssets="All" />
-  </ItemGroup>
+<!--  <ItemGroup Condition=" '$(Configuration)' == 'Release' ">-->
+<!--    <PackageReference Include="SourceLink.Create.CommandLine" Version="2.8.0" PrivateAssets="All" />-->
+<!--    <PackageReference Include="SourceLink.Embed.AllSourceFiles" Version="2.8.0" PrivateAssets="all" />-->
+<!--    <PackageReference Include="SourceLink.Copy.PdbFiles" Version="2.8.0" PrivateAssets="All" />-->
+<!--  </ItemGroup>-->
 
 </Project>
