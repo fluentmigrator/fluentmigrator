@@ -6,16 +6,16 @@
 trigger:
   branches:
     include:
-      - release/*
-      - develop
-      - master
+    - release/*
+    - develop
+    - master
   tags:
     include:
-      - v1.*
-      - v2.*
-      - v3.*
-      - v4.*
-      - v5.*
+    - v1.*
+    - v2.*
+    - v3.*
+    - v4.*
+    - v5.*
 
 pr: none
 
@@ -27,141 +27,84 @@ variables:
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
 
-stages:
-  - stage: Build on Windows
-    jobs:
-      - job: 'Build on Windows'
-        pool:
-          vmImage: 'windows-latest'
-        steps:
-          - task: NuGetToolInstaller@1
+steps:
+- task: NuGetToolInstaller@1
 
-          - task: UseDotNet@2
-            inputs:
-              version: '7.x'
+- task: gitversion/setup@0
+  displayName: 'Install GitVersion (using GitTools 0.10.2.23031113 or later)'
+  inputs:
+    versionSpec: '5.12'
+    includePrerelease: true
 
-          - task: UseGitVersion@5
-            displayName: 'UseGitVersion (preview)'
-            inputs:
-              versionSpec: '5.12'
-              includePrerelease: true
-              updateAssemblyInfo: false
-            env:
-              BUILD_BUILDNUMBER: $(GitVersion.NuGetVersionV2)
+- task: gitversion/execute@0
+  displayName: 'Execute GitVersion (using GitTools 0.10.2.23031113 or later)'
+  inputs:
+    updateAssemblyInfo: false
+  env:
+      BUILD_BUILDNUMBER: $(GitVersion.NuGetVersionV2)
 
-          - task: gitversion/execute@0
-            displayName: 'Execute GitVersion (using GitTools 0.10.2.23031113 or later)'
-            inputs:
-              updateAssemblyInfo: false
-            env:
-              BUILD_BUILDNUMBER: $(GitVersion.NuGetVersionV2)
+- task: NuGetCommand@2
+  inputs:
+    restoreSolution: '$(solution)'
 
-          - task: NuGetCommand@2
-            inputs:
-              restoreSolution: '$(solution)'
+- task: VSBuild@1
+  inputs:
+    solution: '$(solution)'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+    msbuildArgs: '/p:Version="$(build.buildNumber)"'
 
-          - task: VSBuild@1
-            inputs:
-              solution: '$(solution)'
-              platform: '$(buildPlatform)'
-            configuration: '$(buildConfiguration)'
-            msbuildArgs: '/p:Version="$(build.buildNumber)"'
+- task: VSTest@2
+  inputs:
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+    diagnosticsEnabled: true
 
-          - task: VSTest@2
-            inputs:
-              platform: '$(buildPlatform)'
-              configuration: '$(buildConfiguration)'
-              diagnosticsEnabled: true
+- task: CmdLine@2
+  inputs:
+    script: 'dotnet pack $(Build.SourcesDirectory)\FluentMigrator.sln --output $(Build.ArtifactStagingDirectory) --include-symbols -p:Configuration=$(buildConfiguration) -p:Version=$(build.buildNumber) --verbosity Detailed'
 
-          - task: DotNetCoreCLI@2
-            inputs:
-              command: 'publish'
-              publishWebProjects: false
-              projects: 'src/FluentMigrator.Console/FluentMigrator.Console.csproj'
-              configuration: '$(buildConfiguration)'
-              outputDir: '$(Build.ArtifactStagingDirectory)/publish/tools/net48/x86'
-              arguments: '-r win7-x86 -o "$(Build.ArtifactStagingDirectory)/publish/tools/net48/x86" -p:Platform=x86 -p:TargetFramework=net48 -p:Version=$(build.buildNumber)'
-              zipAfterPublish: false
-              modifyOutputPath: false
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    projects: 'src/FluentMigrator.Console/FluentMigrator.Console.csproj'
+    arguments: '-c $(buildConfiguration) -r win7-x86 -o "$(Build.ArtifactStagingDirectory)/publish/tools/net48/x86" -p:Platform=x86 -p:TargetFramework=net48 -p:Version=$(build.buildNumber)'
+    zipAfterPublish: false
+    modifyOutputPath: false
 
-          - task: DotNetCoreCLI@2
-            inputs:
-              command: 'publish'
-              publishWebProjects: false
-              projects: 'src/FluentMigrator.Console/FluentMigrator.Console.csproj'
-              configuration: '$(buildConfiguration)'
-              outputDir: '$(Build.ArtifactStagingDirectory)/publish/tools/net48/x86'
-              arguments: '-r win7-x64 -o "$(Build.ArtifactStagingDirectory)/publish/tools/net48/x64" -p:Platform=x86 -p:TargetFramework=net48 -p:Version=$(build.buildNumber)'
-              zipAfterPublish: false
-              modifyOutputPath: false
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    projects: 'src/FluentMigrator.Console/FluentMigrator.Console.csproj'
+    arguments: '-c $(buildConfiguration) -r win7-x64 -o "$(Build.ArtifactStagingDirectory)/publish/tools/net48/x64" -p:Platform=x64 -p:TargetFramework=net48 -p:Version=$(build.buildNumber)'
+    zipAfterPublish: false
+    modifyOutputPath: false
 
-          - script: nuget.exe pack $(Build.ArtifactStagingDirectory)/publish/FluentMigrator.Console.nuspec -NonInteractive -OutputDirectory $(Build.ArtifactStagingDirectory) -version $(build.buildNumber)
-            displayName: NuGet pack FluentMigrator.Console
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    projects: 'src/FluentMigrator.Console/FluentMigrator.Console.csproj'
+    arguments: '-c $(buildConfiguration) -r any -o "$(Build.ArtifactStagingDirectory)/publish/tools/net48/any" -p:Platform=AnyCpu -p:TargetFramework=net48 -p:Version=$(build.buildNumber)'
+    zipAfterPublish: false
+    modifyOutputPath: false
 
-          - publish: '$(Build.ArtifactStagingDirectory)'
-            displayName: 'Copying FluentMigrator.Console'
+- task: CopyFiles@2
+  inputs:
+    SourceFolder: 'publish'
+    Contents: '**'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)/publish'
 
-  - stage: Build on Ubuntu
-    jobs:
-      - job: 'Build on Ubuntu'
-        pool:
-          vmImage: 'ubuntu-latest'
-        steps:
-          - task: UseDotNet@2
-            inputs:
-              version: '7.x'
+- script: nuget.exe pack $(Build.ArtifactStagingDirectory)/publish/FluentMigrator.Console.nuspec -NonInteractive -OutputDirectory $(Build.ArtifactStagingDirectory) -version $(build.buildNumber)
+  displayName: NuGet pack FluentMigrator.Console
+  
+- script: nuget.exe pack $(Build.ArtifactStagingDirectory)/publish/FluentMigrator.Tools.nuspec -NonInteractive -OutputDirectory $(Build.ArtifactStagingDirectory) -version $(build.buildNumber)
+  displayName: NuGet pack FluentMigrator.Tools
 
-          - task: UseGitVersion@5
-            displayName: 'UseGitVersion (preview)'
-            inputs:
-              versionSpec: '5.12'
-              includePrerelease: true
-              updateAssemblyInfo: false
-            env:
-              BUILD_BUILDNUMBER: $(GitVersion.NuGetVersionV2)
-
-          - task: gitversion/execute@0
-            displayName: 'Execute GitVersion (using GitTools 0.10.2.23031113 or later)'
-            inputs:
-              updateAssemblyInfo: false
-            env:
-              BUILD_BUILDNUMBER: $(GitVersion.NuGetVersionV2)
-
-          - task: DotNetCoreCLI@2
-            inputs:
-              command: 'restore'
-
-          - task: DotNetCoreCLI@1
-            inputs:
-              command: 'build'
-              project: '$(solution)'
-              configuration: '$(buildConfiguration)'
-              versioningScheme: 'byEnvVar'
-
-          - task: DotNetCoreCLI@2
-            inputs:
-              command: 'test'
-              project: '$(solution)'
-              configuration: '$(buildConfiguration)'
-
-          - task: DotNetCoreCLI@2
-            inputs:
-              command: 'pack'
-              project: '$(solution)'
-              configuration: '$(buildConfiguration)'
-              outputDir: '$(Build.ArtifactStagingDirectory)'
-              includesymbols: true
-              includesource: true
-              versioningScheme: 'byEnvVar'
-
-          - task: CopyFiles@2
-            inputs:
-              SourceFolder: 'publish'
-              Contents: '**'
-              TargetFolder: '$(Build.ArtifactStagingDirectory)/publish'
-
-          - task: PublishBuildArtifacts@1
-            inputs:
-              PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-              ArtifactName: 'drop'
-              publishLocation: 'Container'
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'

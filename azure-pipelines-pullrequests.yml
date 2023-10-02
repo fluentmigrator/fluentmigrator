@@ -8,7 +8,7 @@ trigger: none
 pr:
   branches:
     include:
-      - '*'  # must quote since "*" is a YAML reserved character; we want a string
+    - '*'  # must quote since "*" is a YAML reserved character; we want a string
 
 pool:
   vmImage: 'windows-latest'
@@ -18,58 +18,37 @@ variables:
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
 
-stages:
-  - stage: Build on Windows
-    jobs:
-      - job: 'Build on Windows'
-        pool:
-          vmImage: 'windows-latest'
-        steps:
-          - task: NuGetToolInstaller@1
+steps:
+- task: NuGetToolInstaller@1
 
-          - task: UseDotNet@2
-            inputs:
-              version: '7.x'
+- task: UseGitVersion@5
+  displayName: 'UseGitVersion (preview)'
+  inputs:
+    versionSpec: '5.12'
+    includePrerelease: true
+    updateAssemblyInfo: false
+  env:
+      BUILD_BUILDNUMBER: $(GitVersion.NuGetVersionV2)
 
-          - task: NuGetCommand@2
-            inputs:
-              restoreSolution: '$(solution)'
+- task: NuGetCommand@2
+  inputs:
+    restoreSolution: '$(solution)'
 
-          - task: VSBuild@1
-            inputs:
-              solution: '$(solution)'
-              platform: '$(buildPlatform)'
-            configuration: '$(buildConfiguration)'
+- task: VSBuild@1
+  inputs:
+    solution: '$(solution)'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+    msbuildArgs: '/p:Version="$(build.buildNumber)"'
 
-          - task: VSTest@2
-            inputs:
-              platform: '$(buildPlatform)'
-              configuration: '$(buildConfiguration)'
-              diagnosticsEnabled: true
+- task: VSTest@2
+  inputs:
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+    diagnosticsEnabled: true
 
-  - stage: Build on Ubuntu
-    dependsOn: []
-    jobs:
-      - job: 'Build on Ubuntu'
-        pool:
-          vmImage: 'ubuntu-latest'
-        steps:
-          - task: UseDotNet@2
-            inputs:
-              version: '7.x'
-
-          - task: DotNetCoreCLI@2
-            inputs:
-              command: 'restore'
-
-          - task: DotNetCoreCLI@1
-            inputs:
-              command: 'build'
-              project: '$(solution)'
-              configuration: '$(buildConfiguration)'
-
-          - task: DotNetCoreCLI@2
-            inputs:
-              command: 'test'
-              project: '$(solution)'
-              configuration: '$(buildConfiguration)'
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
