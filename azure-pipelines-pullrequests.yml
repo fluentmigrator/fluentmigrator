@@ -21,15 +21,15 @@ variables:
 steps:
 - task: NuGetToolInstaller@1
 
-- task: UseDotNet@2
+- task: gitversion/setup@0
+  displayName: 'Install GitVersion (using GitTools 0.10.2.23031113 or later)'
   inputs:
-    version: '7.x'
-
-- task: UseGitVersion@5
-  displayName: 'UseGitVersion (preview)'
-  inputs:
-    versionSpec: '5.12.0'
+    versionSpec: '5.12'
     includePrerelease: true
+
+- task: gitversion/execute@0
+  displayName: 'Execute GitVersion (using GitTools 0.10.2.23031113 or later)'
+  inputs:
     updateAssemblyInfo: false
   env:
       BUILD_BUILDNUMBER: $(GitVersion.NuGetVersionV2)
