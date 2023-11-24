@@ -35,6 +35,8 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
     using FluentMigrator.Builders.Create.Sequence;
 
     [TestFixture]
+    [Category("Builder")]
+    [Category("RootCreate")]
     public class CreateExpressionRootTests
     {
         [Test]

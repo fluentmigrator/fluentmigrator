@@ -40,6 +40,7 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit
 {
     [TestFixture]
+    [Category("ConventionSet")]
     public class DefaultMigrationConventionsTests
     {
         private static readonly IMigrationRunnerConventions _default = DefaultMigrationRunnerConventions.Instance;

@@ -26,6 +26,7 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit
 {
     [TestFixture]
+    [Category("Exception")]
     public class VersionOrderInvalidExceptionTests
     {
         [Test]

@@ -29,7 +29,7 @@ namespace FluentMigrator.Runner.Generators.Generic
         protected abstract string GenerateTableDescription(
             string schemaName, string tableName, string tableDescription);
         protected abstract string GenerateColumnDescription(
-            string descriptionNme, string schemaName, string tableName, string columnName, string columnDescription);
+            string descriptionName, string schemaName, string tableName, string columnName, string columnDescription);
 
         public virtual IEnumerable<string> GenerateDescriptionStatements(Expressions.CreateTableExpression expression)
         {

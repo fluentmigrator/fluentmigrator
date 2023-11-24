@@ -29,6 +29,8 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Runners
 {
     [TestFixture]
+    [Category("Runner")]
+    [Category("Console")]
     public class MigratorConsoleTests
     {
         private const string Database = ProcessorId.SQLite;

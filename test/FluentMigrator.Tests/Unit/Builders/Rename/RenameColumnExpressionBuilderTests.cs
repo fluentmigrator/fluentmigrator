@@ -24,6 +24,8 @@ using NUnit.Framework;
 namespace FluentMigrator.Tests.Unit.Builders.Rename
 {
     [TestFixture]
+    [Category("Builder")]
+    [Category("RenameColumn")]
     public class RenameColumnExpressionBuilderTests
     {
         [Test]

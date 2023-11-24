@@ -30,6 +30,8 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Builders.Rename
 {
     [TestFixture]
+    [Category("Builder")]
+    [Category("RootRename")]
     public class RenameExpressionRootTests
     {
         [Test]

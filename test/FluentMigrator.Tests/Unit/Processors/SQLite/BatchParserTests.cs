@@ -41,10 +41,6 @@ namespace FluentMigrator.Tests.Unit.Processors.SQLite
             var mockedDbFactory = new Mock<SQLiteDbFactory>();
             mockedDbFactory.SetupGet(conn => conn.Factory).Returns(MockedDbProviderFactory.Object);
 
-            var mockedConnStringReader = new Mock<IConnectionStringReader>();
-            mockedConnStringReader.SetupGet(r => r.Priority).Returns(0);
-            mockedConnStringReader.Setup(r => r.GetConnectionString(It.IsAny<string>())).Returns("server=this");
-
             var serviceProvider = new ServiceCollection()
                 .AddLogging()
                 .AddSingleton<ILoggerProvider, TestLoggerProvider>()

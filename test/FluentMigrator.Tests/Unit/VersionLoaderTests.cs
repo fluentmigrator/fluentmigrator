@@ -35,6 +35,7 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit
 {
     [TestFixture]
+    [Category("Versioning")]
     public class VersionLoaderTests
     {
         [Test]

@@ -241,14 +241,6 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
             result.ShouldBe("ALTER TABLE `TestTable1` MODIFY COLUMN `TestColumn1` VARCHAR(20) NOT NULL COMMENT 'Description:TestColumn1Description'");
         }
 
-        public void CanAlterColumnWithDescriptionWithAdditionalDescriptions()
-        {
-            var expression = GeneratorTestHelper.GetAlterColumnExpressionWithDescriptionWithAdditionalDescriptions();
-
-            var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE `TestTable1` MODIFY COLUMN `TestColumn1` VARCHAR(20) NOT NULL COMMENT 'Description:TestColumn1Description'");
-        }
-
         [Test]
         public void CanCreateColumnWithDescription()
         {
@@ -256,6 +248,15 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
 
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE `TestTable1` ADD COLUMN `TestColumn1` VARCHAR(5) NOT NULL COMMENT 'Description:TestColumn1Description'");
+        }
+
+        [Test]
+        public void CanAlterColumnWithDescriptionWithAdditionalDescriptions()
+        {
+            var expression = GeneratorTestHelper.GetAlterColumnExpressionWithDescriptionWithAdditionalDescriptions();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE `TestTable1` MODIFY COLUMN `TestColumn1` VARCHAR(20) NOT NULL COMMENT 'Description:TestColumn1Description\r\nAdditionalColumnDescriptionKey1:AdditionalColumnDescriptionValue1'");
         }
 
         [Test]

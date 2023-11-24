@@ -16,8 +16,12 @@
 //
 #endregion
 
+using NUnit.Framework;
+
 namespace FluentMigrator.Tests.Unit.Generators
 {
+    [Category("Generator")]
+    [Category("Sequence")]
     public abstract class BaseSequenceTests
     {
         public abstract void CanCreateSequenceWithCustomSchema();

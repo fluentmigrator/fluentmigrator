@@ -28,6 +28,8 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Expressions
 {
     [TestFixture]
+    [Category("Expression")]
+    [Category("DeleteSequence")]
     public class DeleteSequenceExpressionTests
     {
         [Test]

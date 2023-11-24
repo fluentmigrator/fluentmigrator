@@ -27,6 +27,8 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Expressions
 {
     [TestFixture]
+    [Category("Expression")]
+    [Category("CreateSchema")]
     public class CreateSchemaExpressionTests
     {
         [Test]

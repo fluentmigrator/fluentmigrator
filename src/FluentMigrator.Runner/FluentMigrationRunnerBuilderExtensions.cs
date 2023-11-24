@@ -41,6 +41,7 @@ namespace FluentMigrator.Runner
                 .AddPostgres()
                 .AddPostgres92()
                 .AddRedshift()
+                .AddSnowflake()
                 .AddSQLite()
                 .AddSqlServer()
                 .AddSqlServer2000()
