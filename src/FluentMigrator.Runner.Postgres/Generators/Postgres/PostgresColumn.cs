@@ -71,7 +71,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
         private string FormatAlterType(ColumnDefinition column)
         {
             var collation = FormatCollation(column);
-            return $"TYPE {GetColumnType(column)} {collation}";
+            return $"TYPE {GetColumnType(column)}{(string.IsNullOrWhiteSpace(collation) ? string.Empty : " " + collation)}";
         }
 
         protected IList<Func<ColumnDefinition, string>> AlterClauseOrder { get; set; }
