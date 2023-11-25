@@ -111,7 +111,7 @@ namespace FluentMigrator.Runner.Initialization
         /// <summary>
         /// Gets or sets a value indicating whether untagged maintenance items should always be loaded/executed.
         /// </summary>
-        public bool IncludeUntaggedMaintenances { get; set; }
+        public bool IncludeUntaggedMaintenances { get; set; } = true;
 
         /// <summary>
         /// Gets or sets a value indicating whether untagged migrations should always be loaded/executed.

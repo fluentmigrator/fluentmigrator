@@ -38,9 +38,7 @@ namespace FluentMigrator.Example.Migrator
 #endif
                         .AddSQLite()
                         .WithGlobalConnectionString(dbConfig.ConnectionString)
-                // NOTE: For now, recommend using For.All() instead of .For.Migrations() if using Maintenance Migrations
-                // https://github.com/fluentmigrator/fluentmigrator/issues/1062#issuecomment-616598419
-                        .ScanIn(typeof(AddGTDTables).Assembly).For.All())
+                        .ScanIn(typeof(AddGTDTables).Assembly).For.Migrations())
                 .Configure<SelectingProcessorAccessorOptions>(
                     opt => opt.ProcessorId = dbConfig.ProcessorId)
                 .BuildServiceProvider();
