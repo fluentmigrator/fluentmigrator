@@ -172,13 +172,13 @@ namespace FluentMigrator.Builders.Alter.Table
         public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax WithColumnAdditionalDescription(string descriptionName, string description)
         {
             if (string.IsNullOrWhiteSpace(descriptionName))
-                throw new ArgumentException("Cannot be the empty string.", "descriptionName");
+                throw new ArgumentException(@"Cannot be a null or empty string.", nameof(descriptionName));
 
             if (description.Equals("Description"))
                 throw new InvalidOperationException("The given descriptionName is already used as a keyword to create a description, please choose another descriptionName.");
 
             if (string.IsNullOrWhiteSpace(description))
-                throw new ArgumentException("Cannot be the empty string.", "description");
+                throw new ArgumentException(@"Cannot be a null or empty string.", nameof(description));
 
             if (CurrentColumn.AdditionalColumnDescriptions.Keys.Count(i => i.Equals(descriptionName)) > 0)
                 throw new InvalidOperationException("The given descriptionName is already present in the columnDescription list.");
@@ -191,24 +191,25 @@ namespace FluentMigrator.Builders.Alter.Table
         public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax WithColumnAdditionalDescriptions(Dictionary<string, string> columnDescriptions)
         {
             if (columnDescriptions == null)
-                throw new ArgumentException("Cannot be null.", "columnDescriptions");
+                throw new ArgumentNullException(nameof(columnDescriptions));
 
             if (!columnDescriptions.Any())
-                throw new ArgumentException("Cannot be empty.", "columnDescriptions");
+                throw new ArgumentException(@"Cannot be empty.", nameof(columnDescriptions));
 
             if (CurrentColumn.AdditionalColumnDescriptions.Keys.Count(i => i.Equals("Description")) > 0)
                 throw new InvalidOperationException("The given descriptionName is already present in the columnDescription list.");
 
             var isPresent = false;
-            foreach (var newDescription in from newDescription in columnDescriptions
-                                           where !isPresent
-                                           select newDescription)
+            foreach (var newDescription in columnDescriptions)
             {
-                isPresent = CurrentColumn.AdditionalColumnDescriptions.Keys.Count(i => i.Equals(newDescription.Key)) > 0;
+                if (!isPresent)
+                {
+                    isPresent = CurrentColumn.AdditionalColumnDescriptions.Keys.Count(i => i.Equals(newDescription.Key)) > 0;
+                }
             }
 
             if (isPresent)
-                throw new ArgumentException("At least one of new keys provided is already present in the columnDescription list.", "description");
+                throw new ArgumentException(@"At least one of new keys provided is already present in the columnDescription list.", nameof(columnDescriptions));
 
             return this;
         }

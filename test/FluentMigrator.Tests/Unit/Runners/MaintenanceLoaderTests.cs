@@ -16,6 +16,8 @@
 //
 #endregion
 
+using System.Linq;
+
 using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Infrastructure;
@@ -71,12 +73,16 @@ namespace FluentMigrator.Tests.Unit.Runners
             _migrationConventions.Verify(x => x.GetMaintenanceStage, Times.AtLeastOnce());
             Assert.IsNotEmpty(migrationInfos);
 
+            CollectionAssert.AreEquivalent(new[]
+            {
+                typeof(MaintenanceBeforeEach),
+                typeof(MaintenanceBeforeEachNoTag),
+                typeof(MaintenanceBeforeEachWithNonTransactionBehavior)
+            }, migrationInfos.Select(mi => mi.Migration.GetType()));
+
             foreach (var migrationInfo in migrationInfos)
             {
                 migrationInfo.Migration.ShouldNotBeNull();
-
-                // The NoTag maintenance should not be found in the tagged maintenanceLoader because it wants tagged classes
-                Assert.AreNotSame(typeof(MaintenanceBeforeEachNoTag), migrationInfo.Migration.GetType());
 
                 var maintenanceAttribute = migrationInfo.Migration.GetType().GetOneAttribute<MaintenanceAttribute>();
                 maintenanceAttribute.ShouldNotBeNull();
@@ -92,15 +98,20 @@ namespace FluentMigrator.Tests.Unit.Runners
             _migrationConventions.Verify(x => x.TypeHasMatchingTags, Times.AtLeastOnce());
             Assert.IsNotEmpty(migrationInfos);
 
+            CollectionAssert.AreEquivalent(new[]
+            {
+                typeof(MaintenanceBeforeEach),
+                typeof(MaintenanceBeforeEachNoTag),
+                typeof(MaintenanceBeforeEachWithNonTransactionBehavior)
+            }, migrationInfos.Select(mi => mi.Migration.GetType()));
+
             foreach (var migrationInfo in migrationInfos)
             {
                 migrationInfo.Migration.ShouldNotBeNull();
 
-                // The NoTag maintenance should not be found in the tagged maintenanceLoader because it wants tagged classes
-                Assert.AreNotSame(typeof(MaintenanceBeforeEachNoTag), migrationInfo.Migration.GetType());
-
-                DefaultMigrationRunnerConventions.Instance.TypeHasMatchingTags(migrationInfo.Migration.GetType(), _tags)
-                    .ShouldBeTrue();
+                if (migrationInfo.Migration.GetType() != typeof(MaintenanceBeforeEachNoTag))
+                    DefaultMigrationRunnerConventions.Instance.TypeHasMatchingTags(migrationInfo.Migration.GetType(), _tags)
+                        .ShouldBeTrue();
             }
         }
 
