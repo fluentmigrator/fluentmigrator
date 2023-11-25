@@ -49,6 +49,8 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit
 {
     [TestFixture]
+    [Category("Runner")]
+    [Category("MigrationRunner")]
     public class MigrationRunnerTests
     {
         private Mock<IStopWatch> _stopWatch;
@@ -751,6 +753,15 @@ namespace FluentMigrator.Tests.Unit
             Assert.DoesNotThrow(() =>
                 runner.ApplyMigrationUp(
                     new MigrationInfo(7, TransactionBehavior.Default, true, new TestBreakingMigration()), true));
+        }
+
+        [Test]
+        public void TestLoadVersionInfoIfRequired()
+        {
+            var runner = CreateRunner();
+
+            runner.LoadVersionInfoIfRequired().ShouldBeTrue();
+            runner.LoadVersionInfoIfRequired().ShouldBeFalse();
         }
 
         [Test]

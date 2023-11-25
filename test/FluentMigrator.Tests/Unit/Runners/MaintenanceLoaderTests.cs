@@ -32,6 +32,7 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Runners
 {
     [TestFixture]
+    [Category("Maintenance")]
     public class MaintenanceLoaderTests
     {
         public const string Tag1 = "MaintenanceTestTag1";
@@ -84,6 +85,7 @@ namespace FluentMigrator.Tests.Unit.Runners
         }
 
         [Test]
+        [Category("Tagging")]
         public void LoadsMigrationsFilteredByTag()
         {
             var migrationInfos = _maintenanceLoader.LoadMaintenance(MigrationStage.BeforeEach);

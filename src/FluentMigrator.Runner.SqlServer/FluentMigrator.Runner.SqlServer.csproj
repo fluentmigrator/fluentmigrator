@@ -18,13 +18,13 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.SqlClient">
-      <Version>2.1.2</Version>
+      <Version>5.1.2</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="BatchParser" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Update="JetBrains.Annotations" Version="2023.2.0" />
+    <PackageReference Update="JetBrains.Annotations" Version="2023.3.0" />
   </ItemGroup>
 </Project>

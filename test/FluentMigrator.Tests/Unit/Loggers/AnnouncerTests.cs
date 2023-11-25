@@ -30,6 +30,7 @@ using NUnit.Framework;
 namespace FluentMigrator.Tests.Unit.Loggers
 {
     [TestFixture]
+    [Category("Logger")]
     public class AnnouncerTests
     {
         private ILoggerFactory _loggerFactory;

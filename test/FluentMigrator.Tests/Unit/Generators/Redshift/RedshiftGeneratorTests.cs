@@ -29,6 +29,7 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Generators.Redshift
 {
     [TestFixture]
+    [Category("Redshift")]
     public sealed class RedshiftGeneratorTests
     {
         private RedshiftGenerator _generator;

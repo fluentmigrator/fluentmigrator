@@ -21,6 +21,9 @@ using NUnit.Framework;
 namespace FluentMigrator.Tests.Unit.Generators.Firebird
 {
     [TestFixture]
+    [Category("Generator")]
+    [Category("Firebird")]
+    [Category("ProcessorOptions")]
     public class FirebirdOptionsTests
     {
         [TestCase("force quote=true", true)]

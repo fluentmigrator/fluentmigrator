@@ -32,6 +32,8 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Generators.SQLite
 {
     [TestFixture]
+    [Category("Generator")]
+    [Category("SQLite")]
     // ReSharper disable once InconsistentNaming
     public class SQLiteGeneratorTests
     {

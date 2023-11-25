@@ -26,6 +26,8 @@ using NUnit.Framework;
 namespace FluentMigrator.Tests.Unit.Builders.Delete
 {
     [TestFixture]
+    [Category("Builder")]
+    [Category("DeleteColumn")]
     public class DeleteColumnExpressionBuilderTests
     {
         [Test]

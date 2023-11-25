@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Postgres;
@@ -31,6 +32,8 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Generators.Postgres
 {
     [TestFixture]
+    [Category("Generator")]
+    [Category("Postgres")]
     public class PostgresGeneratorTests
     {
         protected PostgresGenerator Generator;
@@ -107,6 +110,17 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
 
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE \"public\".\"NewTable\" ADD \"NewColumn\" varchar(5) NOT NULL DEFAULT (now() at time zone 'UTC');");
+        }
+
+        [Test]
+        public void CanUseSystemMethodCurrentDateTimeOffsetAsADefaultValueForAColumn()
+        {
+            const string tableName = "NewTable";
+            var columnDefinition = new ColumnDefinition { Name = "NewColumn", Size = 5, Type = DbType.String, DefaultValue = SystemMethods.CurrentDateTimeOffset };
+            var expression = new CreateColumnExpression { Column = columnDefinition, TableName = tableName };
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE \"public\".\"NewTable\" ADD \"NewColumn\" varchar(5) NOT NULL DEFAULT current_timestamp;");
         }
 
         [Test]

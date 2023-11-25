@@ -32,6 +32,8 @@ namespace FluentMigrator.Tests.Unit.Expressions
 {
     [TestFixture]
     [Obsolete]
+    [Category("Expression")]
+    [Category("Execute")]
     public class ObsoleteExecuteEmbeddedSqlScriptExpressionTests
     {
         private const string TestSqlScript = "embeddedtestscript.sql";
