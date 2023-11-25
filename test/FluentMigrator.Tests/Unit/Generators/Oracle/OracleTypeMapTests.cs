@@ -138,7 +138,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         [Test]
         public void DecimalOfPrecisionIsNumberWithPrecision()
         {
-            _typeMap.GetTypeMap(DbType.Decimal, (int?)8, precision: 3).ShouldBe("NUMBER(8,3)");
+            _typeMap.GetTypeMap(DbType.Decimal, size: 8, precision: 3).ShouldBe("NUMBER(8,3)");
         }
 
         [Test]

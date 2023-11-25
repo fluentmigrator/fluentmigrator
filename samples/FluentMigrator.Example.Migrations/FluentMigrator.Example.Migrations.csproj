@@ -19,6 +19,6 @@
     <EmbeddedResource Include="**/*.sql" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Update="JetBrains.Annotations" Version="2023.2.0" />
+    <PackageReference Update="JetBrains.Annotations" Version="2023.3.0" />
   </ItemGroup>
 </Project>

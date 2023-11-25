@@ -32,6 +32,8 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Expressions
 {
     [TestFixture]
+    [Category("Expression")]
+    [Category("DeleteForeignKey")]
     public class DeleteForeignKeyExpressionTests
     {
         [Test]

@@ -28,6 +28,7 @@ using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.MySql;
 using FluentMigrator.Runner.Processors.Postgres;
+using FluentMigrator.Runner.Processors.Snowflake;
 using FluentMigrator.Runner.Processors.SQLite;
 using FluentMigrator.Runner.Processors.SqlServer;
 using FluentMigrator.Runner.Processors.Firebird;
@@ -62,6 +63,7 @@ namespace FluentMigrator.Tests.Integration
                 (typeof(FirebirdProcessor), () => IntegrationTestOptions.Firebird),
                 (typeof(PostgresProcessor), () => IntegrationTestOptions.Postgres),
                 (typeof(MySql4Processor), () => IntegrationTestOptions.MySql),
+                (typeof(SnowflakeProcessor), () => IntegrationTestOptions.Snowflake)
             };
         }
 
@@ -182,6 +184,7 @@ namespace FluentMigrator.Tests.Integration
                         .AddFirebird()
                         .AddMySql4()
                         .AddPostgres()
+                        .AddSnowflake()
                         .AddSQLite()
                         .AddSqlServer2005()
                         .AddSqlServer2008()
@@ -220,7 +223,7 @@ namespace FluentMigrator.Tests.Integration
             if (processorType == typeof(FirebirdProcessor) && _isFirstExecuteForFirebird)
             {
                 _isFirstExecuteForFirebird = false;
-                FbConnection.CreateDatabase(serverOptions.ConnectionString, true);
+                FbConnection.CreateDatabase(serverOptions.ConnectionString, overwrite: true);
             }
 
             using (serviceProvider)

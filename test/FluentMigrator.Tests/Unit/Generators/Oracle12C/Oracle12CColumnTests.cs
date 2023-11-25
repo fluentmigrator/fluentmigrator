@@ -42,6 +42,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle12C
         public override void CanCreateAutoIncrementColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetAlterColumnAddAutoIncrementExpression();
+
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE TestTable1 MODIFY TestColumn1 NUMBER(10,0) GENERATED ALWAYS AS IDENTITY ");
         }

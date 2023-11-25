@@ -28,6 +28,9 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Generators.MySql4
 {
     [TestFixture]
+    [Category("Generator")]
+    [Category("Quoter")]
+    [Category("MySql4")]
     public class MySql4QuoterTest
     {
         private IQuoter _quoter = default(MySqlQuoter);

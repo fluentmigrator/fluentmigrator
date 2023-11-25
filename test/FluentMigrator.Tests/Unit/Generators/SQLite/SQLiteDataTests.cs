@@ -25,6 +25,7 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Generators.SQLite
 {
     [TestFixture]
+    [Category("SQLite")]
     // ReSharper disable once InconsistentNaming
     public class SQLiteDataTests : BaseDataTests
     {

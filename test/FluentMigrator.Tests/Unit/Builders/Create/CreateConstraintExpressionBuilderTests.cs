@@ -32,6 +32,8 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Builders.Create
 {
     [TestFixture]
+    [Category("Builder")]
+    [Category("CreateConstraint")]
     public class CreateConstraintExpressionBuilderTests
     {
         private const string TableName = "Bacon";

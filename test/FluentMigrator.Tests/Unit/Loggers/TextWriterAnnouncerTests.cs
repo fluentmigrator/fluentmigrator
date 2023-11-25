@@ -31,6 +31,7 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Loggers
 {
     [TestFixture]
+    [Category("Logger")]
     public class TextWriterAnnouncerTests
     {
         private ILoggerFactory _loggerFactory;

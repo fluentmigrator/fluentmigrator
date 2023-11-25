@@ -86,9 +86,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{B3796E78
 		GitVersion.yml = GitVersion.yml
 		nuget-upload.sh = nuget-upload.sh
 		nuget.config = nuget.config
+		PackageTool.props = PackageTool.props
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentMigrator.Extensions.MySql", "src\FluentMigrator.Extensions.MySql\FluentMigrator.Extensions.MySql.csproj", "{7ECD5A00-B38A-4B51-89BD-B0ED46A41780}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FluentMigrator.Extensions.Snowflake", "src\FluentMigrator.Extensions.Snowflake\FluentMigrator.Extensions.Snowflake.csproj", "{AB31C367-EDA7-45C4-A1D3-44465D10F6ED}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FluentMigrator.Runner.Snowflake", "src\FluentMigrator.Runner.Snowflake\FluentMigrator.Runner.Snowflake.csproj", "{57F43057-E42B-4627-BB4D-09250FF4338B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -388,6 +393,30 @@ Global
 		{7ECD5A00-B38A-4B51-89BD-B0ED46A41780}.Release|x64.Build.0 = Release|Any CPU
 		{7ECD5A00-B38A-4B51-89BD-B0ED46A41780}.Release|x86.ActiveCfg = Release|Any CPU
 		{7ECD5A00-B38A-4B51-89BD-B0ED46A41780}.Release|x86.Build.0 = Release|Any CPU
+		{AB31C367-EDA7-45C4-A1D3-44465D10F6ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB31C367-EDA7-45C4-A1D3-44465D10F6ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB31C367-EDA7-45C4-A1D3-44465D10F6ED}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{AB31C367-EDA7-45C4-A1D3-44465D10F6ED}.Debug|x64.Build.0 = Debug|Any CPU
+		{AB31C367-EDA7-45C4-A1D3-44465D10F6ED}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{AB31C367-EDA7-45C4-A1D3-44465D10F6ED}.Debug|x86.Build.0 = Debug|Any CPU
+		{AB31C367-EDA7-45C4-A1D3-44465D10F6ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB31C367-EDA7-45C4-A1D3-44465D10F6ED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB31C367-EDA7-45C4-A1D3-44465D10F6ED}.Release|x64.ActiveCfg = Release|Any CPU
+		{AB31C367-EDA7-45C4-A1D3-44465D10F6ED}.Release|x64.Build.0 = Release|Any CPU
+		{AB31C367-EDA7-45C4-A1D3-44465D10F6ED}.Release|x86.ActiveCfg = Release|Any CPU
+		{AB31C367-EDA7-45C4-A1D3-44465D10F6ED}.Release|x86.Build.0 = Release|Any CPU
+		{57F43057-E42B-4627-BB4D-09250FF4338B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57F43057-E42B-4627-BB4D-09250FF4338B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57F43057-E42B-4627-BB4D-09250FF4338B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{57F43057-E42B-4627-BB4D-09250FF4338B}.Debug|x64.Build.0 = Debug|Any CPU
+		{57F43057-E42B-4627-BB4D-09250FF4338B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{57F43057-E42B-4627-BB4D-09250FF4338B}.Debug|x86.Build.0 = Debug|Any CPU
+		{57F43057-E42B-4627-BB4D-09250FF4338B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{57F43057-E42B-4627-BB4D-09250FF4338B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{57F43057-E42B-4627-BB4D-09250FF4338B}.Release|x64.ActiveCfg = Release|Any CPU
+		{57F43057-E42B-4627-BB4D-09250FF4338B}.Release|x64.Build.0 = Release|Any CPU
+		{57F43057-E42B-4627-BB4D-09250FF4338B}.Release|x86.ActiveCfg = Release|Any CPU
+		{57F43057-E42B-4627-BB4D-09250FF4338B}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -420,6 +449,8 @@ Global
 		{56103516-EDEA-494F-A3FA-0CCDB5348453} = {16DED0B3-1401-43AD-9402-3DC90918FFD7}
 		{68CA06A0-6BB8-464D-9D7C-2B09B4FAF768} = {16DED0B3-1401-43AD-9402-3DC90918FFD7}
 		{7ECD5A00-B38A-4B51-89BD-B0ED46A41780} = {16DED0B3-1401-43AD-9402-3DC90918FFD7}
+		{AB31C367-EDA7-45C4-A1D3-44465D10F6ED} = {16DED0B3-1401-43AD-9402-3DC90918FFD7}
+		{57F43057-E42B-4627-BB4D-09250FF4338B} = {BFDA3B73-2F8E-4AFF-A6EF-322B9FECD3D1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {722C9D0D-FAB6-4CCE-9A4A-56E24235A9E0}

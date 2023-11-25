@@ -98,7 +98,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                             csb.ClientLibrary = clientLibrary;
                             try
                             {
-                                FbConnection.CreateDatabase(csb.ConnectionString, true);
+                                FbConnection.CreateDatabase(csb.ConnectionString, overwrite: true);
                                 _clientLibrary = clientLibrary;
                                 _foundClientLibrary = true;
                                 return csb.ConnectionString;
@@ -117,7 +117,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             if (_clientLibrary != null)
             {
                 csb.ClientLibrary = _clientLibrary;
-                FbConnection.CreateDatabase(csb.ConnectionString, true);
+                FbConnection.CreateDatabase(csb.ConnectionString, overwrite: true);
                 return csb.ConnectionString;
             }
 

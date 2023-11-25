@@ -90,6 +90,8 @@ namespace FluentMigrator.Tests
 
         public static DatabaseServerOptions Hana => Environment.Is64BitProcess ? GetOptions(ProcessorId.Hana) : DatabaseServerOptions.Empty;
 
+        public static DatabaseServerOptions Snowflake => GetOptions("Snowflake");
+
         public class DatabaseServerOptions
         {
             private ISet<string> _supportedPlatforms;

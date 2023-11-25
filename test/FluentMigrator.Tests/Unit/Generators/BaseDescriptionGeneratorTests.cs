@@ -26,6 +26,8 @@ using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Generators
 {
+    [Category("Generator")]
+    [Category("Description")]
     public abstract class BaseDescriptionGeneratorTests
     {
         protected IDescriptionGenerator DescriptionGenerator { get; set; }
@@ -76,7 +78,7 @@ namespace FluentMigrator.Tests.Unit.Generators
         }
 
         [Test]
-        public void GenerateDescriptionStatementsHaveSingleStatementForDescriptionOnCreate()
+        public virtual void GenerateDescriptionStatementsHaveSingleStatementForDescriptionOnCreate()
         {
             var createTableExpression = GeneratorTestHelper.GetCreateTableWithTableDescription();
             var result = DescriptionGenerator.GenerateDescriptionStatements(createTableExpression);

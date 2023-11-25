@@ -566,6 +566,20 @@ namespace FluentMigrator.Runner
             return VersionLoader.VersionInfo.AppliedMigrations().Any();
         }
 
+        /// <inheritdoc />
+        public bool LoadVersionInfoIfRequired()
+        {
+            if (VersionLoader.AlreadyCreatedVersionTable && VersionLoader.AlreadyCreatedVersionSchema)
+            {
+                return false;
+            }
+            else
+            {
+                VersionLoader.LoadVersionInfo();
+                return true;
+            }
+        }
+
         /// <summary>
         /// Apply the migration using the given migration information
         /// </summary>

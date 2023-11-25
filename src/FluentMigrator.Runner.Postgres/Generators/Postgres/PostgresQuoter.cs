@@ -101,6 +101,8 @@ namespace FluentMigrator.Runner.Generators.Postgres
                     return "now()";
                 case SystemMethods.CurrentUTCDateTime:
                     return "(now() at time zone 'UTC')";
+                case SystemMethods.CurrentDateTimeOffset:
+                    return "current_timestamp";
                 case SystemMethods.CurrentUser:
                     return "current_user";
             }

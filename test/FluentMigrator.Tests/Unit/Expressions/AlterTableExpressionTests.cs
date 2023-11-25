@@ -28,6 +28,8 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Expressions
 {
     [TestFixture]
+    [Category("Expression")]
+    [Category("AlterTable")]
     public class AlterTableExpressionTests
     {
         [Test]

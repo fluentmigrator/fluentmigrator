@@ -27,6 +27,8 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Generators.MySql5
 {
     [TestFixture]
+    [Category("Generator")]
+    [Category("MySql5")]
     public class MySql5TableTests
     {
         protected MySql4Generator Generator;

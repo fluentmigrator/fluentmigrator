@@ -42,6 +42,7 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit
 {
     [TestFixture]
+    [Category("MigrationInfo")]
     public class DefaultMigrationInformationLoaderTests
     {
         [Test]

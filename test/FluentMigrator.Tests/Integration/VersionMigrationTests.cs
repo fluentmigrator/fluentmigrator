@@ -20,6 +20,7 @@ using FluentMigrator.Runner;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Runner.Processors.MySql;
+using FluentMigrator.Runner.Processors.Snowflake;
 using FluentMigrator.Runner.Processors.SQLite;
 using FluentMigrator.Runner.Versioning;
 using FluentMigrator.Runner.VersionTableInfo;
@@ -40,6 +41,7 @@ namespace FluentMigrator.Tests.Integration
     [Category("MySql")]
     [Category("SQLite")]
     [Category("Postgres")]
+    [Category("Snowflake")]
     [Category("SqlServer2005")]
     [Category("SqlServer2008")]
     [Category("SqlServer2012")]

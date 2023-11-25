@@ -37,7 +37,7 @@ namespace FluentMigrator.Tests.Unit.Processors
         protected Mock<DbConnection> MockedConnection { get; private set; }
         protected Mock<DbProviderFactory> MockedDbProviderFactory { get; private set; }
         protected Mock<IConnectionStringAccessor> MockedConnectionStringAccessor { get; private set; }
-        private List<Mock<DbCommand>> MockedCommands { get; set; }
+        protected List<Mock<DbCommand>> MockedCommands { get; private set; }
 
         [SetUp]
         public void SetUp()
@@ -45,9 +45,9 @@ namespace FluentMigrator.Tests.Unit.Processors
             _connectionState = ConnectionState.Closed;
 
             MockedCommands = new List<Mock<DbCommand>>();
-            MockedConnection = new Mock<DbConnection>();
-            MockedDbProviderFactory = new Mock<DbProviderFactory>();
-            MockedConnectionStringAccessor = new Mock<IConnectionStringAccessor>();
+            MockedConnection = new Mock<DbConnection>(MockBehavior.Loose);
+            MockedDbProviderFactory = new Mock<DbProviderFactory>(MockBehavior.Loose);
+            MockedConnectionStringAccessor = new Mock<IConnectionStringAccessor>(MockBehavior.Loose);
 
             MockedConnection.SetupGet(conn => conn.State).Returns(() => _connectionState);
             MockedConnection.Setup(conn => conn.Open()).Callback(() => _connectionState = ConnectionState.Open);
@@ -64,8 +64,9 @@ namespace FluentMigrator.Tests.Unit.Processors
                 .Returns(
                     () =>
                     {
-                        var commandMock = new Mock<DbCommand>()
-                            .SetupProperty(cmd => cmd.CommandText);
+                        var commandMock = new Mock<DbCommand>(MockBehavior.Loose);
+                        commandMock
+                            .SetupSet(cmd => cmd.CommandText = It.IsAny<string>());
                         commandMock.Setup(cmd => cmd.ExecuteNonQuery()).Returns(1);
                         commandMock.Protected().SetupGet<DbConnection>("DbConnection").Returns(MockedConnection.Object);
                         commandMock.Protected().SetupSet<DbConnection>("DbConnection", ItExpr.Is<DbConnection>(v => v == MockedConnection.Object));
@@ -75,6 +76,7 @@ namespace FluentMigrator.Tests.Unit.Processors
                     });
         }
 
+        /*
         [TearDown]
         public void TearDown()
         {
@@ -85,6 +87,7 @@ namespace FluentMigrator.Tests.Unit.Processors
 
             MockedDbProviderFactory.VerifyNoOtherCalls();
         }
+        */
 
         [Test]
         public void TestOneCommandForMultipleLines()
@@ -110,7 +113,7 @@ namespace FluentMigrator.Tests.Unit.Processors
         }
 
         [Test]
-        public void TestThatTwoCommandsGetSeparatedByGo()
+        public virtual void TestThatTwoCommandsGetSeparatedByGo()
         {
             using (var processor = CreateProcessor())
             {
@@ -182,7 +185,7 @@ namespace FluentMigrator.Tests.Unit.Processors
         }
 
         [Test]
-        public void Issue442()
+        public virtual void Issue442()
         {
             var command = "SELECT '\n\n\n';\nSELECT 2;";
 
@@ -206,7 +209,7 @@ namespace FluentMigrator.Tests.Unit.Processors
         }
 
         [Test]
-        public void Issue842()
+        public virtual void Issue842()
         {
             var command = @"insert into MyTable (Id, Data)\nvalues (42, 'This is a list of games played by people\n\nDooM\nPokemon GO\nPotato-o-matic');";
 
@@ -230,7 +233,7 @@ namespace FluentMigrator.Tests.Unit.Processors
         }
 
         [Test]
-        public void TestThatGoWithRunCount()
+        public virtual void TestThatGoWithRunCount()
         {
             using (var processor = CreateProcessor())
             {

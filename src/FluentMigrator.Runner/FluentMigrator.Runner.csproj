@@ -10,13 +10,15 @@
     <ProjectReference Include="..\FluentMigrator.Runner.Core\FluentMigrator.Runner.Core.csproj" />
     <ProjectReference Include="..\FluentMigrator.Runner.Db2\FluentMigrator.Runner.Db2.csproj" />
     <ProjectReference Include="..\FluentMigrator.Runner.Firebird\FluentMigrator.Runner.Firebird.csproj" />
+    <ProjectReference Include="..\FluentMigrator.Runner.Hana\FluentMigrator.Runner.Hana.csproj" />
     <ProjectReference Include="..\FluentMigrator.Runner.MySql\FluentMigrator.Runner.MySql.csproj" />
     <ProjectReference Include="..\FluentMigrator.Runner.Oracle\FluentMigrator.Runner.Oracle.csproj" />
     <ProjectReference Include="..\FluentMigrator.Runner.Postgres\FluentMigrator.Runner.Postgres.csproj" />
     <ProjectReference Include="..\FluentMigrator.Runner.Redshift\FluentMigrator.Runner.Redshift.csproj" />
+    <ProjectReference Include="..\FluentMigrator.Runner.Core\FluentMigrator.Runner.Core.csproj" />
+    <ProjectReference Include="..\FluentMigrator.Runner.Snowflake\FluentMigrator.Runner.Snowflake.csproj" />
     <ProjectReference Include="..\FluentMigrator.Runner.SQLite\FluentMigrator.Runner.SQLite.csproj" />
     <ProjectReference Include="..\FluentMigrator.Runner.SqlServer\FluentMigrator.Runner.SqlServer.csproj" />
-    <ProjectReference Include="..\FluentMigrator.Runner.Hana\FluentMigrator.Runner.Hana.csproj" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net48' ">
     <ProjectReference Include="..\FluentMigrator.Runner.Jet\FluentMigrator.Runner.Jet.csproj" />
@@ -25,9 +27,9 @@
     <None Include="..\..\FluentMigrator.snk" Link="FluentMigrator.snk" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="2.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Update="JetBrains.Annotations" Version="2023.2.0" />
+    <PackageReference Update="JetBrains.Annotations" Version="2023.3.0" />
   </ItemGroup>
 </Project>

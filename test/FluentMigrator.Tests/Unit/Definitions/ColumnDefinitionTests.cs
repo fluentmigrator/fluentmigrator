@@ -29,6 +29,8 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Definitions
 {
     [TestFixture]
+    [Category("Definition")]
+    [Category("Column")]
     public class ColumnDefinitionTests
     {
         [Test]

@@ -25,6 +25,7 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit
 {
     [TestFixture]
+    [Category("StopWatch")]
     public class StopWatchTests
     {
         [Test]

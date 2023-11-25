@@ -34,6 +34,8 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Expressions
 {
     [TestFixture]
+    [Category("Expression")]
+    [Category("ExecuteSqlScript")]
     public class ExecuteSqlScriptExpressionTests
     {
         private string testSqlScript = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "testscript.sql");

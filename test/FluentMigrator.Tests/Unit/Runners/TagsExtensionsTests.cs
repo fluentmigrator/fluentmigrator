@@ -25,6 +25,8 @@ using NUnit.Framework;
 namespace FluentMigrator.Tests.Unit.Runners
 {
     [TestFixture]
+    [Category("Runner")]
+    [Category("Tagging")]
     public class TagsExtensionsTests
     {
         [Test]

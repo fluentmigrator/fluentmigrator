@@ -27,6 +27,8 @@ using NUnit.Framework;
 namespace FluentMigrator.Tests.Unit.Builders.Delete
 {
     [TestFixture]
+    [Category("Builder")]
+    [Category("DeleteForeignKey")]
     public class DeleteForeignKeyExpressionBuilderTests
     {
         [Test]

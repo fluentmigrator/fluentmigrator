@@ -32,8 +32,9 @@ using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Expressions
 {
-
     [TestFixture]
+    [Category("Expression")]
+    [Category("ExecuteEmbeddedSqlScript")]
     public class ExecuteEmbeddedSqlScriptExpressionTests
     {
         private const string TestSqlScript = "embeddedtestscript.sql";

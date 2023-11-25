@@ -116,17 +116,17 @@ namespace FluentMigrator.Runner.Processors
 
         public DataSet ReadTableData(string schemaName, string tableName)
         {
-            throw new NotImplementedException("Method is not supported by the connectionless processor");
+            throw new NotImplementedException($"Method {nameof(ReadTableData)} is not supported by the connectionless processor");
         }
 
         public DataSet Read(string template, params object[] args)
         {
-            throw new NotImplementedException("Method is not supported by the connectionless processor");
+            throw new NotImplementedException($"Method {nameof(Read)} is not supported by the connectionless processor");
         }
 
         public bool Exists(string template, params object[] args)
         {
-            throw new NotImplementedException("Method is not supported by the connectionless processor");
+            throw new NotImplementedException($"Method {nameof(Exists)} is not supported by the connectionless processor");
         }
 
         public void BeginTransaction()
@@ -276,37 +276,37 @@ namespace FluentMigrator.Runner.Processors
 
         public bool SchemaExists(string schemaName)
         {
-            throw new NotImplementedException("Method is not supported by the connectionless processor");
+            throw new NotImplementedException($"Method {nameof(SchemaExists)} is not supported by the connectionless processor");
         }
 
         public bool TableExists(string schemaName, string tableName)
         {
-            throw new NotImplementedException("Method is not supported by the connectionless processor");
+            throw new NotImplementedException($"Method {nameof(TableExists)} is not supported by the connectionless processor");
         }
 
         public bool ColumnExists(string schemaName, string tableName, string columnName)
         {
-            throw new NotImplementedException("Method is not supported by the connectionless processor");
+            throw new NotImplementedException($"Method {nameof(ColumnExists)} is not supported by the connectionless processor");
         }
 
         public bool ConstraintExists(string schemaName, string tableName, string constraintName)
         {
-            throw new NotImplementedException("Method is not supported by the connectionless processor");
+            throw new NotImplementedException($"Method {nameof(ConstraintExists)} is not supported by the connectionless processor");
         }
 
         public bool IndexExists(string schemaName, string tableName, string indexName)
         {
-            throw new NotImplementedException("Method is not supported by the connectionless processor");
+            throw new NotImplementedException($"Method {nameof(IndexExists)} is not supported by the connectionless processor");
         }
 
         public bool SequenceExists(string schemaName, string sequenceName)
         {
-            throw new NotImplementedException("Method is not supported by the connectionless processor");
+            throw new NotImplementedException($"Method {nameof(SequenceExists)} is not supported by the connectionless processor");
         }
 
         public bool DefaultValueExists(string schemaName, string tableName, string columnName, object defaultValue)
         {
-            throw new NotImplementedException("Method is not supported by the connectionless processor");
+            throw new NotImplementedException($"Method {nameof(DefaultValueExists)} is not supported by the connectionless processor");
         }
 
 #pragma warning disable 618

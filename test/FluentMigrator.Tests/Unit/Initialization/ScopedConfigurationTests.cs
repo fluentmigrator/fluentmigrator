@@ -253,6 +253,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
                     ConnectionStrings = new Dictionary<string, string>
                     {
                         ["SQLite"] = "Data Source=:memory:",
+                        ["SQLServer"] = "Data Source=test.db",
                     }
                 };
 
@@ -285,8 +286,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
                     EnsureReloadedConfiguration(config,
                         () =>
                         {
-                            customConfig.ConnectionStrings.Remove("SQLite");
-                            customConfig.ConnectionStrings.Add("SQLite", "Data Source=test.db");
+                            customConfig.ProcessorSelectorOptions.ProcessorId = "SQLServer";
                             SaveConfigFile(jsonFileName, customConfig);
                         });
 

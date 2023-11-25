@@ -30,6 +30,8 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Builders.Alter
 {
     [TestFixture]
+    [Category("Builder")]
+    [Category("RootAlter")]
     public class AlterExpressionRootTests
     {
         [Test]

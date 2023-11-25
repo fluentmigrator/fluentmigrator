@@ -25,6 +25,9 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
 {
     [TestFixture]
+    [Category("Generator")]
+    [Category("SqlServer2008")]
+    [Category("Constraint")]
     public class SqlServer2008ConstraintsTests
     {
         protected SqlServer2008Generator Generator;

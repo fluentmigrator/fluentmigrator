@@ -246,6 +246,7 @@ namespace FluentMigrator.MSBuild
                         .AddPostgres()
                         .AddPostgres92()
                         .AddRedshift()
+                        .AddSnowflake()
                         .AddSQLite()
                         .AddSqlServer()
                         .AddSqlServer2000()
@@ -254,6 +255,7 @@ namespace FluentMigrator.MSBuild
                         .AddSqlServer2012()
                         .AddSqlServer2014()
                         .AddSqlServer2016()
+                    
                         );
             return services;
         }
