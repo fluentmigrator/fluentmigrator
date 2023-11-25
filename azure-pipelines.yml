@@ -30,6 +30,10 @@ variables:
 steps:
 - task: NuGetToolInstaller@1
 
+- task: UseDotNet@2
+  inputs:
+    version: '7.x'
+
 - task: gitversion/setup@0
   displayName: 'Install GitVersion (using GitTools 0.10.2.23031113 or later)'
   inputs:
@@ -99,7 +103,7 @@ steps:
 
 - script: nuget.exe pack $(Build.ArtifactStagingDirectory)/publish/FluentMigrator.Console.nuspec -NonInteractive -OutputDirectory $(Build.ArtifactStagingDirectory) -version $(build.buildNumber)
   displayName: NuGet pack FluentMigrator.Console
-  
+
 - script: nuget.exe pack $(Build.ArtifactStagingDirectory)/publish/FluentMigrator.Tools.nuspec -NonInteractive -OutputDirectory $(Build.ArtifactStagingDirectory) -version $(build.buildNumber)
   displayName: NuGet pack FluentMigrator.Tools
 
