@@ -38,7 +38,6 @@ namespace FluentMigrator.DotNet.Cli
         {
             var serviceCollection = new ServiceCollection();
             var serviceProvider = ConfigureServices(serviceCollection, options, console);
-            Configure(serviceProvider.GetRequiredService<ILoggerFactory>());
             return serviceProvider;
         }
 
@@ -51,7 +50,11 @@ namespace FluentMigrator.DotNet.Cli
 
             var mapper = ConfigureMapper();
             services
-                .AddLogging(lb => lb.AddFluentMigratorConsole())
+                .AddLogging(lb =>
+                {
+                    lb.AddFluentMigratorConsole();
+                    lb.AddDebug();
+                })
                 .AddOptions()
                 .AddSingleton(mapper);
 
@@ -153,12 +156,6 @@ namespace FluentMigrator.DotNet.Cli
                 .AddSingleton(console);
 
             return services.BuildServiceProvider();
-        }
-
-        private static void Configure(ILoggerFactory loggerFactory)
-        {
-            loggerFactory
-                .AddDebug(LogLevel.Trace);
         }
 
         private static IMapper ConfigureMapper()

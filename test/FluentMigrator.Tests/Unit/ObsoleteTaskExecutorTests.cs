@@ -32,9 +32,6 @@ namespace FluentMigrator.Tests.Unit
 
             var processor = new Mock<IMigrationProcessor>();
             const string profile = "Debug";
-            var dataSet = new DataSet();
-            dataSet.Tables.Add(new DataTable());
-            processor.Setup(x => x.ReadTableData(null, It.IsAny<string>())).Returns(dataSet);
 
             _migrationRunner.SetupGet(x => x.Processor).Returns(processor.Object);
 

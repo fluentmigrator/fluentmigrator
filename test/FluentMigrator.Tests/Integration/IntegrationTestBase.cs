@@ -223,7 +223,7 @@ namespace FluentMigrator.Tests.Integration
             if (processorType == typeof(FirebirdProcessor) && _isFirstExecuteForFirebird)
             {
                 _isFirstExecuteForFirebird = false;
-                FbConnection.CreateDatabase(serverOptions.ConnectionString, true);
+                FbConnection.CreateDatabase(serverOptions.ConnectionString, overwrite: true);
             }
 
             using (serviceProvider)

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net48;netstandard2.0</TargetFrameworks>
     <RootNamespace>FluentMigrator.Runner</RootNamespace>
@@ -14,5 +14,8 @@
   <ItemGroup>
     <ProjectReference Include="..\FluentMigrator.Extensions.Snowflake\FluentMigrator.Extensions.Snowflake.csproj" />
     <ProjectReference Include="..\FluentMigrator.Runner.Core\FluentMigrator.Runner.Core.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Update="JetBrains.Annotations" Version="2023.3.0" />
   </ItemGroup>
 </Project>
