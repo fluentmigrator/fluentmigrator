@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
     <SignAssembly>true</SignAssembly>
@@ -26,7 +26,7 @@
     <PackageReference Include="Moq" Version="4.20.69" />
     <PackageReference Include="MySql.Data" Version="8.2.0" />
     <PackageReference Include="Npgsql" Version="8.0.0" />
-    <PackageReference Include="NUnit" Version="3.14.0" />
+    <PackageReference Include="NUnit" Version="4.0.0" />
     <PackageReference Include="NUnit.Console" Version="3.16.3" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
     <PackageReference Include="Shouldly" Version="4.2.1" />
