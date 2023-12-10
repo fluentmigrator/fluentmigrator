@@ -17,8 +17,10 @@
 #endregion
 
 using System;
+using System.Data;
 
 using FluentMigrator.Infrastructure;
+using FluentMigrator.Model;
 
 namespace FluentMigrator.Builders
 {
@@ -253,5 +255,13 @@ namespace FluentMigrator.Builders
         /// <param name="customType">The custom type as SQL identifier</param>
         /// <returns>The next step</returns>
         TNext AsCustom(string customType);
+
+        /// <summary>
+        /// Defines the column using column data type metadata.
+        /// </summary>
+        /// <remarks>Useful for clients using code generation.</remarks>
+        /// <param name="columnDataType">The column data type metadata. See <seealso cref="ColumnDataType"/> for concrete type parameter.</param>
+        /// <returns>The next step</returns>
+        TNext AsColumnDataType(IColumnDataType columnDataType);
     }
 }

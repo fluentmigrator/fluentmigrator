@@ -30,6 +30,7 @@ namespace FluentMigrator.Model
     /// </summary>
     public class ColumnDefinition
         : ICloneable,
+          IColumnDataType,
 #pragma warning disable 618
           ICanBeValidated,
 #pragma warning restore 618

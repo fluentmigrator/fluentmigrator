@@ -248,6 +248,46 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
         }
 
         [Test]
+        public void CallingAsColumnDataTypeWithNonNullCustomTypeSetsTypeToNullAndSetsCustomType()
+        {
+            VerifyColumnProperty(c => c.Type = null, b => b.AsColumnDataType(new ColumnDataType { CustomType = "Test" }));
+            VerifyColumnProperty(c => c.CustomType = "Test", b => b.AsColumnDataType(new ColumnDataType { CustomType = "Test" }));
+        }
+
+        [Test]
+        public void CallingAsColumnDataTypeSetsOnlyProvidedValue()
+        {
+            // Only provide Type
+            Action<AlterTableExpressionBuilder> provideType = b => b.AsColumnDataType(new ColumnDataType { Type = DbType.Boolean });
+            VerifyColumnProperty(c => c.CustomType = null, provideType);
+            VerifyColumnProperty(c => c.Type = DbType.Boolean, provideType);
+            VerifyColumnProperty(c => c.CollationName = null, provideType);
+            VerifyColumnProperty(c => c.Size = null, provideType);
+            VerifyColumnProperty(c => c.Precision = null, provideType);
+            // Provide type and size
+            Action<AlterTableExpressionBuilder> provideTypeSize = b => b.AsColumnDataType(new ColumnDataType { Type = DbType.String, Size = 50 });
+            VerifyColumnProperty(c => c.CustomType = null, provideTypeSize);
+            VerifyColumnProperty(c => c.Type = DbType.String, provideTypeSize);
+            VerifyColumnProperty(c => c.CollationName = null, provideTypeSize);
+            VerifyColumnProperty(c => c.Size = 50, provideTypeSize);
+            VerifyColumnProperty(c => c.Precision = null, provideTypeSize);
+            // Provide type and size with collation
+            Action<AlterTableExpressionBuilder> provideTypeSizeCollation = b => b.AsColumnDataType(new ColumnDataType { Type = DbType.AnsiString, Size = 50, CollationName = "test" });
+            VerifyColumnProperty(c => c.CustomType = null, provideTypeSizeCollation);
+            VerifyColumnProperty(c => c.Type = DbType.AnsiString, provideTypeSizeCollation);
+            VerifyColumnProperty(c => c.CollationName = "test", provideTypeSizeCollation);
+            VerifyColumnProperty(c => c.Size = 50, provideTypeSizeCollation);
+            VerifyColumnProperty(c => c.Precision = null, provideTypeSizeCollation);
+            // Provide type and size/precision
+            Action<AlterTableExpressionBuilder> provideTypeSizePrecision = b => b.AsColumnDataType(new ColumnDataType { Type = DbType.Decimal, Size = 28, Precision = 10 });
+            VerifyColumnProperty(c => c.CustomType = null, provideTypeSizePrecision);
+            VerifyColumnProperty(c => c.Type = DbType.Decimal, provideTypeSizePrecision);
+            VerifyColumnProperty(c => c.CollationName = null, provideTypeSizePrecision);
+            VerifyColumnProperty(c => c.Size = 28, provideTypeSizePrecision);
+            VerifyColumnProperty(c => c.Precision = 10, provideTypeSizePrecision);
+        }
+
+        [Test]
         public void CallingWithDefaultValueSetsDefaultValue()
         {
             const int value = 42;
