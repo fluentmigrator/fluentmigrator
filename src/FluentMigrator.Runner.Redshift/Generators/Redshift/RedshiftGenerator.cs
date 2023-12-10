@@ -117,7 +117,7 @@ namespace FluentMigrator.Runner.Generators.Redshift
 
         public override string Generate(DeleteTableExpression expression)
         {
-            return string.Format("DROP TABLE {0};", Quoter.QuoteTableName(expression.TableName, expression.SchemaName));
+            return $"DROP TABLE{(expression.IfExists ? " IF EXISTS" : "")} {Quoter.QuoteTableName(expression.TableName, expression.SchemaName)};";
         }
 
         public override string Generate(DeleteColumnExpression expression)

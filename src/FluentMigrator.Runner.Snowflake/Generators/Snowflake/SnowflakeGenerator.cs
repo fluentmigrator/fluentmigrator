@@ -74,6 +74,11 @@ namespace FluentMigrator.Runner.Generators.Snowflake
             return string.Format(DropSchema, Quoter.QuoteSchemaName(expression.SchemaName));
         }
 
+        public override string Generate(DeleteTableExpression expression)
+        {
+            return $"DROP TABLE{(expression.IfExists ? " IF EXISTS" : "")} {Quoter.QuoteTableName(expression.TableName, expression.SchemaName)};";
+        }
+
         /// <inheritdoc />
         public override string Generate(AlterColumnExpression expression)
         {

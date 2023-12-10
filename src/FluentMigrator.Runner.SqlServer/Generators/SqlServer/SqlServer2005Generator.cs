@@ -148,6 +148,17 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             return descriptionStatement;
         }
 
+        public override string Generate(DeleteTableExpression expression)
+        {
+            if (expression.IfExists)
+            {
+                return string.Format("IF OBJECT_ID('{0}','U') IS NOT NULL DROP TABLE {0}", Quoter.QuoteTableName(expression.TableName, expression.SchemaName));
+
+            }
+
+            return $"DROP TABLE {Quoter.QuoteTableName(expression.TableName, expression.SchemaName)}";
+        }
+
         public override string Generate(CreateColumnExpression expression)
         {
             var alterTableStatement = base.Generate(expression);

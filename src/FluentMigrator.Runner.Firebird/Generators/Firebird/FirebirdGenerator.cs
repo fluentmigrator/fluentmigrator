@@ -175,6 +175,10 @@ namespace FluentMigrator.Runner.Generators.Firebird
         public override string Generate(DeleteTableExpression expression)
         {
             Truncator.Truncate(expression);
+            if (expression.IfExists)
+            {
+                return string.Format("IF( EXISTS( SELECT 1 FROM RDB$RELATIONS WHERE (rdb$flags IS NOT NULL) AND LOWER(RDB$RELATION_NAME) = LOWER('{0}'))) THEN EXECUTE STATEMENT 'DROP TABLE {0}')", expression.TableName);
+            }
             return base.Generate(expression);
         }
 

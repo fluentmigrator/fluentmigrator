@@ -44,6 +44,15 @@ namespace FluentMigrator.Runner.Generators.Jet
             return CompatibilityMode.HandleCompatibilty("Altering of default constraints is not supported for Jet");
         }
 
+        public override string Generate(DeleteTableExpression expression)
+        {
+            if (expression.IfExists)
+            {
+                return compatabilityMode.HandleCompatabilty("If Exists logic is not supported for Jet");
+            }
+            return base.Generate(expression);
+        }
+
         public override string Generate(CreateSequenceExpression expression)
         {
             return CompatibilityMode.HandleCompatibilty("Sequences are not supported for Jet");

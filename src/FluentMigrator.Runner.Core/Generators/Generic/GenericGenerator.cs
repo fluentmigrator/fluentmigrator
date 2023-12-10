@@ -40,6 +40,7 @@ namespace FluentMigrator.Runner.Generators.Generic
 
         public virtual string CreateTable { get { return "CREATE TABLE {0} ({1})"; } }
         public virtual string DropTable { get { return "DROP TABLE {0}"; } }
+        public virtual string DropTableIfExists { get { return "DROP TABLE IF EXISTS {0}"; } }
 
         public virtual string AddColumn { get { return "ALTER TABLE {0} ADD COLUMN {1}"; } }
         public virtual string DropColumn { get { return "ALTER TABLE {0} DROP COLUMN {1}"; } }
@@ -103,6 +104,10 @@ namespace FluentMigrator.Runner.Generators.Generic
 
         public override string Generate(DeleteTableExpression expression)
         {
+            if (expression.IfExists)
+            {
+                return String.Format(DropTableIfExists, Quoter.QuoteTableName(expression.TableName));
+            }
             return string.Format(DropTable, Quoter.QuoteTableName(expression.TableName, expression.SchemaName));
         }
 

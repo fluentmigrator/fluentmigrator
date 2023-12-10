@@ -1,4 +1,4 @@
-﻿using FluentMigrator.Runner.Generators.Firebird;
+using FluentMigrator.Runner.Generators.Firebird;
 using FluentMigrator.Runner.Processors.Firebird;
 using NUnit.Framework;
 
@@ -235,6 +235,15 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
 
             var result = Generator.Generate(expression);
             result.ShouldBe("DROP TABLE TestTable1");
+        }
+
+        [Test]
+        public override void CanDropTableIfExistsWithDefaultSchema()
+        {
+            var expression = GeneratorTestHelper.GetDeleteTableIfExistsExpression();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("IF( EXISTS( SELECT 1 FROM RDB$RELATIONS WHERE (rdb$flags IS NOT NULL) AND LOWER(RDB$RELATION_NAME) = LOWER('TestTable1'))) THEN EXECUTE STATEMENT 'DROP TABLE TestTable1')");
         }
 
         [Test]

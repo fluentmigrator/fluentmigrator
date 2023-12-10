@@ -179,7 +179,17 @@ namespace FluentMigrator.Runner.Generators.DB2
 
         public override string Generate(Expressions.DeleteTableExpression expression)
         {
-            return string.Format("DROP TABLE {0}", Quoter.QuoteTableName(expression.TableName, expression.SchemaName));
+            if (expression.IfExists)
+            {
+                if (expression.SchemaName == null)
+                {
+                    return CompatibilityMode.HandleCompatibilty("Db2 needs schema name to safely handle if exists");
+                }
+                return
+                    $"IF( EXISTS(SELECT 1 FROM SYSCAT.TABLES WHERE TABSCHEMA = '{Quoter.QuoteSchemaName(expression.SchemaName)}' AND TABNAME = '{Quoter.QuoteTableName(expression.TableName)}')) THEN DROP TABLE {Quoter.QuoteTableName(expression.TableName, expression.SchemaName)} END IF";
+            }
+
+            return $"DROP TABLE {Quoter.QuoteTableName(expression.TableName, expression.SchemaName)}";
         }
 
         public override string Generate(Expressions.DeleteIndexExpression expression)

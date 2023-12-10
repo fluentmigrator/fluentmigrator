@@ -303,6 +303,15 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         }
 
         [Test]
+        public override void CanDropTableIfExistsWithDefaultSchema()
+        {
+            var expression = GeneratorTestHelper.GetDeleteTableIfExistsExpression();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("DROP TABLE IF EXISTS \"TestTable1\"");
+        }
+
+        [Test]
         public override void CanRenameTableWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetRenameTableExpression();

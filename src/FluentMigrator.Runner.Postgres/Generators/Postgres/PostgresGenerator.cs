@@ -453,6 +453,12 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return string.Format("DROP INDEX {0};", indexName);
         }
 
+        public override string Generate(DeleteTableExpression expression)
+        {
+            return
+                $"DROP TABLE{(expression.IfExists ? " IF EXISTS" : "")} {Quoter.QuoteTableName(expression.TableName, expression.SchemaName)};";
+        }
+
         public override string Generate(RenameTableExpression expression)
         {
             return string.Format("ALTER TABLE {0} RENAME TO {1};", Quoter.QuoteTableName(expression.OldName, expression.SchemaName), Quoter.Quote(expression.NewName));

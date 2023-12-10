@@ -36,6 +36,11 @@ namespace FluentMigrator.Expressions
         [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.TableNameCannotBeNullOrEmpty))]
         public virtual string TableName { get; set; }
 
+        /// <summary>
+        /// Specifies the command should only be applied if the object exists.
+        /// </summary>
+        public virtual bool IfExists { get; set; }
+
         /// <inheritdoc />
         public override void ExecuteWith(IMigrationProcessor processor)
         {

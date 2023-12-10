@@ -715,6 +715,11 @@ namespace FluentMigrator.Tests.Unit.Generators
             return new DeleteTableExpression { TableName = TestTableName1 };
         }
 
+        public static DeleteTableExpression GetDeleteTableIfExistsExpression()
+        {
+            return new DeleteTableExpression { TableName = TestTableName1, IfExists = true };
+        }
+
         public static DeleteColumnExpression GetDeleteColumnExpression()
         {
             return GetDeleteColumnExpression(new[] { TestColumnName1 });

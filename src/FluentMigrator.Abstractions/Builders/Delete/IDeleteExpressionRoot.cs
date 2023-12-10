@@ -41,7 +41,7 @@ namespace FluentMigrator.Builders.Delete
         /// </summary>
         /// <param name="tableName">The table name</param>
         /// <returns>The next step</returns>
-        IInSchemaSyntax Table(string tableName);
+        IIfExistsOrInSchemaSyntax Table(string tableName);
 
         /// <summary>
         /// Specify the column to delete

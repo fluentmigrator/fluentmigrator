@@ -296,7 +296,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             expression.SchemaName = TestSchema;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe($@"DROP TABLE ""{TestSchema}"".""TestTable1""", _quotingEnabled);
+            result.ShouldBe($@"DROP TABLE ""{TestSchema}"".""TestTable1"";", _quotingEnabled);
         }
 
         [Test]
@@ -304,7 +304,16 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         {
             var expression = GeneratorTestHelper.GetDeleteTableExpression();
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"DROP TABLE ""PUBLIC"".""TestTable1""", _quotingEnabled);
+            result.ShouldBe(@"DROP TABLE ""PUBLIC"".""TestTable1"";", _quotingEnabled);
+        }
+
+        /// <inheritdoc />
+        public override void CanDropTableIfExistsWithDefaultSchema()
+        {
+            var expression = GeneratorTestHelper.GetDeleteTableIfExistsExpression();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("DROP TABLE IF EXISTS \"public\".\"TestTable1\";", _quotingEnabled);
         }
 
         [Test]

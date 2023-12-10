@@ -60,6 +60,8 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         {
         }
 
+        public override string DropTableIfExists { get { return "IF OBJECT_ID('{0}') IS NOT NULL DROP TABLE {0}"; } }
+
         public override string RenameTable { get { return "sp_rename {0}, {1}"; } }
 
         public override string RenameColumn { get { return "sp_rename {0}, {1}"; } }

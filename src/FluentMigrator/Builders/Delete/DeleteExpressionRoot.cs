@@ -53,7 +53,7 @@ namespace FluentMigrator.Builders.Delete
         }
 
         /// <inheritdoc />
-        public IInSchemaSyntax Table(string tableName)
+        public IIfExistsOrInSchemaSyntax Table(string tableName)
         {
             var expression = new DeleteTableExpression {TableName = tableName};
             _context.Expressions.Add(expression);

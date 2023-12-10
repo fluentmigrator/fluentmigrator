@@ -88,6 +88,11 @@ namespace FluentMigrator.Runner.Generators.Oracle
         }
         public override string Generate(DeleteTableExpression expression)
         {
+            if (expression.IfExists)
+            {
+                return compatabilityMode.HandleCompatabilty("If Exists logic is not supported");
+            }
+
             return string.Format(DropTable, ExpandTableName(Quoter.QuoteTableName(expression.SchemaName),Quoter.QuoteTableName(expression.TableName)));
         }
 

@@ -57,6 +57,10 @@ namespace FluentMigrator.Runner.Generators.Hana
         }
         public override string Generate(DeleteTableExpression expression)
         {
+            if (expression.IfExists)
+            {
+                return compatabilityMode.HandleCompatabilty("If exists syntax is not supported");
+            }
             return string.Format("{0};", base.Generate(expression));
         }
 
