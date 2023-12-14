@@ -74,6 +74,8 @@ namespace FluentMigrator.Runner.VersionTableInfo
 
         public virtual string AppliedOnColumnName => "AppliedOn";
 
+        public bool CreateWithPrimaryKey => false;
+
         public virtual string DescriptionColumnName => "Description";
 
         public virtual bool OwnsSchema => true;
