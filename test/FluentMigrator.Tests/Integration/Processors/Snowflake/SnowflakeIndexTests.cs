@@ -137,6 +137,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Snowflake
         public void TearDown()
         {
             ServiceScope?.Dispose();
+            Processor?.Dispose();
         }
 
         private static void EnsureReference()

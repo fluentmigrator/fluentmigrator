@@ -48,7 +48,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             var expression = new CreateSequenceExpression { Sequence = new SequenceDefinition { Name = "sequence1" } };
 
             var errors = ValidationHelper.CollectErrors(expression);
-            Assert.That(errors.Count, Is.EqualTo(0));
+            Assert.That(errors, Is.Empty);
         }
 
         [Test]

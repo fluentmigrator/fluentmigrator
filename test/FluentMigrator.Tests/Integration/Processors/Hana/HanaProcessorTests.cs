@@ -91,6 +91,8 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
         {
             ServiceScope?.Dispose();
             ServiceProvider?.Dispose();
+            Processor?.Dispose();
+            Output?.Dispose();
         }
     }
 }

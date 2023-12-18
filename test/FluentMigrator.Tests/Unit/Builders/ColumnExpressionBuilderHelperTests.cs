@@ -96,15 +96,21 @@ namespace FluentMigrator.Tests.Unit.Builders
             contextMock.Verify(n => n.Expressions.Add(It.IsAny<IMigrationExpression>()), Times.Once());
 
             //Check that the update data expression was added as expected.  Maybe there's a cleaner way to do this?
-            Assert.IsInstanceOf<UpdateDataExpression>(addedExpression);
+            Assert.That(addedExpression, Is.InstanceOf<UpdateDataExpression>());
             UpdateDataExpression updateDataExpr = (UpdateDataExpression)addedExpression;
-            Assert.IsNotNull(updateDataExpr);
-            Assert.AreEqual("Fred", updateDataExpr.SchemaName);
-            Assert.AreEqual("Flinstone", updateDataExpr.TableName);
-            Assert.AreEqual(true, updateDataExpr.IsAllRows);
-            Assert.AreEqual(1, updateDataExpr.Set.Count);
-            Assert.AreEqual("ColName", updateDataExpr.Set[0].Key);
-            Assert.AreEqual(5, updateDataExpr.Set[0].Value);
+            Assert.That(updateDataExpr, Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(updateDataExpr.SchemaName, Is.EqualTo("Fred"));
+                Assert.That(updateDataExpr.TableName, Is.EqualTo("Flinstone"));
+                Assert.That(updateDataExpr.IsAllRows, Is.EqualTo(true));
+                Assert.That(updateDataExpr.Set, Has.Count.EqualTo(1));
+            });
+            Assert.Multiple(() =>
+            {
+                Assert.That(updateDataExpr.Set[0].Key, Is.EqualTo("ColName"));
+                Assert.That(updateDataExpr.Set[0].Value, Is.EqualTo(5));
+            });
         }
 
         [Test]
@@ -150,32 +156,38 @@ namespace FluentMigrator.Tests.Unit.Builders
             helper.SetNullable(false);
             helper.SetExistingRowsTo(5);
 
-            Assert.AreEqual(2, addedExpressions.Count);
-            Assert.IsInstanceOf<UpdateDataExpression>(addedExpressions[0]);
-            Assert.IsInstanceOf<AlterColumnExpression>(addedExpressions[1]);
+            Assert.That(addedExpressions, Has.Count.EqualTo(2));
+            Assert.That(addedExpressions[0], Is.InstanceOf<UpdateDataExpression>());
+            Assert.That(addedExpressions[1], Is.InstanceOf<AlterColumnExpression>());
 
             //TODO: refactor to use same method of checking as "CallingUniqueAddsIndexExpressionToContext" test does.
             AlterColumnExpression alterColExpr = (AlterColumnExpression)addedExpressions[1];
             Assert.AreNotSame(builderMock.Object.Column, alterColExpr.Column);
-            Assert.AreEqual("Fred", alterColExpr.SchemaName);
-            Assert.AreEqual("Flinstone", alterColExpr.TableName);
+            Assert.Multiple(() =>
+            {
+                Assert.That(alterColExpr.SchemaName, Is.EqualTo("Fred"));
+                Assert.That(alterColExpr.TableName, Is.EqualTo("Flinstone"));
+            });
 
             //Check that the the 'alter' expression column definition is not the same instance as the
             //create column definition.
-            Assert.IsNotNull(alterColExpr.Column);
+            Assert.That(alterColExpr.Column, Is.Not.Null);
             var alterColColumn = alterColExpr.Column;
             Assert.AreNotSame(createColColumn, alterColColumn);
 
-            //Check that all properties on the alter expression column have been cloned.
-            //Could also test this by mocking .clone method to return another mock etc, just doing
-            //it here tho by comparing values.
-            Assert.AreEqual(ColumnModificationType.Alter, alterColColumn.ModificationType);
-            Assert.AreEqual("ColName", alterColColumn.Name);
-            Assert.AreEqual(System.Data.DbType.String, alterColColumn.Type);
-            Assert.AreEqual("CustomType", alterColColumn.CustomType);
-            Assert.AreEqual(false, alterColColumn.IsNullable);
-            Assert.AreEqual(12, alterColColumn.Size);
-            Assert.AreEqual(2, alterColColumn.Precision);
+            Assert.Multiple(() =>
+            {
+                //Check that all properties on the alter expression column have been cloned.
+                //Could also test this by mocking .clone method to return another mock etc, just doing
+                //it here tho by comparing values.
+                Assert.That(alterColColumn.ModificationType, Is.EqualTo(ColumnModificationType.Alter));
+                Assert.That(alterColColumn.Name, Is.EqualTo("ColName"));
+                Assert.That(alterColColumn.Type, Is.EqualTo(System.Data.DbType.String));
+                Assert.That(alterColColumn.CustomType, Is.EqualTo("CustomType"));
+                Assert.That(alterColColumn.IsNullable, Is.EqualTo(false));
+                Assert.That(alterColColumn.Size, Is.EqualTo(12));
+                Assert.That(alterColColumn.Precision, Is.EqualTo(2));
+            });
         }
 
         [Test]

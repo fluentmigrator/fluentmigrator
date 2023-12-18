@@ -46,7 +46,7 @@ namespace FluentMigrator.Tests.Unit.Definitions
 
             var processed = expr.Apply(ConventionSets.NoSchemaName);
 
-            Assert.AreEqual("IX_Table_Name", processed.Index.Name);
+            Assert.That(processed.Index.Name, Is.EqualTo("IX_Table_Name"));
         }
     }
 }

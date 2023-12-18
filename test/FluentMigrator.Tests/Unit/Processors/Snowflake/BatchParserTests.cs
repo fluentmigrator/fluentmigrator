@@ -89,7 +89,7 @@ namespace FluentMigrator.Tests.Unit.Processors.Snowflake
                 "SELECT 2"
             };
 
-            Assert.AreEqual(expected.Length, MockedCommands.Count);
+            Assert.That(MockedCommands, Has.Count.EqualTo(expected.Length));
 
             MockedDbProviderFactory.Verify(factory => factory.CreateConnection());
 

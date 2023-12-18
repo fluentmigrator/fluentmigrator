@@ -37,16 +37,16 @@ namespace FluentMigrator.Tests.Unit.AssemblyLoader
         public void ShouldBeAbleToLoadAssemblyByFileName()
         {
             var assemblyLoader = _assemblyLoaderFactory.GetAssemblyLoader(GetType().Assembly.Location);
-            Assert.IsInstanceOf(typeof(AssemblyLoaderFromFile), assemblyLoader);
-            Assert.AreEqual(GetType().Assembly, assemblyLoader.Load());
+            Assert.That(assemblyLoader, Is.InstanceOf(typeof(AssemblyLoaderFromFile)));
+            Assert.That(assemblyLoader.Load(), Is.EqualTo(GetType().Assembly));
         }
 
         [Test]
         public void ShouldBeAbleToLoadAssemblyAssemblyName()
         {
             var assemblyLoader = _assemblyLoaderFactory.GetAssemblyLoader(GetType().Assembly.GetName().Name);
-            Assert.IsInstanceOf(typeof(AssemblyLoaderFromName), assemblyLoader);
-            Assert.AreEqual(GetType().Assembly, assemblyLoader.Load());
+            Assert.That(assemblyLoader, Is.InstanceOf(typeof(AssemblyLoaderFromName)));
+            Assert.That(assemblyLoader.Load(), Is.EqualTo(GetType().Assembly));
         }
     }
 }

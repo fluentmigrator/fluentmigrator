@@ -74,7 +74,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             var expression = new DeleteForeignKeyExpression { ForeignKey = new ForeignKeyDefinition { ForeignTable = "ForeignTable", Name = "FK"} };
             var errors = ValidationHelper.CollectErrors(expression);
 
-            Assert.That(errors.Count, Is.EqualTo(0));
+            Assert.That(errors, Is.Empty);
         }
 
         [Test]
@@ -128,7 +128,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             };
             var errors = ValidationHelper.CollectErrors(expression);
 
-            Assert.That(errors.Count, Is.EqualTo(0));
+            Assert.That(errors, Is.Empty);
         }
 
         [Test]
@@ -197,8 +197,11 @@ namespace FluentMigrator.Tests.Unit.Expressions
 
             var processed = expression.Apply(ConventionSets.NoSchemaName);
 
-            Assert.That(processed.ForeignKey.ForeignTableSchema, Is.Null);
-            Assert.That(processed.ForeignKey.PrimaryTableSchema, Is.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(processed.ForeignKey.ForeignTableSchema, Is.Null);
+                Assert.That(processed.ForeignKey.PrimaryTableSchema, Is.Null);
+            });
         }
 
         [Test]
@@ -215,8 +218,11 @@ namespace FluentMigrator.Tests.Unit.Expressions
 
             var processed = expression.Apply(ConventionSets.WithSchemaName);
 
-            Assert.That(processed.ForeignKey.ForeignTableSchema, Is.EqualTo("testschema"));
-            Assert.That(processed.ForeignKey.PrimaryTableSchema, Is.EqualTo("testschema"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(processed.ForeignKey.ForeignTableSchema, Is.EqualTo("testschema"));
+                Assert.That(processed.ForeignKey.PrimaryTableSchema, Is.EqualTo("testschema"));
+            });
         }
 
         [Test]
@@ -226,8 +232,11 @@ namespace FluentMigrator.Tests.Unit.Expressions
 
             var processed = expression.Apply(ConventionSets.WithSchemaName);
 
-            Assert.That(processed.ForeignKey.ForeignTableSchema, Is.EqualTo("testdefault"));
-            Assert.That(processed.ForeignKey.PrimaryTableSchema, Is.EqualTo("testdefault"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(processed.ForeignKey.ForeignTableSchema, Is.EqualTo("testdefault"));
+                Assert.That(processed.ForeignKey.PrimaryTableSchema, Is.EqualTo("testdefault"));
+            });
         }
     }
 }

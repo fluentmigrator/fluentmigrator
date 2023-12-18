@@ -36,7 +36,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         public static void ShouldBe(this IEnumerable<string> actual, IEnumerable<string> expected, bool quotingEnabled)
         {
             expected = expected.Select(e => quotingEnabled ? e : e.Replace(@"""", string.Empty));
-            CollectionAssert.AreEqual(expected, actual);
+            Assert.That(actual, Is.EqualTo(expected).AsCollection);
         }
     }
 }

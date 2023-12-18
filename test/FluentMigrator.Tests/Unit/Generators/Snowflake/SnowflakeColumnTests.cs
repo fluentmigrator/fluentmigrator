@@ -226,7 +226,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             expression.Column.CollationName = "Finnish_Swedish_CI_AS";
 
             var ex = Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
-            Assert.AreEqual("Snowflake database does not support collation.", ex.Message);
+            Assert.That(ex.Message, Is.EqualTo("Snowflake database does not support collation."));
         }
     }
 }

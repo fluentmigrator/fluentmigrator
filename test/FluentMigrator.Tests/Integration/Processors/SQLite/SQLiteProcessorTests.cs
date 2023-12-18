@@ -219,6 +219,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
         public void TearDown()
         {
             ServiceScope?.Dispose();
+            Processor?.Dispose();
         }
     }
 }

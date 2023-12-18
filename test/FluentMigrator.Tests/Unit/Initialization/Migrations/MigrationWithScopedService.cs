@@ -35,7 +35,7 @@ namespace FluentMigrator.Tests.Unit.Initialization.Migrations
         /// <inheritdoc />
         public override void Up()
         {
-            Assert.NotNull(_processorOptions?.ConnectionString);
+            Assert.That(_processorOptions?.ConnectionString, Is.Not.Null);
         }
     }
 }

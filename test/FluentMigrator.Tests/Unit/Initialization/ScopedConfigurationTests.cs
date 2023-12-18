@@ -58,7 +58,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
                 using (var scope = serviceProvider.CreateScope())
                 {
                     var accessor = scope.ServiceProvider.GetRequiredService<IConnectionStringAccessor>();
-                    Assert.AreEqual("Data Source=:memory:", accessor.ConnectionString);
+                    Assert.That(accessor.ConnectionString, Is.EqualTo("Data Source=:memory:"));
                 }
             }
         }
@@ -99,7 +99,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
                     using (var scope = serviceProvider.CreateScope())
                     {
                         var accessor = scope.ServiceProvider.GetRequiredService<IConnectionStringAccessor>();
-                        Assert.AreEqual("Data Source=:memory:", accessor.ConnectionString);
+                        Assert.That(accessor.ConnectionString, Is.EqualTo("Data Source=:memory:"));
                     }
 
                     EnsureReloadedConfiguration(config,
@@ -112,7 +112,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
                     using (var scope = serviceProvider.CreateScope())
                     {
                         var accessor = scope.ServiceProvider.GetRequiredService<IConnectionStringAccessor>();
-                        Assert.AreEqual("Data Source=test.db", accessor.ConnectionString);
+                        Assert.That(accessor.ConnectionString, Is.EqualTo("Data Source=test.db"));
                     }
                 }
             }
@@ -163,7 +163,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
                     using (var scope = serviceProvider.CreateScope())
                     {
                         var accessor = scope.ServiceProvider.GetRequiredService<IConnectionStringAccessor>();
-                        Assert.AreEqual("Data Source=:memory:", accessor.ConnectionString);
+                        Assert.That(accessor.ConnectionString, Is.EqualTo("Data Source=:memory:"));
                     }
                 }
             }
@@ -214,7 +214,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
                     using (var scope = serviceProvider.CreateScope())
                     {
                         var accessor = scope.ServiceProvider.GetRequiredService<IConnectionStringAccessor>();
-                        Assert.AreEqual("Data Source=:memory:", accessor.ConnectionString);
+                        Assert.That(accessor.ConnectionString, Is.EqualTo("Data Source=:memory:"));
                     }
 
                     EnsureReloadedConfiguration(config,
@@ -227,7 +227,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
                     using (var scope = serviceProvider.CreateScope())
                     {
                         var accessor = scope.ServiceProvider.GetRequiredService<IConnectionStringAccessor>();
-                        Assert.AreEqual("Data Source=test.db", accessor.ConnectionString);
+                        Assert.That(accessor.ConnectionString, Is.EqualTo("Data Source=test.db"));
                     }
                 }
             }
@@ -280,7 +280,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
                     using (var scope = serviceProvider.CreateScope())
                     {
                         var accessor = scope.ServiceProvider.GetRequiredService<IConnectionStringAccessor>();
-                        Assert.AreEqual("Data Source=:memory:", accessor.ConnectionString);
+                        Assert.That(accessor.ConnectionString, Is.EqualTo("Data Source=:memory:"));
                     }
 
                     EnsureReloadedConfiguration(config,
@@ -293,7 +293,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
                     using (var scope = serviceProvider.CreateScope())
                     {
                         var accessor = scope.ServiceProvider.GetRequiredService<IConnectionStringAccessor>();
-                        Assert.AreEqual("Data Source=test.db", accessor.ConnectionString);
+                        Assert.That(accessor.ConnectionString, Is.EqualTo("Data Source=test.db"));
                     }
                 }
             }
@@ -315,7 +315,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
                 {
                     var source = scope.ServiceProvider.GetRequiredService<IFilteringMigrationSource>();
                     var migrations = source.GetMigrations(t => t == typeof(MigrationWithScopedService)).ToList();
-                    Assert.AreEqual(1, migrations.Count);
+                    Assert.That(migrations, Has.Count.EqualTo(1));
                 }
             }
         }

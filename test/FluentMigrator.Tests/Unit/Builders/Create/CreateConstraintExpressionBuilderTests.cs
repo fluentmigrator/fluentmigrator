@@ -133,7 +133,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             var builder = new CreateConstraintExpressionBuilder(expression);
             builder.Columns(new[] { Column1, Column2, Column1 });
 
-            Assert.That(expression.Constraint.Columns.Count, Is.EqualTo(2));
+            Assert.That(expression.Constraint.Columns, Has.Count.EqualTo(2));
         }
 
         [Test]
@@ -144,7 +144,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             var builder = new CreateConstraintExpressionBuilder(expression);
             builder.Columns(new[] { Column1, Column2, Column1 });
 
-            Assert.That(expression.Constraint.Columns.Count, Is.EqualTo(2));
+            Assert.That(expression.Constraint.Columns, Has.Count.EqualTo(2));
         }
 
         [Test]

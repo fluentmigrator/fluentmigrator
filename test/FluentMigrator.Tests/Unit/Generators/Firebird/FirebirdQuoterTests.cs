@@ -102,12 +102,12 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             actual.ShouldBe("\"similar\"");
         }
 
-        [Test, TestCaseSource("_fbKeywords")]
+        [Test, TestCaseSource(nameof(_fbKeywords))]
         public void Quote_ArgIsKeywordInLowercase_ArgShouldBeQuoted(string quoteArg)
         {
             var argInLowerCase = quoteArg.ToLower();
             var actual = new FirebirdQuoter(false).Quote(argInLowerCase);
-            var expected = string.Format("\"{0}\"", argInLowerCase);
+            var expected = $"\"{argInLowerCase}\"";
             actual.ShouldBe(expected);
         }
     }

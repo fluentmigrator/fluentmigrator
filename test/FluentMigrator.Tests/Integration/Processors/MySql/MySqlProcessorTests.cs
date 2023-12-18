@@ -168,6 +168,7 @@ namespace FluentMigrator.Tests.Integration.Processors.MySql
         public void TearDown()
         {
             ServiceScope?.Dispose();
+            Processor?.Dispose();
         }
     }
 }

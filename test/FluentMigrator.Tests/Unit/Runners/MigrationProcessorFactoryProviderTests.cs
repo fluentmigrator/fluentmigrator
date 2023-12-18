@@ -43,77 +43,77 @@ namespace FluentMigrator.Tests.Unit.Runners
         public void CanRetrieveFactoryWithArgumentString()
         {
             IMigrationProcessorFactory factory = _migrationProcessorFactoryProvider.GetFactory("SQLite");
-            Assert.IsTrue(factory.GetType() == typeof(SQLiteProcessorFactory));
+            Assert.That(factory.GetType() == typeof(SQLiteProcessorFactory));
         }
 
         [Test]
         public void CanRetrieveSqlServer2000FactoryWithArgumentString()
         {
             IMigrationProcessorFactory factory = _migrationProcessorFactoryProvider.GetFactory("SqlServer2000");
-            Assert.IsTrue(factory.GetType() == typeof(SqlServer2000ProcessorFactory));
+            Assert.That(factory.GetType() == typeof(SqlServer2000ProcessorFactory));
         }
 
         [Test]
         public void CanRetrieveSqlServer2005FactoryWithArgumentString()
         {
             IMigrationProcessorFactory factory = _migrationProcessorFactoryProvider.GetFactory("SqlServer2005");
-            Assert.IsTrue(factory.GetType() == typeof(SqlServer2005ProcessorFactory));
+            Assert.That(factory.GetType() == typeof(SqlServer2005ProcessorFactory));
         }
 
         [Test]
         public void CanRetrieveSqlServer2008FactoryWithArgumentString()
         {
             IMigrationProcessorFactory factory = _migrationProcessorFactoryProvider.GetFactory("SqlServer2008");
-            Assert.IsTrue(factory.GetType() == typeof(SqlServer2008ProcessorFactory));
+            Assert.That(factory.GetType() == typeof(SqlServer2008ProcessorFactory));
         }
 
         [Test]
         public void CanRetrieveSqlServer2012FactoryWithArgumentString()
         {
             IMigrationProcessorFactory factory = _migrationProcessorFactoryProvider.GetFactory("SqlServer2012");
-            Assert.IsTrue(factory.GetType() == typeof(SqlServer2012ProcessorFactory));
+            Assert.That(factory.GetType() == typeof(SqlServer2012ProcessorFactory));
         }
 
         [Test]
         public void CanRetrieveSqlServer2014FactoryWithArgumentString()
         {
             IMigrationProcessorFactory factory = _migrationProcessorFactoryProvider.GetFactory("SqlServer2014");
-            Assert.IsTrue(factory.GetType() == typeof(SqlServer2014ProcessorFactory));
+            Assert.That(factory.GetType() == typeof(SqlServer2014ProcessorFactory));
         }
 
         [Test]
         public void CanRetrieveSqlServer2016FactoryWithArgumentString()
         {
             IMigrationProcessorFactory factory = _migrationProcessorFactoryProvider.GetFactory("SqlServer2016");
-            Assert.IsTrue(factory.GetType() == typeof(SqlServer2016ProcessorFactory));
+            Assert.That(factory.GetType() == typeof(SqlServer2016ProcessorFactory));
         }
 
         [Test]
         public void RetrievesSqlServerProcessorFactoryIfArgumentIsSqlServer()
         {
             IMigrationProcessorFactory factory = _migrationProcessorFactoryProvider.GetFactory("SqlServer");
-            Assert.IsTrue(factory.GetType() == typeof(SqlServerProcessorFactory));
+            Assert.That(factory.GetType() == typeof(SqlServerProcessorFactory));
         }
 
 
         [Test]
         public void CanRetrieveOracleFactoryWithArgumentString()
         {
-            Assert.IsInstanceOf<OracleProcessorFactory>(_migrationProcessorFactoryProvider.GetFactory("Oracle"));
+            Assert.That(_migrationProcessorFactoryProvider.GetFactory("Oracle"), Is.InstanceOf<OracleProcessorFactory>());
         }
 
         [Test]
         public void CanRetrieveOracleManagedFactoryWithArgumentString()
         {
             IMigrationProcessorFactory factory = _migrationProcessorFactoryProvider.GetFactory("OracleManaged");
-            Assert.IsTrue(factory.GetType() == typeof(OracleManagedProcessorFactory));
+            Assert.That(factory.GetType() == typeof(OracleManagedProcessorFactory));
         }
 
         [Test]
         public void CanRetrieveHanaFactoryWithArgumentString()
         {
             var factory = _migrationProcessorFactoryProvider.GetFactory("Hana");
-            Assert.IsTrue(factory.GetType() == typeof(HanaProcessorFactory));
+            Assert.That(factory.GetType() == typeof(HanaProcessorFactory));
         }
     }
 }

@@ -65,7 +65,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             var expression = new AlterDefaultConstraintExpression { TableName = "test", ColumnName = "Column1", DefaultValue = SystemMethods.CurrentDateTime};
 
             var errors = ValidationHelper.CollectErrors(expression);
-            Assert.That(errors.Count, Is.EqualTo(0));
+            Assert.That(errors, Is.Empty);
         }
 
         [Test]

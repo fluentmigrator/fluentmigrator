@@ -392,12 +392,14 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         {
             ServiceScope?.Dispose();
             ServiceProvider?.Dispose();
+            Processor?.Dispose();
             if (_temporaryDatabase != null)
             {
                 var connString = _temporaryDatabase.ConnectionString;
                 _temporaryDatabase = null;
                 FbDatabase.DropDatabase(connString);
             }
+            _temporaryDatabase?.Dispose();
         }
     }
 }

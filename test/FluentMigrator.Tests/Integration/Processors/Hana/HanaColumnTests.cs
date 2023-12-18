@@ -127,6 +127,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
         public void TearDown()
         {
             ServiceScope?.Dispose();
+            Processor?.Dispose();
         }
     }
 }

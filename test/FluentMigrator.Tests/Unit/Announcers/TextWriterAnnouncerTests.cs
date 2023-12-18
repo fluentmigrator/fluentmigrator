@@ -40,6 +40,12 @@ namespace FluentMigrator.Tests.Unit.Announcers
                              };
         }
 
+        [TearDown]
+        public void TearDown()
+        {
+            _stringWriter?.Dispose();
+        }
+
         private TextWriterAnnouncer _announcer;
         private StringWriter _stringWriter;
 

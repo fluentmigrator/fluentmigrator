@@ -54,6 +54,13 @@ namespace FluentMigrator.Tests.Unit.Loggers
             _logger = _loggerFactory.CreateLogger("Test");
         }
 
+        [TearDown]
+        public void TearDown()
+        {
+            _loggerFactory?.Dispose();
+            _stringWriter?.Dispose();
+        }
+
         [Test]
         public void CanAnnounceAndPadWithEquals()
         {
