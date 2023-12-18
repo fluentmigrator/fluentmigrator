@@ -610,7 +610,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
 
             var builderAsInterface = (IColumnExpressionBuilder)builder;
 
-            Assert.AreSame(curColumn, builderAsInterface.Column);
+            Assert.That(builderAsInterface.Column, Is.SameAs(curColumn));
         }
 
         [Test]

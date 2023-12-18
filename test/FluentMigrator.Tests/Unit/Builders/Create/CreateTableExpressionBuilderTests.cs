@@ -639,7 +639,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 
             var builderAsInterface = (IColumnExpressionBuilder)builder;
 
-            Assert.AreSame(curColumn, builderAsInterface.Column);
+            Assert.That(builderAsInterface.Column, Is.SameAs(curColumn));
         }
 
         private void VerifyColumnHelperCall(Action<CreateTableExpressionBuilder> callToTest, System.Linq.Expressions.Expression<Action<ColumnExpressionBuilderHelper>> expectedHelperAction)

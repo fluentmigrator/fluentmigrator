@@ -157,12 +157,15 @@ namespace FluentMigrator.Tests.Unit.Builders
             helper.SetExistingRowsTo(5);
 
             Assert.That(addedExpressions, Has.Count.EqualTo(2));
-            Assert.That(addedExpressions[0], Is.InstanceOf<UpdateDataExpression>());
-            Assert.That(addedExpressions[1], Is.InstanceOf<AlterColumnExpression>());
+            Assert.Multiple(() =>
+            {
+                Assert.That(addedExpressions[0], Is.InstanceOf<UpdateDataExpression>());
+                Assert.That(addedExpressions[1], Is.InstanceOf<AlterColumnExpression>());
+            });
 
             //TODO: refactor to use same method of checking as "CallingUniqueAddsIndexExpressionToContext" test does.
             AlterColumnExpression alterColExpr = (AlterColumnExpression)addedExpressions[1];
-            Assert.AreNotSame(builderMock.Object.Column, alterColExpr.Column);
+            Assert.That(alterColExpr.Column, Is.Not.SameAs(builderMock.Object.Column));
             Assert.Multiple(() =>
             {
                 Assert.That(alterColExpr.SchemaName, Is.EqualTo("Fred"));
@@ -173,7 +176,7 @@ namespace FluentMigrator.Tests.Unit.Builders
             //create column definition.
             Assert.That(alterColExpr.Column, Is.Not.Null);
             var alterColColumn = alterColExpr.Column;
-            Assert.AreNotSame(createColColumn, alterColColumn);
+            Assert.That(alterColColumn, Is.Not.SameAs(createColColumn));
 
             Assert.Multiple(() =>
             {

@@ -741,7 +741,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             var builder = new CreateColumnExpressionBuilder(expressionMock.Object, contextMock.Object);
             var builderAsInterface = (IColumnExpressionBuilder)builder;
 
-            Assert.AreSame(curColumn, builderAsInterface.Column);
+            Assert.That(builderAsInterface.Column, Is.SameAs(curColumn));
         }
 
         [Test]

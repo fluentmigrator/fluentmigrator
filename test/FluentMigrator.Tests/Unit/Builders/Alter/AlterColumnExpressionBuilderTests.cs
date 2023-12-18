@@ -699,7 +699,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
             var builder = new AlterColumnExpressionBuilder(expressionMock.Object, contextMock.Object);
             var builderAsInterface = (IColumnExpressionBuilder)builder;
 
-            Assert.AreSame(curColumn, builderAsInterface.Column);
+            Assert.That(builderAsInterface.Column, Is.SameAs(curColumn));
         }
 
         private void VerifyColumnHelperCall(Action<AlterColumnExpressionBuilder> callToTest, System.Linq.Expressions.Expression<Action<ColumnExpressionBuilderHelper>> expectedHelperAction)
