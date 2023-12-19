@@ -16,6 +16,8 @@
 //
 #endregion
 
+using FluentMigrator.SqlServer;
+
 namespace FluentMigrator.Example.Migrations
 {
     [Migration(20090906205440)]
@@ -27,7 +29,7 @@ namespace FluentMigrator.Example.Migrations
                 .WithIdColumn()
                 .WithColumn("Body").AsString(4000).NotNullable()
                 .WithTimeStamps()
-                .WithColumn("User_id").AsInt32();
+                .WithColumn("User_id").AsInt32().Nullable();
         }
 
         public override void Down()
