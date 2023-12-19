@@ -31,6 +31,28 @@ namespace FluentMigrator.Infrastructure.Extensions
         /// <typeparam name="T">The value type</typeparam>
         /// <param name="additionalFeatures">The additional feature values</param>
         /// <param name="key">The key into the <see cref="ISupportAdditionalFeatures.AdditionalFeatures"/> dictionary</param>
+        /// <param name="value">The value found if successful/</param>
+        /// <returns>Whether the <paramref name="key"/> was found in the <paramref name="additionalFeatures"/>. <value>false</value> means the feature was not set by the client.</returns>
+        public static bool TryGetAdditionalFeature<T>(this ISupportAdditionalFeatures additionalFeatures, string key, out T value)
+        {
+            var dict = additionalFeatures.AdditionalFeatures;
+            if (!dict.TryGetValue(key, out var val))
+            {
+                value = default;
+                return false;
+            }
+
+            value = (T)val;
+            
+            return true;
+        }
+
+        /// <summary>
+        /// Gets an additional feature value
+        /// </summary>
+        /// <typeparam name="T">The value type</typeparam>
+        /// <param name="additionalFeatures">The additional feature values</param>
+        /// <param name="key">The key into the <see cref="ISupportAdditionalFeatures.AdditionalFeatures"/> dictionary</param>
         /// <param name="defaultValue">The default value to be used if none was found</param>
         /// <returns>The stored value or the <paramref name="defaultValue"/></returns>
         public static T GetAdditionalFeature<T>(this ISupportAdditionalFeatures additionalFeatures, string key, T defaultValue = default)

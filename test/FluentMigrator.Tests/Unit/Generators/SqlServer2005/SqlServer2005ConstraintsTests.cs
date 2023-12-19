@@ -17,10 +17,13 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 
 using FluentMigrator.Builders.Create.Constraint;
 using FluentMigrator.Builders.Delete.Constraint;
+using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.SqlServer;
 
@@ -326,12 +329,177 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
+        public virtual void CanCreateMultiColumnUniqueConstraintWithCustomSchemaAndFilter()
+        {
+            var expression = GeneratorTestHelper.GetCreateMultiColumnUniqueConstraintExpression();
+            expression.Constraint.SchemaName = "TestSchema";
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintFilter, expression.Constraint.Columns.First() + " IS NOT NULL");
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE UNIQUE INDEX [UC_TestTable1_TestColumn1_TestColumn2] ON [TestSchema].[TestTable1] ([TestColumn1], [TestColumn2]) WHERE TestColumn1 IS NOT NULL");
+        }
+
+        [Test]
+        public virtual void CanCreateMultiColumnUniqueConstraintWithCustomSchemaAndFilterWithNonClusteredIndex()
+        {
+            var expression = GeneratorTestHelper.GetCreateMultiColumnUniqueConstraintExpression();
+            expression.Constraint.SchemaName = "TestSchema";
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.ConstraintType, SqlServerConstraintType.NonClustered);
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintFilter, expression.Constraint.Columns.First() + " IS NOT NULL");
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE UNIQUE INDEX [UC_TestTable1_TestColumn1_TestColumn2] ON [TestSchema].[TestTable1] ([TestColumn1], [TestColumn2]) WHERE TestColumn1 IS NOT NULL");
+        }
+
+        [Test]
+        public virtual void CannotCreateMultiColumnUniqueConstraintWithCustomSchemaAndFilterWithClusteredIndex()
+        {
+            var expression = GeneratorTestHelper.GetCreateUniqueConstraintExpression();
+            expression.Constraint.SchemaName = "TestSchema";
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.ConstraintType, SqlServerConstraintType.Clustered);
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintFilter, expression.Constraint.Columns.First() + " IS NOT NULL");
+
+            var ex = Assert.Throws<Exception>(() => Generator.Generate(expression));
+            Assert.That(ex, Is.Not.Null);
+            Assert.That(ex.Message, Is.EqualTo("Filtered indexes are non-clustered indexes that have the addition of a WHERE clause. SQL Server does not support clustered filtered indexes. Create a non-clustered index with include columns instead to create a non-clustered covering index."));
+        }
+
+        [Test]
+        public virtual void CanCreateMultiColumnUniqueConstraintWithCustomSchemaAndInclude()
+        {
+            var expression = GeneratorTestHelper.GetCreateMultiColumnUniqueConstraintExpression();
+            expression.Constraint.SchemaName = "TestSchema";
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintIncludesList, new List<IndexIncludeDefinition> { new IndexIncludeDefinition { Name = "TestColumn3" } });
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE UNIQUE INDEX [UC_TestTable1_TestColumn1_TestColumn2] ON [TestSchema].[TestTable1] ([TestColumn1], [TestColumn2]) INCLUDE ([TestColumn3])");
+        }
+
+        [Test]
+        public virtual void CanCreateMultiColumnUniqueConstraintWithCustomSchemaAndFilterAndInclude()
+        {
+            var expression = GeneratorTestHelper.GetCreateMultiColumnUniqueConstraintExpression();
+            expression.Constraint.SchemaName = "TestSchema";
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintFilter, expression.Constraint.Columns.First() + " IS NOT NULL");
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintIncludesList, new List<IndexIncludeDefinition> { new IndexIncludeDefinition { Name = "TestColumn3" } });
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE UNIQUE INDEX [UC_TestTable1_TestColumn1_TestColumn2] ON [TestSchema].[TestTable1] ([TestColumn1], [TestColumn2]) INCLUDE ([TestColumn3]) WHERE TestColumn1 IS NOT NULL");
+        }
+
+        [Test]
+        public virtual void CanCreateMultiColumnUniqueConstraintWithCustomSchemaAndFilterAndIncludeWithNonClusteredIndex()
+        {
+            var expression = GeneratorTestHelper.GetCreateMultiColumnUniqueConstraintExpression();
+            expression.Constraint.SchemaName = "TestSchema";
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.ConstraintType, SqlServerConstraintType.NonClustered);
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintFilter, expression.Constraint.Columns.First() + " IS NOT NULL");
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintIncludesList, new List<IndexIncludeDefinition> { new IndexIncludeDefinition { Name = "TestColumn3" } });
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE UNIQUE INDEX [UC_TestTable1_TestColumn1_TestColumn2] ON [TestSchema].[TestTable1] ([TestColumn1], [TestColumn2]) INCLUDE ([TestColumn3]) WHERE TestColumn1 IS NOT NULL");
+        }
+
+        [Test]
+        public virtual void CannotCreateMultiColumnUniqueConstraintWithCustomSchemaAndFilterAndIncludeWithClusteredIndex()
+        {
+            var expression = GeneratorTestHelper.GetCreateUniqueConstraintExpression();
+            expression.Constraint.SchemaName = "TestSchema";
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.ConstraintType, SqlServerConstraintType.Clustered);
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintFilter, expression.Constraint.Columns.First() + " IS NOT NULL");
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintIncludesList, new List<IndexIncludeDefinition> { new IndexIncludeDefinition { Name = "TestColumn3" } });
+
+            var ex = Assert.Throws<Exception>(() => Generator.Generate(expression));
+            Assert.That(ex, Is.Not.Null);
+            Assert.That(ex.Message, Is.EqualTo("Filtered indexes are non-clustered indexes that have the addition of a WHERE clause. SQL Server does not support clustered filtered indexes. Create a non-clustered index with include columns instead to create a non-clustered covering index."));
+        }
+
+        [Test]
         public override void CanCreateMultiColumnUniqueConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnUniqueConstraintExpression();
 
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [UC_TestTable1_TestColumn1_TestColumn2] UNIQUE ([TestColumn1], [TestColumn2])");
+        }
+
+        [Test]
+        public virtual void CanCreateMultiColumnUniqueConstraintWithDefaultSchemaAndFilter()
+        {
+            var expression = GeneratorTestHelper.GetCreateMultiColumnUniqueConstraintExpression();
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintFilter, expression.Constraint.Columns.First() + " IS NOT NULL");
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE UNIQUE INDEX [UC_TestTable1_TestColumn1_TestColumn2] ON [dbo].[TestTable1] ([TestColumn1], [TestColumn2]) WHERE TestColumn1 IS NOT NULL");
+        }
+
+        [Test]
+        public virtual void CanCreateMultiColumnUniqueConstraintWithDefaultSchemaAndFilterWithNonClusteredIndex()
+        {
+            var expression = GeneratorTestHelper.GetCreateMultiColumnUniqueConstraintExpression();
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.ConstraintType, SqlServerConstraintType.NonClustered);
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintFilter, expression.Constraint.Columns.First() + " IS NOT NULL");
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE UNIQUE INDEX [UC_TestTable1_TestColumn1_TestColumn2] ON [dbo].[TestTable1] ([TestColumn1], [TestColumn2]) WHERE TestColumn1 IS NOT NULL");
+        }
+
+        [Test]
+        public virtual void CannotCreateMultiColumnUniqueConstraintWithDefaultSchemaAndFilterWithClusteredIndex()
+        {
+            var expression = GeneratorTestHelper.GetCreateUniqueConstraintExpression();
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.ConstraintType, SqlServerConstraintType.Clustered);
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintFilter, expression.Constraint.Columns.First() + " IS NOT NULL");
+
+            var ex = Assert.Throws<Exception>(() => Generator.Generate(expression));
+            Assert.That(ex, Is.Not.Null);
+            Assert.That(ex.Message, Is.EqualTo("Filtered indexes are non-clustered indexes that have the addition of a WHERE clause. SQL Server does not support clustered filtered indexes. Create a non-clustered index with include columns instead to create a non-clustered covering index."));
+        }
+
+        [Test]
+        public virtual void CanCreateMultiColumnUniqueConstraintWithDefaultSchemaAndInclude()
+        {
+            var expression = GeneratorTestHelper.GetCreateMultiColumnUniqueConstraintExpression();
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintIncludesList, new List<IndexIncludeDefinition> { new IndexIncludeDefinition { Name = "TestColumn3" } });
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE UNIQUE INDEX [UC_TestTable1_TestColumn1_TestColumn2] ON [dbo].[TestTable1] ([TestColumn1], [TestColumn2]) INCLUDE ([TestColumn3])");
+        }
+
+        [Test]
+        public virtual void CanCreateMultiColumnUniqueConstraintWithDefaultSchemaAndFilterAndInclude()
+        {
+            var expression = GeneratorTestHelper.GetCreateMultiColumnUniqueConstraintExpression();
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintFilter, expression.Constraint.Columns.First() + " IS NOT NULL");
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintIncludesList, new List<IndexIncludeDefinition> { new IndexIncludeDefinition { Name = "TestColumn3" } });
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE UNIQUE INDEX [UC_TestTable1_TestColumn1_TestColumn2] ON [dbo].[TestTable1] ([TestColumn1], [TestColumn2]) INCLUDE ([TestColumn3]) WHERE TestColumn1 IS NOT NULL");
+        }
+
+        [Test]
+        public virtual void CanCreateMultiColumnUniqueConstraintWithDefaultSchemaAndFilterAndIncludeWithNonClusteredIndex()
+        {
+            var expression = GeneratorTestHelper.GetCreateMultiColumnUniqueConstraintExpression();
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.ConstraintType, SqlServerConstraintType.NonClustered);
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintFilter, expression.Constraint.Columns.First() + " IS NOT NULL");
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintIncludesList, new List<IndexIncludeDefinition> { new IndexIncludeDefinition { Name = "TestColumn3" } });
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE UNIQUE INDEX [UC_TestTable1_TestColumn1_TestColumn2] ON [dbo].[TestTable1] ([TestColumn1], [TestColumn2]) INCLUDE ([TestColumn3]) WHERE TestColumn1 IS NOT NULL");
+        }
+
+        [Test]
+        public virtual void CannotCreateMultiColumnUniqueConstraintWithDefaultSchemaAndFilterAndIncludeWithClusteredIndex()
+        {
+            var expression = GeneratorTestHelper.GetCreateUniqueConstraintExpression();
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.ConstraintType, SqlServerConstraintType.Clustered);
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintFilter, expression.Constraint.Columns.First() + " IS NOT NULL");
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintIncludesList, new List<IndexIncludeDefinition> { new IndexIncludeDefinition { Name = "TestColumn3" } });
+
+            var ex = Assert.Throws<Exception>(() => Generator.Generate(expression));
+            Assert.That(ex, Is.Not.Null);
+            Assert.That(ex.Message, Is.EqualTo("Filtered indexes are non-clustered indexes that have the addition of a WHERE clause. SQL Server does not support clustered filtered indexes. Create a non-clustered index with include columns instead to create a non-clustered covering index."));
         }
 
         [Test]
@@ -455,12 +623,156 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
+        public virtual void CanCreateNamedMultiColumnUniqueConstraintWithCustomSchemaAndFilter()
+        {
+            var expression = GeneratorTestHelper.GetCreateNamedMultiColumnUniqueConstraintExpression();
+            expression.Constraint.SchemaName = "TestSchema";
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintFilter, expression.Constraint.Columns.First() + " IS NOT NULL");
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE UNIQUE INDEX [TESTUNIQUECONSTRAINT] ON [TestSchema].[TestTable1] ([TestColumn1], [TestColumn2]) WHERE TestColumn1 IS NOT NULL");
+        }
+
+        [Test]
+        public virtual void CanCreateNamedMultiColumnUniqueConstraintWithCustomSchemaAndFilterAndInclude()
+        {
+            var expression = GeneratorTestHelper.GetCreateNamedMultiColumnUniqueConstraintExpression();
+            expression.Constraint.SchemaName = "TestSchema";
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintFilter, expression.Constraint.Columns.First() + " IS NOT NULL");
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintIncludesList, new List<IndexIncludeDefinition> { new IndexIncludeDefinition { Name = "TestColumn3" } });
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE UNIQUE INDEX [TESTUNIQUECONSTRAINT] ON [TestSchema].[TestTable1] ([TestColumn1], [TestColumn2]) INCLUDE ([TestColumn3]) WHERE TestColumn1 IS NOT NULL");
+        }
+
+        [Test]
+        public virtual void CanCreateNamedMultiColumnUniqueConstraintWithCustomSchemaAndFilterAndIncludeWithNonClusteredIndex()
+        {
+            var expression = GeneratorTestHelper.GetCreateNamedMultiColumnUniqueConstraintExpression();
+            expression.Constraint.SchemaName = "TestSchema";
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.ConstraintType, SqlServerConstraintType.NonClustered);
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintFilter, expression.Constraint.Columns.First() + " IS NOT NULL");
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintIncludesList, new List<IndexIncludeDefinition> { new IndexIncludeDefinition { Name = "TestColumn3" } });
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE UNIQUE INDEX [TESTUNIQUECONSTRAINT] ON [TestSchema].[TestTable1] ([TestColumn1], [TestColumn2]) INCLUDE ([TestColumn3]) WHERE TestColumn1 IS NOT NULL");
+        }
+
+        [Test]
+        public virtual void CannotCreateNamedMultiColumnUniqueConstraintWithCustomSchemaAndFilterAndIncludeWithClusteredIndex()
+        {
+            var expression = GeneratorTestHelper.GetCreateNamedMultiColumnUniqueConstraintExpression();
+            expression.Constraint.SchemaName = "TestSchema";
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.ConstraintType, SqlServerConstraintType.Clustered);
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintFilter, expression.Constraint.Columns.First() + " IS NOT NULL");
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintIncludesList, new List<IndexIncludeDefinition> { new IndexIncludeDefinition { Name = "TestColumn3" } });
+
+            var ex = Assert.Throws<Exception>(() => Generator.Generate(expression));
+            Assert.That(ex, Is.Not.Null);
+            Assert.That(ex.Message, Is.EqualTo("Filtered indexes are non-clustered indexes that have the addition of a WHERE clause. SQL Server does not support clustered filtered indexes. Create a non-clustered index with include columns instead to create a non-clustered covering index."));
+        }
+
+        [Test]
+        public virtual void CanCreateNamedMultiColumnUniqueConstraintWithCustomSchemaAndFilterWithNonClusteredIndex()
+        {
+            var expression = GeneratorTestHelper.GetCreateNamedMultiColumnUniqueConstraintExpression();
+            expression.Constraint.SchemaName = "TestSchema";
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.ConstraintType, SqlServerConstraintType.NonClustered);
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintFilter, expression.Constraint.Columns.First() + " IS NOT NULL");
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE UNIQUE INDEX [TESTUNIQUECONSTRAINT] ON [TestSchema].[TestTable1] ([TestColumn1], [TestColumn2]) WHERE TestColumn1 IS NOT NULL");
+        }
+
+        [Test]
+        public virtual void CannotCreateNamedMultiColumnUniqueConstraintWithCustomSchemaAndFilterWithClusteredIndex()
+        {
+            var expression = GeneratorTestHelper.GetCreateNamedMultiColumnUniqueConstraintExpression();
+            expression.Constraint.SchemaName = "TestSchema";
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.ConstraintType, SqlServerConstraintType.Clustered);
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintFilter, expression.Constraint.Columns.First() + " IS NOT NULL");
+
+            var ex = Assert.Throws<Exception>(() => Generator.Generate(expression));
+            Assert.That(ex, Is.Not.Null);
+            Assert.That(ex.Message, Is.EqualTo("Filtered indexes are non-clustered indexes that have the addition of a WHERE clause. SQL Server does not support clustered filtered indexes. Create a non-clustered index with include columns instead to create a non-clustered covering index."));
+        }
+
+        [Test]
         public override void CanCreateNamedMultiColumnUniqueConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedMultiColumnUniqueConstraintExpression();
 
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [TESTUNIQUECONSTRAINT] UNIQUE ([TestColumn1], [TestColumn2])");
+        }
+
+        [Test]
+        public virtual void CanCreateNamedMultiColumnUniqueConstraintWithDefaultSchemaAndFilter()
+        {
+            var expression = GeneratorTestHelper.GetCreateNamedMultiColumnUniqueConstraintExpression();
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintFilter, expression.Constraint.Columns.First() + " IS NOT NULL");
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE UNIQUE INDEX [TESTUNIQUECONSTRAINT] ON [dbo].[TestTable1] ([TestColumn1], [TestColumn2]) WHERE TestColumn1 IS NOT NULL");
+        }
+
+        [Test]
+        public virtual void CanCreateNamedMultiColumnUniqueConstraintWithDefaultSchemaAndFilterAndInclude()
+        {
+            var expression = GeneratorTestHelper.GetCreateNamedMultiColumnUniqueConstraintExpression();
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintFilter, expression.Constraint.Columns.First() + " IS NOT NULL");
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintIncludesList, new List<IndexIncludeDefinition> { new IndexIncludeDefinition { Name = "TestColumn3" } });
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE UNIQUE INDEX [TESTUNIQUECONSTRAINT] ON [dbo].[TestTable1] ([TestColumn1], [TestColumn2]) INCLUDE ([TestColumn3]) WHERE TestColumn1 IS NOT NULL");
+        }
+
+        [Test]
+        public virtual void CanCreateNamedMultiColumnUniqueConstraintWithDefaultSchemaAndFilterAndIncludeWithNonClusteredIndex()
+        {
+            var expression = GeneratorTestHelper.GetCreateNamedMultiColumnUniqueConstraintExpression();
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.ConstraintType, SqlServerConstraintType.NonClustered);
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintFilter, expression.Constraint.Columns.First() + " IS NOT NULL");
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintIncludesList, new List<IndexIncludeDefinition> { new IndexIncludeDefinition { Name = "TestColumn3" } });
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE UNIQUE INDEX [TESTUNIQUECONSTRAINT] ON [dbo].[TestTable1] ([TestColumn1], [TestColumn2]) INCLUDE ([TestColumn3]) WHERE TestColumn1 IS NOT NULL");
+        }
+
+        [Test]
+        public virtual void CannotCreateNamedMultiColumnUniqueConstraintWithDefaultSchemaAndFilterAndIncludeWithClusteredIndex()
+        {
+            var expression = GeneratorTestHelper.GetCreateNamedMultiColumnUniqueConstraintExpression();
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.ConstraintType, SqlServerConstraintType.Clustered);
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintFilter, expression.Constraint.Columns.First() + " IS NOT NULL");
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintIncludesList, new List<IndexIncludeDefinition> { new IndexIncludeDefinition { Name = "TestColumn3" } });
+
+            var ex = Assert.Throws<Exception>(() => Generator.Generate(expression));
+            Assert.That(ex, Is.Not.Null);
+            Assert.That(ex.Message, Is.EqualTo("Filtered indexes are non-clustered indexes that have the addition of a WHERE clause. SQL Server does not support clustered filtered indexes. Create a non-clustered index with include columns instead to create a non-clustered covering index."));
+        }
+
+        [Test]
+        public virtual void CanCreateNamedMultiColumnUniqueConstraintWithDefaultSchemaAndFilterWithNonClusteredIndex()
+        {
+            var expression = GeneratorTestHelper.GetCreateNamedMultiColumnUniqueConstraintExpression();
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.ConstraintType, SqlServerConstraintType.NonClustered);
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintFilter, expression.Constraint.Columns.First() + " IS NOT NULL");
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE UNIQUE INDEX [TESTUNIQUECONSTRAINT] ON [dbo].[TestTable1] ([TestColumn1], [TestColumn2]) WHERE TestColumn1 IS NOT NULL");
+        }
+
+        [Test]
+        public virtual void CannotCreateNamedMultiColumnUniqueConstraintWithDefaultSchemaAndFilterWithClusteredIndex()
+        {
+            var expression = GeneratorTestHelper.GetCreateNamedMultiColumnUniqueConstraintExpression();
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.ConstraintType, SqlServerConstraintType.Clustered);
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintFilter, expression.Constraint.Columns.First() + " IS NOT NULL");
+
+            var ex = Assert.Throws<Exception>(() => Generator.Generate(expression));
+            Assert.That(ex, Is.Not.Null);
+            Assert.That(ex.Message, Is.EqualTo("Filtered indexes are non-clustered indexes that have the addition of a WHERE clause. SQL Server does not support clustered filtered indexes. Create a non-clustered index with include columns instead to create a non-clustered covering index."));
         }
 
         [Test]
@@ -531,12 +843,118 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
+        public virtual void CanCreateUniqueConstraintWithCustomSchemaAndFilter()
+        {
+            var expression = GeneratorTestHelper.GetCreateUniqueConstraintExpression();
+            expression.Constraint.SchemaName = "TestSchema";
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintFilter, expression.Constraint.Columns.First() + " IS NOT NULL");
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE UNIQUE INDEX [UC_TestTable1_TestColumn1] ON [TestSchema].[TestTable1] ([TestColumn1]) WHERE TestColumn1 IS NOT NULL");
+        }
+
+        [Test]
+        public virtual void CanCreateUniqueConstraintWithDefaultSchemaAndFilterAndInclude()
+        {
+            var expression = GeneratorTestHelper.GetCreateUniqueConstraintExpression();
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintFilter, expression.Constraint.Columns.First() + " IS NOT NULL");
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintIncludesList, new List<IndexIncludeDefinition> { new IndexIncludeDefinition { Name = "TestColumn3" } });
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE UNIQUE INDEX [UC_TestTable1_TestColumn1] ON [dbo].[TestTable1] ([TestColumn1]) INCLUDE ([TestColumn3]) WHERE TestColumn1 IS NOT NULL");
+        }
+
+        [Test]
+        public virtual void CanCreateUniqueConstraintWithDefaultSchemaAndFilterAndIncludeWithNonClusteredIndex()
+        {
+            var expression = GeneratorTestHelper.GetCreateUniqueConstraintExpression();
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.ConstraintType, SqlServerConstraintType.NonClustered);
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintFilter, expression.Constraint.Columns.First() + " IS NOT NULL");
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintIncludesList, new List<IndexIncludeDefinition> { new IndexIncludeDefinition { Name = "TestColumn3" } });
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE UNIQUE INDEX [UC_TestTable1_TestColumn1] ON [dbo].[TestTable1] ([TestColumn1]) INCLUDE ([TestColumn3]) WHERE TestColumn1 IS NOT NULL");
+        }
+
+        [Test]
+        public virtual void CannotCreateUniqueConstraintWithDefaultSchemaAndFilterAndIncludeWithClusteredIndex()
+        {
+            var expression = GeneratorTestHelper.GetCreateNamedMultiColumnUniqueConstraintExpression();
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.ConstraintType, SqlServerConstraintType.Clustered);
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintFilter, expression.Constraint.Columns.First() + " IS NOT NULL");
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintIncludesList, new List<IndexIncludeDefinition> { new IndexIncludeDefinition { Name = "TestColumn3" } });
+
+            var ex = Assert.Throws<Exception>(() => Generator.Generate(expression));
+            Assert.That(ex, Is.Not.Null);
+            Assert.That(ex.Message, Is.EqualTo("Filtered indexes are non-clustered indexes that have the addition of a WHERE clause. SQL Server does not support clustered filtered indexes. Create a non-clustered index with include columns instead to create a non-clustered covering index."));
+        }
+
+
+        [Test]
+        public virtual void CanCreateUniqueConstraintWithCustomSchemaAndFilterWithNonClusteredIndex()
+        {
+            var expression = GeneratorTestHelper.GetCreateUniqueConstraintExpression();
+            expression.Constraint.SchemaName = "TestSchema";
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.ConstraintType, SqlServerConstraintType.NonClustered);
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintFilter, expression.Constraint.Columns.First() + " IS NOT NULL");
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE UNIQUE INDEX [UC_TestTable1_TestColumn1] ON [TestSchema].[TestTable1] ([TestColumn1]) WHERE TestColumn1 IS NOT NULL");
+        }
+
+        [Test]
+        public virtual void CannotCreateUniqueConstraintWithCustomSchemaAndFilterWithClusteredIndex()
+        {
+            var expression = GeneratorTestHelper.GetCreateUniqueConstraintExpression();
+            expression.Constraint.SchemaName = "TestSchema";
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.ConstraintType, SqlServerConstraintType.Clustered);
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintFilter, expression.Constraint.Columns.First() + " IS NOT NULL");
+
+            var ex = Assert.Throws<Exception>(() => Generator.Generate(expression));
+            Assert.That(ex, Is.Not.Null);
+            Assert.That(ex.Message, Is.EqualTo("Filtered indexes are non-clustered indexes that have the addition of a WHERE clause. SQL Server does not support clustered filtered indexes. Create a non-clustered index with include columns instead to create a non-clustered covering index."));
+        }
+
+        [Test]
         public override void CanCreateUniqueConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueConstraintExpression();
 
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [UC_TestTable1_TestColumn1] UNIQUE ([TestColumn1])");
+        }
+
+        [Test]
+        public virtual void CanCreateUniqueConstraintWithDefaultSchemaAndFilter()
+        {
+            var expression = GeneratorTestHelper.GetCreateUniqueConstraintExpression();
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintFilter, expression.Constraint.Columns.First() + " IS NOT NULL");
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE UNIQUE INDEX [UC_TestTable1_TestColumn1] ON [dbo].[TestTable1] ([TestColumn1]) WHERE TestColumn1 IS NOT NULL");
+        }
+
+        [Test]
+        public virtual void CanCreateUniqueConstraintWithDefaultSchemaAndFilterWithNonClusteredIndex()
+        {
+            var expression = GeneratorTestHelper.GetCreateUniqueConstraintExpression();
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.ConstraintType, SqlServerConstraintType.NonClustered);
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintFilter, expression.Constraint.Columns.First() + " IS NOT NULL");
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE UNIQUE INDEX [UC_TestTable1_TestColumn1] ON [dbo].[TestTable1] ([TestColumn1]) WHERE TestColumn1 IS NOT NULL");
+        }
+
+        [Test]
+        public virtual void CannotCreateUniqueConstraintWithDefaultSchemaAndFilterWithClusteredIndex()
+        {
+            var expression = GeneratorTestHelper.GetCreateUniqueConstraintExpression();
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.ConstraintType, SqlServerConstraintType.Clustered);
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintFilter, expression.Constraint.Columns.First() + " IS NOT NULL");
+
+            var ex = Assert.Throws<Exception>(() => Generator.Generate(expression));
+            Assert.That(ex, Is.Not.Null);
+            Assert.That(ex.Message, Is.EqualTo("Filtered indexes are non-clustered indexes that have the addition of a WHERE clause. SQL Server does not support clustered filtered indexes. Create a non-clustered index with include columns instead to create a non-clustered covering index."));
         }
 
         [Test]
@@ -633,5 +1051,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE [dbo].[TestTable1] DROP CONSTRAINT [TESTUNIQUECONSTRAINT]");
         }
+
+
     }
 }
