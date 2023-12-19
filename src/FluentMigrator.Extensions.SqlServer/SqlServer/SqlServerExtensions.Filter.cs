@@ -14,6 +14,7 @@
 // limitations under the License.
 #endregion
 
+using FluentMigrator.Builders.Create.Constraint;
 using FluentMigrator.Builders.Create.Index;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Infrastructure.Extensions;
@@ -22,12 +23,19 @@ namespace FluentMigrator.SqlServer
 {
     public static partial class SqlServerExtensions
     {
-        public static readonly string IndexFilter = "SqlServerIndexFilter";
-
         public static ICreateIndexOptionsSyntax Filter(this ICreateIndexOptionsSyntax expression, string filter)
         {
             var additionalFeatures = expression as ISupportAdditionalFeatures;
             additionalFeatures.SetAdditionalFeature(IndexFilter, filter);
+            return expression;
+        }
+
+        public static ICreateConstraintOptionsSyntax Filter(
+            this ICreateConstraintOptionsSyntax expression,
+            string filter)
+        {
+            var additionalFeatures = expression as ISupportAdditionalFeatures;
+            additionalFeatures.SetAdditionalFeature(UniqueConstraintFilter, filter);
             return expression;
         }
     }
