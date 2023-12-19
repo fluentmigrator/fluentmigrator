@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2018, FluentMigrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -55,7 +55,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
                 var embeddedResources = embeddedResourceProviders
                     .SelectMany(x => x.GetEmbeddedResources())
                     .Distinct().ToList();
-                Assert.AreNotEqual(0, embeddedResources.Count);
+                Assert.That(embeddedResources, Is.Not.Empty);
             }
         }
 
@@ -83,7 +83,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
                 var embeddedResources = embeddedResourceProviders
                     .SelectMany(x => x.GetEmbeddedResources())
                     .Distinct().ToList();
-                Assert.AreNotEqual(0, embeddedResources.Count);
+                Assert.That(embeddedResources, Is.Not.Empty);
             }
         }
 
@@ -173,7 +173,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
                 var embeddedResources = embeddedResourceProviders
                     .SelectMany(x => x.GetEmbeddedResources())
                     .Distinct().ToList();
-                Assert.AreNotEqual(0, embeddedResources.Count);
+                Assert.That(embeddedResources, Is.Not.Empty);
             }
         }
 
