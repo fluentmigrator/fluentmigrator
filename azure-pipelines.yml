@@ -7,8 +7,7 @@ trigger:
   branches:
     include:
     - release/*
-    - develop
-    - master
+    - main
   tags:
     include:
     - v1.*
