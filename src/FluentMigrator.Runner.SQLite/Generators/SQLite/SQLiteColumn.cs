@@ -9,8 +9,8 @@ namespace FluentMigrator.Runner.Generators.SQLite
     // ReSharper disable once InconsistentNaming
     internal class SQLiteColumn : ColumnBase
     {
-        public SQLiteColumn()
-            : base(new SQLiteTypeMap(), new SQLiteQuoter())
+        public SQLiteColumn(IQuoter quoter)
+            : base(new SQLiteTypeMap(), quoter)
         {
             // Add UNIQUE before IDENTITY and after PRIMARY KEY
             ClauseOrder.Insert(ClauseOrder.Count - 2, FormatUniqueConstraint);
