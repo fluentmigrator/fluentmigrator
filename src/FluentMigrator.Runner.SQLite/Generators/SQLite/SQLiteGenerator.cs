@@ -46,7 +46,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
         public SQLiteGenerator(
             [NotNull] SQLiteQuoter quoter,
             [NotNull] IOptions<GeneratorOptions> generatorOptions)
-            : base(new SQLiteColumn(), quoter, new EmptyDescriptionGenerator(), generatorOptions)
+            : base(new SQLiteColumn(quoter), quoter, new EmptyDescriptionGenerator(), generatorOptions)
         {
             CompatibilityMode = generatorOptions.Value.CompatibilityMode ?? CompatibilityMode.STRICT;
         }
