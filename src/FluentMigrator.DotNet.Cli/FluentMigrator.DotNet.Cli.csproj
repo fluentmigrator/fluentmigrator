@@ -8,7 +8,7 @@
   </PropertyGroup>
   <Import Project="$(MSBuildThisFileDirectory)../../PackageTool.props" />
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="13.0.0" />
+    <PackageReference Include="AutoMapper" Version="13.0.1" />
     <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="10.0.0" />
     <PackageReference Include="FSharp.Core" Version="8.0.101" />
     <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.1.1" />
