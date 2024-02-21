@@ -22,7 +22,7 @@
     <PackageReference Include="Npgsql" Version="8.0.1" />
     <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="10.0.0" />
     <PackageReference Include="FSharp.Core" Version="8.0.101" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.2" />
     <PackageReference Include="Oracle.ManagedDataAccess" Version="21.13.0" />
     <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.7" />
     <PackageReference Include="MySqlConnector" Version="2.3.5" />
