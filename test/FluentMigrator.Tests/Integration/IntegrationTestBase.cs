@@ -134,8 +134,7 @@ namespace FluentMigrator.Tests.Integration
             if (!IsAnyServerEnabled())
             {
                 Assert.Fail(
-                    "No database processors are configured to run your migration tests.  This message is provided to avoid false positives.  To avoid this message enable one or more test runners in the {0} class.",
-                    nameof(IntegrationTestOptions));
+$"No database processors are configured to run your migration tests.  This message is provided to avoid false positives.  To avoid this message enable one or more test runners in the {nameof(IntegrationTestOptions)} class.");
             }
 
             var executed = false;

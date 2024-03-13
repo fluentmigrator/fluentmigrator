@@ -36,7 +36,7 @@ namespace FluentMigrator.Tests.Unit.BatchParser
             batchParser.SqlText += (sender, evt) => { output.Add(evt.SqlText); };
             batchParser.SpecialToken += (sender, evt) => { Assert.Fail("No special token expected"); };
             batchParser.Process(new LinesSource(new string[0]));
-            Assert.AreEqual(0, output.Count);
+            Assert.That(output, Is.Empty);
         }
 
         [Test]
@@ -47,8 +47,8 @@ namespace FluentMigrator.Tests.Unit.BatchParser
             batchParser.SqlText += (sender, evt) => { output.Add(evt.SqlText); };
             batchParser.SpecialToken += (sender, evt) => { Assert.Fail("No special token expected"); };
             batchParser.Process(new LinesSource(new[] { "asd" }));
-            Assert.AreEqual(1, output.Count);
-            Assert.AreEqual("asd\n", output[0]);
+            Assert.That(output, Has.Count.EqualTo(1));
+            Assert.That(output[0], Is.EqualTo("asd\n"));
         }
 
         [Test]
@@ -68,7 +68,7 @@ namespace FluentMigrator.Tests.Unit.BatchParser
             batchParser.SqlText += (sender, evt) => { output.Add(evt.SqlText); };
             batchParser.SpecialToken += (sender, evt) => { Assert.Fail("No special token expected"); };
             batchParser.Process(new TextReaderSource(new StringReader("\n")));
-            Assert.AreEqual(0, output.Count);
+            Assert.That(output, Is.Empty);
         }
 
         [Test]
@@ -79,8 +79,8 @@ namespace FluentMigrator.Tests.Unit.BatchParser
             batchParser.SqlText += (sender, evt) => { output.Add(evt.SqlText); };
             batchParser.SpecialToken += (sender, evt) => { Assert.Fail("No special token expected"); };
             batchParser.Process(new TextReaderSource(new StringReader("\nasd")));
-            Assert.AreEqual(1, output.Count);
-            Assert.AreEqual("\nasd\n", output[0]);
+            Assert.That(output, Has.Count.EqualTo(1));
+            Assert.That(output[0], Is.EqualTo("\nasd\n"));
         }
 
         [Test]
@@ -92,10 +92,13 @@ namespace FluentMigrator.Tests.Unit.BatchParser
             batchParser.SqlText += (sender, evt) => { output.Add(evt.SqlText); };
             batchParser.SpecialToken += (sender, evt) => { specialTokens.Add(evt.Token); };
             batchParser.Process(new TextReaderSource(new StringReader("asd\ngo")));
-            Assert.AreEqual(1, output.Count);
-            Assert.AreEqual("asd\n", output[0]);
-            Assert.AreEqual(1, specialTokens.Count);
-            Assert.AreEqual("go", specialTokens[0]);
+            Assert.That(output, Has.Count.EqualTo(1));
+            Assert.Multiple(() =>
+            {
+                Assert.That(output[0], Is.EqualTo("asd\n"));
+                Assert.That(specialTokens, Has.Count.EqualTo(1));
+            });
+            Assert.That(specialTokens[0], Is.EqualTo("go"));
         }
 
         [Test]
@@ -107,10 +110,13 @@ namespace FluentMigrator.Tests.Unit.BatchParser
             batchParser.SqlText += (sender, evt) => { output.Add(evt.SqlText); };
             batchParser.SpecialToken += (sender, evt) => { specialTokens.Add(evt.Token); };
             batchParser.Process(new TextReaderSource(new StringReader("gO")));
-            Assert.AreEqual(1, output.Count);
-            Assert.AreEqual(string.Empty, output[0]);
-            Assert.AreEqual(1, specialTokens.Count);
-            Assert.AreEqual("gO", specialTokens[0]);
+            Assert.That(output, Has.Count.EqualTo(1));
+            Assert.Multiple(() =>
+            {
+                Assert.That(output[0], Is.EqualTo(string.Empty));
+                Assert.That(specialTokens, Has.Count.EqualTo(1));
+            });
+            Assert.That(specialTokens[0], Is.EqualTo("gO"));
         }
 
         [Test]
@@ -122,10 +128,13 @@ namespace FluentMigrator.Tests.Unit.BatchParser
             batchParser.SqlText += (sender, evt) => { output.Add(evt.SqlText); };
             batchParser.SpecialToken += (sender, evt) => { specialTokens.Add(evt.Token); };
             batchParser.Process(new TextReaderSource(new StringReader("\n  go")));
-            Assert.AreEqual(1, output.Count);
-            Assert.AreEqual("\n", output[0]);
-            Assert.AreEqual(1, specialTokens.Count);
-            Assert.AreEqual("go", specialTokens[0]);
+            Assert.That(output, Has.Count.EqualTo(1));
+            Assert.Multiple(() =>
+            {
+                Assert.That(output[0], Is.EqualTo("\n"));
+                Assert.That(specialTokens, Has.Count.EqualTo(1));
+            });
+            Assert.That(specialTokens[0], Is.EqualTo("go"));
         }
 
         [Test]
@@ -137,10 +146,13 @@ namespace FluentMigrator.Tests.Unit.BatchParser
             batchParser.SqlText += (sender, evt) => { output.Add(evt.SqlText); };
             batchParser.SpecialToken += (sender, evt) => { specialTokens.Add(evt.Token); };
             batchParser.Process(new TextReaderSource(new StringReader("\nasd\ngo 1 ")));
-            Assert.AreEqual(1, output.Count);
-            Assert.AreEqual("\nasd\n", output[0]);
-            Assert.AreEqual(1, specialTokens.Count);
-            Assert.AreEqual("go 1", specialTokens[0]);
+            Assert.That(output, Has.Count.EqualTo(1));
+            Assert.Multiple(() =>
+            {
+                Assert.That(output[0], Is.EqualTo("\nasd\n"));
+                Assert.That(specialTokens, Has.Count.EqualTo(1));
+            });
+            Assert.That(specialTokens[0], Is.EqualTo("go 1"));
         }
 
         [Test]
@@ -152,10 +164,13 @@ namespace FluentMigrator.Tests.Unit.BatchParser
             batchParser.SqlText += (sender, evt) => { output.Add(evt.SqlText); };
             batchParser.SpecialToken += (sender, evt) => { specialTokens.Add(evt.Token); };
             batchParser.Process(new TextReaderSource(new StringReader("/* test */\nasd\ngo")));
-            Assert.AreEqual(1, output.Count);
-            Assert.AreEqual("/* test */\nasd\n", output[0]);
-            Assert.AreEqual(1, specialTokens.Count);
-            Assert.AreEqual("go", specialTokens[0]);
+            Assert.That(output, Has.Count.EqualTo(1));
+            Assert.Multiple(() =>
+            {
+                Assert.That(output[0], Is.EqualTo("/* test */\nasd\n"));
+                Assert.That(specialTokens, Has.Count.EqualTo(1));
+            });
+            Assert.That(specialTokens[0], Is.EqualTo("go"));
         }
 
         [Test]
@@ -167,10 +182,13 @@ namespace FluentMigrator.Tests.Unit.BatchParser
             batchParser.SqlText += (sender, evt) => { output.Add(evt.SqlText); };
             batchParser.SpecialToken += (sender, evt) => { specialTokens.Add(evt.Token); };
             batchParser.Process(new TextReaderSource(new StringReader("/* test\n * blah */\nasd\ngo")));
-            Assert.AreEqual(1, output.Count);
-            Assert.AreEqual("/* test\n * blah */\nasd\n", output[0]);
-            Assert.AreEqual(1, specialTokens.Count);
-            Assert.AreEqual("go", specialTokens[0]);
+            Assert.That(output, Has.Count.EqualTo(1));
+            Assert.Multiple(() =>
+            {
+                Assert.That(output[0], Is.EqualTo("/* test\n * blah */\nasd\n"));
+                Assert.That(specialTokens, Has.Count.EqualTo(1));
+            });
+            Assert.That(specialTokens[0], Is.EqualTo("go"));
         }
 
         [Test]
@@ -182,9 +200,12 @@ namespace FluentMigrator.Tests.Unit.BatchParser
             batchParser.SqlText += (sender, evt) => { output.Add(evt.SqlText); };
             batchParser.SpecialToken += (sender, evt) => { specialTokens.Add(evt.Token); };
             batchParser.Process(new TextReaderSource(new StringReader("/* test */")));
-            Assert.AreEqual(1, output.Count);
-            Assert.AreEqual("/* test */\n", output[0]);
-            Assert.AreEqual(0, specialTokens.Count);
+            Assert.That(output, Has.Count.EqualTo(1));
+            Assert.Multiple(() =>
+            {
+                Assert.That(output[0], Is.EqualTo("/* test */\n"));
+                Assert.That(specialTokens, Is.Empty);
+            });
         }
 
         [Test]
@@ -197,8 +218,11 @@ namespace FluentMigrator.Tests.Unit.BatchParser
             batchParser.SpecialToken += (sender, evt) => { specialTokens.Add(evt.Token); };
             var source = new TextReaderSource(new StringReader("/* test */"));
             batchParser.Process(source, true);
-            Assert.AreEqual(0, output.Count);
-            Assert.AreEqual(0, specialTokens.Count);
+            Assert.Multiple(() =>
+            {
+                Assert.That(output, Is.Empty);
+                Assert.That(specialTokens, Is.Empty);
+            });
         }
 
         [Test]
@@ -211,8 +235,11 @@ namespace FluentMigrator.Tests.Unit.BatchParser
             batchParser.SpecialToken += (sender, evt) => { specialTokens.Add(evt.Token); };
             var source = new TextReaderSource(new StringReader("/* t \n est */"));
             batchParser.Process(source, true);
-            Assert.AreEqual(0, output.Count);
-            Assert.AreEqual(0, specialTokens.Count);
+            Assert.Multiple(() =>
+            {
+                Assert.That(output, Is.Empty);
+                Assert.That(specialTokens, Is.Empty);
+            });
         }
 
         [TestCase("/* t \n est */qweqwe", "qweqwe\n")]
@@ -226,9 +253,12 @@ namespace FluentMigrator.Tests.Unit.BatchParser
             batchParser.SpecialToken += (sender, evt) => { specialTokens.Add(evt.Token); };
             var source = new TextReaderSource(new StringReader(input));
             batchParser.Process(source, true);
-            Assert.AreEqual(1, output.Count);
-            Assert.AreEqual(expected, output[0]);
-            Assert.AreEqual(0, specialTokens.Count);
+            Assert.That(output, Has.Count.EqualTo(1));
+            Assert.Multiple(() =>
+            {
+                Assert.That(output[0], Is.EqualTo(expected));
+                Assert.That(specialTokens, Is.Empty);
+            });
         }
 
         [TestCase("-- blah\nqweqwe", "\nqweqwe\n")]
@@ -243,9 +273,12 @@ namespace FluentMigrator.Tests.Unit.BatchParser
             batchParser.SpecialToken += (sender, evt) => { specialTokens.Add(evt.Token); };
             var source = new TextReaderSource(new StringReader(input));
             batchParser.Process(source, true);
-            Assert.AreEqual(1, output.Count);
-            Assert.AreEqual(expected, output[0]);
-            Assert.AreEqual(0, specialTokens.Count);
+            Assert.That(output, Has.Count.EqualTo(1));
+            Assert.Multiple(() =>
+            {
+                Assert.That(output[0], Is.EqualTo(expected));
+                Assert.That(specialTokens, Is.Empty);
+            });
         }
 
         [Test]
@@ -258,8 +291,11 @@ namespace FluentMigrator.Tests.Unit.BatchParser
             batchParser.SpecialToken += (sender, evt) => { specialTokens.Add(evt.Token); };
             var source = new TextReaderSource(new StringReader("/* test\n * blah"));
             Assert.Throws<InvalidOperationException>(() => batchParser.Process(source));
-            Assert.AreEqual(0, output.Count);
-            Assert.AreEqual(0, specialTokens.Count);
+            Assert.Multiple(() =>
+            {
+                Assert.That(output, Is.Empty);
+                Assert.That(specialTokens, Is.Empty);
+            });
         }
 
         [Test]
@@ -271,12 +307,18 @@ namespace FluentMigrator.Tests.Unit.BatchParser
             batchParser.SqlText += (sender, evt) => { output.Add(evt.SqlText); };
             batchParser.SpecialToken += (sender, evt) => { specialTokens.Add(evt.Token); };
             batchParser.Process(new TextReaderSource(new StringReader("go\nGO")));
-            Assert.AreEqual(2, output.Count);
-            Assert.AreEqual(string.Empty, output[0]);
-            Assert.AreEqual(string.Empty, output[1]);
-            Assert.AreEqual(2, specialTokens.Count);
-            Assert.AreEqual("go", specialTokens[0]);
-            Assert.AreEqual("GO", specialTokens[1]);
+            Assert.That(output, Has.Count.EqualTo(2));
+            Assert.Multiple(() =>
+            {
+                Assert.That(output[0], Is.EqualTo(string.Empty));
+                Assert.That(output[1], Is.EqualTo(string.Empty));
+                Assert.That(specialTokens, Has.Count.EqualTo(2));
+            });
+            Assert.Multiple(() =>
+            {
+                Assert.That(specialTokens[0], Is.EqualTo("go"));
+                Assert.That(specialTokens[1], Is.EqualTo("GO"));
+            });
         }
     }
 }

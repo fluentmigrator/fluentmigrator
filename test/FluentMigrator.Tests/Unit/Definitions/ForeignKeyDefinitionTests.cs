@@ -142,8 +142,11 @@ namespace FluentMigrator.Tests.Unit.Definitions
 
             var processed = expr.Apply(ConventionSets.NoSchemaName);
 
-            Assert.That(processed.ForeignKey.ForeignTableSchema, Is.Null);
-            Assert.That(processed.ForeignKey.PrimaryTableSchema, Is.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(processed.ForeignKey.ForeignTableSchema, Is.Null);
+                Assert.That(processed.ForeignKey.PrimaryTableSchema, Is.Null);
+            });
         }
 
         [Test]
@@ -161,8 +164,11 @@ namespace FluentMigrator.Tests.Unit.Definitions
 
             var processed = expr.Apply(ConventionSets.WithSchemaName);
 
-            Assert.That(processed.ForeignKey.ForeignTableSchema, Is.EqualTo("testschema"));
-            Assert.That(processed.ForeignKey.PrimaryTableSchema, Is.EqualTo("testschema"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(processed.ForeignKey.ForeignTableSchema, Is.EqualTo("testschema"));
+                Assert.That(processed.ForeignKey.PrimaryTableSchema, Is.EqualTo("testschema"));
+            });
         }
 
         [Test]
@@ -178,8 +184,11 @@ namespace FluentMigrator.Tests.Unit.Definitions
 
             var processed = expr.Apply(ConventionSets.WithSchemaName);
 
-            Assert.That(processed.ForeignKey.ForeignTableSchema, Is.EqualTo("testdefault"));
-            Assert.That(processed.ForeignKey.PrimaryTableSchema, Is.EqualTo("testdefault"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(processed.ForeignKey.ForeignTableSchema, Is.EqualTo("testdefault"));
+                Assert.That(processed.ForeignKey.PrimaryTableSchema, Is.EqualTo("testdefault"));
+            });
         }
     }
 }

@@ -19,13 +19,16 @@
 using System;
 using System.Data;
 using System.IO;
+using System.Linq;
 
+using FluentMigrator.Builders.Insert;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Logging;
 using FluentMigrator.Runner.Processors.SQLite;
+using FluentMigrator.Tests.Helpers;
 
 using JetBrains.Annotations;
 
@@ -126,6 +129,38 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
         }
 
         [Test]
+        public void AGuidCanBeInsertedAndReadAgain([Values] bool binaryGuid)
+        {
+            using (var serviceProvider = CreateProcessorServices(null, binaryGuid))
+            {
+                using (var scope = serviceProvider.CreateScope())
+                {
+                    var processor = scope.ServiceProvider.GetRequiredService<SQLiteProcessor>();
+
+                    var originalGuid = new Guid("B5BA91DD-2D1D-4754-81EE-03F82B8EEFD8");
+
+                    using (var sqLiteTestTable = new SQLiteTestTable(processor, null, "GUID UNIQUEIDENTIFIER")) {
+                        var insertDataExpression = new InsertDataExpression { TableName = sqLiteTestTable.Name };
+                        var builder = new InsertDataExpressionBuilder(insertDataExpression);
+                        builder.Row(new { GUID = originalGuid });
+                        processor.Process(insertDataExpression);
+
+                        using (var dataSet = processor.ReadTableData(null, sqLiteTestTable.Name))
+                        {
+                            using (var dataTable = dataSet.Tables[0])
+                            {
+                                var dataRow = dataTable.Rows.Cast<DataRow>().Single();
+                                var value = dataRow["GUID"];
+                                var actualGuid = binaryGuid ? new Guid((byte[])value) : new Guid((string)value);
+                                Assert.That(actualGuid, Is.EqualTo(originalGuid));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        [Test]
         public void CallingProcessWithPerformDBOperationExpressionWhenInPreviewOnlyModeWillNotMakeDbChanges()
         {
             var output = new StringWriter();
@@ -133,7 +168,8 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
             var serviceProvider = CreateProcessorServices(
                 services => services
                     .AddSingleton<ILoggerProvider>(new SqlScriptFluentMigratorLoggerProvider(output))
-                    .ConfigureRunner(r => r.AsGlobalPreview()));
+                    .ConfigureRunner(r => r.AsGlobalPreview()),
+                false);
             using (serviceProvider)
             {
                 using (var scope = serviceProvider.CreateScope())
@@ -173,13 +209,13 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
             Assert.That(output.ToString(), Does.Contain(@"/* Performing DB Operation */"));
         }
 
-        private ServiceProvider CreateProcessorServices([CanBeNull] Action<IServiceCollection> initAction)
+        private ServiceProvider CreateProcessorServices([CanBeNull] Action<IServiceCollection> initAction, bool binaryGuid)
         {
             if (!IntegrationTestOptions.SQLite.IsEnabled)
                 Assert.Ignore();
 
             var serivces = ServiceCollectionExtensions.CreateServices()
-                .ConfigureRunner(r => r.AddSQLite())
+                .ConfigureRunner(r => r.AddSQLite(binaryGuid))
                 .AddScoped<IConnectionStringReader>(
                     _ => new PassThroughConnectionStringReader("Data Source=:memory:;Pooling=False;")); // Just use in-memory DB
 
@@ -191,7 +227,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
         [OneTimeSetUp]
         public void ClassSetUp()
         {
-            ServiceProvider = CreateProcessorServices(initAction: null);
+            ServiceProvider = CreateProcessorServices(initAction: null, binaryGuid: false);
 
             _column = new Mock<ColumnDefinition>();
             _tableName = "NewTable";
@@ -219,6 +255,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
         public void TearDown()
         {
             ServiceScope?.Dispose();
+            Processor?.Dispose();
         }
     }
 }

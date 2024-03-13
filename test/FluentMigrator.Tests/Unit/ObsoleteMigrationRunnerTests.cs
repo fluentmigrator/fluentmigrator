@@ -148,9 +148,12 @@ namespace FluentMigrator.Tests.Unit
             IMigration migration = new TestEmptyMigration();
             _runner.Up(migration);
 
-            Assert.AreEqual(_applicationContext, _runnerContextMock.Object.ApplicationContext, "The runner context does not have the expected application context.");
-            Assert.AreEqual(_applicationContext, _runner.RunnerContext?.ApplicationContext, "The MigrationRunner does not have the expected application context.");
-            Assert.AreEqual(_applicationContext, migration.ApplicationContext, "The migration does not have the expected application context.");
+            Assert.Multiple(() =>
+            {
+                Assert.That(_runnerContextMock.Object.ApplicationContext, Is.EqualTo(_applicationContext), "The runner context does not have the expected application context.");
+                Assert.That(_runner.RunnerContext?.ApplicationContext, Is.EqualTo(_applicationContext), "The MigrationRunner does not have the expected application context.");
+                Assert.That(migration.ApplicationContext, Is.EqualTo(_applicationContext), "The migration does not have the expected application context.");
+            });
             _announcer.VerifyAll();
         }
 
@@ -160,7 +163,7 @@ namespace FluentMigrator.Tests.Unit
             IMigration migration = new TestEmptyMigration();
             _runner.Up(migration);
 
-            Assert.AreEqual(IntegrationTestOptions.SqlServer2008.ConnectionString, migration.ConnectionString, "The migration does not have the expected connection string.");
+            Assert.That(migration.ConnectionString, Is.EqualTo(IntegrationTestOptions.SqlServer2008.ConnectionString), "The migration does not have the expected connection string.");
             _announcer.VerifyAll();
         }
 
@@ -365,7 +368,7 @@ namespace FluentMigrator.Tests.Unit
             const long fakeMigrationVersion = 2009010101;
             const long fakeMigrationVersion2 = 2009010102;
 
-            Assert.NotNull(_runner.VersionLoader.VersionTableMetaData.TableName);
+            Assert.That(_runner.VersionLoader.VersionTableMetaData.TableName, Is.Not.Null);
 
             LoadVersionData(fakeMigrationVersion, fakeMigrationVersion2);
 
@@ -382,7 +385,7 @@ namespace FluentMigrator.Tests.Unit
 
             LoadVersionData(fakeMigrationVersion);
 
-            Assert.NotNull(_runner.VersionLoader.VersionTableMetaData.TableName);
+            Assert.That(_runner.VersionLoader.VersionTableMetaData.TableName, Is.Not.Null);
 
             _runner.Rollback(1);
 
@@ -392,7 +395,7 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void RollbackToVersionZeroShouldDeleteVersionInfoTable()
         {
-            Assert.NotNull(_runner.VersionLoader.VersionTableMetaData.TableName);
+            Assert.That(_runner.VersionLoader.VersionTableMetaData.TableName, Is.Not.Null);
 
             _runner.RollbackToVersion(0);
 
@@ -673,11 +676,10 @@ namespace FluentMigrator.Tests.Unit
                 _runner.ApplyMigrationUp(
                     new MigrationInfo(7, TransactionBehavior.Default, true, new TestBreakingMigration()), true));
 
-            Assert.NotNull(ex);
+            Assert.That(ex, Is.Not.Null);
 
-            Assert.AreEqual(
-                "The migration 7: TestBreakingMigration is identified as a breaking change, and will not be executed unless the necessary flag (allow-breaking-changes|abc) is passed to the runner.",
-                ex.Message);
+            Assert.That(
+                ex.Message, Is.EqualTo("The migration 7: TestBreakingMigration is identified as a breaking change, and will not be executed unless the necessary flag (allow-breaking-changes|abc) is passed to the runner."));
         }
 
         [Test]

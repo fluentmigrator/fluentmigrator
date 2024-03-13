@@ -35,7 +35,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         public void CanParseFoceQuoteFromProviderOptions(string options, bool expectedValue)
         {
             var fbOpt = new FirebirdOptions().ApplyProviderSwitches(options);
-            Assert.AreEqual(expectedValue, fbOpt.ForceQuote);
+            Assert.That(fbOpt.ForceQuote, Is.EqualTo(expectedValue));
         }
     }
 }

@@ -32,37 +32,44 @@ namespace FluentMigrator.Tests.Unit.Loggers
 {
     public class TextWriterSemicolonDelimiterTests
     {
-        private StringWriter stringWriter;
-        private SqlScriptFluentMigratorLoggerOptions options;
-        private ILoggerFactory loggerFactory;
-        private ILogger logger;
+        private StringWriter _stringWriter;
+        private SqlScriptFluentMigratorLoggerOptions _options;
+        private ILoggerFactory _loggerFactory;
+        private ILogger _logger;
 
-        private string Output => stringWriter.ToString();
+        private string Output => _stringWriter.ToString();
 
         [SetUp]
-        public void SetUp() => stringWriter = new StringWriter();
+        public void SetUp() => _stringWriter = new StringWriter();
+
+        [TearDown]
+        public void TearDown()
+        {
+            _loggerFactory?.Dispose();
+            _stringWriter?.Dispose();
+        }
 
         [Test]
         public void WhenEnabledSqlShouldHaveSemicolonDelimiter()
         {
-            options = new SqlScriptFluentMigratorLoggerOptions() { OutputSemicolonDelimiter = true };
-            loggerFactory = new LoggerFactory();
-            loggerFactory.AddProvider(new SqlScriptFluentMigratorLoggerProvider(stringWriter, options));
-            logger = loggerFactory.CreateLogger("Test");
+            _options = new SqlScriptFluentMigratorLoggerOptions() { OutputSemicolonDelimiter = true };
+            _loggerFactory = new LoggerFactory();
+            _loggerFactory.AddProvider(new SqlScriptFluentMigratorLoggerProvider(_stringWriter, _options));
+            _logger = _loggerFactory.CreateLogger("Test");
 
-            logger.LogSql("DELETE Blah");
+            _logger.LogSql("DELETE Blah");
             Output.ShouldBe($"DELETE Blah;{Environment.NewLine}");
         }
 
         [Test]
         public void WhenDisabledSqlShouldNotHaveSemicolonDelimiter()
         {
-            options = new SqlScriptFluentMigratorLoggerOptions() { OutputSemicolonDelimiter = false };
-            loggerFactory = new LoggerFactory();
-            loggerFactory.AddProvider(new SqlScriptFluentMigratorLoggerProvider(stringWriter, options));
-            logger = loggerFactory.CreateLogger("Test");
+            _options = new SqlScriptFluentMigratorLoggerOptions() { OutputSemicolonDelimiter = false };
+            _loggerFactory = new LoggerFactory();
+            _loggerFactory.AddProvider(new SqlScriptFluentMigratorLoggerProvider(_stringWriter, _options));
+            _logger = _loggerFactory.CreateLogger("Test");
 
-            logger.LogSql("DELETE Blah");
+            _logger.LogSql("DELETE Blah");
             Output.ShouldNotContain(";");
         }
     }

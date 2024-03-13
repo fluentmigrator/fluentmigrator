@@ -39,7 +39,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         public void ModificationTypeShouldBeSetToAlter()
         {
             var expression = new CreateColumnExpression();
-            Assert.AreEqual(ColumnModificationType.Create, expression.Column.ModificationType);
+            Assert.That(expression.Column.ModificationType, Is.EqualTo(ColumnModificationType.Create));
         }
 
         [Test]

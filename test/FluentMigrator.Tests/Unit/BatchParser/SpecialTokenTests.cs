@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2018, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,13 +32,16 @@ namespace FluentMigrator.Tests.Unit.BatchParser
         {
             var source = new LinesSource(new[] { input });
             var reader = source.CreateReader();
-            Assert.IsNotNull(reader);
+            Assert.That(reader, Is.Not.Null);
             var tokenSearcher = new SemicolonSearcher();
             var result = tokenSearcher.Find(reader);
-            Assert.IsNotNull(result);
-            Assert.Greater(result.Index, -1);
-            Assert.AreEqual(1, result.Length);
-            Assert.AreEqual(";", result.Token);
+            Assert.That(result, Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Index, Is.GreaterThan(-1));
+                Assert.That(result.Length, Is.EqualTo(1));
+            });
+            Assert.That(result.Token, Is.EqualTo(";"));
         }
 
         [Test]
@@ -46,10 +49,10 @@ namespace FluentMigrator.Tests.Unit.BatchParser
         {
             var source = new LinesSource(new[] { string.Empty });
             var reader = source.CreateReader();
-            Assert.IsNotNull(reader);
+            Assert.That(reader, Is.Not.Null);
             var tokenSearcher = new SemicolonSearcher();
             var result = tokenSearcher.Find(reader);
-            Assert.IsNull(result);
+            Assert.That(result, Is.Null);
         }
 
         [TestCase("GO", "GO", 1)]
@@ -65,17 +68,20 @@ namespace FluentMigrator.Tests.Unit.BatchParser
         {
             var source = new LinesSource(new[] { input });
             var reader = source.CreateReader();
-            Assert.IsNotNull(reader);
+            Assert.That(reader, Is.Not.Null);
             var tokenSearcher = new GoSearcher();
             var result = tokenSearcher.Find(reader);
-            Assert.IsNotNull(result);
-            Assert.AreEqual(0, result.Index);
-            Assert.AreEqual(input.Length, result.Length);
-            Assert.AreEqual(expected, result.Token);
-            Assert.IsInstanceOf<GoSearcher.GoSearcherParameters>(result.Opaque);
+            Assert.That(result, Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Index, Is.EqualTo(0));
+                Assert.That(result.Length, Is.EqualTo(input.Length));
+            });
+            Assert.That(result.Token, Is.EqualTo(expected));
+            Assert.That(result.Opaque, Is.InstanceOf<GoSearcher.GoSearcherParameters>());
             var goParams = (GoSearcher.GoSearcherParameters) result.Opaque;
-            Assert.NotNull(goParams);
-            Assert.AreEqual(expectedCount, goParams.Count);
+            Assert.That(goParams, Is.Not.Null);
+            Assert.That(goParams.Count, Is.EqualTo(expectedCount));
         }
 
         [TestCase("x GO")]
@@ -85,10 +91,10 @@ namespace FluentMigrator.Tests.Unit.BatchParser
         {
             var source = new LinesSource(new[] { string.Empty });
             var reader = source.CreateReader();
-            Assert.IsNotNull(reader);
+            Assert.That(reader, Is.Not.Null);
             var tokenSearcher = new GoSearcher();
             var result = tokenSearcher.Find(reader);
-            Assert.IsNull(result);
+            Assert.That(result, Is.Null);
         }
 
         [Test]
@@ -96,12 +102,12 @@ namespace FluentMigrator.Tests.Unit.BatchParser
         {
             var source = new LinesSource(new[] { " GO" });
             var reader = source.CreateReader();
-            Assert.IsNotNull(reader);
+            Assert.That(reader, Is.Not.Null);
             reader = reader.Advance(1);
-            Assert.IsNotNull(reader);
+            Assert.That(reader, Is.Not.Null);
             var tokenSearcher = new GoSearcher();
             var result = tokenSearcher.Find(reader);
-            Assert.IsNull(result);
+            Assert.That(result, Is.Null);
         }
     }
 }

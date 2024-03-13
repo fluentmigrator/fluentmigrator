@@ -45,6 +45,13 @@ namespace FluentMigrator.Tests.Unit.Announcers
             };
         }
 
+
+        [TearDown]
+        public void TearDown()
+        {
+            _stringWriter?.Dispose();
+        }
+
         [Test]
         public void Adds_Go_StatementAfterSqlAnouncement()
         {
@@ -66,7 +73,7 @@ namespace FluentMigrator.Tests.Unit.Announcers
         public void Sql_Should_Not_Write_Go_When_Sql_Is_Empty()
         {
             _announcer.Sql("");
-            Assert.IsFalse(Output.Contains("GO"));
+            Assert.That(Output, Does.Not.Contain("GO"));
         }
 
         public string Output

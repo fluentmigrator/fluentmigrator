@@ -38,10 +38,13 @@ namespace FluentMigrator.Tests.Unit.BatchParser
         public void TestConfiguration(Type type, int startLength, int endLength)
         {
             var instance = Activator.CreateInstance(type);
-            Assert.IsInstanceOf<IRangeSearcher>(instance);
+            Assert.That(instance, Is.InstanceOf<IRangeSearcher>());
             var rangeSearcher = (IRangeSearcher)instance;
-            Assert.AreEqual(startLength, rangeSearcher.StartCodeLength);
-            Assert.AreEqual(endLength, rangeSearcher.EndCodeLength);
+            Assert.Multiple(() =>
+            {
+                Assert.That(rangeSearcher.StartCodeLength, Is.EqualTo(startLength));
+                Assert.That(rangeSearcher.EndCodeLength, Is.EqualTo(endLength));
+            });
         }
 
         [TestCase("  \"qweqwe\"  ", "qweqwe")]
@@ -50,22 +53,22 @@ namespace FluentMigrator.Tests.Unit.BatchParser
         {
             var source = new LinesSource(new[] { input });
             var reader = source.CreateReader();
-            Assert.IsNotNull(reader);
+            Assert.That(reader, Is.Not.Null);
 
             var rangeSearcher = new AnsiSqlIdentifier();
             var startIndex = rangeSearcher.FindStartCode(reader);
-            Assert.AreNotEqual(-1, startIndex);
+            Assert.That(startIndex, Is.Not.EqualTo(-1));
 
             reader = reader.Advance(startIndex + rangeSearcher.StartCodeLength);
-            Assert.IsNotNull(reader);
+            Assert.That(reader, Is.Not.Null);
 
             var endInfo = rangeSearcher.FindEndCode(reader);
-            Assert.IsNotNull(endInfo);
-            Assert.IsFalse(endInfo.IsNestedStart);
+            Assert.That(endInfo, Is.Not.Null);
+            Assert.That(endInfo.IsNestedStart, Is.False);
             var endIndex = endInfo.Index;
             var result = reader.ReadString(endIndex - reader.Index);
 
-            Assert.AreEqual(expected, result);
+            Assert.That(result, Is.EqualTo(expected));
         }
 
         [TestCase("  `qweqwe`  ", "qweqwe")]
@@ -74,22 +77,22 @@ namespace FluentMigrator.Tests.Unit.BatchParser
         {
             var source = new LinesSource(new[] { input });
             var reader = source.CreateReader();
-            Assert.IsNotNull(reader);
+            Assert.That(reader, Is.Not.Null);
 
             var rangeSearcher = new MySqlIdentifier();
             var startIndex = rangeSearcher.FindStartCode(reader);
-            Assert.AreNotEqual(-1, startIndex);
+            Assert.That(startIndex, Is.Not.EqualTo(-1));
 
             reader = reader.Advance(startIndex + rangeSearcher.StartCodeLength);
-            Assert.IsNotNull(reader);
+            Assert.That(reader, Is.Not.Null);
 
             var endInfo = rangeSearcher.FindEndCode(reader);
-            Assert.IsNotNull(endInfo);
-            Assert.IsFalse(endInfo.IsNestedStart);
+            Assert.That(endInfo, Is.Not.Null);
+            Assert.That(endInfo.IsNestedStart, Is.False);
             var endIndex = endInfo.Index;
             var result = reader.ReadString(endIndex - reader.Index);
 
-            Assert.AreEqual(expected, result);
+            Assert.That(result, Is.EqualTo(expected));
         }
 
         [TestCase("  [qweqwe]  ", "qweqwe")]
@@ -98,22 +101,22 @@ namespace FluentMigrator.Tests.Unit.BatchParser
         {
             var source = new LinesSource(new[] { input });
             var reader = source.CreateReader();
-            Assert.IsNotNull(reader);
+            Assert.That(reader, Is.Not.Null);
 
             var rangeSearcher = new SqlServerIdentifier();
             var startIndex = rangeSearcher.FindStartCode(reader);
-            Assert.AreNotEqual(-1, startIndex);
+            Assert.That(startIndex, Is.Not.EqualTo(-1));
 
             reader = reader.Advance(startIndex + rangeSearcher.StartCodeLength);
-            Assert.IsNotNull(reader);
+            Assert.That(reader, Is.Not.Null);
 
             var endInfo = rangeSearcher.FindEndCode(reader);
-            Assert.IsNotNull(endInfo);
-            Assert.IsFalse(endInfo.IsNestedStart);
+            Assert.That(endInfo, Is.Not.Null);
+            Assert.That(endInfo.IsNestedStart, Is.False);
             var endIndex = endInfo.Index;
             var result = reader.ReadString(endIndex - reader.Index);
 
-            Assert.AreEqual(expected, result);
+            Assert.That(result, Is.EqualTo(expected));
         }
 
         [TestCase("  'qweqwe'  ", "qweqwe")]
@@ -123,22 +126,22 @@ namespace FluentMigrator.Tests.Unit.BatchParser
         {
             var source = new LinesSource(new[] { input });
             var reader = source.CreateReader();
-            Assert.IsNotNull(reader);
+            Assert.That(reader, Is.Not.Null);
 
             var rangeSearcher = new SqlString();
             var startIndex = rangeSearcher.FindStartCode(reader);
-            Assert.AreNotEqual(-1, startIndex);
+            Assert.That(startIndex, Is.Not.EqualTo(-1));
 
             reader = reader.Advance(startIndex + rangeSearcher.StartCodeLength);
-            Assert.IsNotNull(reader);
+            Assert.That(reader, Is.Not.Null);
 
             var endInfo = rangeSearcher.FindEndCode(reader);
-            Assert.IsNotNull(endInfo);
-            Assert.IsFalse(endInfo.IsNestedStart);
+            Assert.That(endInfo, Is.Not.Null);
+            Assert.That(endInfo.IsNestedStart, Is.False);
             var endIndex = endInfo.Index;
             var result = reader.ReadString(endIndex - reader.Index);
 
-            Assert.AreEqual(expected, result);
+            Assert.That(result, Is.EqualTo(expected));
         }
 
         [TestCase("  'qweqwe")]
@@ -146,17 +149,17 @@ namespace FluentMigrator.Tests.Unit.BatchParser
         {
             var source = new LinesSource(new[] { input });
             var reader = source.CreateReader();
-            Assert.IsNotNull(reader);
+            Assert.That(reader, Is.Not.Null);
 
             var rangeSearcher = new SqlString();
             var startIndex = rangeSearcher.FindStartCode(reader);
-            Assert.AreNotEqual(-1, startIndex);
+            Assert.That(startIndex, Is.Not.EqualTo(-1));
 
             reader = reader.Advance(startIndex + rangeSearcher.StartCodeLength);
-            Assert.IsNotNull(reader);
+            Assert.That(reader, Is.Not.Null);
 
             var endInfo = rangeSearcher.FindEndCode(reader);
-            Assert.IsNull(endInfo);
+            Assert.That(endInfo, Is.Null);
         }
 
         [Test]
@@ -164,11 +167,11 @@ namespace FluentMigrator.Tests.Unit.BatchParser
         {
             var source = new LinesSource(new[] { string.Empty });
             var reader = source.CreateReader();
-            Assert.IsNotNull(reader);
+            Assert.That(reader, Is.Not.Null);
 
             var rangeSearcher = new SqlString();
             var startIndex = rangeSearcher.FindStartCode(reader);
-            Assert.AreEqual(-1, startIndex);
+            Assert.That(startIndex, Is.EqualTo(-1));
         }
 
         [TestCase("  /* blah */  ", " blah ")]
@@ -177,22 +180,22 @@ namespace FluentMigrator.Tests.Unit.BatchParser
         {
             var source = new TextReaderSource(new StringReader(input));
             var reader = source.CreateReader();
-            Assert.IsNotNull(reader);
+            Assert.That(reader, Is.Not.Null);
 
             var rangeSearcher = new MultiLineComment();
             var startIndex = rangeSearcher.FindStartCode(reader);
-            Assert.AreNotEqual(-1, startIndex);
+            Assert.That(startIndex, Is.Not.EqualTo(-1));
 
             reader = reader.Advance(startIndex + rangeSearcher.StartCodeLength);
-            Assert.IsNotNull(reader);
+            Assert.That(reader, Is.Not.Null);
 
             var endInfo = rangeSearcher.FindEndCode(reader);
-            Assert.IsNotNull(endInfo);
-            Assert.IsFalse(endInfo.IsNestedStart);
+            Assert.That(endInfo, Is.Not.Null);
+            Assert.That(endInfo.IsNestedStart, Is.False);
             var endIndex = endInfo.Index;
             var result = reader.ReadString(endIndex - reader.Index);
 
-            Assert.AreEqual(expected, result);
+            Assert.That(result, Is.EqualTo(expected));
         }
 
         [TestCase("/** blah\n * blubb\n*/  ", "* blah\n * blubb\n")]
@@ -201,7 +204,7 @@ namespace FluentMigrator.Tests.Unit.BatchParser
             using (var source = new TextReaderSource(new StringReader(input), true))
             {
                 var reader = source.CreateReader();
-                Assert.IsNotNull(reader);
+                Assert.That(reader, Is.Not.Null);
 
                 var foundStart = false;
                 var content = new StringBuilder();
@@ -224,7 +227,7 @@ namespace FluentMigrator.Tests.Unit.BatchParser
 
                         foundStart = true;
                         reader = reader.Advance(startIndex + rangeSearcher.StartCodeLength);
-                        Assert.IsNotNull(reader);
+                        Assert.That(reader, Is.Not.Null);
                     }
 
                     var endInfo = rangeSearcher.FindEndCode(reader);
@@ -241,8 +244,11 @@ namespace FluentMigrator.Tests.Unit.BatchParser
                     foundStart = false;
                 }
 
-                Assert.IsFalse(foundStart);
-                Assert.AreEqual(expected, content.ToString());
+                Assert.Multiple(() =>
+                {
+                    Assert.That(foundStart, Is.False);
+                    Assert.That(content.ToString(), Is.EqualTo(expected));
+                });
             }
         }
 
@@ -253,7 +259,7 @@ namespace FluentMigrator.Tests.Unit.BatchParser
         {
             var source = new TextReaderSource(new StringReader(input));
             var reader = source.CreateReader();
-            Assert.IsNotNull(reader);
+            Assert.That(reader, Is.Not.Null);
 
             var commentContent = new StringBuilder();
             var commentWriter = new StringWriter(commentContent)
@@ -285,10 +291,10 @@ namespace FluentMigrator.Tests.Unit.BatchParser
 
                 otherWriter.Write(reader.ReadString(startIndex));
                 reader = reader.Advance(startIndex + rangeSearcher.StartCodeLength);
-                Assert.IsNotNull(reader);
+                Assert.That(reader, Is.Not.Null);
 
                 var endInfo = rangeSearcher.FindEndCode(reader);
-                Assert.IsNotNull(endInfo);
+                Assert.That(endInfo, Is.Not.Null);
 
                 var contentLength = endInfo.Index - reader.Index;
                 commentWriter.Write(reader.ReadString(contentLength));
@@ -296,8 +302,11 @@ namespace FluentMigrator.Tests.Unit.BatchParser
                 reader = reader.Advance(contentLength + rangeSearcher.EndCodeLength);
             }
 
-            Assert.AreEqual(expectedComment, commentContent.ToString());
-            Assert.AreEqual(expectedOther, otherContent.ToString());
+            Assert.Multiple(() =>
+            {
+                Assert.That(commentContent.ToString(), Is.EqualTo(expectedComment));
+                Assert.That(otherContent.ToString(), Is.EqualTo(expectedOther));
+            });
         }
 
         [TestCase("   # qweqwe", " qweqwe", "   ")]
@@ -307,7 +316,7 @@ namespace FluentMigrator.Tests.Unit.BatchParser
         {
             var source = new TextReaderSource(new StringReader(input));
             var reader = source.CreateReader();
-            Assert.IsNotNull(reader);
+            Assert.That(reader, Is.Not.Null);
 
             var commentContent = new StringBuilder();
             var commentWriter = new StringWriter(commentContent)
@@ -339,10 +348,10 @@ namespace FluentMigrator.Tests.Unit.BatchParser
 
                 otherWriter.Write(reader.ReadString(startIndex));
                 reader = reader.Advance(startIndex + rangeSearcher.StartCodeLength);
-                Assert.IsNotNull(reader);
+                Assert.That(reader, Is.Not.Null);
 
                 var endInfo = rangeSearcher.FindEndCode(reader);
-                Assert.IsNotNull(endInfo);
+                Assert.That(endInfo, Is.Not.Null);
 
                 var contentLength = endInfo.Index - reader.Index;
                 commentWriter.Write(reader.ReadString(contentLength));
@@ -350,8 +359,11 @@ namespace FluentMigrator.Tests.Unit.BatchParser
                 reader = reader.Advance(contentLength + rangeSearcher.EndCodeLength);
             }
 
-            Assert.AreEqual(expectedComment, commentContent.ToString());
-            Assert.AreEqual(expectedOther, otherContent.ToString());
+            Assert.Multiple(() =>
+            {
+                Assert.That(commentContent.ToString(), Is.EqualTo(expectedComment));
+                Assert.That(otherContent.ToString(), Is.EqualTo(expectedOther));
+            });
         }
 
         [Test]
@@ -361,40 +373,52 @@ namespace FluentMigrator.Tests.Unit.BatchParser
             IRangeSearcher searcher = new NestingMultiLineComment();
             var source = new TextReaderSource(new StringReader("/* /* */ */"));
             var reader = source.CreateReader();
-            Assert.IsNotNull(reader);
+            Assert.Multiple(() =>
+            {
+                Assert.That(reader, Is.Not.Null);
 
-            Assert.AreEqual(0, searcher.FindStartCode(reader));
+                Assert.That(searcher.FindStartCode(reader), Is.EqualTo(0));
+            });
             reader = reader.Advance(2);
-            Assert.IsNotNull(reader);
+            Assert.That(reader, Is.Not.Null);
 
             var endInfo = searcher.FindEndCode(reader);
-            Assert.NotNull(endInfo);
-            Assert.True(endInfo.IsNestedStart);
+            Assert.That(endInfo, Is.Not.Null);
+            Assert.That(endInfo.IsNestedStart);
 
             searchers.Push(searcher);
             searcher = endInfo.NestedRangeSearcher;
-            Assert.NotNull(searcher);
-            Assert.AreEqual(3, endInfo.Index);
+            Assert.Multiple(() =>
+            {
+                Assert.That(searcher, Is.Not.Null);
+                Assert.That(endInfo.Index, Is.EqualTo(3));
+            });
 
             reader = reader.Advance(endInfo.Index - reader.Index + searcher.StartCodeLength);
-            Assert.IsNotNull(reader);
+            Assert.That(reader, Is.Not.Null);
 
             endInfo = searcher.FindEndCode(reader);
-            Assert.NotNull(endInfo);
-            Assert.IsFalse(endInfo.IsNestedStart);
-            Assert.AreEqual(6, endInfo.Index);
+            Assert.That(endInfo, Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(endInfo.IsNestedStart, Is.False);
+                Assert.That(endInfo.Index, Is.EqualTo(6));
+            });
 
             reader = reader.Advance(endInfo.Index - reader.Index + searcher.EndCodeLength);
-            Assert.IsNotNull(reader);
+            Assert.That(reader, Is.Not.Null);
 
             searcher = searchers.Pop();
             endInfo = searcher.FindEndCode(reader);
-            Assert.NotNull(endInfo);
-            Assert.IsFalse(endInfo.IsNestedStart);
-            Assert.AreEqual(9, endInfo.Index);
+            Assert.That(endInfo, Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(endInfo.IsNestedStart, Is.False);
+                Assert.That(endInfo.Index, Is.EqualTo(9));
+            });
 
             reader = reader.Advance(endInfo.Index - reader.Index + searcher.EndCodeLength);
-            Assert.IsNull(reader);
+            Assert.That(reader, Is.Null);
         }
     }
 }

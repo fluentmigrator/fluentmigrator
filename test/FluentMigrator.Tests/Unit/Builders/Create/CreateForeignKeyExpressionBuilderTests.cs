@@ -145,8 +145,11 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             var expression = new CreateForeignKeyExpression();
             var builder = new CreateForeignKeyExpressionBuilder(expression);
             builder.OnUpdate(rule);
-            Assert.That(expression.ForeignKey.OnUpdate, Is.EqualTo(rule));
-            Assert.That(expression.ForeignKey.OnDelete, Is.EqualTo(Rule.None));
+            Assert.Multiple(() =>
+            {
+                Assert.That(expression.ForeignKey.OnUpdate, Is.EqualTo(rule));
+                Assert.That(expression.ForeignKey.OnDelete, Is.EqualTo(Rule.None));
+            });
         }
 
         [TestCase(Rule.Cascade), TestCase(Rule.SetDefault), TestCase(Rule.SetNull), TestCase(Rule.None)]
@@ -155,8 +158,11 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             var expression = new CreateForeignKeyExpression();
             var builder = new CreateForeignKeyExpressionBuilder(expression);
             builder.OnDelete(rule);
-            Assert.That(expression.ForeignKey.OnUpdate, Is.EqualTo(Rule.None));
-            Assert.That(expression.ForeignKey.OnDelete, Is.EqualTo(rule));
+            Assert.Multiple(() =>
+            {
+                Assert.That(expression.ForeignKey.OnUpdate, Is.EqualTo(Rule.None));
+                Assert.That(expression.ForeignKey.OnDelete, Is.EqualTo(rule));
+            });
         }
 
         [TestCase(Rule.Cascade), TestCase(Rule.SetDefault), TestCase(Rule.SetNull), TestCase(Rule.None)]
@@ -165,8 +171,11 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             var expression = new CreateForeignKeyExpression();
             var builder = new CreateForeignKeyExpressionBuilder(expression);
             builder.OnDeleteOrUpdate(rule);
-            Assert.That(expression.ForeignKey.OnUpdate, Is.EqualTo(rule));
-            Assert.That(expression.ForeignKey.OnDelete, Is.EqualTo(rule));
+            Assert.Multiple(() =>
+            {
+                Assert.That(expression.ForeignKey.OnUpdate, Is.EqualTo(rule));
+                Assert.That(expression.ForeignKey.OnDelete, Is.EqualTo(rule));
+            });
         }
     }
 }

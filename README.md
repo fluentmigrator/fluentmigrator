@@ -4,11 +4,13 @@
 
 # News
 
-3.0.0 is released and goes full "dependency injection".
-We also have a new [documentation website](https://fluentmigrator.github.io)!
+5.0.0 is released and supports .NET 6, .NET 7, and .NET 8.
+Thanks to @eloekset, our [documentation website](https://fluentmigrator.github.io) now has 5.0.0 API links!
 
 Please read the [changelog](https://github.com/fluentmigrator/fluentmigrator/blob/master/CHANGELOG.md)
 or the upgrade guide for further information: [2.x to 3.0](https://fluentmigrator.github.io/articles/guides/upgrades/guide-2.0-to-3.0.html?tabs=di).
+
+There should not be a whole lot to do to upgrade from 3.0 to 5.0. As questions arise, we will consider adding a specific guide.
 
 # Packages
 

@@ -107,7 +107,7 @@ namespace FluentMigrator.Tests.Unit.Runners
                 "/task", "migrate:up",
                 "/version", "1");
 
-            Assert.Greater(sbVerbose.ToString().Length, sbNonVerbose.ToString().Length);
+            Assert.That(sbVerbose.ToString(), Has.Length.GreaterThan(sbNonVerbose.ToString().Length));
         }
 
         [Test]
@@ -128,7 +128,7 @@ namespace FluentMigrator.Tests.Unit.Runners
                 "/version", "0");
 
             var output = sb.ToString();
-            Assert.AreNotEqual(0, output.Length);
+            Assert.That(output, Is.Not.Empty);
         }
 
         [Test]
@@ -150,8 +150,11 @@ namespace FluentMigrator.Tests.Unit.Runners
                 "/preview");
 
             var output = sb.ToString();
-            Assert.That(output.Contains("PREVIEW-ONLY MODE"));
-            Assert.AreNotEqual(0, output.Length);
+            Assert.Multiple(() =>
+            {
+                Assert.That(output, Does.Contain("PREVIEW-ONLY MODE"));
+                Assert.That(output, Is.Not.Empty);
+            });
         }
 
         [Test]
@@ -174,8 +177,11 @@ namespace FluentMigrator.Tests.Unit.Runners
                 "/preview");
 
             var output = sb.ToString();
-            Assert.That(output.Contains("PREVIEW-ONLY MODE"));
-            Assert.AreNotEqual(0, output.Length);
+            Assert.Multiple(() =>
+            {
+                Assert.That(output, Does.Contain("PREVIEW-ONLY MODE"));
+                Assert.That(output, Is.Not.Empty);
+            });
         }
 
         [Test]
@@ -187,7 +193,7 @@ namespace FluentMigrator.Tests.Unit.Runners
                 File.Delete(outputFileName);
             }
 
-            Assert.IsFalse(File.Exists(outputFileName));
+            Assert.That(File.Exists(outputFileName), Is.False);
 
             new MigratorConsole().Run(
                 "/db", Database,
@@ -198,7 +204,7 @@ namespace FluentMigrator.Tests.Unit.Runners
                 "/task", "migrate:up",
                 "/version", "0");
 
-            Assert.IsTrue(File.Exists(outputFileName));
+            Assert.That(File.Exists(outputFileName));
             File.Delete(outputFileName);
         }
 
@@ -211,7 +217,7 @@ namespace FluentMigrator.Tests.Unit.Runners
                 File.Delete(outputFileName);
             }
 
-            Assert.IsFalse(File.Exists(outputFileName));
+            Assert.That(File.Exists(outputFileName), Is.False);
 
             new MigratorConsole().Run(
                 "/db", Database,
@@ -223,7 +229,7 @@ namespace FluentMigrator.Tests.Unit.Runners
                 "/task", "migrate:up",
                 "/version", "0");
 
-            Assert.IsTrue(File.Exists(outputFileName));
+            Assert.That(File.Exists(outputFileName));
             File.Delete(outputFileName);
         }
 
@@ -258,7 +264,7 @@ namespace FluentMigrator.Tests.Unit.Runners
 
             var expectedTags = new[] { "uk", "production" };
 
-            CollectionAssert.AreEquivalent(expectedTags, migratorConsole.Tags);
+            Assert.That(migratorConsole.Tags, Is.EquivalentTo(expectedTags));
         }
 
         [Test]
@@ -305,7 +311,7 @@ namespace FluentMigrator.Tests.Unit.Runners
 
             const string expectedProviderSwitces = "QuotedIdentifiers=true";
 
-            CollectionAssert.AreEquivalent(expectedProviderSwitces, migratorConsole.ProviderSwitches);
+            Assert.That(migratorConsole.ProviderSwitches, Is.EquivalentTo(expectedProviderSwitces));
         }
     }
 }

@@ -71,14 +71,14 @@ namespace FluentMigrator.Tests.Unit.Runners
         {
             var migrationInfos = _maintenanceLoader.LoadMaintenance(MigrationStage.BeforeEach);
             _migrationConventions.Verify(x => x.GetMaintenanceStage, Times.AtLeastOnce());
-            Assert.IsNotEmpty(migrationInfos);
+            Assert.That(migrationInfos, Is.Not.Empty);
 
-            CollectionAssert.AreEquivalent(new[]
+            Assert.That(migrationInfos.Select(mi => mi.Migration.GetType()), Is.EquivalentTo(new[]
             {
                 typeof(MaintenanceBeforeEach),
                 typeof(MaintenanceBeforeEachNoTag),
                 typeof(MaintenanceBeforeEachWithNonTransactionBehavior)
-            }, migrationInfos.Select(mi => mi.Migration.GetType()));
+            }));
 
             foreach (var migrationInfo in migrationInfos)
             {
@@ -96,14 +96,14 @@ namespace FluentMigrator.Tests.Unit.Runners
         {
             var migrationInfos = _maintenanceLoader.LoadMaintenance(MigrationStage.BeforeEach);
             _migrationConventions.Verify(x => x.TypeHasMatchingTags, Times.AtLeastOnce());
-            Assert.IsNotEmpty(migrationInfos);
+            Assert.That(migrationInfos, Is.Not.Empty);
 
-            CollectionAssert.AreEquivalent(new[]
+            Assert.That(migrationInfos.Select(mi => mi.Migration.GetType()), Is.EquivalentTo(new[]
             {
                 typeof(MaintenanceBeforeEach),
                 typeof(MaintenanceBeforeEachNoTag),
                 typeof(MaintenanceBeforeEachWithNonTransactionBehavior)
-            }, migrationInfos.Select(mi => mi.Migration.GetType()));
+            }));
 
             foreach (var migrationInfo in migrationInfos)
             {
@@ -119,7 +119,7 @@ namespace FluentMigrator.Tests.Unit.Runners
         public void MigrationInfoIsAttributedIsFalse()
         {
             var migrationInfos = _maintenanceLoader.LoadMaintenance(MigrationStage.BeforeEach);
-            Assert.IsNotEmpty(migrationInfos);
+            Assert.That(migrationInfos, Is.Not.Empty);
 
             foreach (var migrationInfo in migrationInfos)
             {
@@ -131,7 +131,7 @@ namespace FluentMigrator.Tests.Unit.Runners
         public void SetsTransactionBehaviorToSameAsMaintenanceAttribute()
         {
             var migrationInfos = _maintenanceLoader.LoadMaintenance(MigrationStage.BeforeEach);
-            Assert.IsNotEmpty(migrationInfos);
+            Assert.That(migrationInfos, Is.Not.Empty);
 
             foreach (var migrationInfo in migrationInfos)
             {
@@ -148,7 +148,7 @@ namespace FluentMigrator.Tests.Unit.Runners
         {
             var migrationInfos = _maintenanceLoaderNoTags.LoadMaintenance(MigrationStage.BeforeEach);
             _migrationConventions.Verify(x => x.TypeHasMatchingTags, Times.AtLeastOnce());
-            Assert.IsNotEmpty(migrationInfos);
+            Assert.That(migrationInfos, Is.Not.Empty);
 
             bool foundNoTag = false;
             foreach (var migrationInfo in migrationInfos)
@@ -167,7 +167,7 @@ namespace FluentMigrator.Tests.Unit.Runners
                 }
             }
 
-            Assert.IsTrue(foundNoTag);
+            Assert.That(foundNoTag);
         }
     }
 

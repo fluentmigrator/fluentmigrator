@@ -345,12 +345,15 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             };
 
             builder.ForeignKey(fk.Name, fk.PrimaryTableSchema, fk.PrimaryTable, "primaryColumnName");
-            Assert.IsTrue(builder.CurrentColumn.IsForeignKey);
-            Assert.AreEqual(builder.CurrentColumn.ForeignKey.Name, fk.Name);
-            Assert.AreEqual(builder.CurrentColumn.ForeignKey.PrimaryTable, fk.PrimaryTable);
-            Assert.AreEqual(builder.CurrentColumn.ForeignKey.PrimaryTableSchema, fk.PrimaryTableSchema);
-            Assert.AreEqual(builder.CurrentColumn.ForeignKey.ForeignTable, fk.ForeignTable);
-            Assert.AreEqual(builder.CurrentColumn.ForeignKey.ForeignTableSchema, fk.ForeignTableSchema);
+            Assert.That(builder.CurrentColumn.IsForeignKey);
+            Assert.Multiple(() =>
+            {
+                Assert.That(fk.Name, Is.EqualTo(builder.CurrentColumn.ForeignKey.Name));
+                Assert.That(fk.PrimaryTable, Is.EqualTo(builder.CurrentColumn.ForeignKey.PrimaryTable));
+                Assert.That(fk.PrimaryTableSchema, Is.EqualTo(builder.CurrentColumn.ForeignKey.PrimaryTableSchema));
+                Assert.That(fk.ForeignTable, Is.EqualTo(builder.CurrentColumn.ForeignKey.ForeignTable));
+                Assert.That(fk.ForeignTableSchema, Is.EqualTo(builder.CurrentColumn.ForeignKey.ForeignTableSchema));
+            });
         }
 
         [Test]
@@ -544,8 +547,11 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
         {
             var builder = new CreateTableExpressionBuilder(null, null) { CurrentForeignKey = new ForeignKeyDefinition() };
             builder.OnUpdate(rule);
-            Assert.That(builder.CurrentForeignKey.OnUpdate, Is.EqualTo(rule));
-            Assert.That(builder.CurrentForeignKey.OnDelete, Is.EqualTo(Rule.None));
+            Assert.Multiple(() =>
+            {
+                Assert.That(builder.CurrentForeignKey.OnUpdate, Is.EqualTo(rule));
+                Assert.That(builder.CurrentForeignKey.OnDelete, Is.EqualTo(Rule.None));
+            });
         }
 
         [TestCase(Rule.Cascade), TestCase(Rule.SetDefault), TestCase(Rule.SetNull), TestCase(Rule.None)]
@@ -553,8 +559,11 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
         {
             var builder = new CreateTableExpressionBuilder(null, null) { CurrentForeignKey = new ForeignKeyDefinition() };
             builder.OnDelete(rule);
-            Assert.That(builder.CurrentForeignKey.OnUpdate, Is.EqualTo(Rule.None));
-            Assert.That(builder.CurrentForeignKey.OnDelete, Is.EqualTo(rule));
+            Assert.Multiple(() =>
+            {
+                Assert.That(builder.CurrentForeignKey.OnUpdate, Is.EqualTo(Rule.None));
+                Assert.That(builder.CurrentForeignKey.OnDelete, Is.EqualTo(rule));
+            });
         }
 
         [TestCase(Rule.Cascade), TestCase(Rule.SetDefault), TestCase(Rule.SetNull), TestCase(Rule.None)]
@@ -562,8 +571,11 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
         {
             var builder = new CreateTableExpressionBuilder(null, null) { CurrentForeignKey = new ForeignKeyDefinition() };
             builder.OnDeleteOrUpdate(rule);
-            Assert.That(builder.CurrentForeignKey.OnUpdate, Is.EqualTo(rule));
-            Assert.That(builder.CurrentForeignKey.OnDelete, Is.EqualTo(rule));
+            Assert.Multiple(() =>
+            {
+                Assert.That(builder.CurrentForeignKey.OnUpdate, Is.EqualTo(rule));
+                Assert.That(builder.CurrentForeignKey.OnDelete, Is.EqualTo(rule));
+            });
         }
 
         [Test]
@@ -593,7 +605,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 
             var builder = new CreateTableExpressionBuilder(expressionMock.Object, contextMock.Object);
 
-            Assert.IsNotNull(builder.ColumnHelper);
+            Assert.That(builder.ColumnHelper, Is.Not.Null);
         }
 
         [Test]
@@ -607,8 +619,11 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             var builder = new CreateTableExpressionBuilder(expressionMock.Object, contextMock.Object);
             var builderAsInterface = (IColumnExpressionBuilder)builder;
 
-            Assert.AreEqual("Fred", builderAsInterface.SchemaName);
-            Assert.AreEqual("Flinstone", builderAsInterface.TableName);
+            Assert.Multiple(() =>
+            {
+                Assert.That(builderAsInterface.SchemaName, Is.EqualTo("Fred"));
+                Assert.That(builderAsInterface.TableName, Is.EqualTo("Flinstone"));
+            });
         }
 
         [Test]
@@ -624,7 +639,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 
             var builderAsInterface = (IColumnExpressionBuilder)builder;
 
-            Assert.AreSame(curColumn, builderAsInterface.Column);
+            Assert.That(builderAsInterface.Column, Is.SameAs(curColumn));
         }
 
         private void VerifyColumnHelperCall(Action<CreateTableExpressionBuilder> callToTest, System.Linq.Expressions.Expression<Action<ColumnExpressionBuilderHelper>> expectedHelperAction)

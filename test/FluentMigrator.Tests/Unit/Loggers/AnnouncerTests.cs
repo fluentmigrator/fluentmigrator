@@ -51,6 +51,14 @@ namespace FluentMigrator.Tests.Unit.Loggers
             _logger = _loggerFactory.CreateLogger("Test");
         }
 
+
+        [TearDown]
+        public void TearDown()
+        {
+            _loggerFactory?.Dispose();
+            _output?.Dispose();
+        }
+
         [Test]
         public void ElapsedTime_Should_Not_Write_When_ShowElapsedTime_Is_False()
         {
@@ -58,7 +66,7 @@ namespace FluentMigrator.Tests.Unit.Loggers
 
             _logger.LogElapsedTime(time);
 
-            Assert.IsEmpty(_output.ToString());
+            Assert.That(_output.ToString(), Is.Empty);
         }
 
         [Test]
@@ -70,7 +78,7 @@ namespace FluentMigrator.Tests.Unit.Loggers
 
             _logger.LogElapsedTime(time);
 
-            Assert.AreEqual("=> 100s", _output.ToString().Trim());
+            Assert.That(_output.ToString().Trim(), Is.EqualTo("=> 100s"));
         }
 
         [Test]
@@ -80,7 +88,7 @@ namespace FluentMigrator.Tests.Unit.Loggers
 
             _logger.LogError(message);
 
-            Assert.AreEqual($"!!! {message}", _output.ToString().Trim());
+            Assert.That(_output.ToString().Trim(), Is.EqualTo($"!!! {message}"));
         }
 
         [Test]
@@ -91,9 +99,12 @@ namespace FluentMigrator.Tests.Unit.Loggers
             _logger.LogHeader(message);
 
             var lines = GetLines();
-            Assert.GreaterOrEqual(3, lines.Count);
+            Assert.Multiple(() =>
+            {
+                Assert.That(lines, Has.Count.GreaterThanOrEqualTo(3));
 
-            Assert.AreEqual(message, lines[1]);
+                Assert.That(lines[1], Is.EqualTo(message));
+            });
         }
 
         [Test]
@@ -103,7 +114,7 @@ namespace FluentMigrator.Tests.Unit.Loggers
 
             _logger.LogSay(message);
 
-            Assert.AreEqual(message, _output.ToString().Trim());
+            Assert.That(_output.ToString().Trim(), Is.EqualTo(message));
         }
 
         [Test]
@@ -113,7 +124,7 @@ namespace FluentMigrator.Tests.Unit.Loggers
 
             _logger.LogSql(sql);
 
-            Assert.IsEmpty(_output.ToString());
+            Assert.That(_output.ToString(), Is.Empty);
         }
 
         [Test]
@@ -125,7 +136,7 @@ namespace FluentMigrator.Tests.Unit.Loggers
 
             _logger.LogSql(sql);
 
-            Assert.AreEqual(sql, _output.ToString().Trim());
+            Assert.That(_output.ToString().Trim(), Is.EqualTo(sql));
         }
 
         [Test]
@@ -137,7 +148,7 @@ namespace FluentMigrator.Tests.Unit.Loggers
 
             _logger.LogSql(sql);
 
-            Assert.AreEqual("No SQL statement executed.", _output.ToString().Trim());
+            Assert.That(_output.ToString().Trim(), Is.EqualTo("No SQL statement executed."));
         }
 
         private IReadOnlyList<string> GetLines()

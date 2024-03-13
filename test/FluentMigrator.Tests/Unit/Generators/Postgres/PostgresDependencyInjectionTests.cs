@@ -66,7 +66,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
                     .AddColumn("a-column").AsDateTimeOffset().WithDefault(SystemMethods.CurrentDateTimeOffset);
 
                 Assert.That(expressions, Is.Not.Empty);
-                Assert.That(expressions.Count, Is.EqualTo(1));
+                Assert.That(expressions, Has.Count.EqualTo(1));
                 Assert.That(expressions.Single(), Is.TypeOf<CreateColumnExpression>());
                 var addColumnExpression = (CreateColumnExpression) expressions.Single();
                 var statement = generator.Generate(addColumnExpression);

@@ -81,7 +81,7 @@ namespace FluentMigrator.Tests.Unit
                 .BuildServiceProvider()
                 .GetRequiredService<IMigrationInformationLoader>();
 
-            Assert.IsInstanceOf<DefaultMigrationInformationLoader>(loader);
+            Assert.That(loader, Is.InstanceOf<DefaultMigrationInformationLoader>());
 
             var defaultLoader = (DefaultMigrationInformationLoader)loader;
 
@@ -107,7 +107,7 @@ namespace FluentMigrator.Tests.Unit
             var migrationList = loader.LoadMigrations();
             List<Type> actual = migrationList.Select(m => m.Value.Migration.GetType()).ToList();
 
-            CollectionAssert.AreEquivalent(expected, actual);
+            Assert.That(actual, Is.EquivalentTo(expected));
         }
 
         [Test]
@@ -126,7 +126,7 @@ namespace FluentMigrator.Tests.Unit
             var migrationList = loader.LoadMigrations();
             List<Type> actual = migrationList.Select(m => m.Value.Migration.GetType()).ToList();
 
-            CollectionAssert.AreEquivalent(expected, actual);
+            Assert.That(actual, Is.EquivalentTo(expected));
         }
 
         [Test]
@@ -152,7 +152,7 @@ namespace FluentMigrator.Tests.Unit
 
             var actual = loader.LoadMigrations().Select(m => m.Value.Migration.GetType()).ToList();
 
-            CollectionAssert.AreEquivalent(expected, actual);
+            Assert.That(actual, Is.EquivalentTo(expected));
         }
 
         [Test]
@@ -178,7 +178,7 @@ namespace FluentMigrator.Tests.Unit
 
             var actual = loader.LoadMigrations().Select(m => m.Value.Migration.GetType()).ToList();
 
-            CollectionAssert.AreEquivalent(expected, actual);
+            Assert.That(actual, Is.EquivalentTo(expected));
         }
 
         [Test]
@@ -290,7 +290,7 @@ namespace FluentMigrator.Tests.Unit
             var migrationList = loader.LoadMigrations();
             List<Type> actual = migrationList.Select(m => m.Value.Migration.GetType()).ToList();
 
-            CollectionAssert.AreEquivalent(expected, actual);
+            Assert.That(actual, Is.EquivalentTo(expected));
         }
 
         [Test]
@@ -309,7 +309,7 @@ namespace FluentMigrator.Tests.Unit
             var migrationList = loader.LoadMigrations();
             List<Type> actual = migrationList.Select(m => m.Value.Migration.GetType()).ToList();
 
-            CollectionAssert.AreEquivalent(expected, actual);
+            Assert.That(actual, Is.EquivalentTo(expected));
         }
 
         [Test]
@@ -332,7 +332,7 @@ namespace FluentMigrator.Tests.Unit
 
             var actual = loader.LoadMigrations().Select(m => m.Value.Migration.GetType()).ToList();
 
-            CollectionAssert.AreEquivalent(expected, actual);
+            Assert.That(actual, Is.EquivalentTo(expected));
         }
 
         [Test]
@@ -355,7 +355,7 @@ namespace FluentMigrator.Tests.Unit
 
             var actual = loader.LoadMigrations().Select(m => m.Value.Migration.GetType()).ToList();
 
-            CollectionAssert.AreEquivalent(expected, actual);
+            Assert.That(actual, Is.EquivalentTo(expected));
         }
 
         [Test]

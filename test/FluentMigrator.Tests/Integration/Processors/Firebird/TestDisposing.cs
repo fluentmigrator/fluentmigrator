@@ -42,7 +42,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         private ServiceProvider ServiceProvider { get; set; }
 
         [Test]
-        public void Dispose_WasCommited_ShouldNotRollback()
+        public void Dispose_WasCommitted_ShouldNotRollback()
         {
             var createTable = new CreateTableExpression { TableName = "silly" };
             createTable.Columns.Add(new Model.ColumnDefinition { Name = "one", Type = DbType.Int32 });
@@ -94,12 +94,14 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         public void TearDown()
         {
             ServiceProvider?.Dispose();
+            
             if (_temporaryDatabase != null)
             {
                 var connString = _temporaryDatabase.ConnectionString;
                 _temporaryDatabase = null;
                 FbDatabase.DropDatabase(connString);
             }
+            _temporaryDatabase?.Dispose();
         }
     }
 }

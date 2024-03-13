@@ -289,7 +289,7 @@ namespace FluentMigrator.Runner.Processors
         {
             using (var message = new StringWriter())
             {
-                message.WriteLine("An error occured executing the following sql:");
+                message.WriteLine("An error occurred executing the following sql:");
                 message.WriteLine(sql);
                 message.WriteLine("The error was {0}", ex.Message);
 

@@ -26,7 +26,7 @@ namespace FluentMigrator.Tests.Unit.Loggers
         }
 
         [DatapointSource]
-        public TestInputExpected[] GetTestInputExpected()
+        protected TestInputExpected[] GetTestInputExpected()
         {
             var mask = "********";
             return new TestInputExpected[]
@@ -56,7 +56,7 @@ namespace FluentMigrator.Tests.Unit.Loggers
         public void PasswordShouldBeMaskedWhenInConnectionString(TestInputExpected testInputExpected)
         {
             var actual = _passwordMaskUtility.ApplyMask(testInputExpected.Input);
-            Assert.AreEqual(testInputExpected.Expected, actual, $"{nameof(testInputExpected.Input)} [{testInputExpected.Input}]");
+            Assert.That(actual, Is.EqualTo(testInputExpected.Expected), $"{nameof(testInputExpected.Input)} [{testInputExpected.Input}]");
         }
     }
 }

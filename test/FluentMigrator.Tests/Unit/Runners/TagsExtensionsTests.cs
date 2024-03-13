@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 //
 // Copyright (c) 2018, Fluent Migrator Project
 //
@@ -51,7 +51,7 @@ namespace FluentMigrator.Tests.Unit.Runners
             List<string> tags = "Dev,Test,Prod".ToTags();
 
             var expectedTags = new[] { "Dev", "Test", "Prod" };
-            CollectionAssert.AreEquivalent(expectedTags, tags);
+            Assert.That(tags, Is.EquivalentTo(expectedTags));
         }
     }
 }

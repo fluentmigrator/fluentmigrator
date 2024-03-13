@@ -100,12 +100,12 @@ namespace FluentMigrator.Tests.IssueTests.GH0911
                         if (dataType == "varchar")
                         {
                             var maxLength = column["CHARACTER_MAXIMUM_LENGTH"];
-                            Assert.AreEqual(40, maxLength);
+                            Assert.That(maxLength, Is.EqualTo(40));
                             ++foundColumns;
                         }
                     }
 
-                    Assert.AreEqual(3, foundColumns);
+                    Assert.That(foundColumns, Is.EqualTo(3));
                 }
             }
             finally

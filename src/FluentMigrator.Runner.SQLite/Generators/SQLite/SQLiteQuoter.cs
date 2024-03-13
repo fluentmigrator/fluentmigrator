@@ -1,3 +1,5 @@
+using System;
+
 using FluentMigrator.Runner.Generators.Generic;
 
 namespace FluentMigrator.Runner.Generators.SQLite
@@ -5,6 +7,13 @@ namespace FluentMigrator.Runner.Generators.SQLite
     // ReSharper disable once InconsistentNaming
     public class SQLiteQuoter : GenericQuoter
     {
+        private readonly bool _binaryGuid;
+
+        public SQLiteQuoter(bool binaryGuid = false)
+        {
+            _binaryGuid = binaryGuid;
+        }
+
         public override string FormatSystemMethods(SystemMethods value)
         {
             switch (value)
@@ -16,6 +25,17 @@ namespace FluentMigrator.Runner.Generators.SQLite
             }
 
             return base.FormatSystemMethods(value);
+        }
+
+        public override string FormatGuid(Guid value)
+        {
+            if (_binaryGuid)
+            {
+                var byteArray = value.ToByteArray();
+                var hexadecimalStringRepresentation = BitConverter.ToString(byteArray).Replace("-", string.Empty);
+                return "x'" + hexadecimalStringRepresentation + "'";
+            }
+            return base.FormatGuid(value);
         }
 
         public override string QuoteSchemaName(string schemaName)

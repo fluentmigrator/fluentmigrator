@@ -119,17 +119,17 @@ namespace FluentMigrator.Tests.Integration
             return false;
         }
 
-        public void ExecuteWithSupportedProcessors(Action<IMigrationProcessor> test)
+        protected void ExecuteWithSupportedProcessors(Action<IMigrationProcessor> test)
         {
             ExecuteWithSupportedProcessors(test, true);
         }
 
-        public void ExecuteWithSupportedProcessors(Action<IMigrationProcessor> test, bool tryRollback)
+        protected void ExecuteWithSupportedProcessors(Action<IMigrationProcessor> test, bool tryRollback)
         {
             ExecuteWithSupportedProcessors(test, tryRollback, new Type[] { });
         }
 
-        public void ExecuteWithSupportedProcessors(Action<IMigrationProcessor> test, bool tryRollback, params Type[] exceptProcessors)
+        protected void ExecuteWithSupportedProcessors(Action<IMigrationProcessor> test, bool tryRollback, params Type[] exceptProcessors)
         {
             ExecuteWithSupportedProcessors(
                 test,
@@ -137,13 +137,12 @@ namespace FluentMigrator.Tests.Integration
                 procType => !exceptProcessors.Any(p => p.IsAssignableFrom(procType)));
         }
 
-        public void ExecuteWithSupportedProcessors(Action<IMigrationProcessor> test, bool tryRollback, Predicate<Type> isMatch)
+        protected void ExecuteWithSupportedProcessors(Action<IMigrationProcessor> test, bool tryRollback, Predicate<Type> isMatch)
         {
             if (!IsAnyServerEnabled())
             {
                 Assert.Fail(
-                    "No database processors are configured to run your migration tests.  This message is provided to avoid false positives.  To avoid this message enable one or more test runners in the {0} class.",
-                    nameof(IntegrationTestOptions));
+$"No database processors are configured to run your migration tests.  This message is provided to avoid false positives.  To avoid this message enable one or more test runners in the {nameof(IntegrationTestOptions)} class.");
             }
 
             var executed = false;

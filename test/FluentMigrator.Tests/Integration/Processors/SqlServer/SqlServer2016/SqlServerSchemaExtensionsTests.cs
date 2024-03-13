@@ -119,6 +119,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServer.SqlServer2016
         public void TearDown()
         {
             ServiceScope?.Dispose();
+            Processor?.Dispose();
         }
     }
 }

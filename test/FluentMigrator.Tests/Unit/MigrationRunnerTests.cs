@@ -183,7 +183,7 @@ namespace FluentMigrator.Tests.Unit
             IMigration migration = new TestEmptyMigration();
             runner.Up(migration);
 
-            Assert.AreEqual(_applicationContext, migration.ApplicationContext, "The migration does not have the expected application context.");
+            Assert.That(migration.ApplicationContext, Is.EqualTo(_applicationContext), "The migration does not have the expected application context.");
         }
 
         [Test]
@@ -194,7 +194,7 @@ namespace FluentMigrator.Tests.Unit
             IMigration migration = new TestEmptyMigration();
             runner.Up(migration);
 
-            Assert.AreEqual(IntegrationTestOptions.SqlServer2008.ConnectionString, migration.ConnectionString, "The migration does not have the expected connection string.");
+            Assert.That(migration.ConnectionString, Is.EqualTo(IntegrationTestOptions.SqlServer2008.ConnectionString), "The migration does not have the expected connection string.");
         }
 
         [Test]
@@ -397,7 +397,7 @@ namespace FluentMigrator.Tests.Unit
             const long fakeMigrationVersion2 = 2009010102;
 
             var runner = CreateRunner();
-            Assert.NotNull(runner.VersionLoader.VersionTableMetaData.TableName);
+            Assert.That(runner.VersionLoader.VersionTableMetaData.TableName, Is.Not.Null);
 
             LoadVersionData(fakeMigrationVersion, fakeMigrationVersion2);
 
@@ -416,7 +416,7 @@ namespace FluentMigrator.Tests.Unit
 
             LoadVersionData(fakeMigrationVersion);
 
-            Assert.NotNull(runner.VersionLoader.VersionTableMetaData.TableName);
+            Assert.That(runner.VersionLoader.VersionTableMetaData.TableName, Is.Not.Null);
 
             runner.Rollback(1);
 
@@ -428,7 +428,7 @@ namespace FluentMigrator.Tests.Unit
         {
             var runner = CreateRunner();
 
-            Assert.NotNull(runner.VersionLoader.VersionTableMetaData.TableName);
+            Assert.That(runner.VersionLoader.VersionTableMetaData.TableName, Is.Not.Null);
 
             runner.RollbackToVersion(0);
 
@@ -721,11 +721,10 @@ namespace FluentMigrator.Tests.Unit
                 runner.ApplyMigrationUp(
                     new MigrationInfo(7, TransactionBehavior.Default, true, new TestBreakingMigration()), true));
 
-            Assert.NotNull(ex);
+            Assert.That(ex, Is.Not.Null);
 
-            Assert.AreEqual(
-                "The migration 7: TestBreakingMigration is identified as a breaking change, and will not be executed unless the necessary flag (allow-breaking-changes|abc) is passed to the runner.",
-                ex.Message);
+            Assert.That(
+                ex.Message, Is.EqualTo("The migration 7: TestBreakingMigration is identified as a breaking change, and will not be executed unless the necessary flag (allow-breaking-changes|abc) is passed to the runner."));
         }
 
         [Test]
@@ -791,7 +790,7 @@ namespace FluentMigrator.Tests.Unit
             _migrationList.Add(3, new MigrationInfo(3, TransactionBehavior.Default, new Step2Migration2()));
             var runner = CreateRunner();
             runner.MigrateUp();
-            Assert.AreEqual(1, runner.VersionLoader.VersionInfo.Latest());
+            Assert.That(runner.VersionLoader.VersionInfo.Latest(), Is.EqualTo(1));
         }
 
         [Test]
@@ -804,7 +803,7 @@ namespace FluentMigrator.Tests.Unit
             var runner = CreateRunner();
             runner.MigrateUp();
             runner.MigrateUp(); // run migrations second time, this time satisfying constraints
-            Assert.AreEqual(3, runner.VersionLoader.VersionInfo.Latest());
+            Assert.That(runner.VersionLoader.VersionInfo.Latest(), Is.EqualTo(3));
         }
 
         [Test]
@@ -814,7 +813,7 @@ namespace FluentMigrator.Tests.Unit
             _migrationList.Add(1, new MigrationInfo(1, TransactionBehavior.Default, new MultipleConstraintsMigration()));
             var runner = CreateRunner();
             runner.MigrateUp();
-            Assert.AreEqual(0, runner.VersionLoader.VersionInfo.Latest());
+            Assert.That(runner.VersionLoader.VersionInfo.Latest(), Is.EqualTo(0));
         }
 
         [Test]
@@ -824,7 +823,7 @@ namespace FluentMigrator.Tests.Unit
             _migrationList.Add(1, new MigrationInfo(1, TransactionBehavior.Default, new ConstrainedMigrationSuccess()));
             var runner = CreateRunner();
             runner.MigrateUp();
-            Assert.AreEqual(1, runner.VersionLoader.VersionInfo.Latest());
+            Assert.That(runner.VersionLoader.VersionInfo.Latest(), Is.EqualTo(1));
         }
 
         private static bool LineContainsAll(string line, params string[] words)

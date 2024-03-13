@@ -33,7 +33,7 @@ namespace FluentMigrator.Builders.Create.Index
 
         public ICreateIndexNonKeyColumnSyntax Include(string columnName)
         {
-            SupportAdditionalFeatures.Include(columnName);
+            SupportAdditionalFeatures.CreateIndexInclude(columnName);
             return this;
         }
     }

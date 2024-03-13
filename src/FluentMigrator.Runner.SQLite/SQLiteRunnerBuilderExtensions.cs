@@ -33,16 +33,17 @@ namespace FluentMigrator.Runner
         /// Adds SQLite support
         /// </summary>
         /// <param name="builder">The builder to add the SQLite-specific services to</param>
+        /// <param name="binaryGuid">True if guids are stored as binary, false if guids are stored as string</param>
         /// <returns>The migration runner builder</returns>
         // ReSharper disable once InconsistentNaming
-        public static IMigrationRunnerBuilder AddSQLite(this IMigrationRunnerBuilder builder)
+        public static IMigrationRunnerBuilder AddSQLite(this IMigrationRunnerBuilder builder, bool binaryGuid = false)
         {
             builder.Services
                 .AddTransient<SQLiteBatchParser>()
                 .AddScoped<SQLiteDbFactory>()
                 .AddScoped<SQLiteProcessor>()
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<SQLiteProcessor>())
-                .AddScoped<SQLiteQuoter>()
+                .AddScoped(sp => new SQLiteQuoter(binaryGuid))
                 .AddScoped<SQLiteGenerator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<SQLiteGenerator>());
 
