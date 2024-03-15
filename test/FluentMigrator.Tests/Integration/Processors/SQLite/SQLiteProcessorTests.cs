@@ -129,6 +129,20 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
         }
 
         [Test]
+        public void PrimaryKeyNonIdentityColumnsSupported()
+        {
+            var expression = new CreateTableExpression { TableName = _tableName };
+            expression.Columns.Add(new ColumnDefinition {Name = "Id", Type = DbType.Int32, IsPrimaryKey = false, IsIdentity = true, IsNullable = false });
+            expression.Columns.Add(new ColumnDefinition {Name = "Key1", Type = DbType.String, IsPrimaryKey = true, IsIdentity = false, IsNullable = false });
+            expression.Columns.Add(new ColumnDefinition {Name = "Key2", Type = DbType.String, IsPrimaryKey = true, IsIdentity = false, IsNullable = false });
+
+            Processor.Process(expression);
+            Processor.ColumnExists(null, _tableName, "Id").ShouldBeTrue();
+            Processor.ColumnExists(null, _tableName, "Key1").ShouldBeTrue();
+            Processor.ColumnExists(null, _tableName, "Key2").ShouldBeTrue();
+        }
+
+        [Test]
         public void AGuidCanBeInsertedAndReadAgain([Values] bool binaryGuid)
         {
             using (var serviceProvider = CreateProcessorServices(null, binaryGuid))
