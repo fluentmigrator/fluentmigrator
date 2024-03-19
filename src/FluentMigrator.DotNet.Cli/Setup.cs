@@ -34,14 +34,14 @@ namespace FluentMigrator.DotNet.Cli
 {
     public static class Setup
     {
-        public static IServiceProvider BuildServiceProvider(MigratorOptions options, IConsole console)
+        public static ServiceProvider BuildServiceProvider(MigratorOptions options, IConsole console)
         {
             var serviceCollection = new ServiceCollection();
             var serviceProvider = ConfigureServices(serviceCollection, options, console);
             return serviceProvider;
         }
 
-        private static IServiceProvider ConfigureServices(IServiceCollection services, MigratorOptions options, IConsole console)
+        private static ServiceProvider ConfigureServices(IServiceCollection services, MigratorOptions options, IConsole console)
         {
             var conventionSet = new DefaultConventionSet(defaultSchemaName: options.SchemaName, options.WorkingDirectory);
 

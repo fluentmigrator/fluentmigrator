@@ -26,7 +26,7 @@ namespace FluentMigrator.DotNet.Cli.Commands
     {
         protected int ExecuteMigrations(MigratorOptions options, IConsole console)
         {
-            var serviceProvider = Setup.BuildServiceProvider(options, console);
+            using var serviceProvider = Setup.BuildServiceProvider(options, console);
             var executor = serviceProvider.GetRequiredService<TaskExecutor>();
             executor.Execute();
             return 0;
