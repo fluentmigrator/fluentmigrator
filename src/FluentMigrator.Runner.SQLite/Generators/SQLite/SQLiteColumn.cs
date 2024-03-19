@@ -71,7 +71,9 @@ namespace FluentMigrator.Runner.Generators.SQLite
                     throw new ArgumentException($"Cannot create identity constraint on column {column.Name}. SQLite only supports identity on a single integer, primary key column.");
                 }
 
-                return "AUTOINCREMENT";
+                if (column.IsPrimaryKey) {
+                    return "AUTOINCREMENT";
+                }
             }
 
             return string.Empty;
