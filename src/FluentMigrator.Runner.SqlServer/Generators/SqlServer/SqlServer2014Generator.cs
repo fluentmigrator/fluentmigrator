@@ -33,12 +33,12 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         {
         }
 
-        public SqlServer2014Generator(
-            [NotNull] SqlServer2008Quoter quoter,
-            [NotNull] IOptions<GeneratorOptions> generatorOptions)
-            : base(quoter, generatorOptions)
-        {
-        }
+        //public SqlServer2014Generator(
+        //    [NotNull] SqlServer2008Quoter quoter,
+        //    [NotNull] IOptions<GeneratorOptions> generatorOptions)
+        //    : base(quoter, generatorOptions)
+        //{
+        //}
 
         protected SqlServer2014Generator(
             [NotNull] IColumn column,
@@ -46,6 +46,17 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             [NotNull] IDescriptionGenerator descriptionGenerator,
             [NotNull] IOptions<GeneratorOptions> generatorOptions)
             : base(column, quoter, descriptionGenerator, generatorOptions)
+        {
+        }
+               
+        public SqlServer2014Generator(
+            [NotNull] SqlServer2008Quoter quoter,
+            [NotNull] IOptions<GeneratorOptions> generatorOptions)
+            : this(
+                new SqlServer2014Column(new SqlServer2008TypeMap(), quoter),
+                quoter,
+                new SqlServer2005DescriptionGenerator(),
+                generatorOptions)
         {
         }
     }
