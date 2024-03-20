@@ -21,7 +21,7 @@
     <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
-    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.7" />
+    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.8" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\FluentMigrator.Runner\FluentMigrator.Runner.csproj" />
