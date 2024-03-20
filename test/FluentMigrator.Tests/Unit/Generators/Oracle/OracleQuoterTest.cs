@@ -84,6 +84,7 @@ Mrow stare out cat door then go back inside, run outside as soon as door open or
         }
 
         [Test]
+        [Category("NotWorkingOnMono")]
         public void LargeNonUnicodeStringIsChunked()
         {
             var chunks = _quoter.QuoteValue(new NonUnicodeString(OracleDataTests.LargeString));
@@ -91,6 +92,7 @@ Mrow stare out cat door then go back inside, run outside as soon as door open or
         }
 
         [Test]
+        [Category("NotWorkingOnMono")]
         public void LargeStringIsChunked()
         {
             var chunks = _quoter.QuoteValue(OracleDataTests.LargeString);
