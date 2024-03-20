@@ -244,7 +244,7 @@ namespace FluentMigrator.Runner.Processors.SQLite
                 }
                 catch (DbException ex)
                 {
-                    throw new Exception(ex.Message + "\r\nWhile Processing:\r\n\"" + command.CommandText + "\"", ex);
+                    throw new Exception(ex.Message + Environment.NewLine + "While Processing:" + Environment.NewLine + "\"" + command.CommandText + "\"", ex);
                 }
             }
         }
@@ -282,7 +282,7 @@ namespace FluentMigrator.Runner.Processors.SQLite
             }
             catch (DbException ex)
             {
-                throw new Exception(ex.Message + "\r\nWhile Processing:\r\n\"" + sqlBatch + "\"", ex);
+                throw new Exception(ex.Message + Environment.NewLine + "While Processing:" + Environment.NewLine + "\"" + sqlBatch + "\"", ex);
             }
         }
 

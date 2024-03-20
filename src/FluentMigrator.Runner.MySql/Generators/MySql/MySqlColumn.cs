@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Base;
 using System.Linq;
+using System;
 
 namespace FluentMigrator.Runner.Generators.MySql
 {
@@ -50,7 +51,7 @@ namespace FluentMigrator.Runner.Generators.MySql
             };
             descriptionsList.AddRange(from descriptionItem in column.AdditionalColumnDescriptions
                                       select descriptionItem.Key + ":" + descriptionItem.Value);
-            return string.Format("COMMENT {0}", Quoter.QuoteValue(string.Join("\r\n", descriptionsList)));
+            return string.Format("COMMENT {0}", Quoter.QuoteValue(string.Join(Environment.NewLine, descriptionsList)));
         }
 
         /// <inheritdoc />
