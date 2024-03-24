@@ -1,6 +1,6 @@
 #region License
 //
-// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2024, Fluent Migrator Project
 // Copyright (c) 2010, Nathan Brown
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -244,7 +244,7 @@ namespace FluentMigrator.Runner.Processors.SQLite
                 }
                 catch (DbException ex)
                 {
-                    throw new Exception(ex.Message + "\r\nWhile Processing:\r\n\"" + command.CommandText + "\"", ex);
+                    throw new Exception(ex.Message + Environment.NewLine + "While Processing:" + Environment.NewLine + "\"" + command.CommandText + "\"", ex);
                 }
             }
         }
@@ -282,7 +282,7 @@ namespace FluentMigrator.Runner.Processors.SQLite
             }
             catch (DbException ex)
             {
-                throw new Exception(ex.Message + "\r\nWhile Processing:\r\n\"" + sqlBatch + "\"", ex);
+                throw new Exception(ex.Message + Environment.NewLine + "While Processing:" + Environment.NewLine + "\"" + sqlBatch + "\"", ex);
             }
         }
 

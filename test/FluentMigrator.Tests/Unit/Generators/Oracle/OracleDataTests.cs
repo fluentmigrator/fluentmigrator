@@ -297,6 +297,7 @@ Mrow stare out cat door then go back inside, run outside as soon as door open or
         }
 
         [Test]
+        [Category("NotWorkingOnMono")]
         public void CanInsertDataWithLargeString()
         {
             var expression = GetLargeInsertExpression();
@@ -306,6 +307,7 @@ Mrow stare out cat door then go back inside, run outside as soon as door open or
         }
 
         [Test]
+        [Category("NotWorkingOnMono")]
         public void CanUpdateDataWithLargeString()
         {
             var expression = GetLargeUpdateExpression();

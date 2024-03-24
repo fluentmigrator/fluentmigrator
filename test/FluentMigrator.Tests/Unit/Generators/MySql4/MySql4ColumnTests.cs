@@ -256,7 +256,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
             var expression = GeneratorTestHelper.GetAlterColumnExpressionWithDescriptionWithAdditionalDescriptions();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE `TestTable1` MODIFY COLUMN `TestColumn1` VARCHAR(20) NOT NULL COMMENT 'Description:TestColumn1Description\r\nAdditionalColumnDescriptionKey1:AdditionalColumnDescriptionValue1'");
+            result.ShouldBe("ALTER TABLE `TestTable1` MODIFY COLUMN `TestColumn1` VARCHAR(20) NOT NULL COMMENT 'Description:TestColumn1Description" + Environment.NewLine + "AdditionalColumnDescriptionKey1:AdditionalColumnDescriptionValue1'");
         }
 
         [Test]
