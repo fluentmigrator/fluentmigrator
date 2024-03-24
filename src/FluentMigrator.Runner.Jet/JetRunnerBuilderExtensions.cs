@@ -38,6 +38,7 @@ namespace FluentMigrator.Runner
                 .AddScoped<JetProcessor>()
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<JetProcessor>())
                 .AddScoped<JetQuoter>()
+                .AddScoped<IJetTypeMap>(sp => new JetTypeMap())
                 .AddScoped<JetGenerator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<JetGenerator>());
 

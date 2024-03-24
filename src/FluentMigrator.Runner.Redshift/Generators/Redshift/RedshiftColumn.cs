@@ -25,7 +25,7 @@ using FluentMigrator.Runner.Generators.Base;
 
 namespace FluentMigrator.Runner.Generators.Redshift
 {
-    internal class RedshiftColumn : ColumnBase
+    internal class RedshiftColumn : ColumnBase<IRedshiftTypeMap>
     {
         public RedshiftColumn() : base(new RedshiftTypeMap(), new RedshiftQuoter())
         {

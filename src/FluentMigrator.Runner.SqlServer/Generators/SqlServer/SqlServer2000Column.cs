@@ -21,9 +21,9 @@ using FluentMigrator.SqlServer;
 
 namespace FluentMigrator.Runner.Generators.SqlServer
 {
-    internal class SqlServer2000Column : ColumnBase
+    internal class SqlServer2000Column : ColumnBase<ISqlServerTypeMap>
     {
-        public SqlServer2000Column(ITypeMap typeMap, IQuoter quoter)
+        public SqlServer2000Column(ISqlServerTypeMap typeMap, IQuoter quoter)
             : base(typeMap, quoter)
         {
         }

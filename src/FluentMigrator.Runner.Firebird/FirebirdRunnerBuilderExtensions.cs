@@ -57,6 +57,7 @@ namespace FluentMigrator.Runner
                 .AddScoped<FirebirdProcessor>()
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<FirebirdProcessor>())
                 .AddScoped<FirebirdQuoter>()
+                .AddScoped<IFirebirdTypeMap>(sp => new FirebirdTypeMap())
                 .AddScoped<FirebirdGenerator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<FirebirdGenerator>());
 

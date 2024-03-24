@@ -27,7 +27,7 @@ using JetBrains.Annotations;
 
 namespace FluentMigrator.Runner.Generators.Snowflake
 {
-    internal class SnowflakeColumn : ColumnBase
+    internal class SnowflakeColumn : ColumnBase<ISnowflakeTypeMap>
     {
         public SnowflakeColumn([NotNull] SnowflakeOptions sfOptions) : base(
             new SnowflakeTypeMap(),

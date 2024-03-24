@@ -7,10 +7,17 @@ using FluentMigrator.Runner.Generators.Base;
 namespace FluentMigrator.Runner.Generators.SQLite
 {
     // ReSharper disable once InconsistentNaming
-    internal class SQLiteColumn : ColumnBase
+    internal class SQLiteColumn : ColumnBase<ISQLiteTypeMap>
     {
         public SQLiteColumn(IQuoter quoter)
-            : base(new SQLiteTypeMap(), quoter)
+            : this(quoter, new SQLiteTypeMap())
+        {
+            // Add UNIQUE before IDENTITY and after PRIMARY KEY
+            ClauseOrder.Insert(ClauseOrder.Count - 2, FormatUniqueConstraint);
+        }
+
+        public SQLiteColumn(IQuoter quoter, ISQLiteTypeMap typeMap)
+            : base(typeMap, quoter)
         {
             // Add UNIQUE before IDENTITY and after PRIMARY KEY
             ClauseOrder.Insert(ClauseOrder.Count - 2, FormatUniqueConstraint);
@@ -20,7 +27,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
         public override string Generate(IEnumerable<ColumnDefinition> columns, string tableName)
         {
             var colDefs = columns.ToList();
-            var foreignKeyColumns = colDefs.Where(x => x.IsForeignKey && x.ForeignKey != null);
+            var foreignKeyColumns = colDefs.Where(x => x.IsForeignKey && x.ForeignKey != null).ToList();
             var foreignKeyClauses = foreignKeyColumns
                 .Select(x => ", " + FormatForeignKey(x.ForeignKey, GenerateForeignKeyName))
                 .ToList();

@@ -23,7 +23,7 @@ using FluentMigrator.Runner.Generators.Base;
 
 namespace FluentMigrator.Runner.Generators.Oracle
 {
-    internal class OracleColumn : ColumnBase
+    internal class OracleColumn : ColumnBase<IOracleTypeMap>
     {
         protected virtual int OracleObjectNameMaxLength => 30;
 

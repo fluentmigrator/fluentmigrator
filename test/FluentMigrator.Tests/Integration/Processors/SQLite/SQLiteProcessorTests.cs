@@ -131,7 +131,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
         [Test]
         public void AGuidCanBeInsertedAndReadAgain([Values] bool binaryGuid)
         {
-            using (var serviceProvider = CreateProcessorServices(null, binaryGuid))
+            using (var serviceProvider = CreateProcessorServices(null, binaryGuid, false))
             {
                 using (var scope = serviceProvider.CreateScope())
                 {
@@ -169,6 +169,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
                 services => services
                     .AddSingleton<ILoggerProvider>(new SqlScriptFluentMigratorLoggerProvider(output))
                     .ConfigureRunner(r => r.AsGlobalPreview()),
+                false,
                 false);
             using (serviceProvider)
             {
@@ -209,25 +210,25 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
             Assert.That(output.ToString(), Does.Contain(@"/* Performing DB Operation */"));
         }
 
-        private ServiceProvider CreateProcessorServices([CanBeNull] Action<IServiceCollection> initAction, bool binaryGuid)
+        private ServiceProvider CreateProcessorServices([CanBeNull] Action<IServiceCollection> initAction, bool binaryGuid, bool useStrictTables)
         {
             if (!IntegrationTestOptions.SQLite.IsEnabled)
                 Assert.Ignore();
 
-            var serivces = ServiceCollectionExtensions.CreateServices()
-                .ConfigureRunner(r => r.AddSQLite(binaryGuid))
+            var services = ServiceCollectionExtensions.CreateServices()
+                .ConfigureRunner(r => r.AddSQLite(binaryGuid, useStrictTables))
                 .AddScoped<IConnectionStringReader>(
                     _ => new PassThroughConnectionStringReader("Data Source=:memory:;Pooling=False;")); // Just use in-memory DB
 
-            initAction?.Invoke(serivces);
+            initAction?.Invoke(services);
 
-            return serivces.BuildServiceProvider();
+            return services.BuildServiceProvider();
         }
 
         [OneTimeSetUp]
         public void ClassSetUp()
         {
-            ServiceProvider = CreateProcessorServices(initAction: null, binaryGuid: false);
+            ServiceProvider = CreateProcessorServices(initAction: null, binaryGuid: false, useStrictTables: false);
 
             _column = new Mock<ColumnDefinition>();
             _tableName = "NewTable";

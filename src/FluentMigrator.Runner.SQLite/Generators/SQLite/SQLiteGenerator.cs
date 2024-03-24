@@ -45,8 +45,24 @@ namespace FluentMigrator.Runner.Generators.SQLite
 
         public SQLiteGenerator(
             [NotNull] SQLiteQuoter quoter,
+            [NotNull] ISQLiteTypeMap typeMap)
+            : this(quoter, typeMap, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()))
+        {
+            
+        }
+
+        public SQLiteGenerator(
+            [NotNull] SQLiteQuoter quoter,
             [NotNull] IOptions<GeneratorOptions> generatorOptions)
-            : base(new SQLiteColumn(quoter), quoter, new EmptyDescriptionGenerator(), generatorOptions)
+            : this(quoter, new SQLiteTypeMap(false), generatorOptions)
+        {
+        }
+
+        public SQLiteGenerator(
+            [NotNull] SQLiteQuoter quoter,
+            [NotNull] ISQLiteTypeMap typeMap,
+            [NotNull] IOptions<GeneratorOptions> generatorOptions)
+            : base(new SQLiteColumn(quoter, typeMap), quoter, new EmptyDescriptionGenerator(), generatorOptions)
         {
             CompatibilityMode = generatorOptions.Value.CompatibilityMode ?? CompatibilityMode.STRICT;
         }

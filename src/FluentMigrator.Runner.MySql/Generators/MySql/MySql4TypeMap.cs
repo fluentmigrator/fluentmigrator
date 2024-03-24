@@ -20,7 +20,7 @@ using FluentMigrator.Runner.Generators.Base;
 
 namespace FluentMigrator.Runner.Generators.MySql
 {
-    internal class MySql4TypeMap : TypeMapBase
+    internal class MySql4TypeMap : TypeMapBase, IMySqlTypeMap
     {
         public const int AnsiTinyStringCapacity = 127;
         public const int StringCapacity = 255;
@@ -30,7 +30,12 @@ namespace FluentMigrator.Runner.Generators.MySql
         public const int LongTextCapacity = int.MaxValue;
         public const int DecimalCapacity = 254;
 
-        protected override void SetupTypeMaps()
+        public MySql4TypeMap()
+        {
+            SetupTypeMaps();
+        }
+
+        protected virtual void SetupMySqlTypeMaps()
         {
             SetTypeMap(DbType.AnsiStringFixedLength, "CHAR(255)");
             SetTypeMap(DbType.AnsiStringFixedLength, "CHAR($size)", StringCapacity);
@@ -72,6 +77,11 @@ namespace FluentMigrator.Runner.Generators.MySql
             SetTypeMap(DbType.String, "MEDIUMTEXT", MediumTextCapacity);
             SetTypeMap(DbType.String, "LONGTEXT", LongTextCapacity);
             SetTypeMap(DbType.Time, "DATETIME");
+        }
+        
+        protected sealed override void SetupTypeMaps()
+        {
+            SetupMySqlTypeMaps();
         }
     }
 }

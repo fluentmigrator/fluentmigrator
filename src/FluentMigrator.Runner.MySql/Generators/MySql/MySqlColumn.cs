@@ -22,9 +22,9 @@ using System.Linq;
 
 namespace FluentMigrator.Runner.Generators.MySql
 {
-    internal class MySqlColumn : ColumnBase
+    internal class MySqlColumn : ColumnBase<IMySqlTypeMap>
     {
-        public MySqlColumn(ITypeMap typeMap, IQuoter quoter)
+        public MySqlColumn(IMySqlTypeMap typeMap, IQuoter quoter)
             : base(typeMap, quoter)
         {
             ClauseOrder.Add(FormatDescription);
