@@ -92,14 +92,13 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         }
 
         [Test]
-        public void CanCreateTableWithSeededIdentityAndLooseCompatibility()
+        public void CanCreateTableWithSeededIdentity([Values] CompatibilityMode compatibilityMode)
         {
             var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();
             expression.Columns[0].IsPrimaryKey = true;
-            expression.Columns[0].AdditionalFeatures.Add(SqlServerExtensions.IdentitySeed, 3);
-            expression.Columns[0].AdditionalFeatures.Add(SqlServerExtensions.IdentityIncrement, 3);
-            Generator.CompatibilityMode = CompatibilityMode.LOOSE;
+            expression.Columns[0].IsIdentity = true;
 
+            Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
             result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, \"TestColumn2\" INTEGER NOT NULL)");
         }

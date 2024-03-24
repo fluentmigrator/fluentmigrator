@@ -54,6 +54,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
         public SQLiteGenerator(
             [NotNull] SQLiteQuoter quoter,
             [NotNull] IOptions<GeneratorOptions> generatorOptions)
+            // ReSharper disable once RedundantArgumentDefaultValue
             : this(quoter, new SQLiteTypeMap(false), generatorOptions)
         {
         }
@@ -111,26 +112,33 @@ namespace FluentMigrator.Runner.Generators.SQLite
 
         public override string Generate(CreateConstraintExpression expression)
         {
-            if (!expression.Constraint.IsUniqueConstraint)
-                return CompatibilityMode.HandleCompatibilty("Only UNIQUE constraints are supported in SQLite");
+            if (!(expression.Constraint.IsUniqueConstraint || expression.Constraint.IsPrimaryKeyConstraint))
+            {
+                return CompatibilityMode.HandleCompatibilty("Only creating UNIQUE and PRIMARY KEY constraints are supported in SQLite");
+            }
 
-            // Convert the constraint into a UNIQUE index
-            var idx = new CreateIndexExpression();
-            idx.Index.Name = expression.Constraint.ConstraintName;
-            idx.Index.TableName = expression.Constraint.TableName;
-            idx.Index.SchemaName = expression.Constraint.SchemaName;
-            idx.Index.IsUnique = true;
+            if (expression.Constraint.IsUniqueConstraint)
+            {
+                // Convert the constraint into a UNIQUE index
+                var idx = new CreateIndexExpression();
+                idx.Index.Name = expression.Constraint.ConstraintName;
+                idx.Index.TableName = expression.Constraint.TableName;
+                idx.Index.SchemaName = expression.Constraint.SchemaName;
+                idx.Index.IsUnique = true;
 
-            foreach (var col in expression.Constraint.Columns)
-                idx.Index.Columns.Add(new IndexColumnDefinition { Name = col });
+                foreach (var col in expression.Constraint.Columns)
+                    idx.Index.Columns.Add(new IndexColumnDefinition { Name = col });
 
-            return Generate(idx);
+                return Generate(idx);
+            }
+
+            return base.Generate(expression);
         }
 
         public override string Generate(DeleteConstraintExpression expression)
         {
             if (!expression.Constraint.IsUniqueConstraint)
-                return CompatibilityMode.HandleCompatibilty("Only UNIQUE constraints are supported in SQLite");
+                return CompatibilityMode.HandleCompatibilty("Only deleting UNIQUE constraints are supported in SQLite");
 
             // Convert the constraint into a drop UNIQUE index
             var idx = new DeleteIndexExpression();

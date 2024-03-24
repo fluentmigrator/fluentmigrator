@@ -130,10 +130,11 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
         }
 
         [Test]
-        public override void CanCreateTableWithMultiColumnPrimaryKeyWithDefaultSchema()
+        public override void CanCreateTableWithMultiColumnPrimaryKeyWithDefaultSchema([Values] CompatibilityMode compatibilityMode)
         {
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumnPrimaryKeyExpression();
 
+            Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
             result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" NVARCHAR2(255) NOT NULL, \"TestColumn2\" NUMBER(10,0) NOT NULL, PRIMARY KEY (\"TestColumn1\", \"TestColumn2\"))");
         }

@@ -16,6 +16,7 @@
 
 using System.Reflection.Emit;
 
+using FluentMigrator.Runner;
 using FluentMigrator.Runner.Generators.Redshift;
 
 using NUnit.Framework;
@@ -25,14 +26,14 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Generators.Redshift
 {
     [TestFixture]
-    public sealed class RedshiftTableTests : BaseTableTests
+    public class RedshiftTableTests : BaseTableTests
     {
-        private RedshiftGenerator _generator;
+        protected RedshiftGenerator Generator;
 
         [SetUp]
         public void Setup()
         {
-            _generator = new RedshiftGenerator();
+            Generator = new RedshiftGenerator();
         }
 
         [Test]
@@ -44,7 +45,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
             expression.Columns[1].CustomType = "json";
             expression.SchemaName = "TestSchema";
 
-            var result = _generator.Generate(expression);
+            var result = Generator.Generate(expression);
             result.ShouldBe("CREATE TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" text NOT NULL, \"TestColumn2\" json NOT NULL, PRIMARY KEY (\"TestColumn1\"));");
         }
 
@@ -56,7 +57,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
             expression.Columns[1].Type = null;
             expression.Columns[1].CustomType = "json";
 
-            var result = _generator.Generate(expression);
+            var result = Generator.Generate(expression);
             result.ShouldBe("CREATE TABLE \"public\".\"TestTable1\" (\"TestColumn1\" text NOT NULL, \"TestColumn2\" json NOT NULL, PRIMARY KEY (\"TestColumn1\"));");
         }
 
@@ -66,7 +67,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
             var expression = GeneratorTestHelper.GetCreateTableExpression();
             expression.SchemaName = "TestSchema";
 
-            var result = _generator.Generate(expression);
+            var result = Generator.Generate(expression);
             result.ShouldBe("CREATE TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" text NOT NULL, \"TestColumn2\" integer NOT NULL);");
         }
 
@@ -75,7 +76,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
 
-            var result = _generator.Generate(expression);
+            var result = Generator.Generate(expression);
             result.ShouldBe("CREATE TABLE \"public\".\"TestTable1\" (\"TestColumn1\" text NOT NULL, \"TestColumn2\" integer NOT NULL);");
         }
 
@@ -87,7 +88,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
             expression.Columns[0].TableName = expression.TableName;
             expression.SchemaName = "TestSchema";
 
-            var result = _generator.Generate(expression);
+            var result = Generator.Generate(expression);
             result.ShouldBe("CREATE TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" text NOT NULL DEFAULT NULL, \"TestColumn2\" integer NOT NULL DEFAULT 0);");
         }
 
@@ -98,7 +99,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
             expression.Columns[0].DefaultValue = null;
             expression.Columns[0].TableName = expression.TableName;
 
-            var result = _generator.Generate(expression);
+            var result = Generator.Generate(expression);
             result.ShouldBe("CREATE TABLE \"public\".\"TestTable1\" (\"TestColumn1\" text NOT NULL DEFAULT NULL, \"TestColumn2\" integer NOT NULL DEFAULT 0);");
 
         }
@@ -109,7 +110,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
             var expression = GeneratorTestHelper.GetCreateTableWithDefaultValue();
             expression.SchemaName = "TestSchema";
 
-            var result = _generator.Generate(expression);
+            var result = Generator.Generate(expression);
             result.ShouldBe("CREATE TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" text NOT NULL DEFAULT 'Default', \"TestColumn2\" integer NOT NULL DEFAULT 0);");
         }
 
@@ -119,7 +120,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
             var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();
             expression.SchemaName = "TestSchema";
 
-            var result = _generator.Generate(expression);
+            var result = Generator.Generate(expression);
             result.ShouldBe("CREATE TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" integer NOT NULL, \"TestColumn2\" integer NOT NULL);");
         }
 
@@ -128,7 +129,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
         {
             var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();
 
-            var result = _generator.Generate(expression);
+            var result = Generator.Generate(expression);
             result.ShouldBe("CREATE TABLE \"public\".\"TestTable1\" (\"TestColumn1\" integer NOT NULL, \"TestColumn2\" integer NOT NULL);");
         }
 
@@ -137,7 +138,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
         {
             var expression = GeneratorTestHelper.GetCreateTableWithDefaultValue();
 
-            var result = _generator.Generate(expression);
+            var result = Generator.Generate(expression);
             result.ShouldBe("CREATE TABLE \"public\".\"TestTable1\" (\"TestColumn1\" text NOT NULL DEFAULT 'Default', \"TestColumn2\" integer NOT NULL DEFAULT 0);");
         }
 
@@ -147,16 +148,17 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumnPrimaryKeyExpression();
             expression.SchemaName = "TestSchema";
 
-            var result = _generator.Generate(expression);
+            var result = Generator.Generate(expression);
             result.ShouldBe("CREATE TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" text NOT NULL, \"TestColumn2\" integer NOT NULL, PRIMARY KEY (\"TestColumn1\",\"TestColumn2\"));");
         }
 
         [Test]
-        public override void CanCreateTableWithMultiColumnPrimaryKeyWithDefaultSchema()
+        public override void CanCreateTableWithMultiColumnPrimaryKeyWithDefaultSchema([Values] CompatibilityMode compatibilityMode)
         {
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumnPrimaryKeyExpression();
 
-            var result = _generator.Generate(expression);
+            Generator.CompatibilityMode = compatibilityMode;
+            var result = Generator.Generate(expression);
             result.ShouldBe("CREATE TABLE \"public\".\"TestTable1\" (\"TestColumn1\" text NOT NULL, \"TestColumn2\" integer NOT NULL, PRIMARY KEY (\"TestColumn1\",\"TestColumn2\"));");
         }
 
@@ -166,7 +168,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
             var expression = GeneratorTestHelper.GetCreateTableWithNamedMultiColumnPrimaryKeyExpression();
             expression.SchemaName = "TestSchema";
 
-            var result = _generator.Generate(expression);
+            var result = Generator.Generate(expression);
             result.ShouldBe("CREATE TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" text NOT NULL, \"TestColumn2\" integer NOT NULL, CONSTRAINT \"TestKey\" PRIMARY KEY (\"TestColumn1\",\"TestColumn2\"));");
         }
 
@@ -175,7 +177,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
         {
             var expression = GeneratorTestHelper.GetCreateTableWithNamedMultiColumnPrimaryKeyExpression();
 
-            var result = _generator.Generate(expression);
+            var result = Generator.Generate(expression);
             result.ShouldBe("CREATE TABLE \"public\".\"TestTable1\" (\"TestColumn1\" text NOT NULL, \"TestColumn2\" integer NOT NULL, CONSTRAINT \"TestKey\" PRIMARY KEY (\"TestColumn1\",\"TestColumn2\"));");
         }
 
@@ -185,7 +187,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
             var expression = GeneratorTestHelper.GetCreateTableWithNamedPrimaryKeyExpression();
             expression.SchemaName = "TestSchema";
 
-            var result = _generator.Generate(expression);
+            var result = Generator.Generate(expression);
             result.ShouldBe("CREATE TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" text NOT NULL, \"TestColumn2\" integer NOT NULL, CONSTRAINT \"TestKey\" PRIMARY KEY (\"TestColumn1\"));");
         }
 
@@ -194,7 +196,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
         {
             var expression = GeneratorTestHelper.GetCreateTableWithNamedPrimaryKeyExpression();
 
-            var result = _generator.Generate(expression);
+            var result = Generator.Generate(expression);
             result.ShouldBe("CREATE TABLE \"public\".\"TestTable1\" (\"TestColumn1\" text NOT NULL, \"TestColumn2\" integer NOT NULL, CONSTRAINT \"TestKey\" PRIMARY KEY (\"TestColumn1\"));");
         }
 
@@ -204,7 +206,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
             var expression = GeneratorTestHelper.GetCreateTableWithNullableColumn();
             expression.SchemaName = "TestSchema";
 
-            var result = _generator.Generate(expression);
+            var result = Generator.Generate(expression);
             result.ShouldBe("CREATE TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" text, \"TestColumn2\" integer NOT NULL);");
         }
 
@@ -213,7 +215,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
         {
             var expression = GeneratorTestHelper.GetCreateTableWithNullableColumn();
 
-            var result = _generator.Generate(expression);
+            var result = Generator.Generate(expression);
             result.ShouldBe("CREATE TABLE \"public\".\"TestTable1\" (\"TestColumn1\" text, \"TestColumn2\" integer NOT NULL);");
         }
 
@@ -223,7 +225,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
             var expression = GeneratorTestHelper.GetCreateTableWithPrimaryKeyExpression();
             expression.SchemaName = "TestSchema";
 
-            var result = _generator.Generate(expression);
+            var result = Generator.Generate(expression);
             result.ShouldBe("CREATE TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" text NOT NULL, \"TestColumn2\" integer NOT NULL, PRIMARY KEY (\"TestColumn1\"));");
         }
 
@@ -232,7 +234,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
         {
             var expression = GeneratorTestHelper.GetCreateTableWithPrimaryKeyExpression();
 
-            var result = _generator.Generate(expression);
+            var result = Generator.Generate(expression);
             result.ShouldBe("CREATE TABLE \"public\".\"TestTable1\" (\"TestColumn1\" text NOT NULL, \"TestColumn2\" integer NOT NULL, PRIMARY KEY (\"TestColumn1\"));");
         }
 
@@ -242,7 +244,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
             var expression = GeneratorTestHelper.GetDeleteTableExpression();
             expression.SchemaName = "TestSchema";
 
-            var result = _generator.Generate(expression);
+            var result = Generator.Generate(expression);
             result.ShouldBe("DROP TABLE \"TestSchema\".\"TestTable1\";");
         }
 
@@ -251,7 +253,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
         {
             var expression = GeneratorTestHelper.GetDeleteTableExpression();
 
-            var result = _generator.Generate(expression);
+            var result = Generator.Generate(expression);
             result.ShouldBe("DROP TABLE \"public\".\"TestTable1\";");
         }
 
@@ -260,7 +262,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
         {
             var expression = GeneratorTestHelper.GetDeleteTableIfExistsExpression();
 
-            var result = _generator.Generate(expression);
+            var result = Generator.Generate(expression);
             result.ShouldBe("DROP TABLE IF EXISTS \"public\".\"TestTable1\";");
         }
 
@@ -270,7 +272,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
             var expression = GeneratorTestHelper.GetRenameTableExpression();
             expression.SchemaName = "TestSchema";
 
-            var result = _generator.Generate(expression);
+            var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" RENAME TO \"TestTable2\";");
         }
 
@@ -279,7 +281,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
         {
             var expression = GeneratorTestHelper.GetRenameTableExpression();
 
-            var result = _generator.Generate(expression);
+            var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE \"public\".\"TestTable1\" RENAME TO \"TestTable2\";");
         }
     }
