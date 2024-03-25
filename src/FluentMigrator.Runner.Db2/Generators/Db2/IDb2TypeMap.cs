@@ -1,12 +1,12 @@
 #region License
-// Copyright (c) 2019, Fluent Migrator Project
-//
+// Copyright (c) 2024, FluentMigrator Project
+// 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-//
+// 
 // http://www.apache.org/licenses/LICENSE-2.0
-//
+// 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,19 +14,7 @@
 // limitations under the License.
 #endregion
 
-using System.Data;
-
-using FluentMigrator.Runner.Generators.Postgres;
-
-namespace FluentMigrator.Runner.Generators.Postgres92
+namespace FluentMigrator.Runner.Generators.DB2
 {
-    internal class Postgres92TypeMap : PostgresTypeMap
-    {
-        protected override void SetupPostgresTypeMaps()
-        {
-            base.SetupPostgresTypeMaps();
-            
-            SetTypeMap(DbType.Object, "json");
-        }
-    }
+    public interface IDb2TypeMap : ITypeMap { }
 }

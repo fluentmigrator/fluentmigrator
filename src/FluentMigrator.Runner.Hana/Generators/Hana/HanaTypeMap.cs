@@ -22,7 +22,7 @@ using FluentMigrator.Runner.Generators.Base;
 
 namespace FluentMigrator.Runner.Generators.Hana
 {
-    internal class HanaTypeMap : TypeMapBase
+    public sealed class HanaTypeMap : TypeMapBase, IHanaTypeMap
     {
         public const int AnsiStringCapacity = 5000;
         public const int AnsiTextCapacity = 2147483647;
@@ -33,6 +33,11 @@ namespace FluentMigrator.Runner.Generators.Hana
         public const int XmlCapacity = 1073741823;
         public const int ImageCapacity = 2147483647;
 
+        public HanaTypeMap()
+        {
+            SetupTypeMaps();
+        }
+        
         protected override void SetupTypeMaps()
         {
             SetTypeMap(DbType.AnsiStringFixedLength, "CHAR(255)");

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
@@ -10,12 +10,6 @@ namespace FluentMigrator.Runner.Generators.Base
         private readonly Dictionary<DbType, SortedList<int, string>> _templates = new Dictionary<DbType, SortedList<int, string>>();
         private const string SizePlaceholder = "$size";
         protected const string PrecisionPlaceholder = "$precision";
-
-        protected TypeMapBase()
-        {
-            // ReSharper disable once VirtualMemberCallInConstructor
-            SetupTypeMaps();
-        }
 
         protected abstract void SetupTypeMaps();
 
@@ -51,13 +45,6 @@ namespace FluentMigrator.Runner.Generators.Base
             }
 
             throw new NotSupportedException($"Unsupported DbType '{type}'");
-        }
-
-        /// <inheritdoc />
-        [Obsolete]
-        public virtual string GetTypeMap(DbType type, int size, int precision)
-        {
-            return GetTypeMap(type, (int?)size, precision);
         }
 
         private void EnsureHasList(DbType type)

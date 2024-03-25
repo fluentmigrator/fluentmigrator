@@ -22,7 +22,7 @@ using FluentMigrator.Runner.Generators.Base;
 
 namespace FluentMigrator.Runner.Generators.Firebird
 {
-    internal class FirebirdTypeMap : TypeMapBase
+    public sealed class FirebirdTypeMap : TypeMapBase, IFirebirdTypeMap
     {
         private const int DecimalCapacity = 19;
         private const int FirebirdMaxVarcharSize = 32765;
@@ -31,6 +31,11 @@ namespace FluentMigrator.Runner.Generators.Firebird
         // http://www.firebirdsql.org/en/firebird-technical-specifications/
         private const int FirebirdMaxTextSize = int.MaxValue;  // as close as Int32 can come to 32GB
 
+        public FirebirdTypeMap()
+        {
+            SetupTypeMaps();
+        }
+        
         protected override void SetupTypeMaps()
         {
             /*

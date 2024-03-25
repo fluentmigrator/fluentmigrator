@@ -39,6 +39,7 @@ namespace FluentMigrator.Runner
             builder.Services
                 .AddScoped<Db2DbFactory>()
                 .AddScoped<Db2Processor>()
+                .AddScoped<IDb2TypeMap>(sp => new Db2TypeMap())
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<Db2Processor>())
                 .AddScoped<Db2Quoter>()
                 .AddScoped<Db2Generator>()
@@ -59,6 +60,7 @@ namespace FluentMigrator.Runner
             builder.Services
                 .AddScoped<Db2ISeriesDbFactory>()
                 .AddScoped<Db2ISeriesProcessor>()
+                .AddScoped<IDb2TypeMap>(sp => new Db2TypeMap())
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<Db2ISeriesProcessor>())
                 .AddScoped<Db2ISeriesQuoter>()
                 .AddScoped<Db2ISeriesGenerator>()

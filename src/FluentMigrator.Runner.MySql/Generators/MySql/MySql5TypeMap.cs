@@ -22,9 +22,9 @@ namespace FluentMigrator.Runner.Generators.MySql
     {
         public new const int DecimalCapacity = 65;
 
-        protected override void SetupTypeMaps()
+        protected override void SetupMySqlTypeMaps()
         {
-            base.SetupTypeMaps();
+            base.SetupMySqlTypeMaps();
 
             SetTypeMap(DbType.Decimal, "DECIMAL($size,$precision)", DecimalCapacity);
 
@@ -39,5 +39,6 @@ namespace FluentMigrator.Runner.Generators.MySql
             SetTypeMap(DbType.String, "MEDIUMTEXT CHARACTER SET utf8", MediumTextCapacity);
             SetTypeMap(DbType.String, "LONGTEXT CHARACTER SET utf8", LongTextCapacity);
         }
+
     }
 }

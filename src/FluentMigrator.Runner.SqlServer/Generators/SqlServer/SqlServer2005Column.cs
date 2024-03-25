@@ -21,7 +21,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 {
     internal class SqlServer2005Column : SqlServer2000Column
     {
-        public SqlServer2005Column(ITypeMap typeMap, IQuoter quoter)
+        public SqlServer2005Column(ISqlServerTypeMap typeMap, IQuoter quoter)
             : base(typeMap, quoter)
         {
             ClauseOrder.Add(FormatRowGuid);

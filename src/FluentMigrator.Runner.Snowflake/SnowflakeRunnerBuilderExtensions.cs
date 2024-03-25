@@ -55,6 +55,7 @@ namespace FluentMigrator.Runner
                 .AddScoped<SnowflakeProcessor>()
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<SnowflakeProcessor>())
                 .AddScoped<SnowflakeQuoter>()
+                .AddScoped<ISnowflakeTypeMap>(sp => new SnowflakeTypeMap())
                 .AddScoped<SnowflakeGenerator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<SnowflakeGenerator>());
             return builder;

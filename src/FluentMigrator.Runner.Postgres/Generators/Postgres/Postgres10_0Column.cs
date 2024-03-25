@@ -24,7 +24,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
 {
     class Postgres10_0Column : PostgresColumn
     {
-        public Postgres10_0Column(PostgresQuoter quoter, ITypeMap typeMap)
+        public Postgres10_0Column(PostgresQuoter quoter, IPostgresTypeMap typeMap)
             : base(quoter, typeMap)
         {
             AlterClauseOrder.Add(FormatAlterIdentity);

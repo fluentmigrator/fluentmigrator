@@ -21,7 +21,7 @@ using FluentMigrator.Runner.Generators.Base;
 
 namespace FluentMigrator.Runner.Generators.Oracle
 {
-    public class OracleTypeMap : TypeMapBase
+    public class OracleTypeMap : TypeMapBase, IOracleTypeMap
     {
         // See https://docs.oracle.com/cd/B28359_01/server.111/b28320/limits001.htm#i287903
         // and http://docs.oracle.com/cd/B19306_01/server.102/b14220/datatype.htm#i13446
@@ -35,7 +35,12 @@ namespace FluentMigrator.Runner.Generators.Oracle
         public const int UnicodeStringCapacity = 4000;
         public const int UnicodeTextCapacity = int.MaxValue;
 
-        protected override void SetupTypeMaps()
+        public OracleTypeMap()
+        {
+            SetupTypeMaps();
+        }
+        
+        protected sealed override void SetupTypeMaps()
         {
             SetTypeMap(DbType.AnsiStringFixedLength, "CHAR(255 CHAR)");
             SetTypeMap(DbType.AnsiStringFixedLength, "CHAR($size CHAR)", CharStringCapacity);

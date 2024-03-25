@@ -42,7 +42,11 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         [SetUp]
         public void Setup()
         {
-            Generator = new SQLiteGenerator();
+            // ReSharper disable once RedundantArgumentDefaultValue
+            var quoter = new SQLiteQuoter(false);
+            // ReSharper disable once RedundantArgumentDefaultValue
+            var typeMap = new SQLiteTypeMap(false);
+            Generator = new SQLiteGenerator(quoter, typeMap);
         }
 
         [Test]
@@ -130,23 +134,23 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         }
 
         [Test]
-        public void CanUseSystemMethodCurrentDateTimeAsADefaultValueForAColumn()
+        public virtual void CanUseSystemMethodCurrentDateTimeAsADefaultValueForAColumn()
         {
             var expression = new CreateTableExpression { TableName = "TestTable1" };
             expression.Columns.Add(new ColumnDefinition { Name = "DateTimeCol", Type = DbType.DateTime, DefaultValue = SystemMethods.CurrentDateTime});
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"DateTimeCol\" TEXT NOT NULL DEFAULT (datetime('now','localtime')))");
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"DateTimeCol\" DATETIME NOT NULL DEFAULT (datetime('now','localtime')))");
         }
 
         [Test]
-        public void CanUseSystemMethodCurrentUTCDateTimeAsDefaultValueForColumn()
+        public virtual void CanUseSystemMethodCurrentUTCDateTimeAsDefaultValueForColumn()
         {
             var expression = new CreateTableExpression { TableName = "TestTable1" };
             expression.Columns.Add(new ColumnDefinition { Name = "DateTimeCol", Type = DbType.DateTime, DefaultValue = SystemMethods.CurrentUTCDateTime });
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"DateTimeCol\" TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)");
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"DateTimeCol\" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP)");
         }
 
         [Test]

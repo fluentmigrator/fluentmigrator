@@ -39,6 +39,7 @@ namespace FluentMigrator.Runner
                 .AddScoped<RedshiftProcessor>()
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<RedshiftProcessor>())
                 .AddScoped<RedshiftQuoter>()
+                .AddScoped<IRedshiftTypeMap>(sp => new RedshiftTypeMap())
                 .AddScoped<RedshiftGenerator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<RedshiftGenerator>());
 

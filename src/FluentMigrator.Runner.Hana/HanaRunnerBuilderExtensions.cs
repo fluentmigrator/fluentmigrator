@@ -39,6 +39,7 @@ namespace FluentMigrator.Runner
                 .AddScoped<HanaProcessor>()
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<HanaProcessor>())
                 .AddScoped<HanaQuoter>()
+                .AddScoped<IHanaTypeMap>(sp => new HanaTypeMap())
                 .AddScoped<HanaGenerator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<HanaGenerator>());
 

@@ -28,7 +28,7 @@ namespace FluentMigrator.Runner.Generators.DB2
     using System.Linq;
     using System.Text;
 
-    internal class Db2Column : ColumnBase
+    internal class Db2Column : ColumnBase<Db2TypeMap>
     {
         public Db2Column(IQuoter quoter)
             : base(new Db2TypeMap(), quoter)

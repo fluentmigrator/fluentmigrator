@@ -52,7 +52,9 @@ namespace FluentMigrator.Runner
         /// <param name="builder">The builder to add the Oracle-specific services to</param>
         private static void RegisterOracleGenerator(IMigrationRunnerBuilder builder)
         {
-            builder.Services.TryAddScoped<IOracleGenerator, OracleGenerator>();
+            builder.Services
+                .AddScoped<IOracleTypeMap>(sp => new OracleTypeMap())
+                .TryAddScoped<IOracleGenerator, OracleGenerator>();
         }
 
         /// <summary>
