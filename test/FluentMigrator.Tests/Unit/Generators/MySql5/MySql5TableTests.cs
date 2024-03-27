@@ -18,6 +18,7 @@
 
 using System;
 
+using FluentMigrator.Runner;
 using FluentMigrator.Runner.Generators.MySql;
 
 using NUnit.Framework;
@@ -136,10 +137,11 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql5
         }
 
         [Test]
-        public void CanCreateTableWithMultiColumnPrimaryKeyWithDefaultSchema()
+        public void CanCreateTableWithMultiColumnPrimaryKeyWithDefaultSchema([Values] CompatibilityMode compatibilityMode)
         {
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumnPrimaryKeyExpression();
 
+            Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
             result.ShouldBe("CREATE TABLE `TestTable1` (`TestColumn1` NVARCHAR(255) NOT NULL, `TestColumn2` INTEGER NOT NULL, PRIMARY KEY (`TestColumn1`, `TestColumn2`)) ENGINE = INNODB");
         }

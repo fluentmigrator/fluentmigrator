@@ -16,7 +16,6 @@
 //
 #endregion
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -168,9 +167,11 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         }
 
         [Test]
-        public override void CanCreateTableWithMultiColumnPrimaryKeyWithDefaultSchema()
+        public override void CanCreateTableWithMultiColumnPrimaryKeyWithDefaultSchema([Values] CompatibilityMode compatibilityMode)
         {
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumnPrimaryKeyExpression();
+
+            Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
             result.ShouldBe(@"CREATE TABLE ""PUBLIC"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL, ""TestColumn2"" NUMBER NOT NULL, PRIMARY KEY (""TestColumn1"", ""TestColumn2""))", _quotingEnabled);
         }
@@ -262,6 +263,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             var createTableExpression = migrationContext.Expressions.OfType<CreateTableExpression>().First();
             var createForeignKeyExpression = migrationContext.Expressions.OfType<CreateForeignKeyExpression>().First();
 
+            // ReSharper disable once UnusedVariable
             var processed = createForeignKeyExpression.Apply(ConventionSets.NoSchemaName);
 
             var createTableResult = Generator.Generate(createTableExpression);

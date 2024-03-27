@@ -26,21 +26,33 @@ namespace FluentMigrator.Runner.Generators.SQLite
         /// <inheritdoc />
         public override string Generate(IEnumerable<ColumnDefinition> columns, string tableName)
         {
+            var primaryKeyString = string.Empty;
+            
             var colDefs = columns.ToList();
             var foreignKeyColumns = colDefs.Where(x => x.IsForeignKey && x.ForeignKey != null).ToList();
             var foreignKeyClauses = foreignKeyColumns
                 .Select(x => ", " + FormatForeignKey(x.ForeignKey, GenerateForeignKeyName))
                 .ToList();
 
-            // As we generate FKs as part of the create table statement we need a way to prevent
+            // As we generate FKs as part of the CREATE TABLE statement we need a way to prevent
             // these FK's from creating FK constraints (which SQLite doesn't support) so we prefix
             // the FK name and ignore anything in the "CreateConstraint" handler that has this name prefix
             foreach (var fk in foreignKeyColumns) {
                 fk.ForeignKey.Name = "$$IGNORE$$_" + fk.ForeignKey.Name;
             }
 
+            /*
+            var primaryKeyColumns = colDefs.Where(x => x.IsPrimaryKey);
+
+            var pkColDefs = primaryKeyColumns.ToList();
+            if (ShouldPrimaryKeysBeAddedSeparately(pkColDefs))
+            {
+                primaryKeyString = AddPrimaryKeyConstraint(tableName, pkColDefs);
+                foreach (var column in colDefs) { column.IsPrimaryKey = false; }
+            }
+            */
             // Append foreign key definitions after all column definitions and the primary key definition
-            return base.Generate(colDefs, tableName) + string.Concat(foreignKeyClauses);
+            return base.Generate(colDefs, tableName) + primaryKeyString + string.Concat(foreignKeyClauses);
         }
 
         /// <summary>

@@ -1,3 +1,4 @@
+using FluentMigrator.Runner;
 using FluentMigrator.Runner.Generators.Firebird;
 using FluentMigrator.Runner.Processors.Firebird;
 using NUnit.Framework;
@@ -134,10 +135,11 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         }
 
         [Test]
-        public override void CanCreateTableWithMultiColumnPrimaryKeyWithDefaultSchema()
+        public override void CanCreateTableWithMultiColumnPrimaryKeyWithDefaultSchema([Values] CompatibilityMode compatibilityMode)
         {
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumnPrimaryKeyExpression();
 
+            Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
             result.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 VARCHAR(255) NOT NULL, TestColumn2 INTEGER NOT NULL, PRIMARY KEY (TestColumn1, TestColumn2))");
         }

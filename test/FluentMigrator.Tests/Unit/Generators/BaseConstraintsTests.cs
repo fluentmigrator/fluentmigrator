@@ -16,6 +16,8 @@
 //
 #endregion
 
+using FluentMigrator.Runner;
+
 using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Unit.Generators
@@ -30,8 +32,8 @@ namespace FluentMigrator.Tests.Unit.Generators
         public abstract void CanCreateMultiColumnForeignKeyWithCustomSchema();
         public abstract void CanCreateMultiColumnForeignKeyWithDefaultSchema();
         public abstract void CanCreateMultiColumnForeignKeyWithDifferentSchemas();
-        public abstract void CanCreateMultiColumnPrimaryKeyConstraintWithCustomSchema();
-        public abstract void CanCreateMultiColumnPrimaryKeyConstraintWithDefaultSchema();
+        public abstract void CanCreateMultiColumnPrimaryKeyConstraintWithCustomSchema([Values] CompatibilityMode compatibilityMode);
+        public abstract void CanCreateMultiColumnPrimaryKeyConstraintWithDefaultSchema([Values] CompatibilityMode compatibilityMode);
         public abstract void CanCreateMultiColumnUniqueConstraintWithCustomSchema();
         public abstract void CanCreateMultiColumnUniqueConstraintWithDefaultSchema();
         public abstract void CanCreateNamedForeignKeyWithCustomSchema();
@@ -43,16 +45,16 @@ namespace FluentMigrator.Tests.Unit.Generators
         public abstract void CanCreateNamedMultiColumnForeignKeyWithCustomSchema();
         public abstract void CanCreateNamedMultiColumnForeignKeyWithDefaultSchema();
         public abstract void CanCreateNamedMultiColumnForeignKeyWithDifferentSchemas();
-        public abstract void CanCreateNamedMultiColumnPrimaryKeyConstraintWithCustomSchema();
-        public abstract void CanCreateNamedMultiColumnPrimaryKeyConstraintWithDefaultSchema();
+        public abstract void CanCreateNamedMultiColumnPrimaryKeyConstraintWithCustomSchema([Values] CompatibilityMode compatibilityMode);
+        public abstract void CanCreateNamedMultiColumnPrimaryKeyConstraintWithDefaultSchema([Values] CompatibilityMode compatibilityMode);
         public abstract void CanCreateNamedMultiColumnUniqueConstraintWithCustomSchema();
         public abstract void CanCreateNamedMultiColumnUniqueConstraintWithDefaultSchema();
-        public abstract void CanCreateNamedPrimaryKeyConstraintWithCustomSchema();
-        public abstract void CanCreateNamedPrimaryKeyConstraintWithDefaultSchema();
+        public abstract void CanCreateNamedPrimaryKeyConstraintWithCustomSchema([Values] CompatibilityMode compatibilityMode);
+        public abstract void CanCreateNamedPrimaryKeyConstraintWithDefaultSchema([Values] CompatibilityMode compatibilityMode);
         public abstract void CanCreateNamedUniqueConstraintWithCustomSchema();
         public abstract void CanCreateNamedUniqueConstraintWithDefaultSchema();
-        public abstract void CanCreatePrimaryKeyConstraintWithCustomSchema();
-        public abstract void CanCreatePrimaryKeyConstraintWithDefaultSchema();
+        public abstract void CanCreatePrimaryKeyConstraintWithCustomSchema([Values] CompatibilityMode compatibilityMode);
+        public abstract void CanCreatePrimaryKeyConstraintWithDefaultSchema([Values] CompatibilityMode compatibilityMode);
         public abstract void CanCreateUniqueConstraintWithCustomSchema();
         public abstract void CanCreateUniqueConstraintWithDefaultSchema();
         public abstract void CanDropForeignKeyWithCustomSchema();
