@@ -1,6 +1,6 @@
 #region License
 //
-// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -129,9 +129,23 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
         }
 
         [Test]
+        public void PrimaryKeyNonIdentityColumnsSupported()
+        {
+            var expression = new CreateTableExpression { TableName = _tableName };
+            expression.Columns.Add(new ColumnDefinition {Name = "Id", Type = DbType.Int32, IsPrimaryKey = false, IsIdentity = true, IsNullable = false });
+            expression.Columns.Add(new ColumnDefinition {Name = "Key1", Type = DbType.String, IsPrimaryKey = true, IsIdentity = false, IsNullable = false });
+            expression.Columns.Add(new ColumnDefinition {Name = "Key2", Type = DbType.String, IsPrimaryKey = true, IsIdentity = false, IsNullable = false });
+
+            Processor.Process(expression);
+            Processor.ColumnExists(null, _tableName, "Id").ShouldBeTrue();
+            Processor.ColumnExists(null, _tableName, "Key1").ShouldBeTrue();
+            Processor.ColumnExists(null, _tableName, "Key2").ShouldBeTrue();
+        }
+
+        [Test]
         public void AGuidCanBeInsertedAndReadAgain([Values] bool binaryGuid)
         {
-            using (var serviceProvider = CreateProcessorServices(null, binaryGuid))
+            using (var serviceProvider = CreateProcessorServices(null, binaryGuid, false))
             {
                 using (var scope = serviceProvider.CreateScope())
                 {
@@ -169,6 +183,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
                 services => services
                     .AddSingleton<ILoggerProvider>(new SqlScriptFluentMigratorLoggerProvider(output))
                     .ConfigureRunner(r => r.AsGlobalPreview()),
+                false,
                 false);
             using (serviceProvider)
             {
@@ -209,25 +224,25 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
             Assert.That(output.ToString(), Does.Contain(@"/* Performing DB Operation */"));
         }
 
-        private ServiceProvider CreateProcessorServices([CanBeNull] Action<IServiceCollection> initAction, bool binaryGuid)
+        private ServiceProvider CreateProcessorServices([CanBeNull] Action<IServiceCollection> initAction, bool binaryGuid, bool useStrictTables)
         {
             if (!IntegrationTestOptions.SQLite.IsEnabled)
                 Assert.Ignore();
 
-            var serivces = ServiceCollectionExtensions.CreateServices()
-                .ConfigureRunner(r => r.AddSQLite(binaryGuid))
+            var services = ServiceCollectionExtensions.CreateServices()
+                .ConfigureRunner(r => r.AddSQLite(binaryGuid, useStrictTables))
                 .AddScoped<IConnectionStringReader>(
                     _ => new PassThroughConnectionStringReader("Data Source=:memory:;Pooling=False;")); // Just use in-memory DB
 
-            initAction?.Invoke(serivces);
+            initAction?.Invoke(services);
 
-            return serivces.BuildServiceProvider();
+            return services.BuildServiceProvider();
         }
 
         [OneTimeSetUp]
         public void ClassSetUp()
         {
-            ServiceProvider = CreateProcessorServices(initAction: null, binaryGuid: false);
+            ServiceProvider = CreateProcessorServices(initAction: null, binaryGuid: false, useStrictTables: false);
 
             _column = new Mock<ColumnDefinition>();
             _tableName = "NewTable";

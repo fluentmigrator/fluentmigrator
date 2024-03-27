@@ -16,6 +16,7 @@
 //
 #endregion
 
+using System;
 using System.Collections.Generic;
 
 using FluentMigrator.Expressions;
@@ -86,7 +87,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                 descriptionsList.Add(newDescriptionStatementToAdd);
             }
 
-            var joined = string.Join(";\r\n", descriptionsList);
+            var joined = string.Join(";" + Environment.NewLine, descriptionsList);
 
             return joined;
         }

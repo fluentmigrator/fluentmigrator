@@ -37,7 +37,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         [SetUp]
         public void Setup()
         {
-            Generator = new SQLiteGenerator();
+            Generator = new SQLiteGenerator(quoter, new SQLiteTypeMap());
         }
 
         [Test]
@@ -122,7 +122,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expressions = GeneratorTestHelper.GetCreateColumnWithSystemMethodExpression("TestSchema");
             var result = string.Join(Environment.NewLine, expressions.Select(x => (string)Generator.Generate((dynamic)x)));
             result.ShouldBe(
-                @"ALTER TABLE ""TestSchema"".""TestTable1"" ADD COLUMN ""TestColumn1"" TEXT" + Environment.NewLine +
+                @"ALTER TABLE ""TestSchema"".""TestTable1"" ADD COLUMN ""TestColumn1"" DATETIME" + Environment.NewLine +
                 @"UPDATE ""TestSchema"".""TestTable1"" SET ""TestColumn1"" = (datetime('now','localtime')) WHERE 1 = 1");
         }
 
@@ -132,7 +132,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expressions = GeneratorTestHelper.GetCreateColumnWithSystemMethodExpression();
             var result = string.Join(Environment.NewLine, expressions.Select(x => (string)Generator.Generate((dynamic)x)));
             result.ShouldBe(
-                @"ALTER TABLE ""TestTable1"" ADD COLUMN ""TestColumn1"" TEXT" + Environment.NewLine +
+                @"ALTER TABLE ""TestTable1"" ADD COLUMN ""TestColumn1"" DATETIME" + Environment.NewLine +
                 @"UPDATE ""TestTable1"" SET ""TestColumn1"" = (datetime('now','localtime')) WHERE 1 = 1");
         }
 
@@ -143,7 +143,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ADD COLUMN \"TestColumn1\" TEXT NOT NULL");
+            result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ADD COLUMN \"TestColumn1\" NUMERIC NOT NULL");
         }
 
         [Test]
@@ -152,7 +152,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetCreateDecimalColumnExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD COLUMN \"TestColumn1\" TEXT NOT NULL");
+            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD COLUMN \"TestColumn1\" NUMERIC NOT NULL");
         }
 
         [Test]

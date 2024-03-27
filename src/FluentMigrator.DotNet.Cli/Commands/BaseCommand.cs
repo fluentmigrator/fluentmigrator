@@ -1,5 +1,5 @@
 #region License
-// Copyright (c) 2007-2018, Sean Chambers and the FluentMigrator Project
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ namespace FluentMigrator.DotNet.Cli.Commands
     {
         protected int ExecuteMigrations(MigratorOptions options, IConsole console)
         {
-            var serviceProvider = Setup.BuildServiceProvider(options, console);
+            using var serviceProvider = Setup.BuildServiceProvider(options, console);
             var executor = serviceProvider.GetRequiredService<TaskExecutor>();
             executor.Execute();
             return 0;

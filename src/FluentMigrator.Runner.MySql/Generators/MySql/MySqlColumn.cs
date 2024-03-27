@@ -1,5 +1,5 @@
 #region License
-// Copyright (c) 2007-2018, FluentMigrator Project
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,12 +19,13 @@ using System.Collections.Generic;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Base;
 using System.Linq;
+using System;
 
 namespace FluentMigrator.Runner.Generators.MySql
 {
-    internal class MySqlColumn : ColumnBase
+    internal class MySqlColumn : ColumnBase<IMySqlTypeMap>
     {
-        public MySqlColumn(ITypeMap typeMap, IQuoter quoter)
+        public MySqlColumn(IMySqlTypeMap typeMap, IQuoter quoter)
             : base(typeMap, quoter)
         {
             ClauseOrder.Add(FormatDescription);
@@ -50,7 +51,7 @@ namespace FluentMigrator.Runner.Generators.MySql
             };
             descriptionsList.AddRange(from descriptionItem in column.AdditionalColumnDescriptions
                                       select descriptionItem.Key + ":" + descriptionItem.Value);
-            return string.Format("COMMENT {0}", Quoter.QuoteValue(string.Join("\r\n", descriptionsList)));
+            return string.Format("COMMENT {0}", Quoter.QuoteValue(string.Join(Environment.NewLine, descriptionsList)));
         }
 
         /// <inheritdoc />

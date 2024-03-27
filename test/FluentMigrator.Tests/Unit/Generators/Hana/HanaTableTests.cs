@@ -155,10 +155,11 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
         }
 
         [Test]
-        public override void CanCreateTableWithMultiColumnPrimaryKeyWithDefaultSchema()
+        public override void CanCreateTableWithMultiColumnPrimaryKeyWithDefaultSchema([Values] CompatibilityMode compatibilityMode)
         {
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumnPrimaryKeyExpression();
 
+            Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
             result.ShouldBe("CREATE COLUMN TABLE \"TestTable1\" (\"TestColumn1\" NVARCHAR(255), \"TestColumn2\" INTEGER," +
                             " PRIMARY KEY (\"TestColumn1\", \"TestColumn2\"));");

@@ -20,7 +20,7 @@ using FluentMigrator.Runner.Helpers;
 
 #region License
 //
-// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2024, Fluent Migrator Project
 // Copyright (c) 2010, Nathan Brown
 //
 // Licensed under the Apache License, Version 2.0 (the "License");

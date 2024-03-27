@@ -1,5 +1,5 @@
 #region License
-// Copyright (c) 2007-2018, FluentMigrator Project
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
         {
         }
 
-        protected Postgres10_0Generator([NotNull] PostgresQuoter quoter, [NotNull] IOptions<GeneratorOptions> generatorOptions, [NotNull] ITypeMap typeMap)
+        protected Postgres10_0Generator([NotNull] PostgresQuoter quoter, [NotNull] IOptions<GeneratorOptions> generatorOptions, [NotNull] IPostgresTypeMap typeMap)
             : base(new Postgres10_0Column(quoter, typeMap), quoter, generatorOptions)
         {
         }

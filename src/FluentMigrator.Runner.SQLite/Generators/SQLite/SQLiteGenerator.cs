@@ -1,6 +1,6 @@
 #region License
 //
-// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2024, Fluent Migrator Project
 // Copyright (c) 2010, Nathan Brown
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -45,8 +45,25 @@ namespace FluentMigrator.Runner.Generators.SQLite
 
         public SQLiteGenerator(
             [NotNull] SQLiteQuoter quoter,
+            [NotNull] ISQLiteTypeMap typeMap)
+            : this(quoter, typeMap, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()))
+        {
+            
+        }
+
+        public SQLiteGenerator(
+            [NotNull] SQLiteQuoter quoter,
             [NotNull] IOptions<GeneratorOptions> generatorOptions)
-            : base(new SQLiteColumn(quoter), quoter, new EmptyDescriptionGenerator(), generatorOptions)
+            // ReSharper disable once RedundantArgumentDefaultValue
+            : this(quoter, new SQLiteTypeMap(false), generatorOptions)
+        {
+        }
+
+        public SQLiteGenerator(
+            [NotNull] SQLiteQuoter quoter,
+            [NotNull] ISQLiteTypeMap typeMap,
+            [NotNull] IOptions<GeneratorOptions> generatorOptions)
+            : base(new SQLiteColumn(quoter, typeMap), quoter, new EmptyDescriptionGenerator(), generatorOptions)
         {
             CompatibilityMode = generatorOptions.Value.CompatibilityMode ?? CompatibilityMode.STRICT;
         }
@@ -95,26 +112,33 @@ namespace FluentMigrator.Runner.Generators.SQLite
 
         public override string Generate(CreateConstraintExpression expression)
         {
-            if (!expression.Constraint.IsUniqueConstraint)
-                return CompatibilityMode.HandleCompatibilty("Only UNIQUE constraints are supported in SQLite");
+            if (!(expression.Constraint.IsUniqueConstraint || expression.Constraint.IsPrimaryKeyConstraint))
+            {
+                return CompatibilityMode.HandleCompatibilty("Only creating UNIQUE and PRIMARY KEY constraints are supported in SQLite");
+            }
 
-            // Convert the constraint into a UNIQUE index
-            var idx = new CreateIndexExpression();
-            idx.Index.Name = expression.Constraint.ConstraintName;
-            idx.Index.TableName = expression.Constraint.TableName;
-            idx.Index.SchemaName = expression.Constraint.SchemaName;
-            idx.Index.IsUnique = true;
+            if (expression.Constraint.IsUniqueConstraint)
+            {
+                // Convert the constraint into a UNIQUE index
+                var idx = new CreateIndexExpression();
+                idx.Index.Name = expression.Constraint.ConstraintName;
+                idx.Index.TableName = expression.Constraint.TableName;
+                idx.Index.SchemaName = expression.Constraint.SchemaName;
+                idx.Index.IsUnique = true;
 
-            foreach (var col in expression.Constraint.Columns)
-                idx.Index.Columns.Add(new IndexColumnDefinition { Name = col });
+                foreach (var col in expression.Constraint.Columns)
+                    idx.Index.Columns.Add(new IndexColumnDefinition { Name = col });
 
-            return Generate(idx);
+                return Generate(idx);
+            }
+
+            return base.Generate(expression);
         }
 
         public override string Generate(DeleteConstraintExpression expression)
         {
             if (!expression.Constraint.IsUniqueConstraint)
-                return CompatibilityMode.HandleCompatibilty("Only UNIQUE constraints are supported in SQLite");
+                return CompatibilityMode.HandleCompatibilty("Only deleting UNIQUE constraints are supported in SQLite");
 
             // Convert the constraint into a drop UNIQUE index
             var idx = new DeleteIndexExpression();

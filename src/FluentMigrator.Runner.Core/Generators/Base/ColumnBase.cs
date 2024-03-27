@@ -1,5 +1,5 @@
 #region License
-// Copyright (c) 2007-2018, Sean Chambers and the FluentMigrator Project
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ namespace FluentMigrator.Runner.Generators.Base
     /// <summary>
     /// The base class for column definitions
     /// </summary>
+    [Obsolete("Use ColumnBase<TTypeMap> instead. Going forward, column models must have a db-specific type map model.")]
     public abstract class ColumnBase : IColumn
     {
         private readonly ITypeMap _typeMap;
@@ -65,19 +66,6 @@ namespace FluentMigrator.Runner.Generators.Base
         /// Gets the quoter
         /// </summary>
         protected IQuoter Quoter { get; }
-
-        /// <summary>
-        /// Gets the formatted type from the type map
-        /// </summary>
-        /// <param name="value">The database type</param>
-        /// <param name="size">The size (or precision)</param>
-        /// <param name="precision">The precision (or scale)</param>
-        /// <returns>The formatted column type</returns>
-        [Obsolete]
-        protected string GetTypeMap(DbType value, int size, int precision)
-        {
-            return _typeMap.GetTypeMap(value, size, precision);
-        }
 
         /// <summary>
         /// Gets the formatted type from the type map

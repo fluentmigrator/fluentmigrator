@@ -22,13 +22,18 @@ using FluentMigrator.Runner.Generators.Base;
 
 namespace FluentMigrator.Runner.Generators.Snowflake
 {
-    public class SnowflakeTypeMap : TypeMapBase
+    public class SnowflakeTypeMap : TypeMapBase, ISnowflakeTypeMap
     {
         public static readonly int UnicodeStringCapacity = 4194304;
         private const int DecimalCapacity = 38;
         private const int BinaryCapacity = 8388608;
 
-        protected override void SetupTypeMaps()
+        public SnowflakeTypeMap()
+        {
+            SetupTypeMaps();
+        }
+        
+        protected sealed override void SetupTypeMaps()
         {
             SetTypeMap(DbType.AnsiStringFixedLength, "VARCHAR");
             SetTypeMap(DbType.AnsiStringFixedLength, "VARCHAR($size)", UnicodeStringCapacity);

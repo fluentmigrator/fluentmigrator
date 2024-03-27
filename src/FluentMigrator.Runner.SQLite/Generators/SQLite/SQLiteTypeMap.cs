@@ -1,6 +1,6 @@
 #region License
 //
-// Copyright (c) 2007-2018, Fluent Migrator Project
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,8 +23,10 @@ using FluentMigrator.Runner.Generators.Base;
 namespace FluentMigrator.Runner.Generators.SQLite
 {
     // ReSharper disable once InconsistentNaming
-    internal class SQLiteTypeMap : TypeMapBase
+    public sealed class SQLiteTypeMap : TypeMapBase, ISQLiteTypeMap
     {
+        public bool UseStrictTables { get; }
+
         public const int AnsiStringCapacity = 8000;
         public const int AnsiTextCapacity = 2147483647;
         public const int UnicodeStringCapacity = 4000;
@@ -32,6 +34,12 @@ namespace FluentMigrator.Runner.Generators.SQLite
         public const int ImageCapacity = 2147483647;
         public const int DecimalCapacity = 19;
         public const int XmlCapacity = 1073741823;
+
+        public SQLiteTypeMap(bool useStrictTables = false)
+        {
+            UseStrictTables = useStrictTables;
+            SetupTypeMaps();
+        }
 
         protected override void SetupTypeMaps()
         {
@@ -44,22 +52,39 @@ namespace FluentMigrator.Runner.Generators.SQLite
             SetTypeMap(DbType.UInt16, "INTEGER");
             SetTypeMap(DbType.UInt32, "INTEGER");
             SetTypeMap(DbType.UInt64, "INTEGER");
-            SetTypeMap(DbType.Currency, "TEXT");
-            SetTypeMap(DbType.Decimal, "TEXT");
-            SetTypeMap(DbType.Double, "REAL");
-            SetTypeMap(DbType.Single, "REAL");
-            SetTypeMap(DbType.VarNumeric, "TEXT");
+            if (!UseStrictTables)
+            {
+                SetTypeMap(DbType.Currency, "NUMERIC");
+                SetTypeMap(DbType.Decimal, "NUMERIC");
+                SetTypeMap(DbType.Double, "NUMERIC");
+                SetTypeMap(DbType.Single, "NUMERIC");
+                SetTypeMap(DbType.VarNumeric, "NUMERIC");
+                SetTypeMap(DbType.Date, "DATETIME");
+                SetTypeMap(DbType.DateTime, "DATETIME");
+                SetTypeMap(DbType.DateTime2, "DATETIME");
+                SetTypeMap(DbType.Time, "DATETIME");
+                SetTypeMap(DbType.Guid, "UNIQUEIDENTIFIER");
+
+            }
+            else
+            {
+                SetTypeMap(DbType.Currency, "TEXT");
+                SetTypeMap(DbType.Decimal, "TEXT");
+                SetTypeMap(DbType.Double, "REAL");
+                SetTypeMap(DbType.Single, "REAL");
+                SetTypeMap(DbType.VarNumeric, "TEXT");
+                SetTypeMap(DbType.Date, "TEXT");
+                SetTypeMap(DbType.DateTime, "TEXT");
+                SetTypeMap(DbType.DateTime2, "TEXT");
+                SetTypeMap(DbType.Time, "TEXT");
+                SetTypeMap(DbType.Guid, "TEXT");
+            }
+            
             SetTypeMap(DbType.AnsiString, "TEXT");
             SetTypeMap(DbType.String, "TEXT");
             SetTypeMap(DbType.AnsiStringFixedLength, "TEXT");
             SetTypeMap(DbType.StringFixedLength, "TEXT");
-
-            SetTypeMap(DbType.Date, "TEXT");
-            SetTypeMap(DbType.DateTime, "TEXT");
-            SetTypeMap(DbType.DateTime2, "TEXT");
-            SetTypeMap(DbType.Time, "TEXT");
             SetTypeMap(DbType.Boolean, "INTEGER");
-            SetTypeMap(DbType.Guid, "TEXT");
         }
 
         public override string GetTypeMap(DbType type, int? size, int? precision)

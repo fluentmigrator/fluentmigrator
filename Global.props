@@ -5,9 +5,9 @@
     <LangVersion>latest</LangVersion>
     <VersionPrefix>4.0.0</VersionPrefix>
     <Product>FluentMigrator</Product>
-    <Copyright>Sean Chambers and the FluentMigrator project 2008-2022</Copyright>
+    <Copyright>FluentMigrator project 2008-2024</Copyright>
     <Company>FluentMigrator Project</Company>
-    <Authors>Sean Chambers;Josh Coffman;Tom Marien;Mark Junker</Authors>
+    <Authors>Sean Chambers;Josh Coffman;Tom Marien;Mark Junker;John Zabroski</Authors>
     <PackageProjectUrl>https://github.com/fluentmigrator/fluentmigrator/wiki</PackageProjectUrl>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageReleaseNotes>Use of standard dependency injection, configuration and logging libraries.

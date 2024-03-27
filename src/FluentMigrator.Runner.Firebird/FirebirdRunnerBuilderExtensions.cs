@@ -1,5 +1,5 @@
 #region License
-// Copyright (c) 2018, FluentMigrator Project
+// Copyright (c) 2018, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -57,6 +57,7 @@ namespace FluentMigrator.Runner
                 .AddScoped<FirebirdProcessor>()
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<FirebirdProcessor>())
                 .AddScoped<FirebirdQuoter>()
+                .AddScoped<IFirebirdTypeMap>(sp => new FirebirdTypeMap())
                 .AddScoped<FirebirdGenerator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<FirebirdGenerator>());
 

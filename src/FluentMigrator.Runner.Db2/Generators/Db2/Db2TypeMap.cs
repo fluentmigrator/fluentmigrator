@@ -1,6 +1,6 @@
 #region License
 //
-// Copyright (c) 2007-2018, Fluent Migrator Project
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,14 +22,17 @@ using FluentMigrator.Runner.Generators.Base;
 
 namespace FluentMigrator.Runner.Generators.DB2
 {
-    internal class Db2TypeMap : TypeMapBase
+    internal class Db2TypeMap : TypeMapBase, IDb2TypeMap
     {
-        #region Methods
+        public Db2TypeMap()
+        {
+            SetupTypeMaps();
+        }
 
         /// <summary>
         /// The setup type maps.
         /// </summary>
-        protected override void SetupTypeMaps()
+        protected sealed override void SetupTypeMaps()
         {
             SetTypeMap(DbType.AnsiStringFixedLength, "CHARACTER(255)");
             SetTypeMap(DbType.AnsiStringFixedLength, "CHARACTER($size)", 255);
@@ -68,7 +71,5 @@ namespace FluentMigrator.Runner.Generators.DB2
             SetTypeMap(DbType.String, "DBCLOB($size)", 1073741824);
             SetTypeMap(DbType.Xml, "XML");
         }
-
-        #endregion
     }
 }

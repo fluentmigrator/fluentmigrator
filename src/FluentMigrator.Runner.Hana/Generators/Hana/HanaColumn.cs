@@ -7,7 +7,7 @@ using FluentMigrator.Runner.Generators.Base;
 
 namespace FluentMigrator.Runner.Generators.Hana
 {
-    internal class HanaColumn : ColumnBase
+    internal class HanaColumn : ColumnBase<HanaTypeMap>
     {
         private const int HanaObjectNameMaxLength = 30;
 

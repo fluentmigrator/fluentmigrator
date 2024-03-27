@@ -1,5 +1,5 @@
 #region License
-// Copyright (c) 2018, FluentMigrator Project
+// Copyright (c) 2018, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@ namespace FluentMigrator.Runner
             builder.Services
                 .AddScoped<Db2DbFactory>()
                 .AddScoped<Db2Processor>()
+                .AddScoped<IDb2TypeMap>(sp => new Db2TypeMap())
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<Db2Processor>())
                 .AddScoped<Db2Quoter>()
                 .AddScoped<Db2Generator>()
@@ -59,6 +60,7 @@ namespace FluentMigrator.Runner
             builder.Services
                 .AddScoped<Db2ISeriesDbFactory>()
                 .AddScoped<Db2ISeriesProcessor>()
+                .AddScoped<IDb2TypeMap>(sp => new Db2TypeMap())
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<Db2ISeriesProcessor>())
                 .AddScoped<Db2ISeriesQuoter>()
                 .AddScoped<Db2ISeriesGenerator>()

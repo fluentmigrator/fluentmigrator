@@ -1,6 +1,6 @@
 #region License
 //
-// Copyright (c) 2007-2018, Fluent Migrator Project
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ using FluentMigrator.Runner.Generators.Base;
 
 namespace FluentMigrator.Runner.Generators.Jet
 {
-    internal class JetTypeMap : TypeMapBase
+    public sealed class JetTypeMap : TypeMapBase, IJetTypeMap
     {
         public const int AnsiStringCapacity = 255;
         public const int AnsiTextCapacity = 1073741823;
@@ -31,6 +31,11 @@ namespace FluentMigrator.Runner.Generators.Jet
         public const int ImageCapacity = 2147483647;
         public const int DecimalCapacity = 19;
 
+        public JetTypeMap()
+        {
+            SetupTypeMaps();
+        }
+        
         protected override void SetupTypeMaps()
         {
             SetTypeMap(DbType.AnsiStringFixedLength, "CHAR(255)");

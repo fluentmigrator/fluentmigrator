@@ -1,5 +1,5 @@
 #region License
-// Copyright (c) 2018, FluentMigrator Project
+// Copyright (c) 2018, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -38,6 +38,7 @@ namespace FluentMigrator.Runner
                 .AddScoped<JetProcessor>()
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<JetProcessor>())
                 .AddScoped<JetQuoter>()
+                .AddScoped<IJetTypeMap>(sp => new JetTypeMap())
                 .AddScoped<JetGenerator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<JetGenerator>());
 

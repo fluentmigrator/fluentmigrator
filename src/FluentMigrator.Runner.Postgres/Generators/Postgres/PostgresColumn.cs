@@ -28,7 +28,7 @@ using JetBrains.Annotations;
 
 namespace FluentMigrator.Runner.Generators.Postgres
 {
-    internal class PostgresColumn : ColumnBase
+    internal class PostgresColumn : ColumnBase<IPostgresTypeMap>
     {
         [Obsolete]
         public PostgresColumn([NotNull] PostgresQuoter quoter)
@@ -44,7 +44,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
         /// </summary>
         /// <param name="quoter">The Postgres quoter.</param>
         /// <param name="typeMap">The Postgres type map.</param>
-        public PostgresColumn([NotNull] PostgresQuoter quoter, ITypeMap typeMap)
+        public PostgresColumn([NotNull] PostgresQuoter quoter, IPostgresTypeMap typeMap)
             : base(typeMap, quoter)
         {
             AlterClauseOrder = new List<Func<ColumnDefinition, string>> { FormatAlterType, FormatAlterNullable };

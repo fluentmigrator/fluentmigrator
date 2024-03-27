@@ -137,10 +137,11 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
         }
 
         [Test]
-        public override void CanCreateTableWithMultiColumnPrimaryKeyWithDefaultSchema()
+        public override void CanCreateTableWithMultiColumnPrimaryKeyWithDefaultSchema([Values] CompatibilityMode compatibilityMode)
         {
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumnPrimaryKeyExpression();
 
+            Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
             result.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 DBCLOB(1048576) CCSID 1200 NOT NULL, TestColumn2 INTEGER NOT NULL, PRIMARY KEY (TestColumn1, TestColumn2))");
         }
@@ -254,7 +255,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
         public override void CanDropTableIfExistsWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteTableIfExistsExpression();
-            Generator.compatabilityMode = CompatabilityMode.STRICT;
+            Generator.CompatibilityMode = CompatibilityMode.STRICT;
 
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
