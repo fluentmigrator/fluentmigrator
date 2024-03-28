@@ -36,6 +36,7 @@ namespace FluentMigrator.Example.Migrator
 #if NETFRAMEWORK
                         .AddJet()
 #endif
+                        .AddSqlServer()
                         .AddSQLite()
                         .WithGlobalConnectionString(dbConfig.ConnectionString)
                         .ScanIn(typeof(AddGTDTables).Assembly).For.Migrations())
