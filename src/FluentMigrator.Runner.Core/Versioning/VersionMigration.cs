@@ -31,9 +31,14 @@ namespace FluentMigrator.Runner.Versioning
 
         public override void Up()
         {
-            Create.Table(_versionTableMetaData.TableName)
+            var builder = Create.Table(_versionTableMetaData.TableName)
                 .InSchema(_versionTableMetaData.SchemaName)
                 .WithColumn(_versionTableMetaData.ColumnName).AsInt64().NotNullable();
+
+            if (_versionTableMetaData.CreateWithPrimaryKey)
+            {
+                builder.PrimaryKey(_versionTableMetaData.UniqueIndexName);
+            }
         }
 
         public override void Down()
@@ -82,9 +87,9 @@ namespace FluentMigrator.Runner.Versioning
                 .WithOptions().Clustered()
                 .OnColumn(_versionTableMeta.ColumnName);
 
-            Alter.Table(_versionTableMeta.TableName).InSchema(_versionTableMeta.SchemaName).AddColumn(_versionTableMeta.AppliedOnColumnName).AsDateTime().Nullable();
+            Alter.Table(_versionTableMeta.TableName).InSchema(_versionTableMeta.SchemaName)
+                .AddColumn(_versionTableMeta.AppliedOnColumnName).AsDateTime().Nullable();
         }
-
     }
 
     public class VersionDescriptionMigration : Migration
@@ -105,7 +110,7 @@ namespace FluentMigrator.Runner.Versioning
         public override void Down()
         {
             Delete.Column(_versionTableMeta.DescriptionColumnName)
-                  .FromTable(_versionTableMeta.TableName).InSchema(_versionTableMeta.SchemaName);
+                .FromTable(_versionTableMeta.TableName).InSchema(_versionTableMeta.SchemaName);
         }
     }
 }
