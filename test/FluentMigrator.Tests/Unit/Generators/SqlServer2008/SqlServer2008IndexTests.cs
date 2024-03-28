@@ -275,6 +275,24 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
         }
 
         [Test]
+        public void CanCreateIndexWithMultipleIncludeColumnStatements()
+        {
+            var expression = GeneratorTestHelper.GetCreateIndexExpression();
+            var x = (new CreateIndexExpressionBuilder(expression) as ICreateIndexOnColumnSyntax).Include("TestColumn2").Include("TestColumn3");
+            var result = _generator.Generate(expression);
+            result.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) INCLUDE ([TestColumn2], [TestColumn3])");
+        }
+
+        [Test]
+        public void CanCreateIndexWithOneIncludeStatementMultipleColumns()
+        {
+            var expression = GeneratorTestHelper.GetCreateIndexExpression();
+            var x = (new CreateIndexExpressionBuilder(expression) as ICreateIndexOptionsSyntax).Include("TestColumn2").Include("TestColumn3");
+            var result = _generator.Generate(expression);
+            result.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) INCLUDE ([TestColumn2], [TestColumn3])");
+        }
+
+        [Test]
         public void CanCreateIndexWithCompression()
         {
             var expression = GeneratorTestHelper.GetCreateIndexExpression();
