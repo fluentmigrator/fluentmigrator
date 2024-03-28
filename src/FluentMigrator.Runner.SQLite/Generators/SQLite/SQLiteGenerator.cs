@@ -72,12 +72,12 @@ namespace FluentMigrator.Runner.Generators.SQLite
 
         public override string Generate(AlterColumnExpression expression)
         {
-            return CompatibilityMode.HandleCompatibilty("SQLite does not support alter column");
+            return CompatibilityMode.HandleCompatibility("SQLite does not support alter column");
         }
 
         public override string Generate(AlterDefaultConstraintExpression expression)
         {
-            return CompatibilityMode.HandleCompatibilty("SQLite does not support altering of default constraints");
+            return CompatibilityMode.HandleCompatibility("SQLite does not support altering of default constraints");
         }
 
         public override string Generate(CreateForeignKeyExpression expression)
@@ -87,34 +87,34 @@ namespace FluentMigrator.Runner.Generators.SQLite
             if (expression.ForeignKey.Name.StartsWith("$$IGNORE$$_"))
                 return string.Empty;
 
-            return CompatibilityMode.HandleCompatibilty("Foreign keys are not supported in SQLite");
+            return CompatibilityMode.HandleCompatibility("Foreign keys are not supported in SQLite");
         }
 
         public override string Generate(DeleteForeignKeyExpression expression)
         {
-            return CompatibilityMode.HandleCompatibilty("Foreign keys are not supported in SQLite");
+            return CompatibilityMode.HandleCompatibility("Foreign keys are not supported in SQLite");
         }
 
         public override string Generate(CreateSequenceExpression expression)
         {
-            return CompatibilityMode.HandleCompatibilty("Sequences are not supported in SQLite");
+            return CompatibilityMode.HandleCompatibility("Sequences are not supported in SQLite");
         }
 
         public override string Generate(DeleteSequenceExpression expression)
         {
-            return CompatibilityMode.HandleCompatibilty("Sequences are not supported in SQLite");
+            return CompatibilityMode.HandleCompatibility("Sequences are not supported in SQLite");
         }
 
         public override string Generate(DeleteDefaultConstraintExpression expression)
         {
-            return CompatibilityMode.HandleCompatibilty("Default constraints are not supported in SQLite");
+            return CompatibilityMode.HandleCompatibility("Default constraints are not supported in SQLite");
         }
 
         public override string Generate(CreateConstraintExpression expression)
         {
             if (!(expression.Constraint.IsUniqueConstraint || expression.Constraint.IsPrimaryKeyConstraint))
             {
-                return CompatibilityMode.HandleCompatibilty("Only creating UNIQUE and PRIMARY KEY constraints are supported in SQLite");
+                return CompatibilityMode.HandleCompatibility("Only creating UNIQUE and PRIMARY KEY constraints are supported in SQLite");
             }
 
             if (expression.Constraint.IsUniqueConstraint)
@@ -138,7 +138,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
         public override string Generate(DeleteConstraintExpression expression)
         {
             if (!expression.Constraint.IsUniqueConstraint)
-                return CompatibilityMode.HandleCompatibilty("Only deleting UNIQUE constraints are supported in SQLite");
+                return CompatibilityMode.HandleCompatibility("Only deleting UNIQUE constraints are supported in SQLite");
 
             // Convert the constraint into a drop UNIQUE index
             var idx = new DeleteIndexExpression();

@@ -239,7 +239,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
             if (nullDistinctColumns.Count != 0 && !index.IsUnique)
             {
                 // Should never occur
-                CompatibilityMode.HandleCompatibilty("With nulls distinct can only be used for unique indexes");
+                CompatibilityMode.HandleCompatibility("With nulls distinct can only be used for unique indexes");
                 return string.Empty;
             }
 
@@ -656,7 +656,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
             {
                 if (seq.Cache.Value < MINIMUM_CACHE_VALUE)
                 {
-                    return CompatibilityMode.HandleCompatibilty("Cache size must be greater than 1; if you intended to disable caching, set Cache to null.");
+                    return CompatibilityMode.HandleCompatibility("Cache size must be greater than 1; if you intended to disable caching, set Cache to null.");
                 }
                 result.AppendFormat(" CACHE {0}", seq.Cache);
             }
