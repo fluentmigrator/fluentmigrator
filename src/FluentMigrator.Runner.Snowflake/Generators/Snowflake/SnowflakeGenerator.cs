@@ -111,13 +111,13 @@ namespace FluentMigrator.Runner.Generators.Snowflake
         /// <inheritdoc />
         public override string Generate(CreateIndexExpression expression)
         {
-            return CompatibilityMode.HandleCompatibilty("Indices not supported");
+            return CompatibilityMode.HandleCompatibility("Indices not supported");
         }
 
         /// <inheritdoc />
         public override string Generate(DeleteIndexExpression expression)
         {
-            return CompatibilityMode.HandleCompatibilty("Indices not supported");
+            return CompatibilityMode.HandleCompatibility("Indices not supported");
         }
 
         public override string Generate(CreateSequenceExpression expression)

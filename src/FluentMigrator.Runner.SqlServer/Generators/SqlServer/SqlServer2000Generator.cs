@@ -201,12 +201,12 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override string Generate(CreateSequenceExpression expression)
         {
-            return CompatibilityMode.HandleCompatibilty("Sequences are not supported in SqlServer2000");
+            return CompatibilityMode.HandleCompatibility("Sequences are not supported in SqlServer2000");
         }
 
         public override string Generate(DeleteSequenceExpression expression)
         {
-            return CompatibilityMode.HandleCompatibilty("Sequences are not supported in SqlServer2000");
+            return CompatibilityMode.HandleCompatibility("Sequences are not supported in SqlServer2000");
         }
 
         public override string Generate(DeleteDefaultConstraintExpression expression)

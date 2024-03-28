@@ -85,7 +85,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             {
                 if (seq.Cache.Value < MINIMUM_CACHE_VALUE)
                 {
-                    return CompatibilityMode.HandleCompatibilty("Cache size must be greater than 1; if you intended to disable caching, set Cache to null.");
+                    return CompatibilityMode.HandleCompatibility("Cache size must be greater than 1; if you intended to disable caching, set Cache to null.");
                 }
                 result.AppendFormat(" CACHE {0}", seq.Cache);
             }

@@ -141,7 +141,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
         public override string Generate(AlterColumnExpression expression)
         {
             Truncator.Truncate(expression);
-            return CompatibilityMode.HandleCompatibilty("Alter column is not supported as expected");
+            return CompatibilityMode.HandleCompatibility("Alter column is not supported as expected");
         }
 
 
@@ -185,7 +185,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
         public override string Generate(RenameTableExpression expression)
         {
             Truncator.Truncate(expression);
-            return CompatibilityMode.HandleCompatibilty("Rename table is not supported");
+            return CompatibilityMode.HandleCompatibility("Rename table is not supported");
         }
 
         public override string Generate(CreateColumnExpression expression)
