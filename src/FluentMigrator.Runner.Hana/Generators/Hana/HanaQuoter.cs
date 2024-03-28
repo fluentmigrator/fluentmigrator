@@ -14,6 +14,8 @@
 // limitations under the License.
 #endregion
 
+using System.Globalization;
+
 using FluentMigrator.Runner.Generators.Generic;
 
 namespace FluentMigrator.Runner.Generators.Hana
@@ -41,6 +43,16 @@ namespace FluentMigrator.Runner.Generators.Hana
         public override string QuoteSchemaName(string schemaName)
         {
             return string.Empty;
+        }
+
+        public override string QuoteValue(object value)
+        {
+            if (value is bool boolean)
+            {
+                return boolean.ToString(CultureInfo.InvariantCulture).ToUpperInvariant();
+            }
+
+            return base.QuoteValue(value);
         }
     }
 }
