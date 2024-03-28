@@ -26,7 +26,7 @@
     <PackageReference Include="Oracle.ManagedDataAccess" Version="21.13.0" />
     <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.7" />
     <PackageReference Include="MySqlConnector" Version="2.3.6" />
-    <PackageReference Include="Snowflake.Data" Version="2.1.5" />
+    <PackageReference Include="Snowflake.Data" Version="3.1.0" />
   </ItemGroup>
   <ItemGroup Condition=" '$(Platform)' == 'x86' ">
     <PackageReference Include="Oracle.DataAccess.x86.4" Version="4.112.3" />
