@@ -47,7 +47,7 @@ namespace FluentMigrator.Example.Migrator
             var processor = app.Option(
                 "-d|--dialect <DIALECT>",
                 $"The database dialect ({string.Join(",", DefaultConfigurations.Keys)})",
-                CommandOptionType.SingleValue);
+                CommandOptionType.SingleValue, opt => opt.DefaultValue = "SQLite");
             var connectionString = app.Option(
                 "-c|--connection <CONNECTION-STRING>",
                 $"The connection string to connect to the database",
