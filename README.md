@@ -22,7 +22,7 @@ Azure Artifacts (Prerelease)  | [![Azure Artifacts](https://feeds.dev.azure.com/
 The releases are stored on [nuget.org](https://nuget.org)
 while the CI builds are stored on [Azure Artifacts](https://dev.azure.com/fluentmigrator/fluentmigrator/_packaging?_a=feed&feed=fluentmigrator).
 
-:warning: The badge for the Azure Artifacts feed won't display prereleases.  [We're looking into this](https://github.com/fluentmigrator/fluentmigrator/issues/1180#issuecomment-662884030). We've recently migrated from MyGet to Azure Artifacts, ref [this notice](https://github.com/fluentmigrator/fluentmigrator/issues/1183).
+:warning: The badge for the Azure Artifacts feed won't display prereleases.  [We're looking into this](https://github.com/fluentmigrator/fluentmigrator/issues/1180#issuecomment-662884030).
 
 # Project Info
 

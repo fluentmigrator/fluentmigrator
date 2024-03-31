@@ -16,6 +16,8 @@
 //
 #endregion
 
+using FluentMigrator.SqlServer;
+
 namespace FluentMigrator.Example.Migrations
 {
     [Migration(20090906205342)]
@@ -41,6 +43,19 @@ namespace FluentMigrator.Example.Migrations
                 .WithColumn("Password").AsString().NotNullable()
                 .WithColumn("PasswordSalt").AsString().NotNullable()
                 .WithColumn("IsAdmin").AsBoolean().NotNullable();
+
+
+            IfDatabase(ProcessorId.SqlServer).
+                Create.Index("IX_Users").OnTable("Users")
+                    .OnColumn("Name").Ascending()
+                    .WithOptions().NonClustered()
+                    .Include("Login")
+                    .Include("IsAdmin");
+
+            IfDatabase(processorId => processorId != ProcessorId.SqlServer)
+                .Create.Index("IX_Users").OnTable("Users")
+                .OnColumn("Name").Ascending()
+                .WithOptions().NonClustered();
         }
 
         public override void Down()
