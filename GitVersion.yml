@@ -1,6 +1,6 @@
 assembly-versioning-scheme: MajorMinorPatch
 # mode: ContinuousDeployment
-next-version: 4.0.0
+next-version: 5.2.0
 branches:
   release:
     mode: ContinuousDeployment
