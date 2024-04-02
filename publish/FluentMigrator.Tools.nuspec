@@ -13,7 +13,9 @@
 		<releaseNotes>https://github.com/fluentmigrator/fluentmigrator/releases</releaseNotes>
 	</metadata>
 	<files>
+	 	<readme>docs\README.md</readme>
 		<file src="_._" target="content"/>
 		<file src="tools/" />
+		<file src="docs\README-nuget.md" target="docs\" />
 	</files>
 </package>
