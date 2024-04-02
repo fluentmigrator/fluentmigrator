@@ -831,7 +831,7 @@ namespace FluentMigrator.Runner
             if (_serviceProvider == null)
             {
 #pragma warning disable 612
-                context = new MigrationContext(Processor, _migrationAssemblies, RunnerContext?.ApplicationContext, Processor.ConnectionString);
+                context = new MigrationContext(Processor, _migrationAssemblies, Processor.ConnectionString);
 #pragma warning restore 612
             }
             else
@@ -840,9 +840,6 @@ namespace FluentMigrator.Runner
                 context = new MigrationContext(
                     Processor,
                     _serviceProvider,
-#pragma warning disable 612
-                    _options?.ApplicationContext ?? RunnerContext?.ApplicationContext,
-#pragma warning restore 612
                     connectionStringAccessor.ConnectionString);
             }
 
