@@ -44,9 +44,6 @@ namespace FluentMigrator
         private readonly object _mutex = new object();
 
         /// <inheritdoc />
-        public object ApplicationContext { get; protected set; }
-
-        /// <inheritdoc />
         public string ConnectionString { get; protected set; }
 
         /// <summary>
@@ -74,9 +71,6 @@ namespace FluentMigrator
 #pragma warning disable 618
                 _context = context;
 #pragma warning restore 618
-#pragma warning disable 612
-                ApplicationContext = context.ApplicationContext;
-#pragma warning restore 612
                 ConnectionString = context.Connection;
                 Up();
 #pragma warning disable 618
@@ -93,9 +87,6 @@ namespace FluentMigrator
 #pragma warning disable 618
                 _context = context;
 #pragma warning restore 618
-#pragma warning disable 612
-                ApplicationContext = context.ApplicationContext;
-#pragma warning restore 612
                 ConnectionString = context.Connection;
                 Down();
 #pragma warning disable 618

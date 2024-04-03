@@ -64,7 +64,6 @@ namespace FluentMigrator.Tests.Unit
         private ICollection<string> _logMessages;
         private SortedList<long, IMigrationInfo> _migrationList;
         private TestVersionLoader _fakeVersionLoader;
-        private int _applicationContext;
 
         private IServiceCollection _serviceCollection;
 
@@ -74,7 +73,6 @@ namespace FluentMigrator.Tests.Unit
         {
             var asm = Assembly.GetExecutingAssembly();
 
-            _applicationContext = new Random().Next();
             _migrationList = new SortedList<long, IMigrationInfo>();
             _processorMock = new Mock<IMigrationProcessor>(MockBehavior.Loose);
             _migrationLoaderMock = new Mock<IMigrationInformationLoader>(MockBehavior.Loose);
@@ -100,9 +98,6 @@ namespace FluentMigrator.Tests.Unit
                 .AddSingleton(_migrationLoaderMock.Object)
                 .AddScoped<IConnectionStringReader>(_ => new PassThroughConnectionStringReader(connectionString))
                 .AddScoped(_ => _profileLoaderMock.Object)
-#pragma warning disable 612
-                .Configure<RunnerOptions>(opt => opt.ApplicationContext = _applicationContext)
-#pragma warning restore 612
                 .Configure<ProcessorOptions>(
                     opt => opt.ConnectionString = connectionString)
                 .Configure<AssemblySourceOptions>(opt => opt.AssemblyNames = new []{ asm.FullName })
@@ -172,18 +167,6 @@ namespace FluentMigrator.Tests.Unit
             var runner = CreateRunner();
             runner.MigrateDown(2009010101);
             _profileLoaderMock.Verify(x => x.ApplyProfiles(runner), Times.Once());
-        }
-
-        /// <summary>Unit test which ensures that the application context is correctly propagated down to each migration class.</summary>
-        [Test(Description = "Ensure that the application context is correctly propagated down to each migration class.")]
-        public void CanPassApplicationContext()
-        {
-            var runner = CreateRunner();
-
-            IMigration migration = new TestEmptyMigration();
-            runner.Up(migration);
-
-            Assert.That(migration.ApplicationContext, Is.EqualTo(_applicationContext), "The migration does not have the expected application context.");
         }
 
         [Test]

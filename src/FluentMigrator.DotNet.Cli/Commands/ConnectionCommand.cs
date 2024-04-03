@@ -50,10 +50,6 @@ namespace FluentMigrator.DotNet.Cli.Commands
         [Option("--profile <PROFILE>", Description = "The profile to run after executing migrations.")]
         public string Profile { get; set; }
 
-        [Option("--context <CONTEXT>", Description = "Set ApplicationContext to the given string.")]
-        [Obsolete("Use dependency injection to access 'application state'.")]
-        public string Context { get; }
-
         [Option("--timeout <TIMEOUT_SEC>", Description = "Overrides the default database command timeout of 30 seconds.")]
         public int Timeout { get; set; }
 

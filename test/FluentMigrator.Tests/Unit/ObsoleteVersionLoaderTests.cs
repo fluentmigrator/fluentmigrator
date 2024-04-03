@@ -73,27 +73,6 @@ namespace FluentMigrator.Tests.Unit
         }
 
         [Test]
-        [Obsolete("Use dependency injection to access 'application state'.")]
-        public void CanSetupApplicationContext()
-        {
-            var applicationContext = "Test context";
-
-            var runnerContext = new Mock<IRunnerContext>();
-            runnerContext.SetupGet(r => r.ApplicationContext).Returns(applicationContext);
-
-            var runner = new Mock<IMigrationRunner>();
-            runner.SetupGet(r => r.Processor.Options).Returns(new ProcessorOptions());
-            runner.SetupGet(r => r.RunnerContext).Returns(runnerContext.Object);
-
-            var conventions = new MigrationRunnerConventions();
-            var asm = Assembly.GetExecutingAssembly();
-            var loader = new VersionLoader(runner.Object, asm, ConventionSets.NoSchemaName, conventions, runnerContext.Object);
-
-            var versionTableMetaData = loader.GetVersionTableMetaData();
-            versionTableMetaData.ApplicationContext.ShouldBe(applicationContext);
-        }
-
-        [Test]
         public void DeleteVersionShouldExecuteDeleteDataExpression()
         {
             var runnerContext = new Mock<IRunnerContext>();
