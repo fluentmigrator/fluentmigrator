@@ -67,6 +67,10 @@ steps:
 
 - task: CmdLine@2
   inputs:
+    script: 'nuget help'
+
+- task: CmdLine@2
+  inputs:
     script: 'dotnet pack $(Build.SourcesDirectory)\FluentMigrator.sln --output $(Build.ArtifactStagingDirectory) --include-symbols -p:Configuration=$(buildConfiguration) -p:Version=$(build.buildNumber) --verbosity Detailed'
 
 - task: DotNetCoreCLI@2
