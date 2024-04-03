@@ -106,6 +106,12 @@ steps:
     Contents: '**'
     TargetFolder: '$(Build.ArtifactStagingDirectory)/publish'
 
+- task: CopyFiles@2
+  inputs:
+    SourceFolder: 'docs'
+    Contents: '**'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)/publish/docs'
+
 - script: nuget.exe pack $(Build.ArtifactStagingDirectory)/publish/FluentMigrator.Console.nuspec -NonInteractive -OutputDirectory $(Build.ArtifactStagingDirectory) -version $(build.buildNumber)
   displayName: NuGet pack FluentMigrator.Console
 
