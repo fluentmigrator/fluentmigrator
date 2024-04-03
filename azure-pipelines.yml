@@ -110,7 +110,7 @@ steps:
   inputs:
     SourceFolder: 'docs'
     Contents: '**'
-    TargetFolder: '$(Build.ArtifactStagingDirectory)/publish/docs'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)/docs'
 
 - script: nuget.exe pack $(Build.ArtifactStagingDirectory)/publish/FluentMigrator.Console.nuspec -NonInteractive -OutputDirectory $(Build.ArtifactStagingDirectory) -version $(build.buildNumber)
   displayName: NuGet pack FluentMigrator.Console
