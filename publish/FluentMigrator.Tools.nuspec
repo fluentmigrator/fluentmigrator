@@ -16,6 +16,6 @@
 	<files>
 		<file src="_._" target="content"/>
 		<file src="tools/" />
-		<file src="docs\README-nuget.md" target="docs\" />
+		<file src="..\docs\README-nuget.md" target="docs\" />
 	</files>
 </package>
