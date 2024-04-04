@@ -16,8 +16,6 @@
 //
 #endregion
 
-using System;
-
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.VersionTableInfo;
 
@@ -45,9 +43,6 @@ namespace FluentMigrator.Tests.Unit
         public TestVersionTableMetaData(IOptions<RunnerOptions> options)
             : this()
         {
-#pragma warning disable 612
-            ApplicationContext = options.Value.ApplicationContext;
-#pragma warning restore 612
         }
 
         public TestVersionTableMetaData()
@@ -55,9 +50,6 @@ namespace FluentMigrator.Tests.Unit
             SchemaName = "testSchemaName";
             OwnsSchema = true;
         }
-
-        [Obsolete("Use dependency injection to access 'application state'.")]
-        public object ApplicationContext { get; set; }
 
         public string SchemaName { get; set; }
 

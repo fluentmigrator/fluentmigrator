@@ -12,9 +12,11 @@ In addition to forward migration support, FluentMigrator also supports different
 		<projectUrl>https://github.com/fluentmigrator/fluentmigrator/wiki/</projectUrl>
 		<licenseUrl>https://github.com/fluentmigrator/fluentmigrator/blob/master/LICENSE.txt</licenseUrl>
 		<releaseNotes>https://github.com/fluentmigrator/fluentmigrator/releases</releaseNotes>
+		<readme>docs\README-nuget.md</readme>
 	</metadata>
 	<files>
 		<file src="_._" target="content"/>
 		<file src="tools/" />
+		<file src="..\docs\README-nuget.md" target="docs\" />
 	</files>
 </package>

@@ -40,8 +40,6 @@ namespace FluentMigrator.Console
 {
     public class MigratorConsole
     {
-        [Obsolete("Use dependency injection to access 'application state'.")]
-        public string ApplicationContext;
         public string Connection;
         public string ConnectionStringConfigPath;
         public string Namespace;
@@ -193,11 +191,6 @@ namespace FluentMigrator.Console
                         "profile=",
                         "The profile to run after executing migrations.",
                         v => { Profile = v; }
-                    },
-                    {
-                        "context=",
-                        "Set ApplicationContext to the given string.",
-                        v => { ApplicationContext = v; }
                     },
                     {
                         "timeout=",
@@ -423,9 +416,6 @@ namespace FluentMigrator.Console
                         opt.Steps = Steps;
                         opt.Profile = Profile;
                         opt.Tags = Tags.ToArray();
-#pragma warning disable 612
-                        opt.ApplicationContext = ApplicationContext;
-#pragma warning restore 612
                         opt.TransactionPerSession = TransactionPerSession;
                         opt.AllowBreakingChange = AllowBreakingChange;
                         opt.IncludeUntaggedMaintenances = IncludeUntaggedMaintenances;

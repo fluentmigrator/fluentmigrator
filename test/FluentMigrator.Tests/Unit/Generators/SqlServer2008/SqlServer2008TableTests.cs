@@ -58,7 +58,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
 
             var serviceProvider = new ServiceCollection().BuildServiceProvider();
             var querySchema = new Mock<IQuerySchema>();
-            new CreateTableExpressionBuilder(expression, new MigrationContext(querySchema.Object, serviceProvider, null, null))
+            new CreateTableExpressionBuilder(expression, new MigrationContext(querySchema.Object, serviceProvider, null))
                 .WithColumn("Id").AsGuid().PrimaryKey()
                 .WithColumn("TestSparse").AsString(255).Nullable().Sparse();
 
@@ -76,7 +76,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
 
             var serviceProvider = new ServiceCollection().BuildServiceProvider();
             var querySchema = new Mock<IQuerySchema>();
-            new CreateTableExpressionBuilder(expression, new MigrationContext(querySchema.Object, serviceProvider, null, null))
+            new CreateTableExpressionBuilder(expression, new MigrationContext(querySchema.Object, serviceProvider, null))
                 .WithColumn("Id").AsGuid().PrimaryKey()
                 .WithColumn("TestSparse").AsString(255).Sparse();
 
@@ -95,7 +95,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
 
             var serviceProvider = new ServiceCollection().BuildServiceProvider();
             var querySchema = new Mock<IQuerySchema>();
-            new CreateTableExpressionBuilder(expression, new MigrationContext(querySchema.Object, serviceProvider, null, null))
+            new CreateTableExpressionBuilder(expression, new MigrationContext(querySchema.Object, serviceProvider, null))
                 .WithColumn("Id").AsGuid().PrimaryKey()
                 .WithColumn("TestSparse").AsString(255).Sparse();
 

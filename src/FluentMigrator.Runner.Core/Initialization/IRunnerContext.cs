@@ -184,12 +184,6 @@ namespace FluentMigrator.Runner.Initialization
         bool AllowBreakingChange { get; set; }
 
         /// <summary>
-        /// Gets or sets the arbitrary application context passed to the task runner
-        /// </summary>
-        [Obsolete("Use dependency injection to access 'application state'.")]
-        object ApplicationContext { get; set; }
-
-        /// <summary>
         /// Gets or sets the default schema name
         /// </summary>
         /// <remarks>

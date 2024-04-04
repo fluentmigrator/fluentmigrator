@@ -127,9 +127,6 @@ namespace FluentMigrator.Tests.IssueTests.GH0911
             }
 
             /// <inheritdoc />
-            public object ApplicationContext { get; set; }
-
-            /// <inheritdoc />
             public bool OwnsSchema { get; } = true;
 
             /// <inheritdoc />

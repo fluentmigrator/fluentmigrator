@@ -337,7 +337,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         {
             var serviceProvider = new ServiceCollection().BuildServiceProvider();
             var querySchema = new Mock<IQuerySchema>();
-            var context = new MigrationContext(querySchema.Object, serviceProvider, null, null);
+            var context = new MigrationContext(querySchema.Object, serviceProvider, null);
 
             var expression = new CreateTableExpression()
             {
