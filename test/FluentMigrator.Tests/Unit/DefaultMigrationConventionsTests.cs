@@ -599,7 +599,7 @@ namespace FluentMigrator.Tests.Unit
                 null);
             var assemblyCollection = new Mock<IAssemblyCollection>();
             assemblyCollection.SetupGet(c => c.Assemblies).Returns(new Assembly[0]);
-            var context = new MigrationContext(querySchema, assemblyCollection.Object, null, null);
+            var context = new MigrationContext(querySchema, assemblyCollection.Object, null);
             var expr = new ObsoleteAutoScriptMigrationFake();
             expr.GetUpExpressions(context);
 
@@ -628,7 +628,7 @@ namespace FluentMigrator.Tests.Unit
                 null);
             var assemblyCollection = new Mock<IAssemblyCollection>();
             assemblyCollection.SetupGet(c => c.Assemblies).Returns(new Assembly[0]);
-            var context = new MigrationContext(querySchema, assemblyCollection.Object, null, null);
+            var context = new MigrationContext(querySchema, assemblyCollection.Object, null);
             var expr = new ObsoleteAutoScriptMigrationFake();
             expr.GetDownExpressions(context);
 

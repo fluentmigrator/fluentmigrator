@@ -52,12 +52,10 @@ namespace FluentMigrator.Tests.Unit
         private Mock<IRunnerContext> _runnerContextMock;
         private SortedList<long, IMigrationInfo> _migrationList;
         private TestVersionLoader _fakeVersionLoader;
-        private int _applicationContext;
 
         [SetUp]
         public void SetUp()
         {
-            _applicationContext = new Random().Next();
             _migrationList = new SortedList<long, IMigrationInfo>();
             _runnerContextMock = new Mock<IRunnerContext>(MockBehavior.Loose);
             _processorMock = new Mock<IMigrationProcessor>(MockBehavior.Loose);
@@ -83,7 +81,6 @@ namespace FluentMigrator.Tests.Unit
             _runnerContextMock.SetupGet(x => x.Targets).Returns(new[] { Assembly.GetExecutingAssembly().ToString()});
             _runnerContextMock.SetupGet(x => x.Connection).Returns(IntegrationTestOptions.SqlServer2008.ConnectionString);
             _runnerContextMock.SetupGet(x => x.Database).Returns("sqlserver");
-            _runnerContextMock.SetupGet(x => x.ApplicationContext).Returns(_applicationContext);
 
             _migrationLoaderMock.Setup(x => x.LoadMigrations()).Returns(()=> _migrationList);
 
@@ -138,23 +135,6 @@ namespace FluentMigrator.Tests.Unit
         {
             _runner.MigrateDown(2009010101);
             _profileLoaderMock.Verify(x => x.ApplyProfiles(), Times.Once());
-        }
-
-        /// <summary>Unit test which ensures that the application context is correctly propagated down to each migration class.</summary>
-        [Test(Description = "Ensure that the application context is correctly propagated down to each migration class.")]
-        [Obsolete("Use dependency injection to access 'application state'.")]
-        public void CanPassApplicationContext()
-        {
-            IMigration migration = new TestEmptyMigration();
-            _runner.Up(migration);
-
-            Assert.Multiple(() =>
-            {
-                Assert.That(_runnerContextMock.Object.ApplicationContext, Is.EqualTo(_applicationContext), "The runner context does not have the expected application context.");
-                Assert.That(_runner.RunnerContext?.ApplicationContext, Is.EqualTo(_applicationContext), "The MigrationRunner does not have the expected application context.");
-                Assert.That(migration.ApplicationContext, Is.EqualTo(_applicationContext), "The migration does not have the expected application context.");
-            });
-            _announcer.VerifyAll();
         }
 
         [Test]

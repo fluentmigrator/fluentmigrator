@@ -25,10 +25,6 @@ namespace FluentMigrator
     /// </summary>
     public interface IMigration
     {
-        /// <summary>
-        /// Gets the arbitrary application context passed to the task runner
-        /// </summary>
-        object ApplicationContext { get; }
 
         /// <summary>
         /// Gets the connection string passed to the task runner
