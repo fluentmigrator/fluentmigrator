@@ -14,6 +14,7 @@
 // limitations under the License.
 #endregion
 
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
@@ -92,7 +93,7 @@ namespace FluentMigrator.Tests.Unit.Processors
         [Test]
         public void TestOneCommandForMultipleLines()
         {
-            var command = "SELECT 1\nSELECT 2";
+            var command = $"SELECT 1{Environment.NewLine}SELECT 2";
             using (var processor = CreateProcessor())
             {
                 processor.Execute(command);
