@@ -93,12 +93,6 @@ namespace FluentMigrator.Runner.Initialization
         public bool TransactionPerSession { get; set; }
 
         /// <summary>
-        /// Gets or sets the arbitrary application context passed to the task runner
-        /// </summary>
-        [Obsolete("Use dependency injection to access 'application state'.")]
-        public object ApplicationContext { get; set; }
-
-        /// <summary>
         /// Gets or sets a value indicating whether no connection should be used
         /// </summary>
         /// <remarks>
@@ -133,7 +127,6 @@ namespace FluentMigrator.Runner.Initialization
             Tags = runnerContext.Tags?.ToArray();
             AllowBreakingChange = runnerContext.AllowBreakingChange;
             TransactionPerSession = runnerContext.TransactionPerSession;
-            ApplicationContext = runnerContext.ApplicationContext;
             NoConnection = runnerContext.NoConnection;
         }
     }

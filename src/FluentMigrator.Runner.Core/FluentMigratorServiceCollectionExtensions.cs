@@ -173,10 +173,7 @@ namespace Microsoft.Extensions.DependencyInjection
                         var options = sp.GetRequiredService<IOptions<RunnerOptions>>();
                         var connectionStringAccessor = sp.GetRequiredService<IConnectionStringAccessor>();
                         var connectionString = connectionStringAccessor.ConnectionString;
-#pragma warning disable 612
-                        var appContext = options.Value.ApplicationContext;
-#pragma warning restore 612
-                        return new MigrationContext(querySchema, sp, appContext, connectionString);
+                        return new MigrationContext(querySchema, sp, connectionString);
                     });
 
             return services;

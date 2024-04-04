@@ -453,11 +453,6 @@ namespace FluentMigrator.Tests.Unit
         [Migration(1)]
         public class MigrationThatDoesNotInheritFromMigrationBaseClass : IMigration
         {
-            /// <summary>The arbitrary application context passed to the task runner.</summary>
-            public object ApplicationContext
-            {
-                get { throw new NotImplementedException(); }
-            }
 
             public string ConnectionString { get; } = null;
 
