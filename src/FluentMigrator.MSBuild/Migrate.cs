@@ -60,9 +60,6 @@ namespace FluentMigrator.MSBuild
 
         private int? _timeout;
 
-        [Obsolete("Use dependency injection to access 'application state'.")]
-        public string ApplicationContext { get; set; }
-
         [Required]
         public string Connection { get; set; }
 
@@ -186,9 +183,6 @@ namespace FluentMigrator.MSBuild
                         opt.Steps = Steps;
                         opt.Profile = Profile;
                         opt.Tags = Tags.ToTags().ToArray();
-#pragma warning disable 612
-                        opt.ApplicationContext = ApplicationContext;
-#pragma warning restore 612
                         opt.TransactionPerSession = TransactionPerSession;
                         opt.AllowBreakingChange = AllowBreakingChange;
                         opt.IncludeUntaggedMigrations = IncludeUntaggedMigrations;

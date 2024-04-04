@@ -91,8 +91,6 @@ namespace FluentMigrator.Runner
             VersionUniqueMigration = new VersionUniqueMigration(VersionTableMetaData);
             VersionDescriptionMigration = new VersionDescriptionMigration(VersionTableMetaData);
 
-            VersionTableMetaData.ApplicationContext = runnerContext.ApplicationContext;
-
             LoadVersionInfo();
         }
 
