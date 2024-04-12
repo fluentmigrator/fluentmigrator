@@ -44,8 +44,6 @@ namespace FluentMigrator.Runner
                 .AddScoped<MySql4Generator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<MySql4Generator>());
 
-            MigrationProcessorFactoryProvider.Register(new MySql4ProcessorFactory());
-
             return builder;
         }
 
@@ -65,8 +63,6 @@ namespace FluentMigrator.Runner
                 .AddScoped<MySql5Generator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<MySql5Generator>());
 
-            MigrationProcessorFactoryProvider.Register(new MySql5ProcessorFactory());
-
             return builder;
         }
 
@@ -85,8 +81,6 @@ namespace FluentMigrator.Runner
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<MySql8Processor>())
                 .AddScoped<MySql8Generator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<MySql8Generator>());
-
-            MigrationProcessorFactoryProvider.Register(new MySql8ProcessorFactory());
 
             return builder;
         }

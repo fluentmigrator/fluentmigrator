@@ -15,7 +15,6 @@
 #endregion
 
 using FluentMigrator.Runner.Generators.Redshift;
-using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Redshift;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -42,8 +41,6 @@ namespace FluentMigrator.Runner
                 .AddScoped<IRedshiftTypeMap>(sp => new RedshiftTypeMap())
                 .AddScoped<RedshiftGenerator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<RedshiftGenerator>());
-
-            MigrationProcessorFactoryProvider.Register(new RedshiftProcessorFactory());
 
             return builder;
         }
