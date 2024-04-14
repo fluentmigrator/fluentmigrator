@@ -45,8 +45,6 @@ namespace FluentMigrator.Runner
                 .AddScoped<Db2Generator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<Db2Generator>());
 
-            MigrationProcessorFactoryProvider.Register(new Db2ProcessorFactory());
-
             return builder;
         }
 
@@ -65,8 +63,6 @@ namespace FluentMigrator.Runner
                 .AddScoped<Db2ISeriesQuoter>()
                 .AddScoped<Db2ISeriesGenerator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<Db2ISeriesGenerator>());
-
-            MigrationProcessorFactoryProvider.Register(new Db2ISeriesProcessorFactory());
 
             return builder;
         }

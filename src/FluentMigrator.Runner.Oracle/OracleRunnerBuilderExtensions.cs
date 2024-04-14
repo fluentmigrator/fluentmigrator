@@ -80,8 +80,6 @@ namespace FluentMigrator.Runner
                 .AddScoped<T>()
                 .AddScoped<OracleProcessorBase>(sp => sp.GetRequiredService<T>())
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<T>());
-
-            MigrationProcessorFactoryProvider.Register(new OracleProcessorFactory());
         }
 
         /// <summary>
@@ -99,7 +97,6 @@ namespace FluentMigrator.Runner
                 .AddScoped<OracleProcessorBase>(sp => sp.GetRequiredService<T>())
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<T>());
 
-            MigrationProcessorFactoryProvider.Register(new OracleManagedProcessorFactory());
         }
 
         /// <summary>
@@ -115,8 +112,6 @@ namespace FluentMigrator.Runner
                 .AddScoped<DotConnectOracleDbFactory>()
                 .AddScoped<T>()
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<T>());
-
-            MigrationProcessorFactoryProvider.Register(new DotConnectOracleProcessorFactory());
         }
 
         /// <summary>

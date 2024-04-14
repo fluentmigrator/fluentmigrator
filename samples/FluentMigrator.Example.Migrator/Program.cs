@@ -39,11 +39,7 @@ namespace FluentMigrator.Example.Migrator
         {
             var app = new CommandLineApplication();
 
-            var help = app.HelpOption();
-            var mode = app.Option<MigrationMode>(
-                "-m|--mode <MODE>",
-                "The mode of the application (legacy or di)",
-                CommandOptionType.SingleValue);
+            _ = app.HelpOption();
             var processor = app.Option(
                 "-d|--dialect <DIALECT>",
                 $"The database dialect ({string.Join(",", DefaultConfigurations.Keys)})",
@@ -56,20 +52,11 @@ namespace FluentMigrator.Example.Migrator
             app.OnExecute(
                 () =>
                 {
-                    var selectedMode = mode.HasValue() ? mode.ParsedValue : MigrationMode.DI;
                     var dbConfig = CreateDatabaseConfiguration(processor, connectionString);
-                    switch (selectedMode)
-                    {
-                        case MigrationMode.Legacy:
-                            Console.WriteLine(@"Using legacy mode");
-                            RunInLegacyMode(dbConfig);
-                            break;
-                        case MigrationMode.DI:
-                            Console.WriteLine(@"Using dependency injection");
-                            RunWithServices(dbConfig);
-                            break;
-                    }
-
+                    
+                    Console.WriteLine(@"Using dependency injection");
+                    RunWithServices(dbConfig);
+                    
                     return 0;
                 });
 
@@ -90,6 +77,7 @@ namespace FluentMigrator.Example.Migrator
                     };
                 }
 
+                // ReSharper disable once AssignNullToNotNullAttribute
                 if (!DefaultConfigurations.TryGetValue(processorId, out var result))
                 {
                     throw new InvalidOperationException($"No default configuration for dialect {processorId} available");
@@ -100,7 +88,7 @@ namespace FluentMigrator.Example.Migrator
 
             if (connectionString.HasValue())
             {
-                return new DatabaseConfiguration()
+                return new DatabaseConfiguration
                 {
                     ProcessorId = ProcessorId.SQLite,
                     ConnectionString = connectionString.Value(),
@@ -110,10 +98,5 @@ namespace FluentMigrator.Example.Migrator
             return DefaultDatabaseConfigurations.Sqlite;
         }
 
-        private enum MigrationMode
-        {
-            Legacy,
-            DI,
-        }
     }
 }

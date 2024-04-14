@@ -43,8 +43,6 @@ namespace FluentMigrator.Runner
                 .AddScoped<HanaGenerator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<HanaGenerator>());
 
-            MigrationProcessorFactoryProvider.Register(new HanaProcessorFactory());
-
             return builder;
         }
     }
