@@ -61,8 +61,6 @@ namespace FluentMigrator.Runner
                 .AddScoped<FirebirdGenerator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<FirebirdGenerator>());
 
-            MigrationProcessorFactoryProvider.Register(new FirebirdProcessorFactory());
-
             return builder;
         }
     }

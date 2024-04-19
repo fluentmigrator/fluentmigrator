@@ -42,8 +42,6 @@ namespace FluentMigrator.Runner
                 .AddScoped<JetGenerator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<JetGenerator>());
 
-            MigrationProcessorFactoryProvider.Register(new JetProcessorFactory());
-
             return builder;
         }
     }

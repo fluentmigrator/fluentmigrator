@@ -116,12 +116,12 @@ namespace FluentMigrator.Runner.Generators.MySql
 
         public override string Generate(CreateSequenceExpression expression)
         {
-            return CompatibilityMode.HandleCompatibilty("Sequences is not supporteed for MySql");
+            return CompatibilityMode.HandleCompatibility("Sequences is not supporteed for MySql");
         }
 
         public override string Generate(DeleteSequenceExpression expression)
         {
-            return CompatibilityMode.HandleCompatibilty("Sequences is not supporteed for MySql");
+            return CompatibilityMode.HandleCompatibility("Sequences is not supporteed for MySql");
         }
 
         public override string Generate(DeleteConstraintExpression expression)
