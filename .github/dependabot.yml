@@ -2,11 +2,33 @@ version: 2
 updates:
 - package-ecosystem: nuget
   directories:
-    - "/src"
+    - "/src/FluentMigrator.Abstractions"
+    - "/src/FluentMigrator.Console"
+    - "/src/FluentMigrator.DotNet.Cli"
+    - "/src/FluentMigrator.Extensions.MySql"
+    - "/src/FluentMigrator.Extensions.Oracle"
+    - "/src/FluentMigrator.Extensions.Postgres"
+    - "/src/FluentMigrator.Extensions.Snowflake"
+    - "/src/FluentMigrator.Extensions.SqlServer"
+    - "/src/FluentMigrator.MSBuild"
+    - "/src/FluentMigrator.Runner.Core"
+    - "/src/FluentMigrator.Runner.Db2"
+    - "/src/FluentMigrator.Runner.Firebird"
+    - "/src/FluentMigrator.Runner.Hana"
+    - "/src/FluentMigrator.Runner.Jet"
+    - "/src/FluentMigrator.Runner.MySql"
+    - "/src/FluentMigrator.Runner.Oracle"
+    - "/src/FluentMigrator.Runner.Postgres"
+    - "/src/FluentMigrator.Runner.Redshift"
+    - "/src/FluentMigrator.Runner.SQLite"
+    - "/src/FluentMigrator.Runner.Snowflake"
+    - "/src/FluentMigrator.Runner.SqlServer"
+    - "/src/FluentMigrator.Runner"
+    - "/src/FluentMigrator"
     - "/samples/FluentMigrator.Example.Migrations"
     - "/samples/FluentMigrator.Example.Migrator"
     - "/samples/FluentMigrator.Example.TypeMapper"
-    - "/test"
+    - "/test/FluentMigrator.Tests"
   schedule:
     interval: daily
   open-pull-requests-limit: 10
