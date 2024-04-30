@@ -1,6 +1,10 @@
 version: 2
 updates:
 - package-ecosystem: nuget
+  groups:
+    third-party-dependencies:
+      patterns:
+        - "*"
   directories:
     - "/src/FluentMigrator.Abstractions"
     - "/src/FluentMigrator.Console"
