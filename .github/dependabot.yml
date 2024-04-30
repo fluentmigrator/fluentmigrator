@@ -3,7 +3,9 @@ updates:
 - package-ecosystem: nuget
   directories:
     - "/src"
-    - "/samples"
+    - "/samples/FluentMigrator.Example.Migrations"
+    - "/samples/FluentMigrator.Example.Migrator"
+    - "/samples/FluentMigrator.Example.TypeMapper"
     - "/test"
   schedule:
     interval: daily
