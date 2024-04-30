@@ -1,13 +1,16 @@
 version: 2
 updates:
 - package-ecosystem: nuget
-  directory: "/"
+  directories:
+    - "/src"
+    - "/samples"
+    - "/test"
   schedule:
     interval: daily
   open-pull-requests-limit: 10
   reviewers:
-  - jzabroski
+    - jzabroski
   ignore:
-  - dependency-name: FluentMigrator
-    versions:
-    - 5.0.0
+    - dependency-name: FluentMigrator
+      versions:
+        - 5.0.0
