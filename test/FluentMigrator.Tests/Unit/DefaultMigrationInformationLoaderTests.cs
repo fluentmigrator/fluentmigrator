@@ -448,26 +448,6 @@ namespace FluentMigrator.Tests.Unit
         }
     }
 
-    namespace DoesNotInheritFromBaseClass
-    {
-        [Migration(1)]
-        public class MigrationThatDoesNotInheritFromMigrationBaseClass : IMigration
-        {
-
-            public string ConnectionString { get; } = null;
-
-            public void GetUpExpressions(IMigrationContext context)
-            {
-                throw new NotImplementedException();
-            }
-
-            public void GetDownExpressions(IMigrationContext context)
-            {
-                throw new NotImplementedException();
-            }
-        }
-    }
-
     namespace DuplicateVersionNumbers
     {
         [Migration(1)]

@@ -16,6 +16,11 @@
 //
 #endregion
 
+using FluentMigrator.Builders.Alter;
+using FluentMigrator.Builders.Create;
+using FluentMigrator.Builders.Insert;
+using FluentMigrator.Builders.Rename;
+using FluentMigrator.Builders.Schema;
 using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator
@@ -25,7 +30,6 @@ namespace FluentMigrator
     /// </summary>
     public interface IMigration
     {
-
         /// <summary>
         /// Gets the connection string passed to the task runner
         /// </summary>
@@ -42,5 +46,30 @@ namespace FluentMigrator
         /// </summary>
         /// <param name="context">The context to use while collecting the Down migration expressions</param>
         void GetDownExpressions(IMigrationContext context);
+
+        /// <summary>
+        /// Gets the starting point for alterations
+        /// </summary>
+        IAlterExpressionRoot Alter { get; }
+
+        /// <summary>
+        /// Gets the starting point for creating database objects
+        /// </summary>
+        ICreateExpressionRoot Create { get; }
+
+        /// <summary>
+        /// Gets the starting point for renaming database objects
+        /// </summary>
+        IRenameExpressionRoot Rename { get; }
+
+        /// <summary>
+        /// Gets the starting point for data insertion
+        /// </summary>
+        IInsertExpressionRoot Insert { get; }
+
+        /// <summary>
+        /// Gets the starting point for schema-rooted expressions
+        /// </summary>
+        ISchemaExpressionRoot Schema { get; }
     }
 }

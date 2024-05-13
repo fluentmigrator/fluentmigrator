@@ -40,13 +40,27 @@ namespace FluentMigrator.Builders.Create.Index
         /// Initializes a new instance of the <see cref="CreateIndexExpressionBuilder"/> class.
         /// </summary>
         /// <param name="expression">The underlying expression</param>
-        public CreateIndexExpressionBuilder(CreateIndexExpression expression)
+        /// <param name="context">The context where the expression was added</param>
+        /// <param name="migration">The context where the expression was added</param>
+        public CreateIndexExpressionBuilder(CreateIndexExpression expression, IMigrationContext context, IMigration migration)
             : base(expression)
         {
+            _context = context;
+            _migration = migration;
         }
 
         /// <inheritdoc />
         public IDictionary<string, object> AdditionalFeatures => Expression.Index.AdditionalFeatures;
+
+        /// <summary>
+        /// The context where the expression was added
+        /// </summary>
+        private readonly IMigrationContext _context;
+
+        /// <summary>
+        /// The base migration instance
+        /// </summary>
+        private readonly IMigration _migration;
 
         /// <summary>
         /// Gets or sets the current index column definition
@@ -120,6 +134,18 @@ namespace FluentMigrator.Builders.Create.Index
         public ICreateIndexOnColumnSyntax Clustered()
         {
             Expression.Index.IsClustered = true;
+            return this;
+        }
+
+        /// <inheritdoc />
+        public ICreateIndexOnColumnSyntax IfNotExists()
+        {
+            var exists = _migration.Schema
+                .Schema(Expression.Index.SchemaName)
+                .Table(Expression.Index.TableName)
+                .Index(Expression.Index.Name)
+                .Exists();
+            if (exists) _context.Expressions.Remove(Expression);
             return this;
         }
     }

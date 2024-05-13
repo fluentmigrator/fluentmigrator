@@ -23,10 +23,13 @@ using System.Linq;
 
 using FluentMigrator.Builders.Create.Constraint;
 using FluentMigrator.Builders.Delete.Constraint;
+using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.SqlServer;
+
+using Moq;
 
 using NUnit.Framework;
 
@@ -969,8 +972,11 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         [Test]
         public void CanCreatePrimaryKeyWithOnlineOn()
         {
+            var migrationContextMock = new Mock<IMigrationContext>().Object;
+            var migrationMock = new Mock<IMigration>().Object;
+
             var expression = GeneratorTestHelper.GetCreatePrimaryKeyExpression();
-            new CreateConstraintExpressionBuilder(expression).Online();
+            new CreateConstraintExpressionBuilder(expression, migrationContextMock, migrationMock).Online();
 
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [PK_TestTable1_TestColumn1] PRIMARY KEY ([TestColumn1]) WITH (ONLINE=ON)");
@@ -979,8 +985,11 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         [Test]
         public void CanCreatePrimaryKeyWithOnlineOff()
         {
+            var migrationContextMock = new Mock<IMigrationContext>().Object;
+            var migrationMock = new Mock<IMigration>().Object;
+
             var expression = GeneratorTestHelper.GetCreatePrimaryKeyExpression();
-            new CreateConstraintExpressionBuilder(expression).Online(false);
+            new CreateConstraintExpressionBuilder(expression, migrationContextMock, migrationMock).Online(false);
 
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [PK_TestTable1_TestColumn1] PRIMARY KEY ([TestColumn1]) WITH (ONLINE=OFF)");
@@ -1027,8 +1036,12 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         [Test]
         public void CanDropPrimaryKeyWithOnlineOn()
         {
+            var migrationContextMock = new Mock<IMigrationContext>().Object;
+            var migrationMock = new Mock<IMigration>().Object;
+
             var expression = GeneratorTestHelper.GetDeletePrimaryKeyExpression();
-            new DeleteConstraintExpressionBuilder(expression).Online();
+            new DeleteConstraintExpressionBuilder(expression, migrationContextMock, migrationMock).Online();
+
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE [dbo].[TestTable1] DROP CONSTRAINT [TESTPRIMARYKEY] WITH (ONLINE=ON)");
         }
@@ -1036,8 +1049,12 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         [Test]
         public void CanDropPrimaryKeyWithOnlineOff()
         {
+            var migrationContextMock = new Mock<IMigrationContext>().Object;
+            var migrationMock = new Mock<IMigration>().Object;
+
             var expression = GeneratorTestHelper.GetDeletePrimaryKeyExpression();
-            new DeleteConstraintExpressionBuilder(expression).Online(false);
+            new DeleteConstraintExpressionBuilder(expression, migrationContextMock, migrationMock).Online(false);
+
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE [dbo].[TestTable1] DROP CONSTRAINT [TESTPRIMARYKEY] WITH (ONLINE=OFF)");
         }

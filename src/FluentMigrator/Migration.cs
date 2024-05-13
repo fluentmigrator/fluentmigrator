@@ -32,7 +32,7 @@ namespace FluentMigrator
         /// </summary>
         public IDeleteExpressionRoot Delete
         {
-            get { return new DeleteExpressionRoot(Context); }
+            get { return new DeleteExpressionRoot(Context, this); }
         }
 
         /// <summary>

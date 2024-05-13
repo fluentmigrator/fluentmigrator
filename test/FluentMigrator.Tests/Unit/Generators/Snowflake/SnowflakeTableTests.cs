@@ -257,7 +257,8 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             var migrationContexMock = new Mock<IMigrationContext>();
             migrationContexMock.SetupGet(mc => mc.Expressions).Returns(expressions);
             var migrationContext = migrationContexMock.Object;
-            new CreateExpressionRoot(migrationContext)
+            var migrationMock = new Mock<IMigration>().Object;
+            new CreateExpressionRoot(migrationContext, migrationMock)
                 .Table("FooTable")
                 .WithColumn("FooColumn").AsInt32().ForeignKey("BarTable", "BarColumn");
             var createTableExpression = migrationContext.Expressions.OfType<CreateTableExpression>().First();
@@ -279,7 +280,8 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             var migrationContexMock = new Mock<IMigrationContext>();
             migrationContexMock.SetupGet(mc => mc.Expressions).Returns(expressions);
             var migrationContext = migrationContexMock.Object;
-            new CreateExpressionRoot(migrationContext)
+            var migrationMock = new Mock<IMigration>().Object;
+            new CreateExpressionRoot(migrationContext, migrationMock)
                 .Table("FooTable").InSchema("FooSchema")
                 .WithColumn("FooColumn").AsInt32().ForeignKey("fk_bar_foo", "BarSchema", "BarTable", "BarColumn");
             var createTableExpression = migrationContext.Expressions.OfType<CreateTableExpression>().First();

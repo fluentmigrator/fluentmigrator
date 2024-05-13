@@ -19,8 +19,15 @@
 using System;
 using System.Collections.Generic;
 
+using FluentMigrator.Builders.Create;
 using FluentMigrator.Builders.Create.Constraint;
+using FluentMigrator.Builders.Schema;
+using FluentMigrator.Builders.Schema.Constraint;
+using FluentMigrator.Builders.Schema.Index;
+using FluentMigrator.Builders.Schema.Schema;
+using FluentMigrator.Builders.Schema.Table;
 using FluentMigrator.Expressions;
+using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 using FluentMigrator.SqlServer;
 
@@ -51,7 +58,10 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             var expression = expressionMock.Object;
             expression.Constraint = constraintMock.Object;
 
-            expressionBuilderAction(new CreateConstraintExpressionBuilder(expression));
+            var migrationContextMock = new Mock<IMigrationContext>().Object;
+            var migrationMock = new Mock<IMigration>().Object;
+
+            expressionBuilderAction(new CreateConstraintExpressionBuilder(expression, migrationContextMock, migrationMock));
 
             return constraintMock;
         }
@@ -70,7 +80,10 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             var expression = expressionMock.Object;
             expression.Constraint = constraintMock.Object;
 
-            expressionBuilderAction(new CreateConstraintExpressionBuilder(expression));
+            var migrationContextMock = new Mock<IMigrationContext>().Object;
+            var migrationMock = new Mock<IMigration>().Object;
+
+            expressionBuilderAction(new CreateConstraintExpressionBuilder(expression, migrationContextMock, migrationMock));
 
             return collectionMock;
         }
@@ -130,7 +143,10 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
         {
             var expression = new CreateConstraintExpression(ConstraintType.PrimaryKey);
 
-            var builder = new CreateConstraintExpressionBuilder(expression);
+            var migrationContextMock = new Mock<IMigrationContext>().Object;
+            var migrationMock = new Mock<IMigration>().Object;
+
+            var builder = new CreateConstraintExpressionBuilder(expression, migrationContextMock, migrationMock);
             builder.Columns(new[] { Column1, Column2, Column1 });
 
             Assert.That(expression.Constraint.Columns, Has.Count.EqualTo(2));
@@ -141,7 +157,10 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
         {
             var expression = new CreateConstraintExpression(ConstraintType.Unique);
 
-            var builder = new CreateConstraintExpressionBuilder(expression);
+            var migrationContextMock = new Mock<IMigrationContext>().Object;
+            var migrationMock = new Mock<IMigration>().Object;
+
+            var builder = new CreateConstraintExpressionBuilder(expression, migrationContextMock, migrationMock);
             builder.Columns(new[] { Column1, Column2, Column1 });
 
             Assert.That(expression.Constraint.Columns, Has.Count.EqualTo(2));
@@ -185,6 +204,47 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             constraintMock.Object.AdditionalFeatures.ShouldContain(
                 new KeyValuePair<string, object>(SqlServerExtensions.ConstraintType,
                     SqlServerConstraintType.NonClustered));
+        }
+
+        [TestCase(true)]
+        [TestCase(false)]
+        public void CallingIfNotExists(bool isConstraintExist)
+        {
+            var expressions = new List<IMigrationExpression>();
+            var migrationContextMock = new Mock<IMigrationContext>();
+            migrationContextMock.SetupGet(x => x.Expressions).Returns(expressions);
+            var migrationContext = migrationContextMock.Object;
+
+            var schemaConstraintSyntaxMock = new Mock<ISchemaConstraintSyntax>();
+            schemaConstraintSyntaxMock.Setup(x => x.Exists()).Returns(isConstraintExist);
+            var schemaConstraintSyntax = schemaConstraintSyntaxMock.Object;
+
+            var schemaTableSyntaxMock = new Mock<ISchemaTableSyntax>();
+            schemaTableSyntaxMock.Setup(x => x.Constraint(It.IsAny<string>())).Returns(schemaConstraintSyntax);
+            var schemaTableSyntax = schemaTableSyntaxMock.Object;
+
+            var schemaSchemaSyntaxMock = new Mock<ISchemaSchemaSyntax>();
+            schemaSchemaSyntaxMock.Setup(x => x.Table(It.IsAny<string>())).Returns(schemaTableSyntax);
+            var schemaSchemaSyntax = schemaSchemaSyntaxMock.Object;
+
+            var schemaExpressionRootMock = new Mock<ISchemaExpressionRoot>();
+            schemaExpressionRootMock.Setup(x => x.Schema(It.IsAny<string>())).Returns(schemaSchemaSyntax);
+            var schemaExpressionRoot = schemaExpressionRootMock.Object;
+
+            var migrationMock = new Mock<IMigration>();
+            migrationMock.SetupGet(x => x.Schema).Returns(schemaExpressionRoot);
+            var migration = migrationMock.Object;
+
+            var createExpressionRoot = new CreateExpressionRoot(migrationContext, migration);
+
+            createExpressionRoot
+                .PrimaryKey("PK_Users_Id")
+                .OnTable("Users")
+                .Column("Id")
+                .WithOptions().IfNotExists();
+
+            if (isConstraintExist) migrationContext.Expressions.ShouldBeEmpty();
+            if (!isConstraintExist) migrationContext.Expressions.ShouldNotBeEmpty();
         }
     }
 }

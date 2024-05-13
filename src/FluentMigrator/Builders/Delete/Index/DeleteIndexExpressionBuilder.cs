@@ -38,9 +38,11 @@ namespace FluentMigrator.Builders.Delete.Index
         /// Initializes a new instance of the <see cref="DeleteIndexExpressionBuilder"/> class.
         /// </summary>
         /// <param name="expression">The underlying expression</param>
-        public DeleteIndexExpressionBuilder(DeleteIndexExpression expression)
+        public DeleteIndexExpressionBuilder(DeleteIndexExpression expression, IMigrationContext context, IMigration migration)
             : base(expression)
         {
+            _context = context;
+            _migration = migration;
         }
 
         /// <summary>
@@ -51,6 +53,16 @@ namespace FluentMigrator.Builders.Delete.Index
 
         /// <inheritdoc />
         public IDictionary<string, object> AdditionalFeatures => Expression.AdditionalFeatures;
+
+        /// <summary>
+        /// The context where the expression was added
+        /// </summary>
+        private readonly IMigrationContext _context;
+
+        /// <summary>
+        /// The base migration instance
+        /// </summary>
+        private readonly IMigration _migration;
 
         /// <inheritdoc />
         public IDeleteIndexOnColumnOrInSchemaSyntax OnTable(string tableName)
@@ -108,6 +120,18 @@ namespace FluentMigrator.Builders.Delete.Index
         /// <returns>The extension point for additional options</returns>
         public IDeleteIndexOptionsSyntax WithOptions()
         {
+            return this;
+        }
+
+        /// <inheritdoc />
+        public IDeleteIndexOnColumnSyntax IfExists()
+        {
+            var exists = _migration.Schema
+                .Schema(Expression.Index.SchemaName)
+                .Table(Expression.Index.TableName)
+                .Index(Expression.Index.Name)
+                .Exists();
+            if (!exists) _context.Expressions.Remove(Expression);
             return this;
         }
     }

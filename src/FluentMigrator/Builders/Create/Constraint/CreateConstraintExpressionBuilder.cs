@@ -12,19 +12,32 @@ namespace FluentMigrator.Builders.Create.Constraint
         ICreateConstraintOnTableSyntax,
         ICreateConstraintWithSchemaOrColumnSyntax,
         ICreateConstraintOptionsSyntax,
-        ISupportAdditionalFeatures
+        ISupportAdditionalFeatures,
+        ICreateConstraintColumnsOptionsSyntax
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="T:CreateConstraintExpressionBuilder"/> class.
         /// </summary>
         /// <param name="expression">The underlying expression</param>
-        public CreateConstraintExpressionBuilder(CreateConstraintExpression expression)
+        public CreateConstraintExpressionBuilder(CreateConstraintExpression expression, IMigrationContext context, IMigration migration)
             : base(expression)
         {
+            _context = context;
+            _migration = migration;
         }
 
         /// <inheritdoc />
         public IDictionary<string, object> AdditionalFeatures => Expression.Constraint.AdditionalFeatures;
+
+        /// <summary>
+        /// The context where the expression was added
+        /// </summary>
+        private readonly IMigrationContext _context;
+
+        /// <summary>
+        /// The base migration instance
+        /// </summary>
+        private readonly IMigration _migration;
 
         /// <inheritdoc />
         public ICreateConstraintWithSchemaOrColumnSyntax OnTable(string tableName)
@@ -54,6 +67,24 @@ namespace FluentMigrator.Builders.Create.Constraint
         public ICreateConstraintColumnsSyntax WithSchema(string schemaName)
         {
             Expression.Constraint.SchemaName = schemaName;
+            return this;
+        }
+
+        /// <inheritdoc />
+        public ICreateConstraintColumnsOptionsSyntax WithOptions()
+        {
+            return this;
+        }
+
+        /// <inheritdoc />
+        public  ICreateConstraintOptionsSyntax IfNotExists()
+        {
+            var exists = _migration.Schema
+                .Schema(Expression.Constraint.SchemaName)
+                .Table(Expression.Constraint.TableName)
+                .Constraint(Expression.Constraint.ConstraintName)
+                .Exists();
+            if (exists) _context.Expressions.Remove(Expression);
             return this;
         }
     }

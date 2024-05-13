@@ -34,15 +34,25 @@ namespace FluentMigrator.Builders.Delete
     /// </summary>
     public class DeleteExpressionRoot : IDeleteExpressionRoot
     {
+        /// <summary>
+        /// The context to add expressions into
+        /// </summary>
         private readonly IMigrationContext _context;
+
+        /// <summary>
+        /// The base migration instance
+        /// </summary>
+        private readonly IMigration _migration;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DeleteExpressionRoot"/> class.
         /// </summary>
         /// <param name="context">The migration context</param>
-        public DeleteExpressionRoot(IMigrationContext context)
+        /// <param name="migration">The base migration instance</param>
+        public DeleteExpressionRoot(IMigrationContext context, IMigration migration)
         {
             _context = context;
+            _migration = migration;
         }
 
         /// <inheritdoc />
@@ -98,7 +108,7 @@ namespace FluentMigrator.Builders.Delete
             var expression = new DeleteIndexExpression();
             expression.Index.Name = indexName;
             _context.Expressions.Add(expression);
-            return new DeleteIndexExpressionBuilder(expression);
+            return new DeleteIndexExpressionBuilder(expression, _context, _migration);
         }
 
         /// <inheritdoc />
@@ -106,7 +116,7 @@ namespace FluentMigrator.Builders.Delete
         {
             var expression = new DeleteIndexExpression();
             _context.Expressions.Add(expression);
-            return new DeleteIndexExpressionBuilder(expression);
+            return new DeleteIndexExpressionBuilder(expression, _context, _migration);
         }
 
         /// <inheritdoc />
@@ -123,7 +133,7 @@ namespace FluentMigrator.Builders.Delete
             var expression = new DeleteConstraintExpression(ConstraintType.PrimaryKey);
             expression.Constraint.ConstraintName = primaryKeyName;
             _context.Expressions.Add(expression);
-            return new DeleteConstraintExpressionBuilder(expression);
+            return new DeleteConstraintExpressionBuilder(expression, _context, _migration);
         }
 
         /// <inheritdoc />
@@ -132,7 +142,7 @@ namespace FluentMigrator.Builders.Delete
             var expression = new DeleteConstraintExpression(ConstraintType.Unique);
             expression.Constraint.ConstraintName = constraintName;
             _context.Expressions.Add(expression);
-            return new DeleteConstraintExpressionBuilder(expression);
+            return new DeleteConstraintExpressionBuilder(expression, _context, _migration);
         }
 
         /// <inheritdoc />
@@ -140,7 +150,7 @@ namespace FluentMigrator.Builders.Delete
         {
             var expression = new DeleteConstraintExpression(ConstraintType.Unique);
             _context.Expressions.Add(expression);
-            return new DeleteConstraintExpressionBuilder(expression);
+            return new DeleteConstraintExpressionBuilder(expression, _context, _migration);
         }
 
         /// <inheritdoc />

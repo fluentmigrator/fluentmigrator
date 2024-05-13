@@ -21,12 +21,14 @@ using FluentMigrator.Infrastructure;
 namespace FluentMigrator.Builders.Create.Constraint
 {
     /// <summary>
-    /// Options for creating the constraint
+    /// Extension point for create constraint options
     /// </summary>
-    /// <remarks>
-    /// This is an extension point for DB-specific constraint options
-    /// </remarks>
     public interface ICreateConstraintOptionsSyntax : IFluentSyntax
     {
+        /// <summary>
+        /// Set the create constraint options
+        /// </summary>
+        /// <returns>Defines the create constraint options</returns>
+        ICreateConstraintColumnsOptionsSyntax WithOptions();
     }
 }

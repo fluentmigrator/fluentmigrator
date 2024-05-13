@@ -23,6 +23,8 @@ using FluentMigrator.Model;
 using FluentMigrator.Runner;
 using FluentMigrator.Tests.Helpers;
 
+using Moq;
+
 using NUnit.Framework;
 
 using Shouldly;
@@ -62,7 +64,11 @@ namespace FluentMigrator.Tests.Unit.Expressions
         public void ApplyDefaultContraintName()
         {
             var expression = new DeleteConstraintExpression(ConstraintType.Unique);
-            var builder = new DeleteConstraintExpressionBuilder(expression);
+
+            var migrationContextMock = new Mock<IMigrationContext>().Object;
+            var migrationMock = new Mock<IMigration>().Object;
+
+            var builder = new DeleteConstraintExpressionBuilder(expression, migrationContextMock, migrationMock);
             builder.FromTable("Users").Column("AccountId");
 
             var processed = expression.Apply(ConventionSets.NoSchemaName);
