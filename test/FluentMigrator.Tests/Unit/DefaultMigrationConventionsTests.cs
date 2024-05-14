@@ -46,7 +46,7 @@ namespace FluentMigrator.Tests.Unit
         private static readonly IMigrationRunnerConventions _default = DefaultMigrationRunnerConventions.Instance;
 
         [Test]
-        public void GetPrimaryKeyNamePrefixeForColumnWithName()
+        public void GetPrimaryKeyNamePrefixForColumnWithName()
         {
             var expr = new CreateColumnExpression()
             {
@@ -64,7 +64,7 @@ namespace FluentMigrator.Tests.Unit
         }
 
         [Test]
-        public void GetPrimaryKeyNamePrefixeForColumnWithoutName()
+        public void GetPrimaryKeyNamePrefixForColumnWithoutName()
         {
             var expr = new CreateColumnExpression()
             {
@@ -82,7 +82,7 @@ namespace FluentMigrator.Tests.Unit
         }
 
         [Test]
-        public void GetPrimaryKeyNamePrefixeForMultipleColumns()
+        public void GetPrimaryKeyNamePrefixForMultipleColumns()
         {
             var expr = new CreateTableExpression()
             {
