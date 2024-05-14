@@ -14,6 +14,9 @@
 // limitations under the License.
 #endregion
 
+using System;
+using System.Linq;
+
 using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Runner.Conventions
@@ -29,23 +32,24 @@ namespace FluentMigrator.Runner.Conventions
         /// <inheritdoc />
         public IColumnsExpression Apply(IColumnsExpression expression)
         {
+            if (expression.Columns.Count(x => x.IsPrimaryKey) > 1)
+                throw new InvalidOperationException("Error creating table with multiple primary keys.");
+
             foreach (var columnDefinition in expression.Columns)
             {
+                if (string.IsNullOrEmpty(columnDefinition.Name))
+                    throw new ArgumentException("An object or column name is missing or empty.");
+
                 if (columnDefinition.IsPrimaryKey && string.IsNullOrEmpty(columnDefinition.PrimaryKeyName))
                 {
                     var tableName = string.IsNullOrEmpty(columnDefinition.TableName)
                         ? expression.TableName
                         : columnDefinition.TableName;
-                    columnDefinition.PrimaryKeyName = GetPrimaryKeyName(tableName);
+                    columnDefinition.PrimaryKeyName = $"PK_{tableName}_{columnDefinition.Name}";
                 }
             }
 
             return expression;
-        }
-
-        private static string GetPrimaryKeyName(string tableName)
-        {
-            return "PK_" + tableName;
         }
     }
 }
