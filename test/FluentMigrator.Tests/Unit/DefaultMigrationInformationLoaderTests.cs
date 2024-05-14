@@ -37,6 +37,11 @@ using Moq;
 using NUnit.Framework;
 
 using Shouldly;
+using FluentMigrator.Builders.Alter;
+using FluentMigrator.Builders.Create;
+using FluentMigrator.Builders.Rename;
+using FluentMigrator.Builders.Insert;
+using FluentMigrator.Builders.Schema;
 
 
 namespace FluentMigrator.Tests.Unit
@@ -445,6 +450,29 @@ namespace FluentMigrator.Tests.Unit
             {
                 throw new NotImplementedException();
             }
+        }
+    }
+
+    namespace DoesNotInheritFromBaseClass
+    {
+        [Migration(1)]
+        public class MigrationThatDoesNotInheritFromMigrationBaseClass : IMigration
+        {
+            public string ConnectionString { get; } = null;
+
+            public IAlterExpressionRoot Alter => throw new NotImplementedException();
+
+            public ICreateExpressionRoot Create => throw new NotImplementedException();
+
+            public IRenameExpressionRoot Rename => throw new NotImplementedException();
+
+            public IInsertExpressionRoot Insert => throw new NotImplementedException();
+
+            public ISchemaExpressionRoot Schema => throw new NotImplementedException();
+
+            public void GetUpExpressions(IMigrationContext context) => throw new NotImplementedException();
+
+            public void GetDownExpressions(IMigrationContext context) => throw new NotImplementedException();
         }
     }
 
