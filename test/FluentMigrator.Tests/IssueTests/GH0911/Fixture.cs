@@ -146,6 +146,9 @@ namespace FluentMigrator.Tests.IssueTests.GH0911
 
             /// <inheritdoc />
             public string AppliedOnColumnName { get; } = "AppliedOn";
+
+            /// <inheritdoc />
+            public bool CreateWithPrimaryKey { get; } = false;
         }
     }
 }

@@ -27,5 +27,6 @@ namespace FluentMigrator.Runner.VersionTableInfo
         string DescriptionColumnName { get; }
         string UniqueIndexName { get; }
         string AppliedOnColumnName { get; }
+        bool CreateWithPrimaryKey { get; }
     }
 }
