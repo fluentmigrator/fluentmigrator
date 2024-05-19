@@ -61,6 +61,8 @@ namespace FluentMigrator.Tests.Unit
 
         public string AppliedOnColumnName => APPLIED_ON_COLUMN_NAME;
 
+        public bool CreateWithPrimaryKey => false;
+
         public string DescriptionColumnName => DESCRIPTION_COLUMN_NAME;
 
         public bool OwnsSchema { get; set; }
