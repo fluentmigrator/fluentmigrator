@@ -16,6 +16,8 @@
 //
 #endregion
 
+using System.Data;
+
 using FluentMigrator.Exceptions;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
@@ -72,6 +74,17 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
 
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE `NewTable` ADD COLUMN `NewColumn` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP");
+        }
+
+        [Test]
+        public void CanUseSystemMethodCurrentUTCDateTimeAsADefaultValueForAColumn()
+        {
+            const string tableName = "NewTable";
+            var columnDefinition = new ColumnDefinition { Name = "NewColumn", Size = 15, Type = null, CustomType = "TIMESTAMP", DefaultValue = SystemMethods.CurrentUTCDateTime };
+            var expression = new CreateColumnExpression { Column = columnDefinition, TableName = tableName };
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE `NewTable` ADD COLUMN `NewColumn` TIMESTAMP NOT NULL DEFAULT (UTC_TIMESTAMP)");
         }
 
         [Test]
