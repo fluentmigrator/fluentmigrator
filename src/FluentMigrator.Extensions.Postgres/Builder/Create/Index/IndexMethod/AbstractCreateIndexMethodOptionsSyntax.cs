@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2021, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -50,6 +50,12 @@ namespace FluentMigrator.Builder.Create.Index
         public ICreateIndexOnColumnSyntax Clustered()
         {
             return CreateIndexOptionsSyntax.Clustered();
+        }
+
+        /// <inheritdoc />
+        public ICreateIndexOnColumnSyntax IfNotExists()
+        {
+            return CreateIndexOptionsSyntax.IfNotExists();
         }
 
         /// <inheritdoc />

@@ -108,7 +108,7 @@ namespace FluentMigrator
         /// </summary>
         public ICreateExpressionRoot Create
         {
-            get { return new CreateExpressionRoot(Context); }
+            get { return new CreateExpressionRoot(Context, this); }
         }
 
         /// <summary>
@@ -142,7 +142,7 @@ namespace FluentMigrator
         /// <returns>The database specific expression</returns>
         public IIfDatabaseExpressionRoot IfDatabase(params string[] databaseType)
         {
-            return new IfDatabaseExpressionRoot(Context, databaseType);
+            return new IfDatabaseExpressionRoot(Context, this, databaseType);
         }
 
         /// <summary>
@@ -152,7 +152,7 @@ namespace FluentMigrator
         /// <returns>The database specific expression</returns>
         public IIfDatabaseExpressionRoot IfDatabase(Predicate<string> databaseTypeFunc)
         {
-            return new IfDatabaseExpressionRoot(Context, databaseTypeFunc);
+            return new IfDatabaseExpressionRoot(Context, this, databaseTypeFunc);
         }
     }
 }

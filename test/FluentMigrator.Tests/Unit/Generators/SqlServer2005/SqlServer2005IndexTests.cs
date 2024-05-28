@@ -2,9 +2,12 @@ using System.Linq;
 
 using FluentMigrator.Builders.Create.Index;
 using FluentMigrator.Builders.Delete.Index;
+using FluentMigrator.Infrastructure;
 using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.SqlServer;
+
+using Moq;
 
 using NUnit.Framework;
 
@@ -141,8 +144,12 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         [Test]
         public void CanCreateIndexWithOnlineOnOption()
         {
+            var migrationContextMock = new Mock<IMigrationContext>().Object;
+            var migrationMock = new Mock<IMigration>().Object;
+
             var expression = GeneratorTestHelper.GetCreateIndexExpression();
-            new CreateIndexExpressionBuilder(expression).Online();
+            new CreateIndexExpressionBuilder(expression, migrationContextMock, migrationMock).Online();
+
             var result = Generator.Generate(expression);
             result.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) WITH (ONLINE=ON)");
         }
@@ -150,8 +157,12 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         [Test]
         public void CanCreateIndexWithOnlineOffOption()
         {
+            var migrationContextMock = new Mock<IMigrationContext>().Object;
+            var migrationMock = new Mock<IMigration>().Object;
+
             var expression = GeneratorTestHelper.GetCreateIndexExpression();
-            new CreateIndexExpressionBuilder(expression).Online(false);
+            new CreateIndexExpressionBuilder(expression, migrationContextMock, migrationMock).Online(false);
+
             var result = Generator.Generate(expression);
             result.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) WITH (ONLINE=OFF)");
         }
@@ -159,8 +170,12 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         [Test]
         public void CanDropIndexWithOnlineOn()
         {
+            var migrationContextMock = new Mock<IMigrationContext>().Object;
+            var migrationMock = new Mock<IMigration>().Object;
+
             var expression = GeneratorTestHelper.GetDeleteIndexExpression();
-            new DeleteIndexExpressionBuilder(expression).Online();
+            new DeleteIndexExpressionBuilder(expression, migrationContextMock, migrationMock).Online();
+
             var result = Generator.Generate(expression);
             result.ShouldBe("DROP INDEX [TestIndex] ON [dbo].[TestTable1] WITH (ONLINE=ON)");
         }
@@ -168,8 +183,12 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         [Test]
         public void CanDropIndexWithOnlineOff()
         {
+            var migrationContextMock = new Mock<IMigrationContext>().Object;
+            var migrationMock = new Mock<IMigration>().Object;
+
             var expression = GeneratorTestHelper.GetDeleteIndexExpression();
-            new DeleteIndexExpressionBuilder(expression).Online(false);
+            new DeleteIndexExpressionBuilder(expression, migrationContextMock, migrationMock).Online(false);
+
             var result = Generator.Generate(expression);
             result.ShouldBe("DROP INDEX [TestIndex] ON [dbo].[TestTable1] WITH (ONLINE=OFF)");
         }

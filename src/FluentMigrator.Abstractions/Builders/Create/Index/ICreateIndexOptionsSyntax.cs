@@ -21,7 +21,7 @@ using FluentMigrator.Infrastructure;
 namespace FluentMigrator.Builders.Create.Index
 {
     /// <summary>
-    /// Index options
+    /// Extension point for create index options
     /// </summary>
     public interface ICreateIndexOptionsSyntax : IFluentSyntax
     {
@@ -42,5 +42,11 @@ namespace FluentMigrator.Builders.Create.Index
         /// </summary>
         /// <returns>Defines the column for the index</returns>
         ICreateIndexOnColumnSyntax Clustered();
+
+        /// <summary>
+        /// Creates index only if it does not already exist
+        /// </summary>
+        /// <returns>Creates index only if it does not already exist</returns>
+        ICreateIndexOnColumnSyntax IfNotExists();
     }
 }

@@ -18,9 +18,12 @@ using System.Linq;
 
 using FluentMigrator.Builders.Create.Index;
 using FluentMigrator.Expressions;
+using FluentMigrator.Infrastructure;
 using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.SqlServer;
+
+using Moq;
 
 using NUnit.Framework;
 
@@ -155,7 +158,10 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
                 }
             };
 
-            var builder = new CreateIndexExpressionBuilder(expression);
+            var migrationContextMock = new Mock<IMigrationContext>().Object;
+            var migrationMock = new Mock<IMigration>().Object;
+
+            var builder = new CreateIndexExpressionBuilder(expression, migrationContextMock, migrationMock);
             builder
                 .OnTable(GeneratorTestHelper.TestTableName1)
                 .OnColumn(GeneratorTestHelper.TestColumnName1)
@@ -178,7 +184,10 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
                 }
             };
 
-            var builder = new CreateIndexExpressionBuilder(expression);
+            var migrationContextMock = new Mock<IMigrationContext>().Object;
+            var migrationMock = new Mock<IMigration>().Object;
+
+            var builder = new CreateIndexExpressionBuilder(expression, migrationContextMock, migrationMock);
             builder
                 .OnTable(GeneratorTestHelper.TestTableName1)
                 .OnColumn(GeneratorTestHelper.TestColumnName1)
@@ -199,7 +208,10 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
                 }
             };
 
-            var builder = new CreateIndexExpressionBuilder(expression);
+            var migrationContextMock = new Mock<IMigrationContext>().Object;
+            var migrationMock = new Mock<IMigration>().Object;
+
+            var builder = new CreateIndexExpressionBuilder(expression, migrationContextMock, migrationMock);
             builder
                 .OnTable(GeneratorTestHelper.TestTableName1)
                 .OnColumn(GeneratorTestHelper.TestColumnName1).Ascending()
@@ -221,7 +233,10 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
                 }
             };
 
-            var builder = new CreateIndexExpressionBuilder(expression);
+            var migrationContextMock = new Mock<IMigrationContext>().Object;
+            var migrationMock = new Mock<IMigration>().Object;
+
+            var builder = new CreateIndexExpressionBuilder(expression, migrationContextMock, migrationMock);
             builder
                 .OnTable(GeneratorTestHelper.TestTableName1)
                 .OnColumn(GeneratorTestHelper.TestColumnName1).Ascending().NullsDistinct()
@@ -259,8 +274,12 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
         [Test]
         public void CanCreateIndexWithFilter()
         {
+            var migrationContextMock = new Mock<IMigrationContext>().Object;
+            var migrationMock = new Mock<IMigration>().Object;
+
             var expression = GeneratorTestHelper.GetCreateIndexExpression();
-            new CreateIndexExpressionBuilder(expression).Filter("TestColumn2 IS NULL");
+            new CreateIndexExpressionBuilder(expression, migrationContextMock, migrationMock).Filter("TestColumn2 IS NULL");
+
             var result = _generator.Generate(expression);
             result.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) WHERE TestColumn2 IS NULL");
         }
@@ -268,8 +287,12 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
         [Test]
         public void CanCreateIndexWithIncludedColumnAndFilter()
         {
+            var migrationContextMock = new Mock<IMigrationContext>().Object;
+            var migrationMock = new Mock<IMigration>().Object;
+
             var expression = GeneratorTestHelper.GetCreateIndexExpression();
-            var x = new CreateIndexExpressionBuilder(expression).Filter("TestColumn2 IS NULL").Include("TestColumn3");
+            var x = new CreateIndexExpressionBuilder(expression, migrationContextMock, migrationMock).Filter("TestColumn2 IS NULL").Include("TestColumn3");
+
             var result = _generator.Generate(expression);
             result.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) INCLUDE ([TestColumn3]) WHERE TestColumn2 IS NULL");
         }
@@ -277,8 +300,12 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
         [Test]
         public void CanCreateIndexWithMultipleIncludeColumnStatements()
         {
+            var migrationContextMock = new Mock<IMigrationContext>().Object;
+            var migrationMock = new Mock<IMigration>().Object;
+
             var expression = GeneratorTestHelper.GetCreateIndexExpression();
-            var x = (new CreateIndexExpressionBuilder(expression) as ICreateIndexOnColumnSyntax).Include("TestColumn2").Include("TestColumn3");
+            var x = (new CreateIndexExpressionBuilder(expression, migrationContextMock, migrationMock) as ICreateIndexOnColumnSyntax).Include("TestColumn2").Include("TestColumn3");
+
             var result = _generator.Generate(expression);
             result.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) INCLUDE ([TestColumn2], [TestColumn3])");
         }
@@ -286,8 +313,12 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
         [Test]
         public void CanCreateIndexWithOneIncludeStatementMultipleColumns()
         {
+            var migrationContextMock = new Mock<IMigrationContext>().Object;
+            var migrationMock = new Mock<IMigration>().Object;
+
             var expression = GeneratorTestHelper.GetCreateIndexExpression();
-            var x = (new CreateIndexExpressionBuilder(expression) as ICreateIndexOptionsSyntax).Include("TestColumn2").Include("TestColumn3");
+            var x = (new CreateIndexExpressionBuilder(expression, migrationContextMock, migrationMock) as ICreateIndexOptionsSyntax).Include("TestColumn2").Include("TestColumn3");
+
             var result = _generator.Generate(expression);
             result.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) INCLUDE ([TestColumn2], [TestColumn3])");
         }
@@ -295,8 +326,12 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
         [Test]
         public void CanCreateIndexWithCompression()
         {
+            var migrationContextMock = new Mock<IMigrationContext>().Object;
+            var migrationMock = new Mock<IMigration>().Object;
+
             var expression = GeneratorTestHelper.GetCreateIndexExpression();
-            new CreateIndexExpressionBuilder(expression).WithDataCompression(DataCompressionType.Page);
+            new CreateIndexExpressionBuilder(expression, migrationContextMock, migrationMock).WithDataCompression(DataCompressionType.Page);
+
             var result = _generator.Generate(expression);
             result.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) WITH (DATA_COMPRESSION = PAGE)");
         }

@@ -34,15 +34,25 @@ namespace FluentMigrator.Builders.Create
     /// </summary>
     public class CreateExpressionRoot : ICreateExpressionRoot
     {
+        /// <summary>
+        /// The context to add expressions into
+        /// </summary>
         private readonly IMigrationContext _context;
+
+        /// <summary>
+        /// The base migration instance
+        /// </summary>
+        private readonly IMigration _migration;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CreateExpressionRoot"/> class.
         /// </summary>
         /// <param name="context">The migration context</param>
-        public CreateExpressionRoot(IMigrationContext context)
+        /// <param name="migration">The base migration instance</param>
+        public CreateExpressionRoot(IMigrationContext context, IMigration migration)
         {
             _context = context;
+            _migration = migration;
         }
 
         /// <inheritdoc />
@@ -90,7 +100,7 @@ namespace FluentMigrator.Builders.Create
         {
             var expression = new CreateIndexExpression();
             _context.Expressions.Add(expression);
-            return new CreateIndexExpressionBuilder(expression);
+            return new CreateIndexExpressionBuilder(expression, _context, _migration);
         }
 
         /// <inheritdoc />
@@ -98,7 +108,7 @@ namespace FluentMigrator.Builders.Create
         {
             var expression = new CreateIndexExpression { Index = { Name = indexName } };
             _context.Expressions.Add(expression);
-            return new CreateIndexExpressionBuilder(expression);
+            return new CreateIndexExpressionBuilder(expression, _context, _migration);
         }
 
         /// <inheritdoc />
@@ -114,7 +124,7 @@ namespace FluentMigrator.Builders.Create
         {
             var expression = new CreateConstraintExpression(ConstraintType.Unique);
             _context.Expressions.Add(expression);
-            return new CreateConstraintExpressionBuilder(expression);
+            return new CreateConstraintExpressionBuilder(expression, _context, _migration);
         }
 
         /// <inheritdoc />
@@ -123,7 +133,7 @@ namespace FluentMigrator.Builders.Create
             var expression = new CreateConstraintExpression(ConstraintType.Unique);
             expression.Constraint.ConstraintName = constraintName;
             _context.Expressions.Add(expression);
-            return new CreateConstraintExpressionBuilder(expression);
+            return new CreateConstraintExpressionBuilder(expression, _context, _migration);
         }
 
         /// <inheritdoc />
@@ -131,7 +141,7 @@ namespace FluentMigrator.Builders.Create
         {
             var expression = new CreateConstraintExpression(ConstraintType.PrimaryKey);
             _context.Expressions.Add(expression);
-            return new CreateConstraintExpressionBuilder(expression);
+            return new CreateConstraintExpressionBuilder(expression, _context, _migration);
         }
 
         /// <inheritdoc />
@@ -140,7 +150,7 @@ namespace FluentMigrator.Builders.Create
             var expression = new CreateConstraintExpression(ConstraintType.PrimaryKey);
             expression.Constraint.ConstraintName = primaryKeyName;
             _context.Expressions.Add(expression);
-            return new CreateConstraintExpressionBuilder(expression);
+            return new CreateConstraintExpressionBuilder(expression, _context, _migration);
         }
     }
 }

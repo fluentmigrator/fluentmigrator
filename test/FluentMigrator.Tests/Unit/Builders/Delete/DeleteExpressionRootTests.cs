@@ -43,7 +43,9 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
             var contextMock = new Mock<IMigrationContext>();
             contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
 
-            var root = new DeleteExpressionRoot(contextMock.Object);
+            var migrationMock = new Mock<IMigration>().Object;
+
+            var root = new DeleteExpressionRoot(contextMock.Object, migrationMock);
             root.Table("Bacon");
 
             collectionMock.Verify(x => x.Add(It.Is<DeleteTableExpression>(e => e.TableName.Equals("Bacon"))));
@@ -58,7 +60,9 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
             var contextMock = new Mock<IMigrationContext>();
             contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
 
-            var root = new DeleteExpressionRoot(contextMock.Object);
+            var migrationMock = new Mock<IMigration>().Object;
+
+            var root = new DeleteExpressionRoot(contextMock.Object, migrationMock);
             root.Column("Bacon");
 
             collectionMock.Verify(x => x.Add(It.Is<DeleteColumnExpression>(e => e.ColumnNames.ElementAt(0).Equals("Bacon"))));
@@ -72,7 +76,9 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
             var contextMock = new Mock<IMigrationContext>();
             contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
 
-            var root = new DeleteExpressionRoot(contextMock.Object);
+            var migrationMock = new Mock<IMigration>().Object;
+
+            var root = new DeleteExpressionRoot(contextMock.Object, migrationMock);
             var builder = root.Column("Bacon");
 
             builder.ShouldBeOfType<DeleteColumnExpressionBuilder>();
@@ -87,7 +93,9 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
             var contextMock = new Mock<IMigrationContext>();
             contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
 
-            var root = new DeleteExpressionRoot(contextMock.Object);
+            var migrationMock = new Mock<IMigration>().Object;
+
+            var root = new DeleteExpressionRoot(contextMock.Object, migrationMock);
             root.ForeignKey();
 
             collectionMock.Verify(x => x.Add(It.IsAny<DeleteForeignKeyExpression>()));
@@ -101,7 +109,9 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
             var contextMock = new Mock<IMigrationContext>();
             contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
 
-            var root = new DeleteExpressionRoot(contextMock.Object);
+            var migrationMock = new Mock<IMigration>().Object;
+
+            var root = new DeleteExpressionRoot(contextMock.Object, migrationMock);
             var builder = root.ForeignKey();
 
             builder.ShouldBeOfType<DeleteForeignKeyExpressionBuilder>();
@@ -116,7 +126,9 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
             var contextMock = new Mock<IMigrationContext>();
             contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
 
-            var root = new DeleteExpressionRoot(contextMock.Object);
+            var migrationMock = new Mock<IMigration>().Object;
+
+            var root = new DeleteExpressionRoot(contextMock.Object, migrationMock);
             root.ForeignKey("FK_Bacon");
 
             collectionMock.Verify(x => x.Add(It.Is<DeleteForeignKeyExpression>(e => e.ForeignKey.Name.Equals("FK_Bacon"))));
@@ -131,7 +143,9 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
             var contextMock = new Mock<IMigrationContext>();
             contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
 
-            var root = new DeleteExpressionRoot(contextMock.Object);
+            var migrationMock = new Mock<IMigration>().Object;
+
+            var root = new DeleteExpressionRoot(contextMock.Object, migrationMock);
             root.Sequence("Bacon");
 
             collectionMock.Verify(x => x.Add(It.Is<DeleteSequenceExpression>(e => e.SequenceName.Equals("Bacon"))));
@@ -146,7 +160,9 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
             var contextMock = new Mock<IMigrationContext>();
             contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
 
-            var root = new DeleteExpressionRoot(contextMock.Object);
+            var migrationMock = new Mock<IMigration>().Object;
+
+            var root = new DeleteExpressionRoot(contextMock.Object, migrationMock);
             root.DefaultConstraint();
 
             collectionMock.Verify(x => x.Add(It.IsAny<DeleteDefaultConstraintExpression>()));

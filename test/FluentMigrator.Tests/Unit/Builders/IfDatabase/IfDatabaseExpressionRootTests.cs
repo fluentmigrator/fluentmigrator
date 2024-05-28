@@ -219,7 +219,8 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
             var context = serviceProvider.GetRequiredService<IMigrationContext>();
 
             // Arrange
-            var expression = new IfDatabaseExpressionRoot(context, databaseType.ToArray());
+            var migrationMock = new Mock<IMigration>().Object;
+            var expression = new IfDatabaseExpressionRoot(context, migrationMock, databaseType.ToArray());
 
             // Act
             if (fluentExpression == null || fluentExpression.Length == 0)
@@ -247,7 +248,8 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
             var context = serviceProvider.GetRequiredService<IMigrationContext>();
 
             // Arrange
-            var expression = new IfDatabaseExpressionRoot(context, databaseTypePredicate);
+            var migrationMock = new Mock<IMigration>().Object;
+            var expression = new IfDatabaseExpressionRoot(context, migrationMock,databaseTypePredicate);
 
             // Act
             if (fluentExpression == null || fluentExpression.Length == 0)

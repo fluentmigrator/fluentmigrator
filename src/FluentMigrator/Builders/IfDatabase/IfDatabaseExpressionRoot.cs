@@ -41,8 +41,13 @@ namespace FluentMigrator.Builders.IfDatabase
         /// <summary>
         /// The context to add expressions into
         /// </summary>
-        /// <remarks>If the database type doe snot apply then this will be a new context that is not used by the caller</remarks>
+        /// <remarks>If the database type does not apply then this will be a new context that is not used by the caller</remarks>
         private readonly IMigrationContext _context;
+
+        /// <summary>
+        /// The base migration instance
+        /// </summary>
+        private readonly IMigration _migration;
 
         /// <summary>
         /// Initializes a new instance of a the <see cref="IfDatabaseExpressionRoot"/> class that will only add expressions to the provided <paramref name="context"/> if <paramref name="databaseType"/> matches the migration processor
@@ -50,9 +55,11 @@ namespace FluentMigrator.Builders.IfDatabase
         /// <remarks>If the database type does not apply then a <seealso cref="NullIfDatabaseProcessor"/> will be used as a container to void any fluent expressions that would have been executed</remarks>
         /// <param name="context">The context to add expressions to if the database type applies</param>
         /// <param name="databaseType">The database type that the expressions relate to</param>
-        public IfDatabaseExpressionRoot(IMigrationContext context, params string[] databaseType)
+        public IfDatabaseExpressionRoot(IMigrationContext context, IMigration migration, params string[] databaseType)
         {
             if (databaseType == null) throw new ArgumentNullException(nameof(databaseType));
+
+            _migration = migration;
 
             _context = DatabaseTypeApplies(context, databaseType)
                 ? context
@@ -65,9 +72,11 @@ namespace FluentMigrator.Builders.IfDatabase
         /// <remarks>If the database type does not apply then a <seealso cref="NullIfDatabaseProcessor"/> will be used as a container to void any fluent expressions that would have been executed</remarks>
         /// <param name="context">The context to add expressions to if the database type applies</param>
         /// <param name="databaseTypePredicate">The predicate that must be true for the expression to run</param>
-        public IfDatabaseExpressionRoot(IMigrationContext context, Predicate<string> databaseTypePredicate)
+        public IfDatabaseExpressionRoot(IMigrationContext context, IMigration migration, Predicate<string> databaseTypePredicate)
         {
             if (databaseTypePredicate == null) throw new ArgumentNullException(nameof(databaseTypePredicate));
+
+            _migration = migration;
 
             _context = DatabaseTypeApplies(context, databaseTypePredicate)
                 ? context
@@ -87,7 +96,7 @@ namespace FluentMigrator.Builders.IfDatabase
         /// </summary>
         public ICreateExpressionRoot Create
         {
-            get { return new CreateExpressionRoot(_context); }
+            get { return new CreateExpressionRoot(_context, _migration); }
         }
 
         /// <summary>
@@ -95,7 +104,7 @@ namespace FluentMigrator.Builders.IfDatabase
         /// </summary>
         public IDeleteExpressionRoot Delete
         {
-            get { return new DeleteExpressionRoot(_context); }
+            get { return new DeleteExpressionRoot(_context, _migration); }
         }
 
         /// <summary>
