@@ -46,7 +46,25 @@ namespace FluentMigrator.Tests.Unit
         private static readonly IMigrationRunnerConventions _default = DefaultMigrationRunnerConventions.Instance;
 
         [Test]
-        public void GetPrimaryKeyNamePrefixesTableNameWithPKAndUnderscore()
+        public void GetPrimaryKeyNamePrefixForColumnWithName()
+        {
+            var expr = new CreateColumnExpression()
+            {
+                Column =
+                {
+                    Name = "Bar",
+                    TableName = "Foo",
+                    IsPrimaryKey = true,
+                }
+            };
+
+            var processed = expr.Apply(ConventionSets.NoSchemaName);
+
+            processed.Column.PrimaryKeyName.ShouldBe("PK_Foo_Bar");
+        }
+
+        [Test]
+        public void GetPrimaryKeyNamePrefixForColumnWithoutName()
         {
             var expr = new CreateColumnExpression()
             {
@@ -57,8 +75,43 @@ namespace FluentMigrator.Tests.Unit
                 }
             };
 
-            var processed = expr.Apply(ConventionSets.NoSchemaName);
-            processed.Column.PrimaryKeyName.ShouldBe("PK_Foo");
+            var action = () => expr.Apply(ConventionSets.NoSchemaName);
+
+            var exception = action.ShouldThrow<ArgumentException>();
+            exception.Message.ShouldBe("An object or column name is missing or empty.");
+        }
+
+        [Test]
+        public void GetPrimaryKeyNamePrefixForMultipleColumns()
+        {
+            var expr = new CreateTableExpression()
+            {
+                TableName = "Foo",
+                Columns =
+                [
+                    new ColumnDefinition
+                    {
+                        Name = "Bar1",
+                        IsPrimaryKey = true,
+                    },
+                    new ColumnDefinition
+                    {
+                        Name = "Bar2",
+                        IsPrimaryKey = true,
+                    }
+                ]
+            };
+
+            var action = () =>
+            {
+                foreach (var columnsConventions in ConventionSets.NoSchemaName.ColumnsConventions)
+                {
+                    columnsConventions.Apply(expr);
+                }
+            };
+
+            var exception = action.ShouldThrow<InvalidOperationException>();
+            exception.Message.ShouldBe("Error creating table with multiple primary keys.");
         }
 
         [Test]

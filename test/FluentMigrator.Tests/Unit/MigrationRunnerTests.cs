@@ -666,7 +666,7 @@ namespace FluentMigrator.Tests.Unit
         {
             var invalidMigration = new Mock<IMigration>();
             var invalidExpression = new UpdateDataExpression { TableName = "Test" };
-            var secondInvalidExpression = new CreateColumnExpression();
+            var secondInvalidExpression = new CreateColumnExpression() { Column = { Name = "Test" } };
             invalidMigration.Setup(m => m.GetUpExpressions(It.IsAny<IMigrationContext>()))
                 .Callback((IMigrationContext mc) => { mc.Expressions.Add(invalidExpression); mc.Expressions.Add(secondInvalidExpression); });
 
