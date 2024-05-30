@@ -326,7 +326,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
-        public void CanCreateMultiColumnUniqueIndexWithOneNonDistinctNulls()
+        public virtual void CanCreateMultiColumnUniqueIndexWithOneNonDistinctNulls()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueMultiColumnIndexExpression();
             expression.Index.Columns.First().SetAdditionalFeature(PostgresExtensions.IndexColumnNullsDistinct, false);
@@ -336,7 +336,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
-        public void CanCreateMultiColumnUniqueIndexWithTwoNonDistinctNulls()
+        public virtual void CanCreateMultiColumnUniqueIndexWithTwoNonDistinctNulls()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueMultiColumnIndexExpression();
 
