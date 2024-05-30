@@ -224,7 +224,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
 
             if (!string.IsNullOrWhiteSpace(filter) && !string.IsNullOrWhiteSpace(nullsDistinctString))
             {
-                CompatibilityMode.HandleCompatibility("With nulls distinct can not be used along with WHERE, in PostgreSQL 14 or older");
+                CompatibilityMode.HandleCompatibility("In PostgreSQL 14 or older, With nulls distinct can not be combined with WHERE");
                 return string.Empty;
             }
 
