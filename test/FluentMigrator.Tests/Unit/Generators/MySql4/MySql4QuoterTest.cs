@@ -42,6 +42,13 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
         }
 
         [Test]
+        public void CurrentUTCDateTimeIsFormattedParentheses()
+        {
+            _quoter.QuoteValue(SystemMethods.CurrentUTCDateTime)
+                .ShouldBe("(UTC_TIMESTAMP)");
+        }
+
+        [Test]
         public void TimeSpanIsFormattedQuotes()
         {
             _quoter.QuoteValue(new TimeSpan(1,2, 13, 65))

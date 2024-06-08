@@ -48,7 +48,7 @@ namespace FluentMigrator.Runner.Generators.MySql
                 case SystemMethods.CurrentDateTime:
                     return "CURRENT_TIMESTAMP";
                 case SystemMethods.CurrentUTCDateTime:
-                    return "UTC_TIMESTAMP";
+                    return "(UTC_TIMESTAMP)";
                 case SystemMethods.CurrentUser:
                     return "CURRENT_USER()";
             }

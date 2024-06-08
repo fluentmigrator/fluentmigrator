@@ -23,7 +23,6 @@ using System.Reflection;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Initialization.AssemblyLoader;
 using FluentMigrator.Runner.Logging;
-using FluentMigrator.Runner.Processors;
 
 using JetBrains.Annotations;
 
@@ -80,20 +79,6 @@ namespace FluentMigrator.Runner.Initialization
                         asmLoaderFactory,
                         configureRunner)
                     .BuildServiceProvider(validateScopes: true));
-        }
-
-        [Obsolete("Ony the statically provided factories are accessed")]
-        public TaskExecutor(
-            [NotNull] IRunnerContext runnerContext,
-            [CanBeNull] IConnectionStringProvider connectionStringProvider,
-            [NotNull] AssemblyLoaderFactory assemblyLoaderFactory,
-            // ReSharper disable once UnusedParameter.Local
-            MigrationProcessorFactoryProvider factoryProvider)
-            : this(
-                runnerContext,
-                assemblyLoaderFactory,
-                connectionStringProvider)
-        {
         }
 
         [Obsolete]

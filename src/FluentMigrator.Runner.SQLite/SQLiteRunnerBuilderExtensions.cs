@@ -69,8 +69,6 @@ namespace FluentMigrator.Runner
                     })
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<SQLiteGenerator>());
 
-            MigrationProcessorFactoryProvider.Register(new SQLiteProcessorFactory());
-
             return builder;
         }
     }
