@@ -28,7 +28,6 @@ using FluentMigrator.Runner;
 using FluentMigrator.Runner.Generators.DB2;
 using FluentMigrator.Runner.Generators.Firebird;
 using FluentMigrator.Runner.Generators.Hana;
-using FluentMigrator.Runner.Generators.Jet;
 #if NETFRAMEWORK
 using FluentMigrator.Runner.Generators.Jet;
 #endif
