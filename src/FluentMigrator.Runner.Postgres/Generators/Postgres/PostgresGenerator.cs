@@ -220,15 +220,23 @@ namespace FluentMigrator.Runner.Generators.Postgres
         protected virtual string GetFilter(CreateIndexExpression expression)
         {
             var filter = expression.Index.GetAdditionalFeature<string>(PostgresExtensions.IndexFilter);
+            var nullsDistinctString = GetWithNullsDistinctStringInWhere(expression.Index);
+
+            if (!string.IsNullOrWhiteSpace(filter) && !string.IsNullOrWhiteSpace(nullsDistinctString))
+            {
+                CompatibilityMode.HandleCompatibility("In PostgreSQL 14 or older, With nulls distinct can not be combined with WHERE");
+                return string.Empty;
+            }
+
             if (!string.IsNullOrWhiteSpace(filter))
             {
                 return " WHERE " + filter;
             }
 
-            return string.Empty;
+            return nullsDistinctString;
         }
 
-        public virtual string GetWithNullsDistinctString(IndexDefinition index)
+        protected virtual string GetWithNullsDistinctStringInWhere(IndexDefinition index)
         {
             bool? GetNullsDistinct(IndexColumnDefinition column)
                 => column.GetAdditionalFeature(PostgresExtensions.IndexColumnNullsDistinct, (bool?)null);
@@ -254,6 +262,10 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return condition.Length == 0 ? string.Empty : $" WHERE {condition}";
         }
 
+        protected virtual string GetWithNullsDistinctString(IndexDefinition index)
+        {
+            return string.Empty;
+        }
 
         protected virtual string GetAsConcurrently(CreateIndexExpression expression)
         {
@@ -436,10 +448,10 @@ namespace FluentMigrator.Runner.Generators.Postgres
 
             result.Append(")")
                 .Append(GetIncludeString(expression))
+                .Append(GetWithNullsDistinctString(expression.Index))
                 .Append(GetWithIndexStorageParameters(expression))
                 .Append(GetTablespace(expression))
                 .Append(GetFilter(expression))
-                .Append(GetWithNullsDistinctString(expression.Index))
                 .Append(";");
 
             return result.ToString();
