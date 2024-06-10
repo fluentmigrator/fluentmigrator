@@ -28,7 +28,6 @@ using FluentMigrator.Runner;
 using FluentMigrator.Runner.Generators.DB2;
 using FluentMigrator.Runner.Generators.Firebird;
 using FluentMigrator.Runner.Generators.Hana;
-using FluentMigrator.Runner.Generators.Jet;
 #if NETFRAMEWORK
 using FluentMigrator.Runner.Generators.Jet;
 #endif
@@ -39,18 +38,9 @@ using FluentMigrator.Runner.Generators.Redshift;
 using FluentMigrator.Runner.Generators.Snowflake;
 using FluentMigrator.Runner.Generators.SQLite;
 using FluentMigrator.Runner.Generators.SqlServer;
-using FluentMigrator.Runner.Processors.DB2;
-using FluentMigrator.Runner.Processors.Firebird;
-using FluentMigrator.Runner.Processors.Hana;
-using FluentMigrator.Runner.Processors.Oracle;
-using FluentMigrator.Runner.Processors.Snowflake;
-using FluentMigrator.Runner.Processors.SQLite;
-using FluentMigrator.Runner.Processors.SqlServer;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using FluentMigrator.Runner.Processors.Jet;
-using FluentMigrator.Runner.Processors.Redshift;
 
 namespace FluentMigrator.Example.TypeMapper
 {
