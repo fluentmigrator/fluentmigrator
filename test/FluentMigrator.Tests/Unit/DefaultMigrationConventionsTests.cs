@@ -18,7 +18,6 @@
 
 using System;
 using System.Linq;
-using System.Reflection;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
@@ -26,8 +25,6 @@ using FluentMigrator.Model;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Infrastructure;
 using FluentMigrator.Runner.Initialization;
-using FluentMigrator.Runner.Processors;
-using FluentMigrator.Runner.Processors.SqlServer;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -586,65 +583,6 @@ namespace FluentMigrator.Tests.Unit
                 }).AsCollection);
         }
 
-        [Test]
-        [Obsolete]
-        public void ObsoleteGetAutoScriptUpName()
-        {
-            var querySchema = new SqlServerProcessor(
-                new[] { "SqlServer2016", "SqlServer" },
-                null,
-                null,
-                null,
-                new ProcessorOptions(),
-                null);
-            var assemblyCollection = new Mock<IAssemblyCollection>();
-            assemblyCollection.SetupGet(c => c.Assemblies).Returns(new Assembly[0]);
-            var context = new MigrationContext(querySchema, assemblyCollection.Object, null);
-            var expr = new ObsoleteAutoScriptMigrationFake();
-            expr.GetUpExpressions(context);
-
-            var expression = context.Expressions.Single();
-            var processed = (IAutoNameExpression)expression.Apply(ConventionSets.NoSchemaName);
-            processed.AutoNames.ShouldNotBeNull();
-            Assert.That(
-                processed.AutoNames, Is.EqualTo(new[]
-                {
-                    "Scripts.Up.20130508175300_ObsoleteAutoScriptMigrationFake_SqlServer2016.sql",
-                    "Scripts.Up.20130508175300_ObsoleteAutoScriptMigrationFake_SqlServer.sql",
-                    "Scripts.Up.20130508175300_ObsoleteAutoScriptMigrationFake_Generic.sql",
-                }).AsCollection);
-        }
-
-        [Test]
-        [Obsolete]
-        public void ObsoleteGetAutoScriptDownName()
-        {
-            var querySchema = new SqlServerProcessor(
-                new[] { "SqlServer2016", "SqlServer" },
-                null,
-                null,
-                null,
-                new ProcessorOptions(),
-                null);
-            var assemblyCollection = new Mock<IAssemblyCollection>();
-            assemblyCollection.SetupGet(c => c.Assemblies).Returns(new Assembly[0]);
-            var context = new MigrationContext(querySchema, assemblyCollection.Object, null);
-            var expr = new ObsoleteAutoScriptMigrationFake();
-            expr.GetDownExpressions(context);
-
-            var expression = context.Expressions.Single();
-            var processed = (IAutoNameExpression)expression.Apply(ConventionSets.NoSchemaName);
-
-            processed.AutoNames.ShouldNotBeNull();
-            Assert.That(
-                processed.AutoNames, Is.EqualTo(new[]
-                {
-                    "Scripts.Down.20130508175300_ObsoleteAutoScriptMigrationFake_SqlServer2016.sql",
-                    "Scripts.Down.20130508175300_ObsoleteAutoScriptMigrationFake_SqlServer.sql",
-                    "Scripts.Down.20130508175300_ObsoleteAutoScriptMigrationFake_Generic.sql",
-                }).AsCollection);
-        }
-
         private class ConventionsTestClass : ISchemaExpression, IFileSystemExpression
         {
             public string SchemaName { get; set; }
@@ -652,11 +590,6 @@ namespace FluentMigrator.Tests.Unit
         }
     }
 
-    [Migration(20130508175300)]
-    [Obsolete]
-    class ObsoleteAutoScriptMigrationFake : AutoScriptMigration
-    {
-    }
 
     [Migration(20130508175300)]
     class AutoScriptMigrationFake : AutoScriptMigration
