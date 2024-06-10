@@ -87,21 +87,6 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
         }
 
         [Test]
-        [Obsolete]
-        public void ExplicitUnicodeStringIgnoredForNonSqlServer()
-        {
-            var expression = new InsertDataExpression {TableName = "TestTable"};
-            expression.Rows.Add(new InsertionDataDefinition
-                                    {
-                                        new KeyValuePair<string, object>("NormalString", "Just'in"),
-                                        new KeyValuePair<string, object>("UnicodeString", new ExplicitUnicodeString("codethinked'.com"))
-                                    });
-
-            var result = _generator.Generate(expression);
-            result.ShouldBe("INSERT INTO \"public\".\"TestTable\" (\"NormalString\",\"UnicodeString\") VALUES ('Just''in','codethinked''.com');");
-        }
-
-        [Test]
         public void CanAlterColumnAndSetAsNullable()
         {
             var expression = new AlterColumnExpression

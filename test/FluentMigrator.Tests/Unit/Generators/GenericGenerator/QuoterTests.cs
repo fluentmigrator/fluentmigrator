@@ -327,19 +327,5 @@ namespace FluentMigrator.Tests.Unit.Generators.GenericGenerator
         {
             _quoter.QuoteValue(new NonUnicodeString("Test ' String")).ShouldBe("'Test '' String'");
         }
-
-        [Test]
-        [Obsolete]
-        public void ExplicitUnicodeStringIsFormattedAsNormalString()
-        {
-            _quoter.QuoteValue(new ExplicitUnicodeString("Test String")).ShouldBe("'Test String'");
-        }
-
-        [Test]
-        [Obsolete]
-        public void ExplicitUnicodeStringIsFormattedAsNormalStringQuotes()
-        {
-            _quoter.QuoteValue(new ExplicitUnicodeString("Test ' String")).ShouldBe("'Test '' String'");
-        }
     }
 }
