@@ -96,6 +96,21 @@ namespace FluentMigrator.Runner
         }
 
         /// <summary>
+        /// Adds Postgres 15.0 support
+        /// </summary>
+        /// <param name="builder">The builder to add the Postgres-specific services to</param>
+        /// <returns>The migration runner builder</returns>
+        public static IMigrationRunnerBuilder AddPostgres15_0(this IMigrationRunnerBuilder builder)
+        {
+            builder.Services
+                .AddScoped<Postgres15_0Processor>()
+                .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<Postgres15_0Processor>())
+                .AddScoped<Postgres15_0Generator>()
+                .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<Postgres15_0Generator>());
+            return builder.AddCommonPostgresServices();
+        }
+
+        /// <summary>
         /// Add common Postgres services.
         /// </summary>
         /// <param name="builder">The builder to add the Postgres-specific services to</param>

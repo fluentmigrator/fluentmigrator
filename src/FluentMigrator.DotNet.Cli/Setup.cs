@@ -92,6 +92,7 @@ namespace FluentMigrator.DotNet.Cli
                         .AddPostgres92()
                         .AddPostgres10_0()
                         .AddPostgres11_0()
+                        .AddPostgres15_0()
                         .AddRedshift()
                         .AddSnowflake()
                         .AddSQLite()
