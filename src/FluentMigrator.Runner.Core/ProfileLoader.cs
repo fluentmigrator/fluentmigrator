@@ -42,10 +42,6 @@ namespace FluentMigrator.Runner
 
         [Obsolete]
         [CanBeNull]
-        private readonly IMigrationRunner _runner;
-
-        [Obsolete]
-        [CanBeNull]
         private readonly IMigrationRunnerConventions _conventions;
 
         /// <summary>
@@ -61,21 +57,6 @@ namespace FluentMigrator.Runner
         {
             _serviceProvider = serviceProvider;
             Profiles = source.GetProfiles(options.Value.Profile).ToList();
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ProfileLoader"/> class.
-        /// </summary>
-        /// <param name="runnerContext">The migration runner context</param>
-        /// <param name="runner">The migration runner</param>
-        /// <param name="conventions">The migration runner conventions</param>
-        [Obsolete]
-        public ProfileLoader(IRunnerContext runnerContext, IMigrationRunner runner, IMigrationRunnerConventions conventions)
-        {
-            _runner = runner;
-            _conventions = conventions;
-            _serviceProvider = null;
-            Profiles = FindProfilesIn(runner.MigrationAssemblies, runnerContext.Profile).ToList();
         }
 
         /// <inheritdoc />
@@ -101,26 +82,6 @@ namespace FluentMigrator.Runner
         /// Gets all found profiles
         /// </summary>
         public IEnumerable<IMigration> Profiles { get; }
-
-        /// <inheritdoc />
-        [Obsolete]
-        public bool SupportsParameterlessApplyProfile => _runner != null;
-
-        /// <inheritdoc />
-        [Obsolete]
-        public void ApplyProfiles()
-        {
-            if (_runner == null)
-            {
-                Debug.Assert(_serviceProvider != null, "_serviceProvider != null");
-                var runner = _serviceProvider.GetRequiredService<IMigrationRunner>();
-                ApplyProfiles(runner);
-            }
-            else
-            {
-                ApplyProfiles(_runner);
-            }
-        }
 
         /// <inheritdoc />
         public void ApplyProfiles(IMigrationRunner runner)

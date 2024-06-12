@@ -47,13 +47,6 @@ namespace FluentMigrator.Infrastructure
         IQuerySchema QuerySchema { get; }
 
         /// <summary>
-        /// Gets or sets the collection of migration assemblies
-        /// </summary>
-        [Obsolete]
-        [CanBeNull]
-        IAssemblyCollection MigrationAssemblies { get; set; }
-
-        /// <summary>
         /// Gets or sets the connection string
         /// </summary>
         string Connection { get; set; }
