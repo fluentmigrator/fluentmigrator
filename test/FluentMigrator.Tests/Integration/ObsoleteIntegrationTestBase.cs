@@ -36,8 +36,12 @@ using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.Runner.Generators.MySql;
 using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Runner.Generators.Firebird;
+using FluentMigrator.Runner.Initialization;
+using FluentMigrator.Tests.Helpers;
 
 using Microsoft.Data.SqlClient;
+
+using Moq;
 
 using MySql.Data.MySqlClient;
 
@@ -249,7 +253,11 @@ $"No database processors are configured to run your migration tests.  This messa
                 connection.ConnectionString = serverOptions.ConnectionString;
                 connection.Open();
 
-                using (var processor = new SQLiteProcessor(connection, new SQLiteGenerator(), announcer, new ProcessorOptions(), factory, new SQLiteQuoter()))
+                var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Loose);
+                var mockedConnectionStringAccessor = new Mock<IConnectionStringAccessor>(MockBehavior.Loose);
+                mockedConnectionStringAccessor.SetupGet(x => x.ConnectionString).Returns(serverOptions.ConnectionString);
+
+                using (var processor = new SQLiteProcessor(factory, new SQLiteGenerator(), LoggerHelper.Get<SQLiteProcessor>(), OptionHelper.Get<ProcessorOptions>(), mockedConnectionStringAccessor.Object, mockServiceProvider.Object, new SQLiteQuoter()))
                 {
                     test(processor);
 

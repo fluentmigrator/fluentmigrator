@@ -100,12 +100,7 @@ namespace FluentMigrator
                 return _providers = _embeddedResourceProviders;
             }
 
-            var providers = new List<IEmbeddedResourceProvider>
-            {
-#pragma warning disable 612
-                new DefaultEmbeddedResourceProvider(Context.MigrationAssemblies)
-#pragma warning restore 612
-            };
+            var providers = new List<IEmbeddedResourceProvider>();
 
             return _providers = providers;
         }

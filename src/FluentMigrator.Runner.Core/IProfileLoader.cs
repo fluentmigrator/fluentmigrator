@@ -29,18 +29,6 @@ namespace FluentMigrator.Runner
     public interface IProfileLoader
     {
         /// <summary>
-        /// Gets a value indicating whether this instance allows a call to <see cref="ApplyProfiles()"/>
-        /// </summary>
-        [Obsolete]
-        bool SupportsParameterlessApplyProfile { get; }
-
-        /// <summary>
-        /// Apply all loaded profiles
-        /// </summary>
-        [Obsolete]
-        void ApplyProfiles();
-
-        /// <summary>
         /// Apply all loaded profiles with the given runner
         /// </summary>
         /// <param name="runner">The migration runner</param>

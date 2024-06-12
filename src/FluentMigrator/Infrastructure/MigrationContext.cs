@@ -23,7 +23,6 @@ using FluentMigrator.Expressions;
 
 using JetBrains.Annotations;
 
-using Microsoft.Extensions.DependencyInjection;
 
 namespace FluentMigrator.Infrastructure
 {
@@ -32,26 +31,6 @@ namespace FluentMigrator.Infrastructure
     /// </summary>
     public class MigrationContext : IMigrationContext
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MigrationContext"/> class.
-        /// </summary>
-        /// <param name="querySchema">The provider used to query the database</param>
-        /// <param name="migrationAssemblies">The collection of migration assemblies</param>
-        /// <param name="connection">The database connection</param>
-        [Obsolete]
-        public MigrationContext([NotNull] IQuerySchema querySchema, [NotNull] IAssemblyCollection migrationAssemblies, string connection)
-        {
-            // ReSharper disable VirtualMemberCallInConstructor
-            QuerySchema = querySchema;
-            MigrationAssemblies = migrationAssemblies;
-            // ReSharper restore VirtualMemberCallInConstructor
-            Connection = connection;
-            var services = new ServiceCollection();
-            services
-                .AddScoped(sp => migrationAssemblies)
-                .AddScoped<IEmbeddedResourceProvider, DefaultEmbeddedResourceProvider>();
-            ServiceProvider = services.BuildServiceProvider(validateScopes: false);
-        }
 
 
         /// <summary>
@@ -65,10 +44,8 @@ namespace FluentMigrator.Infrastructure
             [NotNull] IServiceProvider serviceProvider,
             string connection)
         {
-            // ReSharper disable VirtualMemberCallInConstructor
+            // ReSharper disable once VirtualMemberCallInConstructor
             QuerySchema = querySchema;
-            MigrationAssemblies = serviceProvider.GetService<IAssemblyCollection>();
-            // ReSharper restore VirtualMemberCallInConstructor
             Connection = connection;
             ServiceProvider = serviceProvider;
         }
@@ -78,10 +55,6 @@ namespace FluentMigrator.Infrastructure
 
         /// <inheritdoc />
         public virtual IQuerySchema QuerySchema { get; set; }
-
-        /// <inheritdoc />
-        [Obsolete]
-        public virtual IAssemblyCollection MigrationAssemblies { get; set; }
 
         /// <inheritdoc />
         public string Connection { get; set; }
