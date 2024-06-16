@@ -329,7 +329,7 @@ namespace FluentMigrator.Tests.Unit.Validation
             var validationResults = sut.Validate(result).ToList();
             validationResults.ShouldNotBeNull();
             validationResults.Count.ShouldBe(1);
-            validationResults.ShouldContain(r => string.Equals(r.ErrorMessage, ErrorMessages.ForeignKeyColumnNamesMustBeUnique, StringComparison.Ordinal));
+            validationResults.ShouldContain(r => string.Equals(r.ErrorMessage, ErrorMessages.PrimaryKeyColumnNamesMustBeUnique, StringComparison.Ordinal));
         }
 
         [Test]
