@@ -24,7 +24,7 @@ namespace FluentMigrator.Expressions
     /// The interface for a migration expression
     /// </summary>
 #pragma warning disable 618
-    public interface IMigrationExpression : ICanBeValidated
+    public interface IMigrationExpression
 #pragma warning restore 618
     {
         /// <summary>

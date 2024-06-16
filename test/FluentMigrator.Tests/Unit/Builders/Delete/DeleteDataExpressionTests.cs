@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 //
 // Copyright (c) 2018, Fluent Migrator Project
 //
@@ -16,12 +16,14 @@
 //
 #endregion
 
+using System;
 using System.Linq;
 using NUnit.Framework;
 
 using FluentMigrator.Expressions;
 using Moq;
 using FluentMigrator.Builders.Delete;
+using FluentMigrator.Validation;
 
 using Shouldly;
 
@@ -95,7 +97,6 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
         {
             var expressionMock = new Mock<DeleteDataExpression>();
 
-
             var builder = new DeleteDataExpressionBuilder(expressionMock.Object);
             builder.IsNull("TestColumn");
 
@@ -104,6 +105,25 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
             rowobject.Key.ShouldBe("TestColumn");
             rowobject.Value.ShouldBeNull();
 
+        }
+
+        [Test]
+        public void DefaultMigrationExpressionValidatorShouldReturnErrorWhenTableNameIsNotSpecified()
+        {
+            var mockServiceProvider = new Mock<IServiceProvider>();
+            var validator = new DefaultMigrationExpressionValidator(mockServiceProvider.Object);
+            var expressionMock = new Mock<DeleteDataExpression>();
+            
+            var builder = new DeleteDataExpressionBuilder(expressionMock.Object);
+            builder.IsNull("TestColumn");
+
+            var result = expressionMock.Object;
+
+            var validationResults = validator.Validate(result).ToList();
+
+            validationResults.ShouldNotBeNull();
+            validationResults.Count.ShouldBeGreaterThan(0);
+            validationResults.ShouldContain(r => string.Equals(r.ErrorMessage, "The TableName field is required.", StringComparison.Ordinal));
         }
     }
 }

@@ -14,6 +14,7 @@
 // limitations under the License.
 #endregion
 
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -95,6 +96,21 @@ namespace FluentMigrator
                 }
             }
 
+            if (value is ICollection collection)
+            {
+                foreach (var item in collection)
+                    if (item is IValidatableObject)
+                    {
+                        var childContext = new ValidationContext(item, context.Items);
+                        childContext.InitializeServiceProvider(context.GetService);
+
+                        if (!TryCollectResults(childContext, item, results))
+                        {
+                            return false;
+                        }
+                    }
+            }
+            
             return true;
         }
     }

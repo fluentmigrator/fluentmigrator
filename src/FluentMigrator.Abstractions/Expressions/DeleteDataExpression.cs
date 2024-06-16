@@ -16,7 +16,6 @@
 //
 #endregion
 
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -47,13 +46,6 @@ namespace FluentMigrator.Expressions
         /// Gets the list of row definitions
         /// </summary>
         public List<DeletionDataDefinition> Rows { get; } = new List<DeletionDataDefinition>();
-
-        /// <inheritdoc />
-        [Obsolete("Use the System.ComponentModel.DataAnnotations.Validator instead")]
-        public void CollectValidationErrors(ICollection<string> errors)
-        {
-            this.CollectErrors(errors);
-        }
 
         /// <inheritdoc />
         public void ExecuteWith(IMigrationProcessor processor)

@@ -17,7 +17,6 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
 
 namespace FluentMigrator.Expressions
 {
@@ -28,13 +27,6 @@ namespace FluentMigrator.Expressions
     {
         /// <inheritdoc />
         public abstract void ExecuteWith(IMigrationProcessor processor);
-
-        /// <inheritdoc />
-        [Obsolete("Use the System.ComponentModel.DataAnnotations.Validator instead")]
-        public virtual void CollectValidationErrors(ICollection<string> errors)
-        {
-            this.CollectErrors(errors);
-        }
 
         /// <inheritdoc />
         public virtual IMigrationExpression Reverse()

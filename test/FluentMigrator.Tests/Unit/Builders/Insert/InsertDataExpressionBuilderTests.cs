@@ -16,12 +16,17 @@
 //
 #endregion
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using FluentMigrator.Builders.Insert;
 using FluentMigrator.Expressions;
 using FluentMigrator.Postgres;
 using FluentMigrator.SqlServer;
+using FluentMigrator.Validation;
+
+using Moq;
 
 using NUnit.Framework;
 
