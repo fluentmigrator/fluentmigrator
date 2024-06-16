@@ -209,7 +209,7 @@ namespace FluentMigrator.Tests.Unit.Validation
             var validationResults = sut.Validate(result).ToList();
             validationResults.ShouldNotBeNull();
             validationResults.Count.ShouldBe(1);
-            validationResults.ShouldContain(r => string.Equals(r.ErrorMessage, ErrorMessages.ForeignKeysPrimaryKeyMustNotHaveColumnNameBeNullOrEmpty, StringComparison.Ordinal));
+            validationResults.ShouldContain(r => string.Equals(r.ErrorMessage, ErrorMessages.PrimaryKeyColumnNameReferencedByForeignKeyMustNotBeNullOrEmpty, StringComparison.Ordinal));
         }
 
         [Test]
@@ -233,7 +233,103 @@ namespace FluentMigrator.Tests.Unit.Validation
             var validationResults = sut.Validate(result).ToList();
             validationResults.ShouldNotBeNull();
             validationResults.Count.ShouldBe(1);
-            validationResults.ShouldContain(r => string.Equals(r.ErrorMessage, ErrorMessages.ForeignKeysPrimaryKeyMustNotHaveColumnNameBeNullOrEmpty, StringComparison.Ordinal));
+            validationResults.ShouldContain(r => string.Equals(r.ErrorMessage, ErrorMessages.PrimaryKeyColumnNameReferencedByForeignKeyMustNotBeNullOrEmpty, StringComparison.Ordinal));
+        }
+
+        [Test]
+        public void ValidateCreateForeignKeyWithLessForeignKeyColumnsThanPrimaryKeyColumnsShouldReturn()
+        {
+            var mockServiceProvider = new Mock<IServiceProvider>();
+            var sut = new DefaultMigrationExpressionValidator(mockServiceProvider.Object);
+            var expressionMock = new Mock<CreateForeignKeyExpression>();
+            expressionMock.SetupProperty(p => p.ForeignKey, new ForeignKeyDefinition { Name = "FK_TestTable_TestForeignColumn_TestPrimaryTable_TestPrimaryColumn" });
+
+            var builder = new CreateForeignKeyExpressionBuilder(expressionMock.Object);
+            _ = builder.FromTable("TestTable")
+                .InSchema("TestSchema")
+                .ForeignColumn("TestForeignColumn")
+                .ToTable("TestPrimaryTable")
+                .InSchema("TestPrimarySchema")
+                .PrimaryColumns("TestPrimaryColumn1", "TestPrimaryColumn2");
+
+            var result = expressionMock.Object;
+
+            var validationResults = sut.Validate(result).ToList();
+            validationResults.ShouldNotBeNull();
+            validationResults.Count.ShouldBe(1);
+            validationResults.ShouldContain(r => string.Equals(r.ErrorMessage, ErrorMessages.ForeignKeyColumnsCountMustMatchPrimaryKeyColumnsCount, StringComparison.Ordinal));
+        }
+
+        [Test]
+        public void ValidateCreateForeignKeyWithMoreForeignKeyColumnsThanPrimaryKeyColumnsShouldReturn()
+        {
+            var mockServiceProvider = new Mock<IServiceProvider>();
+            var sut = new DefaultMigrationExpressionValidator(mockServiceProvider.Object);
+            var expressionMock = new Mock<CreateForeignKeyExpression>();
+            expressionMock.SetupProperty(p => p.ForeignKey, new ForeignKeyDefinition { Name = "FK_TestTable_TestForeignColumn_TestPrimaryTable_TestPrimaryColumn" });
+
+            var builder = new CreateForeignKeyExpressionBuilder(expressionMock.Object);
+            _ = builder.FromTable("TestTable")
+                .InSchema("TestSchema")
+                .ForeignColumns("TestForeignColumn1", "TestForeignColumn2", "TestForeignColumn3")
+                .ToTable("TestPrimaryTable")
+                .InSchema("TestPrimarySchema")
+                .PrimaryColumns("TestPrimaryColumn1", "TestPrimaryColumn2");
+
+            var result = expressionMock.Object;
+
+            var validationResults = sut.Validate(result).ToList();
+            validationResults.ShouldNotBeNull();
+            validationResults.Count.ShouldBe(1);
+            validationResults.ShouldContain(r => string.Equals(r.ErrorMessage, ErrorMessages.ForeignKeyColumnsCountMustMatchPrimaryKeyColumnsCount, StringComparison.Ordinal));
+        }
+
+        [Test]
+        public void ValidateCreateForeignKeyWithDuplicateForeignKeyColumnsShouldReturn()
+        {
+            var mockServiceProvider = new Mock<IServiceProvider>();
+            var sut = new DefaultMigrationExpressionValidator(mockServiceProvider.Object);
+            var expressionMock = new Mock<CreateForeignKeyExpression>();
+            expressionMock.SetupProperty(p => p.ForeignKey, new ForeignKeyDefinition { Name = "FK_TestTable_TestForeignColumn_TestPrimaryTable_TestPrimaryColumn" });
+
+            var builder = new CreateForeignKeyExpressionBuilder(expressionMock.Object);
+            _ = builder.FromTable("TestTable")
+                .InSchema("TestSchema")
+                .ForeignColumns("TestForeignColumn1", "TestForeignColumn1")
+                .ToTable("TestPrimaryTable")
+                .InSchema("TestPrimarySchema")
+                .PrimaryColumns("TestPrimaryColumn1", "TestPrimaryColumn2");
+
+            var result = expressionMock.Object;
+
+            var validationResults = sut.Validate(result).ToList();
+            validationResults.ShouldNotBeNull();
+            validationResults.Count.ShouldBe(1);
+            validationResults.ShouldContain(r => string.Equals(r.ErrorMessage, ErrorMessages.ForeignKeyColumnNamesMustBeUnique, StringComparison.Ordinal));
+        }
+
+        [Test]
+        public void ValidateCreateForeignKeyWithDuplicatePrimaryKeyColumnsShouldReturn()
+        {
+            var mockServiceProvider = new Mock<IServiceProvider>();
+            var sut = new DefaultMigrationExpressionValidator(mockServiceProvider.Object);
+            var expressionMock = new Mock<CreateForeignKeyExpression>();
+            expressionMock.SetupProperty(p => p.ForeignKey, new ForeignKeyDefinition { Name = "FK_TestTable_TestForeignColumn_TestPrimaryTable_TestPrimaryColumn" });
+
+            var builder = new CreateForeignKeyExpressionBuilder(expressionMock.Object);
+            _ = builder.FromTable("TestTable")
+                .InSchema("TestSchema")
+                .ForeignColumns("TestForeignColumn1", "TestForeignColumn2")
+                .ToTable("TestPrimaryTable")
+                .InSchema("TestPrimarySchema")
+                .PrimaryColumns("TestPrimaryColumn1", "TestPrimaryColumn1");
+
+            var result = expressionMock.Object;
+
+            var validationResults = sut.Validate(result).ToList();
+            validationResults.ShouldNotBeNull();
+            validationResults.Count.ShouldBe(1);
+            validationResults.ShouldContain(r => string.Equals(r.ErrorMessage, ErrorMessages.ForeignKeyColumnNamesMustBeUnique, StringComparison.Ordinal));
         }
 
         [Test]

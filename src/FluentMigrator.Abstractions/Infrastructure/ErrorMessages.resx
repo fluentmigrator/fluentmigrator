@@ -207,7 +207,16 @@
   <data name="ForeignKeyMustNotHaveColumnNameBeNullOrEmpty" xml:space="preserve">
     <value>The foreign key must not have a column name be null or an empty string.</value>
   </data>
-  <data name="ForeignKeysPrimaryKeyMustNotHaveColumnNameBeNullOrEmpty" xml:space="preserve">
-    <value>The foreign key's primary key must not have a column name be null or an empty string.</value>
+  <data name="PrimaryKeyColumnNameReferencedByForeignKeyMustNotBeNullOrEmpty" xml:space="preserve">
+    <value>The primary key column name referenced by the foreign key must not be null or an empty string.</value>
+  </data>
+  <data name="ForeignKeyColumnsCountMustMatchPrimaryKeyColumnsCount" xml:space="preserve">
+    <value>The foreign key columns' count must match the primary key columns' count.</value>
+  </data>
+  <data name="ForeignKeyColumnNamesMustBeUnique" xml:space="preserve">
+    <value>The foreign key column names must be unique.</value>
+  </data>
+  <data name="PrimaryKeyColumnNamesMustBeUnique" xml:space="preserve">
+    <value>The primary key column names must be unique.</value>
   </data>
 </root>

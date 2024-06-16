@@ -207,7 +207,16 @@
   <data name="ForeignKeyCannotHaveColumnNameBeNullOrEmpty" xml:space="preserve">
     <value>Der Fremdschlüssel-Name darf nicht null oder leer sein.</value>
   </data>
-  <data name="ForeignKeysPrimaryKeyCannotHaveColumnNameBeNullOrEmpty" xml:space="preserve">
-    <value>Der primäre der Fremdschlüssel-Name darf nicht null oder leer sein.</value>
+  <data name="PrimaryKeyColumnNameReferencedByForeignKeyMustNotBeNullOrEmpty" xml:space="preserve">
+    <value>Der Name der vom Fremdschlüssel referenzierten Primärschlüsselspalte darf nicht null oder leer sein.</value>
+  </data>
+  <data name="ForeignKeyColumnsCountMustMatchPrimaryKeyColumnsCount" xml:space="preserve">
+    <value>Die Anzahl der Fremdschlüsselspalten muss mit der Anzahl der Primärschlüsselspalten übereinstimmen.</value>
+  </data>
+  <data name="ForeignKeyColumnNamesMustBeUnique" xml:space="preserve">
+    <value>Die Anzahl der Fremdschlüsselspalten müssen eindeutig sein.</value>
+  </data>
+  <data name="PrimaryKeyColumnNamesMustBeUnique" xml:space="preserve">
+    <value>Die Anzahl der Primärschlüsselspalten müssen eindeutig sein.</value>
   </data>
 </root>

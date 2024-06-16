@@ -120,6 +120,18 @@ namespace FluentMigrator.Model
                 yield return new ValidationResult(ErrorMessages.ForeignKeyMustHaveOneOrMorePrimaryColumns);
             }
 
+            if (ForeignColumns.Distinct(StringComparer.OrdinalIgnoreCase).Count()
+             != ForeignColumns.Count)
+            {
+                yield return new ValidationResult(ErrorMessages.ForeignKeyColumnNamesMustBeUnique);
+            }
+
+            if (PrimaryColumns.Distinct(StringComparer.OrdinalIgnoreCase).Count()
+             != PrimaryColumns.Count)
+            {
+                yield return new ValidationResult(ErrorMessages.PrimaryKeyColumnNamesMustBeUnique);
+            }
+
             if (ForeignColumns.Any(string.IsNullOrWhiteSpace))
             {
                 yield return new ValidationResult(ErrorMessages.ForeignKeyMustNotHaveColumnNameBeNullOrEmpty);
@@ -127,7 +139,12 @@ namespace FluentMigrator.Model
 
             if (PrimaryColumns.Any(string.IsNullOrWhiteSpace))
             {
-                yield return new ValidationResult(ErrorMessages.ForeignKeysPrimaryKeyMustNotHaveColumnNameBeNullOrEmpty);
+                yield return new ValidationResult(ErrorMessages.PrimaryKeyColumnNameReferencedByForeignKeyMustNotBeNullOrEmpty);
+            }
+
+            if (ForeignColumns.Count != PrimaryColumns.Count)
+            {
+                yield return new ValidationResult(ErrorMessages.ForeignKeyColumnsCountMustMatchPrimaryKeyColumnsCount);
             }
         }
     }

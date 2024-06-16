@@ -133,6 +133,24 @@ namespace FluentMigrator.Infrastructure {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The foreign key column names must be unique..
+        /// </summary>
+        public static string ForeignKeyColumnNamesMustBeUnique {
+            get {
+                return ResourceManager.GetString("ForeignKeyColumnNamesMustBeUnique", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The foreign key columns&apos; count must match the primary key columns&apos; count..
+        /// </summary>
+        public static string ForeignKeyColumnsCountMustMatchPrimaryKeyColumnsCount {
+            get {
+                return ResourceManager.GetString("ForeignKeyColumnsCountMustMatchPrimaryKeyColumnsCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The foreign key must have one or more foreign columns..
         /// </summary>
         public static string ForeignKeyMustHaveOneOrMoreForeignColumns {
@@ -165,15 +183,6 @@ namespace FluentMigrator.Infrastructure {
         public static string ForeignKeyNameCannotBeNullOrEmpty {
             get {
                 return ResourceManager.GetString("ForeignKeyNameCannotBeNullOrEmpty", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to The foreign key&apos;s primary key must not have a column name be null or an empty string..
-        /// </summary>
-        public static string ForeignKeysPrimaryKeyMustNotHaveColumnNameBeNullOrEmpty {
-            get {
-                return ResourceManager.GetString("ForeignKeysPrimaryKeyMustNotHaveColumnNameBeNullOrEmpty", resourceCulture);
             }
         }
         
@@ -264,6 +273,24 @@ namespace FluentMigrator.Infrastructure {
         public static string OperationCannotBeNull {
             get {
                 return ResourceManager.GetString("OperationCannotBeNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The primary key column name referenced by the foreign key must not be null or an empty string..
+        /// </summary>
+        public static string PrimaryKeyColumnNameReferencedByForeignKeyMustNotBeNullOrEmpty {
+            get {
+                return ResourceManager.GetString("PrimaryKeyColumnNameReferencedByForeignKeyMustNotBeNullOrEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The primary key column names must be unique..
+        /// </summary>
+        public static string PrimaryKeyColumnNamesMustBeUnique {
+            get {
+                return ResourceManager.GetString("PrimaryKeyColumnNamesMustBeUnique", resourceCulture);
             }
         }
         

@@ -90,7 +90,7 @@ namespace FluentMigrator.Tests.Unit.Definitions
         [Test]
         public void WhenDefaultSchemaConventionIsAppliedAndSchemaIsNotSetThenSchemaShouldBeNull()
         {
-            var expr = new CreateIndexExpression()
+            var expr = new CreateIndexExpression
             {
                 Index =
                 {
