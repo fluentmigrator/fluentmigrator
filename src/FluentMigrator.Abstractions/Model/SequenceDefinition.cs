@@ -29,9 +29,7 @@ namespace FluentMigrator.Model
     /// </summary>
     public class SequenceDefinition
         : ICloneable,
-#pragma warning disable 618
-          ICanBeValidated
-#pragma warning restore 618
+            IValidatableObject
     {
         /// <summary>
         /// Gets or sets the sequence name
@@ -94,10 +92,12 @@ namespace FluentMigrator.Model
         }
 
         /// <inheritdoc />
-        [Obsolete("Use the System.ComponentModel.DataAnnotations.Validator instead")]
-        public void CollectValidationErrors(ICollection<string> errors)
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            this.CollectErrors(errors);
+            if (string.IsNullOrWhiteSpace(Name))
+            {
+                yield return new ValidationResult(ErrorMessages.SequenceNameCannotBeNullOrEmpty);
+            }
         }
     }
 }

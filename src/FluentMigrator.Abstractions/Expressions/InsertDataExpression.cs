@@ -16,7 +16,6 @@
 //
 #endregion
 
-using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -46,13 +45,6 @@ namespace FluentMigrator.Expressions
         /// Gets the rows to be inserted
         /// </summary>
         public List<InsertionDataDefinition> Rows { get; } = new List<InsertionDataDefinition>();
-
-        /// <inheritdoc />
-        [Obsolete("Use the System.ComponentModel.DataAnnotations.Validator instead")]
-        public void CollectValidationErrors(ICollection<string> errors)
-        {
-            this.CollectErrors(errors);
-        }
 
         /// <inheritdoc />
         public void ExecuteWith(IMigrationProcessor processor)

@@ -68,7 +68,7 @@ namespace FluentMigrator.Tests.Unit.Definitions
         {
             var column = new IndexIncludeDefinition { Name = null };
             var errors = ValidationHelper.CollectErrors(column);
-            errors.ShouldContain(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
+            errors.ShouldContain(ErrorMessages.IndexIncludeColumnNameMustNotBeNullOrEmpty);
         }
 
         [Test]
@@ -76,7 +76,7 @@ namespace FluentMigrator.Tests.Unit.Definitions
         {
             var column = new IndexIncludeDefinition { Name = string.Empty };
             var errors = ValidationHelper.CollectErrors(column);
-            errors.ShouldContain(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
+            errors.ShouldContain(ErrorMessages.IndexIncludeColumnNameMustNotBeNullOrEmpty);
         }
 
         [Test]
@@ -90,7 +90,7 @@ namespace FluentMigrator.Tests.Unit.Definitions
         [Test]
         public void WhenDefaultSchemaConventionIsAppliedAndSchemaIsNotSetThenSchemaShouldBeNull()
         {
-            var expr = new CreateIndexExpression()
+            var expr = new CreateIndexExpression
             {
                 Index =
                 {

@@ -15,7 +15,6 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 using FluentMigrator.Infrastructure;
@@ -23,19 +22,9 @@ using FluentMigrator.Infrastructure;
 namespace FluentMigrator.Model
 {
     public class PostgresIndexAlgorithmDefinition
-        : ICloneable,
-#pragma warning disable 618
-            ICanBeValidated
-#pragma warning restore 618
+        : ICloneable
     {
-        [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.ColumnNameCannotBeNullOrEmpty))]
         public virtual Algorithm Algorithm { get; set; }
-
-        [Obsolete("Use the System.ComponentModel.DataAnnotations.Validator instead")]
-        public virtual void CollectValidationErrors(ICollection<string> errors)
-        {
-            this.CollectErrors(errors);
-        }
 
         public object Clone()
         {

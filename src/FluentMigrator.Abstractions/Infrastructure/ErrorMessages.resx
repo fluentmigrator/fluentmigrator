@@ -195,10 +195,28 @@
   <data name="UpdateDataExpressionMustSpecifyWhereClauseOrAllRows" xml:space="preserve">
     <value>Update statement is missing a condition. Specify one by calling .Where() or target all rows by calling .AllRows().</value>
   </data>
-    <data name="ExpressionTableNameMissing" xml:space="preserve">
+  <data name="ExpressionTableNameMissing" xml:space="preserve">
     <value>expression.TableName must not be empty</value>
   </data>
-    <data name="ExpressionTableNameMissingWithHints" xml:space="preserve">
+  <data name="ExpressionTableNameMissingWithHints" xml:space="preserve">
     <value>Table name not specified, ensure you have appended the OnTable extension. Format should be Delete.ForeignKey(KeyName).OnTable(TableName)</value>
+  </data>
+  <data name="IndexIncludeColumnNameMustNotBeNullOrEmpty" xml:space="preserve">
+    <value>The index include column's name must not be null or an empty string.</value>
+  </data>
+  <data name="ForeignKeyMustNotHaveColumnNameBeNullOrEmpty" xml:space="preserve">
+    <value>The foreign key must not have a column name be null or an empty string.</value>
+  </data>
+  <data name="PrimaryKeyColumnNameReferencedByForeignKeyMustNotBeNullOrEmpty" xml:space="preserve">
+    <value>The primary key column name referenced by the foreign key must not be null or an empty string.</value>
+  </data>
+  <data name="ForeignKeyColumnsCountMustMatchPrimaryKeyColumnsCount" xml:space="preserve">
+    <value>The foreign key columns' count must match the primary key columns' count.</value>
+  </data>
+  <data name="ForeignKeyColumnNamesMustBeUnique" xml:space="preserve">
+    <value>The foreign key column names must be unique.</value>
+  </data>
+  <data name="PrimaryKeyColumnNamesMustBeUnique" xml:space="preserve">
+    <value>The primary key column names must be unique.</value>
   </data>
 </root>
