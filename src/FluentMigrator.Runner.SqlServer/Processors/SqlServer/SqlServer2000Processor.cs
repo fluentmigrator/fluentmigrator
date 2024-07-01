@@ -64,12 +64,6 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         [CanBeNull]
         private readonly IServiceProvider _serviceProvider;
 
-        [Obsolete]
-        public SqlServer2000Processor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
-            : base(connection, factory, generator, announcer, options)
-        {
-        }
-
         public SqlServer2000Processor(
             [NotNull] ILogger<SqlServer2000Processor> logger,
             [NotNull] SqlServer2000Generator generator,
@@ -241,7 +235,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
                 }
                 catch (Exception ex)
                 {
-                    using (var message = new StringWriter())
+                    using (_ = new StringWriter())
                     {
                         ReThrowWithSql(ex, sql);
                     }

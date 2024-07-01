@@ -51,19 +51,6 @@ namespace FluentMigrator.Runner.Processors.SQLite
 
         public override IList<string> DatabaseTypeAliases { get; } = new List<string>();
 
-        [Obsolete]
-        public SQLiteProcessor(
-            IDbConnection connection,
-            IMigrationGenerator generator,
-            IAnnouncer announcer,
-            [NotNull] IMigrationProcessorOptions options,
-            IDbFactory factory,
-            [NotNull] SQLiteQuoter quoter)
-            : base(connection, factory, generator, announcer, options)
-        {
-            _quoter = quoter;
-        }
-
         public SQLiteProcessor(
             [NotNull] SQLiteDbFactory factory,
             [NotNull] SQLiteGenerator generator,

@@ -27,13 +27,6 @@ namespace FluentMigrator.Runner
         private readonly IMigrationProcessor _processor;
         private readonly bool _previewOnly;
 
-        [Obsolete]
-        public MigrationScopeHandler(IMigrationProcessor processor)
-        {
-            _processor = processor;
-            _previewOnly = processor.Options?.PreviewOnly ?? false;
-        }
-
         public MigrationScopeHandler(IMigrationProcessor processor, ProcessorOptions processorOptions)
         {
             _processor = processor;

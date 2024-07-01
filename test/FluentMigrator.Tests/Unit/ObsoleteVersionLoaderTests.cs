@@ -23,7 +23,6 @@ using System.Reflection;
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Initialization;
-using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.VersionTableInfo;
 
 using Moq;
@@ -39,12 +38,15 @@ namespace FluentMigrator.Tests.Unit
     public class ObsoleteVersionLoaderTests
     {
         [Test]
-        public void CanLoadCustomVersionTableMetaData()
+        public void CanLoadCustomVersionTableMetaData([Values] bool schemaExists)
         {
             var runnerContext = new Mock<IRunnerContext>();
 
             var runner = new Mock<IMigrationRunner>();
-            runner.SetupGet(r => r.Processor.Options).Returns(new ProcessorOptions());
+            var migrationProcessor = new Mock<IMigrationProcessor>();
+            migrationProcessor.Setup(mp => mp.SchemaExists(It.IsAny<string>()))
+                .Returns(schemaExists);
+            runner.SetupGet(r => r.Processor).Returns(migrationProcessor.Object);
             runner.SetupGet(r => r.RunnerContext).Returns(runnerContext.Object);
 
             var conventions = new MigrationRunnerConventions();
@@ -56,12 +58,15 @@ namespace FluentMigrator.Tests.Unit
         }
 
         [Test]
-        public void CanLoadDefaultVersionTableMetaData()
+        public void CanLoadDefaultVersionTableMetaData([Values] bool schemaExists)
         {
             var runnerContext = new Mock<IRunnerContext>();
 
             var runner = new Mock<IMigrationRunner>();
-            runner.SetupGet(r => r.Processor.Options).Returns(new ProcessorOptions());
+            var migrationProcessor = new Mock<IMigrationProcessor>();
+            migrationProcessor.Setup(mp => mp.SchemaExists(It.IsAny<string>()))
+                .Returns(schemaExists);
+            runner.SetupGet(r => r.Processor).Returns(migrationProcessor.Object);
             runner.SetupGet(r => r.RunnerContext).Returns(runnerContext.Object);
 
             var conventions = new MigrationRunnerConventions();
