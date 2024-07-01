@@ -34,10 +34,9 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres11_0
     [TestFixture]
     public class Postgres11_0GeneratorTests : Postgres92GeneratorTests
     {
-        protected PostgresGenerator Generator;
 
         [SetUp]
-        public void Setup()
+        public override void Setup()
         {
             var quoter = new PostgresQuoter(new PostgresOptions());
             Generator = new Postgres11_0Generator(quoter, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()));

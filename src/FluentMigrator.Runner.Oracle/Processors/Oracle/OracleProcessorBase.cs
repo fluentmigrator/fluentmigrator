@@ -35,19 +35,6 @@ namespace FluentMigrator.Runner.Processors.Oracle
 {
     public class OracleProcessorBase : GenericProcessorBase
     {
-        [Obsolete]
-        protected OracleProcessorBase(
-            [NotNull] string databaseType,
-            IDbConnection connection,
-            IMigrationGenerator generator,
-            IAnnouncer announcer,
-            IMigrationProcessorOptions options,
-            IDbFactory factory)
-            : base(connection, factory, generator, announcer, options)
-        {
-            DatabaseType = databaseType;
-        }
-
         protected OracleProcessorBase(
             [NotNull] string databaseType,
             [NotNull] OracleBaseDbFactory factory,

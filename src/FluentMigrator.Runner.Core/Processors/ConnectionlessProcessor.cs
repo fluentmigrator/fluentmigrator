@@ -37,24 +37,6 @@ namespace FluentMigrator.Runner.Processors
     public class ConnectionlessProcessor: IMigrationProcessor
     {
         [NotNull] private readonly ILogger _logger;
-#pragma warning disable 612
-        [Obsolete]
-        private readonly IMigrationProcessorOptions _legacyOptions;
-#pragma warning restore 612
-
-        [Obsolete]
-        public ConnectionlessProcessor(
-            IMigrationGenerator generator,
-            IRunnerContext context,
-            IMigrationProcessorOptions options)
-        {
-            _logger = new AnnouncerFluentMigratorLogger(context.Announcer);
-            _legacyOptions = options;
-            DatabaseType = context.Database;
-            Generator = generator;
-            Announcer = context.Announcer;
-            Options = options.GetProcessorOptions(connectionString: null);
-        }
 
         public ConnectionlessProcessor(
             [NotNull] IGeneratorAccessor generatorAccessor,
@@ -69,7 +51,6 @@ namespace FluentMigrator.Runner.Processors
             Options = options.Value;
 #pragma warning disable 612
             Announcer = new LoggerAnnouncer(logger, new AnnouncerOptions() { ShowElapsedTime = true, ShowSql = true });
-            _legacyOptions = options.Value;
 #pragma warning restore 612
         }
 
@@ -87,7 +68,6 @@ namespace FluentMigrator.Runner.Processors
             Options = options.Value;
 #pragma warning disable 612
             Announcer = new LoggerAnnouncer(logger, AnnouncerOptions.AllEnabled);
-            _legacyOptions = options.Value;
 #pragma warning restore 612
         }
 
@@ -99,9 +79,6 @@ namespace FluentMigrator.Runner.Processors
         [Obsolete]
         public IAnnouncer Announcer { get; set; }
         public ProcessorOptions Options {get; set;}
-
-        [Obsolete]
-        IMigrationProcessorOptions IMigrationProcessor.Options => _legacyOptions;
 
         /// <inheritdoc />
         public void Execute(string sql)

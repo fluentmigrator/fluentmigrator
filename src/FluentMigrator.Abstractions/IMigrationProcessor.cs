@@ -33,12 +33,6 @@ namespace FluentMigrator
     public interface IMigrationProcessor : IQuerySchema, IDisposable
     {
         /// <summary>
-        /// Gets the migration processor options
-        /// </summary>
-        [Obsolete]
-        IMigrationProcessorOptions Options { get; }
-
-        /// <summary>
         /// Gets the connection string
         /// </summary>
         [Obsolete]

@@ -41,17 +41,6 @@ namespace FluentMigrator.Runner.Processors.Jet
         public OleDbTransaction Transaction => _transaction;
         private bool _disposed = false;
 
-        [Obsolete]
-        public JetProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options)
-            : base(generator, announcer, options)
-        {
-            _connection = new Lazy<OleDbConnection>(() => (OleDbConnection) connection);
-
-            // Prefetch connectionstring as after opening the security info could no longer be present
-            // for instance on sql server
-            ConnectionString = connection.ConnectionString;
-        }
-
         public JetProcessor(
             [NotNull] JetGenerator generator,
             [NotNull] ILogger<JetProcessor> logger,

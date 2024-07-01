@@ -16,9 +16,6 @@
 //
 #endregion
 
-using System;
-using System.Data;
-
 using FluentMigrator.Runner.Generators.Oracle;
 using FluentMigrator.Runner.Initialization;
 
@@ -32,17 +29,6 @@ namespace FluentMigrator.Runner.Processors.Oracle
 {
     public class OracleProcessor : OracleProcessorBase
     {
-        [Obsolete]
-        public OracleProcessor(
-            IDbConnection connection,
-            IMigrationGenerator generator,
-            IAnnouncer announcer,
-            IMigrationProcessorOptions options,
-            IDbFactory factory)
-            : base(ProcessorId.Oracle, connection, generator, announcer, options, factory)
-        {
-        }
-
         public OracleProcessor(
             [NotNull] OracleDbFactory factory,
             [NotNull] IOracleGenerator generator,

@@ -332,21 +332,23 @@ $"No database processors are configured to run your migration tests.  This messa
                 FbConnection.CreateDatabase(serverOptions.ConnectionString, overwrite: true);
             }
 
-            using (var connection = new FbConnection(serverOptions.ConnectionString))
-            {
-                var options = FirebirdOptions.AutoCommitBehaviour();
-                var processor = new FirebirdProcessor(connection, new FirebirdGenerator(options), announcer, new ProcessorOptions(), new FirebirdDbFactory(serviceProvider: null), options);
+            
+            var options = FirebirdOptions.AutoCommitBehaviour();
+            var processorOptions = OptionHelper.Get<ProcessorOptions>();
+            var mockedConnectionStringAccessor = new Mock<IConnectionStringAccessor>(MockBehavior.Loose);
+            mockedConnectionStringAccessor.SetupGet(x => x.ConnectionString).Returns(serverOptions.ConnectionString);
 
-                try
-                {
-                    test(processor);
-                }
-                catch (Exception)
-                {
-                    if (tryRollback && !processor.WasCommitted)
-                        processor.RollbackTransaction();
-                    throw;
-                }
+            var processor = new FirebirdProcessor(new FirebirdDbFactory(serviceProvider: null), new FirebirdGenerator(options), new FirebirdQuoter(options), LoggerHelper.Get<FirebirdProcessor>(), options: processorOptions, mockedConnectionStringAccessor.Object, options);
+
+            try
+            {
+                test(processor);
+            }
+            catch (Exception)
+            {
+                if (tryRollback && !processor.WasCommitted)
+                    processor.RollbackTransaction();
+                throw;
             }
         }
     }
