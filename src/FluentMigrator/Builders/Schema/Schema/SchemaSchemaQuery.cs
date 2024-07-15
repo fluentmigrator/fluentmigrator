@@ -16,6 +16,7 @@
 //
 #endregion
 
+using FluentMigrator.Builders.Schema.Sequence;
 using FluentMigrator.Builders.Schema.Table;
 using FluentMigrator.Infrastructure;
 
@@ -50,6 +51,12 @@ namespace FluentMigrator.Builders.Schema.Schema
         public ISchemaTableSyntax Table(string tableName)
         {
             return new SchemaTableQuery(_context, _schemaName, tableName);
+        }
+
+        /// <inheritdoc />
+        public ISchemaSequenceSyntax Sequence(string sequenceName)
+        {
+            return new SchemaSequenceQuery(_context, _schemaName, sequenceName);
         }
     }
 }
