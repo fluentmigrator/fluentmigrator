@@ -37,6 +37,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Schema
         private string _testIndex;
         private string _testTable;
         private string _testSchema;
+        private string _testSequence;
         private SchemaExpressionRoot _builder;
 
         [SetUp]
@@ -49,6 +50,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Schema
             _testIndex = "testIndex";
             _testColumn = "testColumn";
             _testConstraint = "testConstraint";
+            _testSequence = "testSequence";
 
             _migrationContextMock.Setup(x => x.QuerySchema).Returns(_querySchemaMock.Object);
             _builder = new SchemaExpressionRoot(_migrationContextMock.Object);
@@ -92,6 +94,15 @@ namespace FluentMigrator.Tests.Unit.Builders.Schema
         }
 
         [Test]
+        public void TestSequenceExists()
+        {
+            _querySchemaMock.Setup(x => x.SequenceExists(null, _testSequence)).Returns(true);
+
+            _builder.Sequence(_testSequence).Exists().ShouldBeTrue();
+            _querySchemaMock.Verify(x => x.SequenceExists(null, _testSequence));
+        }
+
+        [Test]
         public void TestTableExistsWithSchema()
         {
             _querySchemaMock.Setup(x => x.TableExists(_testSchema, _testTable)).Returns(true);
@@ -125,6 +136,15 @@ namespace FluentMigrator.Tests.Unit.Builders.Schema
 
             _builder.Schema(_testSchema).Table(_testTable).Index(_testIndex).Exists().ShouldBeTrue();
             _querySchemaMock.Verify(x => x.IndexExists(_testSchema, _testTable, _testIndex));
+        }
+
+        [Test]
+        public void TestSequenceExistsWithSchema()
+        {
+            _querySchemaMock.Setup(x => x.SequenceExists(_testSchema, _testSequence)).Returns(true);
+
+            _builder.Schema(_testSchema).Sequence(_testSequence).Exists().ShouldBeTrue();
+            _querySchemaMock.Verify(x => x.SequenceExists(_testSchema, _testSequence));
         }
     }
 }
