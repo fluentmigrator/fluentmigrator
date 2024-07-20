@@ -110,8 +110,9 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddScoped<IVersionTableMetaDataAccessor, AssemblySourceVersionTableMetaDataAccessor>()
 
                 // Configure the default version table metadata
-                .AddScoped(sp => sp.GetRequiredService<IVersionTableMetaDataAccessor>().VersionTableMetaData ?? ActivatorUtilities.CreateInstance<DefaultVersionTableMetaData>(sp))
+                .TryAddScoped(sp => sp.GetRequiredService<IVersionTableMetaDataAccessor>().VersionTableMetaData ?? ActivatorUtilities.CreateInstance<DefaultVersionTableMetaData>(sp));
 
+            services
                 // Configure the migration information loader
                 .AddScoped<IMigrationInformationLoader, DefaultMigrationInformationLoader>()
 
