@@ -63,42 +63,54 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddLogging()
 
                 // The default assembly loader factory
-                .AddSingleton<AssemblyLoaderFactory>()
+                .TryAddSingleton<AssemblyLoaderFactory>();
 
+            services
                 // Assembly loader engines
                 .AddSingleton<IAssemblyLoadEngine, AssemblyNameLoadEngine>()
                 .AddSingleton<IAssemblyLoadEngine, AssemblyFileLoadEngine>()
 
                 // Defines the assemblies that are used to find migrations, profiles, maintenance code, etc...
-                .AddSingleton<IAssemblySource, AssemblySource>()
+                .TryAddSingleton<IAssemblySource, AssemblySource>();
 
+            services
                 // Configure the loader for migrations that should be executed during maintenance steps
-                .AddSingleton<IMaintenanceLoader, MaintenanceLoader>()
+                .TryAddSingleton<IMaintenanceLoader, MaintenanceLoader>();
 
+            services
                 // Add the default embedded resource provider
                 .AddSingleton<IEmbeddedResourceProvider>(sp => new DefaultEmbeddedResourceProvider(sp.GetRequiredService<IAssemblySource>().Assemblies))
 
                 // Configure the runner conventions
-                .AddSingleton<IMigrationRunnerConventionsAccessor, AssemblySourceMigrationRunnerConventionsAccessor>()
-                .AddSingleton(sp => sp.GetRequiredService<IMigrationRunnerConventionsAccessor>().MigrationRunnerConventions)
+                .TryAddSingleton<IMigrationRunnerConventionsAccessor, AssemblySourceMigrationRunnerConventionsAccessor>();
 
+            services
+                .TryAddSingleton(sp => sp.GetRequiredService<IMigrationRunnerConventionsAccessor>().MigrationRunnerConventions);
+
+            services
                 // The IStopWatch implementation used to show query timing
-                .AddSingleton<IStopWatch, StopWatch>()
+                .TryAddSingleton<IStopWatch, StopWatch>();
 
+            services
                 // Source for migrations
 #pragma warning disable 618
-                .AddScoped<IMigrationSource, MigrationSource>()
-                .AddScoped(
+                .TryAddScoped<IMigrationSource, MigrationSource>();
+
+            services
+                .TryAddScoped(
                     sp => sp.GetRequiredService<IMigrationSource>() as IFilteringMigrationSource
-                     ?? ActivatorUtilities.CreateInstance<MigrationSource>(sp))
+                     ?? ActivatorUtilities.CreateInstance<MigrationSource>(sp));
 #pragma warning restore 618
 
+            services
                 // Source for profiles
-                .AddScoped<IProfileSource, ProfileSource>()
+                .TryAddScoped<IProfileSource, ProfileSource>();
 
+            services
                 // Configure the accessor for the convention set
-                .AddScoped<IConventionSetAccessor, AssemblySourceConventionSetAccessor>()
+                .TryAddScoped<IConventionSetAccessor, AssemblySourceConventionSetAccessor>();
 
+            services
                 // The default set of conventions to be applied to migration expressions
                 .TryAddScoped(sp =>
                     sp.GetRequiredService<IConventionSetAccessor>().GetConventionSet()
@@ -107,46 +119,58 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services
                 // Configure the accessor for the version table metadata
-                .AddScoped<IVersionTableMetaDataAccessor, AssemblySourceVersionTableMetaDataAccessor>()
+                .TryAddScoped<IVersionTableMetaDataAccessor, AssemblySourceVersionTableMetaDataAccessor>();
 
+            services
                 // Configure the default version table metadata
                 .TryAddScoped(sp => sp.GetRequiredService<IVersionTableMetaDataAccessor>().VersionTableMetaData ?? ActivatorUtilities.CreateInstance<DefaultVersionTableMetaData>(sp));
 
             services
                 // Configure the migration information loader
-                .AddScoped<IMigrationInformationLoader, DefaultMigrationInformationLoader>()
+                .TryAddScoped<IMigrationInformationLoader, DefaultMigrationInformationLoader>();
 
+            services
                 // Provide a way to get the migration generator selected by its options
-                .AddScoped<IGeneratorAccessor, SelectingGeneratorAccessor>()
+                .TryAddScoped<IGeneratorAccessor, SelectingGeneratorAccessor>();
 
+            services
                 // Provide a way to get the migration accessor selected by its options
-                .AddScoped<IProcessorAccessor, SelectingProcessorAccessor>()
+                .TryAddScoped<IProcessorAccessor, SelectingProcessorAccessor>();
 
+            services
                 // IQuerySchema is the base interface for the IMigrationProcessor
-                .AddScoped<IQuerySchema>(sp => sp.GetRequiredService<IProcessorAccessor>().Processor)
+                .TryAddScoped<IQuerySchema>(sp => sp.GetRequiredService<IProcessorAccessor>().Processor);
 
+            services
                 // The profile loader needed by the migration runner
-                .AddScoped<IProfileLoader, ProfileLoader>()
+                .TryAddScoped<IProfileLoader, ProfileLoader>();
 
+            services
                 // Some services especially for the migration runner implementation
-                .AddScoped<IMigrationExpressionValidator, DefaultMigrationExpressionValidator>()
-                .AddScoped<MigrationValidator>()
-                .AddScoped<MigrationScopeHandler>()
+                .TryAddScoped<IMigrationExpressionValidator, DefaultMigrationExpressionValidator>();
 
-                // The connection string readers
+            services
+                .TryAddScoped<MigrationValidator>();
+            services
+                .TryAddScoped<MigrationScopeHandler>();
+
+            // The connection string readers
 #if NETFRAMEWORK
-                .AddScoped<INetConfigManager, NetConfigManager>()
+            services
+                .TryAddScoped<INetConfigManager, NetConfigManager>();
 #pragma warning disable 612
-                .AddScoped<IConnectionStringReader, AppConfigConnectionStringReader>()
+            services
+                .AddScoped<IConnectionStringReader, AppConfigConnectionStringReader>();
 #pragma warning restore 612
 #endif
-
+            services
                 .AddScoped<IConnectionStringReader, ConfigurationConnectionStringReader>()
 
                 // The connection string accessor that evaluates the readers
-                .AddScoped<IConnectionStringAccessor, ConnectionStringAccessor>()
+                .TryAddScoped<IConnectionStringAccessor, ConnectionStringAccessor>();
 
-                .AddScoped<IVersionLoader>(
+            services
+                .TryAddScoped<IVersionLoader>(
                     sp =>
                     {
                         var options = sp.GetRequiredService<IOptions<RunnerOptions>>();
@@ -158,16 +182,19 @@ namespace Microsoft.Extensions.DependencyInjection
                         }
 
                         return ActivatorUtilities.CreateInstance<VersionLoader>(sp);
-                    })
+                    });
 
+            services
                 // Configure the runner
-                .AddScoped<IMigrationRunner, MigrationRunner>()
+                .TryAddScoped<IMigrationRunner, MigrationRunner>();
 
+            services
                 // Configure the task executor
-                .AddScoped<TaskExecutor>()
+                .TryAddScoped<TaskExecutor>();
 
+            services
                 // Migration context
-                .AddTransient<IMigrationContext>(
+                .TryAddTransient<IMigrationContext>(
                     sp =>
                     {
                         var querySchema = sp.GetRequiredService<IQuerySchema>();
