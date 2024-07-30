@@ -15,7 +15,7 @@
 #endregion
 
 using FluentMigrator.Runner.Generators;
-using FluentMigrator.Runner.Generators.Generic;
+using FluentMigrator.Runner.Generators.Base;
 
 namespace FluentMigrator.Runner.Processors
 {
@@ -26,9 +26,9 @@ namespace FluentMigrator.Runner.Processors
         /// <see cref="IMigrationProcessor"/> interface does not expose the quoter directly.
         /// </summary>
         /// <remarks>
-        /// This method relies on the <see cref="IMigrationProcessor"/> being a <see cref="GenericProcessorBase"/> or a
-        /// <see cref="ConnectionlessProcessor"/> and its <see cref="GenericProcessorBase.Generator"/> being a
-        /// <see cref="GenericGenerator"/>. If this is not the case, there is no way to get the <see cref="IQuoter"/> so
+        /// This method relies on the <see cref="IMigrationProcessor"/> being a <see cref="ProcessorBase"/> or a
+        /// <see cref="ConnectionlessProcessor"/> and its <see cref="ProcessorBase.Generator"/> being a
+        /// <see cref="GeneratorBase"/>. If this is not the case, there is no way to get the <see cref="IQuoter"/> so
         /// this method will return <see langword="null"/>.
         /// </remarks>
         public static IQuoter GetQuoter(this IMigrationProcessor processor)
@@ -37,8 +37,8 @@ namespace FluentMigrator.Runner.Processors
 
             switch (processor)
             {
-                case GenericProcessorBase genericProcessorBase:
-                    generator = genericProcessorBase.Generator;
+                case ProcessorBase processorBase:
+                    generator = processorBase.Generator;
                     break;
                 case ConnectionlessProcessor connectionlessProcessor:
                     generator = connectionlessProcessor.Generator;
@@ -49,7 +49,7 @@ namespace FluentMigrator.Runner.Processors
             }
 
             // Safe cast to GenericGenerator since IMigrationGenerator does not expose the quoter
-            return (generator as GenericGenerator)?.Quoter;
+            return (generator as GeneratorBase)?.Quoter;
         }
     }
 }
