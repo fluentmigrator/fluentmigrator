@@ -40,6 +40,7 @@ namespace FluentMigrator.Runner
         private readonly IMigrationProcessor _processor;
 
         private readonly IConventionSet _conventionSet;
+        private readonly IQuoter _quoter;
         private bool _versionSchemaMigrationAlreadyRun;
         private bool _versionMigrationAlreadyRun;
         private bool _versionUniqueMigrationAlreadyRun;
@@ -80,6 +81,7 @@ namespace FluentMigrator.Runner
         {
             _conventionSet = conventionSet;
             _processor = runner.Processor;
+            _quoter = _processor.GetQuoter();
 
             Runner = runner;
             Assemblies = assemblies;
@@ -103,6 +105,7 @@ namespace FluentMigrator.Runner
         {
             _conventionSet = conventionSet;
             _processor = processorAccessor.Processor;
+            _quoter = _processor.GetQuoter();
 
             Runner = runner;
 

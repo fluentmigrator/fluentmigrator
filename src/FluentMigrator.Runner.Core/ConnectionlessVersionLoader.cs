@@ -42,6 +42,8 @@ namespace FluentMigrator.Runner
         [NotNull]
         private readonly IMigrationInformationLoader _migrationInformationLoader;
 
+        private readonly IQuoter _quoter;
+
         private bool _versionsLoaded;
 
         [Obsolete]
@@ -55,6 +57,7 @@ namespace FluentMigrator.Runner
         {
             _migrationInformationLoader = runner.MigrationLoader;
             _processor = runner.Processor;
+            _quoter = _processor.GetQuoter();
 
             Runner = runner;
             Assemblies = assemblies;
@@ -88,6 +91,7 @@ namespace FluentMigrator.Runner
         {
             _processor = processorAccessor.Processor;
             _migrationInformationLoader = migrationInformationLoader;
+            _quoter = _processor.GetQuoter();
             Conventions = conventions;
             StartVersion = runnerOptions.Value.StartVersion;
             TargetVersion = runnerOptions.Value.Version;
