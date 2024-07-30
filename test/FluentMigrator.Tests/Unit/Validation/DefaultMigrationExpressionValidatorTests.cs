@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 using FluentMigrator.Builders.Create.Constraint;
@@ -30,6 +31,13 @@ namespace FluentMigrator.Tests.Unit.Validation
     [Category("Validation")]
     public class DefaultMigrationExpressionValidatorTests
     {
+        [SetUp]
+        public void Setup()
+        {
+            // Ensure validation messages are in English
+            CultureInfo.CurrentUICulture = CultureInfo.InvariantCulture;
+        }
+
         [Test]
         public void ValidateInsertDataExpressionWithoutTableNameShouldReturnError()
         {
