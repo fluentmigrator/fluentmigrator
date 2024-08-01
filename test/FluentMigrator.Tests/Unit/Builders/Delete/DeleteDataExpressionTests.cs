@@ -109,11 +109,9 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
         }
 
         [Test]
+        [SetUICulture("en-US")] // Ensure validation messages are in English
         public void DefaultMigrationExpressionValidatorShouldReturnErrorWhenTableNameIsNotSpecified()
         {
-            // Ensure error messages are in English
-            CultureInfo.CurrentUICulture = CultureInfo.InvariantCulture;
-
             var mockServiceProvider = new Mock<IServiceProvider>();
             var validator = new DefaultMigrationExpressionValidator(mockServiceProvider.Object);
             var expressionMock = new Mock<DeleteDataExpression>();

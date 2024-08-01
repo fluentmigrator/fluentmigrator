@@ -29,14 +29,9 @@ namespace FluentMigrator.Tests.Unit.Validation
 {
     [TestFixture]
     [Category("Validation")]
+    [SetUICulture("en-US")] // Ensure validation messages are in English
     public class DefaultMigrationExpressionValidatorTests
     {
-        [SetUp]
-        public void Setup()
-        {
-            // Ensure validation messages are in English
-            CultureInfo.CurrentUICulture = CultureInfo.InvariantCulture;
-        }
 
         [Test]
         public void ValidateInsertDataExpressionWithoutTableNameShouldReturnError()
