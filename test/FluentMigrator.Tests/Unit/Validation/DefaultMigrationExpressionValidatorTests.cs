@@ -29,7 +29,7 @@ namespace FluentMigrator.Tests.Unit.Validation
 {
     [TestFixture]
     [Category("Validation")]
-    [SetUICulture("en-US")] // Ensure validation messages are in English
+    [SetUICulture("")] // Ensure validation messages are in English
     public class DefaultMigrationExpressionValidatorTests
     {
 
