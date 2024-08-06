@@ -21,6 +21,9 @@ variables:
 steps:
 - task: NuGetToolInstaller@1
 
+- checkout: self
+  fetchDepth: 0
+
 - task: gitversion/setup@0
   displayName: 'Install GitVersion (using GitTools 0.10.2.23031113 or later)'
   inputs:
