@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -364,7 +365,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
             var cleanup = GetIndexStorageParameters<float?>(PostgresExtensions.IndexVacuumCleanupIndexScaleFactor, "VacuumCleanupIndexScaleFactor");
             if (cleanup.HasValue)
             {
-                parameters.Add($"VACUUM_CLEANUP_INDEX_SCALE_FACTOR = {cleanup.Value.ToString().ToUpper()}");
+                parameters.Add($"VACUUM_CLEANUP_INDEX_SCALE_FACTOR = {cleanup.Value.ToString(CultureInfo.InvariantCulture)}");
             }
 
             if (parameters.Count == 0)
