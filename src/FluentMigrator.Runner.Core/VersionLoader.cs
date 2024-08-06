@@ -40,6 +40,7 @@ namespace FluentMigrator.Runner
         private readonly IMigrationProcessor _processor;
 
         private readonly IConventionSet _conventionSet;
+        private readonly IQuoter _quoter;
         private bool _versionSchemaMigrationAlreadyRun;
         private bool _versionMigrationAlreadyRun;
         private bool _versionUniqueMigrationAlreadyRun;
@@ -80,6 +81,7 @@ namespace FluentMigrator.Runner
         {
             _conventionSet = conventionSet;
             _processor = runner.Processor;
+            _quoter = _processor.GetQuoter();
 
             Runner = runner;
             Assemblies = assemblies;
@@ -103,6 +105,7 @@ namespace FluentMigrator.Runner
         {
             _conventionSet = conventionSet;
             _processor = processorAccessor.Processor;
+            _quoter = _processor.GetQuoter();
 
             Runner = runner;
 
@@ -139,10 +142,26 @@ namespace FluentMigrator.Runner
 
         protected virtual InsertionDataDefinition CreateVersionInfoInsertionData(long version, string description)
         {
+            object appliedOnValue;
+
+            if (_quoter is null)
+            {
+                appliedOnValue = DateTime.UtcNow;
+            }
+            else
+            {
+                var quotedCurrentDate = _quoter.QuoteValue(SystemMethods.CurrentUTCDateTime);
+
+                // Default to using DateTime if no system method could be obtained
+                appliedOnValue = string.IsNullOrWhiteSpace(quotedCurrentDate)
+                    ? (object) DateTime.UtcNow
+                    : RawSql.Insert(quotedCurrentDate);
+            }
+
             return new InsertionDataDefinition
                        {
                            new KeyValuePair<string, object>(VersionTableMetaData.ColumnName, version),
-                           new KeyValuePair<string, object>(VersionTableMetaData.AppliedOnColumnName, DateTime.UtcNow),
+                           new KeyValuePair<string, object>(VersionTableMetaData.AppliedOnColumnName, appliedOnValue),
                            new KeyValuePair<string, object>(VersionTableMetaData.DescriptionColumnName, description),
                        };
         }
