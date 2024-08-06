@@ -22,7 +22,9 @@ steps:
 - task: NuGetToolInstaller@1
 
 - checkout: self
+  clean: true
   fetchDepth: 0
+  fetchTags: true
 
 - task: gitversion/setup@0
   displayName: 'Install GitVersion (using GitTools 0.10.2.23031113 or later)'
