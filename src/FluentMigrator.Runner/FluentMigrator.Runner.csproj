@@ -30,6 +30,6 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Update="JetBrains.Annotations" Version="2023.3.0" />
+    <PackageReference Update="JetBrains.Annotations" Version="2024.2.0" />
   </ItemGroup>
 </Project>
