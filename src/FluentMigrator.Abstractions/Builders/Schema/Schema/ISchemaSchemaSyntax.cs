@@ -18,6 +18,7 @@
 
 #endregion
 
+using FluentMigrator.Builders.Schema.Sequence;
 using FluentMigrator.Builders.Schema.Table;
 using FluentMigrator.Infrastructure;
 
@@ -40,5 +41,12 @@ namespace FluentMigrator.Builders.Schema.Schema
         /// <param name="tableName">The table name</param>
         /// <returns>The next step</returns>
         ISchemaTableSyntax Table(string tableName);
+
+        /// <summary>
+        /// Specify the sequence name as basis for a query a database objects existence
+        /// </summary>
+        /// <param name="sequenceName"></param>
+        /// <returns>The next step</returns>
+        ISchemaSequenceSyntax Sequence(string sequenceName);
     }
 }
