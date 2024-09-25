@@ -14,11 +14,6 @@
 // limitations under the License.
 #endregion
 
-using System;
-using System.Collections.Generic;
-
-using FluentMigrator.Infrastructure;
-
 using JetBrains.Annotations;
 
 namespace FluentMigrator.Runner
@@ -33,14 +28,5 @@ namespace FluentMigrator.Runner
         /// </summary>
         /// <param name="runner">The migration runner</param>
         void ApplyProfiles([NotNull] IMigrationRunner runner);
-
-        /// <summary>
-        /// Find all profile name tagged migrations in the given assembly collection
-        /// </summary>
-        /// <param name="assemblies">The assemblies to load the profile tagged migrations from</param>
-        /// <param name="profile">The profile name to search the migrations for</param>
-        /// <returns>The found migrations</returns>
-        [Obsolete]
-        IEnumerable<IMigration> FindProfilesIn(IAssemblyCollection assemblies, string profile);
     }
 }
