@@ -10,7 +10,7 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="13.0.1" />
     <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="10.0.0" />
-    <PackageReference Include="FSharp.Core" Version="8.0.200" />
+    <PackageReference Include="FSharp.Core" Version="8.0.400" />
     <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.1.1" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
@@ -27,6 +27,6 @@
     <ProjectReference Include="..\FluentMigrator.Runner\FluentMigrator.Runner.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Update="JetBrains.Annotations" Version="2023.3.0" />
+    <PackageReference Update="JetBrains.Annotations" Version="2024.2.0" />
   </ItemGroup>
 </Project>
