@@ -35,7 +35,7 @@ Details: https://github.com/fluentmigrator/fluentmigrator/releases
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="JetBrains.Annotations" Version="2023.3.0" PrivateAssets="All" />
+    <PackageReference Include="JetBrains.Annotations" Version="2024.2.0" PrivateAssets="All" />
   </ItemGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)'=='net48'">
