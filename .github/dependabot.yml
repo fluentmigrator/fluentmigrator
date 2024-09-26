@@ -2,9 +2,30 @@ version: 2
 updates:
 - package-ecosystem: nuget
   groups:
-    third-party-dependencies:
+    database-driver-dependencies:
       patterns:
-        - "*"
+        - "*Sqlite*"
+        - "*Pgsql*"
+        - "*Firebird*"
+        - "*Oracle*"
+        - "*Sql*"
+        - "Snowflake*"
+    # Dependency Injection and Microsoft Out-of-Box Dependencies (not included in the SDK)
+    core-dependencies:
+      patterns:
+        - "Autofac*"
+        - "Microsoft.Extensions*"
+    test-dependencies:
+      patterns:
+        - "Moq"
+        - "NUnit*"
+        - "Shouldly"
+        - "Microsoft.NET.Test.Sdk"
+        - "Brutal.Dev.StrongNameSigner"
+    other-dependencies:
+      patterns:
+        - "FSharp*"
+        - "JetBrains.Annotations"
   directory: "/"
   schedule:
     interval: daily
@@ -12,6 +33,7 @@ updates:
   reviewers:
     - jzabroski
   ignore:
+    # Don't update ourselves, even for the Sample project
     - dependency-name: FluentMigrator
       versions:
         - 5.0.0
