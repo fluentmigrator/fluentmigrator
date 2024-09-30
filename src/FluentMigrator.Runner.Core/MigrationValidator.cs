@@ -66,20 +66,6 @@ namespace FluentMigrator.Runner
             _validator = validator ?? new DefaultMigrationExpressionValidator(serviceProvider: null);
         }
 
-        [Obsolete]
-        public MigrationValidator()
-        {
-            _validator = new DefaultMigrationExpressionValidator(null);
-        }
-
-        [Obsolete]
-        public MigrationValidator(IAnnouncer announcer, IConventionSet conventions)
-        {
-            _validator = new DefaultMigrationExpressionValidator(null);
-            _logger = new AnnouncerFluentMigratorLogger(announcer);
-            _conventions = conventions;
-        }
-
         /// <summary>
         /// Validates each migration expression that has implemented the ICanBeValidated interface.
         /// It throws an InvalidMigrationException exception if validation fails.
