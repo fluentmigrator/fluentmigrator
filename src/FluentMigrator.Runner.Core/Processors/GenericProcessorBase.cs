@@ -168,7 +168,7 @@ namespace FluentMigrator.Runner.Processors
             }
             else
             {
-                throw new InvalidOperationException($"{nameof(DbProviderFactory)} was not configured. Check dependency injection set-up logic.")
+                throw new InvalidOperationException($"{nameof(DbProviderFactory)} was not configured. Check dependency injection set-up logic.");
             }
 
             if (Options.Timeout != null)
