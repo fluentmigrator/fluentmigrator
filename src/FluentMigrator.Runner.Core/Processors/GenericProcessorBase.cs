@@ -168,9 +168,7 @@ namespace FluentMigrator.Runner.Processors
             }
             else
             {
-#pragma warning disable 612
-                result = Factory.CreateCommand(commandText, connection, transaction, Options);
-#pragma warning restore 612
+                throw new InvalidOperationException($"{nameof(DbProviderFactory)} was not configured. Check dependency injection set-up logic.")
             }
 
             if (Options.Timeout != null)
