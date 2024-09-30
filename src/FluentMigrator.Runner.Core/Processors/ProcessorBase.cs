@@ -89,9 +89,6 @@ namespace FluentMigrator.Runner.Processors
 #pragma warning restore 612
         }
 
-        [Obsolete]
-        public abstract string ConnectionString { get; }
-
         public abstract string DatabaseType { get; }
 
         public abstract IList<string> DatabaseTypeAliases { get; }
