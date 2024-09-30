@@ -32,11 +32,6 @@ namespace FluentMigrator
     /// </remarks>
     public interface IMigrationProcessor : IQuerySchema, IDisposable
     {
-        /// <summary>
-        /// Gets the connection string
-        /// </summary>
-        [Obsolete]
-        string ConnectionString { get; }
 
         /// <summary>
         /// Execute an SQL statement (escaping not needed)
