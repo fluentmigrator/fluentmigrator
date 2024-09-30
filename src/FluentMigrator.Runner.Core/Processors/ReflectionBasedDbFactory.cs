@@ -35,23 +35,6 @@ namespace FluentMigrator.Runner.Processors
 
         private DbProviderFactory _instance;
 
-        [Obsolete]
-        public ReflectionBasedDbFactory(string assemblyName, string dbProviderFactoryTypeName)
-            : this(new TestEntry(assemblyName, dbProviderFactoryTypeName))
-        {
-        }
-
-        [Obsolete]
-        protected ReflectionBasedDbFactory(params TestEntry[] testEntries)
-        {
-            if (testEntries.Length == 0)
-            {
-                throw new ArgumentException(@"At least one test entry must be specified", nameof(testEntries));
-            }
-
-            _testEntries = testEntries;
-        }
-
         protected ReflectionBasedDbFactory(IServiceProvider serviceProvider, params TestEntry[] testEntries)
         {
             if (testEntries.Length == 0)
@@ -81,15 +64,6 @@ namespace FluentMigrator.Runner.Processors
             var fullExceptionOutput = string.Join(Environment.NewLine, exceptions.Select(x => x.ToString()));
 
             throw new AggregateException($"Unable to load the driver. Attempted to load: {assemblyNames}, with {fullExceptionOutput}", exceptions);
-        }
-
-        [Obsolete]
-        protected static bool TryCreateFactory(
-            [NotNull, ItemNotNull] IEnumerable<TestEntry> entries,
-            [NotNull, ItemNotNull] ICollection<Exception> exceptions,
-            out DbProviderFactory factory)
-        {
-            return TryCreateFactory(serviceProvider: null, entries, exceptions, out factory);
         }
 
         protected static bool TryCreateFactory(
@@ -163,15 +137,6 @@ namespace FluentMigrator.Runner.Processors
 
             factory = null;
             return false;
-        }
-
-        [Obsolete]
-        protected static bool TryCreateFactoryFromRuntimeHost(
-            [NotNull] TestEntry entry,
-            [NotNull, ItemNotNull] ICollection<Exception> exceptions,
-            out DbProviderFactory factory)
-        {
-            return TryCreateFactoryFromRuntimeHost(entry, exceptions, serviceProvider: null, out factory);
         }
 
         protected static bool TryCreateFactoryFromRuntimeHost(

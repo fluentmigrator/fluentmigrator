@@ -23,9 +23,7 @@ using System.Diagnostics;
 
 namespace FluentMigrator.Runner.Processors
 {
-#pragma warning disable 612
-    public abstract class DbFactoryBase : IDbFactory
-#pragma warning restore 612
+    public abstract class DbFactoryBase
     {
         private readonly object _lock = new object();
         private volatile DbProviderFactory _factory;
@@ -61,24 +59,5 @@ namespace FluentMigrator.Runner.Processors
         }
 
         protected abstract DbProviderFactory CreateFactory();
-
-        [Obsolete]
-        public IDbConnection CreateConnection(string connectionString)
-        {
-            var connection = Factory.CreateConnection();
-            Debug.Assert(connection != null, nameof(connection) + " != null");
-            connection.ConnectionString = connectionString;
-            return connection;
-        }
-
-        [Obsolete]
-        public virtual IDbCommand CreateCommand(string commandText, IDbConnection connection, IDbTransaction transaction, IMigrationProcessorOptions options)
-        {
-            var command = connection.CreateCommand();
-            command.CommandText = commandText;
-            if (options?.Timeout != null) command.CommandTimeout = options.Timeout.Value;
-            if (transaction != null) command.Transaction = transaction;
-            return command;
-        }
     }
 }

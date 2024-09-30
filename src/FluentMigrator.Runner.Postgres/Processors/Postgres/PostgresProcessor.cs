@@ -40,19 +40,6 @@ namespace FluentMigrator.Runner.Processors.Postgres
 
         public override IList<string> DatabaseTypeAliases { get; } = new List<string> { ProcessorId.PostgreSQL };
 
-        [Obsolete]
-        public PostgresProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory,
-            [NotNull] PostgresOptions pgOptions)
-            : base(connection, factory, generator, announcer, options)
-        {
-            if (pgOptions == null)
-            {
-                throw new ArgumentNullException(nameof(pgOptions));
-            }
-
-            _quoter = new PostgresQuoter(pgOptions);
-        }
-
         public PostgresProcessor(
             [NotNull] PostgresDbFactory factory,
             [NotNull] PostgresGenerator generator,
