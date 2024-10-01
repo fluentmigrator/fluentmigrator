@@ -1,12 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Much of this configuration is taken from Microsoft documentation on how to set-up custom MSBuild tasks: https://learn.microsoft.com/en-us/visualstudio/msbuild/tutorial-custom-task-code-generation?view=vs-2022#package-the-task-for-distribution -->
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <TargetFrameworks>net48;netstandard2.0</TargetFrameworks>
     <Description>MSBuild runner for FluentMigrator</Description>
+    <!-- The property CopyLocalLockFileAssemblies is needed to make sure that dependencies are copied to the output directory. -->
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);PackBuildOutputs</TargetsForTfmSpecificContentInPackage>
     <ContentTargetFolders>build</ContentTargetFolders>
     <IncludeBuildOutput>false</IncludeBuildOutput>
+    <!-- Tell the SDK to generate a deps.json file; see target AddBuildDependencyFileToBuiltProjectOutputGroupOutput -->
+    <GenerateDependencyFile>true</GenerateDependencyFile>
   </PropertyGroup>
   <!-- Nuget package properties https://docs.microsoft.com/en-us/nuget/reference/msbuild-targets -->
   <Import Project="$(MSBuildThisFileDirectory)../../PackageTool.props" />
@@ -14,6 +18,7 @@
     <DevelopmentDependency>true</DevelopmentDependency>
     <EnablePackageValidation>true</EnablePackageValidation>
     <PackageValidationBaselineVersion>6.0.0</PackageValidationBaselineVersion>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
     <!-- NU5100: We only want to package everything in a top-level build folder. -->
     <!-- NU5127: "This package does not contain a lib/ or ref/ folder, and will therefore be treated as compatible for all frameworks."; this is exactly the behavior we want. -->
     <!-- NU5129: We want to package FluentMigrator.MSBuild.targets -->
@@ -32,11 +37,14 @@
   <ItemGroup Condition=" '$(TargetFramework)' == 'net48' ">
     <Reference Include="System.Configuration" />
   </ItemGroup>
+
+  <!-- Dependencies -->
+  <!-- mark every dependency of this Task project, both PackageReference and ProjectReference with the PrivateAssets="all" attribute. -->
   <ItemGroup>
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.8.3" PrivateAssets="all" ExcludeAssets="Runtime" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Update="JetBrains.Annotations" Version="2024.2.0" />
+    <PackageReference Update="JetBrains.Annotations" Version="2024.2.0" PrivateAssets="all" />
   </ItemGroup>
 
   <Target Name="PackBuildOutputs">
@@ -46,6 +54,19 @@
       <TfmSpecificPackageFile Include="@(DebugSymbolsProjectOutputGroupOutput)" PackagePath="tasks\$(TargetFramework)" />
       <TfmSpecificPackageFile Include="%(_ResolvedProjectReferencePaths.Identity)" PackagePath="tasks\$(TargetFramework)" />
       <TfmSpecificPackageFile Include="@(ReferenceCopyLocalPaths)" Exclude="@(_ResolvedProjectReferencePaths)" PackagePath="tasks\$(TargetFramework)\%(ReferenceCopyLocalPaths.DestinationSubPath)" />
+    </ItemGroup>
+  </Target>
+
+  <!-- This target adds the generated deps.json file to our package output -->
+  <Target
+        Name="AddBuildDependencyFileToBuiltProjectOutputGroupOutput"
+        BeforeTargets="BuiltProjectOutputGroup"
+        Condition=" '$(GenerateDependencyFile)' == 'true'">
+     <ItemGroup>
+        <BuiltProjectOutputGroupOutput
+            Include="$(ProjectDepsFilePath)"
+            TargetPath="$(ProjectDepsFileName)"
+            FinalOutputPath="$(ProjectDepsFilePath)" />
     </ItemGroup>
   </Target>
 
