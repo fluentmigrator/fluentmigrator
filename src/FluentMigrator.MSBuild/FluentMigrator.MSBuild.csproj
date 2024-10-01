@@ -1,23 +1,39 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <OutputType>Library</OutputType>
     <TargetFrameworks>net48;netstandard2.0</TargetFrameworks>
     <Description>MSBuild runner for FluentMigrator</Description>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);PackBuildOutputs</TargetsForTfmSpecificContentInPackage>
+    <ContentTargetFolders>build</ContentTargetFolders>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
   </PropertyGroup>
+  <!-- Nuget package properties https://docs.microsoft.com/en-us/nuget/reference/msbuild-targets -->
   <Import Project="$(MSBuildThisFileDirectory)../../PackageTool.props" />
+  <PropertyGroup>
+    <DevelopmentDependency>true</DevelopmentDependency>
+    <EnablePackageValidation>true</EnablePackageValidation>
+    <PackageValidationBaselineVersion>6.0.0</PackageValidationBaselineVersion>
+    <!-- NU5100: We only want to package everything in a top-level build folder. -->
+    <!-- NU5127: "This package does not contain a lib/ or ref/ folder, and will therefore be treated as compatible for all frameworks."; this is exactly the behavior we want. -->
+    <!-- NU5129: We want to package FluentMigrator.MSBuild.targets -->
+    <NoWarn>$(NoWarn);NU5100;NU5127;NU5129</NoWarn>
+  </PropertyGroup>
   <ItemGroup>
     <None Include="build/**/*.targets">
       <PackagePath>build/%(RecursiveDir)%(Filename)%(Extension)</PackagePath>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <Pack>true</Pack>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FluentMigrator.Runner\FluentMigrator.Runner.csproj" />
+    <ProjectReference Include="..\FluentMigrator.Runner\FluentMigrator.Runner.csproj" PrivateAssets="all" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net48' ">
     <Reference Include="System.Configuration" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.8.3" />
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.8.3" PrivateAssets="all" ExcludeAssets="Runtime" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Update="JetBrains.Annotations" Version="2024.2.0" />
