@@ -22,7 +22,8 @@
     <!-- NU5100: We only want to package everything in a top-level build folder. -->
     <!-- NU5127: "This package does not contain a lib/ or ref/ folder, and will therefore be treated as compatible for all frameworks."; this is exactly the behavior we want. -->
     <!-- NU5129: We want to package FluentMigrator.MSBuild.targets -->
-    <NoWarn>$(NoWarn);NU5100;NU5127;NU5129</NoWarn>
+    <!-- PKV006: .NET Framework 4.8 is not supported by package validation. -->
+    <NoWarn>$(NoWarn);NU5100;NU5127;NU5129;PKV006</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <None Include="build/**/*.targets">
