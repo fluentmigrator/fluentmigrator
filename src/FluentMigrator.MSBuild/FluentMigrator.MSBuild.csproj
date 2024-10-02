@@ -6,13 +6,15 @@
     <Description>MSBuild runner for FluentMigrator</Description>
     <!-- The property CopyLocalLockFileAssemblies is needed to make sure that dependencies are copied to the output directory. -->
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <!-- This property tells MSBuild that we're putting end-user build targets (as content) here -->
     <ContentTargetFolders>build</ContentTargetFolders>
-    <!-- This target will run when MSBuild is collecting the files to be packaged, and we'll implement it below. This property controls the dependency list for this packaging process, so by adding our custom property we hook ourselves into the process in a supported way. -->
-    <TargetsForTfmSpecificBuildOutput>
-        $(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage
-    </TargetsForTfmSpecificBuildOutput>
     <!-- This property tells MSBuild where the root folder of the package's build assets should be. Because we are not a library package, we should not pack to 'lib'. Instead, we choose 'tasks' by convention. -->
     <BuildOutputTargetFolder>tasks</BuildOutputTargetFolder>
+    <!-- This target will run when MSBuild is collecting the files to be packaged, and we'll implement it below. This property controls the dependency list for this packaging process, so by adding our custom property we hook ourselves into the process in a supported way. -->
+    <TargetsForTfmSpecificBuildOutput>
+        $(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage;PackBuildOutputs
+    </TargetsForTfmSpecificBuildOutput>
+    
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <!-- Tell the SDK to generate a deps.json file; see target AddBuildDependencyFileToBuiltProjectOutputGroupOutput -->
     <GenerateDependencyFile>true</GenerateDependencyFile>
@@ -63,6 +65,15 @@
         <BuildOutputInPackage
             Include="@(ReferenceCopyLocalPaths)"
             TargetPath="%(ReferenceCopyLocalPaths.DestinationSubPath)" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="PackBuildOutputs">
+     <TfmSpecificPackageFile Include="$(TargetPath)" PackagePath="tasks\$(TargetFramework)" />
+     <TfmSpecificPackageFile Include="$(ProjectDepsFilePath)" PackagePath="tasks\$(TargetFramework)" />
+     <TfmSpecificPackageFile Include="@(DebugSymbolsProjectOutputGroupOutput)" PackagePath="tasks\$(TargetFramework)" />
+     <TfmSpecificPackageFile Include="%(_ResolvedProjectReferencePaths.Identity)" PackagePath="tasks\$(TargetFramework)" />
+     <TfmSpecificPackageFile Include="@(ReferenceCopyLocalPaths)" Exclude="@(_ResolvedProjectReferencePaths)" PackagePath="tasks\$(TargetFramework)\%(ReferenceCopyLocalPaths.DestinationSubPath)" />
     </ItemGroup>
   </Target>
 
