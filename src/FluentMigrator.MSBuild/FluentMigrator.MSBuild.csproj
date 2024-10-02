@@ -8,6 +8,12 @@
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);PackBuildOutputs</TargetsForTfmSpecificContentInPackage>
     <ContentTargetFolders>build</ContentTargetFolders>
+    <!-- This target will run when MSBuild is collecting the files to be packaged, and we'll implement it below. This property controls the dependency list for this packaging process, so by adding our custom property we hook ourselves into the process in a supported way. -->
+    <TargetsForTfmSpecificBuildOutput>
+        $(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage
+    </TargetsForTfmSpecificBuildOutput>
+    <!-- This property tells MSBuild where the root folder of the package's build assets should be. Because we are not a library package, we should not pack to 'lib'. Instead, we choose 'tasks' by convention. -->
+    <BuildOutputTargetFolder>tasks</BuildOutputTargetFolder>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <!-- Tell the SDK to generate a deps.json file; see target AddBuildDependencyFileToBuiltProjectOutputGroupOutput -->
     <GenerateDependencyFile>true</GenerateDependencyFile>
@@ -18,6 +24,7 @@
     <DevelopmentDependency>true</DevelopmentDependency>
     <EnablePackageValidation>true</EnablePackageValidation>
     <PackageValidationBaselineVersion>6.0.0</PackageValidationBaselineVersion>
+    <!-- Suppress NuGet warning NU5128. -->
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
     <!-- NU5100: We only want to package everything in a top-level build folder. -->
     <!-- NU5127: "This package does not contain a lib/ or ref/ folder, and will therefore be treated as compatible for all frameworks."; this is exactly the behavior we want. -->
@@ -48,13 +55,15 @@
     <PackageReference Update="JetBrains.Annotations" Version="2024.2.0" PrivateAssets="all" />
   </ItemGroup>
 
-  <Target Name="PackBuildOutputs">
+  <!-- This is the target we defined above. It's purpose is to add all of our PackageReference and ProjectReference's runtime assets to our package output.  -->
+  <Target
+    Name="CopyProjectReferencesToPackage"
+    DependsOnTargets="ResolveReferences">
     <ItemGroup>
-      <TfmSpecificPackageFile Include="$(TargetPath)" PackagePath="tasks\$(TargetFramework)" />
-      <TfmSpecificPackageFile Include="$(ProjectDepsFilePath)" PackagePath="tasks\$(TargetFramework)" />
-      <TfmSpecificPackageFile Include="@(DebugSymbolsProjectOutputGroupOutput)" PackagePath="tasks\$(TargetFramework)" />
-      <TfmSpecificPackageFile Include="%(_ResolvedProjectReferencePaths.Identity)" PackagePath="tasks\$(TargetFramework)" />
-      <TfmSpecificPackageFile Include="@(ReferenceCopyLocalPaths)" Exclude="@(_ResolvedProjectReferencePaths)" PackagePath="tasks\$(TargetFramework)\%(ReferenceCopyLocalPaths.DestinationSubPath)" />
+        <!-- The TargetPath is the path inside the package that the source file will be placed. This is already precomputed in the ReferenceCopyLocalPaths items' DestinationSubPath, so reuse it here. -->
+        <BuildOutputInPackage
+            Include="@(ReferenceCopyLocalPaths)"
+            TargetPath="%(ReferenceCopyLocalPaths.DestinationSubPath)" />
     </ItemGroup>
   </Target>
 
