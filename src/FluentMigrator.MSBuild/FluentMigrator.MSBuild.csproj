@@ -6,7 +6,6 @@
     <Description>MSBuild runner for FluentMigrator</Description>
     <!-- The property CopyLocalLockFileAssemblies is needed to make sure that dependencies are copied to the output directory. -->
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);PackBuildOutputs</TargetsForTfmSpecificContentInPackage>
     <ContentTargetFolders>build</ContentTargetFolders>
     <!-- This target will run when MSBuild is collecting the files to be packaged, and we'll implement it below. This property controls the dependency list for this packaging process, so by adding our custom property we hook ourselves into the process in a supported way. -->
     <TargetsForTfmSpecificBuildOutput>
