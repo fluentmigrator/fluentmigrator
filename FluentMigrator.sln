@@ -85,6 +85,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{B3796E78
 		FluentMigrator.snk = FluentMigrator.snk
 		FluentMigrator.v3.ncrunchsolution = FluentMigrator.v3.ncrunchsolution
 		GitVersion.yml = GitVersion.yml
+		Global.props = Global.props
 		nuget-upload.sh = nuget-upload.sh
 		nuget.config = nuget.config
 		PackageTool.props = PackageTool.props
@@ -99,6 +100,11 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "extensions", "extensions", "{DB61C1AF-8934-4F5F-BB8A-451C817536F1}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FluentMigrator.Example.TypeMapper", "samples\FluentMigrator.Example.TypeMapper\FluentMigrator.Example.TypeMapper.csproj", "{CD51E6A3-B43A-493B-B9FD-1C7A6E68F389}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{850DAD53-41AA-46B9-96AA-EEE249DB8AE2}"
+	ProjectSection(SolutionItems) = preProject
+		docs\README-nuget.md = docs\README-nuget.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
