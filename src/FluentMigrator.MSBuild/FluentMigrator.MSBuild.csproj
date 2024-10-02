@@ -69,6 +69,7 @@
   </Target>
 
   <Target Name="PackBuildOutputs">
+    <ItemGroup>
      <TfmSpecificPackageFile Include="$(TargetPath)" PackagePath="tasks\$(TargetFramework)" />
      <TfmSpecificPackageFile Include="$(ProjectDepsFilePath)" PackagePath="tasks\$(TargetFramework)" />
      <TfmSpecificPackageFile Include="@(DebugSymbolsProjectOutputGroupOutput)" PackagePath="tasks\$(TargetFramework)" />
