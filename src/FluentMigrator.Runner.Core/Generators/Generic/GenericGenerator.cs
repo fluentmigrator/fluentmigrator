@@ -309,20 +309,39 @@ namespace FluentMigrator.Runner.Generators.Generic
                 updateItems.Add(string.Format("{0} = {1}", Quoter.QuoteColumnName(item.Key), Quoter.QuoteValue(item.Value)));
             }
 
-            if(expression.IsAllRows)
+            if (expression.IsAllRows)
             {
                 whereClauses.Add("1 = 1");
             }
             else
             {
-                foreach (var item in expression.Where)
-                {
-                    var op = item.Value == null || item.Value == DBNull.Value ? "IS" : "=";
-                    whereClauses.Add(string.Format("{0} {1} {2}", Quoter.QuoteColumnName(item.Key),
-                                                   op, Quoter.QuoteValue(item.Value)));
-                }
+                GenerateUpdateWhere(expression, whereClauses);
             }
+
             return string.Format(UpdateData, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), string.Join(", ", updateItems.ToArray()), string.Join(" AND ", whereClauses.ToArray()));
+        }
+
+        protected virtual void GenerateUpdateWhere(UpdateDataExpression expression, List<string> whereClauses)
+        {
+            foreach (var item in expression.Where)
+            {
+                string op;
+
+                if (item.Value == null || item.Value == DBNull.Value)
+                {
+                    op = "IS ";
+                }
+                else if (item.Value is RawSql)
+                {
+                    op = "";
+                }
+                else
+                {
+                    op = "= ";
+                }
+
+                whereClauses.Add($"{Quoter.QuoteColumnName(item.Key)} {op}{Quoter.QuoteValue(item.Value)}");
+            }
         }
 
         public override string Generate(DeleteDataExpression expression)

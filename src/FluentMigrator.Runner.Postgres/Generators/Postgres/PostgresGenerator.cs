@@ -553,37 +553,6 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return result.ToString();
         }
 
-        public override string Generate(UpdateDataExpression expression)
-        {
-            var updateItems = new List<string>();
-            var whereClauses = new List<string>();
-
-            foreach (var item in expression.Set)
-            {
-                updateItems.Add(string.Format("{0} = {1}", Quoter.QuoteColumnName(item.Key), Quoter.QuoteValue(item.Value)));
-            }
-
-            if (expression.IsAllRows)
-            {
-                whereClauses.Add("1 = 1");
-            }
-            else
-            {
-                foreach (var item in expression.Where)
-                {
-                    var op = item.Value == null || item.Value == DBNull.Value ? "IS" : "=";
-                    whereClauses.Add(string.Format("{0} {1} {2}", Quoter.QuoteColumnName(item.Key),
-                                                   op, Quoter.QuoteValue(item.Value)));
-                }
-            }
-
-            return string.Format(
-                "UPDATE {0} SET {1} WHERE {2};",
-                Quoter.QuoteTableName(expression.TableName, expression.SchemaName),
-                string.Join(", ", updateItems.ToArray()),
-                string.Join(" AND ", whereClauses.ToArray()));
-        }
-
         public override string Generate(AlterSchemaExpression expression)
         {
             return string.Format("ALTER TABLE {0} SET SCHEMA {1};", Quoter.QuoteTableName(expression.TableName, expression.SourceSchemaName), Quoter.QuoteSchemaName(expression.DestinationSchemaName));
