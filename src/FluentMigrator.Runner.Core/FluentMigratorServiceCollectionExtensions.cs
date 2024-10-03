@@ -131,7 +131,10 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddScoped<IMigrationExpressionValidator, DefaultMigrationExpressionValidator>()
                 .AddScoped<MigrationValidator>()
                 .AddScoped<MigrationScopeHandler>()
+                // Register ProcessorOptions explicitly, required by MigrationScopeHandler
+                .AddScoped(sp => sp.GetRequiredService<IOptionsSnapshot<ProcessorOptions>>().Value);
 
+            services
                 // The connection string readers
 #if NETFRAMEWORK
                 .AddScoped<INetConfigManager, NetConfigManager>()
