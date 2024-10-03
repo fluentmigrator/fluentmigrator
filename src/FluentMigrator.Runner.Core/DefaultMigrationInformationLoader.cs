@@ -19,7 +19,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 using FluentMigrator.Exceptions;
 using FluentMigrator.Infrastructure;
@@ -47,40 +46,6 @@ namespace FluentMigrator.Runner
         [CanBeNull]
         private SortedList<long, IMigrationInfo> _migrationInfos;
 
-        [Obsolete]
-        public DefaultMigrationInformationLoader(IMigrationRunnerConventions conventions, Assembly assembly, string @namespace,
-                                                   IEnumerable<string> tagsToMatch)
-          : this(conventions, new SingleAssembly(assembly), @namespace, false, tagsToMatch)
-        {
-        }
-
-        [Obsolete]
-        public DefaultMigrationInformationLoader(IMigrationRunnerConventions conventions, IAssemblyCollection assemblies, string @namespace,
-                                                 IEnumerable<string> tagsToMatch)
-            : this(conventions, assemblies, @namespace, false, tagsToMatch)
-        {
-        }
-
-        [Obsolete]
-        public DefaultMigrationInformationLoader(IMigrationRunnerConventions conventions, Assembly assembly, string @namespace,
-                                                  bool loadNestedNamespaces, IEnumerable<string> tagsToMatch)
-            : this(conventions, new SingleAssembly(assembly), @namespace, loadNestedNamespaces, tagsToMatch)
-        {
-        }
-
-        [Obsolete]
-        public DefaultMigrationInformationLoader(IMigrationRunnerConventions conventions, IAssemblyCollection assemblies, string @namespace,
-                                                 bool loadNestedNamespaces, IEnumerable<string> tagsToMatch)
-        {
-            Conventions = conventions;
-            Assemblies = assemblies;
-            Namespace = @namespace;
-            LoadNestedNamespaces = loadNestedNamespaces;
-            _tagsToMatch = tagsToMatch as string[] ?? tagsToMatch?.ToArray() ?? Array.Empty<string>();
-            _source = new MigrationSource(new AssemblySource(() => assemblies), conventions);
-            _includeUntaggedMigrations = true;
-        }
-
         public DefaultMigrationInformationLoader(
 #pragma warning disable 618
             [NotNull] IMigrationSource source,
@@ -100,18 +65,10 @@ namespace FluentMigrator.Runner
         [NotNull]
         public IMigrationRunnerConventions Conventions { get; }
 
-        [Obsolete]
-        [CanBeNull]
-        public IAssemblyCollection Assemblies { get; }
-
         [CanBeNull]
         public string Namespace { get; }
 
         public bool LoadNestedNamespaces { get; }
-
-        [NotNull, ItemNotNull]
-        [Obsolete]
-        public IEnumerable<string> TagsToMatch => _tagsToMatch;
 
         public SortedList<long, IMigrationInfo> LoadMigrations()
         {

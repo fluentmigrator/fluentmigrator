@@ -33,6 +33,8 @@ using Microsoft.Build.Utilities;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
+using ILogger = Microsoft.Extensions.Logging.ILogger;
+
 namespace FluentMigrator.MSBuild
 {
     public class Migrate :
@@ -115,6 +117,8 @@ namespace FluentMigrator.MSBuild
         public bool IncludeUntaggedMaintenances { get; set; }
 
         public bool IncludeUntaggedMigrations { get; set; } = true;
+
+        public bool UseMsBuildLogging { get; set; } = false;
 
         public string DefaultSchemaName { get; set; }
 
@@ -209,6 +213,11 @@ namespace FluentMigrator.MSBuild
                             opt.OutputGoBetweenStatements = ExecutingAgainstMsSql;
                         })
                     .AddSingleton<ILoggerProvider, LogFileFluentMigratorLoggerProvider>();
+            }
+
+            if (UseMsBuildLogging)
+            {
+                services.AddScoped<ILogger>(provider => new MicrosoftBuildLogger(this));
             }
 
             using (var serviceProvider = services.BuildServiceProvider(validateScopes: false))
