@@ -165,7 +165,7 @@ namespace FluentMigrator.Model
         /// <inheritdoc />
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            if (Type == null && CustomType == null && Expression == null)
+            if (Type == null && CustomType == null)
             {
                 yield return new ValidationResult(ErrorMessages.ColumnTypeMustBeDefined);
             }
