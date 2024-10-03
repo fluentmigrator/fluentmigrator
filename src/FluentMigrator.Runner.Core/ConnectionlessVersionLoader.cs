@@ -23,6 +23,7 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Conventions;
+using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Versioning;
@@ -48,6 +49,7 @@ namespace FluentMigrator.Runner
 
         [Obsolete]
         internal ConnectionlessVersionLoader(
+            IGeneratorAccessor generatorAccessor,
             IMigrationRunner runner,
             IAssemblyCollection assemblies,
             IConventionSet conventionSet,
@@ -57,7 +59,7 @@ namespace FluentMigrator.Runner
         {
             _migrationInformationLoader = runner.MigrationLoader;
             _processor = runner.Processor;
-            _quoter = _processor.GetQuoter();
+            _quoter = generatorAccessor.Generator.GetQuoter();
 
             Runner = runner;
             Assemblies = assemblies;
@@ -83,6 +85,7 @@ namespace FluentMigrator.Runner
         }
 
         public ConnectionlessVersionLoader(
+            [NotNull] IGeneratorAccessor generatorAccessor,
             [NotNull] IProcessorAccessor processorAccessor,
             [NotNull] IMigrationRunnerConventions conventions,
             [NotNull] IOptions<RunnerOptions> runnerOptions,
@@ -91,7 +94,7 @@ namespace FluentMigrator.Runner
         {
             _processor = processorAccessor.Processor;
             _migrationInformationLoader = migrationInformationLoader;
-            _quoter = _processor.GetQuoter();
+            _quoter = generatorAccessor.Generator.GetQuoter();
             Conventions = conventions;
             StartVersion = runnerOptions.Value.StartVersion;
             TargetVersion = runnerOptions.Value.Version;

@@ -28,6 +28,7 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Exceptions;
+using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Infrastructure;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
@@ -88,6 +89,8 @@ namespace FluentMigrator.Tests.Unit
 
             _migrationLoaderMock.Setup(x => x.LoadMigrations()).Returns(()=> _migrationList);
 
+            var generatorAccessorMock = new Mock<IGeneratorAccessor>(MockBehavior.Loose);
+
             _logMessages = new List<string>();
             var connectionString = IntegrationTestOptions.SqlServer2008.ConnectionString;
             _serviceCollection = ServiceCollectionExtensions.CreateServices()
@@ -96,6 +99,7 @@ namespace FluentMigrator.Tests.Unit
                 .AddSingleton(_stopWatch.Object)
                 .AddSingleton(_assemblySourceMock.Object)
                 .AddSingleton(_migrationLoaderMock.Object)
+                .AddSingleton(generatorAccessorMock.Object)
                 .AddScoped<IConnectionStringReader>(_ => new PassThroughConnectionStringReader(connectionString))
                 .AddScoped(_ => _profileLoaderMock.Object)
                 .Configure<ProcessorOptions>(

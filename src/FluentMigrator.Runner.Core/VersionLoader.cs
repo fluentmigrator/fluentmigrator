@@ -27,6 +27,7 @@ using FluentMigrator.Runner.Versioning;
 using FluentMigrator.Runner.VersionTableInfo;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Conventions;
+using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
 
@@ -65,15 +66,17 @@ namespace FluentMigrator.Runner
         internal VersionLoader(
             [NotNull] IMigrationRunner runner,
             [NotNull] Assembly assembly,
+            [NotNull] IGeneratorAccessor generatorAccessor,
             [NotNull] IConventionSet conventionSet,
             [NotNull] IMigrationRunnerConventions conventions,
             [NotNull] IRunnerContext runnerContext)
-            : this(runner, new SingleAssembly(assembly), conventionSet, conventions, runnerContext)
+            : this(runner, new SingleAssembly(assembly), generatorAccessor, conventionSet, conventions, runnerContext)
         {
         }
 
         [Obsolete]
         internal VersionLoader(IMigrationRunner runner, IAssemblyCollection assemblies,
+            [NotNull] IGeneratorAccessor generatorAccessor,
             [NotNull] IConventionSet conventionSet,
             [NotNull] IMigrationRunnerConventions conventions,
             [NotNull] IRunnerContext runnerContext,
@@ -81,7 +84,7 @@ namespace FluentMigrator.Runner
         {
             _conventionSet = conventionSet;
             _processor = runner.Processor;
-            _quoter = _processor.GetQuoter();
+            _quoter = generatorAccessor.Generator.GetQuoter();
 
             Runner = runner;
             Assemblies = assemblies;
@@ -98,6 +101,7 @@ namespace FluentMigrator.Runner
 
         public VersionLoader(
             [NotNull] IProcessorAccessor processorAccessor,
+            [NotNull] IGeneratorAccessor generatorAccessor,
             [NotNull] IConventionSet conventionSet,
             [NotNull] IMigrationRunnerConventions conventions,
             [NotNull] IVersionTableMetaData versionTableMetaData,
@@ -105,7 +109,7 @@ namespace FluentMigrator.Runner
         {
             _conventionSet = conventionSet;
             _processor = processorAccessor.Processor;
-            _quoter = _processor.GetQuoter();
+            _quoter = generatorAccessor.Generator.GetQuoter();
 
             Runner = runner;
 
