@@ -25,7 +25,7 @@ namespace FluentMigrator.Expressions
     /// <summary>
     /// Expression to execute an SQL statement
     /// </summary>
-    public class ExecuteSqlStatementExpression : MigrationExpressionBase
+    public class ExecuteSqlStatementExpression : ExecuteSqlScriptExpressionBase
     {
         /// <summary>
         /// Gets or sets the SQL statement to be executed
@@ -41,7 +41,8 @@ namespace FluentMigrator.Expressions
         /// <inheritdoc />
         public override void ExecuteWith(IMigrationProcessor processor)
         {
-            processor.Execute(SqlStatement);
+            var finalSqlScript = SqlScriptTokenReplacer.ReplaceSqlScriptTokens(SqlStatement, Parameters);
+            processor.Execute(finalSqlScript);
         }
 
         /// <inheritdoc />
