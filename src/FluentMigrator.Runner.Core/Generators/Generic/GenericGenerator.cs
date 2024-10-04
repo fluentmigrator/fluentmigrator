@@ -304,10 +304,7 @@ namespace FluentMigrator.Runner.Generators.Generic
             var updateItems = new List<string>();
             var whereClauses = new List<string>();
 
-            foreach (var item in expression.Set)
-            {
-                updateItems.Add(string.Format("{0} = {1}", Quoter.QuoteColumnName(item.Key), Quoter.QuoteValue(item.Value)));
-            }
+            GenerateUpdateSet(expression, updateItems);
 
             if (expression.IsAllRows)
             {
@@ -315,15 +312,35 @@ namespace FluentMigrator.Runner.Generators.Generic
             }
             else
             {
-                GenerateUpdateWhere(expression, whereClauses);
+                GenerateWhere(expression.Where, whereClauses);
             }
 
             return string.Format(UpdateData, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), string.Join(", ", updateItems.ToArray()), string.Join(" AND ", whereClauses.ToArray()));
         }
 
-        protected virtual void GenerateUpdateWhere(UpdateDataExpression expression, List<string> whereClauses)
+        /// <summary>
+        /// Generates the SET clause for UPDATE statements
+        /// </summary>
+        /// <param name="expression">The Update expression with a SET</param>
+        /// <param name="updateItems">The key value pair that is going to be populated</param>
+        protected virtual void GenerateUpdateSet(UpdateDataExpression expression, List<string> updateItems)
         {
-            foreach (var item in expression.Where)
+            foreach (var item in expression.Set)
+            {
+                var leftPart = item.Key == "" ? "" : $"{Quoter.QuoteColumnName(item.Key)} = ";
+
+                updateItems.Add($"{leftPart}{Quoter.QuoteValue(item.Value)}");
+            }
+        }
+
+        /// <summary>
+        /// Generates the WHERE clause for UPDATE and DELETE statements
+        /// </summary>
+        /// <param name="where">The where expression</param>
+        /// <param name="whereClauses">The key value pair that is going to be populated</param>
+        protected virtual void GenerateWhere(List<KeyValuePair<string, object>> where, List<string> whereClauses)
+        {
+            foreach (var item in where)
             {
                 string op;
 
@@ -340,7 +357,10 @@ namespace FluentMigrator.Runner.Generators.Generic
                     op = "= ";
                 }
 
-                whereClauses.Add($"{Quoter.QuoteColumnName(item.Key)} {op}{Quoter.QuoteValue(item.Value)}");
+                // When the key is an empty string it means the value will contain the column name
+                var columnName = item.Key == "" ? "" : $"{Quoter.QuoteColumnName(item.Key)} ";
+
+                whereClauses.Add($"{columnName}{op}{Quoter.QuoteValue(item.Value)}");
             }
         }
 
@@ -357,16 +377,8 @@ namespace FluentMigrator.Runner.Generators.Generic
                 foreach (var row in expression.Rows)
                 {
                     var whereClauses = new List<string>();
-                    foreach (KeyValuePair<string, object> item in row)
-                    {
-                        var op = item.Value == null || item.Value == DBNull.Value ? "IS" : "=";
-                        whereClauses.Add(
-                            string.Format(
-                                "{0} {1} {2}",
-                                Quoter.QuoteColumnName(item.Key),
-                                op,
-                                Quoter.QuoteValue(item.Value)));
-                    }
+
+                    GenerateWhere(row, whereClauses);
 
                     deleteItems.Add(string.Format(DeleteData, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), string.Join(" AND ", whereClauses.ToArray())));
                 }

@@ -223,35 +223,6 @@ namespace FluentMigrator.Runner.Generators.DB2
                 constraintName);
         }
 
-        public override string Generate(Expressions.DeleteDataExpression expression)
-        {
-            if (expression.IsAllRows)
-            {
-                return string.Format("DELETE FROM {0}", Quoter.QuoteTableName(expression.TableName, expression.SchemaName));
-            }
-            else
-            {
-                var deleteExpressions = new StringBuilder();
-                foreach (var row in expression.Rows)
-                {
-                    var clauses = row.Aggregate(new StringBuilder(), (acc, rowVal) =>
-                    {
-                        var accumulator = acc.Length == 0 ? string.Empty : " AND ";
-                        var clauseOperator = rowVal.Value == null || rowVal.Value == DBNull.Value
-                            ? "IS"
-                            : "=";
-
-                        return acc.AppendFormat("{0}{1} {2} {3}", accumulator, Quoter.QuoteColumnName(rowVal.Key), clauseOperator, Quoter.QuoteValue(rowVal.Value));
-                    });
-
-                    var separator = deleteExpressions.Length > 0 ? " " : string.Empty;
-                    deleteExpressions.AppendFormat("{0}DELETE FROM {1} WHERE {2}", separator, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), clauses);
-                }
-
-                return deleteExpressions.ToString();
-            }
-        }
-
         public override string Generate(Expressions.RenameColumnExpression expression)
         {
             return CompatibilityMode.HandleCompatibility("This feature not directly supported by most versions of DB2.");
@@ -285,30 +256,6 @@ namespace FluentMigrator.Runner.Generators.DB2
             }
 
             return sb.ToString();
-        }
-
-        public override string Generate(Expressions.UpdateDataExpression expression)
-        {
-            var updateClauses = expression.Set.Aggregate(new StringBuilder(), (acc, newRow) =>
-            {
-                var accumulator = acc.Length == 0 ? string.Empty : ", ";
-                return acc.AppendFormat("{0}{1} = {2}", accumulator, Quoter.QuoteColumnName(newRow.Key), Quoter.QuoteValue(newRow.Value));
-            });
-
-            if (expression.IsAllRows)
-            {
-                return string.Format("UPDATE {0} SET {1}", Quoter.QuoteTableName(expression.TableName, expression.SchemaName), updateClauses);
-            }
-
-            var whereClauses = expression.Where.Aggregate(new StringBuilder(), (acc, rowVal) =>
-            {
-                var accumulator = acc.Length == 0 ? string.Empty : " AND ";
-                var clauseOperator = rowVal.Value == null || rowVal.Value == DBNull.Value ? "IS" : "=";
-
-                return acc.AppendFormat("{0}{1} {2} {3}", accumulator, Quoter.QuoteColumnName(rowVal.Key), clauseOperator, Quoter.QuoteValue(rowVal.Value));
-            });
-
-            return string.Format("UPDATE {0} SET {1} WHERE {2}", Quoter.QuoteTableName(expression.TableName, expression.SchemaName), updateClauses, whereClauses);
         }
 
         public override string Generate(Expressions.CreateTableExpression expression)

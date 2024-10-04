@@ -519,40 +519,6 @@ namespace FluentMigrator.Runner.Generators.Postgres
                 ((PostgresColumn)Column).FormatAlterDefaultValue(expression.ColumnName, expression.DefaultValue));
         }
 
-        public override string Generate(DeleteDataExpression expression)
-        {
-            var result = new StringBuilder();
-
-            if (expression.IsAllRows)
-            {
-                result.AppendFormat("DELETE FROM {0};", Quoter.QuoteTableName(expression.TableName, expression.SchemaName));
-            }
-            else
-            {
-                foreach (var row in expression.Rows)
-                {
-                    var where = string.Empty;
-                    var i = 0;
-
-                    foreach (var item in row)
-                    {
-                        if (i != 0)
-                        {
-                            where += " AND ";
-                        }
-
-                        var op = item.Value == null || item.Value == DBNull.Value ? "IS" : "=";
-                        where += string.Format("{0} {1} {2}", Quoter.QuoteColumnName(item.Key), op, Quoter.QuoteValue(item.Value));
-                        i++;
-                    }
-
-                    result.AppendFormat("DELETE FROM {0} WHERE {1};", Quoter.QuoteTableName(expression.TableName, expression.SchemaName), where);
-                }
-            }
-
-            return result.ToString();
-        }
-
         public override string Generate(AlterSchemaExpression expression)
         {
             return string.Format("ALTER TABLE {0} SET SCHEMA {1};", Quoter.QuoteTableName(expression.TableName, expression.SourceSchemaName), Quoter.QuoteSchemaName(expression.DestinationSchemaName));
