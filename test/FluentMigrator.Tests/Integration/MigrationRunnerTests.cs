@@ -2404,8 +2404,8 @@ namespace FluentMigrator.Tests.Integration
                 .Where("Baz IS NULL");
 
             Update.Table("FooRawSql")
-                .Set("Baz = CASE WHEN Bar = 1 THEN 2 ELSE 0 END")
-                .Where("Baz IS NULL");
+                .Set(RawSql.Insert("Baz = CASE WHEN Bar = 1 THEN 2 ELSE 0 END"))
+                .Where(RawSql.Insert("Baz IS NULL"));
 
             Update.Table("FooObjectWithRawSql")
                 .Set(new
@@ -2421,7 +2421,7 @@ namespace FluentMigrator.Tests.Integration
                 .Row("Baz IS NULL");
 
             Delete.FromTable("FooRawSql")
-                .Row("Baz IS NULL");
+                .Row(RawSql.Insert("Baz IS NULL"));
 
             Delete.FromTable("FooObjectWithRawSql")
                 .Row(new
