@@ -1,12 +1,12 @@
 #region License
 // Copyright (c) 2024, Fluent Migrator Project
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -65,61 +65,58 @@ namespace FluentMigrator.MSBuild
             switch (logLevel)
             {
                 case LogLevel.Trace:
-                    _loggingHelper.LogMessage(GetMessageImportance(logLevel), $"{formatter(state, exception)}");
+                    _loggingHelper.LogMessage(MessageImportance.Low, formatter(state, exception));
                     break;
                 case LogLevel.Debug:
-                    _loggingHelper.LogMessage(GetMessageImportance(logLevel), $"{formatter(state, exception)}");
+                    _loggingHelper.LogMessage(MessageImportance.Normal, formatter(state, exception));
                     break;
                 case LogLevel.Information:
-                    _loggingHelper.LogMessage(GetMessageImportance(logLevel), $"{formatter(state, exception)}");
+                    _loggingHelper.LogMessage(MessageImportance.High, formatter(state, exception));
                     break;
                 case LogLevel.Warning:
-                    LogWarning(state, exception, formatter);
+                    _loggingHelper.LogWarning(formatter(state, exception));
                     break;
                 case LogLevel.Error:
                 case LogLevel.Critical:
-                    LogError(state, exception, formatter);
+                    _loggingHelper.LogError(formatter(state, exception));
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
         }
 
-        private MessageImportance GetMessageImportance(LogLevel logLevel)
-        {
-            switch (logLevel)
-            {
-                case LogLevel.Trace: return MessageImportance.Low;
-                case LogLevel.Debug: return MessageImportance.Normal;
-                case LogLevel.Information: return MessageImportance.High;
-                case LogLevel.Warning: return MessageImportance.High;
-                case LogLevel.Error: return MessageImportance.High;
-                case LogLevel.Critical: return MessageImportance.High;
-                default: return MessageImportance.High;
-            }
-        }
-
         /// <inheritdoc />
         public bool IsEnabled(LogLevel logLevel)
         {
-            return _loggingHelper.LogsMessagesOfImportance(GetMessageImportance(logLevel));
+            MessageImportance importance;
+
+            switch (logLevel)
+            {
+                case LogLevel.Information:
+                    importance = MessageImportance.High;
+                    break;
+                case LogLevel.Debug:
+                    importance = MessageImportance.Normal;
+                    break;
+                case LogLevel.Trace:
+                    importance = MessageImportance.Low;
+                    break;
+                case LogLevel.Warning:
+                case LogLevel.Error:
+                case LogLevel.Critical:
+                    // These are always logged.
+                    return true;
+                default:
+                    // Do not log LogLevel.None or invalid.
+                    return false;
+            }
+
+            return _loggingHelper.LogsMessagesOfImportance(importance);
         }
 
         public IDisposable BeginScope<TState>(TState state) => default;
 
         private static void ThrowArgumentNullException(string paramName) =>
             throw new ArgumentNullException(paramName);
-
-        // MSBuild versions earlier than 16.8 do not support help links, so we will try to call the new overload and if
-        // it does not exist we will catch the MissingMethodException and call the old overload.
-        private void LogWarning<TState>(TState state, Exception exception, Func<TState, Exception, string> formatter)
-        {
-            _loggingHelper.LogWarning($"{formatter(state, exception)}");
-        }
-
-        private void LogError<TState>(TState state, Exception exception, Func<TState, Exception, string> formatter)
-        {
-            _loggingHelper.LogError($"{formatter(state, exception)}");
-        }
     }
 }
