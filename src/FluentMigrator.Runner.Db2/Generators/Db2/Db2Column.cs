@@ -33,8 +33,8 @@ namespace FluentMigrator.Runner.Generators.DB2
         public Db2Column(IQuoter quoter)
             : base(new Db2TypeMap(), quoter)
         {
-            ClauseOrder = new List<Func<ColumnDefinition, string>> { FormatString, FormatType, FormatCCSID, FormatNullable, FormatDefaultValue, FormatIdentity };
-            AlterClauseOrder = new List<Func<ColumnDefinition, string>> { FormatType, FormatCCSID, FormatNullable, FormatDefaultValue, FormatIdentity };
+            ClauseOrder = new List<Func<ColumnDefinition, string>> { FormatString, FormatType, FormatCCSID, FormatExpression, FormatNullable, FormatDefaultValue, FormatIdentity };
+            AlterClauseOrder = new List<Func<ColumnDefinition, string>> { FormatType, FormatCCSID, FormatExpression, FormatNullable, FormatDefaultValue, FormatIdentity };
         }
 
         public List<Func<ColumnDefinition, string>> AlterClauseOrder
