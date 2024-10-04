@@ -38,8 +38,23 @@ namespace FluentMigrator.Builders.Execute
         /// Executes an SQL statement
         /// </summary>
         /// <param name="sqlStatement">The SQL statement to execute</param>
+        /// <param name="parameters">The parameters to be replaced in the SQL script</param>
+        void Sql(string sqlStatement, IDictionary<string, string> parameters);
+
+        /// <summary>
+        /// Executes an SQL statement
+        /// </summary>
+        /// <param name="sqlStatement">The SQL statement to execute</param>
         /// <param name="description">Description for this SQL statement for logging purposes</param>
         void Sql(string sqlStatement, string description);
+
+        /// <summary>
+        /// Executes an SQL statement
+        /// </summary>
+        /// <param name="sqlStatement">The SQL statement to execute</param>
+        /// <param name="description">Description for this SQL statement for logging purposes</param>
+        /// <param name="parameters">The parameters to be replaced in the SQL script</param>
+        void Sql(string sqlStatement, string description, IDictionary<string, string> parameters);
 
         /// <summary>
         /// Executes an SQL script loaded from the given file

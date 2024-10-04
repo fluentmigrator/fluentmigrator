@@ -52,9 +52,39 @@ namespace FluentMigrator.Builders.Execute
         }
 
         /// <inheritdoc />
+        public void Sql(string sqlStatement, IDictionary<string, string> parameters)
+        {
+            var expression = new ExecuteSqlStatementExpression
+            {
+                SqlStatement = sqlStatement,
+                Parameters = parameters,
+            };
+
+            _context.Expressions.Add(expression);
+        }
+
+        /// <inheritdoc />
         public void Sql(string sqlStatement, string description)
         {
-            var expression = new ExecuteSqlStatementExpression { SqlStatement = sqlStatement, Description = description };
+            var expression = new ExecuteSqlStatementExpression
+            {
+                SqlStatement = sqlStatement,
+                Description = description,
+            };
+
+            _context.Expressions.Add(expression);
+        }
+
+        /// <inheritdoc />
+        public void Sql(string sqlStatement, string description, IDictionary<string, string> parameters)
+        {
+            var expression = new ExecuteSqlStatementExpression
+            {
+                SqlStatement = sqlStatement,
+                Description = description,
+                Parameters = parameters,
+            };
+
             _context.Expressions.Add(expression);
         }
 
@@ -93,10 +123,10 @@ namespace FluentMigrator.Builders.Execute
                 throw new InvalidOperationException(
                     $"The caller forgot to configure the service provider with at least one {nameof(IEmbeddedResourceProvider)}");
             }
-            
+
             var expression = new ExecuteEmbeddedSqlScriptExpression(embeddedResourceProviders) { SqlScript = embeddedSqlScriptName };
             _context.Expressions.Add(expression);
-            
+
         }
 
         /// <inheritdoc />
@@ -108,7 +138,7 @@ namespace FluentMigrator.Builders.Execute
                 throw new InvalidOperationException(
                     $"The caller forgot to configure the service provider with at least one {nameof(IEmbeddedResourceProvider)}");
             }
-            
+
             var expression = new ExecuteEmbeddedSqlScriptExpression(embeddedResourceProviders)
             {
                 SqlScript = embeddedSqlScriptName,

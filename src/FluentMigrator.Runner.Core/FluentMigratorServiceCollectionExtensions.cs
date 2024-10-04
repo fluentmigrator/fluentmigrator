@@ -33,6 +33,7 @@ using JetBrains.Annotations;
 
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 
 // ReSharper disable once CheckNamespace
@@ -59,8 +60,9 @@ namespace Microsoft.Extensions.DependencyInjection
                 // Add support for options
                 .AddOptions()
 
-                // Add loggins support
+                // Add logging support
                 .AddLogging()
+                .AddScoped<ILogger>(provider => NullLogger.Instance)
 
                 // The default assembly loader factory
                 .AddSingleton<AssemblyLoaderFactory>()
@@ -131,7 +133,10 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddScoped<IMigrationExpressionValidator, DefaultMigrationExpressionValidator>()
                 .AddScoped<MigrationValidator>()
                 .AddScoped<MigrationScopeHandler>()
+                // Register ProcessorOptions explicitly, required by MigrationScopeHandler
+                .AddScoped(sp => sp.GetRequiredService<IOptionsSnapshot<ProcessorOptions>>().Value);
 
+            services
                 // The connection string readers
 #if NETFRAMEWORK
                 .AddScoped<INetConfigManager, NetConfigManager>()
