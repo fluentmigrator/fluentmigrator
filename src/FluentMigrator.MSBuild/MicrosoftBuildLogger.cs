@@ -15,6 +15,7 @@
 #endregion
 
 using System;
+using System.Runtime.CompilerServices;
 
 using Microsoft.Build.Framework;
 
@@ -31,6 +32,8 @@ namespace FluentMigrator.MSBuild
     public class MicrosoftBuildLogger : ILogger
     {
         private readonly TaskLoggingHelper _loggingHelper;
+
+        private static bool _supportsLogsMessagesOfImportance = true;
 
         /// <summary>
         /// Creates an <see cref="MicrosoftBuildLogger"/> from an <see cref="ITask"/>.
@@ -111,7 +114,28 @@ namespace FluentMigrator.MSBuild
                     return false;
             }
 
-            return _loggingHelper.LogsMessagesOfImportance(importance);
+            if (_supportsLogsMessagesOfImportance)
+            {
+                // MSBuild versions earlier than 17 do not have LogsMessagesOfImportance, so we will try to call it
+                // and if it does not exist we will swallow the MissingMethodException and return true.
+                try
+                {
+                    return LogsMessagesOfImportance_17(_loggingHelper, importance);
+                }
+                catch (MissingMethodException)
+                {
+                    // Mark that the method does not exist and don't try to call it again, to avoid the overhead of exceptions.
+                    _supportsLogsMessagesOfImportance = false;
+                }
+            }
+
+            return true;
+
+            [MethodImpl(MethodImplOptions.NoInlining)]
+            static bool LogsMessagesOfImportance_17(TaskLoggingHelper loggingHelper, MessageImportance importance)
+            {
+                return loggingHelper.LogsMessagesOfImportance(importance);
+            }
         }
 
         public IDisposable BeginScope<TState>(TState state) => default;
