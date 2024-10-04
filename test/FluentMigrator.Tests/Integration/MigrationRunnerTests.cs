@@ -18,6 +18,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
@@ -1796,7 +1797,7 @@ namespace FluentMigrator.Tests.Integration
         public void CanSaveSqlStatementWithDescription()
         {
             var outputSql = new StringBuilder();
-           
+
             var provider = new SqlScriptFluentMigratorLoggerProvider(
                 new StringWriter(outputSql),
                 new SqlScriptFluentMigratorLoggerOptions()
@@ -1832,6 +1833,55 @@ namespace FluentMigrator.Tests.Integration
 
                     selectUpMatches.ShouldBe(1);
                     selectDownMatches.ShouldBe(1);
+                },
+                false);
+        }
+
+        [Test]
+        [Category("MySql")]
+        [Category("SQLite")]
+        [Category("Postgres")]
+        [Category("Snowflake")]
+        [Category("SqlServer2005")]
+        [Category("SqlServer2008")]
+        [Category("SqlServer2012")]
+        [Category("SqlServer2014")]
+        [Category("SqlServer2016")]
+        public void CanInjtectParametersInExecuteSql()
+        {
+            var outputSql = new StringBuilder();
+
+            var provider = new SqlScriptFluentMigratorLoggerProvider(
+                new StringWriter(outputSql),
+                new SqlScriptFluentMigratorLoggerOptions()
+                {
+                    ShowSql = true,
+                });
+
+            ExecuteWithSupportedProcessors(
+                services =>
+                {
+                    // Clear sql output between each processor execution
+                    outputSql.Clear();
+
+                    services
+                        .ConfigureRunner(rb => rb.WithVersionTable(new TestVersionTableMetaData()))
+                        .WithMigrationsIn(RootNamespace)
+                        .Configure<ProcessorOptions>(opt => opt.PreviewOnly = true)
+                        .AddSingleton<ILoggerProvider>(provider);
+                },
+                (serviceProvider, processor) =>
+                {
+                    var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
+
+                    runner.Up(new TestExecuteSqlParameters());
+
+                    processor.CommitTransaction();
+                    var outputSqlString = outputSql.ToString();
+                    var selectUpMatches = new Regex("SELECT 1 FROM FOO WHERE BAR = 'test'")
+                            .Matches(outputSqlString).Count;
+
+                    selectUpMatches.ShouldBe(1);
                 },
                 false);
         }
@@ -1973,7 +2023,7 @@ namespace FluentMigrator.Tests.Integration
             Create.Table("TestTable")
                 .WithColumn("Id").AsInt32().NotNullable().PrimaryKey().Identity()
                 .WithColumn("Name").AsString(255).NotNullable().WithDefaultValue("Anonymous");
-            
+
             var testTable2 = Create.Table("TestTable2")
                 .WithColumn("Id").AsInt32().NotNullable().PrimaryKey().Identity()
                 .WithColumn("Name").AsString(255).Nullable()
@@ -2035,7 +2085,7 @@ namespace FluentMigrator.Tests.Integration
         public override void Up()
         {
             _ = Create.Schema("TestSchema");
-            
+
             Create.Table("Users")
                 .InSchema("TestSchema")
                 .WithColumn("UserId").AsInt32().Identity().PrimaryKey()
@@ -2343,6 +2393,21 @@ namespace FluentMigrator.Tests.Integration
         public override void Down()
         {
             Execute.Sql("SELECT 2 FROM BAR", "Description Down");
+        }
+    }
+
+    internal class TestExecuteSqlParameters : Migration
+    {
+        public override void Up()
+        {
+            Execute.Sql("SELECT 1 FROM FOO WHERE BAR = $(BAZ)", new Dictionary<string, string>()
+            {
+                ["BAZ"] = "'test'"
+            });
+        }
+
+        public override void Down()
+        {
         }
     }
 
