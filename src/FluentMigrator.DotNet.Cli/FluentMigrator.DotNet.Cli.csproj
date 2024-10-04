@@ -8,6 +8,9 @@
   </PropertyGroup>
   <Import Project="$(MSBuildThisFileDirectory)../../PackageTool.props" />
   <ItemGroup>
+    <Compile Include="..\FluentMigrator.Runner.Core\DirtyAssemblyResolveHelper.cs" Link="DirtyAssemblyResolveHelper.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="AutoMapper" Version="13.0.1" />
     <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="10.3.1" />
     <PackageReference Include="FSharp.Core" Version="8.0.400" />

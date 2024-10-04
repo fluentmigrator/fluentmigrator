@@ -29,4 +29,9 @@
   <ItemGroup>
     <PackageReference Update="JetBrains.Annotations" Version="2024.2.0" />
   </ItemGroup>
+  <!-- This file is meant to be linked from FluentMigrator.DotNet.Cli and FluentMigrator.MSBuild -->
+  <ItemGroup>
+    <Compile Remove="DirtyAssemblyResolveHelper.cs" />
+    <None Include="DirtyAssemblyResolveHelper.cs" />
+  </ItemGroup>
 </Project>
