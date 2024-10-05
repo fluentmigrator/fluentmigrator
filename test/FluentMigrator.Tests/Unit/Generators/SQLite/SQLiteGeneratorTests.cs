@@ -32,6 +32,8 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Generators.SQLite
 {
     [TestFixture]
+    [Category("Generator")]
+    [Category("SQLite")]
     // ReSharper disable once InconsistentNaming
     public class SQLiteGeneratorTests
     {
@@ -40,20 +42,25 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         [SetUp]
         public void Setup()
         {
-            Generator = new SQLiteGenerator();
+            // ReSharper disable once RedundantArgumentDefaultValue
+            var quoter = new SQLiteQuoter(false);
+            // ReSharper disable once RedundantArgumentDefaultValue
+            var typeMap = new SQLiteTypeMap(false);
+            Generator = new SQLiteGenerator(quoter, typeMap);
         }
 
         [Test]
-        public void CanAlterColumnInStrictMode()
+        public void CanNotAlterColumnInStrictMode()
         {
-            var expression = GeneratorTestHelper.GetRenameColumnExpression();
+            var expression = GeneratorTestHelper.GetAlterColumnExpression();
+
             Generator.CompatibilityMode = CompatibilityMode.STRICT;
 
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
 
         [Test]
-        public void CanAlterSchemaInStrictMode()
+        public void CanNotAlterSchemaInStrictMode()
         {
             Generator.CompatibilityMode = CompatibilityMode.STRICT;
 
@@ -61,7 +68,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         }
 
         [Test]
-        public void CanCreateForeignKeyInStrictMode()
+        public void CanNotCreateForeignKeyInStrictMode()
         {
             Generator.CompatibilityMode = CompatibilityMode.STRICT;
 
@@ -69,7 +76,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         }
 
         [Test]
-        public void CanCreateMulitColumnForeignKeyInStrictMode()
+        public void CanNotCreateMulitColumnForeignKeyInStrictMode()
         {
             Generator.CompatibilityMode = CompatibilityMode.STRICT;
 
@@ -77,7 +84,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         }
 
         [Test]
-        public void CanCreateSchemaInStrictMode()
+        public void CanNotCreateSchemaInStrictMode()
         {
             Generator.CompatibilityMode = CompatibilityMode.STRICT;
 
@@ -85,20 +92,19 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         }
 
         [Test]
-        public void CanCreateTableWithSeededIdentityAndLooseCompatibility()
+        public void CanCreateTableWithSeededIdentity([Values] CompatibilityMode compatibilityMode)
         {
             var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();
             expression.Columns[0].IsPrimaryKey = true;
-            expression.Columns[0].AdditionalFeatures.Add(SqlServerExtensions.IdentitySeed, 3);
-            expression.Columns[0].AdditionalFeatures.Add(SqlServerExtensions.IdentityIncrement, 3);
-            Generator.CompatibilityMode = CompatibilityMode.LOOSE;
+            expression.Columns[0].IsIdentity = true;
 
+            Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
             result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, \"TestColumn2\" INTEGER NOT NULL)");
         }
 
         [Test]
-        public void CanDropForeignKeyInStrictMode()
+        public void CanNotDropForeignKeyInStrictMode()
         {
             var expression = GeneratorTestHelper.GetDeleteForeignKeyExpression();
             Generator.CompatibilityMode = CompatibilityMode.STRICT;
@@ -107,7 +113,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         }
 
         [Test]
-        public void CanDropSchemaInStrictMode()
+        public void CanNotDropSchemaInStrictMode()
         {
             Generator.CompatibilityMode = CompatibilityMode.STRICT;
 
@@ -127,7 +133,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         }
 
         [Test]
-        public void CanUseSystemMethodCurrentDateTimeAsADefaultValueForAColumn()
+        public virtual void CanUseSystemMethodCurrentDateTimeAsADefaultValueForAColumn()
         {
             var expression = new CreateTableExpression { TableName = "TestTable1" };
             expression.Columns.Add(new ColumnDefinition { Name = "DateTimeCol", Type = DbType.DateTime, DefaultValue = SystemMethods.CurrentDateTime});
@@ -137,7 +143,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         }
 
         [Test]
-        public void CanUseSystemMethodCurrentUTCDateTimeAsDefaultValueForColumn()
+        public virtual void CanUseSystemMethodCurrentUTCDateTimeAsDefaultValueForColumn()
         {
             var expression = new CreateTableExpression { TableName = "TestTable1" };
             expression.Columns.Add(new ColumnDefinition { Name = "DateTimeCol", Type = DbType.DateTime, DefaultValue = SystemMethods.CurrentUTCDateTime });
@@ -145,12 +151,15 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var result = Generator.Generate(expression);
             result.ShouldBe("CREATE TABLE \"TestTable1\" (\"DateTimeCol\" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP)");
         }
+
         [Test]
         public void CanRenameColumnInStrictMode()
         {
+            var expression = GeneratorTestHelper.GetRenameColumnExpression();
             Generator.CompatibilityMode = CompatibilityMode.STRICT;
 
-            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(GeneratorTestHelper.GetRenameColumnExpression()));
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE \"TestTable1\" RENAME COLUMN \"TestColumn1\" TO \"TestColumn2\"");
         }
     }
 }

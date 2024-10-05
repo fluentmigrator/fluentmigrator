@@ -1,6 +1,6 @@
 #region License
 //
-// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -88,9 +88,9 @@ namespace FluentMigrator.Expressions
 
             if (ForeignKey.ForeignColumns.Count > 0)
             {
-                var ctxt = new ValidationContext(ForeignKey, validationContext.Items);
-                ctxt.InitializeServiceProvider(validationContext.GetService);
-                ValidationUtilities.TryCollectResults(ctxt, ForeignKey, results);
+                var context = new ValidationContext(ForeignKey, validationContext.Items);
+                context.InitializeServiceProvider(validationContext.GetService);
+                ValidationUtilities.TryCollectResults(context, ForeignKey, results);
             }
             else
             {

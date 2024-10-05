@@ -1,5 +1,5 @@
 #region License
-// Copyright (c) 2018, FluentMigrator Project
+// Copyright (c) 2018, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,10 +15,13 @@
 #endregion
 
 using System;
+#if NETFRAMEWORK
 using System.Data.OleDb;
+#endif
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
+using Microsoft.Data.SqlClient;
 using Microsoft.Data.Sqlite;
 
 namespace FluentMigrator.Example.Migrator
@@ -27,6 +30,7 @@ namespace FluentMigrator.Example.Migrator
     public static class DefaultDatabaseConfigurations
     {
         public static readonly DatabaseConfiguration Sqlite = CreateSqliteConfiguration();
+        public static readonly DatabaseConfiguration SqlServer = CreateSqlServerConfiguration();
 
 #if NETFRAMEWORK
         public static readonly DatabaseConfiguration Jet = CreateJetConfiguration();
@@ -43,10 +47,25 @@ namespace FluentMigrator.Example.Migrator
                 Mode = SqliteOpenMode.ReadWriteCreate
             };
 
-            return new DatabaseConfiguration()
+            return new DatabaseConfiguration
             {
-                ProcessorId = "sqlite",
+                ProcessorId = ProcessorId.SQLite,
                 ConnectionString = csb.ConnectionString,
+            };
+        }
+
+        private static DatabaseConfiguration CreateSqlServerConfiguration()
+        {
+            var scsb = new SqlConnectionStringBuilder();
+            scsb.DataSource = ".";
+            scsb.IntegratedSecurity = true;
+            scsb.InitialCatalog = "FluentMigrator";
+            scsb.TrustServerCertificate = true;
+
+            return new DatabaseConfiguration
+            {
+                ProcessorId = ProcessorId.SqlServer,
+                ConnectionString = scsb.ToString()
             };
         }
 
@@ -107,5 +126,5 @@ namespace FluentMigrator.Example.Migrator
             catalog.Create(connectionString);
         }
 #endif
-    }
+        }
 }

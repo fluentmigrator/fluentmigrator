@@ -1,7 +1,7 @@
 #region License
 
 //
-// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 
 #endregion
 
+using FluentMigrator.Builders.Schema.Sequence;
 using FluentMigrator.Builders.Schema.Table;
 using FluentMigrator.Infrastructure;
 
@@ -40,5 +41,12 @@ namespace FluentMigrator.Builders.Schema.Schema
         /// <param name="tableName">The table name</param>
         /// <returns>The next step</returns>
         ISchemaTableSyntax Table(string tableName);
+
+        /// <summary>
+        /// Specify the sequence name as basis for a query a database objects existence
+        /// </summary>
+        /// <param name="sequenceName"></param>
+        /// <returns>The next step</returns>
+        ISchemaSequenceSyntax Sequence(string sequenceName);
     }
 }

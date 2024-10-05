@@ -1,5 +1,5 @@
 #region License
-// Copyright (c) 2007-2018, FluentMigrator Project
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,10 +32,13 @@ namespace FluentMigrator.SqlServer
         public static readonly string ConstraintType = "SqlServerConstraintType";
         public static readonly string IncludesList = "SqlServerIncludes";
         public static readonly string OnlineIndex = "SqlServerOnlineIndex";
+        public static readonly string IndexFilter = "SqlServerIndexFilter";
         public static readonly string RowGuidColumn = "SqlServerRowGuidColumn";
         public static readonly string IndexColumnNullsDistinct = "SqlServerIndexColumnNullsDistinct";
         public static readonly string SchemaAuthorization = "SqlServerSchemaAuthorization";
         public static readonly string SparseColumn = "SqlServerSparseColumn";
+        public static readonly string UniqueConstraintFilter = "SqlServerUniqueConstraintFilter";
+        public static readonly string UniqueConstraintIncludesList = "SqlServerUniqueConstraintIncludes";
 
         /// <summary>
         /// Inserts data using Sql Server's IDENTITY INSERT feature.
@@ -58,14 +61,16 @@ namespace FluentMigrator.SqlServer
             additionalFeatures.AdditionalFeatures[ConstraintType] = type;
         }
 
-        public static void Clustered(this ICreateConstraintOptionsSyntax expression)
+        public static ICreateConstraintOptionsSyntax Clustered(this ICreateConstraintOptionsSyntax expression)
         {
             SetConstraintType(expression, SqlServerConstraintType.Clustered);
+            return expression;
         }
 
-        public static void NonClustered(this ICreateConstraintOptionsSyntax expression)
+        public static ICreateConstraintOptionsSyntax NonClustered(this ICreateConstraintOptionsSyntax expression)
         {
             SetConstraintType(expression, SqlServerConstraintType.NonClustered);
+            return expression;
         }
 
         public static ICreateTableColumnOptionOrWithColumnSyntax RowGuid(this ICreateTableColumnOptionOrWithColumnSyntax expression)

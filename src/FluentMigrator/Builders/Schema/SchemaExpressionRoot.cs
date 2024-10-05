@@ -1,6 +1,6 @@
 #region License
 //
-// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 #endregion
 
 using FluentMigrator.Builders.Schema.Schema;
+using FluentMigrator.Builders.Schema.Sequence;
 using FluentMigrator.Builders.Schema.Table;
 using FluentMigrator.Infrastructure;
 
@@ -48,6 +49,12 @@ namespace FluentMigrator.Builders.Schema
         public ISchemaSchemaSyntax Schema(string schemaName)
         {
             return new SchemaSchemaQuery(_context, schemaName);
+        }
+
+        /// <inheritdoc />
+        public ISchemaSequenceSyntax Sequence(string sequenceName)
+        {
+            return new SchemaSequenceQuery(_context, null, sequenceName);
         }
     }
 }

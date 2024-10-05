@@ -47,6 +47,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
                 Processor.ColumnExists("Test'Schema", table.Name, "id").ShouldBeTrue();
         }
 
+
         [Test]
         public override void CallingConstraintExistsCanAcceptSchemaNameWithSingleQuote()
         {
@@ -125,6 +126,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
         public void TearDown()
         {
             ServiceScope?.Dispose();
+            Processor?.Dispose();
         }
     }
 }

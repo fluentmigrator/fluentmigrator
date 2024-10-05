@@ -1,6 +1,6 @@
 #region License
 //
-// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ using FluentMigrator.Runner;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Runner.Processors.MySql;
-using FluentMigrator.Runner.Processors.SqlAnywhere;
+using FluentMigrator.Runner.Processors.Snowflake;
 using FluentMigrator.Runner.Processors.SQLite;
 using FluentMigrator.Runner.Versioning;
 using FluentMigrator.Runner.VersionTableInfo;
@@ -41,6 +41,7 @@ namespace FluentMigrator.Tests.Integration
     [Category("MySql")]
     [Category("SQLite")]
     [Category("Postgres")]
+    [Category("Snowflake")]
     [Category("SqlServer2005")]
     [Category("SqlServer2008")]
     [Category("SqlServer2012")]
@@ -106,8 +107,7 @@ namespace FluentMigrator.Tests.Integration
                 true,
                 typeof(SQLiteProcessor),
                 typeof(MySqlProcessor),
-                typeof(FirebirdProcessor),
-                typeof(SqlAnywhereProcessor));
+                typeof(FirebirdProcessor));
         }
 
         [Test]

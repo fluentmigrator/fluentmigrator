@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 //
 // Copyright (c) 2018, Fluent Migrator Project
 //
@@ -16,6 +16,7 @@
 //
 #endregion
 
+using FluentMigrator.Exceptions;
 using FluentMigrator.Runner.Generators.SQLite;
 using NUnit.Framework;
 
@@ -40,8 +41,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         {
             var expression = GeneratorTestHelper.GetAlterSchemaExpression();
 
-            var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
 
         [Test]
@@ -49,8 +49,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         {
             var expression = GeneratorTestHelper.GetCreateSchemaExpression();
 
-            var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
 
         [Test]
@@ -58,8 +57,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         {
             var expression = GeneratorTestHelper.GetDeleteSchemaExpression();
 
-            var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
     }
 }

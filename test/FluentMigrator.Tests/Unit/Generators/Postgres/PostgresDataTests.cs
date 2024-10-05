@@ -1,3 +1,24 @@
+#region License
+//
+// Copyright (c) 2018, Fluent Migrator Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+#endregion
+
+using System;
+
+using FluentMigrator.Postgres;
 using FluentMigrator.Runner.Generators.Postgres;
 using FluentMigrator.Runner.Processors.Postgres;
 
@@ -8,6 +29,7 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Generators.Postgres
 {
     [TestFixture]
+    [Category("Postgres")]
     public class PostgresDataTests : BaseDataTests
     {
         protected PostgresGenerator Generator;
@@ -16,7 +38,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         public void Setup()
         {
             var quoter = new PostgresQuoter(new PostgresOptions());
-            Generator = new PostgresGenerator(quoter);
+            Generator = CreateGenerator(quoter);
         }
 
         [Test]
@@ -129,6 +151,24 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
+        public virtual void CanInsertWithOverridingSystemValue()
+        {
+            var expression = GeneratorTestHelper.GetInsertDataExpression();
+            expression.AdditionalFeatures[PostgresExtensions.OverridingIdentityValues] = PostgresOverridingIdentityValuesType.System;
+
+            Should.Throw<NotSupportedException>(() => Generator.Generate(expression));
+        }
+
+        [Test]
+        public virtual void CanInsertWithOverridingUserValue()
+        {
+            var expression = GeneratorTestHelper.GetInsertDataExpression();
+            expression.AdditionalFeatures[PostgresExtensions.OverridingIdentityValues] = PostgresOverridingIdentityValuesType.User;
+
+            Should.Throw<NotSupportedException>(() => Generator.Generate(expression));
+        }
+
+        [Test]
         public override void CanUpdateDataForAllDataWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpressionWithAllRows();
@@ -173,6 +213,11 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
 
             var result = Generator.Generate(expression);
             result.ShouldBe("UPDATE \"public\".\"TestTable1\" SET \"Name\" = 'Just''in', \"Age\" = 25 WHERE \"Id\" = 9 AND \"Homepage\" IS NULL;");
+        }
+
+        protected virtual PostgresGenerator CreateGenerator(PostgresQuoter quoter)
+        {
+            return new PostgresGenerator(quoter);
         }
     }
 }

@@ -26,6 +26,8 @@ using FluentMigrator.Builders.Delete;
 namespace FluentMigrator.Tests.Unit.Builders.Delete
 {
     [TestFixture]
+    [Category("Builder")]
+    [Category("DeleteConstraint")]
     public class DeleteConstraintTest
     {
         [Test]

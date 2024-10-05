@@ -31,6 +31,7 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Loggers
 {
     [TestFixture]
+    [Category("Logger")]
     public class TextWriterWithGoAnnouncerTests
     {
         private ILoggerFactory _loggerFactory;
@@ -51,6 +52,13 @@ namespace FluentMigrator.Tests.Unit.Loggers
             _loggerFactory = new LoggerFactory();
             _loggerFactory.AddProvider(new SqlScriptFluentMigratorLoggerProvider(_stringWriter, _options));
             _logger = _loggerFactory.CreateLogger("Test");
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            _loggerFactory?.Dispose();
+            _stringWriter?.Dispose();
         }
 
         [Test]
@@ -74,7 +82,7 @@ namespace FluentMigrator.Tests.Unit.Loggers
         public void Sql_Should_Not_Write_Go_When_Sql_Is_Empty()
         {
             _logger.LogSql("");
-            Assert.IsFalse(Output.Contains("GO"));
+            Assert.That(Output, Does.Not.Contain("GO"));
         }
     }
 }

@@ -103,6 +103,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Db2
         public void TearDown()
         {
             ServiceScope?.Dispose();
+            Processor?.Dispose();
         }
 
         private static void EnsureReference()

@@ -79,6 +79,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle
         public void TearDown()
         {
             ServiceScope?.Dispose();
+            Processor?.Dispose();
         }
 
         protected abstract IServiceCollection AddOracleServices(IServiceCollection services);

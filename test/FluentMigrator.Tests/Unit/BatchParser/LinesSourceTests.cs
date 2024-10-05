@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2018, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,7 +21,7 @@ namespace FluentMigrator.Tests.Unit.BatchParser
 {
     public class LinesSourceTests : SourceTestsBase
     {
-        public override ITextSource CreateSource(string content)
+        protected override ITextSource CreateSource(string content)
         {
             string[] lines;
             if (content.Length == 0)

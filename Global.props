@@ -1,23 +1,23 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project>
   <Import Project="DotNetSdkMono.props" />
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
-    <VersionPrefix>3.0.0</VersionPrefix>
+    <VersionPrefix>6.0.0</VersionPrefix>
     <Product>FluentMigrator</Product>
-    <Copyright>Sean Chambers and the FluentMigrator project 2008-2018</Copyright>
+    <Copyright>FluentMigrator project 2008-2024</Copyright>
     <Company>FluentMigrator Project</Company>
-    <Authors>Sean Chambers;Josh Coffman;Tom Marien;Mark Junker</Authors>
+    <Authors>Sean Chambers;Josh Coffman;Tom Marien;Mark Junker;John Zabroski</Authors>
+    <PackageReadmeFile>README-nuget.md</PackageReadmeFile>
     <PackageProjectUrl>https://github.com/fluentmigrator/fluentmigrator/wiki</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/fluentmigrator/fluentmigrator/blob/master/LICENSE.txt</PackageLicenseUrl>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageReleaseNotes>Use of standard dependency injection, configuration and logging libraries.
 Simplification of in-process runner configuration and instantiation.
-dotnet-fm is now a global .NET Core 2.1 tool.
-Minimum .NET Framework version is 4.6.1.
+Minimum .NET Framework version is 4.8, see https://aka.ms/msbuild/developerpacks for more information.
 
 Details: https://github.com/fluentmigrator/fluentmigrator/releases
     </PackageReleaseNotes>
-    <PackageIconUrl>https://github.com/fluentmigrator/fluentmigrator/raw/develop/docs/logo.png</PackageIconUrl>
+    <PackageIcon>logo.png</PackageIcon>
     <RepositoryUrl>https://github.com/fluentmigrator/fluentmigrator.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <MinClientVersion>3.5</MinClientVersion>
@@ -31,10 +31,15 @@ Details: https://github.com/fluentmigrator/fluentmigrator/releases
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="JetBrains.Annotations" Version="11.1.0" PrivateAssets="All" />
+    <None Include="$(MSBuildThisFileDirectory)docs/logo.png" Pack="true" PackagePath="\" />
+    <None Include="$(MSBuildThisFileDirectory)docs/README-nuget.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
-  <PropertyGroup Condition="'$(TargetFramework)'=='net461'">
+  <ItemGroup>
+    <PackageReference Include="JetBrains.Annotations" Version="2024.2.0" PrivateAssets="All" />
+  </ItemGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)'=='net48'">
     <DefineConstants>$(DefineConstants);NETFRAMEWORK</DefineConstants>
   </PropertyGroup>
 

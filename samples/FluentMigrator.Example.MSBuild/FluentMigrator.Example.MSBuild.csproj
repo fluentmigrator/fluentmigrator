@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Migrate">
+  <!--If opening this file in Visual Studio, you may get MSB4062 due to Visual Studio still using the .NET Framwork version of MSBuild. Rebuild your solution when this error occurs and it will go away. -->
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <OutputType>Library</OutputType>
+  </PropertyGroup>
+
+  <UsingTask TaskName="FluentMigrator.MSBuild.Migrate" AssemblyFile="$(FluentMigratorMSBuildAssemblyPath)" />
+
+  <Target Name="Migrate">
+
+    <Message Text="Starting FluentMigrator Migration using $(PkgFluentMigrator_MSBuild)" Importance="High" />
+    <Message Text="Starting FluentMigrator Migration using $(MSBuildThisFileDirectory)../" Importance="High" />
+    <!-- Important: Target must be your Migrations assembly name, not your dll file name.  The dll must be located where dotnet assembly loader can find it (usually same folder as the fluentmigrator dlls) -->
+
+    <Migrate Database="sqlserver2016" Connection="Data Source=(local);Database=FluentMigratorExample;Trusted_Connection=true" Target="$(MSBuildThisFileDirectory)../FluentMigrator.Example.Migrations/bin/Debug/net8.0/FluentMigrator.Example.Migrations.dll" UseMsBuildLogging="true">
+    </Migrate>
+  </Target>
+
+</Project>

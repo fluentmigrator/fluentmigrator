@@ -1,5 +1,5 @@
-﻿#region License
-// Copyright (c) 2018, FluentMigrator Project
+#region License
+// Copyright (c) 2018, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 using FluentMigrator.Runner.Generators.DB2;
 using FluentMigrator.Runner.Generators.DB2.iSeries;
+using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.DB2;
 using FluentMigrator.Runner.Processors.DB2.iSeries;
 
@@ -38,10 +39,12 @@ namespace FluentMigrator.Runner
             builder.Services
                 .AddScoped<Db2DbFactory>()
                 .AddScoped<Db2Processor>()
+                .AddScoped<IDb2TypeMap>(sp => new Db2TypeMap())
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<Db2Processor>())
                 .AddScoped<Db2Quoter>()
                 .AddScoped<Db2Generator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<Db2Generator>());
+
             return builder;
         }
 
@@ -55,10 +58,12 @@ namespace FluentMigrator.Runner
             builder.Services
                 .AddScoped<Db2ISeriesDbFactory>()
                 .AddScoped<Db2ISeriesProcessor>()
+                .AddScoped<IDb2TypeMap>(sp => new Db2TypeMap())
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<Db2ISeriesProcessor>())
                 .AddScoped<Db2ISeriesQuoter>()
                 .AddScoped<Db2ISeriesGenerator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<Db2ISeriesGenerator>());
+
             return builder;
         }
     }

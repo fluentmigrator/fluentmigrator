@@ -100,9 +100,12 @@ namespace FluentMigrator.Tests.Unit
         public void CreatingOneSetsUnderlyingValues()
         {
             var attribute = new TimestampedMigrationAttribute(Year, Month, DayOfMonth, Hour, Minute, Second, TransactionBehavior.None, Description);
-            Assert.That(attribute.Description, Is.EqualTo(Description));
-            Assert.That(attribute.TransactionBehavior, Is.EqualTo(TransactionBehavior.None));
-            Assert.That(attribute.Version, Is.EqualTo(20000615123030));
+            Assert.Multiple(() =>
+            {
+                Assert.That(attribute.Description, Is.EqualTo(Description));
+                Assert.That(attribute.TransactionBehavior, Is.EqualTo(TransactionBehavior.None));
+                Assert.That(attribute.Version, Is.EqualTo(20000615123030));
+            });
         }
 
         [Test]

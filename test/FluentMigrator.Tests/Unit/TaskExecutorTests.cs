@@ -39,6 +39,8 @@ using NUnit.Framework;
 namespace FluentMigrator.Tests.Unit
 {
     [TestFixture]
+    [Category("Runner")]
+    [Category("TaskExecutor")]
     public class TaskExecutorTests : IntegrationTestBase
     {
         private Mock<IMigrationRunner> _migrationRunner;

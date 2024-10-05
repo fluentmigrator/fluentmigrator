@@ -1,5 +1,5 @@
 #region License
-// Copyright (c) 2018, FluentMigrator Project
+// Copyright (c) 2018, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -87,6 +87,8 @@ namespace FluentMigrator.Runner.Logging
             }
             else
             {
+                if (_options.OutputSemicolonDelimiter)
+                    sql += ";";
                 _writer.WriteLineDirect(sql);
                 if (_options.OutputGoBetweenStatements)
                     _writer.WriteLineDirect("GO");

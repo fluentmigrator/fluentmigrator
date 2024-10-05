@@ -1,5 +1,5 @@
 #region License
-// Copyright (c) 2007-2018, Sean Chambers and the FluentMigrator Project
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,10 +20,7 @@ namespace FluentMigrator.DotNet.Cli.Commands
 {
     [HelpOption(Description = "Execute FluentMigrator actions")]
     [Command("dotnet-fm", Description = "The external FluentMigrator runner that integrates into the .NET Core CLI tooling")]
-    [Subcommand(typeof(Migrate))]
-    [Subcommand(typeof(Rollback))]
-    [Subcommand(typeof(Validate))]
-    [Subcommand(typeof(ListCommand))]
+    [Subcommand(typeof(Migrate), typeof(Rollback), typeof(Validate), typeof(ListCommand))]
     public class Root
     {
         protected int OnExecute(CommandLineApplication app, IConsole console)

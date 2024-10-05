@@ -1,5 +1,5 @@
 #region License
-// Copyright (c) 2007-2018, Sean Chambers and the FluentMigrator Project
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,14 +23,9 @@ namespace FluentMigrator.DotNet.Cli.Commands
 {
     [HelpOption]
     [Command("rollback", Description = "Rollback last migration")]
-    [Subcommand(typeof(RollbackBy))]
-    [Subcommand(typeof(RollbackTo))]
-    [Subcommand(typeof(RollbackAll))]
+    [Subcommand(typeof(RollbackBy), typeof(RollbackTo), typeof(RollbackAll))]
     public class Rollback : ConnectionCommand
     {
-        [Option("-m|--transaction-mode <MODE>", Description = "Overrides the transaction behavior of migrations, so that all migrations to be executed will run in one transaction.")]
-        public TransactionMode TransactionMode { get; }
-
         private int OnExecute(IConsole console)
         {
             var options = MigratorOptions.CreateRollbackBy(this, null);

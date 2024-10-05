@@ -18,11 +18,15 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
+using FluentMigrator.Builder.Create.Index;
 using FluentMigrator.Expressions;
+using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Model;
+using FluentMigrator.Postgres;
 using FluentMigrator.Runner.Generators.Generic;
 
 using JetBrains.Annotations;
@@ -33,6 +37,11 @@ namespace FluentMigrator.Runner.Generators.Postgres
 {
     public class PostgresGenerator : GenericGenerator
     {
+        private static readonly HashSet<string> _supportedAdditionalFeatures = new HashSet<string>
+        {
+            PostgresExtensions.IndexColumnNullsDistinct,
+        };
+
         public PostgresGenerator(
             [NotNull] PostgresQuoter quoter)
             : this(quoter, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()))
@@ -49,10 +58,31 @@ namespace FluentMigrator.Runner.Generators.Postgres
         protected PostgresGenerator(
             [NotNull] PostgresQuoter quoter,
             [NotNull] IOptions<GeneratorOptions> generatorOptions,
-            ITypeMap typeMap)
+            IPostgresTypeMap typeMap)
             : base(new PostgresColumn(quoter, typeMap), quoter, new PostgresDescriptionGenerator(quoter), generatorOptions)
         {
         }
+
+        protected PostgresGenerator(
+            [NotNull] IColumn column,
+            [NotNull] PostgresQuoter quoter,
+            [NotNull] IOptions<GeneratorOptions> generatorOptions)
+            : base(column, quoter, new PostgresDescriptionGenerator(quoter), generatorOptions)
+        {
+        }
+
+        /// <inheritdoc />
+        public override bool IsAdditionalFeatureSupported(string feature) =>
+            _supportedAdditionalFeatures.Contains(feature)
+         || base.IsAdditionalFeatureSupported(feature);
+
+        public override string CreateTable { get { return "CREATE TABLE {0} ({1})"; } }
+        public override string DropTable { get { return "DROP TABLE {0};"; } }
+
+        public override string AddColumn { get { return "ALTER TABLE {0} ADD {1};"; } }
+        public override string DropColumn { get { return "ALTER TABLE {0} DROP COLUMN {1};"; } }
+        public override string AlterColumn { get { return "ALTER TABLE {0} {1};"; } }
+        public override string RenameColumn { get { return "ALTER TABLE {0} RENAME COLUMN {1} TO {2};"; } }
 
         public override string Generate(AlterTableExpression expression)
         {
@@ -80,7 +110,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
         {
             var createStatement = new StringBuilder();
             createStatement.AppendFormat(
-                "CREATE TABLE {0} ({1})",
+                CreateTable,
                 Quoter.QuoteTableName(expression.TableName, expression.SchemaName),
                 Column.Generate(expression.Columns, Quoter.Quote(expression.TableName)));
             var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatements(expression)
@@ -99,7 +129,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
         {
             var alterStatement = new StringBuilder();
             alterStatement.AppendFormat(
-                "ALTER TABLE {0} {1};",
+                AlterColumn,
                 Quoter.QuoteTableName(expression.TableName, expression.SchemaName),
                 ((PostgresColumn)Column).GenerateAlterClauses(expression.Column));
             var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatement(expression);
@@ -114,19 +144,16 @@ namespace FluentMigrator.Runner.Generators.Postgres
         public override string Generate(CreateColumnExpression expression)
         {
             var createStatement = new StringBuilder();
-            createStatement.AppendFormat("ALTER TABLE {0} ADD {1};", Quoter.QuoteTableName(expression.TableName, expression.SchemaName), Column.Generate(expression.Column));
+            createStatement.Append(base.Generate(expression));
+
             var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatement(expression);
             if (!string.IsNullOrEmpty(descriptionStatement))
             {
                 createStatement.Append(";");
                 createStatement.Append(descriptionStatement);
             }
-            return createStatement.ToString();
-        }
 
-        public override string Generate(DeleteTableExpression expression)
-        {
-            return string.Format("DROP TABLE {0};", Quoter.QuoteTableName(expression.TableName, expression.SchemaName));
+            return createStatement.ToString();
         }
 
         public override string Generate(DeleteColumnExpression expression)
@@ -135,7 +162,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
             foreach (string columnName in expression.ColumnNames)
             {
                 if (expression.ColumnNames.First() != columnName) builder.AppendLine("");
-                builder.AppendFormat("ALTER TABLE {0} DROP COLUMN {1};",
+                builder.AppendFormat(DropColumn,
                     Quoter.QuoteTableName(expression.TableName, expression.SchemaName),
                     Quoter.QuoteColumnName(columnName));
             }
@@ -167,39 +194,268 @@ namespace FluentMigrator.Runner.Generators.Postgres
                 Quoter.Quote(expression.ForeignKey.Name));
         }
 
+
+        protected virtual string GetIncludeString(CreateIndexExpression column)
+        {
+            var includes = column.GetAdditionalFeature<IList<PostgresIndexIncludeDefinition>>(PostgresExtensions.IncludesList);
+
+            if (includes == null || includes.Count == 0)
+            {
+                return string.Empty;
+            }
+
+            throw new NotSupportedException("The current version doesn't support include index. Please use Postgres 11.");
+        }
+
+        protected virtual Algorithm GetIndexMethod(CreateIndexExpression expression)
+        {
+            var algorithm = expression.GetAdditionalFeature<PostgresIndexAlgorithmDefinition>(PostgresExtensions.IndexAlgorithm);
+            if (algorithm == null)
+            {
+                return Algorithm.BTree;
+            }
+
+            return algorithm.Algorithm;
+        }
+
+        protected virtual string GetFilter(CreateIndexExpression expression)
+        {
+            var filter = expression.Index.GetAdditionalFeature<string>(PostgresExtensions.IndexFilter);
+            var nullsDistinctString = GetWithNullsDistinctStringInWhere(expression.Index);
+
+            if (!string.IsNullOrWhiteSpace(filter) && !string.IsNullOrWhiteSpace(nullsDistinctString))
+            {
+                CompatibilityMode.HandleCompatibility("In PostgreSQL 14 or older, With nulls distinct can not be combined with WHERE");
+                return string.Empty;
+            }
+
+            if (!string.IsNullOrWhiteSpace(filter))
+            {
+                return " WHERE " + filter;
+            }
+
+            return nullsDistinctString;
+        }
+
+        protected virtual string GetWithNullsDistinctStringInWhere(IndexDefinition index)
+        {
+            bool? GetNullsDistinct(IndexColumnDefinition column)
+                => column.GetAdditionalFeature(PostgresExtensions.IndexColumnNullsDistinct, (bool?)null);
+
+            var indexNullsDistinct = index.GetAdditionalFeature(PostgresExtensions.IndexColumnNullsDistinct, (bool?)null);
+
+            var nullDistinctColumns = index.Columns.Where(c => indexNullsDistinct != null || GetNullsDistinct(c) != null).ToList();
+            if (nullDistinctColumns.Count != 0 && !index.IsUnique)
+            {
+                // Should never occur
+                CompatibilityMode.HandleCompatibility("With nulls distinct can only be used for unique indexes");
+                return string.Empty;
+            }
+
+            // The "Nulls (not) distinct" value of the column
+            // takes higher precedence than the value of the index
+            // itself.
+            var conditions = nullDistinctColumns
+                .Where(x => (GetNullsDistinct(x) ?? indexNullsDistinct ?? true) == false)
+                .Select(c => $"{Quoter.QuoteColumnName(c.Name)} IS NOT NULL");
+
+            var condition = string.Join(" AND ", conditions);
+            return condition.Length == 0 ? string.Empty : $" WHERE {condition}";
+        }
+
+        protected virtual string GetWithNullsDistinctString(IndexDefinition index)
+        {
+            return string.Empty;
+        }
+
+        protected virtual string GetAsConcurrently(CreateIndexExpression expression)
+        {
+            var asConcurrently = expression.GetAdditionalFeature<PostgresIndexConcurrentlyDefinition>(PostgresExtensions.Concurrently);
+
+            if (asConcurrently == null || !asConcurrently.IsConcurrently)
+            {
+                return string.Empty;
+            }
+
+            return " CONCURRENTLY";
+        }
+
+        protected virtual string GetAsOnly(CreateIndexExpression expression)
+        {
+            var asOnly = expression.GetAdditionalFeature<PostgresIndexOnlyDefinition>(PostgresExtensions.Only);
+
+            if (asOnly == null || !asOnly.IsOnly)
+            {
+                return string.Empty;
+            }
+
+            throw new NotSupportedException("The current version doesn't support ONLY. Please use Postgres 11 or higher.");
+        }
+
+        protected virtual string GetNullsSort(IndexColumnDefinition column)
+        {
+            var sort = column.GetAdditionalFeature<PostgresIndexNullsSort>(PostgresExtensions.NullsSort);
+            if (sort == null)
+            {
+                return string.Empty;
+            }
+
+            if (sort.Sort == NullSort.First)
+            {
+                return " NULLS FIRST";
+            }
+
+            return " NULLS LAST";
+        }
+
+        protected virtual string GetTablespace(CreateIndexExpression expression)
+        {
+            var tablespace = expression.Index.GetAdditionalFeature<string>(PostgresExtensions.IndexTablespace);
+            if (!string.IsNullOrWhiteSpace(tablespace))
+            {
+                return " TABLESPACE " + tablespace;
+            }
+
+            return string.Empty;
+        }
+
+        protected virtual string GetWithIndexStorageParameters(CreateIndexExpression expression)
+        {
+            var allow = GetAllowIndexStorageParameters();
+            var parameters = new List<string>();
+
+            var fillFactor = GetIndexStorageParameters<int?>(PostgresExtensions.IndexFillFactor, "FillFactor");
+            if (fillFactor.HasValue)
+            {
+                parameters.Add($"FILLFACTOR = {fillFactor}");
+            }
+
+            var fastUpdate = GetIndexStorageParameters<bool?>( PostgresExtensions.IndexFastUpdate, "FastUpdate");
+            if (fastUpdate.HasValue)
+            {
+                parameters.Add($"FASTUPDATE = {ToOnOff(fastUpdate.Value)}");
+            }
+
+            // Postgres 10 or Higher
+            var buffering = GetIndexStorageParameters<GistBuffering?>(PostgresExtensions.IndexBuffering, "Buffering");
+            if (buffering.HasValue)
+            {
+                parameters.Add($"BUFFERING = {buffering.Value.ToString().ToUpper()}");
+            }
+
+            var pendingList = GetIndexStorageParameters<long?>(PostgresExtensions.IndexGinPendingListLimit, "GinPendingListLimit");
+            if (pendingList.HasValue)
+            {
+                parameters.Add($"GIN_PENDING_LIST_LIMIT = {pendingList}");
+            }
+
+            var perRangePage = GetIndexStorageParameters<int?>(PostgresExtensions.IndexPagesPerRange, "PagesPerRange");
+            if (perRangePage.HasValue)
+            {
+                parameters.Add($"PAGES_PER_RANGE = {perRangePage}");
+            }
+
+            var autosummarize = GetIndexStorageParameters<bool?>(PostgresExtensions.IndexAutosummarize, "Autosummarize");
+            if (autosummarize.HasValue)
+            {
+                parameters.Add($"AUTOSUMMARIZE = {ToOnOff(autosummarize.Value)}");
+            }
+
+            // Postgres 11 or Higher
+            var cleanup = GetIndexStorageParameters<float?>(PostgresExtensions.IndexVacuumCleanupIndexScaleFactor, "VacuumCleanupIndexScaleFactor");
+            if (cleanup.HasValue)
+            {
+                parameters.Add($"VACUUM_CLEANUP_INDEX_SCALE_FACTOR = {cleanup.Value.ToString(CultureInfo.InvariantCulture)}");
+            }
+
+            if (parameters.Count == 0)
+            {
+                return string.Empty;
+            }
+
+            return $" WITH ( {string.Join(", ", parameters)} )";
+
+            string ToOnOff(bool value) => value ? "ON" : "OFF";
+
+            T GetIndexStorageParameters<T>(string indexStorageParameter, string indexStorageParameterName)
+            {
+                var parameter = expression.Index.GetAdditionalFeature<T>(indexStorageParameter);
+
+                if (parameter != null && !allow.Contains(indexStorageParameter))
+                {
+                    throw new NotSupportedException($"{indexStorageParameterName} index storage not supported. Please use a new version of Postgres");
+                }
+
+                return parameter;
+            }
+        }
+
+        protected virtual HashSet<string> GetAllowIndexStorageParameters()
+        {
+            return new HashSet<string>(StringComparer.InvariantCultureIgnoreCase)
+            {
+                PostgresExtensions.IndexFillFactor,
+                PostgresExtensions.IndexFastUpdate
+            };
+        }
+
         public override string Generate(CreateIndexExpression expression)
         {
             var result = new StringBuilder("CREATE");
-            if (expression.Index.IsUnique)
-                result.Append(" UNIQUE");
 
-            result.Append(" INDEX {0} ON {1} (");
+            if (expression.Index.IsUnique)
+            {
+                result.Append(" UNIQUE");
+            }
+
+            var indexMethod = GetIndexMethod(expression);
+
+            result.AppendFormat(" INDEX{0} {1} ON{2} {3}{4} (",
+                GetAsConcurrently(expression),
+                Quoter.QuoteIndexName(expression.Index.Name),
+                GetAsOnly(expression),
+                Quoter.QuoteTableName(expression.Index.TableName, expression.Index.SchemaName),
+                // B-Tree is default index method
+                indexMethod == Algorithm.BTree ? string.Empty : $" USING {indexMethod.ToString().ToUpper()}");
 
             var first = true;
             foreach (var column in expression.Index.Columns)
             {
                 if (first)
+                {
                     first = false;
+                }
                 else
+                {
                     result.Append(",");
+                }
 
                 result.Append(Quoter.QuoteColumnName(column.Name));
-                result.Append(column.Direction == Direction.Ascending ? " ASC" : " DESC");
+
+                switch (indexMethod)
+                {
+                    // Doesn't support ASC/DESC neither nulls sorts
+                    case Algorithm.Spgist:
+                    case Algorithm.Gist:
+                    case Algorithm.Gin:
+                    case Algorithm.Brin:
+                    case Algorithm.Hash:
+                        continue;
+                }
+
+                result.Append(column.Direction == Direction.Ascending ? " ASC" : " DESC")
+                    .Append(GetNullsSort(column));
             }
-            result.Append(");");
 
-            return string.Format(result.ToString(), Quoter.QuoteIndexName(expression.Index.Name), Quoter.QuoteTableName(expression.Index.TableName, expression.Index.SchemaName));
+            result.Append(")")
+                .Append(GetIncludeString(expression))
+                .Append(GetWithNullsDistinctString(expression.Index))
+                .Append(GetWithIndexStorageParameters(expression))
+                .Append(GetTablespace(expression))
+                .Append(GetFilter(expression))
+                .Append(";");
 
-            /*
-            var idx = String.Format(result.ToString(), expression.Index.Name, Quoter.QuoteSchemaName(expression.Index.SchemaName), expression.Index.TableName);
-            if (!expression.Index.IsClustered)
-                return idx;
-
-             // Clustered indexes in Postgres do not cluster updates/inserts to the table after the initial cluster operation is applied.
-             // To keep the clustered index up to date run CLUSTER TableName periodically
-
-            return string.Format("{0}; CLUSTER {1}\"{2}\" ON \"{3}\"", idx, Quoter.QuoteSchemaName(expression.Index.SchemaName), expression.Index.TableName, expression.Index.Name);
-             */
+            return result.ToString();
         }
 
         public override string Generate(DeleteIndexExpression expression)
@@ -210,6 +466,12 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return string.Format("DROP INDEX {0};", indexName);
         }
 
+        public override string Generate(DeleteTableExpression expression)
+        {
+            return
+                $"DROP TABLE{(expression.IfExists ? " IF EXISTS" : "")} {Quoter.QuoteTableName(expression.TableName, expression.SchemaName)};";
+        }
+
         public override string Generate(RenameTableExpression expression)
         {
             return string.Format("ALTER TABLE {0} RENAME TO {1};", Quoter.QuoteTableName(expression.OldName, expression.SchemaName), Quoter.Quote(expression.NewName));
@@ -218,7 +480,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
         public override string Generate(RenameColumnExpression expression)
         {
             return string.Format(
-                "ALTER TABLE {0} RENAME COLUMN {1} TO {2};",
+                RenameColumn,
                 Quoter.QuoteTableName(expression.TableName, expression.SchemaName),
                 Quoter.QuoteColumnName(expression.OldName),
                 Quoter.QuoteColumnName(expression.NewName));
@@ -239,7 +501,11 @@ namespace FluentMigrator.Runner.Generators.Postgres
 
                 var columns = GetColumnList(columnNames);
                 var data = GetDataList(columnData);
-                result.AppendFormat("INSERT INTO {0} ({1}) VALUES ({2});", Quoter.QuoteTableName(expression.TableName, expression.SchemaName), columns, data);
+                result.AppendFormat("INSERT INTO {0} ({1}){3} VALUES ({2});",
+                    Quoter.QuoteTableName(expression.TableName, expression.SchemaName),
+                    columns,
+                    data,
+                    GetOverridingIdentityValuesString(expression));
             }
             return result.ToString();
         }
@@ -403,7 +669,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
             {
                 if (seq.Cache.Value < MINIMUM_CACHE_VALUE)
                 {
-                    return CompatibilityMode.HandleCompatibilty("Cache size must be greater than 1; if you intended to disable caching, set Cache to null.");
+                    return CompatibilityMode.HandleCompatibility("Cache size must be greater than 1; if you intended to disable caching, set Cache to null.");
                 }
                 result.AppendFormat(" CACHE {0}", seq.Cache);
             }
@@ -423,6 +689,16 @@ namespace FluentMigrator.Runner.Generators.Postgres
         public override string Generate(DeleteSequenceExpression expression)
         {
             return string.Format("{0};", base.Generate(expression));
+        }
+
+        protected virtual string GetOverridingIdentityValuesString(InsertDataExpression expression)
+        {
+            if (!expression.AdditionalFeatures.ContainsKey(PostgresExtensions.OverridingIdentityValues))
+            {
+                return string.Empty;
+            }
+
+            throw new NotSupportedException("The current version doesn't support OVERRIDING {SYSTEM|USER} VALUE. Please use Postgres 10+.");
         }
     }
 }

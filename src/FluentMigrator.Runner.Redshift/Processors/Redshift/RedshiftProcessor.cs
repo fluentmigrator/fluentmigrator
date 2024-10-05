@@ -37,15 +37,9 @@ namespace FluentMigrator.Runner.Processors.Redshift
     {
         private readonly RedshiftQuoter _quoter = new RedshiftQuoter();
 
-        public override string DatabaseType => "Redshift";
+        public override string DatabaseType => ProcessorId.Redshift;
 
         public override IList<string> DatabaseTypeAliases { get; } = new List<string>();
-
-        [Obsolete]
-        public RedshiftProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
-            : base(connection, factory, generator, announcer, options)
-        {
-        }
 
         public RedshiftProcessor(
             [NotNull] RedshiftDbFactory factory,
@@ -138,11 +132,7 @@ namespace FluentMigrator.Runner.Processors.Redshift
                 {
                     using (var message = new StringWriter())
                     {
-                        message.WriteLine("An error occurred executing the following sql:");
-                        message.WriteLine(sql);
-                        message.WriteLine("The error was {0}", ex.Message);
-
-                        throw new Exception(message.ToString(), ex);
+                        ReThrowWithSql(ex, sql);
                     }
                 }
             }

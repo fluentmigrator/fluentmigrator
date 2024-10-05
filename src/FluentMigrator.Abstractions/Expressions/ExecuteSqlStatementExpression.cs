@@ -1,6 +1,6 @@
 #region License
 //
-// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ namespace FluentMigrator.Expressions
     /// <summary>
     /// Expression to execute an SQL statement
     /// </summary>
-    public class ExecuteSqlStatementExpression : MigrationExpressionBase
+    public class ExecuteSqlStatementExpression : ExecuteSqlScriptExpressionBase
     {
         /// <summary>
         /// Gets or sets the SQL statement to be executed
@@ -33,16 +33,22 @@ namespace FluentMigrator.Expressions
         [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.SqlStatementCannotBeNullOrEmpty))]
         public virtual string SqlStatement { get; set; }
 
+        /// <summary>
+        /// Gets or sets the description for this SQL statement
+        /// </summary>
+        public virtual string Description { get; set; }
+
         /// <inheritdoc />
         public override void ExecuteWith(IMigrationProcessor processor)
         {
-            processor.Execute(SqlStatement);
+            var finalSqlScript = SqlScriptTokenReplacer.ReplaceSqlScriptTokens(SqlStatement, Parameters);
+            processor.Execute(finalSqlScript);
         }
 
         /// <inheritdoc />
         public override string ToString()
         {
-            return base.ToString() + SqlStatement;
+            return base.ToString() + (Description ?? SqlStatement);
         }
     }
 }

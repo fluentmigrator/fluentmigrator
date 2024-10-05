@@ -29,7 +29,7 @@ namespace FluentMigrator.Builders
     /// </summary>
     /// <remarks>
     /// This is a support class for the migrator framework and is not intended for external use.
-    /// TODO: make this internal, and the change assmebly info so InternalsVisibleTo is set for the test assemblies.
+    /// TODO: make this internal, and the change assembly info so InternalsVisibleTo is set for the test assemblies.
     /// </remarks>
     public class ColumnExpressionBuilderHelper
     {

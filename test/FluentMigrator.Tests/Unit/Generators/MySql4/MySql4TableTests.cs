@@ -1,5 +1,6 @@
 using System;
 
+using FluentMigrator.Runner;
 using FluentMigrator.Runner.Generators.MySql;
 
 using NUnit.Framework;
@@ -9,6 +10,8 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Generators.MySql4
 {
     [TestFixture]
+    [Category("Table")]
+    [Category("MySql4")]
     public class MySql4TableTests : BaseTableTests
     {
         protected MySql4Generator Generator;
@@ -135,10 +138,11 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
         }
 
         [Test]
-        public override void CanCreateTableWithMultiColumnPrimaryKeyWithDefaultSchema()
+        public override void CanCreateTableWithMultiColumnPrimaryKeyWithDefaultSchema([Values] CompatibilityMode compatibilityMode)
         {
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumnPrimaryKeyExpression();
 
+            Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
             result.ShouldBe("CREATE TABLE `TestTable1` (`TestColumn1` VARCHAR(255) NOT NULL, `TestColumn2` INTEGER NOT NULL, PRIMARY KEY (`TestColumn1`, `TestColumn2`)) ENGINE = INNODB");
         }
@@ -241,6 +245,15 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
         }
 
         [Test]
+        public override void CanDropTableIfExistsWithDefaultSchema()
+        {
+            var expression = GeneratorTestHelper.GetDeleteTableIfExistsExpression();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("DROP TABLE IF EXISTS `TestTable1`");
+        }
+
+        [Test]
         public override void CanRenameTableWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetRenameTableExpression();
@@ -272,9 +285,20 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
             var expression = GeneratorTestHelper.GetCreateTableWithTableDescriptionAndColumnDescriptions();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE `TestTable1` (`TestColumn1` VARCHAR(255) COMMENT 'TestColumn1Description', `TestColumn2` INTEGER NOT NULL COMMENT 'TestColumn2Description') COMMENT 'TestDescription' ENGINE = INNODB");
+            result.ShouldBe("CREATE TABLE `TestTable1` (`TestColumn1` VARCHAR(255) COMMENT 'Description:TestColumn1Description', `TestColumn2` INTEGER NOT NULL COMMENT 'Description:TestColumn2Description') COMMENT 'TestDescription' ENGINE = INNODB");
         }
 
+        [Test]
+        public void CanCreateTableWithDescriptionAndColumnDescriptionsWithAdditionalDescriptions()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableWithTableDescriptionAndColumnDescriptionsAndAdditionalDescriptions();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE `TestTable1` (`TestColumn1` VARCHAR(255) COMMENT 'Description:TestColumn1Description" + Environment.NewLine +
+                            "AdditionalColumnDescriptionKey1:AdditionalColumnDescriptionValue1', `TestColumn2` INTEGER NOT NULL COMMENT 'Description:TestColumn2Description" + Environment.NewLine +
+                            "AdditionalColumnDescriptionKey2:AdditionalColumnDescriptionValue2') COMMENT 'TestDescription' ENGINE = INNODB");
+        }
+        
         [Test]
         public void CanAlterTableWithDescription()
         {

@@ -27,6 +27,8 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Expressions
 {
     [TestFixture]
+    [Category("Expression")]
+    [Category("DeleteSchema")]
     public class DeleteSchemaExpressionTests
     {
         [Test]
@@ -44,7 +46,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             var expression = new DeleteSchemaExpression { SchemaName = "schema1" };
 
             var errors = ValidationHelper.CollectErrors(expression);
-            Assert.That(errors.Count, Is.EqualTo(0));
+            Assert.That(errors, Is.Empty);
         }
     }
 }

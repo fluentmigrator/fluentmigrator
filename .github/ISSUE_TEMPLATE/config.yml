@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Bug Report
+    url: https://github.com/fluentmigrator/fluentmigrator/issues/new?template=bug_report.md
+    about: Report a bug using the FluentMigrator support form
+  - name: Feature Request (GitHub Discussion Beta)
+    url: https://github.com/fluentmigrator/fluentmigrator/discussions/new
+    about: Share ideas for new features
+  - name: Ask a Question (GitHub Discussion Beta)
+    url: https://github.com/fluentmigrator/fluentmigrator/discussions/new?discussions_q=category%3AHelp
+    about: Ask the community for help

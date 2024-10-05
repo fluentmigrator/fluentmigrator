@@ -16,6 +16,8 @@
 //
 #endregion
 
+using FluentMigrator.Runner;
+
 using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Unit.Generators
@@ -35,7 +37,7 @@ namespace FluentMigrator.Tests.Unit.Generators
         public abstract void CanCreateTableWithIdentityWithCustomSchema();
         public abstract void CanCreateTableWithIdentityWithDefaultSchema();
         public abstract void CanCreateTableWithMultiColumnPrimaryKeyWithCustomSchema();
-        public abstract void CanCreateTableWithMultiColumnPrimaryKeyWithDefaultSchema();
+        public abstract void CanCreateTableWithMultiColumnPrimaryKeyWithDefaultSchema(CompatibilityMode compatibilityMode);
         public abstract void CanCreateTableWithNamedMultiColumnPrimaryKeyWithCustomSchema();
         public abstract void CanCreateTableWithNamedMultiColumnPrimaryKeyWithDefaultSchema();
         public abstract void CanCreateTableWithNamedPrimaryKeyWithCustomSchema();
@@ -46,6 +48,7 @@ namespace FluentMigrator.Tests.Unit.Generators
         public abstract void CanCreateTableWithPrimaryKeyWithDefaultSchema();
         public abstract void CanDropTableWithCustomSchema();
         public abstract void CanDropTableWithDefaultSchema();
+        public abstract void CanDropTableIfExistsWithDefaultSchema();
         public abstract void CanRenameTableWithCustomSchema();
         public abstract void CanRenameTableWithDefaultSchema();
     }

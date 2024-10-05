@@ -1,6 +1,6 @@
 #region License
 
-// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Loggers
 {
     [TestFixture]
+    [Category("Logger")]
     public class TextWriterAnnouncerTests
     {
         private ILoggerFactory _loggerFactory;
@@ -51,6 +52,13 @@ namespace FluentMigrator.Tests.Unit.Loggers
             _loggerFactory = new LoggerFactory();
             _loggerFactory.AddProvider(new SqlScriptFluentMigratorLoggerProvider(_stringWriter, _options));
             _logger = _loggerFactory.CreateLogger("Test");
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            _loggerFactory?.Dispose();
+            _stringWriter?.Dispose();
         }
 
         [Test]

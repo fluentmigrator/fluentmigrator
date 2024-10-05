@@ -1,5 +1,5 @@
 #region License
-// Copyright (c) 2019, FluentMigrator Project
+// Copyright (c) 2019, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
             var conventionSet = services.GetRequiredService<IConventionSet>();
             ISchemaExpression expr = new CreateTableExpression();
             conventionSet.SchemaConvention.Apply(expr);
-            Assert.AreEqual("custom-schema", expr.SchemaName);
+            Assert.That(expr.SchemaName, Is.EqualTo("custom-schema"));
         }
 
         [Test]
@@ -51,7 +51,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
             var conventionSet = services.GetRequiredService<IConventionSet>();
             ISchemaExpression expr = new CreateTableExpression();
             conventionSet.SchemaConvention.Apply(expr);
-            Assert.AreEqual("custom-schema", expr.SchemaName);
+            Assert.That(expr.SchemaName, Is.EqualTo("custom-schema"));
         }
 
         [Test]
@@ -64,7 +64,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
             var conventionSet = services.GetRequiredService<IConventionSet>();
             ISchemaExpression expr = new CreateTableExpression();
             conventionSet.SchemaConvention.Apply(expr);
-            Assert.AreEqual(null, expr.SchemaName);
+            Assert.That(expr.SchemaName, Is.EqualTo(null));
         }
 
         [Test]
@@ -93,7 +93,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
 
             var conventionSets = serviceProvider.GetServices<IConventionSet>();
 
-            Assert.AreEqual(1, conventionSets.Count());
+            Assert.That(conventionSets.Count(), Is.EqualTo(1));
         }
 
         [Test]
@@ -123,7 +123,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
             ISchemaExpression expr = new CreateTableExpression();
             conventionSet.SchemaConvention.Apply(expr);
 
-            Assert.AreEqual(schemaName, expr.SchemaName);
+            Assert.That(expr.SchemaName, Is.EqualTo(schemaName));
         }
 
         [Test]
@@ -153,7 +153,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
             ISchemaExpression expr = new CreateTableExpression();
             conventionSet.SchemaConvention.Apply(expr);
 
-            Assert.AreEqual(schemaName, expr.SchemaName);
+            Assert.That(expr.SchemaName, Is.EqualTo(schemaName));
         }
 
         // ReSharper disable once UnusedMember.Global

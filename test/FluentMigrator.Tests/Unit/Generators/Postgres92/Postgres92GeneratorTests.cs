@@ -37,7 +37,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres92
         protected PostgresGenerator Generator;
 
         [SetUp]
-        public void Setup()
+        public virtual void Setup()
         {
             var quoter = new PostgresQuoter(new PostgresOptions());
             Generator = new Postgres92Generator(quoter, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()));

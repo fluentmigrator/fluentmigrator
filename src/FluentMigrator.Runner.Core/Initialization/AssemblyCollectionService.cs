@@ -1,5 +1,5 @@
 #region License
-// Copyright (c) 2018, FluentMigrator Project
+// Copyright (c) 2018, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ namespace FluentMigrator.Runner.Initialization
 
         private readonly Lazy<Type[]> _exportedTypes;
 
-        private readonly Lazy<ManifestResourceNameWithAssembly[]> _ressourceEntries;
+        private readonly Lazy<ManifestResourceNameWithAssembly[]> _resourceEntries;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AssemblyCollectionService"/> class.
@@ -44,7 +44,7 @@ namespace FluentMigrator.Runner.Initialization
         {
             _lazyAssemblies = new Lazy<Assembly[]>(() => source.Assemblies.ToArray());
             _exportedTypes = new Lazy<Type[]>(() => _lazyAssemblies.Value.SelectMany(a => a.GetExportedTypes()).ToArray());
-            _ressourceEntries = new Lazy<ManifestResourceNameWithAssembly[]>(
+            _resourceEntries = new Lazy<ManifestResourceNameWithAssembly[]>(
                 () => _lazyAssemblies.Value.SelectMany(a => a.GetManifestResourceNames(), (asm, name) => new ManifestResourceNameWithAssembly(name, asm)).ToArray());
         }
 
@@ -55,6 +55,6 @@ namespace FluentMigrator.Runner.Initialization
         public Type[] GetExportedTypes() => _exportedTypes.Value;
 
         /// <inheritdoc />
-        public ManifestResourceNameWithAssembly[] GetManifestResourceNames() => _ressourceEntries.Value;
+        public ManifestResourceNameWithAssembly[] GetManifestResourceNames() => _resourceEntries.Value;
     }
 }

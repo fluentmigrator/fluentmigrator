@@ -1,6 +1,6 @@
 #region License
 //
-// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 using FluentMigrator.Oracle;
+using FluentMigrator.Postgres;
 using FluentMigrator.SqlServer;
 
 using Moq;
@@ -37,6 +38,8 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Builders.Create
 {
     [TestFixture]
+    [Category("Builder")]
+    [Category("CreateColumn")]
     public class CreateColumnExpressionBuilderTests
     {
         [Test]
@@ -285,6 +288,46 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
         {
             VerifyColumnProperty(c => c.Type = null, b => b.AsCustom("Test"));
             VerifyColumnProperty(c => c.CustomType = "Test", b => b.AsCustom("Test"));
+        }
+
+        [Test]
+        public void CallingAsColumnDataTypeWithNonNullCustomTypeSetsTypeToNullAndSetsCustomType()
+        {
+            VerifyColumnProperty(c => c.Type = null, b => b.AsColumnDataType(new ColumnDataType { CustomType = "Test" }));
+            VerifyColumnProperty(c => c.CustomType = "Test", b => b.AsColumnDataType(new ColumnDataType { CustomType = "Test" }));
+        }
+
+        [Test]
+        public void CallingAsColumnDataTypeSetsOnlyProvidedValue()
+        {
+            // Only provide Type
+            Action<CreateColumnExpressionBuilder> provideType = b => b.AsColumnDataType(new ColumnDataType { Type = DbType.Boolean });
+            VerifyColumnProperty(c => c.CustomType = null, provideType);
+            VerifyColumnProperty(c => c.Type = DbType.Boolean, provideType);
+            VerifyColumnProperty(c => c.CollationName = null, provideType);
+            VerifyColumnProperty(c => c.Size = null, provideType);
+            VerifyColumnProperty(c => c.Precision = null, provideType);
+            // Provide type and size
+            Action<CreateColumnExpressionBuilder> provideTypeSize = b => b.AsColumnDataType(new ColumnDataType { Type = DbType.String, Size = 50 });
+            VerifyColumnProperty(c => c.CustomType = null, provideTypeSize);
+            VerifyColumnProperty(c => c.Type = DbType.String, provideTypeSize);
+            VerifyColumnProperty(c => c.CollationName = null, provideTypeSize);
+            VerifyColumnProperty(c => c.Size = 50, provideTypeSize);
+            VerifyColumnProperty(c => c.Precision = null, provideTypeSize);
+            // Provide type and size with collation
+            Action<CreateColumnExpressionBuilder> provideTypeSizeCollation = b => b.AsColumnDataType(new ColumnDataType { Type = DbType.AnsiString, Size = 50, CollationName = "test" });
+            VerifyColumnProperty(c => c.CustomType = null, provideTypeSizeCollation);
+            VerifyColumnProperty(c => c.Type = DbType.AnsiString, provideTypeSizeCollation);
+            VerifyColumnProperty(c => c.CollationName = "test", provideTypeSizeCollation);
+            VerifyColumnProperty(c => c.Size = 50, provideTypeSizeCollation);
+            VerifyColumnProperty(c => c.Precision = null, provideTypeSizeCollation);
+            // Provide type and size/precision
+            Action<CreateColumnExpressionBuilder> provideTypeSizePrecision = b => b.AsColumnDataType(new ColumnDataType { Type = DbType.Decimal, Size = 28, Precision = 10 });
+            VerifyColumnProperty(c => c.CustomType = null, provideTypeSizePrecision);
+            VerifyColumnProperty(c => c.Type = DbType.Decimal, provideTypeSizePrecision);
+            VerifyColumnProperty(c => c.CollationName = null, provideTypeSizePrecision);
+            VerifyColumnProperty(c => c.Size = 28, provideTypeSizePrecision);
+            VerifyColumnProperty(c => c.Precision = 10, provideTypeSizePrecision);
         }
 
         [Test]
@@ -609,8 +652,11 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
         {
             var builder = new CreateColumnExpressionBuilder(null, null) {CurrentForeignKey = new ForeignKeyDefinition()};
             builder.OnUpdate(rule);
-            Assert.That(builder.CurrentForeignKey.OnUpdate, Is.EqualTo(rule));
-            Assert.That(builder.CurrentForeignKey.OnDelete, Is.EqualTo(Rule.None));
+            Assert.Multiple(() =>
+            {
+                Assert.That(builder.CurrentForeignKey.OnUpdate, Is.EqualTo(rule));
+                Assert.That(builder.CurrentForeignKey.OnDelete, Is.EqualTo(Rule.None));
+            });
         }
 
         [TestCase(Rule.Cascade), TestCase(Rule.SetDefault), TestCase(Rule.SetNull), TestCase(Rule.None)]
@@ -618,8 +664,11 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
         {
             var builder = new CreateColumnExpressionBuilder(null, null) { CurrentForeignKey = new ForeignKeyDefinition() };
             builder.OnDelete(rule);
-            Assert.That(builder.CurrentForeignKey.OnUpdate, Is.EqualTo(Rule.None));
-            Assert.That(builder.CurrentForeignKey.OnDelete, Is.EqualTo(rule));
+            Assert.Multiple(() =>
+            {
+                Assert.That(builder.CurrentForeignKey.OnUpdate, Is.EqualTo(Rule.None));
+                Assert.That(builder.CurrentForeignKey.OnDelete, Is.EqualTo(rule));
+            });
         }
 
         [TestCase(Rule.Cascade), TestCase(Rule.SetDefault), TestCase(Rule.SetNull), TestCase(Rule.None)]
@@ -627,8 +676,29 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
         {
             var builder = new CreateColumnExpressionBuilder(null, null) { CurrentForeignKey = new ForeignKeyDefinition() };
             builder.OnDeleteOrUpdate(rule);
-            Assert.That(builder.CurrentForeignKey.OnUpdate, Is.EqualTo(rule));
-            Assert.That(builder.CurrentForeignKey.OnDelete, Is.EqualTo(rule));
+            Assert.Multiple(() =>
+            {
+                Assert.That(builder.CurrentForeignKey.OnUpdate, Is.EqualTo(rule));
+                Assert.That(builder.CurrentForeignKey.OnDelete, Is.EqualTo(rule));
+            });
+        }
+
+        [Test]
+        public void CallingPostgresGeneratedIdentitySetsAdditionalProperties()
+        {
+            var contextMock = new Mock<IMigrationContext>();
+
+            var columnMock = new Mock<ColumnDefinition>();
+            columnMock.SetupGet(x => x.Name).Returns("BaconId");
+
+            var expressionMock = new Mock<CreateColumnExpression>();
+            expressionMock.SetupGet(x => x.Column).Returns(columnMock.Object);
+
+            var builder = new CreateColumnExpressionBuilder(expressionMock.Object, contextMock.Object);
+            builder.Identity(PostgresGenerationType.Always);
+
+            columnMock.Object.AdditionalFeatures.ShouldContain(
+                new KeyValuePair<string, object>(PostgresExtensions.IdentityGeneration, PostgresGenerationType.Always));
         }
 
         [Test]
@@ -639,7 +709,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 
             var builder = new CreateColumnExpressionBuilder(expressionMock.Object, contextMock.Object);
 
-            Assert.IsNotNull(builder.ColumnHelper);
+            Assert.That(builder.ColumnHelper, Is.Not.Null);
         }
 
         [Test]
@@ -653,8 +723,11 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             var builder = new CreateColumnExpressionBuilder(expressionMock.Object, contextMock.Object);
             var builderAsInterface = (IColumnExpressionBuilder)builder;
 
-            Assert.AreEqual("Fred", builderAsInterface.SchemaName);
-            Assert.AreEqual("Flinstone", builderAsInterface.TableName);
+            Assert.Multiple(() =>
+            {
+                Assert.That(builderAsInterface.SchemaName, Is.EqualTo("Fred"));
+                Assert.That(builderAsInterface.TableName, Is.EqualTo("Flinstone"));
+            });
         }
 
         [Test]
@@ -668,7 +741,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             var builder = new CreateColumnExpressionBuilder(expressionMock.Object, contextMock.Object);
             var builderAsInterface = (IColumnExpressionBuilder)builder;
 
-            Assert.AreSame(curColumn, builderAsInterface.Column);
+            Assert.That(builderAsInterface.Column, Is.SameAs(curColumn));
         }
 
         [Test]

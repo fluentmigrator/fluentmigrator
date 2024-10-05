@@ -1,6 +1,6 @@
 #region License
 //
-// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2024, Fluent Migrator Project
 // Copyright (c) 2011, Grant Archibald
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@ using System.Collections.Generic;
 namespace FluentMigrator.Builders.IfDatabase
 {
     /// <summary>
-    /// Provides a null implmentation of a procesor that does not do any work
+    /// Provides a null implementation of a processor that does not do any work
     /// </summary>
     public class NullIfDatabaseProcessor : IQuerySchema
     {

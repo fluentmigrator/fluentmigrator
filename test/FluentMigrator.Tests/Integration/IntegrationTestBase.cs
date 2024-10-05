@@ -1,6 +1,6 @@
 #region License
 //
-// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,11 +28,11 @@ using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.MySql;
 using FluentMigrator.Runner.Processors.Postgres;
+using FluentMigrator.Runner.Processors.Snowflake;
 using FluentMigrator.Runner.Processors.SQLite;
 using FluentMigrator.Runner.Processors.SqlServer;
 using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Runner.Initialization;
-using FluentMigrator.Runner.Processors.SqlAnywhere;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -59,11 +59,11 @@ namespace FluentMigrator.Tests.Integration
                 (typeof(SqlServer2012Processor), () => IntegrationTestOptions.SqlServer2012),
                 (typeof(SqlServer2014Processor), () => IntegrationTestOptions.SqlServer2014),
                 (typeof(SqlServer2016Processor), () => IntegrationTestOptions.SqlServer2016),
-                (typeof(SqlAnywhere16Processor), () => IntegrationTestOptions.SqlAnywhere16),
                 (typeof(SQLiteProcessor), () => IntegrationTestOptions.SQLite),
                 (typeof(FirebirdProcessor), () => IntegrationTestOptions.Firebird),
                 (typeof(PostgresProcessor), () => IntegrationTestOptions.Postgres),
                 (typeof(MySql4Processor), () => IntegrationTestOptions.MySql),
+                (typeof(SnowflakeProcessor), () => IntegrationTestOptions.Snowflake)
             };
         }
 
@@ -134,8 +134,7 @@ namespace FluentMigrator.Tests.Integration
             if (!IsAnyServerEnabled())
             {
                 Assert.Fail(
-                    "No database processors are configured to run your migration tests.  This message is provided to avoid false positives.  To avoid this message enable one or more test runners in the {0} class.",
-                    nameof(IntegrationTestOptions));
+$"No database processors are configured to run your migration tests.  This message is provided to avoid false positives.  To avoid this message enable one or more test runners in the {nameof(IntegrationTestOptions)} class.");
             }
 
             var executed = false;
@@ -184,8 +183,8 @@ namespace FluentMigrator.Tests.Integration
                         .AddFirebird()
                         .AddMySql4()
                         .AddPostgres()
+                        .AddSnowflake()
                         .AddSQLite()
-                        .AddSqlAnywhere16()
                         .AddSqlServer2005()
                         .AddSqlServer2008()
                         .AddSqlServer2012()
@@ -218,10 +217,12 @@ namespace FluentMigrator.Tests.Integration
             var serviceProvider = services
                 .BuildServiceProvider(true);
 
+
+
             if (processorType == typeof(FirebirdProcessor) && _isFirstExecuteForFirebird)
             {
                 _isFirstExecuteForFirebird = false;
-                FbConnection.CreateDatabase(serverOptions.ConnectionString, true);
+                FbConnection.CreateDatabase(serverOptions.ConnectionString, overwrite: true);
             }
 
             using (serviceProvider)
@@ -252,7 +253,7 @@ namespace FluentMigrator.Tests.Integration
 
         protected static bool LogException(Exception exception)
         {
-            TestContext.WriteLine(exception);
+            TestContext.Out.WriteLine(exception);
             return false;
         }
     }

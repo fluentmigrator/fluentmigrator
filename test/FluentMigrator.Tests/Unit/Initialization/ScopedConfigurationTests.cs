@@ -44,7 +44,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
         {
             var config = new ConfigurationBuilder()
                 .AddInMemoryCollection(
-                    new Dictionary<string, string>()
+                    new Dictionary<string, string>
                     {
                         ["ProcessorOptions:ConnectionString"] = "Data Source=:memory:"
                     })
@@ -58,7 +58,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
                 using (var scope = serviceProvider.CreateScope())
                 {
                     var accessor = scope.ServiceProvider.GetRequiredService<IConnectionStringAccessor>();
-                    Assert.AreEqual("Data Source=:memory:", accessor.ConnectionString);
+                    Assert.That(accessor.ConnectionString, Is.EqualTo("Data Source=:memory:"));
                 }
             }
         }
@@ -99,7 +99,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
                     using (var scope = serviceProvider.CreateScope())
                     {
                         var accessor = scope.ServiceProvider.GetRequiredService<IConnectionStringAccessor>();
-                        Assert.AreEqual("Data Source=:memory:", accessor.ConnectionString);
+                        Assert.That(accessor.ConnectionString, Is.EqualTo("Data Source=:memory:"));
                     }
 
                     EnsureReloadedConfiguration(config,
@@ -112,7 +112,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
                     using (var scope = serviceProvider.CreateScope())
                     {
                         var accessor = scope.ServiceProvider.GetRequiredService<IConnectionStringAccessor>();
-                        Assert.AreEqual("Data Source=test.db", accessor.ConnectionString);
+                        Assert.That(accessor.ConnectionString, Is.EqualTo("Data Source=test.db"));
                     }
                 }
             }
@@ -163,7 +163,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
                     using (var scope = serviceProvider.CreateScope())
                     {
                         var accessor = scope.ServiceProvider.GetRequiredService<IConnectionStringAccessor>();
-                        Assert.AreEqual("Data Source=:memory:", accessor.ConnectionString);
+                        Assert.That(accessor.ConnectionString, Is.EqualTo("Data Source=:memory:"));
                     }
                 }
             }
@@ -214,7 +214,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
                     using (var scope = serviceProvider.CreateScope())
                     {
                         var accessor = scope.ServiceProvider.GetRequiredService<IConnectionStringAccessor>();
-                        Assert.AreEqual("Data Source=:memory:", accessor.ConnectionString);
+                        Assert.That(accessor.ConnectionString, Is.EqualTo("Data Source=:memory:"));
                     }
 
                     EnsureReloadedConfiguration(config,
@@ -227,7 +227,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
                     using (var scope = serviceProvider.CreateScope())
                     {
                         var accessor = scope.ServiceProvider.GetRequiredService<IConnectionStringAccessor>();
-                        Assert.AreEqual("Data Source=test.db", accessor.ConnectionString);
+                        Assert.That(accessor.ConnectionString, Is.EqualTo("Data Source=test.db"));
                     }
                 }
             }
@@ -246,14 +246,14 @@ namespace FluentMigrator.Tests.Unit.Initialization
             {
                 var customConfig = new CustomConfig()
                 {
-                    ProcessorSelectorOptions = new SelectingProcessorAccessorOptions()
+                    ProcessorSelectorOptions = new SelectingProcessorAccessorOptions
                     {
                         ProcessorId = "SQLite",
                     },
-                    ConnectionStrings = new Dictionary<string, string>()
+                    ConnectionStrings = new Dictionary<string, string>
                     {
                         ["SQLite"] = "Data Source=:memory:",
-                        ["SQLAnywhere16"] = "Data Source=test.db",
+                        ["SQLServer"] = "Data Source=test.db",
                     }
                 };
 
@@ -280,20 +280,20 @@ namespace FluentMigrator.Tests.Unit.Initialization
                     using (var scope = serviceProvider.CreateScope())
                     {
                         var accessor = scope.ServiceProvider.GetRequiredService<IConnectionStringAccessor>();
-                        Assert.AreEqual("Data Source=:memory:", accessor.ConnectionString);
+                        Assert.That(accessor.ConnectionString, Is.EqualTo("Data Source=:memory:"));
                     }
 
                     EnsureReloadedConfiguration(config,
                         () =>
                         {
-                            customConfig.ProcessorSelectorOptions.ProcessorId = "SqlAnywhere16";
+                            customConfig.ProcessorSelectorOptions.ProcessorId = "SQLServer";
                             SaveConfigFile(jsonFileName, customConfig);
                         });
 
                     using (var scope = serviceProvider.CreateScope())
                     {
                         var accessor = scope.ServiceProvider.GetRequiredService<IConnectionStringAccessor>();
-                        Assert.AreEqual("Data Source=test.db", accessor.ConnectionString);
+                        Assert.That(accessor.ConnectionString, Is.EqualTo("Data Source=test.db"));
                     }
                 }
             }
@@ -315,14 +315,14 @@ namespace FluentMigrator.Tests.Unit.Initialization
                 {
                     var source = scope.ServiceProvider.GetRequiredService<IFilteringMigrationSource>();
                     var migrations = source.GetMigrations(t => t == typeof(MigrationWithScopedService)).ToList();
-                    Assert.AreEqual(1, migrations.Count);
+                    Assert.That(migrations, Has.Count.EqualTo(1));
                 }
             }
         }
 
         private static void SaveConfigFile(string jsonFileName, CustomConfig config)
         {
-            var serializer = new JsonSerializer()
+            var serializer = new JsonSerializer
             {
                 NullValueHandling = NullValueHandling.Ignore,
             };

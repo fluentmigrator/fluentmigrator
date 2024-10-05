@@ -17,8 +17,11 @@
 #endregion
 
 using System;
+using System.Data;
 using System.Linq;
 
+using FluentMigrator.Expressions;
+using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Postgres;
 using FluentMigrator.Runner.Processors.Postgres;
 
@@ -29,15 +32,14 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Generators.Postgres
 {
     [TestFixture]
-    public class PostgresColumnTests : BaseColumnTests
+    [Category("Generator")]
+    [Category("Postgres")]
+    public class PostgresColumnTests : PostgresBaseColumnTests<PostgresGenerator>
     {
-        protected PostgresGenerator Generator;
-
-        [SetUp]
-        public void Setup()
+        protected override PostgresGenerator ConstructGenerator()
         {
             var quoter = new PostgresQuoter(new PostgresOptions());
-            Generator = new PostgresGenerator(quoter);
+            return new PostgresGenerator(quoter);
         }
 
         [Test]
@@ -155,6 +157,55 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
 
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE \"public\".\"TestTable1\" ADD \"TestColumn1\" decimal(19,2) NOT NULL;");
+        }
+
+        [Test]
+        public override void CanCreateTableWithIdentityWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" serial NOT NULL, \"TestColumn2\" integer NOT NULL);");
+        }
+
+        [Test]
+        public override void CanCreateTableWithIdentityWithDefaultSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE \"public\".\"TestTable1\" (\"TestColumn1\" serial NOT NULL, \"TestColumn2\" integer NOT NULL);");
+        }
+
+        [Test]
+        public override void CanCreateColumnWithAutoIncrementAndCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetAlterTableAutoIncrementColumnExpression();
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ADD \"TestColumn1\" serial NOT NULL;");
+        }
+
+        [Test]
+        public override void CanCreateColumnWithAutoIncrementAndDefaultSchema()
+        {
+            var expression = GeneratorTestHelper.GetAlterTableAutoIncrementColumnExpression();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE \"public\".\"TestTable1\" ADD \"TestColumn1\" serial NOT NULL;");
+        }
+
+        [Test]
+        public void CanCreateJsonColumnWithDefaultSchema()
+        {
+            var column = new ColumnDefinition { Name = "TestColumn1", DefaultValue = "{}", CustomType = "json"};
+            var expression =  new CreateColumnExpression { TableName = "TestTable1", Column = column };
+
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE \"public\".\"TestTable1\" ADD \"TestColumn1\" json NOT NULL DEFAULT '{}';");
         }
 
         [Test]

@@ -1,15 +1,38 @@
-﻿using System.Linq;
+#region License
+//
+// Copyright (c) 2018, Fluent Migrator Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+#endregion
+
+using System;
+using System.Linq;
 using NUnit.Framework;
 
 using FluentMigrator.Expressions;
 using Moq;
 using FluentMigrator.Builders.Delete;
+using FluentMigrator.Validation;
 
 using Shouldly;
+using System.Globalization;
 
 namespace FluentMigrator.Tests.Unit.Builders.Delete
 {
     [TestFixture]
+    [Category("Builder")]
+    [Category("DeleteData")]
     public class DeleteDataExpressionTests
     {
 
@@ -75,7 +98,6 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
         {
             var expressionMock = new Mock<DeleteDataExpression>();
 
-
             var builder = new DeleteDataExpressionBuilder(expressionMock.Object);
             builder.IsNull("TestColumn");
 
@@ -84,6 +106,26 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
             rowobject.Key.ShouldBe("TestColumn");
             rowobject.Value.ShouldBeNull();
 
+        }
+
+        [Test]
+        [SetUICulture("")] // Ensure validation messages are in English
+        public void DefaultMigrationExpressionValidatorShouldReturnErrorWhenTableNameIsNotSpecified()
+        {
+            var mockServiceProvider = new Mock<IServiceProvider>();
+            var validator = new DefaultMigrationExpressionValidator(mockServiceProvider.Object);
+            var expressionMock = new Mock<DeleteDataExpression>();
+
+            var builder = new DeleteDataExpressionBuilder(expressionMock.Object);
+            builder.IsNull("TestColumn");
+
+            var result = expressionMock.Object;
+
+            var validationResults = validator.Validate(result).ToList();
+
+            validationResults.ShouldNotBeNull();
+            validationResults.Count.ShouldBeGreaterThan(0);
+            validationResults.ShouldContain(r => string.Equals(r.ErrorMessage, "The TableName field is required.", StringComparison.Ordinal));
         }
     }
 }

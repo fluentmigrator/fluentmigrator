@@ -29,6 +29,8 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Expressions
 {
     [TestFixture]
+    [Category("Expression")]
+    [Category("CreateConstraint")]
     public class CreateConstraintExpressionTests
     {
         [Test]
@@ -75,7 +77,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             expression.Constraint.Columns.Add("column1");
 
             var errors = ValidationHelper.CollectErrors(expression);
-            Assert.That(errors.Count, Is.EqualTo(0));
+            Assert.That(errors, Is.Empty);
         }
 
         [Test]

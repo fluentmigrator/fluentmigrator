@@ -24,7 +24,7 @@ using System.Reflection;
 namespace FluentMigrator.Runner.Initialization
 {
     /// <summary>
-    /// Implementation of <see cref="IMigrationSourceItem"/> that accepts a collection of assemnblies
+    /// Implementation of <see cref="IMigrationSourceItem"/> that accepts a collection of assemblies
     /// </summary>
     public class AssemblyMigrationSourceItem : IMigrationSourceItem
     {
@@ -33,7 +33,7 @@ namespace FluentMigrator.Runner.Initialization
         /// <summary>
         /// Initializes a new instance of the <see cref="AssemblyMigrationSourceItem"/> class.
         /// </summary>
-        /// <param name="assemblies">The assemblies to get the canididate types from</param>
+        /// <param name="assemblies">The assemblies to get the candidate types from</param>
         public AssemblyMigrationSourceItem(IReadOnlyCollection<Assembly> assemblies)
         {
             _assemblies = assemblies;

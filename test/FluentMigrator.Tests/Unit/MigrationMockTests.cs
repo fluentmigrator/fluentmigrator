@@ -1,5 +1,5 @@
 #region License
-// Copyright (c) 2019, FluentMigrator Project
+// Copyright (c) 2019, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ namespace FluentMigrator.Tests.Unit
 
             var sut = new TestMigration();
             var exception = Assert.Throws<InvalidOperationException>(() => sut.GetUpExpressions(contextMock.Object));
-            Assert.AreEqual("Something went wrong!", exception.Message);
+            Assert.That(exception.Message, Is.EqualTo("Something went wrong!"));
         }
 
         private class TestMigration : ForwardOnlyMigration

@@ -1,5 +1,5 @@
 #region License
-// Copyright (c) 2018, FluentMigrator Project
+// Copyright (c) 2018, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,11 +29,11 @@ namespace FluentMigrator.Expressions
     public abstract class ExecuteEmbeddedSqlScriptExpressionBase : ExecuteSqlScriptExpressionBase
     {
         /// <summary>
-        /// Gets the fully qualified ressource name and assembly
+        /// Gets the fully qualified resource name and assembly
         /// </summary>
         /// <param name="resourceNames">The resource names where the <paramref name="sqlScriptNames"/> should be found</param>
-        /// <param name="sqlScriptNames">The names of the SQL script ressources to be found</param>
-        /// <returns>the fully qualified ressource name and assembly</returns>
+        /// <param name="sqlScriptNames">The names of the SQL script resources to be found</param>
+        /// <returns>the fully qualified resource name and assembly</returns>
         protected static (string name, Assembly assembly) GetQualifiedResourcePath(
             [NotNull] IReadOnlyCollection<(string name, Assembly assembly)> resourceNames,
             [NotNull, ItemNotNull] params string[] sqlScriptNames)
@@ -45,12 +45,12 @@ namespace FluentMigrator.Expressions
                 if (foundResources.Count > 1)
                 {
                     var foundAssemblyNames = foundResources.Select(x => x.assembly.FullName).Distinct();
-                    var ressourceNames = foundResources.Select(x => x.name);
+                    var foundResourceNames = foundResources.Select(x => x.name);
                     throw new InvalidOperationException(
 $@"Could not find a unique resource named {sqlScriptName} in assemblies {string.Join(", ", foundAssemblyNames)}.
 Possible candidates are:
 
-{string.Join(Environment.NewLine + "\t", ressourceNames)}
+{string.Join(Environment.NewLine + "\t", foundResourceNames)}
 ");
                 }
 
@@ -66,11 +66,11 @@ Possible candidates are:
         }
 
         /// <summary>
-        /// Finds ressources with the given name
+        /// Finds resources with the given name
         /// </summary>
         /// <param name="resourceNames">The resource names where the <paramref name="sqlScriptName"/> should be found</param>
-        /// <param name="sqlScriptName">The name of the SQL script ressource to be found</param>
-        /// <returns>The found ressources</returns>
+        /// <param name="sqlScriptName">The name of the SQL script resource to be found</param>
+        /// <returns>The found resources</returns>
         [NotNull]
         private static IReadOnlyList<(string name, Assembly assembly)> FindResourceName(
             [NotNull] IEnumerable<(string name, Assembly assembly)> resourceNames,

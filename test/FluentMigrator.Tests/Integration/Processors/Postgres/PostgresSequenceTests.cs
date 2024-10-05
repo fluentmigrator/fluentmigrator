@@ -94,6 +94,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
         public void TearDown()
         {
             ServiceScope?.Dispose();
+            Processor?.Dispose();
         }
     }
 }

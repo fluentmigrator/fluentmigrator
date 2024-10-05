@@ -1,6 +1,6 @@
 #region License
 
-// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,10 @@
 
 #endregion
 
+using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
@@ -100,6 +103,52 @@ namespace FluentMigrator.Builders.Alter.Column
         public IAlterColumnOptionSyntax WithColumnDescription(string description)
         {
             Expression.Column.ColumnDescription = description;
+            return this;
+        }
+
+        /// <inheritdoc />
+        public IAlterColumnOptionSyntax WithColumnAdditionalDescription(string descriptionName, string description)
+        {
+            if (string.IsNullOrWhiteSpace(descriptionName))
+                throw new ArgumentException("Cannot be the empty string.", "descriptionName");
+
+            if(description.Equals("Description"))
+                throw new InvalidOperationException("The given descriptionName is already used as a keyword to create a description, please choose another descriptionName.");
+
+            if (string.IsNullOrWhiteSpace(description))
+                throw new ArgumentException("Cannot be the empty string.", "description");
+
+            if (Expression.Column.AdditionalColumnDescriptions.Keys.Count(i => i.Equals(descriptionName)) > 0)
+                throw new InvalidOperationException("The given descriptionName is already present in the columnDescription list.");
+
+            Expression.Column.AdditionalColumnDescriptions.Add(descriptionName, description);
+
+            return this;
+        }
+
+        /// <inheritdoc />
+        public IAlterColumnOptionSyntax WithColumnAdditionalDescriptions(Dictionary<string, string> columnDescriptions)
+        {
+            if (columnDescriptions == null)
+                throw new ArgumentException("Cannot be null.", "columnDescriptions");
+
+            if (!columnDescriptions.Any())
+                throw new ArgumentException("Cannot be empty.", "columnDescriptions");
+
+            if (Expression.Column.AdditionalColumnDescriptions.Keys.Count(i => i.Equals("Description")) > 0)
+                throw new InvalidOperationException("The given descriptionName is already present in the columnDescription list.");
+
+            var isPresent = false;
+            foreach (var newDescription in from newDescription in columnDescriptions
+                                           where !isPresent
+                                           select newDescription)
+            {
+                isPresent = Expression.Column.AdditionalColumnDescriptions.Keys.Count(i => i.Equals(newDescription.Key)) > 0;
+            }
+
+            if(isPresent)
+                throw new ArgumentException("At least one of new keys provided is already present in the columnDescription list.", "description");
+            
             return this;
         }
 

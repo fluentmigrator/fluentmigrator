@@ -1,6 +1,6 @@
 #region License
 //
-// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,6 +29,8 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Definitions
 {
     [TestFixture]
+    [Category("Definition")]
+    [Category("ForeignKey")]
     public class ForeignKeyDefinitionTests
     {
         [Test]
@@ -140,8 +142,11 @@ namespace FluentMigrator.Tests.Unit.Definitions
 
             var processed = expr.Apply(ConventionSets.NoSchemaName);
 
-            Assert.That(processed.ForeignKey.ForeignTableSchema, Is.Null);
-            Assert.That(processed.ForeignKey.PrimaryTableSchema, Is.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(processed.ForeignKey.ForeignTableSchema, Is.Null);
+                Assert.That(processed.ForeignKey.PrimaryTableSchema, Is.Null);
+            });
         }
 
         [Test]
@@ -159,8 +164,11 @@ namespace FluentMigrator.Tests.Unit.Definitions
 
             var processed = expr.Apply(ConventionSets.WithSchemaName);
 
-            Assert.That(processed.ForeignKey.ForeignTableSchema, Is.EqualTo("testschema"));
-            Assert.That(processed.ForeignKey.PrimaryTableSchema, Is.EqualTo("testschema"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(processed.ForeignKey.ForeignTableSchema, Is.EqualTo("testschema"));
+                Assert.That(processed.ForeignKey.PrimaryTableSchema, Is.EqualTo("testschema"));
+            });
         }
 
         [Test]
@@ -176,8 +184,11 @@ namespace FluentMigrator.Tests.Unit.Definitions
 
             var processed = expr.Apply(ConventionSets.WithSchemaName);
 
-            Assert.That(processed.ForeignKey.ForeignTableSchema, Is.EqualTo("testdefault"));
-            Assert.That(processed.ForeignKey.PrimaryTableSchema, Is.EqualTo("testdefault"));
+            Assert.Multiple(() =>
+            {
+                Assert.That(processed.ForeignKey.ForeignTableSchema, Is.EqualTo("testdefault"));
+                Assert.That(processed.ForeignKey.PrimaryTableSchema, Is.EqualTo("testdefault"));
+            });
         }
     }
 }

@@ -1,5 +1,5 @@
 #region License
-// Copyright (c) 2007-2018, Sean Chambers and the FluentMigrator Project
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ namespace FluentMigrator.Runner.Generators.Base
     /// <summary>
     /// The base class for column definitions
     /// </summary>
+    [Obsolete("Use ColumnBase<TTypeMap> instead. Going forward, column models must have a db-specific type map model.")]
     public abstract class ColumnBase : IColumn
     {
         private readonly ITypeMap _typeMap;
@@ -73,19 +74,6 @@ namespace FluentMigrator.Runner.Generators.Base
         /// <param name="size">The size (or precision)</param>
         /// <param name="precision">The precision (or scale)</param>
         /// <returns>The formatted column type</returns>
-        [Obsolete]
-        protected string GetTypeMap(DbType value, int size, int precision)
-        {
-            return _typeMap.GetTypeMap(value, size, precision);
-        }
-
-        /// <summary>
-        /// Gets the formatted type from the type map
-        /// </summary>
-        /// <param name="value">The database type</param>
-        /// <param name="size">The size (or precision)</param>
-        /// <param name="precision">The precision (or scale)</param>
-        /// <returns>The formatted column type</returns>
         protected string GetTypeMap(DbType value, int? size, int? precision)
         {
             return _typeMap.GetTypeMap(value, size, precision);
@@ -94,7 +82,7 @@ namespace FluentMigrator.Runner.Generators.Base
         /// <summary>
         /// Formats the column name
         /// </summary>
-        /// <param name="column">The column defintiion</param>
+        /// <param name="column">The column definition</param>
         /// <returns>The (probably) quoted column name</returns>
         public virtual string FormatString(ColumnDefinition column)
         {
@@ -172,7 +160,7 @@ namespace FluentMigrator.Runner.Generators.Base
         /// <returns>The primary key constraint SQL fragment</returns>
         protected virtual string FormatPrimaryKey(ColumnDefinition column)
         {
-            //Most Generators allow for adding primary keys as a constrint
+            //Most Generators allow for adding primary keys as a constraint
             return string.Empty;
         }
 
@@ -299,7 +287,7 @@ namespace FluentMigrator.Runner.Generators.Base
         /// <summary>
         /// Returns a value indicating whether the primary key constraint should be added separately
         /// </summary>
-        /// <param name="primaryKeyColumns">The primary key column defintions</param>
+        /// <param name="primaryKeyColumns">The primary key column definitions</param>
         /// <returns><c>true</c> when the primary key constraint should be added separately</returns>
         public virtual bool ShouldPrimaryKeysBeAddedSeparately(IEnumerable<ColumnDefinition> primaryKeyColumns)
         {
@@ -311,7 +299,7 @@ namespace FluentMigrator.Runner.Generators.Base
         /// Creates the primary key constraint SQL fragment
         /// </summary>
         /// <param name="tableName">The table name</param>
-        /// <param name="primaryKeyColumns">The primary key column defintions</param>
+        /// <param name="primaryKeyColumns">The primary key column definitions</param>
         /// <returns>The SQL fragment</returns>
         public virtual string AddPrimaryKeyConstraint(string tableName, IEnumerable<ColumnDefinition> primaryKeyColumns)
         {

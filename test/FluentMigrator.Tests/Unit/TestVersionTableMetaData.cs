@@ -1,6 +1,6 @@
 #region License
 //
-// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,8 +15,6 @@
 // limitations under the License.
 //
 #endregion
-
-using System;
 
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.VersionTableInfo;
@@ -45,9 +43,6 @@ namespace FluentMigrator.Tests.Unit
         public TestVersionTableMetaData(IOptions<RunnerOptions> options)
             : this()
         {
-#pragma warning disable 612
-            ApplicationContext = options.Value.ApplicationContext;
-#pragma warning restore 612
         }
 
         public TestVersionTableMetaData()
@@ -55,9 +50,6 @@ namespace FluentMigrator.Tests.Unit
             SchemaName = "testSchemaName";
             OwnsSchema = true;
         }
-
-        [Obsolete("Use dependency injection to access 'application state'.")]
-        public object ApplicationContext { get; set; }
 
         public string SchemaName { get; set; }
 
@@ -68,6 +60,8 @@ namespace FluentMigrator.Tests.Unit
         public string UniqueIndexName => UNIQUE_INDEX_NAME;
 
         public string AppliedOnColumnName => APPLIED_ON_COLUMN_NAME;
+
+        public bool CreateWithPrimaryKey => false;
 
         public string DescriptionColumnName => DESCRIPTION_COLUMN_NAME;
 

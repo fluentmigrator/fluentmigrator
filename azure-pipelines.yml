@@ -7,8 +7,7 @@ trigger:
   branches:
     include:
     - release/*
-    - develop
-    - master
+    - main
   tags:
     include:
     - v1.*
@@ -29,12 +28,22 @@ variables:
 
 steps:
 - task: NuGetToolInstaller@1
-
-- task: UseGitVersion@5
-  displayName: 'UseGitVersion (preview)'
   inputs:
-    versionSpec: '5.1.3'
+    version: '6.x'
+
+- task: UseDotNet@2
+  inputs:
+    version: '8.x'
+
+- task: gitversion/setup@0
+  displayName: 'Install GitVersion (using GitTools 0.10.2.23031113 or later)'
+  inputs:
+    versionSpec: '5.12'
     includePrerelease: true
+
+- task: gitversion/execute@0
+  displayName: 'Execute GitVersion (using GitTools 0.10.2.23031113 or later)'
+  inputs:
     updateAssemblyInfo: false
   env:
       BUILD_BUILDNUMBER: $(GitVersion.NuGetVersionV2)
@@ -54,6 +63,11 @@ steps:
   inputs:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
+    diagnosticsEnabled: true
+
+- task: CmdLine@2
+  inputs:
+    script: 'nuget help'
 
 - task: CmdLine@2
   inputs:
@@ -64,7 +78,7 @@ steps:
     command: 'publish'
     publishWebProjects: false
     projects: 'src/FluentMigrator.Console/FluentMigrator.Console.csproj'
-    arguments: '-c $(buildConfiguration) -r win7-x86 -o "$(Build.ArtifactStagingDirectory)/publish/tools/net461/x86" -p:Platform=x86 -p:TargetFramework=net461 -p:Version=$(build.buildNumber)'
+    arguments: '-c $(buildConfiguration) -r win7-x86 -o "$(Build.ArtifactStagingDirectory)/publish/tools/net48/x86" -p:Platform=x86 -p:TargetFramework=net48 -p:Version=$(build.buildNumber)'
     zipAfterPublish: false
     modifyOutputPath: false
 
@@ -73,7 +87,7 @@ steps:
     command: 'publish'
     publishWebProjects: false
     projects: 'src/FluentMigrator.Console/FluentMigrator.Console.csproj'
-    arguments: '-c $(buildConfiguration) -r win7-x64 -o "$(Build.ArtifactStagingDirectory)/publish/tools/net461/x64" -p:Platform=x64 -p:TargetFramework=net461 -p:Version=$(build.buildNumber)'
+    arguments: '-c $(buildConfiguration) -r win7-x64 -o "$(Build.ArtifactStagingDirectory)/publish/tools/net48/x64" -p:Platform=x64 -p:TargetFramework=net48 -p:Version=$(build.buildNumber)'
     zipAfterPublish: false
     modifyOutputPath: false
 
@@ -82,7 +96,7 @@ steps:
     command: 'publish'
     publishWebProjects: false
     projects: 'src/FluentMigrator.Console/FluentMigrator.Console.csproj'
-    arguments: '-c $(buildConfiguration) -r any -o "$(Build.ArtifactStagingDirectory)/publish/tools/net461/any" -p:Platform=AnyCpu -p:TargetFramework=net461 -p:Version=$(build.buildNumber)'
+    arguments: '-c $(buildConfiguration) -r any -o "$(Build.ArtifactStagingDirectory)/publish/tools/net48/any" -p:Platform=AnyCpu -p:TargetFramework=net48 -p:Version=$(build.buildNumber)'
     zipAfterPublish: false
     modifyOutputPath: false
 
@@ -92,9 +106,15 @@ steps:
     Contents: '**'
     TargetFolder: '$(Build.ArtifactStagingDirectory)/publish'
 
+- task: CopyFiles@2
+  inputs:
+    SourceFolder: 'docs'
+    Contents: '**'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)/docs'
+
 - script: nuget.exe pack $(Build.ArtifactStagingDirectory)/publish/FluentMigrator.Console.nuspec -NonInteractive -OutputDirectory $(Build.ArtifactStagingDirectory) -version $(build.buildNumber)
   displayName: NuGet pack FluentMigrator.Console
-  
+
 - script: nuget.exe pack $(Build.ArtifactStagingDirectory)/publish/FluentMigrator.Tools.nuspec -NonInteractive -OutputDirectory $(Build.ArtifactStagingDirectory) -version $(build.buildNumber)
   displayName: NuGet pack FluentMigrator.Tools
 

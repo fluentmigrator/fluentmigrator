@@ -1,5 +1,5 @@
 #region License
-// Copyright (c) 2007-2018, FluentMigrator Project
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,9 +22,9 @@ namespace FluentMigrator.Runner.Generators.MySql
     {
         public new const int DecimalCapacity = 65;
 
-        protected override void SetupTypeMaps()
+        protected override void SetupMySqlTypeMaps()
         {
-            base.SetupTypeMaps();
+            base.SetupMySqlTypeMaps();
 
             SetTypeMap(DbType.Decimal, "DECIMAL($size,$precision)", DecimalCapacity);
 
@@ -39,5 +39,6 @@ namespace FluentMigrator.Runner.Generators.MySql
             SetTypeMap(DbType.String, "MEDIUMTEXT CHARACTER SET utf8", MediumTextCapacity);
             SetTypeMap(DbType.String, "LONGTEXT CHARACTER SET utf8", LongTextCapacity);
         }
+
     }
 }

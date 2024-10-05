@@ -1,6 +1,6 @@
 #region License
 //
-// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -182,12 +182,6 @@ namespace FluentMigrator.Runner.Initialization
         /// The option is now stored in <see cref="RunnerOptions.AllowBreakingChange"/>.
         /// </remarks>
         bool AllowBreakingChange { get; set; }
-
-        /// <summary>
-        /// Gets or sets the arbitrary application context passed to the task runner
-        /// </summary>
-        [Obsolete("Use dependency injection to access 'application state'.")]
-        object ApplicationContext { get; set; }
 
         /// <summary>
         /// Gets or sets the default schema name

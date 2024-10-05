@@ -1,6 +1,6 @@
 #region License
 //
-// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -37,8 +36,12 @@ using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.Runner.Generators.MySql;
 using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Runner.Generators.Firebird;
-using FluentMigrator.Runner.Generators.SqlAnywhere;
-using FluentMigrator.Runner.Processors.SqlAnywhere;
+using FluentMigrator.Runner.Initialization;
+using FluentMigrator.Tests.Helpers;
+
+using Microsoft.Data.SqlClient;
+
+using Moq;
 
 using MySql.Data.MySqlClient;
 
@@ -68,7 +71,6 @@ namespace FluentMigrator.Tests.Integration
                 (typeof(SqlServerProcessor), () => IntegrationTestOptions.SqlServer2012, ExecuteWithSqlServer2012),
                 (typeof(SqlServerProcessor), () => IntegrationTestOptions.SqlServer2014, ExecuteWithSqlServer2014),
                 (typeof(SqlServerProcessor), () => IntegrationTestOptions.SqlServer2016, ExecuteWithSqlServer2016),
-                (typeof(SqlAnywhereProcessor), () => IntegrationTestOptions.SqlAnywhere16, ExecuteWithSqlAnywhere),
                 (typeof(SQLiteProcessor), () => IntegrationTestOptions.SQLite, ExecuteWithSqlite),
                 (typeof(FirebirdProcessor), () => IntegrationTestOptions.Firebird, ExecuteWithFirebird),
                 (typeof(PostgresProcessor), () => IntegrationTestOptions.Postgres, ExecuteWithPostgres),
@@ -121,17 +123,17 @@ namespace FluentMigrator.Tests.Integration
             return false;
         }
 
-        public void ExecuteWithSupportedProcessors(Action<IMigrationProcessor> test)
+        protected void ExecuteWithSupportedProcessors(Action<IMigrationProcessor> test)
         {
             ExecuteWithSupportedProcessors(test, true);
         }
 
-        public void ExecuteWithSupportedProcessors(Action<IMigrationProcessor> test, bool tryRollback)
+        protected void ExecuteWithSupportedProcessors(Action<IMigrationProcessor> test, bool tryRollback)
         {
             ExecuteWithSupportedProcessors(test, tryRollback, new Type[] { });
         }
 
-        public void ExecuteWithSupportedProcessors(Action<IMigrationProcessor> test, bool tryRollback, params Type[] exceptProcessors)
+        protected void ExecuteWithSupportedProcessors(Action<IMigrationProcessor> test, bool tryRollback, params Type[] exceptProcessors)
         {
             ExecuteWithSupportedProcessors(
                 test,
@@ -139,13 +141,12 @@ namespace FluentMigrator.Tests.Integration
                 procType => !exceptProcessors.Any(p => p.IsAssignableFrom(procType)));
         }
 
-        public void ExecuteWithSupportedProcessors(Action<IMigrationProcessor> test, bool tryRollback, Predicate<Type> isMatch)
+        protected void ExecuteWithSupportedProcessors(Action<IMigrationProcessor> test, bool tryRollback, Predicate<Type> isMatch)
         {
             if (!IsAnyServerEnabled())
             {
                 Assert.Fail(
-                    "No database processors are configured to run your migration tests.  This message is provided to avoid false positives.  To avoid this message enable one or more test runners in the {0} class.",
-                    nameof(IntegrationTestOptions));
+$"No database processors are configured to run your migration tests.  This message is provided to avoid false positives.  To avoid this message enable one or more test runners in the {nameof(IntegrationTestOptions)} class.");
             }
 
             var executed = false;
@@ -252,34 +253,18 @@ namespace FluentMigrator.Tests.Integration
                 connection.ConnectionString = serverOptions.ConnectionString;
                 connection.Open();
 
-                var processor = new SQLiteProcessor(connection, new SQLiteGenerator(), announcer, new ProcessorOptions(), factory);
-                test(processor);
+                var mockServiceProvider = new Mock<IServiceProvider>(MockBehavior.Loose);
+                var mockedConnectionStringAccessor = new Mock<IConnectionStringAccessor>(MockBehavior.Loose);
+                mockedConnectionStringAccessor.SetupGet(x => x.ConnectionString).Returns(serverOptions.ConnectionString);
 
-                if (tryRollback && !processor.WasCommitted)
+                using (var processor = new SQLiteProcessor(factory, new SQLiteGenerator(), LoggerHelper.Get<SQLiteProcessor>(), OptionHelper.Get<ProcessorOptions>(), mockedConnectionStringAccessor.Object, mockServiceProvider.Object, new SQLiteQuoter()))
                 {
-                    processor.RollbackTransaction();
-                }
-            }
-        }
+                    test(processor);
 
-        protected static void ExecuteWithSqlAnywhere(Action<IMigrationProcessor> test, bool tryRollback, IntegrationTestOptions.DatabaseServerOptions serverOptions)
-        {
-            if (!serverOptions.IsEnabled)
-                return;
-
-            var announcer = new TextWriterAnnouncer(TestContext.Out);
-            announcer.Heading("Testing Migration against Postgres");
-
-            var factory = new SqlAnywhereDbFactory();
-            using (var connection = factory.CreateConnection(serverOptions.ConnectionString))
-            {
-                var processor = new SqlAnywhereProcessor("SqlAnywhere16", connection, new SqlAnywhere16Generator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), factory);
-
-                test(processor);
-
-                if (tryRollback && !processor.WasCommitted)
-                {
-                    processor.RollbackTransaction();
+                    if (tryRollback && !processor.WasCommitted)
+                    {
+                        processor.RollbackTransaction();
+                    }
                 }
             }
         }
@@ -344,24 +329,26 @@ namespace FluentMigrator.Tests.Integration
             if (_isFirstExecuteForFirebird)
             {
                 _isFirstExecuteForFirebird = false;
-                FbConnection.CreateDatabase(serverOptions.ConnectionString, true);
+                FbConnection.CreateDatabase(serverOptions.ConnectionString, overwrite: true);
             }
 
-            using (var connection = new FbConnection(serverOptions.ConnectionString))
-            {
-                var options = FirebirdOptions.AutoCommitBehaviour();
-                var processor = new FirebirdProcessor(connection, new FirebirdGenerator(options), announcer, new ProcessorOptions(), new FirebirdDbFactory(serviceProvider: null), options);
+            
+            var options = FirebirdOptions.AutoCommitBehaviour();
+            var processorOptions = OptionHelper.Get<ProcessorOptions>();
+            var mockedConnectionStringAccessor = new Mock<IConnectionStringAccessor>(MockBehavior.Loose);
+            mockedConnectionStringAccessor.SetupGet(x => x.ConnectionString).Returns(serverOptions.ConnectionString);
 
-                try
-                {
-                    test(processor);
-                }
-                catch (Exception)
-                {
-                    if (tryRollback && !processor.WasCommitted)
-                        processor.RollbackTransaction();
-                    throw;
-                }
+            var processor = new FirebirdProcessor(new FirebirdDbFactory(serviceProvider: null), new FirebirdGenerator(options), new FirebirdQuoter(options), LoggerHelper.Get<FirebirdProcessor>(), options: processorOptions, mockedConnectionStringAccessor.Object, options);
+
+            try
+            {
+                test(processor);
+            }
+            catch (Exception)
+            {
+                if (tryRollback && !processor.WasCommitted)
+                    processor.RollbackTransaction();
+                throw;
             }
         }
     }

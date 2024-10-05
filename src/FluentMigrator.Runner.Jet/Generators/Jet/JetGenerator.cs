@@ -31,32 +31,41 @@ namespace FluentMigrator.Runner.Generators.Jet
 
         public override string Generate(RenameTableExpression expression)
         {
-            return CompatibilityMode.HandleCompatibilty("Renaming of tables is not supported for Jet");
+            return CompatibilityMode.HandleCompatibility("Renaming of tables is not supported for Jet");
         }
 
         public override string Generate(RenameColumnExpression expression)
         {
-            return CompatibilityMode.HandleCompatibilty("Renaming of columns is not supported for Jet");
+            return CompatibilityMode.HandleCompatibility("Renaming of columns is not supported for Jet");
         }
 
         public override string Generate(AlterDefaultConstraintExpression expression)
         {
-            return CompatibilityMode.HandleCompatibilty("Altering of default constraints is not supported for Jet");
+            return CompatibilityMode.HandleCompatibility("Altering of default constraints is not supported for Jet");
+        }
+
+        public override string Generate(DeleteTableExpression expression)
+        {
+            if (expression.IfExists)
+            {
+                return CompatibilityMode.HandleCompatibility("If Exists logic is not supported for Jet");
+            }
+            return base.Generate(expression);
         }
 
         public override string Generate(CreateSequenceExpression expression)
         {
-            return CompatibilityMode.HandleCompatibilty("Sequences are not supported for Jet");
+            return CompatibilityMode.HandleCompatibility("Sequences are not supported for Jet");
         }
 
         public override string Generate(DeleteSequenceExpression expression)
         {
-            return CompatibilityMode.HandleCompatibilty("Sequences are not supported for Jet");
+            return CompatibilityMode.HandleCompatibility("Sequences are not supported for Jet");
         }
 
         public override string Generate(DeleteDefaultConstraintExpression expression)
         {
-            return CompatibilityMode.HandleCompatibilty("Default constraints are not supported");
+            return CompatibilityMode.HandleCompatibility("Default constraints are not supported");
         }
     }
 }

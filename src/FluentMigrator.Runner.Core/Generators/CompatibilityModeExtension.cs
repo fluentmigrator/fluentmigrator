@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 //
 // Copyright (c) 2018, Fluent Migrator Project
 //
@@ -28,11 +28,11 @@ namespace FluentMigrator.Runner.Generators
         /// <summary>
         /// Handles unsupported generator features according to a compatibility mode.
         /// </summary>
-        /// <param name="mode">The compatibility modee</param>
+        /// <param name="mode">The compatibility mode</param>
         /// <param name="message">The exception message (if any gets thrown)</param>
         /// <returns>The string to be returned (if no exception was thrown)</returns>
         /// <exception cref="DatabaseOperationNotSupportedException">The exception to be thrown</exception>
-        public static string HandleCompatibilty(this CompatibilityMode mode, string message)
+        public static string HandleCompatibility(this CompatibilityMode mode, string message)
         {
             if (CompatibilityMode.STRICT == mode)
             {

@@ -19,7 +19,6 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.IO;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators.Postgres;
@@ -37,9 +36,9 @@ namespace FluentMigrator.Runner.Processors.Postgres
     {
         private readonly PostgresQuoter _quoter;
 
-        public override string DatabaseType => "Postgres";
+        public override string DatabaseType => ProcessorId.Postgres;
 
-        public override IList<string> DatabaseTypeAliases { get; } = new List<string> { "PostgreSQL" };
+        public override IList<string> DatabaseTypeAliases { get; } = new List<string> { ProcessorId.PostgreSQL };
 
         [Obsolete]
         public PostgresProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory,
@@ -156,14 +155,7 @@ namespace FluentMigrator.Runner.Processors.Postgres
                 }
                 catch (Exception ex)
                 {
-                    using (var message = new StringWriter())
-                    {
-                        message.WriteLine("An error occurred executing the following sql:");
-                        message.WriteLine(sql);
-                        message.WriteLine("The error was {0}", ex.Message);
-
-                        throw new Exception(message.ToString(), ex);
-                    }
+                    ReThrowWithSql(ex, sql);
                 }
             }
         }

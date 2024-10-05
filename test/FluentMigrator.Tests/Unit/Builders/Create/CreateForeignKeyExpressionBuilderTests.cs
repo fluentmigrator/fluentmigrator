@@ -1,6 +1,6 @@
 #region License
 //
-// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,6 +27,8 @@ using NUnit.Framework;
 namespace FluentMigrator.Tests.Unit.Builders.Create
 {
     [TestFixture]
+    [Category("Builder")]
+    [Category("CreateForeignKey")]
     public class CreateForeignKeyExpressionBuilderTests
     {
         [Test]
@@ -143,8 +145,11 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             var expression = new CreateForeignKeyExpression();
             var builder = new CreateForeignKeyExpressionBuilder(expression);
             builder.OnUpdate(rule);
-            Assert.That(expression.ForeignKey.OnUpdate, Is.EqualTo(rule));
-            Assert.That(expression.ForeignKey.OnDelete, Is.EqualTo(Rule.None));
+            Assert.Multiple(() =>
+            {
+                Assert.That(expression.ForeignKey.OnUpdate, Is.EqualTo(rule));
+                Assert.That(expression.ForeignKey.OnDelete, Is.EqualTo(Rule.None));
+            });
         }
 
         [TestCase(Rule.Cascade), TestCase(Rule.SetDefault), TestCase(Rule.SetNull), TestCase(Rule.None)]
@@ -153,8 +158,11 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             var expression = new CreateForeignKeyExpression();
             var builder = new CreateForeignKeyExpressionBuilder(expression);
             builder.OnDelete(rule);
-            Assert.That(expression.ForeignKey.OnUpdate, Is.EqualTo(Rule.None));
-            Assert.That(expression.ForeignKey.OnDelete, Is.EqualTo(rule));
+            Assert.Multiple(() =>
+            {
+                Assert.That(expression.ForeignKey.OnUpdate, Is.EqualTo(Rule.None));
+                Assert.That(expression.ForeignKey.OnDelete, Is.EqualTo(rule));
+            });
         }
 
         [TestCase(Rule.Cascade), TestCase(Rule.SetDefault), TestCase(Rule.SetNull), TestCase(Rule.None)]
@@ -163,8 +171,11 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             var expression = new CreateForeignKeyExpression();
             var builder = new CreateForeignKeyExpressionBuilder(expression);
             builder.OnDeleteOrUpdate(rule);
-            Assert.That(expression.ForeignKey.OnUpdate, Is.EqualTo(rule));
-            Assert.That(expression.ForeignKey.OnDelete, Is.EqualTo(rule));
+            Assert.Multiple(() =>
+            {
+                Assert.That(expression.ForeignKey.OnUpdate, Is.EqualTo(rule));
+                Assert.That(expression.ForeignKey.OnDelete, Is.EqualTo(rule));
+            });
         }
     }
 }

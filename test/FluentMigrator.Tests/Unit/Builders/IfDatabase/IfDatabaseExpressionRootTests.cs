@@ -1,6 +1,6 @@
 #region License
 //
-// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2024, Fluent Migrator Project
 // Copyright (c) 2011, Grant Archibald
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -36,6 +36,8 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
 {
     [TestFixture]
+    [Category("Builder")]
+    [Category("IfDatabase")]
     public class IfDatabaseExpressionRootTests
     {
         [Test]

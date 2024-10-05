@@ -1,5 +1,5 @@
 #region License
-// Copyright (c) 2018, FluentMigrator Project
+// Copyright (c) 2018, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ namespace FluentMigrator.Runner.Initialization
         /// Initializes a new instance of the <see cref="ProfileSource"/> class.
         /// </summary>
         /// <param name="source">The assembly source</param>
-        /// <param name="conventions">The migration runner conventios</param>
+        /// <param name="conventions">The migration runner conventions</param>
         public ProfileSource(
             [NotNull] IFilteringMigrationSource source,
             [NotNull] IMigrationRunnerConventions conventions)

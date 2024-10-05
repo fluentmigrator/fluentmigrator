@@ -1,5 +1,5 @@
 #region License
-// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -96,7 +96,18 @@ namespace FluentMigrator.Runner.Generators.Firebird
                 case SystemMethods.NewSequentialId:
                 case SystemMethods.NewGuid:
                     return "gen_uuid()";
+                /*
+                 Firebird v.3.0.4: Context variables LOCALTIME and LOCALTIMESTAMP were added as synonyms for CURRENT_TIME and CURRENT_TIMESTAMP, respectively, in anticipation of CURRENT_TIME and CURRENT_TIMESTAMP being redefined in Firebird 4 to represent the time and timestamp in UTC time, to comply with the SQL standards.
+                 Source: https://firebirdsql.org/file/documentation/release_notes/html/en/3_0/bk02ch09s06.html
+
+
+                 Source: https://github.com/FirebirdSQL/firebird/blob/master/doc/sql.extensions/README.time_zone.md#changes-in-current_time-and-current_timestamp
+                 */
                 case SystemMethods.CurrentDateTime:
+                    return "LOCALTIMESTAMP";
+                case SystemMethods.CurrentDateTimeOffset:
+                    throw new ArgumentException($"{nameof(SystemMethods.CurrentDateTimeOffset)} not supported.");
+                case SystemMethods.CurrentUTCDateTime:
                     return "CURRENT_TIMESTAMP";
                 case SystemMethods.CurrentUser:
                     return "CURRENT_USER";

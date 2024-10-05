@@ -1,5 +1,5 @@
 #region License
-// Copyright (c) 2007-2018, FluentMigrator Project
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 
+using FluentMigrator.Builders.Create.Constraint;
 using FluentMigrator.Builders.Create.Index;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Infrastructure.Extensions;
@@ -29,21 +30,36 @@ namespace FluentMigrator.SqlServer
         public static ICreateIndexOptionsSyntax Include(this ICreateIndexOptionsSyntax expression, string columnName)
         {
             var additionalFeatures = expression as ISupportAdditionalFeatures;
-            additionalFeatures.Include(columnName);
+            additionalFeatures.CreateIndexInclude(columnName);
             return expression;
         }
 
         public static ICreateIndexNonKeyColumnSyntax Include(this ICreateIndexOnColumnSyntax expression, string columnName)
         {
             var additionalFeatures = expression as ISupportAdditionalFeatures;
-            additionalFeatures.Include(columnName);
+            additionalFeatures.CreateIndexInclude(columnName);
             return new CreateIndexExpressionNonKeyBuilder(expression, additionalFeatures);
         }
 
-        internal static void Include(this ISupportAdditionalFeatures additionalFeatures, string columnName)
+        internal static void CreateIndexInclude(this ISupportAdditionalFeatures additionalFeatures, string columnName)
         {
             if (additionalFeatures == null)
-                throw new InvalidOperationException(UnsupportedMethodMessage(nameof(Include), nameof(ISupportAdditionalFeatures)));
+                throw new InvalidOperationException(UnsupportedMethodMessage(nameof(CreateIndexInclude), nameof(ISupportAdditionalFeatures)));
+            var includes = additionalFeatures.GetAdditionalFeature<IList<IndexIncludeDefinition>>(IncludesList, () => new List<IndexIncludeDefinition>());
+            includes.Add(new IndexIncludeDefinition { Name = columnName });
+        }
+
+        public static ICreateConstraintOptionsSyntax Include(this ICreateConstraintOptionsSyntax expression, string columnName)
+        {
+            var additionalFeatures = expression as ISupportAdditionalFeatures;
+            additionalFeatures.CreateUniqueConstraintInclude(columnName);
+            return expression;
+        }
+
+        internal static void CreateUniqueConstraintInclude(this ISupportAdditionalFeatures additionalFeatures, string columnName)
+        {
+            if (additionalFeatures == null)
+                throw new InvalidOperationException(UnsupportedMethodMessage(nameof(CreateUniqueConstraintInclude), nameof(ISupportAdditionalFeatures)));
             var includes = additionalFeatures.GetAdditionalFeature<IList<IndexIncludeDefinition>>(IncludesList, () => new List<IndexIncludeDefinition>());
             includes.Add(new IndexIncludeDefinition { Name = columnName });
         }

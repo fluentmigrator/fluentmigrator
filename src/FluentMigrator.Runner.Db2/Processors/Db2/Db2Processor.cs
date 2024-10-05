@@ -1,6 +1,6 @@
 #region License
 //
-// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 //
 #endregion
 
-using System;
 using System.Collections.Generic;
 using System.Data;
 
@@ -35,12 +34,6 @@ namespace FluentMigrator.Runner.Processors.DB2
 {
     public class Db2Processor : GenericProcessorBase
     {
-        [Obsolete]
-        public Db2Processor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
-            : base(connection, factory, generator, announcer, options)
-        {
-            Quoter = new Db2Quoter();
-        }
 
         public Db2Processor(
             [NotNull] Db2DbFactory factory,
@@ -54,7 +47,7 @@ namespace FluentMigrator.Runner.Processors.DB2
             Quoter = quoter;
         }
 
-        public override string DatabaseType => "DB2";
+        public override string DatabaseType => ProcessorId.DB2;
 
         public override IList<string> DatabaseTypeAliases { get; } = new List<string> { "IBM DB2" };
 

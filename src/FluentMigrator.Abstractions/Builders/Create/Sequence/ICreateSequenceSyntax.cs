@@ -49,9 +49,9 @@ namespace FluentMigrator.Builders.Create.Sequence
         /// <summary>
         /// Sets the start value of the sequence
         /// </summary>
-        /// <param name="startwith">The start value</param>
+        /// <param name="startWith">The start value</param>
         /// <returns>Define the sequence options</returns>
-        ICreateSequenceSyntax StartWith(long startwith);
+        ICreateSequenceSyntax StartWith(long startWith);
 
         /// <summary>
         /// Cache the next <paramref name="value"/> number of values for a single sequence increment

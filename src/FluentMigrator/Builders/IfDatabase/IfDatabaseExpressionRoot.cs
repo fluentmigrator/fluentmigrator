@@ -1,6 +1,6 @@
 #region License
 //
-// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2024, Fluent Migrator Project
 // Copyright (c) 2011, Grant Archibald
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,7 +34,7 @@ using FluentMigrator.Infrastructure;
 namespace FluentMigrator.Builders.IfDatabase
 {
     /// <summary>
-    /// Allows for conditional inclusion of expresions based on the migration context
+    /// Allows for conditional inclusion of expressions based on the migration context
     /// </summary>
     public class IfDatabaseExpressionRoot : IIfDatabaseExpressionRoot
     {
@@ -189,9 +189,6 @@ namespace FluentMigrator.Builders.IfDatabase
             var result = new MigrationContext(
                 new NullIfDatabaseProcessor(),
                 originalContext.ServiceProvider,
-#pragma warning disable 612
-                originalContext.ApplicationContext,
-#pragma warning restore 612
                 string.Empty);
             return result;
         }

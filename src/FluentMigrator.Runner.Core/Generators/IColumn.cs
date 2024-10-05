@@ -32,7 +32,7 @@ namespace FluentMigrator.Runner.Generators
     public interface IColumn
     {
         /// <summary>
-        /// Generates the complete column defintion SQL fragment
+        /// Generates the complete column definition SQL fragment
         /// </summary>
         /// <param name="column">The column definition</param>
         /// <returns>The SQL fragment</returns>

@@ -29,6 +29,7 @@ using Moq;
 namespace FluentMigrator.Tests.Unit
 {
     [TestFixture]
+    [Category("Migration")]
     public class AutoReversingMigrationTests
     {
         private Mock<IMigrationContext> _context;
@@ -47,7 +48,7 @@ namespace FluentMigrator.Tests.Unit
             _context.Object.Expressions = new Collection<IMigrationExpression>();
             autoReversibleMigration.GetDownExpressions(_context.Object);
 
-            Assert.True(_context.Object.Expressions.Any(me => me is DeleteTableExpression && ((DeleteTableExpression)me).TableName == "Foo"));
+            Assert.That(_context.Object.Expressions.Any(me => me is DeleteTableExpression expression && expression.TableName == "Foo"));
         }
 
         [Test]
@@ -57,8 +58,8 @@ namespace FluentMigrator.Tests.Unit
             _context.Object.Expressions = new Collection<IMigrationExpression>();
             autoReversibleMigration.GetDownExpressions(_context.Object);
 
-            Assert.IsAssignableFrom(typeof(RenameTableExpression), _context.Object.Expressions.ToList()[0]);
-            Assert.IsAssignableFrom(typeof(DeleteTableExpression), _context.Object.Expressions.ToList()[1]);
+            Assert.That(_context.Object.Expressions.ToList()[0], Is.AssignableFrom(typeof(RenameTableExpression)));
+            Assert.That(_context.Object.Expressions.ToList()[1], Is.AssignableFrom(typeof(DeleteTableExpression)));
         }
 
     }

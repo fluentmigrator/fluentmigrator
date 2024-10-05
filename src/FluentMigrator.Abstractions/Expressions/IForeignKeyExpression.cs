@@ -1,5 +1,5 @@
 #region License
-// Copyright (c) 2007-2018, FluentMigrator Project
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ namespace FluentMigrator.Expressions
     public interface IForeignKeyExpression
     {
         /// <summary>
-        /// Gets the foreign key defintion
+        /// Gets the foreign key definition
         /// </summary>
         ForeignKeyDefinition ForeignKey { get; }
     }

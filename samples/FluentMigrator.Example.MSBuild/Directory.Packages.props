@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<Project>
+    <ItemGroup>
+        <PackageReference Include="FluentMigrator.MSBuild" Version="6.1.4" GeneratePathProperty="true" />
+    </ItemGroup>
+    <PropertyGroup>
+        <FluentMigratorMSBuildAssemblyPath>$(PKGFluentMigrator_MSBuild)\tasks\net8.0\FluentMigrator.MSBuild.dll</FluentMigratorMSBuildAssemblyPath>
+    </PropertyGroup>
+</Project>

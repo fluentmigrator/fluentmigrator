@@ -1,6 +1,6 @@
 #region License
 //
-// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -33,6 +33,8 @@ using Microsoft.Build.Utilities;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
+using ILogger = Microsoft.Extensions.Logging.ILogger;
+
 namespace FluentMigrator.MSBuild
 {
     public class Migrate :
@@ -50,18 +52,15 @@ namespace FluentMigrator.MSBuild
             AppDomain.CurrentDomain.ResourceResolve += CurrentDomain_ResourceResolve;
         }
 
-        private static Assembly CurrentDomain_ResourceResolve(object sender, ResolveEventArgs args)
+        private Assembly CurrentDomain_ResourceResolve(object sender, ResolveEventArgs args)
         {
-            Console.WriteLine(@"Could Not Resolve {0}", args.Name);
+            Log.LogWarning(@"Could Not Resolve {0}", args.Name);
             return null;
         }
 
         private string _databaseType;
 
         private int? _timeout;
-
-        [Obsolete("Use dependency injection to access 'application state'.")]
-        public string ApplicationContext { get; set; }
 
         [Required]
         public string Connection { get; set; }
@@ -118,6 +117,8 @@ namespace FluentMigrator.MSBuild
         public bool IncludeUntaggedMaintenances { get; set; }
 
         public bool IncludeUntaggedMigrations { get; set; } = true;
+
+        public bool UseMsBuildLogging { get; set; } = false;
 
         public string DefaultSchemaName { get; set; }
 
@@ -186,9 +187,6 @@ namespace FluentMigrator.MSBuild
                         opt.Steps = Steps;
                         opt.Profile = Profile;
                         opt.Tags = Tags.ToTags().ToArray();
-#pragma warning disable 612
-                        opt.ApplicationContext = ApplicationContext;
-#pragma warning restore 612
                         opt.TransactionPerSession = TransactionPerSession;
                         opt.AllowBreakingChange = AllowBreakingChange;
                         opt.IncludeUntaggedMigrations = IncludeUntaggedMigrations;
@@ -217,6 +215,11 @@ namespace FluentMigrator.MSBuild
                     .AddSingleton<ILoggerProvider, LogFileFluentMigratorLoggerProvider>();
             }
 
+            if (UseMsBuildLogging)
+            {
+                services.AddScoped<ILogger>(provider => new MicrosoftBuildLogger(this));
+            }
+
             using (var serviceProvider = services.BuildServiceProvider(validateScopes: false))
             {
                 var executor = serviceProvider.GetRequiredService<TaskExecutor>();
@@ -238,6 +241,7 @@ namespace FluentMigrator.MSBuild
                         .AddHana()
                         .AddMySql4()
                         .AddMySql5()
+                        .AddMySql8()
                         .AddOracle()
                         .AddOracle12C()
                         .AddOracleManaged()
@@ -245,7 +249,7 @@ namespace FluentMigrator.MSBuild
                         .AddPostgres()
                         .AddPostgres92()
                         .AddRedshift()
-                        .AddSqlAnywhere()
+                        .AddSnowflake()
                         .AddSQLite()
                         .AddSqlServer()
                         .AddSqlServer2000()
@@ -254,7 +258,8 @@ namespace FluentMigrator.MSBuild
                         .AddSqlServer2012()
                         .AddSqlServer2014()
                         .AddSqlServer2016()
-                        .AddSqlServerCe());
+                    
+                        );
             return services;
         }
     }

@@ -19,7 +19,6 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -51,18 +50,6 @@ namespace FluentMigrator.Runner.Processors.Firebird
         protected List<string> DDLTouchedTables;
         protected Dictionary<string, List<string>> DDLTouchedColumns;
 
-        [Obsolete]
-        public FirebirdProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory, FirebirdOptions fbOptions)
-            : base(connection, factory, generator, announcer, options)
-        {
-            FBOptions = fbOptions ?? throw new ArgumentNullException(nameof(fbOptions));
-            _firebirdVersionFunc = new Lazy<Version>(GetFirebirdVersion);
-            _quoter = new FirebirdQuoter(fbOptions.ForceQuote);
-            truncator = new FirebirdTruncator(FBOptions.TruncateLongNames, FBOptions.PackKeyNames);
-            ClearLocks();
-            ClearDDLFollowers();
-        }
-
         public FirebirdProcessor(
             [NotNull] FirebirdDbFactory factory,
             [NotNull] FirebirdGenerator generator,
@@ -83,7 +70,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             ClearDDLFollowers();
         }
 
-        public override string DatabaseType => "Firebird";
+        public override string DatabaseType => ProcessorId.Firebird;
 
         public override IList<string> DatabaseTypeAliases { get; } = new List<string>();
 
@@ -759,14 +746,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
                 }
                 catch (Exception ex)
                 {
-                    using (var message = new StringWriter())
-                    {
-                        message.WriteLine("An error occurred executing the following sql:");
-                        message.WriteLine(sql);
-                        message.WriteLine("The error was {0}", ex.Message);
-
-                        throw new Exception(message.ToString(), ex);
-                    }
+                    ReThrowWithSql(ex, sql);
                 }
             }
 

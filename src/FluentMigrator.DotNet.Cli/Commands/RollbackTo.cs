@@ -1,5 +1,5 @@
 #region License
-// Copyright (c) 2007-2018, Sean Chambers and the FluentMigrator Project
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,11 +27,11 @@ namespace FluentMigrator.DotNet.Cli.Commands
     [Command("to", Description = "Rollback migrations up to a given version")]
     public class RollbackTo : BaseCommand
     {
-        public Rollback Parent { get; }
+        public Rollback Parent { get; set; }
 
         [Argument(0, "version", "The target version to rollback to.")]
         [Required]
-        public long Version { get; }
+        public long Version { get; set; }
 
         private int OnExecute(IConsole console)
         {

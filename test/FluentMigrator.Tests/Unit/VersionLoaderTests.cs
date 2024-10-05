@@ -35,6 +35,7 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit
 {
     [TestFixture]
+    [Category("Versioning")]
     public class VersionLoaderTests
     {
         [Test]
@@ -73,28 +74,6 @@ namespace FluentMigrator.Tests.Unit
 
             var versionTableMetaData = loader.GetVersionTableMetaData();
             versionTableMetaData.ShouldBeOfType<DefaultVersionTableMetaData>();
-        }
-
-        [Test]
-        [Obsolete("Use dependency injection to access 'application state'.")]
-        public void CanSetupApplicationContext()
-        {
-            var applicationContext = "Test context";
-
-            var processor = new Mock<IMigrationProcessor>();
-            var serviceProvider = ServiceCollectionExtensions.CreateServices()
-                .WithProcessor(processor)
-                .AddScoped(_ => ConventionSets.NoSchemaName)
-                .AddScoped<IMigrationRunnerConventionsAccessor>(
-                    _ => new PassThroughMigrationRunnerConventionsAccessor(new MigrationRunnerConventions()))
-                .AddScoped<IConnectionStringReader>(_ => new PassThroughConnectionStringReader("No connection"))
-                .Configure<RunnerOptions>(opt => opt.ApplicationContext = applicationContext)
-                .BuildServiceProvider();
-
-            var loader = serviceProvider.GetRequiredService<IVersionLoader>();
-
-            var versionTableMetaData = loader.GetVersionTableMetaData();
-            versionTableMetaData.ApplicationContext.ShouldBe(applicationContext);
         }
 
         [Test]

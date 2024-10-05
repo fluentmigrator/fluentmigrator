@@ -7,7 +7,7 @@ using FluentMigrator.Runner.Generators.Base;
 
 namespace FluentMigrator.Runner.Generators.Hana
 {
-    internal class HanaColumn : ColumnBase
+    internal class HanaColumn : ColumnBase<HanaTypeMap>
     {
         private const int HanaObjectNameMaxLength = 30;
 
@@ -44,9 +44,9 @@ namespace FluentMigrator.Runner.Generators.Hana
         protected override string GetPrimaryKeyConstraintName(IEnumerable<ColumnDefinition> primaryKeyColumns, string tableName)
         {
             if (primaryKeyColumns == null)
-                throw new ArgumentNullException("primaryKeyColumns");
+                throw new ArgumentNullException(nameof(primaryKeyColumns));
             if (tableName == null)
-                throw new ArgumentNullException("tableName");
+                throw new ArgumentNullException(nameof(tableName));
 
             var primaryKeyName = primaryKeyColumns.First().PrimaryKeyName;
 

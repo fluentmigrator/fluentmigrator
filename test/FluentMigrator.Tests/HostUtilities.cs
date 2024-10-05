@@ -1,5 +1,5 @@
 #region License
-// Copyright (c) 2018, FluentMigrator Project
+// Copyright (c) 2018, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,12 +15,7 @@
 #endregion
 
 using System;
-using System.Data.SqlServerCe;
-using System.Diagnostics;
 using System.IO;
-using System.Reflection;
-
-using NUnit.Framework;
 
 namespace FluentMigrator.Tests
 {
@@ -53,52 +48,6 @@ namespace FluentMigrator.Tests
         {
             jetCatalogType = Type.GetTypeFromProgID("ADOX.Catalog", false);
             return jetCatalogType != null;
-        }
-
-        public static bool ProbeSqlServerCeBehavior()
-        {
-            var asm = typeof(SqlCeConnection).Assembly;
-            var type = asm.GetType("System.Data.SqlServerCe.NativeMethods");
-            if (SqlServerCeCanFindItsLibraries(type))
-                return true;
-
-            try
-            {
-                return SqlServerCeLoadBinaries(type);
-            }
-            catch (Exception ex)
-            {
-                TestContext.Out.WriteLine(ex);
-                return false;
-            }
-        }
-
-        private static bool SqlServerCeLoadBinaries(Type type)
-        {
-            var method = type.GetMethod("LoadNativeBinariesFromPrivateFolder", BindingFlags.NonPublic | BindingFlags.InvokeMethod | BindingFlags.Static);
-            Debug.Assert(method != null, nameof(method) + " != null");
-            var result = (bool)method.Invoke(null, new object[] { AppContext.BaseDirectory });
-            return result;
-        }
-
-        private static bool SqlServerCeCanFindItsLibraries(Type type)
-        {
-            var method = type.GetMethod("LoadNativeBinaries", BindingFlags.NonPublic | BindingFlags.InvokeMethod | BindingFlags.Static);
-            try
-            {
-                Debug.Assert(method != null, nameof(method) + " != null");
-                method.Invoke(null, null);
-                return true;
-            }
-            catch (TargetInvocationException ex) when (ex.InnerException is SqlCeException sce && sce.NativeError == -1)
-            {
-                return false;
-            }
-            catch (Exception ex)
-            {
-                TestContext.Out.WriteLine(ex);
-                return false;
-            }
         }
     }
 }

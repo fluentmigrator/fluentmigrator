@@ -117,7 +117,7 @@ namespace FluentMigrator.Runner.Generators.Redshift
 
         public override string Generate(DeleteTableExpression expression)
         {
-            return string.Format("DROP TABLE {0};", Quoter.QuoteTableName(expression.TableName, expression.SchemaName));
+            return $"DROP TABLE{(expression.IfExists ? " IF EXISTS" : "")} {Quoter.QuoteTableName(expression.TableName, expression.SchemaName)};";
         }
 
         public override string Generate(DeleteColumnExpression expression)
@@ -160,13 +160,13 @@ namespace FluentMigrator.Runner.Generators.Redshift
 
         public override string Generate(CreateIndexExpression expression)
         {
-            return CompatibilityMode.HandleCompatibilty("Indices not supported");
+            return CompatibilityMode.HandleCompatibility("Indices not supported");
         }
 
         public override string Generate(DeleteIndexExpression expression)
         {
 
-            return CompatibilityMode.HandleCompatibilty("Indices not supported");
+            return CompatibilityMode.HandleCompatibility("Indices not supported");
         }
 
         public override string Generate(RenameTableExpression expression)
@@ -342,12 +342,12 @@ namespace FluentMigrator.Runner.Generators.Redshift
 
         public override string Generate(CreateSequenceExpression expression)
         {
-            return CompatibilityMode.HandleCompatibilty("Sequences not supported");
+            return CompatibilityMode.HandleCompatibility("Sequences not supported");
         }
 
         public override string Generate(DeleteSequenceExpression expression)
         {
-            return CompatibilityMode.HandleCompatibilty("Sequences not supported");
+            return CompatibilityMode.HandleCompatibility("Sequences not supported");
         }
     }
 }

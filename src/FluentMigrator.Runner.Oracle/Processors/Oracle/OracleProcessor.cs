@@ -1,6 +1,6 @@
 #region License
 //
-// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,9 +16,6 @@
 //
 #endregion
 
-using System;
-using System.Data;
-
 using FluentMigrator.Runner.Generators.Oracle;
 using FluentMigrator.Runner.Initialization;
 
@@ -32,24 +29,13 @@ namespace FluentMigrator.Runner.Processors.Oracle
 {
     public class OracleProcessor : OracleProcessorBase
     {
-        [Obsolete]
-        public OracleProcessor(
-            IDbConnection connection,
-            IMigrationGenerator generator,
-            IAnnouncer announcer,
-            IMigrationProcessorOptions options,
-            IDbFactory factory)
-            : base("Oracle", connection, generator, announcer, options, factory)
-        {
-        }
-
         public OracleProcessor(
             [NotNull] OracleDbFactory factory,
             [NotNull] IOracleGenerator generator,
             [NotNull] ILogger<OracleProcessor> logger,
             [NotNull] IOptionsSnapshot<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor)
-            : base("Oracle", factory, generator, logger, options, connectionStringAccessor)
+            : base(ProcessorId.Oracle, factory, generator, logger, options, connectionStringAccessor)
         {
         }
     }

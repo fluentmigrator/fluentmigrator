@@ -23,18 +23,19 @@ using System.Linq;
 
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Base;
-using FluentMigrator.Runner.Processors.Postgres;
 
 using JetBrains.Annotations;
 
 namespace FluentMigrator.Runner.Generators.Postgres
 {
-    internal class PostgresColumn : ColumnBase
+    internal class PostgresColumn : ColumnBase<IPostgresTypeMap>
     {
         [Obsolete]
         public PostgresColumn([NotNull] PostgresQuoter quoter)
             : this(quoter, new PostgresTypeMap())
         {
+            // Note: While Postgres 10.0 introduced the ability to use ICU collations rather than depending on host OS implementations,
+            // the syntax for collation requires specifying a type.  Therefore, FormatAlterType handles collation as well.
             AlterClauseOrder = new List<Func<ColumnDefinition, string>> { FormatAlterType, FormatAlterNullable };
         }
 
@@ -43,7 +44,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
         /// </summary>
         /// <param name="quoter">The Postgres quoter.</param>
         /// <param name="typeMap">The Postgres type map.</param>
-        public PostgresColumn([NotNull] PostgresQuoter quoter, ITypeMap typeMap)
+        public PostgresColumn([NotNull] PostgresQuoter quoter, IPostgresTypeMap typeMap)
             : base(typeMap, quoter)
         {
             AlterClauseOrder = new List<Func<ColumnDefinition, string>> { FormatAlterType, FormatAlterNullable };
@@ -69,7 +70,8 @@ namespace FluentMigrator.Runner.Generators.Postgres
 
         private string FormatAlterType(ColumnDefinition column)
         {
-            return string.Format("TYPE {0}", GetColumnType(column));
+            var collation = FormatCollation(column);
+            return $"TYPE {GetColumnType(column)}{(string.IsNullOrWhiteSpace(collation) ? string.Empty : " " + collation)}";
         }
 
         protected IList<Func<ColumnDefinition, string>> AlterClauseOrder { get; set; }
@@ -127,16 +129,33 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return string.Format(", {0}PRIMARY KEY ({1})", pkName, cols);
         }
 
+        protected void FormatTypeValidator(ColumnDefinition column)
+        {
+            if (column.Type == DbType.DateTimeOffset && (column.Precision < 0 || column.Precision > 6))
+            {
+                throw new ArgumentOutOfRangeException($"Postgres {nameof(DbType.DateTimeOffset)} data type 'timestamp[(p)]' with time zone' supports allowed range from 0 to 6. " +
+                    $"See: https://www.postgresql.org/docs/12/datatype-datetime.html");
+            }
+        }
+
         /// <inheritdoc />
         protected override string FormatType(ColumnDefinition column)
         {
+            FormatTypeValidator(column);
+
             if (column.IsIdentity)
             {
                 if (column.Type == DbType.Int64)
                     return "bigserial";
                 return "serial";
             }
+            
 
+            return ColumnBaseFormatType(column);
+        }
+
+        protected string ColumnBaseFormatType(ColumnDefinition column)
+        {
             return base.FormatType(column);
         }
 

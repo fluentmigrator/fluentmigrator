@@ -1,5 +1,5 @@
 ﻿#region License
-// Copyright (c) 2018, FluentMigrator Project
+// Copyright (c) 2018, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ namespace FluentMigrator.Tests.Unit.Initialization.Migrations
         /// <inheritdoc />
         public override void Up()
         {
-            Assert.NotNull(_processorOptions?.ConnectionString);
+            Assert.That(_processorOptions?.ConnectionString, Is.Not.Null);
         }
     }
 }

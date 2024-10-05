@@ -88,6 +88,11 @@ namespace FluentMigrator.Runner.Generators.Oracle
         }
         public override string Generate(DeleteTableExpression expression)
         {
+            if (expression.IfExists)
+            {
+                return CompatibilityMode.HandleCompatibility("If Exists logic is not supported");
+            }
+
             return string.Format(DropTable, ExpandTableName(Quoter.QuoteTableName(expression.SchemaName),Quoter.QuoteTableName(expression.TableName)));
         }
 
@@ -129,7 +134,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
             {
                 if (seq.Cache.Value < MINIMUM_CACHE_VALUE)
                 {
-                    return CompatibilityMode.HandleCompatibilty("Oracle does not support Cache value equal to 1; if you intended to disable caching, set Cache to null. For information on Oracle limitations, see: https://docs.oracle.com/en/database/oracle/oracle-database/18/sqlrf/CREATE-SEQUENCE.html#GUID-E9C78A8C-615A-4757-B2A8-5E6EFB130571__GUID-7E390BE1-2F6C-4E5A-9D5C-5A2567D636FB");
+                    return CompatibilityMode.HandleCompatibility("Oracle does not support Cache value equal to 1; if you intended to disable caching, set Cache to null. For information on Oracle limitations, see: https://docs.oracle.com/en/database/oracle/oracle-database/18/sqlrf/CREATE-SEQUENCE.html#GUID-E9C78A8C-615A-4757-B2A8-5E6EFB130571__GUID-7E390BE1-2F6C-4E5A-9D5C-5A2567D636FB");
                 }
                 result.AppendFormat(" CACHE {0}", seq.Cache);
             }
@@ -271,6 +276,26 @@ namespace FluentMigrator.Runner.Generators.Oracle
             return WrapInBlock(alterColumnWithDescriptionBuilder.ToString());
         }
 
+        public override string Generate(CreateIndexExpression expression)
+        {
+            var indexColumns = new string[expression.Index.Columns.Count];
+
+            for (var i = 0; i < expression.Index.Columns.Count; i++)
+            {
+                var columnDef = expression.Index.Columns.ElementAt(i);
+
+                var direction = columnDef.Direction == Direction.Ascending ? "ASC" : "DESC";
+                indexColumns[i] = $"{Quoter.QuoteColumnName(columnDef.Name)} {direction}";
+            }
+
+            return string.Format(CreateIndex
+                , GetUniqueString(expression)
+                , GetClusterTypeString(expression)
+                , Quoter.QuoteIndexName(expression.Index.Name, expression.Index.SchemaName)
+                , Quoter.QuoteTableName(expression.Index.TableName, expression.Index.SchemaName)
+                , string.Join(", ", indexColumns));
+        }
+
         public override string Generate(InsertDataExpression expression)
         {
             var columnNames = new List<string>();
@@ -296,7 +321,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
 
         public override string Generate(AlterDefaultConstraintExpression expression)
         {
-            return string.Format(AlterColumn, Quoter.QuoteTableName(expression.TableName), Column.Generate(new ColumnDefinition
+            return string.Format(AlterColumn, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), Column.Generate(new ColumnDefinition
             {
                 ModificationType = ColumnModificationType.Alter,
                 Name = expression.ColumnName,
@@ -308,6 +333,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
         {
             return Generate(new AlterDefaultConstraintExpression
             {
+                SchemaName = expression.SchemaName,
                 TableName = expression.TableName,
                 ColumnName = expression.ColumnName,
                 DefaultValue = null

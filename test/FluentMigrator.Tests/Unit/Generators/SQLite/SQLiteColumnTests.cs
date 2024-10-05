@@ -19,6 +19,7 @@
 using System;
 using System.Linq;
 
+using FluentMigrator.Exceptions;
 using FluentMigrator.Runner.Generators.SQLite;
 using NUnit.Framework;
 
@@ -31,11 +32,12 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
     public class SQLiteColumnTests : BaseColumnTests
     {
         protected SQLiteGenerator Generator;
+        private SQLiteQuoter quoter = new SQLiteQuoter();
 
         [SetUp]
         public void Setup()
         {
-            Generator = new SQLiteGenerator();
+            Generator = new SQLiteGenerator(quoter, new SQLiteTypeMap());
         }
 
         [Test]
@@ -45,7 +47,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD COLUMN \"TestColumn1\" MyDomainType");
+            result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ADD COLUMN \"TestColumn1\" MyDomainType");
         }
 
         [Test]
@@ -63,8 +65,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetAlterColumnExpression();
             expression.SchemaName = "TestSchema";
 
-            var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
 
         [Test]
@@ -72,8 +73,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         {
             var expression = GeneratorTestHelper.GetAlterColumnExpression();
 
-            var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
 
         [Test]
@@ -84,7 +84,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD COLUMN \"TestColumn1\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT");
+            result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ADD COLUMN \"TestColumn1\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT");
         }
 
         [Test]
@@ -104,7 +104,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD COLUMN \"TestColumn1\" TEXT NOT NULL");
+            result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ADD COLUMN \"TestColumn1\" TEXT NOT NULL");
         }
 
         [Test]
@@ -122,8 +122,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expressions = GeneratorTestHelper.GetCreateColumnWithSystemMethodExpression("TestSchema");
             var result = string.Join(Environment.NewLine, expressions.Select(x => (string)Generator.Generate((dynamic)x)));
             result.ShouldBe(
-                @"ALTER TABLE ""TestTable1"" ADD COLUMN ""TestColumn1"" DATETIME" + Environment.NewLine +
-                @"UPDATE ""TestTable1"" SET ""TestColumn1"" = (datetime('now','localtime')) WHERE 1 = 1");
+                @"ALTER TABLE ""TestSchema"".""TestTable1"" ADD COLUMN ""TestColumn1"" DATETIME" + Environment.NewLine +
+                @"UPDATE ""TestSchema"".""TestTable1"" SET ""TestColumn1"" = (datetime('now','localtime')) WHERE 1 = 1");
         }
 
         [Test]
@@ -143,7 +143,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD COLUMN \"TestColumn1\" NUMERIC NOT NULL");
+            result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ADD COLUMN \"TestColumn1\" NUMERIC NOT NULL");
         }
 
         [Test]
@@ -162,7 +162,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" DROP COLUMN \"TestColumn1\"");
         }
 
         [Test]
@@ -171,7 +171,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetDeleteColumnExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            result.ShouldBe("ALTER TABLE \"TestTable1\" DROP COLUMN \"TestColumn1\"");
         }
 
         [Test]
@@ -181,7 +181,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" DROP COLUMN \"TestColumn1\"; ALTER TABLE \"TestSchema\".\"TestTable1\" DROP COLUMN \"TestColumn2\"");
         }
 
         [Test]
@@ -190,7 +190,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetDeleteColumnExpression(new [] { "TestColumn1", "TestColumn2" });
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            result.ShouldBe("ALTER TABLE \"TestTable1\" DROP COLUMN \"TestColumn1\"; ALTER TABLE \"TestTable1\" DROP COLUMN \"TestColumn2\"");
         }
 
         [Test]
@@ -200,7 +200,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            result.ShouldBe($"ALTER TABLE {quoter.QuoteTableName("TestSchema")}.{quoter.QuoteTableName("TestTable1")} "
+              + $"RENAME COLUMN {quoter.QuoteColumnName("TestColumn1")} TO {quoter.QuoteColumnName("TestColumn2")}");
         }
 
         [Test]
@@ -209,7 +210,28 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetRenameColumnExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            result.ShouldBe($"ALTER TABLE {quoter.QuoteTableName("TestTable1")} RENAME COLUMN {quoter.QuoteColumnName("TestColumn1")} TO {quoter.QuoteColumnName("TestColumn2")}");
+        }
+
+        [Test]
+        public virtual void CanCreateUniqueColumnWithDefaultSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateColumnExpression();
+            expression.Column.IsUnique = true;
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD COLUMN \"TestColumn1\" TEXT NOT NULL UNIQUE");
+        }
+
+        [Test]
+        public virtual void CanCreateUniqueColumnWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateColumnExpression();
+            expression.Column.IsUnique = true;
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ADD COLUMN \"TestColumn1\" TEXT NOT NULL UNIQUE");
         }
     }
 }

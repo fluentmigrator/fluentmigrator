@@ -46,6 +46,15 @@ namespace FluentMigrator.Tests.Unit.Generators
         public static string TestColumn1Description = "TestColumn1Description";
         public static string TestColumn2Description = "TestColumn2Description";
         public static string TestColumnCollationName = "Latin1_General_CS_AS";
+        public static Dictionary<string, string> TestAdditionalColumnDescriptions1 = new Dictionary<string, string> ()
+        {
+            {"AdditionalColumnDescriptionKey1", "AdditionalColumnDescriptionValue1" }
+        };
+        public static Dictionary<string, string> TestAdditionalColumnDescriptions2 = new Dictionary<string, string>()
+        {
+            {"AdditionalColumnDescriptionKey2", "AdditionalColumnDescriptionValue2" }
+        };
+
         public static Guid TestGuid = Guid.NewGuid();
 
         public static CreateTableExpression GetCreateTableExpression()
@@ -54,6 +63,12 @@ namespace FluentMigrator.Tests.Unit.Generators
             expression.Columns.Add(new ColumnDefinition { Name = TestColumnName1, Type = DbType.String });
             expression.Columns.Add(new ColumnDefinition { Name = TestColumnName2, Type = DbType.Int32 });
             return expression;
+        }
+
+        public static CreateColumnExpression GetCreateBooleanColumnExpression()
+        {
+            ColumnDefinition column = new ColumnDefinition { Name = TestColumnName1, Type = DbType.Boolean, };
+            return new CreateColumnExpression { TableName = TestTableName1, Column = column };
         }
 
         public static CreateTableExpression GetCreateTableWithDefaultValue()
@@ -135,6 +150,28 @@ namespace FluentMigrator.Tests.Unit.Generators
                 Name = TestColumnName2,
                 Type = DbType.Int32,
                 ColumnDescription = TestColumn2Description
+            });
+
+            return expression;
+        }
+
+        public static CreateTableExpression GetCreateTableWithTableDescriptionAndColumnDescriptionsAndAdditionalDescriptions()
+        {
+            var expression = new CreateTableExpression { TableName = TestTableName1, TableDescription = TestTableDescription };
+            expression.Columns.Add(new ColumnDefinition
+            {
+                Name = TestColumnName1,
+                IsNullable = true,
+                Type = DbType.String,
+                ColumnDescription = TestColumn1Description,
+                AdditionalColumnDescriptions = TestAdditionalColumnDescriptions1
+            });
+            expression.Columns.Add(new ColumnDefinition
+            {
+                Name = TestColumnName2,
+                Type = DbType.Int32,
+                ColumnDescription = TestColumn2Description,
+                AdditionalColumnDescriptions = TestAdditionalColumnDescriptions2
             });
 
             return expression;
@@ -394,8 +431,8 @@ namespace FluentMigrator.Tests.Unit.Generators
 
         public static InsertDataExpression GetInsertGUIDExpression(Guid guid)
         {
-            var expression = new InsertDataExpression {TableName = TestTableName1};
-            expression.Rows.Add(new InsertionDataDefinition {new KeyValuePair<string, object>("guid", guid)});
+            var expression = new InsertDataExpression { TableName = TestTableName1 };
+            expression.Rows.Add(new InsertionDataDefinition { new KeyValuePair<string, object>("guid", guid) });
 
             return expression;
         }
@@ -478,7 +515,7 @@ namespace FluentMigrator.Tests.Unit.Generators
         {
             var serviceProvider = new ServiceCollection().BuildServiceProvider();
             var querySchema = new Mock<IQuerySchema>();
-            var context = new MigrationContext(querySchema.Object, serviceProvider, null, null);
+            var context = new MigrationContext(querySchema.Object, serviceProvider, null);
             var expr = new CreateColumnExpression
             {
                 TableName = TestTableName1,
@@ -495,6 +532,14 @@ namespace FluentMigrator.Tests.Unit.Generators
         {
             CreateColumnExpression columnExpression = GetCreateColumnExpression();
             columnExpression.Column.ColumnDescription = TestColumn1Description;
+            return columnExpression;
+        }
+
+        public static CreateColumnExpression GetCreateColumnExpressionWithDescriptionWithAdditionalDescriptions()
+        {
+            CreateColumnExpression columnExpression = GetCreateColumnExpression();
+            columnExpression.Column.ColumnDescription = TestColumn1Description;
+            columnExpression.Column.AdditionalColumnDescriptions = TestAdditionalColumnDescriptions1;
             return columnExpression;
         }
 
@@ -518,7 +563,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 
         public static AlterTableExpression GetAlterTable()
         {
-            return new AlterTableExpression() {TableName = TestTableName1 };
+            return new AlterTableExpression() { TableName = TestTableName1 };
         }
 
         public static RenameTableExpression GetRenameTableExpression()
@@ -531,7 +576,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 
         public static AlterColumnExpression GetAlterColumnAddAutoIncrementExpression()
         {
-            ColumnDefinition column = new ColumnDefinition { Name = TestColumnName1, IsIdentity = true, IsPrimaryKey = true, Type = DbType.Int32 };
+            ColumnDefinition column = new ColumnDefinition { Name = TestColumnName1, IsIdentity = true, IsPrimaryKey = true, Type = DbType.Int32, ModificationType = ColumnModificationType.Alter };
             return new AlterColumnExpression { TableName = TestTableName1, Column = column };
         }
 
@@ -546,6 +591,20 @@ namespace FluentMigrator.Tests.Unit.Generators
             expression.Column.Size = 20;
             expression.Column.IsNullable = false;
             expression.Column.ModificationType = ColumnModificationType.Alter;
+
+            return expression;
+        }
+
+        public static CreateColumnExpression GetCreateColumnExpressionWithDateTimeOffsetType()
+        {
+            var expression = new CreateColumnExpression();
+            expression.TableName = TestTableName1;
+
+            expression.Column = new ColumnDefinition();
+            expression.Column.Name = TestColumnName1;
+            expression.Column.IsNullable = true;
+            expression.Column.Type = DbType.DateTimeOffset;
+            expression.Column.ModificationType = ColumnModificationType.Create;
 
             return expression;
         }
@@ -568,6 +627,14 @@ namespace FluentMigrator.Tests.Unit.Generators
         {
             var columnExpression = GetAlterColumnExpression();
             columnExpression.Column.ColumnDescription = TestColumn1Description;
+            return columnExpression;
+        }
+
+        public static AlterColumnExpression GetAlterColumnExpressionWithDescriptionWithAdditionalDescriptions()
+        {
+            var columnExpression = GetAlterColumnExpression();
+            columnExpression.Column.ColumnDescription = TestColumn1Description;
+            columnExpression.Column.AdditionalColumnDescriptions = TestAdditionalColumnDescriptions1;
             return columnExpression;
         }
 
@@ -646,6 +713,11 @@ namespace FluentMigrator.Tests.Unit.Generators
         public static DeleteTableExpression GetDeleteTableExpression()
         {
             return new DeleteTableExpression { TableName = TestTableName1 };
+        }
+
+        public static DeleteTableExpression GetDeleteTableIfExistsExpression()
+        {
+            return new DeleteTableExpression { TableName = TestTableName1, IfExists = true };
         }
 
         public static DeleteColumnExpression GetDeleteColumnExpression()
@@ -778,11 +850,11 @@ namespace FluentMigrator.Tests.Unit.Generators
         public static AlterDefaultConstraintExpression GetAlterDefaultConstraintExpression()
         {
             var expression = new AlterDefaultConstraintExpression
-                                 {
-                                     ColumnName = TestColumnName1,
-                                     DefaultValue = 1,
-                                     TableName = TestTableName1
-                                 };
+            {
+                ColumnName = TestColumnName1,
+                DefaultValue = 1,
+                TableName = TestTableName1
+            };
             return expression;
         }
 

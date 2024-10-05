@@ -20,7 +20,7 @@ using FluentMigrator.Runner.Helpers;
 
 #region License
 //
-// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2024, Fluent Migrator Project
 // Copyright (c) 2010, Nathan Brown
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -41,7 +41,6 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using System.Data.SqlClient;
 using System.IO;
 
 using FluentMigrator.Expressions;
@@ -53,6 +52,7 @@ using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -63,12 +63,6 @@ namespace FluentMigrator.Runner.Processors.SqlServer
     {
         [CanBeNull]
         private readonly IServiceProvider _serviceProvider;
-
-        [Obsolete]
-        public SqlServer2000Processor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
-            : base(connection, factory, generator, announcer, options)
-        {
-        }
 
         public SqlServer2000Processor(
             [NotNull] ILogger<SqlServer2000Processor> logger,
@@ -92,9 +86,9 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             _serviceProvider = serviceProvider;
         }
 
-        public override string DatabaseType => "SqlServer2000";
+        public override string DatabaseType => ProcessorId.SqlServer2000;
 
-        public override IList<string> DatabaseTypeAliases { get; } = new List<string>() { "SqlServer" };
+        public override IList<string> DatabaseTypeAliases { get; } = new List<string>() { ProcessorId.SqlServer };
 
         public override void BeginTransaction()
         {
@@ -132,7 +126,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                Logger.LogError(e, "There was an exception checking if table {Table} in {Schema} exists", tableName, schemaName);
             }
             return false;
         }
@@ -241,13 +235,9 @@ namespace FluentMigrator.Runner.Processors.SqlServer
                 }
                 catch (Exception ex)
                 {
-                    using (var message = new StringWriter())
+                    using (_ = new StringWriter())
                     {
-                        message.WriteLine("An error occured executing the following sql:");
-                        message.WriteLine(sql);
-                        message.WriteLine("The error was {0}", ex.Message);
-
-                        throw new Exception(message.ToString(), ex);
+                        ReThrowWithSql(ex, sql);
                     }
                 }
             }
@@ -292,11 +282,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             {
                 using (var message = new StringWriter())
                 {
-                    message.WriteLine("An error occured executing the following sql:");
-                    message.WriteLine(string.IsNullOrEmpty(sqlBatch) ? sql : sqlBatch);
-                    message.WriteLine("The error was {0}", ex.Message);
-
-                    throw new Exception(message.ToString(), ex);
+                    ReThrowWithSql(ex, string.IsNullOrEmpty(sqlBatch) ? sql : sqlBatch);
                 }
             }
         }

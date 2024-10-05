@@ -1,5 +1,5 @@
 #region License
-// Copyright (c) 2007-2018, Sean Chambers and the FluentMigrator Project
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,10 +25,10 @@ namespace FluentMigrator.DotNet.Cli.Commands
     [Command("down", Description = "Revert migrations")]
     public class MigrateDown : BaseCommand
     {
-        public Migrate Parent { get; }
+        public Migrate Parent { get; set; }
 
         [Option("-t|--target <TARGET_VERSION>", Description = "The specific version to migrate.")]
-        public long TargetVersion { get; }
+        public long TargetVersion { get; set; }
 
         private int OnExecute(IConsole console)
         {

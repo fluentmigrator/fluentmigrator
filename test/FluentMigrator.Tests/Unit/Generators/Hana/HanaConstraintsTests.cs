@@ -17,6 +17,8 @@
 #endregion
 
 using System.Data;
+
+using FluentMigrator.Runner;
 using FluentMigrator.Runner.Generators.Hana;
 using NUnit.Framework;
 
@@ -109,21 +111,23 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
         }
 
         [Test]
-        public override void CanCreateMultiColumnPrimaryKeyConstraintWithCustomSchema()
+        public override void CanCreateMultiColumnPrimaryKeyConstraintWithCustomSchema([Values] CompatibilityMode compatibilityMode)
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnPrimaryKeyExpression();
             expression.Constraint.SchemaName = "TestSchema";
 
+            Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE \"TestTable1\" ADD CONSTRAINT \"PK_TestTable1_TestColumn1_TestColumn2\" " +
                             "PRIMARY KEY (\"TestColumn1\", \"TestColumn2\");");
         }
 
         [Test]
-        public override void CanCreateMultiColumnPrimaryKeyConstraintWithDefaultSchema()
+        public override void CanCreateMultiColumnPrimaryKeyConstraintWithDefaultSchema([Values] CompatibilityMode compatibilityMode)
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnPrimaryKeyExpression();
 
+            Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE \"TestTable1\" ADD CONSTRAINT \"PK_TestTable1_TestColumn1_TestColumn2\" " +
                             "PRIMARY KEY (\"TestColumn1\", \"TestColumn2\");");
@@ -263,11 +267,12 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
         }
 
         [Test]
-        public override void CanCreateNamedMultiColumnPrimaryKeyConstraintWithCustomSchema()
+        public override void CanCreateNamedMultiColumnPrimaryKeyConstraintWithCustomSchema([Values] CompatibilityMode compatibilityMode)
         {
             var expression = GeneratorTestHelper.GetCreateNamedMultiColumnPrimaryKeyExpression();
             expression.Constraint.SchemaName = "TestSchema";
 
+            Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE \"TestTable1\" " +
                            "ADD CONSTRAINT \"TESTPRIMARYKEY\" " +
@@ -275,10 +280,11 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
         }
 
         [Test]
-        public override void CanCreateNamedMultiColumnPrimaryKeyConstraintWithDefaultSchema()
+        public override void CanCreateNamedMultiColumnPrimaryKeyConstraintWithDefaultSchema([Values] CompatibilityMode compatibilityMode)
         {
             var expression = GeneratorTestHelper.GetCreateNamedMultiColumnPrimaryKeyExpression();
 
+            Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE \"TestTable1\" " +
                             "ADD CONSTRAINT \"TESTPRIMARYKEY\" " +
@@ -309,11 +315,12 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
         }
 
         [Test]
-        public override void CanCreateNamedPrimaryKeyConstraintWithCustomSchema()
+        public override void CanCreateNamedPrimaryKeyConstraintWithCustomSchema([Values] CompatibilityMode compatibilityMode)
         {
             var expression = GeneratorTestHelper.GetCreateNamedPrimaryKeyExpression();
             expression.Constraint.SchemaName = "TestSchema";
 
+            Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE \"TestTable1\" " +
                             "ADD CONSTRAINT \"TESTPRIMARYKEY\" " +
@@ -321,10 +328,11 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
         }
 
         [Test]
-        public override void CanCreateNamedPrimaryKeyConstraintWithDefaultSchema()
+        public override void CanCreateNamedPrimaryKeyConstraintWithDefaultSchema([Values] CompatibilityMode compatibilityMode)
         {
             var expression = GeneratorTestHelper.GetCreateNamedPrimaryKeyExpression();
 
+            Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE \"TestTable1\" " +
                             "ADD CONSTRAINT \"TESTPRIMARYKEY\" " +
@@ -355,20 +363,22 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
         }
 
         [Test]
-        public override void CanCreatePrimaryKeyConstraintWithCustomSchema()
+        public override void CanCreatePrimaryKeyConstraintWithCustomSchema([Values] CompatibilityMode compatibilityMode)
         {
             var expression = GeneratorTestHelper.GetCreatePrimaryKeyExpression();
             expression.Constraint.SchemaName = "TestSchema";
 
+            Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE \"TestTable1\" ADD CONSTRAINT \"PK_TestTable1_TestColumn1\" PRIMARY KEY (\"TestColumn1\");");
         }
 
         [Test]
-        public override void CanCreatePrimaryKeyConstraintWithDefaultSchema()
+        public override void CanCreatePrimaryKeyConstraintWithDefaultSchema([Values] CompatibilityMode compatibilityMode)
         {
             var expression = GeneratorTestHelper.GetCreatePrimaryKeyExpression();
 
+            Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE \"TestTable1\" ADD CONSTRAINT \"PK_TestTable1_TestColumn1\" PRIMARY KEY (\"TestColumn1\");");
         }

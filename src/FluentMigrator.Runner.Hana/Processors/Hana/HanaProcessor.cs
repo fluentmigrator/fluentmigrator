@@ -19,11 +19,6 @@ namespace FluentMigrator.Runner.Processors.Hana
 {
     public class HanaProcessor : GenericProcessorBase
     {
-        [Obsolete]
-        public HanaProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
-            : base(connection, factory, generator, announcer, options)
-        {
-        }
 
         public HanaProcessor(
             [NotNull] HanaDbFactory factory,
@@ -35,7 +30,7 @@ namespace FluentMigrator.Runner.Processors.Hana
         {
         }
 
-        public override string DatabaseType => "Hana";
+        public override string DatabaseType => ProcessorId.Hana;
 
         public override IList<string> DatabaseTypeAliases { get; } = new List<string>();
 

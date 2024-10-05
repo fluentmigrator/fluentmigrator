@@ -25,7 +25,7 @@ namespace FluentMigrator.Tests.Unit.BatchParser
     [Category("BatchParser")]
     public abstract class SourceTestsBase
     {
-        public abstract ITextSource CreateSource(string content);
+        protected abstract ITextSource CreateSource(string content);
 
         [TestCase("")]
         [TestCase("a", "a")]
@@ -37,33 +37,39 @@ namespace FluentMigrator.Tests.Unit.BatchParser
         public void TestInputs(string content, params string[] lines)
         {
             var source = CreateSource(content);
-            Assert.IsNotNull(source);
+            Assert.That(source, Is.Not.Null);
             var reader = source.CreateReader();
 
             foreach (var line in lines)
             {
-                Assert.NotNull(reader);
-                Assert.AreEqual(line, reader.Line);
-                Assert.AreEqual(0, reader.Index);
+                Assert.That(reader, Is.Not.Null);
+                Assert.Multiple(() =>
+                {
+                    Assert.That(reader.Line, Is.EqualTo(line));
+                    Assert.That(reader.Index, Is.EqualTo(0));
+                });
 
                 var nextReader = reader.Advance(reader.Line.Length);
-                Assert.AreNotSame(reader, nextReader);
+                Assert.That(nextReader, Is.Not.SameAs(reader));
                 reader = nextReader;
             }
 
-            Assert.IsNull(reader);
+            Assert.That(reader, Is.Null);
         }
 
         [Test]
         public void TestReadTooMuch()
         {
             var source = CreateSource("asdasdasd");
-            Assert.IsNotNull(source);
+            Assert.That(source, Is.Not.Null);
             var reader = source.CreateReader();
-            Assert.IsNotNull(reader);
-            Assert.AreEqual("asdasdasd", reader.Line);
-            Assert.AreEqual(0, reader.Index);
-            Assert.AreEqual(9, reader.Length);
+            Assert.That(reader, Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(reader.Line, Is.EqualTo("asdasdasd"));
+                Assert.That(reader.Index, Is.EqualTo(0));
+                Assert.That(reader.Length, Is.EqualTo(9));
+            });
             Assert.Throws<ArgumentOutOfRangeException>(() => reader.ReadString(100));
         }
 
@@ -71,74 +77,92 @@ namespace FluentMigrator.Tests.Unit.BatchParser
         public void TestFullLineAdvance()
         {
             var source = CreateSource("asdasdasd");
-            Assert.IsNotNull(source);
+            Assert.That(source, Is.Not.Null);
             var reader = source.CreateReader();
-            Assert.IsNotNull(reader);
-            Assert.AreEqual("asdasdasd", reader.Line);
-            Assert.AreEqual(0, reader.Index);
+            Assert.That(reader, Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(reader.Line, Is.EqualTo("asdasdasd"));
+                Assert.That(reader.Index, Is.EqualTo(0));
+            });
             var newReader = reader.Advance(reader.Line.Length);
-            Assert.AreNotSame(reader, newReader);
-            Assert.IsNull(newReader);
+            Assert.That(newReader, Is.Not.SameAs(reader));
+            Assert.That(newReader, Is.Null);
         }
 
         [Test]
         public void TestPartialAdvance()
         {
             var source = CreateSource("asdasdasd");
-            Assert.IsNotNull(source);
+            Assert.That(source, Is.Not.Null);
             var reader = source.CreateReader();
-            Assert.IsNotNull(reader);
-            Assert.AreEqual("asd", reader.ReadString(3));
+            Assert.That(reader, Is.Not.Null);
+            Assert.That(reader.ReadString(3), Is.EqualTo("asd"));
             var newReader = reader.Advance(1);
-            Assert.AreNotSame(reader, newReader);
-            Assert.IsNotNull(newReader);
+            Assert.That(newReader, Is.Not.SameAs(reader));
+            Assert.That(newReader, Is.Not.Null);
             reader = newReader;
-            Assert.AreEqual("sda", reader.ReadString(3));
-            Assert.AreEqual(1, reader.Index);
-            Assert.AreEqual(8, reader.Length);
+            Assert.Multiple(() =>
+            {
+                Assert.That(reader.ReadString(3), Is.EqualTo("sda"));
+                Assert.That(reader.Index, Is.EqualTo(1));
+                Assert.That(reader.Length, Is.EqualTo(8));
+            });
         }
 
         [Test]
         public void TestOverlappingAdvanceOneLine()
         {
             var source = CreateSource("asd\nqwe");
-            Assert.IsNotNull(source);
+            Assert.That(source, Is.Not.Null);
             var reader = source.CreateReader();
-            Assert.IsNotNull(reader);
+            Assert.That(reader, Is.Not.Null);
             reader = reader.Advance(4);
-            Assert.IsNotNull(reader);
-            Assert.AreEqual("we", reader.ReadString(2));
-            Assert.AreEqual(1, reader.Index);
+            Assert.That(reader, Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(reader.ReadString(2), Is.EqualTo("we"));
+                Assert.That(reader.Index, Is.EqualTo(1));
+            });
         }
 
         [Test]
         public void TestOverlappingAdvanceTwoLine()
         {
             var source = CreateSource("asd\n\nqwe");
-            Assert.IsNotNull(source);
+            Assert.That(source, Is.Not.Null);
             var reader = source.CreateReader();
-            Assert.IsNotNull(reader);
+            Assert.That(reader, Is.Not.Null);
             reader = reader.Advance(4);
-            Assert.IsNotNull(reader);
-            Assert.AreEqual("we", reader.ReadString(2));
-            Assert.AreEqual(1, reader.Index);
+            Assert.That(reader, Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(reader.ReadString(2), Is.EqualTo("we"));
+                Assert.That(reader.Index, Is.EqualTo(1));
+            });
         }
 
         [Test]
         public void TestNonOverlappingAdvanceTwoLine()
         {
             var source = CreateSource("asd\n\nqwe");
-            Assert.IsNotNull(source);
+            Assert.That(source, Is.Not.Null);
             var reader = source.CreateReader();
-            Assert.IsNotNull(reader);
+            Assert.That(reader, Is.Not.Null);
             reader = reader.Advance(3);
-            Assert.IsNotNull(reader);
-            Assert.AreEqual(string.Empty, reader.Line);
-            Assert.AreEqual(0, reader.Index);
+            Assert.That(reader, Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(reader.Line, Is.EqualTo(string.Empty));
+                Assert.That(reader.Index, Is.EqualTo(0));
+            });
             reader = reader.Advance(0);
-            Assert.IsNotNull(reader);
-            Assert.AreEqual("qwe", reader.Line);
-            Assert.AreEqual(0, reader.Index);
+            Assert.That(reader, Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(reader.Line, Is.EqualTo("qwe"));
+                Assert.That(reader.Index, Is.EqualTo(0));
+            });
         }
     }
 }

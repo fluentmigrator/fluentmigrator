@@ -1,5 +1,5 @@
 #region License
-// Copyright (c) 2018, FluentMigrator Project
+// Copyright (c) 2018, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 using FluentMigrator.Runner.BatchParser;
 using FluentMigrator.Runner.Generators.SqlServer;
+using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.SqlServer;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -40,11 +41,13 @@ namespace FluentMigrator.Runner
         {
             builder.Services.TryAddTransient<SqlServerBatchParser>();
             builder.Services.TryAddScoped<SqlServer2008Quoter>();
+            builder.Services.TryAddScoped<ISqlServerTypeMap>(sp => new SqlServer2008TypeMap());
             builder.Services
                 .AddScoped<SqlServer2016Processor>()
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<SqlServer2016Processor>())
                 .AddScoped<SqlServer2016Generator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<SqlServer2016Generator>());
+
             return builder;
         }
 
@@ -60,8 +63,10 @@ namespace FluentMigrator.Runner
             builder.Services
                 .AddScoped<SqlServer2000Processor>()
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<SqlServer2000Processor>())
+                .AddScoped<ISqlServerTypeMap>(sp => new SqlServer2000TypeMap())
                 .AddScoped<SqlServer2000Generator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<SqlServer2000Generator>());
+
             return builder;
         }
 
@@ -77,8 +82,10 @@ namespace FluentMigrator.Runner
             builder.Services
                 .AddScoped<SqlServer2005Processor>()
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<SqlServer2005Processor>())
+                .AddScoped<ISqlServerTypeMap>(sp => new SqlServer2005TypeMap())
                 .AddScoped<SqlServer2005Generator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<SqlServer2005Generator>());
+
             return builder;
         }
 
@@ -91,11 +98,13 @@ namespace FluentMigrator.Runner
         {
             builder.Services.TryAddTransient<SqlServerBatchParser>();
             builder.Services.TryAddScoped<SqlServer2008Quoter>();
+            builder.Services.TryAddScoped<ISqlServerTypeMap>(sp => sp.GetRequiredService<SqlServer2008TypeMap>());
             builder.Services
                 .AddScoped<SqlServer2008Processor>()
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<SqlServer2008Processor>())
                 .AddScoped<SqlServer2008Generator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<SqlServer2008Generator>());
+
             return builder;
         }
 
@@ -111,8 +120,10 @@ namespace FluentMigrator.Runner
             builder.Services
                 .AddScoped<SqlServer2012Processor>()
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<SqlServer2012Processor>())
+                .AddScoped<ISqlServerTypeMap>(sp => new SqlServer2008TypeMap())
                 .AddScoped<SqlServer2012Generator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<SqlServer2012Generator>());
+
             return builder;
         }
 
@@ -128,8 +139,10 @@ namespace FluentMigrator.Runner
             builder.Services
                 .AddScoped<SqlServer2014Processor>()
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<SqlServer2014Processor>())
+                .AddScoped<ISqlServerTypeMap>(sp => new SqlServer2008TypeMap())
                 .AddScoped<SqlServer2014Generator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<SqlServer2014Generator>());
+
             return builder;
         }
 
@@ -145,8 +158,10 @@ namespace FluentMigrator.Runner
             builder.Services
                 .AddScoped<SqlServer2016Processor>()
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<SqlServer2016Processor>())
+                .AddScoped<ISqlServerTypeMap>(sp => new SqlServer2008TypeMap())
                 .AddScoped<SqlServer2016Generator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<SqlServer2016Generator>());
+
             return builder;
         }
     }

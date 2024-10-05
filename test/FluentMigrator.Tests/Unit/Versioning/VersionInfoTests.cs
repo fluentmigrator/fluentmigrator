@@ -1,6 +1,6 @@
 #region License
 //
-// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Versioning
 {
     [TestFixture]
+    [Category("Versioning")]
     public class VersionInfoTests
     {
         private VersionInfo _versionInfo;

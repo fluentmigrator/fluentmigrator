@@ -1,6 +1,6 @@
 #region License
 //
-// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,11 +16,9 @@
 //
 #endregion
 
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using FluentMigrator.Expressions;
-using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Update
 {
@@ -37,18 +35,6 @@ namespace FluentMigrator.Builders.Update
         /// </summary>
         /// <param name="expression">The underlying expression</param>
         public UpdateDataExpressionBuilder(UpdateDataExpression expression)
-        {
-            _expression = expression;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="UpdateDataExpressionBuilder"/> class.
-        /// </summary>
-        /// <param name="expression">The underlying expression</param>
-        /// <param name="context">The migration context</param>
-        [Obsolete]
-        // ReSharper disable once UnusedParameter.Local
-        public UpdateDataExpressionBuilder(UpdateDataExpression expression, IMigrationContext context)
         {
             _expression = expression;
         }

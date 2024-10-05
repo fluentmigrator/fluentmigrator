@@ -1,6 +1,6 @@
 #region License
 //
-// Copyright (c) 2007-2018, Fluent Migrator Project
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,9 +22,9 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 {
     internal class SqlServer2008TypeMap : SqlServer2005TypeMap
     {
-        protected override void SetupTypeMaps()
+        protected override void SetupSqlServerTypeMaps()
         {
-            base.SetupTypeMaps();
+            base.SetupSqlServerTypeMaps();
 
             SetTypeMap(DbType.DateTime2, "DATETIME2");
             SetTypeMap(DbType.DateTimeOffset, "DATETIMEOFFSET");

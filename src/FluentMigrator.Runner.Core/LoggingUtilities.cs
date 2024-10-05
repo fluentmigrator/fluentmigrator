@@ -1,5 +1,5 @@
-﻿#region License
-// Copyright (c) 2018, FluentMigrator Project
+#region License
+// Copyright (c) 2018, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -139,10 +139,12 @@ namespace FluentMigrator.Runner
                 level += 1;
                 if (exception is AggregateException aggregateException)
                 {
-                    foreach (var innerException in aggregateException.InnerExceptions)
+                    foreach (var innerException in aggregateException.Flatten().InnerExceptions)
                     {
                         writer.WriteExceptionMessage(innerException.Message, level);
                     }
+
+                    exception = null;
                 }
                 else
                 {

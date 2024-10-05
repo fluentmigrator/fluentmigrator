@@ -1,5 +1,5 @@
 #region License
-// Copyright (c) 2018, FluentMigrator Project
+// Copyright (c) 2018, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -35,19 +35,6 @@ namespace FluentMigrator.Runner.Processors.Oracle
 {
     public class OracleProcessorBase : GenericProcessorBase
     {
-        [Obsolete]
-        protected OracleProcessorBase(
-            [NotNull] string databaseType,
-            IDbConnection connection,
-            IMigrationGenerator generator,
-            IAnnouncer announcer,
-            IMigrationProcessorOptions options,
-            IDbFactory factory)
-            : base(connection, factory, generator, announcer, options)
-        {
-            DatabaseType = databaseType;
-        }
-
         protected OracleProcessorBase(
             [NotNull] string databaseType,
             [NotNull] OracleBaseDbFactory factory,
@@ -62,7 +49,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
 
         public override string DatabaseType { get; }
 
-        public override IList<string> DatabaseTypeAliases { get; } = new List<string>() { "Oracle" };
+        public override IList<string> DatabaseTypeAliases { get; } = new List<string>() { ProcessorId.Oracle };
 
         public IQuoter Quoter => ((OracleGenerator) Generator).Quoter;
 
@@ -195,7 +182,14 @@ namespace FluentMigrator.Runner.Processors.Oracle
 
         public override bool SequenceExists(string schemaName, string sequenceName)
         {
-            return false;
+            if (string.IsNullOrEmpty(schemaName))
+            {
+                return Exists("SELECT 1 FROM USER_SEQUENCES WHERE upper(SEQUENCE_NAME) = '{0}'",
+                    FormatHelper.FormatSqlEscape(sequenceName.ToUpper()));
+            }
+
+            return Exists("SELECT 1 FROM ALL_SEQUENCES WHERE upper(SEQUENCE_OWNER) = '{0}' AND upper(SEQUENCE_NAME) = '{1}'",
+                schemaName.ToUpper(), FormatHelper.FormatSqlEscape(sequenceName.ToUpper()));
         }
 
         public override bool DefaultValueExists(string schemaName, string tableName, string columnName,
@@ -290,7 +284,14 @@ namespace FluentMigrator.Runner.Processors.Oracle
             {
                 using (var command = CreateCommand(batch))
                 {
-                    command.ExecuteNonQuery();
+                    try
+                    {
+                        command.ExecuteNonQuery();
+                    }
+                    catch (Exception ex)
+                    {
+                        ReThrowWithSql(ex, batch);
+                    }
                 }
             }
         }

@@ -1,6 +1,6 @@
 #region License
 //
-// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2024, Fluent Migrator Project
 // Copyright (c) 2010, Nathan Brown
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -44,24 +44,12 @@ namespace FluentMigrator.Runner.Processors.SQLite
     {
         [CanBeNull]
         private readonly IServiceProvider _serviceProvider;
+        [NotNull]
+        private readonly SQLiteQuoter _quoter;
 
-        public override string DatabaseType
-        {
-            get { return "SQLite"; }
-        }
+        public override string DatabaseType => ProcessorId.SQLite;
 
         public override IList<string> DatabaseTypeAliases { get; } = new List<string>();
-
-        [Obsolete]
-        public SQLiteProcessor(
-            IDbConnection connection,
-            IMigrationGenerator generator,
-            IAnnouncer announcer,
-            [NotNull] IMigrationProcessorOptions options,
-            IDbFactory factory)
-            : base(connection, factory, generator, announcer, options)
-        {
-        }
 
         public SQLiteProcessor(
             [NotNull] SQLiteDbFactory factory,
@@ -69,10 +57,12 @@ namespace FluentMigrator.Runner.Processors.SQLite
             [NotNull] ILogger<SQLiteProcessor> logger,
             [NotNull] IOptionsSnapshot<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor,
-            [NotNull] IServiceProvider serviceProvider)
+            [NotNull] IServiceProvider serviceProvider,
+            [NotNull] SQLiteQuoter quoter)
             : base(() => factory.Factory, generator, logger, options.Value, connectionStringAccessor)
         {
             _serviceProvider = serviceProvider;
+            _quoter = quoter;
         }
 
         public override bool SchemaExists(string schemaName)
@@ -82,28 +72,33 @@ namespace FluentMigrator.Runner.Processors.SQLite
 
         public override bool TableExists(string schemaName, string tableName)
         {
-            return Exists("select count(*) from sqlite_master where name=\"{0}\" and type='table'", tableName);
+            return Exists("select count(*) from {1}sqlite_master where name={0} and type='table'",
+                _quoter.QuoteValue(tableName),
+                !string.IsNullOrWhiteSpace(schemaName) ? _quoter.QuoteValue(schemaName) + "." : string.Empty);
         }
 
         public override bool ColumnExists(string schemaName, string tableName, string columnName)
         {
-            var dataSet = Read("PRAGMA table_info([{0}])", tableName);
-            if (dataSet.Tables.Count == 0)
-                return false;
-            var table = dataSet.Tables[0];
-            if (!table.Columns.Contains("Name"))
-                return false;
-            return table.Select(string.Format("Name='{0}'", columnName.Replace("'", "''"))).Length > 0;
+            return Exists("select count(*) from {2}sqlite_master AS t, {2}pragma_table_info(t.name) AS c where t.type = 'table' AND t.name = {0} AND c.name = {1}",
+                _quoter.QuoteValue(tableName),
+                _quoter.QuoteValue(columnName),
+                !string.IsNullOrWhiteSpace(schemaName) ? _quoter.QuoteValue(schemaName) + "." : string.Empty);
         }
 
         public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
         {
-            return false;
+            return Exists("select count(*) from {2}sqlite_master where name={0} and tbl_name={1} and type='index' and sql LIKE 'CREATE UNIQUE INDEX %'",
+                   _quoter.QuoteValue(constraintName),
+                   _quoter.QuoteValue(tableName),
+                   !string.IsNullOrWhiteSpace(schemaName) ? _quoter.QuoteValue(schemaName) + "." : string.Empty);
         }
 
         public override bool IndexExists(string schemaName, string tableName, string indexName)
         {
-            return Exists("select count(*) from sqlite_master where name='{0}' and tbl_name='{1}' and type='index'", indexName, tableName);
+            return Exists("select count(*) from {2}sqlite_master where name={0} and tbl_name={1} and type='index'",
+                _quoter.QuoteValue(indexName),
+                _quoter.QuoteValue(tableName),
+                !string.IsNullOrWhiteSpace(schemaName) ? _quoter.QuoteValue(schemaName) + "." : string.Empty);
         }
 
         public override bool SequenceExists(string schemaName, string sequenceName)
@@ -138,7 +133,7 @@ namespace FluentMigrator.Runner.Processors.SQLite
 
         public override DataSet ReadTableData(string schemaName, string tableName)
         {
-            return Read("select * from [{0}]", tableName);
+            return Read("select * from {0}", _quoter.QuoteTableName(tableName, schemaName));
         }
 
         public override bool DefaultValueExists(string schemaName, string tableName, string columnName, object defaultValue)
@@ -236,7 +231,7 @@ namespace FluentMigrator.Runner.Processors.SQLite
                 }
                 catch (DbException ex)
                 {
-                    throw new Exception(ex.Message + "\r\nWhile Processing:\r\n\"" + command.CommandText + "\"", ex);
+                    throw new Exception(ex.Message + Environment.NewLine + "While Processing:" + Environment.NewLine + "\"" + command.CommandText + "\"", ex);
                 }
             }
         }
@@ -274,7 +269,7 @@ namespace FluentMigrator.Runner.Processors.SQLite
             }
             catch (DbException ex)
             {
-                throw new Exception(ex.Message + "\r\nWhile Processing:\r\n\"" + sqlBatch + "\"", ex);
+                throw new Exception(ex.Message + Environment.NewLine + "While Processing:" + Environment.NewLine + "\"" + sqlBatch + "\"", ex);
             }
         }
 

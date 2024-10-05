@@ -147,6 +147,16 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
         }
 
         [Test]
+        public void CanCreateBooleanColumnWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateBooleanColumnExpression();
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD (\"TestColumn1\" BOOLEAN);");
+        }
+
+    [Test]
         public override void CanCreateDecimalColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateDecimalColumnExpression();

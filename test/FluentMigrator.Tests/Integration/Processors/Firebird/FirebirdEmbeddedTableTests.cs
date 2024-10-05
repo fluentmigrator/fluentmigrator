@@ -58,14 +58,17 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                     var processor = serviceProvider.GetRequiredService<IMigrationProcessor>();
                     var result = processor.Read("select * from TheTable");
 
-                    Assert.That(result.Tables.Count, Is.GreaterThan(0));
+                    Assert.That(result.Tables, Is.Not.Empty);
                     var table = result.Tables[0];
 
-                    Assert.That(table.Rows.Count, Is.GreaterThan(0));
+                    Assert.That(table.Rows, Is.Not.Empty);
                     var row = table.Rows[0];
 
-                    Assert.IsTrue(table.Columns.Contains("Name"));
-                    Assert.That(row["Name"], Is.InstanceOf<DBNull>());
+                    Assert.Multiple(() =>
+                    {
+                        Assert.That(table.Columns.Contains("Name"));
+                        Assert.That(row["Name"], Is.InstanceOf<DBNull>());
+                    });
 
                     //---------------Execute Test ----------------------
                     Exception thrown = null;
@@ -79,7 +82,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                     }
 
                     //---------------Test Result -----------------------
-                    Assert.IsNull(thrown);
+                    Assert.That(thrown, Is.Null);
                 }
             }
         }
@@ -113,7 +116,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                     }
 
                     //---------------Test Result -----------------------
-                    Assert.IsNull(thrown);
+                    Assert.That(thrown, Is.Null);
                 }
             }
         }
@@ -174,7 +177,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
 
 
                     //---------------Test Result -----------------------
-                    Assert.IsNull(thrown);
+                    Assert.That(thrown, Is.Null);
                 }
             }
         }
@@ -213,7 +216,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
 
 
                     //---------------Test Result -----------------------
-                    Assert.IsNull(thrown);
+                    Assert.That(thrown, Is.Null);
                 }
             }
         }
@@ -264,7 +267,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
 
 
                     //---------------Test Result -----------------------
-                    Assert.IsNull(thrown);
+                    Assert.That(thrown, Is.Null);
                 }
             }
         }
@@ -303,7 +306,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
 
 
                     //---------------Test Result -----------------------
-                    Assert.IsNull(thrown);
+                    Assert.That(thrown, Is.Null);
                 }
             }
         }
@@ -333,8 +336,11 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                         runner.Up(new UpdateMigration(4, 1));
                         runner.Up(new UpdateMigration(5, 2));
                         processor.CommitTransaction();
-                        Assert.That(CountRowsWith(countSql, processor, 4), Is.EqualTo(1));
-                        Assert.That(CountRowsWith(countSql, processor, 5), Is.EqualTo(1));
+                        Assert.Multiple(() =>
+                        {
+                            Assert.That(CountRowsWith(countSql, processor, 4), Is.EqualTo(1));
+                            Assert.That(CountRowsWith(countSql, processor, 5), Is.EqualTo(1));
+                        });
                     }
                     catch (Exception ex)
                     {
@@ -343,7 +349,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
 
 
                     //---------------Test Result -----------------------
-                    Assert.IsNull(thrown);
+                    Assert.That(thrown, Is.Null);
                 }
             }
         }
@@ -364,9 +370,12 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                     //---------------Assert Precondition----------------
                     const string countSql = "select count(*) as TheCount from TheTable where SomeValue = {0}";
                     var processor = serviceProvider.GetRequiredService<FirebirdProcessor>();
-                    Assert.That(CountRowsWith(countSql, processor, 1), Is.EqualTo(1));
-                    Assert.That(CountRowsWith(countSql, processor, 2), Is.EqualTo(1));
-                    Assert.That(CountRowsWith(countSql, processor, 3), Is.EqualTo(1));
+                    Assert.Multiple(() =>
+                    {
+                        Assert.That(CountRowsWith(countSql, processor, 1), Is.EqualTo(1));
+                        Assert.That(CountRowsWith(countSql, processor, 2), Is.EqualTo(1));
+                        Assert.That(CountRowsWith(countSql, processor, 3), Is.EqualTo(1));
+                    });
 
                     //---------------Execute Test ----------------------
                     Exception thrown = null;
@@ -383,7 +392,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
 
 
                     //---------------Test Result -----------------------
-                    Assert.IsNull(thrown);
+                    Assert.That(thrown, Is.Null);
                 }
             }
         }
@@ -414,51 +423,6 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         }
 
         [Test]
-        [Obsolete]
-        public void ObsoleteAlterTable_MigrationRequiresAutomaticDelete_AndProcessorHasUndoDisabled_ShouldNotThrow()
-        {
-            using (var tempDb = new TemporaryDatabase(IntegrationTestOptions.Firebird, _firebirdLibraryProber))
-            {
-                var connectionString = tempDb.ConnectionString;
-
-                var runnerContext = new RunnerContext(new TextWriterAnnouncer(TestContext.Out))
-                {
-                    Namespace = "FluentMigrator.Tests.Integration.Migrations"
-                };
-
-                using (var connection = new FbConnection(connectionString))
-                {
-                    var announcer = new TextWriterAnnouncer(TestContext.Out) { ShowSql = true };
-                    var options = FirebirdOptions.AutoCommitBehaviour();
-                    options.TruncateLongNames = false;
-                    var processor = new FirebirdProcessor(connection, new FirebirdGenerator(options), announcer,
-                        new ProcessorOptions(), new FirebirdDbFactory(), options);
-                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), runnerContext, processor);
-                    runner.Up(new MigrationWhichCreatesTwoRelatedTables());
-                    processor.CommitTransaction();
-                    FbConnection.ClearPool(connection);
-                }
-
-                //---------------Assert Precondition----------------
-                Assert.IsTrue(ForeignKeyExists(connectionString, MigrationWhichCreatesTwoRelatedTables.ForeignKeyName),
-                    "Foreign key does not exist after first migration");
-                using (var connection = new FbConnection(connectionString))
-                {
-                    var announcer = new TextWriterAnnouncer(TestContext.Out) { ShowSql = true };
-                    var options = FirebirdOptions.AutoCommitBehaviour();
-                    var processor = new FirebirdProcessor(connection, new FirebirdGenerator(options), announcer,
-                        new ProcessorOptions(), new FirebirdDbFactory(), options);
-                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), runnerContext, processor);
-                    runner.Up(new MigrationWhichAltersTableWithFK());
-                    processor.CommitTransaction();
-                }
-
-                Assert.IsTrue(ForeignKeyExists(connectionString, MigrationWhichCreatesTwoRelatedTables.ForeignKeyName),
-                    "Foreign key does not exist after second migration");
-            }
-        }
-
-        [Test]
         public void AlterTable_MigrationRequiresAutomaticDelete_AndProcessorHasUndoDisabled_ShouldNotThrow()
         {
             using (var tempDb = new TemporaryDatabase(IntegrationTestOptions.Firebird, _firebirdLibraryProber))
@@ -473,7 +437,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                 }
 
                 //---------------Assert Precondition----------------
-                Assert.IsTrue(ForeignKeyExists(tempDb.ConnectionString, MigrationWhichCreatesTwoRelatedTables.ForeignKeyName),
+                Assert.That(ForeignKeyExists(tempDb.ConnectionString, MigrationWhichCreatesTwoRelatedTables.ForeignKeyName),
                     "Foreign key does not exist after first migration");
                 using (var serviceProvider = CreateServiceProvider(tempDb.ConnectionString, "FluentMigrator.Tests.Integration.Migrations"))
                 {
@@ -483,7 +447,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                     processor.CommitTransaction();
                 }
 
-                Assert.IsTrue(ForeignKeyExists(tempDb.ConnectionString, MigrationWhichCreatesTwoRelatedTables.ForeignKeyName),
+                Assert.That(ForeignKeyExists(tempDb.ConnectionString, MigrationWhichCreatesTwoRelatedTables.ForeignKeyName),
                     "Foreign key does not exist after second migration");
             }
         }
@@ -497,28 +461,31 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                 fieldName.ToUpper() + "' " +
                 "and rf.RDB$RELATION_NAME = '" + tableName.ToUpper() + "'";
             var result = processor.Read(sql);
-            Assert.That(result.Tables.Count, Is.GreaterThan(0), "Unable to query schema for table '" + tableName + "'");
+            Assert.That(result.Tables, Is.Not.Empty, "Unable to query schema for table '" + tableName + "'");
             var table = result.Tables[0];
 
-            Assert.That(table.Rows.Count, Is.GreaterThan(0), "Unable to query schema for table '" + tableName + "'");
+            Assert.That(table.Rows, Is.Not.Empty, "Unable to query schema for table '" + tableName + "'");
             var row = table.Rows[0];
             var fieldType = row["fieldType"];
             var fieldSubType = row["subType"];
-            Assert.AreEqual(expectedFieldType, fieldType, "Field type mismatch");
-            Assert.AreEqual(expectedFieldSubType, fieldSubType, "Field subtype mismatch");
+            Assert.Multiple(() =>
+            {
+                Assert.That(fieldType, Is.EqualTo(expectedFieldType), "Field type mismatch");
+                Assert.That(fieldSubType, Is.EqualTo(expectedFieldSubType), "Field subtype mismatch");
+            });
         }
 
         private static int CountRowsWith(string countSql, IMigrationProcessor processor, params object[] args)
         {
             var result = processor.Read(countSql, args);
 
-            Assert.That(result.Tables.Count, Is.GreaterThan(0));
+            Assert.That(result.Tables, Is.Not.Empty);
             var table = result.Tables[0];
 
-            Assert.That(table.Rows.Count, Is.GreaterThan(0));
+            Assert.That(table.Rows, Is.Not.Empty);
             var row = table.Rows[0];
 
-            Assert.IsTrue(table.Columns.Contains("TheCount"));
+            Assert.That(table.Columns.Contains("TheCount"));
             return Convert.ToInt32(row["TheCount"]);
         }
 
@@ -527,6 +494,18 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             return ServiceCollectionExtensions.CreateServices()
                 .ConfigureRunner(cfg => cfg.AddFirebird())
                 .AddScoped<IConnectionStringReader>(_ => new PassThroughConnectionStringReader(connectionString))
+                .WithMigrationsIn(@namespace)
+                .BuildServiceProvider();
+        }
+
+        private ServiceProvider CreateServiceProvider(string connectionString, string @namespace, RunnerOptions runnerOptions)
+        {
+            return ServiceCollectionExtensions.CreateServices()
+                .ConfigureRunner(cfg => cfg.AddFirebird())
+                .AddScoped<IConnectionStringReader>(_ => new PassThroughConnectionStringReader(connectionString))
+                // TODO [jaz] FIX.
+                .AddOptions<RunnerOptions>().Configure((RunnerOptions opts) => opts.AllowBreakingChange = runnerOptions.AllowBreakingChange)
+                .Services
                 .WithMigrationsIn(@namespace)
                 .BuildServiceProvider();
         }
