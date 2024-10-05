@@ -8,6 +8,10 @@
     <OutputType>Library</OutputType>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="$(MSBuildProjectDirectory)..\FluentMigrator.Example.Migrations\FluentMigrator.Example.Migrations.csproj"  />
+  </ItemGroup>
+
   <Target Name="Migrate">
 
     <Message Text="Starting FluentMigrator Migration using $(PkgFluentMigrator_MSBuild)" Importance="High" />
