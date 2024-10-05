@@ -34,6 +34,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\FluentMigrator.Runner.Core\DirtyAssemblyResolveHelper.cs" Link="DirtyAssemblyResolveHelper.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\FluentMigrator.Runner\FluentMigrator.Runner.csproj" PrivateAssets="all" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net48' ">
