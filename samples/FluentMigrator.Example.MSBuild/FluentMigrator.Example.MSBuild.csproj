@@ -18,9 +18,8 @@
     </PropertyGroup>
     <Message Text="Starting FluentMigrator Migration using $(FluentMigratorMSBuildAssemblyPath)" Importance="High" />
     <Message Text="Starting FluentMigrator Migration using MigrationAssembly  $(MigrationAssembly)" Importance="High" />
-    <!-- Important: Target must be your Migrations assembly name, not your dll file name.  The dll must be located where dotnet assembly loader can find it (usually same folder as the fluentmigrator dlls) -->
 
-    <Migrate Database="sqlserver2016" Connection="Data Source=(local);Database=FluentMigratorExample;Trusted_Connection=true" Target="$(MigrationAssembly)" UseMsBuildLogging="true">
+    <Migrate Database="sqlserver2016" Connection="Data Source=(local);Database=FluentMigratorExample;Trusted_Connection=true" Target="$(MigrationAssembly)" UseMsBuildLogging="true" AllowDirtyAssemblies="true">
     </Migrate>
   </Target>
 
