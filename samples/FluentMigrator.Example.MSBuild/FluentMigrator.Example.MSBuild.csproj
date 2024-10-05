@@ -14,7 +14,7 @@
     <Message Text="Starting FluentMigrator Migration using $(MSBuildThisFileDirectory)../" Importance="High" />
     <!-- Important: Target must be your Migrations assembly name, not your dll file name.  The dll must be located where dotnet assembly loader can find it (usually same folder as the fluentmigrator dlls) -->
 
-    <Migrate Database="sqlserver2016" Connection="Data Source=(local);Database=FluentMigratorExample;Trusted_Connection=true" Target="$(MSBuildThisFileDirectory)../FluentMigrator.Example.Migrations/bin/Debug/net8.0/FluentMigrator.Example.Migrations.dll" UseMsBuildLogging="true">
+    <Migrate Database="sqlserver2016" Connection="Data Source=(local);Database=FluentMigratorExample;Trusted_Connection=true" Target="$(MSBuildThisFileDirectory)../FluentMigrator.Example.Migrations/bin/Debug/netstandard2.0/FluentMigrator.Example.Migrations.dll" UseMsBuildLogging="true">
     </Migrate>
   </Target>
 
