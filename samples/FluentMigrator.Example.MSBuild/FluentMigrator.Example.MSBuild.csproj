@@ -4,7 +4,7 @@
           Condition="Exists('$(MSBuildProjectDirectory)\FluentMigrator.targets')" />
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFrameworks>net48;net8.0</TargetFrameworks>
     <OutputType>Library</OutputType>
   </PropertyGroup>
 
@@ -13,9 +13,22 @@
   </ItemGroup>
 
   <Target Name="Migrate">
-    <PropertyGroup>
-      <MigrationAssembly>$(MSBuildThisFileDirectory)..\FluentMigrator.Example.Migrations\bin\$(Configuration)\netstandard2.0\FluentMigrator.Example.Migrations.dll</MigrationAssembly>
-    </PropertyGroup>
+    <Choose>
+      <When Condition="'$(TargetFramework)' == 'net48' ">
+        <PropertyGroup>
+          <MigrationAssembly>$(MSBuildThisFileDirectory)..\FluentMigrator.Example.Migrations\bin\$(Configuration)\netstandard2.0\FluentMigrator.Example.Migrations.dll</MigrationAssembly>
+        </PropertyGroup>
+      </When>
+      <Otherwise>
+        <PropertyGroup>
+          <MigrationAssembly>$(MSBuildThisFileDirectory)..\FluentMigrator.Example.Migrations\bin\$(Configuration)\net8.0\FluentMigrator.Example.Migrations.dll</MigrationAssembly>
+        </PropertyGroup>
+      </Otherwise>
+    </Choose>
+
+    <Error Condition="'$(FluentMigratorMSBuildAssemblyPath)' == ''" Text="FluentMigratorMSBuildAssemblyPath is not set." />
+    <Error Condition="'$(MigrationAssembly)' == ''" Text="MigrationAssembly is not set." />
+    
     <Message Text="Starting FluentMigrator Migration using $(FluentMigratorMSBuildAssemblyPath)" Importance="High" />
     <Message Text="Starting FluentMigrator Migration using MigrationAssembly  $(MigrationAssembly)" Importance="High" />
 
