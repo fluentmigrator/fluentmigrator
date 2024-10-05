@@ -19,7 +19,7 @@
     <Message Text="Starting FluentMigrator Migration using $(FluentMigratorMSBuildAssemblyPath)" Importance="High" />
     <Message Text="Starting FluentMigrator Migration using MigrationAssembly  $(MigrationAssembly)" Importance="High" />
 
-    <Migrate Database="sqlserver2016" Connection="Data Source=(local);Database=FluentMigratorExample;Trusted_Connection=true" Target="$(MigrationAssembly)" UseMsBuildLogging="true" AllowDirtyAssemblies="true">
+    <Migrate Database="sqlserver2016" Connection="Data Source=(local);Database=FluentMigratorExample;Trusted_Connection=true" Target="$(MigrationAssembly)" UseMsBuildLogging="true">
     </Migrate>
   </Target>
 
