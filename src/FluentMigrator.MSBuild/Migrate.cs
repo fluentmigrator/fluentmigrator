@@ -120,6 +120,8 @@ namespace FluentMigrator.MSBuild
 
         public bool UseMsBuildLogging { get; set; } = false;
 
+        public bool AllowDirtyAssemblies { get; set; }
+
         public string DefaultSchemaName { get; set; }
 
         private bool ExecutingAgainstMsSql => _databaseType.StartsWith("SqlServer", StringComparison.InvariantCultureIgnoreCase);
@@ -143,6 +145,16 @@ namespace FluentMigrator.MSBuild
             try
             {
                 Log.LogMessage(MessageImportance.Low, "Creating Context");
+
+                if (AllowDirtyAssemblies)
+                {
+                    Log.LogMessage(MessageImportance.High, "AllowDirtyAssemblies is true. Using dirty assembly resolve helper.");
+                    using (DirtyAssemblyResolveHelper.Create())
+                    {
+                        ExecuteMigrations();
+                        return true;
+                    }
+                }
 
                 ExecuteMigrations();
             }
