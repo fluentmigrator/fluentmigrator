@@ -1,4 +1,4 @@
-#region License
+﻿#region License
 // Copyright (c) 2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,13 +14,21 @@
 // limitations under the License.
 #endregion
 
+using Microsoft.CodeAnalysis;
+
 namespace FluentMigrator.Analyzers
 {
-    internal static class Constants
+    public struct MigrationClassDeclaration
     {
-        internal static class Types
+        public MigrationClassDeclaration(INamedTypeSymbol typeSymbol, long migrationVersion)
         {
-            internal const string FluentMigratorMigrationAttribute = "FluentMigrator.MigrationAttribute";
+            Location = typeSymbol.Locations[0];
+            Name = typeSymbol.Name;
+            Version = migrationVersion;
         }
+
+        public string Name { get; set; }
+        public Location Location { get; set; }
+        public long Version { get; set; }
     }
 }
