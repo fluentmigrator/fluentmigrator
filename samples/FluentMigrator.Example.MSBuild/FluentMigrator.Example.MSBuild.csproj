@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildProjectDirectory)\FluentMigrator.targets"
-          Condition="Exists('$(MSBuildProjectDirectory)\FluentMigrator.targets')" />
+  <Import Project="$(MSBuildProjectDirectory)\FluentMigrator.targets" Condition="Exists('$(MSBuildProjectDirectory)\FluentMigrator.targets')" />
 
   <PropertyGroup>
     <TargetFrameworks>net48;net8.0</TargetFrameworks>
@@ -9,9 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="$(MSBuildProjectDirectory)..\FluentMigrator.Example.Migrations\FluentMigrator.Example.Migrations.csproj"  />
+    <ProjectReference Include="..\FluentMigrator.Example.Migrations\FluentMigrator.Example.Migrations.csproj" />
   </ItemGroup>
-
   <Choose>
     <When Condition="'$(TargetFramework)' == 'net48' ">
       <PropertyGroup>
