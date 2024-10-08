@@ -74,6 +74,10 @@ namespace FluentMigrator.Runner.Generators.Redshift
 
         public override string Generate(CreateTableExpression expression)
         {
+            if (expression.Columns.Any(x => x.Expression != null))
+            {
+                CompatibilityMode.HandleCompatibility("Computed columns are not supported");
+            }
             var createStatement = new StringBuilder();
             var tableName = Quoter.Quote(expression.TableName);
             createStatement.AppendFormat("CREATE TABLE {0} ({1})", Quoter.QuoteTableName(expression.TableName, expression.SchemaName), Column.Generate(expression.Columns, tableName));
@@ -91,6 +95,10 @@ namespace FluentMigrator.Runner.Generators.Redshift
 
         public override string Generate(AlterColumnExpression expression)
         {
+            if (expression.Column.Expression != null)
+            {
+                CompatibilityMode.HandleCompatibility("Computed columns are not supported");
+            }
             var alterStatement = new StringBuilder();
             alterStatement.AppendFormat("ALTER TABLE {0} {1};", Quoter.QuoteTableName(expression.TableName, expression.SchemaName), ((RedshiftColumn)Column).GenerateAlterClauses(expression.Column));
             var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatement(expression);
@@ -104,6 +112,10 @@ namespace FluentMigrator.Runner.Generators.Redshift
 
         public override string Generate(CreateColumnExpression expression)
         {
+            if (expression.Column.Expression != null)
+            {
+                CompatibilityMode.HandleCompatibility("Computed columns are not supported");
+            }
             var createStatement = new StringBuilder();
             createStatement.AppendFormat("ALTER TABLE {0} ADD {1};", Quoter.QuoteTableName(expression.TableName, expression.SchemaName), Column.Generate(expression.Column));
             var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatement(expression);

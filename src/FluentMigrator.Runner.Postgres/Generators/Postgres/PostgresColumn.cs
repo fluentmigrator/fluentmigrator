@@ -36,6 +36,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
         {
             // Note: While Postgres 10.0 introduced the ability to use ICU collations rather than depending on host OS implementations,
             // the syntax for collation requires specifying a type.  Therefore, FormatAlterType handles collation as well.
+            // todo: handle virtual columns
             AlterClauseOrder = new List<Func<ColumnDefinition, string>> { FormatAlterType, FormatAlterNullable };
         }
 
@@ -162,6 +163,12 @@ namespace FluentMigrator.Runner.Generators.Postgres
         public string GetColumnType(ColumnDefinition column)
         {
             return FormatType(column);
+        }
+
+        /// <inheritdoc />
+        protected override string FormatExpression(ColumnDefinition column)
+        {
+            return column.Expression == null ? null : "GENERATED ALWAYS AS " + column.Expression + " STORED";
         }
     }
 }
