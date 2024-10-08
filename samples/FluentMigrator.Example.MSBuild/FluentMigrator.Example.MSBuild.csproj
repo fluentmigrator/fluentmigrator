@@ -3,6 +3,7 @@
   <Import Project="$(MSBuildProjectDirectory)\FluentMigrator.targets" Condition="Exists('$(MSBuildProjectDirectory)\FluentMigrator.targets')" />
 
   <PropertyGroup>
+    <!-- In the real world, you would typically not have multiple target frameworks. However, this sample demonstrates it working against .NET Framework and .NET. -->
     <TargetFrameworks>net48;net8.0</TargetFrameworks>
     <OutputType>Library</OutputType>
   </PropertyGroup>
