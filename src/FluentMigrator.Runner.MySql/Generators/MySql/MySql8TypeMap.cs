@@ -16,7 +16,7 @@
 
 namespace FluentMigrator.Runner.Generators.MySql
 {
-    internal class MySql8TypeMap : MySql5TypeMap
+    public class MySql8TypeMap : MySql5TypeMap
     {
     }
 }
