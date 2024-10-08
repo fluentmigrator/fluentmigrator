@@ -20,7 +20,7 @@ using FluentMigrator.Runner.Generators.Base;
 
 namespace FluentMigrator.Runner.Generators.MySql
 {
-    internal class MySql4TypeMap : TypeMapBase, IMySqlTypeMap
+    public class MySql4TypeMap : TypeMapBase, IMySqlTypeMap
     {
         public const int AnsiTinyStringCapacity = 127;
         public const int StringCapacity = 255;
