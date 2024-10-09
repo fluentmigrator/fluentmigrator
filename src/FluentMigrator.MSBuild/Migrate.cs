@@ -33,6 +33,8 @@ using Microsoft.Build.Utilities;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
+using ILogger = Microsoft.Extensions.Logging.ILogger;
+
 namespace FluentMigrator.MSBuild
 {
     public class Migrate :
@@ -116,6 +118,10 @@ namespace FluentMigrator.MSBuild
 
         public bool IncludeUntaggedMigrations { get; set; } = true;
 
+        public bool UseMsBuildLogging { get; set; } = false;
+
+        public bool AllowDirtyAssemblies { get; set; }
+
         public string DefaultSchemaName { get; set; }
 
         private bool ExecutingAgainstMsSql => _databaseType.StartsWith("SqlServer", StringComparison.InvariantCultureIgnoreCase);
@@ -139,6 +145,16 @@ namespace FluentMigrator.MSBuild
             try
             {
                 Log.LogMessage(MessageImportance.Low, "Creating Context");
+
+                if (AllowDirtyAssemblies)
+                {
+                    Log.LogMessage(MessageImportance.High, "AllowDirtyAssemblies is true. Using dirty assembly resolve helper.");
+                    using (DirtyAssemblyResolveHelper.Create())
+                    {
+                        ExecuteMigrations();
+                        return true;
+                    }
+                }
 
                 ExecuteMigrations();
             }
@@ -209,6 +225,11 @@ namespace FluentMigrator.MSBuild
                             opt.OutputGoBetweenStatements = ExecutingAgainstMsSql;
                         })
                     .AddSingleton<ILoggerProvider, LogFileFluentMigratorLoggerProvider>();
+            }
+
+            if (UseMsBuildLogging)
+            {
+                services.AddScoped<ILogger>(provider => new MicrosoftBuildLogger(this));
             }
 
             using (var serviceProvider = services.BuildServiceProvider(validateScopes: false))

@@ -118,6 +118,30 @@
           <source>Table name not specified, ensure you have appended the OnTable extension. Format should be Delete.ForeignKey(KeyName).OnTable(TableName)</source>
           <target state="final">Der Tabellenname wurde nicht angegeben. Stellen Sie sicher, dass sie die "OnTable"-Erweiterungsmethode aufgerufen haben. Der Aufruf sollte wie folgt aussehen: Delete.ForeignKey(KeyName).OnTable(TableName)</target>
         </trans-unit>
+        <trans-unit id="IndexIncludeColumnNameMustNotBeNullOrEmpty" translate="yes" xml:space="preserve">
+          <source>The index include column's name must not be null or an empty string.</source>
+          <target state="final">Der Name der Index-Include-Spalte darf nicht null oder leer sein.</target>
+        </trans-unit>
+        <trans-unit id="ForeignKeyMustNotHaveColumnNameBeNullOrEmpty" translate="yes" xml:space="preserve">
+          <source>The foreign key must not have a column name be null or an empty string.</source>
+          <target state="final">Der Fremdschlüssel-Name darf nicht null oder leer sein.</target>
+        </trans-unit>
+        <trans-unit id="PrimaryKeyColumnNameReferencedByForeignKeyMustNotBeNullOrEmpty" translate="yes" xml:space="preserve">
+          <source>The primary key column name referenced by the foreign key must not be null or an empty string.</source>
+          <target state="final">Der Name der vom Fremdschlüssel referenzierten Primärschlüsselspalte darf nicht null oder leer sein.</target>
+        </trans-unit>
+        <trans-unit id="ForeignKeyColumnsCountMustMatchPrimaryKeyColumnsCount" translate="yes" xml:space="preserve">
+          <source>The foreign key columns' count must match the primary key columns' count.</source>
+          <target state="final">Die Anzahl der Fremdschlüsselspalten muss mit der Anzahl der Primärschlüsselspalten übereinstimmen.</target>
+        </trans-unit>
+        <trans-unit id="ForeignKeyColumnNamesMustBeUnique" translate="yes" xml:space="preserve">
+          <source>The foreign key column names must be unique.</source>
+          <target state="final">Die Anzahl der Fremdschlüsselspalten müssen eindeutig sein.</target>
+        </trans-unit>
+        <trans-unit id="PrimaryKeyColumnNamesMustBeUnique" translate="yes" xml:space="preserve">
+          <source>The primary key column names must be unique.</source>
+          <target state="final">Die Anzahl der Primärschlüsselspalten müssen eindeutig sein.</target>
+        </trans-unit>
       </group>
     </body>
   </file>

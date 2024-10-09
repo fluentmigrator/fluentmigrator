@@ -23,6 +23,7 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Conventions;
+using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Versioning;
@@ -42,10 +43,13 @@ namespace FluentMigrator.Runner
         [NotNull]
         private readonly IMigrationInformationLoader _migrationInformationLoader;
 
+        private readonly IQuoter _quoter;
+
         private bool _versionsLoaded;
 
         [Obsolete]
         internal ConnectionlessVersionLoader(
+            IGeneratorAccessor generatorAccessor,
             IMigrationRunner runner,
             IAssemblyCollection assemblies,
             IConventionSet conventionSet,
@@ -55,6 +59,7 @@ namespace FluentMigrator.Runner
         {
             _migrationInformationLoader = runner.MigrationLoader;
             _processor = runner.Processor;
+            _quoter = generatorAccessor.Generator.GetQuoter();
 
             Runner = runner;
             Assemblies = assemblies;
@@ -80,6 +85,7 @@ namespace FluentMigrator.Runner
         }
 
         public ConnectionlessVersionLoader(
+            [NotNull] IGeneratorAccessor generatorAccessor,
             [NotNull] IProcessorAccessor processorAccessor,
             [NotNull] IMigrationRunnerConventions conventions,
             [NotNull] IOptions<RunnerOptions> runnerOptions,
@@ -88,6 +94,7 @@ namespace FluentMigrator.Runner
         {
             _processor = processorAccessor.Processor;
             _migrationInformationLoader = migrationInformationLoader;
+            _quoter = generatorAccessor.Generator.GetQuoter();
             Conventions = conventions;
             StartVersion = runnerOptions.Value.StartVersion;
             TargetVersion = runnerOptions.Value.Version;
@@ -196,10 +203,26 @@ namespace FluentMigrator.Runner
 
         protected virtual InsertionDataDefinition CreateVersionInfoInsertionData(long version, string description)
         {
+            object appliedOnValue;
+
+            if (_quoter is null)
+            {
+                appliedOnValue = DateTime.UtcNow;
+            }
+            else
+            {
+                var quotedCurrentDate = _quoter.QuoteValue(SystemMethods.CurrentUTCDateTime);
+
+                // Default to using DateTime if no system method could be obtained
+                appliedOnValue = string.IsNullOrWhiteSpace(quotedCurrentDate)
+                    ? (object) DateTime.UtcNow
+                    : RawSql.Insert(quotedCurrentDate);
+            }
+
             return new InsertionDataDefinition
             {
                 new KeyValuePair<string, object>(VersionTableMetaData.ColumnName, version),
-                new KeyValuePair<string, object>(VersionTableMetaData.AppliedOnColumnName, DateTime.UtcNow),
+                new KeyValuePair<string, object>(VersionTableMetaData.AppliedOnColumnName, appliedOnValue),
                 new KeyValuePair<string, object>(VersionTableMetaData.DescriptionColumnName, description)
             };
         }

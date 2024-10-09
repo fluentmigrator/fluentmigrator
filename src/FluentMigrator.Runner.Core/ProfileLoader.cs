@@ -37,45 +37,31 @@ namespace FluentMigrator.Runner
     /// </summary>
     public class ProfileLoader : IProfileLoader
     {
-        [CanBeNull]
-        private readonly IServiceProvider _serviceProvider;
-
-        [Obsolete]
-        [CanBeNull]
-        private readonly IMigrationRunnerConventions _conventions;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ProfileLoader"/> class.
         /// </summary>
         /// <param name="options">The runner options</param>
         /// <param name="source">The profile source</param>
         /// <param name="serviceProvider">The service provider</param>
+        [Obsolete("Use the other constructor")]
         public ProfileLoader(
             [NotNull] IOptions<RunnerOptions> options,
             [NotNull] IProfileSource source,
             [NotNull] IServiceProvider serviceProvider)
         {
-            _serviceProvider = serviceProvider;
             Profiles = source.GetProfiles(options.Value.Profile).ToList();
         }
 
-        /// <inheritdoc />
-        [Obsolete]
-        public IEnumerable<IMigration> FindProfilesIn(IAssemblyCollection assemblies, string profile)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ProfileLoader"/> class.
+        /// </summary>
+        /// <param name="options">The runner options</param>
+        /// <param name="source">The profile source</param>
+        public ProfileLoader(
+            [NotNull] IOptions<RunnerOptions> options,
+            [NotNull] IProfileSource source)
         {
-            if (string.IsNullOrEmpty(profile) || _conventions == null)
-                yield break;
-
-            IEnumerable<Type> matchedTypes = assemblies.GetExportedTypes()
-                .Where(t => _conventions.TypeIsProfile(t) && t.GetOneAttribute<ProfileAttribute>().ProfileName.ToLower() == profile.ToLower())
-                .OrderBy(x => x.Name);
-
-            foreach (var type in matchedTypes)
-            {
-                if (type.FullName == null)
-                    continue;
-                yield return type.Assembly.CreateInstance(type.FullName) as IMigration;
-            }
+            Profiles = source.GetProfiles(options.Value.Profile).ToList();
         }
 
         /// <summary>

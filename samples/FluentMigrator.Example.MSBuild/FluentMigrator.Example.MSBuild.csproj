@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildProjectDirectory)\FluentMigrator.targets" Condition="Exists('$(MSBuildProjectDirectory)\FluentMigrator.targets')" />
+
+  <PropertyGroup>
+    <!-- In the real world, you would typically not have multiple target frameworks. However, this sample demonstrates it working against .NET Framework and .NET. -->
+    <TargetFrameworks>net48;net8.0</TargetFrameworks>
+    <OutputType>Library</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FluentMigrator.Example.Migrations\FluentMigrator.Example.Migrations.csproj" />
+  </ItemGroup>
+  <Choose>
+    <When Condition="'$(TargetFramework)' == 'net48' ">
+      <PropertyGroup>
+        <MigrationAssembly>$(MSBuildThisFileDirectory)..\FluentMigrator.Example.Migrations\bin\$(Configuration)\netstandard2.0\FluentMigrator.Example.Migrations.dll</MigrationAssembly>
+      </PropertyGroup>
+    </When>
+    <Otherwise>
+      <PropertyGroup>
+        <MigrationAssembly>$(MSBuildThisFileDirectory)..\FluentMigrator.Example.Migrations\bin\$(Configuration)\net8.0\FluentMigrator.Example.Migrations.dll</MigrationAssembly>
+      </PropertyGroup>
+    </Otherwise>
+  </Choose>
+
+  <Target Name="Migrate">
+
+    <Error Condition="'$(FluentMigratorMSBuildAssemblyPath)' == ''" Text="FluentMigratorMSBuildAssemblyPath is not set." />
+    <Error Condition="'$(MigrationAssembly)' == ''" Text="MigrationAssembly is not set." />
+    
+    <Message Text="Starting FluentMigrator Migration using $(FluentMigratorMSBuildAssemblyPath)" Importance="High" />
+    <Message Text="Starting FluentMigrator Migration using MigrationAssembly  $(MigrationAssembly)" Importance="High" />
+
+    <Migrate Database="sqlserver2016" Connection="Data Source=(local);Database=FluentMigratorExample;Trusted_Connection=true" Target="$(MigrationAssembly)" UseMsBuildLogging="true">
+    </Migrate>
+  </Target>
+
+</Project>
