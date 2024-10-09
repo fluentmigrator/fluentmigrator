@@ -2,11 +2,12 @@
   <!-- Much of this configuration is taken from Microsoft documentation on how to set-up custom MSBuild tasks: https://learn.microsoft.com/en-us/visualstudio/msbuild/tutorial-custom-task-code-generation?view=vs-2022#package-the-task-for-distribution -->
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFrameworks>net48;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net48;netstandard2.0;net8.0</TargetFrameworks>
     <Description>MSBuild runner for FluentMigrator</Description>
     <!-- The property CopyLocalLockFileAssemblies is needed to make sure that dependencies are copied to the output directory. -->
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);PackBuildOutputs</TargetsForTfmSpecificContentInPackage>
+    <!-- This property tells MSBuild that we're putting end-user build targets (as content) here -->
     <ContentTargetFolders>build</ContentTargetFolders>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <!-- Tell the SDK to generate a deps.json file; see target AddBuildDependencyFileToBuiltProjectOutputGroupOutput -->
@@ -33,6 +34,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\FluentMigrator.Runner.Core\DirtyAssemblyResolveHelper.cs" Link="DirtyAssemblyResolveHelper.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\FluentMigrator.Runner\FluentMigrator.Runner.csproj" PrivateAssets="all" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net48' ">
@@ -42,7 +46,7 @@
   <!-- Dependencies -->
   <!-- mark every dependency of this Task project, both PackageReference and ProjectReference with the PrivateAssets="all" attribute. -->
   <ItemGroup>
-    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.8.3" PrivateAssets="all" ExcludeAssets="Runtime" />
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.11.4" PrivateAssets="all" ExcludeAssets="Runtime" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Update="JetBrains.Annotations" Version="2024.2.0" PrivateAssets="all" />
@@ -59,15 +63,9 @@
   </Target>
 
   <!-- This target adds the generated deps.json file to our package output -->
-  <Target
-        Name="AddBuildDependencyFileToBuiltProjectOutputGroupOutput"
-        BeforeTargets="BuiltProjectOutputGroup"
-        Condition=" '$(GenerateDependencyFile)' == 'true'">
-     <ItemGroup>
-        <BuiltProjectOutputGroupOutput
-            Include="$(ProjectDepsFilePath)"
-            TargetPath="$(ProjectDepsFileName)"
-            FinalOutputPath="$(ProjectDepsFilePath)" />
+  <Target Name="AddBuildDependencyFileToBuiltProjectOutputGroupOutput" BeforeTargets="BuiltProjectOutputGroup" Condition=" '$(GenerateDependencyFile)' == 'true'">
+    <ItemGroup>
+      <BuiltProjectOutputGroupOutput Include="$(ProjectDepsFilePath)" TargetPath="$(ProjectDepsFileName)" FinalOutputPath="$(ProjectDepsFilePath)" />
     </ItemGroup>
   </Target>
 

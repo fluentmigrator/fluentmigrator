@@ -7,7 +7,8 @@ updates:
         - "*Sqlite*"
         - "*Pgsql*"
         - "*Firebird*"
-        - "*Oracle*"
+        - "Oracle.ManagedDataAccess" # .NET Framework dependency for FluentMigrator.Console
+        - "Oracle.ManagedDataAccess.Core" # .NET dependency for FluentMigrator.DotNet.Cli
         - "*Sql*"
         - "Snowflake*"
     # Dependency Injection and Microsoft Out-of-Box Dependencies (not included in the SDK)

@@ -43,12 +43,27 @@ namespace FluentMigrator.Runner.Generators.MySql
 
         public MySql8Generator(
             [NotNull] MySqlQuoter quoter,
+            [NotNull] IMySqlTypeMap typeMap)
+            : this(quoter, typeMap, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()))
+        {
+        }
+
+        public MySql8Generator(
+            [NotNull] MySqlQuoter quoter,
             [NotNull] IOptions<GeneratorOptions> generatorOptions)
             : this(
                 new MySqlColumn(new MySql8TypeMap(), quoter),
                 quoter,
                 new EmptyDescriptionGenerator(),
                 generatorOptions)
+        {
+        }
+
+        public MySql8Generator(
+            [NotNull] MySqlQuoter quoter,
+            [NotNull] IMySqlTypeMap typeMap,
+            [NotNull] IOptions<GeneratorOptions> generatorOptions)
+            : base(new MySqlColumn(typeMap, quoter), quoter, new EmptyDescriptionGenerator(), generatorOptions)
         {
         }
 

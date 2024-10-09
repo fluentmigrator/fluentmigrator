@@ -18,7 +18,7 @@ using System.Data;
 
 namespace FluentMigrator.Runner.Generators.MySql
 {
-    internal class MySql5TypeMap : MySql4TypeMap
+    public class MySql5TypeMap : MySql4TypeMap
     {
         public new const int DecimalCapacity = 65;
 
