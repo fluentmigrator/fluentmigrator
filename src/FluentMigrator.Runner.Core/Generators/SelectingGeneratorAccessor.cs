@@ -52,7 +52,7 @@ namespace FluentMigrator.Runner.Generators
             {
                 // No generator selected
                 if (gens.Count == 0)
-                    throw new InvalidOperationException("No migration generator registerd.");
+                    throw new InvalidOperationException("No migration generator registered.");
                 if (gens.Count > 1)
                     throw new InvalidOperationException("More than one generator registered, but no generator id given. Specify the generator id by configuring SelectingGeneratorAccessorOptions.");
                 Generator = gens.Single();
