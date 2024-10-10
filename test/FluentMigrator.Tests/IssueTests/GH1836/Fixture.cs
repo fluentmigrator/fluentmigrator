@@ -33,6 +33,7 @@ namespace FluentMigrator.Tests.IssueTests.GH1836
             services
                 .AddFluentMigratorCore()
                 .WithProcessor(processor)
+                .ConfigureRunner(x => x.AddSQLite())
                 .AddScoped<IVersionLoader, VersionLoader>();
 
             var serviceProvider = services.BuildServiceProvider();
@@ -52,6 +53,7 @@ namespace FluentMigrator.Tests.IssueTests.GH1836
             // add minimal FluentMigrator registrations
             services
                 .AddFluentMigratorCore()
+                .ConfigureRunner(x => x.AddSQLite())
                 .WithProcessor(processor)
                 .AddScoped<IVersionLoader, VersionLoader>();
 
