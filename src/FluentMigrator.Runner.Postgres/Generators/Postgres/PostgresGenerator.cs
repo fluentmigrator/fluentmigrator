@@ -84,6 +84,9 @@ namespace FluentMigrator.Runner.Generators.Postgres
         public override string AlterColumn { get { return "ALTER TABLE {0} {1};"; } }
         public override string RenameColumn { get { return "ALTER TABLE {0} RENAME COLUMN {1} TO {2};"; } }
 
+        public override string UpdateData { get { return "UPDATE {0} SET {1} WHERE {2};"; } }
+        public override string DeleteData { get { return "DELETE FROM {0} WHERE {1};"; } }
+
         public override string Generate(AlterTableExpression expression)
         {
             var alterStatement = new StringBuilder();
