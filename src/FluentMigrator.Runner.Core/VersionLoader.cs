@@ -27,6 +27,7 @@ using FluentMigrator.Runner.Versioning;
 using FluentMigrator.Runner.VersionTableInfo;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Conventions;
+using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
 
@@ -40,6 +41,7 @@ namespace FluentMigrator.Runner
         private readonly IMigrationProcessor _processor;
 
         private readonly IConventionSet _conventionSet;
+        private readonly IQuoter _quoter;
         private bool _versionSchemaMigrationAlreadyRun;
         private bool _versionMigrationAlreadyRun;
         private bool _versionUniqueMigrationAlreadyRun;
@@ -64,15 +66,17 @@ namespace FluentMigrator.Runner
         internal VersionLoader(
             [NotNull] IMigrationRunner runner,
             [NotNull] Assembly assembly,
+            [NotNull] IGeneratorAccessor generatorAccessor,
             [NotNull] IConventionSet conventionSet,
             [NotNull] IMigrationRunnerConventions conventions,
             [NotNull] IRunnerContext runnerContext)
-            : this(runner, new SingleAssembly(assembly), conventionSet, conventions, runnerContext)
+            : this(runner, new SingleAssembly(assembly), generatorAccessor, conventionSet, conventions, runnerContext)
         {
         }
 
         [Obsolete]
         internal VersionLoader(IMigrationRunner runner, IAssemblyCollection assemblies,
+            [NotNull] IGeneratorAccessor generatorAccessor,
             [NotNull] IConventionSet conventionSet,
             [NotNull] IMigrationRunnerConventions conventions,
             [NotNull] IRunnerContext runnerContext,
@@ -80,6 +84,7 @@ namespace FluentMigrator.Runner
         {
             _conventionSet = conventionSet;
             _processor = runner.Processor;
+            _quoter = generatorAccessor.Generator.GetQuoter();
 
             Runner = runner;
             Assemblies = assemblies;
@@ -96,6 +101,7 @@ namespace FluentMigrator.Runner
 
         public VersionLoader(
             [NotNull] IProcessorAccessor processorAccessor,
+            [NotNull] IGeneratorAccessor generatorAccessor,
             [NotNull] IConventionSet conventionSet,
             [NotNull] IMigrationRunnerConventions conventions,
             [NotNull] IVersionTableMetaData versionTableMetaData,
@@ -103,6 +109,7 @@ namespace FluentMigrator.Runner
         {
             _conventionSet = conventionSet;
             _processor = processorAccessor.Processor;
+            _quoter = generatorAccessor.Generator.GetQuoter();
 
             Runner = runner;
 
@@ -139,10 +146,26 @@ namespace FluentMigrator.Runner
 
         protected virtual InsertionDataDefinition CreateVersionInfoInsertionData(long version, string description)
         {
+            object appliedOnValue;
+
+            if (_quoter is null)
+            {
+                appliedOnValue = DateTime.UtcNow;
+            }
+            else
+            {
+                var quotedCurrentDate = _quoter.QuoteValue(SystemMethods.CurrentUTCDateTime);
+
+                // Default to using DateTime if no system method could be obtained
+                appliedOnValue = string.IsNullOrWhiteSpace(quotedCurrentDate)
+                    ? (object) DateTime.UtcNow
+                    : RawSql.Insert(quotedCurrentDate);
+            }
+
             return new InsertionDataDefinition
                        {
                            new KeyValuePair<string, object>(VersionTableMetaData.ColumnName, version),
-                           new KeyValuePair<string, object>(VersionTableMetaData.AppliedOnColumnName, DateTime.UtcNow),
+                           new KeyValuePair<string, object>(VersionTableMetaData.AppliedOnColumnName, appliedOnValue),
                            new KeyValuePair<string, object>(VersionTableMetaData.DescriptionColumnName, description),
                        };
         }
