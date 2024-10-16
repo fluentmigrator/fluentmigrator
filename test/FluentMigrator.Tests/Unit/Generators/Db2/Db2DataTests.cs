@@ -48,7 +48,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DELETE FROM TestSchema.TestTable1");
+            result.ShouldBe("DELETE FROM TestSchema.TestTable1 WHERE 1 = 1");
         }
 
         [Test]
@@ -57,7 +57,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             var expression = GeneratorTestHelper.GetDeleteDataAllRowsExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DELETE FROM TestTable1");
+            result.ShouldBe("DELETE FROM TestTable1 WHERE 1 = 1");
         }
 
         [Test]
@@ -157,7 +157,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("UPDATE TestSchema.TestTable1 SET Name = 'Just''in', Age = 25");
+            result.ShouldBe("UPDATE TestSchema.TestTable1 SET Name = 'Just''in', Age = 25 WHERE 1 = 1");
         }
 
         [Test]
@@ -166,7 +166,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             var expression = GeneratorTestHelper.GetUpdateDataExpressionWithAllRows();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("UPDATE TestTable1 SET Name = 'Just''in', Age = 25");
+            result.ShouldBe("UPDATE TestTable1 SET Name = 'Just''in', Age = 25 WHERE 1 = 1");
         }
 
         [Test]

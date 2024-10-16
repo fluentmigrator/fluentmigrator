@@ -124,7 +124,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             var result = string.Join(Environment.NewLine, expressions.Select(x => (string)Generator.Generate((dynamic)x)));
             result.ShouldBe(
                 @"ALTER TABLE TestSchema.TestTable1 ADD COLUMN TestColumn1 TIMESTAMP DEFAULT" + Environment.NewLine +
-                @"UPDATE TestSchema.TestTable1 SET TestColumn1 = CURRENT_TIMESTAMP");
+                @"UPDATE TestSchema.TestTable1 SET TestColumn1 = CURRENT_TIMESTAMP WHERE 1 = 1");
         }
 
         [Test]
@@ -134,7 +134,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             var result = string.Join(Environment.NewLine, expressions.Select(x => (string)Generator.Generate((dynamic)x)));
             result.ShouldBe(
                 @"ALTER TABLE TestTable1 ADD COLUMN TestColumn1 TIMESTAMP DEFAULT" + Environment.NewLine +
-                @"UPDATE TestTable1 SET TestColumn1 = CURRENT_TIMESTAMP");
+                @"UPDATE TestTable1 SET TestColumn1 = CURRENT_TIMESTAMP WHERE 1 = 1");
         }
 
         [Test]
