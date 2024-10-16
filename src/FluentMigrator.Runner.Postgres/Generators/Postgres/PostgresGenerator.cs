@@ -87,6 +87,11 @@ namespace FluentMigrator.Runner.Generators.Postgres
         public override string UpdateData { get { return "UPDATE {0} SET {1} WHERE {2};"; } }
         public override string DeleteData { get { return "DELETE FROM {0} WHERE {1};"; } }
 
+        protected override StringBuilder AppendSqlStatementEndToken(StringBuilder stringBuilder)
+        {
+            return stringBuilder.Append(" ");
+        }
+
         public override string Generate(AlterTableExpression expression)
         {
             var alterStatement = new StringBuilder();

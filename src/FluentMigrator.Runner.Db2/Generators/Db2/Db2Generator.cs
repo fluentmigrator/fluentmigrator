@@ -50,6 +50,11 @@ namespace FluentMigrator.Runner.Generators.DB2
         {
         }
 
+        protected override StringBuilder AppendSqlStatementEndToken(StringBuilder stringBuilder)
+        {
+            return stringBuilder.Append(" ");
+        }
+
         public override string Generate(Expressions.AlterDefaultConstraintExpression expression)
         {
             return string.Format(
