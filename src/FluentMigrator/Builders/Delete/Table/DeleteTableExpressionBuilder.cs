@@ -23,7 +23,7 @@ namespace FluentMigrator.Builders.Delete.Table
     /// <summary>
     /// An expression builder for a <see cref="DeleteTableExpression"/>
     /// </summary>
-    public class DeleteTableExpressionBuilder : ExpressionBuilderBase<DeleteTableExpression>, IInSchemaSyntax
+    public class DeleteTableExpressionBuilder : ExpressionBuilderBase<DeleteTableExpression>, IIfExistsOrInSchemaSyntax
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="DeleteTableExpressionBuilder"/> class.
@@ -32,6 +32,13 @@ namespace FluentMigrator.Builders.Delete.Table
         public DeleteTableExpressionBuilder(DeleteTableExpression expression)
             : base(expression)
         {
+            Expression.IfExists = false;
+        }
+
+        public IInSchemaSyntax IfExists()
+        {
+            Expression.IfExists = true;
+            return this;
         }
 
         /// <inheritdoc />

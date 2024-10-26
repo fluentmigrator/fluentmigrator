@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 //
 // Copyright (c) 2018, Fluent Migrator Project
 //
@@ -26,15 +26,20 @@ using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Generators
 {
+    [Category("Generator")]
+    [Category("Description")]
     public abstract class BaseDescriptionGeneratorTests
     {
         protected IDescriptionGenerator DescriptionGenerator { get; set; }
 
         public abstract void GenerateDescriptionStatementsForCreateTableReturnTableDescriptionStatement();
         public abstract void GenerateDescriptionStatementsForCreateTableReturnTableDescriptionAndColumnDescriptionsStatements();
+        public abstract void GenerateDescriptionStatementsForCreateTableReturnTableDescriptionAndColumnDescriptionsWithAdditionalDescriptionsStatements();
         public abstract void GenerateDescriptionStatementForAlterTableReturnTableDescriptionStatement();
         public abstract void GenerateDescriptionStatementForCreateColumnReturnColumnDescriptionStatement();
+        public abstract void GenerateDescriptionStatementForCreateColumnReturnColumnDescriptionStatementWithAdditionalDescriptions();
         public abstract void GenerateDescriptionStatementForAlterColumnReturnColumnDescriptionStatement();
+        public abstract void GenerateDescriptionStatementForAlterColumnReturnColumnDescriptionStatementWithAdditionalDescriptions();
 
         [Test]
         public void GenerateDescriptionStatementsReturnEmptyForNoDescriptionsOnCreateTable()
@@ -73,7 +78,7 @@ namespace FluentMigrator.Tests.Unit.Generators
         }
 
         [Test]
-        public void GenerateDescriptionStatementsHaveSingleStatementForDescriptionOnCreate()
+        public virtual void GenerateDescriptionStatementsHaveSingleStatementForDescriptionOnCreate()
         {
             var createTableExpression = GeneratorTestHelper.GetCreateTableWithTableDescription();
             var result = DescriptionGenerator.GenerateDescriptionStatements(createTableExpression);

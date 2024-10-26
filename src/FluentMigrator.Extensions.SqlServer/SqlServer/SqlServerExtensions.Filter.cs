@@ -1,5 +1,5 @@
 #region License
-// Copyright (c) 2007-2018, FluentMigrator Project
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@
 // limitations under the License.
 #endregion
 
+using FluentMigrator.Builders.Create.Constraint;
 using FluentMigrator.Builders.Create.Index;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Infrastructure.Extensions;
@@ -22,12 +23,19 @@ namespace FluentMigrator.SqlServer
 {
     public static partial class SqlServerExtensions
     {
-        public static readonly string IndexFilter = "SqlServerIndexFilter";
-
         public static ICreateIndexOptionsSyntax Filter(this ICreateIndexOptionsSyntax expression, string filter)
         {
             var additionalFeatures = expression as ISupportAdditionalFeatures;
             additionalFeatures.SetAdditionalFeature(IndexFilter, filter);
+            return expression;
+        }
+
+        public static ICreateConstraintOptionsSyntax Filter(
+            this ICreateConstraintOptionsSyntax expression,
+            string filter)
+        {
+            var additionalFeatures = expression as ISupportAdditionalFeatures;
+            additionalFeatures.SetAdditionalFeature(UniqueConstraintFilter, filter);
             return expression;
         }
     }

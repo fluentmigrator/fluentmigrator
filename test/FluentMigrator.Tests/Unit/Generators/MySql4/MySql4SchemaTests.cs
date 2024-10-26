@@ -7,6 +7,8 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Generators.MySql4
 {
     [TestFixture]
+    [Category("Schema")]
+    [Category("MySql4")]
     public class MySql4SchemaTests : BaseSchemaTests
     {
         protected MySql4Generator Generator;

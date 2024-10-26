@@ -48,11 +48,6 @@ namespace FluentMigrator
         [CanBeNull]
         private IReadOnlyCollection<IEmbeddedResourceProvider> _providers;
 
-        [Obsolete]
-        protected AutoScriptMigration()
-        {
-        }
-
         protected AutoScriptMigration([NotNull] IEnumerable<IEmbeddedResourceProvider> embeddedResourceProviders)
         {
             _embeddedResourceProviders = embeddedResourceProviders.ToList();
@@ -61,16 +56,11 @@ namespace FluentMigrator
         /// <inheritdoc />
         public sealed override void Up()
         {
-#pragma warning disable 612
             var expression = new ExecuteEmbeddedAutoSqlScriptExpression(
                 GetProviders(),
                 GetType(),
                 GetDatabaseNames(),
-                MigrationDirection.Up)
-            {
-                MigrationAssemblies = Context.MigrationAssemblies,
-#pragma warning restore 612
-            };
+                MigrationDirection.Up);
 
             Context.Expressions.Add(expression);
         }
@@ -78,16 +68,11 @@ namespace FluentMigrator
         /// <inheritdoc />
         public sealed override void Down()
         {
-#pragma warning disable 612
             var expression = new ExecuteEmbeddedAutoSqlScriptExpression(
                 GetProviders(),
                 GetType(),
                 GetDatabaseNames(),
-                MigrationDirection.Down)
-            {
-                MigrationAssemblies = Context.MigrationAssemblies,
-#pragma warning restore 612
-            };
+                MigrationDirection.Down);
 
             Context.Expressions.Add(expression);
         }
@@ -115,12 +100,7 @@ namespace FluentMigrator
                 return _providers = _embeddedResourceProviders;
             }
 
-            var providers = new List<IEmbeddedResourceProvider>
-            {
-#pragma warning disable 612
-                new DefaultEmbeddedResourceProvider(Context.MigrationAssemblies)
-#pragma warning restore 612
-            };
+            var providers = new List<IEmbeddedResourceProvider>();
 
             return _providers = providers;
         }
@@ -141,52 +121,20 @@ namespace FluentMigrator
                 Direction = direction;
             }
 
-            [Obsolete]
-            // ReSharper disable once UnusedMember.Local
-            public ExecuteEmbeddedAutoSqlScriptExpression(IAssemblyCollection assemblyCollection, Type migrationType, IList<string> databaseNames, MigrationDirection direction)
-            {
-                _embeddedResourceProviders = new[]
-                {
-                    new DefaultEmbeddedResourceProvider(assemblyCollection),
-                };
-
-                MigrationType = migrationType;
-                DatabaseNames = databaseNames;
-                Direction = direction;
-            }
-
             public IList<string> AutoNames { get; set; }
             public AutoNameContext AutoNameContext { get; } = AutoNameContext.EmbeddedResource;
             public Type MigrationType { get; }
             public IList<string> DatabaseNames { get; }
             public MigrationDirection Direction { get; }
 
-            /// <summary>
-            /// Gets or sets the migration assemblies
-            /// </summary>
-            [Obsolete]
-            [CanBeNull]
-            public IAssemblyCollection MigrationAssemblies { get; set; }
-
-            /// <inheritdoc />
             public override void ExecuteWith(IMigrationProcessor processor)
             {
                 IReadOnlyCollection<(string name, Assembly Assembly)> resourceNames;
-#pragma warning disable 612
-                if (MigrationAssemblies != null)
-                {
-                    resourceNames = MigrationAssemblies.GetManifestResourceNames()
-                        .Select(item => (name: item.Name, assembly: item.Assembly))
-                        .ToList();
-#pragma warning restore 612
-                }
-                else
-                {
-                    resourceNames = _embeddedResourceProviders
-                        .SelectMany(x => x.GetEmbeddedResources())
-                        .Distinct()
-                        .ToList();
-                }
+
+                resourceNames = _embeddedResourceProviders
+                    .SelectMany(x => x.GetEmbeddedResources())
+                    .Distinct()
+                    .ToList();
 
                 var embeddedResourceNameWithAssembly = GetQualifiedResourcePath(resourceNames, AutoNames.ToArray());
                 string sqlText;

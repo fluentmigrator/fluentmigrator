@@ -14,12 +14,6 @@ namespace FluentMigrator.Runner.Generators.Generic
 {
     public abstract class GenericGenerator : GeneratorBase
     {
-        [Obsolete("Use the CompatibilityMode property")]
-        // ReSharper disable once InconsistentNaming
-#pragma warning disable 618
-        public CompatabilityMode compatabilityMode;
-#pragma warning restore 618
-
         protected GenericGenerator(
             IColumn column,
             IQuoter quoter,
@@ -30,16 +24,11 @@ namespace FluentMigrator.Runner.Generators.Generic
             CompatibilityMode = generatorOptions.Value.CompatibilityMode ?? CompatibilityMode.LOOSE;
         }
 
-#pragma warning disable 618, 3005
-        public CompatibilityMode CompatibilityMode
-        {
-            get => (CompatibilityMode) compatabilityMode;
-            set => compatabilityMode = (CompatabilityMode) value;
-        }
-#pragma warning restore 618, 3005
+        public CompatibilityMode CompatibilityMode { get; set; }
 
         public virtual string CreateTable { get { return "CREATE TABLE {0} ({1})"; } }
         public virtual string DropTable { get { return "DROP TABLE {0}"; } }
+        public virtual string DropTableIfExists { get { return "DROP TABLE IF EXISTS {0}"; } }
 
         public virtual string AddColumn { get { return "ALTER TABLE {0} ADD COLUMN {1}"; } }
         public virtual string DropColumn { get { return "ALTER TABLE {0} DROP COLUMN {1}"; } }
@@ -87,7 +76,7 @@ namespace FluentMigrator.Runner.Generators.Generic
 
             if (expression.Columns.Count == 0)
             {
-                throw new ArgumentException("You must specifiy at least one column");
+                throw new ArgumentException("You must specify at least one column");
             }
 
             var quotedTableName = Quoter.QuoteTableName(expression.TableName, expression.SchemaName);
@@ -103,6 +92,10 @@ namespace FluentMigrator.Runner.Generators.Generic
 
         public override string Generate(DeleteTableExpression expression)
         {
+            if (expression.IfExists)
+            {
+                return String.Format(DropTableIfExists, Quoter.QuoteTableName(expression.TableName));
+            }
             return string.Format(DropTable, Quoter.QuoteTableName(expression.TableName, expression.SchemaName));
         }
 
@@ -299,7 +292,7 @@ namespace FluentMigrator.Runner.Generators.Generic
                             "The following database specific additional features are not supported in strict mode [{0}]",
                             unsupportedFeatures.Aggregate((x, y) => x + ", " + y));
                     {
-                        return CompatibilityMode.HandleCompatibilty(errorMessage);
+                        return CompatibilityMode.HandleCompatibility(errorMessage);
                     }
                 }
             }
@@ -377,17 +370,17 @@ namespace FluentMigrator.Runner.Generators.Generic
         //All Schema method throw by default as only Sql server 2005 and up supports them.
         public override string Generate(CreateSchemaExpression expression)
         {
-            return CompatibilityMode.HandleCompatibilty("Schemas are not supported");
+            return CompatibilityMode.HandleCompatibility("Schemas are not supported");
         }
 
         public override string Generate(DeleteSchemaExpression expression)
         {
-            return CompatibilityMode.HandleCompatibilty("Schemas are not supported");
+            return CompatibilityMode.HandleCompatibility("Schemas are not supported");
         }
 
         public override string Generate(AlterSchemaExpression expression)
         {
-            return CompatibilityMode.HandleCompatibilty("Schemas are not supported");
+            return CompatibilityMode.HandleCompatibility("Schemas are not supported");
         }
 
         public override string Generate(CreateSequenceExpression expression)
@@ -421,7 +414,7 @@ namespace FluentMigrator.Runner.Generators.Generic
             {
                 if (seq.Cache.Value < MINIMUM_CACHE_VALUE)
                 {
-                    return CompatibilityMode.HandleCompatibilty("Cache size must be greater than 1; if you intended to disable caching, set Cache to null.");
+                    return CompatibilityMode.HandleCompatibility("Cache size must be greater than 1; if you intended to disable caching, set Cache to null.");
                 }
                 result.AppendFormat(" CACHE {0}", seq.Cache);
             }

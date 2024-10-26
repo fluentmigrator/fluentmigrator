@@ -1,5 +1,5 @@
 #region License
-// Copyright (c) 2018, FluentMigrator Project
+// Copyright (c) 2018, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ using System.Linq;
 using JetBrains.Annotations;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace FluentMigrator.Runner.Initialization
 {
@@ -45,6 +46,9 @@ namespace FluentMigrator.Runner.Initialization
         [NotNull, ItemNotNull]
         private readonly IEnumerable<IMigrationSourceItem> _sourceItems;
 
+        [NotNull]
+        private readonly ILogger _logger;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ProfileSource"/> class.
         /// </summary>
@@ -52,16 +56,19 @@ namespace FluentMigrator.Runner.Initialization
         /// <param name="conventions">The migration runner conventios</param>
         /// <param name="serviceProvider">The service provider</param>
         /// <param name="sourceItems">The additional migration source items</param>
+        /// <param name="logger">The logger for troubleshooting "No migrations found" error.</param>
         public MigrationSource(
             [NotNull] IAssemblySource source,
             [NotNull] IMigrationRunnerConventions conventions,
             [NotNull] IServiceProvider serviceProvider,
-            [NotNull, ItemNotNull] IEnumerable<IMigrationSourceItem> sourceItems)
+            [NotNull, ItemNotNull] IEnumerable<IMigrationSourceItem> sourceItems,
+            [NotNull] ILogger logger)
         {
             _source = source;
             _conventions = conventions;
             _serviceProvider = serviceProvider;
             _sourceItems = sourceItems;
+            _logger = logger;
         }
 
         /// <summary>
@@ -88,18 +95,41 @@ namespace FluentMigrator.Runner.Initialization
         /// <inheritdoc />
         public IEnumerable<IMigration> GetMigrations(Func<Type, bool> predicate)
         {
-            var instances =
-                from type in GetMigrationTypeCandidates()
-                where !type.IsAbstract && typeof(IMigration).IsAssignableFrom(type)
-                where predicate == null || predicate(type)
-                select _instanceCache.GetOrAdd(type, CreateInstance);
-            return instances;
+            foreach (var type in GetMigrationTypeCandidates())
+            {
+                if (type.IsAbstract)
+                {
+                    _logger.Log(LogLevel.Trace, $"Type [{type.AssemblyQualifiedName}] is abstract. Skipping.");
+                    continue;
+                }
+                
+                if (!(typeof(IMigration).IsAssignableFrom(type) || typeof(MigrationBase).IsAssignableFrom(type)))
+                {
+                    _logger.Log(LogLevel.Trace, $"Type [{type.AssemblyQualifiedName}] is not assignable to IMigration. Skipping.");
+                    continue;
+                }
+
+                if (!(predicate == null || predicate(type)))
+                {
+                    _logger.Log(LogLevel.Trace, $"Type [{type.AssemblyQualifiedName}] doesn't satisfy predicate. Skipping.");
+                    continue;
+                }
+
+                _logger.Log(LogLevel.Trace, $"Type {type.AssemblyQualifiedName} is a migration. Adding.");
+
+                yield return _instanceCache.GetOrAdd(type, CreateInstance);
+            }
+        }
+
+        private IEnumerable<Type> GetExportedTypes()
+        {
+            return _source
+                .Assemblies.SelectMany(a => a.GetExportedTypes());
         }
 
         private IEnumerable<Type> GetMigrationTypeCandidates()
         {
-            return _source
-                .Assemblies.SelectMany(a => a.GetExportedTypes())
+            return GetExportedTypes()
                 .Union(_sourceItems.SelectMany(i => i.MigrationTypeCandidates));
         }
 

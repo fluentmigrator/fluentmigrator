@@ -1,5 +1,5 @@
 #region License
-// Copyright (c) 2020, FluentMigrator Project
+// Copyright (c) 2020, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,22 +24,23 @@ namespace FluentMigrator.Model
 {
     public class PostgresIndexIncludeDefinition
         : ICloneable,
-#pragma warning disable 618
-            ICanBeValidated
-#pragma warning restore 618
+            IValidatableObject
     {
-        [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.ColumnNameCannotBeNullOrEmpty))]
+        [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.IndexIncludeColumnNameMustNotBeNullOrEmpty))]
         public virtual string Name { get; set; }
-
-        [Obsolete("Use the System.ComponentModel.DataAnnotations.Validator instead")]
-        public virtual void CollectValidationErrors(ICollection<string> errors)
-        {
-            this.CollectErrors(errors);
-        }
 
         public object Clone()
         {
             return MemberwiseClone();
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (string.IsNullOrWhiteSpace(Name))
+            {
+                yield return new ValidationResult(ErrorMessages.IndexIncludeColumnNameMustNotBeNullOrEmpty);
+            }
         }
     }
 }

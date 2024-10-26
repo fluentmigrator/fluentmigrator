@@ -30,6 +30,8 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Expressions
 {
     [TestFixture]
+    [Category("Expression")]
+    [Category("DeleteConstraint")]
     public class DeleteConstraintExpressionTests
     {
         [Test]

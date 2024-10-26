@@ -38,32 +38,10 @@ namespace FluentMigrator.Expressions
         /// <summary>
         /// Initializes a new instance of the <see cref="ExecuteEmbeddedSqlScriptExpression"/> class.
         /// </summary>
-        [Obsolete]
-        public ExecuteEmbeddedSqlScriptExpression()
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ExecuteEmbeddedSqlScriptExpression"/> class.
-        /// </summary>
         /// <param name="embeddedResourceProviders">The embedded resource providers</param>
         public ExecuteEmbeddedSqlScriptExpression([NotNull] IEnumerable<IEmbeddedResourceProvider> embeddedResourceProviders)
         {
             _embeddedResourceProviders = embeddedResourceProviders.ToList();
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ExecuteEmbeddedSqlScriptExpression"/> class.
-        /// </summary>
-        /// <param name="assemblyCollection">The collection of assemblies to be searched for the resources</param>
-        [Obsolete]
-        public ExecuteEmbeddedSqlScriptExpression([NotNull] IAssemblyCollection assemblyCollection)
-        {
-            MigrationAssemblies = assemblyCollection;
-            _embeddedResourceProviders = new IEmbeddedResourceProvider[]
-            {
-                new DefaultEmbeddedResourceProvider(assemblyCollection),
-            };
         }
 
         /// <summary>
@@ -72,26 +50,12 @@ namespace FluentMigrator.Expressions
         [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.SqlScriptCannotBeNullOrEmpty))]
         public string SqlScript { get; set; }
 
-        /// <summary>
-        /// Gets or sets the migration assemblies
-        /// </summary>
-        [Obsolete()]
-        [CanBeNull]
-        public IAssemblyCollection MigrationAssemblies { get; set; }
-
         /// <inheritdoc />
         public override void ExecuteWith(IMigrationProcessor processor)
         {
             List<(string name, Assembly assembly)> resourceNames;
-#pragma warning disable 612
-            if (MigrationAssemblies != null)
-            {
-                resourceNames = MigrationAssemblies.GetManifestResourceNames()
-                    .Select(item => (name: item.Name, assembly: item.Assembly))
-                    .ToList();
-#pragma warning restore 612
-            }
-            else if (_embeddedResourceProviders != null)
+            
+            if (_embeddedResourceProviders != null)
             {
                 resourceNames = _embeddedResourceProviders
                     .SelectMany(x => x.GetEmbeddedResources())
@@ -100,9 +64,7 @@ namespace FluentMigrator.Expressions
             }
             else
             {
-#pragma warning disable 612
-                throw new InvalidOperationException($"The caller forgot to set the {nameof(MigrationAssemblies)} property.");
-#pragma warning restore 612
+                throw new InvalidOperationException($"The caller forgot to configure the {nameof(_embeddedResourceProviders)} constructor argument.");
             }
 
             var embeddedResourceNameWithAssembly = GetQualifiedResourcePath(resourceNames, SqlScript);

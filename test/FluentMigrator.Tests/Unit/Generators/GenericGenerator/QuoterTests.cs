@@ -35,6 +35,9 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Generators.GenericGenerator
 {
     [TestFixture]
+    [Category("Generator")]
+    [Category("Quoter")]
+    [Category("Generic")]
     public class ConstantFormatterTests
     {
         [SetUp]
@@ -323,20 +326,6 @@ namespace FluentMigrator.Tests.Unit.Generators.GenericGenerator
         public void NonUnicodeStringIsFormattedAsNormalStringQuotes()
         {
             _quoter.QuoteValue(new NonUnicodeString("Test ' String")).ShouldBe("'Test '' String'");
-        }
-
-        [Test]
-        [Obsolete]
-        public void ExplicitUnicodeStringIsFormattedAsNormalString()
-        {
-            _quoter.QuoteValue(new ExplicitUnicodeString("Test String")).ShouldBe("'Test String'");
-        }
-
-        [Test]
-        [Obsolete]
-        public void ExplicitUnicodeStringIsFormattedAsNormalStringQuotes()
-        {
-            _quoter.QuoteValue(new ExplicitUnicodeString("Test ' String")).ShouldBe("'Test '' String'");
         }
     }
 }

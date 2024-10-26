@@ -88,7 +88,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             expression.Columns[0].DefaultValue = true;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE COLUMN TABLE \"TestTable1\" (\"TestColumn1\" NVARCHAR(255) DEFAULT 1, \"TestColumn2\" INTEGER);");
+            result.ShouldBe("CREATE COLUMN TABLE \"TestTable1\" (\"TestColumn1\" NVARCHAR(255) DEFAULT TRUE, \"TestColumn2\" INTEGER);");
         }
 
         [Test]

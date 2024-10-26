@@ -1,5 +1,5 @@
 #region License
-// Copyright (c) 2007-2018, FluentMigrator Project
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,6 +27,8 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Generators.SqlServer2012
 {
     [TestFixture]
+    [Category("Generator")]
+    [Category("SqlServer2012")]
     public class SqlServer2012GeneratorTests
     {
         protected SqlServer2012Generator Generator;

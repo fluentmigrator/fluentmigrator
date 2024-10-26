@@ -1,6 +1,6 @@
 #region License
 //
-// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,10 +25,6 @@ namespace FluentMigrator
     /// </summary>
     public interface IMigration
     {
-        /// <summary>
-        /// Gets the arbitrary application context passed to the task runner
-        /// </summary>
-        object ApplicationContext { get; }
 
         /// <summary>
         /// Gets the connection string passed to the task runner

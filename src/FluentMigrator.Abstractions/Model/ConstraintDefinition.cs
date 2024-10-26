@@ -30,9 +30,6 @@ namespace FluentMigrator.Model
     /// </summary>
     public class ConstraintDefinition
         : ICloneable,
-#pragma warning disable 618
-          ICanBeValidated,
-#pragma warning restore 618
           ISupportAdditionalFeatures,
           IValidatableObject
     {
@@ -94,13 +91,6 @@ namespace FluentMigrator.Model
             AdditionalFeatures.CloneTo(result.AdditionalFeatures);
 
             return result;
-        }
-
-        /// <inheritdoc />
-        [Obsolete("Use the System.ComponentModel.DataAnnotations.Validator instead")]
-        public void CollectValidationErrors(ICollection<string> errors)
-        {
-            this.CollectErrors(errors);
         }
 
         /// <inheritdoc />

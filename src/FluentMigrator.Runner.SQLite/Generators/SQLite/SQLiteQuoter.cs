@@ -1,3 +1,5 @@
+using System;
+
 using FluentMigrator.Runner.Generators.Generic;
 
 namespace FluentMigrator.Runner.Generators.SQLite
@@ -5,6 +7,13 @@ namespace FluentMigrator.Runner.Generators.SQLite
     // ReSharper disable once InconsistentNaming
     public class SQLiteQuoter : GenericQuoter
     {
+        private readonly bool _binaryGuid;
+
+        public SQLiteQuoter(bool binaryGuid = false)
+        {
+            _binaryGuid = binaryGuid;
+        }
+
         public override string FormatSystemMethods(SystemMethods value)
         {
             switch (value)
@@ -18,9 +27,34 @@ namespace FluentMigrator.Runner.Generators.SQLite
             return base.FormatSystemMethods(value);
         }
 
+        public override string FormatGuid(Guid value)
+        {
+            if (_binaryGuid)
+            {
+                var byteArray = value.ToByteArray();
+                var hexadecimalStringRepresentation = BitConverter.ToString(byteArray).Replace("-", string.Empty);
+                return "x'" + hexadecimalStringRepresentation + "'";
+            }
+            return base.FormatGuid(value);
+        }
+
         public override string QuoteSchemaName(string schemaName)
         {
-            return string.Empty;
+            // SQLite doesn't support Schemas in the same sense as other SQL databases (e.g. SQL Server) does,
+            // instead it allows multiple databases to be attached to the current DB connection
+            // and those attached DB's have an `alias` that can be used as a prefix similar to schemas.
+            // As this is nearest paradigm in FM, we'll allow schemas to be defined and generate the
+            // relevant SQL, however we don't currently have an approach for attaching databases
+            // so we'll have to currently assume that the implementor does this.
+            // See: https://www.sqlite.org/lang_attach.html  and https://www.sqlite.org/lang_naming.html
+            return base.QuoteSchemaName(schemaName);
+        }
+
+        public override string QuoteIndexName(string indexName, string schemaName)
+        {
+            return CreateSchemaPrefixedQuotedIdentifier(
+                QuoteSchemaName(schemaName),
+                IsQuoted(indexName) ? indexName : Quote(indexName));
         }
 
         protected override string FormatByteArray(byte[] value)

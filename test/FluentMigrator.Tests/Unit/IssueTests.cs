@@ -1,5 +1,5 @@
-﻿#region License
-// Copyright (c) 2018, FluentMigrator Project
+#region License
+// Copyright (c) 2018, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ namespace FluentMigrator.Tests.Unit
             using (var scope = serviceProvider.CreateScope())
             {
                 var connStringAccessor = scope.ServiceProvider.GetRequiredService<IConnectionStringAccessor>();
-                Assert.IsNull(connStringAccessor.ConnectionString);
+                Assert.That(connStringAccessor.ConnectionString, Is.Null);
             }
 
             // Change the connection string globally
@@ -54,7 +54,7 @@ namespace FluentMigrator.Tests.Unit
             using (var scope = serviceProvider.CreateScope())
             {
                 var connStringAccessor = scope.ServiceProvider.GetRequiredService<IConnectionStringAccessor>();
-                Assert.AreEqual("abc", connStringAccessor.ConnectionString);
+                Assert.That(connStringAccessor.ConnectionString, Is.EqualTo("abc"));
             }
         }
 
@@ -75,7 +75,7 @@ namespace FluentMigrator.Tests.Unit
             using (var scope = serviceProvider.CreateScope())
             {
                 var connStringAccessor = scope.ServiceProvider.GetRequiredService<IConnectionStringAccessor>();
-                Assert.IsNull(connStringAccessor.ConnectionString);
+                Assert.That(connStringAccessor.ConnectionString, Is.Null);
             }
 
             // Set the connection string for the scope only
@@ -93,14 +93,14 @@ namespace FluentMigrator.Tests.Unit
             {
                 var scopedServiceProvider = lifetimeScope.Resolve<IServiceProvider>();
                 var connStringAccessor = scopedServiceProvider.GetRequiredService<IConnectionStringAccessor>();
-                Assert.AreEqual("abc", connStringAccessor.ConnectionString);
+                Assert.That(connStringAccessor.ConnectionString, Is.EqualTo("abc"));
             }
 
             // The connection string is empty again
             using (var scope = serviceProvider.CreateScope())
             {
                 var connStringAccessor = scope.ServiceProvider.GetRequiredService<IConnectionStringAccessor>();
-                Assert.IsNull(connStringAccessor.ConnectionString);
+                Assert.That(connStringAccessor.ConnectionString, Is.Null);
             }
         }
 

@@ -28,12 +28,14 @@ using JetBrains.Annotations;
 
 namespace FluentMigrator.Runner.Generators.Postgres
 {
-    internal class PostgresColumn : ColumnBase
+    internal class PostgresColumn : ColumnBase<IPostgresTypeMap>
     {
         [Obsolete]
         public PostgresColumn([NotNull] PostgresQuoter quoter)
             : this(quoter, new PostgresTypeMap())
         {
+            // Note: While Postgres 10.0 introduced the ability to use ICU collations rather than depending on host OS implementations,
+            // the syntax for collation requires specifying a type.  Therefore, FormatAlterType handles collation as well.
             AlterClauseOrder = new List<Func<ColumnDefinition, string>> { FormatAlterType, FormatAlterNullable };
         }
 
@@ -42,7 +44,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
         /// </summary>
         /// <param name="quoter">The Postgres quoter.</param>
         /// <param name="typeMap">The Postgres type map.</param>
-        public PostgresColumn([NotNull] PostgresQuoter quoter, ITypeMap typeMap)
+        public PostgresColumn([NotNull] PostgresQuoter quoter, IPostgresTypeMap typeMap)
             : base(typeMap, quoter)
         {
             AlterClauseOrder = new List<Func<ColumnDefinition, string>> { FormatAlterType, FormatAlterNullable };
@@ -68,7 +70,8 @@ namespace FluentMigrator.Runner.Generators.Postgres
 
         private string FormatAlterType(ColumnDefinition column)
         {
-            return string.Format("TYPE {0}", GetColumnType(column));
+            var collation = FormatCollation(column);
+            return $"TYPE {GetColumnType(column)}{(string.IsNullOrWhiteSpace(collation) ? string.Empty : " " + collation)}";
         }
 
         protected IList<Func<ColumnDefinition, string>> AlterClauseOrder { get; set; }

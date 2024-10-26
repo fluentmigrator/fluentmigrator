@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace FluentMigrator.Tests.Integration.Migrations
 {
@@ -7,12 +7,21 @@ namespace FluentMigrator.Tests.Integration.Migrations
    {
       public override void Up()
       {
-         Alter.Table("Bar")
+         // SQLite doesn't support altering tables so we can't set the LastLoginDate
+         // to be nullable and then change it to nullable once populated so we allow
+         // this for non-SQLite setups but for SQLite we just set the column as nullable
+         IfDatabase(t => t != ProcessorId.SQLite).Alter.Table("Bar")
              .AddColumn("LastLoginDate")
              .AsDateTime()
              .NotNullable()
              .SetExistingRowsTo(DateTime.Today);
-      }
+
+        IfDatabase(ProcessorId.SQLite).Alter.Table("Bar")
+             .AddColumn("LastLoginDate")
+             .AsDateTime()
+             .Nullable()
+             .SetExistingRowsTo(DateTime.Today);
+        }
 
       public override void Down()
       {

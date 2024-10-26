@@ -282,6 +282,16 @@ namespace FluentMigrator.Builders
             return (TNext)(object)this;
         }
 
+        public TNext AsColumnDataType(IColumnDataType columnDataType)
+        {
+            Column.Type = columnDataType.Type;
+            Column.CollationName = columnDataType.CollationName;
+            Column.Size = columnDataType.Size;
+            Column.Precision = columnDataType.Precision;
+            Column.CustomType = columnDataType.CustomType;
+            return (TNext)(object)this;
+        }
+
         private void SetColumnAsString(DbType dbType, int? size = null, string collationName = "")
         {
             Column.Type = dbType;

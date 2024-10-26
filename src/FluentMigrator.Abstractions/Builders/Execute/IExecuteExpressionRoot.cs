@@ -1,6 +1,6 @@
 #region License
 //
-// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -38,8 +38,23 @@ namespace FluentMigrator.Builders.Execute
         /// Executes an SQL statement
         /// </summary>
         /// <param name="sqlStatement">The SQL statement to execute</param>
+        /// <param name="parameters">The parameters to be replaced in the SQL script</param>
+        void Sql(string sqlStatement, IDictionary<string, string> parameters);
+
+        /// <summary>
+        /// Executes an SQL statement
+        /// </summary>
+        /// <param name="sqlStatement">The SQL statement to execute</param>
         /// <param name="description">Description for this SQL statement for logging purposes</param>
         void Sql(string sqlStatement, string description);
+
+        /// <summary>
+        /// Executes an SQL statement
+        /// </summary>
+        /// <param name="sqlStatement">The SQL statement to execute</param>
+        /// <param name="description">Description for this SQL statement for logging purposes</param>
+        /// <param name="parameters">The parameters to be replaced in the SQL script</param>
+        void Sql(string sqlStatement, string description, IDictionary<string, string> parameters);
 
         /// <summary>
         /// Executes an SQL script loaded from the given file

@@ -1,6 +1,6 @@
 #region License
 //
-// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Exceptions;
+using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Infrastructure;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
@@ -49,6 +50,8 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit
 {
     [TestFixture]
+    [Category("Runner")]
+    [Category("MigrationRunner")]
     public class MigrationRunnerTests
     {
         private Mock<IStopWatch> _stopWatch;
@@ -62,7 +65,6 @@ namespace FluentMigrator.Tests.Unit
         private ICollection<string> _logMessages;
         private SortedList<long, IMigrationInfo> _migrationList;
         private TestVersionLoader _fakeVersionLoader;
-        private int _applicationContext;
 
         private IServiceCollection _serviceCollection;
 
@@ -72,7 +74,6 @@ namespace FluentMigrator.Tests.Unit
         {
             var asm = Assembly.GetExecutingAssembly();
 
-            _applicationContext = new Random().Next();
             _migrationList = new SortedList<long, IMigrationInfo>();
             _processorMock = new Mock<IMigrationProcessor>(MockBehavior.Loose);
             _migrationLoaderMock = new Mock<IMigrationInformationLoader>(MockBehavior.Loose);
@@ -88,6 +89,8 @@ namespace FluentMigrator.Tests.Unit
 
             _migrationLoaderMock.Setup(x => x.LoadMigrations()).Returns(()=> _migrationList);
 
+            var generatorAccessorMock = new Mock<IGeneratorAccessor>(MockBehavior.Loose);
+
             _logMessages = new List<string>();
             var connectionString = IntegrationTestOptions.SqlServer2008.ConnectionString;
             _serviceCollection = ServiceCollectionExtensions.CreateServices()
@@ -96,11 +99,9 @@ namespace FluentMigrator.Tests.Unit
                 .AddSingleton(_stopWatch.Object)
                 .AddSingleton(_assemblySourceMock.Object)
                 .AddSingleton(_migrationLoaderMock.Object)
+                .AddSingleton(generatorAccessorMock.Object)
                 .AddScoped<IConnectionStringReader>(_ => new PassThroughConnectionStringReader(connectionString))
                 .AddScoped(_ => _profileLoaderMock.Object)
-#pragma warning disable 612
-                .Configure<RunnerOptions>(opt => opt.ApplicationContext = _applicationContext)
-#pragma warning restore 612
                 .Configure<ProcessorOptions>(
                     opt => opt.ConnectionString = connectionString)
                 .Configure<AssemblySourceOptions>(opt => opt.AssemblyNames = new []{ asm.FullName })
@@ -172,18 +173,6 @@ namespace FluentMigrator.Tests.Unit
             _profileLoaderMock.Verify(x => x.ApplyProfiles(runner), Times.Once());
         }
 
-        /// <summary>Unit test which ensures that the application context is correctly propagated down to each migration class.</summary>
-        [Test(Description = "Ensure that the application context is correctly propagated down to each migration class.")]
-        public void CanPassApplicationContext()
-        {
-            var runner = CreateRunner();
-
-            IMigration migration = new TestEmptyMigration();
-            runner.Up(migration);
-
-            Assert.AreEqual(_applicationContext, migration.ApplicationContext, "The migration does not have the expected application context.");
-        }
-
         [Test]
         public void CanPassConnectionString()
         {
@@ -192,7 +181,7 @@ namespace FluentMigrator.Tests.Unit
             IMigration migration = new TestEmptyMigration();
             runner.Up(migration);
 
-            Assert.AreEqual(IntegrationTestOptions.SqlServer2008.ConnectionString, migration.ConnectionString, "The migration does not have the expected connection string.");
+            Assert.That(migration.ConnectionString, Is.EqualTo(IntegrationTestOptions.SqlServer2008.ConnectionString), "The migration does not have the expected connection string.");
         }
 
         [Test]
@@ -395,7 +384,7 @@ namespace FluentMigrator.Tests.Unit
             const long fakeMigrationVersion2 = 2009010102;
 
             var runner = CreateRunner();
-            Assert.NotNull(runner.VersionLoader.VersionTableMetaData.TableName);
+            Assert.That(runner.VersionLoader.VersionTableMetaData.TableName, Is.Not.Null);
 
             LoadVersionData(fakeMigrationVersion, fakeMigrationVersion2);
 
@@ -414,7 +403,7 @@ namespace FluentMigrator.Tests.Unit
 
             LoadVersionData(fakeMigrationVersion);
 
-            Assert.NotNull(runner.VersionLoader.VersionTableMetaData.TableName);
+            Assert.That(runner.VersionLoader.VersionTableMetaData.TableName, Is.Not.Null);
 
             runner.Rollback(1);
 
@@ -426,7 +415,7 @@ namespace FluentMigrator.Tests.Unit
         {
             var runner = CreateRunner();
 
-            Assert.NotNull(runner.VersionLoader.VersionTableMetaData.TableName);
+            Assert.That(runner.VersionLoader.VersionTableMetaData.TableName, Is.Not.Null);
 
             runner.RollbackToVersion(0);
 
@@ -719,11 +708,10 @@ namespace FluentMigrator.Tests.Unit
                 runner.ApplyMigrationUp(
                     new MigrationInfo(7, TransactionBehavior.Default, true, new TestBreakingMigration()), true));
 
-            Assert.NotNull(ex);
+            Assert.That(ex, Is.Not.Null);
 
-            Assert.AreEqual(
-                "The migration 7: TestBreakingMigration is identified as a breaking change, and will not be executed unless the necessary flag (allow-breaking-changes|abc) is passed to the runner.",
-                ex.Message);
+            Assert.That(
+                ex.Message, Is.EqualTo("The migration 7: TestBreakingMigration is identified as a breaking change, and will not be executed unless the necessary flag (allow-breaking-changes|abc) is passed to the runner."));
         }
 
         [Test]
@@ -754,6 +742,15 @@ namespace FluentMigrator.Tests.Unit
         }
 
         [Test]
+        public void TestLoadVersionInfoIfRequired()
+        {
+            var runner = CreateRunner();
+
+            runner.LoadVersionInfoIfRequired().ShouldBeTrue();
+            runner.LoadVersionInfoIfRequired().ShouldBeFalse();
+        }
+
+        [Test]
         public void CanLoadCustomMigrationScopeHandler()
         {
             _serviceCollection.AddScoped<IMigrationScopeManager>(scoped => { return _migrationScopeHandlerMock.Object; });
@@ -780,7 +777,7 @@ namespace FluentMigrator.Tests.Unit
             _migrationList.Add(3, new MigrationInfo(3, TransactionBehavior.Default, new Step2Migration2()));
             var runner = CreateRunner();
             runner.MigrateUp();
-            Assert.AreEqual(1, runner.VersionLoader.VersionInfo.Latest());
+            Assert.That(runner.VersionLoader.VersionInfo.Latest(), Is.EqualTo(1));
         }
 
         [Test]
@@ -793,7 +790,7 @@ namespace FluentMigrator.Tests.Unit
             var runner = CreateRunner();
             runner.MigrateUp();
             runner.MigrateUp(); // run migrations second time, this time satisfying constraints
-            Assert.AreEqual(3, runner.VersionLoader.VersionInfo.Latest());
+            Assert.That(runner.VersionLoader.VersionInfo.Latest(), Is.EqualTo(3));
         }
 
         [Test]
@@ -803,7 +800,7 @@ namespace FluentMigrator.Tests.Unit
             _migrationList.Add(1, new MigrationInfo(1, TransactionBehavior.Default, new MultipleConstraintsMigration()));
             var runner = CreateRunner();
             runner.MigrateUp();
-            Assert.AreEqual(0, runner.VersionLoader.VersionInfo.Latest());
+            Assert.That(runner.VersionLoader.VersionInfo.Latest(), Is.EqualTo(0));
         }
 
         [Test]
@@ -813,7 +810,7 @@ namespace FluentMigrator.Tests.Unit
             _migrationList.Add(1, new MigrationInfo(1, TransactionBehavior.Default, new ConstrainedMigrationSuccess()));
             var runner = CreateRunner();
             runner.MigrateUp();
-            Assert.AreEqual(1, runner.VersionLoader.VersionInfo.Latest());
+            Assert.That(runner.VersionLoader.VersionInfo.Latest(), Is.EqualTo(1));
         }
 
         private static bool LineContainsAll(string line, params string[] words)

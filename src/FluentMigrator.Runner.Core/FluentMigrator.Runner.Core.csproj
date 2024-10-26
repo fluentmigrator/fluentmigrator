@@ -1,13 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net461;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net48;netstandard2.0</TargetFrameworks>
     <Description>FluentMigrator is a database migration framework for .NET written in C#. The basic idea is that you can create migrations which are simply classes that derive from the Migration base class and have a Migration attribute with a unique version number attached to them. Upon executing FluentMigrator, you tell it which version to migrate to and it will run all necessary migrations in order to bring your database up to that version. In addition to forward migration support, FluentMigrator also supports different ways to execute the migrations along with selective migrations called profiles and executing arbitrary SQL.</Description>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\FluentMigrator.snk</AssemblyOriginatorKeyFile>
     <RootNamespace>FluentMigrator.Runner</RootNamespace>
   </PropertyGroup>
   <Import Project="$(MSBuildThisFileDirectory)../../PackageLibrary.props" />
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net48' ">
+    <Reference Include="System.Configuration" />
+  </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\FluentMigrator\FluentMigrator.csproj" />
     <ProjectReference Include="..\FluentMigrator.Abstractions\FluentMigrator.Abstractions.csproj" />
   </ItemGroup>
   <ItemGroup>
@@ -17,9 +21,17 @@
     <Folder Include="BatchParser" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="2.0.1" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Options" Version="2.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="8.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Update="JetBrains.Annotations" Version="2024.2.0" />
+  </ItemGroup>
+  <!-- This file is meant to be linked from FluentMigrator.DotNet.Cli and FluentMigrator.MSBuild -->
+  <ItemGroup>
+    <Compile Remove="DirtyAssemblyResolveHelper.cs" />
+    <None Include="DirtyAssemblyResolveHelper.cs" />
   </ItemGroup>
 </Project>

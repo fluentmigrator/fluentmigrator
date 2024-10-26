@@ -1,6 +1,6 @@
 #region License
 //
-// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,6 +28,8 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Expressions
 {
     [TestFixture]
+    [Category("Expression")]
+    [Category("CreateTable")]
     public class CreateTableExpressionTests
     {
         [Test]
@@ -54,7 +56,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             var expression = new CreateTableExpression { TableName = "table1" };
 
             var errors = ValidationHelper.CollectErrors(expression);
-            Assert.That(errors.Count, Is.EqualTo(0));
+            Assert.That(errors, Is.Empty);
         }
 
         [Test]

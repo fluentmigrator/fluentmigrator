@@ -48,6 +48,13 @@ namespace FluentMigrator.Runner.Generators.DB2
         {
             switch (value)
             {
+                case SystemMethods.NewSequentialId:
+                case SystemMethods.NewGuid:
+                    return base.FormatSystemMethods(value);
+                /*
+                 * (The CURRENT TIMEZONE value is determined from C runtime functions.)
+                 * Source: https://www.ibm.com/support/knowledgecenter/en/SSEPGG_9.7.0/com.ibm.db2.luw.sql.ref.doc/doc/r0005887.html
+                 */
                 case SystemMethods.CurrentUTCDateTime:
                     return "(CURRENT_TIMESTAMP - CURRENT_TIMEZONE)";
                 case SystemMethods.CurrentDateTime:

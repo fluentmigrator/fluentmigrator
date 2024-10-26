@@ -1,4 +1,6 @@
-﻿using FluentMigrator.Runner.Generators.Jet;
+using FluentMigrator.Exceptions;
+using FluentMigrator.Runner;
+using FluentMigrator.Runner.Generators.Jet;
 using NUnit.Framework;
 
 using Shouldly;
@@ -130,10 +132,11 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public override void CanCreateTableWithMultiColumnPrimaryKeyWithDefaultSchema()
+        public override void CanCreateTableWithMultiColumnPrimaryKeyWithDefaultSchema([Values] CompatibilityMode compatibilityMode)
         {
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumnPrimaryKeyExpression();
 
+            Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] VARCHAR(255) NOT NULL, [TestColumn2] INTEGER NOT NULL, PRIMARY KEY ([TestColumn1], [TestColumn2]))");
         }
@@ -231,6 +234,25 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
 
             var result = Generator.Generate(expression);
             result.ShouldBe("DROP TABLE [TestTable1]");
+        }
+
+        [Test]
+        public override void CanDropTableIfExistsWithDefaultSchema()
+        {
+            Generator.CompatibilityMode = CompatibilityMode.LOOSE;
+            var expression = GeneratorTestHelper.GetDeleteTableIfExistsExpression();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe(string.Empty);
+        }
+
+        [Test]
+        public void CantDropTableIfExistsWithDefaultSchemaInStrictCompatibilityMode()
+        {
+            Generator.CompatibilityMode = CompatibilityMode.STRICT;
+            var expression = GeneratorTestHelper.GetDeleteTableIfExistsExpression();
+
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
 
         [Test]

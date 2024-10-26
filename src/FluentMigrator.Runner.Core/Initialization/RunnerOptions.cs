@@ -1,5 +1,5 @@
 #region License
-// Copyright (c) 2018, FluentMigrator Project
+// Copyright (c) 2018, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -93,12 +93,6 @@ namespace FluentMigrator.Runner.Initialization
         public bool TransactionPerSession { get; set; }
 
         /// <summary>
-        /// Gets or sets the arbitrary application context passed to the task runner
-        /// </summary>
-        [Obsolete("Use dependency injection to access 'application state'.")]
-        public object ApplicationContext { get; set; }
-
-        /// <summary>
         /// Gets or sets a value indicating whether no connection should be used
         /// </summary>
         /// <remarks>
@@ -111,7 +105,7 @@ namespace FluentMigrator.Runner.Initialization
         /// <summary>
         /// Gets or sets a value indicating whether untagged maintenance items should always be loaded/executed.
         /// </summary>
-        public bool IncludeUntaggedMaintenances { get; set; }
+        public bool IncludeUntaggedMaintenances { get; set; } = true;
 
         /// <summary>
         /// Gets or sets a value indicating whether untagged migrations should always be loaded/executed.
@@ -133,7 +127,6 @@ namespace FluentMigrator.Runner.Initialization
             Tags = runnerContext.Tags?.ToArray();
             AllowBreakingChange = runnerContext.AllowBreakingChange;
             TransactionPerSession = runnerContext.TransactionPerSession;
-            ApplicationContext = runnerContext.ApplicationContext;
             NoConnection = runnerContext.NoConnection;
         }
     }

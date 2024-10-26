@@ -50,18 +50,6 @@ namespace FluentMigrator.Runner.Processors.Firebird
         protected List<string> DDLTouchedTables;
         protected Dictionary<string, List<string>> DDLTouchedColumns;
 
-        [Obsolete]
-        public FirebirdProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory, FirebirdOptions fbOptions)
-            : base(connection, factory, generator, announcer, options)
-        {
-            FBOptions = fbOptions ?? throw new ArgumentNullException(nameof(fbOptions));
-            _firebirdVersionFunc = new Lazy<Version>(GetFirebirdVersion);
-            _quoter = new FirebirdQuoter(fbOptions.ForceQuote);
-            truncator = new FirebirdTruncator(FBOptions.TruncateLongNames, FBOptions.PackKeyNames);
-            ClearLocks();
-            ClearDDLFollowers();
-        }
-
         public FirebirdProcessor(
             [NotNull] FirebirdDbFactory factory,
             [NotNull] FirebirdGenerator generator,
@@ -82,7 +70,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             ClearDDLFollowers();
         }
 
-        public override string DatabaseType => "Firebird";
+        public override string DatabaseType => ProcessorId.Firebird;
 
         public override IList<string> DatabaseTypeAliases { get; } = new List<string>();
 

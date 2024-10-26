@@ -1,5 +1,5 @@
-﻿#region License
-// Copyright (c) 2018, FluentMigrator Project
+#region License
+// Copyright (c) 2018, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -41,21 +41,21 @@ namespace FluentMigrator.Tests.Unit.Initialization
             using (var scope = serviceProvider.CreateScope())
             {
                 var items = scope.ServiceProvider.GetRequiredService<IEnumerable<IAssemblySourceItem>>().ToList();
-                Assert.AreEqual(1, items.Count);
+                Assert.That(items, Has.Count.EqualTo(1));
                 var migrationSourceItems = scope.ServiceProvider.GetRequiredService<IEnumerable<IMigrationSourceItem>>().ToList();
-                Assert.AreEqual(0, migrationSourceItems.Count);
+                Assert.That(migrationSourceItems, Is.Empty);
                 var versionTableMetaDataSourceItems = scope.ServiceProvider.GetRequiredService<IEnumerable<IVersionTableMetaDataSourceItem>>().ToList();
-                Assert.AreEqual(0, versionTableMetaDataSourceItems.Count);
+                Assert.That(versionTableMetaDataSourceItems, Is.Empty);
                 var embeddedResourceProviders = scope.ServiceProvider.GetRequiredService<IEnumerable<IEmbeddedResourceProvider>>().ToList();
-                Assert.AreEqual(1, embeddedResourceProviders.Count);
+                Assert.That(embeddedResourceProviders, Has.Count.EqualTo(1));
 
                 var vtmd = scope.ServiceProvider.GetRequiredService<IVersionTableMetaData>();
-                Assert.IsInstanceOf<TestVersionTableMetaData>(vtmd);
+                Assert.That(vtmd, Is.InstanceOf<TestVersionTableMetaData>());
 
                 var embeddedResources = embeddedResourceProviders
                     .SelectMany(x => x.GetEmbeddedResources())
                     .Distinct().ToList();
-                Assert.AreNotEqual(0, embeddedResources.Count);
+                Assert.That(embeddedResources, Is.Not.Empty);
             }
         }
 
@@ -69,21 +69,21 @@ namespace FluentMigrator.Tests.Unit.Initialization
             using (var scope = serviceProvider.CreateScope())
             {
                 var items = scope.ServiceProvider.GetRequiredService<IEnumerable<IAssemblySourceItem>>().ToList();
-                Assert.AreEqual(1, items.Count);
+                Assert.That(items, Has.Count.EqualTo(1));
                 var migrationSourceItems = scope.ServiceProvider.GetRequiredService<IEnumerable<IMigrationSourceItem>>().ToList();
-                Assert.AreEqual(0, migrationSourceItems.Count);
+                Assert.That(migrationSourceItems, Is.Empty);
                 var versionTableMetaDataSourceItems = scope.ServiceProvider.GetRequiredService<IEnumerable<IVersionTableMetaDataSourceItem>>().ToList();
-                Assert.AreEqual(0, versionTableMetaDataSourceItems.Count);
+                Assert.That(versionTableMetaDataSourceItems, Is.Empty);
                 var embeddedResourceProviders = scope.ServiceProvider.GetRequiredService<IEnumerable<IEmbeddedResourceProvider>>().ToList();
-                Assert.AreEqual(1, embeddedResourceProviders.Count);
+                Assert.That(embeddedResourceProviders, Has.Count.EqualTo(1));
 
                 var vtmd = scope.ServiceProvider.GetRequiredService<IVersionTableMetaData>();
-                Assert.IsInstanceOf<TestVersionTableMetaData>(vtmd);
+                Assert.That(vtmd, Is.InstanceOf<TestVersionTableMetaData>());
 
                 var embeddedResources = embeddedResourceProviders
                     .SelectMany(x => x.GetEmbeddedResources())
                     .Distinct().ToList();
-                Assert.AreNotEqual(0, embeddedResources.Count);
+                Assert.That(embeddedResources, Is.Not.Empty);
             }
         }
 
@@ -99,21 +99,21 @@ namespace FluentMigrator.Tests.Unit.Initialization
             using (var scope = serviceProvider.CreateScope())
             {
                 var assemblySourceItems = scope.ServiceProvider.GetRequiredService<IEnumerable<IAssemblySourceItem>>().ToList();
-                Assert.AreEqual(0, assemblySourceItems.Count);
+                Assert.That(assemblySourceItems, Is.Empty);
                 var migrationSourceItems = scope.ServiceProvider.GetRequiredService<IEnumerable<IMigrationSourceItem>>().ToList();
-                Assert.AreEqual(1, migrationSourceItems.Count);
+                Assert.That(migrationSourceItems, Has.Count.EqualTo(1));
                 var versionTableMetaDataSourceItems = scope.ServiceProvider.GetRequiredService<IEnumerable<IVersionTableMetaDataSourceItem>>().ToList();
-                Assert.AreEqual(0, versionTableMetaDataSourceItems.Count);
+                Assert.That(versionTableMetaDataSourceItems, Is.Empty);
                 var embeddedResourceProviders = scope.ServiceProvider.GetRequiredService<IEnumerable<IEmbeddedResourceProvider>>().ToList();
-                Assert.AreEqual(1, embeddedResourceProviders.Count);
+                Assert.That(embeddedResourceProviders, Has.Count.EqualTo(1));
 
                 var vtmd = scope.ServiceProvider.GetRequiredService<IVersionTableMetaData>();
-                Assert.IsInstanceOf<DefaultVersionTableMetaData>(vtmd);
+                Assert.That(vtmd, Is.InstanceOf<DefaultVersionTableMetaData>());
 
                 var embeddedResources = embeddedResourceProviders
                     .SelectMany(x => x.GetEmbeddedResources())
                     .Distinct().ToList();
-                Assert.AreEqual(0, embeddedResources.Count);
+                Assert.That(embeddedResources, Is.Empty);
             }
         }
 
@@ -129,21 +129,21 @@ namespace FluentMigrator.Tests.Unit.Initialization
             using (var scope = serviceProvider.CreateScope())
             {
                 var assemblySourceItems = scope.ServiceProvider.GetRequiredService<IEnumerable<IAssemblySourceItem>>().ToList();
-                Assert.AreEqual(0, assemblySourceItems.Count);
+                Assert.That(assemblySourceItems, Is.Empty);
                 var migrationSourceItems = scope.ServiceProvider.GetRequiredService<IEnumerable<IMigrationSourceItem>>().ToList();
-                Assert.AreEqual(0, migrationSourceItems.Count);
+                Assert.That(migrationSourceItems, Is.Empty);
                 var versionTableMetaDataSourceItems = scope.ServiceProvider.GetRequiredService<IEnumerable<IVersionTableMetaDataSourceItem>>().ToList();
-                Assert.AreEqual(1, versionTableMetaDataSourceItems.Count);
+                Assert.That(versionTableMetaDataSourceItems, Has.Count.EqualTo(1));
                 var embeddedResourceProviders = scope.ServiceProvider.GetRequiredService<IEnumerable<IEmbeddedResourceProvider>>().ToList();
-                Assert.AreEqual(1, embeddedResourceProviders.Count);
+                Assert.That(embeddedResourceProviders, Has.Count.EqualTo(1));
 
                 var vtmd = scope.ServiceProvider.GetRequiredService<IVersionTableMetaData>();
-                Assert.IsInstanceOf<TestVersionTableMetaData>(vtmd);
+                Assert.That(vtmd, Is.InstanceOf<TestVersionTableMetaData>());
 
                 var embeddedResources = embeddedResourceProviders
                     .SelectMany(x => x.GetEmbeddedResources())
                     .Distinct().ToList();
-                Assert.AreEqual(0, embeddedResources.Count);
+                Assert.That(embeddedResources, Is.Empty);
             }
         }
 
@@ -159,21 +159,21 @@ namespace FluentMigrator.Tests.Unit.Initialization
             using (var scope = serviceProvider.CreateScope())
             {
                 var assemblySourceItems = scope.ServiceProvider.GetRequiredService<IEnumerable<IAssemblySourceItem>>().ToList();
-                Assert.AreEqual(0, assemblySourceItems.Count);
+                Assert.That(assemblySourceItems, Is.Empty);
                 var migrationSourceItems = scope.ServiceProvider.GetRequiredService<IEnumerable<IMigrationSourceItem>>().ToList();
-                Assert.AreEqual(0, migrationSourceItems.Count);
+                Assert.That(migrationSourceItems, Is.Empty);
                 var versionTableMetaDataSourceItems = scope.ServiceProvider.GetRequiredService<IEnumerable<IVersionTableMetaDataSourceItem>>().ToList();
-                Assert.AreEqual(0, versionTableMetaDataSourceItems.Count);
+                Assert.That(versionTableMetaDataSourceItems, Is.Empty);
                 var embeddedResourceProviders = scope.ServiceProvider.GetRequiredService<IEnumerable<IEmbeddedResourceProvider>>().ToList();
-                Assert.AreEqual(2, embeddedResourceProviders.Count);
+                Assert.That(embeddedResourceProviders, Has.Count.EqualTo(2));
 
                 var vtmd = scope.ServiceProvider.GetRequiredService<IVersionTableMetaData>();
-                Assert.IsInstanceOf<DefaultVersionTableMetaData>(vtmd);
+                Assert.That(vtmd, Is.InstanceOf<DefaultVersionTableMetaData>());
 
                 var embeddedResources = embeddedResourceProviders
                     .SelectMany(x => x.GetEmbeddedResources())
                     .Distinct().ToList();
-                Assert.AreNotEqual(0, embeddedResources.Count);
+                Assert.That(embeddedResources, Is.Not.Empty);
             }
         }
 
@@ -189,21 +189,21 @@ namespace FluentMigrator.Tests.Unit.Initialization
             using (var scope = serviceProvider.CreateScope())
             {
                 var assemblySourceItems = scope.ServiceProvider.GetRequiredService<IEnumerable<IAssemblySourceItem>>().ToList();
-                Assert.AreEqual(0, assemblySourceItems.Count);
+                Assert.That(assemblySourceItems, Is.Empty);
                 var migrationSourceItems = scope.ServiceProvider.GetRequiredService<IEnumerable<IMigrationSourceItem>>().ToList();
-                Assert.AreEqual(1, migrationSourceItems.Count);
+                Assert.That(migrationSourceItems, Has.Count.EqualTo(1));
                 var versionTableMetaDataSourceItems = scope.ServiceProvider.GetRequiredService<IEnumerable<IVersionTableMetaDataSourceItem>>().ToList();
-                Assert.AreEqual(1, versionTableMetaDataSourceItems.Count);
+                Assert.That(versionTableMetaDataSourceItems, Has.Count.EqualTo(1));
                 var embeddedResourceProviders = scope.ServiceProvider.GetRequiredService<IEnumerable<IEmbeddedResourceProvider>>().ToList();
-                Assert.AreEqual(1, embeddedResourceProviders.Count);
+                Assert.That(embeddedResourceProviders, Has.Count.EqualTo(1));
 
                 var vtmd = scope.ServiceProvider.GetRequiredService<IVersionTableMetaData>();
-                Assert.IsInstanceOf<TestVersionTableMetaData>(vtmd);
+                Assert.That(vtmd, Is.InstanceOf<TestVersionTableMetaData>());
 
                 var embeddedResources = embeddedResourceProviders
                     .SelectMany(x => x.GetEmbeddedResources())
                     .Distinct().ToList();
-                Assert.AreEqual(0, embeddedResources.Count);
+                Assert.That(embeddedResources, Is.Empty);
             }
         }
     }

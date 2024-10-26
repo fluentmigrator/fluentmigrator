@@ -121,7 +121,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             var result = string.Join(Environment.NewLine, expressions.Select(x => (string)Generator.Generate((dynamic)x)));
             result.ShouldBe(
                 @"ALTER TABLE TestTable1 ADD TestColumn1 TIMESTAMP" + Environment.NewLine +
-                @"UPDATE TestTable1 SET TestColumn1 = CURRENT_TIMESTAMP WHERE 1 = 1");
+                @"UPDATE TestTable1 SET TestColumn1 = LOCALTIMESTAMP WHERE 1 = 1");
         }
 
         [Test]
@@ -131,7 +131,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             var result = string.Join(Environment.NewLine, expressions.Select(x => (string)Generator.Generate((dynamic)x)));
             result.ShouldBe(
                 @"ALTER TABLE TestTable1 ADD TestColumn1 TIMESTAMP" + Environment.NewLine +
-                @"UPDATE TestTable1 SET TestColumn1 = CURRENT_TIMESTAMP WHERE 1 = 1");
+                @"UPDATE TestTable1 SET TestColumn1 = LOCALTIMESTAMP WHERE 1 = 1");
         }
 
         [Test]

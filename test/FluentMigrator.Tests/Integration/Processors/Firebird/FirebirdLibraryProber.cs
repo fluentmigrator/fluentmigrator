@@ -1,5 +1,5 @@
 #region License
-// Copyright (c) 2007-2018, Sean Chambers and the FluentMigrator Project
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -98,7 +98,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                             csb.ClientLibrary = clientLibrary;
                             try
                             {
-                                FbConnection.CreateDatabase(csb.ConnectionString, true);
+                                FbConnection.CreateDatabase(csb.ConnectionString, overwrite: true);
                                 _clientLibrary = clientLibrary;
                                 _foundClientLibrary = true;
                                 return csb.ConnectionString;
@@ -117,7 +117,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             if (_clientLibrary != null)
             {
                 csb.ClientLibrary = _clientLibrary;
-                FbConnection.CreateDatabase(csb.ConnectionString, true);
+                FbConnection.CreateDatabase(csb.ConnectionString, overwrite: true);
                 return csb.ConnectionString;
             }
 

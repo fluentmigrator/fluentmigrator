@@ -1,5 +1,5 @@
 #region License
-// Copyright (c) 2018, FluentMigrator Project
+// Copyright (c) 2018, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@ namespace FluentMigrator.Runner.Generators
             {
                 // No generator selected
                 if (gens.Count == 0)
-                    throw new InvalidOperationException("No migration generator registerd.");
+                    throw new InvalidOperationException("No migration generator registered.");
                 if (gens.Count > 1)
                     throw new InvalidOperationException("More than one generator registered, but no generator id given. Specify the generator id by configuring SelectingGeneratorAccessorOptions.");
                 Generator = gens.Single();

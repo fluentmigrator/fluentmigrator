@@ -1,5 +1,5 @@
 #region License
-// Copyright (c) 2018, FluentMigrator Project
+// Copyright (c) 2018, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -100,12 +100,12 @@ namespace FluentMigrator.Tests.IssueTests.GH0911
                         if (dataType == "varchar")
                         {
                             var maxLength = column["CHARACTER_MAXIMUM_LENGTH"];
-                            Assert.AreEqual(40, maxLength);
+                            Assert.That(maxLength, Is.EqualTo(40));
                             ++foundColumns;
                         }
                     }
 
-                    Assert.AreEqual(3, foundColumns);
+                    Assert.That(foundColumns, Is.EqualTo(3));
                 }
             }
             finally
@@ -127,9 +127,6 @@ namespace FluentMigrator.Tests.IssueTests.GH0911
             }
 
             /// <inheritdoc />
-            public object ApplicationContext { get; set; }
-
-            /// <inheritdoc />
             public bool OwnsSchema { get; } = true;
 
             /// <inheritdoc />
@@ -149,6 +146,9 @@ namespace FluentMigrator.Tests.IssueTests.GH0911
 
             /// <inheritdoc />
             public string AppliedOnColumnName { get; } = "AppliedOn";
+
+            /// <inheritdoc />
+            public bool CreateWithPrimaryKey { get; } = false;
         }
     }
 }

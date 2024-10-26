@@ -37,15 +37,9 @@ namespace FluentMigrator.Runner.Processors.Redshift
     {
         private readonly RedshiftQuoter _quoter = new RedshiftQuoter();
 
-        public override string DatabaseType => "Redshift";
+        public override string DatabaseType => ProcessorId.Redshift;
 
         public override IList<string> DatabaseTypeAliases { get; } = new List<string>();
-
-        [Obsolete]
-        public RedshiftProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
-            : base(connection, factory, generator, announcer, options)
-        {
-        }
 
         public RedshiftProcessor(
             [NotNull] RedshiftDbFactory factory,

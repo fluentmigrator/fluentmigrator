@@ -51,9 +51,6 @@ namespace FluentMigrator.DotNet.Cli
         public bool Preview { get; private set; }
         public bool Verbose { get; private set; }
         public string Profile { get; private set; }
-
-        [Obsolete("Use dependency injection to access 'application state'.")]
-        public string Context { get; private set; }
         public int? Timeout { get; private set; }
         public TransactionMode TransactionMode { get; private set; }
         public bool Output { get; private set; }
@@ -130,7 +127,6 @@ namespace FluentMigrator.DotNet.Cli
             Preview = cmd.Preview;
             Verbose = cmd.Verbose;
             Profile = cmd.Profile;
-            Context = cmd.Context;
             Timeout = cmd.Timeout;
             StripComments = !cmd.StripComments.hasValue || (cmd.StripComments.value ?? true);
             (Output, OutputFileName) = cmd.Output;

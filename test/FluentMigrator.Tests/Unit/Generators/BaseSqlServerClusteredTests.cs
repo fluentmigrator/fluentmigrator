@@ -16,8 +16,12 @@
 //
 #endregion
 
+using NUnit.Framework;
+
 namespace FluentMigrator.Tests.Unit.Generators
 {
+    [Category("Generator")]
+    [Category("Cluster")]
     public abstract class BaseSqlServerClusteredTests
     {
         public abstract void CanCreateClusteredIndexWithCustomSchema();

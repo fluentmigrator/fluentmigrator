@@ -1,5 +1,5 @@
 #region License
-// Copyright (c) 2018, FluentMigrator Project
+// Copyright (c) 2018, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,12 +26,12 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.Postgres
 {
-    class Postgres10_0Processor : PostgresProcessor
+    public class Postgres10_0Processor : PostgresProcessor
     {
         public Postgres10_0Processor(
             [NotNull] PostgresDbFactory factory,
             [NotNull] Postgres10_0Generator generator,
-            [NotNull] ILogger<PostgresProcessor> logger,
+            [NotNull] ILogger<Postgres10_0Processor> logger,
             [NotNull] IOptionsSnapshot<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor,
             [NotNull] PostgresOptions pgOptions)
@@ -39,9 +39,9 @@ namespace FluentMigrator.Runner.Processors.Postgres
         {
         }
 
-        public override string DatabaseType => "PostgreSQL10_0";
+        public override string DatabaseType => ProcessorId.PostgreSQL10_0;
 
-        public override IList<string> DatabaseTypeAliases { get; } = new List<string> { "PostgreSQL" };
+        public override IList<string> DatabaseTypeAliases { get; } = new List<string> { ProcessorId.PostgreSQL };
 
     }
 }

@@ -32,6 +32,8 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 {
     [TestFixture]
+    [Category("Generator")]
+    [Category("SqlServer2005")]
     public class SqlServer2005GeneratorTests
     {
         protected IMigrationGenerator Generator;
@@ -337,7 +339,21 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 
             result.ShouldBe(@"CREATE TABLE [dbo].[TestTable1] ([TestColumn1] NVARCHAR(255), [TestColumn2] INT NOT NULL)" + Environment.NewLine +
                             "GO" + Environment.NewLine +
-                            "EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'TestDescription', @level0type=N'SCHEMA', @level0name='dbo', @level1type=N'TABLE', @level1name='TestTable1';EXEC sys.sp_addextendedproperty @name = N'MS_Description', @value = N'TestColumn1Description', @level0type = N'SCHEMA', @level0name = 'dbo', @level1type = N'Table', @level1name = 'TestTable1', @level2type = N'Column',  @level2name = 'TestColumn1';EXEC sys.sp_addextendedproperty @name = N'MS_Description', @value = N'TestColumn2Description', @level0type = N'SCHEMA', @level0name = 'dbo', @level1type = N'Table', @level1name = 'TestTable1', @level2type = N'Column',  @level2name = 'TestColumn2'" + Environment.NewLine);
+                            "EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'TestDescription', @level0type=N'SCHEMA', @level0name='dbo', @level1type=N'TABLE', @level1name='TestTable1';EXEC sys.sp_addextendedproperty @name = N'MS_Description', @value = N'Description:TestColumn1Description', @level0type = N'SCHEMA', @level0name = 'dbo', @level1type = N'Table', @level1name = 'TestTable1', @level2type = N'Column',  @level2name = 'TestColumn1';EXEC sys.sp_addextendedproperty @name = N'MS_Description', @value = N'Description:TestColumn2Description', @level0type = N'SCHEMA', @level0name = 'dbo', @level1type = N'Table', @level1name = 'TestTable1', @level2type = N'Column',  @level2name = 'TestColumn2'" + Environment.NewLine);
+        }
+
+        [Test]
+        public void CanCreateTableWithDescriptionAndColumnDescriptionWithAdditionalDescriptions()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableWithTableDescriptionAndColumnDescriptionsAndAdditionalDescriptions();
+
+            var result = Generator.Generate(expression);
+
+            result.ShouldBe(@"CREATE TABLE [dbo].[TestTable1] ([TestColumn1] NVARCHAR(255), [TestColumn2] INT NOT NULL)" + Environment.NewLine +
+                            "GO" + Environment.NewLine +
+                            "EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'TestDescription', @level0type=N'SCHEMA', @level0name='dbo', @level1type=N'TABLE', @level1name='TestTable1';EXEC sys.sp_addextendedproperty @name = N'MS_Description', @value = N'Description:TestColumn1Description" + Environment.NewLine +
+                            "AdditionalColumnDescriptionKey1:AdditionalColumnDescriptionValue1', @level0type = N'SCHEMA', @level0name = 'dbo', @level1type = N'Table', @level1name = 'TestTable1', @level2type = N'Column',  @level2name = 'TestColumn1';EXEC sys.sp_addextendedproperty @name = N'MS_Description', @value = N'Description:TestColumn2Description" + Environment.NewLine +
+                            "AdditionalColumnDescriptionKey2:AdditionalColumnDescriptionValue2', @level0type = N'SCHEMA', @level0name = 'dbo', @level1type = N'Table', @level1name = 'TestTable1', @level2type = N'Column',  @level2name = 'TestColumn2'" + Environment.NewLine);
         }
 
         [Test]
@@ -359,7 +375,20 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 
             result.ShouldBe(@"ALTER TABLE [dbo].[TestTable1] ADD [TestColumn1] NVARCHAR(5) NOT NULL" + Environment.NewLine +
                             "GO" + Environment.NewLine +
-                            "EXEC sys.sp_addextendedproperty @name = N'MS_Description', @value = N'TestColumn1Description', @level0type = N'SCHEMA', @level0name = 'dbo', @level1type = N'Table', @level1name = 'TestTable1', @level2type = N'Column',  @level2name = 'TestColumn1'" + Environment.NewLine);
+                            "EXEC sys.sp_addextendedproperty @name = N'MS_Description', @value = N'Description:TestColumn1Description', @level0type = N'SCHEMA', @level0name = 'dbo', @level1type = N'Table', @level1name = 'TestTable1', @level2type = N'Column',  @level2name = 'TestColumn1'" + Environment.NewLine);
+        }
+
+        [Test]
+        public void CanCreateColumnWithDescriptionWithAdditionalDescriptions()
+        {
+            var expression = GeneratorTestHelper.GetCreateColumnExpressionWithDescriptionWithAdditionalDescriptions();
+
+            var result = Generator.Generate(expression);
+
+            result.ShouldBe(@"ALTER TABLE [dbo].[TestTable1] ADD [TestColumn1] NVARCHAR(5) NOT NULL" + Environment.NewLine +
+                            "GO" + Environment.NewLine +
+                            "EXEC sys.sp_addextendedproperty @name = N'MS_Description', @value = N'Description:TestColumn1Description"+Environment.NewLine+
+                            "AdditionalColumnDescriptionKey1:AdditionalColumnDescriptionValue1', @level0type = N'SCHEMA', @level0name = 'dbo', @level1type = N'Table', @level1name = 'TestTable1', @level2type = N'Column',  @level2name = 'TestColumn1'" + Environment.NewLine);
         }
 
         [Test]
@@ -372,6 +401,19 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe(@"ALTER TABLE [dbo].[TestTable1] ALTER COLUMN [TestColumn1] NVARCHAR(20) NOT NULL" + Environment.NewLine +
                             "GO" + Environment.NewLine +
                             "IF EXISTS (SELECT * FROM fn_listextendedproperty(N'MS_Description', N'SCHEMA', N'dbo', N'TABLE', N'TestTable1', N'Column', N'TestColumn1' )) EXEC sys.sp_dropextendedproperty @name=N'MS_Description', @level0type = N'SCHEMA', @level0name = 'dbo', @level1type = N'Table', @level1name = 'TestTable1', @level2type = N'Column',  @level2name = 'TestColumn1';EXEC sys.sp_addextendedproperty @name = N'MS_Description', @value = N'TestColumn1Description', @level0type = N'SCHEMA', @level0name = 'dbo', @level1type = N'Table', @level1name = 'TestTable1', @level2type = N'Column',  @level2name = 'TestColumn1'" + Environment.NewLine);
+        }
+
+        [Test]
+        public void CanAlterColumnWithDescriptionWithAdditionalDescriptions()
+        {
+            var expression = GeneratorTestHelper.GetAlterColumnExpressionWithDescriptionWithAdditionalDescriptions();
+
+            var result = Generator.Generate(expression);
+
+            result.ShouldBe(@"ALTER TABLE [dbo].[TestTable1] ALTER COLUMN [TestColumn1] NVARCHAR(20) NOT NULL" + Environment.NewLine +
+                            "GO" + Environment.NewLine +
+                            "IF EXISTS (SELECT * FROM fn_listextendedproperty(N'MS_Description', N'SCHEMA', N'dbo', N'TABLE', N'TestTable1', N'Column', N'TestColumn1' )) EXEC sys.sp_dropextendedproperty @name=N'MS_Description', @level0type = N'SCHEMA', @level0name = 'dbo', @level1type = N'Table', @level1name = 'TestTable1', @level2type = N'Column',  @level2name = 'TestColumn1';EXEC sys.sp_addextendedproperty @name = N'MS_Description', @value = N'TestColumn1Description', @level0type = N'SCHEMA', @level0name = 'dbo', @level1type = N'Table', @level1name = 'TestTable1', @level2type = N'Column',  @level2name = 'TestColumn1';" + Environment.NewLine +
+                            "IF EXISTS (SELECT * FROM fn_listextendedproperty(N'MS_AdditionalColumnDescriptionKey1', N'SCHEMA', N'dbo', N'TABLE', N'TestTable1', N'Column', N'TestColumn1' )) EXEC sys.sp_dropextendedproperty @name=N'MS_AdditionalColumnDescriptionKey1', @level0type = N'SCHEMA', @level0name = 'dbo', @level1type = N'Table', @level1name = 'TestTable1', @level2type = N'Column',  @level2name = 'TestColumn1';EXEC sys.sp_addextendedproperty @name = N'MS_AdditionalColumnDescriptionKey1', @value = N'TestColumn1Description', @level0type = N'SCHEMA', @level0name = 'dbo', @level1type = N'Table', @level1name = 'TestTable1', @level2type = N'Column',  @level2name = 'TestColumn1'" + Environment.NewLine);
         }
 
         [Test]

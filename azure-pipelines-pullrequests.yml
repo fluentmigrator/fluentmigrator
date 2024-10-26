@@ -8,7 +8,7 @@ trigger: none
 pr:
   branches:
     include:
-    - '*'  # must quote since "*" is a YAML reserved character; we want a string
+    - main
 
 pool:
   vmImage: 'windows-latest'
@@ -21,11 +21,20 @@ variables:
 steps:
 - task: NuGetToolInstaller@1
 
-- task: UseGitVersion@5
-  displayName: 'UseGitVersion (preview)'
+- checkout: self
+  clean: true
+  fetchDepth: 0
+  fetchTags: true
+
+- task: gitversion/setup@0
+  displayName: 'Install GitVersion (using GitTools 0.10.2.23031113 or later)'
   inputs:
-    versionSpec: '5.1.3'
+    versionSpec: '5.12'
     includePrerelease: true
+
+- task: gitversion/execute@0
+  displayName: 'Execute GitVersion (using GitTools 0.10.2.23031113 or later)'
+  inputs:
     updateAssemblyInfo: false
   env:
       BUILD_BUILDNUMBER: $(GitVersion.NuGetVersionV2)

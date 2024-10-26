@@ -1,5 +1,5 @@
 #region License
-// Copyright (c) 2018, FluentMigrator Project
+// Copyright (c) 2018, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,6 +21,9 @@ using NUnit.Framework;
 namespace FluentMigrator.Tests.Unit.Generators.Firebird
 {
     [TestFixture]
+    [Category("Generator")]
+    [Category("Firebird")]
+    [Category("ProcessorOptions")]
     public class FirebirdOptionsTests
     {
         [TestCase("force quote=true", true)]
@@ -32,7 +35,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         public void CanParseFoceQuoteFromProviderOptions(string options, bool expectedValue)
         {
             var fbOpt = new FirebirdOptions().ApplyProviderSwitches(options);
-            Assert.AreEqual(expectedValue, fbOpt.ForceQuote);
+            Assert.That(fbOpt.ForceQuote, Is.EqualTo(expectedValue));
         }
     }
 }

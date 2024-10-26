@@ -1,6 +1,27 @@
-﻿using FluentMigrator.Exceptions;
+#region License
+//
+// Copyright (c) 2018, Fluent Migrator Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+#endregion
+
+using System;
+
+using FluentMigrator.Exceptions;
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators.Oracle;
+
 using NUnit.Framework;
 
 using Shouldly;
@@ -8,6 +29,8 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Generators.Oracle
 {
     [TestFixture]
+    [Category("Generator")]
+    [Category("Oracle")]
     public class OracleGeneratorTests
     {
         protected OracleGenerator Generator;
@@ -89,9 +112,21 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
 
             var result = Generator.Generate(expression);
 
-            result.ShouldBe("BEGIN EXECUTE IMMEDIATE 'CREATE TABLE TestTable1 (TestColumn1 NVARCHAR2(255), TestColumn2 NUMBER(10,0) NOT NULL)';EXECUTE IMMEDIATE 'COMMENT ON TABLE TestTable1 IS ''TestDescription''';EXECUTE IMMEDIATE 'COMMENT ON COLUMN TestTable1.TestColumn1 IS ''TestColumn1Description''';EXECUTE IMMEDIATE 'COMMENT ON COLUMN TestTable1.TestColumn2 IS ''TestColumn2Description'''; END;");
+            result.ShouldBe("BEGIN EXECUTE IMMEDIATE 'CREATE TABLE TestTable1 (TestColumn1 NVARCHAR2(255), TestColumn2 NUMBER(10,0) NOT NULL)';EXECUTE IMMEDIATE 'COMMENT ON TABLE TestTable1 IS ''TestDescription''';EXECUTE IMMEDIATE 'COMMENT ON COLUMN TestTable1.TestColumn1 IS ''Description:TestColumn1Description''';EXECUTE IMMEDIATE 'COMMENT ON COLUMN TestTable1.TestColumn2 IS ''Description:TestColumn2Description'''; END;");
         }
 
+        [Test]
+        public void CanCreateTableWithDescriptionAndColumnDescriptionWithAdditionalDescriptions()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableWithTableDescriptionAndColumnDescriptionsAndAdditionalDescriptions();
+
+            var result = Generator.Generate(expression);
+
+            result.ShouldBe("BEGIN EXECUTE IMMEDIATE 'CREATE TABLE TestTable1 (TestColumn1 NVARCHAR2(255), TestColumn2 NUMBER(10,0) NOT NULL)';EXECUTE IMMEDIATE 'COMMENT ON TABLE TestTable1 IS ''TestDescription''';EXECUTE IMMEDIATE 'COMMENT ON COLUMN TestTable1.TestColumn1 IS ''Description:TestColumn1Description" + Environment.NewLine +
+                "AdditionalColumnDescriptionKey1:AdditionalColumnDescriptionValue1''';EXECUTE IMMEDIATE 'COMMENT ON COLUMN TestTable1.TestColumn2 IS ''Description:TestColumn2Description" + Environment.NewLine +
+                "AdditionalColumnDescriptionKey2:AdditionalColumnDescriptionValue2'''; END;");
+        }
+        
         [Test]
         public void CanAlterTableWithDescription()
         {
@@ -119,7 +154,18 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
 
             var result = Generator.Generate(expression);
 
-            result.ShouldBe("BEGIN EXECUTE IMMEDIATE 'ALTER TABLE TestTable1 ADD TestColumn1 NVARCHAR2(5) NOT NULL';EXECUTE IMMEDIATE 'COMMENT ON COLUMN TestTable1.TestColumn1 IS ''TestColumn1Description'''; END;");
+            result.ShouldBe("BEGIN EXECUTE IMMEDIATE 'ALTER TABLE TestTable1 ADD TestColumn1 NVARCHAR2(5) NOT NULL';EXECUTE IMMEDIATE 'COMMENT ON COLUMN TestTable1.TestColumn1 IS ''Description:TestColumn1Description'''; END;");
+        }
+
+        [Test]
+        public void CanCreateColumnWithDescriptionWithAdditionalDescriptions()
+        {
+            var expression = GeneratorTestHelper.GetCreateColumnExpressionWithDescriptionWithAdditionalDescriptions();
+
+            var result = Generator.Generate(expression);
+
+            result.ShouldBe("BEGIN EXECUTE IMMEDIATE 'ALTER TABLE TestTable1 ADD TestColumn1 NVARCHAR2(5) NOT NULL';EXECUTE IMMEDIATE 'COMMENT ON COLUMN TestTable1.TestColumn1 IS ''Description:TestColumn1Description"+Environment.NewLine+
+                "AdditionalColumnDescriptionKey1:AdditionalColumnDescriptionValue1'''; END;");
         }
 
         [Test]
@@ -139,7 +185,18 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
 
             var result = Generator.Generate(expression);
 
-            result.ShouldBe("BEGIN EXECUTE IMMEDIATE 'ALTER TABLE TestTable1 MODIFY TestColumn1 NVARCHAR2(20) NOT NULL';EXECUTE IMMEDIATE 'COMMENT ON COLUMN TestTable1.TestColumn1 IS ''TestColumn1Description'''; END;");
+            result.ShouldBe("BEGIN EXECUTE IMMEDIATE 'ALTER TABLE TestTable1 MODIFY TestColumn1 NVARCHAR2(20) NOT NULL';EXECUTE IMMEDIATE 'COMMENT ON COLUMN TestTable1.TestColumn1 IS ''Description:TestColumn1Description'''; END;");
+        }
+
+        [Test]
+        public void CanAlterColumnWithDescriptionWithAdditionalDescriptions()
+        {
+            var expression = GeneratorTestHelper.GetAlterColumnExpressionWithDescriptionWithAdditionalDescriptions();
+
+            var result = Generator.Generate(expression);
+
+            result.ShouldBe("BEGIN EXECUTE IMMEDIATE 'ALTER TABLE TestTable1 MODIFY TestColumn1 NVARCHAR2(20) NOT NULL';EXECUTE IMMEDIATE 'COMMENT ON COLUMN TestTable1.TestColumn1 IS ''Description:TestColumn1Description"+Environment.NewLine+
+                "AdditionalColumnDescriptionKey1:AdditionalColumnDescriptionValue1'''; END;");
         }
 
         [Test]

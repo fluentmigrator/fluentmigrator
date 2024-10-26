@@ -1,5 +1,5 @@
 #region License
-// Copyright (c) 2007-2018, FluentMigrator Project
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -60,6 +60,7 @@ namespace FluentMigrator.Postgres
         public const string IndexBuffering = "PostgresGiSTBuffering";
         public const string IndexPagesPerRange = "PostgresBrinPagesPerRange";
         public const string IndexAutosummarize = "PostgresBrinautosummarize";
+        public const string IndexColumnNullsDistinct = "PostgresIndexColumnNullsDistinct";
 
         /// <summary>
         /// Column identity generation ability for PostgreSQL 10 and above

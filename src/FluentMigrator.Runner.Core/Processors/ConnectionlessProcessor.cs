@@ -1,6 +1,6 @@
 #region License
 //
-// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -37,24 +37,6 @@ namespace FluentMigrator.Runner.Processors
     public class ConnectionlessProcessor: IMigrationProcessor
     {
         [NotNull] private readonly ILogger _logger;
-#pragma warning disable 612
-        [Obsolete]
-        private readonly IMigrationProcessorOptions _legacyOptions;
-#pragma warning restore 612
-
-        [Obsolete]
-        public ConnectionlessProcessor(
-            IMigrationGenerator generator,
-            IRunnerContext context,
-            IMigrationProcessorOptions options)
-        {
-            _logger = new AnnouncerFluentMigratorLogger(context.Announcer);
-            _legacyOptions = options;
-            DatabaseType = context.Database;
-            Generator = generator;
-            Announcer = context.Announcer;
-            Options = options.GetProcessorOptions(connectionString: null);
-        }
 
         public ConnectionlessProcessor(
             [NotNull] IGeneratorAccessor generatorAccessor,
@@ -69,7 +51,6 @@ namespace FluentMigrator.Runner.Processors
             Options = options.Value;
 #pragma warning disable 612
             Announcer = new LoggerAnnouncer(logger, new AnnouncerOptions() { ShowElapsedTime = true, ShowSql = true });
-            _legacyOptions = options.Value;
 #pragma warning restore 612
         }
 
@@ -87,7 +68,6 @@ namespace FluentMigrator.Runner.Processors
             Options = options.Value;
 #pragma warning disable 612
             Announcer = new LoggerAnnouncer(logger, AnnouncerOptions.AllEnabled);
-            _legacyOptions = options.Value;
 #pragma warning restore 612
         }
 
@@ -99,9 +79,6 @@ namespace FluentMigrator.Runner.Processors
         [Obsolete]
         public IAnnouncer Announcer { get; set; }
         public ProcessorOptions Options {get; set;}
-
-        [Obsolete]
-        IMigrationProcessorOptions IMigrationProcessor.Options => _legacyOptions;
 
         /// <inheritdoc />
         public void Execute(string sql)
@@ -116,17 +93,17 @@ namespace FluentMigrator.Runner.Processors
 
         public DataSet ReadTableData(string schemaName, string tableName)
         {
-            throw new NotImplementedException("Method is not supported by the connectionless processor");
+            throw new NotImplementedException($"Method {nameof(ReadTableData)} is not supported by the connectionless processor");
         }
 
         public DataSet Read(string template, params object[] args)
         {
-            throw new NotImplementedException("Method is not supported by the connectionless processor");
+            throw new NotImplementedException($"Method {nameof(Read)} is not supported by the connectionless processor");
         }
 
         public bool Exists(string template, params object[] args)
         {
-            throw new NotImplementedException("Method is not supported by the connectionless processor");
+            throw new NotImplementedException($"Method {nameof(Exists)} is not supported by the connectionless processor");
         }
 
         public void BeginTransaction()
@@ -276,37 +253,37 @@ namespace FluentMigrator.Runner.Processors
 
         public bool SchemaExists(string schemaName)
         {
-            throw new NotImplementedException("Method is not supported by the connectionless processor");
+            throw new NotImplementedException($"Method {nameof(SchemaExists)} is not supported by the connectionless processor");
         }
 
         public bool TableExists(string schemaName, string tableName)
         {
-            throw new NotImplementedException("Method is not supported by the connectionless processor");
+            throw new NotImplementedException($"Method {nameof(TableExists)} is not supported by the connectionless processor");
         }
 
         public bool ColumnExists(string schemaName, string tableName, string columnName)
         {
-            throw new NotImplementedException("Method is not supported by the connectionless processor");
+            throw new NotImplementedException($"Method {nameof(ColumnExists)} is not supported by the connectionless processor");
         }
 
         public bool ConstraintExists(string schemaName, string tableName, string constraintName)
         {
-            throw new NotImplementedException("Method is not supported by the connectionless processor");
+            throw new NotImplementedException($"Method {nameof(ConstraintExists)} is not supported by the connectionless processor");
         }
 
         public bool IndexExists(string schemaName, string tableName, string indexName)
         {
-            throw new NotImplementedException("Method is not supported by the connectionless processor");
+            throw new NotImplementedException($"Method {nameof(IndexExists)} is not supported by the connectionless processor");
         }
 
         public bool SequenceExists(string schemaName, string sequenceName)
         {
-            throw new NotImplementedException("Method is not supported by the connectionless processor");
+            throw new NotImplementedException($"Method {nameof(SequenceExists)} is not supported by the connectionless processor");
         }
 
         public bool DefaultValueExists(string schemaName, string tableName, string columnName, object defaultValue)
         {
-            throw new NotImplementedException("Method is not supported by the connectionless processor");
+            throw new NotImplementedException($"Method {nameof(DefaultValueExists)} is not supported by the connectionless processor");
         }
 
 #pragma warning disable 618

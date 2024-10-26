@@ -1,5 +1,5 @@
 #region License
-// Copyright (c) 2007-2018, Sean Chambers and the FluentMigrator Project
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -34,15 +34,14 @@ namespace FluentMigrator.DotNet.Cli
 {
     public static class Setup
     {
-        public static IServiceProvider BuildServiceProvider(MigratorOptions options, IConsole console)
+        public static ServiceProvider BuildServiceProvider(MigratorOptions options, IConsole console)
         {
             var serviceCollection = new ServiceCollection();
             var serviceProvider = ConfigureServices(serviceCollection, options, console);
-            Configure(serviceProvider.GetRequiredService<ILoggerFactory>());
             return serviceProvider;
         }
 
-        private static IServiceProvider ConfigureServices(IServiceCollection services, MigratorOptions options, IConsole console)
+        private static ServiceProvider ConfigureServices(IServiceCollection services, MigratorOptions options, IConsole console)
         {
             var conventionSet = new DefaultConventionSet(defaultSchemaName: options.SchemaName, options.WorkingDirectory);
 
@@ -51,7 +50,11 @@ namespace FluentMigrator.DotNet.Cli
 
             var mapper = ConfigureMapper();
             services
-                .AddLogging(lb => lb.AddFluentMigratorConsole())
+                .AddLogging(lb =>
+                {
+                    lb.AddFluentMigratorConsole();
+                    lb.AddDebug();
+                })
                 .AddOptions()
                 .AddSingleton(mapper);
 
@@ -80,6 +83,7 @@ namespace FluentMigrator.DotNet.Cli
                         .AddHana()
                         .AddMySql4()
                         .AddMySql5()
+                        .AddMySql8()
                         .AddOracle()
                         .AddOracle12C()
                         .AddOracleManaged()
@@ -88,8 +92,9 @@ namespace FluentMigrator.DotNet.Cli
                         .AddPostgres92()
                         .AddPostgres10_0()
                         .AddPostgres11_0()
+                        .AddPostgres15_0()
                         .AddRedshift()
-                        .AddSqlAnywhere()
+                        .AddSnowflake()
                         .AddSQLite()
                         .AddSqlServer()
                         .AddSqlServer2000()
@@ -98,7 +103,7 @@ namespace FluentMigrator.DotNet.Cli
                         .AddSqlServer2012()
                         .AddSqlServer2014()
                         .AddSqlServer2016()
-                        .AddSqlServerCe());
+                        );
 
             services
                 .AddSingleton<IConventionSet>(conventionSet)
@@ -120,9 +125,6 @@ namespace FluentMigrator.DotNet.Cli
                         opt.Steps = options.Steps ?? 1;
                         opt.Profile = options.Profile;
                         opt.Tags = options.Tags.ToArray();
-#pragma warning disable 612
-                        opt.ApplicationContext = options.Context;
-#pragma warning restore 612
                         opt.TransactionPerSession = options.TransactionMode == TransactionMode.Session;
                         opt.AllowBreakingChange = options.AllowBreakingChanges;
                         opt.IncludeUntaggedMigrations = options.IncludeUntaggedMigrations;
@@ -153,12 +155,6 @@ namespace FluentMigrator.DotNet.Cli
                 .AddSingleton(console);
 
             return services.BuildServiceProvider();
-        }
-
-        private static void Configure(ILoggerFactory loggerFactory)
-        {
-            loggerFactory
-                .AddDebug(LogLevel.Trace);
         }
 
         private static IMapper ConfigureMapper()

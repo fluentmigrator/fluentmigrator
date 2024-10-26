@@ -26,6 +26,7 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
 {
     [TestFixture]
+    [Category("SqlServer2000")]
     public class SqlServer2000ClusteredTests : BaseSqlServerClusteredTests
     {
         protected SqlServer2000Generator Generator;

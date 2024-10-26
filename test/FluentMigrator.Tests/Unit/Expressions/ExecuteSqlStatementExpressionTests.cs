@@ -1,6 +1,6 @@
 #region License
-// 
-// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+//
+// Copyright (c) 2007-2024, Fluent Migrator Project
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,7 +19,9 @@
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Tests.Helpers;
+
 using Moq;
+
 using NUnit.Framework;
 
 using Shouldly;
@@ -27,6 +29,8 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Expressions
 {
     [TestFixture]
+    [Category("Expression")]
+    [Category("ExecuteSqlStatement")]
     public class ExecuteSqlStatementExpressionTests
     {
         [Test]

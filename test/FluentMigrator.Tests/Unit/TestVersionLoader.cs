@@ -60,6 +60,9 @@ namespace FluentMigrator.Tests.Unit
             }
 
             DidLoadVersionInfoGetCalled = true;
+
+            AlreadyCreatedVersionTable = true;
+            AlreadyCreatedVersionSchema = true;
         }
 
         public bool DidLoadVersionInfoGetCalled { get; private set; }

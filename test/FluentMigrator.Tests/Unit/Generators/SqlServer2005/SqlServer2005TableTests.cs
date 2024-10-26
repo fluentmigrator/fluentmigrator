@@ -58,7 +58,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 
             var serviceProvider = new ServiceCollection().BuildServiceProvider();
             var querySchema = new Mock<IQuerySchema>();
-            new CreateTableExpressionBuilder(expression, new MigrationContext(querySchema.Object, serviceProvider, null, null))
+            new CreateTableExpressionBuilder(expression, new MigrationContext(querySchema.Object, serviceProvider, null))
                 .WithColumn("Id").AsGuid().PrimaryKey().RowGuid();
 
             var result = Generator.Generate(expression);
@@ -171,10 +171,11 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
-        public override void CanCreateTableWithMultiColumnPrimaryKeyWithDefaultSchema()
+        public override void CanCreateTableWithMultiColumnPrimaryKeyWithDefaultSchema([Values] CompatibilityMode compatibilityMode)
         {
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumnPrimaryKeyExpression();
 
+            Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
             result.ShouldBe("CREATE TABLE [dbo].[TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, PRIMARY KEY ([TestColumn1], [TestColumn2]))");
         }
@@ -323,6 +324,15 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 
             var result = Generator.Generate(expression);
             result.ShouldBe("DROP TABLE [dbo].[TestTable1]");
+        }
+
+        [Test]
+        public override void CanDropTableIfExistsWithDefaultSchema()
+        {
+            var expression = GeneratorTestHelper.GetDeleteTableIfExistsExpression();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe(@"IF OBJECT_ID('[dbo].[TestTable1]','U') IS NOT NULL DROP TABLE [dbo].[TestTable1]");
         }
 
         [Test]

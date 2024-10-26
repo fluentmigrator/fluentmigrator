@@ -5,7 +5,7 @@ using FluentMigrator.Runner.Generators.Base;
 
 namespace FluentMigrator.Runner.Generators.Jet
 {
-    internal class JetColumn : ColumnBase
+    internal class JetColumn : ColumnBase<JetTypeMap>
     {
         public JetColumn()
             : base(new JetTypeMap(), new JetQuoter())

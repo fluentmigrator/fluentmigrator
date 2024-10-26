@@ -141,7 +141,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
         public override string Generate(AlterColumnExpression expression)
         {
             Truncator.Truncate(expression);
-            return CompatibilityMode.HandleCompatibilty("Alter column is not supported as expected");
+            return CompatibilityMode.HandleCompatibility("Alter column is not supported as expected");
         }
 
 
@@ -175,13 +175,17 @@ namespace FluentMigrator.Runner.Generators.Firebird
         public override string Generate(DeleteTableExpression expression)
         {
             Truncator.Truncate(expression);
+            if (expression.IfExists)
+            {
+                return string.Format("IF( EXISTS( SELECT 1 FROM RDB$RELATIONS WHERE (rdb$flags IS NOT NULL) AND LOWER(RDB$RELATION_NAME) = LOWER('{0}'))) THEN EXECUTE STATEMENT 'DROP TABLE {0}')", expression.TableName);
+            }
             return base.Generate(expression);
         }
 
         public override string Generate(RenameTableExpression expression)
         {
             Truncator.Truncate(expression);
-            return CompatibilityMode.HandleCompatibilty("Rename table is not supported");
+            return CompatibilityMode.HandleCompatibility("Rename table is not supported");
         }
 
         public override string Generate(CreateColumnExpression expression)

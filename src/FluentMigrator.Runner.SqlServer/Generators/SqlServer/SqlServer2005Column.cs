@@ -1,5 +1,5 @@
 #region License
-// Copyright (c) 2007-2018, Sean Chambers and the FluentMigrator Project
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 {
     internal class SqlServer2005Column : SqlServer2000Column
     {
-        public SqlServer2005Column(ITypeMap typeMap, IQuoter quoter)
+        public SqlServer2005Column(ISqlServerTypeMap typeMap, IQuoter quoter)
             : base(typeMap, quoter)
         {
             ClauseOrder.Add(FormatRowGuid);

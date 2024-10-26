@@ -1,6 +1,6 @@
 #region License
 //
-// Copyright (c) 2007-2018, Fluent Migrator Project
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ using FluentMigrator.Runner.Generators.Base;
 
 namespace FluentMigrator.Runner.Generators.SqlServer
 {
-    public class SqlServer2000TypeMap : TypeMapBase
+    public class SqlServer2000TypeMap : TypeMapBase, ISqlServerTypeMap
     {
         public const int AnsiStringCapacity = 8000;
         public const int AnsiTextCapacity = 2147483647;
@@ -31,7 +31,12 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         public const int ImageCapacity = 2147483647;
         public const int DecimalCapacity = 38;
 
-        protected override void SetupTypeMaps()
+        public SqlServer2000TypeMap()
+        {
+            SetupTypeMaps();
+        }
+
+        protected virtual void SetupSqlServerTypeMaps()
         {
             SetTypeMap(DbType.AnsiStringFixedLength, "CHAR(255)");
             SetTypeMap(DbType.AnsiStringFixedLength, "CHAR($size)", AnsiStringCapacity);
@@ -62,6 +67,12 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             // Officially this is 1073741823 but we will allow the int.MaxValue Convention
             SetTypeMap(DbType.String, "NTEXT", int.MaxValue);
             SetTypeMap(DbType.Time, "DATETIME");
+        }
+
+
+        protected sealed override void SetupTypeMaps()
+        {
+            SetupSqlServerTypeMaps();
         }
     }
 }

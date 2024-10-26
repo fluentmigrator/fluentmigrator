@@ -314,5 +314,39 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             var result = Generator.Generate(expression);
             result.ShouldBe("CREATE INDEX \"TestIndex\" ON \"public\".\"TestTable1\" (\"TestColumn1\" ASC) TABLESPACE indexspace;");
         }
+
+        [Test]
+        public void CanCreateUniqueIndexWithDistinctNulls()
+        {
+            var expression = GeneratorTestHelper.GetCreateUniqueIndexExpression();
+            expression.Index.Columns.First().SetAdditionalFeature(PostgresExtensions.IndexColumnNullsDistinct, true);
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE UNIQUE INDEX \"TestIndex\" ON \"public\".\"TestTable1\" (\"TestColumn1\" ASC);");
+        }
+
+        [Test]
+        public virtual void CanCreateMultiColumnUniqueIndexWithOneNonDistinctNulls()
+        {
+            var expression = GeneratorTestHelper.GetCreateUniqueMultiColumnIndexExpression();
+            expression.Index.Columns.First().SetAdditionalFeature(PostgresExtensions.IndexColumnNullsDistinct, false);
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE UNIQUE INDEX \"TestIndex\" ON \"public\".\"TestTable1\" (\"TestColumn1\" ASC,\"TestColumn2\" DESC) WHERE \"TestColumn1\" IS NOT NULL;");
+        }
+
+        [Test]
+        public virtual void CanCreateMultiColumnUniqueIndexWithTwoNonDistinctNulls()
+        {
+            var expression = GeneratorTestHelper.GetCreateUniqueMultiColumnIndexExpression();
+
+            foreach (var c in expression.Index.Columns)
+            {
+                c.SetAdditionalFeature(PostgresExtensions.IndexColumnNullsDistinct, false);
+            }
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE UNIQUE INDEX \"TestIndex\" ON \"public\".\"TestTable1\" (\"TestColumn1\" ASC,\"TestColumn2\" DESC) WHERE \"TestColumn1\" IS NOT NULL AND \"TestColumn2\" IS NOT NULL;");
+        }
     }
 }

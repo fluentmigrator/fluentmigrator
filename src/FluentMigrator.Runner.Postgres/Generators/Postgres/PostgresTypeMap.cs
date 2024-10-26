@@ -1,6 +1,6 @@
 #region License
 //
-// Copyright (c) 2007-2018, Fluent Migrator Project
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,12 +22,17 @@ using FluentMigrator.Runner.Generators.Base;
 
 namespace FluentMigrator.Runner.Generators.Postgres
 {
-    internal class PostgresTypeMap : TypeMapBase
+    internal class PostgresTypeMap : TypeMapBase, IPostgresTypeMap
     {
         private const int DecimalCapacity = 1000;
         private const int PostgresMaxVarcharSize = 10485760;
 
-        protected override void SetupTypeMaps()
+        public PostgresTypeMap()
+        {
+            SetupTypeMaps();
+        }
+
+        protected virtual void SetupPostgresTypeMaps()
         {
             SetTypeMap(DbType.AnsiStringFixedLength, "char(255)");
             SetTypeMap(DbType.AnsiStringFixedLength, "char($size)", int.MaxValue);
@@ -58,6 +63,12 @@ namespace FluentMigrator.Runner.Generators.Postgres
             SetTypeMap(DbType.String, "text", int.MaxValue);
             SetTypeMap(DbType.Time, "time");
             SetTypeMap(DbType.Xml, "xml");
+        }
+
+
+        protected sealed override void SetupTypeMaps()
+        {
+            SetupPostgresTypeMaps();
         }
     }
 }

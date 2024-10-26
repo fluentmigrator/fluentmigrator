@@ -57,6 +57,10 @@ namespace FluentMigrator.Runner.Generators.Hana
         }
         public override string Generate(DeleteTableExpression expression)
         {
+            if (expression.IfExists)
+            {
+                return CompatibilityMode.HandleCompatibility("If exists syntax is not supported");
+            }
             return string.Format("{0};", base.Generate(expression));
         }
 
@@ -97,7 +101,7 @@ namespace FluentMigrator.Runner.Generators.Hana
             {
                 if (seq.Cache.Value < MINIMUM_CACHE_VALUE)
                 {
-                    return CompatibilityMode.HandleCompatibilty("Cache size must be greater than 1; if you intended to disable caching, set Cache to null.");
+                    return CompatibilityMode.HandleCompatibility("Cache size must be greater than 1; if you intended to disable caching, set Cache to null.");
                 }
                 result.AppendFormat(" CACHE {0}", seq.Cache);
             }
@@ -247,12 +251,12 @@ namespace FluentMigrator.Runner.Generators.Hana
 
         public override string Generate(AlterDefaultConstraintExpression expression)
         {
-            return CompatibilityMode.HandleCompatibilty("Default constraints are not supported");
+            return CompatibilityMode.HandleCompatibility("Default constraints are not supported");
         }
 
         public override string Generate(DeleteDefaultConstraintExpression expression)
         {
-            return CompatibilityMode.HandleCompatibilty("Default constraints are not supported");
+            return CompatibilityMode.HandleCompatibility("Default constraints are not supported");
         }
 
         public override string Generate(CreateIndexExpression expression)

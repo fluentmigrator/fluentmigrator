@@ -1,5 +1,5 @@
 #region License
-// Copyright (c) 2018, FluentMigrator Project
+// Copyright (c) 2018, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -35,19 +35,6 @@ namespace FluentMigrator.Runner.Processors.Oracle
 {
     public class OracleProcessorBase : GenericProcessorBase
     {
-        [Obsolete]
-        protected OracleProcessorBase(
-            [NotNull] string databaseType,
-            IDbConnection connection,
-            IMigrationGenerator generator,
-            IAnnouncer announcer,
-            IMigrationProcessorOptions options,
-            IDbFactory factory)
-            : base(connection, factory, generator, announcer, options)
-        {
-            DatabaseType = databaseType;
-        }
-
         protected OracleProcessorBase(
             [NotNull] string databaseType,
             [NotNull] OracleBaseDbFactory factory,
@@ -62,7 +49,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
 
         public override string DatabaseType { get; }
 
-        public override IList<string> DatabaseTypeAliases { get; } = new List<string>() { "Oracle" };
+        public override IList<string> DatabaseTypeAliases { get; } = new List<string>() { ProcessorId.Oracle };
 
         public IQuoter Quoter => ((OracleGenerator) Generator).Quoter;
 

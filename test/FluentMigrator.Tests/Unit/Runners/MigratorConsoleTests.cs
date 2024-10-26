@@ -1,6 +1,6 @@
 #region License
 
-// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,9 +29,11 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Runners
 {
     [TestFixture]
+    [Category("Runner")]
+    [Category("Console")]
     public class MigratorConsoleTests
     {
-        private const string Database = "SQLite";
+        private const string Database = ProcessorId.SQLite;
         private const string Connection = "Data Source=:memory:";
         private const string Target = "FluentMigrator.Tests.dll";
 
@@ -105,7 +107,7 @@ namespace FluentMigrator.Tests.Unit.Runners
                 "/task", "migrate:up",
                 "/version", "1");
 
-            Assert.Greater(sbVerbose.ToString().Length, sbNonVerbose.ToString().Length);
+            Assert.That(sbVerbose.ToString(), Has.Length.GreaterThan(sbNonVerbose.ToString().Length));
         }
 
         [Test]
@@ -126,7 +128,7 @@ namespace FluentMigrator.Tests.Unit.Runners
                 "/version", "0");
 
             var output = sb.ToString();
-            Assert.AreNotEqual(0, output.Length);
+            Assert.That(output, Is.Not.Empty);
         }
 
         [Test]
@@ -148,8 +150,11 @@ namespace FluentMigrator.Tests.Unit.Runners
                 "/preview");
 
             var output = sb.ToString();
-            Assert.That(output.Contains("PREVIEW-ONLY MODE"));
-            Assert.AreNotEqual(0, output.Length);
+            Assert.Multiple(() =>
+            {
+                Assert.That(output, Does.Contain("PREVIEW-ONLY MODE"));
+                Assert.That(output, Is.Not.Empty);
+            });
         }
 
         [Test]
@@ -172,8 +177,11 @@ namespace FluentMigrator.Tests.Unit.Runners
                 "/preview");
 
             var output = sb.ToString();
-            Assert.That(output.Contains("PREVIEW-ONLY MODE"));
-            Assert.AreNotEqual(0, output.Length);
+            Assert.Multiple(() =>
+            {
+                Assert.That(output, Does.Contain("PREVIEW-ONLY MODE"));
+                Assert.That(output, Is.Not.Empty);
+            });
         }
 
         [Test]
@@ -185,7 +193,7 @@ namespace FluentMigrator.Tests.Unit.Runners
                 File.Delete(outputFileName);
             }
 
-            Assert.IsFalse(File.Exists(outputFileName));
+            Assert.That(File.Exists(outputFileName), Is.False);
 
             new MigratorConsole().Run(
                 "/db", Database,
@@ -196,7 +204,7 @@ namespace FluentMigrator.Tests.Unit.Runners
                 "/task", "migrate:up",
                 "/version", "0");
 
-            Assert.IsTrue(File.Exists(outputFileName));
+            Assert.That(File.Exists(outputFileName));
             File.Delete(outputFileName);
         }
 
@@ -209,7 +217,7 @@ namespace FluentMigrator.Tests.Unit.Runners
                 File.Delete(outputFileName);
             }
 
-            Assert.IsFalse(File.Exists(outputFileName));
+            Assert.That(File.Exists(outputFileName), Is.False);
 
             new MigratorConsole().Run(
                 "/db", Database,
@@ -221,7 +229,7 @@ namespace FluentMigrator.Tests.Unit.Runners
                 "/task", "migrate:up",
                 "/version", "0");
 
-            Assert.IsTrue(File.Exists(outputFileName));
+            Assert.That(File.Exists(outputFileName));
             File.Delete(outputFileName);
         }
 
@@ -256,7 +264,7 @@ namespace FluentMigrator.Tests.Unit.Runners
 
             var expectedTags = new[] { "uk", "production" };
 
-            CollectionAssert.AreEquivalent(expectedTags, migratorConsole.Tags);
+            Assert.That(migratorConsole.Tags, Is.EquivalentTo(expectedTags));
         }
 
         [Test]
@@ -303,7 +311,7 @@ namespace FluentMigrator.Tests.Unit.Runners
 
             const string expectedProviderSwitces = "QuotedIdentifiers=true";
 
-            CollectionAssert.AreEquivalent(expectedProviderSwitces, migratorConsole.ProviderSwitches);
+            Assert.That(migratorConsole.ProviderSwitches, Is.EquivalentTo(expectedProviderSwitces));
         }
     }
 }

@@ -88,6 +88,11 @@ namespace FluentMigrator.Runner.Generators.Oracle
         }
         public override string Generate(DeleteTableExpression expression)
         {
+            if (expression.IfExists)
+            {
+                return CompatibilityMode.HandleCompatibility("If Exists logic is not supported");
+            }
+
             return string.Format(DropTable, ExpandTableName(Quoter.QuoteTableName(expression.SchemaName),Quoter.QuoteTableName(expression.TableName)));
         }
 
@@ -129,7 +134,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
             {
                 if (seq.Cache.Value < MINIMUM_CACHE_VALUE)
                 {
-                    return CompatibilityMode.HandleCompatibilty("Oracle does not support Cache value equal to 1; if you intended to disable caching, set Cache to null. For information on Oracle limitations, see: https://docs.oracle.com/en/database/oracle/oracle-database/18/sqlrf/CREATE-SEQUENCE.html#GUID-E9C78A8C-615A-4757-B2A8-5E6EFB130571__GUID-7E390BE1-2F6C-4E5A-9D5C-5A2567D636FB");
+                    return CompatibilityMode.HandleCompatibility("Oracle does not support Cache value equal to 1; if you intended to disable caching, set Cache to null. For information on Oracle limitations, see: https://docs.oracle.com/en/database/oracle/oracle-database/18/sqlrf/CREATE-SEQUENCE.html#GUID-E9C78A8C-615A-4757-B2A8-5E6EFB130571__GUID-7E390BE1-2F6C-4E5A-9D5C-5A2567D636FB");
                 }
                 result.AppendFormat(" CACHE {0}", seq.Cache);
             }

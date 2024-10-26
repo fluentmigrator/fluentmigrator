@@ -1,5 +1,5 @@
 #region License
-// Copyright (c) 2018, FluentMigrator Project
+// Copyright (c) 2018, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -40,10 +40,6 @@ namespace FluentMigrator.Tests.Unit.Processors.SQLite
         {
             var mockedDbFactory = new Mock<SQLiteDbFactory>();
             mockedDbFactory.SetupGet(conn => conn.Factory).Returns(MockedDbProviderFactory.Object);
-
-            var mockedConnStringReader = new Mock<IConnectionStringReader>();
-            mockedConnStringReader.SetupGet(r => r.Priority).Returns(0);
-            mockedConnStringReader.Setup(r => r.GetConnectionString(It.IsAny<string>())).Returns("server=this");
 
             var serviceProvider = new ServiceCollection()
                 .AddLogging()

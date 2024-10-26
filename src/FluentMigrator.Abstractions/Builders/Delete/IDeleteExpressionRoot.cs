@@ -1,6 +1,6 @@
 #region License
 //
-// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ namespace FluentMigrator.Builders.Delete
         /// </summary>
         /// <param name="tableName">The table name</param>
         /// <returns>The next step</returns>
-        IInSchemaSyntax Table(string tableName);
+        IIfExistsOrInSchemaSyntax Table(string tableName);
 
         /// <summary>
         /// Specify the column to delete

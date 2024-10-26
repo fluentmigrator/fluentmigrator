@@ -16,6 +16,8 @@
 //
 #endregion
 
+using FluentMigrator.Exceptions;
+using FluentMigrator.Runner;
 using FluentMigrator.Runner.Generators.Oracle;
 using NUnit.Framework;
 
@@ -138,10 +140,11 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public override void CanCreateTableWithMultiColumnPrimaryKeyWithDefaultSchema()
+        public override void CanCreateTableWithMultiColumnPrimaryKeyWithDefaultSchema([Values] CompatibilityMode compatibilityMode)
         {
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumnPrimaryKeyExpression();
 
+            Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
             result.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 NVARCHAR2(255) NOT NULL, TestColumn2 NUMBER(10,0) NOT NULL, PRIMARY KEY (TestColumn1, TestColumn2))");
         }
@@ -239,6 +242,25 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
 
             var result = Generator.Generate(expression);
             result.ShouldBe("DROP TABLE TestTable1");
+        }
+
+        [Test]
+        public override void CanDropTableIfExistsWithDefaultSchema()
+        {
+            var expression = GeneratorTestHelper.GetDeleteTableIfExistsExpression();
+            Generator.CompatibilityMode = CompatibilityMode.LOOSE;
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("");
+        }
+
+        [Test]
+        public void CantDropTableIfExistsWithDefaultSchemaInStrictCompatibilityMode()
+        {
+            var expression = GeneratorTestHelper.GetDeleteTableIfExistsExpression();
+            Generator.CompatibilityMode = CompatibilityMode.STRICT;
+
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
 
         [Test]

@@ -1,6 +1,6 @@
 #region License
 //
-// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2024, Fluent Migrator Project
 // Copyright (c) 2012, Daniel Lee
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -85,7 +85,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             {
                 if (seq.Cache.Value < MINIMUM_CACHE_VALUE)
                 {
-                    return CompatibilityMode.HandleCompatibilty("Cache size must be greater than 1; if you intended to disable caching, set Cache to null.");
+                    return CompatibilityMode.HandleCompatibility("Cache size must be greater than 1; if you intended to disable caching, set Cache to null.");
                 }
                 result.AppendFormat(" CACHE {0}", seq.Cache);
             }

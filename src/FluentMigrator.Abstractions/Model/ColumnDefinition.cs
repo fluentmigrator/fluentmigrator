@@ -1,6 +1,6 @@
 #region License
 //
-// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,9 +30,7 @@ namespace FluentMigrator.Model
     /// </summary>
     public class ColumnDefinition
         : ICloneable,
-#pragma warning disable 618
-          ICanBeValidated,
-#pragma warning restore 618
+          IColumnDataType,
           ISupportAdditionalFeatures,
           IValidatableObject
     {
@@ -118,6 +116,11 @@ namespace FluentMigrator.Model
         public virtual string ColumnDescription { get; set; }
 
         /// <summary>
+        /// Gets or sets any additional column descriptions
+        /// </summary>
+        public virtual Dictionary<string, string> AdditionalColumnDescriptions { get; set; } = new Dictionary<string, string>();
+
+        /// <summary>
         /// Gets or sets the collation name if the column has a string or ansi string type
         /// </summary>
         public virtual string CollationName { get; set; }
@@ -132,13 +135,6 @@ namespace FluentMigrator.Model
         /// called on a column.
         /// </remarks>
         public virtual ForeignKeyDefinition ForeignKey { get; set; }
-
-        /// <inheritdoc />
-        [Obsolete("Use the System.ComponentModel.DataAnnotations.Validator instead")]
-        public virtual void CollectValidationErrors(ICollection<string> errors)
-        {
-            this.CollectErrors(errors);
-        }
 
         /// <inheritdoc />
         public virtual object Clone()
@@ -162,6 +158,14 @@ namespace FluentMigrator.Model
             if (Type == null && CustomType == null)
             {
                 yield return new ValidationResult(ErrorMessages.ColumnTypeMustBeDefined);
+            }
+
+            if (ForeignKey != null)
+            {
+                foreach (var item in ForeignKey.Validate(validationContext))
+                {
+                    yield return item;
+                }
             }
         }
     }

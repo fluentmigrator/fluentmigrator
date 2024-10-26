@@ -28,7 +28,7 @@ using JetBrains.Annotations;
 
 namespace FluentMigrator.Runner.Generators.Firebird
 {
-    internal class FirebirdColumn : ColumnBase
+    internal class FirebirdColumn : ColumnBase<IFirebirdTypeMap>
     {
         public FirebirdColumn([NotNull] FirebirdOptions fbOptions) : base(new FirebirdTypeMap(), new FirebirdQuoter(fbOptions.ForceQuote))
         {

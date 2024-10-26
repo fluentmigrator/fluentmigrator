@@ -1,6 +1,7 @@
-assembly-versioning-scheme: MajorMinorPatch
+assembly-versioning-scheme: Major
+assembly-file-versioning-format: MajorMinorPatch
 # mode: ContinuousDeployment
-next-version: 3.0.0
+tag-prefix: '[vV]?'
 branches:
   release:
     mode: ContinuousDeployment

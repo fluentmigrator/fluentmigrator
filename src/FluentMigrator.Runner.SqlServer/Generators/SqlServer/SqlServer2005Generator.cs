@@ -35,12 +35,19 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 {
     public class SqlServer2005Generator : SqlServer2000Generator
     {
+        private const string ErrorMessageFilteredIndexesAreNonClusteredIndexes =
+            "Filtered indexes are non-clustered indexes that have the addition of a WHERE clause. "
+          + "SQL Server does not support clustered filtered indexes. "
+          + "Create a non-clustered index with include columns instead to create a non-clustered covering index.";
         private static readonly HashSet<string> _supportedAdditionalFeatures = new HashSet<string>
         {
             SqlServerExtensions.IncludesList,
             SqlServerExtensions.OnlineIndex,
             SqlServerExtensions.RowGuidColumn,
             SqlServerExtensions.SchemaAuthorization,
+            SqlServerExtensions.ConstraintType,
+            SqlServerExtensions.UniqueConstraintFilter,
+            SqlServerExtensions.UniqueConstraintIncludesList
         };
 
         public SqlServer2005Generator()
@@ -83,17 +90,30 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override string IdentityInsert { get { return "SET IDENTITY_INSERT {0} {1}"; } }
 
+        public virtual string CreateUniqueConstraint { get { return "CREATE UNIQUE INDEX {1} ON {0} ({2}){3}{4}"; } }
+
         public override string CreateForeignKeyConstraint { get { return "ALTER TABLE {0} ADD CONSTRAINT {1} FOREIGN KEY ({2}) REFERENCES {3} ({4}){5}{6}"; } }
 
-        public virtual string GetIncludeString(CreateIndexExpression column)
+        public virtual string GetIncludeString(CreateIndexExpression expression)
         {
-            var includes = column.GetAdditionalFeature<IList<IndexIncludeDefinition>>(SqlServerExtensions.IncludesList);
+            return GetIncludeStringFor(expression, SqlServerExtensions.IncludesList);
+        }
 
-            string[] indexIncludes = new string[includes?.Count ?? 0];
+        public virtual string GetIncludeString(CreateConstraintExpression expression)
+        {
+            return GetIncludeStringFor(expression, SqlServerExtensions.UniqueConstraintIncludesList);
+        }
+
+        protected string GetIncludeStringFor(ISupportAdditionalFeatures expression, string featureKey)
+        {
+            if (!expression.TryGetAdditionalFeature<IList<IndexIncludeDefinition>>(featureKey, out var includes))
+                return string.Empty;
+
+            var indexIncludes = new string[includes?.Count ?? 0];
 
             if (includes != null)
             {
-                for (int i = 0; i != includes.Count; i++)
+                for (var i = 0; i != includes.Count; i++)
                 {
                     var includeDef = includes[i];
                     indexIncludes[i] = Quoter.QuoteColumnName(includeDef.Name);
@@ -105,6 +125,38 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public virtual string GetFilterString(CreateIndexExpression createIndexExpression)
         {
+            if (createIndexExpression.Index.TryGetAdditionalFeature<string>(SqlServerExtensions.IndexFilter, out var filter))
+            {
+                if (createIndexExpression.Index.IsClustered)
+                    throw new Exception(ErrorMessageFilteredIndexesAreNonClusteredIndexes);
+
+                return " WHERE " + filter;
+            }
+
+            return string.Empty;
+        }
+
+        public virtual string GetFilterString(CreateConstraintExpression createConstraintExpression)
+        {
+            if (createConstraintExpression.Constraint.TryGetAdditionalFeature<string>(SqlServerExtensions.UniqueConstraintFilter, out var filter))
+            {
+                if (createConstraintExpression.Constraint.IsUniqueConstraint)
+                {
+                    if (!createConstraintExpression.Constraint.TryGetAdditionalFeature<SqlServerConstraintType>(
+                            SqlServerExtensions.ConstraintType,
+                            out var indexType)
+                     || indexType == SqlServerConstraintType.NonClustered)
+                    {
+                        return " WHERE " + filter;
+                    }
+
+                    throw new Exception(ErrorMessageFilteredIndexesAreNonClusteredIndexes);
+                }
+
+                throw new InvalidOperationException(
+                    "Create Constraint Expressions with Filters are only supported for Unique Indexes.");
+            }
+
             return string.Empty;
         }
 
@@ -146,6 +198,17 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                 return base.Generate(expression);
 
             return descriptionStatement;
+        }
+
+        public override string Generate(DeleteTableExpression expression)
+        {
+            if (expression.IfExists)
+            {
+                return string.Format("IF OBJECT_ID('{0}','U') IS NOT NULL DROP TABLE {0}", Quoter.QuoteTableName(expression.TableName, expression.SchemaName));
+
+            }
+
+            return $"DROP TABLE {Quoter.QuoteTableName(expression.TableName, expression.SchemaName)}";
         }
 
         public override string Generate(CreateColumnExpression expression)
@@ -254,12 +317,29 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override string Generate(CreateConstraintExpression expression)
         {
+            var filterParts = GetFilterString(expression);
+            var includeParts = GetIncludeString(expression);
+            var columns = string.Join(", ", expression.Constraint.Columns.Select(x => Quoter.QuoteColumnName(x)).ToArray());
+
+            if (expression.Constraint.IsUniqueConstraint)
+                if (expression.Constraint.TryGetAdditionalFeature<string>(SqlServerExtensions.UniqueConstraintFilter, out _) ||
+                    expression.Constraint.TryGetAdditionalFeature<IList<IndexIncludeDefinition>>(SqlServerExtensions.UniqueConstraintIncludesList, out _))
+                    return
+                        string.Format(
+                            CreateUniqueConstraint,
+                            Quoter.QuoteTableName(expression.Constraint.TableName, expression.Constraint.SchemaName),
+                            Quoter.QuoteConstraintName(expression.Constraint.ConstraintName),
+                            columns,
+                            includeParts,
+                            filterParts
+                        );
+            
             var withParts = GetWithOptions(expression);
             var withPart = !string.IsNullOrEmpty(withParts)
                 ? $" WITH ({withParts})"
                 : string.Empty;
 
-            return $"{base.Generate(expression)}{withPart}";
+            return $"{base.Generate(expression)}{filterParts}{withPart}";
         }
 
         public override string Generate(DeleteDefaultConstraintExpression expression)

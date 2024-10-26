@@ -1,6 +1,6 @@
 #region License
 //
-// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -68,7 +68,7 @@ namespace FluentMigrator.Runner.Generators.MySql
         public override string Generate(CreateTableExpression expression)
         {
             if (string.IsNullOrEmpty(expression.TableName)) throw new ArgumentNullException(nameof(expression), @"expression.TableName cannot be empty");
-            if (expression.Columns.Count == 0) throw new ArgumentException("You must specifiy at least one column");
+            if (expression.Columns.Count == 0) throw new ArgumentException("You must specify at least one column");
 
             string errors = ValidateAdditionalFeatureCompatibility(expression.Columns.SelectMany(x => x.AdditionalFeatures));
             if (!string.IsNullOrEmpty(errors)) return errors;
@@ -116,12 +116,12 @@ namespace FluentMigrator.Runner.Generators.MySql
 
         public override string Generate(CreateSequenceExpression expression)
         {
-            return CompatibilityMode.HandleCompatibilty("Sequences is not supporteed for MySql");
+            return CompatibilityMode.HandleCompatibility("Sequences is not supporteed for MySql");
         }
 
         public override string Generate(DeleteSequenceExpression expression)
         {
-            return CompatibilityMode.HandleCompatibilty("Sequences is not supporteed for MySql");
+            return CompatibilityMode.HandleCompatibility("Sequences is not supporteed for MySql");
         }
 
         public override string Generate(DeleteConstraintExpression expression)

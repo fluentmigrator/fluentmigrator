@@ -1,5 +1,5 @@
 #region License
-// Copyright (c) 2007-2018, FluentMigrator Project
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 
 using System.Collections.Generic;
 
+using FluentMigrator.Expressions;
+using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Postgres;
 
 using JetBrains.Annotations;
@@ -36,7 +38,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
         {
         }
 
-        protected Postgres10_0Generator([NotNull] PostgresQuoter quoter, [NotNull] IOptions<GeneratorOptions> generatorOptions, [NotNull] ITypeMap typeMap)
+        protected Postgres10_0Generator([NotNull] PostgresQuoter quoter, [NotNull] IOptions<GeneratorOptions> generatorOptions, [NotNull] IPostgresTypeMap typeMap)
             : base(new Postgres10_0Column(quoter, typeMap), quoter, generatorOptions)
         {
         }
@@ -60,6 +62,22 @@ namespace FluentMigrator.Runner.Generators.Postgres
             allow.Add(PostgresExtensions.IndexAutosummarize);
 
             return allow;
+        }
+
+        /// <inheritdoc />
+        protected override string GetOverridingIdentityValuesString(InsertDataExpression expression)
+        {
+            if (!expression.AdditionalFeatures.ContainsKey(PostgresExtensions.OverridingIdentityValues))
+            {
+                return string.Empty;
+            }
+
+            var overridingIdentityValues =
+                expression.GetAdditionalFeature<PostgresOverridingIdentityValuesType>(
+                    PostgresExtensions.OverridingIdentityValues);
+
+            return string.Format(" OVERRIDING {0} VALUE",
+                overridingIdentityValues == PostgresOverridingIdentityValuesType.User ? "USER" : "SYSTEM");
         }
     }
 }

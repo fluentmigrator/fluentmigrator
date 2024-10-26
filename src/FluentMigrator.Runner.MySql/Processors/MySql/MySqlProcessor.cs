@@ -1,6 +1,6 @@
 #region License
 //
-// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -36,9 +36,9 @@ namespace FluentMigrator.Runner.Processors.MySql
     {
         private readonly MySqlQuoter _quoter = new MySqlQuoter();
 
-        public override string DatabaseType => "MySql";
+        public override string DatabaseType => ProcessorId.MySql;
 
-        public override IList<string> DatabaseTypeAliases { get; } = new List<string> { "MariaDB" };
+        public override IList<string> DatabaseTypeAliases { get; } = new List<string> { ProcessorId.MariaDB };
 
         [Obsolete]
         public MySqlProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
@@ -208,7 +208,7 @@ SELECT CONCAT(
           IF(COLUMN_COMMENT = '', '', CONCAT('COMMENT ', QUOTE(COLUMN_COMMENT), ' ')),
           UPPER(extra))
   FROM INFORMATION_SCHEMA.COLUMNS
- WHERE TABLE_NAME = '{0}' AND COLUMN_NAME = '{1}'", FormatHelper.FormatSqlEscape(expression.TableName), FormatHelper.FormatSqlEscape(expression.OldName));
+ WHERE TABLE_NAME = '{0}' AND COLUMN_NAME = '{1}' AND TABLE_SCHEMA = database()", FormatHelper.FormatSqlEscape(expression.TableName), FormatHelper.FormatSqlEscape(expression.OldName));
 
             var fieldValue = Read(columnDefinitionSql).Tables[0].Rows[0][0];
             var columnDefinition = fieldValue as string;

@@ -1,6 +1,6 @@
 #region License
 //
-// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,14 +16,12 @@
 //
 #endregion
 
-using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators;
-using FluentMigrator.Runner.Generators.DB2;
 using FluentMigrator.Runner.Generators.DB2.iSeries;
 using FluentMigrator.Runner.Helpers;
 using FluentMigrator.Runner.Initialization;
@@ -37,12 +35,6 @@ namespace FluentMigrator.Runner.Processors.DB2.iSeries
 {
     public class Db2ISeriesProcessor : GenericProcessorBase
     {
-        [Obsolete]
-        public Db2ISeriesProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
-            : base(connection, factory, generator, announcer, options)
-        {
-            Quoter = new Db2Quoter();
-        }
 
         public Db2ISeriesProcessor(
             [NotNull] Db2ISeriesDbFactory factory,

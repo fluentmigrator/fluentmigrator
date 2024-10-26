@@ -1,5 +1,5 @@
 #region License
-// Copyright (c) 2007-2018, FluentMigrator Project
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -35,8 +35,23 @@ namespace FluentMigrator.Runner.Generators.MySql
 
         public MySql5Generator(
             [NotNull] MySqlQuoter quoter,
+            [NotNull] IMySqlTypeMap typeMap)
+            : this(quoter, typeMap, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()))
+        {
+        }
+
+        public MySql5Generator(
+            [NotNull] MySqlQuoter quoter,
             [NotNull] IOptions<GeneratorOptions> generatorOptions)
             : this(new MySqlColumn(new MySql5TypeMap(), quoter), quoter, new EmptyDescriptionGenerator(), generatorOptions)
+        {
+        }
+
+        public MySql5Generator(
+            [NotNull] MySqlQuoter quoter,
+            [NotNull] IMySqlTypeMap typeMap,
+            [NotNull] IOptions<GeneratorOptions> generatorOptions)
+            : base(new MySqlColumn(typeMap, quoter), quoter, new EmptyDescriptionGenerator(), generatorOptions)
         {
         }
 

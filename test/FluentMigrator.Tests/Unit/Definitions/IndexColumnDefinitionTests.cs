@@ -1,6 +1,6 @@
 #region License
 //
-// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Definitions
 {
     [TestFixture]
+    [Category("Definition")]
     public class IndexColumnDefinitionTests
     {
         [Test]
@@ -67,7 +68,7 @@ namespace FluentMigrator.Tests.Unit.Definitions
         {
             var column = new IndexIncludeDefinition { Name = null };
             var errors = ValidationHelper.CollectErrors(column);
-            errors.ShouldContain(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
+            errors.ShouldContain(ErrorMessages.IndexIncludeColumnNameMustNotBeNullOrEmpty);
         }
 
         [Test]
@@ -75,7 +76,7 @@ namespace FluentMigrator.Tests.Unit.Definitions
         {
             var column = new IndexIncludeDefinition { Name = string.Empty };
             var errors = ValidationHelper.CollectErrors(column);
-            errors.ShouldContain(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
+            errors.ShouldContain(ErrorMessages.IndexIncludeColumnNameMustNotBeNullOrEmpty);
         }
 
         [Test]
@@ -89,7 +90,7 @@ namespace FluentMigrator.Tests.Unit.Definitions
         [Test]
         public void WhenDefaultSchemaConventionIsAppliedAndSchemaIsNotSetThenSchemaShouldBeNull()
         {
-            var expr = new CreateIndexExpression()
+            var expr = new CreateIndexExpression
             {
                 Index =
                 {

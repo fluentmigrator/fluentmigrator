@@ -1,6 +1,6 @@
 #region License
 //
-// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -33,10 +33,6 @@ namespace FluentMigrator.Runner.Processors
 {
     public abstract class ProcessorBase : IMigrationProcessor
     {
-#pragma warning disable 612
-        [Obsolete]
-        private readonly IMigrationProcessorOptions _legacyOptions;
-#pragma warning restore 612
 
         protected internal readonly IMigrationGenerator Generator;
 
@@ -60,8 +56,6 @@ namespace FluentMigrator.Runner.Processors
                 ProviderSwitches = options.ProviderSwitches,
                 Timeout = options.Timeout == null ? null : (TimeSpan?) TimeSpan.FromSeconds(options.Timeout.Value),
             };
-
-            _legacyOptions = options;
         }
 
         [Obsolete]
@@ -73,7 +67,6 @@ namespace FluentMigrator.Runner.Processors
             Generator = generator;
             Announcer = announcer;
             Options = options;
-            _legacyOptions = options;
             Logger = new AnnouncerFluentMigratorLogger(announcer);
         }
 
@@ -93,12 +86,8 @@ namespace FluentMigrator.Runner.Processors
                     ShowSql = true,
                     ShowElapsedTime = true,
                 });
-            _legacyOptions = options;
 #pragma warning restore 612
         }
-
-        [Obsolete]
-        IMigrationProcessorOptions IMigrationProcessor.Options => _legacyOptions;
 
         [Obsolete]
         public abstract string ConnectionString { get; }
@@ -289,7 +278,7 @@ namespace FluentMigrator.Runner.Processors
         {
             using (var message = new StringWriter())
             {
-                message.WriteLine("An error occured executing the following sql:");
+                message.WriteLine("An error occurred executing the following sql:");
                 message.WriteLine(sql);
                 message.WriteLine("The error was {0}", ex.Message);
 

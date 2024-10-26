@@ -1,5 +1,5 @@
 #region License
-// Copyright (c) 2007-2018, FluentMigrator Project
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,14 +14,18 @@
 // limitations under the License.
 #endregion
 
+using System.Collections.Generic;
+
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Base;
+using System.Linq;
+using System;
 
 namespace FluentMigrator.Runner.Generators.MySql
 {
-    internal class MySqlColumn : ColumnBase
+    internal class MySqlColumn : ColumnBase<IMySqlTypeMap>
     {
-        public MySqlColumn(ITypeMap typeMap, IQuoter quoter)
+        public MySqlColumn(IMySqlTypeMap typeMap, IQuoter quoter)
             : base(typeMap, quoter)
         {
             ClauseOrder.Add(FormatDescription);
@@ -35,9 +39,19 @@ namespace FluentMigrator.Runner.Generators.MySql
 
         protected string FormatDescription(ColumnDefinition column)
         {
-            return string.IsNullOrEmpty(column.ColumnDescription)
-                ? string.Empty
-                : string.Format("COMMENT {0}", Quoter.QuoteValue(column.ColumnDescription));
+            if (string.IsNullOrEmpty(column.ColumnDescription))
+                return string.Empty;
+
+            if (column.AdditionalColumnDescriptions.Count == 0)
+                return string.Format("COMMENT {0}", Quoter.QuoteValue("Description:"+column.ColumnDescription));
+
+            var descriptionsList = new List<string>
+            {
+                string.Format("Description:" + column.ColumnDescription)
+            };
+            descriptionsList.AddRange(from descriptionItem in column.AdditionalColumnDescriptions
+                                      select descriptionItem.Key + ":" + descriptionItem.Value);
+            return string.Format("COMMENT {0}", Quoter.QuoteValue(string.Join(Environment.NewLine, descriptionsList)));
         }
 
         /// <inheritdoc />

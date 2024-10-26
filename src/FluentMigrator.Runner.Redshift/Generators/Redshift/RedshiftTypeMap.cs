@@ -22,12 +22,17 @@ using FluentMigrator.Runner.Generators.Base;
 
 namespace FluentMigrator.Runner.Generators.Redshift
 {
-    internal class RedshiftTypeMap : TypeMapBase
+    internal class RedshiftTypeMap : TypeMapBase, IRedshiftTypeMap
     {
         private const int DecimalCapacity = 1000;
         private const int RedshiftMaxVarcharSize = 10485760;
 
-        protected override void SetupTypeMaps()
+        public RedshiftTypeMap()
+        {
+            SetupTypeMaps();
+        }
+        
+        protected sealed override void SetupTypeMaps()
         {
             SetTypeMap(DbType.AnsiStringFixedLength, "char(255)");
             SetTypeMap(DbType.AnsiStringFixedLength, "char($size)", int.MaxValue);

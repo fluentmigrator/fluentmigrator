@@ -1,5 +1,5 @@
 #region License
-// Copyright (c) 2019, FluentMigrator Project
+// Copyright (c) 2019, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,11 +22,10 @@ namespace FluentMigrator.Runner.Generators.Postgres92
 {
     internal class Postgres92TypeMap : PostgresTypeMap
     {
-        /// <inheritdoc />
-        protected override void SetupTypeMaps()
+        protected override void SetupPostgresTypeMaps()
         {
-            base.SetupTypeMaps();
-
+            base.SetupPostgresTypeMaps();
+            
             SetTypeMap(DbType.Object, "json");
         }
     }

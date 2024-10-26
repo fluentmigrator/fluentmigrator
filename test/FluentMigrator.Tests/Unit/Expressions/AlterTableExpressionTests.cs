@@ -28,6 +28,8 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Expressions
 {
     [TestFixture]
+    [Category("Expression")]
+    [Category("AlterTable")]
     public class AlterTableExpressionTests
     {
         [Test]
@@ -45,7 +47,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             var expression = new AlterTableExpression { TableName = "table1" };
 
             var errors = ValidationHelper.CollectErrors(expression);
-            Assert.That(errors.Count, Is.EqualTo(0));
+            Assert.That(errors, Is.Empty);
         }
 
         [Test]

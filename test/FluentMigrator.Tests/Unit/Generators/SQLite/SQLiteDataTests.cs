@@ -1,5 +1,5 @@
 #region License
-// Copyright (c) 2007-2018, FluentMigrator Project
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Generators.SQLite
 {
     [TestFixture]
+    [Category("SQLite")]
     // ReSharper disable once InconsistentNaming
     public class SQLiteDataTests : BaseDataTests
     {
@@ -43,7 +44,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DELETE FROM \"TestTable1\" WHERE 1 = 1");
+            result.ShouldBe("DELETE FROM \"TestSchema\".\"TestTable1\" WHERE 1 = 1");
         }
 
         [Test]
@@ -62,7 +63,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DELETE FROM \"TestTable1\" WHERE \"Name\" = 'Just''in' AND \"Website\" IS NULL; DELETE FROM \"TestTable1\" WHERE \"Website\" = 'github.com'");
+            result.ShouldBe("DELETE FROM \"TestSchema\".\"TestTable1\" WHERE \"Name\" = 'Just''in' AND \"Website\" IS NULL; DELETE FROM \"TestSchema\".\"TestTable1\" WHERE \"Website\" = 'github.com'");
         }
 
         [Test]
@@ -81,7 +82,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DELETE FROM \"TestTable1\" WHERE \"Name\" = 'Just''in' AND \"Website\" IS NULL");
+            result.ShouldBe("DELETE FROM \"TestSchema\".\"TestTable1\" WHERE \"Name\" = 'Just''in' AND \"Website\" IS NULL");
         }
 
         [Test]
@@ -107,8 +108,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetInsertDataExpression();
             expression.SchemaName = "TestSchema";
 
-            var expected = "INSERT INTO \"TestTable1\" (\"Id\", \"Name\", \"Website\") VALUES (1, 'Just''in', 'codethinked.com');";
-            expected += " INSERT INTO \"TestTable1\" (\"Id\", \"Name\", \"Website\") VALUES (2, 'Na\\te', 'kohari.org')";
+            var expected = "INSERT INTO \"TestSchema\".\"TestTable1\" (\"Id\", \"Name\", \"Website\") VALUES (1, 'Just''in', 'codethinked.com');";
+            expected += " INSERT INTO \"TestSchema\".\"TestTable1\" (\"Id\", \"Name\", \"Website\") VALUES (2, 'Na\\te', 'kohari.org')";
 
             var result = Generator.Generate(expression);
             result.ShouldBe(expected);
@@ -133,7 +134,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(string.Format("INSERT INTO \"TestTable1\" (\"guid\") VALUES ('{0}')", GeneratorTestHelper.TestGuid.ToString()));
+            result.ShouldBe(string.Format("INSERT INTO \"TestSchema\".\"TestTable1\" (\"guid\") VALUES ('{0}')", GeneratorTestHelper.TestGuid.ToString()));
         }
 
         [Test]
@@ -152,7 +153,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("UPDATE \"TestTable1\" SET \"Name\" = 'Just''in', \"Age\" = 25 WHERE 1 = 1");
+            result.ShouldBe("UPDATE \"TestSchema\".\"TestTable1\" SET \"Name\" = 'Just''in', \"Age\" = 25 WHERE 1 = 1");
         }
 
         [Test]
@@ -171,7 +172,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("UPDATE \"TestTable1\" SET \"Name\" = 'Just''in', \"Age\" = 25 WHERE \"Id\" = 9 AND \"Homepage\" IS NULL");
+            result.ShouldBe("UPDATE \"TestSchema\".\"TestTable1\" SET \"Name\" = 'Just''in', \"Age\" = 25 WHERE \"Id\" = 9 AND \"Homepage\" IS NULL");
         }
 
         [Test]

@@ -1,6 +1,6 @@
 #region License
 //
-// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ using FluentMigrator.Builder.Create.Index;
 using FluentMigrator.Builders.Create.Index;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
+using FluentMigrator.MySql;
 using FluentMigrator.Postgres;
 
 using Moq;
@@ -32,6 +33,8 @@ using NUnit.Framework;
 namespace FluentMigrator.Tests.Unit.Builders.Create
 {
     [TestFixture]
+    [Category("Builder")]
+    [Category("CreateIndex")]
     public class CreateIndexExpressionBuilderTests
     {
         [Test]
@@ -171,10 +174,10 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             switch (algorithm)
             {
                 case Algorithm.BTree:
-                    builder.WithOptions().UsingBTree();
+                    PostgresExtensions.UsingBTree(builder.WithOptions());
                     break;
                 case Algorithm.Hash:
-                    builder.WithOptions().UsingHash();
+                    PostgresExtensions.UsingHash(builder.WithOptions());
                     break;
                 case Algorithm.Gist:
                     builder.WithOptions().UsingGist();
@@ -217,7 +220,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             indexMock.VerifyGet(x => x.AdditionalFeatures);
             expressionMock.VerifyGet(e => e.Index);
 
-            Assert.AreEqual("someColumn = 'test'", additionalFeatures[PostgresExtensions.IndexFilter]);
+            Assert.That(additionalFeatures[PostgresExtensions.IndexFilter], Is.EqualTo("someColumn = 'test'"));
         }
 
         [TestCase(arguments: true)]
@@ -289,7 +292,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
         }
 
         [TestCase(NullSort.First)]
-        [TestCase(NullSort.First)]
+        [TestCase(NullSort.Last)]
         public void CallingNullsFirstOrLastToExpressionInPostgres(NullSort sort)
         {
             var collectionMock = new Mock<PostgresIndexNullsSort>();
@@ -329,7 +332,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
         }
 
         [TestCase(NullSort.First)]
-        [TestCase(NullSort.First)]
+        [TestCase(NullSort.Last)]
         public void CallingNullsToExpressionInPostgres(NullSort sort)
         {
             var collectionMock = new Mock<PostgresIndexNullsSort>();
@@ -371,7 +374,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             indexMock.VerifyGet(x => x.AdditionalFeatures);
             expressionMock.VerifyGet(e => e.Index);
 
-            Assert.AreEqual(90, additionalFeatures[PostgresExtensions.IndexFillFactor]);
+            Assert.That(additionalFeatures[PostgresExtensions.IndexFillFactor], Is.EqualTo(90));
         }
 
         [Test]
@@ -387,11 +390,11 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 
             ICreateIndexOnColumnOrInSchemaSyntax builder = new CreateIndexExpressionBuilder(expressionMock.Object);
 
-            builder.WithOptions().UsingBTree().VacuumCleanupIndexScaleFactor(90);
+            PostgresExtensions.UsingBTree(builder.WithOptions()).VacuumCleanupIndexScaleFactor(90);
             indexMock.VerifyGet(x => x.AdditionalFeatures);
             expressionMock.VerifyGet(e => e.Index);
 
-            Assert.AreEqual(90, additionalFeatures[PostgresExtensions.IndexVacuumCleanupIndexScaleFactor]);
+            Assert.That(additionalFeatures[PostgresExtensions.IndexVacuumCleanupIndexScaleFactor], Is.EqualTo(90));
         }
 
         [TestCase(GistBuffering.Auto)]
@@ -413,7 +416,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             indexMock.VerifyGet(x => x.AdditionalFeatures);
             expressionMock.VerifyGet(e => e.Index);
 
-            Assert.AreEqual(buffering, additionalFeatures[PostgresExtensions.IndexBuffering]);
+            Assert.That(additionalFeatures[PostgresExtensions.IndexBuffering], Is.EqualTo(buffering));
         }
 
         [TestCase(true)]
@@ -434,7 +437,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             indexMock.VerifyGet(x => x.AdditionalFeatures);
             expressionMock.VerifyGet(e => e.Index);
 
-            Assert.AreEqual(fastUpdate, additionalFeatures[PostgresExtensions.IndexFastUpdate]);
+            Assert.That(additionalFeatures[PostgresExtensions.IndexFastUpdate], Is.EqualTo(fastUpdate));
         }
 
         [Test]
@@ -454,7 +457,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             indexMock.VerifyGet(x => x.AdditionalFeatures);
             expressionMock.VerifyGet(e => e.Index);
 
-            Assert.AreEqual(90, additionalFeatures[PostgresExtensions.IndexGinPendingListLimit]);
+            Assert.That(additionalFeatures[PostgresExtensions.IndexGinPendingListLimit], Is.EqualTo(90));
         }
 
         [Test]
@@ -474,7 +477,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             indexMock.VerifyGet(x => x.AdditionalFeatures);
             expressionMock.VerifyGet(e => e.Index);
 
-            Assert.AreEqual(90, additionalFeatures[PostgresExtensions.IndexPagesPerRange]);
+            Assert.That(additionalFeatures[PostgresExtensions.IndexPagesPerRange], Is.EqualTo(90));
         }
 
         [TestCase(true)]
@@ -495,7 +498,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             indexMock.VerifyGet(x => x.AdditionalFeatures);
             expressionMock.VerifyGet(e => e.Index);
 
-            Assert.AreEqual(autosummarize, additionalFeatures[PostgresExtensions.IndexAutosummarize]);
+            Assert.That(additionalFeatures[PostgresExtensions.IndexAutosummarize], Is.EqualTo(autosummarize));
         }
 
         [Test]
@@ -518,7 +521,43 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             indexMock.VerifyGet(x => x.AdditionalFeatures);
             expressionMock.VerifyGet(e => e.Index);
 
-            Assert.AreEqual("indexspace", additionalFeatures[PostgresExtensions.IndexTablespace]);
+            Assert.That(additionalFeatures[PostgresExtensions.IndexTablespace], Is.EqualTo("indexspace"));
+        }
+
+        [TestCase(IndexType.BTree)]
+        [TestCase(IndexType.Hash)]
+        public void CallingUsingIndexTypeToExpressionInMySql(IndexType indexType)
+        {
+            var collectionMock = new Mock<MySqlIndexTypeDefinition>();
+
+            var additionalFeatures = new Dictionary<string, object>()
+            {
+                [MySqlExtensions.IndexType] = collectionMock.Object
+            };
+
+            var indexMock = new Mock<IndexDefinition>();
+            indexMock.Setup(x => x.AdditionalFeatures).Returns(additionalFeatures);
+
+            var expressionMock = new Mock<CreateIndexExpression>();
+            expressionMock.SetupGet(e => e.Index).Returns(indexMock.Object);
+
+            ICreateIndexOnColumnOrInSchemaSyntax builder = new CreateIndexExpressionBuilder(expressionMock.Object);
+
+            switch (indexType)
+            {
+                case IndexType.BTree:
+                    MySqlExtensions.UsingBTree(builder.WithOptions());
+                    break;
+                case IndexType.Hash:
+                    MySqlExtensions.UsingHash(builder.WithOptions());
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(indexType), indexType, null);
+            }
+
+            collectionMock.VerifySet(x => x.IndexType = indexType);
+            indexMock.VerifyGet(x => x.AdditionalFeatures);
+            expressionMock.VerifyGet(e => e.Index);
         }
     }
 }

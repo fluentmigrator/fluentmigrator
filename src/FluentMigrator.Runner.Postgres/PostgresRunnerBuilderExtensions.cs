@@ -1,5 +1,5 @@
 #region License
-// Copyright (c) 2018, FluentMigrator Project
+// Copyright (c) 2018, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -40,8 +40,10 @@ namespace FluentMigrator.Runner
             builder.Services
                 .AddScoped<PostgresProcessor>()
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<PostgresProcessor>())
+                .AddScoped<IPostgresTypeMap>(sp => new PostgresTypeMap())
                 .AddScoped<PostgresGenerator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<PostgresGenerator>());
+
             return builder.AddCommonPostgresServices();
         }
 
@@ -55,8 +57,10 @@ namespace FluentMigrator.Runner
             builder.Services
                 .AddScoped<Postgres92Processor>()
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<Postgres92Processor>())
+                .AddScoped<IPostgresTypeMap>(sp => new Postgres92TypeMap())
                 .AddScoped<Postgres92Generator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<Postgres92Generator>());
+
             return builder.AddCommonPostgresServices();
         }
 
@@ -88,6 +92,21 @@ namespace FluentMigrator.Runner
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<Postgres11_0Processor>())
                 .AddScoped<Postgres11_0Generator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<Postgres11_0Generator>());
+            return builder.AddCommonPostgresServices();
+        }
+
+        /// <summary>
+        /// Adds Postgres 15.0 support
+        /// </summary>
+        /// <param name="builder">The builder to add the Postgres-specific services to</param>
+        /// <returns>The migration runner builder</returns>
+        public static IMigrationRunnerBuilder AddPostgres15_0(this IMigrationRunnerBuilder builder)
+        {
+            builder.Services
+                .AddScoped<Postgres15_0Processor>()
+                .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<Postgres15_0Processor>())
+                .AddScoped<Postgres15_0Generator>()
+                .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<Postgres15_0Generator>());
             return builder.AddCommonPostgresServices();
         }
 

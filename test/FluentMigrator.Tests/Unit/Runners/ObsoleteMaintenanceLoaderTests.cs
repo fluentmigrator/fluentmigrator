@@ -1,6 +1,6 @@
 #region License
 //
-// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -59,14 +59,14 @@ namespace FluentMigrator.Tests.Unit.Runners
         {
             var migrationInfos = _maintenanceLoader.LoadMaintenance(MigrationStage.BeforeEach);
             _migrationConventions.Verify(x => x.GetMaintenanceStage, Times.AtLeastOnce());
-            Assert.IsNotEmpty(migrationInfos);
+            Assert.That(migrationInfos, Is.Not.Empty);
 
             foreach (var migrationInfo in migrationInfos)
             {
                 migrationInfo.Migration.ShouldNotBeNull();
 
                 // The NoTag maintenance should not be found in the tagged maintenanceLoader because it wants tagged classes
-                Assert.IsFalse(migrationInfo.Migration.GetType().Equals(typeof(MaintenanceBeforeEachNoTag)));
+                Assert.That(migrationInfo.Migration.GetType().Equals(typeof(MaintenanceBeforeEachNoTag)), Is.False);
 
                 var maintenanceAttribute = migrationInfo.Migration.GetType().GetOneAttribute<MaintenanceAttribute>();
                 maintenanceAttribute.ShouldNotBeNull();
@@ -79,14 +79,14 @@ namespace FluentMigrator.Tests.Unit.Runners
         {
             var migrationInfos = _maintenanceLoader.LoadMaintenance(MigrationStage.BeforeEach);
             _migrationConventions.Verify(x => x.TypeHasMatchingTags, Times.AtLeastOnce());
-            Assert.IsNotEmpty(migrationInfos);
+            Assert.That(migrationInfos, Is.Not.Empty);
 
             foreach (var migrationInfo in migrationInfos)
             {
                 migrationInfo.Migration.ShouldNotBeNull();
 
                 // The NoTag maintenance should not be found in the tagged maintenanceLoader because it wants tagged classes
-                Assert.IsFalse(migrationInfo.Migration.GetType().Equals(typeof(MaintenanceBeforeEachNoTag)));
+                Assert.That(migrationInfo.Migration.GetType().Equals(typeof(MaintenanceBeforeEachNoTag)), Is.False);
 
                 DefaultMigrationRunnerConventions.Instance.TypeHasMatchingTags(migrationInfo.Migration.GetType(), _tags)
                     .ShouldBeTrue();
@@ -97,7 +97,7 @@ namespace FluentMigrator.Tests.Unit.Runners
         public void MigrationInfoIsAttributedIsFalse()
         {
             var migrationInfos = _maintenanceLoader.LoadMaintenance(MigrationStage.BeforeEach);
-            Assert.IsNotEmpty(migrationInfos);
+            Assert.That(migrationInfos, Is.Not.Empty);
 
             foreach (var migrationInfo in migrationInfos)
             {
@@ -109,7 +109,7 @@ namespace FluentMigrator.Tests.Unit.Runners
         public void SetsTransactionBehaviorToSameAsMaintenanceAttribute()
         {
             var migrationInfos = _maintenanceLoader.LoadMaintenance(MigrationStage.BeforeEach);
-            Assert.IsNotEmpty(migrationInfos);
+            Assert.That(migrationInfos, Is.Not.Empty);
 
             foreach (var migrationInfo in migrationInfos)
             {
@@ -126,7 +126,7 @@ namespace FluentMigrator.Tests.Unit.Runners
         {
             var migrationInfos = _maintenanceLoaderNoTags.LoadMaintenance(MigrationStage.BeforeEach);
             _migrationConventions.Verify(x => x.TypeHasMatchingTags, Times.AtLeastOnce());
-            Assert.IsNotEmpty(migrationInfos);
+            Assert.That(migrationInfos, Is.Not.Empty);
 
             bool foundNoTag = false;
             foreach (var migrationInfo in migrationInfos)
@@ -145,7 +145,7 @@ namespace FluentMigrator.Tests.Unit.Runners
                 }
             }
 
-            Assert.IsTrue(foundNoTag);
+            Assert.That(foundNoTag);
         }
     }
 }

@@ -1,5 +1,5 @@
-﻿#region License
-// Copyright (c) 2007-2018, FluentMigrator Project
+#region License
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 using System.Data;
 
+using FluentMigrator.Runner;
 using FluentMigrator.Runner.Generators.Redshift;
 
 using NUnit.Framework;
@@ -25,14 +26,14 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Generators.Redshift
 {
     [TestFixture]
-    public sealed class RedshiftConstraintsTests : BaseConstraintsTests
+    public class RedshiftConstraintsTests : BaseConstraintsTests
     {
-        private RedshiftGenerator _generator;
+        protected RedshiftGenerator Generator;
 
         [SetUp]
         public void Setup()
         {
-            _generator = new RedshiftGenerator();
+            Generator = new RedshiftGenerator();
         }
 
         [Test]
@@ -42,7 +43,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
             expression.ForeignKey.ForeignTableSchema = "TestSchema";
             expression.ForeignKey.PrimaryTableSchema = "TestSchema";
 
-            var result = _generator.Generate(expression);
+            var result = Generator.Generate(expression);
             result.ShouldBe(
                 "ALTER TABLE \"TestSchema\".\"TestTable1\" ADD CONSTRAINT \"FK_TestTable1_TestColumn1_TestTable2_TestColumn2\" FOREIGN KEY (\"TestColumn1\") REFERENCES \"TestSchema\".\"TestTable2\" (\"TestColumn2\");");
         }
@@ -52,7 +53,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
         {
             var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
 
-            var result = _generator.Generate(expression);
+            var result = Generator.Generate(expression);
             result.ShouldBe(
                 "ALTER TABLE \"public\".\"TestTable1\" ADD CONSTRAINT \"FK_TestTable1_TestColumn1_TestTable2_TestColumn2\" FOREIGN KEY (\"TestColumn1\") REFERENCES \"public\".\"TestTable2\" (\"TestColumn2\");");
         }
@@ -63,7 +64,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
             var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
             expression.ForeignKey.ForeignTableSchema = "TestSchema";
 
-            var result = _generator.Generate(expression);
+            var result = Generator.Generate(expression);
             result.ShouldBe(
                 "ALTER TABLE \"TestSchema\".\"TestTable1\" ADD CONSTRAINT \"FK_TestTable1_TestColumn1_TestTable2_TestColumn2\" FOREIGN KEY (\"TestColumn1\") REFERENCES \"public\".\"TestTable2\" (\"TestColumn2\");");
         }
@@ -75,7 +76,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
             expression.ForeignKey.ForeignTableSchema = "TestSchema";
             expression.ForeignKey.PrimaryTableSchema = "TestSchema";
 
-            var result = _generator.Generate(expression);
+            var result = Generator.Generate(expression);
             result.ShouldBe(
                 "ALTER TABLE \"TestSchema\".\"TestTable1\" ADD CONSTRAINT \"FK_TestTable1_TestColumn1_TestColumn3_TestTable2_TestColumn2_TestColumn4\" FOREIGN KEY (\"TestColumn1\",\"TestColumn3\") REFERENCES \"TestSchema\".\"TestTable2\" (\"TestColumn2\",\"TestColumn4\");");
         }
@@ -85,7 +86,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnForeignKeyExpression();
 
-            var result = _generator.Generate(expression);
+            var result = Generator.Generate(expression);
             result.ShouldBe(
                 "ALTER TABLE \"public\".\"TestTable1\" ADD CONSTRAINT \"FK_TestTable1_TestColumn1_TestColumn3_TestTable2_TestColumn2_TestColumn4\" FOREIGN KEY (\"TestColumn1\",\"TestColumn3\") REFERENCES \"public\".\"TestTable2\" (\"TestColumn2\",\"TestColumn4\");");
         }
@@ -96,28 +97,29 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
             var expression = GeneratorTestHelper.GetCreateMultiColumnForeignKeyExpression();
             expression.ForeignKey.ForeignTableSchema = "TestSchema";
 
-            var result = _generator.Generate(expression);
+            var result = Generator.Generate(expression);
             result.ShouldBe(
                 "ALTER TABLE \"TestSchema\".\"TestTable1\" ADD CONSTRAINT \"FK_TestTable1_TestColumn1_TestColumn3_TestTable2_TestColumn2_TestColumn4\" FOREIGN KEY (\"TestColumn1\",\"TestColumn3\") REFERENCES \"public\".\"TestTable2\" (\"TestColumn2\",\"TestColumn4\");");
         }
 
         [Test]
-        public override void CanCreateMultiColumnPrimaryKeyConstraintWithCustomSchema()
+        public override void CanCreateMultiColumnPrimaryKeyConstraintWithCustomSchema([Values] CompatibilityMode compatibilityMode)
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnPrimaryKeyExpression();
             expression.Constraint.SchemaName = "TestSchema";
 
-            var result = _generator.Generate(expression);
+            Generator.CompatibilityMode = compatibilityMode;
+            var result = Generator.Generate(expression);
             result.ShouldBe(
                 "ALTER TABLE \"TestSchema\".\"TestTable1\" ADD CONSTRAINT \"PK_TestTable1_TestColumn1_TestColumn2\" PRIMARY KEY (\"TestColumn1\", \"TestColumn2\");");
         }
 
         [Test]
-        public override void CanCreateMultiColumnPrimaryKeyConstraintWithDefaultSchema()
+        public override void CanCreateMultiColumnPrimaryKeyConstraintWithDefaultSchema([Values] CompatibilityMode compatibilityMode)
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnPrimaryKeyExpression();
 
-            var result = _generator.Generate(expression);
+            var result = Generator.Generate(expression);
             result.ShouldBe(
                 "ALTER TABLE \"public\".\"TestTable1\" ADD CONSTRAINT \"PK_TestTable1_TestColumn1_TestColumn2\" PRIMARY KEY (\"TestColumn1\", \"TestColumn2\");");
         }
@@ -128,7 +130,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
             var expression = GeneratorTestHelper.GetCreateMultiColumnUniqueConstraintExpression();
             expression.Constraint.SchemaName = "TestSchema";
 
-            var result = _generator.Generate(expression);
+            var result = Generator.Generate(expression);
             result.ShouldBe(
                 "ALTER TABLE \"TestSchema\".\"TestTable1\" ADD CONSTRAINT \"UC_TestTable1_TestColumn1_TestColumn2\" UNIQUE (\"TestColumn1\", \"TestColumn2\");");
         }
@@ -138,7 +140,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnUniqueConstraintExpression();
 
-            var result = _generator.Generate(expression);
+            var result = Generator.Generate(expression);
             result.ShouldBe(
                 "ALTER TABLE \"public\".\"TestTable1\" ADD CONSTRAINT \"UC_TestTable1_TestColumn1_TestColumn2\" UNIQUE (\"TestColumn1\", \"TestColumn2\");");
         }
@@ -150,7 +152,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
             expression.ForeignKey.ForeignTableSchema = "TestSchema";
             expression.ForeignKey.PrimaryTableSchema = "TestSchema";
 
-            var result = _generator.Generate(expression);
+            var result = Generator.Generate(expression);
             result.ShouldBe(
                 "ALTER TABLE \"TestSchema\".\"TestTable1\" ADD CONSTRAINT \"FK_Test\" FOREIGN KEY (\"TestColumn1\") REFERENCES \"TestSchema\".\"TestTable2\" (\"TestColumn2\");");
         }
@@ -160,7 +162,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
         {
             var expression = GeneratorTestHelper.GetCreateNamedForeignKeyExpression();
 
-            var result = _generator.Generate(expression);
+            var result = Generator.Generate(expression);
             result.ShouldBe(
                 "ALTER TABLE \"public\".\"TestTable1\" ADD CONSTRAINT \"FK_Test\" FOREIGN KEY (\"TestColumn1\") REFERENCES \"public\".\"TestTable2\" (\"TestColumn2\");");
         }
@@ -171,7 +173,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
             var expression = GeneratorTestHelper.GetCreateNamedForeignKeyExpression();
             expression.ForeignKey.ForeignTableSchema = "TestSchema";
 
-            var result = _generator.Generate(expression);
+            var result = Generator.Generate(expression);
             result.ShouldBe(
                 "ALTER TABLE \"TestSchema\".\"TestTable1\" ADD CONSTRAINT \"FK_Test\" FOREIGN KEY (\"TestColumn1\") REFERENCES \"public\".\"TestTable2\" (\"TestColumn2\");");
         }
@@ -183,7 +185,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
             expression.ForeignKey.OnDelete = Rule.Cascade;
             expression.ForeignKey.OnUpdate = Rule.SetDefault;
 
-            var result = _generator.Generate(expression);
+            var result = Generator.Generate(expression);
             result.ShouldBe(
                 "ALTER TABLE \"public\".\"TestTable1\" ADD CONSTRAINT \"FK_Test\" FOREIGN KEY (\"TestColumn1\") REFERENCES \"public\".\"TestTable2\" (\"TestColumn2\") ON DELETE CASCADE ON UPDATE SET DEFAULT;");
         }
@@ -195,7 +197,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
             var expression = GeneratorTestHelper.GetCreateNamedForeignKeyExpression();
             expression.ForeignKey.OnDelete = rule;
 
-            var result = _generator.Generate(expression);
+            var result = Generator.Generate(expression);
             result.ShouldBe(string.Format(
                                 "ALTER TABLE \"public\".\"TestTable1\" ADD CONSTRAINT \"FK_Test\" FOREIGN KEY (\"TestColumn1\") REFERENCES \"public\".\"TestTable2\" (\"TestColumn2\") ON DELETE {0};",
                                 output));
@@ -208,7 +210,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
             var expression = GeneratorTestHelper.GetCreateNamedForeignKeyExpression();
             expression.ForeignKey.OnUpdate = rule;
 
-            var result = _generator.Generate(expression);
+            var result = Generator.Generate(expression);
             result.ShouldBe(string.Format(
                                 "ALTER TABLE \"public\".\"TestTable1\" ADD CONSTRAINT \"FK_Test\" FOREIGN KEY (\"TestColumn1\") REFERENCES \"public\".\"TestTable2\" (\"TestColumn2\") ON UPDATE {0};",
                                 output));
@@ -221,7 +223,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
             expression.ForeignKey.ForeignTableSchema = "TestSchema";
             expression.ForeignKey.PrimaryTableSchema = "TestSchema";
 
-            var result = _generator.Generate(expression);
+            var result = Generator.Generate(expression);
             result.ShouldBe(
                 "ALTER TABLE \"TestSchema\".\"TestTable1\" ADD CONSTRAINT \"FK_Test\" FOREIGN KEY (\"TestColumn1\",\"TestColumn3\") REFERENCES \"TestSchema\".\"TestTable2\" (\"TestColumn2\",\"TestColumn4\");");
         }
@@ -231,7 +233,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
         {
             var expression = GeneratorTestHelper.GetCreateNamedMultiColumnForeignKeyExpression();
 
-            var result = _generator.Generate(expression);
+            var result = Generator.Generate(expression);
             result.ShouldBe(
                 "ALTER TABLE \"public\".\"TestTable1\" ADD CONSTRAINT \"FK_Test\" FOREIGN KEY (\"TestColumn1\",\"TestColumn3\") REFERENCES \"public\".\"TestTable2\" (\"TestColumn2\",\"TestColumn4\");");
         }
@@ -242,28 +244,30 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
             var expression = GeneratorTestHelper.GetCreateNamedMultiColumnForeignKeyExpression();
             expression.ForeignKey.ForeignTableSchema = "TestSchema";
 
-            var result = _generator.Generate(expression);
+            var result = Generator.Generate(expression);
             result.ShouldBe(
                 "ALTER TABLE \"TestSchema\".\"TestTable1\" ADD CONSTRAINT \"FK_Test\" FOREIGN KEY (\"TestColumn1\",\"TestColumn3\") REFERENCES \"public\".\"TestTable2\" (\"TestColumn2\",\"TestColumn4\");");
         }
 
         [Test]
-        public override void CanCreateNamedMultiColumnPrimaryKeyConstraintWithCustomSchema()
+        public override void CanCreateNamedMultiColumnPrimaryKeyConstraintWithCustomSchema([Values] CompatibilityMode compatibilityMode)
         {
             var expression = GeneratorTestHelper.GetCreateNamedMultiColumnPrimaryKeyExpression();
             expression.Constraint.SchemaName = "TestSchema";
 
-            var result = _generator.Generate(expression);
+            Generator.CompatibilityMode = compatibilityMode;
+            var result = Generator.Generate(expression);
             result.ShouldBe(
                 "ALTER TABLE \"TestSchema\".\"TestTable1\" ADD CONSTRAINT \"TESTPRIMARYKEY\" PRIMARY KEY (\"TestColumn1\", \"TestColumn2\");");
         }
 
         [Test]
-        public override void CanCreateNamedMultiColumnPrimaryKeyConstraintWithDefaultSchema()
+        public override void CanCreateNamedMultiColumnPrimaryKeyConstraintWithDefaultSchema([Values] CompatibilityMode compatibilityMode)
         {
             var expression = GeneratorTestHelper.GetCreateNamedMultiColumnPrimaryKeyExpression();
 
-            var result = _generator.Generate(expression);
+            Generator.CompatibilityMode = compatibilityMode;
+            var result = Generator.Generate(expression);
             result.ShouldBe(
                 "ALTER TABLE \"public\".\"TestTable1\" ADD CONSTRAINT \"TESTPRIMARYKEY\" PRIMARY KEY (\"TestColumn1\", \"TestColumn2\");");
         }
@@ -274,7 +278,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
             var expression = GeneratorTestHelper.GetCreateNamedMultiColumnUniqueConstraintExpression();
             expression.Constraint.SchemaName = "TestSchema";
 
-            var result = _generator.Generate(expression);
+            var result = Generator.Generate(expression);
             result.ShouldBe(
                 "ALTER TABLE \"TestSchema\".\"TestTable1\" ADD CONSTRAINT \"TESTUNIQUECONSTRAINT\" UNIQUE (\"TestColumn1\", \"TestColumn2\");");
         }
@@ -284,28 +288,30 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
         {
             var expression = GeneratorTestHelper.GetCreateNamedMultiColumnUniqueConstraintExpression();
 
-            var result = _generator.Generate(expression);
+            var result = Generator.Generate(expression);
             result.ShouldBe(
                 "ALTER TABLE \"public\".\"TestTable1\" ADD CONSTRAINT \"TESTUNIQUECONSTRAINT\" UNIQUE (\"TestColumn1\", \"TestColumn2\");");
         }
 
         [Test]
-        public override void CanCreateNamedPrimaryKeyConstraintWithCustomSchema()
+        public override void CanCreateNamedPrimaryKeyConstraintWithCustomSchema([Values] CompatibilityMode compatibilityMode)
         {
             var expression = GeneratorTestHelper.GetCreateNamedPrimaryKeyExpression();
             expression.Constraint.SchemaName = "TestSchema";
 
-            var result = _generator.Generate(expression);
+            Generator.CompatibilityMode = compatibilityMode;
+            var result = Generator.Generate(expression);
             result.ShouldBe(
                 "ALTER TABLE \"TestSchema\".\"TestTable1\" ADD CONSTRAINT \"TESTPRIMARYKEY\" PRIMARY KEY (\"TestColumn1\");");
         }
 
         [Test]
-        public override void CanCreateNamedPrimaryKeyConstraintWithDefaultSchema()
+        public override void CanCreateNamedPrimaryKeyConstraintWithDefaultSchema([Values] CompatibilityMode compatibilityMode)
         {
             var expression = GeneratorTestHelper.GetCreateNamedPrimaryKeyExpression();
 
-            var result = _generator.Generate(expression);
+            Generator.CompatibilityMode = compatibilityMode;
+            var result = Generator.Generate(expression);
             result.ShouldBe(
                 "ALTER TABLE \"public\".\"TestTable1\" ADD CONSTRAINT \"TESTPRIMARYKEY\" PRIMARY KEY (\"TestColumn1\");");
         }
@@ -316,7 +322,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
             var expression = GeneratorTestHelper.GetCreateNamedUniqueConstraintExpression();
             expression.Constraint.SchemaName = "TestSchema";
 
-            var result = _generator.Generate(expression);
+            var result = Generator.Generate(expression);
             result.ShouldBe(
                 "ALTER TABLE \"TestSchema\".\"TestTable1\" ADD CONSTRAINT \"TESTUNIQUECONSTRAINT\" UNIQUE (\"TestColumn1\");");
         }
@@ -326,28 +332,30 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
         {
             var expression = GeneratorTestHelper.GetCreateNamedUniqueConstraintExpression();
 
-            var result = _generator.Generate(expression);
+            var result = Generator.Generate(expression);
             result.ShouldBe(
                 "ALTER TABLE \"public\".\"TestTable1\" ADD CONSTRAINT \"TESTUNIQUECONSTRAINT\" UNIQUE (\"TestColumn1\");");
         }
 
         [Test]
-        public override void CanCreatePrimaryKeyConstraintWithCustomSchema()
+        public override void CanCreatePrimaryKeyConstraintWithCustomSchema([Values] CompatibilityMode compatibilityMode)
         {
             var expression = GeneratorTestHelper.GetCreatePrimaryKeyExpression();
             expression.Constraint.SchemaName = "TestSchema";
 
-            var result = _generator.Generate(expression);
+            Generator.CompatibilityMode = compatibilityMode;
+            var result = Generator.Generate(expression);
             result.ShouldBe(
                 "ALTER TABLE \"TestSchema\".\"TestTable1\" ADD CONSTRAINT \"PK_TestTable1_TestColumn1\" PRIMARY KEY (\"TestColumn1\");");
         }
 
         [Test]
-        public override void CanCreatePrimaryKeyConstraintWithDefaultSchema()
+        public override void CanCreatePrimaryKeyConstraintWithDefaultSchema([Values] CompatibilityMode compatibilityMode)
         {
             var expression = GeneratorTestHelper.GetCreatePrimaryKeyExpression();
 
-            var result = _generator.Generate(expression);
+            Generator.CompatibilityMode = compatibilityMode;
+            var result = Generator.Generate(expression);
             result.ShouldBe(
                 "ALTER TABLE \"public\".\"TestTable1\" ADD CONSTRAINT \"PK_TestTable1_TestColumn1\" PRIMARY KEY (\"TestColumn1\");");
         }
@@ -358,7 +366,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
             var expression = GeneratorTestHelper.GetCreateUniqueConstraintExpression();
             expression.Constraint.SchemaName = "TestSchema";
 
-            var result = _generator.Generate(expression);
+            var result = Generator.Generate(expression);
             result.ShouldBe(
                 "ALTER TABLE \"TestSchema\".\"TestTable1\" ADD CONSTRAINT \"UC_TestTable1_TestColumn1\" UNIQUE (\"TestColumn1\");");
         }
@@ -368,7 +376,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
         {
             var expression = GeneratorTestHelper.GetCreateUniqueConstraintExpression();
 
-            var result = _generator.Generate(expression);
+            var result = Generator.Generate(expression);
             result.ShouldBe(
                 "ALTER TABLE \"public\".\"TestTable1\" ADD CONSTRAINT \"UC_TestTable1_TestColumn1\" UNIQUE (\"TestColumn1\");");
         }
@@ -379,7 +387,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
             var expression = GeneratorTestHelper.GetDeleteForeignKeyExpression();
             expression.ForeignKey.ForeignTableSchema = "TestSchema";
 
-            var result = _generator.Generate(expression);
+            var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" DROP CONSTRAINT \"FK_Test\";");
         }
 
@@ -388,7 +396,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
         {
             var expression = GeneratorTestHelper.GetDeleteForeignKeyExpression();
 
-            var result = _generator.Generate(expression);
+            var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE \"public\".\"TestTable1\" DROP CONSTRAINT \"FK_Test\";");
         }
 
@@ -398,7 +406,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
             var expression = GeneratorTestHelper.GetDeletePrimaryKeyExpression();
             expression.Constraint.SchemaName = "TestSchema";
 
-            var result = _generator.Generate(expression);
+            var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" DROP CONSTRAINT \"TESTPRIMARYKEY\";");
         }
 
@@ -407,7 +415,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
         {
             var expression = GeneratorTestHelper.GetDeletePrimaryKeyExpression();
 
-            var result = _generator.Generate(expression);
+            var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE \"public\".\"TestTable1\" DROP CONSTRAINT \"TESTPRIMARYKEY\";");
         }
 
@@ -417,7 +425,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
             var expression = GeneratorTestHelper.GetDeleteUniqueConstraintExpression();
             expression.Constraint.SchemaName = "TestSchema";
 
-            var result = _generator.Generate(expression);
+            var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" DROP CONSTRAINT \"TESTUNIQUECONSTRAINT\";");
         }
 
@@ -426,7 +434,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
         {
             var expression = GeneratorTestHelper.GetDeleteUniqueConstraintExpression();
 
-            var result = _generator.Generate(expression);
+            var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE \"public\".\"TestTable1\" DROP CONSTRAINT \"TESTUNIQUECONSTRAINT\";");
 
         }

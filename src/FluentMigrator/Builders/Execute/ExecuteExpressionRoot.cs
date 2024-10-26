@@ -1,6 +1,6 @@
 #region License
 //
-// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -52,9 +52,39 @@ namespace FluentMigrator.Builders.Execute
         }
 
         /// <inheritdoc />
+        public void Sql(string sqlStatement, IDictionary<string, string> parameters)
+        {
+            var expression = new ExecuteSqlStatementExpression
+            {
+                SqlStatement = sqlStatement,
+                Parameters = parameters,
+            };
+
+            _context.Expressions.Add(expression);
+        }
+
+        /// <inheritdoc />
         public void Sql(string sqlStatement, string description)
         {
-            var expression = new ExecuteSqlStatementExpression { SqlStatement = sqlStatement, Description = description };
+            var expression = new ExecuteSqlStatementExpression
+            {
+                SqlStatement = sqlStatement,
+                Description = description,
+            };
+
+            _context.Expressions.Add(expression);
+        }
+
+        /// <inheritdoc />
+        public void Sql(string sqlStatement, string description, IDictionary<string, string> parameters)
+        {
+            var expression = new ExecuteSqlStatementExpression
+            {
+                SqlStatement = sqlStatement,
+                Description = description,
+                Parameters = parameters,
+            };
+
             _context.Expressions.Add(expression);
         }
 
@@ -90,43 +120,30 @@ namespace FluentMigrator.Builders.Execute
             var embeddedResourceProviders = _context.ServiceProvider.GetService<IEnumerable<IEmbeddedResourceProvider>>();
             if (embeddedResourceProviders == null)
             {
-#pragma warning disable 612
-                Debug.Assert(_context.MigrationAssemblies != null, "_context.MigrationAssemblies != null");
-                var expression = new ExecuteEmbeddedSqlScriptExpression(_context.MigrationAssemblies) { SqlScript = embeddedSqlScriptName };
-#pragma warning restore 612
-                _context.Expressions.Add(expression);
+                throw new InvalidOperationException(
+                    $"The caller forgot to configure the service provider with at least one {nameof(IEmbeddedResourceProvider)}");
             }
-            else
-            {
-                var expression = new ExecuteEmbeddedSqlScriptExpression(embeddedResourceProviders) { SqlScript = embeddedSqlScriptName };
-                _context.Expressions.Add(expression);
-            }
+
+            var expression = new ExecuteEmbeddedSqlScriptExpression(embeddedResourceProviders) { SqlScript = embeddedSqlScriptName };
+            _context.Expressions.Add(expression);
+
         }
 
         /// <inheritdoc />
         public void EmbeddedScript(string embeddedSqlScriptName, IDictionary<string, string> parameters)
         {
             var embeddedResourceProviders = _context.ServiceProvider.GetService<IEnumerable<IEmbeddedResourceProvider>>();
-            ExecuteEmbeddedSqlScriptExpression expression;
             if (embeddedResourceProviders == null)
             {
-#pragma warning disable 612
-                Debug.Assert(_context.MigrationAssemblies != null, "_context.MigrationAssemblies != null");
-                expression = new ExecuteEmbeddedSqlScriptExpression(_context.MigrationAssemblies)
-                {
-                    SqlScript = embeddedSqlScriptName,
-                    Parameters = parameters,
-                };
-#pragma warning restore 612
+                throw new InvalidOperationException(
+                    $"The caller forgot to configure the service provider with at least one {nameof(IEmbeddedResourceProvider)}");
             }
-            else
+
+            var expression = new ExecuteEmbeddedSqlScriptExpression(embeddedResourceProviders)
             {
-                expression = new ExecuteEmbeddedSqlScriptExpression(embeddedResourceProviders)
-                {
-                    SqlScript = embeddedSqlScriptName,
-                    Parameters = parameters,
-                };
-            }
+                SqlScript = embeddedSqlScriptName,
+                Parameters = parameters,
+            };
 
             _context.Expressions.Add(expression);
         }

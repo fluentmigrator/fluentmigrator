@@ -17,6 +17,7 @@
 #endregion
 
 using FluentMigrator.Runner.Generators.Firebird;
+
 using NUnit.Framework;
 
 using Shouldly;
@@ -24,10 +25,12 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Generators.Firebird
 {
     [TestFixture]
+    [Category("Generator")]
+    [Category("Quoter")]
+    [Category("Firebird")]
     public class FirebirdQuoterTests
     {
-        private static readonly string[] _fbKeywords = new[]
-        {
+        private static readonly string[] _fbKeywords = {
             "!<", "^<", "^=", "^>", ",", ":=", "!=", "!>", "(", ")", "<", "<=", "<>", "=", ">", ">=", "||", "~<", "~=", "~>",
             "ABS", "ACCENT", "ACOS", "ACTION", "ACTIVE", "ADD", "ADMIN", "AFTER", "ALL", "ALTER", "ALWAYS", "AND", "ANY",
             "AS", "ASC", "ASCENDING", "ASCII_CHAR", "ASCII_VAL", "ASIN", "AT", "ATAN", "ATAN2", "AUTO", "AUTONOMOUS", "AVG",
@@ -60,7 +63,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             "WRITE", "YEAR", "YEARDAY"
         };
 
-        [Test, TestCaseSource("_fbKeywords")]
+        [Test, TestCaseSource(nameof(_fbKeywords))]
         public void Quote_ArgIsFirebirdKeyword_ArgShouldBeQuoted(string quoteArg)
         {
             var actual = new FirebirdQuoter(false).Quote(quoteArg);
@@ -99,12 +102,12 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             actual.ShouldBe("\"similar\"");
         }
 
-        [Test, TestCaseSource("_fbKeywords")]
+        [Test, TestCaseSource(nameof(_fbKeywords))]
         public void Quote_ArgIsKeywordInLowercase_ArgShouldBeQuoted(string quoteArg)
         {
             var argInLowerCase = quoteArg.ToLower();
             var actual = new FirebirdQuoter(false).Quote(argInLowerCase);
-            var expected = string.Format("\"{0}\"", argInLowerCase);
+            var expected = $"\"{argInLowerCase}\"";
             actual.ShouldBe(expected);
         }
     }

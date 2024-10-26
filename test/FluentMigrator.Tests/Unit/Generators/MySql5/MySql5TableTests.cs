@@ -16,6 +16,9 @@
 //
 #endregion
 
+using System;
+
+using FluentMigrator.Runner;
 using FluentMigrator.Runner.Generators.MySql;
 
 using NUnit.Framework;
@@ -25,6 +28,8 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Generators.MySql5
 {
     [TestFixture]
+    [Category("Generator")]
+    [Category("MySql5")]
     public class MySql5TableTests
     {
         protected MySql4Generator Generator;
@@ -132,10 +137,11 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql5
         }
 
         [Test]
-        public void CanCreateTableWithMultiColumnPrimaryKeyWithDefaultSchema()
+        public void CanCreateTableWithMultiColumnPrimaryKeyWithDefaultSchema([Values] CompatibilityMode compatibilityMode)
         {
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumnPrimaryKeyExpression();
 
+            Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
             result.ShouldBe("CREATE TABLE `TestTable1` (`TestColumn1` NVARCHAR(255) NOT NULL, `TestColumn2` INTEGER NOT NULL, PRIMARY KEY (`TestColumn1`, `TestColumn2`)) ENGINE = INNODB");
         }
@@ -224,7 +230,18 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql5
             var expression = GeneratorTestHelper.GetCreateTableWithTableDescriptionAndColumnDescriptions();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE `TestTable1` (`TestColumn1` NVARCHAR(255) COMMENT 'TestColumn1Description', `TestColumn2` INTEGER NOT NULL COMMENT 'TestColumn2Description') COMMENT 'TestDescription' ENGINE = INNODB");
+            result.ShouldBe("CREATE TABLE `TestTable1` (`TestColumn1` NVARCHAR(255) COMMENT 'Description:TestColumn1Description', `TestColumn2` INTEGER NOT NULL COMMENT 'Description:TestColumn2Description') COMMENT 'TestDescription' ENGINE = INNODB");
+        }
+
+        [Test]
+        public void CanCreateTableWithDescriptionAndColumnDescriptionsWithAdditionalDescriptions()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableWithTableDescriptionAndColumnDescriptionsAndAdditionalDescriptions();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE `TestTable1` (`TestColumn1` NVARCHAR(255) COMMENT 'Description:TestColumn1Description" + Environment.NewLine +
+                            "AdditionalColumnDescriptionKey1:AdditionalColumnDescriptionValue1', `TestColumn2` INTEGER NOT NULL COMMENT 'Description:TestColumn2Description" + Environment.NewLine +
+                            "AdditionalColumnDescriptionKey2:AdditionalColumnDescriptionValue2') COMMENT 'TestDescription' ENGINE = INNODB");
         }
     }
 }

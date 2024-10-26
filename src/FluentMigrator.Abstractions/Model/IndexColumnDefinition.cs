@@ -1,6 +1,6 @@
 #region License
 //
-// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,9 +30,6 @@ namespace FluentMigrator.Model
     /// </summary>
     public class IndexColumnDefinition
         : ICloneable,
-#pragma warning disable 618
-          ICanBeValidated,
-#pragma warning restore 618
           ISupportAdditionalFeatures
     {
         /// <summary>
@@ -48,13 +45,6 @@ namespace FluentMigrator.Model
 
         /// <inheritdoc />
         public virtual IDictionary<string, object> AdditionalFeatures { get; } = new Dictionary<string, object>();
-
-        /// <inheritdoc />
-        [Obsolete("Use the System.ComponentModel.DataAnnotations.Validator instead")]
-        public virtual void CollectValidationErrors(ICollection<string> errors)
-        {
-            this.CollectErrors(errors);
-        }
 
         /// <inheritdoc />
         public object Clone()

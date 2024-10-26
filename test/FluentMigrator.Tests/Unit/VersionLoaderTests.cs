@@ -21,6 +21,7 @@ using System.Linq;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner;
+using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.VersionTableInfo;
 
@@ -35,14 +36,17 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit
 {
     [TestFixture]
+    [Category("Versioning")]
     public class VersionLoaderTests
     {
         [Test]
         public void CanLoadCustomVersionTableMetaData()
         {
             var processor = new Mock<IMigrationProcessor>();
+            var generatorAccessor = new Mock<IGeneratorAccessor>();
             var serviceProvider = ServiceCollectionExtensions.CreateServices()
                 .WithProcessor(processor)
+                .AddScoped(_ => generatorAccessor.Object)
                 .AddScoped(_ => ConventionSets.NoSchemaName)
                 .AddScoped<IMigrationRunnerConventionsAccessor>(sp => new PassThroughMigrationRunnerConventionsAccessor(new MigrationRunnerConventions()))
                 .AddScoped<IConnectionStringReader>(_ => new PassThroughConnectionStringReader("No connection"))
@@ -60,8 +64,10 @@ namespace FluentMigrator.Tests.Unit
             var asm = "s".GetType().Assembly;
 
             var processor = new Mock<IMigrationProcessor>();
+            var generatorAccessor = new Mock<IGeneratorAccessor>();
             var serviceProvider = ServiceCollectionExtensions.CreateServices(false)
                 .WithProcessor(processor)
+                .AddScoped(_ => generatorAccessor.Object)
                 .AddSingleton<IAssemblySourceItem>(new AssemblySourceItem(asm))
                 .AddScoped(_ => ConventionSets.NoSchemaName)
                 .AddScoped<IMigrationRunnerConventionsAccessor>(
@@ -76,33 +82,13 @@ namespace FluentMigrator.Tests.Unit
         }
 
         [Test]
-        [Obsolete("Use dependency injection to access 'application state'.")]
-        public void CanSetupApplicationContext()
-        {
-            var applicationContext = "Test context";
-
-            var processor = new Mock<IMigrationProcessor>();
-            var serviceProvider = ServiceCollectionExtensions.CreateServices()
-                .WithProcessor(processor)
-                .AddScoped(_ => ConventionSets.NoSchemaName)
-                .AddScoped<IMigrationRunnerConventionsAccessor>(
-                    _ => new PassThroughMigrationRunnerConventionsAccessor(new MigrationRunnerConventions()))
-                .AddScoped<IConnectionStringReader>(_ => new PassThroughConnectionStringReader("No connection"))
-                .Configure<RunnerOptions>(opt => opt.ApplicationContext = applicationContext)
-                .BuildServiceProvider();
-
-            var loader = serviceProvider.GetRequiredService<IVersionLoader>();
-
-            var versionTableMetaData = loader.GetVersionTableMetaData();
-            versionTableMetaData.ApplicationContext.ShouldBe(applicationContext);
-        }
-
-        [Test]
         public void DeleteVersionShouldExecuteDeleteDataExpression()
         {
             var processor = new Mock<IMigrationProcessor>();
+            var generatorAccessor = new Mock<IGeneratorAccessor>();
             var serviceProvider = ServiceCollectionExtensions.CreateServices()
                 .WithProcessor(processor)
+                .AddScoped(_ => generatorAccessor.Object)
                 .AddScoped(_ => ConventionSets.NoSchemaName)
                 .AddScoped<IMigrationRunnerConventionsAccessor>(
                     _ => new PassThroughMigrationRunnerConventionsAccessor(new MigrationRunnerConventions()))
@@ -130,8 +116,10 @@ namespace FluentMigrator.Tests.Unit
         public void RemoveVersionTableShouldBehaveAsExpected()
         {
             var processor = new Mock<IMigrationProcessor>();
+            var generatorAccessor = new Mock<IGeneratorAccessor>();
             var serviceProvider = ServiceCollectionExtensions.CreateServices()
                 .WithProcessor(processor)
+                .AddScoped(_ => generatorAccessor.Object)
                 .AddScoped(_ => ConventionSets.NoSchemaName)
                 .AddScoped<IMigrationRunnerConventionsAccessor>(
                     _ => new PassThroughMigrationRunnerConventionsAccessor(new MigrationRunnerConventions()))
@@ -158,8 +146,10 @@ namespace FluentMigrator.Tests.Unit
         public void RemoveVersionTableShouldNotRemoveSchemaIfItDidNotOwnTheSchema()
         {
             var processor = new Mock<IMigrationProcessor>();
+            var generatorAccessor = new Mock<IGeneratorAccessor>();
             var serviceProvider = ServiceCollectionExtensions.CreateServices()
                 .WithProcessor(processor)
+                .AddScoped(_ => generatorAccessor.Object)
                 .AddScoped(_ => ConventionSets.NoSchemaName)
                 .AddScoped<IMigrationRunnerConventionsAccessor>(
                     _ => new PassThroughMigrationRunnerConventionsAccessor(new MigrationRunnerConventions()))
@@ -184,8 +174,10 @@ namespace FluentMigrator.Tests.Unit
         public void UpdateVersionShouldExecuteInsertDataExpression()
         {
             var processor = new Mock<IMigrationProcessor>();
+            var generatorAccessor = new Mock<IGeneratorAccessor>();
             var serviceProvider = ServiceCollectionExtensions.CreateServices()
                 .WithProcessor(processor)
+                .AddScoped(_ => generatorAccessor.Object)
                 .AddScoped(_ => ConventionSets.NoSchemaName)
                 .AddScoped<IMigrationRunnerConventionsAccessor>(
                     _ => new PassThroughMigrationRunnerConventionsAccessor(new MigrationRunnerConventions()))
@@ -214,11 +206,13 @@ namespace FluentMigrator.Tests.Unit
         {
             var processor = new Mock<IMigrationProcessor>();
             var runner = new Mock<IMigrationRunner>();
+            var generatorAccessor = new Mock<IGeneratorAccessor>();
             runner.SetupGet(r => r.Processor).Returns(processor.Object);
             processor.Setup(p => p.SchemaExists(It.IsAny<string>())).Returns(false);
 
             var serviceProvider = ServiceCollectionExtensions.CreateServices()
                 .WithProcessor(processor)
+                .AddScoped(_ => generatorAccessor.Object)
                 .AddScoped(_ => ConventionSets.NoSchemaName)
                 .AddScoped<IMigrationRunnerConventionsAccessor>(
                     _ => new PassThroughMigrationRunnerConventionsAccessor(new MigrationRunnerConventions()))
@@ -239,6 +233,7 @@ namespace FluentMigrator.Tests.Unit
         {
             var processor = new Mock<IMigrationProcessor>();
             var runner = new Mock<IMigrationRunner>();
+            var generatorAccessor = new Mock<IGeneratorAccessor>();
 
             runner.SetupGet(r => r.Processor).Returns(processor.Object);
             processor.Setup(
@@ -247,6 +242,7 @@ namespace FluentMigrator.Tests.Unit
 
             var serviceProvider = ServiceCollectionExtensions.CreateServices()
                 .WithProcessor(processor)
+                .AddScoped(_ => generatorAccessor.Object)
                 .AddScoped(_ => ConventionSets.NoSchemaName)
                 .AddScoped<IMigrationRunnerConventionsAccessor>(
                     _ => new PassThroughMigrationRunnerConventionsAccessor(new MigrationRunnerConventions()))
@@ -267,12 +263,14 @@ namespace FluentMigrator.Tests.Unit
         {
             var processor = new Mock<IMigrationProcessor>();
             var runner = new Mock<IMigrationRunner>();
+            var generatorAccessor = new Mock<IGeneratorAccessor>();
 
             runner.SetupGet(r => r.Processor).Returns(processor.Object);
             processor.Setup(p => p.ColumnExists(new TestVersionTableMetaData().SchemaName, TestVersionTableMetaData.TABLE_NAME, TestVersionTableMetaData.APPLIED_ON_COLUMN_NAME)).Returns(false);
 
             var serviceProvider = ServiceCollectionExtensions.CreateServices()
                 .WithProcessor(processor)
+                .AddScoped(_ => generatorAccessor.Object)
                 .AddScoped(_ => ConventionSets.NoSchemaName)
                 .AddScoped<IMigrationRunnerConventionsAccessor>(
                     _ => new PassThroughMigrationRunnerConventionsAccessor(new MigrationRunnerConventions()))
@@ -293,12 +291,14 @@ namespace FluentMigrator.Tests.Unit
         {
             var processor = new Mock<IMigrationProcessor>();
             var runner = new Mock<IMigrationRunner>();
+            var generatorAccessor = new Mock<IGeneratorAccessor>();
 
             runner.SetupGet(r => r.Processor).Returns(processor.Object);
             processor.Setup(p => p.ColumnExists(new TestVersionTableMetaData().SchemaName, TestVersionTableMetaData.TABLE_NAME, TestVersionTableMetaData.APPLIED_ON_COLUMN_NAME)).Returns(false);
 
             var serviceProvider = ServiceCollectionExtensions.CreateServices()
                 .WithProcessor(processor)
+                .AddScoped(_ => generatorAccessor.Object)
                 .AddScoped(_ => ConventionSets.NoSchemaName)
                 .AddScoped<IMigrationRunnerConventionsAccessor>(
                     _ => new PassThroughMigrationRunnerConventionsAccessor(new MigrationRunnerConventions()))

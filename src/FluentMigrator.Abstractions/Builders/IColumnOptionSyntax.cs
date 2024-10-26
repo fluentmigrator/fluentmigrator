@@ -1,6 +1,6 @@
 #region License
 //
-// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
 // limitations under the License.
 //
 #endregion
+
+using System.Collections.Generic;
 
 using FluentMigrator.Infrastructure;
 
@@ -49,6 +51,21 @@ namespace FluentMigrator.Builders
         /// <param name="description">The description</param>
         /// <returns>The next step</returns>
         TNext WithColumnDescription(string description);
+
+        /// <summary>
+        /// Sets any additional column descriptions using a pair of name and description content
+        /// </summary>
+        /// <param name="descriptionName">The descriptionName</param>
+        /// <param name="description">The description</param>
+        /// <returns>The next step</returns>
+        TNext WithColumnAdditionalDescription(string descriptionName, string description);
+
+        /// <summary>
+        /// Sets any additional column descriptions using a Dictionary containing multiple pairs of name and description content
+        /// </summary>
+        /// <param name="columnDescriptions">The columnDescriptions list</param>
+        /// <returns>The next step</returns>
+        TNext WithColumnAdditionalDescriptions(Dictionary<string,string> columnDescriptions);
 
         /// <summary>
         /// Sets the columns identity configuration

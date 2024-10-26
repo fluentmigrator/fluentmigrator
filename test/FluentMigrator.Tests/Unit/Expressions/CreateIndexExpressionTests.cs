@@ -31,6 +31,8 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Expressions
 {
     [TestFixture]
+    [Category("Expression")]
+    [Category("CreateIndex")]
     public class CreateIndexExpressionTests
     {
         [Test]
@@ -88,7 +90,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
 
             var errors = ValidationHelper.CollectErrors(expression);
 
-            Assert.That(errors.Count, Is.EqualTo(0));
+            Assert.That(errors, Is.Empty);
         }
 
         [Test]

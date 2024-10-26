@@ -1,6 +1,6 @@
 #region License
 //
-// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -36,12 +36,6 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
         public override string DatabaseType => "DotConnectOracle";
 
         public override IList<string> DatabaseTypeAliases { get; } = new List<string>();
-
-        [Obsolete]
-        public DotConnectOracleProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, DotConnectOracleDbFactory factory)
-            : base(connection, factory, generator, announcer, options)
-        {
-        }
 
         public DotConnectOracleProcessor(
             [NotNull] DotConnectOracleDbFactory factory,

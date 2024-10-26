@@ -1,6 +1,6 @@
 #region License
 //
-// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Data;
+using System.Linq;
 
 using FluentMigrator.Infrastructure;
 
@@ -30,9 +31,6 @@ namespace FluentMigrator.Model
     /// </summary>
     public class ForeignKeyDefinition
         : ICloneable,
-#pragma warning disable 618
-          ICanBeValidated,
-#pragma warning restore 618
           IValidatableObject
     {
         /// <summary>
@@ -84,13 +82,6 @@ namespace FluentMigrator.Model
         public virtual ICollection<string> PrimaryColumns { get; set; } = new List<string>();
 
         /// <inheritdoc />
-        [Obsolete("Use the System.ComponentModel.DataAnnotations.Validator instead")]
-        public virtual void CollectValidationErrors(ICollection<string> errors)
-        {
-            this.CollectErrors(errors);
-        }
-
-        /// <inheritdoc />
         public object Clone()
         {
             return new ForeignKeyDefinition
@@ -127,6 +118,33 @@ namespace FluentMigrator.Model
             if (PrimaryColumns.Count == 0)
             {
                 yield return new ValidationResult(ErrorMessages.ForeignKeyMustHaveOneOrMorePrimaryColumns);
+            }
+
+            if (ForeignColumns.Distinct(StringComparer.OrdinalIgnoreCase).Count()
+             != ForeignColumns.Count)
+            {
+                yield return new ValidationResult(ErrorMessages.ForeignKeyColumnNamesMustBeUnique);
+            }
+
+            if (PrimaryColumns.Distinct(StringComparer.OrdinalIgnoreCase).Count()
+             != PrimaryColumns.Count)
+            {
+                yield return new ValidationResult(ErrorMessages.PrimaryKeyColumnNamesMustBeUnique);
+            }
+
+            if (ForeignColumns.Any(string.IsNullOrWhiteSpace))
+            {
+                yield return new ValidationResult(ErrorMessages.ForeignKeyMustNotHaveColumnNameBeNullOrEmpty);
+            }
+
+            if (PrimaryColumns.Any(string.IsNullOrWhiteSpace))
+            {
+                yield return new ValidationResult(ErrorMessages.PrimaryKeyColumnNameReferencedByForeignKeyMustNotBeNullOrEmpty);
+            }
+
+            if (ForeignColumns.Count != PrimaryColumns.Count)
+            {
+                yield return new ValidationResult(ErrorMessages.ForeignKeyColumnsCountMustMatchPrimaryKeyColumnsCount);
             }
         }
     }

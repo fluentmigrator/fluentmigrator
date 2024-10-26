@@ -1,6 +1,6 @@
 #region License
 //
-// Copyright (c) 2007-2018, Fluent Migrator Project
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -138,7 +138,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         [Test]
         public void DecimalOfPrecisionIsNumberWithPrecision()
         {
-            _typeMap.GetTypeMap(DbType.Decimal, (int?)8, precision: 3).ShouldBe("NUMBER(8,3)");
+            _typeMap.GetTypeMap(DbType.Decimal, size: 8, precision: 3).ShouldBe("NUMBER(8,3)");
         }
 
         [Test]

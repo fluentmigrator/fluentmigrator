@@ -96,4 +96,22 @@
   <data name="ExpressionTableNameMissingWithHints" xml:space="preserve">
     <value>Der Tabellenname wurde nicht angegeben. Stellen Sie sicher, dass sie die "OnTable"-Erweiterungsmethode aufgerufen haben. Der Aufruf sollte wie folgt aussehen: Delete.ForeignKey(KeyName).OnTable(TableName)</value>
   </data>
+  <data name="IndexIncludeColumnNameMustNotBeNullOrEmpty" xml:space="preserve">
+    <value>Der Name der Index-Include-Spalte darf nicht null oder leer sein.</value>
+  </data>
+  <data name="ForeignKeyMustNotHaveColumnNameBeNullOrEmpty" xml:space="preserve">
+    <value>Der Fremdschlüssel-Name darf nicht null oder leer sein.</value>
+  </data>
+  <data name="PrimaryKeyColumnNameReferencedByForeignKeyMustNotBeNullOrEmpty" xml:space="preserve">
+    <value>Der Name der vom Fremdschlüssel referenzierten Primärschlüsselspalte darf nicht null oder leer sein.</value>
+  </data>
+  <data name="ForeignKeyColumnsCountMustMatchPrimaryKeyColumnsCount" xml:space="preserve">
+    <value>Die Anzahl der Fremdschlüsselspalten muss mit der Anzahl der Primärschlüsselspalten übereinstimmen.</value>
+  </data>
+  <data name="ForeignKeyColumnNamesMustBeUnique" xml:space="preserve">
+    <value>Die Anzahl der Fremdschlüsselspalten müssen eindeutig sein.</value>
+  </data>
+  <data name="PrimaryKeyColumnNamesMustBeUnique" xml:space="preserve">
+    <value>Die Anzahl der Primärschlüsselspalten müssen eindeutig sein.</value>
+  </data>
 </root>

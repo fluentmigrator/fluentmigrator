@@ -1,5 +1,5 @@
 #region License
-// Copyright (c) 2007-2018, FluentMigrator Project
+// Copyright (c) 2007-2024, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -272,6 +272,24 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
             var x = new CreateIndexExpressionBuilder(expression).Filter("TestColumn2 IS NULL").Include("TestColumn3");
             var result = _generator.Generate(expression);
             result.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) INCLUDE ([TestColumn3]) WHERE TestColumn2 IS NULL");
+        }
+
+        [Test]
+        public void CanCreateIndexWithMultipleIncludeColumnStatements()
+        {
+            var expression = GeneratorTestHelper.GetCreateIndexExpression();
+            var x = (new CreateIndexExpressionBuilder(expression) as ICreateIndexOnColumnSyntax).Include("TestColumn2").Include("TestColumn3");
+            var result = _generator.Generate(expression);
+            result.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) INCLUDE ([TestColumn2], [TestColumn3])");
+        }
+
+        [Test]
+        public void CanCreateIndexWithOneIncludeStatementMultipleColumns()
+        {
+            var expression = GeneratorTestHelper.GetCreateIndexExpression();
+            var x = (new CreateIndexExpressionBuilder(expression) as ICreateIndexOptionsSyntax).Include("TestColumn2").Include("TestColumn3");
+            var result = _generator.Generate(expression);
+            result.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) INCLUDE ([TestColumn2], [TestColumn3])");
         }
 
         [Test]

@@ -1,7 +1,7 @@
 #region License
-// 
-// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
+// Copyright (c) 2007-2024, Fluent Migrator Project
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -26,6 +26,8 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Builders.Schema
 {
     [TestFixture]
+    [Category("Builder")]
+    [Category("RootSchema")]
     public class SchemaExpressionRootTest
     {
         private Mock<IQuerySchema> _querySchemaMock;
@@ -35,6 +37,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Schema
         private string _testIndex;
         private string _testTable;
         private string _testSchema;
+        private string _testSequence;
         private SchemaExpressionRoot _builder;
 
         [SetUp]
@@ -47,6 +50,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Schema
             _testIndex = "testIndex";
             _testColumn = "testColumn";
             _testConstraint = "testConstraint";
+            _testSequence = "testSequence";
 
             _migrationContextMock.Setup(x => x.QuerySchema).Returns(_querySchemaMock.Object);
             _builder = new SchemaExpressionRoot(_migrationContextMock.Object);
@@ -90,6 +94,15 @@ namespace FluentMigrator.Tests.Unit.Builders.Schema
         }
 
         [Test]
+        public void TestSequenceExists()
+        {
+            _querySchemaMock.Setup(x => x.SequenceExists(null, _testSequence)).Returns(true);
+
+            _builder.Sequence(_testSequence).Exists().ShouldBeTrue();
+            _querySchemaMock.Verify(x => x.SequenceExists(null, _testSequence));
+        }
+
+        [Test]
         public void TestTableExistsWithSchema()
         {
             _querySchemaMock.Setup(x => x.TableExists(_testSchema, _testTable)).Returns(true);
@@ -123,6 +136,15 @@ namespace FluentMigrator.Tests.Unit.Builders.Schema
 
             _builder.Schema(_testSchema).Table(_testTable).Index(_testIndex).Exists().ShouldBeTrue();
             _querySchemaMock.Verify(x => x.IndexExists(_testSchema, _testTable, _testIndex));
+        }
+
+        [Test]
+        public void TestSequenceExistsWithSchema()
+        {
+            _querySchemaMock.Setup(x => x.SequenceExists(_testSchema, _testSequence)).Returns(true);
+
+            _builder.Schema(_testSchema).Sequence(_testSequence).Exists().ShouldBeTrue();
+            _querySchemaMock.Verify(x => x.SequenceExists(_testSchema, _testSequence));
         }
     }
 }
