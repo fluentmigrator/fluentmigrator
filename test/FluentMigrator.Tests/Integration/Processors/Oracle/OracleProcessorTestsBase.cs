@@ -14,10 +14,14 @@
 // limitations under the License.
 #endregion
 
+using System;
+
 using FluentMigrator.Runner.Generators.Oracle;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.Oracle;
 using FluentMigrator.Tests.Helpers;
+
+using JetBrains.Annotations;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -106,18 +110,26 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle
             Assert.That(ds.Tables[0].Columns, Is.Not.Empty);
         }
 
-        [OneTimeSetUp]
-        public void ClassSetUp()
+        private ServiceProvider CreateProcessorServices([CanBeNull] Action<IServiceCollection> initAction)
         {
             if (!IntegrationTestOptions.Oracle.IsEnabled)
             {
                 Assert.Ignore();
             }
 
-            var serivces = AddOracleServices(ServiceCollectionExtensions.CreateServices())
+            var services = AddOracleServices(ServiceCollectionExtensions.CreateServices())
                 .AddScoped<IConnectionStringReader>(
                     _ => new PassThroughConnectionStringReader(IntegrationTestOptions.Oracle.ConnectionString));
-            ServiceProvider = serivces.BuildServiceProvider();
+
+            initAction?.Invoke(services);
+
+            return services.BuildServiceProvider();
+        }
+
+        [OneTimeSetUp]
+        public void ClassSetUp()
+        {
+            ServiceProvider = CreateProcessorServices(null);
         }
 
         [OneTimeTearDown]
