@@ -40,7 +40,7 @@ public abstract class ContainerBase
 
     public async Task Start(CancellationToken cancellationToken = default)
     {
-        if (!ServerOptions.IsEnabled)
+        if (!ServerOptions.IsEnabled || !ServerOptions.ContainerEnabled)
         {
             return;
         }
