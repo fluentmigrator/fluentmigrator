@@ -30,12 +30,13 @@ namespace FluentMigrator.Tests.Integration
         [OneTimeSetUp]
         public async Task Setup()
         {
-            await Task.WhenAll(
+            await Task.WhenAll([
                 new MySqlContainer().Start(),
                 new OracleContainer().Start(),
                 new SqlServerContainer().Start(),
-                new PostgresContainer().Start()
-            );
+                new PostgresContainer().Start(),
+                new FirebirdContainer().Start(),
+            ]);
         }
     }
 }
