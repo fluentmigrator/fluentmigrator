@@ -23,7 +23,7 @@
     <PackageReference Include="MySqlConnector" Version="2.3.7" />
     <PackageReference Include="Npgsql" Version="8.0.5" />
     <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="3.21.130" />
-    <PackageReference Include="Snowflake.Data" Version="4.1.0" />
+    <PackageReference Include="Snowflake.Data" Version="4.2.0" />
     <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.10" />
   </ItemGroup>
   <ItemGroup>
