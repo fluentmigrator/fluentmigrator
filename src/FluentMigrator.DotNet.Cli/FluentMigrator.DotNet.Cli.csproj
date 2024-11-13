@@ -13,7 +13,7 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="13.0.1" />
     <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="10.3.1" />
-    <PackageReference Include="FSharp.Core" Version="8.0.401" />
+    <PackageReference Include="FSharp.Core" Version="9.0.100" />
     <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.1.1" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.10" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
