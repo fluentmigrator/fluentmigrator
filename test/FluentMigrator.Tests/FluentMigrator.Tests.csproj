@@ -28,7 +28,7 @@
     <PackageReference Include="MySql.Data" Version="9.1.0" />
     <PackageReference Include="Npgsql" Version="8.0.5" />
     <PackageReference Include="NUnit" Version="4.2.2" />
-    <PackageReference Include="NUnit.Analyzers" Version="4.3.0" />
+    <PackageReference Include="NUnit.Analyzers" Version="4.4.0" />
     <PackageReference Include="NUnit.Console" Version="3.18.3" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.6.0" />
     <PackageReference Include="Shouldly" Version="4.2.1" />
