@@ -23,6 +23,7 @@ updates:
         - "Shouldly"
         - "Microsoft.NET.Test.Sdk"
         - "Brutal.Dev.StrongNameSigner"
+        - "Testcontainers*"
     other-dependencies:
       patterns:
         - "FSharp*"
