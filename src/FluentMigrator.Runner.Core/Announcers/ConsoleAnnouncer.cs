@@ -43,7 +43,7 @@ namespace FluentMigrator.Runner.Announcers
             Write("Source Code:");
             Write("  https://github.com/fluentmigrator/fluentmigrator");
             Write("Ask For Help:");
-            Write("  https://gitter.im/FluentMigrator/fluentmigrator");
+            Write("  https://github.com/fluentmigrator/fluentmigrator/discussions");
             HorizontalRule();
             Console.ResetColor();
         }

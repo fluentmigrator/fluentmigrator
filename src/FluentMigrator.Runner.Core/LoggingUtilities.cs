@@ -98,7 +98,7 @@ namespace FluentMigrator.Runner
             writer.WriteLine("Source Code:");
             writer.WriteLine("  https://github.com/fluentmigrator/fluentmigrator");
             writer.WriteLine("Ask For Help:");
-            writer.WriteLine("  https://gitter.im/FluentMigrator/fluentmigrator");
+            writer.WriteLine("  https://github.com/fluentmigrator/fluentmigrator/discussions");
             writer.WriteHorizontalRuler();
         }
 
