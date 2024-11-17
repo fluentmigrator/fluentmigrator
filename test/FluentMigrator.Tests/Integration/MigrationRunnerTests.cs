@@ -1847,7 +1847,7 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlServer2012")]
         [Category("SqlServer2014")]
         [Category("SqlServer2016")]
-        public void CanInjtectParametersInExecuteSql()
+        public void CanInjectParametersInExecuteSql()
         {
             var outputSql = new StringBuilder();
 
@@ -1882,6 +1882,68 @@ namespace FluentMigrator.Tests.Integration
                             .Matches(outputSqlString).Count;
 
                     selectUpMatches.ShouldBe(1);
+                },
+                false);
+        }
+
+        [Test]
+        [Category("MySql")]
+        [Category("SQLite")]
+        [Category("Postgres")]
+        [Category("Snowflake")]
+        [Category("SqlServer2005")]
+        [Category("SqlServer2008")]
+        [Category("SqlServer2012")]
+        [Category("SqlServer2014")]
+        [Category("SqlServer2016")]
+        public void CanUseRawSqlInUpdateAndDelete()
+        {
+            var outputSql = new StringBuilder();
+
+            var provider = new SqlScriptFluentMigratorLoggerProvider(
+                new StringWriter(outputSql),
+                new SqlScriptFluentMigratorLoggerOptions()
+                {
+                    ShowSql = true,
+                });
+
+            ExecuteWithSupportedProcessors(
+                services =>
+                {
+                    // Clear sql output between each processor execution
+                    outputSql.Clear();
+                    services
+                        .ConfigureRunner(rb => rb.WithVersionTable(new TestVersionTableMetaData()))
+                        .WithMigrationsIn(RootNamespace)
+                        .Configure<ProcessorOptions>(opt => opt.PreviewOnly = true)
+                        .AddSingleton<ILoggerProvider>(provider);
+                },
+                (serviceProvider, processor) =>
+                {
+                    var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
+
+                    runner.Up(new RawSqlMigration());
+
+                    processor.CommitTransaction();
+                    var outputSqlString = outputSql.ToString();
+
+                    // UPDATE : Raw SQL with string
+                    outputSqlString.ShouldContain(@"UPDATE ""FooString"" SET Baz = CASE WHEN Bar = 1 THEN 2 ELSE 0 END WHERE Baz IS NULL");
+
+                    // UPDATE : Raw SQL with RawSql object
+                    outputSqlString.ShouldContain(@"UPDATE ""FooRawSql"" SET Baz = CASE WHEN Bar = 1 THEN 2 ELSE 0 END WHERE Baz IS NULL");
+
+                    // UPDATE : Raw SQL with RawSql object inside an anonymous object
+                    outputSqlString.ShouldContain(@"UPDATE ""FooObjectWithRawSql"" SET ""Baz"" = CASE WHEN Bar = 1 THEN 2 ELSE 0 END WHERE ""Baz"" IS NULL");
+
+                    // DELETE : Raw SQL with string
+                    outputSqlString.ShouldContain(@"DELETE FROM ""FooString"" WHERE Baz IS NULL");
+
+                    // DELETE : Raw SQL with RawSql object
+                    outputSqlString.ShouldContain(@"DELETE FROM ""FooRawSql"" WHERE Baz IS NULL");
+
+                    // DELETE : Raw SQL with RawSql object inside an anonymous object
+                    outputSqlString.ShouldContain(@"DELETE FROM ""FooObjectWithRawSql"" WHERE ""Baz"" IS NULL");
                 },
                 false);
         }
@@ -2330,6 +2392,42 @@ namespace FluentMigrator.Tests.Integration
         public override void Down()
         {
             Update.Table("TestTable").InSchema("TestSchema").Set(new { Name = "Test" }).AllRows();
+        }
+    }
+
+    public class RawSqlMigration : ForwardOnlyMigration
+    {
+        public override void Up()
+        {
+            Update.Table("FooString")
+                .Set("Baz = CASE WHEN Bar = 1 THEN 2 ELSE 0 END")
+                .Where("Baz IS NULL");
+
+            Update.Table("FooRawSql")
+                .Set(RawSql.Insert("Baz = CASE WHEN Bar = 1 THEN 2 ELSE 0 END"))
+                .Where(RawSql.Insert("Baz IS NULL"));
+
+            Update.Table("FooObjectWithRawSql")
+                .Set(new
+                {
+                    Baz = RawSql.Insert("CASE WHEN Bar = 1 THEN 2 ELSE 0 END")
+                })
+                .Where(new
+                {
+                    Baz = RawSql.Insert("IS NULL")
+                });
+
+            Delete.FromTable("FooString")
+                .Row("Baz IS NULL");
+
+            Delete.FromTable("FooRawSql")
+                .Row(RawSql.Insert("Baz IS NULL"));
+
+            Delete.FromTable("FooObjectWithRawSql")
+                .Row(new
+                {
+                    Baz = RawSql.Insert("IS NULL")
+                });
         }
     }
 

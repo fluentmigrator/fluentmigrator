@@ -16,6 +16,9 @@
 //
 #endregion
 
+using System.Collections.Generic;
+using System.ComponentModel;
+
 using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Builders
@@ -39,6 +42,39 @@ namespace FluentMigrator.Builders
         protected ExpressionBuilderBase(T expression)
         {
             Expression = expression;
+        }
+
+        /// <summary>
+        /// Make a key/value pair list from an anonymous object, string or RawSql instance
+        /// </summary>
+        /// <param name="dataAsAnonymousType">The data, can be an anonymous object, string or RawSql instance</param>
+        /// <typeparam name="TOut">The output key/value pair list</typeparam>
+        protected static TOut GetData<TOut>(object dataAsAnonymousType)
+            where TOut : IList<KeyValuePair<string, object>>, new()
+        {
+            var data = new TOut();
+
+            switch (dataAsAnonymousType)
+            {
+                case RawSql rawSql:
+                    data.Add(new KeyValuePair<string, object>("", rawSql));
+                    break;
+
+                // Treat string like RawSql
+                case string stringValue:
+                    data.Add(new KeyValuePair<string, object>("", RawSql.Insert(stringValue)));
+                    break;
+
+                default:
+                    var properties = TypeDescriptor.GetProperties(dataAsAnonymousType);
+                    foreach (PropertyDescriptor property in properties)
+                    {
+                        data.Add(new KeyValuePair<string, object>(property.Name, property.GetValue(dataAsAnonymousType)));
+                    }
+                    break;
+            }
+
+            return data;
         }
     }
 }
