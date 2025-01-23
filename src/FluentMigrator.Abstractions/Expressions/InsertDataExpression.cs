@@ -61,10 +61,10 @@ namespace FluentMigrator.Expressions
                                     TableName = TableName
                                 };
 
-            foreach (var row in Rows)
+            for (var index = Rows.Count - 1; index >= 0; index--)
             {
                 var dataDefinition = new DeletionDataDefinition();
-                dataDefinition.AddRange(row);
+                dataDefinition.AddRange(Rows[index]);
 
                 expression.Rows.Add(dataDefinition);
             }
