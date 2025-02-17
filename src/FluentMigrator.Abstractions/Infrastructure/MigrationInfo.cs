@@ -35,8 +35,9 @@ namespace FluentMigrator.Infrastructure
         /// <param name="version">The migration version</param>
         /// <param name="transactionBehavior">The desired transaction behavior</param>
         /// <param name="migration">The underlying migration</param>
-        public MigrationInfo(long version, TransactionBehavior transactionBehavior, IMigration migration)
-            : this(version, null, transactionBehavior, false, () => migration)
+        /// <param name="versionAsString"></param>
+        public MigrationInfo(long version, TransactionBehavior transactionBehavior, IMigration migration, string versionAsString = null)
+            : this(version, null, transactionBehavior, false, () => migration, versionAsString ?? version.ToString())
         {
         }
 
@@ -45,10 +46,11 @@ namespace FluentMigrator.Infrastructure
         /// </summary>
         /// <param name="version">The migration version</param>
         /// <param name="transactionBehavior">The desired transaction behavior</param>
-        /// <param name="isBreakingChange">Indicates wether the migration is a breaking change</param>
+        /// <param name="isBreakingChange">Indicates whether the migration is a breaking change</param>
         /// <param name="migration">The underlying migration</param>
-        public MigrationInfo(long version, TransactionBehavior transactionBehavior, bool isBreakingChange, IMigration migration)
-            : this(version, null, transactionBehavior, isBreakingChange, () => migration)
+        /// <param name="versionAsString">The human-readable version</param>
+        public MigrationInfo(long version, TransactionBehavior transactionBehavior, bool isBreakingChange, IMigration migration, string versionAsString = null)
+            : this(version, null, transactionBehavior, isBreakingChange, () => migration, versionAsString ?? version.ToString())
         {
         }
 
@@ -58,14 +60,16 @@ namespace FluentMigrator.Infrastructure
         /// <param name="version">The migration version</param>
         /// <param name="description">The migration description</param>
         /// <param name="transactionBehavior">The desired transaction behavior</param>
-        /// <param name="isBreakingChange">Indicates wether the migration is a breaking change</param>
+        /// <param name="isBreakingChange">Indicates whether the migration is a breaking change</param>
         /// <param name="migrationFunc">A function to get the <see cref="IMigration"/> instance</param>
+        /// <param name="versionAsString">The human-readable version</param>
         public MigrationInfo(
             long version,
             string description,
             TransactionBehavior transactionBehavior,
             bool isBreakingChange,
-            Func<IMigration> migrationFunc)
+            Func<IMigration> migrationFunc,
+            string versionAsString)
         {
             if (migrationFunc == null) throw new ArgumentNullException(nameof(migrationFunc));
 
@@ -74,6 +78,7 @@ namespace FluentMigrator.Infrastructure
             TransactionBehavior = transactionBehavior;
             IsBreakingChange = isBreakingChange;
             _lazyMigration = new Lazy<IMigration>(migrationFunc);
+            VersionAsString = versionAsString;
         }
 
         /// <inheritdoc />
@@ -91,6 +96,8 @@ namespace FluentMigrator.Infrastructure
         /// <inheritdoc />
         public bool IsBreakingChange { get; }
 
+        public string VersionAsString { get; }
+
         /// <inheritdoc />
         public object Trait(string name)
         {
@@ -106,7 +113,7 @@ namespace FluentMigrator.Infrastructure
         /// <inheritdoc />
         public string GetName()
         {
-            return string.Format("{0}: {1}", Version, Migration.GetType().Name);
+            return string.Format("{0}: {1}", VersionAsString, Migration.GetType().Name);
         }
 
         /// <summary>
