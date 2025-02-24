@@ -12,9 +12,9 @@
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(Configuration)' == 'Release' ">
-    <PackageReference Include="SourceLink.Create.CommandLine" Version="2.8.0" PrivateAssets="All" />
-    <PackageReference Include="SourceLink.Embed.AllSourceFiles" Version="2.8.0" PrivateAssets="all" />
-    <PackageReference Include="SourceLink.Copy.PdbFiles" Version="2.8.0" PrivateAssets="All" />
+    <PackageReference Include="SourceLink.Create.CommandLine" Version="2.8.3" PrivateAssets="All" />
+    <PackageReference Include="SourceLink.Embed.AllSourceFiles" Version="2.8.3" PrivateAssets="all" />
+    <PackageReference Include="SourceLink.Copy.PdbFiles" Version="2.8.3" PrivateAssets="All" />
   </ItemGroup>
 
 </Project>
