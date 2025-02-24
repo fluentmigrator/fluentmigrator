@@ -17,7 +17,6 @@
 #endregion
 
 using System.Collections.Generic;
-using System.ComponentModel;
 using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Builders.Update
@@ -25,54 +24,41 @@ namespace FluentMigrator.Builders.Update
     /// <summary>
     /// An expression builder for a <see cref="UpdateDataExpression"/>
     /// </summary>
-    public class UpdateDataExpressionBuilder : IUpdateSetOrInSchemaSyntax,
+    public class UpdateDataExpressionBuilder : ExpressionBuilderBase<UpdateDataExpression>, IUpdateSetOrInSchemaSyntax,
         IUpdateWhereSyntax
     {
-        private readonly UpdateDataExpression _expression;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="UpdateDataExpressionBuilder"/> class.
         /// </summary>
         /// <param name="expression">The underlying expression</param>
-        public UpdateDataExpressionBuilder(UpdateDataExpression expression)
+        public UpdateDataExpressionBuilder(UpdateDataExpression expression) : base(expression)
         {
-            _expression = expression;
         }
 
         /// <inheritdoc />
         public IUpdateSetSyntax InSchema(string schemaName)
         {
-            _expression.SchemaName = schemaName;
+            Expression.SchemaName = schemaName;
             return this;
         }
 
         /// <inheritdoc />
         public IUpdateWhereSyntax Set(object dataAsAnonymousType)
         {
-            _expression.Set = GetData(dataAsAnonymousType);
+            Expression.Set = GetData<List<KeyValuePair<string, object>>>(dataAsAnonymousType);
             return this;
         }
 
         /// <inheritdoc />
         public void Where(object dataAsAnonymousType)
         {
-            _expression.Where = GetData(dataAsAnonymousType);
+            Expression.Where = GetData<List<KeyValuePair<string, object>>>(dataAsAnonymousType);
         }
 
         /// <inheritdoc />
         public void AllRows()
         {
-            _expression.IsAllRows = true;
-        }
-
-        private static List<KeyValuePair<string, object>> GetData(object dataAsAnonymousType)
-        {
-            var data = new List<KeyValuePair<string, object>>();
-            var properties = TypeDescriptor.GetProperties(dataAsAnonymousType);
-
-            foreach (PropertyDescriptor property in properties)
-                data.Add(new KeyValuePair<string, object>(property.Name, property.GetValue(dataAsAnonymousType)));
-            return data;
+            Expression.IsAllRows = true;
         }
     }
 }
