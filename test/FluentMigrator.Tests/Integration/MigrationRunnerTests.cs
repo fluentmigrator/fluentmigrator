@@ -18,6 +18,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
@@ -1796,7 +1797,7 @@ namespace FluentMigrator.Tests.Integration
         public void CanSaveSqlStatementWithDescription()
         {
             var outputSql = new StringBuilder();
-           
+
             var provider = new SqlScriptFluentMigratorLoggerProvider(
                 new StringWriter(outputSql),
                 new SqlScriptFluentMigratorLoggerOptions()
@@ -1832,6 +1833,117 @@ namespace FluentMigrator.Tests.Integration
 
                     selectUpMatches.ShouldBe(1);
                     selectDownMatches.ShouldBe(1);
+                },
+                false);
+        }
+
+        [Test]
+        [Category("MySql")]
+        [Category("SQLite")]
+        [Category("Postgres")]
+        [Category("Snowflake")]
+        [Category("SqlServer2005")]
+        [Category("SqlServer2008")]
+        [Category("SqlServer2012")]
+        [Category("SqlServer2014")]
+        [Category("SqlServer2016")]
+        public void CanInjectParametersInExecuteSql()
+        {
+            var outputSql = new StringBuilder();
+
+            var provider = new SqlScriptFluentMigratorLoggerProvider(
+                new StringWriter(outputSql),
+                new SqlScriptFluentMigratorLoggerOptions()
+                {
+                    ShowSql = true,
+                });
+
+            ExecuteWithSupportedProcessors(
+                services =>
+                {
+                    // Clear sql output between each processor execution
+                    outputSql.Clear();
+
+                    services
+                        .ConfigureRunner(rb => rb.WithVersionTable(new TestVersionTableMetaData()))
+                        .WithMigrationsIn(RootNamespace)
+                        .Configure<ProcessorOptions>(opt => opt.PreviewOnly = true)
+                        .AddSingleton<ILoggerProvider>(provider);
+                },
+                (serviceProvider, processor) =>
+                {
+                    var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
+
+                    runner.Up(new TestExecuteSqlParameters());
+
+                    processor.CommitTransaction();
+                    var outputSqlString = outputSql.ToString();
+                    var selectUpMatches = new Regex("SELECT 1 FROM FOO WHERE BAR = 'test'")
+                            .Matches(outputSqlString).Count;
+
+                    selectUpMatches.ShouldBe(1);
+                },
+                false);
+        }
+
+        [Test]
+        [Category("MySql")]
+        [Category("SQLite")]
+        [Category("Postgres")]
+        [Category("Snowflake")]
+        [Category("SqlServer2005")]
+        [Category("SqlServer2008")]
+        [Category("SqlServer2012")]
+        [Category("SqlServer2014")]
+        [Category("SqlServer2016")]
+        public void CanUseRawSqlInUpdateAndDelete()
+        {
+            var outputSql = new StringBuilder();
+
+            var provider = new SqlScriptFluentMigratorLoggerProvider(
+                new StringWriter(outputSql),
+                new SqlScriptFluentMigratorLoggerOptions()
+                {
+                    ShowSql = true,
+                });
+
+            ExecuteWithSupportedProcessors(
+                services =>
+                {
+                    // Clear sql output between each processor execution
+                    outputSql.Clear();
+                    services
+                        .ConfigureRunner(rb => rb.WithVersionTable(new TestVersionTableMetaData()))
+                        .WithMigrationsIn(RootNamespace)
+                        .Configure<ProcessorOptions>(opt => opt.PreviewOnly = true)
+                        .AddSingleton<ILoggerProvider>(provider);
+                },
+                (serviceProvider, processor) =>
+                {
+                    var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
+
+                    runner.Up(new RawSqlMigration());
+
+                    processor.CommitTransaction();
+                    var outputSqlString = outputSql.ToString();
+
+                    // UPDATE : Raw SQL with string
+                    outputSqlString.ShouldContain(@"UPDATE ""FooString"" SET Baz = CASE WHEN Bar = 1 THEN 2 ELSE 0 END WHERE Baz IS NULL");
+
+                    // UPDATE : Raw SQL with RawSql object
+                    outputSqlString.ShouldContain(@"UPDATE ""FooRawSql"" SET Baz = CASE WHEN Bar = 1 THEN 2 ELSE 0 END WHERE Baz IS NULL");
+
+                    // UPDATE : Raw SQL with RawSql object inside an anonymous object
+                    outputSqlString.ShouldContain(@"UPDATE ""FooObjectWithRawSql"" SET ""Baz"" = CASE WHEN Bar = 1 THEN 2 ELSE 0 END WHERE ""Baz"" IS NULL");
+
+                    // DELETE : Raw SQL with string
+                    outputSqlString.ShouldContain(@"DELETE FROM ""FooString"" WHERE Baz IS NULL");
+
+                    // DELETE : Raw SQL with RawSql object
+                    outputSqlString.ShouldContain(@"DELETE FROM ""FooRawSql"" WHERE Baz IS NULL");
+
+                    // DELETE : Raw SQL with RawSql object inside an anonymous object
+                    outputSqlString.ShouldContain(@"DELETE FROM ""FooObjectWithRawSql"" WHERE ""Baz"" IS NULL");
                 },
                 false);
         }
@@ -1973,7 +2085,7 @@ namespace FluentMigrator.Tests.Integration
             Create.Table("TestTable")
                 .WithColumn("Id").AsInt32().NotNullable().PrimaryKey().Identity()
                 .WithColumn("Name").AsString(255).NotNullable().WithDefaultValue("Anonymous");
-            
+
             var testTable2 = Create.Table("TestTable2")
                 .WithColumn("Id").AsInt32().NotNullable().PrimaryKey().Identity()
                 .WithColumn("Name").AsString(255).Nullable()
@@ -2035,7 +2147,7 @@ namespace FluentMigrator.Tests.Integration
         public override void Up()
         {
             _ = Create.Schema("TestSchema");
-            
+
             Create.Table("Users")
                 .InSchema("TestSchema")
                 .WithColumn("UserId").AsInt32().Identity().PrimaryKey()
@@ -2283,6 +2395,42 @@ namespace FluentMigrator.Tests.Integration
         }
     }
 
+    public class RawSqlMigration : ForwardOnlyMigration
+    {
+        public override void Up()
+        {
+            Update.Table("FooString")
+                .Set("Baz = CASE WHEN Bar = 1 THEN 2 ELSE 0 END")
+                .Where("Baz IS NULL");
+
+            Update.Table("FooRawSql")
+                .Set(RawSql.Insert("Baz = CASE WHEN Bar = 1 THEN 2 ELSE 0 END"))
+                .Where(RawSql.Insert("Baz IS NULL"));
+
+            Update.Table("FooObjectWithRawSql")
+                .Set(new
+                {
+                    Baz = RawSql.Insert("CASE WHEN Bar = 1 THEN 2 ELSE 0 END")
+                })
+                .Where(new
+                {
+                    Baz = RawSql.Insert("IS NULL")
+                });
+
+            Delete.FromTable("FooString")
+                .Row("Baz IS NULL");
+
+            Delete.FromTable("FooRawSql")
+                .Row(RawSql.Insert("Baz IS NULL"));
+
+            Delete.FromTable("FooObjectWithRawSql")
+                .Row(new
+                {
+                    Baz = RawSql.Insert("IS NULL")
+                });
+        }
+    }
+
     internal class TestDeleteData : Migration
     {
         public override void Up()
@@ -2343,6 +2491,21 @@ namespace FluentMigrator.Tests.Integration
         public override void Down()
         {
             Execute.Sql("SELECT 2 FROM BAR", "Description Down");
+        }
+    }
+
+    internal class TestExecuteSqlParameters : Migration
+    {
+        public override void Up()
+        {
+            Execute.Sql("SELECT 1 FROM FOO WHERE BAR = $(BAZ)", new Dictionary<string, string>()
+            {
+                ["BAZ"] = "'test'"
+            });
+        }
+
+        public override void Down()
+        {
         }
     }
 

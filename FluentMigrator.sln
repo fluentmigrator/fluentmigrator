@@ -7,7 +7,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		CHANGELOG.md = CHANGELOG.md
-		Directory.Buiild.props = Directory.Buiild.props
+		Directory.Build.props = Directory.Build.props
 		docs\logo.png = docs\logo.png
 		nuget.config = nuget.config
 		README.md = README.md
@@ -85,6 +85,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{B3796E78
 		FluentMigrator.snk = FluentMigrator.snk
 		FluentMigrator.v3.ncrunchsolution = FluentMigrator.v3.ncrunchsolution
 		GitVersion.yml = GitVersion.yml
+		Global.props = Global.props
 		nuget-upload.sh = nuget-upload.sh
 		nuget.config = nuget.config
 		PackageTool.props = PackageTool.props
@@ -99,6 +100,13 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "extensions", "extensions", "{DB61C1AF-8934-4F5F-BB8A-451C817536F1}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FluentMigrator.Example.TypeMapper", "samples\FluentMigrator.Example.TypeMapper\FluentMigrator.Example.TypeMapper.csproj", "{CD51E6A3-B43A-493B-B9FD-1C7A6E68F389}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{850DAD53-41AA-46B9-96AA-EEE249DB8AE2}"
+	ProjectSection(SolutionItems) = preProject
+		docs\README-nuget.md = docs\README-nuget.md
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FluentMigrator.Example.MSBuild", "samples\FluentMigrator.Example.MSBuild\FluentMigrator.Example.MSBuild.csproj", "{2755D82C-E45D-479B-B502-FAAF3322DD9B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -434,6 +442,18 @@ Global
 		{CD51E6A3-B43A-493B-B9FD-1C7A6E68F389}.Release|x64.Build.0 = Release|Any CPU
 		{CD51E6A3-B43A-493B-B9FD-1C7A6E68F389}.Release|x86.ActiveCfg = Release|Any CPU
 		{CD51E6A3-B43A-493B-B9FD-1C7A6E68F389}.Release|x86.Build.0 = Release|Any CPU
+		{2755D82C-E45D-479B-B502-FAAF3322DD9B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2755D82C-E45D-479B-B502-FAAF3322DD9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2755D82C-E45D-479B-B502-FAAF3322DD9B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{2755D82C-E45D-479B-B502-FAAF3322DD9B}.Debug|x64.Build.0 = Debug|Any CPU
+		{2755D82C-E45D-479B-B502-FAAF3322DD9B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{2755D82C-E45D-479B-B502-FAAF3322DD9B}.Debug|x86.Build.0 = Debug|Any CPU
+		{2755D82C-E45D-479B-B502-FAAF3322DD9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2755D82C-E45D-479B-B502-FAAF3322DD9B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2755D82C-E45D-479B-B502-FAAF3322DD9B}.Release|x64.ActiveCfg = Release|Any CPU
+		{2755D82C-E45D-479B-B502-FAAF3322DD9B}.Release|x64.Build.0 = Release|Any CPU
+		{2755D82C-E45D-479B-B502-FAAF3322DD9B}.Release|x86.ActiveCfg = Release|Any CPU
+		{2755D82C-E45D-479B-B502-FAAF3322DD9B}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -470,6 +490,7 @@ Global
 		{57F43057-E42B-4627-BB4D-09250FF4338B} = {BFDA3B73-2F8E-4AFF-A6EF-322B9FECD3D1}
 		{DB61C1AF-8934-4F5F-BB8A-451C817536F1} = {16DED0B3-1401-43AD-9402-3DC90918FFD7}
 		{CD51E6A3-B43A-493B-B9FD-1C7A6E68F389} = {DE3C74CA-1396-44E6-B46B-5536BC9771DB}
+		{2755D82C-E45D-479B-B502-FAAF3322DD9B} = {DE3C74CA-1396-44E6-B46B-5536BC9771DB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {722C9D0D-FAB6-4CCE-9A4A-56E24235A9E0}

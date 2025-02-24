@@ -26,6 +26,7 @@ using FluentMigrator.Builders.Delete;
 using FluentMigrator.Validation;
 
 using Shouldly;
+using System.Globalization;
 
 namespace FluentMigrator.Tests.Unit.Builders.Delete
 {
@@ -108,12 +109,13 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
         }
 
         [Test]
+        [SetUICulture("")] // Ensure validation messages are in English
         public void DefaultMigrationExpressionValidatorShouldReturnErrorWhenTableNameIsNotSpecified()
         {
             var mockServiceProvider = new Mock<IServiceProvider>();
             var validator = new DefaultMigrationExpressionValidator(mockServiceProvider.Object);
             var expressionMock = new Mock<DeleteDataExpression>();
-            
+
             var builder = new DeleteDataExpressionBuilder(expressionMock.Object);
             builder.IsNull("TestColumn");
 

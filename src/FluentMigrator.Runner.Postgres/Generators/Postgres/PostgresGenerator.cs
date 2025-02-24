@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -82,6 +83,14 @@ namespace FluentMigrator.Runner.Generators.Postgres
         public override string DropColumn { get { return "ALTER TABLE {0} DROP COLUMN {1};"; } }
         public override string AlterColumn { get { return "ALTER TABLE {0} {1};"; } }
         public override string RenameColumn { get { return "ALTER TABLE {0} RENAME COLUMN {1} TO {2};"; } }
+
+        public override string UpdateData { get { return "UPDATE {0} SET {1} WHERE {2};"; } }
+        public override string DeleteData { get { return "DELETE FROM {0} WHERE {1};"; } }
+
+        protected override StringBuilder AppendSqlStatementEndToken(StringBuilder stringBuilder)
+        {
+            return stringBuilder.Append(" ");
+        }
 
         public override string Generate(AlterTableExpression expression)
         {
@@ -364,7 +373,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
             var cleanup = GetIndexStorageParameters<float?>(PostgresExtensions.IndexVacuumCleanupIndexScaleFactor, "VacuumCleanupIndexScaleFactor");
             if (cleanup.HasValue)
             {
-                parameters.Add($"VACUUM_CLEANUP_INDEX_SCALE_FACTOR = {cleanup.Value.ToString().ToUpper()}");
+                parameters.Add($"VACUUM_CLEANUP_INDEX_SCALE_FACTOR = {cleanup.Value.ToString(CultureInfo.InvariantCulture)}");
             }
 
             if (parameters.Count == 0)
@@ -516,71 +525,6 @@ namespace FluentMigrator.Runner.Generators.Postgres
                 Quoter.QuoteTableName(expression.TableName, expression.SchemaName),
                 Quoter.QuoteColumnName(expression.ColumnName),
                 ((PostgresColumn)Column).FormatAlterDefaultValue(expression.ColumnName, expression.DefaultValue));
-        }
-
-        public override string Generate(DeleteDataExpression expression)
-        {
-            var result = new StringBuilder();
-
-            if (expression.IsAllRows)
-            {
-                result.AppendFormat("DELETE FROM {0};", Quoter.QuoteTableName(expression.TableName, expression.SchemaName));
-            }
-            else
-            {
-                foreach (var row in expression.Rows)
-                {
-                    var where = string.Empty;
-                    var i = 0;
-
-                    foreach (var item in row)
-                    {
-                        if (i != 0)
-                        {
-                            where += " AND ";
-                        }
-
-                        var op = item.Value == null || item.Value == DBNull.Value ? "IS" : "=";
-                        where += string.Format("{0} {1} {2}", Quoter.QuoteColumnName(item.Key), op, Quoter.QuoteValue(item.Value));
-                        i++;
-                    }
-
-                    result.AppendFormat("DELETE FROM {0} WHERE {1};", Quoter.QuoteTableName(expression.TableName, expression.SchemaName), where);
-                }
-            }
-
-            return result.ToString();
-        }
-
-        public override string Generate(UpdateDataExpression expression)
-        {
-            var updateItems = new List<string>();
-            var whereClauses = new List<string>();
-
-            foreach (var item in expression.Set)
-            {
-                updateItems.Add(string.Format("{0} = {1}", Quoter.QuoteColumnName(item.Key), Quoter.QuoteValue(item.Value)));
-            }
-
-            if (expression.IsAllRows)
-            {
-                whereClauses.Add("1 = 1");
-            }
-            else
-            {
-                foreach (var item in expression.Where)
-                {
-                    var op = item.Value == null || item.Value == DBNull.Value ? "IS" : "=";
-                    whereClauses.Add(string.Format("{0} {1} {2}", Quoter.QuoteColumnName(item.Key),
-                                                   op, Quoter.QuoteValue(item.Value)));
-                }
-            }
-
-            return string.Format(
-                "UPDATE {0} SET {1} WHERE {2};",
-                Quoter.QuoteTableName(expression.TableName, expression.SchemaName),
-                string.Join(", ", updateItems.ToArray()),
-                string.Join(" AND ", whereClauses.ToArray()));
         }
 
         public override string Generate(AlterSchemaExpression expression)

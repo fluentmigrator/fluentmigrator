@@ -253,7 +253,7 @@ $"No database processors are configured to run your migration tests.  This messa
 
         protected static bool LogException(Exception exception)
         {
-            TestContext.WriteLine(exception);
+            TestContext.Out.WriteLine(exception);
             return false;
         }
     }
