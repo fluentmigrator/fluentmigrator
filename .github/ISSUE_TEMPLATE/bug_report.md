@@ -1,7 +1,7 @@
 ---
 name: Bug report
 about: Issues that do not follow this template will be closed
-
+labels: bug
 ---
 
 **Describe the bug**
