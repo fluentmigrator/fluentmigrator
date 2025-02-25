@@ -1,4 +1,4 @@
-name: Multijob workflow to build and deploy Docker app to Azure
+name: Trigger Azure Pipelines on pull request labeled 'needs:ci-build'
 
 on:
   pull_request:
