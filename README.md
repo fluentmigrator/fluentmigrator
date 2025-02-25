@@ -5,7 +5,7 @@
 
 # News
 
-6.1.0 is released and supports .NET 6, .NET 7, and .NET 8.
+6.2.0 is released and supports .NET 6, .NET 7, and .NET 8.
 In 6.0.0, we have begun removing a lot of `[Obsolete]` code. Very little user impact should be seen, other than updating custom VersionTableMetadata to configure CreateWithPrimaryKey setting.
 Thanks to @eloekset, our [documentation website](https://fluentmigrator.github.io) now has 5.0.0 API links!
 
