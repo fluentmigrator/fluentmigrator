@@ -24,6 +24,8 @@ using Microsoft.Extensions.DependencyInjection;
 
 using NUnit.Framework;
 
+using Oracle.ManagedDataAccess.Client;
+
 using Shouldly;
 
 namespace FluentMigrator.Tests.Integration.Processors.Oracle
@@ -31,7 +33,8 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle
     [Category("Integration")]
     public abstract class OracleColumnTestsBase : BaseColumnTests
     {
-        private const string SchemaName = "FMTEST";
+        // Oracle Schemas are different from other RDBMS
+        private string SchemaName =>  new OracleConnectionStringBuilder(Processor.Connection.ConnectionString).UserID;
 
         private ServiceProvider ServiceProvider { get; set; }
         private IServiceScope ServiceScope { get; set; }

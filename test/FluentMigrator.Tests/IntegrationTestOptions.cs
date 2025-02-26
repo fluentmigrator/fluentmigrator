@@ -39,6 +39,10 @@ namespace FluentMigrator.Tests
                 .SetBasePath(asmPath)
                 .AddJsonFile("appsettings.json")
                 .AddUserSecrets("FluentMigrator.Tests")
+                // You can specify env vars to override appsettings values, to enable local containers for example:
+                //  * FM_TestConnectionStrings__SqlServer2016__IsEnabled=true
+                //  * FM_TestConnectionStrings__SqlServer2016__ContainerEnabled=true
+                .AddEnvironmentVariables("FM_")
                 .Build();
             DatabaseServers = config
                 .GetSection("TestConnectionStrings")
@@ -105,6 +109,9 @@ namespace FluentMigrator.Tests
 
             [SuppressMessage("ReSharper", "MemberCanBePrivate.Global", Justification = "Set by JSON serializer")]
             public bool IsEnabled { get; set; }
+
+            [SuppressMessage("ReSharper", "MemberCanBePrivate.Global", Justification = "Set by JSON serializer")]
+            public bool ContainerEnabled { get; set; }
 
             [SuppressMessage("ReSharper", "UnusedMember.Global", Justification = "Set by JSON serializer")]
             public string SupportedPlatforms
