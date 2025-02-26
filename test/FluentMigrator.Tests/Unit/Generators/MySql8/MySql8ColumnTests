@@ -1,0 +1,11 @@
+[Test]
+public override void CanRenameColumnWithCustomSchemaAndDefaultValue()
+{
+    CanRenameColumnWithCustomSchema();
+}
+
+[Test]
+public override void CanRenameColumnWithDefaultSchemaAndDefaultValue()
+{
+    CanRenameColumnWithDefaultSchema();
+}
