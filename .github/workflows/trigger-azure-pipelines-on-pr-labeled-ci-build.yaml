@@ -24,3 +24,4 @@ jobs:
         # Name of the Azure Pipline to be triggered
         azure-pipeline-name: 'fluentmigrator CI for PRs'
         azure-devops-token: '${{ secrets.AZURE_DEVOPS_TOKEN }}'
+        azure-pipeline-variables: '{ "Build.SourceVersion": "${{ github.event.pull_request.head.sha }}" }'
