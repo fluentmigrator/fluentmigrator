@@ -1,10 +1,11 @@
-# FluentMigrator [![(License)](https://img.shields.io/github/license/fluentmigrator/fluentmigrator.svg)](https://github.com/fluentmigrator/fluentmigrator/blob/main/LICENSE.txt) [![FluentMigrator.GitHub.Io Docs](https://img.shields.io/badge/docs-fluentmigrator-blue.svg)](https://fluentmigrator.github.io) [![Fluent-Migrator tag on Stack Overflow](https://img.shields.io/badge/stackoverflow-fluentmigrator-orange.svg)](https://stackoverflow.com/questions/tagged/fluent-migrator) [![NuGet downloads](https://img.shields.io/nuget/dt/FluentMigrator.svg)](https://www.nuget.org/packages/FluentMigrator/) 
+# FluentMigrator [![(License)](https://img.shields.io/github/license/fluentmigrator/fluentmigrator.svg)](https://github.com/fluentmigrator/fluentmigrator/blob/main/LICENSE.txt) [![FluentMigrator.GitHub.Io Docs](https://img.shields.io/badge/docs-fluentmigrator-blue.svg)](https://fluentmigrator.github.io) [![Fluent-Migrator tag on Stack Overflow](https://img.shields.io/badge/stackoverflow-fluentmigrator-orange.svg)](https://stackoverflow.com/questions/tagged/fluent-migrator) [![NuGet downloads](https://img.shields.io/nuget/dt/FluentMigrator.svg)](https://www.nuget.org/packages/FluentMigrator/) [![Build Status](https://dev.azure.com/fluentmigrator/fluentmigrator/_apis/build/status%2Ffluentmigrator%20CI%20for%20PRs?branchName=main)](https://dev.azure.com/fluentmigrator/fluentmigrator/_build/latest?definitionId=7&branchName=main) ![Azure DevOps coverage](https://img.shields.io/azure-devops/coverage/fluentmigrator/fluentmigrator/1)
+
 
 [Fluent Migrator](https://github.com/fluentmigrator/fluentmigrator) is a migration framework for .NET much like Ruby on Rails Migrations. Migrations are a structured way to alter your database schema and are an alternative to creating lots of sql scripts that have to be run manually by every developer involved. Migrations solve the problem of evolving a database schema for multiple databases (for example, the developer's local database, the test database and the production database). Database schema changes are described in classes written in C# that can be checked into a version control system.
 
 # News
 
-6.1.0 is released and supports .NET 6, .NET 7, and .NET 8.
+6.2.0 is released and supports .NET 6, .NET 7, and .NET 8.
 In 6.0.0, we have begun removing a lot of `[Obsolete]` code. Very little user impact should be seen, other than updating custom VersionTableMetadata to configure CreateWithPrimaryKey setting.
 Thanks to @eloekset, our [documentation website](https://fluentmigrator.github.io) now has 5.0.0 API links!
 
