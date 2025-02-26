@@ -25,6 +25,7 @@ using FluentMigrator.Infrastructure;
 using NUnit.Framework;
 
 using Moq;
+using Shouldly;
 
 namespace FluentMigrator.Tests.Unit
 {
@@ -62,6 +63,29 @@ namespace FluentMigrator.Tests.Unit
             Assert.That(_context.Object.Expressions.ToList()[1], Is.AssignableFrom(typeof(DeleteTableExpression)));
         }
 
+        [Test]
+        public void DownMigrationsWithInsertDataGeneratesTheDeleteInInverseOrderOfUpMigrations()
+        {
+            var autoReversibleMigration = new TestInsertDataAutoReversingMigration();
+            _context.Object.Expressions = new Collection<IMigrationExpression>();
+            autoReversibleMigration.GetDownExpressions(_context.Object);
+
+            Assert.That(_context.Object.Expressions.ToList()[0], Is.AssignableFrom(typeof(DeleteDataExpression)));
+
+            var deleteExpression = (_context.Object.Expressions.ToList()[0] as DeleteDataExpression);
+
+            deleteExpression.Rows.Count.ShouldBe(2);
+
+            deleteExpression.Rows[0][0].Key.ShouldBe("Id");
+            deleteExpression.Rows[0][0].Value.ShouldBe(2);
+
+            deleteExpression.Rows[0][1].Key.ShouldBe("ParentId");
+            deleteExpression.Rows[0][1].Value.ShouldBe(1);
+
+            deleteExpression.Rows[1][0].Key.ShouldBe("Id");
+            deleteExpression.Rows[1][0].Value.ShouldBe(1);
+            deleteExpression.Rows[1].Count.ShouldBe(1, "Id 1 doesn't have a ParentId reference");
+        }
     }
 
     internal class TestAutoReversingMigration : AutoReversingMigration
@@ -70,6 +94,21 @@ namespace FluentMigrator.Tests.Unit
         {
             Create.Table("Foo");
             Rename.Table("Foo").InSchema("FooSchema").To("Bar");
+        }
+    }
+
+    internal class TestInsertDataAutoReversingMigration : AutoReversingMigration
+    {
+        public override void Up()
+        {
+            Create.Table("Foo")
+                .WithColumn("Id").AsInt32().PrimaryKey()
+                .WithColumn("ParentId").AsInt32().Nullable()
+                    .ForeignKey("Foo", "Id");
+
+            Insert.IntoTable("Foo")
+                .Row(new { Id = 1 })
+                .Row(new { Id = 2, ParentId = 1 });
         }
     }
 }
