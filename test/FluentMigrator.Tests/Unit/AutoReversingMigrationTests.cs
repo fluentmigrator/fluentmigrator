@@ -70,7 +70,7 @@ namespace FluentMigrator.Tests.Unit
             _context.Object.Expressions = new Collection<IMigrationExpression>();
             autoReversibleMigration.GetDownExpressions(_context.Object);
 
-            Assert.IsAssignableFrom(typeof(DeleteDataExpression), _context.Object.Expressions.ToList()[0]);
+            Assert.That(_context.Object.Expressions.ToList()[0], Is.AssignableFrom(typeof(DeleteDataExpression)));
 
             var deleteExpression = (_context.Object.Expressions.ToList()[0] as DeleteDataExpression);
 
