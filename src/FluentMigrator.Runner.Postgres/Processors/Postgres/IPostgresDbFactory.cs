@@ -21,27 +21,8 @@ using System.Data.Common;
 
 namespace FluentMigrator.Runner.Processors.Postgres
 {
-    public interface PostgresDbFactory
+    public interface IPostgresDbFactory
     {
         public DbProviderFactory Factory { get; }
-    }
-
-    public class ReflectionPostgresDbFactory : ReflectionBasedDbFactory, PostgresDbFactory
-    {
-        private static readonly TestEntry[] _entries =
-        {
-            new TestEntry("Npgsql", "Npgsql.NpgsqlFactory"),
-        };
-
-        [Obsolete]
-        public ReflectionPostgresDbFactory()
-            : this(null)
-        {
-        }
-
-        public ReflectionPostgresDbFactory(IServiceProvider serviceProvider)
-            : base(serviceProvider, _entries)
-        {
-        }
     }
 }
