@@ -17,7 +17,6 @@
 #endregion
 
 using System.Collections.Generic;
-using System.ComponentModel;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
@@ -27,56 +26,44 @@ namespace FluentMigrator.Builders.Delete
     /// <summary>
     /// An expression builder for a <see cref="DeleteDataExpression"/>
     /// </summary>
-    public class DeleteDataExpressionBuilder : IDeleteDataOrInSchemaSyntax
+    public class DeleteDataExpressionBuilder : ExpressionBuilderBase<DeleteDataExpression>, IDeleteDataOrInSchemaSyntax
     {
-        private readonly DeleteDataExpression _expression;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="DeleteDataExpressionBuilder"/> class.
         /// </summary>
         /// <param name="expression">The underlying expression</param>
-        public DeleteDataExpressionBuilder(DeleteDataExpression expression)
+        public DeleteDataExpressionBuilder(DeleteDataExpression expression) : base(expression)
         {
-            _expression = expression;
         }
 
         /// <inheritdoc />
         public void IsNull(string columnName)
         {
-            _expression.Rows.Add(new DeletionDataDefinition
-                                    {
-                                        new KeyValuePair<string, object>(columnName, null)
-                                    });
+            Expression.Rows.Add(
+                new DeletionDataDefinition
+                {
+                    new KeyValuePair<string, object>(columnName, null)
+                });
         }
 
         /// <inheritdoc />
         public IDeleteDataSyntax Row(object dataAsAnonymousType)
         {
-            _expression.Rows.Add(GetData(dataAsAnonymousType));
+            Expression.Rows.Add(GetData<DeletionDataDefinition>(dataAsAnonymousType));
             return this;
         }
 
         /// <inheritdoc />
         public IDeleteDataSyntax InSchema(string schemaName)
         {
-            _expression.SchemaName = schemaName;
+            Expression.SchemaName = schemaName;
             return this;
         }
 
         /// <inheritdoc />
         public void AllRows()
         {
-            _expression.IsAllRows = true;
-        }
-
-        private static DeletionDataDefinition GetData(object dataAsAnonymousType)
-        {
-            var data = new DeletionDataDefinition();
-            var properties = TypeDescriptor.GetProperties(dataAsAnonymousType);
-
-            foreach (PropertyDescriptor property in properties)
-                data.Add(new KeyValuePair<string, object>(property.Name, property.GetValue(dataAsAnonymousType)));
-            return data;
+            Expression.IsAllRows = true;
         }
     }
 }

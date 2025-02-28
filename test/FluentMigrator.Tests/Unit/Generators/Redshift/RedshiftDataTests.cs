@@ -41,7 +41,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
             expression.SchemaName = "TestSchema";
 
             var result = _generator.Generate(expression);
-            result.ShouldBe("DELETE FROM \"TestSchema\".\"TestTable1\";");
+            result.ShouldBe("DELETE FROM \"TestSchema\".\"TestTable1\" WHERE 1 = 1;");
         }
 
         [Test]
@@ -50,7 +50,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
             var expression = GeneratorTestHelper.GetDeleteDataAllRowsExpression();
 
             var result = _generator.Generate(expression);
-            result.ShouldBe("DELETE FROM \"public\".\"TestTable1\";");
+            result.ShouldBe("DELETE FROM \"public\".\"TestTable1\" WHERE 1 = 1;");
         }
 
         [Test]
@@ -61,7 +61,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
 
             var result = _generator.Generate(expression);
             result.ShouldBe(
-                "DELETE FROM \"TestSchema\".\"TestTable1\" WHERE \"Name\" = 'Just''in' AND \"Website\" IS NULL;DELETE FROM \"TestSchema\".\"TestTable1\" WHERE \"Website\" = 'github.com';");
+                "DELETE FROM \"TestSchema\".\"TestTable1\" WHERE \"Name\" = 'Just''in' AND \"Website\" IS NULL; DELETE FROM \"TestSchema\".\"TestTable1\" WHERE \"Website\" = 'github.com';");
         }
 
         [Test]
@@ -71,7 +71,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
 
             var result = _generator.Generate(expression);
             result.ShouldBe(
-                "DELETE FROM \"public\".\"TestTable1\" WHERE \"Name\" = 'Just''in' AND \"Website\" IS NULL;DELETE FROM \"public\".\"TestTable1\" WHERE \"Website\" = 'github.com';");
+                "DELETE FROM \"public\".\"TestTable1\" WHERE \"Name\" = 'Just''in' AND \"Website\" IS NULL; DELETE FROM \"public\".\"TestTable1\" WHERE \"Website\" = 'github.com';");
         }
 
         [Test]

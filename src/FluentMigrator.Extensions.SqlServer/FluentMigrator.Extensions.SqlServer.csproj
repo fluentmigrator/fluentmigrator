@@ -18,6 +18,6 @@
     <ProjectReference Include="..\FluentMigrator.Abstractions\FluentMigrator.Abstractions.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Update="JetBrains.Annotations" Version="2024.2.0" />
+    <PackageReference Update="JetBrains.Annotations" Version="2024.3.0" />
   </ItemGroup>
 </Project>

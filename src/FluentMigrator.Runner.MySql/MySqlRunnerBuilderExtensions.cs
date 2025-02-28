@@ -69,7 +69,7 @@ namespace FluentMigrator.Runner
         /// <summary>
         /// Adds MySQL 5 support
         /// </summary>
-        /// <param name="builder">The builder to add the MySQL 5-specific services to</param>
+        /// <param name="builder">The builder to add the MySQL 8-specific services to</param>
         /// <returns>The migration runner builder</returns>
         public static IMigrationRunnerBuilder AddMySql8(this IMigrationRunnerBuilder builder)
         {
