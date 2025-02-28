@@ -124,7 +124,7 @@ namespace FluentMigrator.Runner
                         var processorOptions = sp.GetRequiredService<IOptionsSnapshot<ProcessorOptions>>();
                         return PostgresOptions.ParseProviderSwitches(processorOptions.Value.ProviderSwitches);
                     })
-                .AddScoped<PostgresDbFactory, ReflectionPostgresDbFactory>()
+                .AddScoped<IPostgresDbFactory, ReflectionPostgresDbFactory>()
                 .AddScoped<PostgresQuoter>();
             return builder;
         }
