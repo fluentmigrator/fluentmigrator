@@ -1578,18 +1578,11 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
-        [Category("MySql")]
-        [Category("SQLite")]
-        [Category("Postgres")]
-        [Category("Snowflake")]
-        [Category("SqlServer2005")]
-        [Category("SqlServer2008")]
-        [Category("SqlServer2012")]
-        [Category("SqlServer2014")]
-        [Category("SqlServer2016")]
-        public void CanUseRawSqlInUpdateAndDelete()
+        [TestCaseSource(typeof(ProcessorTestCaseSource))]
+        public void CanUseRawSqlInUpdateAndDelete(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithProcessor(
+                processorType,
                 services =>
                 {
                     services.WithMigrationsIn(RootNamespace);
@@ -1626,7 +1619,8 @@ namespace FluentMigrator.Tests.Integration
 
                     runner.Down(new RawSqlCreateTableMigration());
                     runner.Down(new TestCreateSchema());
-                });
+                },
+                serverOptions);
         }
 
         private void RemoveMigration1(ProcessorBase processor)
