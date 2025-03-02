@@ -1537,7 +1537,7 @@ namespace FluentMigrator.Tests.Integration
 
         [Test]
         [TestCaseSource(typeof(ProcessorTestCaseSource))]
-        public void CanInjtectParametersInExecuteSql(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
+        public void CanInjectParametersInExecuteSql(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
         {
             var outputSql = new StringBuilder();
 
@@ -1575,6 +1575,58 @@ namespace FluentMigrator.Tests.Integration
                     selectUpMatches.ShouldBe(1);
                 },
                 serverOptions);
+        }
+
+        [Test]
+        [Category("MySql")]
+        [Category("SQLite")]
+        [Category("Postgres")]
+        [Category("Snowflake")]
+        [Category("SqlServer2005")]
+        [Category("SqlServer2008")]
+        [Category("SqlServer2012")]
+        [Category("SqlServer2014")]
+        [Category("SqlServer2016")]
+        public void CanUseRawSqlInUpdateAndDelete()
+        {
+            ExecuteWithSupportedProcessors(
+                services =>
+                {
+                    services.WithMigrationsIn(RootNamespace);
+                },
+                (serviceProvider, processor) =>
+                {
+                    var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
+
+                    runner.Up(new TestCreateSchema());
+
+                    runner.Up(new RawSqlCreateTableMigration());
+                    DataSet upDs = processor.ReadTableData("TestSchema", "Foo");
+
+                    var rows = upDs.Tables[0].Rows;
+                    rows.Count.ShouldBe(3);
+
+                    rows[0]["Baz"].ShouldBe(1);
+                    rows[1]["Baz"].ShouldBe(2);
+                    rows[2]["Baz"].ShouldBe(3);
+
+                    runner.Up(new RawSqlUpdateMigration());
+                    upDs = processor.ReadTableData("TestSchema", "Foo");
+                    rows = upDs.Tables[0].Rows;
+
+                    rows[0]["Baz"].ShouldBe(101);
+                    rows[1]["Baz"].ShouldBe(102);
+                    rows[2]["Baz"].ShouldBe(103);
+
+                    runner.Up(new RawSqlDeleteMigration());
+                    upDs = processor.ReadTableData("TestSchema", "Foo");
+                    rows = upDs.Tables[0].Rows;
+
+                    rows.Count.ShouldBe(0);
+
+                    runner.Down(new RawSqlCreateTableMigration());
+                    runner.Down(new TestCreateSchema());
+                });
         }
 
         private void RemoveMigration1(ProcessorBase processor)
@@ -2021,6 +2073,84 @@ namespace FluentMigrator.Tests.Integration
         public override void Down()
         {
             Update.Table("TestTable").InSchema("TestSchema").Set(new { Name = "Test" }).AllRows();
+        }
+    }
+
+    public class RawSqlCreateTableMigration : Migration
+    {
+        public override void Up()
+        {
+            Create.Table("Foo")
+                .InSchema("TestSchema")
+                .WithColumn("baz").AsInt32().NotNullable();
+
+            Insert.IntoTable("Foo")
+                .InSchema("TestSchema")
+                .Row(new
+                {
+                    baz = 1,
+                })
+                .Row(new
+                {
+                    baz = 2,
+                })
+                .Row(new
+                {
+                    baz = 3,
+                })
+                ;
+        }
+
+        public override void Down()
+        {
+            Delete.Table("Foo").InSchema("TestSchema");
+        }
+    }
+
+    public class RawSqlUpdateMigration : ForwardOnlyMigration
+    {
+        public override void Up()
+        {
+            // UPDATE : Raw SQL with string
+            Update.Table("Foo").InSchema("TestSchema")
+                .Set("baz = CASE WHEN baz = 1 THEN 101 ELSE 0 END")
+                .Where("baz = 1");
+
+            // UPDATE : Raw SQL with RawSql object
+            Update.Table("Foo").InSchema("TestSchema")
+                .Set(RawSql.Insert("baz = CASE WHEN baz = 2 THEN 102 ELSE 0 END"))
+                .Where(RawSql.Insert("baz = 2"));
+
+            // UPDATE : Raw SQL with RawSql object inside an anonymous object
+            Update.Table("Foo").InSchema("TestSchema")
+                .Set(new
+                {
+                    baz = RawSql.Insert("CASE WHEN baz = 3 THEN 103 ELSE 0 END")
+                })
+                .Where(new
+                {
+                    baz = RawSql.Insert("= 3")
+                });
+        }
+    }
+
+    public class RawSqlDeleteMigration : ForwardOnlyMigration
+    {
+        public override void Up()
+        {
+            Delete.FromTable("Foo").InSchema("TestSchema")
+
+                // DELETE : Raw SQL with string
+                .Row("baz = 101")
+
+                // DELETE : Raw SQL with RawSql object
+                .Row(RawSql.Insert("baz = 102"))
+
+                // DELETE : Raw SQL with RawSql object inside an anonymous object
+                .Row(new
+                {
+                    baz = RawSql.Insert("= 103")
+                });
         }
     }
 

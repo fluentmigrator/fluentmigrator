@@ -329,10 +329,10 @@ $"No database processors are configured to run your migration tests.  This messa
             if (_isFirstExecuteForFirebird)
             {
                 _isFirstExecuteForFirebird = false;
-                FbConnection.CreateDatabase(serverOptions.ConnectionString, overwrite: true);
+                FbConnection.CreateDatabase(serverOptions.ConnectionString, pageSize:16384, overwrite: true);
             }
 
-            
+
             var options = FirebirdOptions.AutoCommitBehaviour();
             var processorOptions = OptionHelper.Get<ProcessorOptions>();
             var mockedConnectionStringAccessor = new Mock<IConnectionStringAccessor>(MockBehavior.Loose);

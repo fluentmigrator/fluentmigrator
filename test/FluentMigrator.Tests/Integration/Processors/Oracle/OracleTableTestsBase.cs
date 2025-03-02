@@ -16,6 +16,9 @@
 //
 #endregion
 
+using System;
+using System.IO;
+
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.Oracle;
 using FluentMigrator.Tests.Helpers;
@@ -104,6 +107,8 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle
         {
             ServiceScope = ServiceProvider.CreateScope();
             Processor = ServiceScope.ServiceProvider.GetRequiredService<OracleProcessorBase>();
+
+            OracleTestUtils.CheckNativeOracleDataAccess(Processor);
         }
 
         [TearDown]

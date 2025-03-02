@@ -80,16 +80,9 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             if (!IntegrationTestOptions.Firebird.IsEnabled)
                 Assert.Ignore();
 
-            _temporaryDatabase = new TemporaryDatabase(
-                IntegrationTestOptions.Firebird,
-                _prober);
+            var services = FbDatabase.CreateFirebirdServices(_prober, out _temporaryDatabase);
 
-            var serivces = ServiceCollectionExtensions.CreateServices()
-                .ConfigureRunner(builder => builder.AddFirebird())
-                .AddScoped<IConnectionStringReader>(
-                    _ => new PassThroughConnectionStringReader(_temporaryDatabase.ConnectionString));
-
-            ServiceProvider = serivces.BuildServiceProvider();
+            ServiceProvider = services.BuildServiceProvider();
             ServiceScope = ServiceProvider.CreateScope();
             Processor = ServiceScope.ServiceProvider.GetRequiredService<FirebirdProcessor>();
         }
@@ -100,12 +93,6 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             ServiceScope?.Dispose();
             ServiceProvider?.Dispose();
             Processor?.Dispose();
-            if (_temporaryDatabase != null)
-            {
-                var connString = _temporaryDatabase.ConnectionString;
-                _temporaryDatabase = null;
-                FbDatabase.DropDatabase(connString);
-            }
             _temporaryDatabase?.Dispose();
         }
     }

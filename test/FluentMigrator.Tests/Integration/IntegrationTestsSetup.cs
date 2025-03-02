@@ -36,6 +36,7 @@ namespace FluentMigrator.Tests.Integration
                 new SqlServerContainer().Start(),
                 new PostgresContainer().Start(),
                 new FirebirdContainer().Start(),
+                new Db2Container().Start(),
             ]);
         }
     }

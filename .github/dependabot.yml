@@ -24,6 +24,9 @@ updates:
         - "Microsoft.NET.Test.Sdk"
         - "Brutal.Dev.StrongNameSigner"
         - "Testcontainers*"
+    packaging-dependencies:
+      patterns:
+        - "SourceLink*"
     other-dependencies:
       patterns:
         - "FSharp*"
