@@ -134,7 +134,7 @@ namespace FluentMigrator.Tests.Integration
 
                     logger.LogHeader($"Testing Migration against {processorType}");
 
-                    var processor = (GenericProcessorBase) sp.GetRequiredService(processorType);
+                    var processor = (ProcessorBase) sp.GetRequiredService(processorType);
                     try
                     {
                         testAction(sp, processor);
