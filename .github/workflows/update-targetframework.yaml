@@ -17,7 +17,7 @@ jobs:
         run: |  
           latest_active_channel_version=$(curl -s https://dotnetcli.blob.core.windows.net/dotnet/release-metadata/releases-index.json | jq -r '.["releases-index"][] | select(.["support-phase"] == "active") | .["channel-version"]')
           echo "Latest Active .NET Channel Version: $latest_active_channel_version"  
-          echo "::set-output name=latest_version::$latest_active_channel_version"  
+          run: echo "latest_version=$latest_active_channel_version" >> $GITHUB_OUTPUT
   
       - name: Update TargetFramework  
         run: |  
@@ -31,7 +31,7 @@ jobs:
           git push origin update-targetframework-net$latest_version  
   
       - name: Create Pull Request  
-        uses: peter-evans/create-pull-request@v3  
+        uses: peter-evans/create-pull-request@v7  
         with:  
           branch: update-targetframework-net${{ steps.get-latest-version.outputs.latest_version }}  
           title: Update TargetFramework to net${{ steps.get-latest-version.outputs.latest_version }}  
