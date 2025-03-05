@@ -232,13 +232,14 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
             result.ShouldBe("ALTER TABLE `TestTable1` CHANGE `TestColumn1` `TestColumn2` ");
         }
        
-
-        public override void CanRenameColumnWithCustomSchemaAndDefaultValue()
+        [Test]
+        public void CanRenameColumnWithCustomSchemaAndDefaultValue()
         {
             CanRenameColumnWithCustomSchema();
         }
         
-        public override void CanRenameColumnWithDefaultSchemaAndDefaultValue()
+        [Test]
+        public void CanRenameColumnWithDefaultSchemaAndDefaultValue()
         {
             CanRenameColumnWithDefaultSchema();
         }
