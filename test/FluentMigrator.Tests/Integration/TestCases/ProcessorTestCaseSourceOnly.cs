@@ -14,12 +14,24 @@
 // limitations under the License.
 #endregion
 
+using FluentMigrator.Runner.Processors;
+
 namespace FluentMigrator.Tests.Integration.TestCases;
 
-public class ProcessorTestCaseSourceOnly<TIgnore1>() : ProcessorTestCaseSource(false, typeof(TIgnore1));
+public class ProcessorTestCaseSourceOnly<TIgnore1>() : ProcessorTestCaseSource(false, typeof(TIgnore1))
+    where TIgnore1 : ProcessorBase;
 
-public class ProcessorTestCaseSourceOnly<TIgnore1, TIgnore2>() : ProcessorTestCaseSource(false, typeof(TIgnore1), typeof(TIgnore2));
+public class ProcessorTestCaseSourceOnly<TIgnore1, TIgnore2>() : ProcessorTestCaseSource(false, typeof(TIgnore1), typeof(TIgnore2))
+    where TIgnore1 : ProcessorBase
+    where TIgnore2 : ProcessorBase;
 
-public class ProcessorTestCaseSourceOnly<TIgnore1, TIgnore2, TIgnore3>() : ProcessorTestCaseSource(false, typeof(TIgnore1), typeof(TIgnore2), typeof(TIgnore3));
+public class ProcessorTestCaseSourceOnly<TIgnore1, TIgnore2, TIgnore3>() : ProcessorTestCaseSource(false, typeof(TIgnore1), typeof(TIgnore2), typeof(TIgnore3))
+    where TIgnore1 : ProcessorBase
+    where TIgnore2 : ProcessorBase
+    where TIgnore3 : ProcessorBase;
 
-public class ProcessorTestCaseSourceOnly<TIgnore1, TIgnore2, TIgnore3, TIgnore4>() : ProcessorTestCaseSource(false, typeof(TIgnore1), typeof(TIgnore2), typeof(TIgnore3), typeof(TIgnore4));
+public class ProcessorTestCaseSourceOnly<TIgnore1, TIgnore2, TIgnore3, TIgnore4>() : ProcessorTestCaseSource(false, typeof(TIgnore1), typeof(TIgnore2), typeof(TIgnore3), typeof(TIgnore4))
+    where TIgnore1 : ProcessorBase
+    where TIgnore2 : ProcessorBase
+    where TIgnore3 : ProcessorBase
+    where TIgnore4 : ProcessorBase;
