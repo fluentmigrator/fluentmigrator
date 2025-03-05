@@ -5,10 +5,17 @@ namespace FluentMigrator.Tests.Integration.Migrations
     {
         public override void Up()
         {
-            Create.Table("SameTableFK")
-                .WithColumn("Id").AsInt32().PrimaryKey()
-                .WithColumn("ParentId").AsInt32().Nullable()
-                    .ForeignKey("SameTableFK", "Id");
+            IfDatabase(t => t != ProcessorId.SQLite)
+                .Create.Table("SameTableFK")
+                    .WithColumn("Id").AsInt32().PrimaryKey()
+                    .WithColumn("ParentId").AsInt32().Nullable()
+                        .ForeignKey("SameTableFK", "Id");
+
+            // Foreign keys are not supported in SQLite
+            IfDatabase(ProcessorId.SQLite)
+                .Create.Table("SameTableFK")
+                    .WithColumn("Id").AsInt32().PrimaryKey()
+                    .WithColumn("ParentId").AsInt32().Nullable();
 
             Insert.IntoTable("SameTableFK")
                 .Row(new { Id = 1 })
