@@ -1898,54 +1898,44 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlServer2016")]
         public void CanUseRawSqlInUpdateAndDelete()
         {
-            var outputSql = new StringBuilder();
-
-            var provider = new SqlScriptFluentMigratorLoggerProvider(
-                new StringWriter(outputSql),
-                new SqlScriptFluentMigratorLoggerOptions()
-                {
-                    ShowSql = true,
-                });
-
             ExecuteWithSupportedProcessors(
                 services =>
                 {
-                    // Clear sql output between each processor execution
-                    outputSql.Clear();
-                    services
-                        .ConfigureRunner(rb => rb.WithVersionTable(new TestVersionTableMetaData()))
-                        .WithMigrationsIn(RootNamespace)
-                        .Configure<ProcessorOptions>(opt => opt.PreviewOnly = true)
-                        .AddSingleton<ILoggerProvider>(provider);
+                    services.WithMigrationsIn(RootNamespace);
                 },
                 (serviceProvider, processor) =>
                 {
                     var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
 
-                    runner.Up(new RawSqlMigration());
+                    runner.Up(new TestCreateSchema());
 
-                    processor.CommitTransaction();
-                    var outputSqlString = outputSql.ToString();
+                    runner.Up(new RawSqlCreateTableMigration());
+                    DataSet upDs = processor.ReadTableData("TestSchema", "Foo");
 
-                    // UPDATE : Raw SQL with string
-                    outputSqlString.ShouldContain(@"UPDATE ""FooString"" SET Baz = CASE WHEN Bar = 1 THEN 2 ELSE 0 END WHERE Baz IS NULL");
+                    var rows = upDs.Tables[0].Rows;
+                    rows.Count.ShouldBe(3);
 
-                    // UPDATE : Raw SQL with RawSql object
-                    outputSqlString.ShouldContain(@"UPDATE ""FooRawSql"" SET Baz = CASE WHEN Bar = 1 THEN 2 ELSE 0 END WHERE Baz IS NULL");
+                    rows[0]["Baz"].ShouldBe(1);
+                    rows[1]["Baz"].ShouldBe(2);
+                    rows[2]["Baz"].ShouldBe(3);
 
-                    // UPDATE : Raw SQL with RawSql object inside an anonymous object
-                    outputSqlString.ShouldContain(@"UPDATE ""FooObjectWithRawSql"" SET ""Baz"" = CASE WHEN Bar = 1 THEN 2 ELSE 0 END WHERE ""Baz"" IS NULL");
+                    runner.Up(new RawSqlUpdateMigration());
+                    upDs = processor.ReadTableData("TestSchema", "Foo");
+                    rows = upDs.Tables[0].Rows;
 
-                    // DELETE : Raw SQL with string
-                    outputSqlString.ShouldContain(@"DELETE FROM ""FooString"" WHERE Baz IS NULL");
+                    rows[0]["Baz"].ShouldBe(101);
+                    rows[1]["Baz"].ShouldBe(102);
+                    rows[2]["Baz"].ShouldBe(103);
 
-                    // DELETE : Raw SQL with RawSql object
-                    outputSqlString.ShouldContain(@"DELETE FROM ""FooRawSql"" WHERE Baz IS NULL");
+                    runner.Up(new RawSqlDeleteMigration());
+                    upDs = processor.ReadTableData("TestSchema", "Foo");
+                    rows = upDs.Tables[0].Rows;
 
-                    // DELETE : Raw SQL with RawSql object inside an anonymous object
-                    outputSqlString.ShouldContain(@"DELETE FROM ""FooObjectWithRawSql"" WHERE ""Baz"" IS NULL");
-                },
-                false);
+                    rows.Count.ShouldBe(0);
+
+                    runner.Down(new RawSqlCreateTableMigration());
+                    runner.Down(new TestCreateSchema());
+                });
         }
 
         private void RemoveMigration1(ProcessorBase processor)
@@ -2395,38 +2385,80 @@ namespace FluentMigrator.Tests.Integration
         }
     }
 
-    public class RawSqlMigration : ForwardOnlyMigration
+    public class RawSqlCreateTableMigration : Migration
     {
         public override void Up()
         {
-            Update.Table("FooString")
-                .Set("Baz = CASE WHEN Bar = 1 THEN 2 ELSE 0 END")
-                .Where("Baz IS NULL");
+            Create.Table("Foo")
+                .InSchema("TestSchema")
+                .WithColumn("baz").AsInt32().NotNullable();
 
-            Update.Table("FooRawSql")
-                .Set(RawSql.Insert("Baz = CASE WHEN Bar = 1 THEN 2 ELSE 0 END"))
-                .Where(RawSql.Insert("Baz IS NULL"));
+            Insert.IntoTable("Foo")
+                .InSchema("TestSchema")
+                .Row(new
+                {
+                    baz = 1,
+                })
+                .Row(new
+                {
+                    baz = 2,
+                })
+                .Row(new
+                {
+                    baz = 3,
+                })
+                ;
+        }
 
-            Update.Table("FooObjectWithRawSql")
+        public override void Down()
+        {
+            Delete.Table("Foo").InSchema("TestSchema");
+        }
+    }
+
+    public class RawSqlUpdateMigration : ForwardOnlyMigration
+    {
+        public override void Up()
+        {
+            // UPDATE : Raw SQL with string
+            Update.Table("Foo").InSchema("TestSchema")
+                .Set("baz = CASE WHEN baz = 1 THEN 101 ELSE 0 END")
+                .Where("baz = 1");
+
+            // UPDATE : Raw SQL with RawSql object
+            Update.Table("Foo").InSchema("TestSchema")
+                .Set(RawSql.Insert("baz = CASE WHEN baz = 2 THEN 102 ELSE 0 END"))
+                .Where(RawSql.Insert("baz = 2"));
+
+            // UPDATE : Raw SQL with RawSql object inside an anonymous object
+            Update.Table("Foo").InSchema("TestSchema")
                 .Set(new
                 {
-                    Baz = RawSql.Insert("CASE WHEN Bar = 1 THEN 2 ELSE 0 END")
+                    baz = RawSql.Insert("CASE WHEN baz = 3 THEN 103 ELSE 0 END")
                 })
                 .Where(new
                 {
-                    Baz = RawSql.Insert("IS NULL")
+                    baz = RawSql.Insert("= 3")
                 });
+        }
+    }
 
-            Delete.FromTable("FooString")
-                .Row("Baz IS NULL");
+    public class RawSqlDeleteMigration : ForwardOnlyMigration
+    {
+        public override void Up()
+        {
+            Delete.FromTable("Foo").InSchema("TestSchema")
 
-            Delete.FromTable("FooRawSql")
-                .Row(RawSql.Insert("Baz IS NULL"));
+                // DELETE : Raw SQL with string
+                .Row("baz = 101")
 
-            Delete.FromTable("FooObjectWithRawSql")
+                // DELETE : Raw SQL with RawSql object
+                .Row(RawSql.Insert("baz = 102"))
+
+                // DELETE : Raw SQL with RawSql object inside an anonymous object
                 .Row(new
                 {
-                    Baz = RawSql.Insert("IS NULL")
+                    baz = RawSql.Insert("= 103")
                 });
         }
     }

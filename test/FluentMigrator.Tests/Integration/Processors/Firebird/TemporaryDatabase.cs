@@ -32,6 +32,18 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             if (!connectionOptions.IsEnabled)
                 Assert.Ignore();
 
+            if (connectionOptions.ContainerEnabled)
+            {
+                _connectionString = new Lazy<string>(() =>
+                {
+                    var csb = new FbConnectionStringBuilder(connectionOptions.ConnectionString);
+
+                    return prober.CreateDb(csb);
+                });
+
+                return;
+            }
+
             DbFileName = Path.GetTempFileName();
             _connectionString = new Lazy<string>(() =>
             {
@@ -53,7 +65,12 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         {
             try
             {
-                File.Delete(DbFileName);
+                if (!string.IsNullOrEmpty(DbFileName))
+                {
+                    File.Delete(DbFileName);
+                }
+
+                FbDatabase.DropDatabase(ConnectionString);
             }
             catch
             {
