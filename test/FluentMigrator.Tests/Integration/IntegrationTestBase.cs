@@ -67,7 +67,7 @@ namespace FluentMigrator.Tests.Integration
         protected void ExecuteWithProcessor(
             Type processorType,
             Action<IServiceCollection> initAction,
-            Action<IServiceProvider, GenericProcessorBase> testAction,
+            Action<IServiceProvider, ProcessorBase> testAction,
             Func<IntegrationTestOptions.DatabaseServerOptions> serverOptionsGetter,
             bool tryRollback = false)
         {

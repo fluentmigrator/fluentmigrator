@@ -1637,11 +1637,14 @@ namespace FluentMigrator.Tests.Integration
         }
 
         private void CleanupTestDatabase<TProcessor>(IServiceProvider serviceProvider, TProcessor origProcessor)
-            where TProcessor : GenericProcessorBase
+            where TProcessor : ProcessorBase
         {
             if (origProcessor.WasCommitted)
             {
-                origProcessor.Connection.Close();
+                if (origProcessor is GenericProcessorBase gpb)
+                {
+                    gpb.Connection.Close();
+                }
 
                 using (var scope = serviceProvider.CreateScope())
                 {
