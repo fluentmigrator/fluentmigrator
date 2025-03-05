@@ -15,7 +15,7 @@ jobs:
       - name: Get Latest .NET Version  
         id: get-latest-version  
         run: |  
-          latest_active_channel_version=$(curl -s https://dotnetcli.blob.core.windows.net/dotnet/release-metadata/releases-index.json | jq -r '.["releases-index"][] | select(.["support-phase"] == "active") | sort_by(-"channel-version")[0].["channel-version"]')
+          latest_active_channel_version=$(curl -s https://dotnetcli.blob.core.windows.net/dotnet/release-metadata/releases-index.json | jq -r '.["releases-index"][] | select(.["support-phase"] == "active") | sort_by(-[".channel-version"])[0].["channel-version"]')
           echo "Latest Active .NET Channel Version: $latest_active_channel_version"  
           echo "LATEST_VERSION=" "$latest_active_channel_version" >> $GITHUB_ENV
   
