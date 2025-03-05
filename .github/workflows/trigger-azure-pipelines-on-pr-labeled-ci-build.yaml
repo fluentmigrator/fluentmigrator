@@ -1,7 +1,7 @@
-name: Multijob workflow to build and deploy Docker app to Azure
+name: Trigger Azure Pipelines on pull request labeled 'needs:ci-build'
 
 on:
-  pull_request:
+  pull_request_target:
     types: [ labeled ]
 
 # CONFIGURATION
@@ -23,5 +23,5 @@ jobs:
         azure-devops-project-url: 'https://dev.azure.com/FluentMigrator/FluentMigrator'
         # Name of the Azure Pipline to be triggered
         azure-pipeline-name: 'fluentmigrator CI for PRs'
-        # Paste personal access token of the user as value of secret variable:AZURE_DEVOPS_TOKEN
         azure-devops-token: '${{ secrets.AZURE_DEVOPS_TOKEN }}'
+        azure-pipeline-variables: '{ "Build.SourceVersion": "${{ github.event.pull_request.head.sha }}" }'
