@@ -18,20 +18,20 @@ using FluentMigrator.Runner.Processors;
 
 namespace FluentMigrator.Tests.Integration.TestCases;
 
-public class ProcessorTestCaseSourceOnly<TIgnore1>() : ProcessorTestCaseSource(false, typeof(TIgnore1))
-    where TIgnore1 : ProcessorBase;
+public class ProcessorTestCaseSourceOnly<TOnly1>() : ProcessorTestCaseSource(false, typeof(TOnly1))
+    where TOnly1 : ProcessorBase;
 
-public class ProcessorTestCaseSourceOnly<TIgnore1, TIgnore2>() : ProcessorTestCaseSource(false, typeof(TIgnore1), typeof(TIgnore2))
-    where TIgnore1 : ProcessorBase
-    where TIgnore2 : ProcessorBase;
+public class ProcessorTestCaseSourceOnly<TOnly1, TOnly2>() : ProcessorTestCaseSource(false, typeof(TOnly1), typeof(TOnly2))
+    where TOnly1 : ProcessorBase
+    where TOnly2 : ProcessorBase;
 
-public class ProcessorTestCaseSourceOnly<TIgnore1, TIgnore2, TIgnore3>() : ProcessorTestCaseSource(false, typeof(TIgnore1), typeof(TIgnore2), typeof(TIgnore3))
-    where TIgnore1 : ProcessorBase
-    where TIgnore2 : ProcessorBase
-    where TIgnore3 : ProcessorBase;
+public class ProcessorTestCaseSourceOnly<TOnly1, TOnly2, TOnly3>() : ProcessorTestCaseSource(false, typeof(TOnly1), typeof(TOnly2), typeof(TOnly3))
+    where TOnly1 : ProcessorBase
+    where TOnly2 : ProcessorBase
+    where TOnly3 : ProcessorBase;
 
-public class ProcessorTestCaseSourceOnly<TIgnore1, TIgnore2, TIgnore3, TIgnore4>() : ProcessorTestCaseSource(false, typeof(TIgnore1), typeof(TIgnore2), typeof(TIgnore3), typeof(TIgnore4))
-    where TIgnore1 : ProcessorBase
-    where TIgnore2 : ProcessorBase
-    where TIgnore3 : ProcessorBase
-    where TIgnore4 : ProcessorBase;
+public class ProcessorTestCaseSourceOnly<TOnly1, TOnly2, TOnly3, TOnly4>() : ProcessorTestCaseSource(false, typeof(TOnly1), typeof(TOnly2), typeof(TOnly3), typeof(TOnly4))
+    where TOnly1 : ProcessorBase
+    where TOnly2 : ProcessorBase
+    where TOnly3 : ProcessorBase
+    where TOnly4 : ProcessorBase;
