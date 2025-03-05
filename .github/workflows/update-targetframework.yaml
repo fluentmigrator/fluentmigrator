@@ -15,9 +15,9 @@ jobs:
       - name: Get Latest .NET Version  
         id: get-latest-version  
         run: |  
-          latest_version=$(curl -s https://dotnetcli.blob.core.windows.net/dotnet/release-metadata/releases-index.json | jq -r '.releases-index[0].latest-release')  
-          echo "Latest .NET Version: $latest_version"  
-          echo "::set-output name=latest_version::$latest_version"  
+          latest_active_channel_version=$(curl -s https://dotnetcli.blob.core.windows.net/dotnet/release-metadata/releases-index.json | jq -r '.["releases-index"][] | select(.["support-phase"] == "active") | .["channel-version"]')
+          echo "Latest Active .NET Channel Version: $latest_active_channel_version"  
+          echo "::set-output name=latest_version::$latest_active_channel_version"  
   
       - name: Update TargetFramework  
         run: |  
