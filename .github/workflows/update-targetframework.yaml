@@ -17,23 +17,22 @@ jobs:
         run: |  
           latest_active_channel_version=$(curl -s https://dotnetcli.blob.core.windows.net/dotnet/release-metadata/releases-index.json | jq -r '.["releases-index"][] | select(.["support-phase"] == "active") | .["channel-version"]')
           echo "Latest Active .NET Channel Version: $latest_active_channel_version"  
-          echo "latest_version=$latest_active_channel_version" >> $GITHUB_OUTPUT
+          echo "LATEST_VERSION=$latest_active_channel_version" >> $GITHUB_ENV
   
       - name: Update TargetFramework  
         run: |  
-          latest_version=${{ steps.get-latest-version.outputs.latest_version }}  
-          echo "Updating TargetFramework to net$latest_version"  
-          find . -name '*.csproj' -exec sed -i "s/<TargetFramework>net[0-9.]*<\/TargetFramework>/<TargetFramework>net$latest_version<\/TargetFramework>/g" {} +  
+          echo "Updating TargetFramework to net$LATEST_VERSION"  
+          find . -name '*.csproj' -exec sed -i "s/<TargetFramework>net[0-9.]*<\/TargetFramework>/<TargetFramework>net$LATEST_VERSION<\/TargetFramework>/g" {} +  
           git config --global user.name 'github-actions[bot]'  
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'  
-          git checkout -b update-targetframework-net$latest_version  
-          git commit -am "Update TargetFramework to net$latest_version"  
-          git push origin update-targetframework-net$latest_version  
+          git checkout -b update-targetframework-net$LATEST_VERSION  
+          git commit -am "Update TargetFramework to net$LATEST_VERSION"  
+          git push origin update-targetframework-net$LATEST_VERSION
   
       - name: Create Pull Request  
         uses: peter-evans/create-pull-request@v7  
         with:  
-          branch: update-targetframework-net${{ steps.get-latest-version.outputs.latest_version }}  
-          title: Update TargetFramework to net${{ steps.get-latest-version.outputs.latest_version }}  
+          branch: update-targetframework-net$LATEST_VERSION
+          title: Update TargetFramework to net$LATEST_VERSION
           body: |  
-            This pull request updates the TargetFramework to net${{ steps.get-latest-version.outputs.latest_version }}.  
+            This pull request updates the TargetFramework to net$LATEST_VERSION.  
