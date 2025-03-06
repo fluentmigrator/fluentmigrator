@@ -16,7 +16,18 @@ updates:
     core-dependencies:
       patterns:
         - "Autofac*"
-        - "Microsoft.Extensions*"
+        # There may be a bug in dependabot with wildcards, so enumerating all "Microsoft.Extensions*" packages below
+        - "Microsoft.Extensions.Configuration.Abstractions"
+        - "Microsoft.Extensions.Configuration.Binder"
+        - "Microsoft.Extensions.Configuration.EnvironmentVariables"
+        - "Microsoft.Extensions.Configuration.UserSecrets"
+        - "Microsoft.Extensions.DependencyInjection"
+        - "Microsoft.Extensions.Logging"
+        - "Microsoft.Extensions.Logging.Console"
+        - "Microsoft.Extensions.Logging.Debug"
+        - "Microsoft.Extensions.Options"
+        - "Microsoft.Extensions.Options.ConfigurationExtensions"
+        
     test-dependencies:
       patterns:
         - "Moq"
