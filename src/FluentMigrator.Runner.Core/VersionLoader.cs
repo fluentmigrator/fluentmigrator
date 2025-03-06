@@ -204,21 +204,5 @@ namespace FluentMigrator.Runner
                                     });
             expression.ExecuteWith(_processor);
         }
-
-        [Obsolete]
-        [NotNull]
-        private IVersionTableMetaData CreateVersionTableMetaData(IRunnerContext runnerContext)
-        {
-            var type = Assemblies?.Assemblies.GetVersionTableMetaDataType(Conventions, runnerContext)
-             ?? typeof(DefaultVersionTableMetaData);
-
-            var instance = (IVersionTableMetaData) Activator.CreateInstance(type);
-            if (instance is ISchemaExpression schemaExpression)
-            {
-                _conventionSet.SchemaConvention?.Apply(schemaExpression);
-            }
-
-            return instance;
-        }
     }
 }
