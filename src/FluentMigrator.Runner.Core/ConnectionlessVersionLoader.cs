@@ -47,43 +47,6 @@ namespace FluentMigrator.Runner
 
         private bool _versionsLoaded;
 
-        [Obsolete]
-        internal ConnectionlessVersionLoader(
-            IGeneratorAccessor generatorAccessor,
-            IMigrationRunner runner,
-            IAssemblyCollection assemblies,
-            IConventionSet conventionSet,
-            IMigrationRunnerConventions conventions,
-            IRunnerContext runnerContext,
-            IVersionTableMetaData versionTableMetaData = null)
-        {
-            _migrationInformationLoader = runner.MigrationLoader;
-            _processor = runner.Processor;
-            _quoter = generatorAccessor.Generator.GetQuoter();
-
-            Runner = runner;
-            Assemblies = assemblies;
-            Conventions = conventions;
-            StartVersion = runnerContext.StartVersion;
-            TargetVersion = runnerContext.Version;
-
-            VersionInfo = new VersionInfo();
-            VersionTableMetaData = versionTableMetaData ??
-                (IVersionTableMetaData)Activator.CreateInstance(assemblies.Assemblies.GetVersionTableMetaDataType(
-                    Conventions, runnerContext));
-            VersionMigration = new VersionMigration(VersionTableMetaData);
-            VersionSchemaMigration = new VersionSchemaMigration(VersionTableMetaData);
-            VersionUniqueMigration = new VersionUniqueMigration(VersionTableMetaData);
-            VersionDescriptionMigration = new VersionDescriptionMigration(VersionTableMetaData);
-
-            if (VersionTableMetaData is DefaultVersionTableMetaData defaultMetaData)
-            {
-                conventionSet.SchemaConvention?.Apply(defaultMetaData);
-            }
-
-            LoadVersionInfo();
-        }
-
         public ConnectionlessVersionLoader(
             [NotNull] IGeneratorAccessor generatorAccessor,
             [NotNull] IProcessorAccessor processorAccessor,
@@ -108,10 +71,6 @@ namespace FluentMigrator.Runner
 
             LoadVersionInfo();
         }
-
-        [Obsolete]
-        [CanBeNull]
-        protected IAssemblyCollection Assemblies { get; set; }
 
         public IMigrationRunnerConventions Conventions { get; set; }
         public long StartVersion { get; set; }
