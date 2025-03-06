@@ -17,7 +17,7 @@ jobs:
         run: |  
           latest_active_channel_version=$(curl -s https://dotnetcli.blob.core.windows.net/dotnet/release-metadata/releases-index.json | jq -r '[.["releases-index"][] | select(.["support-phase"] == "active")] | max_by( ."channel-version" ) | .["channel-version"]')
           echo "Latest Active .NET Channel Version: $latest_active_channel_version"  
-          echo "LATEST_VERSION=" "$latest_active_channel_version" >> $GITHUB_ENV
+          echo "LATEST_VERSION=$latest_active_channel_version" >> $GITHUB_ENV
   
       - name: Update TargetFramework  
         run: |  
