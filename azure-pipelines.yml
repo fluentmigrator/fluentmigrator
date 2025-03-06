@@ -34,7 +34,7 @@ steps:
 
 - task: UseDotNet@2
   inputs:
-    version: '8.x'
+    version: '9.x'
 
 - task: gitversion/setup@0
   displayName: 'Install GitVersion (using GitTools 0.10.2.23031113 or later)'
