@@ -35,25 +35,6 @@ namespace FluentMigrator.Runner
     {
         private readonly IDictionary<MigrationStage, IList<IMigration>> _maintenance;
 
-        [Obsolete]
-        public MaintenanceLoader(IAssemblyCollection assemblyCollection, IEnumerable<string> tags, IMigrationRunnerConventions conventions)
-        {
-            var tagsList = tags?.ToArray() ?? new string[0];
-
-            _maintenance = (
-                from a in assemblyCollection.Assemblies
-                    from type in a.GetExportedTypes()
-                    let stage = conventions.GetMaintenanceStage(type)
-                    where stage != null
-                where conventions.HasRequestedTags(type, tagsList, false)
-                let migration = (IMigration)Activator.CreateInstance(type)
-                group migration by stage.GetValueOrDefault()
-            ).ToDictionary(
-                g => g.Key,
-                g => (IList<IMigration>)g.OrderBy(m => m.GetType().Name).ToArray()
-            );
-        }
-
         public MaintenanceLoader(
             [NotNull] IAssemblySource assemblySource,
             [NotNull] IOptions<RunnerOptions> options,

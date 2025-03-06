@@ -49,16 +49,6 @@ namespace FluentMigrator.Infrastructure
             _assemblies = assemblies;
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DefaultEmbeddedResourceProvider"/> class.
-        /// </summary>
-        /// <param name="assemblyCollection">The assembly collection to get the ebmedded resources for</param>
-        [Obsolete]
-        public DefaultEmbeddedResourceProvider([CanBeNull] IAssemblyCollection assemblyCollection)
-        {
-            _assemblies = assemblyCollection?.Assemblies;
-        }
-
         /// <inheritdoc />
         public IEnumerable<(string name, Assembly assembly)> GetEmbeddedResources()
         {
