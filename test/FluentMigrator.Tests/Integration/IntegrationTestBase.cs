@@ -222,7 +222,7 @@ $"No database processors are configured to run your migration tests.  This messa
             if (processorType == typeof(FirebirdProcessor) && _isFirstExecuteForFirebird)
             {
                 _isFirstExecuteForFirebird = false;
-                FbConnection.CreateDatabase(serverOptions.ConnectionString, overwrite: true);
+                FbConnection.CreateDatabase(serverOptions.ConnectionString, pageSize:16384, overwrite: true);
             }
 
             using (serviceProvider)

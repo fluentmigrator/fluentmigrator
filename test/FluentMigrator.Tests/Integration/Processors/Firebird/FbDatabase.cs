@@ -16,10 +16,14 @@
 //
 #endregion
 
-using System.IO;
 using System.Threading;
 
 using FirebirdSql.Data.FirebirdClient;
+
+using FluentMigrator.Runner;
+using FluentMigrator.Runner.Initialization;
+
+using Microsoft.Extensions.DependencyInjection;
 
 namespace FluentMigrator.Tests.Integration.Processors.Firebird
 {
@@ -27,9 +31,14 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
     {
         public static void CreateDatabase(string connectionString)
         {
-            var connectionStringBuilder = new FbConnectionStringBuilder(connectionString);
-            if (File.Exists(connectionStringBuilder.Database))
+            try
+            {
                 DropDatabase(connectionString);
+            }
+            catch
+            {
+                // Ignore
+            }
 
             FbConnection.CreateDatabase(connectionString);
         }
@@ -55,6 +64,22 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                     Thread.Sleep(100);
                 }
             }
+        }
+
+        public static IServiceCollection CreateFirebirdServices(FirebirdLibraryProber prober, out TemporaryDatabase temporaryDatabase)
+        {
+            var services = ServiceCollectionExtensions.CreateServices()
+                .ConfigureRunner(builder => builder.AddFirebird());
+
+            var tempDb = new TemporaryDatabase(IntegrationTestOptions.Firebird, prober);
+
+            services.AddScoped<IConnectionStringReader>(_ =>
+                new PassThroughConnectionStringReader(tempDb.ConnectionString)
+            );
+
+            temporaryDatabase = tempDb;
+
+            return services;
         }
     }
 }

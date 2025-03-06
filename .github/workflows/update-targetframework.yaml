@@ -1,0 +1,38 @@
+name: Update TargetFramework  
+  
+on:  
+  schedule:  
+    - cron: '0 0 * * 0' # Runs weekly  
+  workflow_dispatch:  
+  
+jobs:  
+  update-targetframework:  
+    runs-on: ubuntu-latest  
+    steps:  
+      - name: Checkout repository  
+        uses: actions/checkout@v2  
+  
+      - name: Get Latest .NET Version  
+        id: get-latest-version  
+        run: |  
+          latest_active_channel_version=$(curl -s https://dotnetcli.blob.core.windows.net/dotnet/release-metadata/releases-index.json | jq -r '[.["releases-index"][] | select(.["support-phase"] == "active")] | max_by( ."channel-version" ) | .["channel-version"]')
+          echo "Latest Active .NET Channel Version: $latest_active_channel_version"  
+          echo "LATEST_VERSION=$latest_active_channel_version" >> $GITHUB_ENV
+  
+      - name: Update TargetFramework  
+        run: |  
+          echo "Updating TargetFramework to net$LATEST_VERSION"  
+          find . -name '*.csproj' -exec sed -i "s/<TargetFramework>net[0-9.]*<\/TargetFramework>/<TargetFramework>net$LATEST_VERSION<\/TargetFramework>/g" {} +  
+          git config --global user.name 'github-actions[bot]'  
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'  
+          git checkout -b update-targetframework-net$LATEST_VERSION  
+          git commit -am "Update TargetFramework to net$LATEST_VERSION"  
+          git push origin update-targetframework-net$LATEST_VERSION
+  
+      - name: Create Pull Request  
+        uses: peter-evans/create-pull-request@v7  
+        with:  
+          branch: update-targetframework-net$LATEST_VERSION
+          title: Update TargetFramework to net$LATEST_VERSION
+          body: |  
+            This pull request updates the TargetFramework to net$LATEST_VERSION.  
