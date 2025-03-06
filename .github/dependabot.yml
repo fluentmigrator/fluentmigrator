@@ -6,6 +6,7 @@ updates:
       patterns:
         - "*Sqlite*"
         - "*Pgsql*"
+        - "Microsoft.Data.SqlClient"
         - "*Firebird*"
         - "Oracle.ManagedDataAccess" # .NET Framework dependency for FluentMigrator.Console
         - "Oracle.ManagedDataAccess.Core" # .NET dependency for FluentMigrator.DotNet.Cli
