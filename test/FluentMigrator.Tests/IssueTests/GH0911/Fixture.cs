@@ -45,10 +45,7 @@ namespace FluentMigrator.Tests.IssueTests.GH0911
         [SetUp]
         public void SetUp()
         {
-            if (!_dbOptions.IsEnabled)
-            {
-                Assert.Ignore();
-            }
+            _dbOptions.IgnoreIfNotEnabled();
 
             _dbTableName = $"Test_GH0911_{Guid.NewGuid():N}";
             _serviceProvider = new ServiceCollection()

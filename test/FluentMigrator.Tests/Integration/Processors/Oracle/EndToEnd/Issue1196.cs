@@ -26,8 +26,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle.EndToEnd
         [SetUp]
         public void SetUp()
         {
-            if (!IntegrationTestOptions.Oracle.IsEnabled)
-                Assert.Ignore();
+            IntegrationTestOptions.Oracle.IgnoreIfNotEnabled();
         }
 
         [Test]

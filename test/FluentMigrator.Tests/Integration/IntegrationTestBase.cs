@@ -73,10 +73,7 @@ namespace FluentMigrator.Tests.Integration
         {
             var serverOptions = serverOptionsGetter();
 
-            if (!serverOptions.IsEnabled)
-            {
-                Assert.Ignore($"The configuration for {processorType.Name} is not enabled.");
-            }
+            serverOptions.IgnoreIfNotEnabled();
 
             var services = ServiceCollectionExtensions.CreateServices()
                 .ConfigureRunner(

@@ -72,8 +72,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
         [SetUp]
         public void SetUp()
         {
-            if (!IntegrationTestOptions.Hana.IsEnabled)
-                Assert.Ignore();
+            IntegrationTestOptions.Hana.IgnoreIfNotEnabled();
 
             Output = new StringWriter();
             var serivces = ServiceCollectionExtensions.CreateServices()
