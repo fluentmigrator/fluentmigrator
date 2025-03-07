@@ -214,7 +214,7 @@ namespace FluentMigrator.Runner
         /// <summary>
         /// Gets a value indicating whether a single transaction for the whole session should be used
         /// </summary>
-        public bool TransactionPerSession => _options?.TransactionPerSession ?? RunnerContext?.TransactionPerSession ?? false;
+        public bool TransactionPerSession => _options?.TransactionPerSession ?? false;
 #pragma warning restore 612
 
         /// <summary>
@@ -284,7 +284,7 @@ namespace FluentMigrator.Runner
 
         private bool AllowBreakingChanges =>
 #pragma warning disable 612
-            _options?.AllowBreakingChange ?? RunnerContext?.AllowBreakingChange ?? false;
+            _options?.AllowBreakingChange ?? false;
 #pragma warning restore 612
 
         /// <summary>
