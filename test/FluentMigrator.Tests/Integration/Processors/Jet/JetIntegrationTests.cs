@@ -45,6 +45,9 @@ namespace FluentMigrator.Tests.Integration.Processors.Jet
             if (!IntegrationTestOptions.Jet.IsEnabled)
                 Assert.Ignore();
 
+            if (Environment.Is64BitOperatingSystem)
+                Assert.Inconclusive("Microsoft OLE DB Provider for Jet and Jet ODBC driver are available in 32-bit versions only https://learn.microsoft.com/en-us/office/troubleshoot/access/jet-odbc-driver-available-32-bit-version");
+
             var serivces = ServiceCollectionExtensions.CreateServices()
                 .ConfigureRunner(builder => builder.AddJet())
                 .AddScoped<IConnectionStringReader>(
