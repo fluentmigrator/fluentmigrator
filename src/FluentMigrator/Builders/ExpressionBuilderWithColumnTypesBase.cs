@@ -289,6 +289,8 @@ namespace FluentMigrator.Builders
             Column.Size = columnDataType.Size;
             Column.Precision = columnDataType.Precision;
             Column.CustomType = columnDataType.CustomType;
+            Column.Expression = columnDataType.Expression;
+            Column.ExpressionStored = columnDataType.ExpressionStored;
             return (TNext)(object)this;
         }
 

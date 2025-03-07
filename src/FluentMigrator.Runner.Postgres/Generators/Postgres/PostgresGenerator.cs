@@ -116,6 +116,10 @@ namespace FluentMigrator.Runner.Generators.Postgres
 
         public override string Generate(CreateTableExpression expression)
         {
+            if (expression.Columns.Any(x => !x.ExpressionStored))
+            {
+                CompatibilityMode.HandleCompatibility("Virtual computed columns are not supported");
+            }
             var createStatement = new StringBuilder();
             createStatement.AppendFormat(
                 CreateTable,
@@ -135,6 +139,10 @@ namespace FluentMigrator.Runner.Generators.Postgres
 
         public override string Generate(AlterColumnExpression expression)
         {
+            if (!expression.Column.ExpressionStored)
+            {
+                CompatibilityMode.HandleCompatibility("Virtual computed columns are not supported");
+            }
             var alterStatement = new StringBuilder();
             alterStatement.AppendFormat(
                 AlterColumn,
@@ -151,6 +159,10 @@ namespace FluentMigrator.Runner.Generators.Postgres
 
         public override string Generate(CreateColumnExpression expression)
         {
+            if (!expression.Column.ExpressionStored)
+            {
+                CompatibilityMode.HandleCompatibility("Virtual computed columns are not supported");
+            }
             var createStatement = new StringBuilder();
             createStatement.Append(base.Generate(expression));
 
