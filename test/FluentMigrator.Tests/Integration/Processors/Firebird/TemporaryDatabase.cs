@@ -29,8 +29,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
 
         public TemporaryDatabase(IntegrationTestOptions.DatabaseServerOptions connectionOptions, FirebirdLibraryProber prober)
         {
-            if (!connectionOptions.IsEnabled)
-                Assert.Ignore();
+            connectionOptions.IgnoreIfNotEnabled();
 
             if (connectionOptions.ContainerEnabled)
             {

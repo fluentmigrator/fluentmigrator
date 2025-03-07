@@ -116,10 +116,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle
 
         private ServiceProvider CreateProcessorServices([CanBeNull] Action<IServiceCollection> initAction)
         {
-            if (!IntegrationTestOptions.Oracle.IsEnabled)
-            {
-                Assert.Ignore();
-            }
+            IntegrationTestOptions.Oracle.IgnoreIfNotEnabled();
 
             var services = AddOracleServices(ServiceCollectionExtensions.CreateServices())
                 .AddScoped<IConnectionStringReader>(
