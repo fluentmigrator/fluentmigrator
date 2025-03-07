@@ -29,7 +29,7 @@ namespace FluentMigrator.Runner.Processors.Postgres
     public class Postgres10_0Processor : PostgresProcessor
     {
         public Postgres10_0Processor(
-            [NotNull] PostgresDbFactory factory,
+            [NotNull] IPostgresDbFactory factory,
             [NotNull] Postgres10_0Generator generator,
             [NotNull] ILogger<Postgres10_0Processor> logger,
             [NotNull] IOptionsSnapshot<ProcessorOptions> options,
