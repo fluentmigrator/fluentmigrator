@@ -199,8 +199,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
 
         private ServiceProvider CreateProcessorServices([CanBeNull] Action<IServiceCollection> initAction)
         {
-            if (!IntegrationTestOptions.Postgres.IsEnabled)
-                Assert.Ignore();
+            IntegrationTestOptions.Postgres.IgnoreIfNotEnabled();
 
             var serivces = ServiceCollectionExtensions.CreateServices()
                 .ConfigureRunner(r => r.AddPostgres())

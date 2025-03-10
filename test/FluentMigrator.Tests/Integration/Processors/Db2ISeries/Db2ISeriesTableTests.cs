@@ -87,8 +87,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Db2ISeries
         [OneTimeSetUp]
         public void ClassSetUp()
         {
-            if (!IntegrationTestOptions.Db2ISeries.IsEnabled)
-                Assert.Ignore();
+            IntegrationTestOptions.Db2ISeries.IgnoreIfNotEnabled();
 
             var serivces = ServiceCollectionExtensions.CreateServices()
                 .ConfigureRunner(builder => builder.AddDb2ISeries())

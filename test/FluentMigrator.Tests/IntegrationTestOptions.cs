@@ -24,7 +24,7 @@ using System.Reflection;
 
 using Microsoft.Extensions.Configuration;
 
-using static FluentMigrator.Tests.IntegrationTestOptions;
+using NUnit.Framework;
 
 namespace FluentMigrator.Tests
 {
@@ -44,9 +44,17 @@ namespace FluentMigrator.Tests
                 //  * FM_TestConnectionStrings__SqlServer2016__ContainerEnabled=true
                 .AddEnvironmentVariables("FM_")
                 .Build();
+
             DatabaseServers = config
                 .GetSection("TestConnectionStrings")
                 .Get<IReadOnlyDictionary<string, DatabaseServerOptions>>();
+
+            // Set the name for each DatabaseServers entries
+            foreach (var pair in DatabaseServers)
+            {
+                pair.Value.Name = pair.Key;
+            }
+
             if (Environment.Is64BitProcess)
             {
                 _platformIdentifiers = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
@@ -102,7 +110,10 @@ namespace FluentMigrator.Tests
             private string _supportedPlatformsValue;
             private string _originalConnectionString;
 
-            public static DatabaseServerOptions Empty { get; } = new DatabaseServerOptions() { IsEnabled = false };
+            public static DatabaseServerOptions Empty { get; } = new() { IsEnabled = false };
+
+            [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global", Justification = "Set by JSON serializer")]
+            public string Name { get; set; }
 
             [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global", Justification = "Set by JSON serializer")]
             public string ConnectionString { get; set; }
@@ -151,12 +162,23 @@ namespace FluentMigrator.Tests
 
                 return this;
             }
+
+            public void IgnoreIfNotEnabled()
+            {
+                if (!IsEnabled)
+                {
+                    Assert.Ignore($"{Name} is not enabled. To enable this test, go to appsettings.json and set TestConnectionStrings:{Name}:IsEnabled to true, or set environment variable FM_TestConnectionStrings__{Name}__IsEnabled=true.");
+                }
+            }
         }
 
         private static DatabaseServerOptions GetOptions(string key)
         {
             if (DatabaseServers.TryGetValue(key, out var options))
+            {
                 return options;
+            }
+
             return DatabaseServerOptions.Empty;
         }
     }

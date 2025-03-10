@@ -226,8 +226,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
 
         private ServiceProvider CreateProcessorServices([CanBeNull] Action<IServiceCollection> initAction, bool binaryGuid, bool useStrictTables)
         {
-            if (!IntegrationTestOptions.SQLite.IsEnabled)
-                Assert.Ignore();
+            IntegrationTestOptions.SQLite.IgnoreIfNotEnabled();
 
             var services = ServiceCollectionExtensions.CreateServices()
                 .ConfigureRunner(r => r.AddSQLite(binaryGuid, useStrictTables))

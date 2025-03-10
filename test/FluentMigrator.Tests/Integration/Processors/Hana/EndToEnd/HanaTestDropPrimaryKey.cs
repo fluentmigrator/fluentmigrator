@@ -26,8 +26,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana.EndToEnd
         [SetUp]
         public void SetUp()
         {
-            if (!IntegrationTestOptions.Hana.IsEnabled)
-                Assert.Ignore();
+            IntegrationTestOptions.Hana.IgnoreIfNotEnabled();
         }
 
         [Test]

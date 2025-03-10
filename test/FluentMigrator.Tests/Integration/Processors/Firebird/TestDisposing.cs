@@ -75,8 +75,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [SetUp]
         public void SetUp()
         {
-            if (!IntegrationTestOptions.Firebird.IsEnabled)
-                Assert.Ignore();
+            IntegrationTestOptions.Firebird.IgnoreIfNotEnabled();
 
             var services = FbDatabase.CreateFirebirdServices(_prober, out _temporaryDatabase);
 

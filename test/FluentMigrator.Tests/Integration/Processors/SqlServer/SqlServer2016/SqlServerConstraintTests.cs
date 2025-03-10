@@ -100,8 +100,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServer.SqlServer2016
         [OneTimeSetUp]
         public void ClassSetUp()
         {
-            if (!IntegrationTestOptions.SqlServer2016.IsEnabled)
-                Assert.Ignore();
+            IntegrationTestOptions.SqlServer2016.IgnoreIfNotEnabled();
 
             var serivces = ServiceCollectionExtensions.CreateServices()
                 .ConfigureRunner(r => r.AddSqlServer2016())

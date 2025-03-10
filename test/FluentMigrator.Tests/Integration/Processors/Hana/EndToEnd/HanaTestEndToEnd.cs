@@ -69,8 +69,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana.EndToEnd
 
             public ScopedConnection()
             {
-                if (!IntegrationTestOptions.Hana.IsEnabled)
-                    Assert.Ignore();
+                IntegrationTestOptions.Hana.IgnoreIfNotEnabled();
 
                 var serivces = ServiceCollectionExtensions.CreateServices()
                     .ConfigureRunner(builder => builder.AddHana())
