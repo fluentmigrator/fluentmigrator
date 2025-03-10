@@ -25,7 +25,7 @@ jobs:
           find . -name '*.csproj' | while read csproj; do
             # Extract the current TargetFrameworks value
             TARGET_FRAMEWORKS=$(grep -oP '(?<=<TargetFrameworks>).*?(?=</TargetFrameworks>)' "$csproj")
-            echo $TARGET_FRAMEWORKS
+            echo "TARGET_FRAMEWORKS" $TARGET_FRAMEWORKS
             if [[ -n "$TARGET_FRAMEWORKS" ]]; then
               # Check if the LATEST_VERSION is already in the TargetFrameworks
               if [[ ! "$TARGET_FRAMEWORKS" =~ (^|;)${LATEST_VERSION}($|;) ]]; then
@@ -33,6 +33,7 @@ jobs:
                 NEW_TARGET_FRAMEWORKS="${TARGET_FRAMEWORKS};${LATEST_VERSION}"
                 # Replace the old TargetFrameworks with the new one
                 sed -i "s|<TargetFrameworks>${TARGET_FRAMEWORKS}</TargetFrameworks>|<TargetFrameworks>${NEW_TARGET_FRAMEWORKS}</TargetFrameworks>|g" "$csproj"
+                echo "NEW_TARGET_FRAMEWORKS" $NEW_TARGET_FRAMEWORKS
               fi
             fi
           done
