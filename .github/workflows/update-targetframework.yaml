@@ -30,11 +30,11 @@ jobs:
           git push origin update-targetframework-net$LATEST_VERSION
 
           gh pr create `
-          --title "Add support for TargetFramework net$LATEST_VERSION." `
-          --body "According to https://dotnetcli.blob.core.windows.net/dotnet/release-metadata/releases-index.json, a new major release of .NET runtime is now actively supported." `
-          --base main `
-          --head update-targetframework-net$LATEST_VERSION `
-          --label feature `
+          --title "Add support for TargetFramework net$LATEST_VERSION." \
+          --body "According to https://dotnetcli.blob.core.windows.net/dotnet/release-metadata/releases-index.json, a new major release of .NET runtime is now actively supported." \
+          --base main \
+          --head update-targetframework-net$LATEST_VERSION \
+          --label feature \
           --draft=false
         # Per https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/using-github-cli-in-workflows
         # Quote: "GitHub CLI is preinstalled on all GitHub-hosted runners. For each step that uses GitHub CLI, you must set an environment variable called GH_TOKEN to a token with the required scopes."
