@@ -29,7 +29,7 @@ jobs:
           git commit -am "Update TargetFramework to net$LATEST_VERSION"  
           git push origin update-targetframework-net$LATEST_VERSION
 
-          gh pr create `
+          gh pr create \
           --title "Add support for TargetFramework net$LATEST_VERSION." \
           --body "According to https://dotnetcli.blob.core.windows.net/dotnet/release-metadata/releases-index.json, a new major release of .NET runtime is now actively supported." \
           --base main \
