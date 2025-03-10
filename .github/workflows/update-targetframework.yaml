@@ -38,6 +38,7 @@ jobs:
               fi
             fi
           done
+          echo "done with find"
           git config --global user.name 'github-actions[bot]'  
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'  
           git checkout -b update-targetframework-$LATEST_TFM_VERSION  
