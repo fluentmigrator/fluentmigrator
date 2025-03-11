@@ -22,6 +22,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 using JetBrains.Annotations;
+using NotNull = JetBrains.Annotaitons.NotNullAttribute;
 
 #if NETFRAMEWORK
 using FluentMigrator.Runner.Initialization.NetFramework;
