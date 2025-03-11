@@ -21,6 +21,7 @@ using System.Linq;
 
 using FluentMigrator.Runner.Generators.Firebird;
 using FluentMigrator.Runner.Processors.Firebird;
+
 using NUnit.Framework;
 
 using Shouldly;
@@ -229,54 +230,55 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 VARCHAR(10) NOT NULL");
         }
-[Test]
-public virtual void CanCreateText()
-{
-    var expression = GeneratorTestHelper.GetCreateColumnExpression();
-    expression.Column.Size = 1048576;
 
-    var result = Generator.Generate(expression);
-    result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 BLOB SUB_TYPE TEXT NOT NULL");
-}
+        [Test]
+        public virtual void CanCreateText()
+        {
+            var expression = GeneratorTestHelper.GetCreateColumnExpression();
+            expression.Column.Size = 1048576;
 
-[Test]
-public override void CanCreateColumnWithComputedExpression()
-{
-    var expression = GeneratorTestHelper.GetCreateColumnExpressionWithComputed();
-    
-    var result = Generator.Generate(expression);
-    result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 GENERATED ALWAYS AS (Price * Quantity) NOT NULL");
-}
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 BLOB SUB_TYPE TEXT NOT NULL");
+        }
 
-[Test]
-public override void CanCreateColumnWithStoredComputedExpression()
-{
-    var expression = GeneratorTestHelper.GetCreateColumnExpressionWithStoredComputed();
-    
-    var result = Generator.Generate(expression);
-    // Firebird doesn't support stored computed columns, so it should be the same as non-stored
-    result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 GENERATED ALWAYS AS (Price * Quantity) NOT NULL");
-}
+        [Test]
+        public override void CanCreateColumnWithComputedExpression()
+        {
+            var expression = GeneratorTestHelper.GetCreateColumnExpressionWithComputed();
 
-[Test]
-public override void CanAlterColumnToAddComputedExpression()
-{
-    var expression = GeneratorTestHelper.GetAlterColumnExpressionWithComputed();
-    
-    var result = Generator.Generate(expression);
-    // Firebird doesn't support altering columns to add computed expressions
-    result.ShouldBe(string.Empty);
-}
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 GENERATED ALWAYS AS (Price * Quantity) NOT NULL");
+        }
 
-[Test]
-public override void CanAlterColumnToAddStoredComputedExpression()
-{
-    var expression = GeneratorTestHelper.GetAlterColumnExpressionWithStoredComputed();
-    
-    var result = Generator.Generate(expression);
-    // Firebird doesn't support altering columns to add computed expressions
-    result.ShouldBe(string.Empty);
-}
+        [Test]
+        public override void CanCreateColumnWithStoredComputedExpression()
+        {
+            var expression = GeneratorTestHelper.GetCreateColumnExpressionWithStoredComputed();
+
+            var result = Generator.Generate(expression);
+            // Firebird doesn't support stored computed columns, so it should be the same as non-stored
+            result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 GENERATED ALWAYS AS (Price * Quantity) NOT NULL");
+        }
+
+        [Test]
+        public override void CanAlterColumnToAddComputedExpression()
+        {
+            var expression = GeneratorTestHelper.GetAlterColumnExpressionWithComputed();
+
+            var result = Generator.Generate(expression);
+            // Firebird doesn't support altering columns to add computed expressions
+            result.ShouldBe(string.Empty);
+        }
+
+        [Test]
+        public override void CanAlterColumnToAddStoredComputedExpression()
+        {
+            var expression = GeneratorTestHelper.GetAlterColumnExpressionWithStoredComputed();
+
+            var result = Generator.Generate(expression);
+            // Firebird doesn't support altering columns to add computed expressions
+            result.ShouldBe(string.Empty);
+        }
 
     }
 }
