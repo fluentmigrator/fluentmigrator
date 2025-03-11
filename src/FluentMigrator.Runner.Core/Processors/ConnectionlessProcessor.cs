@@ -46,7 +46,7 @@ namespace FluentMigrator.Runner.Processors
         {
             _logger = logger;
             var generator = generatorAccessor.Generator;
-            DatabaseType = string.IsNullOrEmpty(accessorOptions.Value.ProcessorId) ? generator.GetName() : accessorOptions.Value.ProcessorId;
+            DatabaseType = string.IsNullOrEmpty(accessorOptions.Value.ProcessorId) ? generator.GetName(_logger) : accessorOptions.Value.ProcessorId;
             Generator = generator;
             Options = options.Value;
 #pragma warning disable 612
@@ -62,7 +62,7 @@ namespace FluentMigrator.Runner.Processors
         {
             _logger = logger;
             var generator = generatorAccessor.Generator;
-            DatabaseType = processorIds.FirstOrDefault() ?? generator.GetName();
+            DatabaseType = processorIds.FirstOrDefault() ?? generator.GetName(_logger);
             DatabaseTypeAliases = processorIds.Count == 0 ? Array.Empty<string>() : processorIds.Skip(1).ToArray();
             Generator = generator;
             Options = options.Value;

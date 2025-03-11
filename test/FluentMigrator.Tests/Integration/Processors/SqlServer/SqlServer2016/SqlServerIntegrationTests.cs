@@ -67,8 +67,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServer.SqlServer2016
 
         protected ServiceProvider CreateProcessorServices([CanBeNull] Action<IServiceCollection> initAction)
         {
-            if (!IntegrationTestOptions.SqlServer2016.IsEnabled)
-                Assert.Ignore();
+            IntegrationTestOptions.SqlServer2016.IgnoreIfNotEnabled();
 
             var serivces = ServiceCollectionExtensions.CreateServices()
                 .ConfigureRunner(r => r.AddSqlServer2016())

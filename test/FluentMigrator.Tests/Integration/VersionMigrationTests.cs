@@ -16,14 +16,16 @@
 //
 #endregion
 
+using System;
+
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Runner.Processors.MySql;
-using FluentMigrator.Runner.Processors.Snowflake;
 using FluentMigrator.Runner.Processors.SQLite;
 using FluentMigrator.Runner.Versioning;
 using FluentMigrator.Runner.VersionTableInfo;
+using FluentMigrator.Tests.Integration.TestCases;
 using FluentMigrator.Tests.Unit;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -36,22 +38,14 @@ using Shouldly;
 namespace FluentMigrator.Tests.Integration
 {
     [TestFixture]
-    [Category("Integration")]
-    [Category("Firebird")]
-    [Category("MySql")]
-    [Category("SQLite")]
-    [Category("Postgres")]
-    [Category("Snowflake")]
-    [Category("SqlServer2005")]
-    [Category("SqlServer2008")]
-    [Category("SqlServer2012")]
-    [Category("SqlServer2014")]
     public class VersionMigrationTests : IntegrationTestBase
     {
         [Test]
-        public void CanUseVersionInfo()
+        [TestCaseSource(typeof(ProcessorTestCaseSource))]
+        public void CanUseVersionInfo(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithProcessor(
+                processorType,
                 services => services.WithMigrationsIn("FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3"),
                 (serviceProvider, processor) =>
                 {
@@ -70,13 +64,20 @@ namespace FluentMigrator.Tests.Integration
 
                     runner.Down(new VersionMigration(tableMetaData));
                     processor.TableExists(tableMetaData.SchemaName, tableMetaData.TableName).ShouldBeFalse();
-                });
+                },
+                serverOptions);
         }
 
         [Test]
-        public void CanUseCustomVersionInfo()
+        [TestCaseSource(typeof(ProcessorTestCaseSourceExcept<
+            SQLiteProcessor,
+            MySqlProcessor,
+            FirebirdProcessor
+        >))]
+        public void CanUseCustomVersionInfo(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithProcessor(
+                processorType,
                 services => services
                     .WithMigrationsIn("FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3")
                     .AddScoped<IVersionTableMetaDataAccessor>(_ => new PassThroughVersionTableMetaDataAccessor(new TestVersionTableMetaData())),
@@ -104,16 +105,16 @@ namespace FluentMigrator.Tests.Integration
                     processor.TableExists(tableMetaData.SchemaName, tableMetaData.TableName).ShouldBeFalse();
                     processor.SchemaExists(tableMetaData.SchemaName).ShouldBeFalse();
                 },
-                true,
-                typeof(SQLiteProcessor),
-                typeof(MySqlProcessor),
-                typeof(FirebirdProcessor));
+                serverOptions,
+                true);
         }
 
         [Test]
-        public void CanUseCustomVersionInfoDefaultSchema()
+        [TestCaseSource(typeof(ProcessorTestCaseSource))]
+        public void CanUseCustomVersionInfoDefaultSchema(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithProcessor(
+                processorType,
                 services => services
                     .WithMigrationsIn("FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3")
                     .AddScoped<IVersionTableMetaDataAccessor>(
@@ -139,7 +140,8 @@ namespace FluentMigrator.Tests.Integration
                     runner.RollbackToVersion(0);
 
                     processor.TableExists(null, tableMetaData.TableName).ShouldBeFalse();
-                });
+                },
+                serverOptions);
         }
     }
 }

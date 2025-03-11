@@ -134,8 +134,7 @@ namespace FluentMigrator.Tests.Integration.Processors.MySql
 
         private static ServiceProvider CreateProcessorServices([CanBeNull] Action<IServiceCollection> initAction)
         {
-            if (!IntegrationTestOptions.MySql.IsEnabled)
-                Assert.Ignore();
+            IntegrationTestOptions.MySql.IgnoreIfNotEnabled();
 
             var serivces = ServiceCollectionExtensions.CreateServices()
                 .ConfigureRunner(builder => builder.AddMySql4())
