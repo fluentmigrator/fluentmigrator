@@ -9,7 +9,7 @@
     <Description>Console runner for FluentMigrator</Description>
     <IsPackable>false</IsPackable>
     <Platforms>AnyCPU;x64;x86</Platforms>
-    <RuntimeIdentifiers>win7-x86;win7-x64;any</RuntimeIdentifiers>
+    <RuntimeIdentifiers>win-x86;win-x64;any</RuntimeIdentifiers>
   </PropertyGroup>
   <Import Project="$(MSBuildThisFileDirectory)../../PackageTool.props" />
   <ItemGroup>
