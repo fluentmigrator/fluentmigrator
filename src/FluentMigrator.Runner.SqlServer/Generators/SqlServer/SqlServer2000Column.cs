@@ -80,7 +80,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         protected override string FormatExpression(ColumnDefinition column)
         {
-            return column.Expression == null ? null : "AS " + column.Expression + (column.ExpressionStored ? " PERSISTED" : "");
+            return column.Expression == null ? null : $"AS ({column.Expression}){(column.ExpressionStored ? " PERSISTED" : "")}";
         }
     }
 }

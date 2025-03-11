@@ -115,7 +115,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
         /// <inheritdoc />
         protected override string FormatExpression(ColumnDefinition column)
         {
-            return column.Expression == null ? null : "GENERATED ALWAYS AS " + column.Expression + (column.ExpressionStored ? " STORED" : " VIRTUAL");
+            return column.Expression == null ? null : $"GENERATED ALWAYS AS ({column.Expression}){(column.ExpressionStored ? " STORED" : " VIRTUAL")}";
         }
     }
 }

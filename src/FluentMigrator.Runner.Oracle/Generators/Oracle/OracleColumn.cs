@@ -102,7 +102,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
         /// <inheritdoc/>
         protected override string FormatExpression(ColumnDefinition column)
         {
-            return column.Expression == null ? null : "GENERATED ALWAYS AS " + column.Expression;
+            return column.Expression == null ? null : $"GENERATED ALWAYS AS ({column.Expression})";
         }
     }
 }

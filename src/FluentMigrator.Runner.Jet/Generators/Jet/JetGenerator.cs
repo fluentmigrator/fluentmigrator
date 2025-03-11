@@ -74,7 +74,7 @@ namespace FluentMigrator.Runner.Generators.Jet
         {
             if (expression.Columns.Any(x => x.Expression != null))
             {
-                CompatibilityMode.HandleCompatibility("Computed columns are not supported for Jet");
+                return CompatibilityMode.HandleCompatibility("Computed columns are not supported for Jet");
             }
             return base.Generate(expression);
         }
@@ -83,7 +83,7 @@ namespace FluentMigrator.Runner.Generators.Jet
         {
             if (expression.Column.Expression != null)
             {
-                CompatibilityMode.HandleCompatibility("Computed columns are not supported for Jet");
+                return CompatibilityMode.HandleCompatibility("Computed columns are not supported for Jet");
             }
             return base.Generate(expression);
         }
@@ -92,7 +92,7 @@ namespace FluentMigrator.Runner.Generators.Jet
         {
             if (expression.Column.Expression != null)
             {
-                CompatibilityMode.HandleCompatibility("Computed columns are not supported for Jet");
+                return CompatibilityMode.HandleCompatibility("Computed columns are not supported for Jet");
             }
             return base.Generate(expression);
         }

@@ -77,7 +77,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
         /// <inheritdoc/>
         protected override string FormatExpression(ColumnDefinition column)
         {
-            return column.Expression == null ? null : "GENERATED ALWAYS AS " + column.Expression;
+            return column.Expression == null ? null : $"GENERATED ALWAYS AS ({column.Expression})";
         }
     }
 }

@@ -168,7 +168,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
         /// <inheritdoc />
         protected override string FormatExpression(ColumnDefinition column)
         {
-            return column.Expression == null ? null : "GENERATED ALWAYS AS " + column.Expression + " STORED";
+            return column.Expression == null ? null : $"GENERATED ALWAYS AS ({column.Expression}) STORED";
         }
     }
 }

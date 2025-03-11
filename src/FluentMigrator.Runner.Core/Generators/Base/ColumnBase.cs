@@ -110,7 +110,7 @@ namespace FluentMigrator.Runner.Generators.Base
         /// </summary>
         protected virtual string FormatExpression(ColumnDefinition column)
         {
-            return column.Expression == null ? null : "GENERATED ALWAYS AS " + column.Expression + (column.ExpressionStored ? " STORED" : "");
+            return column.Expression == null ? null : $"GENERATED ALWAYS AS ({column.Expression}){(column.ExpressionStored ? " STORED" : "")}";
         }
 
         /// <summary>
