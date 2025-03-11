@@ -233,61 +233,6 @@ namespace Microsoft.Extensions.DependencyInjection
             return services;
         }
 
-        /// <summary>
-        /// Creates services for a given runner context, connection string provider and assembly loader factory.
-        /// </summary>
-        /// <param name="runnerContext">The runner context</param>
-        /// <param name="connectionStringProvider">The connection string provider</param>
-        /// <param name="defaultAssemblyLoaderFactory">The assembly loader factory</param>
-        /// <param name="configureRunner">The runner builder config deletage</param>
-        /// <returns>The new service collection</returns>
-        [NotNull]
-        [Obsolete]
-        internal static IServiceCollection CreateServices(
-            [NotNull] this IRunnerContext runnerContext,
-            [CanBeNull] IConnectionStringProvider connectionStringProvider,
-            [CanBeNull] AssemblyLoaderFactory defaultAssemblyLoaderFactory = null,
-            [CanBeNull] Action<IMigrationRunnerBuilder> configureRunner = null)
-        {
-            var services = new ServiceCollection();
-            var assemblyLoaderFactory = defaultAssemblyLoaderFactory ?? new AssemblyLoaderFactory();
-
-            if (!runnerContext.NoConnection && connectionStringProvider == null)
-            {
-                runnerContext.NoConnection = true;
-            }
-
-            // Configure the migration runner
-            services
-                .AddLogging(lb => lb.AddProvider(new LegacyFluentMigratorLoggerProvider(runnerContext.Announcer)))
-                .AddFluentMigratorCore()
-                .ConfigureRunner(c => configureRunner?.Invoke(c))
-                .Configure<SelectingProcessorAccessorOptions>(opt => opt.ProcessorId = runnerContext.Database)
-                .AddSingleton(assemblyLoaderFactory)
-                .Configure<TypeFilterOptions>(
-                    opt =>
-                    {
-                        opt.Namespace = runnerContext.Namespace;
-                        opt.NestedNamespaces = runnerContext.NestedNamespaces;
-                    })
-                .Configure<AssemblySourceOptions>(opt => opt.AssemblyNames = runnerContext.Targets)
-                .Configure<RunnerOptions>(
-                    opt => { opt.SetValuesFrom(runnerContext); })
-                .Configure<ProcessorOptions>(opt => { opt.SetValuesFrom(runnerContext); })
-                .Configure<AppConfigConnectionStringAccessorOptions>(
-                    opt => opt.ConnectionStringConfigPath = runnerContext.ConnectionStringConfigPath);
-
-            // Configure the processor
-            if (runnerContext.NoConnection)
-            {
-                // Always return the connectionless processor
-                services
-                    .AddScoped<IProcessorAccessor, ConnectionlessProcessorAccessor>();
-            }
-
-            return services;
-        }
-
         private class MigrationRunnerBuilder : IMigrationRunnerBuilder
         {
             public MigrationRunnerBuilder(IServiceCollection services)
