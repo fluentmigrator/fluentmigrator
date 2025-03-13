@@ -35,7 +35,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
             FBOptions = fbOptions;
 
             //In firebird DEFAULT clause precedes NULLABLE clause
-            ClauseOrder = new List<Func<ColumnDefinition, string>> { FormatString, FormatType, FormatDefaultValue, FormatNullable, FormatPrimaryKey, FormatIdentity };
+            ClauseOrder = new List<Func<ColumnDefinition, string>> { FormatString, FormatType, FormatExpression, FormatDefaultValue, FormatNullable, FormatPrimaryKey, FormatIdentity };
         }
 
         protected FirebirdOptions FBOptions { get; }
@@ -72,6 +72,12 @@ namespace FluentMigrator.Runner.Generators.Firebird
         public virtual string GenerateForDefaultAlter(ColumnDefinition column)
         {
             return FormatDefaultValue(column);
+        }
+
+        /// <inheritdoc/>
+        protected override string FormatExpression(ColumnDefinition column)
+        {
+            return column.Expression == null ? null : $"GENERATED ALWAYS AS ({column.Expression})";
         }
     }
 }
