@@ -24,7 +24,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             expression.Index.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE ASC INDEX TestIndex ON TestTable1 (TestColumn1)");
+            result.ShouldBe("CREATE ASC INDEX TestIndex ON TestTable1 (TestColumn1);");
         }
 
         [Test]
@@ -33,7 +33,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             var expression = GeneratorTestHelper.GetCreateIndexExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE ASC INDEX TestIndex ON TestTable1 (TestColumn1)");
+            result.ShouldBe("CREATE ASC INDEX TestIndex ON TestTable1 (TestColumn1);");
         }
 
         [Test]
@@ -43,7 +43,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             expression.Index.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE ASC INDEX TestIndex ON TestTable1 (TestColumn1, TestColumn2)");
+            result.ShouldBe("CREATE ASC INDEX TestIndex ON TestTable1 (TestColumn1, TestColumn2);");
         }
 
         [Test]
@@ -52,7 +52,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             var expression = GeneratorTestHelper.GetCreateMultiColumnCreateIndexExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE ASC INDEX TestIndex ON TestTable1 (TestColumn1, TestColumn2)");
+            result.ShouldBe("CREATE ASC INDEX TestIndex ON TestTable1 (TestColumn1, TestColumn2);");
         }
 
         [Test]
@@ -62,7 +62,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             expression.Index.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE ASC INDEX TestIndex ON TestTable1 (TestColumn1, TestColumn2)");
+            result.ShouldBe("CREATE UNIQUE ASC INDEX TestIndex ON TestTable1 (TestColumn1, TestColumn2);");
         }
 
         [Test]
@@ -71,7 +71,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             var expression = GeneratorTestHelper.GetCreateUniqueMultiColumnIndexExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE ASC INDEX TestIndex ON TestTable1 (TestColumn1, TestColumn2)");
+            result.ShouldBe("CREATE UNIQUE ASC INDEX TestIndex ON TestTable1 (TestColumn1, TestColumn2);");
         }
 
         [Test]
@@ -81,7 +81,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             expression.Index.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE ASC INDEX TestIndex ON TestTable1 (TestColumn1)");
+            result.ShouldBe("CREATE UNIQUE ASC INDEX TestIndex ON TestTable1 (TestColumn1);");
         }
 
         [Test]
@@ -90,7 +90,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             var expression = GeneratorTestHelper.GetCreateUniqueIndexExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE ASC INDEX TestIndex ON TestTable1 (TestColumn1)");
+            result.ShouldBe("CREATE UNIQUE ASC INDEX TestIndex ON TestTable1 (TestColumn1);");
         }
 
         [Test]
@@ -100,7 +100,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             expression.Index.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DROP INDEX TestIndex");
+            result.ShouldBe("DROP INDEX TestIndex;");
         }
 
         [Test]
@@ -109,7 +109,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             var expression = GeneratorTestHelper.GetDeleteIndexExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DROP INDEX TestIndex");
+            result.ShouldBe("DROP INDEX TestIndex;");
         }
     }
 }

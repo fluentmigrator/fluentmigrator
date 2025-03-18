@@ -48,7 +48,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
             [NotNull] ISQLiteTypeMap typeMap)
             : this(quoter, typeMap, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()))
         {
-            
+
         }
 
         public SQLiteGenerator(
@@ -168,7 +168,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
                 }
             }
 
-            return string.Format(CreateIndex
+            return FormatStatement(CreateIndex
                 , GetUniqueString(expression)
                 , GetClusterTypeString(expression)
                 , Quoter.QuoteIndexName(expression.Index.Name, expression.Index.SchemaName)
@@ -180,7 +180,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
         {
             // SQLite prefixes the index name, rather than the table name with the schema
 
-            return string.Format(DropIndex, Quoter.QuoteIndexName(expression.Index.Name, expression.Index.SchemaName));
+            return FormatStatement(DropIndex, Quoter.QuoteIndexName(expression.Index.Name, expression.Index.SchemaName));
         }
     }
 }

@@ -1,21 +1,3 @@
-#region License
-//
-// Copyright (c) 2018, Fluent Migrator Project
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
-#endregion
-
 using System.Collections.Generic;
 using System.Linq;
 
@@ -64,7 +46,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             expression.Columns[1].CustomType = "timestamp";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe($@"CREATE TABLE ""{TestSchema}"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL, ""TestColumn2"" timestamp NOT NULL, PRIMARY KEY (""TestColumn1""))", _quotingEnabled);
+            result.ShouldBe($@"CREATE TABLE ""{TestSchema}"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL, ""TestColumn2"" timestamp NOT NULL, PRIMARY KEY (""TestColumn1""));", _quotingEnabled);
         }
 
         [Test]
@@ -76,7 +58,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             expression.Columns[1].CustomType = "timestamp";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"CREATE TABLE ""PUBLIC"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL, ""TestColumn2"" timestamp NOT NULL, PRIMARY KEY (""TestColumn1""))", _quotingEnabled);
+            result.ShouldBe(@"CREATE TABLE ""PUBLIC"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL, ""TestColumn2"" timestamp NOT NULL, PRIMARY KEY (""TestColumn1""));", _quotingEnabled);
         }
 
         [Test]
@@ -86,7 +68,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             expression.SchemaName = TestSchema;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe($@"CREATE TABLE ""{TestSchema}"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL, ""TestColumn2"" NUMBER NOT NULL)", _quotingEnabled);
+            result.ShouldBe($@"CREATE TABLE ""{TestSchema}"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL, ""TestColumn2"" NUMBER NOT NULL);", _quotingEnabled);
         }
 
         [Test]
@@ -94,7 +76,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"CREATE TABLE ""PUBLIC"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL, ""TestColumn2"" NUMBER NOT NULL)", _quotingEnabled);
+            result.ShouldBe(@"CREATE TABLE ""PUBLIC"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL, ""TestColumn2"" NUMBER NOT NULL);", _quotingEnabled);
         }
 
         [Test]
@@ -106,7 +88,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             expression.Columns[0].TableName = expression.TableName;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe($@"CREATE TABLE ""{TestSchema}"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL DEFAULT NULL, ""TestColumn2"" NUMBER NOT NULL)", _quotingEnabled);
+            result.ShouldBe($@"CREATE TABLE ""{TestSchema}"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL DEFAULT NULL, ""TestColumn2"" NUMBER NOT NULL);", _quotingEnabled);
         }
 
         [Test]
@@ -117,7 +99,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             expression.Columns[0].TableName = expression.TableName;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe($@"CREATE TABLE ""PUBLIC"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL DEFAULT NULL, ""TestColumn2"" NUMBER NOT NULL)", _quotingEnabled);
+            result.ShouldBe($@"CREATE TABLE ""PUBLIC"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL DEFAULT NULL, ""TestColumn2"" NUMBER NOT NULL);", _quotingEnabled);
         }
 
         [Test]
@@ -127,7 +109,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             expression.SchemaName = TestSchema;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe($@"CREATE TABLE ""{TestSchema}"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL DEFAULT 'Default', ""TestColumn2"" NUMBER NOT NULL DEFAULT 0)", _quotingEnabled);
+            result.ShouldBe($@"CREATE TABLE ""{TestSchema}"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL DEFAULT 'Default', ""TestColumn2"" NUMBER NOT NULL DEFAULT 0);", _quotingEnabled);
         }
 
         [Test]
@@ -135,7 +117,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         {
             var expression = GeneratorTestHelper.GetCreateTableWithDefaultValue();
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"CREATE TABLE ""PUBLIC"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL DEFAULT 'Default', ""TestColumn2"" NUMBER NOT NULL DEFAULT 0)", _quotingEnabled);
+            result.ShouldBe(@"CREATE TABLE ""PUBLIC"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL DEFAULT 'Default', ""TestColumn2"" NUMBER NOT NULL DEFAULT 0);", _quotingEnabled);
         }
 
         [Test]
@@ -145,7 +127,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             expression.SchemaName = TestSchema;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe($@"CREATE TABLE ""{TestSchema}"".""TestTable1"" (""TestColumn1"" NUMBER NOT NULL IDENTITY(1,1), ""TestColumn2"" NUMBER NOT NULL)", _quotingEnabled);
+            result.ShouldBe($@"CREATE TABLE ""{TestSchema}"".""TestTable1"" (""TestColumn1"" NUMBER NOT NULL IDENTITY(1,1), ""TestColumn2"" NUMBER NOT NULL);", _quotingEnabled);
         }
 
         [Test]
@@ -153,7 +135,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         {
             var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"CREATE TABLE ""PUBLIC"".""TestTable1"" (""TestColumn1"" NUMBER NOT NULL IDENTITY(1,1), ""TestColumn2"" NUMBER NOT NULL)", _quotingEnabled);
+            result.ShouldBe(@"CREATE TABLE ""PUBLIC"".""TestTable1"" (""TestColumn1"" NUMBER NOT NULL IDENTITY(1,1), ""TestColumn2"" NUMBER NOT NULL);", _quotingEnabled);
         }
 
         [Test]
@@ -163,7 +145,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             expression.SchemaName = TestSchema;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe($@"CREATE TABLE ""{TestSchema}"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL, ""TestColumn2"" NUMBER NOT NULL, PRIMARY KEY (""TestColumn1"", ""TestColumn2""))", _quotingEnabled);
+            result.ShouldBe($@"CREATE TABLE ""{TestSchema}"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL, ""TestColumn2"" NUMBER NOT NULL, PRIMARY KEY (""TestColumn1"", ""TestColumn2""));", _quotingEnabled);
         }
 
         [Test]
@@ -173,7 +155,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
 
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"CREATE TABLE ""PUBLIC"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL, ""TestColumn2"" NUMBER NOT NULL, PRIMARY KEY (""TestColumn1"", ""TestColumn2""))", _quotingEnabled);
+            result.ShouldBe(@"CREATE TABLE ""PUBLIC"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL, ""TestColumn2"" NUMBER NOT NULL, PRIMARY KEY (""TestColumn1"", ""TestColumn2""));", _quotingEnabled);
         }
 
         [Test]
@@ -183,7 +165,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             expression.SchemaName = TestSchema;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe($@"CREATE TABLE ""{TestSchema}"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL, ""TestColumn2"" NUMBER NOT NULL, CONSTRAINT ""TestKey"" PRIMARY KEY (""TestColumn1"", ""TestColumn2""))", _quotingEnabled);
+            result.ShouldBe($@"CREATE TABLE ""{TestSchema}"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL, ""TestColumn2"" NUMBER NOT NULL, CONSTRAINT ""TestKey"" PRIMARY KEY (""TestColumn1"", ""TestColumn2""));", _quotingEnabled);
         }
 
         [Test]
@@ -191,7 +173,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         {
             var expression = GeneratorTestHelper.GetCreateTableWithNamedMultiColumnPrimaryKeyExpression();
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"CREATE TABLE ""PUBLIC"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL, ""TestColumn2"" NUMBER NOT NULL, CONSTRAINT ""TestKey"" PRIMARY KEY (""TestColumn1"", ""TestColumn2""))", _quotingEnabled);
+            result.ShouldBe(@"CREATE TABLE ""PUBLIC"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL, ""TestColumn2"" NUMBER NOT NULL, CONSTRAINT ""TestKey"" PRIMARY KEY (""TestColumn1"", ""TestColumn2""));", _quotingEnabled);
         }
 
         [Test]
@@ -201,7 +183,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             expression.SchemaName = TestSchema;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe($@"CREATE TABLE ""{TestSchema}"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL, ""TestColumn2"" NUMBER NOT NULL, CONSTRAINT ""TestKey"" PRIMARY KEY (""TestColumn1""))", _quotingEnabled);
+            result.ShouldBe($@"CREATE TABLE ""{TestSchema}"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL, ""TestColumn2"" NUMBER NOT NULL, CONSTRAINT ""TestKey"" PRIMARY KEY (""TestColumn1""));", _quotingEnabled);
         }
 
         [Test]
@@ -209,7 +191,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         {
             var expression = GeneratorTestHelper.GetCreateTableWithNamedPrimaryKeyExpression();
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"CREATE TABLE ""PUBLIC"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL, ""TestColumn2"" NUMBER NOT NULL, CONSTRAINT ""TestKey"" PRIMARY KEY (""TestColumn1""))", _quotingEnabled);
+            result.ShouldBe(@"CREATE TABLE ""PUBLIC"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL, ""TestColumn2"" NUMBER NOT NULL, CONSTRAINT ""TestKey"" PRIMARY KEY (""TestColumn1""));", _quotingEnabled);
         }
 
         [Test]
@@ -220,7 +202,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             expression.Columns[0].IsNullable = true;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe($@"CREATE TABLE ""{TestSchema}"".""TestTable1"" (""TestColumn1"" VARCHAR, ""TestColumn2"" NUMBER NOT NULL)", _quotingEnabled);
+            result.ShouldBe($@"CREATE TABLE ""{TestSchema}"".""TestTable1"" (""TestColumn1"" VARCHAR, ""TestColumn2"" NUMBER NOT NULL);", _quotingEnabled);
         }
 
         [Test]
@@ -229,7 +211,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             var expression = GeneratorTestHelper.GetCreateTableExpression();
             expression.Columns[0].IsNullable = true;
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"CREATE TABLE ""PUBLIC"".""TestTable1"" (""TestColumn1"" VARCHAR, ""TestColumn2"" NUMBER NOT NULL)", _quotingEnabled);
+            result.ShouldBe(@"CREATE TABLE ""PUBLIC"".""TestTable1"" (""TestColumn1"" VARCHAR, ""TestColumn2"" NUMBER NOT NULL);", _quotingEnabled);
         }
 
         [Test]
@@ -239,7 +221,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             expression.SchemaName = TestSchema;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe($@"CREATE TABLE ""{TestSchema}"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL, ""TestColumn2"" NUMBER NOT NULL, PRIMARY KEY (""TestColumn1""))", _quotingEnabled);
+            result.ShouldBe($@"CREATE TABLE ""{TestSchema}"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL, ""TestColumn2"" NUMBER NOT NULL, PRIMARY KEY (""TestColumn1""));", _quotingEnabled);
         }
 
         [Test]
@@ -247,7 +229,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         {
             var expression = GeneratorTestHelper.GetCreateTableWithPrimaryKeyExpression();
             var result = Generator.Generate(expression);
-            result.ShouldBe($@"CREATE TABLE ""PUBLIC"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL, ""TestColumn2"" NUMBER NOT NULL, PRIMARY KEY (""TestColumn1""))", _quotingEnabled);
+            result.ShouldBe($@"CREATE TABLE ""PUBLIC"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL, ""TestColumn2"" NUMBER NOT NULL, PRIMARY KEY (""TestColumn1""));", _quotingEnabled);
         }
 
         [Test]
@@ -268,8 +250,8 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
 
             var createTableResult = Generator.Generate(createTableExpression);
             var createForeignKeyResult = Generator.Generate(createForeignKeyExpression);
-            createTableResult.ShouldBe(@"CREATE TABLE ""PUBLIC"".""FooTable"" (""FooColumn"" NUMBER NOT NULL)", _quotingEnabled);
-            createForeignKeyResult.ShouldBe(@"ALTER TABLE ""PUBLIC"".""FooTable"" ADD CONSTRAINT ""FK_FooTable_FooColumn_BarTable_BarColumn"" FOREIGN KEY (""FooColumn"") REFERENCES ""PUBLIC"".""BarTable"" (""BarColumn"")", _quotingEnabled);
+            createTableResult.ShouldBe(@"CREATE TABLE ""PUBLIC"".""FooTable"" (""FooColumn"" NUMBER NOT NULL);", _quotingEnabled);
+            createForeignKeyResult.ShouldBe(@"ALTER TABLE ""PUBLIC"".""FooTable"" ADD CONSTRAINT ""FK_FooTable_FooColumn_BarTable_BarColumn"" FOREIGN KEY (""FooColumn"") REFERENCES ""PUBLIC"".""BarTable"" (""BarColumn"");", _quotingEnabled);
         }
 
         [Test]
@@ -287,8 +269,8 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
 
             var createTableResult = Generator.Generate(createTableExpression);
             var createForeignKeyResult = Generator.Generate(createForeignKeyExpression);
-            createTableResult.ShouldBe(@"CREATE TABLE ""FooSchema"".""FooTable"" (""FooColumn"" NUMBER NOT NULL)", _quotingEnabled);
-            createForeignKeyResult.ShouldBe(@"ALTER TABLE ""FooSchema"".""FooTable"" ADD CONSTRAINT ""fk_bar_foo"" FOREIGN KEY (""FooColumn"") REFERENCES ""BarSchema"".""BarTable"" (""BarColumn"")", _quotingEnabled);
+            createTableResult.ShouldBe(@"CREATE TABLE ""FooSchema"".""FooTable"" (""FooColumn"" NUMBER NOT NULL);", _quotingEnabled);
+            createForeignKeyResult.ShouldBe(@"ALTER TABLE ""FooSchema"".""FooTable"" ADD CONSTRAINT ""fk_bar_foo"" FOREIGN KEY (""FooColumn"") REFERENCES ""BarSchema"".""BarTable"" (""BarColumn"");", _quotingEnabled);
         }
 
         [Test]
@@ -325,7 +307,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             expression.SchemaName = TestSchema;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe($@"ALTER TABLE ""{TestSchema}"".""TestTable1"" RENAME TO ""{TestSchema}"".""TestTable2""", _quotingEnabled);
+            result.ShouldBe($@"ALTER TABLE ""{TestSchema}"".""TestTable1"" RENAME TO ""{TestSchema}"".""TestTable2"";", _quotingEnabled);
         }
 
         [Test]
@@ -333,7 +315,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         {
             var expression = GeneratorTestHelper.GetRenameTableExpression();
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" RENAME TO ""PUBLIC"".""TestTable2""", _quotingEnabled);
+            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" RENAME TO ""PUBLIC"".""TestTable2"";", _quotingEnabled);
         }
     }
 }

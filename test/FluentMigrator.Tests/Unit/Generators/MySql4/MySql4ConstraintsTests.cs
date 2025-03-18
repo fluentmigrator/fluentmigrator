@@ -1,21 +1,3 @@
-#region License
-//
-// Copyright (c) 2018, Fluent Migrator Project
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
-#endregion
-
 using System.Data;
 
 using FluentMigrator.Runner;
@@ -45,7 +27,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
             expression.ForeignKey.PrimaryTableSchema = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `FK_TestTable1_TestColumn1_TestTable2_TestColumn2` FOREIGN KEY (`TestColumn1`) REFERENCES `TestTable2` (`TestColumn2`)");
+            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `FK_TestTable1_TestColumn1_TestTable2_TestColumn2` FOREIGN KEY (`TestColumn1`) REFERENCES `TestTable2` (`TestColumn2`);");
         }
 
         [Test]
@@ -54,7 +36,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
             var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `FK_TestTable1_TestColumn1_TestTable2_TestColumn2` FOREIGN KEY (`TestColumn1`) REFERENCES `TestTable2` (`TestColumn2`)");
+            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `FK_TestTable1_TestColumn1_TestTable2_TestColumn2` FOREIGN KEY (`TestColumn1`) REFERENCES `TestTable2` (`TestColumn2`);");
         }
 
         [Test]
@@ -64,7 +46,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
             expression.ForeignKey.ForeignTableSchema = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `FK_TestTable1_TestColumn1_TestTable2_TestColumn2` FOREIGN KEY (`TestColumn1`) REFERENCES `TestTable2` (`TestColumn2`)");
+            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `FK_TestTable1_TestColumn1_TestTable2_TestColumn2` FOREIGN KEY (`TestColumn1`) REFERENCES `TestTable2` (`TestColumn2`);");
         }
 
         [Test]
@@ -75,7 +57,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
             expression.ForeignKey.PrimaryTableSchema = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `FK_TestTable1_TestColumn1_TestColumn3_TestTable2_TestColumn2_TestColumn4` FOREIGN KEY (`TestColumn1`, `TestColumn3`) REFERENCES `TestTable2` (`TestColumn2`, `TestColumn4`)");
+            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `FK_TestTable1_TestColumn1_TestColumn3_TestTable2_TestColumn2_TestColumn4` FOREIGN KEY (`TestColumn1`, `TestColumn3`) REFERENCES `TestTable2` (`TestColumn2`, `TestColumn4`);");
         }
 
         [Test]
@@ -84,7 +66,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
             var expression = GeneratorTestHelper.GetCreateMultiColumnForeignKeyExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `FK_TestTable1_TestColumn1_TestColumn3_TestTable2_TestColumn2_TestColumn4` FOREIGN KEY (`TestColumn1`, `TestColumn3`) REFERENCES `TestTable2` (`TestColumn2`, `TestColumn4`)");
+            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `FK_TestTable1_TestColumn1_TestColumn3_TestTable2_TestColumn2_TestColumn4` FOREIGN KEY (`TestColumn1`, `TestColumn3`) REFERENCES `TestTable2` (`TestColumn2`, `TestColumn4`);");
         }
 
         [Test]
@@ -94,7 +76,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
             expression.ForeignKey.ForeignTableSchema = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `FK_TestTable1_TestColumn1_TestColumn3_TestTable2_TestColumn2_TestColumn4` FOREIGN KEY (`TestColumn1`, `TestColumn3`) REFERENCES `TestTable2` (`TestColumn2`, `TestColumn4`)");
+            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `FK_TestTable1_TestColumn1_TestColumn3_TestTable2_TestColumn2_TestColumn4` FOREIGN KEY (`TestColumn1`, `TestColumn3`) REFERENCES `TestTable2` (`TestColumn2`, `TestColumn4`);");
         }
 
         [Test]
@@ -105,7 +87,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
 
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `PK_TestTable1_TestColumn1_TestColumn2` PRIMARY KEY (`TestColumn1`, `TestColumn2`)");
+            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `PK_TestTable1_TestColumn1_TestColumn2` PRIMARY KEY (`TestColumn1`, `TestColumn2`);");
         }
 
         [Test]
@@ -115,7 +97,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
 
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `PK_TestTable1_TestColumn1_TestColumn2` PRIMARY KEY (`TestColumn1`, `TestColumn2`)");
+            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `PK_TestTable1_TestColumn1_TestColumn2` PRIMARY KEY (`TestColumn1`, `TestColumn2`);");
         }
 
         [Test]
@@ -125,7 +107,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
             expression.Constraint.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `UC_TestTable1_TestColumn1_TestColumn2` UNIQUE (`TestColumn1`, `TestColumn2`)");
+            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `UC_TestTable1_TestColumn1_TestColumn2` UNIQUE (`TestColumn1`, `TestColumn2`);");
         }
 
         [Test]
@@ -134,7 +116,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
             var expression = GeneratorTestHelper.GetCreateMultiColumnUniqueConstraintExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `UC_TestTable1_TestColumn1_TestColumn2` UNIQUE (`TestColumn1`, `TestColumn2`)");
+            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `UC_TestTable1_TestColumn1_TestColumn2` UNIQUE (`TestColumn1`, `TestColumn2`);");
         }
 
         [Test]
@@ -145,7 +127,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
             expression.ForeignKey.PrimaryTableSchema = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `FK_Test` FOREIGN KEY (`TestColumn1`) REFERENCES `TestTable2` (`TestColumn2`)");
+            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `FK_Test` FOREIGN KEY (`TestColumn1`) REFERENCES `TestTable2` (`TestColumn2`);");
         }
 
         [Test]
@@ -154,7 +136,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
             var expression = GeneratorTestHelper.GetCreateNamedForeignKeyExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `FK_Test` FOREIGN KEY (`TestColumn1`) REFERENCES `TestTable2` (`TestColumn2`)");
+            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `FK_Test` FOREIGN KEY (`TestColumn1`) REFERENCES `TestTable2` (`TestColumn2`);");
         }
 
         [Test]
@@ -164,7 +146,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
             expression.ForeignKey.ForeignTableSchema = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `FK_Test` FOREIGN KEY (`TestColumn1`) REFERENCES `TestTable2` (`TestColumn2`)");
+            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `FK_Test` FOREIGN KEY (`TestColumn1`) REFERENCES `TestTable2` (`TestColumn2`);");
         }
 
         [Test]
@@ -175,7 +157,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
             expression.ForeignKey.OnUpdate = Rule.SetDefault;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `FK_Test` FOREIGN KEY (`TestColumn1`) REFERENCES `TestTable2` (`TestColumn2`) ON DELETE CASCADE ON UPDATE SET DEFAULT");
+            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `FK_Test` FOREIGN KEY (`TestColumn1`) REFERENCES `TestTable2` (`TestColumn2`) ON DELETE CASCADE ON UPDATE SET DEFAULT;");
         }
 
         [TestCase(Rule.SetDefault, "SET DEFAULT"), TestCase(Rule.SetNull, "SET NULL"), TestCase(Rule.Cascade, "CASCADE")]
@@ -185,7 +167,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
             expression.ForeignKey.OnDelete = rule;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(string.Format("ALTER TABLE `TestTable1` ADD CONSTRAINT `FK_Test` FOREIGN KEY (`TestColumn1`) REFERENCES `TestTable2` (`TestColumn2`) ON DELETE {0}", output));
+            result.ShouldBe(string.Format("ALTER TABLE `TestTable1` ADD CONSTRAINT `FK_Test` FOREIGN KEY (`TestColumn1`) REFERENCES `TestTable2` (`TestColumn2`) ON DELETE {0};", output));
         }
 
         [TestCase(Rule.SetDefault, "SET DEFAULT"), TestCase(Rule.SetNull, "SET NULL"), TestCase(Rule.Cascade, "CASCADE")]
@@ -195,7 +177,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
             expression.ForeignKey.OnUpdate = rule;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(string.Format("ALTER TABLE `TestTable1` ADD CONSTRAINT `FK_Test` FOREIGN KEY (`TestColumn1`) REFERENCES `TestTable2` (`TestColumn2`) ON UPDATE {0}", output));
+            result.ShouldBe(string.Format("ALTER TABLE `TestTable1` ADD CONSTRAINT `FK_Test` FOREIGN KEY (`TestColumn1`) REFERENCES `TestTable2` (`TestColumn2`) ON UPDATE {0};", output));
         }
 
         [Test]
@@ -206,7 +188,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
             expression.ForeignKey.PrimaryTableSchema = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `FK_Test` FOREIGN KEY (`TestColumn1`, `TestColumn3`) REFERENCES `TestTable2` (`TestColumn2`, `TestColumn4`)");
+            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `FK_Test` FOREIGN KEY (`TestColumn1`, `TestColumn3`) REFERENCES `TestTable2` (`TestColumn2`, `TestColumn4`);");
         }
 
         [Test]
@@ -215,7 +197,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
             var expression = GeneratorTestHelper.GetCreateNamedMultiColumnForeignKeyExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `FK_Test` FOREIGN KEY (`TestColumn1`, `TestColumn3`) REFERENCES `TestTable2` (`TestColumn2`, `TestColumn4`)");
+            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `FK_Test` FOREIGN KEY (`TestColumn1`, `TestColumn3`) REFERENCES `TestTable2` (`TestColumn2`, `TestColumn4`);");
         }
 
         [Test]
@@ -225,7 +207,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
             expression.ForeignKey.ForeignTableSchema = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `FK_Test` FOREIGN KEY (`TestColumn1`, `TestColumn3`) REFERENCES `TestTable2` (`TestColumn2`, `TestColumn4`)");
+            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `FK_Test` FOREIGN KEY (`TestColumn1`, `TestColumn3`) REFERENCES `TestTable2` (`TestColumn2`, `TestColumn4`);");
         }
 
         [Test]
@@ -236,7 +218,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
 
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `TESTPRIMARYKEY` PRIMARY KEY (`TestColumn1`, `TestColumn2`)");
+            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `TESTPRIMARYKEY` PRIMARY KEY (`TestColumn1`, `TestColumn2`);");
         }
 
         [Test]
@@ -246,7 +228,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
 
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `TESTPRIMARYKEY` PRIMARY KEY (`TestColumn1`, `TestColumn2`)");
+            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `TESTPRIMARYKEY` PRIMARY KEY (`TestColumn1`, `TestColumn2`);");
         }
 
         [Test]
@@ -256,7 +238,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
             expression.Constraint.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `TESTUNIQUECONSTRAINT` UNIQUE (`TestColumn1`, `TestColumn2`)");
+            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `TESTUNIQUECONSTRAINT` UNIQUE (`TestColumn1`, `TestColumn2`);");
         }
 
         [Test]
@@ -265,7 +247,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
             var expression = GeneratorTestHelper.GetCreateNamedMultiColumnUniqueConstraintExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `TESTUNIQUECONSTRAINT` UNIQUE (`TestColumn1`, `TestColumn2`)");
+            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `TESTUNIQUECONSTRAINT` UNIQUE (`TestColumn1`, `TestColumn2`);");
         }
 
         [Test]
@@ -276,7 +258,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
 
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `TESTPRIMARYKEY` PRIMARY KEY (`TestColumn1`)");
+            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `TESTPRIMARYKEY` PRIMARY KEY (`TestColumn1`);");
         }
 
         [Test]
@@ -286,7 +268,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
 
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `TESTPRIMARYKEY` PRIMARY KEY (`TestColumn1`)");
+            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `TESTPRIMARYKEY` PRIMARY KEY (`TestColumn1`);");
         }
 
         [Test]
@@ -296,7 +278,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
             expression.Constraint.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `TESTUNIQUECONSTRAINT` UNIQUE (`TestColumn1`)");
+            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `TESTUNIQUECONSTRAINT` UNIQUE (`TestColumn1`);");
         }
 
         [Test]
@@ -305,7 +287,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
             var expression = GeneratorTestHelper.GetCreateNamedUniqueConstraintExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `TESTUNIQUECONSTRAINT` UNIQUE (`TestColumn1`)");
+            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `TESTUNIQUECONSTRAINT` UNIQUE (`TestColumn1`);");
         }
 
         [Test]
@@ -316,7 +298,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
 
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `PK_TestTable1_TestColumn1` PRIMARY KEY (`TestColumn1`)");
+            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `PK_TestTable1_TestColumn1` PRIMARY KEY (`TestColumn1`);");
         }
 
         [Test]
@@ -326,7 +308,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
 
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `PK_TestTable1_TestColumn1` PRIMARY KEY (`TestColumn1`)");
+            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `PK_TestTable1_TestColumn1` PRIMARY KEY (`TestColumn1`);");
         }
 
         [Test]
@@ -336,7 +318,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
             expression.Constraint.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `UC_TestTable1_TestColumn1` UNIQUE (`TestColumn1`)");
+            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `UC_TestTable1_TestColumn1` UNIQUE (`TestColumn1`);");
         }
 
         [Test]
@@ -345,7 +327,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
             var expression = GeneratorTestHelper.GetCreateUniqueConstraintExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `UC_TestTable1_TestColumn1` UNIQUE (`TestColumn1`)");
+            result.ShouldBe("ALTER TABLE `TestTable1` ADD CONSTRAINT `UC_TestTable1_TestColumn1` UNIQUE (`TestColumn1`);");
         }
 
         [Test]
@@ -355,7 +337,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
             expression.ForeignKey.ForeignTableSchema = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE `TestTable1` DROP FOREIGN KEY `FK_Test`");
+            result.ShouldBe("ALTER TABLE `TestTable1` DROP FOREIGN KEY `FK_Test`;");
         }
 
         [Test]
@@ -364,7 +346,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
             var expression = GeneratorTestHelper.GetDeleteForeignKeyExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE `TestTable1` DROP FOREIGN KEY `FK_Test`");
+            result.ShouldBe("ALTER TABLE `TestTable1` DROP FOREIGN KEY `FK_Test`;");
         }
 
         [Test]
@@ -374,7 +356,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
             expression.Constraint.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE `TestTable1` DROP PRIMARY KEY");
+            result.ShouldBe("ALTER TABLE `TestTable1` DROP PRIMARY KEY;");
         }
 
         [Test]
@@ -383,7 +365,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
             var expression = GeneratorTestHelper.GetDeletePrimaryKeyExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE `TestTable1` DROP PRIMARY KEY");
+            result.ShouldBe("ALTER TABLE `TestTable1` DROP PRIMARY KEY;");
         }
 
         [Test]
@@ -393,7 +375,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
             expression.Constraint.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE `TestTable1` DROP INDEX `TESTUNIQUECONSTRAINT`");
+            result.ShouldBe("ALTER TABLE `TestTable1` DROP INDEX `TESTUNIQUECONSTRAINT`;");
         }
 
         [Test]
@@ -402,7 +384,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
             var expression = GeneratorTestHelper.GetDeleteUniqueConstraintExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE `TestTable1` DROP INDEX `TESTUNIQUECONSTRAINT`");
+            result.ShouldBe("ALTER TABLE `TestTable1` DROP INDEX `TESTUNIQUECONSTRAINT`;");
         }
     }
 }

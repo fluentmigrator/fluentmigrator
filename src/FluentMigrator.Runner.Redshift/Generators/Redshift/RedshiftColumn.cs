@@ -64,7 +64,7 @@ namespace FluentMigrator.Runner.Generators.Redshift
             {
                 string columnClause = action(column);
                 if (!string.IsNullOrEmpty(columnClause))
-                    clauses.Add(string.Format("ALTER {0} {1}", Quoter.QuoteColumnName(column.Name), columnClause));
+                    clauses.Add(string.Format("{0} {1}", Quoter.QuoteColumnName(column.Name), columnClause));
             }
 
             return string.Join(", ", clauses.ToArray());

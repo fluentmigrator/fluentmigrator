@@ -1,19 +1,3 @@
-#region License
-// Copyright (c) 2007-2024, Fluent Migrator Project
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-// http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-#endregion
-
 using System.Linq;
 
 using FluentMigrator.Builders.Create.Index;
@@ -46,7 +30,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
             expression.Index.SchemaName = "TestSchema";
 
             var result = _generator.Generate(expression);
-            result.ShouldBe("CREATE INDEX [TestIndex] ON [TestSchema].[TestTable1] ([TestColumn1] ASC)");
+            result.ShouldBe("CREATE INDEX [TestIndex] ON [TestSchema].[TestTable1] ([TestColumn1] ASC);");
         }
 
         [Test]
@@ -55,7 +39,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
             var expression = GeneratorTestHelper.GetCreateIndexExpression();
 
             var result = _generator.Generate(expression);
-            result.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC)");
+            result.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC);");
         }
 
         [Test]
@@ -65,7 +49,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
             expression.Index.SchemaName = "TestSchema";
 
             var result = _generator.Generate(expression);
-            result.ShouldBe("CREATE INDEX [TestIndex] ON [TestSchema].[TestTable1] ([TestColumn1] ASC, [TestColumn2] DESC)");
+            result.ShouldBe("CREATE INDEX [TestIndex] ON [TestSchema].[TestTable1] ([TestColumn1] ASC, [TestColumn2] DESC);");
         }
 
         [Test]
@@ -74,7 +58,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
             var expression = GeneratorTestHelper.GetCreateMultiColumnCreateIndexExpression();
 
             var result = _generator.Generate(expression);
-            result.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC, [TestColumn2] DESC)");
+            result.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC, [TestColumn2] DESC);");
         }
 
         [Test]
@@ -84,7 +68,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
             expression.Index.SchemaName = "TestSchema";
 
             var result = _generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [TestSchema].[TestTable1] ([TestColumn1] ASC, [TestColumn2] DESC)");
+            result.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [TestSchema].[TestTable1] ([TestColumn1] ASC, [TestColumn2] DESC);");
         }
 
         [Test]
@@ -93,7 +77,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
             var expression = GeneratorTestHelper.GetCreateUniqueMultiColumnIndexExpression();
 
             var result = _generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC, [TestColumn2] DESC)");
+            result.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC, [TestColumn2] DESC);");
         }
 
         [Test]
@@ -103,7 +87,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
             expression.Index.SchemaName = "TestSchema";
 
             var result = _generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [TestSchema].[TestTable1] ([TestColumn1] ASC)");
+            result.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [TestSchema].[TestTable1] ([TestColumn1] ASC);");
         }
 
         [Test]
@@ -112,7 +96,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
             var expression = GeneratorTestHelper.GetCreateUniqueIndexExpression();
 
             var result = _generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC)");
+            result.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC);");
         }
 
         [Test]
@@ -122,7 +106,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
             expression.Index.SchemaName = "TestSchema";
 
             var result = _generator.Generate(expression);
-            result.ShouldBe("DROP INDEX [TestIndex] ON [TestSchema].[TestTable1]");
+            result.ShouldBe("DROP INDEX [TestIndex] ON [TestSchema].[TestTable1];");
         }
 
         [Test]
@@ -131,7 +115,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
             var expression = GeneratorTestHelper.GetDeleteIndexExpression();
 
             var result = _generator.Generate(expression);
-            result.ShouldBe("DROP INDEX [TestIndex] ON [dbo].[TestTable1]");
+            result.ShouldBe("DROP INDEX [TestIndex] ON [dbo].[TestTable1];");
         }
 
         [Test]
@@ -141,7 +125,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
             expression.Index.Columns.First().SetAdditionalFeature(SqlServerExtensions.IndexColumnNullsDistinct, true);
 
             var result = _generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC)");
+            result.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC);");
         }
 
         [Test]
@@ -164,7 +148,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
                 .WithOptions().Unique();
 
             var result = _generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) WHERE [TestColumn1] IS NOT NULL");
+            result.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) WHERE [TestColumn1] IS NOT NULL;");
         }
 
         [Test]
@@ -185,7 +169,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
                 .Unique().NullsNotDistinct();
 
             var result = _generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) WHERE [TestColumn1] IS NOT NULL");
+            result.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) WHERE [TestColumn1] IS NOT NULL;");
         }
 
         [Test]
@@ -207,7 +191,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
                 .WithOptions().UniqueNullsNotDistinct();
 
             var result = _generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC, [TestColumn2] DESC) WHERE [TestColumn1] IS NOT NULL AND [TestColumn2] IS NOT NULL");
+            result.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC, [TestColumn2] DESC) WHERE [TestColumn1] IS NOT NULL AND [TestColumn2] IS NOT NULL;");
         }
 
         [Test]
@@ -229,7 +213,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
                 .WithOptions().UniqueNullsNotDistinct();
 
             var result = _generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC, [TestColumn2] DESC) WHERE [TestColumn2] IS NOT NULL");
+            result.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC, [TestColumn2] DESC) WHERE [TestColumn2] IS NOT NULL;");
         }
 
         [Test]
@@ -239,7 +223,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
             expression.Index.Columns.First().SetAdditionalFeature(SqlServerExtensions.IndexColumnNullsDistinct, false);
 
             var result = _generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC, [TestColumn2] DESC) WHERE [TestColumn1] IS NOT NULL");
+            result.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC, [TestColumn2] DESC) WHERE [TestColumn1] IS NOT NULL;");
         }
 
         [Test]
@@ -253,7 +237,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
             }
 
             var result = _generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC, [TestColumn2] DESC) WHERE [TestColumn1] IS NOT NULL AND [TestColumn2] IS NOT NULL");
+            result.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC, [TestColumn2] DESC) WHERE [TestColumn1] IS NOT NULL AND [TestColumn2] IS NOT NULL;");
         }
 
         [Test]
@@ -262,7 +246,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
             var expression = GeneratorTestHelper.GetCreateIndexExpression();
             new CreateIndexExpressionBuilder(expression).Filter("TestColumn2 IS NULL");
             var result = _generator.Generate(expression);
-            result.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) WHERE TestColumn2 IS NULL");
+            result.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) WHERE TestColumn2 IS NULL;");
         }
 
         [Test]
@@ -271,7 +255,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
             var expression = GeneratorTestHelper.GetCreateIndexExpression();
             var x = new CreateIndexExpressionBuilder(expression).Filter("TestColumn2 IS NULL").Include("TestColumn3");
             var result = _generator.Generate(expression);
-            result.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) INCLUDE ([TestColumn3]) WHERE TestColumn2 IS NULL");
+            result.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) INCLUDE ([TestColumn3]) WHERE TestColumn2 IS NULL;");
         }
 
         [Test]
@@ -280,7 +264,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
             var expression = GeneratorTestHelper.GetCreateIndexExpression();
             var x = (new CreateIndexExpressionBuilder(expression) as ICreateIndexOnColumnSyntax).Include("TestColumn2").Include("TestColumn3");
             var result = _generator.Generate(expression);
-            result.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) INCLUDE ([TestColumn2], [TestColumn3])");
+            result.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) INCLUDE ([TestColumn2], [TestColumn3]);");
         }
 
         [Test]
@@ -289,7 +273,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
             var expression = GeneratorTestHelper.GetCreateIndexExpression();
             var x = (new CreateIndexExpressionBuilder(expression) as ICreateIndexOptionsSyntax).Include("TestColumn2").Include("TestColumn3");
             var result = _generator.Generate(expression);
-            result.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) INCLUDE ([TestColumn2], [TestColumn3])");
+            result.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) INCLUDE ([TestColumn2], [TestColumn3]);");
         }
 
         [Test]
@@ -298,7 +282,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
             var expression = GeneratorTestHelper.GetCreateIndexExpression();
             new CreateIndexExpressionBuilder(expression).WithDataCompression(DataCompressionType.Page);
             var result = _generator.Generate(expression);
-            result.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) WITH (DATA_COMPRESSION = PAGE)");
+            result.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) WITH (DATA_COMPRESSION = PAGE);");
         }
     }
 }

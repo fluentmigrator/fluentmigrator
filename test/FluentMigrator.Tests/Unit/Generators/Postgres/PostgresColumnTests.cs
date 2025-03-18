@@ -124,20 +124,22 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         public override void CanCreateColumnWithSystemMethodAndCustomSchema()
         {
             var expressions = GeneratorTestHelper.GetCreateColumnWithSystemMethodExpression("TestSchema");
-            var result = string.Join(Environment.NewLine, expressions.Select(x => (string)Generator.Generate((dynamic)x)));
-            result.ShouldBe(
-                @"ALTER TABLE ""TestSchema"".""TestTable1"" ADD ""TestColumn1"" timestamp;" + Environment.NewLine +
-                @"UPDATE ""TestSchema"".""TestTable1"" SET ""TestColumn1"" = now() WHERE 1 = 1;");
+            var result = expressions.Select(x => (string)Generator.Generate((dynamic)x));
+            result.ShouldBe([
+                @"ALTER TABLE ""TestSchema"".""TestTable1"" ADD ""TestColumn1"" timestamp;",
+                @"UPDATE ""TestSchema"".""TestTable1"" SET ""TestColumn1"" = now() WHERE 1 = 1;",
+            ]);
         }
 
         [Test]
         public override void CanCreateColumnWithSystemMethodAndDefaultSchema()
         {
             var expressions = GeneratorTestHelper.GetCreateColumnWithSystemMethodExpression();
-            var result = string.Join(Environment.NewLine, expressions.Select(x => (string)Generator.Generate((dynamic)x)));
-            result.ShouldBe(
-                @"ALTER TABLE ""public"".""TestTable1"" ADD ""TestColumn1"" timestamp;" + Environment.NewLine +
-                @"UPDATE ""public"".""TestTable1"" SET ""TestColumn1"" = now() WHERE 1 = 1;");
+            var result = expressions.Select(x => (string)Generator.Generate((dynamic)x));
+            result.ShouldBe([
+                @"ALTER TABLE ""public"".""TestTable1"" ADD ""TestColumn1"" timestamp;",
+                @"UPDATE ""public"".""TestTable1"" SET ""TestColumn1"" = now() WHERE 1 = 1;",
+            ]);
         }
 
         [Test]
@@ -234,7 +236,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" DROP COLUMN \"TestColumn1\";" + Environment.NewLine + "ALTER TABLE \"TestSchema\".\"TestTable1\" DROP COLUMN \"TestColumn2\";");
+            result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" DROP COLUMN \"TestColumn1\";ALTER TABLE \"TestSchema\".\"TestTable1\" DROP COLUMN \"TestColumn2\";");
         }
 
         [Test]
@@ -243,7 +245,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             var expression = GeneratorTestHelper.GetDeleteColumnExpression(new[] { "TestColumn1", "TestColumn2" });
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"public\".\"TestTable1\" DROP COLUMN \"TestColumn1\";" + Environment.NewLine + "ALTER TABLE \"public\".\"TestTable1\" DROP COLUMN \"TestColumn2\";");
+            result.ShouldBe("ALTER TABLE \"public\".\"TestTable1\" DROP COLUMN \"TestColumn1\";ALTER TABLE \"public\".\"TestTable1\" DROP COLUMN \"TestColumn2\";");
         }
 
         [Test]

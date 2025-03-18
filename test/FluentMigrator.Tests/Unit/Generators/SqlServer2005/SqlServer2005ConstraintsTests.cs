@@ -249,7 +249,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.ForeignKey.PrimaryTableSchema = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [FK_TestTable1_TestColumn1_TestTable2_TestColumn2] FOREIGN KEY ([TestColumn1]) REFERENCES [TestSchema].[TestTable2] ([TestColumn2])");
+            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [FK_TestTable1_TestColumn1_TestTable2_TestColumn2] FOREIGN KEY ([TestColumn1]) REFERENCES [TestSchema].[TestTable2] ([TestColumn2]);");
         }
 
         [Test]
@@ -258,7 +258,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [FK_TestTable1_TestColumn1_TestTable2_TestColumn2] FOREIGN KEY ([TestColumn1]) REFERENCES [dbo].[TestTable2] ([TestColumn2])");
+            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [FK_TestTable1_TestColumn1_TestTable2_TestColumn2] FOREIGN KEY ([TestColumn1]) REFERENCES [dbo].[TestTable2] ([TestColumn2]);");
         }
 
         [Test]
@@ -268,7 +268,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.ForeignKey.ForeignTableSchema = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [FK_TestTable1_TestColumn1_TestTable2_TestColumn2] FOREIGN KEY ([TestColumn1]) REFERENCES [dbo].[TestTable2] ([TestColumn2])");
+            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [FK_TestTable1_TestColumn1_TestTable2_TestColumn2] FOREIGN KEY ([TestColumn1]) REFERENCES [dbo].[TestTable2] ([TestColumn2]);");
         }
 
         [Test]
@@ -279,7 +279,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.ForeignKey.PrimaryTableSchema = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [FK_TestTable1_TestColumn1_TestColumn3_TestTable2_TestColumn2_TestColumn4] FOREIGN KEY ([TestColumn1], [TestColumn3]) REFERENCES [TestSchema].[TestTable2] ([TestColumn2], [TestColumn4])");
+            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [FK_TestTable1_TestColumn1_TestColumn3_TestTable2_TestColumn2_TestColumn4] FOREIGN KEY ([TestColumn1], [TestColumn3]) REFERENCES [TestSchema].[TestTable2] ([TestColumn2], [TestColumn4]);");
         }
 
         [Test]
@@ -288,7 +288,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             var expression = GeneratorTestHelper.GetCreateMultiColumnForeignKeyExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [FK_TestTable1_TestColumn1_TestColumn3_TestTable2_TestColumn2_TestColumn4] FOREIGN KEY ([TestColumn1], [TestColumn3]) REFERENCES [dbo].[TestTable2] ([TestColumn2], [TestColumn4])");
+            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [FK_TestTable1_TestColumn1_TestColumn3_TestTable2_TestColumn2_TestColumn4] FOREIGN KEY ([TestColumn1], [TestColumn3]) REFERENCES [dbo].[TestTable2] ([TestColumn2], [TestColumn4]);");
         }
 
         [Test]
@@ -298,7 +298,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.ForeignKey.ForeignTableSchema = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [FK_TestTable1_TestColumn1_TestColumn3_TestTable2_TestColumn2_TestColumn4] FOREIGN KEY ([TestColumn1], [TestColumn3]) REFERENCES [dbo].[TestTable2] ([TestColumn2], [TestColumn4])");
+            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [FK_TestTable1_TestColumn1_TestColumn3_TestTable2_TestColumn2_TestColumn4] FOREIGN KEY ([TestColumn1], [TestColumn3]) REFERENCES [dbo].[TestTable2] ([TestColumn2], [TestColumn4]);");
         }
 
         public override void CanCreateMultiColumnPrimaryKeyConstraintWithCustomSchema([Values] CompatibilityMode compatibilityMode)
@@ -308,7 +308,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [PK_TestTable1_TestColumn1_TestColumn2] PRIMARY KEY ([TestColumn1], [TestColumn2])");
+            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [PK_TestTable1_TestColumn1_TestColumn2] PRIMARY KEY ([TestColumn1], [TestColumn2]);");
         }
 
         [Test]
@@ -318,7 +318,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [PK_TestTable1_TestColumn1_TestColumn2] PRIMARY KEY ([TestColumn1], [TestColumn2])");
+            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [PK_TestTable1_TestColumn1_TestColumn2] PRIMARY KEY ([TestColumn1], [TestColumn2]);");
         }
 
         [Test]
@@ -328,7 +328,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.Constraint.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [UC_TestTable1_TestColumn1_TestColumn2] UNIQUE ([TestColumn1], [TestColumn2])");
+            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [UC_TestTable1_TestColumn1_TestColumn2] UNIQUE ([TestColumn1], [TestColumn2]);");
         }
 
         [Test]
@@ -339,7 +339,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintFilter, expression.Constraint.Columns.First() + " IS NOT NULL");
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE INDEX [UC_TestTable1_TestColumn1_TestColumn2] ON [TestSchema].[TestTable1] ([TestColumn1], [TestColumn2]) WHERE TestColumn1 IS NOT NULL");
+            result.ShouldBe("CREATE UNIQUE INDEX [UC_TestTable1_TestColumn1_TestColumn2] ON [TestSchema].[TestTable1] ([TestColumn1], [TestColumn2]) WHERE TestColumn1 IS NOT NULL;");
         }
 
         [Test]
@@ -351,7 +351,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintFilter, expression.Constraint.Columns.First() + " IS NOT NULL");
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE INDEX [UC_TestTable1_TestColumn1_TestColumn2] ON [TestSchema].[TestTable1] ([TestColumn1], [TestColumn2]) WHERE TestColumn1 IS NOT NULL");
+            result.ShouldBe("CREATE UNIQUE INDEX [UC_TestTable1_TestColumn1_TestColumn2] ON [TestSchema].[TestTable1] ([TestColumn1], [TestColumn2]) WHERE TestColumn1 IS NOT NULL;");
         }
 
         [Test]
@@ -375,7 +375,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintIncludesList, new List<IndexIncludeDefinition> { new IndexIncludeDefinition { Name = "TestColumn3" } });
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE INDEX [UC_TestTable1_TestColumn1_TestColumn2] ON [TestSchema].[TestTable1] ([TestColumn1], [TestColumn2]) INCLUDE ([TestColumn3])");
+            result.ShouldBe("CREATE UNIQUE INDEX [UC_TestTable1_TestColumn1_TestColumn2] ON [TestSchema].[TestTable1] ([TestColumn1], [TestColumn2]) INCLUDE ([TestColumn3]);");
         }
 
         [Test]
@@ -387,7 +387,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintIncludesList, new List<IndexIncludeDefinition> { new IndexIncludeDefinition { Name = "TestColumn3" } });
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE INDEX [UC_TestTable1_TestColumn1_TestColumn2] ON [TestSchema].[TestTable1] ([TestColumn1], [TestColumn2]) INCLUDE ([TestColumn3]) WHERE TestColumn1 IS NOT NULL");
+            result.ShouldBe("CREATE UNIQUE INDEX [UC_TestTable1_TestColumn1_TestColumn2] ON [TestSchema].[TestTable1] ([TestColumn1], [TestColumn2]) INCLUDE ([TestColumn3]) WHERE TestColumn1 IS NOT NULL;");
         }
 
         [Test]
@@ -400,7 +400,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintIncludesList, new List<IndexIncludeDefinition> { new IndexIncludeDefinition { Name = "TestColumn3" } });
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE INDEX [UC_TestTable1_TestColumn1_TestColumn2] ON [TestSchema].[TestTable1] ([TestColumn1], [TestColumn2]) INCLUDE ([TestColumn3]) WHERE TestColumn1 IS NOT NULL");
+            result.ShouldBe("CREATE UNIQUE INDEX [UC_TestTable1_TestColumn1_TestColumn2] ON [TestSchema].[TestTable1] ([TestColumn1], [TestColumn2]) INCLUDE ([TestColumn3]) WHERE TestColumn1 IS NOT NULL;");
         }
 
         [Test]
@@ -423,7 +423,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             var expression = GeneratorTestHelper.GetCreateMultiColumnUniqueConstraintExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [UC_TestTable1_TestColumn1_TestColumn2] UNIQUE ([TestColumn1], [TestColumn2])");
+            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [UC_TestTable1_TestColumn1_TestColumn2] UNIQUE ([TestColumn1], [TestColumn2]);");
         }
 
         [Test]
@@ -433,7 +433,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintFilter, expression.Constraint.Columns.First() + " IS NOT NULL");
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE INDEX [UC_TestTable1_TestColumn1_TestColumn2] ON [dbo].[TestTable1] ([TestColumn1], [TestColumn2]) WHERE TestColumn1 IS NOT NULL");
+            result.ShouldBe("CREATE UNIQUE INDEX [UC_TestTable1_TestColumn1_TestColumn2] ON [dbo].[TestTable1] ([TestColumn1], [TestColumn2]) WHERE TestColumn1 IS NOT NULL;");
         }
 
         [Test]
@@ -444,7 +444,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintFilter, expression.Constraint.Columns.First() + " IS NOT NULL");
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE INDEX [UC_TestTable1_TestColumn1_TestColumn2] ON [dbo].[TestTable1] ([TestColumn1], [TestColumn2]) WHERE TestColumn1 IS NOT NULL");
+            result.ShouldBe("CREATE UNIQUE INDEX [UC_TestTable1_TestColumn1_TestColumn2] ON [dbo].[TestTable1] ([TestColumn1], [TestColumn2]) WHERE TestColumn1 IS NOT NULL;");
         }
 
         [Test]
@@ -466,7 +466,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintIncludesList, new List<IndexIncludeDefinition> { new IndexIncludeDefinition { Name = "TestColumn3" } });
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE INDEX [UC_TestTable1_TestColumn1_TestColumn2] ON [dbo].[TestTable1] ([TestColumn1], [TestColumn2]) INCLUDE ([TestColumn3])");
+            result.ShouldBe("CREATE UNIQUE INDEX [UC_TestTable1_TestColumn1_TestColumn2] ON [dbo].[TestTable1] ([TestColumn1], [TestColumn2]) INCLUDE ([TestColumn3]);");
         }
 
         [Test]
@@ -477,7 +477,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintIncludesList, new List<IndexIncludeDefinition> { new IndexIncludeDefinition { Name = "TestColumn3" } });
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE INDEX [UC_TestTable1_TestColumn1_TestColumn2] ON [dbo].[TestTable1] ([TestColumn1], [TestColumn2]) INCLUDE ([TestColumn3]) WHERE TestColumn1 IS NOT NULL");
+            result.ShouldBe("CREATE UNIQUE INDEX [UC_TestTable1_TestColumn1_TestColumn2] ON [dbo].[TestTable1] ([TestColumn1], [TestColumn2]) INCLUDE ([TestColumn3]) WHERE TestColumn1 IS NOT NULL;");
         }
 
         [Test]
@@ -489,7 +489,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintIncludesList, new List<IndexIncludeDefinition> { new IndexIncludeDefinition { Name = "TestColumn3" } });
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE INDEX [UC_TestTable1_TestColumn1_TestColumn2] ON [dbo].[TestTable1] ([TestColumn1], [TestColumn2]) INCLUDE ([TestColumn3]) WHERE TestColumn1 IS NOT NULL");
+            result.ShouldBe("CREATE UNIQUE INDEX [UC_TestTable1_TestColumn1_TestColumn2] ON [dbo].[TestTable1] ([TestColumn1], [TestColumn2]) INCLUDE ([TestColumn3]) WHERE TestColumn1 IS NOT NULL;");
         }
 
         [Test]
@@ -513,7 +513,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.ForeignKey.PrimaryTableSchema = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([TestColumn1]) REFERENCES [TestSchema].[TestTable2] ([TestColumn2])");
+            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([TestColumn1]) REFERENCES [TestSchema].[TestTable2] ([TestColumn2]);");
         }
 
         [Test]
@@ -522,7 +522,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             var expression = GeneratorTestHelper.GetCreateNamedForeignKeyExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([TestColumn1]) REFERENCES [dbo].[TestTable2] ([TestColumn2])");
+            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([TestColumn1]) REFERENCES [dbo].[TestTable2] ([TestColumn2]);");
         }
 
         [Test]
@@ -532,7 +532,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.ForeignKey.ForeignTableSchema = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([TestColumn1]) REFERENCES [dbo].[TestTable2] ([TestColumn2])");
+            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([TestColumn1]) REFERENCES [dbo].[TestTable2] ([TestColumn2]);");
         }
 
         [Test]
@@ -543,7 +543,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.ForeignKey.OnUpdate = Rule.SetDefault;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([TestColumn1]) REFERENCES [dbo].[TestTable2] ([TestColumn2]) ON DELETE CASCADE ON UPDATE SET DEFAULT");
+            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([TestColumn1]) REFERENCES [dbo].[TestTable2] ([TestColumn2]) ON DELETE CASCADE ON UPDATE SET DEFAULT;");
         }
 
         [TestCase(Rule.SetDefault, "SET DEFAULT"), TestCase(Rule.SetNull, "SET NULL"), TestCase(Rule.Cascade, "CASCADE")]
@@ -553,7 +553,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.ForeignKey.OnDelete = rule;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(string.Format("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([TestColumn1]) REFERENCES [dbo].[TestTable2] ([TestColumn2]) ON DELETE {0}", output));
+            result.ShouldBe(string.Format("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([TestColumn1]) REFERENCES [dbo].[TestTable2] ([TestColumn2]) ON DELETE {0};", output));
         }
 
         [TestCase(Rule.SetDefault, "SET DEFAULT"), TestCase(Rule.SetNull, "SET NULL"), TestCase(Rule.Cascade, "CASCADE")]
@@ -563,7 +563,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.ForeignKey.OnUpdate = rule;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(string.Format("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([TestColumn1]) REFERENCES [dbo].[TestTable2] ([TestColumn2]) ON UPDATE {0}", output));
+            result.ShouldBe(string.Format("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([TestColumn1]) REFERENCES [dbo].[TestTable2] ([TestColumn2]) ON UPDATE {0};", output));
         }
 
         [Test]
@@ -574,7 +574,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.ForeignKey.PrimaryTableSchema = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([TestColumn1], [TestColumn3]) REFERENCES [TestSchema].[TestTable2] ([TestColumn2], [TestColumn4])");
+            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([TestColumn1], [TestColumn3]) REFERENCES [TestSchema].[TestTable2] ([TestColumn2], [TestColumn4]);");
         }
 
         [Test]
@@ -583,7 +583,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             var expression = GeneratorTestHelper.GetCreateNamedMultiColumnForeignKeyExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([TestColumn1], [TestColumn3]) REFERENCES [dbo].[TestTable2] ([TestColumn2], [TestColumn4])");
+            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([TestColumn1], [TestColumn3]) REFERENCES [dbo].[TestTable2] ([TestColumn2], [TestColumn4]);");
         }
 
         [Test]
@@ -593,7 +593,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.ForeignKey.ForeignTableSchema = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([TestColumn1], [TestColumn3]) REFERENCES [dbo].[TestTable2] ([TestColumn2], [TestColumn4])");
+            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([TestColumn1], [TestColumn3]) REFERENCES [dbo].[TestTable2] ([TestColumn2], [TestColumn4]);");
         }
 
         [Test]
@@ -604,7 +604,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [TESTPRIMARYKEY] PRIMARY KEY ([TestColumn1], [TestColumn2])");
+            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [TESTPRIMARYKEY] PRIMARY KEY ([TestColumn1], [TestColumn2]);");
         }
 
         [Test]
@@ -614,7 +614,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [TESTPRIMARYKEY] PRIMARY KEY ([TestColumn1], [TestColumn2])");
+            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [TESTPRIMARYKEY] PRIMARY KEY ([TestColumn1], [TestColumn2]);");
         }
 
         [Test]
@@ -624,7 +624,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.Constraint.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [TESTUNIQUECONSTRAINT] UNIQUE ([TestColumn1], [TestColumn2])");
+            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [TESTUNIQUECONSTRAINT] UNIQUE ([TestColumn1], [TestColumn2]);");
         }
 
         [Test]
@@ -635,7 +635,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintFilter, expression.Constraint.Columns.First() + " IS NOT NULL");
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE INDEX [TESTUNIQUECONSTRAINT] ON [TestSchema].[TestTable1] ([TestColumn1], [TestColumn2]) WHERE TestColumn1 IS NOT NULL");
+            result.ShouldBe("CREATE UNIQUE INDEX [TESTUNIQUECONSTRAINT] ON [TestSchema].[TestTable1] ([TestColumn1], [TestColumn2]) WHERE TestColumn1 IS NOT NULL;");
         }
 
         [Test]
@@ -647,7 +647,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintIncludesList, new List<IndexIncludeDefinition> { new IndexIncludeDefinition { Name = "TestColumn3" } });
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE INDEX [TESTUNIQUECONSTRAINT] ON [TestSchema].[TestTable1] ([TestColumn1], [TestColumn2]) INCLUDE ([TestColumn3]) WHERE TestColumn1 IS NOT NULL");
+            result.ShouldBe("CREATE UNIQUE INDEX [TESTUNIQUECONSTRAINT] ON [TestSchema].[TestTable1] ([TestColumn1], [TestColumn2]) INCLUDE ([TestColumn3]) WHERE TestColumn1 IS NOT NULL;");
         }
 
         [Test]
@@ -660,7 +660,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintIncludesList, new List<IndexIncludeDefinition> { new IndexIncludeDefinition { Name = "TestColumn3" } });
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE INDEX [TESTUNIQUECONSTRAINT] ON [TestSchema].[TestTable1] ([TestColumn1], [TestColumn2]) INCLUDE ([TestColumn3]) WHERE TestColumn1 IS NOT NULL");
+            result.ShouldBe("CREATE UNIQUE INDEX [TESTUNIQUECONSTRAINT] ON [TestSchema].[TestTable1] ([TestColumn1], [TestColumn2]) INCLUDE ([TestColumn3]) WHERE TestColumn1 IS NOT NULL;");
         }
 
         [Test]
@@ -686,7 +686,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintFilter, expression.Constraint.Columns.First() + " IS NOT NULL");
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE INDEX [TESTUNIQUECONSTRAINT] ON [TestSchema].[TestTable1] ([TestColumn1], [TestColumn2]) WHERE TestColumn1 IS NOT NULL");
+            result.ShouldBe("CREATE UNIQUE INDEX [TESTUNIQUECONSTRAINT] ON [TestSchema].[TestTable1] ([TestColumn1], [TestColumn2]) WHERE TestColumn1 IS NOT NULL;");
         }
 
         [Test]
@@ -708,7 +708,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             var expression = GeneratorTestHelper.GetCreateNamedMultiColumnUniqueConstraintExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [TESTUNIQUECONSTRAINT] UNIQUE ([TestColumn1], [TestColumn2])");
+            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [TESTUNIQUECONSTRAINT] UNIQUE ([TestColumn1], [TestColumn2]);");
         }
 
         [Test]
@@ -718,7 +718,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintFilter, expression.Constraint.Columns.First() + " IS NOT NULL");
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE INDEX [TESTUNIQUECONSTRAINT] ON [dbo].[TestTable1] ([TestColumn1], [TestColumn2]) WHERE TestColumn1 IS NOT NULL");
+            result.ShouldBe("CREATE UNIQUE INDEX [TESTUNIQUECONSTRAINT] ON [dbo].[TestTable1] ([TestColumn1], [TestColumn2]) WHERE TestColumn1 IS NOT NULL;");
         }
 
         [Test]
@@ -729,7 +729,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintIncludesList, new List<IndexIncludeDefinition> { new IndexIncludeDefinition { Name = "TestColumn3" } });
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE INDEX [TESTUNIQUECONSTRAINT] ON [dbo].[TestTable1] ([TestColumn1], [TestColumn2]) INCLUDE ([TestColumn3]) WHERE TestColumn1 IS NOT NULL");
+            result.ShouldBe("CREATE UNIQUE INDEX [TESTUNIQUECONSTRAINT] ON [dbo].[TestTable1] ([TestColumn1], [TestColumn2]) INCLUDE ([TestColumn3]) WHERE TestColumn1 IS NOT NULL;");
         }
 
         [Test]
@@ -741,7 +741,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintIncludesList, new List<IndexIncludeDefinition> { new IndexIncludeDefinition { Name = "TestColumn3" } });
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE INDEX [TESTUNIQUECONSTRAINT] ON [dbo].[TestTable1] ([TestColumn1], [TestColumn2]) INCLUDE ([TestColumn3]) WHERE TestColumn1 IS NOT NULL");
+            result.ShouldBe("CREATE UNIQUE INDEX [TESTUNIQUECONSTRAINT] ON [dbo].[TestTable1] ([TestColumn1], [TestColumn2]) INCLUDE ([TestColumn3]) WHERE TestColumn1 IS NOT NULL;");
         }
 
         [Test]
@@ -765,7 +765,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintFilter, expression.Constraint.Columns.First() + " IS NOT NULL");
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE INDEX [TESTUNIQUECONSTRAINT] ON [dbo].[TestTable1] ([TestColumn1], [TestColumn2]) WHERE TestColumn1 IS NOT NULL");
+            result.ShouldBe("CREATE UNIQUE INDEX [TESTUNIQUECONSTRAINT] ON [dbo].[TestTable1] ([TestColumn1], [TestColumn2]) WHERE TestColumn1 IS NOT NULL;");
         }
 
         [Test]
@@ -788,7 +788,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [TESTPRIMARYKEY] PRIMARY KEY ([TestColumn1])");
+            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [TESTPRIMARYKEY] PRIMARY KEY ([TestColumn1]);");
         }
 
         [Test]
@@ -798,7 +798,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [TESTPRIMARYKEY] PRIMARY KEY ([TestColumn1])");
+            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [TESTPRIMARYKEY] PRIMARY KEY ([TestColumn1]);");
         }
 
         [Test]
@@ -808,7 +808,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.Constraint.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [TESTUNIQUECONSTRAINT] UNIQUE ([TestColumn1])");
+            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [TESTUNIQUECONSTRAINT] UNIQUE ([TestColumn1]);");
         }
 
         [Test]
@@ -817,7 +817,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             var expression = GeneratorTestHelper.GetCreateNamedUniqueConstraintExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [TESTUNIQUECONSTRAINT] UNIQUE ([TestColumn1])");
+            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [TESTUNIQUECONSTRAINT] UNIQUE ([TestColumn1]);");
         }
 
         [Test]
@@ -828,7 +828,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [PK_TestTable1_TestColumn1] PRIMARY KEY ([TestColumn1])");
+            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [PK_TestTable1_TestColumn1] PRIMARY KEY ([TestColumn1]);");
         }
 
         [Test]
@@ -838,7 +838,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [PK_TestTable1_TestColumn1] PRIMARY KEY ([TestColumn1])");
+            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [PK_TestTable1_TestColumn1] PRIMARY KEY ([TestColumn1]);");
         }
 
         [Test]
@@ -848,7 +848,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.Constraint.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [UC_TestTable1_TestColumn1] UNIQUE ([TestColumn1])");
+            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [UC_TestTable1_TestColumn1] UNIQUE ([TestColumn1]);");
         }
 
         [Test]
@@ -859,7 +859,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintFilter, expression.Constraint.Columns.First() + " IS NOT NULL");
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE INDEX [UC_TestTable1_TestColumn1] ON [TestSchema].[TestTable1] ([TestColumn1]) WHERE TestColumn1 IS NOT NULL");
+            result.ShouldBe("CREATE UNIQUE INDEX [UC_TestTable1_TestColumn1] ON [TestSchema].[TestTable1] ([TestColumn1]) WHERE TestColumn1 IS NOT NULL;");
         }
 
         [Test]
@@ -870,7 +870,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintIncludesList, new List<IndexIncludeDefinition> { new IndexIncludeDefinition { Name = "TestColumn3" } });
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE INDEX [UC_TestTable1_TestColumn1] ON [dbo].[TestTable1] ([TestColumn1]) INCLUDE ([TestColumn3]) WHERE TestColumn1 IS NOT NULL");
+            result.ShouldBe("CREATE UNIQUE INDEX [UC_TestTable1_TestColumn1] ON [dbo].[TestTable1] ([TestColumn1]) INCLUDE ([TestColumn3]) WHERE TestColumn1 IS NOT NULL;");
         }
 
         [Test]
@@ -882,7 +882,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintIncludesList, new List<IndexIncludeDefinition> { new IndexIncludeDefinition { Name = "TestColumn3" } });
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE INDEX [UC_TestTable1_TestColumn1] ON [dbo].[TestTable1] ([TestColumn1]) INCLUDE ([TestColumn3]) WHERE TestColumn1 IS NOT NULL");
+            result.ShouldBe("CREATE UNIQUE INDEX [UC_TestTable1_TestColumn1] ON [dbo].[TestTable1] ([TestColumn1]) INCLUDE ([TestColumn3]) WHERE TestColumn1 IS NOT NULL;");
         }
 
         [Test]
@@ -908,7 +908,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintFilter, expression.Constraint.Columns.First() + " IS NOT NULL");
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE INDEX [UC_TestTable1_TestColumn1] ON [TestSchema].[TestTable1] ([TestColumn1]) WHERE TestColumn1 IS NOT NULL");
+            result.ShouldBe("CREATE UNIQUE INDEX [UC_TestTable1_TestColumn1] ON [TestSchema].[TestTable1] ([TestColumn1]) WHERE TestColumn1 IS NOT NULL;");
         }
 
         [Test]
@@ -917,7 +917,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             var expression = GeneratorTestHelper.GetCreateUniqueConstraintExpression();
             expression.Constraint.SchemaName = "TestSchema";
             expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.ConstraintType, SqlServerConstraintType.Clustered);
-            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintFilter, expression.Constraint.Columns.First() + " IS NOT NULL");
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintFilter, expression.Constraint.Columns.First() + " IS NOT NULL;");
 
             var ex = Assert.Throws<Exception>(() => Generator.Generate(expression));
             Assert.That(ex, Is.Not.Null);
@@ -930,7 +930,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             var expression = GeneratorTestHelper.GetCreateUniqueConstraintExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [UC_TestTable1_TestColumn1] UNIQUE ([TestColumn1])");
+            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [UC_TestTable1_TestColumn1] UNIQUE ([TestColumn1]);");
         }
 
         [Test]
@@ -940,7 +940,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintFilter, expression.Constraint.Columns.First() + " IS NOT NULL");
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE INDEX [UC_TestTable1_TestColumn1] ON [dbo].[TestTable1] ([TestColumn1]) WHERE TestColumn1 IS NOT NULL");
+            result.ShouldBe("CREATE UNIQUE INDEX [UC_TestTable1_TestColumn1] ON [dbo].[TestTable1] ([TestColumn1]) WHERE TestColumn1 IS NOT NULL;");
         }
 
         [Test]
@@ -951,7 +951,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintFilter, expression.Constraint.Columns.First() + " IS NOT NULL");
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE INDEX [UC_TestTable1_TestColumn1] ON [dbo].[TestTable1] ([TestColumn1]) WHERE TestColumn1 IS NOT NULL");
+            result.ShouldBe("CREATE UNIQUE INDEX [UC_TestTable1_TestColumn1] ON [dbo].[TestTable1] ([TestColumn1]) WHERE TestColumn1 IS NOT NULL;");
         }
 
         [Test]
@@ -973,7 +973,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             new CreateConstraintExpressionBuilder(expression).Online();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [PK_TestTable1_TestColumn1] PRIMARY KEY ([TestColumn1]) WITH (ONLINE=ON)");
+            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [PK_TestTable1_TestColumn1] PRIMARY KEY ([TestColumn1]) WITH (ONLINE=ON);");
         }
 
         [Test]
@@ -983,7 +983,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             new CreateConstraintExpressionBuilder(expression).Online(false);
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [PK_TestTable1_TestColumn1] PRIMARY KEY ([TestColumn1]) WITH (ONLINE=OFF)");
+            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [PK_TestTable1_TestColumn1] PRIMARY KEY ([TestColumn1]) WITH (ONLINE=OFF);");
         }
 
         [Test]
@@ -993,7 +993,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.ForeignKey.ForeignTableSchema = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] DROP CONSTRAINT [FK_Test]");
+            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] DROP CONSTRAINT [FK_Test];");
         }
 
         [Test]
@@ -1002,7 +1002,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             var expression = GeneratorTestHelper.GetDeleteForeignKeyExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] DROP CONSTRAINT [FK_Test]");
+            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] DROP CONSTRAINT [FK_Test];");
         }
 
         [Test]
@@ -1012,7 +1012,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.Constraint.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] DROP CONSTRAINT [TESTPRIMARYKEY]");
+            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] DROP CONSTRAINT [TESTPRIMARYKEY];");
         }
 
         [Test]
@@ -1021,7 +1021,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             var expression = GeneratorTestHelper.GetDeletePrimaryKeyExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] DROP CONSTRAINT [TESTPRIMARYKEY]");
+            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] DROP CONSTRAINT [TESTPRIMARYKEY];");
         }
 
         [Test]
@@ -1030,7 +1030,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             var expression = GeneratorTestHelper.GetDeletePrimaryKeyExpression();
             new DeleteConstraintExpressionBuilder(expression).Online();
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] DROP CONSTRAINT [TESTPRIMARYKEY] WITH (ONLINE=ON)");
+            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] DROP CONSTRAINT [TESTPRIMARYKEY] WITH (ONLINE=ON);");
         }
 
         [Test]
@@ -1039,7 +1039,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             var expression = GeneratorTestHelper.GetDeletePrimaryKeyExpression();
             new DeleteConstraintExpressionBuilder(expression).Online(false);
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] DROP CONSTRAINT [TESTPRIMARYKEY] WITH (ONLINE=OFF)");
+            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] DROP CONSTRAINT [TESTPRIMARYKEY] WITH (ONLINE=OFF);");
         }
 
         [Test]
@@ -1049,7 +1049,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.Constraint.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] DROP CONSTRAINT [TESTUNIQUECONSTRAINT]");
+            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] DROP CONSTRAINT [TESTUNIQUECONSTRAINT];");
         }
 
         [Test]
@@ -1058,7 +1058,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             var expression = GeneratorTestHelper.GetDeleteUniqueConstraintExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] DROP CONSTRAINT [TESTUNIQUECONSTRAINT]");
+            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] DROP CONSTRAINT [TESTUNIQUECONSTRAINT];");
         }
 
 

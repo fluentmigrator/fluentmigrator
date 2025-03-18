@@ -273,7 +273,8 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
         [Test]
         public void CallingAsDecimalWithSizeAndPrecisionSetsColumnDbTypeToDecimal()
         {
-            VerifyColumnDbType(DbType.Decimal, b => b.AsDecimal(1, 2));
+            // ReSharper disable once ValueRangeAttributeViolation
+            VerifyColumnDbType(DbType.Decimal, b => b.AsDecimal(30, 2));
         }
 
         [Test]

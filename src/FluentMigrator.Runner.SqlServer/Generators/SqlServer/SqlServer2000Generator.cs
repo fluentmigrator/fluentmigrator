@@ -90,7 +90,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             return (indexType.Equals(SqlServerConstraintType.Clustered)) ? " CLUSTERED" : " NONCLUSTERED";
         }
 
-        public override string Generate(CreateConstraintExpression expression)
+        protected StringBuilder GenerateCreateConstraintPart(CreateConstraintExpression expression)
         {
             var constraintType = (expression.Constraint.IsPrimaryKeyConstraint) ? "PRIMARY KEY" : "UNIQUE";
 
@@ -98,7 +98,8 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
             string columns = string.Join(", ", expression.Constraint.Columns.Select(x => Quoter.QuoteColumnName(x)).ToArray());
 
-            return string.Format(CreateConstraint,
+            return new StringBuilder().AppendFormat(
+                CreateConstraint,
                 Quoter.QuoteTableName(expression.Constraint.TableName, expression.Constraint.SchemaName),
                 Quoter.Quote(expression.Constraint.ConstraintName),
                 constraintType,
@@ -106,11 +107,18 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                 columns);
         }
 
+        public override string Generate(CreateConstraintExpression expression)
+        {
+            var statement = GenerateCreateConstraintPart(expression);
+
+            return AppendSqlStatementEndToken(statement).ToString();
+        }
+
         public override string Generate(RenameTableExpression expression)
         {
             var sourceParam = Quoter.QuoteValue(Quoter.QuoteTableName(expression.OldName, expression.SchemaName));
             var destinationParam = Quoter.QuoteValue(expression.NewName);
-            return string.Format(RenameTable, sourceParam, destinationParam);
+            return FormatStatement(RenameTable, sourceParam, destinationParam);
         }
 
         public override string Generate(RenameColumnExpression expression)
@@ -119,7 +127,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             var columnName = Quoter.QuoteColumnName(expression.OldName);
             var sourceParam = Quoter.QuoteValue($"{tableName}.{columnName}");
             var destinationParam = Quoter.QuoteValue(expression.NewName);
-            return string.Format(RenameColumn, sourceParam, destinationParam);
+            return FormatStatement(RenameColumn, sourceParam, destinationParam);
         }
 
         public override string Generate(DeleteColumnExpression expression)
@@ -149,7 +157,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
             builder.AppendLine();
 
-            builder.AppendLine(string.Format("-- now we can finally drop column" + Environment.NewLine + "ALTER TABLE {0} DROP COLUMN {1};",
+            builder.AppendLine(FormatStatement("-- now we can finally drop column" + Environment.NewLine + "ALTER TABLE {0} DROP COLUMN {1}",
                                          Quoter.QuoteTableName(expression.TableName, expression.SchemaName),
                                          Quoter.QuoteColumnName(columnName)));
         }
@@ -181,11 +189,12 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         {
             if (IsUsingIdentityInsert(expression))
             {
-                return string.Format("{0}; {1}; {2}",
-                            string.Format(IdentityInsert, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), "ON"),
-                            base.Generate(expression),
-                            string.Format(IdentityInsert, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), "OFF"));
+                return
+                    FormatStatement(IdentityInsert, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), "ON") +
+                    base.Generate(expression) +
+                    FormatStatement(IdentityInsert, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), "OFF");
             }
+
             return base.Generate(expression);
         }
 
