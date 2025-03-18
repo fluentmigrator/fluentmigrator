@@ -74,10 +74,7 @@ namespace FluentMigrator.Runner.Generators.Base
             get { return _column; }
         }
 
-        public IQuoter Quoter
-        {
-            get { return _quoter; }
-        }
+        public IQuoter Quoter => _quoter;
 
         protected IDescriptionGenerator DescriptionGenerator
         {
