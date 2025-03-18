@@ -1,8 +1,8 @@
 #region License
 
-// 
+//
 // Copyright (c) 2007-2024, Fluent Migrator Project
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -30,15 +30,15 @@ namespace FluentMigrator.Tests.Integration.Migrations
             // successfully tested. At time of implementing, the FK constraint
             // wasn't explicitly used by any tests and so should affect anything.
 
+            Create.Table("Groups")
+                .WithColumn("GroupId").AsInt32().Identity().PrimaryKey()
+                .WithColumn("Name").AsString(32).NotNullable();
+
             Create.Table("Users")
                 .WithColumn("UserId").AsInt32().Identity().PrimaryKey()
                 .WithColumn("GroupId").AsInt32().NotNullable().ForeignKey("Groups", "GroupId")
                 .WithColumn("UserName").AsString(32).NotNullable()
                 .WithColumn("Password").AsString(32).NotNullable();
-
-            Create.Table("Groups")
-                .WithColumn("GroupId").AsInt32().Identity().PrimaryKey()
-                .WithColumn("Name").AsString(32).NotNullable();
 
             Create.Column("Foo").OnTable("Users").AsInt16().Indexed().WithDefaultValue(1);
 

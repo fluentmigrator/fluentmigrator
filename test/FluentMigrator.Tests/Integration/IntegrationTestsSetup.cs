@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 //
 // Copyright (c) 2007-2024, Fluent Migrator Project
 //
@@ -16,16 +16,28 @@
 //
 #endregion
 
-using System;
+using System.Threading.Tasks;
 
-using JetBrains.Annotations;
+using FluentMigrator.Tests.Containers;
 
-namespace FluentMigrator.Runner.Initialization
+using NUnit.Framework;
+
+namespace FluentMigrator.Tests.Integration
 {
-    [Obsolete]
-    public interface IConnectionStringProvider
+    [SetUpFixture]
+    public class IntegrationTestsSetup
     {
-        [CanBeNull]
-        string GetConnectionString(IAnnouncer announcer, string connection, string configPath, string assemblyLocation, string database);
+        [OneTimeSetUp]
+        public async Task Setup()
+        {
+            await Task.WhenAll([
+                new MySqlContainer().Start(),
+                new OracleContainer().Start(),
+                new SqlServerContainer().Start(),
+                new PostgresContainer().Start(),
+                new FirebirdContainer().Start(),
+                new Db2Container().Start(),
+            ]);
+        }
     }
 }

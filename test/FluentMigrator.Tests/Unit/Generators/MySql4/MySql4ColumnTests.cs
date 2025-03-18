@@ -231,6 +231,18 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE `TestTable1` CHANGE `TestColumn1` `TestColumn2` ");
         }
+       
+        [Test]
+        public void CanRenameColumnWithCustomSchemaAndDefaultValue()
+        {
+            CanRenameColumnWithCustomSchema();
+        }
+        
+        [Test]
+        public void CanRenameColumnWithDefaultSchemaAndDefaultValue()
+        {
+            CanRenameColumnWithDefaultSchema();
+        }
 
         [Test]
         public void CanAlterColumnWithDescription()

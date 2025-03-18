@@ -46,16 +46,6 @@ namespace FluentMigrator.Runner.Initialization
                     .Union(sourceItems.SelectMany(i => i.Assemblies)).ToList());
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AssemblySource"/> class.
-        /// </summary>
-        /// <param name="assemblyCollectionFunc">Function to get the assembly collection</param>
-        [Obsolete]
-        public AssemblySource(Func<IAssemblyCollection> assemblyCollectionFunc)
-        {
-            _assemblies = new Lazy<IReadOnlyCollection<Assembly>>(() => assemblyCollectionFunc().Assemblies);
-        }
-
         /// <inheritdoc />
         public IReadOnlyCollection<Assembly> Assemblies => _assemblies.Value;
 

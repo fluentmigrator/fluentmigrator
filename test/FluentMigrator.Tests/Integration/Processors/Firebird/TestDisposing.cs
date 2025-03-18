@@ -75,32 +75,17 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [SetUp]
         public void SetUp()
         {
-            if (!IntegrationTestOptions.Firebird.IsEnabled)
-                Assert.Ignore();
+            IntegrationTestOptions.Firebird.IgnoreIfNotEnabled();
 
-            _temporaryDatabase = new TemporaryDatabase(
-                IntegrationTestOptions.Firebird,
-                _prober);
+            var services = FbDatabase.CreateFirebirdServices(_prober, out _temporaryDatabase);
 
-            var serivces = ServiceCollectionExtensions.CreateServices()
-                .ConfigureRunner(builder => builder.AddFirebird())
-                .AddScoped<IConnectionStringReader>(
-                    _ => new PassThroughConnectionStringReader(_temporaryDatabase.ConnectionString));
-
-            ServiceProvider = serivces.BuildServiceProvider();
+            ServiceProvider = services.BuildServiceProvider();
         }
 
         [TearDown]
         public void TearDown()
         {
             ServiceProvider?.Dispose();
-            
-            if (_temporaryDatabase != null)
-            {
-                var connString = _temporaryDatabase.ConnectionString;
-                _temporaryDatabase = null;
-                FbDatabase.DropDatabase(connString);
-            }
             _temporaryDatabase?.Dispose();
         }
     }

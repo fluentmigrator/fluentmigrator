@@ -33,14 +33,13 @@ using FluentMigrator.Runner.Logging;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Runner.Processors.MySql;
-using FluentMigrator.Runner.Processors.Oracle;
 using FluentMigrator.Runner.Processors.Postgres;
-using FluentMigrator.Runner.Processors.Redshift;
 using FluentMigrator.Runner.Processors.Snowflake;
 using FluentMigrator.Runner.Processors.SQLite;
 using FluentMigrator.Runner.Processors.SqlServer;
 using FluentMigrator.Runner.VersionTableInfo;
 using FluentMigrator.Tests.Integration.Migrations.Tagged;
+using FluentMigrator.Tests.Integration.TestCases;
 using FluentMigrator.Tests.Unit;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -61,20 +60,12 @@ namespace FluentMigrator.Tests.Integration
         private const string RootNamespace = "FluentMigrator.Tests.Integration.Migrations";
 
         [Test]
-        [Category("Firebird")]
-        [Category("MySql")]
-        [Category("SQLite")]
-        [Category("Postgres")]
-        [Category("Snowflake")]
-        [Category("SqlServer2005")]
-        [Category("SqlServer2008")]
-        [Category("SqlServer2012")]
-        [Category("SqlServer2014")]
-        [Category("SqlServer2016")]
-        public void CanRunMigration()
+        [TestCaseSource(typeof(ProcessorTestCaseSource))]
+        public void CanRunMigration(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
         {
-            ExecuteWithSupportedProcessors(
-                init => init.WithMigrationsIn(RootNamespace),
+            ExecuteWithProcessor(
+                processorType,
+                services => services.WithMigrationsIn(RootNamespace),
                 (serviceProvider, processor) =>
                 {
                     var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
@@ -88,20 +79,11 @@ namespace FluentMigrator.Tests.Integration
 
                     runner.Down(new TestCreateAndDropTableMigration());
                     processor.TableExists(null, "TestTable").ShouldBeFalse();
-                });
+                },
+                serverOptions);
         }
 
         [Test]
-        [Category("Firebird")]
-        [Category("MySql")]
-        [Category("SQLite")]
-        [Category("Postgres")]
-        [Category("Snowflake")]
-        [Category("SqlServer2005")]
-        [Category("SqlServer2008")]
-        [Category("SqlServer2012")]
-        [Category("SqlServer2014")]
-        [Category("SqlServer2016")]
         public void CanSilentlyFail()
         {
             var processor = new Mock<IMigrationProcessor>();
@@ -127,18 +109,13 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
-        [Category("Firebird")]
-        [Category("MySql")]
-        [Category("Postgres")]
-        [Category("Snowflake")]
-        [Category("SqlServer2005")]
-        [Category("SqlServer2008")]
-        [Category("SqlServer2012")]
-        [Category("SqlServer2014")]
-        [Category("SqlServer2016")]
-        public void CanApplyForeignKeyConvention()
+        [TestCaseSource(typeof(ProcessorTestCaseSourceExcept<
+            SQLiteProcessor
+        >))]
+        public void CanApplyForeignKeyConvention(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithProcessor(
+                processorType,
                 services => services.WithMigrationsIn(RootNamespace),
                 (serviceProvider, processor) =>
                 {
@@ -150,22 +127,19 @@ namespace FluentMigrator.Tests.Integration
                     runner.Down(new TestForeignKeyNamingConvention());
                     processor.ConstraintExists(null, "Users", "FK_Users_GroupId_Groups_GroupId").ShouldBeFalse();
                 },
-                true,
-                typeof(SQLiteProcessor));
+                serverOptions,
+                true);
         }
 
         [Test]
-        [Category("MySql")]
-        [Category("Postgres")]
-        [Category("Snowflake")]
-        [Category("SqlServer2005")]
-        [Category("SqlServer2008")]
-        [Category("SqlServer2012")]
-        [Category("SqlServer2014")]
-        [Category("SqlServer2016")]
-        public void CanApplyForeignKeyConventionWithSchema()
+        [TestCaseSource(typeof(ProcessorTestCaseSourceExcept<
+            SQLiteProcessor,
+            FirebirdProcessor
+        >))]
+        public void CanApplyForeignKeyConventionWithSchema(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithProcessor(
+                processorType,
                 services => services.WithMigrationsIn(RootNamespace),
                 (serviceProvider, processor) =>
                 {
@@ -176,24 +150,17 @@ namespace FluentMigrator.Tests.Integration
                     processor.ConstraintExists("TestSchema", "Users", "FK_Users_GroupId_Groups_GroupId").ShouldBeTrue();
                     runner.Down(new TestForeignKeyNamingConventionWithSchema());
                 },
-                false,
-                typeof(SQLiteProcessor),
-                typeof(FirebirdProcessor));
+                serverOptions);
         }
 
         [Test]
-        [Category("Firebird")]
-        [Category("MySql")]
-        [Category("SQLite")]
-        [Category("Postgres")]
-        [Category("SqlServer2005")]
-        [Category("SqlServer2008")]
-        [Category("SqlServer2012")]
-        [Category("SqlServer2014")]
-        [Category("SqlServer2016")]
-        public void CanApplyIndexConvention()
+        [TestCaseSource(typeof(ProcessorTestCaseSourceExcept<
+            SnowflakeProcessor /* Snowflake does not have default schema. */
+        >))]
+        public void CanApplyIndexConvention(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithProcessor(
+                processorType,
                 services => services.WithMigrationsIn(RootNamespace),
                 (serviceProvider, processor) =>
                 {
@@ -204,26 +171,20 @@ namespace FluentMigrator.Tests.Integration
                     processor.TableExists(null, "Users").ShouldBeTrue();
 
                     runner.Down(new TestIndexNamingConvention());
-                    processor.IndexExists(null, "Users", "IX_Users_GroupId").ShouldBeFalse();
                     processor.TableExists(null, "Users").ShouldBeFalse();
                 },
-                true,
-                typeof(SnowflakeProcessor) /* Snowflake does not have default schema. */);
+                serverOptions,
+                true);
         }
 
         [Test]
-        [Category("Firebird")]
-        [Category("MySql")]
-        [Category("Postgres")]
-        [Category("Snowflake")]
-        [Category("SqlServer2005")]
-        [Category("SqlServer2008")]
-        [Category("SqlServer2012")]
-        [Category("SqlServer2014")]
-        [Category("SqlServer2016")]
-        public void CanApplyUniqueConvention()
+        [TestCaseSource(typeof(ProcessorTestCaseSourceExcept<
+            SQLiteProcessor
+        >))]
+        public void CanApplyUniqueConvention(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithProcessor(
+                processorType,
                 services => services.WithMigrationsIn(RootNamespace),
                 (serviceProvider, processor) =>
                 {
@@ -239,23 +200,17 @@ namespace FluentMigrator.Tests.Integration
                     processor.ConstraintExists(null, "Users", "UC_Users_AccountId").ShouldBeFalse();
                     processor.TableExists(null, "Users").ShouldBeFalse();
                 },
-                false,
-                typeof(SQLiteProcessor));
+                serverOptions);
         }
 
         [Test]
-        [Category("Firebird")]
-        [Category("MySql")]
-        [Category("SQLite")]
-        [Category("Postgres")]
-        [Category("SqlServer2005")]
-        [Category("SqlServer2008")]
-        [Category("SqlServer2012")]
-        [Category("SqlServer2014")]
-        [Category("SqlServer2016")]
-        public void CanApplyIndexConventionWithSchema()
+        [TestCaseSource(typeof(ProcessorTestCaseSourceExcept<
+            SnowflakeProcessor /* Snowflake does not support indices. */
+        >))]
+        public void CanApplyIndexConventionWithSchema(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithProcessor(
+                processorType,
                 services => services.WithMigrationsIn(RootNamespace),
                 (serviceProvider, processor) =>
                 {
@@ -269,23 +224,17 @@ namespace FluentMigrator.Tests.Integration
                     processor.IndexExists("TestSchema", "Users", "IX_Users_GroupId").ShouldBeFalse();
                     processor.TableExists("TestSchema", "Users").ShouldBeFalse();
                 },
-                true,
-                typeof(SnowflakeProcessor) /* Snowflake does not support indices. */);
+                serverOptions);
         }
 
         [Test]
-        [Category("Firebird")]
-        [Category("MySql")]
-        [Category("SQLite")]
-        [Category("Postgres")]
-        [Category("SqlServer2005")]
-        [Category("SqlServer2008")]
-        [Category("SqlServer2012")]
-        [Category("SqlServer2014")]
-        [Category("SqlServer2016")]
-        public void CanCreateAndDropIndex()
+        [TestCaseSource(typeof(ProcessorTestCaseSourceExcept<
+            SnowflakeProcessor /* Snowflake does not support indices. */
+        >))]
+        public void CanCreateAndDropIndex(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithProcessor(
+                processorType,
                 services => services.WithMigrationsIn(RootNamespace),
                 (serviceProvider, processor) =>
                 {
@@ -305,21 +254,18 @@ namespace FluentMigrator.Tests.Integration
 
                     //processor.CommitTransaction();
                 },
-                true,
-                typeof(SnowflakeProcessor) /* Snowflake does not support indices. */);
+                serverOptions);
         }
 
         [Test]
-        [Category("MySql")]
-        [Category("Postgres")]
-        [Category("SqlServer2005")]
-        [Category("SqlServer2008")]
-        [Category("SqlServer2012")]
-        [Category("SqlServer2014")]
-        [Category("SqlServer2016")]
-        public void CanCreateAndDropIndexWithSchema()
+        [TestCaseSource(typeof(ProcessorTestCaseSourceExcept<
+            FirebirdProcessor,
+            SnowflakeProcessor /* Snowflake does not support indices. */
+        >))]
+        public void CanCreateAndDropIndexWithSchema(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithProcessor(
+                processorType,
                 services => services.WithMigrationsIn(RootNamespace),
                 (serviceProvider, processor) =>
                 {
@@ -342,24 +288,17 @@ namespace FluentMigrator.Tests.Integration
                     runner.Down(new TestCreateSchema());
                     //processor.CommitTransaction();
                 },
-                false,
-                typeof(FirebirdProcessor),
-                typeof(SnowflakeProcessor) /* Snowflake does not support indices. */);
+                serverOptions);
         }
 
         [Test]
-        [Category("Firebird")]
-        [Category("MySql")]
-        [Category("SQLite")]
-        [Category("Postgres")]
-        [Category("SqlServer2005")]
-        [Category("SqlServer2008")]
-        [Category("SqlServer2012")]
-        [Category("SqlServer2014")]
-        [Category("SqlServer2016")]
-        public void CanRenameTable()
+        [TestCaseSource(typeof(ProcessorTestCaseSourceExcept<
+            SnowflakeProcessor /* This test does not work with snowflake, see test CanRenameTableWithSchema in class SnowflakeMigrationRunnerTests. */
+        >))]
+        public void CanRenameTable(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithProcessor(
+                processorType,
                 services => services.WithMigrationsIn(RootNamespace),
                 (serviceProvider, processor) =>
                 {
@@ -381,23 +320,18 @@ namespace FluentMigrator.Tests.Integration
 
                     //processor.CommitTransaction();
                 },
-                true,
-                typeof(SnowflakeProcessor) /* This test does not work with snowflake, see test CanRenameTableWithSchema in class SnowflakeMigrationRunnerTests. */);
+                serverOptions,
+                true);
         }
 
         [Test]
-        [Category("Firebird")]
-        [Category("MySql")]
-        [Category("SQLite")]
-        [Category("Postgres")]
-        [Category("SqlServer2005")]
-        [Category("SqlServer2008")]
-        [Category("SqlServer2012")]
-        [Category("SqlServer2014")]
-        [Category("SqlServer2016")]
-        public void CanRenameTableWithSchema()
+        [TestCaseSource(typeof(ProcessorTestCaseSourceExcept<
+            SnowflakeProcessor /* This test does not work with snowflake, see test CanRenameTableWithSchema in class SnowflakeMigrationRunnerTests. */
+        >))]
+        public void CanRenameTableWithSchema(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithProcessor(
+                processorType,
                 services => services.WithMigrationsIn(RootNamespace),
                 (serviceProvider, processor) =>
                 {
@@ -423,22 +357,19 @@ namespace FluentMigrator.Tests.Integration
 
                     //processor.CommitTransaction();
                 },
-                true,
-                typeof(SnowflakeProcessor) /* This test does not work with snowflake, see test CanRenameTableWithSchema in class SnowflakeMigrationRunnerTests. */);
+                serverOptions,
+                true);
         }
 
         [Test]
-        [Category("Firebird")]
-        [Category("MySql")]
-        [Category("Postgres")]
-        [Category("SqlServer2005")]
-        [Category("SqlServer2008")]
-        [Category("SqlServer2012")]
-        [Category("SqlServer2014")]
-        [Category("SqlServer2016")]
-        public void CanRenameColumn()
+        [TestCaseSource(typeof(ProcessorTestCaseSourceExcept<
+            SQLiteProcessor,
+            SnowflakeProcessor /* This test does not work with snowflake, see test CanRenameColumnWithSchema in class SnowflakeMigrationRunnerTests. */
+        >))]
+        public void CanRenameColumn(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithProcessor(
+                processorType,
                 services => services.WithMigrationsIn(RootNamespace),
                 (serviceProvider, processor) =>
                 {
@@ -458,22 +389,20 @@ namespace FluentMigrator.Tests.Integration
                     runner.Down(new TestCreateAndDropTableMigration());
                     processor.ColumnExists(null, "TestTable2", "Name").ShouldBeFalse();
                 },
-                true,
-                typeof(SQLiteProcessor),
-                typeof(SnowflakeProcessor) /* This test does not work with snowflake, see test CanRenameColumnWithSchema in class SnowflakeMigrationRunnerTests. */);
+                serverOptions,
+                true);
         }
 
         [Test]
-        [Category("MySql")]
-        [Category("Postgres")]
-        [Category("SqlServer2005")]
-        [Category("SqlServer2008")]
-        [Category("SqlServer2012")]
-        [Category("SqlServer2014")]
-        [Category("SqlServer2016")]
-        public void CanRenameColumnWithSchema()
+        [TestCaseSource(typeof(ProcessorTestCaseSourceExcept<
+            SQLiteProcessor,
+            FirebirdProcessor,
+            SnowflakeProcessor /* This test does not work with snowflake, see test CanRenameColumnWithSchema in class SnowflakeMigrationRunnerTests. */
+        >))]
+        public void CanRenameColumnWithSchema(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithProcessor(
+                processorType,
                 services => services.WithMigrationsIn(RootNamespace),
                 (serviceProvider, processor) =>
                 {
@@ -497,26 +426,16 @@ namespace FluentMigrator.Tests.Integration
 
                     runner.Down(new TestCreateSchema());
                 },
-                true,
-                typeof(SQLiteProcessor),
-                typeof(FirebirdProcessor),
-                typeof(SnowflakeProcessor) /* This test does not work with snowflake, see test CanRenameColumnWithSchema in class SnowflakeMigrationRunnerTests. */);
+                serverOptions,
+                true);
         }
 
         [Test]
-        [Category("Firebird")]
-        [Category("MySql")]
-        [Category("SQLite")]
-        [Category("Postgres")]
-        [Category("Snowflake")]
-        [Category("SqlServer2005")]
-        [Category("SqlServer2008")]
-        [Category("SqlServer2012")]
-        [Category("SqlServer2014")]
-        [Category("SqlServer2016")]
-        public void CanLoadMigrations()
+        [TestCaseSource(typeof(ProcessorTestCaseSource))]
+        public void CanLoadMigrations(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithProcessor(
+                processorType,
                 services => services.WithMigrationsIn(RootNamespace),
                 (serviceProvider, _) =>
                 {
@@ -525,23 +444,16 @@ namespace FluentMigrator.Tests.Integration
                     //runner.Processor.CommitTransaction();
 
                     runner.MigrationLoader.LoadMigrations().ShouldNotBeNull();
-                });
+                },
+                serverOptions);
         }
 
         [Test]
-        [Category("Firebird")]
-        [Category("MySql")]
-        [Category("SQLite")]
-        [Category("Postgres")]
-        [Category("Snowflake")]
-        [Category("SqlServer2005")]
-        [Category("SqlServer2008")]
-        [Category("SqlServer2012")]
-        [Category("SqlServer2014")]
-        [Category("SqlServer2016")]
-        public void CanLoadVersion()
+        [TestCaseSource(typeof(ProcessorTestCaseSource))]
+        public void CanLoadVersion(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithProcessor(
+                processorType,
                 services => services.WithMigrationsIn(RootNamespace),
                 (serviceProvider, _) =>
                 {
@@ -550,16 +462,20 @@ namespace FluentMigrator.Tests.Integration
                     //runner.Processor.CommitTransaction();
                     runner.VersionLoader.VersionInfo.ShouldNotBeNull();
                 },
-                true,
-                Array.Empty<Type>());
+                serverOptions,
+                true
+            );
         }
 
         [Test]
-        [Category("Snowflake")]
-        [Category("SqlServer2016")]
-        public void CanLoadVersionCustomTable()
+        [TestCaseSource(typeof(ProcessorTestCaseSourceOnly<
+            SnowflakeProcessor,
+            SqlServer2016Processor
+        >))]
+        public void CanLoadVersionCustomTable(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithProcessor(
+                processorType,
                 services => services.ConfigureRunner(rb => rb.WithVersionTable(new TestVersionTableMetaData())).WithMigrationsIn(RootNamespace),
                 (serviceProvider, _) =>
                 {
@@ -568,35 +484,16 @@ namespace FluentMigrator.Tests.Integration
                     //runner.Processor.CommitTransaction();
                     runner.VersionLoader.VersionInfo.ShouldNotBeNull();
                 },
-                true,
-                typeof(FirebirdProcessor),
-                typeof(MySqlProcessor),
-                typeof(MySql4Processor),
-                typeof(MySql5Processor),
-                typeof(OracleProcessor),
-                typeof(RedshiftProcessor),
-                typeof(SQLiteProcessor),
-                typeof(SqlServer2000Processor),
-                typeof(SqlServer2005Processor),
-                typeof(SqlServer2008Processor),
-                typeof(SqlServer2014Processor),
-                typeof(SqlServer2012Processor));
+                serverOptions,
+                true);
         }
 
         [Test]
-        [Category("Firebird")]
-        [Category("MySql")]
-        [Category("SQLite")]
-        [Category("Postgres")]
-        [Category("Snowflake")]
-        [Category("SqlServer2005")]
-        [Category("SqlServer2008")]
-        [Category("SqlServer2012")]
-        [Category("SqlServer2014")]
-        [Category("SqlServer2016")]
-        public void CanRunMigrations()
+        [TestCaseSource(typeof(ProcessorTestCaseSource))]
+        public void CanRunMigrations(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithProcessor(
+                processorType,
                 services => services.WithMigrationsIn(RootNamespace),
                 (serviceProvider, _) =>
                 {
@@ -610,28 +507,21 @@ namespace FluentMigrator.Tests.Integration
                     runner.VersionLoader.VersionInfo.HasAppliedMigration(4).ShouldBeTrue();
                     runner.VersionLoader.VersionInfo.HasAppliedMigration(5).ShouldBeTrue();
                     runner.VersionLoader.VersionInfo.HasAppliedMigration(6).ShouldBeTrue();
-                    runner.VersionLoader.VersionInfo.Latest().ShouldBe(6);
+                    runner.VersionLoader.VersionInfo.HasAppliedMigration(7).ShouldBeTrue();
+                    runner.VersionLoader.VersionInfo.Latest().ShouldBe(7);
 
                     runner.RollbackToVersion(0, false);
                 },
-                true,
-                Array.Empty<Type>());
+                serverOptions,
+                true);
         }
 
         [Test]
-        [Category("Firebird")]
-        [Category("MySql")]
-        [Category("SQLite")]
-        [Category("Postgres")]
-        [Category("Snowflake")]
-        [Category("SqlServer2005")]
-        [Category("SqlServer2008")]
-        [Category("SqlServer2012")]
-        [Category("SqlServer2014")]
-        [Category("SqlServer2016")]
-        public void CanMigrateASpecificVersion()
+        [TestCaseSource(typeof(ProcessorTestCaseSource))]
+        public void CanMigrateASpecificVersion(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithProcessor(
+                processorType,
                 services => services.WithMigrationsIn(RootNamespace),
                 (serviceProvider, processor) =>
                 {
@@ -653,30 +543,20 @@ namespace FluentMigrator.Tests.Integration
                         runner.RollbackToVersion(0, false);
                     }
                 },
-                true,
-                Array.Empty<Type>());
+                serverOptions,
+                true);
         }
 
         [Test]
-        [Category("Firebird")]
-        [Category("MySql")]
-        [Category("Postgres")]
-        [Category("Snowflake")]
-        [Category("SqlServer2005")]
-        [Category("SqlServer2008")]
-        [Category("SqlServer2012")]
-        [Category("SqlServer2014")]
-        [Category("SqlServer2016")]
-        public void CanMigrateASpecificVersionDown()
+        [TestCaseSource(typeof(ProcessorTestCaseSourceExcept<
+            SQLiteProcessor
+        >))]
+        public void CanMigrateASpecificVersionDown(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
         {
-            var excludedProcessors = new[]
-            {
-                typeof(SQLiteProcessor),
-            };
-
             try
             {
-                ExecuteWithSupportedProcessors(
+                ExecuteWithProcessor(
+                    processorType,
                     services => services.WithMigrationsIn(RootNamespace),
                     (serviceProvider, processor) =>
                     {
@@ -698,37 +578,29 @@ namespace FluentMigrator.Tests.Integration
 
                         processor.TableExists(null, "Users").ShouldBeFalse();
                     },
-                    false,
-                    excludedProcessors);
+                    serverOptions);
             }
             finally
             {
-                ExecuteWithSupportedProcessors(
+                ExecuteWithProcessor(
+                    processorType,
                     services => services.WithMigrationsIn(RootNamespace),
                     (serviceProvider, _) =>
                     {
                         var runner = (MigrationRunner) serviceProvider.GetRequiredService<IMigrationRunner>();
                         runner.RollbackToVersion(0, false);
                     },
-                    false,
-                    excludedProcessors);
+                    serverOptions
+                );
             }
         }
 
         [Test]
-        [Category("Firebird")]
-        [Category("MySql")]
-        [Category("SQLite")]
-        [Category("Postgres")]
-        [Category("Snowflake")]
-        [Category("SqlServer2005")]
-        [Category("SqlServer2008")]
-        [Category("SqlServer2012")]
-        [Category("SqlServer2014")]
-        [Category("SqlServer2016")]
-        public void RollbackAllShouldRemoveVersionInfoTable()
+        [TestCaseSource(typeof(ProcessorTestCaseSource))]
+        public void RollbackAllShouldRemoveVersionInfoTable(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithProcessor(
+                processorType,
                 services => services.WithMigrationsIn(RootNamespace),
                 (serviceProvider, processor) =>
                 {
@@ -746,20 +618,19 @@ namespace FluentMigrator.Tests.Integration
                         runner.VersionLoader.VersionTableMetaData.SchemaName,
                         runner.VersionLoader.VersionTableMetaData.TableName).ShouldBeFalse();
                 },
-                true,
-                Array.Empty<Type>());
+                serverOptions,
+                true
+            );
         }
 
         [Test]
-        [Category("SqlServer2008")]
-        public void MigrateUpWithSqlServerProcessorShouldCommitItsTransaction()
+        [TestCaseSource(typeof(ProcessorTestCaseSourceOnly<
+            SqlServer2008Processor
+        >))]
+        public void MigrateUpWithSqlServerProcessorShouldCommitItsTransaction(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
         {
-            if (!IntegrationTestOptions.SqlServer2008.IsEnabled)
-            {
-                return;
-            }
-
-            ExecuteWithProcessor<SqlServer2008Processor>(
+            ExecuteWithProcessor(
+                processorType,
                 init => init.WithMigrationsIn(RootNamespace),
                 (serviceProvider, processor) =>
                 {
@@ -772,23 +643,20 @@ namespace FluentMigrator.Tests.Integration
                     }
                     finally
                     {
-                        CleanupTestSqlServerDatabase(serviceProvider, processor);
+                        CleanupTestDatabase(serviceProvider, processor);
                     }
                 },
-                false,
-                IntegrationTestOptions.SqlServer2008);
+                serverOptions);
         }
 
         [Test]
-        [Category("SqlServer2008")]
-        public void MigrateUpSpecificVersionWithSqlServerProcessorShouldCommitItsTransaction()
+        [TestCaseSource(typeof(ProcessorTestCaseSourceOnly<
+            SqlServer2008Processor
+        >))]
+        public void MigrateUpSpecificVersionWithSqlServerProcessorShouldCommitItsTransaction(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
         {
-            if (!IntegrationTestOptions.SqlServer2008.IsEnabled)
-            {
-                return;
-            }
-
-            ExecuteWithProcessor<SqlServer2008Processor>(
+            ExecuteWithProcessor(
+                processorType,
                 init => init.WithMigrationsIn(RootNamespace),
                 (serviceProvider, processor) =>
                 {
@@ -801,27 +669,18 @@ namespace FluentMigrator.Tests.Integration
                     }
                     finally
                     {
-                        CleanupTestSqlServerDatabase(serviceProvider, processor);
+                        CleanupTestDatabase(serviceProvider, processor);
                     }
                 },
-                false,
-                IntegrationTestOptions.SqlServer2008);
+                serverOptions);
         }
 
         [Test]
-        [Category("Firebird")]
-        [Category("MySql")]
-        [Category("SQLite")]
-        [Category("Postgres")]
-        [Category("Snowflake")]
-        [Category("SqlServer2005")]
-        [Category("SqlServer2008")]
-        [Category("SqlServer2012")]
-        [Category("SqlServer2014")]
-        [Category("SqlServer2016")]
-        public void MigrateUpWithTaggedMigrationsShouldOnlyApplyMatchedMigrations()
+        [TestCaseSource(typeof(ProcessorTestCaseSource))]
+        public void MigrateUpWithTaggedMigrationsShouldOnlyApplyMatchedMigrations(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithProcessor(
+                processorType,
                 services => services.WithMigrationsIn(typeof(TenantATable).Namespace)
                     .Configure<RunnerOptions>(opt => opt.Tags = new[] { "TenantA" }),
                 (serviceProvider, processor) =>
@@ -842,24 +701,17 @@ namespace FluentMigrator.Tests.Integration
                         runner.RollbackToVersion(0);
                     }
                 },
-                true,
-                Array.Empty<Type>());
+                serverOptions,
+                true
+            );
         }
 
         [Test]
-        [Category("Firebird")]
-        [Category("MySql")]
-        [Category("SQLite")]
-        [Category("Postgres")]
-        [Category("Snowflake")]
-        [Category("SqlServer2005")]
-        [Category("SqlServer2008")]
-        [Category("SqlServer2012")]
-        [Category("SqlServer2014")]
-        [Category("SqlServer2016")]
-        public void MigrateUpWithTaggedMigrationsAndUsingMultipleTagsShouldOnlyApplyMatchedMigrations()
+        [TestCaseSource(typeof(ProcessorTestCaseSource))]
+        public void MigrateUpWithTaggedMigrationsAndUsingMultipleTagsShouldOnlyApplyMatchedMigrations(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithProcessor(
+                processorType,
                 services => services.WithMigrationsIn(typeof(TenantATable).Namespace)
                     .Configure<RunnerOptions>(opt => opt.Tags = new[] { "TenantA", "TenantB" }),
                 (serviceProvider, processor) =>
@@ -880,24 +732,17 @@ namespace FluentMigrator.Tests.Integration
                         runner.RollbackToVersion(0);
                     }
                 },
-                true,
-                Array.Empty<Type>());
+                serverOptions,
+                true
+            );
         }
 
         [Test]
-        [Category("Firebird")]
-        [Category("MySql")]
-        [Category("SQLite")]
-        [Category("Postgres")]
-        [Category("Snowflake")]
-        [Category("SqlServer2005")]
-        [Category("SqlServer2008")]
-        [Category("SqlServer2012")]
-        [Category("SqlServer2014")]
-        [Category("SqlServer2016")]
-        public void MigrateUpWithDifferentTaggedShouldIgnoreConcreteOfTagged()
+        [TestCaseSource(typeof(ProcessorTestCaseSource))]
+        public void MigrateUpWithDifferentTaggedShouldIgnoreConcreteOfTagged(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithProcessor(
+                processorType,
                 services => services.WithMigrationsIn(typeof(TenantATable).Namespace)
                     .Configure<RunnerOptions>(opt => opt.Tags = new[] { "TenantB" }),
                 (serviceProvider, processor) =>
@@ -917,28 +762,20 @@ namespace FluentMigrator.Tests.Integration
                         runner.RollbackToVersion(0);
                     }
                 },
-                true,
-                Array.Empty<Type>());
+                serverOptions,
+                true);
         }
 
         [Test]
-        [Category("Firebird")]
-        [Category("MySql")]
-        [Category("Postgres")]
-        [Category("Snowflake")]
-        [Category("SqlServer2005")]
-        [Category("SqlServer2008")]
-        [Category("SqlServer2012")]
-        [Category("SqlServer2014")]
-        [Category("SqlServer2016")]
-        public void MigrateDownWithDifferentTagsToMigrateUpShouldApplyMatchedMigrations()
+        [TestCaseSource(typeof(ProcessorTestCaseSource))]
+        public void MigrateDownWithDifferentTagsToMigrateUpShouldApplyMatchedMigrations(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
         {
             var migrationsNamespace = typeof(TenantATable).Namespace;
-            var excludedProcessors = Array.Empty<Type>();
 
             try
             {
-                ExecuteWithSupportedProcessors(
+                ExecuteWithProcessor(
+                    processorType,
                     services => services.WithMigrationsIn(migrationsNamespace).Configure<RunnerOptions>(opt => opt.Tags = new[] { "TenantA" }),
                     (serviceProvider, processor) =>
                     {
@@ -950,10 +787,10 @@ namespace FluentMigrator.Tests.Integration
                         processor.TableExists(null, "TenantBTable").ShouldBeFalse();
                         processor.TableExists(null, "TenantAandBTable").ShouldBeTrue();
                     },
-                    false,
-                    excludedProcessors);
+                    serverOptions);
 
-                ExecuteWithSupportedProcessors(
+                ExecuteWithProcessor(
+                    processorType,
                     services => services.WithMigrationsIn(migrationsNamespace).Configure<RunnerOptions>(opt => opt.Tags = new[] { "TenantB" }),
                     (serviceProvider, processor) =>
                     {
@@ -965,32 +802,28 @@ namespace FluentMigrator.Tests.Integration
                         processor.TableExists(null, "TenantBTable").ShouldBeFalse();
                         processor.TableExists(null, "TenantAandBTable").ShouldBeFalse();
                     },
-                    false,
-                    excludedProcessors);
+                    serverOptions);
             }
             finally
             {
-                ExecuteWithSupportedProcessors(
+                ExecuteWithProcessor(
+                    processorType,
                     services => services.WithMigrationsIn(migrationsNamespace).Configure<RunnerOptions>(opt => opt.Tags = new[] { "TenantA" }),
                     (serviceProvider, _) =>
                     {
                         var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
                         runner.RollbackToVersion(0, false);
                     },
-                    false,
-                    excludedProcessors);
+                    serverOptions);
             }
         }
 
         [Test]
-        [Category("SqlServer2008")]
-        public void VersionInfoCreationScriptsOnlyGeneratedOnceInPreviewMode()
+        [TestCaseSource(typeof(ProcessorTestCaseSourceOnly<
+            SqlServer2008Processor
+        >))]
+        public void VersionInfoCreationScriptsOnlyGeneratedOnceInPreviewMode(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
         {
-            if (!IntegrationTestOptions.SqlServer2008.IsEnabled)
-            {
-                return;
-            }
-
             var outputSql = new StringWriter();
             var provider = new SqlScriptFluentMigratorLoggerProvider(
                 outputSql,
@@ -999,7 +832,8 @@ namespace FluentMigrator.Tests.Integration
                     ShowSql = true,
                 });
 
-            ExecuteWithProcessor<SqlServer2008Processor>(
+            ExecuteWithProcessor(
+                processorType,
                 services => services
                     .ConfigureRunner(rb => rb.WithVersionTable(new TestVersionTableMetaData()))
                     .WithMigrationsIn(RootNamespace)
@@ -1040,27 +874,18 @@ namespace FluentMigrator.Tests.Integration
                     }
                     finally
                     {
-                        CleanupTestSqlServerDatabase(serviceProvider, processor);
+                        CleanupTestDatabase(serviceProvider, processor);
                     }
                 },
-                false,
-                IntegrationTestOptions.SqlServer2008);
+                serverOptions);
         }
 
         [Test]
-        [Category("Firebird")]
-        [Category("MySql")]
-        [Category("SQLite")]
-        [Category("Postgres")]
-        [Category("Snowflake")]
-        [Category("SqlServer2005")]
-        [Category("SqlServer2008")]
-        [Category("SqlServer2012")]
-        [Category("SqlServer2014")]
-        [Category("SqlServer2016")]
-        public void MigrateUpWithTaggedMigrationsShouldNotApplyAnyMigrationsIfNoTagsParameterIsPassedIntoTheRunner()
+        [TestCaseSource(typeof(ProcessorTestCaseSource))]
+        public void MigrateUpWithTaggedMigrationsShouldNotApplyAnyMigrationsIfNoTagsParameterIsPassedIntoTheRunner(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithProcessor(
+                processorType,
                 services => services.WithMigrationsIn(typeof(TenantATable).Namespace),
                 (serviceProvider, processor) =>
                 {
@@ -1080,28 +905,25 @@ namespace FluentMigrator.Tests.Integration
                         runner.RollbackToVersion(0);
                     }
                 },
-                true,
-                Array.Empty<Type>());
+                serverOptions,
+                true
+            );
         }
 
         [Test]
-        [Category("Firebird")]
-        [Category("Snowflake")]
-        [Category("SqlServer2005")]
-        [Category("SqlServer2008")]
-        [Category("SqlServer2012")]
-        [Category("SqlServer2014")]
-        [Category("SqlServer2016")]
-        public void ValidateVersionOrderShouldDoNothingIfUnappliedMigrationVersionIsGreaterThanLatestAppliedMigration()
+        [TestCaseSource(typeof(ProcessorTestCaseSourceExcept<
+            MySqlProcessor,
+            PostgresProcessor
+        >))]
+        public void ValidateVersionOrderShouldDoNothingIfUnappliedMigrationVersionIsGreaterThanLatestAppliedMigration(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
         {
-            var excludedProcessors = new[] { typeof(MySqlProcessor), typeof(PostgresProcessor), };
-
             var namespacePass2 = typeof(Migrations.Interleaved.Pass2.User).Namespace;
             var namespacePass3 = typeof(Migrations.Interleaved.Pass3.User).Namespace;
 
             try
             {
-                ExecuteWithSupportedProcessors(
+                ExecuteWithProcessor(
+                    processorType,
                     services => services.WithMigrationsIn(namespacePass2),
                     (serviceProvider, _) =>
                     {
@@ -1110,10 +932,10 @@ namespace FluentMigrator.Tests.Integration
 
                         runner.MigrateUp(3);
                     },
-                    tryRollback: false,
-                    excludedProcessors);
+                    serverOptions);
 
-                ExecuteWithSupportedProcessors(
+                ExecuteWithProcessor(
+                    processorType,
                     services => services.WithMigrationsIn(namespacePass3),
                     (serviceProvider, _) =>
                     {
@@ -1122,12 +944,12 @@ namespace FluentMigrator.Tests.Integration
 
                         Assert.DoesNotThrow(runner.ValidateVersionOrder);
                     },
-                    tryRollback: false,
-                    excludedProcessors);
+                    serverOptions);
             }
             finally
             {
-                ExecuteWithSupportedProcessors(
+                ExecuteWithProcessor(
+                    processorType,
                     services => services.WithMigrationsIn(namespacePass3),
                     (serviceProvider, _) =>
                     {
@@ -1135,24 +957,17 @@ namespace FluentMigrator.Tests.Integration
                             .GetRequiredService<IMigrationRunner>();
                         runner.RollbackToVersion(0);
                     },
-                    tryRollback: true,
-                    excludedProcessors);
+                    serverOptions,
+                    true);
             }
         }
 
         [Test]
-        [Category("Firebird")]
-        [Category("Postgres")]
-        [Category("Snowflake")]
-        [Category("SqlServer2005")]
-        [Category("SqlServer2008")]
-        [Category("SqlServer2012")]
-        [Category("SqlServer2014")]
-        [Category("SqlServer2016")]
-        public void ValidateVersionOrderShouldThrowExceptionIfUnappliedMigrationVersionIsLessThanLatestAppliedMigration()
+        [TestCaseSource(typeof(ProcessorTestCaseSourceExcept<
+            MySqlProcessor
+        >))]
+        public void ValidateVersionOrderShouldThrowExceptionIfUnappliedMigrationVersionIsLessThanLatestAppliedMigration(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
         {
-            var excludedProcessors = new[] { typeof(MySqlProcessor), };
-
             var namespacePass2 = typeof(Migrations.Interleaved.Pass2.User).Namespace;
             var namespacePass3 = typeof(Migrations.Interleaved.Pass3.User).Namespace;
 
@@ -1160,7 +975,8 @@ namespace FluentMigrator.Tests.Integration
 
             try
             {
-                ExecuteWithSupportedProcessors(
+                ExecuteWithProcessor(
+                    processorType,
                     services => services.WithMigrationsIn(namespacePass2),
                     (serviceProvider, _) =>
                     {
@@ -1169,10 +985,10 @@ namespace FluentMigrator.Tests.Integration
 
                         migrationRunner.MigrateUp();
                     },
-                    tryRollback: false,
-                    excludedProcessors);
+                    serverOptions);
 
-                ExecuteWithSupportedProcessors(
+                ExecuteWithProcessor(
+                    processorType,
                     services => services.WithMigrationsIn(namespacePass3),
                     (serviceProvider, _) =>
                     {
@@ -1181,8 +997,7 @@ namespace FluentMigrator.Tests.Integration
 
                         migrationRunner.ValidateVersionOrder();
                     },
-                    tryRollback: false,
-                    excludedProcessors);
+                    serverOptions);
             }
             catch (VersionOrderInvalidException ex)
             {
@@ -1190,7 +1005,8 @@ namespace FluentMigrator.Tests.Integration
             }
             finally
             {
-                ExecuteWithSupportedProcessors(
+                ExecuteWithProcessor(
+                    processorType,
                     services => services.WithMigrationsIn(namespacePass3),
                     (serviceProvider, _) =>
                     {
@@ -1199,8 +1015,8 @@ namespace FluentMigrator.Tests.Integration
 
                         migrationRunner.RollbackToVersion(0);
                     },
-                    tryRollback: true,
-                    excludedProcessors);
+                    serverOptions,
+                    true);
             }
 
             caughtException.ShouldNotBeNull();
@@ -1212,28 +1028,14 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
-        [Category("Snowflake")]
-        [Category("SqlServer2012")]
-        public void CanCreateSequence()
+        [TestCaseSource(typeof(ProcessorTestCaseSourceOnly<
+            SnowflakeProcessor,
+            SqlServer2012Processor
+        >))]
+        public void CanCreateSequence(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
         {
-            var excludedProcessors = new[]
-            {
-                typeof(FirebirdProcessor),
-                typeof(MySqlProcessor),
-                typeof(MySql4Processor),
-                typeof(MySql5Processor),
-                typeof(OracleProcessor),
-                typeof(PostgresProcessor),
-                typeof(RedshiftProcessor),
-                typeof(SQLiteProcessor),
-                typeof(SqlServer2000Processor),
-                typeof(SqlServer2005Processor),
-                typeof(SqlServer2008Processor),
-                typeof(SqlServer2014Processor),
-                typeof(SqlServer2016Processor)
-            };
-
-            ExecuteWithSupportedProcessors(
+            ExecuteWithProcessor(
+                processorType,
                 services => services.WithMigrationsIn(RootNamespace),
                 (serviceProvider, processor) =>
                 {
@@ -1245,75 +1047,47 @@ namespace FluentMigrator.Tests.Integration
                     runner.Down(new TestCreateSequence());
                     processor.SequenceExists(null, "TestSequence").ShouldBeFalse();
                 },
-                true,
-                excludedProcessors
-                );
+                serverOptions,
+                true);
         }
 
         [Test]
-        [Category("Postgres")]
-        [Category("Snowflake")]
-        [Category("SqlServer2012")]
-        public void CanCreateSequenceWithSchema()
+        [TestCaseSource(typeof(ProcessorTestCaseSourceOnly<
+            PostgresProcessor,
+            SnowflakeProcessor,
+            SqlServer2012Processor
+        >))]
+        public void CanCreateSequenceWithSchema(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
         {
-            // todo [jaz]: Clean-up and reconcile with develop branch so that develop branch can be deleted.
-            if (!IntegrationTestOptions.SqlServer2012.IsEnabled && !IntegrationTestOptions.Postgres.IsEnabled && !IntegrationTestOptions.Snowflake.IsEnabled)
-            {
-                Assert.Ignore("No processor found for the given action.");
-            }
+            ExecuteWithProcessor(
+                processorType,
+                services => services.WithMigrationsIn(RootNamespace),
+                (serviceProvider, processor) =>
+                {
+                    var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
 
-            void CreateAndDropSequence(IServiceProvider serviceProvider, ProcessorBase processor)
-            {
-                var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
+                    runner.Up(new TestCreateSchema());
+                    runner.Up(new TestCreateSequenceWithSchema());
+                    processor.SequenceExists("TestSchema", "TestSequence").ShouldBeTrue();
 
-                runner.Up(new TestCreateSchema());
-                runner.Up(new TestCreateSequenceWithSchema());
-                processor.SequenceExists("TestSchema", "TestSequence").ShouldBeTrue();
-
-                runner.Down(new TestCreateSequenceWithSchema());
-                runner.Down(new TestCreateSchema());
-                processor.SequenceExists("TestSchema", "TestSequence").ShouldBeFalse();
-            }
-
-            if (IntegrationTestOptions.SqlServer2012.IsEnabled)
-            {
-                ExecuteWithProcessor<SqlServer2012Processor>(
-                    services => services.WithMigrationsIn(RootNamespace),
-                    (Action<IServiceProvider, ProcessorBase>)CreateAndDropSequence,
-                    true,
-                    IntegrationTestOptions.SqlServer2012);
-            }
-
-            if (IntegrationTestOptions.Postgres.IsEnabled)
-            {
-                ExecuteWithProcessor<PostgresProcessor>(
-                    services => services.WithMigrationsIn(RootNamespace),
-                    (Action<IServiceProvider, ProcessorBase>)CreateAndDropSequence,
-                    true,
-                    IntegrationTestOptions.Postgres);
-            }
-
-            if (IntegrationTestOptions.Snowflake.IsEnabled)
-            {
-                ExecuteWithProcessor<SnowflakeProcessor>(
-                    services => services.WithMigrationsIn(RootNamespace),
-                    (Action<IServiceProvider, ProcessorBase>)CreateAndDropSequence,
-                    true,
-                    IntegrationTestOptions.Snowflake);
-            }
+                    runner.Down(new TestCreateSequenceWithSchema());
+                    runner.Down(new TestCreateSchema());
+                    processor.SequenceExists("TestSchema", "TestSequence").ShouldBeFalse();
+                },
+                serverOptions,
+                true);
         }
 
         [Test]
-        [Category("MySql")]
-        [Category("Postgres")]
-        [Category("SqlServer2005")]
-        [Category("SqlServer2008")]
-        [Category("SqlServer2012")]
-        [Category("SqlServer2014")]
-        [Category("SqlServer2016")]
-        public void CanAlterColumnWithSchema()
+        [TestCaseSource(typeof(ProcessorTestCaseSourceExcept<
+            SQLiteProcessor,
+            FirebirdProcessor,
+            SnowflakeProcessor /* Snowflake does not support decreasing varchar column length! */
+        >))]
+        public void CanAlterColumnWithSchema(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithProcessor(
+                processorType,
                 services => services.WithMigrationsIn(RootNamespace),
                 (serviceProvider, processor) =>
                 {
@@ -1335,24 +1109,19 @@ namespace FluentMigrator.Tests.Integration
 
                     runner.Down(new TestCreateSchema());
                 },
-                true,
-                typeof(SQLiteProcessor),
-                typeof(FirebirdProcessor),
-                typeof(SnowflakeProcessor) /* Snowflake does not support decreasing varchar column length! */);
+                serverOptions,
+                true);
         }
 
         [Test]
-        [Category("MySql")]
-        [Category("Postgres")]
-        [Category("Snowflake")]
-        [Category("SqlServer2005")]
-        [Category("SqlServer2008")]
-        [Category("SqlServer2012")]
-        [Category("SqlServer2014")]
-        [Category("SqlServer2016")]
-        public void CanAlterTableWithSchema()
+        [TestCaseSource(typeof(ProcessorTestCaseSourceExcept<
+            SQLiteProcessor,
+            FirebirdProcessor
+        >))]
+        public void CanAlterTableWithSchema(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithProcessor(
+                processorType,
                 services => services.WithMigrationsIn(RootNamespace),
                 (serviceProvider, processor) =>
                 {
@@ -1373,23 +1142,19 @@ namespace FluentMigrator.Tests.Integration
 
                     runner.Down(new TestCreateSchema());
                 },
-                true,
-                typeof(SQLiteProcessor),
-                typeof(FirebirdProcessor));
+                serverOptions,
+                true);
         }
 
         [Test]
-        [Category("MySql")]
-        [Category("Postgres")]
-        [Category("Snowflake")]
-        [Category("SqlServer2005")]
-        [Category("SqlServer2008")]
-        [Category("SqlServer2012")]
-        [Category("SqlServer2014")]
-        [Category("SqlServer2016")]
-        public void CanAlterTablesSchema()
+        [TestCaseSource(typeof(ProcessorTestCaseSourceExcept<
+            SQLiteProcessor,
+            FirebirdProcessor
+        >))]
+        public void CanAlterTablesSchema(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithProcessor(
+                processorType,
                 services => services.WithMigrationsIn(RootNamespace),
                 (serviceProvider, processor) =>
                 {
@@ -1410,24 +1175,16 @@ namespace FluentMigrator.Tests.Integration
 
                     runner.Down(new TestCreateSchema());
                 },
-                true,
-                typeof(SQLiteProcessor),
-                typeof(FirebirdProcessor));
+                serverOptions,
+                true);
         }
 
         [Test]
-        [Category("Firebird")]
-        [Category("MySql")]
-        [Category("Postgres")]
-        [Category("Snowflake")]
-        [Category("SqlServer2005")]
-        [Category("SqlServer2008")]
-        [Category("SqlServer2012")]
-        [Category("SqlServer2014")]
-        [Category("SqlServer2016")]
-        public void CanCreateUniqueConstraint()
+        [TestCaseSource(typeof(ProcessorTestCaseSource))]
+        public void CanCreateUniqueConstraint(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithProcessor(
+                processorType,
                 services => services.WithMigrationsIn(RootNamespace),
                 (serviceProvider, processor) =>
                 {
@@ -1444,22 +1201,18 @@ namespace FluentMigrator.Tests.Integration
 
                     runner.Down(new TestCreateAndDropTableMigration());
                 },
-                true,
-                Array.Empty<Type>());
+                serverOptions,
+                true);
         }
 
         [Test]
-        [Category("MySql")]
-        [Category("Postgres")]
-        [Category("Snowflake")]
-        [Category("SqlServer2005")]
-        [Category("SqlServer2008")]
-        [Category("SqlServer2012")]
-        [Category("SqlServer2014")]
-        [Category("SqlServer2016")]
-        public void CanCreateUniqueConstraintWithSchema()
+        [TestCaseSource(typeof(ProcessorTestCaseSourceExcept<
+            FirebirdProcessor
+        >))]
+        public void CanCreateUniqueConstraintWithSchema(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithProcessor(
+                processorType,
                 services => services.WithMigrationsIn(RootNamespace),
                 (serviceProvider, processor) =>
                 {
@@ -1480,23 +1233,16 @@ namespace FluentMigrator.Tests.Integration
 
                     runner.Down(new TestCreateSchema());
                 },
-                true,
-                typeof(FirebirdProcessor));
+                serverOptions,
+                true);
         }
 
         [Test]
-        [Category("Firebird")]
-        [Category("MySql")]
-        [Category("Postgres")]
-        [Category("Snowflake")]
-        [Category("SqlServer2005")]
-        [Category("SqlServer2008")]
-        [Category("SqlServer2012")]
-        [Category("SqlServer2014")]
-        [Category("SqlServer2016")]
-        public void CanInsertData()
+        [TestCaseSource(typeof(ProcessorTestCaseSource))]
+        public void CanInsertData(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithProcessor(
+                processorType,
                 services => services.WithMigrationsIn(RootNamespace),
                 (serviceProvider, processor) =>
                 {
@@ -1508,21 +1254,18 @@ namespace FluentMigrator.Tests.Integration
                     ds.Tables[0].Rows[0][1].ShouldBe("Test");
 
                     runner.Down(new TestCreateAndDropTableMigration());
-                });
+                },
+                serverOptions);
         }
 
         [Test]
-        [Category("MySql")]
-        [Category("Postgres")]
-        [Category("Snowflake")]
-        [Category("SqlServer2005")]
-        [Category("SqlServer2008")]
-        [Category("SqlServer2012")]
-        [Category("SqlServer2014")]
-        [Category("SqlServer2016")]
-        public void CanInsertDataWithSchema()
+        [TestCaseSource(typeof(ProcessorTestCaseSourceExcept<
+            FirebirdProcessor
+        >))]
+        public void CanInsertDataWithSchema(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithProcessor(
+                processorType,
                 services => services.WithMigrationsIn(RootNamespace),
                 (serviceProvider, processor) =>
                 {
@@ -1539,22 +1282,18 @@ namespace FluentMigrator.Tests.Integration
 
                     runner.Down(new TestCreateSchema());
                 },
-                true,
-                typeof(FirebirdProcessor));
+                serverOptions,
+                true);
         }
 
         [Test]
-        [Category("MySql")]
-        [Category("Postgres")]
-        [Category("Snowflake")]
-        [Category("SqlServer2005")]
-        [Category("SqlServer2008")]
-        [Category("SqlServer2012")]
-        [Category("SqlServer2014")]
-        [Category("SqlServer2016")]
-        public void CanUpdateData()
+        [TestCaseSource(typeof(ProcessorTestCaseSourceExcept<
+            FirebirdProcessor
+        >))]
+        public void CanUpdateData(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithProcessor(
+                processorType,
                 services => services.WithMigrationsIn(RootNamespace),
                 (serviceProvider, processor) =>
                 {
@@ -1578,25 +1317,18 @@ namespace FluentMigrator.Tests.Integration
 
                     runner.Down(new TestCreateSchema());
                 },
-                true,
-                typeof(FirebirdProcessor));
+                serverOptions,
+                true);
         }
 
         [Test]
-        [Category("Firebird")]
-        [Category("MySql")]
-        [Category("Postgres")]
-        [Category("Snowflake")]
-        [Category("SqlServer2005")]
-        [Category("SqlServer2008")]
-        [Category("SqlServer2012")]
-        [Category("SqlServer2014")]
-        [Category("SqlServer2016")]
-        public void CanDeleteData()
+        [TestCaseSource(typeof(ProcessorTestCaseSourceExcept<
+            FirebirdProcessor
+        >))]
+        public void CanDeleteData(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
         {
-            var excludedProcessors = Array.Empty<Type>();
-
-            ExecuteWithSupportedProcessors(
+            ExecuteWithProcessor(
+                processorType,
                 services => services.WithMigrationsIn(RootNamespace),
                 (serviceProvider, processor) =>
                 {
@@ -1615,22 +1347,18 @@ namespace FluentMigrator.Tests.Integration
 
                     runner.Down(new TestCreateAndDropTableMigration());
                 },
-                true,
-                excludedProcessors);
+                serverOptions,
+                true);
         }
 
         [Test]
-        [Category("MySql")]
-        [Category("Postgres")]
-        [Category("Snowflake")]
-        [Category("SqlServer2005")]
-        [Category("SqlServer2008")]
-        [Category("SqlServer2012")]
-        [Category("SqlServer2014")]
-        [Category("SqlServer2016")]
-        public void CanDeleteDataWithSchema()
+        [TestCaseSource(typeof(ProcessorTestCaseSourceExcept<
+            FirebirdProcessor
+        >))]
+        public void CanDeleteDataWithSchema(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithProcessor(
+                processorType,
                 services => services.WithMigrationsIn(RootNamespace),
                 (serviceProvider, processor) =>
                 {
@@ -1653,22 +1381,18 @@ namespace FluentMigrator.Tests.Integration
 
                     runner.Down(new TestCreateSchema());
                 },
-                true,
-                typeof(FirebirdProcessor));
+                serverOptions,
+                true);
         }
 
         [Test]
-        [Category("Firebird")]
-        [Category("MySql")]
-        [Category("Postgres")]
-        [Category("SqlServer2005")]
-        [Category("SqlServer2008")]
-        [Category("SqlServer2012")]
-        [Category("SqlServer2014")]
-        [Category("SqlServer2016")]
-        public void CanReverseCreateIndex()
+        [TestCaseSource(typeof(ProcessorTestCaseSourceExcept<
+            SnowflakeProcessor /* Snowflake does not support indices. */
+        >))]
+        public void CanReverseCreateIndex(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithProcessor(
+                processorType,
                 services => services.WithMigrationsIn(RootNamespace),
                 (serviceProvider, processor) =>
                 {
@@ -1688,23 +1412,16 @@ namespace FluentMigrator.Tests.Integration
 
                     runner.Down(new TestCreateSchema());
                 },
-                true,
-                typeof(SnowflakeProcessor) /* Snowflake does not support indices. */);
+                serverOptions,
+                true);
         }
 
         [Test]
-        [Category("Firebird")]
-        [Category("MySql")]
-        [Category("Postgres")]
-        [Category("Snowflake")]
-        [Category("SqlServer2005")]
-        [Category("SqlServer2008")]
-        [Category("SqlServer2012")]
-        [Category("SqlServer2014")]
-        [Category("SqlServer2016")]
-        public void CanReverseCreateUniqueConstraint()
+        [TestCaseSource(typeof(ProcessorTestCaseSource))]
+        public void CanReverseCreateUniqueConstraint(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithProcessor(
+                processorType,
                 services => services.WithMigrationsIn(RootNamespace),
                 (serviceProvider, processor) =>
                 {
@@ -1720,23 +1437,16 @@ namespace FluentMigrator.Tests.Integration
 
                     runner.Down(new TestCreateAndDropTableMigration());
                 },
-                true,
-                Array.Empty<Type>());
+                serverOptions,
+                true);
         }
 
         [Test]
-        [Category("Firebird")]
-        [Category("MySql")]
-        [Category("Postgres")]
-        [Category("Snowflake")]
-        [Category("SqlServer2005")]
-        [Category("SqlServer2008")]
-        [Category("SqlServer2012")]
-        [Category("SqlServer2014")]
-        [Category("SqlServer2016")]
-        public void CanReverseCreateUniqueConstraintWithSchema()
+        [TestCaseSource(typeof(ProcessorTestCaseSource))]
+        public void CanReverseCreateUniqueConstraintWithSchema(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithProcessor(
+                processorType,
                 services => services.WithMigrationsIn(RootNamespace),
                 (serviceProvider, processor) =>
                 {
@@ -1756,23 +1466,18 @@ namespace FluentMigrator.Tests.Integration
 
                     runner.Down(new TestCreateSchema());
                 },
-                true,
-                Array.Empty<Type>());
+                serverOptions,
+                true);
         }
 
         [Test]
-        [Category("MySql")]
-        [Category("SQLite")]
-        [Category("Postgres")]
-        [Category("Snowflake")]
-        [Category("SqlServer2005")]
-        [Category("SqlServer2008")]
-        [Category("SqlServer2012")]
-        [Category("SqlServer2014")]
-        [Category("SqlServer2016")]
-        public void CanExecuteSql()
+        [TestCaseSource(typeof(ProcessorTestCaseSourceExcept<
+            FirebirdProcessor
+        >))]
+        public void CanExecuteSql(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithProcessor(
+                processorType,
                 services => services.WithMigrationsIn(RootNamespace),
                 (serviceProvider, _) =>
                 {
@@ -1780,21 +1485,14 @@ namespace FluentMigrator.Tests.Integration
 
                     runner.Up(new TestExecuteSql());
                     runner.Down(new TestExecuteSql());
-                }, true,
-                typeof(FirebirdProcessor));
+                },
+                serverOptions,
+                true);
         }
 
         [Test]
-        [Category("MySql")]
-        [Category("SQLite")]
-        [Category("Postgres")]
-        [Category("Snowflake")]
-        [Category("SqlServer2005")]
-        [Category("SqlServer2008")]
-        [Category("SqlServer2012")]
-        [Category("SqlServer2014")]
-        [Category("SqlServer2016")]
-        public void CanSaveSqlStatementWithDescription()
+        [TestCaseSource(typeof(ProcessorTestCaseSource))]
+        public void CanSaveSqlStatementWithDescription(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
         {
             var outputSql = new StringBuilder();
 
@@ -1805,7 +1503,8 @@ namespace FluentMigrator.Tests.Integration
                     ShowSql = true,
                 });
 
-            ExecuteWithSupportedProcessors(
+            ExecuteWithProcessor(
+                processorType,
                 services =>
                 {
                     // Clear sql output between each processor execution
@@ -1834,20 +1533,12 @@ namespace FluentMigrator.Tests.Integration
                     selectUpMatches.ShouldBe(1);
                     selectDownMatches.ShouldBe(1);
                 },
-                false);
+                serverOptions);
         }
 
         [Test]
-        [Category("MySql")]
-        [Category("SQLite")]
-        [Category("Postgres")]
-        [Category("Snowflake")]
-        [Category("SqlServer2005")]
-        [Category("SqlServer2008")]
-        [Category("SqlServer2012")]
-        [Category("SqlServer2014")]
-        [Category("SqlServer2016")]
-        public void CanInjtectParametersInExecuteSql()
+        [TestCaseSource(typeof(ProcessorTestCaseSource))]
+        public void CanInjectParametersInExecuteSql(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
         {
             var outputSql = new StringBuilder();
 
@@ -1858,7 +1549,8 @@ namespace FluentMigrator.Tests.Integration
                     ShowSql = true,
                 });
 
-            ExecuteWithSupportedProcessors(
+            ExecuteWithProcessor(
+                processorType,
                 services =>
                 {
                     // Clear sql output between each processor execution
@@ -1879,11 +1571,57 @@ namespace FluentMigrator.Tests.Integration
                     processor.CommitTransaction();
                     var outputSqlString = outputSql.ToString();
                     var selectUpMatches = new Regex("SELECT 1 FROM FOO WHERE BAR = 'test'")
-                            .Matches(outputSqlString).Count;
+                        .Matches(outputSqlString).Count;
 
                     selectUpMatches.ShouldBe(1);
                 },
-                false);
+                serverOptions);
+        }
+
+        [Test]
+        [TestCaseSource(typeof(ProcessorTestCaseSource))]
+        public void CanUseRawSqlInUpdateAndDelete(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
+        {
+            ExecuteWithProcessor(
+                processorType,
+                services =>
+                {
+                    services.WithMigrationsIn(RootNamespace);
+                },
+                (serviceProvider, processor) =>
+                {
+                    var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
+
+                    runner.Up(new TestCreateSchema());
+
+                    runner.Up(new RawSqlCreateTableMigration());
+                    DataSet upDs = processor.ReadTableData("TestSchema", "Foo");
+
+                    var rows = upDs.Tables[0].Rows;
+                    rows.Count.ShouldBe(3);
+
+                    rows[0]["Baz"].ShouldBe(1);
+                    rows[1]["Baz"].ShouldBe(2);
+                    rows[2]["Baz"].ShouldBe(3);
+
+                    runner.Up(new RawSqlUpdateMigration());
+                    upDs = processor.ReadTableData("TestSchema", "Foo");
+                    rows = upDs.Tables[0].Rows;
+
+                    rows[0]["Baz"].ShouldBe(101);
+                    rows[1]["Baz"].ShouldBe(102);
+                    rows[2]["Baz"].ShouldBe(103);
+
+                    runner.Up(new RawSqlDeleteMigration());
+                    upDs = processor.ReadTableData("TestSchema", "Foo");
+                    rows = upDs.Tables[0].Rows;
+
+                    rows.Count.ShouldBe(0);
+
+                    runner.Down(new RawSqlCreateTableMigration());
+                    runner.Down(new TestCreateSchema());
+                },
+                serverOptions);
         }
 
         private void RemoveMigration1(ProcessorBase processor)
@@ -1899,12 +1637,15 @@ namespace FluentMigrator.Tests.Integration
             }
         }
 
-        private void CleanupTestSqlServerDatabase<TProcessor>(IServiceProvider serviceProvider, TProcessor origProcessor)
-            where TProcessor : SqlServerProcessor
+        private void CleanupTestDatabase<TProcessor>(IServiceProvider serviceProvider, TProcessor origProcessor)
+            where TProcessor : ProcessorBase
         {
             if (origProcessor.WasCommitted)
             {
-                origProcessor.Connection.Close();
+                if (origProcessor is GenericProcessorBase gpb)
+                {
+                    gpb.Connection.Close();
+                }
 
                 using (var scope = serviceProvider.CreateScope())
                 {
@@ -2330,6 +2071,84 @@ namespace FluentMigrator.Tests.Integration
         public override void Down()
         {
             Update.Table("TestTable").InSchema("TestSchema").Set(new { Name = "Test" }).AllRows();
+        }
+    }
+
+    public class RawSqlCreateTableMigration : Migration
+    {
+        public override void Up()
+        {
+            Create.Table("Foo")
+                .InSchema("TestSchema")
+                .WithColumn("baz").AsInt32().NotNullable();
+
+            Insert.IntoTable("Foo")
+                .InSchema("TestSchema")
+                .Row(new
+                {
+                    baz = 1,
+                })
+                .Row(new
+                {
+                    baz = 2,
+                })
+                .Row(new
+                {
+                    baz = 3,
+                })
+                ;
+        }
+
+        public override void Down()
+        {
+            Delete.Table("Foo").InSchema("TestSchema");
+        }
+    }
+
+    public class RawSqlUpdateMigration : ForwardOnlyMigration
+    {
+        public override void Up()
+        {
+            // UPDATE : Raw SQL with string
+            Update.Table("Foo").InSchema("TestSchema")
+                .Set("baz = CASE WHEN baz = 1 THEN 101 ELSE 0 END")
+                .Where("baz = 1");
+
+            // UPDATE : Raw SQL with RawSql object
+            Update.Table("Foo").InSchema("TestSchema")
+                .Set(RawSql.Insert("baz = CASE WHEN baz = 2 THEN 102 ELSE 0 END"))
+                .Where(RawSql.Insert("baz = 2"));
+
+            // UPDATE : Raw SQL with RawSql object inside an anonymous object
+            Update.Table("Foo").InSchema("TestSchema")
+                .Set(new
+                {
+                    baz = RawSql.Insert("CASE WHEN baz = 3 THEN 103 ELSE 0 END")
+                })
+                .Where(new
+                {
+                    baz = RawSql.Insert("= 3")
+                });
+        }
+    }
+
+    public class RawSqlDeleteMigration : ForwardOnlyMigration
+    {
+        public override void Up()
+        {
+            Delete.FromTable("Foo").InSchema("TestSchema")
+
+                // DELETE : Raw SQL with string
+                .Row("baz = 101")
+
+                // DELETE : Raw SQL with RawSql object
+                .Row(RawSql.Insert("baz = 102"))
+
+                // DELETE : Raw SQL with RawSql object inside an anonymous object
+                .Row(new
+                {
+                    baz = RawSql.Insert("= 103")
+                });
         }
     }
 

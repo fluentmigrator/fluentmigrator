@@ -17,20 +17,13 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 using FirebirdSql.Data.FirebirdClient;
 
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Processors;
-using FluentMigrator.Runner.Processors.MySql;
-using FluentMigrator.Runner.Processors.Postgres;
-using FluentMigrator.Runner.Processors.Snowflake;
-using FluentMigrator.Runner.Processors.SQLite;
-using FluentMigrator.Runner.Processors.SqlServer;
 using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Runner.Initialization;
 
@@ -44,28 +37,9 @@ namespace FluentMigrator.Tests.Integration
 {
     public class IntegrationTestBase
     {
-        private readonly List<(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> getOptionsFunc)> _processors;
-
         private bool _isFirstExecuteForFirebird = true;
 
         private string _tempDataDirectory;
-
-        protected IntegrationTestBase()
-        {
-            _processors = new List<(Type, Func<IntegrationTestOptions.DatabaseServerOptions>)>
-            {
-                (typeof(SqlServer2005Processor), () => IntegrationTestOptions.SqlServer2005),
-                (typeof(SqlServer2008Processor), () => IntegrationTestOptions.SqlServer2008),
-                (typeof(SqlServer2012Processor), () => IntegrationTestOptions.SqlServer2012),
-                (typeof(SqlServer2014Processor), () => IntegrationTestOptions.SqlServer2014),
-                (typeof(SqlServer2016Processor), () => IntegrationTestOptions.SqlServer2016),
-                (typeof(SQLiteProcessor), () => IntegrationTestOptions.SQLite),
-                (typeof(FirebirdProcessor), () => IntegrationTestOptions.Firebird),
-                (typeof(PostgresProcessor), () => IntegrationTestOptions.Postgres),
-                (typeof(MySql4Processor), () => IntegrationTestOptions.MySql),
-                (typeof(SnowflakeProcessor), () => IntegrationTestOptions.Snowflake)
-            };
-        }
 
         [SetUp]
         public void SetUpFirebird()
@@ -90,92 +64,16 @@ namespace FluentMigrator.Tests.Integration
             }
         }
 
-        private bool IsAnyServerEnabled(params Type[] exceptProcessors)
-        {
-            return IsAnyServerEnabled(procType => !exceptProcessors.Any(p => p.IsAssignableFrom(procType)));
-        }
-
-        private bool IsAnyServerEnabled(Predicate<Type> isMatch)
-        {
-            foreach (var (processorType, getOptionsFunc) in _processors)
-            {
-                var opt = getOptionsFunc();
-                if (!opt.IsEnabled)
-                    continue;
-
-                if (!isMatch(processorType))
-                    continue;
-
-                return true;
-            }
-
-            return false;
-        }
-
-        protected void ExecuteWithSupportedProcessors(
-            Action<IServiceCollection> initAction,
-            Action<IServiceProvider, ProcessorBase> testAction,
-            bool tryRollback = true,
-            params Type[] exceptProcessors)
-        {
-            ExecuteWithSupportedProcessors(
-                initAction,
-                testAction,
-                tryRollback,
-                procType => !exceptProcessors.Any(p => p.IsAssignableFrom(procType)));
-        }
-
-        private void ExecuteWithSupportedProcessors(
-            Action<IServiceCollection> initAction,
-            Action<IServiceProvider, ProcessorBase> testAction,
-            bool tryRollback,
-            Predicate<Type> isMatch)
-        {
-            if (!IsAnyServerEnabled())
-            {
-                Assert.Fail(
-$"No database processors are configured to run your migration tests.  This message is provided to avoid false positives.  To avoid this message enable one or more test runners in the {nameof(IntegrationTestOptions)} class.");
-            }
-
-            var executed = false;
-            foreach (var (processorType, getOptionsFunc) in _processors)
-            {
-                var opt = getOptionsFunc();
-                if (!opt.IsEnabled)
-                    continue;
-
-                if (!isMatch(processorType))
-                    continue;
-
-                executed = true;
-                ExecuteWithProcessor(processorType, initAction, testAction, tryRollback, opt);
-            }
-
-            if (!executed)
-            {
-                Assert.Ignore("No processor found for the given action.");
-            }
-        }
-
-        protected void ExecuteWithProcessor<TProcessor>(
-            Action<IServiceCollection> initAction,
-            Action<IServiceProvider, TProcessor> testAction,
-            bool tryRollback,
-            IntegrationTestOptions.DatabaseServerOptions serverOptions)
-            where TProcessor : ProcessorBase
-        {
-            ExecuteWithProcessor(typeof(TProcessor), initAction, (sp, proc) => testAction(sp, (TProcessor)proc), tryRollback, serverOptions);
-        }
-
-        private void ExecuteWithProcessor(
+        protected void ExecuteWithProcessor(
             Type processorType,
             Action<IServiceCollection> initAction,
             Action<IServiceProvider, ProcessorBase> testAction,
-            bool tryRollback,
-            IntegrationTestOptions.DatabaseServerOptions serverOptions)
+            Func<IntegrationTestOptions.DatabaseServerOptions> serverOptionsGetter,
+            bool tryRollback = false)
         {
-            if (!serverOptions.IsEnabled)
-                Assert.Ignore($"The configuration for {processorType.Name} is not enabled.");
+            var serverOptions = serverOptionsGetter();
+
+            serverOptions.IgnoreIfNotEnabled();
 
             var services = ServiceCollectionExtensions.CreateServices()
                 .ConfigureRunner(
@@ -217,12 +115,10 @@ $"No database processors are configured to run your migration tests.  This messa
             var serviceProvider = services
                 .BuildServiceProvider(true);
 
-
-
             if (processorType == typeof(FirebirdProcessor) && _isFirstExecuteForFirebird)
             {
                 _isFirstExecuteForFirebird = false;
-                FbConnection.CreateDatabase(serverOptions.ConnectionString, overwrite: true);
+                FbConnection.CreateDatabase(serverOptions.ConnectionString, pageSize:16384, overwrite: true);
             }
 
             using (serviceProvider)

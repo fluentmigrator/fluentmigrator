@@ -14,11 +14,9 @@
 // limitations under the License.
 #endregion
 
-using System;
 using System.Collections.Generic;
 
 using FluentMigrator.Runner.Conventions;
-using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
@@ -29,12 +27,6 @@ namespace FluentMigrator.Runner
         // ReSharper disable once UnusedMember.Global
         public DefaultConventionSet()
             : this(defaultSchemaName: null, workingDirectory: null)
-        {
-        }
-
-        [Obsolete]
-        public DefaultConventionSet([CanBeNull] IRunnerContext runnerContext)
-            : this(runnerContext?.DefaultSchemaName, runnerContext?.WorkingDirectory)
         {
         }
 

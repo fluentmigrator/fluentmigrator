@@ -171,7 +171,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                 {
                     ds.Tables[0].ShouldNotBeNull();
                     ds.Tables[0].Rows[0].ShouldNotBeNull();
-                    ds.Tables[0].Rows[0]["generated_value"].ShouldBe(7);
+                    ds.Tables[0].Rows[0]["generated_value"].ShouldBe(6); // First gen is the initial value
                 }
 
                 Processor.Process(new DeleteSequenceExpression { SequenceName = "Sequence" });
@@ -369,19 +369,11 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [SetUp]
         public void SetUp()
         {
-            if (!IntegrationTestOptions.Firebird.IsEnabled)
-                Assert.Ignore();
+            IntegrationTestOptions.Firebird.IgnoreIfNotEnabled();
 
-            _temporaryDatabase = new TemporaryDatabase(
-                IntegrationTestOptions.Firebird,
-                _prober);
+            var services = FbDatabase.CreateFirebirdServices(_prober, out _temporaryDatabase);
 
-            var serivces = ServiceCollectionExtensions.CreateServices()
-                .ConfigureRunner(builder => builder.AddFirebird())
-                .AddScoped<IConnectionStringReader>(
-                    _ => new PassThroughConnectionStringReader(_temporaryDatabase.ConnectionString));
-
-            ServiceProvider = serivces.BuildServiceProvider();
+            ServiceProvider = services.BuildServiceProvider();
             ServiceScope = ServiceProvider.CreateScope();
             Processor = ServiceScope.ServiceProvider.GetRequiredService<FirebirdProcessor>();
             Quoter = ServiceScope.ServiceProvider.GetRequiredService<FirebirdQuoter>();
@@ -393,12 +385,6 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             ServiceScope?.Dispose();
             ServiceProvider?.Dispose();
             Processor?.Dispose();
-            if (_temporaryDatabase != null)
-            {
-                var connString = _temporaryDatabase.ConnectionString;
-                _temporaryDatabase = null;
-                FbDatabase.DropDatabase(connString);
-            }
             _temporaryDatabase?.Dispose();
         }
     }

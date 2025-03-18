@@ -56,10 +56,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Snowflake
         [OneTimeSetUp]
         public void ClassSetUp()
         {
-            if (!IntegrationTestOptions.Snowflake.IsEnabled)
-            {
-                Assert.Ignore("Snowflake integration tests are disabled.");
-            }
+            IntegrationTestOptions.Snowflake.IgnoreIfNotEnabled();
         }
 
         private void ExecuteWithProcessor(

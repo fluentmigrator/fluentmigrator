@@ -20,10 +20,6 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-using FluentMigrator.Infrastructure;
-using FluentMigrator.Runner.Initialization.AssemblyLoader;
-using FluentMigrator.Runner.Logging;
-
 using JetBrains.Annotations;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -56,51 +52,7 @@ namespace FluentMigrator.Runner.Initialization
             _logger = logger;
             _assemblySource = assemblySource;
             _runnerOptions = runnerOptions.Value;
-#pragma warning disable 612
-            ConnectionStringProvider = serviceProvider.GetService<IConnectionStringProvider>();
-#pragma warning restore 612
             _lazyServiceProvider = new Lazy<IServiceProvider>(() => serviceProvider);
-        }
-
-        [Obsolete]
-        public TaskExecutor([NotNull] IRunnerContext runnerContext,
-            [CanBeNull] Action<IMigrationRunnerBuilder> configureRunner = null)
-        {
-            var runnerCtxt = runnerContext ?? throw new ArgumentNullException(nameof(runnerContext));
-            _logger = new AnnouncerFluentMigratorLogger(runnerCtxt.Announcer);
-            _runnerOptions = new RunnerOptions(runnerCtxt);
-            var asmLoaderFactory = new AssemblyLoaderFactory();
-            _assemblySource = new AssemblySource(() => new AssemblyCollection(asmLoaderFactory.GetTargetAssemblies(runnerCtxt.Targets)));
-            ConnectionStringProvider = new DefaultConnectionStringProvider();
-            _lazyServiceProvider = new Lazy<IServiceProvider>(
-                () => runnerContext
-                    .CreateServices(
-                        ConnectionStringProvider,
-                        asmLoaderFactory,
-                        configureRunner)
-                    .BuildServiceProvider(validateScopes: true));
-        }
-
-        [Obsolete]
-        public TaskExecutor(
-            [NotNull] IRunnerContext runnerContext,
-            [NotNull] AssemblyLoaderFactory assemblyLoaderFactory,
-            [CanBeNull] IConnectionStringProvider connectionStringProvider = null,
-            [CanBeNull] Action<IMigrationRunnerBuilder> configureRunner = null)
-        {
-            var runnerCtxt = runnerContext ?? throw new ArgumentNullException(nameof(runnerContext));
-            _logger = new AnnouncerFluentMigratorLogger(runnerCtxt.Announcer);
-            _runnerOptions = new RunnerOptions(runnerCtxt);
-            ConnectionStringProvider = connectionStringProvider;
-            var asmLoaderFactory = assemblyLoaderFactory ?? throw new ArgumentNullException(nameof(assemblyLoaderFactory));
-            _assemblySource = new AssemblySource(() => new AssemblyCollection(asmLoaderFactory.GetTargetAssemblies(runnerCtxt.Targets)));
-            _lazyServiceProvider = new Lazy<IServiceProvider>(
-                () => runnerContext
-                    .CreateServices(
-                        connectionStringProvider,
-                        asmLoaderFactory,
-                        configureRunner)
-                    .BuildServiceProvider(validateScopes: true));
         }
 
         /// <summary>
@@ -111,13 +63,6 @@ namespace FluentMigrator.Runner.Initialization
         /// </remarks>
         [CanBeNull]
         protected IMigrationRunner Runner { get; set; }
-
-        /// <summary>
-        /// Gets the connection string provider
-        /// </summary>
-        [CanBeNull]
-        [Obsolete]
-        protected IConnectionStringProvider ConnectionStringProvider { get; }
 
         /// <summary>
         /// Gets the service provider used to instantiate all migration services

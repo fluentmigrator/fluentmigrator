@@ -16,10 +16,10 @@
     <ProjectReference Include="..\FluentMigrator\FluentMigrator.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="10.3.1" />
-    <PackageReference Include="Microsoft.Extensions.Options" Version="8.0.0" />
+    <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="10.3.2" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.2" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Update="JetBrains.Annotations" Version="2024.2.0" />
+    <PackageReference Update="JetBrains.Annotations" Version="2024.3.0" />
   </ItemGroup>
 </Project>

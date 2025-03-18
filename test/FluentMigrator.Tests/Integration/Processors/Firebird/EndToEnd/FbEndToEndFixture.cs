@@ -44,8 +44,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird.EndToEnd
         [SetUp]
         public void SetUp()
         {
-            if (!IntegrationTestOptions.Firebird.IsEnabled)
-                Assert.Ignore();
+            IntegrationTestOptions.Firebird.IgnoreIfNotEnabled();
             _temporaryDatabase = new TemporaryDatabase(
                 IntegrationTestOptions.Firebird,
                 _firebirdLibraryProber);

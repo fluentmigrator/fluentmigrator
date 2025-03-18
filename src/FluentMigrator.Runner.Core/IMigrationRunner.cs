@@ -40,13 +40,6 @@ namespace FluentMigrator.Runner
         IMigrationInformationLoader MigrationLoader { get; }
 
         /// <summary>
-        /// Gets the runner context
-        /// </summary>
-        [Obsolete]
-        [CanBeNull]
-        IRunnerContext RunnerContext { get; }
-
-        /// <summary>
         /// Executes an <c>Up</c> migration
         /// </summary>
         /// <param name="migration">The migration to execute</param>

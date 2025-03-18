@@ -49,10 +49,6 @@ namespace FluentMigrator.Runner
         private IVersionInfo _versionInfo;
         private IMigrationRunnerConventions Conventions { get; set; }
 
-        [CanBeNull]
-        [Obsolete]
-        protected IAssemblyCollection Assemblies { get; set; }
-
         public IVersionTableMetaData VersionTableMetaData { get; }
 
         [NotNull]
@@ -61,43 +57,6 @@ namespace FluentMigrator.Runner
         public IMigration VersionMigration { get; }
         public IMigration VersionUniqueMigration { get; }
         public IMigration VersionDescriptionMigration { get; }
-
-        [Obsolete]
-        internal VersionLoader(
-            [NotNull] IMigrationRunner runner,
-            [NotNull] Assembly assembly,
-            [NotNull] IGeneratorAccessor generatorAccessor,
-            [NotNull] IConventionSet conventionSet,
-            [NotNull] IMigrationRunnerConventions conventions,
-            [NotNull] IRunnerContext runnerContext)
-            : this(runner, new SingleAssembly(assembly), generatorAccessor, conventionSet, conventions, runnerContext)
-        {
-        }
-
-        [Obsolete]
-        internal VersionLoader(IMigrationRunner runner, IAssemblyCollection assemblies,
-            [NotNull] IGeneratorAccessor generatorAccessor,
-            [NotNull] IConventionSet conventionSet,
-            [NotNull] IMigrationRunnerConventions conventions,
-            [NotNull] IRunnerContext runnerContext,
-            [CanBeNull] IVersionTableMetaData versionTableMetaData = null)
-        {
-            _conventionSet = conventionSet;
-            _processor = runner.Processor;
-            _quoter = generatorAccessor.Generator.GetQuoter();
-
-            Runner = runner;
-            Assemblies = assemblies;
-
-            Conventions = conventions;
-            VersionTableMetaData = versionTableMetaData ?? CreateVersionTableMetaData(runnerContext);
-            VersionMigration = new VersionMigration(VersionTableMetaData);
-            VersionSchemaMigration = new VersionSchemaMigration(VersionTableMetaData);
-            VersionUniqueMigration = new VersionUniqueMigration(VersionTableMetaData);
-            VersionDescriptionMigration = new VersionDescriptionMigration(VersionTableMetaData);
-
-            LoadVersionInfo();
-        }
 
         public VersionLoader(
             [NotNull] IProcessorAccessor processorAccessor,
@@ -244,22 +203,6 @@ namespace FluentMigrator.Runner
                                         new KeyValuePair<string, object>(VersionTableMetaData.ColumnName, version)
                                     });
             expression.ExecuteWith(_processor);
-        }
-
-        [Obsolete]
-        [NotNull]
-        private IVersionTableMetaData CreateVersionTableMetaData(IRunnerContext runnerContext)
-        {
-            var type = Assemblies?.Assemblies.GetVersionTableMetaDataType(Conventions, runnerContext)
-             ?? typeof(DefaultVersionTableMetaData);
-
-            var instance = (IVersionTableMetaData) Activator.CreateInstance(type);
-            if (instance is ISchemaExpression schemaExpression)
-            {
-                _conventionSet.SchemaConvention?.Apply(schemaExpression);
-            }
-
-            return instance;
         }
     }
 }

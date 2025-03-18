@@ -138,8 +138,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Snowflake
         [OneTimeSetUp]
         public void ClassSetUp()
         {
-            if (!IntegrationTestOptions.Snowflake.IsEnabled)
-                Assert.Ignore();
+            IntegrationTestOptions.Snowflake.IgnoreIfNotEnabled();
 
             var services = ServiceCollectionExtensions.CreateServices()
                 .ConfigureRunner(r => r.AddSnowflake())

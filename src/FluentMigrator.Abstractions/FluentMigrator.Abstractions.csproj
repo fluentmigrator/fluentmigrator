@@ -46,6 +46,6 @@
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Update="JetBrains.Annotations" Version="2024.2.0" />
+    <PackageReference Update="JetBrains.Annotations" Version="2024.3.0" />
   </ItemGroup>
 </Project>

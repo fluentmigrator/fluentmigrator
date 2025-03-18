@@ -3,7 +3,9 @@
 # Add steps that publish symbols, save build artifacts, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
 
-trigger: none
+# According to https://learn.microsoft.com/en-us/azure/devops/pipelines/repos/github?view=azure-devops&tabs=yaml#opting-out-of-ci
+# setting `trigger: none` opts out of CI triggers entirely.
+# trigger: none
 
 pr:
   branches:
