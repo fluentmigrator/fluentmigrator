@@ -17,25 +17,12 @@
 #endregion
 
 using System;
+using System.Data.Common;
 
 namespace FluentMigrator.Runner.Processors.Postgres
 {
-    public class PostgresDbFactory : ReflectionBasedDbFactory
+    public interface IPostgresDbFactory
     {
-        private static readonly TestEntry[] _entries =
-        {
-            new TestEntry("Npgsql", "Npgsql.NpgsqlFactory"),
-        };
-
-        [Obsolete]
-        public PostgresDbFactory()
-            : this(null)
-        {
-        }
-
-        public PostgresDbFactory(IServiceProvider serviceProvider)
-            : base(serviceProvider, _entries)
-        {
-        }
+        public DbProviderFactory Factory { get; }
     }
 }
