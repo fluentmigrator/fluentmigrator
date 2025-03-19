@@ -72,5 +72,15 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         {
             return string.Format("DF_{0}_{1}", tableName, columnName);
         }
+
+        protected override string FormatType(ColumnDefinition column)
+        {
+            return column.Expression != null ? null : base.FormatType(column);
+        }
+
+        protected override string FormatExpression(ColumnDefinition column)
+        {
+            return column.Expression == null ? null : $"AS ({column.Expression}){(column.ExpressionStored ? " PERSISTED" : "")}";
+        }
     }
 }
