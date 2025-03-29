@@ -53,6 +53,12 @@ namespace FluentMigrator.Runner.Generators.Postgres
         {
         }
 
+        /// <inheritdoc />
+        public override string GeneratorId => GeneratorIdConstants.PostgreSQL11_0;
+
+        /// <inheritdoc />
+        public override List<string> GeneratorIdAliases => new List<string> { GeneratorIdConstants.PostgreSQL11_0, GeneratorIdConstants.PostgreSQL };
+
         protected override string GetIncludeString(CreateIndexExpression column)
         {
             var includes = column.GetAdditionalFeature<IList<PostgresIndexIncludeDefinition>>(PostgresExtensions.IncludesList);

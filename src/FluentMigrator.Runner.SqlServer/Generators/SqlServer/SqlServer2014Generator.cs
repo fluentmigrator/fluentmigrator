@@ -14,6 +14,8 @@
 // limitations under the License.
 #endregion
 
+using System.Collections.Generic;
+
 using JetBrains.Annotations;
 
 using Microsoft.Extensions.Options;
@@ -48,5 +50,12 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             : base(column, quoter, descriptionGenerator, generatorOptions)
         {
         }
+
+
+        /// <inheritdoc />
+        public override string GeneratorId => GeneratorIdConstants.SqlServer2014;
+
+        /// <inheritdoc />
+        public override List<string> GeneratorIdAliases => new List<string> { GeneratorIdConstants.SqlServer2014, GeneratorIdConstants.SqlServer };
     }
 }

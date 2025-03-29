@@ -81,6 +81,13 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         {
         }
 
+        /// <inheritdoc />
+        public override string GeneratorId => GeneratorIdConstants.SqlServer2005;
+
+        /// <inheritdoc />
+        public override List<string> GeneratorIdAliases => new List<string> { GeneratorIdConstants.SqlServer2005, GeneratorIdConstants.SqlServer };
+
+
         public override string AddColumn { get { return "ALTER TABLE {0} ADD {1}"; } }
 
         public override string CreateSchema { get { return "CREATE SCHEMA {0}{1}"; } }

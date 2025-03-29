@@ -17,6 +17,7 @@
 //
 #endregion
 
+using System.Collections.Generic;
 using System.Text;
 
 using JetBrains.Annotations;
@@ -53,6 +54,13 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             : base(column, quoter, descriptionGenerator, generatorOptions)
         {
         }
+
+
+        /// <inheritdoc />
+        public override string GeneratorId => GeneratorIdConstants.SqlServer2012;
+
+        /// <inheritdoc />
+        public override List<string> GeneratorIdAliases => new List<string> { GeneratorIdConstants.SqlServer2012, GeneratorIdConstants.SqlServer };
 
         public override string Generate(Expressions.CreateSequenceExpression expression)
         {

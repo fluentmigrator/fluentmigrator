@@ -36,9 +36,9 @@ namespace FluentMigrator.Runner.Processors.MySql
     {
         private readonly MySqlQuoter _quoter = new MySqlQuoter();
 
-        public override string DatabaseType => ProcessorId.MySql;
+        public override string DatabaseType => ProcessorIdConstants.MySql;
 
-        public override IList<string> DatabaseTypeAliases { get; } = new List<string> { ProcessorId.MariaDB };
+        public override IList<string> DatabaseTypeAliases { get; } = new List<string> { ProcessorIdConstants.MariaDB };
 
         [Obsolete]
         public MySqlProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)

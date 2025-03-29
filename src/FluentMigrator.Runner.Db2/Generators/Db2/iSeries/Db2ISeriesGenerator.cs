@@ -14,6 +14,8 @@
 // limitations under the License.
 #endregion
 
+using System.Collections.Generic;
+
 using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Generators.DB2.iSeries
@@ -37,5 +39,11 @@ namespace FluentMigrator.Runner.Generators.DB2.iSeries
             : base(quoter, generatorOptions)
         {
         }
+
+        /// <inheritdoc />
+        public override string GeneratorId => GeneratorIdConstants.Db2ISeries;
+
+        /// <inheritdoc />
+        public override List<string> GeneratorIdAliases => new List<string> { GeneratorIdConstants.Db2ISeries, GeneratorIdConstants.DB2 };
     }
 }
