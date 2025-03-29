@@ -49,7 +49,7 @@ namespace FluentMigrator.Example.Migrator
 
             return new DatabaseConfiguration
             {
-                ProcessorId = ProcessorId.SQLite,
+                ProcessorId = ProcessorIdConstants.SQLite,
                 ConnectionString = csb.ConnectionString,
             };
         }
@@ -64,7 +64,7 @@ namespace FluentMigrator.Example.Migrator
 
             return new DatabaseConfiguration
             {
-                ProcessorId = ProcessorId.SqlServer,
+                ProcessorId = ProcessorIdConstants.SqlServer,
                 ConnectionString = scsb.ToString()
             };
         }

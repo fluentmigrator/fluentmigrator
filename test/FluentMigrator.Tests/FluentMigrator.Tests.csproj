@@ -95,4 +95,7 @@
   <ItemGroup>
     <PackageReference Update="JetBrains.Annotations" Version="2024.3.0" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Configuration\" />
+  </ItemGroup>
 </Project>
