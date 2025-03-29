@@ -79,5 +79,12 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return string.Format(" OVERRIDING {0} VALUE",
                 overridingIdentityValues == PostgresOverridingIdentityValuesType.User ? "USER" : "SYSTEM");
         }
+
+        /// <inheritdoc />
+        public override string GeneratorId => GeneratorIdConstants.PostgreSQL10_0;
+
+        /// <inheritdoc />
+        public override List<string> GeneratorIdAliases =>
+            [GeneratorIdConstants.PostgreSQL10_0, GeneratorIdConstants.PostgreSQL];
     }
 }

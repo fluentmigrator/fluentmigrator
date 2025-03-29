@@ -90,7 +90,7 @@ namespace FluentMigrator.Example.Migrator
             {
                 return new DatabaseConfiguration
                 {
-                    ProcessorId = ProcessorId.SQLite,
+                    ProcessorId = ProcessorIdConstants.SQLite,
                     ConnectionString = connectionString.Value(),
                 };
             }

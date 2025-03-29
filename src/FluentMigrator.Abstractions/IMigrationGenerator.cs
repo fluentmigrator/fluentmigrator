@@ -16,6 +16,8 @@
 //
 #endregion
 
+using System.Collections.Generic;
+
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators;
 
@@ -30,6 +32,16 @@ namespace FluentMigrator
         /// Provides the Quoter used by the migration generator.
         /// </summary>
         IQuoter Quoter { get; }
+
+        /// <summary>
+        /// The ID of the generator.
+        /// </summary>
+        string GeneratorId { get; }
+
+        /// <summary>
+        /// The alternative ID of the generator.
+        /// </summary>
+        List<string> GeneratorIdAliases { get; }
         
         /// <summary>
         /// Generates a <c>CREATE SCHEMA</c> SQL statement

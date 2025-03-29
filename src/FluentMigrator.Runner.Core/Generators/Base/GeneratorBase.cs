@@ -16,6 +16,8 @@
 //
 #endregion
 
+using System.Collections.Generic;
+
 using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Runner.Generators.Base
@@ -32,6 +34,12 @@ namespace FluentMigrator.Runner.Generators.Base
             _quoter = quoter;
             _descriptionGenerator = descriptionGenerator;
         }
+
+        /// <inheritdoc />
+        public abstract string GeneratorId { get; }
+
+        /// <inheritdoc />
+        public abstract List<string> GeneratorIdAliases { get; }
 
         public abstract string Generate(CreateSchemaExpression expression);
         public abstract string Generate(DeleteSchemaExpression expression);

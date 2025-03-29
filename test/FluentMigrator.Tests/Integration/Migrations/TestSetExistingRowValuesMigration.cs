@@ -10,13 +10,13 @@ namespace FluentMigrator.Tests.Integration.Migrations
          // SQLite doesn't support altering tables so we can't set the LastLoginDate
          // to be nullable and then change it to nullable once populated so we allow
          // this for non-SQLite setups but for SQLite we just set the column as nullable
-         IfDatabase(t => t != ProcessorId.SQLite).Alter.Table("Bar")
+         IfDatabase(t => t != ProcessorIdConstants.SQLite).Alter.Table("Bar")
              .AddColumn("LastLoginDate")
              .AsDateTime()
              .NotNullable()
              .SetExistingRowsTo(DateTime.Today);
 
-        IfDatabase(ProcessorId.SQLite).Alter.Table("Bar")
+        IfDatabase(ProcessorIdConstants.SQLite).Alter.Table("Bar")
              .AddColumn("LastLoginDate")
              .AsDateTime()
              .Nullable()

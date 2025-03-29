@@ -32,7 +32,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
             [NotNull] ILogger<OracleManagedProcessor> logger,
             [NotNull] IOptionsSnapshot<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor)
-            : base(ProcessorId.OracleManaged, factory, generator, logger, options, connectionStringAccessor)
+            : base(ProcessorIdConstants.OracleManaged, factory, generator, logger, options, connectionStringAccessor)
         {
         }
     }

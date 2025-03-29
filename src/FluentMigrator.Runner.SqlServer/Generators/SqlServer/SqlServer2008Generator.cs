@@ -69,6 +69,13 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         {
         }
 
+        /// <inheritdoc />
+        public override string GeneratorId => GeneratorIdConstants.SqlServer2008;
+
+        /// <inheritdoc />
+        public override List<string> GeneratorIdAliases =>
+            [GeneratorIdConstants.SqlServer2008, GeneratorIdConstants.SqlServer];
+        
         public override bool IsAdditionalFeatureSupported(string feature)
         {
             return _supportedAdditionalFeatures.Contains(feature)
