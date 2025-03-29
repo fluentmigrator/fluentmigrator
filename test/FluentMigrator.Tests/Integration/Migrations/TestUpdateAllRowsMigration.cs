@@ -16,7 +16,7 @@ namespace FluentMigrator.Tests.Integration.Migrations
                 .Set(new { SomeDate = DateTime.Today })
                 .AllRows();
 
-            IfDatabase(t => t != ProcessorId.SQLite).Alter.Table("Bar")
+            IfDatabase(t => t != ProcessorIdConstants.SQLite).Alter.Table("Bar")
                 .AlterColumn("SomeDate")
                 .AsDateTime()
                 .NotNullable();

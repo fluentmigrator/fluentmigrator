@@ -73,34 +73,34 @@ namespace FluentMigrator.Tests
 
         private static IReadOnlyDictionary<string, DatabaseServerOptions> DatabaseServers { get;}
 
-        public static DatabaseServerOptions SqlServer2005 => GetOptions(ProcessorId.SqlServer2005);
+        public static DatabaseServerOptions SqlServer2005 => GetOptions(ProcessorIdConstants.SqlServer2005);
 
-        public static DatabaseServerOptions SqlServer2008 => GetOptions(ProcessorId.SqlServer2008);
+        public static DatabaseServerOptions SqlServer2008 => GetOptions(ProcessorIdConstants.SqlServer2008);
 
-        public static DatabaseServerOptions SqlServer2012 => GetOptions(ProcessorId.SqlServer2012);
+        public static DatabaseServerOptions SqlServer2012 => GetOptions(ProcessorIdConstants.SqlServer2012);
 
-        public static DatabaseServerOptions SqlServer2014 => GetOptions(ProcessorId.SqlServer2014);
+        public static DatabaseServerOptions SqlServer2014 => GetOptions(ProcessorIdConstants.SqlServer2014);
 
-        public static DatabaseServerOptions SqlServer2016 => GetOptions(ProcessorId.SqlServer2016);
+        public static DatabaseServerOptions SqlServer2016 => GetOptions(ProcessorIdConstants.SqlServer2016);
 
-        public static DatabaseServerOptions Jet => GetOptions(ProcessorId.Jet);
+        public static DatabaseServerOptions Jet => GetOptions(ProcessorIdConstants.Jet);
 
         // ReSharper disable once InconsistentNaming
-        public static DatabaseServerOptions SQLite => GetOptions(ProcessorId.SQLite).ReplaceConnectionStringDataDirectory();
+        public static DatabaseServerOptions SQLite => GetOptions(ProcessorIdConstants.SQLite).ReplaceConnectionStringDataDirectory();
 
-        public static DatabaseServerOptions MySql => GetOptions(ProcessorId.MySql);
+        public static DatabaseServerOptions MySql => GetOptions(ProcessorIdConstants.MySql);
 
-        public static DatabaseServerOptions Postgres => GetOptions(ProcessorId.Postgres);
+        public static DatabaseServerOptions Postgres => GetOptions(ProcessorIdConstants.Postgres);
 
-        public static DatabaseServerOptions Firebird => GetOptions(ProcessorId.Firebird).GetOptionsForPlatform();
+        public static DatabaseServerOptions Firebird => GetOptions(ProcessorIdConstants.Firebird).GetOptionsForPlatform();
 
-        public static DatabaseServerOptions Oracle => GetOptions(ProcessorId.Oracle);
+        public static DatabaseServerOptions Oracle => GetOptions(ProcessorIdConstants.Oracle);
 
-        public static DatabaseServerOptions Db2 => Environment.Is64BitProcess ? GetOptions(ProcessorId.DB2) : DatabaseServerOptions.Empty;
+        public static DatabaseServerOptions Db2 => Environment.Is64BitProcess ? GetOptions(ProcessorIdConstants.DB2) : DatabaseServerOptions.Empty;
 
-        public static DatabaseServerOptions Db2ISeries => GetOptions(ProcessorId.Db2ISeries);
+        public static DatabaseServerOptions Db2ISeries => GetOptions(ProcessorIdConstants.Db2ISeries);
 
-        public static DatabaseServerOptions Hana => Environment.Is64BitProcess ? GetOptions(ProcessorId.Hana) : DatabaseServerOptions.Empty;
+        public static DatabaseServerOptions Hana => Environment.Is64BitProcess ? GetOptions(ProcessorIdConstants.Hana) : DatabaseServerOptions.Empty;
 
         public static DatabaseServerOptions Snowflake => GetOptions("Snowflake");
 

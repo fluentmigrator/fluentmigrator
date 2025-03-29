@@ -74,6 +74,10 @@ namespace FluentMigrator.Runner.Generators
         {
             foreach (var generator in generators)
             {
+                if (string.Equals(generator.GeneratorId, generatorId, StringComparison.OrdinalIgnoreCase))
+                    return generator;
+                if (generator.GeneratorIdAliases.Any(g => string.Equals(g, generatorId, StringComparison.OrdinalIgnoreCase)))
+                    return generator;
                 if (string.Equals(GetName(generator), generatorId, StringComparison.OrdinalIgnoreCase))
                     return generator;
             }

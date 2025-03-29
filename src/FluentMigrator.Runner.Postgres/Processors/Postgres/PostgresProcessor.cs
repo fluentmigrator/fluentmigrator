@@ -36,9 +36,9 @@ namespace FluentMigrator.Runner.Processors.Postgres
     {
         private readonly PostgresQuoter _quoter;
 
-        public override string DatabaseType => ProcessorId.Postgres;
+        public override string DatabaseType => ProcessorIdConstants.Postgres;
 
-        public override IList<string> DatabaseTypeAliases { get; } = new List<string> { ProcessorId.PostgreSQL };
+        public override IList<string> DatabaseTypeAliases { get; } = new List<string> { ProcessorIdConstants.PostgreSQL };
 
         public PostgresProcessor(
             [NotNull] PostgresDbFactory factory,

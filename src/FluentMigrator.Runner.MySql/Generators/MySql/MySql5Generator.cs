@@ -14,6 +14,8 @@
 // limitations under the License.
 #endregion
 
+using System.Collections.Generic;
+
 using JetBrains.Annotations;
 
 using Microsoft.Extensions.Options;
@@ -63,5 +65,14 @@ namespace FluentMigrator.Runner.Generators.MySql
             : base(column, quoter, descriptionGenerator, generatorOptions)
         {
         }
+
+        /// <inheritdoc />
+        public override string GeneratorId => GeneratorIdConstants.MySql5;
+
+        /// <inheritdoc />
+        public override List<string> GeneratorIdAliases =>
+        [
+            GeneratorIdConstants.MySql5, GeneratorIdConstants.MySql, GeneratorIdConstants.MariaDB
+        ];
     }
 }

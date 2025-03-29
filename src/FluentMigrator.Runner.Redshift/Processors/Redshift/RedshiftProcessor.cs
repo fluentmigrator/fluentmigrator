@@ -37,7 +37,7 @@ namespace FluentMigrator.Runner.Processors.Redshift
     {
         private readonly RedshiftQuoter _quoter = new RedshiftQuoter();
 
-        public override string DatabaseType => ProcessorId.Redshift;
+        public override string DatabaseType => ProcessorIdConstants.Redshift;
 
         public override IList<string> DatabaseTypeAliases { get; } = new List<string>();
 

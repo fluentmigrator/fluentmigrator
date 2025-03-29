@@ -14,6 +14,8 @@
 // limitations under the License.
 #endregion
 
+using System.Collections.Generic;
+
 using FluentMigrator.Runner.Generators.Postgres;
 
 using JetBrains.Annotations;
@@ -30,5 +32,11 @@ namespace FluentMigrator.Runner.Generators.Postgres92
             : base(quoter, generatorOptions, new Postgres92TypeMap())
         {
         }
+
+        /// <inheritdoc />
+        public override string GeneratorId => GeneratorIdConstants.Postgres92;
+
+        /// <inheritdoc />
+        public override List<string> GeneratorIdAliases => new List<string> { GeneratorIdConstants.Postgres92, GeneratorIdConstants.PostgreSQL9_2 };
     }
 }

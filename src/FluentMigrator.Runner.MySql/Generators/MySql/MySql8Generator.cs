@@ -14,7 +14,7 @@
 // limitations under the License.
 #endregion
 
-using System.Linq;
+using System.Collections.Generic;
 using System.Text;
 
 using FluentMigrator.Expressions;
@@ -123,6 +123,15 @@ namespace FluentMigrator.Runner.Generators.MySql
             return query.Append(");")
                 .ToString();
         }
+
+        /// <inheritdoc />
+        public override string GeneratorId => GeneratorIdConstants.MySql8;
+
+        /// <inheritdoc />
+        public override List<string> GeneratorIdAliases =>
+        [
+            GeneratorIdConstants.MySql8, GeneratorIdConstants.MySql, GeneratorIdConstants.MariaDB
+        ];
 
 
         protected virtual IndexType GetIndexType(CreateIndexExpression expression)
