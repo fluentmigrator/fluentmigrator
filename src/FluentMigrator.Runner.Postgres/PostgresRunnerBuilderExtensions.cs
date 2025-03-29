@@ -39,9 +39,11 @@ namespace FluentMigrator.Runner
         {
             builder.Services
                 .AddScoped<PostgresProcessor>()
+                .AddScoped<Postgres15_0Processor>()
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<Postgres15_0Processor>())
                 .AddScoped<IPostgresTypeMap>(sp => new PostgresTypeMap())
                 .AddScoped<PostgresGenerator>()
+                .AddScoped<Postgres15_0Generator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<Postgres15_0Generator>());
 
             return builder.AddCommonPostgresServices();
