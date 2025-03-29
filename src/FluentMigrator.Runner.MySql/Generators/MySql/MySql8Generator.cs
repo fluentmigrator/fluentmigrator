@@ -128,7 +128,10 @@ namespace FluentMigrator.Runner.Generators.MySql
         public override string GeneratorId => GeneratorIdConstants.MySql8;
 
         /// <inheritdoc />
-        public override List<string> GeneratorIdAliases => new List<string> { GeneratorIdConstants.MySql5, GeneratorIdConstants.MySql, GeneratorIdConstants.MariaDB };
+        public override List<string> GeneratorIdAliases =>
+        [
+            GeneratorIdConstants.MySql8, GeneratorIdConstants.MySql, GeneratorIdConstants.MariaDB
+        ];
 
 
         protected virtual IndexType GetIndexType(CreateIndexExpression expression)

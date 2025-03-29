@@ -39,9 +39,9 @@ namespace FluentMigrator.Runner
             builder.Services.TryAddScoped<MySqlQuoter>();
             builder.Services.AddScoped<IMySqlTypeMap>(_ => new MySql4TypeMap());
             builder.Services
-                .AddScoped<MySql4Processor>()
+                .AddScoped<MySql8Processor>()
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<MySql8Processor>())
-                .AddScoped<MySql4Generator>()
+                .AddScoped<MySql8Generator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<MySql8Generator>());
 
             return builder;

@@ -60,7 +60,8 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         public override string GeneratorId => GeneratorIdConstants.SqlServer2012;
 
         /// <inheritdoc />
-        public override List<string> GeneratorIdAliases => new List<string> { GeneratorIdConstants.SqlServer2012, GeneratorIdConstants.SqlServer };
+        public override List<string> GeneratorIdAliases =>
+            [GeneratorIdConstants.SqlServer2012, GeneratorIdConstants.SqlServer];
 
         public override string Generate(Expressions.CreateSequenceExpression expression)
         {

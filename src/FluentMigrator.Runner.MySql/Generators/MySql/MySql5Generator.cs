@@ -70,6 +70,9 @@ namespace FluentMigrator.Runner.Generators.MySql
         public override string GeneratorId => GeneratorIdConstants.MySql5;
 
         /// <inheritdoc />
-        public override List<string> GeneratorIdAliases => new List<string> { GeneratorIdConstants.MySql5, GeneratorIdConstants.MySql, GeneratorIdConstants.MariaDB };
+        public override List<string> GeneratorIdAliases =>
+        [
+            GeneratorIdConstants.MySql5, GeneratorIdConstants.MySql, GeneratorIdConstants.MariaDB
+        ];
     }
 }

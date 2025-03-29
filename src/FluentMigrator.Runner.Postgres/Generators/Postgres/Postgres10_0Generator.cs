@@ -84,6 +84,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
         public override string GeneratorId => GeneratorIdConstants.PostgreSQL10_0;
 
         /// <inheritdoc />
-        public override List<string> GeneratorIdAliases => new List<string> { GeneratorIdConstants.PostgreSQL10_0, GeneratorIdConstants.PostgreSQL };
+        public override List<string> GeneratorIdAliases =>
+            [GeneratorIdConstants.PostgreSQL10_0, GeneratorIdConstants.PostgreSQL];
     }
 }

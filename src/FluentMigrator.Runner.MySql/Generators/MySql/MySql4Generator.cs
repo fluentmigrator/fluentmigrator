@@ -69,7 +69,7 @@ namespace FluentMigrator.Runner.Generators.MySql
         public override string GeneratorId => GeneratorIdConstants.MySql4;
 
         /// <inheritdoc />
-        public override List<string> GeneratorIdAliases => new List<string> { GeneratorIdConstants.MySql4, GeneratorIdConstants.MySql };
+        public override List<string> GeneratorIdAliases => [GeneratorIdConstants.MySql4, GeneratorIdConstants.MySql];
 
         public override string Generate(CreateTableExpression expression)
         {
