@@ -33,7 +33,7 @@ namespace FluentMigrator.Runner.Generators.Redshift
     public class RedshiftGenerator : GenericGenerator
     {
         public override string RenameTable { get { return "ALTER TABLE {0} RENAME TO {1}"; } }
-        public override string AlterColumn { get { return "ALTER TABLE {0} ALTER {1}"; } }
+        public override string AlterColumn { get { return "ALTER TABLE {0} {1}"; } }
         public override string AddColumn { get { return "ALTER TABLE {0} ADD {1}"; } }
 
         public RedshiftGenerator()
