@@ -58,22 +58,6 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public IQuoter Quoter { get; }
 
-        [Obsolete]
-        public SqlServerProcessor(
-            IEnumerable<string> databaseTypes,
-            IDbConnection connection,
-            GenericGenerator generator,
-            IAnnouncer announcer,
-            [NotNull] IMigrationProcessorOptions options,
-            IDbFactory factory)
-            : base(connection, factory, generator, announcer, options)
-        {
-            var dbTypes = databaseTypes.ToList();
-            DatabaseType = dbTypes.First();
-            DatabaseTypeAliases = dbTypes.Skip(1).ToList();
-            Quoter = generator?.Quoter;
-        } 
-
         protected SqlServerProcessor(
             [NotNull, ItemNotNull] IEnumerable<string> databaseTypes,
             [NotNull] IMigrationGenerator generator,

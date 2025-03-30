@@ -130,6 +130,13 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             return FormatStatement(RenameColumn, sourceParam, destinationParam);
         }
 
+        /// <inheritdoc />
+        public override string GeneratorId => GeneratorIdConstants.SqlServer2000;
+
+        /// <inheritdoc />
+        public override List<string> GeneratorIdAliases =>
+            [GeneratorIdConstants.SqlServer2000, GeneratorIdConstants.SqlServer];
+
         public override string Generate(DeleteColumnExpression expression)
         {
             // before we drop a column, we have to drop any default value constraints in SQL Server

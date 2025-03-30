@@ -16,6 +16,7 @@
 //
 #endregion
 
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -118,6 +119,12 @@ namespace FluentMigrator.Runner.Generators.Hana
             var tableName = Quoter.QuoteTableName(expression.TableName);
             return FormatStatement("CREATE COLUMN TABLE {0} ({1})", tableName, Column.Generate(expression.Columns, tableName));
         }
+
+        /// <inheritdoc />
+        public override string GeneratorId => GeneratorIdConstants.Hana;
+
+        /// <inheritdoc />
+        public override List<string> GeneratorIdAliases => new List<string> { GeneratorIdConstants.Hana };
 
         public override string Generate(CreateTableExpression expression)
         {

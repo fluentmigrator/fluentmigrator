@@ -44,5 +44,8 @@ namespace FluentMigrator.Runner.Generators.Oracle
             : base(new Oracle12CColumn(quoter), quoter, new OracleDescriptionGenerator(), generatorOptions)
         {
         }
+
+        /// <inheritdoc />
+        public override string GeneratorId => GeneratorIdConstants.Oracle12c;
     }
 }

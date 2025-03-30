@@ -80,6 +80,12 @@ namespace FluentMigrator.Runner.Generators.Postgres
         public override string AlterColumn => "ALTER TABLE {0} {1}";
         public override string RenameTable => "ALTER TABLE {0} RENAME TO {1}";
 
+        /// <inheritdoc />
+        public override string GeneratorId => GeneratorIdConstants.PostgreSQL;
+
+        /// <inheritdoc />
+        public override List<string> GeneratorIdAliases => [GeneratorIdConstants.PostgreSQL, GeneratorIdConstants.Postgres];
+
         public override string Generate(CreateSchemaExpression expression)
         {
             return FormatStatement(CreateSchema, Quoter.QuoteSchemaName(expression.SchemaName));

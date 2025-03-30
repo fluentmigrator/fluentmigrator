@@ -49,7 +49,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
 
         public override string DatabaseType { get; }
 
-        public override IList<string> DatabaseTypeAliases { get; } = new List<string>() { ProcessorId.Oracle };
+        public override IList<string> DatabaseTypeAliases { get; } = new List<string>() { ProcessorIdConstants.Oracle };
 
         public IQuoter Quoter => ((OracleGenerator) Generator).Quoter;
 

@@ -47,9 +47,9 @@ namespace FluentMigrator.Runner.Processors.DB2
             Quoter = quoter;
         }
 
-        public override string DatabaseType => ProcessorId.DB2;
+        public override string DatabaseType => ProcessorIdConstants.DB2;
 
-        public override IList<string> DatabaseTypeAliases { get; } = new List<string> { "IBM DB2" };
+        public override IList<string> DatabaseTypeAliases { get; } = new List<string> { ProcessorIdConstants.IbmDb2, ProcessorIdConstants.DB2 };
 
         public IQuoter Quoter
         {
