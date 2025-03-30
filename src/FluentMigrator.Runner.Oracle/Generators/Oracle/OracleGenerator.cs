@@ -197,11 +197,6 @@ namespace FluentMigrator.Runner.Generators.Oracle
 
             return FormatStatement("CREATE TABLE {0} ({1})",ExpandTableName(schemaName,tableName), Column.Generate(expression.Columns, tableName));
         }
-        //
-        // protected override StringBuilder AppendSqlStatementEndToken(StringBuilder stringBuilder)
-        // {
-        //     return stringBuilder.AppendLine().AppendLine(";");
-        // }
 
         /// <inheritdoc />
         public override string GeneratorId => GeneratorIdConstants.Oracle;
