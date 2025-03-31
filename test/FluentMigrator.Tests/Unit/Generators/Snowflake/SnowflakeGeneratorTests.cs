@@ -1,21 +1,3 @@
-#region License
-//
-// Copyright (c) 2018, Fluent Migrator Project
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
-#endregion
-
 using System.Data;
 
 using FluentMigrator.Exceptions;
@@ -82,7 +64,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             var expression = new CreateColumnExpression { TableName = "TestTable1", Column = column, SchemaName = "TestSchema" };
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"ALTER TABLE ""TestSchema"".""TestTable1"" ADD COLUMN ""TestColumn1"" VARCHAR(5) NOT NULL DEFAULT CURRENT_TIMESTAMP()", _quotingEnabled);
+            result.ShouldBe(@"ALTER TABLE ""TestSchema"".""TestTable1"" ADD COLUMN ""TestColumn1"" VARCHAR(5) NOT NULL DEFAULT CURRENT_TIMESTAMP();", _quotingEnabled);
         }
 
         [Test]
@@ -99,7 +81,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             expression.Columns.Add(column);
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"CREATE TABLE ""TestSchema"".""TestTable1"" (""TestColumn1"" VARCHAR(5) NOT NULL DEFAULT CURRENT_TIMESTAMP())", _quotingEnabled);
+            result.ShouldBe(@"CREATE TABLE ""TestSchema"".""TestTable1"" (""TestColumn1"" VARCHAR(5) NOT NULL DEFAULT CURRENT_TIMESTAMP());", _quotingEnabled);
         }
 
         [Test]
@@ -111,7 +93,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             expression.Columns[0].AdditionalFeatures.Add(SnowflakeExtensions.IdentityIncrement, 23);
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"CREATE TABLE ""TestSchema"".""TestTable1"" (""TestColumn1"" NUMBER NOT NULL IDENTITY(45,23), ""TestColumn2"" NUMBER NOT NULL)", _quotingEnabled);
+            result.ShouldBe(@"CREATE TABLE ""TestSchema"".""TestTable1"" (""TestColumn1"" NUMBER NOT NULL IDENTITY(45,23), ""TestColumn2"" NUMBER NOT NULL);", _quotingEnabled);
         }
 
         [Test]
@@ -120,7 +102,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             var expression = new DeleteDefaultConstraintExpression {ColumnName = "Name", SchemaName = "Personalia", TableName = "Person" };
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"ALTER TABLE ""Personalia"".""Person"" ALTER COLUMN ""Name"" DROP DEFAULT", _quotingEnabled);
+            result.ShouldBe(@"ALTER TABLE ""Personalia"".""Person"" ALTER COLUMN ""Name"" DROP DEFAULT;", _quotingEnabled);
         }
     }
 }

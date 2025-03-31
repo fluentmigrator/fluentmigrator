@@ -52,7 +52,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             expression.Column.DefaultValue = "Foo";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [TestTable1] ALTER COLUMN [TestColumn1] NVARCHAR(20) NOT NULL");
+            result.ShouldBe("ALTER TABLE [TestTable1] ALTER COLUMN [TestColumn1] NVARCHAR(20) NOT NULL;");
         }
 
         [Test]
@@ -103,7 +103,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             var expression = new CreateColumnExpression { TableName = "TestTable1", Column = column };
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [TestTable1] ADD [TestColumn1] NVARCHAR(5) NOT NULL DEFAULT GetDate()");
+            result.ShouldBe("ALTER TABLE [TestTable1] ADD [TestColumn1] NVARCHAR(5) NOT NULL DEFAULT GetDate();");
         }
 
         [Test]
@@ -128,7 +128,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             expression.Columns.Add(column);
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(5) NOT NULL DEFAULT GetDate())");
+            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(5) NOT NULL DEFAULT GetDate());");
         }
 
         [Test]
@@ -139,7 +139,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             expression.Columns[0].AdditionalFeatures.Add(SqlServerExtensions.IdentityIncrement, 23);
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] INT NOT NULL IDENTITY(45,23), [TestColumn2] INT NOT NULL)");
+            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] INT NOT NULL IDENTITY(45,23), [TestColumn2] INT NOT NULL);");
         }
 
         [Test]

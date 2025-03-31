@@ -100,7 +100,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
 
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, \"TestColumn2\" INTEGER NOT NULL)");
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, \"TestColumn2\" INTEGER NOT NULL);");
         }
 
         [Test]
@@ -139,7 +139,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.Columns.Add(new ColumnDefinition { Name = "DateTimeCol", Type = DbType.DateTime, DefaultValue = SystemMethods.CurrentDateTime});
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"DateTimeCol\" DATETIME NOT NULL DEFAULT (datetime('now','localtime')))");
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"DateTimeCol\" DATETIME NOT NULL DEFAULT (datetime('now','localtime')));");
         }
 
         [Test]
@@ -149,7 +149,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.Columns.Add(new ColumnDefinition { Name = "DateTimeCol", Type = DbType.DateTime, DefaultValue = SystemMethods.CurrentUTCDateTime });
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"DateTimeCol\" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP)");
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"DateTimeCol\" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP);");
         }
 
         [Test]
@@ -159,7 +159,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             Generator.CompatibilityMode = CompatibilityMode.STRICT;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestTable1\" RENAME COLUMN \"TestColumn1\" TO \"TestColumn2\"");
+            result.ShouldBe("ALTER TABLE \"TestTable1\" RENAME COLUMN \"TestColumn1\" TO \"TestColumn2\";");
         }
     }
 }

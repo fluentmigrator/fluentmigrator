@@ -23,7 +23,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             expression.Index.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE INDEX TestSchema.TestIndex ON TestSchema.TestTable1 (TestColumn1 ASC)");
+            result.ShouldBe("CREATE INDEX TestSchema.TestIndex ON TestSchema.TestTable1 (TestColumn1 ASC);");
         }
 
         [Test]
@@ -32,7 +32,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             var expression = GeneratorTestHelper.GetCreateIndexExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE INDEX TestIndex ON TestTable1 (TestColumn1 ASC)");
+            result.ShouldBe("CREATE INDEX TestIndex ON TestTable1 (TestColumn1 ASC);");
         }
 
         [Test]
@@ -42,7 +42,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             expression.Index.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE INDEX TestSchema.TestIndex ON TestSchema.TestTable1 (TestColumn1 ASC, TestColumn2 DESC)");
+            result.ShouldBe("CREATE INDEX TestSchema.TestIndex ON TestSchema.TestTable1 (TestColumn1 ASC, TestColumn2 DESC);");
         }
 
         [Test]
@@ -51,7 +51,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             var expression = GeneratorTestHelper.GetCreateMultiColumnCreateIndexExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE INDEX TestIndex ON TestTable1 (TestColumn1 ASC, TestColumn2 DESC)");
+            result.ShouldBe("CREATE INDEX TestIndex ON TestTable1 (TestColumn1 ASC, TestColumn2 DESC);");
         }
 
         [Test]
@@ -61,7 +61,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             expression.Index.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE INDEX TestSchema.TestIndex ON TestSchema.TestTable1 (TestColumn1 ASC, TestColumn2 DESC)");
+            result.ShouldBe("CREATE UNIQUE INDEX TestSchema.TestIndex ON TestSchema.TestTable1 (TestColumn1 ASC, TestColumn2 DESC);");
         }
 
         [Test]
@@ -70,7 +70,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             var expression = GeneratorTestHelper.GetCreateUniqueMultiColumnIndexExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE INDEX TestIndex ON TestTable1 (TestColumn1 ASC, TestColumn2 DESC)");
+            result.ShouldBe("CREATE UNIQUE INDEX TestIndex ON TestTable1 (TestColumn1 ASC, TestColumn2 DESC);");
         }
 
         [Test]
@@ -80,7 +80,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             expression.Index.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE INDEX TestSchema.TestIndex ON TestSchema.TestTable1 (TestColumn1 ASC)");
+            result.ShouldBe("CREATE UNIQUE INDEX TestSchema.TestIndex ON TestSchema.TestTable1 (TestColumn1 ASC);");
         }
 
         [Test]
@@ -89,7 +89,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             var expression = GeneratorTestHelper.GetCreateUniqueIndexExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE INDEX TestIndex ON TestTable1 (TestColumn1 ASC)");
+            result.ShouldBe("CREATE UNIQUE INDEX TestIndex ON TestTable1 (TestColumn1 ASC);");
         }
 
         [Test]
@@ -99,7 +99,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             expression.Index.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DROP INDEX TestSchema.TestIndex");
+            result.ShouldBe("DROP INDEX TestSchema.TestIndex;");
         }
 
         [Test]
@@ -108,7 +108,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             var expression = GeneratorTestHelper.GetDeleteIndexExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DROP INDEX TestIndex");
+            result.ShouldBe("DROP INDEX TestIndex;");
         }
     }
 }

@@ -50,7 +50,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             var expression = GeneratorTestHelper.GetAlterSchemaExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"ALTER TABLE ""TestSchema1"".""TestTable"" RENAME TO ""TestSchema2"".""TestTable""", _quotingEnabled);
+            result.ShouldBe(@"ALTER TABLE ""TestSchema1"".""TestTable"" RENAME TO ""TestSchema2"".""TestTable"";", _quotingEnabled);
         }
 
         [Test]
@@ -59,7 +59,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             var expression = GeneratorTestHelper.GetCreateSchemaExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"CREATE SCHEMA ""TestSchema""", _quotingEnabled);
+            result.ShouldBe(@"CREATE SCHEMA ""TestSchema"";", _quotingEnabled);
         }
 
         [Test]
@@ -68,7 +68,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             var expression = GeneratorTestHelper.GetDeleteSchemaExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"DROP SCHEMA ""TestSchema""", _quotingEnabled);
+            result.ShouldBe(@"DROP SCHEMA ""TestSchema"";", _quotingEnabled);
         }
     }
 }

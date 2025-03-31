@@ -213,7 +213,8 @@ SELECT CONCAT(
             var fieldValue = Read(columnDefinitionSql).Tables[0].Rows[0][0];
             var columnDefinition = fieldValue as string;
 
-            Process(Generator.Generate(expression) + columnDefinition);
+            // Remove trailing semicolon. TODO: we should find a better way to avoid this
+            Process(Generator.Generate(expression).TrimEnd(';') + " " + columnDefinition);
         }
     }
 }

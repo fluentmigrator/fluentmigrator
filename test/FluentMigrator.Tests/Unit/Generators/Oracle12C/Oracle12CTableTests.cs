@@ -35,7 +35,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle12C
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE TestSchema.TestTable1 (TestColumn1 NUMBER(10,0) GENERATED ALWAYS AS IDENTITY , TestColumn2 NUMBER(10,0) NOT NULL)");
+            result.ShouldBe("CREATE TABLE TestSchema.TestTable1 (TestColumn1 NUMBER(10,0) GENERATED ALWAYS AS IDENTITY, TestColumn2 NUMBER(10,0) NOT NULL);");
         }
 
         [Test]
@@ -44,7 +44,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle12C
             var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 NUMBER(10,0) GENERATED ALWAYS AS IDENTITY , TestColumn2 NUMBER(10,0) NOT NULL)");
+            result.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 NUMBER(10,0) GENERATED ALWAYS AS IDENTITY, TestColumn2 NUMBER(10,0) NOT NULL);");
         }
     }
 }

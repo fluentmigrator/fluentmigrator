@@ -1,21 +1,3 @@
-#region License
-//
-// Copyright (c) 2018, Fluent Migrator Project
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
-#endregion
-
 using FluentMigrator.Builders.Create.Table;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
@@ -54,7 +36,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" TEXT NOT NULL, \"TestColumn2\" timestamp NOT NULL, PRIMARY KEY (\"TestColumn1\"))");
+            result.ShouldBe("CREATE TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" TEXT NOT NULL, \"TestColumn2\" timestamp NOT NULL, PRIMARY KEY (\"TestColumn1\"));");
         }
 
         [Test]
@@ -66,7 +48,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.Columns[1].CustomType = "timestamp";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" TEXT NOT NULL, \"TestColumn2\" timestamp NOT NULL, PRIMARY KEY (\"TestColumn1\"))");
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" TEXT NOT NULL, \"TestColumn2\" timestamp NOT NULL, PRIMARY KEY (\"TestColumn1\"));");
         }
 
         [Test]
@@ -76,7 +58,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" TEXT NOT NULL, \"TestColumn2\" INTEGER NOT NULL)");
+            result.ShouldBe("CREATE TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" TEXT NOT NULL, \"TestColumn2\" INTEGER NOT NULL);");
         }
 
         [Test]
@@ -85,7 +67,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetCreateTableExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" TEXT NOT NULL, \"TestColumn2\" INTEGER NOT NULL)");
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" TEXT NOT NULL, \"TestColumn2\" INTEGER NOT NULL);");
         }
 
         [Test]
@@ -97,7 +79,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" TEXT NOT NULL DEFAULT NULL, \"TestColumn2\" INTEGER NOT NULL DEFAULT 0)");
+            result.ShouldBe("CREATE TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" TEXT NOT NULL DEFAULT NULL, \"TestColumn2\" INTEGER NOT NULL DEFAULT 0);");
         }
 
         [Test]
@@ -108,7 +90,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.Columns[0].TableName = expression.TableName;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" TEXT NOT NULL DEFAULT NULL, \"TestColumn2\" INTEGER NOT NULL DEFAULT 0)");
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" TEXT NOT NULL DEFAULT NULL, \"TestColumn2\" INTEGER NOT NULL DEFAULT 0);");
         }
 
         [Test]
@@ -118,7 +100,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" TEXT NOT NULL DEFAULT 'Default', \"TestColumn2\" INTEGER NOT NULL DEFAULT 0)");
+            result.ShouldBe("CREATE TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" TEXT NOT NULL DEFAULT 'Default', \"TestColumn2\" INTEGER NOT NULL DEFAULT 0);");
         }
 
         [Test]
@@ -127,7 +109,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetCreateTableWithDefaultValue();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" TEXT NOT NULL DEFAULT 'Default', \"TestColumn2\" INTEGER NOT NULL DEFAULT 0)");
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" TEXT NOT NULL DEFAULT 'Default', \"TestColumn2\" INTEGER NOT NULL DEFAULT 0);");
         }
 
         [Test]
@@ -139,7 +121,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, \"TestColumn2\" INTEGER NOT NULL)");
+            result.ShouldBe("CREATE TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, \"TestColumn2\" INTEGER NOT NULL);");
         }
 
         [Test]
@@ -150,7 +132,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.Columns[0].IsPrimaryKey = true;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, \"TestColumn2\" INTEGER NOT NULL)");
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, \"TestColumn2\" INTEGER NOT NULL);");
         }
 
         [Test]
@@ -160,7 +142,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" TEXT NOT NULL, \"TestColumn2\" INTEGER NOT NULL, PRIMARY KEY (\"TestColumn1\", \"TestColumn2\"))");
+            result.ShouldBe("CREATE TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" TEXT NOT NULL, \"TestColumn2\" INTEGER NOT NULL, PRIMARY KEY (\"TestColumn1\", \"TestColumn2\"));");
         }
 
         [Test]
@@ -170,7 +152,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
 
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" TEXT NOT NULL, \"TestColumn2\" INTEGER NOT NULL, PRIMARY KEY (\"TestColumn1\", \"TestColumn2\"))");
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" TEXT NOT NULL, \"TestColumn2\" INTEGER NOT NULL, PRIMARY KEY (\"TestColumn1\", \"TestColumn2\"));");
         }
 
         [Test]
@@ -180,7 +162,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" TEXT NOT NULL, \"TestColumn2\" INTEGER NOT NULL, CONSTRAINT \"TestKey\" PRIMARY KEY (\"TestColumn1\", \"TestColumn2\"))");
+            result.ShouldBe("CREATE TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" TEXT NOT NULL, \"TestColumn2\" INTEGER NOT NULL, CONSTRAINT \"TestKey\" PRIMARY KEY (\"TestColumn1\", \"TestColumn2\"));");
         }
 
         [Test]
@@ -189,7 +171,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetCreateTableWithNamedMultiColumnPrimaryKeyExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" TEXT NOT NULL, \"TestColumn2\" INTEGER NOT NULL, CONSTRAINT \"TestKey\" PRIMARY KEY (\"TestColumn1\", \"TestColumn2\"))");
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" TEXT NOT NULL, \"TestColumn2\" INTEGER NOT NULL, CONSTRAINT \"TestKey\" PRIMARY KEY (\"TestColumn1\", \"TestColumn2\"));");
         }
 
         [Test]
@@ -199,7 +181,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" TEXT NOT NULL, \"TestColumn2\" INTEGER NOT NULL, CONSTRAINT \"TestKey\" PRIMARY KEY (\"TestColumn1\"))");
+            result.ShouldBe("CREATE TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" TEXT NOT NULL, \"TestColumn2\" INTEGER NOT NULL, CONSTRAINT \"TestKey\" PRIMARY KEY (\"TestColumn1\"));");
         }
 
         [Test]
@@ -208,7 +190,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetCreateTableWithNamedPrimaryKeyExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" TEXT NOT NULL, \"TestColumn2\" INTEGER NOT NULL, CONSTRAINT \"TestKey\" PRIMARY KEY (\"TestColumn1\"))");
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" TEXT NOT NULL, \"TestColumn2\" INTEGER NOT NULL, CONSTRAINT \"TestKey\" PRIMARY KEY (\"TestColumn1\"));");
         }
 
         [Test]
@@ -218,7 +200,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" TEXT, \"TestColumn2\" INTEGER NOT NULL)");
+            result.ShouldBe("CREATE TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" TEXT, \"TestColumn2\" INTEGER NOT NULL);");
         }
 
         [Test]
@@ -227,7 +209,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetCreateTableWithNullableColumn();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" TEXT, \"TestColumn2\" INTEGER NOT NULL)");
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" TEXT, \"TestColumn2\" INTEGER NOT NULL);");
         }
 
         [Test]
@@ -237,7 +219,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" TEXT NOT NULL, \"TestColumn2\" INTEGER NOT NULL, PRIMARY KEY (\"TestColumn1\"))");
+            result.ShouldBe("CREATE TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" TEXT NOT NULL, \"TestColumn2\" INTEGER NOT NULL, PRIMARY KEY (\"TestColumn1\"));");
         }
 
         [Test]
@@ -246,7 +228,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetCreateTableWithPrimaryKeyExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" TEXT NOT NULL, \"TestColumn2\" INTEGER NOT NULL, PRIMARY KEY (\"TestColumn1\"))");
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" TEXT NOT NULL, \"TestColumn2\" INTEGER NOT NULL, PRIMARY KEY (\"TestColumn1\"));");
         }
 
         [Test]
@@ -255,7 +237,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetCreateTableWithForeignKey();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" TEXT NOT NULL, \"TestColumn2\" INTEGER NOT NULL, CONSTRAINT \"FK_TestT_TestT\" FOREIGN KEY (\"TestColumn1\") REFERENCES \"TestTable2\" (\"TestColumn2\"))");
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" TEXT NOT NULL, \"TestColumn2\" INTEGER NOT NULL, CONSTRAINT \"FK_TestT_TestT\" FOREIGN KEY (\"TestColumn1\") REFERENCES \"TestTable2\" (\"TestColumn2\"));");
         }
 
         [Test]
@@ -264,7 +246,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumnForeignKey();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" TEXT NOT NULL, \"TestColumn2\" INTEGER NOT NULL, CONSTRAINT \"FK_TestT_TestT\" FOREIGN KEY (\"TestColumn1\", \"TestColumn3\") REFERENCES \"TestTable2\" (\"TestColumn2\", \"TestColumn4\"))");
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" TEXT NOT NULL, \"TestColumn2\" INTEGER NOT NULL, CONSTRAINT \"FK_TestT_TestT\" FOREIGN KEY (\"TestColumn1\", \"TestColumn3\") REFERENCES \"TestTable2\" (\"TestColumn2\", \"TestColumn4\"));");
         }
 
         [Test]
@@ -273,7 +255,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetCreateTableWithNameForeignKey();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" TEXT NOT NULL, \"TestColumn2\" INTEGER NOT NULL, CONSTRAINT \"FK_Test\" FOREIGN KEY (\"TestColumn1\") REFERENCES \"TestTable2\" (\"TestColumn2\"))");
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" TEXT NOT NULL, \"TestColumn2\" INTEGER NOT NULL, CONSTRAINT \"FK_Test\" FOREIGN KEY (\"TestColumn1\") REFERENCES \"TestTable2\" (\"TestColumn2\"));");
         }
 
         [Test]
@@ -282,7 +264,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetCreateTableWithNameMultiColumnForeignKey();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" TEXT NOT NULL, \"TestColumn2\" INTEGER NOT NULL, CONSTRAINT \"FK_Test\" FOREIGN KEY (\"TestColumn1\", \"TestColumn3\") REFERENCES \"TestTable2\" (\"TestColumn2\", \"TestColumn4\"))");
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" TEXT NOT NULL, \"TestColumn2\" INTEGER NOT NULL, CONSTRAINT \"FK_Test\" FOREIGN KEY (\"TestColumn1\", \"TestColumn3\") REFERENCES \"TestTable2\" (\"TestColumn2\", \"TestColumn4\"));");
         }
 
         [Test]
@@ -292,7 +274,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DROP TABLE \"TestSchema\".\"TestTable1\"");
+            result.ShouldBe("DROP TABLE \"TestSchema\".\"TestTable1\";");
         }
 
         [Test]
@@ -301,7 +283,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetDeleteTableExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DROP TABLE \"TestTable1\"");
+            result.ShouldBe("DROP TABLE \"TestTable1\";");
         }
 
         [Test]
@@ -310,7 +292,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetDeleteTableIfExistsExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DROP TABLE IF EXISTS \"TestTable1\"");
+            result.ShouldBe("DROP TABLE IF EXISTS \"TestTable1\";");
         }
 
         [Test]
@@ -320,7 +302,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" RENAME TO \"TestTable2\"");
+            result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" RENAME TO \"TestTable2\";");
         }
 
         [Test]
@@ -329,7 +311,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetRenameTableExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestTable1\" RENAME TO \"TestTable2\"");
+            result.ShouldBe("ALTER TABLE \"TestTable1\" RENAME TO \"TestTable2\";");
         }
 
         [Test]
@@ -354,7 +336,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
                 .WithColumn("Whatever3").AsString();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"Contact\" (\"Id\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, \"FirstName\" TEXT, \"FamilyName\" TEXT NOT NULL, \"Whatever1\" TEXT NOT NULL, \"Whatever2\" TEXT, \"Whatever3\" TEXT NOT NULL)");
+            result.ShouldBe("CREATE TABLE \"Contact\" (\"Id\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, \"FirstName\" TEXT, \"FamilyName\" TEXT NOT NULL, \"Whatever1\" TEXT NOT NULL, \"Whatever2\" TEXT, \"Whatever3\" TEXT NOT NULL);");
         }
     }
 }

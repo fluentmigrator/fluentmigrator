@@ -73,7 +73,7 @@ Attack dog, run away and pretend to be victim stare at the wall, play with food 
 Spend six hours per day washing, but still have a crusty butthole sugar, my siamese, stalks me (in a good way), day and night . Stare out cat door then go back inside flee in terror at cucumber discovered on floor. Refuse to leave cardboard box sun bathe ignore the squirrels, you''ll never catch them anyway. Run around the house at 4 in the morning cat meoooow i iz master of hoomaan, not hoomaan master of i, oooh damn dat dog leave fur on owners clothes. Knock over christmas tree immediately regret falling into bathtub check cat door for ambush 10 times before coming in yet kitty loves pigs for stretch cat mojo , and eat a plant, kill a hand. Look at dog hiiiiiisssss pee on walls it smells like breakfast. Eats owners hair then claws head. Grab pompom in mouth and put in water dish eat a rug and furry furry hairs everywhere oh no human coming lie on counter don''t get off counter but meow meow, i tell my human or scratch leg; meow for can opener to feed me for chew master''s slippers. There''s a forty year old lady there let us feast.
 I heard this rumor where the humans are our owners 😻, pfft, what do they know?! who''s the baby, stare at wall turn and meow stare at wall some more meow again continue staring so hunt anything that moves my left donut is missing, as is my right, for stuff and things. Pet me pet me don''t pet me. Sugar, my siamese, stalks me (in a good way), day and night . Instead of drinking water from the cat bowl, make sure to steal water from the toilet i love cuddles catching very fast laser pointer, for jump up to edge of bath, fall in then scramble in a mad panic to get out, or woops poop hanging from butt must get rid run run around house drag poop on floor maybe it comes off woops left bro') || TO_CLOB('wn marks on floor human slave clean lick butt now as lick i the shoes. Stuff and things being gorgeous with belly side up ignore the squirrels, you''ll never catch them anyway pounce on unsuspecting person eat and than sleep on your face. Cat cat moo moo lick ears lick paws lick butt, for poop in a handbag look delicious and drink the soapy mopping up water then puke giant foamy fur-balls. Fight own tail Gate keepers of hell or favor packaging over toy sleep all day whilst slave is at work, play all night whilst slave is sleeping where is my slave? I''m getting hungry, yet immediately regret falling into bathtub. Pet me pet me don''t pet me instantly break out into full speed gallop across the house for no reason. Gnaw the corn cob scratch the postman wake up lick paw wake up owner meow meow poop in a handbag look delicious and drink the soapy mopping up water then puke giant foamy fur-balls so plan steps for world domination destroy couch, chase laser and push your water glass on the floor. Check cat door for ambush 10 times before coming in always ensure to lay down in such a manner that tail can lightly brush human''s nose so cats are the world and snuggles up to shoulders or knees and purrs you to sleep. Eat a plant, kill a hand eat fish on floor see owner, run in terror pretend not to be evil. Leave hair on owner''s clothes carefully drink from water glass and then spill it everywhere and proceed to lick the puddle destroy couch as revenge there''s a forty year old lady there let us feast if it smells like fish eat as much as you wish. Tickle my belly at your own peril i will pester for food when you''re in the kitchen even if it''s salad intrigued by the shower, but intently sniff hand stretch, yet eat the rubberband and experiences short bursts of poo-phoria after going to the loo cat mojo . Run around the house at 4 in the morning all of a sudden cat goes crazy, scream at teh bath and groom yourself 4 hours - checked, have your beauty sleep 18 hours - checked, be fabulous for the rest of the day - checked or my slave human didn''t give me any food so i pooped on the floor and you have cat to be kitten me right meow bite nose of your human. Hate dog chew on cable, yet i’m so hungry i’m so hungry but ew not for that chase red laser dot pet me pet me pet me pet me, bite, scratch, why are you petting me play riveting piece on synthesizer keyboard purr purr purr until owner pets why owner not pet me hiss scratch meow. Put butt in owner''s face then cats take over the world cat meoooow i iz master of hoomaan, not hoomaan master of i, oooh damn dat dog. Dont wait for the storm to pass, dance in the rain sleep all day whilst slave is at work, play all night whilst slave is sleeping curl into a furry donut let me in let me out let me in let me out let me in let me out who broke this door anyway , for push your water glass on the floor yet destroy couch as revenge. Bleghbleghvomit my furball really tie the room together meow in empty rooms and eat grass, throw it back up for rub butt on table adventure always. Climb a tree, wait for a fireman jump to fireman then scratch his face leave fur on owners clothes if human is on laptop sit on the keyboard human clearly uses close to one life a night no one naps that long so i revive by standing on chestawaken!, for brown cats with pink ears, and spot something, big eyes, big eyes, crouch, shake butt, prepare to pounce yet plop down in the middle where everybody walks. Groom forever, stretch tongue and leave it slightly out, blep scratch the furniture eat all the power cords. Love me! nya nya nyan run around the house at 4 in the morning. Sleep going to catch the red dot today going to catch the red dot today, curl up and sleep on the freshly laundered towels open the door, let me out, let me out, let me-out, let me-aow, let meaow, meaow!, tickle my belly at your own peril i will pester fo') || TO_CLOB('r food when you''re in the kitchen even if it''s salad . My slave human didn''t give me any food so i pooped on the floor see brother cat receive pets, attack out of jealousy, or hide when guests come over caticus cuteicus. You are a captive audience while sitting on the toilet, pet me peer out window, chatter at birds, lure them to mouth and put butt in owner''s face but eat prawns daintily with a claw then lick paws clean wash down prawns with a lap of carnation milk then retire to the warmest spot on the couch to claw at the fabric before taking a catnap or wake up wander around the house making large amounts of noise jump on top of your human''s bed and fall asleep again for eat fish on floor.
 Mrow stare out cat door then go back inside, run outside as soon as door open or i hate cucumber pls dont throw it at me run up and down stairs for fall asleep on the washing machine. Love me!. Hide at bottom of staircase to trip human attack like a vicious monster carefully drink from water glass and then spill it everywhere and proceed to lick the puddle yet miaow then turn around and show you my bum. I like fish munch on tasty moths. Steal the warm chair right after you get up snuggles up to shoulders or knees and purrs you to sleep and carefully drink from water glass and then spill it everywhere and proceed to lick the puddle dont wait for the storm to pass, dance in the rain scratch the box. Sleep in the bathroom sink. I like big cats and i can not lie find something else more interesting, and stare out the window push your water glass on the floor. Bathe private parts with tongue then lick owner''s face. Peer out window, chatter at birds, lure them to mouth sit by the fire, eat too much then proceed to regurgitate all over living room carpet while humans eat dinner chase red laser dot russian blue. Spit up on light gray carpet instead of adjacent linoleum groom yourself 4 hours - checked, have your beauty sleep 18 hours - checked, be fabulous for the rest of the day - checked destroy couch as revenge yet sniff sniff lick the plastic bag eat the rubberband. Leave fur on owners clothes poop in litter box, scratch the walls. Then cats take over the world catasstrophe allways wanting food. Kitty time attack like a vicious monster so with tail in the air yet chew master''s slippers, yet relentlessly pursues moth or wake up human for food at 4am. Refuse to come home when humans are going to bed; stay out all night then yowl like i am dying at 4am pooping rainbow while flying in a toasted bread costume in space, but prance along on top of the garden fence, annoy the neighbor''s dog and make it bark let me in let me out let me in let me out let me in let me out who broke this door anyway for sugar, my siamese, stalks me (in a good way), day and night relentlessly pursues moth bite off human''s toes. Somehow manage to catch a bird but have no idea what to do next, so play with it until it dies of shock attack like a vicious monster kitty pounce, trip, faceplant you didn''t see that no you didn''t definitely didn''t lick, lick, lick, and preen away the embarrassment for howl uncontrollably for no reason. Cat dog hate mouse eat string barf pillow no baths hate everything cat mojo get suspicious of own shadow then go play with toilette paper yet lick the curtain just to be annoying let me in let me out let me in let me out let me in let me out who broke this door anyway .
-')) SELECT 1 FROM DUAL";
+')) SELECT 1 FROM DUAL;";
 
         private const string LargeUpdateStringExpected =
             @"UPDATE TestTable SET Name = TO_NCLOB('🐈
@@ -87,7 +87,7 @@ Attack dog, run away and pretend to be victim stare at the wall, play with food 
 Spend six hours per day washing, but still have a crusty butthole sugar, my siamese, stalks me (in a good way), day and night . Stare out cat door then go back inside flee in terror at cucumber discovered on floor. Refuse to leave cardboard box sun bathe ignore the squirrels, you''ll never catch them anyway. Run around the house at 4 in the morning cat meoooow i iz master of hoomaan, not hoomaan master of i, oooh damn dat dog leave fur on owners clothes. Knock over christmas tree immediately regret falling into bathtub check cat door for ambush 10 times before coming in yet kitty loves pigs for stretch cat mojo , and eat a plant, kill a hand. Look at dog hiiiiiisssss pee on walls it smells like breakfast. Eats owners hair then claws head. Grab pompom in mouth and put in water dish eat a rug and furry furry hairs everywhere oh no human coming lie on counter don''t get off counter but meow meow, i tell my human or scratch leg; meow for can opener to feed me for chew master''s slippers. There''s a forty year old lady there let us feast.
 I heard this rumor where the humans are our owners 😻, pfft, what do they know?! who''s the baby, stare at wall turn and meow stare at wall some more meow again continue staring so hunt anything that moves my left donut is missing, as is my right, for stuff and things. Pet me pet me don''t pet me. Sugar, my siamese, stalks me (in a good way), day and night . Instead of drinking water from the cat bowl, make sure to steal water from the toilet i love cuddles catching very fast laser pointer, for jump up to edge of bath, fall in then scramble in a mad panic to get out, or woops poop hanging from butt must get rid run run around house drag poop on floor maybe it comes off woops left bro') || TO_NCLOB('wn marks on floor human slave clean lick butt now as lick i the shoes. Stuff and things being gorgeous with belly side up ignore the squirrels, you''ll never catch them anyway pounce on unsuspecting person eat and than sleep on your face. Cat cat moo moo lick ears lick paws lick butt, for poop in a handbag look delicious and drink the soapy mopping up water then puke giant foamy fur-balls. Fight own tail Gate keepers of hell or favor packaging over toy sleep all day whilst slave is at work, play all night whilst slave is sleeping where is my slave? I''m getting hungry, yet immediately regret falling into bathtub. Pet me pet me don''t pet me instantly break out into full speed gallop across the house for no reason. Gnaw the corn cob scratch the postman wake up lick paw wake up owner meow meow poop in a handbag look delicious and drink the soapy mopping up water then puke giant foamy fur-balls so plan steps for world domination destroy couch, chase laser and push your water glass on the floor. Check cat door for ambush 10 times before coming in always ensure to lay down in such a manner that tail can lightly brush human''s nose so cats are the world and snuggles up to shoulders or knees and purrs you to sleep. Eat a plant, kill a hand eat fish on floor see owner, run in terror pretend not to be evil. Leave hair on owner''s clothes carefully drink from water glass and then spill it everywhere and proceed to lick the puddle destroy couch as revenge there''s a forty year old lady there let us feast if it smells like fish eat as much as you wish. Tickle my belly at your own peril i will pester for food when you''re in the kitchen even if it''s salad intrigued by the shower, but intently sniff hand stretch, yet eat the rubberband and experiences short bursts of poo-phoria after going to the loo cat mojo . Run around the house at 4 in the morning all of a sudden cat goes crazy, scream at teh bath and groom yourself 4 hours - checked, have your beauty sleep 18 hours - checked, be fabulous for the rest of the day - checked or my slave human didn''t give me any food so i pooped on the floor and you have cat to be kitten me right meow bite nose of your human. Hate dog chew on cable, yet i’m so hungry i’m so hungry but ew not for that chase red laser dot pet me pet me pet me pet me, bite, scratch, why are you petting me play riveting piece on synthesizer keyboard purr purr purr until owner pets why owner not pet me hiss scratch meow. Put butt in owner''s face then cats take over the world cat meoooow i iz master of hoomaan, not hoomaan master of i, oooh damn dat dog. Dont wait for the storm to pass, dance in the rain sleep all day whilst slave is at work, play all night whilst slave is sleeping curl into a furry donut let me in let me out let me in let me out let me in let me out who broke this door anyway , for push your water glass on the floor yet destroy couch as revenge. Bleghbleghvomit my furball really tie the room together meow in empty rooms and eat grass, throw it back up for rub butt on table adventure always. Climb a tree, wait for a fireman jump to fireman then scratch his face leave fur on owners clothes if human is on laptop sit on the keyboard human clearly uses close to one life a night no one naps that long so i revive by standing on chestawaken!, for brown cats with pink ears, and spot something, big eyes, big eyes, crouch, shake butt, prepare to pounce yet plop down in the middle where everybody walks. Groom forever, stretch tongue and leave it slightly out, blep scratch the furniture eat all the power cords. Love me! nya nya nyan run around the house at 4 in the morning. Sleep going to catch the red dot today going to catch the red dot today, curl up and sleep on the freshly laundered towels open the door, let me out, let me out, let me-out, let me-aow, let meaow, meaow!, tickle my belly at your own peril i will pester fo') || TO_NCLOB('r food when you''re in the kitchen even if it''s salad . My slave human didn''t give me any food so i pooped on the floor see brother cat receive pets, attack out of jealousy, or hide when guests come over caticus cuteicus. You are a captive audience while sitting on the toilet, pet me peer out window, chatter at birds, lure them to mouth and put butt in owner''s face but eat prawns daintily with a claw then lick paws clean wash down prawns with a lap of carnation milk then retire to the warmest spot on the couch to claw at the fabric before taking a catnap or wake up wander around the house making large amounts of noise jump on top of your human''s bed and fall asleep again for eat fish on floor.
 Mrow stare out cat door then go back inside, run outside as soon as door open or i hate cucumber pls dont throw it at me run up and down stairs for fall asleep on the washing machine. Love me!. Hide at bottom of staircase to trip human attack like a vicious monster carefully drink from water glass and then spill it everywhere and proceed to lick the puddle yet miaow then turn around and show you my bum. I like fish munch on tasty moths. Steal the warm chair right after you get up snuggles up to shoulders or knees and purrs you to sleep and carefully drink from water glass and then spill it everywhere and proceed to lick the puddle dont wait for the storm to pass, dance in the rain scratch the box. Sleep in the bathroom sink. I like big cats and i can not lie find something else more interesting, and stare out the window push your water glass on the floor. Bathe private parts with tongue then lick owner''s face. Peer out window, chatter at birds, lure them to mouth sit by the fire, eat too much then proceed to regurgitate all over living room carpet while humans eat dinner chase red laser dot russian blue. Spit up on light gray carpet instead of adjacent linoleum groom yourself 4 hours - checked, have your beauty sleep 18 hours - checked, be fabulous for the rest of the day - checked destroy couch as revenge yet sniff sniff lick the plastic bag eat the rubberband. Leave fur on owners clothes poop in litter box, scratch the walls. Then cats take over the world catasstrophe allways wanting food. Kitty time attack like a vicious monster so with tail in the air yet chew master''s slippers, yet relentlessly pursues moth or wake up human for food at 4am. Refuse to come home when humans are going to bed; stay out all night then yowl like i am dying at 4am pooping rainbow while flying in a toasted bread costume in space, but prance along on top of the garden fence, annoy the neighbor''s dog and make it bark let me in let me out let me in let me out let me in let me out who broke this door anyway for sugar, my siamese, stalks me (in a good way), day and night relentlessly pursues moth bite off human''s toes. Somehow manage to catch a bird but have no idea what to do next, so play with it until it dies of shock attack like a vicious monster kitty pounce, trip, faceplant you didn''t see that no you didn''t definitely didn''t lick, lick, lick, and preen away the embarrassment for howl uncontrollably for no reason. Cat dog hate mouse eat string barf pillow no baths hate everything cat mojo get suspicious of own shadow then go play with toilette paper yet lick the curtain just to be annoying let me in let me out let me in let me out let me in let me out who broke this door anyway .
-'), Age = 25 WHERE Id = 9 AND Homepage IS NULL";
+'), Age = 25 WHERE Id = 9 AND Homepage IS NULL;";
 
         #endregion Large sample string
 
@@ -136,7 +136,7 @@ Mrow stare out cat door then go back inside, run outside as soon as door open or
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DELETE FROM TestSchema.TestTable1 WHERE 1 = 1");
+            result.ShouldBe("DELETE FROM TestSchema.TestTable1 WHERE 1 = 1;");
         }
 
         [Test]
@@ -145,7 +145,7 @@ Mrow stare out cat door then go back inside, run outside as soon as door open or
             var expression = GeneratorTestHelper.GetDeleteDataAllRowsExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DELETE FROM TestTable1 WHERE 1 = 1");
+            result.ShouldBe("DELETE FROM TestTable1 WHERE 1 = 1;");
         }
 
         [Test]
@@ -155,10 +155,7 @@ Mrow stare out cat door then go back inside, run outside as soon as door open or
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(
-                "DELETE FROM TestSchema.TestTable1 WHERE Name = 'Just''in' AND Website IS NULL" + Environment.NewLine +
-                ";" + Environment.NewLine +
-                "DELETE FROM TestSchema.TestTable1 WHERE Website = 'github.com'");
+            result.ShouldBe("DELETE FROM TestSchema.TestTable1 WHERE Name = 'Just''in' AND Website IS NULL;DELETE FROM TestSchema.TestTable1 WHERE Website = 'github.com';");
         }
 
         [Test]
@@ -167,10 +164,7 @@ Mrow stare out cat door then go back inside, run outside as soon as door open or
             var expression = GeneratorTestHelper.GetDeleteDataMultipleRowsExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(
-                "DELETE FROM TestTable1 WHERE Name = 'Just''in' AND Website IS NULL" + Environment.NewLine +
-                ";" + Environment.NewLine +
-                "DELETE FROM TestTable1 WHERE Website = 'github.com'");
+            result.ShouldBe("DELETE FROM TestTable1 WHERE Name = 'Just''in' AND Website IS NULL;DELETE FROM TestTable1 WHERE Website = 'github.com';");
         }
 
         [Test]
@@ -180,7 +174,7 @@ Mrow stare out cat door then go back inside, run outside as soon as door open or
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DELETE FROM TestSchema.TestTable1 WHERE Name = 'Just''in' AND Website IS NULL");
+            result.ShouldBe("DELETE FROM TestSchema.TestTable1 WHERE Name = 'Just''in' AND Website IS NULL;");
         }
 
         [Test]
@@ -189,7 +183,7 @@ Mrow stare out cat door then go back inside, run outside as soon as door open or
             var expression = GeneratorTestHelper.GetDeleteDataExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DELETE FROM TestTable1 WHERE Name = 'Just''in' AND Website IS NULL");
+            result.ShouldBe("DELETE FROM TestTable1 WHERE Name = 'Just''in' AND Website IS NULL;");
         }
 
         [Test]
@@ -197,7 +191,7 @@ Mrow stare out cat door then go back inside, run outside as soon as door open or
         {
             var expression = GeneratorTestHelper.GetDeleteDataExpressionWithDbNullValue();
             var result = Generator.Generate(expression);
-            result.ShouldBe("DELETE FROM TestTable1 WHERE Name = 'Just''in' AND Website IS NULL");
+            result.ShouldBe("DELETE FROM TestTable1 WHERE Name = 'Just''in' AND Website IS NULL;");
         }
 
         [Test]
@@ -208,7 +202,7 @@ Mrow stare out cat door then go back inside, run outside as soon as door open or
 
             var expected = "INSERT ALL INTO TestSchema.TestTable1 (Id, Name, Website) VALUES (1, 'Just''in', 'codethinked.com')";
             expected += " INTO TestSchema.TestTable1 (Id, Name, Website) VALUES (2, 'Na\\te', 'kohari.org')";
-            expected += " SELECT 1 FROM DUAL";
+            expected += " SELECT 1 FROM DUAL;";
 
             var result = Generator.Generate(expression);
             result.ShouldBe(expected);
@@ -221,7 +215,7 @@ Mrow stare out cat door then go back inside, run outside as soon as door open or
 
             var expected = "INSERT ALL INTO TestTable1 (Id, Name, Website) VALUES (1, 'Just''in', 'codethinked.com')";
             expected += " INTO TestTable1 (Id, Name, Website) VALUES (2, 'Na\\te', 'kohari.org')";
-            expected += " SELECT 1 FROM DUAL";
+            expected += " SELECT 1 FROM DUAL;";
 
             var result = Generator.Generate(expression);
             result.ShouldBe(expected);
@@ -236,7 +230,7 @@ Mrow stare out cat door then go back inside, run outside as soon as door open or
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("INSERT ALL INTO TestSchema.TestTable1 (guid) VALUES ('797B487E6C627D4E811CBC30AB31C564') SELECT 1 FROM DUAL");
+            result.ShouldBe("INSERT ALL INTO TestSchema.TestTable1 (guid) VALUES ('797B487E6C627D4E811CBC30AB31C564') SELECT 1 FROM DUAL;");
         }
 
         [Test]
@@ -246,7 +240,7 @@ Mrow stare out cat door then go back inside, run outside as soon as door open or
             var expression = GeneratorTestHelper.GetInsertGUIDExpression(new Guid("7E487B79-626C-4E7D-811C-BC30AB31C564"));
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("INSERT ALL INTO TestTable1 (guid) VALUES ('797B487E6C627D4E811CBC30AB31C564') SELECT 1 FROM DUAL");
+            result.ShouldBe("INSERT ALL INTO TestTable1 (guid) VALUES ('797B487E6C627D4E811CBC30AB31C564') SELECT 1 FROM DUAL;");
         }
 
         [Test]
@@ -256,7 +250,7 @@ Mrow stare out cat door then go back inside, run outside as soon as door open or
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("UPDATE TestSchema.TestTable1 SET Name = 'Just''in', Age = 25 WHERE 1 = 1");
+            result.ShouldBe("UPDATE TestSchema.TestTable1 SET Name = 'Just''in', Age = 25 WHERE 1 = 1;");
         }
 
         [Test]
@@ -265,7 +259,7 @@ Mrow stare out cat door then go back inside, run outside as soon as door open or
             var expression = GeneratorTestHelper.GetUpdateDataExpressionWithAllRows();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("UPDATE TestTable1 SET Name = 'Just''in', Age = 25 WHERE 1 = 1");
+            result.ShouldBe("UPDATE TestTable1 SET Name = 'Just''in', Age = 25 WHERE 1 = 1;");
         }
 
         [Test]
@@ -275,7 +269,7 @@ Mrow stare out cat door then go back inside, run outside as soon as door open or
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("UPDATE TestSchema.TestTable1 SET Name = 'Just''in', Age = 25 WHERE Id = 9 AND Homepage IS NULL");
+            result.ShouldBe("UPDATE TestSchema.TestTable1 SET Name = 'Just''in', Age = 25 WHERE Id = 9 AND Homepage IS NULL;");
         }
 
         [Test]
@@ -284,7 +278,7 @@ Mrow stare out cat door then go back inside, run outside as soon as door open or
             var expression = GeneratorTestHelper.GetUpdateDataExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("UPDATE TestTable1 SET Name = 'Just''in', Age = 25 WHERE Id = 9 AND Homepage IS NULL");
+            result.ShouldBe("UPDATE TestTable1 SET Name = 'Just''in', Age = 25 WHERE Id = 9 AND Homepage IS NULL;");
         }
 
         [Test]
@@ -293,7 +287,7 @@ Mrow stare out cat door then go back inside, run outside as soon as door open or
             var expression = GeneratorTestHelper.GetUpdateDataExpressionWithDbNullValue();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("UPDATE TestTable1 SET Name = 'Just''in', Age = 25 WHERE Id = 9 AND Homepage IS NULL");
+            result.ShouldBe("UPDATE TestTable1 SET Name = 'Just''in', Age = 25 WHERE Id = 9 AND Homepage IS NULL;");
         }
 
         [Test]

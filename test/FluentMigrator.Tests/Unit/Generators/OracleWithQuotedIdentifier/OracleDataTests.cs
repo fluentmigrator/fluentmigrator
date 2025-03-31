@@ -45,7 +45,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DELETE FROM \"TestSchema\".\"TestTable1\" WHERE 1 = 1");
+            result.ShouldBe("DELETE FROM \"TestSchema\".\"TestTable1\" WHERE 1 = 1;");
         }
 
         [Test]
@@ -54,7 +54,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
             var expression = GeneratorTestHelper.GetDeleteDataAllRowsExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DELETE FROM \"TestTable1\" WHERE 1 = 1");
+            result.ShouldBe("DELETE FROM \"TestTable1\" WHERE 1 = 1;");
         }
 
         [Test]
@@ -65,9 +65,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
 
             var result = Generator.Generate(expression);
             result.ShouldBe(
-                "DELETE FROM \"TestSchema\".\"TestTable1\" WHERE \"Name\" = 'Just''in' AND \"Website\" IS NULL" + Environment.NewLine +
-                ";" + Environment.NewLine +
-                "DELETE FROM \"TestSchema\".\"TestTable1\" WHERE \"Website\" = 'github.com'");
+                "DELETE FROM \"TestSchema\".\"TestTable1\" WHERE \"Name\" = 'Just''in' AND \"Website\" IS NULL;DELETE FROM \"TestSchema\".\"TestTable1\" WHERE \"Website\" = 'github.com';");
         }
 
         [Test]
@@ -77,9 +75,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
 
             var result = Generator.Generate(expression);
             result.ShouldBe(
-                "DELETE FROM \"TestTable1\" WHERE \"Name\" = 'Just''in' AND \"Website\" IS NULL" + Environment.NewLine +
-                ";" + Environment.NewLine +
-                "DELETE FROM \"TestTable1\" WHERE \"Website\" = 'github.com'");
+                "DELETE FROM \"TestTable1\" WHERE \"Name\" = 'Just''in' AND \"Website\" IS NULL;DELETE FROM \"TestTable1\" WHERE \"Website\" = 'github.com';");
         }
 
         [Test]
@@ -89,7 +85,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DELETE FROM \"TestSchema\".\"TestTable1\" WHERE \"Name\" = 'Just''in' AND \"Website\" IS NULL");
+            result.ShouldBe("DELETE FROM \"TestSchema\".\"TestTable1\" WHERE \"Name\" = 'Just''in' AND \"Website\" IS NULL;");
         }
 
         [Test]
@@ -98,7 +94,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
             var expression = GeneratorTestHelper.GetDeleteDataExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DELETE FROM \"TestTable1\" WHERE \"Name\" = 'Just''in' AND \"Website\" IS NULL");
+            result.ShouldBe("DELETE FROM \"TestTable1\" WHERE \"Name\" = 'Just''in' AND \"Website\" IS NULL;");
         }
 
         [Test]
@@ -106,7 +102,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
         {
             var expression = GeneratorTestHelper.GetDeleteDataExpressionWithDbNullValue();
             var result = Generator.Generate(expression);
-            result.ShouldBe("DELETE FROM \"TestTable1\" WHERE \"Name\" = 'Just''in' AND \"Website\" IS NULL");
+            result.ShouldBe("DELETE FROM \"TestTable1\" WHERE \"Name\" = 'Just''in' AND \"Website\" IS NULL;");
         }
 
         [Test]
@@ -117,7 +113,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
 
             var expected = "INSERT ALL INTO \"TestSchema\".\"TestTable1\" (\"Id\", \"Name\", \"Website\") VALUES (1, 'Just''in', 'codethinked.com')";
             expected += " INTO \"TestSchema\".\"TestTable1\" (\"Id\", \"Name\", \"Website\") VALUES (2, 'Na\\te', 'kohari.org')";
-            expected += " SELECT 1 FROM DUAL";
+            expected += " SELECT 1 FROM DUAL;";
 
             var result = Generator.Generate(expression);
             result.ShouldBe(expected);
@@ -130,7 +126,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
 
             var expected = "INSERT ALL INTO \"TestTable1\" (\"Id\", \"Name\", \"Website\") VALUES (1, 'Just''in', 'codethinked.com')";
             expected += " INTO \"TestTable1\" (\"Id\", \"Name\", \"Website\") VALUES (2, 'Na\\te', 'kohari.org')";
-            expected += " SELECT 1 FROM DUAL";
+            expected += " SELECT 1 FROM DUAL;";
 
             var result = Generator.Generate(expression);
             result.ShouldBe(expected);
@@ -144,7 +140,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("INSERT ALL INTO \"TestSchema\".\"TestTable1\" (\"guid\") VALUES ('797B487E6C627D4E811CBC30AB31C564') SELECT 1 FROM DUAL");
+            result.ShouldBe("INSERT ALL INTO \"TestSchema\".\"TestTable1\" (\"guid\") VALUES ('797B487E6C627D4E811CBC30AB31C564') SELECT 1 FROM DUAL;");
         }
 
         [Test]
@@ -154,7 +150,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
             var expression = GeneratorTestHelper.GetInsertGUIDExpression(new Guid("7E487B79-626C-4E7D-811C-BC30AB31C564"));
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("INSERT ALL INTO \"TestTable1\" (\"guid\") VALUES ('797B487E6C627D4E811CBC30AB31C564') SELECT 1 FROM DUAL");
+            result.ShouldBe("INSERT ALL INTO \"TestTable1\" (\"guid\") VALUES ('797B487E6C627D4E811CBC30AB31C564') SELECT 1 FROM DUAL;");
         }
 
         [Test]
@@ -164,7 +160,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("UPDATE \"TestSchema\".\"TestTable1\" SET \"Name\" = 'Just''in', \"Age\" = 25 WHERE 1 = 1");
+            result.ShouldBe("UPDATE \"TestSchema\".\"TestTable1\" SET \"Name\" = 'Just''in', \"Age\" = 25 WHERE 1 = 1;");
         }
 
         [Test]
@@ -173,7 +169,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
             var expression = GeneratorTestHelper.GetUpdateDataExpressionWithAllRows();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("UPDATE \"TestTable1\" SET \"Name\" = 'Just''in', \"Age\" = 25 WHERE 1 = 1");
+            result.ShouldBe("UPDATE \"TestTable1\" SET \"Name\" = 'Just''in', \"Age\" = 25 WHERE 1 = 1;");
         }
 
         [Test]
@@ -183,7 +179,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("UPDATE \"TestSchema\".\"TestTable1\" SET \"Name\" = 'Just''in', \"Age\" = 25 WHERE \"Id\" = 9 AND \"Homepage\" IS NULL");
+            result.ShouldBe("UPDATE \"TestSchema\".\"TestTable1\" SET \"Name\" = 'Just''in', \"Age\" = 25 WHERE \"Id\" = 9 AND \"Homepage\" IS NULL;");
         }
 
         [Test]
@@ -192,7 +188,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
             var expression = GeneratorTestHelper.GetUpdateDataExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("UPDATE \"TestTable1\" SET \"Name\" = 'Just''in', \"Age\" = 25 WHERE \"Id\" = 9 AND \"Homepage\" IS NULL");
+            result.ShouldBe("UPDATE \"TestTable1\" SET \"Name\" = 'Just''in', \"Age\" = 25 WHERE \"Id\" = 9 AND \"Homepage\" IS NULL;");
         }
 
         [Test]
@@ -201,7 +197,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
             var expression = GeneratorTestHelper.GetUpdateDataExpressionWithDbNullValue();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("UPDATE \"TestTable1\" SET \"Name\" = 'Just''in', \"Age\" = 25 WHERE \"Id\" = 9 AND \"Homepage\" IS NULL");
+            result.ShouldBe("UPDATE \"TestTable1\" SET \"Name\" = 'Just''in', \"Age\" = 25 WHERE \"Id\" = 9 AND \"Homepage\" IS NULL;");
         }
     }
 }

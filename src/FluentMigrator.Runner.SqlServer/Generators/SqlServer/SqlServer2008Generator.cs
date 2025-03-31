@@ -75,14 +75,37 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         /// <inheritdoc />
         public override List<string> GeneratorIdAliases =>
             [GeneratorIdConstants.SqlServer2008, GeneratorIdConstants.SqlServer];
-        
+
         public override bool IsAdditionalFeatureSupported(string feature)
         {
             return _supportedAdditionalFeatures.Contains(feature)
              || base.IsAdditionalFeatureSupported(feature);
         }
 
-        public virtual string GetWithNullsDistinctString(IndexDefinition index)
+        /// <inheritdoc />
+        public override string GetFilterString(CreateIndexExpression createIndexExpression)
+        {
+            var baseFilter = base.GetFilterString(createIndexExpression);
+            var nullsDistinct = GetWithNullsDistinctString(createIndexExpression.Index);
+
+            if (string.IsNullOrEmpty(baseFilter) && string.IsNullOrEmpty(nullsDistinct))
+            {
+                return string.Empty;
+            }
+
+            if (string.IsNullOrEmpty(nullsDistinct))
+            {
+                return baseFilter;
+            }
+
+            baseFilter = string.IsNullOrEmpty(baseFilter) ?
+                $" WHERE {nullsDistinct}" :
+                $" AND  {nullsDistinct}";
+
+            return baseFilter;
+        }
+
+        protected string GetWithNullsDistinctString(IndexDefinition index)
         {
             bool? GetNullsDistinct(IndexColumnDefinition column)
             {
@@ -110,14 +133,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             if (condition.Length == 0)
                 return string.Empty;
 
-            return $" WHERE {condition}";
-        }
-
-        public override string Generate(CreateIndexExpression expression)
-        {
-            var sql = base.Generate(expression);
-            sql += GetWithNullsDistinctString(expression.Index);
-            return sql;
+            return condition;
         }
 
         /// <inheritdoc />

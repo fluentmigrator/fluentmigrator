@@ -212,11 +212,11 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         {
             if (expression.IfExists)
             {
-                return string.Format("IF OBJECT_ID('{0}','U') IS NOT NULL DROP TABLE {0}", Quoter.QuoteTableName(expression.TableName, expression.SchemaName));
+                return FormatStatement("IF OBJECT_ID('{0}','U') IS NOT NULL DROP TABLE {0}", Quoter.QuoteTableName(expression.TableName, expression.SchemaName));
 
             }
 
-            return $"DROP TABLE {Quoter.QuoteTableName(expression.TableName, expression.SchemaName)}";
+            return FormatStatement(DropTable, Quoter.QuoteTableName(expression.TableName, expression.SchemaName));
         }
 
         public override string Generate(CreateColumnExpression expression)
@@ -259,7 +259,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             {
                 foreignColumns.Add(Quoter.QuoteColumnName(column));
             }
-            return string.Format(
+            return FormatStatement(
                 CreateForeignKeyConstraint,
                 Quoter.QuoteTableName(expression.ForeignKey.ForeignTable, expression.ForeignKey.ForeignTableSchema),
                 Quoter.QuoteColumnName(expression.ForeignKey.Name),
@@ -290,12 +290,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                 }
             }
 
-            var withParts = GetWithOptions(expression);
-            var withPart = !string.IsNullOrEmpty(withParts)
-                ? $" WITH ({withParts})"
-                : string.Empty;
-
-            var result = string.Format(
+            return FormatStatement(
                 CreateIndex,
                 GetUniqueString(expression),
                 GetClusterTypeString(expression),
@@ -304,23 +299,25 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                 string.Join(", ", indexColumns),
                 GetIncludeString(expression),
                 GetFilterString(expression),
-                withPart);
-
-            return result;
+                GetWithPart(expression));
         }
 
         public override string Generate(DeleteIndexExpression expression)
         {
-            var withParts = GetWithOptions(expression);
-            var withPart = !string.IsNullOrEmpty(withParts)
-                ? $" WITH ({withParts})"
-                : string.Empty;
-
-            return string.Format(
+            return FormatStatement(
                 DropIndex,
                 Quoter.QuoteIndexName(expression.Index.Name),
                 Quoter.QuoteTableName(expression.Index.TableName, expression.Index.SchemaName),
-                withPart);
+                GetWithPart(expression));
+        }
+
+        private string GetWithPart(ISupportAdditionalFeatures expression)
+        {
+            var withParts = GetWithOptions(expression);
+
+            return !string.IsNullOrEmpty(withParts)
+                ? $" WITH ({withParts})"
+                : string.Empty;
         }
 
         public override string Generate(CreateConstraintExpression expression)
@@ -329,25 +326,29 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             var includeParts = GetIncludeString(expression);
             var columns = string.Join(", ", expression.Constraint.Columns.Select(x => Quoter.QuoteColumnName(x)).ToArray());
 
-            if (expression.Constraint.IsUniqueConstraint)
-                if (expression.Constraint.TryGetAdditionalFeature<string>(SqlServerExtensions.UniqueConstraintFilter, out _) ||
-                    expression.Constraint.TryGetAdditionalFeature<IList<IndexIncludeDefinition>>(SqlServerExtensions.UniqueConstraintIncludesList, out _))
-                    return
-                        string.Format(
-                            CreateUniqueConstraint,
-                            Quoter.QuoteTableName(expression.Constraint.TableName, expression.Constraint.SchemaName),
-                            Quoter.QuoteConstraintName(expression.Constraint.ConstraintName),
-                            columns,
-                            includeParts,
-                            filterParts
-                        );
-            
-            var withParts = GetWithOptions(expression);
-            var withPart = !string.IsNullOrEmpty(withParts)
-                ? $" WITH ({withParts})"
-                : string.Empty;
+            if (expression.Constraint.IsUniqueConstraint &&
+                (
+                    expression.Constraint.TryGetAdditionalFeature<string>(SqlServerExtensions.UniqueConstraintFilter, out _) ||
+                    expression.Constraint.TryGetAdditionalFeature<IList<IndexIncludeDefinition>>(SqlServerExtensions.UniqueConstraintIncludesList, out _)
+                ))
+            {
+                return FormatStatement(
+                    CreateUniqueConstraint,
+                    Quoter.QuoteTableName(expression.Constraint.TableName, expression.Constraint.SchemaName),
+                    Quoter.QuoteConstraintName(expression.Constraint.ConstraintName),
+                    columns,
+                    includeParts,
+                    filterParts
+                );
+            }
 
-            return $"{base.Generate(expression)}{filterParts}{withPart}";
+            var statement = GenerateCreateConstraintPart(expression);
+
+            statement.Append(GetWithPart(expression));
+
+            AppendSqlStatementEndToken(statement);
+
+            return statement.ToString();
         }
 
         public override string Generate(DeleteDefaultConstraintExpression expression)
@@ -373,12 +374,11 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override string Generate(DeleteConstraintExpression expression)
         {
-            var withParts = GetWithOptions(expression);
-            var withPart = !string.IsNullOrEmpty(withParts)
-                ? $" WITH ({withParts})"
-                : string.Empty;
-
-            return $"{base.Generate(expression)}{withPart}";
+            return FormatStatement("ALTER TABLE {0} DROP CONSTRAINT {1}{2}",
+                Quoter.QuoteTableName(expression.Constraint.TableName, expression.Constraint.SchemaName),
+                Quoter.QuoteConstraintName(expression.Constraint.ConstraintName),
+                GetWithPart(expression)
+            );
         }
 
         public override string Generate(CreateSchemaExpression expression)
@@ -393,17 +393,17 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                 authFragment = string.Empty;
             }
 
-            return string.Format(CreateSchema, Quoter.QuoteSchemaName(expression.SchemaName), authFragment);
+            return FormatStatement(CreateSchema, Quoter.QuoteSchemaName(expression.SchemaName), authFragment);
         }
 
         public override string Generate(DeleteSchemaExpression expression)
         {
-            return string.Format(DropSchema, Quoter.QuoteSchemaName(expression.SchemaName));
+            return FormatStatement(DropSchema, Quoter.QuoteSchemaName(expression.SchemaName));
         }
 
         public override string Generate(AlterSchemaExpression expression)
         {
-            return string.Format(AlterSchema, Quoter.QuoteSchemaName(expression.DestinationSchemaName), Quoter.QuoteTableName(expression.TableName, expression.SourceSchemaName));
+            return FormatStatement(AlterSchema, Quoter.QuoteSchemaName(expression.DestinationSchemaName), Quoter.QuoteTableName(expression.TableName, expression.SourceSchemaName));
         }
 
         private string ComposeStatements(string ddlStatement, IEnumerable<string> otherStatements)
@@ -413,7 +413,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             var statementsBuilder = new StringBuilder();
             statementsBuilder.AppendLine(ddlStatement);
             statementsBuilder.AppendLine("GO");
-            statementsBuilder.AppendLine(string.Join(";", otherStatementsArray));
+            statementsBuilder.Append(string.Join("", otherStatementsArray));
 
             return statementsBuilder.ToString();
         }

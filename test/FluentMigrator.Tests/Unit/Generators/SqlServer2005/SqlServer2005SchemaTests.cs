@@ -43,7 +43,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             var expression = GeneratorTestHelper.GetAlterSchemaExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER SCHEMA [TestSchema2] TRANSFER [TestSchema1].[TestTable]");
+            result.ShouldBe("ALTER SCHEMA [TestSchema2] TRANSFER [TestSchema1].[TestTable];");
         }
 
         [Test]
@@ -52,7 +52,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             var expression = GeneratorTestHelper.GetCreateSchemaExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE SCHEMA [TestSchema]");
+            result.ShouldBe("CREATE SCHEMA [TestSchema];");
         }
 
         [Test]
@@ -61,7 +61,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             var expression = GeneratorTestHelper.GetDeleteSchemaExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DROP SCHEMA [TestSchema]");
+            result.ShouldBe("DROP SCHEMA [TestSchema];");
         }
 
         [Test]
@@ -72,7 +72,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             builder.Authorization("dbo");
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE SCHEMA [TestSchema] AUTHORIZATION [dbo]");
+            result.ShouldBe("CREATE SCHEMA [TestSchema] AUTHORIZATION [dbo];");
         }
     }
 }
