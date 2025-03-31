@@ -70,6 +70,12 @@ namespace FluentMigrator.Runner.Generators.Redshift
             return alterStatement.ToString();
         }
 
+        /// <inheritdoc />
+        public override string GeneratorId => GeneratorIdConstants.Redshift;
+
+        /// <inheritdoc />
+        public override List<string> GeneratorIdAliases => new List<string> { GeneratorIdConstants.Redshift };
+
         public override string Generate(CreateSchemaExpression expression)
         {
             return string.Format("CREATE SCHEMA {0};", Quoter.QuoteSchemaName(expression.SchemaName));

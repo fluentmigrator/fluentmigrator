@@ -31,9 +31,9 @@ namespace FluentMigrator.Runner.Processors.Postgres92
 {
     public class Postgres92Processor : PostgresProcessor
     {
-        public override string DatabaseType => "Postgres92";
+        public override string DatabaseType => ProcessorIdConstants.Postgres92;
 
-        public override IList<string> DatabaseTypeAliases { get; } = new List<string> { "PostgreSQL92" };
+        public override IList<string> DatabaseTypeAliases { get; } = new List<string> { ProcessorIdConstants.Postgres92, ProcessorIdConstants.PostgreSQL92 };
 
         public Postgres92Processor(
             [NotNull] PostgresDbFactory factory,

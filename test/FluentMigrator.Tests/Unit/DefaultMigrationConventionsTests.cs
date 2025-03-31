@@ -534,8 +534,8 @@ namespace FluentMigrator.Tests.Unit
         public void GetAutoScriptUpName()
         {
             var processor = new Mock<IMigrationProcessor>();
-            processor.SetupGet(p => p.DatabaseType).Returns("SqlServer2016");
-            processor.SetupGet(p => p.DatabaseTypeAliases).Returns(new[] { "SqlServer" });
+            processor.SetupGet(p => p.DatabaseType).Returns(ProcessorIdConstants.SqlServer2016);
+            processor.SetupGet(p => p.DatabaseTypeAliases).Returns(new[] { ProcessorIdConstants.SqlServer });
             var serviceProvider = ServiceCollectionExtensions.CreateServices()
                 .WithProcessor(processor)
                 .AddScoped<IConnectionStringReader>(_ => new PassThroughConnectionStringReader("No connection"))
@@ -560,8 +560,8 @@ namespace FluentMigrator.Tests.Unit
         public void GetAutoScriptDownName()
         {
             var processor = new Mock<IMigrationProcessor>();
-            processor.SetupGet(p => p.DatabaseType).Returns("SqlServer2016");
-            processor.SetupGet(p => p.DatabaseTypeAliases).Returns(new[] { "SqlServer" });
+            processor.SetupGet(p => p.DatabaseType).Returns(ProcessorIdConstants.SqlServer2016);
+            processor.SetupGet(p => p.DatabaseTypeAliases).Returns(new[] { ProcessorIdConstants.SqlServer });
             var serviceProvider = ServiceCollectionExtensions.CreateServices()
                 .WithProcessor(processor)
                 .AddScoped<IConnectionStringReader>(_ => new PassThroughConnectionStringReader("No connection"))

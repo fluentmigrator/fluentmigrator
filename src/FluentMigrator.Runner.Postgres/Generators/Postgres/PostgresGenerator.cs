@@ -104,6 +104,12 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return alterStatement.ToString();
         }
 
+        /// <inheritdoc />
+        public override string GeneratorId => GeneratorIdConstants.PostgreSQL;
+
+        /// <inheritdoc />
+        public override List<string> GeneratorIdAliases => [GeneratorIdConstants.PostgreSQL, GeneratorIdConstants.Postgres];
+
         public override string Generate(CreateSchemaExpression expression)
         {
             return string.Format("CREATE SCHEMA {0};", Quoter.QuoteSchemaName(expression.SchemaName));

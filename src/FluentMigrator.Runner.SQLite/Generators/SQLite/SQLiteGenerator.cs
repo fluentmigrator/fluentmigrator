@@ -17,6 +17,7 @@
 //
 #endregion
 
+using System.Collections.Generic;
 using System.Linq;
 
 using FluentMigrator.Expressions;
@@ -69,6 +70,12 @@ namespace FluentMigrator.Runner.Generators.SQLite
         }
 
         public override string RenameTable { get { return "ALTER TABLE {0} RENAME TO {1}"; } }
+
+        /// <inheritdoc />
+        public override string GeneratorId => GeneratorIdConstants.SQLite;
+
+        /// <inheritdoc />
+        public override List<string> GeneratorIdAliases => new List<string> { GeneratorIdConstants.SQLite };
 
         public override string Generate(AlterColumnExpression expression)
         {
