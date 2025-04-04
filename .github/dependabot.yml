@@ -43,6 +43,9 @@ updates:
     packaging-dependencies:
       patterns:
         - "SourceLink*"
+    sample-code-dependencies:
+      patterns:
+        - "FluentMigrator*"
     other-dependencies:
       patterns:
         - "FSharp*"
