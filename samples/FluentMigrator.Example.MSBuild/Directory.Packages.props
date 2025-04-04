@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <Project>
     <ItemGroup>
-        <PackageReference Include="FluentMigrator.MSBuild" Version="7.0.0" GeneratePathProperty="true" />
+        <PackageReference Include="FluentMigrator.MSBuild" Version="7.1.0" GeneratePathProperty="true" />
     </ItemGroup>
     <PropertyGroup>
         <FluentMigratorTfm Condition="'$(MSBuildRuntimeType)' == 'Core' And '$(TargetFramework)' == 'net8.0'">net8.0</FluentMigratorTfm>
