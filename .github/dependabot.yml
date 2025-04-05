@@ -27,7 +27,7 @@ updates:
         - "Microsoft.Extensions.Logging.Debug"
         - "Microsoft.Extensions.Options"
         - "Microsoft.Extensions.Options.ConfigurationExtensions"
-        
+
     test-dependencies:
       patterns:
         - "Moq"
@@ -43,6 +43,9 @@ updates:
     packaging-dependencies:
       patterns:
         - "SourceLink*"
+    roslyn-analyzers-dependencies:
+      patterns:
+        - "Microsoft.CodeAnalysis*"
     other-dependencies:
       patterns:
         - "FSharp*"
