@@ -183,11 +183,13 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
             builder.AppendLine();
 
-            builder.AppendFormat("-- create alter table command to create new default constraint as string and run it" + Environment.NewLine +"ALTER TABLE {0} WITH NOCHECK ADD CONSTRAINT {3} DEFAULT({2}) FOR {1};",
+            builder.AppendFormat("-- create alter table command to create new default constraint as string and run it" + Environment.NewLine +"ALTER TABLE {0} WITH NOCHECK ADD CONSTRAINT {3} DEFAULT({2}) FOR {1}",
                 Quoter.QuoteTableName(expression.TableName, expression.SchemaName),
                 Quoter.QuoteColumnName(expression.ColumnName),
                 SqlServer2000Column.FormatDefaultValue(expression.DefaultValue, Quoter),
                 Quoter.QuoteConstraintName(SqlServer2000Column.GetDefaultConstraintName(expression.TableName, expression.ColumnName)));
+
+            AppendSqlStatementEndToken(builder);
 
             return builder.ToString();
         }
