@@ -106,7 +106,12 @@ namespace FluentMigrator.Runner.Generators.MySql
 
         public override string Generate(RenameColumnExpression expression)
         {
-            return FormatStatement("ALTER TABLE {0} CHANGE {1} {2}", Quoter.QuoteTableName(expression.TableName), Quoter.QuoteColumnName(expression.OldName), Quoter.QuoteColumnName(expression.NewName));
+            return FormatStatement(GenerateWithoutEndStatement(expression));
+        }
+
+        internal string GenerateWithoutEndStatement(RenameColumnExpression expression)
+        {
+            return string.Format("ALTER TABLE {0} CHANGE {1} {2}", Quoter.QuoteTableName(expression.TableName), Quoter.QuoteColumnName(expression.OldName), Quoter.QuoteColumnName(expression.NewName));
         }
 
         public override string Generate(AlterDefaultConstraintExpression expression)
