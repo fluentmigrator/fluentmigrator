@@ -60,7 +60,7 @@ namespace FluentMigrator.Runner.Generators.Snowflake
         /// <inheritdoc />
         public override string Generate(DeleteDefaultConstraintExpression expression)
         {
-            return $"ALTER TABLE {Quoter.QuoteTableName(expression.TableName, expression.SchemaName)} ALTER COLUMN {Quoter.QuoteColumnName(expression.ColumnName)} DROP DEFAULT";
+            return FormatStatement($"ALTER TABLE {Quoter.QuoteTableName(expression.TableName, expression.SchemaName)} ALTER COLUMN {Quoter.QuoteColumnName(expression.ColumnName)} DROP DEFAULT");
         }
 
         /// <inheritdoc />
@@ -72,18 +72,18 @@ namespace FluentMigrator.Runner.Generators.Snowflake
         /// <inheritdoc />
         public override string Generate(CreateSchemaExpression expression)
         {
-            return string.Format(CreateSchema, Quoter.QuoteSchemaName(expression.SchemaName));
+            return FormatStatement(CreateSchema, Quoter.QuoteSchemaName(expression.SchemaName));
         }
 
         /// <inheritdoc />
         public override string Generate(DeleteSchemaExpression expression)
         {
-            return string.Format(DropSchema, Quoter.QuoteSchemaName(expression.SchemaName));
+            return FormatStatement(DropSchema, Quoter.QuoteSchemaName(expression.SchemaName));
         }
 
         public override string Generate(DeleteTableExpression expression)
         {
-            return $"DROP TABLE{(expression.IfExists ? " IF EXISTS" : "")} {Quoter.QuoteTableName(expression.TableName, expression.SchemaName)};";
+            return FormatStatement($"DROP TABLE{(expression.IfExists ? " IF EXISTS" : "")} {Quoter.QuoteTableName(expression.TableName, expression.SchemaName)}");
         }
 
         /// <inheritdoc />
@@ -100,19 +100,19 @@ namespace FluentMigrator.Runner.Generators.Snowflake
                 return errors;
             }
 
-            return string.Format(AlterColumn, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), ((SnowflakeColumn)Column).GenerateAlterColumn(expression.Column));
+            return FormatStatement(AlterColumn, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), ((SnowflakeColumn)Column).GenerateAlterColumn(expression.Column));
         }
 
         /// <inheritdoc />
         public override string Generate(RenameTableExpression expression)
         {
-            return $"ALTER TABLE {Quoter.QuoteTableName(expression.OldName, expression.SchemaName)} RENAME TO {Quoter.QuoteTableName(expression.NewName, expression.SchemaName)}";
+            return FormatStatement($"ALTER TABLE {Quoter.QuoteTableName(expression.OldName, expression.SchemaName)} RENAME TO {Quoter.QuoteTableName(expression.NewName, expression.SchemaName)}");
         }
 
         /// <inheritdoc />
         public override string Generate(AlterSchemaExpression expression)
         {
-            return $"ALTER TABLE {Quoter.QuoteTableName(expression.TableName, expression.SourceSchemaName)} RENAME TO {Quoter.QuoteTableName(expression.TableName, expression.DestinationSchemaName)}";
+            return FormatStatement($"ALTER TABLE {Quoter.QuoteTableName(expression.TableName, expression.SourceSchemaName)} RENAME TO {Quoter.QuoteTableName(expression.TableName, expression.DestinationSchemaName)}");
         }
 
         /// <inheritdoc />
@@ -142,6 +142,8 @@ namespace FluentMigrator.Runner.Generators.Snowflake
             {
                 result.AppendFormat(" INCREMENT {0}", seq.Increment);
             }
+
+            AppendSqlStatementEndToken(result);
 
             return result.ToString();
         }

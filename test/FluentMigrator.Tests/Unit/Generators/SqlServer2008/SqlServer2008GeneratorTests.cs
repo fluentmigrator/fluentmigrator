@@ -51,7 +51,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
             expression.Columns.Add(new ColumnDefinition { TableName = "TestTable1", Name = "TestColumn4", Type = DbType.Time });
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE [dbo].[TestTable1] ([TestColumn1] DATETIMEOFFSET NOT NULL, [TestColumn2] DATETIME2 NOT NULL, [TestColumn3] DATE NOT NULL, [TestColumn4] TIME NOT NULL)");
+            result.ShouldBe("CREATE TABLE [dbo].[TestTable1] ([TestColumn1] DATETIMEOFFSET NOT NULL, [TestColumn2] DATETIME2 NOT NULL, [TestColumn3] DATE NOT NULL, [TestColumn4] TIME NOT NULL);");
         }
 
         [Test]
@@ -69,7 +69,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
             };
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [dbo].[NewTable] ADD [NewColumn] DATETIME NOT NULL CONSTRAINT [DF__NewColumn] DEFAULT SYSDATETIMEOFFSET()");
+            result.ShouldBe("ALTER TABLE [dbo].[NewTable] ADD [NewColumn] DATETIME NOT NULL CONSTRAINT [DF__NewColumn] DEFAULT SYSDATETIMEOFFSET();");
         }
 
         [Test]
@@ -84,7 +84,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
                                     });
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("INSERT INTO [dbo].[TestTable] ([Id], [Name], [Website]) VALUES (1, SCOPE_IDENTITY(), N'codethinked.com')");
+            result.ShouldBe("INSERT INTO [dbo].[TestTable] ([Id], [Name], [Website]) VALUES (1, SCOPE_IDENTITY(), N'codethinked.com');");
         }
 
         [Test]
@@ -99,7 +99,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
                                     });
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("INSERT INTO [dbo].[TestTable] ([Id], [Name], [Website]) VALUES (1, @@IDENTITY, N'codethinked.com')");
+            result.ShouldBe("INSERT INTO [dbo].[TestTable] ([Id], [Name], [Website]) VALUES (1, @@IDENTITY, N'codethinked.com');");
         }
 
         [Test]
@@ -112,7 +112,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
             });
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("INSERT INTO [dbo].[TestTable] ([NonUnicodeStringValue]) VALUES ('NonUnicodeString')");
+            result.ShouldBe("INSERT INTO [dbo].[TestTable] ([NonUnicodeStringValue]) VALUES ('NonUnicodeString');");
         }
     }
 }

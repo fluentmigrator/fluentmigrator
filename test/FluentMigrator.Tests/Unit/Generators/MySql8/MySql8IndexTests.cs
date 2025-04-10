@@ -10,7 +10,7 @@ using NUnit.Framework;
 
 using Shouldly;
 
-namespace FluentMigrator.Tests.Unit.Generators.Postgres
+namespace FluentMigrator.Tests.Unit.Generators.MySql8
 {
     [TestFixture]
     public class MySql8IndexTests : BaseIndexTests
@@ -100,7 +100,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             var expression = GeneratorTestHelper.GetDeleteIndexExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DROP INDEX `TestIndex` ON `TestTable1`");
+            result.ShouldBe("DROP INDEX `TestIndex` ON `TestTable1`;");
         }
 
         // This index method doesn't support ASC/DES neither NULLS sort

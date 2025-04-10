@@ -54,7 +54,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2012
             };
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [dbo].[NewTable] ADD [NewColumn] DATETIME NOT NULL CONSTRAINT [DF__NewColumn] DEFAULT SYSDATETIMEOFFSET()");
+            result.ShouldBe("ALTER TABLE [dbo].[NewTable] ADD [NewColumn] DATETIME NOT NULL CONSTRAINT [DF__NewColumn] DEFAULT SYSDATETIMEOFFSET();");
         }
     }
 }

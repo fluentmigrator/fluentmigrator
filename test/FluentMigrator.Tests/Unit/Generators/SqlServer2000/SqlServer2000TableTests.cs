@@ -58,7 +58,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
                 .WithColumn("Id").AsGuid().PrimaryKey().RowGuid();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE [TestTable1] ([Id] UNIQUEIDENTIFIER NOT NULL, PRIMARY KEY ([Id]))");
+            result.ShouldBe("CREATE TABLE [TestTable1] ([Id] UNIQUEIDENTIFIER NOT NULL, PRIMARY KEY ([Id]));");
         }
 
         [Test]
@@ -71,7 +71,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] [timestamp] NOT NULL, PRIMARY KEY ([TestColumn1]))");
+            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] [timestamp] NOT NULL, PRIMARY KEY ([TestColumn1]));");
         }
 
         [Test]
@@ -83,7 +83,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             expression.Columns[1].CustomType = "[timestamp]";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] [timestamp] NOT NULL, PRIMARY KEY ([TestColumn1]))");
+            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] [timestamp] NOT NULL, PRIMARY KEY ([TestColumn1]));");
         }
 
         [Test]
@@ -93,7 +93,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL)");
+            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL);");
         }
 
         [Test]
@@ -102,7 +102,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             var expression = GeneratorTestHelper.GetCreateTableExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL)");
+            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL);");
         }
 
         [Test]
@@ -114,7 +114,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL CONSTRAINT [DF_TestTable1_TestColumn1] DEFAULT NULL, [TestColumn2] INT NOT NULL)");
+            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL CONSTRAINT [DF_TestTable1_TestColumn1] DEFAULT NULL, [TestColumn2] INT NOT NULL);");
         }
 
         [Test]
@@ -125,7 +125,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             expression.Columns[0].TableName = expression.TableName;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL CONSTRAINT [DF_TestTable1_TestColumn1] DEFAULT NULL, [TestColumn2] INT NOT NULL)");
+            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL CONSTRAINT [DF_TestTable1_TestColumn1] DEFAULT NULL, [TestColumn2] INT NOT NULL);");
         }
 
         [Test]
@@ -135,7 +135,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL CONSTRAINT [DF_TestTable1_TestColumn1] DEFAULT N'Default', [TestColumn2] INT NOT NULL CONSTRAINT [DF_TestTable1_TestColumn2] DEFAULT 0)");
+            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL CONSTRAINT [DF_TestTable1_TestColumn1] DEFAULT N'Default', [TestColumn2] INT NOT NULL CONSTRAINT [DF_TestTable1_TestColumn2] DEFAULT 0);");
         }
 
         [Test]
@@ -144,7 +144,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             var expression = GeneratorTestHelper.GetCreateTableWithDefaultValue();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL CONSTRAINT [DF_TestTable1_TestColumn1] DEFAULT N'Default', [TestColumn2] INT NOT NULL CONSTRAINT [DF_TestTable1_TestColumn2] DEFAULT 0)");
+            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL CONSTRAINT [DF_TestTable1_TestColumn1] DEFAULT N'Default', [TestColumn2] INT NOT NULL CONSTRAINT [DF_TestTable1_TestColumn2] DEFAULT 0);");
         }
 
         [Test]
@@ -154,7 +154,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] INT NOT NULL IDENTITY(1,1), [TestColumn2] INT NOT NULL)");
+            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] INT NOT NULL IDENTITY(1,1), [TestColumn2] INT NOT NULL);");
         }
 
         [Test]
@@ -163,7 +163,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] INT NOT NULL IDENTITY(1,1), [TestColumn2] INT NOT NULL)");
+            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] INT NOT NULL IDENTITY(1,1), [TestColumn2] INT NOT NULL);");
         }
 
         [Test]
@@ -173,7 +173,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, PRIMARY KEY ([TestColumn1], [TestColumn2]))");
+            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, PRIMARY KEY ([TestColumn1], [TestColumn2]));");
         }
 
         [Test]
@@ -183,7 +183,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
 
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, PRIMARY KEY ([TestColumn1], [TestColumn2]))");
+            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, PRIMARY KEY ([TestColumn1], [TestColumn2]));");
         }
 
         [Test]
@@ -193,7 +193,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, CONSTRAINT [TestKey] PRIMARY KEY ([TestColumn1], [TestColumn2]))");
+            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, CONSTRAINT [TestKey] PRIMARY KEY ([TestColumn1], [TestColumn2]));");
         }
 
         [Test]
@@ -202,7 +202,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             var expression = GeneratorTestHelper.GetCreateTableWithNamedMultiColumnPrimaryKeyExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, CONSTRAINT [TestKey] PRIMARY KEY ([TestColumn1], [TestColumn2]))");
+            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, CONSTRAINT [TestKey] PRIMARY KEY ([TestColumn1], [TestColumn2]));");
         }
 
         [Test]
@@ -212,7 +212,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, CONSTRAINT [TestKey] PRIMARY KEY ([TestColumn1]))");
+            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, CONSTRAINT [TestKey] PRIMARY KEY ([TestColumn1]));");
         }
 
         [Test]
@@ -221,7 +221,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             var expression = GeneratorTestHelper.GetCreateTableWithNamedPrimaryKeyExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, CONSTRAINT [TestKey] PRIMARY KEY ([TestColumn1]))");
+            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, CONSTRAINT [TestKey] PRIMARY KEY ([TestColumn1]));");
         }
 
         [Test]
@@ -232,7 +232,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255), [TestColumn2] INT NOT NULL)");
+            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255), [TestColumn2] INT NOT NULL);");
         }
 
         [Test]
@@ -242,7 +242,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             expression.Columns[0].IsNullable = true;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255), [TestColumn2] INT NOT NULL)");
+            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255), [TestColumn2] INT NOT NULL);");
         }
 
         [Test]
@@ -252,7 +252,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, PRIMARY KEY ([TestColumn1]))");
+            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, PRIMARY KEY ([TestColumn1]));");
         }
 
         [Test]
@@ -261,7 +261,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             var expression = GeneratorTestHelper.GetCreateTableWithPrimaryKeyExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, PRIMARY KEY ([TestColumn1]))");
+            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, PRIMARY KEY ([TestColumn1]));");
         }
 
         [Test]
@@ -271,7 +271,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DROP TABLE [TestTable1]");
+            result.ShouldBe("DROP TABLE [TestTable1];");
         }
 
         [Test]
@@ -280,7 +280,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             var expression = GeneratorTestHelper.GetDeleteTableExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DROP TABLE [TestTable1]");
+            result.ShouldBe("DROP TABLE [TestTable1];");
         }
 
         [Test]
@@ -289,7 +289,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             var expression = GeneratorTestHelper.GetDeleteTableIfExistsExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("IF OBJECT_ID('[TestTable1]') IS NOT NULL DROP TABLE [TestTable1]");
+            result.ShouldBe("IF OBJECT_ID('[TestTable1]') IS NOT NULL DROP TABLE [TestTable1];");
         }
 
         [Test]
@@ -299,7 +299,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("sp_rename N'[TestTable1]', N'TestTable2'");
+            result.ShouldBe("sp_rename N'[TestTable1]', N'TestTable2';");
         }
 
         [Test]
@@ -308,7 +308,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             var expression = GeneratorTestHelper.GetRenameTableExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("sp_rename N'[TestTable1]', N'TestTable2'");
+            result.ShouldBe("sp_rename N'[TestTable1]', N'TestTable2';");
         }
     }
 }
