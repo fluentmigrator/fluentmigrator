@@ -33,7 +33,7 @@
     <PackageReference Include="NUnit.Console" Version="3.20.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="5.0.0" />
     <PackageReference Include="Shouldly" Version="4.3.0" />
-    <PackageReference Include="Snowflake.Data" Version="4.3.0" />
+    <PackageReference Include="Snowflake.Data" Version="4.4.0" />
     <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.11" />
     <PackageReference Include="Testcontainers" Version="4.3.0" />
     <PackageReference Include="Testcontainers.FirebirdSql" Version="4.3.0" />
