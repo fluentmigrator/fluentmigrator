@@ -35,12 +35,12 @@
     <PackageReference Include="Shouldly" Version="4.3.0" />
     <PackageReference Include="Snowflake.Data" Version="4.4.0" />
     <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.11" />
-    <PackageReference Include="Testcontainers" Version="4.3.0" />
-    <PackageReference Include="Testcontainers.FirebirdSql" Version="4.3.0" />
-    <PackageReference Include="Testcontainers.MsSql" Version="4.3.0" />
-    <PackageReference Include="Testcontainers.MySql" Version="4.3.0" />
+    <PackageReference Include="Testcontainers" Version="4.4.0" />
+    <PackageReference Include="Testcontainers.FirebirdSql" Version="4.4.0" />
+    <PackageReference Include="Testcontainers.MsSql" Version="4.4.0" />
+    <PackageReference Include="Testcontainers.MySql" Version="4.4.0" />
     <PackageReference Include="Testcontainers.Oracle" Version="4.3.0" />
-    <PackageReference Include="Testcontainers.PostgreSql" Version="4.3.0" />
+    <PackageReference Include="Testcontainers.PostgreSql" Version="4.4.0" />
     <PackageReference Include="Testcontainers.Db2" Version="4.3.0" />
   </ItemGroup>
   <ItemGroup>
