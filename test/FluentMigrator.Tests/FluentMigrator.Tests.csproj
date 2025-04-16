@@ -26,7 +26,7 @@
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.4" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
     <PackageReference Include="Moq" Version="4.20.72" />
-    <PackageReference Include="MySql.Data" Version="9.2.0" />
+    <PackageReference Include="MySql.Data" Version="9.3.0" />
     <PackageReference Include="Npgsql" Version="8.0.7" />
     <PackageReference Include="NUnit" Version="4.3.2" />
     <PackageReference Include="NUnit.Analyzers" Version="4.7.0" />
@@ -35,12 +35,12 @@
     <PackageReference Include="Shouldly" Version="4.3.0" />
     <PackageReference Include="Snowflake.Data" Version="4.4.0" />
     <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.11" />
-    <PackageReference Include="Testcontainers" Version="4.3.0" />
-    <PackageReference Include="Testcontainers.FirebirdSql" Version="4.3.0" />
-    <PackageReference Include="Testcontainers.MsSql" Version="4.3.0" />
-    <PackageReference Include="Testcontainers.MySql" Version="4.3.0" />
+    <PackageReference Include="Testcontainers" Version="4.4.0" />
+    <PackageReference Include="Testcontainers.FirebirdSql" Version="4.4.0" />
+    <PackageReference Include="Testcontainers.MsSql" Version="4.4.0" />
+    <PackageReference Include="Testcontainers.MySql" Version="4.4.0" />
     <PackageReference Include="Testcontainers.Oracle" Version="4.3.0" />
-    <PackageReference Include="Testcontainers.PostgreSql" Version="4.3.0" />
+    <PackageReference Include="Testcontainers.PostgreSql" Version="4.4.0" />
     <PackageReference Include="Testcontainers.Db2" Version="4.3.0" />
   </ItemGroup>
   <ItemGroup>
