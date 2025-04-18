@@ -263,6 +263,14 @@ namespace FluentMigrator.Builders.Alter.Table
             return this;
         }
 
+        /// <inheritdoc/>
+        public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax AsExpression(string expression, bool stored = false)
+        {
+            CurrentColumn.Expression = expression;
+            CurrentColumn.ExpressionStored = stored;
+            return this;
+        }
+
         /// <inheritdoc />
         public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax Unique()
         {
