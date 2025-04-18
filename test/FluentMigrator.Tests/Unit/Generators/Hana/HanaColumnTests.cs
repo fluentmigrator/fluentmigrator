@@ -120,20 +120,22 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
         public override void CanCreateColumnWithSystemMethodAndCustomSchema()
         {
             var expressions = GeneratorTestHelper.GetCreateColumnWithSystemMethodExpression("TestSchema");
-            var result = string.Join(Environment.NewLine, expressions.Select(x => (string)Generator.Generate((dynamic)x)));
-            result.ShouldBe(
-                @"ALTER TABLE ""TestTable1"" ADD (""TestColumn1"" DATETIME NULL);" + Environment.NewLine +
-                @"UPDATE ""TestTable1"" SET ""TestColumn1"" = CURRENT_TIMESTAMP WHERE 1 = 1;");
+            var result = expressions.Select(x => (string)Generator.Generate((dynamic)x));
+            result.ShouldBe([
+                @"ALTER TABLE ""TestTable1"" ADD (""TestColumn1"" DATETIME NULL);",
+                @"UPDATE ""TestTable1"" SET ""TestColumn1"" = CURRENT_TIMESTAMP WHERE 1 = 1;",
+            ]);
         }
 
         [Test]
         public override void CanCreateColumnWithSystemMethodAndDefaultSchema()
         {
             var expressions = GeneratorTestHelper.GetCreateColumnWithSystemMethodExpression();
-            var result = string.Join(Environment.NewLine, expressions.Select(x => (string)Generator.Generate((dynamic)x)));
-            result.ShouldBe(
-                @"ALTER TABLE ""TestTable1"" ADD (""TestColumn1"" DATETIME NULL);" + Environment.NewLine +
-                @"UPDATE ""TestTable1"" SET ""TestColumn1"" = CURRENT_TIMESTAMP WHERE 1 = 1;");
+            var result = expressions.Select(x => (string)Generator.Generate((dynamic)x));
+            result.ShouldBe([
+                @"ALTER TABLE ""TestTable1"" ADD (""TestColumn1"" DATETIME NULL);",
+                @"UPDATE ""TestTable1"" SET ""TestColumn1"" = CURRENT_TIMESTAMP WHERE 1 = 1;",
+            ]);
         }
 
         [Test]
@@ -191,7 +193,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestTable1\" DROP (\"TestColumn1\"); ALTER TABLE \"TestTable1\" DROP (\"TestColumn2\");");
+            result.ShouldBe("ALTER TABLE \"TestTable1\" DROP (\"TestColumn1\");ALTER TABLE \"TestTable1\" DROP (\"TestColumn2\");");
         }
 
         [Test]
@@ -200,7 +202,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             var expression = GeneratorTestHelper.GetDeleteColumnExpression(new[] { "TestColumn1", "TestColumn2" });
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestTable1\" DROP (\"TestColumn1\"); ALTER TABLE \"TestTable1\" DROP (\"TestColumn2\");");
+            result.ShouldBe("ALTER TABLE \"TestTable1\" DROP (\"TestColumn1\");ALTER TABLE \"TestTable1\" DROP (\"TestColumn2\");");
         }
 
         [Test]

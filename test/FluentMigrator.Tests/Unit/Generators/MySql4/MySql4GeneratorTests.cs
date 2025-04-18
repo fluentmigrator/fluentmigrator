@@ -73,7 +73,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
             var expression = new CreateColumnExpression { Column = columnDefinition, TableName = "NewTable" };
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE `NewTable` ADD COLUMN `NewColumn` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP");
+            result.ShouldBe("ALTER TABLE `NewTable` ADD COLUMN `NewColumn` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;");
         }
 
         [Test]
@@ -84,7 +84,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
             var expression = new CreateColumnExpression { Column = columnDefinition, TableName = tableName };
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE `NewTable` ADD COLUMN `NewColumn` TIMESTAMP NOT NULL DEFAULT (UTC_TIMESTAMP)");
+            result.ShouldBe("ALTER TABLE `NewTable` ADD COLUMN `NewColumn` TIMESTAMP NOT NULL DEFAULT (UTC_TIMESTAMP);");
         }
 
         [Test]
@@ -94,7 +94,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
             expression.DefaultValue = SystemMethods.CurrentDateTime;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE `TestTable1` ALTER `TestColumn1` SET DEFAULT CURRENT_TIMESTAMP");
+            result.ShouldBe("ALTER TABLE `TestTable1` ALTER `TestColumn1` SET DEFAULT CURRENT_TIMESTAMP;");
         }
 
         [Test]
@@ -107,7 +107,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
             };
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE `TestTable1` ALTER `TestColumn1` DROP DEFAULT");
+            result.ShouldBe("ALTER TABLE `TestTable1` ALTER `TestColumn1` DROP DEFAULT;");
         }
     }
 }

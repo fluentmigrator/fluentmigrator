@@ -38,6 +38,7 @@ using FluentMigrator.Runner.Processors.Snowflake;
 using FluentMigrator.Runner.Processors.SQLite;
 using FluentMigrator.Runner.Processors.SqlServer;
 using FluentMigrator.Runner.VersionTableInfo;
+using FluentMigrator.Tests.Integration.Migrations.Issues;
 using FluentMigrator.Tests.Integration.Migrations.Tagged;
 using FluentMigrator.Tests.Integration.TestCases;
 using FluentMigrator.Tests.Unit;
@@ -1622,6 +1623,33 @@ namespace FluentMigrator.Tests.Integration
                     runner.Down(new TestCreateSchema());
                 },
                 serverOptions);
+        }
+
+        [Test]
+        [TestCaseSource(typeof(ProcessorTestCaseSourceExcept<
+            FirebirdProcessor
+        >))]
+        public void CanInsertLargeText(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
+        {
+            ExecuteWithProcessor(
+                processorType,
+                services => services.WithMigrationsIn(RootNamespace),
+                (serviceProvider, processor) =>
+                {
+                    var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
+
+                    runner.Up(new TestLargeTextInsertMigration_Issue1196());
+
+                    DataSet upDs = processor.ReadTableData(null, "SimpleTable");
+
+                    var rows = upDs.Tables[0].Rows;
+                    rows.Count.ShouldBe(1);
+                    rows[0]["LargeUnicodeString"].ShouldBe(TestLargeTextInsertMigration_Issue1196.LargeString);
+
+                    runner.Down(new TestLargeTextInsertMigration_Issue1196());
+                },
+                serverOptions,
+                true);
         }
 
         private void RemoveMigration1(ProcessorBase processor)

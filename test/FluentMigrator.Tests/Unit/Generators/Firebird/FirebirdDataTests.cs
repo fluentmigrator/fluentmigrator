@@ -44,7 +44,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DELETE FROM TestTable1 WHERE 1 = 1");
+            result.ShouldBe("DELETE FROM TestTable1 WHERE 1 = 1;");
         }
 
         [Test]
@@ -53,7 +53,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             var expression = GeneratorTestHelper.GetDeleteDataAllRowsExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DELETE FROM TestTable1 WHERE 1 = 1");
+            result.ShouldBe("DELETE FROM TestTable1 WHERE 1 = 1;");
 
         }
 
@@ -64,7 +64,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DELETE FROM TestTable1 WHERE Name = 'Just''in' AND Website IS NULL; DELETE FROM TestTable1 WHERE Website = 'github.com'");
+            result.ShouldBe("DELETE FROM TestTable1 WHERE Name = 'Just''in' AND Website IS NULL;DELETE FROM TestTable1 WHERE Website = 'github.com';");
         }
 
         [Test]
@@ -73,7 +73,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             var expression = GeneratorTestHelper.GetDeleteDataMultipleRowsExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DELETE FROM TestTable1 WHERE Name = 'Just''in' AND Website IS NULL; DELETE FROM TestTable1 WHERE Website = 'github.com'");
+            result.ShouldBe("DELETE FROM TestTable1 WHERE Name = 'Just''in' AND Website IS NULL;DELETE FROM TestTable1 WHERE Website = 'github.com';");
         }
 
         [Test]
@@ -83,7 +83,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DELETE FROM TestTable1 WHERE Name = 'Just''in' AND Website IS NULL");
+            result.ShouldBe("DELETE FROM TestTable1 WHERE Name = 'Just''in' AND Website IS NULL;");
         }
 
         [Test]
@@ -92,7 +92,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             var expression = GeneratorTestHelper.GetDeleteDataExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DELETE FROM TestTable1 WHERE Name = 'Just''in' AND Website IS NULL");
+            result.ShouldBe("DELETE FROM TestTable1 WHERE Name = 'Just''in' AND Website IS NULL;");
         }
 
         [Test]
@@ -100,7 +100,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         {
             var expression = GeneratorTestHelper.GetDeleteDataExpressionWithDbNullValue();
             var result = Generator.Generate(expression);
-            result.ShouldBe("DELETE FROM TestTable1 WHERE Name = 'Just''in' AND Website IS NULL");
+            result.ShouldBe("DELETE FROM TestTable1 WHERE Name = 'Just''in' AND Website IS NULL;");
         }
 
         [Test]
@@ -110,7 +110,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             expression.SchemaName = "TestSchema";
 
             var expected = "INSERT INTO TestTable1 (Id, Name, Website) VALUES (1, 'Just''in', 'codethinked.com');";
-            expected += " INSERT INTO TestTable1 (Id, Name, Website) VALUES (2, 'Na\\te', 'kohari.org')";
+            expected += "INSERT INTO TestTable1 (Id, Name, Website) VALUES (2, 'Na\\te', 'kohari.org');";
 
             var result = Generator.Generate(expression);
             result.ShouldBe(expected);
@@ -122,7 +122,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             var expression = GeneratorTestHelper.GetInsertDataExpression();
 
             var expected = "INSERT INTO TestTable1 (Id, Name, Website) VALUES (1, 'Just''in', 'codethinked.com');";
-            expected += " INSERT INTO TestTable1 (Id, Name, Website) VALUES (2, 'Na\\te', 'kohari.org')";
+            expected += "INSERT INTO TestTable1 (Id, Name, Website) VALUES (2, 'Na\\te', 'kohari.org');";
 
             var result = Generator.Generate(expression);
             result.ShouldBe(expected);
@@ -135,7 +135,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(string.Format("INSERT INTO TestTable1 (guid) VALUES ('{0}')", GeneratorTestHelper.TestGuid));
+            result.ShouldBe(string.Format("INSERT INTO TestTable1 (guid) VALUES ('{0}');", GeneratorTestHelper.TestGuid));
         }
 
         [Test]
@@ -144,7 +144,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             var expression = GeneratorTestHelper.GetInsertGUIDExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(string.Format("INSERT INTO TestTable1 (guid) VALUES ('{0}')", GeneratorTestHelper.TestGuid));
+            result.ShouldBe(string.Format("INSERT INTO TestTable1 (guid) VALUES ('{0}');", GeneratorTestHelper.TestGuid));
         }
 
         [Test]
@@ -154,7 +154,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("UPDATE TestTable1 SET Name = 'Just''in', Age = 25 WHERE 1 = 1");
+            result.ShouldBe("UPDATE TestTable1 SET Name = 'Just''in', Age = 25 WHERE 1 = 1;");
         }
 
         [Test]
@@ -163,7 +163,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             var expression = GeneratorTestHelper.GetUpdateDataExpressionWithAllRows();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("UPDATE TestTable1 SET Name = 'Just''in', Age = 25 WHERE 1 = 1");
+            result.ShouldBe("UPDATE TestTable1 SET Name = 'Just''in', Age = 25 WHERE 1 = 1;");
         }
 
         [Test]
@@ -173,7 +173,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("UPDATE TestTable1 SET Name = 'Just''in', Age = 25 WHERE Id = 9 AND Homepage IS NULL");
+            result.ShouldBe("UPDATE TestTable1 SET Name = 'Just''in', Age = 25 WHERE Id = 9 AND Homepage IS NULL;");
         }
 
         [Test]
@@ -182,7 +182,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             var expression = GeneratorTestHelper.GetUpdateDataExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("UPDATE TestTable1 SET Name = 'Just''in', Age = 25 WHERE Id = 9 AND Homepage IS NULL");
+            result.ShouldBe("UPDATE TestTable1 SET Name = 'Just''in', Age = 25 WHERE Id = 9 AND Homepage IS NULL;");
         }
 
         [Test]
@@ -191,7 +191,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             var expression = GeneratorTestHelper.GetUpdateDataExpressionWithDbNullValue();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("UPDATE TestTable1 SET Name = 'Just''in', Age = 25 WHERE Id = 9 AND Homepage IS NULL");
+            result.ShouldBe("UPDATE TestTable1 SET Name = 'Just''in', Age = 25 WHERE Id = 9 AND Homepage IS NULL;");
         }
     }
 }

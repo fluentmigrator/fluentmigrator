@@ -28,7 +28,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" NVARCHAR2(255) NOT NULL, \"TestColumn2\" BINARY_DOUBLE NOT NULL, PRIMARY KEY (\"TestColumn1\"))");
+            result.ShouldBe("CREATE TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" NVARCHAR2(255) NOT NULL, \"TestColumn2\" BINARY_DOUBLE NOT NULL, PRIMARY KEY (\"TestColumn1\"));");
         }
 
         [Test]
@@ -40,7 +40,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
             expression.Columns[1].CustomType = "BINARY_DOUBLE";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" NVARCHAR2(255) NOT NULL, \"TestColumn2\" BINARY_DOUBLE NOT NULL, PRIMARY KEY (\"TestColumn1\"))");
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" NVARCHAR2(255) NOT NULL, \"TestColumn2\" BINARY_DOUBLE NOT NULL, PRIMARY KEY (\"TestColumn1\"));");
         }
 
         [Test]
@@ -50,7 +50,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" NVARCHAR2(255) NOT NULL, \"TestColumn2\" NUMBER(10,0) NOT NULL)");
+            result.ShouldBe("CREATE TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" NVARCHAR2(255) NOT NULL, \"TestColumn2\" NUMBER(10,0) NOT NULL);");
         }
 
         [Test]
@@ -59,7 +59,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
             var expression = GeneratorTestHelper.GetCreateTableExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" NVARCHAR2(255) NOT NULL, \"TestColumn2\" NUMBER(10,0) NOT NULL)");
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" NVARCHAR2(255) NOT NULL, \"TestColumn2\" NUMBER(10,0) NOT NULL);");
         }
 
         [Test]
@@ -71,7 +71,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" NVARCHAR2(255) DEFAULT NULL NOT NULL, \"TestColumn2\" NUMBER(10,0) NOT NULL)");
+            result.ShouldBe("CREATE TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" NVARCHAR2(255) DEFAULT NULL NOT NULL, \"TestColumn2\" NUMBER(10,0) NOT NULL);");
         }
 
         [Test]
@@ -82,7 +82,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
             expression.Columns[0].TableName = expression.TableName;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" NVARCHAR2(255) DEFAULT NULL NOT NULL, \"TestColumn2\" NUMBER(10,0) NOT NULL)");
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" NVARCHAR2(255) DEFAULT NULL NOT NULL, \"TestColumn2\" NUMBER(10,0) NOT NULL);");
         }
 
         [Test]
@@ -92,7 +92,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" NVARCHAR2(255) DEFAULT 'Default' NOT NULL, \"TestColumn2\" NUMBER(10,0) DEFAULT 0 NOT NULL)");
+            result.ShouldBe("CREATE TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" NVARCHAR2(255) DEFAULT 'Default' NOT NULL, \"TestColumn2\" NUMBER(10,0) DEFAULT 0 NOT NULL);");
         }
 
         [Test]
@@ -101,7 +101,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
             var expression = GeneratorTestHelper.GetCreateTableWithDefaultValue();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" NVARCHAR2(255) DEFAULT 'Default' NOT NULL, \"TestColumn2\" NUMBER(10,0) DEFAULT 0 NOT NULL)");
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" NVARCHAR2(255) DEFAULT 'Default' NOT NULL, \"TestColumn2\" NUMBER(10,0) DEFAULT 0 NOT NULL);");
         }
 
         [Test]
@@ -126,7 +126,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" NVARCHAR2(255) NOT NULL, \"TestColumn2\" NUMBER(10,0) NOT NULL, PRIMARY KEY (\"TestColumn1\", \"TestColumn2\"))");
+            result.ShouldBe("CREATE TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" NVARCHAR2(255) NOT NULL, \"TestColumn2\" NUMBER(10,0) NOT NULL, PRIMARY KEY (\"TestColumn1\", \"TestColumn2\"));");
         }
 
         [Test]
@@ -136,7 +136,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
 
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" NVARCHAR2(255) NOT NULL, \"TestColumn2\" NUMBER(10,0) NOT NULL, PRIMARY KEY (\"TestColumn1\", \"TestColumn2\"))");
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" NVARCHAR2(255) NOT NULL, \"TestColumn2\" NUMBER(10,0) NOT NULL, PRIMARY KEY (\"TestColumn1\", \"TestColumn2\"));");
         }
 
         [Test]
@@ -146,7 +146,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" NVARCHAR2(255) NOT NULL, \"TestColumn2\" NUMBER(10,0) NOT NULL, CONSTRAINT \"TestKey\" PRIMARY KEY (\"TestColumn1\", \"TestColumn2\"))");
+            result.ShouldBe("CREATE TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" NVARCHAR2(255) NOT NULL, \"TestColumn2\" NUMBER(10,0) NOT NULL, CONSTRAINT \"TestKey\" PRIMARY KEY (\"TestColumn1\", \"TestColumn2\"));");
         }
 
         [Test]
@@ -155,7 +155,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
             var expression = GeneratorTestHelper.GetCreateTableWithNamedMultiColumnPrimaryKeyExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" NVARCHAR2(255) NOT NULL, \"TestColumn2\" NUMBER(10,0) NOT NULL, CONSTRAINT \"TestKey\" PRIMARY KEY (\"TestColumn1\", \"TestColumn2\"))");
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" NVARCHAR2(255) NOT NULL, \"TestColumn2\" NUMBER(10,0) NOT NULL, CONSTRAINT \"TestKey\" PRIMARY KEY (\"TestColumn1\", \"TestColumn2\"));");
         }
 
         [Test]
@@ -165,7 +165,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" NVARCHAR2(255) NOT NULL, \"TestColumn2\" NUMBER(10,0) NOT NULL, CONSTRAINT \"TestKey\" PRIMARY KEY (\"TestColumn1\"))");
+            result.ShouldBe("CREATE TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" NVARCHAR2(255) NOT NULL, \"TestColumn2\" NUMBER(10,0) NOT NULL, CONSTRAINT \"TestKey\" PRIMARY KEY (\"TestColumn1\"));");
         }
 
         [Test]
@@ -174,7 +174,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
             var expression = GeneratorTestHelper.GetCreateTableWithNamedPrimaryKeyExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" NVARCHAR2(255) NOT NULL, \"TestColumn2\" NUMBER(10,0) NOT NULL, CONSTRAINT \"TestKey\" PRIMARY KEY (\"TestColumn1\"))");
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" NVARCHAR2(255) NOT NULL, \"TestColumn2\" NUMBER(10,0) NOT NULL, CONSTRAINT \"TestKey\" PRIMARY KEY (\"TestColumn1\"));");
         }
 
         [Test]
@@ -184,7 +184,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" NVARCHAR2(255), \"TestColumn2\" NUMBER(10,0) NOT NULL)");
+            result.ShouldBe("CREATE TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" NVARCHAR2(255), \"TestColumn2\" NUMBER(10,0) NOT NULL);");
         }
 
         [Test]
@@ -193,7 +193,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
             var expression = GeneratorTestHelper.GetCreateTableWithNullableColumn();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" NVARCHAR2(255), \"TestColumn2\" NUMBER(10,0) NOT NULL)");
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" NVARCHAR2(255), \"TestColumn2\" NUMBER(10,0) NOT NULL);");
         }
 
         [Test]
@@ -203,7 +203,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" NVARCHAR2(255) NOT NULL, \"TestColumn2\" NUMBER(10,0) NOT NULL, PRIMARY KEY (\"TestColumn1\"))");
+            result.ShouldBe("CREATE TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" NVARCHAR2(255) NOT NULL, \"TestColumn2\" NUMBER(10,0) NOT NULL, PRIMARY KEY (\"TestColumn1\"));");
         }
 
         [Test]
@@ -212,7 +212,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
             var expression = GeneratorTestHelper.GetCreateTableWithPrimaryKeyExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" NVARCHAR2(255) NOT NULL, \"TestColumn2\" NUMBER(10,0) NOT NULL, PRIMARY KEY (\"TestColumn1\"))");
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" NVARCHAR2(255) NOT NULL, \"TestColumn2\" NUMBER(10,0) NOT NULL, PRIMARY KEY (\"TestColumn1\"));");
         }
 
         [Test]
@@ -222,7 +222,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DROP TABLE \"TestSchema\".\"TestTable1\"");
+            result.ShouldBe("DROP TABLE \"TestSchema\".\"TestTable1\";");
         }
 
         [Test]
@@ -231,7 +231,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
             var expression = GeneratorTestHelper.GetDeleteTableExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DROP TABLE \"TestTable1\"");
+            result.ShouldBe("DROP TABLE \"TestTable1\";");
         }
 
         [Test]
@@ -260,7 +260,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" RENAME TO \"TestTable2\"");
+            result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" RENAME TO \"TestTable2\";");
         }
 
         [Test]
@@ -269,7 +269,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
             var expression = GeneratorTestHelper.GetRenameTableExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestTable1\" RENAME TO \"TestTable2\"");
+            result.ShouldBe("ALTER TABLE \"TestTable1\" RENAME TO \"TestTable2\";");
         }
     }
 }
