@@ -33,11 +33,30 @@ namespace FluentMigrator.Runner
         /// </summary>
         /// <param name="builder">The builder to add the MySQL 4-specific services to</param>
         /// <returns>The migration runner builder</returns>
+        public static IMigrationRunnerBuilder AddMySql(this IMigrationRunnerBuilder builder)
+        {
+            builder.Services.TryAddScoped<MySqlDbFactory>();
+            builder.Services.TryAddScoped<MySqlQuoter>();
+            builder.Services.AddScoped<IMySqlTypeMap>(_ => new MySql4TypeMap());
+            builder.Services
+                .AddScoped<MySql8Processor>()
+                .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<MySql8Processor>())
+                .AddScoped<MySql8Generator>()
+                .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<MySql8Generator>());
+
+            return builder;
+        }
+
+        /// <summary>
+        /// Adds MySQL 4 support
+        /// </summary>
+        /// <param name="builder">The builder to add the MySQL 4-specific services to</param>
+        /// <returns>The migration runner builder</returns>
         public static IMigrationRunnerBuilder AddMySql4(this IMigrationRunnerBuilder builder)
         {
             builder.Services.TryAddScoped<MySqlDbFactory>();
             builder.Services.TryAddScoped<MySqlQuoter>();
-            builder.Services.AddScoped<IMySqlTypeMap>(sp => new MySql4TypeMap());
+            builder.Services.AddScoped<IMySqlTypeMap>(_ => new MySql4TypeMap());
             builder.Services
                 .AddScoped<MySql4Processor>()
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<MySql4Processor>())

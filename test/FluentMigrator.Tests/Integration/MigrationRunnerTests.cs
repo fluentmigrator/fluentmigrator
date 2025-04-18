@@ -1771,9 +1771,9 @@ namespace FluentMigrator.Tests.Integration
                 .WithColumn("Name").AsString(255).Nullable()
                 .WithColumn("TestTableId").AsInt32().NotNullable();
 
-            IfDatabase(ProcessorId.SQLite)
+            IfDatabase(ProcessorIdConstants.SQLite)
                 .Delegate(() => testTable2.ForeignKey("fk_TestTable2_TestTableId_TestTable_Id", "TestTable", "Id"));
-            IfDatabase(t => t != ProcessorId.SQLite)
+            IfDatabase(t => t != ProcessorIdConstants.SQLite)
                 .Create.ForeignKey("fk_TestTable2_TestTableId_TestTable_Id")
                     .FromTable("TestTable2").ForeignColumn("TestTableId")
                     .ToTable("TestTable").PrimaryColumn("Id");
@@ -1857,9 +1857,9 @@ namespace FluentMigrator.Tests.Integration
         {
             // SQLite doesn't support creating schemas so for non SQLite DB's we'll create
             // the schema, but for SQLite we'll attach a temp DB with the schema alias
-            _ = IfDatabase(t => t != ProcessorId.SQLite).Create.Schema("TestSchema");
+            _ = IfDatabase(t => t != ProcessorIdConstants.SQLite).Create.Schema("TestSchema");
 
-            IfDatabase(ProcessorId.SQLite).Execute.Sql("ATTACH DATABASE '' AS \"TestSchema\"");
+            IfDatabase(ProcessorIdConstants.SQLite).Execute.Sql("ATTACH DATABASE '' AS \"TestSchema\"");
 
             Create.Table("Users")
                 .InSchema("TestSchema")
@@ -1875,7 +1875,7 @@ namespace FluentMigrator.Tests.Integration
         {
             Delete.Index("IX_Users_GroupId").OnTable("Users").InSchema("TestSchema").OnColumn("GroupId");
             Delete.Table("Users").InSchema("TestSchema");
-            IfDatabase(t => t != ProcessorId.SQLite).Delete.Schema("TestSchema");
+            IfDatabase(t => t != ProcessorIdConstants.SQLite).Delete.Schema("TestSchema");
 
             // Can't actually detatch SQLite DB here as migrations run in a transaction
             // and you can't detach a database whilst in a transaction
@@ -1953,14 +1953,14 @@ namespace FluentMigrator.Tests.Integration
         {
             // SQLite doesn't support creating schemas so for non SQLite DB's we'll create
             // the schema, but for SQLite we'll attach a temp DB with the schema alias
-            _ = IfDatabase(t => t != ProcessorId.SQLite).Create.Schema("TestSchema");
+            _ = IfDatabase(t => t != ProcessorIdConstants.SQLite).Create.Schema("TestSchema");
 
-            IfDatabase(ProcessorId.SQLite).Execute.Sql("ATTACH DATABASE '' AS \"TestSchema\"");
+            IfDatabase(ProcessorIdConstants.SQLite).Execute.Sql("ATTACH DATABASE '' AS \"TestSchema\"");
         }
 
         public override void Down()
         {
-            IfDatabase(t => t != ProcessorId.SQLite).Delete.Schema("TestSchema");
+            IfDatabase(t => t != ProcessorIdConstants.SQLite).Delete.Schema("TestSchema");
 
             // Can't actually detatch SQLite DB here as migrations run in a transaction
             // and you can't detach a database whilst in a transaction

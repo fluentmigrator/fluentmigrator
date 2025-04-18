@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 
 using FluentMigrator.Expressions;
@@ -45,6 +46,12 @@ namespace FluentMigrator.Runner.Generators.Jet
         {
             return CompatibilityMode.HandleCompatibility("Altering of default constraints is not supported for Jet");
         }
+
+        /// <inheritdoc />
+        public override string GeneratorId => GeneratorIdConstants.Jet;
+
+        /// <inheritdoc />
+        public override List<string> GeneratorIdAliases => new List<string> { GeneratorIdConstants.Jet };
 
         public override string Generate(DeleteTableExpression expression)
         {

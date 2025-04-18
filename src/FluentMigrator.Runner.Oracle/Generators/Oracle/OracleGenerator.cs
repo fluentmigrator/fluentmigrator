@@ -209,6 +209,12 @@ namespace FluentMigrator.Runner.Generators.Oracle
             return stringBuilder.AppendLine().AppendLine(";");
         }
 
+        /// <inheritdoc />
+        public override string GeneratorId => GeneratorIdConstants.Oracle;
+
+        /// <inheritdoc />
+        public override List<string> GeneratorIdAliases => new List<string> { GeneratorIdConstants.Oracle };
+
         public override string Generate(CreateTableExpression expression)
         {
             if (expression.Columns.Any(x => x.ExpressionStored))

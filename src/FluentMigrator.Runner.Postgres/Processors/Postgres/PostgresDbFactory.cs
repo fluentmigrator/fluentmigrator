@@ -27,12 +27,6 @@ namespace FluentMigrator.Runner.Processors.Postgres
             new TestEntry("Npgsql", "Npgsql.NpgsqlFactory"),
         };
 
-        [Obsolete]
-        public PostgresDbFactory()
-            : this(null)
-        {
-        }
-
         public PostgresDbFactory(IServiceProvider serviceProvider)
             : base(serviceProvider, _entries)
         {

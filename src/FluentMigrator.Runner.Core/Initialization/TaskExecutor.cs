@@ -52,9 +52,6 @@ namespace FluentMigrator.Runner.Initialization
             _logger = logger;
             _assemblySource = assemblySource;
             _runnerOptions = runnerOptions.Value;
-#pragma warning disable 612
-            ConnectionStringProvider = serviceProvider.GetService<IConnectionStringProvider>();
-#pragma warning restore 612
             _lazyServiceProvider = new Lazy<IServiceProvider>(() => serviceProvider);
         }
 
@@ -66,13 +63,6 @@ namespace FluentMigrator.Runner.Initialization
         /// </remarks>
         [CanBeNull]
         protected IMigrationRunner Runner { get; set; }
-
-        /// <summary>
-        /// Gets the connection string provider
-        /// </summary>
-        [CanBeNull]
-        [Obsolete]
-        protected IConnectionStringProvider ConnectionStringProvider { get; }
 
         /// <summary>
         /// Gets the service provider used to instantiate all migration services

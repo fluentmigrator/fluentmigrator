@@ -31,8 +31,13 @@ namespace FluentMigrator.Example.Migrations
         /// <inheritdoc />
         public override void Up()
         {
-            Execute.Sql(@"/* this is a test script */
+            IfDatabase(processorId => processorId == ProcessorIdConstants.SQLite)
+                .Execute.Sql(@"/* this is a test script */
 update Notes set body=body || ' (modified)';
+");
+            IfDatabase(processorId=> processorId != ProcessorIdConstants.SQLite)
+                .Execute.Sql(@"/* this is a test script */
+update Notes set body=body + ' (modified)';
 ");
         }
 

@@ -23,9 +23,10 @@ jobs:
         run: |
           LATEST_TFM_VERSION=net$LATEST_VERSION
           echo "Updating TargetFramework to $LATEST_TFM_VERSION"
+          set -x
           find . -name '*.csproj' | while read csproj; do
             # Extract the current TargetFrameworks value
-            TARGET_FRAMEWORKS=$(grep -oP '(?<=<TargetFrameworks>).*?(?=</TargetFrameworks>)' "$csproj")
+            TARGET_FRAMEWORKS=$(grep -oP '(?<=<TargetFrameworks>).*?(?=</TargetFrameworks>)' "$csproj" || echo -e '\0')
             echo "TARGET_FRAMEWORKS" $TARGET_FRAMEWORKS
             if [[ -n "$TARGET_FRAMEWORKS" ]]; then
               # Check if the LATEST_TFM_VERSION is already in the TargetFrameworks

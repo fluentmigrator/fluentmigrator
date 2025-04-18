@@ -45,14 +45,14 @@ namespace FluentMigrator.Example.Migrations
                 .WithColumn("IsAdmin").AsBoolean().NotNullable();
 
 
-            IfDatabase(ProcessorId.SqlServer).
+            IfDatabase(ProcessorIdConstants.SqlServer).
                 Create.Index("IX_Users").OnTable("Users")
                     .OnColumn("Name").Ascending()
                     .WithOptions().NonClustered()
                     .Include("Login")
                     .Include("IsAdmin");
 
-            IfDatabase(processorId => processorId != ProcessorId.SqlServer)
+            IfDatabase(processorId => processorId != ProcessorIdConstants.SqlServer)
                 .Create.Index("IX_Users").OnTable("Users")
                 .OnColumn("Name").Ascending()
                 .WithOptions().NonClustered();

@@ -177,6 +177,12 @@ namespace FluentMigrator.Runner.Generators.DB2
                 columnList);
         }
 
+        /// <inheritdoc />
+        public override string GeneratorId => GeneratorIdConstants.DB2;
+
+        /// <inheritdoc />
+        public override List<string> GeneratorIdAliases => new List<string> { GeneratorIdConstants.DB2 };
+
         public override string Generate(Expressions.CreateSchemaExpression expression)
         {
             return string.Format("CREATE SCHEMA {0}", Quoter.QuoteSchemaName(expression.SchemaName));

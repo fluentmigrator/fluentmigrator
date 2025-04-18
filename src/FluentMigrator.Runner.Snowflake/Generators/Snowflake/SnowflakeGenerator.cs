@@ -14,6 +14,7 @@
 // limitations under the License.
 #endregion
 
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -62,6 +63,12 @@ namespace FluentMigrator.Runner.Generators.Snowflake
         {
             return $"ALTER TABLE {Quoter.QuoteTableName(expression.TableName, expression.SchemaName)} ALTER COLUMN {Quoter.QuoteColumnName(expression.ColumnName)} DROP DEFAULT";
         }
+
+        /// <inheritdoc />
+        public override string GeneratorId => GeneratorIdConstants.Snowflake;
+
+        /// <inheritdoc />
+        public override List<string> GeneratorIdAliases => new List<string> { GeneratorIdConstants.Snowflake };
 
         /// <inheritdoc />
         public override string Generate(CreateSchemaExpression expression)

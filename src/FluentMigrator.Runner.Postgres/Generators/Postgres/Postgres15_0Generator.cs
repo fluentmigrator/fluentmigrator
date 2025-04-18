@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 
 using FluentMigrator.Infrastructure.Extensions;
@@ -33,6 +34,13 @@ namespace FluentMigrator.Runner.Generators.Postgres
             : base(column, quoter, generatorOptions)
         {
         }
+
+        /// <inheritdoc />
+        public override string GeneratorId => GeneratorIdConstants.PostgreSQL15_0;
+
+        /// <inheritdoc />
+        public override List<string> GeneratorIdAliases =>
+            [GeneratorIdConstants.PostgreSQL15_0, GeneratorIdConstants.PostgreSQL];
 
         protected override string GetWithNullsDistinctStringInWhere(IndexDefinition index)
         {

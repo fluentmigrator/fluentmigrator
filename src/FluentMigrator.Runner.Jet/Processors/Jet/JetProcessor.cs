@@ -70,7 +70,7 @@ namespace FluentMigrator.Runner.Processors.Jet
         [Obsolete]
         public override string ConnectionString { get; }
 
-        public override string DatabaseType { get; } = ProcessorId.Jet;
+        public override string DatabaseType { get; } = ProcessorIdConstants.Jet;
 
         public override IList<string> DatabaseTypeAliases { get; } = new List<string>();
 

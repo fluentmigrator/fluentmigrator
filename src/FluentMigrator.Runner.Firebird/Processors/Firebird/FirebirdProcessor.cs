@@ -70,7 +70,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             ClearDDLFollowers();
         }
 
-        public override string DatabaseType => ProcessorId.Firebird;
+        public override string DatabaseType => ProcessorIdConstants.Firebird;
 
         public override IList<string> DatabaseTypeAliases { get; } = new List<string>();
 

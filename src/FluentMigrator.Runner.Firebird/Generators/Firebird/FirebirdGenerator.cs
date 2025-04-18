@@ -17,6 +17,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
@@ -169,6 +170,12 @@ namespace FluentMigrator.Runner.Generators.Firebird
 
             return string.Empty;
         }
+
+        /// <inheritdoc />
+        public override string GeneratorId => GeneratorIdConstants.Firebird;
+
+        /// <inheritdoc />
+        public override List<string> GeneratorIdAliases => new List<string> { GeneratorIdConstants.Firebird };
 
         public override string Generate(CreateTableExpression expression)
         {

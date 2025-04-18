@@ -80,7 +80,7 @@ steps:
     command: 'publish'
     publishWebProjects: false
     projects: 'src/FluentMigrator.Console/FluentMigrator.Console.csproj'
-    arguments: '-c $(buildConfiguration) -r win7-x86 -o "$(Build.ArtifactStagingDirectory)/publish/tools/net48/x86" -p:Platform=x86 -p:TargetFramework=net48 -p:Version=$(build.buildNumber)'
+    arguments: '-c $(buildConfiguration) -r win-x86 -o "$(Build.ArtifactStagingDirectory)/publish/tools/net48/x86" -p:Platform=x86 -p:TargetFramework=net48 -p:Version=$(build.buildNumber)'
     zipAfterPublish: false
     modifyOutputPath: false
 
@@ -89,7 +89,7 @@ steps:
     command: 'publish'
     publishWebProjects: false
     projects: 'src/FluentMigrator.Console/FluentMigrator.Console.csproj'
-    arguments: '-c $(buildConfiguration) -r win7-x64 -o "$(Build.ArtifactStagingDirectory)/publish/tools/net48/x64" -p:Platform=x64 -p:TargetFramework=net48 -p:Version=$(build.buildNumber)'
+    arguments: '-c $(buildConfiguration) -r win-x64 -o "$(Build.ArtifactStagingDirectory)/publish/tools/net48/x64" -p:Platform=x64 -p:TargetFramework=net48 -p:Version=$(build.buildNumber)'
     zipAfterPublish: false
     modifyOutputPath: false
 
