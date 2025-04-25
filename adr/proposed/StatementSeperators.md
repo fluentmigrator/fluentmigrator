@@ -34,18 +34,30 @@ DELIMITER <char sequence>
 </td>
     </tr>
     <tr>
-      <td> Postgres </td>
-<td> "dollar quoting" e.g.<br/><br/>
+      <td> Postgres </td> <td> <code>;</code> </td>
+<td>
 
-```sql
-$function$
-BEGIN
- RETURN ($1 ~ $q$[\t\r\n\v\\]$q$);
-END;
-$function$
+PostgreSQL itself does not provide a built-in way to override the semicolon (;) as the statement terminator within its SQL syntax. The semicolon is a fundamental part of SQL syntax in PostgreSQL, and there is no direct configuration or command to change this behavior within the database server.<br />
+
+However, if you are using the psql command-line interface to interact with PostgreSQL, there is a way to change the statement terminator temporarily. You can use the \set command to redefine the statement terminator. For example: <br />
+
+```
+\set ECHO_HIDDEN 1  
+\set myterminator '^'  
 ```
 
-</td> <td> n/a </td>
+Then you can use `\;` to execute the commands with the new terminator:<br />
+
+```
+SELECT * FROM users\myterminator  
+INSERT INTO users (name, email) VALUES ('John Doe', 'john.doe@example.com')\myterminator  
+```
+
+Note that this method is specific to the psql interactive terminal and does not affect how statements are terminated in SQL scripts or other PostgreSQL clients and tools.<br />
+
+In other PostgreSQL clients or when running SQL scripts directly, you will need to use the standard semicolon terminator. If you need to handle complex scripts with alternative terminators, you might need to preprocess the scripts with a custom parser or use a tool that supports such functionality.
+
+</td>
     </tr>
     <tr>
       <td> Firebird </td> <td> <code>;</code> </td>
@@ -109,3 +121,15 @@ n/a
     </tr>
   </tbody>
 </table>
+
+# Notes on Postgres
+
+In addition to semi-colon statement separator, Postgres also supports "dollar quoting" ($$).  Dollar-quoting is used to define string constants or code blocks.
+
+```sql
+$function$
+BEGIN
+ RETURN ($1 ~ $q$[\t\r\n\v\\]$q$);
+END;
+$function$
+```
