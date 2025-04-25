@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net48;netstandard2.0</TargetFrameworks>
     <RootNamespace>FluentMigrator.Runner</RootNamespace>
@@ -16,7 +16,7 @@
     <ProjectReference Include="..\FluentMigrator\FluentMigrator.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="10.3.2" />
+    <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="10.3.3" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.2" />
   </ItemGroup>
   <ItemGroup>
