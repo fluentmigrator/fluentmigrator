@@ -22,8 +22,8 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.4" />
     <PackageReference Include="MySqlConnector" Version="2.4.0" />
     <PackageReference Include="Npgsql" Version="8.0.7" />
-    <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="23.7.0" />
-    <PackageReference Include="Snowflake.Data" Version="4.3.0" />
+    <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="23.8.0" />
+    <PackageReference Include="Snowflake.Data" Version="4.4.1" />
     <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.11" />
   </ItemGroup>
   <ItemGroup>
