@@ -46,7 +46,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
             expression.Column.IsNullable = null;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestTable1\" MODIFY \"TestColumn1\" NVARCHAR2(20)");
+            result.ShouldBe("ALTER TABLE \"TestTable1\" MODIFY \"TestColumn1\" NVARCHAR2(20);");
         }
 
         [Test]

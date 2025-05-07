@@ -54,7 +54,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             expression.Columns[0].Type = DbType.Int64;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 BIGINT NOT NULL AS IDENTITY, TestColumn2 INTEGER NOT NULL)");
+            result.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 BIGINT NOT NULL AS IDENTITY, TestColumn2 INTEGER NOT NULL);");
         }
 
         [Test]
@@ -65,7 +65,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             expression.Columns[0].Size = 10000;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 VARBINARY(10000) NOT NULL, TestColumn2 INTEGER NOT NULL)");
+            result.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 VARBINARY(10000) NOT NULL, TestColumn2 INTEGER NOT NULL);");
         }
 
         [Test]
@@ -76,7 +76,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             expression.Columns[0].DefaultValue = 'T';
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 CHAR(1) NOT NULL DEFAULT 'T', TestColumn2 INTEGER NOT NULL)");
+            result.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 CHAR(1) NOT NULL DEFAULT 'T', TestColumn2 INTEGER NOT NULL);");
         }
 
         [Test]
@@ -87,7 +87,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             var expression = new CreateColumnExpression { Column = columnDefinition, TableName = tableName };
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE NewTable ADD COLUMN NewColumn VARCHAR(18) NOT NULL DEFAULT USER");
+            result.ShouldBe("ALTER TABLE NewTable ADD COLUMN NewColumn VARCHAR(18) NOT NULL DEFAULT USER;");
         }
 
         [Test]
@@ -98,7 +98,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             var expression = new CreateColumnExpression { Column = columnDefinition, TableName = tableName };
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE NewTable ADD COLUMN NewColumn VARGRAPHIC(5) CCSID 1200 NOT NULL DEFAULT (CURRENT_TIMESTAMP - CURRENT_TIMEZONE)");
+            result.ShouldBe("ALTER TABLE NewTable ADD COLUMN NewColumn VARGRAPHIC(5) CCSID 1200 NOT NULL DEFAULT (CURRENT_TIMESTAMP - CURRENT_TIMEZONE);");
         }
 
         [Test]
@@ -112,7 +112,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             });
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("INSERT INTO TestTable (NormalString, UnicodeString) VALUES ('Just''in', 'codethinked''.com')");
+            result.ShouldBe("INSERT INTO TestTable (NormalString, UnicodeString) VALUES ('Just''in', 'codethinked''.com');");
         }
 
         [Test]
@@ -126,7 +126,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             };
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestSchema.TestTable1 ALTER COLUMN TestColumn1 SET DATA TYPE DBCLOB(1048576) CCSID 1200");
+            result.ShouldBe("ALTER TABLE TestSchema.TestTable1 ALTER COLUMN TestColumn1 SET DATA TYPE DBCLOB(1048576) CCSID 1200;");
         }
 
         [Test]
@@ -140,7 +140,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             };
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestSchema.TestTable1 ALTER COLUMN TestColumn1 SET DATA TYPE DBCLOB(1048576) CCSID 1200 NOT NULL");
+            result.ShouldBe("ALTER TABLE TestSchema.TestTable1 ALTER COLUMN TestColumn1 SET DATA TYPE DBCLOB(1048576) CCSID 1200 NOT NULL;");
         }
 
         [Test]
@@ -154,7 +154,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             };
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestSchema.TestTable1 ALTER COLUMN TestColumn1 DROP DEFAULT");
+            result.ShouldBe("ALTER TABLE TestSchema.TestTable1 ALTER COLUMN TestColumn1 DROP DEFAULT;");
         }
 
         [Test]
@@ -165,7 +165,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestSchema.TestTable1 ALTER COLUMN TestColumn1 SET DEFAULT USER");
+            result.ShouldBe("ALTER TABLE TestSchema.TestTable1 ALTER COLUMN TestColumn1 SET DEFAULT USER;");
         }
 
         [Test]
@@ -176,7 +176,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestSchema.TestTable1 ALTER COLUMN TestColumn1 SET DEFAULT CURRENT_TIMESTAMP");
+            result.ShouldBe("ALTER TABLE TestSchema.TestTable1 ALTER COLUMN TestColumn1 SET DEFAULT CURRENT_TIMESTAMP;");
         }
 
         //[Test]
@@ -201,7 +201,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             };
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestSchema.TestTable1 ALTER COLUMN TestColumn1 SET DATA TYPE DBCLOB(1048576) CCSID 1200 NOT NULL");
+            result.ShouldBe("ALTER TABLE TestSchema.TestTable1 ALTER COLUMN TestColumn1 SET DATA TYPE DBCLOB(1048576) CCSID 1200 NOT NULL;");
         }
     }
 }

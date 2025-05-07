@@ -24,7 +24,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             expression.Sequence.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE SEQUENCE \"Sequence\"");
+            result.ShouldBe("CREATE SEQUENCE \"Sequence\";");
         }
 
         [Test]
@@ -33,7 +33,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             var expression = GeneratorTestHelper.GetCreateSequenceExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE SEQUENCE \"Sequence\"");
+            result.ShouldBe("CREATE SEQUENCE \"Sequence\";");
         }
 
         [Test]
@@ -43,7 +43,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DROP SEQUENCE \"Sequence\"");
+            result.ShouldBe("DROP SEQUENCE \"Sequence\";");
         }
 
         [Test]
@@ -52,7 +52,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             var expression = GeneratorTestHelper.GetDeleteSequenceExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DROP SEQUENCE \"Sequence\"");
+            result.ShouldBe("DROP SEQUENCE \"Sequence\";");
         }
     }
 }

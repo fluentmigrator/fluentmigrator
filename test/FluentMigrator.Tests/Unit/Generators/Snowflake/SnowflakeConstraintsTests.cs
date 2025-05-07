@@ -56,7 +56,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             expression.ForeignKey.PrimaryTableSchema = TestSchema;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe($@"ALTER TABLE ""{TestSchema}"".""TestTable1"" ADD CONSTRAINT ""FK_TestTable1_TestColumn1_TestTable2_TestColumn2"" FOREIGN KEY (""TestColumn1"") REFERENCES ""{TestSchema}"".""TestTable2"" (""TestColumn2"")", _quotingEnabled);
+            result.ShouldBe($@"ALTER TABLE ""{TestSchema}"".""TestTable1"" ADD CONSTRAINT ""FK_TestTable1_TestColumn1_TestTable2_TestColumn2"" FOREIGN KEY (""TestColumn1"") REFERENCES ""{TestSchema}"".""TestTable2"" (""TestColumn2"");", _quotingEnabled);
         }
 
         [Test]
@@ -64,7 +64,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         {
             var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ADD CONSTRAINT ""FK_TestTable1_TestColumn1_TestTable2_TestColumn2"" FOREIGN KEY (""TestColumn1"") REFERENCES ""PUBLIC"".""TestTable2"" (""TestColumn2"")", _quotingEnabled);
+            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ADD CONSTRAINT ""FK_TestTable1_TestColumn1_TestTable2_TestColumn2"" FOREIGN KEY (""TestColumn1"") REFERENCES ""PUBLIC"".""TestTable2"" (""TestColumn2"");", _quotingEnabled);
         }
 
         [Test]
@@ -75,7 +75,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             expression.ForeignKey.PrimaryTableSchema = "TestSchema2";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe($@"ALTER TABLE ""{TestSchema}"".""TestTable1"" ADD CONSTRAINT ""FK_TestTable1_TestColumn1_TestTable2_TestColumn2"" FOREIGN KEY (""TestColumn1"") REFERENCES ""TestSchema2"".""TestTable2"" (""TestColumn2"")", _quotingEnabled);
+            result.ShouldBe($@"ALTER TABLE ""{TestSchema}"".""TestTable1"" ADD CONSTRAINT ""FK_TestTable1_TestColumn1_TestTable2_TestColumn2"" FOREIGN KEY (""TestColumn1"") REFERENCES ""TestSchema2"".""TestTable2"" (""TestColumn2"");", _quotingEnabled);
         }
 
         [Test]
@@ -86,7 +86,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             expression.ForeignKey.PrimaryTableSchema = TestSchema;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe($@"ALTER TABLE ""{TestSchema}"".""TestTable1"" ADD CONSTRAINT ""FK_TestTable1_TestColumn1_TestColumn3_TestTable2_TestColumn2_TestColumn4"" FOREIGN KEY (""TestColumn1"", ""TestColumn3"") REFERENCES ""{TestSchema}"".""TestTable2"" (""TestColumn2"", ""TestColumn4"")", _quotingEnabled);
+            result.ShouldBe($@"ALTER TABLE ""{TestSchema}"".""TestTable1"" ADD CONSTRAINT ""FK_TestTable1_TestColumn1_TestColumn3_TestTable2_TestColumn2_TestColumn4"" FOREIGN KEY (""TestColumn1"", ""TestColumn3"") REFERENCES ""{TestSchema}"".""TestTable2"" (""TestColumn2"", ""TestColumn4"");", _quotingEnabled);
         }
 
         [Test]
@@ -94,7 +94,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnForeignKeyExpression();
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ADD CONSTRAINT ""FK_TestTable1_TestColumn1_TestColumn3_TestTable2_TestColumn2_TestColumn4"" FOREIGN KEY (""TestColumn1"", ""TestColumn3"") REFERENCES ""PUBLIC"".""TestTable2"" (""TestColumn2"", ""TestColumn4"")", _quotingEnabled);
+            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ADD CONSTRAINT ""FK_TestTable1_TestColumn1_TestColumn3_TestTable2_TestColumn2_TestColumn4"" FOREIGN KEY (""TestColumn1"", ""TestColumn3"") REFERENCES ""PUBLIC"".""TestTable2"" (""TestColumn2"", ""TestColumn4"");", _quotingEnabled);
         }
 
         [Test]
@@ -105,7 +105,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             expression.ForeignKey.PrimaryTableSchema = "TestSchema2";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe($@"ALTER TABLE ""{TestSchema}"".""TestTable1"" ADD CONSTRAINT ""FK_TestTable1_TestColumn1_TestColumn3_TestTable2_TestColumn2_TestColumn4"" FOREIGN KEY (""TestColumn1"", ""TestColumn3"") REFERENCES ""TestSchema2"".""TestTable2"" (""TestColumn2"", ""TestColumn4"")", _quotingEnabled);
+            result.ShouldBe($@"ALTER TABLE ""{TestSchema}"".""TestTable1"" ADD CONSTRAINT ""FK_TestTable1_TestColumn1_TestColumn3_TestTable2_TestColumn2_TestColumn4"" FOREIGN KEY (""TestColumn1"", ""TestColumn3"") REFERENCES ""TestSchema2"".""TestTable2"" (""TestColumn2"", ""TestColumn4"");", _quotingEnabled);
         }
 
         [Test]
@@ -116,7 +116,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
 
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
-            result.ShouldBe($@"ALTER TABLE ""{TestSchema}"".""TestTable1"" ADD CONSTRAINT ""PK_TestTable1_TestColumn1_TestColumn2"" PRIMARY KEY (""TestColumn1"", ""TestColumn2"")", _quotingEnabled);
+            result.ShouldBe($@"ALTER TABLE ""{TestSchema}"".""TestTable1"" ADD CONSTRAINT ""PK_TestTable1_TestColumn1_TestColumn2"" PRIMARY KEY (""TestColumn1"", ""TestColumn2"");", _quotingEnabled);
         }
 
         [Test]
@@ -126,7 +126,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
 
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ADD CONSTRAINT ""PK_TestTable1_TestColumn1_TestColumn2"" PRIMARY KEY (""TestColumn1"", ""TestColumn2"")", _quotingEnabled);
+            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ADD CONSTRAINT ""PK_TestTable1_TestColumn1_TestColumn2"" PRIMARY KEY (""TestColumn1"", ""TestColumn2"");", _quotingEnabled);
         }
 
         [Test]
@@ -136,7 +136,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             expression.Constraint.SchemaName = TestSchema;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe($@"ALTER TABLE ""{TestSchema}"".""TestTable1"" ADD CONSTRAINT ""UC_TestTable1_TestColumn1_TestColumn2"" UNIQUE (""TestColumn1"", ""TestColumn2"")", _quotingEnabled);
+            result.ShouldBe($@"ALTER TABLE ""{TestSchema}"".""TestTable1"" ADD CONSTRAINT ""UC_TestTable1_TestColumn1_TestColumn2"" UNIQUE (""TestColumn1"", ""TestColumn2"");", _quotingEnabled);
         }
 
         [Test]
@@ -144,7 +144,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnUniqueConstraintExpression();
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ADD CONSTRAINT ""UC_TestTable1_TestColumn1_TestColumn2"" UNIQUE (""TestColumn1"", ""TestColumn2"")", _quotingEnabled);
+            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ADD CONSTRAINT ""UC_TestTable1_TestColumn1_TestColumn2"" UNIQUE (""TestColumn1"", ""TestColumn2"");", _quotingEnabled);
         }
 
         [Test]
@@ -155,7 +155,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             expression.ForeignKey.PrimaryTableSchema = TestSchema;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe($@"ALTER TABLE ""{TestSchema}"".""TestTable1"" ADD CONSTRAINT ""FK_Test"" FOREIGN KEY (""TestColumn1"") REFERENCES ""{TestSchema}"".""TestTable2"" (""TestColumn2"")", _quotingEnabled);
+            result.ShouldBe($@"ALTER TABLE ""{TestSchema}"".""TestTable1"" ADD CONSTRAINT ""FK_Test"" FOREIGN KEY (""TestColumn1"") REFERENCES ""{TestSchema}"".""TestTable2"" (""TestColumn2"");", _quotingEnabled);
         }
 
         [Test]
@@ -163,7 +163,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         {
             var expression = GeneratorTestHelper.GetCreateNamedForeignKeyExpression();
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ADD CONSTRAINT ""FK_Test"" FOREIGN KEY (""TestColumn1"") REFERENCES ""PUBLIC"".""TestTable2"" (""TestColumn2"")", _quotingEnabled);
+            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ADD CONSTRAINT ""FK_Test"" FOREIGN KEY (""TestColumn1"") REFERENCES ""PUBLIC"".""TestTable2"" (""TestColumn2"");", _quotingEnabled);
         }
 
         [Test]
@@ -174,7 +174,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             expression.ForeignKey.PrimaryTableSchema = "TestSchema2";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe($@"ALTER TABLE ""{TestSchema}"".""TestTable1"" ADD CONSTRAINT ""FK_Test"" FOREIGN KEY (""TestColumn1"") REFERENCES ""TestSchema2"".""TestTable2"" (""TestColumn2"")", _quotingEnabled);
+            result.ShouldBe($@"ALTER TABLE ""{TestSchema}"".""TestTable1"" ADD CONSTRAINT ""FK_Test"" FOREIGN KEY (""TestColumn1"") REFERENCES ""TestSchema2"".""TestTable2"" (""TestColumn2"");", _quotingEnabled);
         }
 
         [Test]
@@ -187,7 +187,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             expression.ForeignKey.OnUpdate = Rule.SetDefault;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe($@"ALTER TABLE ""{TestSchema}"".""TestTable1"" ADD CONSTRAINT ""FK_Test"" FOREIGN KEY (""TestColumn1"") REFERENCES ""{TestSchema}"".""TestTable2"" (""TestColumn2"") ON DELETE CASCADE ON UPDATE SET DEFAULT", _quotingEnabled);
+            result.ShouldBe($@"ALTER TABLE ""{TestSchema}"".""TestTable1"" ADD CONSTRAINT ""FK_Test"" FOREIGN KEY (""TestColumn1"") REFERENCES ""{TestSchema}"".""TestTable2"" (""TestColumn2"") ON DELETE CASCADE ON UPDATE SET DEFAULT;", _quotingEnabled);
         }
 
         [TestCase(Rule.SetDefault, "SET DEFAULT"), TestCase(Rule.SetNull, "SET NULL"), TestCase(Rule.Cascade, "CASCADE")]
@@ -199,7 +199,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             expression.ForeignKey.OnDelete = rule;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe($@"ALTER TABLE ""{TestSchema}"".""TestTable1"" ADD CONSTRAINT ""FK_Test"" FOREIGN KEY (""TestColumn1"") REFERENCES ""{TestSchema}"".""TestTable2"" (""TestColumn2"") ON DELETE {output}", _quotingEnabled);
+            result.ShouldBe($@"ALTER TABLE ""{TestSchema}"".""TestTable1"" ADD CONSTRAINT ""FK_Test"" FOREIGN KEY (""TestColumn1"") REFERENCES ""{TestSchema}"".""TestTable2"" (""TestColumn2"") ON DELETE {output};", _quotingEnabled);
         }
 
         [TestCase(Rule.SetDefault, "SET DEFAULT"), TestCase(Rule.SetNull, "SET NULL"), TestCase(Rule.Cascade, "CASCADE")]
@@ -211,7 +211,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             expression.ForeignKey.OnUpdate = rule;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe($@"ALTER TABLE ""{TestSchema}"".""TestTable1"" ADD CONSTRAINT ""FK_Test"" FOREIGN KEY (""TestColumn1"") REFERENCES ""{TestSchema}"".""TestTable2"" (""TestColumn2"") ON UPDATE {output}", _quotingEnabled);
+            result.ShouldBe($@"ALTER TABLE ""{TestSchema}"".""TestTable1"" ADD CONSTRAINT ""FK_Test"" FOREIGN KEY (""TestColumn1"") REFERENCES ""{TestSchema}"".""TestTable2"" (""TestColumn2"") ON UPDATE {output};", _quotingEnabled);
         }
 
         [Test]
@@ -222,7 +222,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             expression.ForeignKey.PrimaryTableSchema = TestSchema;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe($@"ALTER TABLE ""{TestSchema}"".""TestTable1"" ADD CONSTRAINT ""FK_Test"" FOREIGN KEY (""TestColumn1"", ""TestColumn3"") REFERENCES ""{TestSchema}"".""TestTable2"" (""TestColumn2"", ""TestColumn4"")", _quotingEnabled);
+            result.ShouldBe($@"ALTER TABLE ""{TestSchema}"".""TestTable1"" ADD CONSTRAINT ""FK_Test"" FOREIGN KEY (""TestColumn1"", ""TestColumn3"") REFERENCES ""{TestSchema}"".""TestTable2"" (""TestColumn2"", ""TestColumn4"");", _quotingEnabled);
         }
 
         [Test]
@@ -230,7 +230,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         {
             var expression = GeneratorTestHelper.GetCreateNamedMultiColumnForeignKeyExpression();
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ADD CONSTRAINT ""FK_Test"" FOREIGN KEY (""TestColumn1"", ""TestColumn3"") REFERENCES ""PUBLIC"".""TestTable2"" (""TestColumn2"", ""TestColumn4"")", _quotingEnabled);
+            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ADD CONSTRAINT ""FK_Test"" FOREIGN KEY (""TestColumn1"", ""TestColumn3"") REFERENCES ""PUBLIC"".""TestTable2"" (""TestColumn2"", ""TestColumn4"");", _quotingEnabled);
         }
 
         [Test]
@@ -241,7 +241,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             expression.ForeignKey.PrimaryTableSchema = "TestSchema2";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe($@"ALTER TABLE ""{TestSchema}"".""TestTable1"" ADD CONSTRAINT ""FK_Test"" FOREIGN KEY (""TestColumn1"", ""TestColumn3"") REFERENCES ""TestSchema2"".""TestTable2"" (""TestColumn2"", ""TestColumn4"")", _quotingEnabled);
+            result.ShouldBe($@"ALTER TABLE ""{TestSchema}"".""TestTable1"" ADD CONSTRAINT ""FK_Test"" FOREIGN KEY (""TestColumn1"", ""TestColumn3"") REFERENCES ""TestSchema2"".""TestTable2"" (""TestColumn2"", ""TestColumn4"");", _quotingEnabled);
         }
 
         [Test]
@@ -252,7 +252,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
 
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
-            result.ShouldBe($@"ALTER TABLE ""{TestSchema}"".""TestTable1"" ADD CONSTRAINT ""TESTPRIMARYKEY"" PRIMARY KEY (""TestColumn1"", ""TestColumn2"")", _quotingEnabled);
+            result.ShouldBe($@"ALTER TABLE ""{TestSchema}"".""TestTable1"" ADD CONSTRAINT ""TESTPRIMARYKEY"" PRIMARY KEY (""TestColumn1"", ""TestColumn2"");", _quotingEnabled);
         }
 
         [Test]
@@ -262,7 +262,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
 
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ADD CONSTRAINT ""TESTPRIMARYKEY"" PRIMARY KEY (""TestColumn1"", ""TestColumn2"")", _quotingEnabled);
+            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ADD CONSTRAINT ""TESTPRIMARYKEY"" PRIMARY KEY (""TestColumn1"", ""TestColumn2"");", _quotingEnabled);
         }
 
         [Test]
@@ -272,7 +272,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             expression.Constraint.SchemaName = TestSchema;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe($@"ALTER TABLE ""{TestSchema}"".""TestTable1"" ADD CONSTRAINT ""TESTUNIQUECONSTRAINT"" UNIQUE (""TestColumn1"", ""TestColumn2"")", _quotingEnabled);
+            result.ShouldBe($@"ALTER TABLE ""{TestSchema}"".""TestTable1"" ADD CONSTRAINT ""TESTUNIQUECONSTRAINT"" UNIQUE (""TestColumn1"", ""TestColumn2"");", _quotingEnabled);
         }
 
         [Test]
@@ -280,7 +280,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         {
             var expression = GeneratorTestHelper.GetCreateNamedMultiColumnUniqueConstraintExpression();
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ADD CONSTRAINT ""TESTUNIQUECONSTRAINT"" UNIQUE (""TestColumn1"", ""TestColumn2"")", _quotingEnabled);
+            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ADD CONSTRAINT ""TESTUNIQUECONSTRAINT"" UNIQUE (""TestColumn1"", ""TestColumn2"");", _quotingEnabled);
         }
 
         [Test]
@@ -291,7 +291,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
 
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
-            result.ShouldBe($@"ALTER TABLE ""{TestSchema}"".""TestTable1"" ADD CONSTRAINT ""TESTPRIMARYKEY"" PRIMARY KEY (""TestColumn1"")", _quotingEnabled);
+            result.ShouldBe($@"ALTER TABLE ""{TestSchema}"".""TestTable1"" ADD CONSTRAINT ""TESTPRIMARYKEY"" PRIMARY KEY (""TestColumn1"");", _quotingEnabled);
         }
 
         [Test]
@@ -301,7 +301,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
 
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ADD CONSTRAINT ""TESTPRIMARYKEY"" PRIMARY KEY (""TestColumn1"")", _quotingEnabled);
+            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ADD CONSTRAINT ""TESTPRIMARYKEY"" PRIMARY KEY (""TestColumn1"");", _quotingEnabled);
         }
 
         [Test]
@@ -311,7 +311,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             expression.Constraint.SchemaName = TestSchema;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe($@"ALTER TABLE ""{TestSchema}"".""TestTable1"" ADD CONSTRAINT ""TESTUNIQUECONSTRAINT"" UNIQUE (""TestColumn1"")", _quotingEnabled);
+            result.ShouldBe($@"ALTER TABLE ""{TestSchema}"".""TestTable1"" ADD CONSTRAINT ""TESTUNIQUECONSTRAINT"" UNIQUE (""TestColumn1"");", _quotingEnabled);
         }
 
         [Test]
@@ -319,7 +319,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         {
             var expression = GeneratorTestHelper.GetCreateNamedUniqueConstraintExpression();
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ADD CONSTRAINT ""TESTUNIQUECONSTRAINT"" UNIQUE (""TestColumn1"")", _quotingEnabled);
+            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ADD CONSTRAINT ""TESTUNIQUECONSTRAINT"" UNIQUE (""TestColumn1"");", _quotingEnabled);
         }
 
         [Test]
@@ -330,7 +330,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
 
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
-            result.ShouldBe($@"ALTER TABLE ""{TestSchema}"".""TestTable1"" ADD CONSTRAINT ""PK_TestTable1_TestColumn1"" PRIMARY KEY (""TestColumn1"")", _quotingEnabled);
+            result.ShouldBe($@"ALTER TABLE ""{TestSchema}"".""TestTable1"" ADD CONSTRAINT ""PK_TestTable1_TestColumn1"" PRIMARY KEY (""TestColumn1"");", _quotingEnabled);
         }
 
         [Test]
@@ -340,7 +340,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
 
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ADD CONSTRAINT ""PK_TestTable1_TestColumn1"" PRIMARY KEY (""TestColumn1"")", _quotingEnabled);
+            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ADD CONSTRAINT ""PK_TestTable1_TestColumn1"" PRIMARY KEY (""TestColumn1"");", _quotingEnabled);
         }
 
         [Test]
@@ -350,7 +350,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             expression.Constraint.SchemaName = TestSchema;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe($@"ALTER TABLE ""{TestSchema}"".""TestTable1"" ADD CONSTRAINT ""UC_TestTable1_TestColumn1"" UNIQUE (""TestColumn1"")", _quotingEnabled);
+            result.ShouldBe($@"ALTER TABLE ""{TestSchema}"".""TestTable1"" ADD CONSTRAINT ""UC_TestTable1_TestColumn1"" UNIQUE (""TestColumn1"");", _quotingEnabled);
         }
 
         [Test]
@@ -358,7 +358,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         {
             var expression = GeneratorTestHelper.GetCreateUniqueConstraintExpression();
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ADD CONSTRAINT ""UC_TestTable1_TestColumn1"" UNIQUE (""TestColumn1"")", _quotingEnabled);
+            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ADD CONSTRAINT ""UC_TestTable1_TestColumn1"" UNIQUE (""TestColumn1"");", _quotingEnabled);
         }
 
         [Test]
@@ -368,7 +368,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             expression.ForeignKey.ForeignTableSchema = TestSchema;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe($@"ALTER TABLE ""{TestSchema}"".""TestTable1"" DROP CONSTRAINT ""FK_Test""", _quotingEnabled);
+            result.ShouldBe($@"ALTER TABLE ""{TestSchema}"".""TestTable1"" DROP CONSTRAINT ""FK_Test"";", _quotingEnabled);
         }
 
         [Test]
@@ -376,7 +376,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         {
             var expression = GeneratorTestHelper.GetDeleteForeignKeyExpression();
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" DROP CONSTRAINT ""FK_Test""", _quotingEnabled);
+            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" DROP CONSTRAINT ""FK_Test"";", _quotingEnabled);
         }
 
         [Test]
@@ -386,7 +386,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             expression.Constraint.SchemaName = TestSchema;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe($@"ALTER TABLE ""{TestSchema}"".""TestTable1"" DROP CONSTRAINT ""TESTPRIMARYKEY""", _quotingEnabled);
+            result.ShouldBe($@"ALTER TABLE ""{TestSchema}"".""TestTable1"" DROP CONSTRAINT ""TESTPRIMARYKEY"";", _quotingEnabled);
         }
 
         [Test]
@@ -394,7 +394,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         {
             var expression = GeneratorTestHelper.GetDeletePrimaryKeyExpression();
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" DROP CONSTRAINT ""TESTPRIMARYKEY""", _quotingEnabled);
+            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" DROP CONSTRAINT ""TESTPRIMARYKEY"";", _quotingEnabled);
         }
 
         [Test]
@@ -404,7 +404,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             expression.Constraint.SchemaName = TestSchema;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe($@"ALTER TABLE ""{TestSchema}"".""TestTable1"" DROP CONSTRAINT ""TESTUNIQUECONSTRAINT""", _quotingEnabled);
+            result.ShouldBe($@"ALTER TABLE ""{TestSchema}"".""TestTable1"" DROP CONSTRAINT ""TESTUNIQUECONSTRAINT"";", _quotingEnabled);
         }
 
         [Test]
@@ -412,7 +412,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         {
             var expression = GeneratorTestHelper.GetDeleteUniqueConstraintExpression();
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" DROP CONSTRAINT ""TESTUNIQUECONSTRAINT""", _quotingEnabled);
+            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" DROP CONSTRAINT ""TESTUNIQUECONSTRAINT"";", _quotingEnabled);
         }
     }
 }

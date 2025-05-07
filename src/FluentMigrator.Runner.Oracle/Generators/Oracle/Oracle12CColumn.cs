@@ -79,10 +79,10 @@ namespace FluentMigrator.Runner.Generators.Oracle
             var optionsString = "";
             if (options.Count > 0)
             {
-                optionsString = $"({string.Join(" ", options)})";
+                optionsString = $" ({string.Join(" ", options)})";
             }
 
-            return $"GENERATED {generationType} AS IDENTITY {optionsString}";
+            return $"GENERATED {generationType} AS IDENTITY{optionsString}";
         }
 
         /// <inheritdoc />

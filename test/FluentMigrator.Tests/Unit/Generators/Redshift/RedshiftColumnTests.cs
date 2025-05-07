@@ -118,20 +118,22 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
         public override void CanCreateColumnWithSystemMethodAndCustomSchema()
         {
             var expressions = GeneratorTestHelper.GetCreateColumnWithSystemMethodExpression("TestSchema");
-            var result = string.Join(Environment.NewLine, expressions.Select(x => (string)_generator.Generate((dynamic)x)));
-            result.ShouldBe(
-                @"ALTER TABLE ""TestSchema"".""TestTable1"" ADD ""TestColumn1"" timestamp;" + Environment.NewLine +
-                @"UPDATE ""TestSchema"".""TestTable1"" SET ""TestColumn1"" = SYSDATE WHERE 1 = 1;");
+            var result = expressions.Select(x => (string)_generator.Generate((dynamic)x));
+            result.ShouldBe([
+                @"ALTER TABLE ""TestSchema"".""TestTable1"" ADD ""TestColumn1"" timestamp;",
+                @"UPDATE ""TestSchema"".""TestTable1"" SET ""TestColumn1"" = SYSDATE WHERE 1 = 1;",
+            ]);
         }
 
         [Test]
         public override void CanCreateColumnWithSystemMethodAndDefaultSchema()
         {
             var expressions = GeneratorTestHelper.GetCreateColumnWithSystemMethodExpression();
-            var result = string.Join(Environment.NewLine, expressions.Select(x => (string)_generator.Generate((dynamic)x)));
-            result.ShouldBe(
-                @"ALTER TABLE ""public"".""TestTable1"" ADD ""TestColumn1"" timestamp;" + Environment.NewLine +
-                @"UPDATE ""public"".""TestTable1"" SET ""TestColumn1"" = SYSDATE WHERE 1 = 1;");
+            var result = expressions.Select(x => (string)_generator.Generate((dynamic)x));
+            result.ShouldBe([
+                @"ALTER TABLE ""public"".""TestTable1"" ADD ""TestColumn1"" timestamp;",
+                @"UPDATE ""public"".""TestTable1"" SET ""TestColumn1"" = SYSDATE WHERE 1 = 1;",
+            ]);
         }
 
         [Test]

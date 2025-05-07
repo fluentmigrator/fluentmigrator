@@ -50,7 +50,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.Columns.Add(new ColumnDefinition { Name = "DateTimeCol", Type = DbType.DateTime, DefaultValue = SystemMethods.CurrentDateTime});
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"DateTimeCol\" TEXT NOT NULL DEFAULT (datetime('now','localtime')))");
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"DateTimeCol\" TEXT NOT NULL DEFAULT (datetime('now','localtime')));");
         }
 
         [Test]
@@ -60,7 +60,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.Columns.Add(new ColumnDefinition { Name = "DateTimeCol", Type = DbType.DateTime, DefaultValue = SystemMethods.CurrentUTCDateTime });
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"DateTimeCol\" TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)");
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"DateTimeCol\" TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);");
         }
     }
 }

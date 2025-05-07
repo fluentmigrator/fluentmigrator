@@ -19,6 +19,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+
+using JetBrains.Annotations;
 
 namespace FluentMigrator.Runner.Generators.Generic
 {
@@ -31,6 +34,21 @@ namespace FluentMigrator.Runner.Generators.Generic
             string schemaName, string tableName, string tableDescription);
         protected abstract string GenerateColumnDescription(
             string descriptionName, string schemaName, string tableName, string columnName, string columnDescription);
+
+        [StringFormatMethod("format")]
+        protected string FormatStatement(string format, params object[] args)
+        {
+            var builder = new StringBuilder().AppendFormat(format, args);
+
+            AppendSqlStatementEndToken(builder);
+
+            return builder.ToString();
+        }
+
+        protected virtual StringBuilder AppendSqlStatementEndToken(StringBuilder stringBuilder)
+        {
+            return stringBuilder.Append(";");
+        }
 
         public virtual IEnumerable<string> GenerateDescriptionStatements(Expressions.CreateTableExpression expression)
         {
