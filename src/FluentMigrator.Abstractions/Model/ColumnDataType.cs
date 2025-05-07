@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2023, Fluent Migrator Project
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,5 +34,11 @@ namespace FluentMigrator.Model
 
         /// <inheritdoc />
         public string CustomType { get; set; }
+
+        /// <inheritdoc />
+        public string Expression { get; set; }
+
+        /// <inheritdoc />
+        public bool ExpressionStored { get; set; }
     }
 }

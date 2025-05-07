@@ -61,6 +61,16 @@ namespace FluentMigrator.Model
         public virtual string CustomType { get; set; }
 
         /// <summary>
+        /// Gets or sets a expression that defines the column
+        /// </summary>
+        public virtual string Expression { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the calculated value is stored
+        /// </summary>
+        public virtual bool ExpressionStored { get; set; }
+
+        /// <summary>
         /// Gets or sets the columns default value
         /// </summary>
         public virtual object DefaultValue { get; set; } = new UndefinedDefaultValue();
