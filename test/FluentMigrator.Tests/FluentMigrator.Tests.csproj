@@ -13,7 +13,7 @@
     <None Include="..\..\FluentMigrator.snk" Link="FluentMigrator.snk" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Autofac" Version="8.2.1" />
+    <PackageReference Include="Autofac" Version="8.3.0" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="10.0.0" />
     <PackageReference Include="Brutal.Dev.StrongNameSigner" Version="3.5.1" />
     <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="10.3.3" />
