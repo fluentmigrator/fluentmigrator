@@ -60,6 +60,11 @@ namespace FluentMigrator
         public long Version { get; }
 
         /// <summary>
+        /// Gets the human-readable version
+        /// </summary>
+        public virtual string VersionAsString => this.Version.ToString();
+
+        /// <summary>
         /// Gets the desired transaction behavior
         /// </summary>
         public TransactionBehavior TransactionBehavior { get; }
