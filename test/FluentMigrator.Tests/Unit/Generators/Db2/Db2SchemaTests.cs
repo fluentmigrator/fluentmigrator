@@ -33,7 +33,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             var expression = GeneratorTestHelper.GetCreateSchemaExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE SCHEMA TestSchema");
+            result.ShouldBe("CREATE SCHEMA TestSchema;");
         }
 
         [Test]
@@ -42,7 +42,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             var expression = GeneratorTestHelper.GetDeleteSchemaExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DROP SCHEMA TestSchema RESTRICT");
+            result.ShouldBe("DROP SCHEMA TestSchema RESTRICT;");
         }
     }
 }

@@ -1,21 +1,3 @@
-#region License
-//
-// Copyright (c) 2018, Fluent Migrator Project
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
-#endregion
-
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -106,7 +88,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.Index.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE INDEX [TestIndex] ON [TestSchema].[TestTable1] ([TestColumn1] ASC) INCLUDE ([TestColumn2])");
+            result.ShouldBe("CREATE INDEX [TestIndex] ON [TestSchema].[TestTable1] ([TestColumn1] ASC) INCLUDE ([TestColumn2]);");
         }
 
         [Test]
@@ -115,7 +97,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             var expression = GeneratorTestHelper.GetCreateIncludeIndexExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) INCLUDE ([TestColumn2])");
+            result.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) INCLUDE ([TestColumn2]);");
         }
 
         [Test]
@@ -125,7 +107,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.Index.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE INDEX [TestIndex] ON [TestSchema].[TestTable1] ([TestColumn1] ASC) INCLUDE ([TestColumn2], [TestColumn3])");
+            result.ShouldBe("CREATE INDEX [TestIndex] ON [TestSchema].[TestTable1] ([TestColumn1] ASC) INCLUDE ([TestColumn2], [TestColumn3]);");
         }
 
         [Test]
@@ -134,7 +116,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             var expression = GeneratorTestHelper.GetCreateMultiIncludeIndexExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) INCLUDE ([TestColumn2], [TestColumn3])");
+            result.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) INCLUDE ([TestColumn2], [TestColumn3]);");
         }
 
         [Test]
@@ -146,7 +128,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.Columns[0].Size = int.MaxValue;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE [TestSchema].[TestTable1] ([TestColumn1] NVARCHAR(MAX) NOT NULL, [TestColumn2] INT NOT NULL)");
+            result.ShouldBe("CREATE TABLE [TestSchema].[TestTable1] ([TestColumn1] NVARCHAR(MAX) NOT NULL, [TestColumn2] INT NOT NULL);");
         }
 
         [Test]
@@ -157,7 +139,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.Columns[0].Size = int.MaxValue;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE [dbo].[TestTable1] ([TestColumn1] NVARCHAR(MAX) NOT NULL, [TestColumn2] INT NOT NULL)");
+            result.ShouldBe("CREATE TABLE [dbo].[TestTable1] ([TestColumn1] NVARCHAR(MAX) NOT NULL, [TestColumn2] INT NOT NULL);");
         }
 
         [Test]
@@ -168,7 +150,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.Columns[0].AdditionalFeatures.Add(SqlServerExtensions.IdentityIncrement, 23);
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE [dbo].[TestTable1] ([TestColumn1] INT NOT NULL IDENTITY(45,23), [TestColumn2] INT NOT NULL)");
+            result.ShouldBe("CREATE TABLE [dbo].[TestTable1] ([TestColumn1] INT NOT NULL IDENTITY(45,23), [TestColumn2] INT NOT NULL);");
         }
 
         [Test]
@@ -183,7 +165,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD [TestColumn1] XML NOT NULL");
+            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD [TestColumn1] XML NOT NULL;");
         }
 
         [Test]
@@ -197,7 +179,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.Column.Type = DbType.Xml;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD [TestColumn1] XML NOT NULL");
+            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD [TestColumn1] XML NOT NULL;");
         }
 
         [Test]
@@ -229,53 +211,55 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         public void CanUseSystemMethodCurrentDateTimeAsADefaultValueForAColumn()
         {
             var expression = new CreateColumnExpression
+            {
+                TableName = "NewTable",
+                Column = new ColumnDefinition
                 {
-                    Column = new ColumnDefinition
-                        {
-                            Name = "NewColumn", Type = DbType.DateTime,
-                            DefaultValue = SystemMethods.CurrentDateTime
-                        },
-                    TableName = "NewTable"
-                };
+                    Name = "NewColumn",
+                    Type = DbType.DateTime,
+                    DefaultValue = SystemMethods.CurrentDateTime
+                }
+            };
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [dbo].[NewTable] ADD [NewColumn] DATETIME NOT NULL CONSTRAINT [DF__NewColumn] DEFAULT GETDATE()");
+            result.ShouldBe("ALTER TABLE [dbo].[NewTable] ADD [NewColumn] DATETIME NOT NULL CONSTRAINT [DF__NewColumn] DEFAULT GETDATE();");
         }
 
         [Test]
         public void CanUseSystemMethodCurrentUserAsADefaultValueForAColumn()
         {
             var expression = new CreateColumnExpression
+            {
+                TableName = "NewTable",
+                Column = new ColumnDefinition
                 {
-                    Column = new ColumnDefinition
-                        {
-                            Name = "NewColumn",
-                            Size = 15,
-                            Type = DbType.String,
-                            DefaultValue = SystemMethods.CurrentUser
-                        },
-                    TableName = "NewTable"
-                };
+                    Name = "NewColumn",
+                    Type = DbType.String,
+                    Size = 15,
+                    DefaultValue = SystemMethods.CurrentUser
+                }
+            };
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [dbo].[NewTable] ADD [NewColumn] NVARCHAR(15) NOT NULL CONSTRAINT [DF__NewColumn] DEFAULT CURRENT_USER");
+            result.ShouldBe("ALTER TABLE [dbo].[NewTable] ADD [NewColumn] NVARCHAR(15) NOT NULL CONSTRAINT [DF__NewColumn] DEFAULT CURRENT_USER;");
         }
 
         [Test]
         public void CanUseSystemMethodCurrentUTCDateTimeAsADefaultValueForAColumn()
         {
             var expression = new CreateColumnExpression
+            {
+                TableName = "NewTable",
+                Column = new ColumnDefinition
                 {
-                    Column = new ColumnDefinition
-                        {
-                            Name = "NewColumn",
-                            Type = DbType.DateTime,
-                            DefaultValue = SystemMethods.CurrentUTCDateTime
-                        }, TableName = "NewTable"
-                };
+                    Name = "NewColumn",
+                    Type = DbType.DateTime,
+                    DefaultValue = SystemMethods.CurrentUTCDateTime
+                }
+            };
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [dbo].[NewTable] ADD [NewColumn] DATETIME NOT NULL CONSTRAINT [DF__NewColumn] DEFAULT GETUTCDATE()");
+            result.ShouldBe("ALTER TABLE [dbo].[NewTable] ADD [NewColumn] DATETIME NOT NULL CONSTRAINT [DF__NewColumn] DEFAULT GETUTCDATE();");
         }
 
         [Test]
@@ -293,7 +277,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             };
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [dbo].[NewTable] ADD [NewColumn] DATETIME NOT NULL CONSTRAINT [DF__NewColumn] DEFAULT GETUTCDATE()");
+            result.ShouldBe("ALTER TABLE [dbo].[NewTable] ADD [NewColumn] DATETIME NOT NULL CONSTRAINT [DF__NewColumn] DEFAULT GETUTCDATE();");
         }
 
         [Test]
@@ -310,7 +294,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
                 };
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [dbo].[NewTable] ADD [NewColumn] UNIQUEIDENTIFIER NOT NULL CONSTRAINT [DF__NewColumn] DEFAULT NEWID()");
+            result.ShouldBe("ALTER TABLE [dbo].[NewTable] ADD [NewColumn] UNIQUEIDENTIFIER NOT NULL CONSTRAINT [DF__NewColumn] DEFAULT NEWID();");
         }
 
         [Test]
@@ -327,7 +311,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
                 };
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [dbo].[NewTable] ADD [NewColumn] UNIQUEIDENTIFIER NOT NULL CONSTRAINT [DF__NewColumn] DEFAULT NEWSEQUENTIALID()");
+            result.ShouldBe("ALTER TABLE [dbo].[NewTable] ADD [NewColumn] UNIQUEIDENTIFIER NOT NULL CONSTRAINT [DF__NewColumn] DEFAULT NEWSEQUENTIALID();");
         }
 
         [Test]
@@ -337,9 +321,9 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 
             var result = Generator.Generate(expression);
 
-            result.ShouldBe(@"CREATE TABLE [dbo].[TestTable1] ([TestColumn1] NVARCHAR(255), [TestColumn2] INT NOT NULL)" + Environment.NewLine +
+            result.ShouldBe(@"CREATE TABLE [dbo].[TestTable1] ([TestColumn1] NVARCHAR(255), [TestColumn2] INT NOT NULL);" + Environment.NewLine +
                             "GO" + Environment.NewLine +
-                            "EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'TestDescription', @level0type=N'SCHEMA', @level0name='dbo', @level1type=N'TABLE', @level1name='TestTable1';EXEC sys.sp_addextendedproperty @name = N'MS_Description', @value = N'Description:TestColumn1Description', @level0type = N'SCHEMA', @level0name = 'dbo', @level1type = N'Table', @level1name = 'TestTable1', @level2type = N'Column',  @level2name = 'TestColumn1';EXEC sys.sp_addextendedproperty @name = N'MS_Description', @value = N'Description:TestColumn2Description', @level0type = N'SCHEMA', @level0name = 'dbo', @level1type = N'Table', @level1name = 'TestTable1', @level2type = N'Column',  @level2name = 'TestColumn2'" + Environment.NewLine);
+                            "EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'TestDescription', @level0type=N'SCHEMA', @level0name='dbo', @level1type=N'TABLE', @level1name='TestTable1';EXEC sys.sp_addextendedproperty @name = N'MS_Description', @value = N'Description:TestColumn1Description', @level0type = N'SCHEMA', @level0name = 'dbo', @level1type = N'Table', @level1name = 'TestTable1', @level2type = N'Column',  @level2name = 'TestColumn1';EXEC sys.sp_addextendedproperty @name = N'MS_Description', @value = N'Description:TestColumn2Description', @level0type = N'SCHEMA', @level0name = 'dbo', @level1type = N'Table', @level1name = 'TestTable1', @level2type = N'Column',  @level2name = 'TestColumn2';");
         }
 
         [Test]
@@ -349,11 +333,11 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 
             var result = Generator.Generate(expression);
 
-            result.ShouldBe(@"CREATE TABLE [dbo].[TestTable1] ([TestColumn1] NVARCHAR(255), [TestColumn2] INT NOT NULL)" + Environment.NewLine +
+            result.ShouldBe(@"CREATE TABLE [dbo].[TestTable1] ([TestColumn1] NVARCHAR(255), [TestColumn2] INT NOT NULL);" + Environment.NewLine +
                             "GO" + Environment.NewLine +
                             "EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'TestDescription', @level0type=N'SCHEMA', @level0name='dbo', @level1type=N'TABLE', @level1name='TestTable1';EXEC sys.sp_addextendedproperty @name = N'MS_Description', @value = N'Description:TestColumn1Description" + Environment.NewLine +
                             "AdditionalColumnDescriptionKey1:AdditionalColumnDescriptionValue1', @level0type = N'SCHEMA', @level0name = 'dbo', @level1type = N'Table', @level1name = 'TestTable1', @level2type = N'Column',  @level2name = 'TestColumn1';EXEC sys.sp_addextendedproperty @name = N'MS_Description', @value = N'Description:TestColumn2Description" + Environment.NewLine +
-                            "AdditionalColumnDescriptionKey2:AdditionalColumnDescriptionValue2', @level0type = N'SCHEMA', @level0name = 'dbo', @level1type = N'Table', @level1name = 'TestTable1', @level2type = N'Column',  @level2name = 'TestColumn2'" + Environment.NewLine);
+                            "AdditionalColumnDescriptionKey2:AdditionalColumnDescriptionValue2', @level0type = N'SCHEMA', @level0name = 'dbo', @level1type = N'Table', @level1name = 'TestTable1', @level2type = N'Column',  @level2name = 'TestColumn2';");
         }
 
         [Test]
@@ -363,7 +347,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 
             var result = Generator.Generate(expression);
 
-            result.ShouldBe(@"IF EXISTS ( SELECT * FROM fn_listextendedproperty(N'MS_Description', N'SCHEMA', N'dbo', N'TABLE', N'TestTable1', NULL, NULL)) EXEC sys.sp_dropextendedproperty @name=N'MS_Description', @level0type=N'SCHEMA', @level0name='dbo', @level1type=N'TABLE', @level1name='TestTable1';EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'TestDescription', @level0type=N'SCHEMA', @level0name='dbo', @level1type=N'TABLE', @level1name='TestTable1'");
+            result.ShouldBe(@"IF EXISTS ( SELECT * FROM fn_listextendedproperty(N'MS_Description', N'SCHEMA', N'dbo', N'TABLE', N'TestTable1', NULL, NULL)) EXEC sys.sp_dropextendedproperty @name=N'MS_Description', @level0type=N'SCHEMA', @level0name='dbo', @level1type=N'TABLE', @level1name='TestTable1';EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'TestDescription', @level0type=N'SCHEMA', @level0name='dbo', @level1type=N'TABLE', @level1name='TestTable1';");
         }
 
         [Test]
@@ -373,9 +357,9 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 
             var result = Generator.Generate(expression);
 
-            result.ShouldBe(@"ALTER TABLE [dbo].[TestTable1] ADD [TestColumn1] NVARCHAR(5) NOT NULL" + Environment.NewLine +
+            result.ShouldBe(@"ALTER TABLE [dbo].[TestTable1] ADD [TestColumn1] NVARCHAR(5) NOT NULL;" + Environment.NewLine +
                             "GO" + Environment.NewLine +
-                            "EXEC sys.sp_addextendedproperty @name = N'MS_Description', @value = N'Description:TestColumn1Description', @level0type = N'SCHEMA', @level0name = 'dbo', @level1type = N'Table', @level1name = 'TestTable1', @level2type = N'Column',  @level2name = 'TestColumn1'" + Environment.NewLine);
+                            "EXEC sys.sp_addextendedproperty @name = N'MS_Description', @value = N'Description:TestColumn1Description', @level0type = N'SCHEMA', @level0name = 'dbo', @level1type = N'Table', @level1name = 'TestTable1', @level2type = N'Column',  @level2name = 'TestColumn1';");
         }
 
         [Test]
@@ -385,10 +369,10 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 
             var result = Generator.Generate(expression);
 
-            result.ShouldBe(@"ALTER TABLE [dbo].[TestTable1] ADD [TestColumn1] NVARCHAR(5) NOT NULL" + Environment.NewLine +
+            result.ShouldBe(@"ALTER TABLE [dbo].[TestTable1] ADD [TestColumn1] NVARCHAR(5) NOT NULL;" + Environment.NewLine +
                             "GO" + Environment.NewLine +
                             "EXEC sys.sp_addextendedproperty @name = N'MS_Description', @value = N'Description:TestColumn1Description"+Environment.NewLine+
-                            "AdditionalColumnDescriptionKey1:AdditionalColumnDescriptionValue1', @level0type = N'SCHEMA', @level0name = 'dbo', @level1type = N'Table', @level1name = 'TestTable1', @level2type = N'Column',  @level2name = 'TestColumn1'" + Environment.NewLine);
+                            "AdditionalColumnDescriptionKey1:AdditionalColumnDescriptionValue1', @level0type = N'SCHEMA', @level0name = 'dbo', @level1type = N'Table', @level1name = 'TestTable1', @level2type = N'Column',  @level2name = 'TestColumn1';");
         }
 
         [Test]
@@ -398,9 +382,9 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 
             var result = Generator.Generate(expression);
 
-            result.ShouldBe(@"ALTER TABLE [dbo].[TestTable1] ALTER COLUMN [TestColumn1] NVARCHAR(20) NOT NULL" + Environment.NewLine +
+            result.ShouldBe(@"ALTER TABLE [dbo].[TestTable1] ALTER COLUMN [TestColumn1] NVARCHAR(20) NOT NULL;" + Environment.NewLine +
                             "GO" + Environment.NewLine +
-                            "IF EXISTS (SELECT * FROM fn_listextendedproperty(N'MS_Description', N'SCHEMA', N'dbo', N'TABLE', N'TestTable1', N'Column', N'TestColumn1' )) EXEC sys.sp_dropextendedproperty @name=N'MS_Description', @level0type = N'SCHEMA', @level0name = 'dbo', @level1type = N'Table', @level1name = 'TestTable1', @level2type = N'Column',  @level2name = 'TestColumn1';EXEC sys.sp_addextendedproperty @name = N'MS_Description', @value = N'TestColumn1Description', @level0type = N'SCHEMA', @level0name = 'dbo', @level1type = N'Table', @level1name = 'TestTable1', @level2type = N'Column',  @level2name = 'TestColumn1'" + Environment.NewLine);
+                            "IF EXISTS (SELECT * FROM fn_listextendedproperty(N'MS_Description', N'SCHEMA', N'dbo', N'TABLE', N'TestTable1', N'Column', N'TestColumn1' )) EXEC sys.sp_dropextendedproperty @name=N'MS_Description', @level0type = N'SCHEMA', @level0name = 'dbo', @level1type = N'Table', @level1name = 'TestTable1', @level2type = N'Column',  @level2name = 'TestColumn1';EXEC sys.sp_addextendedproperty @name = N'MS_Description', @value = N'TestColumn1Description', @level0type = N'SCHEMA', @level0name = 'dbo', @level1type = N'Table', @level1name = 'TestTable1', @level2type = N'Column',  @level2name = 'TestColumn1';");
         }
 
         [Test]
@@ -410,10 +394,10 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 
             var result = Generator.Generate(expression);
 
-            result.ShouldBe(@"ALTER TABLE [dbo].[TestTable1] ALTER COLUMN [TestColumn1] NVARCHAR(20) NOT NULL" + Environment.NewLine +
+            result.ShouldBe(@"ALTER TABLE [dbo].[TestTable1] ALTER COLUMN [TestColumn1] NVARCHAR(20) NOT NULL;" + Environment.NewLine +
                             "GO" + Environment.NewLine +
                             "IF EXISTS (SELECT * FROM fn_listextendedproperty(N'MS_Description', N'SCHEMA', N'dbo', N'TABLE', N'TestTable1', N'Column', N'TestColumn1' )) EXEC sys.sp_dropextendedproperty @name=N'MS_Description', @level0type = N'SCHEMA', @level0name = 'dbo', @level1type = N'Table', @level1name = 'TestTable1', @level2type = N'Column',  @level2name = 'TestColumn1';EXEC sys.sp_addextendedproperty @name = N'MS_Description', @value = N'TestColumn1Description', @level0type = N'SCHEMA', @level0name = 'dbo', @level1type = N'Table', @level1name = 'TestTable1', @level2type = N'Column',  @level2name = 'TestColumn1';" + Environment.NewLine +
-                            "IF EXISTS (SELECT * FROM fn_listextendedproperty(N'MS_AdditionalColumnDescriptionKey1', N'SCHEMA', N'dbo', N'TABLE', N'TestTable1', N'Column', N'TestColumn1' )) EXEC sys.sp_dropextendedproperty @name=N'MS_AdditionalColumnDescriptionKey1', @level0type = N'SCHEMA', @level0name = 'dbo', @level1type = N'Table', @level1name = 'TestTable1', @level2type = N'Column',  @level2name = 'TestColumn1';EXEC sys.sp_addextendedproperty @name = N'MS_AdditionalColumnDescriptionKey1', @value = N'TestColumn1Description', @level0type = N'SCHEMA', @level0name = 'dbo', @level1type = N'Table', @level1name = 'TestTable1', @level2type = N'Column',  @level2name = 'TestColumn1'" + Environment.NewLine);
+                            "IF EXISTS (SELECT * FROM fn_listextendedproperty(N'MS_AdditionalColumnDescriptionKey1', N'SCHEMA', N'dbo', N'TABLE', N'TestTable1', N'Column', N'TestColumn1' )) EXEC sys.sp_dropextendedproperty @name=N'MS_AdditionalColumnDescriptionKey1', @level0type = N'SCHEMA', @level0name = 'dbo', @level1type = N'Table', @level1name = 'TestTable1', @level2type = N'Column',  @level2name = 'TestColumn1';EXEC sys.sp_addextendedproperty @name = N'MS_AdditionalColumnDescriptionKey1', @value = N'TestColumn1Description', @level0type = N'SCHEMA', @level0name = 'dbo', @level1type = N'Table', @level1name = 'TestTable1', @level2type = N'Column',  @level2name = 'TestColumn1';");
         }
 
         [Test]
@@ -423,7 +407,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 
             var result = Generator.Generate(expression);
 
-            result.ShouldBe(@"ALTER TABLE [dbo].[TestTable1] ADD [TestColumn1] NVARCHAR(5) COLLATE " + GeneratorTestHelper.TestColumnCollationName + " NOT NULL");
+            result.ShouldBe(@"ALTER TABLE [dbo].[TestTable1] ADD [TestColumn1] NVARCHAR(5) COLLATE " + GeneratorTestHelper.TestColumnCollationName + " NOT NULL;");
         }
 
         [Test]
@@ -433,7 +417,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 
             var result = Generator.Generate(expression);
 
-            result.ShouldBe(@"ALTER TABLE [dbo].[TestTable1] ALTER COLUMN [TestColumn1] NVARCHAR(20) COLLATE " + GeneratorTestHelper.TestColumnCollationName + " NOT NULL");
+            result.ShouldBe(@"ALTER TABLE [dbo].[TestTable1] ALTER COLUMN [TestColumn1] NVARCHAR(20) COLLATE " + GeneratorTestHelper.TestColumnCollationName + " NOT NULL;");
         }
 
         [Test]
@@ -450,7 +434,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             };
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("UPDATE [dbo].[TestTable1] SET [Guid] = NEWID() WHERE 1 = 1");
+            result.ShouldBe("UPDATE [dbo].[TestTable1] SET [Guid] = NEWID() WHERE 1 = 1;");
         }
 
         [Test]
@@ -467,7 +451,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             };
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("UPDATE [dbo].[TestTable1] SET [Guid] = NEWSEQUENTIALID() WHERE 1 = 1");
+            result.ShouldBe("UPDATE [dbo].[TestTable1] SET [Guid] = NEWSEQUENTIALID() WHERE 1 = 1;");
         }
 
         [Test]
@@ -484,7 +468,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             };
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("UPDATE [dbo].[TestTable1] SET [DateTime] = GETDATE() WHERE 1 = 1");
+            result.ShouldBe("UPDATE [dbo].[TestTable1] SET [DateTime] = GETDATE() WHERE 1 = 1;");
         }
 
         [Test]
@@ -501,7 +485,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             };
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("UPDATE [dbo].[TestTable1] SET [DateTime] = GETUTCDATE() WHERE 1 = 1");
+            result.ShouldBe("UPDATE [dbo].[TestTable1] SET [DateTime] = GETUTCDATE() WHERE 1 = 1;");
         }
     }
 }

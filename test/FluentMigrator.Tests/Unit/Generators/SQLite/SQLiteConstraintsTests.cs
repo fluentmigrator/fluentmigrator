@@ -100,7 +100,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             Generator.CompatibilityMode = compatibilityMode;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ADD CONSTRAINT \"PK_TestTable1_TestColumn1_TestColumn2\" PRIMARY KEY (\"TestColumn1\", \"TestColumn2\")");
+            result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ADD CONSTRAINT \"PK_TestTable1_TestColumn1_TestColumn2\" PRIMARY KEY (\"TestColumn1\", \"TestColumn2\");");
         }
 
         [Test]
@@ -110,7 +110,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
 
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD CONSTRAINT \"PK_TestTable1_TestColumn1_TestColumn2\" PRIMARY KEY (\"TestColumn1\", \"TestColumn2\")");
+            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD CONSTRAINT \"PK_TestTable1_TestColumn1_TestColumn2\" PRIMARY KEY (\"TestColumn1\", \"TestColumn2\");");
         }
 
         [Test]
@@ -120,7 +120,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.Constraint.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE INDEX \"TestSchema\".\"UC_TestTable1_TestColumn1_TestColumn2\" ON \"TestTable1\" (\"TestColumn1\" ASC, \"TestColumn2\" ASC)");
+            result.ShouldBe("CREATE UNIQUE INDEX \"TestSchema\".\"UC_TestTable1_TestColumn1_TestColumn2\" ON \"TestTable1\" (\"TestColumn1\" ASC, \"TestColumn2\" ASC);");
         }
 
         [Test]
@@ -129,7 +129,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetCreateMultiColumnUniqueConstraintExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE INDEX \"UC_TestTable1_TestColumn1_TestColumn2\" ON \"TestTable1\" (\"TestColumn1\" ASC, \"TestColumn2\" ASC)");
+            result.ShouldBe("CREATE UNIQUE INDEX \"UC_TestTable1_TestColumn1_TestColumn2\" ON \"TestTable1\" (\"TestColumn1\" ASC, \"TestColumn2\" ASC);");
         }
 
         [Test]
@@ -222,7 +222,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
 
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ADD CONSTRAINT \"TESTPRIMARYKEY\" PRIMARY KEY (\"TestColumn1\", \"TestColumn2\")");
+            result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ADD CONSTRAINT \"TESTPRIMARYKEY\" PRIMARY KEY (\"TestColumn1\", \"TestColumn2\");");
         }
 
         [Test]
@@ -232,7 +232,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
 
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD CONSTRAINT \"TESTPRIMARYKEY\" PRIMARY KEY (\"TestColumn1\", \"TestColumn2\")");
+            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD CONSTRAINT \"TESTPRIMARYKEY\" PRIMARY KEY (\"TestColumn1\", \"TestColumn2\");");
         }
 
         [Test]
@@ -242,7 +242,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.Constraint.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE INDEX \"TestSchema\".\"TESTUNIQUECONSTRAINT\" ON \"TestTable1\" (\"TestColumn1\" ASC, \"TestColumn2\" ASC)");
+            result.ShouldBe("CREATE UNIQUE INDEX \"TestSchema\".\"TESTUNIQUECONSTRAINT\" ON \"TestTable1\" (\"TestColumn1\" ASC, \"TestColumn2\" ASC);");
         }
 
         [Test]
@@ -251,7 +251,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetCreateNamedMultiColumnUniqueConstraintExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE INDEX \"TESTUNIQUECONSTRAINT\" ON \"TestTable1\" (\"TestColumn1\" ASC, \"TestColumn2\" ASC)");
+            result.ShouldBe("CREATE UNIQUE INDEX \"TESTUNIQUECONSTRAINT\" ON \"TestTable1\" (\"TestColumn1\" ASC, \"TestColumn2\" ASC);");
         }
 
         [Test]
@@ -262,7 +262,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
 
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ADD CONSTRAINT \"TESTPRIMARYKEY\" PRIMARY KEY (\"TestColumn1\")");
+            result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ADD CONSTRAINT \"TESTPRIMARYKEY\" PRIMARY KEY (\"TestColumn1\");");
         }
 
         [Test]
@@ -272,8 +272,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
 
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
-            
-            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD CONSTRAINT \"TESTPRIMARYKEY\" PRIMARY KEY (\"TestColumn1\")");
+
+            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD CONSTRAINT \"TESTPRIMARYKEY\" PRIMARY KEY (\"TestColumn1\");");
         }
 
         [Test]
@@ -283,7 +283,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.Constraint.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE INDEX \"TestSchema\".\"TESTUNIQUECONSTRAINT\" ON \"TestTable1\" (\"TestColumn1\" ASC)");
+            result.ShouldBe("CREATE UNIQUE INDEX \"TestSchema\".\"TESTUNIQUECONSTRAINT\" ON \"TestTable1\" (\"TestColumn1\" ASC);");
         }
 
         [Test]
@@ -292,7 +292,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetCreateNamedUniqueConstraintExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE INDEX \"TESTUNIQUECONSTRAINT\" ON \"TestTable1\" (\"TestColumn1\" ASC)");
+            result.ShouldBe("CREATE UNIQUE INDEX \"TESTUNIQUECONSTRAINT\" ON \"TestTable1\" (\"TestColumn1\" ASC);");
         }
 
         [Test]
@@ -303,7 +303,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
 
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ADD CONSTRAINT \"PK_TestTable1_TestColumn1\" PRIMARY KEY (\"TestColumn1\")");
+            result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ADD CONSTRAINT \"PK_TestTable1_TestColumn1\" PRIMARY KEY (\"TestColumn1\");");
         }
 
         [Test]
@@ -313,8 +313,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
 
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
-            
-            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD CONSTRAINT \"PK_TestTable1_TestColumn1\" PRIMARY KEY (\"TestColumn1\")");
+
+            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD CONSTRAINT \"PK_TestTable1_TestColumn1\" PRIMARY KEY (\"TestColumn1\");");
         }
 
         [Test]
@@ -324,7 +324,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.Constraint.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE INDEX \"TestSchema\".\"UC_TestTable1_TestColumn1\" ON \"TestTable1\" (\"TestColumn1\" ASC)");
+            result.ShouldBe("CREATE UNIQUE INDEX \"TestSchema\".\"UC_TestTable1_TestColumn1\" ON \"TestTable1\" (\"TestColumn1\" ASC);");
         }
 
         [Test]
@@ -333,7 +333,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetCreateUniqueConstraintExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE INDEX \"UC_TestTable1_TestColumn1\" ON \"TestTable1\" (\"TestColumn1\" ASC)");
+            result.ShouldBe("CREATE UNIQUE INDEX \"UC_TestTable1_TestColumn1\" ON \"TestTable1\" (\"TestColumn1\" ASC);");
         }
 
         [Test]
@@ -377,7 +377,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.Constraint.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DROP INDEX \"TestSchema\".\"TESTUNIQUECONSTRAINT\"");
+            result.ShouldBe("DROP INDEX \"TestSchema\".\"TESTUNIQUECONSTRAINT\";");
         }
 
         [Test]
@@ -386,7 +386,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetDeleteUniqueConstraintExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DROP INDEX \"TESTUNIQUECONSTRAINT\"");
+            result.ShouldBe("DROP INDEX \"TESTUNIQUECONSTRAINT\";");
         }
     }
 }
