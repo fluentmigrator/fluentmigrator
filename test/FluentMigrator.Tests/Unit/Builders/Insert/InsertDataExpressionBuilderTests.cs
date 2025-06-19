@@ -65,22 +65,83 @@ namespace FluentMigrator.Tests.Unit.Builders.Insert
         }
 
         [Test]
-        public void RowsGetPopulatedWhenRowWithDictionaryIsCalled()
+        public void RowsGetSetWhenRowsIsCalled()
         {
-            var values = new Dictionary<string, object>();
-            values["Data1"] = "Row1Data1";
-            values["Data2"] = "Row1Data2";
-
             var expression = new InsertDataExpression();
 
-            new InsertDataExpressionBuilder(expression).Row(values);
+            var builder = new InsertDataExpressionBuilder(expression);
+            builder
+                .Rows(
+                    new { Data1 = "Row1Data1", Data2 = "Row1Data2" },
+                    new { Data1 = "Row2Data1", Data2 = "Row2Data2" }
+                );
+
+            expression.Rows.Count.ShouldBe(2);
+
+            expression.Rows[0][0].Key.ShouldBe("Data1");
+            expression.Rows[0][0].Value.ShouldBe("Row1Data1");
+
+            expression.Rows[0][1].Key.ShouldBe("Data2");
+            expression.Rows[0][1].Value.ShouldBe("Row1Data2");
+
+            expression.Rows[1][0].Key.ShouldBe("Data1");
+            expression.Rows[1][0].Value.ShouldBe("Row2Data1");
+
+            expression.Rows[1][1].Key.ShouldBe("Data2");
+            expression.Rows[1][1].Value.ShouldBe("Row2Data2");
+        }
+
+        [Test]
+        public void RowsGetPopulatedWhenRowWithDictionaryIsCalled()
+        {
+            var expression = new InsertDataExpression();
+
+            new InsertDataExpressionBuilder(expression).Row(
+                new Dictionary<string, object>
+                {
+                    ["Data1"] = "Row1Data1",
+                    ["Data2"] = "Row1Data2"
+                });
 
             expression.Rows.Count.ShouldBe(1);
 
             expression.Rows[0][0].Key.ShouldBe("Data1");
             expression.Rows[0][0].Value.ShouldBe("Row1Data1");
+
             expression.Rows[0][1].Key.ShouldBe("Data2");
             expression.Rows[0][1].Value.ShouldBe("Row1Data2");
+        }
+
+        [Test]
+        public void RowsGetPopulatedWhenRowsWithDictionaryIsCalled()
+        {
+            var expression = new InsertDataExpression();
+
+            new InsertDataExpressionBuilder(expression).Rows(
+                new Dictionary<string, object>
+                {
+                    ["Data1"] = "Row1Data1",
+                    ["Data2"] = "Row1Data2"
+                },
+                new Dictionary<string, object>
+                {
+                    ["Data1"] = "Row2Data1",
+                    ["Data2"] = "Row2Data2"
+                });
+
+            expression.Rows.Count.ShouldBe(2);
+
+            expression.Rows[0][0].Key.ShouldBe("Data1");
+            expression.Rows[0][0].Value.ShouldBe("Row1Data1");
+
+            expression.Rows[0][1].Key.ShouldBe("Data2");
+            expression.Rows[0][1].Value.ShouldBe("Row1Data2");
+
+            expression.Rows[1][0].Key.ShouldBe("Data1");
+            expression.Rows[1][0].Value.ShouldBe("Row2Data1");
+
+            expression.Rows[1][1].Key.ShouldBe("Data2");
+            expression.Rows[1][1].Value.ShouldBe("Row2Data2");
         }
 
         [Test]

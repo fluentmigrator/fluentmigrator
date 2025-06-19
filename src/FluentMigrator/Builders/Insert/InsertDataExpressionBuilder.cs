@@ -18,6 +18,7 @@
 
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
@@ -45,21 +46,35 @@ namespace FluentMigrator.Builders.Insert
         public IDictionary<string, object> AdditionalFeatures => _expression.AdditionalFeatures;
 
         /// <inheritdoc />
-        public IInsertDataSyntax Row(object dataAsAnonymousType)
+        public IInsertDataSyntax Row(object recordAsAnonymousType)
         {
-            IDictionary<string, object> data = ExtractData(dataAsAnonymousType);
-
-            return Row(data);
+            return Rows(recordAsAnonymousType);
         }
 
         /// <inheritdoc />
-        public IInsertDataSyntax Row(IDictionary<string, object> data)
+        public IInsertDataSyntax Rows(params object[] recordsAsAnonymousTypes)
         {
-            var dataDefinition = new InsertionDataDefinition();
+            var records = recordsAsAnonymousTypes.Select(ExtractData).ToArray();
+            return Rows(records);
+        }
 
-            dataDefinition.AddRange(data);
+        /// <inheritdoc />
+        public IInsertDataSyntax Row(IDictionary<string, object> record)
+        {
+            return Rows(record);
+        }
 
-            _expression.Rows.Add(dataDefinition);
+        /// <inheritdoc />
+        public IInsertDataSyntax Rows(params IDictionary<string, object>[] records)
+        {
+            var dataDefinitions = records.Select(record =>
+            {
+                var dataDefinition = new InsertionDataDefinition();
+                dataDefinition.AddRange(record);
+                return dataDefinition;
+            });
+
+            _expression.Rows.AddRange(dataDefinitions);
 
             return this;
         }
