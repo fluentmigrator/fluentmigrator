@@ -10,7 +10,9 @@
 pr:
   branches:
     include:
-    - main
+    - '*'
+    exclude:
+    - archive*
 
 pool:
   vmImage: 'windows-latest'
