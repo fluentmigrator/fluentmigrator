@@ -20,7 +20,7 @@ using System.Data;
 
 namespace FluentMigrator.Runner.Generators.SqlServer
 {
-    internal class SqlServer2008TypeMap : SqlServer2005TypeMap
+    public class SqlServer2008TypeMap : SqlServer2005TypeMap
     {
         protected override void SetupSqlServerTypeMaps()
         {
