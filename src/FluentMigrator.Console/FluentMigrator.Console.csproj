@@ -22,11 +22,11 @@
     <PackageReference Include="Npgsql" Version="8.0.7" />
     <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="10.3.3" />
     <PackageReference Include="FSharp.Core" Version="9.0.202" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.4" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.6" />
     <PackageReference Include="Oracle.ManagedDataAccess" Version="23.8.0" />
     <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.11" />
     <PackageReference Include="MySqlConnector" Version="2.4.0" />
-    <PackageReference Include="Snowflake.Data" Version="4.4.1" />
+    <PackageReference Include="Snowflake.Data" Version="4.6.0" />
   </ItemGroup>
   <ItemGroup Condition=" '$(Platform)' == 'x86' ">
     <PackageReference Include="Oracle.DataAccess.x86.4" Version="4.112.3" />
