@@ -11,7 +11,7 @@
     <Compile Include="..\FluentMigrator.Runner.Core\DirtyAssemblyResolveHelper.cs" Link="DirtyAssemblyResolveHelper.cs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="14.0.0" />
+    <PackageReference Include="AutoMapper" Version="15.0.0" />
     <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="10.3.3" />
     <PackageReference Include="FSharp.Core" Version="9.0.202" />
     <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.1.1" />
