@@ -30,18 +30,35 @@ namespace FluentMigrator.Builders.Insert
         /// <summary>
         /// Specify the data to insert
         /// </summary>
-        /// <param name="dataAsAnonymousType">An anonymous object that is used to insert data</param>
+        /// <param name="recordAsAnonymousType">An anonymous object that is used to insert data</param>
         /// <remarks>
         /// The properties are the column names and their values are the row values.
         /// </remarks>
         /// <returns>The next step</returns>
-        IInsertDataSyntax Row(object dataAsAnonymousType);
+        IInsertDataSyntax Row(object recordAsAnonymousType);
 
         /// <summary>
         /// Specify the data to insert
         /// </summary>
-        /// <param name="data">The dictionary containing column name/value combinations</param>
+        /// <param name="recordsAsAnonymousTypes">An array of anonymous objects that are used to insert data</param>
+        /// <remarks>
+        /// The properties are the column names and their values are the row values.
+        /// </remarks>
         /// <returns>The next step</returns>
-        IInsertDataSyntax Row(IDictionary<string, object> data);
+        IInsertDataSyntax Rows(params object[] recordsAsAnonymousTypes);
+
+        /// <summary>
+        /// Specify the data to insert
+        /// </summary>
+        /// <param name="record">The dictionary containing column name/value combinations</param>
+        /// <returns>The next step</returns>
+        IInsertDataSyntax Row(IDictionary<string, object> record);
+
+        /// <summary>
+        /// Specify the data to insert
+        /// </summary>
+        /// <param name="records">An array of dictionaries each containing column name/value combinations</param>
+        /// <returns>The next step</returns>
+        IInsertDataSyntax Rows(params IDictionary<string, object>[] records);
     }
 }
