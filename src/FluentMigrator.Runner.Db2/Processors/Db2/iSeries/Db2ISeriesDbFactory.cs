@@ -24,7 +24,7 @@ namespace FluentMigrator.Runner.Processors.DB2.iSeries
     {
         private static readonly TestEntry[] _testEntries =
         {
-            new TestEntry("IBM.Data.DB2.iSeries", "IBM.Data.DB2.iSeries.iDB2Factory"),
+            new TestEntry("IBM.Data.DB2.iSeries", "IBM.Data.DB2.iSeries.iDB2Factory", () => Type.GetType("IBM.Data.DB2.iSeries.iDB2Factory, IBM.Data.DB2.iSeries")),
         };
 
         [Obsolete]

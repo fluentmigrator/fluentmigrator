@@ -27,6 +27,9 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Initialization
 {
+#if NET
+    [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This type uses AppDomain to load assemblies, which may not be preserved in trimmed applications.")]
+#endif
     public class AssemblySourceConventionSetAccessor : IConventionSetAccessor
     {
         private readonly Lazy<IConventionSet> _lazyValue;

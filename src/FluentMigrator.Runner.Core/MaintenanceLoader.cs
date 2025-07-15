@@ -39,14 +39,17 @@ namespace FluentMigrator.Runner
             [NotNull] IAssemblySource assemblySource,
             [NotNull] IOptions<RunnerOptions> options,
             [NotNull] IMigrationRunnerConventions conventions,
-            [NotNull] IServiceProvider serviceProvider)
+            [NotNull] IServiceProvider serviceProvider,
+            [CanBeNull] ITypeSource typeSource = null)
         {
-            var tagsList = options.Value.Tags ?? new string[0];
+            var tagsList = options.Value.Tags ?? Array.Empty<string>();
 
-            var types = assemblySource.Assemblies.SelectMany(a => a.ExportedTypes).ToList();
+            typeSource ??= new AssemblyTypeSource(assemblySource);
 
+#pragma warning disable IL2026
+#pragma warning disable IL2072
             _maintenance = (
-                from type in types
+                from type in typeSource.GetTypes()
                 let stage = conventions.GetMaintenanceStage(type)
                 where stage != null
                 where conventions.HasRequestedTags(type, tagsList, options.Value.IncludeUntaggedMaintenances)
@@ -56,6 +59,8 @@ namespace FluentMigrator.Runner
                 g => g.Key,
                 g => (IList<IMigration>)g.OrderBy(m => m.GetType().Name).ToArray()
             );
+#pragma warning disable IL2072
+#pragma warning restore IL2026
         }
 
         public IList<IMigrationInfo> LoadMaintenance(MigrationStage stage)

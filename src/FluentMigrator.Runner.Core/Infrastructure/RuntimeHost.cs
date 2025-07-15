@@ -26,6 +26,9 @@ using FluentMigrator.Runner.Infrastructure.Hosts;
 
 namespace FluentMigrator.Runner.Infrastructure
 {
+#if NET
+    [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This type uses the AppDomain to load assemblies, which may not be preserved in trimmed applications.")]
+#endif
     public static class RuntimeHost
     {
         private static readonly string[] _noNames = new string[0];

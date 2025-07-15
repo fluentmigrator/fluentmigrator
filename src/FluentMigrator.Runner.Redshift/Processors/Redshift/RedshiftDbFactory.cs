@@ -24,7 +24,7 @@ namespace FluentMigrator.Runner.Processors.Redshift
     {
         private static readonly TestEntry[] _entries =
         {
-            new TestEntry("Npgsql", "Npgsql.NpgsqlFactory"),
+            new TestEntry("Npgsql", "Npgsql.NpgsqlFactory", () => Type.GetType("Npgsql.NpgsqlFactory, Npgsql")),
         };
 
         [Obsolete]

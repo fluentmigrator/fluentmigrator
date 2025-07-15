@@ -30,6 +30,9 @@ namespace FluentMigrator.Builders.Update
         /// </summary>
         /// <param name="dataAsAnonymousType">The columns and values to be used set</param>
         /// <returns>The next step</returns>
+#if NET
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("The properties of the anonymous type cannot be statically analyzed.")]
+#endif
         IUpdateWhereSyntax Set(object dataAsAnonymousType);
     }
 }

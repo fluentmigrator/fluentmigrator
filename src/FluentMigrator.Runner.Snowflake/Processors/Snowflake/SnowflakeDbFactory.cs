@@ -24,7 +24,7 @@ namespace FluentMigrator.Runner.Processors.Snowflake
     {
         private static readonly TestEntry[] _entries =
         {
-            new TestEntry("Snowflake.Data", "Snowflake.Data.Client.SnowflakeDbFactory"),
+            new TestEntry("Snowflake.Data", "Snowflake.Data.Client.SnowflakeDbFactory", () => Type.GetType("Snowflake.Data.Client.SnowflakeDbFactory, Snowflake.Data.Client"))
         };
 
         public SnowflakeDbFactory(IServiceProvider serviceProvider)

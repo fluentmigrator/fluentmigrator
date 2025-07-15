@@ -23,6 +23,9 @@ using JetBrains.Annotations;
 
 namespace FluentMigrator.Runner.Initialization
 {
+#if NET
+    [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This type uses gets the exported types from assemblies, which may not be preserved in trimmed applications.")]
+#endif
     public class AssemblySourceItem<T> : ITypeSourceItem<T>
         where T : class
     {

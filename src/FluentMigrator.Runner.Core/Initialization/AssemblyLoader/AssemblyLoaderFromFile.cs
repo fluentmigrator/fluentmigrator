@@ -23,6 +23,9 @@ using FluentMigrator.Runner.Infrastructure;
 
 namespace FluentMigrator.Runner.Initialization.AssemblyLoader
 {
+#if NET
+    [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This type uses AppDomain to load assemblies, which may not be preserved in trimmed applications.")]
+#endif
     public class AssemblyLoaderFromFile : IAssemblyLoader
     {
         private readonly string _name;

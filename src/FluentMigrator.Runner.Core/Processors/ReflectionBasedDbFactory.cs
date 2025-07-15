@@ -37,7 +37,7 @@ namespace FluentMigrator.Runner.Processors
 
         [Obsolete]
         public ReflectionBasedDbFactory(string assemblyName, string dbProviderFactoryTypeName)
-            : this(new TestEntry(assemblyName, dbProviderFactoryTypeName))
+            : this(new TestEntry(assemblyName, dbProviderFactoryTypeName, () => Type.GetType($"{dbProviderFactoryTypeName}, {assemblyName}")))
         {
         }
 
@@ -100,6 +100,24 @@ namespace FluentMigrator.Runner.Processors
         {
             var entriesCollection = entries.ToList();
 
+            foreach (var item in entriesCollection)
+            {
+                if (TryCreateFromPreloadedType(exceptions, item, out factory))
+                {
+                    return true;
+                }
+            }
+
+#if NET
+            if (!System.Runtime.CompilerServices.RuntimeFeature.IsDynamicCodeSupported)
+            {
+                // Dynamic code is not supported, so we cannot use reflection to load types.
+                // This is a limitation of the current environment (e.g., AOT compilation).
+                factory = null;
+                return false;
+            }
+#endif
+
             foreach (var entry in entriesCollection)
             {
                 if (TryCreateFromCurrentDomain(entry, exceptions, out factory))
@@ -136,6 +154,44 @@ namespace FluentMigrator.Runner.Processors
             return false;
         }
 
+        protected static bool TryCreateFromPreloadedType(
+            ICollection<Exception> exceptions,
+            TestEntry item,
+            out DbProviderFactory factory)
+        {
+            var type = item.TypeFactory?.Invoke();
+
+            if (type == null)
+            {
+                factory = null;
+                return false;
+            }
+
+            try
+            {
+#pragma warning disable IL2072 // The constructor has the attribute DynamicallyAccessedMembersAttribute
+                if (TryGetInstance(type, out factory))
+                {
+                    return true;
+                }
+
+                factory = (DbProviderFactory) Activator.CreateInstance(type);
+                return true;
+#pragma warning restore IL2072
+            }
+            catch (Exception ex)
+            {
+                // Ignore, check if we could load the assembly
+                exceptions.Add(new Exception($"Failed to create instance of {item.DBProviderFactoryTypeName} from {item.AssemblyName}", ex));
+            }
+
+            factory = null;
+            return false;
+        }
+
+#if NET
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This method uses reflection to load DbProviderFactory types, which may not be preserved in trimmed applications.")]
+#endif
         protected static bool TryCreateFromAppDomainPaths(
             [NotNull] TestEntry entry,
             [NotNull, ItemNotNull] ICollection<Exception> exceptions,
@@ -165,6 +221,9 @@ namespace FluentMigrator.Runner.Processors
             return false;
         }
 
+#if NET
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This method uses reflection to load DbProviderFactory types, which may not be preserved in trimmed applications.")]
+#endif
         [Obsolete]
         protected static bool TryCreateFactoryFromRuntimeHost(
             [NotNull] TestEntry entry,
@@ -174,6 +233,9 @@ namespace FluentMigrator.Runner.Processors
             return TryCreateFactoryFromRuntimeHost(entry, exceptions, serviceProvider: null, out factory);
         }
 
+#if NET
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This method uses reflection to load DbProviderFactory types, which may not be preserved in trimmed applications.")]
+#endif
         protected static bool TryCreateFactoryFromRuntimeHost(
             [NotNull] TestEntry entry,
             [NotNull, ItemNotNull] ICollection<Exception> exceptions,
@@ -198,6 +260,9 @@ namespace FluentMigrator.Runner.Processors
             return TryCreateFromCurrentDomain(entry, exceptions, out factory);
         }
 
+#if NET
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This method uses reflection to load DbProviderFactory types, which may not be preserved in trimmed applications.")]
+#endif
         protected static bool TryLoadAssemblyFromAppDomainDirectories(
             [NotNull] string assemblyName,
             [NotNull, ItemNotNull] ICollection<Exception> exceptions,
@@ -210,6 +275,9 @@ namespace FluentMigrator.Runner.Processors
                 out assembly);
         }
 
+#if NET
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This method uses reflection to load DbProviderFactory types, which may not be preserved in trimmed applications.")]
+#endif
         protected static bool TryLoadAssemblyFromDirectories(
             [NotNull, ItemNotNull] IEnumerable<string> directories,
             [NotNull] string assemblyName,
@@ -241,6 +309,9 @@ namespace FluentMigrator.Runner.Processors
             return false;
         }
 
+#if NET
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This method uses reflection to load DbProviderFactory types, which may not be preserved in trimmed applications.")]
+#endif
         private static bool TryCreateFromGac(
             [NotNull] TestEntry entry,
             [NotNull, ItemNotNull] ICollection<Exception> exceptions,
@@ -259,6 +330,7 @@ namespace FluentMigrator.Runner.Processors
             {
                 var assembly = Assembly.Load(asmName);
                 var type = assembly.GetType(entry.DBProviderFactoryTypeName, true);
+
                 if (TryGetInstance(type, out factory))
                 {
                     return true;
@@ -275,6 +347,9 @@ namespace FluentMigrator.Runner.Processors
             }
         }
 
+#if NET
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This method uses reflection to load DbProviderFactory types, which may not be preserved in trimmed applications.")]
+#endif
         private static bool TryCreateFromCurrentDomain(
             [NotNull] TestEntry entry,
             [NotNull, ItemNotNull] ICollection<Exception> exceptions,
@@ -335,9 +410,18 @@ namespace FluentMigrator.Runner.Processors
         }
 
         private static bool TryGetInstance(
-            [NotNull] Type factoryType,
+#if NET
+            [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicFields | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)]
+#endif
+            [CanBeNull] Type factoryType,
             out DbProviderFactory factory)
         {
+            if (factoryType == null)
+            {
+                factory = null;
+                return false;
+            }
+
             var instanceField = factoryType.GetField(
                 "Instance",
                 BindingFlags.Static | BindingFlags.Public | BindingFlags.GetField);
@@ -360,7 +444,7 @@ namespace FluentMigrator.Runner.Processors
         }
 
         private static bool TryCastInstance(
-            [NotNull] object value,
+            [CanBeNull] object value,
             out DbProviderFactory factory)
         {
             factory = value as DbProviderFactory;
@@ -390,15 +474,21 @@ namespace FluentMigrator.Runner.Processors
                 yield return assemblyDirectory;
             }
         }
+#if NET
+        [return: System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicFields | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)]
+#endif
+        protected delegate Type GetTypeDelegate();
 
         protected class TestEntry
         {
             public TestEntry(
                 [NotNull] string assemblyName,
-                [NotNull] string dbProviderFactoryTypeName)
+                [NotNull] string dbProviderFactoryTypeName,
+                [CanBeNull] GetTypeDelegate typeFactory)
             {
                 AssemblyName = assemblyName;
                 DBProviderFactoryTypeName = dbProviderFactoryTypeName;
+                TypeFactory = typeFactory;
             }
 
             [NotNull]
@@ -406,6 +496,9 @@ namespace FluentMigrator.Runner.Processors
 
             [NotNull]
             public string DBProviderFactoryTypeName { get; }
+
+            [CanBeNull]
+            public GetTypeDelegate TypeFactory { get; }
         }
     }
 }

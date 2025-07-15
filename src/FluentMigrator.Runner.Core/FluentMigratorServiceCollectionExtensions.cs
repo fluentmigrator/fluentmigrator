@@ -50,7 +50,41 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="services">The <see cref="IServiceCollection" /> to add services to.</param>
         /// <returns>The updated service collection</returns>
         [NotNull]
+#if NET
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This method uses AppDomain to load assemblies, which may not be preserved in trimmed applications.")]
+#endif
         public static IServiceCollection AddFluentMigratorCore(
+            [NotNull] this IServiceCollection services)
+        {
+            services
+                // The default assembly loader factory
+                .TryAddSingleton<AssemblyLoaderFactory>();
+
+            services
+                // Defines the assemblies that are used to find migrations, profiles, maintenance code, etc...
+                .TryAddSingleton<IAssemblySource, AssemblySource>();
+
+            services
+                // Provides the types out of the assemblies
+                .TryAddSingleton<ITypeSource, AssemblyTypeSource>();
+
+            services
+                // Assembly loader engines
+                .AddSingleton<IAssemblyLoadEngine, AssemblyNameLoadEngine>()
+                .AddSingleton<IAssemblyLoadEngine, AssemblyFileLoadEngine>();
+
+            AddFluentMigratorCoreWithoutAssemblyLoader(services);
+
+            return services;
+        }
+
+        /// <summary>
+        /// Adds migration runner (except the DB processor specific) services to the specified <see cref="IServiceCollection"/>.
+        /// </summary>
+        /// <param name="services">The <see cref="IServiceCollection" /> to add services to.</param>
+        /// <returns>The updated service collection</returns>
+        [NotNull]
+        public static IServiceCollection AddFluentMigratorCoreWithoutAssemblyLoader(
             [NotNull] this IServiceCollection services)
         {
             if (services == null)
@@ -62,29 +96,26 @@ namespace Microsoft.Extensions.DependencyInjection
 
                 // Add logging support
                 .AddLogging()
-                .AddScoped<ILogger>(provider => NullLogger.Instance)
-
-                // The default assembly loader factory
-                .TryAddSingleton<AssemblyLoaderFactory>();
+                .AddScoped<ILogger>(provider => NullLogger.Instance);
 
             services
-                // Assembly loader engines
-                .AddSingleton<IAssemblyLoadEngine, AssemblyNameLoadEngine>()
-                .AddSingleton<IAssemblyLoadEngine, AssemblyFileLoadEngine>()
+                .TryAddSingleton<IAssemblySource, EmptyAssemblySource>();
 
-                // Defines the assemblies that are used to find migrations, profiles, maintenance code, etc...
-                .TryAddSingleton<IAssemblySource, AssemblySource>();
-
+#pragma warning disable IL2026
             services
                 // Configure the loader for migrations that should be executed during maintenance steps
                 .TryAddSingleton<IMaintenanceLoader, MaintenanceLoader>();
+#pragma warning restore IL2026
 
             services
                 // Add the default embedded resource provider
-                .AddSingleton<IEmbeddedResourceProvider>(sp => new DefaultEmbeddedResourceProvider(sp.GetRequiredService<IAssemblySource>().Assemblies))
+                .AddSingleton<IEmbeddedResourceProvider>(sp => new DefaultEmbeddedResourceProvider(sp.GetRequiredService<IAssemblySource>().Assemblies));
 
-                // Configure the runner conventions
+                // Configure the runner
+#pragma warning disable IL2026
+            services
                 .TryAddSingleton<IMigrationRunnerConventionsAccessor, AssemblySourceMigrationRunnerConventionsAccessor>();
+#pragma warning restore IL2026
 
             services
                 .TryAddSingleton(sp => sp.GetRequiredService<IMigrationRunnerConventionsAccessor>().MigrationRunnerConventions);
@@ -93,15 +124,17 @@ namespace Microsoft.Extensions.DependencyInjection
                 // The IStopWatch implementation used to show query timing
                 .TryAddSingleton<IStopWatch, StopWatch>();
 
+#pragma warning disable 618
+#pragma warning disable IL2026
             services
                 // Source for migrations
-#pragma warning disable 618
                 .TryAddScoped<IMigrationSource, MigrationSource>();
 
             services
                 .TryAddScoped(
                     sp => sp.GetRequiredService<IMigrationSource>() as IFilteringMigrationSource
                      ?? ActivatorUtilities.CreateInstance<MigrationSource>(sp));
+#pragma warning restore IL2026
 #pragma warning restore 618
 
             services
@@ -110,7 +143,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services
                 // Configure the accessor for the convention set
-                .TryAddScoped<IConventionSetAccessor, AssemblySourceConventionSetAccessor>();
+                .TryAddScoped<IConventionSetAccessor, TypeSourceConventionSetAccessor>();
 
             services
                 // The default set of conventions to be applied to migration expressions

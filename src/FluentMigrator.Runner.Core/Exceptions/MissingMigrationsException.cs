@@ -33,6 +33,9 @@ namespace FluentMigrator.Runner.Exceptions
         {
         }
 
+#if NET
+        [Obsolete("Formatter-based serialization is obsolete")]
+#endif
         public MissingMigrationsException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }

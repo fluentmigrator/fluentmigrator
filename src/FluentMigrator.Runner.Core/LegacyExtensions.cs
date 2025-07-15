@@ -43,6 +43,7 @@ namespace FluentMigrator.Runner
         /// Gets the name for a given migration generator instance
         /// </summary>
         /// <param name="generator">The migration generator instance to get its name for</param>
+        /// <param name="logger">The logger to log a warning if the ProcessorId is not set</param>
         /// <returns>The name of the migration generator</returns>
         [NotNull]
         public static string GetName([NotNull] this IMigrationGenerator generator, ILogger logger)
