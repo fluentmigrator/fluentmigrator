@@ -11,8 +11,6 @@ pr:
   branches:
     include:
     - '*'
-    exclude:
-    - archive*
 
 pool:
   vmImage: 'windows-latest'
