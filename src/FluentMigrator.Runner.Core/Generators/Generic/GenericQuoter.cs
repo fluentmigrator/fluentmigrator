@@ -56,6 +56,8 @@ namespace FluentMigrator.Runner.Generators.Generic
                     return FormatEnum(v);
                 case decimal v:
                     return FormatDecimal(v);
+                case int v:
+                    return FormatInteger(v);
                 case RawSql v:
                     return v.Value;
                 case byte[] v:
@@ -82,6 +84,11 @@ namespace FluentMigrator.Runner.Generators.Generic
         }
 
         private string FormatDecimal(decimal value)
+        {
+            return value.ToString(CultureInfo.InvariantCulture);
+        }
+
+        private string FormatInteger(int value)
         {
             return value.ToString(CultureInfo.InvariantCulture);
         }
