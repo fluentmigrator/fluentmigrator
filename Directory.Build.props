@@ -1,5 +1,6 @@
 <Project>
  <PropertyGroup>
+   <DotNetTargetFrameworksInActiveSupportPhase>net8.0;net9.0</DotNetTargetFrameworksInActiveSupportPhase>
    <Deterministic>true</Deterministic>
  </PropertyGroup>
 </Project>
