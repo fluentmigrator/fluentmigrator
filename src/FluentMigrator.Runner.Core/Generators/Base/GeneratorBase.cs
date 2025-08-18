@@ -77,16 +77,10 @@ namespace FluentMigrator.Runner.Generators.Base
             return string.Empty;
         }
 
-        protected IColumn Column
-        {
-            get { return _column; }
-        }
+        protected IColumn Column => _column;
 
         public IQuoter Quoter => _quoter;
 
-        protected IDescriptionGenerator DescriptionGenerator
-        {
-            get { return _descriptionGenerator; }
-        }
+        protected IDescriptionGenerator DescriptionGenerator => _descriptionGenerator;
     }
 }

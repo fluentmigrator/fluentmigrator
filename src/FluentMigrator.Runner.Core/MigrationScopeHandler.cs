@@ -60,9 +60,6 @@ namespace FluentMigrator.Runner
             if (HasActiveMigrationScope) throw new InvalidOperationException("The runner is already in an active migration scope.");
         }
 
-        private bool HasActiveMigrationScope
-        {
-            get { return CurrentScope != null && CurrentScope.IsActive; }
-        }
+        private bool HasActiveMigrationScope => CurrentScope != null && CurrentScope.IsActive;
     }
 }

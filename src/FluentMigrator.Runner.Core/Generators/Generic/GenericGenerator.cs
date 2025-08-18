@@ -28,31 +28,31 @@ namespace FluentMigrator.Runner.Generators.Generic
 
         public CompatibilityMode CompatibilityMode { get; set; }
 
-        public virtual string CreateTable { get { return "CREATE TABLE {0} ({1})"; } }
-        public virtual string DropTable { get { return "DROP TABLE {0}"; } }
-        public virtual string DropTableIfExists { get { return "DROP TABLE IF EXISTS {0}"; } }
+        public virtual string CreateTable => "CREATE TABLE {0} ({1})";
+        public virtual string DropTable => "DROP TABLE {0}";
+        public virtual string DropTableIfExists => "DROP TABLE IF EXISTS {0}";
 
-        public virtual string AddColumn { get { return "ALTER TABLE {0} ADD COLUMN {1}"; } }
-        public virtual string DropColumn { get { return "ALTER TABLE {0} DROP COLUMN {1}"; } }
-        public virtual string AlterColumn { get { return "ALTER TABLE {0} ALTER COLUMN {1}"; } }
-        public virtual string RenameColumn { get { return "ALTER TABLE {0} RENAME COLUMN {1} TO {2}"; } }
+        public virtual string AddColumn => "ALTER TABLE {0} ADD COLUMN {1}";
+        public virtual string DropColumn => "ALTER TABLE {0} DROP COLUMN {1}";
+        public virtual string AlterColumn => "ALTER TABLE {0} ALTER COLUMN {1}";
+        public virtual string RenameColumn => "ALTER TABLE {0} RENAME COLUMN {1} TO {2}";
 
-        public virtual string RenameTable { get { return "RENAME TABLE {0} TO {1}"; } }
+        public virtual string RenameTable => "RENAME TABLE {0} TO {1}";
 
-        public virtual string CreateSchema { get { return "CREATE SCHEMA {0}"; } }
-        public virtual string AlterSchema { get { return "ALTER SCHEMA {0} TRANSFER {1}"; } }
-        public virtual string DropSchema { get { return "DROP SCHEMA {0}"; } }
+        public virtual string CreateSchema => "CREATE SCHEMA {0}";
+        public virtual string AlterSchema => "ALTER SCHEMA {0} TRANSFER {1}";
+        public virtual string DropSchema => "DROP SCHEMA {0}";
 
-        public virtual string CreateIndex { get { return "CREATE {0}{1}INDEX {2} ON {3} ({4})"; } }
-        public virtual string DropIndex { get { return "DROP INDEX {0}"; } }
+        public virtual string CreateIndex => "CREATE {0}{1}INDEX {2} ON {3} ({4})";
+        public virtual string DropIndex => "DROP INDEX {0}";
 
-        public virtual string InsertData { get { return "INSERT INTO {0} ({1}) VALUES ({2})"; } }
-        public virtual string UpdateData { get { return "UPDATE {0} SET {1} WHERE {2}"; } }
-        public virtual string DeleteData { get { return "DELETE FROM {0} WHERE {1}"; } }
+        public virtual string InsertData => "INSERT INTO {0} ({1}) VALUES ({2})";
+        public virtual string UpdateData => "UPDATE {0} SET {1} WHERE {2}";
+        public virtual string DeleteData => "DELETE FROM {0} WHERE {1}";
 
-        public virtual string CreateConstraint { get { return "ALTER TABLE {0} ADD CONSTRAINT {1} {2} ({3})"; } }
-        public virtual string DeleteConstraint { get { return "ALTER TABLE {0} DROP CONSTRAINT {1}"; } }
-        public virtual string CreateForeignKeyConstraint { get { return "ALTER TABLE {0} ADD {1}"; } }
+        public virtual string CreateConstraint => "ALTER TABLE {0} ADD CONSTRAINT {1} {2} ({3})";
+        public virtual string DeleteConstraint => "ALTER TABLE {0} DROP CONSTRAINT {1}";
+        public virtual string CreateForeignKeyConstraint => "ALTER TABLE {0} ADD {1}";
 
         [StringFormatMethod("format")]
         protected string FormatStatement(string format, params object[] args)

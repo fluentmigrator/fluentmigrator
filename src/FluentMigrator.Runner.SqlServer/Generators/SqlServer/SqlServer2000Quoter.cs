@@ -22,13 +22,13 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 {
     public class SqlServer2000Quoter : GenericQuoter
     {
-        public override string OpenQuote { get { return "["; } }
+        public override string OpenQuote => "[";
 
-        public override string CloseQuote { get { return "]"; } }
+        public override string CloseQuote => "]";
 
-        public override string CloseQuoteEscapeString { get { return "]]"; } }
+        public override string CloseQuoteEscapeString => "]]";
 
-        public override string OpenQuoteEscapeString { get { return string.Empty; } }
+        public override string OpenQuoteEscapeString => string.Empty;
 
         public override string QuoteSchemaName(string schemaName)
         {
