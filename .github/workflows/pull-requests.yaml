@@ -4,7 +4,7 @@ on:
     - '*'
 env:
   solution: 'FluentMigrator.sln'
-  buildPlatform: Any CPU
+  buildPlatform: 'Any CPU'
   buildConfiguration: Release
 jobs:
   build:
@@ -34,14 +34,11 @@ jobs:
         updateAssemblyInfo: false
     - run: nuget restore ${{ env.solution }}
     - run: msbuild '${{ env.solution }}' /p:configuration='${{ env.buildConfiguration }}' /p:platform='${{ env.buildPlatform }}' /p:Version="${{ github.run_number }}"
-    - run: |
-        $vsTestConsoleExe = "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\Extensions\TestPlatform\vstest.console.exe"
-        $targetTestDll = ""
-        $testRunSettings = "/Settings:`"`" "
-        #Note that the `" is an escape character to quote strings, and the `& is needed to start the command
-        $command = "`& `"$vsTestConsoleExe`" `"$targetTestDll`" $testRunSettings $parameters "
-        Write-Host "$command"
-        Invoke-Expression $command
+    - name: Setup VSTest Path
+      uses: darenm/Setup-VSTest@v1.3
+  
+    - name: VSTest
+      run: vstest.console.exe .\test\FluentMigrator.Tests\bin\${{ env.buildConfiguration }}\FluentMigrator.Tests.dll
       shell: powershell
     - uses: actions/upload-artifact@v4
       with:
