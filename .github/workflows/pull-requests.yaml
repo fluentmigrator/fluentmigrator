@@ -6,6 +6,7 @@ env:
   solution: 'FluentMigrator.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: Release
+  FM_TestConnectionStrings__SqlServer2016__ContainerEnabled: true
 jobs:
   build:
     runs-on: windows-latest
