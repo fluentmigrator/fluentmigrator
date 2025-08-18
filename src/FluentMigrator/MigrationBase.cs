@@ -88,42 +88,27 @@ namespace FluentMigrator
         /// <summary>
         /// Gets the starting point for alterations
         /// </summary>
-        public IAlterExpressionRoot Alter
-        {
-            get { return new AlterExpressionRoot(Context); }
-        }
+        public IAlterExpressionRoot Alter => new AlterExpressionRoot(Context);
 
         /// <summary>
         /// Gets the starting point for creating database objects
         /// </summary>
-        public ICreateExpressionRoot Create
-        {
-            get { return new CreateExpressionRoot(Context); }
-        }
+        public ICreateExpressionRoot Create => new CreateExpressionRoot(Context);
 
         /// <summary>
         /// Gets the starting point for renaming database objects
         /// </summary>
-        public IRenameExpressionRoot Rename
-        {
-            get { return new RenameExpressionRoot(Context); }
-        }
+        public IRenameExpressionRoot Rename => new RenameExpressionRoot(Context);
 
         /// <summary>
         /// Gets the starting point for data insertion
         /// </summary>
-        public IInsertExpressionRoot Insert
-        {
-            get { return new InsertExpressionRoot(Context); }
-        }
+        public IInsertExpressionRoot Insert => new InsertExpressionRoot(Context);
 
         /// <summary>
         /// Gets the starting point for schema-rooted expressions
         /// </summary>
-        public ISchemaExpressionRoot Schema
-        {
-            get { return new SchemaExpressionRoot(Context); }
-        }
+        public ISchemaExpressionRoot Schema => new SchemaExpressionRoot(Context);
 
         /// <summary>
         /// Gets the starting point for database specific expressions

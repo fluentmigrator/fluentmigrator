@@ -69,7 +69,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
             CompatibilityMode = generatorOptions.Value.CompatibilityMode ?? CompatibilityMode.STRICT;
         }
 
-        public override string RenameTable { get { return "ALTER TABLE {0} RENAME TO {1}"; } }
+        public override string RenameTable => "ALTER TABLE {0} RENAME TO {1}";
 
         /// <inheritdoc />
         public override string GeneratorId => GeneratorIdConstants.SQLite;
