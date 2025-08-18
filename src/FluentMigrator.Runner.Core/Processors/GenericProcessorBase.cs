@@ -31,9 +31,6 @@ namespace FluentMigrator.Runner.Processors
 {
     public abstract class GenericProcessorBase : ProcessorBase
     {
-        [Obsolete]
-        private readonly string _connectionString;
-
         [NotNull, ItemCanBeNull]
         private readonly Lazy<DbProviderFactory> _dbProviderFactory;
 
@@ -60,10 +57,6 @@ namespace FluentMigrator.Runner.Processors
             // the base class (due to the missing information)
             Options.ConnectionString = connection?.ConnectionString;
 
-            // Prefetch connectionstring as after opening the security info could no longer be present
-            // for instance on sql server
-            _connectionString = connection?.ConnectionString;
-
             Factory = factory;
 
             _lazyConnection = new Lazy<IDbConnection>(() => connection);
@@ -84,10 +77,6 @@ namespace FluentMigrator.Runner.Processors
 #pragma warning disable 612
             var legacyFactory = new DbFactoryWrapper(this);
 
-            // Prefetch connectionstring as after opening the security info could no longer be present
-            // for instance on sql server
-            _connectionString = connectionString;
-
             Factory = legacyFactory;
 #pragma warning restore 612
 
@@ -103,9 +92,6 @@ namespace FluentMigrator.Runner.Processors
                     return connection;
                 });
         }
-
-        [Obsolete("Will change from public to protected")]
-        public override string ConnectionString => _connectionString;
 
         public IDbConnection Connection
         {
