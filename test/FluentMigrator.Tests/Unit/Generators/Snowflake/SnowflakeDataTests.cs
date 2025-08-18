@@ -54,7 +54,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             expression.SchemaName = TestSchema;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe($@"DELETE FROM ""{TestSchema}"".""TestTable1"" WHERE 1 = 1", _quotingEnabled);
+            result.ShouldBe($@"DELETE FROM ""{TestSchema}"".""TestTable1"" WHERE 1 = 1;", _quotingEnabled);
         }
 
         [Test]
@@ -62,7 +62,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         {
             var expression = GeneratorTestHelper.GetDeleteDataAllRowsExpression();
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"DELETE FROM ""PUBLIC"".""TestTable1"" WHERE 1 = 1", _quotingEnabled);
+            result.ShouldBe(@"DELETE FROM ""PUBLIC"".""TestTable1"" WHERE 1 = 1;", _quotingEnabled);
         }
 
         [Test]
@@ -72,7 +72,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             expression.SchemaName = TestSchema;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe($@"DELETE FROM ""{TestSchema}"".""TestTable1"" WHERE ""Name"" = 'Just''in' AND ""Website"" IS NULL; DELETE FROM ""{TestSchema}"".""TestTable1"" WHERE ""Website"" = 'github.com'", _quotingEnabled);
+            result.ShouldBe($@"DELETE FROM ""{TestSchema}"".""TestTable1"" WHERE ""Name"" = 'Just''in' AND ""Website"" IS NULL;DELETE FROM ""{TestSchema}"".""TestTable1"" WHERE ""Website"" = 'github.com';", _quotingEnabled);
         }
 
         [Test]
@@ -80,7 +80,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         {
             var expression = GeneratorTestHelper.GetDeleteDataMultipleRowsExpression();
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"DELETE FROM ""PUBLIC"".""TestTable1"" WHERE ""Name"" = 'Just''in' AND ""Website"" IS NULL; DELETE FROM ""PUBLIC"".""TestTable1"" WHERE ""Website"" = 'github.com'", _quotingEnabled);
+            result.ShouldBe(@"DELETE FROM ""PUBLIC"".""TestTable1"" WHERE ""Name"" = 'Just''in' AND ""Website"" IS NULL;DELETE FROM ""PUBLIC"".""TestTable1"" WHERE ""Website"" = 'github.com';", _quotingEnabled);
         }
 
         [Test]
@@ -90,7 +90,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             expression.SchemaName = TestSchema;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe($@"DELETE FROM ""{TestSchema}"".""TestTable1"" WHERE ""Name"" = 'Just''in' AND ""Website"" IS NULL", _quotingEnabled);
+            result.ShouldBe($@"DELETE FROM ""{TestSchema}"".""TestTable1"" WHERE ""Name"" = 'Just''in' AND ""Website"" IS NULL;", _quotingEnabled);
         }
 
         [Test]
@@ -98,7 +98,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         {
             var expression = GeneratorTestHelper.GetDeleteDataExpression();
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"DELETE FROM ""PUBLIC"".""TestTable1"" WHERE ""Name"" = 'Just''in' AND ""Website"" IS NULL", _quotingEnabled);
+            result.ShouldBe(@"DELETE FROM ""PUBLIC"".""TestTable1"" WHERE ""Name"" = 'Just''in' AND ""Website"" IS NULL;", _quotingEnabled);
         }
 
         [Test]
@@ -106,7 +106,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         {
             var expression = GeneratorTestHelper.GetDeleteDataExpressionWithDbNullValue();
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"DELETE FROM ""PUBLIC"".""TestTable1"" WHERE ""Name"" = 'Just''in' AND ""Website"" IS NULL", _quotingEnabled);
+            result.ShouldBe(@"DELETE FROM ""PUBLIC"".""TestTable1"" WHERE ""Name"" = 'Just''in' AND ""Website"" IS NULL;", _quotingEnabled);
         }
 
         [Test]
@@ -116,7 +116,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             expression.SchemaName = TestSchema;
 
             var expected = $@"INSERT INTO ""{TestSchema}"".""TestTable1"" (""Id"", ""Name"", ""Website"") VALUES (1, 'Just''in', 'codethinked.com');";
-            expected += $@" INSERT INTO ""{TestSchema}"".""TestTable1"" (""Id"", ""Name"", ""Website"") VALUES (2, 'Na\te', 'kohari.org')";
+            expected += $@"INSERT INTO ""{TestSchema}"".""TestTable1"" (""Id"", ""Name"", ""Website"") VALUES (2, 'Na\te', 'kohari.org');";
 
             var result = Generator.Generate(expression);
             result.ShouldBe(expected, _quotingEnabled);
@@ -126,8 +126,8 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         public override void CanInsertDataWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetInsertDataExpression();
-            var expected = $@"INSERT INTO ""PUBLIC"".""TestTable1"" (""Id"", ""Name"", ""Website"") VALUES (1, 'Just''in', 'codethinked.com');";
-            expected += $@" INSERT INTO ""PUBLIC"".""TestTable1"" (""Id"", ""Name"", ""Website"") VALUES (2, 'Na\te', 'kohari.org')";
+            var expected = @"INSERT INTO ""PUBLIC"".""TestTable1"" (""Id"", ""Name"", ""Website"") VALUES (1, 'Just''in', 'codethinked.com');";
+            expected += @"INSERT INTO ""PUBLIC"".""TestTable1"" (""Id"", ""Name"", ""Website"") VALUES (2, 'Na\te', 'kohari.org');";
 
             var result = Generator.Generate(expression);
             result.ShouldBe(expected, _quotingEnabled);
@@ -140,7 +140,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             expression.SchemaName = TestSchema;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe($@"INSERT INTO ""{TestSchema}"".""TestTable1"" (""guid"") VALUES ('{GeneratorTestHelper.TestGuid}')", _quotingEnabled);
+            result.ShouldBe($@"INSERT INTO ""{TestSchema}"".""TestTable1"" (""guid"") VALUES ('{GeneratorTestHelper.TestGuid}');", _quotingEnabled);
         }
 
         [Test]
@@ -148,7 +148,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         {
             var expression = GeneratorTestHelper.GetInsertGUIDExpression();
             var result = Generator.Generate(expression);
-            result.ShouldBe($@"INSERT INTO ""PUBLIC"".""TestTable1"" (""guid"") VALUES ('{GeneratorTestHelper.TestGuid}')", _quotingEnabled);
+            result.ShouldBe($@"INSERT INTO ""PUBLIC"".""TestTable1"" (""guid"") VALUES ('{GeneratorTestHelper.TestGuid}');", _quotingEnabled);
         }
 
         [Test]
@@ -158,7 +158,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             expression.SchemaName = TestSchema;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe($@"UPDATE ""{TestSchema}"".""TestTable1"" SET ""Name"" = 'Just''in', ""Age"" = 25 WHERE 1 = 1", _quotingEnabled);
+            result.ShouldBe($@"UPDATE ""{TestSchema}"".""TestTable1"" SET ""Name"" = 'Just''in', ""Age"" = 25 WHERE 1 = 1;", _quotingEnabled);
         }
 
         [Test]
@@ -166,7 +166,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpressionWithAllRows();
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"UPDATE ""PUBLIC"".""TestTable1"" SET ""Name"" = 'Just''in', ""Age"" = 25 WHERE 1 = 1", _quotingEnabled);
+            result.ShouldBe(@"UPDATE ""PUBLIC"".""TestTable1"" SET ""Name"" = 'Just''in', ""Age"" = 25 WHERE 1 = 1;", _quotingEnabled);
         }
 
         [Test]
@@ -176,7 +176,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             expression.SchemaName = TestSchema;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe($@"UPDATE ""{TestSchema}"".""TestTable1"" SET ""Name"" = 'Just''in', ""Age"" = 25 WHERE ""Id"" = 9 AND ""Homepage"" IS NULL", _quotingEnabled);
+            result.ShouldBe($@"UPDATE ""{TestSchema}"".""TestTable1"" SET ""Name"" = 'Just''in', ""Age"" = 25 WHERE ""Id"" = 9 AND ""Homepage"" IS NULL;", _quotingEnabled);
         }
 
         [Test]
@@ -184,7 +184,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpression();
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"UPDATE ""PUBLIC"".""TestTable1"" SET ""Name"" = 'Just''in', ""Age"" = 25 WHERE ""Id"" = 9 AND ""Homepage"" IS NULL", _quotingEnabled);
+            result.ShouldBe(@"UPDATE ""PUBLIC"".""TestTable1"" SET ""Name"" = 'Just''in', ""Age"" = 25 WHERE ""Id"" = 9 AND ""Homepage"" IS NULL;", _quotingEnabled);
         }
 
         [Test]
@@ -192,7 +192,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpressionWithDbNullValue();
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"UPDATE ""PUBLIC"".""TestTable1"" SET ""Name"" = 'Just''in', ""Age"" = 25 WHERE ""Id"" = 9 AND ""Homepage"" IS NULL", _quotingEnabled);
+            result.ShouldBe(@"UPDATE ""PUBLIC"".""TestTable1"" SET ""Name"" = 'Just''in', ""Age"" = 25 WHERE ""Id"" = 9 AND ""Homepage"" IS NULL;", _quotingEnabled);
         }
     }
 }

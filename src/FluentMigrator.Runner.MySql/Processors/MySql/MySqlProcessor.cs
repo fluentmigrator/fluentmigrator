@@ -191,6 +191,18 @@ namespace FluentMigrator.Runner.Processors.MySql
 
         public override void Process(RenameColumnExpression expression)
         {
+            // MySql 8.0+ supports column rename without needing to know the column type
+            if (Generator is MySql8Generator)
+            {
+                base.Process(expression);
+                return;
+            }
+
+            if (Generator is not MySql4Generator mysql4Generator)
+            {
+                throw new InvalidOperationException("MySql4Generator is required for this operation");
+            }
+
             var columnDefinitionSql = string.Format(@"
 SELECT CONCAT(
           CAST(COLUMN_TYPE AS CHAR),
@@ -213,7 +225,7 @@ SELECT CONCAT(
             var fieldValue = Read(columnDefinitionSql).Tables[0].Rows[0][0];
             var columnDefinition = fieldValue as string;
 
-            Process(Generator.Generate(expression) + columnDefinition);
+            Process(mysql4Generator.GenerateWithoutEndStatement(expression) + " " + columnDefinition);
         }
     }
 }

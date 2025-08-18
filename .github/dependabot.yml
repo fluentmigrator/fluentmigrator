@@ -43,6 +43,9 @@ updates:
     packaging-dependencies:
       patterns:
         - "SourceLink*"
+    sample-code-dependencies:
+      patterns:
+        - "FluentMigrator*"
     roslyn-analyzers-dependencies:
       patterns:
         - "Microsoft.CodeAnalysis*"
@@ -54,8 +57,6 @@ updates:
   schedule:
     interval: daily
   open-pull-requests-limit: 20
-  reviewers:
-    - jzabroski
   ignore:
     # Don't update ourselves, even for the Sample project
     - dependency-name: FluentMigrator

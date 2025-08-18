@@ -36,12 +36,9 @@ namespace FluentMigrator
         /// <summary>
         /// Gets or sets the migration context
         /// </summary>
-        [Obsolete("Use the Context property instead")]
-        // ReSharper disable once InconsistentNaming
-        // ReSharper disable once MemberCanBePrivate.Global
-        internal IMigrationContext _context;
+        private IMigrationContext _context;
 
-        private readonly object _mutex = new object();
+        private readonly object _mutex = new();
 
         /// <inheritdoc />
         public string ConnectionString { get; protected set; }
@@ -49,9 +46,7 @@ namespace FluentMigrator
         /// <summary>
         /// Gets the migration context
         /// </summary>
-#pragma warning disable 618
         internal IMigrationContext Context => _context ?? throw new InvalidOperationException("The context is not set");
-#pragma warning restore 618
 
         /// <summary>
         /// Collect the UP migration expressions
@@ -68,14 +63,11 @@ namespace FluentMigrator
         {
             lock (_mutex)
             {
-#pragma warning disable 618
                 _context = context;
-#pragma warning restore 618
                 ConnectionString = context.Connection;
                 Up();
-#pragma warning disable 618
+
                 _context = null;
-#pragma warning restore 618
             }
         }
 
@@ -84,14 +76,12 @@ namespace FluentMigrator
         {
             lock (_mutex)
             {
-#pragma warning disable 618
                 _context = context;
-#pragma warning restore 618
+
                 ConnectionString = context.Connection;
                 Down();
-#pragma warning disable 618
+
                 _context = null;
-#pragma warning restore 618
             }
         }
 

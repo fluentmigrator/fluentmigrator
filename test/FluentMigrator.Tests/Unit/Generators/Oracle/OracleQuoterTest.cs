@@ -20,6 +20,7 @@ using System;
 
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Oracle;
+using FluentMigrator.Tests.Integration.Migrations.Issues;
 
 using NUnit.Framework;
 
@@ -87,7 +88,7 @@ Mrow stare out cat door then go back inside, run outside as soon as door open or
         [Category("NotWorkingOnMono")]
         public void LargeNonUnicodeStringIsChunked()
         {
-            var chunks = _quoter.QuoteValue(new NonUnicodeString(OracleDataTests.LargeString));
+            var chunks = _quoter.QuoteValue(new NonUnicodeString(TestLargeTextInsertMigration_Issue1196.LargeString));
             chunks.ShouldBe(LargeNonUnicodeStringChunked);
         }
 
@@ -95,16 +96,16 @@ Mrow stare out cat door then go back inside, run outside as soon as door open or
         [Category("NotWorkingOnMono")]
         public void LargeStringIsChunked()
         {
-            var chunks = _quoter.QuoteValue(OracleDataTests.LargeString);
+            var chunks = _quoter.QuoteValue(TestLargeTextInsertMigration_Issue1196.LargeString);
             chunks.ShouldBe(LargeStringChunked);
         }
 
         [Test]
-        [TestCase(OracleDataTests.LargeString, OracleQuoterBase.MaxChunkLength)]
-        [TestCase(OracleDataTests.LargeString, 500)]
-        [TestCase(OracleDataTests.LargeString, 100)]
-        [TestCase(OracleDataTests.LargeString, 10)]
-        [TestCase(OracleDataTests.LargeString, 2)]
+        [TestCase(TestLargeTextInsertMigration_Issue1196.LargeString, OracleQuoterBase.MaxChunkLength)]
+        [TestCase(TestLargeTextInsertMigration_Issue1196.LargeString, 500)]
+        [TestCase(TestLargeTextInsertMigration_Issue1196.LargeString, 100)]
+        [TestCase(TestLargeTextInsertMigration_Issue1196.LargeString, 10)]
+        [TestCase(TestLargeTextInsertMigration_Issue1196.LargeString, 2)]
         [TestCase("foo bar baz", OracleQuoterBase.MaxChunkLength)]
         [TestCase("foo bar baz", 500)]
         [TestCase("foo bar baz", 100)]

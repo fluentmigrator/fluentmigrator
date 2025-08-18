@@ -48,7 +48,6 @@ namespace FluentMigrator.DotNet.Cli
             var targetIsSqlServer = !string.IsNullOrEmpty(options.ProcessorType)
              && options.ProcessorType.StartsWith("sqlserver", StringComparison.OrdinalIgnoreCase);
 
-            var mapper = ConfigureMapper();
             services
                 .AddLogging(lb =>
                 {
@@ -56,7 +55,7 @@ namespace FluentMigrator.DotNet.Cli
                     lb.AddDebug();
                 })
                 .AddOptions()
-                .AddSingleton(mapper);
+                .AddSingleton(serviceProvider => ConfigureMapper(serviceProvider));
 
             if (options.Output)
             {
@@ -157,9 +156,10 @@ namespace FluentMigrator.DotNet.Cli
             return services.BuildServiceProvider();
         }
 
-        private static IMapper ConfigureMapper()
+        private static IMapper ConfigureMapper(IServiceProvider serviceProvider)
         {
-            var mapperConfig = new MapperConfiguration(cfg => cfg.CreateMap<MigratorOptions, MigratorOptions>());
+            var loggerFactory = serviceCollection.GetRequiredServiceFor<ILoggerFactory>();
+            var mapperConfig = new MapperConfiguration(cfg => cfg.CreateMap<MigratorOptions, MigratorOptions>(), loggerFactory);
             mapperConfig.AssertConfigurationIsValid();
             return new Mapper(mapperConfig);
         }

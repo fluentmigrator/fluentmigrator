@@ -108,12 +108,14 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                 result.Append(" CYCLE");
             }
 
+            AppendSqlStatementEndToken(result);
+
             return result.ToString();
         }
 
         public override string Generate(Expressions.DeleteSequenceExpression expression)
         {
-            return $"DROP SEQUENCE {Quoter.QuoteSequenceName(expression.SequenceName, expression.SchemaName)}";
+            return FormatStatement("DROP SEQUENCE {0}", Quoter.QuoteSequenceName(expression.SequenceName, expression.SchemaName));
         }
     }
 }
