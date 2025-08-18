@@ -55,7 +55,7 @@ namespace FluentMigrator.DotNet.Cli
                     lb.AddDebug();
                 })
                 .AddOptions()
-                .AddSingleton(serviceProvider => ConfigureMapper(serviceProvider));
+                .AddSingleton(ConfigureMapper);
 
             if (options.Output)
             {
@@ -136,11 +136,17 @@ namespace FluentMigrator.DotNet.Cli
                         opt.PreviewOnly = options.Preview;
                         opt.ProviderSwitches = options.ProcessorSwitches;
                         opt.StripComments = options.StripComments;
-                        opt.Timeout = options.Timeout == null ? null : (TimeSpan?) TimeSpan.FromSeconds(options.Timeout.Value);
+                        opt.Timeout = options.Timeout == null ? null : TimeSpan.FromSeconds(options.Timeout.Value);
                     });
 
             services
-                .Configure<MigratorOptions>(mc => mapper.Map(options, mc));
+                .AddOptions<MigratorOptions>()
+                .Configure(
+                    (MigratorOptions optionsConfig, IServiceProvider serviceProvider) =>
+                    {
+                        var mapper = serviceProvider.GetRequiredService<IMapper>();
+                        mapper.Map(options, optionsConfig);
+                    });
 
             services
                 .Configure<FluentMigratorLoggerOptions>(
@@ -158,7 +164,7 @@ namespace FluentMigrator.DotNet.Cli
 
         private static IMapper ConfigureMapper(IServiceProvider serviceProvider)
         {
-            var loggerFactory = serviceCollection.GetRequiredServiceFor<ILoggerFactory>();
+            var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
             var mapperConfig = new MapperConfiguration(cfg => cfg.CreateMap<MigratorOptions, MigratorOptions>(), loggerFactory);
             mapperConfig.AssertConfigurationIsValid();
             return new Mapper(mapperConfig);
