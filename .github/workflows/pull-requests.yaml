@@ -3,7 +3,7 @@ on:
     branches:
     - '*'
 env:
-  solution: '**/FluentMigrator.sln'
+  solution: 'FluentMigrator.sln'
   buildPlatform: Any CPU
   buildConfiguration: Release
 jobs:
