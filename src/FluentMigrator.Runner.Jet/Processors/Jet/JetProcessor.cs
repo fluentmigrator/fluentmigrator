@@ -61,14 +61,7 @@ namespace FluentMigrator.Runner.Processors.Jet
                         return conn;
                     });
             }
-
-#pragma warning disable 612
-            ConnectionString = connectionString;
-#pragma warning restore 612
         }
-
-        [Obsolete]
-        public override string ConnectionString { get; }
 
         public override string DatabaseType { get; } = ProcessorIdConstants.Jet;
 

@@ -71,9 +71,6 @@ namespace FluentMigrator.Runner.Processors
 #pragma warning restore 612
         }
 
-        [Obsolete("Will change from public to protected")]
-        public string ConnectionString { get; } = "No connection";
-
         public IMigrationGenerator Generator { get; set; }
 
         [Obsolete]
