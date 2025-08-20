@@ -2,6 +2,7 @@ on:
   pull_request:
     branches:
     - '*'
+    
 env:
   solution: 'FluentMigrator.sln'
   buildPlatform: 'Any CPU'
@@ -10,7 +11,7 @@ env:
   FM_TestConnectionStrings__SqlServer2016__IsEnabled: true
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
     - uses: microsoft/setup-msbuild@v1.0.2
