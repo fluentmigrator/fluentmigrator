@@ -22,6 +22,7 @@ using System.Linq;
 using System.Text;
 
 using FluentMigrator.Expressions;
+using FluentMigrator.Generation;
 using FluentMigrator.Runner.Generators.Generic;
 using FluentMigrator.SqlServer;
 

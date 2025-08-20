@@ -14,6 +14,7 @@
 // limitations under the License.
 #endregion
 
+using FluentMigrator.Generation;
 using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Base;

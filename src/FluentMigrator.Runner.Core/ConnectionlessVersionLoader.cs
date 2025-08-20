@@ -20,9 +20,8 @@ using System;
 using System.Collections.Generic;
 
 using FluentMigrator.Expressions;
-using FluentMigrator.Infrastructure;
+using FluentMigrator.Generation;
 using FluentMigrator.Model;
-using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;

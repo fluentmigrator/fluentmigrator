@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using FluentMigrator.Expressions;
+using FluentMigrator.Generation;
 using FluentMigrator.Runner.Generators.Generic;
 
 using JetBrains.Annotations;

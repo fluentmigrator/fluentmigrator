@@ -20,7 +20,7 @@ using System.Collections.Generic;
 using System.Data;
 
 using FluentMigrator.Expressions;
-using FluentMigrator.Runner.Generators;
+using FluentMigrator.Generation;
 using FluentMigrator.Runner.Generators.DB2;
 using FluentMigrator.Runner.Helpers;
 using FluentMigrator.Runner.Initialization;

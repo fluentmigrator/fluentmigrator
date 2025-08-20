@@ -16,6 +16,8 @@
 
 using System.Collections.Generic;
 
+using FluentMigrator.Generation;
+
 using JetBrains.Annotations;
 
 using Microsoft.Extensions.Options;

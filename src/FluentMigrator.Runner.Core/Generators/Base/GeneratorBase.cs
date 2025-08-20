@@ -19,6 +19,7 @@
 using System.Collections.Generic;
 
 using FluentMigrator.Expressions;
+using FluentMigrator.Generation;
 
 namespace FluentMigrator.Runner.Generators.Base
 {

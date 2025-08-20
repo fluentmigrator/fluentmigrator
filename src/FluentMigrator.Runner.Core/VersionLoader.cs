@@ -19,9 +19,9 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Reflection;
 
 using FluentMigrator.Expressions;
+using FluentMigrator.Generation;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Versioning;
 using FluentMigrator.Runner.VersionTableInfo;

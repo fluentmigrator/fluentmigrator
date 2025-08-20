@@ -20,7 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-using FluentMigrator.Runner.Generators;
+using FluentMigrator.Generation;
 using FluentMigrator.Runner.Processors.SqlServer;
 
 using Microsoft.Data.SqlClient;

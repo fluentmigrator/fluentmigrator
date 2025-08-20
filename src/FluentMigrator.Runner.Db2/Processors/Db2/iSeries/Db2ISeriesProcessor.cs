@@ -21,7 +21,7 @@ using System.Data;
 using System.Linq;
 
 using FluentMigrator.Expressions;
-using FluentMigrator.Runner.Generators;
+using FluentMigrator.Generation;
 using FluentMigrator.Runner.Generators.DB2.iSeries;
 using FluentMigrator.Runner.Helpers;
 using FluentMigrator.Runner.Initialization;

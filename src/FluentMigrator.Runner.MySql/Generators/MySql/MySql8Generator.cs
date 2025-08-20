@@ -18,6 +18,7 @@ using System.Collections.Generic;
 using System.Text;
 
 using FluentMigrator.Expressions;
+using FluentMigrator.Generation;
 using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Model;
 using FluentMigrator.MySql;

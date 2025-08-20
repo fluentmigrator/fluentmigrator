@@ -90,7 +90,7 @@ namespace FluentMigrator.Tests.Unit.Runners
             var migrationGenerator = (IMigrationGenerator)serviceProvider.GetRequiredService(generator);
             var migrationProcessorAccessor = serviceProvider.GetRequiredService<IProcessorAccessor>();
             var migrationGeneratorAccessor = serviceProvider.GetRequiredService<IGeneratorAccessor>();
-            
+
             Assert.That(migrationProcessor.DatabaseType, Is.EqualTo(processorId));
             Assert.That(migrationGenerator.GeneratorId, Is.EqualTo(generatorId));
             Assert.That(migrationProcessor.DatabaseType, Is.EqualTo(
@@ -126,7 +126,7 @@ namespace FluentMigrator.Tests.Unit.Runners
             Assert.That(migrationProcessorAccessor.Processor.DatabaseType, processorMatcher);
             Assert.That(migrationGeneratorAccessor.Generator.GeneratorId, generatorMatcher);
         }
-        
+
         private IServiceProvider GetServiceProvider(string processorId, string generatorId)
         {
             var serviceProvider = new ServiceCollection()

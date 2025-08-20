@@ -18,7 +18,7 @@
 
 using System;
 
-using FluentMigrator.Runner.Generators;
+using FluentMigrator.Generation;
 using FluentMigrator.Runner.Generators.Oracle;
 using FluentMigrator.Tests.Integration.Migrations.Issues;
 
