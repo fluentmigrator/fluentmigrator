@@ -42,7 +42,7 @@ jobs:
     - name: VSTest
       run: |
         dotnet tool install --global coverlet.console
-        coverlet . --target "vstest.console.exe" --targetargs "test\FluentMigrator.Tests\bin\${{ env.buildConfiguration }}\net48\FluentMigrator.Tests.dll /EnableCodeCoverage" --format "opencover" --output "coverage.xml"
+        dotnet test test\FluentMigrator.Tests\bin\${{ env.buildConfiguration }}\net48\FluentMigrator.Tests.dll --collect:"XPlat Code Coverage;Format=opencover"
       shell: powershell
     - uses: actions/upload-artifact@v4
       with:
