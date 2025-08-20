@@ -60,19 +60,19 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         {
         }
 
-        public override string DropTableIfExists { get { return "IF OBJECT_ID('{0}') IS NOT NULL DROP TABLE {0}"; } }
+        public override string DropTableIfExists => "IF OBJECT_ID('{0}') IS NOT NULL DROP TABLE {0}";
 
-        public override string RenameTable { get { return "sp_rename {0}, {1}"; } }
+        public override string RenameTable => "sp_rename {0}, {1}";
 
-        public override string RenameColumn { get { return "sp_rename {0}, {1}"; } }
+        public override string RenameColumn => "sp_rename {0}, {1}";
 
-        public override string DropIndex { get { return "DROP INDEX {1}.{0}"; } }
+        public override string DropIndex => "DROP INDEX {1}.{0}";
 
-        public override string AddColumn { get { return "ALTER TABLE {0} ADD {1}"; } }
+        public override string AddColumn => "ALTER TABLE {0} ADD {1}";
 
-        public virtual string IdentityInsert { get { return "SET IDENTITY_INSERT {0} {1}"; } }
+        public virtual string IdentityInsert => "SET IDENTITY_INSERT {0} {1}";
 
-        public override string CreateConstraint { get { return "ALTER TABLE {0} ADD CONSTRAINT {1} {2}{3} ({4})"; } }
+        public override string CreateConstraint => "ALTER TABLE {0} ADD CONSTRAINT {1} {2}{3} ({4})";
 
         //Not need for the nonclusted keyword as it is the default mode
         public override string GetClusterTypeString(CreateIndexExpression column)

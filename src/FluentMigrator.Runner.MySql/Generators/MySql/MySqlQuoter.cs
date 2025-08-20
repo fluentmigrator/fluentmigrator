@@ -20,9 +20,9 @@ namespace FluentMigrator.Runner.Generators.MySql
 {
     public class MySqlQuoter : GenericQuoter
     {
-        public override string OpenQuote { get { return "`"; } }
+        public override string OpenQuote => "`";
 
-        public override string CloseQuote { get { return "`"; } }
+        public override string CloseQuote => "`";
 
         public override string QuoteValue(object value)
         {

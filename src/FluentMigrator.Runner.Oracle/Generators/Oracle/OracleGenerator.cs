@@ -145,25 +145,13 @@ namespace FluentMigrator.Runner.Generators.Oracle
             return result.ToString();
         }
 
-        public override string AddColumn
-        {
-            get { return "ALTER TABLE {0} ADD {1}"; }
-        }
+        public override string AddColumn => "ALTER TABLE {0} ADD {1}";
 
-        public override string AlterColumn
-        {
-            get { return "ALTER TABLE {0} MODIFY {1}"; }
-        }
+        public override string AlterColumn => "ALTER TABLE {0} MODIFY {1}";
 
-        public override string RenameTable
-        {
-            get { return "ALTER TABLE {0} RENAME TO {1}"; }
-        }
+        public override string RenameTable => "ALTER TABLE {0} RENAME TO {1}";
 
-        public override string InsertData
-        {
-            get { return "INTO {0} ({1}) VALUES ({2})"; }
-        }
+        public override string InsertData => "INTO {0} ({1}) VALUES ({2})";
 
         private static string ExpandTableName(string schema, string table)
         {

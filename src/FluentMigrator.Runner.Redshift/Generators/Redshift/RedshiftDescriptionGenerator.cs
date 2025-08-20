@@ -33,10 +33,7 @@ namespace FluentMigrator.Runner.Generators.Redshift
             _quoter = new RedshiftQuoter();
         }
 
-        protected IQuoter Quoter
-        {
-            get { return _quoter; }
-        }
+        protected IQuoter Quoter => _quoter;
 
         #region Constants
 

@@ -89,18 +89,18 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             [GeneratorIdConstants.SqlServer2005, GeneratorIdConstants.SqlServer];
 
 
-        public override string AddColumn { get { return "ALTER TABLE {0} ADD {1}"; } }
+        public override string AddColumn => "ALTER TABLE {0} ADD {1}";
 
-        public override string CreateSchema { get { return "CREATE SCHEMA {0}{1}"; } }
+        public override string CreateSchema => "CREATE SCHEMA {0}{1}";
 
-        public override string CreateIndex { get { return "CREATE {0}{1}INDEX {2} ON {3} ({4}){5}{6}{7}"; } }
-        public override string DropIndex { get { return "DROP INDEX {0} ON {1}{2}"; } }
+        public override string CreateIndex => "CREATE {0}{1}INDEX {2} ON {3} ({4}){5}{6}{7}";
+        public override string DropIndex => "DROP INDEX {0} ON {1}{2}";
 
-        public override string IdentityInsert { get { return "SET IDENTITY_INSERT {0} {1}"; } }
+        public override string IdentityInsert => "SET IDENTITY_INSERT {0} {1}";
 
-        public virtual string CreateUniqueConstraint { get { return "CREATE UNIQUE INDEX {1} ON {0} ({2}){3}{4}"; } }
+        public virtual string CreateUniqueConstraint => "CREATE UNIQUE INDEX {1} ON {0} ({2}){3}{4}";
 
-        public override string CreateForeignKeyConstraint { get { return "ALTER TABLE {0} ADD CONSTRAINT {1} FOREIGN KEY ({2}) REFERENCES {3} ({4}){5}{6}"; } }
+        public override string CreateForeignKeyConstraint => "ALTER TABLE {0} ADD CONSTRAINT {1} FOREIGN KEY ({2}) REFERENCES {3} ({4}){5}{6}";
 
         public virtual string GetIncludeString(CreateIndexExpression expression)
         {

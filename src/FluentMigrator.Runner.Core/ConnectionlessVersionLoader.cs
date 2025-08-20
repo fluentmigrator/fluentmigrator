@@ -86,19 +86,11 @@ namespace FluentMigrator.Runner
         public IVersionInfo VersionInfo { get; set; }
         public IVersionTableMetaData VersionTableMetaData { get; set; }
 
-        public bool AlreadyCreatedVersionSchema
-        {
-            get
-            {
-                return string.IsNullOrEmpty(VersionTableMetaData.SchemaName) ||
-                       _processor.SchemaExists(VersionTableMetaData.SchemaName);
-            }
-        }
+        public bool AlreadyCreatedVersionSchema =>
+            string.IsNullOrEmpty(VersionTableMetaData.SchemaName) ||
+            _processor.SchemaExists(VersionTableMetaData.SchemaName);
 
-        public bool AlreadyCreatedVersionTable
-        {
-            get { return _processor.TableExists(VersionTableMetaData.SchemaName, VersionTableMetaData.TableName); }
-        }
+        public bool AlreadyCreatedVersionTable => _processor.TableExists(VersionTableMetaData.SchemaName, VersionTableMetaData.TableName);
 
         public void DeleteVersion(long version)
         {

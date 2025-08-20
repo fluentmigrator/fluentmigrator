@@ -77,64 +77,40 @@ namespace FluentMigrator.Builders.IfDatabase
         /// <summary>
         /// Alter the schema of an existing object
         /// </summary>
-        public IAlterExpressionRoot Alter
-        {
-            get { return new AlterExpressionRoot(_context); }
-        }
+        public IAlterExpressionRoot Alter => new AlterExpressionRoot(_context);
 
         /// <summary>
         /// Create a new database object
         /// </summary>
-        public ICreateExpressionRoot Create
-        {
-            get { return new CreateExpressionRoot(_context); }
-        }
+        public ICreateExpressionRoot Create => new CreateExpressionRoot(_context);
 
         /// <summary>
         /// Delete a database object, table, or row
         /// </summary>
-        public IDeleteExpressionRoot Delete
-        {
-            get { return new DeleteExpressionRoot(_context); }
-        }
+        public IDeleteExpressionRoot Delete => new DeleteExpressionRoot(_context);
 
         /// <summary>
         /// Rename tables / columns
         /// </summary>
-        public IRenameExpressionRoot Rename
-        {
-            get { return new RenameExpressionRoot(_context); }
-        }
+        public IRenameExpressionRoot Rename => new RenameExpressionRoot(_context);
 
         /// <summary>
         /// Insert data into a table
         /// </summary>
-        public IInsertExpressionRoot Insert
-        {
-            get { return new InsertExpressionRoot(_context); }
-        }
+        public IInsertExpressionRoot Insert => new InsertExpressionRoot(_context);
 
         /// <summary>
         /// Execute SQL statements
         /// </summary>
-        public IExecuteExpressionRoot Execute
-        {
-            get { return new ExecuteExpressionRoot(_context); }
-        }
+        public IExecuteExpressionRoot Execute => new ExecuteExpressionRoot(_context);
 
         /// <inheritdoc />
-        public ISchemaExpressionRoot Schema
-        {
-            get { return new SchemaExpressionRoot(_context); }
-        }
+        public ISchemaExpressionRoot Schema => new SchemaExpressionRoot(_context);
 
         /// <summary>
         /// Update an existing row
         /// </summary>
-        public IUpdateExpressionRoot Update
-        {
-            get { return new UpdateExpressionRoot(_context); }
-        }
+        public IUpdateExpressionRoot Update => new UpdateExpressionRoot(_context);
 
         /// <inheritdoc />
         public void Delegate(Action delegation)

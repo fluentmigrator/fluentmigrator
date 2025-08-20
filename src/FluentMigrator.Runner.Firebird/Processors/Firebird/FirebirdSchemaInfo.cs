@@ -79,8 +79,8 @@ namespace FluentMigrator.Runner.Processors.Firebird
         public string TableName { get; }
         public object DefaultValue { get; }
         public int Position { get; }
-        public DbType? DBType { get { return GetDBType(); } }
-        public string CustomType { get { return GetCustomDBType(); } }
+        public DbType? DBType => GetDBType();
+        public string CustomType => GetCustomDBType();
         public bool IsNullable { get; }
         public int? Precision { get; }
         public int? CharacterLength { get; }
@@ -340,11 +340,11 @@ namespace FluentMigrator.Runner.Processors.Firebird
         public int Sequence { get; }
         public int Type { get; }
         public string Body { get; }
-        public bool Before { get { return Type % 2 == 1; } }
-        public bool OnInsert { get { return Type == 1 || Type == 2; } }
-        public bool OnUpdate { get { return Type == 3 || Type == 4; } }
-        public bool OnDelete { get { return Type == 5 || Type == 6; } }
-        public TriggerEvent Event { get { return OnInsert ? TriggerEvent.Insert : OnUpdate ? TriggerEvent.Update : TriggerEvent.Delete; } }
+        public bool Before => Type % 2 == 1;
+        public bool OnInsert => Type == 1 || Type == 2;
+        public bool OnUpdate => Type == 3 || Type == 4;
+        public bool OnDelete => Type == 5 || Type == 6;
+        public TriggerEvent Event => OnInsert ? TriggerEvent.Insert : OnUpdate ? TriggerEvent.Update : TriggerEvent.Delete;
 
         private TriggerInfo(DataRow drTrigger)
         {

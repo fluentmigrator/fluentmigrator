@@ -61,8 +61,8 @@ namespace FluentMigrator.Runner.Initialization.NetFramework
 
         public Func<string> MachineNameProvider
         {
-            get { return _machineNameProvider; }
-            set { _machineNameProvider = value; }
+            get => _machineNameProvider;
+            set => _machineNameProvider = value;
         }
 
         public void LoadConnectionString()
