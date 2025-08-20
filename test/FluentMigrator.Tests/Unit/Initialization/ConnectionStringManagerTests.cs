@@ -15,7 +15,7 @@
 // limitations under the License.
 //
 #endregion
-
+#if NETFRAMEWORK
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -176,3 +176,4 @@ namespace FluentMigrator.Tests.Unit.Initialization
         }
     }
 }
+#endif
