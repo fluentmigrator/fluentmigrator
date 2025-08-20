@@ -33,7 +33,7 @@ jobs:
         BUILD_BUILDNUMBER: ${{ env.GitVersion.NuGetVersionV2 }}
       with:
         updateAssemblyInfo: false
-    - run: dotnet restore ${{ env.solution }}
+    - run: dotnet restore ${{ env.solution }} --use-current-runtime # implies long-term support release of .NET
     - run: dotnet build '${{ env.solution }}' --no-restore --property:configuration='${{ env.buildConfiguration }}' --property:platform='${{ env.buildPlatform }}' --property:Version="${{ github.run_number }}"
     - name: Setup VSTest Path
       uses: darenm/Setup-VSTest@v1.3
