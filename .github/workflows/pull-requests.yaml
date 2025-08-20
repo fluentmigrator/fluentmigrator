@@ -18,7 +18,6 @@ jobs:
       uses: gittools/actions/gitversion/setup@v0.9.11
       with:
         versionSpec: 5.x
-    - uses: nuget/setup-nuget@v1
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
@@ -34,8 +33,8 @@ jobs:
         BUILD_BUILDNUMBER: ${{ env.GitVersion.NuGetVersionV2 }}
       with:
         updateAssemblyInfo: false
-    - run: nuget restore ${{ env.solution }}
-    - run: dotnet build '${{ env.solution }}' --property:configuration='${{ env.buildConfiguration }}' --property:platform='${{ env.buildPlatform }}' --property:Version="${{ github.run_number }}"
+    - run: dotnet restore ${{ env.solution }}
+    - run: dotnet build '${{ env.solution }}' --no-restore --property:configuration='${{ env.buildConfiguration }}' --property:platform='${{ env.buildPlatform }}' --property:Version="${{ github.run_number }}"
     - name: Setup VSTest Path
       uses: darenm/Setup-VSTest@v1.3
   
