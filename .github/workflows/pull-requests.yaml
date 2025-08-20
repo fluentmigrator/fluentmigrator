@@ -42,7 +42,7 @@ jobs:
     - name: VSTest
       run: |
         dotnet tool install --global coverlet.console
-        dotnet test test\FluentMigrator.Tests\bin\${{ env.buildConfiguration }}\net48\FluentMigrator.Tests.dll --collect:"XPlat Code Coverage;Format=opencover"
+        dotnet test test/FluentMigrator.Tests/bin/${{ env.buildConfiguration }}/net8.0/FluentMigrator.Tests.dll --collect:"XPlat Code Coverage;Format=opencover"
       shell: bash
     - uses: actions/upload-artifact@v4
       with:
