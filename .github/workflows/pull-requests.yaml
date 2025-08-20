@@ -40,7 +40,9 @@ jobs:
       uses: darenm/Setup-VSTest@v1.3
   
     - name: VSTest
-      run: vstest.console.exe test\FluentMigrator.Tests\bin\${{ env.buildConfiguration }}\net48\FluentMigrator.Tests.dll
+      run: |
+        dotnet tool install --global coverlet.console
+        coverlet . --target "vstest.console.exe" --targetargs "test\FluentMigrator.Tests\bin\${{ env.buildConfiguration }}\net48\FluentMigrator.Tests.dll /EnableCodeCoverage" --format "opencover" --output "coverage.xml"
       shell: powershell
     - uses: actions/upload-artifact@v4
       with:
