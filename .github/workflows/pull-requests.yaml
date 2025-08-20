@@ -14,7 +14,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: microsoft/setup-msbuild@v1.0.2
     - name: Install GitVersion
       uses: gittools/actions/gitversion/setup@v0.9.11
       with:
@@ -36,7 +35,7 @@ jobs:
       with:
         updateAssemblyInfo: false
     - run: nuget restore ${{ env.solution }}
-    - run: msbuild '${{ env.solution }}' /p:configuration='${{ env.buildConfiguration }}' /p:platform='${{ env.buildPlatform }}' /p:Version="${{ github.run_number }}"
+    - run: dotnet build '${{ env.solution }}' --property:configuration='${{ env.buildConfiguration }}' --property:platform='${{ env.buildPlatform }}' --property:Version="${{ github.run_number }}"
     - name: Setup VSTest Path
       uses: darenm/Setup-VSTest@v1.3
   
