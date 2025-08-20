@@ -4,7 +4,7 @@ on:
     - '*'
     
 env:
-  solution: 'FluentMigrator.sln'
+  solution: 'src'
   buildPlatform: 'Any CPU'
   buildConfiguration: Release
   FM_TestConnectionStrings__SqlServer2016__ContainerEnabled: true
