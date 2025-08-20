@@ -55,7 +55,7 @@
     <ProjectReference Include="..\..\src\FluentMigrator.Runner.Db2\FluentMigrator.Runner.Db2.csproj" />
     <ProjectReference Include="..\..\src\FluentMigrator.Runner.Firebird\FluentMigrator.Runner.Firebird.csproj" />
     <ProjectReference Include="..\..\src\FluentMigrator.Runner.Hana\FluentMigrator.Runner.Hana.csproj" />
-    <ProjectReference Include="..\..\src\FluentMigrator.Runner.Jet\FluentMigrator.Runner.Jet.csproj" />
+    <ProjectReference Include="..\..\src\FluentMigrator.Runner.Jet\FluentMigrator.Runner.Jet.csproj" Condition="'$(TargetFramework)' != 'net48'" />
     <ProjectReference Include="..\..\src\FluentMigrator.Runner.MySql\FluentMigrator.Runner.MySql.csproj" />
     <ProjectReference Include="..\..\src\FluentMigrator.Runner.Oracle\FluentMigrator.Runner.Oracle.csproj" />
     <ProjectReference Include="..\..\src\FluentMigrator.Runner.Postgres\FluentMigrator.Runner.Postgres.csproj" />
