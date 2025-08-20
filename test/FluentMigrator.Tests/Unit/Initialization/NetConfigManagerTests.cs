@@ -16,6 +16,7 @@
 //
 #endregion
 
+#if NETFRAMEWORK
 using System;
 using System.Configuration;
 using System.IO;
@@ -94,3 +95,4 @@ namespace FluentMigrator.Tests.Unit.Initialization
         }
     }
 }
+#endif
