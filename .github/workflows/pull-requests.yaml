@@ -22,6 +22,9 @@ jobs:
       with:
         fetch-depth: 0
         clean: true
+    - uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.0.x'
     - name: Install GitVersion (using GitTools 0.10.2.23031113 or later)
       uses: gittools/actions/gitversion/setup@v0.9.11
       with:
