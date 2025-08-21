@@ -197,7 +197,7 @@ namespace FluentMigrator.Builders.Create.Column
         }
 
         /// <inheritdoc/>
-        public ICreateColumnOptionSyntax AsExpression(string expression, bool stored = false)
+        public ICreateColumnOptionSyntax Computed(string expression, bool stored = false)
         {
             Expression.Column.Expression = expression;
             Expression.Column.ExpressionStored = stored;

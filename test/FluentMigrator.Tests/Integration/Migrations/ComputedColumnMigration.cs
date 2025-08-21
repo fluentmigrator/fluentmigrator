@@ -27,10 +27,10 @@ namespace FluentMigrator.Tests.Integration.Migrations
                 .WithColumn("Id").AsInt32().PrimaryKey().Identity()
                 .WithColumn("Price").AsDecimal(10, 2).NotNullable()
                 .WithColumn("Quantity").AsInt32().NotNullable()
-                .WithColumn("Total").AsDecimal(10, 2).AsExpression("Price * Quantity");
+                .WithColumn("Total").AsDecimal(10, 2).Computed("Price * Quantity");
                 
             Alter.Table("Products")
-                .AddColumn("TotalWithTax").AsDecimal(10, 2).AsExpression("Total * 1.1", true);
+                .AddColumn("TotalWithTax").AsDecimal(10, 2).Computed("Total * 1.1", true);
         }
         
         public override void Down()

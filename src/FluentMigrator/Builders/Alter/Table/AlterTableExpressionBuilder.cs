@@ -264,7 +264,7 @@ namespace FluentMigrator.Builders.Alter.Table
         }
 
         /// <inheritdoc/>
-        public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax AsExpression(string expression, bool stored = false)
+        public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax Computed(string expression, bool stored = false)
         {
             CurrentColumn.Expression = expression;
             CurrentColumn.ExpressionStored = stored;

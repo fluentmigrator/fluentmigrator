@@ -202,7 +202,7 @@ namespace FluentMigrator.Builders.Alter.Column
         }
 
         /// <inheritdoc/>
-        public IAlterColumnOptionSyntax AsExpression(string expression, bool stored = false)
+        public IAlterColumnOptionSyntax Computed(string expression, bool stored = false)
         {
             Expression.Column.Expression = expression;
             Expression.Column.ExpressionStored = stored;

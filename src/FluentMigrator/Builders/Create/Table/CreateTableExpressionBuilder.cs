@@ -203,7 +203,7 @@ namespace FluentMigrator.Builders.Create.Table
         }
 
         /// <inheritdoc/>
-        public ICreateTableColumnOptionOrWithColumnSyntax AsExpression(string expression, bool stored = false)
+        public ICreateTableColumnOptionOrWithColumnSyntax Computed(string expression, bool stored = false)
         {
             CurrentColumn.Expression = expression;
             CurrentColumn.ExpressionStored = stored;
