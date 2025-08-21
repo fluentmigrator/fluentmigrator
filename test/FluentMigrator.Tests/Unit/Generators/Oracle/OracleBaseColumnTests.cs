@@ -262,7 +262,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             var expression = GeneratorTestHelper.GetCreateColumnExpressionWithComputed();
             
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 GENERATED ALWAYS AS (Price * Quantity) NOT NULL");
+            result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 GENERATED ALWAYS AS (Price * Quantity) NOT NULL;");
         }
 
         [Test]
@@ -271,7 +271,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             var expression = GeneratorTestHelper.GetCreateColumnExpressionWithStoredComputed();
             
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 GENERATED ALWAYS AS (Price * Quantity) NOT NULL");
+            result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 GENERATED ALWAYS AS (Price * Quantity) NOT NULL;");
         }
 
         [Test]
@@ -280,7 +280,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             var expression = GeneratorTestHelper.GetAlterColumnExpressionWithComputed();
             
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestTable1 MODIFY TestColumn1 GENERATED ALWAYS AS (Price * Quantity)");
+            result.ShouldBe("ALTER TABLE TestTable1 MODIFY TestColumn1 GENERATED ALWAYS AS (Price * Quantity);");
         }
 
         [Test]
@@ -289,7 +289,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             var expression = GeneratorTestHelper.GetAlterColumnExpressionWithStoredComputed();
             
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestTable1 MODIFY TestColumn1 GENERATED ALWAYS AS (Price * Quantity)");
+            result.ShouldBe("ALTER TABLE TestTable1 MODIFY TestColumn1 GENERATED ALWAYS AS (Price * Quantity);");
         }
     }
 }

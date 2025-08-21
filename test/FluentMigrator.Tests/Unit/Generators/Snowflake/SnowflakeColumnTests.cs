@@ -237,7 +237,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             var expression = GeneratorTestHelper.GetCreateColumnExpressionWithComputed();
             
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ADD COLUMN ""TestColumn1"" GENERATED ALWAYS AS (Price * Quantity) NOT NULL", _quotingEnabled);
+            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ADD COLUMN ""TestColumn1"" GENERATED ALWAYS AS (Price * Quantity) NOT NULL;", _quotingEnabled);
         }
 
         [Test]
@@ -247,7 +247,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             
             // Snowflake doesn't distinguish between stored and virtual computed columns
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ADD COLUMN ""TestColumn1"" GENERATED ALWAYS AS (Price * Quantity) STORED NOT NULL", _quotingEnabled);
+            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ADD COLUMN ""TestColumn1"" GENERATED ALWAYS AS (Price * Quantity) STORED NOT NULL;", _quotingEnabled);
         }
 
         [Test]
@@ -256,7 +256,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             var expression = GeneratorTestHelper.GetAlterColumnExpressionWithComputed();
             
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ALTER COLUMN ""TestColumn1"" SET NOT NULL, COLUMN ""TestColumn1"" , COLUMN ""TestColumn1"" COMMENT ''", _quotingEnabled);
+            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ALTER COLUMN ""TestColumn1"" SET NOT NULL, COLUMN ""TestColumn1"" , COLUMN ""TestColumn1"" COMMENT '';", _quotingEnabled);
         }
 
         [Test]
@@ -266,7 +266,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             
             // Snowflake doesn't distinguish between stored and virtual computed columns
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ALTER COLUMN ""TestColumn1"" SET NOT NULL, COLUMN ""TestColumn1"" , COLUMN ""TestColumn1"" COMMENT ''", _quotingEnabled);
+            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ALTER COLUMN ""TestColumn1"" SET NOT NULL, COLUMN ""TestColumn1"" , COLUMN ""TestColumn1"" COMMENT '';", _quotingEnabled);
         }
     }
 }

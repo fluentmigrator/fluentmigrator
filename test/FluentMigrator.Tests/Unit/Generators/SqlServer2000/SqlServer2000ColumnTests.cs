@@ -330,7 +330,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             var expression = GeneratorTestHelper.GetCreateColumnExpressionWithComputed();
             
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [TestTable1] ADD [TestColumn1] AS (Price * Quantity) NOT NULL");
+            result.ShouldBe("ALTER TABLE [TestTable1] ADD [TestColumn1] AS (Price * Quantity) NOT NULL;");
         }
 
         [Test]
@@ -339,7 +339,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             var expression = GeneratorTestHelper.GetCreateColumnExpressionWithStoredComputed();
             
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [TestTable1] ADD [TestColumn1] AS (Price * Quantity) PERSISTED NOT NULL");
+            result.ShouldBe("ALTER TABLE [TestTable1] ADD [TestColumn1] AS (Price * Quantity) PERSISTED NOT NULL;");
         }
 
         [Test]
@@ -348,7 +348,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             var expression = GeneratorTestHelper.GetAlterColumnExpressionWithComputed();
             
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [TestTable1] ALTER COLUMN [TestColumn1] AS (Price * Quantity) NOT NULL");
+            result.ShouldBe("ALTER TABLE [TestTable1] ALTER COLUMN [TestColumn1] AS (Price * Quantity) NOT NULL;");
         }
 
         [Test]
@@ -357,7 +357,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             var expression = GeneratorTestHelper.GetAlterColumnExpressionWithStoredComputed();
             
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [TestTable1] ALTER COLUMN [TestColumn1] AS (Price * Quantity) PERSISTED NOT NULL");
+            result.ShouldBe("ALTER TABLE [TestTable1] ALTER COLUMN [TestColumn1] AS (Price * Quantity) PERSISTED NOT NULL;");
         }
     }
 }

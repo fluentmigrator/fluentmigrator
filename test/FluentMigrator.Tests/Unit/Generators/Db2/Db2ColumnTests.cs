@@ -220,7 +220,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             var expression = GeneratorTestHelper.GetCreateColumnExpressionWithComputed();
             
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestTable1 ADD COLUMN TestColumn1 GENERATED ALWAYS AS (Price * Quantity) NOT NULL DEFAULT");
+            result.ShouldBe("ALTER TABLE TestTable1 ADD COLUMN TestColumn1 GENERATED ALWAYS AS (Price * Quantity) NOT NULL DEFAULT;");
         }
 
         [Test]
@@ -229,7 +229,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             var expression = GeneratorTestHelper.GetCreateColumnExpressionWithStoredComputed();
             
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestTable1 ADD COLUMN TestColumn1 GENERATED ALWAYS AS (Price * Quantity) STORED NOT NULL DEFAULT");
+            result.ShouldBe("ALTER TABLE TestTable1 ADD COLUMN TestColumn1 GENERATED ALWAYS AS (Price * Quantity) STORED NOT NULL DEFAULT;");
         }
 
         [Test]
@@ -238,7 +238,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             var expression = GeneratorTestHelper.GetAlterColumnExpressionWithComputed();
             
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestTable1 ALTER COLUMN TestColumn1 SET DATA TYPE GENERATED ALWAYS AS (Price * Quantity) NOT NULL");
+            result.ShouldBe("ALTER TABLE TestTable1 ALTER COLUMN TestColumn1 SET DATA TYPE GENERATED ALWAYS AS (Price * Quantity) NOT NULL;");
         }
 
         [Test]
@@ -247,7 +247,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             var expression = GeneratorTestHelper.GetAlterColumnExpressionWithStoredComputed();
             
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestTable1 ALTER COLUMN TestColumn1 SET DATA TYPE GENERATED ALWAYS AS (Price * Quantity) STORED NOT NULL");
+            result.ShouldBe("ALTER TABLE TestTable1 ALTER COLUMN TestColumn1 SET DATA TYPE GENERATED ALWAYS AS (Price * Quantity) STORED NOT NULL;");
         }
 
         [SetUp]

@@ -241,7 +241,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetCreateColumnExpressionWithComputed();
             
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD COLUMN \"TestColumn1\" GENERATED ALWAYS AS (Price * Quantity) VIRTUAL NOT NULL");
+            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD COLUMN \"TestColumn1\" GENERATED ALWAYS AS (Price * Quantity) VIRTUAL NOT NULL;");
         }
 
         [Test]
@@ -250,7 +250,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetCreateColumnExpressionWithStoredComputed();
             
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD COLUMN \"TestColumn1\" GENERATED ALWAYS AS (Price * Quantity) STORED NOT NULL");
+            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD COLUMN \"TestColumn1\" GENERATED ALWAYS AS (Price * Quantity) STORED NOT NULL;");
         }
 
         [Test]
