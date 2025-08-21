@@ -46,7 +46,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 MyDomainType");
+            result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 MyDomainType;");
         }
 
         [Test]
@@ -55,7 +55,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             var expression = GeneratorTestHelper.GetCreateColumnExpressionWithNullableCustomType();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 MyDomainType");
+            result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 MyDomainType;");
         }
 
         [Test]
@@ -103,7 +103,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 VARCHAR(5) NOT NULL");
+            result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 VARCHAR(5) NOT NULL;");
         }
 
         [Test]
@@ -112,27 +112,29 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 VARCHAR(5) NOT NULL");
+            result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 VARCHAR(5) NOT NULL;");
         }
 
         [Test]
         public override void CanCreateColumnWithSystemMethodAndCustomSchema()
         {
             var expressions = GeneratorTestHelper.GetCreateColumnWithSystemMethodExpression("TestSchema");
-            var result = string.Join(Environment.NewLine, expressions.Select(x => (string)Generator.Generate((dynamic)x)));
-            result.ShouldBe(
-                @"ALTER TABLE TestTable1 ADD TestColumn1 TIMESTAMP" + Environment.NewLine +
-                @"UPDATE TestTable1 SET TestColumn1 = LOCALTIMESTAMP WHERE 1 = 1");
+            var result = expressions.Select(x => (string)Generator.Generate((dynamic)x));
+            result.ShouldBe([
+                @"ALTER TABLE TestTable1 ADD TestColumn1 TIMESTAMP;",
+                @"UPDATE TestTable1 SET TestColumn1 = LOCALTIMESTAMP WHERE 1 = 1;",
+            ]);
         }
 
         [Test]
         public override void CanCreateColumnWithSystemMethodAndDefaultSchema()
         {
             var expressions = GeneratorTestHelper.GetCreateColumnWithSystemMethodExpression();
-            var result = string.Join(Environment.NewLine, expressions.Select(x => (string)Generator.Generate((dynamic)x)));
-            result.ShouldBe(
-                @"ALTER TABLE TestTable1 ADD TestColumn1 TIMESTAMP" + Environment.NewLine +
-                @"UPDATE TestTable1 SET TestColumn1 = LOCALTIMESTAMP WHERE 1 = 1");
+            var result = expressions.Select(x => (string)Generator.Generate((dynamic)x));
+            result.ShouldBe([
+                @"ALTER TABLE TestTable1 ADD TestColumn1 TIMESTAMP;",
+                @"UPDATE TestTable1 SET TestColumn1 = LOCALTIMESTAMP WHERE 1 = 1;",
+            ]);
         }
 
         [Test]
@@ -142,7 +144,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 DECIMAL(19, 2) NOT NULL");
+            result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 DECIMAL(19, 2) NOT NULL;");
         }
 
         [Test]
@@ -151,7 +153,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             var expression = GeneratorTestHelper.GetCreateDecimalColumnExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 DECIMAL(19, 2) NOT NULL");
+            result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 DECIMAL(19, 2) NOT NULL;");
         }
 
         [Test]
@@ -161,7 +163,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestTable1 DROP TestColumn1");
+            result.ShouldBe("ALTER TABLE TestTable1 DROP TestColumn1;");
         }
 
         [Test]
@@ -170,7 +172,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             var expression = GeneratorTestHelper.GetDeleteColumnExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestTable1 DROP TestColumn1");
+            result.ShouldBe("ALTER TABLE TestTable1 DROP TestColumn1;");
         }
 
         [Test]
@@ -180,7 +182,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestTable1 DROP TestColumn1; ALTER TABLE TestTable1 DROP TestColumn2");
+            result.ShouldBe("ALTER TABLE TestTable1 DROP TestColumn1;ALTER TABLE TestTable1 DROP TestColumn2;");
         }
 
         [Test]
@@ -189,7 +191,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             var expression = GeneratorTestHelper.GetDeleteColumnExpression(new[] { "TestColumn1", "TestColumn2" });
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestTable1 DROP TestColumn1; ALTER TABLE TestTable1 DROP TestColumn2");
+            result.ShouldBe("ALTER TABLE TestTable1 DROP TestColumn1;ALTER TABLE TestTable1 DROP TestColumn2;");
         }
 
         [Test]
@@ -199,7 +201,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestTable1 ALTER COLUMN TestColumn1 TO TestColumn2");
+            result.ShouldBe("ALTER TABLE TestTable1 ALTER COLUMN TestColumn1 TO TestColumn2;");
         }
 
         [Test]
@@ -208,7 +210,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             var expression = GeneratorTestHelper.GetRenameColumnExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestTable1 ALTER COLUMN TestColumn1 TO TestColumn2");
+            result.ShouldBe("ALTER TABLE TestTable1 ALTER COLUMN TestColumn1 TO TestColumn2;");
         }
 
         [Test]
@@ -218,7 +220,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             expression.Column.Size = null;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 VARCHAR(255) NOT NULL");
+            result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 VARCHAR(255) NOT NULL;");
         }
 
         [Test]
@@ -228,7 +230,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             expression.Column.Size = 10;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 VARCHAR(10) NOT NULL");
+            result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 VARCHAR(10) NOT NULL;");
         }
 
         [Test]
@@ -238,7 +240,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             expression.Column.Size = 1048576;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 BLOB SUB_TYPE TEXT NOT NULL");
+            result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 BLOB SUB_TYPE TEXT NOT NULL;");
         }
 
         [Test]

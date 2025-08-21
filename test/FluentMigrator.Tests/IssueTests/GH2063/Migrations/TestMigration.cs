@@ -1,4 +1,4 @@
-#region License
+﻿#region License
 // Copyright (c) 2018, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,28 +14,27 @@
 // limitations under the License.
 #endregion
 
-using NUnit.Framework;
-
-namespace FluentMigrator.Tests.Integration.Processors.Oracle.EndToEnd
+namespace FluentMigrator.Tests.IssueTests.GH2063.Migrations
 {
-    [TestFixture]
-    [Category("Integration")]
-    [Category("OracleManaged")]
-    public class Issue1196 : OracleManagedEndToEndFixture
+    [Migration(version: 1)]
+    public class TestMigration : Migration
     {
-        [SetUp]
-        public void SetUp()
+        /// <inheritdoc />
+        public override void Up()
         {
-            IntegrationTestOptions.Oracle.IgnoreIfNotEnabled();
+            Create.Table("NamingConfig")
+                .WithColumn("Id").AsGuid().PrimaryKey()
+                .WithColumn("RenameEpisodes").AsInt32();
+
+            Update.Table("NamingConfig")
+                .Set(new { RenameEpisodes = 1 })
+                .Where(new { RenameEpisodes = -1 });
         }
 
-        [Test]
-        public void Insert_LongStringLiteral_ShouldNotFail()
+        /// <inheritdoc />
+        public override void Down()
         {
-            var ns = typeof(FluentMigrator.Tests.Integration.Migrations.Oracle.Issue1196.Migration_v100_AddSimpleTable).Namespace;
-
-            Migrate(ns);
-            Rollback(ns);
+            Delete.Table("NamingConfig");
         }
     }
 }

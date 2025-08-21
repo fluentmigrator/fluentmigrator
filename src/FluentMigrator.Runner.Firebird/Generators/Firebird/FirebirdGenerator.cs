@@ -79,6 +79,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
         public override string AddColumn { get { return "ALTER TABLE {0} ADD {1}"; } }
         public override string DropColumn { get { return "ALTER TABLE {0} DROP {1}"; } }
         public override string RenameColumn { get { return "ALTER TABLE {0} ALTER COLUMN {1} TO {2}"; } }
+        public override string DropTableIfExists { get { return "IF( EXISTS( SELECT 1 FROM RDB$RELATIONS WHERE (rdb$flags IS NOT NULL) AND LOWER(RDB$RELATION_NAME) = LOWER('{0}'))) THEN EXECUTE STATEMENT 'DROP TABLE {0}')"; } }
 
         protected FirebirdOptions FBOptions { get; }
 
@@ -89,7 +90,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
         public override string Generate(AlterDefaultConstraintExpression expression)
         {
             Truncator.Truncate(expression);
-            return string.Format("ALTER TABLE {0} ALTER COLUMN {1} SET DEFAULT {2}",
+            return FormatStatement("ALTER TABLE {0} ALTER COLUMN {1} SET DEFAULT {2}",
                 Quoter.QuoteTableName(expression.TableName),
                 Quoter.QuoteColumnName(expression.ColumnName),
                 Quoter.QuoteValue(expression.DefaultValue)
@@ -99,7 +100,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
         public override string Generate(DeleteDefaultConstraintExpression expression)
         {
             Truncator.Truncate(expression);
-            return string.Format("ALTER TABLE {0} ALTER COLUMN {1} DROP DEFAULT",
+            return FormatStatement("ALTER TABLE {0} ALTER COLUMN {1} DROP DEFAULT",
                 Quoter.QuoteTableName(expression.TableName),
                 Quoter.QuoteColumnName(expression.ColumnName)
                 );
@@ -131,7 +132,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
 
             }
 
-            return string.Format(CreateIndex
+            return FormatStatement(CreateIndex
                 , GetUniqueString(expression)
                 , indexDirection == Direction.Ascending ? "ASC " : "DESC "
                 , Quoter.QuoteIndexName(expression.Index.Name)
@@ -153,20 +154,20 @@ namespace FluentMigrator.Runner.Generators.Firebird
         public override string Generate(CreateSequenceExpression expression)
         {
             Truncator.Truncate(expression);
-            return string.Format("CREATE SEQUENCE {0}", Quoter.QuoteSequenceName(expression.Sequence.Name));
+            return FormatStatement("CREATE SEQUENCE {0}", Quoter.QuoteSequenceName(expression.Sequence.Name));
         }
 
         public override string Generate(DeleteSequenceExpression expression)
         {
             Truncator.Truncate(expression);
-            return string.Format("DROP SEQUENCE {0}", Quoter.QuoteSequenceName(expression.SequenceName));
+            return FormatStatement("DROP SEQUENCE {0}", Quoter.QuoteSequenceName(expression.SequenceName));
         }
 
         public string GenerateAlterSequence(SequenceDefinition sequence)
         {
             Truncator.Truncate(sequence);
             if (sequence.StartWith != null)
-                return string.Format("ALTER SEQUENCE {0} RESTART WITH {1}", Quoter.QuoteSequenceName(sequence.Name), sequence.StartWith.ToString());
+                return FormatStatement("ALTER SEQUENCE {0} RESTART WITH {1}", Quoter.QuoteSequenceName(sequence.Name), sequence.StartWith.ToString());
 
             return string.Empty;
         }
@@ -190,10 +191,6 @@ namespace FluentMigrator.Runner.Generators.Firebird
         public override string Generate(DeleteTableExpression expression)
         {
             Truncator.Truncate(expression);
-            if (expression.IfExists)
-            {
-                return string.Format("IF( EXISTS( SELECT 1 FROM RDB$RELATIONS WHERE (rdb$flags IS NOT NULL) AND LOWER(RDB$RELATION_NAME) = LOWER('{0}'))) THEN EXECUTE STATEMENT 'DROP TABLE {0}')", expression.TableName);
-            }
             return base.Generate(expression);
         }
 
@@ -282,7 +279,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
         public virtual string GenerateSetNullPre3(string tableName, ColumnDefinition column)
         {
             Truncator.Truncate(column);
-            return string.Format(AlterColumnSetNullablePre3,
+            return FormatStatement(AlterColumnSetNullablePre3,
                 !column.IsNullable.HasValue || !column.IsNullable.Value  ? "1" : "NULL",
                 Quoter.QuoteValue(tableName),
                 Quoter.QuoteValue(column.Name)
@@ -294,7 +291,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
             Truncator.Truncate(column);
             var dropSet = !column.IsNullable.HasValue ? "DROP" : "SET";
             var nullable = column.IsNullable.GetValueOrDefault() ? "NULL" : "NOT NULL";
-            return string.Format(AlterColumnSetNullable3,
+            return FormatStatement(AlterColumnSetNullable3,
                 Quoter.QuoteTableName(tableName),
                 Quoter.QuoteColumnName(column.Name),
                 dropSet,
@@ -305,7 +302,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
         public virtual string GenerateSetType(string tableName, ColumnDefinition column)
         {
             Truncator.Truncate(column);
-            return string.Format(AlterColumnSetType,
+            return FormatStatement(AlterColumnSetType,
                 Quoter.QuoteTableName(tableName),
                 Quoter.QuoteColumnName(column.Name),
                 ((FirebirdColumn) Column).GenerateForTypeAlter(column)

@@ -49,25 +49,13 @@ namespace FluentMigrator.Runner.Generators.Hana
         {
         }
 
-        public override string DropTable
-        {
-            get
-            {
-                return "DROP TABLE {0}";
-            }
-        }
         public override string Generate(DeleteTableExpression expression)
         {
             if (expression.IfExists)
             {
                 return CompatibilityMode.HandleCompatibility("If exists syntax is not supported");
             }
-            return string.Format("{0};", base.Generate(expression));
-        }
-
-        public override string Generate(RenameTableExpression expression)
-        {
-            return string.Format("{0};", base.Generate(expression));
+            return base.Generate(expression);
         }
 
         public override string Generate(CreateSequenceExpression expression)
@@ -116,48 +104,20 @@ namespace FluentMigrator.Runner.Generators.Hana
                 result.Append(" CYCLE");
             }
 
-            result.Append(";");
-
+            AppendSqlStatementEndToken(result);
 
             return result.ToString();
         }
 
-        public override string AddColumn
-        {
-            get { return "ALTER TABLE {0} ADD ({1})"; }
-        }
-
-        public override string AlterColumn
-        {
-            get { return "ALTER TABLE {0} ALTER ({1})"; }
-        }
-
-        public override string DropColumn
-        {
-            get { return "ALTER TABLE {0} DROP ({1})"; }
-        }
-
-        public override string RenameColumn { get { return "RENAME COLUMN {0}.{1} TO {2}"; } }
-
-        public override string Generate(DeleteDataExpression expression)
-        {
-            return string.Format("{0};", base.Generate(expression));
-        }
-
-        public override string Generate(InsertDataExpression expression)
-        {
-            return string.Format("{0};", base.Generate(expression));
-        }
+        public override string AddColumn => "ALTER TABLE {0} ADD ({1})";
+        public override string AlterColumn => "ALTER TABLE {0} ALTER ({1})";
+        public override string DropColumn => "ALTER TABLE {0} DROP ({1})";
+        public override string RenameColumn => "RENAME COLUMN {0}.{1} TO {2}";
 
         private string InnerGenerate(CreateTableExpression expression)
         {
             var tableName = Quoter.QuoteTableName(expression.TableName);
-            return string.Format("CREATE COLUMN TABLE {0} ({1});", tableName, Column.Generate(expression.Columns, tableName));
-        }
-
-        public override string Generate(UpdateDataExpression expression)
-        {
-            return string.Format("{0};", base.Generate(expression));
+            return FormatStatement("CREATE COLUMN TABLE {0} ({1})", tableName, Column.Generate(expression.Columns, tableName));
         }
 
         /// <inheritdoc />
@@ -192,9 +152,7 @@ namespace FluentMigrator.Runner.Generators.Hana
         {
             var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatement(expression);
 
-            return string.Format("{0};",
-                string.IsNullOrEmpty(descriptionStatement)
-                ? base.Generate(expression) : descriptionStatement);
+            return string.IsNullOrEmpty(descriptionStatement) ? base.Generate(expression) : descriptionStatement;
         }
 
         public override string Generate(CreateColumnExpression expression)
@@ -202,7 +160,7 @@ namespace FluentMigrator.Runner.Generators.Hana
             var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatement(expression);
 
             if (string.IsNullOrEmpty(descriptionStatement))
-                return string.Format("{0};",base.Generate(expression) );
+                return base.Generate(expression);
 
             var wrappedCreateColumnStatement = base.Generate(expression);
 
@@ -217,7 +175,7 @@ namespace FluentMigrator.Runner.Generators.Hana
             var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatement(expression);
 
             if (string.IsNullOrEmpty(descriptionStatement))
-                return string.Format("{0};", base.Generate(expression));
+                return base.Generate(expression);
 
             var wrappedAlterColumnStatement = base.Generate(expression);
 
@@ -227,33 +185,14 @@ namespace FluentMigrator.Runner.Generators.Hana
             return WrapInBlock(alterColumnWithDescriptionBuilder.ToString());
         }
 
-        public override string Generate(DeleteColumnExpression expression)
-        {
-            return string.Format("{0};", base.Generate(expression));
-        }
-
-        public override string Generate(CreateForeignKeyExpression expression)
-        {
-            return string.Format("{0};", base.Generate(expression));
-        }
-        public override string Generate(CreateConstraintExpression expression)
-        {
-            return string.Format("{0};", base.Generate(expression));
-        }
-
-        public override string Generate(DeleteForeignKeyExpression expression)
-        {
-            return string.Format("{0};", base.Generate(expression));
-        }
-
         public override string Generate(DeleteConstraintExpression expression)
         {
             if (expression.Constraint.IsPrimaryKeyConstraint)
             {
-                return string.Format("ALTER TABLE {0} DROP PRIMARY KEY;", Quoter.QuoteTableName(expression.Constraint.TableName));
+                return FormatStatement("ALTER TABLE {0} DROP PRIMARY KEY", Quoter.QuoteTableName(expression.Constraint.TableName));
             }
 
-            return string.Format("{0};", base.Generate(expression));
+            return base.Generate(expression);
         }
 
         public override string Generate(AlterDefaultConstraintExpression expression)
@@ -266,34 +205,11 @@ namespace FluentMigrator.Runner.Generators.Hana
             return CompatibilityMode.HandleCompatibility("Default constraints are not supported");
         }
 
-        public override string Generate(CreateIndexExpression expression)
-        {
-            return string.Format("{0};", base.Generate(expression));
-        }
-
-        public override string Generate(DeleteIndexExpression expression)
-        {
-            return string.Format("{0};", base.Generate(expression));
-        }
-
-        public override string Generate(DeleteSequenceExpression expression)
-        {
-            var result = new StringBuilder("DROP SEQUENCE ")
-                .Append(Quoter.QuoteSequenceName(expression.SequenceName))
-                .Append(';');
-            return result.ToString();
-        }
-
-        public override string Generate(RenameColumnExpression expression)
-        {
-            return string.Format("{0};", base.Generate(expression));
-        }
-
-        private static string WrapInBlock(string sql)
+        private string WrapInBlock(string sql)
         {
             return string.IsNullOrEmpty(sql)
                 ? string.Empty
-                : string.Format("BEGIN {0} END;", sql);
+                : FormatStatement("BEGIN {0} END", sql);
         }
     }
 }

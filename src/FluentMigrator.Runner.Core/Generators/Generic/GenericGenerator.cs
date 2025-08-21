@@ -8,6 +8,8 @@ using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Base;
 
+using JetBrains.Annotations;
+
 using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Generators.Generic
@@ -52,6 +54,16 @@ namespace FluentMigrator.Runner.Generators.Generic
         public virtual string DeleteConstraint { get { return "ALTER TABLE {0} DROP CONSTRAINT {1}"; } }
         public virtual string CreateForeignKeyConstraint { get { return "ALTER TABLE {0} ADD {1}"; } }
 
+        [StringFormatMethod("format")]
+        protected string FormatStatement(string format, params object[] args)
+        {
+            var builder = new StringBuilder().AppendFormat(format, args);
+
+            AppendSqlStatementEndToken(builder);
+
+            return builder.ToString();
+        }
+
         public virtual string GetUniqueString(CreateIndexExpression column)
         {
             return column.Index.IsUnique ? "UNIQUE " : string.Empty;
@@ -87,21 +99,22 @@ namespace FluentMigrator.Runner.Generators.Generic
                 return errors;
             }
 
-            return string.Format(CreateTable, quotedTableName, Column.Generate(expression.Columns, quotedTableName));
+            return FormatStatement(CreateTable, quotedTableName, Column.Generate(expression.Columns, quotedTableName));
         }
 
         public override string Generate(DeleteTableExpression expression)
         {
             if (expression.IfExists)
             {
-                return String.Format(DropTableIfExists, Quoter.QuoteTableName(expression.TableName));
+                return FormatStatement(DropTableIfExists, Quoter.QuoteTableName(expression.TableName));
             }
-            return string.Format(DropTable, Quoter.QuoteTableName(expression.TableName, expression.SchemaName));
+
+            return FormatStatement(DropTable, Quoter.QuoteTableName(expression.TableName, expression.SchemaName));
         }
 
         public override string Generate(RenameTableExpression expression)
         {
-            return string.Format(RenameTable, Quoter.QuoteTableName(expression.OldName, expression.SchemaName), Quoter.Quote(expression.NewName));
+            return FormatStatement(RenameTable, Quoter.QuoteTableName(expression.OldName, expression.SchemaName), Quoter.Quote(expression.NewName));
         }
 
         public override string Generate(CreateColumnExpression expression)
@@ -112,7 +125,7 @@ namespace FluentMigrator.Runner.Generators.Generic
                 return errors;
             }
 
-            return string.Format(AddColumn, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), Column.Generate(expression.Column));
+            return FormatStatement(AddColumn, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), Column.Generate(expression.Column));
         }
 
         public override string Generate(AlterColumnExpression expression)
@@ -123,7 +136,7 @@ namespace FluentMigrator.Runner.Generators.Generic
                 return errors;
             }
 
-            return string.Format(AlterColumn, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), Column.Generate(expression.Column));
+            return FormatStatement(AlterColumn, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), Column.Generate(expression.Column));
         }
 
         public override string Generate(DeleteColumnExpression expression)
@@ -131,23 +144,24 @@ namespace FluentMigrator.Runner.Generators.Generic
             var builder = new StringBuilder();
             foreach (var columnName in expression.ColumnNames)
             {
-                if (expression.ColumnNames.First() != columnName)
-                {
-                    AppendSqlStatementEndToken(builder);
-                }
+                builder.AppendFormat(
+                    DropColumn,
+                    Quoter.QuoteTableName(expression.TableName, expression.SchemaName),
+                    Quoter.QuoteColumnName(columnName));
 
-                builder.AppendFormat(DropColumn, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), Quoter.QuoteColumnName(columnName));
+                AppendSqlStatementEndToken(builder);
             }
+
             return builder.ToString();
         }
 
         public override string Generate(RenameColumnExpression expression)
         {
-            return string.Format(RenameColumn,
+            return FormatStatement(RenameColumn,
                 Quoter.QuoteTableName(expression.TableName, expression.SchemaName),
                 Quoter.QuoteColumnName(expression.OldName),
                 Quoter.QuoteColumnName(expression.NewName)
-                );
+            );
         }
 
         /// <inheritdoc />
@@ -169,7 +183,7 @@ namespace FluentMigrator.Runner.Generators.Generic
                 }
             }
 
-            return string.Format(CreateIndex
+            return FormatStatement(CreateIndex
                 , GetUniqueString(expression)
                 , GetClusterTypeString(expression)
                 , Quoter.QuoteIndexName(expression.Index.Name)
@@ -179,12 +193,12 @@ namespace FluentMigrator.Runner.Generators.Generic
 
         public override string Generate(DeleteIndexExpression expression)
         {
-            return string.Format(DropIndex, Quoter.QuoteIndexName(expression.Index.Name), Quoter.QuoteTableName(expression.Index.TableName, expression.Index.SchemaName));
+            return FormatStatement(DropIndex, Quoter.QuoteIndexName(expression.Index.Name), Quoter.QuoteTableName(expression.Index.TableName, expression.Index.SchemaName));
         }
 
         public override string Generate(CreateForeignKeyExpression expression)
         {
-            return string.Format(
+            return FormatStatement(
                 CreateForeignKeyConstraint,
                 Quoter.QuoteTableName(expression.ForeignKey.ForeignTable, expression.ForeignKey.ForeignTableSchema),
                 Column.FormatForeignKey(expression.ForeignKey, GenerateForeignKeyName));
@@ -201,7 +215,7 @@ namespace FluentMigrator.Runner.Generators.Generic
                 columns[i] = Quoter.QuoteColumnName(expression.Constraint.Columns.ElementAt(i));
             }
 
-            return string.Format(CreateConstraint, Quoter.QuoteTableName(expression.Constraint.TableName, expression.Constraint.SchemaName),
+            return FormatStatement(CreateConstraint, Quoter.QuoteTableName(expression.Constraint.TableName, expression.Constraint.SchemaName),
                 Quoter.QuoteConstraintName(expression.Constraint.ConstraintName),
                 constraintType,
                 string.Join(", ", columns));
@@ -209,7 +223,7 @@ namespace FluentMigrator.Runner.Generators.Generic
 
         public override string Generate(DeleteConstraintExpression expression)
         {
-            return string.Format(DeleteConstraint, Quoter.QuoteTableName(expression.Constraint.TableName, expression.Constraint.SchemaName), Quoter.QuoteConstraintName(expression.Constraint.ConstraintName));
+            return FormatStatement(DeleteConstraint, Quoter.QuoteTableName(expression.Constraint.TableName, expression.Constraint.SchemaName), Quoter.QuoteConstraintName(expression.Constraint.ConstraintName));
         }
 
         public virtual string GenerateForeignKeyName(ForeignKeyDefinition foreignKey)
@@ -224,7 +238,10 @@ namespace FluentMigrator.Runner.Generators.Generic
                 throw new ArgumentNullException(nameof(expression), ErrorMessages.ExpressionTableNameMissingWithHints);
             }
 
-            return string.Format(DeleteConstraint, Quoter.QuoteTableName(expression.ForeignKey.ForeignTable, expression.ForeignKey.ForeignTableSchema), Quoter.QuoteColumnName(expression.ForeignKey.Name));
+            return FormatStatement(DeleteConstraint,
+                Quoter.QuoteTableName(expression.ForeignKey.ForeignTable, expression.ForeignKey.ForeignTableSchema),
+                Quoter.QuoteColumnName(expression.ForeignKey.Name)
+            );
         }
 
         public override string Generate(InsertDataExpression expression)
@@ -238,16 +255,13 @@ namespace FluentMigrator.Runner.Generators.Generic
             var output = new StringBuilder();
             foreach (var pair in GenerateColumnNamesAndValues(expression))
             {
-                if (output.Length != 0)
-                {
-                    AppendSqlStatementEndToken(output);
-                }
-
                 output.AppendFormat(
                     InsertData,
                     Quoter.QuoteTableName(expression.TableName, expression.SchemaName),
                     pair.Key,
                     pair.Value);
+
+                AppendSqlStatementEndToken(output);
             }
 
             return output.ToString();
@@ -255,7 +269,7 @@ namespace FluentMigrator.Runner.Generators.Generic
 
         protected virtual StringBuilder AppendSqlStatementEndToken(StringBuilder stringBuilder)
         {
-            return stringBuilder.Append("; ");
+            return stringBuilder.Append(";");
         }
 
         protected List<KeyValuePair<string,string>> GenerateColumnNamesAndValues(InsertDataExpression expression)
@@ -315,7 +329,11 @@ namespace FluentMigrator.Runner.Generators.Generic
                 GenerateWhere(expression.Where, whereClauses);
             }
 
-            return string.Format(UpdateData, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), string.Join(", ", updateItems.ToArray()), string.Join(" AND ", whereClauses.ToArray()));
+            return FormatStatement(UpdateData,
+                Quoter.QuoteTableName(expression.TableName, expression.SchemaName),
+                string.Join(", ", updateItems.ToArray()),
+                string.Join(" AND ", whereClauses.ToArray())
+            );
         }
 
         /// <summary>
@@ -387,12 +405,8 @@ namespace FluentMigrator.Runner.Generators.Generic
             var output = new StringBuilder();
             foreach (var deleteItem in deleteItems)
             {
-                if (output.Length != 0)
-                {
-                    AppendSqlStatementEndToken(output);
-                }
-
                 output.Append(deleteItem);
+                AppendSqlStatementEndToken(output);
             }
 
             return output.ToString();
@@ -459,14 +473,14 @@ namespace FluentMigrator.Runner.Generators.Generic
                 result.Append(" CYCLE");
             }
 
+            AppendSqlStatementEndToken(result);
+
             return result.ToString();
         }
 
         public override string Generate(DeleteSequenceExpression expression)
         {
-            var result = new StringBuilder("DROP SEQUENCE ");
-            result.AppendFormat(Quoter.QuoteSequenceName(expression.SequenceName, expression.SchemaName));
-            return result.ToString();
+            return FormatStatement("DROP SEQUENCE {0}", Quoter.QuoteSequenceName(expression.SequenceName, expression.SchemaName));
         }
     }
 }

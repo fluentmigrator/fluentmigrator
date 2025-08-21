@@ -78,14 +78,6 @@ namespace FluentMigrator.Runner.Generators.Oracle
             return useQuotedIdentifiers ? new OracleQuoterQuotedIdentifier() : new OracleQuoter();
         }
 
-
-        public override string DropTable
-        {
-            get
-            {
-                return "DROP TABLE {0}";
-            }
-        }
         public override string Generate(DeleteTableExpression expression)
         {
             if (expression.IfExists)
@@ -93,7 +85,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
                 return CompatibilityMode.HandleCompatibility("If Exists logic is not supported");
             }
 
-            return string.Format(DropTable, ExpandTableName(Quoter.QuoteTableName(expression.SchemaName),Quoter.QuoteTableName(expression.TableName)));
+            return FormatStatement(DropTable, ExpandTableName(Quoter.QuoteTableName(expression.SchemaName),Quoter.QuoteTableName(expression.TableName)));
         }
 
         public override string Generate(CreateSequenceExpression expression)
@@ -148,6 +140,8 @@ namespace FluentMigrator.Runner.Generators.Oracle
                 result.Append(" CYCLE");
             }
 
+            AppendSqlStatementEndToken(result);
+
             return result.ToString();
         }
 
@@ -176,24 +170,24 @@ namespace FluentMigrator.Runner.Generators.Oracle
             return string.IsNullOrEmpty(schema) ? table : string.Concat(schema,".",table);
         }
 
-        private static string WrapStatementInExecuteImmediateBlock(string statement)
+        private string WrapStatementInExecuteImmediateBlock(string statement)
         {
             if (string.IsNullOrEmpty(statement))
             {
                 return string.Empty;
             }
 
-            return string.Format("EXECUTE IMMEDIATE '{0}';", FormatHelper.FormatSqlEscape(statement));
+            return FormatStatement("EXECUTE IMMEDIATE '{0}'", FormatHelper.FormatSqlEscape(statement));
         }
 
-        private static string WrapInBlock(string sql)
+        private string WrapInBlock(string sql)
         {
             if (string.IsNullOrEmpty(sql))
             {
                 return string.Empty;
             }
 
-            return string.Format("BEGIN {0} END;", sql);
+            return FormatStatement("BEGIN {0} END", sql);
         }
 
         private string InnerGenerate(CreateTableExpression expression)
@@ -201,12 +195,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
             var tableName = Quoter.QuoteTableName(expression.TableName);
             var schemaName = Quoter.QuoteSchemaName(expression.SchemaName);
 
-            return string.Format("CREATE TABLE {0} ({1})",ExpandTableName(schemaName,tableName), Column.Generate(expression.Columns, tableName));
-        }
-
-        protected override StringBuilder AppendSqlStatementEndToken(StringBuilder stringBuilder)
-        {
-            return stringBuilder.AppendLine().AppendLine(";");
+            return FormatStatement("CREATE TABLE {0} ({1})",ExpandTableName(schemaName,tableName), Column.Generate(expression.Columns, tableName));
         }
 
         /// <inheritdoc />
@@ -306,7 +295,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
                 indexColumns[i] = $"{Quoter.QuoteColumnName(columnDef.Name)} {direction}";
             }
 
-            return string.Format(CreateIndex
+            return FormatStatement(CreateIndex
                 , GetUniqueString(expression)
                 , GetClusterTypeString(expression)
                 , Quoter.QuoteIndexName(expression.Index.Name, expression.Index.SchemaName)
@@ -334,12 +323,13 @@ namespace FluentMigrator.Runner.Generators.Oracle
                 string values = string.Join(", ", columnValues.ToArray());
                 insertStrings.Add(string.Format(InsertData, ExpandTableName(Quoter.QuoteSchemaName(expression.SchemaName), Quoter.QuoteTableName(expression.TableName)), columns, values));
             }
-            return "INSERT ALL " + string.Join(" ", insertStrings.ToArray()) + " SELECT 1 FROM DUAL";
+
+            return FormatStatement("INSERT ALL {0} SELECT 1 FROM DUAL", string.Join(" ", insertStrings.ToArray()));
         }
 
         public override string Generate(AlterDefaultConstraintExpression expression)
         {
-            return string.Format(AlterColumn, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), Column.Generate(new ColumnDefinition
+            return FormatStatement(AlterColumn, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), Column.Generate(new ColumnDefinition
             {
                 ModificationType = ColumnModificationType.Alter,
                 Name = expression.ColumnName,
@@ -363,7 +353,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
             var quotedSchema = Quoter.QuoteSchemaName(expression.Index.SchemaName);
             var quotedIndex = Quoter.QuoteIndexName(expression.Index.Name);
             var indexName = string.IsNullOrEmpty(quotedSchema) ? quotedIndex : $"{quotedSchema}.{quotedIndex}";
-            return string.Format("DROP INDEX {0}", indexName);
+            return FormatStatement("DROP INDEX {0}", indexName);
         }
     }
 }
