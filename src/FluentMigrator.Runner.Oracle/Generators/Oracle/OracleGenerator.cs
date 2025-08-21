@@ -206,6 +206,10 @@ namespace FluentMigrator.Runner.Generators.Oracle
 
         public override string Generate(CreateTableExpression expression)
         {
+            if (expression.Columns.Any(x => x.ExpressionStored))
+            {
+                CompatibilityMode.HandleCompatibility("Stored computed columns are not supported");
+            }
             var descriptionStatements = DescriptionGenerator.GenerateDescriptionStatements(expression);
             var statements = descriptionStatements as string[] ?? descriptionStatements.ToArray();
 
@@ -243,6 +247,10 @@ namespace FluentMigrator.Runner.Generators.Oracle
 
         public override string Generate(CreateColumnExpression expression)
         {
+            if (expression.Column.ExpressionStored)
+            {
+                CompatibilityMode.HandleCompatibility("Stored computed columns are not supported");
+            }
             var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatement(expression);
 
             if (string.IsNullOrEmpty(descriptionStatement))
@@ -258,6 +266,10 @@ namespace FluentMigrator.Runner.Generators.Oracle
 
         public override string Generate(AlterColumnExpression expression)
         {
+            if (expression.Column.ExpressionStored)
+            {
+                CompatibilityMode.HandleCompatibility("Stored computed columns are not supported");
+            }
             var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatement(expression);
 
             if (string.IsNullOrEmpty(descriptionStatement))

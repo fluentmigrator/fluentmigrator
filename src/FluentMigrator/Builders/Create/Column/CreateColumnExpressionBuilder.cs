@@ -192,7 +192,15 @@ namespace FluentMigrator.Builders.Create.Column
         /// <inheritdoc />
         public ICreateColumnOptionSyntax NotNullable()
         {
-           ColumnHelper.SetNullable(false);
+            ColumnHelper.SetNullable(false);
+            return this;
+        }
+
+        /// <inheritdoc/>
+        public ICreateColumnOptionSyntax Computed(string expression, bool stored = false)
+        {
+            Expression.Column.Expression = expression;
+            Expression.Column.ExpressionStored = stored;
             return this;
         }
 

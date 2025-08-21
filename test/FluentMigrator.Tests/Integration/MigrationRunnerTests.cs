@@ -509,7 +509,8 @@ namespace FluentMigrator.Tests.Integration
                     runner.VersionLoader.VersionInfo.HasAppliedMigration(5).ShouldBeTrue();
                     runner.VersionLoader.VersionInfo.HasAppliedMigration(6).ShouldBeTrue();
                     runner.VersionLoader.VersionInfo.HasAppliedMigration(7).ShouldBeTrue();
-                    runner.VersionLoader.VersionInfo.Latest().ShouldBe(7);
+                    runner.VersionLoader.VersionInfo.HasAppliedMigration(8).ShouldBeTrue();
+                    runner.VersionLoader.VersionInfo.Latest().ShouldBe(8);
 
                     runner.RollbackToVersion(0, false);
                 },
