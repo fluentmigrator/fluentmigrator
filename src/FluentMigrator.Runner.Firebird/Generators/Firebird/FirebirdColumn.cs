@@ -79,5 +79,17 @@ namespace FluentMigrator.Runner.Generators.Firebird
         {
             return column.Expression == null ? null : $"GENERATED ALWAYS AS ({column.Expression})";
         }
+
+        /// <inheritdoc />
+        protected override string FormatNullable(ColumnDefinition column)
+        {
+            if (column.Expression == null)
+            {
+                return base.FormatNullable(column);
+            }
+
+            // In Firebird, computed columns seem not to allow NULL/NOT NULL specification
+            return string.Empty;
+        }
     }
 }

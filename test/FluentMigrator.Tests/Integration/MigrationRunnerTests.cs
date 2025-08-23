@@ -38,6 +38,7 @@ using FluentMigrator.Runner.Processors.Snowflake;
 using FluentMigrator.Runner.Processors.SQLite;
 using FluentMigrator.Runner.Processors.SqlServer;
 using FluentMigrator.Runner.VersionTableInfo;
+using FluentMigrator.Tests.Integration.Migrations.Computed;
 using FluentMigrator.Tests.Integration.Migrations.Issues;
 using FluentMigrator.Tests.Integration.Migrations.Tagged;
 using FluentMigrator.Tests.Integration.TestCases;
@@ -1283,6 +1284,53 @@ namespace FluentMigrator.Tests.Integration
                     runner.Down(new TestCreateAndDropTableMigrationWithSchema());
 
                     runner.Down(new TestCreateSchema());
+                },
+                serverOptions,
+                true);
+        }
+
+        [Test]
+        [TestCaseSource(typeof(ProcessorTestCaseSource))]
+        public void CanUseComputedStoredColumn(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
+        {
+            ExecuteWithProcessor(
+                processorType,
+                services => services.WithMigrationsIn(RootNamespace),
+                (serviceProvider, processor) =>
+                {
+                    var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
+
+                    runner.Up(new ComputedStoredColumnMigration());
+
+                    DataSet ds = processor.ReadTableData(null, "products");
+                    ds.Tables[0].Rows.Count.ShouldBe(1);
+                    ds.Tables[0].Rows[0][3].ShouldBe(200m); // Total = Price * Quantity
+
+                    runner.Down(new ComputedStoredColumnMigration());
+                },
+                serverOptions,
+                true);
+        }
+
+        [Test]
+        [TestCaseSource(typeof(ProcessorTestCaseSource))]
+        public void CanUseComputedNotStoredColumn(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
+        {
+            ExecuteWithProcessor(
+                processorType,
+                services => services.WithMigrationsIn(RootNamespace),
+                (serviceProvider, processor) =>
+                {
+                    var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
+
+                    runner.Up(new ComputedNotStoredColumnMigration());
+
+                    DataSet ds = processor.ReadTableData(null, "products_nullable");
+                    ds.Tables[0].Rows.Count.ShouldBe(2);
+                    ds.Tables[0].Rows[0][3].ShouldBe(200m); // Total = Price * Quantity
+                    ds.Tables[0].Rows[1][3].ShouldBe(DBNull.Value); // Total = Price * Quantity
+
+                    runner.Down(new ComputedNotStoredColumnMigration());
                 },
                 serverOptions,
                 true);

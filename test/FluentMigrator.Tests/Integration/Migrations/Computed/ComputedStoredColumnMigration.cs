@@ -16,26 +16,30 @@
 //
 #endregion
 
-namespace FluentMigrator.Tests.Integration.Migrations
+namespace FluentMigrator.Tests.Integration.Migrations.Computed
 {
     [Migration(8)]
-    public class ComputedColumnMigration : Migration
+    public class ComputedStoredColumnMigration : Migration
     {
         public override void Up()
         {
-            Create.Table("Products")
-                .WithColumn("Id").AsInt32().PrimaryKey().Identity()
-                .WithColumn("Price").AsDecimal(10, 2).NotNullable()
-                .WithColumn("Quantity").AsInt32().NotNullable()
-                .WithColumn("Total").AsDecimal(10, 2).Computed("Price * Quantity");
-                
-            Alter.Table("Products")
-                .AddColumn("TotalWithTax").AsDecimal(10, 2).Computed("Total * 1.1", true);
+            Create.Table("products")
+                .WithColumn("id").AsInt32().PrimaryKey().Identity()
+                .WithColumn("price").AsDecimal(10, 2).NotNullable()
+                .WithColumn("quantity").AsInt32().NotNullable()
+                .WithColumn("total").AsDecimal(10, 2).NotNullable()
+                    .Computed("price * quantity", true);
+
+            Insert.IntoTable("products").Row(new
+            {
+                price = 100.00m,
+                quantity = 2,
+            });
         }
-        
+
         public override void Down()
         {
-            Delete.Table("Products");
+            Delete.Table("products");
         }
     }
 }
