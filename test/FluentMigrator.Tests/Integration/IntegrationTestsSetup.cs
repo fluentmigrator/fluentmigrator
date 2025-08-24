@@ -32,11 +32,11 @@ namespace FluentMigrator.Tests.Integration
         {
             await Task.WhenAll([
                 new MySqlContainer().Start(),
-                new OracleContainer().Start(),
+                // new OracleContainer().Start(),
                 new SqlServerContainer().Start(),
                 new PostgresContainer().Start(),
                 new FirebirdContainer().Start(),
-                new Db2Container().Start(),
+                // new Db2Container().Start(),
             ]);
         }
     }

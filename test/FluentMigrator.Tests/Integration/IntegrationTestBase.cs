@@ -35,7 +35,8 @@ using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Integration
 {
-    public class IntegrationTestBase
+    [Category("Integration")]
+    public abstract class IntegrationTestBase
     {
         private bool _isFirstExecuteForFirebird = true;
 

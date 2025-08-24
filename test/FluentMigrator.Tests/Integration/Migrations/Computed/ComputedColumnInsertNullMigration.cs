@@ -19,21 +19,20 @@
 namespace FluentMigrator.Tests.Integration.Migrations.Computed
 {
     [Migration(8)]
-    public class ComputedNotStoredColumnMigration : Migration
+    public class ComputedColumnInsertNullMigration : Migration
     {
         public override void Up()
         {
-            Create.Table("products")
-                .WithColumn("id").AsInt32().PrimaryKey().Identity()
-                .WithColumn("price").AsDecimal(10, 2).Nullable()
-                .WithColumn("quantity").AsInt32().Nullable()
-                .WithColumn("total").AsDecimal(10, 2).Nullable()
-                    .Computed("price * quantity", false);
+            Insert.IntoTable("products").Row(new
+            {
+                price = 30.00m,
+                quantity = (decimal?)null,
+            });
         }
 
         public override void Down()
         {
-            Delete.Table("products");
+            Delete.FromTable("products").AllRows();
         }
     }
 }

@@ -29,12 +29,6 @@ namespace FluentMigrator.Tests.Integration.Migrations.Computed
                 .WithColumn("quantity").AsInt32().NotNullable()
                 .WithColumn("total").AsDecimal(10, 2).NotNullable()
                     .Computed("price * quantity", true);
-
-            Insert.IntoTable("products").Row(new
-            {
-                price = 100.00m,
-                quantity = 2,
-            });
         }
 
         public override void Down()

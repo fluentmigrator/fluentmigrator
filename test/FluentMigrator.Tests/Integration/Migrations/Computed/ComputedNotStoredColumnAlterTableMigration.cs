@@ -18,22 +18,18 @@
 
 namespace FluentMigrator.Tests.Integration.Migrations.Computed
 {
-    [Migration(8)]
-    public class ComputedNotStoredColumnMigration : Migration
+    [Migration(11)]
+    public class ComputedNotStoredColumnAlterTableMigration : Migration
     {
         public override void Up()
         {
-            Create.Table("products")
-                .WithColumn("id").AsInt32().PrimaryKey().Identity()
-                .WithColumn("price").AsDecimal(10, 2).Nullable()
-                .WithColumn("quantity").AsInt32().Nullable()
-                .WithColumn("total").AsDecimal(10, 2).Nullable()
-                    .Computed("price * quantity", false);
+            Alter.Table("products")
+                .AddColumn("total").AsDecimal(10, 2).Nullable().Computed("price * quantity", false);
         }
 
         public override void Down()
         {
-            Delete.Table("products");
+            Delete.Column("total").FromTable("products");
         }
     }
 }

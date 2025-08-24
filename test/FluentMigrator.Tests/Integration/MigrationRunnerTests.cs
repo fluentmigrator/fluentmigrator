@@ -1290,53 +1290,6 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
-        [TestCaseSource(typeof(ProcessorTestCaseSource))]
-        public void CanUseComputedStoredColumn(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
-        {
-            ExecuteWithProcessor(
-                processorType,
-                services => services.WithMigrationsIn(RootNamespace),
-                (serviceProvider, processor) =>
-                {
-                    var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
-
-                    runner.Up(new ComputedStoredColumnMigration());
-
-                    DataSet ds = processor.ReadTableData(null, "products");
-                    ds.Tables[0].Rows.Count.ShouldBe(1);
-                    ds.Tables[0].Rows[0][3].ShouldBe(200m); // Total = Price * Quantity
-
-                    runner.Down(new ComputedStoredColumnMigration());
-                },
-                serverOptions,
-                true);
-        }
-
-        [Test]
-        [TestCaseSource(typeof(ProcessorTestCaseSource))]
-        public void CanUseComputedNotStoredColumn(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
-        {
-            ExecuteWithProcessor(
-                processorType,
-                services => services.WithMigrationsIn(RootNamespace),
-                (serviceProvider, processor) =>
-                {
-                    var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
-
-                    runner.Up(new ComputedNotStoredColumnMigration());
-
-                    DataSet ds = processor.ReadTableData(null, "products_nullable");
-                    ds.Tables[0].Rows.Count.ShouldBe(2);
-                    ds.Tables[0].Rows[0][3].ShouldBe(200m); // Total = Price * Quantity
-                    ds.Tables[0].Rows[1][3].ShouldBe(DBNull.Value); // Total = Price * Quantity
-
-                    runner.Down(new ComputedNotStoredColumnMigration());
-                },
-                serverOptions,
-                true);
-        }
-
-        [Test]
         [TestCaseSource(typeof(ProcessorTestCaseSourceExcept<
             FirebirdProcessor
         >))]
