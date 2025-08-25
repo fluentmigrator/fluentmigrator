@@ -17,8 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text.RegularExpressions;
+using System.Text;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators;
@@ -195,15 +194,41 @@ namespace FluentMigrator.Runner.Processors.Oracle
         public override bool DefaultValueExists(string schemaName, string tableName, string columnName,
             object defaultValue)
         {
-            return false;
+            if (tableName == null)
+            {
+                throw new ArgumentNullException(nameof(tableName));
+            }
+
+            if (columnName == null)
+            {
+                throw new ArgumentNullException(nameof(columnName));
+            }
+
+            if (columnName.Length == 0 || tableName.Length == 0)
+            {
+                return false;
+            }
+
+            if (string.IsNullOrEmpty(schemaName))
+            {
+                return Exists(
+                    "SELECT 1 FROM USER_TAB_COLUMNS WHERE upper(TABLE_NAME) = '{0}' AND upper(COLUMN_NAME) = '{1}' AND DATA_DEFAULT IS NOT NULL",
+                    FormatHelper.FormatSqlEscape(tableName.ToUpper()),
+                    FormatHelper.FormatSqlEscape(columnName.ToUpper()));
+            }
+
+            return Exists(
+                "SELECT 1 FROM ALL_TAB_COLUMNS WHERE upper(OWNER) = '{0}' AND upper(TABLE_NAME) = '{1}' AND upper(COLUMN_NAME) = '{2}' AND DATA_DEFAULT IS NOT NULL",
+                schemaName.ToUpper(), FormatHelper.FormatSqlEscape(tableName.ToUpper()),
+                FormatHelper.FormatSqlEscape(columnName.ToUpper()));
         }
 
-        public override void Execute(string template, params object[] args)
+        public override void Execute([StructuredMessageTemplate] string template, params object[] args)
         {
             Process(string.Format(template, args));
         }
 
-        public override bool Exists(string template, params object[] args)
+        public override bool Exists([StructuredMessageTemplate] string template, params object[] args)
         {
             if (template == null)
             {
@@ -235,7 +260,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
             return Read("SELECT * FROM {0}.{1}", Quoter.QuoteSchemaName(schemaName), Quoter.QuoteTableName(tableName));
         }
 
-        public override DataSet Read(string template, params object[] args)
+        public override DataSet Read([StructuredMessageTemplate] string template, params object[] args)
         {
             if (template == null)
             {
@@ -265,6 +290,92 @@ namespace FluentMigrator.Runner.Processors.Oracle
             expression.Operation?.Invoke(Connection, Transaction);
         }
 
+        /// <summary>
+        /// Splits a SQL script into individual statements, taking into account Oracle-specific syntax rules.
+        /// </summary>
+        private static List<string> SplitOracleSqlStatements(string sqlScript)
+        {
+            var statements = new List<string>();
+            var currentStatement = new StringBuilder();
+            var inString = false;
+            var inSingleLineComment = false;
+            var inMultiLineComment = false;
+            var prevChar = '\0';
+
+            foreach (var c in sqlScript)
+            {
+                if (inSingleLineComment)
+                {
+                    currentStatement.Append(c);
+                    if (c == '\n')
+                    {
+                        inSingleLineComment = false;
+                    }
+                    continue;
+                }
+
+                if (inMultiLineComment)
+                {
+                    currentStatement.Append(c);
+                    if (prevChar == '*' && c == '/')
+                    {
+                        inMultiLineComment = false;
+                    }
+                    prevChar = c;
+                    continue;
+                }
+
+                if (inString)
+                {
+                    currentStatement.Append(c);
+                    if (c == '\'' && prevChar != '\\')
+                    {
+                        inString = false;
+                    }
+                    prevChar = c;
+                    continue;
+                }
+
+                switch (c)
+                {
+                    // Check for comment start
+                    case '-' when prevChar == '-':
+                        inSingleLineComment = true;
+                        currentStatement.Append(c);
+                        continue;
+                    case '*' when prevChar == '/':
+                        inMultiLineComment = true;
+                        currentStatement.Append(c);
+                        continue;
+                    // Check for string start
+                    case '\'':
+                        inString = true;
+                        currentStatement.Append(c);
+                        prevChar = c;
+                        continue;
+                    // Check for statement terminator
+                    case ';':
+                        statements.Add(currentStatement.ToString().TrimEnd(';').Trim());
+                        currentStatement.Clear();
+                        prevChar = '\0';
+                        continue;
+                    default:
+                        currentStatement.Append(c);
+                        prevChar = c;
+                        break;
+                }
+            }
+
+            // Add any remaining content
+            if (currentStatement.Length > 0)
+            {
+                statements.Add(currentStatement.ToString());
+            }
+
+            return statements;
+        }
+
+
         protected override void Process(string sql)
         {
             Logger.LogSql(sql);
@@ -276,9 +387,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
 
             EnsureConnectionIsOpen();
 
-            var batches = Regex.Split(sql, @"^\s*;\s*$", RegexOptions.Multiline)
-                .Select(x => x.Trim())
-                .Where(x => !string.IsNullOrEmpty(x));
+            var batches = SplitOracleSqlStatements(sql);
 
             foreach (var batch in batches)
             {
