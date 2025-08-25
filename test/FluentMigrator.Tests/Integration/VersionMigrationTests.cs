@@ -22,6 +22,7 @@ using FluentMigrator.Runner;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Runner.Processors.MySql;
+using FluentMigrator.Runner.Processors.Oracle;
 using FluentMigrator.Runner.Processors.SQLite;
 using FluentMigrator.Runner.Versioning;
 using FluentMigrator.Runner.VersionTableInfo;
@@ -72,7 +73,8 @@ namespace FluentMigrator.Tests.Integration
         [TestCaseSource(typeof(ProcessorTestCaseSourceExcept<
             SQLiteProcessor,
             MySqlProcessor,
-            FirebirdProcessor
+            FirebirdProcessor,
+            OracleProcessorBase
         >))]
         public void CanUseCustomVersionInfo(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
         {
