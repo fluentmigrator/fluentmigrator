@@ -20,6 +20,7 @@ using System.Data;
 using System.Text;
 
 using FluentMigrator.Expressions;
+using FluentMigrator.Runner.BatchParser;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Oracle;
 using FluentMigrator.Runner.Helpers;
@@ -292,12 +293,14 @@ namespace FluentMigrator.Runner.Processors.Oracle
 
         /// <summary>
         /// Splits a SQL script into individual statements, taking into account Oracle-specific syntax rules.
+        /// <remarks>We could use <see cref="SqlBatchParser"/> but it does not handle multiple lines strings.</remarks>
         /// </summary>
         private static List<string> SplitOracleSqlStatements(string sqlScript)
         {
             var statements = new List<string>();
             var currentStatement = new StringBuilder();
             var inString = false;
+            var inIdentifier = false;
             var inSingleLineComment = false;
             var inMultiLineComment = false;
             var prevChar = '\0';
@@ -336,6 +339,17 @@ namespace FluentMigrator.Runner.Processors.Oracle
                     continue;
                 }
 
+                if (inIdentifier)
+                {
+                    currentStatement.Append(c);
+                    if (c == '"')
+                    {
+                        inIdentifier = false;
+                    }
+                    prevChar = c;
+                    continue;
+                }
+
                 switch (c)
                 {
                     // Check for comment start
@@ -350,6 +364,12 @@ namespace FluentMigrator.Runner.Processors.Oracle
                     // Check for string start
                     case '\'':
                         inString = true;
+                        currentStatement.Append(c);
+                        prevChar = c;
+                        continue;
+                    // Check for inIdentifier start
+                    case '"':
+                        inIdentifier = true;
                         currentStatement.Append(c);
                         prevChar = c;
                         continue;
@@ -374,7 +394,6 @@ namespace FluentMigrator.Runner.Processors.Oracle
 
             return statements;
         }
-
 
         protected override void Process(string sql)
         {
