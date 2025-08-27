@@ -1,26 +1,30 @@
 on:
-  pull-request:
+  pull_request:
     branches:
     - '*'
+    
 env:
-  solution: '**/FluentMigrator.sln'
-  buildPlatform: Any CPU
+  solution: 'FluentMigrator.sln'
+  buildPlatform: 'Any CPU'
   buildConfiguration: Release
+  FM_TestConnectionStrings__SqlServer2016__ContainerEnabled: true
+  FM_TestConnectionStrings__SqlServer2016__IsEnabled: true
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - uses: microsoft/setup-msbuild@v1.0.2
     - name: Install GitVersion
       uses: gittools/actions/gitversion/setup@v0.9.11
       with:
         versionSpec: 5.x
-    - uses: nuget/setup-nuget@v1
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
         clean: true
+    - uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.0.x'
     - name: Install GitVersion (using GitTools 0.10.2.23031113 or later)
       uses: gittools/actions/gitversion/setup@v0.9.11
       with:
@@ -32,18 +36,15 @@ jobs:
         BUILD_BUILDNUMBER: ${{ env.GitVersion.NuGetVersionV2 }}
       with:
         updateAssemblyInfo: false
-    - run: nuget restore ${{ env.solution }}
-    - run: msbuild '${{ env.solution }}' /p:configuration='${{ env.buildConfiguration }}' /p:platform='${{ env.buildPlatform }}' /p:Version="${{ github.run_number }}"
-    - run: |
-        $vsTestConsoleExe = "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\Extensions\TestPlatform\vstest.console.exe"
-        $targetTestDll = ""
-        $testRunSettings = "/Settings:`"`" "
-        #Note that the `" is an escape character to quote strings, and the `& is needed to start the command
-        $command = "`& `"$vsTestConsoleExe`" `"$targetTestDll`" $testRunSettings $parameters "
-        Write-Host "$command"
-        Invoke-Expression $command
-      shell: powershell
-    - uses: actions/upload-artifact@v2
+    - run: dotnet restore ${{ env.solution }} --use-current-runtime # implies long-term support release of .NET
+    - run: dotnet build '${{ env.solution }}' --no-restore --property:configuration='${{ env.buildConfiguration }}' --property:platform='${{ env.buildPlatform }}' --property:Version="${{ github.run_number }}"
+  
+    - name: VSTest
+      run: |
+        dotnet tool install --global coverlet.console
+        dotnet test test/FluentMigrator.Tests/bin/${{ env.buildConfiguration }}/net8.0/FluentMigrator.Tests.dll --collect:"XPlat Code Coverage;Format=opencover"
+      shell: bash
+    - uses: actions/upload-artifact@v4
       with:
         path: ${{ github.workspace }}
         name: drop
