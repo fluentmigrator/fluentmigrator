@@ -43,7 +43,7 @@ jobs:
       run: |
         dotnet tool install --global coverlet.console
         # Coverlet recommends publishing the Tests in order to support XPlat Code Coverage.
-        dotnet publish .\test\FluentMigrator.Tests\FluentMigrator.Tests.csproj --framework net8.0
+        dotnet publish test/FluentMigrator.Tests/FluentMigrator.Tests.csproj --framework net8.0
         dotnet test test/FluentMigrator.Tests/bin/${{ env.buildConfiguration }}/net8.0/FluentMigrator.Tests.dll --collect:"XPlat Code Coverage;Format=opencover"
       shell: bash
     - uses: actions/upload-artifact@v4
