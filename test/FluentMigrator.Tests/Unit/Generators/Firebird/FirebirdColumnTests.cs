@@ -249,7 +249,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             var expression = GeneratorTestHelper.GetCreateColumnExpressionWithComputed();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 GENERATED ALWAYS AS (Price * Quantity) NOT NULL;");
+            result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 GENERATED ALWAYS AS (Price * Quantity);");
         }
 
         [Test]
@@ -259,7 +259,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
 
             var result = Generator.Generate(expression);
             // Firebird doesn't support stored computed columns, so it should be the same as non-stored
-            result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 GENERATED ALWAYS AS (Price * Quantity) NOT NULL;");
+            result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 GENERATED ALWAYS AS (Price * Quantity);");
         }
 
         [Test]
