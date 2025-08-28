@@ -30,7 +30,7 @@ namespace FluentMigrator.Runner.Generators.Jet
         {
         }
 
-        public override string DropIndex { get { return "DROP INDEX {0} ON {1}"; } }
+        public override string DropIndex => "DROP INDEX {0} ON {1}";
 
         public override string Generate(RenameTableExpression expression)
         {

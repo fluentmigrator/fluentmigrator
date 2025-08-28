@@ -58,6 +58,6 @@ namespace FluentMigrator.Runner.Processors.Oracle
 
         /// <inheritdoc />
         public override IList<string> DatabaseTypeAliases { get; } = new List<string>()
-            { "Oracle-12c-Manager", "Oracle 12c Managed", "Oracle Managed", "Oracle" };
+            { "Oracle-12c-Managed", "Oracle 12c Managed", "Oracle Managed", "Oracle" };
     }
 }

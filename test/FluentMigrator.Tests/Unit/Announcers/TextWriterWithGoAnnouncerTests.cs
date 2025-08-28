@@ -76,9 +76,6 @@ namespace FluentMigrator.Tests.Unit.Announcers
             Assert.That(Output, Does.Not.Contain("GO"));
         }
 
-        public string Output
-        {
-            get { return _stringWriter.GetStringBuilder().ToString(); }
-        }
+        public string Output => _stringWriter.GetStringBuilder().ToString();
     }
 }

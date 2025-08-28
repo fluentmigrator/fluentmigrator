@@ -81,6 +81,7 @@ namespace FluentMigrator.Tests.Integration
                     r => r
                         .AddFirebird()
                         .AddMySql4()
+                        .AddOracle12CManaged()
                         .AddPostgres()
                         .AddSnowflake()
                         .AddSQLite()
@@ -88,7 +89,8 @@ namespace FluentMigrator.Tests.Integration
                         .AddSqlServer2008()
                         .AddSqlServer2012()
                         .AddSqlServer2014()
-                        .AddSqlServer2016())
+                        .AddSqlServer2016()
+                    )
                 .AddScoped<IProcessorAccessor>(
                     sp =>
                     {

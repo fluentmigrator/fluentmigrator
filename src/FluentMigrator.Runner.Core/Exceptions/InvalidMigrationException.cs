@@ -27,12 +27,6 @@ namespace FluentMigrator.Runner.Exceptions
             _errors = errors;
         }
 
-        public override string Message
-        {
-            get
-            {
-                return string.Format("The migration {0} contained the following Validation Error(s): {1}", _migration.GetType().Name, _errors);
-            }
-        }
+        public override string Message => string.Format("The migration {0} contained the following Validation Error(s): {1}", _migration.GetType().Name, _errors);
     }
 }

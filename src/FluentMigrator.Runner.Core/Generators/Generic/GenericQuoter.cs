@@ -153,9 +153,9 @@ namespace FluentMigrator.Runner.Generators.Generic
             return ValueQuote + value + ValueQuote;
         }
 
-        public virtual string ValueQuote { get { return "'"; } }
+        public virtual string ValueQuote => "'";
 
-        public virtual string EscapeValueQuote { get { return ValueQuote + ValueQuote; } }
+        public virtual string EscapeValueQuote => ValueQuote + ValueQuote;
 
         /// <summary>
         /// Gets the separator between identifiers (e.g. the dot between SCHEMA.TABLENAME)
@@ -172,8 +172,8 @@ namespace FluentMigrator.Runner.Generators.Generic
         /// </summary>
         public virtual string CloseQuote => "\"";
 
-        public virtual string OpenQuoteEscapeString { get { return OpenQuote.PadRight(2, OpenQuote.ToCharArray()[0]); } }
-        public virtual string CloseQuoteEscapeString { get { return CloseQuote.PadRight(2, CloseQuote.ToCharArray()[0]); } }
+        public virtual string OpenQuoteEscapeString => OpenQuote.PadRight(2, OpenQuote.ToCharArray()[0]);
+        public virtual string CloseQuoteEscapeString => CloseQuote.PadRight(2, CloseQuote.ToCharArray()[0]);
 
         /// <inheritdoc />
         public virtual bool IsQuoted(string name)

@@ -67,19 +67,19 @@ namespace FluentMigrator.Runner.Generators.Firebird
         //It's kind of a hack to mess with system tables, but this is the cleanest and time-tested method to alter the nullable constraint.
         // It's even mentioned in the firebird official FAQ.
         // Currently the only drawback is that the integrity is not checked by the engine, you have to ensure it manually
-        public string AlterColumnSetNullablePre3 { get { return "UPDATE RDB$RELATION_FIELDS SET RDB$NULL_FLAG = {0} WHERE lower(rdb$relation_name) = lower({1}) AND lower(RDB$FIELD_NAME) = lower({2})"; } }
+        public string AlterColumnSetNullablePre3 => "UPDATE RDB$RELATION_FIELDS SET RDB$NULL_FLAG = {0} WHERE lower(rdb$relation_name) = lower({1}) AND lower(RDB$FIELD_NAME) = lower({2})";
 
         /// <summary>
         /// ALTER TABLE table_name ALTER column_name { DROP | SET } [NOT] NULL
         /// </summary>
-        public string AlterColumnSetNullable3 { get { return "ALTER TABLE {0} ALTER {1} {2} {3}"; } }
+        public string AlterColumnSetNullable3 => "ALTER TABLE {0} ALTER {1} {2} {3}";
 
-        public string AlterColumnSetType { get { return "ALTER TABLE {0} ALTER COLUMN {1} TYPE {2}"; } }
+        public string AlterColumnSetType => "ALTER TABLE {0} ALTER COLUMN {1} TYPE {2}";
 
-        public override string AddColumn { get { return "ALTER TABLE {0} ADD {1}"; } }
-        public override string DropColumn { get { return "ALTER TABLE {0} DROP {1}"; } }
-        public override string RenameColumn { get { return "ALTER TABLE {0} ALTER COLUMN {1} TO {2}"; } }
-        public override string DropTableIfExists { get { return "IF( EXISTS( SELECT 1 FROM RDB$RELATIONS WHERE (rdb$flags IS NOT NULL) AND LOWER(RDB$RELATION_NAME) = LOWER('{0}'))) THEN EXECUTE STATEMENT 'DROP TABLE {0}')"; } }
+        public override string AddColumn => "ALTER TABLE {0} ADD {1}";
+        public override string DropColumn => "ALTER TABLE {0} DROP {1}";
+        public override string RenameColumn => "ALTER TABLE {0} ALTER COLUMN {1} TO {2}";
+        public override string DropTableIfExists => "IF( EXISTS( SELECT 1 FROM RDB$RELATIONS WHERE (rdb$flags IS NOT NULL) AND LOWER(RDB$RELATION_NAME) = LOWER('{0}'))) THEN EXECUTE STATEMENT 'DROP TABLE {0}')";
 
         protected FirebirdOptions FBOptions { get; }
 
