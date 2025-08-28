@@ -108,6 +108,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{850DAD53-4
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FluentMigrator.Example.MSBuild", "samples\FluentMigrator.Example.MSBuild\FluentMigrator.Example.MSBuild.csproj", "{2755D82C-E45D-479B-B502-FAAF3322DD9B}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "gh-actions", "gh-actions", "{A3987BA7-73EB-468A-96D9-498949F94759}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\pull-requests.yaml = .github\workflows\pull-requests.yaml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

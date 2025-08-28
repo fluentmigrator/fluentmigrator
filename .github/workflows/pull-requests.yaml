@@ -1,12 +1,22 @@
+name: Pull Requests
+
 on:
   pull_request:
     branches:
     - '*'
-    
+
 env:
   solution: 'FluentMigrator.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: Release
+
+  # Enable containers for integration tests
+  FM_TestConnectionStrings__MySql__ContainerEnabled: true
+  FM_TestConnectionStrings__MySql__IsEnabled: true
+  FM_TestConnectionStrings__Oracle__ContainerEnabled: true
+  FM_TestConnectionStrings__Oracle__IsEnabled: true
+  FM_TestConnectionStrings__Postgres__ContainerEnabled: true
+  FM_TestConnectionStrings__Postgres__IsEnabled: true
   FM_TestConnectionStrings__SqlServer2016__ContainerEnabled: true
   FM_TestConnectionStrings__SqlServer2016__IsEnabled: true
 jobs:
@@ -38,7 +48,7 @@ jobs:
         updateAssemblyInfo: false
     - run: dotnet restore ${{ env.solution }} --use-current-runtime # implies long-term support release of .NET
     - run: dotnet build '${{ env.solution }}' --no-restore --property:configuration='${{ env.buildConfiguration }}' --property:platform='${{ env.buildPlatform }}' --property:Version="${{ github.run_number }}"
-  
+
     - name: VSTest
       run: |
         dotnet tool install --global coverlet.console
@@ -46,7 +56,7 @@ jobs:
         dotnet publish test/FluentMigrator.Tests/FluentMigrator.Tests.csproj --framework net8.0
         dotnet test test/FluentMigrator.Tests/bin/${{ env.buildConfiguration }}/net8.0/FluentMigrator.Tests.dll --collect:"XPlat Code Coverage;Format=opencover"
       shell: bash
-    - uses: actions/upload-artifact@v4
-      with:
-        path: ${{ github.workspace }}
-        name: drop
+#    - uses: actions/upload-artifact@v4
+#      with:
+#        path: ${{ github.workspace }}
+#        name: drop
