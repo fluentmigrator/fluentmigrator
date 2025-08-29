@@ -24,14 +24,8 @@ namespace FluentMigrator.Runner.Processors.DB2.iSeries
     {
         private static readonly TestEntry[] _testEntries =
         {
-            new TestEntry("IBM.Data.DB2.iSeries", "IBM.Data.DB2.iSeries.iDB2Factory"),
+            new TestEntry("Net.IBM.Data.DB2.iSeries", "Net.IBM.Data.DB2.iSeries.iDB2Factory"),
         };
-
-        [Obsolete]
-        public Db2ISeriesDbFactory()
-            : base(_testEntries)
-        {
-        }
 
         public Db2ISeriesDbFactory(IServiceProvider serviceProvider)
             : base(serviceProvider, _testEntries)

@@ -66,18 +66,11 @@
     <ProjectReference Include="..\..\src\FluentMigrator.Runner.SqlServer\FluentMigrator.Runner.SqlServer.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="IBM.Data.DB2">
-      <HintPath>..\..\lib\DB2\amd64\IBM.Data.DB2.dll</HintPath>
-    </Reference>
     <Reference Include="Sap.Data.Hana.v4.5">
       <HintPath>..\..\lib\Hana\ado.net\v4.5\Sap.Data.Hana.v4.5.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="../../lib/DB2/clidriver/**/*.*">
-      <Link>clidriver/%(RecursiveDir)%(Filename)%(Extension)</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="../../lib/Hana/*.*">
       <Link>%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

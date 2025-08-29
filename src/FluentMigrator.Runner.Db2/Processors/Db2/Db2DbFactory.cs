@@ -24,15 +24,9 @@ namespace FluentMigrator.Runner.Processors.DB2
     {
         private static readonly TestEntry[] _testEntries =
         {
-            new TestEntry("IBM.Data.DB2.Core", "IBM.Data.DB2.Core.DB2Factory"),
-            new TestEntry("IBM.Data.DB2", "IBM.Data.DB2.DB2Factory"),
+            new TestEntry("Net.IBM.Data.DB2.Core", "Net.IBM.Data.DB2.Core.DB2Factory"),
+            new TestEntry("Net.IBM.Data.DB2", "Net.IBM.Data.DB2.DB2Factory"),
         };
-
-        [Obsolete]
-        public Db2DbFactory()
-            : base(_testEntries)
-        {
-        }
 
         public Db2DbFactory(IServiceProvider serviceProvider)
             : base(serviceProvider, _testEntries)
