@@ -1,7 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup Condition="'$(CI)' == 'true'">
+    <TargetFramework>net8.0</TargetFramework>
+    <RuntimeIdentifiers>linux-x86;linux-x64;any</RuntimeIdentifiers>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(CI)' == ''">
+    <TargetFramework>net48</TargetFramework>
+    <RuntimeIdentifiers>win-x86;win-x64;any</RuntimeIdentifiers>
+  </PropertyGroup>
+
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net48</TargetFrameworks>
     <AssemblyName>Migrate</AssemblyName>
     <PackageId>FluentMigrator.Console</PackageId>
     <SignAssembly>true</SignAssembly>
@@ -9,8 +17,8 @@
     <Description>Console runner for FluentMigrator</Description>
     <IsPackable>false</IsPackable>
     <Platforms>AnyCPU;x64;x86</Platforms>
-    <RuntimeIdentifiers>win-x86;win-x64;any</RuntimeIdentifiers>
   </PropertyGroup>
+
   <Import Project="$(MSBuildThisFileDirectory)../../PackageTool.props" />
   <ItemGroup>
     <None Include="..\..\FluentMigrator.snk" Link="FluentMigrator.snk" />
@@ -23,7 +31,8 @@
     <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="10.3.3" />
     <PackageReference Include="FSharp.Core" Version="9.0.202" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.4" />
-    <PackageReference Include="Oracle.ManagedDataAccess" Version="23.8.0" />
+    <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="23.8.0" Condition="'$(TargetFramework)' == 'net8.0'" />
+    <PackageReference Include="Oracle.ManagedDataAccess" Version="23.8.0" Condition="'$(TargetFramework)' == 'net48'" />
     <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.11" />
     <PackageReference Include="MySqlConnector" Version="2.4.0" />
     <PackageReference Include="Snowflake.Data" Version="4.4.1" />
