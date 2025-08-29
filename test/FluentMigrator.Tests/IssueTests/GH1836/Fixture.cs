@@ -69,7 +69,7 @@ namespace FluentMigrator.Tests.IssueTests.GH1836
 
         private class CustomVersionTableMetaData : DefaultVersionTableMetaData
         {
-            public CustomVersionTableMetaData(IOptions<RunnerOptions> runnerOptions)
+            public CustomVersionTableMetaData(IConventionSet conventionSet, IOptions<RunnerOptions> runnerOptions)
                 : base(conventionSet, runnerOptions)
             {
             }
