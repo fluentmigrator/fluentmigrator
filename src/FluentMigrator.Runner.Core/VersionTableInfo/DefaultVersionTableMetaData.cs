@@ -35,19 +35,6 @@ namespace FluentMigrator.Runner.VersionTableInfo
             conventionSet.SchemaConvention?.Apply(this);
         }
 
-        [Obsolete("Use dependency injection")]
-        public DefaultVersionTableMetaData()
-            : this(string.Empty)
-        {
-        }
-
-        [Obsolete("Use dependency injection")]
-        public DefaultVersionTableMetaData(string schemaName)
-        {
-            // ReSharper disable once VirtualMemberCallInConstructor
-            SchemaName = schemaName ?? string.Empty;
-        }
-
         public virtual string SchemaName { get; set; }
 
         public virtual string TableName => "VersionInfo";
