@@ -774,6 +774,24 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             VerifyColumnHelperCall(c => c.SetExistingRowsTo("test"), h => h.SetExistingRowsTo("test"));
         }
 
+        [Test]
+        public void CallingComputedSetsColumnExpression()
+        {
+            VerifyColumnProperty(c => c.Expression = "Price * Quantity", b => b.Computed("Price * Quantity"));
+        }
+
+        [Test]
+        public void CallingComputedSetsColumnExpressionStoredToFalseByDefault()
+        {
+            VerifyColumnProperty(c => c.ExpressionStored = false, b => b.Computed("Price * Quantity"));
+        }
+
+        [Test]
+        public void CallingComputedWithStoredTrueSetsColumnExpressionStoredToTrue()
+        {
+            VerifyColumnProperty(c => c.ExpressionStored = true, b => b.Computed("Price * Quantity", true));
+        }
+
         private void VerifyColumnHelperCall(Action<CreateColumnExpressionBuilder> callToTest, System.Linq.Expressions.Expression<Action<ColumnExpressionBuilderHelper>> expectedHelperAction)
         {
             var expressionMock = new Mock<CreateColumnExpression>();

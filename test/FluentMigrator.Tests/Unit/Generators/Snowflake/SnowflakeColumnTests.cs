@@ -230,5 +230,43 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             var ex = Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
             Assert.That(ex.Message, Is.EqualTo("Snowflake database does not support collation."));
         }
+
+        [Test]
+        public override void CanCreateColumnWithComputedExpression()
+        {
+            var expression = GeneratorTestHelper.GetCreateColumnExpressionWithComputed();
+            
+            var result = Generator.Generate(expression);
+            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ADD COLUMN ""TestColumn1"" GENERATED ALWAYS AS (Price * Quantity) NOT NULL;", _quotingEnabled);
+        }
+
+        [Test]
+        public override void CanCreateColumnWithStoredComputedExpression()
+        {
+            var expression = GeneratorTestHelper.GetCreateColumnExpressionWithStoredComputed();
+            
+            // Snowflake doesn't distinguish between stored and virtual computed columns
+            var result = Generator.Generate(expression);
+            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ADD COLUMN ""TestColumn1"" GENERATED ALWAYS AS (Price * Quantity) STORED NOT NULL;", _quotingEnabled);
+        }
+
+        [Test]
+        public override void CanAlterColumnToAddComputedExpression()
+        {
+            var expression = GeneratorTestHelper.GetAlterColumnExpressionWithComputed();
+            
+            var result = Generator.Generate(expression);
+            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ALTER COLUMN ""TestColumn1"" SET NOT NULL, COLUMN ""TestColumn1"" , COLUMN ""TestColumn1"" COMMENT '';", _quotingEnabled);
+        }
+
+        [Test]
+        public override void CanAlterColumnToAddStoredComputedExpression()
+        {
+            var expression = GeneratorTestHelper.GetAlterColumnExpressionWithStoredComputed();
+            
+            // Snowflake doesn't distinguish between stored and virtual computed columns
+            var result = Generator.Generate(expression);
+            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ALTER COLUMN ""TestColumn1"" SET NOT NULL, COLUMN ""TestColumn1"" , COLUMN ""TestColumn1"" COMMENT '';", _quotingEnabled);
+        }
     }
 }

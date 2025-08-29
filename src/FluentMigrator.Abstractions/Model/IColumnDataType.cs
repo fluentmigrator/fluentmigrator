@@ -44,5 +44,15 @@ namespace FluentMigrator.Model
         /// Gets or sets a database specific custom column type
         /// </summary>
         string CustomType { get; set; }
+
+        /// <summary>
+        /// Gets or sets an expression that defines the column
+        /// </summary>
+        string Expression { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the calculated value is stored
+        /// </summary>
+        bool ExpressionStored { get; set; }
     }
 }

@@ -201,6 +201,14 @@ namespace FluentMigrator.Builders.Alter.Column
             return this;
         }
 
+        /// <inheritdoc/>
+        public IAlterColumnOptionSyntax Computed(string expression, bool stored = false)
+        {
+            Expression.Column.Expression = expression;
+            Expression.Column.ExpressionStored = stored;
+            return this;
+        }
+
         /// <inheritdoc />
         public IAlterColumnOptionSyntax Unique()
         {

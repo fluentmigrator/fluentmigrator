@@ -30,7 +30,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         /// <inheritdoc />
         protected override string FormatNullable(ColumnDefinition column)
         {
-            if (column.IsNullable == true && column.Type == null && !string.IsNullOrEmpty(column.CustomType))
+            if (column.IsNullable == true && column.Type == null && !string.IsNullOrEmpty(column.CustomType) && column.Expression == null)
             {
                 return "NULL";
             }

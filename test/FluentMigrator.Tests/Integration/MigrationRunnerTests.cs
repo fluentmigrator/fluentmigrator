@@ -39,6 +39,7 @@ using FluentMigrator.Runner.Processors.Snowflake;
 using FluentMigrator.Runner.Processors.SQLite;
 using FluentMigrator.Runner.Processors.SqlServer;
 using FluentMigrator.Runner.VersionTableInfo;
+using FluentMigrator.Tests.Integration.Migrations.Computed;
 using FluentMigrator.Tests.Integration.Migrations.Issues;
 using FluentMigrator.Tests.Integration.Migrations.Tagged;
 using FluentMigrator.Tests.Integration.TestCases;
@@ -510,7 +511,8 @@ namespace FluentMigrator.Tests.Integration
                     runner.VersionLoader.VersionInfo.HasAppliedMigration(5).ShouldBeTrue();
                     runner.VersionLoader.VersionInfo.HasAppliedMigration(6).ShouldBeTrue();
                     runner.VersionLoader.VersionInfo.HasAppliedMigration(7).ShouldBeTrue();
-                    runner.VersionLoader.VersionInfo.Latest().ShouldBe(7);
+                    runner.VersionLoader.VersionInfo.HasAppliedMigration(8).ShouldBeTrue();
+                    runner.VersionLoader.VersionInfo.Latest().ShouldBe(8);
 
                     runner.RollbackToVersion(0, false);
                 },
