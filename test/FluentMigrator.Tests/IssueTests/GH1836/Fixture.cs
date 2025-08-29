@@ -69,18 +69,7 @@ namespace FluentMigrator.Tests.IssueTests.GH1836
 
         private class CustomVersionTableMetaData : DefaultVersionTableMetaData
         {
-#pragma warning disable CS0618 // Type or member is obsolete
-            public CustomVersionTableMetaData()
-            {
-            }
-
-            public CustomVersionTableMetaData(string schemaName)
-                : base(schemaName)
-            {
-            }
-#pragma warning restore CS0618 // Type or member is obsolete
-
-            public CustomVersionTableMetaData(IConventionSet conventionSet, IOptions<RunnerOptions> runnerOptions)
+            public CustomVersionTableMetaData(IOptions<RunnerOptions> runnerOptions)
                 : base(conventionSet, runnerOptions)
             {
             }
