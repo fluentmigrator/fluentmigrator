@@ -702,6 +702,24 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
             Assert.That(builderAsInterface.Column, Is.SameAs(curColumn));
         }
 
+        [Test]
+        public void CallingComputedSetsColumnExpression()
+        {
+            VerifyColumnProperty(c => c.Expression = "Price * Quantity", b => b.Computed("Price * Quantity"));
+        }
+
+        [Test]
+        public void CallingComputedSetsColumnExpressionStoredToFalseByDefault()
+        {
+            VerifyColumnProperty(c => c.ExpressionStored = false, b => b.Computed("Price * Quantity"));
+        }
+
+        [Test]
+        public void CallingComputedWithStoredTrueSetsColumnExpressionStoredToTrue()
+        {
+            VerifyColumnProperty(c => c.ExpressionStored = true, b => b.Computed("Price * Quantity", true));
+        }
+
         private void VerifyColumnHelperCall(Action<AlterColumnExpressionBuilder> callToTest, System.Linq.Expressions.Expression<Action<ColumnExpressionBuilderHelper>> expectedHelperAction)
         {
             var expressionMock = new Mock<AlterColumnExpression>();
