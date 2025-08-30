@@ -28,8 +28,8 @@ jobs:
     strategy:
       matrix:
         dotnet-tfm: [
-#          net8.0,
-          net9.0,
+          net8.0,
+#          net9.0,
         ]
 
     steps:
@@ -37,10 +37,10 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: Setup dotnet 9.0.x
+    - name: Setup dotnet
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: '9.0.x'
+        dotnet-version: '8.0.x'
 
     - name: "Restore, Build, Test"
       run: dotnet test --framework ${{ matrix.dotnet-tfm }} --configuration ${{ env.buildConfiguration }} --verbosity quiet --logger trx --collect:"XPlat Code Coverage" --results-directory "TestResults-${{ matrix.dotnet-tfm }}"
