@@ -40,7 +40,7 @@ jobs:
         dotnet-version: '9.0.x'
 
     - name: "Restore, Build, Test"
-      run: dotnet test --configuration ${{ env.buildConfiguration }} --verbosity normal --logger trx --collect:"XPlat Code Coverage"
+      run: dotnet test --framework ${{ matrix.dotnet-version }} --configuration ${{ env.buildConfiguration }} --verbosity quiet --logger trx --collect:"XPlat Code Coverage" --results-directory "TestResults-${{ matrix.dotnet-version }}"
 
     - name: Combine Coverage Reports
       uses: danielpalme/ReportGenerator-GitHub-Action@v5.4.10
@@ -83,12 +83,12 @@ jobs:
     - name: Upload Test Result Files
       uses: actions/upload-artifact@v4
       with:
-        name: test-results
-        path: ${{ github.workspace }}/**/TestResults/**/*
+        name: test-results-${{ matrix.dotnet-version }}
+        path: ${{ github.workspace }}/**/TestResults-${{ matrix.dotnet-version }}/**/*
         retention-days: 5
 
     - name: Publish Test Results
-      uses: EnricoMi/publish-unit-test-result-action@v2.20.0
-      if: always()
+      uses: EnricoMi/publish-unit-test-result-action@v2
+      if: (!cancelled())
       with:
         trx_files: "${{ github.workspace }}/**/*.trx"
