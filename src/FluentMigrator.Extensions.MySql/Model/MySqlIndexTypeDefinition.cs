@@ -27,9 +27,13 @@ namespace FluentMigrator.Model
     public class MySqlIndexTypeDefinition
         : ICloneable
     {
+        /// <summary>
+        /// Specifies the Index Type.
+        /// </summary>
         [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.ColumnNameCannotBeNullOrEmpty))]
         public virtual IndexType IndexType { get; set; }
 
+        /// <inheritdoc />
         public object Clone()
         {
             return MemberwiseClone();
