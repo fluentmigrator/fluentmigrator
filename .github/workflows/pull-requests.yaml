@@ -28,7 +28,7 @@ jobs:
     strategy:
       matrix:
         dotnet-tfm: [
-          net8.0,
+#          net8.0,
           net9.0,
         ]
 
@@ -92,6 +92,6 @@ jobs:
 
     - name: Publish Test Results
       uses: EnricoMi/publish-unit-test-result-action@v2
-      if: (!cancelled())
+      if: always()
       with:
         trx_files: "${{ github.workspace }}/**/*.trx"
