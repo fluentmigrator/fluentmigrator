@@ -27,7 +27,10 @@ jobs:
 
     strategy:
       matrix:
-        dotnet-version: [ '8.0.x', '9.0.x' ]
+        dotnet-tfm: [
+          net8.0,
+          net9.0,
+        ]
 
     steps:
     - uses: actions/checkout@v4
@@ -40,7 +43,7 @@ jobs:
         dotnet-version: '9.0.x'
 
     - name: "Restore, Build, Test"
-      run: dotnet test --framework ${{ matrix.dotnet-version }} --configuration ${{ env.buildConfiguration }} --verbosity quiet --logger trx --collect:"XPlat Code Coverage" --results-directory "TestResults-${{ matrix.dotnet-version }}"
+      run: dotnet test --framework ${{ matrix.dotnet-tfm }} --configuration ${{ env.buildConfiguration }} --verbosity quiet --logger trx --collect:"XPlat Code Coverage" --results-directory "TestResults-${{ matrix.dotnet-tfm }}"
 
     - name: Combine Coverage Reports
       uses: danielpalme/ReportGenerator-GitHub-Action@v5.4.10
@@ -83,8 +86,8 @@ jobs:
     - name: Upload Test Result Files
       uses: actions/upload-artifact@v4
       with:
-        name: test-results-${{ matrix.dotnet-version }}
-        path: ${{ github.workspace }}/**/TestResults-${{ matrix.dotnet-version }}/**/*
+        name: test-results-${{ matrix.dotnet-tfm }}
+        path: ${{ github.workspace }}/**/TestResults-${{ matrix.dotnet-tfm }}/**/*
         retention-days: 5
 
     - name: Publish Test Results
