@@ -35,23 +35,6 @@ namespace FluentMigrator.Runner.Processors
 
         private DbProviderFactory _instance;
 
-        [Obsolete]
-        public ReflectionBasedDbFactory(string assemblyName, string dbProviderFactoryTypeName)
-            : this(new TestEntry(assemblyName, dbProviderFactoryTypeName))
-        {
-        }
-
-        [Obsolete]
-        protected ReflectionBasedDbFactory(params TestEntry[] testEntries)
-        {
-            if (testEntries.Length == 0)
-            {
-                throw new ArgumentException(@"At least one test entry must be specified", nameof(testEntries));
-            }
-
-            _testEntries = testEntries;
-        }
-
         protected ReflectionBasedDbFactory(IServiceProvider serviceProvider, params TestEntry[] testEntries)
         {
             if (testEntries.Length == 0)
