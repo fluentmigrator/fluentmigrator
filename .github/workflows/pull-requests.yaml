@@ -52,6 +52,8 @@ jobs:
         no_build: true
         msbuild_configuration: ${{ env.buildConfiguration }}
         fail_build_on_failed_tests: true
+        gist_name: FluentMigratorTests.md
+        gist_token: ${{ secrets.GIST_TOKEN }}
 #
 #    - name: VSTest
 #      run: |
