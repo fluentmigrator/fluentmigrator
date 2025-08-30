@@ -21,7 +21,9 @@ env:
   FM_TestConnectionStrings__SqlServer2016__IsEnabled: true
 jobs:
   build:
+    name: "Build & Test"
     runs-on: ubuntu-latest
+    permissions: write-all
 
     strategy:
       matrix:
@@ -31,39 +33,62 @@ jobs:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
-        clean: true
 
     - name: Setup dotnet 9.0.x
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: '9.0.x'
 
-    - run: dotnet restore ${{ env.solution }}
-    - run: dotnet build '${{ env.solution }}' --no-restore --property:configuration='${{ env.buildConfiguration }}' --property:platform='${{ env.buildPlatform }}' --property:Version="${{ github.run_number }}"
+    - name: "Restore, Build, Test"
+      run: dotnet test --configuration ${{ env.buildConfiguration }} --verbosity normal --logger trx --collect:"XPlat Code Coverage"
 
-    - name: Run tests and collect results
-      uses: zyborg/dotnet-tests-report@v1
+    - name: Combine Coverage Reports
+      uses: danielpalme/ReportGenerator-GitHub-Action@v5.4.10
       with:
-        project_path: ${{ env.solution }}
-        report_name: FluentMigratorTests
-        report_title: FluentMigrator Tests
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        no_restore: true
-        no_build: true
-        msbuild_configuration: ${{ env.buildConfiguration }}
-        skip_check_run: true
-        fail_build_on_failed_tests: true
-        gist_name: FluentMigratorTests.md
-        gist_token: ${{ secrets.GIST_TOKEN }}
-#
-#    - name: VSTest
-#      run: |
-#        dotnet tool install --global coverlet.console
-#        # Coverlet recommends publishing the Tests in order to support XPlat Code Coverage.
-#        dotnet publish test/FluentMigrator.Tests/FluentMigrator.Tests.csproj --framework net8.0
-#        dotnet test test/FluentMigrator.Tests/bin/${{ env.buildConfiguration }}/net8.0/FluentMigrator.Tests.dll --collect:"XPlat Code Coverage;Format=opencover"
-#      shell: bash
-#    - uses: actions/upload-artifact@v4
-#      with:
-#        path: ${{ github.workspace }}
-#        name: drop
+        reports: "**/*.cobertura.xml"
+        targetdir: "${{ github.workspace }}"
+        reporttypes: "Cobertura"
+        verbosity: "Info"
+        title: "Code Coverage"
+        tag: "${{ github.run_number }}_${{ github.run_id }}"
+        toolpath: "reportgeneratortool"
+
+    - name: Upload Combined Coverage XML
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage
+        path: ${{ github.workspace }}/Cobertura.xml
+        retention-days: 5
+
+    - name: Publish Code Coverage Report
+      uses: irongut/CodeCoverageSummary@v1.3.0
+      with:
+        filename: "Cobertura.xml"
+        badge: true
+        fail_below_min: false
+        format: markdown
+        hide_branch_rate: false
+        hide_complexity: false
+        indicators: true
+        output: both
+        thresholds: "10 30"
+
+    - name: Add Coverage PR Comment
+      uses: marocchino/sticky-pull-request-comment@v2
+      if: github.event_name == 'pull_request'
+      with:
+        recreate: true
+        path: code-coverage-results.md
+
+    - name: Upload Test Result Files
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results
+        path: ${{ github.workspace }}/**/TestResults/**/*
+        retention-days: 5
+
+    - name: Publish Test Results
+      uses: EnricoMi/publish-unit-test-result-action@v2.20.0
+      if: always()
+      with:
+        trx_files: "${{ github.workspace }}/**/*.trx"
