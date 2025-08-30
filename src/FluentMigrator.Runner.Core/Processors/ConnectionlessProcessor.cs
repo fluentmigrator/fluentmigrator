@@ -24,8 +24,6 @@ using System.Linq;
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators;
-using FluentMigrator.Runner.Initialization;
-using FluentMigrator.Runner.Logging;
 
 using JetBrains.Annotations;
 
@@ -74,8 +72,9 @@ namespace FluentMigrator.Runner.Processors
         public IMigrationGenerator Generator { get; set; }
 
         [Obsolete]
-        public IAnnouncer Announcer { get; set; }
-        public ProcessorOptions Options {get; set;}
+        private IAnnouncer Announcer { get; set; }
+
+        private ProcessorOptions Options {get; set;}
 
         /// <inheritdoc />
         public void Execute(string sql)
@@ -88,31 +87,37 @@ namespace FluentMigrator.Runner.Processors
             Process(string.Format(template, args));
         }
 
+        /// <inheritdoc cref="IMigrationProcessor.ReadTableData"/>
         public DataSet ReadTableData(string schemaName, string tableName)
         {
             throw new NotImplementedException($"Method {nameof(ReadTableData)} is not supported by the connectionless processor");
         }
 
+        /// <inheritdoc cref="IMigrationProcessor.Read"/>
         public DataSet Read(string template, params object[] args)
         {
             throw new NotImplementedException($"Method {nameof(Read)} is not supported by the connectionless processor");
         }
 
+        /// <inheritdoc cref="IMigrationProcessor.Exists"/>
         public bool Exists(string template, params object[] args)
         {
             throw new NotImplementedException($"Method {nameof(Exists)} is not supported by the connectionless processor");
         }
 
+        /// <inheritdoc cref="IMigrationProcessor.BeginTransaction"/>
         public void BeginTransaction()
         {
 
         }
 
+        /// <inheritdoc cref="IMigrationProcessor.CommitTransaction"/>
         public void CommitTransaction()
         {
 
         }
 
+        /// <inheritdoc cref="IMigrationProcessor.RollbackTransaction"/>
         public void RollbackTransaction()
         {
 
@@ -123,172 +128,207 @@ namespace FluentMigrator.Runner.Processors
             _logger.LogSql(sql);
         }
 
+        /// <inheritdoc cref="IMigrationProcessor.Process(FluentMigrator.Expressions.CreateSchemaExpression)"/>
         public void Process(CreateSchemaExpression expression)
         {
             Process(Generator.Generate(expression));
         }
 
+        /// <inheritdoc cref="IMigrationProcessor.Process(FluentMigrator.Expressions.DeleteSchemaExpression)"/>
         public void Process(DeleteSchemaExpression expression)
         {
             Process(Generator.Generate(expression));
         }
 
+        /// <inheritdoc cref="IMigrationProcessor.Process(FluentMigrator.Expressions.AlterTableExpression)"/>
         public void Process(AlterTableExpression expression)
         {
             Process(Generator.Generate(expression));
         }
 
+        /// <inheritdoc cref="IMigrationProcessor.Process(FluentMigrator.Expressions.AlterColumnExpression)"/>
         public void Process(AlterColumnExpression expression)
         {
             Process(Generator.Generate(expression));
         }
 
+        /// <inheritdoc cref="IMigrationProcessor.Process(FluentMigrator.Expressions.CreateTableExpression)"/>
         public void Process(CreateTableExpression expression)
         {
             Process(Generator.Generate(expression));
         }
 
+        /// <inheritdoc cref="IMigrationProcessor.Process(FluentMigrator.Expressions.CreateColumnExpression)"/>
         public void Process(CreateColumnExpression expression)
         {
             Process(Generator.Generate(expression));
         }
 
+        /// <inheritdoc cref="IMigrationProcessor.Process(FluentMigrator.Expressions.DeleteTableExpression)"/>
         public void Process(DeleteTableExpression expression)
         {
             Process(Generator.Generate(expression));
         }
 
+        /// <inheritdoc cref="IMigrationProcessor.Process(FluentMigrator.Expressions.DeleteColumnExpression)"/>
         public void Process(DeleteColumnExpression expression)
         {
             Process(Generator.Generate(expression));
         }
 
+        /// <inheritdoc cref="IMigrationProcessor.Process(FluentMigrator.Expressions.CreateForeignKeyExpression)"/>
         public void Process(CreateForeignKeyExpression expression)
         {
             Process(Generator.Generate(expression));
         }
 
+        /// <inheritdoc cref="IMigrationProcessor.Process(FluentMigrator.Expressions.DeleteForeignKeyExpression)"/>
         public void Process(DeleteForeignKeyExpression expression)
         {
             Process(Generator.Generate(expression));
         }
 
+        /// <inheritdoc cref="IMigrationProcessor.Process(FluentMigrator.Expressions.CreateIndexExpression)"/>
         public void Process(CreateIndexExpression expression)
         {
             Process(Generator.Generate(expression));
         }
 
+        /// <inheritdoc cref="IMigrationProcessor.Process(FluentMigrator.Expressions.DeleteIndexExpression)"/>
         public void Process(DeleteIndexExpression expression)
         {
             Process(Generator.Generate(expression));
         }
 
+        /// <inheritdoc cref="IMigrationProcessor.Process(FluentMigrator.Expressions.RenameTableExpression)"/>
         public void Process(RenameTableExpression expression)
         {
             Process(Generator.Generate(expression));
         }
 
+        /// <inheritdoc cref="IMigrationProcessor.Process(FluentMigrator.Expressions.RenameColumnExpression)"/>
         public void Process(RenameColumnExpression expression)
         {
             Process(Generator.Generate(expression));
         }
 
+        /// <inheritdoc cref="IMigrationProcessor.Process(FluentMigrator.Expressions.InsertDataExpression)"/>
         public void Process(InsertDataExpression expression)
         {
             Process(Generator.Generate(expression));
         }
 
+        /// <inheritdoc cref="IMigrationProcessor.Process(FluentMigrator.Expressions.AlterDefaultConstraintExpression)"/>
         public void Process(AlterDefaultConstraintExpression expression)
         {
             Process(Generator.Generate(expression));
         }
 
+        /// <inheritdoc cref="IMigrationProcessor.Process(FluentMigrator.Expressions.PerformDBOperationExpression)"/>
         public void Process(PerformDBOperationExpression expression)
         {
             _logger.LogSay("Performing DB Operation");
         }
 
+        /// <inheritdoc cref="IMigrationProcessor.Process(FluentMigrator.Expressions.DeleteDataExpression)"/>
         public void Process(DeleteDataExpression expression)
         {
             Process(Generator.Generate(expression));
         }
 
+        /// <inheritdoc cref="IMigrationProcessor.Process(FluentMigrator.Expressions.UpdateDataExpression)"/>
         public void Process(UpdateDataExpression expression)
         {
             Process(Generator.Generate(expression));
         }
 
+        /// <inheritdoc cref="IMigrationProcessor.Process(FluentMigrator.Expressions.AlterSchemaExpression)"/>
         public void Process(AlterSchemaExpression expression)
         {
             Process(Generator.Generate(expression));
         }
 
+        /// <inheritdoc cref="IMigrationProcessor.Process(FluentMigrator.Expressions.CreateSequenceExpression)"/>
         public void Process(CreateSequenceExpression expression)
         {
             Process(Generator.Generate(expression));
         }
 
+        /// <inheritdoc cref="IMigrationProcessor.Process(FluentMigrator.Expressions.DeleteSequenceExpression)"/>
         public void Process(DeleteSequenceExpression expression)
         {
             Process(Generator.Generate(expression));
         }
 
+        /// <inheritdoc cref="IMigrationProcessor.Process(FluentMigrator.Expressions.CreateConstraintExpression)"/>
         public void Process(CreateConstraintExpression expression)
         {
             Process(Generator.Generate(expression));
         }
 
+        /// <inheritdoc cref="IMigrationProcessor.Process(FluentMigrator.Expressions.DeleteConstraintExpression)"/>
         public void Process(DeleteConstraintExpression expression)
         {
             Process(Generator.Generate(expression));
         }
 
+        /// <inheritdoc cref="IMigrationProcessor.Process(FluentMigrator.Expressions.DeleteDefaultConstraintExpression)"/>
         public void Process(DeleteDefaultConstraintExpression expression)
         {
             Process(Generator.Generate(expression));
         }
 
+        /// <inheritdoc cref="IQuerySchema.SchemaExists"/>
         public bool SchemaExists(string schemaName)
         {
             throw new NotImplementedException($"Method {nameof(SchemaExists)} is not supported by the connectionless processor");
         }
 
+        /// <inheritdoc cref="IQuerySchema.TableExists"/>
         public bool TableExists(string schemaName, string tableName)
         {
             throw new NotImplementedException($"Method {nameof(TableExists)} is not supported by the connectionless processor");
         }
 
+        /// <inheritdoc cref="IQuerySchema.ColumnExists"/>
         public bool ColumnExists(string schemaName, string tableName, string columnName)
         {
             throw new NotImplementedException($"Method {nameof(ColumnExists)} is not supported by the connectionless processor");
         }
 
+        /// <inheritdoc cref="IQuerySchema.ConstraintExists"/>
         public bool ConstraintExists(string schemaName, string tableName, string constraintName)
         {
             throw new NotImplementedException($"Method {nameof(ConstraintExists)} is not supported by the connectionless processor");
         }
 
+        /// <inheritdoc cref="IQuerySchema.IndexExists"/>
         public bool IndexExists(string schemaName, string tableName, string indexName)
         {
             throw new NotImplementedException($"Method {nameof(IndexExists)} is not supported by the connectionless processor");
         }
 
+        /// <inheritdoc cref="IQuerySchema.SequenceExists"/>
         public bool SequenceExists(string schemaName, string sequenceName)
         {
             throw new NotImplementedException($"Method {nameof(SequenceExists)} is not supported by the connectionless processor");
         }
 
+        /// <inheritdoc cref="IQuerySchema.DefaultValueExists"/>
         public bool DefaultValueExists(string schemaName, string tableName, string columnName, object defaultValue)
         {
             throw new NotImplementedException($"Method {nameof(DefaultValueExists)} is not supported by the connectionless processor");
         }
 
 #pragma warning disable 618
+        /// <inheritdoc cref="IQuerySchema.DatabaseType"/>
         public string DatabaseType { get; }
 #pragma warning restore 618
 
+        /// <inheritdoc cref="IQuerySchema.DatabaseTypeAliases"/>
         public IList<string> DatabaseTypeAliases { get; } = new List<string>();
 
+        /// <inheritdoc cref="IDisposable.Dispose"/>
         public void Dispose()
         {
         }

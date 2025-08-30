@@ -21,6 +21,9 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Model
 {
+    /// <summary>
+    /// Data model for MySQL Index Type.
+    /// </summary>
     public class MySqlIndexTypeDefinition
         : ICloneable
     {
@@ -33,9 +36,19 @@ namespace FluentMigrator.Model
         }
     }
 
+    /// <summary>
+    /// Enumeration of supported MySQL Index Types.
+    /// </summary>
+    /// <seealso cref="MySqlIndexTypeDefinition"/>
     public enum IndexType
     {
+        /// <summary>
+        /// MySQL primarily uses B-tree indexes (specifically B+ trees) as its default and most common indexing method for tables.
+        /// </summary>
         BTree,
+        /// <summary>
+        /// MySQL utilizes hash indexes primarily for efficient exact-match lookups. While the MEMORY storage engine supports explicit hash index creation, InnoDB, MySQL's default storage engine, implements an internal feature called the Adaptive Hash Index (AHI).
+        /// </summary>
         Hash
     }
 }
