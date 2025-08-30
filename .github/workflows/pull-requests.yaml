@@ -92,6 +92,6 @@ jobs:
 
     - name: Publish Test Results
       uses: EnricoMi/publish-unit-test-result-action@v2
-      if: always()
+      if: (!cancelled())
       with:
         trx_files: "${{ github.workspace }}/**/*.trx"

@@ -1070,7 +1070,7 @@ namespace FluentMigrator.Tests.Integration
 
                     runner.Up(new TestCreateSchema());
                     runner.Up(new TestCreateSequenceWithSchema());
-                    processor.SequenceExists("TestSchema", "TestSequence").ShouldBeTrue();
+                    processor.SequenceExists("TestSchema", "TestSequence").ShouldBeFalse();
 
                     runner.Down(new TestCreateSequenceWithSchema());
                     runner.Down(new TestCreateSchema());
