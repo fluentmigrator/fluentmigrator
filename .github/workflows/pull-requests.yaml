@@ -38,18 +38,19 @@ jobs:
       with:
         dotnet-version: ${{ matrix.dotnet-version }}
 
+    - run: dotnet restore ${{ env.solution }} --use-current-runtime # implies long-term support release of .NET
+    - run: dotnet build '${{ env.solution }}' --no-restore --property:configuration='${{ env.buildConfiguration }}' --property:platform='${{ env.buildPlatform }}' --property:Version="${{ github.run_number }}"
+
     - name: Run tests and collect results
       uses: zyborg/dotnet-tests-report@v1
       with:
         project_path: ${{ env.solution }}
-        report_name: FluentMigrator.Tests
+        report_name: FluentMigratorTests
         report_title: FluentMigrator Tests
         github_token: ${{ secrets.GITHUB_TOKEN }}
+        no_restore: true
         msbuild_configuration: ${{ env.buildConfiguration }}
         fail_build_on_failed_tests: true
-
-#    - run: dotnet restore ${{ env.solution }} --use-current-runtime # implies long-term support release of .NET
-#    - run: dotnet build '${{ env.solution }}' --no-restore --property:configuration='${{ env.buildConfiguration }}' --property:platform='${{ env.buildPlatform }}' --property:Version="${{ github.run_number }}"
 #
 #    - name: VSTest
 #      run: |
