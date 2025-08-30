@@ -25,12 +25,6 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
             new TestEntry("DevArt.Data.Oracle", "Devart.Data.Oracle.OracleProviderFactory"),
         };
 
-        [Obsolete]
-        public DotConnectOracleDbFactory()
-            : this(serviceProvider: null)
-        {
-        }
-
         public DotConnectOracleDbFactory(IServiceProvider serviceProvider)
             : base(serviceProvider, _entries)
         {
