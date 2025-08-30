@@ -51,6 +51,7 @@ jobs:
         no_restore: true
         no_build: true
         msbuild_configuration: ${{ env.buildConfiguration }}
+        skip_check_run: true
         fail_build_on_failed_tests: true
         gist_name: FluentMigratorTests.md
         gist_token: ${{ secrets.GIST_TOKEN }}
