@@ -23,6 +23,9 @@ namespace FluentMigrator.MySql
     /// </summary>
     public static partial class MySqlExtensions
     {
+        /// <summary>
+        /// Unique key for additional feature (<see cref="ISupportAdditionalFeatures"/>) to customize MySQL indexes with an index type.
+        /// </summary>
         public const string IndexType = "MySqlIndexType";
 
         private static string UnsupportedMethodMessage(string methodName, string interfaceName)
