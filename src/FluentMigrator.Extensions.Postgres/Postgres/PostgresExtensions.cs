@@ -23,12 +23,15 @@ using FluentMigrator.Infrastructure;
 namespace FluentMigrator.Postgres
 {
     /// <summary>
-    /// Feature extensions for PostgreSQL
+    /// Feature extensions for PostgreSQL.
     /// </summary>
-    /// <remarks> Given:
+    /// <remarks>
+    /// <para>Given:</para>
+    /// <code>
     /// MigrationBase m = null;
-    ///
-    /// These are valid calls:
+    /// </code>
+    /// <para>These are valid calls:</para>
+    /// <code>
     /// m.Alter.Column("").OnTable("").AsInt16().AddIdentity(PostgresGenerationType.Always);
     /// m.Alter.Column("").OnTable("").AsInt16().SetIdentity(PostgresGenerationType.Always);
     /// m.Alter.Column("").OnTable("").AsInt16().DropIdentity(true);
@@ -36,14 +39,16 @@ namespace FluentMigrator.Postgres
     /// m.Alter.Column("").OnTable("").AsInt16().Identity(PostgresGenerationType.Always);  //Ideally would like to stop this, forcing use of AddIdentity instead, but can't
     /// m.Alter.Table("").AddColumn("").AsInt16().Identity(PostgresGenerationType.Always);
     /// m.Alter.Table("").AlterColumn("").AsInt16().Identity(PostgresGenerationType.Always);
-    ///
-    /// These are not possible:
+    /// </code>
+    /// <para>These are not possible:</para>
+    /// <code>
     /// m.Alter.Table("").AddColumn("").AsInt16().AddIdentity(PostgresGenerationType.Always);
     /// m.Alter.Table("").AddColumn("").AsInt16().SetIdentity(PostgresGenerationType.Always);
     /// m.Alter.Table("").AddColumn("").AsInt16().DropIdentity(PostgresGenerationType.Always);
     /// m.Alter.Table("").AlterColumn("").AsInt16().AddIdentity(PostgresGenerationType.Always);  //Ideally would like to have these 3, but can't distinguish between return type AddColumn and AlterColumn at compiletime
     /// m.Alter.Table("").AlterColumn("").AsInt16().SetIdentity(PostgresGenerationType.Always);
     /// m.Alter.Table("").AlterColumn("").AsInt16().DropIdentity(false);
+    /// </code>
     /// </remarks>
     public static partial class PostgresExtensions
     {

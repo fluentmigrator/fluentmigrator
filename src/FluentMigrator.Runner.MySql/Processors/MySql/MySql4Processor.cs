@@ -26,6 +26,9 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.MySql
 {
+    /// <summary>
+    /// The MySQL 4 processor for FluentMigrator.
+    /// </summary>
     public class MySql4Processor : MySqlProcessor
     {
         /// <inheritdoc />

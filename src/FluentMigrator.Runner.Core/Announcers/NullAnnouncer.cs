@@ -23,6 +23,11 @@ namespace FluentMigrator.Runner.Announcers
     [Obsolete]
     public class NullAnnouncer : Announcer
     {
+        /// <summary>
+        /// Does NOT log a message.
+        /// </summary>
+        /// <param name="message">Ignored.</param>
+        /// <param name="isNotSql">Ignored.</param>
         public override void Write(string message, bool isNotSql = true)
         {
         }

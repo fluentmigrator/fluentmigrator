@@ -29,6 +29,9 @@ using Microsoft.Extensions.Logging;
 
 namespace FluentMigrator.Runner.Processors
 {
+    /// <summary>
+    /// Base class for generic database processors in FluentMigrator.
+    /// </summary>
     public abstract class GenericProcessorBase : ProcessorBase
     {
         [NotNull, ItemCanBeNull]
@@ -42,6 +45,7 @@ namespace FluentMigrator.Runner.Processors
 
         private bool _disposed = false;
 
+        /// <inheritdoc />
         [Obsolete]
         protected GenericProcessorBase(
             IDbConnection connection,
@@ -62,6 +66,7 @@ namespace FluentMigrator.Runner.Processors
             _lazyConnection = new Lazy<IDbConnection>(() => connection);
         }
 
+        /// <inheritdoc />
         protected GenericProcessorBase(
             [CanBeNull] Func<DbProviderFactory> factoryAccessor,
             [NotNull] IMigrationGenerator generator,
@@ -93,22 +98,37 @@ namespace FluentMigrator.Runner.Processors
                 });
         }
 
+        /// <summary>
+        /// Gets the database connection.
+        /// </summary>
         public IDbConnection Connection
         {
             get => _connection ?? _lazyConnection.Value;
             protected set => _connection = value;
         }
 
+        /// <summary>
+        /// Gets the database factory.
+        /// </summary>
         [Obsolete]
         [NotNull]
         public IDbFactory Factory { get; protected set; }
 
+        /// <summary>
+        /// Gets the current database transaction.
+        /// </summary>
         [CanBeNull]
         public IDbTransaction Transaction { get; protected set; }
 
+        /// <summary>
+        /// Gets the database provider factory.
+        /// </summary>
         [CanBeNull]
         protected DbProviderFactory DbProviderFactory => _dbProviderFactory.Value;
 
+        /// <summary>
+        /// Ensures the database connection is open.
+        /// </summary>
         protected virtual void EnsureConnectionIsOpen()
         {
             if (Connection != null && Connection.State != ConnectionState.Open)
@@ -117,6 +137,9 @@ namespace FluentMigrator.Runner.Processors
             }
         }
 
+        /// <summary>
+        /// Ensures the database connection is closed.
+        /// </summary>
         protected virtual void EnsureConnectionIsClosed()
         {
             if ((_connection != null || (_lazyConnection.IsValueCreated && Connection != null)) && Connection.State != ConnectionState.Closed)
@@ -125,6 +148,7 @@ namespace FluentMigrator.Runner.Processors
             }
         }
 
+        /// <inheritdoc />
         public override void BeginTransaction()
         {
             if (Transaction != null) return;
@@ -136,6 +160,7 @@ namespace FluentMigrator.Runner.Processors
             Transaction = Connection?.BeginTransaction();
         }
 
+        /// <inheritdoc />
         public override void RollbackTransaction()
         {
             if (Transaction == null) return;
@@ -147,6 +172,7 @@ namespace FluentMigrator.Runner.Processors
             Transaction = null;
         }
 
+        /// <inheritdoc />
         public override void CommitTransaction()
         {
             if (Transaction == null) return;
@@ -158,6 +184,7 @@ namespace FluentMigrator.Runner.Processors
             Transaction = null;
         }
 
+        /// <inheritdoc />
         protected override void Dispose(bool isDisposing)
         {
             if (!isDisposing || _disposed)
@@ -173,11 +200,23 @@ namespace FluentMigrator.Runner.Processors
             }
         }
 
+        /// <summary>
+        /// Creates a database command for the specified command text.
+        /// </summary>
+        /// <param name="commandText">The command text.</param>
+        /// <returns>The database command.</returns>
         protected virtual IDbCommand CreateCommand(string commandText)
         {
             return CreateCommand(commandText, Connection, Transaction);
         }
 
+        /// <summary>
+        /// Creates a database command for the specified command text, connection, and transaction.
+        /// </summary>
+        /// <param name="commandText">The command text.</param>
+        /// <param name="connection">The database connection.</param>
+        /// <param name="transaction">The database transaction.</param>
+        /// <returns>The database command.</returns>
         protected virtual IDbCommand CreateCommand(string commandText, IDbConnection connection, IDbTransaction transaction)
         {
             IDbCommand result;
@@ -205,11 +244,15 @@ namespace FluentMigrator.Runner.Processors
             return result;
         }
 
+        /// <summary>
+        /// Wrapper for legacy database factory.
+        /// </summary>
         [Obsolete]
         private class DbFactoryWrapper : IDbFactory
         {
             private readonly GenericProcessorBase _processor;
 
+            /// <inheritdoc />
             public DbFactoryWrapper(GenericProcessorBase processor)
             {
                 _processor = processor;

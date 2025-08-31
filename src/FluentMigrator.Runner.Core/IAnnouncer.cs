@@ -21,14 +21,47 @@ namespace FluentMigrator.Runner
     [Obsolete]
     public interface IAnnouncer
     {
+        /// <summary>
+        /// Logs a heading message.
+        /// </summary>
+        /// <param name="message"></param>
         void Heading(string message);
+        /// <summary>
+        /// Logs a regular message.
+        /// </summary>
+        /// <param name="message"></param>
         void Say(string message);
+        /// <summary>
+        /// Logs an emphasized message.
+        /// </summary>
+        /// <param name="message"></param>
         void Emphasize(string message);
+        /// <summary>
+        /// Logs a SQL message.
+        /// </summary>
+        /// <param name="sql"></param>
         void Sql(string sql);
+        /// <summary>
+        /// Logs the elapsed time.
+        /// </summary>
+        /// <param name="timeSpan"></param>
         void ElapsedTime(TimeSpan timeSpan);
+        /// <summary>
+        /// Logs an error message.
+        /// </summary>
+        /// <param name="message"></param>
         void Error(string message);
+        /// <summary>
+        /// Logs an error message.
+        /// </summary>
+        /// <param name="exception"></param>
         void Error(Exception exception);
 
+        /// <summary>
+        /// Logs a message.
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="isNotSql"></param>
         [Obsolete]
         void Write(string message, bool isNotSql = true);
     }

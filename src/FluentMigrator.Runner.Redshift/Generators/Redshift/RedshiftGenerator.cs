@@ -30,23 +30,32 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Generators.Redshift
 {
+    /// <summary>
+    /// The Amazon Redshift SQL generator for FluentMigrator.
+    /// </summary>
     public class RedshiftGenerator : GenericGenerator
     {
+        /// <inheritdoc />
         public override string RenameTable => "ALTER TABLE {0} RENAME TO {1}";
+        /// <inheritdoc />
         public override string AlterColumn => "ALTER TABLE {0} {1}";
+        /// <inheritdoc />
         public override string AddColumn => "ALTER TABLE {0} ADD {1}";
 
+        /// <inheritdoc />
         public RedshiftGenerator()
             : this(new RedshiftQuoter())
         {
         }
 
+        /// <inheritdoc />
         public RedshiftGenerator(
             [NotNull] RedshiftQuoter quoter)
             : this(quoter, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()))
         {
         }
 
+        /// <inheritdoc />
         public RedshiftGenerator(
             [NotNull] RedshiftQuoter quoter,
             [NotNull] IOptions<GeneratorOptions> generatorOptions)
@@ -54,6 +63,7 @@ namespace FluentMigrator.Runner.Generators.Redshift
         {
         }
 
+        /// <inheritdoc />
         public override string Generate(AlterTableExpression expression)
         {
             var alterStatement = new StringBuilder();
@@ -75,16 +85,19 @@ namespace FluentMigrator.Runner.Generators.Redshift
         /// <inheritdoc />
         public override List<string> GeneratorIdAliases => new List<string> { GeneratorIdConstants.Redshift };
 
+        /// <inheritdoc />
         public override string Generate(CreateSchemaExpression expression)
         {
             return FormatStatement("CREATE SCHEMA {0}", Quoter.QuoteSchemaName(expression.SchemaName));
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteSchemaExpression expression)
         {
             return FormatStatement("DROP SCHEMA {0}", Quoter.QuoteSchemaName(expression.SchemaName));
         }
 
+        /// <inheritdoc />
         public override string Generate(CreateTableExpression expression)
         {
             var createStatement = new StringBuilder();
@@ -107,6 +120,7 @@ namespace FluentMigrator.Runner.Generators.Redshift
             return createStatement.ToString();
         }
 
+        /// <inheritdoc />
         public override string Generate(AlterColumnExpression expression)
         {
             var alterStatement = new StringBuilder();
@@ -124,6 +138,7 @@ namespace FluentMigrator.Runner.Generators.Redshift
             return alterStatement.ToString();
         }
 
+        /// <inheritdoc />
         public override string Generate(CreateColumnExpression expression)
         {
             var createStatement = new StringBuilder();
@@ -141,11 +156,13 @@ namespace FluentMigrator.Runner.Generators.Redshift
             return createStatement.ToString();
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteTableExpression expression)
         {
             return FormatStatement(DropTable, $"{(expression.IfExists ? "IF EXISTS " : "")}{Quoter.QuoteTableName(expression.TableName, expression.SchemaName)}");
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteColumnExpression expression)
         {
             StringBuilder builder = new StringBuilder();
@@ -162,6 +179,7 @@ namespace FluentMigrator.Runner.Generators.Redshift
             return builder.ToString();
         }
 
+        /// <inheritdoc />
         public override string Generate(CreateForeignKeyExpression expression)
         {
             var primaryColumns = GetColumnList(expression.ForeignKey.PrimaryColumns);
@@ -180,16 +198,19 @@ namespace FluentMigrator.Runner.Generators.Redshift
             );
         }
 
+        /// <inheritdoc />
         public override string Generate(CreateIndexExpression expression)
         {
             return CompatibilityMode.HandleCompatibility("Indices not supported");
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteIndexExpression expression)
         {
             return CompatibilityMode.HandleCompatibility("Indices not supported");
         }
 
+        /// <inheritdoc />
         public override string Generate(InsertDataExpression expression)
         {
             var result = new StringBuilder();
@@ -212,6 +233,7 @@ namespace FluentMigrator.Runner.Generators.Redshift
             return result.ToString();
         }
 
+        /// <inheritdoc />
         public override string Generate(AlterDefaultConstraintExpression expression)
         {
             return FormatStatement(
@@ -221,6 +243,7 @@ namespace FluentMigrator.Runner.Generators.Redshift
                 ((RedshiftColumn)Column).FormatAlterDefaultValue(expression.ColumnName, expression.DefaultValue));
         }
 
+        /// <inheritdoc />
         public override string Generate(AlterSchemaExpression expression)
         {
             return FormatStatement(
@@ -229,11 +252,13 @@ namespace FluentMigrator.Runner.Generators.Redshift
                 Quoter.QuoteSchemaName(expression.DestinationSchemaName));
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteDefaultConstraintExpression expression)
         {
             return FormatStatement("ALTER TABLE {0} ALTER {1} DROP DEFAULT", Quoter.QuoteTableName(expression.TableName, expression.SchemaName), Quoter.Quote(expression.ColumnName));
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteConstraintExpression expression)
         {
             return FormatStatement(
@@ -242,6 +267,7 @@ namespace FluentMigrator.Runner.Generators.Redshift
                 Quoter.Quote(expression.Constraint.ConstraintName));
         }
 
+        /// <inheritdoc />
         public override string Generate(CreateConstraintExpression expression)
         {
             var constraintType = (expression.Constraint.IsPrimaryKeyConstraint) ? "PRIMARY KEY" : "UNIQUE";
@@ -261,6 +287,11 @@ namespace FluentMigrator.Runner.Generators.Redshift
                 string.Join(", ", columns));
         }
 
+        /// <summary>
+        /// Gets a comma-separated list of quoted column names.
+        /// </summary>
+        /// <param name="columns">The column names.</param>
+        /// <returns>The quoted column list.</returns>
         protected string GetColumnList(IEnumerable<string> columns)
         {
             var result = "";
@@ -271,6 +302,11 @@ namespace FluentMigrator.Runner.Generators.Redshift
             return result.TrimEnd(',');
         }
 
+        /// <summary>
+        /// Gets a comma-separated list of quoted values.
+        /// </summary>
+        /// <param name="data">The values.</param>
+        /// <returns>The quoted value list.</returns>
         protected string GetDataList(List<object> data)
         {
             var result = "";
@@ -281,11 +317,13 @@ namespace FluentMigrator.Runner.Generators.Redshift
             return result.TrimEnd(',');
         }
 
+        /// <inheritdoc />
         public override string Generate(CreateSequenceExpression expression)
         {
             return CompatibilityMode.HandleCompatibility("Sequences not supported");
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteSequenceExpression expression)
         {
             return CompatibilityMode.HandleCompatibility("Sequences not supported");

@@ -36,9 +36,12 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.Firebird
 {
+    /// <summary>
+    /// The Firebird processor for FluentMigrator.
+    /// </summary>
     public class FirebirdProcessor : GenericProcessorBase
     {
-        // ReSharper disable once InconsistentNaming
+        /// <inheritdoc />
         [Obsolete("Use the Truncator property")]
         protected readonly FirebirdTruncator truncator;
 
@@ -50,6 +53,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
         protected List<string> DDLTouchedTables;
         protected Dictionary<string, List<string>> DDLTouchedColumns;
 
+        /// <inheritdoc />
         public FirebirdProcessor(
             [NotNull] FirebirdDbFactory factory,
             [NotNull] FirebirdGenerator generator,
@@ -70,18 +74,25 @@ namespace FluentMigrator.Runner.Processors.Firebird
             ClearDDLFollowers();
         }
 
+        /// <inheritdoc />
         public override string DatabaseType => ProcessorIdConstants.Firebird;
 
+        /// <inheritdoc />
         public override IList<string> DatabaseTypeAliases { get; } = new List<string>();
 
+        /// <inheritdoc />
         public FirebirdOptions FBOptions { get; }
+        /// <inheritdoc />
         public bool IsFirebird3 => _firebirdVersionFunc.Value >= new Version(3, 0);
+        /// <inheritdoc />
         public new IMigrationGenerator Generator => base.Generator;
 
+        /// <inheritdoc />
         [Obsolete]
         public new IAnnouncer Announcer => base.Announcer;
 
 #pragma warning disable 618
+        /// <inheritdoc />
         public FirebirdTruncator Truncator => truncator;
 #pragma warning restore 618
 
@@ -108,18 +119,21 @@ namespace FluentMigrator.Runner.Processors.Firebird
             }
         }
 
+        /// <inheritdoc />
         public override bool SchemaExists(string schemaName)
         {
             //No schema support in firebird
             return true;
         }
 
+        /// <inheritdoc />
         public override bool TableExists(string schemaName, string tableName)
         {
             CheckTable(schemaName);
             return Exists("select rdb$relation_name from rdb$relations where (rdb$flags IS NOT NULL) and (lower(rdb$relation_name) = lower('{0}'))", FormatToSafeName(tableName));
         }
 
+        /// <inheritdoc />
         public override bool ColumnExists(string schemaName, string tableName, string columnName)
         {
             CheckTable(tableName);
@@ -127,40 +141,44 @@ namespace FluentMigrator.Runner.Processors.Firebird
             return Exists("select rdb$field_name from rdb$relation_fields where (lower(rdb$relation_name) = lower('{0}')) and (lower(rdb$field_name) = lower('{1}'))", FormatToSafeName(tableName), FormatToSafeName(columnName));
         }
 
+        /// <inheritdoc />
         public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
         {
             CheckTable(tableName);
             return Exists("select rdb$constraint_name from rdb$relation_constraints where (lower(rdb$relation_name) = lower('{0}')) and (lower(rdb$constraint_name) = lower('{1}'))", FormatToSafeName(tableName), FormatToSafeName(constraintName));
         }
 
+        /// <inheritdoc />
         public override bool IndexExists(string schemaName, string tableName, string indexName)
         {
             CheckTable(tableName);
             return Exists("select rdb$index_name from rdb$indices where (lower(rdb$relation_name) = lower('{0}')) and (lower(rdb$index_name) = lower('{1}')) and (rdb$system_flag <> 1 OR rdb$system_flag IS NULL) and (rdb$foreign_key IS NULL)", FormatToSafeName(tableName), FormatToSafeName(indexName));
         }
 
+        /// <inheritdoc />
         public override bool SequenceExists(string schemaName, string sequenceName)
         {
             return Exists("select rdb$generator_name from rdb$generators where lower(rdb$generator_name) = lower('{0}')", FormatToSafeName(sequenceName));
         }
 
+        /// <inheritdoc />
         public virtual bool TriggerExists(string schemaName, string tableName, string triggerName)
         {
             CheckTable(tableName);
             return Exists("select rdb$trigger_name from rdb$triggers where (lower(rdb$relation_name) = lower('{0}')) and (lower(rdb$trigger_name) = lower('{1}'))", FormatToSafeName(tableName), FormatToSafeName(triggerName));
         }
 
+        /// <inheritdoc />
         public override DataSet ReadTableData(string schemaName, string tableName)
         {
             CheckTable(tableName);
             return Read("SELECT * FROM {0}", _quoter.QuoteTableName(tableName, schemaName));
         }
 
+        /// <inheritdoc />
         public override DataSet Read(string template, params object[] args)
         {
             EnsureConnectionIsOpen();
-
-            //Announcer.Sql(String.Format(template,args));
 
             using (var command = CreateCommand(string.Format(template, args)))
             using (var reader = command.ExecuteReader())
@@ -169,11 +187,13 @@ namespace FluentMigrator.Runner.Processors.Firebird
             }
         }
 
+        /// <inheritdoc />
         public override bool DefaultValueExists(string schemaName, string tableName, string columnName, object defaultValue)
         {
             return false;
         }
 
+        /// <inheritdoc />
         public override bool Exists(string template, params object[] args)
         {
             EnsureConnectionIsOpen();
@@ -185,6 +205,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             }
         }
 
+        /// <inheritdoc />
         public override void BeginTransaction()
         {
             base.BeginTransaction();
@@ -192,6 +213,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             ClearDDLFollowers();
         }
 
+        /// <inheritdoc />
         public override void CommitTransaction()
         {
             base.CommitTransaction();
@@ -199,6 +221,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             ClearLocks();
         }
 
+        /// <inheritdoc />
         public override void RollbackTransaction()
         {
             base.RollbackTransaction();
@@ -206,6 +229,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             ClearLocks();
         }
 
+        /// <inheritdoc />
         public virtual void CommitRetaining()
         {
             if (IsRunningOutOfMigrationScope())
@@ -220,12 +244,14 @@ namespace FluentMigrator.Runner.Processors.Firebird
             BeginTransaction();
         }
 
+        /// <inheritdoc />
         public virtual void AutoCommit()
         {
             if (FBOptions.TransactionModel == FirebirdTransactionModel.AutoCommit)
                 CommitRetaining();
         }
 
+        /// <inheritdoc />
         public bool IsRunningOutOfMigrationScope()
         {
             return Transaction == null;
@@ -271,17 +297,20 @@ namespace FluentMigrator.Runner.Processors.Firebird
             DDLTouchedColumns = new Dictionary<string, List<string>>();
         }
 
+        /// <inheritdoc />
         public void LockTable(string tableName)
         {
             if (!DDLTouchedTables.Contains(tableName))
                 DDLTouchedTables.Add(tableName);
         }
 
+        /// <inheritdoc />
         public void LockColumn(string tableName, IEnumerable<string> columns)
         {
             columns.ToList().ForEach(x => LockColumn(tableName, x));
         }
 
+        /// <inheritdoc />
         public void LockColumn(string tableName, string columnName)
         {
             if (!DDLTouchedColumns.ContainsKey(tableName))
@@ -294,6 +323,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             }
         }
 
+        /// <inheritdoc />
         public void CheckTable(string tableName)
         {
             if (DDLTouchedTables.Contains(tableName))
@@ -309,11 +339,13 @@ namespace FluentMigrator.Runner.Processors.Firebird
             }
         }
 
+        /// <inheritdoc />
         public void CheckColumn(string tableName, IEnumerable<string> columns)
         {
             columns.ToList().ForEach(x => CheckColumn(tableName, x));
         }
 
+        /// <inheritdoc />
         public void CheckColumn(string tableName, string columnName)
         {
             CheckTable(tableName);
@@ -330,6 +362,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             }
         }
 
+        /// <inheritdoc />
         public override void Process(CreateColumnExpression expression)
         {
             Truncator.Truncate(expression);
@@ -343,12 +376,11 @@ namespace FluentMigrator.Runner.Processors.Firebird
                 CreateSequenceForIdentity(expression.TableName, expression.Column.Name);
             }
 
-            /*if (FBOptions.TransactionModel == FirebirdTransactionModel.AutoCommitOnCheckFail)
-                CommitRetaining();*/
             if (FBOptions.TransactionModel != FirebirdTransactionModel.None)
                 CommitRetaining();
         }
 
+        /// <inheritdoc />
         public override void Process(AlterColumnExpression expression)
         {
             Truncator.Truncate(expression);
@@ -427,7 +459,6 @@ namespace FluentMigrator.Runner.Processors.Firebird
                 identitySequenceExists = false;
             }
 
-
             //Adjust identity generators
             if (expression.Column.IsIdentity)
             {
@@ -439,9 +470,9 @@ namespace FluentMigrator.Runner.Processors.Firebird
                 if (identitySequenceExists)
                     DeleteSequenceForIdentity(expression.TableName, expression.Column.Name);
             }
-
         }
 
+        /// <inheritdoc />
         public override void Process(RenameColumnExpression expression)
         {
             Truncator.Truncate(expression);
@@ -452,6 +483,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             InternalProcess(Generator.Generate(expression));
         }
 
+        /// <inheritdoc />
         public override void Process(DeleteColumnExpression expression)
         {
             Truncator.Truncate(expression);
@@ -468,13 +500,14 @@ namespace FluentMigrator.Runner.Processors.Firebird
                 }
                 catch (ArgumentException)
                 {
-                    // Ignore argument exception???
+                    // Ignore argument exception
                 }
             }
 
             InternalProcess(Generator.Generate(expression));
         }
 
+        /// <inheritdoc />
         public override void Process(CreateTableExpression expression)
         {
             Truncator.Truncate(expression);
@@ -487,13 +520,11 @@ namespace FluentMigrator.Runner.Processors.Firebird
                     CreateSequenceForIdentity(expression.TableName, colDef.Name);
             }
 
-            /*if(FBOptions.TransactionModel == FirebirdTransactionModel.AutoCommitOnCheckFail)
-                CommitRetaining();*/
             if (FBOptions.TransactionModel != FirebirdTransactionModel.None)
                 CommitRetaining();
-
         }
 
+        /// <inheritdoc />
         public override void Process(AlterTableExpression expression)
         {
             Truncator.Truncate(expression);
@@ -502,6 +533,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             InternalProcess(Generator.Generate(expression));
         }
 
+        /// <inheritdoc />
         public override void Process(RenameTableExpression expression)
         {
             Truncator.Truncate(expression);
@@ -561,6 +593,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             Process(delTable);
         }
 
+        /// <inheritdoc />
         public override void Process(DeleteTableExpression expression)
         {
             Truncator.Truncate(expression);
@@ -569,6 +602,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             InternalProcess(Generator.Generate(expression));
         }
 
+        /// <inheritdoc />
         public override void Process(AlterDefaultConstraintExpression expression)
         {
             Truncator.Truncate(expression);
@@ -577,6 +611,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             InternalProcess(Generator.Generate(expression));
         }
 
+        /// <inheritdoc />
         public override void Process(DeleteDefaultConstraintExpression expression)
         {
             Truncator.Truncate(expression);
@@ -585,6 +620,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             InternalProcess(Generator.Generate(expression));
         }
 
+        /// <inheritdoc />
         public override void Process(CreateIndexExpression expression)
         {
             Truncator.Truncate(expression);
@@ -593,6 +629,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             InternalProcess(Generator.Generate(expression));
         }
 
+        /// <inheritdoc />
         public override void Process(DeleteIndexExpression expression)
         {
             Truncator.Truncate(expression);
@@ -601,48 +638,56 @@ namespace FluentMigrator.Runner.Processors.Firebird
             InternalProcess(Generator.Generate(expression));
         }
 
+        /// <inheritdoc />
         public override void Process(CreateSchemaExpression expression)
         {
             Truncator.Truncate(expression);
             InternalProcess(Generator.Generate(expression));
         }
 
+        /// <inheritdoc />
         public override void Process(AlterSchemaExpression expression)
         {
             Truncator.Truncate(expression);
             InternalProcess(Generator.Generate(expression));
         }
 
+        /// <inheritdoc />
         public override void Process(DeleteSchemaExpression expression)
         {
             Truncator.Truncate(expression);
             InternalProcess(Generator.Generate(expression));
         }
 
+        /// <inheritdoc />
         public override void Process(CreateConstraintExpression expression)
         {
             Truncator.Truncate(expression);
             InternalProcess(Generator.Generate(expression));
         }
 
+        /// <inheritdoc />
         public override void Process(DeleteConstraintExpression expression)
         {
             Truncator.Truncate(expression);
             InternalProcess(Generator.Generate(expression));
         }
 
+        /// <inheritdoc />
         public override void Process(CreateForeignKeyExpression expression)
         {
             Truncator.Truncate(expression);
             InternalProcess(Generator.Generate(expression));
         }
 
+        /// <inheritdoc />
         public override void Process(DeleteForeignKeyExpression expression)
         {
             Truncator.Truncate(expression);
             InternalProcess(Generator.Generate(expression));
         }
 
+        /// <inheritdoc />
         public override void Process(CreateSequenceExpression expression)
         {
             Truncator.Truncate(expression);
@@ -650,15 +695,16 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
             if (expression.Sequence.StartWith != null)
                 InternalProcess(((FirebirdGenerator) Generator).GenerateAlterSequence(expression.Sequence));
-
         }
 
+        /// <inheritdoc />
         public override void Process(DeleteSequenceExpression expression)
         {
             Truncator.Truncate(expression);
             InternalProcess(Generator.Generate(expression));
         }
 
+        /// <inheritdoc />
         public override void Process(InsertDataExpression expression)
         {
             Truncator.Truncate(expression);
@@ -673,6 +719,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             }
         }
 
+        /// <inheritdoc />
         public override void Process(DeleteDataExpression expression)
         {
             Truncator.Truncate(expression);
@@ -698,6 +745,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             }
         }
 
+        /// <inheritdoc />
         public override void Process(UpdateDataExpression expression)
         {
             Truncator.Truncate(expression);
@@ -705,11 +753,13 @@ namespace FluentMigrator.Runner.Processors.Firebird
             InternalProcess(Generator.Generate(expression));
         }
 
+        /// <inheritdoc />
         public override void Execute(string template, params object[] args)
         {
             Process(string.Format(template, args));
         }
 
+        /// <inheritdoc />
         public override void Process(PerformDBOperationExpression expression)
         {
             Logger.LogSay("Performing DB Operation");
@@ -755,6 +805,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
         }
 
+        /// <inheritdoc />
         protected override void Process(string sql)
         {
             InternalProcess(sql);
@@ -827,11 +878,13 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
         }
 
+        /// <inheritdoc />
         public PerformDBOperationExpression CreateTriggerExpression(string tableName, TriggerInfo trigger)
         {
             return CreateTriggerExpression(tableName, trigger.Name, trigger.Before, trigger.Event, trigger.Body);
         }
 
+        /// <inheritdoc />
         public PerformDBOperationExpression CreateTriggerExpression(string tableName, string triggerName, bool onBefore, TriggerEvent onEvent, string triggerBody)
         {
             tableName = Truncator.Truncate(tableName);
@@ -857,6 +910,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             return createTrigger;
         }
 
+        /// <inheritdoc />
         public PerformDBOperationExpression DeleteTriggerExpression(string tableName, string triggerName)
         {
             tableName = Truncator.Truncate(tableName);

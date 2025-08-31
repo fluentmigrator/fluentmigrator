@@ -24,7 +24,7 @@ using Microsoft.Extensions.Options;
 namespace FluentMigrator.Runner.Announcers
 {
     /// <summary>
-    /// Implementation of <see cref="IAnnouncer"/> that redirects all log messages to an <see cref="ILogger"/>
+    /// Implementation of <see cref="IAnnouncer"/> that redirects all log messages to an <see cref="ILogger"/>.
     /// </summary>
     [Obsolete]
     public class LoggerAnnouncer : IAnnouncer
