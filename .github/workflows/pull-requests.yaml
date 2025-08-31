@@ -43,13 +43,13 @@ jobs:
         dotnet-version: '9.0.x'
 
     - name: Restore
-      run: dotnet restore --verbosity quiet
+      run: dotnet restore --verbosity quiet --use-current-runtime
 
     - name: Build
-      run: dotnet build --no-restore --verbosity quiet --framework ${{ matrix.dotnet-tfm }} --configuration ${{ env.buildConfiguration }}
+      run: dotnet build --no-restore --verbosity quiet --use-current-runtime --configuration ${{ env.buildConfiguration }}
 
     - name: Test
-      run: dotnet test --no-restore --no-build --verbosity quiet --framework ${{ matrix.dotnet-tfm }} --configuration ${{ env.buildConfiguration }} --logger trx --collect:"XPlat Code Coverage" --results-directory "TestResults-${{ matrix.dotnet-tfm }}"
+      run: dotnet test --no-restore --no-build --verbosity quiet --configuration ${{ env.buildConfiguration }} --logger trx --collect:"XPlat Code Coverage" --results-directory "TestResults-${{ matrix.dotnet-tfm }}"
 
     - name: Combine Coverage Reports
       uses: danielpalme/ReportGenerator-GitHub-Action@v5.4.10
