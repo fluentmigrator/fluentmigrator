@@ -42,14 +42,8 @@ jobs:
       with:
         dotnet-version: '9.0.x'
 
-    - name: Restore
-      run: dotnet restore --verbosity quiet --use-current-runtime
-
-    - name: Build
-      run: dotnet build --no-restore --verbosity quiet --use-current-runtime --configuration ${{ env.buildConfiguration }}
-
-    - name: Test
-      run: dotnet test --no-restore --no-build --verbosity quiet --configuration ${{ env.buildConfiguration }} --logger trx --collect:"XPlat Code Coverage" --results-directory "TestResults-${{ matrix.dotnet-tfm }}"
+    - name: "Restore, Build, Test"
+      run: dotnet test --framework ${{ matrix.dotnet-tfm }} --configuration ${{ env.buildConfiguration }} --verbosity quiet --logger trx --collect:"XPlat Code Coverage" --results-directory "TestResults-${{ matrix.dotnet-tfm }}"
 
     - name: Combine Coverage Reports
       uses: danielpalme/ReportGenerator-GitHub-Action@v5.4.10
@@ -100,4 +94,4 @@ jobs:
       uses: EnricoMi/publish-unit-test-result-action@v2
       if: (!cancelled())
       with:
-        trx_files: "${{ github.workspace }}/**/*.trx"
+        files: "${{ github.workspace }}/**/*.trx"
