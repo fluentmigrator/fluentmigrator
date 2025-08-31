@@ -16,6 +16,7 @@
 //
 #endregion
 
+#if !NETFRAMEWORK
 using System.Diagnostics;
 
 using FluentMigrator.Runner;
@@ -95,7 +96,8 @@ namespace FluentMigrator.Tests.Integration.Processors.Db2ISeries
         private static void EnsureReference()
         {
             // This is here to avoid the removal of the referenced assembly
-            Debug.WriteLine(typeof(Net.IBM.Data.DB2.DB2Factory));
+            Debug.WriteLine(typeof(IBM.Data.Db2.DB2Factory));
         }
     }
 }
+#endif

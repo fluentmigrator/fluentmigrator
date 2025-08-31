@@ -16,6 +16,7 @@
 //
 #endregion
 
+#if !NETFRAMEWORK
 using System.Diagnostics;
 
 using FluentMigrator.Runner;
@@ -112,3 +113,4 @@ namespace FluentMigrator.Tests.Integration.Processors.Db2ISeries
         }
     }
 }
+#endif
