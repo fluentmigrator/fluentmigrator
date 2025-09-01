@@ -33,14 +33,20 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.Jet
 {
+    /// <summary>
+    /// The Jet migration processor.
+    /// </summary>
     public class JetProcessor : ProcessorBase
     {
         private readonly Lazy<OleDbConnection> _connection;
         private OleDbTransaction _transaction;
+        /// <inheritdoc />
         public OleDbConnection Connection => _connection.Value;
+        /// <inheritdoc />
         public OleDbTransaction Transaction => _transaction;
         private bool _disposed = false;
 
+        /// <inheritdoc />
         public JetProcessor(
             [NotNull] JetGenerator generator,
             [NotNull] ILogger<JetProcessor> logger,
@@ -63,22 +69,31 @@ namespace FluentMigrator.Runner.Processors.Jet
             }
         }
 
+        /// <inheritdoc />
         public override string DatabaseType { get; } = ProcessorIdConstants.Jet;
 
+        /// <inheritdoc />
         public override IList<string> DatabaseTypeAliases { get; } = new List<string>();
 
+        /// <summary>
+        /// Ensures the database connection is open.
+        /// </summary>
         protected void EnsureConnectionIsOpen()
         {
             if (Connection.State != ConnectionState.Open)
                 Connection.Open();
         }
 
+        /// <summary>
+        /// Ensures the database connection is closed.
+        /// </summary>
         protected void EnsureConnectionIsClosed()
         {
             if (Connection.State != ConnectionState.Closed)
                 Connection.Close();
         }
 
+        /// <inheritdoc />
         public override void Process(PerformDBOperationExpression expression)
         {
             Logger.LogSay("Performing DB Operation");
@@ -91,6 +106,7 @@ namespace FluentMigrator.Runner.Processors.Jet
             expression.Operation?.Invoke(Connection, _transaction);
         }
 
+        /// <inheritdoc />
         protected override void Process(string sql)
         {
             Logger.LogSql(sql);
@@ -113,11 +129,13 @@ namespace FluentMigrator.Runner.Processors.Jet
             }
         }
 
+        /// <inheritdoc />
         public override DataSet ReadTableData(string schemaName, string tableName)
         {
             return Read("SELECT * FROM [{0}]", tableName);
         }
 
+        /// <inheritdoc />
         public override DataSet Read(string template, params object[] args)
         {
             EnsureConnectionIsOpen();
@@ -131,6 +149,7 @@ namespace FluentMigrator.Runner.Processors.Jet
             }
         }
 
+        /// <inheritdoc />
         public override bool Exists(string template, params object[] args)
         {
             EnsureConnectionIsOpen();
@@ -143,21 +162,25 @@ namespace FluentMigrator.Runner.Processors.Jet
             }
         }
 
+        /// <inheritdoc />
         public override bool SequenceExists(string schemaName, string sequenceName)
         {
             return false;
         }
 
+        /// <inheritdoc />
         public override void Execute(string template, params object[] args)
         {
             Process(string.Format(template, args));
         }
 
+        /// <inheritdoc />
         public override bool SchemaExists(string tableName)
         {
             return true;
         }
 
+        /// <inheritdoc />
         public override bool TableExists(string schemaName, string tableName)
         {
             EnsureConnectionIsOpen();
@@ -178,6 +201,7 @@ namespace FluentMigrator.Runner.Processors.Jet
             }
         }
 
+        /// <inheritdoc />
         public override bool ColumnExists(string schemaName, string tableName, string columnName)
         {
             EnsureConnectionIsOpen();
@@ -198,6 +222,7 @@ namespace FluentMigrator.Runner.Processors.Jet
             }
         }
 
+        /// <inheritdoc />
         public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
         {
             EnsureConnectionIsOpen();
@@ -210,6 +235,7 @@ namespace FluentMigrator.Runner.Processors.Jet
             }
         }
 
+        /// <inheritdoc />
         public override bool IndexExists(string schemaName, string tableName, string indexName)
         {
             EnsureConnectionIsOpen();
@@ -222,11 +248,13 @@ namespace FluentMigrator.Runner.Processors.Jet
             }
         }
 
+        /// <inheritdoc />
         public override bool DefaultValueExists(string schemaName, string tableName, string columnName, object defaultValue)
         {
             return false;
         }
 
+        /// <inheritdoc />
         public override void BeginTransaction()
         {
             if (_transaction != null) return;
@@ -237,6 +265,7 @@ namespace FluentMigrator.Runner.Processors.Jet
             _transaction = Connection.BeginTransaction();
         }
 
+        /// <inheritdoc />
         public override void RollbackTransaction()
         {
             if (_transaction == null) return;
@@ -247,6 +276,7 @@ namespace FluentMigrator.Runner.Processors.Jet
             _transaction = null;
         }
 
+        /// <inheritdoc />
         public override void CommitTransaction()
         {
             if (_transaction == null) return;

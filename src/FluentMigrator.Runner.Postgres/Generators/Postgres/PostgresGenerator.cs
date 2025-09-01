@@ -35,6 +35,9 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Generators.Postgres
 {
+    /// <summary>
+    /// The PostgreSQL SQL generator for FluentMigrator.
+    /// </summary>
     public class PostgresGenerator : GenericGenerator
     {
         private static readonly HashSet<string> _supportedAdditionalFeatures = new HashSet<string>
@@ -42,12 +45,14 @@ namespace FluentMigrator.Runner.Generators.Postgres
             PostgresExtensions.IndexColumnNullsDistinct,
         };
 
+        /// <inheritdoc />
         public PostgresGenerator(
             [NotNull] PostgresQuoter quoter)
             : this(quoter, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()))
         {
         }
 
+        /// <inheritdoc />
         public PostgresGenerator(
             [NotNull] PostgresQuoter quoter,
             [NotNull] IOptions<GeneratorOptions> generatorOptions)
@@ -55,6 +60,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
         {
         }
 
+        /// <inheritdoc />
         protected PostgresGenerator(
             [NotNull] PostgresQuoter quoter,
             [NotNull] IOptions<GeneratorOptions> generatorOptions,
@@ -63,6 +69,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
         {
         }
 
+        /// <inheritdoc />
         protected PostgresGenerator(
             [NotNull] IColumn column,
             [NotNull] PostgresQuoter quoter,
@@ -76,8 +83,11 @@ namespace FluentMigrator.Runner.Generators.Postgres
             _supportedAdditionalFeatures.Contains(feature)
          || base.IsAdditionalFeatureSupported(feature);
 
+        /// <inheritdoc />
         public override string AddColumn => "ALTER TABLE {0} ADD {1}";
+        /// <inheritdoc />
         public override string AlterColumn => "ALTER TABLE {0} {1}";
+        /// <inheritdoc />
         public override string RenameTable => "ALTER TABLE {0} RENAME TO {1}";
 
         /// <inheritdoc />
@@ -86,16 +96,19 @@ namespace FluentMigrator.Runner.Generators.Postgres
         /// <inheritdoc />
         public override List<string> GeneratorIdAliases => [GeneratorIdConstants.PostgreSQL, GeneratorIdConstants.Postgres];
 
+        /// <inheritdoc />
         public override string Generate(CreateSchemaExpression expression)
         {
             return FormatStatement(CreateSchema, Quoter.QuoteSchemaName(expression.SchemaName));
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteSchemaExpression expression)
         {
             return FormatStatement(DropSchema, Quoter.QuoteSchemaName(expression.SchemaName));
         }
 
+        /// <inheritdoc />
         public override string Generate(AlterColumnExpression expression)
         {
             var alterStatement = new StringBuilder();
@@ -117,6 +130,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return alterStatement.ToString();
         }
 
+        /// <inheritdoc />
         public override string Generate(CreateForeignKeyExpression expression)
         {
             var primaryColumns = GetColumnList(expression.ForeignKey.PrimaryColumns);
@@ -135,6 +149,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
             );
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteForeignKeyExpression expression)
         {
             return FormatStatement("ALTER TABLE {0} DROP CONSTRAINT {1}",
@@ -142,7 +157,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
                 Quoter.Quote(expression.ForeignKey.Name));
         }
 
-
+        /// <inheritdoc />
         protected virtual string GetIncludeString(CreateIndexExpression column)
         {
             var includes = column.GetAdditionalFeature<IList<PostgresIndexIncludeDefinition>>(PostgresExtensions.IncludesList);
@@ -155,6 +170,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
             throw new NotSupportedException("The current version doesn't support include index. Please use Postgres 11.");
         }
 
+        /// <inheritdoc />
         protected virtual Algorithm GetIndexMethod(CreateIndexExpression expression)
         {
             var algorithm = expression.GetAdditionalFeature<PostgresIndexAlgorithmDefinition>(PostgresExtensions.IndexAlgorithm);
@@ -166,6 +182,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return algorithm.Algorithm;
         }
 
+        /// <inheritdoc />
         protected virtual string GetFilter(CreateIndexExpression expression)
         {
             var filter = expression.Index.GetAdditionalFeature<string>(PostgresExtensions.IndexFilter);
@@ -185,6 +202,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return nullsDistinctString;
         }
 
+        /// <inheritdoc />
         protected virtual string GetWithNullsDistinctStringInWhere(IndexDefinition index)
         {
             bool? GetNullsDistinct(IndexColumnDefinition column)
@@ -211,11 +229,13 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return condition.Length == 0 ? string.Empty : $" WHERE {condition}";
         }
 
+        /// <inheritdoc />
         protected virtual string GetWithNullsDistinctString(IndexDefinition index)
         {
             return string.Empty;
         }
 
+        /// <inheritdoc />
         protected virtual string GetAsConcurrently(CreateIndexExpression expression)
         {
             var asConcurrently = expression.GetAdditionalFeature<PostgresIndexConcurrentlyDefinition>(PostgresExtensions.Concurrently);
@@ -228,6 +248,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return " CONCURRENTLY";
         }
 
+        /// <inheritdoc />
         protected virtual string GetAsOnly(CreateIndexExpression expression)
         {
             var asOnly = expression.GetAdditionalFeature<PostgresIndexOnlyDefinition>(PostgresExtensions.Only);
@@ -240,6 +261,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
             throw new NotSupportedException("The current version doesn't support ONLY. Please use Postgres 11 or higher.");
         }
 
+        /// <inheritdoc />
         protected virtual string GetNullsSort(IndexColumnDefinition column)
         {
             var sort = column.GetAdditionalFeature<PostgresIndexNullsSort>(PostgresExtensions.NullsSort);
@@ -256,6 +278,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return " NULLS LAST";
         }
 
+        /// <inheritdoc />
         protected virtual string GetTablespace(CreateIndexExpression expression)
         {
             var tablespace = expression.Index.GetAdditionalFeature<string>(PostgresExtensions.IndexTablespace);
@@ -267,6 +290,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return string.Empty;
         }
 
+        /// <inheritdoc />
         protected virtual string GetWithIndexStorageParameters(CreateIndexExpression expression)
         {
             var allow = GetAllowIndexStorageParameters();
@@ -338,6 +362,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
             }
         }
 
+        /// <inheritdoc />
         protected virtual HashSet<string> GetAllowIndexStorageParameters()
         {
             return new HashSet<string>(StringComparer.InvariantCultureIgnoreCase)
@@ -347,6 +372,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
             };
         }
 
+        /// <inheritdoc />
         public override string Generate(CreateIndexExpression expression)
         {
             var result = new StringBuilder("CREATE");
@@ -407,6 +433,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return result.ToString();
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteIndexExpression expression)
         {
             var quotedSchema = Quoter.QuoteSchemaName(expression.Index.SchemaName);
@@ -415,6 +442,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return FormatStatement("DROP INDEX {0}", indexName);
         }
 
+        /// <inheritdoc />
         public override string Generate(InsertDataExpression expression)
         {
             var result = new StringBuilder();
@@ -442,6 +470,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return result.ToString();
         }
 
+        /// <inheritdoc />
         public override string Generate(AlterDefaultConstraintExpression expression)
         {
             return FormatStatement(
@@ -451,21 +480,25 @@ namespace FluentMigrator.Runner.Generators.Postgres
                 ((PostgresColumn)Column).FormatAlterDefaultValue(expression.ColumnName, expression.DefaultValue));
         }
 
+        /// <inheritdoc />
         public override string Generate(AlterSchemaExpression expression)
         {
             return FormatStatement("ALTER TABLE {0} SET SCHEMA {1}", Quoter.QuoteTableName(expression.TableName, expression.SourceSchemaName), Quoter.QuoteSchemaName(expression.DestinationSchemaName));
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteDefaultConstraintExpression expression)
         {
             return FormatStatement("ALTER TABLE {0} ALTER {1} DROP DEFAULT", Quoter.QuoteTableName(expression.TableName, expression.SchemaName), Quoter.Quote(expression.ColumnName));
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteConstraintExpression expression)
         {
             return FormatStatement("ALTER TABLE {0} DROP CONSTRAINT {1}", Quoter.QuoteTableName(expression.Constraint.TableName, expression.Constraint.SchemaName), Quoter.Quote(expression.Constraint.ConstraintName));
         }
 
+        /// <inheritdoc />
         public override string Generate(CreateConstraintExpression expression)
         {
             var constraintType = (expression.Constraint.IsPrimaryKeyConstraint) ? "PRIMARY KEY" : "UNIQUE";
@@ -485,6 +518,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
                 string.Join(", ", columns));
         }
 
+        /// <inheritdoc />
         protected string GetColumnList(IEnumerable<string> columns)
         {
             var result = "";
@@ -495,6 +529,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return result.TrimEnd(',');
         }
 
+        /// <inheritdoc />
         protected string GetDataList(List<object> data)
         {
             var result = "";
@@ -505,6 +540,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return result.TrimEnd(',');
         }
 
+        /// <inheritdoc />
         public override string Generate(CreateSequenceExpression expression)
         {
             var result = new StringBuilder("CREATE SEQUENCE ");
@@ -555,6 +591,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return result.ToString();
         }
 
+        /// <inheritdoc />
         protected virtual string GetOverridingIdentityValuesString(InsertDataExpression expression)
         {
             if (!expression.AdditionalFeatures.ContainsKey(PostgresExtensions.OverridingIdentityValues))

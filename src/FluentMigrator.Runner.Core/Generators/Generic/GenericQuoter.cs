@@ -22,6 +22,7 @@ namespace FluentMigrator.Runner.Generators.Generic
 {
     using System;
 
+    /// <inheritdoc />
     public class GenericQuoter : IQuoter
     {
         /// <inheritdoc />
@@ -69,11 +70,13 @@ namespace FluentMigrator.Runner.Generators.Generic
             return value.ToString();
         }
 
+        /// <inheritdoc />
         public virtual string FromTimeSpan(TimeSpan value)
         {
             return ValueQuote + value.ToString() + ValueQuote;
         }
 
+        /// <inheritdoc />
         protected virtual string FormatByteArray(byte[] value)
         {
             var hex = new System.Text.StringBuilder((value.Length * 2)+2);
@@ -83,108 +86,118 @@ namespace FluentMigrator.Runner.Generators.Generic
             return hex.ToString();
         }
 
+        /// <inheritdoc />
         private string FormatDecimal(decimal value)
         {
             return value.ToString(CultureInfo.InvariantCulture);
         }
 
+        /// <inheritdoc />
         private string FormatInteger(int value)
         {
             return value.ToString(CultureInfo.InvariantCulture);
         }
 
+        /// <inheritdoc />
         private string FormatFloat(float value)
         {
             return value.ToString(CultureInfo.InvariantCulture);
         }
 
+        /// <inheritdoc />
         private string FormatDouble(double value)
         {
             return value.ToString(CultureInfo.InvariantCulture);
         }
 
+        /// <inheritdoc />
         public virtual string FormatNull()
         {
             return "NULL";
         }
 
+        /// <inheritdoc />
         public virtual string FormatAnsiString(string value)
         {
             return ValueQuote + value.Replace(ValueQuote, EscapeValueQuote) + ValueQuote;
         }
 
+        /// <inheritdoc />
         public virtual string FormatNationalString(string value)
         {
             return ValueQuote + value.Replace(ValueQuote, EscapeValueQuote) + ValueQuote;
         }
 
+        /// <inheritdoc />
         public virtual string FormatSystemMethods(SystemMethods value)
         {
             throw new NotSupportedException($"The system method {value} is not supported.");
         }
 
+        /// <inheritdoc />
         public virtual string FormatChar(char value)
         {
             return ValueQuote + value + ValueQuote;
         }
 
+        /// <inheritdoc />
         public virtual string FormatBool(bool value)
         {
             return (value) ? 1.ToString() : 0.ToString();
         }
 
+        /// <inheritdoc />
         public virtual string FormatGuid(Guid value)
         {
             return ValueQuote + value.ToString() + ValueQuote;
         }
 
+        /// <inheritdoc />
         public virtual string FormatDateTime(DateTime value)
         {
             return ValueQuote + (value).ToString("yyyy-MM-ddTHH:mm:ss",CultureInfo.InvariantCulture) + ValueQuote;
         }
 
+        /// <inheritdoc />
         public virtual string FormatDateTimeOffset(DateTimeOffset value)
         {
             return ValueQuote + (value).ToString("yyyy-MM-ddTHH:mm:sszzz", CultureInfo.InvariantCulture) + ValueQuote;
         }
 
+        /// <inheritdoc />
         public virtual string FormatEnum(object value)
         {
             return ValueQuote + value + ValueQuote;
         }
 
+        /// <inheritdoc />
         public virtual string ValueQuote => "'";
 
+        /// <inheritdoc />
         public virtual string EscapeValueQuote => ValueQuote + ValueQuote;
 
-        /// <summary>
-        /// Gets the separator between identifiers (e.g. the dot between SCHEMA.TABLENAME)
-        /// </summary>
+        /// <inheritdoc />
         public virtual string IdentifierSeparator { get; } = ".";
 
-        /// <summary>
-        /// Returns the opening quote identifier - " is the standard according to the specification
-        /// </summary>
+        /// <inheritdoc />
         public virtual string OpenQuote => "\"";
 
-        /// <summary>
-        /// Returns the closing quote identifier - " is the standard according to the specification
-        /// </summary>
+        /// <inheritdoc />
         public virtual string CloseQuote => "\"";
 
+        /// <inheritdoc />
         public virtual string OpenQuoteEscapeString => OpenQuote.PadRight(2, OpenQuote.ToCharArray()[0]);
+        /// <inheritdoc />
         public virtual string CloseQuoteEscapeString => CloseQuote.PadRight(2, CloseQuote.ToCharArray()[0]);
 
         /// <inheritdoc />
         public virtual bool IsQuoted(string name)
         {
             if (string.IsNullOrEmpty(name)) return false;
-            //This can return true incorrectly in some cases edge cases.
-            //If a string say [myname]] is passed in this is not correctly quote for MSSQL but this function will
-            //return true.
             return (name.StartsWith(OpenQuote) && name.EndsWith(CloseQuote));
         }
 
+        /// <inheritdoc />
         [ContractAnnotation("name:null => false")]
         protected virtual bool ShouldQuote([CanBeNull] string name)
         {
@@ -194,7 +207,6 @@ namespace FluentMigrator.Runner.Generators.Generic
         /// <inheritdoc />
         public virtual string Quote(string name)
         {
-            //Exit early if not quoting is needed
             if (!ShouldQuote(name))
                 return name;
 
@@ -207,7 +219,6 @@ namespace FluentMigrator.Runner.Generators.Generic
                 quotedName = name.Replace(OpenQuote, OpenQuoteEscapeString);
             }
 
-            //If closing quote is the same as the opening quote then no need to escape again
             if (OpenQuote != CloseQuote)
             {
                 if (!string.IsNullOrEmpty(CloseQuoteEscapeString))
