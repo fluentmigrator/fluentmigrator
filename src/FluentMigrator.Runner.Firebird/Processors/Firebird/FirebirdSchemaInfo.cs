@@ -464,8 +464,5 @@ namespace FluentMigrator.Runner.Processors.Firebird
                 return new SequenceInfo(ds.Tables[0].Rows[0], processor);
             }
         }
-
-
-}    }    }
-
+    }
 }
