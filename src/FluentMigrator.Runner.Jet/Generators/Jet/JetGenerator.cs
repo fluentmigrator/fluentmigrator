@@ -91,6 +91,7 @@ namespace FluentMigrator.Runner.Generators.Jet
             return CompatibilityMode.HandleCompatibility("Default constraints are not supported");
         }
 
+        /// <inheritdoc />
         public override string Generate(CreateTableExpression expression)
         {
             if (expression.Columns.Any(x => x.Expression != null))

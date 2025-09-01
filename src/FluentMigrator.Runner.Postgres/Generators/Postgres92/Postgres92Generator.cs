@@ -24,8 +24,16 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Generators.Postgres92
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class Postgres92Generator : PostgresGenerator
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="quoter"></param>
+        /// <param name="generatorOptions"></param>
         public Postgres92Generator(
             [NotNull] PostgresQuoter quoter,
             [NotNull] IOptions<GeneratorOptions> generatorOptions)
