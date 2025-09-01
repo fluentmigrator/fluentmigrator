@@ -16,8 +16,13 @@
 //
 #endregion
 
+using FluentMigrator.Runner.Generators.Generic;
+
 namespace FluentMigrator.Runner.Generators.SqlServer
 {
+    /// <summary>
+    /// The SQL Server 2005 SQL quoter for FluentMigrator.
+    /// </summary>
     public class SqlServer2005Quoter : SqlServer2000Quoter
     {
         public override string QuoteSchemaName(string schemaName)

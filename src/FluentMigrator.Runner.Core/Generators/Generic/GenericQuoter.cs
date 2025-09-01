@@ -22,7 +22,9 @@ namespace FluentMigrator.Runner.Generators.Generic
 {
     using System;
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Provides default quoting and value formatting for SQL generators.
+    /// </summary>
     public class GenericQuoter : IQuoter
     {
         /// <inheritdoc />
@@ -290,6 +292,12 @@ namespace FluentMigrator.Runner.Generators.Generic
             return unquoted;
         }
 
+        /// <summary>
+        /// Creates a schema-prefixed quoted identifier.
+        /// </summary>
+        /// <param name="quotedSchemaName">The quoted schema name.</param>
+        /// <param name="quotedIdentifier">The quoted identifier.</param>
+        /// <returns>The schema-prefixed quoted identifier.</returns>
         protected virtual string CreateSchemaPrefixedQuotedIdentifier(string quotedSchemaName, string quotedIdentifier)
         {
             if (string.IsNullOrEmpty(quotedSchemaName))

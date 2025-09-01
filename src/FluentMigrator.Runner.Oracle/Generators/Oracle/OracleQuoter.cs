@@ -23,9 +23,11 @@ using JetBrains.Annotations;
 
 namespace FluentMigrator.Runner.Generators.Oracle
 {
+    /// <summary>
+    /// The Oracle SQL quoter for FluentMigrator.
+    /// </summary>
     public class OracleQuoter : OracleQuoterQuotedIdentifier
     {
-
         /// <summary>
         /// https://docs.oracle.com/cd/A97630_01/appdev.920/a42525/apb.htm
         /// </summary>
@@ -49,6 +51,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
             },
             StringComparer.OrdinalIgnoreCase);
 
+        /// <inheritdoc />
         [ContractAnnotation("name:null => false")]
         protected override bool ShouldQuote(string name)
         {

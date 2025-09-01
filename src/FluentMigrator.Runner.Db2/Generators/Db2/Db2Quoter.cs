@@ -20,15 +20,23 @@ using FluentMigrator.Runner.Generators.Generic;
 
 namespace FluentMigrator.Runner.Generators.DB2
 {
+    /// <summary>
+    /// The DB2 SQL quoter for FluentMigrator.
+    /// </summary>
     public class Db2Quoter : GenericQuoter
     {
+        /// <summary>
+        /// Special characters that require quoting in DB2 identifiers.
+        /// </summary>
         public readonly char[] SpecialChars = "\"%'()*+|,{}-./:;<=>?^[]".ToCharArray();
 
+        /// <inheritdoc />
         public override string FormatDateTime(DateTime value)
         {
             return ValueQuote + value.ToString("yyyy-MM-dd-HH.mm.ss") + ValueQuote;
         }
 
+        /// <inheritdoc />
         protected override bool ShouldQuote(string name)
         {
             if (string.IsNullOrEmpty(name))
@@ -37,6 +45,7 @@ namespace FluentMigrator.Runner.Generators.DB2
             return name.IndexOfAny(SpecialChars) != -1;
         }
 
+        /// <inheritdoc />
         public override string QuoteIndexName(string indexName, string schemaName)
         {
             return CreateSchemaPrefixedQuotedIdentifier(
@@ -44,6 +53,7 @@ namespace FluentMigrator.Runner.Generators.DB2
                 IsQuoted(indexName) ? indexName : Quote(indexName));
         }
 
+        /// <inheritdoc />
         public override string FormatSystemMethods(SystemMethods value)
         {
             switch (value)
