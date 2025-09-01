@@ -382,7 +382,27 @@ namespace FluentMigrator.Runner.Processors.Firebird
     /// <summary>
     /// Represents Firebird trigger metadata.
     /// </summary>
-    public enum TriggerEvent { Insert, Update, Delete }
+    public enum TriggerEvent
+    {
+        /// <summary>
+        /// Represents the trigger event type for Firebird triggers that occur during an <c>INSERT</c> operation.
+        /// </summary>
+        /// <remarks>
+        /// This event is used to define triggers that execute when a new record is inserted into a table.
+        /// </remarks>
+        Insert,
+        /// <summary>
+        /// Represents the trigger event for an update operation in Firebird.
+        /// </summary>
+        Update,
+        /// <summary>
+        /// Represents the "DELETE" event in Firebird triggers.
+        /// </summary>
+        /// <remarks>
+        /// This event is triggered when a delete operation occurs on the associated table.
+        /// </remarks>
+        Delete
+    }
 
     /// <summary>
     /// Represents Firebird trigger metadata.
