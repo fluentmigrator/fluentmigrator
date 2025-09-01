@@ -8,7 +8,7 @@ on:
 env:
   solution: 'FluentMigrator.sln'
   buildPlatform: 'Any CPU'
-  buildConfiguration: Debug
+  buildConfiguration: Release
 
   # Enable containers for integration tests
   FM_TestConnectionStrings__MySql__ContainerEnabled: true
@@ -19,11 +19,13 @@ env:
   FM_TestConnectionStrings__Postgres__IsEnabled: true
   FM_TestConnectionStrings__SqlServer2016__ContainerEnabled: true
   FM_TestConnectionStrings__SqlServer2016__IsEnabled: true
+
 jobs:
   build:
-    name: "Build & Test"
+    name: Build & Test
     runs-on: ubuntu-latest
-    permissions: write-all
+    permissions:
+      pull-requests: write
 
     strategy:
       matrix:
@@ -33,16 +35,29 @@ jobs:
         ]
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
 
-    - name: Setup dotnet
+    - name: Install GitVersion
+      uses: gittools/actions/gitversion/setup@v4.1.0
+      with:
+        versionSpec: 5.x
+
+    - name: Execute GitVersion
+      uses: gittools/actions/gitversion/execute@v4.1.0
+      env:
+        BUILD_BUILDNUMBER: ${{ env.GitVersion.NuGetVersionV2 }}
+      with:
+        updateAssemblyInfo: false
+
+    - name: Setup dotnet SDK
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: '9.0.x'
 
-    - name: "Restore, Build, Test"
+    - name: Restore, Build, Test
       run: dotnet test --framework ${{ matrix.dotnet-tfm }} --configuration ${{ env.buildConfiguration }} --verbosity quiet --logger trx --collect:"XPlat Code Coverage" --results-directory "TestResults-${{ matrix.dotnet-tfm }}"
 
     - name: Combine Coverage Reports

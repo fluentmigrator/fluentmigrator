@@ -30,7 +30,6 @@ public class OracleContainer : ContainerBase
 
     /// <inheritdoc />
     protected override DockerContainer Build() => new OracleBuilder()
-        .WithImage("gvenzl/oracle-free:23-slim-faststart")
         .WithUsername("TestSchema")
         .WithReuse(true)
         .Build();
