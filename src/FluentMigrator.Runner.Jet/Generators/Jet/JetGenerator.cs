@@ -101,6 +101,7 @@ namespace FluentMigrator.Runner.Generators.Jet
             return base.Generate(expression);
         }
 
+        /// <inheritdoc />
         public override string Generate(CreateColumnExpression expression)
         {
             if (expression.Column.Expression != null)
@@ -110,6 +111,7 @@ namespace FluentMigrator.Runner.Generators.Jet
             return base.Generate(expression);
         }
 
+        /// <inheritdoc />
         public override string Generate(AlterColumnExpression expression)
         {
             if (expression.Column.Expression != null)

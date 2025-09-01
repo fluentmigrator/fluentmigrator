@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2018, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,6 +25,11 @@ namespace FluentMigrator.Runner.Initialization
     /// </summary>
     public interface IProfileSource
     {
+        /// <summary>
+        /// Retrieves a collection of migrations associated with the specified profile.
+        /// </summary>
+        /// <param name="profile">The name of the profile to filter migrations. Can be <c>null</c> to retrieve all migrations.</param>
+        /// <returns>A collection of migrations that match the specified profile.</returns>
         [NotNull, ItemNotNull]
         IEnumerable<IMigration> GetProfiles([CanBeNull] string profile);
     }

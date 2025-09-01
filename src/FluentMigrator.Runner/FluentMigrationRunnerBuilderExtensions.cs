@@ -16,6 +16,9 @@
 
 namespace FluentMigrator.Runner
 {
+    /// <summary>
+    /// Provides extension methods for configuring an in-process migration runner builder with support for various database systems.
+    /// </summary>
     public static class FluentMigrationRunnerBuilderExtensions
     {
         /// <summary>

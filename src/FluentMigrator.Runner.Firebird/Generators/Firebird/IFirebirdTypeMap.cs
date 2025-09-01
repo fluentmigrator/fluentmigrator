@@ -16,6 +16,14 @@
 
 namespace FluentMigrator.Runner.Generators.Firebird
 {
+    /// <summary>
+    /// Defines a type map specific to the Firebird database.
+    /// </summary>
+    /// <remarks>
+    /// This interface extends the <see cref="ITypeMap"/> interface, providing mappings between
+    /// .NET <see cref="System.Data.DbType"/> values and their corresponding Firebird SQL types.
+    /// It is used internally by the Firebird database generator to handle type conversions.
+    /// </remarks>
     public interface IFirebirdTypeMap : ITypeMap
     {
         

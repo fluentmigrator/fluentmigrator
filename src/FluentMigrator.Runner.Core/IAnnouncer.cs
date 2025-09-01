@@ -18,6 +18,14 @@ using System;
 
 namespace FluentMigrator.Runner
 {
+    /// <summary>
+    /// Represents an interface for logging and announcing messages during migrations.
+    /// </summary>
+    /// <remarks>
+    /// This interface is marked as <see cref="ObsoleteAttribute"/> and may be removed in future versions.
+    /// Implementations of this interface are used to log messages, errors, SQL statements, and other information
+    /// during the execution of database migrations.
+    /// </remarks>
     [Obsolete]
     public interface IAnnouncer
     {

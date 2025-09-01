@@ -20,8 +20,35 @@ using System.Reflection;
 
 namespace FluentMigrator.Runner.Initialization.AssemblyLoader
 {
+    /// <summary>
+    /// Defines the contract for loading assemblies.
+    /// </summary>
+    /// <remarks>
+    /// This interface provides a method to load assemblies, which can be implemented
+    /// to support different strategies for locating and loading assemblies, such as
+    /// by name or from a file path.
+    /// </remarks>
     public interface IAssemblyLoader
     {
+        /// <summary>
+        /// Loads an assembly based on the implementation of the loader.
+        /// </summary>
+        /// <returns>
+        /// The loaded <see cref="System.Reflection.Assembly"/> instance.
+        /// </returns>
+        /// <remarks>
+        /// The specific strategy for loading the assembly depends on the implementation of the loader.
+        /// For example, it could load an assembly by its name or from a file path.
+        /// </remarks>
+        /// <exception cref="System.IO.FileNotFoundException">
+        /// Thrown if the assembly cannot be found.
+        /// </exception>
+        /// <exception cref="System.BadImageFormatException">
+        /// Thrown if the assembly is not a valid assembly or was compiled with a later version of the CLR than the current process.
+        /// </exception>
+        /// <exception cref="System.IO.FileLoadException">
+        /// Thrown if the assembly is found but cannot be loaded.
+        /// </exception>
         Assembly Load();
     }
 }

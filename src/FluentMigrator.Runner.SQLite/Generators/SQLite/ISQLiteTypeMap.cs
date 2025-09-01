@@ -14,7 +14,16 @@
 // limitations under the License.
 #endregion
 
+using System.Data;
+
 namespace FluentMigrator.Runner.Generators.SQLite
 {
+    /// <summary>
+    /// Represents a specialized type map for SQLite, extending the functionality of <see cref="ITypeMap"/>.
+    /// </summary>
+    /// <remarks>
+    /// This interface provides mappings between <see cref="DbType"/> and SQLite-specific SQL types.
+    /// It is designed to be used in conjunction with SQLite database operations.
+    /// </remarks>
     public interface ISQLiteTypeMap : ITypeMap { }
 }
