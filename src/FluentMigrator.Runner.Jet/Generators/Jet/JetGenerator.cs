@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators.Generic;
@@ -88,6 +89,34 @@ namespace FluentMigrator.Runner.Generators.Jet
         public override string Generate(DeleteDefaultConstraintExpression expression)
         {
             return CompatibilityMode.HandleCompatibility("Default constraints are not supported");
+        }
+
+        /// <inheritdoc />
+        public override string Generate(CreateTableExpression expression)
+        {
+            if (expression.Columns.Any(x => x.Expression != null))
+            {
+                return CompatibilityMode.HandleCompatibility("Computed columns are not supported for Jet");
+            }
+            return base.Generate(expression);
+        }
+
+        public override string Generate(CreateColumnExpression expression)
+        {
+            if (expression.Column.Expression != null)
+            {
+                return CompatibilityMode.HandleCompatibility("Computed columns are not supported for Jet");
+            }
+            return base.Generate(expression);
+        }
+
+        public override string Generate(AlterColumnExpression expression)
+        {
+            if (expression.Column.Expression != null)
+            {
+                return CompatibilityMode.HandleCompatibility("Computed columns are not supported for Jet");
+            }
+            return base.Generate(expression);
         }
     }
 }

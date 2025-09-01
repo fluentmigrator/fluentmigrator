@@ -174,6 +174,10 @@ namespace FluentMigrator.Runner.Generators.Firebird
         public override string Generate(AlterColumnExpression expression)
         {
             Truncator.Truncate(expression);
+            if (expression.Column.ExpressionStored)
+            {
+                CompatibilityMode.HandleCompatibility("Stored computed columns are not supported");
+            }
             return CompatibilityMode.HandleCompatibility("Alter column is not supported as expected");
         }
 
@@ -215,6 +219,10 @@ namespace FluentMigrator.Runner.Generators.Firebird
         public override string Generate(CreateTableExpression expression)
         {
             Truncator.Truncate(expression);
+            if (expression.Columns.Any(x => x.ExpressionStored))
+            {
+                CompatibilityMode.HandleCompatibility("Stored computed columns are not supported");
+            }
             return base.Generate(expression);
         }
 
@@ -236,6 +244,10 @@ namespace FluentMigrator.Runner.Generators.Firebird
         public override string Generate(CreateColumnExpression expression)
         {
             Truncator.Truncate(expression);
+            if (expression.Column.ExpressionStored)
+            {
+                CompatibilityMode.HandleCompatibility("Stored computed columns are not supported");
+            }
             return base.Generate(expression);
         }
 

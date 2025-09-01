@@ -20,6 +20,12 @@ using System;
 
 namespace FluentMigrator.Runner.Announcers
 {
+    /// <summary>
+    /// An announcer implementation that suppresses all output.
+    /// </summary>
+    /// <remarks>
+    /// This class is a no-op implementation of <see cref="Announcer"/>. It does not log or display any messages.
+    /// </remarks>
     [Obsolete]
     public class NullAnnouncer : Announcer
     {

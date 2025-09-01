@@ -108,9 +108,25 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return FormatStatement(DropSchema, Quoter.QuoteSchemaName(expression.SchemaName));
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Generates the SQL statement to alter a column in a PostgreSQL database.
+        /// </summary>
+        /// <param name="expression">
+        /// The <see cref="FluentMigrator.Expressions.AlterColumnExpression"/> containing the details of the column alteration.
+        /// </param>
+        /// <returns>
+        /// A <see cref="string"/> representing the SQL statement to alter the column.
+        /// </returns>
+        /// <remarks>
+        /// This method handles compatibility issues, such as unsupported virtual computed columns, 
+        /// and appends additional SQL statements for column descriptions if applicable.
+        /// </remarks>
         public override string Generate(AlterColumnExpression expression)
         {
+            if (expression.Column.Expression != null && !expression.Column.ExpressionStored)
+            {
+                CompatibilityMode.HandleCompatibility("Virtual computed columns are not supported");
+            }
             var alterStatement = new StringBuilder();
             alterStatement.AppendFormat(
                 AlterColumn,
@@ -157,7 +173,20 @@ namespace FluentMigrator.Runner.Generators.Postgres
                 Quoter.Quote(expression.ForeignKey.Name));
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Generates the "INCLUDE" clause for a PostgreSQL index creation statement.
+        /// </summary>
+        /// <param name="column">The <see cref="CreateIndexExpression"/> containing the index definition.</param>
+        /// <returns>
+        /// A string representing the "INCLUDE" clause for the index, or an empty string if no includes are defined.
+        /// </returns>
+        /// <exception cref="NotSupportedException">
+        /// Thrown when the current version of PostgreSQL does not support include indexes.
+        /// </exception>
+        /// <remarks>
+        /// This method retrieves additional features from the <paramref name="column"/> using the key
+        /// <see cref="PostgresExtensions.IncludesList"/>. If no includes are defined, an empty string is returned.
+        /// </remarks>
         protected virtual string GetIncludeString(CreateIndexExpression column)
         {
             var includes = column.GetAdditionalFeature<IList<PostgresIndexIncludeDefinition>>(PostgresExtensions.IncludesList);
@@ -170,7 +199,21 @@ namespace FluentMigrator.Runner.Generators.Postgres
             throw new NotSupportedException("The current version doesn't support include index. Please use Postgres 11.");
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Determines the index algorithm to be used for a PostgreSQL index creation based on the provided
+        /// <see cref="FluentMigrator.Expressions.CreateIndexExpression"/>.
+        /// </summary>
+        /// <param name="expression">
+        /// The <see cref="FluentMigrator.Expressions.CreateIndexExpression"/> containing the index definition and additional features.
+        /// </param>
+        /// <returns>
+        /// The <see cref="FluentMigrator.Model.Algorithm"/> to be used for the index. Defaults to <see cref="FluentMigrator.Model.Algorithm.BTree"/>
+        /// if no specific algorithm is defined.
+        /// </returns>
+        /// <remarks>
+        /// This method retrieves the algorithm from the additional features of the <paramref name="expression"/> using
+        /// the <c>PostgresExtensions.IndexAlgorithm</c> key. If no algorithm is specified, it defaults to <see cref="FluentMigrator.Model.Algorithm.BTree"/>.
+        /// </remarks>
         protected virtual Algorithm GetIndexMethod(CreateIndexExpression expression)
         {
             var algorithm = expression.GetAdditionalFeature<PostgresIndexAlgorithmDefinition>(PostgresExtensions.IndexAlgorithm);
@@ -182,7 +225,22 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return algorithm.Algorithm;
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Generates a filter clause for a PostgreSQL index creation statement based on the provided
+        /// <see cref="CreateIndexExpression"/>. The filter clause is derived from additional features
+        /// or specific PostgreSQL index options, such as "WITH NULLS DISTINCT".
+        /// </summary>
+        /// <param name="expression">
+        /// The <see cref="CreateIndexExpression"/> containing the index definition and additional features.
+        /// </param>
+        /// <returns>
+        /// A string representing the filter clause for the index, or an empty string if the filter cannot
+        /// be combined with certain PostgreSQL options. Returns <c>null</c> if no filter or relevant options are specified.
+        /// </returns>
+        /// <remarks>
+        /// If both a filter and a "WITH NULLS DISTINCT" option are specified, compatibility issues with
+        /// PostgreSQL 14 or older are handled by returning an empty string.
+        /// </remarks>
         protected virtual string GetFilter(CreateIndexExpression expression)
         {
             var filter = expression.Index.GetAdditionalFeature<string>(PostgresExtensions.IndexFilter);
@@ -202,7 +260,22 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return nullsDistinctString;
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Generates a SQL condition string for handling "nulls distinct" behavior in a PostgreSQL index.
+        /// </summary>
+        /// <param name="index">The <see cref="IndexDefinition"/> representing the index for which the condition is generated.</param>
+        /// <returns>
+        /// A SQL condition string to be included in the WHERE clause of the index definition, 
+        /// or an empty string if no "nulls distinct" behavior is applicable.
+        /// </returns>
+        /// <remarks>
+        /// This method evaluates the "nulls distinct" feature for both the index and its columns.
+        /// If "nulls distinct" is enabled, it ensures that only non-null values are considered for the index.
+        /// This feature is only applicable for unique indexes.
+        /// </remarks>
+        /// <exception cref="CompatibilityModeExtension">
+        /// Thrown if "nulls distinct" is used on a non-unique index, as this is not supported.
+        /// </exception>
         protected virtual string GetWithNullsDistinctStringInWhere(IndexDefinition index)
         {
             bool? GetNullsDistinct(IndexColumnDefinition column)
@@ -229,13 +302,34 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return condition.Length == 0 ? string.Empty : $" WHERE {condition}";
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Generates a SQL fragment for handling "NULLS DISTINCT" behavior in PostgreSQL index definitions.
+        /// </summary>
+        /// <param name="index">The <see cref="IndexDefinition"/> representing the index for which the SQL fragment is generated.</param>
+        /// <returns>A SQL fragment string that specifies the "NULLS DISTINCT" behavior for the index, or an empty string if not applicable.</returns>
+        /// <remarks>
+        /// This method is intended to be overridden in derived classes to provide specific behavior for different PostgreSQL versions.
+        /// </remarks>
         protected virtual string GetWithNullsDistinctString(IndexDefinition index)
         {
             return string.Empty;
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Generates the "CONCURRENTLY" keyword for a PostgreSQL "CREATE INDEX" statement
+        /// if the <see cref="CreateIndexExpression"/> specifies the "Concurrently" feature.
+        /// </summary>
+        /// <param name="expression">
+        /// The <see cref="CreateIndexExpression"/> containing the index definition and additional features.
+        /// </param>
+        /// <returns>
+        /// A string containing " CONCURRENTLY" if the "Concurrently" feature is enabled; otherwise, an empty string.
+        /// </returns>
+        /// <remarks>
+        /// This method checks for the presence of the "Concurrently" feature in the additional features
+        /// of the provided <see cref="CreateIndexExpression"/>. If the feature is enabled, it appends
+        /// the "CONCURRENTLY" keyword to the generated SQL.
+        /// </remarks>
         protected virtual string GetAsConcurrently(CreateIndexExpression expression)
         {
             var asConcurrently = expression.GetAdditionalFeature<PostgresIndexConcurrentlyDefinition>(PostgresExtensions.Concurrently);
@@ -248,7 +342,16 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return " CONCURRENTLY";
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Generates the "ONLY" clause for a PostgreSQL index creation statement if the index is restricted to a specific table.
+        /// </summary>
+        /// <param name="expression">The <see cref="CreateIndexExpression"/> containing the index definition.</param>
+        /// <returns>
+        /// A string representing the "ONLY" clause if applicable; otherwise, an empty string.
+        /// </returns>
+        /// <exception cref="NotSupportedException">
+        /// Thrown when the "ONLY" clause is requested but the PostgreSQL version does not support it.
+        /// </exception>
         protected virtual string GetAsOnly(CreateIndexExpression expression)
         {
             var asOnly = expression.GetAdditionalFeature<PostgresIndexOnlyDefinition>(PostgresExtensions.Only);
@@ -261,7 +364,18 @@ namespace FluentMigrator.Runner.Generators.Postgres
             throw new NotSupportedException("The current version doesn't support ONLY. Please use Postgres 11 or higher.");
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Generates the SQL fragment for specifying the sorting of NULL values in an index column.
+        /// </summary>
+        /// <param name="column">The <see cref="IndexColumnDefinition"/> representing the index column.</param>
+        /// <returns>
+        /// A string containing the SQL fragment for NULL sorting, such as "NULLS FIRST" or "NULLS LAST",
+        /// or an empty string if no NULL sorting is specified.
+        /// </returns>
+        /// <remarks>
+        /// This method retrieves the NULL sorting behavior from the additional features of the column
+        /// using the key <see cref="PostgresExtensions.NullsSort"/>.
+        /// </remarks>
         protected virtual string GetNullsSort(IndexColumnDefinition column)
         {
             var sort = column.GetAdditionalFeature<PostgresIndexNullsSort>(PostgresExtensions.NullsSort);
@@ -278,7 +392,19 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return " NULLS LAST";
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Retrieves the tablespace definition for a PostgreSQL index creation statement.
+        /// </summary>
+        /// <param name="expression">
+        /// The <see cref="FluentMigrator.Expressions.CreateIndexExpression"/> containing the index definition.
+        /// </param>
+        /// <returns>
+        /// A <see cref="string"/> representing the tablespace clause for the index, or an empty string if no tablespace is specified.
+        /// </returns>
+        /// <remarks>
+        /// The method checks for an additional feature named <c>PostgresExtensions.IndexTablespace</c> in the index definition.
+        /// If a valid tablespace is specified, it returns a formatted "TABLESPACE" clause; otherwise, it returns an empty string.
+        /// </remarks>
         protected virtual string GetTablespace(CreateIndexExpression expression)
         {
             var tablespace = expression.Index.GetAdditionalFeature<string>(PostgresExtensions.IndexTablespace);
@@ -290,7 +416,21 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return string.Empty;
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Generates a string representation of the storage parameters for an index in PostgreSQL.
+        /// </summary>
+        /// <param name="expression">
+        /// The <see cref="FluentMigrator.Expressions.CreateIndexExpression"/> containing the index definition
+        /// and additional features to be included in the storage parameters.
+        /// </param>
+        /// <returns>
+        /// A string containing the formatted storage parameters for the index, or an empty string if no parameters are specified.
+        /// </returns>
+        /// <remarks>
+        /// This method processes various PostgreSQL-specific index storage parameters, such as fill factor, fast update,
+        /// buffering, pending list limit, pages per range, auto-summarize, and vacuum cleanup index scale factor.
+        /// It ensures that only allowed parameters are included in the final output.
+        /// </remarks>
         protected virtual string GetWithIndexStorageParameters(CreateIndexExpression expression)
         {
             var allow = GetAllowIndexStorageParameters();
@@ -362,7 +502,18 @@ namespace FluentMigrator.Runner.Generators.Postgres
             }
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Retrieves a set of allowed index storage parameters for PostgreSQL.
+        /// </summary>
+        /// <remarks>
+        /// This method defines the default set of index storage parameters that are supported
+        /// by PostgreSQL. Derived classes can override this method to extend or modify the
+        /// list of allowed parameters.
+        /// </remarks>
+        /// <returns>
+        /// A <see cref="HashSet{T}"/> containing the names of the allowed index storage parameters,
+        /// using a case-insensitive string comparer.
+        /// </returns>
         protected virtual HashSet<string> GetAllowIndexStorageParameters()
         {
             return new HashSet<string>(StringComparer.InvariantCultureIgnoreCase)
@@ -518,7 +669,11 @@ namespace FluentMigrator.Runner.Generators.Postgres
                 string.Join(", ", columns));
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Generates a comma-separated list of quoted column names for use in SQL statements.
+        /// </summary>
+        /// <param name="columns">The collection of column names to be quoted and concatenated.</param>
+        /// <returns>A string containing the quoted column names, separated by commas.</returns>
         protected string GetColumnList(IEnumerable<string> columns)
         {
             var result = "";
@@ -529,7 +684,11 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return result.TrimEnd(',');
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Constructs a comma-separated list of quoted values from the provided data.
+        /// </summary>
+        /// <param name="data">The list of objects to be quoted and concatenated.</param>
+        /// <returns>A string containing the quoted values, separated by commas.</returns>
         protected string GetDataList(List<object> data)
         {
             var result = "";
@@ -591,7 +750,22 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return result.ToString();
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Generates a string representing the "OVERRIDING {SYSTEM|USER} VALUE" clause for an INSERT statement
+        /// in PostgreSQL, based on the provided <see cref="InsertDataExpression"/>.
+        /// </summary>
+        /// <param name="expression">
+        /// The <see cref="InsertDataExpression"/> containing the data and additional features
+        /// for the INSERT operation.
+        /// </param>
+        /// <returns>
+        /// A string representing the "OVERRIDING {SYSTEM|USER} VALUE" clause if the feature is specified;
+        /// otherwise, an empty string.
+        /// </returns>
+        /// <exception cref="NotSupportedException">
+        /// Thrown if the feature is specified but the current PostgreSQL version does not support
+        /// "OVERRIDING {SYSTEM|USER} VALUE".
+        /// </exception>
         protected virtual string GetOverridingIdentityValuesString(InsertDataExpression expression)
         {
             if (!expression.AdditionalFeatures.ContainsKey(PostgresExtensions.OverridingIdentityValues))

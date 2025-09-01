@@ -46,7 +46,7 @@ namespace FluentMigrator.Tests.Unit.Generators
         public static string TestColumn1Description = "TestColumn1Description";
         public static string TestColumn2Description = "TestColumn2Description";
         public static string TestColumnCollationName = "Latin1_General_CS_AS";
-        public static Dictionary<string, string> TestAdditionalColumnDescriptions1 = new Dictionary<string, string> ()
+        public static Dictionary<string, string> TestAdditionalColumnDescriptions1 = new Dictionary<string, string>()
         {
             {"AdditionalColumnDescriptionKey1", "AdditionalColumnDescriptionValue1" }
         };
@@ -620,6 +620,86 @@ namespace FluentMigrator.Tests.Unit.Generators
             expression.Column.CustomType = "MyDomainType";
             expression.Column.ModificationType = ColumnModificationType.Create;
 
+            return expression;
+        }
+
+        public static CreateColumnExpression GetCreateColumnExpressionWithComputed()
+        {
+            ColumnDefinition column = new ColumnDefinition
+            {
+                Name = TestColumnName1,
+                Expression = "Price * Quantity",
+                ExpressionStored = false,
+                ModificationType = ColumnModificationType.Create
+            };
+            return new CreateColumnExpression { TableName = TestTableName1, Column = column };
+        }
+
+        public static CreateColumnExpression GetCreateColumnExpressionWithStoredComputed()
+        {
+            ColumnDefinition column = new ColumnDefinition
+            {
+                Name = TestColumnName1,
+                Expression = "Price * Quantity",
+                ExpressionStored = true,
+                ModificationType = ColumnModificationType.Create
+            };
+            return new CreateColumnExpression { TableName = TestTableName1, Column = column };
+        }
+
+        public static AlterColumnExpression GetAlterColumnExpressionWithComputed()
+        {
+            var expression = new AlterColumnExpression();
+            expression.TableName = TestTableName1;
+
+            expression.Column = new ColumnDefinition();
+            expression.Column.Name = TestColumnName1;
+            expression.Column.Expression = "Price * Quantity";
+            expression.Column.ExpressionStored = false;
+            expression.Column.ModificationType = ColumnModificationType.Alter;
+
+            return expression;
+        }
+
+        public static AlterColumnExpression GetAlterColumnExpressionWithStoredComputed()
+        {
+            var expression = new AlterColumnExpression();
+            expression.TableName = TestTableName1;
+
+            expression.Column = new ColumnDefinition();
+            expression.Column.Name = TestColumnName1;
+            expression.Column.Expression = "Price * Quantity";
+            expression.Column.ExpressionStored = true;
+            expression.Column.ModificationType = ColumnModificationType.Alter;
+
+            return expression;
+        }
+
+        public static CreateTableExpression GetCreateTableWithComputedColumn()
+        {
+            CreateTableExpression expression = new CreateTableExpression() { TableName = TestTableName1 };
+            expression.Columns.Add(new ColumnDefinition { Name = "Price", Type = DbType.Decimal, Size = 10, Precision = 2 });
+            expression.Columns.Add(new ColumnDefinition { Name = "Quantity", Type = DbType.Int32 });
+            expression.Columns.Add(new ColumnDefinition
+            {
+                Name = "Total",
+                Expression = "Price * Quantity",
+                ExpressionStored = false
+            });
+            return expression;
+        }
+
+        public static CreateTableExpression GetCreateTableWithStoredComputedColumn()
+        {
+            CreateTableExpression expression = new CreateTableExpression() { TableName = TestTableName1 };
+            expression.Columns.Add(new ColumnDefinition { Name = "Price", Type = DbType.Decimal, Size = 10, Precision = 2 });
+            expression.Columns.Add(new ColumnDefinition { Name = "Quantity", Type = DbType.Int32 });
+            expression.Columns.Add(new ColumnDefinition
+            {
+                Name = "Total",
+                Expression = "Price * Quantity",
+                ExpressionStored = true
+            });
             return expression;
         }
 

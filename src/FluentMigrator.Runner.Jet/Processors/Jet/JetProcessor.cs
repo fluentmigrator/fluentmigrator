@@ -40,11 +40,24 @@ namespace FluentMigrator.Runner.Processors.Jet
     {
         private readonly Lazy<OleDbConnection> _connection;
         private OleDbTransaction _transaction;
-        /// <inheritdoc />
+        /// <summary>
+        /// Gets the <see cref="OleDbConnection"/> instance used by the Jet migration processor.
+        /// </summary>
+        /// <remarks>
+        /// This property lazily initializes and retrieves the database connection used for executing migration operations.
+        /// Ensure the connection is properly opened or closed using the appropriate methods.
+        /// </remarks>
         public OleDbConnection Connection => _connection.Value;
-        /// <inheritdoc />
+        /// <summary>
+        /// Gets the current transaction associated with the Jet database connection.
+        /// </summary>
+        /// <remarks>
+        /// This property provides access to the <see cref="System.Data.OleDb.OleDbTransaction"/> 
+        /// used for executing commands within a transactional context. Ensure that the connection 
+        /// is open before accessing this property.
+        /// </remarks>
         public OleDbTransaction Transaction => _transaction;
-        private bool _disposed = false;
+        private bool _disposed;
 
         /// <inheritdoc />
         public JetProcessor(
@@ -189,7 +202,7 @@ namespace FluentMigrator.Runner.Processors.Jet
             using (var tables = Connection.GetOleDbSchemaTable(OleDbSchemaGuid.Tables, restrict))
             {
                 Debug.Assert(tables != null, nameof(tables) + " != null");
-                for (int i = 0; i < tables.Rows.Count; i++)
+                for (int i = 0; i < tables!.Rows.Count; i++)
                 {
                     var name = tables.Rows[i].ItemArray[2].ToString();
                     if (name == tableName)
@@ -210,7 +223,7 @@ namespace FluentMigrator.Runner.Processors.Jet
             using (var columns = Connection.GetOleDbSchemaTable(OleDbSchemaGuid.Columns, restrict))
             {
                 Debug.Assert(columns != null, nameof(columns) + " != null");
-                for (int i = 0; i < columns.Rows.Count; i++)
+                for (int i = 0; i < columns!.Rows.Count; i++)
                 {
                     var name = columns.Rows[i].ItemArray[3].ToString();
                     if (name == columnName)
@@ -231,7 +244,7 @@ namespace FluentMigrator.Runner.Processors.Jet
             using (var constraints = Connection.GetOleDbSchemaTable(OleDbSchemaGuid.Table_Constraints, restrict))
             {
                 Debug.Assert(constraints != null, nameof(constraints) + " != null");
-                return constraints.Rows.Count > 0;
+                return constraints!.Rows.Count > 0;
             }
         }
 
@@ -244,7 +257,7 @@ namespace FluentMigrator.Runner.Processors.Jet
             using (var indexes = Connection.GetOleDbSchemaTable(OleDbSchemaGuid.Indexes, restrict))
             {
                 Debug.Assert(indexes != null, nameof(indexes) + " != null");
-                return indexes.Rows.Count > 0;
+                return indexes!.Rows.Count > 0;
             }
         }
 
@@ -287,6 +300,7 @@ namespace FluentMigrator.Runner.Processors.Jet
             _transaction = null;
         }
 
+        /// <inheritdoc />
         protected override void Dispose(bool isDisposing)
         {
             if (!isDisposing || _disposed)

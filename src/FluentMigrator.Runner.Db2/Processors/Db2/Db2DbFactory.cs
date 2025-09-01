@@ -28,12 +28,6 @@ namespace FluentMigrator.Runner.Processors.DB2
             new TestEntry("IBM.Data.DB2", "IBM.Data.DB2.DB2Factory"),
         };
 
-        [Obsolete]
-        public Db2DbFactory()
-            : base(_testEntries)
-        {
-        }
-
         public Db2DbFactory(IServiceProvider serviceProvider)
             : base(serviceProvider, _testEntries)
         {
