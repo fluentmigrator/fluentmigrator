@@ -32,6 +32,15 @@ namespace FluentMigrator.Builder.Create.Index
         /// </summary>
         protected ICreateIndexOptionsSyntax CreateIndexOptionsSyntax { get; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AbstractCreateIndexMethodOptionsSyntax"/> class.
+        /// </summary>
+        /// <param name="createIndexOptionsSyntax">
+        /// The syntax object used to define index options.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="createIndexOptionsSyntax"/> is <c>null</c>.
+        /// </exception>
         protected AbstractCreateIndexMethodOptionsSyntax([NotNull] ICreateIndexOptionsSyntax createIndexOptionsSyntax)
         {
             CreateIndexOptionsSyntax = createIndexOptionsSyntax ?? throw new ArgumentNullException(nameof(createIndexOptionsSyntax));

@@ -39,7 +39,24 @@ namespace FluentMigrator.Runner.Processors
     {
         [NotNull] private readonly ILogger _logger;
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FluentMigrator.Runner.Processors.ConnectionlessProcessor"/> class.
+        /// </summary>
+        /// <param name="generatorAccessor">
+        /// The accessor providing the migration generator used for generating SQL statements.
+        /// </param>
+        /// <param name="logger">
+        /// The logger used for logging messages and diagnostics.
+        /// </param>
+        /// <param name="options">
+        /// The options snapshot containing configuration for the processor.
+        /// </param>
+        /// <param name="accessorOptions">
+        /// The options specifying the processor accessor configuration, including the processor ID.
+        /// </param>
+        /// <remarks>
+        /// This constructor initializes the processor with the provided generator, logger, and configuration options.
+        /// </remarks>
         public ConnectionlessProcessor(
             [NotNull] IGeneratorAccessor generatorAccessor,
             [NotNull] ILogger logger,
@@ -56,7 +73,26 @@ namespace FluentMigrator.Runner.Processors
 #pragma warning restore 612
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FluentMigrator.Runner.Processors.ConnectionlessProcessor"/> class.
+        /// </summary>
+        /// <param name="generatorAccessor">
+        /// An accessor to retrieve the migration generator used to generate SQL statements.
+        /// </param>
+        /// <param name="logger">
+        /// The logger instance used for logging migration-related information.
+        /// </param>
+        /// <param name="options">
+        /// The processor options that configure the behavior of the processor.
+        /// </param>
+        /// <param name="processorIds">
+        /// A collection of processor identifiers, where the first identifier represents the database type,
+        /// and subsequent identifiers represent aliases for the database type.
+        /// </param>
+        /// <remarks>
+        /// This constructor initializes the processor with the provided generator, logger, options, and processor identifiers.
+        /// It also sets up the database type and its aliases based on the provided processor IDs.
+        /// </remarks>
         public ConnectionlessProcessor(
             [NotNull] IGeneratorAccessor generatorAccessor,
             [NotNull] ILogger logger,
@@ -74,14 +110,32 @@ namespace FluentMigrator.Runner.Processors
 #pragma warning restore 612
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Gets or sets the migration generator used to generate SQL statements
+        /// for database migration expressions.
+        /// </summary>
+        /// <value>
+        /// An instance of <see cref="IMigrationGenerator"/> that provides methods
+        /// to generate SQL for various migration expressions.
+        /// </value>
         public IMigrationGenerator Generator { get; set; }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Gets or sets the announcer used for logging migration-related messages.
+        /// </summary>
+        /// <remarks>
+        /// This property is marked as <see cref="ObsoleteAttribute"/> and should not be used in new code.
+        /// </remarks>
         [Obsolete]
         private IAnnouncer Announcer { get; set; }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Gets or sets the processor options that define the behavior and configuration
+        /// of the migration processor.
+        /// </summary>
+        /// <value>
+        /// An instance of <see cref="ProcessorOptions"/> containing the processor's settings.
+        /// </value>
         private ProcessorOptions Options {get; set;}
 
         /// <inheritdoc />
@@ -132,6 +186,13 @@ namespace FluentMigrator.Runner.Processors
 
         }
 
+        /// <summary>
+        /// Executes the specified SQL statement using the connectionless processor.
+        /// </summary>
+        /// <param name="sql">The SQL statement to be executed.</param>
+        /// <remarks>
+        /// This method logs the provided SQL statement using the associated <see cref="ILogger"/> instance.
+        /// </remarks>
         protected void Process(string sql)
         {
             _logger.LogSql(sql);
