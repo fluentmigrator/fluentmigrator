@@ -210,6 +210,7 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
             expression.Operation?.Invoke(Connection, Transaction);
         }
 
+        /// <inheritdoc />
         protected override void Process(string sql)
         {
             Logger.LogSql(sql);
