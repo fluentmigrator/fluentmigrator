@@ -26,6 +26,14 @@ using FluentMigrator.Runner.Infrastructure.Hosts;
 
 namespace FluentMigrator.Runner.Infrastructure
 {
+    /// <summary>
+    /// Provides functionality to interact with the runtime environment, including locating and retrieving assemblies.
+    /// </summary>
+    /// <remarks>
+    /// This static class serves as an abstraction layer for runtime-specific operations, such as finding assemblies
+    /// in the Global Assembly Cache (GAC) or other runtime-specific directories. It is designed to support
+    /// different runtime environments by utilizing an internal host abstraction.
+    /// </remarks>
     public static class RuntimeHost
     {
         private static readonly string[] _noNames = new string[0];
@@ -36,8 +44,30 @@ namespace FluentMigrator.Runner.Infrastructure
         private static readonly IHostAbstraction _currentHost = new NetCoreHost();
 #endif
 
+        /// <summary>
+        /// Gets the current host abstraction used by the runtime environment.
+        /// </summary>
+        /// <remarks>
+        /// This property provides access to the runtime-specific implementation of <see cref="IHostAbstraction"/>.
+        /// It is used to perform operations such as retrieving the base directory, creating instances of types,
+        /// and accessing loaded assemblies in the current runtime environment.
+        /// </remarks>
+        /// <value>
+        /// An instance of <see cref="IHostAbstraction"/> representing the current runtime host.
+        /// </value>
         public static IHostAbstraction Current => _currentHost;
 
+        /// <summary>
+        /// Finds and retrieves all assemblies available in the runtime environment.
+        /// </summary>
+        /// <returns>
+        /// An <see cref="IEnumerable{T}"/> of <see cref="AssemblyName"/> objects representing the assemblies found.
+        /// </returns>
+        /// <remarks>
+        /// This method searches for assemblies in runtime-specific directories, such as the Global Assembly Cache (GAC) 
+        /// on Windows or equivalent locations in other environments. It iterates through directories and retrieves 
+        /// assembly metadata for each discovered assembly.
+        /// </remarks>
         public static IEnumerable<AssemblyName> FindAssemblies()
         {
             foreach (var fullGacDirectory in GetFullGacDirectories())
@@ -53,6 +83,18 @@ namespace FluentMigrator.Runner.Infrastructure
             }
         }
 
+        /// <summary>
+        /// Finds and retrieves assembly names from the runtime environment that match the specified name.
+        /// </summary>
+        /// <param name="name">The name of the assembly to search for.</param>
+        /// <returns>
+        /// An enumerable collection of <see cref="AssemblyName"/> objects representing the assemblies
+        /// that match the specified name.
+        /// </returns>
+        /// <remarks>
+        /// This method filters the assemblies found by <see cref="FindAssemblies()"/> to include only those
+        /// whose names match the specified <paramref name="name"/> (case-insensitive).
+        /// </remarks>
         public static IEnumerable<AssemblyName> FindAssemblies(string name)
         {
             foreach (var assemblyName in FindAssemblies())
@@ -62,6 +104,24 @@ namespace FluentMigrator.Runner.Infrastructure
             }
         }
 
+        /// <summary>
+        /// Retrieves the assembly names from a specified directory within the Global Assembly Cache (GAC).
+        /// </summary>
+        /// <param name="fullGacDirectory">
+        /// The full path to the GAC directory where the assemblies are located.
+        /// </param>
+        /// <param name="assemblyName">
+        /// The base name of the assembly to search for within the specified GAC directory.
+        /// </param>
+        /// <returns>
+        /// An <see cref="IEnumerable{T}"/> of <see cref="AssemblyName"/> objects representing the assemblies found
+        /// in the specified directory.
+        /// </returns>
+        /// <remarks>
+        /// This method iterates through subdirectories of the specified GAC directory, parsing metadata such as 
+        /// version, culture, and public key token to construct <see cref="AssemblyName"/> instances for each assembly.
+        /// Invalid or incomplete metadata is ignored.
+        /// </remarks>
         private static IEnumerable<AssemblyName> GetAssemblyNames(string fullGacDirectory, string assemblyName)
         {
             foreach (var fullPath in Directory.EnumerateDirectories(Path.Combine(fullGacDirectory, assemblyName)))
@@ -109,6 +169,20 @@ namespace FluentMigrator.Runner.Infrastructure
             }
         }
 
+        /// <summary>
+        /// Retrieves the full paths of directories containing the Global Assembly Cache (GAC) or equivalent locations
+        /// based on the current runtime environment.
+        /// </summary>
+        /// <returns>
+        /// An <see cref="IEnumerable{T}"/> of <see cref="string"/> objects representing the full paths of GAC directories
+        /// or equivalent runtime-specific directories.
+        /// </returns>
+        /// <remarks>
+        /// This method determines the appropriate directories to search for assemblies based on the operating system
+        /// and runtime environment. On Windows, it locates GAC directories using the <c>WINDIR</c> environment variable.
+        /// On Mono, it identifies the GAC directory relative to the framework's base directory.
+        /// If no suitable directories are found, an empty collection is returned.
+        /// </remarks>
         private static IEnumerable<string> GetFullGacDirectories()
         {
             var winDir = Environment.GetEnvironmentVariable("WINDIR");
@@ -134,6 +208,18 @@ namespace FluentMigrator.Runner.Infrastructure
             return new[] { gacDir };
         }
 
+        /// <summary>
+        /// Retrieves the full paths of Global Assembly Cache (GAC) directories on Windows.
+        /// </summary>
+        /// <param name="winDir">The Windows directory path, typically obtained from the <c>WINDIR</c> environment variable.</param>
+        /// <returns>
+        /// An <see cref="IEnumerable{T}"/> of <see cref="string"/> containing the full paths to the GAC directories.
+        /// </returns>
+        /// <remarks>
+        /// This method constructs the full paths to the GAC directories based on the provided Windows directory path.
+        /// It iterates through predefined GAC directory names and combines them with the base .NET assembly paths.
+        /// Only directories that exist on the file system are included in the result.
+        /// </remarks>
         private static IEnumerable<string> GetFullGacDirectoriesOnWindows(string winDir)
         {
             var netAssemblyPaths = new []
@@ -155,6 +241,17 @@ namespace FluentMigrator.Runner.Infrastructure
             }
         }
 
+        /// <summary>
+        /// Retrieves the names of directories used by the Global Assembly Cache (GAC) in the current runtime environment.
+        /// </summary>
+        /// <returns>
+        /// An array of strings representing the names of the GAC directories specific to the current runtime environment.
+        /// </returns>
+        /// <remarks>
+        /// This method determines the appropriate GAC directories based on whether the process is running in a 64-bit or 32-bit environment.
+        /// For 64-bit processes, it includes directories such as "GAC_MSIL", "GAC_64", and others.
+        /// For 32-bit processes, it includes directories such as "GAC_MSIL", "GAC_32", and others.
+        /// </remarks>
         private static string[] GetGacDirectories()
         {
             if (Environment.Is64BitProcess)
