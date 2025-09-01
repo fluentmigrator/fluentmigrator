@@ -24,12 +24,6 @@ namespace FluentMigrator.Runner.Processors.Hana
 {
     public class HanaDbFactory : ReflectionBasedDbFactory
     {
-        [Obsolete]
-        public HanaDbFactory()
-            : base(GetTestEntries().ToArray())
-        {
-        }
-
         public HanaDbFactory(IServiceProvider serviceProvider)
             : base(serviceProvider, GetTestEntries().ToArray())
         {

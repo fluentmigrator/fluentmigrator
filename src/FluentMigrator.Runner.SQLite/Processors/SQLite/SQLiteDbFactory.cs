@@ -30,12 +30,6 @@ namespace FluentMigrator.Runner.Processors.SQLite
             new TestEntry("Mono.Data.Sqlite, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756", "Mono.Data.Sqlite.SqliteFactory"),
         };
 
-        [Obsolete]
-        public SQLiteDbFactory()
-            : base(_testEntries)
-        {
-        }
-
         public SQLiteDbFactory(IServiceProvider serviceProvider)
             : base(serviceProvider, _testEntries)
         {

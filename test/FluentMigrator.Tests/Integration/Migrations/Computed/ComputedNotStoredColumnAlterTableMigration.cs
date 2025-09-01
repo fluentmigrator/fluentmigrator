@@ -16,20 +16,20 @@
 //
 #endregion
 
-using System;
-
-namespace FluentMigrator.Runner.Processors.DB2.iSeries
+namespace FluentMigrator.Tests.Integration.Migrations.Computed
 {
-    public class Db2ISeriesDbFactory : ReflectionBasedDbFactory
+    [Migration(11)]
+    public class ComputedNotStoredColumnAlterTableMigration : Migration
     {
-        private static readonly TestEntry[] _testEntries =
+        public override void Up()
         {
-            new TestEntry("IBM.Data.DB2.iSeries", "IBM.Data.DB2.iSeries.iDB2Factory"),
-        };
+            Alter.Table("products")
+                .AddColumn("total").AsDecimal(10, 2).Nullable().Computed("price * quantity", false);
+        }
 
-        public Db2ISeriesDbFactory(IServiceProvider serviceProvider)
-            : base(serviceProvider, _testEntries)
+        public override void Down()
         {
+            Delete.Column("total").FromTable("products");
         }
     }
 }

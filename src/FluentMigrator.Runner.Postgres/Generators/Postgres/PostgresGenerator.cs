@@ -108,9 +108,12 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return FormatStatement(DropSchema, Quoter.QuoteSchemaName(expression.SchemaName));
         }
 
-        /// <inheritdoc />
         public override string Generate(AlterColumnExpression expression)
         {
+            if (expression.Column.Expression != null && !expression.Column.ExpressionStored)
+            {
+                CompatibilityMode.HandleCompatibility("Virtual computed columns are not supported");
+            }
             var alterStatement = new StringBuilder();
             alterStatement.AppendFormat(
                 AlterColumn,

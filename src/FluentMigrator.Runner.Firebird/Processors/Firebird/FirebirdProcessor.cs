@@ -561,7 +561,9 @@ namespace FluentMigrator.Runner.Processors.Firebird
                 Precision = x.Precision,
                 Size = x.Size,
                 Type = x.Type,
-                CustomType = x.CustomType
+                CustomType = x.CustomType,
+                Expression = x.Expression,
+                ExpressionStored = x.ExpressionStored,
             }));
 
             Process(createNew);

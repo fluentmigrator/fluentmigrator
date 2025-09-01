@@ -15,6 +15,7 @@
 #endregion
 
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 using FluentMigrator.Exceptions;
@@ -94,8 +95,32 @@ namespace FluentMigrator.Runner.Generators.Snowflake
         }
 
         /// <inheritdoc />
+        public override string Generate(CreateTableExpression expression)
+        {
+            if (expression.Columns.Any(x => x.Expression != null))
+            {
+                CompatibilityMode.HandleCompatibility("Computed columns are not supported");
+            }
+            return base.Generate(expression);
+        }
+
+        /// <inheritdoc />
+        public override string Generate(CreateColumnExpression expression)
+        {
+            if (expression.Column.Expression != null)
+            {
+                CompatibilityMode.HandleCompatibility("Computed columns are not supported");
+            }
+            return base.Generate(expression);
+        }
+
+        /// <inheritdoc />
         public override string Generate(AlterColumnExpression expression)
         {
+            if (expression.Column.Expression != null)
+            {
+                CompatibilityMode.HandleCompatibility("Computed columns are not supported");
+            }
             if (!(expression.Column.DefaultValue is ColumnDefinition.UndefinedDefaultValue))
             {
                 throw new DatabaseOperationNotSupportedException("Snowflake database does not support adding or changing default constraint after column has been created.");
