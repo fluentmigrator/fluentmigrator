@@ -234,5 +234,41 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ADD COLUMN \"TestColumn1\" TEXT NOT NULL UNIQUE;");
         }
+
+        [Test]
+        public override void CanCreateColumnWithComputedExpression()
+        {
+            var expression = GeneratorTestHelper.GetCreateColumnExpressionWithComputed();
+            
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD COLUMN \"TestColumn1\" GENERATED ALWAYS AS (Price * Quantity) VIRTUAL NOT NULL;");
+        }
+
+        [Test]
+        public override void CanCreateColumnWithStoredComputedExpression()
+        {
+            var expression = GeneratorTestHelper.GetCreateColumnExpressionWithStoredComputed();
+            
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD COLUMN \"TestColumn1\" GENERATED ALWAYS AS (Price * Quantity) STORED NOT NULL;");
+        }
+
+        [Test]
+        public override void CanAlterColumnToAddComputedExpression()
+        {
+            var expression = GeneratorTestHelper.GetAlterColumnExpressionWithComputed();
+            
+            // SQLite doesn't support altering columns
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
+        }
+
+        [Test]
+        public override void CanAlterColumnToAddStoredComputedExpression()
+        {
+            var expression = GeneratorTestHelper.GetAlterColumnExpressionWithStoredComputed();
+            
+            // SQLite doesn't support altering columns
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
+        }
     }
 }
