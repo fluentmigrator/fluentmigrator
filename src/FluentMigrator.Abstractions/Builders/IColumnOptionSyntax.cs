@@ -112,6 +112,14 @@ namespace FluentMigrator.Builders
         TNext NotNullable();
 
         /// <summary>
+        /// Defines the column as a computed column
+        /// </summary>
+        /// <param name="expression">The expression to calculate</param>
+        /// <param name="stored">Whether the computed column is virtual or stored</param>
+        /// <returns>The next step</returns>
+        TNext Computed(string expression, bool stored = false);
+
+        /// <summary>
         /// Specify a unique index for the column
         /// </summary>
         /// <returns>The next step</returns>
