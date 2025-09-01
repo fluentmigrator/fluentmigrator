@@ -6,8 +6,12 @@ using FluentMigrator.Runner.Generators.Firebird;
 
 namespace FluentMigrator.Runner.Processors.Firebird
 {
+    /// <summary>
+    /// Helper methods for working with Firebird ADO.NET values.
+    /// </summary>
     public static class AdoHelper
     {
+        /// <inheritdoc />
         public static int? GetIntValue(object val)
         {
             if (val == DBNull.Value)
@@ -15,36 +19,45 @@ namespace FluentMigrator.Runner.Processors.Firebird
             return int.Parse(val.ToString());
         }
 
+        /// <inheritdoc />
         public static string GetStringValue(object val)
         {
             return val.ToString();
         }
 
+        /// <inheritdoc />
         public static string FormatValue(string value)
         {
             return value.Replace(@"'", @"''");
         }
-
     }
 
+    /// <summary>
+    /// Represents Firebird table metadata.
+    /// </summary>
     public sealed class TableInfo
     {
         private static readonly string query = "select rdb$relation_name from rdb$relations where lower(rdb$relation_name) = lower('{0}')";
 
+        /// <inheritdoc />
         public string Name { get; }
+        /// <inheritdoc />
         public bool Exists { get; }
 
+        /// <inheritdoc />
         public TableInfo(DataRow drMeta)
             : this(drMeta["rdb$relation_name"].ToString().Trim(), true)
         {
         }
 
+        /// <inheritdoc />
         public TableInfo(string name, bool exists)
         {
             Name = name;
             Exists = exists;
         }
 
+        /// <inheritdoc />
         public static TableInfo Read(FirebirdProcessor processor, string tableName, FirebirdQuoter quoter)
         {
             var fbTableName = quoter.ToFbObjectName(tableName);
@@ -55,6 +68,9 @@ namespace FluentMigrator.Runner.Processors.Firebird
         }
     }
 
+    /// <summary>
+    /// Represents Firebird column metadata.
+    /// </summary>
     public sealed class ColumnInfo
     {
         private static readonly string query = @"select
@@ -75,17 +91,29 @@ namespace FluentMigrator.Runner.Processors.Firebird
                     where (lower(fields.rdb$relation_name) = lower('{0}'))
                     ";
 
+        /// <inheritdoc />
         public string Name { get; }
+        /// <inheritdoc />
         public string TableName { get; }
+        /// <inheritdoc />
         public object DefaultValue { get; }
+        /// <inheritdoc />
         public int Position { get; }
+        /// <inheritdoc />
         public DbType? DBType => GetDBType();
+        /// <inheritdoc />
         public string CustomType => GetCustomDBType();
+        /// <inheritdoc />
         public bool IsNullable { get; }
+        /// <inheritdoc />
         public int? Precision { get; }
+        /// <inheritdoc />
         public int? CharacterLength { get; }
+        /// <inheritdoc />
         public int? FieldType { get; }
+        /// <inheritdoc />
         public int? FieldSubType { get; }
+        /// <inheritdoc />
         public string FieldTypeName { get; }
 
         private ColumnInfo(DataRow drColumn)
@@ -100,8 +128,9 @@ namespace FluentMigrator.Runner.Processors.Firebird
             FieldType = AdoHelper.GetIntValue(drColumn["field_type"]);
             FieldSubType = AdoHelper.GetIntValue(drColumn["field_sub_type"]);
             FieldTypeName = AdoHelper.GetStringValue(drColumn["field_type_name"]).Trim();
-
         }
+
+        /// <inheritdoc />
         public static List<ColumnInfo> Read(FirebirdProcessor processor, TableInfo table)
         {
             using (DataSet ds = processor.Read(query, AdoHelper.FormatValue(table.Name)))
@@ -199,13 +228,15 @@ namespace FluentMigrator.Runner.Processors.Firebird
                 {
                     if (int.TryParse(value, out var res))
                         return res;
-
                 }
             }
             throw new NotSupportedException(string.Format("Can't parse default value {0}", src));
         }
     }
 
+    /// <summary>
+    /// Represents Firebird index metadata.
+    /// </summary>
     public sealed class IndexInfo
     {
         private static readonly string query = @"select
@@ -216,12 +247,16 @@ namespace FluentMigrator.Runner.Processors.Firebird
                 from rdb$indices where rdb$index_name = '{0}'";
         private static readonly string indexFieldQuery = @"select rdb$field_name from rdb$index_segments where rdb$index_name = '{0}'";
 
+        /// <inheritdoc />
         public string Name { get; }
+        /// <inheritdoc />
         public string TableName { get; }
+        /// <inheritdoc />
         public bool IsUnique { get; }
+        /// <inheritdoc />
         public bool IsAscending { get; }
+        /// <inheritdoc />
         public List<string> Columns { get; }
-
 
         private IndexInfo(DataRow drIndex, FirebirdProcessor processor)
         {
@@ -237,6 +272,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             }
         }
 
+        /// <inheritdoc />
         public static List<IndexInfo> Read(FirebirdProcessor processor, TableInfo table)
         {
             using (DataSet ds = processor.Read(query, AdoHelper.FormatValue(table.Name)))
@@ -248,6 +284,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             }
         }
 
+        /// <inheritdoc />
         public static IndexInfo Read(FirebirdProcessor processor, string indexName)
         {
             using (DataSet ds = processor.Read(singleQuery, AdoHelper.FormatValue(indexName)))
@@ -257,6 +294,9 @@ namespace FluentMigrator.Runner.Processors.Firebird
         }
     }
 
+    /// <summary>
+    /// Represents Firebird constraint metadata.
+    /// </summary>
     public sealed class ConstraintInfo
     {
         private static readonly string query = @"select
@@ -266,14 +306,23 @@ namespace FluentMigrator.Runner.Processors.Firebird
                 rdb$const_name_uq, rdb$update_rule, rdb$delete_rule
                 from rdb$ref_constraints where rdb$constraint_name = '{0}'";
 
+        /// <inheritdoc />
         public string Name { get; }
+        /// <inheritdoc />
         public bool IsPrimaryKey { get; }
+        /// <inheritdoc />
         public bool IsUnique { get; }
+        /// <inheritdoc />
         public bool IsNotNull { get; }
+        /// <inheritdoc />
         public bool IsForeignKey { get; }
+        /// <inheritdoc />
         public string IndexName { get; }
+        /// <inheritdoc />
         public IndexInfo ForeignIndex { get; }
+        /// <inheritdoc />
         public Rule UpdateRule { get; }
+        /// <inheritdoc />
         public Rule DeleteRule { get; }
 
         private ConstraintInfo(DataRow drConstraint, FirebirdProcessor processor)
@@ -317,6 +366,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             }
         }
 
+        /// <inheritdoc />
         public static List<ConstraintInfo> Read(FirebirdProcessor processor, TableInfo table)
         {
             using (DataSet ds = processor.Read(query, AdoHelper.FormatValue(table.Name)))
@@ -329,21 +379,37 @@ namespace FluentMigrator.Runner.Processors.Firebird
         }
     }
 
+    /// <summary>
+    /// Represents Firebird trigger metadata.
+    /// </summary>
     public enum TriggerEvent { Insert, Update, Delete }
+
+    /// <summary>
+    /// Represents Firebird trigger metadata.
+    /// </summary>
     public sealed class TriggerInfo
     {
         private static readonly string query = @"select
                 rdb$trigger_name, rdb$trigger_sequence, rdb$trigger_type, rdb$trigger_source
                 from rdb$triggers where rdb$relation_name = '{0}'";
 
+        /// <inheritdoc />
         public string Name { get; }
+        /// <inheritdoc />
         public int Sequence { get; }
+        /// <inheritdoc />
         public int Type { get; }
+        /// <inheritdoc />
         public string Body { get; }
+        /// <inheritdoc />
         public bool Before => Type % 2 == 1;
+        /// <inheritdoc />
         public bool OnInsert => Type == 1 || Type == 2;
+        /// <inheritdoc />
         public bool OnUpdate => Type == 3 || Type == 4;
+        /// <inheritdoc />
         public bool OnDelete => Type == 5 || Type == 6;
+        /// <inheritdoc />
         public TriggerEvent Event => OnInsert ? TriggerEvent.Insert : OnUpdate ? TriggerEvent.Update : TriggerEvent.Delete;
 
         private TriggerInfo(DataRow drTrigger)
@@ -354,6 +420,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             Body = drTrigger["rdb$trigger_source"].ToString().Trim();
         }
 
+        /// <inheritdoc />
         public static List<TriggerInfo> Read(FirebirdProcessor processor, TableInfo table)
         {
             using (DataSet ds = processor.Read(query, AdoHelper.FormatValue(table.Name)))
@@ -366,12 +433,17 @@ namespace FluentMigrator.Runner.Processors.Firebird
         }
     }
 
+    /// <summary>
+    /// Represents Firebird sequence metadata.
+    /// </summary>
     public sealed class SequenceInfo
     {
         private static readonly string query = @"select rdb$generator_name from rdb$generators where rdb$generator_name = '{0}'";
         private static readonly string queryValue = "select gen_id(\"{0}\", 0) as gen_val from rdb$database";
 
+        /// <inheritdoc />
         public string Name { get; }
+        /// <inheritdoc />
         public int CurrentValue{get; }
 
         private SequenceInfo(DataRow drSequence, FirebirdProcessor processor)
@@ -383,6 +455,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             }
         }
 
+        /// <inheritdoc />
         public static SequenceInfo Read(FirebirdProcessor processor, string sequenceName, FirebirdQuoter quoter)
         {
             var fbSequenceName = quoter.ToFbObjectName(sequenceName);
@@ -391,6 +464,8 @@ namespace FluentMigrator.Runner.Processors.Firebird
                 return new SequenceInfo(ds.Tables[0].Rows[0], processor);
             }
         }
-    }
+
+
+}    }    }
 
 }
