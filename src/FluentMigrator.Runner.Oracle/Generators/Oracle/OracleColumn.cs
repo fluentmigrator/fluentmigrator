@@ -98,5 +98,11 @@ namespace FluentMigrator.Runner.Generators.Oracle
             var result = string.Format("CONSTRAINT {0} ", Quoter.QuoteConstraintName(primaryKeyName));
             return result;
         }
+
+        /// <inheritdoc/>
+        protected override string FormatExpression(ColumnDefinition column)
+        {
+            return column.Expression == null ? null : $"GENERATED ALWAYS AS ({column.Expression})";
+        }
     }
 }

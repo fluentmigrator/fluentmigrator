@@ -154,5 +154,11 @@ namespace FluentMigrator.Runner.Generators.Postgres
         {
             return FormatType(column);
         }
+
+        /// <inheritdoc />
+        protected override string FormatExpression(ColumnDefinition column)
+        {
+            return column.Expression == null ? null : $"GENERATED ALWAYS AS ({column.Expression}) STORED";
+        }
     }
 }
