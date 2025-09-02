@@ -31,9 +31,20 @@ namespace FluentMigrator.Model
     public class PostgresIndexConcurrentlyDefinition
         : ICloneable
     {
+        /// <summary>
+        /// Gets or sets a value indicating whether the PostgreSQL index should be created concurrently.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if the index should be created with the "CONCURRENTLY" option, allowing it to be created without locking the table; 
+        /// otherwise, <c>false</c>.
+        /// </value>
+        /// <remarks>
+        /// The "CONCURRENTLY" option is useful for creating indexes on large tables in PostgreSQL without blocking write operations.
+        /// </remarks>
         [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.ColumnNameCannotBeNullOrEmpty))]
         public virtual bool IsConcurrently { get; set; }
 
+        /// <inheritdoc />
         public object Clone()
         {
             return MemberwiseClone();

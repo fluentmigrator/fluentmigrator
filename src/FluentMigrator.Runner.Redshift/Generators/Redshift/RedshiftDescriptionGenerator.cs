@@ -41,6 +41,16 @@ namespace FluentMigrator.Runner.Generators.Redshift
             _quoter = new RedshiftQuoter();
         }
 
+        /// <summary>
+        /// Gets the <see cref="FluentMigrator.Runner.Generators.IQuoter"/> instance used for quoting
+        /// and escaping SQL identifiers and values specific to Amazon Redshift.
+        /// </summary>
+        /// <remarks>
+        /// This property provides access to the quoting logic implemented by the 
+        /// <see cref="FluentMigrator.Runner.Generators.Redshift.RedshiftQuoter"/> class, 
+        /// which ensures that SQL identifiers and values are correctly escaped and quoted
+        /// according to Redshift's requirements.
+        /// </remarks>
         protected IQuoter Quoter => _quoter;
 
         #region Constants
@@ -54,9 +64,10 @@ namespace FluentMigrator.Runner.Generators.Redshift
         {
             return string.IsNullOrEmpty(schemaName)
                ? Quoter.QuoteTableName(tableName)
-               : string.Format("{0}.{1}", Quoter.QuoteSchemaName(schemaName), Quoter.QuoteTableName(tableName));
+               : $"{Quoter.QuoteSchemaName(schemaName)}.{Quoter.QuoteTableName(tableName)}";
         }
 
+        /// <inheritdoc />
         protected override string GenerateTableDescription(
             string schemaName, string tableName, string tableDescription)
         {
@@ -66,6 +77,7 @@ namespace FluentMigrator.Runner.Generators.Redshift
             return string.Format(TableDescriptionTemplate, GetFullTableName(schemaName, tableName), tableDescription.Replace("'", "''"));
         }
 
+        /// <inheritdoc />
         protected override string GenerateColumnDescription(
             string descriptionName, string schemaName, string tableName, string columnName, string columnDescription)
         {

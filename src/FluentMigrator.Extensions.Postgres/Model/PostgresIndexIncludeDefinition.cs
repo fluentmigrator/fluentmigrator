@@ -34,9 +34,22 @@ namespace FluentMigrator.Model
         : ICloneable,
             IValidatableObject
     {
+        /// <summary>
+        /// Gets or sets the name of the column to be included in the PostgreSQL index.
+        /// </summary>
+        /// <value>
+        /// The name of the included column. This value must not be null, empty, or consist only of whitespace.
+        /// </value>
+        /// <remarks>
+        /// This property is required and is validated to ensure it is not null or empty.
+        /// </remarks>
+        /// <exception cref="ValidationException">
+        /// Thrown when the value is null, empty, or consists only of whitespace.
+        /// </exception>
         [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.IndexIncludeColumnNameMustNotBeNullOrEmpty))]
         public virtual string Name { get; set; }
 
+        /// <inheritdoc />
         public object Clone()
         {
             return MemberwiseClone();

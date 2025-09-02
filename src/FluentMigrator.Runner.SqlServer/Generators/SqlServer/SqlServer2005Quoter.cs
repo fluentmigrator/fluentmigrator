@@ -16,8 +16,6 @@
 //
 #endregion
 
-using FluentMigrator.Runner.Generators.Generic;
-
 namespace FluentMigrator.Runner.Generators.SqlServer
 {
     /// <summary>
@@ -25,6 +23,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
     /// </summary>
     public class SqlServer2005Quoter : SqlServer2000Quoter
     {
+        /// <inheritdoc />
         public override string QuoteSchemaName(string schemaName)
         {
             if (string.IsNullOrEmpty(schemaName))

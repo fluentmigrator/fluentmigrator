@@ -20,6 +20,12 @@ using FluentMigrator.Exceptions;
 
 namespace FluentMigrator.Runner
 {
+    /// <summary>
+    /// Represents an exception specific to Snowflake operations within FluentMigrator.
+    /// </summary>
+    /// <remarks>
+    /// This exception is thrown when an error occurs during the execution of Snowflake-related SQL operations.
+    /// </remarks>
     public class SnowflakeException : FluentMigratorException
     {
         /// <inheritdoc />
