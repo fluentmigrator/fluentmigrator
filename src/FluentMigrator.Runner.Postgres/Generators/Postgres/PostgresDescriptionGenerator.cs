@@ -18,6 +18,7 @@
 
 using System;
 
+using FluentMigrator.Generation;
 using FluentMigrator.Runner.Generators.Generic;
 
 using JetBrains.Annotations;

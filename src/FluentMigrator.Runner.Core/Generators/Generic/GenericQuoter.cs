@@ -16,6 +16,8 @@
 
 using System.Globalization;
 
+using FluentMigrator.Generation;
+
 using JetBrains.Annotations;
 
 namespace FluentMigrator.Runner.Generators.Generic

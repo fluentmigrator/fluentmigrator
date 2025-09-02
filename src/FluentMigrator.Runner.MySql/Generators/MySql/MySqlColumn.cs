@@ -21,6 +21,8 @@ using FluentMigrator.Runner.Generators.Base;
 using System.Linq;
 using System;
 
+using FluentMigrator.Generation;
+
 namespace FluentMigrator.Runner.Generators.MySql
 {
     internal class MySqlColumn : ColumnBase<IMySqlTypeMap>

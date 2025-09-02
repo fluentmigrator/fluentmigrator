@@ -17,7 +17,7 @@
 #endregion
 
 using FluentMigrator.Runner;
-using FluentMigrator.Runner.Generators;
+using FluentMigrator.Generation;
 using FluentMigrator.Runner.Generators.Hana;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.Hana;
