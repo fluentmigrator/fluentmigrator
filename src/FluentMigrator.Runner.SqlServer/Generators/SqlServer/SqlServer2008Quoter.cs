@@ -16,8 +16,12 @@
 
 namespace FluentMigrator.Runner.Generators.SqlServer
 {
+    /// <summary>
+    /// The SQL Server 2008 SQL quoter for FluentMigrator.
+    /// </summary>
     public class SqlServer2008Quoter : SqlServer2005Quoter
     {
+        /// <inheritdoc />
         public override string FormatSystemMethods(SystemMethods value)
         {
             switch (value)

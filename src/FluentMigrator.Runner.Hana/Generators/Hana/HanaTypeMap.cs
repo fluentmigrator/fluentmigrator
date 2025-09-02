@@ -22,22 +22,35 @@ using FluentMigrator.Runner.Generators.Base;
 
 namespace FluentMigrator.Runner.Generators.Hana
 {
+    /// <summary>
+    /// Provides type mapping between <see cref="DbType"/> and SAP HANA SQL types.
+    /// </summary>
     public sealed class HanaTypeMap : TypeMapBase, IHanaTypeMap
     {
+        /// <summary>Default capacity for ANSI string columns.</summary>
         public const int AnsiStringCapacity = 5000;
+        /// <summary>Default capacity for ANSI text columns.</summary>
         public const int AnsiTextCapacity = 2147483647;
+        /// <summary>Default capacity for Unicode string columns.</summary>
         public const int UnicodeStringCapacity = 2000;
+        /// <summary>Default capacity for Unicode text columns.</summary>
         public const int UnicodeTextCapacity = int.MaxValue;
+        /// <summary>Default capacity for BLOB columns.</summary>
         public const int BlobCapacity = 2147483647;
+        /// <summary>Default capacity for DECIMAL columns.</summary>
         public const int DecimalCapacity = 38;
+        /// <summary>Default capacity for XML columns.</summary>
         public const int XmlCapacity = 1073741823;
+        /// <summary>Default capacity for IMAGE columns.</summary>
         public const int ImageCapacity = 2147483647;
 
+        /// <inheritdoc />
         public HanaTypeMap()
         {
             SetupTypeMaps();
         }
         
+        /// <inheritdoc />
         protected override void SetupTypeMaps()
         {
             SetTypeMap(DbType.AnsiStringFixedLength, "CHAR(255)");

@@ -20,6 +20,16 @@ using System;
 
 namespace FluentMigrator.Runner.Processors.Oracle
 {
+    /// <summary>
+    /// Represents a database factory for Oracle Managed database processors.
+    /// </summary>
+    /// <remarks>
+    /// This class extends the <see cref="OracleBaseDbFactory"/> to provide specific functionality
+    /// for creating Oracle Managed database factories. It utilizes the managed Oracle database
+    /// driver for database operations.
+    /// </remarks>
+    /// <seealso cref="OracleBaseDbFactory"/>
+    /// <seealso cref="ReflectionBasedDbFactory"/>
     public class OracleManagedDbFactory : OracleBaseDbFactory
     {
         private static readonly TestEntry[] _entries =
@@ -27,12 +37,33 @@ namespace FluentMigrator.Runner.Processors.Oracle
             new TestEntry("Oracle.ManagedDataAccess", "Oracle.ManagedDataAccess.Client.OracleClientFactory"),
         };
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OracleManagedDbFactory"/> class.
+        /// </summary>
+        /// <remarks>
+        /// This constructor is marked as obsolete and initializes the factory with a default
+        /// <see langword="null"/> service provider. It is primarily used for backward compatibility.
+        /// </remarks>
+        /// <seealso cref="OracleBaseDbFactory"/>
+        /// <seealso cref="ReflectionBasedDbFactory"/>
         [Obsolete]
         public OracleManagedDbFactory()
             : this(serviceProvider: null)
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OracleManagedDbFactory"/> class.
+        /// </summary>
+        /// <param name="serviceProvider">
+        /// The <see cref="IServiceProvider"/> used to resolve dependencies required by the factory.
+        /// </param>
+        /// <remarks>
+        /// This constructor initializes the <see cref="OracleManagedDbFactory"/> with the specified
+        /// <paramref name="serviceProvider"/> and predefined test entries for the Oracle Managed
+        /// database provider. It leverages the functionality provided by the base class
+        /// <see cref="OracleBaseDbFactory"/>.
+        /// </remarks>
         public OracleManagedDbFactory(IServiceProvider serviceProvider)
             : base(serviceProvider, _entries)
         {

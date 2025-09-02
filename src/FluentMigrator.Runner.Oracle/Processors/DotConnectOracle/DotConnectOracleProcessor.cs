@@ -31,12 +31,18 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.DotConnectOracle
 {
+    /// <summary>
+    /// The DotConnect Oracle migration processor.
+    /// </summary>
     public class DotConnectOracleProcessor : GenericProcessorBase
     {
+        /// <inheritdoc />
         public override string DatabaseType => "DotConnectOracle";
 
+        /// <inheritdoc />
         public override IList<string> DatabaseTypeAliases { get; } = new List<string>();
 
+        /// <inheritdoc />
         public DotConnectOracleProcessor(
             [NotNull] DotConnectOracleDbFactory factory,
             [NotNull] IOracleGenerator generator,
@@ -47,6 +53,7 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
         {
         }
 
+        /// <inheritdoc />
         public override bool SchemaExists(string schemaName)
         {
             if (schemaName == null)
@@ -58,6 +65,7 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
             return Exists("SELECT 1 FROM ALL_USERS WHERE USERNAME = '{0}'", schemaName.ToUpper());
         }
 
+        /// <inheritdoc />
         public override bool TableExists(string schemaName, string tableName)
         {
             if (tableName == null)
@@ -72,6 +80,7 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
             return Exists("SELECT 1 FROM ALL_TABLES WHERE OWNER = '{0}' AND TABLE_NAME = '{1}'", schemaName.ToUpper(), tableName.ToUpper());
         }
 
+        /// <inheritdoc />
         public override bool ColumnExists(string schemaName, string tableName, string columnName)
         {
             if (tableName == null)
@@ -88,6 +97,7 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
             return Exists("SELECT 1 FROM ALL_TAB_COLUMNS WHERE OWNER = '{0}' AND TABLE_NAME = '{1}' AND COLUMN_NAME = '{2}'", schemaName.ToUpper(), tableName.ToUpper(), columnName.ToUpper());
         }
 
+        /// <inheritdoc />
         public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
         {
             if (tableName == null)
@@ -106,6 +116,7 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
             return Exists("SELECT 1 FROM ALL_CONSTRAINTS WHERE OWNER = '{0}' AND CONSTRAINT_NAME = '{1}'", schemaName.ToUpper(), constraintName.ToUpper());
         }
 
+        /// <inheritdoc />
         public override bool IndexExists(string schemaName, string tableName, string indexName)
         {
             if (tableName == null)
@@ -124,21 +135,25 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
             return Exists("SELECT 1 FROM ALL_INDEXES WHERE OWNER = '{0}' AND INDEX_NAME = '{1}'", schemaName.ToUpper(), indexName.ToUpper());
         }
 
+        /// <inheritdoc />
         public override bool SequenceExists(string schemaName, string sequenceName)
         {
             return false;
         }
 
+        /// <inheritdoc />
         public override bool DefaultValueExists(string schemaName, string tableName, string columnName, object defaultValue)
         {
             return false;
         }
 
+        /// <inheritdoc />
         public override void Execute(string template, params object[] args)
         {
             Process(string.Format(template, args));
         }
 
+        /// <inheritdoc />
         public override bool Exists(string template, params object[] args)
         {
             if (template == null)
@@ -153,6 +168,7 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
             }
         }
 
+        /// <inheritdoc />
         public override DataSet ReadTableData(string schemaName, string tableName)
         {
             if (tableName == null)
@@ -164,6 +180,7 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
             return Read("SELECT * FROM {0}.{1}", schemaName.ToUpper(), tableName.ToUpper());
         }
 
+        /// <inheritdoc />
         public override DataSet Read(string template, params object[] args)
         {
             if (template == null)
@@ -178,6 +195,7 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
             }
         }
 
+        /// <inheritdoc />
         public override void Process(PerformDBOperationExpression expression)
         {
             Logger.LogSay("Performing DB Operation");
@@ -192,6 +210,7 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
             expression.Operation?.Invoke(Connection, Transaction);
         }
 
+        /// <inheritdoc />
         protected override void Process(string sql)
         {
             Logger.LogSql(sql);

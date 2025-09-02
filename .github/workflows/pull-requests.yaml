@@ -1,0 +1,52 @@
+on:
+  pull_request:
+    branches:
+    - '*'
+    
+env:
+  solution: 'FluentMigrator.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: Release
+  FM_TestConnectionStrings__SqlServer2016__ContainerEnabled: true
+  FM_TestConnectionStrings__SqlServer2016__IsEnabled: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install GitVersion
+      uses: gittools/actions/gitversion/setup@v0.9.11
+      with:
+        versionSpec: 5.x
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+        clean: true
+    - uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.0.x'
+    - name: Install GitVersion (using GitTools 0.10.2.23031113 or later)
+      uses: gittools/actions/gitversion/setup@v0.9.11
+      with:
+        versionSpec: 5.12
+        includePrerelease: true
+    - name: Execute GitVersion (using GitTools 0.10.2.23031113 or later)
+      uses: gittools/actions/gitversion/execute@v0.9.11
+      env:
+        BUILD_BUILDNUMBER: ${{ env.GitVersion.NuGetVersionV2 }}
+      with:
+        updateAssemblyInfo: false
+    - run: dotnet restore ${{ env.solution }} --use-current-runtime # implies long-term support release of .NET
+    - run: dotnet build '${{ env.solution }}' --no-restore --property:configuration='${{ env.buildConfiguration }}' --property:platform='${{ env.buildPlatform }}' --property:Version="${{ github.run_number }}"
+  
+    - name: VSTest
+      run: |
+        dotnet tool install --global coverlet.console
+        # Coverlet recommends publishing the Tests in order to support XPlat Code Coverage.
+        dotnet publish test/FluentMigrator.Tests/FluentMigrator.Tests.csproj --framework net8.0
+        dotnet test test/FluentMigrator.Tests/bin/${{ env.buildConfiguration }}/net8.0/FluentMigrator.Tests.dll --collect:"XPlat Code Coverage;Format=opencover"
+      shell: bash
+    - uses: actions/upload-artifact@v4
+      with:
+        path: ${{ github.workspace }}
+        name: drop

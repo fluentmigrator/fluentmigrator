@@ -1,3 +1,21 @@
+#region License
+//
+// Copyright (c) 2018, Fluent Migrator Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,8 +33,12 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Generators.Generic
 {
+    /// <summary>
+    /// Provides a base implementation for SQL generators.
+    /// </summary>
     public abstract class GenericGenerator : GeneratorBase
     {
+        /// <inheritdoc />
         protected GenericGenerator(
             IColumn column,
             IQuoter quoter,
@@ -27,34 +49,55 @@ namespace FluentMigrator.Runner.Generators.Generic
             CompatibilityMode = generatorOptions.Value.CompatibilityMode ?? CompatibilityMode.LOOSE;
         }
 
+        /// <inheritdoc />
         public CompatibilityMode CompatibilityMode { get; set; }
 
-        public virtual string CreateTable { get { return "CREATE TABLE {0} ({1})"; } }
-        public virtual string DropTable { get { return "DROP TABLE {0}"; } }
-        public virtual string DropTableIfExists { get { return "DROP TABLE IF EXISTS {0}"; } }
+        /// <inheritdoc />
+        public virtual string CreateTable => "CREATE TABLE {0} ({1})";
+        /// <inheritdoc />
+        public virtual string DropTable => "DROP TABLE {0}";
+        /// <inheritdoc />
+        public virtual string DropTableIfExists => "DROP TABLE IF EXISTS {0}";
 
-        public virtual string AddColumn { get { return "ALTER TABLE {0} ADD COLUMN {1}"; } }
-        public virtual string DropColumn { get { return "ALTER TABLE {0} DROP COLUMN {1}"; } }
-        public virtual string AlterColumn { get { return "ALTER TABLE {0} ALTER COLUMN {1}"; } }
-        public virtual string RenameColumn { get { return "ALTER TABLE {0} RENAME COLUMN {1} TO {2}"; } }
+        /// <inheritdoc />
+        public virtual string AddColumn => "ALTER TABLE {0} ADD COLUMN {1}";
+        /// <inheritdoc />
+        public virtual string DropColumn => "ALTER TABLE {0} DROP COLUMN {1}";
+        /// <inheritdoc />
+        public virtual string AlterColumn => "ALTER TABLE {0} ALTER COLUMN {1}";
+        /// <inheritdoc />
+        public virtual string RenameColumn => "ALTER TABLE {0} RENAME COLUMN {1} TO {2}";
 
-        public virtual string RenameTable { get { return "RENAME TABLE {0} TO {1}"; } }
+        /// <inheritdoc />
+        public virtual string RenameTable => "RENAME TABLE {0} TO {1}";
 
-        public virtual string CreateSchema { get { return "CREATE SCHEMA {0}"; } }
-        public virtual string AlterSchema { get { return "ALTER SCHEMA {0} TRANSFER {1}"; } }
-        public virtual string DropSchema { get { return "DROP SCHEMA {0}"; } }
+        /// <inheritdoc />
+        public virtual string CreateSchema => "CREATE SCHEMA {0}";
+        /// <inheritdoc />
+        public virtual string AlterSchema => "ALTER SCHEMA {0} TRANSFER {1}";
+        /// <inheritdoc />
+        public virtual string DropSchema => "DROP SCHEMA {0}";
 
-        public virtual string CreateIndex { get { return "CREATE {0}{1}INDEX {2} ON {3} ({4})"; } }
-        public virtual string DropIndex { get { return "DROP INDEX {0}"; } }
+        /// <inheritdoc />
+        public virtual string CreateIndex => "CREATE {0}{1}INDEX {2} ON {3} ({4})";
+        /// <inheritdoc />
+        public virtual string DropIndex => "DROP INDEX {0}";
 
-        public virtual string InsertData { get { return "INSERT INTO {0} ({1}) VALUES ({2})"; } }
-        public virtual string UpdateData { get { return "UPDATE {0} SET {1} WHERE {2}"; } }
-        public virtual string DeleteData { get { return "DELETE FROM {0} WHERE {1}"; } }
+        /// <inheritdoc />
+        public virtual string InsertData => "INSERT INTO {0} ({1}) VALUES ({2})";
+        /// <inheritdoc />
+        public virtual string UpdateData => "UPDATE {0} SET {1} WHERE {2}";
+        /// <inheritdoc />
+        public virtual string DeleteData => "DELETE FROM {0} WHERE {1}";
 
-        public virtual string CreateConstraint { get { return "ALTER TABLE {0} ADD CONSTRAINT {1} {2} ({3})"; } }
-        public virtual string DeleteConstraint { get { return "ALTER TABLE {0} DROP CONSTRAINT {1}"; } }
-        public virtual string CreateForeignKeyConstraint { get { return "ALTER TABLE {0} ADD {1}"; } }
+        /// <inheritdoc />
+        public virtual string CreateConstraint => "ALTER TABLE {0} ADD CONSTRAINT {1} {2} ({3})";
+        /// <inheritdoc />
+        public virtual string DeleteConstraint => "ALTER TABLE {0} DROP CONSTRAINT {1}";
+        /// <inheritdoc />
+        public virtual string CreateForeignKeyConstraint => "ALTER TABLE {0} ADD {1}";
 
+        /// <inheritdoc />
         [StringFormatMethod("format")]
         protected string FormatStatement(string format, params object[] args)
         {
@@ -65,21 +108,19 @@ namespace FluentMigrator.Runner.Generators.Generic
             return builder.ToString();
         }
 
+        /// <inheritdoc />
         public virtual string GetUniqueString(CreateIndexExpression column)
         {
             return column.Index.IsUnique ? "UNIQUE " : string.Empty;
         }
 
+        /// <inheritdoc />
         public virtual string GetClusterTypeString(CreateIndexExpression column)
         {
             return string.Empty;
         }
 
-        /// <summary>
-        /// Outputs a create table string
-        /// </summary>
-        /// <param name="expression"></param>
-        /// <returns></returns>
+        /// <inheritdoc />
         public override string Generate(CreateTableExpression expression)
         {
             if (string.IsNullOrEmpty(expression.TableName))
@@ -103,6 +144,7 @@ namespace FluentMigrator.Runner.Generators.Generic
             return FormatStatement(CreateTable, quotedTableName, Column.Generate(expression.Columns, quotedTableName));
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteTableExpression expression)
         {
             if (expression.IfExists)
@@ -113,11 +155,13 @@ namespace FluentMigrator.Runner.Generators.Generic
             return FormatStatement(DropTable, Quoter.QuoteTableName(expression.TableName, expression.SchemaName));
         }
 
+        /// <inheritdoc />
         public override string Generate(RenameTableExpression expression)
         {
             return FormatStatement(RenameTable, Quoter.QuoteTableName(expression.OldName, expression.SchemaName), Quoter.Quote(expression.NewName));
         }
 
+        /// <inheritdoc />
         public override string Generate(CreateColumnExpression expression)
         {
             var errors = ValidateAdditionalFeatureCompatibility(expression.Column.AdditionalFeatures);
@@ -129,6 +173,7 @@ namespace FluentMigrator.Runner.Generators.Generic
             return FormatStatement(AddColumn, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), Column.Generate(expression.Column));
         }
 
+        /// <inheritdoc />
         public override string Generate(AlterColumnExpression expression)
         {
             var errors = ValidateAdditionalFeatureCompatibility(expression.Column.AdditionalFeatures);
@@ -140,6 +185,7 @@ namespace FluentMigrator.Runner.Generators.Generic
             return FormatStatement(AlterColumn, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), Column.Generate(expression.Column));
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteColumnExpression expression)
         {
             var builder = new StringBuilder();
@@ -156,6 +202,7 @@ namespace FluentMigrator.Runner.Generators.Generic
             return builder.ToString();
         }
 
+        /// <inheritdoc />
         public override string Generate(RenameColumnExpression expression)
         {
             return FormatStatement(RenameColumn,
@@ -192,11 +239,13 @@ namespace FluentMigrator.Runner.Generators.Generic
                 , string.Join(", ", indexColumns));
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteIndexExpression expression)
         {
             return FormatStatement(DropIndex, Quoter.QuoteIndexName(expression.Index.Name), Quoter.QuoteTableName(expression.Index.TableName, expression.Index.SchemaName));
         }
 
+        /// <inheritdoc />
         public override string Generate(CreateForeignKeyExpression expression)
         {
             return FormatStatement(
@@ -205,6 +254,7 @@ namespace FluentMigrator.Runner.Generators.Generic
                 Column.FormatForeignKey(expression.ForeignKey, GenerateForeignKeyName));
         }
 
+        /// <inheritdoc />
         public override string Generate(CreateConstraintExpression expression)
         {
             var constraintType = (expression.Constraint.IsPrimaryKeyConstraint) ? "PRIMARY KEY" : "UNIQUE";
@@ -222,16 +272,19 @@ namespace FluentMigrator.Runner.Generators.Generic
                 string.Join(", ", columns));
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteConstraintExpression expression)
         {
             return FormatStatement(DeleteConstraint, Quoter.QuoteTableName(expression.Constraint.TableName, expression.Constraint.SchemaName), Quoter.QuoteConstraintName(expression.Constraint.ConstraintName));
         }
 
+        /// <inheritdoc />
         public virtual string GenerateForeignKeyName(ForeignKeyDefinition foreignKey)
         {
             return Column.GenerateForeignKeyName(foreignKey);
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteForeignKeyExpression expression)
         {
             if (expression.ForeignKey.ForeignTable == null)
@@ -245,6 +298,7 @@ namespace FluentMigrator.Runner.Generators.Generic
             );
         }
 
+        /// <inheritdoc />
         public override string Generate(InsertDataExpression expression)
         {
             var errors = ValidateAdditionalFeatureCompatibility(expression.AdditionalFeatures);
@@ -268,11 +322,13 @@ namespace FluentMigrator.Runner.Generators.Generic
             return output.ToString();
         }
 
+        /// <inheritdoc />
         protected virtual StringBuilder AppendSqlStatementEndToken(StringBuilder stringBuilder)
         {
             return stringBuilder.Append(";");
         }
 
+        /// <inheritdoc />
         protected List<KeyValuePair<string,string>> GenerateColumnNamesAndValues(InsertDataExpression expression)
         {
             var insertStrings = new List<KeyValuePair<string, string>>();
@@ -295,6 +351,7 @@ namespace FluentMigrator.Runner.Generators.Generic
             return insertStrings;
         }
 
+        /// <inheritdoc />
         protected string ValidateAdditionalFeatureCompatibility(IEnumerable<KeyValuePair<string, object>> features)
         {
             if (CompatibilityMode == CompatibilityMode.STRICT) {
@@ -314,6 +371,7 @@ namespace FluentMigrator.Runner.Generators.Generic
             return string.Empty;
         }
 
+        /// <inheritdoc />
         public override string Generate(UpdateDataExpression expression)
         {
             var updateItems = new List<string>();
@@ -383,6 +441,7 @@ namespace FluentMigrator.Runner.Generators.Generic
             }
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteDataExpression expression)
         {
             var deleteItems = new List<string>();
@@ -413,22 +472,25 @@ namespace FluentMigrator.Runner.Generators.Generic
             return output.ToString();
         }
 
-        //All Schema method throw by default as only Sql server 2005 and up supports them.
+        /// <inheritdoc />
         public override string Generate(CreateSchemaExpression expression)
         {
             return CompatibilityMode.HandleCompatibility("Schemas are not supported");
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteSchemaExpression expression)
         {
             return CompatibilityMode.HandleCompatibility("Schemas are not supported");
         }
 
+        /// <inheritdoc />
         public override string Generate(AlterSchemaExpression expression)
         {
             return CompatibilityMode.HandleCompatibility("Schemas are not supported");
         }
 
+        /// <inheritdoc />
         public override string Generate(CreateSequenceExpression expression)
         {
             var result = new StringBuilder("CREATE SEQUENCE ");
@@ -479,6 +541,7 @@ namespace FluentMigrator.Runner.Generators.Generic
             return result.ToString();
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteSequenceExpression expression)
         {
             return FormatStatement("DROP SEQUENCE {0}", Quoter.QuoteSequenceName(expression.SequenceName, expression.SchemaName));

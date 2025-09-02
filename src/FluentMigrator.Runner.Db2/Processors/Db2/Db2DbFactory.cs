@@ -20,6 +20,14 @@ using System;
 
 namespace FluentMigrator.Runner.Processors.DB2
 {
+    /// <summary>
+    /// Represents a database factory for DB2, providing functionality to create and manage
+    /// DB2 database connections using reflection-based mechanisms.
+    /// </summary>
+    /// <remarks>
+    /// This class extends <see cref="FluentMigrator.Runner.Processors.ReflectionBasedDbFactory"/> and
+    /// utilizes predefined test entries to locate and initialize the appropriate DB2 database factory.
+    /// </remarks>
     public class Db2DbFactory : ReflectionBasedDbFactory
     {
         private static readonly TestEntry[] _testEntries =
@@ -28,12 +36,16 @@ namespace FluentMigrator.Runner.Processors.DB2
             new TestEntry("IBM.Data.DB2", "IBM.Data.DB2.DB2Factory"),
         };
 
-        [Obsolete]
-        public Db2DbFactory()
-            : base(_testEntries)
-        {
-        }
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FluentMigrator.Runner.Processors.DB2.Db2DbFactory"/> class.
+        /// </summary>
+        /// <param name="serviceProvider">
+        /// The service provider used to resolve dependencies required by the factory.
+        /// </param>
+        /// <remarks>
+        /// This constructor passes the predefined DB2 test entries to the base class
+        /// <see cref="FluentMigrator.Runner.Processors.ReflectionBasedDbFactory"/> for initialization.
+        /// </remarks>
         public Db2DbFactory(IServiceProvider serviceProvider)
             : base(serviceProvider, _testEntries)
         {

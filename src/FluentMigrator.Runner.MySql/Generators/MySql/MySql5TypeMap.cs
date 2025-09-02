@@ -18,10 +18,26 @@ using System.Data;
 
 namespace FluentMigrator.Runner.Generators.MySql
 {
+    /// <summary>
+    /// Represents the type mapping for MySQL 5 database.
+    /// </summary>
+    /// <remarks>
+    /// This class extends <see cref="FluentMigrator.Runner.Generators.MySql.MySql4TypeMap"/> to provide
+    /// additional or updated type mappings specific to MySQL 5. It is used to map .NET data types to
+    /// their corresponding MySQL 5 database types.
+    /// </remarks>
     public class MySql5TypeMap : MySql4TypeMap
     {
+        /// <summary>
+        /// Represents the maximum capacity for the DECIMAL data type in MySQL 5.
+        /// </summary>
+        /// <remarks>
+        /// This constant overrides the <see cref="FluentMigrator.Runner.Generators.MySql.MySql4TypeMap.DecimalCapacity"/> 
+        /// to define the updated maximum capacity for the DECIMAL type specific to MySQL 5.
+        /// </remarks>
         public new const int DecimalCapacity = 65;
 
+        /// <inheritdoc />
         protected override void SetupMySqlTypeMaps()
         {
             base.SetupMySqlTypeMaps();

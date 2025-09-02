@@ -16,5 +16,8 @@
 
 namespace FluentMigrator.Runner.Generators.Redshift
 {
+    /// <summary>
+    /// Represents a mapping of <see cref="System.Data.DbType"/> to SQL types specific to Amazon Redshift.
+    /// </summary>
     public interface IRedshiftTypeMap : ITypeMap { }
 }

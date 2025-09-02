@@ -16,5 +16,12 @@
 
 namespace FluentMigrator.Runner.Generators.Oracle
 {
+    /// <summary>
+    /// Represents a specialized type map for Oracle databases, extending the functionality of <see cref="ITypeMap"/>.
+    /// </summary>
+    /// <remarks>
+    /// This interface provides Oracle-specific mappings between <see cref="System.Data.DbType"/> and SQL types.
+    /// It is utilized by Oracle-related database migration components to ensure compatibility with Oracle's data type system.
+    /// </remarks>
     public interface IOracleTypeMap : ITypeMap { }
 }

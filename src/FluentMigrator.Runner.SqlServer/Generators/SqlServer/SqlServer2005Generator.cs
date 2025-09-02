@@ -34,6 +34,9 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Generators.SqlServer
 {
+    /// <summary>
+    /// The SQL Server 2005 SQL generator for FluentMigrator.
+    /// </summary>
     public class SqlServer2005Generator : SqlServer2000Generator
     {
         private const string ErrorMessageFilteredIndexesAreNonClusteredIndexes =
@@ -51,17 +54,20 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             SqlServerExtensions.UniqueConstraintIncludesList
         };
 
+        /// <inheritdoc />
         public SqlServer2005Generator()
             : this(new SqlServer2005Quoter())
         {
         }
 
+        /// <inheritdoc />
         public SqlServer2005Generator(
             [NotNull] SqlServer2005Quoter quoter)
             : this(quoter, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()))
         {
         }
 
+        /// <inheritdoc />
         public SqlServer2005Generator(
             [NotNull] SqlServer2005Quoter quoter,
             [NotNull] IOptions<GeneratorOptions> generatorOptions)
@@ -73,6 +79,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         {
         }
 
+        /// <inheritdoc />
         protected SqlServer2005Generator(
             [NotNull] IColumn column,
             [NotNull] IQuoter quoter,
@@ -89,30 +96,47 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         public override List<string> GeneratorIdAliases =>
             [GeneratorIdConstants.SqlServer2005, GeneratorIdConstants.SqlServer];
 
+        /// <inheritdoc />
+        public override string AddColumn => "ALTER TABLE {0} ADD {1}";
 
-        public override string AddColumn { get { return "ALTER TABLE {0} ADD {1}"; } }
+        /// <inheritdoc />
+        public override string CreateSchema => "CREATE SCHEMA {0}{1}";
 
-        public override string CreateSchema { get { return "CREATE SCHEMA {0}{1}"; } }
+        /// <inheritdoc />
+        public override string CreateIndex => "CREATE {0}{1}INDEX {2} ON {3} ({4}){5}{6}{7}";
 
-        public override string CreateIndex { get { return "CREATE {0}{1}INDEX {2} ON {3} ({4}){5}{6}{7}"; } }
-        public override string DropIndex { get { return "DROP INDEX {0} ON {1}{2}"; } }
+        /// <inheritdoc />
+        public override string DropIndex => "DROP INDEX {0} ON {1}{2}";
 
-        public override string IdentityInsert { get { return "SET IDENTITY_INSERT {0} {1}"; } }
+        /// <inheritdoc />
+        public override string IdentityInsert => "SET IDENTITY_INSERT {0} {1}";
 
-        public virtual string CreateUniqueConstraint { get { return "CREATE UNIQUE INDEX {1} ON {0} ({2}){3}{4}"; } }
+        /// <summary>
+        /// Gets the SQL for creating a unique constraint.
+        /// </summary>
+        public virtual string CreateUniqueConstraint => "CREATE UNIQUE INDEX {1} ON {0} ({2}){3}{4}";
 
-        public override string CreateForeignKeyConstraint { get { return "ALTER TABLE {0} ADD CONSTRAINT {1} FOREIGN KEY ({2}) REFERENCES {3} ({4}){5}{6}"; } }
+        /// <inheritdoc />
+        public override string CreateForeignKeyConstraint => "ALTER TABLE {0} ADD CONSTRAINT {1} FOREIGN KEY ({2}) REFERENCES {3} ({4}){5}{6}";
 
+        /// <inheritdoc />
         public virtual string GetIncludeString(CreateIndexExpression expression)
         {
             return GetIncludeStringFor(expression, SqlServerExtensions.IncludesList);
         }
 
+        /// <inheritdoc />
         public virtual string GetIncludeString(CreateConstraintExpression expression)
         {
             return GetIncludeStringFor(expression, SqlServerExtensions.UniqueConstraintIncludesList);
         }
 
+        /// <summary>
+        /// Gets the include string for additional features.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <param name="featureKey">The feature key.</param>
+        /// <returns>The include string.</returns>
         protected string GetIncludeStringFor(ISupportAdditionalFeatures expression, string featureKey)
         {
             if (!expression.TryGetAdditionalFeature<IList<IndexIncludeDefinition>>(featureKey, out var includes))
@@ -132,6 +156,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             return includes?.Count > 0 ? " INCLUDE (" + string.Join(", ", indexIncludes) + ")" : string.Empty;
         }
 
+        /// <inheritdoc />
         public virtual string GetFilterString(CreateIndexExpression createIndexExpression)
         {
             if (createIndexExpression.Index.TryGetAdditionalFeature<string>(SqlServerExtensions.IndexFilter, out var filter))
@@ -145,6 +170,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             return string.Empty;
         }
 
+        /// <inheritdoc />
         public virtual string GetFilterString(CreateConstraintExpression createConstraintExpression)
         {
             if (createConstraintExpression.Constraint.TryGetAdditionalFeature<string>(SqlServerExtensions.UniqueConstraintFilter, out var filter))
@@ -169,6 +195,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             return string.Empty;
         }
 
+        /// <inheritdoc />
         public virtual string GetWithOptions(ISupportAdditionalFeatures expression)
         {
             var items = new List<string>();
@@ -181,12 +208,14 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             return string.Join(", ", items);
         }
 
+        /// <inheritdoc />
         public override bool IsAdditionalFeatureSupported(string feature)
         {
             return _supportedAdditionalFeatures.Contains(feature)
              || base.IsAdditionalFeatureSupported(feature);
         }
 
+        /// <inheritdoc />
         public override string Generate(CreateTableExpression expression)
         {
             var descriptionStatements = DescriptionGenerator.GenerateDescriptionStatements(expression);
@@ -199,6 +228,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             return ComposeStatements(createTableStatement, descriptionStatementsArray);
         }
 
+        /// <inheritdoc />
         public override string Generate(AlterTableExpression expression)
         {
             var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatement(expression);
@@ -209,17 +239,18 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             return descriptionStatement;
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteTableExpression expression)
         {
             if (expression.IfExists)
             {
                 return FormatStatement("IF OBJECT_ID('{0}','U') IS NOT NULL DROP TABLE {0}", Quoter.QuoteTableName(expression.TableName, expression.SchemaName));
-
             }
 
             return FormatStatement(DropTable, Quoter.QuoteTableName(expression.TableName, expression.SchemaName));
         }
 
+        /// <inheritdoc />
         public override string Generate(CreateColumnExpression expression)
         {
             var alterTableStatement = base.Generate(expression);
@@ -231,6 +262,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             return ComposeStatements(alterTableStatement, new[] { descriptionStatement });
         }
 
+        /// <inheritdoc />
         public override string Generate(AlterColumnExpression expression)
         {
             var alterTableStatement = base.Generate(expression);
@@ -242,6 +274,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             return ComposeStatements(alterTableStatement, new[] { descriptionStatement });
         }
 
+        /// <inheritdoc />
         public override string Generate(CreateForeignKeyExpression expression)
         {
             if (expression.ForeignKey.PrimaryColumns.Count != expression.ForeignKey.ForeignColumns.Count)
@@ -272,6 +305,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                 );
         }
 
+        /// <inheritdoc />
         public override string Generate(CreateIndexExpression expression)
         {
             string[] indexColumns = new string[expression.Index.Columns.Count];
@@ -303,6 +337,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                 GetWithPart(expression));
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteIndexExpression expression)
         {
             return FormatStatement(
@@ -321,6 +356,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                 : string.Empty;
         }
 
+        /// <inheritdoc />
         public override string Generate(CreateConstraintExpression expression)
         {
             var filterParts = GetFilterString(expression);
@@ -352,6 +388,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             return statement.ToString();
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteDefaultConstraintExpression expression)
         {
             string sql =
@@ -373,6 +410,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             return string.Format(sql, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), expression.ColumnName);
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteConstraintExpression expression)
         {
             return FormatStatement("ALTER TABLE {0} DROP CONSTRAINT {1}{2}",
@@ -382,6 +420,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             );
         }
 
+        /// <inheritdoc />
         public override string Generate(CreateSchemaExpression expression)
         {
             string authFragment;
@@ -397,11 +436,13 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             return FormatStatement(CreateSchema, Quoter.QuoteSchemaName(expression.SchemaName), authFragment);
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteSchemaExpression expression)
         {
             return FormatStatement(DropSchema, Quoter.QuoteSchemaName(expression.SchemaName));
         }
 
+        /// <inheritdoc />
         public override string Generate(AlterSchemaExpression expression)
         {
             return FormatStatement(AlterSchema, Quoter.QuoteSchemaName(expression.DestinationSchemaName), Quoter.QuoteTableName(expression.TableName, expression.SourceSchemaName));

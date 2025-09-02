@@ -20,15 +20,49 @@ using System.Reflection;
 
 namespace FluentMigrator.Runner.Initialization.AssemblyLoader
 {
+    /// <summary>
+    /// Provides functionality to load an assembly by its name.
+    /// </summary>
+    /// <remarks>
+    /// This class implements the <see cref="IAssemblyLoader"/> interface and is used to load assemblies
+    /// based on their names. It is typically used when the assembly name is known but not its file path.
+    /// </remarks>
     public class AssemblyLoaderFromName : IAssemblyLoader
     {
         private readonly string _name;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AssemblyLoaderFromName"/> class with the specified assembly name.
+        /// </summary>
+        /// <param name="name">The name of the assembly to be loaded.</param>
+        /// <remarks>
+        /// This constructor sets the assembly name that will be used to load the assembly
+        /// when the <see cref="Load"/> method is called.
+        /// </remarks>
         public AssemblyLoaderFromName(string name)
         {
             _name = name;
         }
 
+        /// <summary>
+        /// Loads the assembly specified by the name provided during the initialization of this instance.
+        /// </summary>
+        /// <returns>
+        /// The loaded <see cref="System.Reflection.Assembly"/> corresponding to the specified name.
+        /// </returns>
+        /// <remarks>
+        /// This method uses the <see cref="System.Reflection.Assembly.Load(string)"/> method to load the assembly
+        /// by its name. Ensure that the assembly name is valid and resolvable in the current application context.
+        /// </remarks>
+        /// <exception cref="System.IO.FileNotFoundException">
+        /// Thrown if the assembly with the specified name cannot be found.
+        /// </exception>
+        /// <exception cref="System.BadImageFormatException">
+        /// Thrown if the assembly is not a valid assembly or was compiled with a later version of the CLR than the current process.
+        /// </exception>
+        /// <exception cref="System.IO.FileLoadException">
+        /// Thrown if the assembly is found but cannot be loaded.
+        /// </exception>
         public Assembly Load()
         {
             Assembly assembly = Assembly.Load(_name);

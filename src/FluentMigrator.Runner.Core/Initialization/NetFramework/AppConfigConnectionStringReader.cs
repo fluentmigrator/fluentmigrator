@@ -53,6 +53,24 @@ namespace FluentMigrator.Runner.Initialization.NetFramework
         [CanBeNull]
         private ConnectionInfo _connectionInfo;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AppConfigConnectionStringReader"/> class.
+        /// </summary>
+        /// <param name="configManager">
+        /// The <see cref="INetConfigManager"/> instance used to access .NET configuration mechanisms.
+        /// </param>
+        /// <param name="assemblySource">
+        /// The <see cref="IAssemblySource"/> instance providing access to assemblies for determining the assembly location.
+        /// </param>
+        /// <param name="logger">
+        /// The <see cref="ILogger{TCategoryName}"/> instance for logging messages.
+        /// </param>
+        /// <param name="options">
+        /// The options for configuring the <see cref="AppConfigConnectionStringReader"/>.
+        /// </param>
+        /// <remarks>
+        /// This constructor is marked as <see cref="ObsoleteAttribute"/> and may be removed in future versions.
+        /// </remarks>
         public AppConfigConnectionStringReader(
             [NotNull] INetConfigManager configManager,
             [NotNull] IAssemblySource assemblySource,
@@ -67,6 +85,20 @@ namespace FluentMigrator.Runner.Initialization.NetFramework
             _assemblyLocation = singleAssembly != null ? singleAssembly.Location : string.Empty;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AppConfigConnectionStringReader"/> class.
+        /// </summary>
+        /// <param name="configManager">The configuration manager used to access .NET configuration sections.</param>
+        /// <param name="assemblyLocation">The location of the assembly to be used for configuration resolution.</param>
+        /// <param name="announcer">The announcer used for logging messages.</param>
+        /// <param name="options">The options for configuring the connection string reader.</param>
+        /// <remarks>
+        /// This constructor is marked as <see cref="ObsoleteAttribute"/> and may be removed in future versions.
+        /// </remarks>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="configManager"/>, <paramref name="assemblyLocation"/>, <paramref name="announcer"/>, 
+        /// or <paramref name="options"/> is <c>null</c>.
+        /// </exception>
         [Obsolete]
         public AppConfigConnectionStringReader(
             [NotNull] INetConfigManager configManager,
@@ -99,6 +131,19 @@ namespace FluentMigrator.Runner.Initialization.NetFramework
             return result?.ConnectionString ?? connectionStringOrName;
         }
 
+        /// <summary>
+        /// Loads a connection string based on the provided name or value and the specified assembly location.
+        /// </summary>
+        /// <param name="connectionStringOrName">
+        /// The connection string or the name of the connection string to load. Can be <c>null</c>.
+        /// </param>
+        /// <param name="assemblyLocation">
+        /// The location of the assembly to use for loading the connection string. Can be <c>null</c>.
+        /// </param>
+        /// <returns>
+        /// A <see cref="ConnectionInfo"/> object containing the loaded connection string and related details,
+        /// or <c>null</c> if no connection string could be resolved.
+        /// </returns>
         [CanBeNull]
         private ConnectionInfo LoadConnectionString([CanBeNull] string connectionStringOrName, [CanBeNull] string assemblyLocation)
         {
@@ -127,6 +172,20 @@ namespace FluentMigrator.Runner.Initialization.NetFramework
             return result;
         }
 
+        /// <summary>
+        /// Loads a connection string from the specified configuration file.
+        /// </summary>
+        /// <param name="connectionStringName">
+        /// The name of the connection string to retrieve. If <c>null</c> or empty, 
+        /// the connection string associated with the machine name is used.
+        /// </param>
+        /// <param name="configurationFile">
+        /// The configuration file from which to load the connection string.
+        /// </param>
+        /// <returns>
+        /// A <see cref="ConnectionInfo"/> object containing the connection string details, 
+        /// or <c>null</c> if the connection string could not be found.
+        /// </returns>
         [CanBeNull]
         private ConnectionInfo LoadConnectionStringFromConfigurationFile([CanBeNull] string connectionStringName, [NotNull] Configuration configurationFile)
         {
@@ -145,6 +204,22 @@ namespace FluentMigrator.Runner.Initialization.NetFramework
             return ReadConnectionString(connectionString, configurationFile.FilePath);
         }
 
+        /// <summary>
+        /// Reads a connection string from the provided <see cref="ConnectionStringSettings"/> and configuration file path.
+        /// </summary>
+        /// <param name="connectionSetting">
+        /// The <see cref="ConnectionStringSettings"/> instance containing the connection string information.
+        /// </param>
+        /// <param name="configurationFile">
+        /// The path to the configuration file from which the connection string is being read.
+        /// </param>
+        /// <returns>
+        /// A <see cref="ConnectionInfo"/> instance containing the connection string details, or <c>null</c> if the
+        /// <paramref name="connectionSetting"/> is <c>null</c>.
+        /// </returns>
+        /// <remarks>
+        /// This method is marked as <see cref="PureAttribute"/>, indicating it does not modify the state of the object.
+        /// </remarks>
         [Pure]
         [CanBeNull]
         private ConnectionInfo ReadConnectionString(
@@ -156,11 +231,20 @@ namespace FluentMigrator.Runner.Initialization.NetFramework
             return new ConnectionInfo(connectionSetting.Name, connectionSetting.ConnectionString, configurationFile);
         }
 
+        /// <summary>
+        /// Outputs the results of the connection string resolution process to the logger.
+        /// </summary>
+        /// <param name="info">The <see cref="ConnectionInfo"/> object containing the resolved connection string and its metadata.
+        /// If <c>null</c>, an error message will be logged.</param>
+        /// <remarks>
+        /// This method logs the connection string details, masking sensitive information such as passwords.
+        /// If the connection string cannot be resolved, an error message is logged.
+        /// </remarks>
         private void OutputResults(ConnectionInfo info)
         {
             if (info == null)
             {
-                _logger.LogError("Unable to resolve any connectionstring using parameters \"/connection\" and \"/configPath\"");
+                _logger.LogError("Unable to resolve any ConnectionString using parameters \"/connection\" and \"/configPath\"");
                 return;
             }
 
@@ -185,8 +269,27 @@ namespace FluentMigrator.Runner.Initialization.NetFramework
             _logger.LogSay(message);
         }
 
+        /// <summary>
+        /// Represents information about a database connection, including the connection string, 
+        /// its name, and the source from which it was loaded.
+        /// </summary>
         private class ConnectionInfo
         {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="ConnectionInfo"/> class.
+            /// </summary>
+            /// <param name="name">
+            /// The name of the connection string. Can be <c>null</c> if the connection string does not have a name.
+            /// </param>
+            /// <param name="connectionString">
+            /// The connection string used to connect to the database. Cannot be <c>null</c>.
+            /// </param>
+            /// <param name="source">
+            /// The source from which the connection string was loaded. Can be <c>null</c> if the source is not specified.
+            /// </param>
+            /// <exception cref="ArgumentNullException">
+            /// Thrown when <paramref name="connectionString"/> is <c>null</c>.
+            /// </exception>
             public ConnectionInfo([CanBeNull] string name, [NotNull] string connectionString, [CanBeNull] string source)
             {
                 Name = name;
@@ -194,12 +297,34 @@ namespace FluentMigrator.Runner.Initialization.NetFramework
                 Source = source;
             }
 
+            /// <summary>
+            /// Gets the name of the connection string.
+            /// </summary>
+            /// <value>
+            /// The name of the connection string, or <c>null</c> if the connection string does not have a name.
+            /// </value>
             [CanBeNull]
             public string Name { get; }
 
+            /// <summary>
+            /// Gets the connection string used to connect to the database.
+            /// </summary>
+            /// <value>
+            /// A non-null string representing the connection string.
+            /// </value>
+            /// <exception cref="ArgumentNullException">
+            /// Thrown when attempting to set the property to <c>null</c>.
+            /// </exception>
             [NotNull]
             public string ConnectionString { get; }
 
+            /// <summary>
+            /// Gets the source from which the connection string was loaded.
+            /// </summary>
+            /// <value>
+            /// The source of the connection string, such as a configuration file path. 
+            /// Can be <c>null</c> if the source is not specified.
+            /// </value>
             [CanBeNull]
             public string Source { get; }
         }

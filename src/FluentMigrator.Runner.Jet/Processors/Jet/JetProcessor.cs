@@ -33,14 +33,33 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.Jet
 {
+    /// <summary>
+    /// The Jet migration processor.
+    /// </summary>
     public class JetProcessor : ProcessorBase
     {
         private readonly Lazy<OleDbConnection> _connection;
         private OleDbTransaction _transaction;
+        /// <summary>
+        /// Gets the <see cref="OleDbConnection"/> instance used by the Jet migration processor.
+        /// </summary>
+        /// <remarks>
+        /// This property lazily initializes and retrieves the database connection used for executing migration operations.
+        /// Ensure the connection is properly opened or closed using the appropriate methods.
+        /// </remarks>
         public OleDbConnection Connection => _connection.Value;
+        /// <summary>
+        /// Gets the current transaction associated with the Jet database connection.
+        /// </summary>
+        /// <remarks>
+        /// This property provides access to the <see cref="System.Data.OleDb.OleDbTransaction"/> 
+        /// used for executing commands within a transactional context. Ensure that the connection 
+        /// is open before accessing this property.
+        /// </remarks>
         public OleDbTransaction Transaction => _transaction;
-        private bool _disposed = false;
+        private bool _disposed;
 
+        /// <inheritdoc />
         public JetProcessor(
             [NotNull] JetGenerator generator,
             [NotNull] ILogger<JetProcessor> logger,
@@ -61,31 +80,33 @@ namespace FluentMigrator.Runner.Processors.Jet
                         return conn;
                     });
             }
-
-#pragma warning disable 612
-            ConnectionString = connectionString;
-#pragma warning restore 612
         }
 
-        [Obsolete]
-        public override string ConnectionString { get; }
-
+        /// <inheritdoc />
         public override string DatabaseType { get; } = ProcessorIdConstants.Jet;
 
+        /// <inheritdoc />
         public override IList<string> DatabaseTypeAliases { get; } = new List<string>();
 
+        /// <summary>
+        /// Ensures the database connection is open.
+        /// </summary>
         protected void EnsureConnectionIsOpen()
         {
             if (Connection.State != ConnectionState.Open)
                 Connection.Open();
         }
 
+        /// <summary>
+        /// Ensures the database connection is closed.
+        /// </summary>
         protected void EnsureConnectionIsClosed()
         {
             if (Connection.State != ConnectionState.Closed)
                 Connection.Close();
         }
 
+        /// <inheritdoc />
         public override void Process(PerformDBOperationExpression expression)
         {
             Logger.LogSay("Performing DB Operation");
@@ -98,6 +119,7 @@ namespace FluentMigrator.Runner.Processors.Jet
             expression.Operation?.Invoke(Connection, _transaction);
         }
 
+        /// <inheritdoc />
         protected override void Process(string sql)
         {
             Logger.LogSql(sql);
@@ -120,11 +142,13 @@ namespace FluentMigrator.Runner.Processors.Jet
             }
         }
 
+        /// <inheritdoc />
         public override DataSet ReadTableData(string schemaName, string tableName)
         {
             return Read("SELECT * FROM [{0}]", tableName);
         }
 
+        /// <inheritdoc />
         public override DataSet Read(string template, params object[] args)
         {
             EnsureConnectionIsOpen();
@@ -138,6 +162,7 @@ namespace FluentMigrator.Runner.Processors.Jet
             }
         }
 
+        /// <inheritdoc />
         public override bool Exists(string template, params object[] args)
         {
             EnsureConnectionIsOpen();
@@ -150,21 +175,25 @@ namespace FluentMigrator.Runner.Processors.Jet
             }
         }
 
+        /// <inheritdoc />
         public override bool SequenceExists(string schemaName, string sequenceName)
         {
             return false;
         }
 
+        /// <inheritdoc />
         public override void Execute(string template, params object[] args)
         {
             Process(string.Format(template, args));
         }
 
+        /// <inheritdoc />
         public override bool SchemaExists(string tableName)
         {
             return true;
         }
 
+        /// <inheritdoc />
         public override bool TableExists(string schemaName, string tableName)
         {
             EnsureConnectionIsOpen();
@@ -173,7 +202,7 @@ namespace FluentMigrator.Runner.Processors.Jet
             using (var tables = Connection.GetOleDbSchemaTable(OleDbSchemaGuid.Tables, restrict))
             {
                 Debug.Assert(tables != null, nameof(tables) + " != null");
-                for (int i = 0; i < tables.Rows.Count; i++)
+                for (int i = 0; i < tables!.Rows.Count; i++)
                 {
                     var name = tables.Rows[i].ItemArray[2].ToString();
                     if (name == tableName)
@@ -185,6 +214,7 @@ namespace FluentMigrator.Runner.Processors.Jet
             }
         }
 
+        /// <inheritdoc />
         public override bool ColumnExists(string schemaName, string tableName, string columnName)
         {
             EnsureConnectionIsOpen();
@@ -193,7 +223,7 @@ namespace FluentMigrator.Runner.Processors.Jet
             using (var columns = Connection.GetOleDbSchemaTable(OleDbSchemaGuid.Columns, restrict))
             {
                 Debug.Assert(columns != null, nameof(columns) + " != null");
-                for (int i = 0; i < columns.Rows.Count; i++)
+                for (int i = 0; i < columns!.Rows.Count; i++)
                 {
                     var name = columns.Rows[i].ItemArray[3].ToString();
                     if (name == columnName)
@@ -205,6 +235,7 @@ namespace FluentMigrator.Runner.Processors.Jet
             }
         }
 
+        /// <inheritdoc />
         public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
         {
             EnsureConnectionIsOpen();
@@ -213,10 +244,11 @@ namespace FluentMigrator.Runner.Processors.Jet
             using (var constraints = Connection.GetOleDbSchemaTable(OleDbSchemaGuid.Table_Constraints, restrict))
             {
                 Debug.Assert(constraints != null, nameof(constraints) + " != null");
-                return constraints.Rows.Count > 0;
+                return constraints!.Rows.Count > 0;
             }
         }
 
+        /// <inheritdoc />
         public override bool IndexExists(string schemaName, string tableName, string indexName)
         {
             EnsureConnectionIsOpen();
@@ -225,15 +257,17 @@ namespace FluentMigrator.Runner.Processors.Jet
             using (var indexes = Connection.GetOleDbSchemaTable(OleDbSchemaGuid.Indexes, restrict))
             {
                 Debug.Assert(indexes != null, nameof(indexes) + " != null");
-                return indexes.Rows.Count > 0;
+                return indexes!.Rows.Count > 0;
             }
         }
 
+        /// <inheritdoc />
         public override bool DefaultValueExists(string schemaName, string tableName, string columnName, object defaultValue)
         {
             return false;
         }
 
+        /// <inheritdoc />
         public override void BeginTransaction()
         {
             if (_transaction != null) return;
@@ -244,6 +278,7 @@ namespace FluentMigrator.Runner.Processors.Jet
             _transaction = Connection.BeginTransaction();
         }
 
+        /// <inheritdoc />
         public override void RollbackTransaction()
         {
             if (_transaction == null) return;
@@ -254,6 +289,7 @@ namespace FluentMigrator.Runner.Processors.Jet
             _transaction = null;
         }
 
+        /// <inheritdoc />
         public override void CommitTransaction()
         {
             if (_transaction == null) return;
@@ -264,6 +300,7 @@ namespace FluentMigrator.Runner.Processors.Jet
             _transaction = null;
         }
 
+        /// <inheritdoc />
         protected override void Dispose(bool isDisposing)
         {
             if (!isDisposing || _disposed)

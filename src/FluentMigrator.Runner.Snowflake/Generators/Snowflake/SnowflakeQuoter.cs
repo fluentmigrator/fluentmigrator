@@ -24,12 +24,17 @@ using FluentMigrator.Runner.Processors.Snowflake;
 
 namespace FluentMigrator.Runner.Generators.Snowflake
 {
+    /// <summary>
+    /// The Snowflake SQL quoter for FluentMigrator.
+    /// </summary>
     public class SnowflakeQuoter : GenericQuoter
     {
         private readonly bool _quoteIdentifiers;
 
+        /// <inheritdoc />
         public SnowflakeQuoter(SnowflakeOptions sfOptions) : this(sfOptions.QuoteIdentifiers) { }
 
+        /// <inheritdoc />
         public SnowflakeQuoter(bool quoteIdentifiers)
         {
             _quoteIdentifiers = quoteIdentifiers;
@@ -59,6 +64,7 @@ namespace FluentMigrator.Runner.Generators.Snowflake
         /// </summary>
         public override string CloseQuoteEscapeString => _quoteIdentifiers ? base.CloseQuoteEscapeString : string.Empty;
 
+        /// <inheritdoc />
         public override bool IsQuoted(string name) => _quoteIdentifiers && base.IsQuoted(name);
 
         /// <inheritdoc />
@@ -67,6 +73,7 @@ namespace FluentMigrator.Runner.Generators.Snowflake
             return base.QuoteSchemaName(schemaName ?? DefaultSchemaName);
         }
 
+        /// <inheritdoc />
         public string DefaultSchemaName => "PUBLIC";
 
         /// <inheritdoc />
@@ -81,6 +88,7 @@ namespace FluentMigrator.Runner.Generators.Snowflake
             return ValueQuote + value.ToString("yyyy-MM-dd HH:mm:ss zzz", CultureInfo.InvariantCulture) + ValueQuote;
         }
 
+        /// <inheritdoc />
         public override string FormatSystemMethods(SystemMethods value)
         {
             switch (value)

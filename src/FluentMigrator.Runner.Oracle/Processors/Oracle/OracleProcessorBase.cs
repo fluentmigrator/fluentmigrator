@@ -17,10 +17,10 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text.RegularExpressions;
+using System.Text;
 
 using FluentMigrator.Expressions;
+using FluentMigrator.Runner.BatchParser;
 using FluentMigrator.Generation;
 using FluentMigrator.Runner.Generators.Oracle;
 using FluentMigrator.Runner.Helpers;
@@ -33,8 +33,20 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.Oracle
 {
+    /// <summary>
+    /// Base class for Oracle processors in FluentMigrator.
+    /// </summary>
     public class OracleProcessorBase : GenericProcessorBase
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OracleProcessorBase"/> class.
+        /// </summary>
+        /// <param name="databaseType">The database type name.</param>
+        /// <param name="factory">The Oracle database factory.</param>
+        /// <param name="generator">The migration generator.</param>
+        /// <param name="logger">The logger.</param>
+        /// <param name="options">The processor options.</param>
+        /// <param name="connectionStringAccessor">The connection string accessor.</param>
         protected OracleProcessorBase(
             [NotNull] string databaseType,
             [NotNull] OracleBaseDbFactory factory,
@@ -47,12 +59,18 @@ namespace FluentMigrator.Runner.Processors.Oracle
             DatabaseType = databaseType;
         }
 
+        /// <inheritdoc />
         public override string DatabaseType { get; }
 
+        /// <inheritdoc />
         public override IList<string> DatabaseTypeAliases { get; } = new List<string>() { ProcessorIdConstants.Oracle };
 
+        /// <summary>
+        /// Gets the quoter for Oracle SQL.
+        /// </summary>
         public IQuoter Quoter => ((OracleGenerator) Generator).Quoter;
 
+        /// <inheritdoc />
         public override bool SchemaExists(string schemaName)
         {
             if (schemaName == null)
@@ -68,6 +86,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
             return Exists("SELECT 1 FROM ALL_USERS WHERE USERNAME = '{0}'", schemaName.ToUpper());
         }
 
+        /// <inheritdoc />
         public override bool TableExists(string schemaName, string tableName)
         {
             if (tableName == null)
@@ -90,6 +109,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
                 schemaName.ToUpper(), FormatHelper.FormatSqlEscape(tableName.ToUpper()));
         }
 
+        /// <inheritdoc />
         public override bool ColumnExists(string schemaName, string tableName, string columnName)
         {
             if (tableName == null)
@@ -121,6 +141,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
                 FormatHelper.FormatSqlEscape(columnName.ToUpper()));
         }
 
+        /// <inheritdoc />
         public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
         {
             if (tableName == null)
@@ -151,6 +172,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
                 FormatHelper.FormatSqlEscape(constraintName.ToUpper()));
         }
 
+        /// <inheritdoc />
         public override bool IndexExists(string schemaName, string tableName, string indexName)
         {
             if (tableName == null)
@@ -180,6 +202,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
                 schemaName.ToUpper(), FormatHelper.FormatSqlEscape(indexName.ToUpper()));
         }
 
+        /// <inheritdoc />
         public override bool SequenceExists(string schemaName, string sequenceName)
         {
             if (string.IsNullOrEmpty(schemaName))
@@ -192,18 +215,47 @@ namespace FluentMigrator.Runner.Processors.Oracle
                 schemaName.ToUpper(), FormatHelper.FormatSqlEscape(sequenceName.ToUpper()));
         }
 
+        /// <inheritdoc />
         public override bool DefaultValueExists(string schemaName, string tableName, string columnName,
             object defaultValue)
         {
-            return false;
+            if (tableName == null)
+            {
+                throw new ArgumentNullException(nameof(tableName));
+            }
+
+            if (columnName == null)
+            {
+                throw new ArgumentNullException(nameof(columnName));
+            }
+
+            if (columnName.Length == 0 || tableName.Length == 0)
+            {
+                return false;
+            }
+
+            if (string.IsNullOrEmpty(schemaName))
+            {
+                return Exists(
+                    "SELECT 1 FROM USER_TAB_COLUMNS WHERE upper(TABLE_NAME) = '{0}' AND upper(COLUMN_NAME) = '{1}' AND DATA_DEFAULT IS NOT NULL",
+                    FormatHelper.FormatSqlEscape(tableName.ToUpper()),
+                    FormatHelper.FormatSqlEscape(columnName.ToUpper()));
+            }
+
+            return Exists(
+                "SELECT 1 FROM ALL_TAB_COLUMNS WHERE upper(OWNER) = '{0}' AND upper(TABLE_NAME) = '{1}' AND upper(COLUMN_NAME) = '{2}' AND DATA_DEFAULT IS NOT NULL",
+                schemaName.ToUpper(), FormatHelper.FormatSqlEscape(tableName.ToUpper()),
+                FormatHelper.FormatSqlEscape(columnName.ToUpper()));
         }
 
-        public override void Execute(string template, params object[] args)
+        /// <inheritdoc />
+        public override void Execute([StructuredMessageTemplate] string template, params object[] args)
         {
             Process(string.Format(template, args));
         }
 
-        public override bool Exists(string template, params object[] args)
+        /// <inheritdoc />
+        public override bool Exists([StructuredMessageTemplate] string template, params object[] args)
         {
             if (template == null)
             {
@@ -220,6 +272,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
             }
         }
 
+        /// <inheritdoc />
         public override DataSet ReadTableData(string schemaName, string tableName)
         {
             if (tableName == null)
@@ -235,7 +288,8 @@ namespace FluentMigrator.Runner.Processors.Oracle
             return Read("SELECT * FROM {0}.{1}", Quoter.QuoteSchemaName(schemaName), Quoter.QuoteTableName(tableName));
         }
 
-        public override DataSet Read(string template, params object[] args)
+        /// <inheritdoc />
+        public override DataSet Read([StructuredMessageTemplate] string template, params object[] args)
         {
             if (template == null)
             {
@@ -251,6 +305,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
             }
         }
 
+        /// <inheritdoc />
         public override void Process(PerformDBOperationExpression expression)
         {
             Logger.LogSay("Performing DB Operation");
@@ -265,6 +320,111 @@ namespace FluentMigrator.Runner.Processors.Oracle
             expression.Operation?.Invoke(Connection, Transaction);
         }
 
+        /// <summary>
+        /// Splits a SQL script into individual statements, taking into account Oracle-specific syntax rules.
+        /// <remarks>We could use <see cref="SqlBatchParser"/> but it does not handle multiple lines strings.</remarks>
+        /// </summary>
+        private static List<string> SplitOracleSqlStatements(string sqlScript)
+        {
+            var statements = new List<string>();
+            var currentStatement = new StringBuilder();
+            var inString = false;
+            var inIdentifier = false;
+            var inSingleLineComment = false;
+            var inMultiLineComment = false;
+            var prevChar = '\0';
+
+            foreach (var c in sqlScript)
+            {
+                if (inSingleLineComment)
+                {
+                    currentStatement.Append(c);
+                    if (c == '\n')
+                    {
+                        inSingleLineComment = false;
+                    }
+                    continue;
+                }
+
+                if (inMultiLineComment)
+                {
+                    currentStatement.Append(c);
+                    if (prevChar == '*' && c == '/')
+                    {
+                        inMultiLineComment = false;
+                    }
+                    prevChar = c;
+                    continue;
+                }
+
+                if (inString)
+                {
+                    currentStatement.Append(c);
+                    if (c == '\'' && prevChar != '\\')
+                    {
+                        inString = false;
+                    }
+                    prevChar = c;
+                    continue;
+                }
+
+                if (inIdentifier)
+                {
+                    currentStatement.Append(c);
+                    if (c == '"')
+                    {
+                        inIdentifier = false;
+                    }
+                    prevChar = c;
+                    continue;
+                }
+
+                switch (c)
+                {
+                    // Check for comment start
+                    case '-' when prevChar == '-':
+                        inSingleLineComment = true;
+                        currentStatement.Append(c);
+                        continue;
+                    case '*' when prevChar == '/':
+                        inMultiLineComment = true;
+                        currentStatement.Append(c);
+                        continue;
+                    // Check for string start
+                    case '\'':
+                        inString = true;
+                        currentStatement.Append(c);
+                        prevChar = c;
+                        continue;
+                    // Check for inIdentifier start
+                    case '"':
+                        inIdentifier = true;
+                        currentStatement.Append(c);
+                        prevChar = c;
+                        continue;
+                    // Check for statement terminator
+                    case ';':
+                        statements.Add(currentStatement.ToString().TrimEnd(';').Trim());
+                        currentStatement.Clear();
+                        prevChar = '\0';
+                        continue;
+                    default:
+                        currentStatement.Append(c);
+                        prevChar = c;
+                        break;
+                }
+            }
+
+            // Add any remaining content
+            if (currentStatement.Length > 0)
+            {
+                statements.Add(currentStatement.ToString());
+            }
+
+            return statements;
+        }
+
+        /// <inheritdoc />
         protected override void Process(string sql)
         {
             Logger.LogSql(sql);
@@ -276,9 +436,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
 
             EnsureConnectionIsOpen();
 
-            var batches = Regex.Split(sql, @"^\s*;\s*$", RegexOptions.Multiline)
-                .Select(x => x.Trim())
-                .Where(x => !string.IsNullOrEmpty(x));
+            var batches = SplitOracleSqlStatements(sql);
 
             foreach (var batch in batches)
             {

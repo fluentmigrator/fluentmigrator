@@ -32,6 +32,9 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Generators.SqlServer
 {
+    /// <summary>
+    /// The SQL Server 2008 SQL generator for FluentMigrator.
+    /// </summary>
     public class SqlServer2008Generator : SqlServer2005Generator
     {
         private static readonly HashSet<string> _supportedAdditionalFeatures = new HashSet<string>
@@ -39,17 +42,20 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             SqlServerExtensions.IndexColumnNullsDistinct,
         };
 
+        /// <inheritdoc />
         public SqlServer2008Generator()
             : this(new SqlServer2008Quoter())
         {
         }
 
+        /// <inheritdoc />
         public SqlServer2008Generator(
             [NotNull] SqlServer2008Quoter quoter)
             : this(quoter, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()))
         {
         }
 
+        /// <inheritdoc />
         public SqlServer2008Generator(
             [NotNull] SqlServer2008Quoter quoter,
             [NotNull] IOptions<GeneratorOptions> generatorOptions)
@@ -61,6 +67,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         {
         }
 
+        /// <inheritdoc />
         protected SqlServer2008Generator(
             [NotNull] IColumn column,
             [NotNull] IQuoter quoter,
@@ -77,6 +84,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         public override List<string> GeneratorIdAliases =>
             [GeneratorIdConstants.SqlServer2008, GeneratorIdConstants.SqlServer];
 
+        /// <inheritdoc />
         public override bool IsAdditionalFeatureSupported(string feature)
         {
             return _supportedAdditionalFeatures.Contains(feature)
@@ -106,6 +114,11 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             return baseFilter;
         }
 
+        /// <summary>
+        /// Gets the SQL fragment for "nulls distinct" columns in unique indexes.
+        /// </summary>
+        /// <param name="index">The index definition.</param>
+        /// <returns>The SQL fragment.</returns>
         protected string GetWithNullsDistinctString(IndexDefinition index)
         {
             bool? GetNullsDistinct(IndexColumnDefinition column)

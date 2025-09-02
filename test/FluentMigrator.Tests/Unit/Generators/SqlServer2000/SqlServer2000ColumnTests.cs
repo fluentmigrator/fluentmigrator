@@ -323,5 +323,41 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             var result = Generator.Generate(expression);
             result.ShouldBe("sp_rename N'[TestTable1].[TestColumn1]', N'TestColumn2';");
         }
+
+        [Test]
+        public override void CanCreateColumnWithComputedExpression()
+        {
+            var expression = GeneratorTestHelper.GetCreateColumnExpressionWithComputed();
+            
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestTable1] ADD [TestColumn1] AS (Price * Quantity) NOT NULL;");
+        }
+
+        [Test]
+        public override void CanCreateColumnWithStoredComputedExpression()
+        {
+            var expression = GeneratorTestHelper.GetCreateColumnExpressionWithStoredComputed();
+            
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestTable1] ADD [TestColumn1] AS (Price * Quantity) PERSISTED NOT NULL;");
+        }
+
+        [Test]
+        public override void CanAlterColumnToAddComputedExpression()
+        {
+            var expression = GeneratorTestHelper.GetAlterColumnExpressionWithComputed();
+            
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestTable1] ALTER COLUMN [TestColumn1] AS (Price * Quantity) NOT NULL;");
+        }
+
+        [Test]
+        public override void CanAlterColumnToAddStoredComputedExpression()
+        {
+            var expression = GeneratorTestHelper.GetAlterColumnExpressionWithStoredComputed();
+            
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestTable1] ALTER COLUMN [TestColumn1] AS (Price * Quantity) PERSISTED NOT NULL;");
+        }
     }
 }

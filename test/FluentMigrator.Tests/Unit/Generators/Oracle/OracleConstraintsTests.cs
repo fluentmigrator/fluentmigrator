@@ -468,7 +468,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
 
             var result = Generator.Generate(expression);
 
-            result.ShouldBe("ALTER TABLE USER.TestTable1 MODIFY TestColumn1 DEFAULT 1;");
+            result.ShouldBe("ALTER TABLE \"USER\".TestTable1 MODIFY TestColumn1 DEFAULT 1;");
         }
 
         [Test]
@@ -480,7 +480,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
 
             var result = Generator.Generate(expression);
 
-            result.ShouldBe("ALTER TABLE USER.TestTable1 MODIFY TestColumn1 DEFAULT '1';");
+            result.ShouldBe("ALTER TABLE \"USER\".TestTable1 MODIFY TestColumn1 DEFAULT '1';");
         }
 
         [Test]
@@ -492,7 +492,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
 
             var result = Generator.Generate(expression);
 
-            result.ShouldBe("ALTER TABLE USER.TestTable1 MODIFY TestColumn1 DEFAULT sys_guid();");
+            result.ShouldBe("ALTER TABLE \"USER\".TestTable1 MODIFY TestColumn1 DEFAULT sys_guid();");
         }
 
         [Test]
@@ -504,7 +504,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
 
             var result = Generator.Generate(expression);
 
-            result.ShouldBe("ALTER TABLE USER.TestTable1 MODIFY TestColumn1 DEFAULT LOCALTIMESTAMP;");
+            result.ShouldBe("ALTER TABLE \"USER\".TestTable1 MODIFY TestColumn1 DEFAULT LOCALTIMESTAMP;");
         }
 
         [Test]
@@ -516,7 +516,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
 
             var result = Generator.Generate(expression);
 
-            result.ShouldBe("ALTER TABLE USER.TestTable1 MODIFY TestColumn1 DEFAULT USER;");
+            result.ShouldBe("ALTER TABLE \"USER\".TestTable1 MODIFY TestColumn1 DEFAULT USER;");
         }
 
         [Test]
@@ -537,7 +537,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
 
             var result = Generator.Generate(expression);
 
-            result.ShouldBe("ALTER TABLE USER.TestTable1 MODIFY TestColumn1 DEFAULT NULL;");
+            result.ShouldBe("ALTER TABLE \"USER\".TestTable1 MODIFY TestColumn1 DEFAULT NULL;");
         }
     }
 }

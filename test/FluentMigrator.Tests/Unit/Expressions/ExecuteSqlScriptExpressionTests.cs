@@ -87,6 +87,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
 
         [Test]
         [Category("NotWorkingOnMono")]
+        [Platform(Exclude = "Linux,Mono", Reason = "Linux does not support different drives")]
         public void CanUseScriptsOnAnotherDriveToWorkingDirectory()
         {
             var scriptOnAnotherDrive = "z" + Path.VolumeSeparatorChar + Path.DirectorySeparatorChar + testSqlScript;

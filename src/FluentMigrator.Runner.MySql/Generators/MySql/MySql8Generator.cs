@@ -29,19 +29,25 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Generators.MySql
 {
+    /// <summary>
+    /// The MySQL 8 SQL generator for FluentMigrator.
+    /// </summary>
     public class MySql8Generator : MySql5Generator
     {
+        /// <inheritdoc />
         public MySql8Generator()
             : this(new MySqlQuoter())
         {
         }
 
+        /// <inheritdoc />
         public MySql8Generator(
             [NotNull] MySqlQuoter quoter)
             : this(quoter, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()))
         {
         }
 
+        /// <inheritdoc />
         public MySql8Generator(
             [NotNull] MySqlQuoter quoter,
             [NotNull] IMySqlTypeMap typeMap)
@@ -49,6 +55,7 @@ namespace FluentMigrator.Runner.Generators.MySql
         {
         }
 
+        /// <inheritdoc />
         public MySql8Generator(
             [NotNull] MySqlQuoter quoter,
             [NotNull] IOptions<GeneratorOptions> generatorOptions)
@@ -60,6 +67,7 @@ namespace FluentMigrator.Runner.Generators.MySql
         {
         }
 
+        /// <inheritdoc />
         public MySql8Generator(
             [NotNull] MySqlQuoter quoter,
             [NotNull] IMySqlTypeMap typeMap,
@@ -68,6 +76,7 @@ namespace FluentMigrator.Runner.Generators.MySql
         {
         }
 
+        /// <inheritdoc />
         protected MySql8Generator(
             [NotNull] IColumn column,
             [NotNull] IQuoter quoter,
@@ -77,6 +86,7 @@ namespace FluentMigrator.Runner.Generators.MySql
         {
         }
 
+        /// <inheritdoc />
         public override string Generate(CreateIndexExpression expression)
         {
             var query = new StringBuilder("CREATE");
@@ -94,7 +104,6 @@ namespace FluentMigrator.Runner.Generators.MySql
                 indexMethod == IndexType.BTree ? string.Empty : $" USING {indexMethod.ToString().ToUpperInvariant()}",
                 Quoter.QuoteTableName(expression.Index.TableName, expression.Index.SchemaName)
             );
-
 
             query.Append(" (");
             var first = true;
@@ -135,7 +144,11 @@ namespace FluentMigrator.Runner.Generators.MySql
             GeneratorIdConstants.MySql8, GeneratorIdConstants.MySql, GeneratorIdConstants.MariaDB
         ];
 
-
+        /// <summary>
+        /// Gets the index type for the given index expression.
+        /// </summary>
+        /// <param name="expression">The index expression.</param>
+        /// <returns>The index type.</returns>
         protected virtual IndexType GetIndexType(CreateIndexExpression expression)
         {
             var algorithm =
@@ -147,6 +160,8 @@ namespace FluentMigrator.Runner.Generators.MySql
 
             return algorithm.IndexType;
         }
+
+        /// <inheritdoc />
         public override string Generate(RenameColumnExpression expression)
         {
             return FormatStatement(RenameColumn, Quoter.QuoteTableName(expression.TableName), Quoter.QuoteColumnName(expression.OldName), Quoter.QuoteColumnName(expression.NewName));

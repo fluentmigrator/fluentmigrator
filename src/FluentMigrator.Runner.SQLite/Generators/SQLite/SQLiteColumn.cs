@@ -113,5 +113,11 @@ namespace FluentMigrator.Runner.Generators.SQLite
             var pkColDefs = primaryKeyColumns.ToList();
             return !pkColDefs.Any(x => x.IsIdentity) && pkColDefs.Any(x => x.IsPrimaryKey);
         }
+
+        /// <inheritdoc />
+        protected override string FormatExpression(ColumnDefinition column)
+        {
+            return column.Expression == null ? null : $"GENERATED ALWAYS AS ({column.Expression}){(column.ExpressionStored ? " STORED" : " VIRTUAL")}";
+        }
     }
 }

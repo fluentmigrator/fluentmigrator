@@ -24,19 +24,25 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Generators.MySql
 {
+    /// <summary>
+    /// The MySQL 5 SQL generator for FluentMigrator.
+    /// </summary>
     public class MySql5Generator : MySql4Generator
     {
+        /// <inheritdoc />
         public MySql5Generator()
             : this(new MySqlQuoter())
         {
         }
 
+        /// <inheritdoc />
         public MySql5Generator(
             [NotNull] MySqlQuoter quoter)
             : this(quoter, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()))
         {
         }
 
+        /// <inheritdoc />
         public MySql5Generator(
             [NotNull] MySqlQuoter quoter,
             [NotNull] IMySqlTypeMap typeMap)
@@ -44,6 +50,7 @@ namespace FluentMigrator.Runner.Generators.MySql
         {
         }
 
+        /// <inheritdoc />
         public MySql5Generator(
             [NotNull] MySqlQuoter quoter,
             [NotNull] IOptions<GeneratorOptions> generatorOptions)
@@ -51,6 +58,7 @@ namespace FluentMigrator.Runner.Generators.MySql
         {
         }
 
+        /// <inheritdoc />
         public MySql5Generator(
             [NotNull] MySqlQuoter quoter,
             [NotNull] IMySqlTypeMap typeMap,
@@ -59,6 +67,7 @@ namespace FluentMigrator.Runner.Generators.MySql
         {
         }
 
+        /// <inheritdoc />
         protected MySql5Generator(
             [NotNull] IColumn column,
             [NotNull] IQuoter quoter,
