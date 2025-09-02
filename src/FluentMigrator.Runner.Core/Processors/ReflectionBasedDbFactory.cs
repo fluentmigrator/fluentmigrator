@@ -90,6 +90,30 @@ namespace FluentMigrator.Runner.Processors
             throw new AggregateException($"Unable to load the driver. Attempted to load: {assemblyNames}, with {fullExceptionOutput}", exceptions);
         }
 
+        /// <summary>
+        /// Attempts to create a <see cref="DbProviderFactory"/> instance by iterating through the provided test entries.
+        /// </summary>
+        /// <param name="entries">
+        /// A collection of <see cref="TestEntry"/> objects that specify the assembly and type information
+        /// required to create the <see cref="DbProviderFactory"/>.
+        /// </param>
+        /// <param name="exceptions">
+        /// A collection to which any exceptions encountered during the creation process will be added.
+        /// </param>
+        /// <param name="factory">
+        /// When this method returns, contains the created <see cref="DbProviderFactory"/> instance if the operation succeeded;
+        /// otherwise, <see langword="null"/>.
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> if a <see cref="DbProviderFactory"/> was successfully created; otherwise, <see langword="false"/>.
+        /// </returns>
+        /// <remarks>
+        /// This method is marked as <see cref="ObsoleteAttribute"/> and may be removed in future versions.
+        /// It is recommended to use the overload that includes the <see cref="IServiceProvider"/> parameter for better extensibility.
+        /// </remarks>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="entries"/> or <paramref name="exceptions"/> is <see langword="null"/>.
+        /// </exception>
         [Obsolete]
         protected static bool TryCreateFactory(
             [NotNull, ItemNotNull] IEnumerable<TestEntry> entries,
@@ -218,6 +242,27 @@ namespace FluentMigrator.Runner.Processors
             return false;
         }
 
+        /// <summary>
+        /// Attempts to create a <see cref="DbProviderFactory"/> instance using the runtime host.
+        /// </summary>
+        /// <param name="entry">
+        /// The <see cref="TestEntry"/> containing the assembly name and provider factory type name
+        /// required to create the factory.
+        /// </param>
+        /// <param name="exceptions">
+        /// A collection to which any exceptions encountered during the creation process will be added.
+        /// </param>
+        /// <param name="factory">
+        /// When this method returns, contains the created <see cref="DbProviderFactory"/> instance if
+        /// the creation was successful; otherwise, <c>null</c>.
+        /// </param>
+        /// <returns>
+        /// <c>true</c> if the factory was successfully created; otherwise, <c>false</c>.
+        /// </returns>
+        /// <remarks>
+        /// This method is marked as <see cref="ObsoleteAttribute"/> and may be removed in future versions.
+        /// It attempts to dynamically load the required assembly and type from the runtime host.
+        /// </remarks>
         [Obsolete]
         protected static bool TryCreateFactoryFromRuntimeHost(
             [NotNull] TestEntry entry,

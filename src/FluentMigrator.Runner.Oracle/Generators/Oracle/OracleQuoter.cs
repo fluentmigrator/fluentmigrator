@@ -51,6 +51,11 @@ namespace FluentMigrator.Runner.Generators.Oracle
             },
             StringComparer.OrdinalIgnoreCase);
 
+        /// <summary>
+        /// Determines whether the specified name should be quoted for Oracle SQL.
+        /// </summary>
+        /// <param name="name">The identifier name to check.</param>
+        /// <returns><c>true</c> if the name should be quoted; otherwise, <c>false</c>.</returns>
         /// <inheritdoc />
         [ContractAnnotation("name:null => false")]
         protected override bool ShouldQuote(string name)

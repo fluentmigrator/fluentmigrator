@@ -107,15 +107,47 @@ namespace FluentMigrator.Runner.Processors
         /// </exception>
         protected abstract DbProviderFactory CreateFactory();
 
+        /// <summary>
+        /// Creates a new database connection using the specified connection string.
+        /// </summary>
+        /// <param name="connectionString">The connection string used to establish the database connection.</param>
+        /// <returns>An <see cref="IDbConnection"/> instance representing the database connection.</returns>
+        /// <remarks>
+        /// This method utilizes the <see cref="Factory"/> property to create the connection.
+        /// Ensure that the <see cref="Factory"/> is properly initialized before calling this method.
+        /// </remarks>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown if the <see cref="Factory"/> fails to create a connection.
+        /// </exception>
+        /// <seealso cref="IDbFactory.CreateConnection(string)"/>
         [Obsolete]
         public IDbConnection CreateConnection(string connectionString)
         {
             var connection = Factory.CreateConnection();
             Debug.Assert(connection != null, nameof(connection) + " != null");
-            connection.ConnectionString = connectionString;
+            connection!.ConnectionString = connectionString;
             return connection;
         }
 
+        /// <summary>
+        /// Creates a new database command using the specified command text, connection, transaction, and options.
+        /// </summary>
+        /// <param name="commandText">The SQL command text to be executed.</param>
+        /// <param name="connection">The database connection to associate with the command.</param>
+        /// <param name="transaction">The database transaction to associate with the command, if any.</param>
+        /// <param name="options">The migration processor options, including timeout settings.</param>
+        /// <returns>An <see cref="IDbCommand"/> instance representing the database command.</returns>
+        /// <remarks>
+        /// This method initializes a new command using the provided connection and sets its properties
+        /// such as <see cref="IDbCommand.CommandText"/>, <see cref="IDbCommand.CommandTimeout"/>, and
+        /// <see cref="IDbCommand.Transaction"/> based on the given parameters.
+        /// </remarks>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="connection"/> is <c>null</c>.
+        /// </exception>
+        /// <seealso cref="IDbConnection"/>
+        /// <seealso cref="IDbTransaction"/>
+        /// <seealso cref="IMigrationProcessorOptions"/>
         [Obsolete]
         public virtual IDbCommand CreateCommand(string commandText, IDbConnection connection, IDbTransaction transaction, IMigrationProcessorOptions options)
         {

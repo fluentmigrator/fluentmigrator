@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2018, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -43,6 +43,14 @@ namespace FluentMigrator.Runner.BatchParser.SpecialTokenSearchers
             return new SpecialTokenInfo(0, reader.Line.Length, token, parameters);
         }
 
+        /// <summary>
+        /// Extracts the count value from a "GO n" or "GO" token in the provided SQL string.
+        /// </summary>
+        /// <param name="sql">The SQL string containing the "GO" token.</param>
+        /// <returns>
+        /// The count value specified in the "GO n" token, or <c>1</c> if no count is specified.
+        /// Returns <c>null</c> if the input string does not match the expected "GO" token format.
+        /// </returns>
         public static int? GetGoCount(string sql)
         {
             var match = _regex.Match(sql);

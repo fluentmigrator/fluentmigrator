@@ -21,6 +21,13 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Model
 {
+    /// <summary>
+    /// Represents the definition of a PostgreSQL index with the ability to specify whether it should be created concurrently.
+    /// </summary>
+    /// <remarks>
+    /// This class is used to define the "CONCURRENTLY" option for PostgreSQL index creation, which allows the index to be created without locking the table.
+    /// It implements <see cref="ICloneable"/> to allow cloning of its instances.
+    /// </remarks>
     public class PostgresIndexConcurrentlyDefinition
         : ICloneable
     {

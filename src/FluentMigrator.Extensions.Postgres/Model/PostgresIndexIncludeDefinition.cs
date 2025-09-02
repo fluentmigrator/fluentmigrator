@@ -22,6 +22,14 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Model
 {
+    /// <summary>
+    /// Represents a definition for an included column in a PostgreSQL index.
+    /// </summary>
+    /// <remarks>
+    /// This class is used to specify additional columns to include in a PostgreSQL index.
+    /// It implements <see cref="ICloneable"/> for creating shallow copies and
+    /// <see cref="IValidatableObject"/> for validating its properties.
+    /// </remarks>
     public class PostgresIndexIncludeDefinition
         : ICloneable,
             IValidatableObject
