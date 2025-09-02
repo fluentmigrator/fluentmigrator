@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2021, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,6 +22,14 @@ using JetBrains.Annotations;
 
 namespace FluentMigrator.Builder.Create.Index
 {
+    /// <summary>
+    /// Provides a fluent interface for configuring BRIN (Block Range INdex) index options in PostgreSQL.
+    /// </summary>
+    /// <remarks>
+    /// This class extends <see cref="AbstractCreateIndexMethodOptionsSyntax"/> and implements
+    /// <see cref="ICreateBrinIndexOptionsSyntax"/> to allow configuration of BRIN-specific options such as
+    /// fill factor, pages per range, and auto-summarization.
+    /// </remarks>
     public class CreateBrinIndexOptionsSyntax : AbstractCreateIndexMethodOptionsSyntax, ICreateBrinIndexOptionsSyntax
     {
         /// <inheritdoc />
@@ -31,6 +39,13 @@ namespace FluentMigrator.Builder.Create.Index
         }
 
 
+        /// <summary>
+        /// Represents the key used to configure the number of pages per range for a BRIN (Block Range INdex) in PostgreSQL.
+        /// </summary>
+        /// <remarks>
+        /// This constant is utilized as a key for the <see cref="ISupportAdditionalFeatures.AdditionalFeatures"/> dictionary
+        /// to specify the number of pages per range when creating a BRIN index.
+        /// </remarks>
         public const string IndexPagesPerRange = "PostgresBrinPagesPerRange";
 
         /// <inheritdoc />
@@ -60,6 +75,13 @@ namespace FluentMigrator.Builder.Create.Index
             return Autosummarize(false);
         }
 
+        /// <summary>
+        /// Represents the key used to configure the auto-summarization feature for a BRIN (Block Range INdex) in PostgreSQL.
+        /// </summary>
+        /// <remarks>
+        /// This constant is utilized as a key for the <see cref="ISupportAdditionalFeatures.AdditionalFeatures"/> dictionary
+        /// to enable or disable the auto-summarization feature when creating a BRIN index.
+        /// </remarks>
         public const string IndexAutosummarize = "PostgresBrinautosummarize";
 
         /// <inheritdoc />

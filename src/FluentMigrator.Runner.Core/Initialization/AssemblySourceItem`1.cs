@@ -23,6 +23,10 @@ using JetBrains.Annotations;
 
 namespace FluentMigrator.Runner.Initialization
 {
+    /// <summary>
+    /// Represents a source of assemblies that provides types implementing the interface of type <typeparamref name="T"/>.
+    /// </summary>
+    /// <typeparam name="T">The type of the interface to implement.</typeparam>
     public class AssemblySourceItem<T> : ITypeSourceItem<T>
         where T : class
     {

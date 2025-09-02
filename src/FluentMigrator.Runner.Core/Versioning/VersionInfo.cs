@@ -21,25 +21,38 @@ using System.Linq;
 
 namespace FluentMigrator.Runner.Versioning
 {
+    /// <summary>
+    /// Represents the versioning information for migrations, providing functionality
+    /// to query and update the applied migration versions.
+    /// </summary>
+    /// <remarks>
+    /// This class implements the <see cref="IVersionInfo"/> interface, allowing
+    /// management of migration versions, including retrieving the latest version,
+    /// adding applied migrations, and checking for specific applied migrations.
+    /// </remarks>
     public class VersionInfo : IVersionInfo
     {
         private IList<long> _versionsApplied = new List<long>();
 
+        /// <inheritdoc />
         public long Latest()
         {
             return _versionsApplied.OrderByDescending(x => x).FirstOrDefault();
         }
 
+        /// <inheritdoc />
         public void AddAppliedMigration(long migration)
         {
             _versionsApplied.Add(migration);
         }
 
+        /// <inheritdoc />
         public bool HasAppliedMigration(long migration)
         {
             return _versionsApplied.Contains(migration);
         }
 
+        /// <inheritdoc />
         public IEnumerable<long> AppliedMigrations()
         {
             return _versionsApplied.OrderByDescending(x => x).AsEnumerable();

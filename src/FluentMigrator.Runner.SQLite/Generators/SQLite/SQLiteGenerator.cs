@@ -30,20 +30,26 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Generators.SQLite
 {
+    /// <summary>
+    /// The SQLite SQL generator for FluentMigrator.
+    /// </summary>
     // ReSharper disable once InconsistentNaming
     public class SQLiteGenerator : GenericGenerator
     {
+        /// <inheritdoc />
         public SQLiteGenerator()
             : this(new SQLiteQuoter())
         {
         }
 
+        /// <inheritdoc />
         public SQLiteGenerator(
             [NotNull] SQLiteQuoter quoter)
             : this(quoter, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()))
         {
         }
 
+        /// <inheritdoc />
         public SQLiteGenerator(
             [NotNull] SQLiteQuoter quoter,
             [NotNull] ISQLiteTypeMap typeMap)
@@ -52,6 +58,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
 
         }
 
+        /// <inheritdoc />
         public SQLiteGenerator(
             [NotNull] SQLiteQuoter quoter,
             [NotNull] IOptions<GeneratorOptions> generatorOptions)
@@ -60,6 +67,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
         {
         }
 
+        /// <inheritdoc />
         public SQLiteGenerator(
             [NotNull] SQLiteQuoter quoter,
             [NotNull] ISQLiteTypeMap typeMap,
@@ -69,6 +77,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
             CompatibilityMode = generatorOptions.Value.CompatibilityMode ?? CompatibilityMode.STRICT;
         }
 
+        /// <inheritdoc />
         public override string RenameTable => "ALTER TABLE {0} RENAME TO {1}";
 
         /// <inheritdoc />
@@ -77,16 +86,19 @@ namespace FluentMigrator.Runner.Generators.SQLite
         /// <inheritdoc />
         public override List<string> GeneratorIdAliases => new List<string> { GeneratorIdConstants.SQLite };
 
+        /// <inheritdoc />
         public override string Generate(AlterColumnExpression expression)
         {
             return CompatibilityMode.HandleCompatibility("SQLite does not support alter column");
         }
 
+        /// <inheritdoc />
         public override string Generate(AlterDefaultConstraintExpression expression)
         {
             return CompatibilityMode.HandleCompatibility("SQLite does not support altering of default constraints");
         }
 
+        /// <inheritdoc />
         public override string Generate(CreateForeignKeyExpression expression)
         {
             // If a FK name starts with $$IGNORE$$_ then it means it was handled by the CREATE TABLE
@@ -97,26 +109,31 @@ namespace FluentMigrator.Runner.Generators.SQLite
             return CompatibilityMode.HandleCompatibility("Foreign keys are not supported in SQLite");
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteForeignKeyExpression expression)
         {
             return CompatibilityMode.HandleCompatibility("Foreign keys are not supported in SQLite");
         }
 
+        /// <inheritdoc />
         public override string Generate(CreateSequenceExpression expression)
         {
             return CompatibilityMode.HandleCompatibility("Sequences are not supported in SQLite");
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteSequenceExpression expression)
         {
             return CompatibilityMode.HandleCompatibility("Sequences are not supported in SQLite");
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteDefaultConstraintExpression expression)
         {
             return CompatibilityMode.HandleCompatibility("Default constraints are not supported in SQLite");
         }
 
+        /// <inheritdoc />
         public override string Generate(CreateConstraintExpression expression)
         {
             if (!(expression.Constraint.IsUniqueConstraint || expression.Constraint.IsPrimaryKeyConstraint))
@@ -142,6 +159,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
             return base.Generate(expression);
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteConstraintExpression expression)
         {
             if (!expression.Constraint.IsUniqueConstraint)
@@ -155,6 +173,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
             return Generate(idx);
         }
 
+        /// <inheritdoc />
         public override string Generate(CreateIndexExpression expression)
         {
             // SQLite prefixes the index name, rather than the table name with the schema
@@ -183,6 +202,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
                 , string.Join(", ", indexColumns));
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteIndexExpression expression)
         {
             // SQLite prefixes the index name, rather than the table name with the schema

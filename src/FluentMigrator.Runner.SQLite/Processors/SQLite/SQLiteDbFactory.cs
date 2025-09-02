@@ -21,6 +21,13 @@ using System;
 namespace FluentMigrator.Runner.Processors.SQLite
 {
     // ReSharper disable once InconsistentNaming
+    /// <summary>
+    /// Represents a factory for creating SQLite database-related components.
+    /// </summary>
+    /// <remarks>
+    /// This class extends <see cref="FluentMigrator.Runner.Processors.ReflectionBasedDbFactory"/> 
+    /// to provide SQLite-specific database factory functionality.
+    /// </remarks>
     public class SQLiteDbFactory : ReflectionBasedDbFactory
     {
         private static readonly TestEntry[] _testEntries =
@@ -30,6 +37,16 @@ namespace FluentMigrator.Runner.Processors.SQLite
             new TestEntry("Mono.Data.Sqlite, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756", "Mono.Data.Sqlite.SqliteFactory"),
         };
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SQLiteDbFactory"/> class.
+        /// </summary>
+        /// <param name="serviceProvider">
+        /// The service provider used to resolve dependencies required by the factory.
+        /// </param>
+        /// <remarks>
+        /// This constructor passes SQLite-specific test entries to the base class
+        /// <see cref="FluentMigrator.Runner.Processors.ReflectionBasedDbFactory"/>.
+        /// </remarks>
         public SQLiteDbFactory(IServiceProvider serviceProvider)
             : base(serviceProvider, _testEntries)
         {

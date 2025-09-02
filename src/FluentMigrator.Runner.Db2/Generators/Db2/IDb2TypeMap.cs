@@ -16,5 +16,13 @@
 
 namespace FluentMigrator.Runner.Generators.DB2
 {
+    /// <summary>
+    /// Represents a specialized type map for DB2 databases, providing mappings between 
+    /// <see cref="System.Data.DbType"/> and corresponding DB2 SQL data types.
+    /// </summary>
+    /// <remarks>
+    /// This interface extends <see cref="FluentMigrator.Runner.Generators.ITypeMap"/> 
+    /// to include DB2-specific type mapping functionality.
+    /// </remarks>
     public interface IDb2TypeMap : ITypeMap { }
 }

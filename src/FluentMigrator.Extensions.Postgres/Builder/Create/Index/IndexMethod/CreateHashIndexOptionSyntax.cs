@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2021, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,6 +20,14 @@ using JetBrains.Annotations;
 
 namespace FluentMigrator.Builder.Create.Index
 {
+    /// <summary>
+    /// Provides syntax for configuring hash index options during the creation of an index.
+    /// </summary>
+    /// <remarks>
+    /// This class extends <see cref="AbstractCreateIndexMethodOptionsSyntax"/> and implements
+    /// <see cref="ICreateHashIndexOptionSyntax"/> to support fluent configuration of hash index options,
+    /// such as setting the fill factor.
+    /// </remarks>
     public class CreateHashIndexOptionSyntax : AbstractCreateIndexMethodOptionsSyntax, ICreateHashIndexOptionSyntax
     {
         /// <inheritdoc />

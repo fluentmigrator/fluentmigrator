@@ -21,6 +21,14 @@ using System.Text.RegularExpressions;
 
 namespace FluentMigrator.Runner.Processors.Postgres
 {
+    /// <summary>
+    /// Represents configuration options for the PostgreSQL database processor.
+    /// </summary>
+    /// <remarks>
+    /// This class provides settings that influence the behavior of PostgreSQL database processing,
+    /// such as whether to force quoting of identifiers. It also includes functionality to parse
+    /// provider-specific switches into configuration options.
+    /// </remarks>
     public class PostgresOptions : ICloneable
     {
         /// <summary>
@@ -28,6 +36,21 @@ namespace FluentMigrator.Runner.Processors.Postgres
         /// </summary>
         public bool ForceQuote { get; set; } = true;
 
+        /// <summary>
+        /// Parses provider-specific switches into a <see cref="PostgresOptions"/> instance.
+        /// </summary>
+        /// <param name="providerSwitches">
+        /// A string containing key-value pairs of provider-specific options, separated by spaces.
+        /// Each key-value pair should be in the format <c>key=value</c>.
+        /// </param>
+        /// <returns>
+        /// A new instance of <see cref="PostgresOptions"/> configured based on the parsed switches.
+        /// </returns>
+        /// <remarks>
+        /// This method processes the provided switches to configure options such as 
+        /// <see cref="PostgresOptions.ForceQuote"/>. If a switch is not recognized or cannot be parsed, 
+        /// it is ignored.
+        /// </remarks>
         public static PostgresOptions ParseProviderSwitches(string providerSwitches)
         {
             var retval = new PostgresOptions();

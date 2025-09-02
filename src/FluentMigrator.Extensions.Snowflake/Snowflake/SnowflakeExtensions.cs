@@ -18,9 +18,32 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Snowflake
 {
+    /// <summary>
+    /// Provides extension methods and constants for working with Snowflake-specific features in FluentMigrator.
+    /// </summary>
+    /// <remarks>
+    /// This class includes predefined constants for Snowflake identity column configurations, such as 
+    /// <see cref="IdentitySeed"/> and <see cref="IdentityIncrement"/>, which can be used to specify the 
+    /// seed and increment values for identity columns in Snowflake.
+    /// </remarks>
     public static partial class SnowflakeExtensions
     {
+        /// <summary>
+        /// Represents the key used to specify the seed value for an identity column in Snowflake.
+        /// </summary>
+        /// <remarks>
+        /// This constant is utilized in conjunction with the <see cref="ISupportAdditionalFeatures"/> interface
+        /// to define the starting value of an identity column when creating or modifying tables in Snowflake.
+        /// </remarks>
         public static readonly string IdentitySeed = "SnowflakeIdentitySeed";
+        /// <summary>
+        /// Represents the predefined constant for specifying the increment value of an identity column
+        /// in Snowflake when using FluentMigrator.
+        /// </summary>
+        /// <remarks>
+        /// This constant is used as a key in the <see cref="FluentMigrator.Model.ColumnDefinition.AdditionalFeatures"/> 
+        /// dictionary to define the increment value for Snowflake identity columns.
+        /// </remarks>
         public static readonly string IdentityIncrement = "SnowflakeIdentityIncrement";
 
         private static string UnsupportedMethodMessage(object methodName, string interfaceName)

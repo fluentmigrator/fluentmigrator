@@ -21,46 +21,60 @@ using System.Collections.Generic;
 
 namespace FluentMigrator.Runner.Announcers
 {
+    /// <summary>
+    /// An announcer that delegates to multiple <see cref="IAnnouncer"/> instances.
+    /// </summary>
     [Obsolete]
     public class CompositeAnnouncer : IAnnouncer
     {
+        /// <inheritdoc />
         public CompositeAnnouncer(params IAnnouncer[] announcers)
         {
             Announcers = announcers ?? new IAnnouncer[0];
         }
 
+        /// <summary>
+        /// Gets the collection of announcers.
+        /// </summary>
         public IEnumerable<IAnnouncer> Announcers { get; }
 
+        /// <inheritdoc />
         public void Heading(string message)
         {
             Each(a => a.Heading(message));
         }
 
+        /// <inheritdoc />
         public void Say(string message)
         {
             Each(a => a.Say(message));
         }
 
+        /// <inheritdoc />
         public void Emphasize(string message)
         {
             Each(a => a.Emphasize(message));
         }
 
+        /// <inheritdoc />
         public void Sql(string sql)
         {
             Each(a => a.Sql(sql));
         }
 
+        /// <inheritdoc />
         public void ElapsedTime(TimeSpan timeSpan)
         {
             Each(a => a.ElapsedTime(timeSpan));
         }
 
+        /// <inheritdoc />
         public void Error(string message)
         {
             Each(a => a.Error(message));
         }
 
+        /// <inheritdoc />
         public void Error(Exception exception)
         {
             while (exception != null)
@@ -70,6 +84,7 @@ namespace FluentMigrator.Runner.Announcers
             }
         }
 
+        /// <inheritdoc />
         [Obsolete]
         public void Write(string message, bool isNotSql)
         {

@@ -14,10 +14,23 @@
 // limitations under the License.
 #endregion
 
+using System;
+
 using FluentMigrator.Runner.Generators.Base;
 
 namespace FluentMigrator.Runner.Generators
 {
+    /// <summary>
+    /// Provides extension methods for working with migration generators in FluentMigrator.
+    /// </summary>
+    /// <remarks>
+    /// This class contains utility methods to simplify interactions with implementations of the
+    /// <see cref="IMigrationGenerator"/> interface, such as retrieving the associated <see cref="IQuoter"/>.
+    ///
+    /// This is particularly useful because the <see cref="IMigrationGenerator"/> interface does not expose the
+    ///  <see cref="IQuoter"/> property directly. This will be addressed in a future major release.
+    /// </remarks>
+    [Obsolete]
     public static class GeneratorExtensions
     {
         /// <summary>
@@ -29,6 +42,7 @@ namespace FluentMigrator.Runner.Generators
         /// not the case, there is no way to get the <see cref="IQuoter"/> so this method will return
         /// <see langword="null"/>.
         /// </remarks>
+        [Obsolete]
         public static IQuoter GetQuoter(this IMigrationGenerator generator)
         {
             // Safe cast to GenericGenerator since IMigrationGenerator does not expose the quoter

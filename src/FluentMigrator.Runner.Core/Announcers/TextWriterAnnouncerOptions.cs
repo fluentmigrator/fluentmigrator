@@ -19,9 +19,21 @@ using System.Diagnostics;
 
 namespace FluentMigrator.Runner.Announcers
 {
+    /// <summary>
+    /// Provides configuration options for the <see cref="TextWriterAnnouncer"/>.
+    /// </summary>
+    /// <remarks>
+    /// This class is marked as <see cref="ObsoleteAttribute"/> and may be removed in future versions.
+    /// </remarks>
     [Obsolete]
     public class TextWriterAnnouncerOptions : AnnouncerOptions
     {
+        /// <summary>
+        /// Gets or sets the delegate used to handle the writing of messages.
+        /// </summary>
+        /// <remarks>
+        /// By default, this property is initialized to a handler that writes messages to the debug output.
+        /// </remarks>
         public Action<string> WriteDelegate { get; set; } = DefaultWriteHandler;
 
         private static void DefaultWriteHandler(string line)

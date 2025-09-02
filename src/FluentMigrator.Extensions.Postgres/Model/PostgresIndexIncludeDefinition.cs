@@ -22,13 +22,34 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Model
 {
+    /// <summary>
+    /// Represents a definition for an included column in a PostgreSQL index.
+    /// </summary>
+    /// <remarks>
+    /// This class is used to specify additional columns to include in a PostgreSQL index.
+    /// It implements <see cref="ICloneable"/> for creating shallow copies and
+    /// <see cref="IValidatableObject"/> for validating its properties.
+    /// </remarks>
     public class PostgresIndexIncludeDefinition
         : ICloneable,
             IValidatableObject
     {
+        /// <summary>
+        /// Gets or sets the name of the column to be included in the PostgreSQL index.
+        /// </summary>
+        /// <value>
+        /// The name of the included column. This value must not be null, empty, or consist only of whitespace.
+        /// </value>
+        /// <remarks>
+        /// This property is required and is validated to ensure it is not null or empty.
+        /// </remarks>
+        /// <exception cref="ValidationException">
+        /// Thrown when the value is null, empty, or consists only of whitespace.
+        /// </exception>
         [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.IndexIncludeColumnNameMustNotBeNullOrEmpty))]
         public virtual string Name { get; set; }
 
+        /// <inheritdoc />
         public object Clone()
         {
             return MemberwiseClone();

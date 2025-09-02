@@ -28,27 +28,39 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.VersionTableInfo
 {
+    /// <summary>
+    /// Provides default version table metadata for tracking migrations.
+    /// </summary>
     public class DefaultVersionTableMetaData : IVersionTableMetaData, ISchemaExpression
     {
+        /// <inheritdoc />
         public DefaultVersionTableMetaData(IConventionSet conventionSet, IOptions<RunnerOptions> runnerOptions)
         {
             conventionSet.SchemaConvention?.Apply(this);
         }
 
+        /// <inheritdoc />
         public virtual string SchemaName { get; set; }
 
+        /// <inheritdoc />
         public virtual string TableName => "VersionInfo";
 
+        /// <inheritdoc />
         public virtual string ColumnName => "Version";
 
+        /// <inheritdoc />
         public virtual string UniqueIndexName => "UC_Version";
 
+        /// <inheritdoc />
         public virtual string AppliedOnColumnName => "AppliedOn";
 
+        /// <inheritdoc />
         public bool CreateWithPrimaryKey => false;
 
+        /// <inheritdoc />
         public virtual string DescriptionColumnName => "Description";
 
+        /// <inheritdoc />
         public virtual bool OwnsSchema => true;
     }
 }

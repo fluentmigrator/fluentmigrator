@@ -23,6 +23,9 @@ namespace FluentMigrator.Runner
     /// </summary>
     public static class RunnerEventIds
     {
+        /// <summary>
+        /// Represents the category name used for logging events in the FluentMigrator runner.
+        /// </summary>
         public const string RunnerCategory = "FluentMigrator.Runner";
 
         /// <summary>

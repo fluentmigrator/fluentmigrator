@@ -18,17 +18,58 @@ using System;
 
 namespace FluentMigrator.Runner
 {
+    /// <summary>
+    /// Represents an interface for logging and announcing messages during migrations.
+    /// </summary>
+    /// <remarks>
+    /// This interface is marked as <see cref="ObsoleteAttribute"/> and may be removed in future versions.
+    /// Implementations of this interface are used to log messages, errors, SQL statements, and other information
+    /// during the execution of database migrations.
+    /// </remarks>
     [Obsolete]
     public interface IAnnouncer
     {
+        /// <summary>
+        /// Logs a heading message.
+        /// </summary>
+        /// <param name="message"></param>
         void Heading(string message);
+        /// <summary>
+        /// Logs a regular message.
+        /// </summary>
+        /// <param name="message"></param>
         void Say(string message);
+        /// <summary>
+        /// Logs an emphasized message.
+        /// </summary>
+        /// <param name="message"></param>
         void Emphasize(string message);
+        /// <summary>
+        /// Logs a SQL message.
+        /// </summary>
+        /// <param name="sql"></param>
         void Sql(string sql);
+        /// <summary>
+        /// Logs the elapsed time.
+        /// </summary>
+        /// <param name="timeSpan"></param>
         void ElapsedTime(TimeSpan timeSpan);
+        /// <summary>
+        /// Logs an error message.
+        /// </summary>
+        /// <param name="message"></param>
         void Error(string message);
+        /// <summary>
+        /// Logs an error message.
+        /// </summary>
+        /// <param name="exception"></param>
         void Error(Exception exception);
 
+        /// <summary>
+        /// Logs a message.
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="isNotSql"></param>
         [Obsolete]
         void Write(string message, bool isNotSql = true);
     }

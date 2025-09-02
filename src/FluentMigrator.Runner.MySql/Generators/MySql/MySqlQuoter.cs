@@ -18,17 +18,24 @@ using FluentMigrator.Runner.Generators.Generic;
 
 namespace FluentMigrator.Runner.Generators.MySql
 {
+    /// <summary>
+    /// The MySQL SQL quoter for FluentMigrator.
+    /// </summary>
     public class MySqlQuoter : GenericQuoter
     {
+        /// <inheritdoc />
         public override string OpenQuote => "`";
 
+        /// <inheritdoc />
         public override string CloseQuote => "`";
 
+        /// <inheritdoc />
         public override string QuoteValue(object value)
         {
             return base.QuoteValue(value).Replace(@"\", @"\\");
         }
 
+        /// <inheritdoc />
         public override string FromTimeSpan(System.TimeSpan value)
         {
             return string.Format("{0}{1:00}:{2:00}:{3:00}{0}"
@@ -38,6 +45,7 @@ namespace FluentMigrator.Runner.Generators.MySql
                 , value.Seconds);
         }
 
+        /// <inheritdoc />
         public override string FormatSystemMethods(SystemMethods value)
         {
             switch (value)
@@ -56,6 +64,7 @@ namespace FluentMigrator.Runner.Generators.MySql
             return base.FormatSystemMethods(value);
         }
 
+        /// <inheritdoc />
         public override string QuoteSchemaName(string schemaName)
         {
             // This database doesn't support schemata

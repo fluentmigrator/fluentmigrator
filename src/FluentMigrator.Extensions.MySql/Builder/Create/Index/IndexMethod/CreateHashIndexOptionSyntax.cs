@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2021, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,6 +20,14 @@ using JetBrains.Annotations;
 
 namespace FluentMigrator.Builder.Create.Index
 {
+    /// <summary>
+    /// Provides syntax for creating a hash index with specific options in a fluent manner.
+    /// </summary>
+    /// <remarks>
+    /// This class extends <see cref="FluentMigrator.Builder.Create.Index.AbstractCreateIndexMethodOptionsSyntax"/> 
+    /// and implements <see cref="FluentMigrator.Builder.Create.Index.ICreateHashIndexOptionSyntax"/> 
+    /// to support hash index-specific configurations.
+    /// </remarks>
     public class CreateHashIndexOptionSyntax : AbstractCreateIndexMethodOptionsSyntax, ICreateHashIndexOptionSyntax
     {
         /// <inheritdoc />
