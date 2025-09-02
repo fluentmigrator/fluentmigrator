@@ -16,6 +16,15 @@
 
 namespace FluentMigrator.Runner.Generators.MySql
 {
+    /// <summary>
+    /// Represents a specialized type map for MySQL databases, providing mappings between
+    /// <see cref="System.Data.DbType"/> and MySQL-specific SQL types.
+    /// </summary>
+    /// <remarks>
+    /// This interface extends <see cref="FluentMigrator.Runner.Generators.ITypeMap"/> to include
+    /// MySQL-specific type mapping functionality. Implementations of this interface are used
+    /// to define and retrieve the appropriate MySQL SQL type for a given <see cref="System.Data.DbType"/>.
+    /// </remarks>
     public interface IMySqlTypeMap : ITypeMap
     {
 

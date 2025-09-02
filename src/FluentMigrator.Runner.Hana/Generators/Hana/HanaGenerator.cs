@@ -29,19 +29,25 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Generators.Hana
 {
+    /// <summary>
+    /// The SAP Hana SQL generator for FluentMigrator.
+    /// </summary>
     public class HanaGenerator : GenericGenerator
     {
+        /// <inheritdoc />
         public HanaGenerator()
             : this(new HanaQuoter())
         {
         }
 
+        /// <inheritdoc />
         public HanaGenerator(
             [NotNull] HanaQuoter quoter)
             : this(quoter, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()))
         {
         }
 
+        /// <inheritdoc />
         public HanaGenerator(
             [NotNull] HanaQuoter quoter,
             [NotNull] IOptions<GeneratorOptions> generatorOptions)
@@ -49,6 +55,7 @@ namespace FluentMigrator.Runner.Generators.Hana
         {
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteTableExpression expression)
         {
             if (expression.IfExists)
@@ -58,6 +65,7 @@ namespace FluentMigrator.Runner.Generators.Hana
             return base.Generate(expression);
         }
 
+        /// <inheritdoc />
         public override string Generate(CreateSequenceExpression expression)
         {
             var result = new StringBuilder("CREATE SEQUENCE ");
@@ -109,9 +117,13 @@ namespace FluentMigrator.Runner.Generators.Hana
             return result.ToString();
         }
 
+        /// <inheritdoc />
         public override string AddColumn => "ALTER TABLE {0} ADD ({1})";
+        /// <inheritdoc />
         public override string AlterColumn => "ALTER TABLE {0} ALTER ({1})";
+        /// <inheritdoc />
         public override string DropColumn => "ALTER TABLE {0} DROP ({1})";
+        /// <inheritdoc />
         public override string RenameColumn => "RENAME COLUMN {0}.{1} TO {2}";
 
         private string InnerGenerate(CreateTableExpression expression)
@@ -126,6 +138,7 @@ namespace FluentMigrator.Runner.Generators.Hana
         /// <inheritdoc />
         public override List<string> GeneratorIdAliases => new List<string> { GeneratorIdConstants.Hana };
 
+        /// <inheritdoc />
         public override string Generate(CreateTableExpression expression)
         {
             var descriptionStatements = DescriptionGenerator.GenerateDescriptionStatements(expression);
@@ -148,6 +161,7 @@ namespace FluentMigrator.Runner.Generators.Hana
             return WrapInBlock(createTableWithDescriptionsBuilder.ToString());
         }
 
+        /// <inheritdoc />
         public override string Generate(AlterTableExpression expression)
         {
             var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatement(expression);
@@ -155,6 +169,7 @@ namespace FluentMigrator.Runner.Generators.Hana
             return string.IsNullOrEmpty(descriptionStatement) ? base.Generate(expression) : descriptionStatement;
         }
 
+        /// <inheritdoc />
         public override string Generate(CreateColumnExpression expression)
         {
             var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatement(expression);
@@ -170,6 +185,7 @@ namespace FluentMigrator.Runner.Generators.Hana
             return WrapInBlock(createColumnWithDescriptionBuilder.ToString());
         }
 
+        /// <inheritdoc />
         public override string Generate(AlterColumnExpression expression)
         {
             var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatement(expression);
@@ -185,6 +201,7 @@ namespace FluentMigrator.Runner.Generators.Hana
             return WrapInBlock(alterColumnWithDescriptionBuilder.ToString());
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteConstraintExpression expression)
         {
             if (expression.Constraint.IsPrimaryKeyConstraint)
@@ -195,11 +212,13 @@ namespace FluentMigrator.Runner.Generators.Hana
             return base.Generate(expression);
         }
 
+        /// <inheritdoc />
         public override string Generate(AlterDefaultConstraintExpression expression)
         {
             return CompatibilityMode.HandleCompatibility("Default constraints are not supported");
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteDefaultConstraintExpression expression)
         {
             return CompatibilityMode.HandleCompatibility("Default constraints are not supported");

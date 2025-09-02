@@ -18,6 +18,15 @@
 
 namespace FluentMigrator.Runner.Generators.Oracle
 {
+    /// <summary>
+    /// Provides an implementation of <see cref="OracleQuoterBase"/> that enforces quoted identifiers
+    /// for Oracle-specific SQL expressions.
+    /// </summary>
+    /// <remarks>
+    /// This class is used to ensure that all identifiers, such as table and column names, are quoted
+    /// in Oracle SQL statements, which is particularly useful when dealing with reserved keywords or
+    /// special characters in identifiers.
+    /// </remarks>
     public class OracleQuoterQuotedIdentifier : OracleQuoterBase
     {
     }

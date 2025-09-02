@@ -16,17 +16,36 @@
 
 namespace FluentMigrator.Runner.Exceptions
 {
+    /// <summary>
+    /// Represents an exception that is thrown when a migration contains validation errors.
+    /// </summary>
+    /// <remarks>
+    /// This exception is used to indicate that a migration has failed validation due to one or more errors.
+    /// The specific migration and the associated validation errors are included in the exception details.
+    /// </remarks>
     public class InvalidMigrationException : RunnerException
     {
         private readonly IMigration _migration;
         private readonly string _errors;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="InvalidMigrationException"/> class with the specified migration and validation errors.
+        /// </summary>
+        /// <param name="migration">The migration that caused the exception.</param>
+        /// <param name="errors">The validation errors associated with the migration.</param>
+        /// <remarks>
+        /// This constructor is used to create an exception instance when a migration fails validation.
+        /// The <paramref name="migration"/> parameter identifies the specific migration, and the <paramref name="errors"/> parameter
+        /// provides details about the validation errors that occurred.
+        /// </remarks>
         public InvalidMigrationException(IMigration migration, string errors)
         {
             _migration = migration;
             _errors = errors;
         }
 
-        public override string Message => string.Format("The migration {0} contained the following Validation Error(s): {1}", _migration.GetType().Name, _errors);
+        /// <inheritdoc />
+        public override string Message =>
+            $"The migration {_migration.GetType().Name} contained the following Validation Error(s): {_errors}";
     }
 }

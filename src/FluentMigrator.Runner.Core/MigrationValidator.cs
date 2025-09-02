@@ -25,7 +25,6 @@ using System.Text;
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Exceptions;
-using FluentMigrator.Runner.Logging;
 using FluentMigrator.Validation;
 
 using JetBrains.Annotations;
@@ -34,6 +33,14 @@ using Microsoft.Extensions.Logging;
 
 namespace FluentMigrator.Runner
 {
+    /// <summary>
+    /// Provides functionality to validate migration expressions and apply conventions to them.
+    /// This class ensures that all migration expressions implementing the <see cref="IMigrationExpressionValidator"/> interface
+    /// are validated according to the specified conventions and validators.
+    /// </summary>
+    /// <remarks>
+    /// <seealso cref="IValidationChildren"/> can be used on properties of migration expressions to validate child objects.
+    /// </remarks>
     public class MigrationValidator
     {
         [CanBeNull]
@@ -45,6 +52,19 @@ namespace FluentMigrator.Runner
         [NotNull]
         private readonly IMigrationExpressionValidator _validator;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MigrationValidator"/> class.
+        /// </summary>
+        /// <param name="logger">The logger used for logging validation messages.</param>
+        /// <param name="conventions">The set of conventions to be applied to migration expressions.</param>
+        /// <param name="validator">
+        /// An optional migration expression validator. If not provided, a default implementation of 
+        /// <see cref="IMigrationExpressionValidator"/> will be used.
+        /// </param>
+        /// <remarks>
+        /// This constructor ensures that migration expressions are validated and conventions are applied
+        /// according to the provided <paramref name="conventions"/> and <paramref name="validator"/>.
+        /// </remarks>
         internal MigrationValidator(
             [NotNull] ILogger logger,
             [NotNull] IConventionSet conventions,
@@ -56,6 +76,18 @@ namespace FluentMigrator.Runner
         }
 
         // ReSharper disable once UnusedMember.Global
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MigrationValidator"/> class.
+        /// </summary>
+        /// <param name="logger">
+        /// The logger instance used to log validation and convention application details.
+        /// </param>
+        /// <param name="conventions">
+        /// The set of conventions to be applied to migration expressions.
+        /// </param>
+        /// <param name="validator">
+        /// An optional migration expression validator. If not provided, a default validator will be used.
+        /// </param>
         public MigrationValidator(
             [NotNull] ILogger<MigrationValidator> logger,
             [NotNull] IConventionSet conventions,

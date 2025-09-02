@@ -20,6 +20,15 @@ using System;
 
 namespace FluentMigrator.Runner.Processors.DB2.iSeries
 {
+    /// <summary>
+    /// Represents a database factory for IBM DB2 iSeries, leveraging reflection-based mechanisms
+    /// to create and manage database provider factories.
+    /// </summary>
+    /// <remarks>
+    /// This class is specifically designed to support the IBM DB2 iSeries database by utilizing
+    /// the <c>IBM.Data.DB2.iSeries</c> provider. It extends the <see cref="FluentMigrator.Runner.Processors.ReflectionBasedDbFactory"/>
+    /// to provide functionality for dynamically resolving and creating database provider factories.
+    /// </remarks>
     public class Db2ISeriesDbFactory : ReflectionBasedDbFactory
     {
         private static readonly TestEntry[] _testEntries =
@@ -27,6 +36,16 @@ namespace FluentMigrator.Runner.Processors.DB2.iSeries
             new TestEntry("IBM.Data.DB2.iSeries", "IBM.Data.DB2.iSeries.iDB2Factory"),
         };
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FluentMigrator.Runner.Processors.DB2.iSeries.Db2ISeriesDbFactory"/> class.
+        /// </summary>
+        /// <param name="serviceProvider">
+        /// The service provider used to resolve dependencies required by the factory.
+        /// </param>
+        /// <remarks>
+        /// This constructor leverages the base <see cref="FluentMigrator.Runner.Processors.ReflectionBasedDbFactory"/> 
+        /// class to dynamically resolve and create database provider factories for IBM DB2 iSeries.
+        /// </remarks>
         public Db2ISeriesDbFactory(IServiceProvider serviceProvider)
             : base(serviceProvider, _testEntries)
         {

@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2021, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,6 +23,13 @@ using JetBrains.Annotations;
 
 namespace FluentMigrator.Builder.Create.Index
 {
+    /// <summary>
+    /// Provides syntax for configuring GiST index options during the creation of an index in a database migration.
+    /// </summary>
+    /// <remarks>
+    /// This class extends <see cref="AbstractCreateIndexMethodOptionsSyntax"/> and implements <see cref="ICreateGiSTIndexOptionsSyntax"/>.
+    /// It allows specifying GiST-specific options such as buffering and fill factor.
+    /// </remarks>
     public class CreateGistIndexOptionsSyntax : AbstractCreateIndexMethodOptionsSyntax, ICreateGiSTIndexOptionsSyntax
     {
         /// <inheritdoc />

@@ -18,6 +18,14 @@ using System;
 
 namespace FluentMigrator.Runner.Processors.DotConnectOracle
 {
+    /// <summary>
+    /// Represents a database factory for DotConnect Oracle, utilizing reflection-based mechanisms
+    /// to create and manage database provider factories.
+    /// </summary>
+    /// <remarks>
+    /// This class is specifically designed to work with the DotConnect Oracle provider
+    /// and is used internally by FluentMigrator to facilitate database migrations.
+    /// </remarks>
     public class DotConnectOracleDbFactory : ReflectionBasedDbFactory
     {
         private static readonly TestEntry[] _entries =
@@ -25,6 +33,16 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
             new TestEntry("DevArt.Data.Oracle", "Devart.Data.Oracle.OracleProviderFactory"),
         };
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DotConnectOracleDbFactory"/> class.
+        /// </summary>
+        /// <param name="serviceProvider">
+        /// The service provider used to resolve dependencies required by the factory.
+        /// </param>
+        /// <remarks>
+        /// This constructor leverages the base <see cref="ReflectionBasedDbFactory"/> functionality
+        /// to initialize the database factory with predefined test entries specific to the DotConnect Oracle provider.
+        /// </remarks>
         public DotConnectOracleDbFactory(IServiceProvider serviceProvider)
             : base(serviceProvider, _entries)
         {

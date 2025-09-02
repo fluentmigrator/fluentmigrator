@@ -22,15 +22,40 @@ using JetBrains.Annotations;
 
 namespace FluentMigrator.Runner
 {
+    /// <summary>
+    /// Represents the default set of conventions used by FluentMigrator during migration operations.
+    /// </summary>
+    /// <remarks>
+    /// This class provides a predefined set of conventions for schema, constraints, foreign keys, indexes, 
+    /// sequences, and other migration-related elements. It implements the <see cref="FluentMigrator.Runner.Conventions.IConventionSet"/> 
+    /// interface and is designed to simplify the configuration of migrations by applying consistent rules and behaviors.
+    /// </remarks>
     public class DefaultConventionSet : IConventionSet
     {
         // ReSharper disable once UnusedMember.Global
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FluentMigrator.Runner.DefaultConventionSet"/> class
+        /// with default conventions for schema, constraints, foreign keys, indexes, sequences, and more.
+        /// </summary>
+        /// <remarks>
+        /// This constructor sets up a default set of conventions to be used during migration operations.
+        /// It delegates to the parameterized constructor with default values for schema name and working directory.
+        /// </remarks>
         public DefaultConventionSet()
             : this(defaultSchemaName: null, workingDirectory: null)
         {
         }
 
         // ReSharper disable once MemberCanBePrivate.Global
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DefaultConventionSet"/> class with the specified default schema name and working directory.
+        /// </summary>
+        /// <param name="defaultSchemaName">
+        /// The default schema name to be used in conventions. Can be <c>null</c>.
+        /// </param>
+        /// <param name="workingDirectory">
+        /// The working directory to be used for path-related conventions. Can be <c>null</c>.
+        /// </param>
         public DefaultConventionSet([CanBeNull] string defaultSchemaName, [CanBeNull] string workingDirectory)
         {
             var schemaConvention =

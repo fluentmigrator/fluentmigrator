@@ -30,17 +30,23 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Generators.Snowflake
 {
+    /// <summary>
+    /// The Snowflake SQL generator for FluentMigrator.
+    /// </summary>
     public class SnowflakeGenerator : GenericGenerator
     {
+        /// <inheritdoc />
         public SnowflakeGenerator(
             [NotNull] SnowflakeOptions sfOptions)
             : this(sfOptions, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions())) { }
 
+        /// <inheritdoc />
         public SnowflakeGenerator(
             [NotNull] SnowflakeOptions sfOptions,
             [NotNull] IOptions<GeneratorOptions> generatorOptions)
             : this(new SnowflakeQuoter(sfOptions.QuoteIdentifiers), sfOptions, generatorOptions) { }
 
+        /// <inheritdoc />
         public SnowflakeGenerator(
             [NotNull] SnowflakeQuoter quoter,
             [NotNull] SnowflakeOptions sfOptions,
@@ -153,6 +159,7 @@ namespace FluentMigrator.Runner.Generators.Snowflake
             return CompatibilityMode.HandleCompatibility("Indices not supported");
         }
 
+        /// <inheritdoc />
         public override string Generate(CreateSequenceExpression expression)
         {
             var result = new StringBuilder("CREATE SEQUENCE ");

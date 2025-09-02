@@ -21,8 +21,19 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Runner
 {
+    /// <summary>
+    /// Defines the contract for loading maintenance migrations based on a specified migration stage.
+    /// </summary>
     public interface IMaintenanceLoader
     {
+        /// <summary>
+        /// Loads the maintenance migrations for the specified migration stage.
+        /// </summary>
+        /// <param name="stage">The <see cref="MigrationStage"/> for which maintenance migrations should be loaded.</param>
+        /// <returns>
+        /// A list of <see cref="IMigrationInfo"/> objects representing the maintenance migrations
+        /// associated with the specified <paramref name="stage"/>.
+        /// </returns>
         IList<IMigrationInfo> LoadMaintenance(MigrationStage stage);
     }
 }

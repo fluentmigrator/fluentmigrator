@@ -20,6 +20,14 @@ using System;
 
 namespace FluentMigrator.Runner.Processors.Snowflake
 {
+    /// <summary>
+    /// Represents a database factory specifically designed for Snowflake database integration.
+    /// </summary>
+    /// <remarks>
+    /// This class extends <see cref="FluentMigrator.Runner.Processors.ReflectionBasedDbFactory"/> to provide
+    /// Snowflake-specific database factory functionality. It is typically used in conjunction with the
+    /// FluentMigrator framework to facilitate database migrations targeting Snowflake.
+    /// </remarks>
     public class SnowflakeDbFactory : ReflectionBasedDbFactory
     {
         private static readonly TestEntry[] _entries =
@@ -27,6 +35,17 @@ namespace FluentMigrator.Runner.Processors.Snowflake
             new TestEntry("Snowflake.Data", "Snowflake.Data.Client.SnowflakeDbFactory"),
         };
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FluentMigrator.Runner.Processors.Snowflake.SnowflakeDbFactory"/> class.
+        /// </summary>
+        /// <param name="serviceProvider">
+        /// The <see cref="IServiceProvider"/> used to resolve dependencies required by the database factory.
+        /// </param>
+        /// <remarks>
+        /// This constructor passes Snowflake-specific configuration entries to the base class
+        /// <see cref="FluentMigrator.Runner.Processors.ReflectionBasedDbFactory"/> to enable integration
+        /// with the Snowflake database.
+        /// </remarks>
         public SnowflakeDbFactory(IServiceProvider serviceProvider)
             : base(serviceProvider, _entries)
         {

@@ -22,6 +22,9 @@ using FluentMigrator.Runner.Processors.Firebird;
 
 namespace FluentMigrator.Runner.Generators.Firebird
 {
+    /// <summary>
+    /// The Firebird SQL quoter for FluentMigrator.
+    /// </summary>
     public class FirebirdQuoter : GenericQuoter
     {
         // see http://www.firebirdsql.org/refdocs/langrefupd25-reskeywords-full-keywords.html
@@ -60,20 +63,19 @@ namespace FluentMigrator.Runner.Generators.Firebird
 
         private readonly bool _forceQuote;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="FirebirdQuoter"/> class.
-        /// </summary>
-        /// <param name="options">The firebird specific options</param>
+        /// <inheritdoc />
         public FirebirdQuoter(FirebirdOptions options)
             : this(options.ForceQuote)
         {
         }
 
+        /// <inheritdoc />
         public FirebirdQuoter(bool forceQuote)
         {
             _forceQuote = forceQuote;
         }
 
+        /// <inheritdoc />
         protected override bool ShouldQuote(string name)
         {
             if (string.IsNullOrEmpty(name))
@@ -89,6 +91,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
             return false;
         }
 
+        /// <inheritdoc />
         public override string FormatSystemMethods(SystemMethods value)
         {
             switch (value)
@@ -116,11 +119,13 @@ namespace FluentMigrator.Runner.Generators.Firebird
             return base.FormatSystemMethods(value);
         }
 
+        /// <inheritdoc />
         public override string FormatDateTime(DateTime value)
         {
             return ValueQuote + (value).ToString("yyyy-MM-dd HH:mm:ss") + ValueQuote;
         }
 
+        /// <inheritdoc />
         public string ToFbObjectName(string objName)
         {
             if (IsQuoted(objName))
@@ -131,6 +136,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
             return objName.ToUpper();
         }
 
+        /// <inheritdoc />
         public override string QuoteSchemaName(string schemaName)
         {
             // This database doesn't support schemata

@@ -17,18 +17,8 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-
-using FluentMigrator.Runner.Initialization;
-using FluentMigrator.Runner.Initialization.AssemblyLoader;
-using FluentMigrator.Runner.VersionTableInfo;
-using FluentMigrator.Runner.Processors;
-
 using JetBrains.Annotations;
 
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace FluentMigrator.Runner
@@ -43,6 +33,7 @@ namespace FluentMigrator.Runner
         /// Gets the name for a given migration generator instance
         /// </summary>
         /// <param name="generator">The migration generator instance to get its name for</param>
+        /// <param name="logger">The logger instance to warn that we are using legacy value via reflection.</param>
         /// <returns>The name of the migration generator</returns>
         [NotNull]
         public static string GetName([NotNull] this IMigrationGenerator generator, ILogger logger)

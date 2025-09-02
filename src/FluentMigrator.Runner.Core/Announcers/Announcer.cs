@@ -22,16 +22,23 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Announcers
 {
+    /// <summary>
+    /// Base class for announcers in FluentMigrator.
+    /// </summary>
     [Obsolete]
     public abstract class Announcer : IAnnouncer
     {
+        /// <inheritdoc />
         public virtual bool ShowSql { get; set; }
+        /// <inheritdoc />
         public virtual bool ShowElapsedTime { get; set; }
 
+        /// <inheritdoc />
         protected Announcer()
         {
         }
 
+        /// <inheritdoc />
         protected Announcer(IOptions<AnnouncerOptions> options)
         {
             // ReSharper disable VirtualMemberCallInConstructor
@@ -40,21 +47,25 @@ namespace FluentMigrator.Runner.Announcers
             // ReSharper restore VirtualMemberCallInConstructor
         }
 
+        /// <inheritdoc />
         public virtual void Heading(string message)
         {
             Write(message);
         }
 
+        /// <inheritdoc />
         public virtual void Say(string message)
         {
             Write(message);
         }
 
+        /// <inheritdoc />
         public virtual void Emphasize(string message)
         {
             Write(message);
         }
 
+        /// <inheritdoc />
         public virtual void Sql(string sql)
         {
             if (!ShowSql) return;
@@ -64,6 +75,7 @@ namespace FluentMigrator.Runner.Announcers
             else Write(sql, false);
         }
 
+        /// <inheritdoc />
         public virtual void ElapsedTime(TimeSpan timeSpan)
         {
             if (!ShowElapsedTime) return;
@@ -71,6 +83,7 @@ namespace FluentMigrator.Runner.Announcers
             Write(string.Format("=> {0}s", timeSpan.TotalSeconds));
         }
 
+        /// <inheritdoc />
         public virtual void Error(Exception exception)
         {
             while (exception != null)
@@ -80,11 +93,13 @@ namespace FluentMigrator.Runner.Announcers
             }
         }
 
+        /// <inheritdoc />
         public virtual void Error(string message)
         {
             Write(string.Format("!!! {0}", message));
         }
 
+        /// <inheritdoc />
         public abstract void Write(string message, bool isNotSql = true);
     }
 }

@@ -35,6 +35,9 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner
 {
+    /// <summary>
+    /// A version loader that does not require a database connection.
+    /// </summary>
     public class ConnectionlessVersionLoader : IVersionLoader
     {
         [NotNull]
@@ -47,6 +50,7 @@ namespace FluentMigrator.Runner
 
         private bool _versionsLoaded;
 
+        /// <inheritdoc />
         public ConnectionlessVersionLoader(
             [NotNull] IGeneratorAccessor generatorAccessor,
             [NotNull] IProcessorAccessor processorAccessor,
@@ -72,26 +76,39 @@ namespace FluentMigrator.Runner
             LoadVersionInfo();
         }
 
+        /// <inheritdoc />
         public IMigrationRunnerConventions Conventions { get; set; }
+        /// <inheritdoc />
         public long StartVersion { get; set; }
+        /// <inheritdoc />
         public long TargetVersion { get; set; }
+        /// <inheritdoc />
         public VersionSchemaMigration VersionSchemaMigration { get; }
+        /// <inheritdoc />
         public IMigration VersionMigration { get; }
+        /// <inheritdoc />
         public IMigration VersionUniqueMigration { get; }
+        /// <inheritdoc />
         public IMigration VersionDescriptionMigration { get; }
 
+        /// <inheritdoc />
         [Obsolete]
         [CanBeNull]
         public IMigrationRunner Runner { get; set; }
+        /// <inheritdoc />
         public IVersionInfo VersionInfo { get; set; }
+        /// <inheritdoc />
         public IVersionTableMetaData VersionTableMetaData { get; set; }
 
+        /// <inheritdoc />
         public bool AlreadyCreatedVersionSchema =>
             string.IsNullOrEmpty(VersionTableMetaData.SchemaName) ||
             _processor.SchemaExists(VersionTableMetaData.SchemaName);
 
+        /// <inheritdoc />
         public bool AlreadyCreatedVersionTable => _processor.TableExists(VersionTableMetaData.SchemaName, VersionTableMetaData.TableName);
 
+        /// <inheritdoc />
         public void DeleteVersion(long version)
         {
             var expression = new DeleteDataExpression {TableName = VersionTableMetaData.TableName, SchemaName = VersionTableMetaData.SchemaName};
@@ -102,11 +119,13 @@ namespace FluentMigrator.Runner
             expression.ExecuteWith(_processor);
         }
 
+        /// <inheritdoc />
         public IVersionTableMetaData GetVersionTableMetaData()
         {
             return VersionTableMetaData;
         }
 
+        /// <inheritdoc />
         public void LoadVersionInfo()
         {
             if (_versionsLoaded)
@@ -125,6 +144,7 @@ namespace FluentMigrator.Runner
             _versionsLoaded = true;
         }
 
+        /// <inheritdoc />
         public void RemoveVersionTable()
         {
             var expression = new DeleteTableExpression {TableName = VersionTableMetaData.TableName, SchemaName = VersionTableMetaData.SchemaName};
@@ -137,11 +157,13 @@ namespace FluentMigrator.Runner
             }
         }
 
+        /// <inheritdoc />
         public void UpdateVersionInfo(long version)
         {
             UpdateVersionInfo(version, null);
         }
 
+        /// <inheritdoc />
         public void UpdateVersionInfo(long version, string description)
         {
             var dataExpression = new InsertDataExpression();
@@ -152,6 +174,12 @@ namespace FluentMigrator.Runner
             dataExpression.ExecuteWith(_processor);
         }
 
+        /// <summary>
+        /// Creates the insertion data for the version info table.
+        /// </summary>
+        /// <param name="version">The migration version.</param>
+        /// <param name="description">The migration description.</param>
+        /// <returns>The insertion data definition.</returns>
         protected virtual InsertionDataDefinition CreateVersionInfoInsertionData(long version, string description)
         {
             object appliedOnValue;

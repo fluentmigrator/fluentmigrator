@@ -26,6 +26,12 @@ namespace FluentMigrator.Runner.Announcers
     [Obsolete]
     public class AnnouncerOptions
     {
+        /// <summary>
+        /// A pre-configured instance of <see cref="AnnouncerOptions"/> where all options are enabled.
+        /// </summary>
+        /// <remarks>
+        /// This field is marked as <see cref="ObsoleteAttribute"/> and may be removed in future versions.
+        /// </remarks>
         [Obsolete]
         public static readonly AnnouncerOptions AllEnabled = new AnnouncerOptions()
         {
