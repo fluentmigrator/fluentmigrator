@@ -20,8 +20,23 @@ using FluentMigrator.Infrastructure.Extensions;
 
 namespace FluentMigrator.Postgres
 {
+    /// <summary>
+    /// Provides extension methods for PostgreSQL-specific features in FluentMigrator.
+    /// </summary>
+    /// <remarks>
+    /// This class contains methods and constants to support PostgreSQL-specific functionality, 
+    /// such as defining tablespaces and additional index features.
+    /// </remarks>
     public static partial class PostgresExtensions
     {
+        /// <summary>
+        /// Represents the key used to define the tablespace for an index in PostgreSQL.
+        /// </summary>
+        /// <remarks>
+        /// This constant is utilized in conjunction with PostgreSQL-specific FluentMigrator extensions
+        /// to specify the tablespace for an index. It is primarily used as an additional feature key
+        /// when configuring index options.
+        /// </remarks>
         public const string IndexTablespace = "PostgresTablespace";
 
         /// <summary>

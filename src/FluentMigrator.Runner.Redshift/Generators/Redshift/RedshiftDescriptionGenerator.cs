@@ -28,6 +28,14 @@ namespace FluentMigrator.Runner.Generators.Redshift
     {
         private readonly IQuoter _quoter;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FluentMigrator.Runner.Generators.Redshift.RedshiftDescriptionGenerator"/> class.
+        /// </summary>
+        /// <remarks>
+        /// This constructor sets up the description generator specifically for Amazon Redshift by
+        /// initializing the <see cref="FluentMigrator.Runner.Generators.Redshift.RedshiftQuoter"/> 
+        /// to handle SQL quoting and escaping requirements.
+        /// </remarks>
         public RedshiftDescriptionGenerator()
         {
             _quoter = new RedshiftQuoter();
