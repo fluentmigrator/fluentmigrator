@@ -16,6 +16,7 @@
 
 using System;
 
+using FluentMigrator.Generation;
 using FluentMigrator.Runner.Generators.Base;
 
 namespace FluentMigrator.Runner.Generators

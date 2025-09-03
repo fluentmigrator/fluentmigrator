@@ -22,6 +22,7 @@ using System.Data;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
+using FluentMigrator.Generation;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.DB2;
 using FluentMigrator.Runner.Generators.DB2.iSeries;

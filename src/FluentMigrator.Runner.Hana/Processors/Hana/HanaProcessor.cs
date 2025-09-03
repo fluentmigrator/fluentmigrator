@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 
 using FluentMigrator.Expressions;
-using FluentMigrator.Runner.Generators;
+using FluentMigrator.Generation;
 using FluentMigrator.Runner.Generators.Hana;
 using FluentMigrator.Runner.Helpers;
 using FluentMigrator.Runner.Initialization;

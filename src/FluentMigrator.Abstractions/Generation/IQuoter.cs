@@ -16,16 +16,13 @@
 //
 #endregion
 
-using System;
-
 using JetBrains.Annotations;
 
-namespace FluentMigrator.Runner.Generators
+namespace FluentMigrator.Generation
 {
     /// <summary>
     /// The interface to be implemented for handling quotes
     /// </summary>
-    [Obsolete("Warning! This type will move in a future version of FluentMigrator to FluentMigrator.Generation.IQuoter")]
     public interface IQuoter
     {
         /// <summary>

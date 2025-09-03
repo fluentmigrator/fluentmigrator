@@ -20,6 +20,8 @@
 using System.Collections.Generic;
 using System.Text;
 
+using FluentMigrator.Generation;
+
 using JetBrains.Annotations;
 
 using Microsoft.Extensions.Options;
