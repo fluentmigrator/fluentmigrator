@@ -24,7 +24,9 @@ jobs:
   build:
     name: Build & Test
     runs-on: ubuntu-latest
-    permissions: write-all
+    permissions:
+      checks: write
+      pull-requests: write
 
     strategy:
       matrix:
