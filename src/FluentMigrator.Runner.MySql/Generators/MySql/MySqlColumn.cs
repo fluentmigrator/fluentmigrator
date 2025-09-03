@@ -21,6 +21,8 @@ using FluentMigrator.Runner.Generators.Base;
 using System.Linq;
 using System;
 
+using FluentMigrator.Generation;
+
 namespace FluentMigrator.Runner.Generators.MySql
 {
     internal class MySqlColumn : ColumnBase<IMySqlTypeMap>
@@ -58,6 +60,12 @@ namespace FluentMigrator.Runner.Generators.MySql
         protected override string FormatIdentity(ColumnDefinition column)
         {
             return column.IsIdentity ? "AUTO_INCREMENT" : string.Empty;
+        }
+
+        /// <inheritdoc />
+        protected override string FormatExpression(ColumnDefinition column)
+        {
+            return column.Expression == null ? null : $"GENERATED ALWAYS AS ({column.Expression}){(column.ExpressionStored ? " STORED" : " VIRTUAL")}";
         }
     }
 }

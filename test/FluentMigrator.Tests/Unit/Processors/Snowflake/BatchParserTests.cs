@@ -40,7 +40,13 @@ namespace FluentMigrator.Tests.Unit.Processors.Snowflake
     {
         protected override IMigrationProcessor CreateProcessor()
         {
-            var mockedDbFactory = new Mock<SnowflakeDbFactory>(null);
+            var serviceProvider = new ServiceCollection()
+                .AddLogging()
+                .AddSingleton<ILoggerProvider, TestLoggerProvider>()
+                .AddTransient<SnowflakeBatchParser>()
+                .BuildServiceProvider();
+
+            var mockedDbFactory = new Mock<SnowflakeDbFactory>(serviceProvider);
             mockedDbFactory.SetupGet(conn => conn.Factory).Returns(MockedDbProviderFactory.Object);
 
             var mockedConnStringReader = new Mock<IConnectionStringReader>();
@@ -50,12 +56,6 @@ namespace FluentMigrator.Tests.Unit.Processors.Snowflake
 
                 return "server=this";
             });
-
-            var serviceProvider = new ServiceCollection()
-                .AddLogging()
-                .AddSingleton<ILoggerProvider, TestLoggerProvider>()
-                .AddTransient<SnowflakeBatchParser>()
-                .BuildServiceProvider();
 
             var logger = serviceProvider.GetRequiredService<ILogger<SnowflakeProcessor>>();
 

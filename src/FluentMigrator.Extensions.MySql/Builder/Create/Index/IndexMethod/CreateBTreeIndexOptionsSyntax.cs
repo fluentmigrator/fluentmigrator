@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2021, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,6 +20,13 @@ using JetBrains.Annotations;
 
 namespace FluentMigrator.Builder.Create.Index
 {
+    /// <summary>
+    /// Provides syntax for configuring B-tree index options during the creation of an index.
+    /// </summary>
+    /// <remarks>
+    /// This class extends <see cref="AbstractCreateIndexMethodOptionsSyntax"/> to provide specific
+    /// functionality for B-tree index options. It implements <see cref="ICreateBTreeIndexOptionsSyntax"/>.
+    /// </remarks>
     public class CreateBTreeIndexOptionsSyntax : AbstractCreateIndexMethodOptionsSyntax, ICreateBTreeIndexOptionsSyntax
     {
         /// <inheritdoc />

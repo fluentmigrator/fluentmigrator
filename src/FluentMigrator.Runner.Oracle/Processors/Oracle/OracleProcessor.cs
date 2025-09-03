@@ -27,8 +27,12 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.Oracle
 {
+    /// <summary>
+    /// The Oracle processor for FluentMigrator.
+    /// </summary>
     public class OracleProcessor : OracleProcessorBase
     {
+        /// <inheritdoc />
         public OracleProcessor(
             [NotNull] OracleDbFactory factory,
             [NotNull] IOracleGenerator generator,

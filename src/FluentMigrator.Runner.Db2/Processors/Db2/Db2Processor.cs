@@ -20,7 +20,7 @@ using System.Collections.Generic;
 using System.Data;
 
 using FluentMigrator.Expressions;
-using FluentMigrator.Runner.Generators;
+using FluentMigrator.Generation;
 using FluentMigrator.Runner.Generators.DB2;
 using FluentMigrator.Runner.Helpers;
 using FluentMigrator.Runner.Initialization;
@@ -32,9 +32,12 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.DB2
 {
+    /// <summary>
+    /// The DB2 migration processor.
+    /// </summary>
     public class Db2Processor : GenericProcessorBase
     {
-
+        /// <inheritdoc />
         public Db2Processor(
             [NotNull] Db2DbFactory factory,
             [NotNull] Db2Generator generator,
@@ -47,16 +50,16 @@ namespace FluentMigrator.Runner.Processors.DB2
             Quoter = quoter;
         }
 
+        /// <inheritdoc />
         public override string DatabaseType => ProcessorIdConstants.DB2;
 
+        /// <inheritdoc />
         public override IList<string> DatabaseTypeAliases { get; } = new List<string> { ProcessorIdConstants.IbmDb2, ProcessorIdConstants.DB2 };
 
-        public IQuoter Quoter
-        {
-            get;
-            set;
-        }
+        /// <inheritdoc />
+        public IQuoter Quoter { get; set; }
 
+        /// <inheritdoc />
         public override bool ColumnExists(string schemaName, string tableName, string columnName)
         {
             var conditions = new List<string>
@@ -74,6 +77,7 @@ namespace FluentMigrator.Runner.Processors.DB2
             return doesExist;
         }
 
+        /// <inheritdoc />
         public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
         {
             var conditions = new List<string>
@@ -90,6 +94,7 @@ namespace FluentMigrator.Runner.Processors.DB2
             return Exists("SELECT CONSTNAME FROM SYSCAT.TABCONST WHERE {0}", condition);
         }
 
+        /// <inheritdoc />
         public override bool DefaultValueExists(string schemaName, string tableName, string columnName, object defaultValue)
         {
             var defaultValueAsString = string.Format("%{0}%", FormatHelper.FormatSqlEscape(defaultValue.ToString()));
@@ -109,11 +114,13 @@ namespace FluentMigrator.Runner.Processors.DB2
             return Exists("SELECT \"DEFAULT\" FROM SYSCAT.COLUMNS WHERE {0}", condition);
         }
 
+        /// <inheritdoc />
         public override void Execute(string template, params object[] args)
         {
             Process(string.Format(template, args));
         }
 
+        /// <inheritdoc />
         public override bool Exists(string template, params object[] args)
         {
             EnsureConnectionIsOpen();
@@ -125,6 +132,7 @@ namespace FluentMigrator.Runner.Processors.DB2
             }
         }
 
+        /// <inheritdoc />
         public override bool IndexExists(string schemaName, string tableName, string indexName)
         {
             var conditions = new List<string>
@@ -143,6 +151,7 @@ namespace FluentMigrator.Runner.Processors.DB2
             return doesExist;
         }
 
+        /// <inheritdoc />
         public override void Process(PerformDBOperationExpression expression)
         {
             Logger.LogSay("Performing DB Operation");
@@ -157,6 +166,7 @@ namespace FluentMigrator.Runner.Processors.DB2
             expression.Operation?.Invoke(Connection, Transaction);
         }
 
+        /// <inheritdoc />
         public override DataSet Read(string template, params object[] args)
         {
             EnsureConnectionIsOpen();
@@ -168,11 +178,13 @@ namespace FluentMigrator.Runner.Processors.DB2
             }
         }
 
+        /// <inheritdoc />
         public override DataSet ReadTableData(string schemaName, string tableName)
         {
             return Read("SELECT * FROM {0}", Quoter.QuoteTableName(tableName, schemaName));
         }
 
+        /// <inheritdoc />
         public override bool SchemaExists(string schemaName)
         {
             var conditions = new List<string>
@@ -185,11 +197,13 @@ namespace FluentMigrator.Runner.Processors.DB2
             return Exists("SELECT SCHEMANAME FROM SYSCAT.SCHEMATA WHERE {0}", condition);
         }
 
+        /// <inheritdoc />
         public override bool SequenceExists(string schemaName, string sequenceName)
         {
             return false;
         }
 
+        /// <inheritdoc />
         public override bool TableExists(string schemaName, string tableName)
         {
             var conditions = new List<string>
@@ -205,6 +219,7 @@ namespace FluentMigrator.Runner.Processors.DB2
             return Exists("SELECT TABNAME FROM SYSCAT.TABLES WHERE {0}", condition);
         }
 
+        /// <inheritdoc />
         protected override void Process(string sql)
         {
             Logger.LogSql(sql);
@@ -222,6 +237,12 @@ namespace FluentMigrator.Runner.Processors.DB2
             }
         }
 
+        /// <summary>
+        /// Builds an equality comparison for SQL queries.
+        /// </summary>
+        /// <param name="columnName">The column name.</param>
+        /// <param name="value">The value to compare.</param>
+        /// <returns>The SQL comparison string.</returns>
         private string BuildEqualityComparison(string columnName, string value)
         {
             if (Quoter.IsQuoted(value))

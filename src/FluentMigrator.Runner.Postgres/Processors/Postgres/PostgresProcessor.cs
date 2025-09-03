@@ -32,14 +32,20 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.Postgres
 {
+    /// <summary>
+    /// The PostgreSQL migration processor.
+    /// </summary>
     public class PostgresProcessor : GenericProcessorBase
     {
         private readonly PostgresQuoter _quoter;
 
+        /// <inheritdoc />
         public override string DatabaseType => ProcessorIdConstants.Postgres;
 
+        /// <inheritdoc />
         public override IList<string> DatabaseTypeAliases { get; } = new List<string> { ProcessorIdConstants.PostgreSQL };
 
+        /// <inheritdoc />
         public PostgresProcessor(
             [NotNull] PostgresDbFactory factory,
             [NotNull] PostgresGenerator generator,
@@ -57,52 +63,62 @@ namespace FluentMigrator.Runner.Processors.Postgres
             _quoter = new PostgresQuoter(pgOptions);
         }
 
+        /// <inheritdoc />
         public override void Execute(string template, params object[] args)
         {
             Process(string.Format(template, args));
         }
 
+        /// <inheritdoc />
         public override bool SchemaExists(string schemaName)
         {
             return Exists("select * from information_schema.schemata where schema_name = '{0}'", FormatToSafeSchemaName(schemaName));
         }
 
+        /// <inheritdoc />
         public override bool TableExists(string schemaName, string tableName)
         {
             return Exists("select * from information_schema.tables where table_schema = '{0}' and table_name = '{1}'", FormatToSafeSchemaName(schemaName), FormatToSafeName(tableName));
         }
 
+        /// <inheritdoc />
         public override bool ColumnExists(string schemaName, string tableName, string columnName)
         {
             return Exists("select * from information_schema.columns where table_schema = '{0}' and table_name = '{1}' and column_name = '{2}'", FormatToSafeSchemaName(schemaName), FormatToSafeName(tableName), FormatToSafeName(columnName));
         }
 
+        /// <inheritdoc />
         public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
         {
             return Exists("select * from information_schema.table_constraints where constraint_catalog = current_catalog and table_schema = '{0}' and table_name = '{1}' and constraint_name = '{2}'", FormatToSafeSchemaName(schemaName), FormatToSafeName(tableName), FormatToSafeName(constraintName));
         }
 
+        /// <inheritdoc />
         public override bool IndexExists(string schemaName, string tableName, string indexName)
         {
             return Exists("select * from pg_catalog.pg_indexes where schemaname='{0}' and tablename = '{1}' and indexname = '{2}'", FormatToSafeSchemaName(schemaName), FormatToSafeName(tableName), FormatToSafeName(indexName));
         }
 
+        /// <inheritdoc />
         public override bool SequenceExists(string schemaName, string sequenceName)
         {
             return Exists("select * from information_schema.sequences where sequence_catalog = current_catalog and sequence_schema ='{0}' and sequence_name = '{1}'", FormatToSafeSchemaName(schemaName), FormatToSafeName(sequenceName));
         }
 
+        /// <inheritdoc />
         public override DataSet ReadTableData(string schemaName, string tableName)
         {
             return Read("SELECT * FROM {0}", _quoter.QuoteTableName(tableName, schemaName));
         }
 
+        /// <inheritdoc />
         public override bool DefaultValueExists(string schemaName, string tableName, string columnName, object defaultValue)
         {
             string defaultValueAsString = string.Format("%{0}%", FormatHelper.FormatSqlEscape(defaultValue.ToString()));
             return Exists("select * from information_schema.columns where table_schema = '{0}' and table_name = '{1}' and column_name = '{2}' and column_default like '{3}'", FormatToSafeSchemaName(schemaName), FormatToSafeName(tableName), FormatToSafeName(columnName), defaultValueAsString);
         }
 
+        /// <inheritdoc />
         public override DataSet Read(string template, params object[] args)
         {
             EnsureConnectionIsOpen();
@@ -114,6 +130,7 @@ namespace FluentMigrator.Runner.Processors.Postgres
             }
         }
 
+        /// <inheritdoc />
         public override bool Exists(string template, params object[] args)
         {
             EnsureConnectionIsOpen();
@@ -125,6 +142,7 @@ namespace FluentMigrator.Runner.Processors.Postgres
             }
         }
 
+        /// <inheritdoc />
         protected override void Process(string sql)
         {
             Logger.LogSql(sql);
@@ -147,6 +165,7 @@ namespace FluentMigrator.Runner.Processors.Postgres
             }
         }
 
+        /// <inheritdoc />
         public override void Process(PerformDBOperationExpression expression)
         {
             Logger.LogSay("Performing DB Operation");
@@ -159,6 +178,11 @@ namespace FluentMigrator.Runner.Processors.Postgres
             expression.Operation?.Invoke(Connection, Transaction);
         }
 
+        /// <summary>
+        /// Formats a schema name for safe SQL usage.
+        /// </summary>
+        /// <param name="schemaName">The schema name.</param>
+        /// <returns>The formatted schema name.</returns>
         private string FormatToSafeSchemaName(string schemaName)
         {
             var schemaNameCased = schemaName;
@@ -170,6 +194,11 @@ namespace FluentMigrator.Runner.Processors.Postgres
             return FormatHelper.FormatSqlEscape(_quoter.UnQuoteSchemaName(schemaNameCased));
         }
 
+        /// <summary>
+        /// Formats a SQL identifier for safe SQL usage.
+        /// </summary>
+        /// <param name="sqlName">The identifier name.</param>
+        /// <returns>The formatted name.</returns>
         private string FormatToSafeName(string sqlName)
         {
             var sqlNameCased = sqlName;

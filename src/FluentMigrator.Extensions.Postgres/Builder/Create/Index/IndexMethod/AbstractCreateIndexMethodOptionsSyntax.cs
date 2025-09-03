@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2021, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,10 +25,34 @@ using JetBrains.Annotations;
 
 namespace FluentMigrator.Builder.Create.Index
 {
+    /// <summary>
+    /// Provides an abstract base class for defining index creation options syntax.
+    /// </summary>
+    /// <remarks>
+    /// This class serves as a foundation for implementing specific index creation options
+    /// for various database systems. It encapsulates common functionality and delegates
+    /// specific operations to the underlying <see cref="ICreateIndexOptionsSyntax"/> implementation.
+    /// </remarks>
     public abstract class AbstractCreateIndexMethodOptionsSyntax : ICreateIndexMethodOptionsSyntax
     {
+        /// <summary>
+        /// Gets the underlying <see cref="ICreateIndexOptionsSyntax"/> implementation used to define index creation options.
+        /// </summary>
+        /// <remarks>
+        /// This property provides access to the encapsulated <see cref="ICreateIndexOptionsSyntax"/> instance, 
+        /// which is responsible for implementing the specific index creation options.
+        /// </remarks>
         protected ICreateIndexOptionsSyntax CreateIndexOptionsSyntax { get; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AbstractCreateIndexMethodOptionsSyntax"/> class.
+        /// </summary>
+        /// <param name="createIndexOptionsSyntax">
+        /// The <see cref="ICreateIndexOptionsSyntax"/> instance used to configure index options.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="createIndexOptionsSyntax"/> is <c>null</c>.
+        /// </exception>
         protected AbstractCreateIndexMethodOptionsSyntax([NotNull] ICreateIndexOptionsSyntax createIndexOptionsSyntax)
         {
             CreateIndexOptionsSyntax = createIndexOptionsSyntax ?? throw new ArgumentNullException(nameof(createIndexOptionsSyntax));

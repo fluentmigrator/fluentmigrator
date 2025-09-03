@@ -22,10 +22,15 @@ using FluentMigrator.Runner.Generators.Generic;
 
 namespace FluentMigrator.Runner.Generators.Redshift
 {
+    /// <summary>
+    /// The Amazon Redshift SQL quoter for FluentMigrator.
+    /// </summary>
     public class RedshiftQuoter : GenericQuoter
     {
+        /// <inheritdoc />
         public override string FormatBool(bool value) { return value ? "true" : "false"; }
 
+        /// <inheritdoc />
         public override string QuoteSchemaName(string schemaName)
         {
             if (string.IsNullOrEmpty(schemaName))
@@ -33,12 +38,14 @@ namespace FluentMigrator.Runner.Generators.Redshift
             return base.QuoteSchemaName(schemaName);
         }
 
+        /// <inheritdoc />
         protected override string FormatByteArray(byte[] array)
         {
             var arrayAsHex = array.Select(b => b.ToString("X2")).ToArray();
             return @"E'\\x" + string.Concat(arrayAsHex) + "'";
         }
 
+        /// <inheritdoc />
         public string UnQuoteSchemaName(string quoted)
         {
             if (string.IsNullOrEmpty(quoted))
@@ -47,6 +54,7 @@ namespace FluentMigrator.Runner.Generators.Redshift
             return UnQuote(quoted);
         }
 
+        /// <inheritdoc />
         public override string FormatSystemMethods(SystemMethods value)
         {
             switch (value)

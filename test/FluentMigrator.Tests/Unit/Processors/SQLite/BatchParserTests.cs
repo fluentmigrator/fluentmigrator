@@ -18,7 +18,6 @@ using System.Linq;
 
 using FluentMigrator.Runner.BatchParser;
 using FluentMigrator.Runner.Generators.SQLite;
-using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.SQLite;
 using FluentMigrator.Tests.Logging;
@@ -38,14 +37,14 @@ namespace FluentMigrator.Tests.Unit.Processors.SQLite
     {
         protected override IMigrationProcessor CreateProcessor()
         {
-            var mockedDbFactory = new Mock<SQLiteDbFactory>();
-            mockedDbFactory.SetupGet(conn => conn.Factory).Returns(MockedDbProviderFactory.Object);
-
             var serviceProvider = new ServiceCollection()
                 .AddLogging()
                 .AddSingleton<ILoggerProvider, TestLoggerProvider>()
                 .AddTransient<SQLiteBatchParser>()
                 .BuildServiceProvider();
+
+            var mockedDbFactory = new Mock<SQLiteDbFactory>(serviceProvider);
+            mockedDbFactory.SetupGet(conn => conn.Factory).Returns(MockedDbProviderFactory.Object);
 
             var logger = serviceProvider.GetRequiredService<ILogger<SQLiteProcessor>>();
 

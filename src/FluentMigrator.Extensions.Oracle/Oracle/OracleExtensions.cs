@@ -17,21 +17,42 @@
 using System;
 
 using FluentMigrator.Builders;
-using FluentMigrator.Builders.Create.Constraint;
-using FluentMigrator.Builders.Create.Table;
-using FluentMigrator.Builders.Insert;
 using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Oracle
 {
+    /// <summary>
+    /// Provides extension methods for Oracle-specific column identity configuration.
+    /// </summary>
     public static class OracleExtensions
     {
+        /// <summary>
+        /// The additional feature key for Oracle identity generation type.
+        /// </summary>
         public static string IdentityGeneration => "OracleIdentityGeneration";
+        /// <summary>
+        /// The additional feature key for Oracle identity start value.
+        /// </summary>
         public static string IdentityStartWith => "OracleIdentityStartWith";
+        /// <summary>
+        /// The additional feature key for Oracle identity increment value.
+        /// </summary>
         public static string IdentityIncrementBy => "OracleIdentityIncrementBy";
+        /// <summary>
+        /// The additional feature key for Oracle identity minimum value.
+        /// </summary>
         public static string IdentityMinValue => "OracleIdentityMinValue";
+        /// <summary>
+        /// The additional feature key for Oracle identity maximum value.
+        /// </summary>
         public static string IdentityMaxValue => "OracleIdentityMaxValue";
 
+        /// <summary>
+        /// Generates an error message indicating that a specific method must be called on an object implementing a specified interface.
+        /// </summary>
+        /// <param name="methodName">The name of the method that was attempted to be called.</param>
+        /// <param name="interfaceName">The name of the required interface that the object must implement.</param>
+        /// <returns>A formatted error message string.</returns>
         private static string UnsupportedMethodMessage(object methodName, string interfaceName)
         {
             var msg = string.Format(ErrorMessages.MethodXMustBeCalledOnObjectImplementingY, methodName, interfaceName);
@@ -114,6 +135,19 @@ namespace FluentMigrator.Oracle
             return SetIdentity(expression, generation, startWith, incrementBy, minValue, maxValue, castColumn);
         }
 
+        /// <summary>
+        /// Configures the identity settings for an Oracle column.
+        /// </summary>
+        /// <typeparam name="TNext">The next fluent syntax type in the chain.</typeparam>
+        /// <typeparam name="TNextFk">The next fluent syntax type in the chain for foreign keys.</typeparam>
+        /// <param name="expression">The column option syntax to configure.</param>
+        /// <param name="generation">The identity generation type for the column.</param>
+        /// <param name="startWith">The starting value for the identity column (optional).</param>
+        /// <param name="incrementBy">The increment value for the identity column (optional).</param>
+        /// <param name="minValue">The minimum value for the identity column (optional).</param>
+        /// <param name="maxValue">The maximum value for the identity column (optional).</param>
+        /// <param name="castColumn">The column supporting additional features.</param>
+        /// <returns>The next fluent syntax in the chain.</returns>
         private static TNext SetIdentity<TNext, TNextFk>(
             IColumnOptionSyntax<TNext, TNextFk> expression,
             OracleGenerationType generation,
@@ -132,6 +166,16 @@ namespace FluentMigrator.Oracle
             return expression.Identity();
         }
 
+        /// <summary>
+        /// Retrieves the column definition associated with the specified column option syntax.
+        /// </summary>
+        /// <typeparam name="TNext">The type of the next fluent syntax in the chain.</typeparam>
+        /// <typeparam name="TNextFk">The type of the next fluent syntax in the chain for foreign keys.</typeparam>
+        /// <param name="expression">The column option syntax from which to retrieve the column definition.</param>
+        /// <returns>The column definition that supports additional features.</returns>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the provided <paramref name="expression"/> does not implement <see cref="IColumnExpressionBuilder"/>.
+        /// </exception>
         private static ISupportAdditionalFeatures GetColumn<TNext, TNextFk>(IColumnOptionSyntax<TNext, TNextFk> expression) where TNext : IFluentSyntax where TNextFk : IFluentSyntax
         {
             if (expression is IColumnExpressionBuilder cast1)

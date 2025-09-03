@@ -59,11 +59,22 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
+    /// <summary>
+    /// The SQL Server 2000 processor for FluentMigrator.
+    /// </summary>
     public class SqlServer2000Processor : GenericProcessorBase
     {
         [CanBeNull]
         private readonly IServiceProvider _serviceProvider;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SqlServer2000Processor"/> class.
+        /// </summary>
+        /// <param name="logger">The logger.</param>
+        /// <param name="generator">The migration generator.</param>
+        /// <param name="options">The processor options.</param>
+        /// <param name="connectionStringAccessor">The connection string accessor.</param>
+        /// <param name="serviceProvider">The service provider.</param>
         public SqlServer2000Processor(
             [NotNull] ILogger<SqlServer2000Processor> logger,
             [NotNull] SqlServer2000Generator generator,
@@ -74,6 +85,15 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SqlServer2000Processor"/> class.
+        /// </summary>
+        /// <param name="factory">The database provider factory.</param>
+        /// <param name="logger">The logger.</param>
+        /// <param name="generator">The migration generator.</param>
+        /// <param name="options">The processor options.</param>
+        /// <param name="connectionStringAccessor">The connection string accessor.</param>
+        /// <param name="serviceProvider">The service provider.</param>
         protected SqlServer2000Processor(
             DbProviderFactory factory,
             [NotNull] ILogger logger,
@@ -86,22 +106,27 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             _serviceProvider = serviceProvider;
         }
 
+        /// <inheritdoc />
         public override string DatabaseType => ProcessorIdConstants.SqlServer2000;
 
+        /// <inheritdoc />
         public override IList<string> DatabaseTypeAliases { get; } = new List<string>() { ProcessorIdConstants.SqlServer };
 
+        /// <inheritdoc />
         public override void BeginTransaction()
         {
             base.BeginTransaction();
             Logger.LogSql("BEGIN TRANSACTION");
         }
 
+        /// <inheritdoc />
         public override void CommitTransaction()
         {
             base.CommitTransaction();
             Logger.LogSql("COMMIT TRANSACTION");
         }
 
+        /// <inheritdoc />
         public override void RollbackTransaction()
         {
             if (Transaction == null)
@@ -113,11 +138,13 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             Logger.LogSql("ROLLBACK TRANSACTION");
         }
 
+        /// <inheritdoc />
         public override bool SchemaExists(string schemaName)
         {
             return true;
         }
 
+        /// <inheritdoc />
         public override bool TableExists(string schemaName, string tableName)
         {
             try
@@ -131,6 +158,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             return false;
         }
 
+        /// <inheritdoc />
         public override bool ColumnExists(string schemaName, string tableName, string columnName)
         {
             return Exists("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '{0}' AND COLUMN_NAME = '{1}'",
@@ -138,32 +166,38 @@ namespace FluentMigrator.Runner.Processors.SqlServer
                 FormatHelper.FormatSqlEscape(columnName));
         }
 
+        /// <inheritdoc />
         public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
         {
             return Exists("SELECT * FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE CONSTRAINT_CATALOG = DB_NAME() AND TABLE_NAME = '{0}' AND CONSTRAINT_NAME = '{1}'",
                 FormatHelper.FormatSqlEscape(tableName), FormatHelper.FormatSqlEscape(constraintName));
         }
 
+        /// <inheritdoc />
         public override bool IndexExists(string schemaName, string tableName, string indexName)
         {
             return Exists("SELECT NULL FROM sysindexes WHERE name = '{0}'", FormatHelper.FormatSqlEscape(indexName));
         }
 
+        /// <inheritdoc />
         public override bool SequenceExists(string schemaName, string sequenceName)
         {
             return false;
         }
 
+        /// <inheritdoc />
         public override bool DefaultValueExists(string schemaName, string tableName, string columnName, object defaultValue)
         {
             return false;
         }
 
+        /// <inheritdoc />
         public override DataSet ReadTableData(string schemaName, string tableName)
         {
             return Read("SELECT * FROM [{0}]", tableName);
         }
 
+        /// <inheritdoc />
         public override DataSet Read(string template, params object[] args)
         {
             EnsureConnectionIsOpen();
@@ -175,6 +209,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             }
         }
 
+        /// <inheritdoc />
         public override bool Exists(string template, params object[] args)
         {
             EnsureConnectionIsOpen();
@@ -186,11 +221,13 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             }
         }
 
+        /// <inheritdoc />
         public override void Execute(string template, params object[] args)
         {
             Process(string.Format(template, args));
         }
 
+        /// <inheritdoc />
         protected override void Process(string sql)
         {
             Logger.LogSql(sql);
@@ -287,6 +324,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             }
         }
 
+        /// <inheritdoc />
         public override void Process(PerformDBOperationExpression expression)
         {
             EnsureConnectionIsOpen();

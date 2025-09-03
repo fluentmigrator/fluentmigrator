@@ -31,6 +31,9 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner
 {
+    /// <summary>
+    /// Loads migration information from a migration source.
+    /// </summary>
     public class DefaultMigrationInformationLoader : IMigrationInformationLoader
     {
         [NotNull, ItemNotNull]
@@ -46,6 +49,7 @@ namespace FluentMigrator.Runner
         [CanBeNull]
         private SortedList<long, IMigrationInfo> _migrationInfos;
 
+        /// <inheritdoc />
         public DefaultMigrationInformationLoader(
 #pragma warning disable 618
             [NotNull] IMigrationSource source,
@@ -62,14 +66,18 @@ namespace FluentMigrator.Runner
             _includeUntaggedMigrations = runnerOptions.Value.IncludeUntaggedMigrations;
         }
 
+        /// <inheritdoc />
         [NotNull]
         public IMigrationRunnerConventions Conventions { get; }
 
+        /// <inheritdoc />
         [CanBeNull]
         public string Namespace { get; }
 
+        /// <inheritdoc />
         public bool LoadNestedNamespaces { get; }
 
+        /// <inheritdoc />
         public SortedList<long, IMigrationInfo> LoadMigrations()
         {
             if (_migrationInfos != null)
@@ -103,6 +111,7 @@ namespace FluentMigrator.Runner
             return _migrationInfos;
         }
 
+        /// <inheritdoc />
         [NotNull, ItemNotNull]
         private static IEnumerable<IMigrationInfo> FindMigrations(
 #pragma warning disable 618

@@ -26,8 +26,21 @@ using JetBrains.Annotations;
 
 namespace FluentMigrator.Runner
 {
+    /// <summary>
+    /// Provides functionality to load migration information from a source.
+    /// </summary>
     public interface IMigrationInformationLoader
     {
+        /// <summary>
+        /// Loads and retrieves a sorted list of migrations.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="SortedList{TKey, TValue}"/> where the key is the migration version as a <see cref="long"/>,
+        /// and the value is the corresponding <see cref="IMigrationInfo"/> instance.
+        /// </returns>
+        /// <remarks>
+        /// This method is responsible for discovering and organizing migrations in a sorted order based on their version.
+        /// </remarks>
         [NotNull]
         SortedList<long, IMigrationInfo> LoadMigrations();
     }

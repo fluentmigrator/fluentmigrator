@@ -16,6 +16,12 @@
 
 namespace FluentMigrator.Runner.Generators.Oracle
 {
+    /// <summary>
+    /// Defines the interface for the Oracle 12c SQL generator used in FluentMigrator.
+    /// </summary>
+    /// <remarks>
+    /// This interface extends <see cref="IOracleGenerator"/> to provide functionality specific to Oracle 12c.
+    /// </remarks>
     public interface IOracle12CGenerator : IOracleGenerator
     {
     }

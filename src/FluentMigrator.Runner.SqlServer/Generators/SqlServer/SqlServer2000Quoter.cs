@@ -20,26 +20,36 @@ using FluentMigrator.Runner.Generators.Generic;
 
 namespace FluentMigrator.Runner.Generators.SqlServer
 {
+    /// <summary>
+    /// The SQL Server 2000 SQL quoter for FluentMigrator.
+    /// </summary>
     public class SqlServer2000Quoter : GenericQuoter
     {
+        /// <inheritdoc />
         public override string OpenQuote => "[";
 
+        /// <inheritdoc />
         public override string CloseQuote => "]";
 
+        /// <inheritdoc />
         public override string CloseQuoteEscapeString => "]]";
 
+        /// <inheritdoc />
         public override string OpenQuoteEscapeString => string.Empty;
 
+        /// <inheritdoc />
         public override string QuoteSchemaName(string schemaName)
         {
             return string.Empty;
         }
 
+        /// <inheritdoc />
         public override string FormatNationalString(string value)
         {
             return $"N{FormatAnsiString(value)}";
         }
 
+        /// <inheritdoc />
         public override string FormatSystemMethods(SystemMethods value)
         {
             switch (value)

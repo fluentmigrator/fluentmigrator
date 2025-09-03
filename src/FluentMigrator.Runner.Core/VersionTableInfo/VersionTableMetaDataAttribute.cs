@@ -20,6 +20,14 @@ using System;
 
 namespace FluentMigrator.Runner.VersionTableInfo
 {
+    /// <summary>
+    /// An attribute used to mark a class as providing metadata for a version table.
+    /// </summary>
+    /// <remarks>
+    /// Classes decorated with this attribute are expected to implement the
+    /// <see cref="IVersionTableMetaData"/> interface. This attribute is utilized
+    /// by the migration runner to identify and process version table metadata.
+    /// </remarks>
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     public class VersionTableMetaDataAttribute : Attribute
     {

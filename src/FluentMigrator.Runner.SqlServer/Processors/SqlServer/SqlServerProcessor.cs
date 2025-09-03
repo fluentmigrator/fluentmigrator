@@ -22,10 +22,10 @@ using System.IO;
 using System.Linq;
 
 using FluentMigrator.Expressions;
+using FluentMigrator.Generation;
 using FluentMigrator.Runner.BatchParser;
 using FluentMigrator.Runner.BatchParser.Sources;
 using FluentMigrator.Runner.BatchParser.SpecialTokenSearchers;
-using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Generic;
 using FluentMigrator.Runner.Helpers;
 using FluentMigrator.Runner.Initialization;
@@ -39,6 +39,9 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
+    /// <summary>
+    /// The SQL Server processor for FluentMigrator.
+    /// </summary>
     public class SqlServerProcessor : GenericProcessorBase
     {
         [CanBeNull]
@@ -52,12 +55,27 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         private const string SEQUENCES_EXISTS = "SELECT 1 WHERE EXISTS (SELECT * FROM INFORMATION_SCHEMA.SEQUENCES WHERE SEQUENCE_SCHEMA = '{0}' AND SEQUENCE_NAME = '{1}' )";
         private const string DEFAULTVALUE_EXISTS = "SELECT 1 WHERE EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}' AND COLUMN_NAME = '{2}' AND COLUMN_DEFAULT LIKE '{3}')";
 
+        /// <inheritdoc />
         public override string DatabaseType { get;}
 
+        /// <inheritdoc />
         public override IList<string> DatabaseTypeAliases { get; }
 
+        /// <summary>
+        /// Gets the quoter for SQL Server.
+        /// </summary>
         public IQuoter Quoter { get; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SqlServerProcessor"/> class.
+        /// </summary>
+        /// <param name="databaseTypes">The database type names.</param>
+        /// <param name="generator">The migration generator.</param>
+        /// <param name="quoter">The SQL quoter.</param>
+        /// <param name="logger">The logger.</param>
+        /// <param name="options">The processor options.</param>
+        /// <param name="connectionStringAccessor">The connection string accessor.</param>
+        /// <param name="serviceProvider">The service provider.</param>
         protected SqlServerProcessor(
             [NotNull, ItemNotNull] IEnumerable<string> databaseTypes,
             [NotNull] IMigrationGenerator generator,
@@ -70,6 +88,17 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SqlServerProcessor"/> class.
+        /// </summary>
+        /// <param name="databaseTypes">The database type names.</param>
+        /// <param name="factory">The database provider factory.</param>
+        /// <param name="generator">The migration generator.</param>
+        /// <param name="quoter">The SQL quoter.</param>
+        /// <param name="logger">The logger.</param>
+        /// <param name="options">The processor options.</param>
+        /// <param name="connectionStringAccessor">The connection string accessor.</param>
+        /// <param name="serviceProvider">The service provider.</param>
         protected SqlServerProcessor(
             [NotNull, ItemNotNull] IEnumerable<string> databaseTypes,
             [NotNull] DbProviderFactory factory,
@@ -88,23 +117,31 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             Quoter = quoter;
         }
 
+        /// <summary>
+        /// Returns a safe schema name, defaulting to "dbo" if null or empty.
+        /// </summary>
+        /// <param name="schemaName">The schema name.</param>
+        /// <returns>The safe schema name.</returns>
         private static string SafeSchemaName(string schemaName)
         {
             return string.IsNullOrEmpty(schemaName) ? "dbo" : FormatHelper.FormatSqlEscape(schemaName);
         }
 
+        /// <inheritdoc />
         public override void BeginTransaction()
         {
             base.BeginTransaction();
             Logger.LogSql("BEGIN TRANSACTION");
         }
 
+        /// <inheritdoc />
         public override void CommitTransaction()
         {
             base.CommitTransaction();
             Logger.LogSql("COMMIT TRANSACTION");
         }
 
+        /// <inheritdoc />
         public override void RollbackTransaction()
         {
             if (Transaction == null)
@@ -116,11 +153,13 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             Logger.LogSql("ROLLBACK TRANSACTION");
         }
 
+        /// <inheritdoc />
         public override bool SchemaExists(string schemaName)
         {
             return Exists(SqlSchemaExists, SafeSchemaName(schemaName));
         }
 
+        /// <inheritdoc />
         public override bool TableExists(string schemaName, string tableName)
         {
             try
@@ -135,30 +174,35 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             return false;
         }
 
+        /// <inheritdoc />
         public override bool ColumnExists(string schemaName, string tableName, string columnName)
         {
             return Exists(COLUMN_EXISTS, SafeSchemaName(schemaName),
                 FormatHelper.FormatSqlEscape(tableName), FormatHelper.FormatSqlEscape(columnName));
         }
 
+        /// <inheritdoc />
         public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
         {
             return Exists(CONSTRAINT_EXISTS, SafeSchemaName(schemaName),
                 FormatHelper.FormatSqlEscape(tableName), FormatHelper.FormatSqlEscape(constraintName));
         }
 
+        /// <inheritdoc />
         public override bool IndexExists(string schemaName, string tableName, string indexName)
         {
             return Exists(INDEX_EXISTS,
                 FormatHelper.FormatSqlEscape(indexName), SafeSchemaName(schemaName), FormatHelper.FormatSqlEscape(tableName));
         }
 
+        /// <inheritdoc />
         public override bool SequenceExists(string schemaName, string sequenceName)
         {
             return Exists(SEQUENCES_EXISTS, SafeSchemaName(schemaName),
                 FormatHelper.FormatSqlEscape(sequenceName));
         }
 
+        /// <inheritdoc />
         public override bool DefaultValueExists(string schemaName, string tableName, string columnName, object defaultValue)
         {
             var defaultValueAsString = string.Format("%{0}%", FormatHelper.FormatSqlEscape(defaultValue.ToString()));
@@ -167,11 +211,13 @@ namespace FluentMigrator.Runner.Processors.SqlServer
                 FormatHelper.FormatSqlEscape(columnName), defaultValueAsString);
         }
 
+        /// <inheritdoc />
         public override void Execute(string template, params object[] args)
         {
             Process(string.Format(template, args));
         }
 
+        /// <inheritdoc />
         public override bool Exists(string template, params object[] args)
         {
             EnsureConnectionIsOpen();
@@ -183,11 +229,13 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             }
         }
 
+        /// <inheritdoc />
         public override DataSet ReadTableData(string schemaName, string tableName)
         {
             return Read("SELECT * FROM [{0}].[{1}]", SafeSchemaName(schemaName), tableName);
         }
 
+        /// <inheritdoc />
         public override DataSet Read(string template, params object[] args)
         {
             EnsureConnectionIsOpen();
@@ -199,6 +247,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             }
         }
 
+        /// <inheritdoc />
         protected override void Process(string sql)
         {
             Logger.LogSql(sql);
@@ -299,6 +348,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             }
         }
 
+        /// <inheritdoc />
         public override void Process(PerformDBOperationExpression expression)
         {
             Logger.LogSay("Performing DB Operation");

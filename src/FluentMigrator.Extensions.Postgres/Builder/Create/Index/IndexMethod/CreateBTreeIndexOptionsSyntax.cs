@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2021, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,6 +23,14 @@ using JetBrains.Annotations;
 
 namespace FluentMigrator.Builder.Create.Index
 {
+    /// <summary>
+    /// Provides a fluent interface for configuring B-tree index options in a PostgreSQL database.
+    /// </summary>
+    /// <remarks>
+    /// This class extends <see cref="AbstractCreateIndexMethodOptionsSyntax"/> and implements
+    /// <see cref="ICreateBTreeIndexOptionsSyntax"/> to allow for the configuration of B-tree specific
+    /// index options, such as fill factor and vacuum cleanup index scale factor.
+    /// </remarks>
     public class CreateBTreeIndexOptionsSyntax : AbstractCreateIndexMethodOptionsSyntax, ICreateBTreeIndexOptionsSyntax
     {
         /// <inheritdoc />

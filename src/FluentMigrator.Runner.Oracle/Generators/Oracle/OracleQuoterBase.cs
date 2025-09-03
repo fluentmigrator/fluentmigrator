@@ -23,13 +23,36 @@ using FluentMigrator.Runner.Generators.Generic;
 
 namespace FluentMigrator.Runner.Generators.Oracle
 {
+    /// <summary>
+    /// Provides a base implementation for quoting and formatting Oracle-specific SQL expressions.
+    /// </summary>
+    /// <remarks>
+    /// This class extends the functionality of <see cref="FluentMigrator.Runner.Generators.Generic.GenericQuoter"/> 
+    /// to handle Oracle-specific requirements, such as escaping characters, splitting strings into chunks, 
+    /// and formatting various data types like dates, GUIDs, and time spans.
+    /// </remarks>
     public class OracleQuoterBase : GenericQuoter
     {
-        // http://www.dba-oracle.com/t_ora_01704_string_literal_too_long.htm
+
+        /// <summary>
+        /// The maximum chunk length for Oracle string literals.
+        /// </summary>
+        /// <remarks>
+        /// See http://www.dba-oracle.com/t_ora_01704_string_literal_too_long.htm
+        /// </remarks>
         public const int MaxChunkLength = 3900;
 
+        /// <summary>
+        /// The escape characters for Oracle string literals.
+        /// </summary>
         public static readonly char[] EscapeCharacters = new[] { '\'', '\t', '\r', '\n' };
 
+        /// <summary>
+        /// Splits a string into chunks of the specified maximum length, considering escape characters.
+        /// </summary>
+        /// <param name="str">The string to split.</param>
+        /// <param name="maxChunkLength">The maximum chunk length.</param>
+        /// <returns>An enumerable of string chunks.</returns>
         public static IEnumerable<string> SplitBy(string str, int maxChunkLength)
         {
             if (string.IsNullOrEmpty(str))
@@ -57,17 +80,20 @@ namespace FluentMigrator.Runner.Generators.Oracle
             yield return chunk.ToString();
         }
 
+        /// <inheritdoc />
         public override string FormatDateTime(DateTime value)
         {
             var result = string.Format("to_date({0}{1}{0}, {0}yyyy-mm-dd hh24:mi:ss{0})", ValueQuote, value.ToString("yyyy-MM-dd HH:mm:ss")); //ISO 8601 DATETIME FORMAT (EXCEPT 'T' CHAR)
             return result;
         }
 
+        /// <inheritdoc />
         public override string QuoteIndexName(string indexName, string schemaName)
         {
             return CreateSchemaPrefixedQuotedIdentifier(QuoteSchemaName(schemaName), IsQuoted(indexName) ? indexName : Quote(indexName));
         }
 
+        /// <inheritdoc />
         public override string FromTimeSpan(TimeSpan value)
         {
             return string.Format("{0}{1} {2}:{3}:{4}.{5}{0}"
@@ -79,11 +105,13 @@ namespace FluentMigrator.Runner.Generators.Oracle
                 , value.Milliseconds);
         }
 
+        /// <inheritdoc />
         public override string FormatGuid(Guid value)
         {
             return string.Format("{0}{1}{0}", ValueQuote, BitConverter.ToString(value.ToByteArray()).Replace("-", string.Empty));
         }
 
+        /// <inheritdoc />
         public override string FormatSystemMethods(SystemMethods value)
         {
             switch (value)
@@ -104,6 +132,13 @@ namespace FluentMigrator.Runner.Generators.Oracle
             return base.FormatSystemMethods(value);
         }
 
+        /// <summary>
+        /// Formats a string value using the specified Oracle function and formatter, splitting into chunks if necessary.
+        /// </summary>
+        /// <param name="value">The string value to format.</param>
+        /// <param name="oracleFunction">The Oracle function to use.</param>
+        /// <param name="formatter">The formatter function.</param>
+        /// <returns>The formatted string.</returns>
         private static string FormatString(string value, string oracleFunction, Func<string, string> formatter)
         {
             if (value.Length < MaxChunkLength)
@@ -117,6 +152,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
             return string.Join(" || ", chunks);
         }
 
+        /// <inheritdoc />
         public override string FormatAnsiString(string value)
         {
             if (value.Length < MaxChunkLength)
@@ -127,6 +163,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
             return FormatString(value, "TO_CLOB", base.FormatAnsiString);
         }
 
+        /// <inheritdoc />
         public override string FormatNationalString(string value)
         {
             if (value.Length < MaxChunkLength)

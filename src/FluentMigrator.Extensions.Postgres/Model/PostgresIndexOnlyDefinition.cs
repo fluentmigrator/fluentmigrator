@@ -18,11 +18,30 @@ using System;
 
 namespace FluentMigrator.Model
 {
+    /// <summary>
+    /// Represents a definition for a PostgreSQL index with the "ONLY" clause.
+    /// </summary>
+    /// <remarks>
+    /// This class is used to specify whether the "ONLY" clause should be applied to a PostgreSQL index.
+    /// The "ONLY" clause restricts the index to the specified table, excluding any inherited tables.
+    /// </remarks>
     public class PostgresIndexOnlyDefinition
         : ICloneable
     {
+        /// <summary>
+        /// Gets or sets a value indicating whether the "ONLY" clause should be applied to the PostgreSQL index.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if the "ONLY" clause is applied, restricting the index to the specified table and excluding inherited tables;
+        /// otherwise, <c>false</c>.
+        /// </value>
+        /// <remarks>
+        /// The "ONLY" clause is used in PostgreSQL to limit the scope of an index to the table it is defined on,
+        /// without including any inherited tables.
+        /// </remarks>
         public virtual bool IsOnly { get; set; }
 
+        /// <inheritdoc />
         public object Clone()
         {
             return MemberwiseClone();

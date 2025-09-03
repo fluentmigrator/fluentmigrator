@@ -27,43 +27,55 @@ using System.Security.Cryptography;
 
 namespace FluentMigrator.Runner.Generators.Firebird
 {
+    /// <summary>
+    /// Provides logic for truncating Firebird object names to comply with maximum length restrictions.
+    /// </summary>
     public class FirebirdTruncator
     {
         private readonly bool _enabled;
         private readonly bool _packKeyNames;
 
+        /// <inheritdoc />
         public FirebirdTruncator(bool enabled, bool packKeyNames)
         {
             _enabled = enabled;
             _packKeyNames = packKeyNames;
         }
 
+        /// <inheritdoc />
         public void Truncate(CreateSchemaExpression expression) { }
+        /// <inheritdoc />
         public void Truncate(AlterSchemaExpression expression) { }
+        /// <inheritdoc />
         public void Truncate(DeleteSchemaExpression expression) { }
 
+        /// <inheritdoc />
         public void Truncate(CreateTableExpression expression)
         {
             expression.TableName = Truncate(expression.TableName);
             TruncateColumns(expression.Columns);
         }
 
+        /// <inheritdoc />
         public void Truncate(AlterTableExpression expression)
         {
             expression.TableName = Truncate(expression.TableName);
         }
 
+        /// <inheritdoc />
         public void Truncate(DeleteTableExpression expression)
         {
             expression.TableName = Truncate(expression.TableName);
         }
 
+        /// <inheritdoc />
         public void Truncate(RenameTableExpression expression)
         {
             expression.OldName = Truncate(expression.OldName);
             expression.NewName = Truncate(expression.NewName);
         }
 
+        /// <inheritdoc />
         public void Truncate(ColumnDefinition column)
         {
             column.Name = Truncate(column.Name);
@@ -72,24 +84,28 @@ namespace FluentMigrator.Runner.Generators.Firebird
                 column.PrimaryKeyName = _packKeyNames ? Pack(column.PrimaryKeyName) : Truncate(column.PrimaryKeyName);
         }
 
+        /// <inheritdoc />
         public void Truncate(CreateColumnExpression expression)
         {
             expression.TableName = Truncate(expression.TableName);
             Truncate(expression.Column);
         }
 
+        /// <inheritdoc />
         public void Truncate(AlterColumnExpression expression)
         {
             expression.TableName = Truncate(expression.TableName);
             Truncate(expression.Column);
         }
 
+        /// <inheritdoc />
         public void Truncate(DeleteColumnExpression expression)
         {
             expression.TableName = Truncate(expression.TableName);
             expression.ColumnNames = TruncateNames(expression.ColumnNames);
         }
 
+        /// <inheritdoc />
         public void Truncate(RenameColumnExpression expression)
         {
             expression.OldName = Truncate(expression.OldName);
@@ -97,6 +113,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
             expression.TableName = Truncate(expression.TableName);
         }
 
+        /// <inheritdoc />
         public void Truncate(IndexDefinition index)
         {
             index.TableName = Truncate(index.TableName);
@@ -104,17 +121,19 @@ namespace FluentMigrator.Runner.Generators.Firebird
             index.Columns.ToList().ForEach(x => x.Name = Truncate(x.Name));
         }
 
-
+        /// <inheritdoc />
         public void Truncate(CreateIndexExpression expression)
         {
             Truncate(expression.Index);
         }
 
+        /// <inheritdoc />
         public void Truncate(DeleteIndexExpression expression)
         {
             Truncate(expression.Index);
         }
 
+        /// <inheritdoc />
         public void Truncate(ConstraintDefinition constraint)
         {
             constraint.TableName = Truncate(constraint.TableName);
@@ -122,16 +141,19 @@ namespace FluentMigrator.Runner.Generators.Firebird
             constraint.Columns = TruncateNames(constraint.Columns);
         }
 
+        /// <inheritdoc />
         public void Truncate(CreateConstraintExpression expression)
         {
             Truncate(expression.Constraint);
         }
 
+        /// <inheritdoc />
         public void Truncate(DeleteConstraintExpression expression)
         {
             Truncate(expression.Constraint);
         }
 
+        /// <inheritdoc />
         public void Truncate(ForeignKeyDefinition foreignKey)
         {
             foreignKey.Name = _packKeyNames ? Pack(foreignKey.Name) : Truncate(foreignKey.Name);
@@ -141,42 +163,50 @@ namespace FluentMigrator.Runner.Generators.Firebird
             foreignKey.ForeignColumns = TruncateNames(foreignKey.ForeignColumns);
         }
 
+        /// <inheritdoc />
         public void Truncate(CreateForeignKeyExpression expression)
         {
             Truncate(expression.ForeignKey);
         }
+        /// <inheritdoc />
         public void Truncate(DeleteForeignKeyExpression expression)
         {
             Truncate(expression.ForeignKey);
         }
 
+        /// <inheritdoc />
         public void Truncate(AlterDefaultConstraintExpression expression)
         {
             expression.TableName = Truncate(expression.TableName);
             expression.ColumnName = Truncate(expression.ColumnName);
         }
 
+        /// <inheritdoc />
         public void Truncate(DeleteDefaultConstraintExpression expression)
         {
             expression.TableName = Truncate(expression.TableName);
             expression.ColumnName = Truncate(expression.ColumnName);
         }
 
+        /// <inheritdoc />
         public void Truncate(SequenceDefinition sequence)
         {
             sequence.Name = Truncate(sequence.Name);
         }
 
+        /// <inheritdoc />
         public void Truncate(CreateSequenceExpression expression)
         {
             Truncate(expression.Sequence);
         }
 
+        /// <inheritdoc />
         public void Truncate(DeleteSequenceExpression expression)
         {
             expression.SequenceName = Truncate(expression.SequenceName);
         }
 
+        /// <inheritdoc />
         public void Truncate(InsertDataExpression expression)
         {
             expression.TableName = Truncate(expression.TableName);
@@ -194,6 +224,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
             expression.Rows.AddRange(insertions);
         }
 
+        /// <inheritdoc />
         public void Truncate(DeleteDataExpression expression)
         {
             expression.TableName = Truncate(expression.TableName);
@@ -211,6 +242,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
             expression.Rows.AddRange(deletions);
         }
 
+        /// <inheritdoc />
         public void Truncate(UpdateDataExpression expression)
         {
             expression.TableName = Truncate(expression.TableName);
@@ -233,6 +265,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
             }
         }
 
+        /// <inheritdoc />
         public ICollection<string> TruncateNames(ICollection<string> names)
         {
             List<string> ret = new List<string>();
@@ -243,6 +276,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
             return ret;
         }
 
+        /// <inheritdoc />
         public void TruncateColumns(ICollection<ColumnDefinition> columns)
         {
             foreach (ColumnDefinition colDef in columns)
@@ -251,6 +285,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
             }
         }
 
+        /// <inheritdoc />
         public string Truncate(string name)
         {
             if (!string.IsNullOrEmpty(name))
@@ -266,6 +301,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
             return name;
         }
 
+        /// <inheritdoc />
         public string Pack(string name)
         {
             if (!string.IsNullOrEmpty(name))

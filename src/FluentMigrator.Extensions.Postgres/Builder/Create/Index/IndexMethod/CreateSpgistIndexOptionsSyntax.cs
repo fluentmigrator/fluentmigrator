@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2021, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,6 +20,15 @@ using JetBrains.Annotations;
 
 namespace FluentMigrator.Builder.Create.Index
 {
+    /// <summary>
+    /// Provides SP-GiST (Space-Partitioned Generalized Search Tree) index options
+    /// for use in PostgreSQL migrations.
+    /// </summary>
+    /// <remarks>
+    /// This class extends <see cref="AbstractCreateIndexMethodOptionsSyntax"/> and implements
+    /// <see cref="ICreateSpgistIndexOptionsSyntax"/> to allow fluent configuration of SP-GiST index options,
+    /// such as setting the fill factor.
+    /// </remarks>
     public class CreateSpgistIndexOptionsSyntax : AbstractCreateIndexMethodOptionsSyntax, ICreateSpgistIndexOptionsSyntax
     {
         /// <inheritdoc />

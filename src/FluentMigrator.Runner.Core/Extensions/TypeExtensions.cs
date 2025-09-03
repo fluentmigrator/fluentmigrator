@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 
 // Copyright (c) 2007-2024, Fluent Migrator Project
 // 
@@ -20,13 +20,33 @@ using System;
 
 namespace FluentMigrator.Runner.Extensions
 {
+    /// <summary>
+    /// Provides extension methods for working with <see cref="System.Type"/> objects.
+    /// </summary>
     public static class TypeExtensions
     {
+        /// <summary>
+        /// Determines whether the specified <see cref="Type"/> is assignable to the type specified by the generic parameter <typeparamref name="T"/>.
+        /// </summary>
+        /// <typeparam name="T">The type to check against.</typeparam>
+        /// <param name="type">The <see cref="Type"/> to evaluate.</param>
+        /// <returns>
+        /// <c>true</c> if the specified <see cref="Type"/> is assignable to <typeparamref name="T"/>; otherwise, <c>false</c>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="type"/> is <c>null</c>.</exception>
         public static bool Is<T>(this Type type)
         {
             return typeof (T).IsAssignableFrom(type);
         }
 
+        /// <summary>
+        /// Determines whether the specified <see cref="Type"/> is a concrete class.
+        /// </summary>
+        /// <param name="type">The <see cref="Type"/> to evaluate.</param>
+        /// <returns>
+        /// <c>true</c> if the specified <see cref="Type"/> is a class and not abstract; otherwise, <c>false</c>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="type"/> is <c>null</c>.</exception>
         public static bool IsConcrete(this Type type)
         {
             return type.IsClass && !type.IsAbstract;

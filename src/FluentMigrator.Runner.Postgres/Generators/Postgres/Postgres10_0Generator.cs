@@ -26,23 +26,30 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Generators.Postgres
 {
+    /// <summary>
+    /// The PostgreSQL 10.0 SQL generator for FluentMigrator.
+    /// </summary>
     public class Postgres10_0Generator : PostgresGenerator
     {
+        /// <inheritdoc />
         public Postgres10_0Generator([NotNull] PostgresQuoter quoter)
             : this(quoter, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()))
         {
         }
 
+        /// <inheritdoc />
         public Postgres10_0Generator([NotNull] PostgresQuoter quoter, [NotNull] IOptions<GeneratorOptions> generatorOptions)
             : base(new Postgres10_0Column(quoter, new Postgres92.Postgres92TypeMap()), quoter, generatorOptions)
         {
         }
 
+        /// <inheritdoc />
         protected Postgres10_0Generator([NotNull] PostgresQuoter quoter, [NotNull] IOptions<GeneratorOptions> generatorOptions, [NotNull] IPostgresTypeMap typeMap)
             : base(new Postgres10_0Column(quoter, typeMap), quoter, generatorOptions)
         {
         }
 
+        /// <inheritdoc />
         protected Postgres10_0Generator(
             [NotNull] IColumn column,
             [NotNull] PostgresQuoter quoter,
@@ -76,8 +83,8 @@ namespace FluentMigrator.Runner.Generators.Postgres
                 expression.GetAdditionalFeature<PostgresOverridingIdentityValuesType>(
                     PostgresExtensions.OverridingIdentityValues);
 
-            return string.Format(" OVERRIDING {0} VALUE",
-                overridingIdentityValues == PostgresOverridingIdentityValuesType.User ? "USER" : "SYSTEM");
+            return
+                $" OVERRIDING {(overridingIdentityValues == PostgresOverridingIdentityValuesType.User ? "USER" : "SYSTEM")} VALUE";
         }
 
         /// <inheritdoc />

@@ -20,7 +20,7 @@ using System;
 using System.Globalization;
 using System.Threading;
 
-using FluentMigrator.Runner.Generators;
+using FluentMigrator.Generation;
 using FluentMigrator.Runner.Generators.Generic;
 using FluentMigrator.Runner.Generators.Jet;
 using FluentMigrator.Runner.Generators.MySql;

@@ -17,7 +17,7 @@
 using System;
 using System.Collections.Generic;
 
-using FluentMigrator.Runner.Generators;
+using FluentMigrator.Generation;
 
 namespace FluentMigrator.Runner.Processors.Firebird
 {
