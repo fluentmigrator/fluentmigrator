@@ -64,7 +64,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             var expression = new CreateColumnExpression { TableName = "TestTable1", Column = column, SchemaName = "TestSchema" };
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"ALTER TABLE ""TestSchema"".""TestTable1"" ADD COLUMN ""TestColumn1"" VARCHAR(5) NOT NULL DEFAULT CURRENT_TIMESTAMP();", _quotingEnabled);
+            result.ShouldBe(@"ALTER TABLE ""TestSchema"".""TestTable1"" ADD COLUMN ""TestColumn1"" VARCHAR(5) NOT NULL DEFAULT SYSDATE()::TIMESTAMP_NTZ;", _quotingEnabled);
         }
 
         [Test]
@@ -81,7 +81,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             expression.Columns.Add(column);
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"CREATE TABLE ""TestSchema"".""TestTable1"" (""TestColumn1"" VARCHAR(5) NOT NULL DEFAULT CURRENT_TIMESTAMP());", _quotingEnabled);
+            result.ShouldBe(@"CREATE TABLE ""TestSchema"".""TestTable1"" (""TestColumn1"" VARCHAR(5) NOT NULL DEFAULT SYSDATE()::TIMESTAMP_NTZ);", _quotingEnabled);
         }
 
         [Test]
