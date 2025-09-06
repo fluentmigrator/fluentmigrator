@@ -37,13 +37,13 @@ steps:
   inputs:
     version: '9.x'
 
-- task: gitversion/setup@0
+- task: gitversion-setup@4.1.0
   displayName: 'Install GitVersion (using GitTools 0.10.2.23031113 or later)'
   inputs:
     versionSpec: '5.12'
     includePrerelease: true
 
-- task: gitversion/execute@0
+- task: gitversion-execute@4.1.0
   displayName: 'Execute GitVersion (using GitTools 0.10.2.23031113 or later)'
   inputs:
     updateAssemblyInfo: false
