@@ -22,7 +22,6 @@ using System.Data;
 using System.Linq;
 
 using FluentMigrator.Expressions;
-using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators;
 
 using JetBrains.Annotations;
@@ -65,12 +64,8 @@ namespace FluentMigrator.Runner.Processors
         {
             _logger = logger;
             var generator = generatorAccessor.Generator;
-            DatabaseType = string.IsNullOrEmpty(accessorOptions.Value.ProcessorId) ? generator.GetName(_logger) : accessorOptions.Value.ProcessorId;
+            DatabaseType = string.IsNullOrEmpty(accessorOptions.Value.ProcessorId) ? generator.GeneratorId : accessorOptions.Value.ProcessorId;
             Generator = generator;
-            Options = options.Value;
-#pragma warning disable 612
-            Announcer = new LoggerAnnouncer(logger, new AnnouncerOptions() { ShowElapsedTime = true, ShowSql = true });
-#pragma warning restore 612
         }
 
         /// <summary>
@@ -101,13 +96,9 @@ namespace FluentMigrator.Runner.Processors
         {
             _logger = logger;
             var generator = generatorAccessor.Generator;
-            DatabaseType = processorIds.FirstOrDefault() ?? generator.GetName(_logger);
+            DatabaseType = processorIds.FirstOrDefault() ?? generator.GeneratorId;
             DatabaseTypeAliases = processorIds.Count == 0 ? Array.Empty<string>() : processorIds.Skip(1).ToArray();
             Generator = generator;
-            Options = options.Value;
-#pragma warning disable 612
-            Announcer = new LoggerAnnouncer(logger, AnnouncerOptions.AllEnabled);
-#pragma warning restore 612
         }
 
         /// <summary>
@@ -119,24 +110,6 @@ namespace FluentMigrator.Runner.Processors
         /// to generate SQL for various migration expressions.
         /// </value>
         public IMigrationGenerator Generator { get; set; }
-
-        /// <summary>
-        /// Gets or sets the announcer used for logging migration-related messages.
-        /// </summary>
-        /// <remarks>
-        /// This property is marked as <see cref="ObsoleteAttribute"/> and should not be used in new code.
-        /// </remarks>
-        [Obsolete]
-        private IAnnouncer Announcer { get; set; }
-
-        /// <summary>
-        /// Gets or sets the processor options that define the behavior and configuration
-        /// of the migration processor.
-        /// </summary>
-        /// <value>
-        /// An instance of <see cref="ProcessorOptions"/> containing the processor's settings.
-        /// </value>
-        private ProcessorOptions Options {get; set;}
 
         /// <inheritdoc />
         public void Execute(string sql)

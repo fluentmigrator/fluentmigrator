@@ -18,14 +18,13 @@ using System;
 using System.Collections.Generic;
 
 using JetBrains.Annotations;
-#pragma warning disable 618
 
 namespace FluentMigrator.Runner.Initialization
 {
     /// <summary>
     /// This is a specialization of <see cref="IMigrationSource"/> that allows filtering the types beforehand
     /// </summary>
-    public interface IFilteringMigrationSource : IMigrationSource
+    public interface IFilteringMigrationSource
     {
         /// <summary>
         /// Returns the instances for all found types implementing <see cref="IMigration"/>

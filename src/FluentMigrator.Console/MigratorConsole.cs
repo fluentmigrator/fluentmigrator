@@ -396,10 +396,6 @@ namespace FluentMigrator.Console
                 .AddSingleton<IConventionSet>(conventionSet)
                 .Configure<SelectingProcessorAccessorOptions>(opt => opt.ProcessorId = ProcessorType)
                 .Configure<AssemblySourceOptions>(opt => opt.AssemblyNames = new[] { TargetAssembly })
-#pragma warning disable 612
-                .Configure<AppConfigConnectionStringAccessorOptions>(
-                    opt => opt.ConnectionStringConfigPath = ConnectionStringConfigPath)
-#pragma warning restore 612
                 .Configure<TypeFilterOptions>(
                     opt =>
                     {

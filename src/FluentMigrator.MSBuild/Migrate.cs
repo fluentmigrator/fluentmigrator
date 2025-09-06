@@ -24,7 +24,9 @@ using FluentMigrator.Runner;
 using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Extensions;
 using FluentMigrator.Runner.Initialization;
+#if NETFRAMEWORK
 using FluentMigrator.Runner.Initialization.NetFramework;
+#endif
 using FluentMigrator.Runner.Logging;
 using FluentMigrator.Runner.Processors;
 
@@ -195,10 +197,6 @@ namespace FluentMigrator.MSBuild
                 .AddSingleton<ILoggerProvider, FluentMigratorConsoleLoggerProvider>()
                 .Configure<SelectingProcessorAccessorOptions>(opt => opt.ProcessorId = DatabaseType)
                 .Configure<AssemblySourceOptions>(opt => opt.AssemblyNames = Targets)
-#pragma warning disable 612
-                .Configure<AppConfigConnectionStringAccessorOptions>(
-                    opt => opt.ConnectionStringConfigPath = ConnectionStringConfigPath)
-#pragma warning restore 612
                 .Configure<TypeFilterOptions>(
                     opt =>
                     {
