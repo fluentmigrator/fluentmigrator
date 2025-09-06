@@ -856,9 +856,15 @@ namespace FluentMigrator.Runner
 
                 var isCurrent = (status & MigrationStatus.AppliedMask) == MigrationStatus.Current;
                 var isBreaking = (status & MigrationStatus.Breaking) == MigrationStatus.Breaking;
-                if (isCurrent || isBreaking)
+                if (isBreaking)
                 {
-                    _logger.LogEmphasized(message);
+                    const string skull = "💀";
+                    _logger.LogEmphasized($"{skull} {message}");
+                }
+                else if (isCurrent)
+                {
+                    const string placeOfInterestSign = "⌘";
+                    _logger.LogSay($"{placeOfInterestSign} {message}");
                 }
                 else
                 {
