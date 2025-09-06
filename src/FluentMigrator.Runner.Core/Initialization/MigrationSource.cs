@@ -53,7 +53,7 @@ namespace FluentMigrator.Runner.Initialization
         /// Initializes a new instance of the <see cref="ProfileSource"/> class.
         /// </summary>
         /// <param name="source">The assembly source</param>
-        /// <param name="conventions">The migration runner conventios</param>
+        /// <param name="conventions">The migration runner conventions</param>
         /// <param name="serviceProvider">The service provider</param>
         /// <param name="sourceItems">The additional migration source items</param>
         /// <param name="logger">The logger for troubleshooting "No migrations found" error.</param>
@@ -69,27 +69,6 @@ namespace FluentMigrator.Runner.Initialization
             _serviceProvider = serviceProvider;
             _sourceItems = sourceItems;
             _logger = logger;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ProfileSource"/> class.
-        /// </summary>
-        /// <param name="source">The assembly source</param>
-        /// <param name="conventions">The migration runner conventions</param>
-        [Obsolete]
-        public MigrationSource(
-            [NotNull] IAssemblySource source,
-            [NotNull] IMigrationRunnerConventions conventions)
-        {
-            _source = source;
-            _conventions = conventions;
-            _sourceItems = Enumerable.Empty<IMigrationSourceItem>();
-        }
-
-        /// <inheritdoc />
-        public IEnumerable<IMigration> GetMigrations()
-        {
-            return GetMigrations(_conventions.TypeIsMigration);
         }
 
         /// <inheritdoc />
@@ -121,18 +100,47 @@ namespace FluentMigrator.Runner.Initialization
             }
         }
 
+        /// <summary>
+        /// Retrieves all exported types from the assemblies provided by the <see cref="IAssemblySource"/>.
+        /// </summary>
+        /// <returns>
+        /// A collection of <see cref="Type"/> objects representing the exported types from the assemblies.
+        /// </returns>
+        /// <remarks>
+        /// This method aggregates the exported types from all assemblies in the <see cref="IAssemblySource"/>.
+        /// </remarks>
         private IEnumerable<Type> GetExportedTypes()
         {
             return _source
                 .Assemblies.SelectMany(a => a.GetExportedTypes());
         }
 
+        /// <summary>
+        /// Retrieves a collection of migration type candidates by combining exported types from the assemblies
+        /// provided by the <see cref="IAssemblySource"/> and migration type candidates from additional source items.
+        /// </summary>
+        /// <returns>
+        /// A collection of <see cref="Type"/> objects representing potential migration types.
+        /// </returns>
+        /// <remarks>
+        /// This method aggregates the exported types from the assemblies in the <see cref="IAssemblySource"/> 
+        /// and the migration type candidates from the additional <see cref="IMigrationSourceItem"/> instances.
+        /// </remarks>
         private IEnumerable<Type> GetMigrationTypeCandidates()
         {
             return GetExportedTypes()
                 .Union(_sourceItems.SelectMany(i => i.MigrationTypeCandidates));
         }
 
+        /// <summary>
+        /// Creates an instance of the specified migration type.
+        /// </summary>
+        /// <param name="type">The type of the migration to create.</param>
+        /// <returns>An instance of the specified migration type.</returns>
+        /// <remarks>
+        /// If a service provider is available, it uses <see cref="ActivatorUtilities.CreateInstance(IServiceProvider, Type)"/> 
+        /// to create the instance. Otherwise, it falls back to <see cref="Activator.CreateInstance(Type)"/>.
+        /// </remarks>
         private IMigration CreateInstance(Type type)
         {
             if (_serviceProvider == null)
