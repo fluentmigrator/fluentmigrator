@@ -95,23 +95,6 @@ namespace FluentMigrator.Runner.Initialization
         protected IServiceProvider ServiceProvider => _lazyServiceProvider.Value;
 
         /// <summary>
-        /// Retrieves the target assemblies that contain migration classes.
-        /// </summary>
-        /// <remarks>
-        /// This method fetches the assemblies from the configured <see cref="IAssemblySource"/>.
-        /// If the assemblies have already been retrieved, the cached collection is returned.
-        /// </remarks>
-        /// <returns>
-        /// A collection of <see cref="Assembly"/> instances representing the target assemblies.
-        /// </returns>
-        /// <seealso cref="IAssemblySource.Assemblies"/>
-        [Obsolete]
-        protected virtual IEnumerable<Assembly> GetTargetAssemblies()
-        {
-            return _assemblies ?? (_assemblies = _assemblySource.Assemblies);
-        }
-
-        /// <summary>
         /// Will be called during the runner scope initialization
         /// </summary>
         /// <remarks>
