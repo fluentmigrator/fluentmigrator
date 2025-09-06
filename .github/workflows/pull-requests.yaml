@@ -26,6 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       checks: write
+      issues: write
       pull-requests: write
 
     strategy:
