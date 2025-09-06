@@ -40,7 +40,7 @@ steps:
 - task: gitversion-setup@4.1.0
   displayName: 'Install GitVersion (using GitTools 0.10.2.23031113 or later)'
   inputs:
-    versionSpec: '5.12'
+    versionSpec: '6.3.x'
     includePrerelease: true
 
 - task: gitversion-execute@4.1.0
