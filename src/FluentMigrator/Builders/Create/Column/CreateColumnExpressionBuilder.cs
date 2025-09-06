@@ -307,6 +307,56 @@ namespace FluentMigrator.Builders.Create.Column
         }
 
         /// <inheritdoc />
+        public ICreateColumnOptionOrForeignKeyCascadeSyntax ForeignKey(string[] foreignColumns, string primaryTableName, string[] primaryColumns)
+        {
+            return ForeignKey(null, null, foreignColumns, primaryTableName, primaryColumns);
+        }
+
+        /// <inheritdoc />
+        public ICreateColumnOptionOrForeignKeyCascadeSyntax ForeignKey(string foreignKeyName, string[] foreignColumns, string primaryTableName, string[] primaryColumns)
+        {
+            return ForeignKey(foreignKeyName, null, foreignColumns, primaryTableName, primaryColumns);
+        }
+
+        /// <inheritdoc />
+        public ICreateColumnOptionOrForeignKeyCascadeSyntax ForeignKey(
+            string foreignKeyName,
+            string primaryTableSchema,
+            string[] foreignColumns,
+            string primaryTableName,
+            string[] primaryColumns)
+        {
+            Expression.Column.IsForeignKey = true;
+
+            var fk = new CreateForeignKeyExpression
+            {
+                ForeignKey = new ForeignKeyDefinition
+                {
+                    Name = foreignKeyName,
+                    PrimaryTable = primaryTableName,
+                    PrimaryTableSchema = primaryTableSchema,
+                    ForeignTable = Expression.TableName,
+                    ForeignTableSchema = Expression.SchemaName
+                }
+            };
+
+            // Add all foreign and primary columns
+            foreach (var column in foreignColumns)
+            {
+                fk.ForeignKey.ForeignColumns.Add(column);
+            }
+            foreach (var column in primaryColumns)
+            {
+                fk.ForeignKey.PrimaryColumns.Add(column);
+            }
+
+            _context.Expressions.Add(fk);
+            CurrentForeignKey = fk.ForeignKey;
+            Expression.Column.ForeignKey = fk.ForeignKey;
+            return this;
+        }
+
+        /// <inheritdoc />
         public ICreateColumnOptionOrForeignKeyCascadeSyntax OnDelete(Rule rule)
         {
             CurrentForeignKey.OnDelete = rule;

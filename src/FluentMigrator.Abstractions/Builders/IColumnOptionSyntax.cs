@@ -166,6 +166,36 @@ namespace FluentMigrator.Builders
         TNextFk ForeignKey();
 
         /// <summary>
+        /// Specifies a multi-column foreign key
+        /// </summary>
+        /// <param name="foreignColumns">The foreign key column names</param>
+        /// <param name="primaryTableName">The primary table name</param>
+        /// <param name="primaryColumns">The primary table column names</param>
+        /// <returns>The next step</returns>
+        TNextFk ForeignKey(string[] foreignColumns, string primaryTableName, string[] primaryColumns);
+
+        /// <summary>
+        /// Specifies a multi-column foreign key
+        /// </summary>
+        /// <param name="foreignKeyName">The foreign key name</param>
+        /// <param name="foreignColumns">The foreign key column names</param>
+        /// <param name="primaryTableName">The primary table name</param>
+        /// <param name="primaryColumns">The primary table column names</param>
+        /// <returns>The next step</returns>
+        TNextFk ForeignKey(string foreignKeyName, string[] foreignColumns, string primaryTableName, string[] primaryColumns);
+
+        /// <summary>
+        /// Specifies a multi-column foreign key
+        /// </summary>
+        /// <param name="foreignKeyName">The foreign key name</param>
+        /// <param name="primaryTableSchema">The primary table schema name</param>
+        /// <param name="foreignColumns">The foreign key column names</param>
+        /// <param name="primaryTableName">The primary table name</param>
+        /// <param name="primaryColumns">The primary table column names</param>
+        /// <returns>The next step</returns>
+        TNextFk ForeignKey(string foreignKeyName, string primaryTableSchema, string[] foreignColumns, string primaryTableName, string[] primaryColumns);
+
+        /// <summary>
         /// Specify a foreign key pointing to the current column
         /// </summary>
         /// <param name="foreignTableName">The foreign key table</param>
