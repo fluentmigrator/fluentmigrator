@@ -44,11 +44,17 @@ namespace FluentMigrator.Runner.Processors
         private DbProviderFactory _instance;
 
         /// <summary>
-        /// 
+        /// Initializes a new instance of the <see cref="ReflectionBasedDbFactory"/> class.
         /// </summary>
-        /// <param name="serviceProvider"></param>
-        /// <param name="testEntries"></param>
-        /// <exception cref="ArgumentException"></exception>
+        /// <param name="serviceProvider">
+        /// The service provider used to resolve dependencies.
+        /// </param>
+        /// <param name="testEntries">
+        /// An array of <see cref="TestEntry"/> instances representing the test entries.
+        /// </param>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="testEntries"/> is empty.
+        /// </exception>
         protected ReflectionBasedDbFactory(IServiceProvider serviceProvider, params TestEntry[] testEntries)
         {
             if (testEntries.Length == 0)
