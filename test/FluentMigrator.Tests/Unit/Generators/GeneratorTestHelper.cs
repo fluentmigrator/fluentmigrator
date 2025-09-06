@@ -267,7 +267,7 @@ namespace FluentMigrator.Tests.Unit.Generators
             expression.Columns.Add(new ColumnDefinition { Name = "TestColumn3", Type = DbType.String });
             
             // This will be created using the fluent syntax with the new multi-column ForeignKey method
-            // The foreign key will be defined as: ForeignKey(new[] { TestColumnName1, TestColumnName2 }, TestTableName2, new[] { TestColumnName2, "TestColumn4" })
+            // The foreign key will be defined as: ForeignKey([TestColumnName1, TestColumnName2], TestTableName2, [TestColumnName2, "TestColumn4"])
             return expression;
         }
 

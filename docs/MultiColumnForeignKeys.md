@@ -20,7 +20,7 @@ FluentMigrator now supports multi-column foreign keys through new overloads of t
 .ForeignKey(string foreignKeyName, string[] foreignColumns, string primaryTableName, string[] primaryColumns)
 
 // Multi-column foreign key with schema
-.ForeignKey(string foreignKeyName, string primaryTableSchema, string[] foreignColumns, string primaryTableName, string[] primaryColumns)
+.ForeignKey(string foreignKeyName, string[] foreignColumns, string primaryTableSchema, string primaryTableName, string[] primaryColumns)
 ```
 
 ## Examples
@@ -44,7 +44,7 @@ public class CreateAreaTables : Migration
             .WithColumn("ArticleId").AsString().NotNullable()
             .WithColumn("AreaGroupIndex").AsInt32().NotNullable()
             .WithColumn("Index").AsInt32().NotNullable()
-            .ForeignKey(new[] { "ArticleId", "AreaGroupIndex" }, "AreaGroup", new[] { "ArticleId", "Index" })
+            .ForeignKey(["ArticleId", "AreaGroupIndex"], "AreaGroup", ["ArticleId", "Index"])
             .OnDelete(Rule.Cascade);
     }
 
@@ -78,9 +78,9 @@ Create.Table("Area")
     .WithColumn("AreaGroupIndex").AsInt32().NotNullable()
     .WithColumn("Index").AsInt32().NotNullable()
     .ForeignKey("FK_Area_References_AreaGroup", 
-                new[] { "ArticleId", "AreaGroupIndex" }, 
+                ["ArticleId", "AreaGroupIndex"], 
                 "AreaGroup", 
-                new[] { "ArticleId", "Index" })
+                ["ArticleId", "Index"])
     .OnDelete(Rule.Cascade);
 ```
 
@@ -92,10 +92,10 @@ Create.Table("Area").InSchema("content")
     .WithColumn("AreaGroupIndex").AsInt32().NotNullable()
     .WithColumn("Index").AsInt32().NotNullable()
     .ForeignKey("FK_Area_AreaGroup", 
+                ["ArticleId", "AreaGroupIndex"], 
                 "content",  // primary table schema
-                new[] { "ArticleId", "AreaGroupIndex" }, 
                 "AreaGroup", 
-                new[] { "ArticleId", "Index" })
+                ["ArticleId", "Index"])
     .OnDelete(Rule.Cascade);
 ```
 
@@ -134,7 +134,7 @@ Create.Table("Area")
     .WithColumn("ArticleId").AsString().NotNullable()
     .WithColumn("AreaGroupIndex").AsInt32().NotNullable()
     .WithColumn("Index").AsInt32().NotNullable()
-    .ForeignKey(new[] { "ArticleId", "AreaGroupIndex" }, "AreaGroup", new[] { "ArticleId", "Index" })
+    .ForeignKey(["ArticleId", "AreaGroupIndex"], "AreaGroup", ["ArticleId", "Index"])
     .OnDelete(Rule.Cascade);
 
 Create.PrimaryKey("PK_Area")

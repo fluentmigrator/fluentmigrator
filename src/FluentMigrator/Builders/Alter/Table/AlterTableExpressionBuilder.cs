@@ -373,20 +373,20 @@ namespace FluentMigrator.Builders.Alter.Table
         /// <inheritdoc />
         public IAlterTableColumnOptionOrAddColumnOrAlterColumnOrForeignKeyCascadeSyntax ForeignKey(string[] foreignColumns, string primaryTableName, string[] primaryColumns)
         {
-            return ForeignKey(null, null, foreignColumns, primaryTableName, primaryColumns);
+            return ForeignKey(null, foreignColumns, null, primaryTableName, primaryColumns);
         }
 
         /// <inheritdoc />
         public IAlterTableColumnOptionOrAddColumnOrAlterColumnOrForeignKeyCascadeSyntax ForeignKey(string foreignKeyName, string[] foreignColumns, string primaryTableName, string[] primaryColumns)
         {
-            return ForeignKey(foreignKeyName, null, foreignColumns, primaryTableName, primaryColumns);
+            return ForeignKey(foreignKeyName, foreignColumns, null, primaryTableName, primaryColumns);
         }
 
         /// <inheritdoc />
         public IAlterTableColumnOptionOrAddColumnOrAlterColumnOrForeignKeyCascadeSyntax ForeignKey(
             string foreignKeyName,
-            string primaryTableSchema,
             string[] foreignColumns,
+            string primaryTableSchema,
             string primaryTableName,
             string[] primaryColumns)
         {

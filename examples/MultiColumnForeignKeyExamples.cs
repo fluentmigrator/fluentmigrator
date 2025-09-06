@@ -52,7 +52,7 @@ namespace FluentMigrator.Example.MultiColumnForeignKey
                 .WithColumn("AreaGroupIndex").AsInt32().NotNullable()
                 .WithColumn("Index").AsInt32().NotNullable()
                 // The following line uses the new multi-column foreign key syntax
-                .ForeignKey(new[] { "ArticleId", "AreaGroupIndex" }, "AreaGroup", new[] { "ArticleId", "Index" })
+                .ForeignKey(["ArticleId", "AreaGroupIndex"], "AreaGroup", ["ArticleId", "Index"])
                 .OnDelete(Rule.Cascade);
 
             // Add composite primary key to Area
@@ -93,7 +93,7 @@ namespace FluentMigrator.Example.MultiColumnForeignKey
                 .WithColumn("AreaGroupIndex").AsInt32().NotNullable()
                 .WithColumn("Index").AsInt32().NotNullable()
                 // This demonstrates the named version of the new multi-column foreign key syntax
-                .ForeignKey("FK_Area_AreaGroup", new[] { "ArticleId", "AreaGroupIndex" }, "AreaGroup", new[] { "ArticleId", "Index" })
+                .ForeignKey("FK_Area_AreaGroup", ["ArticleId", "AreaGroupIndex"], "AreaGroup", ["ArticleId", "Index"])
                 .OnDelete(Rule.Cascade);
 
             // Add composite primary key to Area
@@ -137,7 +137,7 @@ namespace FluentMigrator.Example.MultiColumnForeignKey
                 .WithColumn("AreaGroupIndex").AsInt32().NotNullable()
                 .WithColumn("Index").AsInt32().NotNullable()
                 // This demonstrates the schema-aware version of the new multi-column foreign key syntax
-                .ForeignKey("FK_Area_AreaGroup", "content", new[] { "ArticleId", "AreaGroupIndex" }, "AreaGroup", new[] { "ArticleId", "Index" })
+                .ForeignKey("FK_Area_AreaGroup", ["ArticleId", "AreaGroupIndex"], "content", "AreaGroup", ["ArticleId", "Index"])
                 .OnDelete(Rule.Cascade);
 
             // Add composite primary key to Area
