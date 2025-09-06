@@ -24,7 +24,6 @@ using FluentMigrator.Runner.VersionTableInfo;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
-using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Versioning
 {
@@ -39,27 +38,25 @@ namespace FluentMigrator.Tests.Unit.Versioning
             // Arrange
             var versionTableMetaData = new TestVersionTableMetaData { CreateWithPrimaryKey = false };
             var migration = new VersionUniqueMigration(versionTableMetaData);
-            var contextMock = CreateMigrationContext();
+            var collectionMock = new Mock<ICollection<IMigrationExpression>>();
+            var contextMock = CreateMigrationContext(collectionMock);
 
             // Act
             migration.GetUpExpressions(contextMock.Object);
 
             // Assert
-            var expressions = contextMock.Object.Expressions;
-            expressions.Count.ShouldBe(2);
-            
             // Should create unique index
-            var createIndexExpression = expressions[0] as CreateIndexExpression;
-            createIndexExpression.ShouldNotBeNull();
-            createIndexExpression.Index.Name.ShouldBe(versionTableMetaData.UniqueIndexName);
-            createIndexExpression.Index.IsUnique.ShouldBeTrue();
-            createIndexExpression.Index.IsClustered.ShouldBeTrue();
+            collectionMock.Verify(x => x.Add(It.Is<CreateIndexExpression>(e => 
+                e.Index.Name == versionTableMetaData.UniqueIndexName &&
+                e.Index.IsUnique &&
+                e.Index.IsClustered)), Times.Once);
             
             // Should add AppliedOn column
-            var alterTableExpression = expressions[1] as AlterTableExpression;
-            alterTableExpression.ShouldNotBeNull();
-            alterTableExpression.Columns.Count.ShouldBe(1);
-            alterTableExpression.Columns[0].Name.ShouldBe(versionTableMetaData.AppliedOnColumnName);
+            collectionMock.Verify(x => x.Add(It.Is<AlterTableExpression>(e => 
+                e.Columns.Count == 1 &&
+                e.Columns[0].Name == versionTableMetaData.AppliedOnColumnName)), Times.Once);
+            
+            collectionMock.Verify(x => x.Add(It.IsAny<IMigrationExpression>()), Times.Exactly(2));
         }
 
         [Test]
@@ -68,30 +65,32 @@ namespace FluentMigrator.Tests.Unit.Versioning
             // Arrange
             var versionTableMetaData = new TestVersionTableMetaData { CreateWithPrimaryKey = true };
             var migration = new VersionUniqueMigration(versionTableMetaData);
-            var contextMock = CreateMigrationContext();
+            var collectionMock = new Mock<ICollection<IMigrationExpression>>();
+            var contextMock = CreateMigrationContext(collectionMock);
 
             // Act
             migration.GetUpExpressions(contextMock.Object);
 
             // Assert
-            var expressions = contextMock.Object.Expressions;
-            expressions.Count.ShouldBe(1);
+            // Should NOT create unique index
+            collectionMock.Verify(x => x.Add(It.IsAny<CreateIndexExpression>()), Times.Never);
             
-            // Should only add AppliedOn column, no index creation
-            var alterTableExpression = expressions[0] as AlterTableExpression;
-            alterTableExpression.ShouldNotBeNull();
-            alterTableExpression.Columns.Count.ShouldBe(1);
-            alterTableExpression.Columns[0].Name.ShouldBe(versionTableMetaData.AppliedOnColumnName);
+            // Should only add AppliedOn column
+            collectionMock.Verify(x => x.Add(It.Is<AlterTableExpression>(e => 
+                e.Columns.Count == 1 &&
+                e.Columns[0].Name == versionTableMetaData.AppliedOnColumnName)), Times.Once);
+            
+            collectionMock.Verify(x => x.Add(It.IsAny<IMigrationExpression>()), Times.Exactly(1));
         }
 
-        private Mock<IMigrationContext> CreateMigrationContext()
+        private Mock<IMigrationContext> CreateMigrationContext(Mock<ICollection<IMigrationExpression>> collectionMock)
         {
             var services = new ServiceCollection();
             var serviceProvider = services.BuildServiceProvider(validateScopes: false);
 
             var contextMock = new Mock<IMigrationContext>();
-            contextMock.SetupGet(x => x.Expressions).Returns(new List<IMigrationExpression>());
-            contextMock.SetupGet(x => x.ServiceProvider).Returns(serviceProvider);
+            contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
+            contextMock.Setup(x => x.ServiceProvider).Returns(serviceProvider);
             
             return contextMock;
         }
