@@ -160,10 +160,6 @@ namespace Microsoft.Extensions.DependencyInjection
 #if NETFRAMEWORK
             services
                 .TryAddScoped<INetConfigManager, NetConfigManager>();
-#pragma warning disable 612
-            services
-                .AddScoped<IConnectionStringReader, AppConfigConnectionStringReader>();
-#pragma warning restore 612
 #endif
             services
                 .AddScoped<IConnectionStringReader, ConfigurationConnectionStringReader>()
