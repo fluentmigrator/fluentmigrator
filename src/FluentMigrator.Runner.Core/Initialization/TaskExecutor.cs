@@ -17,8 +17,6 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
-using System.Reflection;
 
 using JetBrains.Annotations;
 
@@ -41,21 +39,16 @@ namespace FluentMigrator.Runner.Initialization
         [NotNull]
         private readonly ILogger _logger;
 
-        [NotNull]
-        private readonly IAssemblySource _assemblySource;
-
         private readonly RunnerOptions _runnerOptions;
 
         [NotNull, ItemNotNull]
         private readonly Lazy<IServiceProvider> _lazyServiceProvider;
 
-        private IReadOnlyCollection<Assembly> _assemblies;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="TaskExecutor"/> class.
         /// </summary>
         /// <param name="logger">The logger instance used for logging execution details.</param>
-        /// <param name="assemblySource">The source of assemblies containing migrations.</param>
+        /// <param name="assemblySource">The source of assemblies containing migrations. CURRENTLY UNUSED.</param>
         /// <param name="runnerOptions">The configuration options for the migration runner.</param>
         /// <param name="serviceProvider">The service provider used to resolve dependencies.</param>
         /// <remarks>
@@ -67,14 +60,39 @@ namespace FluentMigrator.Runner.Initialization
         /// <paramref name="assemblySource"/>, <paramref name="runnerOptions"/>, 
         /// or <paramref name="serviceProvider"/>) are <c>null</c>.
         /// </exception>
+        [Obsolete]
         public TaskExecutor(
             [NotNull] ILogger<TaskExecutor> logger,
             [NotNull] IAssemblySource assemblySource,
             [NotNull] IOptions<RunnerOptions> runnerOptions,
             [NotNull] IServiceProvider serviceProvider)
+            : this(logger, runnerOptions, serviceProvider)
         {
             _logger = logger;
-            _assemblySource = assemblySource;
+            _runnerOptions = runnerOptions.Value;
+            _lazyServiceProvider = new Lazy<IServiceProvider>(() => serviceProvider);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TaskExecutor"/> class.
+        /// </summary>
+        /// <param name="logger">The logger instance used for logging execution details.</param>
+        /// <param name="runnerOptions">The configuration options for the migration runner.</param>
+        /// <param name="serviceProvider">The service provider used to resolve dependencies.</param>
+        /// <remarks>
+        /// This constructor sets up the necessary dependencies for the <see cref="TaskExecutor"/> 
+        /// to manage and execute migration tasks effectively.
+        /// </remarks>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when any of the required parameters (<paramref name="logger"/>, 
+        /// <paramref name="runnerOptions"/>, or <paramref name="serviceProvider"/>) are <c>null</c>.
+        /// </exception>
+        public TaskExecutor(
+            [NotNull] ILogger<TaskExecutor> logger,
+            [NotNull] IOptions<RunnerOptions> runnerOptions,
+            [NotNull] IServiceProvider serviceProvider)
+        {
+            _logger = logger;
             _runnerOptions = runnerOptions.Value;
             _lazyServiceProvider = new Lazy<IServiceProvider>(() => serviceProvider);
         }
