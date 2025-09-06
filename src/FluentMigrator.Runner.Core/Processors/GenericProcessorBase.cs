@@ -43,47 +43,20 @@ namespace FluentMigrator.Runner.Processors
         [CanBeNull]
         private IDbConnection _connection;
 
-        private bool _disposed = false;
-
-        /// <inheritdoc />
-        [Obsolete]
-        protected GenericProcessorBase(
-            IDbConnection connection,
-            IDbFactory factory,
-            IMigrationGenerator generator,
-            IAnnouncer announcer,
-            [NotNull] IMigrationProcessorOptions options)
-            : base(generator, announcer, options)
-        {
-            _dbProviderFactory = new Lazy<DbProviderFactory>(() => (factory as DbFactoryBase)?.Factory);
-
-            // Set the connection string, because it cannot be set by
-            // the base class (due to the missing information)
-            Options.ConnectionString = connection?.ConnectionString;
-
-            Factory = factory;
-
-            _lazyConnection = new Lazy<IDbConnection>(() => connection);
-        }
+        private bool _disposed;
 
         /// <inheritdoc />
         protected GenericProcessorBase(
-            [CanBeNull] Func<DbProviderFactory> factoryAccessor,
+            [NotNull] Func<DbProviderFactory> factoryAccessor,
             [NotNull] IMigrationGenerator generator,
             [NotNull] ILogger logger,
             [NotNull] ProcessorOptions options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor)
             : base(generator, logger, options)
         {
-            _dbProviderFactory = new Lazy<DbProviderFactory>(() => factoryAccessor?.Invoke());
+            _dbProviderFactory = new Lazy<DbProviderFactory>(factoryAccessor.Invoke);
 
             var connectionString = connectionStringAccessor.ConnectionString;
-
-#pragma warning disable 612
-            var legacyFactory = new DbFactoryWrapper(this);
-
-            Factory = legacyFactory;
-#pragma warning restore 612
 
             _lazyConnection = new Lazy<IDbConnection>(
                 () =>
@@ -92,7 +65,7 @@ namespace FluentMigrator.Runner.Processors
                         return null;
                     var connection = DbProviderFactory.CreateConnection();
                     Debug.Assert(connection != null, nameof(Connection) + " != null");
-                    connection.ConnectionString = connectionString;
+                    connection!.ConnectionString = connectionString;
                     connection.Open();
                     return connection;
                 });
@@ -106,13 +79,6 @@ namespace FluentMigrator.Runner.Processors
             get => _connection ?? _lazyConnection.Value;
             protected set => _connection = value;
         }
-
-        /// <summary>
-        /// Gets the database factory.
-        /// </summary>
-        [Obsolete]
-        [NotNull]
-        public IDbFactory Factory { get; protected set; }
 
         /// <summary>
         /// Gets the current database transaction.
@@ -224,16 +190,14 @@ namespace FluentMigrator.Runner.Processors
             {
                 result = DbProviderFactory.CreateCommand();
                 Debug.Assert(result != null, nameof(result) + " != null");
-                result.Connection = connection;
+                result!.Connection = connection;
                 if (transaction != null)
                     result.Transaction = transaction;
                 result.CommandText = commandText;
             }
             else
             {
-#pragma warning disable 612
-                result = Factory.CreateCommand(commandText, connection, transaction, Options);
-#pragma warning restore 612
+                throw new InvalidOperationException("DbProviderFactory not initialized.");
             }
 
             if (Options.Timeout != null)
@@ -242,42 +206,6 @@ namespace FluentMigrator.Runner.Processors
             }
 
             return result;
-        }
-
-        /// <summary>
-        /// Wrapper for legacy database factory.
-        /// </summary>
-        [Obsolete]
-        private class DbFactoryWrapper : IDbFactory
-        {
-            private readonly GenericProcessorBase _processor;
-
-            /// <inheritdoc />
-            public DbFactoryWrapper(GenericProcessorBase processor)
-            {
-                _processor = processor;
-            }
-
-            /// <inheritdoc />
-            public IDbConnection CreateConnection(string connectionString)
-            {
-                Debug.Assert(_processor.DbProviderFactory != null, "_processor.DbProviderFactory != null");
-                var result = _processor.DbProviderFactory.CreateConnection();
-                Debug.Assert(result != null, nameof(result) + " != null");
-                result.ConnectionString = connectionString;
-                return result;
-            }
-
-            /// <inheritdoc />
-            [Obsolete]
-            public IDbCommand CreateCommand(
-                string commandText,
-                IDbConnection connection,
-                IDbTransaction transaction,
-                IMigrationProcessorOptions options)
-            {
-                return _processor.CreateCommand(commandText);
-            }
         }
     }
 }
