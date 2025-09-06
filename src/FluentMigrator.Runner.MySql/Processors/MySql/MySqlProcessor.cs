@@ -46,15 +46,6 @@ namespace FluentMigrator.Runner.Processors.MySql
         public override IList<string> DatabaseTypeAliases { get; } = new List<string> { ProcessorIdConstants.MariaDB };
 
         /// <summary>
-        /// Obsolete constructor for legacy support.
-        /// </summary>
-        [Obsolete]
-        public MySqlProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
-            : base(connection, factory, generator, announcer, options)
-        {
-        }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="MySqlProcessor"/> class.
         /// </summary>
         /// <param name="factory">The MySQL database factory.</param>
