@@ -115,6 +115,17 @@ namespace FluentMigrator.Builders.Execute
         }
 
         /// <inheritdoc />
+        public void WithConnection(Action<IDbConnection, IDbTransaction> operation, string description)
+        {
+            var expression = new PerformDBOperationExpression 
+            { 
+                Operation = operation,
+                Description = description
+            };
+            _context.Expressions.Add(expression);
+        }
+
+        /// <inheritdoc />
         public void EmbeddedScript(string embeddedSqlScriptName)
         {
             var embeddedResourceProviders = _context.ServiceProvider.GetService<IEnumerable<IEmbeddedResourceProvider>>();
