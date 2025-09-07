@@ -106,7 +106,7 @@ steps:
     zipAfterPublish: false
     modifyOutputPath: false
 
-task: DotNetCoreCLI@2
+- task: DotNetCoreCLI@2
   displayName: 'Publish FM Console net8.0-windows/any'
   inputs:
     command: 'publish'
