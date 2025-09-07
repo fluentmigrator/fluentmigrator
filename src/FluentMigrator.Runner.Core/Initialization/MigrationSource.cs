@@ -138,7 +138,7 @@ namespace FluentMigrator.Runner.Initialization
         /// <param name="type">The type of the migration to create.</param>
         /// <returns>An instance of the specified migration type.</returns>
         /// <remarks>
-        /// If a service provider is available, it uses <see cref="ActivatorUtilities.CreateInstance(IServiceProvider, Type)"/> 
+        /// If a service provider is available, it uses <see cref="ActivatorUtilities.CreateInstance(IServiceProvider, Type, Object[])"/> 
         /// to create the instance. Otherwise, it falls back to <see cref="Activator.CreateInstance(Type)"/>.
         /// </remarks>
         private IMigration CreateInstance(Type type)
