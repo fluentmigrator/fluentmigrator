@@ -59,7 +59,7 @@ steps:
     solution: '$(solution)'
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
-    msbuildArgs: '/p:Version="$(build.buildNumber)"'
+    msbuildArgs: '/p:Version="$(BUILD_BUILDNUMBER)"'
 
 - task: VSTest@2
   inputs:
