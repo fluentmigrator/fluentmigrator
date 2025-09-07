@@ -1,10 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup Condition="'$(CI)' == 'true'">
+  <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('Linux'))">
     <TargetFramework>net8.0</TargetFramework>
     <RuntimeIdentifiers>linux-x86;linux-x64;any</RuntimeIdentifiers>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(CI)' == ''">
-    <TargetFramework>net48</TargetFramework>
+  <PropertyGroup Condition="!$([MSBuild]::IsOSPlatform('Linux'))">
+    <TargetFrameworks>net48;net8.0</TargetFrameworks>
     <RuntimeIdentifiers>win-x86;win-x64;any</RuntimeIdentifiers>
   </PropertyGroup>
 
