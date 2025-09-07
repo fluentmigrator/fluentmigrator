@@ -253,7 +253,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         }
 
         [Test]
-        public void CanCreateTableWithFluentMultiColumnForeignKey()
+        public override void CanCreateTableWithFluentMultiColumnForeignKey()
         {
             // Test the new fluent API for multi-column foreign keys
             var expression = new CreateTableExpression { TableName = "Area" };
@@ -266,8 +266,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
                     Name = "FK_Area_AreaGroup",
                     PrimaryTable = "AreaGroup",
                     ForeignTable = "Area",
-                    PrimaryColumns = new[] { "ArticleId", "Index" },
-                    ForeignColumns = new[] { "ArticleId", "AreaGroupIndex" }
+                    PrimaryColumns = ["ArticleId", "Index"],
+                    ForeignColumns = ["ArticleId", "AreaGroupIndex"]
                 }
             });
 
