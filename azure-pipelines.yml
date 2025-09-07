@@ -44,6 +44,7 @@ steps:
     includePrerelease: true
 
 - task: gitversion-execute@4.1.0
+  name: version_step
   displayName: 'Execute GitVersion (using GitTools 0.10.2.23031113 or later)'
   inputs:
     updateAssemblyInfo: false
@@ -59,7 +60,7 @@ steps:
     solution: '$(solution)'
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
-    msbuildArgs: '/p:Version=$(build.buildNumber)'
+    msbuildArgs: '/p:Version=$(version_step.semVer)'
 
 - task: VSTest@2
   inputs:
