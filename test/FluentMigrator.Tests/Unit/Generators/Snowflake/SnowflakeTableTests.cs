@@ -1,9 +1,11 @@
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 
 using FluentMigrator.Builders.Create;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
+using FluentMigrator.Model;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Generators.Snowflake;
 using FluentMigrator.Runner.Processors.Snowflake;
@@ -316,6 +318,36 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             var expression = GeneratorTestHelper.GetRenameTableExpression();
             var result = Generator.Generate(expression);
             result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" RENAME TO ""PUBLIC"".""TestTable2"";", _quotingEnabled);
+        }
+
+        [Test]
+        public override void CanCreateTableWithFluentMultiColumnForeignKey()
+        {
+            // Test the new fluent API for multi-column foreign keys
+            // Snowflake doesn't support inline foreign keys in CREATE TABLE, so the foreign key definition is ignored
+            var expression = new CreateTableExpression { TableName = "Area", SchemaName = "PUBLIC" };
+            expression.Columns.Add(new ColumnDefinition { Name = "ArticleId", Type = DbType.String });
+            expression.Columns.Add(new ColumnDefinition { Name = "AreaGroupIndex", Type = DbType.Int32 });
+            expression.Columns.Add(new ColumnDefinition { Name = "Index", Type = DbType.Int32, 
+                IsForeignKey = true,
+                ForeignKey = new ForeignKeyDefinition
+                {
+                    Name = "FK_Area_AreaGroup",
+                    PrimaryTable = "AreaGroup",
+                    ForeignTable = "Area",
+                    PrimaryColumns = ["ArticleId", "Index"],
+                    ForeignColumns = ["ArticleId", "AreaGroupIndex"]
+                }
+            });
+
+            var result = Generator.Generate(expression);
+            result.ShouldContain("CREATE TABLE");
+            result.ShouldContain("Area");
+            result.ShouldContain("ArticleId");
+            result.ShouldContain("AreaGroupIndex");
+            result.ShouldContain("Index");
+            // Foreign key constraint should not be present in CREATE TABLE for Snowflake
+            result.ShouldNotContain("FOREIGN KEY");
         }
     }
 }
