@@ -48,7 +48,7 @@ steps:
   inputs:
     updateAssemblyInfo: false
   env:
-      FM_BUILD_BUILDNUMBER: $(GitVersion.NuGetVersionV2)
+      BUILD_BUILDNUMBER: $(GitVersion.semVer)
 
 - task: NuGetCommand@2
   inputs:
@@ -59,7 +59,7 @@ steps:
     solution: '$(solution)'
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
-    msbuildArgs: '/p:Version="$(FM_BUILD_BUILDNUMBER)"'
+    msbuildArgs: '/p:Version=$(build.buildNumber)'
 
 - task: VSTest@2
   inputs:
