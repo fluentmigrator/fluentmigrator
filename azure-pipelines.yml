@@ -38,14 +38,14 @@ steps:
     version: '9.x'
 
 - task: gitversion-setup@4.1.0
-  displayName: 'Install GitVersion (using GitTools 0.10.2.23031113 or later)'
+  displayName: 'Install GitVersion (using GitTools 4.1.0 or later)'
   inputs:
     versionSpec: '6.3.x'
     includePrerelease: true
 
 - task: gitversion-execute@4.1.0
   name: version_step
-  displayName: 'Execute GitVersion (using GitTools 0.10.2.23031113 or later)'
+  displayName: 'Execute GitVersion (using GitTools 4.1.0 or later)'
   inputs:
     updateAssemblyInfo: false
   env:
@@ -77,6 +77,7 @@ steps:
     script: 'dotnet pack $(Build.SourcesDirectory)\FluentMigrator.sln --output $(Build.ArtifactStagingDirectory) --include-symbols -p:Configuration=$(buildConfiguration) -p:Version=$(version_step.semVer) --verbosity Detailed'
 
 - task: DotNetCoreCLI@2
+  displayName: 'Publish FM Console net48/x86'
   inputs:
     command: 'publish'
     publishWebProjects: false
@@ -86,6 +87,7 @@ steps:
     modifyOutputPath: false
 
 - task: DotNetCoreCLI@2
+  displayName: 'Publish FM Console net48/x64'
   inputs:
     command: 'publish'
     publishWebProjects: false
@@ -95,11 +97,22 @@ steps:
     modifyOutputPath: false
 
 - task: DotNetCoreCLI@2
+  displayName: 'Publish FM Console net48/any'
   inputs:
     command: 'publish'
     publishWebProjects: false
     projects: 'src/FluentMigrator.Console/FluentMigrator.Console.csproj'
     arguments: '-c $(buildConfiguration) -r any -o "$(Build.ArtifactStagingDirectory)/publish/tools/net48/any" -p:Platform=AnyCpu -p:TargetFramework=net48 -p:Version=$(version_step.semVer)'
+    zipAfterPublish: false
+    modifyOutputPath: false
+
+task: DotNetCoreCLI@2
+  displayName: 'Publish FM Console net8.0-windows/any'
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    projects: 'src/FluentMigrator.Console/FluentMigrator.Console.csproj'
+    arguments: '-c $(buildConfiguration) -r any -o "$(Build.ArtifactStagingDirectory)/publish/tools/net8.0-windows/any" -p:Platform=AnyCpu -p:TargetFramework=net8.0 -p:Version=$(version_step.semVer)'
     zipAfterPublish: false
     modifyOutputPath: false
 
