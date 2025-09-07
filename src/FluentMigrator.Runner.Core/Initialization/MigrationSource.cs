@@ -50,7 +50,7 @@ namespace FluentMigrator.Runner.Initialization
         private readonly ILogger _logger;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ProfileSource"/> class.
+        /// Initializes a new instance of the <see cref="MigrationSource"/> class.
         /// </summary>
         /// <param name="source">The assembly source</param>
         /// <param name="conventions">The migration runner conventions</param>
