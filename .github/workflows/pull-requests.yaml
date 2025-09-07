@@ -10,20 +10,10 @@ env:
   buildPlatform: 'Any CPU'
   buildConfiguration: Release
 
-  # Enable containers for integration tests
-  FM_TestConnectionStrings__MySql__ContainerEnabled: true
-  FM_TestConnectionStrings__MySql__IsEnabled: true
-  FM_TestConnectionStrings__Oracle__ContainerEnabled: true
-  FM_TestConnectionStrings__Oracle__IsEnabled: true
-  FM_TestConnectionStrings__Postgres__ContainerEnabled: true
-  FM_TestConnectionStrings__Postgres__IsEnabled: true
-  FM_TestConnectionStrings__SqlServer2016__ContainerEnabled: true
-  FM_TestConnectionStrings__SqlServer2016__IsEnabled: true
-
 jobs:
   build:
     name: Build & Test
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     permissions:
       checks: write
       issues: write
@@ -31,6 +21,7 @@ jobs:
 
     strategy:
       matrix:
+        os: [ubuntu-latest, windows-latest]
         dotnet-tfm: [
           net8.0,
 #          net9.0,
@@ -61,6 +52,16 @@ jobs:
 
     - name: Restore, Build, Test
       run: dotnet test --framework ${{ matrix.dotnet-tfm }} --configuration ${{ env.buildConfiguration }} --verbosity quiet --logger trx --collect:"XPlat Code Coverage" --results-directory "TestResults-${{ matrix.dotnet-tfm }}"
+      env:
+        # Enable containers for integration tests only on Linux
+        FM_TestConnectionStrings__MySql__ContainerEnabled: ${{ matrix.os == 'ubuntu-latest' }}
+        FM_TestConnectionStrings__MySql__IsEnabled: ${{ matrix.os == 'ubuntu-latest' }}
+        FM_TestConnectionStrings__Oracle__ContainerEnabled: ${{ matrix.os == 'ubuntu-latest' }}
+        FM_TestConnectionStrings__Oracle__IsEnabled: ${{ matrix.os == 'ubuntu-latest' }}
+        FM_TestConnectionStrings__Postgres__ContainerEnabled: ${{ matrix.os == 'ubuntu-latest' }}
+        FM_TestConnectionStrings__Postgres__IsEnabled: ${{ matrix.os == 'ubuntu-latest' }}
+        FM_TestConnectionStrings__SqlServer2016__ContainerEnabled: ${{ matrix.os == 'ubuntu-latest' }}
+        FM_TestConnectionStrings__SqlServer2016__IsEnabled: ${{ matrix.os == 'ubuntu-latest' }}
 
     - name: Combine Coverage Reports
       uses: danielpalme/ReportGenerator-GitHub-Action@v5.4.10
@@ -76,7 +77,7 @@ jobs:
     - name: Upload Combined Coverage XML
       uses: actions/upload-artifact@v4
       with:
-        name: coverage
+        name: coverage-${{ matrix.os }}-${{ matrix.dotnet-tfm }}
         path: ${{ github.workspace }}/Cobertura.xml
         retention-days: 5
 
@@ -103,7 +104,7 @@ jobs:
     - name: Upload Test Result Files
       uses: actions/upload-artifact@v4
       with:
-        name: test-results-${{ matrix.dotnet-tfm }}
+        name: test-results-${{ matrix.os }}-${{ matrix.dotnet-tfm }}
         path: ${{ github.workspace }}/**/TestResults-${{ matrix.dotnet-tfm }}/**/*
         retention-days: 5
 
