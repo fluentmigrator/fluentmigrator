@@ -25,7 +25,9 @@ using FluentMigrator.Runner;
 using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Exceptions;
 using FluentMigrator.Runner.Initialization;
+#if NETFRAMEWORK
 using FluentMigrator.Runner.Initialization.NetFramework;
+#endif
 using FluentMigrator.Runner.Logging;
 using FluentMigrator.Runner.Processors;
 
