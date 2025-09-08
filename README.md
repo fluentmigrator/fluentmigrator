@@ -2,17 +2,6 @@
 
 [Fluent Migrator](https://github.com/fluentmigrator/fluentmigrator) is a migration framework for .NET much like Ruby on Rails Migrations. Migrations are a structured way to alter your database schema and are an alternative to creating lots of sql scripts that have to be run manually by every developer involved. Migrations solve the problem of evolving a database schema for multiple databases (for example, the developer's local database, the test database and the production database). Database schema changes are described in classes written in C# that can be checked into a version control system.
 
-# News
-
-6.2.0 is released and supports .NET 6, .NET 7, and .NET 8.
-In 6.0.0, we have begun removing a lot of `[Obsolete]` code. Very little user impact should be seen, other than updating custom VersionTableMetadata to configure CreateWithPrimaryKey setting.
-Thanks to @eloekset, our [documentation website](https://fluentmigrator.github.io) now has 5.0.0 API links!
-
-Please read the [changelog](https://github.com/fluentmigrator/fluentmigrator/blob/main/CHANGELOG.md)
-or the upgrade guide for further information: [2.x to 3.0](https://fluentmigrator.github.io/articles/guides/upgrades/guide-2.0-to-3.0.html?tabs=di).
-
-There should not be a whole lot to do to upgrade from 3.0 to 5.0. As questions arise, we will consider adding a specific guide.
-
 # Packages
 
 Package Source      | Status   | Source Code Tree
@@ -25,16 +14,37 @@ while the CI builds are stored on [Azure Artifacts](https://dev.azure.com/fluent
 
 :warning: The badge for the Azure Artifacts feed won't display prereleases.  [We're looking into this](https://github.com/fluentmigrator/fluentmigrator/issues/1180#issuecomment-662884030).
 
+# News
+
+* 7.1.0
+    * support for .NET 9, bug fixes, remove more obsolete code
+* 7.0.0
+    * removed net6.0 and net7.0 support
+    * TestContainers for integration tests to improve stability. Thanks @PhenX!
+* 6.2.0
+    * supports .NET 6, .NET 7, and .NET 8.
+* 6.0.0 milestones
+    * removing a lot of `[Obsolete]` code. Very little user impact should be seen, other than updating custom VersionTableMetadata to configure CreateWithPrimaryKey setting.
+* 5.2.0 milestones
+   * make TypeMap injectable 
+* 5.0.0 milestones
+    * thanks to @eloekset, our [documentation website](https://fluentmigrator.github.io) now has 5.0.0 API links!
+
+Please read the [changelog](https://github.com/fluentmigrator/fluentmigrator/blob/main/CHANGELOG.md)
+or the upgrade guide for further information: [2.x to 3.0](https://fluentmigrator.github.io/articles/guides/upgrades/guide-2.0-to-3.0.html?tabs=di).
+
+There should not be a whole lot to do to upgrade from 3.0 to 5.0. As questions arise, we will consider adding a specific guide.
+
 # Project Info
 
-|                           |         |
-|---------------------------|---------|
-| **Documentation**         | [On our GitHub pages](https://fluentmigrator.github.io) |
-| **Discussions**           | [![GitHub Discussions](https://img.shields.io/github/discussions/fluentmigrator/fluentmigrator.svg)](https://github.com/fluentmigrator/fluentmigrator/discussions) |
-| **Bug/Feature Tracking**  | [![GitHub issues](https://img.shields.io/github/issues/fluentmigrator/fluentmigrator.svg)](https://github.com/fluentmigrator/fluentmigrator/issues) |
-| **Build server (new)**    | [![AzureDevOps](https://img.shields.io/azure-devops/build/fluentmigrator/22b31067-b424-416b-b89f-682210a37a55/1)](https://dev.azure.com/fluentmigrator/fluentmigrator/_build?definitionId=1) |
+|                              |         |
+|------------------------------|---------|
+| **Documentation**            | [On our GitHub pages](https://fluentmigrator.github.io) |
+| **Discussions**              | [![GitHub Discussions](https://img.shields.io/github/discussions/fluentmigrator/fluentmigrator.svg)](https://github.com/fluentmigrator/fluentmigrator/discussions) |
+| **Bug/Feature Tracking**     | [![GitHub issues](https://img.shields.io/github/issues/fluentmigrator/fluentmigrator.svg)](https://github.com/fluentmigrator/fluentmigrator/issues) |
+| **Build server (Releases)**  | [![AzureDevOps](https://img.shields.io/azure-devops/build/fluentmigrator/22b31067-b424-416b-b89f-682210a37a55/1)](https://dev.azure.com/fluentmigrator/fluentmigrator/_build?definitionId=1) |
 
-# Prerequisites
+# Optional Prerequisites
 
 | Tool                              | Consequences when not installed |
 |-----------------------------------|---------------------------------|
