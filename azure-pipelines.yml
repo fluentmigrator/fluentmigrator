@@ -27,6 +27,9 @@ variables:
   solution: '**/FluentMigrator.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
+  # setting RuntimeIdentifier to empty string prevents MSBuild from using RuntimeIdentifiers set in the csproj, thereby allowing it to be the mystical "any" RID.
+  # without this trick, you cannot publish an "any" architecture binary, because dotnet publish will fail with "error NETSDK1084: There is no application host available for the specified RuntimeIdentifier 'any'."
+  anyRuntimeIdentifier: ''
 
 steps:
 - task: NuGetToolInstaller@1
@@ -102,7 +105,7 @@ steps:
     command: 'publish'
     publishWebProjects: false
     projects: 'src/FluentMigrator.Console/FluentMigrator.Console.csproj'
-    arguments: '-c $(buildConfiguration) -r any -o "$(Build.ArtifactStagingDirectory)/publish/tools/net48/any" -p:Platform=AnyCpu -p:TargetFramework=net48 -p:Version=$(version_step.semVer)'
+    arguments: '-c $(buildConfiguration) -r $(anyRuntimeIdentifier) -o "$(Build.ArtifactStagingDirectory)/publish/tools/net48/any" -p:Platform=AnyCpu -p:TargetFramework=net48 -p:Version=$(version_step.semVer)'
     zipAfterPublish: false
     modifyOutputPath: false
 
@@ -112,7 +115,7 @@ steps:
     command: 'publish'
     publishWebProjects: false
     projects: 'src/FluentMigrator.Console/FluentMigrator.Console.csproj'
-    arguments: '-c $(buildConfiguration) -r any -o "$(Build.ArtifactStagingDirectory)/publish/tools/net8.0-windows/any" -p:Platform=AnyCpu -p:TargetFramework=net8.0 -p:Version=$(version_step.semVer)'
+    arguments: '-c $(buildConfiguration) -r $(anyRuntimeIdentifier) -o "$(Build.ArtifactStagingDirectory)/publish/tools/net8.0-windows/any" -p:Platform=AnyCpu -p:TargetFramework=net8.0 -p:Version=$(version_step.semVer)'
     zipAfterPublish: false
     modifyOutputPath: false
 
