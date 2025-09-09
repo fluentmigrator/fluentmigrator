@@ -134,6 +134,13 @@ steps:
 - script: nuget.exe help
   displayName: NuGet version info
 
+- task: NuGetCommand@2
+  inputs:
+    command: 'pack'
+    packagesToPack: '$(Build.ArtifactStagingDirectory)/publish/FluentMigrator.Console.nuspec'
+    packDestination: '$(Build.ArtifactStagingDirectory)'
+    buildProperties: 'Version=$(version_step.semVer)'
+    
 - script: nuget.exe pack $(Build.ArtifactStagingDirectory)/publish/FluentMigrator.Console.nuspec -NonInteractive -OutputDirectory $(Build.ArtifactStagingDirectory) -version $(version_step.semVer)
   displayName: NuGet pack FluentMigrator.Console
 
