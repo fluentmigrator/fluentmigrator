@@ -81,7 +81,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             expression.Columns.Add(column);
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"CREATE TABLE ""TestSchema"".""TestTable1"" (""TestColumn1"" VARCHAR(5) NOT NULL DEFAULT SYSDATE()::TIMESTAMP_NTZ);", _quotingEnabled);
+            result.ShouldBe(@"CREATE TABLE ""TestSchema"".""TestTable1"" (""TestColumn1"" VARCHAR(5) NOT NULL DEFAULT SYSDATE());", _quotingEnabled);
         }
 
         [Test]
