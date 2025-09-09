@@ -34,7 +34,7 @@ variables:
 steps:
 - task: NuGetToolInstaller@1
   inputs:
-    version: '6.x'
+    version: '6.11.x'
 
 - task: UseDotNet@2
   inputs:
