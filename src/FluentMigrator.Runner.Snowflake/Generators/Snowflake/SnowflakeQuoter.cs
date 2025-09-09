@@ -98,7 +98,7 @@ namespace FluentMigrator.Runner.Generators.Snowflake
                 case SystemMethods.CurrentDateTimeOffset:
                     return "CURRENT_TIMESTAMP()";
                 case SystemMethods.CurrentDateTime:
-                    return "SYSDATE()::TIMESTAMP_NTZ";
+                    return "SYSDATE()";
                 case SystemMethods.CurrentUTCDateTime:
                     return "CONVERT_TIMEZONE('UTC',CURRENT_TIMESTAMP())";
                 case SystemMethods.CurrentUser:
