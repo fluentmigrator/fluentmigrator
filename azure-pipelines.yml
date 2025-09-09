@@ -131,6 +131,9 @@ steps:
     Contents: '**'
     TargetFolder: '$(Build.ArtifactStagingDirectory)/docs'
 
+- script: nuget.exe help
+  displayName: NuGet version info
+
 - script: nuget.exe pack $(Build.ArtifactStagingDirectory)/publish/FluentMigrator.Console.nuspec -NonInteractive -OutputDirectory $(Build.ArtifactStagingDirectory) -version $(version_step.semVer)
   displayName: NuGet pack FluentMigrator.Console
 
