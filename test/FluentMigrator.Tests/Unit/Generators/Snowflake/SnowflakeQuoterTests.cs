@@ -27,7 +27,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             var result = _quoterQuotingEnabled.FormatSystemMethods(SystemMethods.CurrentDateTime);
 
             // Assert
-            Assert.That(result, Is.EqualTo("SYSDATE()::TIMESTAMP_NTZ"));
+            Assert.That(result, Is.EqualTo("SYSDATE()"));
         }
 
         [Test]
