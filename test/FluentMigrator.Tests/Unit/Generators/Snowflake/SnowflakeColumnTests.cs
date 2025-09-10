@@ -128,7 +128,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             var result = expressions.Select(x => (string)Generator.Generate((dynamic)x));
             result.ShouldBe(new [] {
                 @"ALTER TABLE ""TestSchema"".""TestTable1"" ADD COLUMN ""TestColumn1"" TIMESTAMP_NTZ;",
-                @"UPDATE ""TestSchema"".""TestTable1"" SET ""TestColumn1"" = CURRENT_TIMESTAMP() WHERE 1 = 1;"
+                @"UPDATE ""TestSchema"".""TestTable1"" SET ""TestColumn1"" = SYSDATE() WHERE 1 = 1;"
             }, _quotingEnabled);
         }
 
@@ -139,7 +139,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             var result = expressions.Select(x => (string)Generator.Generate((dynamic)x));
             result.ShouldBe(new[] {
                 @"ALTER TABLE ""PUBLIC"".""TestTable1"" ADD COLUMN ""TestColumn1"" TIMESTAMP_NTZ;",
-                @"UPDATE ""PUBLIC"".""TestTable1"" SET ""TestColumn1"" = CURRENT_TIMESTAMP() WHERE 1 = 1;",
+                @"UPDATE ""PUBLIC"".""TestTable1"" SET ""TestColumn1"" = SYSDATE() WHERE 1 = 1;",
             }, _quotingEnabled);
         }
 
