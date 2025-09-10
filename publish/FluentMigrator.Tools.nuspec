@@ -3,7 +3,7 @@
 	<metadata>
 		<id>FluentMigrator.Tools</id>
 		<version>$version$</version>
-		<authors>Josh Coffman, Tom Marien, Mark Junker</authors>
+		<authors>Sean Chambers,Josh Coffman,Tom Marien,Mark Junker,John Zabroski</authors>
 		<summary>!!!OBSOLETE!!! Please use FluentMigrator.Console instead</summary>
 		<description>!!!OBSOLETE!!! Please use FluentMigrator.Console instead</description>
 		<iconUrl>https://github.com/fluentmigrator/fluentmigrator/raw/develop/docs/logo.png</iconUrl>
