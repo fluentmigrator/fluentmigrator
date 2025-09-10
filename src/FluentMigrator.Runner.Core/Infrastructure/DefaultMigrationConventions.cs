@@ -87,7 +87,7 @@ namespace FluentMigrator.Runner.Infrastructure
         {
             var migrationType = migration.GetType();
             var migrationAttribute = migrationType.GetCustomAttribute<MigrationAttribute>();
-            var migrationInfo = new MigrationInfo(migrationAttribute.Version, migrationAttribute.Description, migrationAttribute.TransactionBehavior, migrationAttribute.BreakingChange, () => migration);
+            var migrationInfo = new MigrationInfo(migrationAttribute.Version, migrationAttribute.Description, migrationAttribute.TransactionBehavior, migrationAttribute.BreakingChange, () => migration, migrationAttribute.VersionAsString);
 
             foreach (var traitAttribute in migrationType.GetCustomAttributes<MigrationTraitAttribute>(true))
                 migrationInfo.AddTrait(traitAttribute.Name, traitAttribute.Value);
