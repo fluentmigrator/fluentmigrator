@@ -17,12 +17,12 @@ export default defineConfig({
     title: 'FluentMigrator',
     description: 'A .NET migration framework for database schema management',
     head: headers,
+    base: process.env.GITHUB_PAGES === 'true' ? '/fluentmigrator/' : '/', // TODO: fix this when on final domain
 
     themeConfig: {
         outline: 2,
         logo: '/logo.svg',
         externalLinkIcon: true,
-        base: '/fluentmigrator/',
 
         nav: [
             {text: 'Home', link: '/'},
