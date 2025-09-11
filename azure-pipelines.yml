@@ -34,7 +34,7 @@ variables:
 steps:
 - task: NuGetToolInstaller@1
   inputs:
-    version: '6.x'
+    versionSpec: '6.11.1'
 
 - task: UseDotNet@2
   inputs:
@@ -131,6 +131,16 @@ steps:
     Contents: '**'
     TargetFolder: '$(Build.ArtifactStagingDirectory)/docs'
 
+- script: nuget.exe help
+  displayName: NuGet version info
+
+- task: NuGetCommand@2
+  inputs:
+    command: 'pack'
+    packagesToPack: '$(Build.ArtifactStagingDirectory)/publish/FluentMigrator.Console.nuspec'
+    packDestination: '$(Build.ArtifactStagingDirectory)'
+    buildProperties: 'Version=$(version_step.semVer)'
+    
 - script: nuget.exe pack $(Build.ArtifactStagingDirectory)/publish/FluentMigrator.Console.nuspec -NonInteractive -OutputDirectory $(Build.ArtifactStagingDirectory) -version $(version_step.semVer)
   displayName: NuGet pack FluentMigrator.Console
 
