@@ -50,9 +50,22 @@ namespace FluentMigrator.Builders.Update
         }
 
         /// <inheritdoc />
+        public IUpdateWhereSyntax Set(IDictionary<string, object> data)
+        {
+            Expression.Set = GetData<List<KeyValuePair<string, object>>>(data);
+            return this;
+        }
+
+        /// <inheritdoc />
         public void Where(object dataAsAnonymousType)
         {
             Expression.Where = GetData<List<KeyValuePair<string, object>>>(dataAsAnonymousType);
+        }
+
+        /// <inheritdoc />
+        public void Where(IDictionary<string, object> data)
+        {
+            Expression.Where = GetData<List<KeyValuePair<string, object>>>(data);
         }
 
         /// <inheritdoc />
