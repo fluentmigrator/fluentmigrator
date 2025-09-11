@@ -17,7 +17,7 @@ export default defineConfig({
     title: 'FluentMigrator',
     description: 'A .NET migration framework for database schema management',
     head: headers,
-    base: process.env.GITHUB_PAGES === 'true' ? '/fluentmigrator/' : '/', // TODO: fix this when on final domain
+    base: '/fluentmigrator/',
 
     themeConfig: {
         outline: 2,

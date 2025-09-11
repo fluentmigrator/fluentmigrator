@@ -32,13 +32,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'npm'
-          cache-dependency-path: 'docs-website/package-lock.json'
 
       - name: Install dependencies
         run: |
           cd docs-website
-          npm ci
+          npm ci --no-audit --no-fund
 
       - name: Build documentation
         run: |
