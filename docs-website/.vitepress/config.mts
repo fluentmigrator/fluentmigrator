@@ -22,6 +22,7 @@ export default defineConfig({
         outline: 2,
         logo: '/logo.svg',
         externalLinkIcon: true,
+        base: process.env.GITHUB_PAGES === 'true' ? '/fluentmigrator/' : '/', // TODO: fix this when on final domain
 
         nav: [
             {text: 'Home', link: '/'},
