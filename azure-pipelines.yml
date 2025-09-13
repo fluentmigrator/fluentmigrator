@@ -110,12 +110,22 @@ steps:
     modifyOutputPath: false
 
 - task: DotNetCoreCLI@2
-  displayName: 'Publish FM Console net8.0-windows/any'
+  displayName: 'Publish FM Console net8.0/win-x64'
   inputs:
     command: 'publish'
     publishWebProjects: false
     projects: 'src/FluentMigrator.Console/FluentMigrator.Console.csproj'
-    arguments: '-c $(buildConfiguration) -r "$(anyRuntimeIdentifier)" -o "$(Build.ArtifactStagingDirectory)/publish/tools/net8.0-windows/any" -p:Platform=AnyCpu -p:TargetFramework=net8.0 -p:Version=$(version_step.semVer)'
+    arguments: '-c $(buildConfiguration) -r "win-x64" -o "$(Build.ArtifactStagingDirectory)/publish/tools/net8.0/win-x64" -p:Platform=x64 -p:TargetFramework=net8.0 -p:Version=$(version_step.semVer)'
+    zipAfterPublish: false
+    modifyOutputPath: false
+
+- task: DotNetCoreCLI@2
+  displayName: 'Publish FM Console net8.0/win-x64'
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    projects: 'src/FluentMigrator.Console/FluentMigrator.Console.csproj'
+    arguments: '-c $(buildConfiguration) -r "win-x86" -o "$(Build.ArtifactStagingDirectory)/publish/tools/net8.0/win-x86" -p:Platform=x86 -p:TargetFramework=net8.0 -p:Version=$(version_step.semVer)'
     zipAfterPublish: false
     modifyOutputPath: false
 
