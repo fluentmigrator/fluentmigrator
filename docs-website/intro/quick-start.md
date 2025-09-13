@@ -48,6 +48,8 @@ var runner = scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
 runner.MigrateUp();
 ```
 
+A more complete sample is available [below](#step-3-configure-the-migration-runner).
+
 #### dotnet-fm CLI
 ```bash
 # Install globally
@@ -93,20 +95,7 @@ Add these to your `.csproj` file:
 <PackageReference Include="FluentMigrator.Runner" Version="7.2.0" />
 ```
 
-You'll also need a database provider package:
-```xml
-<!-- For SQL Server -->
-<PackageReference Include="FluentMigrator.Runner.SqlServer" Version="7.2.0" />
-
-<!-- For PostgreSQL -->
-<PackageReference Include="FluentMigrator.Runner.Postgres" Version="7.2.0" />
-
-<!-- For MySQL -->
-<PackageReference Include="FluentMigrator.Runner.MySql" Version="7.2.0" />
-
-<!-- For SQLite -->
-<PackageReference Include="FluentMigrator.Runner.SQLite" Version="7.2.0" />
-```
+You'll also need one of the [database provider packages](/intro/installation.md#database-provider-packages).
 
 ## Step 2: Create Your First Migration
 

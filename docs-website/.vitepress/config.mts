@@ -70,6 +70,7 @@ export default defineConfig({
                 {
                     text: 'Migration Runners',
                     items: [
+                        {text: 'Choosing a runner', link: '/runners/index'},
                         {text: 'In-Process Runner', link: '/runners/in-process'},
                         {text: 'Console Tool (Migrate.exe)', link: '/runners/console'},
                         {text: 'dotnet-fm CLI', link: '/runners/dotnet-fm'}

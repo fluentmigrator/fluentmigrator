@@ -25,11 +25,12 @@ FluentMigrator provides several ways to execute your migrations, from in-process
 ### dotnet-fm CLI Tool
 - **Best for**: .NET Core applications, CI/CD pipelines
 - **Pros**: Cross-platform, integrates with dotnet CLI
-- **Cons**: Requires .NET Core SDK
+- **Cons**: Requires .NET Core SDK, not recommended in production environments
 
 ## Quick Start Examples
 
 ### In-Process (Recommended)
+
 ```csharp
 using var serviceProvider = new ServiceCollection()
     .AddFluentMigratorCore()
@@ -43,6 +44,8 @@ using var scope = serviceProvider.CreateScope();
 var runner = scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
 runner.MigrateUp();
 ```
+
+A more complete sample is available in the [Quick Start guide](/intro/quick-start.md#step-3-configure-the-migration-runner).
 
 ### dotnet-fm CLI
 ```bash

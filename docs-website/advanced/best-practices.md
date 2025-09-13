@@ -86,6 +86,63 @@ public class Migration1 : Migration { }
 public class UpdateStuff : Migration { }
 ```
 
+### 4. Keep Data Migrations Separate from Schema Migrations
+
+And if a "temporary" column or table is needed for a data migration, remove it in a subsequent migration.
+
+```csharp
+// ✅ Good: Separate migrations for schema and data changes
+[Migration(202401151500, "Add IsActive column to Users table")]
+public class AddIsActiveToUsers : Migration
+{
+    public override void Up()
+    {
+        Alter.Table("Users")
+            .AddColumn("IsActive").AsBoolean().NotNullable().WithDefaultValue(true);
+    }
+
+    public override void Down()
+    {
+        Delete.Column("IsActive").FromTable("Users");
+    }
+}
+
+[Migration(202401151505, "Set IsActive to false for inactive users")]
+public class SetInactiveUsers : Migration
+{
+    public override void Up()
+    {
+        Update.Table("Users")
+            .Set(new { IsActive = false })
+            .Where(new { LastLogin = RawSql.Insert("< DATE('now', '-1 year')") });
+    }
+
+    public override void Down()
+    {
+        // No rollback needed for data changes
+    }
+}
+
+// ❌ Bad: Mixing schema and data changes
+[Migration(202401151510, "Add IsActive column and set inactive users")]
+public class AddIsActiveAndSetInactive : Migration
+{
+    public override void Up()
+    {
+        Alter.Table("Users")
+            .AddColumn("IsActive").AsBoolean().NotNullable().WithDefaultValue(true);
+
+        Update.Table("Users")
+            .Set(new { IsActive = false })
+            .Where(new { LastLogin = RawSql.Insert("< DATE('now', '-1 year')") });
+    }
+    public override void Down()
+    {
+        Delete.Column("IsActive").FromTable("Users");
+    }
+}
+```
+
 ## Team Collaboration Best Practices
 
 ### 1. Migration Naming and Organization
