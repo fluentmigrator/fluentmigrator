@@ -54,6 +54,13 @@ steps:
   env:
       BUILD_BUILDNUMBER: $(GitVersion.semVer)
 
+- task: PowerShell@2
+  name: update_build_number
+  displayName: 'Update Build Number with GitVersion'
+  inputs:
+    targetType: 'inline'
+    script: Write-Host "##vso[build.updatebuildnumber]$(version_step.semVer)+$(Build.BuildId)"
+
 - task: NuGetCommand@2
   inputs:
     restoreSolution: '$(solution)'
