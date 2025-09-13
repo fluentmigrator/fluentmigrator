@@ -6,7 +6,7 @@ hero:
   text: Database Schema Management
   tagline: A migration framework for .NET much like Ruby on Rails Migrations
   image:
-    src: /logo-big.svg
+    src: /logo.svg
     alt: FluentMigrator Logo
   actions:
     - theme: brand
