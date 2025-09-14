@@ -1,7 +1,5 @@
-# ASP.NET Core (.NET Framework)
-# Build and test ASP.NET Core projects targeting the full .NET Framework.
-# Add steps that publish symbols, save build artifacts, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
+# .NET Core (.NET Framework) AzureDevOps Pipeline
+# See: https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
 
 trigger:
   branches:
@@ -53,6 +51,13 @@ steps:
     updateAssemblyInfo: false
   env:
       BUILD_BUILDNUMBER: $(GitVersion.semVer)
+
+- task: PowerShell@2
+  name: update_build_number
+  displayName: 'Update Build Number with GitVersion'
+  inputs:
+    targetType: 'inline'
+    script: Write-Host "##vso[build.updatebuildnumber]$(version_step.semVer)+$(Build.BuildId)"
 
 - task: NuGetCommand@2
   inputs:
@@ -110,12 +115,22 @@ steps:
     modifyOutputPath: false
 
 - task: DotNetCoreCLI@2
-  displayName: 'Publish FM Console net8.0-windows/any'
+  displayName: 'Publish FM Console net8.0/win-x64'
   inputs:
     command: 'publish'
     publishWebProjects: false
     projects: 'src/FluentMigrator.Console/FluentMigrator.Console.csproj'
-    arguments: '-c $(buildConfiguration) -r "$(anyRuntimeIdentifier)" -o "$(Build.ArtifactStagingDirectory)/publish/tools/net8.0-windows/any" -p:Platform=AnyCpu -p:TargetFramework=net8.0 -p:Version=$(version_step.semVer)'
+    arguments: '-c $(buildConfiguration) -r "win-x64" -o "$(Build.ArtifactStagingDirectory)/publish/tools/net8.0/win-x64" -p:Platform=x64 -p:TargetFramework=net8.0 -p:Version=$(version_step.semVer)'
+    zipAfterPublish: false
+    modifyOutputPath: false
+
+- task: DotNetCoreCLI@2
+  displayName: 'Publish FM Console net8.0/win-x64'
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    projects: 'src/FluentMigrator.Console/FluentMigrator.Console.csproj'
+    arguments: '-c $(buildConfiguration) -r "win-x86" -o "$(Build.ArtifactStagingDirectory)/publish/tools/net8.0/win-x86" -p:Platform=x86 -p:TargetFramework=net8.0 -p:Version=$(version_step.semVer)'
     zipAfterPublish: false
     modifyOutputPath: false
 
