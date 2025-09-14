@@ -1,4 +1,5 @@
 import {defineConfig} from 'vitepress'
+import { fileURLToPath, URL } from 'node:url'
 
 const umamiScript: HeadConfig = ['script', {
     defer: 'true',
@@ -141,5 +142,19 @@ export default defineConfig({
                 timeStyle: 'medium',
             },
         },
+    },
+
+    // Override default theme components
+    vite: {
+        resolve: {
+            alias: [
+                {
+                    find: /^.*\/NotFound\.vue$/,
+                    replacement: fileURLToPath(
+                        new URL('./theme/components/NotFound.vue', import.meta.url)
+                    )
+                }
+            ]
+        }
     }
 })
