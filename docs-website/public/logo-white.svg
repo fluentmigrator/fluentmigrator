@@ -5,7 +5,7 @@
    viewBox="0 0 3840 3840"
    version="1.1"
    id="svg1"
-   sodipodi:docname="logo.svg"
+   sodipodi:docname="logo-white.svg"
    inkscape:version="1.4.2 (f4327f4, 2025-05-13)"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
@@ -71,7 +71,7 @@
        inkscape:label="man"
        style="fill:#000000;fill-opacity:1">
       <circle
-         style="fill:#000000;fill-opacity:1;stroke-width:6.07313;stroke-linecap:round;stroke-linejoin:round"
+         style="fill:#ffffff;fill-opacity:1;stroke-width:6.07313;stroke-linecap:round;stroke-linejoin:round"
          id="path4"
          cx="3152.7012"
          cy="705.90338"
@@ -79,19 +79,20 @@
          inkscape:label="head" />
       <g
          id="g1"
-         inkscape:label="body">
+         inkscape:label="body"
+         style="stroke:#ffffff;stroke-opacity:1">
         <path
-           style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:294.88;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+           style="fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:294.88;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
            d="m 1934.6508,2869.7519 295.2818,-557.0087 16.2016,-624.4556 667.7395,248.0667 -126.9323,560.94"
            id="path6"
            sodipodi:nodetypes="ccccc" />
         <path
-           style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:254.632;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+           style="fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:254.632;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
            d="m 1901.0961,1326.2336 781.8255,-312.0591"
            id="path7"
            sodipodi:nodetypes="cc" />
         <path
-           style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:462.033;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+           style="fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:462.033;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
            d="m 2328.6313,1677.9827 411.3334,-579.9213"
            id="path8"
            sodipodi:nodetypes="cc" />

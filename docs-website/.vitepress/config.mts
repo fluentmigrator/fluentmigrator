@@ -8,6 +8,10 @@ const umamiScript: HeadConfig = ['script', {
 
 const baseHeaders: HeadConfig[] = [];
 
+// Favicon
+baseHeaders.push(['link', {rel: 'icon', href: 'logo-favicon.svg'}]);
+
+// Umami analytics script is only added when building for GitHub Pages
 const headers = process.env.GITHUB_PAGES === 'true' ?
     [...baseHeaders, umamiScript] :
     baseHeaders;
@@ -16,12 +20,16 @@ const headers = process.env.GITHUB_PAGES === 'true' ?
 export default defineConfig({
     title: 'FluentMigrator',
     description: 'A .NET migration framework for database schema management',
+    lang: 'en-US',
     head: headers,
     base: '/fluentmigrator/',
 
     themeConfig: {
         outline: 2,
-        logo: '/logo.svg',
+        logo: {
+            dark: '/logo-white.svg',
+            light: '/logo.svg'
+        },
         externalLinkIcon: true,
 
         nav: [
