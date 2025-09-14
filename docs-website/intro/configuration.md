@@ -171,28 +171,75 @@ FluentMigrator uses these default naming patterns:
 
 ### Custom Naming Convention
 
-```csharp
-public class CustomConventionSet : IConventionSet
-{
-    public IRootExpressionFactory RootExpressionFactory { get; set; }
-    public IDefaultSchemaNameConvention DefaultSchemaNameConvention { get; set; }
-    public IColumnsConventions ColumnsConventions { get; set; }
-    public IConstraintConventions ConstraintConventions { get; set; }
-    public IForeignKeyConventions ForeignKeyConventions { get; set; }
-    public IIndexConventions IndexConventions { get; set; }
-    public ISequenceConventions SequenceConventions { get; set; }
-    public IAutoNameConventions AutoNameConventions { get; set; }
-}
+FluentMigrator supports changing naming conventions for:
 
-// Register custom conventions
-services.Configure<SelectingProcessorAccessorOptions>(opt =>
+ * Columns
+ * Constraints
+ * Indexes
+ * Sequences
+ * Schemas
+ * Auto Names
+ * Root Paths
+
+While FluentMigrator comes with reasonable naming conventions, some organizations may have strict standards. In such cases, overriding FluentMigrator's opinion may be desirable.
+
+#### High-Level Tasks
+
+1. Implement the `IConventionSet` interface (example: see below)
+2. Register the `IConventionSet` as singleton: `services.AddSingleton<IConventionSet, YourConventionSet>()`
+
+Example `IConventionSet` implementation :
+
+```csharp
+public class YourConventionSet : IConventionSet
 {
-    opt.ProcessorFactories.Add(new SqlServerProcessorFactory());
-})
-.Configure<ProcessorOptions>(opt =>
-{
-    opt.ConventionSet = new CustomConventionSet();
-});
+    public YourConventionSet()
+        : this(new DefaultConventionSet())
+    {
+    }
+
+    public YourConventionSet(IConventionSet innerConventionSet)
+    {
+        ForeignKeyConventions = new List<IForeignKeyConvention>()
+        {
+            /* This is where you do your stuff */
+            new YourCustomDefaultForeignKeyNameConvention(),
+            innerConventionSet.SchemaConvention,
+        };
+
+        ColumnsConventions = innerConventionSet.ColumnsConventions;
+        ConstraintConventions = innerConventionSet.ConstraintConventions;
+        IndexConventions = innerConventionSet.IndexConventions;
+        SequenceConventions = innerConventionSet.SequenceConventions;
+        AutoNameConventions = innerConventionSet.AutoNameConventions;
+        SchemaConvention = innerConventionSet.SchemaConvention;
+        RootPathConvention = innerConventionSet.RootPathConvention;
+    }
+
+    /// <inheritdoc />
+    public IRootPathConvention RootPathConvention { get; }
+
+    /// <inheritdoc />
+    public DefaultSchemaConvention SchemaConvention { get; }
+
+    /// <inheritdoc />
+    public IList<IColumnsConvention> ColumnsConventions { get; }
+
+    /// <inheritdoc />
+    public IList<IConstraintConvention> ConstraintConventions { get; }
+
+    /// <inheritdoc />
+    public IList<IForeignKeyConvention> ForeignKeyConventions { get; }
+
+    /// <inheritdoc />
+    public IList<IIndexConvention> IndexConventions { get; }
+
+    /// <inheritdoc />
+    public IList<ISequenceConvention> SequenceConventions { get; }
+
+    /// <inheritdoc />
+    public IList<IAutoNameConvention> AutoNameConventions { get; }
+}
 ```
 
 ### Override Default Names
