@@ -24,6 +24,26 @@ public class CreateSimpleTable : Migration
 }
 ```
 
+## Table Deletion
+
+```csharp
+[Migration(1)]
+public class DropTables : Migration
+{
+    public override void Up()
+    {
+        Delete.Table("Users");
+
+        Delete.Table("Orders").IfExists(); // Safely delete if it exists
+    }
+
+    public override void Down()
+    {
+        // Recreate tables if needed
+    }
+}
+```
+
 ## Column Types
 
 FluentMigrator supports all common column types:
