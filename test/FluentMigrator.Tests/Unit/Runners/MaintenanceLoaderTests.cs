@@ -17,7 +17,6 @@
 #endregion
 
 using System.Linq;
-using System.Text.Json;
 
 using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Runner;
@@ -192,7 +191,6 @@ namespace FluentMigrator.Tests.Unit.Runners
         public void LoadsMigrationsFilterNamespace()
         {
             var migrationInfos = _maintenanceLoaderTypeFilter.LoadMaintenance(MigrationStage.BeforeEach);
-            System.Console.WriteLine(JsonSerializer.Serialize(migrationInfos));
             Assert.That(migrationInfos, Is.Not.Empty);
 
             bool found = false;
