@@ -23,6 +23,7 @@ using System.Linq;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Runner.Initialization;
+using static FluentMigrator.Runner.TypeFinder;
 
 using JetBrains.Annotations;
 
@@ -47,6 +48,9 @@ namespace FluentMigrator.Runner
         /// <param name="options">
         /// The options for configuring the migration runner.
         /// </param>
+        /// <param name="filterOptions">
+        /// The options used to filter maintenance migrations by namespace and nested namespaces.
+        /// </param>
         /// <param name="conventions">
         /// The conventions used to identify and process migrations and maintenance stages.
         /// </param>
@@ -59,6 +63,7 @@ namespace FluentMigrator.Runner
         public MaintenanceLoader(
             [NotNull] IAssemblySource assemblySource,
             [NotNull] IOptions<RunnerOptions> options,
+            [NotNull] IOptionsSnapshot<TypeFilterOptions> filterOptions,
             [NotNull] IMigrationRunnerConventions conventions,
             [NotNull] IServiceProvider serviceProvider)
         {
@@ -70,6 +75,7 @@ namespace FluentMigrator.Runner
                 from type in types
                 let stage = conventions.GetMaintenanceStage(type)
                 where stage != null
+                where type.IsInNamespace(filterOptions.Value.Namespace, filterOptions.Value.NestedNamespaces)
                 where conventions.HasRequestedTags(type, tagsList, options.Value.IncludeUntaggedMaintenances)
                 let migration = (IMigration) ActivatorUtilities.CreateInstance(serviceProvider, type)
                 group migration by stage.GetValueOrDefault()
