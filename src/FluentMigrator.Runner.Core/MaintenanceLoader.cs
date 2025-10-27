@@ -41,6 +41,38 @@ namespace FluentMigrator.Runner
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MaintenanceLoader"/> class.
+        /// Creates empty <see cref="TypeFilterOptions" /> and forwards them to the main constructor.
+        /// </summary>
+        /// <param name="assemblySource">
+        /// The source of assemblies containing migration and maintenance classes.
+        /// </param>
+        /// <param name="options">
+        /// The options for configuring the migration runner.
+        /// </param>
+        /// <param name="conventions">
+        /// The conventions used to identify and process migrations and maintenance stages.
+        /// </param>
+        /// <param name="serviceProvider">
+        /// The service provider used to resolve dependencies for migration and maintenance instances.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if any of the required parameters are <c>null</c>.
+        /// </exception>
+        public MaintenanceLoader(
+            [NotNull] IAssemblySource assemblySource,
+            [NotNull] IOptions<RunnerOptions> options,
+            [NotNull] IMigrationRunnerConventions conventions,
+            [NotNull] IServiceProvider serviceProvider)
+            : this(
+                assemblySource,
+                options,
+                Options.Create(new TypeFilterOptions()),
+                conventions,
+                serviceProvider)
+        { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MaintenanceLoader"/> class.
         /// </summary>
         /// <param name="assemblySource">
         /// The source of assemblies containing migration and maintenance classes.
@@ -63,7 +95,7 @@ namespace FluentMigrator.Runner
         public MaintenanceLoader(
             [NotNull] IAssemblySource assemblySource,
             [NotNull] IOptions<RunnerOptions> options,
-            [NotNull] IOptionsSnapshot<TypeFilterOptions> filterOptions,
+            [NotNull] IOptions<TypeFilterOptions> filterOptions,
             [NotNull] IMigrationRunnerConventions conventions,
             [NotNull] IServiceProvider serviceProvider)
         {
