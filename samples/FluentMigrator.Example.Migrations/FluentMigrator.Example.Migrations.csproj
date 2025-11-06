@@ -2,6 +2,8 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <Description>Assembly containing migrations for the example project</Description>
+    <!-- Copying local lock file assemblies is only needed if using FluentMigrator.MSBuild.dll -->
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <!-- By default, *.cs files will be automatically included as compile items,
     but *.sql files will be automatically included as None items.  This disables that behavior. -->
     <EnableDefaultNoneItems>false</EnableDefaultNoneItems>
