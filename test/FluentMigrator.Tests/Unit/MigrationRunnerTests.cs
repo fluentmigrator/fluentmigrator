@@ -523,7 +523,7 @@ namespace FluentMigrator.Tests.Unit
                     Times.Exactly(1)
                 );
 
-            //After setup is done, fake version loader owns the proccess
+            //After setup is done, fake version loader owns the process
             _fakeVersionLoader.DidLoadVersionInfoGetCalled.ShouldBe(true);
         }
 
