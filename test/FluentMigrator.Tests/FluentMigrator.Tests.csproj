@@ -1,7 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <Choose>
+    <When Condition="$([MSBuild]::IsOSPlatform('Linux'))">
+      <TargetFramework>net8.0</TargetFramework>
+    </When>
+    <Otherwise>
+      <!-- Condition="!$([MSBuild]::IsOSPlatform('Linux'))"; Assume Windows OS; we still test .NET Framework 4.8 for backwards compatibility reasons -->
+      <TargetFramework>net48</TargetFramework>
+    </Otherwise>
+  </Choose>
   <PropertyGroup>
-    <TargetFramework Condition="$([MSBuild]::IsOSPlatform('Linux'))">net8.0</TargetFramework>
-    <TargetFramework Condition="!$([MSBuild]::IsOSPlatform('Linux'))">net48</TargetFramework>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\FluentMigrator.snk</AssemblyOriginatorKeyFile>
     <UserSecretsId>FluentMigrator.Tests</UserSecretsId>

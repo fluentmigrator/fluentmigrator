@@ -21,8 +21,11 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
-        dotnet-tfm: [net8.0]
+         include:
+          - os: windows-latest
+            dotnet-tfm: net48
+          - os: ubuntu-latest
+            dotnet-tfm: net8.0
 
     steps:
     - name: Checkout
