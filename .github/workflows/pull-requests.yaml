@@ -22,10 +22,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
-        dotnet-tfm: [
-          net8.0,
-#          net9.0,
-        ]
+        dotnet-tfm: [net8.0]
 
     steps:
     - name: Checkout
@@ -110,6 +107,8 @@ jobs:
 
     - name: Publish Test Results
       uses: EnricoMi/publish-unit-test-result-action@v2
-      if: (!cancelled())
+      # GitHub Actions initially only supported containerized actions, which is not supported on Windows
+      # and this particular GitHub action from EnricoMi is a containerized action
+      if: matrix.os == 'ubuntu-latest' && (!cancelled())
       with:
         files: "${{ github.workspace }}/**/*.trx"
