@@ -26,8 +26,6 @@ jobs:
             dotnet-tfm: net48
           - os: ubuntu-latest
             dotnet-tfm: net8.0
-#          - os: ubuntu-latest
-#            dotnet-tfm: net9.0
 
     steps:
     - name: Checkout
