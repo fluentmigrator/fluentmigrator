@@ -83,6 +83,7 @@ jobs:
 
     - name: Publish Code Coverage Report
       uses: irongut/CodeCoverageSummary@v1.3.0
+      if: matrix.os == 'ubuntu-latest' && (!cancelled())
       with:
         filename: "Cobertura.xml"
         badge: true
