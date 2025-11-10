@@ -1,11 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <Choose>
     <When Condition="$([MSBuild]::IsOSPlatform('Linux'))">
-      <TargetFramework>net8.0</TargetFramework>
+      <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+      </PropertyGroup>
     </When>
     <Otherwise>
       <!-- Condition="!$([MSBuild]::IsOSPlatform('Linux'))"; Assume Windows OS; we still test .NET Framework 4.8 for backwards compatibility reasons -->
-      <TargetFramework>net48</TargetFramework>
+      <PropertyGroup>
+        <TargetFramework>net48</TargetFramework>
+      </PropertyGroup>
     </Otherwise>
   </Choose>
   <PropertyGroup>
