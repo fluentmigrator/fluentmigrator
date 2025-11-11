@@ -33,7 +33,7 @@ namespace FluentMigrator.Tests.Unit.Versioning
     public class VersionUniqueMigrationTests
     {
         [Test]
-        public void UpShouldCreateUniqueIndexWhenCreateWithPrimaryKeyIsFalse()
+        public void UpShouldCreateClusteredUniqueIndexWhenCreateWithPrimaryKeyIsFalse()
         {
             // Arrange
             var versionTableMetaData = new TestVersionTableMetaData { CreateWithPrimaryKey = false };
@@ -45,22 +45,21 @@ namespace FluentMigrator.Tests.Unit.Versioning
             migration.GetUpExpressions(contextMock.Object);
 
             // Assert
-            // Should create unique index
+            // Should create clustered unique index
             collectionMock.Verify(x => x.Add(It.Is<CreateIndexExpression>(e => 
                 e.Index.Name == versionTableMetaData.UniqueIndexName &&
                 e.Index.IsUnique &&
                 e.Index.IsClustered)), Times.Once);
             
             // Should add AppliedOn column
-            collectionMock.Verify(x => x.Add(It.Is<AlterTableExpression>(e => 
-                e.Columns.Count == 1 &&
-                e.Columns[0].Name == versionTableMetaData.AppliedOnColumnName)), Times.Once);
+            collectionMock.Verify(x => x.Add(It.Is<CreateColumnExpression>(e => 
+                e.Column.Name == versionTableMetaData.AppliedOnColumnName)), Times.Once);
             
-            collectionMock.Verify(x => x.Add(It.IsAny<IMigrationExpression>()), Times.Exactly(2));
+            collectionMock.Verify(x => x.Add(It.IsAny<IMigrationExpression>()), Times.Exactly(3));
         }
 
         [Test]
-        public void UpShouldNotCreateUniqueIndexWhenCreateWithPrimaryKeyIsTrue()
+        public void UpShouldCreateNonClusteredUniqueIndexWhenCreateWithPrimaryKeyIsTrue()
         {
             // Arrange
             var versionTableMetaData = new TestVersionTableMetaData { CreateWithPrimaryKey = true };
@@ -72,15 +71,17 @@ namespace FluentMigrator.Tests.Unit.Versioning
             migration.GetUpExpressions(contextMock.Object);
 
             // Assert
-            // Should NOT create unique index
-            collectionMock.Verify(x => x.Add(It.IsAny<CreateIndexExpression>()), Times.Never);
+            // Should create non-clustered unique index
+            collectionMock.Verify(x => x.Add(It.Is<CreateIndexExpression>(e => 
+                e.Index.Name == versionTableMetaData.UniqueIndexName &&
+                e.Index.IsUnique &&
+                !e.Index.IsClustered)), Times.Once);
             
-            // Should only add AppliedOn column
-            collectionMock.Verify(x => x.Add(It.Is<AlterTableExpression>(e => 
-                e.Columns.Count == 1 &&
-                e.Columns[0].Name == versionTableMetaData.AppliedOnColumnName)), Times.Once);
+            // Should add AppliedOn column
+            collectionMock.Verify(x => x.Add(It.Is<CreateColumnExpression>(e => 
+                e.Column.Name == versionTableMetaData.AppliedOnColumnName)), Times.Once);
             
-            collectionMock.Verify(x => x.Add(It.IsAny<IMigrationExpression>()), Times.Exactly(1));
+            collectionMock.Verify(x => x.Add(It.IsAny<IMigrationExpression>()), Times.Exactly(3));
         }
 
         private Mock<IMigrationContext> CreateMigrationContext(Mock<ICollection<IMigrationExpression>> collectionMock)

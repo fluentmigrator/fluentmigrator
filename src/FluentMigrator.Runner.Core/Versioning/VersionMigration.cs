@@ -139,17 +139,25 @@ namespace FluentMigrator.Runner.Versioning
         /// <inheritdoc />
         public override void Up()
         {
-            // Only create the unique index if no primary key exists
-            // If CreateWithPrimaryKey is true, a primary key already provides the uniqueness constraint
+            var createIndexBuilder = Create.Index(_versionTableMeta.UniqueIndexName)
+                .OnTable(_versionTableMeta.TableName)
+                .InSchema(_versionTableMeta.SchemaName)
+                .WithOptions().Unique();
+
             if (!_versionTableMeta.CreateWithPrimaryKey)
             {
-                Create.Index(_versionTableMeta.UniqueIndexName)
-                    .OnTable(_versionTableMeta.TableName)
-                    .InSchema(_versionTableMeta.SchemaName)
-                    .WithOptions().Unique()
-                    .WithOptions().Clustered()
-                    .OnColumn(_versionTableMeta.ColumnName);
+                createIndexBuilder
+                    .WithOptions()
+                    .Clustered();
             }
+            else
+            {
+                createIndexBuilder
+                    .WithOptions()
+                    .NonClustered();
+            }
+
+            createIndexBuilder.OnColumn(_versionTableMeta.ColumnName);
 
             Alter.Table(_versionTableMeta.TableName).InSchema(_versionTableMeta.SchemaName)
                 .AddColumn(_versionTableMeta.AppliedOnColumnName).AsDateTime().Nullable();
