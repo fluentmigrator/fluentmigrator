@@ -44,11 +44,17 @@ namespace FluentMigrator.Runner.Processors
         private DbProviderFactory _instance;
 
         /// <summary>
-        /// 
+        /// Initializes a new instance of the <see cref="ReflectionBasedDbFactory"/> class.
         /// </summary>
-        /// <param name="serviceProvider"></param>
-        /// <param name="testEntries"></param>
-        /// <exception cref="ArgumentException"></exception>
+        /// <param name="serviceProvider">
+        /// The service provider used to resolve dependencies.
+        /// </param>
+        /// <param name="testEntries">
+        /// An array of <see cref="TestEntry"/> instances representing the test entries.
+        /// </param>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="testEntries"/> is empty.
+        /// </exception>
         protected ReflectionBasedDbFactory(IServiceProvider serviceProvider, params TestEntry[] testEntries)
         {
             if (testEntries.Length == 0)
@@ -88,39 +94,6 @@ namespace FluentMigrator.Runner.Processors
             var fullExceptionOutput = string.Join(Environment.NewLine, exceptions.Select(x => x.ToString()));
 
             throw new AggregateException($"Unable to load the driver. Attempted to load: {assemblyNames}, with {fullExceptionOutput}", exceptions);
-        }
-
-        /// <summary>
-        /// Attempts to create a <see cref="DbProviderFactory"/> instance by iterating through the provided test entries.
-        /// </summary>
-        /// <param name="entries">
-        /// A collection of <see cref="TestEntry"/> objects that specify the assembly and type information
-        /// required to create the <see cref="DbProviderFactory"/>.
-        /// </param>
-        /// <param name="exceptions">
-        /// A collection to which any exceptions encountered during the creation process will be added.
-        /// </param>
-        /// <param name="factory">
-        /// When this method returns, contains the created <see cref="DbProviderFactory"/> instance if the operation succeeded;
-        /// otherwise, <see langword="null"/>.
-        /// </param>
-        /// <returns>
-        /// <see langword="true"/> if a <see cref="DbProviderFactory"/> was successfully created; otherwise, <see langword="false"/>.
-        /// </returns>
-        /// <remarks>
-        /// This method is marked as <see cref="ObsoleteAttribute"/> and may be removed in future versions.
-        /// It is recommended to use the overload that includes the <see cref="IServiceProvider"/> parameter for better extensibility.
-        /// </remarks>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown if <paramref name="entries"/> or <paramref name="exceptions"/> is <see langword="null"/>.
-        /// </exception>
-        [Obsolete]
-        protected static bool TryCreateFactory(
-            [NotNull, ItemNotNull] IEnumerable<TestEntry> entries,
-            [NotNull, ItemNotNull] ICollection<Exception> exceptions,
-            out DbProviderFactory factory)
-        {
-            return TryCreateFactory(serviceProvider: null, entries, exceptions, out factory);
         }
 
         /// <summary>

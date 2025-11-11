@@ -23,9 +23,26 @@ using System.IO;
 
 namespace FluentMigrator.Runner.Initialization.NetFramework
 {
+    /// <summary>
+    /// Provides functionality for managing and loading .NET configuration files in a .NET Framework environment.
+    /// </summary>
+    /// <remarks>
+    /// This class implements the <see cref="FluentMigrator.Runner.Initialization.NetFramework.INetConfigManager"/> interface
+    /// and offers methods to load configuration files from specified paths or the machine configuration.
+    /// </remarks>
     internal class NetConfigManager
         : INetConfigManager
     {
+        /// <summary>
+        /// Loads a .NET configuration file from the specified path.
+        /// </summary>
+        /// <param name="path">The path to the configuration file. If the file does not have a ".config" extension, it will be appended automatically.</param>
+        /// <returns>
+        /// A <see cref="System.Configuration.Configuration"/> object representing the loaded configuration.
+        /// </returns>
+        /// <exception cref="System.ArgumentException">
+        /// Thrown when the <paramref name="path"/> is <c>null</c>, empty, or does not point to an existing file.
+        /// </exception>
         public Configuration LoadFromFile(string path)
         {
             if (string.IsNullOrEmpty(path) || !File.Exists(path))
@@ -41,6 +58,16 @@ namespace FluentMigrator.Runner.Initialization.NetFramework
             return ConfigurationManager.OpenMappedExeConfiguration(fileMap, ConfigurationUserLevel.None);
         }
 
+        /// <summary>
+        /// Loads the machine-level configuration file.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="System.Configuration.Configuration"/> object representing the machine-level configuration.
+        /// </returns>
+        /// <remarks>
+        /// This method retrieves the configuration settings from the machine-level configuration file
+        /// using <see cref="System.Configuration.ConfigurationManager.OpenMachineConfiguration"/>.
+        /// </remarks>
         public Configuration LoadFromMachineConfiguration()
         {
             return ConfigurationManager.OpenMachineConfiguration();

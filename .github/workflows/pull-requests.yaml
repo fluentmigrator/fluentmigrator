@@ -4,6 +4,9 @@ on:
   pull_request_target:
     branches:
     - '*'
+  push:
+    branches:
+    - 'main'
 
 env:
   solution: 'FluentMigrator.sln'

@@ -351,7 +351,10 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         /// <inheritdoc />
         public override void Process(PerformDBOperationExpression expression)
         {
-            Logger.LogSay("Performing DB Operation");
+            var message = string.IsNullOrEmpty(expression.Description) 
+                ? "Performing DB Operation" 
+                : $"Performing DB Operation: {expression.Description}";
+            Logger.LogSay(message);
 
             if (Options.PreviewOnly)
             {
