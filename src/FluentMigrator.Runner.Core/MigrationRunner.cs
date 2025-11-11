@@ -970,3 +970,4 @@ namespace FluentMigrator.Runner
         }
     }
 }
+
