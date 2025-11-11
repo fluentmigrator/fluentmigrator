@@ -33,7 +33,7 @@ namespace FluentMigrator.Runner.Processors.DB2.iSeries
     {
         private static readonly TestEntry[] _testEntries =
         {
-            new TestEntry("IBM.Data.DB2.iSeries", "IBM.Data.DB2.iSeries.iDB2Factory"),
+            new TestEntry("Net.IBM.Data.DB2.iSeries", "Net.IBM.Data.DB2.iSeries.iDB2Factory"),
         };
 
         /// <summary>
