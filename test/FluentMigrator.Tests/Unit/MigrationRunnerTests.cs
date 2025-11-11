@@ -821,11 +821,12 @@ namespace FluentMigrator.Tests.Unit
             _migrationList.Clear();
             _migrationList.Add(1, new MigrationInfo(1, TransactionBehavior.Default, new TestMigration()));
             
-            // Setup processor mock to throw exception on BeginTransaction (simulating invalid connection string)
+            var runner = CreateRunner();
+
+            // Setup processor mock to throw exception on BeginTransaction AFTER runner initialization
+            // Use SetupSequence to throw on the validation call (which is the first call after initialization)
             _processorMock.Setup(x => x.BeginTransaction())
                 .Throws(new ArgumentException("Invalid connection string"));
-
-            var runner = CreateRunner();
 
             // Act & Assert
             var exception = Assert.Throws<UndeterminableConnectionException>(() => runner.MigrateUp());
@@ -841,14 +842,14 @@ namespace FluentMigrator.Tests.Unit
             _migrationList.Clear();
             _migrationList.Add(1, new MigrationInfo(1, TransactionBehavior.Default, new TestMigration()));
             
-            // Setup processor mock to throw exception on BeginTransaction
-            _processorMock.Setup(x => x.BeginTransaction())
-                .Throws(new ArgumentException("Invalid connection string"));
-
             var runner = CreateRunner(services =>
             {
                 services.Configure<ProcessorOptions>(opt => opt.PreviewOnly = true);
             });
+
+            // Setup processor mock to throw exception on BeginTransaction AFTER runner initialization
+            _processorMock.Setup(x => x.BeginTransaction())
+                .Throws(new ArgumentException("Invalid connection string"));
 
             // Act & Assert - Should not throw exception in preview mode
             Assert.DoesNotThrow(() => runner.MigrateUp());
@@ -860,11 +861,11 @@ namespace FluentMigrator.Tests.Unit
             // Arrange
             _migrationList.Clear(); // No migrations to apply
             
-            // Setup processor mock to throw exception on BeginTransaction (simulating invalid connection string)
+            var runner = CreateRunner();
+
+            // Setup processor mock to throw exception on BeginTransaction AFTER runner initialization
             _processorMock.Setup(x => x.BeginTransaction())
                 .Throws(new ArgumentException("Invalid connection string"));
-
-            var runner = CreateRunner();
 
             // Act & Assert - Should still validate connection even with no migrations
             var exception = Assert.Throws<UndeterminableConnectionException>(() => runner.MigrateUp());
