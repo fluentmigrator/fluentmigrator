@@ -32,8 +32,14 @@ namespace FluentMigrator.Runner.Processors.DB2
     {
         private static readonly TestEntry[] _testEntries =
         {
+            // We no longer ship assemblies for DB2 on .NET Framework, as we are moving away from saving third party assemblies in the repository,
+            // but we will attempt to provide loading support.
+#if NETFRAMEWORK
+            new TestEntry("Net.IBM.Data.Db2", "Net.IBM.Data.Db2.DB2Factory"),
+#else
             new TestEntry("Net.IBM.Data.DB2.Core", "Net.IBM.Data.DB2.Core.DB2Factory"),
             new TestEntry("Net.IBM.Data.DB2", "Net.IBM.Data.DB2.DB2Factory"),
+#endif
         };
 
         /// <summary>
