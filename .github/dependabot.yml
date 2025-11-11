@@ -7,6 +7,7 @@ updates:
         - "*Sqlite*"
         - "*Pgsql*"
         - "Microsoft.Data.SqlClient"
+        - "Net.IBM.Data.Db2"
         - "*Firebird*"
         - "Oracle.ManagedDataAccess" # .NET Framework dependency for FluentMigrator.Console
         - "Oracle.ManagedDataAccess.Core" # .NET dependency for FluentMigrator.DotNet.Cli
@@ -16,6 +17,7 @@ updates:
     core-dependencies:
       patterns:
         - "Autofac*"
+        - "Microsoft.Build.Utilities.Core"
         # There may be a bug in dependabot with wildcards, so enumerating all "Microsoft.Extensions*" packages below
         - "Microsoft.Extensions.Configuration.Abstractions"
         - "Microsoft.Extensions.Configuration.Binder"
@@ -27,7 +29,7 @@ updates:
         - "Microsoft.Extensions.Logging.Debug"
         - "Microsoft.Extensions.Options"
         - "Microsoft.Extensions.Options.ConfigurationExtensions"
-        
+
     test-dependencies:
       patterns:
         - "Moq"

@@ -1,7 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <Choose>
+    <When Condition="$([MSBuild]::IsOSPlatform('Linux'))">
+      <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+      </PropertyGroup>
+    </When>
+    <Otherwise>
+      <!-- Condition="!$([MSBuild]::IsOSPlatform('Linux'))"; Assume Windows OS; we still test .NET Framework 4.8 for backwards compatibility reasons -->
+      <PropertyGroup>
+        <TargetFramework>net48</TargetFramework>
+      </PropertyGroup>
+    </Otherwise>
+  </Choose>
   <PropertyGroup>
-    <TargetFramework Condition="$([MSBuild]::IsOSPlatform('Linux'))">net8.0</TargetFramework>
-    <TargetFramework Condition="!$([MSBuild]::IsOSPlatform('Linux'))">net48</TargetFramework>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\FluentMigrator.snk</AssemblyOriginatorKeyFile>
     <UserSecretsId>FluentMigrator.Tests</UserSecretsId>
@@ -29,6 +40,8 @@
     <PackageReference Include="Moq" Version="4.20.72" />
     <PackageReference Include="MySql.Data" Version="9.3.0" />
     <PackageReference Include="Npgsql" Version="8.0.7" />
+    <PackageReference Include="Net.IBM.Data.Db2" Version="9.0.0.300" Condition=" '$(OS)' == 'Windows_NT' " />
+    <PackageReference Include="Net.IBM.Data.Db2-lnx" Version="9.0.0.300" Condition=" '$(OS)' != 'Windows_NT' " />
     <PackageReference Include="NUnit" Version="4.3.2" />
     <PackageReference Include="NUnit.Analyzers" Version="4.9.2" />
     <PackageReference Include="NUnit.Console" Version="3.20.1" />
@@ -66,18 +79,11 @@
     <ProjectReference Include="..\..\src\FluentMigrator.Runner.SqlServer\FluentMigrator.Runner.SqlServer.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="IBM.Data.DB2">
-      <HintPath>..\..\lib\DB2\amd64\IBM.Data.DB2.dll</HintPath>
-    </Reference>
     <Reference Include="Sap.Data.Hana.v4.5">
       <HintPath>..\..\lib\Hana\ado.net\v4.5\Sap.Data.Hana.v4.5.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="../../lib/DB2/clidriver/**/*.*">
-      <Link>clidriver/%(RecursiveDir)%(Filename)%(Extension)</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="../../lib/Hana/*.*">
       <Link>%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

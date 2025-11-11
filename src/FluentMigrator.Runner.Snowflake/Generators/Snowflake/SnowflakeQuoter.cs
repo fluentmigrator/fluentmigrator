@@ -96,8 +96,10 @@ namespace FluentMigrator.Runner.Generators.Snowflake
                 case SystemMethods.NewGuid:
                     return "UUID_STRING()";
                 case SystemMethods.CurrentDateTimeOffset:
-                case SystemMethods.CurrentDateTime:
                     return "CURRENT_TIMESTAMP()";
+                case SystemMethods.CurrentDateTime:
+                    // SYSDATE() returns TIMESTAMP_NTZ, compatible with VersionInfo table
+                    return "SYSDATE()";
                 case SystemMethods.CurrentUTCDateTime:
                     return "CONVERT_TIMEZONE('UTC',CURRENT_TIMESTAMP())";
                 case SystemMethods.CurrentUser:

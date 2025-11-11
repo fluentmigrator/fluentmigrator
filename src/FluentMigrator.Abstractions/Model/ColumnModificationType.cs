@@ -1,7 +1,7 @@
 namespace FluentMigrator.Model
 {
     /// <summary>
-    /// Indicates wheter a column should be created or altered
+    /// Indicates whether a column should be created or altered
     /// </summary>
     public enum ColumnModificationType
     {
