@@ -67,7 +67,7 @@ jobs:
         FM_TestConnectionStrings__SqlServer2016__IsEnabled: ${{ matrix.os == 'ubuntu-latest' }}
 
     - name: Combine Coverage Reports
-      uses: danielpalme/ReportGenerator-GitHub-Action@v5.4.10
+      uses: danielpalme/ReportGenerator-GitHub-Action@v5.5.0
       with:
         reports: "**/*.cobertura.xml"
         targetdir: "${{ github.workspace }}"
