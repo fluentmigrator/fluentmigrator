@@ -15,8 +15,11 @@
 #endregion
 
 using System.Reflection.Emit;
+using System.Data;
 
 using FluentMigrator.Runner;
+using FluentMigrator.Model;
+using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators.Redshift;
 
 using NUnit.Framework;
@@ -284,5 +287,36 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE \"public\".\"TestTable1\" RENAME TO \"TestTable2\";");
         }
+    
+        [Test]
+        public override void CanCreateTableWithFluentMultiColumnForeignKey()
+        {
+            // Test the new fluent API for multi-column foreign keys
+            // This database doesn't support inline foreign keys in CREATE TABLE, so the foreign key definition is ignored
+            var expression = new CreateTableExpression { TableName = "Area" };
+            expression.Columns.Add(new ColumnDefinition { Name = "ArticleId", Type = DbType.String });
+            expression.Columns.Add(new ColumnDefinition { Name = "AreaGroupIndex", Type = DbType.Int32 });
+            expression.Columns.Add(new ColumnDefinition { Name = "Index", Type = DbType.Int32, 
+                IsForeignKey = true,
+                ForeignKey = new ForeignKeyDefinition
+                {
+                    Name = "FK_Area_AreaGroup",
+                    PrimaryTable = "AreaGroup",
+                    ForeignTable = "Area",
+                    PrimaryColumns = ["ArticleId", "Index"],
+                    ForeignColumns = ["ArticleId", "AreaGroupIndex"]
+                }
+            });
+
+            var result = Generator.Generate(expression);
+            result.ShouldContain("CREATE TABLE");
+            result.ShouldContain("Area");
+            result.ShouldContain("ArticleId");
+            result.ShouldContain("AreaGroupIndex");
+            result.ShouldContain("Index");
+            // Foreign key constraint should not be present in CREATE TABLE for most databases
+            result.ShouldNotContain("FOREIGN KEY");
+        }
+
     }
 }
