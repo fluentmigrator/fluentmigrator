@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFrameworks>netstandard2.0;net8.0;net9.0</TargetFrameworks>
     <Description>Assembly containing migrations for the example project</Description>
     <!-- Copying local lock file assemblies is only needed if using FluentMigrator.MSBuild.dll -->
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>

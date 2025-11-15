@@ -25,6 +25,7 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Infrastructure.Extensions;
+using FluentMigrator.Exceptions;
 using FluentMigrator.Runner.Exceptions;
 using FluentMigrator.Runner.Processors;
 
@@ -338,6 +339,9 @@ namespace FluentMigrator.Runner
         /// <param name="useAutomaticTransactionManagement"><c>true</c> if automatic transaction management should be used</param>
         public void MigrateUp(long targetVersion, bool useAutomaticTransactionManagement)
         {
+            // Validate connection early to catch invalid connection strings before attempting migrations
+            ValidateConnection();
+
             var migrationInfos = GetUpMigrationsToApply(targetVersion);
 
             using (IMigrationScope scope = _migrationScopeManager.CreateOrWrapMigrationScope(useAutomaticTransactionManagement && TransactionPerSession))
@@ -923,6 +927,32 @@ namespace FluentMigrator.Runner
             return !VersionLoader.VersionInfo.HasAppliedMigration(version) && version < VersionLoader.VersionInfo.Latest();
         }
 
+        /// <summary>
+        /// Validates that the database connection can be established
+        /// </summary>
+        /// <exception cref="UndeterminableConnectionException">Thrown when the connection string is invalid or the database is unreachable</exception>
+        private void ValidateConnection()
+        {
+            // Skip connection validation in preview mode as no actual database connection is needed
+            if (_processorOptions.PreviewOnly)
+            {
+                return;
+            }
+
+            try
+            {
+                // Attempt to begin and immediately rollback a transaction to test the connection
+                // This will force the processor to open the connection and validate it
+                Processor.BeginTransaction();
+                Processor.RollbackTransaction();
+            }
+            catch (Exception ex)
+            {
+                // Wrap the exception in UndeterminableConnectionException to provide consistent error handling
+                throw new UndeterminableConnectionException($"Failed to establish database connection. Please verify your connection string and ensure the database server is accessible. Error: {ex.Message}", ex);
+            }
+        }
+
         /// <inheritdoc />
         public IMigrationScope BeginScope()
         {
@@ -940,3 +970,5 @@ namespace FluentMigrator.Runner
         }
     }
 }
+
+
