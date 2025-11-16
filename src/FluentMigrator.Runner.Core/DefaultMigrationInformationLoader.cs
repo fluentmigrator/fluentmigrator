@@ -31,6 +31,9 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner
 {
+    /// <summary>
+    /// Loads migration information from a migration source.
+    /// </summary>
     public class DefaultMigrationInformationLoader : IMigrationInformationLoader
     {
         [NotNull, ItemNotNull]
@@ -40,15 +43,34 @@ namespace FluentMigrator.Runner
 
         [NotNull]
 #pragma warning disable 618
-        private readonly IMigrationSource _source;
+        private readonly IFilteringMigrationSource _source;
 #pragma warning restore 618
 
         [CanBeNull]
         private SortedList<long, IMigrationInfo> _migrationInfos;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DefaultMigrationInformationLoader"/> class.
+        /// </summary>
+        /// <param name="source">
+        /// The migration source that provides migrations, filtered by the specified criteria.
+        /// </param>
+        /// <param name="filterOptions">
+        /// The options used to filter migrations by namespace and nested namespaces.
+        /// </param>
+        /// <param name="conventions">
+        /// The conventions used by the migration runner to identify and process migrations.
+        /// </param>
+        /// <param name="runnerOptions">
+        /// The options for configuring the migration runner, including tags and untagged migration handling.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if any of the required parameters (<paramref name="source"/>, <paramref name="filterOptions"/>, 
+        /// <paramref name="conventions"/>, or <paramref name="runnerOptions"/>) are <c>null</c>.
+        /// </exception>
         public DefaultMigrationInformationLoader(
 #pragma warning disable 618
-            [NotNull] IMigrationSource source,
+            [NotNull] IFilteringMigrationSource source,
 #pragma warning restore 618
             [NotNull] IOptionsSnapshot<TypeFilterOptions> filterOptions,
             [NotNull] IMigrationRunnerConventions conventions,
@@ -62,14 +84,37 @@ namespace FluentMigrator.Runner
             _includeUntaggedMigrations = runnerOptions.Value.IncludeUntaggedMigrations;
         }
 
+        /// <summary>
+        /// Gets the conventions used by the migration runner to identify and process migrations,
+        /// profiles, maintenance stages, version table metadata, and tags.
+        /// </summary>
+        /// <value>
+        /// An instance of <see cref="IMigrationRunnerConventions"/> that defines the conventions
+        /// for the migration runner.
+        /// </value>
         [NotNull]
         public IMigrationRunnerConventions Conventions { get; }
 
+        /// <summary>
+        /// Gets the namespace used to filter migrations.
+        /// </summary>
+        /// <remarks>
+        /// This property is typically set based on the <see cref="TypeFilterOptions.Namespace"/> value.
+        /// It is used to restrict the migrations loaded to those within the specified namespace.
+        /// </remarks>
         [CanBeNull]
         public string Namespace { get; }
 
+        /// <summary>
+        /// Gets a value indicating whether migrations from nested namespaces should be included
+        /// when loading migration information.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if migrations from nested namespaces should be included; otherwise, <c>false</c>.
+        /// </value>
         public bool LoadNestedNamespaces { get; }
 
+        /// <inheritdoc />
         public SortedList<long, IMigrationInfo> LoadMigrations()
         {
             if (_migrationInfos != null)
@@ -106,7 +151,7 @@ namespace FluentMigrator.Runner
         [NotNull, ItemNotNull]
         private static IEnumerable<IMigrationInfo> FindMigrations(
 #pragma warning disable 618
-            [NotNull] IMigrationSource source,
+            [NotNull] IFilteringMigrationSource source,
 #pragma warning restore 618
             [NotNull] IMigrationRunnerConventions conventions,
             [CanBeNull] string @namespace,
@@ -123,19 +168,7 @@ namespace FluentMigrator.Runner
                 return conventions.HasRequestedTags(type, tagsToMatch, includeUntagged);
             }
 
-            IReadOnlyCollection<IMigration> migrations;
-
-            if (source is IFilteringMigrationSource filteringSource)
-            {
-                migrations = filteringSource.GetMigrations(IsMatchingMigration).ToList();
-            }
-            else
-            {
-                migrations =
-                    (from migration in source.GetMigrations()
-                     where IsMatchingMigration(migration.GetType())
-                     select migration).ToList();
-            }
+            IReadOnlyCollection<IMigration> migrations = source.GetMigrations(IsMatchingMigration).ToList();
 
             if (migrations.Count == 0)
             {

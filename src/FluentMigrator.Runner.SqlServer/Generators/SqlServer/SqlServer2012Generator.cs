@@ -20,25 +20,33 @@
 using System.Collections.Generic;
 using System.Text;
 
+using FluentMigrator.Generation;
+
 using JetBrains.Annotations;
 
 using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Generators.SqlServer
 {
+    /// <summary>
+    /// The SQL Server 2012 SQL generator for FluentMigrator.
+    /// </summary>
     public class SqlServer2012Generator : SqlServer2008Generator
     {
+        /// <inheritdoc />
         public SqlServer2012Generator()
             : this(new SqlServer2008Quoter())
         {
         }
 
+        /// <inheritdoc />
         public SqlServer2012Generator(
             [NotNull] SqlServer2008Quoter quoter)
             : base(quoter, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()))
         {
         }
 
+        /// <inheritdoc />
         public SqlServer2012Generator(
             [NotNull] SqlServer2008Quoter quoter,
             [NotNull] IOptions<GeneratorOptions> generatorOptions)
@@ -46,6 +54,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         {
         }
 
+        /// <inheritdoc />
         protected SqlServer2012Generator(
             [NotNull] IColumn column,
             [NotNull] IQuoter quoter,
@@ -55,7 +64,6 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         {
         }
 
-
         /// <inheritdoc />
         public override string GeneratorId => GeneratorIdConstants.SqlServer2012;
 
@@ -63,6 +71,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         public override List<string> GeneratorIdAliases =>
             [GeneratorIdConstants.SqlServer2012, GeneratorIdConstants.SqlServer];
 
+        /// <inheritdoc />
         public override string Generate(Expressions.CreateSequenceExpression expression)
         {
             var result = new StringBuilder("CREATE SEQUENCE ");
@@ -113,6 +122,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             return result.ToString();
         }
 
+        /// <inheritdoc />
         public override string Generate(Expressions.DeleteSequenceExpression expression)
         {
             return FormatStatement("DROP SEQUENCE {0}", Quoter.QuoteSequenceName(expression.SequenceName, expression.SchemaName));

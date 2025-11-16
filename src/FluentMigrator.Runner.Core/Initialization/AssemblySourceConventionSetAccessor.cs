@@ -27,6 +27,14 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Initialization
 {
+    /// <summary>
+    /// Provides access to a convention set by utilizing assembly sources and type filtering options.
+    /// </summary>
+    /// <remarks>
+    /// This class is responsible for retrieving an implementation of <see cref="IConventionSet"/> 
+    /// from the provided assembly sources and type candidates. It uses type filtering options 
+    /// to determine valid types and supports dependency injection for instantiation.
+    /// </remarks>
     public class AssemblySourceConventionSetAccessor : IConventionSetAccessor
     {
         private readonly Lazy<IConventionSet> _lazyValue;

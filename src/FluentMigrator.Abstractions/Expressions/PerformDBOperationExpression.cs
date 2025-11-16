@@ -35,6 +35,11 @@ namespace FluentMigrator.Expressions
         [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.OperationCannotBeNull))]
         public Action<IDbConnection, IDbTransaction> Operation { get; set; }
 
+        /// <summary>
+        /// Gets or sets the description of the operation for logging purposes
+        /// </summary>
+        public string Description { get; set; }
+
         /// <inheritdoc />
         public override void ExecuteWith(IMigrationProcessor processor)
         {

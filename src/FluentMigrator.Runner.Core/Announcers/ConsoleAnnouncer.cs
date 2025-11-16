@@ -22,18 +22,26 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Announcers
 {
+    /// <summary>
+    /// An announcer that writes output to the console.
+    /// </summary>
     [Obsolete]
     public class ConsoleAnnouncer : Announcer
     {
+        /// <inheritdoc />
         public ConsoleAnnouncer()
         {
         }
 
+        /// <inheritdoc />
         public ConsoleAnnouncer(IOptions<AnnouncerOptions> options)
             : base(options)
         {
         }
 
+        /// <summary>
+        /// Writes the FluentMigrator header to the console.
+        /// </summary>
         public void Header()
         {
             Console.ForegroundColor = ConsoleColor.Green;
@@ -48,11 +56,15 @@ namespace FluentMigrator.Runner.Announcers
             Console.ResetColor();
         }
 
+        /// <summary>
+        /// Writes a horizontal rule to the console.
+        /// </summary>
         public void HorizontalRule()
         {
             Write("".PadRight(79, '-'));
         }
 
+        /// <inheritdoc />
         public override void Heading(string message)
         {
             Console.ForegroundColor = ConsoleColor.Green;
@@ -62,6 +74,7 @@ namespace FluentMigrator.Runner.Announcers
             Console.ResetColor();
         }
 
+        /// <inheritdoc />
         public override void Say(string message)
         {
             Console.ForegroundColor = ConsoleColor.White;
@@ -69,6 +82,7 @@ namespace FluentMigrator.Runner.Announcers
             Console.ResetColor();
         }
 
+        /// <inheritdoc />
         public override void Emphasize(string message)
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
@@ -76,12 +90,14 @@ namespace FluentMigrator.Runner.Announcers
             Console.ResetColor();
         }
 
+        /// <inheritdoc />
         public override void ElapsedTime(TimeSpan timeSpan)
         {
             Console.ResetColor();
             base.ElapsedTime(timeSpan);
         }
 
+        /// <inheritdoc />
         public override void Error(string message)
         {
             Console.ForegroundColor = ConsoleColor.Red;
@@ -89,6 +105,7 @@ namespace FluentMigrator.Runner.Announcers
             Console.ResetColor();
         }
 
+        /// <inheritdoc />
         public override void Write(string message, bool isNotSql = true)
         {
             Console.Out.WriteLine(message);

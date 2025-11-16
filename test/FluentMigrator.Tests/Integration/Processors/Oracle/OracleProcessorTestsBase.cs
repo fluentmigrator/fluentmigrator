@@ -50,7 +50,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle
         {
             using (var table = new OracleTestTable(Processor, SchemaName, "id int"))
             {
-                Processor.ColumnExists("testschema", table.Name, "ID").ShouldBeFalse();
+                Processor.ColumnExists("UnknownSchema", table.Name, "ID").ShouldBeFalse();
             }
         }
 
@@ -60,7 +60,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle
             using (var table = new OracleTestTable(Processor, SchemaName, "id int"))
             {
                 table.WithUniqueConstraintOn("ID");
-                Processor.ConstraintExists("testschema", table.Name, "UC_id").ShouldBeFalse();
+                Processor.ConstraintExists("UnknownSchema", table.Name, "UC_id").ShouldBeFalse();
             }
         }
 
@@ -69,7 +69,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle
         {
             using (var table = new OracleTestTable(Processor, SchemaName, "id int"))
             {
-                Processor.TableExists("testschema", table.Name).ShouldBeFalse();
+                Processor.TableExists("UnknownSchema", table.Name).ShouldBeFalse();
             }
         }
 

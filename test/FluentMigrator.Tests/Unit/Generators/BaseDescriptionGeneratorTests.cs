@@ -18,6 +18,7 @@
 
 using System.Linq;
 
+using FluentMigrator.Generation;
 using FluentMigrator.Runner.Generators;
 
 using NUnit.Framework;

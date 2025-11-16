@@ -24,7 +24,9 @@ using FluentMigrator.Runner.Generators.DB2;
 using FluentMigrator.Runner.Generators.DB2.iSeries;
 using FluentMigrator.Runner.Generators.Firebird;
 using FluentMigrator.Runner.Generators.Hana;
+#if NETFRAMEWORK
 using FluentMigrator.Runner.Generators.Jet;
+#endif
 using FluentMigrator.Runner.Generators.MySql;
 using FluentMigrator.Runner.Generators.Oracle;
 using FluentMigrator.Runner.Generators.Postgres;
@@ -64,7 +66,9 @@ namespace FluentMigrator.Tests.Unit.Runners
         [TestCase(typeof(Db2ISeriesProcessor), typeof(Db2ISeriesGenerator), ProcessorIdConstants.Db2ISeries, GeneratorIdConstants.Db2ISeries)]
         [TestCase(typeof(FirebirdProcessor), typeof(FirebirdGenerator), ProcessorIdConstants.Firebird, GeneratorIdConstants.Firebird)]
         [TestCase(typeof(HanaProcessor), typeof(HanaGenerator), ProcessorIdConstants.Hana, GeneratorIdConstants.Hana)]
+#if NETFRAMEWORK
         [TestCase(typeof(JetProcessor), typeof(JetGenerator), ProcessorIdConstants.Jet, GeneratorIdConstants.Jet)]
+#endif
         [TestCase(typeof(MySql4Processor), typeof(MySql4Generator), ProcessorIdConstants.MySql4, GeneratorIdConstants.MySql4)]
         [TestCase(typeof(MySql5Processor), typeof(MySql5Generator), ProcessorIdConstants.MySql5, GeneratorIdConstants.MySql5)]
         [TestCase(typeof(MySql8Processor), typeof(MySql8Generator), ProcessorIdConstants.MySql8, GeneratorIdConstants.MySql8)]
@@ -90,7 +94,7 @@ namespace FluentMigrator.Tests.Unit.Runners
             var migrationGenerator = (IMigrationGenerator)serviceProvider.GetRequiredService(generator);
             var migrationProcessorAccessor = serviceProvider.GetRequiredService<IProcessorAccessor>();
             var migrationGeneratorAccessor = serviceProvider.GetRequiredService<IGeneratorAccessor>();
-            
+
             Assert.That(migrationProcessor.DatabaseType, Is.EqualTo(processorId));
             Assert.That(migrationGenerator.GeneratorId, Is.EqualTo(generatorId));
             Assert.That(migrationProcessor.DatabaseType, Is.EqualTo(
@@ -126,7 +130,7 @@ namespace FluentMigrator.Tests.Unit.Runners
             Assert.That(migrationProcessorAccessor.Processor.DatabaseType, processorMatcher);
             Assert.That(migrationGeneratorAccessor.Generator.GeneratorId, generatorMatcher);
         }
-        
+
         private IServiceProvider GetServiceProvider(string processorId, string generatorId)
         {
             var serviceProvider = new ServiceCollection()

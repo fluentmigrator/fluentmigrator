@@ -20,21 +20,57 @@ using FluentMigrator.Runner.Generators.Base;
 
 namespace FluentMigrator.Runner.Generators.MySql
 {
+    /// <summary>
+    /// Represents the type mapping for MySQL 4 database.
+    /// </summary>
+    /// <remarks>
+    /// This class provides a set of predefined type mappings for MySQL 4, including constants for
+    /// various data type capacities such as string, text, and decimal types. It extends the 
+    /// <see cref="FluentMigrator.Runner.Generators.Base.TypeMapBase"/> class and implements the 
+    /// <see cref="FluentMigrator.Runner.Generators.MySql.IMySqlTypeMap"/> interface.
+    /// </remarks>
     public class MySql4TypeMap : TypeMapBase, IMySqlTypeMap
     {
+        /// <summary>
+        /// The maximum capacity for ANSI tiny strings.
+        /// </summary>
         public const int AnsiTinyStringCapacity = 127;
+        /// <summary>
+        /// The default string capacity.
+        /// </summary>
         public const int StringCapacity = 255;
+        /// <summary>
+        /// The maximum capacity for VARCHAR types.
+        /// </summary>
         public const int VarcharCapacity = 8192;
+        /// <summary>
+        /// The maximum capacity for TEXT types.
+        /// </summary>
         public const int TextCapacity = 65535;
+        /// <summary>
+        /// The maximum capacity for MEDIUMTEXT types.
+        /// </summary>
         public const int MediumTextCapacity = 16777215;
+        /// <summary>
+        /// The maximum capacity for LONGTEXT types.
+        /// </summary>
         public const int LongTextCapacity = int.MaxValue;
+        /// <summary>
+        /// The maximum capacity for DECIMAL types.
+        /// </summary>
         public const int DecimalCapacity = 254;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MySql4TypeMap"/> class.
+        /// </summary>
         public MySql4TypeMap()
         {
             SetupTypeMaps();
         }
 
+        /// <summary>
+        /// Sets up the MySQL type mappings for MySQL 4.
+        /// </summary>
         protected virtual void SetupMySqlTypeMaps()
         {
             SetTypeMap(DbType.AnsiStringFixedLength, "CHAR(255)");
@@ -79,6 +115,7 @@ namespace FluentMigrator.Runner.Generators.MySql
             SetTypeMap(DbType.Time, "DATETIME");
         }
         
+        /// <inheritdoc />
         protected sealed override void SetupTypeMaps()
         {
             SetupMySqlTypeMaps();

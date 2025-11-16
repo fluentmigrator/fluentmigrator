@@ -14,6 +14,8 @@
 // limitations under the License.
 #endregion
 
+using System;
+
 using FluentMigrator.Runner.Generators.Oracle;
 using FluentMigrator.Runner.Initialization;
 
@@ -24,8 +26,40 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.Oracle
 {
+    /// <summary>
+    /// Represents a processor for managing Oracle databases using the managed Oracle driver.
+    /// </summary>
+    /// <remarks>
+    /// This class extends <see cref="OracleProcessorBase"/> and provides functionality specific to the managed Oracle driver.
+    /// It is used to execute database operations and schema queries for Oracle databases.
+    /// </remarks>
     public class OracleManagedProcessor : OracleProcessorBase
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OracleManagedProcessor"/> class.
+        /// </summary>
+        /// <param name="factory">
+        /// The <see cref="OracleManagedDbFactory"/> responsible for creating database connections.
+        /// </param>
+        /// <param name="generator">
+        /// The <see cref="IOracleGenerator"/> used to generate SQL statements for Oracle databases.
+        /// </param>
+        /// <param name="logger">
+        /// The <see cref="ILogger{TCategoryName}"/> instance used for logging operations.
+        /// </param>
+        /// <param name="options">
+        /// The <see cref="IOptionsSnapshot{TOptions}"/> containing configuration options for the processor.
+        /// </param>
+        /// <param name="connectionStringAccessor">
+        /// The <see cref="IConnectionStringAccessor"/> used to access the database connection string.
+        /// </param>
+        /// <remarks>
+        /// This constructor initializes the base <see cref="OracleProcessorBase"/> with the managed Oracle driver
+        /// and provides the required dependencies for executing database operations.
+        /// </remarks>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if any of the parameters are <c>null</c>.
+        /// </exception>
         public OracleManagedProcessor(
             [NotNull] OracleManagedDbFactory factory,
             [NotNull] IOracleGenerator generator,

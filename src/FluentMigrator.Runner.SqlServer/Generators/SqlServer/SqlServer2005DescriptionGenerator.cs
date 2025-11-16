@@ -24,6 +24,14 @@ using FluentMigrator.Runner.Generators.Generic;
 
 namespace FluentMigrator.Runner.Generators.SqlServer
 {
+    /// <summary>
+    /// Generates SQL Server 2005-specific SQL statements for managing table and column descriptions.
+    /// </summary>
+    /// <remarks>
+    /// This class extends the <see cref="FluentMigrator.Runner.Generators.Generic.GenericDescriptionGenerator"/> 
+    /// to provide functionality specific to SQL Server 2005. It handles the creation, removal, and verification 
+    /// of extended properties used to store descriptions for tables and columns.
+    /// </remarks>
     public class SqlServer2005DescriptionGenerator : GenericDescriptionGenerator
     {
         #region Constants
@@ -48,6 +56,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         #endregion
 
+        /// <inheritdoc />
         public override string GenerateDescriptionStatement(AlterTableExpression expression)
         {
             if (string.IsNullOrEmpty(expression.TableDescription))
@@ -63,6 +72,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             return string.Join("", new[] { tableVerificationStatement, removalStatement, newDescriptionStatement });
         }
 
+        /// <inheritdoc />
         public override string GenerateDescriptionStatement(AlterColumnExpression expression)
         {
             if (string.IsNullOrEmpty(expression.Column.ColumnDescription))
@@ -75,14 +85,14 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             var removalStatement = GenerateColumnDescriptionRemoval("Description", formattedSchemaName, expression.TableName, expression.Column.Name);
             var newDescriptionStatement = GenerateColumnDescription("Description", formattedSchemaName, expression.TableName, expression.Column.Name, expression.Column.ColumnDescription);
 
-            var initialDescriptionSatetement = string.Join("", new[] { columnVerificationStatement, removalStatement, newDescriptionStatement });
+            var initialDescriptionStatement = string.Join("", new[] { columnVerificationStatement, removalStatement, newDescriptionStatement });
 
             if (expression.Column.AdditionalColumnDescriptions.Count == 0)
-                return initialDescriptionSatetement;
+                return initialDescriptionStatement;
 
             var descriptionsList = new List<string>
             {
-                initialDescriptionSatetement
+                initialDescriptionStatement
             };
 
             foreach (var description in expression.Column.AdditionalColumnDescriptions)
@@ -101,6 +111,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             return joined;
         }
 
+        /// <inheritdoc />
         protected override string GenerateTableDescription(string schemaName, string tableName, string tableDescription)
         {
             if (string.IsNullOrEmpty(tableDescription))
@@ -114,6 +125,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                 tableName);
         }
 
+        /// <inheritdoc />
         protected override string GenerateColumnDescription(string descriptionName, string schemaName, string tableName, string columnName, string columnDescription)
         {
             if (string.IsNullOrEmpty(columnDescription))

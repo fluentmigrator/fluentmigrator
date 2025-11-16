@@ -2,6 +2,14 @@ using FluentMigrator.Runner.Generators.Generic;
 
 namespace FluentMigrator.Runner.Generators.Hana
 {
+    /// <summary>
+    /// A description generator for SAP HANA database.
+    /// </summary>
+    /// <remarks>
+    /// This class generates SQL statements to set descriptions for tables and columns
+    /// in a SAP HANA database. It extends the functionality of the <see cref="FluentMigrator.Runner.Generators.Generic.GenericDescriptionGenerator"/> 
+    /// by providing HANA-specific SQL syntax for table and column comments.
+    /// </remarks>
     public class HanaDescriptionGenerator : GenericDescriptionGenerator
     {
         #region Constants
@@ -15,9 +23,10 @@ namespace FluentMigrator.Runner.Generators.Hana
         {
             return string.IsNullOrEmpty(schemaName)
                ? tableName
-               : string.Format("{0}.{1}", schemaName, tableName);
+               : $"{schemaName}.{tableName}";
         }
 
+        /// <inheritdoc />
         protected override string GenerateTableDescription(
             string schemaName, string tableName, string tableDescription)
         {
@@ -27,6 +36,7 @@ namespace FluentMigrator.Runner.Generators.Hana
             return string.Format(TableDescriptionTemplate, GetFullTableName(schemaName, tableName), tableDescription);
         }
 
+        /// <inheritdoc />
         protected override string GenerateColumnDescription(
             string descriptionName, string schemaName, string tableName, string columnName, string columnDescription)
         {

@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 
+using FluentMigrator.Generation;
 using FluentMigrator.Model;
 
 namespace FluentMigrator.Runner.Generators.Base
@@ -50,6 +51,7 @@ namespace FluentMigrator.Runner.Generators.Base
                 FormatString,
                 FormatType,
                 FormatCollation,
+                FormatExpression,
                 FormatNullable,
                 FormatDefaultValue,
                 FormatPrimaryKey,
@@ -102,6 +104,14 @@ namespace FluentMigrator.Runner.Generators.Base
             }
 
             return GetTypeMap(column.Type.Value, column.Size, column.Precision);
+        }
+
+        /// <summary>
+        /// Formats a computed column type definition
+        /// </summary>
+        protected virtual string FormatExpression(ColumnDefinition column)
+        {
+            return column.Expression == null ? null : $"GENERATED ALWAYS AS ({column.Expression}){(column.ExpressionStored ? " STORED" : "")}";
         }
 
         /// <summary>

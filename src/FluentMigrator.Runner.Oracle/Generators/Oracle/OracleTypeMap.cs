@@ -21,25 +21,85 @@ using FluentMigrator.Runner.Generators.Base;
 
 namespace FluentMigrator.Runner.Generators.Oracle
 {
+    /// <summary>
+    /// Provides Oracle-specific mappings between <see cref="System.Data.DbType"/> and SQL types.
+    /// </summary>
     public class OracleTypeMap : TypeMapBase, IOracleTypeMap
     {
         // See https://docs.oracle.com/cd/B28359_01/server.111/b28320/limits001.htm#i287903
         // and http://docs.oracle.com/cd/B19306_01/server.102/b14220/datatype.htm#i13446
         // for limits in Oracle data types.
+        /// <summary>
+        /// Specifies the maximum capacity, in characters, for ANSI string types in Oracle databases.
+        /// </summary>
+        /// <remarks>
+        /// This constant is used to define the upper limit for the size of ANSI string columns
+        /// when mapping <see cref="System.Data.DbType.AnsiString"/> to Oracle SQL types.
+        /// The value is based on Oracle's VARCHAR2 data type limitations.
+        /// </remarks>
         public const int AnsiStringCapacity = 4000;
+        /// <summary>
+        /// Specifies the maximum capacity, in characters, for ANSI text types in Oracle databases.
+        /// </summary>
+        /// <remarks>
+        /// This constant is used to define the upper limit for the size of ANSI text columns
+        /// when mapping <see cref="System.Data.DbType.AnsiString"/> to Oracle SQL types.
+        /// The value <c>int.MaxValue</c> represents the unbounded, theoretical maximum size for large text data in Oracle databases.
+        /// </remarks>
         public const int AnsiTextCapacity = int.MaxValue;
+        /// <summary>
+        /// Represents the maximum capacity for a BLOB (Binary Large Object) in Oracle databases.
+        /// </summary>
+        /// <remarks>
+        /// This constant is used to define the maximum size for BLOB data types in Oracle-specific mappings.
+        /// It is set to <see cref="int.MaxValue"/>, which indicates the largest possible size for a BLOB.
+        /// </remarks>
         public const int BlobCapacity = int.MaxValue;
+        /// <summary>
+        /// Represents the maximum capacity, in characters, for Oracle CHAR data types.
+        /// </summary>
+        /// <remarks>
+        /// This constant is used to define the maximum size for Oracle CHAR types when mapping
+        /// <see cref="System.Data.DbType.StringFixedLength"/> to Oracle SQL types.
+        /// </remarks>
         public const int CharStringCapacity = 2000;
+        /// <summary>
+        /// Represents the maximum precision for a decimal type in Oracle databases.
+        /// </summary>
         public const int DecimalCapacity = 38;
+        /// <summary>
+        /// Represents the maximum capacity, in bytes, for the Oracle RAW data type.
+        /// </summary>
+        /// <remarks>
+        /// This constant is used to define the maximum size of binary data that can be stored in a RAW column.
+        /// </remarks>
         public const int RawCapacity = 2000;
+        /// <summary>
+        /// Represents the maximum capacity for Unicode string types in Oracle databases.
+        /// </summary>
         public const int UnicodeStringCapacity = 4000;
+        /// <summary>
+        /// Represents the maximum capacity for Unicode text in Oracle databases.
+        /// </summary>
+        /// <remarks>
+        /// This constant is used to define the size limit for NCLOB data types in Oracle,
+        /// which are used to store large Unicode text data.
+        /// </remarks>
         public const int UnicodeTextCapacity = int.MaxValue;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OracleTypeMap"/> class.
+        /// </summary>
+        /// <remarks>
+        /// This constructor sets up the Oracle-specific mappings between 
+        /// <see cref="System.Data.DbType"/> and SQL types by invoking the <see cref="SetupTypeMaps"/> method.
+        /// </remarks>
         public OracleTypeMap()
         {
             SetupTypeMaps();
         }
-        
+
+        /// <inheritdoc />
         protected sealed override void SetupTypeMaps()
         {
             SetTypeMap(DbType.AnsiStringFixedLength, "CHAR(255 CHAR)");

@@ -21,43 +21,63 @@ using System.Collections.Generic;
 
 namespace FluentMigrator.Runner.Initialization
 {
+    /// <summary>
+    /// Provides context information for running migrations.
+    /// </summary>
     [Obsolete]
     public class RunnerContext : IRunnerContext
     {
+        /// <inheritdoc />
         public RunnerContext(IAnnouncer announcer)
         {
             Announcer = announcer;
         }
 
+        /// <inheritdoc />
         public string Database { get; set; }
+        /// <inheritdoc />
         public string Connection { get; set; }
+        /// <inheritdoc />
         public string[] Targets { get; set; }
+        /// <inheritdoc />
         public bool PreviewOnly { get; set; }
+        /// <inheritdoc />
         public string Namespace { get; set; }
+        /// <inheritdoc />
         public bool NestedNamespaces { get; set; }
+        /// <inheritdoc />
         public string Task { get; set; }
+        /// <inheritdoc />
         public long Version { get; set; }
+        /// <inheritdoc />
         public long StartVersion { get; set; }
+        /// <inheritdoc />
         public bool NoConnection { get; set; }
+        /// <inheritdoc />
         public int Steps { get; set; }
+        /// <inheritdoc />
         public string WorkingDirectory { get; set; }
+        /// <inheritdoc />
         public string Profile { get; set; }
+        /// <inheritdoc />
         public int? Timeout { get; set; }
+        /// <inheritdoc />
         public string ConnectionStringConfigPath { get; set; }
+        /// <inheritdoc />
         public IEnumerable<string> Tags { get; set; }
+        /// <inheritdoc />
         public bool TransactionPerSession { get; set; }
-
         /// <inheritdoc />
         public bool AllowBreakingChange { get; set; }
+        /// <inheritdoc />
         public string ProviderSwitches { get; set; }
-
+        /// <inheritdoc />
         public IAnnouncer Announcer { get; }
-
+        /// <inheritdoc />
         public IStopWatch StopWatch { get; } = new StopWatch();
-
         /// <inheritdoc />
         public string DefaultSchemaName { get; set; }
-
+        /// <inheritdoc />
         public bool StripComments { get; set; }
     }
 }

@@ -16,6 +16,9 @@
 
 namespace FluentMigrator.Runner.Generators.Jet
 {
+    /// <summary>
+    /// Represents a type mapping specific to the Jet database.
+    /// </summary>
     public interface IJetTypeMap : ITypeMap
     {
         

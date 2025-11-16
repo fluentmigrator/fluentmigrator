@@ -16,5 +16,8 @@
 
 namespace FluentMigrator.Runner.Generators.Postgres
 {
+    /// <summary>
+    /// Represents a specialized type map for PostgreSQL, extending the functionality of <see cref="FluentMigrator.Runner.Generators.ITypeMap"/>.
+    /// </summary>
     public interface IPostgresTypeMap : ITypeMap { }
 }

@@ -80,6 +80,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{B3796E78
 	ProjectSection(SolutionItems) = preProject
 		azure-pipelines-pullrequests.yml = azure-pipelines-pullrequests.yml
 		azure-pipelines.yml = azure-pipelines.yml
+		.github\dependabot.yml = .github\dependabot.yml
 		Directory.Build.props = Directory.Build.props
 		DotNetSdkMono.props = DotNetSdkMono.props
 		FluentMigrator.snk = FluentMigrator.snk
@@ -107,6 +108,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{850DAD53-4
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FluentMigrator.Example.MSBuild", "samples\FluentMigrator.Example.MSBuild\FluentMigrator.Example.MSBuild.csproj", "{2755D82C-E45D-479B-B502-FAAF3322DD9B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "gh-actions", "gh-actions", "{A3987BA7-73EB-468A-96D9-498949F94759}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\pull-requests.yaml = .github\workflows\pull-requests.yaml
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "analyzers", "analyzers", "{4C0E608C-2A95-46FD-AE82-5070B7967CDF}"
 EndProject

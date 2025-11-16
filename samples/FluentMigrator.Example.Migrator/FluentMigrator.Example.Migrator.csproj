@@ -6,16 +6,6 @@
     <Description>Example project that shows how to execute migrations</Description>
   </PropertyGroup>
   <Import Project="../../Global.props" />
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net48' and '$(OS)' == 'Windows_NT' ">
-    <COMReference Include="ADOX.dll">
-      <Guid>00000600-0000-0010-8000-00aa006d2ea4</Guid>
-      <VersionMajor>6</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Lcid>0</Lcid>
-      <Isolated>false</Isolated>
-    </COMReference>
-  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.1.1" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.4" />

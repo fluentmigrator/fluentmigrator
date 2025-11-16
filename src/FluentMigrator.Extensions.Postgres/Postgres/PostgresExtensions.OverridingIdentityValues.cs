@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2021, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,13 +17,31 @@
 using System;
 
 using FluentMigrator.Builders.Insert;
+using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Infrastructure.Extensions;
 
 namespace FluentMigrator.Postgres
 {
+    /// <summary>
+    /// Provides extension methods for PostgreSQL-specific functionality in FluentMigrator.
+    /// </summary>
+    /// <remarks>
+    /// This class contains constants and methods that facilitate the use of PostgreSQL-specific features,
+    /// such as overriding identity values and additional index or column options.
+    /// </remarks>
     public static partial class PostgresExtensions
     {
+        /// <summary>
+        /// Represents the key used to specify the "OVERRIDING {SYSTEM|USER} VALUE" feature
+        /// for PostgreSQL insert operations.
+        /// </summary>
+        /// <remarks>
+        /// This constant is utilized to add or retrieve the <c>OVERRIDING SYSTEM VALUE</c>
+        /// or <c>OVERRIDING USER VALUE</c> behavior in PostgreSQL insert statements.
+        /// It is primarily used in conjunction with the <see cref="InsertDataExpression.AdditionalFeatures"/> 
+        /// dictionary to enable overriding identity values.
+        /// </remarks>
         public const string OverridingIdentityValues = "PostgresOverridingIdentityValues";
 
         /// <summary>

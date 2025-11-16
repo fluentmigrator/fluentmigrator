@@ -16,10 +16,22 @@
 
 namespace FluentMigrator
 {
+    /// <summary>
+    /// Specifies the Oracle identity column generation type.
+    /// </summary>
     public enum OracleGenerationType
     {
+        /// <summary>
+        /// Always generate the identity value.
+        /// </summary>
         Always,
+        /// <summary>
+        /// Generate the identity value by default.
+        /// </summary>
         ByDefault,
+        /// <summary>
+        /// Generate the identity value by default when the value is null.
+        /// </summary>
         ByDefaultOnNull
     }
 }

@@ -16,33 +16,93 @@
 //
 #endregion
 
+using System;
+using System.Collections.Generic;
+
+using JetBrains.Annotations;
+
 namespace FluentMigrator.Runner.Generators.Oracle
 {
+    /// <summary>
+    /// The Oracle SQL quoter for FluentMigrator.
+    /// </summary>
     public class OracleQuoter : OracleQuoterQuotedIdentifier
     {
-        public override string Quote(string name)
+        /// <summary>
+        /// https://docs.oracle.com/cd/A97630_01/appdev.920/a42525/apb.htm
+        /// </summary>
+        private static readonly HashSet<string> _keywords = new HashSet<string>(
+            new[]
+            {
+                "access", "else", "modify", "start", "add", "exclusive", "noaudit", "select",
+                "all", "exists", "nocompress", "session", "alter", "file", "not", "set",
+                "and", "float", "notfound", "share", "any", "for", "nowait", "size",
+                "arraylen", "from", "null", "smallint", "as", "grant", "number", "sqlbuf",
+                "asc", "group", "of", "successful", "audit", "having", "offline", "synonym",
+                "between", "identified", "on", "sysdate", "by", "immediate", "online", "table",
+                "char", "in", "option", "then", "check", "increment", "or", "to",
+                "cluster", "index", "order", "trigger", "column", "initial", "pctfree", "uid",
+                "comment", "insert", "prior", "union", "compress", "integer", "privileges", "unique",
+                "connect", "intersect", "public", "update", "create", "into", "raw", "user",
+                "current", "is", "rename", "validate", "date", "level", "resource", "values",
+                "decimal", "like", "revoke", "varchar", "default", "lock", "row", "varchar2",
+                "delete", "long", "rowid", "view", "desc", "maxextents", "rowlabel", "whenever",
+                "distinct", "minus", "rownum", "where", "drop", "mode", "rows", "with"
+            },
+            StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>
+        /// Determines whether the specified name should be quoted for Oracle SQL.
+        /// </summary>
+        /// <param name="name">The identifier name to check.</param>
+        /// <returns><c>true</c> if the name should be quoted; otherwise, <c>false</c>.</returns>
+        /// <inheritdoc />
+        [ContractAnnotation("name:null => false")]
+        protected override bool ShouldQuote(string name)
         {
-            return UnQuote(name);
+            if (string.IsNullOrEmpty(name))
+            {
+                return false;
+            }
+
+            if (_keywords.Contains(name))
+            {
+                return true;
+            }
+
+            // Otherwise, quote only when it's not a valid Oracle identifier
+            var first = name[0];
+            if (!IsLetter(first))
+            {
+                return true;
+            }
+
+            var len = name.Length;
+            for (var i = 1; i < len; i++)
+            {
+                var c = name[i];
+                if (!IsIdentifierChar(c))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
-        public override string QuoteConstraintName(string constraintName, string schemaName = null)
+        private static bool IsLetter(char c)
         {
-            return base.QuoteConstraintName(UnQuote(constraintName), UnQuote(schemaName));
+            return c is >= 'A' and <= 'Z' or >= 'a' and <= 'z';
         }
 
-        public override string QuoteIndexName(string indexName, string schemaName)
+        private static bool IsIdentifierChar(char c)
         {
-            return base.QuoteIndexName(UnQuote(indexName), UnQuote(schemaName));
+            return IsLetter(c) || IsDigit(c) || c == '_' || c == '$' || c == '#';
         }
 
-        public override string QuoteTableName(string tableName, string schemaName = null)
+        private static bool IsDigit(char c)
         {
-            return base.QuoteTableName(UnQuote(tableName), UnQuote(schemaName));
-        }
-
-        public override string QuoteSequenceName(string sequenceName, string schemaName)
-        {
-            return base.QuoteTableName(UnQuote(sequenceName), UnQuote(schemaName));
+            return c is >= '0' and <= '9';
         }
     }
 }

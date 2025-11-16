@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 
+using FluentMigrator.Generation;
 using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Model;
 using FluentMigrator.Oracle;

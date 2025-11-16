@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2021, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,6 +23,13 @@ using JetBrains.Annotations;
 
 namespace FluentMigrator.Builder.Create.Index
 {
+    /// <summary>
+    /// Provides syntax for configuring GIN (Generalized Inverted Index) index options in PostgreSQL.
+    /// </summary>
+    /// <remarks>
+    /// This class extends <see cref="AbstractCreateIndexMethodOptionsSyntax"/> to provide additional
+    /// configuration options specific to GIN indexes, such as fill factor, fast update, and pending list limit.
+    /// </remarks>
     public class CreateGinIndexOptionsSyntax : AbstractCreateIndexMethodOptionsSyntax, ICreateGinIndexOptionsSyntax
     {
         /// <inheritdoc />

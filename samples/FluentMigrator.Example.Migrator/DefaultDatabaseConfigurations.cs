@@ -15,9 +15,6 @@
 #endregion
 
 using System;
-#if NETFRAMEWORK
-using System.Data.OleDb;
-#endif
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
@@ -32,11 +29,6 @@ namespace FluentMigrator.Example.Migrator
         public static readonly DatabaseConfiguration Sqlite = CreateSqliteConfiguration();
         public static readonly DatabaseConfiguration SqlServer = CreateSqlServerConfiguration();
 
-#if NETFRAMEWORK
-        public static readonly DatabaseConfiguration Jet = CreateJetConfiguration();
-        public static readonly DatabaseConfiguration Jet32 = CreateJet32Configuration();
-        public static readonly DatabaseConfiguration Jet64 = CreateJet64Configuration();
-#endif
         private static DatabaseConfiguration CreateSqliteConfiguration()
         {
             // Configure the DB connection
@@ -68,63 +60,5 @@ namespace FluentMigrator.Example.Migrator
                 ConnectionString = scsb.ToString()
             };
         }
-
-#if NETFRAMEWORK
-        private static DatabaseConfiguration CreateJetConfiguration()
-        {
-            if (Environment.Is64BitProcess)
-                return CreateJet64Configuration();
-            return CreateJet32Configuration();
-        }
-
-        private static DatabaseConfiguration CreateJet32Configuration()
-        {
-            // Configure the DB connection
-            var dbFileName = Path.Combine(AppContext.BaseDirectory, "test.mdb");
-            var csb = new OleDbConnectionStringBuilder
-            {
-                DataSource = dbFileName,
-                Provider = "Microsoft.Jet.OLEDB.4.0",
-            };
-
-            var connectionString = csb.ConnectionString;
-            EnsureMdbExists(dbFileName, connectionString);
-
-            return new DatabaseConfiguration()
-            {
-                ProcessorId = "jet",
-                ConnectionString = connectionString,
-            };
-        }
-
-        private static DatabaseConfiguration CreateJet64Configuration()
-        {
-            // Configure the DB connection
-            var dbFileName = Path.Combine(AppContext.BaseDirectory, "test.mdb");
-            var csb = new OleDbConnectionStringBuilder
-            {
-                DataSource = dbFileName,
-                Provider = "Microsoft.ACE.OLEDB.12.0",
-            };
-
-            var connectionString = csb.ConnectionString;
-            EnsureMdbExists(dbFileName, connectionString);
-
-            return new DatabaseConfiguration()
-            {
-                ProcessorId = "jet",
-                ConnectionString = connectionString,
-            };
-        }
-
-        private static void EnsureMdbExists(string dbFileName, string connectionString)
-        {
-            if (File.Exists(dbFileName))
-                return;
-
-            var catalog = new ADOX.Catalog();
-            catalog.Create(connectionString);
-        }
-#endif
-        }
+    }
 }

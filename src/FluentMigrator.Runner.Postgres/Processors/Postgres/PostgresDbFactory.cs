@@ -20,6 +20,9 @@ using System;
 
 namespace FluentMigrator.Runner.Processors.Postgres
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class PostgresDbFactory : ReflectionBasedDbFactory
     {
         private static readonly TestEntry[] _entries =
@@ -27,6 +30,12 @@ namespace FluentMigrator.Runner.Processors.Postgres
             new TestEntry("Npgsql", "Npgsql.NpgsqlFactory"),
         };
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FluentMigrator.Runner.Processors.Postgres.PostgresDbFactory"/> class.
+        /// </summary>
+        /// <param name="serviceProvider">
+        /// The service provider used to resolve dependencies required by the database factory.
+        /// </param>
         public PostgresDbFactory(IServiceProvider serviceProvider)
             : base(serviceProvider, _entries)
         {

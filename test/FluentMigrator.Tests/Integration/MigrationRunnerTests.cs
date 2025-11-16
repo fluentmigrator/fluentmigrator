@@ -33,11 +33,13 @@ using FluentMigrator.Runner.Logging;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Runner.Processors.MySql;
+using FluentMigrator.Runner.Processors.Oracle;
 using FluentMigrator.Runner.Processors.Postgres;
 using FluentMigrator.Runner.Processors.Snowflake;
 using FluentMigrator.Runner.Processors.SQLite;
 using FluentMigrator.Runner.Processors.SqlServer;
 using FluentMigrator.Runner.VersionTableInfo;
+using FluentMigrator.Tests.Integration.Migrations.Computed;
 using FluentMigrator.Tests.Integration.Migrations.Issues;
 using FluentMigrator.Tests.Integration.Migrations.Tagged;
 using FluentMigrator.Tests.Integration.TestCases;
@@ -1150,7 +1152,8 @@ namespace FluentMigrator.Tests.Integration
         [Test]
         [TestCaseSource(typeof(ProcessorTestCaseSourceExcept<
             SQLiteProcessor,
-            FirebirdProcessor
+            FirebirdProcessor,
+            OracleProcessorBase /* Oracle does not support schemas in the same way as other DBMSs */
         >))]
         public void CanAlterTablesSchema(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
         {
@@ -2025,12 +2028,14 @@ namespace FluentMigrator.Tests.Integration
     {
         public override void Up()
         {
-            Alter.Column("Name2").OnTable("TestTable2").InSchema("TestSchema").AsAnsiString(100).Nullable();
+            IfDatabase(processorId => !processorId.Contains(ProcessorIdConstants.Oracle))
+                .Alter.Column("Name2").OnTable("TestTable2").InSchema("TestSchema").AsAnsiString(100).Nullable();
         }
 
         public override void Down()
         {
-            Alter.Column("Name2").OnTable("TestTable2").InSchema("TestSchema").AsString(10).Nullable();
+            IfDatabase(processorId => !processorId.Contains(ProcessorIdConstants.Oracle))
+                .Alter.Column("Name2").OnTable("TestTable2").InSchema("TestSchema").AsString(10).Nullable();
         }
     }
 
@@ -2262,12 +2267,20 @@ namespace FluentMigrator.Tests.Integration
     {
         public override void Up()
         {
-            Execute.Sql("select 1");
+            IfDatabase(processorId => !processorId.Contains(ProcessorIdConstants.Oracle))
+                .Execute.Sql("select 1");
+
+            IfDatabase(processorId => processorId.Contains(ProcessorIdConstants.Oracle))
+                .Execute.Sql("select 1 from dual");
         }
 
         public override void Down()
         {
-            Execute.Sql("select 2");
+            IfDatabase(processorId => !processorId.Contains(ProcessorIdConstants.Oracle))
+                .Execute.Sql("select 1");
+
+            IfDatabase(processorId => processorId.Contains(ProcessorIdConstants.Oracle))
+                .Execute.Sql("select 1 from dual");
         }
     }
 }

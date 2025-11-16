@@ -1,0 +1,121 @@
+name: Pull Requests
+
+on:
+  pull_request_target:
+    branches:
+    - '*'
+  push:
+    branches:
+    - 'main'
+
+env:
+  solution: 'FluentMigrator.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: Release
+
+jobs:
+  build:
+    name: Build & Test
+    runs-on: ${{ matrix.os }}
+    permissions:
+      checks: write
+      issues: write
+      pull-requests: write
+
+    strategy:
+      matrix:
+         include:
+          - os: windows-latest
+            dotnet-tfm: net48
+          - os: ubuntu-latest
+            dotnet-tfm: net8.0
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Install GitVersion
+      uses: gittools/actions/gitversion/setup@v4.1.0
+      with:
+        versionSpec: 6.3.x
+
+    - name: Execute GitVersion
+      uses: gittools/actions/gitversion/execute@v4.1.0
+      env:
+        BUILD_BUILDNUMBER: ${{ env.GitVersion.NuGetVersionV2 }}
+      with:
+        updateAssemblyInfo: false
+
+    - name: Setup dotnet SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.0.x'
+
+    - name: Restore, Build, Test
+      run: dotnet test --framework ${{ matrix.dotnet-tfm }} --configuration ${{ env.buildConfiguration }} --verbosity quiet --logger trx --collect:"XPlat Code Coverage" --results-directory "TestResults-${{ matrix.dotnet-tfm }}"
+      env:
+        # Enable containers for integration tests only on Linux
+        FM_TestConnectionStrings__MySql__ContainerEnabled: ${{ matrix.os == 'ubuntu-latest' }}
+        FM_TestConnectionStrings__MySql__IsEnabled: ${{ matrix.os == 'ubuntu-latest' }}
+        FM_TestConnectionStrings__Oracle__ContainerEnabled: ${{ matrix.os == 'ubuntu-latest' }}
+        FM_TestConnectionStrings__Oracle__IsEnabled: ${{ matrix.os == 'ubuntu-latest' }}
+        FM_TestConnectionStrings__Postgres__ContainerEnabled: ${{ matrix.os == 'ubuntu-latest' }}
+        FM_TestConnectionStrings__Postgres__IsEnabled: ${{ matrix.os == 'ubuntu-latest' }}
+        FM_TestConnectionStrings__SqlServer2016__ContainerEnabled: ${{ matrix.os == 'ubuntu-latest' }}
+        FM_TestConnectionStrings__SqlServer2016__IsEnabled: ${{ matrix.os == 'ubuntu-latest' }}
+
+    - name: Combine Coverage Reports
+      uses: danielpalme/ReportGenerator-GitHub-Action@v5.5.0
+      with:
+        reports: "**/*.cobertura.xml"
+        targetdir: "${{ github.workspace }}"
+        reporttypes: "Cobertura"
+        verbosity: "Info"
+        title: "Code Coverage"
+        tag: "${{ github.run_number }}_${{ github.run_id }}"
+        toolpath: "reportgeneratortool"
+
+    - name: Upload Combined Coverage XML
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-${{ matrix.os }}-${{ matrix.dotnet-tfm }}
+        path: ${{ github.workspace }}/Cobertura.xml
+        retention-days: 5
+
+    - name: Publish Code Coverage Report
+      uses: irongut/CodeCoverageSummary@v1.3.0
+      if: matrix.os == 'ubuntu-latest' && (!cancelled())
+      with:
+        filename: "Cobertura.xml"
+        badge: true
+        fail_below_min: false
+        format: markdown
+        hide_branch_rate: false
+        hide_complexity: false
+        indicators: true
+        output: both
+        thresholds: "10 30"
+
+    - name: Add Coverage PR Comment
+      uses: marocchino/sticky-pull-request-comment@v2
+      if: github.event_name == 'pull_request'
+      with:
+        recreate: true
+        path: code-coverage-results.md
+
+    - name: Upload Test Result Files
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results-${{ matrix.os }}-${{ matrix.dotnet-tfm }}
+        path: ${{ github.workspace }}/**/TestResults-${{ matrix.dotnet-tfm }}/**/*
+        retention-days: 5
+
+    - name: Publish Test Results
+      uses: EnricoMi/publish-unit-test-result-action@v2
+      # GitHub Actions initially only supported containerized actions, which is not supported on Windows
+      # and this particular GitHub action from EnricoMi is a containerized action
+      if: matrix.os == 'ubuntu-latest' && (!cancelled())
+      with:
+        files: "${{ github.workspace }}/**/*.trx"

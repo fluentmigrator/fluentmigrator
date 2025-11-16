@@ -20,6 +20,13 @@ using FluentMigrator.Runner.Generators.Generic;
 
 namespace FluentMigrator.Runner.Generators.Oracle
 {
+    /// <summary>
+    /// A generator for creating SQL statements to set descriptions for Oracle database tables and columns.
+    /// </summary>
+    /// <remarks>
+    /// This class extends <see cref="FluentMigrator.Runner.Generators.Generic.GenericDescriptionGenerator"/> 
+    /// to provide Oracle-specific implementations for generating table and column descriptions.
+    /// </remarks>
     public class OracleDescriptionGenerator : GenericDescriptionGenerator
     {
         #region Constants
@@ -36,6 +43,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
                : string.Format("{0}.{1}", schemaName, tableName);
         }
 
+        /// <inheritdoc />
         protected override string GenerateTableDescription(
             string schemaName, string tableName, string tableDescription)
         {
@@ -48,6 +56,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
                 tableDescription.Replace("'", "''"));
         }
 
+        /// <inheritdoc />
         protected override string GenerateColumnDescription(
             string descriptionName, string schemaName, string tableName, string columnName, string columnDescription)
         {

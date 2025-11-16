@@ -26,9 +26,31 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
+    /// <summary>
+    /// Represents a migration processor for SQL Server 2012.
+    /// </summary>
+    /// <remarks>
+    /// This processor is specifically designed to handle migrations targeting SQL Server 2012.
+    /// It extends the functionality of <see cref="SqlServerProcessor"/> by utilizing the
+    /// <see cref="SqlServer2012Generator"/> and <see cref="SqlServer2008Quoter"/> for SQL generation
+    /// and quoting, respectively.
+    /// </remarks>
     public class SqlServer2012Processor : SqlServerProcessor
     {
-        /// <inheritdoc />
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SqlServer2012Processor"/> class.
+        /// </summary>
+        /// <param name="logger">The logger used for logging migration operations.</param>
+        /// <param name="quoter">The SQL quoter specific to SQL Server 2008.</param>
+        /// <param name="generator">The SQL generator specific to SQL Server 2012.</param>
+        /// <param name="options">The processor options for configuring migration behavior.</param>
+        /// <param name="connectionStringAccessor">The accessor for retrieving the database connection string.</param>
+        /// <param name="serviceProvider">The service provider for resolving dependencies.</param>
+        /// <remarks>
+        /// This constructor sets up the processor to handle migrations for SQL Server 2012,
+        /// utilizing the <see cref="SqlServer2012Generator"/> for SQL generation and
+        /// <see cref="SqlServer2008Quoter"/> for quoting.
+        /// </remarks>
         public SqlServer2012Processor(
             [NotNull] ILogger<SqlServer2012Processor> logger,
             [NotNull] SqlServer2008Quoter quoter,

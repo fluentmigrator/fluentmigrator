@@ -16,6 +16,14 @@
 
 namespace FluentMigrator.Runner.Generators.MySql
 {
+    /// <summary>
+    /// Represents the type mapping for MySQL 8 database.
+    /// </summary>
+    /// <remarks>
+    /// This class extends <see cref="FluentMigrator.Runner.Generators.MySql.MySql5TypeMap"/> to provide
+    /// additional or updated type mappings specific to MySQL 8. It is used to map .NET data types to
+    /// their corresponding MySQL 8 database types.
+    /// </remarks>
     public class MySql8TypeMap : MySql5TypeMap
     {
     }

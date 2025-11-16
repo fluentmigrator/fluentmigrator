@@ -7,6 +7,14 @@ using JetBrains.Annotations;
 
 namespace FluentMigrator.Runner.BatchParser
 {
+    /// <summary>
+    /// Represents a specialized SQL batch parser tailored for Snowflake SQL syntax.
+    /// </summary>
+    /// <remarks>
+    /// This class extends the <see cref="SqlBatchParser"/> to provide support for parsing Snowflake-specific SQL batches.
+    /// It utilizes predefined range searchers and special token searchers to identify and process SQL statements
+    /// and tokens specific to Snowflake.
+    /// </remarks>
     public class SnowflakeBatchParser : SqlBatchParser
     {
         [NotNull, ItemNotNull]
