@@ -32,7 +32,10 @@ namespace FluentMigrator.Analyzers.Analysis
             _lazyMigrationAttributeType = new Lazy<INamedTypeSymbol>(() => compilation.GetTypeByMetadataName(Constants.Types.FluentMigratorMigrationAttribute));
         }
 
-        public Compilation Compilation { get; set; }
+        /// <summary>
+        /// Gets the Roslyn <see cref="Compilation"/> associated with this context.
+        /// </summary>
+        public Compilation Compilation { get; }
 
         public INamedTypeSymbol MigrationAttributeType => _lazyMigrationAttributeType?.Value;
 
