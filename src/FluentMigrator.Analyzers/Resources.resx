@@ -121,7 +121,7 @@
     <value>Migration version isn't unique.</value>
   </data>
   <data name="MigrationAttributeVersionShouldBeUniqueAnalyzerMessageFormat" xml:space="preserve">
-    <value>Migration attributes on {0} having conflicting version of {1}</value>
+    <value>Migration attributes on {0} have conflicting version {1}</value>
   </data>
   <data name="MigrationAttributeVersionShouldBeUniqueAnalyzerTitle" xml:space="preserve">
     <value>Migration version isn't unique</value>
