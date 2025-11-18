@@ -1,114 +1,226 @@
 ---
-description: 'Guidelines for building C# applications'
+description: 'Guidelines for contributing to FluentMigrator - a database migration framework for .NET'
 applyTo: '**/*.cs'
 ---
 
-# C# Development
+# FluentMigrator Development Guidelines
 
-## C# Instructions
-- Always use the latest version C#, currently C# 13 features.
-- Write clear and concise comments for each function.
+FluentMigrator is a migration framework for .NET much like Ruby on Rails Migrations. It provides a structured way to evolve database schemas across multiple database providers.
 
-## General Instructions
-- Make only high confidence suggestions when reviewing code changes.
-- Write code with good maintainability practices, including comments on why certain design decisions were made.
-- Handle edge cases and write clear exception handling.
-- For libraries or external dependencies, mention their usage and purpose in comments.
+## Project Overview
+
+FluentMigrator supports multiple database providers including:
+- SQL Server
+- PostgreSQL
+- MySQL
+- SQLite
+- Oracle
+- Firebird
+- Snowflake
+- SAP HANA
+- Jet (MS Access)
+- Redshift
+- DB2
+
+## C# Language Guidelines
+
+- Use the latest C# features (currently C# 13) when appropriate
+- Apply code-formatting style defined in `.editorconfig`
+- Insert a newline before the opening curly brace of any code block (per `.editorconfig`)
+- Use pattern matching and switch expressions wherever possible
+- Use `nameof` instead of string literals when referring to member names
+- Write clear and concise XML doc comments for all public APIs
+  - Include `<example>` and `<code>` blocks when applicable
+  - Document parameters, returns, exceptions, and remarks
 
 ## Naming Conventions
 
-- Follow PascalCase for component names, method names, and public members.
-- Use camelCase for private fields and local variables.
-- Prefix interface names with "I" (e.g., IUserService).
-
-## Formatting
-
-- Apply code-formatting style defined in `.editorconfig`.
-- Prefer file-scoped namespace declarations and single-line using directives.
-- Insert a newline before the opening curly brace of any code block (e.g., after `if`, `for`, `while`, `foreach`, `using`, `try`, etc.).
-- Ensure that the final return statement of a method is on its own line.
-- Use pattern matching and switch expressions wherever possible.
-- Use `nameof` instead of string literals when referring to member names.
-- Ensure that XML doc comments are created for any public APIs. When applicable, include `<example>` and `<code>` documentation in the comments.
-
-## Project Setup and Structure
-
-- Guide users through creating a new .NET project with the appropriate templates.
-- Explain the purpose of each generated file and folder to build understanding of the project structure.
-- Demonstrate how to organize code using feature folders or domain-driven design principles.
-- Show proper separation of concerns with models, services, and data access layers.
-- Explain the Program.cs and configuration system in ASP.NET Core 9 including environment-specific settings.
+- Follow PascalCase for class names, method names, and public members
+- Use camelCase for private fields with underscore prefix (`_camelCase`)
+- Prefix interface names with "I" (e.g., `IMigrationProcessor`)
+- Use PascalCase for constant fields
+- Use PascalCase for static fields
 
 ## Nullable Reference Types
 
-- Declare variables non-nullable, and check for `null` at entry points.
-- Always use `is null` or `is not null` instead of `== null` or `!= null`.
-- Trust the C# null annotations and don't add null checks when the type system says a value cannot be null.
+- Declare variables non-nullable by default
+- Check for `null` at entry points
+- Always use `is null` or `is not null` instead of `== null` or `!= null`
+- Trust C# null annotations and avoid redundant null checks
 
-## Data Access Patterns
+## Migration Development Patterns
 
-- Guide the implementation of a data access layer using Entity Framework Core.
-- Explain different options (SQL Server, SQLite, In-Memory) for development and production.
-- Demonstrate repository pattern implementation and when it's beneficial.
-- Show how to implement database migrations and data seeding.
-- Explain efficient query patterns to avoid common performance issues.
+### Migration Structure
 
-## Authentication and Authorization
+- Each migration should inherit from `Migration` or `AutoReversingMigration`
+- Use the `[Migration(version)]` attribute with a timestamp-based version number (e.g., `[Migration(20090906205342)]`)
+- Implement both `Up()` and `Down()` methods for reversibility
+- Use `AutoReversingMigration` when the framework can automatically generate `Down()` from `Up()` operations
 
-- Guide users through implementing authentication using JWT Bearer tokens.
-- Explain OAuth 2.0 and OpenID Connect concepts as they relate to ASP.NET Core.
-- Show how to implement role-based and policy-based authorization.
-- Demonstrate integration with Microsoft Entra ID (formerly Azure AD).
-- Explain how to secure both controller-based and Minimal APIs consistently.
+### Example Migration Pattern
 
-## Validation and Error Handling
+```csharp
+[Migration(20090906205342)]
+public class AddUsersTable : Migration
+{
+    public override void Up()
+    {
+        Create.Table("Users")
+            .WithIdColumn()
+            .WithColumn("Name").AsString().NotNullable()
+            .WithColumn("Email").AsString().NotNullable();
+    }
 
-- Guide the implementation of model validation using data annotations and FluentValidation.
-- Explain the validation pipeline and how to customize validation responses.
-- Demonstrate a global exception handling strategy using middleware.
-- Show how to create consistent error responses across the API.
-- Explain problem details (RFC 7807) implementation for standardized error responses.
+    public override void Down()
+    {
+        Delete.Table("Users");
+    }
+}
+```
 
-## API Versioning and Documentation
+### Database-Agnostic Code
 
-- Guide users through implementing and explaining API versioning strategies.
-- Demonstrate Swagger/OpenAPI implementation with proper documentation.
-- Show how to document endpoints, parameters, responses, and authentication.
-- Explain versioning in both controller-based and Minimal APIs.
-- Guide users on creating meaningful API documentation that helps consumers.
+- Write migrations to be database-agnostic when possible
+- Use the `IfDatabase()` method to provide database-specific implementations when needed
+- Test against multiple database providers to ensure compatibility
+- Use `ProcessorIdConstants` for database identification
 
-## Logging and Monitoring
+```csharp
+IfDatabase(ProcessorIdConstants.SqlServer)
+    .Create.Index("IX_Users").OnTable("Users")
+        .OnColumn("Name").Ascending()
+        .WithOptions().NonClustered()
+        .Include("Login");
 
-- Guide the implementation of structured logging using Serilog or other providers.
-- Explain the logging levels and when to use each.
-- Demonstrate integration with Application Insights for telemetry collection.
-- Show how to implement custom telemetry and correlation IDs for request tracking.
-- Explain how to monitor API performance, errors, and usage patterns.
+IfDatabase(processorId => !processorId.Contains(ProcessorIdConstants.SqlServer))
+    .Create.Index("IX_Users").OnTable("Users")
+        .OnColumn("Name").Ascending();
+```
 
-## Testing
+### Common Migration Operations
 
-- Always include test cases for critical paths of the application.
-- Guide users through creating unit tests.
-- Do not emit "Act", "Arrange" or "Assert" comments.
-- Copy existing style in nearby files for test method names and capitalization.
-- Explain integration testing approaches for API endpoints.
-- Demonstrate how to mock dependencies for effective testing.
-- Show how to test authentication and authorization logic.
-- Explain test-driven development principles as applied to API development.
+- Use fluent interface methods like `Create.Table()`, `Alter.Table()`, `Delete.Table()`
+- Use extension methods like `.WithIdColumn()` and `.WithTimeStamps()` from `FluentMigrator.SqlServer`
+- Leverage `Execute.Sql()` for complex operations that don't have fluent equivalents
+- Use `Insert.IntoTable()` for data seeding when appropriate
 
-## Performance Optimization
+## Testing Guidelines
 
-- Guide users on implementing caching strategies (in-memory, distributed, response caching).
-- Explain asynchronous programming patterns and why they matter for API performance.
-- Demonstrate pagination, filtering, and sorting for large data sets.
-- Show how to implement compression and other performance optimizations.
-- Explain how to measure and benchmark API performance.
+### Test Organization
 
-## Deployment and DevOps
+- Unit tests go in `FluentMigrator.Tests/Unit`
+- Integration tests go in `FluentMigrator.Tests/Integration`
+- Use NUnit framework with `[TestFixture]` and `[Test]` attributes
+- Categorize tests using `[Category("Integration")]` and database-specific categories like `[Category("SqlServer")]`
 
-- Guide users through containerizing their API using .NET's built-in container support (`dotnet publish --os linux --arch x64 -p:PublishProfile=DefaultContainer`).
-- Explain the differences between manual Dockerfile creation and .NET's container publishing features.
-- Explain CI/CD pipelines for NET applications.
-- Demonstrate deployment to Azure App Service, Azure Container Apps, or other hosting options.
-- Show how to implement health checks and readiness probes.
-- Explain environment-specific configurations for different deployment stages.
+### Test Patterns
+
+- Use Shouldly for assertions (e.g., `result.ShouldBe(expected)`)
+- Do NOT emit "Act", "Arrange" or "Assert" comments in tests
+- Follow existing test naming conventions in nearby files
+- Test both `Up()` and `Down()` migration methods
+- Test migrations against actual database providers for integration tests
+- Use `TestCaseSource` for parameterized tests across multiple database providers
+
+### Example Test Pattern
+
+```csharp
+[TestFixture]
+[Category("Integration")]
+[Category("SqlServer")]
+public class SqlServerMigrationTests
+{
+    [Test]
+    public void CanCreateTable()
+    {
+        // Setup code
+        var runner = CreateRunner();
+        
+        // Execute migration
+        runner.Up(new CreateUsersTable());
+        
+        // Verify
+        TableExists("Users").ShouldBe(true);
+    }
+}
+```
+
+## Processor and Generator Development
+
+### Processors
+
+- Processors execute migrations against specific database providers
+- Inherit from appropriate base classes (e.g., `GenericProcessorBase`)
+- Implement provider-specific SQL generation and execution
+- Handle database-specific quirks and limitations
+- Always properly dispose of database connections and commands
+
+### Generators
+
+- Generators create SQL statements from migration expressions
+- Inherit from `GeneratorBase` or database-specific generator base classes
+- Override methods to generate provider-specific SQL syntax
+- Use quoters for proper identifier quoting
+- Handle database-specific data types, index options, and constraints
+
+## Code Organization
+
+### Project Structure
+
+- `FluentMigrator` - Core migration API and abstractions
+- `FluentMigrator.Abstractions` - Interfaces and base contracts
+- `FluentMigrator.Runner.*` - Database provider-specific implementations
+- `FluentMigrator.Extensions.*` - Provider-specific extension methods
+- `FluentMigrator.Console` - Command-line interface
+- `FluentMigrator.DotNet.Cli` - .NET CLI tool
+
+### Extension Methods
+
+- Place extension methods in appropriate namespace (e.g., `FluentMigrator.SqlServer`)
+- Document clearly which database providers support each extension
+- Use descriptive method names that match database provider terminology
+
+## Error Handling and Validation
+
+- Validate migration operations before execution when possible
+- Throw descriptive exceptions for unsupported operations
+- Use appropriate exception types from `FluentMigrator.Exceptions`
+- Provide helpful error messages that guide users to solutions
+- Log important operations and errors through the announcer system
+
+## License and Copyright
+
+- All source files must include the Apache License 2.0 header
+- Copyright should be attributed to "Fluent Migrator Project"
+- Use the standard license header format found in existing files
+
+## Building and Testing
+
+- Build using `dotnet build FluentMigrator.sln`
+- Run tests using `dotnet test`
+- Integration tests require database connections (configure via environment)
+- Follow Azure Pipelines configuration for CI/CD patterns
+- Use GitVersion for versioning (configured in `GitVersion.yml`)
+
+## Dependency Injection
+
+- FluentMigrator uses Microsoft.Extensions.DependencyInjection
+- Register services appropriately in service collections
+- Use constructor injection for dependencies
+- Follow existing DI patterns in `FluentMigrator.Runner.Core`
+
+## Performance Considerations
+
+- Minimize database round-trips in migrations
+- Use batch operations when available
+- Be mindful of transaction scope and duration
+- Consider impact on large databases and tables
+- Test performance with realistic data volumes
+
+## Documentation
+
+- Update documentation in `docs-website/` for user-facing changes
+- Document breaking changes in CHANGELOG.md
+- Provide migration examples for new features
+- Reference the documentation website: https://fluentmigrator.github.io
+- Keep README.md up to date with major changes
