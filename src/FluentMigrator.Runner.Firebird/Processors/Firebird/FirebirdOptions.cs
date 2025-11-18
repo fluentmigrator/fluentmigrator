@@ -24,7 +24,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
         AutoCommitOnCheckFail,
 
         /// <summary>
-        /// Automaticaly commits every processed statement
+        /// Automatically commits every processed statement
         /// </summary>
         AutoCommit,
 
