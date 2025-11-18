@@ -23,7 +23,7 @@ export default defineConfig({
     description: 'A .NET migration framework for database schema management',
     lang: 'en-US',
     head: headers,
-    base: '/fluentmigrator/',
+    base: '/',
 
     themeConfig: {
         outline: 2,
