@@ -48,6 +48,9 @@ updates:
     sample-code-dependencies:
       patterns:
         - "FluentMigrator*"
+    roslyn-analyzers-dependencies:
+      patterns:
+        - "Microsoft.CodeAnalysis*"
     other-dependencies:
       patterns:
         - "FSharp*"

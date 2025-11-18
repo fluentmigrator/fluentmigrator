@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+
+    <MsCodeAnalysisCoreVersion>4.11.0</MsCodeAnalysisCoreVersion>
+    <MsCodeAnalysisAnalyzerTestingVersion>1.1.2</MsCodeAnalysisAnalyzerTestingVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="$(MsCodeAnalysisCoreVersion)" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="$(MsCodeAnalysisCoreVersion)" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="$(MsCodeAnalysisCoreVersion)" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="$(MsCodeAnalysisCoreVersion)" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Analyzer.Testing" Version="$(MsCodeAnalysisAnalyzerTestingVersion)" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.CodeFix.Testing" Version="$(MsCodeAnalysisAnalyzerTestingVersion)" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+    <PackageReference Include="NUnit" Version="3.12.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\FluentMigrator.Abstractions\FluentMigrator.Abstractions.csproj" />
+    <ProjectReference Include="..\..\src\FluentMigrator.Analyzers\FluentMigrator.Analyzers.csproj" OutputItemType="Analyzer" />
+  </ItemGroup>
+
+</Project>
