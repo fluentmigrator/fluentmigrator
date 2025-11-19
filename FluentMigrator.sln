@@ -22,6 +22,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FluentMigrator.MSBuild", "src\FluentMigrator.MSBuild\FluentMigrator.MSBuild.csproj", "{49EEA395-BF7E-470C-8302-802C455C478F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{CE354F3F-F5B9-4723-A5A1-26B37E949103}"
+	ProjectSection(SolutionItems) = preProject
+		test\Directory.Build.props = test\Directory.Build.props
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FluentMigrator.Tests", "test\FluentMigrator.Tests\FluentMigrator.Tests.csproj", "{706A4E07-6F35-4043-994E-3A9A9C957588}"
 EndProject
