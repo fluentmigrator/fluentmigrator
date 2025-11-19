@@ -135,8 +135,8 @@ jobs:
         echo "=== Check test project obj folder ==="
         TEST_OBJ="test/FluentMigrator.Analyzers.Tests/obj"
         if [ -d "$TEST_OBJ" ]; then
-          echo "Found $TEST_OBJ, listing contents (first 500 chars of each file):"
-          find "$TEST_OBJ" -type f -maxdepth 3 -print -exec sh -c 'echo "---- {} ----"; head -c 500 "{}" || true; echo' \;
+          echo "Found $TEST_OBJ, listing contents (first 1000 chars of each file):"
+          find "$TEST_OBJ" -type f -maxdepth 3 -print -exec sh -c 'echo "---- {} ----"; head -c 1000 "{}" || true; echo' \;
         else
           echo "$TEST_OBJ does not exist"
         fi
@@ -154,14 +154,19 @@ jobs:
         $testObj = "test\FluentMigrator.Analyzers.Tests\obj"
         Write-Host "=== Check test project obj folder ($testObj) ==="
         if (Test-Path $testObj) {
-          Get-ChildItem $testObj -Recurse -File | ForEach-Object {
-            Write-Host "---- $($_.FullName) ----"
-            # show the first ~200 chars/lines safely
+          Get-ChildItem -Path $testObj -Recurse -File | ForEach-Object {
+            $file = $_.FullName
+            Write-Host "---- $file ----"
+
             try {
-              Get-Content -Path $_.FullName -TotalCount 40 | ForEach-Object { Write-Host $_ }
-            } catch {
-              Write-Host "Unable to dump content of $($_.FullName): $($_.Exception.Message)"
+              # Output the first 1000 lines
+              Get-Content -Path $file -TotalCount 1000
             }
+            catch {
+              Write-Warning "Unable to read '$file': $($_.Exception.Message)"
+            }
+
+            Write-Host ""
           }
         } else {
           Write-Host "$testObj does not exist"
