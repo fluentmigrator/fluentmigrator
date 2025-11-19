@@ -35,8 +35,15 @@ steps:
     versionSpec: '6.11.1'
 
 - task: UseDotNet@2
+  displayName: 'UseDotNet 9.x SDK'
   inputs:
     version: '9.x'
+
+- task: UseDotNet@2
+  displayName: 'UseDotNet 8.x runtime'
+  inputs:
+    packageType: 'runtime'
+    version: '8.x'
 
 - task: gitversion-setup@4.1.0
   displayName: 'Install GitVersion (using GitTools 4.1.0 or later)'
