@@ -10,6 +10,8 @@
             <!-- Condition="!$([MSBuild]::IsOSPlatform('Linux'))"; Assume Windows OS; we still test .NET Framework 4.8 for backwards compatibility reasons -->
             <PropertyGroup>
                 <TargetFrameworks>net48;net8.0</TargetFrameworks>
+                <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+                <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
             </PropertyGroup>
         </Otherwise>
     </Choose>
