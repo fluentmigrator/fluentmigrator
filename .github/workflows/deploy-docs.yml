@@ -44,7 +44,7 @@ jobs:
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
-          personal_token: ${{ secrets.GH_PAT }}
+          deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
           publish_dir: ./docs-website/.vitepress/dist
           external_repository: fluentmigrator/fluentmigrator.github.io
           publish_branch: main
