@@ -119,3 +119,47 @@ jobs:
       if: matrix.os == 'ubuntu-latest' && (!cancelled())
       with:
         files: "${{ github.workspace }}/**/*.trx"
+
+    - name: Diagnostics (Linux)
+      if: matrix.os == 'ubuntu-latest' && failure()
+      run: |
+        echo "=== dotnet --info ==="
+        dotnet --info || true
+
+        echo "=== Repo root listing ==="
+        ls -la || true
+
+        echo "=== Check test project obj folder ==="
+        TEST_OBJ="test/FluentMigrator.Analyzers.Tests/obj"
+        if [ -d "$TEST_OBJ" ]; then
+          echo "Found $TEST_OBJ, listing contents (first 500 chars of each file):"
+          find "$TEST_OBJ" -type f -maxdepth 3 -print -exec sh -c 'echo "---- {} ----"; head -c 500 "{}" || true; echo' \;
+        else
+          echo "$TEST_OBJ does not exist"
+        fi
+
+    - name: Diagnostics (Windows)
+      if: matrix.os == 'windows-latest' && failure()
+      shell: pwsh
+      run: |
+        Write-Host "=== dotnet --info ==="
+        dotnet --info
+
+        Write-Host "=== Repo root listing ==="
+        Get-ChildItem -Force
+
+        $testObj = "test\FluentMigrator.Analyzers.Tests\obj"
+        Write-Host "=== Check test project obj folder ($testObj) ==="
+        if (Test-Path $testObj) {
+          Get-ChildItem $testObj -Recurse -File | ForEach-Object {
+            Write-Host "---- $($_.FullName) ----"
+            # show the first ~200 chars/lines safely
+            try {
+              Get-Content -Path $_.FullName -TotalCount 40 | ForEach-Object { Write-Host $_ }
+            } catch {
+              Write-Host "Unable to dump content of $($_.FullName): $($_.Exception.Message)"
+            }
+          }
+        } else {
+          Write-Host "$testObj does not exist"
+        }
