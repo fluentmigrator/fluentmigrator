@@ -53,7 +53,10 @@ jobs:
       with:
         dotnet-version: '9.0.x'
 
-    - name: Restore, Build, Test
+    - name: Restore
+      run: dotnet restore
+
+    - name: Build, Test
       run: dotnet test --framework ${{ matrix.dotnet-tfm }} --configuration ${{ env.buildConfiguration }} --verbosity quiet --logger trx --collect:"XPlat Code Coverage" --results-directory "TestResults-${{ matrix.dotnet-tfm }}"
       env:
         # Enable containers for integration tests only on Linux
