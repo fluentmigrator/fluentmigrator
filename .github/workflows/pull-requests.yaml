@@ -53,6 +53,11 @@ jobs:
       with:
         dotnet-version: '9.0.x'
 
+    - name: Clean artifacts
+      run: |
+        dotnet clean -v minimal
+        git clean -xfd
+
     - name: Restore, Build, Test
       run: dotnet test --framework ${{ matrix.dotnet-tfm }} --configuration ${{ env.buildConfiguration }} --verbosity quiet --logger trx --collect:"XPlat Code Coverage" --results-directory "TestResults-${{ matrix.dotnet-tfm }}"
       env:
