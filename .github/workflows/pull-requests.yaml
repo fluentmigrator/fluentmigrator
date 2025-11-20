@@ -76,7 +76,7 @@ jobs:
 
         try {
           $page = (Invoke-WebRequest -Uri $downloadPage -ErrorAction Stop).Content
-          if ($page -match 'https?://[^\s"''<>]+ndp48-devpack-enu\.exe') { $link = $Matches[0] }
+          if ($page -match 'https://download\.visualstudio\.microsoft\.com/[^\s"''<>]+ndp48-devpack-enu\.exe') { $link = $Matches[0] }
         } catch {
           $link = $null
         }
