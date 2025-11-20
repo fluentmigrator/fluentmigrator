@@ -57,14 +57,68 @@ jobs:
       if: matrix.os == 'windows-latest'
       shell: pwsh
       run: |
-        # Install .NET Framework 4.8 Developer Pack for building net48 projects
-        $installerUrl = "https://download.visualstudio.microsoft.com/download/pr/014120d7-d689-4305-befd-3cb711108212/0fd66638cde16859462a6243a4629a50/ndp48-devpack-enu.exe"
-        $installerPath = "$env:TEMP\ndp48-devpack-enu.exe"
-        Write-Host "Downloading .NET Framework 4.8 Developer Pack..."
-        Invoke-WebRequest -Uri $installerUrl -OutFile $installerPath
-        Write-Host "Installing .NET Framework 4.8 Developer Pack..."
-        Start-Process -FilePath $installerPath -ArgumentList "/quiet", "/norestart" -Wait
-        Write-Host ".NET Framework 4.8 Developer Pack installed."
+        # Check registry for .NET Framework 4.8 (Release >= 528040 indicates 4.8)
+        try { $reg = Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full' -ErrorAction Stop; $release = $reg.Release } catch { $release = 0 }
+
+        if ($release -ge 528040) {
+          Write-Host ".NET Framework 4.8 or higher already installed (Release=$release). Skipping install."
+          exit 0
+        }
+
+        Write-Host "No .NET Framework 4.8 Developer Pack found (Release=$release). Installing..."
+
+        # Ensure TLS 1.2 for secure downloads
+        [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
+        # Resolve the current Microsoft download link by scraping the official docs page
+        $downloadPage = 'https://learn.microsoft.com/en-us/dotnet/framework/install/dotnet-48'
+        Write-Host "Resolving installer URL from: $downloadPage"
+
+        try {
+          $page = (Invoke-WebRequest -Uri $downloadPage -ErrorAction Stop).Content
+          if ($page -match 'https://download\.visualstudio\.microsoft\.com/[^\s"''<>]+ndp48-devpack-enu\.exe') { $link = $Matches[0] }
+        } catch {
+          $link = $null
+        }
+
+        if (-not $link) {
+          throw "Failed to resolve download URL for ndp48-devpack-enu.exe from Microsoft documentation. Please update the workflow with a valid installer URL."
+        }
+
+        Write-Host "Resolved download URL: $link"
+
+        $installerPath = Join-Path $env:TEMP 'ndp48-devpack-enu.exe'
+
+        # Download with retries; prefer BITS when available
+        $maxAttempts = 5
+        for ($i = 1; $i -le $maxAttempts; $i++) {
+          try {
+            if (Get-Command Start-BitsTransfer -ErrorAction SilentlyContinue) {
+              Start-BitsTransfer -Source $link -Destination $installerPath -ErrorAction Stop
+            } else {
+              Invoke-WebRequest -Uri $link -OutFile $installerPath -UseBasicParsing -ErrorAction Stop
+            }
+            break
+          } catch {
+            Write-Warning "Download attempt $i failed: $($_.Exception.Message)"
+            if ($i -eq $maxAttempts) { throw "Failed to download .NET Framework 4.8 Developer Pack after $maxAttempts attempts." }
+            Start-Sleep -Seconds (15 * $i)
+          }
+        }
+
+        Write-Host "Running installer: $installerPath"
+        Start-Process -FilePath $installerPath -ArgumentList '/quiet','/norestart' -Wait -ErrorAction Stop
+
+        # Verify installation
+        try { $reg = Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full' -ErrorAction Stop; $newRelease = $reg.Release } catch { $newRelease = 0 }
+        if ($newRelease -ge 528040) {
+          Write-Host ".NET Framework 4.8 Developer Pack installed (Release=$newRelease)."
+        } else {
+          throw ".NET Framework 4.8 installation completed but registry Release value is $newRelease."
+        }
+
+        # Cleanup
+        if (Test-Path $installerPath) { Remove-Item $installerPath -Force -ErrorAction SilentlyContinue }
 
     - name: Restore, Build, Test
       run: dotnet test --framework ${{ matrix.dotnet-tfm }} --configuration ${{ env.buildConfiguration }} --verbosity quiet --logger trx --collect:"XPlat Code Coverage" --results-directory "TestResults-${{ matrix.dotnet-tfm }}"
