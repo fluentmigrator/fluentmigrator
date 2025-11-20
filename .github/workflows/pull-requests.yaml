@@ -75,20 +75,10 @@ jobs:
         Write-Host "Resolving installer URL from: $downloadPage"
 
         try {
-          $html = Invoke-RestMethod -Uri $downloadPage -ErrorAction Stop
-          $link = ($html.links | Where-Object { $_.href -and $_.href -match 'ndp48-devpack-enu\.exe' } | Select-Object -First 1).href
+          $page = (Invoke-WebRequest -Uri $downloadPage -ErrorAction Stop).Content
+          if ($page -match 'https?://[^\s"''<>]+ndp48-devpack-enu\.exe') { $link = $Matches[0] }
         } catch {
           $link = $null
-        }
-
-        # Fallback: raw content search
-        if (-not $link) {
-          try {
-            $page = (Invoke-WebRequest -Uri $downloadPage -ErrorAction Stop).Content
-            if ($page -match 'https?://[^"'>]+ndp48-devpack-enu\.exe') { $link = $Matches[0] }
-          } catch {
-            $link = $null
-          }
         }
 
         if (-not $link) {
@@ -104,7 +94,7 @@ jobs:
         for ($i = 1; $i -le $maxAttempts; $i++) {
           try {
             if (Get-Command Start-BitsTransfer -ErrorAction SilentlyContinue) {
-              Start-BitsTransfer -Source $link -Destination $installerPath -RetryInterval 15 -RetryTimeout 600 -ErrorAction Stop
+              Start-BitsTransfer -Source $link -Destination $installerPath -ErrorAction Stop
             } else {
               Invoke-WebRequest -Uri $link -OutFile $installerPath -UseBasicParsing -ErrorAction Stop
             }
