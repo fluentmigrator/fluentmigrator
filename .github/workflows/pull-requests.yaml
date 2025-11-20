@@ -53,11 +53,21 @@ jobs:
       with:
         dotnet-version: '9.0.x'
 
-    - name: Restore
-      run: dotnet restore
+    - name: Setup .NET Framework 4.8 Developer Pack (Windows)
+      if: matrix.os == 'windows-latest'
+      shell: pwsh
+      run: |
+        # Install .NET Framework 4.8 Developer Pack for building net48 projects
+        $installerUrl = "https://download.visualstudio.microsoft.com/download/pr/014120d7-d689-4305-befd-3cb711108212/0fd66638cde16859462a6243a4629a50/ndp48-devpack-enu.exe"
+        $installerPath = "$env:TEMP\ndp48-devpack-enu.exe"
+        Write-Host "Downloading .NET Framework 4.8 Developer Pack..."
+        Invoke-WebRequest -Uri $installerUrl -OutFile $installerPath
+        Write-Host "Installing .NET Framework 4.8 Developer Pack..."
+        Start-Process -FilePath $installerPath -ArgumentList "/quiet", "/norestart" -Wait
+        Write-Host ".NET Framework 4.8 Developer Pack installed."
 
-    - name: Build, Test
-      run: dotnet test --no-restore --framework ${{ matrix.dotnet-tfm }} --configuration ${{ env.buildConfiguration }} --verbosity quiet --logger trx --collect:"XPlat Code Coverage" --results-directory "TestResults-${{ matrix.dotnet-tfm }}"
+    - name: Restore, Build, Test
+      run: dotnet test --framework ${{ matrix.dotnet-tfm }} --configuration ${{ env.buildConfiguration }} --verbosity quiet --logger trx --collect:"XPlat Code Coverage" --results-directory "TestResults-${{ matrix.dotnet-tfm }}"
       env:
         # Enable containers for integration tests only on Linux
         FM_TestConnectionStrings__MySql__ContainerEnabled: ${{ matrix.os == 'ubuntu-latest' }}
