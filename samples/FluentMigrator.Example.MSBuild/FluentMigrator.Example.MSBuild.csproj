@@ -27,11 +27,11 @@
         <MigrationAssembly>$(MSBuildThisFileDirectory)..\FluentMigrator.Example.Migrations\bin\$(Configuration)\net9.0\FluentMigrator.Example.Migrations.dll</MigrationAssembly>
       </PropertyGroup>
     </When>
-    <Otherwise>
+    <When Condition="'$(TargetFramework)' == 'net10.0' ">
       <PropertyGroup>
         <MigrationAssembly>$(MSBuildThisFileDirectory)..\FluentMigrator.Example.Migrations\bin\$(Configuration)\net10.0\FluentMigrator.Example.Migrations.dll</MigrationAssembly>
       </PropertyGroup>
-    </Otherwise>
+    </When>
   </Choose>
 
   <Target Name="Migrate">
