@@ -1,8 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
+  <Choose>
+    <When Condition="$([MSBuild]::IsOSPlatform('Linux'))">
+      <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+      </PropertyGroup>
+    </When>
+    <Otherwise>
+      <!-- Condition="!$([MSBuild]::IsOSPlatform('Linux'))"; Assume Windows OS; we still test .NET Framework 4.8 for backwards compatibility reasons -->
+      <PropertyGroup>
+        <TargetFramework>net48</TargetFramework>
+      </PropertyGroup>
+    </Otherwise>
+  </Choose>
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
 
@@ -19,6 +29,7 @@
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.CodeFix.Testing" Version="$(MsCodeAnalysisAnalyzerTestingVersion)" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
     <PackageReference Include="NUnit" Version="3.12.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="5.2.0" />
   </ItemGroup>
 
   <ItemGroup>
