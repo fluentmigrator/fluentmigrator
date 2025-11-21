@@ -53,7 +53,9 @@ namespace FluentMigrator.SqlProj
                 var includePath = item.Attribute("Include")?.Value;
                 if (!string.IsNullOrEmpty(includePath) && includePath.EndsWith(".sql", StringComparison.OrdinalIgnoreCase))
                 {
-                    var fullPath = Path.Combine(projectDirectory, includePath);
+                    // Normalize path separators for cross-platform compatibility
+                    var normalizedPath = includePath.Replace('\\', Path.DirectorySeparatorChar);
+                    var fullPath = Path.Combine(projectDirectory, normalizedPath);
                     if (File.Exists(fullPath))
                     {
                         sqlFiles.Add(fullPath);

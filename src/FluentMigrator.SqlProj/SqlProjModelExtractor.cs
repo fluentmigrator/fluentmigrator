@@ -36,9 +36,27 @@ namespace FluentMigrator.SqlProj
                 throw new FileNotFoundException($"SqlProj file not found: {sqlProjPath}");
             }
 
-            // Use DacFx to build the model from the project file
-            // This will parse all SQL scripts and build a complete schema model
-            var model = new TSqlModel(sqlProjPath, DacSchemaModelStorageType.Memory);
+            // Parse the sqlproj file to get SQL script paths
+            var parser = new SqlProjParser();
+            var sqlFiles = parser.ParseSqlProjFile(sqlProjPath).ToList();
+            var sqlContents = parser.ReadSqlFiles(sqlFiles);
+
+            // Create a new TSqlModel and add all SQL scripts to it
+            var model = new TSqlModel(SqlServerVersion.Sql160, new TSqlModelOptions());
+            
+            foreach (var kvp in sqlContents)
+            {
+                try
+                {
+                    // Add SQL to the model
+                    model.AddObjects(kvp.Value);
+                }
+                catch (Exception ex)
+                {
+                    // Provide helpful error message with the file name
+                    throw new InvalidOperationException($"Could not parse {Path.GetFileName(kvp.Key)}: {ex.Message}", ex);
+                }
+            }
             
             return model;
         }
@@ -52,7 +70,9 @@ namespace FluentMigrator.SqlProj
         {
             var tables = new List<TableDefinition>();
             
-            foreach (var table in model.GetObjects(DacQueryScopes.UserDefined, Table.TypeClass))
+            var tableObjects = model.GetObjects(DacQueryScopes.UserDefined, Table.TypeClass);
+            
+            foreach (var table in tableObjects)
             {
                 var tableName = table.Name;
                 var schemaName = tableName.Parts.Count > 1 ? tableName.Parts[0] : "dbo";
