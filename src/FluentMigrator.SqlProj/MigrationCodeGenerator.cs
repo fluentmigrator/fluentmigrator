@@ -23,6 +23,7 @@ namespace FluentMigrator.SqlProj
     /// </summary>
     public class MigrationCodeGenerator
     {
+        private const int DefaultFixedLengthStringSize = 1;
         private readonly string _migrationNamespace;
 
         public MigrationCodeGenerator(string migrationNamespace = "Migrations")
@@ -173,10 +174,10 @@ namespace FluentMigrator.SqlProj
                 "SMALLDATETIME" => ".AsDateTime()",
                 "TIME" => ".AsTime()",
                 "DATETIMEOFFSET" => ".AsDateTimeOffset()",
-                "CHAR" => column.Length.HasValue ? $".AsFixedLengthAnsiString({column.Length})" : ".AsFixedLengthAnsiString(1)",
+                "CHAR" => column.Length.HasValue ? $".AsFixedLengthAnsiString({column.Length})" : ".AsFixedLengthAnsiString(DefaultFixedLengthStringSize)",
                 "VARCHAR" => column.Length.HasValue ? $".AsAnsiString({column.Length})" : ".AsAnsiString()",
                 "TEXT" => ".AsAnsiString(int.MaxValue)",
-                "NCHAR" => column.Length.HasValue ? $".AsFixedLengthString({column.Length})" : ".AsFixedLengthString(1)",
+                "NCHAR" => column.Length.HasValue ? $".AsFixedLengthString({column.Length})" : ".AsFixedLengthString(DefaultFixedLengthStringSize)",
                 "NVARCHAR" => column.Length.HasValue ? $".AsString({column.Length})" : ".AsString()",
                 "NTEXT" => ".AsString(int.MaxValue)",
                 "BINARY" => column.Length.HasValue ? $".AsBinary({column.Length})" : ".AsBinary()",
@@ -195,7 +196,12 @@ namespace FluentMigrator.SqlProj
         public static long GenerateVersionNumber()
         {
             var now = DateTime.UtcNow;
-            return long.Parse(now.ToString("yyyyMMddHHmmss"));
+            return now.Year * 10000000000L +
+                   now.Month * 100000000L +
+                   now.Day * 1000000L +
+                   now.Hour * 10000L +
+                   now.Minute * 100L +
+                   now.Second;
         }
     }
 }

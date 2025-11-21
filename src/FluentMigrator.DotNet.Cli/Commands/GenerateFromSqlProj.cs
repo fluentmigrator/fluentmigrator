@@ -28,13 +28,13 @@ namespace FluentMigrator.DotNet.Cli.Commands
     public class GenerateFromSqlProj : BaseCommand
     {
         [Option("-p|--project <PATH>", Description = "Path to the .sqlproj file")]
-        public string SqlProjPath { get; set; }
+        public string SqlProjPath { get; set; } = string.Empty;
 
         [Option("-o|--output <PATH>", Description = "Output directory for generated migration file")]
-        public string OutputPath { get; set; }
+        public string OutputPath { get; set; } = string.Empty;
 
         [Option("-n|--name <NAME>", Description = "Name for the migration class")]
-        public string MigrationName { get; set; }
+        public string MigrationName { get; set; } = string.Empty;
 
         [Option("--namespace <NAMESPACE>", Description = "Namespace for the migration class (default: Migrations)")]
         public string Namespace { get; set; } = "Migrations";
