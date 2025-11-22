@@ -61,15 +61,37 @@ public class BasicUpdateOperations : Migration
 {
     public override void Up()
     {
-        // Update all rows
+        // Update all rows using anonymous object
         Update.Table("Users")
             .Set(new { IsActive = true, UpdatedAt = DateTime.Now })
             .AllRows();
 
-        // Update with WHERE condition
+        // Update with WHERE condition using anonymous object
         Update.Table("Users")
             .Set(new { IsActive = false })
             .Where(new { Name = "John Doe" });
+
+        // Update using dictionary (useful for dynamic scenarios)
+        var updates = new Dictionary<string, object>
+        {
+            { "IsActive", true },
+            { "UpdatedAt", DateTime.Now }
+        };
+        
+        Update.Table("Users")
+            .Set(updates)
+            .AllRows();
+
+        // WHERE clause with dictionary
+        var criteria = new Dictionary<string, object>
+        {
+            { "Name", "John Doe" },
+            { "Email", "john.doe@example.com" }
+        };
+        
+        Update.Table("Users")
+            .Set(new { IsActive = false })
+            .Where(criteria);
 
         // For complex operations, using raw SQL helper (Fluent Migrator 7.0+):
         Update.Table("Users")
@@ -92,6 +114,94 @@ public class BasicUpdateOperations : Migration
         Update.Table("Users")
             .Set(new { IsActive = true })
             .AllRows();
+    }
+}
+```
+
+#### Using Dictionaries for Dynamic Updates
+
+The `Set()` and `Where()` methods support `IDictionary<string, object>` in addition to anonymous objects. This is particularly useful when:
+
+- Building updates dynamically at runtime
+- Reading column values from configuration
+- Creating reusable migration helpers
+- Working with reflection-based scenarios
+
+```csharp
+public class DynamicUpdateOperations : Migration
+{
+    public override void Up()
+    {
+        // Dynamic update based on configuration
+        var configValues = LoadConfigurationValues();
+        var updates = new Dictionary<string, object>();
+        
+        foreach (var setting in configValues)
+        {
+            updates[setting.ColumnName] = setting.Value;
+        }
+        
+        Update.Table("Configuration")
+            .Set(updates)
+            .Where(new Dictionary<string, object>
+            {
+                { "Environment", "Production" },
+                { "IsActive", true }
+            });
+    }
+
+    public override void Down() { }
+    
+    private IEnumerable<ConfigSetting> LoadConfigurationValues()
+    {
+        // Load from external source
+        return new[]
+        {
+            new ConfigSetting { ColumnName = "MaxConnections", Value = 100 },
+            new ConfigSetting { ColumnName = "Timeout", Value = 30 }
+        };
+    }
+}
+
+public class ConfigSetting
+{
+    public string ColumnName { get; set; }
+    public object Value { get; set; }
+}
+```
+
+#### Mixing Anonymous Objects and Dictionaries
+
+You can use both approaches within the same migration:
+
+```csharp
+public class MixedUpdateOperations : Migration
+{
+    public override void Up()
+    {
+        // Use anonymous object for known, static values
+        Update.Table("Users")
+            .Set(new { Status = "Active" })
+            .Where(BuildDynamicCriteria());  // Use dictionary for dynamic criteria
+    }
+
+    public override void Down() { }
+
+    private Dictionary<string, object> BuildDynamicCriteria()
+    {
+        var criteria = new Dictionary<string, object>();
+        
+        // Add criteria based on runtime conditions
+        if (DateTime.Now.DayOfWeek == DayOfWeek.Monday)
+        {
+            criteria["Department"] = "Sales";
+        }
+        else
+        {
+            criteria["Department"] = "Marketing";
+        }
+        
+        return criteria;
     }
 }
 ```

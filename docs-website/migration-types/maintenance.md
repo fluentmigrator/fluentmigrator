@@ -280,6 +280,145 @@ using (var scope = serviceProvider.CreateScope())
 }
 ```
 
+## Namespace Filtering
+
+Maintenance migrations support namespace filtering, allowing you to organize and selectively run maintenance tasks based on their namespace. This is particularly useful in large projects with multiple modules or environments.
+
+### Configuring Namespace Filter
+
+```csharp
+var serviceProvider = new ServiceCollection()
+    .AddFluentMigratorCore()
+    .ConfigureRunner(rb => rb
+        .AddSqlServer()
+        .WithGlobalConnectionString(connectionString)
+        .ScanIn(Assembly.GetExecutingAssembly()).For.Migrations())
+    .Configure<TypeFilterOptions>(opt =>
+    {
+        // Only load maintenance migrations from specific namespace
+        opt.Namespace = "MyProject.Migrations.Production";
+        opt.NestedNamespaces = true;  // Include nested namespaces
+    })
+    .BuildServiceProvider(false);
+```
+
+### Organizing Maintenance Migrations by Namespace
+
+```csharp
+namespace MyProject.Migrations.Production
+{
+    [Maintenance(MigrationStage.AfterAll)]
+    public class ProductionCleanup : Migration
+    {
+        public override void Up()
+        {
+            // Production-specific cleanup
+            Execute.Sql("UPDATE STATISTICS");
+        }
+
+        public override void Down() { }
+    }
+}
+
+namespace MyProject.Migrations.Development
+{
+    [Maintenance(MigrationStage.AfterAll)]
+    public class DevelopmentCleanup : Migration
+    {
+        public override void Up()
+        {
+            // Development-specific cleanup
+            Execute.Sql("TRUNCATE TABLE DebugLogs");
+        }
+
+        public override void Down() { }
+    }
+}
+```
+
+### Command-Line Namespace Filtering
+
+Filter maintenance migrations by namespace when using command-line tools:
+
+#### Console Tool (Migrate.exe)
+```bash
+# Run maintenance migrations only from specific namespace
+Migrate.exe -db SqlServer -conn "connection_string" \
+    -assembly "MyMigrations.dll" \
+    -namespace "MyProject.Migrations.Production" \
+    -nested true
+```
+
+#### dotnet-fm CLI
+```bash
+# Run maintenance migrations only from specific namespace
+dotnet fm migrate -p SqlServer -c "connection_string" \
+    -a "MyMigrations.dll" \
+    --namespace "MyProject.Migrations.Production" \
+    --nested
+```
+
+### Use Cases for Namespace Filtering
+
+**1. Environment-Specific Maintenance**
+
+Separate maintenance tasks by environment without using tags:
+
+```csharp
+namespace MyProject.Migrations.Prod.Maintenance
+{
+    [Maintenance(MigrationStage.AfterAll)]
+    public class ProductionOptimization : Migration { /* ... */ }
+}
+
+namespace MyProject.Migrations.Dev.Maintenance
+{
+    [Maintenance(MigrationStage.AfterAll)]
+    public class DevelopmentDataSeeding : Migration { /* ... */ }
+}
+```
+
+**2. Module-Based Organization**
+
+In modular applications, group maintenance by module:
+
+```csharp
+namespace MyApp.Modules.Identity.Maintenance
+{
+    [Maintenance(MigrationStage.BeforeAll)]
+    public class IdentitySetup : Migration { /* ... */ }
+}
+
+namespace MyApp.Modules.Reporting.Maintenance
+{
+    [Maintenance(MigrationStage.AfterAll)]
+    public class ReportingCleanup : Migration { /* ... */ }
+}
+```
+
+**3. Combining with Nested Namespaces**
+
+When `NestedNamespaces = true`, all maintenance migrations in child namespaces are included:
+
+```csharp
+// Configuration
+opt.Namespace = "MyProject.Migrations";
+opt.NestedNamespaces = true;
+
+// These will ALL be included:
+namespace MyProject.Migrations { /* maintenance */ }
+namespace MyProject.Migrations.Core { /* maintenance */ }
+namespace MyProject.Migrations.Core.System { /* maintenance */ }
+
+// These will be excluded:
+namespace MyProject.Other { /* maintenance */ }
+namespace OtherProject.Migrations { /* maintenance */ }
+```
+
+::: tip
+Namespace filtering applies to both regular migrations and maintenance migrations. When using namespace filtering, ensure your regular migrations and related maintenance migrations are in the same namespace hierarchy.
+:::
+
 ## Best Practices
 
 ### 1. Use Appropriate Stages
