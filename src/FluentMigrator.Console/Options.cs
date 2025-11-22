@@ -489,15 +489,16 @@ namespace Mono.Options
             this.option = optionName;
         }
 
+        public string OptionName
+        {
+            get { return this.option; }
+        }
+
+#if NETFRAMEWORK
         protected OptionException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
             this.option = info.GetString("OptionName");
-        }
-
-        public string OptionName
-        {
-            get { return this.option; }
         }
 
         [SecurityPermission(SecurityAction.LinkDemand, SerializationFormatter = true)]
@@ -506,6 +507,7 @@ namespace Mono.Options
             base.GetObjectData(info, context);
             info.AddValue("OptionName", option);
         }
+#endif
     }
 
     public delegate void OptionAction<TKey, TValue>(TKey key, TValue value);
