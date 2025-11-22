@@ -2,7 +2,7 @@
   <!-- Much of this configuration is taken from Microsoft documentation on how to set-up custom MSBuild tasks: https://learn.microsoft.com/en-us/visualstudio/msbuild/tutorial-custom-task-code-generation?view=vs-2022#package-the-task-for-distribution -->
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFrameworks>net48;netstandard2.0;net8.0;net9.0</TargetFrameworks>
+    <TargetFrameworks>net48;netstandard2.0;net8.0;net9.0;net10.0</TargetFrameworks>
     <Description>MSBuild runner for FluentMigrator</Description>
     <!-- The property CopyLocalLockFileAssemblies is needed to make sure that dependencies are copied to the output directory. -->
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
