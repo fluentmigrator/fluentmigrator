@@ -489,16 +489,16 @@ namespace Mono.Options
             this.option = optionName;
         }
 
+        public string OptionName
+        {
+            get { return this.option; }
+        }
+
 #if NETFRAMEWORK
         protected OptionException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
             this.option = info.GetString("OptionName");
-        }
-
-        public string OptionName
-        {
-            get { return this.option; }
         }
 
         [SecurityPermission(SecurityAction.LinkDemand, SerializationFormatter = true)]
