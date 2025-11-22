@@ -27,8 +27,8 @@ namespace FluentMigrator.Analyzers
             Version = migrationVersion;
         }
 
-        public string Name { get; init; }
-        public Location Location { get; init; }
-        public long Version { get; init; }
+        public string Name { get; }
+        public Location Location { get; }
+        public long Version { get; }
     }
 }
