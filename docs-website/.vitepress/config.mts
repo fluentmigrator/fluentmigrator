@@ -111,7 +111,8 @@ export default defineConfig({
                         {text: 'Best Practices', link: '/advanced/best-practices'},
                         {text: 'Migration Versioning', link: '/advanced/versioning'},
                         {text: 'Conditional Logic', link: '/advanced/conditional-logic'},
-                        {text: 'Custom Extensions', link: '/advanced/custom-extensions'}
+                        {text: 'Custom Extensions', link: '/advanced/custom-extensions'},
+                        {text: 'Analyzers', link: '/advanced/analyzers'}
                     ]
                 },
             ]
