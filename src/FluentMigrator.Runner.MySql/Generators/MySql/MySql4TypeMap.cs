@@ -112,7 +112,7 @@ namespace FluentMigrator.Runner.Generators.MySql
             SetTypeMap(DbType.String, "TEXT", TextCapacity);
             SetTypeMap(DbType.String, "MEDIUMTEXT", MediumTextCapacity);
             SetTypeMap(DbType.String, "LONGTEXT", LongTextCapacity);
-            SetTypeMap(DbType.Time, "DATETIME");
+            SetTypeMap(DbType.Time, "TIME");
         }
         
         /// <inheritdoc />
