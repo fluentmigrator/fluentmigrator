@@ -282,6 +282,10 @@ using (var scope = serviceProvider.CreateScope())
 
 ## Namespace Filtering
 
+::: info Available Since
+FluentMigrator 7.2.0
+:::
+
 Maintenance migrations support namespace filtering, allowing you to organize and selectively run maintenance tasks based on their namespace. This is particularly useful in large projects with multiple modules or environments.
 
 ### Configuring Namespace Filter

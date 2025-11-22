@@ -120,6 +120,10 @@ public class BasicUpdateOperations : Migration
 
 #### Using Dictionaries for Dynamic Updates
 
+::: info Available Since
+FluentMigrator 7.2.0
+:::
+
 The `Set()` and `Where()` methods support `IDictionary<string, object>` in addition to anonymous objects. This is particularly useful when:
 
 - Building updates dynamically at runtime

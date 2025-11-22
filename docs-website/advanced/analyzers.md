@@ -1,5 +1,9 @@
 # Analyzers
 
+::: info Available Since
+FluentMigrator 7.2.0
+:::
+
 FluentMigrator provides Roslyn-based code analyzers to help catch common mistakes and enforce best practices at compile time. These analyzers are distributed as a separate NuGet package and integrate directly into your IDE and build process.
 
 ## Installation
