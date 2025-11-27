@@ -21,14 +21,14 @@ FluentMigrator.Example.SqlProj/
 
 ### Using the CLI tool
 
-1. Install the FluentMigrator CLI tool:
+1. Install the FluentMigrator Migration Generator CLI tool:
    ```bash
-   dotnet tool install -g FluentMigrator.DotNet.Cli
+   dotnet tool install -g FluentMigrator.MigrationGenerator
    ```
 
 2. Generate a migration from the .sqlproj file:
    ```bash
-   dotnet fm generate-from-sqlproj \
+   fm-generator from-sqlproj \
      --project ./SampleDatabase.sqlproj \
      --output ./GeneratedMigrations \
      --name InitialDatabaseSchema \

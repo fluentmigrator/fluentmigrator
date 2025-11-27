@@ -16,18 +16,10 @@
 
 using McMaster.Extensions.CommandLineUtils;
 
-namespace FluentMigrator.DotNet.Cli.Commands
+namespace FluentMigrator.MigrationGenerator
 {
-    [HelpOption(Description = "Execute FluentMigrator actions")]
-    [Command("dotnet-fm", Description = "The external FluentMigrator runner that integrates into the .NET Core CLI tooling")]
-    [Subcommand(typeof(Migrate), typeof(Rollback), typeof(Validate), typeof(ListCommand))]
-    public class Root
+    public class Program
     {
-        protected int OnExecute(CommandLineApplication app, IConsole console)
-        {
-            console.Error.WriteLine("You must specify a subcommand.");
-            app.ShowHelp();
-            return 1;
-        }
+        public static int Main(string[] args) => CommandLineApplication.Execute<Commands.Root>(args);
     }
 }

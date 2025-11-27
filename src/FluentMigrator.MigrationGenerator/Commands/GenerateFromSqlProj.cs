@@ -21,11 +21,11 @@ using FluentMigrator.SqlProj;
 
 // ReSharper disable UnassignedGetOnlyAutoProperty
 
-namespace FluentMigrator.DotNet.Cli.Commands
+namespace FluentMigrator.MigrationGenerator.Commands
 {
     [HelpOption]
-    [Command("generate-from-sqlproj", Description = "Generate FluentMigrator migration from SQL Server Database Project (.sqlproj)")]
-    public class GenerateFromSqlProj : BaseCommand
+    [Command("from-sqlproj", Description = "Generate FluentMigrator migration from SQL Server Database Project (.sqlproj)")]
+    public class GenerateFromSqlProj
     {
         [Option("-p|--project <PATH>", Description = "Path to the .sqlproj file")]
         public string SqlProjPath { get; set; } = string.Empty;

@@ -42,23 +42,7 @@ namespace FluentMigrator.SqlProj
         {
             var sb = new StringBuilder();
             
-            // Generate header
-            sb.AppendLine("#region License");
-            sb.AppendLine("// Copyright (c) 2007-2024, Fluent Migrator Project");
-            sb.AppendLine("//");
-            sb.AppendLine("// Licensed under the Apache License, Version 2.0 (the \"License\");");
-            sb.AppendLine("// you may not use this file except in compliance with the License.");
-            sb.AppendLine("// You may obtain a copy of the License at");
-            sb.AppendLine("//");
-            sb.AppendLine("// http://www.apache.org/licenses/LICENSE-2.0");
-            sb.AppendLine("//");
-            sb.AppendLine("// Unless required by applicable law or agreed to in writing, software");
-            sb.AppendLine("// distributed under the License is distributed on an \"AS IS\" BASIS,");
-            sb.AppendLine("// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.");
-            sb.AppendLine("// See the License for the specific language governing permissions and");
-            sb.AppendLine("// limitations under the License.");
-            sb.AppendLine("#endregion");
-            sb.AppendLine();
+            // Generate using statements
             sb.AppendLine("using FluentMigrator;");
             sb.AppendLine();
             sb.AppendLine($"namespace {_migrationNamespace}");
