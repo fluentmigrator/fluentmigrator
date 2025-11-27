@@ -14,12 +14,15 @@
 // limitations under the License.
 #endregion
 
+using NUnit.Framework;
+
 namespace FluentMigrator.SqlProj.Tests;
 
+[TestFixture]
 public class MigrationCodeGeneratorTests
 {
-    [Fact]
-    public void GenerateMigration_CreatesValidMigrationCode()
+    [Test]
+    public Task GenerateMigration_CreatesValidMigrationCode()
     {
         var generator = new MigrationCodeGenerator("TestNamespace");
         var tables = new List<TableDefinition>
@@ -50,19 +53,11 @@ public class MigrationCodeGeneratorTests
 
         var result = generator.GenerateMigration(tables, "TestMigration", 123456789);
 
-        Assert.Contains("namespace TestNamespace", result);
-        Assert.Contains("[Migration(123456789)]", result);
-        Assert.Contains("public class TestMigration : Migration", result);
-        Assert.Contains("Create.Table(\"TestTable\")", result);
-        Assert.Contains(".WithColumn(\"Id\").AsInt32().NotNullable().Identity()", result);
-        Assert.Contains(".WithColumn(\"Name\").AsString(100).NotNullable()", result);
-        Assert.Contains("public override void Up()", result);
-        Assert.Contains("public override void Down()", result);
-        Assert.Contains("Delete.Table(\"TestTable\");", result);
+        return Verify(result);
     }
 
-    [Fact]
-    public void GenerateMigration_HandlesCustomSchema()
+    [Test]
+    public Task GenerateMigration_HandlesCustomSchema()
     {
         var generator = new MigrationCodeGenerator();
         var tables = new List<TableDefinition>
@@ -85,11 +80,11 @@ public class MigrationCodeGeneratorTests
 
         var result = generator.GenerateMigration(tables, "CustomSchemaMigration", 123);
 
-        Assert.Contains(".InSchema(\"custom\")", result);
+        return Verify(result);
     }
 
-    [Fact]
-    public void GenerateMigration_HandlesDecimalWithPrecision()
+    [Test]
+    public Task GenerateMigration_HandlesDecimalWithPrecision()
     {
         var generator = new MigrationCodeGenerator();
         var tables = new List<TableDefinition>
@@ -114,18 +109,18 @@ public class MigrationCodeGeneratorTests
 
         var result = generator.GenerateMigration(tables, "DecimalMigration", 123);
 
-        Assert.Contains(".AsDecimal(18, 2)", result);
+        return Verify(result);
     }
 
-    [Fact]
+    [Test]
     public void GenerateVersionNumber_ReturnsValidTimestamp()
     {
         var version = MigrationCodeGenerator.GenerateVersionNumber();
 
-        Assert.True(version > 20000000000000); // After year 2000
-        Assert.True(version < 30000000000000); // Before year 3000
+        Assert.That(version, Is.GreaterThan(20000000000000)); // After year 2000
+        Assert.That(version, Is.LessThan(30000000000000)); // Before year 3000
         
         var versionStr = version.ToString();
-        Assert.Equal(14, versionStr.Length); // YYYYMMDDHHmmss format
+        Assert.That(versionStr.Length, Is.EqualTo(14)); // YYYYMMDDHHmmss format
     }
 }
