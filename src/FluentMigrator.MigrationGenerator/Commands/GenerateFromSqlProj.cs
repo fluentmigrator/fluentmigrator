@@ -43,7 +43,7 @@ namespace FluentMigrator.MigrationGenerator.Commands
         public long? Version { get; set; }
 
         [Option("--verbose", Description = "Show verbose output")]
-        public bool Verbose { get; }
+        public bool Verbose { get; set; }
 
         private int OnExecute(IConsole console)
         {
