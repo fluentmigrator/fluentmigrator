@@ -4,7 +4,8 @@
     <ToolCommandName>fm-generator</ToolCommandName>
     <PackAsTool>true</PackAsTool>
     <OutputType>Exe</OutputType>
-    <Description>.NET CLI tool for generating FluentMigrator migrations from SQL Server Database Projects</Description>
+    <Description>.NET CLI tool for generating FluentMigrator migrations from SQL Server Database Projects (.sqlproj). Automatically converts SSDT database schemas to FluentMigrator C# migration code.</Description>
+    <PackageTags>fluentmigrator;migration;database;sqlproj;ssdt;sql-server;dacpac;code-generator;schema</PackageTags>
   </PropertyGroup>
   <Import Project="$(MSBuildThisFileDirectory)../../PackageTool.props" />
   <ItemGroup>

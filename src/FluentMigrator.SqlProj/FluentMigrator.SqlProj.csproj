@@ -2,8 +2,8 @@
   <PropertyGroup>
     <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
     <RootNamespace>FluentMigrator.SqlProj</RootNamespace>
-    <Description>FluentMigrator support for generating migrations from SQL Server Database Projects (.sqlproj)</Description>
-    <PackageTags>fluent;migrator;fluentmigrator;migration;database;sqlproj;dacpac</PackageTags>
+    <Description>FluentMigrator support for generating migrations from SQL Server Database Projects (.sqlproj). Parses SSDT database schemas and converts them to FluentMigrator C# migration code.</Description>
+    <PackageTags>fluentmigrator;migration;database;sqlproj;ssdt;sql-server;dacpac;code-generator;schema</PackageTags>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
