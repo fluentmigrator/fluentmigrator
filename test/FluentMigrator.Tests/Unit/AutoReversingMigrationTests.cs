@@ -86,6 +86,23 @@ namespace FluentMigrator.Tests.Unit
             deleteExpression.Rows[1][0].Value.ShouldBe(1);
             deleteExpression.Rows[1].Count.ShouldBe(1, "Id 1 doesn't have a ParentId reference");
         }
+
+        [Test]
+        public void AlterTableAddColumnAutoReversingMigrationGivesDeleteColumnDown()
+        {
+            var autoReversibleMigration = new TestAlterTableAddColumnAutoReversingMigration();
+            _context.Object.Expressions = new Collection<IMigrationExpression>();
+            autoReversibleMigration.GetDownExpressions(_context.Object);
+
+            var expressions = _context.Object.Expressions.ToList();
+
+            var deleteColumnExpressions = expressions.OfType<DeleteColumnExpression>().ToList();
+            deleteColumnExpressions.Count.ShouldBe(3);
+
+            deleteColumnExpressions.ShouldContain(e => e.TableName == "Library" && e.ColumnNames.Contains("address_ar"));
+            deleteColumnExpressions.ShouldContain(e => e.TableName == "Library" && e.ColumnNames.Contains("details_ar"));
+            deleteColumnExpressions.ShouldContain(e => e.TableName == "Library" && e.ColumnNames.Contains("organization_details_ar"));
+        }
     }
 
     internal class TestAutoReversingMigration : AutoReversingMigration
@@ -109,6 +126,17 @@ namespace FluentMigrator.Tests.Unit
             Insert.IntoTable("Foo")
                 .Row(new { Id = 1 })
                 .Row(new { Id = 2, ParentId = 1 });
+        }
+    }
+
+    internal class TestAlterTableAddColumnAutoReversingMigration : AutoReversingMigration
+    {
+        public override void Up()
+        {
+            Alter.Table("Library")
+                .AddColumn("organization_details_ar").AsString(2000).Nullable()
+                .AddColumn("details_ar").AsString(2000).Nullable()
+                .AddColumn("address_ar").AsString(250).Nullable();
         }
     }
 }
