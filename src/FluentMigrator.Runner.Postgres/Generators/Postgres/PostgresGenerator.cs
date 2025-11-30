@@ -60,11 +60,16 @@ namespace FluentMigrator.Runner.Generators.Postgres
         {
         }
 
-        /// <inheritdoc />
-        protected PostgresGenerator(
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PostgresGenerator"/> class.
+        /// </summary>
+        /// <param name="quoter">The Postgres quoter.</param>
+        /// <param name="generatorOptions">The generator options.</param>
+        /// <param name="typeMap">The Postgres type map.</param>
+        public PostgresGenerator(
             [NotNull] PostgresQuoter quoter,
             [NotNull] IOptions<GeneratorOptions> generatorOptions,
-            IPostgresTypeMap typeMap)
+            [NotNull] IPostgresTypeMap typeMap)
             : base(new PostgresColumn(quoter, typeMap), quoter, new PostgresDescriptionGenerator(quoter), generatorOptions)
         {
         }
