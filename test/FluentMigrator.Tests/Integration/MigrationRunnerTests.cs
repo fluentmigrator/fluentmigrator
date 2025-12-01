@@ -1602,11 +1602,12 @@ namespace FluentMigrator.Tests.Integration
                     DataSet upDs = processor.ReadTableData("TestSchema", "Foo");
 
                     var rows = upDs.Tables[0].Rows;
-                    rows.Count.ShouldBe(3);
+                    rows.Count.ShouldBe(4);
 
                     rows[0]["Baz"].ShouldBe(1);
                     rows[1]["Baz"].ShouldBe(2);
                     rows[2]["Baz"].ShouldBe(3);
+                    rows[3]["Baz"].ShouldBe(4);
 
                     runner.Up(new RawSqlUpdateMigration());
                     upDs = processor.ReadTableData("TestSchema", "Foo");
@@ -1615,6 +1616,7 @@ namespace FluentMigrator.Tests.Integration
                     rows[0]["Baz"].ShouldBe(101);
                     rows[1]["Baz"].ShouldBe(102);
                     rows[2]["Baz"].ShouldBe(103);
+                    rows[3]["Baz"].ShouldBe(104);
 
                     runner.Up(new RawSqlDeleteMigration());
                     upDs = processor.ReadTableData("TestSchema", "Foo");
@@ -2129,6 +2131,10 @@ namespace FluentMigrator.Tests.Integration
                 {
                     baz = 3,
                 })
+                .Row(new
+                {
+                    baz = 4,
+                })
                 ;
         }
 
@@ -2162,6 +2168,17 @@ namespace FluentMigrator.Tests.Integration
                 {
                     baz = RawSql.Insert("= 3")
                 });
+
+            // UPDATE : Raw SQL with RawSql object inside an anonymous object (backward compatibility - no explicit operator)
+            Update.Table("Foo").InSchema("TestSchema")
+                .Set(new
+                {
+                    baz = RawSql.Insert("CASE WHEN baz = 4 THEN 104 ELSE 0 END")
+                })
+                .Where(new
+                {
+                    baz = RawSql.Insert("4")
+                });
         }
     }
 
@@ -2181,6 +2198,12 @@ namespace FluentMigrator.Tests.Integration
                 .Row(new
                 {
                     baz = RawSql.Insert("= 103")
+                })
+
+                // DELETE : Raw SQL with RawSql object inside an anonymous object (backward compatibility - no explicit operator)
+                .Row(new
+                {
+                    baz = RawSql.Insert("104")
                 });
         }
     }
