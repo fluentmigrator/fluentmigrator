@@ -282,7 +282,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         [Test]
         public void CanDeleteDataWithRawSqlInClause()
         {
-            // Test RawSql with IN clause
+            // Test RawSql with IN clause with space
             var expression = new DeleteDataExpression
             {
                 TableName = "TestTable"
@@ -294,6 +294,23 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 
             var result = Generator.Generate(expression);
             result.ShouldBe("DELETE FROM [dbo].[TestTable] WHERE [Status] IN (1, 2, 3);");
+        }
+
+        [Test]
+        public void CanDeleteDataWithRawSqlInClauseNoSpace()
+        {
+            // Test RawSql with IN clause without space after IN
+            var expression = new DeleteDataExpression
+            {
+                TableName = "TestTable"
+            };
+            expression.Rows.Add(new DeletionDataDefinition
+            {
+                new KeyValuePair<string, object>("Status", RawSql.Insert("IN(1, 2, 3)"))
+            });
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("DELETE FROM [dbo].[TestTable] WHERE [Status] IN(1, 2, 3);");
         }
 
         [Test]

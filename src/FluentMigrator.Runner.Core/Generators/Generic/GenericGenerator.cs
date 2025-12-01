@@ -445,7 +445,7 @@ namespace FluentMigrator.Runner.Generators.Generic
         }
 
         /// <summary>
-        /// Checks if a raw SQL string starts with an operator (=, IS, IN, &lt;&gt;, !=, &lt;, &gt;, &lt;=, &gt;=, LIKE, NOT, BETWEEN)
+        /// Checks if a raw SQL string starts with an operator (=, IS, IN, comparison operators, LIKE, NOT, BETWEEN)
         /// </summary>
         /// <param name="rawSqlValue">The raw SQL value to check</param>
         /// <returns>True if the string starts with an operator, false otherwise</returns>
@@ -470,6 +470,7 @@ namespace FluentMigrator.Runner.Generators.Generic
             }
 
             // Check for keyword operators (case-insensitive)
+            // IN can be followed by a space or directly by a parenthesis
             return StartsWithKeywordOperator(trimmed, "IS ")
                 || StartsWithKeywordOperator(trimmed, "IN ")
                 || StartsWithKeywordOperator(trimmed, "IN(")
