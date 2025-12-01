@@ -16,6 +16,10 @@
 //
 #endregion
 
+using System.Collections.Generic;
+
+using FluentMigrator.Expressions;
+using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.SqlServer;
 
@@ -222,6 +226,154 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 
             var result = Generator.Generate(expression);
             result.ShouldBe("UPDATE [dbo].[TestTable1] SET [Name] = N'Just''in', [Age] = 25 WHERE [Id] = 9 AND [Homepage] IS NULL;");
+        }
+
+        [Test]
+        public void CanDeleteDataWithRawSqlSubquery()
+        {
+            // Test the backward compatibility case: RawSql with a subquery should add "= " operator
+            var expression = new DeleteDataExpression
+            {
+                TableName = "RolePermissions"
+            };
+            expression.Rows.Add(new DeletionDataDefinition
+            {
+                new KeyValuePair<string, object>("PermissionId", RawSql.Insert("(SELECT [Id] FROM [dbo].[Permissions] WHERE [Name] = 'Foo')"))
+            });
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("DELETE FROM [dbo].[RolePermissions] WHERE [PermissionId] = (SELECT [Id] FROM [dbo].[Permissions] WHERE [Name] = 'Foo');");
+        }
+
+        [Test]
+        public void CanDeleteDataWithRawSqlExplicitOperator()
+        {
+            // Test the new syntax where operator is explicitly included in RawSql
+            var expression = new DeleteDataExpression
+            {
+                TableName = "TestTable"
+            };
+            expression.Rows.Add(new DeletionDataDefinition
+            {
+                new KeyValuePair<string, object>("Status", RawSql.Insert("= 3"))
+            });
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("DELETE FROM [dbo].[TestTable] WHERE [Status] = 3;");
+        }
+
+        [Test]
+        public void CanDeleteDataWithRawSqlIsNull()
+        {
+            // Test RawSql with IS NULL operator
+            var expression = new DeleteDataExpression
+            {
+                TableName = "TestTable"
+            };
+            expression.Rows.Add(new DeletionDataDefinition
+            {
+                new KeyValuePair<string, object>("Status", RawSql.Insert("IS NULL"))
+            });
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("DELETE FROM [dbo].[TestTable] WHERE [Status] IS NULL;");
+        }
+
+        [Test]
+        public void CanDeleteDataWithRawSqlInClause()
+        {
+            // Test RawSql with IN clause
+            var expression = new DeleteDataExpression
+            {
+                TableName = "TestTable"
+            };
+            expression.Rows.Add(new DeletionDataDefinition
+            {
+                new KeyValuePair<string, object>("Status", RawSql.Insert("IN (1, 2, 3)"))
+            });
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("DELETE FROM [dbo].[TestTable] WHERE [Status] IN (1, 2, 3);");
+        }
+
+        [Test]
+        public void CanDeleteDataWithRawSqlFullWhereClause()
+        {
+            // Test RawSql as full WHERE clause (empty key)
+            var expression = new DeleteDataExpression
+            {
+                TableName = "TestTable"
+            };
+            expression.Rows.Add(new DeletionDataDefinition
+            {
+                new KeyValuePair<string, object>("", RawSql.Insert("Status = 1 AND Active = 0"))
+            });
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("DELETE FROM [dbo].[TestTable] WHERE Status = 1 AND Active = 0;");
+        }
+
+        [Test]
+        public void CanUpdateDataWithRawSqlSubquery()
+        {
+            // Test backward compatibility for UPDATE with RawSql subquery in WHERE clause
+            var expression = new UpdateDataExpression
+            {
+                TableName = "TestTable"
+            };
+            expression.Set = new List<KeyValuePair<string, object>>
+            {
+                new KeyValuePair<string, object>("Name", "Updated")
+            };
+            expression.Where = new List<KeyValuePair<string, object>>
+            {
+                new KeyValuePair<string, object>("Id", RawSql.Insert("(SELECT MAX(Id) FROM OtherTable)"))
+            };
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("UPDATE [dbo].[TestTable] SET [Name] = N'Updated' WHERE [Id] = (SELECT MAX(Id) FROM OtherTable);");
+        }
+
+        [Test]
+        public void CanUpdateDataWithRawSqlLikeOperator()
+        {
+            // Test RawSql with LIKE operator
+            var expression = new UpdateDataExpression
+            {
+                TableName = "TestTable"
+            };
+            expression.Set = new List<KeyValuePair<string, object>>
+            {
+                new KeyValuePair<string, object>("Name", "Updated")
+            };
+            expression.Where = new List<KeyValuePair<string, object>>
+            {
+                new KeyValuePair<string, object>("Name", RawSql.Insert("LIKE 'Test%'"))
+            };
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("UPDATE [dbo].[TestTable] SET [Name] = N'Updated' WHERE [Name] LIKE 'Test%';");
+        }
+
+        [Test]
+        public void CanUpdateDataWithRawSqlComparisonOperators()
+        {
+            // Test RawSql with comparison operators (<, >, <=, >=, <>)
+            var expression = new UpdateDataExpression
+            {
+                TableName = "TestTable"
+            };
+            expression.Set = new List<KeyValuePair<string, object>>
+            {
+                new KeyValuePair<string, object>("Status", 1)
+            };
+            expression.Where = new List<KeyValuePair<string, object>>
+            {
+                new KeyValuePair<string, object>("Age", RawSql.Insert("> 18"))
+            };
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("UPDATE [dbo].[TestTable] SET [Status] = 1 WHERE [Age] > 18;");
         }
     }
 }

@@ -425,9 +425,12 @@ namespace FluentMigrator.Runner.Generators.Generic
                 {
                     op = "IS ";
                 }
-                else if (item.Value is RawSql)
+                else if (item.Value is RawSql rawSql)
                 {
-                    op = "";
+                    // When there's a column name (key is not empty), check if RawSql starts with an operator.
+                    // If not, add "= " for backward compatibility (e.g., RawSql.Insert("(SELECT ...)") should become "= (SELECT ...)").
+                    // If it does start with an operator (e.g., "= 3", "IS NULL", "IN (1,2)"), use it as-is.
+                    op = item.Key != "" && !StartsWithOperator(rawSql.Value) ? "= " : "";
                 }
                 else
                 {
@@ -439,6 +442,48 @@ namespace FluentMigrator.Runner.Generators.Generic
 
                 whereClauses.Add($"{columnName}{op}{Quoter.QuoteValue(item.Value)}");
             }
+        }
+
+        /// <summary>
+        /// Checks if a raw SQL string starts with an operator (=, IS, IN, &lt;&gt;, !=, &lt;, &gt;, &lt;=, &gt;=, LIKE, NOT, BETWEEN)
+        /// </summary>
+        /// <param name="rawSqlValue">The raw SQL value to check</param>
+        /// <returns>True if the string starts with an operator, false otherwise</returns>
+        private static bool StartsWithOperator(string rawSqlValue)
+        {
+            if (string.IsNullOrEmpty(rawSqlValue))
+            {
+                return false;
+            }
+
+            var trimmed = rawSqlValue.TrimStart();
+            if (trimmed.Length == 0)
+            {
+                return false;
+            }
+
+            // Check for symbolic operators first (=, <>, !=, <, >, <=, >=)
+            var firstChar = trimmed[0];
+            if (firstChar == '=' || firstChar == '<' || firstChar == '>' || firstChar == '!')
+            {
+                return true;
+            }
+
+            // Check for keyword operators (case-insensitive)
+            return StartsWithKeywordOperator(trimmed, "IS ")
+                || StartsWithKeywordOperator(trimmed, "IN ")
+                || StartsWithKeywordOperator(trimmed, "IN(")
+                || StartsWithKeywordOperator(trimmed, "LIKE ")
+                || StartsWithKeywordOperator(trimmed, "NOT ")
+                || StartsWithKeywordOperator(trimmed, "BETWEEN ");
+        }
+
+        /// <summary>
+        /// Checks if a string starts with a specific keyword operator (case-insensitive)
+        /// </summary>
+        private static bool StartsWithKeywordOperator(string value, string keyword)
+        {
+            return value.StartsWith(keyword, StringComparison.OrdinalIgnoreCase);
         }
 
         /// <inheritdoc />
