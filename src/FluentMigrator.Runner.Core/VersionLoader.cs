@@ -76,7 +76,7 @@ namespace FluentMigrator.Runner
         {
             _conventionSet = conventionSet;
             _processor = processorAccessor.Processor;
-            _quoter = generatorAccessor.Generator.GetQuoter();
+            _quoter = generatorAccessor.Generator.Quoter;
 
             Runner = runner;
 

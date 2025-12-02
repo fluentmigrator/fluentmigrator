@@ -24,7 +24,7 @@ namespace FluentMigrator.Runner.Generators.Snowflake
     /// specific to the Snowflake database.
     /// </summary>
     /// <remarks>
-    /// This class extends <see cref="FluentMigrator.Runner.Generators.Generic.GenericDescriptionGenerator"/> 
+    /// This class extends <see cref="FluentMigrator.Runner.Generators.Generic.GenericDescriptionGenerator"/>
     /// to provide Snowflake-specific implementations for generating table and column descriptions.
     /// </remarks>
     public class SnowflakeDescriptionGenerator : GenericDescriptionGenerator
@@ -33,11 +33,11 @@ namespace FluentMigrator.Runner.Generators.Snowflake
         /// Initializes a new instance of the <see cref="FluentMigrator.Runner.Generators.Snowflake.SnowflakeDescriptionGenerator"/> class.
         /// </summary>
         /// <param name="quoter">
-        /// An instance of <see cref="FluentMigrator.Runner.Generators.Snowflake.SnowflakeQuoter"/> 
+        /// An instance of <see cref="FluentMigrator.Runner.Generators.Snowflake.SnowflakeQuoter"/>
         /// used to handle SQL quoting specific to the Snowflake database.
         /// </param>
         /// <remarks>
-        /// This constructor sets up the generator to create Snowflake-specific SQL statements 
+        /// This constructor sets up the generator to create Snowflake-specific SQL statements
         /// for describing tables and columns.
         /// </remarks>
         public SnowflakeDescriptionGenerator(SnowflakeQuoter quoter)
@@ -46,15 +46,15 @@ namespace FluentMigrator.Runner.Generators.Snowflake
         }
 
         /// <summary>
-        /// Gets the <see cref="FluentMigrator.Runner.Generators.IQuoter"/> instance used for quoting SQL identifiers
+        /// Gets the <see cref="IQuoter"/> instance used for quoting SQL identifiers
         /// and values specific to the Snowflake database.
         /// </summary>
         /// <value>
-        /// An instance of <see cref="FluentMigrator.Runner.Generators.Snowflake.SnowflakeQuoter"/> 
+        /// An instance of <see cref="FluentMigrator.Runner.Generators.Snowflake.SnowflakeQuoter"/>
         /// that provides Snowflake-specific quoting functionality.
         /// </value>
         /// <remarks>
-        /// This property is used internally by the generator to ensure that SQL statements are properly quoted 
+        /// This property is used internally by the generator to ensure that SQL statements are properly quoted
         /// according to Snowflake's requirements.
         /// </remarks>
         protected IQuoter Quoter { get; }

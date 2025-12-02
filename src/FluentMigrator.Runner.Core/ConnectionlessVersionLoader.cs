@@ -60,7 +60,7 @@ namespace FluentMigrator.Runner
         {
             _processor = processorAccessor.Processor;
             _migrationInformationLoader = migrationInformationLoader;
-            _quoter = generatorAccessor.Generator.GetQuoter();
+            _quoter = generatorAccessor.Generator.Quoter;
             Conventions = conventions;
             StartVersion = runnerOptions.Value.StartVersion;
             TargetVersion = runnerOptions.Value.Version;
