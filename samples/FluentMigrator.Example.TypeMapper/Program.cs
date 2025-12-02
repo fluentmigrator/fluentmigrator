@@ -68,7 +68,6 @@ namespace FluentMigrator.Example.TypeMapper
                 .Union(serviceProvider.GetServices<IOracleTypeMap>())
                 .Union(serviceProvider.GetServices<IRedshiftTypeMap>())
                 .Union(serviceProvider.GetServices<ISnowflakeTypeMap>())
-                .Union(serviceProvider.GetServices<ISnowflakeTypeMap>())
                 .Union(serviceProvider.GetServices<ISQLiteTypeMap>()).ToList();
 
             var sb = new StringBuilder();
