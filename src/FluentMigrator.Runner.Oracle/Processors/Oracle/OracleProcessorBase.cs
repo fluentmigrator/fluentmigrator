@@ -422,7 +422,6 @@ namespace FluentMigrator.Runner.Processors.Oracle
                 if (char.IsLetter(c) || c == '_')
                 {
                     var keyword = new StringBuilder();
-                    var startIndex = i;
                     while (i < sqlScript.Length && (char.IsLetterOrDigit(sqlScript[i]) || sqlScript[i] == '_'))
                     {
                         keyword.Append(sqlScript[i]);
