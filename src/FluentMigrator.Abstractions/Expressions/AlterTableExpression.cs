@@ -49,6 +49,17 @@ namespace FluentMigrator.Expressions
         }
 
         /// <inheritdoc />
+        public override IMigrationExpression Reverse()
+        {
+            return new AlterTableExpression
+            {
+                SchemaName = SchemaName,
+                TableName = TableName,
+                TableDescription = TableDescription
+            };
+        }
+
+        /// <inheritdoc />
         public override string ToString()
         {
             return base.ToString() + TableName;
