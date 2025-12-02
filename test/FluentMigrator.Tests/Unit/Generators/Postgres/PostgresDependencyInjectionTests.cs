@@ -137,6 +137,26 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             }
         }
 
+        [Test]
+        public void CanUseCustomPostgresTypeMapRegisteredAfterAddPostgres()
+        {
+            var services = new ServiceCollection()
+                .AddFluentMigratorCore()
+                .ConfigureRunner(rb => rb.AddPostgres())
+                .AddScoped<IPostgresTypeMap, CustomPostgresTypeMap>()
+                .BuildServiceProvider(true);
+
+            using (var scope = services.CreateScope())
+            {
+                var generator = scope.ServiceProvider.GetRequiredService<IMigrationGenerator>();
+                var createTableExpression = new CreateTableExpression { TableName = "TestTable" };
+                createTableExpression.Columns.Add(new Model.ColumnDefinition { Name = "Name", Type = DbType.String, Size = 255 });
+
+                var statement = generator.Generate(createTableExpression);
+                Assert.That(statement, Is.EqualTo("CREATE TABLE \"public\".\"TestTable\" (\"Name\" citext NOT NULL);"));
+            }
+        }
+
         /// <summary>
         /// Custom quoter for Postgres.
         /// </summary>
