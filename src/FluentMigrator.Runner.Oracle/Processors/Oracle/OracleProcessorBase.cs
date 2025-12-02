@@ -458,8 +458,9 @@ namespace FluentMigrator.Runner.Processors.Oracle
                             }
                             
                             var nextKeywordStr = nextKeyword.ToString().ToUpperInvariant();
-                            // END IF, END LOOP, END CASE are control structure terminators, not block terminators
-                            if (nextKeywordStr == "IF" || nextKeywordStr == "LOOP" || nextKeywordStr == "CASE")
+                            // END IF, END LOOP, END CASE, END WHILE, END FOR are control structure terminators, not block terminators
+                            if (nextKeywordStr == "IF" || nextKeywordStr == "LOOP" || nextKeywordStr == "CASE" || 
+                                nextKeywordStr == "WHILE" || nextKeywordStr == "FOR")
                             {
                                 isControlStructureEnd = true;
                             }
@@ -479,6 +480,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
                                 // Can have: END; or END <name>; or END\n; etc.
                                 j = i + 1;
                                 var foundContent = new StringBuilder();
+                                var foundSemicolon = false;
                                 
                                 // Skip whitespace and collect optional identifier (procedure/function name)
                                 while (j < sqlScript.Length)
@@ -491,6 +493,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
                                         currentStatement.Append(foundContent);
                                         currentStatement.Append(';');
                                         i = j; // Move past the semicolon
+                                        foundSemicolon = true;
                                         
                                         // Add the complete PL/SQL block
                                         var statement = currentStatement.ToString().Trim();
@@ -499,7 +502,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
                                             statements.Add(statement);
                                         }
                                         currentStatement.Clear();
-                                        prevChar = '\0';
+                                        prevChar = ';';
                                         break;
                                     }
                                     else if (char.IsWhiteSpace(ch) || char.IsLetterOrDigit(ch) || ch == '_')
@@ -510,9 +513,16 @@ namespace FluentMigrator.Runner.Processors.Oracle
                                     }
                                     else
                                     {
-                                        // Found something else - not a simple END; statement
+                                        // Found something else - append what we collected and continue normally
+                                        // This handles cases where END is not followed by a semicolon or identifier
+                                        currentStatement.Append(foundContent);
                                         break;
                                     }
+                                }
+                                
+                                if (foundSemicolon)
+                                {
+                                    continue;
                                 }
                                 
                                 prevChar = keyword.Length > 0 ? keyword[keyword.Length - 1] : '\0';
