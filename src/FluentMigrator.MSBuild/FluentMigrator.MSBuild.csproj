@@ -46,7 +46,7 @@
   <!-- Dependencies -->
   <!-- mark every dependency of this Task project, both PackageReference and ProjectReference with the PrivateAssets="all" attribute. -->
   <ItemGroup>
-    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.11.4" PrivateAssets="all" ExcludeAssets="Runtime" />
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.14.28" PrivateAssets="all" ExcludeAssets="Runtime" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Update="JetBrains.Annotations" Version="2024.3.0" PrivateAssets="all" />
