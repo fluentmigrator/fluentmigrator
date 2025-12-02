@@ -35,8 +35,14 @@ steps:
     versionSpec: '6.11.1'
 
 - task: UseDotNet@2
-  displayName: 'UseDotNet 9.x SDK'
+  displayName: 'UseDotNet 10.x SDK'
   inputs:
+    version: '10.x'
+
+- task: UseDotNet@2
+  displayName: 'UseDotNet 9.x runtime'
+  inputs:
+    packageType: 'runtime'
     version: '9.x'
 
 - task: UseDotNet@2
