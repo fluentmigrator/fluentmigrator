@@ -14,10 +14,7 @@
 // limitations under the License.
 #endregion
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 using FluentMigrator.Runner.Processors.Oracle;
 
@@ -31,27 +28,11 @@ namespace FluentMigrator.Tests.Unit.Processors.Oracle
     [Category("Oracle")]
     public class OracleSqlParserTests
     {
-        private static List<string> CallSplitOracleSqlStatements(string sqlScript)
-        {
-            // Use reflection to call the private method
-            var method = typeof(OracleProcessorBase).GetMethod(
-                "SplitOracleSqlStatements",
-                BindingFlags.NonPublic | BindingFlags.Static);
-
-            if (method is null)
-            {
-                throw new InvalidOperationException("SplitOracleSqlStatements method not found");
-            }
-
-            var result = method.Invoke(null, new object[] { sqlScript });
-            return (List<string>)result;
-        }
-
         [Test]
         public void SimpleSqlStatement_ShouldBeSplitCorrectly()
         {
             var sql = "SELECT * FROM users;";
-            var result = CallSplitOracleSqlStatements(sql);
+            var result = OracleSqlParser.SplitOracleSqlStatements(sql);
 
             result.Count.ShouldBe(1);
             result[0].ShouldBe("SELECT * FROM users");
@@ -61,7 +42,7 @@ namespace FluentMigrator.Tests.Unit.Processors.Oracle
         public void MultipleSqlStatements_ShouldBeSplitCorrectly()
         {
             var sql = "SELECT * FROM users; SELECT * FROM orders;";
-            var result = CallSplitOracleSqlStatements(sql);
+            var result = OracleSqlParser.SplitOracleSqlStatements(sql);
 
             result.Count.ShouldBe(2);
             result[0].ShouldBe("SELECT * FROM users");
@@ -72,7 +53,7 @@ namespace FluentMigrator.Tests.Unit.Processors.Oracle
         public void BeginEndBlock_ShouldNotBeSplit()
         {
             var sql = "BEGIN\r\n    DBMS_OUTPUT.NEW_LINE;\r\nEND;";
-            var result = CallSplitOracleSqlStatements(sql);
+            var result = OracleSqlParser.SplitOracleSqlStatements(sql);
 
             result.Count.ShouldBe(1);
             result[0].ShouldBe("BEGIN\r\n    DBMS_OUTPUT.NEW_LINE;\r\nEND;");
@@ -85,7 +66,7 @@ namespace FluentMigrator.Tests.Unit.Processors.Oracle
     EXECUTE IMMEDIATE 'CREATE TABLE test (id INT)';
     EXECUTE IMMEDIATE 'INSERT INTO test VALUES (1)';
 END;";
-            var result = CallSplitOracleSqlStatements(sql);
+            var result = OracleSqlParser.SplitOracleSqlStatements(sql);
 
             result.Count.ShouldBe(1);
             result[0].ShouldBe(sql);
@@ -100,7 +81,7 @@ BEGIN
     SELECT COUNT(*) INTO v_count FROM users;
     DBMS_OUTPUT.PUT_LINE(v_count);
 END;";
-            var result = CallSplitOracleSqlStatements(sql);
+            var result = OracleSqlParser.SplitOracleSqlStatements(sql);
 
             result.Count.ShouldBe(1);
             result[0].ShouldBe(sql);
@@ -114,7 +95,7 @@ BEGIN
     DBMS_OUTPUT.NEW_LINE;
 END;
 SELECT * FROM test;";
-            var result = CallSplitOracleSqlStatements(sql);
+            var result = OracleSqlParser.SplitOracleSqlStatements(sql);
 
             result.Count.ShouldBe(3);
             result[0].ShouldBe("CREATE TABLE test (id INT)");
@@ -131,7 +112,7 @@ SELECT * FROM test;";
     END;
     DBMS_OUTPUT.PUT_LINE('Outer');
 END;";
-            var result = CallSplitOracleSqlStatements(sql);
+            var result = OracleSqlParser.SplitOracleSqlStatements(sql);
 
             result.Count.ShouldBe(1);
             result[0].ShouldBe(sql);
@@ -141,7 +122,7 @@ END;";
         public void BeginInString_ShouldBeIgnored()
         {
             var sql = "SELECT 'BEGIN' FROM dual; SELECT 'END' FROM dual;";
-            var result = CallSplitOracleSqlStatements(sql);
+            var result = OracleSqlParser.SplitOracleSqlStatements(sql);
 
             result.Count.ShouldBe(2);
             result[0].ShouldBe("SELECT 'BEGIN' FROM dual");
@@ -152,7 +133,7 @@ END;";
         public void BeginInComment_ShouldBeIgnored()
         {
             var sql = "SELECT * FROM users; -- BEGIN\r\nSELECT * FROM orders;";
-            var result = CallSplitOracleSqlStatements(sql);
+            var result = OracleSqlParser.SplitOracleSqlStatements(sql);
 
             result.Count.ShouldBe(2);
             result[0].ShouldBe("SELECT * FROM users");
@@ -166,7 +147,7 @@ END;";
 BEGIN
     DBMS_OUTPUT.PUT_LINE('Test');
 END test_proc;";
-            var result = CallSplitOracleSqlStatements(sql);
+            var result = OracleSqlParser.SplitOracleSqlStatements(sql);
 
             result.Count.ShouldBe(1);
             result[0].ShouldBe(sql);
@@ -179,7 +160,7 @@ END test_proc;";
 BEGIN
     RETURN 1;
 END test_func;";
-            var result = CallSplitOracleSqlStatements(sql);
+            var result = OracleSqlParser.SplitOracleSqlStatements(sql);
 
             result.Count.ShouldBe(1);
             result[0].ShouldBe(sql);
@@ -189,7 +170,7 @@ END test_func;";
         public void MultiLineCommentWithSemicolon_ShouldBeIgnored()
         {
             var sql = "SELECT * FROM users /* ; */; SELECT * FROM orders;";
-            var result = CallSplitOracleSqlStatements(sql);
+            var result = OracleSqlParser.SplitOracleSqlStatements(sql);
 
             result.Count.ShouldBe(2);
             result[0].ShouldBe("SELECT * FROM users /* ; */");
@@ -200,7 +181,7 @@ END test_func;";
         public void EmptyStatement_ShouldBeIgnored()
         {
             var sql = ";;SELECT * FROM users;";
-            var result = CallSplitOracleSqlStatements(sql);
+            var result = OracleSqlParser.SplitOracleSqlStatements(sql);
 
             result.Where(s => !string.IsNullOrWhiteSpace(s)).Count().ShouldBe(1);
         }
@@ -209,7 +190,7 @@ END test_func;";
         public void SqlWithoutTrailingSemicolon_ShouldBeIncluded()
         {
             var sql = "SELECT * FROM users";
-            var result = CallSplitOracleSqlStatements(sql);
+            var result = OracleSqlParser.SplitOracleSqlStatements(sql);
 
             result.Count.ShouldBe(1);
             result[0].ShouldBe("SELECT * FROM users");
@@ -225,7 +206,7 @@ END test_func;";
         EXECUTE IMMEDIATE 'CREATE TABLE test (id INT)';
     END IF;
 END;";
-            var result = CallSplitOracleSqlStatements(sql);
+            var result = OracleSqlParser.SplitOracleSqlStatements(sql);
 
             result.Count.ShouldBe(1);
             result[0].ShouldBe(sql);
@@ -240,7 +221,7 @@ EXCEPTION
     WHEN OTHERS THEN
         NULL;
 END;";
-            var result = CallSplitOracleSqlStatements(sql);
+            var result = OracleSqlParser.SplitOracleSqlStatements(sql);
 
             result.Count.ShouldBe(1);
             result[0].ShouldBe(sql);
