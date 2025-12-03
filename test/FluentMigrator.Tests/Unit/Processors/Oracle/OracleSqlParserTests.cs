@@ -90,16 +90,14 @@ END;";
         [Test]
         public void MixedStatements_BeginEndAndSimple_ShouldBeSplitCorrectly()
         {
-            var sql = @"CREATE TABLE test (id INT);
-BEGIN
-    DBMS_OUTPUT.NEW_LINE;
-END;
-SELECT * FROM test;";
+            // Use explicit newlines to avoid cross-platform issues
+            var newLine = "\n";
+            var sql = $"CREATE TABLE test (id INT);{newLine}BEGIN{newLine}    DBMS_OUTPUT.NEW_LINE;{newLine}END;{newLine}SELECT * FROM test;";
             var result = OracleSqlParser.SplitOracleSqlStatements(sql);
 
             result.Count.ShouldBe(3);
             result[0].ShouldBe("CREATE TABLE test (id INT)");
-            result[1].ShouldBe("BEGIN\n    DBMS_OUTPUT.NEW_LINE;\nEND;");
+            result[1].ShouldBe($"BEGIN{newLine}    DBMS_OUTPUT.NEW_LINE;{newLine}END;");
             result[2].ShouldBe("SELECT * FROM test");
         }
 
