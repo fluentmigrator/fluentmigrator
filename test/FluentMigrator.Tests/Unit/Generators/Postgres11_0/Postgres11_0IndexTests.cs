@@ -11,7 +11,7 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Generators.Postgres11_0
 {
     [TestFixture]
-    public class Postgres11_0IndexTests : Postgres10_0IndexTests
+    public abstract class Postgres11_0IndexTests : Postgres10_0IndexTests
     {
         /// <inheritdoc />
         protected override PostgresGenerator CreateGenerator(PostgresQuoter quoter)
