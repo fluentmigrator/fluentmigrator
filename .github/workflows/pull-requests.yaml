@@ -127,6 +127,7 @@ jobs:
 
     - name: Combine Coverage Reports
       uses: danielpalme/ReportGenerator-GitHub-Action@v5.5.0
+      if: '!cancelled()'
       with:
         reports: "**/*.cobertura.xml"
         targetdir: "${{ github.workspace }}"
@@ -138,6 +139,7 @@ jobs:
 
     - name: Upload Combined Coverage XML
       uses: actions/upload-artifact@v4
+      if: '!cancelled()'
       with:
         name: coverage-${{ matrix.os }}-${{ matrix.dotnet-tfm }}
         path: ${{ github.workspace }}/Cobertura.xml
