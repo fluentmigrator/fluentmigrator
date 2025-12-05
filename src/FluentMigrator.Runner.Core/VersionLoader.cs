@@ -25,10 +25,8 @@ using FluentMigrator.Generation;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Versioning;
 using FluentMigrator.Runner.VersionTableInfo;
-using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Generators;
-using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
 
 using JetBrains.Annotations;
@@ -76,7 +74,7 @@ namespace FluentMigrator.Runner
         {
             _conventionSet = conventionSet;
             _processor = processorAccessor.Processor;
-            _quoter = generatorAccessor.Generator.GetQuoter();
+            _quoter = generatorAccessor.Generator.Quoter;
 
             Runner = runner;
 
@@ -125,12 +123,22 @@ namespace FluentMigrator.Runner
             }
             else
             {
-                var quotedCurrentDate = _quoter.QuoteValue(SystemMethods.CurrentUTCDateTime);
-
-                // Default to using DateTime if no system method could be obtained
-                appliedOnValue = string.IsNullOrWhiteSpace(quotedCurrentDate)
-                    ? (object) DateTime.UtcNow
-                    : RawSql.Insert(quotedCurrentDate);
+                string quotedCurrentDate = null;
+                try
+                {
+                    quotedCurrentDate = _quoter.QuoteValue(SystemMethods.CurrentUTCDateTime);
+                }
+                catch
+                {
+                    // Swallow exception - some IQuoter implementations do not support system method CurrentUTCDateTime
+                }
+                finally
+                {
+                    // Default to using DateTime if no system method could be obtained
+                    appliedOnValue = string.IsNullOrWhiteSpace(quotedCurrentDate)
+                        ? (object)DateTime.UtcNow
+                        : RawSql.Insert(quotedCurrentDate);
+                }
             }
 
             return new InsertionDataDefinition

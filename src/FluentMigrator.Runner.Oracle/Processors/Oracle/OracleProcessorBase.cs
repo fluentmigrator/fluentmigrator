@@ -17,10 +17,8 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Text;
 
 using FluentMigrator.Expressions;
-using FluentMigrator.Runner.BatchParser;
 using FluentMigrator.Generation;
 using FluentMigrator.Runner.Generators.Oracle;
 using FluentMigrator.Runner.Helpers;
@@ -320,110 +318,6 @@ namespace FluentMigrator.Runner.Processors.Oracle
             expression.Operation?.Invoke(Connection, Transaction);
         }
 
-        /// <summary>
-        /// Splits a SQL script into individual statements, taking into account Oracle-specific syntax rules.
-        /// <remarks>We could use <see cref="SqlBatchParser"/> but it does not handle multiple lines strings.</remarks>
-        /// </summary>
-        private static List<string> SplitOracleSqlStatements(string sqlScript)
-        {
-            var statements = new List<string>();
-            var currentStatement = new StringBuilder();
-            var inString = false;
-            var inIdentifier = false;
-            var inSingleLineComment = false;
-            var inMultiLineComment = false;
-            var prevChar = '\0';
-
-            foreach (var c in sqlScript)
-            {
-                if (inSingleLineComment)
-                {
-                    currentStatement.Append(c);
-                    if (c == '\n')
-                    {
-                        inSingleLineComment = false;
-                    }
-                    continue;
-                }
-
-                if (inMultiLineComment)
-                {
-                    currentStatement.Append(c);
-                    if (prevChar == '*' && c == '/')
-                    {
-                        inMultiLineComment = false;
-                    }
-                    prevChar = c;
-                    continue;
-                }
-
-                if (inString)
-                {
-                    currentStatement.Append(c);
-                    if (c == '\'' && prevChar != '\\')
-                    {
-                        inString = false;
-                    }
-                    prevChar = c;
-                    continue;
-                }
-
-                if (inIdentifier)
-                {
-                    currentStatement.Append(c);
-                    if (c == '"')
-                    {
-                        inIdentifier = false;
-                    }
-                    prevChar = c;
-                    continue;
-                }
-
-                switch (c)
-                {
-                    // Check for comment start
-                    case '-' when prevChar == '-':
-                        inSingleLineComment = true;
-                        currentStatement.Append(c);
-                        continue;
-                    case '*' when prevChar == '/':
-                        inMultiLineComment = true;
-                        currentStatement.Append(c);
-                        continue;
-                    // Check for string start
-                    case '\'':
-                        inString = true;
-                        currentStatement.Append(c);
-                        prevChar = c;
-                        continue;
-                    // Check for inIdentifier start
-                    case '"':
-                        inIdentifier = true;
-                        currentStatement.Append(c);
-                        prevChar = c;
-                        continue;
-                    // Check for statement terminator
-                    case ';':
-                        statements.Add(currentStatement.ToString().TrimEnd(';').Trim());
-                        currentStatement.Clear();
-                        prevChar = '\0';
-                        continue;
-                    default:
-                        currentStatement.Append(c);
-                        prevChar = c;
-                        break;
-                }
-            }
-
-            // Add any remaining content
-            if (currentStatement.Length > 0)
-            {
-                statements.Add(currentStatement.ToString());
-            }
-
-            return statements;
-        }
-
         /// <inheritdoc />
         protected override void Process(string sql)
         {
@@ -436,7 +330,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
 
             EnsureConnectionIsOpen();
 
-            var batches = SplitOracleSqlStatements(sql);
+            var batches = OracleSqlParser.SplitOracleSqlStatements(sql);
 
             foreach (var batch in batches)
             {

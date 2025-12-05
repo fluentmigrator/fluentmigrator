@@ -34,7 +34,7 @@ namespace FluentMigrator.Runner.Generators.Redshift
         /// </summary>
         /// <remarks>
         /// This constructor sets up the description generator specifically for Amazon Redshift by
-        /// initializing the <see cref="FluentMigrator.Runner.Generators.Redshift.RedshiftQuoter"/> 
+        /// initializing the <see cref="FluentMigrator.Runner.Generators.Redshift.RedshiftQuoter"/>
         /// to handle SQL quoting and escaping requirements.
         /// </remarks>
         public RedshiftDescriptionGenerator()
@@ -43,12 +43,12 @@ namespace FluentMigrator.Runner.Generators.Redshift
         }
 
         /// <summary>
-        /// Gets the <see cref="FluentMigrator.Runner.Generators.IQuoter"/> instance used for quoting
+        /// Gets the <see cref="IQuoter"/> instance used for quoting
         /// and escaping SQL identifiers and values specific to Amazon Redshift.
         /// </summary>
         /// <remarks>
-        /// This property provides access to the quoting logic implemented by the 
-        /// <see cref="FluentMigrator.Runner.Generators.Redshift.RedshiftQuoter"/> class, 
+        /// This property provides access to the quoting logic implemented by the
+        /// <see cref="FluentMigrator.Runner.Generators.Redshift.RedshiftQuoter"/> class,
         /// which ensures that SQL identifiers and values are correctly escaped and quoted
         /// according to Redshift's requirements.
         /// </remarks>

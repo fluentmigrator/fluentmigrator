@@ -30,6 +30,7 @@ using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Exceptions;
 using FluentMigrator.Runner.Generators;
+using FluentMigrator.Runner.Generators.Generic;
 using FluentMigrator.Runner.Infrastructure;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
@@ -90,7 +91,13 @@ namespace FluentMigrator.Tests.Unit
 
             _migrationLoaderMock.Setup(x => x.LoadMigrations()).Returns(()=> _migrationList);
 
+            var generatorMock = new Mock<IMigrationGenerator>(MockBehavior.Loose);
+            generatorMock.SetupGet(x => x.Quoter)
+                .Returns(new GenericQuoter());
             var generatorAccessorMock = new Mock<IGeneratorAccessor>(MockBehavior.Loose);
+
+            generatorAccessorMock.SetupGet(x => x.Generator)
+                .Returns(generatorMock.Object);
 
             _logMessages = new List<string>();
             var connectionString = IntegrationTestOptions.SqlServer2008.ConnectionString;

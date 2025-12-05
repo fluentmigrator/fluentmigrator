@@ -53,42 +53,38 @@ jobs:
       with:
         dotnet-version: '9.0.x'
 
+    - name: Setup dotnet SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.0.x'
+
     - name: Setup .NET Framework 4.8 Developer Pack (Windows)
       if: matrix.os == 'windows-latest'
       shell: pwsh
       run: |
         # Check registry for .NET Framework 4.8 (Release >= 528040 indicates 4.8)
         try { $reg = Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full' -ErrorAction Stop; $release = $reg.Release } catch { $release = 0 }
-
         if ($release -ge 528040) {
           Write-Host ".NET Framework 4.8 or higher already installed (Release=$release). Skipping install."
           exit 0
         }
-
         Write-Host "No .NET Framework 4.8 Developer Pack found (Release=$release). Installing..."
-
         # Ensure TLS 1.2 for secure downloads
         [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-
         # Resolve the current Microsoft download link by scraping the official docs page
         $downloadPage = 'https://learn.microsoft.com/en-us/dotnet/framework/install/dotnet-48'
         Write-Host "Resolving installer URL from: $downloadPage"
-
         try {
           $page = (Invoke-WebRequest -Uri $downloadPage -ErrorAction Stop).Content
           if ($page -match 'https://download\.visualstudio\.microsoft\.com/[^\s"''<>]+ndp48-devpack-enu\.exe') { $link = $Matches[0] }
         } catch {
           $link = $null
         }
-
         if (-not $link) {
           throw "Failed to resolve download URL for ndp48-devpack-enu.exe from Microsoft documentation. Please update the workflow with a valid installer URL."
         }
-
         Write-Host "Resolved download URL: $link"
-
         $installerPath = Join-Path $env:TEMP 'ndp48-devpack-enu.exe'
-
         # Download with retries; prefer BITS when available
         $maxAttempts = 5
         for ($i = 1; $i -le $maxAttempts; $i++) {
@@ -105,10 +101,8 @@ jobs:
             Start-Sleep -Seconds (15 * $i)
           }
         }
-
         Write-Host "Running installer: $installerPath"
         Start-Process -FilePath $installerPath -ArgumentList '/quiet','/norestart' -Wait -ErrorAction Stop
-
         # Verify installation
         try { $reg = Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full' -ErrorAction Stop; $newRelease = $reg.Release } catch { $newRelease = 0 }
         if ($newRelease -ge 528040) {
@@ -116,10 +110,8 @@ jobs:
         } else {
           throw ".NET Framework 4.8 installation completed but registry Release value is $newRelease."
         }
-
         # Cleanup
         if (Test-Path $installerPath) { Remove-Item $installerPath -Force -ErrorAction SilentlyContinue }
-
     - name: Restore, Build, Test
       run: dotnet test --framework ${{ matrix.dotnet-tfm }} --configuration ${{ env.buildConfiguration }} --verbosity quiet --logger trx --collect:"XPlat Code Coverage" --results-directory "TestResults-${{ matrix.dotnet-tfm }}"
       env:
@@ -135,7 +127,7 @@ jobs:
 
     - name: Combine Coverage Reports
       uses: danielpalme/ReportGenerator-GitHub-Action@v5.5.0
-      if: (!cancelled())
+      if: '!cancelled()'
       with:
         reports: "**/*.cobertura.xml"
         targetdir: "${{ github.workspace }}"
@@ -147,7 +139,7 @@ jobs:
 
     - name: Upload Combined Coverage XML
       uses: actions/upload-artifact@v4
-      if: (!cancelled())
+      if: '!cancelled()'
       with:
         name: coverage-${{ matrix.os }}-${{ matrix.dotnet-tfm }}
         path: ${{ github.workspace }}/Cobertura.xml
@@ -176,6 +168,7 @@ jobs:
 
     - name: Upload Test Result Files
       uses: actions/upload-artifact@v4
+      if: '!cancelled()'
       with:
         name: test-results-${{ matrix.os }}-${{ matrix.dotnet-tfm }}
         path: ${{ github.workspace }}/**/TestResults-${{ matrix.dotnet-tfm }}/**/*
@@ -194,10 +187,8 @@ jobs:
       run: |
         echo "=== dotnet --info ==="
         dotnet --info || true
-
         echo "=== Repo root listing ==="
         ls -la || true
-
         echo "=== Check test project obj folder ==="
         TEST_OBJ="test/FluentMigrator.Analyzers.Tests/obj"
         if [ -d "$TEST_OBJ" ]; then
@@ -206,24 +197,20 @@ jobs:
         else
           echo "$TEST_OBJ does not exist"
         fi
-
     - name: Diagnostics (Windows)
       if: matrix.os == 'windows-latest' && failure()
       shell: pwsh
       run: |
         Write-Host "=== dotnet --info ==="
         dotnet --info
-
         Write-Host "=== Repo root listing ==="
         Get-ChildItem -Force
-
         $testObj = "test\FluentMigrator.Analyzers.Tests\obj"
         Write-Host "=== Check test project obj folder ($testObj) ==="
         if (Test-Path $testObj) {
           Get-ChildItem -Path $testObj -Recurse -File | ForEach-Object {
             $file = $_.FullName
             Write-Host "---- $file ----"
-
             try {
               # Output the first 1000 lines
               Get-Content -Path $file -TotalCount 1000
@@ -231,7 +218,6 @@ jobs:
             catch {
               Write-Warning "Unable to read '$file': $($_.Exception.Message)"
             }
-
             Write-Host ""
           }
         } else {
