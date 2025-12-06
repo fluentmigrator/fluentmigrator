@@ -38,7 +38,9 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.SQLite
 {
-
+    /// <summary>
+    /// The SQLite processor for FluentMigrator.
+    /// </summary>
     // ReSharper disable once InconsistentNaming
     public class SQLiteProcessor : GenericProcessorBase
     {
@@ -47,10 +49,13 @@ namespace FluentMigrator.Runner.Processors.SQLite
         [NotNull]
         private readonly SQLiteQuoter _quoter;
 
-        public override string DatabaseType => ProcessorId.SQLite;
+        /// <inheritdoc />
+        public override string DatabaseType => ProcessorIdConstants.SQLite;
 
+        /// <inheritdoc />
         public override IList<string> DatabaseTypeAliases { get; } = new List<string>();
 
+        /// <inheritdoc />
         public SQLiteProcessor(
             [NotNull] SQLiteDbFactory factory,
             [NotNull] SQLiteGenerator generator,
@@ -65,11 +70,13 @@ namespace FluentMigrator.Runner.Processors.SQLite
             _quoter = quoter;
         }
 
+        /// <inheritdoc />
         public override bool SchemaExists(string schemaName)
         {
             return true;
         }
 
+        /// <inheritdoc />
         public override bool TableExists(string schemaName, string tableName)
         {
             return Exists("select count(*) from {1}sqlite_master where name={0} and type='table'",
@@ -77,6 +84,7 @@ namespace FluentMigrator.Runner.Processors.SQLite
                 !string.IsNullOrWhiteSpace(schemaName) ? _quoter.QuoteValue(schemaName) + "." : string.Empty);
         }
 
+        /// <inheritdoc />
         public override bool ColumnExists(string schemaName, string tableName, string columnName)
         {
             return Exists("select count(*) from {2}sqlite_master AS t, {2}pragma_table_info(t.name) AS c where t.type = 'table' AND t.name = {0} AND c.name = {1}",
@@ -85,6 +93,7 @@ namespace FluentMigrator.Runner.Processors.SQLite
                 !string.IsNullOrWhiteSpace(schemaName) ? _quoter.QuoteValue(schemaName) + "." : string.Empty);
         }
 
+        /// <inheritdoc />
         public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
         {
             return Exists("select count(*) from {2}sqlite_master where name={0} and tbl_name={1} and type='index' and sql LIKE 'CREATE UNIQUE INDEX %'",
@@ -93,6 +102,7 @@ namespace FluentMigrator.Runner.Processors.SQLite
                    !string.IsNullOrWhiteSpace(schemaName) ? _quoter.QuoteValue(schemaName) + "." : string.Empty);
         }
 
+        /// <inheritdoc />
         public override bool IndexExists(string schemaName, string tableName, string indexName)
         {
             return Exists("select count(*) from {2}sqlite_master where name={0} and tbl_name={1} and type='index'",
@@ -101,16 +111,19 @@ namespace FluentMigrator.Runner.Processors.SQLite
                 !string.IsNullOrWhiteSpace(schemaName) ? _quoter.QuoteValue(schemaName) + "." : string.Empty);
         }
 
+        /// <inheritdoc />
         public override bool SequenceExists(string schemaName, string sequenceName)
         {
             return false;
         }
 
+        /// <inheritdoc />
         public override void Execute(string template, params object[] args)
         {
             Process(string.Format(template, args));
         }
 
+        /// <inheritdoc />
         public override bool Exists(string template, params object[] args)
         {
             EnsureConnectionIsOpen();
@@ -131,19 +144,25 @@ namespace FluentMigrator.Runner.Processors.SQLite
             }
         }
 
+        /// <inheritdoc />
         public override DataSet ReadTableData(string schemaName, string tableName)
         {
             return Read("select * from {0}", _quoter.QuoteTableName(tableName, schemaName));
         }
 
+        /// <inheritdoc />
         public override bool DefaultValueExists(string schemaName, string tableName, string columnName, object defaultValue)
         {
             return false;
         }
 
+        /// <inheritdoc />
         public override void Process(PerformDBOperationExpression expression)
         {
-            Logger.LogSay("Performing DB Operation");
+            var message = string.IsNullOrEmpty(expression.Description) 
+                ? "Performing DB Operation" 
+                : $"Performing DB Operation: {expression.Description}";
+            Logger.LogSay(message);
 
             if (Options.PreviewOnly)
                 return;
@@ -153,6 +172,7 @@ namespace FluentMigrator.Runner.Processors.SQLite
             expression.Operation?.Invoke(Connection, Transaction);
         }
 
+        /// <inheritdoc />
         protected override void Process(string sql)
         {
             if (string.IsNullOrEmpty(sql))
@@ -204,8 +224,6 @@ namespace FluentMigrator.Runner.Processors.SQLite
             {
                 ExecuteNonQuery(sql);
             }
-
-
         }
 
         private bool ContainsGo(string sql)
@@ -273,6 +291,7 @@ namespace FluentMigrator.Runner.Processors.SQLite
             }
         }
 
+        /// <inheritdoc />
         public override DataSet Read(string template, params object[] args)
         {
             EnsureConnectionIsOpen();

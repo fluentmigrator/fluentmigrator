@@ -16,5 +16,12 @@
 
 namespace FluentMigrator.Runner.Generators.Snowflake
 {
+    /// <summary>
+    /// Defines a type map specific to the Snowflake database.
+    /// </summary>
+    /// <remarks>
+    /// This interface extends <see cref="FluentMigrator.Runner.Generators.ITypeMap"/> to provide
+    /// mappings between <see cref="System.Data.DbType"/> and Snowflake-specific SQL types.
+    /// </remarks>
     public interface ISnowflakeTypeMap : ITypeMap { }
 }

@@ -2,7 +2,7 @@
   "profiles": {
     "FluentMigrator.DotNet.Cli": {
       "commandName": "Project",
-      "commandLineArgs": "migrate -p SqlServer2016 -c \"Server=localhost;Database=FluentMigrator;Integrated Security=SSPI;TrustServerCertificate=True;\" --assembly ..\\..\\..\\..\\..\\samples\\FluentMigrator.Example.Migrations\\bin\\Debug\\netstandard2.0\\FluentMigrator.Example.Migrations.dll"
+      "commandLineArgs": "migrate -p SqlServer -c \"Server=(localdb)\\MSSQLLocalDB;Database=FluentMigrator;Integrated Security=SSPI;TrustServerCertificate=True;\" --assembly ..\\..\\..\\..\\..\\samples\\FluentMigrator.Example.Migrations\\bin\\Debug\\netstandard2.0\\FluentMigrator.Example.Migrations.dll"
     }
   }
 }

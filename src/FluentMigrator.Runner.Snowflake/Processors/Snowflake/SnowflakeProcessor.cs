@@ -37,6 +37,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace FluentMigrator.Runner.Processors.Snowflake
 {
+    /// <summary>
+    /// The Snowflake processor for FluentMigrator.
+    /// </summary>
     public class SnowflakeProcessor : GenericProcessorBase
     {
         private readonly IServiceProvider _serviceProvider;
@@ -64,12 +67,18 @@ namespace FluentMigrator.Runner.Processors.Snowflake
         /// <inheritdoc />
         public override IList<string> DatabaseTypeAliases => new List<string>();
 
+        /// <summary>
+        /// Gets the quoter for Snowflake SQL.
+        /// </summary>
         public SnowflakeQuoter Quoter { get; }
 
         /// <inheritdoc />
         public override void Process(PerformDBOperationExpression expression)
         {
-            Logger.LogSay("Performing DB Operation");
+            var message = string.IsNullOrEmpty(expression.Description) 
+                ? "Performing DB Operation" 
+                : $"Performing DB Operation: {expression.Description}";
+            Logger.LogSay(message);
             if (Options.PreviewOnly)
             {
                 return;
@@ -79,6 +88,11 @@ namespace FluentMigrator.Runner.Processors.Snowflake
             expression.Operation?.Invoke(Connection, Transaction);
         }
 
+        /// <summary>
+        /// Determines if the SQL contains multiple statements.
+        /// </summary>
+        /// <param name="sql">The SQL string.</param>
+        /// <returns>True if multiple statements are found; otherwise, false.</returns>
         private bool ContainsMultipleStatements(string sql)
         {
             var containsMultipleStatements = false;
@@ -92,6 +106,10 @@ namespace FluentMigrator.Runner.Processors.Snowflake
             return containsMultipleStatements;
         }
 
+        /// <summary>
+        /// Executes a batch non-query SQL command, handling multiple statements.
+        /// </summary>
+        /// <param name="sql">The SQL batch.</param>
         private void ExecuteBatchNonQuery(string sql)
         {
             var sqlBatch = string.Empty;
@@ -141,6 +159,10 @@ namespace FluentMigrator.Runner.Processors.Snowflake
             }
         }
 
+        /// <summary>
+        /// Executes a non-query SQL command.
+        /// </summary>
+        /// <param name="sql">The SQL command.</param>
         private void ExecuteNonQuery(string sql)
         {
             using (var command = CreateCommand(sql))
@@ -163,12 +185,22 @@ namespace FluentMigrator.Runner.Processors.Snowflake
             }
         }
 
+        /// <summary>
+        /// Formats the schema name for Snowflake metadata queries.
+        /// </summary>
+        /// <param name="schema">The schema name.</param>
+        /// <returns>The formatted schema name.</returns>
         private string FormatSnowflakeMetadataQuerySchemaName(string schema)
         {
             var dbSchema = schema ?? Quoter.DefaultSchemaName;
             return FormatHelper.FormatSqlEscape(_quoteIdentifiers ? dbSchema : dbSchema.ToUpperInvariant());
         }
 
+        /// <summary>
+        /// Formats the identifier for Snowflake metadata queries.
+        /// </summary>
+        /// <param name="identifier">The identifier.</param>
+        /// <returns>The formatted identifier.</returns>
         private string FormatSnowflakeMetadataQueryIdentifier(string identifier)
         {
             return FormatHelper.FormatSqlEscape(_quoteIdentifiers ? identifier : identifier.ToUpperInvariant());

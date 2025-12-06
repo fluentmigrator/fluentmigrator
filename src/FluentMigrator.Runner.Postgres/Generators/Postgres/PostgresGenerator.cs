@@ -35,6 +35,9 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Generators.Postgres
 {
+    /// <summary>
+    /// The PostgreSQL SQL generator for FluentMigrator.
+    /// </summary>
     public class PostgresGenerator : GenericGenerator
     {
         private static readonly HashSet<string> _supportedAdditionalFeatures = new HashSet<string>
@@ -42,12 +45,14 @@ namespace FluentMigrator.Runner.Generators.Postgres
             PostgresExtensions.IndexColumnNullsDistinct,
         };
 
+        /// <inheritdoc />
         public PostgresGenerator(
             [NotNull] PostgresQuoter quoter)
             : this(quoter, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()))
         {
         }
 
+        /// <inheritdoc />
         public PostgresGenerator(
             [NotNull] PostgresQuoter quoter,
             [NotNull] IOptions<GeneratorOptions> generatorOptions)
@@ -55,14 +60,21 @@ namespace FluentMigrator.Runner.Generators.Postgres
         {
         }
 
-        protected PostgresGenerator(
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PostgresGenerator"/> class.
+        /// </summary>
+        /// <param name="quoter">The Postgres quoter.</param>
+        /// <param name="generatorOptions">The generator options.</param>
+        /// <param name="typeMap">The Postgres type map.</param>
+        public PostgresGenerator(
             [NotNull] PostgresQuoter quoter,
             [NotNull] IOptions<GeneratorOptions> generatorOptions,
-            IPostgresTypeMap typeMap)
+            [NotNull] IPostgresTypeMap typeMap)
             : base(new PostgresColumn(quoter, typeMap), quoter, new PostgresDescriptionGenerator(quoter), generatorOptions)
         {
         }
 
+        /// <inheritdoc />
         protected PostgresGenerator(
             [NotNull] IColumn column,
             [NotNull] PostgresQuoter quoter,
@@ -76,115 +88,78 @@ namespace FluentMigrator.Runner.Generators.Postgres
             _supportedAdditionalFeatures.Contains(feature)
          || base.IsAdditionalFeatureSupported(feature);
 
-        public override string CreateTable { get { return "CREATE TABLE {0} ({1})"; } }
-        public override string DropTable { get { return "DROP TABLE {0};"; } }
+        /// <inheritdoc />
+        public override string AddColumn => "ALTER TABLE {0} ADD {1}";
+        /// <inheritdoc />
+        public override string AlterColumn => "ALTER TABLE {0} {1}";
+        /// <inheritdoc />
+        public override string RenameTable => "ALTER TABLE {0} RENAME TO {1}";
 
-        public override string AddColumn { get { return "ALTER TABLE {0} ADD {1};"; } }
-        public override string DropColumn { get { return "ALTER TABLE {0} DROP COLUMN {1};"; } }
-        public override string AlterColumn { get { return "ALTER TABLE {0} {1};"; } }
-        public override string RenameColumn { get { return "ALTER TABLE {0} RENAME COLUMN {1} TO {2};"; } }
+        /// <inheritdoc />
+        public override string GeneratorId => GeneratorIdConstants.PostgreSQL;
 
-        public override string UpdateData { get { return "UPDATE {0} SET {1} WHERE {2};"; } }
-        public override string DeleteData { get { return "DELETE FROM {0} WHERE {1};"; } }
+        /// <inheritdoc />
+        public override List<string> GeneratorIdAliases => [GeneratorIdConstants.PostgreSQL, GeneratorIdConstants.Postgres];
 
-        protected override StringBuilder AppendSqlStatementEndToken(StringBuilder stringBuilder)
-        {
-            return stringBuilder.Append(" ");
-        }
-
-        public override string Generate(AlterTableExpression expression)
-        {
-            var alterStatement = new StringBuilder();
-            var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatement(expression);
-            alterStatement.Append(base.Generate(expression));
-            if (string.IsNullOrEmpty(descriptionStatement))
-            {
-                alterStatement.Append(descriptionStatement);
-            }
-            return alterStatement.ToString();
-        }
-
+        /// <inheritdoc />
         public override string Generate(CreateSchemaExpression expression)
         {
-            return string.Format("CREATE SCHEMA {0};", Quoter.QuoteSchemaName(expression.SchemaName));
+            return FormatStatement(CreateSchema, Quoter.QuoteSchemaName(expression.SchemaName));
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteSchemaExpression expression)
         {
-            return string.Format("DROP SCHEMA {0};", Quoter.QuoteSchemaName(expression.SchemaName));
+            return FormatStatement(DropSchema, Quoter.QuoteSchemaName(expression.SchemaName));
         }
 
-        public override string Generate(CreateTableExpression expression)
-        {
-            var createStatement = new StringBuilder();
-            createStatement.AppendFormat(
-                CreateTable,
-                Quoter.QuoteTableName(expression.TableName, expression.SchemaName),
-                Column.Generate(expression.Columns, Quoter.Quote(expression.TableName)));
-            var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatements(expression)
-                ?.ToList();
-            createStatement.Append(";");
-
-            if (descriptionStatement != null && descriptionStatement.Count != 0)
-            {
-                createStatement.Append(string.Join(";", descriptionStatement.ToArray()));
-                createStatement.Append(";");
-            }
-            return createStatement.ToString();
-        }
-
+        /// <summary>
+        /// Generates the SQL statement to alter a column in a PostgreSQL database.
+        /// </summary>
+        /// <param name="expression">
+        /// The <see cref="FluentMigrator.Expressions.AlterColumnExpression"/> containing the details of the column alteration.
+        /// </param>
+        /// <returns>
+        /// A <see cref="string"/> representing the SQL statement to alter the column.
+        /// </returns>
+        /// <remarks>
+        /// This method handles compatibility issues, such as unsupported virtual computed columns, 
+        /// and appends additional SQL statements for column descriptions if applicable.
+        /// </remarks>
         public override string Generate(AlterColumnExpression expression)
         {
+            if (expression.Column.Expression != null && !expression.Column.ExpressionStored)
+            {
+                CompatibilityMode.HandleCompatibility("Virtual computed columns are not supported");
+            }
             var alterStatement = new StringBuilder();
             alterStatement.AppendFormat(
                 AlterColumn,
                 Quoter.QuoteTableName(expression.TableName, expression.SchemaName),
                 ((PostgresColumn)Column).GenerateAlterClauses(expression.Column));
+
+            AppendSqlStatementEndToken(alterStatement);
+
             var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatement(expression);
+
             if (!string.IsNullOrEmpty(descriptionStatement))
             {
-                alterStatement.Append(";");
                 alterStatement.Append(descriptionStatement);
+                AppendSqlStatementEndToken(alterStatement);
             }
+
             return alterStatement.ToString();
         }
 
-        public override string Generate(CreateColumnExpression expression)
-        {
-            var createStatement = new StringBuilder();
-            createStatement.Append(base.Generate(expression));
-
-            var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatement(expression);
-            if (!string.IsNullOrEmpty(descriptionStatement))
-            {
-                createStatement.Append(";");
-                createStatement.Append(descriptionStatement);
-            }
-
-            return createStatement.ToString();
-        }
-
-        public override string Generate(DeleteColumnExpression expression)
-        {
-            StringBuilder builder = new StringBuilder();
-            foreach (string columnName in expression.ColumnNames)
-            {
-                if (expression.ColumnNames.First() != columnName) builder.AppendLine("");
-                builder.AppendFormat(DropColumn,
-                    Quoter.QuoteTableName(expression.TableName, expression.SchemaName),
-                    Quoter.QuoteColumnName(columnName));
-            }
-            return builder.ToString();
-        }
-
+        /// <inheritdoc />
         public override string Generate(CreateForeignKeyExpression expression)
         {
             var primaryColumns = GetColumnList(expression.ForeignKey.PrimaryColumns);
             var foreignColumns = GetColumnList(expression.ForeignKey.ForeignColumns);
 
-            const string sql = "ALTER TABLE {0} ADD CONSTRAINT {1} FOREIGN KEY ({2}) REFERENCES {3} ({4}){5}{6};";
+            const string sql = "ALTER TABLE {0} ADD CONSTRAINT {1} FOREIGN KEY ({2}) REFERENCES {3} ({4}){5}{6}";
 
-            return string.Format(sql,
+            return FormatStatement(sql,
                 Quoter.QuoteTableName(expression.ForeignKey.ForeignTable, expression.ForeignKey.ForeignTableSchema),
                 Quoter.Quote(expression.ForeignKey.Name),
                 foreignColumns,
@@ -195,14 +170,28 @@ namespace FluentMigrator.Runner.Generators.Postgres
             );
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteForeignKeyExpression expression)
         {
-            return string.Format("ALTER TABLE {0} DROP CONSTRAINT {1};",
+            return FormatStatement("ALTER TABLE {0} DROP CONSTRAINT {1}",
                 Quoter.QuoteTableName(expression.ForeignKey.ForeignTable, expression.ForeignKey.ForeignTableSchema),
                 Quoter.Quote(expression.ForeignKey.Name));
         }
 
-
+        /// <summary>
+        /// Generates the "INCLUDE" clause for a PostgreSQL index creation statement.
+        /// </summary>
+        /// <param name="column">The <see cref="CreateIndexExpression"/> containing the index definition.</param>
+        /// <returns>
+        /// A string representing the "INCLUDE" clause for the index, or an empty string if no includes are defined.
+        /// </returns>
+        /// <exception cref="NotSupportedException">
+        /// Thrown when the current version of PostgreSQL does not support include indexes.
+        /// </exception>
+        /// <remarks>
+        /// This method retrieves additional features from the <paramref name="column"/> using the key
+        /// <see cref="PostgresExtensions.IncludesList"/>. If no includes are defined, an empty string is returned.
+        /// </remarks>
         protected virtual string GetIncludeString(CreateIndexExpression column)
         {
             var includes = column.GetAdditionalFeature<IList<PostgresIndexIncludeDefinition>>(PostgresExtensions.IncludesList);
@@ -215,6 +204,21 @@ namespace FluentMigrator.Runner.Generators.Postgres
             throw new NotSupportedException("The current version doesn't support include index. Please use Postgres 11.");
         }
 
+        /// <summary>
+        /// Determines the index algorithm to be used for a PostgreSQL index creation based on the provided
+        /// <see cref="FluentMigrator.Expressions.CreateIndexExpression"/>.
+        /// </summary>
+        /// <param name="expression">
+        /// The <see cref="FluentMigrator.Expressions.CreateIndexExpression"/> containing the index definition and additional features.
+        /// </param>
+        /// <returns>
+        /// The <see cref="FluentMigrator.Model.Algorithm"/> to be used for the index. Defaults to <see cref="FluentMigrator.Model.Algorithm.BTree"/>
+        /// if no specific algorithm is defined.
+        /// </returns>
+        /// <remarks>
+        /// This method retrieves the algorithm from the additional features of the <paramref name="expression"/> using
+        /// the <c>PostgresExtensions.IndexAlgorithm</c> key. If no algorithm is specified, it defaults to <see cref="FluentMigrator.Model.Algorithm.BTree"/>.
+        /// </remarks>
         protected virtual Algorithm GetIndexMethod(CreateIndexExpression expression)
         {
             var algorithm = expression.GetAdditionalFeature<PostgresIndexAlgorithmDefinition>(PostgresExtensions.IndexAlgorithm);
@@ -226,6 +230,22 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return algorithm.Algorithm;
         }
 
+        /// <summary>
+        /// Generates a filter clause for a PostgreSQL index creation statement based on the provided
+        /// <see cref="CreateIndexExpression"/>. The filter clause is derived from additional features
+        /// or specific PostgreSQL index options, such as "WITH NULLS DISTINCT".
+        /// </summary>
+        /// <param name="expression">
+        /// The <see cref="CreateIndexExpression"/> containing the index definition and additional features.
+        /// </param>
+        /// <returns>
+        /// A string representing the filter clause for the index, or an empty string if the filter cannot
+        /// be combined with certain PostgreSQL options. Returns <c>null</c> if no filter or relevant options are specified.
+        /// </returns>
+        /// <remarks>
+        /// If both a filter and a "WITH NULLS DISTINCT" option are specified, compatibility issues with
+        /// PostgreSQL 14 or older are handled by returning an empty string.
+        /// </remarks>
         protected virtual string GetFilter(CreateIndexExpression expression)
         {
             var filter = expression.Index.GetAdditionalFeature<string>(PostgresExtensions.IndexFilter);
@@ -245,6 +265,22 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return nullsDistinctString;
         }
 
+        /// <summary>
+        /// Generates a SQL condition string for handling "nulls distinct" behavior in a PostgreSQL index.
+        /// </summary>
+        /// <param name="index">The <see cref="IndexDefinition"/> representing the index for which the condition is generated.</param>
+        /// <returns>
+        /// A SQL condition string to be included in the WHERE clause of the index definition, 
+        /// or an empty string if no "nulls distinct" behavior is applicable.
+        /// </returns>
+        /// <remarks>
+        /// This method evaluates the "nulls distinct" feature for both the index and its columns.
+        /// If "nulls distinct" is enabled, it ensures that only non-null values are considered for the index.
+        /// This feature is only applicable for unique indexes.
+        /// </remarks>
+        /// <exception cref="CompatibilityModeExtension">
+        /// Thrown if "nulls distinct" is used on a non-unique index, as this is not supported.
+        /// </exception>
         protected virtual string GetWithNullsDistinctStringInWhere(IndexDefinition index)
         {
             bool? GetNullsDistinct(IndexColumnDefinition column)
@@ -271,11 +307,34 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return condition.Length == 0 ? string.Empty : $" WHERE {condition}";
         }
 
+        /// <summary>
+        /// Generates a SQL fragment for handling "NULLS DISTINCT" behavior in PostgreSQL index definitions.
+        /// </summary>
+        /// <param name="index">The <see cref="IndexDefinition"/> representing the index for which the SQL fragment is generated.</param>
+        /// <returns>A SQL fragment string that specifies the "NULLS DISTINCT" behavior for the index, or an empty string if not applicable.</returns>
+        /// <remarks>
+        /// This method is intended to be overridden in derived classes to provide specific behavior for different PostgreSQL versions.
+        /// </remarks>
         protected virtual string GetWithNullsDistinctString(IndexDefinition index)
         {
             return string.Empty;
         }
 
+        /// <summary>
+        /// Generates the "CONCURRENTLY" keyword for a PostgreSQL "CREATE INDEX" statement
+        /// if the <see cref="CreateIndexExpression"/> specifies the "Concurrently" feature.
+        /// </summary>
+        /// <param name="expression">
+        /// The <see cref="CreateIndexExpression"/> containing the index definition and additional features.
+        /// </param>
+        /// <returns>
+        /// A string containing " CONCURRENTLY" if the "Concurrently" feature is enabled; otherwise, an empty string.
+        /// </returns>
+        /// <remarks>
+        /// This method checks for the presence of the "Concurrently" feature in the additional features
+        /// of the provided <see cref="CreateIndexExpression"/>. If the feature is enabled, it appends
+        /// the "CONCURRENTLY" keyword to the generated SQL.
+        /// </remarks>
         protected virtual string GetAsConcurrently(CreateIndexExpression expression)
         {
             var asConcurrently = expression.GetAdditionalFeature<PostgresIndexConcurrentlyDefinition>(PostgresExtensions.Concurrently);
@@ -288,6 +347,16 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return " CONCURRENTLY";
         }
 
+        /// <summary>
+        /// Generates the "ONLY" clause for a PostgreSQL index creation statement if the index is restricted to a specific table.
+        /// </summary>
+        /// <param name="expression">The <see cref="CreateIndexExpression"/> containing the index definition.</param>
+        /// <returns>
+        /// A string representing the "ONLY" clause if applicable; otherwise, an empty string.
+        /// </returns>
+        /// <exception cref="NotSupportedException">
+        /// Thrown when the "ONLY" clause is requested but the PostgreSQL version does not support it.
+        /// </exception>
         protected virtual string GetAsOnly(CreateIndexExpression expression)
         {
             var asOnly = expression.GetAdditionalFeature<PostgresIndexOnlyDefinition>(PostgresExtensions.Only);
@@ -300,6 +369,18 @@ namespace FluentMigrator.Runner.Generators.Postgres
             throw new NotSupportedException("The current version doesn't support ONLY. Please use Postgres 11 or higher.");
         }
 
+        /// <summary>
+        /// Generates the SQL fragment for specifying the sorting of NULL values in an index column.
+        /// </summary>
+        /// <param name="column">The <see cref="IndexColumnDefinition"/> representing the index column.</param>
+        /// <returns>
+        /// A string containing the SQL fragment for NULL sorting, such as "NULLS FIRST" or "NULLS LAST",
+        /// or an empty string if no NULL sorting is specified.
+        /// </returns>
+        /// <remarks>
+        /// This method retrieves the NULL sorting behavior from the additional features of the column
+        /// using the key <see cref="PostgresExtensions.NullsSort"/>.
+        /// </remarks>
         protected virtual string GetNullsSort(IndexColumnDefinition column)
         {
             var sort = column.GetAdditionalFeature<PostgresIndexNullsSort>(PostgresExtensions.NullsSort);
@@ -316,6 +397,19 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return " NULLS LAST";
         }
 
+        /// <summary>
+        /// Retrieves the tablespace definition for a PostgreSQL index creation statement.
+        /// </summary>
+        /// <param name="expression">
+        /// The <see cref="FluentMigrator.Expressions.CreateIndexExpression"/> containing the index definition.
+        /// </param>
+        /// <returns>
+        /// A <see cref="string"/> representing the tablespace clause for the index, or an empty string if no tablespace is specified.
+        /// </returns>
+        /// <remarks>
+        /// The method checks for an additional feature named <c>PostgresExtensions.IndexTablespace</c> in the index definition.
+        /// If a valid tablespace is specified, it returns a formatted "TABLESPACE" clause; otherwise, it returns an empty string.
+        /// </remarks>
         protected virtual string GetTablespace(CreateIndexExpression expression)
         {
             var tablespace = expression.Index.GetAdditionalFeature<string>(PostgresExtensions.IndexTablespace);
@@ -327,6 +421,21 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return string.Empty;
         }
 
+        /// <summary>
+        /// Generates a string representation of the storage parameters for an index in PostgreSQL.
+        /// </summary>
+        /// <param name="expression">
+        /// The <see cref="FluentMigrator.Expressions.CreateIndexExpression"/> containing the index definition
+        /// and additional features to be included in the storage parameters.
+        /// </param>
+        /// <returns>
+        /// A string containing the formatted storage parameters for the index, or an empty string if no parameters are specified.
+        /// </returns>
+        /// <remarks>
+        /// This method processes various PostgreSQL-specific index storage parameters, such as fill factor, fast update,
+        /// buffering, pending list limit, pages per range, auto-summarize, and vacuum cleanup index scale factor.
+        /// It ensures that only allowed parameters are included in the final output.
+        /// </remarks>
         protected virtual string GetWithIndexStorageParameters(CreateIndexExpression expression)
         {
             var allow = GetAllowIndexStorageParameters();
@@ -398,6 +507,18 @@ namespace FluentMigrator.Runner.Generators.Postgres
             }
         }
 
+        /// <summary>
+        /// Retrieves a set of allowed index storage parameters for PostgreSQL.
+        /// </summary>
+        /// <remarks>
+        /// This method defines the default set of index storage parameters that are supported
+        /// by PostgreSQL. Derived classes can override this method to extend or modify the
+        /// list of allowed parameters.
+        /// </remarks>
+        /// <returns>
+        /// A <see cref="HashSet{T}"/> containing the names of the allowed index storage parameters,
+        /// using a case-insensitive string comparer.
+        /// </returns>
         protected virtual HashSet<string> GetAllowIndexStorageParameters()
         {
             return new HashSet<string>(StringComparer.InvariantCultureIgnoreCase)
@@ -407,6 +528,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
             };
         }
 
+        /// <inheritdoc />
         public override string Generate(CreateIndexExpression expression)
         {
             var result = new StringBuilder("CREATE");
@@ -460,40 +582,23 @@ namespace FluentMigrator.Runner.Generators.Postgres
                 .Append(GetWithNullsDistinctString(expression.Index))
                 .Append(GetWithIndexStorageParameters(expression))
                 .Append(GetTablespace(expression))
-                .Append(GetFilter(expression))
-                .Append(";");
+                .Append(GetFilter(expression));
+
+            AppendSqlStatementEndToken(result);
 
             return result.ToString();
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteIndexExpression expression)
         {
             var quotedSchema = Quoter.QuoteSchemaName(expression.Index.SchemaName);
             var quotedIndex = Quoter.QuoteIndexName(expression.Index.Name);
             var indexName = string.IsNullOrEmpty(quotedSchema) ? quotedIndex : $"{quotedSchema}.{quotedIndex}";
-            return string.Format("DROP INDEX {0};", indexName);
+            return FormatStatement("DROP INDEX {0}", indexName);
         }
 
-        public override string Generate(DeleteTableExpression expression)
-        {
-            return
-                $"DROP TABLE{(expression.IfExists ? " IF EXISTS" : "")} {Quoter.QuoteTableName(expression.TableName, expression.SchemaName)};";
-        }
-
-        public override string Generate(RenameTableExpression expression)
-        {
-            return string.Format("ALTER TABLE {0} RENAME TO {1};", Quoter.QuoteTableName(expression.OldName, expression.SchemaName), Quoter.Quote(expression.NewName));
-        }
-
-        public override string Generate(RenameColumnExpression expression)
-        {
-            return string.Format(
-                RenameColumn,
-                Quoter.QuoteTableName(expression.TableName, expression.SchemaName),
-                Quoter.QuoteColumnName(expression.OldName),
-                Quoter.QuoteColumnName(expression.NewName));
-        }
-
+        /// <inheritdoc />
         public override string Generate(InsertDataExpression expression)
         {
             var result = new StringBuilder();
@@ -509,39 +614,47 @@ namespace FluentMigrator.Runner.Generators.Postgres
 
                 var columns = GetColumnList(columnNames);
                 var data = GetDataList(columnData);
-                result.AppendFormat("INSERT INTO {0} ({1}){3} VALUES ({2});",
+                result.AppendFormat("INSERT INTO {0} ({1}){3} VALUES ({2})",
                     Quoter.QuoteTableName(expression.TableName, expression.SchemaName),
                     columns,
                     data,
                     GetOverridingIdentityValuesString(expression));
+
+                AppendSqlStatementEndToken(result);
             }
+
             return result.ToString();
         }
 
+        /// <inheritdoc />
         public override string Generate(AlterDefaultConstraintExpression expression)
         {
-            return string.Format(
-                "ALTER TABLE {0} ALTER {1} DROP DEFAULT, ALTER {1} {2};",
+            return FormatStatement(
+                "ALTER TABLE {0} ALTER {1} DROP DEFAULT, ALTER {1} {2}",
                 Quoter.QuoteTableName(expression.TableName, expression.SchemaName),
                 Quoter.QuoteColumnName(expression.ColumnName),
                 ((PostgresColumn)Column).FormatAlterDefaultValue(expression.ColumnName, expression.DefaultValue));
         }
 
+        /// <inheritdoc />
         public override string Generate(AlterSchemaExpression expression)
         {
-            return string.Format("ALTER TABLE {0} SET SCHEMA {1};", Quoter.QuoteTableName(expression.TableName, expression.SourceSchemaName), Quoter.QuoteSchemaName(expression.DestinationSchemaName));
+            return FormatStatement("ALTER TABLE {0} SET SCHEMA {1}", Quoter.QuoteTableName(expression.TableName, expression.SourceSchemaName), Quoter.QuoteSchemaName(expression.DestinationSchemaName));
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteDefaultConstraintExpression expression)
         {
-            return string.Format("ALTER TABLE {0} ALTER {1} DROP DEFAULT;", Quoter.QuoteTableName(expression.TableName, expression.SchemaName), Quoter.Quote(expression.ColumnName));
+            return FormatStatement("ALTER TABLE {0} ALTER {1} DROP DEFAULT", Quoter.QuoteTableName(expression.TableName, expression.SchemaName), Quoter.Quote(expression.ColumnName));
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteConstraintExpression expression)
         {
-            return string.Format("ALTER TABLE {0} DROP CONSTRAINT {1};", Quoter.QuoteTableName(expression.Constraint.TableName, expression.Constraint.SchemaName), Quoter.Quote(expression.Constraint.ConstraintName));
+            return FormatStatement("ALTER TABLE {0} DROP CONSTRAINT {1}", Quoter.QuoteTableName(expression.Constraint.TableName, expression.Constraint.SchemaName), Quoter.Quote(expression.Constraint.ConstraintName));
         }
 
+        /// <inheritdoc />
         public override string Generate(CreateConstraintExpression expression)
         {
             var constraintType = (expression.Constraint.IsPrimaryKeyConstraint) ? "PRIMARY KEY" : "UNIQUE";
@@ -553,14 +666,19 @@ namespace FluentMigrator.Runner.Generators.Postgres
                 columns[i] = Quoter.QuoteColumnName(expression.Constraint.Columns.ElementAt(i));
             }
 
-            return string.Format(
-                "ALTER TABLE {0} ADD CONSTRAINT {1} {2} ({3});",
+            return FormatStatement(
+                "ALTER TABLE {0} ADD CONSTRAINT {1} {2} ({3})",
                 Quoter.QuoteTableName(expression.Constraint.TableName, expression.Constraint.SchemaName),
                 Quoter.QuoteConstraintName(expression.Constraint.ConstraintName),
                 constraintType,
                 string.Join(", ", columns));
         }
 
+        /// <summary>
+        /// Generates a comma-separated list of quoted column names for use in SQL statements.
+        /// </summary>
+        /// <param name="columns">The collection of column names to be quoted and concatenated.</param>
+        /// <returns>A string containing the quoted column names, separated by commas.</returns>
         protected string GetColumnList(IEnumerable<string> columns)
         {
             var result = "";
@@ -571,6 +689,11 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return result.TrimEnd(',');
         }
 
+        /// <summary>
+        /// Constructs a comma-separated list of quoted values from the provided data.
+        /// </summary>
+        /// <param name="data">The list of objects to be quoted and concatenated.</param>
+        /// <returns>A string containing the quoted values, separated by commas.</returns>
         protected string GetDataList(List<object> data)
         {
             var result = "";
@@ -581,6 +704,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return result.TrimEnd(',');
         }
 
+        /// <inheritdoc />
         public override string Generate(CreateSequenceExpression expression)
         {
             var result = new StringBuilder("CREATE SEQUENCE ");
@@ -626,14 +750,27 @@ namespace FluentMigrator.Runner.Generators.Postgres
                 result.Append(" CYCLE");
             }
 
-            return string.Format("{0};", result.ToString());
+            AppendSqlStatementEndToken(result);
+
+            return result.ToString();
         }
 
-        public override string Generate(DeleteSequenceExpression expression)
-        {
-            return string.Format("{0};", base.Generate(expression));
-        }
-
+        /// <summary>
+        /// Generates a string representing the "OVERRIDING {SYSTEM|USER} VALUE" clause for an INSERT statement
+        /// in PostgreSQL, based on the provided <see cref="InsertDataExpression"/>.
+        /// </summary>
+        /// <param name="expression">
+        /// The <see cref="InsertDataExpression"/> containing the data and additional features
+        /// for the INSERT operation.
+        /// </param>
+        /// <returns>
+        /// A string representing the "OVERRIDING {SYSTEM|USER} VALUE" clause if the feature is specified;
+        /// otherwise, an empty string.
+        /// </returns>
+        /// <exception cref="NotSupportedException">
+        /// Thrown if the feature is specified but the current PostgreSQL version does not support
+        /// "OVERRIDING {SYSTEM|USER} VALUE".
+        /// </exception>
         protected virtual string GetOverridingIdentityValuesString(InsertDataExpression expression)
         {
             if (!expression.AdditionalFeatures.ContainsKey(PostgresExtensions.OverridingIdentityValues))

@@ -23,21 +23,28 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Announcers
 {
+    /// <summary>
+    /// An announcer that writes output to a <see cref="TextWriter"/> and appends "GO" after SQL statements.
+    /// </summary>
     [Obsolete]
     public class TextWriterWithGoAnnouncer : TextWriterAnnouncer
     {
+        /// <inheritdoc />
         public TextWriterWithGoAnnouncer(TextWriter writer)
             : base(writer)
         { }
 
-        public  TextWriterWithGoAnnouncer(Action<string> write)
+        /// <inheritdoc />
+        public TextWriterWithGoAnnouncer(Action<string> write)
             : base(write)
         { }
 
-        public  TextWriterWithGoAnnouncer(IOptions<TextWriterAnnouncerOptions> options)
+        /// <inheritdoc />
+        public TextWriterWithGoAnnouncer(IOptions<TextWriterAnnouncerOptions> options)
             : base(options)
         { }
 
+        /// <inheritdoc />
         public override void Sql(string sql)
         {
             if (!ShowSql) return;

@@ -16,6 +16,7 @@
 
 using System.Data.Common;
 
+using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Postgres;
 using FluentMigrator.Runner.Generators.Postgres92;
 using FluentMigrator.Runner.Processors;
@@ -23,6 +24,7 @@ using FluentMigrator.Runner.Processors.Postgres;
 using FluentMigrator.Runner.Processors.Postgres92;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner
@@ -40,12 +42,20 @@ namespace FluentMigrator.Runner
         /// <returns>The migration runner builder</returns>
         public static IMigrationRunnerBuilder AddPostgres(this IMigrationRunnerBuilder builder, DbProviderFactory dbProviderFactory = null)
         {
+            builder.Services.TryAddScoped<IPostgresTypeMap, PostgresTypeMap>();
             builder.Services
                 .AddScoped<PostgresProcessor>()
-                .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<PostgresProcessor>())
-                .AddScoped<IPostgresTypeMap>(sp => new PostgresTypeMap())
-                .AddScoped<PostgresGenerator>()
-                .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<PostgresGenerator>());
+                .AddScoped<Postgres15_0Processor>()
+                .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<Postgres15_0Processor>())
+                .AddScoped(sp => new PostgresGenerator(
+                    sp.GetRequiredService<PostgresQuoter>(),
+                    sp.GetRequiredService<IOptions<GeneratorOptions>>(),
+                    sp.GetRequiredService<IPostgresTypeMap>()))
+                .AddScoped(sp => new Postgres15_0Generator(
+                    sp.GetRequiredService<PostgresQuoter>(),
+                    sp.GetRequiredService<IOptions<GeneratorOptions>>(),
+                    sp.GetRequiredService<IPostgresTypeMap>()))
+                .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<Postgres15_0Generator>());
 
             return builder.AddCommonPostgresServices(dbProviderFactory);
         }
@@ -58,11 +68,14 @@ namespace FluentMigrator.Runner
         /// <returns>The migration runner builder</returns>
         public static IMigrationRunnerBuilder AddPostgres92(this IMigrationRunnerBuilder builder, DbProviderFactory dbProviderFactory = null)
         {
+            builder.Services.TryAddScoped<IPostgresTypeMap, Postgres92TypeMap>();
             builder.Services
                 .AddScoped<Postgres92Processor>()
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<Postgres92Processor>())
-                .AddScoped<IPostgresTypeMap>(sp => new Postgres92TypeMap())
-                .AddScoped<Postgres92Generator>()
+                .AddScoped(sp => new Postgres92Generator(
+                    sp.GetRequiredService<PostgresQuoter>(),
+                    sp.GetRequiredService<IOptions<GeneratorOptions>>(),
+                    sp.GetRequiredService<IPostgresTypeMap>()))
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<Postgres92Generator>());
 
             return builder.AddCommonPostgresServices(dbProviderFactory);
@@ -77,10 +90,14 @@ namespace FluentMigrator.Runner
         /// <returns>The migration runner builder</returns>
         public static IMigrationRunnerBuilder AddPostgres10_0(this IMigrationRunnerBuilder builder, DbProviderFactory dbProviderFactory = null)
         {
+            builder.Services.TryAddScoped<IPostgresTypeMap, Postgres92TypeMap>();
             builder.Services
                 .AddScoped<Postgres10_0Processor>()
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<Postgres10_0Processor>())
-                .AddScoped<Postgres10_0Generator>()
+                .AddScoped(sp => new Postgres10_0Generator(
+                    sp.GetRequiredService<PostgresQuoter>(),
+                    sp.GetRequiredService<IOptions<GeneratorOptions>>(),
+                    sp.GetRequiredService<IPostgresTypeMap>()))
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<Postgres10_0Generator>());
             return builder.AddCommonPostgresServices(dbProviderFactory);
         }
@@ -93,10 +110,14 @@ namespace FluentMigrator.Runner
         /// <returns>The migration runner builder</returns>
         public static IMigrationRunnerBuilder AddPostgres11_0(this IMigrationRunnerBuilder builder, DbProviderFactory dbProviderFactory = null)
         {
+            builder.Services.TryAddScoped<IPostgresTypeMap, Postgres92TypeMap>();
             builder.Services
                 .AddScoped<Postgres11_0Processor>()
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<Postgres11_0Processor>())
-                .AddScoped<Postgres11_0Generator>()
+                .AddScoped(sp => new Postgres11_0Generator(
+                    sp.GetRequiredService<PostgresQuoter>(),
+                    sp.GetRequiredService<IOptions<GeneratorOptions>>(),
+                    sp.GetRequiredService<IPostgresTypeMap>()))
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<Postgres11_0Generator>());
             return builder.AddCommonPostgresServices(dbProviderFactory);
         }
@@ -109,10 +130,14 @@ namespace FluentMigrator.Runner
         /// <returns>The migration runner builder</returns>
         public static IMigrationRunnerBuilder AddPostgres15_0(this IMigrationRunnerBuilder builder, DbProviderFactory dbProviderFactory = null)
         {
+            builder.Services.TryAddScoped<IPostgresTypeMap, Postgres92TypeMap>();
             builder.Services
                 .AddScoped<Postgres15_0Processor>()
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<Postgres15_0Processor>())
-                .AddScoped<Postgres15_0Generator>()
+                .AddScoped(sp => new Postgres15_0Generator(
+                    sp.GetRequiredService<PostgresQuoter>(),
+                    sp.GetRequiredService<IOptions<GeneratorOptions>>(),
+                    sp.GetRequiredService<IPostgresTypeMap>()))
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<Postgres15_0Generator>());
             return builder.AddCommonPostgresServices(dbProviderFactory);
         }

@@ -20,29 +20,39 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Generators.Oracle
 {
+    /// <summary>
+    /// The Oracle 12c SQL generator for FluentMigrator.
+    /// </summary>
     public class Oracle12CGenerator : OracleGenerator, IOracle12CGenerator
     {
+        /// <inheritdoc />
         public Oracle12CGenerator()
             : this(false)
         {
         }
 
+        /// <inheritdoc />
         public Oracle12CGenerator(bool useQuotedIdentifiers)
             : this(GetQuoter(useQuotedIdentifiers))
         {
         }
 
+        /// <inheritdoc />
         public Oracle12CGenerator(
             [NotNull] OracleQuoterBase quoter)
             : this(quoter, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()))
         {
         }
 
+        /// <inheritdoc />
         public Oracle12CGenerator(
             [NotNull] OracleQuoterBase quoter,
             [NotNull] IOptions<GeneratorOptions> generatorOptions)
             : base(new Oracle12CColumn(quoter), quoter, new OracleDescriptionGenerator(), generatorOptions)
         {
         }
+
+        /// <inheritdoc />
+        public override string GeneratorId => GeneratorIdConstants.Oracle12c;
     }
 }

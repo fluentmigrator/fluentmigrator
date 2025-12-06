@@ -16,8 +16,12 @@
 
 namespace FluentMigrator.Runner.Generators.DB2.iSeries
 {
+    /// <summary>
+    /// The DB2 iSeries SQL quoter for FluentMigrator.
+    /// </summary>
     public class Db2ISeriesQuoter : Db2Quoter
     {
+        /// <inheritdoc />
         public override string QuoteConstraintName(string constraintName, string schemaName = null)
         {
             return CreateSchemaPrefixedQuotedIdentifier(
@@ -25,6 +29,7 @@ namespace FluentMigrator.Runner.Generators.DB2.iSeries
                 IsQuoted(constraintName) ? constraintName : Quote(constraintName));
         }
 
+        /// <inheritdoc />
         public override string QuoteIndexName(string indexName, string schemaName)
         {
             return CreateSchemaPrefixedQuotedIdentifier(

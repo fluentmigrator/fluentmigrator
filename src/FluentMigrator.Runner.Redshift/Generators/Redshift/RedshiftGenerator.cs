@@ -30,22 +30,32 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Generators.Redshift
 {
+    /// <summary>
+    /// The Amazon Redshift SQL generator for FluentMigrator.
+    /// </summary>
     public class RedshiftGenerator : GenericGenerator
     {
-        public override string UpdateData { get { return "UPDATE {0} SET {1} WHERE {2};"; } }
-        public override string DeleteData { get { return "DELETE FROM {0} WHERE {1};"; } }
+        /// <inheritdoc />
+        public override string RenameTable => "ALTER TABLE {0} RENAME TO {1}";
+        /// <inheritdoc />
+        public override string AlterColumn => "ALTER TABLE {0} {1}";
+        /// <inheritdoc />
+        public override string AddColumn => "ALTER TABLE {0} ADD {1}";
 
+        /// <inheritdoc />
         public RedshiftGenerator()
             : this(new RedshiftQuoter())
         {
         }
 
+        /// <inheritdoc />
         public RedshiftGenerator(
             [NotNull] RedshiftQuoter quoter)
             : this(quoter, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()))
         {
         }
 
+        /// <inheritdoc />
         public RedshiftGenerator(
             [NotNull] RedshiftQuoter quoter,
             [NotNull] IOptions<GeneratorOptions> generatorOptions)
@@ -53,11 +63,7 @@ namespace FluentMigrator.Runner.Generators.Redshift
         {
         }
 
-        protected override StringBuilder AppendSqlStatementEndToken(StringBuilder stringBuilder)
-        {
-            return stringBuilder.Append(" ");
-        }
-
+        /// <inheritdoc />
         public override string Generate(AlterTableExpression expression)
         {
             var alterStatement = new StringBuilder();
@@ -67,87 +73,133 @@ namespace FluentMigrator.Runner.Generators.Redshift
             {
                 alterStatement.Append(descriptionStatement);
             }
+
+            AppendSqlStatementEndToken(alterStatement);
+
             return alterStatement.ToString();
         }
 
+        /// <inheritdoc />
+        public override string GeneratorId => GeneratorIdConstants.Redshift;
+
+        /// <inheritdoc />
+        public override List<string> GeneratorIdAliases => new List<string> { GeneratorIdConstants.Redshift };
+
+        /// <inheritdoc />
         public override string Generate(CreateSchemaExpression expression)
         {
-            return string.Format("CREATE SCHEMA {0};", Quoter.QuoteSchemaName(expression.SchemaName));
+            return FormatStatement("CREATE SCHEMA {0}", Quoter.QuoteSchemaName(expression.SchemaName));
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteSchemaExpression expression)
         {
-            return string.Format("DROP SCHEMA {0};", Quoter.QuoteSchemaName(expression.SchemaName));
+            return FormatStatement("DROP SCHEMA {0}", Quoter.QuoteSchemaName(expression.SchemaName));
         }
 
+        /// <inheritdoc />
         public override string Generate(CreateTableExpression expression)
         {
+            if (expression.Columns.Any(x => x.Expression != null))
+            {
+                CompatibilityMode.HandleCompatibility("Computed columns are not supported");
+            }
             var createStatement = new StringBuilder();
             var tableName = Quoter.Quote(expression.TableName);
-            createStatement.AppendFormat("CREATE TABLE {0} ({1})", Quoter.QuoteTableName(expression.TableName, expression.SchemaName), Column.Generate(expression.Columns, tableName));
+            createStatement.AppendFormat(CreateTable, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), Column.Generate(expression.Columns, tableName));
             var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatements(expression)
                 ?.ToList();
-            createStatement.Append(";");
+
+            AppendSqlStatementEndToken(createStatement);
 
             if (descriptionStatement != null && descriptionStatement.Count != 0)
             {
-                createStatement.Append(string.Join(";", descriptionStatement.ToArray()));
-                createStatement.Append(";");
+                foreach (var ds in descriptionStatement)
+                {
+                    createStatement.Append(ds);
+                    AppendSqlStatementEndToken(createStatement);
+                }
             }
+
             return createStatement.ToString();
         }
 
+        /// <inheritdoc />
         public override string Generate(AlterColumnExpression expression)
         {
+            if (expression.Column.Expression != null)
+            {
+                CompatibilityMode.HandleCompatibility("Computed columns are not supported");
+            }
             var alterStatement = new StringBuilder();
-            alterStatement.AppendFormat("ALTER TABLE {0} {1};", Quoter.QuoteTableName(expression.TableName, expression.SchemaName), ((RedshiftColumn)Column).GenerateAlterClauses(expression.Column));
+            alterStatement.AppendFormat(AlterColumn, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), ((RedshiftColumn)Column).GenerateAlterClauses(expression.Column));
             var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatement(expression);
+
+            AppendSqlStatementEndToken(alterStatement);
+
             if (!string.IsNullOrEmpty(descriptionStatement))
             {
-                alterStatement.Append(";");
                 alterStatement.Append(descriptionStatement);
+                AppendSqlStatementEndToken(alterStatement);
             }
+
             return alterStatement.ToString();
         }
 
+        /// <inheritdoc />
         public override string Generate(CreateColumnExpression expression)
         {
+            if (expression.Column.Expression != null)
+            {
+                CompatibilityMode.HandleCompatibility("Computed columns are not supported");
+            }
             var createStatement = new StringBuilder();
-            createStatement.AppendFormat("ALTER TABLE {0} ADD {1};", Quoter.QuoteTableName(expression.TableName, expression.SchemaName), Column.Generate(expression.Column));
+            createStatement.AppendFormat(AddColumn, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), Column.Generate(expression.Column));
             var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatement(expression);
+
+            AppendSqlStatementEndToken(createStatement);
+
             if (!string.IsNullOrEmpty(descriptionStatement))
             {
-                createStatement.Append(";");
                 createStatement.Append(descriptionStatement);
+                AppendSqlStatementEndToken(createStatement);
             }
+
             return createStatement.ToString();
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteTableExpression expression)
         {
-            return $"DROP TABLE{(expression.IfExists ? " IF EXISTS" : "")} {Quoter.QuoteTableName(expression.TableName, expression.SchemaName)};";
+            return FormatStatement(DropTable, $"{(expression.IfExists ? "IF EXISTS " : "")}{Quoter.QuoteTableName(expression.TableName, expression.SchemaName)}");
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteColumnExpression expression)
         {
             StringBuilder builder = new StringBuilder();
+
             foreach (string columnName in expression.ColumnNames) {
                 if (expression.ColumnNames.First() != columnName) builder.AppendLine("");
-                builder.AppendFormat("ALTER TABLE {0} DROP COLUMN {1};",
+                builder.AppendFormat("ALTER TABLE {0} DROP COLUMN {1}",
                     Quoter.QuoteTableName(expression.TableName, expression.SchemaName),
                     Quoter.QuoteColumnName(columnName));
+
+                AppendSqlStatementEndToken(builder);
             }
+
             return builder.ToString();
         }
 
+        /// <inheritdoc />
         public override string Generate(CreateForeignKeyExpression expression)
         {
             var primaryColumns = GetColumnList(expression.ForeignKey.PrimaryColumns);
             var foreignColumns = GetColumnList(expression.ForeignKey.ForeignColumns);
 
-            const string sql = "ALTER TABLE {0} ADD CONSTRAINT {1} FOREIGN KEY ({2}) REFERENCES {3} ({4}){5}{6};";
+            const string sql = "ALTER TABLE {0} ADD CONSTRAINT {1} FOREIGN KEY ({2}) REFERENCES {3} ({4}){5}{6}";
 
-            return string.Format(sql,
+            return FormatStatement(sql,
                 Quoter.QuoteTableName(expression.ForeignKey.ForeignTable, expression.ForeignKey.ForeignTableSchema),
                 Quoter.Quote(expression.ForeignKey.Name),
                 foreignColumns,
@@ -158,42 +210,19 @@ namespace FluentMigrator.Runner.Generators.Redshift
             );
         }
 
-        public override string Generate(DeleteForeignKeyExpression expression)
-        {
-            return string.Format(
-                "ALTER TABLE {0} DROP CONSTRAINT {1};",
-                Quoter.QuoteTableName(expression.ForeignKey.ForeignTable, expression.ForeignKey.ForeignTableSchema),
-                Quoter.Quote(expression.ForeignKey.Name));
-        }
-
+        /// <inheritdoc />
         public override string Generate(CreateIndexExpression expression)
         {
             return CompatibilityMode.HandleCompatibility("Indices not supported");
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteIndexExpression expression)
         {
-
             return CompatibilityMode.HandleCompatibility("Indices not supported");
         }
 
-        public override string Generate(RenameTableExpression expression)
-        {
-            return string.Format(
-                "ALTER TABLE {0} RENAME TO {1};",
-                Quoter.QuoteTableName(expression.OldName, expression.SchemaName),
-                Quoter.Quote(expression.NewName));
-        }
-
-        public override string Generate(RenameColumnExpression expression)
-        {
-            return string.Format(
-                "ALTER TABLE {0} RENAME COLUMN {1} TO {2};",
-                Quoter.QuoteTableName(expression.TableName, expression.SchemaName),
-                Quoter.QuoteColumnName(expression.OldName),
-                Quoter.QuoteColumnName(expression.NewName));
-        }
-
+        /// <inheritdoc />
         public override string Generate(InsertDataExpression expression)
         {
             var result = new StringBuilder();
@@ -209,41 +238,48 @@ namespace FluentMigrator.Runner.Generators.Redshift
 
                 var columns = GetColumnList(columnNames);
                 var data = GetDataList(columnData);
-                result.AppendFormat("INSERT INTO {0} ({1}) VALUES ({2});", Quoter.QuoteTableName(expression.TableName, expression.SchemaName), columns, data);
+                result.AppendFormat("INSERT INTO {0} ({1}) VALUES ({2})", Quoter.QuoteTableName(expression.TableName, expression.SchemaName), columns, data);
+
+                AppendSqlStatementEndToken(result);
             }
             return result.ToString();
         }
 
+        /// <inheritdoc />
         public override string Generate(AlterDefaultConstraintExpression expression)
         {
-            return string.Format(
-                "ALTER TABLE {0} ALTER {1} DROP DEFAULT, ALTER {1} {2};",
+            return FormatStatement(
+                "ALTER TABLE {0} ALTER {1} DROP DEFAULT, ALTER {1} {2}",
                 Quoter.QuoteTableName(expression.TableName, expression.SchemaName),
                 Quoter.QuoteColumnName(expression.ColumnName),
                 ((RedshiftColumn)Column).FormatAlterDefaultValue(expression.ColumnName, expression.DefaultValue));
         }
 
+        /// <inheritdoc />
         public override string Generate(AlterSchemaExpression expression)
         {
-            return string.Format(
-                "ALTER TABLE {0} SET SCHEMA {1};",
+            return FormatStatement(
+                "ALTER TABLE {0} SET SCHEMA {1}",
                 Quoter.QuoteTableName(expression.TableName, expression.SourceSchemaName),
                 Quoter.QuoteSchemaName(expression.DestinationSchemaName));
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteDefaultConstraintExpression expression)
         {
-            return string.Format("ALTER TABLE {0} ALTER {1} DROP DEFAULT;", Quoter.QuoteTableName(expression.TableName, expression.SchemaName), Quoter.Quote(expression.ColumnName));
+            return FormatStatement("ALTER TABLE {0} ALTER {1} DROP DEFAULT", Quoter.QuoteTableName(expression.TableName, expression.SchemaName), Quoter.Quote(expression.ColumnName));
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteConstraintExpression expression)
         {
-            return string.Format(
-                "ALTER TABLE {0} DROP CONSTRAINT {1};",
+            return FormatStatement(
+                "ALTER TABLE {0} DROP CONSTRAINT {1}",
                 Quoter.QuoteTableName(expression.Constraint.TableName, expression.Constraint.SchemaName),
                 Quoter.Quote(expression.Constraint.ConstraintName));
         }
 
+        /// <inheritdoc />
         public override string Generate(CreateConstraintExpression expression)
         {
             var constraintType = (expression.Constraint.IsPrimaryKeyConstraint) ? "PRIMARY KEY" : "UNIQUE";
@@ -255,14 +291,19 @@ namespace FluentMigrator.Runner.Generators.Redshift
                 columns[i] = Quoter.QuoteColumnName(expression.Constraint.Columns.ElementAt(i));
             }
 
-            return string.Format(
-                "ALTER TABLE {0} ADD CONSTRAINT {1} {2} ({3});",
+            return FormatStatement(
+                "ALTER TABLE {0} ADD CONSTRAINT {1} {2} ({3})",
                 Quoter.QuoteTableName(expression.Constraint.TableName, expression.Constraint.SchemaName),
                 Quoter.QuoteConstraintName(expression.Constraint.ConstraintName),
                 constraintType,
                 string.Join(", ", columns));
         }
 
+        /// <summary>
+        /// Gets a comma-separated list of quoted column names.
+        /// </summary>
+        /// <param name="columns">The column names.</param>
+        /// <returns>The quoted column list.</returns>
         protected string GetColumnList(IEnumerable<string> columns)
         {
             var result = "";
@@ -273,6 +314,11 @@ namespace FluentMigrator.Runner.Generators.Redshift
             return result.TrimEnd(',');
         }
 
+        /// <summary>
+        /// Gets a comma-separated list of quoted values.
+        /// </summary>
+        /// <param name="data">The values.</param>
+        /// <returns>The quoted value list.</returns>
         protected string GetDataList(List<object> data)
         {
             var result = "";
@@ -283,11 +329,13 @@ namespace FluentMigrator.Runner.Generators.Redshift
             return result.TrimEnd(',');
         }
 
+        /// <inheritdoc />
         public override string Generate(CreateSequenceExpression expression)
         {
             return CompatibilityMode.HandleCompatibility("Sequences not supported");
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteSequenceExpression expression)
         {
             return CompatibilityMode.HandleCompatibility("Sequences not supported");

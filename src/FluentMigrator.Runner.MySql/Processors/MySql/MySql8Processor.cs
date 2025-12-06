@@ -26,6 +26,9 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.MySql
 {
+    /// <summary>
+    /// The MySQL 8 processor for FluentMigrator.
+    /// </summary>
     public class MySql8Processor : MySqlProcessor
     {
         /// <inheritdoc />
@@ -44,13 +47,13 @@ namespace FluentMigrator.Runner.Processors.MySql
         }
 
         /// <inheritdoc />
-        public override string DatabaseType => ProcessorId.MySql8;
+        public override string DatabaseType => ProcessorIdConstants.MySql8;
 
         /// <inheritdoc />
         public override IList<string> DatabaseTypeAliases { get; } = new List<string>()
         {
-            ProcessorId.MariaDB,
-            ProcessorId.MySql,
+            ProcessorIdConstants.MariaDB,
+            ProcessorIdConstants.MySql,
             "MySQL 8"
         };
     }

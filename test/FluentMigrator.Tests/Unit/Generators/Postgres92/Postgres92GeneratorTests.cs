@@ -18,6 +18,7 @@
 
 using System.Data;
 
+using FluentMigrator.Generation;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Postgres;
 using FluentMigrator.Runner.Generators.Postgres92;

@@ -18,8 +18,12 @@
 
 namespace FluentMigrator.Runner.Generators.SqlServer
 {
+    /// <summary>
+    /// The SQL Server 2005 SQL quoter for FluentMigrator.
+    /// </summary>
     public class SqlServer2005Quoter : SqlServer2000Quoter
     {
+        /// <inheritdoc />
         public override string QuoteSchemaName(string schemaName)
         {
             if (string.IsNullOrEmpty(schemaName))

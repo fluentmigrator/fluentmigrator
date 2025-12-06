@@ -23,6 +23,7 @@ using System.Linq;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Runner.Initialization;
+using static FluentMigrator.Runner.TypeFinder;
 
 using JetBrains.Annotations;
 
@@ -31,13 +32,70 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner
 {
+    /// <summary>
+    /// Provides functionality to load and organize maintenance migrations based on specified stages and conventions.
+    /// </summary>
     public class MaintenanceLoader : IMaintenanceLoader
     {
         private readonly IDictionary<MigrationStage, IList<IMigration>> _maintenance;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MaintenanceLoader"/> class.
+        /// Creates empty <see cref="TypeFilterOptions" /> and forwards them to the main constructor.
+        /// </summary>
+        /// <param name="assemblySource">
+        /// The source of assemblies containing migration and maintenance classes.
+        /// </param>
+        /// <param name="options">
+        /// The options for configuring the migration runner.
+        /// </param>
+        /// <param name="conventions">
+        /// The conventions used to identify and process migrations and maintenance stages.
+        /// </param>
+        /// <param name="serviceProvider">
+        /// The service provider used to resolve dependencies for migration and maintenance instances.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if any of the required parameters are <c>null</c>.
+        /// </exception>
         public MaintenanceLoader(
             [NotNull] IAssemblySource assemblySource,
             [NotNull] IOptions<RunnerOptions> options,
+            [NotNull] IMigrationRunnerConventions conventions,
+            [NotNull] IServiceProvider serviceProvider)
+            : this(
+                assemblySource,
+                options,
+                Options.Create(new TypeFilterOptions()),
+                conventions,
+                serviceProvider)
+        { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MaintenanceLoader"/> class.
+        /// </summary>
+        /// <param name="assemblySource">
+        /// The source of assemblies containing migration and maintenance classes.
+        /// </param>
+        /// <param name="options">
+        /// The options for configuring the migration runner.
+        /// </param>
+        /// <param name="filterOptions">
+        /// The options used to filter maintenance migrations by namespace and nested namespaces.
+        /// </param>
+        /// <param name="conventions">
+        /// The conventions used to identify and process migrations and maintenance stages.
+        /// </param>
+        /// <param name="serviceProvider">
+        /// The service provider used to resolve dependencies for migration and maintenance instances.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if any of the required parameters are <c>null</c>.
+        /// </exception>
+        public MaintenanceLoader(
+            [NotNull] IAssemblySource assemblySource,
+            [NotNull] IOptions<RunnerOptions> options,
+            [NotNull] IOptions<TypeFilterOptions> filterOptions,
             [NotNull] IMigrationRunnerConventions conventions,
             [NotNull] IServiceProvider serviceProvider)
         {
@@ -49,6 +107,7 @@ namespace FluentMigrator.Runner
                 from type in types
                 let stage = conventions.GetMaintenanceStage(type)
                 where stage != null
+                where type.IsInNamespace(filterOptions.Value.Namespace, filterOptions.Value.NestedNamespaces)
                 where conventions.HasRequestedTags(type, tagsList, options.Value.IncludeUntaggedMaintenances)
                 let migration = (IMigration) ActivatorUtilities.CreateInstance(serviceProvider, type)
                 group migration by stage.GetValueOrDefault()
@@ -58,6 +117,14 @@ namespace FluentMigrator.Runner
             );
         }
 
+        /// <summary>
+        /// Loads maintenance migrations for the specified migration stage.
+        /// </summary>
+        /// <param name="stage">The migration stage for which to load maintenance migrations.</param>
+        /// <returns>
+        /// A list of <see cref="IMigrationInfo"/> objects representing the maintenance migrations
+        /// associated with the specified <paramref name="stage"/>.
+        /// </returns>
         public IList<IMigrationInfo> LoadMaintenance(MigrationStage stage)
         {
             IList<IMigrationInfo> migrationInfos = new List<IMigrationInfo>();

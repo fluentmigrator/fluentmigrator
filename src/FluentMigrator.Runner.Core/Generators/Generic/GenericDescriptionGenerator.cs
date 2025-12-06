@@ -19,19 +19,43 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+
+using JetBrains.Annotations;
 
 namespace FluentMigrator.Runner.Generators.Generic
 {
     /// <summary>
-    /// Base class to generate descriptions for tables/classes
+    /// Base class to generate descriptions for tables/classes.
     /// </summary>
     public abstract class GenericDescriptionGenerator : IDescriptionGenerator
     {
+        /// <inheritdoc />
         protected abstract string GenerateTableDescription(
             string schemaName, string tableName, string tableDescription);
+
+        /// <inheritdoc />
         protected abstract string GenerateColumnDescription(
             string descriptionName, string schemaName, string tableName, string columnName, string columnDescription);
 
+        /// <inheritdoc />
+        [StringFormatMethod("format")]
+        protected string FormatStatement(string format, params object[] args)
+        {
+            var builder = new StringBuilder().AppendFormat(format, args);
+
+            AppendSqlStatementEndToken(builder);
+
+            return builder.ToString();
+        }
+
+        /// <inheritdoc />
+        protected virtual StringBuilder AppendSqlStatementEndToken(StringBuilder stringBuilder)
+        {
+            return stringBuilder.Append(";");
+        }
+
+        /// <inheritdoc />
         public virtual IEnumerable<string> GenerateDescriptionStatements(Expressions.CreateTableExpression expression)
         {
             var statements = new List<string>();
@@ -72,6 +96,7 @@ namespace FluentMigrator.Runner.Generators.Generic
             return statements;
         }
 
+        /// <inheritdoc />
         public virtual string GenerateDescriptionStatement(Expressions.AlterTableExpression expression)
         {
             if (string.IsNullOrEmpty(expression.TableDescription))
@@ -81,6 +106,7 @@ namespace FluentMigrator.Runner.Generators.Generic
                 expression.SchemaName, expression.TableName, expression.TableDescription);
         }
 
+        /// <inheritdoc />
         public virtual string GenerateDescriptionStatement(Expressions.CreateColumnExpression expression)
         {
             if (string.IsNullOrEmpty(expression.Column.ColumnDescription))
@@ -107,6 +133,7 @@ namespace FluentMigrator.Runner.Generators.Generic
             }
         }
 
+        /// <inheritdoc />
         public virtual string GenerateDescriptionStatement(Expressions.AlterColumnExpression expression)
         {
             if (string.IsNullOrEmpty(expression.Column.ColumnDescription))

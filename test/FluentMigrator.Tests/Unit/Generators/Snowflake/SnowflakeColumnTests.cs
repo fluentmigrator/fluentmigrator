@@ -55,7 +55,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"ALTER TABLE ""TestSchema"".""TestTable1"" ADD COLUMN ""TestColumn1"" MyDomainType", _quotingEnabled);
+            result.ShouldBe(@"ALTER TABLE ""TestSchema"".""TestTable1"" ADD COLUMN ""TestColumn1"" MyDomainType;", _quotingEnabled);
         }
 
         [Test]
@@ -63,7 +63,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpressionWithNullableCustomType();
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ADD COLUMN ""TestColumn1"" MyDomainType", _quotingEnabled);
+            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ADD COLUMN ""TestColumn1"" MyDomainType;", _quotingEnabled);
         }
 
         [Test]
@@ -74,7 +74,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"ALTER TABLE ""TestSchema"".""TestTable1"" ALTER COLUMN ""TestColumn1"" SET NOT NULL, COLUMN ""TestColumn1"" VARCHAR(20), COLUMN ""TestColumn1"" COMMENT ''", _quotingEnabled);
+            result.ShouldBe(@"ALTER TABLE ""TestSchema"".""TestTable1"" ALTER COLUMN ""TestColumn1"" SET NOT NULL, COLUMN ""TestColumn1"" VARCHAR(20), COLUMN ""TestColumn1"" COMMENT '';", _quotingEnabled);
         }
 
         [Test]
@@ -82,7 +82,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         {
             var expression = GeneratorTestHelper.GetAlterColumnExpression();
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ALTER COLUMN ""TestColumn1"" SET NOT NULL, COLUMN ""TestColumn1"" VARCHAR(20), COLUMN ""TestColumn1"" COMMENT ''", _quotingEnabled);
+            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ALTER COLUMN ""TestColumn1"" SET NOT NULL, COLUMN ""TestColumn1"" VARCHAR(20), COLUMN ""TestColumn1"" COMMENT '';", _quotingEnabled);
         }
 
         [Test]
@@ -92,7 +92,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"ALTER TABLE ""TestSchema"".""TestTable1"" ALTER COLUMN ""TestColumn1"" SET NOT NULL, COLUMN ""TestColumn1"" NUMBER, COLUMN ""TestColumn1"" COMMENT ''", _quotingEnabled);
+            result.ShouldBe(@"ALTER TABLE ""TestSchema"".""TestTable1"" ALTER COLUMN ""TestColumn1"" SET NOT NULL, COLUMN ""TestColumn1"" NUMBER, COLUMN ""TestColumn1"" COMMENT '';", _quotingEnabled);
         }
 
         [Test]
@@ -100,7 +100,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         {
             var expression = GeneratorTestHelper.GetAlterColumnAddAutoIncrementExpression();
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ALTER COLUMN ""TestColumn1"" SET NOT NULL, COLUMN ""TestColumn1"" NUMBER, COLUMN ""TestColumn1"" COMMENT ''", _quotingEnabled);
+            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ALTER COLUMN ""TestColumn1"" SET NOT NULL, COLUMN ""TestColumn1"" NUMBER, COLUMN ""TestColumn1"" COMMENT '';", _quotingEnabled);
         }
 
         [Test]
@@ -110,7 +110,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"ALTER TABLE ""TestSchema"".""TestTable1"" ADD COLUMN ""TestColumn1"" VARCHAR(5) NOT NULL", _quotingEnabled);
+            result.ShouldBe(@"ALTER TABLE ""TestSchema"".""TestTable1"" ADD COLUMN ""TestColumn1"" VARCHAR(5) NOT NULL;", _quotingEnabled);
         }
 
         [Test]
@@ -118,7 +118,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ADD COLUMN ""TestColumn1"" VARCHAR(5) NOT NULL", _quotingEnabled);
+            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ADD COLUMN ""TestColumn1"" VARCHAR(5) NOT NULL;", _quotingEnabled);
         }
 
         [Test]
@@ -126,9 +126,10 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         {
             var expressions = GeneratorTestHelper.GetCreateColumnWithSystemMethodExpression("TestSchema");
             var result = expressions.Select(x => (string)Generator.Generate((dynamic)x));
-            result.ShouldBe(new [] { 
-                @"ALTER TABLE ""TestSchema"".""TestTable1"" ADD COLUMN ""TestColumn1"" TIMESTAMP_NTZ",
-                @"UPDATE ""TestSchema"".""TestTable1"" SET ""TestColumn1"" = CURRENT_TIMESTAMP() WHERE 1 = 1" }, _quotingEnabled);
+            result.ShouldBe(new [] {
+                @"ALTER TABLE ""TestSchema"".""TestTable1"" ADD COLUMN ""TestColumn1"" TIMESTAMP_NTZ;",
+                @"UPDATE ""TestSchema"".""TestTable1"" SET ""TestColumn1"" = SYSDATE() WHERE 1 = 1;"
+            }, _quotingEnabled);
         }
 
         [Test]
@@ -137,8 +138,9 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             var expressions = GeneratorTestHelper.GetCreateColumnWithSystemMethodExpression();
             var result = expressions.Select(x => (string)Generator.Generate((dynamic)x));
             result.ShouldBe(new[] {
-                @"ALTER TABLE ""PUBLIC"".""TestTable1"" ADD COLUMN ""TestColumn1"" TIMESTAMP_NTZ",
-                @"UPDATE ""PUBLIC"".""TestTable1"" SET ""TestColumn1"" = CURRENT_TIMESTAMP() WHERE 1 = 1" }, _quotingEnabled);
+                @"ALTER TABLE ""PUBLIC"".""TestTable1"" ADD COLUMN ""TestColumn1"" TIMESTAMP_NTZ;",
+                @"UPDATE ""PUBLIC"".""TestTable1"" SET ""TestColumn1"" = SYSDATE() WHERE 1 = 1;",
+            }, _quotingEnabled);
         }
 
         [Test]
@@ -148,7 +150,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"ALTER TABLE ""TestSchema"".""TestTable1"" ADD COLUMN ""TestColumn1"" NUMBER(19,2) NOT NULL", _quotingEnabled);
+            result.ShouldBe(@"ALTER TABLE ""TestSchema"".""TestTable1"" ADD COLUMN ""TestColumn1"" NUMBER(19,2) NOT NULL;", _quotingEnabled);
         }
 
         [Test]
@@ -156,7 +158,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         {
             var expression = GeneratorTestHelper.GetCreateDecimalColumnExpression();
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ADD COLUMN ""TestColumn1"" NUMBER(19,2) NOT NULL", _quotingEnabled);
+            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ADD COLUMN ""TestColumn1"" NUMBER(19,2) NOT NULL;", _quotingEnabled);
         }
 
         [Test]
@@ -167,7 +169,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"ALTER TABLE ""TestSchema"".""TestTable1"" DROP COLUMN ""TestColumn1""", _quotingEnabled);
+            result.ShouldBe(@"ALTER TABLE ""TestSchema"".""TestTable1"" DROP COLUMN ""TestColumn1"";", _quotingEnabled);
         }
 
         [Test]
@@ -176,7 +178,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             //This does not work if it is a primary key
             var expression = GeneratorTestHelper.GetDeleteColumnExpression();
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" DROP COLUMN ""TestColumn1""", _quotingEnabled);
+            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" DROP COLUMN ""TestColumn1"";", _quotingEnabled);
         }
 
         [Test]
@@ -187,7 +189,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"ALTER TABLE ""TestSchema"".""TestTable1"" DROP COLUMN ""TestColumn1""; ALTER TABLE ""TestSchema"".""TestTable1"" DROP COLUMN ""TestColumn2""", _quotingEnabled);
+            result.ShouldBe(@"ALTER TABLE ""TestSchema"".""TestTable1"" DROP COLUMN ""TestColumn1"";ALTER TABLE ""TestSchema"".""TestTable1"" DROP COLUMN ""TestColumn2"";", _quotingEnabled);
         }
 
         [Test]
@@ -196,7 +198,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             //This does not work if it is a primary key
             var expression = GeneratorTestHelper.GetDeleteColumnExpression(new [] { "TestColumn1", "TestColumn2" });
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" DROP COLUMN ""TestColumn1""; ALTER TABLE ""PUBLIC"".""TestTable1"" DROP COLUMN ""TestColumn2""", _quotingEnabled);
+            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" DROP COLUMN ""TestColumn1"";ALTER TABLE ""PUBLIC"".""TestTable1"" DROP COLUMN ""TestColumn2"";", _quotingEnabled);
         }
 
         [Test]
@@ -206,7 +208,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"ALTER TABLE ""TestSchema"".""TestTable1"" RENAME COLUMN ""TestColumn1"" TO ""TestColumn2""", _quotingEnabled);
+            result.ShouldBe(@"ALTER TABLE ""TestSchema"".""TestTable1"" RENAME COLUMN ""TestColumn1"" TO ""TestColumn2"";", _quotingEnabled);
         }
 
         [Test]
@@ -214,7 +216,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         {
             var expression = GeneratorTestHelper.GetRenameColumnExpression();
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" RENAME COLUMN ""TestColumn1"" TO ""TestColumn2""", _quotingEnabled);
+            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" RENAME COLUMN ""TestColumn1"" TO ""TestColumn2"";", _quotingEnabled);
         }
 
 
@@ -227,6 +229,44 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
 
             var ex = Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
             Assert.That(ex.Message, Is.EqualTo("Snowflake database does not support collation."));
+        }
+
+        [Test]
+        public override void CanCreateColumnWithComputedExpression()
+        {
+            var expression = GeneratorTestHelper.GetCreateColumnExpressionWithComputed();
+            
+            var result = Generator.Generate(expression);
+            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ADD COLUMN ""TestColumn1"" GENERATED ALWAYS AS (Price * Quantity) NOT NULL;", _quotingEnabled);
+        }
+
+        [Test]
+        public override void CanCreateColumnWithStoredComputedExpression()
+        {
+            var expression = GeneratorTestHelper.GetCreateColumnExpressionWithStoredComputed();
+            
+            // Snowflake doesn't distinguish between stored and virtual computed columns
+            var result = Generator.Generate(expression);
+            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ADD COLUMN ""TestColumn1"" GENERATED ALWAYS AS (Price * Quantity) STORED NOT NULL;", _quotingEnabled);
+        }
+
+        [Test]
+        public override void CanAlterColumnToAddComputedExpression()
+        {
+            var expression = GeneratorTestHelper.GetAlterColumnExpressionWithComputed();
+            
+            var result = Generator.Generate(expression);
+            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ALTER COLUMN ""TestColumn1"" SET NOT NULL, COLUMN ""TestColumn1"" , COLUMN ""TestColumn1"" COMMENT '';", _quotingEnabled);
+        }
+
+        [Test]
+        public override void CanAlterColumnToAddStoredComputedExpression()
+        {
+            var expression = GeneratorTestHelper.GetAlterColumnExpressionWithStoredComputed();
+            
+            // Snowflake doesn't distinguish between stored and virtual computed columns
+            var result = Generator.Generate(expression);
+            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ALTER COLUMN ""TestColumn1"" SET NOT NULL, COLUMN ""TestColumn1"" , COLUMN ""TestColumn1"" COMMENT '';", _quotingEnabled);
         }
     }
 }

@@ -248,10 +248,9 @@ namespace FluentMigrator.Tests.Unit
         {
             public FakeTaskExecutor(
                 [NotNull] ILogger<TaskExecutor> logger,
-                [NotNull] IAssemblySource assemblySource,
                 [NotNull] IOptions<RunnerOptions> runnerOptions,
                 [NotNull] IServiceProvider serviceProvider)
-                : base(logger, assemblySource, runnerOptions, serviceProvider)
+                : base(logger, runnerOptions, serviceProvider)
             {
             }
         }

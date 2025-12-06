@@ -1,10 +1,13 @@
 <?xml version="1.0"?>
 <Project>
     <ItemGroup>
-        <PackageReference Include="FluentMigrator.MSBuild" Version="6.2.0" GeneratePathProperty="true" />
+        <PackageReference Include="FluentMigrator.MSBuild" Version="7.1.0" GeneratePathProperty="true" />
     </ItemGroup>
     <PropertyGroup>
-        <FluentMigratorTfm Condition="'$(MSBuildRuntimeType)' == 'Core'">net8.0</FluentMigratorTfm>
-       <FluentMigratorTfm Condition="'$(MSBuildRuntimeType)' == 'Full'">net48</FluentMigratorTfm> <FluentMigratorMSBuildAssemblyPath>$(PKGFluentMigrator_MSBuild)\tasks\$(FluentMigratorTfm)\FluentMigrator.MSBuild.dll</FluentMigratorMSBuildAssemblyPath>
+        <FluentMigratorTfm Condition="'$(MSBuildRuntimeType)' == 'Core' And '$(TargetFramework)' == 'net8.0'">net8.0</FluentMigratorTfm>
+        <FluentMigratorTfm Condition="'$(MSBuildRuntimeType)' == 'Core' And '$(TargetFramework)' == 'net9.0'">net9.0</FluentMigratorTfm>
+        <FluentMigratorTfm Condition="'$(MSBuildRuntimeType)' == 'Core' And '$(TargetFramework)' == 'net10.0'">net10.0</FluentMigratorTfm>
+        <FluentMigratorTfm Condition="'$(MSBuildRuntimeType)' == 'Full'">net48</FluentMigratorTfm>
+        <FluentMigratorMSBuildAssemblyPath>$(PKGFluentMigrator_MSBuild)\tasks\$(FluentMigratorTfm)\FluentMigrator.MSBuild.dll</FluentMigratorMSBuildAssemblyPath>
     </PropertyGroup>
 </Project>

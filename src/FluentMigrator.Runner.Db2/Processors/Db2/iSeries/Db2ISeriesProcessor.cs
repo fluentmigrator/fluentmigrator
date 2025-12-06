@@ -21,7 +21,7 @@ using System.Data;
 using System.Linq;
 
 using FluentMigrator.Expressions;
-using FluentMigrator.Runner.Generators;
+using FluentMigrator.Generation;
 using FluentMigrator.Runner.Generators.DB2.iSeries;
 using FluentMigrator.Runner.Helpers;
 using FluentMigrator.Runner.Initialization;
@@ -33,9 +33,23 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.DB2.iSeries
 {
+    /// <summary>
+    /// The IBM Db2 for iSeries processor for FluentMigrator.
+    /// </summary>
     public class Db2ISeriesProcessor : GenericProcessorBase
     {
+        /// <summary>
+        /// Gets or sets the quoter for iSeries SQL.
+        /// </summary>
+        public IQuoter Quoter { get; set; }
 
+        /// <inheritdoc />
+        public override string DatabaseType => ProcessorIdConstants.Db2ISeries;
+
+        /// <inheritdoc />
+        public override IList<string> DatabaseTypeAliases { get; } = new List<string> { ProcessorIdConstants.IbmDb2ISeries, ProcessorIdConstants.DB2 };
+
+        /// <inheritdoc />
         public Db2ISeriesProcessor(
             [NotNull] Db2ISeriesDbFactory factory,
             [NotNull] Db2ISeriesGenerator generator,
@@ -48,16 +62,7 @@ namespace FluentMigrator.Runner.Processors.DB2.iSeries
             Quoter = quoter;
         }
 
-        public override string DatabaseType => "DB2 iSeries";
-
-        public override IList<string> DatabaseTypeAliases { get; } = new List<string> { "IBM DB2 iSeries", "DB2" };
-
-        public IQuoter Quoter
-        {
-            get;
-            set;
-        }
-
+        /// <inheritdoc />
         public override bool ColumnExists(string schemaName, string tableName, string columnName)
         {
             var schema = string.IsNullOrEmpty(schemaName) ? string.Empty : "TABLE_SCHEMA = '" + FormatToSafeName(schemaName) + "' AND ";
@@ -66,6 +71,7 @@ namespace FluentMigrator.Runner.Processors.DB2.iSeries
             return doesExist;
         }
 
+        /// <inheritdoc />
         public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
         {
             var schema = string.IsNullOrEmpty(schemaName) ? string.Empty : "TABLE_SCHEMA = '" + FormatToSafeName(schemaName) + "' AND ";
@@ -73,6 +79,7 @@ namespace FluentMigrator.Runner.Processors.DB2.iSeries
             return Exists("SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE {0} TABLE_NAME = '{1}' AND CONSTRAINT_NAME='{2}'", schema, FormatToSafeName(tableName), FormatToSafeName(constraintName));
         }
 
+        /// <inheritdoc />
         public override bool DefaultValueExists(string schemaName, string tableName, string columnName, object defaultValue)
         {
             var schema = string.IsNullOrEmpty(schemaName) ? string.Empty : "TABLE_SCHEMA = '" + FormatToSafeName(schemaName) + "' AND ";
@@ -81,11 +88,13 @@ namespace FluentMigrator.Runner.Processors.DB2.iSeries
             return Exists("SELECT COLUMN_DEFAULT FROM INFORMATION_SCHEMA.COLUMNS WHERE {0} TABLE_NAME = '{1}' AND COLUMN_NAME = '{2}' AND COLUMN_DEFAULT LIKE '{3}'", schema, FormatToSafeName(tableName), columnName.ToUpper(), defaultValueAsString);
         }
 
+        /// <inheritdoc />
         public override void Execute(string template, params object[] args)
         {
             Process(string.Format(template, args));
         }
 
+        /// <inheritdoc />
         public override bool Exists(string template, params object[] args)
         {
             EnsureConnectionIsOpen();
@@ -97,6 +106,7 @@ namespace FluentMigrator.Runner.Processors.DB2.iSeries
             }
         }
 
+        /// <inheritdoc />
         public override bool IndexExists(string schemaName, string tableName, string indexName)
         {
             var schema = string.IsNullOrEmpty(schemaName) ? string.Empty : "INDEX_SCHEMA = '" + FormatToSafeName(schemaName) + "' AND ";
@@ -110,9 +120,13 @@ namespace FluentMigrator.Runner.Processors.DB2.iSeries
             return doesExist;
         }
 
+        /// <inheritdoc />
         public override void Process(PerformDBOperationExpression expression)
         {
-            Logger.LogSay("Performing DB Operation");
+            var message = string.IsNullOrEmpty(expression.Description) 
+                ? "Performing DB Operation" 
+                : $"Performing DB Operation: {expression.Description}";
+            Logger.LogSay(message);
 
             if (Options.PreviewOnly)
             {
@@ -124,6 +138,7 @@ namespace FluentMigrator.Runner.Processors.DB2.iSeries
             expression.Operation?.Invoke(Connection, Transaction);
         }
 
+        /// <inheritdoc />
         public override DataSet Read(string template, params object[] args)
         {
             EnsureConnectionIsOpen();
@@ -135,21 +150,25 @@ namespace FluentMigrator.Runner.Processors.DB2.iSeries
             }
         }
 
+        /// <inheritdoc />
         public override DataSet ReadTableData(string schemaName, string tableName)
         {
             return Read("SELECT * FROM {0}", Quoter.QuoteTableName(tableName, schemaName));
         }
 
+        /// <inheritdoc />
         public override bool SchemaExists(string schemaName)
         {
             return Exists("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '{0}'", FormatToSafeName(schemaName));
         }
 
+        /// <inheritdoc />
         public override bool SequenceExists(string schemaName, string sequenceName)
         {
             return false;
         }
 
+        /// <inheritdoc />
         public override bool TableExists(string schemaName, string tableName)
         {
             var schema = string.IsNullOrEmpty(schemaName) ? string.Empty : "TABLE_SCHEMA = '" + FormatToSafeName(schemaName) + "' AND ";
@@ -157,6 +176,7 @@ namespace FluentMigrator.Runner.Processors.DB2.iSeries
             return Exists("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE {0}TABLE_NAME = '{1}'", schema, FormatToSafeName(tableName));
         }
 
+        /// <inheritdoc />
         protected override void Process(string sql)
         {
             Logger.LogSql(sql);
@@ -174,6 +194,11 @@ namespace FluentMigrator.Runner.Processors.DB2.iSeries
             }
         }
 
+        /// <summary>
+        /// Formats the SQL name to a safe SQL value.
+        /// </summary>
+        /// <param name="sqlName">The SQL name.</param>
+        /// <returns>The formatted SQL name.</returns>
         private string FormatToSafeName(string sqlName)
         {
             var rawName = Quoter.UnQuote(sqlName);

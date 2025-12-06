@@ -30,7 +30,7 @@ using Microsoft.Extensions.Options;
 namespace FluentMigrator.Runner.Processors
 {
     /// <summary>
-    /// An <see cref="IProcessorAccessor"/> implementation that selects one generator by name
+    /// An <see cref="IProcessorAccessor"/> implementation that selects one processor by name
     /// </summary>
     public class SelectingProcessorAccessor : IProcessorAccessor
     {
@@ -58,16 +58,20 @@ namespace FluentMigrator.Runner.Processors
             {
                 // No generator selected
                 if (procs.Count == 0)
+                {
                     throw new ProcessorFactoryNotFoundException("No migration processor registered.");
+                }
+
                 if (procs.Count > 1)
+                {
                     throw new ProcessorFactoryNotFoundException("More than one processor registered, but no processor id given. Specify the processor id by configuring SelectingProcessorAccessorOptions.");
+                }
                 foundProcessor = procs.Single();
-                //(Processor as ProcessorBase).Generator
             }
             else
             {
                 // One of multiple generators
-                foundProcessor = FindGenerator(procs, processorId);
+                foundProcessor = FindProcessor(procs, processorId);
             }
 
             // Special handling when no connection string could be found
@@ -77,7 +81,7 @@ namespace FluentMigrator.Runner.Processors
             {
                 if (foundProcessor is ProcessorBase processorBase)
                 {
-                    var databaseIds = new List<string>() { processorBase.DatabaseType };
+                    var databaseIds = new List<string> { processorBase.DatabaseType };
                     databaseIds.AddRange(processorBase.DatabaseTypeAliases);
 
                     var processorOptions = serviceProvider.GetRequiredService<IOptionsSnapshot<ProcessorOptions>>();
@@ -96,13 +100,13 @@ namespace FluentMigrator.Runner.Processors
         public IMigrationProcessor Processor { get; }
 
         [NotNull]
-        private IMigrationProcessor FindGenerator(
+        private IMigrationProcessor FindProcessor(
             [NotNull, ItemNotNull] IReadOnlyCollection<IMigrationProcessor> processors,
-            [NotNull] string processorsId)
+            [NotNull] string processorId)
         {
             foreach (var processor in processors)
             {
-                if (string.Equals(processor.DatabaseType, processorsId, StringComparison.OrdinalIgnoreCase))
+                if (string.Equals(processor.DatabaseType, processorId, StringComparison.OrdinalIgnoreCase))
                     return processor;
             }
 
@@ -110,13 +114,13 @@ namespace FluentMigrator.Runner.Processors
             {
                 foreach (var databaseTypeAlias in processor.DatabaseTypeAliases)
                 {
-                    if (string.Equals(databaseTypeAlias, processorsId, StringComparison.OrdinalIgnoreCase))
+                    if (string.Equals(databaseTypeAlias, processorId, StringComparison.OrdinalIgnoreCase))
                         return processor;
                 }
             }
 
-            var generatorNames = string.Join(", ", processors.Select(p => p.DatabaseType).Union(processors.SelectMany(p => p.DatabaseTypeAliases)));
-            throw new ProcessorFactoryNotFoundException($@"A migration generator with the ID {processorsId} couldn't be found. Available generators are: {generatorNames}");
+            var processorNames = string.Join(", ", processors.Select(p => p.DatabaseType).Union(processors.SelectMany(p => p.DatabaseTypeAliases)));
+            throw new ProcessorFactoryNotFoundException($@"A migration processor with the ID {processorId} couldn't be found. Available processors are: {processorNames}");
         }
 
         private class PassThroughGeneratorAccessor : IGeneratorAccessor

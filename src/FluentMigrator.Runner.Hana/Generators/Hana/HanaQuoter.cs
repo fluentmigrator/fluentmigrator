@@ -20,13 +20,18 @@ using FluentMigrator.Runner.Generators.Generic;
 
 namespace FluentMigrator.Runner.Generators.Hana
 {
+    /// <summary>
+    /// The SAP HANA SQL quoter for FluentMigrator.
+    /// </summary>
     public class HanaQuoter : GenericQuoter
     {
+        /// <inheritdoc />
         public override string FormatNationalString(string value)
         {
             return $"N{FormatAnsiString(value)}";
         }
 
+        /// <inheritdoc />
         public override string FormatSystemMethods(SystemMethods value)
         {
             switch (value)
@@ -40,11 +45,13 @@ namespace FluentMigrator.Runner.Generators.Hana
             return base.FormatSystemMethods(value);
         }
 
+        /// <inheritdoc />
         public override string QuoteSchemaName(string schemaName)
         {
             return string.Empty;
         }
 
+        /// <inheritdoc />
         public override string QuoteValue(object value)
         {
             if (value is bool boolean)

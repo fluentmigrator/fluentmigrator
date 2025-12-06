@@ -22,20 +22,31 @@ using FluentMigrator.Runner.Generators.Base;
 
 namespace FluentMigrator.Runner.Generators.Jet
 {
+    /// <summary>
+    /// Provides type mapping between <see cref="DbType"/> and Microsoft Jet SQL types.
+    /// </summary>
     public sealed class JetTypeMap : TypeMapBase, IJetTypeMap
     {
+        /// <summary>Default capacity for ANSI string columns.</summary>
         public const int AnsiStringCapacity = 255;
+        /// <summary>Default capacity for ANSI text columns.</summary>
         public const int AnsiTextCapacity = 1073741823;
+        /// <summary>Default capacity for Unicode string columns.</summary>
         public const int UnicodeStringCapacity = 255;
+        /// <summary>Default capacity for Unicode text columns.</summary>
         public const int UnicodeTextCapacity = 1073741823;
+        /// <summary>Default capacity for IMAGE columns.</summary>
         public const int ImageCapacity = 2147483647;
+        /// <summary>Default capacity for DECIMAL columns.</summary>
         public const int DecimalCapacity = 19;
 
+        /// <inheritdoc />
         public JetTypeMap()
         {
             SetupTypeMaps();
         }
         
+        /// <inheritdoc />
         protected override void SetupTypeMaps()
         {
             SetTypeMap(DbType.AnsiStringFixedLength, "CHAR(255)");

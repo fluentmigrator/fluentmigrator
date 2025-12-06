@@ -29,5 +29,8 @@ public class OracleContainer : ContainerBase
     protected override int Port => 1521;
 
     /// <inheritdoc />
-    protected override DockerContainer Build() => new OracleBuilder().WithReuse(true).Build();
+    protected override DockerContainer Build() => new OracleBuilder()
+        .WithUsername("TestSchema")
+        .WithReuse(true)
+        .Build();
 }

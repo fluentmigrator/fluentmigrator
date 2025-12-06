@@ -17,8 +17,6 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
-using System.Reflection;
 
 using JetBrains.Annotations;
 
@@ -28,33 +26,74 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Initialization
 {
+    /// <summary>
+    /// Represents the main task execution mechanism within the FluentMigrator runner.
+    /// </summary>
+    /// <remarks>
+    /// This class is responsible for managing the initialization and execution of migration tasks.
+    /// It provides functionality to determine if migrations need to be applied and handles the execution
+    /// of those migrations within a controlled scope.
+    /// </remarks>
     public class TaskExecutor
     {
         [NotNull]
         private readonly ILogger _logger;
-
-        [NotNull]
-        private readonly IAssemblySource _assemblySource;
 
         private readonly RunnerOptions _runnerOptions;
 
         [NotNull, ItemNotNull]
         private readonly Lazy<IServiceProvider> _lazyServiceProvider;
 
-        private IReadOnlyCollection<Assembly> _assemblies;
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TaskExecutor"/> class.
+        /// </summary>
+        /// <param name="logger">The logger instance used for logging execution details.</param>
+        /// <param name="assemblySource">The source of assemblies containing migrations. CURRENTLY UNUSED.</param>
+        /// <param name="runnerOptions">The configuration options for the migration runner.</param>
+        /// <param name="serviceProvider">The service provider used to resolve dependencies.</param>
+        /// <remarks>
+        /// This constructor sets up the necessary dependencies for the <see cref="TaskExecutor"/> 
+        /// to manage and execute migration tasks effectively.
+        /// </remarks>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when any of the required parameters (<paramref name="logger"/>, 
+        /// <paramref name="assemblySource"/>, <paramref name="runnerOptions"/>, 
+        /// or <paramref name="serviceProvider"/>) are <c>null</c>.
+        /// </exception>
+        [Obsolete]
         public TaskExecutor(
             [NotNull] ILogger<TaskExecutor> logger,
             [NotNull] IAssemblySource assemblySource,
             [NotNull] IOptions<RunnerOptions> runnerOptions,
             [NotNull] IServiceProvider serviceProvider)
+            : this(logger, runnerOptions, serviceProvider)
         {
             _logger = logger;
-            _assemblySource = assemblySource;
             _runnerOptions = runnerOptions.Value;
-#pragma warning disable 612
-            ConnectionStringProvider = serviceProvider.GetService<IConnectionStringProvider>();
-#pragma warning restore 612
+            _lazyServiceProvider = new Lazy<IServiceProvider>(() => serviceProvider);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TaskExecutor"/> class.
+        /// </summary>
+        /// <param name="logger">The logger instance used for logging execution details.</param>
+        /// <param name="runnerOptions">The configuration options for the migration runner.</param>
+        /// <param name="serviceProvider">The service provider used to resolve dependencies.</param>
+        /// <remarks>
+        /// This constructor sets up the necessary dependencies for the <see cref="TaskExecutor"/> 
+        /// to manage and execute migration tasks effectively.
+        /// </remarks>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when any of the required parameters (<paramref name="logger"/>, 
+        /// <paramref name="runnerOptions"/>, or <paramref name="serviceProvider"/>) are <c>null</c>.
+        /// </exception>
+        public TaskExecutor(
+            [NotNull] ILogger<TaskExecutor> logger,
+            [NotNull] IOptions<RunnerOptions> runnerOptions,
+            [NotNull] IServiceProvider serviceProvider)
+        {
+            _logger = logger;
+            _runnerOptions = runnerOptions.Value;
             _lazyServiceProvider = new Lazy<IServiceProvider>(() => serviceProvider);
         }
 
@@ -68,23 +107,10 @@ namespace FluentMigrator.Runner.Initialization
         protected IMigrationRunner Runner { get; set; }
 
         /// <summary>
-        /// Gets the connection string provider
-        /// </summary>
-        [CanBeNull]
-        [Obsolete]
-        protected IConnectionStringProvider ConnectionStringProvider { get; }
-
-        /// <summary>
         /// Gets the service provider used to instantiate all migration services
         /// </summary>
         [NotNull]
         protected IServiceProvider ServiceProvider => _lazyServiceProvider.Value;
-
-        [Obsolete]
-        protected virtual IEnumerable<Assembly> GetTargetAssemblies()
-        {
-            return _assemblies ?? (_assemblies = _assemblySource.Assemblies);
-        }
 
         /// <summary>
         /// Will be called during the runner scope initialization
@@ -96,6 +122,23 @@ namespace FluentMigrator.Runner.Initialization
         {
         }
 
+        /// <summary>
+        /// Executes the specified migration task based on the configured options.
+        /// </summary>
+        /// <remarks>
+        /// This method determines the type of migration task to execute (e.g., migrate, rollback, validate version order, etc.)
+        /// and performs the corresponding operation using the <see cref="IMigrationRunner"/>.
+        /// </remarks>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown if the migration task cannot be executed due to invalid or missing configuration.
+        /// </exception>
+        /// <example>
+        /// Example usage:
+        /// <code>
+        /// var executor = new TaskExecutor(logger, assemblySource, runnerOptions, serviceProvider);
+        /// executor.Execute();
+        /// </code>
+        /// </example>
         public void Execute()
         {
             using (var scope = new RunnerScope(this))

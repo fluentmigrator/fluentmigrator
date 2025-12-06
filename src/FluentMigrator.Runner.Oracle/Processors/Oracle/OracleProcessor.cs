@@ -27,15 +27,19 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.Oracle
 {
+    /// <summary>
+    /// The Oracle processor for FluentMigrator.
+    /// </summary>
     public class OracleProcessor : OracleProcessorBase
     {
+        /// <inheritdoc />
         public OracleProcessor(
             [NotNull] OracleDbFactory factory,
             [NotNull] IOracleGenerator generator,
             [NotNull] ILogger<OracleProcessor> logger,
             [NotNull] IOptionsSnapshot<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor)
-            : base(ProcessorId.Oracle, factory, generator, logger, options, connectionStringAccessor)
+            : base(ProcessorIdConstants.Oracle, factory, generator, logger, options, connectionStringAccessor)
         {
         }
     }

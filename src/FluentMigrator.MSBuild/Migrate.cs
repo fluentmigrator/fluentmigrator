@@ -24,7 +24,9 @@ using FluentMigrator.Runner;
 using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Extensions;
 using FluentMigrator.Runner.Initialization;
+#if NETFRAMEWORK
 using FluentMigrator.Runner.Initialization.NetFramework;
+#endif
 using FluentMigrator.Runner.Logging;
 using FluentMigrator.Runner.Processors;
 
@@ -67,14 +69,28 @@ namespace FluentMigrator.MSBuild
 
         public string ConnectionStringConfigPath { get; set; }
 
-        public string Target { get { return (Targets != null && Targets.Length == 1) ? Targets[0] : string.Empty; } set { Targets = new[] { value }; } }
+        public string Target
+        {
+            get => Targets != null && Targets.Length == 1 ? Targets[0] : string.Empty;
+            set => Targets = new[] { value };
+        }
 
         public string[] Targets { get; set; }
-        public string MigrationAssembly { get { return (Targets != null && Targets.Length == 1) ? Targets[0] : string.Empty; } set { Targets = new[] {value}; } }
 
-        public string Database { get { return _databaseType; } set { _databaseType = value; } }
+        public string MigrationAssembly {
+            get => Targets != null && Targets.Length == 1 ? Targets[0] : string.Empty;
+            set => Targets = new[] {value};
+        }
 
-        public string DatabaseType { get { return _databaseType; } set { _databaseType = value; } }
+        public string Database {
+            get => _databaseType;
+            set => _databaseType = value;
+        }
+
+        public string DatabaseType {
+            get => _databaseType;
+            set => _databaseType = value;
+        }
 
         public bool Verbose { get; set; }
 
@@ -181,10 +197,6 @@ namespace FluentMigrator.MSBuild
                 .AddSingleton<ILoggerProvider, FluentMigratorConsoleLoggerProvider>()
                 .Configure<SelectingProcessorAccessorOptions>(opt => opt.ProcessorId = DatabaseType)
                 .Configure<AssemblySourceOptions>(opt => opt.AssemblyNames = Targets)
-#pragma warning disable 612
-                .Configure<AppConfigConnectionStringAccessorOptions>(
-                    opt => opt.ConnectionStringConfigPath = ConnectionStringConfigPath)
-#pragma warning restore 612
                 .Configure<TypeFilterOptions>(
                     opt =>
                     {
@@ -270,7 +282,7 @@ namespace FluentMigrator.MSBuild
                         .AddSqlServer2012()
                         .AddSqlServer2014()
                         .AddSqlServer2016()
-                    
+
                         );
             return services;
         }

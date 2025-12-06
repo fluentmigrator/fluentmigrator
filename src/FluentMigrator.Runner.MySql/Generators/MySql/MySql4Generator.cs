@@ -17,9 +17,11 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 using FluentMigrator.Expressions;
+using FluentMigrator.Generation;
 using FluentMigrator.Runner.Generators.Generic;
 
 using JetBrains.Annotations;
@@ -28,19 +30,25 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Generators.MySql
 {
+    /// <summary>
+    /// The MySQL 4 SQL generator for FluentMigrator.
+    /// </summary>
     public class MySql4Generator : GenericGenerator
     {
+        /// <inheritdoc />
         public MySql4Generator()
             : this(new MySqlQuoter())
         {
         }
 
+        /// <inheritdoc />
         public MySql4Generator(
             [NotNull] MySqlQuoter quoter)
             : this(quoter, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()))
         {
         }
 
+        /// <inheritdoc />
         public MySql4Generator(
             [NotNull] MySqlQuoter quoter,
             [NotNull] IOptions<GeneratorOptions> generatorOptions)
@@ -52,6 +60,7 @@ namespace FluentMigrator.Runner.Generators.MySql
         {
         }
 
+        /// <inheritdoc />
         protected MySql4Generator(
             [NotNull] IColumn column,
             [NotNull] IQuoter quoter,
@@ -61,10 +70,19 @@ namespace FluentMigrator.Runner.Generators.MySql
         {
         }
 
-        public override string AlterColumn { get { return "ALTER TABLE {0} MODIFY COLUMN {1}"; } }
-        public override string DeleteConstraint { get { return "ALTER TABLE {0} DROP {1}{2}"; } }
-        //public override string DeleteConstraint { get { return "ALTER TABLE {0} DROP FOREIGN KEY {1}"; } }
+        /// <inheritdoc />
+        public override string AlterColumn => "ALTER TABLE {0} MODIFY COLUMN {1}";
 
+        /// <inheritdoc />
+        public override string DeleteConstraint => "ALTER TABLE {0} DROP {1}{2}";
+
+        /// <inheritdoc />
+        public override string GeneratorId => GeneratorIdConstants.MySql4;
+
+        /// <inheritdoc />
+        public override List<string> GeneratorIdAliases => [GeneratorIdConstants.MySql4, GeneratorIdConstants.MySql];
+
+        /// <inheritdoc />
         public override string Generate(CreateTableExpression expression)
         {
             if (string.IsNullOrEmpty(expression.TableName)) throw new ArgumentNullException(nameof(expression), @"expression.TableName cannot be empty");
@@ -79,69 +97,88 @@ namespace FluentMigrator.Runner.Generators.MySql
                 ? string.Empty
                 : string.Format(" COMMENT {0}", Quoter.QuoteValue(expression.TableDescription));
 
-            return string.Format("CREATE TABLE {0} ({1}){2} ENGINE = INNODB",
+            return FormatStatement("CREATE TABLE {0} ({1}){2} ENGINE = INNODB",
                 quotedTableName,
                 Column.Generate(expression.Columns, quotedTableName),
                 tableDescription);
         }
 
+        /// <inheritdoc />
         public override string Generate(AlterTableExpression expression)
         {
             if (string.IsNullOrEmpty(expression.TableDescription))
                 return base.Generate(expression);
 
-            return string.Format("ALTER TABLE {0} COMMENT {1}", Quoter.QuoteTableName(expression.TableName), Quoter.QuoteValue(expression.TableDescription));
+            return FormatStatement("ALTER TABLE {0} COMMENT {1}", Quoter.QuoteTableName(expression.TableName), Quoter.QuoteValue(expression.TableDescription));
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteIndexExpression expression)
         {
-            return string.Format("DROP INDEX {0} ON {1}", Quoter.QuoteIndexName(expression.Index.Name), Quoter.QuoteTableName(expression.Index.TableName));
+            return FormatStatement("DROP INDEX {0} ON {1}", Quoter.QuoteIndexName(expression.Index.Name), Quoter.QuoteTableName(expression.Index.TableName));
         }
 
+        /// <inheritdoc />
         public override string Generate(RenameColumnExpression expression)
         {
-            return string.Format("ALTER TABLE {0} CHANGE {1} {2} ", Quoter.QuoteTableName(expression.TableName), Quoter.QuoteColumnName(expression.OldName), Quoter.QuoteColumnName(expression.NewName));
+            return FormatStatement(GenerateWithoutEndStatement(expression));
         }
 
+        /// <summary>
+        /// Generates the SQL for renaming a column without an end statement.
+        /// </summary>
+        /// <param name="expression">The rename column expression.</param>
+        /// <returns>The SQL statement.</returns>
+        internal string GenerateWithoutEndStatement(RenameColumnExpression expression)
+        {
+            return string.Format("ALTER TABLE {0} CHANGE {1} {2}", Quoter.QuoteTableName(expression.TableName), Quoter.QuoteColumnName(expression.OldName), Quoter.QuoteColumnName(expression.NewName));
+        }
+
+        /// <inheritdoc />
         public override string Generate(AlterDefaultConstraintExpression expression)
         {
             // Available since MySQL 4.0.22 (2005)
             var defaultValue = ((MySqlColumn)Column).FormatDefaultValue(expression.DefaultValue);
-            return string.Format(
+            return FormatStatement(
                 "ALTER TABLE {0} ALTER {1} SET {2}",
                 Quoter.QuoteTableName(expression.TableName),
                 Quoter.QuoteColumnName(expression.ColumnName),
                 defaultValue);
         }
 
+        /// <inheritdoc />
         public override string Generate(CreateSequenceExpression expression)
         {
             return CompatibilityMode.HandleCompatibility("Sequences is not supporteed for MySql");
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteSequenceExpression expression)
         {
             return CompatibilityMode.HandleCompatibility("Sequences is not supporteed for MySql");
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteConstraintExpression expression)
         {
             if (expression.Constraint.IsPrimaryKeyConstraint)
             {
-                return string.Format(DeleteConstraint, Quoter.QuoteTableName(expression.Constraint.TableName), "PRIMARY KEY", "");
+                return FormatStatement(DeleteConstraint, Quoter.QuoteTableName(expression.Constraint.TableName), "PRIMARY KEY", "");
             }
-            return string.Format(DeleteConstraint, Quoter.QuoteTableName(expression.Constraint.TableName), "INDEX ", Quoter.Quote(expression.Constraint.ConstraintName));
+            return FormatStatement(DeleteConstraint, Quoter.QuoteTableName(expression.Constraint.TableName), "INDEX ", Quoter.Quote(expression.Constraint.ConstraintName));
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteForeignKeyExpression expression)
         {
-            return string.Format(DeleteConstraint, Quoter.QuoteTableName(expression.ForeignKey.ForeignTable), "FOREIGN KEY ", Quoter.QuoteColumnName(expression.ForeignKey.Name));
+            return FormatStatement(DeleteConstraint, Quoter.QuoteTableName(expression.ForeignKey.ForeignTable), "FOREIGN KEY ", Quoter.QuoteColumnName(expression.ForeignKey.Name));
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteDefaultConstraintExpression expression)
         {
             // Available since MySQL 4.0.22 (2005)
-            return string.Format(
+            return FormatStatement(
                 "ALTER TABLE {0} ALTER {1} DROP DEFAULT",
                 Quoter.QuoteTableName(expression.TableName),
                 Quoter.QuoteColumnName(expression.ColumnName));

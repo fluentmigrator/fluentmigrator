@@ -20,6 +20,14 @@ using System;
 
 namespace FluentMigrator.Runner.Processors.Redshift
 {
+    /// <summary>
+    /// Provides a database factory implementation for Amazon Redshift, enabling the creation of database connections
+    /// and commands specific to Redshift using the Npgsql provider.
+    /// </summary>
+    /// <remarks>
+    /// This class extends <see cref="FluentMigrator.Runner.Processors.ReflectionBasedDbFactory"/> to leverage reflection-based
+    /// mechanisms for dynamically loading and creating database provider factories.
+    /// </remarks>
     public class RedshiftDbFactory : ReflectionBasedDbFactory
     {
         private static readonly TestEntry[] _entries =
@@ -27,12 +35,32 @@ namespace FluentMigrator.Runner.Processors.Redshift
             new TestEntry("Npgsql", "Npgsql.NpgsqlFactory"),
         };
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FluentMigrator.Runner.Processors.Redshift.RedshiftDbFactory"/> class.
+        /// </summary>
+        /// <remarks>
+        /// This constructor is marked as <see cref="System.ObsoleteAttribute"/> and is intended for backward compatibility.
+        /// It initializes the factory with a default service provider.
+        /// </remarks>
+        /// <seealso cref="FluentMigrator.Runner.Processors.Redshift.RedshiftDbFactory(IServiceProvider)"/>
         [Obsolete]
         public RedshiftDbFactory()
             : this(null)
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FluentMigrator.Runner.Processors.Redshift.RedshiftDbFactory"/> class
+        /// with the specified service provider.
+        /// </summary>
+        /// <param name="serviceProvider">
+        /// The <see cref="IServiceProvider"/> used to resolve dependencies required by the factory.
+        /// If <c>null</c>, a default service provider will be used.
+        /// </param>
+        /// <remarks>
+        /// This constructor allows for dependency injection of a service provider, enabling more flexible
+        /// and testable configurations for Redshift database connections.
+        /// </remarks>
         public RedshiftDbFactory(IServiceProvider serviceProvider)
             : base(serviceProvider, _entries)
         {

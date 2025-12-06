@@ -23,8 +23,19 @@ using FluentMigrator.Model;
 
 namespace FluentMigrator.Postgres
 {
+    /// <summary>
+    /// Provides extension methods for PostgreSQL-specific index creation options.
+    /// </summary>
     public static partial class PostgresExtensions
     {
+        /// <summary>
+        /// Represents the key used to store or retrieve the NULL sorting behavior
+        /// for PostgreSQL index columns in the additional features dictionary.
+        /// </summary>
+        /// <remarks>
+        /// This constant is utilized to specify or retrieve the sorting of NULL values
+        /// (e.g., "NULLS FIRST" or "NULLS LAST") when creating or modifying PostgreSQL indexes.
+        /// </remarks>
         public const string NullsSort = "PostgresNulls";
 
         /// <summary>

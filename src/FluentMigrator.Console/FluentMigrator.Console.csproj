@@ -1,7 +1,16 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('Linux'))">
+    <TargetFramework>net8.0</TargetFramework>
+    <RuntimeIdentifiers>linux</RuntimeIdentifiers>
+  </PropertyGroup>
+  <PropertyGroup Condition="!$([MSBuild]::IsOSPlatform('Linux'))">
+    <TargetFrameworks>net48;net8.0</TargetFrameworks>
+    <RuntimeIdentifiers Condition="'$(TargetFramework)' == 'net48'">win-x86;win-x64;any</RuntimeIdentifiers>
+    <RuntimeIdentifiers Condition="'$(TargetFramework)' == 'net8.0'">win-x86;win-x64;win-arm64</RuntimeIdentifiers>
+  </PropertyGroup>
+
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net48</TargetFrameworks>
     <AssemblyName>Migrate</AssemblyName>
     <PackageId>FluentMigrator.Console</PackageId>
     <SignAssembly>true</SignAssembly>
@@ -9,8 +18,8 @@
     <Description>Console runner for FluentMigrator</Description>
     <IsPackable>false</IsPackable>
     <Platforms>AnyCPU;x64;x86</Platforms>
-    <RuntimeIdentifiers>win7-x86;win7-x64;any</RuntimeIdentifiers>
   </PropertyGroup>
+
   <Import Project="$(MSBuildThisFileDirectory)../../PackageTool.props" />
   <ItemGroup>
     <None Include="..\..\FluentMigrator.snk" Link="FluentMigrator.snk" />
@@ -20,13 +29,14 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Npgsql" Version="8.0.7" />
-    <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="10.3.2" />
-    <PackageReference Include="FSharp.Core" Version="9.0.201" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.2" />
-    <PackageReference Include="Oracle.ManagedDataAccess" Version="23.7.0" />
+    <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="10.3.3" />
+    <PackageReference Include="FSharp.Core" Version="9.0.202" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.4" />
+    <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="23.8.0" Condition="'$(TargetFramework)' == 'net8.0'" />
+    <PackageReference Include="Oracle.ManagedDataAccess" Version="23.8.0" Condition="'$(TargetFramework)' == 'net48'" />
     <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.11" />
     <PackageReference Include="MySqlConnector" Version="2.4.0" />
-    <PackageReference Include="Snowflake.Data" Version="4.3.0" />
+    <PackageReference Include="Snowflake.Data" Version="4.4.1" />
   </ItemGroup>
   <ItemGroup Condition=" '$(Platform)' == 'x86' ">
     <PackageReference Include="Oracle.DataAccess.x86.4" Version="4.112.3" />
@@ -44,5 +54,6 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Update="JetBrains.Annotations" Version="2024.3.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.7" />
   </ItemGroup>
 </Project>

@@ -19,12 +19,12 @@ using System;
 using FluentMigrator;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner;
-using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Initialization.AssemblyLoader;
+#if NETFRAMEWORK
 using FluentMigrator.Runner.Initialization.NetFramework;
-using FluentMigrator.Runner.Logging;
+#endif
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.VersionTableInfo;
 using FluentMigrator.Validation;
@@ -62,7 +62,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
                 // Add logging support
                 .AddLogging()
-                .AddScoped<ILogger>(provider => NullLogger.Instance)
+                .AddScoped<ILogger>(_ => NullLogger.Instance)
 
                 // The default assembly loader factory
                 .TryAddSingleton<AssemblyLoaderFactory>();
@@ -95,14 +95,12 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services
                 // Source for migrations
-#pragma warning disable 618
-                .TryAddScoped<IMigrationSource, MigrationSource>();
+                .TryAddScoped<IFilteringMigrationSource, MigrationSource>();
 
             services
                 .TryAddScoped(
-                    sp => sp.GetRequiredService<IMigrationSource>() as IFilteringMigrationSource
+                    sp => sp.GetRequiredService<IFilteringMigrationSource>()
                      ?? ActivatorUtilities.CreateInstance<MigrationSource>(sp));
-#pragma warning restore 618
 
             services
                 // Source for profiles
@@ -162,10 +160,6 @@ namespace Microsoft.Extensions.DependencyInjection
 #if NETFRAMEWORK
             services
                 .TryAddScoped<INetConfigManager, NetConfigManager>();
-#pragma warning disable 612
-            services
-                .AddScoped<IConnectionStringReader, AppConfigConnectionStringReader>();
-#pragma warning restore 612
 #endif
             services
                 .AddScoped<IConnectionStringReader, ConfigurationConnectionStringReader>()
@@ -202,7 +196,6 @@ namespace Microsoft.Extensions.DependencyInjection
                     sp =>
                     {
                         var querySchema = sp.GetRequiredService<IQuerySchema>();
-                        var options = sp.GetRequiredService<IOptions<RunnerOptions>>();
                         var connectionStringAccessor = sp.GetRequiredService<IConnectionStringAccessor>();
                         var connectionString = connectionStringAccessor.ConnectionString;
                         return new MigrationContext(querySchema, sp, connectionString);
@@ -233,86 +226,22 @@ namespace Microsoft.Extensions.DependencyInjection
             return services;
         }
 
-        /// <summary>
-        /// Creates services for a given runner context, connection string provider and assembly loader factory.
-        /// </summary>
-        /// <param name="runnerContext">The runner context</param>
-        /// <param name="connectionStringProvider">The connection string provider</param>
-        /// <param name="defaultAssemblyLoaderFactory">The assembly loader factory</param>
-        /// <param name="configureRunner">The runner builder config deletage</param>
-        /// <returns>The new service collection</returns>
-        [NotNull]
-        [Obsolete]
-        internal static IServiceCollection CreateServices(
-            [NotNull] this IRunnerContext runnerContext,
-            [CanBeNull] IConnectionStringProvider connectionStringProvider,
-            [CanBeNull] AssemblyLoaderFactory defaultAssemblyLoaderFactory = null,
-            [CanBeNull] Action<IMigrationRunnerBuilder> configureRunner = null)
+        /// <inheritdoc />
+        private class MigrationRunnerBuilder(IServiceCollection services) : IMigrationRunnerBuilder
         {
-            var services = new ServiceCollection();
-            var assemblyLoaderFactory = defaultAssemblyLoaderFactory ?? new AssemblyLoaderFactory();
-
-            if (!runnerContext.NoConnection && connectionStringProvider == null)
-            {
-                runnerContext.NoConnection = true;
-            }
-
-            // Configure the migration runner
-            services
-                .AddLogging(lb => lb.AddProvider(new LegacyFluentMigratorLoggerProvider(runnerContext.Announcer)))
-                .AddFluentMigratorCore()
-                .ConfigureRunner(c => configureRunner?.Invoke(c))
-                .Configure<SelectingProcessorAccessorOptions>(opt => opt.ProcessorId = runnerContext.Database)
-                .AddSingleton(assemblyLoaderFactory)
-                .Configure<TypeFilterOptions>(
-                    opt =>
-                    {
-                        opt.Namespace = runnerContext.Namespace;
-                        opt.NestedNamespaces = runnerContext.NestedNamespaces;
-                    })
-                .Configure<AssemblySourceOptions>(opt => opt.AssemblyNames = runnerContext.Targets)
-                .Configure<RunnerOptions>(
-                    opt => { opt.SetValuesFrom(runnerContext); })
-                .Configure<ProcessorOptions>(opt => { opt.SetValuesFrom(runnerContext); })
-                .Configure<AppConfigConnectionStringAccessorOptions>(
-                    opt => opt.ConnectionStringConfigPath = runnerContext.ConnectionStringConfigPath);
-
-            // Configure the processor
-            if (runnerContext.NoConnection)
-            {
-                // Always return the connectionless processor
-                services
-                    .AddScoped<IProcessorAccessor, ConnectionlessProcessorAccessor>();
-            }
-
-            return services;
-        }
-
-        private class MigrationRunnerBuilder : IMigrationRunnerBuilder
-        {
-            public MigrationRunnerBuilder(IServiceCollection services)
-            {
-                Services = services;
-                DanglingAssemblySourceItem = null;
-            }
+            /// <inheritdoc />
+            public IServiceCollection Services { get; } = services;
 
             /// <inheritdoc />
-            public IServiceCollection Services { get; }
-
-            /// <inheritdoc />
-            public IAssemblySourceItem DanglingAssemblySourceItem { get; set; }
+            public IAssemblySourceItem DanglingAssemblySourceItem { get; set; } = null;
         }
 
+        /// <inheritdoc />
         [UsedImplicitly]
-        private class ConnectionlessProcessorAccessor : IProcessorAccessor
+        private class ConnectionlessProcessorAccessor(IServiceProvider serviceProvider) : IProcessorAccessor
         {
-            public ConnectionlessProcessorAccessor(IServiceProvider serviceProvider)
-            {
-                Processor = ActivatorUtilities.CreateInstance<ConnectionlessProcessor>(serviceProvider);
-            }
-
             /// <inheritdoc />
-            public IMigrationProcessor Processor { get; }
+            public IMigrationProcessor Processor { get; } = ActivatorUtilities.CreateInstance<ConnectionlessProcessor>(serviceProvider);
         }
     }
 }

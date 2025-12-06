@@ -29,12 +29,18 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.Postgres92
 {
+    /// <summary>
+    /// The PostgreSQL 9.2 processor for FluentMigrator.
+    /// </summary>
     public class Postgres92Processor : PostgresProcessor
     {
-        public override string DatabaseType => "Postgres92";
+        /// <inheritdoc />
+        public override string DatabaseType => ProcessorIdConstants.Postgres92;
 
-        public override IList<string> DatabaseTypeAliases { get; } = new List<string> { "PostgreSQL92" };
+        /// <inheritdoc />
+        public override IList<string> DatabaseTypeAliases { get; } = new List<string> { ProcessorIdConstants.Postgres92, ProcessorIdConstants.PostgreSQL92 };
 
+        /// <inheritdoc />
         public Postgres92Processor(
             [NotNull] IPostgresDbFactory factory,
             [NotNull] Postgres92Generator generator,

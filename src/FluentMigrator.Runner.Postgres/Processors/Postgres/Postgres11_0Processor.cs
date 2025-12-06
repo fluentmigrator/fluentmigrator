@@ -26,8 +26,16 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.Postgres
 {
+    /// <summary>
+    /// Represents a migration processor for PostgreSQL 11.0.
+    /// </summary>
+    /// <remarks>
+    /// This class provides specific functionality for handling migrations targeting PostgreSQL version 11.0.
+    /// It extends the <see cref="PostgresProcessor"/> to include PostgreSQL 11.0-specific behavior and configurations.
+    /// </remarks>
     public class Postgres11_0Processor : PostgresProcessor
     {
+        /// <inheritdoc />
         public Postgres11_0Processor(
             [NotNull] IPostgresDbFactory factory,
             [NotNull] Postgres11_0Generator generator,
@@ -39,9 +47,11 @@ namespace FluentMigrator.Runner.Processors.Postgres
         {
         }
 
-        public override string DatabaseType => ProcessorId.PostgreSQL11_0;
+        /// <inheritdoc />
+        public override string DatabaseType => ProcessorIdConstants.PostgreSQL11_0;
 
-        public override IList<string> DatabaseTypeAliases { get; } = new List<string> { ProcessorId.PostgreSQL };
+        /// <inheritdoc />
+        public override IList<string> DatabaseTypeAliases { get; } = new List<string> { ProcessorIdConstants.PostgreSQL11_0, ProcessorIdConstants.PostgreSQL };
 
     }
 }

@@ -26,8 +26,12 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.Postgres
 {
+    /// <summary>
+    /// The PostgreSQL 10.0 processor for FluentMigrator.
+    /// </summary>
     public class Postgres10_0Processor : PostgresProcessor
     {
+        /// <inheritdoc />
         public Postgres10_0Processor(
             [NotNull] IPostgresDbFactory factory,
             [NotNull] Postgres10_0Generator generator,
@@ -39,9 +43,10 @@ namespace FluentMigrator.Runner.Processors.Postgres
         {
         }
 
-        public override string DatabaseType => ProcessorId.PostgreSQL10_0;
+        /// <inheritdoc />
+        public override string DatabaseType => ProcessorIdConstants.PostgreSQL10_0;
 
-        public override IList<string> DatabaseTypeAliases { get; } = new List<string> { ProcessorId.PostgreSQL };
-
+        /// <inheritdoc />
+        public override IList<string> DatabaseTypeAliases { get; } = new List<string> { ProcessorIdConstants.PostgreSQL10_0, ProcessorIdConstants.PostgreSQL };
     }
 }

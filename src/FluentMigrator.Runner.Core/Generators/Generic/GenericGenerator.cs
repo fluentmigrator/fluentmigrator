@@ -1,19 +1,44 @@
+#region License
+//
+// Copyright (c) 2018, Fluent Migrator Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
 using FluentMigrator.Expressions;
+using FluentMigrator.Generation;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Base;
+
+using JetBrains.Annotations;
 
 using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Generators.Generic
 {
+    /// <summary>
+    /// Provides a base implementation for SQL generators.
+    /// </summary>
     public abstract class GenericGenerator : GeneratorBase
     {
+        /// <inheritdoc />
         protected GenericGenerator(
             IColumn column,
             IQuoter quoter,
@@ -24,49 +49,78 @@ namespace FluentMigrator.Runner.Generators.Generic
             CompatibilityMode = generatorOptions.Value.CompatibilityMode ?? CompatibilityMode.LOOSE;
         }
 
+        /// <inheritdoc />
         public CompatibilityMode CompatibilityMode { get; set; }
 
-        public virtual string CreateTable { get { return "CREATE TABLE {0} ({1})"; } }
-        public virtual string DropTable { get { return "DROP TABLE {0}"; } }
-        public virtual string DropTableIfExists { get { return "DROP TABLE IF EXISTS {0}"; } }
+        /// <inheritdoc />
+        public virtual string CreateTable => "CREATE TABLE {0} ({1})";
+        /// <inheritdoc />
+        public virtual string DropTable => "DROP TABLE {0}";
+        /// <inheritdoc />
+        public virtual string DropTableIfExists => "DROP TABLE IF EXISTS {0}";
 
-        public virtual string AddColumn { get { return "ALTER TABLE {0} ADD COLUMN {1}"; } }
-        public virtual string DropColumn { get { return "ALTER TABLE {0} DROP COLUMN {1}"; } }
-        public virtual string AlterColumn { get { return "ALTER TABLE {0} ALTER COLUMN {1}"; } }
-        public virtual string RenameColumn { get { return "ALTER TABLE {0} RENAME COLUMN {1} TO {2}"; } }
+        /// <inheritdoc />
+        public virtual string AddColumn => "ALTER TABLE {0} ADD COLUMN {1}";
+        /// <inheritdoc />
+        public virtual string DropColumn => "ALTER TABLE {0} DROP COLUMN {1}";
+        /// <inheritdoc />
+        public virtual string AlterColumn => "ALTER TABLE {0} ALTER COLUMN {1}";
+        /// <inheritdoc />
+        public virtual string RenameColumn => "ALTER TABLE {0} RENAME COLUMN {1} TO {2}";
 
-        public virtual string RenameTable { get { return "RENAME TABLE {0} TO {1}"; } }
+        /// <inheritdoc />
+        public virtual string RenameTable => "RENAME TABLE {0} TO {1}";
 
-        public virtual string CreateSchema { get { return "CREATE SCHEMA {0}"; } }
-        public virtual string AlterSchema { get { return "ALTER SCHEMA {0} TRANSFER {1}"; } }
-        public virtual string DropSchema { get { return "DROP SCHEMA {0}"; } }
+        /// <inheritdoc />
+        public virtual string CreateSchema => "CREATE SCHEMA {0}";
+        /// <inheritdoc />
+        public virtual string AlterSchema => "ALTER SCHEMA {0} TRANSFER {1}";
+        /// <inheritdoc />
+        public virtual string DropSchema => "DROP SCHEMA {0}";
 
-        public virtual string CreateIndex { get { return "CREATE {0}{1}INDEX {2} ON {3} ({4})"; } }
-        public virtual string DropIndex { get { return "DROP INDEX {0}"; } }
+        /// <inheritdoc />
+        public virtual string CreateIndex => "CREATE {0}{1}INDEX {2} ON {3} ({4})";
+        /// <inheritdoc />
+        public virtual string DropIndex => "DROP INDEX {0}";
 
-        public virtual string InsertData { get { return "INSERT INTO {0} ({1}) VALUES ({2})"; } }
-        public virtual string UpdateData { get { return "UPDATE {0} SET {1} WHERE {2}"; } }
-        public virtual string DeleteData { get { return "DELETE FROM {0} WHERE {1}"; } }
+        /// <inheritdoc />
+        public virtual string InsertData => "INSERT INTO {0} ({1}) VALUES ({2})";
+        /// <inheritdoc />
+        public virtual string UpdateData => "UPDATE {0} SET {1} WHERE {2}";
+        /// <inheritdoc />
+        public virtual string DeleteData => "DELETE FROM {0} WHERE {1}";
 
-        public virtual string CreateConstraint { get { return "ALTER TABLE {0} ADD CONSTRAINT {1} {2} ({3})"; } }
-        public virtual string DeleteConstraint { get { return "ALTER TABLE {0} DROP CONSTRAINT {1}"; } }
-        public virtual string CreateForeignKeyConstraint { get { return "ALTER TABLE {0} ADD {1}"; } }
+        /// <inheritdoc />
+        public virtual string CreateConstraint => "ALTER TABLE {0} ADD CONSTRAINT {1} {2} ({3})";
+        /// <inheritdoc />
+        public virtual string DeleteConstraint => "ALTER TABLE {0} DROP CONSTRAINT {1}";
+        /// <inheritdoc />
+        public virtual string CreateForeignKeyConstraint => "ALTER TABLE {0} ADD {1}";
 
+        /// <inheritdoc />
+        [StringFormatMethod("format")]
+        protected string FormatStatement(string format, params object[] args)
+        {
+            var builder = new StringBuilder().AppendFormat(format, args);
+
+            AppendSqlStatementEndToken(builder);
+
+            return builder.ToString();
+        }
+
+        /// <inheritdoc />
         public virtual string GetUniqueString(CreateIndexExpression column)
         {
             return column.Index.IsUnique ? "UNIQUE " : string.Empty;
         }
 
+        /// <inheritdoc />
         public virtual string GetClusterTypeString(CreateIndexExpression column)
         {
             return string.Empty;
         }
 
-        /// <summary>
-        /// Outputs a create table string
-        /// </summary>
-        /// <param name="expression"></param>
-        /// <returns></returns>
+        /// <inheritdoc />
         public override string Generate(CreateTableExpression expression)
         {
             if (string.IsNullOrEmpty(expression.TableName))
@@ -87,23 +141,27 @@ namespace FluentMigrator.Runner.Generators.Generic
                 return errors;
             }
 
-            return string.Format(CreateTable, quotedTableName, Column.Generate(expression.Columns, quotedTableName));
+            return FormatStatement(CreateTable, quotedTableName, Column.Generate(expression.Columns, quotedTableName));
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteTableExpression expression)
         {
             if (expression.IfExists)
             {
-                return String.Format(DropTableIfExists, Quoter.QuoteTableName(expression.TableName));
+                return FormatStatement(DropTableIfExists, Quoter.QuoteTableName(expression.TableName));
             }
-            return string.Format(DropTable, Quoter.QuoteTableName(expression.TableName, expression.SchemaName));
+
+            return FormatStatement(DropTable, Quoter.QuoteTableName(expression.TableName, expression.SchemaName));
         }
 
+        /// <inheritdoc />
         public override string Generate(RenameTableExpression expression)
         {
-            return string.Format(RenameTable, Quoter.QuoteTableName(expression.OldName, expression.SchemaName), Quoter.Quote(expression.NewName));
+            return FormatStatement(RenameTable, Quoter.QuoteTableName(expression.OldName, expression.SchemaName), Quoter.Quote(expression.NewName));
         }
 
+        /// <inheritdoc />
         public override string Generate(CreateColumnExpression expression)
         {
             var errors = ValidateAdditionalFeatureCompatibility(expression.Column.AdditionalFeatures);
@@ -112,9 +170,10 @@ namespace FluentMigrator.Runner.Generators.Generic
                 return errors;
             }
 
-            return string.Format(AddColumn, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), Column.Generate(expression.Column));
+            return FormatStatement(AddColumn, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), Column.Generate(expression.Column));
         }
 
+        /// <inheritdoc />
         public override string Generate(AlterColumnExpression expression)
         {
             var errors = ValidateAdditionalFeatureCompatibility(expression.Column.AdditionalFeatures);
@@ -123,31 +182,34 @@ namespace FluentMigrator.Runner.Generators.Generic
                 return errors;
             }
 
-            return string.Format(AlterColumn, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), Column.Generate(expression.Column));
+            return FormatStatement(AlterColumn, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), Column.Generate(expression.Column));
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteColumnExpression expression)
         {
             var builder = new StringBuilder();
             foreach (var columnName in expression.ColumnNames)
             {
-                if (expression.ColumnNames.First() != columnName)
-                {
-                    AppendSqlStatementEndToken(builder);
-                }
+                builder.AppendFormat(
+                    DropColumn,
+                    Quoter.QuoteTableName(expression.TableName, expression.SchemaName),
+                    Quoter.QuoteColumnName(columnName));
 
-                builder.AppendFormat(DropColumn, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), Quoter.QuoteColumnName(columnName));
+                AppendSqlStatementEndToken(builder);
             }
+
             return builder.ToString();
         }
 
+        /// <inheritdoc />
         public override string Generate(RenameColumnExpression expression)
         {
-            return string.Format(RenameColumn,
+            return FormatStatement(RenameColumn,
                 Quoter.QuoteTableName(expression.TableName, expression.SchemaName),
                 Quoter.QuoteColumnName(expression.OldName),
                 Quoter.QuoteColumnName(expression.NewName)
-                );
+            );
         }
 
         /// <inheritdoc />
@@ -169,7 +231,7 @@ namespace FluentMigrator.Runner.Generators.Generic
                 }
             }
 
-            return string.Format(CreateIndex
+            return FormatStatement(CreateIndex
                 , GetUniqueString(expression)
                 , GetClusterTypeString(expression)
                 , Quoter.QuoteIndexName(expression.Index.Name)
@@ -177,19 +239,22 @@ namespace FluentMigrator.Runner.Generators.Generic
                 , string.Join(", ", indexColumns));
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteIndexExpression expression)
         {
-            return string.Format(DropIndex, Quoter.QuoteIndexName(expression.Index.Name), Quoter.QuoteTableName(expression.Index.TableName, expression.Index.SchemaName));
+            return FormatStatement(DropIndex, Quoter.QuoteIndexName(expression.Index.Name), Quoter.QuoteTableName(expression.Index.TableName, expression.Index.SchemaName));
         }
 
+        /// <inheritdoc />
         public override string Generate(CreateForeignKeyExpression expression)
         {
-            return string.Format(
+            return FormatStatement(
                 CreateForeignKeyConstraint,
                 Quoter.QuoteTableName(expression.ForeignKey.ForeignTable, expression.ForeignKey.ForeignTableSchema),
                 Column.FormatForeignKey(expression.ForeignKey, GenerateForeignKeyName));
         }
 
+        /// <inheritdoc />
         public override string Generate(CreateConstraintExpression expression)
         {
             var constraintType = (expression.Constraint.IsPrimaryKeyConstraint) ? "PRIMARY KEY" : "UNIQUE";
@@ -201,22 +266,25 @@ namespace FluentMigrator.Runner.Generators.Generic
                 columns[i] = Quoter.QuoteColumnName(expression.Constraint.Columns.ElementAt(i));
             }
 
-            return string.Format(CreateConstraint, Quoter.QuoteTableName(expression.Constraint.TableName, expression.Constraint.SchemaName),
+            return FormatStatement(CreateConstraint, Quoter.QuoteTableName(expression.Constraint.TableName, expression.Constraint.SchemaName),
                 Quoter.QuoteConstraintName(expression.Constraint.ConstraintName),
                 constraintType,
                 string.Join(", ", columns));
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteConstraintExpression expression)
         {
-            return string.Format(DeleteConstraint, Quoter.QuoteTableName(expression.Constraint.TableName, expression.Constraint.SchemaName), Quoter.QuoteConstraintName(expression.Constraint.ConstraintName));
+            return FormatStatement(DeleteConstraint, Quoter.QuoteTableName(expression.Constraint.TableName, expression.Constraint.SchemaName), Quoter.QuoteConstraintName(expression.Constraint.ConstraintName));
         }
 
+        /// <inheritdoc />
         public virtual string GenerateForeignKeyName(ForeignKeyDefinition foreignKey)
         {
             return Column.GenerateForeignKeyName(foreignKey);
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteForeignKeyExpression expression)
         {
             if (expression.ForeignKey.ForeignTable == null)
@@ -224,9 +292,13 @@ namespace FluentMigrator.Runner.Generators.Generic
                 throw new ArgumentNullException(nameof(expression), ErrorMessages.ExpressionTableNameMissingWithHints);
             }
 
-            return string.Format(DeleteConstraint, Quoter.QuoteTableName(expression.ForeignKey.ForeignTable, expression.ForeignKey.ForeignTableSchema), Quoter.QuoteColumnName(expression.ForeignKey.Name));
+            return FormatStatement(DeleteConstraint,
+                Quoter.QuoteTableName(expression.ForeignKey.ForeignTable, expression.ForeignKey.ForeignTableSchema),
+                Quoter.QuoteColumnName(expression.ForeignKey.Name)
+            );
         }
 
+        /// <inheritdoc />
         public override string Generate(InsertDataExpression expression)
         {
             var errors = ValidateAdditionalFeatureCompatibility(expression.AdditionalFeatures);
@@ -238,26 +310,25 @@ namespace FluentMigrator.Runner.Generators.Generic
             var output = new StringBuilder();
             foreach (var pair in GenerateColumnNamesAndValues(expression))
             {
-                if (output.Length != 0)
-                {
-                    AppendSqlStatementEndToken(output);
-                }
-
                 output.AppendFormat(
                     InsertData,
                     Quoter.QuoteTableName(expression.TableName, expression.SchemaName),
                     pair.Key,
                     pair.Value);
+
+                AppendSqlStatementEndToken(output);
             }
 
             return output.ToString();
         }
 
+        /// <inheritdoc />
         protected virtual StringBuilder AppendSqlStatementEndToken(StringBuilder stringBuilder)
         {
-            return stringBuilder.Append("; ");
+            return stringBuilder.Append(";");
         }
 
+        /// <inheritdoc />
         protected List<KeyValuePair<string,string>> GenerateColumnNamesAndValues(InsertDataExpression expression)
         {
             var insertStrings = new List<KeyValuePair<string, string>>();
@@ -280,6 +351,7 @@ namespace FluentMigrator.Runner.Generators.Generic
             return insertStrings;
         }
 
+        /// <inheritdoc />
         protected string ValidateAdditionalFeatureCompatibility(IEnumerable<KeyValuePair<string, object>> features)
         {
             if (CompatibilityMode == CompatibilityMode.STRICT) {
@@ -299,6 +371,7 @@ namespace FluentMigrator.Runner.Generators.Generic
             return string.Empty;
         }
 
+        /// <inheritdoc />
         public override string Generate(UpdateDataExpression expression)
         {
             var updateItems = new List<string>();
@@ -315,7 +388,11 @@ namespace FluentMigrator.Runner.Generators.Generic
                 GenerateWhere(expression.Where, whereClauses);
             }
 
-            return string.Format(UpdateData, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), string.Join(", ", updateItems.ToArray()), string.Join(" AND ", whereClauses.ToArray()));
+            return FormatStatement(UpdateData,
+                Quoter.QuoteTableName(expression.TableName, expression.SchemaName),
+                string.Join(", ", updateItems.ToArray()),
+                string.Join(" AND ", whereClauses.ToArray())
+            );
         }
 
         /// <summary>
@@ -348,9 +425,12 @@ namespace FluentMigrator.Runner.Generators.Generic
                 {
                     op = "IS ";
                 }
-                else if (item.Value is RawSql)
+                else if (item.Value is RawSql rawSql)
                 {
-                    op = "";
+                    // When there's a column name (key is not empty), check if RawSql starts with an operator.
+                    // If not, add "= " for backward compatibility (e.g., RawSql.Insert("(SELECT ...)") should become "= (SELECT ...)").
+                    // If it does start with an operator (e.g., "= 3", "IS NULL", "IN (1,2)"), use it as-is.
+                    op = item.Key != "" && !StartsWithOperator(rawSql.Value) ? "= " : "";
                 }
                 else
                 {
@@ -364,6 +444,50 @@ namespace FluentMigrator.Runner.Generators.Generic
             }
         }
 
+        /// <summary>
+        /// Checks if a raw SQL string starts with an operator (=, IS, IN, comparison operators, LIKE, NOT, BETWEEN)
+        /// </summary>
+        /// <param name="rawSqlValue">The raw SQL value to check</param>
+        /// <returns>True if the string starts with an operator, false otherwise</returns>
+        private static bool StartsWithOperator(string rawSqlValue)
+        {
+            if (string.IsNullOrEmpty(rawSqlValue))
+            {
+                return false;
+            }
+
+            var trimmed = rawSqlValue.TrimStart();
+            if (trimmed.Length == 0)
+            {
+                return false;
+            }
+
+            // Check for symbolic operators first (=, <>, !=, <, >, <=, >=)
+            var firstChar = trimmed[0];
+            if (firstChar == '=' || firstChar == '<' || firstChar == '>' || firstChar == '!')
+            {
+                return true;
+            }
+
+            // Check for keyword operators (case-insensitive)
+            // IN can be followed by a space or directly by a parenthesis
+            return StartsWithKeywordOperator(trimmed, "IS ")
+                || StartsWithKeywordOperator(trimmed, "IN ")
+                || StartsWithKeywordOperator(trimmed, "IN(")
+                || StartsWithKeywordOperator(trimmed, "LIKE ")
+                || StartsWithKeywordOperator(trimmed, "NOT ")
+                || StartsWithKeywordOperator(trimmed, "BETWEEN ");
+        }
+
+        /// <summary>
+        /// Checks if a string starts with a specific keyword operator (case-insensitive)
+        /// </summary>
+        private static bool StartsWithKeywordOperator(string value, string keyword)
+        {
+            return value.StartsWith(keyword, StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <inheritdoc />
         public override string Generate(DeleteDataExpression expression)
         {
             var deleteItems = new List<string>();
@@ -387,33 +511,32 @@ namespace FluentMigrator.Runner.Generators.Generic
             var output = new StringBuilder();
             foreach (var deleteItem in deleteItems)
             {
-                if (output.Length != 0)
-                {
-                    AppendSqlStatementEndToken(output);
-                }
-
                 output.Append(deleteItem);
+                AppendSqlStatementEndToken(output);
             }
 
             return output.ToString();
         }
 
-        //All Schema method throw by default as only Sql server 2005 and up supports them.
+        /// <inheritdoc />
         public override string Generate(CreateSchemaExpression expression)
         {
             return CompatibilityMode.HandleCompatibility("Schemas are not supported");
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteSchemaExpression expression)
         {
             return CompatibilityMode.HandleCompatibility("Schemas are not supported");
         }
 
+        /// <inheritdoc />
         public override string Generate(AlterSchemaExpression expression)
         {
             return CompatibilityMode.HandleCompatibility("Schemas are not supported");
         }
 
+        /// <inheritdoc />
         public override string Generate(CreateSequenceExpression expression)
         {
             var result = new StringBuilder("CREATE SEQUENCE ");
@@ -459,14 +582,15 @@ namespace FluentMigrator.Runner.Generators.Generic
                 result.Append(" CYCLE");
             }
 
+            AppendSqlStatementEndToken(result);
+
             return result.ToString();
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteSequenceExpression expression)
         {
-            var result = new StringBuilder("DROP SEQUENCE ");
-            result.AppendFormat(Quoter.QuoteSequenceName(expression.SequenceName, expression.SchemaName));
-            return result.ToString();
+            return FormatStatement("DROP SEQUENCE {0}", Quoter.QuoteSequenceName(expression.SequenceName, expression.SchemaName));
         }
     }
 }

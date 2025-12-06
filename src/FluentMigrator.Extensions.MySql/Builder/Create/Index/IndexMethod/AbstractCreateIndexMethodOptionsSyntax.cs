@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2021, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,10 +24,23 @@ using JetBrains.Annotations;
 
 namespace FluentMigrator.Builder.Create.Index
 {
+    /// <inheritdoc />
     public abstract class AbstractCreateIndexMethodOptionsSyntax : ICreateIndexMethodOptionsSyntax
     {
+        /// <summary>
+        /// Used to accumulate configuration state on create index options.
+        /// </summary>
         protected ICreateIndexOptionsSyntax CreateIndexOptionsSyntax { get; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AbstractCreateIndexMethodOptionsSyntax"/> class.
+        /// </summary>
+        /// <param name="createIndexOptionsSyntax">
+        /// The syntax object used to define index options.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown when <paramref name="createIndexOptionsSyntax"/> is <c>null</c>.
+        /// </exception>
         protected AbstractCreateIndexMethodOptionsSyntax([NotNull] ICreateIndexOptionsSyntax createIndexOptionsSyntax)
         {
             CreateIndexOptionsSyntax = createIndexOptionsSyntax ?? throw new ArgumentNullException(nameof(createIndexOptionsSyntax));

@@ -28,9 +28,32 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
+    /// <summary>
+    /// Represents a migration processor for SQL Server 2016.
+    /// </summary>
+    /// <remarks>
+    /// This processor is responsible for executing database migrations specifically targeting
+    /// SQL Server 2016. It extends the functionality of <see cref="SqlServerProcessor"/> and
+    /// utilizes the <see cref="SqlServer2016Generator"/> for generating SQL scripts.
+    /// </remarks>
     public class SqlServer2016Processor : SqlServerProcessor
     {
-        /// <inheritdoc />
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SqlServer2016Processor"/> class.
+        /// </summary>
+        /// <param name="logger">The logger used to log messages and errors.</param>
+        /// <param name="quoter">The SQL quoter used for quoting SQL identifiers and literals.</param>
+        /// <param name="generator">The SQL generator used to generate SQL scripts for SQL Server 2016.</param>
+        /// <param name="options">The processor options that define configuration settings.</param>
+        /// <param name="connectionStringAccessor">The accessor for retrieving the database connection string.</param>
+        /// <param name="serviceProvider">The service provider used for dependency injection.</param>
+        /// <remarks>
+        /// This constructor initializes the processor with the specified dependencies, enabling it to execute
+        /// database migrations targeting SQL Server 2016.
+        /// </remarks>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if any of the required parameters are <c>null</c>.
+        /// </exception>
         public SqlServer2016Processor(
             [NotNull] ILogger<SqlServer2016Processor> logger,
             [NotNull] SqlServer2008Quoter quoter,
@@ -59,7 +82,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             [NotNull] IConnectionStringAccessor connectionStringAccessor,
             [NotNull] IServiceProvider serviceProvider)
             : base(
-                new[] { ProcessorId.SqlServer2016, ProcessorId.SqlServer },
+                new[] { ProcessorIdConstants.SqlServer2016, ProcessorIdConstants.SqlServer },
                 factory,
                 generator,
                 quoter,

@@ -26,8 +26,16 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.Postgres
 {
+    /// <summary>
+    /// Represents a migration processor for PostgreSQL version 15.0.
+    /// </summary>
+    /// <remarks>
+    /// This processor extends the <see cref="PostgresProcessor"/> to provide support for PostgreSQL 15.0-specific features.
+    /// It uses the <see cref="Postgres15_0Generator"/> for generating SQL statements and integrates with the FluentMigrator framework.
+    /// </remarks>
     public class Postgres15_0Processor : PostgresProcessor
     {
+        /// <inheritdoc />
         public Postgres15_0Processor(
             [NotNull] IPostgresDbFactory factory,
             [NotNull] Postgres15_0Generator generator,
@@ -39,9 +47,11 @@ namespace FluentMigrator.Runner.Processors.Postgres
         {
         }
 
-        public override string DatabaseType => ProcessorId.PostgreSQL15_0;
+        /// <inheritdoc />
+        public override string DatabaseType => ProcessorIdConstants.PostgreSQL15_0;
 
-        public override IList<string> DatabaseTypeAliases { get; } = new List<string> { ProcessorId.PostgreSQL };
+        /// <inheritdoc />
+        public override IList<string> DatabaseTypeAliases { get; } = new List<string> { ProcessorIdConstants.PostgreSQL15_0, ProcessorIdConstants.PostgreSQL };
 
     }
 }

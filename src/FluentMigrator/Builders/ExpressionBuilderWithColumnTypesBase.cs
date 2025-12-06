@@ -1,7 +1,10 @@
+using System.ComponentModel.DataAnnotations;
 using System.Data;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
+
+using JetBrains.Annotations;
 
 namespace FluentMigrator.Builders
 {
@@ -146,7 +149,7 @@ namespace FluentMigrator.Builders
         }
 
         /// <inheritdoc />
-        public TNext AsDecimal(int size, int precision)
+        public TNext AsDecimal([ValueRange(0, 28)] int size, int precision)
         {
             Column.Type = DbType.Decimal;
             Column.Size = size;
@@ -289,6 +292,8 @@ namespace FluentMigrator.Builders
             Column.Size = columnDataType.Size;
             Column.Precision = columnDataType.Precision;
             Column.CustomType = columnDataType.CustomType;
+            Column.Expression = columnDataType.Expression;
+            Column.ExpressionStored = columnDataType.ExpressionStored;
             return (TNext)(object)this;
         }
 

@@ -202,6 +202,14 @@ namespace FluentMigrator.Builders.Create.Table
             return this;
         }
 
+        /// <inheritdoc/>
+        public ICreateTableColumnOptionOrWithColumnSyntax Computed(string expression, bool stored = false)
+        {
+            CurrentColumn.Expression = expression;
+            CurrentColumn.ExpressionStored = stored;
+            return this;
+        }
+
         /// <inheritdoc />
         public ICreateTableColumnOptionOrWithColumnSyntax Unique()
         {

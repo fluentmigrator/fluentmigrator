@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 
+using FluentMigrator.Generation;
 using FluentMigrator.Model;
 
 namespace FluentMigrator.Runner.Generators.Base
@@ -26,10 +27,10 @@ namespace FluentMigrator.Runner.Generators.Base
     /// <summary>
     /// The base class for column definitions
     /// </summary>
-    [Obsolete("Use ColumnBase<TTypeMap> instead. Going forward, column models must have a db-specific type map model.")]
-    public abstract class ColumnBase : IColumn
+    public abstract class ColumnBase<TTypeMap> : IColumn
+        where TTypeMap : ITypeMap
     {
-        private readonly ITypeMap _typeMap;
+        private readonly TTypeMap _typeMap;
 
         /// <summary>
         /// Gets or sets the clause order
@@ -37,11 +38,11 @@ namespace FluentMigrator.Runner.Generators.Base
         protected IList<Func<ColumnDefinition, string>> ClauseOrder { get; set; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ColumnBase"/> class.
+        /// Initializes a new instance of the <see cref="ColumnBase{TTypeMap}"/> class.
         /// </summary>
         /// <param name="typeMap">The type map</param>
         /// <param name="quoter">The quoter</param>
-        protected ColumnBase(ITypeMap typeMap, IQuoter quoter)
+        protected ColumnBase(TTypeMap typeMap, IQuoter quoter)
         {
             _typeMap = typeMap;
             Quoter = quoter;
@@ -50,6 +51,7 @@ namespace FluentMigrator.Runner.Generators.Base
                 FormatString,
                 FormatType,
                 FormatCollation,
+                FormatExpression,
                 FormatNullable,
                 FormatDefaultValue,
                 FormatPrimaryKey,
@@ -102,6 +104,14 @@ namespace FluentMigrator.Runner.Generators.Base
             }
 
             return GetTypeMap(column.Type.Value, column.Size, column.Precision);
+        }
+
+        /// <summary>
+        /// Formats a computed column type definition
+        /// </summary>
+        protected virtual string FormatExpression(ColumnDefinition column)
+        {
+            return column.Expression == null ? null : $"GENERATED ALWAYS AS ({column.Expression}){(column.ExpressionStored ? " STORED" : "")}";
         }
 
         /// <summary>

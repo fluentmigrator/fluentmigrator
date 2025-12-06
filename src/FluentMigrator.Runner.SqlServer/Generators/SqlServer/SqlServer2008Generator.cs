@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using FluentMigrator.Expressions;
+using FluentMigrator.Generation;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Model;
@@ -31,6 +32,9 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Generators.SqlServer
 {
+    /// <summary>
+    /// The SQL Server 2008 SQL generator for FluentMigrator.
+    /// </summary>
     public class SqlServer2008Generator : SqlServer2005Generator
     {
         private static readonly HashSet<string> _supportedAdditionalFeatures = new HashSet<string>
@@ -38,17 +42,20 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             SqlServerExtensions.IndexColumnNullsDistinct,
         };
 
+        /// <inheritdoc />
         public SqlServer2008Generator()
             : this(new SqlServer2008Quoter())
         {
         }
 
+        /// <inheritdoc />
         public SqlServer2008Generator(
             [NotNull] SqlServer2008Quoter quoter)
             : this(quoter, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()))
         {
         }
 
+        /// <inheritdoc />
         public SqlServer2008Generator(
             [NotNull] SqlServer2008Quoter quoter,
             [NotNull] IOptions<GeneratorOptions> generatorOptions)
@@ -60,6 +67,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         {
         }
 
+        /// <inheritdoc />
         protected SqlServer2008Generator(
             [NotNull] IColumn column,
             [NotNull] IQuoter quoter,
@@ -69,13 +77,49 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         {
         }
 
+        /// <inheritdoc />
+        public override string GeneratorId => GeneratorIdConstants.SqlServer2008;
+
+        /// <inheritdoc />
+        public override List<string> GeneratorIdAliases =>
+            [GeneratorIdConstants.SqlServer2008, GeneratorIdConstants.SqlServer];
+
+        /// <inheritdoc />
         public override bool IsAdditionalFeatureSupported(string feature)
         {
             return _supportedAdditionalFeatures.Contains(feature)
              || base.IsAdditionalFeatureSupported(feature);
         }
 
-        public virtual string GetWithNullsDistinctString(IndexDefinition index)
+        /// <inheritdoc />
+        public override string GetFilterString(CreateIndexExpression createIndexExpression)
+        {
+            var baseFilter = base.GetFilterString(createIndexExpression);
+            var nullsDistinct = GetWithNullsDistinctString(createIndexExpression.Index);
+
+            if (string.IsNullOrEmpty(baseFilter) && string.IsNullOrEmpty(nullsDistinct))
+            {
+                return string.Empty;
+            }
+
+            if (string.IsNullOrEmpty(nullsDistinct))
+            {
+                return baseFilter;
+            }
+
+            baseFilter = string.IsNullOrEmpty(baseFilter) ?
+                $" WHERE {nullsDistinct}" :
+                $" AND  {nullsDistinct}";
+
+            return baseFilter;
+        }
+
+        /// <summary>
+        /// Gets the SQL fragment for "nulls distinct" columns in unique indexes.
+        /// </summary>
+        /// <param name="index">The index definition.</param>
+        /// <returns>The SQL fragment.</returns>
+        protected string GetWithNullsDistinctString(IndexDefinition index)
         {
             bool? GetNullsDistinct(IndexColumnDefinition column)
             {
@@ -103,14 +147,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             if (condition.Length == 0)
                 return string.Empty;
 
-            return $" WHERE {condition}";
-        }
-
-        public override string Generate(CreateIndexExpression expression)
-        {
-            var sql = base.Generate(expression);
-            sql += GetWithNullsDistinctString(expression.Index);
-            return sql;
+            return condition;
         }
 
         /// <inheritdoc />

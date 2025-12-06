@@ -14,17 +14,49 @@
 // limitations under the License.
 #endregion
 
+using FluentMigrator.Generation;
 using FluentMigrator.Runner.Generators.Generic;
 
 namespace FluentMigrator.Runner.Generators.Snowflake
 {
+    /// <summary>
+    /// A generator for creating SQL statements to set descriptions for tables and columns
+    /// specific to the Snowflake database.
+    /// </summary>
+    /// <remarks>
+    /// This class extends <see cref="FluentMigrator.Runner.Generators.Generic.GenericDescriptionGenerator"/>
+    /// to provide Snowflake-specific implementations for generating table and column descriptions.
+    /// </remarks>
     public class SnowflakeDescriptionGenerator : GenericDescriptionGenerator
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FluentMigrator.Runner.Generators.Snowflake.SnowflakeDescriptionGenerator"/> class.
+        /// </summary>
+        /// <param name="quoter">
+        /// An instance of <see cref="FluentMigrator.Runner.Generators.Snowflake.SnowflakeQuoter"/>
+        /// used to handle SQL quoting specific to the Snowflake database.
+        /// </param>
+        /// <remarks>
+        /// This constructor sets up the generator to create Snowflake-specific SQL statements
+        /// for describing tables and columns.
+        /// </remarks>
         public SnowflakeDescriptionGenerator(SnowflakeQuoter quoter)
         {
             Quoter = quoter;
         }
 
+        /// <summary>
+        /// Gets the <see cref="IQuoter"/> instance used for quoting SQL identifiers
+        /// and values specific to the Snowflake database.
+        /// </summary>
+        /// <value>
+        /// An instance of <see cref="FluentMigrator.Runner.Generators.Snowflake.SnowflakeQuoter"/>
+        /// that provides Snowflake-specific quoting functionality.
+        /// </value>
+        /// <remarks>
+        /// This property is used internally by the generator to ensure that SQL statements are properly quoted
+        /// according to Snowflake's requirements.
+        /// </remarks>
         protected IQuoter Quoter { get; }
 
         #region Constants

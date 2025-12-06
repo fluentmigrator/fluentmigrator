@@ -61,8 +61,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DELETE FROM \"TestTable1\" WHERE \"Name\" = N'Just''in' AND \"Website\" IS NULL; " +
-                            "DELETE FROM \"TestTable1\" WHERE \"Website\" = N'github.com';");
+            result.ShouldBe("DELETE FROM \"TestTable1\" WHERE \"Name\" = N'Just''in' AND \"Website\" IS NULL;DELETE FROM \"TestTable1\" WHERE \"Website\" = N'github.com';");
         }
 
         [Test]
@@ -71,8 +70,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             var expression = GeneratorTestHelper.GetDeleteDataMultipleRowsExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DELETE FROM \"TestTable1\" WHERE \"Name\" = N'Just''in' AND \"Website\" IS NULL; " +
-                            "DELETE FROM \"TestTable1\" WHERE \"Website\" = N'github.com';");
+            result.ShouldBe("DELETE FROM \"TestTable1\" WHERE \"Name\" = N'Just''in' AND \"Website\" IS NULL;DELETE FROM \"TestTable1\" WHERE \"Website\" = N'github.com';");
         }
 
         [Test]
@@ -108,8 +106,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             var expression = GeneratorTestHelper.GetInsertDataExpression();
             expression.SchemaName = "TestSchema";
 
-            var expected = "INSERT INTO \"TestTable1\" (\"Id\", \"Name\", \"Website\") VALUES (1, N'Just''in', N'codethinked.com');";
-            expected += " INSERT INTO \"TestTable1\" (\"Id\", \"Name\", \"Website\") VALUES (2, N'Na\\te', N'kohari.org');";
+            var expected = "INSERT INTO \"TestTable1\" (\"Id\", \"Name\", \"Website\") VALUES (1, N'Just''in', N'codethinked.com');INSERT INTO \"TestTable1\" (\"Id\", \"Name\", \"Website\") VALUES (2, N'Na\\te', N'kohari.org');";
 
             var result = Generator.Generate(expression);
             result.ShouldBe(expected);
@@ -120,8 +117,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
         {
             var expression = GeneratorTestHelper.GetInsertDataExpression();
 
-            var expected = "INSERT INTO \"TestTable1\" (\"Id\", \"Name\", \"Website\") VALUES (1, N'Just''in', N'codethinked.com');";
-            expected += " INSERT INTO \"TestTable1\" (\"Id\", \"Name\", \"Website\") VALUES (2, N'Na\\te', N'kohari.org');";
+            var expected = "INSERT INTO \"TestTable1\" (\"Id\", \"Name\", \"Website\") VALUES (1, N'Just''in', N'codethinked.com');INSERT INTO \"TestTable1\" (\"Id\", \"Name\", \"Website\") VALUES (2, N'Na\\te', N'kohari.org');";
 
             var result = Generator.Generate(expression);
             result.ShouldBe(expected);

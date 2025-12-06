@@ -4,7 +4,7 @@
 
   <PropertyGroup>
     <!-- In the real world, you would typically not have multiple target frameworks. However, this sample demonstrates it working against .NET Framework and .NET. -->
-    <TargetFrameworks>net48;net8.0</TargetFrameworks>
+    <TargetFrameworks>net48;net8.0;net9.0;net10.0</TargetFrameworks>
     <OutputType>Library</OutputType>
   </PropertyGroup>
 
@@ -17,11 +17,21 @@
         <MigrationAssembly>$(MSBuildThisFileDirectory)..\FluentMigrator.Example.Migrations\bin\$(Configuration)\netstandard2.0\FluentMigrator.Example.Migrations.dll</MigrationAssembly>
       </PropertyGroup>
     </When>
-    <Otherwise>
+    <When Condition="'$(TargetFramework)' == 'net8.0' ">
       <PropertyGroup>
         <MigrationAssembly>$(MSBuildThisFileDirectory)..\FluentMigrator.Example.Migrations\bin\$(Configuration)\net8.0\FluentMigrator.Example.Migrations.dll</MigrationAssembly>
       </PropertyGroup>
-    </Otherwise>
+    </When>
+    <When Condition="'$(TargetFramework)' == 'net9.0' ">
+      <PropertyGroup>
+        <MigrationAssembly>$(MSBuildThisFileDirectory)..\FluentMigrator.Example.Migrations\bin\$(Configuration)\net9.0\FluentMigrator.Example.Migrations.dll</MigrationAssembly>
+      </PropertyGroup>
+    </When>
+    <When Condition="'$(TargetFramework)' == 'net10.0' ">
+      <PropertyGroup>
+        <MigrationAssembly>$(MSBuildThisFileDirectory)..\FluentMigrator.Example.Migrations\bin\$(Configuration)\net10.0\FluentMigrator.Example.Migrations.dll</MigrationAssembly>
+      </PropertyGroup>
+    </When>
   </Choose>
 
   <Target Name="Migrate">

@@ -14,6 +14,8 @@
 // limitations under the License.
 #endregion
 
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 using FluentMigrator.Exceptions;
@@ -28,17 +30,23 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Generators.Snowflake
 {
+    /// <summary>
+    /// The Snowflake SQL generator for FluentMigrator.
+    /// </summary>
     public class SnowflakeGenerator : GenericGenerator
     {
+        /// <inheritdoc />
         public SnowflakeGenerator(
             [NotNull] SnowflakeOptions sfOptions)
             : this(sfOptions, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions())) { }
 
+        /// <inheritdoc />
         public SnowflakeGenerator(
             [NotNull] SnowflakeOptions sfOptions,
             [NotNull] IOptions<GeneratorOptions> generatorOptions)
             : this(new SnowflakeQuoter(sfOptions.QuoteIdentifiers), sfOptions, generatorOptions) { }
 
+        /// <inheritdoc />
         public SnowflakeGenerator(
             [NotNull] SnowflakeQuoter quoter,
             [NotNull] SnowflakeOptions sfOptions,
@@ -59,29 +67,60 @@ namespace FluentMigrator.Runner.Generators.Snowflake
         /// <inheritdoc />
         public override string Generate(DeleteDefaultConstraintExpression expression)
         {
-            return $"ALTER TABLE {Quoter.QuoteTableName(expression.TableName, expression.SchemaName)} ALTER COLUMN {Quoter.QuoteColumnName(expression.ColumnName)} DROP DEFAULT";
+            return FormatStatement($"ALTER TABLE {Quoter.QuoteTableName(expression.TableName, expression.SchemaName)} ALTER COLUMN {Quoter.QuoteColumnName(expression.ColumnName)} DROP DEFAULT");
         }
+
+        /// <inheritdoc />
+        public override string GeneratorId => GeneratorIdConstants.Snowflake;
+
+        /// <inheritdoc />
+        public override List<string> GeneratorIdAliases => new List<string> { GeneratorIdConstants.Snowflake };
 
         /// <inheritdoc />
         public override string Generate(CreateSchemaExpression expression)
         {
-            return string.Format(CreateSchema, Quoter.QuoteSchemaName(expression.SchemaName));
+            return FormatStatement(CreateSchema, Quoter.QuoteSchemaName(expression.SchemaName));
         }
 
         /// <inheritdoc />
         public override string Generate(DeleteSchemaExpression expression)
         {
-            return string.Format(DropSchema, Quoter.QuoteSchemaName(expression.SchemaName));
+            return FormatStatement(DropSchema, Quoter.QuoteSchemaName(expression.SchemaName));
         }
 
+        /// <inheritdoc />
         public override string Generate(DeleteTableExpression expression)
         {
-            return $"DROP TABLE{(expression.IfExists ? " IF EXISTS" : "")} {Quoter.QuoteTableName(expression.TableName, expression.SchemaName)};";
+            return FormatStatement($"DROP TABLE{(expression.IfExists ? " IF EXISTS" : "")} {Quoter.QuoteTableName(expression.TableName, expression.SchemaName)}");
+        }
+
+        /// <inheritdoc />
+        public override string Generate(CreateTableExpression expression)
+        {
+            if (expression.Columns.Any(x => x.Expression != null))
+            {
+                CompatibilityMode.HandleCompatibility("Computed columns are not supported");
+            }
+            return base.Generate(expression);
+        }
+
+        /// <inheritdoc />
+        public override string Generate(CreateColumnExpression expression)
+        {
+            if (expression.Column.Expression != null)
+            {
+                CompatibilityMode.HandleCompatibility("Computed columns are not supported");
+            }
+            return base.Generate(expression);
         }
 
         /// <inheritdoc />
         public override string Generate(AlterColumnExpression expression)
         {
+            if (expression.Column.Expression != null)
+            {
+                CompatibilityMode.HandleCompatibility("Computed columns are not supported");
+            }
             if (!(expression.Column.DefaultValue is ColumnDefinition.UndefinedDefaultValue))
             {
                 throw new DatabaseOperationNotSupportedException("Snowflake database does not support adding or changing default constraint after column has been created.");
@@ -93,19 +132,19 @@ namespace FluentMigrator.Runner.Generators.Snowflake
                 return errors;
             }
 
-            return string.Format(AlterColumn, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), ((SnowflakeColumn)Column).GenerateAlterColumn(expression.Column));
+            return FormatStatement(AlterColumn, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), ((SnowflakeColumn)Column).GenerateAlterColumn(expression.Column));
         }
 
         /// <inheritdoc />
         public override string Generate(RenameTableExpression expression)
         {
-            return $"ALTER TABLE {Quoter.QuoteTableName(expression.OldName, expression.SchemaName)} RENAME TO {Quoter.QuoteTableName(expression.NewName, expression.SchemaName)}";
+            return FormatStatement($"ALTER TABLE {Quoter.QuoteTableName(expression.OldName, expression.SchemaName)} RENAME TO {Quoter.QuoteTableName(expression.NewName, expression.SchemaName)}");
         }
 
         /// <inheritdoc />
         public override string Generate(AlterSchemaExpression expression)
         {
-            return $"ALTER TABLE {Quoter.QuoteTableName(expression.TableName, expression.SourceSchemaName)} RENAME TO {Quoter.QuoteTableName(expression.TableName, expression.DestinationSchemaName)}";
+            return FormatStatement($"ALTER TABLE {Quoter.QuoteTableName(expression.TableName, expression.SourceSchemaName)} RENAME TO {Quoter.QuoteTableName(expression.TableName, expression.DestinationSchemaName)}");
         }
 
         /// <inheritdoc />
@@ -120,6 +159,7 @@ namespace FluentMigrator.Runner.Generators.Snowflake
             return CompatibilityMode.HandleCompatibility("Indices not supported");
         }
 
+        /// <inheritdoc />
         public override string Generate(CreateSequenceExpression expression)
         {
             var result = new StringBuilder("CREATE SEQUENCE ");
@@ -135,6 +175,8 @@ namespace FluentMigrator.Runner.Generators.Snowflake
             {
                 result.AppendFormat(" INCREMENT {0}", seq.Increment);
             }
+
+            AppendSqlStatementEndToken(result);
 
             return result.ToString();
         }

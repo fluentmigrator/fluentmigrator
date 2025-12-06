@@ -48,7 +48,6 @@ namespace FluentMigrator.DotNet.Cli
             var targetIsSqlServer = !string.IsNullOrEmpty(options.ProcessorType)
              && options.ProcessorType.StartsWith("sqlserver", StringComparison.OrdinalIgnoreCase);
 
-            var mapper = ConfigureMapper();
             services
                 .AddLogging(lb =>
                 {
@@ -56,7 +55,7 @@ namespace FluentMigrator.DotNet.Cli
                     lb.AddDebug();
                 })
                 .AddOptions()
-                .AddSingleton(mapper);
+                .AddSingleton(ConfigureMapper);
 
             if (options.Output)
             {
@@ -137,11 +136,17 @@ namespace FluentMigrator.DotNet.Cli
                         opt.PreviewOnly = options.Preview;
                         opt.ProviderSwitches = options.ProcessorSwitches;
                         opt.StripComments = options.StripComments;
-                        opt.Timeout = options.Timeout == null ? null : (TimeSpan?) TimeSpan.FromSeconds(options.Timeout.Value);
+                        opt.Timeout = options.Timeout == null ? null : TimeSpan.FromSeconds(options.Timeout.Value);
                     });
 
             services
-                .Configure<MigratorOptions>(mc => mapper.Map(options, mc));
+                .AddOptions<MigratorOptions>()
+                .Configure(
+                    (MigratorOptions optionsConfig, IServiceProvider serviceProvider) =>
+                    {
+                        var mapper = serviceProvider.GetRequiredService<IMapper>();
+                        mapper.Map(options, optionsConfig);
+                    });
 
             services
                 .Configure<FluentMigratorLoggerOptions>(
@@ -157,9 +162,10 @@ namespace FluentMigrator.DotNet.Cli
             return services.BuildServiceProvider();
         }
 
-        private static IMapper ConfigureMapper()
+        private static IMapper ConfigureMapper(IServiceProvider serviceProvider)
         {
-            var mapperConfig = new MapperConfiguration(cfg => cfg.CreateMap<MigratorOptions, MigratorOptions>());
+            var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
+            var mapperConfig = new MapperConfiguration(cfg => cfg.CreateMap<MigratorOptions, MigratorOptions>(), loggerFactory);
             mapperConfig.AssertConfigurationIsValid();
             return new Mapper(mapperConfig);
         }

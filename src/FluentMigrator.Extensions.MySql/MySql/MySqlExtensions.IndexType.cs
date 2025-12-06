@@ -24,8 +24,17 @@ using FluentMigrator.Model;
 
 namespace FluentMigrator.MySql
 {
+    /// <summary>
+    /// Extension methods for MySQL syntax.
+    /// </summary>
     public static partial class MySqlExtensions
     {
+        /// <summary>
+        /// Configures the CREATE INDEX expression to use a MySQL B-Tree index type.
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException">Only one index method is allowed per CREATE INDEX expression.</exception>
         public static ICreateBTreeIndexOptionsSyntax UsingBTree(this ICreateIndexOptionsSyntax expression)
         {
             if (expression is ICreateIndexMethodOptionsSyntax)
@@ -38,6 +47,12 @@ namespace FluentMigrator.MySql
             return new CreateBTreeIndexOptionsSyntax(expression);
         }
 
+        /// <summary>
+        /// Configures the CREATE INDEX expression to use a MySQL Hash index type.
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException">Only one index method is allowed per CREATE INDEX expression.</exception>
         public static ICreateHashIndexOptionSyntax UsingHash(this ICreateIndexOptionsSyntax expression)
         {
             if (expression is ICreateIndexMethodOptionsSyntax)
@@ -50,6 +65,13 @@ namespace FluentMigrator.MySql
             return new CreateHashIndexOptionSyntax(expression);
         }
 
+        /// <summary>
+        /// Configures the CREATE INDEX expression to use a MySQL index type.
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <param name="indexType">The Index Type to use.</param>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException">Only one index method is allowed per CREATE INDEX expression.</exception>
         public static ICreateIndexMethodOptionsSyntax Using(this ICreateIndexOptionsSyntax expression, IndexType indexType)
         {
             if (expression is ICreateIndexMethodOptionsSyntax)
@@ -70,6 +92,13 @@ namespace FluentMigrator.MySql
             }
         }
 
+        /// <summary>
+        /// MySQL-specific helper method for configuring the CREATE INDEX expression to use a MySQL B-Tree index type.
+        /// </summary>
+        /// <param name="additionalFeatures"></param>
+        /// <param name="indexType">The Index Type to use.</param>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException">Only one index method is allowed per CREATE INDEX expression.</exception>
         public static void Using(this ISupportAdditionalFeatures additionalFeatures, IndexType indexType)
         {
             if (additionalFeatures == null)

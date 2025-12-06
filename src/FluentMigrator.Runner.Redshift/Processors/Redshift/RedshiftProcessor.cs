@@ -33,14 +33,20 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.Redshift
 {
+    /// <summary>
+    /// The Amazon Redshift processor for FluentMigrator.
+    /// </summary>
     public class RedshiftProcessor : GenericProcessorBase
     {
         private readonly RedshiftQuoter _quoter = new RedshiftQuoter();
 
-        public override string DatabaseType => ProcessorId.Redshift;
+        /// <inheritdoc />
+        public override string DatabaseType => ProcessorIdConstants.Redshift;
 
+        /// <inheritdoc />
         public override IList<string> DatabaseTypeAliases { get; } = new List<string>();
 
+        /// <inheritdoc />
         public RedshiftProcessor(
             [NotNull] RedshiftDbFactory factory,
             [NotNull] RedshiftGenerator generator,
@@ -51,46 +57,56 @@ namespace FluentMigrator.Runner.Processors.Redshift
         {
         }
 
+        /// <inheritdoc />
         public override void Execute(string template, params object[] args)
         {
             Process(string.Format(template, args));
         }
 
+        /// <inheritdoc />
         public override bool SchemaExists(string schemaName)
         {
             return Exists("select * from information_schema.schemata where schema_name ilike '{0}'", FormatToSafeSchemaName(schemaName));
         }
 
+        /// <inheritdoc />
         public override bool TableExists(string schemaName, string tableName)
         {
             return Exists("select * from information_schema.tables where table_schema ilike '{0}' and table_name ilike '{1}'", FormatToSafeSchemaName(schemaName), FormatToSafeName(tableName));
         }
 
+        /// <inheritdoc />
         public override bool ColumnExists(string schemaName, string tableName, string columnName)
         {
             return Exists("select * from information_schema.columns where table_schema ilike '{0}' and table_name ilike '{1}' and column_name ilike '{2}'", FormatToSafeSchemaName(schemaName), FormatToSafeName(tableName), FormatToSafeName(columnName));
         }
 
+        /// <inheritdoc />
         public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
             => false;
 
+        /// <inheritdoc />
         public override bool IndexExists(string schemaName, string tableName, string indexName)
             => false;
 
+        /// <inheritdoc />
         public override bool SequenceExists(string schemaName, string sequenceName)
             => false;
 
+        /// <inheritdoc />
         public override DataSet ReadTableData(string schemaName, string tableName)
         {
             return Read("SELECT * FROM {0}", _quoter.QuoteTableName(tableName, schemaName));
         }
 
+        /// <inheritdoc />
         public override bool DefaultValueExists(string schemaName, string tableName, string columnName, object defaultValue)
         {
             string defaultValueAsString = string.Format("%{0}%", FormatHelper.FormatSqlEscape(defaultValue.ToString()));
             return Exists("select * from information_schema.columns where table_schema ilike '{0}' and table_name ilike '{1}' and column_name ilike '{2}' and column_default like '{3}'", FormatToSafeSchemaName(schemaName), FormatToSafeName(tableName), FormatToSafeName(columnName), defaultValueAsString);
         }
 
+        /// <inheritdoc />
         public override DataSet Read(string template, params object[] args)
         {
             EnsureConnectionIsOpen();
@@ -102,6 +118,7 @@ namespace FluentMigrator.Runner.Processors.Redshift
             }
         }
 
+        /// <inheritdoc />
         public override bool Exists(string template, params object[] args)
         {
             EnsureConnectionIsOpen();
@@ -113,6 +130,7 @@ namespace FluentMigrator.Runner.Processors.Redshift
             }
         }
 
+        /// <inheritdoc />
         protected override void Process(string sql)
         {
             Logger.LogSql(sql);
@@ -138,9 +156,13 @@ namespace FluentMigrator.Runner.Processors.Redshift
             }
         }
 
+        /// <inheritdoc />
         public override void Process(PerformDBOperationExpression expression)
         {
-            Logger.LogSay("Performing DB Operation");
+            var message = string.IsNullOrEmpty(expression.Description) 
+                ? "Performing DB Operation" 
+                : $"Performing DB Operation: {expression.Description}";
+            Logger.LogSay(message);
 
             if (Options.PreviewOnly)
                 return;
@@ -150,11 +172,21 @@ namespace FluentMigrator.Runner.Processors.Redshift
             expression.Operation?.Invoke(Connection, Transaction);
         }
 
+        /// <summary>
+        /// Formats the schema name to a safe SQL value.
+        /// </summary>
+        /// <param name="schemaName">The schema name.</param>
+        /// <returns>The formatted schema name.</returns>
         private string FormatToSafeSchemaName(string schemaName)
         {
             return FormatHelper.FormatSqlEscape(_quoter.UnQuoteSchemaName(schemaName));
         }
 
+        /// <summary>
+        /// Formats the SQL name to a safe SQL value.
+        /// </summary>
+        /// <param name="sqlName">The SQL name.</param>
+        /// <returns>The formatted SQL name.</returns>
         private string FormatToSafeName(string sqlName)
         {
             return FormatHelper.FormatSqlEscape(_quoter.UnQuote(sqlName));
