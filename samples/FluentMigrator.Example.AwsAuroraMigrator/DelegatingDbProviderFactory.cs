@@ -31,8 +31,8 @@ namespace FluentMigrator.Example.AwsAuroraMigrator
         }
 
         public override bool CanCreateDataSourceEnumerator => _dbProviderFactory.CanCreateDataSourceEnumerator;
-        public override DbCommand CreateCommand() => _dbProviderFactory.CreateCommand();
-        public override DbCommandBuilder CreateCommandBuilder() => _dbProviderFactory.CreateCommandBuilder();
+        public override DbCommand? CreateCommand() => _dbProviderFactory.CreateCommand();
+        public override DbCommandBuilder? CreateCommandBuilder() => _dbProviderFactory.CreateCommandBuilder();
 
         /// <summary>
         /// Delegates connection creation to the underlying <see cref="DbDataSource"/>, which encapsulates all the information needed to connect to a specific database.
@@ -40,12 +40,12 @@ namespace FluentMigrator.Example.AwsAuroraMigrator
         /// <returns></returns>
         public override DbConnection CreateConnection() => _dbDataSource.CreateConnection();
 
-        public override DbConnectionStringBuilder CreateConnectionStringBuilder() => _dbProviderFactory.CreateConnectionStringBuilder();
+        public override DbConnectionStringBuilder? CreateConnectionStringBuilder() => _dbProviderFactory.CreateConnectionStringBuilder();
 
-        public override DbDataAdapter CreateDataAdapter() => _dbProviderFactory.CreateDataAdapter();
+        public override DbDataAdapter? CreateDataAdapter() => _dbProviderFactory.CreateDataAdapter();
 
-        public override DbDataSourceEnumerator CreateDataSourceEnumerator() => _dbProviderFactory.CreateDataSourceEnumerator();
+        public override DbDataSourceEnumerator? CreateDataSourceEnumerator() => _dbProviderFactory.CreateDataSourceEnumerator();
 
-        public override DbParameter CreateParameter() => _dbProviderFactory.CreateParameter();
+        public override DbParameter? CreateParameter() => _dbProviderFactory.CreateParameter();
     }
 }

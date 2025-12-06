@@ -1,15 +1,15 @@
-﻿
-using Microsoft.Extensions.DependencyInjection;
+﻿using System.Data.Common;
 
 using Amazon.RDS.Util;
 
-using Npgsql;
-using FluentMigrator.Example.AwsAuroraMigrator;
-using System.Data.Common;
-using FluentMigrator.Runner;
 using FluentMigrator.Example.Migrations;
+using FluentMigrator.Runner;
 
-namespace DbMigrationRunner
+using Microsoft.Extensions.DependencyInjection;
+
+using Npgsql;
+
+namespace FluentMigrator.Example.AwsAuroraMigrator
 {
     class Program
     {
@@ -17,7 +17,7 @@ namespace DbMigrationRunner
         {
             var hostname = Environment.GetEnvironmentVariable("DB_HOSTNAME");
             var username = Environment.GetEnvironmentVariable("DB_USERNAME");
-            var port = int.Parse(Environment.GetEnvironmentVariable("DB_PORT"));
+            var port = int.TryParse(Environment.GetEnvironmentVariable("DB_PORT"), out var p) ? p : 5432;
             var database = Environment.GetEnvironmentVariable("DB_DATABASE");
 
             var csb = new NpgsqlConnectionStringBuilder();
