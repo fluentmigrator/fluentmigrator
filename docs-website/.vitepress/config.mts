@@ -12,8 +12,8 @@ const baseHeaders: HeadConfig[] = [];
 // Favicon
 baseHeaders.push(['link', {rel: 'icon', href: 'logo-favicon.svg'}]);
 
-// Umami analytics script is only added when building for GitHub Pages
-const headers = process.env.GITHUB_PAGES === 'true' ?
+// Umami analytics script is only added when building for GitHub Actions
+const headers = process.env.GITHUB_ACTIONS === 'true' ?
     [...baseHeaders, umamiScript] :
     baseHeaders;
 
