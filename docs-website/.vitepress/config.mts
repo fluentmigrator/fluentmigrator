@@ -4,7 +4,7 @@ import { fileURLToPath, URL } from 'node:url'
 const umamiScript: HeadConfig = ['script', {
     defer: 'true',
     src: 'https://cloud.umami.is/script.js',
-    'data-website-id': '', // TODO: Add your Umami website ID here
+    'data-website-id': '94fdf127-4c87-48d0-b7d8-11825e6ee7ab',
 }]
 
 const baseHeaders: HeadConfig[] = [];
