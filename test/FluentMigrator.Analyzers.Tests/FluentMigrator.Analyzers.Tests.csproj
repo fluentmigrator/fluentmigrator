@@ -16,7 +16,7 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
 
-    <MsCodeAnalysisCoreVersion>4.11.0</MsCodeAnalysisCoreVersion>
+    <MsCodeAnalysisCoreVersion>5.0.0</MsCodeAnalysisCoreVersion>
     <MsCodeAnalysisAnalyzerTestingVersion>1.1.2</MsCodeAnalysisAnalyzerTestingVersion>
   </PropertyGroup>
 
