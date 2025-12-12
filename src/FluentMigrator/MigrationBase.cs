@@ -22,6 +22,7 @@ using FluentMigrator.Builders.Alter;
 using FluentMigrator.Builders.Create;
 using FluentMigrator.Builders.IfDatabase;
 using FluentMigrator.Builders.Insert;
+using FluentMigrator.Builders.Merge;
 using FluentMigrator.Builders.Rename;
 using FluentMigrator.Builders.Schema;
 using FluentMigrator.Infrastructure;
@@ -104,6 +105,11 @@ namespace FluentMigrator
         /// Gets the starting point for data insertion
         /// </summary>
         public IInsertExpressionRoot Insert => new InsertExpressionRoot(Context);
+
+        /// <summary>
+        /// Gets the starting point for data merging (insert or update)
+        /// </summary>
+        public IMergeExpressionRoot Merge => new MergeExpressionRoot(Context);
 
         /// <summary>
         /// Gets the starting point for schema-rooted expressions
