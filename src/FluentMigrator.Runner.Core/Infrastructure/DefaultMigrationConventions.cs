@@ -128,13 +128,15 @@ namespace FluentMigrator.Runner.Infrastructure
                 return false;
 
             var tagNamesForAllBehavior = tags.Where(t => t.Behavior == TagBehavior.RequireAll).SelectMany(t => t.TagNames).ToArray();
-            if (tagNamesForAllBehavior.Any() && matchTagsList.All(t => tagNamesForAllBehavior.Any(t.Equals)))
+            // For RequireAll behavior: Check if ANY requested tag matches ANY migration tag
+            // This allows migrations with [Tags("Schema")] to match when requested tags are ["Schema", "Data"]
+            if (tagNamesForAllBehavior.Any() && matchTagsList.Any(t => tagNamesForAllBehavior.Any(tag => tag.Equals(t))))
             {
                 return true;
             }
 
             var tagNamesForAnyBehavior = tags.Where(t => t.Behavior == TagBehavior.RequireAny).SelectMany(t => t.TagNames).ToArray();
-            if (tagNamesForAnyBehavior.Any() && matchTagsList.Any(t => tagNamesForAnyBehavior.Any(t.Equals)))
+            if (tagNamesForAnyBehavior.Any() && matchTagsList.Any(t => tagNamesForAnyBehavior.Any(tag => tag.Equals(t))))
             {
                 return true;
             }
