@@ -70,30 +70,19 @@ namespace FluentMigrator.Postgres
         }
 
         /// <summary>
-        /// Creates a security label on a database object.
+        /// Creates a security label on a database object using a strongly-typed builder.
         /// </summary>
+        /// <typeparam name="TBuilder">The type of security label builder to use.</typeparam>
         /// <param name="root">The create expression root.</param>
         /// <returns>A builder for specifying the security label details.</returns>
         /// <example>
         /// <code>
-        /// // Create a security label on a table
-        /// Create.SecurityLabel&lt;CustomProvide&gt;()
-        ///     .OnTable("users")
-        ///     .InSchema("public")
-        ///     .WithLabel("some label");
-        ///
-        /// // Create a security label on a table with a specific provider
-        /// Create.SecurityLabel&lt;CustomProvide&gt;()
-        ///     .OnTable("users")
-        ///     .InSchema("public")
-        ///     .WithLabel("TABLESAMPLE BERNOULLI(10)");
-        ///
-        /// // Create a security label on a column
-        /// Create.SecurityLabel&lt;CustomProvide&gt;()
+        /// // Create a security label using a custom provider
+        /// Create.SecurityLabel&lt;AnonSecurityLabelBuilder&gt;()
         ///     .OnColumn("email")
         ///     .OnTable("users")
         ///     .InSchema("public")
-        ///     .WithLabel("MASKED WITH FUNCTION anon.fake_email()");
+        ///     .WithLabel(label =&gt; label.MaskedWithFakeEmail());
         /// </code>
         /// </example>
         public static ICreateSecurityLabelOnObjectSyntax<TBuilder> SecurityLabel<TBuilder>(this ICreateExpressionRoot root)
@@ -108,27 +97,55 @@ namespace FluentMigrator.Postgres
         /// Deletes a security label from a database object by setting it to NULL.
         /// </summary>
         /// <param name="root">The delete expression root.</param>
+        /// <param name="provider">Provider name</param>
         /// <returns>A builder for specifying the security label to delete.</returns>
         /// <example>
         /// <code>
         /// // Delete a security label from a table
-        /// Delete.SecurityLabel()
-        ///     .For("anon")
+        /// Delete.SecurityLabel("anon")
         ///     .FromTable("users")
         ///     .InSchema("public");
         ///
         /// // Delete a security label from a column
-        /// Delete.SecurityLabel()
-        ///     .For("anon")
+        /// Delete.SecurityLabel("anon")
         ///     .FromColumn("email")
         ///     .OnTable("users")
         ///     .InSchema("public");
         /// </code>
         /// </example>
-        public static IDeleteSecurityLabelSyntax SecurityLabel(this IDeleteExpressionRoot root)
+        public static IDeleteSecurityLabelFromObjectSyntax SecurityLabel(this IDeleteExpressionRoot root, string provider)
         {
             var context = GetMigrationContext(root);
-            return new DeleteSecurityLabelExpressionBuilder(context);
+            return new DeleteSecurityLabelExpressionBuilder(context).For(provider);
+        }
+
+        /// <summary>
+        /// Deletes a security label from a database object using a strongly-typed builder.
+        /// The provider name is automatically determined from the builder.
+        /// </summary>
+        /// <typeparam name="TBuilder">The type of security label builder to use (determines the provider).</typeparam>
+        /// <param name="root">The delete expression root.</param>
+        /// <returns>A builder for specifying the security label to delete.</returns>
+        /// <example>
+        /// <code>
+        /// // Delete a security label using a typed builder (provider automatically set)
+        /// Delete.SecurityLabel&lt;AnonSecurityLabelBuilder&gt;()
+        ///     .FromTable("users")
+        ///     .InSchema("public");
+        ///
+        /// // Delete a security label from a column
+        /// Delete.SecurityLabel&lt;AnonSecurityLabelBuilder&gt;()
+        ///     .FromColumn("email")
+        ///     .OnTable("users")
+        ///     .InSchema("public");
+        /// </code>
+        /// </example>
+        public static IDeleteSecurityLabelFromObjectSyntax SecurityLabel<TBuilder>(this IDeleteExpressionRoot root)
+            where TBuilder : ISecurityLabelSyntaxBuilder, new()
+        {
+            var context = GetMigrationContext(root);
+            var builder = new TBuilder();
+            return new DeleteSecurityLabelExpressionBuilder(context).For(builder.ProviderName);
         }
 
         /// <summary>

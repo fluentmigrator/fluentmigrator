@@ -534,23 +534,30 @@ Create.SecurityLabel("anon")
 
 #### Deleting Security Labels
 ```csharp
-// Delete a security label from a table
-Delete.SecurityLabel()
-    .For("anon")
+// Delete a security label from a table (using provider name)
+Delete.SecurityLabel("anon")
     .FromTable("users")
     .InSchema("public");
 
-// Delete a security label from a column
-Delete.SecurityLabel()
-    .For("anon")
+// Delete a security label from a column (using provider name)
+Delete.SecurityLabel("anon")
     .FromColumn("email")
     .OnTable("users")
     .InSchema("public");
 
-// Delete a security label from a role
-Delete.SecurityLabel()
-    .For("anon")
+// Delete a security label from a role (using provider name)
+Delete.SecurityLabel("anon")
     .FromRole("masked_user");
+
+// Delete using a typed builder (provider automatically determined)
+Delete.SecurityLabel<AnonSecurityLabelBuilder>()
+    .FromTable("users")
+    .InSchema("public");
+
+Delete.SecurityLabel<AnonSecurityLabelBuilder>()
+    .FromColumn("email")
+    .OnTable("users")
+    .InSchema("public");
 ```
 
 ### PostgreSQL Anonymizer Integration
@@ -736,34 +743,108 @@ Create.SecurityLabel<AnonSecurityLabelBuilder>()
 
 ### Creating Custom Security Label Providers
 
-You can create your own security label builder by implementing `ISecurityLabelSyntaxBuilder`:
+You can create your own security label builder by extending `SecurityLabelSyntaxBuilderBase`. This allows you to create strongly-typed, provider-specific APIs for any PostgreSQL security label provider.
+
+#### Step 1: Create the Builder Class
 
 ```csharp
 using FluentMigrator.Builder.SecurityLabel;
 
-public class MySepgsqlLabelBuilder : SecurityLabelSyntaxBuilderBase
+/// <summary>
+/// Custom security label builder for SELinux PostgreSQL (sepgsql).
+/// </summary>
+public class SepgsqlLabelBuilder : SecurityLabelSyntaxBuilderBase
 {
+    // Required: Define the provider name used in the SECURITY LABEL statement
     public override string ProviderName => "sepgsql";
 
-    public MySepgsqlLabelBuilder SystemObject()
+    // Add strongly-typed methods for common label patterns
+    public SepgsqlLabelBuilder SystemObject()
     {
         RawLabel("system_u:object_r:sepgsql_table_t:s0");
         return this;
     }
 
-    public MySepgsqlLabelBuilder UserObject(string user, string role)
+    public SepgsqlLabelBuilder UserObject(string user, string role)
     {
         RawLabel($"{user}:object_r:{role}:s0");
         return this;
     }
-}
 
-// Usage
-Create.SecurityLabel<MySepgsqlLabelBuilder>()
-    .OnTable("users")
-    .InSchema("public")
-    .WithLabel(label => label.SystemObject());
+    public SepgsqlLabelBuilder UnconfinedTable()
+    {
+        RawLabel("unconfined_u:object_r:sepgsql_table_t:s0");
+        return this;
+    }
+
+    public SepgsqlLabelBuilder WithSecurityLevel(string user, string role, string level)
+    {
+        RawLabel($"{user}:object_r:{role}:{level}");
+        return this;
+    }
+}
 ```
+
+#### Step 2: Use the Builder in Migrations
+
+```csharp
+using FluentMigrator;
+using FluentMigrator.Postgres;
+
+[Migration(20250101120000)]
+public class ApplySepgsqlLabels : Migration
+{
+    public override void Up()
+    {
+        // Create security labels using the typed builder
+        Create.SecurityLabel<SepgsqlLabelBuilder>()
+            .OnTable("users")
+            .InSchema("public")
+            .WithLabel(label => label.SystemObject());
+
+        Create.SecurityLabel<SepgsqlLabelBuilder>()
+            .OnTable("audit_logs")
+            .InSchema("public")
+            .WithLabel(label => label.WithSecurityLevel("admin_u", "sepgsql_table_t", "s0:c0.c1023"));
+
+        // You can also use raw labels when needed
+        Create.SecurityLabel<SepgsqlLabelBuilder>()
+            .OnColumn("password_hash")
+            .OnTable("users")
+            .InSchema("public")
+            .WithLabel("custom_raw_label_if_needed");
+    }
+
+    public override void Down()
+    {
+        // Delete using the same typed builder
+        Delete.SecurityLabel<SepgsqlLabelBuilder>()
+            .FromTable("users")
+            .InSchema("public");
+
+        Delete.SecurityLabel<SepgsqlLabelBuilder>()
+            .FromTable("audit_logs")
+            .InSchema("public");
+
+        Delete.SecurityLabel<SepgsqlLabelBuilder>()
+            .FromColumn("password_hash")
+            .OnTable("users")
+            .InSchema("public");
+    }
+}
+```
+
+#### Key Points for Custom Providers
+
+1. **Extend `SecurityLabelSyntaxBuilderBase`**: This base class provides the `RawLabel()` method and implements `ISecurityLabelSyntaxBuilder`.
+
+2. **Override `ProviderName`**: This property returns the provider name used in the SQL `SECURITY LABEL FOR provider` clause.
+
+3. **Return `this` from methods**: This enables method chaining within the builder.
+
+4. **Use `RawLabel()` to set the label**: Call this method to set the actual label string that will be used in the SQL statement.
+
+5. **Available for both Create and Delete**: Use `Create.SecurityLabel<YourBuilder>()` and `Delete.SecurityLabel<YourBuilder>()` for consistency.
 
 ### Complete Example Migration
 ```csharp
@@ -815,39 +896,33 @@ public class ApplyDataMasking : Migration
 
     public override void Down()
     {
-        // Remove masking rules
-        Delete.SecurityLabel()
-            .For("anon")
+        // Remove masking rules using the typed builder
+        Delete.SecurityLabel<AnonSecurityLabelBuilder>()
             .FromColumn("email")
             .OnTable("users")
             .InSchema("public");
 
-        Delete.SecurityLabel()
-            .For("anon")
+        Delete.SecurityLabel<AnonSecurityLabelBuilder>()
             .FromColumn("first_name")
             .OnTable("users")
             .InSchema("public");
 
-        Delete.SecurityLabel()
-            .For("anon")
+        Delete.SecurityLabel<AnonSecurityLabelBuilder>()
             .FromColumn("last_name")
             .OnTable("users")
             .InSchema("public");
 
-        Delete.SecurityLabel()
-            .For("anon")
+        Delete.SecurityLabel<AnonSecurityLabelBuilder>()
             .FromColumn("phone")
             .OnTable("users")
             .InSchema("public");
 
-        Delete.SecurityLabel()
-            .For("anon")
+        Delete.SecurityLabel<AnonSecurityLabelBuilder>()
             .FromColumn("ssn")
             .OnTable("users")
             .InSchema("public");
 
-        Delete.SecurityLabel()
-            .For("anon")
+        Delete.SecurityLabel<AnonSecurityLabelBuilder>()
             .FromRole("analyst");
     }
 }

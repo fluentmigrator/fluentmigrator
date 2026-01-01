@@ -120,7 +120,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
                 hasLabel.ShouldBeTrue();
 
                 var (deleteRoot, deleteExpressions) = DeleteExpressionRootWithContext();
-                deleteRoot.SecurityLabel()
+                deleteRoot.SecurityLabel("foo")
                     .FromTable(table.Name)
                     .InSchema("public");
                 ExecuteExpressions(deleteExpressions);
