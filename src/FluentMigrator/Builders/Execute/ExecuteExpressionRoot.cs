@@ -45,6 +45,9 @@ namespace FluentMigrator.Builders.Execute
         }
 
         /// <inheritdoc />
+        public IMigrationContext GetMigrationContext() => _context;
+
+        /// <inheritdoc />
         public void Sql(string sqlStatement)
         {
             var expression = new ExecuteSqlStatementExpression { SqlStatement = sqlStatement };
@@ -117,8 +120,8 @@ namespace FluentMigrator.Builders.Execute
         /// <inheritdoc />
         public void WithConnection(Action<IDbConnection, IDbTransaction> operation, string description)
         {
-            var expression = new PerformDBOperationExpression 
-            { 
+            var expression = new PerformDBOperationExpression
+            {
                 Operation = operation,
                 Description = description
             };
