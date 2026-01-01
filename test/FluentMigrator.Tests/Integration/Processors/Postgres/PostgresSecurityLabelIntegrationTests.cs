@@ -145,11 +145,14 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
 
         private bool SecurityLabelExists(string catalogTable, string objectName, string expectedLabel)
         {
+            var escapedObjectName = EscapeSqlString(objectName);
+            var escapedLabel = EscapeSqlString(expectedLabel);
+
             var query = $@"
                 SELECT 1 
                 FROM pg_seclabels sl
                 JOIN {catalogTable} c ON sl.objoid = c.oid
-                WHERE c.{{0}} = '{objectName}' AND sl.label = '{expectedLabel}'";
+                WHERE c.{{0}} = '{escapedObjectName}' AND sl.label = '{escapedLabel}'";
 
             var columnName = catalogTable switch
             {
@@ -164,16 +167,25 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
 
         private bool ColumnSecurityLabelExists(string tableName, string columnName, string expectedLabel)
         {
+            var escapedTableName = EscapeSqlString(tableName);
+            var escapedColumnName = EscapeSqlString(columnName);
+            var escapedLabel = EscapeSqlString(expectedLabel);
+
             var query = $@"
                 SELECT 1 
                 FROM pg_seclabels sl
                 JOIN pg_class c ON sl.objoid = c.oid
                 JOIN pg_attribute a ON a.attrelid = c.oid AND a.attnum = sl.objsubid
-                WHERE c.relname = '{tableName}' 
-                  AND a.attname = '{columnName}'
-                  AND sl.label = '{expectedLabel}'";
+                WHERE c.relname = '{escapedTableName}' 
+                  AND a.attname = '{escapedColumnName}'
+                  AND sl.label = '{escapedLabel}'";
 
             return Processor.Exists(query);
+        }
+
+        private static string EscapeSqlString(string value)
+        {
+            return value?.Replace("'", "''") ?? string.Empty;
         }
 
         [OneTimeSetUp]
