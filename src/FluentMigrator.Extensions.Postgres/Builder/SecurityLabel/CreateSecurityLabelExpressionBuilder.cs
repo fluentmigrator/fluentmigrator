@@ -27,12 +27,10 @@ namespace FluentMigrator.Builder.SecurityLabel;
 /// </summary>
 public class CreateSecurityLabelExpressionBuilder<TBuilder> :
     ICreateSecurityLabelSyntax<TBuilder>,
-    ICreateSecurityLabelOnObjectSyntax<TBuilder>,
     ICreateSecurityLabelOnTableSyntax<TBuilder>,
     ICreateSecurityLabelOnColumnSyntax<TBuilder>,
     ICreateSecurityLabelOnColumnTableSyntax<TBuilder>,
-    ICreateSecurityLabelOnViewSyntax<TBuilder>,
-    ICreateSecurityLabelWithLabelSyntax<TBuilder>
+    ICreateSecurityLabelOnViewSyntax<TBuilder>
     where TBuilder : ISecurityLabelSyntaxBuilder, new()
 {
     private readonly IMigrationContext _context;
@@ -48,7 +46,6 @@ public class CreateSecurityLabelExpressionBuilder<TBuilder> :
         _definition = new PostgresSecurityLabelDefinition();
     }
 
-    /// <inheritdoc />
     public ICreateSecurityLabelOnObjectSyntax<TBuilder> For(string provider)
     {
         _definition.Provider = provider;

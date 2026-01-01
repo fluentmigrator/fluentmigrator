@@ -25,12 +25,6 @@ namespace FluentMigrator.Builder.SecurityLabel;
 /// </summary>
 public interface ICreateSecurityLabelSyntax<TBuilder> : ICreateSecurityLabelOnObjectSyntax<TBuilder>
 {
-    /// <summary>
-    /// Specifies the security label provider.
-    /// </summary>
-    /// <param name="provider">The name of the provider (e.g., "anon", "sepgsql").</param>
-    /// <returns>The next step in the fluent syntax.</returns>
-    ICreateSecurityLabelOnObjectSyntax<TBuilder> For(string provider);
 }
 
 /// <summary>

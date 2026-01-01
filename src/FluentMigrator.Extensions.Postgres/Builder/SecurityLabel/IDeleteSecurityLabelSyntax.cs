@@ -19,22 +19,9 @@ using FluentMigrator.Infrastructure;
 namespace FluentMigrator.Builder.SecurityLabel;
 
 /// <summary>
-/// Defines the starting syntax for deleting a security label.
-/// </summary>
-public interface IDeleteSecurityLabelSyntax : IDeleteSecurityLabelFromObjectSyntax
-{
-    /// <summary>
-    /// Specifies the security label provider.
-    /// </summary>
-    /// <param name="provider">The name of the provider (e.g., "anon", "sepgsql").</param>
-    /// <returns>The next step in the fluent syntax.</returns>
-    IDeleteSecurityLabelFromObjectSyntax For(string provider);
-}
-
-/// <summary>
 /// Defines the syntax for selecting the object type for the security label to delete.
 /// </summary>
-public interface IDeleteSecurityLabelFromObjectSyntax : IFluentSyntax
+public interface IDeleteSecurityLabelSyntax : IFluentSyntax
 {
     /// <summary>
     /// Specifies that the security label is being deleted from a table.

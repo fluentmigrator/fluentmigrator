@@ -113,7 +113,7 @@ namespace FluentMigrator.Postgres
         ///     .InSchema("public");
         /// </code>
         /// </example>
-        public static IDeleteSecurityLabelFromObjectSyntax SecurityLabel(this IDeleteExpressionRoot root, string provider)
+        public static IDeleteSecurityLabelSyntax SecurityLabel(this IDeleteExpressionRoot root, string provider)
         {
             var context = GetMigrationContext(root);
             return new DeleteSecurityLabelExpressionBuilder(context).For(provider);
@@ -140,7 +140,7 @@ namespace FluentMigrator.Postgres
         ///     .InSchema("public");
         /// </code>
         /// </example>
-        public static IDeleteSecurityLabelFromObjectSyntax SecurityLabel<TBuilder>(this IDeleteExpressionRoot root)
+        public static IDeleteSecurityLabelSyntax SecurityLabel<TBuilder>(this IDeleteExpressionRoot root)
             where TBuilder : ISecurityLabelSyntaxBuilder, new()
         {
             var context = GetMigrationContext(root);

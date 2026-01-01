@@ -25,7 +25,6 @@ namespace FluentMigrator.Builder.SecurityLabel;
 /// </summary>
 public class DeleteSecurityLabelExpressionBuilder :
     IDeleteSecurityLabelSyntax,
-    IDeleteSecurityLabelFromObjectSyntax,
     IDeleteSecurityLabelFromTableSyntax,
     IDeleteSecurityLabelFromColumnSyntax,
     IDeleteSecurityLabelFromColumnTableSyntax,
@@ -44,8 +43,7 @@ public class DeleteSecurityLabelExpressionBuilder :
         _definition = new PostgresSecurityLabelDefinition();
     }
 
-    /// <inheritdoc />
-    public IDeleteSecurityLabelFromObjectSyntax For(string provider)
+    public IDeleteSecurityLabelSyntax For(string provider)
     {
         _definition.Provider = provider;
         return this;
