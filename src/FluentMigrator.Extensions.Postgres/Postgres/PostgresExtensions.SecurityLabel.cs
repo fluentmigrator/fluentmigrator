@@ -97,14 +97,29 @@ namespace FluentMigrator.Postgres
             return new DeleteSecurityLabelExpressionBuilder(context);
         }
 
+        /// <summary>
+        /// Gets the migration context from a Create or Delete expression root.
+        /// </summary>
+        /// <param name="root">The expression root (CreateExpressionRoot or DeleteExpressionRoot).</param>
+        /// <returns>The migration context.</returns>
+        /// <remarks>
+        /// This uses reflection to access the private _context field because the 
+        /// ICreateExpressionRoot and IDeleteExpressionRoot interfaces don't expose the context.
+        /// This is necessary for adding new expression types that need to be added to the
+        /// context's expression list.
+        /// </remarks>
+        /// <exception cref="System.InvalidOperationException">
+        /// Thrown when the context cannot be accessed from the expression root.
+        /// </exception>
         private static IMigrationContext GetMigrationContext(object root)
         {
-            // The CreateExpressionRoot and DeleteExpressionRoot have a private _context field
-            // We need to access it via reflection or use a different approach
-            var contextField = root.GetType().GetField("_context", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            var rootType = root.GetType();
+            var contextField = rootType.GetField("_context", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
             if (contextField is null)
             {
-                throw new System.InvalidOperationException("Cannot access migration context from expression root.");
+                throw new System.InvalidOperationException(
+                    $"Cannot access migration context from expression root of type '{rootType.Name}'. " +
+                    "SecurityLabel extension methods require CreateExpressionRoot or DeleteExpressionRoot.");
             }
             return (IMigrationContext)contextField.GetValue(root);
         }
