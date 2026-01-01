@@ -17,162 +17,163 @@
 using System;
 using System.Text;
 
-namespace FluentMigrator.Postgres.Builder.SecurityLabel
+using FluentMigrator.Postgres;
+
+namespace FluentMigrator.Builder.SecurityLabel;
+
+/// <summary>
+/// Generates SQL statements for PostgreSQL security labels.
+/// </summary>
+public static class PostgresSecurityLabelSqlGenerator
 {
     /// <summary>
-    /// Generates SQL statements for PostgreSQL security labels.
+    /// Generates a SQL statement to create or set a security label on an object.
     /// </summary>
-    public static class PostgresSecurityLabelSqlGenerator
+    /// <param name="definition">The security label definition.</param>
+    /// <returns>The generated SQL statement.</returns>
+    public static string GenerateCreateSecurityLabelSql(PostgresSecurityLabelDefinition definition)
     {
-        /// <summary>
-        /// Generates a SQL statement to create or set a security label on an object.
-        /// </summary>
-        /// <param name="definition">The security label definition.</param>
-        /// <returns>The generated SQL statement.</returns>
-        public static string GenerateCreateSecurityLabelSql(PostgresSecurityLabelDefinition definition)
+        if (definition is null)
         {
-            if (definition is null)
-            {
-                throw new ArgumentNullException(nameof(definition));
-            }
-
-            if (string.IsNullOrWhiteSpace(definition.Label))
-            {
-                throw new ArgumentException("Label must not be null or empty.", nameof(definition));
-            }
-
-            var builder = new StringBuilder("SECURITY LABEL");
-
-            AppendProvider(builder, definition.Provider);
-            AppendObjectClause(builder, definition);
-            AppendLabelValue(builder, definition.Label);
-
-            builder.Append(';');
-            return builder.ToString();
+            throw new ArgumentNullException(nameof(definition));
         }
 
-        /// <summary>
-        /// Generates a SQL statement to delete (set to NULL) a security label on an object.
-        /// </summary>
-        /// <param name="definition">The security label definition.</param>
-        /// <returns>The generated SQL statement.</returns>
-        public static string GenerateDeleteSecurityLabelSql(PostgresSecurityLabelDefinition definition)
+        if (string.IsNullOrWhiteSpace(definition.Label))
         {
-            if (definition is null)
-            {
-                throw new ArgumentNullException(nameof(definition));
-            }
-
-            var builder = new StringBuilder("SECURITY LABEL");
-
-            AppendProvider(builder, definition.Provider);
-            AppendObjectClause(builder, definition);
-            builder.Append(" IS NULL;");
-
-            return builder.ToString();
+            throw new ArgumentException(nameof(definition));
         }
 
-        private static void AppendProvider(StringBuilder builder, string provider)
+        var builder = new StringBuilder("SECURITY LABEL");
+
+        AppendProvider(builder, definition.Provider);
+        AppendObjectClause(builder, definition);
+        AppendLabelValue(builder, definition.Label);
+
+        builder.Append(';');
+        return builder.ToString();
+    }
+
+    /// <summary>
+    /// Generates a SQL statement to delete (set to NULL) a security label on an object.
+    /// </summary>
+    /// <param name="definition">The security label definition.</param>
+    /// <returns>The generated SQL statement.</returns>
+    public static string GenerateDeleteSecurityLabelSql(PostgresSecurityLabelDefinition definition)
+    {
+        if (definition is null)
         {
-            if (!string.IsNullOrWhiteSpace(provider))
-            {
-                builder.Append(" FOR ");
-                builder.Append(QuoteIdentifier(provider));
-            }
+            throw new ArgumentNullException(nameof(definition));
         }
 
-        private static void AppendObjectClause(StringBuilder builder, PostgresSecurityLabelDefinition definition)
+        var builder = new StringBuilder("SECURITY LABEL");
+
+        AppendProvider(builder, definition.Provider);
+        AppendObjectClause(builder, definition);
+        builder.Append(" IS NULL;");
+
+        return builder.ToString();
+    }
+
+    private static void AppendProvider(StringBuilder builder, string provider)
+    {
+        if (!string.IsNullOrWhiteSpace(provider))
         {
-            builder.Append(" ON ");
+            builder.Append(" FOR ");
+            builder.Append(QuoteIdentifier(provider));
+        }
+    }
 
-            switch (definition.ObjectType)
-            {
-                case PostgresSecurityLabelObjectType.Table:
-                    builder.Append("TABLE ");
-                    builder.Append(QuoteQualifiedName(definition.SchemaName, definition.ObjectName));
-                    break;
+    private static void AppendObjectClause(StringBuilder builder, PostgresSecurityLabelDefinition definition)
+    {
+        builder.Append(" ON ");
 
-                case PostgresSecurityLabelObjectType.Column:
-                    builder.Append("COLUMN ");
-                    AppendColumnName(builder, definition);
-                    break;
+        switch (definition.ObjectType)
+        {
+            case PostgresSecurityLabelObjectType.Table:
+                builder.Append("TABLE ");
+                builder.Append(QuoteQualifiedName(definition.SchemaName, definition.ObjectName));
+                break;
 
-                case PostgresSecurityLabelObjectType.Schema:
-                    builder.Append("SCHEMA ");
-                    builder.Append(QuoteIdentifier(definition.ObjectName));
-                    break;
+            case PostgresSecurityLabelObjectType.Column:
+                builder.Append("COLUMN ");
+                AppendColumnName(builder, definition);
+                break;
 
-                case PostgresSecurityLabelObjectType.Role:
-                    builder.Append("ROLE ");
-                    builder.Append(QuoteIdentifier(definition.ObjectName));
-                    break;
+            case PostgresSecurityLabelObjectType.Schema:
+                builder.Append("SCHEMA ");
+                builder.Append(QuoteIdentifier(definition.ObjectName));
+                break;
 
-                case PostgresSecurityLabelObjectType.View:
-                    builder.Append("VIEW ");
-                    builder.Append(QuoteQualifiedName(definition.SchemaName, definition.ObjectName));
-                    break;
+            case PostgresSecurityLabelObjectType.Role:
+                builder.Append("ROLE ");
+                builder.Append(QuoteIdentifier(definition.ObjectName));
+                break;
 
-                default:
-                    throw new ArgumentException($"Unsupported object type: {definition.ObjectType}", nameof(definition));
-            }
+            case PostgresSecurityLabelObjectType.View:
+                builder.Append("VIEW ");
+                builder.Append(QuoteQualifiedName(definition.SchemaName, definition.ObjectName));
+                break;
+
+            default:
+                throw new ArgumentException($"Unsupported object type: {definition.ObjectType}", nameof(definition));
+        }
+    }
+
+    private static void AppendColumnName(StringBuilder builder, PostgresSecurityLabelDefinition definition)
+    {
+        if (string.IsNullOrWhiteSpace(definition.ColumnName))
+        {
+            throw new ArgumentException("Column name must be specified for column security labels.", nameof(definition));
         }
 
-        private static void AppendColumnName(StringBuilder builder, PostgresSecurityLabelDefinition definition)
+        if (string.IsNullOrWhiteSpace(definition.ObjectName))
         {
-            if (string.IsNullOrWhiteSpace(definition.ColumnName))
-            {
-                throw new ArgumentException("Column name must be specified for column security labels.", nameof(definition));
-            }
-
-            if (string.IsNullOrWhiteSpace(definition.ObjectName))
-            {
-                throw new ArgumentException("Table name must be specified for column security labels.", nameof(definition));
-            }
-
-            var qualifiedTable = QuoteQualifiedName(definition.SchemaName, definition.ObjectName);
-            builder.Append(qualifiedTable);
-            builder.Append('.');
-            builder.Append(QuoteIdentifier(definition.ColumnName));
+            throw new ArgumentException("Table name must be specified for column security labels.", nameof(definition));
         }
 
-        private static void AppendLabelValue(StringBuilder builder, string label)
+        var qualifiedTable = QuoteQualifiedName(definition.SchemaName, definition.ObjectName);
+        builder.Append(qualifiedTable);
+        builder.Append('.');
+        builder.Append(QuoteIdentifier(definition.ColumnName));
+    }
+
+    private static void AppendLabelValue(StringBuilder builder, string label)
+    {
+        builder.Append(" IS ");
+        builder.Append(QuoteLiteral(label));
+    }
+
+    private static string QuoteQualifiedName(string schemaName, string objectName)
+    {
+        if (string.IsNullOrWhiteSpace(schemaName))
         {
-            builder.Append(" IS ");
-            builder.Append(QuoteLiteral(label));
+            return QuoteIdentifier(objectName);
         }
 
-        private static string QuoteQualifiedName(string schemaName, string objectName)
-        {
-            if (string.IsNullOrWhiteSpace(schemaName))
-            {
-                return QuoteIdentifier(objectName);
-            }
+        return $"{QuoteIdentifier(schemaName)}.{QuoteIdentifier(objectName)}";
+    }
 
-            return $"{QuoteIdentifier(schemaName)}.{QuoteIdentifier(objectName)}";
+    private static string QuoteIdentifier(string identifier)
+    {
+        if (string.IsNullOrWhiteSpace(identifier))
+        {
+            throw new ArgumentException(nameof(identifier));
         }
 
-        private static string QuoteIdentifier(string identifier)
-        {
-            if (string.IsNullOrWhiteSpace(identifier))
-            {
-                throw new ArgumentException("Identifier must not be null or empty.", nameof(identifier));
-            }
+        // Escape any double quotes in the identifier by doubling them
+        var escaped = identifier.Replace("\"", "\"\"");
+        return $"\"{escaped}\"";
+    }
 
-            // Escape any double quotes in the identifier by doubling them
-            var escaped = identifier.Replace("\"", "\"\"");
-            return $"\"{escaped}\"";
+    private static string QuoteLiteral(string value)
+    {
+        if (value is null)
+        {
+            return "NULL";
         }
 
-        private static string QuoteLiteral(string value)
-        {
-            if (value is null)
-            {
-                return "NULL";
-            }
-
-            // Escape any single quotes in the value by doubling them
-            var escaped = value.Replace("'", "''");
-            return $"'{escaped}'";
-        }
+        // Escape any single quotes in the value by doubling them
+        var escaped = value.Replace("'", "''");
+        return $"'{escaped}'";
     }
 }

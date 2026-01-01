@@ -16,8 +16,8 @@
 
 using System;
 
+using FluentMigrator.Builder.SecurityLabel;
 using FluentMigrator.Postgres;
-using FluentMigrator.Postgres.Builder.SecurityLabel;
 
 using NUnit.Framework;
 

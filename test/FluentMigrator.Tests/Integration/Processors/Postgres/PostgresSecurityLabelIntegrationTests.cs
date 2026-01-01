@@ -16,6 +16,7 @@
 
 using System.Collections.Generic;
 
+using FluentMigrator.Builder.SecurityLabel.Anon;
 using FluentMigrator.Builders.Create;
 using FluentMigrator.Builders.Delete;
 using FluentMigrator.Expressions;
@@ -52,7 +53,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
             {
                 var (createRoot, expressions) = CreateExpressionRootWithContext();
 
-                createRoot.SecurityLabel()
+                createRoot.SecurityLabel("foo")
                     .OnTable(table.Name)
                     .InSchema("public")
                     .WithLabel("test label");
@@ -71,8 +72,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
             {
                 var (createRoot, expressions) = CreateExpressionRootWithContext();
 
-                createRoot.SecurityLabel()
-                    .For("anon")
+                createRoot.SecurityLabel("foo")
                     .OnTable(table.Name)
                     .InSchema("public")
                     .WithLabel("test label with provider");
@@ -91,7 +91,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
             {
                 var (createRoot, expressions) = CreateExpressionRootWithContext();
 
-                createRoot.SecurityLabel()
+                createRoot.SecurityLabel("foo")
                     .OnColumn("id")
                     .OnTable(table.Name)
                     .InSchema("public")
@@ -110,7 +110,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
             using (var table = new PostgresTestTable(Processor, "public", "id int"))
             {
                 var (createRoot, createExpressions) = CreateExpressionRootWithContext();
-                createRoot.SecurityLabel()
+                createRoot.SecurityLabel("foo")
                     .OnTable(table.Name)
                     .InSchema("public")
                     .WithLabel("to be deleted");
@@ -140,7 +140,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
                 Processor.Execute($"CREATE SCHEMA IF NOT EXISTS \"{schemaName}\";");
 
                 var (createRoot, expressions) = CreateExpressionRootWithContext();
-                createRoot.SecurityLabel()
+                createRoot.SecurityLabel("foo")
                     .OnSchema(schemaName)
                     .WithLabel("schema label");
                 ExecuteExpressions(expressions);
@@ -164,7 +164,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
                 Processor.Execute($"CREATE ROLE \"{roleName}\";");
 
                 var (createRoot, expressions) = CreateExpressionRootWithContext();
-                createRoot.SecurityLabel()
+                createRoot.SecurityLabel("foo")
                     .OnRole(roleName)
                     .WithLabel("role label");
                 ExecuteExpressions(expressions);
@@ -190,7 +190,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
                     Processor.Execute($"CREATE VIEW \"public\".\"{viewName}\" AS SELECT id FROM \"public\".\"{table.Name}\";");
 
                     var (createRoot, expressions) = CreateExpressionRootWithContext();
-                    createRoot.SecurityLabel()
+                    createRoot.SecurityLabel("foo")
                         .OnView(viewName)
                         .InSchema("public")
                         .WithLabel("view label");
@@ -213,7 +213,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
             {
                 var (createRoot, expressions) = CreateExpressionRootWithContext();
 
-                createRoot.SecurityLabel()
+                createRoot.SecurityLabel<AnonSecurityLabelBuilder>()
                     .OnColumn("name")
                     .OnTable(table.Name)
                     .InSchema("public")
@@ -233,7 +233,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
             {
                 var (createRoot, expressions) = CreateExpressionRootWithContext();
 
-                createRoot.SecurityLabel()
+                createRoot.SecurityLabel<AnonSecurityLabelBuilder>()
                     .OnColumn("email")
                     .OnTable(table.Name)
                     .InSchema("public")
@@ -253,7 +253,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
             {
                 var (createRoot, expressions) = CreateExpressionRootWithContext();
 
-                createRoot.SecurityLabel()
+                createRoot.SecurityLabel<AnonSecurityLabelBuilder>()
                     .OnColumn("lastname")
                     .OnTable(table.Name)
                     .InSchema("public")
@@ -273,7 +273,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
             {
                 var (createRoot, expressions) = CreateExpressionRootWithContext();
 
-                createRoot.SecurityLabel()
+                createRoot.SecurityLabel<AnonSecurityLabelBuilder>()
                     .OnColumn("email")
                     .OnTable(table.Name)
                     .InSchema("public")
@@ -293,7 +293,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
             {
                 var (createRoot, expressions) = CreateExpressionRootWithContext();
 
-                createRoot.SecurityLabel()
+                createRoot.SecurityLabel<AnonSecurityLabelBuilder>()
                     .OnColumn("name")
                     .OnTable(table.Name)
                     .InSchema("public")
@@ -340,7 +340,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
             var escapedLabel = EscapeSqlString(expectedLabel);
 
             var query = $@"
-                SELECT 1 
+                SELECT 1
                 FROM pg_seclabels sl
                 JOIN {catalogTable} c ON sl.objoid = c.oid
                 WHERE c.{{0}} = '{escapedObjectName}' AND sl.label = '{escapedLabel}'";
@@ -363,11 +363,11 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
             var escapedLabel = EscapeSqlString(expectedLabel);
 
             var query = $@"
-                SELECT 1 
+                SELECT 1
                 FROM pg_seclabels sl
                 JOIN pg_class c ON sl.objoid = c.oid
                 JOIN pg_attribute a ON a.attrelid = c.oid AND a.attnum = sl.objsubid
-                WHERE c.relname = '{escapedTableName}' 
+                WHERE c.relname = '{escapedTableName}'
                   AND a.attname = '{escapedColumnName}'
                   AND sl.label = '{escapedLabel}'";
 

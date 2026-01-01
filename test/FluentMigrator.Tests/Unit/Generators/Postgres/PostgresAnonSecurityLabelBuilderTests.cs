@@ -16,7 +16,7 @@
 
 using System;
 
-using FluentMigrator.Postgres.Builder.SecurityLabel.Anon;
+using FluentMigrator.Builder.SecurityLabel.Anon;
 
 using NUnit.Framework;
 
@@ -27,7 +27,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
     [TestFixture]
     [Category("Generator")]
     [Category("Postgres")]
-    public class AnonSecurityLabelBuilderTests
+    public class PostgresAnonSecurityLabelBuilderTests
     {
         [Test]
         public void CanBuildMaskedWithValue()
@@ -352,7 +352,8 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         [Test]
         public void ProviderNameIsAnon()
         {
-            AnonSecurityLabelBuilder.ProviderName.ShouldBe("anon");
+            var builder = new AnonSecurityLabelBuilder();
+            builder.ProviderName.ShouldBe("anon");
         }
     }
 }

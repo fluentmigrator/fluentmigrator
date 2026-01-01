@@ -14,10 +14,10 @@
 // limitations under the License.
 #endregion
 
+using FluentMigrator.Builder.SecurityLabel;
 using FluentMigrator.Builders.Create;
 using FluentMigrator.Builders.Delete;
 using FluentMigrator.Infrastructure;
-using FluentMigrator.Postgres.Builder.SecurityLabel;
 
 namespace FluentMigrator.Postgres
 {
@@ -39,6 +39,7 @@ namespace FluentMigrator.Postgres
         /// Creates a security label on a database object.
         /// </summary>
         /// <param name="root">The create expression root.</param>
+        /// <param name="provider">Provider name</param>
         /// <returns>A builder for specifying the security label details.</returns>
         /// <example>
         /// <code>
@@ -47,27 +48,60 @@ namespace FluentMigrator.Postgres
         ///     .OnTable("users")
         ///     .InSchema("public")
         ///     .WithLabel("some label");
-        /// 
+        ///
         /// // Create a security label on a table with a specific provider
-        /// Create.SecurityLabel()
-        ///     .For("anon")
+        /// Create.SecurityLabel("anon")
         ///     .OnTable("users")
         ///     .InSchema("public")
         ///     .WithLabel("TABLESAMPLE BERNOULLI(10)");
-        /// 
+        ///
         /// // Create a security label on a column
-        /// Create.SecurityLabel()
-        ///     .For("anon")
+        /// Create.SecurityLabel("anon")
         ///     .OnColumn("email")
         ///     .OnTable("users")
         ///     .InSchema("public")
         ///     .WithLabel("MASKED WITH FUNCTION anon.fake_email()");
         /// </code>
         /// </example>
-        public static ICreateSecurityLabelSyntax SecurityLabel(this ICreateExpressionRoot root)
+        public static ICreateSecurityLabelOnObjectSyntax<RawSecurityLabelBuilder> SecurityLabel(this ICreateExpressionRoot root, string provider)
         {
             var context = GetMigrationContext(root);
-            return new CreateSecurityLabelExpressionBuilder(context);
+            return new CreateSecurityLabelExpressionBuilder<RawSecurityLabelBuilder>(context).For(provider);
+        }
+
+        /// <summary>
+        /// Creates a security label on a database object.
+        /// </summary>
+        /// <param name="root">The create expression root.</param>
+        /// <returns>A builder for specifying the security label details.</returns>
+        /// <example>
+        /// <code>
+        /// // Create a security label on a table
+        /// Create.SecurityLabel&lt;CustomProvide&gt;()
+        ///     .OnTable("users")
+        ///     .InSchema("public")
+        ///     .WithLabel("some label");
+        ///
+        /// // Create a security label on a table with a specific provider
+        /// Create.SecurityLabel&lt;CustomProvide&gt;()
+        ///     .OnTable("users")
+        ///     .InSchema("public")
+        ///     .WithLabel("TABLESAMPLE BERNOULLI(10)");
+        ///
+        /// // Create a security label on a column
+        /// Create.SecurityLabel&lt;CustomProvide&gt;()
+        ///     .OnColumn("email")
+        ///     .OnTable("users")
+        ///     .InSchema("public")
+        ///     .WithLabel("MASKED WITH FUNCTION anon.fake_email()");
+        /// </code>
+        /// </example>
+        public static ICreateSecurityLabelOnObjectSyntax<TBuilder> SecurityLabel<TBuilder>(this ICreateExpressionRoot root)
+            where TBuilder : ISecurityLabelSyntaxBuilder, new()
+        {
+            var context = GetMigrationContext(root);
+            var builder = new TBuilder();
+            return new CreateSecurityLabelExpressionBuilder<TBuilder>(context).For(builder.ProviderName);
         }
 
         /// <summary>
@@ -82,7 +116,7 @@ namespace FluentMigrator.Postgres
         ///     .For("anon")
         ///     .FromTable("users")
         ///     .InSchema("public");
-        /// 
+        ///
         /// // Delete a security label from a column
         /// Delete.SecurityLabel()
         ///     .For("anon")
@@ -103,7 +137,7 @@ namespace FluentMigrator.Postgres
         /// <param name="root">The expression root (CreateExpressionRoot or DeleteExpressionRoot).</param>
         /// <returns>The migration context.</returns>
         /// <remarks>
-        /// This uses reflection to access the private _context field because the 
+        /// This uses reflection to access the private _context field because the
         /// ICreateExpressionRoot and IDeleteExpressionRoot interfaces don't expose the context.
         /// This is necessary for adding new expression types that need to be added to the
         /// context's expression list.

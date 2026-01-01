@@ -16,227 +16,183 @@
 
 using System;
 
-namespace FluentMigrator.Postgres.Builder.SecurityLabel.Anon
+namespace FluentMigrator.Builder.SecurityLabel.Anon;
+
+/// <summary>
+/// Implementation of the PostgreSQL Anonymizer security label builder.
+/// </summary>
+public class AnonSecurityLabelBuilder : SecurityLabelSyntaxBuilderBase
 {
-    /// <summary>
-    /// Implementation of the PostgreSQL Anonymizer security label builder.
-    /// </summary>
-    public class AnonSecurityLabelBuilder : IAnonSecurityLabelBuilder
+    // <inheritdoc/>
+    public override string ProviderName => "anon";
+
+    public AnonSecurityLabelBuilder MaskedWithValue(string value)
     {
-        private string _label;
-
-        /// <summary>
-        /// Gets the provider name for PostgreSQL Anonymizer.
-        /// </summary>
-        public const string ProviderName = "anon";
-
-        /// <inheritdoc />
-        public IAnonSecurityLabelBuilder MaskedWithValue(string value)
+        if (string.IsNullOrWhiteSpace(value))
         {
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                throw new ArgumentException("Value cannot be null or empty.", nameof(value));
-            }
-            // Escape single quotes in the value
-            var escapedValue = value.Replace("'", "''");
-            _label = $"MASKED WITH VALUE ''{escapedValue}''";
-            return this;
+            throw new ArgumentException(nameof(value));
         }
+        // Escape single quotes in the value
+        var escapedValue = value.Replace("'", "''");
+        RawLabel($"MASKED WITH VALUE ''{escapedValue}''");
+        return this;
+    }
 
-        /// <inheritdoc />
-        public IAnonSecurityLabelBuilder MaskedWithFunction(string functionCall)
+    public AnonSecurityLabelBuilder MaskedWithFunction(string functionCall)
+    {
+        if (string.IsNullOrWhiteSpace(functionCall))
         {
-            if (string.IsNullOrWhiteSpace(functionCall))
-            {
-                throw new ArgumentException("Function call cannot be null or empty.", nameof(functionCall));
-            }
-            _label = $"MASKED WITH FUNCTION {functionCall}";
-            return this;
+            throw new ArgumentException(nameof(functionCall));
         }
+        RawLabel($"MASKED WITH FUNCTION {functionCall}");
+        return this;
+    }
 
-        /// <inheritdoc />
-        public IAnonSecurityLabelBuilder MaskedWithFakeFirstName()
-        {
-            _label = "MASKED WITH FUNCTION anon.fake_first_name()";
-            return this;
-        }
+    public AnonSecurityLabelBuilder MaskedWithFakeFirstName()
+    {
+        RawLabel("MASKED WITH FUNCTION anon.fake_first_name()");
+        return this;
+    }
 
-        /// <inheritdoc />
-        public IAnonSecurityLabelBuilder MaskedWithFakeLastName()
-        {
-            _label = "MASKED WITH FUNCTION anon.fake_last_name()";
-            return this;
-        }
+    public AnonSecurityLabelBuilder MaskedWithFakeLastName()
+    {
+        RawLabel("MASKED WITH FUNCTION anon.fake_last_name()");
+        return this;
+    }
 
-        /// <inheritdoc />
-        public IAnonSecurityLabelBuilder MaskedWithDummyLastName()
-        {
-            _label = "MASKED WITH FUNCTION anon.dummy_last_name()";
-            return this;
-        }
+    public AnonSecurityLabelBuilder MaskedWithDummyLastName()
+    {
+        RawLabel("MASKED WITH FUNCTION anon.dummy_last_name()");
+        return this;
+    }
 
-        /// <inheritdoc />
-        public IAnonSecurityLabelBuilder MaskedWithFakeEmail()
-        {
-            _label = "MASKED WITH FUNCTION anon.fake_email()";
-            return this;
-        }
+    public AnonSecurityLabelBuilder MaskedWithFakeEmail()
+    {
+        RawLabel("MASKED WITH FUNCTION anon.fake_email()");
+        return this;
+    }
 
-        /// <inheritdoc />
-        public IAnonSecurityLabelBuilder MaskedWithPseudoEmail(string usernameColumn)
+    public AnonSecurityLabelBuilder MaskedWithPseudoEmail(string usernameColumn)
+    {
+        if (string.IsNullOrWhiteSpace(usernameColumn))
         {
-            if (string.IsNullOrWhiteSpace(usernameColumn))
-            {
-                throw new ArgumentException("Username column cannot be null or empty.", nameof(usernameColumn));
-            }
-            _label = $"MASKED WITH FUNCTION anon.pseudo_email({usernameColumn})";
-            return this;
+            throw new ArgumentException(nameof(usernameColumn));
         }
+        RawLabel($"MASKED WITH FUNCTION anon.pseudo_email({usernameColumn})");
+        return this;
+    }
 
-        /// <inheritdoc />
-        public IAnonSecurityLabelBuilder MaskedWithFakeCompany()
-        {
-            _label = "MASKED WITH FUNCTION anon.fake_company()";
-            return this;
-        }
+    public AnonSecurityLabelBuilder MaskedWithFakeCompany()
+    {
+        RawLabel("MASKED WITH FUNCTION anon.fake_company()");
+        return this;
+    }
 
-        /// <inheritdoc />
-        public IAnonSecurityLabelBuilder MaskedWithFakeCity()
-        {
-            _label = "MASKED WITH FUNCTION anon.fake_city()";
-            return this;
-        }
+    public AnonSecurityLabelBuilder MaskedWithFakeCity()
+    {
+        RawLabel("MASKED WITH FUNCTION anon.fake_city()");
+        return this;
+    }
 
-        /// <inheritdoc />
-        public IAnonSecurityLabelBuilder MaskedWithFakeCountry()
-        {
-            _label = "MASKED WITH FUNCTION anon.fake_country()";
-            return this;
-        }
+    public AnonSecurityLabelBuilder MaskedWithFakeCountry()
+    {
+        RawLabel("MASKED WITH FUNCTION anon.fake_country()");
+        return this;
+    }
 
-        /// <inheritdoc />
-        public IAnonSecurityLabelBuilder MaskedWithFakeAddress()
-        {
-            _label = "MASKED WITH FUNCTION anon.fake_address()";
-            return this;
-        }
+    public AnonSecurityLabelBuilder MaskedWithFakeAddress()
+    {
+        RawLabel("MASKED WITH FUNCTION anon.fake_address()");
+        return this;
+    }
 
-        /// <inheritdoc />
-        public IAnonSecurityLabelBuilder MaskedWithFakePhone()
-        {
-            _label = "MASKED WITH FUNCTION anon.fake_phone()";
-            return this;
-        }
+    public AnonSecurityLabelBuilder MaskedWithFakePhone()
+    {
+        RawLabel("MASKED WITH FUNCTION anon.fake_phone()");
+        return this;
+    }
 
-        /// <inheritdoc />
-        public IAnonSecurityLabelBuilder MaskedWithFakeIban()
-        {
-            _label = "MASKED WITH FUNCTION anon.fake_iban()";
-            return this;
-        }
+    public AnonSecurityLabelBuilder MaskedWithFakeIban()
+    {
+        RawLabel("MASKED WITH FUNCTION anon.fake_iban()");
+        return this;
+    }
 
-        /// <inheritdoc />
-        public IAnonSecurityLabelBuilder MaskedWithFakeSiret()
-        {
-            _label = "MASKED WITH FUNCTION anon.fake_siret()";
-            return this;
-        }
+    public AnonSecurityLabelBuilder MaskedWithFakeSiret()
+    {
+        RawLabel("MASKED WITH FUNCTION anon.fake_siret()");
+        return this;
+    }
 
-        /// <inheritdoc />
-        public IAnonSecurityLabelBuilder MaskedWithFakeSiren()
-        {
-            _label = "MASKED WITH FUNCTION anon.fake_siren()";
-            return this;
-        }
+    public AnonSecurityLabelBuilder MaskedWithFakeSiren()
+    {
+        RawLabel("MASKED WITH FUNCTION anon.fake_siren()");
+        return this;
+    }
 
-        /// <inheritdoc />
-        public IAnonSecurityLabelBuilder MaskedWithRandomString()
+    public AnonSecurityLabelBuilder MaskedWithRandomString(int length = 12)
+    {
+        if (length <= 0)
         {
-            _label = "MASKED WITH FUNCTION anon.random_string(12)";
-            return this;
+            throw new ArgumentOutOfRangeException(nameof(length));
         }
+        RawLabel($"MASKED WITH FUNCTION anon.random_string({length})");
+        return this;
+    }
 
-        /// <inheritdoc />
-        public IAnonSecurityLabelBuilder MaskedWithRandomString(int length)
-        {
-            if (length <= 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(length), "Length must be greater than 0.");
-            }
-            _label = $"MASKED WITH FUNCTION anon.random_string({length})";
-            return this;
-        }
+    public AnonSecurityLabelBuilder MaskedWithRandomInt()
+    {
+        RawLabel("MASKED WITH FUNCTION anon.random_int()");
+        return this;
+    }
 
-        /// <inheritdoc />
-        public IAnonSecurityLabelBuilder MaskedWithRandomInt()
+    public AnonSecurityLabelBuilder MaskedWithRandomInt(int min, int max)
+    {
+        if (min > max)
         {
-            _label = "MASKED WITH FUNCTION anon.random_int()";
-            return this;
+            throw new ArgumentException("Min value cannot be greater than max value.");
         }
+        RawLabel($"MASKED WITH FUNCTION anon.random_int_between({min}, {max})");
+        return this;
+    }
 
-        /// <inheritdoc />
-        public IAnonSecurityLabelBuilder MaskedWithRandomInt(int min, int max)
-        {
-            if (min > max)
-            {
-                throw new ArgumentException("Min value cannot be greater than max value.");
-            }
-            _label = $"MASKED WITH FUNCTION anon.random_int_between({min}, {max})";
-            return this;
-        }
+    public AnonSecurityLabelBuilder MaskedWithRandomDate()
+    {
+        RawLabel("MASKED WITH FUNCTION anon.random_date()");
+        return this;
+    }
 
-        /// <inheritdoc />
-        public IAnonSecurityLabelBuilder MaskedWithRandomDate()
+    public AnonSecurityLabelBuilder MaskedWithRandomDateBetween(string startDate, string endDate)
+    {
+        if (string.IsNullOrWhiteSpace(startDate))
         {
-            _label = "MASKED WITH FUNCTION anon.random_date()";
-            return this;
+            throw new ArgumentException(nameof(startDate));
         }
+        if (string.IsNullOrWhiteSpace(endDate))
+        {
+            throw new ArgumentException(nameof(endDate));
+        }
+        RawLabel($"MASKED WITH FUNCTION anon.random_date_between(''{startDate}'', ''{endDate}'')");
+        return this;
+    }
 
-        /// <inheritdoc />
-        public IAnonSecurityLabelBuilder MaskedWithRandomDateBetween(string startDate, string endDate)
+    public AnonSecurityLabelBuilder MaskedWithPartialScrambling(int prefix, char padding, int suffix)
+    {
+        if (prefix < 0)
         {
-            if (string.IsNullOrWhiteSpace(startDate))
-            {
-                throw new ArgumentException("Start date cannot be null or empty.", nameof(startDate));
-            }
-            if (string.IsNullOrWhiteSpace(endDate))
-            {
-                throw new ArgumentException("End date cannot be null or empty.", nameof(endDate));
-            }
-            _label = $"MASKED WITH FUNCTION anon.random_date_between(''{startDate}'', ''{endDate}'')";
-            return this;
+            throw new ArgumentOutOfRangeException(nameof(prefix));
         }
+        if (suffix < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(suffix));
+        }
+        RawLabel($"MASKED WITH FUNCTION anon.partial({prefix}, ''{padding}'', {suffix})");
+        return this;
+    }
 
-        /// <inheritdoc />
-        public IAnonSecurityLabelBuilder MaskedWithPartialScrambling(int prefix, char padding, int suffix)
-        {
-            if (prefix < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(prefix), "Prefix must be non-negative.");
-            }
-            if (suffix < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(suffix), "Suffix must be non-negative.");
-            }
-            _label = $"MASKED WITH FUNCTION anon.partial({prefix}, ''{padding}'', {suffix})";
-            return this;
-        }
-
-        /// <inheritdoc />
-        public IAnonSecurityLabelBuilder Masked()
-        {
-            _label = "MASKED";
-            return this;
-        }
-
-        /// <inheritdoc />
-        public string Build()
-        {
-            if (string.IsNullOrWhiteSpace(_label))
-            {
-                throw new InvalidOperationException("No masking rule has been specified. Call one of the Masked* methods first.");
-            }
-            return _label;
-        }
+    public AnonSecurityLabelBuilder Masked()
+    {
+        RawLabel("MASKED");
+        return this;
     }
 }

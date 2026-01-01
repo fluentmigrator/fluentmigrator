@@ -16,113 +16,113 @@
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
+using FluentMigrator.Postgres;
 
-namespace FluentMigrator.Postgres.Builder.SecurityLabel
+namespace FluentMigrator.Builder.SecurityLabel;
+
+/// <summary>
+/// Builds an expression to delete a security label from a PostgreSQL object.
+/// </summary>
+public class DeleteSecurityLabelExpressionBuilder :
+    IDeleteSecurityLabelSyntax,
+    IDeleteSecurityLabelFromObjectSyntax,
+    IDeleteSecurityLabelFromTableSyntax,
+    IDeleteSecurityLabelFromColumnSyntax,
+    IDeleteSecurityLabelFromColumnTableSyntax,
+    IDeleteSecurityLabelFromViewSyntax
 {
+    private readonly IMigrationContext _context;
+    private readonly PostgresSecurityLabelDefinition _definition;
+
     /// <summary>
-    /// Builds an expression to delete a security label from a PostgreSQL object.
+    /// Initializes a new instance of the <see cref="DeleteSecurityLabelExpressionBuilder"/> class.
     /// </summary>
-    public class DeleteSecurityLabelExpressionBuilder :
-        IDeleteSecurityLabelSyntax,
-        IDeleteSecurityLabelFromObjectSyntax,
-        IDeleteSecurityLabelFromTableSyntax,
-        IDeleteSecurityLabelFromColumnSyntax,
-        IDeleteSecurityLabelFromColumnTableSyntax,
-        IDeleteSecurityLabelFromViewSyntax
+    /// <param name="context">The migration context.</param>
+    public DeleteSecurityLabelExpressionBuilder(IMigrationContext context)
     {
-        private readonly IMigrationContext _context;
-        private readonly PostgresSecurityLabelDefinition _definition;
+        _context = context;
+        _definition = new PostgresSecurityLabelDefinition();
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DeleteSecurityLabelExpressionBuilder"/> class.
-        /// </summary>
-        /// <param name="context">The migration context.</param>
-        public DeleteSecurityLabelExpressionBuilder(IMigrationContext context)
-        {
-            _context = context;
-            _definition = new PostgresSecurityLabelDefinition();
-        }
+    /// <inheritdoc />
+    public IDeleteSecurityLabelFromObjectSyntax For(string provider)
+    {
+        _definition.Provider = provider;
+        return this;
+    }
 
-        /// <inheritdoc />
-        public IDeleteSecurityLabelFromObjectSyntax For(string provider)
-        {
-            _definition.Provider = provider;
-            return this;
-        }
+    /// <inheritdoc />
+    public IDeleteSecurityLabelFromTableSyntax FromTable(string tableName)
+    {
+        _definition.ObjectType = PostgresSecurityLabelObjectType.Table;
+        _definition.ObjectName = tableName;
+        return this;
+    }
 
-        /// <inheritdoc />
-        public IDeleteSecurityLabelFromTableSyntax FromTable(string tableName)
-        {
-            _definition.ObjectType = PostgresSecurityLabelObjectType.Table;
-            _definition.ObjectName = tableName;
-            return this;
-        }
+    /// <inheritdoc />
+    public IDeleteSecurityLabelFromColumnSyntax FromColumn(string columnName)
+    {
+        _definition.ObjectType = PostgresSecurityLabelObjectType.Column;
+        _definition.ColumnName = columnName;
+        return this;
+    }
 
-        /// <inheritdoc />
-        public IDeleteSecurityLabelFromColumnSyntax FromColumn(string columnName)
-        {
-            _definition.ObjectType = PostgresSecurityLabelObjectType.Column;
-            _definition.ColumnName = columnName;
-            return this;
-        }
+    /// <inheritdoc />
+    public void FromSchema(string schemaName)
+    {
+        _definition.ObjectType = PostgresSecurityLabelObjectType.Schema;
+        _definition.ObjectName = schemaName;
+        AddExpression();
+    }
 
-        /// <inheritdoc />
-        public void FromSchema(string schemaName)
-        {
-            _definition.ObjectType = PostgresSecurityLabelObjectType.Schema;
-            _definition.ObjectName = schemaName;
-            AddExpression();
-        }
+    /// <inheritdoc />
+    public void FromRole(string roleName)
+    {
+        _definition.ObjectType = PostgresSecurityLabelObjectType.Role;
+        _definition.ObjectName = roleName;
+        AddExpression();
+    }
 
-        /// <inheritdoc />
-        public void FromRole(string roleName)
-        {
-            _definition.ObjectType = PostgresSecurityLabelObjectType.Role;
-            _definition.ObjectName = roleName;
-            AddExpression();
-        }
+    /// <inheritdoc />
+    public IDeleteSecurityLabelFromViewSyntax FromView(string viewName)
+    {
+        _definition.ObjectType = PostgresSecurityLabelObjectType.View;
+        _definition.ObjectName = viewName;
+        return this;
+    }
 
-        /// <inheritdoc />
-        public IDeleteSecurityLabelFromViewSyntax FromView(string viewName)
-        {
-            _definition.ObjectType = PostgresSecurityLabelObjectType.View;
-            _definition.ObjectName = viewName;
-            return this;
-        }
+    /// <inheritdoc />
+    void IDeleteSecurityLabelFromTableSyntax.InSchema(string schemaName)
+    {
+        _definition.SchemaName = schemaName;
+        AddExpression();
+    }
 
-        /// <inheritdoc />
-        void IDeleteSecurityLabelFromTableSyntax.InSchema(string schemaName)
-        {
-            _definition.SchemaName = schemaName;
-            AddExpression();
-        }
+    /// <inheritdoc />
+    IDeleteSecurityLabelFromColumnTableSyntax IDeleteSecurityLabelFromColumnSyntax.OnTable(string tableName)
+    {
+        _definition.ObjectName = tableName;
+        return this;
+    }
 
-        /// <inheritdoc />
-        IDeleteSecurityLabelFromColumnTableSyntax IDeleteSecurityLabelFromColumnSyntax.OnTable(string tableName)
-        {
-            _definition.ObjectName = tableName;
-            return this;
-        }
+    /// <inheritdoc />
+    void IDeleteSecurityLabelFromColumnTableSyntax.InSchema(string schemaName)
+    {
+        _definition.SchemaName = schemaName;
+        AddExpression();
+    }
 
-        /// <inheritdoc />
-        void IDeleteSecurityLabelFromColumnTableSyntax.InSchema(string schemaName)
-        {
-            _definition.SchemaName = schemaName;
-            AddExpression();
-        }
+    /// <inheritdoc />
+    void IDeleteSecurityLabelFromViewSyntax.InSchema(string schemaName)
+    {
+        _definition.SchemaName = schemaName;
+        AddExpression();
+    }
 
-        /// <inheritdoc />
-        void IDeleteSecurityLabelFromViewSyntax.InSchema(string schemaName)
-        {
-            _definition.SchemaName = schemaName;
-            AddExpression();
-        }
-
-        private void AddExpression()
-        {
-            var sql = PostgresSecurityLabelSqlGenerator.GenerateDeleteSecurityLabelSql(_definition);
-            var expression = new ExecuteSqlStatementExpression { SqlStatement = sql };
-            _context.Expressions.Add(expression);
-        }
+    private void AddExpression()
+    {
+        var sql = PostgresSecurityLabelSqlGenerator.GenerateDeleteSecurityLabelSql(_definition);
+        var expression = new ExecuteSqlStatementExpression { SqlStatement = sql };
+        _context.Expressions.Add(expression);
     }
 }

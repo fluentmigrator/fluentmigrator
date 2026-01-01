@@ -18,139 +18,139 @@ using System;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
-using FluentMigrator.Postgres.Builder.SecurityLabel.Anon;
+using FluentMigrator.Postgres;
 
-namespace FluentMigrator.Postgres.Builder.SecurityLabel
+namespace FluentMigrator.Builder.SecurityLabel;
+
+/// <summary>
+/// Builds an expression to create a security label on a PostgreSQL object.
+/// </summary>
+public class CreateSecurityLabelExpressionBuilder<TBuilder> :
+    ICreateSecurityLabelSyntax<TBuilder>,
+    ICreateSecurityLabelOnObjectSyntax<TBuilder>,
+    ICreateSecurityLabelOnTableSyntax<TBuilder>,
+    ICreateSecurityLabelOnColumnSyntax<TBuilder>,
+    ICreateSecurityLabelOnColumnTableSyntax<TBuilder>,
+    ICreateSecurityLabelOnViewSyntax<TBuilder>,
+    ICreateSecurityLabelWithLabelSyntax<TBuilder>
+    where TBuilder : ISecurityLabelSyntaxBuilder, new()
 {
+    private readonly IMigrationContext _context;
+    private readonly PostgresSecurityLabelDefinition _definition;
+
     /// <summary>
-    /// Builds an expression to create a security label on a PostgreSQL object.
+    /// Initializes a new instance of the <see cref="CreateSecurityLabelExpressionBuilder{TBuilder}"/> class.
     /// </summary>
-    public class CreateSecurityLabelExpressionBuilder :
-        ICreateSecurityLabelSyntax,
-        ICreateSecurityLabelOnObjectSyntax,
-        ICreateSecurityLabelOnTableSyntax,
-        ICreateSecurityLabelOnColumnSyntax,
-        ICreateSecurityLabelOnColumnTableSyntax,
-        ICreateSecurityLabelOnViewSyntax,
-        ICreateSecurityLabelWithLabelSyntax
+    /// <param name="context">The migration context.</param>
+    public CreateSecurityLabelExpressionBuilder(IMigrationContext context)
     {
-        private readonly IMigrationContext _context;
-        private readonly PostgresSecurityLabelDefinition _definition;
+        _context = context;
+        _definition = new PostgresSecurityLabelDefinition();
+    }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CreateSecurityLabelExpressionBuilder"/> class.
-        /// </summary>
-        /// <param name="context">The migration context.</param>
-        public CreateSecurityLabelExpressionBuilder(IMigrationContext context)
+    /// <inheritdoc />
+    public ICreateSecurityLabelOnObjectSyntax<TBuilder> For(string provider)
+    {
+        _definition.Provider = provider;
+        return this;
+    }
+
+    /// <inheritdoc />
+    public ICreateSecurityLabelOnTableSyntax<TBuilder> OnTable(string tableName)
+    {
+        _definition.ObjectType = PostgresSecurityLabelObjectType.Table;
+        _definition.ObjectName = tableName;
+        return this;
+    }
+
+    /// <inheritdoc />
+    public ICreateSecurityLabelOnColumnSyntax<TBuilder> OnColumn(string columnName)
+    {
+        _definition.ObjectType = PostgresSecurityLabelObjectType.Column;
+        _definition.ColumnName = columnName;
+        return this;
+    }
+
+    /// <inheritdoc />
+    public ICreateSecurityLabelWithLabelSyntax<TBuilder> OnSchema(string schemaName)
+    {
+        _definition.ObjectType = PostgresSecurityLabelObjectType.Schema;
+        _definition.ObjectName = schemaName;
+        return this;
+    }
+
+    /// <inheritdoc />
+    public ICreateSecurityLabelWithLabelSyntax<TBuilder> OnRole(string roleName)
+    {
+        _definition.ObjectType = PostgresSecurityLabelObjectType.Role;
+        _definition.ObjectName = roleName;
+        return this;
+    }
+
+    /// <inheritdoc />
+    public ICreateSecurityLabelOnViewSyntax<TBuilder> OnView(string viewName)
+    {
+        _definition.ObjectType = PostgresSecurityLabelObjectType.View;
+        _definition.ObjectName = viewName;
+        return this;
+    }
+
+    /// <inheritdoc />
+    ICreateSecurityLabelWithLabelSyntax<TBuilder> ICreateSecurityLabelOnTableSyntax<TBuilder>.InSchema(string schemaName)
+    {
+        _definition.SchemaName = schemaName;
+        return this;
+    }
+
+    /// <inheritdoc />
+    ICreateSecurityLabelOnColumnTableSyntax<TBuilder> ICreateSecurityLabelOnColumnSyntax<TBuilder>.OnTable(string tableName)
+    {
+        _definition.ObjectName = tableName;
+        return this;
+    }
+
+    /// <inheritdoc />
+    ICreateSecurityLabelWithLabelSyntax<TBuilder> ICreateSecurityLabelOnColumnTableSyntax<TBuilder>.InSchema(string schemaName)
+    {
+        _definition.SchemaName = schemaName;
+        return this;
+    }
+
+    /// <inheritdoc />
+    ICreateSecurityLabelWithLabelSyntax<TBuilder> ICreateSecurityLabelOnViewSyntax<TBuilder>.InSchema(string schemaName)
+    {
+        _definition.SchemaName = schemaName;
+        return this;
+    }
+
+    /// <inheritdoc />
+    public void WithLabel(string label)
+    {
+        _definition.Label = label;
+        AddExpression();
+    }
+
+    /// <inheritdoc />
+    public void WithLabel(Action<TBuilder> configure)
+    {
+        if (configure is null)
         {
-            _context = context;
-            _definition = new PostgresSecurityLabelDefinition();
+            throw new ArgumentNullException(nameof(configure));
         }
 
-        /// <inheritdoc />
-        public ICreateSecurityLabelOnObjectSyntax For(string provider)
-        {
-            _definition.Provider = provider;
-            return this;
-        }
+        var builder = new TBuilder();
+        configure(builder);
 
-        /// <inheritdoc />
-        public ICreateSecurityLabelOnTableSyntax OnTable(string tableName)
-        {
-            _definition.ObjectType = PostgresSecurityLabelObjectType.Table;
-            _definition.ObjectName = tableName;
-            return this;
-        }
+        _definition.Provider = builder.ProviderName;
+        _definition.Label = builder.Build();
 
-        /// <inheritdoc />
-        public ICreateSecurityLabelOnColumnSyntax OnColumn(string columnName)
-        {
-            _definition.ObjectType = PostgresSecurityLabelObjectType.Column;
-            _definition.ColumnName = columnName;
-            return this;
-        }
+        AddExpression();
+    }
 
-        /// <inheritdoc />
-        public ICreateSecurityLabelWithLabelSyntax OnSchema(string schemaName)
-        {
-            _definition.ObjectType = PostgresSecurityLabelObjectType.Schema;
-            _definition.ObjectName = schemaName;
-            return this;
-        }
-
-        /// <inheritdoc />
-        public ICreateSecurityLabelWithLabelSyntax OnRole(string roleName)
-        {
-            _definition.ObjectType = PostgresSecurityLabelObjectType.Role;
-            _definition.ObjectName = roleName;
-            return this;
-        }
-
-        /// <inheritdoc />
-        public ICreateSecurityLabelOnViewSyntax OnView(string viewName)
-        {
-            _definition.ObjectType = PostgresSecurityLabelObjectType.View;
-            _definition.ObjectName = viewName;
-            return this;
-        }
-
-        /// <inheritdoc />
-        ICreateSecurityLabelWithLabelSyntax ICreateSecurityLabelOnTableSyntax.InSchema(string schemaName)
-        {
-            _definition.SchemaName = schemaName;
-            return this;
-        }
-
-        /// <inheritdoc />
-        ICreateSecurityLabelOnColumnTableSyntax ICreateSecurityLabelOnColumnSyntax.OnTable(string tableName)
-        {
-            _definition.ObjectName = tableName;
-            return this;
-        }
-
-        /// <inheritdoc />
-        ICreateSecurityLabelWithLabelSyntax ICreateSecurityLabelOnColumnTableSyntax.InSchema(string schemaName)
-        {
-            _definition.SchemaName = schemaName;
-            return this;
-        }
-
-        /// <inheritdoc />
-        ICreateSecurityLabelWithLabelSyntax ICreateSecurityLabelOnViewSyntax.InSchema(string schemaName)
-        {
-            _definition.SchemaName = schemaName;
-            return this;
-        }
-
-        /// <inheritdoc />
-        public void WithLabel(string label)
-        {
-            _definition.Label = label;
-            AddExpression();
-        }
-
-        /// <inheritdoc />
-        public void WithLabel(Action<IAnonSecurityLabelBuilder> configure)
-        {
-            if (configure is null)
-            {
-                throw new ArgumentNullException(nameof(configure));
-            }
-
-            var builder = new AnonSecurityLabelBuilder();
-            configure(builder);
-
-            // Automatically set the provider to "anon" when using the typed builder
-            _definition.Provider = AnonSecurityLabelBuilder.ProviderName;
-            _definition.Label = builder.Build();
-            AddExpression();
-        }
-
-        private void AddExpression()
-        {
-            var sql = PostgresSecurityLabelSqlGenerator.GenerateCreateSecurityLabelSql(_definition);
-            var expression = new ExecuteSqlStatementExpression { SqlStatement = sql };
-            _context.Expressions.Add(expression);
-        }
+    private void AddExpression()
+    {
+        var sql = PostgresSecurityLabelSqlGenerator.GenerateCreateSecurityLabelSql(_definition);
+        var expression = new ExecuteSqlStatementExpression { SqlStatement = sql };
+        _context.Expressions.Add(expression);
     }
 }
