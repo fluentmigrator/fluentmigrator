@@ -206,6 +206,107 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
             }
         }
 
+        [Test]
+        public void CanApplySecurityLabelWithTypedBuilderMaskedWithValue()
+        {
+            using (var table = new PostgresTestTable(Processor, "public", "name varchar(100)"))
+            {
+                var (createRoot, expressions) = CreateExpressionRootWithContext();
+
+                createRoot.SecurityLabel()
+                    .OnColumn("name")
+                    .OnTable(table.Name)
+                    .InSchema("public")
+                    .WithLabel(label => label.MaskedWithValue("CONFIDENTIAL"));
+
+                ExecuteExpressions(expressions);
+
+                var hasLabel = ColumnSecurityLabelExists(table.Name, "name", "MASKED WITH VALUE ''CONFIDENTIAL''");
+                hasLabel.ShouldBeTrue();
+            }
+        }
+
+        [Test]
+        public void CanApplySecurityLabelWithTypedBuilderMaskedWithFakeEmail()
+        {
+            using (var table = new PostgresTestTable(Processor, "public", "email varchar(255)"))
+            {
+                var (createRoot, expressions) = CreateExpressionRootWithContext();
+
+                createRoot.SecurityLabel()
+                    .OnColumn("email")
+                    .OnTable(table.Name)
+                    .InSchema("public")
+                    .WithLabel(label => label.MaskedWithFakeEmail());
+
+                ExecuteExpressions(expressions);
+
+                var hasLabel = ColumnSecurityLabelExists(table.Name, "email", "MASKED WITH FUNCTION anon.fake_email()");
+                hasLabel.ShouldBeTrue();
+            }
+        }
+
+        [Test]
+        public void CanApplySecurityLabelWithTypedBuilderMaskedWithDummyLastName()
+        {
+            using (var table = new PostgresTestTable(Processor, "public", "lastname varchar(100)"))
+            {
+                var (createRoot, expressions) = CreateExpressionRootWithContext();
+
+                createRoot.SecurityLabel()
+                    .OnColumn("lastname")
+                    .OnTable(table.Name)
+                    .InSchema("public")
+                    .WithLabel(label => label.MaskedWithDummyLastName());
+
+                ExecuteExpressions(expressions);
+
+                var hasLabel = ColumnSecurityLabelExists(table.Name, "lastname", "MASKED WITH FUNCTION anon.dummy_last_name()");
+                hasLabel.ShouldBeTrue();
+            }
+        }
+
+        [Test]
+        public void CanApplySecurityLabelWithTypedBuilderMaskedWithPseudoEmail()
+        {
+            using (var table = new PostgresTestTable(Processor, "public", "username varchar(100), email varchar(255)"))
+            {
+                var (createRoot, expressions) = CreateExpressionRootWithContext();
+
+                createRoot.SecurityLabel()
+                    .OnColumn("email")
+                    .OnTable(table.Name)
+                    .InSchema("public")
+                    .WithLabel(label => label.MaskedWithPseudoEmail("username"));
+
+                ExecuteExpressions(expressions);
+
+                var hasLabel = ColumnSecurityLabelExists(table.Name, "email", "MASKED WITH FUNCTION anon.pseudo_email(username)");
+                hasLabel.ShouldBeTrue();
+            }
+        }
+
+        [Test]
+        public void TypedBuilderAutomaticallySetsAnonProvider()
+        {
+            using (var table = new PostgresTestTable(Processor, "public", "name varchar(100)"))
+            {
+                var (createRoot, expressions) = CreateExpressionRootWithContext();
+
+                createRoot.SecurityLabel()
+                    .OnColumn("name")
+                    .OnTable(table.Name)
+                    .InSchema("public")
+                    .WithLabel(label => label.MaskedWithFakeFirstName());
+
+                // The expression should have been generated with the anon provider
+                expressions.Count.ShouldBe(1);
+                var sqlExpression = expressions[0] as ExecuteSqlStatementExpression;
+                sqlExpression.ShouldNotBeNull();
+                sqlExpression.SqlStatement.ShouldContain("FOR \"anon\"");
+            }
+        }
+
         private (CreateExpressionRoot, IList<IMigrationExpression>) CreateExpressionRootWithContext()
         {
             var expressions = new List<IMigrationExpression>();

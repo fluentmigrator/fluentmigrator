@@ -14,7 +14,10 @@
 // limitations under the License.
 #endregion
 
+using System;
+
 using FluentMigrator.Infrastructure;
+using FluentMigrator.Postgres.Builder.SecurityLabel.Anon;
 
 namespace FluentMigrator.Postgres.Builder.SecurityLabel
 {
@@ -130,9 +133,31 @@ namespace FluentMigrator.Postgres.Builder.SecurityLabel
     public interface ICreateSecurityLabelWithLabelSyntax : IFluentSyntax
     {
         /// <summary>
-        /// Specifies the security label value.
+        /// Specifies the security label value as a raw string.
         /// </summary>
         /// <param name="label">The label value.</param>
         void WithLabel(string label);
+
+        /// <summary>
+        /// Specifies the security label using a strongly-typed PostgreSQL Anonymizer builder.
+        /// This automatically sets the provider to "anon".
+        /// </summary>
+        /// <param name="configure">The action to configure the anonymizer label.</param>
+        /// <example>
+        /// <code>
+        /// Create.SecurityLabel()
+        ///     .OnColumn("email")
+        ///     .OnTable("users")
+        ///     .InSchema("public")
+        ///     .WithLabel(label => label.MaskedWithFakeEmail());
+        /// 
+        /// Create.SecurityLabel()
+        ///     .OnColumn("name")
+        ///     .OnTable("users")
+        ///     .InSchema("public")
+        ///     .WithLabel(label => label.MaskedWithValue("CONFIDENTIAL"));
+        /// </code>
+        /// </example>
+        void WithLabel(Action<IAnonSecurityLabelBuilder> configure);
     }
 }

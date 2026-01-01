@@ -14,8 +14,11 @@
 // limitations under the License.
 #endregion
 
+using System;
+
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
+using FluentMigrator.Postgres.Builder.SecurityLabel.Anon;
 
 namespace FluentMigrator.Postgres.Builder.SecurityLabel
 {
@@ -123,6 +126,23 @@ namespace FluentMigrator.Postgres.Builder.SecurityLabel
         public void WithLabel(string label)
         {
             _definition.Label = label;
+            AddExpression();
+        }
+
+        /// <inheritdoc />
+        public void WithLabel(Action<IAnonSecurityLabelBuilder> configure)
+        {
+            if (configure is null)
+            {
+                throw new ArgumentNullException(nameof(configure));
+            }
+
+            var builder = new AnonSecurityLabelBuilder();
+            configure(builder);
+
+            // Automatically set the provider to "anon" when using the typed builder
+            _definition.Provider = AnonSecurityLabelBuilder.ProviderName;
+            _definition.Label = builder.Build();
             AddExpression();
         }
 
