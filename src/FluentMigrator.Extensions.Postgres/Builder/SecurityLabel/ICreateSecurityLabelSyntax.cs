@@ -21,6 +21,19 @@ namespace FluentMigrator.Postgres.Builder.SecurityLabel
     /// <summary>
     /// Defines the starting syntax for creating a security label.
     /// </summary>
+    public interface ICreateSecurityLabelSyntax : ICreateSecurityLabelOnObjectSyntax
+    {
+        /// <summary>
+        /// Specifies the security label provider.
+        /// </summary>
+        /// <param name="provider">The name of the provider (e.g., "anon", "sepgsql").</param>
+        /// <returns>The next step in the fluent syntax.</returns>
+        ICreateSecurityLabelOnObjectSyntax For(string provider);
+    }
+
+    /// <summary>
+    /// Defines the syntax for selecting the object type for the security label.
+    /// </summary>
     public interface ICreateSecurityLabelOnObjectSyntax : IFluentSyntax
     {
         /// <summary>
@@ -42,14 +55,14 @@ namespace FluentMigrator.Postgres.Builder.SecurityLabel
         /// </summary>
         /// <param name="schemaName">The name of the schema.</param>
         /// <returns>The next step in the fluent syntax.</returns>
-        ICreateSecurityLabelWithProviderSyntax OnSchema(string schemaName);
+        ICreateSecurityLabelWithLabelSyntax OnSchema(string schemaName);
 
         /// <summary>
         /// Specifies that the security label is for a role.
         /// </summary>
         /// <param name="roleName">The name of the role.</param>
         /// <returns>The next step in the fluent syntax.</returns>
-        ICreateSecurityLabelWithProviderSyntax OnRole(string roleName);
+        ICreateSecurityLabelWithLabelSyntax OnRole(string roleName);
 
         /// <summary>
         /// Specifies that the security label is for a view.
@@ -60,16 +73,16 @@ namespace FluentMigrator.Postgres.Builder.SecurityLabel
     }
 
     /// <summary>
-    /// Defines the syntax for specifying a table's schema or proceeding with provider.
+    /// Defines the syntax for specifying a table's schema or proceeding with the label.
     /// </summary>
-    public interface ICreateSecurityLabelOnTableSyntax : ICreateSecurityLabelWithProviderSyntax
+    public interface ICreateSecurityLabelOnTableSyntax : ICreateSecurityLabelWithLabelSyntax
     {
         /// <summary>
         /// Specifies the schema containing the table.
         /// </summary>
         /// <param name="schemaName">The name of the schema.</param>
         /// <returns>The next step in the fluent syntax.</returns>
-        ICreateSecurityLabelWithProviderSyntax InSchema(string schemaName);
+        ICreateSecurityLabelWithLabelSyntax InSchema(string schemaName);
     }
 
     /// <summary>
@@ -86,48 +99,29 @@ namespace FluentMigrator.Postgres.Builder.SecurityLabel
     }
 
     /// <summary>
-    /// Defines the syntax for specifying a column's table schema or proceeding with provider.
+    /// Defines the syntax for specifying a column's table schema or proceeding with the label.
     /// </summary>
-    public interface ICreateSecurityLabelOnColumnTableSyntax : ICreateSecurityLabelWithProviderSyntax
+    public interface ICreateSecurityLabelOnColumnTableSyntax : ICreateSecurityLabelWithLabelSyntax
     {
         /// <summary>
         /// Specifies the schema containing the table.
         /// </summary>
         /// <param name="schemaName">The name of the schema.</param>
         /// <returns>The next step in the fluent syntax.</returns>
-        ICreateSecurityLabelWithProviderSyntax InSchema(string schemaName);
+        ICreateSecurityLabelWithLabelSyntax InSchema(string schemaName);
     }
 
     /// <summary>
-    /// Defines the syntax for specifying a view's schema or proceeding with provider.
+    /// Defines the syntax for specifying a view's schema or proceeding with the label.
     /// </summary>
-    public interface ICreateSecurityLabelOnViewSyntax : ICreateSecurityLabelWithProviderSyntax
+    public interface ICreateSecurityLabelOnViewSyntax : ICreateSecurityLabelWithLabelSyntax
     {
         /// <summary>
         /// Specifies the schema containing the view.
         /// </summary>
         /// <param name="schemaName">The name of the schema.</param>
         /// <returns>The next step in the fluent syntax.</returns>
-        ICreateSecurityLabelWithProviderSyntax InSchema(string schemaName);
-    }
-
-    /// <summary>
-    /// Defines the syntax for specifying the provider and label.
-    /// </summary>
-    public interface ICreateSecurityLabelWithProviderSyntax : IFluentSyntax
-    {
-        /// <summary>
-        /// Specifies the security label provider.
-        /// </summary>
-        /// <param name="provider">The name of the provider (e.g., "anon", "sepgsql").</param>
-        /// <returns>The next step in the fluent syntax.</returns>
-        ICreateSecurityLabelWithLabelSyntax WithProvider(string provider);
-
-        /// <summary>
-        /// Specifies the security label value (without a specific provider).
-        /// </summary>
-        /// <param name="label">The label value.</param>
-        void WithLabel(string label);
+        ICreateSecurityLabelWithLabelSyntax InSchema(string schemaName);
     }
 
     /// <summary>

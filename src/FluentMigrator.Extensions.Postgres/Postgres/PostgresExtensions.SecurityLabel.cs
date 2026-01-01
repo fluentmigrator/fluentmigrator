@@ -14,9 +14,8 @@
 // limitations under the License.
 #endregion
 
-using System;
-
-using FluentMigrator.Expressions;
+using FluentMigrator.Builders.Create;
+using FluentMigrator.Builders.Delete;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Postgres.Builder.SecurityLabel;
 
@@ -39,55 +38,75 @@ namespace FluentMigrator.Postgres
         /// <summary>
         /// Creates a security label on a database object.
         /// </summary>
-        /// <param name="context">The migration context.</param>
+        /// <param name="root">The create expression root.</param>
         /// <returns>A builder for specifying the security label details.</returns>
         /// <example>
         /// <code>
         /// // Create a security label on a table
-        /// this.CreateSecurityLabel()
+        /// Create.SecurityLabel()
         ///     .OnTable("users")
         ///     .InSchema("public")
-        ///     .WithProvider("anon")
+        ///     .WithLabel("some label");
+        /// 
+        /// // Create a security label on a table with a specific provider
+        /// Create.SecurityLabel()
+        ///     .For("anon")
+        ///     .OnTable("users")
+        ///     .InSchema("public")
         ///     .WithLabel("TABLESAMPLE BERNOULLI(10)");
         /// 
         /// // Create a security label on a column
-        /// this.CreateSecurityLabel()
+        /// Create.SecurityLabel()
+        ///     .For("anon")
         ///     .OnColumn("email")
         ///     .OnTable("users")
         ///     .InSchema("public")
-        ///     .WithProvider("anon")
         ///     .WithLabel("MASKED WITH FUNCTION anon.fake_email()");
         /// </code>
         /// </example>
-        public static ICreateSecurityLabelOnObjectSyntax CreateSecurityLabel(this IMigrationContext context)
+        public static ICreateSecurityLabelSyntax SecurityLabel(this ICreateExpressionRoot root)
         {
+            var context = GetMigrationContext(root);
             return new CreateSecurityLabelExpressionBuilder(context);
         }
 
         /// <summary>
         /// Deletes a security label from a database object by setting it to NULL.
         /// </summary>
-        /// <param name="context">The migration context.</param>
+        /// <param name="root">The delete expression root.</param>
         /// <returns>A builder for specifying the security label to delete.</returns>
         /// <example>
         /// <code>
         /// // Delete a security label from a table
-        /// this.DeleteSecurityLabel()
+        /// Delete.SecurityLabel()
+        ///     .For("anon")
         ///     .FromTable("users")
-        ///     .InSchema("public")
-        ///     .WithProvider("anon");
+        ///     .InSchema("public");
         /// 
         /// // Delete a security label from a column
-        /// this.DeleteSecurityLabel()
+        /// Delete.SecurityLabel()
+        ///     .For("anon")
         ///     .FromColumn("email")
         ///     .OnTable("users")
-        ///     .InSchema("public")
-        ///     .WithProvider("anon");
+        ///     .InSchema("public");
         /// </code>
         /// </example>
-        public static IDeleteSecurityLabelFromObjectSyntax DeleteSecurityLabel(this IMigrationContext context)
+        public static IDeleteSecurityLabelSyntax SecurityLabel(this IDeleteExpressionRoot root)
         {
+            var context = GetMigrationContext(root);
             return new DeleteSecurityLabelExpressionBuilder(context);
+        }
+
+        private static IMigrationContext GetMigrationContext(object root)
+        {
+            // The CreateExpressionRoot and DeleteExpressionRoot have a private _context field
+            // We need to access it via reflection or use a different approach
+            var contextField = root.GetType().GetField("_context", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            if (contextField is null)
+            {
+                throw new System.InvalidOperationException("Cannot access migration context from expression root.");
+            }
+            return (IMigrationContext)contextField.GetValue(root);
         }
     }
 }

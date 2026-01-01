@@ -23,12 +23,12 @@ namespace FluentMigrator.Postgres.Builder.SecurityLabel
     /// Builds an expression to delete a security label from a PostgreSQL object.
     /// </summary>
     public class DeleteSecurityLabelExpressionBuilder :
+        IDeleteSecurityLabelSyntax,
         IDeleteSecurityLabelFromObjectSyntax,
         IDeleteSecurityLabelFromTableSyntax,
         IDeleteSecurityLabelFromColumnSyntax,
         IDeleteSecurityLabelFromColumnTableSyntax,
-        IDeleteSecurityLabelFromViewSyntax,
-        IDeleteSecurityLabelWithProviderSyntax
+        IDeleteSecurityLabelFromViewSyntax
     {
         private readonly IMigrationContext _context;
         private readonly PostgresSecurityLabelDefinition _definition;
@@ -41,6 +41,13 @@ namespace FluentMigrator.Postgres.Builder.SecurityLabel
         {
             _context = context;
             _definition = new PostgresSecurityLabelDefinition();
+        }
+
+        /// <inheritdoc />
+        public IDeleteSecurityLabelFromObjectSyntax For(string provider)
+        {
+            _definition.Provider = provider;
+            return this;
         }
 
         /// <inheritdoc />
@@ -60,19 +67,19 @@ namespace FluentMigrator.Postgres.Builder.SecurityLabel
         }
 
         /// <inheritdoc />
-        public IDeleteSecurityLabelWithProviderSyntax FromSchema(string schemaName)
+        public void FromSchema(string schemaName)
         {
             _definition.ObjectType = PostgresSecurityLabelObjectType.Schema;
             _definition.ObjectName = schemaName;
-            return this;
+            AddExpression();
         }
 
         /// <inheritdoc />
-        public IDeleteSecurityLabelWithProviderSyntax FromRole(string roleName)
+        public void FromRole(string roleName)
         {
             _definition.ObjectType = PostgresSecurityLabelObjectType.Role;
             _definition.ObjectName = roleName;
-            return this;
+            AddExpression();
         }
 
         /// <inheritdoc />
@@ -84,10 +91,10 @@ namespace FluentMigrator.Postgres.Builder.SecurityLabel
         }
 
         /// <inheritdoc />
-        IDeleteSecurityLabelWithProviderSyntax IDeleteSecurityLabelFromTableSyntax.InSchema(string schemaName)
+        void IDeleteSecurityLabelFromTableSyntax.InSchema(string schemaName)
         {
             _definition.SchemaName = schemaName;
-            return this;
+            AddExpression();
         }
 
         /// <inheritdoc />
@@ -98,29 +105,16 @@ namespace FluentMigrator.Postgres.Builder.SecurityLabel
         }
 
         /// <inheritdoc />
-        IDeleteSecurityLabelWithProviderSyntax IDeleteSecurityLabelFromColumnTableSyntax.InSchema(string schemaName)
+        void IDeleteSecurityLabelFromColumnTableSyntax.InSchema(string schemaName)
         {
             _definition.SchemaName = schemaName;
-            return this;
-        }
-
-        /// <inheritdoc />
-        IDeleteSecurityLabelWithProviderSyntax IDeleteSecurityLabelFromViewSyntax.InSchema(string schemaName)
-        {
-            _definition.SchemaName = schemaName;
-            return this;
-        }
-
-        /// <inheritdoc />
-        public void WithProvider(string provider)
-        {
-            _definition.Provider = provider;
             AddExpression();
         }
 
         /// <inheritdoc />
-        public void Delete()
+        void IDeleteSecurityLabelFromViewSyntax.InSchema(string schemaName)
         {
+            _definition.SchemaName = schemaName;
             AddExpression();
         }
 

@@ -14,14 +14,21 @@
 // limitations under the License.
 #endregion
 
-using System.Data;
+using System.Collections.Generic;
 
+using FluentMigrator.Builders.Create;
+using FluentMigrator.Builders.Delete;
+using FluentMigrator.Expressions;
+using FluentMigrator.Infrastructure;
+using FluentMigrator.Postgres;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.Postgres;
 using FluentMigrator.Tests.Helpers;
 
 using Microsoft.Extensions.DependencyInjection;
+
+using Moq;
 
 using NUnit.Framework;
 
@@ -39,13 +46,18 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
         private PostgresProcessor Processor { get; set; }
 
         [Test]
-        public void CanApplySecurityLabelToTable()
+        public void CanApplySecurityLabelToTableUsingFluentApi()
         {
             using (var table = new PostgresTestTable(Processor, "public", "id int"))
             {
-                var sql = $"SECURITY LABEL ON TABLE \"public\".\"{table.Name}\" IS 'test label';";
+                var (createRoot, expressions) = CreateExpressionRootWithContext();
 
-                Processor.Execute(sql);
+                createRoot.SecurityLabel()
+                    .OnTable(table.Name)
+                    .InSchema("public")
+                    .WithLabel("test label");
+
+                ExecuteExpressions(expressions);
 
                 var hasLabel = SecurityLabelExists("pg_class", table.Name, "test label");
                 hasLabel.ShouldBeTrue();
@@ -53,13 +65,39 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
         }
 
         [Test]
-        public void CanApplySecurityLabelToColumn()
+        public void CanApplySecurityLabelToTableWithProviderUsingFluentApi()
         {
             using (var table = new PostgresTestTable(Processor, "public", "id int"))
             {
-                var sql = $"SECURITY LABEL ON COLUMN \"public\".\"{table.Name}\".\"id\" IS 'column label';";
+                var (createRoot, expressions) = CreateExpressionRootWithContext();
 
-                Processor.Execute(sql);
+                createRoot.SecurityLabel()
+                    .For("anon")
+                    .OnTable(table.Name)
+                    .InSchema("public")
+                    .WithLabel("test label with provider");
+
+                ExecuteExpressions(expressions);
+
+                var hasLabel = SecurityLabelExists("pg_class", table.Name, "test label with provider");
+                hasLabel.ShouldBeTrue();
+            }
+        }
+
+        [Test]
+        public void CanApplySecurityLabelToColumnUsingFluentApi()
+        {
+            using (var table = new PostgresTestTable(Processor, "public", "id int"))
+            {
+                var (createRoot, expressions) = CreateExpressionRootWithContext();
+
+                createRoot.SecurityLabel()
+                    .OnColumn("id")
+                    .OnTable(table.Name)
+                    .InSchema("public")
+                    .WithLabel("column label");
+
+                ExecuteExpressions(expressions);
 
                 var hasLabel = ColumnSecurityLabelExists(table.Name, "id", "column label");
                 hasLabel.ShouldBeTrue();
@@ -67,16 +105,25 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
         }
 
         [Test]
-        public void CanDeleteSecurityLabelFromTable()
+        public void CanDeleteSecurityLabelFromTableUsingFluentApi()
         {
             using (var table = new PostgresTestTable(Processor, "public", "id int"))
             {
-                Processor.Execute($"SECURITY LABEL ON TABLE \"public\".\"{table.Name}\" IS 'to be deleted';");
+                var (createRoot, createExpressions) = CreateExpressionRootWithContext();
+                createRoot.SecurityLabel()
+                    .OnTable(table.Name)
+                    .InSchema("public")
+                    .WithLabel("to be deleted");
+                ExecuteExpressions(createExpressions);
 
                 var hasLabel = SecurityLabelExists("pg_class", table.Name, "to be deleted");
                 hasLabel.ShouldBeTrue();
 
-                Processor.Execute($"SECURITY LABEL ON TABLE \"public\".\"{table.Name}\" IS NULL;");
+                var (deleteRoot, deleteExpressions) = DeleteExpressionRootWithContext();
+                deleteRoot.SecurityLabel()
+                    .FromTable(table.Name)
+                    .InSchema("public");
+                ExecuteExpressions(deleteExpressions);
 
                 hasLabel = SecurityLabelExists("pg_class", table.Name, "to be deleted");
                 hasLabel.ShouldBeFalse();
@@ -84,14 +131,19 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
         }
 
         [Test]
-        public void CanApplySecurityLabelToSchema()
+        public void CanApplySecurityLabelToSchemaUsingFluentApi()
         {
             const string schemaName = "test_security_label_schema";
 
             try
             {
                 Processor.Execute($"CREATE SCHEMA IF NOT EXISTS \"{schemaName}\";");
-                Processor.Execute($"SECURITY LABEL ON SCHEMA \"{schemaName}\" IS 'schema label';");
+
+                var (createRoot, expressions) = CreateExpressionRootWithContext();
+                createRoot.SecurityLabel()
+                    .OnSchema(schemaName)
+                    .WithLabel("schema label");
+                ExecuteExpressions(expressions);
 
                 var hasLabel = SecurityLabelExists("pg_namespace", schemaName, "schema label");
                 hasLabel.ShouldBeTrue();
@@ -103,14 +155,19 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
         }
 
         [Test]
-        public void CanApplySecurityLabelToRole()
+        public void CanApplySecurityLabelToRoleUsingFluentApi()
         {
             const string roleName = "test_security_label_role";
 
             try
             {
                 Processor.Execute($"CREATE ROLE \"{roleName}\";");
-                Processor.Execute($"SECURITY LABEL ON ROLE \"{roleName}\" IS 'role label';");
+
+                var (createRoot, expressions) = CreateExpressionRootWithContext();
+                createRoot.SecurityLabel()
+                    .OnRole(roleName)
+                    .WithLabel("role label");
+                ExecuteExpressions(expressions);
 
                 var hasLabel = SecurityLabelExists("pg_authid", roleName, "role label");
                 hasLabel.ShouldBeTrue();
@@ -122,7 +179,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
         }
 
         [Test]
-        public void CanApplySecurityLabelToView()
+        public void CanApplySecurityLabelToViewUsingFluentApi()
         {
             const string viewName = "test_security_label_view";
 
@@ -131,7 +188,13 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
                 try
                 {
                     Processor.Execute($"CREATE VIEW \"public\".\"{viewName}\" AS SELECT id FROM \"public\".\"{table.Name}\";");
-                    Processor.Execute($"SECURITY LABEL ON VIEW \"public\".\"{viewName}\" IS 'view label';");
+
+                    var (createRoot, expressions) = CreateExpressionRootWithContext();
+                    createRoot.SecurityLabel()
+                        .OnView(viewName)
+                        .InSchema("public")
+                        .WithLabel("view label");
+                    ExecuteExpressions(expressions);
 
                     var hasLabel = SecurityLabelExists("pg_class", viewName, "view label");
                     hasLabel.ShouldBeTrue();
@@ -139,6 +202,33 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
                 finally
                 {
                     Processor.Execute($"DROP VIEW IF EXISTS \"public\".\"{viewName}\";");
+                }
+            }
+        }
+
+        private (CreateExpressionRoot, IList<IMigrationExpression>) CreateExpressionRootWithContext()
+        {
+            var expressions = new List<IMigrationExpression>();
+            var contextMock = new Mock<IMigrationContext>();
+            contextMock.SetupGet(c => c.Expressions).Returns(expressions);
+            return (new CreateExpressionRoot(contextMock.Object), expressions);
+        }
+
+        private (DeleteExpressionRoot, IList<IMigrationExpression>) DeleteExpressionRootWithContext()
+        {
+            var expressions = new List<IMigrationExpression>();
+            var contextMock = new Mock<IMigrationContext>();
+            contextMock.SetupGet(c => c.Expressions).Returns(expressions);
+            return (new DeleteExpressionRoot(contextMock.Object), expressions);
+        }
+
+        private void ExecuteExpressions(IList<IMigrationExpression> expressions)
+        {
+            foreach (var expression in expressions)
+            {
+                if (expression is ExecuteSqlStatementExpression sqlExpression)
+                {
+                    Processor.Execute(sqlExpression.SqlStatement);
                 }
             }
         }

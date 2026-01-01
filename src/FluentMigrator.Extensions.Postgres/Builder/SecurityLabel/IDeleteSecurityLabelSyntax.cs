@@ -21,6 +21,19 @@ namespace FluentMigrator.Postgres.Builder.SecurityLabel
     /// <summary>
     /// Defines the starting syntax for deleting a security label.
     /// </summary>
+    public interface IDeleteSecurityLabelSyntax : IDeleteSecurityLabelFromObjectSyntax
+    {
+        /// <summary>
+        /// Specifies the security label provider.
+        /// </summary>
+        /// <param name="provider">The name of the provider (e.g., "anon", "sepgsql").</param>
+        /// <returns>The next step in the fluent syntax.</returns>
+        IDeleteSecurityLabelFromObjectSyntax For(string provider);
+    }
+
+    /// <summary>
+    /// Defines the syntax for selecting the object type for the security label to delete.
+    /// </summary>
     public interface IDeleteSecurityLabelFromObjectSyntax : IFluentSyntax
     {
         /// <summary>
@@ -42,14 +55,14 @@ namespace FluentMigrator.Postgres.Builder.SecurityLabel
         /// </summary>
         /// <param name="schemaName">The name of the schema.</param>
         /// <returns>The next step in the fluent syntax.</returns>
-        IDeleteSecurityLabelWithProviderSyntax FromSchema(string schemaName);
+        void FromSchema(string schemaName);
 
         /// <summary>
         /// Specifies that the security label is being deleted from a role.
         /// </summary>
         /// <param name="roleName">The name of the role.</param>
         /// <returns>The next step in the fluent syntax.</returns>
-        IDeleteSecurityLabelWithProviderSyntax FromRole(string roleName);
+        void FromRole(string roleName);
 
         /// <summary>
         /// Specifies that the security label is being deleted from a view.
@@ -60,16 +73,15 @@ namespace FluentMigrator.Postgres.Builder.SecurityLabel
     }
 
     /// <summary>
-    /// Defines the syntax for specifying a table's schema or proceeding with provider.
+    /// Defines the syntax for specifying a table's schema or completing the delete.
     /// </summary>
-    public interface IDeleteSecurityLabelFromTableSyntax : IDeleteSecurityLabelWithProviderSyntax
+    public interface IDeleteSecurityLabelFromTableSyntax : IFluentSyntax
     {
         /// <summary>
-        /// Specifies the schema containing the table.
+        /// Specifies the schema containing the table and completes the delete operation.
         /// </summary>
         /// <param name="schemaName">The name of the schema.</param>
-        /// <returns>The next step in the fluent syntax.</returns>
-        IDeleteSecurityLabelWithProviderSyntax InSchema(string schemaName);
+        void InSchema(string schemaName);
     }
 
     /// <summary>
@@ -86,45 +98,26 @@ namespace FluentMigrator.Postgres.Builder.SecurityLabel
     }
 
     /// <summary>
-    /// Defines the syntax for specifying a column's table schema or proceeding with provider.
+    /// Defines the syntax for specifying a column's table schema or completing the delete.
     /// </summary>
-    public interface IDeleteSecurityLabelFromColumnTableSyntax : IDeleteSecurityLabelWithProviderSyntax
+    public interface IDeleteSecurityLabelFromColumnTableSyntax : IFluentSyntax
     {
         /// <summary>
-        /// Specifies the schema containing the table.
+        /// Specifies the schema containing the table and completes the delete operation.
         /// </summary>
         /// <param name="schemaName">The name of the schema.</param>
-        /// <returns>The next step in the fluent syntax.</returns>
-        IDeleteSecurityLabelWithProviderSyntax InSchema(string schemaName);
+        void InSchema(string schemaName);
     }
 
     /// <summary>
-    /// Defines the syntax for specifying a view's schema or proceeding with provider.
+    /// Defines the syntax for specifying a view's schema or completing the delete.
     /// </summary>
-    public interface IDeleteSecurityLabelFromViewSyntax : IDeleteSecurityLabelWithProviderSyntax
+    public interface IDeleteSecurityLabelFromViewSyntax : IFluentSyntax
     {
         /// <summary>
-        /// Specifies the schema containing the view.
+        /// Specifies the schema containing the view and completes the delete operation.
         /// </summary>
         /// <param name="schemaName">The name of the schema.</param>
-        /// <returns>The next step in the fluent syntax.</returns>
-        IDeleteSecurityLabelWithProviderSyntax InSchema(string schemaName);
-    }
-
-    /// <summary>
-    /// Defines the syntax for specifying the provider for the label to delete.
-    /// </summary>
-    public interface IDeleteSecurityLabelWithProviderSyntax : IFluentSyntax
-    {
-        /// <summary>
-        /// Specifies the security label provider and deletes the label.
-        /// </summary>
-        /// <param name="provider">The name of the provider (e.g., "anon", "sepgsql").</param>
-        void WithProvider(string provider);
-
-        /// <summary>
-        /// Deletes the security label (without a specific provider).
-        /// </summary>
-        void Delete();
+        void InSchema(string schemaName);
     }
 }

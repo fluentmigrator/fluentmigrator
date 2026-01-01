@@ -23,12 +23,12 @@ namespace FluentMigrator.Postgres.Builder.SecurityLabel
     /// Builds an expression to create a security label on a PostgreSQL object.
     /// </summary>
     public class CreateSecurityLabelExpressionBuilder :
+        ICreateSecurityLabelSyntax,
         ICreateSecurityLabelOnObjectSyntax,
         ICreateSecurityLabelOnTableSyntax,
         ICreateSecurityLabelOnColumnSyntax,
         ICreateSecurityLabelOnColumnTableSyntax,
         ICreateSecurityLabelOnViewSyntax,
-        ICreateSecurityLabelWithProviderSyntax,
         ICreateSecurityLabelWithLabelSyntax
     {
         private readonly IMigrationContext _context;
@@ -42,6 +42,13 @@ namespace FluentMigrator.Postgres.Builder.SecurityLabel
         {
             _context = context;
             _definition = new PostgresSecurityLabelDefinition();
+        }
+
+        /// <inheritdoc />
+        public ICreateSecurityLabelOnObjectSyntax For(string provider)
+        {
+            _definition.Provider = provider;
+            return this;
         }
 
         /// <inheritdoc />
@@ -61,7 +68,7 @@ namespace FluentMigrator.Postgres.Builder.SecurityLabel
         }
 
         /// <inheritdoc />
-        public ICreateSecurityLabelWithProviderSyntax OnSchema(string schemaName)
+        public ICreateSecurityLabelWithLabelSyntax OnSchema(string schemaName)
         {
             _definition.ObjectType = PostgresSecurityLabelObjectType.Schema;
             _definition.ObjectName = schemaName;
@@ -69,7 +76,7 @@ namespace FluentMigrator.Postgres.Builder.SecurityLabel
         }
 
         /// <inheritdoc />
-        public ICreateSecurityLabelWithProviderSyntax OnRole(string roleName)
+        public ICreateSecurityLabelWithLabelSyntax OnRole(string roleName)
         {
             _definition.ObjectType = PostgresSecurityLabelObjectType.Role;
             _definition.ObjectName = roleName;
@@ -85,7 +92,7 @@ namespace FluentMigrator.Postgres.Builder.SecurityLabel
         }
 
         /// <inheritdoc />
-        ICreateSecurityLabelWithProviderSyntax ICreateSecurityLabelOnTableSyntax.InSchema(string schemaName)
+        ICreateSecurityLabelWithLabelSyntax ICreateSecurityLabelOnTableSyntax.InSchema(string schemaName)
         {
             _definition.SchemaName = schemaName;
             return this;
@@ -99,23 +106,16 @@ namespace FluentMigrator.Postgres.Builder.SecurityLabel
         }
 
         /// <inheritdoc />
-        ICreateSecurityLabelWithProviderSyntax ICreateSecurityLabelOnColumnTableSyntax.InSchema(string schemaName)
+        ICreateSecurityLabelWithLabelSyntax ICreateSecurityLabelOnColumnTableSyntax.InSchema(string schemaName)
         {
             _definition.SchemaName = schemaName;
             return this;
         }
 
         /// <inheritdoc />
-        ICreateSecurityLabelWithProviderSyntax ICreateSecurityLabelOnViewSyntax.InSchema(string schemaName)
+        ICreateSecurityLabelWithLabelSyntax ICreateSecurityLabelOnViewSyntax.InSchema(string schemaName)
         {
             _definition.SchemaName = schemaName;
-            return this;
-        }
-
-        /// <inheritdoc />
-        public ICreateSecurityLabelWithLabelSyntax WithProvider(string provider)
-        {
-            _definition.Provider = provider;
             return this;
         }
 
