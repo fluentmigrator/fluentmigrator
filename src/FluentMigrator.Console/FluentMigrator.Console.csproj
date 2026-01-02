@@ -31,7 +31,7 @@
     <PackageReference Include="Npgsql" Version="8.0.7" />
     <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="10.3.3" />
     <PackageReference Include="FSharp.Core" Version="9.0.202" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.4" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="$(MicrosoftPackageVersion)" />
     <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="23.8.0" Condition="'$(TargetFramework)' == 'net8.0'" />
     <PackageReference Include="Oracle.ManagedDataAccess" Version="23.8.0" Condition="'$(TargetFramework)' == 'net48'" />
     <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.11" />
@@ -53,7 +53,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Update="JetBrains.Annotations" Version="2024.3.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.7" />
   </ItemGroup>
 </Project>

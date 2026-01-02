@@ -15,7 +15,4 @@
     <ProjectReference Include="..\FluentMigrator.Extensions.Snowflake\FluentMigrator.Extensions.Snowflake.csproj" />
     <ProjectReference Include="..\FluentMigrator.Runner.Core\FluentMigrator.Runner.Core.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <PackageReference Update="JetBrains.Annotations" Version="2024.3.0" />
-  </ItemGroup>
 </Project>
