@@ -11,7 +11,7 @@
     <PackageReadmeFile>README-nuget.md</PackageReadmeFile>
     <PackageProjectUrl>https://github.com/fluentmigrator/fluentmigrator/wiki</PackageProjectUrl>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <PackageReleaseNotes>https://github.com/fluentmigrator/fluentmigrator/releases</PackageReleaseNotes>
+    <PackageReleaseNotes>Latest changes and detailed release notes are available on GitHub Releases: https://github.com/fluentmigrator/fluentmigrator/releases</PackageReleaseNotes>
     <PackageIcon>logo.png</PackageIcon>
     <RepositoryUrl>https://github.com/fluentmigrator/fluentmigrator.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
