@@ -15,7 +15,7 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 
 using Microsoft.CodeAnalysis;
 
@@ -39,6 +39,6 @@ namespace FluentMigrator.Analyzers.Analysis
 
         public INamedTypeSymbol MigrationAttributeType => _lazyMigrationAttributeType?.Value;
 
-        public List<MigrationClassDeclaration> Migrations { get; } = new List<MigrationClassDeclaration>();
+        public ConcurrentBag<MigrationClassDeclaration> Migrations { get; } = new ConcurrentBag<MigrationClassDeclaration>();
     }
 }
