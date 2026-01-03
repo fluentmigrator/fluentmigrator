@@ -20,6 +20,11 @@ using Testcontainers.PostgreSql;
 
 namespace FluentMigrator.Tests.Containers;
 
+/// <summary>
+/// Container for PostgreSQL with the Anonymizer extension.
+/// Uses the registry.gitlab.com/dalibo/postgresql_anonymizer image to enable
+/// testing of security labels with the anon extension.
+/// </summary>
 public class PostgresContainer : ContainerBase
 {
     /// <inheritdoc />
@@ -29,5 +34,8 @@ public class PostgresContainer : ContainerBase
     protected override int Port => 5432;
 
     /// <inheritdoc />
-    protected override DockerContainer Build() => new PostgreSqlBuilder().WithReuse(true).Build();
+    protected override DockerContainer Build() => new PostgreSqlBuilder()
+        .WithImage("registry.gitlab.com/dalibo/postgresql_anonymizer:stable")
+        .WithReuse(true)
+        .Build();
 }
