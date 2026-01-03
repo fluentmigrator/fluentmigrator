@@ -31,6 +31,9 @@ namespace FluentMigrator.Analyzers
         public const string DiagnosticId = "FM0001";
         private const string Category = "FluentMigrator";
 
+        // Disable concurrent execution to avoid threading issues with FluentMigratorContext.Migrations
+        protected override bool ShouldEnableConcurrentExecution => false;
+
         // You can change these strings in the Resources.resx file. If you do not want your analyzer to be localize-able, you can use regular strings for Title and MessageFormat.
         private static readonly LocalizableString Title = new LocalizableResourceString(nameof(Resources.MigrationAttributeVersionShouldBeUniqueAnalyzerTitle), Resources.ResourceManager, typeof(Resources));
         private static readonly LocalizableString MessageFormat = new LocalizableResourceString(nameof(Resources.MigrationAttributeVersionShouldBeUniqueAnalyzerMessageFormat), Resources.ResourceManager, typeof(Resources));

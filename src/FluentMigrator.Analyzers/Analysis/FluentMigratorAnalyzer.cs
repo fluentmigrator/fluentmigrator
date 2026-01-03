@@ -20,9 +20,15 @@ namespace FluentMigrator.Analyzers.Analysis
 {
     public abstract class FluentMigratorAnalyzer : DiagnosticAnalyzer
     {
+        protected virtual bool ShouldEnableConcurrentExecution => true;
+
         public override void Initialize(AnalysisContext context)
         {
-            context.EnableConcurrentExecution();
+            if (ShouldEnableConcurrentExecution)
+            {
+                context.EnableConcurrentExecution();
+            }
+
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
 
             context.RegisterCompilationStartAction(compilationStartContext =>
