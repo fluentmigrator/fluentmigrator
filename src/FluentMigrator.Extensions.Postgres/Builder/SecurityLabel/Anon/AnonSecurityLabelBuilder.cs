@@ -41,7 +41,7 @@ public class AnonSecurityLabelBuilder : SecurityLabelSyntaxBuilderBase
         }
         // Escape single quotes in the value
         var escapedValue = value.Replace("'", "''");
-        RawLabel($"MASKED WITH VALUE ''{escapedValue}''");
+        RawLabel($"MASKED WITH VALUE '{escapedValue}'");
         return this;
     }
 
@@ -267,7 +267,7 @@ public class AnonSecurityLabelBuilder : SecurityLabelSyntaxBuilderBase
         {
             throw new ArgumentException("End date cannot be null or whitespace.", nameof(endDate));
         }
-        RawLabel($"MASKED WITH FUNCTION anon.random_date_between(''{startDate}'', ''{endDate}'')");
+        RawLabel($"MASKED WITH FUNCTION anon.random_date_between('{startDate}', '{endDate}')");
         return this;
     }
 
@@ -289,7 +289,7 @@ public class AnonSecurityLabelBuilder : SecurityLabelSyntaxBuilderBase
         {
             throw new ArgumentOutOfRangeException(nameof(suffix), "Suffix cannot be negative.");
         }
-        RawLabel($"MASKED WITH FUNCTION anon.partial({prefix}, ''{padding}'', {suffix})");
+        RawLabel($"MASKED WITH FUNCTION anon.partial({prefix}, '{padding}', {suffix})");
         return this;
     }
 

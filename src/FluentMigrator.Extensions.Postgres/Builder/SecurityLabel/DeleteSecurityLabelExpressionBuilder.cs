@@ -14,8 +14,11 @@
 // limitations under the License.
 #endregion
 
+using System.Collections.Generic;
+
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
+using FluentMigrator.Model;
 using FluentMigrator.Postgres;
 
 namespace FluentMigrator.Builder.SecurityLabel;
@@ -33,6 +36,8 @@ public class DeleteSecurityLabelExpressionBuilder :
     private readonly IMigrationContext _context;
     private readonly PostgresSecurityLabelDefinition _definition;
 
+    private bool ExpressionAdded { get; set; }
+
     /// <summary>
     /// Initializes a new instance of the <see cref="DeleteSecurityLabelExpressionBuilder"/> class.
     /// </summary>
@@ -48,14 +53,6 @@ public class DeleteSecurityLabelExpressionBuilder :
     /// </summary>
     /// <param name="provider">The name of the security label provider (for example, <c>selinux</c>).</param>
     /// <returns>The current <see cref="IDeleteSecurityLabelSyntax"/> instance to continue the fluent configuration.</returns>
-    /// <example>
-    /// <code>
-    /// Delete.SecurityLabel()
-    ///     .For("selinux")
-    ///     .FromTable("Users")
-    ///     .InSchema("public");
-    /// </code>
-    /// </example>
     public IDeleteSecurityLabelSyntax For(string provider)
     {
         _definition.Provider = provider;
@@ -67,6 +64,7 @@ public class DeleteSecurityLabelExpressionBuilder :
     {
         _definition.ObjectType = PostgresSecurityLabelObjectType.Table;
         _definition.ObjectName = tableName;
+        AddExpression();
         return this;
     }
 
@@ -99,6 +97,7 @@ public class DeleteSecurityLabelExpressionBuilder :
     {
         _definition.ObjectType = PostgresSecurityLabelObjectType.View;
         _definition.ObjectName = viewName;
+        AddExpression();
         return this;
     }
 
@@ -113,6 +112,7 @@ public class DeleteSecurityLabelExpressionBuilder :
     IDeleteSecurityLabelFromColumnTableSyntax IDeleteSecurityLabelFromColumnSyntax.OnTable(string tableName)
     {
         _definition.ObjectName = tableName;
+        AddExpression();
         return this;
     }
 
@@ -132,8 +132,18 @@ public class DeleteSecurityLabelExpressionBuilder :
 
     private void AddExpression()
     {
+        // Remove the last added expression if it was added previously.
+        // This ensures that only one expression is added for the delete operation.
+        // Note: IMigrationExpression.Expressions should be a list.
+        if (ExpressionAdded && _context.Expressions is IList<IMigrationExpression> { Count: > 0 } list)
+        {
+            list.RemoveAt(_context.Expressions.Count - 1);
+        }
+
         var sql = PostgresSecurityLabelSqlGenerator.GenerateDeleteSecurityLabelSql(_definition);
         var expression = new ExecuteSqlStatementExpression { SqlStatement = sql };
         _context.Expressions.Add(expression);
+
+        ExpressionAdded = true;
     }
 }

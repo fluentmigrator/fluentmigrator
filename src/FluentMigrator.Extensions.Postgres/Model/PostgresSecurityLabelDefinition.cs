@@ -14,7 +14,9 @@
 // limitations under the License.
 #endregion
 
-namespace FluentMigrator.Postgres
+using FluentMigrator.Postgres;
+
+namespace FluentMigrator.Model
 {
     /// <summary>
     /// Represents the definition of a PostgreSQL security label.

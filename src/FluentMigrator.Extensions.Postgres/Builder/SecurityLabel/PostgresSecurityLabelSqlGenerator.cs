@@ -17,6 +17,7 @@
 using System;
 using System.Text;
 
+using FluentMigrator.Model;
 using FluentMigrator.Postgres;
 
 namespace FluentMigrator.Builder.SecurityLabel;

@@ -36,7 +36,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             builder.MaskedWithValue("foo");
             var result = builder.Build();
 
-            result.ShouldBe("MASKED WITH VALUE ''foo''");
+            result.ShouldBe("MASKED WITH VALUE 'foo'");
         }
 
         [Test]
@@ -46,7 +46,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             builder.MaskedWithValue("it's a test");
             var result = builder.Build();
 
-            result.ShouldBe("MASKED WITH VALUE ''it''s a test''");
+            result.ShouldBe("MASKED WITH VALUE 'it''s a test'");
         }
 
         [Test]
@@ -246,7 +246,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             builder.MaskedWithRandomDateBetween("2020-01-01", "2025-12-31");
             var result = builder.Build();
 
-            result.ShouldBe("MASKED WITH FUNCTION anon.random_date_between(''2020-01-01'', ''2025-12-31'')");
+            result.ShouldBe("MASKED WITH FUNCTION anon.random_date_between('2020-01-01', '2025-12-31')");
         }
 
         [Test]
@@ -256,7 +256,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             builder.MaskedWithPartialScrambling(2, '*', 2);
             var result = builder.Build();
 
-            result.ShouldBe("MASKED WITH FUNCTION anon.partial(2, ''*'', 2)");
+            result.ShouldBe("MASKED WITH FUNCTION anon.partial(2, '*', 2)");
         }
 
         [Test]

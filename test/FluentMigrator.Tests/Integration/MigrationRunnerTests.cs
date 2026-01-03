@@ -1831,6 +1831,12 @@ namespace FluentMigrator.Tests.Integration
                         // Delete the security label
                         runner.Up(new TestDeleteSecurityLabelFromColumn());
 
+                        var r = processor.Read(@"
+                            SELECT sl.label, c.relname, a.attname
+                            FROM pg_seclabels sl
+                            JOIN pg_class c ON sl.objoid = c.oid
+                            JOIN pg_attribute a ON a.attrelid = c.oid AND a.attnum = sl.objsubid");
+
                         // Verify the label was removed
                         hasLabel = processor.Exists(@"
                             SELECT 1
