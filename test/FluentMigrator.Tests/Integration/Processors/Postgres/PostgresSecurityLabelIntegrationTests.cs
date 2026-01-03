@@ -17,7 +17,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using FluentMigrator.Builder.SecurityLabel.Anon;
+using FluentMigrator.Builder.SecurityLabel.Provider;
 using FluentMigrator.Builders.Create;
 using FluentMigrator.Builders.Delete;
 using FluentMigrator.Expressions;

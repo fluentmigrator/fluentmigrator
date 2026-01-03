@@ -16,7 +16,7 @@
 
 using System;
 
-namespace FluentMigrator.Builder.SecurityLabel.Anon;
+namespace FluentMigrator.Builder.SecurityLabel.Provider;
 
 /// <summary>
 /// Implementation of the PostgreSQL Anonymizer security label builder.

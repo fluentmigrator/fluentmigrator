@@ -25,7 +25,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-using FluentMigrator.Builder.SecurityLabel.Anon;
+using FluentMigrator.Builder.SecurityLabel.Provider;
 using FluentMigrator.Expressions;
 using FluentMigrator.Postgres;
 using FluentMigrator.Runner;

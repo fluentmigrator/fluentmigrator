@@ -16,7 +16,7 @@
 
 using System;
 
-using FluentMigrator.Builder.SecurityLabel.Anon;
+using FluentMigrator.Builder.SecurityLabel.Provider;
 
 using NUnit.Framework;
 
