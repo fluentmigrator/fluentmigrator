@@ -43,6 +43,19 @@ public class DeleteSecurityLabelExpressionBuilder :
         _definition = new PostgresSecurityLabelDefinition();
     }
 
+    /// <summary>
+    /// Specifies the security label provider for which the label should be deleted.
+    /// </summary>
+    /// <param name="provider">The name of the security label provider (for example, <c>selinux</c>).</param>
+    /// <returns>The current <see cref="IDeleteSecurityLabelSyntax"/> instance to continue the fluent configuration.</returns>
+    /// <example>
+    /// <code>
+    /// Delete.SecurityLabel()
+    ///     .For("selinux")
+    ///     .FromTable("Users")
+    ///     .InSchema("public");
+    /// </code>
+    /// </example>
     public IDeleteSecurityLabelSyntax For(string provider)
     {
         _definition.Provider = provider;

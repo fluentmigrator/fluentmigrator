@@ -31,6 +31,8 @@ public static class PostgresSecurityLabelSqlGenerator
     /// </summary>
     /// <param name="definition">The security label definition.</param>
     /// <returns>The generated SQL statement.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="definition"/> is null.</exception>
+    /// <exception cref="ArgumentException">Thrown when the label in <paramref name="definition"/> is null or whitespace.</exception>
     public static string GenerateCreateSecurityLabelSql(PostgresSecurityLabelDefinition definition)
     {
         if (definition is null)
@@ -40,7 +42,7 @@ public static class PostgresSecurityLabelSqlGenerator
 
         if (string.IsNullOrWhiteSpace(definition.Label))
         {
-            throw new ArgumentException(nameof(definition));
+            throw new ArgumentException("Label cannot be null or whitespace.", nameof(definition));
         }
 
         var builder = new StringBuilder("SECURITY LABEL");
@@ -58,6 +60,7 @@ public static class PostgresSecurityLabelSqlGenerator
     /// </summary>
     /// <param name="definition">The security label definition.</param>
     /// <returns>The generated SQL statement.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="definition"/> is null.</exception>
     public static string GenerateDeleteSecurityLabelSql(PostgresSecurityLabelDefinition definition)
     {
         if (definition is null)
@@ -157,7 +160,7 @@ public static class PostgresSecurityLabelSqlGenerator
     {
         if (string.IsNullOrWhiteSpace(identifier))
         {
-            throw new ArgumentException(nameof(identifier));
+            throw new ArgumentException("Identifier cannot be null or whitespace.", nameof(identifier));
         }
 
         // Escape any double quotes in the identifier by doubling them

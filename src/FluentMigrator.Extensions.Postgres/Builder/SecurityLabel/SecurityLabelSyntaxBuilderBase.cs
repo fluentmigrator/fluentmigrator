@@ -19,8 +19,32 @@ using System.Text;
 
 namespace FluentMigrator.Builder.SecurityLabel;
 
+/// <summary>
+/// Provides a base implementation for building security label strings for a specific database provider.
+/// </summary>
+/// <remarks>
+/// Subclasses are expected to use the protected <see cref="Content" /> builder to compose the security label
+/// and to expose a provider-specific <see cref="ProviderName" />.
+/// </remarks>
+/// <example>
+/// <code>
+/// public sealed class MySepgsqlLabelBuilder : SecurityLabelSyntaxBuilderBase
+/// {
+///     public override string ProviderName =&gt; "sepgsql";
+///
+///     public MySepgsqlLabelBuilder SystemObject()
+///     {
+///         RawLabel("system_u:object_r:sepgsql_table_t:s0");
+///         return this;
+///     }
+/// }
+/// </code>
+/// </example>
 public abstract class SecurityLabelSyntaxBuilderBase : ISecurityLabelSyntaxBuilder
 {
+    /// <summary>
+    /// Gets the string builder used to compose the security label content.
+    /// </summary>
     protected StringBuilder Content { get; } = new();
 
     /// <inheritdoc />

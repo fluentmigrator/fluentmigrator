@@ -17,10 +17,11 @@
 namespace FluentMigrator.Builder.SecurityLabel;
 
 /// <summary>
-/// Raw security label builder for PostgreSQL
+/// Raw security label builder for PostgreSQL that allows setting arbitrary label values.
+/// This builder does not specify a provider name, allowing labels to be set without a provider clause.
 /// </summary>
 public class RawSecurityLabelBuilder : SecurityLabelSyntaxBuilderBase
 {
-    // <inheritdoc/>
+    /// <inheritdoc />
     public override string ProviderName => null;
 }

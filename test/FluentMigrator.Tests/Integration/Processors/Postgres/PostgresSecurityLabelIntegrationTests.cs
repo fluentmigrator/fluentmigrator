@@ -15,6 +15,7 @@
 #endregion
 
 using System.Collections.Generic;
+using System.Linq;
 
 using FluentMigrator.Builder.SecurityLabel.Anon;
 using FluentMigrator.Builders.Create;
@@ -307,6 +308,163 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
             }
         }
 
+        [Test]
+        public void CanDeleteSecurityLabelFromColumnUsingFluentApi()
+        {
+            using (var table = new PostgresTestTable(Processor, "public", "id int"))
+            {
+                var (createRoot, createExpressions) = CreateExpressionRootWithContext();
+                createRoot.SecurityLabel("foo")
+                    .OnColumn("id")
+                    .OnTable(table.Name)
+                    .InSchema("public")
+                    .WithLabel("column label to delete");
+                ExecuteExpressions(createExpressions);
+
+                var hasLabel = ColumnSecurityLabelExists(table.Name, "id", "column label to delete");
+                hasLabel.ShouldBeTrue();
+
+                var (deleteRoot, deleteExpressions) = DeleteExpressionRootWithContext();
+                deleteRoot.SecurityLabel("foo")
+                    .FromColumn("id")
+                    .OnTable(table.Name)
+                    .InSchema("public");
+                ExecuteExpressions(deleteExpressions);
+
+                hasLabel = ColumnSecurityLabelExists(table.Name, "id", "column label to delete");
+                hasLabel.ShouldBeFalse();
+            }
+        }
+
+        [Test]
+        public void CanDeleteSecurityLabelFromSchemaUsingFluentApi()
+        {
+            const string schemaName = "test_security_label_delete_schema";
+
+            try
+            {
+                Processor.Execute($"CREATE SCHEMA IF NOT EXISTS \"{schemaName}\";");
+
+                var (createRoot, createExpressions) = CreateExpressionRootWithContext();
+                createRoot.SecurityLabel("foo")
+                    .OnSchema(schemaName)
+                    .WithLabel("schema label to delete");
+                ExecuteExpressions(createExpressions);
+
+                var hasLabel = SecurityLabelExists("pg_namespace", schemaName, "schema label to delete");
+                hasLabel.ShouldBeTrue();
+
+                var (deleteRoot, deleteExpressions) = DeleteExpressionRootWithContext();
+                deleteRoot.SecurityLabel("foo")
+                    .FromSchema(schemaName);
+                ExecuteExpressions(deleteExpressions);
+
+                hasLabel = SecurityLabelExists("pg_namespace", schemaName, "schema label to delete");
+                hasLabel.ShouldBeFalse();
+            }
+            finally
+            {
+                Processor.Execute($"DROP SCHEMA IF EXISTS \"{schemaName}\" CASCADE;");
+            }
+        }
+
+        [Test]
+        public void CanDeleteSecurityLabelFromRoleUsingFluentApi()
+        {
+            const string roleName = "test_security_label_delete_role";
+
+            try
+            {
+                Processor.Execute($"CREATE ROLE \"{roleName}\";");
+
+                var (createRoot, createExpressions) = CreateExpressionRootWithContext();
+                createRoot.SecurityLabel("foo")
+                    .OnRole(roleName)
+                    .WithLabel("role label to delete");
+                ExecuteExpressions(createExpressions);
+
+                var hasLabel = SecurityLabelExists("pg_authid", roleName, "role label to delete");
+                hasLabel.ShouldBeTrue();
+
+                var (deleteRoot, deleteExpressions) = DeleteExpressionRootWithContext();
+                deleteRoot.SecurityLabel("foo")
+                    .FromRole(roleName);
+                ExecuteExpressions(deleteExpressions);
+
+                hasLabel = SecurityLabelExists("pg_authid", roleName, "role label to delete");
+                hasLabel.ShouldBeFalse();
+            }
+            finally
+            {
+                Processor.Execute($"DROP ROLE IF EXISTS \"{roleName}\";");
+            }
+        }
+
+        [Test]
+        public void CanDeleteSecurityLabelFromViewUsingFluentApi()
+        {
+            const string viewName = "test_security_label_delete_view";
+
+            using (var table = new PostgresTestTable(Processor, "public", "id int"))
+            {
+                try
+                {
+                    Processor.Execute($"CREATE VIEW \"public\".\"{viewName}\" AS SELECT id FROM \"public\".\"{table.Name}\";");
+
+                    var (createRoot, createExpressions) = CreateExpressionRootWithContext();
+                    createRoot.SecurityLabel("foo")
+                        .OnView(viewName)
+                        .InSchema("public")
+                        .WithLabel("view label to delete");
+                    ExecuteExpressions(createExpressions);
+
+                    var hasLabel = SecurityLabelExists("pg_class", viewName, "view label to delete");
+                    hasLabel.ShouldBeTrue();
+
+                    var (deleteRoot, deleteExpressions) = DeleteExpressionRootWithContext();
+                    deleteRoot.SecurityLabel("foo")
+                        .FromView(viewName)
+                        .InSchema("public");
+                    ExecuteExpressions(deleteExpressions);
+
+                    hasLabel = SecurityLabelExists("pg_class", viewName, "view label to delete");
+                    hasLabel.ShouldBeFalse();
+                }
+                finally
+                {
+                    Processor.Execute($"DROP VIEW IF EXISTS \"public\".\"{viewName}\";");
+                }
+            }
+        }
+
+        [Test]
+        public void CanDeleteSecurityLabelUsingTypedBuilder()
+        {
+            using (var table = new PostgresTestTable(Processor, "public", "email varchar(255)"))
+            {
+                var (createRoot, createExpressions) = CreateExpressionRootWithContext();
+                createRoot.SecurityLabel<AnonSecurityLabelBuilder>()
+                    .OnColumn("email")
+                    .OnTable(table.Name)
+                    .InSchema("public")
+                    .WithLabel(label => label.MaskedWithFakeEmail());
+                ExecuteExpressions(createExpressions);
+
+                var hasLabel = ColumnSecurityLabelExists(table.Name, "email", "MASKED WITH FUNCTION anon.fake_email()");
+                hasLabel.ShouldBeTrue();
+
+                var (deleteRoot, deleteExpressions) = DeleteExpressionRootWithContext();
+                deleteRoot.SecurityLabel<AnonSecurityLabelBuilder>()
+                    .FromColumn("email")
+                    .OnTable(table.Name)
+                    .InSchema("public");
+                ExecuteExpressions(deleteExpressions);
+
+                hasLabel = ColumnSecurityLabelExists(table.Name, "email", "MASKED WITH FUNCTION anon.fake_email()");
+                hasLabel.ShouldBeFalse();
+            }
+        }
+
         private (CreateExpressionRoot, IList<IMigrationExpression>) CreateExpressionRootWithContext()
         {
             var expressions = new List<IMigrationExpression>();
@@ -325,12 +483,9 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
 
         private void ExecuteExpressions(IList<IMigrationExpression> expressions)
         {
-            foreach (var expression in expressions)
+            foreach (var sqlExpression in expressions.OfType<ExecuteSqlStatementExpression>())
             {
-                if (expression is ExecuteSqlStatementExpression sqlExpression)
-                {
-                    Processor.Execute(sqlExpression.SqlStatement);
-                }
+                Processor.Execute(sqlExpression.SqlStatement);
             }
         }
 

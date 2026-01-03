@@ -25,6 +25,7 @@ namespace FluentMigrator.Builder.SecurityLabel;
 /// <summary>
 /// Builds an expression to create a security label on a PostgreSQL object.
 /// </summary>
+/// <typeparam name="TBuilder">The type of security label syntax builder.</typeparam>
 public class CreateSecurityLabelExpressionBuilder<TBuilder> :
     ICreateSecurityLabelSyntax<TBuilder>,
     ICreateSecurityLabelOnTableSyntax<TBuilder>,
@@ -46,6 +47,11 @@ public class CreateSecurityLabelExpressionBuilder<TBuilder> :
         _definition = new PostgresSecurityLabelDefinition();
     }
 
+    /// <summary>
+    /// Specifies the security label provider for the PostgreSQL object.
+    /// </summary>
+    /// <param name="provider">The name of the security label provider (for example, <c>sepgsql</c>).</param>
+    /// <returns>The current builder instance to continue configuring the security label.</returns>
     public ICreateSecurityLabelOnObjectSyntax<TBuilder> For(string provider)
     {
         _definition.Provider = provider;
