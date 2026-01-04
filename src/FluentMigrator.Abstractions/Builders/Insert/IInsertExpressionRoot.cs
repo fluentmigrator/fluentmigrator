@@ -16,14 +16,12 @@
 //
 #endregion
 
-using FluentMigrator.Infrastructure;
-
 namespace FluentMigrator.Builders.Insert
 {
     /// <summary>
     /// The root of the INSERT expression
     /// </summary>
-    public interface IInsertExpressionRoot : IFluentSyntax
+    public interface IInsertExpressionRoot : IFluentSyntaxRoot
     {
         /// <summary>
         /// Specify the table name to insert data to

@@ -23,14 +23,13 @@ using FluentMigrator.Builders.Create.Index;
 using FluentMigrator.Builders.Create.Schema;
 using FluentMigrator.Builders.Create.Sequence;
 using FluentMigrator.Builders.Create.Table;
-using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Create
 {
     /// <summary>
     /// The root expression for a CREATE operation
     /// </summary>
-    public interface ICreateExpressionRoot : IFluentSyntax
+    public interface ICreateExpressionRoot : IFluentSyntaxRoot
     {
         /// <summary>
         /// Creates a schema

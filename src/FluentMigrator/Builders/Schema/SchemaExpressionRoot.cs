@@ -40,6 +40,9 @@ namespace FluentMigrator.Builders.Schema
         }
 
         /// <inheritdoc />
+        public IMigrationContext GetMigrationContext() => _context;
+
+        /// <inheritdoc />
         public ISchemaTableSyntax Table(string tableName)
         {
             return new SchemaTableQuery(_context, null, tableName);

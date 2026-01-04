@@ -40,6 +40,9 @@ namespace FluentMigrator.Builders.Alter
         }
 
         /// <inheritdoc />
+        public IMigrationContext GetMigrationContext() => _context;
+
+        /// <inheritdoc />
         public IAlterTableAddColumnOrAlterColumnOrSchemaOrDescriptionSyntax Table(string tableName)
         {
             var expression = new AlterTableExpression { TableName = tableName };

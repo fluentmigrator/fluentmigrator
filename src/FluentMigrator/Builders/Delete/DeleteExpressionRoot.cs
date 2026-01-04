@@ -46,6 +46,9 @@ namespace FluentMigrator.Builders.Delete
         }
 
         /// <inheritdoc />
+        public IMigrationContext GetMigrationContext() => _context;
+
+        /// <inheritdoc />
         public void Schema(string schemaName)
         {
             var expression = new DeleteSchemaExpression {SchemaName = schemaName};

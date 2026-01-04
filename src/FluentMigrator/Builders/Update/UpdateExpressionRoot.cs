@@ -38,6 +38,9 @@ namespace FluentMigrator.Builders.Update
         }
 
         /// <inheritdoc />
+        public IMigrationContext GetMigrationContext() => _context;
+
+        /// <inheritdoc />
         public IUpdateSetOrInSchemaSyntax Table(string tableName)
         {
             var expression = new UpdateDataExpression { TableName = tableName };

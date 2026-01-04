@@ -17,7 +17,6 @@
 using FluentMigrator.Builder.SecurityLabel;
 using FluentMigrator.Builders.Create;
 using FluentMigrator.Builders.Delete;
-using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Postgres
 {
@@ -65,7 +64,7 @@ namespace FluentMigrator.Postgres
         /// </example>
         public static ICreateSecurityLabelOnObjectSyntax<RawSecurityLabelBuilder> SecurityLabel(this ICreateExpressionRoot root, string provider)
         {
-            var context = GetMigrationContext(root);
+            var context = root.GetMigrationContext();
             return new CreateSecurityLabelExpressionBuilder<RawSecurityLabelBuilder>(context).For(provider);
         }
 
@@ -88,7 +87,7 @@ namespace FluentMigrator.Postgres
         public static ICreateSecurityLabelOnObjectSyntax<TBuilder> SecurityLabel<TBuilder>(this ICreateExpressionRoot root)
             where TBuilder : ISecurityLabelSyntaxBuilder, new()
         {
-            var context = GetMigrationContext(root);
+            var context = root.GetMigrationContext();
             var builder = new TBuilder();
             return new CreateSecurityLabelExpressionBuilder<TBuilder>(context).For(builder.ProviderName);
         }
@@ -115,7 +114,7 @@ namespace FluentMigrator.Postgres
         /// </example>
         public static IDeleteSecurityLabelSyntax SecurityLabel(this IDeleteExpressionRoot root, string provider)
         {
-            var context = GetMigrationContext(root);
+            var context = root.GetMigrationContext();
             return new DeleteSecurityLabelExpressionBuilder(context).For(provider);
         }
 
@@ -143,36 +142,9 @@ namespace FluentMigrator.Postgres
         public static IDeleteSecurityLabelSyntax SecurityLabel<TBuilder>(this IDeleteExpressionRoot root)
             where TBuilder : ISecurityLabelSyntaxBuilder, new()
         {
-            var context = GetMigrationContext(root);
+            var context = root.GetMigrationContext();
             var builder = new TBuilder();
             return new DeleteSecurityLabelExpressionBuilder(context).For(builder.ProviderName);
-        }
-
-        /// <summary>
-        /// Gets the migration context from a Create or Delete expression root.
-        /// </summary>
-        /// <param name="root">The expression root (CreateExpressionRoot or DeleteExpressionRoot).</param>
-        /// <returns>The migration context.</returns>
-        /// <remarks>
-        /// This uses reflection to access the private _context field because the
-        /// ICreateExpressionRoot and IDeleteExpressionRoot interfaces don't expose the context.
-        /// This is necessary for adding new expression types that need to be added to the
-        /// context's expression list.
-        /// </remarks>
-        /// <exception cref="System.InvalidOperationException">
-        /// Thrown when the context cannot be accessed from the expression root.
-        /// </exception>
-        private static IMigrationContext GetMigrationContext(object root)
-        {
-            var rootType = root.GetType();
-            var contextField = rootType.GetField("_context", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            if (contextField is null)
-            {
-                throw new System.InvalidOperationException(
-                    $"Cannot access migration context from expression root of type '{rootType.Name}'. " +
-                    "SecurityLabel extension methods require CreateExpressionRoot or DeleteExpressionRoot.");
-            }
-            return (IMigrationContext)contextField.GetValue(root);
         }
     }
 }

@@ -40,6 +40,9 @@ namespace FluentMigrator.Builders.Rename
         }
 
         /// <inheritdoc />
+        public IMigrationContext GetMigrationContext() => _context;
+
+        /// <inheritdoc />
         public IRenameTableToOrInSchemaSyntax Table(string oldName)
         {
             var expression = new RenameTableExpression { OldName = oldName };

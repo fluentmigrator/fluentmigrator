@@ -17,14 +17,13 @@
 #endregion
 
 using FluentMigrator.Builders.Rename.Table;
-using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Rename
 {
     /// <summary>
     /// The expression root for renaming tables or columns
     /// </summary>
-    public interface IRenameExpressionRoot : IFluentSyntax
+    public interface IRenameExpressionRoot : IFluentSyntaxRoot
     {
         /// <summary>
         /// Specify the table (or its column) to be renamed

@@ -19,14 +19,13 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Execute
 {
     /// <summary>
     /// Executes some SQL
     /// </summary>
-    public interface IExecuteExpressionRoot : IFluentSyntax
+    public interface IExecuteExpressionRoot : IFluentSyntaxRoot
     {
         /// <summary>
         /// Executes an SQL statement

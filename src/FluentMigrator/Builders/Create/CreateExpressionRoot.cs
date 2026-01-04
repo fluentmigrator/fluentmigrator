@@ -46,6 +46,9 @@ namespace FluentMigrator.Builders.Create
         }
 
         /// <inheritdoc />
+        public IMigrationContext GetMigrationContext() => _context;
+
+        /// <inheritdoc />
         public ICreateSchemaOptionsSyntax Schema(string schemaName)
         {
             var expression = new CreateSchemaExpression { SchemaName = schemaName };

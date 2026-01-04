@@ -38,6 +38,9 @@ namespace FluentMigrator.Builders.Insert
         }
 
         /// <inheritdoc />
+        public IMigrationContext GetMigrationContext() => _context;
+
+        /// <inheritdoc />
         public IInsertDataOrInSchemaSyntax IntoTable(string tableName)
         {
             var expression = new InsertDataExpression { TableName = tableName };

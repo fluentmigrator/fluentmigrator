@@ -16,18 +16,18 @@
 //
 #endregion
 
-namespace FluentMigrator.Builders.Update
+using FluentMigrator.Infrastructure;
+
+namespace FluentMigrator.Builders
 {
     /// <summary>
-    /// The expression root to update rows
+    /// The base interface for all fluent root syntax builders
     /// </summary>
-    public interface IUpdateExpressionRoot : IFluentSyntaxRoot
+    public interface IFluentSyntaxRoot : IFluentSyntax
     {
         /// <summary>
-        /// Specifies the table to update its data
+        /// Get the migration context
         /// </summary>
-        /// <param name="tableName">The table name</param>
-        /// <returns>The next step</returns>
-        IUpdateSetOrInSchemaSyntax Table(string tableName);
+        IMigrationContext GetMigrationContext();
     }
 }
