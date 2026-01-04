@@ -30,7 +30,6 @@ namespace FluentMigrator.Runner.Processors.Oracle
     /// </remarks>
     /// <seealso cref="OracleBaseDbFactory"/>
     /// <seealso cref="ReflectionBasedDbFactory"/>
-    /// <seealso cref="IDbFactory"/>
     public class OracleDbFactory : OracleBaseDbFactory
     {
         private static readonly TestEntry[] _testEntries =
@@ -65,7 +64,6 @@ namespace FluentMigrator.Runner.Processors.Oracle
         /// </remarks>
         /// <seealso cref="OracleBaseDbFactory"/>
         /// <seealso cref="ReflectionBasedDbFactory"/>
-        /// <seealso cref="IDbFactory"/>
         public OracleDbFactory(IServiceProvider serviceProvider)
             : base(serviceProvider, _testEntries)
         {
