@@ -17,6 +17,7 @@
 using FluentMigrator.Builder.SecurityLabel;
 using FluentMigrator.Builders.Create;
 using FluentMigrator.Builders.Delete;
+using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Postgres
 {
@@ -64,7 +65,7 @@ namespace FluentMigrator.Postgres
         /// </example>
         public static ICreateSecurityLabelOnObjectSyntax<RawSecurityLabelBuilder> SecurityLabel(this ICreateExpressionRoot root, string provider)
         {
-            var context = root.GetMigrationContext();
+            var context = ((IMigrationContextAccessor)root).GetMigrationContext();
             return new CreateSecurityLabelExpressionBuilder<RawSecurityLabelBuilder>(context).For(provider);
         }
 
@@ -87,7 +88,7 @@ namespace FluentMigrator.Postgres
         public static ICreateSecurityLabelOnObjectSyntax<TBuilder> SecurityLabel<TBuilder>(this ICreateExpressionRoot root)
             where TBuilder : ISecurityLabelSyntaxBuilder, new()
         {
-            var context = root.GetMigrationContext();
+            var context = ((IMigrationContextAccessor)root).GetMigrationContext();
             var builder = new TBuilder();
             return new CreateSecurityLabelExpressionBuilder<TBuilder>(context).For(builder.ProviderName);
         }
@@ -114,7 +115,7 @@ namespace FluentMigrator.Postgres
         /// </example>
         public static IDeleteSecurityLabelSyntax SecurityLabel(this IDeleteExpressionRoot root, string provider)
         {
-            var context = root.GetMigrationContext();
+            var context = ((IMigrationContextAccessor)root).GetMigrationContext();
             return new DeleteSecurityLabelExpressionBuilder(context).For(provider);
         }
 
@@ -142,7 +143,7 @@ namespace FluentMigrator.Postgres
         public static IDeleteSecurityLabelSyntax SecurityLabel<TBuilder>(this IDeleteExpressionRoot root)
             where TBuilder : ISecurityLabelSyntaxBuilder, new()
         {
-            var context = root.GetMigrationContext();
+            var context = ((IMigrationContextAccessor)root).GetMigrationContext();
             var builder = new TBuilder();
             return new DeleteSecurityLabelExpressionBuilder(context).For(builder.ProviderName);
         }

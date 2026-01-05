@@ -21,13 +21,14 @@ using FluentMigrator.Builders.Delete.DefaultConstraint;
 using FluentMigrator.Builders.Delete.ForeignKey;
 using FluentMigrator.Builders.Delete.Index;
 using FluentMigrator.Builders.Delete.Constraint;
+using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Delete
 {
     /// <summary>
     /// The root expression for a DELETE operation
     /// </summary>
-    public interface IDeleteExpressionRoot : IFluentSyntaxRoot
+    public interface IDeleteExpressionRoot : IFluentSyntax
     {
         /// <summary>
         /// Specify the schema to delete

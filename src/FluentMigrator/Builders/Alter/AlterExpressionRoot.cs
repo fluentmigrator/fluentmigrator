@@ -26,7 +26,7 @@ namespace FluentMigrator.Builders.Alter
     /// <summary>
     /// The root expression for alterations
     /// </summary>
-    public class AlterExpressionRoot : IAlterExpressionRoot
+    public class AlterExpressionRoot : IAlterExpressionRoot, IMigrationContextAccessor
     {
         private readonly IMigrationContext _context;
 
@@ -40,7 +40,7 @@ namespace FluentMigrator.Builders.Alter
         }
 
         /// <inheritdoc />
-        public IMigrationContext GetMigrationContext() => _context;
+        IMigrationContext IMigrationContextAccessor.GetMigrationContext() => _context;
 
         /// <inheritdoc />
         public IAlterTableAddColumnOrAlterColumnOrSchemaOrDescriptionSyntax Table(string tableName)

@@ -26,7 +26,7 @@ namespace FluentMigrator.Builders.Rename
     /// <summary>
     /// The implementation of the <see cref="IRenameExpressionRoot"/> interface.
     /// </summary>
-    public class RenameExpressionRoot : IRenameExpressionRoot
+    public class RenameExpressionRoot : IRenameExpressionRoot, IMigrationContextAccessor
     {
         private readonly IMigrationContext _context;
 
@@ -40,7 +40,7 @@ namespace FluentMigrator.Builders.Rename
         }
 
         /// <inheritdoc />
-        public IMigrationContext GetMigrationContext() => _context;
+        IMigrationContext IMigrationContextAccessor.GetMigrationContext() => _context;
 
         /// <inheritdoc />
         public IRenameTableToOrInSchemaSyntax Table(string oldName)

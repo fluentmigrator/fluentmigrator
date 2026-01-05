@@ -16,12 +16,14 @@
 //
 #endregion
 
+using FluentMigrator.Infrastructure;
+
 namespace FluentMigrator.Builders.Update
 {
     /// <summary>
     /// The expression root to update rows
     /// </summary>
-    public interface IUpdateExpressionRoot : IFluentSyntaxRoot
+    public interface IUpdateExpressionRoot : IFluentSyntax
     {
         /// <summary>
         /// Specifies the table to update its data

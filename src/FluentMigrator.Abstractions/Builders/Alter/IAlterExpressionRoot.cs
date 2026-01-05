@@ -18,13 +18,14 @@
 
 using FluentMigrator.Builders.Alter.Column;
 using FluentMigrator.Builders.Alter.Table;
+using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Alter
 {
     /// <summary>
     /// The root expression interface for the alterations
     /// </summary>
-    public interface IAlterExpressionRoot : IFluentSyntaxRoot
+    public interface IAlterExpressionRoot : IFluentSyntax
     {
         /// <summary>
         /// Alter the table or its columns/options

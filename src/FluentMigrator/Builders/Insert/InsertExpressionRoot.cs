@@ -24,7 +24,7 @@ namespace FluentMigrator.Builders.Insert
     /// <summary>
     /// The implementation of the <see cref="IInsertExpressionRoot"/> interface.
     /// </summary>
-    public class InsertExpressionRoot : IInsertExpressionRoot
+    public class InsertExpressionRoot : IInsertExpressionRoot, IMigrationContextAccessor
     {
         private readonly IMigrationContext _context;
 
@@ -38,7 +38,7 @@ namespace FluentMigrator.Builders.Insert
         }
 
         /// <inheritdoc />
-        public IMigrationContext GetMigrationContext() => _context;
+        IMigrationContext IMigrationContextAccessor.GetMigrationContext() => _context;
 
         /// <inheritdoc />
         public IInsertDataOrInSchemaSyntax IntoTable(string tableName)

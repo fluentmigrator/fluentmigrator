@@ -19,13 +19,14 @@
 using FluentMigrator.Builders.Schema.Schema;
 using FluentMigrator.Builders.Schema.Sequence;
 using FluentMigrator.Builders.Schema.Table;
+using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Schema
 {
     /// <summary>
     /// The expression root to query the existence of database objects
     /// </summary>
-    public interface ISchemaExpressionRoot : IFluentSyntaxRoot
+    public interface ISchemaExpressionRoot : IFluentSyntax
     {
         /// <summary>
         /// Specify the table as base to query a database objects existence

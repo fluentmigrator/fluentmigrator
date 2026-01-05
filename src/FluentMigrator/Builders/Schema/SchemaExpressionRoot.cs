@@ -26,7 +26,7 @@ namespace FluentMigrator.Builders.Schema
     /// <summary>
     /// The implementation of the <see cref="ISchemaExpressionRoot"/> interface.
     /// </summary>
-    public class SchemaExpressionRoot : ISchemaExpressionRoot
+    public class SchemaExpressionRoot : ISchemaExpressionRoot, IMigrationContextAccessor
     {
         private readonly IMigrationContext _context;
 
@@ -40,7 +40,7 @@ namespace FluentMigrator.Builders.Schema
         }
 
         /// <inheritdoc />
-        public IMigrationContext GetMigrationContext() => _context;
+        IMigrationContext IMigrationContextAccessor.GetMigrationContext() => _context;
 
         /// <inheritdoc />
         public ISchemaTableSyntax Table(string tableName)
