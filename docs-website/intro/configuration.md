@@ -138,16 +138,16 @@ By implementing the `IVersionTableMetaData` interface you can change the default
 (custom table name, specific schema...).
 The interface exposes these properties:
 
-| Property              | Default value   | Description                                                               |
-|-----------------------|-----------------|---------------------------------------------------------------------------|
-| SchemaName            | (empty)         | The schema where the version table is stored                              |
-| TableName             | `"VersionInfo"` | The table where the version information is stored                         |
-| ColumnName            | `"Version"`     | The name of the column where the version numbers are stored               |
-| DescriptionColumnName | `"Description"` | The name of the last migration applied                                    |
-| AppliedOnColumnName   | `"AppliedOn"`   | The datetime of when the last migration was applied                       |
-| UniqueIndexName       | `"UC_Version"`  | The name of the unique constraint for the version column                  |
-| CreateWithPrimaryKey  | `false`         | Whether to create the version table with a primary key                    |
-| OwnsSchema            | `true`          | Whether to create/delete the schema at the same time the table is created |
+| Property              | Default value   | Description                                                                            |
+|-----------------------|-----------------|----------------------------------------------------------------------------------------|
+| SchemaName            | (empty)         | The schema where the version table is stored                                           |
+| TableName             | `"VersionInfo"` | The table where the version information is stored                                      |
+| ColumnName            | `"Version"`     | The name of the column where each migration version number is stored                   |
+| DescriptionColumnName | `"Description"` | The name of the column where each migration description is stored                      |
+| AppliedOnColumnName   | `"AppliedOn"`   | The name of the column where the datetime of when each migration was applied is stored |
+| UniqueIndexName       | `"UC_Version"`  | The name of the unique constraint for the version column                               |
+| CreateWithPrimaryKey  | `false`         | Whether to create the version table with a primary key                                 |
+| OwnsSchema            | `true`          | Whether to create/delete the schema at the same time the table is created              |
 
 Create a new public class that implements the `IVersionTableMetaData` interface
 and decorate it with the `[VersionTableMetaDataAttribute]`.
