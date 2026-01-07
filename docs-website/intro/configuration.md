@@ -134,27 +134,62 @@ FluentMigrator automatically creates a `VersionInfo` table to track applied migr
 
 ### Custom Version Table
 
+By implementing the `IVersionTableMetaData` interface you can change the defaults for the VersionInfo table
+(custom table name, specific schema...).
+The interface exposes these properties:
+
+| Property              | Default value   | Description                                                                            |
+|-----------------------|-----------------|----------------------------------------------------------------------------------------|
+| SchemaName            | (empty)         | The schema where the version table is stored                                           |
+| TableName             | `"VersionInfo"` | The table where the version information is stored                                      |
+| ColumnName            | `"Version"`     | The name of the column where each migration version number is stored                   |
+| DescriptionColumnName | `"Description"` | The name of the column where each migration description is stored                      |
+| AppliedOnColumnName   | `"AppliedOn"`   | The name of the column where the datetime of when each migration was applied is stored |
+| UniqueIndexName       | `"UC_Version"`  | The name of the unique constraint for the version column                               |
+| CreateWithPrimaryKey  | `false`         | Whether to create the version table with a primary key                                 |
+| OwnsSchema            | `true`          | Whether to create/delete the schema at the same time the table is created              |
+
+Create a new public class that implements the `IVersionTableMetaData` interface
+and decorate it with the `[VersionTableMetaDataAttribute]`.
+
 ```csharp
-public class CustomVersionTable : DefaultVersionTableMetaData
+[VersionTableMetaData]
+public class CustomVersionTable : IVersionTableMetaData
 {
-    public override string TableName => "MigrationHistory";
-    public override string SchemaName => "dbo";
-    public override string ColumnName => "Version";
-    public override string DescriptionColumnName => "Description";
-    public override string AppliedOnColumnName => "AppliedDate";
+    public bool OwnsSchema => true;
+    public string SchemaName => null;
+    public string TableName => "CustomVersionInfo";
+    public string ColumnName => "Version";
+    public string DescriptionColumnName => "Description";
+    public string UniqueIndexName => "UC_Version";
+    public string AppliedOnColumnName => "AppliedOn";
+    public bool CreateWithPrimaryKey => false;
 }
 
-// Use custom version table
-.WithVersionTable(new CustomVersionTable())
+// ... and use it in the runner configuration:
+services => services
+  .ConfigureRunner(rb => rb.WithVersionTable(new CustomVersionTable()))
 ```
+### Custom Version Table based on DefaultVersionTableMetaData
 
-### Version Table in Specific Schema
+You can also inherit from `DefaultVersionTableMetaData` to override only specific properties, but will need to add
+a constructor to call the base class and register it differently, as shown below:
 
 ```csharp
-.WithVersionTable(new DefaultVersionTableMetaData()
+[VersionTableMetaData]
+public class CustomVersionTable : DefaultVersionTableMetaData
 {
-    SchemaName = "migrations"
-})
+    /// <inheritdoc />
+    public CustomVersionTable(IConventionSet conventionSet, IOptions<RunnerOptions> runnerOptions) : base(conventionSet, runnerOptions)
+    {
+    }
+
+    public override string TableName => "CustomVersionInfo";
+    public override string SchemaName => "migrations";
+}
+
+// ... and use while configuring services
+services.AddScoped<IVersionTableMetaData, CustomVersionTable>();
 ```
 
 ## Naming Conventions and Convention Sets
