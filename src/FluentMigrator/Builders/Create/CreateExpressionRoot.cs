@@ -32,7 +32,7 @@ namespace FluentMigrator.Builders.Create
     /// <summary>
     /// The <see cref="ICreateExpressionRoot"/> implementation
     /// </summary>
-    public class CreateExpressionRoot : ICreateExpressionRoot
+    public class CreateExpressionRoot : ICreateExpressionRoot, IMigrationContextAccessor
     {
         private readonly IMigrationContext _context;
 
@@ -44,6 +44,9 @@ namespace FluentMigrator.Builders.Create
         {
             _context = context;
         }
+
+        /// <inheritdoc />
+        IMigrationContext IMigrationContextAccessor.GetMigrationContext() => _context;
 
         /// <inheritdoc />
         public ICreateSchemaOptionsSyntax Schema(string schemaName)

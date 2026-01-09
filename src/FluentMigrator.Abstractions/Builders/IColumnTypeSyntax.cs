@@ -17,7 +17,6 @@
 #endregion
 
 using System;
-using System.Data;
 
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
