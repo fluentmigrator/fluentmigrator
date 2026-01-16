@@ -12,20 +12,20 @@ Currently, FluentMigrator does not provide built-in support for column visibilit
 
 The following table summarizes column visibility support across different database providers:
 
-| Database       | Support | Syntax | Keywords | Notes |
-| -------------- | ------- | ------ | -------- | ----- |
-| SQL Server     | ✓ (2016+) | `ALTER TABLE tablename ADD columnname datatype HIDDEN` | `HIDDEN` | Introduced in SQL Server 2016 for temporal tables. Hidden columns are excluded from `SELECT *` but can be explicitly selected. Cannot be used with primary key columns. |
-| Oracle         | ✓ (12c+) | `ALTER TABLE tablename ADD (columnname datatype INVISIBLE)` | `INVISIBLE`, `VISIBLE` | Introduced in Oracle 12c. Invisible columns are not returned by `SELECT *` or `DESCRIBE` unless explicitly requested. Can toggle between `VISIBLE` and `INVISIBLE`. |
-| MySQL          | ✓ (8.0.23+) | `ALTER TABLE tablename ADD COLUMN columnname datatype INVISIBLE` | `INVISIBLE`, `VISIBLE` | Introduced in MySQL 8.0.23. Invisible columns are not included in `SELECT *` statements. Can be toggled using `ALTER TABLE ... MODIFY COLUMN ... VISIBLE/INVISIBLE`. |
-| MariaDB        | ✓ (10.3+) | `ALTER TABLE tablename ADD COLUMN columnname datatype INVISIBLE` | `INVISIBLE`, `VISIBLE` | Introduced in MariaDB 10.3. Similar behavior to MySQL. Invisible columns do not appear in `SELECT *` queries. |
-| PostgreSQL     | ✗ | N/A | N/A | No native support for column visibility. Workarounds include views or table inheritance, but these are not equivalent features. |
-| SQLite         | ✗ | N/A | N/A | No native support for column visibility. |
-| Firebird       | ✗ | N/A | N/A | No native support for column visibility. |
-| DB2            | ✓ (v9.7+) | `CREATE TABLE tablename (columnname datatype IMPLICITLY HIDDEN)` | `IMPLICITLY HIDDEN` | Supports implicitly hidden columns. Hidden columns are not included in `SELECT *` or `INSERT` without explicit column list. Can be accessed by explicitly specifying the column name. |
-| Snowflake      | ✗ | N/A | N/A | No native support for column visibility. Uses tagging and masking policies for similar use cases. |
-| SAP HANA       | ✗ | N/A | N/A | No native support for column visibility. |
-| Redshift       | ✗ | N/A | N/A | Based on PostgreSQL; no native support for column visibility. |
-| Jet (MS Access)| ✗ | N/A | N/A | No native support for column visibility. |
+| Database       | Support | Keywords | CREATE TABLE Syntax | ALTER TABLE ADD COLUMN Syntax | ALTER TABLE ALTER COLUMN Syntax | Notes |
+| -------------- | ------- | -------- | ------------------- | ----------------------------- | ------------------------------- | ----- |
+| SQL Server     | ✓ (2016+) | `HIDDEN` | `CREATE TABLE tablename (columnname datatype HIDDEN)` | `ALTER TABLE tablename ADD columnname datatype HIDDEN` | `ALTER TABLE tablename ALTER COLUMN columnname ADD HIDDEN` | Introduced in SQL Server 2016 for temporal tables. Hidden columns are excluded from `SELECT *` but can be explicitly selected. Cannot be used with primary key columns. |
+| Oracle         | ✓ (12c+) | `INVISIBLE`, `VISIBLE` | `CREATE TABLE tablename (columnname datatype INVISIBLE)` | `ALTER TABLE tablename ADD (columnname datatype INVISIBLE)` | `ALTER TABLE tablename MODIFY (columnname INVISIBLE)` or `VISIBLE` | Introduced in Oracle 12c. Invisible columns are not returned by `SELECT *` or `DESCRIBE` unless explicitly requested. Can toggle between `VISIBLE` and `INVISIBLE`. |
+| MySQL          | ✓ (8.0.23+) | `INVISIBLE`, `VISIBLE` | `CREATE TABLE tablename (columnname datatype INVISIBLE)` | `ALTER TABLE tablename ADD COLUMN columnname datatype INVISIBLE` | `ALTER TABLE tablename MODIFY COLUMN columnname datatype INVISIBLE` or `VISIBLE` | Introduced in MySQL 8.0.23. Invisible columns are not included in `SELECT *` statements. Can be toggled using `ALTER TABLE ... MODIFY COLUMN`. |
+| MariaDB        | ✓ (10.3+) | `INVISIBLE`, `VISIBLE` | `CREATE TABLE tablename (columnname datatype INVISIBLE)` | `ALTER TABLE tablename ADD COLUMN columnname datatype INVISIBLE` | `ALTER TABLE tablename MODIFY COLUMN columnname datatype INVISIBLE` or `VISIBLE` | Introduced in MariaDB 10.3. Similar behavior to MySQL. Invisible columns do not appear in `SELECT *` queries. |
+| DB2            | ✓ (v9.7+) | `IMPLICITLY HIDDEN`, `NOT HIDDEN` | `CREATE TABLE tablename (columnname datatype IMPLICITLY HIDDEN)` | `ALTER TABLE tablename ADD COLUMN columnname datatype IMPLICITLY HIDDEN` | `ALTER TABLE tablename ALTER COLUMN columnname SET IMPLICITLY HIDDEN` or `SET NOT HIDDEN` | Supports implicitly hidden columns. Hidden columns are not included in `SELECT *` or `INSERT` without explicit column list. Can be accessed by explicitly specifying the column name. |
+| PostgreSQL     | ✗ | N/A | N/A | N/A | N/A | No native support for column visibility. Workarounds include views or table inheritance, but these are not equivalent features. |
+| SQLite         | ✗ | N/A | N/A | N/A | N/A | No native support for column visibility. |
+| Firebird       | ✗ | N/A | N/A | N/A | N/A | No native support for column visibility. |
+| Snowflake      | ✗ | N/A | N/A | N/A | N/A | No native support for column visibility. Uses tagging and masking policies for similar use cases. |
+| SAP HANA       | ✗ | N/A | N/A | N/A | N/A | No native support for column visibility. |
+| Redshift       | ✗ | N/A | N/A | N/A | N/A | Based on PostgreSQL; no native support for column visibility. |
+| Jet (MS Access)| ✗ | N/A | N/A | N/A | N/A | No native support for column visibility. |
 
 ### References
 
@@ -33,7 +33,7 @@ The following table summarizes column visibility support across different databa
 2. **Oracle**: [Invisible Columns](https://docs.oracle.com/database/121/SQLRF/statements_7002.htm#SQLRF01402)
 3. **MySQL**: [Invisible Columns](https://dev.mysql.com/doc/refman/8.0/en/invisible-columns.html)
 4. **MariaDB**: [Invisible Columns](https://mariadb.com/kb/en/invisible-columns/)
-5. **DB2**: [Hidden Columns](https://www.ibm.com/docs/en/db2/12.1.x?topic=concepts-hidden-columns)
+5. **DB2**: [Hidden Columns](https://www.ibm.com/docs/en/db2/12.1.x?topic=concepts-hidden-columns), [ALTER TABLE Statement](https://www.ibm.com/docs/en/db2/12.1.x?topic=statements-alter-table#sdx-synid_column-options)
 
 ## Use Cases
 
