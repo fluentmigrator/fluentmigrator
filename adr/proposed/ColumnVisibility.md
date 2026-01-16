@@ -21,7 +21,7 @@ The following table summarizes column visibility support across different databa
 | PostgreSQL     | ✗ | N/A | N/A | No native support for column visibility. Workarounds include views or table inheritance, but these are not equivalent features. |
 | SQLite         | ✗ | N/A | N/A | No native support for column visibility. |
 | Firebird       | ✗ | N/A | N/A | No native support for column visibility. |
-| DB2            | ✗ | N/A | N/A | No native support for column visibility. |
+| DB2            | ✓ (v9.7+) | `CREATE TABLE tablename (columnname datatype IMPLICITLY HIDDEN)` | `IMPLICITLY HIDDEN` | Supports implicitly hidden columns. Hidden columns are not included in `SELECT *` or `INSERT` without explicit column list. Can be accessed by explicitly specifying the column name. |
 | Snowflake      | ✗ | N/A | N/A | No native support for column visibility. Uses tagging and masking policies for similar use cases. |
 | SAP HANA       | ✗ | N/A | N/A | No native support for column visibility. |
 | Redshift       | ✗ | N/A | N/A | Based on PostgreSQL; no native support for column visibility. |
@@ -33,6 +33,7 @@ The following table summarizes column visibility support across different databa
 2. **Oracle**: [Invisible Columns](https://docs.oracle.com/database/121/SQLRF/statements_7002.htm#SQLRF01402)
 3. **MySQL**: [Invisible Columns](https://dev.mysql.com/doc/refman/8.0/en/invisible-columns.html)
 4. **MariaDB**: [Invisible Columns](https://mariadb.com/kb/en/invisible-columns/)
+5. **DB2**: [Hidden Columns](https://www.ibm.com/docs/en/db2/12.1.x?topic=concepts-hidden-columns)
 
 ## Use Cases
 
@@ -150,7 +151,7 @@ public class AddTemporalColumnsConditionally : Migration
     public override void Up()
     {
         // Apply hidden columns only for databases that support it
-        if (IfDatabase("SqlServer", "Oracle", "MySql", "MariaDB").Create.Column("SysStartTime")
+        if (IfDatabase("SqlServer", "Oracle", "MySql", "MariaDB", "DB2").Create.Column("SysStartTime")
             .OnTable("Orders")
             .AsDateTime2().NotNullable()
             .WithDefault(SystemMethods.CurrentDateTime)
@@ -236,6 +237,16 @@ protected override string GetColumnVisibilityClause(ColumnDefinition column)
     return string.Empty;
 }
 
+// Db2Generator.cs (v9.7+)
+protected override string GetColumnVisibilityClause(ColumnDefinition column)
+{
+    if (column.IsHidden == true)
+    {
+        return "IMPLICITLY HIDDEN";
+    }
+    return string.Empty;
+}
+
 // PostgresGenerator.cs and others without support
 protected override string GetColumnVisibilityClause(ColumnDefinition column)
 {
@@ -258,6 +269,7 @@ Visibility support should be version-gated for generators:
 - Oracle: Only supported in Oracle 12c and later
 - MySQL: Only supported in MySQL 8.0.23 and later
 - MariaDB: Only supported in MariaDB 10.3 and later
+- DB2: Only supported in DB2 v9.7 and later
 
 Generators should either:
 1. Throw a descriptive exception when the feature is used with an unsupported version, or
@@ -270,12 +282,14 @@ When altering columns:
 - Oracle uses `ALTER TABLE ... MODIFY (column_name INVISIBLE)` or `VISIBLE`
 - MySQL uses `ALTER TABLE ... MODIFY COLUMN column_name datatype INVISIBLE` or `VISIBLE`
 - MariaDB uses `ALTER TABLE ... MODIFY COLUMN column_name datatype INVISIBLE` or `VISIBLE`
+- DB2 uses `ALTER TABLE ... ALTER COLUMN column_name SET IMPLICITLY HIDDEN` (v9.7+)
 
 ### 5. Constraints and Limitations
 
 - **SQL Server**: `HIDDEN` cannot be applied to primary key columns or columns with unique constraints in some contexts
 - **Oracle**: `INVISIBLE` columns are not included in `DESCRIBE` output
 - **MySQL/MariaDB**: Must have at least one visible column in a table
+- **DB2**: `IMPLICITLY HIDDEN` columns are not returned by `SELECT *` or `INSERT` statements without explicit column list
 - All providers: Hidden/invisible columns are still accessible via explicit column selection
 
 ### 6. Testing Strategy
@@ -349,7 +363,7 @@ Implement the proposed core API extension (`Hidden()` and `Visible()` methods) f
 The implementation should:
 - Add `Hidden()` and `Visible()` methods to `IColumnOptionSyntax`
 - Add `IsHidden` nullable boolean property to `ColumnDefinition`
-- Implement generator support for SQL Server 2016+, Oracle 12c+, MySQL 8.0.23+, and MariaDB 10.3+
+- Implement generator support for SQL Server 2016+, Oracle 12c+, MySQL 8.0.23+, MariaDB 10.3+, and DB2 v9.7+
 - Throw descriptive exceptions or log warnings for unsupported databases
 - Include comprehensive integration tests for supported providers
 
