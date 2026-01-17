@@ -25,7 +25,9 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
+using FluentMigrator.Builder.SecurityLabel.Provider;
 using FluentMigrator.Expressions;
+using FluentMigrator.Postgres;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Exceptions;
 using FluentMigrator.Runner.Initialization;
@@ -1691,6 +1693,170 @@ namespace FluentMigrator.Tests.Integration
                 origProcessor.RollbackTransaction();
             }
         }
+
+        [Test]
+        [TestCaseSource(typeof(ProcessorTestCaseSourceOnly<PostgresProcessor>))]
+        public void CanApplySecurityLabelWithAnonExtension(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
+        {
+            ExecuteWithProcessor(
+                processorType,
+                services => services.WithMigrationsIn(RootNamespace),
+                (serviceProvider, processor) =>
+                {
+                    var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
+
+                    // Initialize the anon extension
+                    runner.Up(new TestInitializeAnonExtension());
+
+                    try
+                    {
+                        // Create a table and apply security label with typed builder
+                        runner.Up(new TestCreateTableWithSecurityLabel());
+
+                        // Verify the security label was applied
+                        var hasLabel = processor.Exists(@"
+                            SELECT 1
+                            FROM pg_seclabels sl
+                            JOIN pg_class c ON sl.objoid = c.oid
+                            JOIN pg_attribute a ON a.attrelid = c.oid AND a.attnum = sl.objsubid
+                            WHERE c.relname = 'SecureUsers'
+                              AND a.attname = 'email'
+                              AND sl.label = 'MASKED WITH FUNCTION anon.fake_email()'");
+
+                        hasLabel.ShouldBeTrue();
+
+                        runner.Down(new TestCreateTableWithSecurityLabel());
+                    }
+                    finally
+                    {
+                        runner.Down(new TestInitializeAnonExtension());
+                    }
+                },
+                serverOptions,
+                true);
+        }
+
+        [Test]
+        [TestCaseSource(typeof(ProcessorTestCaseSourceOnly<PostgresProcessor>))]
+        public void CanApplyMultipleSecurityLabelsWithAnonExtension(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
+        {
+            ExecuteWithProcessor(
+                processorType,
+                services => services.WithMigrationsIn(RootNamespace),
+                (serviceProvider, processor) =>
+                {
+                    var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
+
+                    // Initialize the anon extension
+                    runner.Up(new TestInitializeAnonExtension());
+
+                    try
+                    {
+                        // Create a table and apply multiple security labels
+                        runner.Up(new TestCreateTableWithMultipleSecurityLabels());
+
+                        // Verify email security label
+                        var hasEmailLabel = processor.Exists(@"
+                            SELECT 1
+                            FROM pg_seclabels sl
+                            JOIN pg_class c ON sl.objoid = c.oid
+                            JOIN pg_attribute a ON a.attrelid = c.oid AND a.attnum = sl.objsubid
+                            WHERE c.relname = 'CustomerData'
+                              AND a.attname = 'email'
+                              AND sl.label = 'MASKED WITH FUNCTION anon.fake_email()'");
+                        hasEmailLabel.ShouldBeTrue();
+
+                        // Verify name security label
+                        var hasNameLabel = processor.Exists(@"
+                            SELECT 1
+                            FROM pg_seclabels sl
+                            JOIN pg_class c ON sl.objoid = c.oid
+                            JOIN pg_attribute a ON a.attrelid = c.oid AND a.attnum = sl.objsubid
+                            WHERE c.relname = 'CustomerData'
+                              AND a.attname = 'full_name'
+                              AND sl.label = 'MASKED WITH VALUE ''CONFIDENTIAL'''");
+                        hasNameLabel.ShouldBeTrue();
+
+                        // Verify phone security label
+                        var hasPhoneLabel = processor.Exists(@"
+                            SELECT 1
+                            FROM pg_seclabels sl
+                            JOIN pg_class c ON sl.objoid = c.oid
+                            JOIN pg_attribute a ON a.attrelid = c.oid AND a.attnum = sl.objsubid
+                            WHERE c.relname = 'CustomerData'
+                              AND a.attname = 'phone'
+                              AND sl.label = 'MASKED WITH FUNCTION anon.partial(2, ''*'', 2)'");
+                        hasPhoneLabel.ShouldBeTrue();
+
+                        runner.Down(new TestCreateTableWithMultipleSecurityLabels());
+                    }
+                    finally
+                    {
+                        runner.Down(new TestInitializeAnonExtension());
+                    }
+                },
+                serverOptions,
+                true);
+        }
+
+        [Test]
+        [TestCaseSource(typeof(ProcessorTestCaseSourceOnly<PostgresProcessor>))]
+        public void CanDeleteSecurityLabelWithAnonExtension(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
+        {
+            ExecuteWithProcessor(
+                processorType,
+                services => services.WithMigrationsIn(RootNamespace),
+                (serviceProvider, processor) =>
+                {
+                    var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
+
+                    // Initialize the anon extension
+                    runner.Up(new TestInitializeAnonExtension());
+
+                    try
+                    {
+                        // Create a table with security label
+                        runner.Up(new TestCreateTableWithSecurityLabel());
+
+                        // Verify the label exists
+                        var hasLabel = processor.Exists(@"
+                            SELECT 1
+                            FROM pg_seclabels sl
+                            JOIN pg_class c ON sl.objoid = c.oid
+                            JOIN pg_attribute a ON a.attrelid = c.oid AND a.attnum = sl.objsubid
+                            WHERE c.relname = 'SecureUsers'
+                              AND a.attname = 'email'");
+                        hasLabel.ShouldBeTrue();
+
+                        // Delete the security label
+                        runner.Up(new TestDeleteSecurityLabelFromColumn());
+
+                        var r = processor.Read(@"
+                            SELECT sl.label, c.relname, a.attname
+                            FROM pg_seclabels sl
+                            JOIN pg_class c ON sl.objoid = c.oid
+                            JOIN pg_attribute a ON a.attrelid = c.oid AND a.attnum = sl.objsubid");
+
+                        // Verify the label was removed
+                        hasLabel = processor.Exists(@"
+                            SELECT 1
+                            FROM pg_seclabels sl
+                            JOIN pg_class c ON sl.objoid = c.oid
+                            JOIN pg_attribute a ON a.attrelid = c.oid AND a.attnum = sl.objsubid
+                            WHERE c.relname = 'SecureUsers'
+                              AND a.attname = 'email'");
+                        hasLabel.ShouldBeFalse();
+
+                        runner.Down(new TestCreateTableWithSecurityLabel());
+                    }
+                    finally
+                    {
+                        runner.Down(new TestInitializeAnonExtension());
+                    }
+                },
+                serverOptions,
+                true);
+        }
     }
 
     internal class TestForeignKeyNamingConvention : Migration
@@ -2304,6 +2470,95 @@ namespace FluentMigrator.Tests.Integration
 
             IfDatabase(processorId => processorId.Contains(ProcessorIdConstants.Oracle))
                 .Execute.Sql("select 1 from dual");
+        }
+    }
+
+    /// <summary>
+    /// Migration to initialize the PostgreSQL Anonymizer extension.
+    /// </summary>
+    internal class TestInitializeAnonExtension : Migration
+    {
+        public override void Up()
+        {
+            Execute.Sql("CREATE EXTENSION IF NOT EXISTS anon CASCADE;");
+            Execute.Sql("SELECT anon.init();");
+        }
+
+        public override void Down()
+        {
+            Execute.Sql("DROP EXTENSION IF EXISTS anon CASCADE;");
+        }
+    }
+
+    /// <summary>
+    /// Migration to create a table with a security label on a column using the typed builder.
+    /// </summary>
+    internal class TestCreateTableWithSecurityLabel : Migration
+    {
+        public override void Up()
+        {
+            Create.Table("SecureUsers")
+                .WithColumn("Id").AsInt32().NotNullable().PrimaryKey().Identity()
+                .WithColumn("email").AsString(255).NotNullable();
+
+            Create.SecurityLabel<AnonSecurityLabelBuilder>()
+                .OnColumn("email")
+                .OnTable("SecureUsers")
+                .WithLabel(label => label.MaskedWithFakeEmail());
+        }
+
+        public override void Down()
+        {
+            Delete.Table("SecureUsers");
+        }
+    }
+
+    /// <summary>
+    /// Migration to create a table with multiple security labels using different masking methods.
+    /// </summary>
+    internal class TestCreateTableWithMultipleSecurityLabels : Migration
+    {
+        public override void Up()
+        {
+            Create.Table("CustomerData")
+                .WithColumn("Id").AsInt32().NotNullable().PrimaryKey().Identity()
+                .WithColumn("email").AsString(255).NotNullable()
+                .WithColumn("full_name").AsString(255).NotNullable()
+                .WithColumn("phone").AsString(50).Nullable();
+
+            // Apply different masking strategies to different columns
+            Create.SecurityLabel<AnonSecurityLabelBuilder>()
+                .OnColumn("email")
+                .OnTable("CustomerData")
+                .WithLabel(label => label.MaskedWithFakeEmail());
+
+            Create.SecurityLabel<AnonSecurityLabelBuilder>()
+                .OnColumn("full_name")
+                .OnTable("CustomerData")
+                .WithLabel(label => label.MaskedWithValue("CONFIDENTIAL"));
+
+            Create.SecurityLabel<AnonSecurityLabelBuilder>()
+                .OnColumn("phone")
+                .OnTable("CustomerData")
+                .WithLabel(label => label.MaskedWithPartialScrambling(2, '*', 2));
+        }
+
+        public override void Down()
+        {
+            Delete.Table("CustomerData");
+        }
+    }
+
+    /// <summary>
+    /// Migration to delete a security label from a column.
+    /// </summary>
+    internal class TestDeleteSecurityLabelFromColumn : ForwardOnlyMigration
+    {
+        public override void Up()
+        {
+            Delete.SecurityLabel<AnonSecurityLabelBuilder>()
+                .FromColumn("email")
+                .OnTable("SecureUsers");
         }
     }
 }

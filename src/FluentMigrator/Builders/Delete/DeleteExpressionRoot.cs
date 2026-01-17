@@ -32,7 +32,7 @@ namespace FluentMigrator.Builders.Delete
     /// <summary>
     /// The implementation of the <see cref="IDeleteExpressionRoot"/> interface
     /// </summary>
-    public class DeleteExpressionRoot : IDeleteExpressionRoot
+    public class DeleteExpressionRoot : IDeleteExpressionRoot, IMigrationContextAccessor
     {
         private readonly IMigrationContext _context;
 
@@ -44,6 +44,9 @@ namespace FluentMigrator.Builders.Delete
         {
             _context = context;
         }
+
+        /// <inheritdoc />
+        IMigrationContext IMigrationContextAccessor.GetMigrationContext() => _context;
 
         /// <inheritdoc />
         public void Schema(string schemaName)

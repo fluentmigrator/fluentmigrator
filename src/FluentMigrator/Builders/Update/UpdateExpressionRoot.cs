@@ -24,7 +24,7 @@ namespace FluentMigrator.Builders.Update
     /// <summary>
     /// The implementation of the <see cref="IUpdateExpressionRoot"/> interface.
     /// </summary>
-    public class UpdateExpressionRoot : IUpdateExpressionRoot
+    public class UpdateExpressionRoot : IUpdateExpressionRoot, IMigrationContextAccessor
     {
         private readonly IMigrationContext _context;
 
@@ -36,6 +36,9 @@ namespace FluentMigrator.Builders.Update
         {
             _context = context;
         }
+
+        /// <inheritdoc />
+        IMigrationContext IMigrationContextAccessor.GetMigrationContext() => _context;
 
         /// <inheritdoc />
         public IUpdateSetOrInSchemaSyntax Table(string tableName)

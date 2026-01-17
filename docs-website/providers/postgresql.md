@@ -487,3 +487,442 @@ Create.Index("IX_Data_Gin").OnTable("MyTable")
     .OnColumn("Data")
     .UsingIndexAlgorithm(PostgresIndexAlgorithm.Gin);
 ```
+
+## Security Labels
+
+::: warning Minimum Version
+Security Labels support is available starting from **FluentMigrator 8.0**.
+:::
+
+PostgreSQL Security Labels allow you to apply access control labels to database objects. This is commonly used with security label providers like SELinux (sepgsql) or [PostgreSQL Anonymizer](https://postgresql-anonymizer.readthedocs.io/) (anon).
+
+### Raw Security Labels
+
+#### Creating Security Labels
+```csharp
+using FluentMigrator.Postgres;
+
+// Create a security label on a table with a provider
+Create.SecurityLabel("sepgsql")
+    .OnTable("users")
+    .InSchema("public")
+    .WithLabel("system_u:object_r:sepgsql_table_t:s0");
+
+// Create a security label on a column
+Create.SecurityLabel("anon")
+    .OnColumn("email")
+    .OnTable("users")
+    .InSchema("public")
+    .WithLabel("MASKED WITH FUNCTION anon.fake_email()");
+
+// Create a security label on a schema
+Create.SecurityLabel("sepgsql")
+    .OnSchema("public")
+    .WithLabel("system_u:object_r:sepgsql_schema_t:s0");
+
+// Create a security label on a role
+Create.SecurityLabel("anon")
+    .OnRole("masked_user")
+    .WithLabel("MASKED");
+
+// Create a security label on a view
+Create.SecurityLabel("anon")
+    .OnView("user_view")
+    .InSchema("public")
+    .WithLabel("TABLESAMPLE BERNOULLI(10)");
+```
+
+#### Deleting Security Labels
+```csharp
+// Delete a security label from a table (using provider name)
+Delete.SecurityLabel("anon")
+    .FromTable("users")
+    .InSchema("public");
+
+// Delete a security label from a column (using provider name)
+Delete.SecurityLabel("anon")
+    .FromColumn("email")
+    .OnTable("users")
+    .InSchema("public");
+
+// Delete a security label from a role (using provider name)
+Delete.SecurityLabel("anon")
+    .FromRole("masked_user");
+
+// Delete using a typed builder (provider automatically determined)
+Delete.SecurityLabel<AnonSecurityLabelBuilder>()
+    .FromTable("users")
+    .InSchema("public");
+
+Delete.SecurityLabel<AnonSecurityLabelBuilder>()
+    .FromColumn("email")
+    .OnTable("users")
+    .InSchema("public");
+```
+
+### PostgreSQL Anonymizer Integration
+
+FluentMigrator provides strongly-typed support for [PostgreSQL Anonymizer](https://postgresql-anonymizer.readthedocs.io/) masking rules using a generic builder type. When using the typed builder, the provider is automatically set to "anon".
+
+#### Using the Generic Builder
+
+Use `Create.SecurityLabel<AnonSecurityLabelBuilder>()` to access the strongly-typed API:
+
+```csharp
+using FluentMigrator.Builder.SecurityLabel.Anon;
+
+// Mask with fake email
+Create.SecurityLabel<AnonSecurityLabelBuilder>()
+    .OnColumn("email")
+    .OnTable("users")
+    .InSchema("public")
+    .WithLabel(label => label.MaskedWithFakeEmail());
+```
+
+#### Fake Data Masking
+```csharp
+// Mask with fake first name
+Create.SecurityLabel<AnonSecurityLabelBuilder>()
+    .OnColumn("first_name")
+    .OnTable("users")
+    .InSchema("public")
+    .WithLabel(label => label.MaskedWithFakeFirstName());
+
+// Mask with fake last name
+Create.SecurityLabel<AnonSecurityLabelBuilder>()
+    .OnColumn("last_name")
+    .OnTable("users")
+    .InSchema("public")
+    .WithLabel(label => label.MaskedWithFakeLastName());
+
+// Mask with dummy last name
+Create.SecurityLabel<AnonSecurityLabelBuilder>()
+    .OnColumn("last_name")
+    .OnTable("users")
+    .InSchema("public")
+    .WithLabel(label => label.MaskedWithDummyLastName());
+
+// Mask with fake company
+Create.SecurityLabel<AnonSecurityLabelBuilder>()
+    .OnColumn("company")
+    .OnTable("users")
+    .InSchema("public")
+    .WithLabel(label => label.MaskedWithFakeCompany());
+
+// Mask with fake city, country, address, phone
+Create.SecurityLabel<AnonSecurityLabelBuilder>()
+    .OnColumn("city")
+    .OnTable("users")
+    .InSchema("public")
+    .WithLabel(label => label.MaskedWithFakeCity());
+
+Create.SecurityLabel<AnonSecurityLabelBuilder>()
+    .OnColumn("phone")
+    .OnTable("users")
+    .InSchema("public")
+    .WithLabel(label => label.MaskedWithFakePhone());
+```
+
+#### Static Value Masking
+```csharp
+// Mask with a static value
+Create.SecurityLabel<AnonSecurityLabelBuilder>()
+    .OnColumn("ssn")
+    .OnTable("users")
+    .InSchema("public")
+    .WithLabel(label => label.MaskedWithValue("CONFIDENTIAL"));
+```
+
+#### Pseudo-Anonymization
+```csharp
+// Mask email using another column as username
+Create.SecurityLabel<AnonSecurityLabelBuilder>()
+    .OnColumn("email")
+    .OnTable("users")
+    .InSchema("public")
+    .WithLabel(label => label.MaskedWithPseudoEmail("username"));
+```
+
+#### Random Data Masking
+```csharp
+// Mask with random string (default 12 characters)
+Create.SecurityLabel<AnonSecurityLabelBuilder>()
+    .OnColumn("token")
+    .OnTable("users")
+    .InSchema("public")
+    .WithLabel(label => label.MaskedWithRandomString());
+
+// Mask with random string of specific length
+Create.SecurityLabel<AnonSecurityLabelBuilder>()
+    .OnColumn("code")
+    .OnTable("users")
+    .InSchema("public")
+    .WithLabel(label => label.MaskedWithRandomString(8));
+
+// Mask with random integer
+Create.SecurityLabel<AnonSecurityLabelBuilder>()
+    .OnColumn("age")
+    .OnTable("users")
+    .InSchema("public")
+    .WithLabel(label => label.MaskedWithRandomInt());
+
+// Mask with random integer in range
+Create.SecurityLabel<AnonSecurityLabelBuilder>()
+    .OnColumn("age")
+    .OnTable("users")
+    .InSchema("public")
+    .WithLabel(label => label.MaskedWithRandomInt(18, 65));
+
+// Mask with random date
+Create.SecurityLabel<AnonSecurityLabelBuilder>()
+    .OnColumn("birth_date")
+    .OnTable("users")
+    .InSchema("public")
+    .WithLabel(label => label.MaskedWithRandomDate());
+
+// Mask with random date in range
+Create.SecurityLabel<AnonSecurityLabelBuilder>()
+    .OnColumn("birth_date")
+    .OnTable("users")
+    .InSchema("public")
+    .WithLabel(label => label.MaskedWithRandomDateBetween("1970-01-01", "2000-12-31"));
+```
+
+#### Partial Scrambling
+```csharp
+// Partial scrambling: keep first 2 and last 2 characters, replace middle with '*'
+// "John Doe" becomes "Jo***oe"
+Create.SecurityLabel<AnonSecurityLabelBuilder>()
+    .OnColumn("name")
+    .OnTable("users")
+    .InSchema("public")
+    .WithLabel(label => label.MaskedWithPartialScrambling(2, '*', 2));
+```
+
+#### Custom Function Masking
+```csharp
+// Mask with a custom PostgreSQL Anonymizer function
+Create.SecurityLabel<AnonSecurityLabelBuilder>()
+    .OnColumn("data")
+    .OnTable("users")
+    .InSchema("public")
+    .WithLabel(label => label.MaskedWithFunction("anon.lorem_ipsum(2)"));
+```
+
+#### Role-Based Masking
+```csharp
+// Mark a role as masked (for role-based dynamic masking)
+Create.SecurityLabel<AnonSecurityLabelBuilder>()
+    .OnRole("analyst")
+    .WithLabel(label => label.Masked());
+```
+
+### Financial Data Masking (French formats)
+```csharp
+// Mask with fake IBAN
+Create.SecurityLabel<AnonSecurityLabelBuilder>()
+    .OnColumn("iban")
+    .OnTable("bank_accounts")
+    .InSchema("public")
+    .WithLabel(label => label.MaskedWithFakeIban());
+
+// Mask with fake SIRET (French business registration)
+Create.SecurityLabel<AnonSecurityLabelBuilder>()
+    .OnColumn("siret")
+    .OnTable("companies")
+    .InSchema("public")
+    .WithLabel(label => label.MaskedWithFakeSiret());
+
+// Mask with fake SIREN (French company registration)
+Create.SecurityLabel<AnonSecurityLabelBuilder>()
+    .OnColumn("siren")
+    .OnTable("companies")
+    .InSchema("public")
+    .WithLabel(label => label.MaskedWithFakeSiren());
+```
+
+### Creating Custom Security Label Providers
+
+You can create your own security label builder by extending `SecurityLabelSyntaxBuilderBase`. This allows you to create strongly-typed, provider-specific APIs for any PostgreSQL security label provider.
+
+#### Step 1: Create the Builder Class
+
+```csharp
+using FluentMigrator.Builder.SecurityLabel;
+
+/// <summary>
+/// Custom security label builder for SELinux PostgreSQL (sepgsql).
+/// </summary>
+public class SepgsqlLabelBuilder : SecurityLabelSyntaxBuilderBase
+{
+    // Required: Define the provider name used in the SECURITY LABEL statement
+    public override string ProviderName => "sepgsql";
+
+    // Add strongly-typed methods for common label patterns
+    public SepgsqlLabelBuilder SystemObject()
+    {
+        RawLabel("system_u:object_r:sepgsql_table_t:s0");
+        return this;
+    }
+
+    public SepgsqlLabelBuilder UserObject(string user, string role)
+    {
+        RawLabel($"{user}:object_r:{role}:s0");
+        return this;
+    }
+
+    public SepgsqlLabelBuilder UnconfinedTable()
+    {
+        RawLabel("unconfined_u:object_r:sepgsql_table_t:s0");
+        return this;
+    }
+
+    public SepgsqlLabelBuilder WithSecurityLevel(string user, string role, string level)
+    {
+        RawLabel($"{user}:object_r:{role}:{level}");
+        return this;
+    }
+}
+```
+
+#### Step 2: Use the Builder in Migrations
+
+```csharp
+using FluentMigrator;
+using FluentMigrator.Postgres;
+
+[Migration(20250101120000)]
+public class ApplySepgsqlLabels : Migration
+{
+    public override void Up()
+    {
+        // Create security labels using the typed builder
+        Create.SecurityLabel<SepgsqlLabelBuilder>()
+            .OnTable("users")
+            .InSchema("public")
+            .WithLabel(label => label.SystemObject());
+
+        Create.SecurityLabel<SepgsqlLabelBuilder>()
+            .OnTable("audit_logs")
+            .InSchema("public")
+            .WithLabel(label => label.WithSecurityLevel("admin_u", "sepgsql_table_t", "s0:c0.c1023"));
+
+        // You can also use raw labels when needed
+        Create.SecurityLabel<SepgsqlLabelBuilder>()
+            .OnColumn("password_hash")
+            .OnTable("users")
+            .InSchema("public")
+            .WithLabel("custom_raw_label_if_needed");
+    }
+
+    public override void Down()
+    {
+        // Delete using the same typed builder
+        Delete.SecurityLabel<SepgsqlLabelBuilder>()
+            .FromTable("users")
+            .InSchema("public");
+
+        Delete.SecurityLabel<SepgsqlLabelBuilder>()
+            .FromTable("audit_logs")
+            .InSchema("public");
+
+        Delete.SecurityLabel<SepgsqlLabelBuilder>()
+            .FromColumn("password_hash")
+            .OnTable("users")
+            .InSchema("public");
+    }
+}
+```
+
+#### Key Points for Custom Providers
+
+1. **Extend `SecurityLabelSyntaxBuilderBase`**: This base class provides the `RawLabel()` method and implements `ISecurityLabelSyntaxBuilder`.
+
+2. **Override `ProviderName`**: This property returns the provider name used in the SQL `SECURITY LABEL FOR provider` clause.
+
+3. **Return `this` from methods**: This enables method chaining within the builder.
+
+4. **Use `RawLabel()` to set the label**: Call this method to set the actual label string that will be used in the SQL statement.
+
+5. **Available for both Create and Delete**: Use `Create.SecurityLabel<YourBuilder>()` and `Delete.SecurityLabel<YourBuilder>()` for consistency.
+
+### Complete Example Migration
+```csharp
+using FluentMigrator;
+using FluentMigrator.Postgres;
+using FluentMigrator.Builder.SecurityLabel.Anon;
+
+[Migration(20250101120000)]
+public class ApplyDataMasking : Migration
+{
+    public override void Up()
+    {
+        // Create masking rules for sensitive columns
+        Create.SecurityLabel<AnonSecurityLabelBuilder>()
+            .OnColumn("email")
+            .OnTable("users")
+            .InSchema("public")
+            .WithLabel(label => label.MaskedWithFakeEmail());
+
+        Create.SecurityLabel<AnonSecurityLabelBuilder>()
+            .OnColumn("first_name")
+            .OnTable("users")
+            .InSchema("public")
+            .WithLabel(label => label.MaskedWithFakeFirstName());
+
+        Create.SecurityLabel<AnonSecurityLabelBuilder>()
+            .OnColumn("last_name")
+            .OnTable("users")
+            .InSchema("public")
+            .WithLabel(label => label.MaskedWithFakeLastName());
+
+        Create.SecurityLabel<AnonSecurityLabelBuilder>()
+            .OnColumn("phone")
+            .OnTable("users")
+            .InSchema("public")
+            .WithLabel(label => label.MaskedWithFakePhone());
+
+        Create.SecurityLabel<AnonSecurityLabelBuilder>()
+            .OnColumn("ssn")
+            .OnTable("users")
+            .InSchema("public")
+            .WithLabel(label => label.MaskedWithValue("XXX-XX-XXXX"));
+
+        // Mark a role as masked for dynamic masking
+        Create.SecurityLabel<AnonSecurityLabelBuilder>()
+            .OnRole("analyst")
+            .WithLabel(label => label.Masked());
+    }
+
+    public override void Down()
+    {
+        // Remove masking rules using the typed builder
+        Delete.SecurityLabel<AnonSecurityLabelBuilder>()
+            .FromColumn("email")
+            .OnTable("users")
+            .InSchema("public");
+
+        Delete.SecurityLabel<AnonSecurityLabelBuilder>()
+            .FromColumn("first_name")
+            .OnTable("users")
+            .InSchema("public");
+
+        Delete.SecurityLabel<AnonSecurityLabelBuilder>()
+            .FromColumn("last_name")
+            .OnTable("users")
+            .InSchema("public");
+
+        Delete.SecurityLabel<AnonSecurityLabelBuilder>()
+            .FromColumn("phone")
+            .OnTable("users")
+            .InSchema("public");
+
+        Delete.SecurityLabel<AnonSecurityLabelBuilder>()
+            .FromColumn("ssn")
+            .OnTable("users")
+            .InSchema("public");
+
+        Delete.SecurityLabel<AnonSecurityLabelBuilder>()
+            .FromRole("analyst");
+    }
+}
