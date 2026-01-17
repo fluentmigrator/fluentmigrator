@@ -29,6 +29,9 @@ namespace FluentMigrator.DotNet.Cli.Commands
         [Required]
         public IEnumerable<string> TargetAssemblies { get; set;}
 
+        [Option("-v|--version-info-meta-data-json <VERSION_INFO_TABLE_META_DATA_JSON>", Description = "The json that describe metada (for example '{\"SchemaName\": \"custom_schema\", \"TableName\": \"custom_table_name\"}').")]
+        public string VersionInfoTableMetadataJson { get; set;}
+
         [Option("-n|--namespace <NAMESPACE>", Description = "The namespace contains the migrations you want to run. Default is all migrations found within the Target Assembly will be run.")]
         public string Namespace { get; set; }
 
