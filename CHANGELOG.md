@@ -440,3 +440,4 @@ Unlisted due to unintentional breaking change.
   - Oracle: Table schema now added more consistently
 - Tests:
   - Mark integration tests as ignored when no active processor could be found
+

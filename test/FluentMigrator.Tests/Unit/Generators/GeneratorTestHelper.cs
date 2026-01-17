@@ -259,6 +259,18 @@ namespace FluentMigrator.Tests.Unit.Generators
             return expression;
         }
 
+        public static CreateTableExpression GetCreateTableWithFluentMultiColumnForeignKey()
+        {
+            var expression = new CreateTableExpression { TableName = TestTableName1 };
+            expression.Columns.Add(new ColumnDefinition { Name = TestColumnName1, Type = DbType.String });
+            expression.Columns.Add(new ColumnDefinition { Name = TestColumnName2, Type = DbType.Int32 });
+            expression.Columns.Add(new ColumnDefinition { Name = "TestColumn3", Type = DbType.String });
+            
+            // This will be created using the fluent syntax with the new multi-column ForeignKey method
+            // The foreign key will be defined as: ForeignKey([TestColumnName1, TestColumnName2], TestTableName2, [TestColumnName2, "TestColumn4"])
+            return expression;
+        }
+
         public static CreateIndexExpression GetCreateIndexExpression()
         {
             var expression = new CreateIndexExpression();
