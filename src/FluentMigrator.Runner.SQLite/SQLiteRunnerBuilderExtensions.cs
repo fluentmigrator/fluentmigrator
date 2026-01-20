@@ -39,9 +39,10 @@ namespace FluentMigrator.Runner
         /// <param name="builder">The builder to add the SQLite-specific services to</param>
         /// <param name="binaryGuid">True if guids are stored as binary, false if guids are stored as string</param>
         /// <param name="useStrictTables">True if SQLite strict table mode is used. All tables in database should have the same strict table setting.</param>
+        /// <param name="compatibilityMode">The compatibility mode for the migration generator</param>
         /// <returns>The migration runner builder</returns>
         // ReSharper disable once InconsistentNaming
-        public static IMigrationRunnerBuilder AddSQLite(this IMigrationRunnerBuilder builder, bool binaryGuid = false, bool useStrictTables = false)
+        public static IMigrationRunnerBuilder AddSQLite(this IMigrationRunnerBuilder builder, bool binaryGuid = false, bool useStrictTables = false, CompatibilityMode? compatibilityMode = null)
         {
             builder.Services
                 .AddTransient<SQLiteBatchParser>()
@@ -65,7 +66,7 @@ namespace FluentMigrator.Runner
                         return new SQLiteGenerator(
                             new SQLiteQuoter(binaryGuid),
                             typeMap,
-                            new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()));
+                            new OptionsWrapper<GeneratorOptions>(new GeneratorOptions { CompatibilityMode = compatibilityMode }));
                     })
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<SQLiteGenerator>());
 
