@@ -74,8 +74,8 @@ There is a new template `ctorc` which creates a StyleCop-compatible constructor 
 
 # Code style
 
-Please use an editor that supports the [.editorconfig](https://raw.githubusercontent.com/fluentmigrator/fluentmigrator/master/.editorconfig)
-and/or the ReSharper/Rider settings [FluentMigrator.sln.DotSettings](https://raw.githubusercontent.com/fluentmigrator/fluentmigrator/master/FluentMigrator.sln.DotSettings).
+Please use an editor that supports the [.editorconfig](https://raw.githubusercontent.com/fluentmigrator/fluentmigrator/main/.editorconfig)
+and/or the ReSharper/Rider settings [FluentMigrator.sln.DotSettings](https://raw.githubusercontent.com/fluentmigrator/fluentmigrator/main/FluentMigrator.sln.DotSettings).
 
 ## Generic
 
