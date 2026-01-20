@@ -79,7 +79,7 @@ and/or the ReSharper/Rider settings [FluentMigrator.sln.DotSettings](https://raw
 
 ## Generic
 
-* Use spaces for indention
+* Use spaces for indentation
 * Add a "new line" character when the last line is not empty
 * Remove trailing whitespace characters
 
