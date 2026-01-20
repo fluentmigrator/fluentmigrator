@@ -98,7 +98,7 @@ and/or the ReSharper/Rider settings [FluentMigrator.sln.DotSettings](https://raw
 ```cs
 #region License
 //
-// Copyright (c) 2018, Fluent Migrator Project
+// Copyright (c) 2026, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
