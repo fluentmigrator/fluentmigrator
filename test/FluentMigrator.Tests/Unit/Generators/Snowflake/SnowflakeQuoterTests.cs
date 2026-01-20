@@ -27,7 +27,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             var result = _quoterQuotingEnabled.FormatSystemMethods(SystemMethods.CurrentDateTime);
 
             // Assert
-            Assert.That(result, Is.EqualTo("SYSDATE()"));
+            Assert.That(result, Is.EqualTo("CURRENT_TIMESTAMP()"));
         }
 
         [Test]
@@ -41,13 +41,13 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         }
 
         [Test]
-        public void FormatSystemMethods_CurrentUTCDateTime_ReturnsConvertTimezone()
+        public void FormatSystemMethods_CurrentUTCDateTime_ReturnsSysdate()
         {
             // Act
             var result = _quoterQuotingEnabled.FormatSystemMethods(SystemMethods.CurrentUTCDateTime);
 
             // Assert
-            Assert.That(result, Is.EqualTo("CONVERT_TIMEZONE('UTC',CURRENT_TIMESTAMP())"));
+            Assert.That(result, Is.EqualTo("SYSDATE()"));
         }
 
         [Test]
@@ -57,7 +57,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             var result = _quoterQuotingDisabled.FormatSystemMethods(SystemMethods.CurrentDateTime);
 
             // Assert
-            Assert.That(result, Is.EqualTo("SYSDATE()"));
+            Assert.That(result, Is.EqualTo("CURRENT_TIMESTAMP()"));
         }
 
         [Test]
