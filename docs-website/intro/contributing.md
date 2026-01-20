@@ -4,8 +4,7 @@
 2. [Create a branch](https://git-scm.com/book/en/v2/Git-Branching-Branches-in-a-Nutshell)
 3. Code (and add tests)
 4. Create a pull request on GitHub
-    * Target the `develop` branch for API-breaking changes
-    * Target the `master` branch for non-API-breaking changes and/or hotfixes
+    * Target the `main` branch for all changes
 5. Get the pull request merged
 6. Done
 
