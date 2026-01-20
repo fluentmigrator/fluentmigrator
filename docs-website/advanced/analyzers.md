@@ -26,7 +26,7 @@ Once installed, the analyzers will automatically run during builds and provide r
 
 ### FM0001: Migration Version Should Be Unique
 
-**Category**: FluentMigrator  
+**Category**: FluentMigrator
 **Severity**: Warning
 
 This analyzer ensures that each migration in your project has a unique version number. Duplicate version numbers can cause unpredictable behavior during migration execution.
@@ -145,7 +145,7 @@ Analyzers run automatically during build and can be configured to treat warnings
 <PropertyGroup>
   <!-- Treat all warnings as errors -->
   <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-  
+
   <!-- Or treat specific analyzer warnings as errors -->
   <WarningsAsErrors>FM0001</WarningsAsErrors>
 </PropertyGroup>
@@ -251,4 +251,4 @@ Potential future analyzers may include:
 
 ## Contributing
 
-Interested in contributing new analyzers? Check out the [FluentMigrator contribution guide](https://github.com/fluentmigrator/fluentmigrator/blob/main/CONTRIBUTING.md) and the existing analyzer implementation in the `src/FluentMigrator.Analyzers` directory.
+Interested in contributing new analyzers? Check out the [FluentMigrator contribution guide](https://fluentmigrator.github.io/intro/contributing.html) and the existing analyzer implementation in the `src/FluentMigrator.Analyzers` directory.

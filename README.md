@@ -26,7 +26,7 @@ while the CI builds are stored on [Azure Artifacts](https://dev.azure.com/fluent
 * 6.0.0 milestones
     * removing a lot of `[Obsolete]` code. Very little user impact should be seen, other than updating custom VersionTableMetadata to configure CreateWithPrimaryKey setting.
 * 5.2.0 milestones
-   * make TypeMap injectable 
+   * make TypeMap injectable
 * 5.0.0 milestones
     * thanks to @eloekset, our [documentation website](https://fluentmigrator.github.io) now has 5.0.0 API links!
 
@@ -66,7 +66,7 @@ A [long list](https://github.com/fluentmigrator/fluentmigrator/blob/main/CONTRIB
 
 # Contributing
 
-Please see our guide on [how to contribute](https://fluentmigrator.github.io/articles/guides/contribution.html)
+Please see our guide on [how to contribute](https://fluentmigrator.github.io/intro/contributing.html)
 
 # Third Party Contributions / FluentMigrator Ecosystem
 
