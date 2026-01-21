@@ -1,3 +1,5 @@
+using System;
+
 using FluentMigrator.Runner.Generators.Generic;
 
 namespace FluentMigrator.Runner.Generators.Hana
@@ -10,6 +12,7 @@ namespace FluentMigrator.Runner.Generators.Hana
     /// in a SAP HANA database. It extends the functionality of the <see cref="FluentMigrator.Runner.Generators.Generic.GenericDescriptionGenerator"/> 
     /// by providing HANA-specific SQL syntax for table and column comments.
     /// </remarks>
+    [Obsolete("Hana support will go away unless someone in the community steps up to provide support.")]
     public class HanaDescriptionGenerator : GenericDescriptionGenerator
     {
         #region Constants

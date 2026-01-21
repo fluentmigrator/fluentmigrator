@@ -16,6 +16,7 @@
 //
 #endregion
 
+using System;
 using System.Data;
 
 using FluentMigrator.Runner.Generators.Base;
@@ -25,6 +26,7 @@ namespace FluentMigrator.Runner.Generators.Hana
     /// <summary>
     /// Provides type mapping between <see cref="DbType"/> and SAP HANA SQL types.
     /// </summary>
+    [Obsolete("Hana support will go away unless someone in the community steps up to provide support.")]
     public sealed class HanaTypeMap : TypeMapBase, IHanaTypeMap
     {
         /// <summary>Default capacity for ANSI string columns.</summary>

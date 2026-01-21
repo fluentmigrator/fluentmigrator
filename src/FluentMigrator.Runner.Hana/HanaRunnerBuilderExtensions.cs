@@ -14,6 +14,8 @@
 // limitations under the License.
 #endregion
 
+using System;
+
 using FluentMigrator.Runner.Generators.Hana;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Hana;
@@ -25,6 +27,7 @@ namespace FluentMigrator.Runner
     /// <summary>
     /// Extension methods for <see cref="IMigrationRunnerBuilder"/>
     /// </summary>
+    [Obsolete("Hana support will go away unless someone in the community steps up to provide support.")]
     public static class HanaRunnerBuilderExtensions
     {
         /// <summary>
@@ -32,6 +35,7 @@ namespace FluentMigrator.Runner
         /// </summary>
         /// <param name="builder">The builder to add the SAP Hana-specific services to</param>
         /// <returns>The migration runner builder</returns>
+        [Obsolete("Hana support will go away unless someone in the community steps up to provide support.")]
         public static IMigrationRunnerBuilder AddHana(this IMigrationRunnerBuilder builder)
         {
             builder.Services

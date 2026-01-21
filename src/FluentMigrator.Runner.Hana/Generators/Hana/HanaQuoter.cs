@@ -14,6 +14,7 @@
 // limitations under the License.
 #endregion
 
+using System;
 using System.Globalization;
 
 using FluentMigrator.Runner.Generators.Generic;
@@ -23,6 +24,7 @@ namespace FluentMigrator.Runner.Generators.Hana
     /// <summary>
     /// The SAP HANA SQL quoter for FluentMigrator.
     /// </summary>
+    [Obsolete("Hana support will go away unless someone in the community steps up to provide support.")]
     public class HanaQuoter : GenericQuoter
     {
         /// <inheritdoc />

@@ -20,6 +20,7 @@ namespace FluentMigrator.Runner.Processors.Hana
     /// <summary>
     /// The SAP Hana processor for FluentMigrator.
     /// </summary>
+    [Obsolete("Hana support will go away unless someone in the community steps up to provide support.")]
     public class HanaProcessor : GenericProcessorBase
     {
         /// <inheritdoc />
