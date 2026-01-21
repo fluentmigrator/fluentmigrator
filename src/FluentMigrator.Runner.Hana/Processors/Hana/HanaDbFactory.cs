@@ -29,6 +29,7 @@ namespace FluentMigrator.Runner.Processors.Hana
     /// This class extends <see cref="FluentMigrator.Runner.Processors.ReflectionBasedDbFactory"/> 
     /// to provide functionality tailored to the SAP HANA database.
     /// </remarks>
+    [Obsolete("Hana support will go away unless someone in the community steps up to provide support.")]
     public class HanaDbFactory : ReflectionBasedDbFactory
     {
         /// <summary>
