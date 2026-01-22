@@ -90,6 +90,7 @@ namespace FluentMigrator.Tests.Unit.Processors.Snowflake
             };
 
             Assert.That(MockedCommands, Has.Count.EqualTo(expected.Length));
+            Assert.That(CapturedCommandTexts, Has.Count.EqualTo(expected.Length));
 
             MockedDbProviderFactory.Verify(factory => factory.CreateConnection());
 
@@ -97,9 +98,9 @@ namespace FluentMigrator.Tests.Unit.Processors.Snowflake
             {
                 var command = expected[index];
                 var mockedCommand = MockedCommands[index];
+                Assert.That(CapturedCommandTexts[index], Is.EqualTo(command));
                 MockedDbProviderFactory.Verify(factory => factory.CreateCommand());
                 mockedCommand.VerifySet(cmd => cmd.Connection = MockedConnection.Object);
-                mockedCommand.VerifySet(cmd => cmd.CommandText = command);
                 mockedCommand.Verify(cmd => cmd.ExecuteNonQuery(), Times.Exactly(1));
                 mockedCommand.Protected().Verify("Dispose", Times.Exactly(1), ItExpr.IsAny<bool>());
             }

@@ -39,6 +39,7 @@ namespace FluentMigrator.Tests.Unit.Processors
         protected Mock<DbProviderFactory> MockedDbProviderFactory { get; private set; }
         protected Mock<IConnectionStringAccessor> MockedConnectionStringAccessor { get; private set; }
         protected List<Mock<DbCommand>> MockedCommands { get; private set; }
+        protected List<string> CapturedCommandTexts { get; private set; }
 
         [SetUp]
         public void SetUp()
@@ -46,6 +47,7 @@ namespace FluentMigrator.Tests.Unit.Processors
             _connectionState = ConnectionState.Closed;
 
             MockedCommands = new List<Mock<DbCommand>>();
+            CapturedCommandTexts = new List<string>();
             MockedConnection = new Mock<DbConnection>(MockBehavior.Loose);
             MockedDbProviderFactory = new Mock<DbProviderFactory>(MockBehavior.Loose);
             MockedConnectionStringAccessor = new Mock<IConnectionStringAccessor>(MockBehavior.Loose);
@@ -66,8 +68,10 @@ namespace FluentMigrator.Tests.Unit.Processors
                     () =>
                     {
                         var commandMock = new Mock<DbCommand>(MockBehavior.Loose);
+                        // Use callback to capture CommandText to avoid flaky VerifySet behavior with Moq/Castle.DynamicProxy
                         commandMock
-                            .SetupSet(cmd => cmd.CommandText = It.IsAny<string>());
+                            .SetupSet(cmd => cmd.CommandText = It.IsAny<string>())
+                            .Callback<string>(value => CapturedCommandTexts.Add(value));
                         commandMock.Setup(cmd => cmd.ExecuteNonQuery()).Returns(1);
                         commandMock.Protected().SetupGet<DbConnection>("DbConnection").Returns(MockedConnection.Object);
                         commandMock.Protected().SetupSet<DbConnection>("DbConnection", ItExpr.Is<DbConnection>(v => v == MockedConnection.Object));
@@ -101,11 +105,13 @@ namespace FluentMigrator.Tests.Unit.Processors
 
             MockedDbProviderFactory.Verify(factory => factory.CreateConnection());
 
+            Assert.That(CapturedCommandTexts, Has.Count.EqualTo(1));
+            Assert.That(CapturedCommandTexts[0], Is.EqualTo(command));
+
             foreach (var mockedCommand in MockedCommands)
             {
                 MockedDbProviderFactory.Verify(factory => factory.CreateCommand());
                 mockedCommand.VerifySet(cmd => cmd.Connection = MockedConnection.Object);
-                mockedCommand.VerifySet(cmd => cmd.CommandText = command);
                 mockedCommand.Verify(cmd => cmd.ExecuteNonQuery());
                 mockedCommand.Protected().Verify("Dispose", Times.Exactly(1), ItExpr.IsAny<bool>());
             }
@@ -123,13 +129,15 @@ namespace FluentMigrator.Tests.Unit.Processors
 
             MockedDbProviderFactory.Verify(factory => factory.CreateConnection());
 
+            Assert.That(CapturedCommandTexts, Has.Count.EqualTo(2));
+
             for (int index = 0; index < MockedCommands.Count; index++)
             {
                 var command = $"SELECT {index + 1}";
                 var mockedCommand = MockedCommands[index];
+                Assert.That(CapturedCommandTexts[index], Is.EqualTo(command));
                 MockedDbProviderFactory.Verify(factory => factory.CreateCommand());
                 mockedCommand.VerifySet(cmd => cmd.Connection = MockedConnection.Object);
-                mockedCommand.VerifySet(cmd => cmd.CommandText = command);
                 mockedCommand.Verify(cmd => cmd.ExecuteNonQuery());
                 mockedCommand.Protected().Verify("Dispose", Times.Exactly(1), ItExpr.IsAny<bool>());
             }
@@ -149,11 +157,13 @@ namespace FluentMigrator.Tests.Unit.Processors
 
             MockedDbProviderFactory.Verify(factory => factory.CreateConnection());
 
+            Assert.That(CapturedCommandTexts, Has.Count.EqualTo(1));
+            Assert.That(CapturedCommandTexts[0], Is.EqualTo(command));
+
             foreach (var mockedCommand in MockedCommands)
             {
                 MockedDbProviderFactory.Verify(factory => factory.CreateCommand());
                 mockedCommand.VerifySet(cmd => cmd.Connection = MockedConnection.Object);
-                mockedCommand.VerifySet(cmd => cmd.CommandText = command);
                 mockedCommand.Verify(cmd => cmd.ExecuteNonQuery());
                 mockedCommand.Protected().Verify("Dispose", Times.Exactly(1), ItExpr.IsAny<bool>());
             }
@@ -173,11 +183,13 @@ namespace FluentMigrator.Tests.Unit.Processors
 
             MockedDbProviderFactory.Verify(factory => factory.CreateConnection());
 
+            Assert.That(CapturedCommandTexts, Has.Count.EqualTo(1));
+            Assert.That(CapturedCommandTexts[0], Is.EqualTo(command));
+
             foreach (var mockedCommand in MockedCommands)
             {
                 MockedDbProviderFactory.Verify(factory => factory.CreateCommand());
                 mockedCommand.VerifySet(cmd => cmd.Connection = MockedConnection.Object);
-                mockedCommand.VerifySet(cmd => cmd.CommandText = command);
                 mockedCommand.Verify(cmd => cmd.ExecuteNonQuery());
                 mockedCommand.Protected().Verify("Dispose", Times.Exactly(1), ItExpr.IsAny<bool>());
             }
@@ -197,11 +209,13 @@ namespace FluentMigrator.Tests.Unit.Processors
 
             MockedDbProviderFactory.Verify(factory => factory.CreateConnection());
 
+            Assert.That(CapturedCommandTexts, Has.Count.EqualTo(1));
+            Assert.That(CapturedCommandTexts[0], Is.EqualTo(command));
+
             foreach (var mockedCommand in MockedCommands)
             {
                 MockedDbProviderFactory.Verify(factory => factory.CreateCommand());
                 mockedCommand.VerifySet(cmd => cmd.Connection = MockedConnection.Object);
-                mockedCommand.VerifySet(cmd => cmd.CommandText = command);
                 mockedCommand.Verify(cmd => cmd.ExecuteNonQuery());
                 mockedCommand.Protected().Verify("Dispose", Times.Exactly(1), ItExpr.IsAny<bool>());
             }
@@ -221,11 +235,13 @@ namespace FluentMigrator.Tests.Unit.Processors
 
             MockedDbProviderFactory.Verify(factory => factory.CreateConnection());
 
+            Assert.That(CapturedCommandTexts, Has.Count.EqualTo(1));
+            Assert.That(CapturedCommandTexts[0], Is.EqualTo(command));
+
             foreach (var mockedCommand in MockedCommands)
             {
                 MockedDbProviderFactory.Verify(factory => factory.CreateCommand());
                 mockedCommand.VerifySet(cmd => cmd.Connection = MockedConnection.Object);
-                mockedCommand.VerifySet(cmd => cmd.CommandText = command);
                 mockedCommand.Verify(cmd => cmd.ExecuteNonQuery());
                 mockedCommand.Protected().Verify("Dispose", Times.Exactly(1), ItExpr.IsAny<bool>());
             }
@@ -249,6 +265,7 @@ namespace FluentMigrator.Tests.Unit.Processors
             };
 
             Assert.That(MockedCommands, Has.Count.EqualTo(expected.Length));
+            Assert.That(CapturedCommandTexts, Has.Count.EqualTo(expected.Length));
 
             MockedDbProviderFactory.Verify(factory => factory.CreateConnection());
 
@@ -256,9 +273,9 @@ namespace FluentMigrator.Tests.Unit.Processors
             {
                 var (command, count) = expected[index];
                 var mockedCommand = MockedCommands[index];
+                Assert.That(CapturedCommandTexts[index], Is.EqualTo(command));
                 MockedDbProviderFactory.Verify(factory => factory.CreateCommand());
                 mockedCommand.VerifySet(cmd => cmd.Connection = MockedConnection.Object);
-                mockedCommand.VerifySet(cmd => cmd.CommandText = command);
                 mockedCommand.Verify(cmd => cmd.ExecuteNonQuery(), Times.Exactly(count));
                 mockedCommand.Protected().Verify("Dispose", Times.Exactly(1), ItExpr.IsAny<bool>());
             }

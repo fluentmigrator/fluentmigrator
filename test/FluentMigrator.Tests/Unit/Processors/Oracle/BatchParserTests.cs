@@ -77,10 +77,11 @@ namespace FluentMigrator.Tests.Unit.Processors.Oracle
 
             // Oracle will treat this as a single command since GO is not a separator
             Assert.That(MockedCommands, Has.Count.EqualTo(1));
+            Assert.That(CapturedCommandTexts, Has.Count.EqualTo(1));
+            Assert.That(CapturedCommandTexts[0], Is.EqualTo(command));
             var mockedCommand = MockedCommands[0];
             MockedDbProviderFactory.Verify(factory => factory.CreateCommand());
             mockedCommand.VerifySet(cmd => cmd.Connection = MockedConnection.Object);
-            mockedCommand.VerifySet(cmd => cmd.CommandText = command);
             mockedCommand.Verify(cmd => cmd.ExecuteNonQuery());
         }
 
@@ -100,12 +101,13 @@ namespace FluentMigrator.Tests.Unit.Processors.Oracle
 
             // Oracle treats GO as literal text, so it's a single command
             Assert.That(MockedCommands, Has.Count.EqualTo(1));
+            Assert.That(CapturedCommandTexts, Has.Count.EqualTo(1));
+            Assert.That(CapturedCommandTexts[0], Is.EqualTo(command));
             MockedDbProviderFactory.Verify(factory => factory.CreateConnection());
 
             var mockedCommand = MockedCommands[0];
             MockedDbProviderFactory.Verify(factory => factory.CreateCommand());
             mockedCommand.VerifySet(cmd => cmd.Connection = MockedConnection.Object);
-            mockedCommand.VerifySet(cmd => cmd.CommandText = command);
             mockedCommand.Verify(cmd => cmd.ExecuteNonQuery());
         }
 
@@ -144,10 +146,11 @@ namespace FluentMigrator.Tests.Unit.Processors.Oracle
 
             // This is a single statement with no semicolon
             Assert.That(MockedCommands, Has.Count.EqualTo(1));
+            Assert.That(CapturedCommandTexts, Has.Count.EqualTo(1));
+            Assert.That(CapturedCommandTexts[0], Is.EqualTo(command));
             var mockedCommand = MockedCommands[0];
             MockedDbProviderFactory.Verify(factory => factory.CreateCommand());
             mockedCommand.VerifySet(cmd => cmd.Connection = MockedConnection.Object);
-            mockedCommand.VerifySet(cmd => cmd.CommandText = command);
             mockedCommand.Verify(cmd => cmd.ExecuteNonQuery());
         }
 
