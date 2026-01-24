@@ -28,13 +28,15 @@ namespace FluentMigrator.Example.Migrations
         {
             Create.Table("Contexts")
                 .WithIdColumn()
-                .WithColumn("Name").AsString().NotNullable();
+                .WithColumn("Name").AsString().NotNullable()
+                .WithAuditTable();
 
             Create.Table("Projects")
                 .WithIdColumn()
                 .WithColumn("Name").AsString().NotNullable()
                 .WithColumn("Position").AsInt32().NotNullable()
-                .WithColumn("Done").AsBoolean().NotNullable();
+                .WithColumn("Done").AsBoolean().NotNullable()
+                .WithAuditTable();
 
             Create.Table("Users")
                 .WithIdColumn()
@@ -42,7 +44,8 @@ namespace FluentMigrator.Example.Migrations
                 .WithColumn("Login").AsString().NotNullable()
                 .WithColumn("Password").AsString().NotNullable()
                 .WithColumn("PasswordSalt").AsString().NotNullable()
-                .WithColumn("IsAdmin").AsBoolean().NotNullable();
+                .WithColumn("IsAdmin").AsBoolean().NotNullable()
+                .WithAuditTable();
 
 
             IfDatabase(ProcessorIdConstants.SqlServer)
