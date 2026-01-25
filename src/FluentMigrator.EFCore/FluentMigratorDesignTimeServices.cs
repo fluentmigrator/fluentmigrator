@@ -18,14 +18,13 @@ using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.EntityFrameworkCore.Migrations.Design;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace FluentMigrator.EFCore
+namespace FluentMigrator.EFCore;
+
+public class FluentMigratorDesignTimeServices : IDesignTimeServices
 {
-    public class FluentMigratorDesignTimeServices : IDesignTimeServices
+    public void ConfigureDesignTimeServices(IServiceCollection services)
     {
-        public void ConfigureDesignTimeServices(IServiceCollection services)
-        {
-            services.AddSingleton<ICSharpMigrationOperationGenerator, FluentMigratorCSharpMigrationOperationGenerator>();
-            services.AddSingleton<IMigrationsCodeGenerator, FluentMigratorCSharpMigrationsGenerator>();
-        }
+        services.AddSingleton<ICSharpMigrationOperationGenerator, FluentMigratorCSharpMigrationOperationGenerator>();
+        services.AddSingleton<IMigrationsCodeGenerator, FluentMigratorCSharpMigrationsGenerator>();
     }
 }
