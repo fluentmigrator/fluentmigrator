@@ -1,5 +1,5 @@
 #region License
-// Copyright (c) 2024, Fluent Migrator Project
+// Copyright (c) 2026, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,37 +14,24 @@
 // limitations under the License.
 #endregion
 
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
 namespace FluentMigrator.EFCore.Example.DbContext;
 
-public class User
+/// <summary>
+/// Demonstrates self-referencing (hierarchical) relationship.
+/// </summary>
+public class Category
 {
     public int Id { get; set; }
 
-    [Required]
-    [MaxLength(100)]
     public string Name { get; set; } = string.Empty;
 
-    [Required]
-    [MaxLength(255)]
-    [EmailAddress]
-    public string Email { get; set; } = string.Empty;
+    public string? Description { get; set; }
 
-    public DateTime CreatedAt { get; set; }
-
-    public UserTypeEnum UserType { get; set; }
-
-    // Soft delete
-    public bool IsDeleted { get; set; }
-
-    // Computed column (configured in OnModelCreating)
-    [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-    public string? FullName { get; set; }
+    // Self-referencing for hierarchy
+    public int? ParentCategoryId { get; set; }
+    public Category? ParentCategory { get; set; }
 
     // Navigation properties
-    public UserProfile? Profile { get; set; }
+    public ICollection<Category> SubCategories { get; set; } = new List<Category>();
     public ICollection<Product> Products { get; set; } = new List<Product>();
-    public ICollection<Order> Orders { get; set; } = new List<Order>();
 }

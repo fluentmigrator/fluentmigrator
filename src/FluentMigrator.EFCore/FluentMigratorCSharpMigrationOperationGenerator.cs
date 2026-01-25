@@ -158,16 +158,23 @@ public class FluentMigratorCSharpMigrationOperationGenerator : CSharpMigrationOp
     {
         var tableName = TransformTableName(operation.Table);
 
-        var columns = operation.Columns.Length == 1
-            ? Code.Literal(TransformColumnName(operation.Columns[0]))
-            : $"new[] {{ {string.Join(", ", operation.Columns.Select(c => Code.Literal(TransformColumnName(c))))} }}";
-
         builder.Append($"Create.Index({Code.Literal(operation.Name)})");
-        builder.Append($".OnTable({Code.Literal(tableName)}).OnColumn({columns})");
+        builder.Append($".OnTable({Code.Literal(tableName)})");
 
-        if (operation.IsUnique)
+        for (var i = 0; i < operation.Columns.Length; i++)
         {
-            builder.Append(".Unique()");
+            var columnName = TransformColumnName(operation.Columns[i]);
+            builder.Append($".OnColumn({Code.Literal(columnName)})");
+
+            if (operation.IsUnique)
+            {
+                builder.Append(".Unique()");
+            }
+            else
+            {
+                var direction = operation.IsDescending?[i] == true ? "Descending" : "Ascending";
+                builder.Append($".{direction}()");
+            }
         }
 
         builder.AppendLine(";");
@@ -189,6 +196,42 @@ public class FluentMigratorCSharpMigrationOperationGenerator : CSharpMigrationOp
         var tableName = TransformTableName(operation.Table);
 
         builder.AppendLine($"Delete.Index({Code.Literal(operation.Name)}).OnTable({Code.Literal(tableName)});");
+    }
+
+    public void GenerateInsertData(InsertDataOperation operation, IndentedStringBuilder builder)
+    {
+        var tableName = TransformTableName(operation.Table);
+
+        builder.AppendLine($"Insert.IntoTable({Code.Literal(tableName)})");
+        using (builder.Indent())
+        {
+            builder.AppendLine(".Rows([");
+
+            using (builder.Indent())
+            {
+                foreach (var valueSet in operation.Values)
+                {
+                    builder.AppendLine("new");
+                    builder.AppendLine("{");
+
+                    using (builder.Indent())
+                    {
+                        foreach (var t in operation.Columns)
+                        {
+                            var columnName = TransformColumnName(t);
+                            var value = Code.UnknownLiteral(valueSet);
+                            builder.AppendLine($"{columnName} = {value},");
+                        }
+                    }
+
+                    builder.AppendLine("},");
+                }
+            }
+
+            builder.AppendLine("])");
+        }
+
+        builder.AppendLine(";");
     }
 
     private void GenerateColumnDefinition(
@@ -254,12 +297,12 @@ public class FluentMigratorCSharpMigrationOperationGenerator : CSharpMigrationOp
     {
         if (column.Precision.HasValue && column.Scale.HasValue)
         {
-            return $"({column.Precision.Value}, {column.Scale.Value})";
+            return $"{column.Precision.Value}, {column.Scale.Value}";
         }
 
         if (column.Precision.HasValue)
         {
-            return $"({column.Precision.Value})";
+            return $"{column.Precision.Value}";
         }
 
         return string.Empty;

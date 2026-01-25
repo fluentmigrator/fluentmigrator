@@ -33,20 +33,26 @@ public class Product
     public string Login { get; set; } = string.Empty;
 
     [StringLength(10)]
-    public string Code { get; set; }
+    public string Code { get; set; } = string.Empty;
 
     [MaxLength(int.MaxValue)]
     public string Description { get; set; } = string.Empty;
 
     [Column("ProductPrice")]
+    [Precision(18, 2)]
     public decimal Price { get; set; }
 
     public int UserId { get; set; }
-
     public User User { get; set; } = null!;
+
+    public int? CategoryId { get; set; }
+    public Category? Category { get; set; }
 
     public Guid UniqueIdentifier { get; set; }
 
     [NotMapped]
     public int StockQuantity { get; set; }
+
+    // Many-to-Many with Tag through ProductTag
+    public ICollection<ProductTag> ProductTags { get; set; } = new List<ProductTag>();
 }

@@ -148,6 +148,9 @@ public class FluentMigratorCSharpMigrationsGenerator : CSharpMigrationsGenerator
                 case DropIndexOperation dropIndexOp:
                     operationGenerator.GenerateDropIndex(dropIndexOp, builder);
                     break;
+                case InsertDataOperation insertDataOp:
+                    operationGenerator.GenerateInsertData(insertDataOp, builder);
+                    break;
                 default:
                     builder.AppendLine($"// Unsupported operation: {operation.GetType().Name}");
                     break;
