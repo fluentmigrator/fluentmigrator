@@ -46,7 +46,7 @@ public class FluentMigratorCSharpMigrationOperationGenerator : CSharpMigrationOp
             foreach (var column in operation.Columns)
             {
                 var isPrimaryKey = operation.PrimaryKey != null && operation.PrimaryKey.Columns.Contains(column.Name);
-                GenerateColumnDefinition(column, builder, isPrimaryKey);
+                GenerateColumnDefinition(column, builder, isPrimaryKey, true);
             }
         }
         builder.AppendLine(";");
@@ -172,9 +172,15 @@ public class FluentMigratorCSharpMigrationOperationGenerator : CSharpMigrationOp
         builder.AppendLine($"Delete.Index({Code.Literal(operation.Name)}).OnTable({Code.Literal(operation.Table)});");
     }
 
-    private void GenerateColumnDefinition(AddColumnOperation column, IndentedStringBuilder builder, bool isPrimaryKey)
+    private void GenerateColumnDefinition(
+        AddColumnOperation column,
+        IndentedStringBuilder builder,
+        bool isPrimaryKey,
+        bool isCreateTable = false)
     {
-        var line = $".WithColumn({Code.Literal(column.Name)})";
+        var line = isCreateTable ?
+            $".WithColumn({Code.Literal(column.Name)})" :
+            $".AddColumn({Code.Literal(column.Name)})";
 
         line += $".As{GetFluentMigratorType(column.ClrType, column.ColumnType)}()";
 
