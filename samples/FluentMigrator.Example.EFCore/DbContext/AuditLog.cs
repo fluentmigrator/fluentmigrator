@@ -29,7 +29,7 @@ public class AuditLog
     /// <summary>
     /// The JSON data
     /// </summary>
-    public string Changes { get; set; }
+    public Change Changes { get; set; }
 
     /// <summary>
     /// The name of the entity that was changed
@@ -45,6 +45,15 @@ public class AuditLog
     /// The date of the change
     /// </summary>
     public DateTime Timestamp { get; set; }
+}
+
+public class Change
+{
+    public string PropertyName { get; set; }
+
+    public string OldValue { get; set; }
+
+    public string NewValue { get; set; }
 }
 
 public enum ActionTypeEnum

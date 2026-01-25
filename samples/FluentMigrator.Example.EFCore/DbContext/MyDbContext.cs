@@ -28,7 +28,7 @@ public class MyDbContext : Microsoft.EntityFrameworkCore.DbContext
     public DbSet<Category> Categories { get; set; }
     public DbSet<Tag> Tags { get; set; }
     public DbSet<UserProfile> UserProfiles { get; set; }
-    // public DbSet<AuditLog> AuditLogs { get; set; }
+    public DbSet<AuditLog> AuditLogs { get; set; }
 
     // TPH (Table Per Hierarchy) inheritance
     public DbSet<Payment> Payments { get; set; }
@@ -250,29 +250,29 @@ public class MyDbContext : Microsoft.EntityFrameworkCore.DbContext
                 .HasMaxLength(34); // IBAN max length
         });
 
-        // // ===== AuditLog Configuration =====
-        // modelBuilder.Entity<AuditLog>(entity =>
-        // {
-        //     entity.HasKey(a => a.Id);
-        //
-        //     // JSON column (EF Core 7+)
-        //     entity.OwnsOne(a => a.Changes, changes =>
-        //     {
-        //         changes.ToJson();
-        //     });
-        //
-        //     entity.Property(a => a.EntityName)
-        //         .IsRequired()
-        //         .HasMaxLength(100);
-        //
-        //     entity.Property(a => a.Action)
-        //         .HasConversion<string>()
-        //         .HasMaxLength(20);
-        //
-        //     // Index for querying by date
-        //     entity.HasIndex(a => a.Timestamp)
-        //         .HasDatabaseName("IX_AuditLog_Timestamp");
-        // });
+        // ===== AuditLog Configuration =====
+        modelBuilder.Entity<AuditLog>(entity =>
+        {
+            entity.HasKey(a => a.Id);
+
+            // JSON column (EF Core 7+)
+            entity.OwnsOne(a => a.Changes, changes =>
+            {
+                changes.ToJson();
+            });
+
+            entity.Property(a => a.EntityName)
+                .IsRequired()
+                .HasMaxLength(100);
+
+            entity.Property(a => a.Action)
+                .HasConversion<string>()
+                .HasMaxLength(20);
+
+            // Index for querying by date
+            entity.HasIndex(a => a.Timestamp)
+                .HasDatabaseName("IX_AuditLog_Timestamp");
+        });
 
         // ===== Sequence Configuration =====
         modelBuilder.HasSequence<int>("OrderNumbers", schema: "dbo")
