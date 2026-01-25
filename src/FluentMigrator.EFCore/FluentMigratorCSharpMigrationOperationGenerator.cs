@@ -1,34 +1,24 @@
-﻿#region License
-// Copyright (c) 2024, Fluent Migrator Project
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-// http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-#endregion
-
-using System;
+﻿using System;
 using System.Linq;
 
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations.Design;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.EFCore;
 
 public class FluentMigratorCSharpMigrationOperationGenerator : CSharpMigrationOperationGenerator
 {
-    public FluentMigratorCSharpMigrationOperationGenerator(CSharpMigrationOperationGeneratorDependencies dependencies)
+    private readonly FluentMigratorOptions _options;
+
+    public FluentMigratorCSharpMigrationOperationGenerator(
+        CSharpMigrationOperationGeneratorDependencies dependencies,
+        IOptions<FluentMigratorOptions> options)
         : base(dependencies)
     {
+        _options = options.Value;
     }
 
     private ICSharpHelper Code => Dependencies.CSharpHelper;
@@ -38,9 +28,21 @@ public class FluentMigratorCSharpMigrationOperationGenerator : CSharpMigrationOp
         GenerateCreateTable(operation, builder);
     }
 
+    private string TransformTableName(string name)
+    {
+        return _options.TableNameTransformer.Invoke(name);
+    }
+
+    private string TransformColumnName(string name)
+    {
+        return _options.ColumnNameTransformer.Invoke(name);
+    }
+
     public void GenerateCreateTable(CreateTableOperation operation, IndentedStringBuilder builder)
     {
-        builder.AppendLine($"Create.Table({Code.Literal(operation.Name)})");
+        var tableName = TransformTableName(operation.Name);
+
+        builder.AppendLine($"Create.Table({Code.Literal(tableName)})");
         using (builder.Indent())
         {
             foreach (var column in operation.Columns)
@@ -57,14 +59,15 @@ public class FluentMigratorCSharpMigrationOperationGenerator : CSharpMigrationOp
         {
             foreach (var foreignKey in operation.ForeignKeys)
             {
-                var columns = string.Join(", ", foreignKey.Columns.Select(c => Code.Literal(c)));
-                var principalColumns = string.Join(", ", (foreignKey.PrincipalColumns ?? []).Select(c => Code.Literal(c)));
+                var columns = string.Join(", ", foreignKey.Columns.Select(c => Code.Literal(TransformColumnName(c))));
+                var principalColumns = string.Join(", ", (foreignKey.PrincipalColumns ?? []).Select(c => Code.Literal(TransformColumnName(c))));
+                var principalTable = TransformTableName(foreignKey.PrincipalTable);
 
                 builder.AppendLine($"Create.ForeignKey({Code.Literal(foreignKey.Name)})");
                 using (builder.Indent())
                 {
-                    builder.AppendLine($".FromTable({Code.Literal(operation.Name)}).ForeignColumns({columns})");
-                    builder.AppendLine($".ToTable({Code.Literal(foreignKey.PrincipalTable)}).PrimaryColumns({principalColumns});");
+                    builder.AppendLine($".FromTable({Code.Literal(tableName)}).ForeignColumns({columns})");
+                    builder.AppendLine($".ToTable({Code.Literal(principalTable)}).PrimaryColumns({principalColumns});");
                 }
                 builder.AppendLine();
             }
@@ -78,7 +81,9 @@ public class FluentMigratorCSharpMigrationOperationGenerator : CSharpMigrationOp
 
     public void GenerateAddColumn(AddColumnOperation operation, IndentedStringBuilder builder)
     {
-        builder.AppendLine($"Alter.Table({Code.Literal(operation.Table)})");
+        var tableName = TransformTableName(operation.Name);
+
+        builder.AppendLine($"Alter.Table({Code.Literal(tableName)})");
         using (builder.Indent())
         {
             GenerateColumnDefinition(operation, builder, false);
@@ -93,7 +98,9 @@ public class FluentMigratorCSharpMigrationOperationGenerator : CSharpMigrationOp
 
     public void GenerateDropTable(DropTableOperation operation, IndentedStringBuilder builder)
     {
-        builder.AppendLine($"Delete.Table({Code.Literal(operation.Name)});");
+        var tableName = TransformTableName(operation.Name);
+
+        builder.AppendLine($"Delete.Table({Code.Literal(tableName)});");
     }
 
     protected override void Generate(DropColumnOperation operation, IndentedStringBuilder builder)
@@ -113,7 +120,9 @@ public class FluentMigratorCSharpMigrationOperationGenerator : CSharpMigrationOp
 
     public void GenerateAlterColumn(AlterColumnOperation operation, IndentedStringBuilder builder)
     {
-        builder.AppendLine($"Alter.Table({Code.Literal(operation.Table)})");
+        var tableName = TransformTableName(operation.Name);
+
+        builder.AppendLine($"Alter.Table({Code.Literal(tableName)})");
         using (builder.Indent())
         {
             GenerateAlterColumnDefinition(operation, builder);
@@ -147,12 +156,14 @@ public class FluentMigratorCSharpMigrationOperationGenerator : CSharpMigrationOp
 
     public void GenerateCreateIndex(CreateIndexOperation operation, IndentedStringBuilder builder)
     {
+        var tableName = TransformTableName(operation.Table);
+
         var columns = operation.Columns.Length == 1
-            ? Code.Literal(operation.Columns[0])
-            : $"new[] {{ {string.Join(", ", operation.Columns.Select(c => Code.Literal(c)))} }}";
+            ? Code.Literal(TransformColumnName(operation.Columns[0]))
+            : $"new[] {{ {string.Join(", ", operation.Columns.Select(c => Code.Literal(TransformColumnName(c))))} }}";
 
         builder.Append($"Create.Index({Code.Literal(operation.Name)})");
-        builder.Append($".OnTable({Code.Literal(operation.Table)}).OnColumn({columns})");
+        builder.Append($".OnTable({Code.Literal(tableName)}).OnColumn({columns})");
 
         if (operation.IsUnique)
         {
@@ -169,7 +180,15 @@ public class FluentMigratorCSharpMigrationOperationGenerator : CSharpMigrationOp
 
     public void GenerateDropIndex(DropIndexOperation operation, IndentedStringBuilder builder)
     {
-        builder.AppendLine($"Delete.Index({Code.Literal(operation.Name)}).OnTable({Code.Literal(operation.Table)});");
+        if (string.IsNullOrEmpty(operation.Table))
+        {
+            builder.AppendLine($"Delete.Index({Code.Literal(operation.Name)});");
+            return;
+        }
+
+        var tableName = TransformTableName(operation.Table);
+
+        builder.AppendLine($"Delete.Index({Code.Literal(operation.Name)}).OnTable({Code.Literal(tableName)});");
     }
 
     private void GenerateColumnDefinition(
@@ -178,9 +197,11 @@ public class FluentMigratorCSharpMigrationOperationGenerator : CSharpMigrationOp
         bool isPrimaryKey,
         bool isCreateTable = false)
     {
+        var columnName = TransformColumnName(column.Name);
+
         var line = isCreateTable ?
-            $".WithColumn({Code.Literal(column.Name)})" :
-            $".AddColumn({Code.Literal(column.Name)})";
+            $".WithColumn({Code.Literal(columnName)})" :
+            $".AddColumn({Code.Literal(columnName)})";
 
         line += $".As{GetFluentMigratorType(column.ClrType, column.ColumnType)}()";
 

@@ -1,5 +1,5 @@
 #region License
-// Copyright (c) 2024, Fluent Migrator Project
+// Copyright (c) 2026, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,13 +14,22 @@
 // limitations under the License.
 #endregion
 
-namespace FluentMigrator.EFCore.Example.DbContext;
+using System;
 
-public class User
+using Microsoft.Extensions.DependencyInjection;
+
+namespace FluentMigrator.EFCore;
+
+public static class FluentMigratorOptionsExtensions
 {
-    public int Id { get; set; }
-    public string Name { get; set; } = string.Empty;
-    public string Email { get; set; } = string.Empty;
-    public DateTime CreatedAt { get; set; }
-    public UserTypeEnum UserType { get; set; }
+    /// <summary>
+    /// Configure FluentMigrator code generation options
+    /// </summary>
+    public static IServiceCollection ConfigureFluentMigratorMigrationGenerator(
+        this IServiceCollection services,
+        Action<FluentMigratorOptions> configure)
+    {
+        services.Configure(configure);
+        return services;
+    }
 }

@@ -17,21 +17,29 @@
 using System;
 using System.Collections.Generic;
 
+using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations.Design;
 using Microsoft.EntityFrameworkCore.Migrations.Operations;
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.EFCore;
 
 public class FluentMigratorCSharpMigrationsGenerator : CSharpMigrationsGenerator
 {
+    private readonly FluentMigratorOptions _options;
+
     public FluentMigratorCSharpMigrationsGenerator(
         MigrationsCodeGeneratorDependencies dependencies,
-        CSharpMigrationsGeneratorDependencies csharpDependencies)
+        CSharpMigrationsGeneratorDependencies csharpDependencies,
+        IOptions<FluentMigratorOptions> options)
         : base(dependencies, csharpDependencies)
     {
+        _options = options.Value;
     }
+
+    private ICSharpHelper Code => CSharpDependencies.CSharpHelper;
 
     public override string GenerateMigration(
         string? migrationNamespace,
@@ -40,17 +48,35 @@ public class FluentMigratorCSharpMigrationsGenerator : CSharpMigrationsGenerator
         IReadOnlyList<MigrationOperation> downOperations)
     {
         var builder = new IndentedStringBuilder();
-        var timestamp = DateTime.UtcNow.ToString("yyyyMMddHHmmss");
+        var timestamp = _options.TimestampProvider(_options.TimestampFormat);
 
         builder.AppendLine("using FluentMigrator;");
+
+        // Additional usings from options
+        foreach (var additionalUsing in _options.AdditionalUsings)
+        {
+            builder.AppendLine($"using {additionalUsing};");
+        }
         builder.AppendLine();
+
         builder.AppendLine($"namespace {migrationNamespace}");
         builder.AppendLine("{");
 
         using (builder.Indent())
         {
             builder.AppendLine($"[Migration({timestamp})]");
-            builder.AppendLine($"public class {migrationName} : Migration");
+
+            // Add Tags attribute if specified
+            if (_options.DefaultTags.Count > 0)
+            {
+                foreach (var tagSet in _options.DefaultTags)
+                {
+                    var tagsArray = string.Join(", ", tagSet.ConvertAll(tag => Code.Literal(tag)));
+                    builder.AppendLine($"[Tags({tagsArray})]");
+                }
+            }
+
+            builder.AppendLine($"public class {migrationName} : {_options.BaseMigrationClass}");
             builder.AppendLine("{");
 
             using (builder.Indent())
