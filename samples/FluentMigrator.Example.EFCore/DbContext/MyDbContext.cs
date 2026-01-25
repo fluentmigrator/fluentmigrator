@@ -27,4 +27,19 @@ public class MyDbContext : Microsoft.EntityFrameworkCore.DbContext
     {
         optionsBuilder.UseSqlite("Data Source=mydatabase.db");
     }
+
+    /// <inheritdoc />
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Product>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Code).IsFixedLength();
+        });
+
+        modelBuilder.Entity<User>(entity =>
+        {
+            entity.Property(e => e.Name).UseCollation("SQL_Latin1_General_CP1_CI_AS");
+        });
+    }
 }

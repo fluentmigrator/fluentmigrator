@@ -203,7 +203,7 @@ public class FluentMigratorCSharpMigrationOperationGenerator : CSharpMigrationOp
             $".WithColumn({Code.Literal(columnName)})" :
             $".AddColumn({Code.Literal(columnName)})";
 
-        line += $".As{GetFluentMigratorType(column.ClrType, column.ColumnType)}()";
+        line += GetFluentMigratorType(column);
 
         if (column.IsNullable)
         {
@@ -224,16 +224,6 @@ public class FluentMigratorCSharpMigrationOperationGenerator : CSharpMigrationOp
             line += $".WithDefaultValue({Code.UnknownLiteral(column.DefaultValue)})";
         }
 
-        if (column.IsUnicode == false)
-        {
-            line += ".AsAnsiString()";
-        }
-
-        if (column.MaxLength.HasValue)
-        {
-            line += $".WithSize({column.MaxLength.Value})";
-        }
-
         builder.AppendLine(line);
     }
 
@@ -241,7 +231,7 @@ public class FluentMigratorCSharpMigrationOperationGenerator : CSharpMigrationOp
     {
         var line = $".AlterColumn({Code.Literal(column.Name)})";
 
-        line += $".As{GetFluentMigratorType(column.ClrType, column.ColumnType)}()";
+        line += GetFluentMigratorType(column);
 
         if (column.IsNullable)
         {
@@ -257,36 +247,112 @@ public class FluentMigratorCSharpMigrationOperationGenerator : CSharpMigrationOp
             line += $".WithDefaultValue({Code.UnknownLiteral(column.DefaultValue)})";
         }
 
-        if (column.IsUnicode == false)
-        {
-            line += ".AsAnsiString()";
-        }
-
-        if (column.MaxLength.HasValue)
-        {
-            line += $".WithSize({column.MaxLength.Value})";
-        }
-
         builder.AppendLine(line);
     }
 
-    private string GetFluentMigratorType(Type clrType, string? columnType)
+    protected string GetDecimalTypeOptions(ColumnOperation column)
     {
-        var underlyingType = Nullable.GetUnderlyingType(clrType) ?? clrType;
+        if (column.Precision.HasValue && column.Scale.HasValue)
+        {
+            return $"({column.Precision.Value}, {column.Scale.Value})";
+        }
 
-        if (underlyingType == typeof(int)) return "Int32";
-        if (underlyingType == typeof(long)) return "Int64";
-        if (underlyingType == typeof(short)) return "Int16";
-        if (underlyingType == typeof(byte)) return "Byte";
-        if (underlyingType == typeof(bool)) return "Boolean";
-        if (underlyingType == typeof(string)) return "String";
-        if (underlyingType == typeof(DateTime)) return "DateTime";
-        if (underlyingType == typeof(decimal)) return "Decimal";
-        if (underlyingType == typeof(double)) return "Double";
-        if (underlyingType == typeof(float)) return "Float";
-        if (underlyingType == typeof(Guid)) return "Guid";
-        if (underlyingType == typeof(byte[])) return "Binary";
+        if (column.Precision.HasValue)
+        {
+            return $"({column.Precision.Value})";
+        }
 
-        return "String"; // fallback
+        return string.Empty;
+    }
+
+    private string GetFluentMigratorType(ColumnOperation column)
+    {
+        var underlyingType = Nullable.GetUnderlyingType(column.ClrType) ?? column.ClrType;
+
+        if (underlyingType == typeof(int))
+        {
+            return ".AsInt32()";
+        }
+
+        if (underlyingType == typeof(long))
+        {
+            return ".AsInt64()";
+        }
+
+        if (underlyingType == typeof(short))
+        {
+            return ".AsInt16()";
+        }
+
+        if (underlyingType == typeof(byte))
+        {
+            return ".AsByte()";
+        }
+
+        if (underlyingType == typeof(bool))
+        {
+            return ".AsBoolean()";
+        }
+
+        if (underlyingType == typeof(string))
+        {
+            string options;
+            if (column.MaxLength.HasValue)
+            {
+                options = $"{(column.MaxLength.Value == int.MaxValue ? "int.MaxValue" : column.MaxLength)}";
+
+                if (column.Collation != null)
+                {
+                    options += $", {Code.Literal(column.Collation)}";
+                }
+            }
+            else
+            {
+                options = column.Collation != null ? Code.Literal(column.Collation) : string.Empty;
+            }
+
+            if (column.IsFixedLength == true)
+            {
+                return column.IsUnicode == false ?
+                    $".AsFixedLengthAnsiString({options})" :
+                    $".AsFixedLengthString({options})";
+            }
+
+            return column.IsUnicode == false ?
+                $".AsAnsiString({options})" :
+                $".AsString({options})";
+        }
+
+        if (underlyingType == typeof(DateTime))
+        {
+            return ".AsDateTime()";
+        }
+
+        if (underlyingType == typeof(decimal))
+        {
+            return $".AsDecimal({GetDecimalTypeOptions(column)})";
+        }
+
+        if (underlyingType == typeof(double))
+        {
+            return ".AsDouble()";
+        }
+
+        if (underlyingType == typeof(float))
+        {
+            return ".AsFloat()";
+        }
+
+        if (underlyingType == typeof(Guid))
+        {
+            return ".AsGuid()";
+        }
+
+        if (underlyingType == typeof(byte[]))
+        {
+            return ".AsBinary()";
+        }
+
+        return ".AsCustom(" + Code.Literal(column.ColumnType) + ")";
     }
 }

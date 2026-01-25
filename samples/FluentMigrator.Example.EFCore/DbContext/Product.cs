@@ -14,13 +14,39 @@
 // limitations under the License.
 #endregion
 
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+using Microsoft.EntityFrameworkCore;
+
 namespace FluentMigrator.EFCore.Example.DbContext;
 
+[Index(nameof(UniqueIdentifier), IsUnique = true)]
 public class Product
 {
     public int Id { get; set; }
+
+    [MaxLength(100)]
     public string Name { get; set; } = string.Empty;
+
+    [MaxLength(50)]
+    public string Login { get; set; } = string.Empty;
+
+    [StringLength(10)]
+    public string Code { get; set; }
+
+    [MaxLength(int.MaxValue)]
+    public string Description { get; set; } = string.Empty;
+
+    [Column("ProductPrice")]
     public decimal Price { get; set; }
+
     public int UserId { get; set; }
+
     public User User { get; set; } = null!;
+
+    public Guid UniqueIdentifier { get; set; }
+
+    [NotMapped]
+    public int StockQuantity { get; set; }
 }

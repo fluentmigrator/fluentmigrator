@@ -27,9 +27,16 @@ public class MyDesignTimeServices : IDesignTimeServices
         {
             options.BaseMigrationClass = nameof(MyBaseMigration);
             options.TableNameTransformer = name => name.ToUpperInvariant();
-            options.ColumnNameTransformer = name => ToSnakeCase(name);
+            options.ColumnNameTransformer = ToSnakeCase;
             options.TimestampProvider = (format) => DateTime.Now.ToString(format);
             options.TimestampFormat = "yyyy_MM_dd_HH_mm_ss";
+            options.DefaultTags = [
+                ["test"],
+                ["production", "staging"]
+            ];
+            options.AdditionalUsings = [
+                "System.Linq",
+            ];
             // ... etc
         });
     }
