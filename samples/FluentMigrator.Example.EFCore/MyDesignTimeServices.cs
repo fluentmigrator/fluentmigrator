@@ -26,9 +26,8 @@ public class MyDesignTimeServices : IDesignTimeServices
         services.ConfigureFluentMigratorMigrationGenerator(options =>
         {
             options.BaseMigrationClass = nameof(MyBaseMigration);
-            options.TableNameTransformer = name => name.ToUpperInvariant();
-            options.ColumnNameTransformer = ToSnakeCase;
-            options.TimestampProvider = (format) => DateTime.Now.ToString(format);
+            options.TableNameWriter = (csharpHelper, name) => csharpHelper.Literal(name.ToUpperInvariant());
+            options.TimestampProvider = format => DateTime.Now.ToString(format);
             options.TimestampFormat = "yyyy_MM_dd_HH_mm_ss";
             options.DefaultTags = [
                 ["test"],
@@ -39,33 +38,5 @@ public class MyDesignTimeServices : IDesignTimeServices
             ];
             // ... etc
         });
-    }
-
-    private string ToSnakeCase(string name)
-    {
-        if (string.IsNullOrEmpty(name))
-        {
-            return name;
-        }
-
-        var result = "";
-        for (var i = 0; i < name.Length; i++)
-        {
-            var c = name[i];
-            if (char.IsUpper(c))
-            {
-                if (i > 0)
-                {
-                    result += "_";
-                }
-
-                result += char.ToLower(c);
-            }
-            else
-            {
-                result += c;
-            }
-        }
-        return result;
     }
 }

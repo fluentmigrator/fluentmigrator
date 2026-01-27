@@ -37,7 +37,7 @@ public class MyDbContext : Microsoft.EntityFrameworkCore.DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseSqlite("Data Source=mydatabase.db");
+        optionsBuilder.UseNpgsql("Fakedb");
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

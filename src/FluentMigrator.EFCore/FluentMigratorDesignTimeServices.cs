@@ -26,5 +26,6 @@ public class FluentMigratorDesignTimeServices : IDesignTimeServices
     {
         services.AddSingleton<ICSharpMigrationOperationGenerator, FluentMigratorCSharpMigrationOperationGenerator>();
         services.AddSingleton<IMigrationsCodeGenerator, FluentMigratorCSharpMigrationsGenerator>();
+        services.AddSingleton<IMigrationsScaffolder, FluentMigratorMigrationsScaffolder>();
     }
 }

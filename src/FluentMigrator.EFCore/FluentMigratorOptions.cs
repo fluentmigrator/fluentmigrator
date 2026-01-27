@@ -17,6 +17,8 @@
 using System;
 using System.Collections.Generic;
 
+using Microsoft.EntityFrameworkCore.Design;
+
 namespace FluentMigrator.EFCore;
 
 public class FluentMigratorOptions
@@ -32,14 +34,9 @@ public class FluentMigratorOptions
     public List<string> AdditionalUsings { get; set; } = new();
 
     /// <summary>
-    /// Custom column name transformer
+    /// Custom table name writer
     /// </summary>
-    public Func<string, string> ColumnNameTransformer { get; set; } = name => name;
-
-    /// <summary>
-    /// Custom table name transformer
-    /// </summary>
-    public Func<string, string> TableNameTransformer { get; set; } = name => name;
+    public Func<ICSharpHelper, string, string> TableNameWriter { get; set; } = (csharpHelper, name) => csharpHelper.Literal(name);
 
     /// <summary>
     /// Whether to add [Tags] attribute to migrations

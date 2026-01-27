@@ -30,6 +30,7 @@ public static class FluentMigratorOptionsExtensions
         Action<FluentMigratorOptions> configure)
     {
         services.Configure(configure);
+
         return services;
     }
 }

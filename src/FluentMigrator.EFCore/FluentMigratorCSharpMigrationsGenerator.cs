@@ -165,37 +165,6 @@ public class FluentMigratorCSharpMigrationsGenerator : CSharpMigrationsGenerator
         string migrationId,
         IModel targetModel)
     {
-        // Designer files are optional - they're only used for advanced scenarios like:
-        // - Reverting to a specific migration point
-        // - Debugging model state at a specific migration
-        // For most workflows, the ModelSnapshot is sufficient
-
-        // Return empty to skip generating Designer files
-        // return string.Empty;
-
-        // Generate EF Core metadata with a different class name to avoid conflicts
-        var metadata = base.GenerateMetadata(migrationNamespace, contextType, migrationName, migrationId, targetModel);
-
-        // Replace the class name to avoid duplicate definition
-        metadata = metadata.Replace($"partial class {migrationName}", $"partial class {migrationName}Metadata");
-
-        // Remove the 'override' keyword since we're not inheriting from Migration anymore
-        metadata = metadata.Replace("protected override void BuildTargetModel", "protected void BuildTargetModel");
-
-        // Remove the Migration attribute - this is metadata only, not a FluentMigrator migration
-        // The attribute line looks like: [Migration("migrationId")]
-        var lines = metadata.Split([Environment.NewLine], StringSplitOptions.None);
-        var result = new System.Text.StringBuilder();
-
-        foreach (var line in lines)
-        {
-            // Skip lines that contain the Migration attribute
-            if (!line.Trim().StartsWith("[Migration("))
-            {
-                result.AppendLine(line);
-            }
-        }
-
-        return result.ToString();
+        return string.Empty;
     }
 }
