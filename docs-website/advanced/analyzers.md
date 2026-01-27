@@ -1,14 +1,16 @@
 # Analyzers
 
-::: info Available Since
-FluentMigrator 7.2.0
+::: warning Coming Soon
+The FluentMigrator.Analyzers package will be available with FluentMigrator 7.2.0 release. The feature is currently in the main branch and will be published to NuGet.org with the next release.
+
+To use the analyzers before the official release, you can build the package from source or use pre-release versions from the [Azure Artifacts feed](https://dev.azure.com/fluentmigrator/fluentmigrator/_packaging?_a=feed&feed=fluentmigrator).
 :::
 
 FluentMigrator provides Roslyn-based code analyzers to help catch common mistakes and enforce best practices at compile time. These analyzers are distributed as a separate NuGet package and integrate directly into your IDE and build process.
 
 ## Installation
 
-The analyzers are available as a NuGet package that can be added to your migration projects:
+Once released, the analyzers will be available as a NuGet package that can be added to your migration projects:
 
 ```bash
 dotnet add package FluentMigrator.Analyzers
