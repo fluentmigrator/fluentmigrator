@@ -243,7 +243,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         public void CanBuildMaskedWithRandomDateBetween()
         {
             var builder = new AnonSecurityLabelBuilder();
-            builder.MaskedWithRandomDateBetween("2020-01-01", "2025-12-31");
+            builder.MaskedWithRandomDateBetween("'2020-01-01'", "'2025-12-31'");
             var result = builder.Build();
 
             result.ShouldBe("MASKED WITH FUNCTION anon.random_date_between('2020-01-01', '2025-12-31')");

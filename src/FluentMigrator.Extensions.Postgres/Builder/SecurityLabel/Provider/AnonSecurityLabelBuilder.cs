@@ -16,6 +16,8 @@
 
 using System;
 
+using JetBrains.Annotations;
+
 namespace FluentMigrator.Builder.SecurityLabel.Provider;
 
 /// <summary>
@@ -26,6 +28,46 @@ public class AnonSecurityLabelBuilder : SecurityLabelSyntaxBuilderBase
 {
     /// <inheritdoc/>
     public override string ProviderName => "anon";
+
+    /// <summary>
+    /// Builds an array of SQL-formatted argument strings from the provided values.
+    /// </summary>
+    private static string[] BuildArgsArray(params object[] args)
+    {
+        if (args is null || args.Length == 0)
+        {
+            return [];
+        }
+
+        var argsArray = new string[args.Length];
+        for (var i = 0; i < args.Length; i++)
+        {
+            argsArray[i] = BuildSqlValue(args[i]);
+
+        }
+        return argsArray;
+    }
+
+    /// <summary>
+    /// Builds the SQL representation of a value for use in function calls.
+    /// </summary>
+    private static string BuildSqlValue(object value) => value switch
+    {
+        null => "NULL",
+        RawSql sql => sql.Value,
+        string str => str, // Strings are handled as-is to allow column names
+        char c => $"'{c}'",
+        bool b => b ? "TRUE" : "FALSE",
+        DateTime dt => BuildSqlValue(dt.ToString("yyyy-MM-dd HH:mm:ss")),
+        DateTimeOffset dto => BuildSqlValue(dto.ToString("yyyy-MM-dd HH:mm:ss zzz")),
+        int or long or short or byte or uint or ulong or ushort or sbyte or float or double or decimal => Convert.ToString(value, System.Globalization.CultureInfo.InvariantCulture),
+        _ => BuildSqlValue(value.ToString()),
+    };
+
+    /// <summary>
+    /// Escapes and formats a string for SQL usage.
+    /// </summary>
+    private static string MakeSqlString(string value) => $"'{value.Replace("'", "''")}'";
 
     /// <summary>
     /// Masks the column with a static value.
@@ -39,25 +81,42 @@ public class AnonSecurityLabelBuilder : SecurityLabelSyntaxBuilderBase
         {
             throw new ArgumentException("Value cannot be null or whitespace.", nameof(value));
         }
-        // Escape single quotes in the value
-        var escapedValue = value.Replace("'", "''");
-        RawLabel($"MASKED WITH VALUE '{escapedValue}'");
+
+        RawLabel($"MASKED WITH VALUE {MakeSqlString(value)}");
         return this;
     }
 
     /// <summary>
     /// Masks the column with a custom function call.
     /// </summary>
-    /// <param name="functionCall">The function call expression (e.g., "anon.my_function()").</param>
+    /// <param name="functionName">The function name, or call expression (e.g., "anon.my_function()").</param>
+    /// <param name="args">Function params, it no parenthesis is provided in functionName</param>
     /// <returns>The current builder instance for method chaining.</returns>
-    /// <exception cref="ArgumentException">Thrown when <paramref name="functionCall"/> is null or whitespace.</exception>
-    public AnonSecurityLabelBuilder MaskedWithFunction(string functionCall)
+    /// <exception cref="ArgumentException">Thrown when <paramref name="functionName"/> is null or whitespace.</exception>
+    public AnonSecurityLabelBuilder MaskedWithFunction([NotNull] string functionName, params object[] args)
     {
-        if (string.IsNullOrWhiteSpace(functionCall))
+        if (string.IsNullOrWhiteSpace(functionName))
         {
-            throw new ArgumentException("Function call cannot be null or whitespace.", nameof(functionCall));
+            throw new ArgumentException("Function name cannot be null or whitespace.", nameof(functionName));
         }
-        RawLabel($"MASKED WITH FUNCTION {functionCall}");
+
+        // If parentheses already present, use as-is; otherwise ensure parentheses.
+        if (functionName.IndexOf('(') >= 0)
+        {
+            RawLabel($"MASKED WITH FUNCTION {functionName}");
+            return this;
+        }
+
+        // No parameters
+        if (args is null || args.Length == 0)
+        {
+            RawLabel($"MASKED WITH FUNCTION {functionName}()");
+            return this;
+        }
+
+        // Build anon.<functionName>(args...)
+        var argsPart = "(" + string.Join(", ", BuildArgsArray(args)) + ")";
+        RawLabel($"MASKED WITH FUNCTION {functionName}{argsPart}");
         return this;
     }
 
@@ -67,8 +126,7 @@ public class AnonSecurityLabelBuilder : SecurityLabelSyntaxBuilderBase
     /// <returns>The current builder instance for method chaining.</returns>
     public AnonSecurityLabelBuilder MaskedWithFakeFirstName()
     {
-        RawLabel("MASKED WITH FUNCTION anon.fake_first_name()");
-        return this;
+        return MaskedWithFunction("anon.fake_first_name");
     }
 
     /// <summary>
@@ -77,8 +135,7 @@ public class AnonSecurityLabelBuilder : SecurityLabelSyntaxBuilderBase
     /// <returns>The current builder instance for method chaining.</returns>
     public AnonSecurityLabelBuilder MaskedWithFakeLastName()
     {
-        RawLabel("MASKED WITH FUNCTION anon.fake_last_name()");
-        return this;
+        return MaskedWithFunction("anon.fake_last_name");
     }
 
     /// <summary>
@@ -87,8 +144,7 @@ public class AnonSecurityLabelBuilder : SecurityLabelSyntaxBuilderBase
     /// <returns>The current builder instance for method chaining.</returns>
     public AnonSecurityLabelBuilder MaskedWithDummyLastName()
     {
-        RawLabel("MASKED WITH FUNCTION anon.dummy_last_name()");
-        return this;
+        return MaskedWithFunction("anon.dummy_last_name");
     }
 
     /// <summary>
@@ -97,24 +153,22 @@ public class AnonSecurityLabelBuilder : SecurityLabelSyntaxBuilderBase
     /// <returns>The current builder instance for method chaining.</returns>
     public AnonSecurityLabelBuilder MaskedWithFakeEmail()
     {
-        RawLabel("MASKED WITH FUNCTION anon.fake_email()");
-        return this;
+        return MaskedWithFunction("anon.fake_email");
     }
 
     /// <summary>
     /// Masks the column with a pseudo email based on another column.
     /// </summary>
-    /// <param name="usernameColumn">The column containing the username to base the pseudo email on.</param>
+    /// <param name="seed">The column containing the username to base the pseudo email on.</param>
     /// <returns>The current builder instance for method chaining.</returns>
-    /// <exception cref="ArgumentException">Thrown when <paramref name="usernameColumn"/> is null or whitespace.</exception>
-    public AnonSecurityLabelBuilder MaskedWithPseudoEmail(string usernameColumn)
+    /// <exception cref="ArgumentException">Thrown when <paramref name="seed"/> is null or whitespace.</exception>
+    public AnonSecurityLabelBuilder MaskedWithPseudoEmail(string seed)
     {
-        if (string.IsNullOrWhiteSpace(usernameColumn))
+        if (string.IsNullOrWhiteSpace(seed))
         {
-            throw new ArgumentException("Username column cannot be null or whitespace.", nameof(usernameColumn));
+            throw new ArgumentException("Username column cannot be null or whitespace.", nameof(seed));
         }
-        RawLabel($"MASKED WITH FUNCTION anon.pseudo_email({usernameColumn})");
-        return this;
+        return MaskedWithFunction("anon.pseudo_email", seed);
     }
 
     /// <summary>
@@ -123,8 +177,7 @@ public class AnonSecurityLabelBuilder : SecurityLabelSyntaxBuilderBase
     /// <returns>The current builder instance for method chaining.</returns>
     public AnonSecurityLabelBuilder MaskedWithFakeCompany()
     {
-        RawLabel("MASKED WITH FUNCTION anon.fake_company()");
-        return this;
+        return MaskedWithFunction("anon.fake_company");
     }
 
     /// <summary>
@@ -133,8 +186,7 @@ public class AnonSecurityLabelBuilder : SecurityLabelSyntaxBuilderBase
     /// <returns>The current builder instance for method chaining.</returns>
     public AnonSecurityLabelBuilder MaskedWithFakeCity()
     {
-        RawLabel("MASKED WITH FUNCTION anon.fake_city()");
-        return this;
+        return MaskedWithFunction("anon.fake_city");
     }
 
     /// <summary>
@@ -143,8 +195,7 @@ public class AnonSecurityLabelBuilder : SecurityLabelSyntaxBuilderBase
     /// <returns>The current builder instance for method chaining.</returns>
     public AnonSecurityLabelBuilder MaskedWithFakeCountry()
     {
-        RawLabel("MASKED WITH FUNCTION anon.fake_country()");
-        return this;
+        return MaskedWithFunction("anon.fake_country");
     }
 
     /// <summary>
@@ -153,8 +204,7 @@ public class AnonSecurityLabelBuilder : SecurityLabelSyntaxBuilderBase
     /// <returns>The current builder instance for method chaining.</returns>
     public AnonSecurityLabelBuilder MaskedWithFakeAddress()
     {
-        RawLabel("MASKED WITH FUNCTION anon.fake_address()");
-        return this;
+        return MaskedWithFunction("anon.fake_address");
     }
 
     /// <summary>
@@ -163,8 +213,7 @@ public class AnonSecurityLabelBuilder : SecurityLabelSyntaxBuilderBase
     /// <returns>The current builder instance for method chaining.</returns>
     public AnonSecurityLabelBuilder MaskedWithFakePhone()
     {
-        RawLabel("MASKED WITH FUNCTION anon.fake_phone()");
-        return this;
+        return MaskedWithFunction("anon.fake_phone");
     }
 
     /// <summary>
@@ -173,8 +222,7 @@ public class AnonSecurityLabelBuilder : SecurityLabelSyntaxBuilderBase
     /// <returns>The current builder instance for method chaining.</returns>
     public AnonSecurityLabelBuilder MaskedWithFakeIban()
     {
-        RawLabel("MASKED WITH FUNCTION anon.fake_iban()");
-        return this;
+        return MaskedWithFunction("anon.fake_iban");
     }
 
     /// <summary>
@@ -183,8 +231,7 @@ public class AnonSecurityLabelBuilder : SecurityLabelSyntaxBuilderBase
     /// <returns>The current builder instance for method chaining.</returns>
     public AnonSecurityLabelBuilder MaskedWithFakeSiret()
     {
-        RawLabel("MASKED WITH FUNCTION anon.fake_siret()");
-        return this;
+        return MaskedWithFunction("anon.fake_siret");
     }
 
     /// <summary>
@@ -193,8 +240,7 @@ public class AnonSecurityLabelBuilder : SecurityLabelSyntaxBuilderBase
     /// <returns>The current builder instance for method chaining.</returns>
     public AnonSecurityLabelBuilder MaskedWithFakeSiren()
     {
-        RawLabel("MASKED WITH FUNCTION anon.fake_siren()");
-        return this;
+        return MaskedWithFunction("anon.fake_siren");
     }
 
     /// <summary>
@@ -209,8 +255,7 @@ public class AnonSecurityLabelBuilder : SecurityLabelSyntaxBuilderBase
         {
             throw new ArgumentOutOfRangeException(nameof(length), "Length must be greater than 0.");
         }
-        RawLabel($"MASKED WITH FUNCTION anon.random_string({length})");
-        return this;
+        return MaskedWithFunction("anon.random_string", length);
     }
 
     /// <summary>
@@ -219,8 +264,7 @@ public class AnonSecurityLabelBuilder : SecurityLabelSyntaxBuilderBase
     /// <returns>The current builder instance for method chaining.</returns>
     public AnonSecurityLabelBuilder MaskedWithRandomInt()
     {
-        RawLabel("MASKED WITH FUNCTION anon.random_int()");
-        return this;
+        return MaskedWithFunction("anon.random_int");
     }
 
     /// <summary>
@@ -236,8 +280,7 @@ public class AnonSecurityLabelBuilder : SecurityLabelSyntaxBuilderBase
         {
             throw new ArgumentException("Min value cannot be greater than max value.", nameof(min));
         }
-        RawLabel($"MASKED WITH FUNCTION anon.random_int_between({min}, {max})");
-        return this;
+        return MaskedWithFunction("anon.random_int_between", min, max);
     }
 
     /// <summary>
@@ -246,8 +289,7 @@ public class AnonSecurityLabelBuilder : SecurityLabelSyntaxBuilderBase
     /// <returns>The current builder instance for method chaining.</returns>
     public AnonSecurityLabelBuilder MaskedWithRandomDate()
     {
-        RawLabel("MASKED WITH FUNCTION anon.random_date()");
-        return this;
+        return MaskedWithFunction("anon.random_date");
     }
 
     /// <summary>
@@ -267,8 +309,8 @@ public class AnonSecurityLabelBuilder : SecurityLabelSyntaxBuilderBase
         {
             throw new ArgumentException("End date cannot be null or whitespace.", nameof(endDate));
         }
-        RawLabel($"MASKED WITH FUNCTION anon.random_date_between('{startDate}', '{endDate}')");
-        return this;
+
+        return MaskedWithFunction("anon.random_date_between", startDate, endDate);
     }
 
     /// <summary>
@@ -289,8 +331,7 @@ public class AnonSecurityLabelBuilder : SecurityLabelSyntaxBuilderBase
         {
             throw new ArgumentOutOfRangeException(nameof(suffix), "Suffix cannot be negative.");
         }
-        RawLabel($"MASKED WITH FUNCTION anon.partial({prefix}, '{padding}', {suffix})");
-        return this;
+        return MaskedWithFunction("anon.partial", prefix, BuildSqlValue(padding), suffix);
     }
 
     /// <summary>
