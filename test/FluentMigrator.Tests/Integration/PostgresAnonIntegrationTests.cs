@@ -69,7 +69,6 @@ namespace FluentMigrator.Tests.Integration
 
                         // Validate using both pg_seclabels and anon.pg_masking_rules
                         ValidateMaskingRuleExists(processor, "SecureUsers", "email", "MASKED WITH FUNCTION anon.fake_email()");
-                        ValidateSecurityLabelExists(processor, "SecureUsers", "email", "MASKED WITH FUNCTION anon.fake_email()");
 
                         // Validate that the anonymization actually works
                         ValidateAnonymizationWorks(processor);
@@ -105,18 +104,10 @@ namespace FluentMigrator.Tests.Integration
 
                         runner.Up(new TestCreateTableWithMultipleSecurityLabels());
 
-                        // Validate email masking rule using both methods
+                        // Validate masking rules
                         ValidateMaskingRuleExists(processor, "CustomerData", "email", "MASKED WITH FUNCTION anon.fake_email()");
-                        ValidateSecurityLabelExists(processor, "CustomerData", "email", "MASKED WITH FUNCTION anon.fake_email()");
-
-                        // // Validate full_name masking rule using both methods
-                        // TODO FIXME
-                        // ValidateMaskingRuleExists(processor, "CustomerData", "full_name", "MASKED WITH VALUE 'CONFIDENTIAL'");
-                        // ValidateSecurityLabelExists(processor, "CustomerData", "full_name", "MASKED WITH VALUE 'CONFIDENTIAL'");
-
-                        // Validate phone masking rule using both methods
+                        ValidateMaskingRuleExists(processor, "CustomerData", "full_name", "MASKED WITH VALUE 'CONFIDENTIAL'");
                         ValidateMaskingRuleExists(processor, "CustomerData", "phone", "MASKED WITH FUNCTION anon.partial(phone, 2, '*', 2)");
-                        ValidateSecurityLabelExists(processor, "CustomerData", "phone", "MASKED WITH FUNCTION anon.partial(phone, 2, '*', 2)");
 
                         // Validate that the anonymization actually works
                         ValidateAnonymizationWorks(processor);
@@ -502,7 +493,6 @@ namespace FluentMigrator.Tests.Integration
 
                         // Validate using both pg_seclabels and anon.pg_masking_rules
                         ValidateMaskingRuleExists(processor, tableName, columnName, expectedLabel);
-                        ValidateSecurityLabelExists(processor, tableName, columnName, expectedLabel);
 
                         // Validate that the anonymization actually works by calling anonymize_database()
                         // This is the ultimate test - if the rule is invalid, this will throw an error
@@ -530,47 +520,13 @@ namespace FluentMigrator.Tests.Integration
         }
 
         /// <summary>
-        /// Validates that a masking rule exists in anon.pg_masking_rules.
-        /// This is the recommended way to check masking rules according to PostgreSQL Anonymizer documentation.
+        /// Validates that a masking rule exists in anon.pg_masking_rules and pg_seclabels.
         /// </summary>
         /// <param name="processor">The processor to query.</param>
         /// <param name="tableName">The table name to check.</param>
         /// <param name="columnName">The column name to check.</param>
         /// <param name="expectedLabel">The expected masking label.</param>
         private static void ValidateMaskingRuleExists(
-            ProcessorBase processor,
-            string tableName,
-            string columnName,
-            string expectedLabel)
-        {
-            // Remove the "MASKED WITH FUNCTION " and "MASKED WITH VALUE " prefix for comparison
-            expectedLabel = expectedLabel
-                .Replace("MASKED WITH FUNCTION ", string.Empty)
-                .Replace("MASKED WITH VALUE ", string.Empty);
-
-            DataSet allRules = processor.Read($@"
-                SELECT masking_function
-                FROM anon.pg_masking_rules
-                WHERE relname = '{tableName}'
-                  AND attname = '{columnName}';");
-
-            var results = allRules.Tables[0].Rows;
-            var dbRule = results[0].ItemArray[0].ToString();
-
-            dbRule.ShouldBe(
-                expectedLabel,
-                $"Expected masking rule '{expectedLabel}' on column '{tableName}.{columnName}' in anon.pg_masking_rules");
-        }
-
-        /// <summary>
-        /// Validates that a security label exists in pg_seclabels.
-        /// This is the traditional way to check security labels.
-        /// </summary>
-        /// <param name="processor">The processor to query.</param>
-        /// <param name="tableName">The table name to check.</param>
-        /// <param name="columnName">The column name to check.</param>
-        /// <param name="expectedLabel">The expected security label.</param>
-        private static void ValidateSecurityLabelExists(
             ProcessorBase processor,
             string tableName,
             string columnName,
@@ -586,6 +542,35 @@ namespace FluentMigrator.Tests.Integration
                   AND sl.label = '{expectedLabel.Replace("'", "''")}'");
 
             hasLabel.ShouldBeTrue($"Expected security label '{expectedLabel}' on column '{tableName}.{columnName}' in pg_seclabels");
+
+            var allRules = processor.Read($@"
+                SELECT masking_function, masking_value
+                FROM anon.pg_masking_rules
+                WHERE relname = '{tableName}'
+                  AND attname = '{columnName}';");
+
+            var result = allRules.Tables[0].Rows[0];
+
+            var dbMaskingFunction = result["masking_function"] as string;
+            var dbMaskingValue = result["masking_value"] as string;
+
+            if (expectedLabel.StartsWith("MASKED WITH FUNCTION "))
+            {
+                var expectedMaskingRule = expectedLabel.Replace("MASKED WITH FUNCTION ", string.Empty);
+
+                dbMaskingFunction.ShouldBe(
+                    expectedMaskingRule,
+                    $"Expected masking rule '{expectedMaskingRule}' on column '{tableName}.{columnName}' in anon.pg_masking_rules");
+            }
+            else if (expectedLabel.StartsWith("MASKED WITH VALUE "))
+            {
+                var expectedMaskingValue = expectedLabel.Replace("MASKED WITH VALUE ", string.Empty);
+
+                dbMaskingValue.ShouldBe(
+                    expectedMaskingValue,
+                    $"Expected masking value '{expectedMaskingValue}' on column '{tableName}.{columnName}' in anon.pg_masking_rules");
+            }
+
         }
 
         /// <summary>
