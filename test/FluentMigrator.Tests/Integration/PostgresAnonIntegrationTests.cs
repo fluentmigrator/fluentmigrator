@@ -468,6 +468,82 @@ namespace FluentMigrator.Tests.Integration
 
         #endregion
 
+        #region Extended Random Functions Tests
+
+        [Test]
+        [TestCaseSource(typeof(ProcessorTestCaseSourceOnly<PostgresProcessor>))]
+        public void CanApplyRandomDateMasking(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
+        {
+            ExecuteAnonTest(processorType, serverOptions,
+                new TestExtendedRandomFunctions(),
+                "TestData", "random_date", "MASKED WITH FUNCTION anon.random_date()");
+        }
+
+        [Test]
+        [TestCaseSource(typeof(ProcessorTestCaseSourceOnly<PostgresProcessor>))]
+        public void CanApplyRandomZipMasking(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
+        {
+            ExecuteAnonTest(processorType, serverOptions,
+                new TestExtendedRandomFunctions(),
+                "TestData", "zip_code", "MASKED WITH FUNCTION anon.random_zip()");
+        }
+
+        [Test]
+        [TestCaseSource(typeof(ProcessorTestCaseSourceOnly<PostgresProcessor>))]
+        public void CanApplyRandomPhoneMasking(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
+        {
+            ExecuteAnonTest(processorType, serverOptions,
+                new TestExtendedRandomFunctions(),
+                "TestData", "phone", "MASKED WITH FUNCTION anon.random_phone('01')");
+        }
+
+        [Test]
+        [TestCaseSource(typeof(ProcessorTestCaseSourceOnly<PostgresProcessor>))]
+        public void CanApplyRandomHashMasking(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
+        {
+            ExecuteAnonTest(processorType, serverOptions,
+                new TestExtendedRandomFunctions(),
+                "TestData", "hash_value", "MASKED WITH FUNCTION anon.random_hash(zip_code)");
+        }
+
+        [Test]
+        [TestCaseSource(typeof(ProcessorTestCaseSourceOnly<PostgresProcessor>))]
+        public void CanApplyRandomBigIntBetweenMasking(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
+        {
+            ExecuteAnonTest(processorType, serverOptions,
+                new TestExtendedRandomFunctions(),
+                "TestData", "big_number", "MASKED WITH FUNCTION anon.random_bigint_between(1000, 9999)");
+        }
+
+        [Test]
+        [TestCaseSource(typeof(ProcessorTestCaseSourceOnly<PostgresProcessor>))]
+        public void CanApplyRandomInArrayMasking(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
+        {
+            ExecuteAnonTest(processorType, serverOptions,
+                new TestExtendedRandomFunctions(),
+                "TestData", "priority", "MASKED WITH FUNCTION anon.random_in(ARRAY[1,2,3])");
+        }
+
+        [Test]
+        [TestCaseSource(typeof(ProcessorTestCaseSourceOnly<PostgresProcessor>))]
+        public void CanApplyRandomInEnumMasking(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
+        {
+            ExecuteAnonTest(processorType, serverOptions,
+                new TestExtendedRandomFunctions(),
+                "TestData", "status", "MASKED WITH FUNCTION anon.random_in_enum(status)");
+        }
+
+        [Test]
+        [TestCaseSource(typeof(ProcessorTestCaseSourceOnly<PostgresProcessor>))]
+        public void CanApplyRandomIdMasking(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
+        {
+            ExecuteAnonTest(processorType, serverOptions,
+                new TestExtendedRandomFunctions(),
+                "TestData", "unique_id", "MASKED WITH FUNCTION anon.random_id()");
+        }
+
+        #endregion
+
         #region Helper Methods
 
         /// <summary>
@@ -962,6 +1038,63 @@ namespace FluentMigrator.Tests.Integration
         public override void Down()
         {
             Delete.Table("TestData");
+        }
+    }
+
+    internal class TestExtendedRandomFunctions : Migration
+    {
+        public override void Up()
+        {
+            Execute.Sql("CREATE TYPE test_status AS ENUM ('pending', 'active', 'completed');");
+
+            Create.Table("TestData")
+                .WithColumn("id").AsInt32().NotNullable().PrimaryKey().Identity()
+                .WithColumn("random_date").AsDate().Nullable()
+                .WithColumn("zip_code").AsString(10).Nullable()
+                .WithColumn("phone").AsString(20).Nullable()
+                .WithColumn("hash_value").AsString(100).Nullable()
+                .WithColumn("big_number").AsInt64().Nullable()
+                .WithColumn("priority").AsInt32().Nullable()
+                .WithColumn("status").AsCustom("test_status").Nullable()
+                .WithColumn("unique_id").AsInt64().Nullable();
+
+            Create.SecurityLabel<AnonSecurityLabelBuilder>()
+                .OnColumn("random_date").OnTable("TestData")
+                .WithLabel(label => label.MaskedWithRandomDate());
+
+            Create.SecurityLabel<AnonSecurityLabelBuilder>()
+                .OnColumn("zip_code").OnTable("TestData")
+                .WithLabel(label => label.MaskedWithRandomZip());
+
+            Create.SecurityLabel<AnonSecurityLabelBuilder>()
+                .OnColumn("phone").OnTable("TestData")
+                .WithLabel(label => label.MaskedWithRandomPhone("'01'"));
+
+            Create.SecurityLabel<AnonSecurityLabelBuilder>()
+                .OnColumn("hash_value").OnTable("TestData")
+                .WithLabel(label => label.MaskedWithRandomHash("zip_code"));
+
+            Create.SecurityLabel<AnonSecurityLabelBuilder>()
+                .OnColumn("big_number").OnTable("TestData")
+                .WithLabel(label => label.MaskedWithRandomBigIntBetween(1000, 9999));
+
+            Create.SecurityLabel<AnonSecurityLabelBuilder>()
+                .OnColumn("priority").OnTable("TestData")
+                .WithLabel(label => label.MaskedWithRandomIn("ARRAY[1,2,3]"));
+
+            Create.SecurityLabel<AnonSecurityLabelBuilder>()
+                .OnColumn("status").OnTable("TestData")
+                .WithLabel(label => label.MaskedWithRandomInEnum("status"));
+
+            Create.SecurityLabel<AnonSecurityLabelBuilder>()
+                .OnColumn("unique_id").OnTable("TestData")
+                .WithLabel(label => label.MaskedWithRandomId());
+        }
+
+        public override void Down()
+        {
+            Delete.Table("TestData");
+            Execute.Sql("DROP TYPE IF EXISTS test_status;");
         }
     }
 

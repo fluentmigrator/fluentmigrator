@@ -988,5 +988,229 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
 
             result.ShouldBe("MASKED WITH FUNCTION anon.dummy_user_agent()");
         }
+
+        // ============ EXTENDED RANDOM FUNCTIONS ============
+        [Test]
+        public void CanBuildMaskedWithRandomDate()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithRandomDate();
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.random_date()");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithRandomZip()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithRandomZip();
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.random_zip()");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithRandomPhone()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithRandomPhone("'01'");
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.random_phone('01')");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithRandomHash()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithRandomHash("id");
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.random_hash(id)");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithRandomBigIntBetween()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithRandomBigIntBetween(1000L, 9999L);
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.random_bigint_between(1000, 9999)");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithRandomIn()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithRandomIn("ARRAY[1,2,3]");
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.random_in(ARRAY[1,2,3])");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithRandomInString()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithRandomIn("ARRAY['red','green','blue']");
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.random_in(ARRAY['red','green','blue'])");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithRandomInEnum()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithRandomInEnum("status");
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.random_in_enum(status)");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithRandomInInt4Range()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithRandomInInt4Range("'[5,6)'");
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.random_in_int4range('[5,6)')");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithRandomInInt8Range()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithRandomInInt8Range("'[100,200]'");
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.random_in_int8range('[100,200]')");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithRandomInNumRange()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithRandomInNumRange("'[0.1,0.9]'");
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.random_in_numrange('[0.1,0.9]')");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithRandomInDateRange()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithRandomInDateRange("'[2001-01-01, 2001-12-31)'");
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.random_in_daterange('[2001-01-01, 2001-12-31)')");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithRandomInTsRange()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithRandomInTsRange("'[2022-10-01,2022-10-31]'");
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.random_in_tsrange('[2022-10-01,2022-10-31]')");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithRandomInTstzRange()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithRandomInTstzRange("'[2022-10-01,2022-10-31]'");
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.random_in_tstzrange('[2022-10-01,2022-10-31]')");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithRandomId()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithRandomId();
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.random_id()");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithRandomIdInt()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithRandomIdInt();
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.random_id_int()");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithRandomIdSmallInt()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithRandomIdSmallInt();
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.random_id_small_int()");
+        }
+
+        [Test]
+        public void ThrowsWhenRandomPhonePrefixIsNull()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+
+            Should.Throw<ArgumentException>(() => builder.MaskedWithRandomPhone(null));
+        }
+
+        [Test]
+        public void ThrowsWhenRandomHashSeedIsNull()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+
+            Should.Throw<ArgumentException>(() => builder.MaskedWithRandomHash(null));
+        }
+
+        [Test]
+        public void ThrowsWhenRandomBigIntMinGreaterThanMax()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+
+            Should.Throw<ArgumentException>(() => builder.MaskedWithRandomBigIntBetween(1000L, 100L));
+        }
+
+        [Test]
+        public void ThrowsWhenRandomInArrayIsNull()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+
+            Should.Throw<ArgumentException>(() => builder.MaskedWithRandomIn(null));
+        }
+
+        [Test]
+        public void ThrowsWhenRandomInEnumColumnIsNull()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+
+            Should.Throw<ArgumentException>(() => builder.MaskedWithRandomInEnum(null));
+        }
+
+        [Test]
+        public void ThrowsWhenRandomInRangeIsNull()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+
+            Should.Throw<ArgumentException>(() => builder.MaskedWithRandomInInt4Range(null));
+            Should.Throw<ArgumentException>(() => builder.MaskedWithRandomInInt8Range(null));
+            Should.Throw<ArgumentException>(() => builder.MaskedWithRandomInNumRange(null));
+            Should.Throw<ArgumentException>(() => builder.MaskedWithRandomInDateRange(null));
+            Should.Throw<ArgumentException>(() => builder.MaskedWithRandomInTsRange(null));
+            Should.Throw<ArgumentException>(() => builder.MaskedWithRandomInTstzRange(null));
+        }
     }
 }
