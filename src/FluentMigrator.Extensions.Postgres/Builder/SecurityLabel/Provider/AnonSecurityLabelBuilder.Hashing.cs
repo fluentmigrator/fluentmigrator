@@ -31,9 +31,9 @@ public static class AnonHashAlgorithm
     public const string Md5 = "md5";
 
     /// <summary>
-    /// SHA1 hash algorithm.
+    /// SHA224 hash algorithm.
     /// </summary>
-    public const string Sha1 = "sha1";
+    public const string Sha224 = "sha224";
 
     /// <summary>
     /// SHA256 hash algorithm.
@@ -58,53 +58,45 @@ public static class AnonHashAlgorithm
 public partial class AnonSecurityLabelBuilder
 {
     /// <summary>
-    /// Masks the column with a hash digest using MD5 (default algorithm).
+    /// Masks the column with a hash digest
     /// </summary>
     /// <returns>The current builder instance for method chaining.</returns>
-    public AnonSecurityLabelBuilder MaskedWithHash()
+    public AnonSecurityLabelBuilder MaskedWithHash([NotNull] string value)
     {
-        return MaskedWithFunction("anon.hash");
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            throw new ArgumentException("Value cannot be null or whitespace.", nameof(value));
+        }
+
+        return MaskedWithFunction("anon.hash", value);
     }
 
     /// <summary>
     /// Masks the column with a hash digest using the specified algorithm.
     /// </summary>
+    /// <param name="value">The value to hash</param>
+    /// <param name="salt">The salt to use</param>
     /// <param name="algorithm">The hash algorithm to use (e.g., "md5", "sha256", "sha512"). Use constants from <see cref="AnonHashAlgorithm"/>.</param>
     /// <returns>The current builder instance for method chaining.</returns>
     /// <exception cref="ArgumentException">Thrown when <paramref name="algorithm"/> is null or whitespace.</exception>
-    public AnonSecurityLabelBuilder MaskedWithHash([NotNull] string algorithm)
+    public AnonSecurityLabelBuilder MaskedWithDigest([NotNull] string value, [NotNull] string salt, [NotNull] string algorithm)
     {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            throw new ArgumentException("Value cannot be null or whitespace.", nameof(value));
+        }
+
+        if (string.IsNullOrWhiteSpace(salt))
+        {
+            throw new ArgumentException("Salt cannot be null or whitespace.", nameof(salt));
+        }
+
         if (string.IsNullOrWhiteSpace(algorithm))
         {
             throw new ArgumentException("Algorithm cannot be null or whitespace.", nameof(algorithm));
         }
 
-        return MaskedWithFunction("anon.hash", algorithm);
-    }
-
-    /// <summary>
-    /// Masks the column with an HMAC hash using MD5 (default algorithm).
-    /// </summary>
-    /// <returns>The current builder instance for method chaining.</returns>
-    public AnonSecurityLabelBuilder MaskedWithHmacHash()
-    {
-        return MaskedWithFunction("anon.hmac_hash");
-    }
-
-    /// <summary>
-    /// Masks the column with an HMAC hash using the specified algorithm.
-    /// </summary>
-    /// <param name="algorithm">The hash algorithm to use (e.g., "md5", "sha256", "sha512"). Use constants from <see cref="AnonHashAlgorithm"/>.</param>
-    /// <returns>The current builder instance for method chaining.</returns>
-    /// <exception cref="ArgumentException">Thrown when <paramref name="algorithm"/> is null or whitespace.</exception>
-    public AnonSecurityLabelBuilder MaskedWithHmacHash([NotNull] string algorithm)
-    {
-        if (string.IsNullOrWhiteSpace(algorithm))
-        {
-            throw new ArgumentException("Algorithm cannot be null or whitespace.", nameof(algorithm));
-        }
-
-        return MaskedWithFunction("anon.hmac_hash", algorithm);
+        return MaskedWithFunction("anon.digest", value, salt, BuildSqlString(algorithm));
     }
 }
 

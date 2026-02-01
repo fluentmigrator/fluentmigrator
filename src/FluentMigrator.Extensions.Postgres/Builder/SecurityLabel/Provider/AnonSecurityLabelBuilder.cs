@@ -68,7 +68,7 @@ public partial class AnonSecurityLabelBuilder : SecurityLabelSyntaxBuilderBase
     /// <summary>
     /// Escapes and formats a string for SQL usage.
     /// </summary>
-    protected static string MakeSqlString(string value) => $"'{value.Replace("'", "''")}'";
+    protected static string BuildSqlString(string value) => $"'{value.Replace("'", "''")}'";
 
     /// <summary>
     /// Masks the column with a static value.
@@ -83,7 +83,7 @@ public partial class AnonSecurityLabelBuilder : SecurityLabelSyntaxBuilderBase
             throw new ArgumentException("Value cannot be null or whitespace.", nameof(value));
         }
 
-        RawLabel($"MASKED WITH VALUE {MakeSqlString(value)}");
+        RawLabel($"MASKED WITH VALUE {BuildSqlString(value)}");
         return this;
     }
 

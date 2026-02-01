@@ -208,16 +208,6 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
-        public void CanBuildMaskedWithFakePhone()
-        {
-            var builder = new AnonSecurityLabelBuilder();
-            builder.MaskedWithFakePhone();
-            var result = builder.Build();
-
-            result.ShouldBe("MASKED WITH FUNCTION anon.fake_phone()");
-        }
-
-        [Test]
         public void CanBuildMaskedWithFakeIban()
         {
             var builder = new AnonSecurityLabelBuilder();
@@ -235,16 +225,6 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             var result = builder.Build();
 
             result.ShouldBe("MASKED WITH FUNCTION anon.fake_siret()");
-        }
-
-        [Test]
-        public void CanBuildMaskedWithFakeSiren()
-        {
-            var builder = new AnonSecurityLabelBuilder();
-            builder.MaskedWithFakeSiren();
-            var result = builder.Build();
-
-            result.ShouldBe("MASKED WITH FUNCTION anon.fake_siren()");
         }
 
         // ============ DUMMY FUNCTIONS ============
@@ -265,7 +245,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             builder.MaskedWithDummyFirstName("fr_FR");
             var result = builder.Build();
 
-            result.ShouldBe("MASKED WITH FUNCTION anon.dummy_first_name(fr_FR)");
+            result.ShouldBe("MASKED WITH FUNCTION anon.dummy_first_name_locale('fr_FR')");
         }
 
         [Test]
@@ -275,37 +255,37 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             builder.MaskedWithDummyLastName("en_US");
             var result = builder.Build();
 
-            result.ShouldBe("MASKED WITH FUNCTION anon.dummy_last_name(en_US)");
+            result.ShouldBe("MASKED WITH FUNCTION anon.dummy_last_name_locale('en_US')");
         }
 
         [Test]
         public void CanBuildMaskedWithDummyEmail()
         {
             var builder = new AnonSecurityLabelBuilder();
-            builder.MaskedWithDummyEmail();
+            builder.MaskedWithDummyFreeEmail();
             var result = builder.Build();
 
-            result.ShouldBe("MASKED WITH FUNCTION anon.dummy_email()");
+            result.ShouldBe("MASKED WITH FUNCTION anon.dummy_free_email()");
         }
 
         [Test]
-        public void CanBuildMaskedWithDummyCompany()
+        public void CanBuildMaskedWithDummyCompanyName()
         {
             var builder = new AnonSecurityLabelBuilder();
-            builder.MaskedWithDummyCompany();
+            builder.MaskedWithDummyCompanyName();
             var result = builder.Build();
 
-            result.ShouldBe("MASKED WITH FUNCTION anon.dummy_company()");
+            result.ShouldBe("MASKED WITH FUNCTION anon.dummy_company_name()");
         }
 
         [Test]
-        public void CanBuildMaskedWithDummyCompanyWithLocale()
+        public void CanBuildMaskedWithDummyCompanyNameWithLocale()
         {
             var builder = new AnonSecurityLabelBuilder();
-            builder.MaskedWithDummyCompany("de_DE");
+            builder.MaskedWithDummyCompanyName("de_DE");
             var result = builder.Build();
 
-            result.ShouldBe("MASKED WITH FUNCTION anon.dummy_company(de_DE)");
+            result.ShouldBe("MASKED WITH FUNCTION anon.dummy_company_name_locale('de_DE')");
         }
 
         [Test]
@@ -325,7 +305,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             builder.MaskedWithDummyAddress("es_ES");
             var result = builder.Build();
 
-            result.ShouldBe("MASKED WITH FUNCTION anon.dummy_address(es_ES)");
+            result.ShouldBe("MASKED WITH FUNCTION anon.dummy_address_locale('es_ES')");
         }
 
         [Test]
@@ -345,7 +325,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             builder.MaskedWithDummyCity("it_IT");
             var result = builder.Build();
 
-            result.ShouldBe("MASKED WITH FUNCTION anon.dummy_city(it_IT)");
+            result.ShouldBe("MASKED WITH FUNCTION anon.dummy_city_locale('it_IT')");
         }
 
         [Test]
@@ -365,17 +345,17 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             builder.MaskedWithDummyCountry("pt_PT");
             var result = builder.Build();
 
-            result.ShouldBe("MASKED WITH FUNCTION anon.dummy_country(pt_PT)");
+            result.ShouldBe("MASKED WITH FUNCTION anon.dummy_country_locale('pt_PT')");
         }
 
         [Test]
         public void CanBuildMaskedWithDummyPhone()
         {
             var builder = new AnonSecurityLabelBuilder();
-            builder.MaskedWithDummyPhone();
+            builder.MaskedWithDummyPhoneNumber();
             var result = builder.Build();
 
-            result.ShouldBe("MASKED WITH FUNCTION anon.dummy_phone()");
+            result.ShouldBe("MASKED WITH FUNCTION anon.dummy_phone_number()");
         }
 
         [Test]
@@ -538,16 +518,6 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
-        public void CanBuildMaskedWithPseudoPhone()
-        {
-            var builder = new AnonSecurityLabelBuilder();
-            builder.MaskedWithPseudoPhone("id");
-            var result = builder.Build();
-
-            result.ShouldBe("MASKED WITH FUNCTION anon.pseudo_phone(id)");
-        }
-
-        [Test]
         public void CanBuildMaskedWithPseudoIban()
         {
             var builder = new AnonSecurityLabelBuilder();
@@ -598,50 +568,30 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         public void CanBuildMaskedWithHash()
         {
             var builder = new AnonSecurityLabelBuilder();
-            builder.MaskedWithHash();
+            builder.MaskedWithHash("foo");
             var result = builder.Build();
 
-            result.ShouldBe("MASKED WITH FUNCTION anon.hash()");
+            result.ShouldBe("MASKED WITH FUNCTION anon.hash(foo)");
         }
 
         [Test]
         public void CanBuildMaskedWithHashWithAlgorithm()
         {
             var builder = new AnonSecurityLabelBuilder();
-            builder.MaskedWithHash("sha256");
+            builder.MaskedWithDigest("foo", "'bar'", "sha256");
             var result = builder.Build();
 
-            result.ShouldBe("MASKED WITH FUNCTION anon.hash(sha256)");
+            result.ShouldBe("MASKED WITH FUNCTION anon.digest(foo, 'bar', 'sha256')");
         }
 
         [Test]
         public void CanBuildMaskedWithHashWithSha512()
         {
             var builder = new AnonSecurityLabelBuilder();
-            builder.MaskedWithHash(AnonHashAlgorithm.Sha512);
+            builder.MaskedWithDigest("foo", "'bar'", AnonHashAlgorithm.Sha512);
             var result = builder.Build();
 
-            result.ShouldBe("MASKED WITH FUNCTION anon.hash(sha512)");
-        }
-
-        [Test]
-        public void CanBuildMaskedWithHmacHash()
-        {
-            var builder = new AnonSecurityLabelBuilder();
-            builder.MaskedWithHmacHash();
-            var result = builder.Build();
-
-            result.ShouldBe("MASKED WITH FUNCTION anon.hmac_hash()");
-        }
-
-        [Test]
-        public void CanBuildMaskedWithHmacHashWithAlgorithm()
-        {
-            var builder = new AnonSecurityLabelBuilder();
-            builder.MaskedWithHmacHash("sha1");
-            var result = builder.Build();
-
-            result.ShouldBe("MASKED WITH FUNCTION anon.hmac_hash(sha1)");
+            result.ShouldBe("MASKED WITH FUNCTION anon.digest(foo, 'bar', 'sha512')");
         }
 
         [Test]
@@ -662,23 +612,23 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
 
         // ============ NOISE FUNCTIONS ============
         [Test]
-        public void CanBuildMaskedWithAddNoiseToInt()
+        public void CanBuildMaskedWithAddNumericNoise()
         {
             var builder = new AnonSecurityLabelBuilder();
-            builder.MaskedWithAddNoiseToInt(0.5);
+            builder.MaskedWithNoise("foo", 0.5);
             var result = builder.Build();
 
-            result.ShouldBe("MASKED WITH FUNCTION anon.add_noise_to_int(0.5)");
+            result.ShouldBe("MASKED WITH FUNCTION anon.noise(foo, 0.5)");
         }
 
         [Test]
-        public void CanBuildMaskedWithAddNoiseToNumeric()
+        public void CanBuildMaskedWithDateNoise()
         {
             var builder = new AnonSecurityLabelBuilder();
-            builder.MaskedWithAddNoiseToNumeric(0.3);
+            builder.MaskedWithDateNoise("foo", "2 days");
             var result = builder.Build();
 
-            result.ShouldBe("MASKED WITH FUNCTION anon.add_noise_to_numeric(0.3)");
+            result.ShouldBe("MASKED WITH FUNCTION anon.dnoise(foo, '2 days')");
         }
 
         [Test]
@@ -686,7 +636,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         {
             var builder = new AnonSecurityLabelBuilder();
 
-            Should.Throw<ArgumentOutOfRangeException>(() => builder.MaskedWithAddNoiseToInt(0));
+            Should.Throw<ArgumentOutOfRangeException>(() => builder.MaskedWithNoise("foo", 0));
         }
 
         [Test]
@@ -694,38 +644,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         {
             var builder = new AnonSecurityLabelBuilder();
 
-            Should.Throw<ArgumentOutOfRangeException>(() => builder.MaskedWithAddNoiseToNumeric(-0.5));
-        }
-
-        // ============ GENERALIZE FUNCTIONS ============
-        [Test]
-        public void CanBuildMaskedWithGeneralizeIban()
-        {
-            var builder = new AnonSecurityLabelBuilder();
-            builder.MaskedWithGeneralizeIban();
-            var result = builder.Build();
-
-            result.ShouldBe("MASKED WITH FUNCTION anon.generalize_iban()");
-        }
-
-        [Test]
-        public void CanBuildMaskedWithGeneralizePhoneNumber()
-        {
-            var builder = new AnonSecurityLabelBuilder();
-            builder.MaskedWithGeneralizePhoneNumber();
-            var result = builder.Build();
-
-            result.ShouldBe("MASKED WITH FUNCTION anon.generalize_phone_number()");
-        }
-
-        [Test]
-        public void CanBuildMaskedWithGeneralizeEmail()
-        {
-            var builder = new AnonSecurityLabelBuilder();
-            builder.MaskedWithGeneralizeEmail();
-            var result = builder.Build();
-
-            result.ShouldBe("MASKED WITH FUNCTION anon.generalize_email()");
+            Should.Throw<ArgumentOutOfRangeException>(() => builder.MaskedWithNoise("foo", -0.5));
         }
 
         // ============ RANDOM FUNCTIONS ============
@@ -750,16 +669,6 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
-        public void CanBuildMaskedWithRandomIntDefault()
-        {
-            var builder = new AnonSecurityLabelBuilder();
-            builder.MaskedWithRandomInt();
-            var result = builder.Build();
-
-            result.ShouldBe("MASKED WITH FUNCTION anon.random_int()");
-        }
-
-        [Test]
         public void CanBuildMaskedWithRandomIntBetween()
         {
             var builder = new AnonSecurityLabelBuilder();
@@ -767,16 +676,6 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             var result = builder.Build();
 
             result.ShouldBe("MASKED WITH FUNCTION anon.random_int_between(10, 100)");
-        }
-
-        [Test]
-        public void CanBuildMaskedWithRandomDateDefault()
-        {
-            var builder = new AnonSecurityLabelBuilder();
-            builder.MaskedWithRandomDate();
-            var result = builder.Build();
-
-            result.ShouldBe("MASKED WITH FUNCTION anon.random_date()");
         }
 
         [Test]
@@ -834,10 +733,10 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         public void CanBuildMaskedWithPartialScrambling()
         {
             var builder = new AnonSecurityLabelBuilder();
-            builder.MaskedWithPartialScrambling(2, '*', 2);
+            builder.MaskedWithPartialScrambling("foo", 2, '*', 2);
             var result = builder.Build();
 
-            result.ShouldBe("MASKED WITH FUNCTION anon.partial(2, '*', 2)");
+            result.ShouldBe("MASKED WITH FUNCTION anon.partial(foo, 2, '*', 2)");
         }
 
         [Test]
@@ -845,7 +744,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         {
             var builder = new AnonSecurityLabelBuilder();
 
-            Should.Throw<ArgumentOutOfRangeException>(() => builder.MaskedWithPartialScrambling(-1, '*', 2));
+            Should.Throw<ArgumentOutOfRangeException>(() => builder.MaskedWithPartialScrambling("foo", -1, '*', 2));
         }
 
         [Test]
@@ -853,7 +752,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         {
             var builder = new AnonSecurityLabelBuilder();
 
-            Should.Throw<ArgumentOutOfRangeException>(() => builder.MaskedWithPartialScrambling(2, '*', -1));
+            Should.Throw<ArgumentOutOfRangeException>(() => builder.MaskedWithPartialScrambling("foo", 2, '*', -1));
         }
     }
 }

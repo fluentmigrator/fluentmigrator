@@ -205,22 +205,6 @@ public partial class AnonSecurityLabelBuilder
     }
 
     /// <summary>
-    /// Masks the column with a pseudo-random phone number based on a seed column.
-    /// </summary>
-    /// <param name="seed">The column name to use as seed for reproducible generation.</param>
-    /// <returns>The current builder instance for method chaining.</returns>
-    /// <exception cref="ArgumentException">Thrown when <paramref name="seed"/> is null or whitespace.</exception>
-    public AnonSecurityLabelBuilder MaskedWithPseudoPhone([NotNull] string seed)
-    {
-        if (string.IsNullOrWhiteSpace(seed))
-        {
-            throw new ArgumentException("Seed column cannot be null or whitespace.", nameof(seed));
-        }
-
-        return MaskedWithFunction("anon.pseudo_phone", seed);
-    }
-
-    /// <summary>
     /// Masks the column with a pseudo-random IBAN based on a seed column.
     /// </summary>
     /// <param name="seed">The column name to use as seed for reproducible generation.</param>

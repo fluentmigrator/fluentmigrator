@@ -43,15 +43,6 @@ public partial class AnonSecurityLabelBuilder
     }
 
     /// <summary>
-    /// Masks the column with a random integer.
-    /// </summary>
-    /// <returns>The current builder instance for method chaining.</returns>
-    public AnonSecurityLabelBuilder MaskedWithRandomInt()
-    {
-        return MaskedWithFunction("anon.random_int");
-    }
-
-    /// <summary>
     /// Masks the column with a random integer within the specified range (inclusive).
     /// </summary>
     /// <param name="min">The minimum value (inclusive).</param>
@@ -66,15 +57,6 @@ public partial class AnonSecurityLabelBuilder
         }
 
         return MaskedWithFunction("anon.random_int_between", min, max);
-    }
-
-    /// <summary>
-    /// Masks the column with a random date.
-    /// </summary>
-    /// <returns>The current builder instance for method chaining.</returns>
-    public AnonSecurityLabelBuilder MaskedWithRandomDate()
-    {
-        return MaskedWithFunction("anon.random_date");
     }
 
     /// <summary>

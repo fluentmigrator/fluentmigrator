@@ -86,15 +86,6 @@ public partial class AnonSecurityLabelBuilder
     }
 
     /// <summary>
-    /// Masks the column with a fake phone number.
-    /// </summary>
-    /// <returns>The current builder instance for method chaining.</returns>
-    public AnonSecurityLabelBuilder MaskedWithFakePhone()
-    {
-        return MaskedWithFunction("anon.fake_phone");
-    }
-
-    /// <summary>
     /// Masks the column with a fake IBAN (International Bank Account Number).
     /// </summary>
     /// <returns>The current builder instance for method chaining.</returns>
@@ -110,15 +101,6 @@ public partial class AnonSecurityLabelBuilder
     public AnonSecurityLabelBuilder MaskedWithFakeSiret()
     {
         return MaskedWithFunction("anon.fake_siret");
-    }
-
-    /// <summary>
-    /// Masks the column with a fake SIREN number (French business identifier).
-    /// </summary>
-    /// <returns>The current builder instance for method chaining.</returns>
-    public AnonSecurityLabelBuilder MaskedWithFakeSiren()
-    {
-        return MaskedWithFunction("anon.fake_siren");
     }
 }
 

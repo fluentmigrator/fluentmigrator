@@ -25,15 +25,21 @@ namespace FluentMigrator.Builder.SecurityLabel.Provider;
 public partial class AnonSecurityLabelBuilder
 {
     /// <summary>
-    /// Masks the column with a dummy first name.
+    /// Masks the column with a specified function and optional locale.
     /// </summary>
+    /// <param name="functionName">The PG Anonymizer dummy function name</param>
     /// <param name="locale">Optional locale code (e.g., "en_US", "fr_FR"). If null, uses default locale.</param>
     /// <returns>The current builder instance for method chaining.</returns>
-    public AnonSecurityLabelBuilder MaskedWithDummyFirstName(string locale = null)
+    private AnonSecurityLabelBuilder MaskedWithLocale(string functionName, string locale)
     {
+        if (string.IsNullOrWhiteSpace(functionName))
+        {
+            throw new ArgumentException("Function name cannot be null or whitespace.", nameof(functionName));
+        }
+
         if (locale is null)
         {
-            return MaskedWithFunction("anon.dummy_first_name");
+            return MaskedWithFunction(functionName);
         }
 
         if (string.IsNullOrWhiteSpace(locale))
@@ -41,7 +47,17 @@ public partial class AnonSecurityLabelBuilder
             throw new ArgumentException("Locale cannot be null or whitespace.", nameof(locale));
         }
 
-        return MaskedWithFunction("anon.dummy_first_name", locale);
+        return MaskedWithFunction(functionName + "_locale", BuildSqlString(locale));
+    }
+
+    /// <summary>
+    /// Masks the column with a dummy first name.
+    /// </summary>
+    /// <param name="locale">Optional locale code (e.g., "en_US", "fr_FR"). If null, uses default locale.</param>
+    /// <returns>The current builder instance for method chaining.</returns>
+    public AnonSecurityLabelBuilder MaskedWithDummyFirstName(string locale = null)
+    {
+        return MaskedWithLocale("anon.dummy_first_name", locale);
     }
 
     /// <summary>
@@ -51,26 +67,17 @@ public partial class AnonSecurityLabelBuilder
     /// <returns>The current builder instance for method chaining.</returns>
     public AnonSecurityLabelBuilder MaskedWithDummyLastName(string locale = null)
     {
-        if (locale is null)
-        {
-            return MaskedWithFunction("anon.dummy_last_name");
-        }
-
-        if (string.IsNullOrWhiteSpace(locale))
-        {
-            throw new ArgumentException("Locale cannot be null or whitespace.", nameof(locale));
-        }
-
-        return MaskedWithFunction("anon.dummy_last_name", locale);
+        return MaskedWithLocale("anon.dummy_last_name", locale);
     }
 
     /// <summary>
     /// Masks the column with a dummy email address.
     /// </summary>
+    /// <param name="locale">Optional locale code (e.g., "en_US", "fr_FR"). If null, uses default locale.</param>
     /// <returns>The current builder instance for method chaining.</returns>
-    public AnonSecurityLabelBuilder MaskedWithDummyEmail()
+    public AnonSecurityLabelBuilder MaskedWithDummyFreeEmail(string locale = null)
     {
-        return MaskedWithFunction("anon.dummy_email");
+        return MaskedWithLocale("anon.dummy_free_email", locale);
     }
 
     /// <summary>
@@ -78,19 +85,9 @@ public partial class AnonSecurityLabelBuilder
     /// </summary>
     /// <param name="locale">Optional locale code (e.g., "en_US", "fr_FR"). If null, uses default locale.</param>
     /// <returns>The current builder instance for method chaining.</returns>
-    public AnonSecurityLabelBuilder MaskedWithDummyCompany(string locale = null)
+    public AnonSecurityLabelBuilder MaskedWithDummyCompanyName(string locale = null)
     {
-        if (locale is null)
-        {
-            return MaskedWithFunction("anon.dummy_company");
-        }
-
-        if (string.IsNullOrWhiteSpace(locale))
-        {
-            throw new ArgumentException("Locale cannot be null or whitespace.", nameof(locale));
-        }
-
-        return MaskedWithFunction("anon.dummy_company", locale);
+        return MaskedWithLocale("anon.dummy_company_name", locale);
     }
 
     /// <summary>
@@ -100,17 +97,7 @@ public partial class AnonSecurityLabelBuilder
     /// <returns>The current builder instance for method chaining.</returns>
     public AnonSecurityLabelBuilder MaskedWithDummyAddress(string locale = null)
     {
-        if (locale is null)
-        {
-            return MaskedWithFunction("anon.dummy_address");
-        }
-
-        if (string.IsNullOrWhiteSpace(locale))
-        {
-            throw new ArgumentException("Locale cannot be null or whitespace.", nameof(locale));
-        }
-
-        return MaskedWithFunction("anon.dummy_address", locale);
+        return MaskedWithLocale("anon.dummy_address", locale);
     }
 
     /// <summary>
@@ -120,17 +107,7 @@ public partial class AnonSecurityLabelBuilder
     /// <returns>The current builder instance for method chaining.</returns>
     public AnonSecurityLabelBuilder MaskedWithDummyCity(string locale = null)
     {
-        if (locale is null)
-        {
-            return MaskedWithFunction("anon.dummy_city");
-        }
-
-        if (string.IsNullOrWhiteSpace(locale))
-        {
-            throw new ArgumentException("Locale cannot be null or whitespace.", nameof(locale));
-        }
-
-        return MaskedWithFunction("anon.dummy_city", locale);
+        return MaskedWithLocale("anon.dummy_city", locale);
     }
 
     /// <summary>
@@ -140,26 +117,17 @@ public partial class AnonSecurityLabelBuilder
     /// <returns>The current builder instance for method chaining.</returns>
     public AnonSecurityLabelBuilder MaskedWithDummyCountry(string locale = null)
     {
-        if (locale is null)
-        {
-            return MaskedWithFunction("anon.dummy_country");
-        }
-
-        if (string.IsNullOrWhiteSpace(locale))
-        {
-            throw new ArgumentException("Locale cannot be null or whitespace.", nameof(locale));
-        }
-
-        return MaskedWithFunction("anon.dummy_country", locale);
+        return MaskedWithLocale("anon.dummy_country", locale);
     }
 
     /// <summary>
     /// Masks the column with a dummy phone number.
     /// </summary>
+    /// <param name="locale">Optional locale code (e.g., "en_US", "fr_FR"). If null, uses default locale.</param>
     /// <returns>The current builder instance for method chaining.</returns>
-    public AnonSecurityLabelBuilder MaskedWithDummyPhone()
+    public AnonSecurityLabelBuilder MaskedWithDummyPhoneNumber(string locale = null)
     {
-        return MaskedWithFunction("anon.dummy_phone");
+        return MaskedWithLocale("anon.dummy_phone_number", locale);
     }
 
     /// <summary>

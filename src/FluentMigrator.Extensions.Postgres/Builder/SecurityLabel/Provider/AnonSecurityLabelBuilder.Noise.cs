@@ -27,33 +27,44 @@ public partial class AnonSecurityLabelBuilder
     /// <summary>
     /// Masks an integer column by adding random noise based on the specified ratio.
     /// </summary>
+    /// <param name="originalValue">Original value</param>
     /// <param name="noiseRatio">The noise ratio as a decimal (e.g., 0.5 for 50% noise). Must be positive.</param>
     /// <returns>The current builder instance for method chaining.</returns>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="noiseRatio"/> is negative or zero.</exception>
-    public AnonSecurityLabelBuilder MaskedWithAddNoiseToInt(double noiseRatio)
+    public AnonSecurityLabelBuilder MaskedWithNoise(string originalValue, double noiseRatio)
     {
+        if (string.IsNullOrWhiteSpace(originalValue))
+        {
+            throw new ArgumentException("Original value cannot be null or whitespace.", nameof(originalValue));
+        }
+
         if (noiseRatio <= 0)
         {
             throw new ArgumentOutOfRangeException(nameof(noiseRatio), "Noise ratio must be positive.");
         }
 
-        return MaskedWithFunction("anon.add_noise_to_int", noiseRatio);
+        return MaskedWithFunction("anon.noise", originalValue, noiseRatio);
     }
 
     /// <summary>
-    /// Masks a numeric column by adding random noise based on the specified ratio.
+    /// Masks an datetime column by adding random noise based on the specified ratio.
     /// </summary>
-    /// <param name="noiseRatio">The noise ratio as a decimal (e.g., 0.5 for 50% noise). Must be positive.</param>
+    /// <param name="originalValue">Original value</param>
+    /// <param name="interval">The interval string representing the noise ratio (e.g., '1 day', '2 hours').</param>
     /// <returns>The current builder instance for method chaining.</returns>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="noiseRatio"/> is negative or zero.</exception>
-    public AnonSecurityLabelBuilder MaskedWithAddNoiseToNumeric(double noiseRatio)
+    public AnonSecurityLabelBuilder MaskedWithDateNoise(string originalValue, string interval)
     {
-        if (noiseRatio <= 0)
+        if (string.IsNullOrWhiteSpace(originalValue))
         {
-            throw new ArgumentOutOfRangeException(nameof(noiseRatio), "Noise ratio must be positive.");
+            throw new ArgumentException("Original value cannot be null or whitespace.", nameof(originalValue));
         }
 
-        return MaskedWithFunction("anon.add_noise_to_numeric", noiseRatio);
+        if (string.IsNullOrWhiteSpace(interval))
+        {
+            throw new ArgumentException("Interval cannot be null or whitespace.", nameof(interval));
+        }
+
+        return MaskedWithFunction("anon.dnoise", originalValue, BuildSqlString(interval));
     }
 }
 

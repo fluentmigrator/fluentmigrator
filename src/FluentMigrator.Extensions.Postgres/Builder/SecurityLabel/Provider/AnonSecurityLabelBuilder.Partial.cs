@@ -16,6 +16,8 @@
 
 using System;
 
+using JetBrains.Annotations;
+
 namespace FluentMigrator.Builder.SecurityLabel.Provider;
 
 /// <summary>
@@ -27,13 +29,19 @@ public partial class AnonSecurityLabelBuilder
     /// <summary>
     /// Masks the column with partial scrambling, preserving a prefix and suffix.
     /// </summary>
+    /// <param name="value">Value to scramble</param>
     /// <param name="prefixLength">The number of characters to preserve at the beginning.</param>
     /// <param name="paddingCharacter">The padding character to use for the scrambled portion.</param>
     /// <param name="suffixLength">The number of characters to preserve at the end.</param>
     /// <returns>The current builder instance for method chaining.</returns>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="prefixLength"/> or <paramref name="suffixLength"/> is negative.</exception>
-    public AnonSecurityLabelBuilder MaskedWithPartialScrambling(int prefixLength, char paddingCharacter, int suffixLength)
+    public AnonSecurityLabelBuilder MaskedWithPartialScrambling([NotNull] string value, int prefixLength, char paddingCharacter, int suffixLength)
     {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            throw new ArgumentException("Value cannot be null or whitespace.", nameof(value));
+        }
+
         if (prefixLength < 0)
         {
             throw new ArgumentOutOfRangeException(nameof(prefixLength), "Prefix length cannot be negative.");
@@ -44,7 +52,7 @@ public partial class AnonSecurityLabelBuilder
             throw new ArgumentOutOfRangeException(nameof(suffixLength), "Suffix length cannot be negative.");
         }
 
-        return MaskedWithFunction("anon.partial", prefixLength, BuildSqlValue(paddingCharacter), suffixLength);
+        return MaskedWithFunction("anon.partial", value, prefixLength, BuildSqlValue(paddingCharacter), suffixLength);
     }
 }
 
