@@ -110,6 +110,64 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
+        public void CanBuildMasked()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.Masked();
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED");
+        }
+
+        [Test]
+        public void ThrowsWhenBuildCalledWithoutConfiguration()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+
+            Should.Throw<InvalidOperationException>(() => builder.Build());
+        }
+
+        [Test]
+        public void ThrowsWhenMaskedWithValueIsNull()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+
+            Should.Throw<ArgumentException>(() => builder.MaskedWithValue(null));
+        }
+
+        [Test]
+        public void ThrowsWhenMaskedWithValueIsEmpty()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+
+            Should.Throw<ArgumentException>(() => builder.MaskedWithValue(""));
+        }
+
+        [Test]
+        public void ThrowsWhenMaskedWithFunctionIsNull()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+
+            Should.Throw<ArgumentException>(() => builder.MaskedWithFunction(null));
+        }
+
+        [Test]
+        public void ThrowsWhenMaskedWithPseudoEmailColumnIsNull()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+
+            Should.Throw<ArgumentException>(() => builder.MaskedWithPseudoEmail(null));
+        }
+
+        [Test]
+        public void ProviderNameIsAnon()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.ProviderName.ShouldBe("anon");
+        }
+
+        // ============ FAKE FUNCTIONS ============
+        [Test]
         public void CanBuildMaskedWithFakeCompany()
         {
             var builder = new AnonSecurityLabelBuilder();
@@ -189,6 +247,488 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("MASKED WITH FUNCTION anon.fake_siren()");
         }
 
+        // ============ DUMMY FUNCTIONS ============
+        [Test]
+        public void CanBuildMaskedWithDummyFirstName()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithDummyFirstName();
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.dummy_first_name()");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithDummyFirstNameWithLocale()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithDummyFirstName("fr_FR");
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.dummy_first_name(fr_FR)");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithDummyLastNameWithLocale()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithDummyLastName("en_US");
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.dummy_last_name(en_US)");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithDummyEmail()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithDummyEmail();
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.dummy_email()");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithDummyCompany()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithDummyCompany();
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.dummy_company()");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithDummyCompanyWithLocale()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithDummyCompany("de_DE");
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.dummy_company(de_DE)");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithDummyAddress()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithDummyAddress();
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.dummy_address()");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithDummyAddressWithLocale()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithDummyAddress("es_ES");
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.dummy_address(es_ES)");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithDummyCity()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithDummyCity();
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.dummy_city()");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithDummyCityWithLocale()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithDummyCity("it_IT");
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.dummy_city(it_IT)");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithDummyCountry()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithDummyCountry();
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.dummy_country()");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithDummyCountryWithLocale()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithDummyCountry("pt_PT");
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.dummy_country(pt_PT)");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithDummyPhone()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithDummyPhone();
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.dummy_phone()");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithDummyIban()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithDummyIban();
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.dummy_iban()");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithDummySiret()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithDummySiret();
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.dummy_siret()");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithDummySiren()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithDummySiren();
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.dummy_siren()");
+        }
+
+        [Test]
+        public void ThrowsWhenDummyFirstNameLocaleIsEmpty()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+
+            Should.Throw<ArgumentException>(() => builder.MaskedWithDummyFirstName(""));
+        }
+
+        // ============ PSEUDO FUNCTIONS ============
+        [Test]
+        public void CanBuildMaskedWithPseudoFirstName()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithPseudoFirstName("id");
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.pseudo_first_name(id)");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithPseudoFirstNameWithLocale()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithPseudoFirstName("id", "fr_FR");
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.pseudo_first_name(id, fr_FR)");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithPseudoLastName()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithPseudoLastName("id");
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.pseudo_last_name(id)");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithPseudoLastNameWithLocale()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithPseudoLastName("id", "en_US");
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.pseudo_last_name(id, en_US)");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithPseudoCompany()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithPseudoCompany("id");
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.pseudo_company(id)");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithPseudoCompanyWithLocale()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithPseudoCompany("id", "de_DE");
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.pseudo_company(id, de_DE)");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithPseudoAddress()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithPseudoAddress("id");
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.pseudo_address(id)");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithPseudoAddressWithLocale()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithPseudoAddress("id", "es_ES");
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.pseudo_address(id, es_ES)");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithPseudoCity()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithPseudoCity("id");
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.pseudo_city(id)");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithPseudoCityWithLocale()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithPseudoCity("id", "it_IT");
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.pseudo_city(id, it_IT)");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithPseudoCountry()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithPseudoCountry("id");
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.pseudo_country(id)");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithPseudoCountryWithLocale()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithPseudoCountry("id", "pt_PT");
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.pseudo_country(id, pt_PT)");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithPseudoPhone()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithPseudoPhone("id");
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.pseudo_phone(id)");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithPseudoIban()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithPseudoIban("id");
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.pseudo_iban(id)");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithPseudoSiret()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithPseudoSiret("id");
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.pseudo_siret(id)");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithPseudoSiren()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithPseudoSiren("id");
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.pseudo_siren(id)");
+        }
+
+        [Test]
+        public void ThrowsWhenPseudoFirstNameSeedIsNull()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+
+            Should.Throw<ArgumentException>(() => builder.MaskedWithPseudoFirstName(null));
+        }
+
+        [Test]
+        public void ThrowsWhenPseudoFirstNameSeedIsEmpty()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+
+            Should.Throw<ArgumentException>(() => builder.MaskedWithPseudoFirstName(""));
+        }
+
+        // ============ HASHING FUNCTIONS ============
+        [Test]
+        public void CanBuildMaskedWithHash()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithHash();
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.hash()");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithHashWithAlgorithm()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithHash("sha256");
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.hash(sha256)");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithHashWithSha512()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithHash(AnonHashAlgorithm.Sha512);
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.hash(sha512)");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithHmacHash()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithHmacHash();
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.hmac_hash()");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithHmacHashWithAlgorithm()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithHmacHash("sha1");
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.hmac_hash(sha1)");
+        }
+
+        [Test]
+        public void ThrowsWhenHashAlgorithmIsNull()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+
+            Should.Throw<ArgumentException>(() => builder.MaskedWithHash(null));
+        }
+
+        [Test]
+        public void ThrowsWhenHashAlgorithmIsEmpty()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+
+            Should.Throw<ArgumentException>(() => builder.MaskedWithHash(""));
+        }
+
+        // ============ NOISE FUNCTIONS ============
+        [Test]
+        public void CanBuildMaskedWithAddNoiseToInt()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithAddNoiseToInt(0.5);
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.add_noise_to_int(0.5)");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithAddNoiseToNumeric()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithAddNoiseToNumeric(0.3);
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.add_noise_to_numeric(0.3)");
+        }
+
+        [Test]
+        public void ThrowsWhenNoiseRatioIsZero()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+
+            Should.Throw<ArgumentOutOfRangeException>(() => builder.MaskedWithAddNoiseToInt(0));
+        }
+
+        [Test]
+        public void ThrowsWhenNoiseRatioIsNegative()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+
+            Should.Throw<ArgumentOutOfRangeException>(() => builder.MaskedWithAddNoiseToNumeric(-0.5));
+        }
+
+        // ============ GENERALIZE FUNCTIONS ============
+        [Test]
+        public void CanBuildMaskedWithGeneralizeIban()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithGeneralizeIban();
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.generalize_iban()");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithGeneralizePhoneNumber()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithGeneralizePhoneNumber();
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.generalize_phone_number()");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithGeneralizeEmail()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithGeneralizeEmail();
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.generalize_email()");
+        }
+
+        // ============ RANDOM FUNCTIONS ============
         [Test]
         public void CanBuildMaskedWithRandomStringDefault()
         {
@@ -220,10 +760,10 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
-        public void CanBuildMaskedWithRandomIntWithRange()
+        public void CanBuildMaskedWithRandomIntBetween()
         {
             var builder = new AnonSecurityLabelBuilder();
-            builder.MaskedWithRandomInt(10, 100);
+            builder.MaskedWithRandomIntBetween(10, 100);
             var result = builder.Build();
 
             result.ShouldBe("MASKED WITH FUNCTION anon.random_int_between(10, 100)");
@@ -250,66 +790,6 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
-        public void CanBuildMaskedWithPartialScrambling()
-        {
-            var builder = new AnonSecurityLabelBuilder();
-            builder.MaskedWithPartialScrambling(2, '*', 2);
-            var result = builder.Build();
-
-            result.ShouldBe("MASKED WITH FUNCTION anon.partial(2, '*', 2)");
-        }
-
-        [Test]
-        public void CanBuildMasked()
-        {
-            var builder = new AnonSecurityLabelBuilder();
-            builder.Masked();
-            var result = builder.Build();
-
-            result.ShouldBe("MASKED");
-        }
-
-        [Test]
-        public void ThrowsWhenBuildCalledWithoutConfiguration()
-        {
-            var builder = new AnonSecurityLabelBuilder();
-
-            Should.Throw<InvalidOperationException>(() => builder.Build());
-        }
-
-        [Test]
-        public void ThrowsWhenMaskedWithValueIsNull()
-        {
-            var builder = new AnonSecurityLabelBuilder();
-
-            Should.Throw<ArgumentException>(() => builder.MaskedWithValue(null));
-        }
-
-        [Test]
-        public void ThrowsWhenMaskedWithValueIsEmpty()
-        {
-            var builder = new AnonSecurityLabelBuilder();
-
-            Should.Throw<ArgumentException>(() => builder.MaskedWithValue(""));
-        }
-
-        [Test]
-        public void ThrowsWhenMaskedWithFunctionIsNull()
-        {
-            var builder = new AnonSecurityLabelBuilder();
-
-            Should.Throw<ArgumentException>(() => builder.MaskedWithFunction(null));
-        }
-
-        [Test]
-        public void ThrowsWhenMaskedWithPseudoEmailColumnIsNull()
-        {
-            var builder = new AnonSecurityLabelBuilder();
-
-            Should.Throw<ArgumentException>(() => builder.MaskedWithPseudoEmail(null));
-        }
-
-        [Test]
         public void ThrowsWhenRandomStringLengthIsZero()
         {
             var builder = new AnonSecurityLabelBuilder();
@@ -330,7 +810,34 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         {
             var builder = new AnonSecurityLabelBuilder();
 
-            Should.Throw<ArgumentException>(() => builder.MaskedWithRandomInt(100, 10));
+            Should.Throw<ArgumentException>(() => builder.MaskedWithRandomIntBetween(100, 10));
+        }
+
+        [Test]
+        public void ThrowsWhenRandomDateStartIsNull()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+
+            Should.Throw<ArgumentException>(() => builder.MaskedWithRandomDateBetween(null, "'2025-12-31'"));
+        }
+
+        [Test]
+        public void ThrowsWhenRandomDateEndIsNull()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+
+            Should.Throw<ArgumentException>(() => builder.MaskedWithRandomDateBetween("'2020-01-01'", null));
+        }
+
+        // ============ PARTIAL FUNCTIONS ============
+        [Test]
+        public void CanBuildMaskedWithPartialScrambling()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithPartialScrambling(2, '*', 2);
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.partial(2, '*', 2)");
         }
 
         [Test]
@@ -347,13 +854,6 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             var builder = new AnonSecurityLabelBuilder();
 
             Should.Throw<ArgumentOutOfRangeException>(() => builder.MaskedWithPartialScrambling(2, '*', -1));
-        }
-
-        [Test]
-        public void ProviderNameIsAnon()
-        {
-            var builder = new AnonSecurityLabelBuilder();
-            builder.ProviderName.ShouldBe("anon");
         }
     }
 }
