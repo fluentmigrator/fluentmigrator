@@ -831,5 +831,162 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
 
             Should.Throw<ArgumentException>(() => builder.MaskedWithLoremIpsum(paragraphs: 3, words: 20, characters: "50"));
         }
+
+        // ============ EXTENDED DUMMY FUNCTIONS ============
+        [Test]
+        public void CanBuildMaskedWithDummyBic()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithDummyBic();
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.dummy_bic()");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithDummyCreditCardNumber()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithDummyCreditCardNumber();
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.dummy_credit_card_number()");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithDummyIpv4()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithDummyIpv4();
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.dummy_ipv4()");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithDummyIpv6()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithDummyIpv6();
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.dummy_ipv6()");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithDummyMacAddress()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithDummyMacAddress();
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.dummy_mac_address()");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithDummyUuidv4()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithDummyUuidv4();
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.dummy_uuidv4()");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithDummyName()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithDummyName();
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.dummy_name()");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithDummyNameWithLocale()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithDummyName("fr_FR");
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.dummy_name_locale('fr_FR')");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithDummyWords()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithDummyWords(3, 7);
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.dummy_words('[3,7]')");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithDummyWordsWithLocale()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithDummyWords(2, 5, "en_US");
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.dummy_words_locale('[2,5]', 'en_US')");
+        }
+
+        [Test]
+        public void ThrowsWhenDummyWordsMinIsLessThanOne()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+
+            Should.Throw<ArgumentOutOfRangeException>(() => builder.MaskedWithDummyWords(0, 5));
+        }
+
+        [Test]
+        public void ThrowsWhenDummyWordsMaxIsLessThanMin()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+
+            Should.Throw<ArgumentException>(() => builder.MaskedWithDummyWords(5, 3));
+        }
+
+        [Test]
+        public void CanBuildMaskedWithDummyLatitude()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithDummyLatitude();
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.dummy_latitude()");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithDummyLongitude()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithDummyLongitude();
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.dummy_longitude()");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithDummyHexColor()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithDummyHexColor();
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.dummy_hex_color()");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithDummyUserAgent()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithDummyUserAgent();
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.dummy_user_agent()");
+        }
     }
 }
