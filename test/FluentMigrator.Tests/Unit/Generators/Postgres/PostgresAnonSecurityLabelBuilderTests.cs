@@ -227,6 +227,16 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("MASKED WITH FUNCTION anon.fake_siret()");
         }
 
+        [Test]
+        public void CanBuildMaskedWithFakePostcode()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithFakePostcode();
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.fake_postcode()");
+        }
+
         // ============ DUMMY FUNCTIONS ============
         [Test]
         public void CanBuildMaskedWithDummyFirstName()
@@ -753,6 +763,73 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             var builder = new AnonSecurityLabelBuilder();
 
             Should.Throw<ArgumentOutOfRangeException>(() => builder.MaskedWithPartialScrambling("foo", 2, '*', -1));
+        }
+
+        // ============ LOREM IPSUM FUNCTIONS ============
+        [Test]
+        public void CanBuildMaskedWithLoremIpsumDefaultParagraphs()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithLoremIpsum();
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.lorem_ipsum( paragraphs := 5 )");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithLoremIpsumWithParagraphs()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithLoremIpsum(paragraphs: 3);
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.lorem_ipsum( paragraphs := 3 )");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithLoremIpsumWithWords()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithLoremIpsum(words: 20);
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.lorem_ipsum( words := 20 )");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithLoremIpsumWithCharacters()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithLoremIpsum(characters: "50");
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.lorem_ipsum( characters := 50 )");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithLoremIpsumWithCharactersFromColumn()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithLoremIpsum(characters: "anon.length(table.column)");
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.lorem_ipsum( characters := anon.length(table.column) )");
+        }
+
+        [Test]
+        public void ThrowsWhenLoremIpsumHasMultipleParameters()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+
+            Should.Throw<ArgumentException>(() => builder.MaskedWithLoremIpsum(paragraphs: 3, words: 20));
+        }
+
+        [Test]
+        public void ThrowsWhenLoremIpsumHasAllParameters()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+
+            Should.Throw<ArgumentException>(() => builder.MaskedWithLoremIpsum(paragraphs: 3, words: 20, characters: "50"));
         }
     }
 }

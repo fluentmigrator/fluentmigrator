@@ -14,6 +14,8 @@
 // limitations under the License.
 #endregion
 
+using System;
+
 namespace FluentMigrator.Builder.SecurityLabel.Provider;
 
 /// <summary>
@@ -101,6 +103,15 @@ public partial class AnonSecurityLabelBuilder
     public AnonSecurityLabelBuilder MaskedWithFakeSiret()
     {
         return MaskedWithFunction("anon.fake_siret");
+    }
+
+    /// <summary>
+    /// Masks the column with a fake postcode.
+    /// </summary>
+    /// <returns>The current builder instance for method chaining.</returns>
+    public AnonSecurityLabelBuilder MaskedWithFakePostcode()
+    {
+        return MaskedWithFunction("anon.fake_postcode");
     }
 }
 

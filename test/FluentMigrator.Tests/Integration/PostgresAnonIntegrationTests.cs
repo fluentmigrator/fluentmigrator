@@ -455,6 +455,19 @@ namespace FluentMigrator.Tests.Integration
 
         #endregion
 
+        #region Lorem Ipsum Functions Tests
+
+        [Test]
+        [TestCaseSource(typeof(ProcessorTestCaseSourceOnly<PostgresProcessor>))]
+        public void CanApplyLoremIpsumMasking(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
+        {
+            ExecuteAnonTest(processorType, serverOptions,
+                new TestLoremIpsumFunctions(),
+                "TestData", "description", "MASKED WITH FUNCTION anon.lorem_ipsum( paragraphs := 3 )");
+        }
+
+        #endregion
+
         #region Helper Methods
 
         /// <summary>
@@ -709,7 +722,8 @@ namespace FluentMigrator.Tests.Integration
                 .WithColumn("address").AsString(500).Nullable()
                 .WithColumn("phone").AsString(50).Nullable()
                 .WithColumn("iban").AsString(50).Nullable()
-                .WithColumn("siret").AsString(50).Nullable();
+                .WithColumn("siret").AsString(50).Nullable()
+                .WithColumn("postcode").AsString(10).Nullable();
 
             Create.SecurityLabel<AnonSecurityLabelBuilder>()
                 .OnColumn("first_name").OnTable("TestData")
@@ -746,6 +760,10 @@ namespace FluentMigrator.Tests.Integration
             Create.SecurityLabel<AnonSecurityLabelBuilder>()
                 .OnColumn("siret").OnTable("TestData")
                 .WithLabel(label => label.MaskedWithFakeSiret());
+
+            Create.SecurityLabel<AnonSecurityLabelBuilder>()
+                .OnColumn("postcode").OnTable("TestData")
+                .WithLabel(label => label.MaskedWithFakePostcode());
         }
 
         public override void Down()
@@ -928,8 +946,25 @@ namespace FluentMigrator.Tests.Integration
         }
     }
 
+    internal class TestLoremIpsumFunctions : Migration
+    {
+        public override void Up()
+        {
+            Create.Table("TestData")
+                .WithColumn("id").AsInt32().NotNullable().PrimaryKey().Identity()
+                .WithColumn("description").AsString(1000).Nullable();
+
+            Create.SecurityLabel<AnonSecurityLabelBuilder>()
+                .OnColumn("description").OnTable("TestData")
+                .WithLabel(label => label.MaskedWithLoremIpsum(paragraphs: 3));
+        }
+
+        public override void Down()
+        {
+            Delete.Table("TestData");
+        }
+    }
+
     #endregion
 }
-
-
 
