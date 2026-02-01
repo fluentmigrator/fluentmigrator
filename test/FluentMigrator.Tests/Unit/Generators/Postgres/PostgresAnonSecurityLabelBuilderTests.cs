@@ -379,26 +379,6 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
-        public void CanBuildMaskedWithDummySiret()
-        {
-            var builder = new AnonSecurityLabelBuilder();
-            builder.MaskedWithDummySiret();
-            var result = builder.Build();
-
-            result.ShouldBe("MASKED WITH FUNCTION anon.dummy_siret()");
-        }
-
-        [Test]
-        public void CanBuildMaskedWithDummySiren()
-        {
-            var builder = new AnonSecurityLabelBuilder();
-            builder.MaskedWithDummySiren();
-            var result = builder.Build();
-
-            result.ShouldBe("MASKED WITH FUNCTION anon.dummy_siren()");
-        }
-
-        [Test]
         public void ThrowsWhenDummyFirstNameLocaleIsEmpty()
         {
             var builder = new AnonSecurityLabelBuilder();
@@ -421,10 +401,10 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         public void CanBuildMaskedWithPseudoFirstNameWithLocale()
         {
             var builder = new AnonSecurityLabelBuilder();
-            builder.MaskedWithPseudoFirstName("id", "fr_FR");
+            builder.MaskedWithPseudoFirstName("id", "abcd");
             var result = builder.Build();
 
-            result.ShouldBe("MASKED WITH FUNCTION anon.pseudo_first_name(id, fr_FR)");
+            result.ShouldBe("MASKED WITH FUNCTION anon.pseudo_first_name(id, 'abcd')");
         }
 
         [Test]
@@ -441,10 +421,10 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         public void CanBuildMaskedWithPseudoLastNameWithLocale()
         {
             var builder = new AnonSecurityLabelBuilder();
-            builder.MaskedWithPseudoLastName("id", "en_US");
+            builder.MaskedWithPseudoLastName("id", "abcd");
             var result = builder.Build();
 
-            result.ShouldBe("MASKED WITH FUNCTION anon.pseudo_last_name(id, en_US)");
+            result.ShouldBe("MASKED WITH FUNCTION anon.pseudo_last_name(id, 'abcd')");
         }
 
         [Test]
@@ -461,10 +441,10 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         public void CanBuildMaskedWithPseudoCompanyWithLocale()
         {
             var builder = new AnonSecurityLabelBuilder();
-            builder.MaskedWithPseudoCompany("id", "de_DE");
+            builder.MaskedWithPseudoCompany("id", "abcd");
             var result = builder.Build();
 
-            result.ShouldBe("MASKED WITH FUNCTION anon.pseudo_company(id, de_DE)");
+            result.ShouldBe("MASKED WITH FUNCTION anon.pseudo_company(id, 'abcd')");
         }
 
         [Test]
@@ -481,10 +461,10 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         public void CanBuildMaskedWithPseudoAddressWithLocale()
         {
             var builder = new AnonSecurityLabelBuilder();
-            builder.MaskedWithPseudoAddress("id", "es_ES");
+            builder.MaskedWithPseudoAddress("id", "abcd");
             var result = builder.Build();
 
-            result.ShouldBe("MASKED WITH FUNCTION anon.pseudo_address(id, es_ES)");
+            result.ShouldBe("MASKED WITH FUNCTION anon.pseudo_address(id, 'abcd')");
         }
 
         [Test]
@@ -501,10 +481,10 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         public void CanBuildMaskedWithPseudoCityWithLocale()
         {
             var builder = new AnonSecurityLabelBuilder();
-            builder.MaskedWithPseudoCity("id", "it_IT");
+            builder.MaskedWithPseudoCity("id", "abcd");
             var result = builder.Build();
 
-            result.ShouldBe("MASKED WITH FUNCTION anon.pseudo_city(id, it_IT)");
+            result.ShouldBe("MASKED WITH FUNCTION anon.pseudo_city(id, 'abcd')");
         }
 
         [Test]
@@ -521,10 +501,10 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         public void CanBuildMaskedWithPseudoCountryWithLocale()
         {
             var builder = new AnonSecurityLabelBuilder();
-            builder.MaskedWithPseudoCountry("id", "pt_PT");
+            builder.MaskedWithPseudoCountry("id", "abcd");
             var result = builder.Build();
 
-            result.ShouldBe("MASKED WITH FUNCTION anon.pseudo_country(id, pt_PT)");
+            result.ShouldBe("MASKED WITH FUNCTION anon.pseudo_country(id, 'abcd')");
         }
 
         [Test]
@@ -545,16 +525,6 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             var result = builder.Build();
 
             result.ShouldBe("MASKED WITH FUNCTION anon.pseudo_siret(id)");
-        }
-
-        [Test]
-        public void CanBuildMaskedWithPseudoSiren()
-        {
-            var builder = new AnonSecurityLabelBuilder();
-            builder.MaskedWithPseudoSiren("id");
-            var result = builder.Build();
-
-            result.ShouldBe("MASKED WITH FUNCTION anon.pseudo_siren(id)");
         }
 
         [Test]

@@ -140,24 +140,6 @@ public partial class AnonSecurityLabelBuilder
     }
 
     /// <summary>
-    /// Masks the column with a dummy SIRET number (French establishment identifier).
-    /// </summary>
-    /// <returns>The current builder instance for method chaining.</returns>
-    public AnonSecurityLabelBuilder MaskedWithDummySiret()
-    {
-        return MaskedWithFunction("anon.dummy_siret");
-    }
-
-    /// <summary>
-    /// Masks the column with a dummy SIREN number (French business identifier).
-    /// </summary>
-    /// <returns>The current builder instance for method chaining.</returns>
-    public AnonSecurityLabelBuilder MaskedWithDummySiren()
-    {
-        return MaskedWithFunction("anon.dummy_siren");
-    }
-
-    /// <summary>
     /// Masks the column with a dummy BIC (Bank Identifier Code).
     /// </summary>
     /// <returns>The current builder instance for method chaining.</returns>
