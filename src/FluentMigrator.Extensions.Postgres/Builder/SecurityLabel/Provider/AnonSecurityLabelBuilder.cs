@@ -59,8 +59,8 @@ public partial class AnonSecurityLabelBuilder : SecurityLabelSyntaxBuilderBase
         string str => str, // Strings are handled as-is to allow column names
         char c => $"'{c}'",
         bool b => b ? "TRUE" : "FALSE",
-        DateTime dt => BuildSqlValue(dt.ToString("yyyy-MM-dd HH:mm:ss")),
-        DateTimeOffset dto => BuildSqlValue(dto.ToString("yyyy-MM-dd HH:mm:ss zzz")),
+        DateTime dt => BuildSqlString(dt.ToString("yyyy-MM-dd HH:mm:ss")),
+        DateTimeOffset dto => BuildSqlString(dto.ToString("yyyy-MM-dd HH:mm:ss zzz")),
         int or long or short or byte or uint or ulong or ushort or sbyte or float or double or decimal => Convert.ToString(value, System.Globalization.CultureInfo.InvariantCulture),
         _ => BuildSqlValue(value.ToString()),
     };
@@ -91,7 +91,7 @@ public partial class AnonSecurityLabelBuilder : SecurityLabelSyntaxBuilderBase
     /// Masks the column with a custom function call.
     /// </summary>
     /// <param name="functionName">The function name, or call expression (e.g., "anon.my_function()").</param>
-    /// <param name="args">Function params, it no parenthesis is provided in functionName</param>
+    /// <param name="args">Function params, if no parentheses are provided in <paramref name="functionName"/>.</param>
     /// <returns>The current builder instance for method chaining.</returns>
     /// <exception cref="ArgumentException">Thrown when <paramref name="functionName"/> is null or whitespace.</exception>
     public AnonSecurityLabelBuilder MaskedWithFunction([NotNull] string functionName, params object[] args)

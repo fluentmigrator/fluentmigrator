@@ -47,7 +47,7 @@ public partial class AnonSecurityLabelBuilder
     }
 
     /// <summary>
-    /// Masks an datetime column by adding random noise based on the specified ratio.
+    /// Masks a datetime column by adding random noise based on the specified ratio.
     /// </summary>
     /// <param name="originalValue">Original value</param>
     /// <param name="interval">The interval string representing the noise ratio (e.g., '1 day', '2 hours').</param>

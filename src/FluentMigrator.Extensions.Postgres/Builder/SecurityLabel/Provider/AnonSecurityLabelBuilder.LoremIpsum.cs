@@ -21,15 +21,41 @@ namespace FluentMigrator.Builder.SecurityLabel.Provider;
 public partial class AnonSecurityLabelBuilder
 {
     /// <summary>
-    /// Lorem ipsum generator for TEXT and VARCHAR columns :
-    /// anon.lorem_ipsum() returns 5 paragraphs
-    /// anon.lorem_ipsum(2) returns 2 paragraphs
-    /// anon.lorem_ipsum( paragraphs := 4 ) returns 4 paragraphs
-    /// anon.lorem_ipsum( words := 20 ) returns 20 words
-    /// anon.lorem_ipsum( characters := 7 ) returns 7 characters
-    /// anon.lorem_ipsum( characters := anon.length(table.column) ) returns the same amount of characters as the original string
+    /// Generates a PostgreSQL <c>anon.lorem_ipsum</c> function call for TEXT and VARCHAR columns.
     /// </summary>
+    /// <param name="paragraphs">
+    /// The number of paragraphs to generate. If both <paramref name="words"/> and <paramref name="characters"/> are not specified,
+    /// this value defaults to 5 paragraphs when <c>null</c> or 0 is provided.
+    /// </param>
+    /// <param name="words">
+    /// The number of words to generate. If specified, <paramref name="paragraphs"/> and <paramref name="characters"/> must be omitted.
+    /// </param>
+    /// <param name="characters">
+    /// The number of characters to generate, or an expression such as <c>anon.length(table.column)</c>. If specified,
+    /// <paramref name="paragraphs"/> and <paramref name="words"/> must be omitted.
+    /// </param>
     /// <returns>The current builder instance for method chaining.</returns>
+    /// <example>
+    /// <code>
+    /// // Returns 5 paragraphs (default)
+    /// builder.MaskedWithLoremIpsum();
+    ///
+    /// // Returns 2 paragraphs
+    /// builder.MaskedWithLoremIpsum(paragraphs: 2);
+    ///
+    /// // Returns 4 paragraphs
+    /// builder.MaskedWithLoremIpsum(paragraphs: 4);
+    ///
+    /// // Returns 20 words
+    /// builder.MaskedWithLoremIpsum(words: 20);
+    ///
+    /// // Returns 7 characters
+    /// builder.MaskedWithLoremIpsum(characters: "7");
+    ///
+    /// // Returns the same number of characters as the original string
+    /// builder.MaskedWithLoremIpsum(characters: "anon.length(table.column)");
+    /// </code>
+    /// </example>
     public AnonSecurityLabelBuilder MaskedWithLoremIpsum(int? paragraphs = null, int? words = null, string characters = null)
     {
         // Ensure only one parameter is used and that the parameters are valid
