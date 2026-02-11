@@ -371,6 +371,56 @@ namespace FluentMigrator.Builders.Alter.Table
         }
 
         /// <inheritdoc />
+        public IAlterTableColumnOptionOrAddColumnOrAlterColumnOrForeignKeyCascadeSyntax ForeignKey(string[] foreignColumns, string primaryTableName, string[] primaryColumns)
+        {
+            return ForeignKey(null, foreignColumns, null, primaryTableName, primaryColumns);
+        }
+
+        /// <inheritdoc />
+        public IAlterTableColumnOptionOrAddColumnOrAlterColumnOrForeignKeyCascadeSyntax ForeignKey(string foreignKeyName, string[] foreignColumns, string primaryTableName, string[] primaryColumns)
+        {
+            return ForeignKey(foreignKeyName, foreignColumns, null, primaryTableName, primaryColumns);
+        }
+
+        /// <inheritdoc />
+        public IAlterTableColumnOptionOrAddColumnOrAlterColumnOrForeignKeyCascadeSyntax ForeignKey(
+            string foreignKeyName,
+            string[] foreignColumns,
+            string primaryTableSchema,
+            string primaryTableName,
+            string[] primaryColumns)
+        {
+            CurrentColumn.IsForeignKey = true;
+
+            var fk = new CreateForeignKeyExpression
+            {
+                ForeignKey = new ForeignKeyDefinition
+                {
+                    Name = foreignKeyName,
+                    PrimaryTable = primaryTableName,
+                    PrimaryTableSchema = primaryTableSchema,
+                    ForeignTable = Expression.TableName,
+                    ForeignTableSchema = Expression.SchemaName
+                }
+            };
+
+            // Add all foreign and primary columns
+            foreach (var column in foreignColumns)
+            {
+                fk.ForeignKey.ForeignColumns.Add(column);
+            }
+            foreach (var column in primaryColumns)
+            {
+                fk.ForeignKey.PrimaryColumns.Add(column);
+            }
+
+            _context.Expressions.Add(fk);
+            CurrentForeignKey = fk.ForeignKey;
+            CurrentColumn.ForeignKey = fk.ForeignKey;
+            return this;
+        }
+
+        /// <inheritdoc />
         public IAlterTableColumnOptionOrAddColumnOrAlterColumnOrForeignKeyCascadeSyntax OnDelete(Rule rule)
         {
             CurrentForeignKey.OnDelete = rule;
