@@ -25,9 +25,15 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace FluentMigrator.Analyzers
 {
+    /// <summary>
+    /// Analyzer that ensures migration attribute versions are unique within a compilation.
+    /// </summary>
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class MigrationAttributeVersionShouldBeUniqueAnalyzer : FluentMigratorAnalyzer
     {
+        /// <summary>
+        /// The diagnostic ID for duplicate migration version warnings.
+        /// </summary>
         public const string DiagnosticId = "FM0001";
         private const string Category = "FluentMigrator";
 
@@ -38,6 +44,9 @@ namespace FluentMigrator.Analyzers
 
         private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, isEnabledByDefault: true, description: Description, customTags: "CompilationEnd");
 
+        /// <summary>
+        /// Gets the set of diagnostic descriptors supported by this analyzer.
+        /// </summary>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
         internal override void AnalyzeCompilation(CompilationStartAnalysisContext compilationStartContext, FluentMigratorContext fluentMigratorContext)
