@@ -18,8 +18,16 @@ using Microsoft.CodeAnalysis;
 
 namespace FluentMigrator.Analyzers
 {
+    /// <summary>
+    /// Represents a migration class declaration with its associated metadata.
+    /// </summary>
     public struct MigrationClassDeclaration
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MigrationClassDeclaration"/> struct.
+        /// </summary>
+        /// <param name="typeSymbol">The type symbol representing the migration class.</param>
+        /// <param name="migrationVersion">The version number of the migration.</param>
         public MigrationClassDeclaration(INamedTypeSymbol typeSymbol, long migrationVersion)
         {
             Location = typeSymbol.Locations[0];
@@ -27,8 +35,19 @@ namespace FluentMigrator.Analyzers
             Version = migrationVersion;
         }
 
+        /// <summary>
+        /// Gets the name of the migration class.
+        /// </summary>
         public string Name { get; init; }
+
+        /// <summary>
+        /// Gets the source location of the migration class declaration.
+        /// </summary>
         public Location Location { get; init; }
+
+        /// <summary>
+        /// Gets the version number of the migration.
+        /// </summary>
         public long Version { get; init; }
     }
 }

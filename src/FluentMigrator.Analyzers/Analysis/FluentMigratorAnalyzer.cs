@@ -18,8 +18,15 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace FluentMigrator.Analyzers.Analysis
 {
+    /// <summary>
+    /// Base class for FluentMigrator analyzers.
+    /// </summary>
     public abstract class FluentMigratorAnalyzer : DiagnosticAnalyzer
     {
+        /// <summary>
+        /// Initializes the analyzer by registering actions for compilation analysis.
+        /// </summary>
+        /// <param name="context">The analysis context.</param>
         public override void Initialize(AnalysisContext context)
         {
             context.EnableConcurrentExecution();

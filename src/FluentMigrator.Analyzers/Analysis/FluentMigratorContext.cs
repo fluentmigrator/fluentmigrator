@@ -21,6 +21,9 @@ using Microsoft.CodeAnalysis;
 
 namespace FluentMigrator.Analyzers.Analysis
 {
+    /// <summary>
+    /// Provides context for FluentMigrator analysis operations.
+    /// </summary>
     public class FluentMigratorContext
     {
         private readonly Lazy<INamedTypeSymbol> _lazyMigrationAttributeType;
@@ -37,8 +40,14 @@ namespace FluentMigrator.Analyzers.Analysis
         /// </summary>
         public Compilation Compilation { get; }
 
+        /// <summary>
+        /// Gets the <see cref="INamedTypeSymbol"/> representing the Migration attribute type.
+        /// </summary>
         public INamedTypeSymbol MigrationAttributeType => _lazyMigrationAttributeType?.Value;
 
+        /// <summary>
+        /// Gets the collection of migration class declarations found during analysis.
+        /// </summary>
         public ConcurrentBag<MigrationClassDeclaration> Migrations { get; } = new ConcurrentBag<MigrationClassDeclaration>();
     }
 }
