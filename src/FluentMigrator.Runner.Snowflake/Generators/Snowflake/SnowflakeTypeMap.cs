@@ -39,7 +39,7 @@ namespace FluentMigrator.Runner.Generators.Snowflake
         /// This field defines the maximum size, in characters, for Unicode string types
         /// such as <c>VARCHAR</c> when mapped to Snowflake-specific SQL types.
         /// </remarks>
-        public const int UnicodeStringCapacity = 134217728;
+        public static readonly int UnicodeStringCapacity = 134217728;
         /// <summary>
         /// Represents the maximum precision for decimal types in Snowflake.
         /// </summary>
