@@ -90,7 +90,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             [TestCase(8001)]
             [TestCase(4194304)]
             [TestCase(134217728)]
-            public void ItMapsAnsiStringFixedLengthWithSizeToCharOfSize(int size)
+            public void ItMapsAnsiStringFixedLengthWithSizeToVarcharOfSize(int size)
             {
                 var template = TypeMap.GetTypeMap(DbType.AnsiStringFixedLength, size, precision: null);
 
@@ -98,7 +98,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             }
 
             [Test]
-            public void ItThrowsIfAnsiStringHasSizeAbove134217728()
+            public void ItThrowsIfAnsiStringFixedLengthHasSizeAbove134217728()
             {
                 Should.Throw<NotSupportedException>(
                     () => TypeMap.GetTypeMap(DbType.AnsiStringFixedLength, 134217729, precision: null));
@@ -122,7 +122,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             [TestCase(4001)]
             [TestCase(4194304)]
             [TestCase(134217728)]
-            public void ItMapsStringWithSizeToNvarcharOfSize(int size)
+            public void ItMapsStringWithSizeToVarcharOfSize(int size)
             {
                 var template = TypeMap.GetTypeMap(DbType.String, size, precision: null);
 
@@ -153,11 +153,20 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             [TestCase(1)]
             [TestCase(4000)]
             [TestCase(4001)]
-            public void ItMapsStringFixedLengthWithSizeToNcharOfSize(int size)
+            [TestCase(4194304)]
+            [TestCase(134217728)]
+            public void ItMapsStringFixedLengthWithSizeToVarcharOfSize(int size)
             {
                 var template = TypeMap.GetTypeMap(DbType.StringFixedLength, size, precision: null);
 
                 template.ShouldBe($"VARCHAR({size})");
+            }
+
+            [Test]
+            public void ItThrowsIfStringFixedLengthHasSizeAbove134217728()
+            {
+                Should.Throw<NotSupportedException>(
+                    () => TypeMap.GetTypeMap(DbType.StringFixedLength, 134217729, precision: null));
             }
         }
 
