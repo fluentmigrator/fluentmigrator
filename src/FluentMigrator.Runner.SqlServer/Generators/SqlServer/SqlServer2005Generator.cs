@@ -254,12 +254,27 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         public override string Generate(CreateColumnExpression expression)
         {
             var alterTableStatement = base.Generate(expression);
+
+            if (expression.Column.IsPrimaryKey)
+            {
+                alterTableStatement = GenerateAlterTableWithPrimaryKey(expression, alterTableStatement);
+            }
+
             var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatement(expression);
 
             if (string.IsNullOrEmpty(descriptionStatement))
                 return alterTableStatement;
 
             return ComposeStatements(alterTableStatement, new[] { descriptionStatement });
+        }
+
+        private string GenerateAlterTableWithPrimaryKey(CreateColumnExpression expression, string alterTableStatement)
+        {
+            var primaryKeyConstraint = string.IsNullOrEmpty(expression.Column.PrimaryKeyName)
+                ? "PRIMARY KEY"
+                : $"CONSTRAINT {Quoter.QuoteConstraintName(expression.Column.PrimaryKeyName)} PRIMARY KEY";
+
+            return alterTableStatement.TrimEnd(';') + $" {primaryKeyConstraint};";
         }
 
         /// <inheritdoc />
