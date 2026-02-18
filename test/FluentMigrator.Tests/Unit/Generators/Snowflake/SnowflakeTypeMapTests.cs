@@ -56,6 +56,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             [TestCase(8000)]
             [TestCase(8001)]
             [TestCase(4194304)]
+            [TestCase(134217728)]
             public void ItMapsAnsiStringWithSizeToVarcharOfSize(int size)
             {
                 var template = TypeMap.GetTypeMap(DbType.AnsiString, size, precision: null);
@@ -64,10 +65,10 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             }
 
             [Test]
-            public void ItThrowsIfAnsiStringHasSizeAbove4194304()
+            public void ItThrowsIfAnsiStringHasSizeAbove134217728()
             {
                 Should.Throw<NotSupportedException>(
-                    () => TypeMap.GetTypeMap(DbType.AnsiString, 4194305, precision: null));
+                    () => TypeMap.GetTypeMap(DbType.AnsiString, 134217729, precision: null));
             }
         }
 
@@ -88,6 +89,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             [TestCase(8000)]
             [TestCase(8001)]
             [TestCase(4194304)]
+            [TestCase(134217728)]
             public void ItMapsAnsiStringFixedLengthWithSizeToCharOfSize(int size)
             {
                 var template = TypeMap.GetTypeMap(DbType.AnsiStringFixedLength, size, precision: null);
@@ -96,10 +98,10 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             }
 
             [Test]
-            public void ItThrowsIfAnsiStringHasSizeAbove4194304()
+            public void ItThrowsIfAnsiStringHasSizeAbove134217728()
             {
                 Should.Throw<NotSupportedException>(
-                    () => TypeMap.GetTypeMap(DbType.AnsiStringFixedLength, 4194305, precision: null));
+                    () => TypeMap.GetTypeMap(DbType.AnsiStringFixedLength, 134217729, precision: null));
             }
         }
 
@@ -119,6 +121,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             [TestCase(4000)]
             [TestCase(4001)]
             [TestCase(4194304)]
+            [TestCase(134217728)]
             public void ItMapsStringWithSizeToNvarcharOfSize(int size)
             {
                 var template = TypeMap.GetTypeMap(DbType.String, size, precision: null);
@@ -127,10 +130,10 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             }
 
             [Test]
-            public void ItThrowsIfStringHasSizeAbove4194304()
+            public void ItThrowsIfStringHasSizeAbove134217728()
             {
                 Should.Throw<NotSupportedException>(
-                    () => TypeMap.GetTypeMap(DbType.String, 4194305, precision: null));
+                    () => TypeMap.GetTypeMap(DbType.String, 134217729, precision: null));
             }
         }
 
