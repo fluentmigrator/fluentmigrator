@@ -51,12 +51,11 @@ The following table summarizes the capabilities of each supported database provi
 - **Syntax**: `ALTER TABLE table_name RENAME INDEX old_pk_name TO new_pk_name`
 - **Support**: Supported with significant limitations
 - **Considerations**: 
-  - MySQL primary keys are automatically named "PRIMARY" (reserved name)
-  - The `RENAME INDEX` syntax was added in MySQL 5.7 (2015)
-  - While technically possible to rename the PRIMARY index, it's rarely done in practice
-  - Cannot rename if foreign keys from other tables reference this primary key (MySQL error 1828)
+  - The `RENAME INDEX` syntax was added in MySQL 5.7 (2015) and works for regular indexes
+  - MySQL primary keys are automatically named "PRIMARY" (a reserved name)
+  - Attempting to rename a PRIMARY KEY fails with MySQL error 1828 if foreign keys from other tables reference this primary key
   - MySQL doesn't allow custom PRIMARY KEY constraint names during creation like other databases
-  - Most MySQL schemas treat the PRIMARY name as immutable
+  - Custom primary key names are uncommon in MySQL practice; most schemas treat the PRIMARY name as immutable
   - Alternative workaround: Drop and recreate, but requires knowing column list and risks FK violations
 - **Auto-rename on table rename**: No - the PRIMARY index retains its name
 
