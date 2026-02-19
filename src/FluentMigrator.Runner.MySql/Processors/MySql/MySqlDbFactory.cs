@@ -18,6 +18,15 @@ using System;
 
 namespace FluentMigrator.Runner.Processors.MySql
 {
+    /// <summary>
+    /// Represents a factory for creating MySQL database processors and related components.
+    /// </summary>
+    /// <remarks>
+    /// This class is used internally by FluentMigrator to provide support for MySQL database migrations.
+    /// It extends the <see cref="FluentMigrator.Runner.Processors.ReflectionBasedDbFactory"/> to leverage reflection-based
+    /// database factory capabilities.
+    /// </remarks>
+    /// <seealso cref="FluentMigrator.Runner.Processors.ReflectionBasedDbFactory"/>
     public class MySqlDbFactory : ReflectionBasedDbFactory
     {
         private static readonly TestEntry[] _entries =
@@ -27,12 +36,32 @@ namespace FluentMigrator.Runner.Processors.MySql
             new TestEntry("MySqlConnector", "MySqlConnector.MySqlConnectorFactory", () => Type.GetType("MySqlConnector.MySqlConnectorFactory, MySqlConnector"))
         };
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FluentMigrator.Runner.Processors.MySql.MySqlDbFactory"/> class.
+        /// </summary>
+        /// <remarks>
+        /// This constructor is marked as obsolete and initializes the factory with a default service provider.
+        /// </remarks>
+        /// <seealso cref="FluentMigrator.Runner.Processors.MySql.MySqlDbFactory(IServiceProvider)"/>
         [Obsolete]
         public MySqlDbFactory()
             : this(serviceProvider: null)
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FluentMigrator.Runner.Processors.MySql.MySqlDbFactory"/> class
+        /// with the specified service provider.
+        /// </summary>
+        /// <param name="serviceProvider">
+        /// The <see cref="IServiceProvider"/> instance used to resolve dependencies for the factory.
+        /// </param>
+        /// <remarks>
+        /// This constructor allows for the customization of the service provider used by the factory.
+        /// It leverages the base <see cref="FluentMigrator.Runner.Processors.ReflectionBasedDbFactory"/> constructor
+        /// to initialize the factory with the provided service provider and predefined test entries.
+        /// </remarks>
+        /// <seealso cref="FluentMigrator.Runner.Processors.ReflectionBasedDbFactory"/>
         public MySqlDbFactory(IServiceProvider serviceProvider)
             : base(serviceProvider, _entries)
         {

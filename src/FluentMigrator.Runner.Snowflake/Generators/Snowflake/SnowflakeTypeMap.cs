@@ -22,17 +22,54 @@ using FluentMigrator.Runner.Generators.Base;
 
 namespace FluentMigrator.Runner.Generators.Snowflake
 {
+    /// <summary>
+    /// Represents a type map specific to the Snowflake database.
+    /// </summary>
+    /// <remarks>
+    /// This class extends <see cref="FluentMigrator.Runner.Generators.Base.TypeMapBase"/> and implements
+    /// <see cref="FluentMigrator.Runner.Generators.Snowflake.ISnowflakeTypeMap"/> to provide mappings
+    /// between <see cref="System.Data.DbType"/> and Snowflake-specific SQL types.
+    /// </remarks>
     public class SnowflakeTypeMap : TypeMapBase, ISnowflakeTypeMap
     {
-        public static readonly int UnicodeStringCapacity = 4194304;
+        /// <summary>
+        /// Represents the maximum capacity for Unicode string types in Snowflake.
+        /// </summary>
+        /// <remarks>
+        /// This field defines the maximum size, in characters, for Unicode string types
+        /// such as <c>VARCHAR</c> when mapped to Snowflake-specific SQL types.
+        /// </remarks>
+        public static readonly int UnicodeStringCapacity = 134217728;
+        /// <summary>
+        /// Represents the maximum precision for decimal types in Snowflake.
+        /// </summary>
+        /// <remarks>
+        /// This constant defines the maximum number of digits (precision) that can be used
+        /// for decimal types when mapped to Snowflake-specific SQL types.
+        /// </remarks>
         private const int DecimalCapacity = 38;
+        /// <summary>
+        /// Represents the maximum capacity, in bytes, for binary data types in Snowflake.
+        /// </summary>
+        /// <remarks>
+        /// This constant defines the maximum size for binary data types, such as <c>BINARY</c>,
+        /// when mapped to Snowflake-specific SQL types.
+        /// </remarks>
         private const int BinaryCapacity = 8388608;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FluentMigrator.Runner.Generators.Snowflake.SnowflakeTypeMap"/> class.
+        /// </summary>
+        /// <remarks>
+        /// This constructor sets up the type mappings between <see cref="System.Data.DbType"/> and Snowflake-specific SQL types
+        /// by invoking the <see cref="SetupTypeMaps"/> method.
+        /// </remarks>
         public SnowflakeTypeMap()
         {
             SetupTypeMaps();
         }
-        
+
+        /// <inheritdoc />
         protected sealed override void SetupTypeMaps()
         {
             SetTypeMap(DbType.AnsiStringFixedLength, "VARCHAR");

@@ -28,23 +28,33 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Generators.Postgres
 {
+    /// <inheritdoc />
     public class Postgres11_0Generator : Postgres10_0Generator
     {
+        /// <inheritdoc />
         public Postgres11_0Generator([NotNull] PostgresQuoter quoter)
             : this(quoter, new OptionsWrapper<GeneratorOptions>(new GeneratorOptions()))
         {
         }
 
+        /// <inheritdoc />
         public Postgres11_0Generator([NotNull] PostgresQuoter quoter, [NotNull] IOptions<GeneratorOptions> generatorOptions)
             : base(new Postgres10_0Column(quoter, new Postgres92.Postgres92TypeMap()), quoter, generatorOptions)
         {
         }
 
-        protected Postgres11_0Generator([NotNull] PostgresQuoter quoter, [NotNull] IOptions<GeneratorOptions> generatorOptions, [NotNull] IPostgresTypeMap typeMap)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Postgres11_0Generator"/> class.
+        /// </summary>
+        /// <param name="quoter">The Postgres quoter.</param>
+        /// <param name="generatorOptions">The generator options.</param>
+        /// <param name="typeMap">The Postgres type map.</param>
+        public Postgres11_0Generator([NotNull] PostgresQuoter quoter, [NotNull] IOptions<GeneratorOptions> generatorOptions, [NotNull] IPostgresTypeMap typeMap)
             : base(new Postgres10_0Column(quoter, typeMap), quoter, generatorOptions)
         {
         }
 
+        /// <inheritdoc />
         protected Postgres11_0Generator(
             [NotNull] IColumn column,
             [NotNull] PostgresQuoter quoter,
@@ -60,6 +70,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
         public override List<string> GeneratorIdAliases =>
             [GeneratorIdConstants.PostgreSQL11_0, GeneratorIdConstants.PostgreSQL];
 
+        /// <inheritdoc />
         protected override string GetIncludeString(CreateIndexExpression column)
         {
             var includes = column.GetAdditionalFeature<IList<PostgresIndexIncludeDefinition>>(PostgresExtensions.IncludesList);
@@ -96,7 +107,6 @@ namespace FluentMigrator.Runner.Generators.Postgres
 
             return " ONLY";
         }
-
 
         /// <inheritdoc />
         protected override HashSet<string> GetAllowIndexStorageParameters()

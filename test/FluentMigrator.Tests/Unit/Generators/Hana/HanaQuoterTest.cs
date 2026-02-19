@@ -16,7 +16,7 @@
 //
 #endregion
 
-using FluentMigrator.Runner.Generators;
+using FluentMigrator.Generation;
 using FluentMigrator.Runner.Generators.Hana;
 
 using NUnit.Framework;

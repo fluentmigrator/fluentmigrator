@@ -20,8 +20,25 @@ using System.Data;
 
 namespace FluentMigrator.Runner.Generators.SqlServer
 {
-    internal class SqlServer2008TypeMap : SqlServer2005TypeMap
+    /// <summary>
+    /// Represents the SQL Server 2008-specific type map used for database migrations.
+    /// </summary>
+    /// <remarks>
+    /// This class extends <see cref="SqlServer2005TypeMap"/> to include support for 
+    /// SQL Server 2008-specific data types, such as <c>DATETIME2</c>, <c>DATETIMEOFFSET</c>, 
+    /// <c>DATE</c>, and <c>TIME</c>. It provides mappings between .NET <see cref="System.Data.DbType"/> 
+    /// values and their corresponding SQL Server 2008 data types.
+    /// </remarks>
+    public class SqlServer2008TypeMap : SqlServer2005TypeMap
     {
+        /// <summary>
+        /// Configures the SQL Server 2008-specific type mappings.
+        /// </summary>
+        /// <remarks>
+        /// This method extends the base type mappings defined in <see cref="SqlServer2005TypeMap"/> 
+        /// by adding support for SQL Server 2008-specific types, such as <c>DATETIME2</c>, 
+        /// <c>DATETIMEOFFSET</c>, <c>DATE</c>, and <c>TIME</c>.
+        /// </remarks>
         protected override void SetupSqlServerTypeMaps()
         {
             base.SetupSqlServerTypeMaps();

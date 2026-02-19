@@ -25,7 +25,9 @@ using FluentMigrator.Runner;
 using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Exceptions;
 using FluentMigrator.Runner.Initialization;
+#if NETFRAMEWORK
 using FluentMigrator.Runner.Initialization.NetFramework;
+#endif
 using FluentMigrator.Runner.Logging;
 using FluentMigrator.Runner.Processors;
 
@@ -396,10 +398,6 @@ namespace FluentMigrator.Console
                 .AddSingleton<IConventionSet>(conventionSet)
                 .Configure<SelectingProcessorAccessorOptions>(opt => opt.ProcessorId = ProcessorType)
                 .Configure<AssemblySourceOptions>(opt => opt.AssemblyNames = new[] { TargetAssembly })
-#pragma warning disable 612
-                .Configure<AppConfigConnectionStringAccessorOptions>(
-                    opt => opt.ConnectionStringConfigPath = ConnectionStringConfigPath)
-#pragma warning restore 612
                 .Configure<TypeFilterOptions>(
                     opt =>
                     {

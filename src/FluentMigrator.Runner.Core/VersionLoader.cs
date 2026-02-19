@@ -19,22 +19,21 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Reflection;
 
 using FluentMigrator.Expressions;
+using FluentMigrator.Generation;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Versioning;
 using FluentMigrator.Runner.VersionTableInfo;
-using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Generators;
-using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
 
 using JetBrains.Annotations;
 
 namespace FluentMigrator.Runner
 {
+    /// <inheritdoc />
     public class VersionLoader : IVersionLoader
     {
         [NotNull]
@@ -49,15 +48,22 @@ namespace FluentMigrator.Runner
         private IVersionInfo _versionInfo;
         private IMigrationRunnerConventions Conventions { get; set; }
 
+        /// <inheritdoc />
         public IVersionTableMetaData VersionTableMetaData { get; }
 
+        /// <inheritdoc />
         [NotNull]
         public IMigrationRunner Runner { get; set; }
+        /// <inheritdoc />
         public VersionSchemaMigration VersionSchemaMigration { get; }
+        /// <inheritdoc />
         public IMigration VersionMigration { get; }
+        /// <inheritdoc />
         public IMigration VersionUniqueMigration { get; }
+        /// <inheritdoc />
         public IMigration VersionDescriptionMigration { get; }
 
+        /// <inheritdoc />
         public VersionLoader(
             [NotNull] IProcessorAccessor processorAccessor,
             [NotNull] IGeneratorAccessor generatorAccessor,
@@ -68,7 +74,7 @@ namespace FluentMigrator.Runner
         {
             _conventionSet = conventionSet;
             _processor = processorAccessor.Processor;
-            _quoter = generatorAccessor.Generator.GetQuoter();
+            _quoter = generatorAccessor.Generator.Quoter;
 
             Runner = runner;
 
@@ -82,11 +88,13 @@ namespace FluentMigrator.Runner
             LoadVersionInfo();
         }
 
+        /// <inheritdoc />
         public void UpdateVersionInfo(long version)
         {
             UpdateVersionInfo(version, null);
         }
 
+        /// <inheritdoc />
         public void UpdateVersionInfo(long version, string description)
         {
             var dataExpression = new InsertDataExpression();
@@ -97,12 +105,14 @@ namespace FluentMigrator.Runner
             dataExpression.ExecuteWith(_processor);
         }
 
+        /// <inheritdoc />
         [NotNull]
         public IVersionTableMetaData GetVersionTableMetaData()
         {
             return VersionTableMetaData;
         }
 
+        /// <inheritdoc />
         protected virtual InsertionDataDefinition CreateVersionInfoInsertionData(long version, string description)
         {
             object appliedOnValue;
@@ -113,12 +123,22 @@ namespace FluentMigrator.Runner
             }
             else
             {
-                var quotedCurrentDate = _quoter.QuoteValue(SystemMethods.CurrentUTCDateTime);
-
-                // Default to using DateTime if no system method could be obtained
-                appliedOnValue = string.IsNullOrWhiteSpace(quotedCurrentDate)
-                    ? (object) DateTime.UtcNow
-                    : RawSql.Insert(quotedCurrentDate);
+                string quotedCurrentDate = null;
+                try
+                {
+                    quotedCurrentDate = _quoter.QuoteValue(SystemMethods.CurrentUTCDateTime);
+                }
+                catch
+                {
+                    // Swallow exception - some IQuoter implementations do not support system method CurrentUTCDateTime
+                }
+                finally
+                {
+                    // Default to using DateTime if no system method could be obtained
+                    appliedOnValue = string.IsNullOrWhiteSpace(quotedCurrentDate)
+                        ? (object)DateTime.UtcNow
+                        : RawSql.Insert(quotedCurrentDate);
+                }
             }
 
             return new InsertionDataDefinition
@@ -129,23 +149,30 @@ namespace FluentMigrator.Runner
                        };
         }
 
+        /// <inheritdoc />
         public IVersionInfo VersionInfo
         {
             get => _versionInfo;
             set => _versionInfo = value ?? throw new ArgumentException("Cannot set VersionInfo to null");
         }
 
+        /// <inheritdoc />
         public bool AlreadyCreatedVersionSchema => string.IsNullOrEmpty(VersionTableMetaData.SchemaName) ||
             _processor.SchemaExists(VersionTableMetaData.SchemaName);
 
+        /// <inheritdoc />
         public bool AlreadyCreatedVersionTable => _processor.TableExists(VersionTableMetaData.SchemaName, VersionTableMetaData.TableName);
 
+        /// <inheritdoc />
         public bool AlreadyMadeVersionUnique => _processor.ColumnExists(VersionTableMetaData.SchemaName, VersionTableMetaData.TableName, VersionTableMetaData.AppliedOnColumnName);
 
+        /// <inheritdoc />
         public bool AlreadyMadeVersionDescription => _processor.ColumnExists(VersionTableMetaData.SchemaName, VersionTableMetaData.TableName, VersionTableMetaData.DescriptionColumnName);
 
+        /// <inheritdoc />
         public bool OwnsVersionSchema => VersionTableMetaData.OwnsSchema;
 
+        /// <inheritdoc />
         public void LoadVersionInfo()
         {
             if (!AlreadyCreatedVersionSchema && !_versionSchemaMigrationAlreadyRun)
@@ -183,6 +210,7 @@ namespace FluentMigrator.Runner
             }
         }
 
+        /// <inheritdoc />
         public void RemoveVersionTable()
         {
             var expression = new DeleteTableExpression { TableName = VersionTableMetaData.TableName, SchemaName = VersionTableMetaData.SchemaName };
@@ -195,6 +223,7 @@ namespace FluentMigrator.Runner
             }
         }
 
+        /// <inheritdoc />
         public void DeleteVersion(long version)
         {
             var expression = new DeleteDataExpression { TableName = VersionTableMetaData.TableName, SchemaName = VersionTableMetaData.SchemaName };

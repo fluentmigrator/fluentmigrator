@@ -17,24 +17,50 @@
 #endregion
 
 using System;
-using System.Data;
 using System.Data.Common;
-using System.Diagnostics;
 
 namespace FluentMigrator.Runner.Processors
 {
 #pragma warning disable 612
-    public abstract class DbFactoryBase : IDbFactory
+    /// <summary>
+    /// Provides a base implementation for database factory classes, enabling the creation
+    /// of database connections and commands. This abstract class serves as a foundation
+    /// for specific database factory implementations.
+    /// </summary>
+    /// <remarks>
+    /// This class offers support for lazy initialization of the underlying <see cref="DbProviderFactory"/>.
+    /// </remarks>
+    /// <seealso cref="DbProviderFactory"/>
+    public abstract class DbFactoryBase
 #pragma warning restore 612
     {
         private readonly object _lock = new object();
         private volatile DbProviderFactory _factory;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DbFactoryBase"/> class with the specified
+        /// <see cref="DbProviderFactory"/>.
+        /// </summary>
+        /// <param name="factory">
+        /// The <see cref="DbProviderFactory"/> used to create database connections and commands.
+        /// </param>
+        /// <remarks>
+        /// This constructor allows derived classes to specify the <see cref="DbProviderFactory"/>
+        /// to be used for creating database-related objects. The provided factory is stored
+        /// internally and used by the <see cref="Factory"/> property.
+        /// </remarks>
         protected DbFactoryBase(DbProviderFactory factory)
         {
             _factory = factory;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DbFactoryBase"/> class.
+        /// </summary>
+        /// <remarks>
+        /// This parameterless constructor is intended for use by derived classes that require
+        /// custom initialization logic or deferred setup of the <see cref="DbProviderFactory"/>.
+        /// </remarks>
         protected DbFactoryBase()
         {
         }
@@ -60,25 +86,20 @@ namespace FluentMigrator.Runner.Processors
             }
         }
 
+        /// <summary>
+        /// Creates an instance of the <see cref="DbProviderFactory"/> specific to the database implementation.
+        /// </summary>
+        /// <remarks>
+        /// This method must be implemented by derived classes to provide the appropriate
+        /// <see cref="DbProviderFactory"/> for the database being targeted. The factory is used
+        /// to create database connections and commands.
+        /// </remarks>
+        /// <returns>
+        /// An instance of <see cref="DbProviderFactory"/> that corresponds to the specific database implementation.
+        /// </returns>
+        /// <exception cref="AggregateException">
+        /// Thrown if the factory cannot be created, typically due to missing or invalid dependencies.
+        /// </exception>
         protected abstract DbProviderFactory CreateFactory();
-
-        [Obsolete]
-        public IDbConnection CreateConnection(string connectionString)
-        {
-            var connection = Factory.CreateConnection();
-            Debug.Assert(connection != null, nameof(connection) + " != null");
-            connection.ConnectionString = connectionString;
-            return connection;
-        }
-
-        [Obsolete]
-        public virtual IDbCommand CreateCommand(string commandText, IDbConnection connection, IDbTransaction transaction, IMigrationProcessorOptions options)
-        {
-            var command = connection.CreateCommand();
-            command.CommandText = commandText;
-            if (options?.Timeout != null) command.CommandTimeout = options.Timeout.Value;
-            if (transaction != null) command.Transaction = transaction;
-            return command;
-        }
     }
 }

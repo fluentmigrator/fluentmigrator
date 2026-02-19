@@ -1,7 +1,5 @@
-# ASP.NET Core (.NET Framework)
-# Build and test ASP.NET Core projects targeting the full .NET Framework.
-# Add steps that publish symbols, save build artifacts, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
+# .NET Core (.NET Framework) AzureDevOps Pipeline
+# See: https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
 
 trigger:
   branches:
@@ -10,13 +8,8 @@ trigger:
     - main
   tags:
     include:
-    - v1.*
-    - v2.*
-    - v3.*
-    - v4.*
-    - v5.*
-    - v6.*
-    - v7.*
+    - v8.*
+    - v*.*.* # ex: v8.0.0
 
 pr: none
 
@@ -27,28 +20,52 @@ variables:
   solution: '**/FluentMigrator.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
+  # setting RuntimeIdentifier to empty string prevents MSBuild from using RuntimeIdentifiers set in the csproj, thereby allowing it to be the mystical "any" RID.
+  # without this trick, you cannot publish an "any" architecture binary, because dotnet publish will fail with "error NETSDK1084: There is no application host available for the specified RuntimeIdentifier 'any'."
+  anyRuntimeIdentifier: ''
 
 steps:
 - task: NuGetToolInstaller@1
   inputs:
-    version: '6.x'
+    versionSpec: '6.11.1'
 
 - task: UseDotNet@2
+  displayName: 'UseDotNet 10.x SDK'
   inputs:
+    version: '10.x'
+
+- task: UseDotNet@2
+  displayName: 'UseDotNet 9.x runtime'
+  inputs:
+    packageType: 'runtime'
     version: '9.x'
 
-- task: gitversion/setup@0
-  displayName: 'Install GitVersion (using GitTools 0.10.2.23031113 or later)'
+- task: UseDotNet@2
+  displayName: 'UseDotNet 8.x runtime'
   inputs:
-    versionSpec: '5.12'
+    packageType: 'runtime'
+    version: '8.x'
+
+- task: gitversion-setup@4.1.0
+  displayName: 'Install GitVersion (using GitTools 4.1.0 or later)'
+  inputs:
+    versionSpec: '6.3.x'
     includePrerelease: true
 
-- task: gitversion/execute@0
-  displayName: 'Execute GitVersion (using GitTools 0.10.2.23031113 or later)'
+- task: gitversion-execute@4.1.0
+  name: version_step
+  displayName: 'Execute GitVersion (using GitTools 4.1.0 or later)'
   inputs:
     updateAssemblyInfo: false
   env:
-      BUILD_BUILDNUMBER: $(GitVersion.NuGetVersionV2)
+      BUILD_BUILDNUMBER: $(GitVersion.semVer)
+
+- task: PowerShell@2
+  name: update_build_number
+  displayName: 'Update Build Number with GitVersion'
+  inputs:
+    targetType: 'inline'
+    script: Write-Host "##vso[build.updatebuildnumber]$(version_step.semVer)+$(Build.BuildId)"
 
 - task: NuGetCommand@2
   inputs:
@@ -59,7 +76,7 @@ steps:
     solution: '$(solution)'
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
-    msbuildArgs: '/p:Version="$(build.buildNumber)"'
+    msbuildArgs: '/p:Version=$(version_step.semVer)'
 
 - task: VSTest@2
   inputs:
@@ -73,32 +90,55 @@ steps:
 
 - task: CmdLine@2
   inputs:
-    script: 'dotnet pack $(Build.SourcesDirectory)\FluentMigrator.sln --output $(Build.ArtifactStagingDirectory) --include-symbols -p:Configuration=$(buildConfiguration) -p:Version=$(build.buildNumber) --verbosity Detailed'
+    script: 'dotnet pack $(Build.SourcesDirectory)\FluentMigrator.sln --output $(Build.ArtifactStagingDirectory) --include-symbols -p:Configuration=$(buildConfiguration) -p:Version=$(version_step.semVer) --verbosity Detailed'
 
 - task: DotNetCoreCLI@2
+  displayName: 'Publish FM Console net48/x86'
   inputs:
     command: 'publish'
     publishWebProjects: false
     projects: 'src/FluentMigrator.Console/FluentMigrator.Console.csproj'
-    arguments: '-c $(buildConfiguration) -r win-x86 -o "$(Build.ArtifactStagingDirectory)/publish/tools/net48/x86" -p:Platform=x86 -p:TargetFramework=net48 -p:Version=$(build.buildNumber)'
+    arguments: '-c $(buildConfiguration) -r win-x86 -o "$(Build.ArtifactStagingDirectory)/publish/tools/net48/x86" -p:Platform=x86 -p:TargetFramework=net48 -p:Version=$(version_step.semVer)'
     zipAfterPublish: false
     modifyOutputPath: false
 
 - task: DotNetCoreCLI@2
+  displayName: 'Publish FM Console net48/x64'
   inputs:
     command: 'publish'
     publishWebProjects: false
     projects: 'src/FluentMigrator.Console/FluentMigrator.Console.csproj'
-    arguments: '-c $(buildConfiguration) -r win-x64 -o "$(Build.ArtifactStagingDirectory)/publish/tools/net48/x64" -p:Platform=x64 -p:TargetFramework=net48 -p:Version=$(build.buildNumber)'
+    arguments: '-c $(buildConfiguration) -r win-x64 -o "$(Build.ArtifactStagingDirectory)/publish/tools/net48/x64" -p:Platform=x64 -p:TargetFramework=net48 -p:Version=$(version_step.semVer)'
     zipAfterPublish: false
     modifyOutputPath: false
 
 - task: DotNetCoreCLI@2
+  displayName: 'Publish FM Console net48/any'
   inputs:
     command: 'publish'
     publishWebProjects: false
     projects: 'src/FluentMigrator.Console/FluentMigrator.Console.csproj'
-    arguments: '-c $(buildConfiguration) -r any -o "$(Build.ArtifactStagingDirectory)/publish/tools/net48/any" -p:Platform=AnyCpu -p:TargetFramework=net48 -p:Version=$(build.buildNumber)'
+    arguments: '-c $(buildConfiguration) -r "$(anyRuntimeIdentifier)" -o "$(Build.ArtifactStagingDirectory)/publish/tools/net48/any" -p:Platform=AnyCpu -p:TargetFramework=net48 -p:Version=$(version_step.semVer)'
+    zipAfterPublish: false
+    modifyOutputPath: false
+
+- task: DotNetCoreCLI@2
+  displayName: 'Publish FM Console net8.0/win-x64'
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    projects: 'src/FluentMigrator.Console/FluentMigrator.Console.csproj'
+    arguments: '-c $(buildConfiguration) -r "win-x64" -o "$(Build.ArtifactStagingDirectory)/publish/tools/net8.0/win-x64" -p:Platform=x64 -p:TargetFramework=net8.0 -p:Version=$(version_step.semVer)'
+    zipAfterPublish: false
+    modifyOutputPath: false
+
+- task: DotNetCoreCLI@2
+  displayName: 'Publish FM Console net8.0/win-x64'
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    projects: 'src/FluentMigrator.Console/FluentMigrator.Console.csproj'
+    arguments: '-c $(buildConfiguration) -r "win-x86" -o "$(Build.ArtifactStagingDirectory)/publish/tools/net8.0/win-x86" -p:Platform=x86 -p:TargetFramework=net8.0 -p:Version=$(version_step.semVer)'
     zipAfterPublish: false
     modifyOutputPath: false
 
@@ -114,10 +154,20 @@ steps:
     Contents: '**'
     TargetFolder: '$(Build.ArtifactStagingDirectory)/docs'
 
-- script: nuget.exe pack $(Build.ArtifactStagingDirectory)/publish/FluentMigrator.Console.nuspec -NonInteractive -OutputDirectory $(Build.ArtifactStagingDirectory) -version $(build.buildNumber)
+- script: nuget.exe help
+  displayName: NuGet version info
+
+- task: NuGetCommand@2
+  inputs:
+    command: 'pack'
+    packagesToPack: '$(Build.ArtifactStagingDirectory)/publish/FluentMigrator.Console.nuspec'
+    packDestination: '$(Build.ArtifactStagingDirectory)'
+    buildProperties: 'Version=$(version_step.semVer)'
+    
+- script: nuget.exe pack $(Build.ArtifactStagingDirectory)/publish/FluentMigrator.Console.nuspec -NonInteractive -OutputDirectory $(Build.ArtifactStagingDirectory) -version $(version_step.semVer)
   displayName: NuGet pack FluentMigrator.Console
 
-- script: nuget.exe pack $(Build.ArtifactStagingDirectory)/publish/FluentMigrator.Tools.nuspec -NonInteractive -OutputDirectory $(Build.ArtifactStagingDirectory) -version $(build.buildNumber)
+- script: nuget.exe pack $(Build.ArtifactStagingDirectory)/publish/FluentMigrator.Tools.nuspec -NonInteractive -OutputDirectory $(Build.ArtifactStagingDirectory) -version $(version_step.semVer)
   displayName: NuGet pack FluentMigrator.Tools
 
 - task: PublishBuildArtifacts@1

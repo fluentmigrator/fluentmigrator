@@ -22,19 +22,43 @@ using System.Linq;
 
 namespace FluentMigrator.Runner.Processors.Hana
 {
+    /// <summary>
+    /// Represents a database factory specifically designed for SAP HANA.
+    /// </summary>
+    /// <remarks>
+    /// This class extends <see cref="FluentMigrator.Runner.Processors.ReflectionBasedDbFactory"/> 
+    /// to provide functionality tailored to the SAP HANA database.
+    /// </remarks>
+    [Obsolete("Hana support will go away unless someone in the community steps up to provide support.")]
     public class HanaDbFactory : ReflectionBasedDbFactory
     {
-        [Obsolete]
-        public HanaDbFactory()
-            : base(GetTestEntries().ToArray())
-        {
-        }
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="HanaDbFactory"/> class.
+        /// </summary>
+        /// <param name="serviceProvider">
+        /// The <see cref="IServiceProvider"/> used to resolve dependencies required by the factory.
+        /// </param>
+        /// <remarks>
+        /// This constructor leverages the base implementation provided by 
+        /// <see cref="FluentMigrator.Runner.Processors.ReflectionBasedDbFactory"/> and 
+        /// supplies test entries specific to SAP HANA.
+        /// </remarks>
         public HanaDbFactory(IServiceProvider serviceProvider)
             : base(serviceProvider, GetTestEntries().ToArray())
         {
         }
 
+        /// <summary>
+        /// Provides a collection of test entries for SAP HANA database provider factories.
+        /// </summary>
+        /// <returns>
+        /// An <see cref="IEnumerable{T}"/> of <see cref="FluentMigrator.Runner.Processors.ReflectionBasedDbFactory.TestEntry"/> 
+        /// objects, each representing a test entry for a SAP HANA database provider factory.
+        /// </returns>
+        /// <remarks>
+        /// This method yields test entries containing the assembly name and the database provider factory type name 
+        /// required for dynamically loading and creating SAP HANA database provider factories.
+        /// </remarks>
         private static IEnumerable<TestEntry> GetTestEntries()
         {
             yield return new TestEntry("Sap.Data.Hana", "Sap.Data.Hana.HanaFactory", () => Type.GetType("Sap.Data.Hana.HanaFactory, Sap.Data.Hana"));

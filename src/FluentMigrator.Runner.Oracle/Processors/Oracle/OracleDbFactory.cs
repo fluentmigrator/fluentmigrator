@@ -20,6 +20,16 @@ using System;
 
 namespace FluentMigrator.Runner.Processors.Oracle
 {
+    /// <summary>
+    /// Represents a database factory for Oracle database processors.
+    /// </summary>
+    /// <remarks>
+    /// This class extends the <see cref="OracleBaseDbFactory"/> to provide specific functionality
+    /// for creating Oracle database factories. It serves as an implementation tailored for Oracle
+    /// database processors and supports dependency injection via <see cref="IServiceProvider"/>.
+    /// </remarks>
+    /// <seealso cref="OracleBaseDbFactory"/>
+    /// <seealso cref="ReflectionBasedDbFactory"/>
     public class OracleDbFactory : OracleBaseDbFactory
     {
         private static readonly TestEntry[] _testEntries =
@@ -27,12 +37,33 @@ namespace FluentMigrator.Runner.Processors.Oracle
             new TestEntry("Oracle.DataAccess", "Oracle.DataAccess.Client.OracleClientFactory", () => Type.GetType("Oracle.DataAccess.Client.OracleClientFactory, Oracle.DataAccess")),
         };
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OracleDbFactory"/> class.
+        /// </summary>
+        /// <remarks>
+        /// This constructor is marked as obsolete and initializes the factory without a service provider.
+        /// It is recommended to use the constructor that accepts an <see cref="IServiceProvider"/> for dependency injection.
+        /// </remarks>
+        /// <seealso cref="OracleDbFactory(IServiceProvider)"/>
         [Obsolete]
         public OracleDbFactory()
             : this(serviceProvider: null)
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OracleDbFactory"/> class with the specified service provider.
+        /// </summary>
+        /// <param name="serviceProvider">
+        /// The <see cref="IServiceProvider"/> used to resolve dependencies required by the factory.
+        /// </param>
+        /// <remarks>
+        /// This constructor allows for dependency injection via the <paramref name="serviceProvider"/> parameter.
+        /// It initializes the base functionality for Oracle database factories by passing the provided service
+        /// provider and predefined test entries to the base class constructor.
+        /// </remarks>
+        /// <seealso cref="OracleBaseDbFactory"/>
+        /// <seealso cref="ReflectionBasedDbFactory"/>
         public OracleDbFactory(IServiceProvider serviceProvider)
             : base(serviceProvider, _testEntries)
         {

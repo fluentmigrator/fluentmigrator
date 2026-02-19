@@ -32,20 +32,27 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.MySql
 {
+    /// <summary>
+    /// The MySQL processor for FluentMigrator.
+    /// </summary>
     public class MySqlProcessor : GenericProcessorBase
     {
         private readonly MySqlQuoter _quoter = new MySqlQuoter();
 
+        /// <inheritdoc />
         public override string DatabaseType => ProcessorIdConstants.MySql;
 
+        /// <inheritdoc />
         public override IList<string> DatabaseTypeAliases { get; } = new List<string> { ProcessorIdConstants.MariaDB };
 
-        [Obsolete]
-        public MySqlProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
-            : base(connection, factory, generator, announcer, options)
-        {
-        }
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MySqlProcessor"/> class.
+        /// </summary>
+        /// <param name="factory">The MySQL database factory.</param>
+        /// <param name="generator">The migration generator.</param>
+        /// <param name="logger">The logger.</param>
+        /// <param name="options">The processor options.</param>
+        /// <param name="connectionStringAccessor">The connection string accessor.</param>
         protected MySqlProcessor(
             [NotNull] MySqlDbFactory factory,
             [NotNull] IMigrationGenerator generator,
@@ -56,17 +63,20 @@ namespace FluentMigrator.Runner.Processors.MySql
         {
         }
 
+        /// <inheritdoc />
         public override bool SchemaExists(string schemaName)
         {
             return true;
         }
 
+        /// <inheritdoc />
         public override bool TableExists(string schemaName, string tableName)
         {
             return Exists(@"select table_name from information_schema.tables
                             where table_schema = SCHEMA() and table_name='{0}'", FormatHelper.FormatSqlEscape(tableName));
         }
 
+        /// <inheritdoc />
         public override bool ColumnExists(string schemaName, string tableName, string columnName)
         {
             const string sql = @"select column_name from information_schema.columns
@@ -75,6 +85,7 @@ namespace FluentMigrator.Runner.Processors.MySql
             return Exists(sql, FormatHelper.FormatSqlEscape(tableName), FormatHelper.FormatSqlEscape(columnName));
         }
 
+        /// <inheritdoc />
         public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
         {
             const string sql = @"select constraint_name from information_schema.table_constraints
@@ -83,6 +94,7 @@ namespace FluentMigrator.Runner.Processors.MySql
             return Exists(sql, FormatHelper.FormatSqlEscape(tableName), FormatHelper.FormatSqlEscape(constraintName));
         }
 
+        /// <inheritdoc />
         public override bool IndexExists(string schemaName, string tableName, string indexName)
         {
             const string sql = @"select index_name from information_schema.statistics
@@ -91,11 +103,13 @@ namespace FluentMigrator.Runner.Processors.MySql
             return Exists(sql, FormatHelper.FormatSqlEscape(tableName), FormatHelper.FormatSqlEscape(indexName));
         }
 
+        /// <inheritdoc />
         public override bool SequenceExists(string schemaName, string sequenceName)
         {
             return false;
         }
 
+        /// <inheritdoc />
         public override bool DefaultValueExists(string schemaName, string tableName, string columnName, object defaultValue)
         {
             var defaultValueAsString = string.Format("%{0}%", FormatHelper.FormatSqlEscape(defaultValue.ToString()));
@@ -103,6 +117,7 @@ namespace FluentMigrator.Runner.Processors.MySql
                FormatHelper.FormatSqlEscape(tableName), FormatHelper.FormatSqlEscape(columnName), defaultValueAsString);
         }
 
+        /// <inheritdoc />
         public override void Execute(string template, params object[] args)
         {
             var commandText = string.Format(template, args);
@@ -121,6 +136,7 @@ namespace FluentMigrator.Runner.Processors.MySql
             }
         }
 
+        /// <inheritdoc />
         public override bool Exists(string template, params object[] args)
         {
             EnsureConnectionIsOpen();
@@ -141,11 +157,13 @@ namespace FluentMigrator.Runner.Processors.MySql
             }
         }
 
+        /// <inheritdoc />
         public override DataSet ReadTableData(string schemaName, string tableName)
         {
             return Read("select * from {0}", _quoter.QuoteTableName(tableName, schemaName));
         }
 
+        /// <inheritdoc />
         public override DataSet Read(string template, params object[] args)
         {
             EnsureConnectionIsOpen();
@@ -157,6 +175,7 @@ namespace FluentMigrator.Runner.Processors.MySql
             }
         }
 
+        /// <inheritdoc />
         protected override void Process(string sql)
         {
             Logger.LogSql(sql);
@@ -174,9 +193,13 @@ namespace FluentMigrator.Runner.Processors.MySql
             }
         }
 
+        /// <inheritdoc />
         public override void Process(PerformDBOperationExpression expression)
         {
-            Logger.LogSay("Performing DB Operation");
+            var message = string.IsNullOrEmpty(expression.Description) 
+                ? "Performing DB Operation" 
+                : $"Performing DB Operation: {expression.Description}";
+            Logger.LogSay(message);
 
             if (Options.PreviewOnly)
             {
@@ -189,6 +212,7 @@ namespace FluentMigrator.Runner.Processors.MySql
             expression.Operation?.Invoke(Connection, Transaction);
         }
 
+        /// <inheritdoc />
         public override void Process(RenameColumnExpression expression)
         {
             // MySql 8.0+ supports column rename without needing to know the column type

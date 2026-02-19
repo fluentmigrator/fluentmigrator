@@ -20,8 +20,18 @@ using FluentMigrator.Infrastructure.Extensions;
 
 namespace FluentMigrator.Postgres
 {
+    /// <summary>
+    /// Provides extension methods and constants for PostgreSQL-specific functionality in FluentMigrator.
+    /// </summary>
     public static partial class PostgresExtensions
     {
+        /// <summary>
+        /// Represents the key used to store or retrieve the filter condition for PostgreSQL index creation.
+        /// </summary>
+        /// <remarks>
+        /// This constant is utilized in conjunction with the <see cref="Filter"/> method
+        /// to specify a WHERE clause for an index in PostgreSQL.
+        /// </remarks>
         public const string IndexFilter = "PostgresIndexFilter";
 
         /// <summary>

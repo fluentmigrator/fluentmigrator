@@ -44,6 +44,7 @@ namespace FluentMigrator.Tests.Unit.Runners
         private Mock<IMigrationRunnerConventions> _migrationConventions;
         private IMaintenanceLoader _maintenanceLoader;
         private IMaintenanceLoader _maintenanceLoaderNoTags;
+        private IMaintenanceLoader _maintenanceLoaderTypeFilter;
 
         [SetUp]
         public void Setup()
@@ -64,6 +65,16 @@ namespace FluentMigrator.Tests.Unit.Runners
                 .AddSingleton<IMigrationRunnerConventionsAccessor>(new PassThroughMigrationRunnerConventionsAccessor(_migrationConventions.Object))
                 .BuildServiceProvider()
                 .GetRequiredService<IMaintenanceLoader>();
+
+            _maintenanceLoaderTypeFilter = ServiceCollectionExtensions.CreateServices()
+                .Configure<TypeFilterOptions>(opt =>
+                {
+                    opt.Namespace = "FluentMigrator.Tests.Unit.Runners.MigrationsOtherNamespace";
+                    opt.NestedNamespaces = true;
+                })
+                .AddSingleton<IMigrationRunnerConventionsAccessor>(new PassThroughMigrationRunnerConventionsAccessor(_migrationConventions.Object))
+                .BuildServiceProvider()
+                .GetRequiredService<IMaintenanceLoader>();
         }
 
         [Test]
@@ -77,7 +88,8 @@ namespace FluentMigrator.Tests.Unit.Runners
             {
                 typeof(MaintenanceBeforeEach),
                 typeof(MaintenanceBeforeEachNoTag),
-                typeof(MaintenanceBeforeEachWithNonTransactionBehavior)
+                typeof(MaintenanceBeforeEachWithNonTransactionBehavior),
+                typeof(Runners.MigrationsOtherNamespace.MaintenanceBeforeEachNoTag)
             }));
 
             foreach (var migrationInfo in migrationInfos)
@@ -102,14 +114,16 @@ namespace FluentMigrator.Tests.Unit.Runners
             {
                 typeof(MaintenanceBeforeEach),
                 typeof(MaintenanceBeforeEachNoTag),
-                typeof(MaintenanceBeforeEachWithNonTransactionBehavior)
+                typeof(MaintenanceBeforeEachWithNonTransactionBehavior),
+                typeof(Runners.MigrationsOtherNamespace.MaintenanceBeforeEachNoTag)
             }));
 
+            var excludes = new[] { typeof(MaintenanceBeforeEachNoTag), typeof(Runners.MigrationsOtherNamespace.MaintenanceBeforeEachNoTag) };
             foreach (var migrationInfo in migrationInfos)
             {
                 migrationInfo.Migration.ShouldNotBeNull();
 
-                if (migrationInfo.Migration.GetType() != typeof(MaintenanceBeforeEachNoTag))
+                if (!excludes.Contains(migrationInfo.Migration.GetType()))
                     DefaultMigrationRunnerConventions.Instance.TypeHasMatchingTags(migrationInfo.Migration.GetType(), _tags)
                         .ShouldBeTrue();
             }
@@ -159,6 +173,9 @@ namespace FluentMigrator.Tests.Unit.Runners
                 if (migrationInfo.Migration.GetType() == typeof(MaintenanceBeforeEachNoTag))
                 {
                     foundNoTag = true;
+                } else if (migrationInfo.Migration.GetType() == typeof(Runners.MigrationsOtherNamespace.MaintenanceBeforeEachNoTag))
+                {
+                    continue;
                 }
                 else
                 {
@@ -168,6 +185,32 @@ namespace FluentMigrator.Tests.Unit.Runners
             }
 
             Assert.That(foundNoTag);
+        }
+
+        [Test]
+        public void LoadsMigrationsFilterNamespace()
+        {
+            var migrationInfos = _maintenanceLoaderTypeFilter.LoadMaintenance(MigrationStage.BeforeEach);
+            Assert.That(migrationInfos, Is.Not.Empty);
+
+            bool found = false;
+            foreach (var migrationInfo in migrationInfos)
+            {
+                migrationInfo.Migration.ShouldNotBeNull();
+
+                // Both notag maintenance and tagged maintenance should be found in the notag maintenanceLoader because he doesn't care about tags
+                if (migrationInfo.Migration.GetType() == typeof(Runners.MigrationsOtherNamespace.MaintenanceBeforeEachNoTag))
+                {
+                    found = true;
+                }
+                else
+                {
+                    DefaultMigrationRunnerConventions.Instance.TypeHasMatchingTags(migrationInfo.Migration.GetType(), _tags)
+                        .ShouldBeTrue();
+                }
+            }
+
+            Assert.That(found);
         }
     }
 
@@ -203,6 +246,18 @@ namespace FluentMigrator.Tests.Unit.Runners
         public override void Up() { }
         public override void Down() { }
     }
+
+    [Maintenance(MigrationStage.BeforeEach)]
+    public class MaintenanceBeforeEachNoTag : Migration
+    {
+        public override void Up() { }
+        public override void Down() { }
+    }
+
+}
+
+namespace FluentMigrator.Tests.Unit.Runners.MigrationsOtherNamespace
+{
 
     [Maintenance(MigrationStage.BeforeEach)]
     public class MaintenanceBeforeEachNoTag : Migration

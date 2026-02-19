@@ -24,11 +24,13 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 
+using FluentMigrator.Exceptions;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Exceptions;
 using FluentMigrator.Runner.Generators;
+using FluentMigrator.Runner.Generators.Generic;
 using FluentMigrator.Runner.Infrastructure;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
@@ -89,7 +91,13 @@ namespace FluentMigrator.Tests.Unit
 
             _migrationLoaderMock.Setup(x => x.LoadMigrations()).Returns(()=> _migrationList);
 
+            var generatorMock = new Mock<IMigrationGenerator>(MockBehavior.Loose);
+            generatorMock.SetupGet(x => x.Quoter)
+                .Returns(new GenericQuoter());
             var generatorAccessorMock = new Mock<IGeneratorAccessor>(MockBehavior.Loose);
+
+            generatorAccessorMock.SetupGet(x => x.Generator)
+                .Returns(generatorMock.Object);
 
             _logMessages = new List<string>();
             var connectionString = IntegrationTestOptions.SqlServer2008.ConnectionString;
@@ -523,7 +531,7 @@ namespace FluentMigrator.Tests.Unit
                     Times.Exactly(1)
                 );
 
-            //After setup is done, fake version loader owns the proccess
+            //After setup is done, fake version loader owns the process
             _fakeVersionLoader.DidLoadVersionInfoGetCalled.ShouldBe(true);
         }
 
@@ -811,6 +819,66 @@ namespace FluentMigrator.Tests.Unit
             var runner = CreateRunner();
             runner.MigrateUp();
             Assert.That(runner.VersionLoader.VersionInfo.Latest(), Is.EqualTo(1));
+        }
+
+        [Test]
+        public void MigrateUpShouldValidateConnectionAndThrowExceptionForInvalidConnectionString()
+        {
+            // Arrange
+            _migrationList.Clear();
+            _migrationList.Add(1, new MigrationInfo(1, TransactionBehavior.Default, new TestMigration()));
+            
+            var runner = CreateRunner();
+
+            // Setup processor mock to throw exception on BeginTransaction AFTER runner initialization
+            // Use SetupSequence to throw on the validation call (which is the first call after initialization)
+            _processorMock.Setup(x => x.BeginTransaction())
+                .Throws(new ArgumentException("Invalid connection string"));
+
+            // Act & Assert
+            var exception = Assert.Throws<UndeterminableConnectionException>(() => runner.MigrateUp());
+            Assert.That(exception.Message, Does.Contain("Failed to establish database connection"));
+            Assert.That(exception.InnerException, Is.Not.Null);
+            Assert.That(exception.InnerException.Message, Does.Contain("Invalid connection string"));
+        }
+
+        [Test]
+        public void MigrateUpShouldSkipConnectionValidationInPreviewMode()
+        {
+            // Arrange
+            _migrationList.Clear();
+            _migrationList.Add(1, new MigrationInfo(1, TransactionBehavior.Default, new TestMigration()));
+            
+            var runner = CreateRunner(services =>
+            {
+                services.Configure<ProcessorOptions>(opt => opt.PreviewOnly = true);
+            });
+
+            // Setup processor mock to throw exception on BeginTransaction AFTER runner initialization
+            _processorMock.Setup(x => x.BeginTransaction())
+                .Throws(new ArgumentException("Invalid connection string"));
+
+            // Act & Assert - Should not throw exception in preview mode
+            Assert.DoesNotThrow(() => runner.MigrateUp());
+        }
+
+        [Test]
+        public void MigrateUpShouldValidateConnectionEvenWhenNoMigrationsToApply()
+        {
+            // Arrange
+            _migrationList.Clear(); // No migrations to apply
+            
+            var runner = CreateRunner();
+
+            // Setup processor mock to throw exception on BeginTransaction AFTER runner initialization
+            _processorMock.Setup(x => x.BeginTransaction())
+                .Throws(new ArgumentException("Invalid connection string"));
+
+            // Act & Assert - Should still validate connection even with no migrations
+            var exception = Assert.Throws<UndeterminableConnectionException>(() => runner.MigrateUp());
+            Assert.That(exception.Message, Does.Contain("Failed to establish database connection"));
+            Assert.That(exception.InnerException, Is.Not.Null);
+            Assert.That(exception.InnerException.Message, Does.Contain("Invalid connection string"));
         }
 
         private static bool LineContainsAll(string line, params string[] words)

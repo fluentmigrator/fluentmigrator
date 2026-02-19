@@ -24,23 +24,46 @@ using FluentMigrator.Runner.Infrastructure;
 
 namespace FluentMigrator.Runner
 {
+    /// <inheritdoc />
+    /// <summary>
+    /// Provides default conventions used by the migration runner in FluentMigrator.
+    /// </summary>
+    /// <remarks>
+    /// This class defines a set of default behaviors and rules for identifying migrations, profiles,
+    /// version table metadata, and other migration-related components. It also allows customization
+    /// of these conventions by modifying its properties.
+    /// </remarks>
     public class MigrationRunnerConventions : IMigrationRunnerConventions
     {
         private static readonly IMigrationRunnerConventions _default = DefaultMigrationRunnerConventions.Instance;
 
+        /// <inheritdoc />
         public Func<Type, bool> TypeIsMigration { get; set; }
+        /// <inheritdoc />
         public Func<Type, bool> TypeIsProfile { get; set; }
+        /// <inheritdoc />
         public Func<Type, MigrationStage?> GetMaintenanceStage { get; set; }
+        /// <inheritdoc />
         public Func<Type, bool> TypeIsVersionTableMetaData { get; set; }
 
+        /// <inheritdoc />
         [Obsolete]
         public Func<Type, IMigrationInfo> GetMigrationInfo { get; set; }
 
         /// <inheritdoc />
         public Func<IMigration, IMigrationInfo> GetMigrationInfoForMigration { get; }
+        /// <inheritdoc />
         public Func<Type, bool> TypeHasTags { get; set; }
+        /// <inheritdoc />
         public Func<Type, IEnumerable<string>, bool> TypeHasMatchingTags { get; set; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MigrationRunnerConventions"/> class.
+        /// </summary>
+        /// <remarks>
+        /// This constructor sets up default conventions for identifying migrations, version table metadata, 
+        /// profiles, maintenance stages, and tag matching within the FluentMigrator framework.
+        /// </remarks>
         public MigrationRunnerConventions()
         {
             TypeIsMigration = _default.TypeIsMigration;

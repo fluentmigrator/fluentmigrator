@@ -49,10 +49,7 @@ namespace FluentMigrator.Tests.Unit.Announcers
         private TextWriterAnnouncer _announcer;
         private StringWriter _stringWriter;
 
-        public string Output
-        {
-            get { return _stringWriter.GetStringBuilder().ToString(); }
-        }
+        public string Output => _stringWriter.GetStringBuilder().ToString();
 
         [Test]
         public void CanAnnounceAndPadWithEquals()

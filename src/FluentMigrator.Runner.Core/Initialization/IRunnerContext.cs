@@ -24,6 +24,13 @@ using FluentMigrator.Runner.Processors;
 
 namespace FluentMigrator.Runner.Initialization
 {
+    /// <summary>
+    /// Represents the context information required for configuring and running migrations.
+    /// </summary>
+    /// <remarks>
+    /// This interface is marked as <see cref="ObsoleteAttribute"/> and may be removed in future versions.
+    /// The reason is that the options pattern should be used instead. See <see cref="RunnerOptions"/>.
+    /// </remarks>
     [Obsolete]
     public interface IRunnerContext
     {

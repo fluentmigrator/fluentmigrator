@@ -20,9 +20,20 @@ using System;
 
 namespace FluentMigrator.Runner.Announcers
 {
+    /// <summary>
+    /// An announcer implementation that suppresses all output.
+    /// </summary>
+    /// <remarks>
+    /// This class is a no-op implementation of <see cref="Announcer"/>. It does not log or display any messages.
+    /// </remarks>
     [Obsolete]
     public class NullAnnouncer : Announcer
     {
+        /// <summary>
+        /// Does NOT log a message.
+        /// </summary>
+        /// <param name="message">Ignored.</param>
+        /// <param name="isNotSql">Ignored.</param>
         public override void Write(string message, bool isNotSql = true)
         {
         }

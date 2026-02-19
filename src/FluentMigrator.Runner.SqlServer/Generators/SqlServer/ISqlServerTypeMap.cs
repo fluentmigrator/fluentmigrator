@@ -16,5 +16,12 @@
 
 namespace FluentMigrator.Runner.Generators.SqlServer
 {
+    /// <summary>
+    /// Represents a specialized type map for SQL Server, extending the functionality of <see cref="FluentMigrator.Runner.Generators.ITypeMap"/>.
+    /// </summary>
+    /// <remarks>
+    /// This interface provides SQL Server-specific mappings for database types, enabling precise control over type conversions
+    /// and compatibility with various SQL Server versions.
+    /// </remarks>
     public interface ISqlServerTypeMap : ITypeMap { }
 }

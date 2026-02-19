@@ -23,39 +23,48 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Announcers
 {
+    /// <summary>
+    /// An announcer that writes output to a <see cref="TextWriter"/>.
+    /// </summary>
     [Obsolete("Use DependencyInjection extension method chain instead: .AddLogging(lb => lb.AddDebug().AddFluentMigratorConsole())")]
     public class TextWriterAnnouncer : Announcer
     {
         private readonly Action<string> _write;
 
+        /// <inheritdoc />
         public TextWriterAnnouncer(TextWriter writer)
             : this(writer.Write)
         {
         }
 
+        /// <inheritdoc />
         public TextWriterAnnouncer(Action<string> write)
         {
             _write = write;
         }
 
+        /// <inheritdoc />
         public TextWriterAnnouncer(IOptions<TextWriterAnnouncerOptions> options)
             : base(options)
         {
             _write = options.Value.WriteDelegate;
         }
 
+        /// <inheritdoc />
         public override void Heading(string message)
         {
             base.Heading(string.Format("{0} ", message).PadRight(75, '='));
             _write(Environment.NewLine);
         }
 
+        /// <inheritdoc />
         public override void ElapsedTime(TimeSpan timeSpan)
         {
             base.ElapsedTime(timeSpan);
             _write(Environment.NewLine);
         }
 
+        /// <inheritdoc />
         public override void Write(string message, bool isNotSql = true)
         {
             _write(isNotSql ? string.Format("/* {0} */", message) : message);

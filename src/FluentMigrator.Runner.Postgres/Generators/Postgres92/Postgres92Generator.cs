@@ -24,12 +24,34 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Generators.Postgres92
 {
+    /// <summary>
+    /// The Postgres 9.2 SQL generator for FluentMigrator.
+    /// </summary>
     public class Postgres92Generator : PostgresGenerator
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Postgres92Generator"/> class.
+        /// </summary>
+        /// <param name="quoter">The Postgres quoter.</param>
+        /// <param name="generatorOptions">The generator options.</param>
         public Postgres92Generator(
             [NotNull] PostgresQuoter quoter,
             [NotNull] IOptions<GeneratorOptions> generatorOptions)
             : base(quoter, generatorOptions, new Postgres92TypeMap())
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Postgres92Generator"/> class.
+        /// </summary>
+        /// <param name="quoter">The Postgres quoter.</param>
+        /// <param name="generatorOptions">The generator options.</param>
+        /// <param name="typeMap">The Postgres type map.</param>
+        public Postgres92Generator(
+            [NotNull] PostgresQuoter quoter,
+            [NotNull] IOptions<GeneratorOptions> generatorOptions,
+            [NotNull] IPostgresTypeMap typeMap)
+            : base(quoter, generatorOptions, typeMap)
         {
         }
 

@@ -30,25 +30,16 @@ namespace FluentMigrator
         /// <summary>
         /// Gets the starting point for data deletions
         /// </summary>
-        public IDeleteExpressionRoot Delete
-        {
-            get { return new DeleteExpressionRoot(Context); }
-        }
+        public IDeleteExpressionRoot Delete => new DeleteExpressionRoot(Context);
 
         /// <summary>
         /// Gets the starting point for SQL execution
         /// </summary>
-        public IExecuteExpressionRoot Execute
-        {
-            get { return new ExecuteExpressionRoot(Context); }
-        }
+        public IExecuteExpressionRoot Execute => new ExecuteExpressionRoot(Context);
 
         /// <summary>
         /// Gets the starting point for data updates
         /// </summary>
-        public IUpdateExpressionRoot Update
-        {
-            get { return new UpdateExpressionRoot(Context); }
-        }
+        public IUpdateExpressionRoot Update => new UpdateExpressionRoot(Context);
     }
 }

@@ -26,26 +26,37 @@ using FluentMigrator.Runner.VersionTableInfo;
 
 namespace FluentMigrator.Runner.Infrastructure
 {
+    /// <summary>
+    /// Provides default conventions for migration runner.
+    /// </summary>
     public class DefaultMigrationRunnerConventions : IMigrationRunnerConventions
     {
         private DefaultMigrationRunnerConventions()
         {
         }
 
+        /// <inheritdoc />
         public static DefaultMigrationRunnerConventions Instance { get; } = new DefaultMigrationRunnerConventions();
 
+        /// <inheritdoc />
         public Func<Type, bool> TypeIsMigration => TypeIsMigrationImpl;
+        /// <inheritdoc />
         public Func<Type, bool> TypeIsProfile => TypeIsProfileImpl;
+        /// <inheritdoc />
         public Func<Type, MigrationStage?> GetMaintenanceStage => GetMaintenanceStageImpl;
+        /// <inheritdoc />
         public Func<Type, bool> TypeIsVersionTableMetaData => TypeIsVersionTableMetaDataImpl;
 
+        /// <inheritdoc />
         [Obsolete]
         public Func<Type, IMigrationInfo> GetMigrationInfo => GetMigrationInfoForImpl;
 
         /// <inheritdoc />
         public Func<IMigration, IMigrationInfo> GetMigrationInfoForMigration => GetMigrationInfoForMigrationImpl;
 
+        /// <inheritdoc />
         public Func<Type, bool> TypeHasTags => TypeHasTagsImpl;
+        /// <inheritdoc />
         public Func<Type, IEnumerable<string>, bool> TypeHasMatchingTags => TypeHasMatchingTagsImpl;
 
         private static bool TypeIsMigrationImpl(Type type)

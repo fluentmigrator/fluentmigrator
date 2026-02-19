@@ -31,7 +31,7 @@ namespace FluentMigrator.Builders.Execute
     /// <summary>
     /// The implementation of the <see cref="IExecuteExpressionRoot"/> interface.
     /// </summary>
-    public class ExecuteExpressionRoot : IExecuteExpressionRoot
+    public class ExecuteExpressionRoot : IExecuteExpressionRoot, IMigrationContextAccessor
     {
         private readonly IMigrationContext _context;
 
@@ -43,6 +43,9 @@ namespace FluentMigrator.Builders.Execute
         {
             _context = context;
         }
+
+        /// <inheritdoc />
+        IMigrationContext IMigrationContextAccessor.GetMigrationContext() => _context;
 
         /// <inheritdoc />
         public void Sql(string sqlStatement)
@@ -111,6 +114,17 @@ namespace FluentMigrator.Builders.Execute
         public void WithConnection(Action<IDbConnection, IDbTransaction> operation)
         {
             var expression = new PerformDBOperationExpression { Operation = operation };
+            _context.Expressions.Add(expression);
+        }
+
+        /// <inheritdoc />
+        public void WithConnection(Action<IDbConnection, IDbTransaction> operation, string description)
+        {
+            var expression = new PerformDBOperationExpression
+            {
+                Operation = operation,
+                Description = description
+            };
             _context.Expressions.Add(expression);
         }
 

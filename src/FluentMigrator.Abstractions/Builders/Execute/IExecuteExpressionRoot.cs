@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+
 using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Execute
@@ -74,6 +75,13 @@ namespace FluentMigrator.Builders.Execute
         /// </summary>
         /// <param name="operation">The operation to execute on a given connection and transaction</param>
         void WithConnection(Action<IDbConnection, IDbTransaction> operation);
+
+        /// <summary>
+        /// Calls an action to execute dynamically generated SQL statements
+        /// </summary>
+        /// <param name="operation">The operation to execute on a given connection and transaction</param>
+        /// <param name="description">Description for this operation for logging purposes</param>
+        void WithConnection(Action<IDbConnection, IDbTransaction> operation, string description);
 
         /// <summary>
         /// Executes an SQL script loaded from an embedded resource

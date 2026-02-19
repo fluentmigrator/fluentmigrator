@@ -14,8 +14,19 @@
 // limitations under the License.
 #endregion
 
+using System;
+
 namespace FluentMigrator.Runner.Generators.Hana
 {
+    /// <summary>
+    /// Represents a specialized type map for SAP HANA database, providing mappings
+    /// between <see cref="System.Data.DbType"/> and HANA-specific SQL types.
+    /// </summary>
+    /// <remarks>
+    /// This interface extends <see cref="FluentMigrator.Runner.Generators.ITypeMap"/> to
+    /// include HANA-specific type mapping functionality.
+    /// </remarks>
+    [Obsolete("Hana support will go away unless someone in the community steps up to provide support.")]
     public interface IHanaTypeMap : ITypeMap
     {
         

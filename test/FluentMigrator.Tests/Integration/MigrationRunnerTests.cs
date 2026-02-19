@@ -25,7 +25,9 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
+using FluentMigrator.Builder.SecurityLabel.Provider;
 using FluentMigrator.Expressions;
+using FluentMigrator.Postgres;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Exceptions;
 using FluentMigrator.Runner.Initialization;
@@ -33,11 +35,13 @@ using FluentMigrator.Runner.Logging;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Runner.Processors.MySql;
+using FluentMigrator.Runner.Processors.Oracle;
 using FluentMigrator.Runner.Processors.Postgres;
 using FluentMigrator.Runner.Processors.Snowflake;
 using FluentMigrator.Runner.Processors.SQLite;
 using FluentMigrator.Runner.Processors.SqlServer;
 using FluentMigrator.Runner.VersionTableInfo;
+using FluentMigrator.Tests.Integration.Migrations.Computed;
 using FluentMigrator.Tests.Integration.Migrations.Issues;
 using FluentMigrator.Tests.Integration.Migrations.Tagged;
 using FluentMigrator.Tests.Integration.TestCases;
@@ -1150,7 +1154,8 @@ namespace FluentMigrator.Tests.Integration
         [Test]
         [TestCaseSource(typeof(ProcessorTestCaseSourceExcept<
             SQLiteProcessor,
-            FirebirdProcessor
+            FirebirdProcessor,
+            OracleProcessorBase /* Oracle does not support schemas in the same way as other DBMSs */
         >))]
         public void CanAlterTablesSchema(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
         {
@@ -1599,11 +1604,12 @@ namespace FluentMigrator.Tests.Integration
                     DataSet upDs = processor.ReadTableData("TestSchema", "Foo");
 
                     var rows = upDs.Tables[0].Rows;
-                    rows.Count.ShouldBe(3);
+                    rows.Count.ShouldBe(4);
 
                     rows[0]["Baz"].ShouldBe(1);
                     rows[1]["Baz"].ShouldBe(2);
                     rows[2]["Baz"].ShouldBe(3);
+                    rows[3]["Baz"].ShouldBe(4);
 
                     runner.Up(new RawSqlUpdateMigration());
                     upDs = processor.ReadTableData("TestSchema", "Foo");
@@ -1612,6 +1618,7 @@ namespace FluentMigrator.Tests.Integration
                     rows[0]["Baz"].ShouldBe(101);
                     rows[1]["Baz"].ShouldBe(102);
                     rows[2]["Baz"].ShouldBe(103);
+                    rows[3]["Baz"].ShouldBe(104);
 
                     runner.Up(new RawSqlDeleteMigration());
                     upDs = processor.ReadTableData("TestSchema", "Foo");
@@ -2025,12 +2032,14 @@ namespace FluentMigrator.Tests.Integration
     {
         public override void Up()
         {
-            Alter.Column("Name2").OnTable("TestTable2").InSchema("TestSchema").AsAnsiString(100).Nullable();
+            IfDatabase(processorId => !processorId.Contains(ProcessorIdConstants.Oracle))
+                .Alter.Column("Name2").OnTable("TestTable2").InSchema("TestSchema").AsAnsiString(100).Nullable();
         }
 
         public override void Down()
         {
-            Alter.Column("Name2").OnTable("TestTable2").InSchema("TestSchema").AsString(10).Nullable();
+            IfDatabase(processorId => !processorId.Contains(ProcessorIdConstants.Oracle))
+                .Alter.Column("Name2").OnTable("TestTable2").InSchema("TestSchema").AsString(10).Nullable();
         }
     }
 
@@ -2124,6 +2133,10 @@ namespace FluentMigrator.Tests.Integration
                 {
                     baz = 3,
                 })
+                .Row(new
+                {
+                    baz = 4,
+                })
                 ;
         }
 
@@ -2157,6 +2170,17 @@ namespace FluentMigrator.Tests.Integration
                 {
                     baz = RawSql.Insert("= 3")
                 });
+
+            // UPDATE : Raw SQL with RawSql object inside an anonymous object (backward compatibility - no explicit operator)
+            Update.Table("Foo").InSchema("TestSchema")
+                .Set(new
+                {
+                    baz = RawSql.Insert("CASE WHEN baz = 4 THEN 104 ELSE 0 END")
+                })
+                .Where(new
+                {
+                    baz = RawSql.Insert("4")
+                });
         }
     }
 
@@ -2176,6 +2200,12 @@ namespace FluentMigrator.Tests.Integration
                 .Row(new
                 {
                     baz = RawSql.Insert("= 103")
+                })
+
+                // DELETE : Raw SQL with RawSql object inside an anonymous object (backward compatibility - no explicit operator)
+                .Row(new
+                {
+                    baz = RawSql.Insert("104")
                 });
         }
     }
@@ -2262,12 +2292,20 @@ namespace FluentMigrator.Tests.Integration
     {
         public override void Up()
         {
-            Execute.Sql("select 1");
+            IfDatabase(processorId => !processorId.Contains(ProcessorIdConstants.Oracle))
+                .Execute.Sql("select 1");
+
+            IfDatabase(processorId => processorId.Contains(ProcessorIdConstants.Oracle))
+                .Execute.Sql("select 1 from dual");
         }
 
         public override void Down()
         {
-            Execute.Sql("select 2");
+            IfDatabase(processorId => !processorId.Contains(ProcessorIdConstants.Oracle))
+                .Execute.Sql("select 1");
+
+            IfDatabase(processorId => processorId.Contains(ProcessorIdConstants.Oracle))
+                .Execute.Sql("select 1 from dual");
         }
     }
 }

@@ -11,7 +11,9 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Generators.Postgres11_0
 {
     [TestFixture]
+#pragma warning disable NUnit1034 // Class is used as base class but also contains tests to execute
     public class Postgres11_0IndexTests : Postgres10_0IndexTests
+#pragma warning restore NUnit1034
     {
         /// <inheritdoc />
         protected override PostgresGenerator CreateGenerator(PostgresQuoter quoter)

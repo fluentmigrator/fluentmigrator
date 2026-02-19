@@ -34,9 +34,13 @@ namespace FluentMigrator.Builders.Create.Table
                                                 ICreateTableWithColumnOrSchemaOrDescriptionSyntax,
                                                 ICreateTableColumnAsTypeSyntax,
                                                 ICreateTableColumnOptionOrForeignKeyCascadeOrWithColumnSyntax,
-                                                IColumnExpressionBuilder
+                                                IColumnExpressionBuilder,
+                                                IMigrationContextAccessor
     {
         private readonly IMigrationContext _context;
+
+        /// <inheritdoc />
+        IMigrationContext IMigrationContextAccessor.GetMigrationContext() => _context;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CreateTableExpressionBuilder"/> class.
@@ -199,6 +203,14 @@ namespace FluentMigrator.Builders.Create.Table
         public ICreateTableColumnOptionOrWithColumnSyntax NotNullable()
         {
             ColumnHelper.SetNullable(false);
+            return this;
+        }
+
+        /// <inheritdoc/>
+        public ICreateTableColumnOptionOrWithColumnSyntax Computed(string expression, bool stored = false)
+        {
+            CurrentColumn.Expression = expression;
+            CurrentColumn.ExpressionStored = stored;
             return this;
         }
 

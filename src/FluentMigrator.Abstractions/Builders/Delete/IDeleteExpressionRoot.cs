@@ -19,9 +19,9 @@
 using FluentMigrator.Builders.Delete.Column;
 using FluentMigrator.Builders.Delete.DefaultConstraint;
 using FluentMigrator.Builders.Delete.ForeignKey;
-using FluentMigrator.Infrastructure;
 using FluentMigrator.Builders.Delete.Index;
 using FluentMigrator.Builders.Delete.Constraint;
+using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Delete
 {

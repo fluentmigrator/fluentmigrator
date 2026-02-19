@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+
+using FluentMigrator.Generation;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Base;
 
@@ -110,6 +112,12 @@ namespace FluentMigrator.Runner.Generators.SQLite
             // If there are no identity column then we can add as a separate constraint
             var pkColDefs = primaryKeyColumns.ToList();
             return !pkColDefs.Any(x => x.IsIdentity) && pkColDefs.Any(x => x.IsPrimaryKey);
+        }
+
+        /// <inheritdoc />
+        protected override string FormatExpression(ColumnDefinition column)
+        {
+            return column.Expression == null ? null : $"GENERATED ALWAYS AS ({column.Expression}){(column.ExpressionStored ? " STORED" : " VIRTUAL")}";
         }
     }
 }

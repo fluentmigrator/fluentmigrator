@@ -34,16 +34,6 @@ namespace FluentMigrator.Runner.Initialization
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RunnerOptions"/> class.
-        /// </summary>
-        /// <param name="runnerContext">The runner context</param>
-        [Obsolete]
-        public RunnerOptions(IRunnerContext runnerContext)
-        {
-            SetValuesFrom(runnerContext);
-        }
-
-        /// <summary>
         /// Gets or sets the task to execute
         /// </summary>
         [CanBeNull]

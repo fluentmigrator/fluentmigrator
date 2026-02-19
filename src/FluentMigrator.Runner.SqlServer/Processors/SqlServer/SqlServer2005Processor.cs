@@ -26,6 +26,9 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
+    /// <summary>
+    /// The SQL Server 2005 processor for FluentMigrator.
+    /// </summary>
     public class SqlServer2005Processor : SqlServerProcessor
     {
         /// <inheritdoc />

@@ -38,5 +38,30 @@ namespace FluentMigrator.Tests.Unit.Expressions
             var errors = ValidationHelper.CollectErrors(expression);
             errors.ShouldContain(ErrorMessages.OperationCannotBeNull);
         }
+
+        [Test]
+        public void DescriptionCanBeSet()
+        {
+            const string testDescription = "Test operation description";
+            var expression = new PerformDBOperationExpression 
+            { 
+                Operation = (connection, transaction) => { },
+                Description = testDescription
+            };
+            
+            expression.Description.ShouldBe(testDescription);
+        }
+
+        [Test]
+        public void DescriptionCanBeNull()
+        {
+            var expression = new PerformDBOperationExpression 
+            { 
+                Operation = (connection, transaction) => { },
+                Description = null
+            };
+            
+            expression.Description.ShouldBeNull();
+        }
     }
 }

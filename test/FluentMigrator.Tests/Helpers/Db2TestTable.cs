@@ -20,7 +20,7 @@ using System;
 using System.Data;
 using System.Text;
 
-using FluentMigrator.Runner.Generators;
+using FluentMigrator.Generation;
 using FluentMigrator.Runner.Generators.DB2;
 using FluentMigrator.Runner.Processors.DB2;
 

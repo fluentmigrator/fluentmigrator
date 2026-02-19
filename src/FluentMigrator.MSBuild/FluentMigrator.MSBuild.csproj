@@ -2,7 +2,7 @@
   <!-- Much of this configuration is taken from Microsoft documentation on how to set-up custom MSBuild tasks: https://learn.microsoft.com/en-us/visualstudio/msbuild/tutorial-custom-task-code-generation?view=vs-2022#package-the-task-for-distribution -->
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFrameworks>net48;netstandard2.0;net8.0;net9.0</TargetFrameworks>
+    <TargetFrameworks>net48;netstandard2.0;net8.0;net9.0;net10.0</TargetFrameworks>
     <Description>MSBuild runner for FluentMigrator</Description>
     <!-- The property CopyLocalLockFileAssemblies is needed to make sure that dependencies are copied to the output directory. -->
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
@@ -46,10 +46,7 @@
   <!-- Dependencies -->
   <!-- mark every dependency of this Task project, both PackageReference and ProjectReference with the PrivateAssets="all" attribute. -->
   <ItemGroup>
-    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.11.4" PrivateAssets="all" ExcludeAssets="Runtime" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Update="JetBrains.Annotations" Version="2024.3.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.14.28" PrivateAssets="all" ExcludeAssets="Runtime" />
   </ItemGroup>
 
   <Target Name="PackBuildOutputs">

@@ -68,6 +68,14 @@ namespace FluentMigrator.Builders
                     data.Add(new KeyValuePair<string, object>("", RawSql.Insert(stringValue)));
                     break;
 
+                // Handle IDictionary<string, object> directly
+                case IDictionary<string, object> dictionary:
+                    foreach (var kvp in dictionary)
+                    {
+                        data.Add(kvp);
+                    }
+                    break;
+
                 default:
                     var properties = TypeDescriptor.GetProperties(dataAsAnonymousType);
                     foreach (PropertyDescriptor property in properties)

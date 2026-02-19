@@ -79,5 +79,24 @@ namespace FluentMigrator.Tests.Unit.Expressions
 
             Assert.That(processed.SchemaName, Is.EqualTo("testdefault"));
         }
+
+        [Test]
+        public void ReverseReturnsAlterTableExpression()
+        {
+            var expression = new AlterTableExpression
+            {
+                TableName = "TestTable",
+                SchemaName = "TestSchema",
+                TableDescription = "TestDescription"
+            };
+
+            var reversed = expression.Reverse();
+
+            Assert.That(reversed, Is.TypeOf<AlterTableExpression>());
+            var reversedExpression = (AlterTableExpression)reversed;
+            Assert.That(reversedExpression.TableName, Is.EqualTo("TestTable"));
+            Assert.That(reversedExpression.SchemaName, Is.EqualTo("TestSchema"));
+            Assert.That(reversedExpression.TableDescription, Is.EqualTo("TestDescription"));
+        }
     }
 }

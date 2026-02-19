@@ -28,13 +28,18 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Generators.DB2
 {
+    /// <summary>
+    /// The DB2 SQL generator for FluentMigrator.
+    /// </summary>
     public class Db2Generator : GenericGenerator
     {
+        /// <inheritdoc />
         public Db2Generator()
             : this(new Db2Quoter())
         {
         }
 
+        /// <inheritdoc />
         public Db2Generator(
             Db2Quoter quoter)
             : this(
@@ -43,6 +48,7 @@ namespace FluentMigrator.Runner.Generators.DB2
         {
         }
 
+        /// <inheritdoc />
         public Db2Generator(
             Db2Quoter quoter,
             IOptions<GeneratorOptions> generatorOptions)
@@ -50,6 +56,7 @@ namespace FluentMigrator.Runner.Generators.DB2
         {
         }
 
+        /// <inheritdoc />
         public override string Generate(Expressions.AlterDefaultConstraintExpression expression)
         {
             return FormatStatement(
@@ -59,6 +66,7 @@ namespace FluentMigrator.Runner.Generators.DB2
                 ((Db2Column)Column).FormatAlterDefaultValue(expression.ColumnName, expression.DefaultValue));
         }
 
+        /// <inheritdoc />
         public override string Generate(Expressions.DeleteDefaultConstraintExpression expression)
         {
             return FormatStatement(
@@ -67,6 +75,7 @@ namespace FluentMigrator.Runner.Generators.DB2
                 Quoter.QuoteColumnName(expression.ColumnName));
         }
 
+        /// <inheritdoc />
         public override string Generate(Expressions.DeleteColumnExpression expression)
         {
             var builder = new StringBuilder();
@@ -86,6 +95,7 @@ namespace FluentMigrator.Runner.Generators.DB2
             return builder.ToString();
         }
 
+        /// <inheritdoc />
         public override string Generate(Expressions.CreateColumnExpression expression)
         {
             expression.Column.AdditionalFeatures.Add(new KeyValuePair<string, object>("IsCreateColumn", true));
@@ -96,6 +106,7 @@ namespace FluentMigrator.Runner.Generators.DB2
                 Column.Generate(expression.Column));
         }
 
+        /// <inheritdoc />
         public override string Generate(Expressions.CreateForeignKeyExpression expression)
         {
             if (expression.ForeignKey.PrimaryColumns.Count != expression.ForeignKey.ForeignColumns.Count)
@@ -130,6 +141,7 @@ namespace FluentMigrator.Runner.Generators.DB2
                 Column.FormatCascade("DELETE", expression.ForeignKey.OnDelete));
         }
 
+        /// <inheritdoc />
         public override string Generate(Expressions.CreateConstraintExpression expression)
         {
             var constraintName = Quoter.QuoteConstraintName(expression.Constraint.ConstraintName, expression.Constraint.SchemaName);
@@ -146,6 +158,7 @@ namespace FluentMigrator.Runner.Generators.DB2
                 columnList);
         }
 
+        /// <inheritdoc />
         public override string Generate(Expressions.CreateIndexExpression expression)
         {
             var indexWithSchema = Quoter.QuoteIndexName(expression.Index.Name, expression.Index.SchemaName);
@@ -172,11 +185,13 @@ namespace FluentMigrator.Runner.Generators.DB2
         /// <inheritdoc />
         public override List<string> GeneratorIdAliases => new List<string> { GeneratorIdConstants.DB2 };
 
+        /// <inheritdoc />
         public override string Generate(Expressions.CreateSchemaExpression expression)
         {
             return FormatStatement("CREATE SCHEMA {0}", Quoter.QuoteSchemaName(expression.SchemaName));
         }
 
+        /// <inheritdoc />
         public override string Generate(Expressions.DeleteTableExpression expression)
         {
             if (expression.IfExists)
@@ -197,17 +212,20 @@ namespace FluentMigrator.Runner.Generators.DB2
             return FormatStatement(DropTable, Quoter.QuoteTableName(expression.TableName, expression.SchemaName));
         }
 
+        /// <inheritdoc />
         public override string Generate(Expressions.DeleteIndexExpression expression)
         {
             var indexWithSchema = Quoter.QuoteIndexName(expression.Index.Name, expression.Index.SchemaName);
             return FormatStatement("DROP INDEX {0}", indexWithSchema);
         }
 
+        /// <inheritdoc />
         public override string Generate(Expressions.DeleteSchemaExpression expression)
         {
             return FormatStatement("DROP SCHEMA {0} RESTRICT", Quoter.QuoteSchemaName(expression.SchemaName));
         }
 
+        /// <inheritdoc />
         public override string Generate(Expressions.DeleteConstraintExpression expression)
         {
             var constraintName = Quoter.QuoteConstraintName(expression.Constraint.ConstraintName, expression.Constraint.SchemaName);
@@ -218,6 +236,7 @@ namespace FluentMigrator.Runner.Generators.DB2
                 constraintName);
         }
 
+        /// <inheritdoc />
         public override string Generate(Expressions.DeleteForeignKeyExpression expression)
         {
             var constraintName = Quoter.QuoteConstraintName(expression.ForeignKey.Name, expression.ForeignKey.ForeignTableSchema);
@@ -228,11 +247,13 @@ namespace FluentMigrator.Runner.Generators.DB2
                 constraintName);
         }
 
+        /// <inheritdoc />
         public override string Generate(Expressions.RenameColumnExpression expression)
         {
             return CompatibilityMode.HandleCompatibility("This feature not directly supported by most versions of DB2.");
         }
 
+        /// <inheritdoc />
         public override string Generate(Expressions.InsertDataExpression expression)
         {
             var sb = new StringBuilder();
@@ -265,6 +286,7 @@ namespace FluentMigrator.Runner.Generators.DB2
             return sb.ToString();
         }
 
+        /// <inheritdoc />
         public override string Generate(Expressions.AlterColumnExpression expression)
         {
             try
@@ -277,6 +299,8 @@ namespace FluentMigrator.Runner.Generators.DB2
                 return CompatibilityMode.HandleCompatibility(e.Message);
             }
         }
+
+        /// <inheritdoc />
         public override string Generate(Expressions.AlterSchemaExpression expression)
         {
             return CompatibilityMode.HandleCompatibility("This feature not directly supported by most versions of DB2.");

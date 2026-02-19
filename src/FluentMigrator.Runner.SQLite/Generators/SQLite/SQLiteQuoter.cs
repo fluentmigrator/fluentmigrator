@@ -4,16 +4,21 @@ using FluentMigrator.Runner.Generators.Generic;
 
 namespace FluentMigrator.Runner.Generators.SQLite
 {
+    /// <summary>
+    /// The SQLite SQL quoter for FluentMigrator.
+    /// </summary>
     // ReSharper disable once InconsistentNaming
     public class SQLiteQuoter : GenericQuoter
     {
         private readonly bool _binaryGuid;
 
+        /// <inheritdoc />
         public SQLiteQuoter(bool binaryGuid = false)
         {
             _binaryGuid = binaryGuid;
         }
 
+        /// <inheritdoc />
         public override string FormatSystemMethods(SystemMethods value)
         {
             switch (value)
@@ -27,6 +32,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
             return base.FormatSystemMethods(value);
         }
 
+        /// <inheritdoc />
         public override string FormatGuid(Guid value)
         {
             if (_binaryGuid)
@@ -38,6 +44,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
             return base.FormatGuid(value);
         }
 
+        /// <inheritdoc />
         public override string QuoteSchemaName(string schemaName)
         {
             // SQLite doesn't support Schemas in the same sense as other SQL databases (e.g. SQL Server) does,
@@ -50,6 +57,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
             return base.QuoteSchemaName(schemaName);
         }
 
+        /// <inheritdoc />
         public override string QuoteIndexName(string indexName, string schemaName)
         {
             return CreateSchemaPrefixedQuotedIdentifier(
@@ -57,6 +65,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
                 IsQuoted(indexName) ? indexName : Quote(indexName));
         }
 
+        /// <inheritdoc />
         protected override string FormatByteArray(byte[] value)
         {
             var hex = new System.Text.StringBuilder((value.Length * 2) + 3);

@@ -20,6 +20,15 @@ using System;
 
 namespace FluentMigrator.Runner.Processors.Firebird
 {
+    /// <summary>
+    /// Represents a database factory for Firebird, leveraging reflection-based mechanisms 
+    /// to create and manage Firebird database provider factories.
+    /// </summary>
+    /// <remarks>
+    /// This class is specifically designed to work with Firebird SQL databases and integrates 
+    /// with the FluentMigrator framework. It uses reflection to locate and instantiate the 
+    /// Firebird database provider factory.
+    /// </remarks>
     public class FirebirdDbFactory : ReflectionBasedDbFactory
     {
         private static readonly TestEntry[] _entries =
@@ -27,12 +36,32 @@ namespace FluentMigrator.Runner.Processors.Firebird
             new TestEntry("FirebirdSql.Data.FirebirdClient", "FirebirdSql.Data.FirebirdClient.FirebirdClientFactory", () => Type.GetType("FirebirdSql.Data.FirebirdClient.FirebirdClientFactory, FirebirdSql.Data.FirebirdClient")),
         };
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FirebirdDbFactory"/> class with default settings.
+        /// </summary>
+        /// <remarks>
+        /// This constructor is marked as <see cref="ObsoleteAttribute"/> and should be avoided in favor of the 
+        /// parameterized constructor that accepts an <see cref="IServiceProvider"/>. It initializes the 
+        /// Firebird database provider factory using reflection-based mechanisms.
+        /// </remarks>
+        /// <seealso cref="FirebirdDbFactory(IServiceProvider)"/>
         [Obsolete]
         public FirebirdDbFactory()
             : this(null)
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FirebirdDbFactory"/> class.
+        /// </summary>
+        /// <param name="serviceProvider">
+        /// The <see cref="IServiceProvider"/> instance used to resolve dependencies 
+        /// for the Firebird database provider factory.
+        /// </param>
+        /// <remarks>
+        /// This constructor leverages the base <see cref="ReflectionBasedDbFactory"/> 
+        /// to initialize the Firebird database provider factory using predefined test entries.
+        /// </remarks>
         public FirebirdDbFactory(IServiceProvider serviceProvider)
             : base(serviceProvider, _entries)
         {

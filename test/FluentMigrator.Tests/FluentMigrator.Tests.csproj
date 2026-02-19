@@ -1,6 +1,18 @@
 <Project Sdk="Microsoft.NET.Sdk">
+  <Choose>
+    <When Condition="$([MSBuild]::IsOSPlatform('Linux'))">
+      <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+      </PropertyGroup>
+    </When>
+    <Otherwise>
+      <!-- Condition="!$([MSBuild]::IsOSPlatform('Linux'))"; Assume Windows OS; we still test .NET Framework 4.8 for backwards compatibility reasons -->
+      <PropertyGroup>
+        <TargetFramework>net48</TargetFramework>
+      </PropertyGroup>
+    </Otherwise>
+  </Choose>
   <PropertyGroup>
-    <TargetFramework>net48</TargetFramework>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\FluentMigrator.snk</AssemblyOriginatorKeyFile>
     <UserSecretsId>FluentMigrator.Tests</UserSecretsId>
@@ -18,30 +30,37 @@
     <PackageReference Include="Brutal.Dev.StrongNameSigner" Version="3.5.1" />
     <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="10.3.3" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.4" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.4" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="9.0.4" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="9.0.4" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.4" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.4" />
-    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.4" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.7" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="9.0.7" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="9.0.7" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.7" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.7" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.7" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
     <PackageReference Include="Moq" Version="4.20.72" />
     <PackageReference Include="MySql.Data" Version="9.3.0" />
     <PackageReference Include="Npgsql" Version="8.0.7" />
+    <PackageReference Include="Net.IBM.Data.Db2" Version="9.0.0.300" Condition=" '$(OS)' == 'Windows_NT' " />
+    <PackageReference Include="Net.IBM.Data.Db2-lnx" Version="9.0.0.300" Condition=" '$(OS)' != 'Windows_NT' " />
     <PackageReference Include="NUnit" Version="4.3.2" />
-    <PackageReference Include="NUnit.Analyzers" Version="4.7.0" />
-    <PackageReference Include="NUnit.Console" Version="3.20.0" />
+    <PackageReference Include="NUnit.Analyzers" Version="4.9.2" />
+    <PackageReference Include="NUnit.Console" Version="3.20.1" />
     <PackageReference Include="NUnit3TestAdapter" Version="5.0.0" />
     <PackageReference Include="Shouldly" Version="4.3.0" />
+    <PackageReference Include="coverlet.collector" Version="6.0.4">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="System.Data.OleDb" Version="9.0.7" />
     <PackageReference Include="Snowflake.Data" Version="4.4.1" />
     <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.11" />
-    <PackageReference Include="Testcontainers" Version="4.4.0" />
-    <PackageReference Include="Testcontainers.FirebirdSql" Version="4.4.0" />
-    <PackageReference Include="Testcontainers.MsSql" Version="4.4.0" />
-    <PackageReference Include="Testcontainers.MySql" Version="4.4.0" />
-    <PackageReference Include="Testcontainers.Oracle" Version="4.4.0" />
-    <PackageReference Include="Testcontainers.PostgreSql" Version="4.4.0" />
-    <PackageReference Include="Testcontainers.Db2" Version="4.4.0" />
+    <PackageReference Include="Testcontainers" Version="4.6.0" />
+    <PackageReference Include="Testcontainers.FirebirdSql" Version="4.6.0" />
+    <PackageReference Include="Testcontainers.MsSql" Version="4.6.0" />
+    <PackageReference Include="Testcontainers.MySql" Version="4.6.0" />
+    <PackageReference Include="Testcontainers.Oracle" Version="4.6.0" />
+    <PackageReference Include="Testcontainers.PostgreSql" Version="4.6.0" />
+    <PackageReference Include="Testcontainers.Db2" Version="4.6.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\FluentMigrator.Console\FluentMigrator.Console.csproj" />
@@ -50,7 +69,7 @@
     <ProjectReference Include="..\..\src\FluentMigrator.Runner.Db2\FluentMigrator.Runner.Db2.csproj" />
     <ProjectReference Include="..\..\src\FluentMigrator.Runner.Firebird\FluentMigrator.Runner.Firebird.csproj" />
     <ProjectReference Include="..\..\src\FluentMigrator.Runner.Hana\FluentMigrator.Runner.Hana.csproj" />
-    <ProjectReference Include="..\..\src\FluentMigrator.Runner.Jet\FluentMigrator.Runner.Jet.csproj" />
+    <ProjectReference Include="..\..\src\FluentMigrator.Runner.Jet\FluentMigrator.Runner.Jet.csproj" Condition="'$(TargetFramework)' != 'net48'" />
     <ProjectReference Include="..\..\src\FluentMigrator.Runner.MySql\FluentMigrator.Runner.MySql.csproj" />
     <ProjectReference Include="..\..\src\FluentMigrator.Runner.Oracle\FluentMigrator.Runner.Oracle.csproj" />
     <ProjectReference Include="..\..\src\FluentMigrator.Runner.Postgres\FluentMigrator.Runner.Postgres.csproj" />
@@ -60,18 +79,11 @@
     <ProjectReference Include="..\..\src\FluentMigrator.Runner.SqlServer\FluentMigrator.Runner.SqlServer.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="IBM.Data.DB2">
-      <HintPath>..\..\lib\DB2\amd64\IBM.Data.DB2.dll</HintPath>
-    </Reference>
     <Reference Include="Sap.Data.Hana.v4.5">
       <HintPath>..\..\lib\Hana\ado.net\v4.5\Sap.Data.Hana.v4.5.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="../../lib/DB2/clidriver/**/*.*">
-      <Link>clidriver/%(RecursiveDir)%(Filename)%(Extension)</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="../../lib/Hana/*.*">
       <Link>%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -91,8 +103,5 @@
     <None Update="Unit\Initialization\Fixtures\*.*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Update="JetBrains.Annotations" Version="2024.3.0" />
   </ItemGroup>
 </Project>
