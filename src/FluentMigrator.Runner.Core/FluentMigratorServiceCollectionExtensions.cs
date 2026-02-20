@@ -258,7 +258,6 @@ namespace Microsoft.Extensions.DependencyInjection
                     sp =>
                     {
                         var querySchema = sp.GetRequiredService<IQuerySchema>();
-                        var options = sp.GetRequiredService<IOptions<RunnerOptions>>();
                         var connectionStringAccessor = sp.GetRequiredService<IConnectionStringAccessor>();
                         var connectionString = connectionStringAccessor.ConnectionString;
                         return new MigrationContext(querySchema, sp, connectionString);
@@ -289,31 +288,22 @@ namespace Microsoft.Extensions.DependencyInjection
             return services;
         }
 
-        private class MigrationRunnerBuilder : IMigrationRunnerBuilder
+        /// <inheritdoc />
+        private class MigrationRunnerBuilder(IServiceCollection services) : IMigrationRunnerBuilder
         {
-            public MigrationRunnerBuilder(IServiceCollection services)
-            {
-                Services = services;
-                DanglingAssemblySourceItem = null;
-            }
+            /// <inheritdoc />
+            public IServiceCollection Services { get; } = services;
 
             /// <inheritdoc />
-            public IServiceCollection Services { get; }
-
-            /// <inheritdoc />
-            public IAssemblySourceItem DanglingAssemblySourceItem { get; set; }
+            public IAssemblySourceItem DanglingAssemblySourceItem { get; set; } = null;
         }
 
+        /// <inheritdoc />
         [UsedImplicitly]
-        private class ConnectionlessProcessorAccessor : IProcessorAccessor
+        private class ConnectionlessProcessorAccessor(IServiceProvider serviceProvider) : IProcessorAccessor
         {
-            public ConnectionlessProcessorAccessor(IServiceProvider serviceProvider)
-            {
-                Processor = ActivatorUtilities.CreateInstance<ConnectionlessProcessor>(serviceProvider);
-            }
-
             /// <inheritdoc />
-            public IMigrationProcessor Processor { get; }
+            public IMigrationProcessor Processor { get; } = ActivatorUtilities.CreateInstance<ConnectionlessProcessor>(serviceProvider);
         }
     }
 }

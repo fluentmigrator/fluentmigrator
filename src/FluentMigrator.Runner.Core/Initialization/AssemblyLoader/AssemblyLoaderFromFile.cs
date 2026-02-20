@@ -16,6 +16,7 @@
 //
 #endregion
 
+using System;
 using System.IO;
 using System.Reflection;
 
@@ -62,13 +63,13 @@ namespace FluentMigrator.Runner.Initialization.AssemblyLoader
         /// This method attempts to resolve the file path of the assembly if it is not rooted. It first checks the runtime's base directory
         /// and then attempts to resolve the full path. If the file cannot be found, it uses the original file name.
         /// </remarks>
-        /// <exception cref="System.IO.FileNotFoundException">
+        /// <exception cref="FileNotFoundException">
         /// Thrown if the specified assembly file does not exist.
         /// </exception>
-        /// <exception cref="System.BadImageFormatException">
+        /// <exception cref="BadImageFormatException">
         /// Thrown if the file is not a valid assembly or was compiled with a later version of the runtime than is currently loaded.
         /// </exception>
-        /// <exception cref="System.IO.FileLoadException">
+        /// <exception cref="FileLoadException">
         /// Thrown if the assembly is found but cannot be loaded.
         /// </exception>
         public Assembly Load()
