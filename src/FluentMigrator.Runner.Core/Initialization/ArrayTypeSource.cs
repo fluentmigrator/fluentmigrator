@@ -16,15 +16,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-
-using FluentMigrator.Infrastructure;
 
 using JetBrains.Annotations;
-
-using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Initialization
 {
@@ -33,9 +26,6 @@ namespace FluentMigrator.Runner.Initialization
         private readonly Type[] _types;
 
         public ArrayTypeSource(
-#if NET
-            [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.Interfaces)]
-#endif
             [NotNull] Type[] types)
         {
             _types = types;

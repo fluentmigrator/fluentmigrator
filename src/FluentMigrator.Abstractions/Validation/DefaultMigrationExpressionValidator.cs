@@ -50,8 +50,10 @@ namespace FluentMigrator.Validation
             {
                 return Enumerable.Empty<ValidationResult>();
             }
-#endif
 
+            // The IsDynamicCodeSupported check above ensures reflection is available at runtime.
+#pragma warning disable IL2026
+#endif
             var items = new Dictionary<object, object>();
             var context = new ValidationContext(expression, items);
             if (_serviceProvider != null)
@@ -64,6 +66,9 @@ namespace FluentMigrator.Validation
             {
                 return result;
             }
+#if NET
+#pragma warning restore IL2026
+#endif
 
             return Enumerable.Empty<ValidationResult>();
         }

@@ -27,6 +27,14 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Initialization
 {
+    /// <summary>
+    /// Provides access to a convention set by utilizing assembly sources and type filtering options.
+    /// </summary>
+    /// <remarks>
+    /// This class is responsible for retrieving an implementation of <see cref="IConventionSet"/>
+    /// from the provided assembly sources and type candidates. It uses type filtering options
+    /// to determine valid types and supports dependency injection for instantiation.
+    /// </remarks>
 #if NET
     [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This type uses AppDomain to load assemblies, which may not be preserved in trimmed applications.")]
 #endif

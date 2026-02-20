@@ -23,6 +23,7 @@ using System.Linq;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Runner.Initialization;
+using static FluentMigrator.Runner.TypeFinder;
 
 using JetBrains.Annotations;
 
@@ -31,13 +32,46 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner
 {
+    /// <summary>
+    /// Provides functionality to load and organize maintenance migrations based on specified stages and conventions.
+    /// </summary>
     public class MaintenanceLoader : IMaintenanceLoader
     {
         private readonly IDictionary<MigrationStage, IList<IMigration>> _maintenance;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MaintenanceLoader"/> class.
+        /// </summary>
+        /// <param name="assemblySource">
+        /// The source of assemblies containing migration and maintenance classes.
+        /// </param>
+        /// <param name="options">
+        /// The options for configuring the migration runner.
+        /// </param>
+        /// <param name="filterOptions">
+        /// The options used to filter maintenance migrations by namespace and nested namespaces.
+        /// </param>
+        /// <param name="conventions">
+        /// The conventions used to identify and process migrations and maintenance stages.
+        /// </param>
+        /// <param name="serviceProvider">
+        /// The service provider used to resolve dependencies for migration and maintenance instances.
+        /// </param>
+        /// <param name="typeSource">
+        /// An optional type source; when provided, types are taken from it instead of from the assembly source.
+        /// When not provided, an <see cref="AssemblyTypeSource"/> wrapping <paramref name="assemblySource"/> is used,
+        /// which requires unreferenced code.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if any of the required parameters are <c>null</c>.
+        /// </exception>
+#if NET
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("When typeSource is not provided, assembly scanning uses reflection which may not be preserved in trimmed applications.")]
+#endif
         public MaintenanceLoader(
             [NotNull] IAssemblySource assemblySource,
             [NotNull] IOptions<RunnerOptions> options,
+            [NotNull] IOptions<TypeFilterOptions> filterOptions,
             [NotNull] IMigrationRunnerConventions conventions,
             [NotNull] IServiceProvider serviceProvider,
             [CanBeNull] ITypeSource typeSource = null)
@@ -46,12 +80,11 @@ namespace FluentMigrator.Runner
 
             typeSource ??= new AssemblyTypeSource(assemblySource);
 
-#pragma warning disable IL2026
-#pragma warning disable IL2072
             _maintenance = (
                 from type in typeSource.GetTypes()
                 let stage = conventions.GetMaintenanceStage(type)
                 where stage != null
+                where type.IsInNamespace(filterOptions.Value.Namespace, filterOptions.Value.NestedNamespaces)
                 where conventions.HasRequestedTags(type, tagsList, options.Value.IncludeUntaggedMaintenances)
                 let migration = (IMigration) ActivatorUtilities.CreateInstance(serviceProvider, type)
                 group migration by stage.GetValueOrDefault()
@@ -59,10 +92,16 @@ namespace FluentMigrator.Runner
                 g => g.Key,
                 g => (IList<IMigration>)g.OrderBy(m => m.GetType().Name).ToArray()
             );
-#pragma warning disable IL2072
-#pragma warning restore IL2026
         }
 
+        /// <summary>
+        /// Loads maintenance migrations for the specified migration stage.
+        /// </summary>
+        /// <param name="stage">The migration stage for which to load maintenance migrations.</param>
+        /// <returns>
+        /// A list of <see cref="IMigrationInfo"/> objects representing the maintenance migrations
+        /// associated with the specified <paramref name="stage"/>.
+        /// </returns>
         public IList<IMigrationInfo> LoadMaintenance(MigrationStage stage)
         {
             IList<IMigrationInfo> migrationInfos = new List<IMigrationInfo>();

@@ -27,17 +27,25 @@ using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Initialization
 {
+    /// <summary>
+    /// Provides access to a convention set by utilizing type sources and type filtering options.
+    /// </summary>
+    /// <remarks>
+    /// This class is responsible for retrieving an implementation of <see cref="IConventionSet"/>
+    /// from the provided type sources and type candidates. It uses type filtering options
+    /// to determine valid types and supports dependency injection for instantiation.
+    /// </remarks>
     public class TypeSourceConventionSetAccessor : IConventionSetAccessor
     {
         private readonly Lazy<IConventionSet> _lazyValue;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AssemblySourceVersionTableMetaDataAccessor"/> class.
+        /// Initializes a new instance of the <see cref="TypeSourceConventionSetAccessor"/> class.
         /// </summary>
         /// <param name="typeFilterOptions">The type filter options</param>
         /// <param name="sources">The sources to get type candidates</param>
         /// <param name="serviceProvider">The service provider used to instantiate the found <see cref="IConventionSet"/> implementation</param>
-        /// <param name="typeSource">The types used to search for the <see cref="IConventionSet"/> implementation</param>
+        /// <param name="typeSource">The type source used to search for the <see cref="IConventionSet"/> implementation</param>
         public TypeSourceConventionSetAccessor(
             [NotNull] IOptionsSnapshot<TypeFilterOptions> typeFilterOptions,
             [NotNull, ItemNotNull] IEnumerable<ITypeSourceItem<IConventionSet>> sources,

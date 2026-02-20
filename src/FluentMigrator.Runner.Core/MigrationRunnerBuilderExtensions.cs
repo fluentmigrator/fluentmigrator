@@ -177,12 +177,15 @@ namespace FluentMigrator.Runner
             return builder;
         }
 
+        /// <summary>
+        /// Registers specific types as migration sources.
+        /// </summary>
+        /// <param name="builder">The runner builder</param>
+        /// <param name="types">The types to register as migration sources</param>
+        /// <returns>The runner builder</returns>
         public static IMigrationRunnerBuilder WithTypes(
             this IMigrationRunnerBuilder builder,
-#if NET
-            [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.Interfaces)]
-#endif
-            [NotNull] Type[] types)
+            [NotNull] params Type[] types)
         {
             builder.Services
                 .AddSingleton(new ArrayTypeSource(types));

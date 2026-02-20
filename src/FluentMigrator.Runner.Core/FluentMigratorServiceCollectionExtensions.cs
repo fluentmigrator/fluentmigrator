@@ -23,7 +23,9 @@ using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Initialization.AssemblyLoader;
+#if NETFRAMEWORK
 using FluentMigrator.Runner.Initialization.NetFramework;
+#endif
 using FluentMigrator.Runner.Logging;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.VersionTableInfo;
@@ -49,13 +51,23 @@ namespace Microsoft.Extensions.DependencyInjection
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection" /> to add services to.</param>
         /// <returns>The updated service collection</returns>
+        /// <remarks>
+        /// This overload scans assemblies for migrations at runtime using reflection and is not
+        /// compatible with trimmed or NativeAOT applications. For AOT-compatible usage, use
+        /// <see cref="AddFluentMigratorSlim"/> and register types explicitly
+        /// with <c>.WithTypes(typeof(MyMigration), ...)</c>.
+        /// </remarks>
         [NotNull]
 #if NET
-        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This method uses AppDomain to load assemblies, which may not be preserved in trimmed applications.")]
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This method uses AppDomain to load assemblies, which may not be preserved in trimmed applications. Use AddFluentMigratorSlim().WithTypes(new Type[] { ... }) instead.")] 
 #endif
         public static IServiceCollection AddFluentMigratorCore(
             [NotNull] this IServiceCollection services)
         {
+            if (services == null)
+                throw new ArgumentNullException(nameof(services));
+
+#pragma warning disable IL2026 // Assembly scanning; callers are warned by [RequiresUnreferencedCode] above
             services
                 // The default assembly loader factory
                 .TryAddSingleton<AssemblyLoaderFactory>();
@@ -72,19 +84,34 @@ namespace Microsoft.Extensions.DependencyInjection
                 // Assembly loader engines
                 .AddSingleton<IAssemblyLoadEngine, AssemblyNameLoadEngine>()
                 .AddSingleton<IAssemblyLoadEngine, AssemblyFileLoadEngine>();
+#pragma warning restore IL2026
 
-            AddFluentMigratorCoreWithoutAssemblyLoader(services);
-
-            return services;
+            return AddFluentMigratorSlim(services);
         }
 
         /// <summary>
-        /// Adds migration runner (except the DB processor specific) services to the specified <see cref="IServiceCollection"/>.
+        /// Adds migration runner services to the specified <see cref="IServiceCollection"/> without registering
+        /// the assembly-scanning infrastructure. This is the recommended entry point for trimmed and NativeAOT
+        /// applications.
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection" /> to add services to.</param>
         /// <returns>The updated service collection</returns>
+        /// <remarks>
+        /// After calling this method, register migration types explicitly using
+        /// <c>ConfigureRunner(rb => rb.WithTypes(typeof(MyMigration), ...))</c>.
+        /// Assembly scanning (<c>ScanIn</c>) is not available when using this method.
+        /// </remarks>
+        /// <example>
+        /// <code>
+        /// services.AddFluentMigratorSlim()
+        ///     .ConfigureRunner(rb => rb
+        ///         .AddSQLite()
+        ///         .WithGlobalConnectionString("Data Source=:memory:")
+        ///         .WithTypes(typeof(Migration001_CreateUsers), typeof(Migration002_AddEmail)));
+        /// </code>
+        /// </example>
         [NotNull]
-        public static IServiceCollection AddFluentMigratorCoreWithoutAssemblyLoader(
+        public static IServiceCollection AddFluentMigratorSlim(
             [NotNull] this IServiceCollection services)
         {
             if (services == null)
@@ -195,10 +222,6 @@ namespace Microsoft.Extensions.DependencyInjection
 #if NETFRAMEWORK
             services
                 .TryAddScoped<INetConfigManager, NetConfigManager>();
-#pragma warning disable 612
-            services
-                .AddScoped<IConnectionStringReader, AppConfigConnectionStringReader>();
-#pragma warning restore 612
 #endif
             services
                 .AddScoped<IConnectionStringReader, ConfigurationConnectionStringReader>()
@@ -243,6 +266,17 @@ namespace Microsoft.Extensions.DependencyInjection
 
             return services;
         }
+
+        /// <summary>
+        /// Adds migration runner (except the DB processor specific) services to the specified <see cref="IServiceCollection"/>.
+        /// </summary>
+        /// <param name="services">The <see cref="IServiceCollection" /> to add services to.</param>
+        /// <returns>The updated service collection</returns>
+        [NotNull]
+        [Obsolete("Use AddFluentMigratorSlim() instead for AOT-compatible setups. This method will be removed in a future version.")]
+        public static IServiceCollection AddFluentMigratorCoreWithoutAssemblyLoader(
+            [NotNull] this IServiceCollection services)
+            => AddFluentMigratorSlim(services);
 
         /// <summary>
         /// Configures the migration runner

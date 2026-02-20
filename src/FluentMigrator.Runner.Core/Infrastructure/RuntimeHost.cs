@@ -26,6 +26,14 @@ using FluentMigrator.Runner.Infrastructure.Hosts;
 
 namespace FluentMigrator.Runner.Infrastructure
 {
+    /// <summary>
+    /// Provides functionality to interact with the runtime environment, including locating and retrieving assemblies.
+    /// </summary>
+    /// <remarks>
+    /// This static class serves as an abstraction layer for runtime-specific operations, such as finding assemblies
+    /// in the Global Assembly Cache (GAC) or other runtime-specific directories. It is designed to support
+    /// different runtime environments by utilizing an internal host abstraction.
+    /// </remarks>
 #if NET
     [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This type uses the AppDomain to load assemblies, which may not be preserved in trimmed applications.")]
 #endif
@@ -39,8 +47,30 @@ namespace FluentMigrator.Runner.Infrastructure
         private static readonly IHostAbstraction _currentHost = new NetCoreHost();
 #endif
 
+        /// <summary>
+        /// Gets the current host abstraction used by the runtime environment.
+        /// </summary>
+        /// <remarks>
+        /// This property provides access to the runtime-specific implementation of <see cref="IHostAbstraction"/>.
+        /// It is used to perform operations such as retrieving the base directory, creating instances of types,
+        /// and accessing loaded assemblies in the current runtime environment.
+        /// </remarks>
+        /// <value>
+        /// An instance of <see cref="IHostAbstraction"/> representing the current runtime host.
+        /// </value>
         public static IHostAbstraction Current => _currentHost;
 
+        /// <summary>
+        /// Finds and retrieves all assemblies available in the runtime environment.
+        /// </summary>
+        /// <returns>
+        /// An <see cref="IEnumerable{T}"/> of <see cref="AssemblyName"/> objects representing the assemblies found.
+        /// </returns>
+        /// <remarks>
+        /// This method searches for assemblies in runtime-specific directories, such as the Global Assembly Cache (GAC)
+        /// on Windows or equivalent locations in other environments. It iterates through directories and retrieves
+        /// assembly metadata for each discovered assembly.
+        /// </remarks>
         public static IEnumerable<AssemblyName> FindAssemblies()
         {
             foreach (var fullGacDirectory in GetFullGacDirectories())
@@ -56,6 +86,18 @@ namespace FluentMigrator.Runner.Infrastructure
             }
         }
 
+        /// <summary>
+        /// Finds and retrieves assembly names from the runtime environment that match the specified name.
+        /// </summary>
+        /// <param name="name">The name of the assembly to search for.</param>
+        /// <returns>
+        /// An enumerable collection of <see cref="AssemblyName"/> objects representing the assemblies
+        /// that match the specified name.
+        /// </returns>
+        /// <remarks>
+        /// This method filters the assemblies found by <see cref="FindAssemblies()"/> to include only those
+        /// whose names match the specified <paramref name="name"/> (case-insensitive).
+        /// </remarks>
         public static IEnumerable<AssemblyName> FindAssemblies(string name)
         {
             foreach (var assemblyName in FindAssemblies())

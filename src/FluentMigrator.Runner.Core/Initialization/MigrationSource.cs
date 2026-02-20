@@ -29,7 +29,9 @@ namespace FluentMigrator.Runner.Initialization
     /// <summary>
     /// The default implementation of a <see cref="IFilteringMigrationSource"/>.
     /// </summary>
-    public class MigrationSource : IFilteringMigrationSource
+#pragma warning disable 618
+    public class MigrationSource : IFilteringMigrationSource, IMigrationSource
+#pragma warning restore 618
     {
         [NotNull]
         private readonly ITypeSource _source;
@@ -50,14 +52,20 @@ namespace FluentMigrator.Runner.Initialization
         private readonly ILogger _logger;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ProfileSource"/> class.
+        /// Initializes a new instance of the <see cref="MigrationSource"/> class.
         /// </summary>
         /// <param name="source">The assembly source</param>
-        /// <param name="conventions">The migration runner conventios</param>
+        /// <param name="conventions">The migration runner conventions</param>
         /// <param name="serviceProvider">The service provider</param>
         /// <param name="sourceItems">The additional migration source items</param>
         /// <param name="logger">The logger for troubleshooting "No migrations found" error.</param>
-        /// <param name="typeSource">The type source</param>
+        /// <param name="typeSource">
+        /// The type source; when not provided, an <see cref="AssemblyTypeSource"/> wrapping
+        /// <paramref name="source"/> is used, which requires unreferenced code.
+        /// </param>
+#if NET
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("When typeSource is not provided, assembly scanning uses reflection which may not be preserved in trimmed applications.")]
+#endif
         public MigrationSource(
             [NotNull] IAssemblySource source,
             [NotNull] IMigrationRunnerConventions conventions,
@@ -74,7 +82,7 @@ namespace FluentMigrator.Runner.Initialization
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ProfileSource"/> class.
+        /// Initializes a new instance of the <see cref="MigrationSource"/> class.
         /// </summary>
         /// <param name="source">The assembly source</param>
         /// <param name="conventions">The migration runner conventions</param>

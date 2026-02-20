@@ -17,12 +17,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Text;
 
 using FluentMigrator.Infrastructure;
-
-using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner.Initialization
 {
@@ -36,6 +32,10 @@ namespace FluentMigrator.Runner.Initialization
     {
         private readonly IAssemblySource _source;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AssemblyTypeSource"/> class.
+        /// </summary>
+        /// <param name="source">The assembly source providing access to the assemblies</param>
         public AssemblyTypeSource(IAssemblySource source)
         {
             _source = source;

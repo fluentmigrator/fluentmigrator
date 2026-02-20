@@ -63,6 +63,11 @@ namespace FluentMigrator.Runner.Processors
             _testEntries = testEntries;
         }
 
+#if NET
+        // TryCreateFactory checks RuntimeFeature.IsDynamicCodeSupported and safely skips
+        // reflection in AOT environments, but the attribute is needed for static analysis.
+#pragma warning disable IL2026
+#endif
         protected override DbProviderFactory CreateFactory()
         {
             if (_instance != null)
@@ -82,8 +87,14 @@ namespace FluentMigrator.Runner.Processors
 
             throw new AggregateException($"Unable to load the driver. Attempted to load: {assemblyNames}, with {fullExceptionOutput}", exceptions);
         }
+#if NET
+#pragma warning restore IL2026
+#endif
 
         [Obsolete]
+#if NET
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This method uses reflection to load DbProviderFactory types, which may not be preserved in trimmed applications.")]
+#endif
         protected static bool TryCreateFactory(
             [NotNull, ItemNotNull] IEnumerable<TestEntry> entries,
             [NotNull, ItemNotNull] ICollection<Exception> exceptions,
@@ -92,6 +103,9 @@ namespace FluentMigrator.Runner.Processors
             return TryCreateFactory(serviceProvider: null, entries, exceptions, out factory);
         }
 
+#if NET
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This method uses reflection to load DbProviderFactory types, which may not be preserved in trimmed applications.")]
+#endif
         protected static bool TryCreateFactory(
             [CanBeNull] IServiceProvider serviceProvider,
             [NotNull, ItemNotNull] IEnumerable<TestEntry> entries,
@@ -397,6 +411,9 @@ namespace FluentMigrator.Runner.Processors
             }
         }
 
+#if NET
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This method uses reflection to scan for assemblies in the GAC, which may not be preserved in trimmed applications.")]
+#endif
         [NotNull, ItemNotNull]
         private static IEnumerable<AssemblyName> FindAssembliesInGac([NotNull, ItemNotNull] params string[] names)
         {
