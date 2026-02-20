@@ -42,7 +42,7 @@ namespace FluentMigrator.Runner.Processors.Postgres92
 
         /// <inheritdoc />
         public Postgres92Processor(
-            [NotNull] PostgresDbFactory factory,
+            [NotNull] IPostgresDbFactory factory,
             [NotNull] Postgres92Generator generator,
             [NotNull] ILogger<PostgresProcessor> logger,
             [NotNull] IOptionsSnapshot<ProcessorOptions> options,

@@ -14,6 +14,8 @@
 // limitations under the License.
 #endregion
 
+using System.Data.Common;
+
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Postgres;
 using FluentMigrator.Runner.Generators.Postgres92;
@@ -36,8 +38,9 @@ namespace FluentMigrator.Runner
         /// Adds Postgres support
         /// </summary>
         /// <param name="builder">The builder to add the Postgres-specific services to</param>
+        /// <param name="dbProviderFactory">The DbProviderFactory to use to construct the PostgreSQL Data Source classes</param>
         /// <returns>The migration runner builder</returns>
-        public static IMigrationRunnerBuilder AddPostgres(this IMigrationRunnerBuilder builder)
+        public static IMigrationRunnerBuilder AddPostgres(this IMigrationRunnerBuilder builder, DbProviderFactory dbProviderFactory = null)
         {
             builder.Services.TryAddScoped<IPostgresTypeMap, PostgresTypeMap>();
             builder.Services
@@ -54,15 +57,16 @@ namespace FluentMigrator.Runner
                     sp.GetRequiredService<IPostgresTypeMap>()))
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<Postgres15_0Generator>());
 
-            return builder.AddCommonPostgresServices();
+            return builder.AddCommonPostgresServices(dbProviderFactory);
         }
 
         /// <summary>
         /// Adds Postgres 9.2 support
         /// </summary>
         /// <param name="builder">The builder to add the Postgres-specific services to</param>
+        /// <param name="dbProviderFactory">The DbProviderFactory to use to construct the PostgreSQL Data Source classes</param>
         /// <returns>The migration runner builder</returns>
-        public static IMigrationRunnerBuilder AddPostgres92(this IMigrationRunnerBuilder builder)
+        public static IMigrationRunnerBuilder AddPostgres92(this IMigrationRunnerBuilder builder, DbProviderFactory dbProviderFactory = null)
         {
             builder.Services.TryAddScoped<IPostgresTypeMap, Postgres92TypeMap>();
             builder.Services
@@ -74,7 +78,7 @@ namespace FluentMigrator.Runner
                     sp.GetRequiredService<IPostgresTypeMap>()))
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<Postgres92Generator>());
 
-            return builder.AddCommonPostgresServices();
+            return builder.AddCommonPostgresServices(dbProviderFactory);
         }
 
 
@@ -82,8 +86,9 @@ namespace FluentMigrator.Runner
         /// Adds Postgres 10.0 support
         /// </summary>
         /// <param name="builder">The builder to add the Postgres-specific services to</param>
+        /// <param name="dbProviderFactory">The DbProviderFactory to use to construct the PostgreSQL Data Source classes</param>
         /// <returns>The migration runner builder</returns>
-        public static IMigrationRunnerBuilder AddPostgres10_0(this IMigrationRunnerBuilder builder)
+        public static IMigrationRunnerBuilder AddPostgres10_0(this IMigrationRunnerBuilder builder, DbProviderFactory dbProviderFactory = null)
         {
             builder.Services.TryAddScoped<IPostgresTypeMap, Postgres92TypeMap>();
             builder.Services
@@ -94,15 +99,16 @@ namespace FluentMigrator.Runner
                     sp.GetRequiredService<IOptions<GeneratorOptions>>(),
                     sp.GetRequiredService<IPostgresTypeMap>()))
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<Postgres10_0Generator>());
-            return builder.AddCommonPostgresServices();
+            return builder.AddCommonPostgresServices(dbProviderFactory);
         }
 
         /// <summary>
         /// Adds Postgres 11.0 support
         /// </summary>
         /// <param name="builder">The builder to add the Postgres-specific services to</param>
+        /// <param name="dbProviderFactory">The DbProviderFactory to use to construct the PostgreSQL Data Source classes</param>
         /// <returns>The migration runner builder</returns>
-        public static IMigrationRunnerBuilder AddPostgres11_0(this IMigrationRunnerBuilder builder)
+        public static IMigrationRunnerBuilder AddPostgres11_0(this IMigrationRunnerBuilder builder, DbProviderFactory dbProviderFactory = null)
         {
             builder.Services.TryAddScoped<IPostgresTypeMap, Postgres92TypeMap>();
             builder.Services
@@ -113,15 +119,16 @@ namespace FluentMigrator.Runner
                     sp.GetRequiredService<IOptions<GeneratorOptions>>(),
                     sp.GetRequiredService<IPostgresTypeMap>()))
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<Postgres11_0Generator>());
-            return builder.AddCommonPostgresServices();
+            return builder.AddCommonPostgresServices(dbProviderFactory);
         }
 
         /// <summary>
         /// Adds Postgres 15.0 support
         /// </summary>
         /// <param name="builder">The builder to add the Postgres-specific services to</param>
+        /// <param name="dbProviderFactory">The DbProviderFactory to use to construct the PostgreSQL Data Source classes</param>
         /// <returns>The migration runner builder</returns>
-        public static IMigrationRunnerBuilder AddPostgres15_0(this IMigrationRunnerBuilder builder)
+        public static IMigrationRunnerBuilder AddPostgres15_0(this IMigrationRunnerBuilder builder, DbProviderFactory dbProviderFactory = null)
         {
             builder.Services.TryAddScoped<IPostgresTypeMap, Postgres92TypeMap>();
             builder.Services
@@ -132,15 +139,16 @@ namespace FluentMigrator.Runner
                     sp.GetRequiredService<IOptions<GeneratorOptions>>(),
                     sp.GetRequiredService<IPostgresTypeMap>()))
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<Postgres15_0Generator>());
-            return builder.AddCommonPostgresServices();
+            return builder.AddCommonPostgresServices(dbProviderFactory);
         }
 
         /// <summary>
         /// Add common Postgres services.
         /// </summary>
         /// <param name="builder">The builder to add the Postgres-specific services to</param>
+        /// <param name="dbProviderFactory">The DbProviderFactory to use to construct the PostgreSQL Data Source classes</param>
         /// <returns>The migration runner builder</returns>
-        private static IMigrationRunnerBuilder AddCommonPostgresServices(this IMigrationRunnerBuilder builder)
+        private static IMigrationRunnerBuilder AddCommonPostgresServices(this IMigrationRunnerBuilder builder, DbProviderFactory dbProviderFactory)
         {
             builder.Services
                 .AddScoped(
@@ -149,9 +157,23 @@ namespace FluentMigrator.Runner
                         var processorOptions = sp.GetRequiredService<IOptionsSnapshot<ProcessorOptions>>();
                         return PostgresOptions.ParseProviderSwitches(processorOptions.Value.ProviderSwitches);
                     })
-                .AddScoped<PostgresDbFactory>()
                 .AddScoped<PostgresQuoter>();
+            if (dbProviderFactory != null)
+            {
+                builder.Services.AddSingleton<IPostgresDbFactory>(new PostgresDbFactoryAdapter(dbProviderFactory));
+            }
+            else
+            {
+                builder.Services.AddScoped<IPostgresDbFactory, ReflectionPostgresDbFactory>();
+            }
             return builder;
+        }
+
+        private class PostgresDbFactoryAdapter : IPostgresDbFactory
+        {
+            public PostgresDbFactoryAdapter(DbProviderFactory dbProviderFactory) => Factory = dbProviderFactory;
+
+            public DbProviderFactory Factory { get; }
         }
     }
 }

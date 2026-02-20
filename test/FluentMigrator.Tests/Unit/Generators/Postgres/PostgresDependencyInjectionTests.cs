@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Linq;
 
 using FluentMigrator.Builders.Alter.Table;
@@ -71,7 +72,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
                 Assert.That(expressions, Is.Not.Empty);
                 Assert.That(expressions, Has.Count.EqualTo(1));
                 Assert.That(expressions.Single(), Is.TypeOf<CreateColumnExpression>());
-                var addColumnExpression = (CreateColumnExpression) expressions.Single();
+                var addColumnExpression = (CreateColumnExpression)expressions.Single();
                 var statement = generator.Generate(addColumnExpression);
                 Assert.That(statement, Is.EqualTo("ALTER TABLE \"public\".\"a-table\" ADD \"a-column\" timestamptz NOT NULL DEFAULT my_current_timestamp();"));
             }
@@ -234,6 +235,10 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
                 SetTypeMap(DbType.Xml, "xml");
                 SetTypeMap(DbType.Object, "json");
             }
+        }
+
+        private class CustomDbProviderFactory : DbProviderFactory {
+
         }
     }
 }
