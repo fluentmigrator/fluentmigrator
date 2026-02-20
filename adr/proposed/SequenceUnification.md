@@ -31,6 +31,7 @@ This ADR addresses issue #1228 and proposes a unified approach to sequence manag
 | **SAP HANA** | ✅ Yes | `CREATE SEQUENCE schema.name` | Full ANSI SQL support |
 | **Snowflake** | ✅ Yes | `CREATE SEQUENCE schema.name` | Full ANSI SQL support |
 | **Redshift** | ✅ Yes | `CREATE SEQUENCE schema.name` | Based on PostgreSQL |
+| **MariaDB** | ✅ Yes | `CREATE SEQUENCE [schema.]name` | Native sequence support via SEQUENCE Engine |
 | **MySQL 5.x/8.x** | ❌ No | N/A | No native sequence support |
 | **SQLite** | ❌ No | N/A | No native sequence support |
 | **Jet (MS Access)** | ❌ No | N/A | No native sequence support; uses AutoNumber |
@@ -48,6 +49,8 @@ MySQL doesn't support sequences but provides AUTO_INCREMENT for similar function
   SELECT LAST_INSERT_ID();
   ```
 - **Recommendation**: Document that sequences map to AUTO_INCREMENT in MySQL context
+
+**Note on MariaDB**: MariaDB, a fork of MySQL, provides native `CREATE SEQUENCE` support through its SEQUENCE Engine, offering an experience similar to Oracle or PostgreSQL. If using MariaDB instead of MySQL, native sequence operations are fully supported. See [MariaDB SEQUENCE documentation](https://mariadb.com/docs/server/reference/sql-structure/sequences/create-sequence).
 
 #### SQLite Workaround
 SQLite doesn't support sequences but provides AUTOINCREMENT:
