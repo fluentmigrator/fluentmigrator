@@ -1,6 +1,7 @@
 using FluentMigrator.Builders.Create.Table;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
+using FluentMigrator.Model;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Generators.SQLite;
 
@@ -11,6 +12,8 @@ using Moq;
 using NUnit.Framework;
 
 using Shouldly;
+
+using System.Data;
 
 namespace FluentMigrator.Tests.Unit.Generators.SQLite
 {
@@ -247,6 +250,29 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
 
             var result = Generator.Generate(expression);
             result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" TEXT NOT NULL, \"TestColumn2\" INTEGER NOT NULL, CONSTRAINT \"FK_TestT_TestT\" FOREIGN KEY (\"TestColumn1\", \"TestColumn3\") REFERENCES \"TestTable2\" (\"TestColumn2\", \"TestColumn4\"));");
+        }
+
+        [Test]
+        public override void CanCreateTableWithFluentMultiColumnForeignKey()
+        {
+            // Test the new fluent API for multi-column foreign keys
+            var expression = new CreateTableExpression { TableName = "Area" };
+            expression.Columns.Add(new ColumnDefinition { Name = "ArticleId", Type = DbType.String });
+            expression.Columns.Add(new ColumnDefinition { Name = "AreaGroupIndex", Type = DbType.Int32 });
+            expression.Columns.Add(new ColumnDefinition { Name = "Index", Type = DbType.Int32, 
+                IsForeignKey = true,
+                ForeignKey = new ForeignKeyDefinition
+                {
+                    Name = "FK_Area_AreaGroup",
+                    PrimaryTable = "AreaGroup",
+                    ForeignTable = "Area",
+                    PrimaryColumns = ["ArticleId", "Index"],
+                    ForeignColumns = ["ArticleId", "AreaGroupIndex"]
+                }
+            });
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE \"Area\" (\"ArticleId\" TEXT NOT NULL, \"AreaGroupIndex\" INTEGER NOT NULL, \"Index\" INTEGER NOT NULL, CONSTRAINT \"FK_Area_AreaGroup\" FOREIGN KEY (\"ArticleId\", \"AreaGroupIndex\") REFERENCES \"AreaGroup\" (\"ArticleId\", \"Index\"));");
         }
 
         [Test]
