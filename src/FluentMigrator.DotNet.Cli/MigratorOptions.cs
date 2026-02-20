@@ -40,6 +40,7 @@ namespace FluentMigrator.DotNet.Cli
         public string ProcessorType { get; private set; }
         public string ProcessorSwitches { get; private set; }
         public IReadOnlyCollection<string> TargetAssemblies { get; private set; }
+        public string VersionInfoTableMetadataJson { get; set; }
         public long? TargetVersion { get; private set; }
         public int? Steps { get; private set; }
         public string Namespace { get; private set; }
@@ -136,6 +137,7 @@ namespace FluentMigrator.DotNet.Cli
         private MigratorOptions Init(MigrationCommand cmd)
         {
             TargetAssemblies = cmd.TargetAssemblies.ToList();
+            VersionInfoTableMetadataJson = cmd.VersionInfoTableMetadataJson;
             Namespace = cmd.Namespace;
             NestedNamespaces = cmd.NestedNamespaces;
             StartVersion = cmd.StartVersion;
