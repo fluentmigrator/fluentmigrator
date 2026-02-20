@@ -268,17 +268,6 @@ namespace Microsoft.Extensions.DependencyInjection
         }
 
         /// <summary>
-        /// Adds migration runner (except the DB processor specific) services to the specified <see cref="IServiceCollection"/>.
-        /// </summary>
-        /// <param name="services">The <see cref="IServiceCollection" /> to add services to.</param>
-        /// <returns>The updated service collection</returns>
-        [NotNull]
-        [Obsolete("Use AddFluentMigratorSlim() instead for AOT-compatible setups. This method will be removed in a future version.")]
-        public static IServiceCollection AddFluentMigratorCoreWithoutAssemblyLoader(
-            [NotNull] this IServiceCollection services)
-            => AddFluentMigratorSlim(services);
-
-        /// <summary>
         /// Configures the migration runner
         /// </summary>
         /// <param name="services">The <see cref="IServiceCollection" /> to add services to.</param>
