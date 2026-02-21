@@ -46,12 +46,18 @@ namespace FluentMigrator.Builders.Insert
         public IDictionary<string, object> AdditionalFeatures => _expression.AdditionalFeatures;
 
         /// <inheritdoc />
+#if NET
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("The properties of the anonymous type cannot be statically analyzed.")]
+#endif
         public IInsertDataSyntax Row(object recordAsAnonymousType)
         {
             return Rows(recordAsAnonymousType);
         }
 
         /// <inheritdoc />
+#if NET
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("The properties of the anonymous type cannot be statically analyzed.")]
+#endif
         public IInsertDataSyntax Rows(params object[] recordsAsAnonymousTypes)
         {
             var records = recordsAsAnonymousTypes.Select(ExtractData).ToArray();
@@ -86,6 +92,9 @@ namespace FluentMigrator.Builders.Insert
             return this;
         }
 
+#if NET
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("The properties of the anonymous type cannot be statically analyzed.")]
+#endif
         private static IDictionary<string, object> ExtractData(object dataAsAnonymousType)
         {
             var data = new Dictionary<string, object>();

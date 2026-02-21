@@ -1,5 +1,5 @@
-#region License
-// Copyright (c) 2019, Fluent Migrator Project
+﻿#region License
+// Copyright (c) 2026, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,32 +28,29 @@ using Microsoft.Extensions.Options;
 namespace FluentMigrator.Runner.Initialization
 {
     /// <summary>
-    /// Provides access to a convention set by utilizing assembly sources and type filtering options.
+    /// Provides access to a convention set by utilizing type sources and type filtering options.
     /// </summary>
     /// <remarks>
     /// This class is responsible for retrieving an implementation of <see cref="IConventionSet"/>
-    /// from the provided assembly sources and type candidates. It uses type filtering options
+    /// from the provided type sources and type candidates. It uses type filtering options
     /// to determine valid types and supports dependency injection for instantiation.
     /// </remarks>
-#if NET
-    [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This type uses AppDomain to load assemblies, which may not be preserved in trimmed applications.")]
-#endif
-    public class AssemblySourceConventionSetAccessor : IConventionSetAccessor
+    public class TypeSourceConventionSetAccessor : IConventionSetAccessor
     {
         private readonly Lazy<IConventionSet> _lazyValue;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AssemblySourceVersionTableMetaDataAccessor"/> class.
+        /// Initializes a new instance of the <see cref="TypeSourceConventionSetAccessor"/> class.
         /// </summary>
         /// <param name="typeFilterOptions">The type filter options</param>
         /// <param name="sources">The sources to get type candidates</param>
         /// <param name="serviceProvider">The service provider used to instantiate the found <see cref="IConventionSet"/> implementation</param>
-        /// <param name="assemblySource">The assemblies used to search for the <see cref="IConventionSet"/> implementation</param>
-        public AssemblySourceConventionSetAccessor(
+        /// <param name="typeSource">The type source used to search for the <see cref="IConventionSet"/> implementation</param>
+        public TypeSourceConventionSetAccessor(
             [NotNull] IOptionsSnapshot<TypeFilterOptions> typeFilterOptions,
             [NotNull, ItemNotNull] IEnumerable<ITypeSourceItem<IConventionSet>> sources,
             [CanBeNull] IServiceProvider serviceProvider,
-            [CanBeNull] IAssemblySource assemblySource = null)
+            [CanBeNull] ITypeSource typeSource = null)
         {
             var filterOptions = typeFilterOptions.Value;
             _lazyValue = new Lazy<IConventionSet>(
@@ -65,15 +62,17 @@ namespace FluentMigrator.Runner.Initialization
                     }
 
                     var matchedType = sources.SelectMany(source => source.GetCandidates(IsValidType))
-                        .Union(GetAssemblyTypes(assemblySource, IsValidType))
+                        .Union(GetAssemblyTypes(typeSource, IsValidType))
                         .FirstOrDefault();
 
+#pragma warning disable IL2072
                     if (matchedType != null)
                     {
                         if (serviceProvider == null)
                             return (IConventionSet)Activator.CreateInstance(matchedType);
                         return (IConventionSet)ActivatorUtilities.CreateInstance(serviceProvider, matchedType);
                     }
+#pragma warning restore IL2072
 
                     return null;
                 });
@@ -85,11 +84,11 @@ namespace FluentMigrator.Runner.Initialization
             return _lazyValue.Value;
         }
 
-        private static IEnumerable<Type> GetAssemblyTypes([CanBeNull] IAssemblySource assemblySource, [NotNull] Predicate<Type> predicate)
+        private static IEnumerable<Type> GetAssemblyTypes([CanBeNull] ITypeSource typeSource, [NotNull] Predicate<Type> predicate)
         {
-            if (assemblySource == null)
+            if (typeSource == null)
                 return Enumerable.Empty<Type>();
-            return assemblySource.Assemblies.SelectMany(a => a.GetExportedTypes())
+            return typeSource.GetTypes()
                 .Where(t => !t.IsAbstract && t.IsClass)
                 .Where(t => typeof(IConventionSet).IsAssignableFrom(t))
                 .Where(t => predicate(t));

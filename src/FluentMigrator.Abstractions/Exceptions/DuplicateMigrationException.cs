@@ -56,6 +56,9 @@ namespace FluentMigrator.Exceptions
         /// </summary>
         /// <param name="info">The serialization information</param>
         /// <param name="context">The streaming context</param>
+#if NET
+        [Obsolete("Formatter-based serialization is obsolete")]
+#endif
         public DuplicateMigrationException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }

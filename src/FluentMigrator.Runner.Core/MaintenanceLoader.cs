@@ -41,38 +41,6 @@ namespace FluentMigrator.Runner
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MaintenanceLoader"/> class.
-        /// Creates empty <see cref="TypeFilterOptions" /> and forwards them to the main constructor.
-        /// </summary>
-        /// <param name="assemblySource">
-        /// The source of assemblies containing migration and maintenance classes.
-        /// </param>
-        /// <param name="options">
-        /// The options for configuring the migration runner.
-        /// </param>
-        /// <param name="conventions">
-        /// The conventions used to identify and process migrations and maintenance stages.
-        /// </param>
-        /// <param name="serviceProvider">
-        /// The service provider used to resolve dependencies for migration and maintenance instances.
-        /// </param>
-        /// <exception cref="ArgumentNullException">
-        /// Thrown if any of the required parameters are <c>null</c>.
-        /// </exception>
-        public MaintenanceLoader(
-            [NotNull] IAssemblySource assemblySource,
-            [NotNull] IOptions<RunnerOptions> options,
-            [NotNull] IMigrationRunnerConventions conventions,
-            [NotNull] IServiceProvider serviceProvider)
-            : this(
-                assemblySource,
-                options,
-                Options.Create(new TypeFilterOptions()),
-                conventions,
-                serviceProvider)
-        { }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MaintenanceLoader"/> class.
         /// </summary>
         /// <param name="assemblySource">
         /// The source of assemblies containing migration and maintenance classes.
@@ -89,22 +57,31 @@ namespace FluentMigrator.Runner
         /// <param name="serviceProvider">
         /// The service provider used to resolve dependencies for migration and maintenance instances.
         /// </param>
+        /// <param name="typeSource">
+        /// An optional type source; when provided, types are taken from it instead of from the assembly source.
+        /// When not provided, an <see cref="AssemblyTypeSource"/> wrapping <paramref name="assemblySource"/> is used,
+        /// which requires unreferenced code.
+        /// </param>
         /// <exception cref="ArgumentNullException">
         /// Thrown if any of the required parameters are <c>null</c>.
         /// </exception>
+#if NET
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("When typeSource is not provided, assembly scanning uses reflection which may not be preserved in trimmed applications.")]
+#endif
         public MaintenanceLoader(
             [NotNull] IAssemblySource assemblySource,
             [NotNull] IOptions<RunnerOptions> options,
             [NotNull] IOptions<TypeFilterOptions> filterOptions,
             [NotNull] IMigrationRunnerConventions conventions,
-            [NotNull] IServiceProvider serviceProvider)
+            [NotNull] IServiceProvider serviceProvider,
+            [CanBeNull] ITypeSource typeSource = null)
         {
-            var tagsList = options.Value.Tags ?? new string[0];
+            var tagsList = options.Value.Tags ?? Array.Empty<string>();
 
-            var types = assemblySource.Assemblies.SelectMany(a => a.ExportedTypes).ToList();
+            typeSource ??= new AssemblyTypeSource(assemblySource);
 
             _maintenance = (
-                from type in types
+                from type in typeSource.GetTypes()
                 let stage = conventions.GetMaintenanceStage(type)
                 where stage != null
                 where type.IsInNamespace(filterOptions.Value.Namespace, filterOptions.Value.NestedNamespaces)

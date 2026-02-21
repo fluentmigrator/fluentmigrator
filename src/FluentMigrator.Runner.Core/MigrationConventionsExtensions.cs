@@ -33,6 +33,9 @@ namespace FluentMigrator.Runner
         /// <returns><see langword="true"/> when the requested tags match the tags attached to the type.</returns>
         public static bool HasRequestedTags(
             this IMigrationRunnerConventions conventions,
+#if NET
+            [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.Interfaces)]
+#endif
             Type type,
             string[] tagsList,
             bool includeUntagged)

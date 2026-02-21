@@ -28,6 +28,9 @@ namespace FluentMigrator.Runner.Initialization
     /// <summary>
     /// Searches for a <see cref="IMigrationRunnerConventions"/> implementation in the given assemblies
     /// </summary>
+#if NET
+    [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This type uses the AppDomain to load assemblies, which may not be preserved in trimmed applications.")]
+#endif
     public class AssemblySourceMigrationRunnerConventionsAccessor : IMigrationRunnerConventionsAccessor
     {
         private readonly Lazy<IMigrationRunnerConventions> _lazyConventions;

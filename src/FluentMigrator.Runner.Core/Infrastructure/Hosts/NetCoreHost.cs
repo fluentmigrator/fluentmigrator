@@ -24,6 +24,9 @@ using System.Reflection;
 
 namespace FluentMigrator.Runner.Infrastructure.Hosts
 {
+#if NET
+    [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This type uses AppDomain to load assemblies, which may not be preserved in trimmed applications.")]
+#endif
     internal class NetCoreHost : IHostAbstraction
     {
         public string BaseDirectory

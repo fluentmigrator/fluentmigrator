@@ -95,18 +95,30 @@ namespace FluentMigrator.Runner.Infrastructure
             return migrationInfo;
         }
 
-        private IMigrationInfo GetMigrationInfoForImpl(Type migrationType)
+        private IMigrationInfo GetMigrationInfoForImpl(
+#if NET
+            [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
+#endif
+            Type migrationType)
         {
             var migration = (IMigration) Activator.CreateInstance(migrationType);
             return GetMigrationInfoForMigration(migration);
         }
 
-        private static bool TypeHasTagsImpl(Type type)
+        private static bool TypeHasTagsImpl(
+#if NET
+            [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.Interfaces)]
+#endif
+            Type type)
         {
             return GetInheritedCustomAttributes<TagsAttribute>(type).Any();
         }
 
-        private static IEnumerable<T> GetInheritedCustomAttributes<T>(Type type)
+        private static IEnumerable<T> GetInheritedCustomAttributes<T>(
+    #if NET
+            [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.Interfaces)]
+    #endif
+            Type type)
         {
             var attributeType = typeof(T);
 
@@ -119,7 +131,11 @@ namespace FluentMigrator.Runner.Infrastructure
                 .Cast<T>();
         }
 
-        private static bool TypeHasMatchingTagsImpl(Type type, IEnumerable<string> tagsToMatch)
+        private static bool TypeHasMatchingTagsImpl(
+#if NET
+            [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.Interfaces)]
+#endif
+            Type type, IEnumerable<string> tagsToMatch)
         {
             var tags = GetInheritedCustomAttributes<TagsAttribute>(type).ToList();
             var matchTagsList = tagsToMatch.ToList();

@@ -23,6 +23,9 @@ namespace FluentMigrator.Runner.Initialization.AssemblyLoader
     /// <summary>
     /// Class that creates an <see cref="IAssemblyLoader"/> for a given assembly name
     /// </summary>
+#if NET
+    [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This type uses AppDomain to load assemblies, which may not be preserved in trimmed applications.")]
+#endif
     public class AssemblyLoaderFactory
     {
         /// <summary>

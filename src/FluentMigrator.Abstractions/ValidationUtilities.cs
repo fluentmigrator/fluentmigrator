@@ -26,6 +26,9 @@ namespace FluentMigrator
     /// <summary>
     /// Helper functions to validate objects
     /// </summary>
+#if NET
+    [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This type uses reflection to validate migration expressions, which may not be preserved in trimmed applications.")]
+#endif
     internal static class ValidationUtilities
     {
         /// <summary>
@@ -110,7 +113,7 @@ namespace FluentMigrator
                         }
                     }
             }
-            
+
             return true;
         }
     }

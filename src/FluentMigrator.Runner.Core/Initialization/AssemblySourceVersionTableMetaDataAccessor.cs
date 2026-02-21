@@ -62,9 +62,11 @@ namespace FluentMigrator.Runner.Initialization
 
                     if (matchedType != null)
                     {
+#pragma warning disable IL2072 // Public constructor
                         if (serviceProvider == null)
                             return (IVersionTableMetaData)Activator.CreateInstance(matchedType);
                         return (IVersionTableMetaData)ActivatorUtilities.CreateInstance(serviceProvider, matchedType);
+#pragma warning restore IL2072
                     }
 
                     return null;
@@ -76,12 +78,22 @@ namespace FluentMigrator.Runner.Initialization
 
         private static IEnumerable<Type> GetAssemblyTypes([CanBeNull] IAssemblySource assemblySource, [NotNull] Predicate<Type> predicate)
         {
+#if NET
+            if (!System.Runtime.CompilerServices.RuntimeFeature.IsDynamicCodeSupported)
+            {
+                return Enumerable.Empty<Type>();
+            }
+#endif
+
             if (assemblySource == null)
                 return Enumerable.Empty<Type>();
+
+#pragma warning disable IL2026 // Requires unreferenced code
             return assemblySource.Assemblies.SelectMany(a => a.GetExportedTypes())
                 .Where(t => !t.IsAbstract && t.IsClass)
                 .Where(t => typeof(IVersionTableMetaData).IsAssignableFrom(t))
                 .Where(t => predicate(t));
+#pragma warning restore IL2026
         }
     }
 }

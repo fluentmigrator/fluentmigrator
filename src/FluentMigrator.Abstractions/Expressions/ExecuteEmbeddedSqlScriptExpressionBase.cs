@@ -77,10 +77,9 @@ Possible candidates are:
             [NotNull] string sqlScriptName)
         {
             //resource full name is in format `namespace.resourceName`
-            var sqlScriptParts = sqlScriptName.Split('.').Reverse().ToArray();
+            var sqlScriptParts = Enumerable.Reverse(sqlScriptName.Split('.')).ToArray();
 
-            bool IsNameMatch((string name, Assembly assembly) x) => x.name.Split('.')
-                .Reverse()
+            bool IsNameMatch((string name, Assembly assembly) x) => Enumerable.Reverse(x.name.Split('.'))
                 .Take(sqlScriptParts.Length)
                 .SequenceEqual(sqlScriptParts, StringComparer.InvariantCultureIgnoreCase);
 
