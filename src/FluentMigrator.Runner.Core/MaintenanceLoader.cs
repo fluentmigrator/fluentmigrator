@@ -68,17 +68,20 @@ namespace FluentMigrator.Runner
             [NotNull] IMigrationRunnerConventions conventions,
             [NotNull] IServiceProvider serviceProvider)
             : this(
+                new AssemblyTypeSource(assemblySource),
                 options,
                 Options.Create(new TypeFilterOptions()),
                 conventions,
-                serviceProvider,
-                new AssemblyTypeSource(assemblySource))
+                serviceProvider)
         {
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MaintenanceLoader"/> class.
         /// </summary>
+        /// <param name="typeSource">
+        /// The source of types containing migration and maintenance classes.
+        /// </param>
         /// <param name="options">
         /// The options for configuring the migration runner.
         /// </param>
@@ -91,18 +94,15 @@ namespace FluentMigrator.Runner
         /// <param name="serviceProvider">
         /// The service provider used to resolve dependencies for migration and maintenance instances.
         /// </param>
-        /// <param name="typeSource">
-        /// An optional type source; when provided, types are taken from it instead of from the assembly source.
-        /// </param>
         /// <exception cref="ArgumentNullException">
         /// Thrown if any of the required parameters are <c>null</c>.
         /// </exception>
         public MaintenanceLoader(
+            [NotNull] ITypeSource typeSource,
             [NotNull] IOptions<RunnerOptions> options,
             [NotNull] IOptions<TypeFilterOptions> filterOptions,
             [NotNull] IMigrationRunnerConventions conventions,
-            [NotNull] IServiceProvider serviceProvider,
-            [NotNull] ITypeSource typeSource)
+            [NotNull] IServiceProvider serviceProvider)
         {
             var tagsList = options.Value.Tags ?? Array.Empty<string>();
 #if NET
