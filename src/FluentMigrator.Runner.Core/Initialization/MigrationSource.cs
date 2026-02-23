@@ -134,12 +134,32 @@ namespace FluentMigrator.Runner.Initialization
             }
         }
 
+        /// <summary>
+        /// Retrieves a collection of migration type candidates by combining exported types from the assemblies
+        /// provided by the <see cref="IAssemblySource"/> and migration type candidates from additional source items.
+        /// </summary>
+        /// <returns>
+        /// A collection of <see cref="Type"/> objects representing potential migration types.
+        /// </returns>
+        /// <remarks>
+        /// This method aggregates the exported types from the assemblies in the <see cref="IAssemblySource"/> 
+        /// and the migration type candidates from the additional <see cref="IMigrationSourceItem"/> instances.
+        /// </remarks>
         private IEnumerable<Type> GetMigrationTypeCandidates()
         {
             return _source.GetTypes()
                 .Union(_sourceItems.SelectMany(i => i.MigrationTypeCandidates));
         }
 
+        /// <summary>
+        /// Creates an instance of the specified migration type.
+        /// </summary>
+        /// <param name="type">The type of the migration to create.</param>
+        /// <returns>An instance of the specified migration type.</returns>
+        /// <remarks>
+        /// If a service provider is available, it uses <see cref="ActivatorUtilities.CreateInstance(IServiceProvider, Type, Object[])"/> 
+        /// to create the instance. Otherwise, it falls back to <see cref="Activator.CreateInstance(Type)"/>.
+        /// </remarks>
         private IMigration CreateInstance(
 #if NET
             [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]
