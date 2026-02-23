@@ -41,10 +41,44 @@ namespace FluentMigrator.Runner
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MaintenanceLoader"/> class.
+        /// Creates empty <see cref="TypeFilterOptions" /> and forwards them to the main constructor.
         /// </summary>
         /// <param name="assemblySource">
         /// The source of assemblies containing migration and maintenance classes.
         /// </param>
+        /// <param name="options">
+        /// The options for configuring the migration runner.
+        /// </param>
+        /// <param name="conventions">
+        /// The conventions used to identify and process migrations and maintenance stages.
+        /// </param>
+        /// <param name="serviceProvider">
+        /// The service provider used to resolve dependencies for migration and maintenance instances.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if any of the required parameters are <c>null</c>.
+        /// </exception>
+        [Obsolete("Use the constructor that accepts ITypeSource instead")]
+#if NET
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This constructor uses reflection-based assembly scanning via AssemblyTypeSource. Use the constructor that accepts ITypeSource for AOT-compatible usage.")]
+#endif
+        public MaintenanceLoader(
+            [NotNull] IAssemblySource assemblySource,
+            [NotNull] IOptions<RunnerOptions> options,
+            [NotNull] IMigrationRunnerConventions conventions,
+            [NotNull] IServiceProvider serviceProvider)
+            : this(
+                options,
+                Options.Create(new TypeFilterOptions()),
+                conventions,
+                serviceProvider,
+                new AssemblyTypeSource(assemblySource))
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MaintenanceLoader"/> class.
+        /// </summary>
         /// <param name="options">
         /// The options for configuring the migration runner.
         /// </param>
@@ -59,27 +93,21 @@ namespace FluentMigrator.Runner
         /// </param>
         /// <param name="typeSource">
         /// An optional type source; when provided, types are taken from it instead of from the assembly source.
-        /// When not provided, an <see cref="AssemblyTypeSource"/> wrapping <paramref name="assemblySource"/> is used,
-        /// which requires unreferenced code.
         /// </param>
         /// <exception cref="ArgumentNullException">
         /// Thrown if any of the required parameters are <c>null</c>.
         /// </exception>
-#if NET
-        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("When typeSource is not provided, assembly scanning uses reflection which may not be preserved in trimmed applications.")]
-#endif
         public MaintenanceLoader(
-            [NotNull] IAssemblySource assemblySource,
             [NotNull] IOptions<RunnerOptions> options,
             [NotNull] IOptions<TypeFilterOptions> filterOptions,
             [NotNull] IMigrationRunnerConventions conventions,
             [NotNull] IServiceProvider serviceProvider,
-            [CanBeNull] ITypeSource typeSource = null)
+            [NotNull] ITypeSource typeSource)
         {
             var tagsList = options.Value.Tags ?? Array.Empty<string>();
-
-            typeSource ??= new AssemblyTypeSource(assemblySource);
-
+#if NET
+#pragma warning disable IL2072 // Types from ITypeSource are either statically known (ArrayTypeSource) or come from a [RequiresUnreferencedCode] path (AssemblyTypeSource) — safe in both cases.
+#endif
             _maintenance = (
                 from type in typeSource.GetTypes()
                 let stage = conventions.GetMaintenanceStage(type)
@@ -87,11 +115,15 @@ namespace FluentMigrator.Runner
                 where type.IsInNamespace(filterOptions.Value.Namespace, filterOptions.Value.NestedNamespaces)
                 where conventions.HasRequestedTags(type, tagsList, options.Value.IncludeUntaggedMaintenances)
                 let migration = (IMigration) ActivatorUtilities.CreateInstance(serviceProvider, type)
+
                 group migration by stage.GetValueOrDefault()
             ).ToDictionary(
                 g => g.Key,
                 g => (IList<IMigration>)g.OrderBy(m => m.GetType().Name).ToArray()
             );
+#if NET
+#pragma warning restore IL2072
+#endif
         }
 
         /// <summary>

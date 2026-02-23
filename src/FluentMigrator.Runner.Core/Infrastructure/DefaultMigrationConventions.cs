@@ -54,10 +54,19 @@ namespace FluentMigrator.Runner.Infrastructure
         /// <inheritdoc />
         public Func<IMigration, IMigrationInfo> GetMigrationInfoForMigration => GetMigrationInfoForMigrationImpl;
 
+#if NET
+        // TODO(AOT): We should consider making a delegate with DynamicallyAccessedMembers annotations to avoid the need for these warnings,
+        // however this would be a breaking change to the interface, so for now we will just suppress the warnings on the implementations.
+
+        #pragma warning disable IL2111 // We cannot annotate the parameter of this delegate with DynamicallyAccessedMembers.
+#endif
         /// <inheritdoc />
         public Func<Type, bool> TypeHasTags => TypeHasTagsImpl;
         /// <inheritdoc />
         public Func<Type, IEnumerable<string>, bool> TypeHasMatchingTags => TypeHasMatchingTagsImpl;
+#if NET
+#pragma warning restore IL2111
+#endif
 
         private static bool TypeIsMigrationImpl(Type type)
         {

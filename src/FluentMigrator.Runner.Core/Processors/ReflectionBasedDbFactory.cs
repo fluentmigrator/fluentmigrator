@@ -44,6 +44,9 @@ namespace FluentMigrator.Runner.Processors
         private DbProviderFactory _instance;
 
         [Obsolete("Use the constructor that accepts IServiceProvider for proper dependency injection support.")]
+#if NET
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This constructor uses reflection to load DbProviderFactory types, which may not be preserved in trimmed applications.")]
+#endif
         public ReflectionBasedDbFactory(string assemblyName, string dbProviderFactoryTypeName)
             : this(new TestEntry(assemblyName, dbProviderFactoryTypeName, () => Type.GetType($"{dbProviderFactoryTypeName}, {assemblyName}")))
         {

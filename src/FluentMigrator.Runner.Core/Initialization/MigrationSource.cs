@@ -130,7 +130,13 @@ namespace FluentMigrator.Runner.Initialization
 
                 _logger.Log(LogLevel.Trace, $"Type {type.AssemblyQualifiedName} is a migration. Adding.");
 
+#if NET
+#pragma warning disable IL2111 // The types are marked with DynamicallyAccessedMembers in ITypeSource implementations.
+#endif
                 yield return _instanceCache.GetOrAdd(type, CreateInstance);
+#if NET
+#pragma warning restore IL2111
+#endif
             }
         }
 
