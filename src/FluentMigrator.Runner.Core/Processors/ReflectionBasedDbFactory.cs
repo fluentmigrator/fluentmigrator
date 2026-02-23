@@ -787,8 +787,33 @@ namespace FluentMigrator.Runner.Processors
 #endif
         protected delegate Type GetTypeDelegate();
 
+        /// <summary>
+        /// Represents an entry used for testing the creation of database provider factories via reflection.
+        /// </summary>
+        /// <remarks>
+        /// This class encapsulates the necessary information, such as the assembly name and the database provider factory type name,
+        /// to dynamically load and create database provider factories at runtime. It is primarily used internally by
+        /// <see cref="ReflectionBasedDbFactory"/> and its derived classes.
+        /// </remarks>
         protected class TestEntry
         {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="ReflectionBasedDbFactory.TestEntry"/> class.
+            /// </summary>
+            /// <param name="assemblyName">
+            /// The name of the assembly containing the database provider factory type.
+            /// </param>
+            /// <param name="dbProviderFactoryTypeName">
+            /// The fully qualified name of the database provider factory type.
+            /// </param>
+            /// <param name="typeFactory">
+            /// An optional delegate that returns the pre-loaded <see cref="Type"/> for the database provider factory.
+            /// When provided, this delegate is invoked first to resolve the factory type without relying on reflection-based assembly loading.
+            /// </param>
+            /// <remarks>
+            /// This constructor is used to create a test entry that encapsulates the information required to
+            /// dynamically load and create a database provider factory via reflection.
+            /// </remarks>
             public TestEntry(
                 [NotNull] string assemblyName,
                 [NotNull] string dbProviderFactoryTypeName,
@@ -799,12 +824,37 @@ namespace FluentMigrator.Runner.Processors
                 TypeFactory = typeFactory;
             }
 
+            /// <summary>
+            /// Gets the name of the assembly that contains the database provider factory.
+            /// </summary>
+            /// <remarks>
+            /// This property provides the assembly name required to dynamically load the database provider factory
+            /// during runtime. It is used internally by the <see cref="ReflectionBasedDbFactory"/> to locate and
+            /// instantiate the appropriate factory.
+            /// </remarks>
             [NotNull]
             public string AssemblyName { get; }
 
+            /// <summary>
+            /// Gets the fully qualified name of the database provider factory type.
+            /// </summary>
+            /// <remarks>
+            /// This property specifies the type name of the database provider factory that is used to create
+            /// database connections via reflection. It is primarily utilized internally by the
+            /// <see cref="ReflectionBasedDbFactory"/> class to dynamically load and instantiate the appropriate
+            /// database provider factory at runtime.
+            /// </remarks>
             [NotNull]
             public string DBProviderFactoryTypeName { get; }
 
+            /// <summary>
+            /// Gets an optional delegate that returns the pre-loaded <see cref="Type"/> for the database provider factory.
+            /// </summary>
+            /// <remarks>
+            /// When this property is not <c>null</c>, the delegate is invoked before attempting any reflection-based
+            /// assembly loading. This allows AOT-compatible callers to supply the factory type directly, bypassing
+            /// the dynamic assembly discovery paths that are unavailable in trimmed or NativeAOT builds.
+            /// </remarks>
             [CanBeNull]
             public GetTypeDelegate TypeFactory { get; }
         }
