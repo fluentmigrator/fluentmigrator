@@ -1,5 +1,9 @@
 <Project>
   <PropertyGroup>
+    <!--
+      Target net8.0 was added to enable trimming and AOT compilation support.
+      At the time of writing .NET 8.0 was the latest supported version of .NET.
+    -->
     <TargetFrameworks>$(TargetFrameworks);net8.0</TargetFrameworks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">

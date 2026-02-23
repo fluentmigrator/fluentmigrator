@@ -115,7 +115,6 @@ namespace FluentMigrator.Runner
                 where type.IsInNamespace(filterOptions.Value.Namespace, filterOptions.Value.NestedNamespaces)
                 where conventions.HasRequestedTags(type, tagsList, options.Value.IncludeUntaggedMaintenances)
                 let migration = (IMigration) ActivatorUtilities.CreateInstance(serviceProvider, type)
-
                 group migration by stage.GetValueOrDefault()
             ).ToDictionary(
                 g => g.Key,
