@@ -231,6 +231,98 @@ The following FluentMigrator operations cannot be supported and should be handle
 | `Create.Index().Clustered()` | DuckDB has no concept of clustered indexes |
 | `Create.Index().Include(column)` | DuckDB ART indexes do not support covering index `INCLUDE` columns |
 
+## Integration Tests
+
+### Why DuckDB Does Not Need a TestContainers Container
+
+Unlike the other database providers supported by FluentMigrator (PostgreSQL, SQL Server, MySQL, Oracle, Firebird, DB2), **DuckDB is an in-process embedded database** — it runs entirely inside the calling process and does not expose a network port. There is no DuckDB server daemon and no official `Testcontainers.DuckDB` NuGet module.
+
+This means the DuckDB integration tests should follow the same pattern as **SQLite** rather than the container-based pattern used for server databases.
+
+### Proposed Changes to the Test Infrastructure
+
+#### 1. `appsettings.json`
+
+Add a `DuckDB` entry with an in-memory connection string, enabled by default (matching the SQLite entry):
+
+```json
+"DuckDB": {
+    "ConnectionString": "Data Source=:memory:",
+    "IsEnabled": true
+}
+```
+
+No `ContainerEnabled` field is needed because DuckDB does not use a container.
+
+#### 2. `IntegrationTestOptions.cs`
+
+Add a static property for DuckDB alongside the other database options (note: `ProcessorIdConstants.DuckDB` must first be added to `src/FluentMigrator/ProcessorId.cs` as described in the [Project Structure](#1-project-structure) section above):
+
+```csharp
+// ReSharper disable once InconsistentNaming
+public static DatabaseServerOptions DuckDB => GetOptions(ProcessorIdConstants.DuckDB);
+```
+
+#### 3. `IntegrationTestsSetup.cs`
+
+No changes are needed. Because DuckDB is in-process, there is no container to start. `Task.WhenAll([...])` in `IntegrationTestsSetup.OneTimeSetUp` should not include a `DuckDBContainer` entry.
+
+#### 4. Integration Test Structure
+
+Integration tests should be placed at:
+
+```
+test/FluentMigrator.Tests/Integration/Processors/DuckDB/
+├── DuckDBProcessorTests.cs
+├── DuckDBTableTests.cs
+├── DuckDBColumnTests.cs
+├── DuckDBConstraintTests.cs
+├── DuckDBIndexTests.cs
+├── DuckDBSchemaTests.cs
+└── DuckDBSequenceTests.cs
+```
+
+Each test class follows the SQLite pattern: a `CreateProcessorServices` helper configures the runner with `AddDuckDB()` and a `PassThroughConnectionStringReader` pointing to `"Data Source=:memory:"`, and `[OneTimeSetUp]` / `[SetUp]` / `[TearDown]` methods manage the service scope lifecycle. The test class attributes should be:
+
+```csharp
+[TestFixture]
+[Category("Integration")]
+[Category("DuckDB")]
+// ReSharper disable once InconsistentNaming
+public class DuckDBProcessorTests
+{
+    private ServiceProvider ServiceProvider { get; set; }
+    private IServiceScope ServiceScope { get; set; }
+    private DuckDBProcessor Processor { get; set; }
+
+    private ServiceProvider CreateProcessorServices(Action<IServiceCollection> initAction = null)
+    {
+        IntegrationTestOptions.DuckDB.IgnoreIfNotEnabled();
+
+        var services = ServiceCollectionExtensions.CreateServices()
+            .ConfigureRunner(r => r.AddDuckDB())
+            .AddScoped<IConnectionStringReader>(
+                _ => new PassThroughConnectionStringReader("Data Source=:memory:"));
+
+        initAction?.Invoke(services);
+        return services.BuildServiceProvider();
+    }
+    // ...
+}
+```
+
+### DuckDB-Specific Testing Considerations
+
+Because DuckDB is in-process, the following testing considerations apply:
+
+1. **In-memory isolation**: Each test class creates its own `ServiceProvider` (and thus its own in-memory database instance). Each `[SetUp]` creates a new service scope, so tables created by one test are visible to subsequent tests within the same `ServiceProvider` lifetime but not across providers. This is the same isolation model as SQLite integration tests.
+
+2. **File-based testing**: If file-based persistence needs to be tested, a cross-platform temporary path such as `Path.Combine(Path.GetTempPath(), "fluentmigrator_duckdb_test.db")` can be substituted for the in-memory connection string. The test `[TearDown]` or `[OneTimeTearDown]` should delete the file after each test. This is analogous to the `ReplaceConnectionStringDataDirectory()` approach used by SQLite.
+
+3. **No schema setup required**: Since DuckDB creates an in-memory database automatically on first connection, there is no equivalent to the Oracle `TestSchema` user or the SQL Server database name that must be pre-created.
+
+4. **Concurrent write restriction**: DuckDB in-memory mode only allows a single writer at a time. Because `GenericProcessorBase` uses a single connection per processor instance and integration tests run on a single service scope at a time, this constraint is naturally satisfied without any special handling in tests.
+
 ## References
 
 - [DuckDB SQL Introduction](https://duckdb.org/docs/stable/sql/introduction)
