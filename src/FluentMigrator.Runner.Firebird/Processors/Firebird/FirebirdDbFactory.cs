@@ -33,7 +33,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
     {
         private static readonly TestEntry[] _entries =
         {
-            new TestEntry("FirebirdSql.Data.FirebirdClient", "FirebirdSql.Data.FirebirdClient.FirebirdClientFactory"),
+            new TestEntry("FirebirdSql.Data.FirebirdClient", "FirebirdSql.Data.FirebirdClient.FirebirdClientFactory", () => Type.GetType("FirebirdSql.Data.FirebirdClient.FirebirdClientFactory, FirebirdSql.Data.FirebirdClient")),
         };
 
         /// <summary>

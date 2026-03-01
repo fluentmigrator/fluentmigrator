@@ -165,6 +165,9 @@ namespace FluentMigrator.Runner
         /// <param name="builder">The runner builder</param>
         /// <param name="assemblies">The target assemblies</param>
         /// <returns>The runner builder</returns>
+#if NET
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This method uses gets the exported types from assemblies, which may not be preserved in trimmed applications.")]
+#endif
         public static IMigrationRunnerBuilder WithMigrationsIn(
             this IMigrationRunnerBuilder builder,
             [NotNull, ItemNotNull] params Assembly[] assemblies)
@@ -175,11 +178,29 @@ namespace FluentMigrator.Runner
         }
 
         /// <summary>
+        /// Registers specific types as migration sources.
+        /// </summary>
+        /// <param name="builder">The runner builder</param>
+        /// <param name="types">The types to register as migration sources</param>
+        /// <returns>The runner builder</returns>
+        public static IMigrationRunnerBuilder WithTypes(
+            this IMigrationRunnerBuilder builder,
+            [NotNull] params Type[] types)
+        {
+            builder.Services
+                .AddSingleton(new ArrayTypeSource(types));
+            return builder;
+        }
+
+        /// <summary>
         /// Scans for types in the given assemblies
         /// </summary>
         /// <param name="builder">The runner builder</param>
         /// <param name="assemblies">The assemblies to scan</param>
         /// <returns>The next step</returns>
+#if NET
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This method uses reflection to load types, which may not be preserved in trimmed applications.")]
+#endif
         public static IScanInBuilder ScanIn(
             this IMigrationRunnerBuilder builder,
             [NotNull, ItemNotNull] params Assembly[] assemblies)
@@ -188,6 +209,9 @@ namespace FluentMigrator.Runner
             return new ScanInBuilder(builder, sourceItem);
         }
 
+#if NET
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This type uses reflection to load types, which may not be preserved in trimmed applications.")]
+#endif
         private class ScanInBuilder : IScanInBuilder, IScanInForBuilder
         {
             private readonly IMigrationRunnerBuilder _builder;

@@ -29,10 +29,12 @@ namespace FluentMigrator.Runner.Initialization
     /// <summary>
     /// The default implementation of a <see cref="IFilteringMigrationSource"/>.
     /// </summary>
-    public class MigrationSource : IFilteringMigrationSource
+#pragma warning disable 618
+    public class MigrationSource : IFilteringMigrationSource, IMigrationSource
+#pragma warning restore 618
     {
         [NotNull]
-        private readonly IAssemblySource _source;
+        private readonly ITypeSource _source;
 
         [NotNull]
         private readonly IMigrationRunnerConventions _conventions;
@@ -52,13 +54,16 @@ namespace FluentMigrator.Runner.Initialization
         /// <summary>
         /// Initializes a new instance of the <see cref="MigrationSource"/> class.
         /// </summary>
-        /// <param name="source">The assembly source</param>
+        /// <param name="source">The source of types containing migration and maintenance classes.</param>
         /// <param name="conventions">The migration runner conventions</param>
         /// <param name="serviceProvider">The service provider</param>
         /// <param name="sourceItems">The additional migration source items</param>
         /// <param name="logger">The logger for troubleshooting "No migrations found" error.</param>
+#if NET
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("When typeSource is not provided, assembly scanning uses reflection which may not be preserved in trimmed applications.")]
+#endif
         public MigrationSource(
-            [NotNull] IAssemblySource source,
+            [NotNull] ITypeSource source,
             [NotNull] IMigrationRunnerConventions conventions,
             [NotNull] IServiceProvider serviceProvider,
             [NotNull, ItemNotNull] IEnumerable<IMigrationSourceItem> sourceItems,
@@ -71,6 +76,57 @@ namespace FluentMigrator.Runner.Initialization
             _logger = logger;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MigrationSource"/> class.
+        /// </summary>
+        /// <param name="source">The assembly source</param>
+        /// <param name="conventions">The migration runner conventions</param>
+        /// <param name="serviceProvider">The service provider</param>
+        /// <param name="sourceItems">The additional migration source items</param>
+        /// <param name="logger">The logger for troubleshooting "No migrations found" error.</param>
+        [Obsolete]
+#if NET
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("When typeSource is not provided, assembly scanning uses reflection which may not be preserved in trimmed applications.")]
+#endif
+        public MigrationSource(
+            [NotNull] IAssemblySource source,
+            [NotNull] IMigrationRunnerConventions conventions,
+            [NotNull] IServiceProvider serviceProvider,
+            [NotNull, ItemNotNull] IEnumerable<IMigrationSourceItem> sourceItems,
+            [NotNull] ILogger logger)
+        : this(
+             new AssemblyTypeSource(source),
+             conventions,
+             serviceProvider,
+             sourceItems,
+             logger)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MigrationSource"/> class.
+        /// </summary>
+        /// <param name="source">The assembly source</param>
+        /// <param name="conventions">The migration runner conventions</param>
+        [Obsolete]
+#if NET
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This type uses the AppDomain to load assemblies, which may not be preserved in trimmed applications.")]
+#endif
+        public MigrationSource(
+            [NotNull] IAssemblySource source,
+            [NotNull] IMigrationRunnerConventions conventions)
+        {
+            _source = new AssemblyTypeSource(source);
+            _conventions = conventions;
+            _sourceItems = Enumerable.Empty<IMigrationSourceItem>();
+        }
+
+        /// <inheritdoc />
+        public IEnumerable<IMigration> GetMigrations()
+        {
+            return GetMigrations(_conventions.TypeIsMigration);
+        }
+
         /// <inheritdoc />
         public IEnumerable<IMigration> GetMigrations(Func<Type, bool> predicate)
         {
@@ -81,7 +137,7 @@ namespace FluentMigrator.Runner.Initialization
                     _logger.Log(LogLevel.Trace, $"Type [{type.AssemblyQualifiedName}] is abstract. Skipping.");
                     continue;
                 }
-                
+
                 if (!(typeof(IMigration).IsAssignableFrom(type) || typeof(MigrationBase).IsAssignableFrom(type)))
                 {
                     _logger.Log(LogLevel.Trace, $"Type [{type.AssemblyQualifiedName}] is not assignable to IMigration. Skipping.");
@@ -96,23 +152,14 @@ namespace FluentMigrator.Runner.Initialization
 
                 _logger.Log(LogLevel.Trace, $"Type {type.AssemblyQualifiedName} is a migration. Adding.");
 
+#if NET
+#pragma warning disable IL2111 // The types are marked with DynamicallyAccessedMembers in ITypeSource implementations.
+#endif
                 yield return _instanceCache.GetOrAdd(type, CreateInstance);
+#if NET
+#pragma warning restore IL2111
+#endif
             }
-        }
-
-        /// <summary>
-        /// Retrieves all exported types from the assemblies provided by the <see cref="IAssemblySource"/>.
-        /// </summary>
-        /// <returns>
-        /// A collection of <see cref="Type"/> objects representing the exported types from the assemblies.
-        /// </returns>
-        /// <remarks>
-        /// This method aggregates the exported types from all assemblies in the <see cref="IAssemblySource"/>.
-        /// </remarks>
-        private IEnumerable<Type> GetExportedTypes()
-        {
-            return _source
-                .Assemblies.SelectMany(a => a.GetExportedTypes());
         }
 
         /// <summary>
@@ -128,7 +175,7 @@ namespace FluentMigrator.Runner.Initialization
         /// </remarks>
         private IEnumerable<Type> GetMigrationTypeCandidates()
         {
-            return GetExportedTypes()
+            return _source.GetTypes()
                 .Union(_sourceItems.SelectMany(i => i.MigrationTypeCandidates));
         }
 
@@ -141,7 +188,11 @@ namespace FluentMigrator.Runner.Initialization
         /// If a service provider is available, it uses <see cref="ActivatorUtilities.CreateInstance(IServiceProvider, Type, Object[])"/> 
         /// to create the instance. Otherwise, it falls back to <see cref="Activator.CreateInstance(Type)"/>.
         /// </remarks>
-        private IMigration CreateInstance(Type type)
+        private IMigration CreateInstance(
+#if NET
+            [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]
+#endif
+            Type type)
         {
             if (_serviceProvider == null)
             {

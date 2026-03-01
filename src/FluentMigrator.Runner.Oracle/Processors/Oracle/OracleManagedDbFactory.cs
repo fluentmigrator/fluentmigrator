@@ -34,7 +34,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
     {
         private static readonly TestEntry[] _entries =
         {
-            new TestEntry("Oracle.ManagedDataAccess", "Oracle.ManagedDataAccess.Client.OracleClientFactory"),
+            new TestEntry("Oracle.ManagedDataAccess", "Oracle.ManagedDataAccess.Client.OracleClientFactory", () => Type.GetType("Oracle.ManagedDataAccess.Client.OracleClientFactory, Oracle.ManagedDataAccess")),
         };
 
         /// <summary>

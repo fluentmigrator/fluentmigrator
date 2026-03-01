@@ -58,24 +58,29 @@ namespace FluentMigrator.Runner
         /// <exception cref="ArgumentNullException">
         /// Thrown if any of the required parameters are <c>null</c>.
         /// </exception>
+        [Obsolete("Use the constructor that accepts ITypeSource instead")]
+#if NET
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This constructor uses reflection-based assembly scanning via AssemblyTypeSource. Use the constructor that accepts ITypeSource for AOT-compatible usage.")]
+#endif
         public MaintenanceLoader(
             [NotNull] IAssemblySource assemblySource,
             [NotNull] IOptions<RunnerOptions> options,
             [NotNull] IMigrationRunnerConventions conventions,
             [NotNull] IServiceProvider serviceProvider)
             : this(
-                assemblySource,
+                new AssemblyTypeSource(assemblySource),
                 options,
                 Options.Create(new TypeFilterOptions()),
                 conventions,
                 serviceProvider)
-        { }
+        {
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MaintenanceLoader"/> class.
         /// </summary>
-        /// <param name="assemblySource">
-        /// The source of assemblies containing migration and maintenance classes.
+        /// <param name="typeSource">
+        /// The source of types containing migration and maintenance classes.
         /// </param>
         /// <param name="options">
         /// The options for configuring the migration runner.
@@ -93,18 +98,18 @@ namespace FluentMigrator.Runner
         /// Thrown if any of the required parameters are <c>null</c>.
         /// </exception>
         public MaintenanceLoader(
-            [NotNull] IAssemblySource assemblySource,
+            [NotNull] ITypeSource typeSource,
             [NotNull] IOptions<RunnerOptions> options,
             [NotNull] IOptions<TypeFilterOptions> filterOptions,
             [NotNull] IMigrationRunnerConventions conventions,
             [NotNull] IServiceProvider serviceProvider)
         {
-            var tagsList = options.Value.Tags ?? new string[0];
-
-            var types = assemblySource.Assemblies.SelectMany(a => a.ExportedTypes).ToList();
-
+            var tagsList = options.Value.Tags ?? Array.Empty<string>();
+#if NET
+#pragma warning disable IL2072 // Types from ITypeSource are either statically known (ArrayTypeSource) or come from a [RequiresUnreferencedCode] path (AssemblyTypeSource) — safe in both cases.
+#endif
             _maintenance = (
-                from type in types
+                from type in typeSource.GetTypes()
                 let stage = conventions.GetMaintenanceStage(type)
                 where stage != null
                 where type.IsInNamespace(filterOptions.Value.Namespace, filterOptions.Value.NestedNamespaces)
@@ -115,6 +120,9 @@ namespace FluentMigrator.Runner
                 g => g.Key,
                 g => (IList<IMigration>)g.OrderBy(m => m.GetType().Name).ToArray()
             );
+#if NET
+#pragma warning restore IL2072
+#endif
         }
 
         /// <summary>

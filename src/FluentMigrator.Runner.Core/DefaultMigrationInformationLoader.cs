@@ -159,7 +159,11 @@ namespace FluentMigrator.Runner
             [NotNull, ItemNotNull] string[] tagsToMatch,
             bool includeUntagged)
         {
-            bool IsMatchingMigration(Type type)
+            bool IsMatchingMigration(
+#if NET
+                [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.Interfaces)]
+#endif
+                Type type)
             {
                 if (!type.IsInNamespace(@namespace, loadNestedNamespaces))
                     return false;

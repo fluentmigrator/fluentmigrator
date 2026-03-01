@@ -34,6 +34,9 @@ namespace FluentMigrator.Runner.Infrastructure
     /// in the Global Assembly Cache (GAC) or other runtime-specific directories. It is designed to support
     /// different runtime environments by utilizing an internal host abstraction.
     /// </remarks>
+#if NET
+    [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This type uses the AppDomain to load assemblies, which may not be preserved in trimmed applications.")]
+#endif
     public static class RuntimeHost
     {
         private static readonly string[] _noNames = new string[0];
@@ -64,8 +67,8 @@ namespace FluentMigrator.Runner.Infrastructure
         /// An <see cref="IEnumerable{T}"/> of <see cref="AssemblyName"/> objects representing the assemblies found.
         /// </returns>
         /// <remarks>
-        /// This method searches for assemblies in runtime-specific directories, such as the Global Assembly Cache (GAC) 
-        /// on Windows or equivalent locations in other environments. It iterates through directories and retrieves 
+        /// This method searches for assemblies in runtime-specific directories, such as the Global Assembly Cache (GAC)
+        /// on Windows or equivalent locations in other environments. It iterates through directories and retrieves
         /// assembly metadata for each discovered assembly.
         /// </remarks>
         public static IEnumerable<AssemblyName> FindAssemblies()
@@ -118,7 +121,7 @@ namespace FluentMigrator.Runner.Infrastructure
         /// in the specified directory.
         /// </returns>
         /// <remarks>
-        /// This method iterates through subdirectories of the specified GAC directory, parsing metadata such as 
+        /// This method iterates through subdirectories of the specified GAC directory, parsing metadata such as
         /// version, culture, and public key token to construct <see cref="AssemblyName"/> instances for each assembly.
         /// Invalid or incomplete metadata is ignored.
         /// </remarks>

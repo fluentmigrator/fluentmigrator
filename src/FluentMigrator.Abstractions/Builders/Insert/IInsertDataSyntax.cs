@@ -35,6 +35,9 @@ namespace FluentMigrator.Builders.Insert
         /// The properties are the column names and their values are the row values.
         /// </remarks>
         /// <returns>The next step</returns>
+#if NET
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("The properties of the anonymous type cannot be statically analyzed.")]
+#endif
         IInsertDataSyntax Row(object recordAsAnonymousType);
 
         /// <summary>
@@ -45,6 +48,9 @@ namespace FluentMigrator.Builders.Insert
         /// The properties are the column names and their values are the row values.
         /// </remarks>
         /// <returns>The next step</returns>
+#if NET
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("The properties of the anonymous type cannot be statically analyzed.")]
+#endif
         IInsertDataSyntax Rows(params object[] recordsAsAnonymousTypes);
 
         /// <summary>

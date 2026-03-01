@@ -33,7 +33,7 @@ namespace FluentMigrator.Runner.Processors.DB2.iSeries
     {
         private static readonly TestEntry[] _testEntries =
         {
-            new TestEntry("Net.IBM.Data.DB2.iSeries", "Net.IBM.Data.DB2.iSeries.iDB2Factory"),
+            new TestEntry("Net.IBM.Data.DB2.iSeries", "Net.IBM.Data.DB2.iSeries.iDB2Factory", () => Type.GetType("Net.IBM.Data.DB2.iSeries.iDB2Factory, Net.IBM.Data.DB2.iSeries")),
         };
 
         /// <summary>
@@ -43,7 +43,7 @@ namespace FluentMigrator.Runner.Processors.DB2.iSeries
         /// The service provider used to resolve dependencies required by the factory.
         /// </param>
         /// <remarks>
-        /// This constructor leverages the base <see cref="FluentMigrator.Runner.Processors.ReflectionBasedDbFactory"/> 
+        /// This constructor leverages the base <see cref="FluentMigrator.Runner.Processors.ReflectionBasedDbFactory"/>
         /// class to dynamically resolve and create database provider factories for IBM DB2 iSeries.
         /// </remarks>
         public Db2ISeriesDbFactory(IServiceProvider serviceProvider)

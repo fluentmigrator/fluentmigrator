@@ -27,7 +27,7 @@ namespace FluentMigrator.Runner.Processors.Postgres
     {
         private static readonly TestEntry[] _entries =
         {
-            new TestEntry("Npgsql", "Npgsql.NpgsqlFactory"),
+            new TestEntry("Npgsql", "Npgsql.NpgsqlFactory", () => Type.GetType("Npgsql.NpgsqlFactory, Npgsql")),
         };
 
         /// <summary>

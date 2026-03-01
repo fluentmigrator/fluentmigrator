@@ -30,7 +30,7 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
     {
         private static readonly TestEntry[] _entries =
         {
-            new TestEntry("DevArt.Data.Oracle", "Devart.Data.Oracle.OracleProviderFactory"),
+            new TestEntry("DevArt.Data.Oracle", "Devart.Data.Oracle.OracleProviderFactory", () => Type.GetType("Devart.Data.Oracle.OracleProviderFactory, Devart.Data.Oracle")),
         };
 
         /// <summary>
