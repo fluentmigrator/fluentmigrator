@@ -1,5 +1,8 @@
 using System;
+using System.Data;
 
+using FluentMigrator.Expressions;
+using FluentMigrator.Model;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Generators.MySql;
 
@@ -306,6 +309,30 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
 
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE `TestTable1` COMMENT 'TestDescription';");
+        }
+
+        [Test]
+        public override void CanCreateTableWithFluentMultiColumnForeignKey()
+        {
+            // Test the new fluent API for multi-column foreign keys
+            // MySQL doesn't support inline foreign keys in CREATE TABLE, so the foreign key definition is ignored
+            var expression = new CreateTableExpression { TableName = "Area" };
+            expression.Columns.Add(new ColumnDefinition { Name = "ArticleId", Type = DbType.String });
+            expression.Columns.Add(new ColumnDefinition { Name = "AreaGroupIndex", Type = DbType.Int32 });
+            expression.Columns.Add(new ColumnDefinition { Name = "Index", Type = DbType.Int32, 
+                IsForeignKey = true,
+                ForeignKey = new ForeignKeyDefinition
+                {
+                    Name = "FK_Area_AreaGroup",
+                    PrimaryTable = "AreaGroup",
+                    ForeignTable = "Area",
+                    PrimaryColumns = ["ArticleId", "Index"],
+                    ForeignColumns = ["ArticleId", "AreaGroupIndex"]
+                }
+            });
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE `Area` (`ArticleId` VARCHAR(255) NOT NULL, `AreaGroupIndex` INTEGER NOT NULL, `Index` INTEGER NOT NULL) ENGINE = INNODB;");
         }
     }
 }
