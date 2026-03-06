@@ -45,15 +45,6 @@ namespace FluentMigrator.Validation
         /// <inheritdoc />
         public virtual IEnumerable<ValidationResult> Validate(IMigrationExpression expression)
         {
-#if NET
-            if (!System.Runtime.CompilerServices.RuntimeFeature.IsDynamicCodeSupported)
-            {
-                return Enumerable.Empty<ValidationResult>();
-            }
-
-            // The IsDynamicCodeSupported check above ensures reflection is available at runtime.
-#pragma warning disable IL2026
-#endif
             var items = new Dictionary<object, object>();
             var context = new ValidationContext(expression, items);
             if (_serviceProvider != null)
@@ -62,13 +53,15 @@ namespace FluentMigrator.Validation
             }
 
             var result = new List<ValidationResult>();
+
+            // Expression and model types with [Required] attributes are preserved
+            // in AOT/trimmed builds via ILLink.Descriptors.xml.
+#pragma warning disable IL2026
             if (!ValidationUtilities.TryCollectResults(context, expression, result))
             {
                 return result;
             }
-#if NET
 #pragma warning restore IL2026
-#endif
 
             return Enumerable.Empty<ValidationResult>();
         }

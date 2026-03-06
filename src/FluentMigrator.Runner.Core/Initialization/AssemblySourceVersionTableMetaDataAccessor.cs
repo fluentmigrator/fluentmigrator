@@ -78,12 +78,10 @@ namespace FluentMigrator.Runner.Initialization
 
         private static IEnumerable<Type> GetAssemblyTypes([CanBeNull] IAssemblySource assemblySource, [NotNull] Predicate<Type> predicate)
         {
-#if NET
-            if (!System.Runtime.CompilerServices.RuntimeFeature.IsDynamicCodeSupported)
+            if (!AotSupport.IsDynamicCodeSupported)
             {
                 return Enumerable.Empty<Type>();
             }
-#endif
 
             if (assemblySource == null)
                 return Enumerable.Empty<Type>();

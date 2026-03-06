@@ -179,15 +179,13 @@ namespace FluentMigrator.Runner.Processors
                 }
             }
 
-#if NET
-            if (!System.Runtime.CompilerServices.RuntimeFeature.IsDynamicCodeSupported)
+            if (!AotSupport.IsDynamicCodeSupported)
             {
                 // Dynamic code is not supported, so we cannot use reflection to load types.
                 // This is a limitation of the current environment (e.g., AOT compilation).
                 factory = null;
                 return false;
             }
-#endif
 
             foreach (var entry in entriesCollection)
             {
