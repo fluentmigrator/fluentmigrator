@@ -22,6 +22,7 @@ using FluentMigrator.Runner;
 using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Initialization;
+using FluentMigrator.Runner.Infrastructure;
 using FluentMigrator.Runner.Initialization.AssemblyLoader;
 #if NETFRAMEWORK
 using FluentMigrator.Runner.Initialization.NetFramework;
@@ -146,6 +147,18 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services
                 .TryAddSingleton(sp => sp.GetRequiredService<IMigrationRunnerConventionsAccessor>().MigrationRunnerConventions);
+
+            services
+                .TryAddSingleton(sp =>
+                {
+                    var conventions = sp.GetRequiredService<IMigrationRunnerConventions>();
+                    if (conventions is IMigrationRunnerTagConventions tagConventions)
+                    {
+                        return tagConventions;
+                    }
+
+                    return DefaultMigrationRunnerConventions.Instance as IMigrationRunnerTagConventions;
+                });
 
             services
                 // The IStopWatch implementation used to show query timing

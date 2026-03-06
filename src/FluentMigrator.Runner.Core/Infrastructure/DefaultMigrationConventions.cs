@@ -29,7 +29,7 @@ namespace FluentMigrator.Runner.Infrastructure
     /// <summary>
     /// Provides default conventions for migration runner.
     /// </summary>
-    public class DefaultMigrationRunnerConventions : IMigrationRunnerConventions
+    public class DefaultMigrationRunnerConventions : IMigrationRunnerConventions, IMigrationRunnerTagConventions
     {
         private DefaultMigrationRunnerConventions()
         {
@@ -55,18 +55,32 @@ namespace FluentMigrator.Runner.Infrastructure
         public Func<IMigration, IMigrationInfo> GetMigrationInfoForMigration => GetMigrationInfoForMigrationImpl;
 
 #if NET
-        // TODO(AOT): We should consider making a delegate with DynamicallyAccessedMembers annotations to avoid the need for these warnings,
-        // however this would be a breaking change to the interface, so for now we will just suppress the warnings on the implementations.
-
-        #pragma warning disable IL2111 // We cannot annotate the parameter of this delegate with DynamicallyAccessedMembers.
+#pragma warning disable IL2111 // Replaced by IMigrationRunnerTagConventions
 #endif
-        /// <inheritdoc />
+        /// <inheritdoc cref="IMigrationRunnerConventions.TypeHasTags" />
+        [Obsolete("Use IMigrationRunnerTagConventions.TypeHasTags instead.")]
         public Func<Type, bool> TypeHasTags => TypeHasTagsImpl;
-        /// <inheritdoc />
+        /// <inheritdoc cref="IMigrationRunnerConventions.TypeHasMatchingTags" />
+        [Obsolete("Use IMigrationRunnerTagConventions.TypeHasMatchingTags instead.")]
         public Func<Type, IEnumerable<string>, bool> TypeHasMatchingTags => TypeHasMatchingTagsImpl;
 #if NET
 #pragma warning restore IL2111
 #endif
+
+        /// <inheritdoc />
+        bool IMigrationRunnerTagConventions.TypeHasTags(
+#if NET
+            [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.Interfaces)]
+#endif
+            Type type) => TypeHasTagsImpl(type);
+
+        /// <inheritdoc />
+        bool IMigrationRunnerTagConventions.TypeHasMatchingTags(
+#if NET
+            [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.Interfaces)]
+#endif
+            Type type,
+            IEnumerable<string> tagsToMatch) => TypeHasMatchingTagsImpl(type, tagsToMatch);
 
         private static bool TypeIsMigrationImpl(Type type)
         {
