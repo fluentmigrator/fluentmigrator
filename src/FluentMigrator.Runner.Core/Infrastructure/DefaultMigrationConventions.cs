@@ -55,10 +55,10 @@ namespace FluentMigrator.Runner.Infrastructure
         public Func<IMigration, IMigrationInfo> GetMigrationInfoForMigration => GetMigrationInfoForMigrationImpl;
 
         /// <inheritdoc />
-        [Obsolete("Use the TypeHasTags(Type) method instead. This property will be removed in a future version.")]
+        [Obsolete("Use the TypeHasTags(Type) method instead. This property will be removed in version 9.0.0.")]
         public Func<Type, bool> TypeHasTagsFunc => TypeHasTagsImpl;
         /// <inheritdoc />
-        [Obsolete("Use the TypeHasMatchingTags(Type, IEnumerable<string>) method instead. This property will be removed in a future version.")]
+        [Obsolete("Use the TypeHasMatchingTags(Type, IEnumerable<string>) method instead. This property will be removed in version 9.0.0.")]
         public Func<Type, IEnumerable<string>, bool> TypeHasMatchingTagsFunc => TypeHasMatchingTagsImpl;
 
         /// <inheritdoc />
