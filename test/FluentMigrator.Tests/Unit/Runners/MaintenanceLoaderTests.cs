@@ -16,6 +16,8 @@
 //
 #endregion
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
 
 using FluentMigrator.Infrastructure.Extensions;
@@ -52,8 +54,10 @@ namespace FluentMigrator.Tests.Unit.Runners
             _migrationConventions = new Mock<IMigrationRunnerConventions>();
             _migrationConventions.Setup(x => x.GetMaintenanceStage).Returns(DefaultMigrationRunnerConventions.Instance.GetMaintenanceStage);
             _migrationConventions.Setup(x => x.TypeIsMigration).Returns(DefaultMigrationRunnerConventions.Instance.TypeIsMigration);
-            _migrationConventions.Setup(x => x.TypeHasTags).Returns(DefaultMigrationRunnerConventions.Instance.TypeHasTags);
-            _migrationConventions.Setup(x => x.TypeHasMatchingTags).Returns(DefaultMigrationRunnerConventions.Instance.TypeHasMatchingTags);
+            _migrationConventions.Setup(x => x.TypeHasTags(It.IsAny<Type>()))
+                .Returns<Type>(t => DefaultMigrationRunnerConventions.Instance.TypeHasTags(t));
+            _migrationConventions.Setup(x => x.TypeHasMatchingTags(It.IsAny<Type>(), It.IsAny<IEnumerable<string>>()))
+                .Returns<Type, IEnumerable<string>>((t, tags) => DefaultMigrationRunnerConventions.Instance.TypeHasMatchingTags(t, tags));
 
             _maintenanceLoader = ServiceCollectionExtensions.CreateServices()
                 .Configure<RunnerOptions>(opt => opt.Tags = _tags)
@@ -107,7 +111,7 @@ namespace FluentMigrator.Tests.Unit.Runners
         public void LoadsMigrationsFilteredByTag()
         {
             var migrationInfos = _maintenanceLoader.LoadMaintenance(MigrationStage.BeforeEach);
-            _migrationConventions.Verify(x => x.TypeHasMatchingTags, Times.AtLeastOnce());
+            _migrationConventions.Verify(x => x.TypeHasMatchingTags(It.IsAny<Type>(), It.IsAny<IEnumerable<string>>()), Times.AtLeastOnce());
             Assert.That(migrationInfos, Is.Not.Empty);
 
             Assert.That(migrationInfos.Select(mi => mi.Migration.GetType()), Is.EquivalentTo(new[]
@@ -161,7 +165,7 @@ namespace FluentMigrator.Tests.Unit.Runners
         public void LoadsMigrationsNoTag()
         {
             var migrationInfos = _maintenanceLoaderNoTags.LoadMaintenance(MigrationStage.BeforeEach);
-            _migrationConventions.Verify(x => x.TypeHasMatchingTags, Times.AtLeastOnce());
+            _migrationConventions.Verify(x => x.TypeHasMatchingTags(It.IsAny<Type>(), It.IsAny<IEnumerable<string>>()), Times.AtLeastOnce());
             Assert.That(migrationInfos, Is.Not.Empty);
 
             bool foundNoTag = false;

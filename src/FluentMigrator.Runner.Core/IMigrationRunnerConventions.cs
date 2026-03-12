@@ -88,30 +88,64 @@ namespace FluentMigrator.Runner
         Func<IMigration, IMigrationInfo> GetMigrationInfoForMigration { get; }
 
         /// <summary>
-        /// Determines whether the specified type is associated with tags.
+        /// Gets a delegate that determines whether the specified type is associated with tags.
         /// </summary>
         /// <remarks>
-        /// This property is used to check if a given type has tags, typically by inspecting
-        /// attributes or metadata associated with the type. It is commonly utilized in scenarios
-        /// where migrations or other components need to be filtered or categorized based on tags.
+        /// This property is obsolete. Use the <see cref="TypeHasTags(Type)"/> method instead,
+        /// which supports NativeAOT scenarios through trimming annotations.
         /// </remarks>
         /// <value>
         /// A function that takes a <see cref="Type"/> as input and returns <c>true</c> if the type
         /// has tags; otherwise, <c>false</c>.
         /// </value>
-        Func<Type, bool> TypeHasTags { get; }
+        [Obsolete("Use the TypeHasTags(Type) method instead. This property will be removed in version 9.0.0.")]
+        Func<Type, bool> TypeHasTagsFunc { get; }
 
         /// <summary>
-        /// Determines whether a given type has tags that match a specified set of tags.
+        /// Gets a delegate that determines whether a given type has tags that match a specified set of tags.
         /// </summary>
         /// <remarks>
-        /// This property is used to evaluate if a migration type is associated with a specific set of tags,
-        /// which can be useful for filtering migrations based on their tagging.
+        /// This property is obsolete. Use the <see cref="TypeHasMatchingTags(Type, IEnumerable{string})"/> method instead,
+        /// which supports NativeAOT scenarios through trimming annotations.
         /// </remarks>
         /// <value>
         /// A function that takes a <see cref="Type"/> and an <see cref="IEnumerable{T}"/> of <see cref="string"/> 
         /// representing the tags to match, and returns <c>true</c> if the type has matching tags; otherwise, <c>false</c>.
         /// </value>
-        Func<Type, IEnumerable<string>, bool> TypeHasMatchingTags { get; }
+        [Obsolete("Use the TypeHasMatchingTags(Type, IEnumerable<string>) method instead. This property will be removed in version 9.0.0.")]
+        Func<Type, IEnumerable<string>, bool> TypeHasMatchingTagsFunc { get; }
+
+        /// <summary>
+        /// Determines whether the specified type is associated with tags.
+        /// </summary>
+        /// <remarks>
+        /// This method checks if a given type has tags, typically by inspecting
+        /// attributes or metadata associated with the type. It is commonly utilized in scenarios
+        /// where migrations or other components need to be filtered or categorized based on tags.
+        /// </remarks>
+        /// <param name="type">The type to check for tags.</param>
+        /// <returns><c>true</c> if the type has tags; otherwise, <c>false</c>.</returns>
+        bool TypeHasTags(
+#if NET
+            [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
+#endif
+            Type type);
+
+        /// <summary>
+        /// Determines whether a given type has tags that match a specified set of tags.
+        /// </summary>
+        /// <remarks>
+        /// This method evaluates if a migration type is associated with a specific set of tags,
+        /// which can be useful for filtering migrations based on their tagging.
+        /// </remarks>
+        /// <param name="type">The type to check for matching tags.</param>
+        /// <param name="tagsToMatch">The tags to match against.</param>
+        /// <returns><c>true</c> if the type has matching tags; otherwise, <c>false</c>.</returns>
+        bool TypeHasMatchingTags(
+#if NET
+            [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
+#endif
+            Type type,
+            IEnumerable<string> tagsToMatch);
     }
 }

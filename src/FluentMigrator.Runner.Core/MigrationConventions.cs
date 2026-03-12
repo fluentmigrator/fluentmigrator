@@ -53,9 +53,36 @@ namespace FluentMigrator.Runner
         /// <inheritdoc />
         public Func<IMigration, IMigrationInfo> GetMigrationInfoForMigration { get; }
         /// <inheritdoc />
-        public Func<Type, bool> TypeHasTags { get; set; }
+        [Obsolete("Use the TypeHasTags(Type) method instead. This property will be removed in version 9.0.0.")]
+        public Func<Type, bool> TypeHasTagsFunc { get; set; }
         /// <inheritdoc />
-        public Func<Type, IEnumerable<string>, bool> TypeHasMatchingTags { get; set; }
+        [Obsolete("Use the TypeHasMatchingTags(Type, IEnumerable<string>) method instead. This property will be removed in version 9.0.0.")]
+        public Func<Type, IEnumerable<string>, bool> TypeHasMatchingTagsFunc { get; set; }
+
+        /// <inheritdoc />
+        public virtual bool TypeHasTags(
+#if NET
+            [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
+#endif
+            Type type)
+        {
+#pragma warning disable CS0618 // Type or member is obsolete
+            return TypeHasTagsFunc(type);
+#pragma warning restore CS0618
+        }
+
+        /// <inheritdoc />
+        public virtual bool TypeHasMatchingTags(
+#if NET
+            [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
+#endif
+            Type type,
+            IEnumerable<string> tagsToMatch)
+        {
+#pragma warning disable CS0618 // Type or member is obsolete
+            return TypeHasMatchingTagsFunc(type, tagsToMatch);
+#pragma warning restore CS0618
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MigrationRunnerConventions"/> class.
@@ -74,8 +101,10 @@ namespace FluentMigrator.Runner
             TypeIsProfile = _default.TypeIsProfile;
             GetMaintenanceStage = _default.GetMaintenanceStage;
             GetMigrationInfoForMigration = _default.GetMigrationInfoForMigration;
-            TypeHasTags = _default.TypeHasTags;
-            TypeHasMatchingTags = _default.TypeHasMatchingTags;
+#pragma warning disable CS0618 // Type or member is obsolete
+            TypeHasTagsFunc = _default.TypeHasTagsFunc;
+            TypeHasMatchingTagsFunc = _default.TypeHasMatchingTagsFunc;
+#pragma warning restore CS0618
         }
     }
 }
