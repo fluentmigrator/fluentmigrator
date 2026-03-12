@@ -55,9 +55,26 @@ namespace FluentMigrator.Runner.Infrastructure
         public Func<IMigration, IMigrationInfo> GetMigrationInfoForMigration => GetMigrationInfoForMigrationImpl;
 
         /// <inheritdoc />
-        public Func<Type, bool> TypeHasTags => TypeHasTagsImpl;
+        [Obsolete("Use the TypeHasTags(Type) method instead. This property will be removed in a future version.")]
+        public Func<Type, bool> TypeHasTagsFunc => TypeHasTagsImpl;
         /// <inheritdoc />
-        public Func<Type, IEnumerable<string>, bool> TypeHasMatchingTags => TypeHasMatchingTagsImpl;
+        [Obsolete("Use the TypeHasMatchingTags(Type, IEnumerable<string>) method instead. This property will be removed in a future version.")]
+        public Func<Type, IEnumerable<string>, bool> TypeHasMatchingTagsFunc => TypeHasMatchingTagsImpl;
+
+        /// <inheritdoc />
+        public virtual bool TypeHasTags(
+#if NET
+            [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
+#endif
+            Type type) => TypeHasTagsImpl(type);
+
+        /// <inheritdoc />
+        public virtual bool TypeHasMatchingTags(
+#if NET
+            [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
+#endif
+            Type type,
+            IEnumerable<string> tagsToMatch) => TypeHasMatchingTagsImpl(type, tagsToMatch);
 
         private static bool TypeIsMigrationImpl(Type type)
         {
