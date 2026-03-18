@@ -188,7 +188,7 @@ namespace FluentMigrator.Runner
             [NotNull] params Type[] types)
         {
             builder.Services
-                .AddSingleton(new ArrayTypeSource(types));
+                .AddSingleton<ITypeSource>(new ArrayTypeSource(types));
             return builder;
         }
 

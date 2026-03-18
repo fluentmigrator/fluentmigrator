@@ -97,6 +97,7 @@ namespace FluentMigrator.Runner
         /// <exception cref="ArgumentNullException">
         /// Thrown if any of the required parameters are <c>null</c>.
         /// </exception>
+        [ActivatorUtilitiesConstructor]
         public MaintenanceLoader(
             [NotNull] ITypeSource typeSource,
             [NotNull] IOptions<RunnerOptions> options,

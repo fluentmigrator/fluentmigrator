@@ -62,6 +62,7 @@ namespace FluentMigrator.Runner.Initialization
 #if NET
         [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("When typeSource is not provided, assembly scanning uses reflection which may not be preserved in trimmed applications.")]
 #endif
+        [ActivatorUtilitiesConstructor]
         public MigrationSource(
             [NotNull] ITypeSource source,
             [NotNull] IMigrationRunnerConventions conventions,

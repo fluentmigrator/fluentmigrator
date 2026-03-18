@@ -129,10 +129,13 @@ namespace Microsoft.Extensions.DependencyInjection
             services
                 .TryAddSingleton<IAssemblySource, EmptyAssemblySource>();
 
+            services
+                .TryAddSingleton<ITypeSource>(new ArrayTypeSource(Array.Empty<Type>()));
+
 #pragma warning disable IL2026
             services
                 // Configure the loader for migrations that should be executed during maintenance steps
-                .TryAddSingleton<IMaintenanceLoader, MaintenanceLoader>();
+                .TryAddSingleton<IMaintenanceLoader>(sp => ActivatorUtilities.CreateInstance<MaintenanceLoader>(sp));
 #pragma warning restore IL2026
 
             services
@@ -168,12 +171,23 @@ namespace Microsoft.Extensions.DependencyInjection
 #pragma warning disable IL2026
             services
                 // Source for migrations
-                .TryAddScoped<IMigrationSource, MigrationSource>();
+                .TryAddScoped<IMigrationSource>(sp =>
+                    new MigrationSource(
+                        sp.GetRequiredService<ITypeSource>(),
+                        sp.GetRequiredService<IMigrationRunnerConventions>(),
+                        sp,
+                        sp.GetServices<IMigrationSourceItem>(),
+                        sp.GetRequiredService<ILogger>()));
 
             services
                 .TryAddScoped(
                     sp => sp.GetRequiredService<IMigrationSource>() as IFilteringMigrationSource
-                     ?? ActivatorUtilities.CreateInstance<MigrationSource>(sp));
+                     ?? new MigrationSource(
+                        sp.GetRequiredService<ITypeSource>(),
+                        sp.GetRequiredService<IMigrationRunnerConventions>(),
+                        sp,
+                        sp.GetServices<IMigrationSourceItem>(),
+                        sp.GetRequiredService<ILogger>()));
 #pragma warning restore IL2026
 #pragma warning restore 618
 

@@ -10,6 +10,7 @@
   </PropertyGroup>
   <Import Project="$(MSBuildThisFileDirectory)../../Global.props" />
   <ItemGroup>
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.6" />
     <PackageReference Include="TUnit" Version="1.18.21" />
   </ItemGroup>
   <ItemGroup>
