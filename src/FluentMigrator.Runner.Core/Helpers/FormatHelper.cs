@@ -1,4 +1,6 @@
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace FluentMigrator.Runner.Helpers
 {
     /// <summary>
@@ -19,7 +21,7 @@ namespace FluentMigrator.Runner.Helpers
         /// This method is commonly used to sanitize SQL strings by replacing single quotes with two single quotes,
         /// ensuring that the resulting string is safe for use in SQL queries.
         /// </remarks>
-        public static string FormatSqlEscape(string sql)
+        public static string FormatSqlEscape([StringSyntax(StringSyntaxAttribute.Sql)] string sql)
         {
             return sql.Replace("'", "''");
         }

@@ -15,6 +15,7 @@
 #endregion
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace FluentMigrator.Runner
 {
@@ -48,7 +49,7 @@ namespace FluentMigrator.Runner
         /// Logs a SQL message.
         /// </summary>
         /// <param name="sql"></param>
-        void Sql(string sql);
+        void Sql([StringSyntax(StringSyntaxAttribute.Sql)] string sql);
         /// <summary>
         /// Logs the elapsed time.
         /// </summary>

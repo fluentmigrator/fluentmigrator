@@ -18,7 +18,8 @@
     <MinClientVersion>3.5</MinClientVersion>
     <IsPackable>false</IsPackable>
     <!-- Enable the CS300x warnings when the obsoleted code gets removed -->
-    <NoWarn>$(NoWarn);CS3001;CS3002;CS3003;CS3005;NU5105;NU1701</NoWarn>
+    <!-- CS0436 is suppressed for internal polyfill types (e.g., StringSyntaxAttribute) shared across assemblies -->
+    <NoWarn>$(NoWarn);CS3001;CS3002;CS3003;CS3005;CS0436;NU5105;NU1701</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
