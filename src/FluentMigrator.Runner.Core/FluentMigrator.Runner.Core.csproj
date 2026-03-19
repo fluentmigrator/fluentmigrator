@@ -18,9 +18,6 @@
     <None Include="..\..\FluentMigrator.snk" Link="FluentMigrator.snk" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\FluentMigrator.Abstractions\Compatibility\StringSyntaxAttribute.cs" Link="Compatibility\StringSyntaxAttribute.cs" />
-  </ItemGroup>
-  <ItemGroup>
     <Folder Include="BatchParser" />
   </ItemGroup>
   <ItemGroup>
