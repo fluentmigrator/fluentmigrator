@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+#pragma warning disable CS0436 // Type conflicts with imported type (StringSyntaxAttribute polyfill)
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 

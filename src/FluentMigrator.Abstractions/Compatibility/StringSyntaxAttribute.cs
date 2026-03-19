@@ -17,6 +17,10 @@
 #endregion
 
 #if !NET7_0_OR_GREATER
+// Polyfill for StringSyntaxAttribute which is defined in .NET 7+.
+// When multiple assemblies include this polyfill, CS0436 is expected.
+#pragma warning disable CS0436
+
 namespace System.Diagnostics.CodeAnalysis
 {
     /// <summary>

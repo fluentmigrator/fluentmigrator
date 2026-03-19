@@ -1,3 +1,4 @@
+#pragma warning disable CS0436 // Type conflicts with imported type (StringSyntaxAttribute polyfill)
 using System.Diagnostics.CodeAnalysis;
 
 namespace FluentMigrator.Runner.Helpers

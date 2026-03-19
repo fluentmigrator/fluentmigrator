@@ -15,6 +15,7 @@
 #endregion
 
 using System;
+#pragma warning disable CS0436 // Type conflicts with imported type (StringSyntaxAttribute polyfill)
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;

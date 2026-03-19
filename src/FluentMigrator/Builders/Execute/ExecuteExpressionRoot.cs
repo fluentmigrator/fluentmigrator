@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+#pragma warning disable CS0436 // Type conflicts with imported type (StringSyntaxAttribute polyfill)
 using System.Diagnostics.CodeAnalysis;
 
 using FluentMigrator.Expressions;
