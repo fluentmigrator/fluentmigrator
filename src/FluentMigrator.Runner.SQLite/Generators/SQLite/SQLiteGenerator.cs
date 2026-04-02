@@ -23,6 +23,7 @@ using System.Linq;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Generic;
+using FluentMigrator.SQLite;
 
 using JetBrains.Annotations;
 
@@ -87,12 +88,30 @@ namespace FluentMigrator.Runner.Generators.SQLite
         public override List<string> GeneratorIdAliases => new List<string> { GeneratorIdConstants.SQLite };
 
         /// <inheritdoc />
+        public override string Generate(CreateTableExpression expression)
+        {
+            var createTable = base.Generate(expression);
+
+            if (expression.AdditionalFeatures.TryGetValue(SQLiteExtensions.WithoutRowIdTable, out var withoutRowId)
+                && withoutRowId is true)
+            {
+                // Remove trailing semicolon (if any) before appending WITHOUT ROWID
+                var trimmed = createTable.TrimEnd();
+                if (trimmed.EndsWith(";"))
+                {
+                    trimmed = trimmed.Substring(0, trimmed.Length - 1);
+                }
+                return trimmed + " WITHOUT ROWID;";
+            }
+
+            return createTable;
+        }
+
+        /// <inheritdoc />
         public override string Generate(AlterColumnExpression expression)
         {
             return CompatibilityMode.HandleCompatibility("SQLite does not support alter column");
         }
-
-        /// <inheritdoc />
         public override string Generate(AlterDefaultConstraintExpression expression)
         {
             return CompatibilityMode.HandleCompatibility("SQLite does not support altering of default constraints");

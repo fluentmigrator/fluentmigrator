@@ -28,7 +28,7 @@ namespace FluentMigrator.Expressions
     /// <summary>
     /// Expression to create a table
     /// </summary>
-    public class CreateTableExpression : MigrationExpressionBase, ISchemaExpression, IColumnsExpression, IValidationChildren
+    public class CreateTableExpression : MigrationExpressionBase, ISchemaExpression, IColumnsExpression, ISupportAdditionalFeatures, IValidationChildren
     {
         /// <inheritdoc />
         public virtual string SchemaName { get; set; }
@@ -46,6 +46,9 @@ namespace FluentMigrator.Expressions
         /// Gets or sets the table description
         /// </summary>
         public virtual string TableDescription { get; set; }
+
+        /// <inheritdoc />
+        public IDictionary<string, object> AdditionalFeatures { get; } = new Dictionary<string, object>();
 
         /// <inheritdoc />
         IEnumerable<ColumnDefinition> IColumnsExpression.Columns => Columns;
