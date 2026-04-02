@@ -112,6 +112,8 @@ namespace FluentMigrator.Runner.Generators.SQLite
         {
             return CompatibilityMode.HandleCompatibility("SQLite does not support alter column");
         }
+
+        /// <inheritdoc />
         public override string Generate(AlterDefaultConstraintExpression expression)
         {
             return CompatibilityMode.HandleCompatibility("SQLite does not support altering of default constraints");
