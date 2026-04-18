@@ -201,6 +201,10 @@ namespace Microsoft.Extensions.DependencyInjection
                         return new MigrationContext(querySchema, sp, connectionString);
                     });
 
+            services
+                // Connection Factory
+                .TryAddScoped<IMigrationConnectionFactory, ConnectionStringMigrationConnectionFactory>();
+
             return services;
         }
 
