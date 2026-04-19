@@ -44,15 +44,15 @@ namespace FluentMigrator.Runner.Processors.Oracle
         /// <param name="generator">The migration generator.</param>
         /// <param name="logger">The logger.</param>
         /// <param name="options">The processor options.</param>
-        /// <param name="connectionStringAccessor">The connection string accessor.</param>
+        /// <param name="connectionFactory">The migration connection factory.</param>
         protected OracleProcessorBase(
             [NotNull] string databaseType,
             [NotNull] OracleBaseDbFactory factory,
             [NotNull] IMigrationGenerator generator,
             [NotNull] ILogger logger,
             [NotNull] IOptionsSnapshot<ProcessorOptions> options,
-            [NotNull] IConnectionStringAccessor connectionStringAccessor)
-            : base(() => factory.Factory, generator, logger, options.Value, connectionStringAccessor)
+            [NotNull] IMigrationConnectionFactory connectionFactory)
+            : base(() => factory.Factory, generator, logger, options.Value, connectionFactory)
         {
             DatabaseType = databaseType;
         }

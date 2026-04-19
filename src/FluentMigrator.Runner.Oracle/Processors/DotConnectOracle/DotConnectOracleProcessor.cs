@@ -48,8 +48,8 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
             [NotNull] IOracleGenerator generator,
             [NotNull] ILogger<DotConnectOracleProcessor> logger,
             [NotNull] IOptionsSnapshot<ProcessorOptions> options,
-            [NotNull] IConnectionStringAccessor connectionStringAccessor)
-            : base(() => factory.Factory, generator, logger, options.Value, connectionStringAccessor)
+            [NotNull] IMigrationConnectionFactory connectionFactory)
+            : base(() => factory.Factory, generator, logger, options.Value, connectionFactory)
         {
         }
 

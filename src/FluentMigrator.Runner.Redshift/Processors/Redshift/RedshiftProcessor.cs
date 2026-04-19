@@ -52,8 +52,8 @@ namespace FluentMigrator.Runner.Processors.Redshift
             [NotNull] RedshiftGenerator generator,
             [NotNull] ILogger<RedshiftProcessor> logger,
             [NotNull] IOptionsSnapshot<ProcessorOptions> options,
-            [NotNull] IConnectionStringAccessor connectionStringAccessor)
-            : base(() => factory.Factory, generator, logger, options.Value, connectionStringAccessor)
+            [NotNull] IMigrationConnectionFactory connectionFactory)
+            : base(() => factory.Factory, generator, logger, options.Value, connectionFactory)
         {
         }
 

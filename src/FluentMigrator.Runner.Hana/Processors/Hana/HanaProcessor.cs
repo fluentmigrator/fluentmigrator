@@ -29,8 +29,8 @@ namespace FluentMigrator.Runner.Processors.Hana
             [NotNull] HanaGenerator generator,
             [NotNull] ILogger<HanaProcessor> logger,
             [NotNull] IOptionsSnapshot<ProcessorOptions> options,
-            [NotNull] IConnectionStringAccessor connectionStringAccessor)
-            : base(() => factory.Factory, generator, logger, options.Value, connectionStringAccessor)
+            [NotNull] IMigrationConnectionFactory connectionFactory)
+            : base(() => factory.Factory, generator, logger, options.Value, connectionFactory)
         {
         }
 

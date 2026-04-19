@@ -52,13 +52,13 @@ namespace FluentMigrator.Runner
                     var factory = sp.GetService<SQLiteDbFactory>();
                     var logger = sp.GetService<ILogger<SQLiteProcessor>>();
                     var options = sp.GetService<IOptionsSnapshot<ProcessorOptions>>();
-                    var connectionStringAccessor = sp.GetService<IConnectionStringAccessor>();
+                    var connectionFactory = sp.GetService<IMigrationConnectionFactory>();
                     var sqliteQuoter = new SQLiteQuoter(false);
-                    return new SQLiteProcessor(factory, sp.GetService<SQLiteGenerator>(), logger, options, connectionStringAccessor, sp, sqliteQuoter);
+                    return new SQLiteProcessor(factory, sp.GetService<SQLiteGenerator>(), logger, options, connectionFactory, sp, sqliteQuoter);
                 })
                 .AddScoped<ISQLiteTypeMap>(sp => new SQLiteTypeMap(useStrictTables))
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<SQLiteProcessor>())
-                
+
                 .AddScoped(
                     sp =>
                     {

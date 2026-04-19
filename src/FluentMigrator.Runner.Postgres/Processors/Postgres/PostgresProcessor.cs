@@ -51,9 +51,9 @@ namespace FluentMigrator.Runner.Processors.Postgres
             [NotNull] PostgresGenerator generator,
             [NotNull] ILogger<PostgresProcessor> logger,
             [NotNull] IOptionsSnapshot<ProcessorOptions> options,
-            [NotNull] IConnectionStringAccessor connectionStringAccessor,
+            [NotNull] IMigrationConnectionFactory connectionFactory,
             [NotNull] PostgresOptions pgOptions)
-            : base(() => factory.Factory, generator, logger, options.Value, connectionStringAccessor)
+            : base(() => factory.Factory, generator, logger, options.Value, connectionFactory)
         {
             if (pgOptions == null)
             {

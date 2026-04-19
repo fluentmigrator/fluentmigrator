@@ -38,18 +38,18 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
         /// <param name="generator">The SQL generator</param>
         /// <param name="logger">The logger</param>
         /// <param name="options">The processor options</param>
-        /// <param name="connectionStringAccessor">The accessor for the connection strings</param>
+        /// <param name="connectionFactory">The migration connection factory</param>
         public DotConnectOracle12CProcessor(
             [NotNull] DotConnectOracleDbFactory factory,
             [NotNull] IOracle12CGenerator generator,
             [NotNull] ILogger<DotConnectOracle12CProcessor> logger,
             [NotNull] IOptionsSnapshot<ProcessorOptions> options,
-            [NotNull] IConnectionStringAccessor connectionStringAccessor) : base(
+            [NotNull] IMigrationConnectionFactory connectionFactory) : base(
             factory,
             generator,
             logger,
             options,
-            connectionStringAccessor)
+            connectionFactory)
         {
         }
 

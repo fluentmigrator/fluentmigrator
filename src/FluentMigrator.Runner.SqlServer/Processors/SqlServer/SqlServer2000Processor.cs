@@ -73,15 +73,15 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         /// <param name="logger">The logger.</param>
         /// <param name="generator">The migration generator.</param>
         /// <param name="options">The processor options.</param>
-        /// <param name="connectionStringAccessor">The connection string accessor.</param>
+        /// <param name="connectionFactory">The migration connection factory.</param>
         /// <param name="serviceProvider">The service provider.</param>
         public SqlServer2000Processor(
             [NotNull] ILogger<SqlServer2000Processor> logger,
             [NotNull] SqlServer2000Generator generator,
             [NotNull] IOptionsSnapshot<ProcessorOptions> options,
-            [NotNull] IConnectionStringAccessor connectionStringAccessor,
+            [NotNull] IMigrationConnectionFactory connectionFactory,
             [NotNull] IServiceProvider serviceProvider)
-            : this(SqlClientFactory.Instance, logger, generator, options, connectionStringAccessor, serviceProvider)
+            : this(SqlClientFactory.Instance, logger, generator, options, connectionFactory, serviceProvider)
         {
         }
 
@@ -92,16 +92,16 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         /// <param name="logger">The logger.</param>
         /// <param name="generator">The migration generator.</param>
         /// <param name="options">The processor options.</param>
-        /// <param name="connectionStringAccessor">The connection string accessor.</param>
+        /// <param name="connectionFactory">The migration connection factory.</param>
         /// <param name="serviceProvider">The service provider.</param>
         protected SqlServer2000Processor(
             DbProviderFactory factory,
             [NotNull] ILogger logger,
             [NotNull] SqlServer2000Generator generator,
             [NotNull] IOptionsSnapshot<ProcessorOptions> options,
-            [NotNull] IConnectionStringAccessor connectionStringAccessor,
+            [NotNull] IMigrationConnectionFactory connectionFactory,
             [NotNull] IServiceProvider serviceProvider)
-            : base(() => factory, generator, logger, options.Value, connectionStringAccessor)
+            : base(() => factory, generator, logger, options.Value, connectionFactory)
         {
             _serviceProvider = serviceProvider;
         }

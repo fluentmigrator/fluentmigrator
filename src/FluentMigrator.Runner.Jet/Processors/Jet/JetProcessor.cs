@@ -64,20 +64,18 @@ namespace FluentMigrator.Runner.Processors.Jet
             [NotNull] JetGenerator generator,
             [NotNull] ILogger<JetProcessor> logger,
             [NotNull] IOptionsSnapshot<ProcessorOptions> options,
-            [NotNull] IConnectionStringAccessor connectionStringAccessor)
+            [NotNull] IMigrationConnectionFactory connectionFactory)
             : base(generator, logger, options.Value)
         {
             var factory = OleDbFactory.Instance;
-            var connectionString = connectionStringAccessor.ConnectionString ?? options.Value.ConnectionString;
             if (factory != null)
             {
                 _connection = new Lazy<OleDbConnection>(
                     () =>
                     {
-                        var conn = (OleDbConnection) factory.CreateConnection();
-                        Debug.Assert(conn != null, nameof(conn) + " != null");
-                        conn.ConnectionString = connectionString;
-                        return conn;
+                        var connection = connectionFactory.CreateConnection(factory);
+                        Debug.Assert(connection != null, nameof(connection) + " != null");
+                        return (OleDbConnection)connection;
                     });
             }
         }

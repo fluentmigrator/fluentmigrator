@@ -74,7 +74,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         /// <param name="quoter">The SQL quoter.</param>
         /// <param name="logger">The logger.</param>
         /// <param name="options">The processor options.</param>
-        /// <param name="connectionStringAccessor">The connection string accessor.</param>
+        /// <param name="connectionFactory">The migration connection factory.</param>
         /// <param name="serviceProvider">The service provider.</param>
         protected SqlServerProcessor(
             [NotNull, ItemNotNull] IEnumerable<string> databaseTypes,
@@ -82,9 +82,9 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             [NotNull] IQuoter quoter,
             [NotNull] ILogger logger,
             [NotNull] IOptionsSnapshot<ProcessorOptions> options,
-            [NotNull] IConnectionStringAccessor connectionStringAccessor,
+            [NotNull] IMigrationConnectionFactory connectionFactory,
             [NotNull] IServiceProvider serviceProvider)
-            : this(databaseTypes, SqlClientFactory.Instance, generator, quoter, logger, options, connectionStringAccessor, serviceProvider)
+            : this(databaseTypes, SqlClientFactory.Instance, generator, quoter, logger, options, connectionFactory, serviceProvider)
         {
         }
 
@@ -97,7 +97,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         /// <param name="quoter">The SQL quoter.</param>
         /// <param name="logger">The logger.</param>
         /// <param name="options">The processor options.</param>
-        /// <param name="connectionStringAccessor">The connection string accessor.</param>
+        /// <param name="connectionFactory">The migration connection factory.</param>
         /// <param name="serviceProvider">The service provider.</param>
         protected SqlServerProcessor(
             [NotNull, ItemNotNull] IEnumerable<string> databaseTypes,
@@ -106,9 +106,9 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             [NotNull] IQuoter quoter,
             [NotNull] ILogger logger,
             [NotNull] IOptionsSnapshot<ProcessorOptions> options,
-            [NotNull] IConnectionStringAccessor connectionStringAccessor,
+            [NotNull] IMigrationConnectionFactory connectionFactory,
             [NotNull] IServiceProvider serviceProvider)
-            : base(() => factory, generator, logger, options.Value, connectionStringAccessor)
+            : base(() => factory, generator, logger, options.Value, connectionFactory)
         {
             _serviceProvider = serviceProvider;
             var dbTypes = databaseTypes.ToList();

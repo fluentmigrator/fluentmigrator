@@ -171,10 +171,8 @@ namespace Microsoft.Extensions.DependencyInjection
                 .TryAddScoped<IVersionLoader>(
                     sp =>
                     {
-                        var options = sp.GetRequiredService<IOptions<RunnerOptions>>();
-                        var connAccessor = sp.GetRequiredService<IConnectionStringAccessor>();
-                        var hasConnection = !string.IsNullOrEmpty(connAccessor.ConnectionString);
-                        if (options.Value.NoConnection || !hasConnection)
+                        var connectionFactory = sp.GetRequiredService<IMigrationConnectionFactory>();
+                        if (!connectionFactory.HasConnection)
                         {
                             return ActivatorUtilities.CreateInstance<ConnectionlessVersionLoader>(sp);
                         }

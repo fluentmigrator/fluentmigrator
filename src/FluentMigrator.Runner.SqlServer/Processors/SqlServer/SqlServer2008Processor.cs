@@ -37,9 +37,9 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             [NotNull] SqlServer2008Quoter quoter,
             [NotNull] SqlServer2008Generator generator,
             [NotNull] IOptionsSnapshot<ProcessorOptions> options,
-            [NotNull] IConnectionStringAccessor connectionStringAccessor,
+            [NotNull] IMigrationConnectionFactory connectionFactory,
             [NotNull] IServiceProvider serviceProvider)
-            : base(new[] { ProcessorIdConstants.SqlServer2008, ProcessorIdConstants.SqlServer }, generator, quoter, logger, options, connectionStringAccessor, serviceProvider)
+            : base(new[] { ProcessorIdConstants.SqlServer2008, ProcessorIdConstants.SqlServer }, generator, quoter, logger, options, connectionFactory, serviceProvider)
         {
         }
     }

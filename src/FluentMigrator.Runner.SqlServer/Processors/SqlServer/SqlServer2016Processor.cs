@@ -45,7 +45,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         /// <param name="quoter">The SQL quoter used for quoting SQL identifiers and literals.</param>
         /// <param name="generator">The SQL generator used to generate SQL scripts for SQL Server 2016.</param>
         /// <param name="options">The processor options that define configuration settings.</param>
-        /// <param name="connectionStringAccessor">The accessor for retrieving the database connection string.</param>
+        /// <param name="connectionFactory">The migration connection factory.</param>
         /// <param name="serviceProvider">The service provider used for dependency injection.</param>
         /// <remarks>
         /// This constructor initializes the processor with the specified dependencies, enabling it to execute
@@ -59,7 +59,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             [NotNull] SqlServer2008Quoter quoter,
             [NotNull] SqlServer2016Generator generator,
             [NotNull] IOptionsSnapshot<ProcessorOptions> options,
-            [NotNull] IConnectionStringAccessor connectionStringAccessor,
+            [NotNull] IMigrationConnectionFactory connectionFactory,
             [NotNull] IServiceProvider serviceProvider)
             : this(
                 SqlClientFactory.Instance,
@@ -67,7 +67,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
                 quoter,
                 generator,
                 options,
-                connectionStringAccessor,
+                connectionFactory,
                 serviceProvider)
         {
         }
@@ -79,7 +79,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             [NotNull] SqlServer2008Quoter quoter,
             [NotNull] SqlServer2016Generator generator,
             [NotNull] IOptionsSnapshot<ProcessorOptions> options,
-            [NotNull] IConnectionStringAccessor connectionStringAccessor,
+            [NotNull] IMigrationConnectionFactory connectionFactory,
             [NotNull] IServiceProvider serviceProvider)
             : base(
                 new[] { ProcessorIdConstants.SqlServer2016, ProcessorIdConstants.SqlServer },
@@ -88,7 +88,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
                 quoter,
                 logger,
                 options,
-                connectionStringAccessor,
+                connectionFactory,
                 serviceProvider)
         {
         }

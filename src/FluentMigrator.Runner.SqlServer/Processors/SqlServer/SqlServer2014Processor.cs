@@ -42,7 +42,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         /// <param name="quoter">The SQL quoter specific to SQL Server 2008, used for quoting SQL identifiers and literals.</param>
         /// <param name="generator">The SQL generator specific to SQL Server 2014, used to generate SQL statements.</param>
         /// <param name="options">The processor options containing configuration settings.</param>
-        /// <param name="connectionStringAccessor">The accessor for retrieving the connection string.</param>
+        /// <param name="connectionFactory">The migration connection factory.</param>
         /// <param name="serviceProvider">The service provider for resolving dependencies.</param>
         /// <remarks>
         /// This constructor sets up the SQL Server 2014 processor with the necessary dependencies,
@@ -53,9 +53,9 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             [NotNull] SqlServer2008Quoter quoter,
             [NotNull] SqlServer2014Generator generator,
             [NotNull] IOptionsSnapshot<ProcessorOptions> options,
-            [NotNull] IConnectionStringAccessor connectionStringAccessor,
+            [NotNull] IMigrationConnectionFactory connectionFactory,
             [NotNull] IServiceProvider serviceProvider)
-            : base(new[] { ProcessorIdConstants.SqlServer2014, ProcessorIdConstants.SqlServer }, generator, quoter, logger, options, connectionStringAccessor, serviceProvider)
+            : base(new[] { ProcessorIdConstants.SqlServer2014, ProcessorIdConstants.SqlServer }, generator, quoter, logger, options, connectionFactory, serviceProvider)
         {
         }
     }

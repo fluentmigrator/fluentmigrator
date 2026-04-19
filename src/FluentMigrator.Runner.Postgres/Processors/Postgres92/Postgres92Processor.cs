@@ -46,9 +46,9 @@ namespace FluentMigrator.Runner.Processors.Postgres92
             [NotNull] Postgres92Generator generator,
             [NotNull] ILogger<PostgresProcessor> logger,
             [NotNull] IOptionsSnapshot<ProcessorOptions> options,
-            [NotNull] IConnectionStringAccessor connectionStringAccessor,
+            [NotNull] IMigrationConnectionFactory connectionFactory,
             [NotNull] PostgresOptions pgOptions)
-            : base(factory, generator, logger, options, connectionStringAccessor, pgOptions)
+            : base(factory, generator, logger, options, connectionFactory, pgOptions)
         {
         }
     }

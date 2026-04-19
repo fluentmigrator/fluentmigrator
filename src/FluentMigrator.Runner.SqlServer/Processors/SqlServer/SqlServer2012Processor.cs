@@ -44,7 +44,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         /// <param name="quoter">The SQL quoter specific to SQL Server 2008.</param>
         /// <param name="generator">The SQL generator specific to SQL Server 2012.</param>
         /// <param name="options">The processor options for configuring migration behavior.</param>
-        /// <param name="connectionStringAccessor">The accessor for retrieving the database connection string.</param>
+        /// <param name="connectionFactory">The migration connection factory.</param>
         /// <param name="serviceProvider">The service provider for resolving dependencies.</param>
         /// <remarks>
         /// This constructor sets up the processor to handle migrations for SQL Server 2012,
@@ -56,9 +56,9 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             [NotNull] SqlServer2008Quoter quoter,
             [NotNull] SqlServer2012Generator generator,
             [NotNull] IOptionsSnapshot<ProcessorOptions> options,
-            [NotNull] IConnectionStringAccessor connectionStringAccessor,
+            [NotNull] IMigrationConnectionFactory connectionFactory,
             [NotNull] IServiceProvider serviceProvider)
-            : base(new[] { ProcessorIdConstants.SqlServer2012, ProcessorIdConstants.SqlServer }, generator, quoter, logger, options, connectionStringAccessor, serviceProvider)
+            : base(new[] { ProcessorIdConstants.SqlServer2012, ProcessorIdConstants.SqlServer }, generator, quoter, logger, options, connectionFactory, serviceProvider)
         {
         }
     }

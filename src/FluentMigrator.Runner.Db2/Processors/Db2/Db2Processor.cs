@@ -44,8 +44,8 @@ namespace FluentMigrator.Runner.Processors.DB2
             [NotNull] Db2Quoter quoter,
             [NotNull] ILogger<Db2Processor> logger,
             [NotNull] IOptionsSnapshot<ProcessorOptions> options,
-            [NotNull] IConnectionStringAccessor connectionStringAccessor)
-            : base(() => factory.Factory, generator, logger, options.Value, connectionStringAccessor)
+            [NotNull] IMigrationConnectionFactory connectionFactory)
+            : base(() => factory.Factory, generator, logger, options.Value, connectionFactory)
         {
             Quoter = quoter;
         }

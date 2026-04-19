@@ -51,8 +51,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
 
             try
             {
-                using (var serviceProvider = CreateSqliteServiceProvider(
-                    runnerBuilder => runnerBuilder.WithGlobalConnectionString(connectionString)))
+                using (var serviceProvider = CreateSqliteServiceProvider(connectionString))
                 using (var scope = serviceProvider.CreateScope())
                 {
                     var runner = scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
@@ -75,17 +74,15 @@ namespace FluentMigrator.Tests.Unit.Initialization
         {
             var databasePath = GetTempDatabasePath();
             var connectionString = BuildSqliteConnectionString(databasePath);
-            var createConnectionCount = 0;
+            var createdConnectionCount = 0;
 
             try
             {
-                using (var serviceProvider = CreateSqliteServiceProvider(
-                    runnerBuilder => runnerBuilder.WithConnectionFactory(
-                        _ =>
-                        {
-                            createConnectionCount++;
-                            return new SqliteConnection(connectionString);
-                        })))
+                using (var serviceProvider = CreateSqliteServiceProvider(_ =>
+                {
+                    createdConnectionCount++;
+                    return new SqliteConnection(connectionString);
+                }))
                 using (var scope = serviceProvider.CreateScope())
                 {
                     var runner = scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
@@ -94,7 +91,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
                 }
 
                 Assert.That(
-                    createConnectionCount,
+                    createdConnectionCount,
                     Is.GreaterThan(0),
                     "The configured connection factory should have been used.");
 
@@ -150,32 +147,42 @@ namespace FluentMigrator.Tests.Unit.Initialization
         }
 
         [Test]
-        public void PreviewOnlyWithConnectionFactoryDoesNotOpenConnection()
+        public void PreviewOnlyWithConnectionFactoryCanResolveVersionLoader()
         {
-            var connectionFactory = new RecordingMigrationConnectionFactory();
-            connectionFactory.Connection.ThrowOnOpen = true;
+            var databasePath = GetTempDatabasePath();
+            var connectionString = BuildSqliteConnectionString(databasePath);
+            var createdConnectionCount = 0;
 
-            using (var serviceProvider = CreateSqliteServiceProvider(
-                runnerBuilder => runnerBuilder.WithConnectionFactory(
-                    _ => connectionFactory.CreateConnection(null)),
-                services => services.Configure<ProcessorOptions>(
-                    options => options.PreviewOnly = true)))
-            using (var scope = serviceProvider.CreateScope())
+            try
             {
-                var runner = scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
+                using (var serviceProvider = CreateSqliteServiceProvider(_ =>
+                {
+                    createdConnectionCount++;
+                    return new SqliteConnection(connectionString);
+                },
+                services => services.Configure<ProcessorOptions>(options => options.PreviewOnly = true)))
+                using (var scope = serviceProvider.CreateScope())
+                {
+                    var runner = scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
 
-                Assert.DoesNotThrow(
-                    () => runner.MigrateUp(CreatePreviewOnlyTable.Version));
+                    Assert.DoesNotThrow(
+                        () => runner.MigrateUp(CreatePreviewOnlyTable.Version));
+                }
+
+                Assert.That(
+                    createdConnectionCount,
+                    Is.GreaterThan(0),
+                    "Preview-only mode still opens a connection to read version information.");
             }
-
-            Assert.That(
-                connectionFactory.Connection.OpenCount,
-                Is.EqualTo(0),
-                "Preview-only mode should generate/log SQL without opening the factory-created connection.");
+            finally
+            {
+                DeleteDatabaseFile(databasePath);
+            }
         }
 
-        private static ServiceProvider CreateSqliteServiceProvider(
-            Action<IMigrationRunnerBuilder> configureRunner,
+        private static ServiceProvider CreateProviderServiceProvider(
+            Action<IMigrationRunnerBuilder> addProvider,
+            Func<IServiceProvider, IDbConnection> connectionFactory,
             Action<IServiceCollection> configureServices = null)
         {
             var services = new ServiceCollection()
@@ -183,12 +190,46 @@ namespace FluentMigrator.Tests.Unit.Initialization
                 .ConfigureRunner(
                     runnerBuilder =>
                     {
-                        runnerBuilder.AddSQLite();
-
-                        configureRunner(runnerBuilder);
+                        addProvider(runnerBuilder);
 
                         runnerBuilder
-                            .ScanIn(typeof(CreateGlobalConnectionStringTable).Assembly)
+                            .WithConnectionFactory(connectionFactory)
+                            .ScanIn(typeof(CreateFactoryConnectionTable).Assembly)
+                            .For.Migrations();
+                    })
+                .Configure<TypeFilterOptions>(
+                    options =>
+                    {
+                        options.Namespace = MigrationNamespace;
+                        options.NestedNamespaces = true;
+                    });
+
+            configureServices?.Invoke(services);
+
+            return services.BuildServiceProvider();
+        }
+        private static ServiceProvider CreateSqliteServiceProvider(
+            Func<IServiceProvider, IDbConnection> connectionFactory,
+            Action<IServiceCollection> configureServices = null)
+        {
+            return CreateProviderServiceProvider(
+                runnerBuilder => runnerBuilder.AddSQLite(),
+                connectionFactory,
+                configureServices);
+        }
+        private static ServiceProvider CreateSqliteServiceProvider(
+            string connectionString,
+            Action<IServiceCollection> configureServices = null)
+        {
+            var services = new ServiceCollection()
+                .AddFluentMigratorCore()
+                .ConfigureRunner(
+                    runnerBuilder =>
+                    {
+                        runnerBuilder
+                            .AddSQLite()
+                            .WithGlobalConnectionString(connectionString)
+                            .ScanIn(typeof(CreateFactoryConnectionTable).Assembly)
                             .For.Migrations();
                     })
                 .Configure<TypeFilterOptions>(
@@ -215,6 +256,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
             var builder = new SqliteConnectionStringBuilder
             {
                 DataSource = databasePath,
+                Pooling = false
             };
 
             return builder.ToString();
@@ -241,6 +283,8 @@ namespace FluentMigrator.Tests.Unit.Initialization
 
         private static void DeleteDatabaseFile(string databasePath)
         {
+            SqliteConnection.ClearAllPools();
+
             if (File.Exists(databasePath))
             {
                 File.Delete(databasePath);

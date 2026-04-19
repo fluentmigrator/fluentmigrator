@@ -61,10 +61,10 @@ namespace FluentMigrator.Runner.Processors.SQLite
             [NotNull] SQLiteGenerator generator,
             [NotNull] ILogger<SQLiteProcessor> logger,
             [NotNull] IOptionsSnapshot<ProcessorOptions> options,
-            [NotNull] IConnectionStringAccessor connectionStringAccessor,
+            [NotNull] IMigrationConnectionFactory connectionFactory,
             [NotNull] IServiceProvider serviceProvider,
             [NotNull] SQLiteQuoter quoter)
-            : base(() => factory.Factory, generator, logger, options.Value, connectionStringAccessor)
+            : base(() => factory.Factory, generator, logger, options.Value, connectionFactory)
         {
             _serviceProvider = serviceProvider;
             _quoter = quoter;
@@ -159,8 +159,8 @@ namespace FluentMigrator.Runner.Processors.SQLite
         /// <inheritdoc />
         public override void Process(PerformDBOperationExpression expression)
         {
-            var message = string.IsNullOrEmpty(expression.Description) 
-                ? "Performing DB Operation" 
+            var message = string.IsNullOrEmpty(expression.Description)
+                ? "Performing DB Operation"
                 : $"Performing DB Operation: {expression.Description}";
             Logger.LogSay(message);
 

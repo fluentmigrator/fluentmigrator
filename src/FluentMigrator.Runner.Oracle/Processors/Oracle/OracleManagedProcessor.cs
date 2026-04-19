@@ -50,8 +50,8 @@ namespace FluentMigrator.Runner.Processors.Oracle
         /// <param name="options">
         /// The <see cref="IOptionsSnapshot{TOptions}"/> containing configuration options for the processor.
         /// </param>
-        /// <param name="connectionStringAccessor">
-        /// The <see cref="IConnectionStringAccessor"/> used to access the database connection string.
+        /// <param name="connectionFactory">
+        /// The <see cref="IMigrationConnectionFactory"/> used to create connections.
         /// </param>
         /// <remarks>
         /// This constructor initializes the base <see cref="OracleProcessorBase"/> with the managed Oracle driver
@@ -65,8 +65,8 @@ namespace FluentMigrator.Runner.Processors.Oracle
             [NotNull] IOracleGenerator generator,
             [NotNull] ILogger<OracleManagedProcessor> logger,
             [NotNull] IOptionsSnapshot<ProcessorOptions> options,
-            [NotNull] IConnectionStringAccessor connectionStringAccessor)
-            : base(ProcessorIdConstants.OracleManaged, factory, generator, logger, options, connectionStringAccessor)
+            [NotNull] IMigrationConnectionFactory connectionFactory)
+            : base(ProcessorIdConstants.OracleManaged, factory, generator, logger, options, connectionFactory)
         {
         }
     }

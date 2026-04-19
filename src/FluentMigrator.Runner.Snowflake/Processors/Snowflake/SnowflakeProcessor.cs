@@ -52,9 +52,9 @@ namespace FluentMigrator.Runner.Processors.Snowflake
             [NotNull] SnowflakeQuoter quoter,
             [NotNull] ILogger<SnowflakeProcessor> logger,
             [NotNull] IOptionsSnapshot<ProcessorOptions> options,
-            [NotNull] IConnectionStringAccessor connectionStringAccessor,
+            [NotNull] IMigrationConnectionFactory connectionFactory,
             [NotNull] SnowflakeOptions sfOptions,
-            [NotNull] IServiceProvider serviceProvider) : base(() => factory.Factory, generator, logger, options.Value, connectionStringAccessor)
+            [NotNull] IServiceProvider serviceProvider) : base(() => factory.Factory, generator, logger, options.Value, connectionFactory)
         {
             _quoteIdentifiers = sfOptions.QuoteIdentifiers;
             Quoter = quoter;
