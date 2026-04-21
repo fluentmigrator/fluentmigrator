@@ -39,56 +39,64 @@ using NUnit.Framework;
 namespace FluentMigrator.Tests.Unit.Initialization
 {
     [TestFixture]
-    public sealed class MigrationRunnerBuilderConnectionFactoryTests
+    [Category("ConnectionFactory")]
+    public sealed class ConnectionFactoryTests
     {
         private const string MigrationNamespace = "FluentMigrator.Tests.Unit.Initialization.Migrations.ConnectionFactory";
+        private string _tempDataDirectory;
+
+        [SetUp]
+        public void SetUpDataDirectory()
+        {
+            _tempDataDirectory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(_tempDataDirectory);
+            AppDomain.CurrentDomain.SetData("DataDirectory", _tempDataDirectory);
+        }
+
+        [TearDown]
+        public void TearDownDataDirectory()
+        {
+            if (!string.IsNullOrEmpty(_tempDataDirectory) && Directory.Exists(_tempDataDirectory))
+            {
+                Directory.Delete(_tempDataDirectory, true);
+            }
+        }
 
         [Test]
         public void WithGlobalConnectionStringStillRunsMigration()
         {
-            var databasePath = GetTempDatabasePath();
-            var connectionString = BuildSqliteConnectionString(databasePath);
-
-            try
+            using (var serviceProvider = CreateProviderWithGlobalConnectionString())
+            using (var scope = serviceProvider.CreateScope())
             {
-                using (var serviceProvider = CreateSqliteServiceProvider(connectionString))
-                using (var scope = serviceProvider.CreateScope())
-                {
-                    var runner = scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
+                var runner = scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
 
-                    runner.MigrateUp(CreateGlobalConnectionStringTable.Version);
-                }
+                runner.MigrateUp(CreateGlobalConnectionStringTable.Version);
 
                 Assert.That(
-                    TableExists(connectionString, CreateGlobalConnectionStringTable.TableName),
+                    TableExists(CreateGlobalConnectionStringTable.TableName),
                     Is.True);
-            }
-            finally
-            {
-                DeleteDatabaseFile(databasePath);
+
+                runner.MigrateDown(0);
             }
         }
 
         [Test]
         public void WithConnectionFactoryUsesFactoryWhenConnectionStringIsEmpty()
         {
-            var databasePath = GetTempDatabasePath();
-            var connectionString = BuildSqliteConnectionString(databasePath);
             var createdConnectionCount = 0;
 
-            try
-            {
-                using (var serviceProvider = CreateSqliteServiceProvider(_ =>
-                {
-                    createdConnectionCount++;
-                    return new SqliteConnection(connectionString);
-                }))
-                using (var scope = serviceProvider.CreateScope())
-                {
-                    var runner = scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
+            using var connection = CreateConnection();
 
-                    runner.MigrateUp(CreateFactoryConnectionTable.Version);
-                }
+            using (var serviceProvider = CreateProviderWithConnectionFactory(_ =>
+            {
+                createdConnectionCount++;
+                return connection;
+            }))
+            using (var scope = serviceProvider.CreateScope())
+            {
+                var runner = scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
+
+                runner.MigrateUp(CreateFactoryConnectionTable.Version);
 
                 Assert.That(
                     createdConnectionCount,
@@ -96,13 +104,11 @@ namespace FluentMigrator.Tests.Unit.Initialization
                     "The configured connection factory should have been used.");
 
                 Assert.That(
-                    TableExists(connectionString, CreateFactoryConnectionTable.TableName),
+                    TableExists(CreateFactoryConnectionTable.TableName),
                     Is.True,
                     "The migration should execute against the factory-created connection.");
-            }
-            finally
-            {
-                DeleteDatabaseFile(databasePath);
+
+                runner.MigrateDown(0);
             }
         }
 
@@ -149,146 +155,85 @@ namespace FluentMigrator.Tests.Unit.Initialization
         [Test]
         public void PreviewOnlyWithConnectionFactoryCanResolveVersionLoader()
         {
-            var databasePath = GetTempDatabasePath();
-            var connectionString = BuildSqliteConnectionString(databasePath);
             var createdConnectionCount = 0;
 
-            try
+            using (var serviceProvider = CreateProviderWithConnectionFactory(_ =>
             {
-                using (var serviceProvider = CreateSqliteServiceProvider(_ =>
-                {
-                    createdConnectionCount++;
-                    return new SqliteConnection(connectionString);
-                },
-                services => services.Configure<ProcessorOptions>(options => options.PreviewOnly = true)))
-                using (var scope = serviceProvider.CreateScope())
-                {
-                    var runner = scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
+                createdConnectionCount++;
+                return CreateConnection();
+            },
+            services => services.Configure<ProcessorOptions>(options => options.PreviewOnly = true)))
+            using (var scope = serviceProvider.CreateScope())
+            {
+                var runner = scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
 
-                    Assert.DoesNotThrow(
-                        () => runner.MigrateUp(CreatePreviewOnlyTable.Version));
-                }
+                Assert.DoesNotThrow(
+                    () => runner.MigrateUp(CreatePreviewOnlyTable.Version));
 
                 Assert.That(
                     createdConnectionCount,
                     Is.GreaterThan(0),
                     "Preview-only mode still opens a connection to read version information.");
-            }
-            finally
-            {
-                DeleteDatabaseFile(databasePath);
+
+                runner.MigrateDown(0);
             }
         }
 
         private static ServiceProvider CreateProviderServiceProvider(
-            Action<IMigrationRunnerBuilder> addProvider,
-            Func<IServiceProvider, IDbConnection> connectionFactory,
+            Action<IMigrationRunnerBuilder> configureRunner,
             Action<IServiceCollection> configureServices = null)
         {
             var services = new ServiceCollection()
                 .AddFluentMigratorCore()
-                .ConfigureRunner(
-                    runnerBuilder =>
-                    {
-                        addProvider(runnerBuilder);
-
-                        runnerBuilder
-                            .WithConnectionFactory(connectionFactory)
-                            .ScanIn(typeof(CreateFactoryConnectionTable).Assembly)
-                            .For.Migrations();
-                    })
-                .Configure<TypeFilterOptions>(
-                    options =>
-                    {
-                        options.Namespace = MigrationNamespace;
-                        options.NestedNamespaces = true;
-                    });
-
-            configureServices?.Invoke(services);
-
-            return services.BuildServiceProvider();
-        }
-        private static ServiceProvider CreateSqliteServiceProvider(
-            Func<IServiceProvider, IDbConnection> connectionFactory,
-            Action<IServiceCollection> configureServices = null)
-        {
-            return CreateProviderServiceProvider(
-                runnerBuilder => runnerBuilder.AddSQLite(),
-                connectionFactory,
-                configureServices);
-        }
-        private static ServiceProvider CreateSqliteServiceProvider(
-            string connectionString,
-            Action<IServiceCollection> configureServices = null)
-        {
-            var services = new ServiceCollection()
-                .AddFluentMigratorCore()
-                .ConfigureRunner(
-                    runnerBuilder =>
-                    {
-                        runnerBuilder
-                            .AddSQLite()
-                            .WithGlobalConnectionString(connectionString)
-                            .ScanIn(typeof(CreateFactoryConnectionTable).Assembly)
-                            .For.Migrations();
-                    })
-                .Configure<TypeFilterOptions>(
-                    options =>
-                    {
-                        options.Namespace = MigrationNamespace;
-                        options.NestedNamespaces = true;
-                    });
-
-            configureServices?.Invoke(services);
-
-            return services.BuildServiceProvider();
-        }
-
-        private static string GetTempDatabasePath()
-        {
-            return Path.Combine(
-                Path.GetTempPath(),
-                $"fluentmigrator-connection-factory-{Guid.NewGuid():N}.sqlite");
-        }
-
-        private static string BuildSqliteConnectionString(string databasePath)
-        {
-            var builder = new SqliteConnectionStringBuilder
-            {
-                DataSource = databasePath,
-                Pooling = false
-            };
-
-            return builder.ToString();
-        }
-
-        private static bool TableExists(string connectionString, string tableName)
-        {
-            using (var connection = new SqliteConnection(connectionString))
-            {
-                connection.Open();
-
-                using (var command = connection.CreateCommand())
+                .ConfigureRunner(runnerBuilder =>
                 {
-                    command.CommandText =
-                        "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = $tableName;";
-                    command.Parameters.AddWithValue("$tableName", tableName);
+                    runnerBuilder
+                        .AddSQLite()
+                        .ScanIn(typeof(CreateFactoryConnectionTable).Assembly)
+                        .For.Migrations();
 
-                    var result = command.ExecuteScalar();
+                    configureRunner(runnerBuilder);
+                })
+                .Configure<TypeFilterOptions>(
+                    options =>
+                    {
+                        options.Namespace = MigrationNamespace;
+                        options.NestedNamespaces = true;
+                    });
 
-                    return Convert.ToInt64(result) == 1;
-                }
-            }
+            configureServices?.Invoke(services);
+
+            return services.BuildServiceProvider();
+        }
+        private static ServiceProvider CreateProviderWithConnectionFactory(
+            Func<IServiceProvider, IDbConnection> connectionFactory,
+            Action<IServiceCollection> configureServices = null)
+        {
+            return CreateProviderServiceProvider(x => x.WithConnectionFactory(connectionFactory), configureServices);
+        }
+        private static ServiceProvider CreateProviderWithGlobalConnectionString()
+        {
+            return CreateProviderServiceProvider(x => x.WithGlobalConnectionString(IntegrationTestOptions.SQLite.ConnectionString));
         }
 
-        private static void DeleteDatabaseFile(string databasePath)
+        private SqliteConnection CreateConnection()
         {
-            SqliteConnection.ClearAllPools();
+            return new SqliteConnection(IntegrationTestOptions.SQLite.ConnectionString);
+        }
 
-            if (File.Exists(databasePath))
-            {
-                File.Delete(databasePath);
-            }
+        private static bool TableExists(string tableName)
+        {
+            using var connection = new SqliteConnection(IntegrationTestOptions.SQLite.ConnectionString);
+            connection.Open();
+
+            using var command = connection.CreateCommand();
+            command.CommandText =
+                "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = $tableName;";
+            command.Parameters.AddWithValue("$tableName", tableName);
+
+            var result = command.ExecuteScalar();
+
+            return Convert.ToInt64(result) == 1;
         }
 
         private sealed class TestGenericProcessor : GenericProcessorBase
