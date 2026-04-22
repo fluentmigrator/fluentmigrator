@@ -56,6 +56,23 @@ namespace FluentMigrator.Runner.Processors.SQLite
         public override IList<string> DatabaseTypeAliases { get; } = new List<string>();
 
         /// <inheritdoc />
+        [Obsolete("Use the constructor that accepts IMigrationConnectionFactory instead.")]
+        public SQLiteProcessor(
+            [NotNull] SQLiteDbFactory factory,
+            [NotNull] SQLiteGenerator generator,
+            [NotNull] ILogger<SQLiteProcessor> logger,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> options,
+            [NotNull] IConnectionStringAccessor connectionStringAccessor,
+            [NotNull] IServiceProvider serviceProvider,
+            [NotNull] SQLiteQuoter quoter)
+            : base(() => factory.Factory, generator, logger, options.Value, connectionStringAccessor)
+        {
+            _serviceProvider = serviceProvider;
+            _quoter = quoter;
+        }
+
+        /// <inheritdoc />
+        [ActivatorUtilitiesConstructor]
         public SQLiteProcessor(
             [NotNull] SQLiteDbFactory factory,
             [NotNull] SQLiteGenerator generator,

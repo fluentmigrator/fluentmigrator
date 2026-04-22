@@ -14,6 +14,7 @@
 // limitations under the License.
 #endregion
 
+using System;
 using System.Collections.Generic;
 
 using FluentMigrator.Runner.Generators.Oracle;
@@ -21,6 +22,7 @@ using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -38,7 +40,31 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
         /// <param name="generator">The SQL generator</param>
         /// <param name="logger">The logger</param>
         /// <param name="options">The processor options</param>
+        /// <param name="connectionStringAccessor">The accessor for the connection strings</param>
+        [Obsolete("Use the constructor that accepts IMigrationConnectionFactory instead.")]
+        public DotConnectOracle12CProcessor(
+            [NotNull] DotConnectOracleDbFactory factory,
+            [NotNull] IOracle12CGenerator generator,
+            [NotNull] ILogger<DotConnectOracle12CProcessor> logger,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> options,
+            [NotNull] IConnectionStringAccessor connectionStringAccessor) : base(
+            factory,
+            generator,
+            logger,
+            options,
+            connectionStringAccessor)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DotConnectOracle12CProcessor"/> class.
+        /// </summary>
+        /// <param name="factory">The DB object factory</param>
+        /// <param name="generator">The SQL generator</param>
+        /// <param name="logger">The logger</param>
+        /// <param name="options">The processor options</param>
         /// <param name="connectionFactory">The migration connection factory</param>
+        [ActivatorUtilitiesConstructor]
         public DotConnectOracle12CProcessor(
             [NotNull] DotConnectOracleDbFactory factory,
             [NotNull] IOracle12CGenerator generator,

@@ -16,11 +16,14 @@
 //
 #endregion
 
+using System;
+
 using FluentMigrator.Runner.Generators.Oracle;
 using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -33,6 +36,19 @@ namespace FluentMigrator.Runner.Processors.Oracle
     public class OracleProcessor : OracleProcessorBase
     {
         /// <inheritdoc />
+        [Obsolete("Use the constructor that accepts IMigrationConnectionFactory instead.")]
+        public OracleProcessor(
+            [NotNull] OracleDbFactory factory,
+            [NotNull] IOracleGenerator generator,
+            [NotNull] ILogger<OracleProcessor> logger,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> options,
+            [NotNull] IConnectionStringAccessor connectionStringAccessor)
+            : base(ProcessorIdConstants.Oracle, factory, generator, logger, options, connectionStringAccessor)
+        {
+        }
+
+        /// <inheritdoc />
+        [ActivatorUtilitiesConstructor]
         public OracleProcessor(
             [NotNull] OracleDbFactory factory,
             [NotNull] IOracleGenerator generator,

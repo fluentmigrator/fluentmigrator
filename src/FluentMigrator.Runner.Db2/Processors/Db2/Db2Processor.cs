@@ -16,6 +16,7 @@
 //
 #endregion
 
+using System;
 using System.Collections.Generic;
 using System.Data;
 
@@ -27,6 +28,7 @@ using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -38,6 +40,21 @@ namespace FluentMigrator.Runner.Processors.DB2
     public class Db2Processor : GenericProcessorBase
     {
         /// <inheritdoc />
+        [Obsolete("Use the constructor that accepts IMigrationConnectionFactory instead.")]
+        public Db2Processor(
+            [NotNull] Db2DbFactory factory,
+            [NotNull] Db2Generator generator,
+            [NotNull] Db2Quoter quoter,
+            [NotNull] ILogger<Db2Processor> logger,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> options,
+            [NotNull] IConnectionStringAccessor connectionStringAccessor)
+            : base(() => factory.Factory, generator, logger, options.Value, connectionStringAccessor)
+        {
+            Quoter = quoter;
+        }
+
+        /// <inheritdoc />
+        [ActivatorUtilitiesConstructor]
         public Db2Processor(
             [NotNull] Db2DbFactory factory,
             [NotNull] Db2Generator generator,
@@ -154,8 +171,8 @@ namespace FluentMigrator.Runner.Processors.DB2
         /// <inheritdoc />
         public override void Process(PerformDBOperationExpression expression)
         {
-            var message = string.IsNullOrEmpty(expression.Description) 
-                ? "Performing DB Operation" 
+            var message = string.IsNullOrEmpty(expression.Description)
+                ? "Performing DB Operation"
                 : $"Performing DB Operation: {expression.Description}";
             Logger.LogSay(message);
 

@@ -16,6 +16,7 @@
 //
 #endregion
 
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -28,6 +29,7 @@ using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -50,6 +52,21 @@ namespace FluentMigrator.Runner.Processors.DB2.iSeries
         public override IList<string> DatabaseTypeAliases { get; } = new List<string> { ProcessorIdConstants.IbmDb2ISeries, ProcessorIdConstants.DB2 };
 
         /// <inheritdoc />
+        [Obsolete("Use the constructor that accepts IMigrationConnectionFactory instead.")]
+        public Db2ISeriesProcessor(
+            [NotNull] Db2ISeriesDbFactory factory,
+            [NotNull] Db2ISeriesGenerator generator,
+            [NotNull] Db2ISeriesQuoter quoter,
+            [NotNull] ILogger<Db2ISeriesProcessor> logger,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> options,
+            [NotNull] IConnectionStringAccessor connectionStringAccessor)
+            : base(() => factory.Factory, generator, logger, options.Value, connectionStringAccessor)
+        {
+            Quoter = quoter;
+        }
+
+        /// <inheritdoc />
+        [ActivatorUtilitiesConstructor]
         public Db2ISeriesProcessor(
             [NotNull] Db2ISeriesDbFactory factory,
             [NotNull] Db2ISeriesGenerator generator,

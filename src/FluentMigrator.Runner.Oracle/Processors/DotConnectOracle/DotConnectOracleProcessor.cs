@@ -26,6 +26,7 @@ using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -43,6 +44,19 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
         public override IList<string> DatabaseTypeAliases { get; } = new List<string>();
 
         /// <inheritdoc />
+        [Obsolete("Use the constructor that accepts IMigrationConnectionFactory instead.")]
+        public DotConnectOracleProcessor(
+            [NotNull] DotConnectOracleDbFactory factory,
+            [NotNull] IOracleGenerator generator,
+            [NotNull] ILogger<DotConnectOracleProcessor> logger,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> options,
+            [NotNull] IConnectionStringAccessor connectionStringAccessor)
+            : base(() => factory.Factory, generator, logger, options.Value, connectionStringAccessor)
+        {
+        }
+
+        /// <inheritdoc />
+        [ActivatorUtilitiesConstructor]
         public DotConnectOracleProcessor(
             [NotNull] DotConnectOracleDbFactory factory,
             [NotNull] IOracleGenerator generator,

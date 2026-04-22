@@ -46,6 +46,18 @@ namespace FluentMigrator.Runner.Processors
         private bool _disposed;
 
         /// <inheritdoc />
+        [Obsolete("Use the constructor that accepts IMigrationConnectionFactory instead.")]
+        protected GenericProcessorBase(
+            [NotNull] Func<DbProviderFactory> factoryAccessor,
+            [NotNull] IMigrationGenerator generator,
+            [NotNull] ILogger logger,
+            [NotNull] ProcessorOptions options,
+            [NotNull] IConnectionStringAccessor connectionStringAccessor)
+            : this(factoryAccessor, generator, logger, options, new ConnectionStringMigrationConnectionFactory(connectionStringAccessor))
+        {
+        }
+
+        /// <inheritdoc />
         protected GenericProcessorBase(
             [NotNull] Func<DbProviderFactory> factoryAccessor,
             [NotNull] IMigrationGenerator generator,

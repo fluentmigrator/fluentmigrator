@@ -28,6 +28,7 @@ using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -60,6 +61,31 @@ namespace FluentMigrator.Runner.Processors.Jet
         private bool _disposed;
 
         /// <inheritdoc />
+        [Obsolete("Use the constructor that accepts IMigrationConnectionFactory instead.")]
+        public JetProcessor(
+            [NotNull] JetGenerator generator,
+            [NotNull] ILogger<JetProcessor> logger,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> options,
+            [NotNull] IConnectionStringAccessor connectionStringAccessor)
+            : base(generator, logger, options.Value)
+        {
+            var factory = OleDbFactory.Instance;
+            var connectionString = connectionStringAccessor.ConnectionString ?? options.Value.ConnectionString;
+            if (factory != null)
+            {
+                _connection = new Lazy<OleDbConnection>(
+                    () =>
+                    {
+                        var conn = (OleDbConnection)factory.CreateConnection();
+                        Debug.Assert(conn != null, nameof(conn) + " != null");
+                        conn.ConnectionString = connectionString;
+                        return conn;
+                    });
+            }
+        }
+
+        /// <inheritdoc />
+        [ActivatorUtilitiesConstructor]
         public JetProcessor(
             [NotNull] JetGenerator generator,
             [NotNull] ILogger<JetProcessor> logger,
@@ -107,8 +133,8 @@ namespace FluentMigrator.Runner.Processors.Jet
         /// <inheritdoc />
         public override void Process(PerformDBOperationExpression expression)
         {
-            var message = string.IsNullOrEmpty(expression.Description) 
-                ? "Performing DB Operation" 
+            var message = string.IsNullOrEmpty(expression.Description)
+                ? "Performing DB Operation"
                 : $"Performing DB Operation: {expression.Description}";
             Logger.LogSay(message);
 

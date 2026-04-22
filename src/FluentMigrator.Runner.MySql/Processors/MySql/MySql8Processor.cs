@@ -14,6 +14,7 @@
 // limitations under the License.
 #endregion
 
+using System;
 using System.Collections.Generic;
 
 using FluentMigrator.Runner.Generators.MySql;
@@ -21,6 +22,7 @@ using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -32,6 +34,23 @@ namespace FluentMigrator.Runner.Processors.MySql
     public class MySql8Processor : MySqlProcessor
     {
         /// <inheritdoc />
+        [Obsolete("Use the constructor that accepts IMigrationConnectionFactory instead.")]
+        public MySql8Processor(
+            [NotNull] MySqlDbFactory factory,
+            [NotNull] MySql8Generator generator,
+            [NotNull] ILogger<MySql8Processor> logger,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> options,
+            [NotNull] IConnectionStringAccessor connectionStringAccessor) : base(
+            factory,
+            generator,
+            logger,
+            options,
+            connectionStringAccessor)
+        {
+        }
+
+        /// <inheritdoc />
+        [ActivatorUtilitiesConstructor]
         public MySql8Processor(
             [NotNull] MySqlDbFactory factory,
             [NotNull] MySql8Generator generator,

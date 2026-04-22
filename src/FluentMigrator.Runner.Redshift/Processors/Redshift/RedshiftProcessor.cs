@@ -28,6 +28,7 @@ using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -47,6 +48,19 @@ namespace FluentMigrator.Runner.Processors.Redshift
         public override IList<string> DatabaseTypeAliases { get; } = new List<string>();
 
         /// <inheritdoc />
+        [Obsolete("Use the constructor that accepts IMigrationConnectionFactory instead.")]
+        public RedshiftProcessor(
+            [NotNull] RedshiftDbFactory factory,
+            [NotNull] RedshiftGenerator generator,
+            [NotNull] ILogger<RedshiftProcessor> logger,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> options,
+            [NotNull] IConnectionStringAccessor connectionStringAccessor)
+            : base(() => factory.Factory, generator, logger, options.Value, connectionStringAccessor)
+        {
+        }
+
+        /// <inheritdoc />
+        [ActivatorUtilitiesConstructor]
         public RedshiftProcessor(
             [NotNull] RedshiftDbFactory factory,
             [NotNull] RedshiftGenerator generator,

@@ -16,6 +16,7 @@
 //
 #endregion
 
+using System;
 using System.Collections.Generic;
 
 using FluentMigrator.Runner.Generators.Postgres92;
@@ -24,6 +25,7 @@ using FluentMigrator.Runner.Processors.Postgres;
 
 using JetBrains.Annotations;
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -41,6 +43,20 @@ namespace FluentMigrator.Runner.Processors.Postgres92
         public override IList<string> DatabaseTypeAliases { get; } = new List<string> { ProcessorIdConstants.Postgres92, ProcessorIdConstants.PostgreSQL92 };
 
         /// <inheritdoc />
+        [Obsolete("Use the constructor that accepts IMigrationConnectionFactory instead.")]
+        public Postgres92Processor(
+            [NotNull] PostgresDbFactory factory,
+            [NotNull] Postgres92Generator generator,
+            [NotNull] ILogger<PostgresProcessor> logger,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> options,
+            [NotNull] IConnectionStringAccessor connectionStringAccessor,
+            [NotNull] PostgresOptions pgOptions)
+            : base(factory, generator, logger, options, connectionStringAccessor, pgOptions)
+        {
+        }
+
+        /// <inheritdoc />
+        [ActivatorUtilitiesConstructor]
         public Postgres92Processor(
             [NotNull] PostgresDbFactory factory,
             [NotNull] Postgres92Generator generator,

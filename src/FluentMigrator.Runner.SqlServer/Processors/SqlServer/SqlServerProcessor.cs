@@ -74,6 +74,29 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         /// <param name="quoter">The SQL quoter.</param>
         /// <param name="logger">The logger.</param>
         /// <param name="options">The processor options.</param>
+        /// <param name="connectionStringAccessor">The connection string accessor.</param>
+        /// <param name="serviceProvider">The service provider.</param>
+        [Obsolete("Use the constructor that accepts IMigrationConnectionFactory instead.")]
+        protected SqlServerProcessor(
+            [NotNull, ItemNotNull] IEnumerable<string> databaseTypes,
+            [NotNull] IMigrationGenerator generator,
+            [NotNull] IQuoter quoter,
+            [NotNull] ILogger logger,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> options,
+            [NotNull] IConnectionStringAccessor connectionStringAccessor,
+            [NotNull] IServiceProvider serviceProvider)
+            : this(databaseTypes, SqlClientFactory.Instance, generator, quoter, logger, options, connectionStringAccessor, serviceProvider)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SqlServerProcessor"/> class.
+        /// </summary>
+        /// <param name="databaseTypes">The database type names.</param>
+        /// <param name="generator">The migration generator.</param>
+        /// <param name="quoter">The SQL quoter.</param>
+        /// <param name="logger">The logger.</param>
+        /// <param name="options">The processor options.</param>
         /// <param name="connectionFactory">The migration connection factory.</param>
         /// <param name="serviceProvider">The service provider.</param>
         protected SqlServerProcessor(
@@ -86,6 +109,36 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             [NotNull] IServiceProvider serviceProvider)
             : this(databaseTypes, SqlClientFactory.Instance, generator, quoter, logger, options, connectionFactory, serviceProvider)
         {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SqlServerProcessor"/> class.
+        /// </summary>
+        /// <param name="databaseTypes">The database type names.</param>
+        /// <param name="factory">The database provider factory.</param>
+        /// <param name="generator">The migration generator.</param>
+        /// <param name="quoter">The SQL quoter.</param>
+        /// <param name="logger">The logger.</param>
+        /// <param name="options">The processor options.</param>
+        /// <param name="connectionStringAccessor">The connection string accessor.</param>
+        /// <param name="serviceProvider">The service provider.</param>
+        [Obsolete("Use the constructor that accepts IMigrationConnectionFactory instead.")]
+        protected SqlServerProcessor(
+            [NotNull, ItemNotNull] IEnumerable<string> databaseTypes,
+            [NotNull] DbProviderFactory factory,
+            [NotNull] IMigrationGenerator generator,
+            [NotNull] IQuoter quoter,
+            [NotNull] ILogger logger,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> options,
+            [NotNull] IConnectionStringAccessor connectionStringAccessor,
+            [NotNull] IServiceProvider serviceProvider)
+            : base(() => factory, generator, logger, options.Value, connectionStringAccessor)
+        {
+            _serviceProvider = serviceProvider;
+            var dbTypes = databaseTypes.ToList();
+            DatabaseType = dbTypes.First();
+            DatabaseTypeAliases = dbTypes.Skip(1).ToList();
+            Quoter = quoter;
         }
 
         /// <summary>

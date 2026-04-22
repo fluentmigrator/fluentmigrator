@@ -16,11 +16,14 @@
 
 using FluentMigrator.Runner.BatchParser;
 using FluentMigrator.Runner.Generators.SqlServer;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.SqlServer;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner
 {
@@ -43,7 +46,14 @@ namespace FluentMigrator.Runner
             builder.Services.TryAddScoped<SqlServer2008Quoter>();
             builder.Services.TryAddScoped<ISqlServerTypeMap>(sp => new SqlServer2008TypeMap());
             builder.Services
-                .AddScoped<SqlServer2016Processor>()
+                .AddScoped<SqlServer2016Processor>(sp =>
+                    new SqlServer2016Processor(
+                        sp.GetRequiredService<ILogger<SqlServer2016Processor>>(),
+                        sp.GetRequiredService<SqlServer2008Quoter>(),
+                        sp.GetRequiredService<SqlServer2016Generator>(),
+                        sp.GetRequiredService<IOptionsSnapshot<ProcessorOptions>>(),
+                        sp.GetRequiredService<IMigrationConnectionFactory>(),
+                        sp))
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<SqlServer2016Processor>())
                 .AddScoped<SqlServer2016Generator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<SqlServer2016Generator>());
@@ -61,7 +71,13 @@ namespace FluentMigrator.Runner
             builder.Services.TryAddTransient<SqlServerBatchParser>();
             builder.Services.TryAddScoped<SqlServer2000Quoter>();
             builder.Services
-                .AddScoped<SqlServer2000Processor>()
+                .AddScoped<SqlServer2000Processor>(sp =>
+                    new SqlServer2000Processor(
+                        sp.GetRequiredService<ILogger<SqlServer2000Processor>>(),
+                        sp.GetRequiredService<SqlServer2000Generator>(),
+                        sp.GetRequiredService<IOptionsSnapshot<ProcessorOptions>>(),
+                        sp.GetRequiredService<IMigrationConnectionFactory>(),
+                        sp))
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<SqlServer2000Processor>())
                 .AddScoped<ISqlServerTypeMap>(sp => new SqlServer2000TypeMap())
                 .AddScoped<SqlServer2000Generator>()
@@ -80,7 +96,14 @@ namespace FluentMigrator.Runner
             builder.Services.TryAddTransient<SqlServerBatchParser>();
             builder.Services.TryAddScoped<SqlServer2005Quoter>();
             builder.Services
-                .AddScoped<SqlServer2005Processor>()
+                .AddScoped<SqlServer2005Processor>(sp =>
+                    new SqlServer2005Processor(
+                        sp.GetRequiredService<ILogger<SqlServer2005Processor>>(),
+                        sp.GetRequiredService<SqlServer2005Quoter>(),
+                        sp.GetRequiredService<SqlServer2005Generator>(),
+                        sp.GetRequiredService<IOptionsSnapshot<ProcessorOptions>>(),
+                        sp.GetRequiredService<IMigrationConnectionFactory>(),
+                        sp))
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<SqlServer2005Processor>())
                 .AddScoped<ISqlServerTypeMap>(sp => new SqlServer2005TypeMap())
                 .AddScoped<SqlServer2005Generator>()
@@ -100,7 +123,14 @@ namespace FluentMigrator.Runner
             builder.Services.TryAddScoped<SqlServer2008Quoter>();
             builder.Services.TryAddScoped<ISqlServerTypeMap>(sp => sp.GetRequiredService<SqlServer2008TypeMap>());
             builder.Services
-                .AddScoped<SqlServer2008Processor>()
+                .AddScoped<SqlServer2008Processor>(sp =>
+                    new SqlServer2008Processor(
+                        sp.GetRequiredService<ILogger<SqlServer2008Processor>>(),
+                        sp.GetRequiredService<SqlServer2008Quoter>(),
+                        sp.GetRequiredService<SqlServer2008Generator>(),
+                        sp.GetRequiredService<IOptionsSnapshot<ProcessorOptions>>(),
+                        sp.GetRequiredService<IMigrationConnectionFactory>(),
+                        sp))
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<SqlServer2008Processor>())
                 .AddScoped<SqlServer2008Generator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<SqlServer2008Generator>());
@@ -118,7 +148,14 @@ namespace FluentMigrator.Runner
             builder.Services.TryAddTransient<SqlServerBatchParser>();
             builder.Services.TryAddScoped<SqlServer2008Quoter>();
             builder.Services
-                .AddScoped<SqlServer2012Processor>()
+                .AddScoped<SqlServer2012Processor>(sp =>
+                    new SqlServer2012Processor(
+                        sp.GetRequiredService<ILogger<SqlServer2012Processor>>(),
+                        sp.GetRequiredService<SqlServer2008Quoter>(),
+                        sp.GetRequiredService<SqlServer2012Generator>(),
+                        sp.GetRequiredService<IOptionsSnapshot<ProcessorOptions>>(),
+                        sp.GetRequiredService<IMigrationConnectionFactory>(),
+                        sp))
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<SqlServer2012Processor>())
                 .AddScoped<ISqlServerTypeMap>(sp => new SqlServer2008TypeMap())
                 .AddScoped<SqlServer2012Generator>()
@@ -137,7 +174,14 @@ namespace FluentMigrator.Runner
             builder.Services.TryAddTransient<SqlServerBatchParser>();
             builder.Services.TryAddScoped<SqlServer2008Quoter>();
             builder.Services
-                .AddScoped<SqlServer2014Processor>()
+                .AddScoped<SqlServer2014Processor>(sp =>
+                    new SqlServer2014Processor(
+                        sp.GetRequiredService<ILogger<SqlServer2014Processor>>(),
+                        sp.GetRequiredService<SqlServer2008Quoter>(),
+                        sp.GetRequiredService<SqlServer2014Generator>(),
+                        sp.GetRequiredService<IOptionsSnapshot<ProcessorOptions>>(),
+                        sp.GetRequiredService<IMigrationConnectionFactory>(),
+                        sp))
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<SqlServer2014Processor>())
                 .AddScoped<ISqlServerTypeMap>(sp => new SqlServer2008TypeMap())
                 .AddScoped<SqlServer2014Generator>()
@@ -156,7 +200,14 @@ namespace FluentMigrator.Runner
             builder.Services.TryAddTransient<SqlServerBatchParser>();
             builder.Services.TryAddScoped<SqlServer2008Quoter>();
             builder.Services
-                .AddScoped<SqlServer2016Processor>()
+                .AddScoped<SqlServer2016Processor>(sp =>
+                    new SqlServer2016Processor(
+                        sp.GetRequiredService<ILogger<SqlServer2016Processor>>(),
+                        sp.GetRequiredService<SqlServer2008Quoter>(),
+                        sp.GetRequiredService<SqlServer2016Generator>(),
+                        sp.GetRequiredService<IOptionsSnapshot<ProcessorOptions>>(),
+                        sp.GetRequiredService<IMigrationConnectionFactory>(),
+                        sp))
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<SqlServer2016Processor>())
                 .AddScoped<ISqlServerTypeMap>(sp => new SqlServer2008TypeMap())
                 .AddScoped<SqlServer2016Generator>()

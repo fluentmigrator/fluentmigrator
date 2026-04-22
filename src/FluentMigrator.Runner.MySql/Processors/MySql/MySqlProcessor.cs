@@ -52,6 +52,25 @@ namespace FluentMigrator.Runner.Processors.MySql
         /// <param name="generator">The migration generator.</param>
         /// <param name="logger">The logger.</param>
         /// <param name="options">The processor options.</param>
+        /// <param name="connectionStringAccessor">The connection string accessor.</param>
+        [Obsolete("Use the constructor that accepts IMigrationConnectionFactory instead.")]
+        protected MySqlProcessor(
+            [NotNull] MySqlDbFactory factory,
+            [NotNull] IMigrationGenerator generator,
+            [NotNull] ILogger<MySqlProcessor> logger,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> options,
+            [NotNull] IConnectionStringAccessor connectionStringAccessor)
+            : base(() => factory.Factory, generator, logger, options.Value, connectionStringAccessor)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MySqlProcessor"/> class.
+        /// </summary>
+        /// <param name="factory">The MySQL database factory.</param>
+        /// <param name="generator">The migration generator.</param>
+        /// <param name="logger">The logger.</param>
+        /// <param name="options">The processor options.</param>
         /// <param name="connectionFactory">The migration connection factory.</param>
         protected MySqlProcessor(
             [NotNull] MySqlDbFactory factory,
@@ -196,8 +215,8 @@ namespace FluentMigrator.Runner.Processors.MySql
         /// <inheritdoc />
         public override void Process(PerformDBOperationExpression expression)
         {
-            var message = string.IsNullOrEmpty(expression.Description) 
-                ? "Performing DB Operation" 
+            var message = string.IsNullOrEmpty(expression.Description)
+                ? "Performing DB Operation"
                 : $"Performing DB Operation: {expression.Description}";
             Logger.LogSay(message);
 

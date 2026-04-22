@@ -12,6 +12,7 @@ using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -24,6 +25,19 @@ namespace FluentMigrator.Runner.Processors.Hana
     public class HanaProcessor : GenericProcessorBase
     {
         /// <inheritdoc />
+        [Obsolete("Use the constructor that accepts IMigrationConnectionFactory instead.")]
+        public HanaProcessor(
+            [NotNull] HanaDbFactory factory,
+            [NotNull] HanaGenerator generator,
+            [NotNull] ILogger<HanaProcessor> logger,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> options,
+            [NotNull] IConnectionStringAccessor connectionStringAccessor)
+            : base(() => factory.Factory, generator, logger, options.Value, connectionStringAccessor)
+        {
+        }
+
+        /// <inheritdoc />
+        [ActivatorUtilitiesConstructor]
         public HanaProcessor(
             [NotNull] HanaDbFactory factory,
             [NotNull] HanaGenerator generator,

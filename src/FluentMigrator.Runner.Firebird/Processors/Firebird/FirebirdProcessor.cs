@@ -32,6 +32,7 @@ using FluentMigrator.Runner.Models;
 
 using JetBrains.Annotations;
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -81,6 +82,29 @@ namespace FluentMigrator.Runner.Processors.Firebird
         protected Dictionary<string, List<string>> DDLTouchedColumns;
 
         /// <inheritdoc />
+        [Obsolete("Use the constructor that accepts IMigrationConnectionFactory instead.")]
+        public FirebirdProcessor(
+            [NotNull] FirebirdDbFactory factory,
+            [NotNull] FirebirdGenerator generator,
+            [NotNull] FirebirdQuoter quoter,
+            [NotNull] ILogger<FirebirdProcessor> logger,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> options,
+            [NotNull] IConnectionStringAccessor connectionStringAccessor,
+            [NotNull] FirebirdOptions fbOptions)
+            : base(() => factory.Factory, generator, logger, options.Value, connectionStringAccessor)
+        {
+            FBOptions = fbOptions ?? throw new ArgumentNullException(nameof(fbOptions));
+            _firebirdVersionFunc = new Lazy<Version>(GetFirebirdVersion);
+            _quoter = quoter;
+#pragma warning disable 618
+            truncator = new FirebirdTruncator(FBOptions.TruncateLongNames, FBOptions.PackKeyNames);
+#pragma warning restore 618
+            ClearLocks();
+            ClearDDLFollowers();
+        }
+
+        /// <inheritdoc />
+        [ActivatorUtilitiesConstructor]
         public FirebirdProcessor(
             [NotNull] FirebirdDbFactory factory,
             [NotNull] FirebirdGenerator generator,

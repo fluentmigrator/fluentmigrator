@@ -48,14 +48,14 @@ namespace FluentMigrator.Runner
                 .AddTransient<SQLiteBatchParser>()
                 .AddScoped<SQLiteDbFactory>()
                 .AddScoped<SQLiteProcessor>(sp =>
-                {
-                    var factory = sp.GetService<SQLiteDbFactory>();
-                    var logger = sp.GetService<ILogger<SQLiteProcessor>>();
-                    var options = sp.GetService<IOptionsSnapshot<ProcessorOptions>>();
-                    var connectionFactory = sp.GetService<IMigrationConnectionFactory>();
-                    var sqliteQuoter = new SQLiteQuoter(false);
-                    return new SQLiteProcessor(factory, sp.GetService<SQLiteGenerator>(), logger, options, connectionFactory, sp, sqliteQuoter);
-                })
+                    new SQLiteProcessor(
+                        sp.GetRequiredService<SQLiteDbFactory>(),
+                        sp.GetRequiredService<SQLiteGenerator>(),
+                        sp.GetRequiredService<ILogger<SQLiteProcessor>>(),
+                        sp.GetRequiredService<IOptionsSnapshot<ProcessorOptions>>(),
+                        sp.GetRequiredService<IMigrationConnectionFactory>(),
+                        sp,
+                        new SQLiteQuoter(false)))
                 .AddScoped<ISQLiteTypeMap>(sp => new SQLiteTypeMap(useStrictTables))
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<SQLiteProcessor>())
 
