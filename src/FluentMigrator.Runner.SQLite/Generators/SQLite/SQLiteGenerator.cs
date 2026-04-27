@@ -114,6 +114,32 @@ namespace FluentMigrator.Runner.Generators.SQLite
 
             var withoutRowId = expression.AdditionalFeatures.TryGetValue(SQLiteExtensions.WithoutRowIdTable, out var value)
                 && value is true;
+
+            if (withoutRowId)
+            {
+                var hasPrimaryKeyColumn = expression.Columns.Any(column => column.IsPrimaryKey);
+                var hasPrimaryKeyConstraint = expression.Constraints is not null
+                    && expression.Constraints.Any(constraint => constraint.IsPrimaryKeyConstraint);
+
+                if (!hasPrimaryKeyColumn && !hasPrimaryKeyConstraint)
+                {
+                    return CompatibilityMode.HandleCompatibility(
+                        "SQLite requires a PRIMARY KEY on tables created WITHOUT ROWID. " +
+                        $"Table '{expression.TableName}' is marked WITHOUT ROWID but defines no primary key.");
+                }
+
+                var identityColumns = expression.Columns
+                    .Where(column => column.IsIdentity)
+                    .ToList();
+
+                if (identityColumns.Count > 0)
+                {
+                    var identityColumnNames = string.Join(", ", identityColumns.Select(column => column.Name));
+                    return CompatibilityMode.HandleCompatibility(
+                        "SQLite does not allow AUTOINCREMENT or IDENTITY columns on WITHOUT ROWID tables. " +
+                        $"Table '{expression.TableName}' defines identity column(s): {identityColumnNames}.");
+                }
+            }
             var withoutRowIdCommand = withoutRowId ? " WITHOUT ROWID" : string.Empty;
 
             return FormatStatement(CreateTable, quotedTableName, Column.Generate(expression.Columns, quotedTableName), withoutRowIdCommand);
