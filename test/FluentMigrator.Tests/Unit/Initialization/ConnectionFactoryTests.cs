@@ -442,5 +442,115 @@ namespace FluentMigrator.Tests.Unit.Initialization
             {
             }
         }
+
+#if NET7_0_OR_GREATER
+        [Test]
+        public void WithDataSourceThrowsWhenBuilderIsNull()
+        {
+            IMigrationRunnerBuilder builder = null;
+
+            var ex = Assert.Throws<ArgumentNullException>(
+                () => builder.WithDataSource(_ => throw new NotImplementedException()));
+
+            Assert.That(ex.ParamName, Is.EqualTo("builder"));
+        }
+
+        [Test]
+        public void WithDataSourceThrowsWhenDataSourceFactoryIsNull()
+        {
+            var ex = Assert.Throws<ArgumentNullException>(
+                () => CreateProviderServiceProvider(x => x.WithDataSource(null)));
+
+            Assert.That(ex.ParamName, Is.EqualTo("dataSourceFactory"));
+        }
+
+        [Test]
+        public void WithDataSourceUsesDataSourceWhenConnectionStringIsEmpty()
+        {
+            var createdDataSourceCount = 0;
+            var createdConnectionCount = 0;
+
+            using (var serviceProvider = CreateProviderWithDataSource(_ =>
+            {
+                createdDataSourceCount++;
+
+                return new TestDbDataSource(() =>
+                {
+                    createdConnectionCount++;
+                    return CreateConnection();
+                });
+            }))
+            using (var scope = serviceProvider.CreateScope())
+            {
+                var runner = scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
+
+                runner.MigrateUp(CreateFactoryConnectionTable.Version);
+
+                using (Assert.EnterMultipleScope())
+                {
+                    Assert.That(
+                        createdDataSourceCount,
+                        Is.GreaterThan(0),
+                        "The configured data source factory should have been used.");
+
+                    Assert.That(
+                        createdConnectionCount,
+                        Is.GreaterThan(0),
+                        "The configured data source should have created a connection.");
+
+                    Assert.That(
+                        TableExists(CreateFactoryConnectionTable.TableName),
+                        Is.True,
+                        "The migration should execute against the data source created connection.");
+                }
+
+                runner.MigrateDown(0);
+            }
+        }
+
+        [Test]
+        public void WithDataSourceThrowsWhenFactoryReturnsNull()
+        {
+            using (var serviceProvider = CreateProviderWithDataSource(_ => null))
+            using (var scope = serviceProvider.CreateScope())
+            {
+                var runner = scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
+
+                var ex = Assert.Throws<InvalidOperationException>(
+                    () => runner.MigrateUp(CreateFactoryConnectionTable.Version));
+
+                Assert.That(
+                    ex.Message,
+                    Is.EqualTo("The configured data source factory returned null."));
+            }
+        }
+
+        private static ServiceProvider CreateProviderWithDataSource(
+            Func<IServiceProvider, DbDataSource> dataSourceFactory,
+            Action<IServiceCollection> configureServices = null)
+        {
+            return CreateProviderServiceProvider(
+                x => x.WithDataSource(dataSourceFactory),
+                configureServices);
+        }
+
+        private sealed class TestDbDataSource : DbDataSource
+        {
+            private readonly Func<DbConnection> _createConnection;
+
+            public TestDbDataSource(Func<DbConnection> createConnection)
+            {
+                _createConnection = createConnection
+                    ?? throw new ArgumentNullException(nameof(createConnection));
+            }
+
+            public override string ConnectionString => IntegrationTestOptions.SQLite.ConnectionString;
+
+            protected override DbConnection CreateDbConnection()
+            {
+                return _createConnection();
+            }
+        }
+#endif
     }
 }

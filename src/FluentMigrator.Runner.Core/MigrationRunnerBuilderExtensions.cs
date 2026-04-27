@@ -349,5 +349,27 @@ namespace FluentMigrator.Runner
                 return connection;
             }
         }
+
+#if NET7_0_OR_GREATER
+        /// <summary>
+        /// Configures the migration runner to create database connections
+        /// from the specified <see cref="DbDataSource"/>.
+        /// </summary>
+        /// <param name="builder">The runner builder</param>
+        /// <param name="dataSourceFactory">
+        /// A factory delegate used to resolve the <see cref="DbDataSource"/>
+        /// that will be used to create connections.</param>
+        /// <returns>The runner builder</returns>
+        public static IMigrationRunnerBuilder WithDataSource(
+            this IMigrationRunnerBuilder builder,
+            [NotNull] Func<IServiceProvider, DbDataSource> dataSourceFactory)
+        {
+            return builder.WithConnectionFactory(sp =>
+            {
+                var dataSource = dataSourceFactory(sp);
+                return dataSourceFactory(sp).CreateConnection();
+            });
+        }
+#endif
     }
 }
