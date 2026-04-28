@@ -350,6 +350,7 @@ namespace FluentMigrator.Runner
             }
         }
 
+        // DbDataSource was introduced in .NET 7 and is not supported on .NET Framework.
 #if NET7_0_OR_GREATER
         /// <summary>
         /// Configures the migration runner to create database connections

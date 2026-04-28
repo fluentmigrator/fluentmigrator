@@ -19,8 +19,6 @@
 using System;
 using System.Data.Common;
 
-using FirebirdSql.Data.FirebirdClient;
-
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.Firebird;
@@ -37,17 +35,14 @@ using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
+using FirebirdSql.Data.FirebirdClient;
 using MySql.Data.MySqlClient;
-
 using Npgsql;
+using Oracle.ManagedDataAccess.Client;
+using Snowflake.Data.Client;
 
 using NUnit.Framework;
-
-using Oracle.ManagedDataAccess.Client;
-
 using Shouldly;
-
-using Snowflake.Data.Client;
 
 namespace FluentMigrator.Tests.Integration
 {

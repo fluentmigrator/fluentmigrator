@@ -40,6 +40,7 @@ Should something be a parameter (static value) or injectable (factory that can r
 | 10.  | Logging as **ILoggerProvider**       | `ILoggerProvider`                                | MS DI `IServiceCollection`                        | MS DI `IServiceCollection.Configure`         |
 | 11.  | Mapping FM Types to DB Types         | `ITypeMap`                                       |                                                   |                                              |
 | 12.  | Connection strings                   | string                                           | `IConnectionStringReader`                         | `IConnectionStringAccessor`                  |
+| 13.  | Connections                          | `IDbConnection`                                  | `IMigrationConnectionFactory`                     | Same as Type Getter*                         |
 
 
 1. Migration Runner. See also:

@@ -7,7 +7,9 @@ The in-process runner is the **recommended approach** for most applications. It 
 ### Basic Setup
 
 ```csharp
+using System.Data.Common;
 using FluentMigrator.Runner;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.DependencyInjection;
 
 class Program
@@ -23,14 +25,21 @@ class Program
 
     private static ServiceProvider CreateServices()
     {
+        const string connectionString = "Server=.;Database=MyDb;Integrated Security=true";
+
         return new ServiceCollection()
+            // Register the provider data source once in the application container.
+            // The data source owns provider-level configuration.
+            .AddSingleton<DbDataSource>(_ =>
+                SqlClientFactory.Instance.CreateDataSource(connectionString))
+
             // Add common FluentMigrator services
             .AddFluentMigratorCore()
             .ConfigureRunner(rb => rb
                 // Add database support (choose your provider)
                 .AddSqlServer()
-                // Set the connection string
-                .WithGlobalConnectionString("Server=.;Database=MyDb;Integrated Security=true")
+                // Use the configured data source for migration connections.
+                .WithDataSource(sp => sp.GetRequiredService<DbDataSource>())
                 // Define the assembly containing the migrations
                 .ScanIn(typeof(AddLogTable).Assembly).For.All())
             // Enable logging to console
@@ -52,25 +61,54 @@ class Program
 
 ## Configuration
 
+> [!NOTE]
+> For .NET 8 and later, prefer configuring a provider `DbDataSource` and passing it to FluentMigrator with `WithDataSource(...)`. `WithGlobalConnectionString(...)` remains supported for existing applications and simpler setups.
+
 The in-process runner offers extensive configuration options for database providers, assembly scanning, processor options, and more.
 
 For comprehensive configuration details, see the [Configuration Guide](/intro/configuration.md).
 
 ### Basic Provider Setup
 ```csharp
-.ConfigureRunner(rb => rb
-    .AddSqlServer()                                    // Database provider
-    .WithGlobalConnectionString(connectionString)      // Connection string
-    .ScanIn(typeof(MyMigration).Assembly).For.All())  // Assembly scanning
+const string connectionString = "Server=.;Database=MyDb;Integrated Security=true";
+
+services
+    // Register the provider data source once in the application container.
+    // The data source stays owned by the application.
+    .AddSingleton<DbDataSource>(_ =>
+        SqlClientFactory.Instance.CreateDataSource(connectionString));
+
+services
+    .AddFluentMigratorCore()
+    .ConfigureRunner(runner => runner
+        // Database provider
+        .AddSqlServer()
+        // Use the configured data source for migration connections.
+        .WithDataSource(sp => sp.GetRequiredService<DbDataSource>())
+        // Assembly scanning
+        .ScanIn(typeof(MyMigration).Assembly).For.Migrations());
 ```
 
 ### Common Configuration Patterns
 ```csharp
-.ConfigureRunner(rb => rb
-    .AddSqlServer()
-    .WithGlobalConnectionString(connectionString)
-    .ScanIn(typeof(Migration1).Assembly, typeof(Migration2).Assembly) // Multiple assemblies
-    .For.All())
+const string connectionString = "Server=.;Database=MyDb;Integrated Security=true";
+
+services
+    // Register the provider data source once in the application container.
+    // The data source stays owned by the application.
+    .AddSingleton<DbDataSource>(_ =>
+        SqlClientFactory.Instance.CreateDataSource(connectionString));
+
+services
+    .AddFluentMigratorCore()
+    .ConfigureRunner(runner => runner
+        // Database provider
+        .AddSqlServer()
+        // Use the configured data source for migration connections.
+        .WithDataSource(sp => sp.GetRequiredService<DbDataSource>())
+        // Scan multiple assemblies for migrations.
+        .ScanIn(typeof(Migration1).Assembly, typeof(Migration2).Assembly)
+        .For.All());
 ```
 
 ## Application Integration
@@ -82,11 +120,18 @@ public class Startup
 {
     public void ConfigureServices(IServiceCollection services)
     {
+        var connectionString = Configuration.GetConnectionString("DefaultConnection");
+
+        // Register the provider data source once in the application container.
+        // The data source stays owned by the application.
+        services.AddSingleton<DbDataSource>(_ =>
+            SqlClientFactory.Instance.CreateDataSource(connectionString));
+
         // Add FluentMigrator
         services.AddFluentMigratorCore()
             .ConfigureRunner(rb => rb
                 .AddSqlServer()
-                .WithGlobalConnectionString(Configuration.GetConnectionString("DefaultConnection"))
+                .WithDataSource(sp => sp.GetRequiredService<DbDataSource>())
                 .ScanIn(typeof(AddUserTable).Assembly).For.All())
             .AddLogging(lb => lb.AddFluentMigratorConsole());
     }
@@ -128,10 +173,18 @@ class Program
         Host.CreateDefaultBuilder(args)
             .ConfigureServices((context, services) =>
             {
+                var connectionString 
+                    = context.Configuration.GetConnectionString("DefaultConnection");
+
+                // Register the provider data source once in the application container.
+                // The data source stays owned by the application.
+                services.AddSingleton<DbDataSource>(_ =>
+                    SqlClientFactory.Instance.CreateDataSource(connectionString));
+
                 services.AddFluentMigratorCore()
                     .ConfigureRunner(rb => rb
                         .AddSqlServer()
-                        .WithGlobalConnectionString(context.Configuration.GetConnectionString("DefaultConnection"))
+                        .WithDataSource(sp => sp.GetRequiredService<DbDataSource>())
                         .ScanIn(typeof(MyMigration).Assembly).For.All());
             });
 }

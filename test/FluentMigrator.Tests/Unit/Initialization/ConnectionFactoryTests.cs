@@ -81,6 +81,134 @@ namespace FluentMigrator.Tests.Unit.Initialization
         }
 
         [Test]
+        public void WithGlobalConnectionStringCanBeUsedByConnectionFactory()
+        {
+            var createdConnectionCount = 0;
+
+            using (var serviceProvider = CreateProviderServiceProvider(runnerBuilder =>
+            {
+                runnerBuilder.WithGlobalConnectionString(IntegrationTestOptions.SQLite.ConnectionString);
+
+                runnerBuilder.WithConnectionFactory(serviceProvider =>
+                {
+                    createdConnectionCount++;
+
+                    var connectionStringAccessor =
+                        serviceProvider.GetRequiredService<IConnectionStringAccessor>();
+
+                    return new SqliteConnection(connectionStringAccessor.ConnectionString);
+                });
+            }))
+            using (var scope = serviceProvider.CreateScope())
+            {
+                var runner = scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
+
+                runner.MigrateUp(CreateFactoryConnectionTable.Version);
+
+                using (Assert.EnterMultipleScope())
+                {
+                    Assert.That(
+                        createdConnectionCount,
+                        Is.GreaterThan(0),
+                        "The configured connection factory should have been used.");
+
+                    Assert.That(
+                        TableExists(CreateFactoryConnectionTable.TableName),
+                        Is.True,
+                        "The migration should execute against a connection created by the factory using the global connection string.");
+                }
+
+                runner.MigrateDown(0);
+            }
+        }
+
+        [Test]
+        public void WithGlobalConnectionStringDelegateCanBeUsedByConnectionFactory()
+        {
+            var createdConnectionCount = 0;
+
+            using (var serviceProvider = CreateProviderServiceProvider(runnerBuilder =>
+            {
+                runnerBuilder.WithGlobalConnectionString(_ => IntegrationTestOptions.SQLite.ConnectionString);
+
+                runnerBuilder.WithConnectionFactory(serviceProvider =>
+                {
+                    createdConnectionCount++;
+
+                    var connectionStringAccessor =
+                        serviceProvider.GetRequiredService<IConnectionStringAccessor>();
+
+                    return new SqliteConnection(connectionStringAccessor.ConnectionString);
+                });
+            }))
+            using (var scope = serviceProvider.CreateScope())
+            {
+                var runner = scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
+
+                runner.MigrateUp(CreateFactoryConnectionTable.Version);
+
+                using (Assert.EnterMultipleScope())
+                {
+                    Assert.That(
+                        createdConnectionCount,
+                        Is.GreaterThan(0),
+                        "The configured connection factory should have been used.");
+
+                    Assert.That(
+                        TableExists(CreateFactoryConnectionTable.TableName),
+                        Is.True,
+                        "The migration should execute against a connection created by the factory using the global connection string delegate.");
+                }
+
+                runner.MigrateDown(0);
+            }
+        }
+
+        [Test]
+        public void WithGlobalConnectionStringAndConnectionFactoryUsesFactoryConnection()
+        {
+            var should_not_create_database_path = Path.Combine(_tempDataDirectory, "not-used", "ShouldNotBeUsed.db");
+            var createdConnectionCount = 0;
+
+            using (var serviceProvider = CreateProviderServiceProvider(runnerBuilder =>
+            {
+                runnerBuilder.WithGlobalConnectionString(CreateUnusedConnectionString(should_not_create_database_path));
+
+                runnerBuilder.WithConnectionFactory(_ =>
+                {
+                    createdConnectionCount++;
+                    return CreateConnection();
+                });
+            }))
+            using (var scope = serviceProvider.CreateScope())
+            {
+                var runner = scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
+
+                runner.MigrateUp(CreateFactoryConnectionTable.Version);
+
+                using (Assert.EnterMultipleScope())
+                {
+                    Assert.That(
+                        createdConnectionCount,
+                        Is.GreaterThan(0),
+                        "The configured connection factory should have been used.");
+
+                    Assert.That(
+                        TableExists(CreateFactoryConnectionTable.TableName),
+                        Is.True,
+                        "The migration should execute against the factory-created connection, not the global connection string.");
+
+                    Assert.That(
+                        File.Exists(should_not_create_database_path),
+                        Is.False,
+                        "The global connection string should not have been used.");
+                }
+
+                runner.MigrateDown(0);
+            }
+        }
+
+        [Test]
         public void WithConnectionFactoryUsesFactoryWhenConnectionStringIsEmpty()
         {
             var createdConnectionCount = 0;
@@ -179,6 +307,35 @@ namespace FluentMigrator.Tests.Unit.Initialization
             }
         }
 
+        [Test]
+        public void CustomMigrationConnectionFactoryCanBeRegisteredDirectly()
+        {
+            var connectionFactory = new TestSqliteMigrationConnectionFactory(CreateConnection);
+            using (var serviceProvider = CreateProviderServiceProvider(
+                _ => { },
+                services => services.AddScoped<IMigrationConnectionFactory>(_ => connectionFactory)))
+            using (var scope = serviceProvider.CreateScope())
+            {
+                var runner = scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
+
+                runner.MigrateUp(CreateFactoryConnectionTable.Version);
+
+                using (Assert.EnterMultipleScope())
+                {
+                    Assert.That(
+                        connectionFactory.CreateConnectionCount,
+                        Is.GreaterThan(0),
+                        "The registered IMigrationConnectionFactory should have been used.");
+
+                    Assert.That(
+                        TableExists(CreateFactoryConnectionTable.TableName),
+                        Is.True);
+                }
+
+                runner.MigrateDown(0);
+            }
+        }
+
         private static ServiceProvider CreateProviderServiceProvider(
             Action<IMigrationRunnerBuilder> configureRunner,
             Action<IServiceCollection> configureServices = null)
@@ -214,6 +371,18 @@ namespace FluentMigrator.Tests.Unit.Initialization
         private static ServiceProvider CreateProviderWithGlobalConnectionString()
         {
             return CreateProviderServiceProvider(x => x.WithGlobalConnectionString(IntegrationTestOptions.SQLite.ConnectionString));
+        }
+
+        private string CreateUnusedConnectionString(string databasePath)
+        {
+            var builder = new SqliteConnectionStringBuilder
+            {
+                DataSource = databasePath,
+                Mode = SqliteOpenMode.ReadOnly,
+                Pooling = false,
+            };
+
+            return builder.ToString();
         }
 
         private SqliteConnection CreateConnection()
@@ -443,6 +612,28 @@ namespace FluentMigrator.Tests.Unit.Initialization
             }
         }
 
+        private sealed class TestSqliteMigrationConnectionFactory : IMigrationConnectionFactory
+        {
+            private readonly Func<IDbConnection> _createConnection;
+
+            public TestSqliteMigrationConnectionFactory(Func<IDbConnection> createConnection)
+            {
+                _createConnection = createConnection
+                    ?? throw new ArgumentNullException(nameof(createConnection));
+            }
+
+            public int CreateConnectionCount { get; private set; }
+
+            public bool HasConnection => true;
+
+            public IDbConnection CreateConnection(DbProviderFactory providerFactory)
+            {
+                CreateConnectionCount++;
+
+                return _createConnection();
+            }
+        }
+
 #if NET7_0_OR_GREATER
         [Test]
         public void WithDataSourceThrowsWhenBuilderIsNull()
@@ -522,6 +713,113 @@ namespace FluentMigrator.Tests.Unit.Initialization
                 Assert.That(
                     ex.Message,
                     Is.EqualTo("The configured data source factory returned null."));
+            }
+        }
+
+        [Test]
+        public void WithGlobalConnectionStringAndDataSourceUsesDataSourceConnection()
+        {
+            var should_not_create_database_path = Path.Combine(_tempDataDirectory, "not-used", "ShouldNotBeUsed.db");
+            var createdDataSourceCount = 0;
+            var createdConnectionCount = 0;
+
+            using (var serviceProvider = CreateProviderServiceProvider(runnerBuilder =>
+            {
+                runnerBuilder.WithGlobalConnectionString(CreateUnusedConnectionString(should_not_create_database_path));
+
+                runnerBuilder.WithDataSource(_ =>
+                {
+                    createdDataSourceCount++;
+
+                    return new TestDbDataSource(() =>
+                    {
+                        createdConnectionCount++;
+                        return CreateConnection();
+                    });
+                });
+            }))
+            using (var scope = serviceProvider.CreateScope())
+            {
+                var runner = scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
+
+                runner.MigrateUp(CreateFactoryConnectionTable.Version);
+
+                using (Assert.EnterMultipleScope())
+                {
+                    Assert.That(
+                        createdDataSourceCount,
+                        Is.GreaterThan(0),
+                        "The configured data source factory should have been used.");
+
+                    Assert.That(
+                        createdConnectionCount,
+                        Is.GreaterThan(0),
+                        "The configured data source should have created a connection.");
+
+                    Assert.That(
+                        TableExists(CreateFactoryConnectionTable.TableName),
+                        Is.True,
+                        "The migration should execute against the data source-created connection, not the global connection string.");
+
+                    Assert.That(
+                        File.Exists(should_not_create_database_path),
+                        Is.False,
+                        "The global connection string should not have been used.");
+                }
+
+                runner.MigrateDown(0);
+            }
+        }
+
+        [Test]
+        public void WithGlobalConnectionStringCanBeUsedByDataSourceFactory()
+        {
+            var createdDataSourceCount = 0;
+            var createdConnectionCount = 0;
+
+            using (var serviceProvider = CreateProviderServiceProvider(runnerBuilder =>
+            {
+                runnerBuilder.WithGlobalConnectionString(IntegrationTestOptions.SQLite.ConnectionString);
+
+                runnerBuilder.WithDataSource(serviceProvider =>
+                {
+                    createdDataSourceCount++;
+
+                    var connectionStringAccessor =
+                        serviceProvider.GetRequiredService<IConnectionStringAccessor>();
+
+                    return new TestDbDataSource(() =>
+                    {
+                        createdConnectionCount++;
+                        return new SqliteConnection(connectionStringAccessor.ConnectionString);
+                    });
+                });
+            }))
+            using (var scope = serviceProvider.CreateScope())
+            {
+                var runner = scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
+
+                runner.MigrateUp(CreateFactoryConnectionTable.Version);
+
+                using (Assert.EnterMultipleScope())
+                {
+                    Assert.That(
+                        createdDataSourceCount,
+                        Is.GreaterThan(0),
+                        "The configured data source factory should have been used.");
+
+                    Assert.That(
+                        createdConnectionCount,
+                        Is.GreaterThan(0),
+                        "The configured data source should have created a connection.");
+
+                    Assert.That(
+                        TableExists(CreateFactoryConnectionTable.TableName),
+                        Is.True,
+                        "The migration should execute against a connection created by the data source using the global connection string.");
+                }
+
+                runner.MigrateDown(0);
             }
         }
 
