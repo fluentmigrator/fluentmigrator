@@ -31,7 +31,7 @@ namespace FluentMigrator
         /// <param name="sqlText">The SQL script where the tokens will be replaced</param>
         /// <param name="parameters">The tokens to be replaced</param>
         /// <returns>The SQL script with the replaced tokens</returns>
-        public static string ReplaceSqlScriptTokens([StringSyntax(StringSyntaxAttribute.Sql)] string sqlText, IDictionary<string, string> parameters)
+        public static string ReplaceSqlScriptTokens([StringSyntax("sql")] string sqlText, IDictionary<string, string> parameters)
         {
             // Are parameters set?
             if (parameters != null && parameters.Count != 0)
