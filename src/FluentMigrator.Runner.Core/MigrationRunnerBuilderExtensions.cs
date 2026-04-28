@@ -365,9 +365,24 @@ namespace FluentMigrator.Runner
             this IMigrationRunnerBuilder builder,
             [NotNull] Func<IServiceProvider, DbDataSource> dataSourceFactory)
         {
+            if (builder == null)
+            {
+                throw new ArgumentNullException(nameof(builder));
+            }
+
+            if (dataSourceFactory == null)
+            {
+                throw new ArgumentNullException(nameof(dataSourceFactory));
+            }
+
             return builder.WithConnectionFactory(sp =>
             {
                 var dataSource = dataSourceFactory(sp);
+                if (dataSource == null)
+                {
+                    throw new InvalidOperationException("The configured data source factory returned null.");
+                }
+
                 return dataSourceFactory(sp).CreateConnection();
             });
         }

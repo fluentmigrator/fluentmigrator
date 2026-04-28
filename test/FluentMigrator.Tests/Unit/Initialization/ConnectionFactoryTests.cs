@@ -167,12 +167,12 @@ namespace FluentMigrator.Tests.Unit.Initialization
         [Test]
         public void WithGlobalConnectionStringAndConnectionFactoryUsesFactoryConnection()
         {
-            var should_not_create_database_path = Path.Combine(_tempDataDirectory, "not-used", "ShouldNotBeUsed.db");
+            var shouldNotCreateDatabasePath = Path.Combine(_tempDataDirectory, "not-used", "ShouldNotBeUsed.db");
             var createdConnectionCount = 0;
 
             using (var serviceProvider = CreateProviderServiceProvider(runnerBuilder =>
             {
-                runnerBuilder.WithGlobalConnectionString(CreateUnusedConnectionString(should_not_create_database_path));
+                runnerBuilder.WithGlobalConnectionString(CreateUnusedConnectionString(shouldNotCreateDatabasePath));
 
                 runnerBuilder.WithConnectionFactory(_ =>
                 {
@@ -199,7 +199,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
                         "The migration should execute against the factory-created connection, not the global connection string.");
 
                     Assert.That(
-                        File.Exists(should_not_create_database_path),
+                        File.Exists(shouldNotCreateDatabasePath),
                         Is.False,
                         "The global connection string should not have been used.");
                 }
@@ -634,6 +634,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
             }
         }
 
+        // DbDataSource was introduced in .NET 7 and is not supported on .NET Framework.
 #if NET7_0_OR_GREATER
         [Test]
         public void WithDataSourceThrowsWhenBuilderIsNull()
@@ -705,10 +706,10 @@ namespace FluentMigrator.Tests.Unit.Initialization
             using (var serviceProvider = CreateProviderWithDataSource(_ => null))
             using (var scope = serviceProvider.CreateScope())
             {
-                var runner = scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
+                var connectionFactory = scope.ServiceProvider.GetRequiredService<IMigrationConnectionFactory>();
 
                 var ex = Assert.Throws<InvalidOperationException>(
-                    () => runner.MigrateUp(CreateFactoryConnectionTable.Version));
+                    () => connectionFactory.CreateConnection(SqliteFactory.Instance));
 
                 Assert.That(
                     ex.Message,
@@ -719,13 +720,13 @@ namespace FluentMigrator.Tests.Unit.Initialization
         [Test]
         public void WithGlobalConnectionStringAndDataSourceUsesDataSourceConnection()
         {
-            var should_not_create_database_path = Path.Combine(_tempDataDirectory, "not-used", "ShouldNotBeUsed.db");
+            var shouldNotCreateDatabasePath = Path.Combine(_tempDataDirectory, "not-used", "ShouldNotBeUsed.db");
             var createdDataSourceCount = 0;
             var createdConnectionCount = 0;
 
             using (var serviceProvider = CreateProviderServiceProvider(runnerBuilder =>
             {
-                runnerBuilder.WithGlobalConnectionString(CreateUnusedConnectionString(should_not_create_database_path));
+                runnerBuilder.WithGlobalConnectionString(CreateUnusedConnectionString(shouldNotCreateDatabasePath));
 
                 runnerBuilder.WithDataSource(_ =>
                 {
@@ -762,7 +763,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
                         "The migration should execute against the data source-created connection, not the global connection string.");
 
                     Assert.That(
-                        File.Exists(should_not_create_database_path),
+                        File.Exists(shouldNotCreateDatabasePath),
                         Is.False,
                         "The global connection string should not have been used.");
                 }
