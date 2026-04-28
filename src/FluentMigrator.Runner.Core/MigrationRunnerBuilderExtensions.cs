@@ -383,7 +383,7 @@ namespace FluentMigrator.Runner
                     throw new InvalidOperationException("The configured data source factory returned null.");
                 }
 
-                return dataSourceFactory(sp).CreateConnection();
+                return dataSource.CreateConnection();
             });
         }
 #endif
