@@ -129,27 +129,35 @@ jobs:
       uses: danielpalme/ReportGenerator-GitHub-Action@v5.5.0
       if: '!cancelled()'
       with:
-        reports: "**/*.cobertura.xml"
-        targetdir: "${{ github.workspace }}"
+        reports: "${{ github.workspace }}/**/TestResults-${{ matrix.dotnet-tfm }}/**/coverage.cobertura.xml"
+        targetdir: "${{ github.workspace }}/coverage"
         reporttypes: "Cobertura"
+        reportfile: "Cobertura.xml"
         verbosity: "Info"
         title: "Code Coverage"
         tag: "${{ github.run_number }}_${{ github.run_id }}"
         toolpath: "reportgeneratortool"
+
+    - name: Verify coverage file exists
+      if: matrix.os == 'ubuntu-latest' && (!cancelled())
+      run: |
+        echo "=== Coverage directory listing ==="
+        ls -la "${{ github.workspace }}/coverage/" || true
+        test -f "${{ github.workspace }}/coverage/Cobertura.xml"
 
     - name: Upload Combined Coverage XML
       uses: actions/upload-artifact@v4
       if: '!cancelled()'
       with:
         name: coverage-${{ matrix.os }}-${{ matrix.dotnet-tfm }}
-        path: ${{ github.workspace }}/Cobertura.xml
+        path: ${{ github.workspace }}/coverage/Cobertura.xml
         retention-days: 5
 
     - name: Publish Code Coverage Report
       uses: irongut/CodeCoverageSummary@v1.3.0
       if: matrix.os == 'ubuntu-latest' && (!cancelled())
       with:
-        filename: "Cobertura.xml"
+        filename: "${{ github.workspace }}/coverage/Cobertura.xml"
         badge: true
         fail_below_min: false
         format: markdown
@@ -164,7 +172,7 @@ jobs:
       if: github.event_name == 'pull_request'
       with:
         recreate: true
-        path: code-coverage-results.md
+        path: ${{ github.workspace }}/code-coverage-results.md
 
     - name: Upload Test Result Files
       uses: actions/upload-artifact@v4

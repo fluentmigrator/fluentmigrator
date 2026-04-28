@@ -74,7 +74,7 @@ steps:
   inputs:
     command: 'test'
     projects: '$(solution)'
-    arguments: '--configuration $(buildConfiguration) --no-build --no-restore'
+    arguments: '--configuration $(buildConfiguration) --no-build'
 
 - task: PublishBuildArtifacts@1
   inputs:
