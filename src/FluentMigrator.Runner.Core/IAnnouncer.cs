@@ -49,7 +49,7 @@ namespace FluentMigrator.Runner
         /// Logs a SQL message.
         /// </summary>
         /// <param name="sql"></param>
-        void Sql([StringSyntax(StringSyntaxAttribute.Sql)] string sql);
+        void Sql([StringSyntax("sql")] string sql);
         /// <summary>
         /// Logs the elapsed time.
         /// </summary>
