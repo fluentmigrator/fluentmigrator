@@ -61,11 +61,6 @@ namespace System.Diagnostics.CodeAnalysis
         /// Gets optional arguments associated with the specific syntax employed.
         /// </summary>
         public object[] Arguments { get; }
-
-        /// <summary>
-        /// The syntax identifier for strings containing SQL.
-        /// </summary>
-        public const string Sql = "sql";
     }
 }
 #endif
