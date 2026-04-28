@@ -32,7 +32,7 @@ namespace FluentMigrator.Expressions
         /// Gets or sets the SQL statement to be executed
         /// </summary>
         [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.SqlStatementCannotBeNullOrEmpty))]
-        [StringSyntax(StringSyntaxAttribute.Sql)]
+        [StringSyntax("sql")]
         public virtual string SqlStatement { get; set; }
 
         /// <summary>
