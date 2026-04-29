@@ -38,7 +38,7 @@ The databases evaluated below were chosen because they explicitly advertise Flig
 | **Dremio** | Data lakehouse / query engine | GA (Dremio v22+) |
 | **Spice.AI OSS (Spice OSS)** | Data acceleration / federation | GA – Flight SQL is the primary interface |
 | **InfluxDB v3 (Edge / Cloud Serverless)** | Time-series | GA |
-| **Apache Datafusion (standalone server)** | Embeddable query engine | GA via `datafusion-flight-sql-server` |
+| **Apache DataFusion (standalone server)** | Embeddable query engine | GA via `datafusion-flight-sql-server` |
 | **DuckDB (server mode)** | Embedded OLAP | Community (`duckdb-flight-sql-server`) – see separate ADR |
 
 ---
