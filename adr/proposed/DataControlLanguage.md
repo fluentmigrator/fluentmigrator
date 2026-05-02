@@ -249,31 +249,227 @@ IfDatabase(ProcessorIdConstants.SqlServer)
 
 ### Proposed Expression Classes
 
+The following diagrams show the builder chain for each DCL operation. Each arrow (`→`) indicates the interface returned by a method call.
+
 ```
-IGrantPrivilegeExpressionBuilder
-  .OnTable(tableName)         → IGrantObjectExpressionBuilder
-  .OnSchema(schemaName)       → IGrantObjectExpressionBuilder
-  .OnDatabase(databaseName)   → IGrantObjectExpressionBuilder
-  .ToUser(userName)           → IGrantFinalBuilder
-  .ToRole(roleName)           → IGrantFinalBuilder
-  .WithGrantOption()          → terminates chain
+// GRANT privilege
+Grant.Privilege(privilege)   → IGrantPrivilegeExpressionBuilder
+  .OnTable(tableName)        → IGrantObjectExpressionBuilder
+  .OnSchema(schemaName)      → IGrantObjectExpressionBuilder
+  .OnDatabase(databaseName)  → IGrantObjectExpressionBuilder
 
-IGrantRoleExpressionBuilder
-  .ToUser(userName)           → IGrantFinalBuilder
-  .ToRole(roleName)           → IGrantFinalBuilder
-  .WithAdminOption()          → terminates chain
+IGrantObjectExpressionBuilder
+  .ToUser(userName)          → IGrantFinalBuilder
+  .ToRole(roleName)          → IGrantFinalBuilder
+  .ToPublic()                → IGrantFinalBuilder
 
-IRevokePrivilegeExpressionBuilder
-  .OnTable(tableName)         → IRevokeObjectExpressionBuilder
-  .OnSchema(schemaName)       → IRevokeObjectExpressionBuilder
-  .GrantOptionFor(privilege)  → IRevokeObjectExpressionBuilder (removes WITH GRANT OPTION only)
-  .FromUser(userName)         → IRevokeFinalBuilder
-  .FromRole(roleName)         → IRevokeFinalBuilder
+IGrantFinalBuilder
+  .WithGrantOption()         (terminates chain)
 
-IDenyPrivilegeExpressionBuilder  // SQL Server only
-  .OnTable(tableName)         → IDenyObjectExpressionBuilder
-  .ToUser(userName)           → IDenyFinalBuilder
-  .ToRole(roleName)           → IDenyFinalBuilder
+// GRANT role
+Grant.Role(roleName)         → IGrantRoleExpressionBuilder
+  .ToUser(userName)          → IGrantRoleFinalBuilder
+  .ToRole(roleName)          → IGrantRoleFinalBuilder
+
+IGrantRoleFinalBuilder
+  .WithAdminOption()         (terminates chain)
+
+// REVOKE privilege
+Revoke.Privilege(privilege)        → IRevokePrivilegeExpressionBuilder
+  .OnTable(tableName)              → IRevokeObjectExpressionBuilder
+  .OnSchema(schemaName)            → IRevokeObjectExpressionBuilder
+  .OnDatabase(databaseName)        → IRevokeObjectExpressionBuilder
+  .GrantOptionFor(privilege)       → IRevokeObjectExpressionBuilder
+
+IRevokeObjectExpressionBuilder
+  .FromUser(userName)              → IRevokeFinalBuilder
+  .FromRole(roleName)              → IRevokeFinalBuilder
+  .FromPublic()                    → IRevokeFinalBuilder
+
+IRevokeFinalBuilder
+  // No mandatory methods — statement is complete.
+  // Provider-specific options (CASCADE, RESTRICT) are
+  // exposed as extension methods from provider packages.
+
+// REVOKE role
+Revoke.Role(roleName)              → IRevokeRoleExpressionBuilder
+  .FromUser(userName)              → IRevokeFinalBuilder
+  .FromRole(roleName)              → IRevokeFinalBuilder
+
+// DENY (SQL Server only)
+Deny.Privilege(privilege)    → IDenyPrivilegeExpressionBuilder
+  .OnTable(tableName)        → IDenyObjectExpressionBuilder
+
+IDenyObjectExpressionBuilder
+  .ToUser(userName)          → IDenyFinalBuilder
+  .ToRole(roleName)          → IDenyFinalBuilder
+
+IDenyFinalBuilder
+  .Cascade()                 (terminates chain — SQL Server CASCADE DENY)
+```
+
+### Builder Interface Definitions
+
+```csharp
+// ── Grant privilege ──────────────────────────────────────────────────────────
+
+/// <summary>Fluent entry point for GRANT privilege statements.</summary>
+public interface IGrantPrivilegeExpressionBuilder : IFluentSyntax
+{
+    /// <summary>Specifies the table on which the privilege is granted.</summary>
+    IGrantObjectExpressionBuilder OnTable(string tableName);
+
+    /// <summary>Specifies the schema on which the privilege is granted.</summary>
+    IGrantObjectExpressionBuilder OnSchema(string schemaName);
+
+    /// <summary>Specifies the database on which the privilege is granted.</summary>
+    IGrantObjectExpressionBuilder OnDatabase(string databaseName);
+}
+
+/// <summary>Specifies the principal that receives the privilege.</summary>
+public interface IGrantObjectExpressionBuilder : IFluentSyntax
+{
+    /// <summary>Grants the privilege to the named user.</summary>
+    IGrantFinalBuilder ToUser(string userName);
+
+    /// <summary>Grants the privilege to the named role.</summary>
+    IGrantFinalBuilder ToRole(string roleName);
+
+    /// <summary>Grants the privilege to PUBLIC (all users).</summary>
+    IGrantFinalBuilder ToPublic();
+}
+
+/// <summary>
+/// Optional terminal step after a privilege GRANT. The GRANT statement
+/// is complete without calling any method on this interface.
+/// </summary>
+public interface IGrantFinalBuilder : IFluentSyntax
+{
+    /// <summary>
+    /// Appends WITH GRANT OPTION, allowing the grantee to re-grant
+    /// the privilege to other principals. Supported by all DCL-capable
+    /// providers.
+    /// </summary>
+    void WithGrantOption();
+}
+
+// ── Grant role ───────────────────────────────────────────────────────────────
+
+/// <summary>Fluent entry point for GRANT role statements.</summary>
+public interface IGrantRoleExpressionBuilder : IFluentSyntax
+{
+    /// <summary>Grants the role to the named user.</summary>
+    IGrantRoleFinalBuilder ToUser(string userName);
+
+    /// <summary>
+    /// Grants the role to another named role (where the provider supports
+    /// role-to-role grants, e.g. PostgreSQL, Snowflake).
+    /// </summary>
+    IGrantRoleFinalBuilder ToRole(string roleName);
+}
+
+/// <summary>
+/// Optional terminal step after a role GRANT. The GRANT statement
+/// is complete without calling any method on this interface.
+/// </summary>
+public interface IGrantRoleFinalBuilder : IFluentSyntax
+{
+    /// <summary>
+    /// Appends WITH ADMIN OPTION, allowing the grantee to administer
+    /// (grant or revoke) the role. Supported by all DCL-capable providers.
+    /// </summary>
+    void WithAdminOption();
+}
+
+// ── Revoke privilege ─────────────────────────────────────────────────────────
+
+/// <summary>Fluent entry point for REVOKE privilege statements.</summary>
+public interface IRevokePrivilegeExpressionBuilder : IFluentSyntax
+{
+    /// <summary>Specifies the table from which the privilege is revoked.</summary>
+    IRevokeObjectExpressionBuilder OnTable(string tableName);
+
+    /// <summary>Specifies the schema from which the privilege is revoked.</summary>
+    IRevokeObjectExpressionBuilder OnSchema(string schemaName);
+
+    /// <summary>Specifies the database from which the privilege is revoked.</summary>
+    IRevokeObjectExpressionBuilder OnDatabase(string databaseName);
+
+    /// <summary>
+    /// Removes only the GRANT OPTION for the named privilege, leaving the
+    /// underlying privilege intact (emits REVOKE GRANT OPTION FOR ...).
+    /// </summary>
+    IRevokeObjectExpressionBuilder GrantOptionFor(string privilege);
+}
+
+/// <summary>Specifies the principal from whom the privilege is revoked.</summary>
+public interface IRevokeObjectExpressionBuilder : IFluentSyntax
+{
+    /// <summary>Revokes the privilege from the named user.</summary>
+    IRevokeFinalBuilder FromUser(string userName);
+
+    /// <summary>Revokes the privilege from the named role.</summary>
+    IRevokeFinalBuilder FromRole(string roleName);
+
+    /// <summary>Revokes the privilege from PUBLIC.</summary>
+    IRevokeFinalBuilder FromPublic();
+}
+
+/// <summary>
+/// Terminal marker interface for a REVOKE statement. The statement is
+/// complete at this point; no further methods are required.
+/// Provider-specific options such as CASCADE or RESTRICT are surfaced
+/// as extension methods on this interface from the relevant provider
+/// packages (e.g. FluentMigrator.Extensions.Postgres).
+/// </summary>
+public interface IRevokeFinalBuilder : IFluentSyntax { }
+
+// ── Revoke role ──────────────────────────────────────────────────────────────
+
+/// <summary>Fluent entry point for REVOKE role statements.</summary>
+public interface IRevokeRoleExpressionBuilder : IFluentSyntax
+{
+    /// <summary>Revokes the role from the named user.</summary>
+    IRevokeFinalBuilder FromUser(string userName);
+
+    /// <summary>Revokes the role from another named role.</summary>
+    IRevokeFinalBuilder FromRole(string roleName);
+}
+
+// ── Deny (SQL Server only) ───────────────────────────────────────────────────
+
+/// <summary>
+/// Fluent entry point for DENY privilege statements. SQL Server only —
+/// use inside an <c>IfDatabase(ProcessorIdConstants.SqlServer)</c> block.
+/// </summary>
+public interface IDenyPrivilegeExpressionBuilder : IFluentSyntax
+{
+    /// <summary>Specifies the table on which the privilege is denied.</summary>
+    IDenyObjectExpressionBuilder OnTable(string tableName);
+}
+
+/// <summary>Specifies the principal to whom the privilege is denied.</summary>
+public interface IDenyObjectExpressionBuilder : IFluentSyntax
+{
+    /// <summary>Denies the privilege to the named user.</summary>
+    IDenyFinalBuilder ToUser(string userName);
+
+    /// <summary>Denies the privilege to the named role.</summary>
+    IDenyFinalBuilder ToRole(string roleName);
+}
+
+/// <summary>
+/// Optional terminal step after a DENY. The statement is complete
+/// without calling any method on this interface.
+/// </summary>
+public interface IDenyFinalBuilder : IFluentSyntax
+{
+    /// <summary>
+    /// Appends CASCADE, propagating the DENY to any principals that were
+    /// granted the privilege by the denied principal. SQL Server only.
+    /// </summary>
+    void Cascade();
+}
 ```
 
 ### Column-Level Privileges
