@@ -69,7 +69,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
             IntegrationTestOptions.Hana.IgnoreIfNotEnabled();
 
             var serivces = ServiceCollectionExtensions.CreateServices()
-                .ConfigureRunner(builder => builder.AddHana())
+                .ConfigureRunner(builder => builder.AddHana8())
                 .AddScoped<IConnectionStringReader>(
                     _ => new PassThroughConnectionStringReader(IntegrationTestOptions.Hana.ConnectionString));
             ServiceProvider = serivces.BuildServiceProvider();

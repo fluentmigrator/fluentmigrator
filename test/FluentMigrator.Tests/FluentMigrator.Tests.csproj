@@ -78,17 +78,6 @@
     <ProjectReference Include="..\..\src\FluentMigrator.Runner.SQLite\FluentMigrator.Runner.SQLite.csproj" />
     <ProjectReference Include="..\..\src\FluentMigrator.Runner.SqlServer\FluentMigrator.Runner.SqlServer.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Reference Include="Sap.Data.Hana.v4.5">
-      <HintPath>..\..\lib\Hana\ado.net\v4.5\Sap.Data.Hana.v4.5.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="../../lib/Hana/*.*">
-      <Link>%(Filename)%(Extension)</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
   <ItemGroup Condition=" '$(MSBuildRuntimeType)' == 'Core' or '$(OS)' != 'Windows_NT' ">
     <Compile Remove="Integration\Processors\Jet\**" />
     <Compile Remove="Helpers\JetTestTable.cs" />

@@ -6,7 +6,6 @@ using System.Text;
 using FluentMigrator.Generation;
 using FluentMigrator.Runner.Generators.Hana;
 using FluentMigrator.Runner.Processors.Hana;
-using Sap.Data.Hana;
 
 namespace FluentMigrator.Tests.Helpers
 {
@@ -14,10 +13,10 @@ namespace FluentMigrator.Tests.Helpers
     {
         private readonly IQuoter _quoter = new HanaQuoter();
         private readonly string _schemaName;
-        public HanaConnection Connection { get; private set; }
+        public IDbConnection Connection { get; private set; }
         public string Name { get; set; }
         public string NameWithSchema { get; set; }
-        public HanaTransaction Transaction { get; private set; }
+        public IDbTransaction Transaction { get; private set; }
 
         public HanaTestTable(HanaProcessor processor, string schemaName, params string[] columnDefinitions)
         {
@@ -39,8 +38,8 @@ namespace FluentMigrator.Tests.Helpers
         {
             NameWithSchema = _quoter.QuoteTableName(Name, _schemaName);
 
-            Connection = (HanaConnection)processor.Connection;
-            Transaction = (HanaTransaction)processor.Transaction;
+            Connection = processor.Connection;
+            Transaction = processor.Transaction;
 
             if (Connection.State != ConnectionState.Open)
                 Connection.Open();
@@ -76,8 +75,12 @@ namespace FluentMigrator.Tests.Helpers
             sb.Append(")");
 
             var s = sb.ToString();
-            using (var command = new HanaCommand(s, Connection, Transaction))
+            using (var command = Connection.CreateCommand())
+            {
+                command.CommandText = s;
+                command.Transaction = Transaction;
                 command.ExecuteNonQuery();
+            }
         }
 
         public void Drop()
@@ -88,15 +91,23 @@ namespace FluentMigrator.Tests.Helpers
             if (!string.IsNullOrEmpty(quotedSchema))
                 sb.AppendFormat(";DROP SCHEMA {0}", quotedSchema);
 
-            using (var command = new HanaCommand(sb.ToString(), Connection, Transaction))
+            using (var command = Connection.CreateCommand())
+            {
+                command.CommandText = sb.ToString();
+                command.Transaction = Transaction;
                 command.ExecuteNonQuery();
+            }
         }
 
         public void WithDefaultValueOn(string column)
         {
             const int defaultValue = 1;
-            using (var command = new HanaCommand(string.Format(" ALTER TABLE {0} ALTER {1} SET DEFAULT {2}", _quoter.QuoteTableName(Name, _schemaName), _quoter.QuoteColumnName(column), defaultValue), Connection, Transaction))
+            using (var command = Connection.CreateCommand())
+            {
+                command.CommandText = string.Format(" ALTER TABLE {0} ALTER {1} SET DEFAULT {2}", _quoter.QuoteTableName(Name, _schemaName), _quoter.QuoteColumnName(column), defaultValue);
+                command.Transaction = Transaction;
                 command.ExecuteNonQuery();
+            }
         }
 
         public string WithIndexOn(string column)
@@ -107,8 +118,12 @@ namespace FluentMigrator.Tests.Helpers
 
             var quotedIndexName = _quoter.QuoteIndexName(indexName);
 
-            using (var command = new HanaCommand(string.Format("CREATE INDEX {0} ON {1} ({2})", quotedIndexName, quotedObjectName, _quoter.QuoteColumnName(column)), Connection, Transaction))
+            using (var command = Connection.CreateCommand())
+            {
+                command.CommandText = string.Format("CREATE INDEX {0} ON {1} ({2})", quotedIndexName, quotedObjectName, _quoter.QuoteColumnName(column));
+                command.Transaction = Transaction;
                 command.ExecuteNonQuery();
+            }
 
             return indexName;
         }
@@ -119,10 +134,12 @@ namespace FluentMigrator.Tests.Helpers
 
         public void WithUniqueConstraintOn(string column, string name)
         {
-            var sb = new StringBuilder();
-            sb.Append(string.Format("ALTER TABLE {0} ADD CONSTRAINT {1} UNIQUE ({2})", _quoter.QuoteTableName(Name), _quoter.QuoteConstraintName(name), _quoter.QuoteColumnName(column)));
-            using (var command = new HanaCommand(sb.ToString(), Connection, Transaction))
+            using (var command = Connection.CreateCommand())
+            {
+                command.CommandText = string.Format("ALTER TABLE {0} ADD CONSTRAINT {1} UNIQUE ({2})", _quoter.QuoteTableName(Name), _quoter.QuoteConstraintName(name), _quoter.QuoteColumnName(column));
+                command.Transaction = Transaction;
                 command.ExecuteNonQuery();
+            }
         }
     }
 }

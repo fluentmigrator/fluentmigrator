@@ -142,7 +142,7 @@ namespace FluentMigrator.Tests.Unit.Runners
                         .AddDotConnectOracle()
                         .AddDotConnectOracle12C()
                         .AddFirebird()
-                        .AddHana()
+                        .AddHana8()
                         .AddJet()
                         .AddMySql()
                         .AddMySql4()

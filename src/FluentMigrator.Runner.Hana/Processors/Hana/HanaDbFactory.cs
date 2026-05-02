@@ -29,7 +29,6 @@ namespace FluentMigrator.Runner.Processors.Hana
     /// This class extends <see cref="FluentMigrator.Runner.Processors.ReflectionBasedDbFactory"/> 
     /// to provide functionality tailored to the SAP HANA database.
     /// </remarks>
-    [Obsolete("Hana support will go away unless someone in the community steps up to provide support.")]
     public class HanaDbFactory : ReflectionBasedDbFactory
     {
         /// <summary>
@@ -63,6 +62,8 @@ namespace FluentMigrator.Runner.Processors.Hana
         {
             yield return new TestEntry("Sap.Data.Hana", "Sap.Data.Hana.HanaFactory");
             yield return new TestEntry("Sap.Data.Hana.v4.5", "Sap.Data.Hana.HanaFactory");
+            yield return new TestEntry("Sap.Data.Hana.v8.0", "Sap.Data.Hana.HanaFactory");
+            yield return new TestEntry("Sap.Data.Hana.v10.0", "Sap.Data.Hana.HanaFactory");
         }
     }
 }

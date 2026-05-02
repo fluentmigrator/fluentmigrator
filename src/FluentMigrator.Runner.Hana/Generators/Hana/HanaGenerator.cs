@@ -33,7 +33,6 @@ namespace FluentMigrator.Runner.Generators.Hana
     /// <summary>
     /// The SAP Hana SQL generator for FluentMigrator.
     /// </summary>
-    [Obsolete("Hana support will go away unless someone in the community steps up to provide support.")]
     public class HanaGenerator : GenericGenerator
     {
         /// <inheritdoc />
