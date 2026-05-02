@@ -49,16 +49,16 @@ The following tables cover the DCL privilege types supported by each provider ac
 
 ##### Table / View Privileges
 
-| Privilege | SQL Server | PostgreSQL | MySQL / MariaDB | Aurora MySQL | Aurora PostgreSQL | D-SQL | Oracle | SQLite | Firebird | DB2 LUW | DB2 iSeries | Snowflake | SAP HANA | Jet (Access) | Redshift |
-|-----------|-----------|------------|-----------------|--------------|-------------------|-------|--------|--------|----------|---------|-------------|-----------|----------|--------------|----------|
-| `SELECT` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ | ⚠️ (UI only) | ✅ |
-| `INSERT` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ | ⚠️ (UI only) | ✅ |
-| `UPDATE` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ | ⚠️ (UI only) | ✅ |
-| `DELETE` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ | ⚠️ (UI only) | ✅ |
-| `REFERENCES` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
-| `TRIGGER` | ✅ | ✅ | ❌ | ❌ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| `TRUNCATE` | ❌ | ✅ (PG 14+) | ❌ | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| `OWNERSHIP` | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ | ❌ | ❌ |
+| Privilege | SQL Server | PostgreSQL | MySQL / MariaDB | Aurora MySQL | Aurora PostgreSQL | D-SQL | Oracle | SQLite | Firebird | DB2 LUW | DB2 iSeries | Snowflake | SAP HANA | Redshift |
+|-----------|-----------|------------|-----------------|--------------|-------------------|-------|--------|--------|----------|---------|-------------|-----------|----------|----------|
+| `SELECT` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `INSERT` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `UPDATE` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `DELETE` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| `REFERENCES` | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
+| `TRIGGER` | ✅ | ✅ | ❌ | ❌ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| `TRUNCATE` | ❌ | ✅ (PG 14+) | ❌ | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| `OWNERSHIP` | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | ❌ | ❌ |
 
 ##### Column-Level Privileges
 
@@ -106,7 +106,6 @@ The following tables cover the DCL privilege types supported by each provider ac
 | **DB2 iSeries** | ✅ | ✅ | ❌ | ✅ | ✅ | Uses `GRANT` and `REVOKE`. Object authority model differs slightly from LUW. |
 | **Snowflake** | ✅ | ✅ | ❌ | ✅ | ✅ | No DENY. Snowflake uses role-based access control (RBAC) exclusively. `WITH GRANT OPTION` supported. |
 | **SAP HANA** | ✅ | ✅ | ❌ | ✅ | ✅ | No DENY. Full GRANT/REVOKE. `WITH GRANT OPTION` supported. |
-| **Jet (MS Access)** | ⚠️ | ⚠️ | ❌ | ❌ | ❌ | Very limited: GRANT/REVOKE available only in Jet SQL via Jet ADOX or DAO. Rarely used programmatically and not SQL-standard compliant. |
 | **Redshift** | ✅ | ✅ | ❌ | ✅ | ✅ | PostgreSQL-compatible. No DENY. Column-level privileges not supported (table-level only). |
 
 ---
@@ -188,13 +187,6 @@ The following tables cover the DCL privilege types supported by each provider ac
 - **Scopes**: Table, View, Procedure, Function, Schema, Database, Package, Structured Privilege
 - **References**: [SAP HANA GRANT Statement](https://help.sap.com/docs/SAP_HANA_PLATFORM/4fe29514fd584807ac9f2a04f6754767/20f674e1751910148a8b990d33efbdc5.html), [SAP HANA REVOKE Statement](https://help.sap.com/docs/SAP_HANA_PLATFORM/4fe29514fd584807ac9f2a04f6754767/20fc91e2751910148fc5847c87c8e27a.html)
 
-#### Jet (MS Access)
-- **Syntax**: `GRANT privilege ON TABLE table_name TO user` — available in Jet SQL via ADOX/DAO
-- **REVOKE**: `REVOKE privilege ON TABLE table_name FROM user`
-- **No DENY**: No equivalent.
-- **Caveats**: Jet's DCL is minimally documented, rarely used programmatically, and not fully compliant with ANSI SQL. MS Access user-level security has been deprecated since Access 2007 for `.accdb` files. Granting/revoking is only meaningful for legacy `.mdb` (workgroup-secured) files.
-- **References**: [Jet SQL GRANT statement (deprecated)](https://support.microsoft.com/en-us/office/grant-statement-microsoft-access-sql-72b8dc01-9fe3-4c49-9d16-6e9a3dd91dac), [User-Level Security FAQ](https://learn.microsoft.com/en-us/office/client-developer/access/desktop-database-reference/grant-statement-microsoft-access-sql)
-
 #### Amazon Redshift
 - **Syntax**: `GRANT privilege ON TABLE table_name TO user [WITH GRANT OPTION]`
 - **Role Membership**: `GRANT ROLE role_name TO { user_name | ROLE other_role }`
@@ -210,10 +202,9 @@ The following tables cover the DCL privilege types supported by each provider ac
 | Category | Providers |
 |----------|-----------|
 | **Full GRANT + REVOKE support** | SQL Server, PostgreSQL, MySQL 8, MariaDB, Aurora MySQL, Aurora PostgreSQL, Oracle, Firebird, DB2 LUW, DB2 iSeries, Snowflake, SAP HANA, Redshift |
-| **GRANT + REVOKE with limitations** | Jet (MS Access) — legacy only, deprecated in modern `.accdb` |
 | **DENY support** | SQL Server only |
 | **No DCL support** | SQLite |
-| **Role membership (GRANT role TO user)** | All except SQLite and Jet |
+| **Role membership (GRANT role TO user)** | All except SQLite |
 | **Column-level privileges** | SQL Server, PostgreSQL, MySQL, Oracle, DB2 LUW, SAP HANA, Snowflake (SELECT only) |
 
 ---
@@ -316,9 +307,9 @@ The following features are non-standard or provider-specific and should be expre
 | **PostgreSQL row-level security** | Separate ADR / provider extension | RLS is a complex PostgreSQL-specific feature beyond DCL |
 | **Oracle system privileges** | Provider-specific extension method | System-level privileges (`CREATE TABLE`, `CREATE SESSION`) differ from object privileges |
 
-### Handling SQLite and Jet (No DCL Support)
+### Handling SQLite (No DCL Support)
 
-For providers that do not support DCL (SQLite) or where DCL is deprecated (Jet/MS Access), FluentMigrator should throw a `DatabaseOperationNotSupportedException` when a DCL expression is executed, consistent with how other unsupported operations are currently handled (see `GenericGenerator.NotSupported()`).
+For providers that do not support DCL (SQLite), FluentMigrator should throw a `DatabaseOperationNotSupportedException` when a DCL expression is executed, consistent with how other unsupported operations are currently handled (see `GenericGenerator.NotSupported()`).
 
 ---
 
@@ -332,11 +323,9 @@ For providers that do not support DCL (SQLite) or where DCL is deprecated (Jet/M
 
 4. **Use `IfDatabase()` for DENY** (SQL Server only) rather than polluting the top-level `Deny` root with a misleading cross-database abstraction.
 
-5. **Throw `DatabaseOperationNotSupportedException`** for SQLite; emit a warning or no-op for Jet (deprecated user-level security).
+5. **Throw `DatabaseOperationNotSupportedException`** for SQLite.
 
-6. **Do not implement DCL for Jet** in any meaningful way—MS Access user-level security was deprecated in 2007. Document this as out of scope.
-
-7. **Keep `GRANT OPTION` / `ADMIN OPTION` in the core API** (`.WithGrantOption()` / `.WithAdminOption()`), since they are supported by all DCL-capable providers.
+6. **Keep `GRANT OPTION` / `ADMIN OPTION` in the core API** (`.WithGrantOption()` / `.WithAdminOption()`), since they are supported by all DCL-capable providers.
 
 ---
 
@@ -353,7 +342,7 @@ This ADR provides the research necessary to make an informed decision about impl
 **Cons**:
 - DCL semantics differ significantly between providers, especially for roles and column-level privileges.
 - DENY is SQL Server-only, creating an asymmetry in the top-level API.
-- SQLite and legacy Jet cannot support DCL at all.
+- SQLite cannot support DCL at all.
 - MySQL's `'user'@'host'` model requires special handling.
 - Snowflake's exclusive RBAC model may require custom extensions.
 
@@ -376,8 +365,7 @@ This ADR provides the research necessary to make an informed decision about impl
 - **DB2 iSeries**: [IBM i GRANT Object Privileges](https://www.ibm.com/docs/en/i/7.5?topic=statements-grant-object-privileges)
 - **Snowflake**: [GRANT Privilege](https://docs.snowflake.com/en/sql-reference/sql/grant-privilege), [REVOKE Privilege](https://docs.snowflake.com/en/sql-reference/sql/revoke-privilege), [Access Control Overview](https://docs.snowflake.com/en/user-guide/security-access-control-overview)
 - **SAP HANA**: [SAP HANA GRANT Statement](https://help.sap.com/docs/SAP_HANA_PLATFORM/4fe29514fd584807ac9f2a04f6754767/20f674e1751910148a8b990d33efbdc5.html), [SAP HANA REVOKE Statement](https://help.sap.com/docs/SAP_HANA_PLATFORM/4fe29514fd584807ac9f2a04f6754767/20fc91e2751910148fc5847c87c8e27a.html)
-- **Jet / MS Access**: [GRANT Statement (MS Access SQL)](https://support.microsoft.com/en-us/office/grant-statement-microsoft-access-sql-72b8dc01-9fe3-4c49-9d16-6e9a3dd91dac)
 - **Amazon Redshift**: [GRANT](https://docs.aws.amazon.com/redshift/latest/dg/r_GRANT.html), [REVOKE](https://docs.aws.amazon.com/redshift/latest/dg/r_REVOKE.html), [Redshift Role-Based Access Control](https://docs.aws.amazon.com/redshift/latest/mgmt/redshift-iam-access-control-overview.html)
 
 ## Conclusion
-GRANT and REVOKE are supported by all FluentMigrator providers except SQLite (no user model) and Jet/MS Access (deprecated). DENY is unique to SQL Server. The proposed `Grant` / `Revoke` top-level syntax, modeled after the existing FluentMigrator fluent API, provides a clean and database-agnostic abstraction for the most commonly used DCL operations. Provider-specific features (DENY, column-level grants, Snowflake RBAC, MySQL host-qualified users) should be exposed via `IfDatabase()` blocks, provider extension methods, or `ISupportAdditionalFeatures` to keep the core API portable and uncluttered.
+GRANT and REVOKE are supported by all FluentMigrator providers except SQLite (no user model). DENY is unique to SQL Server. The proposed `Grant` / `Revoke` top-level syntax, modeled after the existing FluentMigrator fluent API, provides a clean and database-agnostic abstraction for the most commonly used DCL operations. Provider-specific features (DENY, column-level grants, Snowflake RBAC, MySQL host-qualified users) should be exposed via `IfDatabase()` blocks, provider extension methods, or `ISupportAdditionalFeatures` to keep the core API portable and uncluttered.
