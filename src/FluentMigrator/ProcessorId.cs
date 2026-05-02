@@ -11,7 +11,6 @@ namespace FluentMigrator
         public const string Firebird = nameof(Firebird);
         [Obsolete("Hana support will go away unless someone in the community steps up to provide support.")]
         public const string Hana = nameof(Hana);
-        public const string Jet = nameof(Jet);
         public const string MariaDB = nameof(MariaDB);
         public const string MySql = nameof(MySql);
         public const string MySql4 = nameof(MySql4);
@@ -48,7 +47,6 @@ namespace FluentMigrator
         public const string Firebird = nameof(Firebird);
         [Obsolete("Hana support will go away unless someone in the community steps up to provide support.")]
         public const string Hana = nameof(Hana);
-        public const string Jet = nameof(Jet);
         public const string MariaDB = nameof(MariaDB);
         public const string MySql = nameof(MySql);
         public const string MySql4 = nameof(MySql4);
