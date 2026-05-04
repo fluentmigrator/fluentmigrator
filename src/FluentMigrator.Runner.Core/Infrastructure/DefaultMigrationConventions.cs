@@ -63,14 +63,14 @@ namespace FluentMigrator.Runner.Infrastructure
 
         /// <inheritdoc />
         public virtual bool TypeHasTags(
-#if NET
+#if NET6_0_OR_GREATER
             [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
 #endif
             Type type) => TypeHasTagsImpl(type);
 
         /// <inheritdoc />
         public virtual bool TypeHasMatchingTags(
-#if NET
+#if NET6_0_OR_GREATER
             [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
 #endif
             Type type,

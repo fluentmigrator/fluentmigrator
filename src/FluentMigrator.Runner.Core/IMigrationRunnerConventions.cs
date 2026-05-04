@@ -126,7 +126,7 @@ namespace FluentMigrator.Runner
         /// <param name="type">The type to check for tags.</param>
         /// <returns><c>true</c> if the type has tags; otherwise, <c>false</c>.</returns>
         bool TypeHasTags(
-#if NET
+#if NET6_0_OR_GREATER
             [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
 #endif
             Type type);
@@ -142,7 +142,7 @@ namespace FluentMigrator.Runner
         /// <param name="tagsToMatch">The tags to match against.</param>
         /// <returns><c>true</c> if the type has matching tags; otherwise, <c>false</c>.</returns>
         bool TypeHasMatchingTags(
-#if NET
+#if NET6_0_OR_GREATER
             [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
 #endif
             Type type,

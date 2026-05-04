@@ -59,27 +59,59 @@ namespace FluentMigrator.Runner
         [Obsolete("Use the TypeHasMatchingTags(Type, IEnumerable<string>) method instead. This property will be removed in version 9.0.0.")]
         public Func<Type, IEnumerable<string>, bool> TypeHasMatchingTagsFunc { get; set; }
 
+        /// <summary>
+        /// Gets or sets the function used to determine whether a type has associated tags.
+        /// </summary>
+        /// <remarks>
+        /// This property is kept for backward compatibility and will be removed in version 9.0.0.
+        /// Use <see cref="IMigrationRunnerConventions.TypeHasTags(Type)"/> instead.
+        /// </remarks>
+        [Obsolete("Use the TypeHasTags(Type) method instead. This property will be removed in version 9.0.0.")]
+        public Func<Type, bool> TypeHasTags
+        {
+#pragma warning disable CS0618 // TypeHasTagsFunc is obsolete
+            get => TypeHasTagsFunc;
+            set => TypeHasTagsFunc = value;
+#pragma warning restore CS0618
+        }
+
+        /// <summary>
+        /// Gets or sets the function used to determine whether a type has matching tags.
+        /// </summary>
+        /// <remarks>
+        /// This property is kept for backward compatibility and will be removed in version 9.0.0.
+        /// Use <see cref="IMigrationRunnerConventions.TypeHasMatchingTags(Type, IEnumerable{string})"/> instead.
+        /// </remarks>
+        [Obsolete("Use the TypeHasMatchingTags(Type, IEnumerable<string>) method instead. This property will be removed in version 9.0.0.")]
+        public Func<Type, IEnumerable<string>, bool> TypeHasMatchingTags
+        {
+#pragma warning disable CS0618 // TypeHasMatchingTagsFunc is obsolete
+            get => TypeHasMatchingTagsFunc;
+            set => TypeHasMatchingTagsFunc = value;
+#pragma warning restore CS0618
+        }
+
         /// <inheritdoc />
-        public virtual bool TypeHasTags(
-#if NET
+        bool IMigrationRunnerConventions.TypeHasTags(
+#if NET6_0_OR_GREATER
             [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
 #endif
             Type type)
         {
-#pragma warning disable CS0618 // Type or member is obsolete
+#pragma warning disable CS0618 // TypeHasTagsFunc is obsolete
             return TypeHasTagsFunc(type);
 #pragma warning restore CS0618
         }
 
         /// <inheritdoc />
-        public virtual bool TypeHasMatchingTags(
-#if NET
+        bool IMigrationRunnerConventions.TypeHasMatchingTags(
+#if NET6_0_OR_GREATER
             [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
 #endif
             Type type,
             IEnumerable<string> tagsToMatch)
         {
-#pragma warning disable CS0618 // Type or member is obsolete
+#pragma warning disable CS0618 // TypeHasMatchingTagsFunc is obsolete
             return TypeHasMatchingTagsFunc(type, tagsToMatch);
 #pragma warning restore CS0618
         }
