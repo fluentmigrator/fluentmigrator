@@ -31,7 +31,7 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <MicrosoftPackageVersion>[8.0.0,)</MicrosoftPackageVersion>
+    <MicrosoftPackageVersion>10.0.8</MicrosoftPackageVersion>
   </PropertyGroup>
 
   <ItemGroup>
