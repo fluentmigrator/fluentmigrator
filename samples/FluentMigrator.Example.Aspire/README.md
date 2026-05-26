@@ -12,11 +12,21 @@ The sample has three important projects:
 
 ## How it works
 
-The `AspireFluentMigrator.AppHost` project orchestrates everything:
+The `Aspire.Hosting.FluentMigrator` project orchestrates everything:
 
 1. A PostgreSQL container is started.
 2. `AspireFluentMigrator.MigrationService` waits for the database to be ready, then runs all pending FluentMigrator migrations and calls `IHostApplicationLifetime.StopApplication()` to signal completion.
 3. `AspireFluentMigrator.ApiService` waits for the migration service to **complete** (using `WaitForCompletion`) before it starts accepting requests. This guarantees the database schema is up-to-date before any API traffic arrives.
+
+The AppHost uses a dedicated `AddFluentMigratorMigrations` helper to keep the orchestration code concise, similar to how EF Core's `AddEFMigrations` keeps migration wiring centralized.
+
+## Resource commands
+
+The migration resource appears in the Aspire Dashboard with a custom command:
+
+| Command | Description |
+|---------|-------------|
+| Update Database | Re-runs the migration worker so pending FluentMigrator migrations are applied. |
 
 ## Adding a new migration
 
@@ -63,12 +73,12 @@ dotnet workload install aspire
 **Using the .NET CLI:**
 
 ```shell
-dotnet run --project AspireFluentMigrator.AppHost
+dotnet run --project Aspire.Hosting.FluentMigrator
 ```
 
 **Using Visual Studio:**
 
-Open `FluentMigrator.Example.Aspire.sln` and set `AspireFluentMigrator.AppHost` as the startup project.
+Open `FluentMigrator.Example.Aspire.slnx` and set `Aspire.Hosting.FluentMigrator` as the startup project.
 
 When the app starts, the Aspire dashboard opens in your browser. You will see:
 
@@ -77,3 +87,7 @@ When the app starts, the Aspire dashboard opens in your browser. You will see:
 - The `api` service starting after the migration completes.
 
 Navigate to the `api` service endpoint (shown in the Aspire dashboard) and browse to `/` to see entries being inserted and returned.
+
+## Next step for Aspire community plug-in acceptance
+
+To publish this as an Aspire community plug-in (`Aspire.Hosting.FluentMigrator`) outside the sample, the next step is to follow the Aspire community contribution process and propose the package in the community toolkit with documentation, tests, and API review, rather than requesting ad-hoc approval through social media mentions.

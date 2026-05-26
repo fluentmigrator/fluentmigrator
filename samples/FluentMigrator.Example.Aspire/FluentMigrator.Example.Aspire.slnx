@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Aspire.Hosting.FluentMigrator/Aspire.Hosting.FluentMigrator.csproj" />
+  <Project Path="AspireFluentMigrator.ApiService/AspireFluentMigrator.ApiService.csproj" />
+  <Project Path="AspireFluentMigrator.MigrationService/AspireFluentMigrator.MigrationService.csproj" />
+  <Project Path="AspireFluentMigrator.ServiceDefaults/AspireFluentMigrator.ServiceDefaults.csproj" />
+</Solution>
