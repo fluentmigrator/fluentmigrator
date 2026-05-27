@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;net8.0;net9.0;net10.0</TargetFrameworks>
+    <Description>System.CommandLine command definitions for FluentMigrator</Description>
+  </PropertyGroup>
+  <Import Project="$(MSBuildThisFileDirectory)../../PackageLibrary.props" />
+  <ItemGroup>
+    <PackageReference Include="System.CommandLine" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="$(MicrosoftPackageVersion)" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="$(MicrosoftPackageVersion)" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="$(MicrosoftPackageVersion)" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="$(MicrosoftPackageVersion)" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FluentMigrator.Runner\FluentMigrator.Runner.csproj" />
+  </ItemGroup>
+</Project>
