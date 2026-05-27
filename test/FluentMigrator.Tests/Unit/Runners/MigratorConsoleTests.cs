@@ -101,7 +101,7 @@ namespace FluentMigrator.Tests.Unit.Runners
             new MigratorConsole().Run(
                 "/db", Database,
                 "/connection", Connection,
-                "/verbose", "1",
+                "/verbose", "true",
                 "/target", Target,
                 "/namespace", "FluentMigrator.Tests.Integration.Migrations",
                 "/task", "migrate:up",
@@ -254,7 +254,7 @@ namespace FluentMigrator.Tests.Unit.Runners
             migratorConsole.Run(
                 "/db", Database,
                 "/connection", Connection,
-                "/verbose", "1",
+                "/verbose", "true",
                 "/target", Target,
                 "/namespace", "FluentMigrator.Tests.Integration.Migrations",
                 "/task", "migrate:up",
@@ -312,6 +312,105 @@ namespace FluentMigrator.Tests.Unit.Runners
             const string expectedProviderSwitces = "QuotedIdentifiers=true";
 
             Assert.That(migratorConsole.ProviderSwitches, Is.EquivalentTo(expectedProviderSwitces));
+        }
+
+        // ── NormalizeArgs backward-compatibility (regression) ─────────────────
+
+        [Test]
+        public void NormalizeArgs_SlashPrefixConvertedToDoubleHyphen()
+        {
+            var input  = new[] { "/db", "sqlite", "/connection", "conn" };
+            var output = MigratorConsole.NormalizeArgs(input);
+
+            Assert.That(output, Is.EqualTo(new[] { "--db", "sqlite", "--connection", "conn" }));
+        }
+
+        [Test]
+        public void NormalizeArgs_SlashPrefixCaseNormalized()
+        {
+            var input  = new[] { "/DB", "sqlite", "/Connection", "conn", "/TASK", "migrate:up" };
+            var output = MigratorConsole.NormalizeArgs(input);
+
+            Assert.That(output, Is.EqualTo(new[] { "--db", "sqlite", "--connection", "conn", "--task", "migrate:up" }));
+        }
+
+        [Test]
+        public void NormalizeArgs_FilePathNotConverted()
+        {
+            // A forward-slash path should NOT be changed to --
+            var input  = new[] { "/target", "/path/to/assembly.dll" };
+            var output = MigratorConsole.NormalizeArgs(input);
+
+            Assert.That(output, Is.EqualTo(new[] { "--target", "/path/to/assembly.dll" }));
+        }
+
+        [Test]
+        public void NormalizeArgs_SlashWithEqualsValuePreservesValue()
+        {
+            var input  = new[] { "/task=migrate:up" };
+            var output = MigratorConsole.NormalizeArgs(input);
+
+            Assert.That(output, Is.EqualTo(new[] { "--task=migrate:up" }));
+        }
+
+        [Test]
+        public void NormalizeArgs_DoubleDashArgsPassedThrough()
+        {
+            var input  = new[] { "--provider", "sqlite", "--connection", "conn" };
+            var output = MigratorConsole.NormalizeArgs(input);
+
+            Assert.That(output, Is.EqualTo(new[] { "--provider", "sqlite", "--connection", "conn" }));
+        }
+
+        // ── New --option syntax (forward-compatibility) ───────────────────────
+
+        [Test]
+        public void CanInitMigratorConsoleWithNewStyleArguments()
+        {
+            var console = new MigratorConsole();
+            console.Run(
+                "--provider", Database,
+                "--connection", Connection,
+                "--assembly", Target,
+                "--namespace", "FluentMigrator.Tests.Integration.Migrations",
+                "--nested",
+                "--task", "migrate:up",
+                "--version", "1");
+
+            console.Connection.ShouldBe(Connection);
+            console.Namespace.ShouldBe("FluentMigrator.Tests.Integration.Migrations");
+            console.NestedNamespaces.ShouldBeTrue();
+            console.Task.ShouldBe("migrate:up");
+            console.Version.ShouldBe(1);
+        }
+
+        [Test]
+        public void CanInitMigratorConsoleUsingShortAlias()
+        {
+            // -a is the short alias for --assembly; -c for --connection
+            var console = new MigratorConsole();
+            console.Run(
+                "--db", Database,
+                "-c", Connection,
+                "--target", Target,
+                "--task", "migrate:up");
+
+            console.Connection.ShouldBe(Connection);
+            console.Task.ShouldBe("migrate:up");
+        }
+
+        [Test]
+        public void VerboseFlagAcceptsTrueValue()
+        {
+            var console = new MigratorConsole();
+            console.Run(
+                "--db", Database,
+                "--connection", Connection,
+                "--assembly", Target,
+                "--task", "migrate:up",
+                "--verbose", "true");
+
+            console.Verbose.ShouldBeTrue();
         }
     }
 }

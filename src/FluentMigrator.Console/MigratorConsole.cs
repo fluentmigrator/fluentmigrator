@@ -82,20 +82,20 @@ namespace FluentMigrator.Console
         };
 
         private static readonly Option<string> ProcessorOpt = new Option<string>(
-            "--provider", new[] { "--dbType", "--db" })
+            "--provider", new[] { "--dbType", "--dbtype", "--db" })
         {
             Description = "REQUIRED. The kind of database you are migrating against.",
             Required = true,
         };
 
         private static readonly Option<string> ConnectionOpt = new Option<string>(
-            "--connectionString", new[] { "--connection", "--conn", "-c" })
+            "--connectionString", new[] { "--connectionstring", "--connection", "--conn", "-c" })
         {
             Description = "The name of the connection string or the connection string itself.",
         };
 
         private static readonly Option<string> ConnectionStringConfigPathOpt = new Option<string>(
-            "--connectionStringConfigPath", new[] { "--configPath" })
+            "--connectionStringConfigPath", new[] { "--connectionstringconfigpath", "--configPath", "--configpath" })
         {
             Description = "The path of the machine.config where the named connection string is found.",
         };
@@ -118,13 +118,13 @@ namespace FluentMigrator.Console
         };
 
         private static readonly Option<bool> OutputSemicolonDelimiterOpt = new Option<bool>(
-            "--outputSemicolonDelimiter", new[] { "--outsemdel", "--osd" })
+            "--outputSemicolonDelimiter", new[] { "--outputsemicolondelimiter", "--outsemdel", "--osd" })
         {
             Description = "Whether each command should be delimited with a semicolon.",
         };
 
         private static readonly Option<string> OutputFilenameOpt = new Option<string>(
-            "--outputFilename", new[] { "--outfile", "--of" })
+            "--outputFilename", new[] { "--outputfilename", "--outfile", "--of" })
         {
             Description = "The name of the file to output the generated SQL to.",
         };
@@ -152,13 +152,13 @@ namespace FluentMigrator.Console
         };
 
         private static readonly Option<long> StartVersionOpt = new Option<long>(
-            "--startVersion", new[] { "--start-version" })
+            "--startVersion", new[] { "--startversion", "--start-version" })
         {
             Description = "The specific version to start migrating from. Only used when NoConnection is true.",
         };
 
         private static readonly Option<bool> NoConnectionOpt = new Option<bool>(
-            "--noConnection", new[] { "--no-connection" })
+            "--noConnection", new[] { "--noconnection", "--no-connection" })
         {
             Description = "Indicates that migrations will be generated without consulting a target database.",
         };
@@ -169,7 +169,7 @@ namespace FluentMigrator.Console
         };
 
         private static readonly Option<bool> StopOnErrorOpt = new Option<bool>(
-            "--stopOnError", new[] { "--stop-on-error" })
+            "--stopOnError", new[] { "--stoponerror", "--stop-on-error" })
         {
             Description = "Pauses migration execution until the user input if any error occurred.",
         };
@@ -243,6 +243,42 @@ namespace FluentMigrator.Console
 
         // ── Entry point ──────────────────────────────────────────────────────
 
+        /// <summary>
+        /// Normalizes legacy Mono.Options-style arguments to System.CommandLine style.
+        /// Converts <c>/option</c> prefix (case-insensitive) to <c>--option</c> (lower-case),
+        /// preserving the value portion unchanged so existing scripts continue to work.
+        /// </summary>
+        public static string[] NormalizeArgs(string[] args)
+        {
+            var result = new string[args.Length];
+            for (var i = 0; i < args.Length; i++)
+            {
+                var arg = args[i];
+                // Convert /option or /option=value → --option or --option=value
+                if (arg.Length > 1 && arg[0] == '/' && char.IsLetter(arg[1]))
+                {
+                    var rest = arg.Substring(1);
+                    // Exclude file/UNC paths (contain a subsequent slash)
+                    if (rest.IndexOf('/') < 0 && rest.IndexOf('\\') < 0)
+                    {
+                        var eqIdx = rest.IndexOf('=');
+                        if (eqIdx >= 0)
+                        {
+                            // /Option=value → --option=value  (option name lowercased, value preserved)
+                            arg = "--" + rest.Substring(0, eqIdx).ToLowerInvariant() + rest.Substring(eqIdx);
+                        }
+                        else
+                        {
+                            // /Option → --option
+                            arg = "--" + rest.ToLowerInvariant();
+                        }
+                    }
+                }
+                result[i] = arg;
+            }
+            return result;
+        }
+
         public int Run(params string[] args)
         {
             System.Console.Out.WriteHeader();
@@ -250,7 +286,7 @@ namespace FluentMigrator.Console
             try
             {
                 var root = BuildRootCommand();
-                var parseResult = root.Parse(args);
+                var parseResult = root.Parse(NormalizeArgs(args));
 
                 return parseResult.Invoke(new InvocationConfiguration());
             }
