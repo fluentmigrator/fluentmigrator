@@ -140,7 +140,7 @@ jobs:
       uses: danielpalme/ReportGenerator-GitHub-Action@v5.5.7
       if: '!cancelled()'
       with:
-        reports: "$GITHUB_WORKSPACE/**/TestResults-${{ matrix.dotnet-tfm }}/**/*Cobertura.xml"
+        reports: "**/*.cobertura.xml"
         targetdir: "$GITHUB_WORKSPACE/coverage"
         reporttypes: "Cobertura"
         verbosity: "Info"
