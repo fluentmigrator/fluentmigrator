@@ -147,7 +147,7 @@ jobs:
         title: "Code Coverage"
         tag: "${{ github.run_number }}_${{ github.run_id }}"
         toolpath: "reportgeneratortool"
-    - run: cat coveragereport/SummaryGithub.md >> $GITHUB_STEP_SUMMARY"
+    - run: cat coveragereport/SummaryGithub.md >> $GITHUB_STEP_SUMMARY
 
     - name: Upload Combined Coverage XML
       uses: actions/upload-artifact@v4
