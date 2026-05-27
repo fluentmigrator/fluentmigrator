@@ -114,7 +114,7 @@ jobs:
         if (Test-Path $installerPath) { Remove-Item $installerPath -Force -ErrorAction SilentlyContinue }
 
     - name: Restore, Build, Test
-      run: dotnet test --framework ${{ matrix.dotnet-tfm }} --configuration ${{ env.buildConfiguration }} --verbosity quiet --logger trx --collect:"XPlat Code Coverage" --results-directory "TestResults-${{ matrix.dotnet-tfm }}"
+      run: dotnet test --framework ${{ matrix.dotnet-tfm }} --configuration ${{ env.buildConfiguration }} --verbosity quiet --logger trx --collect:"XPlat Code Coverage" --results-directory "TestResults-${{ matrix.dotnet-tfm }}" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura
       env:
         # Enable containers for integration tests only on Linux
         FM_TestConnectionStrings__MySql__ContainerEnabled: ${{ matrix.os == 'ubuntu-latest' }}
