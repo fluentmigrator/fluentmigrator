@@ -67,16 +67,18 @@ steps:
     targetType: 'inline'
     script: Write-Host "##vso[build.updatebuildnumber]$(version_step.semVer)+$(Build.BuildId)"
 
-- task: NuGetCommand@2
+- task: DotNetCoreCLI@2
+  displayName: 'Restore NuGet packages'
   inputs:
-    restoreSolution: '$(solution)'
+    command: 'restore'
+    projects: '$(solution)'
 
-- task: VSBuild@1
+- task: DotNetCoreCLI@2
+  displayName: 'Build solution'
   inputs:
-    solution: '$(solution)'
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
-    msbuildArgs: '/p:Version=$(version_step.semVer)'
+    command: 'build'
+    projects: '$(solution)'
+    arguments: '--configuration $(buildConfiguration) -p:Version=$(version_step.semVer) --no-restore'
 
 - task: VSTest@2
   inputs:
