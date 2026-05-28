@@ -43,6 +43,7 @@ jobs:
         versionSpec: 6.3.x
 
     - name: Execute GitVersion
+      id: gitversion
       uses: gittools/actions/gitversion/execute@v4.5.0
       env:
         BUILD_BUILDNUMBER: ${{ env.GitVersion.NuGetVersionV2 }}
@@ -130,6 +131,20 @@ jobs:
     - name: AOT Smoke Tests
       if: matrix.dotnet-tfm == 'net8.0'
       run: dotnet run --project test/FluentMigrator.Tests.Aot/FluentMigrator.Tests.Aot.csproj --configuration ${{ env.buildConfiguration }} --verbosity quiet\
+
+    # Pack triggers .NET package validation (EnablePackageValidation in PackageLibrary.props),
+    # which fails the build on breaking public-API changes against PackageValidationBaselineVersion.
+    # Windows-only because the libraries multi-target net48, which builds natively there.
+    # Version must be >= the baseline, so use the GitVersion-computed package version.
+    # Build first, then pack --no-build: the analyzer packs (and is validated) during build via
+    # GeneratePackageOnBuild, and --no-build avoids its NU5019 on a subsequent CLI pack.
+    - name: Validate package API compatibility
+      if: matrix.os == 'windows-latest' && (!cancelled())
+      shell: pwsh
+      run: |
+        dotnet build ${{ env.solution }} --configuration ${{ env.buildConfiguration }} --verbosity minimal -p:Version=${{ steps.gitversion.outputs.fullSemVer }}
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+        dotnet pack ${{ env.solution }} --configuration ${{ env.buildConfiguration }} --no-build --verbosity minimal -p:Version=${{ steps.gitversion.outputs.fullSemVer }}
 
     - name: Verify test results coverage files exists
       if: matrix.os == 'ubuntu-latest' && (!cancelled())

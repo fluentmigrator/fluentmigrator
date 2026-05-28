@@ -81,10 +81,21 @@ public partial class AnonSecurityLabelBuilder
     /// Masks the column with a pseudo-random email based on a seed column.
     /// </summary>
     /// <param name="seed">The column name to use as seed for reproducible generation.</param>
-    /// <param name="salt">Optional salt value to further randomize the output.</param>
     /// <returns>The current builder instance for method chaining.</returns>
     /// <exception cref="ArgumentException">Thrown when <paramref name="seed"/> is null or whitespace.</exception>
-    public AnonSecurityLabelBuilder MaskedWithPseudoEmail([NotNull] string seed, string salt = null)
+    public AnonSecurityLabelBuilder MaskedWithPseudoEmail([NotNull] string seed)
+    {
+        return MaskedWithPseudoEmail(seed, null);
+    }
+
+    /// <summary>
+    /// Masks the column with a pseudo-random email based on a seed column.
+    /// </summary>
+    /// <param name="seed">The column name to use as seed for reproducible generation.</param>
+    /// <param name="salt">Salt value to further randomize the output.</param>
+    /// <returns>The current builder instance for method chaining.</returns>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="seed"/> is null or whitespace.</exception>
+    public AnonSecurityLabelBuilder MaskedWithPseudoEmail([NotNull] string seed, string salt)
     {
         return MaskedWithSalt("anon.pseudo_email", seed, salt);
     }
