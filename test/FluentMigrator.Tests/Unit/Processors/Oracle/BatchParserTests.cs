@@ -55,7 +55,7 @@ namespace FluentMigrator.Tests.Unit.Processors.Oracle
                 new OracleGenerator(),
                 logger,
                 opt,
-                MockedConnectionStringAccessor.Object);
+                MockedMigrationConnectionFactory.Object);
         }
 
         /// <summary>

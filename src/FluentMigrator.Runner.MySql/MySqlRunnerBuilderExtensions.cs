@@ -15,11 +15,14 @@
 #endregion
 
 using FluentMigrator.Runner.Generators.MySql;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.MySql;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner
 {
@@ -39,7 +42,13 @@ namespace FluentMigrator.Runner
             builder.Services.TryAddScoped<MySqlQuoter>();
             builder.Services.AddScoped<IMySqlTypeMap>(_ => new MySql4TypeMap());
             builder.Services
-                .AddScoped<MySql8Processor>()
+                .AddScoped<MySql8Processor>(sp =>
+                    new MySql8Processor(
+                        sp.GetRequiredService<MySqlDbFactory>(),
+                        sp.GetRequiredService<MySql8Generator>(),
+                        sp.GetRequiredService<ILogger<MySql8Processor>>(),
+                        sp.GetRequiredService<IOptionsSnapshot<ProcessorOptions>>(),
+                        sp.GetRequiredService<IMigrationConnectionFactory>()))
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<MySql8Processor>())
                 .AddScoped<MySql8Generator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<MySql8Generator>());
@@ -58,7 +67,13 @@ namespace FluentMigrator.Runner
             builder.Services.TryAddScoped<MySqlQuoter>();
             builder.Services.AddScoped<IMySqlTypeMap>(_ => new MySql4TypeMap());
             builder.Services
-                .AddScoped<MySql4Processor>()
+                .AddScoped<MySql4Processor>(sp =>
+                    new MySql4Processor(
+                        sp.GetRequiredService<MySqlDbFactory>(),
+                        sp.GetRequiredService<MySql4Generator>(),
+                        sp.GetRequiredService<ILogger<MySql4Processor>>(),
+                        sp.GetRequiredService<IOptionsSnapshot<ProcessorOptions>>(),
+                        sp.GetRequiredService<IMigrationConnectionFactory>()))
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<MySql4Processor>())
                 .AddScoped<MySql4Generator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<MySql4Generator>());
@@ -77,7 +92,13 @@ namespace FluentMigrator.Runner
             builder.Services.TryAddScoped<MySqlQuoter>();
             builder.Services.AddScoped<IMySqlTypeMap>(sp => new MySql5TypeMap());
             builder.Services
-                .AddScoped<MySql5Processor>()
+                .AddScoped<MySql5Processor>(sp =>
+                    new MySql5Processor(
+                        sp.GetRequiredService<MySqlDbFactory>(),
+                        sp.GetRequiredService<MySql5Generator>(),
+                        sp.GetRequiredService<ILogger<MySql5Processor>>(),
+                        sp.GetRequiredService<IOptionsSnapshot<ProcessorOptions>>(),
+                        sp.GetRequiredService<IMigrationConnectionFactory>()))
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<MySql5Processor>())
                 .AddScoped<MySql5Generator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<MySql5Generator>());
@@ -96,7 +117,13 @@ namespace FluentMigrator.Runner
             builder.Services.TryAddScoped<MySqlQuoter>();
             builder.Services.AddScoped<IMySqlTypeMap>(sp => new MySql8TypeMap());
             builder.Services
-                .AddScoped<MySql8Processor>()
+                .AddScoped<MySql8Processor>(sp =>
+                    new MySql8Processor(
+                        sp.GetRequiredService<MySqlDbFactory>(),
+                        sp.GetRequiredService<MySql8Generator>(),
+                        sp.GetRequiredService<ILogger<MySql8Processor>>(),
+                        sp.GetRequiredService<IOptionsSnapshot<ProcessorOptions>>(),
+                        sp.GetRequiredService<IMigrationConnectionFactory>()))
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<MySql8Processor>())
                 .AddScoped<MySql8Generator>()
                 .AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<MySql8Generator>());

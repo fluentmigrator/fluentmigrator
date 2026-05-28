@@ -21,6 +21,7 @@ using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -48,6 +49,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         /// This constructor sets up the SQL Server 2014 processor with the necessary dependencies,
         /// enabling it to handle migrations specific to SQL Server 2014.
         /// </remarks>
+        [Obsolete("Use the constructor that accepts IMigrationConnectionFactory instead.")]
         public SqlServer2014Processor(
             [NotNull] ILogger<SqlServer2014Processor> logger,
             [NotNull] SqlServer2008Quoter quoter,
@@ -56,6 +58,31 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             [NotNull] IConnectionStringAccessor connectionStringAccessor,
             [NotNull] IServiceProvider serviceProvider)
             : base(new[] { ProcessorIdConstants.SqlServer2014, ProcessorIdConstants.SqlServer }, generator, quoter, logger, options, connectionStringAccessor, serviceProvider)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SqlServer2014Processor"/> class.
+        /// </summary>
+        /// <param name="logger">The logger used to log migration processing details.</param>
+        /// <param name="quoter">The SQL quoter specific to SQL Server 2008, used for quoting SQL identifiers and literals.</param>
+        /// <param name="generator">The SQL generator specific to SQL Server 2014, used to generate SQL statements.</param>
+        /// <param name="options">The processor options containing configuration settings.</param>
+        /// <param name="connectionFactory">The migration connection factory.</param>
+        /// <param name="serviceProvider">The service provider for resolving dependencies.</param>
+        /// <remarks>
+        /// This constructor sets up the SQL Server 2014 processor with the necessary dependencies,
+        /// enabling it to handle migrations specific to SQL Server 2014.
+        /// </remarks>
+        [ActivatorUtilitiesConstructor]
+        public SqlServer2014Processor(
+            [NotNull] ILogger<SqlServer2014Processor> logger,
+            [NotNull] SqlServer2008Quoter quoter,
+            [NotNull] SqlServer2014Generator generator,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> options,
+            [NotNull] IMigrationConnectionFactory connectionFactory,
+            [NotNull] IServiceProvider serviceProvider)
+            : base(new[] { ProcessorIdConstants.SqlServer2014, ProcessorIdConstants.SqlServer }, generator, quoter, logger, options, connectionFactory, serviceProvider)
         {
         }
     }

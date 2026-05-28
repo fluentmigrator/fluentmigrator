@@ -15,10 +15,12 @@
 #endregion
 
 using FluentMigrator.Runner.Generators.Firebird;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Firebird;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner
@@ -54,7 +56,15 @@ namespace FluentMigrator.Runner
                         return ((FirebirdOptions)fbOptions.Clone()).ApplyProviderSwitches(processorOptions.Value.ProviderSwitches);
                     })
                 .AddScoped<FirebirdDbFactory>()
-                .AddScoped<FirebirdProcessor>()
+                .AddScoped<FirebirdProcessor>(sp =>
+                    new FirebirdProcessor(
+                        sp.GetRequiredService<FirebirdDbFactory>(),
+                        sp.GetRequiredService<FirebirdGenerator>(),
+                        sp.GetRequiredService<FirebirdQuoter>(),
+                        sp.GetRequiredService<ILogger<FirebirdProcessor>>(),
+                        sp.GetRequiredService<IOptionsSnapshot<ProcessorOptions>>(),
+                        sp.GetRequiredService<IMigrationConnectionFactory>(),
+                        sp.GetRequiredService<FirebirdOptions>()))
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<FirebirdProcessor>())
                 .AddScoped<FirebirdQuoter>()
                 .AddScoped<IFirebirdTypeMap>(sp => new FirebirdTypeMap())

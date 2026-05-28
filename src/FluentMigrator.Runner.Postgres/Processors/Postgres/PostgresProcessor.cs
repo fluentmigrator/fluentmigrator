@@ -27,6 +27,7 @@ using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -46,6 +47,7 @@ namespace FluentMigrator.Runner.Processors.Postgres
         public override IList<string> DatabaseTypeAliases { get; } = new List<string> { ProcessorIdConstants.PostgreSQL };
 
         /// <inheritdoc />
+        [Obsolete("Use the constructor that accepts IMigrationConnectionFactory instead.")]
         public PostgresProcessor(
             [NotNull] PostgresDbFactory factory,
             [NotNull] PostgresGenerator generator,
@@ -54,6 +56,25 @@ namespace FluentMigrator.Runner.Processors.Postgres
             [NotNull] IConnectionStringAccessor connectionStringAccessor,
             [NotNull] PostgresOptions pgOptions)
             : base(() => factory.Factory, generator, logger, options.Value, connectionStringAccessor)
+        {
+            if (pgOptions == null)
+            {
+                throw new ArgumentNullException(nameof(pgOptions));
+            }
+
+            _quoter = new PostgresQuoter(pgOptions);
+        }
+
+        /// <inheritdoc />
+        [ActivatorUtilitiesConstructor]
+        public PostgresProcessor(
+            [NotNull] PostgresDbFactory factory,
+            [NotNull] PostgresGenerator generator,
+            [NotNull] ILogger<PostgresProcessor> logger,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> options,
+            [NotNull] IMigrationConnectionFactory connectionFactory,
+            [NotNull] PostgresOptions pgOptions)
+            : base(() => factory.Factory, generator, logger, options.Value, connectionFactory)
         {
             if (pgOptions == null)
             {

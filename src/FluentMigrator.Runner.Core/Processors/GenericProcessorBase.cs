@@ -46,27 +46,38 @@ namespace FluentMigrator.Runner.Processors
         private bool _disposed;
 
         /// <inheritdoc />
+        [Obsolete("Use the constructor that accepts IMigrationConnectionFactory instead.")]
         protected GenericProcessorBase(
             [NotNull] Func<DbProviderFactory> factoryAccessor,
             [NotNull] IMigrationGenerator generator,
             [NotNull] ILogger logger,
             [NotNull] ProcessorOptions options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor)
+            : this(factoryAccessor, generator, logger, options, new ConnectionStringMigrationConnectionFactory(connectionStringAccessor))
+        {
+        }
+
+        /// <inheritdoc />
+        protected GenericProcessorBase(
+            [NotNull] Func<DbProviderFactory> factoryAccessor,
+            [NotNull] IMigrationGenerator generator,
+            [NotNull] ILogger logger,
+            [NotNull] ProcessorOptions options,
+            [NotNull] IMigrationConnectionFactory connectionFactory)
             : base(generator, logger, options)
         {
             _dbProviderFactory = new Lazy<DbProviderFactory>(factoryAccessor.Invoke);
-
-            var connectionString = connectionStringAccessor.ConnectionString;
 
             _lazyConnection = new Lazy<IDbConnection>(
                 () =>
                 {
                     if (DbProviderFactory == null)
                         return null;
-                    var connection = DbProviderFactory.CreateConnection();
+                    
+                    var connection = connectionFactory.CreateConnection(DbProviderFactory);
                     Debug.Assert(connection != null, nameof(Connection) + " != null");
-                    connection!.ConnectionString = connectionString;
-                    connection.Open();
+                    if (connection.State != ConnectionState.Open)
+                        connection.Open();
                     return connection;
                 });
         }
@@ -202,7 +213,7 @@ namespace FluentMigrator.Runner.Processors
 
             if (Options.Timeout != null)
             {
-                result.CommandTimeout = (int) Options.Timeout.Value.TotalSeconds;
+                result.CommandTimeout = (int)Options.Timeout.Value.TotalSeconds;
             }
 
             return result;

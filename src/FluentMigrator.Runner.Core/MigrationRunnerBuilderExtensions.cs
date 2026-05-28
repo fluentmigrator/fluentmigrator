@@ -15,6 +15,8 @@
 #endregion
 
 using System;
+using System.Data;
+using System.Data.Common;
 using System.Linq;
 using System.Reflection;
 
@@ -27,6 +29,7 @@ using FluentMigrator.Runner.VersionTableInfo;
 using JetBrains.Annotations;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner
@@ -305,5 +308,84 @@ namespace FluentMigrator.Runner
                 return _builder;
             }
         }
+
+        /// <summary>
+        /// Sets the global connection factory
+        /// </summary>
+        /// <param name="builder">The runner builder</param>
+        /// <param name="connectionFactory">The function that creates the database connection.</param>
+        /// <returns>The runner builder</returns>
+        public static IMigrationRunnerBuilder WithConnectionFactory(
+            this IMigrationRunnerBuilder builder,
+            [NotNull] Func<IServiceProvider, IDbConnection> connectionFactory)
+        {
+            builder.Services.Replace(
+                ServiceDescriptor.Scoped<IMigrationConnectionFactory>(
+                    sp => new DelegateMigrationConnectionFactory(() => connectionFactory(sp))));
+
+            return builder;
+        }
+
+        private sealed class DelegateMigrationConnectionFactory : IMigrationConnectionFactory
+        {
+            private readonly Func<IDbConnection> _connectionFactory;
+
+            public DelegateMigrationConnectionFactory([NotNull] Func<IDbConnection> connectionFactory)
+            {
+                _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
+            }
+
+            public bool HasConnection => true;
+
+            public IDbConnection CreateConnection(DbProviderFactory providerFactory)
+            {
+                var connection = _connectionFactory();
+
+                if (connection == null)
+                {
+                    throw new InvalidOperationException("The configured connection factory returned null.");
+                }
+
+                return connection;
+            }
+        }
+
+        // DbDataSource was introduced in .NET 7 and is not supported on .NET Framework.
+#if NET7_0_OR_GREATER
+        /// <summary>
+        /// Configures the migration runner to create database connections
+        /// from the specified <see cref="DbDataSource"/>.
+        /// </summary>
+        /// <param name="builder">The runner builder</param>
+        /// <param name="dataSourceFactory">
+        /// A factory delegate used to resolve the <see cref="DbDataSource"/>
+        /// that will be used to create connections.</param>
+        /// <returns>The runner builder</returns>
+        public static IMigrationRunnerBuilder WithDataSource(
+            this IMigrationRunnerBuilder builder,
+            [NotNull] Func<IServiceProvider, DbDataSource> dataSourceFactory)
+        {
+            if (builder == null)
+            {
+                throw new ArgumentNullException(nameof(builder));
+            }
+
+            if (dataSourceFactory == null)
+            {
+                throw new ArgumentNullException(nameof(dataSourceFactory));
+            }
+
+            return builder.WithConnectionFactory(sp =>
+            {
+                var dataSource = dataSourceFactory(sp);
+                if (dataSource == null)
+                {
+                    throw new InvalidOperationException("The configured data source factory returned null.");
+                }
+
+                return dataSource.CreateConnection();
+            });
+        }
+#endif
     }
 }

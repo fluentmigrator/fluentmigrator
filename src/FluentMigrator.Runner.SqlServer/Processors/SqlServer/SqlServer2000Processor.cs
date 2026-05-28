@@ -75,6 +75,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         /// <param name="options">The processor options.</param>
         /// <param name="connectionStringAccessor">The connection string accessor.</param>
         /// <param name="serviceProvider">The service provider.</param>
+        [Obsolete("Use the constructor that accepts IMigrationConnectionFactory instead.")]
         public SqlServer2000Processor(
             [NotNull] ILogger<SqlServer2000Processor> logger,
             [NotNull] SqlServer2000Generator generator,
@@ -88,12 +89,32 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         /// <summary>
         /// Initializes a new instance of the <see cref="SqlServer2000Processor"/> class.
         /// </summary>
+        /// <param name="logger">The logger.</param>
+        /// <param name="generator">The migration generator.</param>
+        /// <param name="options">The processor options.</param>
+        /// <param name="connectionFactory">The migration connection factory.</param>
+        /// <param name="serviceProvider">The service provider.</param>
+        [ActivatorUtilitiesConstructor]
+        public SqlServer2000Processor(
+            [NotNull] ILogger<SqlServer2000Processor> logger,
+            [NotNull] SqlServer2000Generator generator,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> options,
+            [NotNull] IMigrationConnectionFactory connectionFactory,
+            [NotNull] IServiceProvider serviceProvider)
+            : this(SqlClientFactory.Instance, logger, generator, options, connectionFactory, serviceProvider)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SqlServer2000Processor"/> class.
+        /// </summary>
         /// <param name="factory">The database provider factory.</param>
         /// <param name="logger">The logger.</param>
         /// <param name="generator">The migration generator.</param>
         /// <param name="options">The processor options.</param>
         /// <param name="connectionStringAccessor">The connection string accessor.</param>
         /// <param name="serviceProvider">The service provider.</param>
+        [Obsolete("Use the constructor that accepts IMigrationConnectionFactory instead.")]
         protected SqlServer2000Processor(
             DbProviderFactory factory,
             [NotNull] ILogger logger,
@@ -102,6 +123,27 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             [NotNull] IConnectionStringAccessor connectionStringAccessor,
             [NotNull] IServiceProvider serviceProvider)
             : base(() => factory, generator, logger, options.Value, connectionStringAccessor)
+        {
+            _serviceProvider = serviceProvider;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SqlServer2000Processor"/> class.
+        /// </summary>
+        /// <param name="factory">The database provider factory.</param>
+        /// <param name="logger">The logger.</param>
+        /// <param name="generator">The migration generator.</param>
+        /// <param name="options">The processor options.</param>
+        /// <param name="connectionFactory">The migration connection factory.</param>
+        /// <param name="serviceProvider">The service provider.</param>
+        protected SqlServer2000Processor(
+            DbProviderFactory factory,
+            [NotNull] ILogger logger,
+            [NotNull] SqlServer2000Generator generator,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> options,
+            [NotNull] IMigrationConnectionFactory connectionFactory,
+            [NotNull] IServiceProvider serviceProvider)
+            : base(() => factory, generator, logger, options.Value, connectionFactory)
         {
             _serviceProvider = serviceProvider;
         }

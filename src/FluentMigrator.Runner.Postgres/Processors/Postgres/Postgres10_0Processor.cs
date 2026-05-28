@@ -14,6 +14,7 @@
 // limitations under the License.
 #endregion
 
+using System;
 using System.Collections.Generic;
 
 using FluentMigrator.Runner.Generators.Postgres;
@@ -21,6 +22,7 @@ using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -32,6 +34,7 @@ namespace FluentMigrator.Runner.Processors.Postgres
     public class Postgres10_0Processor : PostgresProcessor
     {
         /// <inheritdoc />
+        [Obsolete("Use the constructor that accepts IMigrationConnectionFactory instead.")]
         public Postgres10_0Processor(
             [NotNull] PostgresDbFactory factory,
             [NotNull] Postgres10_0Generator generator,
@@ -40,6 +43,19 @@ namespace FluentMigrator.Runner.Processors.Postgres
             [NotNull] IConnectionStringAccessor connectionStringAccessor,
             [NotNull] PostgresOptions pgOptions)
             : base(factory, generator, logger, options, connectionStringAccessor, pgOptions)
+        {
+        }
+
+        /// <inheritdoc />
+        [ActivatorUtilitiesConstructor]
+        public Postgres10_0Processor(
+            [NotNull] PostgresDbFactory factory,
+            [NotNull] Postgres10_0Generator generator,
+            [NotNull] ILogger<Postgres10_0Processor> logger,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> options,
+            [NotNull] IMigrationConnectionFactory connectionFactory,
+            [NotNull] PostgresOptions pgOptions)
+            : base(factory, generator, logger, options, connectionFactory, pgOptions)
         {
         }
 

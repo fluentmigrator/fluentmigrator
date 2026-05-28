@@ -15,10 +15,13 @@
 #endregion
 
 using FluentMigrator.Runner.Generators.Jet;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Jet;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner
 {
@@ -35,7 +38,12 @@ namespace FluentMigrator.Runner
         public static IMigrationRunnerBuilder AddJet(this IMigrationRunnerBuilder builder)
         {
             builder.Services
-                .AddScoped<JetProcessor>()
+                .AddScoped<JetProcessor>(sp =>
+                    new JetProcessor(
+                        sp.GetRequiredService<JetGenerator>(),
+                        sp.GetRequiredService<ILogger<JetProcessor>>(),
+                        sp.GetRequiredService<IOptionsSnapshot<ProcessorOptions>>(),
+                        sp.GetRequiredService<IMigrationConnectionFactory>()))
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<JetProcessor>())
                 .AddScoped<JetQuoter>()
                 .AddScoped<IJetTypeMap>(sp => new JetTypeMap())

@@ -31,13 +31,11 @@ namespace FluentMigrator.Tests.Unit.Processors
     [Category("BatchParser")]
     public abstract class ProcessorBatchParserTestsBase
     {
-        private const string ConnectionString = "server=this";
-
         private ConnectionState _connectionState;
 
         protected Mock<DbConnection> MockedConnection { get; private set; }
         protected Mock<DbProviderFactory> MockedDbProviderFactory { get; private set; }
-        protected Mock<IConnectionStringAccessor> MockedConnectionStringAccessor { get; private set; }
+        protected Mock<IMigrationConnectionFactory> MockedMigrationConnectionFactory { get; private set; }
         protected List<Mock<DbCommand>> MockedCommands { get; private set; }
         protected List<string> CapturedCommandTexts { get; private set; }
 
@@ -50,7 +48,7 @@ namespace FluentMigrator.Tests.Unit.Processors
             CapturedCommandTexts = new List<string>();
             MockedConnection = new Mock<DbConnection>(MockBehavior.Loose);
             MockedDbProviderFactory = new Mock<DbProviderFactory>(MockBehavior.Loose);
-            MockedConnectionStringAccessor = new Mock<IConnectionStringAccessor>(MockBehavior.Loose);
+            MockedMigrationConnectionFactory = new Mock<IMigrationConnectionFactory>(MockBehavior.Loose);
 
             MockedConnection.SetupGet(conn => conn.State).Returns(() => _connectionState);
             MockedConnection.Setup(conn => conn.Open()).Callback(() => _connectionState = ConnectionState.Open);
@@ -58,10 +56,16 @@ namespace FluentMigrator.Tests.Unit.Processors
             MockedConnection.SetupProperty(conn => conn.ConnectionString);
             MockedConnection.Protected().Setup("Dispose", ItExpr.IsAny<bool>());
 
-            MockedConnectionStringAccessor.SetupGet(a => a.ConnectionString).Returns(ConnectionString);
-
             MockedDbProviderFactory.Setup(factory => factory.CreateConnection())
                 .Returns(MockedConnection.Object);
+
+            MockedMigrationConnectionFactory
+                .SetupGet(factory => factory.HasConnection)
+                .Returns(true);
+
+            MockedMigrationConnectionFactory
+                .Setup(factory => factory.CreateConnection(It.IsAny<DbProviderFactory>()))
+                .Returns((DbProviderFactory providerFactory) => providerFactory.CreateConnection());
 
             MockedDbProviderFactory.Setup(factory => factory.CreateCommand())
                 .Returns(

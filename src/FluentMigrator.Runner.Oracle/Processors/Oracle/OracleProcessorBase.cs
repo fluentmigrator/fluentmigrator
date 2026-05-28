@@ -45,6 +45,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
         /// <param name="logger">The logger.</param>
         /// <param name="options">The processor options.</param>
         /// <param name="connectionStringAccessor">The connection string accessor.</param>
+        [Obsolete("Use the constructor that accepts IMigrationConnectionFactory instead.")]
         protected OracleProcessorBase(
             [NotNull] string databaseType,
             [NotNull] OracleBaseDbFactory factory,
@@ -53,6 +54,27 @@ namespace FluentMigrator.Runner.Processors.Oracle
             [NotNull] IOptionsSnapshot<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor)
             : base(() => factory.Factory, generator, logger, options.Value, connectionStringAccessor)
+        {
+            DatabaseType = databaseType;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OracleProcessorBase"/> class.
+        /// </summary>
+        /// <param name="databaseType">The database type name.</param>
+        /// <param name="factory">The Oracle database factory.</param>
+        /// <param name="generator">The migration generator.</param>
+        /// <param name="logger">The logger.</param>
+        /// <param name="options">The processor options.</param>
+        /// <param name="connectionFactory">The migration connection factory.</param>
+        protected OracleProcessorBase(
+            [NotNull] string databaseType,
+            [NotNull] OracleBaseDbFactory factory,
+            [NotNull] IMigrationGenerator generator,
+            [NotNull] ILogger logger,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> options,
+            [NotNull] IMigrationConnectionFactory connectionFactory)
+            : base(() => factory.Factory, generator, logger, options.Value, connectionFactory)
         {
             DatabaseType = databaseType;
         }

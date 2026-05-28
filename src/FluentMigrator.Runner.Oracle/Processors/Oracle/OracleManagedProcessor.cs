@@ -21,6 +21,7 @@ using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -60,6 +61,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
         /// <exception cref="ArgumentNullException">
         /// Thrown if any of the parameters are <c>null</c>.
         /// </exception>
+        [Obsolete("Use the constructor that accepts IMigrationConnectionFactory instead.")]
         public OracleManagedProcessor(
             [NotNull] OracleManagedDbFactory factory,
             [NotNull] IOracleGenerator generator,
@@ -67,6 +69,42 @@ namespace FluentMigrator.Runner.Processors.Oracle
             [NotNull] IOptionsSnapshot<ProcessorOptions> options,
             [NotNull] IConnectionStringAccessor connectionStringAccessor)
             : base(ProcessorIdConstants.OracleManaged, factory, generator, logger, options, connectionStringAccessor)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OracleManagedProcessor"/> class.
+        /// </summary>
+        /// <param name="factory">
+        /// The <see cref="OracleManagedDbFactory"/> responsible for creating database connections.
+        /// </param>
+        /// <param name="generator">
+        /// The <see cref="IOracleGenerator"/> used to generate SQL statements for Oracle databases.
+        /// </param>
+        /// <param name="logger">
+        /// The <see cref="ILogger{TCategoryName}"/> instance used for logging operations.
+        /// </param>
+        /// <param name="options">
+        /// The <see cref="IOptionsSnapshot{TOptions}"/> containing configuration options for the processor.
+        /// </param>
+        /// <param name="connectionFactory">
+        /// The <see cref="IMigrationConnectionFactory"/> used to create connections.
+        /// </param>
+        /// <remarks>
+        /// This constructor initializes the base <see cref="OracleProcessorBase"/> with the managed Oracle driver
+        /// and provides the required dependencies for executing database operations.
+        /// </remarks>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if any of the parameters are <c>null</c>.
+        /// </exception>
+        [ActivatorUtilitiesConstructor]
+        public OracleManagedProcessor(
+            [NotNull] OracleManagedDbFactory factory,
+            [NotNull] IOracleGenerator generator,
+            [NotNull] ILogger<OracleManagedProcessor> logger,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> options,
+            [NotNull] IMigrationConnectionFactory connectionFactory)
+            : base(ProcessorIdConstants.OracleManaged, factory, generator, logger, options, connectionFactory)
         {
         }
     }

@@ -17,10 +17,13 @@
 using System;
 
 using FluentMigrator.Runner.Generators.Hana;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Hana;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner
 {
@@ -40,7 +43,13 @@ namespace FluentMigrator.Runner
         {
             builder.Services
                 .AddScoped<HanaDbFactory>()
-                .AddScoped<HanaProcessor>()
+                .AddScoped<HanaProcessor>(sp =>
+                    new HanaProcessor(
+                        sp.GetRequiredService<HanaDbFactory>(),
+                        sp.GetRequiredService<HanaGenerator>(),
+                        sp.GetRequiredService<ILogger<HanaProcessor>>(),
+                        sp.GetRequiredService<IOptionsSnapshot<ProcessorOptions>>(),
+                        sp.GetRequiredService<IMigrationConnectionFactory>()))
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<HanaProcessor>())
                 .AddScoped<HanaQuoter>()
                 .AddScoped<IHanaTypeMap>(sp => new HanaTypeMap())
