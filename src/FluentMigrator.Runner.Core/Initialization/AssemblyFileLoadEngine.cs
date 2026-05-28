@@ -26,6 +26,9 @@ namespace FluentMigrator.Runner.Initialization
     /// <summary>
     /// Tries to load the assembly from a file
     /// </summary>
+#if NET
+    [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This type uses AppDomain to load assemblies, which may not be preserved in trimmed applications.")]
+#endif
     public class AssemblyFileLoadEngine : IAssemblyLoadEngine
     {
         /// <inheritdoc />

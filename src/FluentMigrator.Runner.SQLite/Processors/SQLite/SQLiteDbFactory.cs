@@ -32,9 +32,9 @@ namespace FluentMigrator.Runner.Processors.SQLite
     {
         private static readonly TestEntry[] _testEntries =
         {
-            new TestEntry("Microsoft.Data.Sqlite", "Microsoft.Data.Sqlite.SqliteFactory"),
-            new TestEntry("System.Data.SQLite", "System.Data.SQLite.SQLiteFactory"),
-            new TestEntry("Mono.Data.Sqlite, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756", "Mono.Data.Sqlite.SqliteFactory"),
+            new TestEntry("Microsoft.Data.Sqlite", "Microsoft.Data.Sqlite.SqliteFactory", () => Type.GetType("Microsoft.Data.Sqlite.SqliteFactory, Microsoft.Data.Sqlite")),
+            new TestEntry("System.Data.SQLite", "System.Data.SQLite.SQLiteFactory", () => Type.GetType("System.Data.SQLite.SQLiteFactory, System.Data.SQLite")),
+            new TestEntry("Mono.Data.Sqlite, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756", "Mono.Data.Sqlite.SqliteFactory", () => Type.GetType("Mono.Data.Sqlite.SqliteFactory, Mono.Data.Sqlite")),
         };
 
         /// <summary>

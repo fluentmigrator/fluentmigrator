@@ -127,6 +127,10 @@ jobs:
         FM_TestConnectionStrings__SqlServer2016__ContainerEnabled: ${{ matrix.os == 'ubuntu-latest' }}
         FM_TestConnectionStrings__SqlServer2016__IsEnabled: ${{ matrix.os == 'ubuntu-latest' }}
 
+    - name: AOT Smoke Tests
+      if: matrix.dotnet-tfm == 'net8.0'
+      run: dotnet run --project test/FluentMigrator.Tests.Aot/FluentMigrator.Tests.Aot.csproj --configuration ${{ env.buildConfiguration }} --verbosity quiet\
+
     - name: Verify test results coverage files exists
       if: matrix.os == 'ubuntu-latest' && (!cancelled())
       run: |

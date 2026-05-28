@@ -52,8 +52,10 @@ namespace FluentMigrator.Tests.Unit.Runners
             _migrationConventions = new Mock<IMigrationRunnerConventions>();
             _migrationConventions.Setup(x => x.GetMaintenanceStage).Returns(DefaultMigrationRunnerConventions.Instance.GetMaintenanceStage);
             _migrationConventions.Setup(x => x.TypeIsMigration).Returns(DefaultMigrationRunnerConventions.Instance.TypeIsMigration);
+#pragma warning disable CS0618
             _migrationConventions.Setup(x => x.TypeHasTags).Returns(DefaultMigrationRunnerConventions.Instance.TypeHasTags);
             _migrationConventions.Setup(x => x.TypeHasMatchingTags).Returns(DefaultMigrationRunnerConventions.Instance.TypeHasMatchingTags);
+#pragma warning restore CS0618
 
             _maintenanceLoader = ServiceCollectionExtensions.CreateServices()
                 .Configure<RunnerOptions>(opt => opt.Tags = _tags)
@@ -107,7 +109,9 @@ namespace FluentMigrator.Tests.Unit.Runners
         public void LoadsMigrationsFilteredByTag()
         {
             var migrationInfos = _maintenanceLoader.LoadMaintenance(MigrationStage.BeforeEach);
+#pragma warning disable CS0618
             _migrationConventions.Verify(x => x.TypeHasMatchingTags, Times.AtLeastOnce());
+#pragma warning restore CS0618
             Assert.That(migrationInfos, Is.Not.Empty);
 
             Assert.That(migrationInfos.Select(mi => mi.Migration.GetType()), Is.EquivalentTo(new[]
@@ -124,7 +128,7 @@ namespace FluentMigrator.Tests.Unit.Runners
                 migrationInfo.Migration.ShouldNotBeNull();
 
                 if (!excludes.Contains(migrationInfo.Migration.GetType()))
-                    DefaultMigrationRunnerConventions.Instance.TypeHasMatchingTags(migrationInfo.Migration.GetType(), _tags)
+                    ((IMigrationRunnerTagConventions)DefaultMigrationRunnerConventions.Instance).TypeHasMatchingTags(migrationInfo.Migration.GetType(), _tags)
                         .ShouldBeTrue();
             }
         }
@@ -161,7 +165,9 @@ namespace FluentMigrator.Tests.Unit.Runners
         public void LoadsMigrationsNoTag()
         {
             var migrationInfos = _maintenanceLoaderNoTags.LoadMaintenance(MigrationStage.BeforeEach);
+#pragma warning disable CS0618
             _migrationConventions.Verify(x => x.TypeHasMatchingTags, Times.AtLeastOnce());
+#pragma warning restore CS0618
             Assert.That(migrationInfos, Is.Not.Empty);
 
             bool foundNoTag = false;
@@ -179,7 +185,7 @@ namespace FluentMigrator.Tests.Unit.Runners
                 }
                 else
                 {
-                    DefaultMigrationRunnerConventions.Instance.TypeHasMatchingTags(migrationInfo.Migration.GetType(), _tags)
+                    ((IMigrationRunnerTagConventions)DefaultMigrationRunnerConventions.Instance).TypeHasMatchingTags(migrationInfo.Migration.GetType(), _tags)
                         .ShouldBeTrue();
                 }
             }
@@ -205,7 +211,7 @@ namespace FluentMigrator.Tests.Unit.Runners
                 }
                 else
                 {
-                    DefaultMigrationRunnerConventions.Instance.TypeHasMatchingTags(migrationInfo.Migration.GetType(), _tags)
+                    ((IMigrationRunnerTagConventions)DefaultMigrationRunnerConventions.Instance).TypeHasMatchingTags(migrationInfo.Migration.GetType(), _tags)
                         .ShouldBeTrue();
                 }
             }

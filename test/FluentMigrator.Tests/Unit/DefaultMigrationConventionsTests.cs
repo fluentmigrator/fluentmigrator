@@ -41,6 +41,7 @@ namespace FluentMigrator.Tests.Unit
     public class DefaultMigrationConventionsTests
     {
         private static readonly IMigrationRunnerConventions _default = DefaultMigrationRunnerConventions.Instance;
+        private static readonly IMigrationRunnerTagConventions _tagConventions = (IMigrationRunnerTagConventions)DefaultMigrationRunnerConventions.Instance;
 
         [Test]
         public void GetPrimaryKeyNamePrefixesTableNameWithPKAndUnderscore()
@@ -244,28 +245,28 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void TypeHasTagsReturnTrueIfTypeHasTagsAttribute()
         {
-            _default.TypeHasTags(typeof(TaggedWithUk))
+            _tagConventions.TypeHasTags(typeof(TaggedWithUk))
                 .ShouldBeTrue();
         }
 
         [Test]
         public void TypeHasTagsReturnTrueIfInheritedTypeHasTagsAttribute()
         {
-            _default.TypeHasTags(typeof(InheritedFromTaggedWithUk))
+            _tagConventions.TypeHasTags(typeof(InheritedFromTaggedWithUk))
                 .ShouldBeTrue();
         }
 
         [Test]
         public void TypeHasTagsReturnFalseIfTypeDoesNotHaveTagsAttribute()
         {
-            _default.TypeHasTags(typeof(HasNoTagsFake))
+            _tagConventions.TypeHasTags(typeof(HasNoTagsFake))
                 .ShouldBeFalse();
         }
 
         [Test]
         public void TypeHasTagsReturnTrueIfBaseTypeDoesHaveTagsAttribute()
         {
-            _default.TypeHasTags(typeof(ConcreteHasTagAttribute))
+            _tagConventions.TypeHasTags(typeof(ConcreteHasTagAttribute))
                 .ShouldBeTrue();
         }
 
@@ -275,7 +276,7 @@ namespace FluentMigrator.Tests.Unit
             [Category("Tagging")]
             public void WhenTypeHasTagAttributeButNoTagsPassedInReturnsFalse()
             {
-                _default.TypeHasMatchingTags(typeof(TaggedWithUk), new string[] { })
+                _tagConventions.TypeHasMatchingTags(typeof(TaggedWithUk), new string[] { })
                     .ShouldBeFalse();
             }
 
@@ -283,7 +284,7 @@ namespace FluentMigrator.Tests.Unit
             [Category("Tagging")]
             public void WhenTypeHasTagAttributeWithNoTagNamesReturnsFalse()
             {
-                _default.TypeHasMatchingTags(typeof(HasTagAttributeWithNoTagNames), new string[] { })
+                _tagConventions.TypeHasMatchingTags(typeof(HasTagAttributeWithNoTagNames), new string[] { })
                     .ShouldBeFalse();
             }
 
@@ -291,7 +292,7 @@ namespace FluentMigrator.Tests.Unit
             [Category("Tagging")]
             public void WhenTypeHasOneTagThatDoesNotMatchSingleThenTagReturnsFalse()
             {
-                _default.TypeHasMatchingTags(typeof(TaggedWithUk), new[] { "IE" })
+                _tagConventions.TypeHasMatchingTags(typeof(TaggedWithUk), new[] { "IE" })
                     .ShouldBeFalse();
             }
 
@@ -299,7 +300,7 @@ namespace FluentMigrator.Tests.Unit
             [Category("Tagging")]
             public void WhenTypeHasOneTagThatDoesMatchSingleTagThenReturnsTrue()
             {
-                _default.TypeHasMatchingTags(typeof(TaggedWithUk), new[] { "UK" })
+                _tagConventions.TypeHasMatchingTags(typeof(TaggedWithUk), new[] { "UK" })
                     .ShouldBeTrue();
             }
 
@@ -307,7 +308,7 @@ namespace FluentMigrator.Tests.Unit
             [Category("Tagging")]
             public void WhenTypeHasOneTagThatPartiallyMatchesTagThenReturnsFalse()
             {
-                _default.TypeHasMatchingTags(typeof(TaggedWithUk), new[] { "UK2" })
+                _tagConventions.TypeHasMatchingTags(typeof(TaggedWithUk), new[] { "UK2" })
                     .ShouldBeFalse();
             }
 
@@ -315,7 +316,7 @@ namespace FluentMigrator.Tests.Unit
             [Category("Tagging")]
             public void WhenTypeHasOneTagThatDoesMatchMultipleTagsThenReturnsFalse()
             {
-                _default.TypeHasMatchingTags(typeof(TaggedWithUk), new[] { "UK", "Production" })
+                _tagConventions.TypeHasMatchingTags(typeof(TaggedWithUk), new[] { "UK", "Production" })
                     .ShouldBeFalse();
             }
 
@@ -323,7 +324,7 @@ namespace FluentMigrator.Tests.Unit
             [Category("Tagging")]
             public void WhenTypeHasTagsInTwoAttributeThatDoesMatchSingleTagThenReturnsTrue()
             {
-                _default.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndProductionAndStagingInTwoTagsAttributes), new[] { "UK" })
+                _tagConventions.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndProductionAndStagingInTwoTagsAttributes), new[] { "UK" })
                     .ShouldBeTrue();
             }
 
@@ -331,7 +332,7 @@ namespace FluentMigrator.Tests.Unit
             [Category("Tagging")]
             public void WhenTypeHasTagsInTwoAttributesThatDoesMatchMultipleTagsThenReturnsTrue()
             {
-                _default.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndProductionAndStagingInTwoTagsAttributes), new[] { "UK", "Production" })
+                _tagConventions.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndProductionAndStagingInTwoTagsAttributes), new[] { "UK", "Production" })
                     .ShouldBeTrue();
             }
 
@@ -339,7 +340,7 @@ namespace FluentMigrator.Tests.Unit
             [Category("Tagging")]
             public void WhenTypeHasTagsInOneAttributeThatDoesMatchMultipleTagsThenReturnsTrue()
             {
-                _default.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndProductionAndStagingInOneTagsAttribute), new[] { "UK", "Production" })
+                _tagConventions.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndProductionAndStagingInOneTagsAttribute), new[] { "UK", "Production" })
                     .ShouldBeTrue();
             }
 
@@ -347,7 +348,7 @@ namespace FluentMigrator.Tests.Unit
             [Category("Tagging")]
             public void WhenTypeHasTagsInTwoAttributesThatDontNotMatchMultipleTagsThenReturnsFalse()
             {
-                _default.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndProductionAndStagingInTwoTagsAttributes), new[] { "UK", "IE" })
+                _tagConventions.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndProductionAndStagingInTwoTagsAttributes), new[] { "UK", "IE" })
                     .ShouldBeFalse();
             }
 
@@ -355,7 +356,7 @@ namespace FluentMigrator.Tests.Unit
             [Category("Tagging")]
             public void WhenBaseTypeHasTagsThenConcreteTypeReturnsTrue()
             {
-                _default.TypeHasMatchingTags(typeof(ConcreteHasTagAttribute), new[] { "UK" })
+                _tagConventions.TypeHasMatchingTags(typeof(ConcreteHasTagAttribute), new[] { "UK" })
                     .ShouldBeTrue();
             }
 
@@ -365,7 +366,7 @@ namespace FluentMigrator.Tests.Unit
             [Category("Tagging")]
             public void WhenTypeHasSingleTagWithSingleTagNameAndBehaviorOfAnyAndHasMatchingTagNamesThenReturnTrue()
             {
-                _default.TypeHasMatchingTags(typeof(TaggedWithUkAndAnyBehavior), new[] { "UK", "IE" })
+                _tagConventions.TypeHasMatchingTags(typeof(TaggedWithUkAndAnyBehavior), new[] { "UK", "IE" })
                     .ShouldBeTrue();
             }
 
@@ -373,7 +374,7 @@ namespace FluentMigrator.Tests.Unit
             [Category("Tagging")]
             public void WhenTypeHasSingleTagWithSingleTagNameAndBehaviorOfAnyButNoMatchingTagNamesThenReturnFalse()
             {
-                _default.TypeHasMatchingTags(typeof(TaggedWithUkAndAnyBehavior), new[] { "Chrome", "IE" })
+                _tagConventions.TypeHasMatchingTags(typeof(TaggedWithUkAndAnyBehavior), new[] { "Chrome", "IE" })
                     .ShouldBeFalse();
             }
 
@@ -381,7 +382,7 @@ namespace FluentMigrator.Tests.Unit
             [Category("Tagging")]
             public void WhenTypeHasSingleTagWithMultipleTagNamesAndBehaviorOfAnyWithSomeMatchingTagNamesThenReturnTrue()
             {
-                _default.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndProductionAndStagingAndAnyBehaviorInOneTagsAttribute), new[] { "UK", "Staging", "IE" })
+                _tagConventions.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndProductionAndStagingAndAnyBehaviorInOneTagsAttribute), new[] { "UK", "Staging", "IE" })
                     .ShouldBeTrue();
             }
 
@@ -389,7 +390,7 @@ namespace FluentMigrator.Tests.Unit
             [Category("Tagging")]
             public void WhenTypeHasSingleTagWithMultipleTagNamesAndBehaviorOfAnyWithNoMatchingTagNamesThenReturnFalse()
             {
-                _default.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndProductionAndStagingAndAnyBehaviorInOneTagsAttribute), new[] { "IE", "Chrome" })
+                _tagConventions.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndProductionAndStagingAndAnyBehaviorInOneTagsAttribute), new[] { "IE", "Chrome" })
                     .ShouldBeFalse();
             }
 
@@ -397,7 +398,7 @@ namespace FluentMigrator.Tests.Unit
             [Category("Tagging")]
             public void WhenTypeHasMultipleTagsWithMultipleTagNamesAndAllTagsHaveBehaviorOfAnyWithAllHavingAMatchingTagNameThenReturnTrue()
             {
-                _default.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndProductionAndStagingInTwoTagsAttributesWithAnyBehaviorOnBoth), new[] { "UK", "Staging" })
+                _tagConventions.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndProductionAndStagingInTwoTagsAttributesWithAnyBehaviorOnBoth), new[] { "UK", "Staging" })
                     .ShouldBeTrue();
             }
 
@@ -405,7 +406,7 @@ namespace FluentMigrator.Tests.Unit
             [Category("Tagging")]
             public void WhenTypeHasMultipleTagsWithMultipleTagNamesAndAllTagsHaveBehaviorOfAnyWithOneTagNotHavingAMatchingTagNameThenReturnTrue()
             {
-                _default.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndProductionAndStagingInTwoTagsAttributesWithAnyBehaviorOnBoth), new[] { "UK", "IE" })
+                _tagConventions.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndProductionAndStagingInTwoTagsAttributesWithAnyBehaviorOnBoth), new[] { "UK", "IE" })
                     .ShouldBeTrue();
             }
 
@@ -413,7 +414,7 @@ namespace FluentMigrator.Tests.Unit
             [Category("Tagging")]
             public void WhenTypeHasMultipleTagsWithMultipleTagNamesAndOneHasBehaviorOfAnyAndOtherHasBehaviorOfAllWithAllTagNamesMatchingThenReturnTrue()
             {
-                _default.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndAllBehaviorAndProductionAndStagingAndAnyBehaviorInTwoTagsAttributes), new[] { "UK", "Staging" })
+                _tagConventions.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndAllBehaviorAndProductionAndStagingAndAnyBehaviorInTwoTagsAttributes), new[] { "UK", "Staging" })
                     .ShouldBeTrue();
             }
 
@@ -421,7 +422,7 @@ namespace FluentMigrator.Tests.Unit
             [Category("Tagging")]
             public void WhenTypeHasMultipleTagsWithMultipleTagNamesAndOneHasBehaviorOfAnyAndOtherHasBehaviorOfAllWithoutAllTagNamesMatchingThenReturnTrue()
             {
-                _default.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndAllBehaviorAndProductionAndStagingAndAnyBehaviorInTwoTagsAttributes), new[] { "UK", "Staging", "IE" })
+                _tagConventions.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndAllBehaviorAndProductionAndStagingAndAnyBehaviorInTwoTagsAttributes), new[] { "UK", "Staging", "IE" })
                     .ShouldBeTrue();
             }
 
@@ -429,7 +430,7 @@ namespace FluentMigrator.Tests.Unit
             [Category("Tagging")]
             public void WhenTypeHasMultipleTagsWithMultipleTagNamesAndOneHasBehaviorOfAnyWithoutAnyMatchingTagNamesAndOtherHasBehaviorOfAllWithTagNamesMatchingThenReturnTrue()
             {
-                _default.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndAllBehaviorAndProductionAndStagingAndAnyBehaviorInTwoTagsAttributes), new[] { "BE", "UK" })
+                _tagConventions.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndAllBehaviorAndProductionAndStagingAndAnyBehaviorInTwoTagsAttributes), new[] { "BE", "UK" })
                     .ShouldBeTrue();
             }
 
@@ -437,7 +438,7 @@ namespace FluentMigrator.Tests.Unit
             [Category("Tagging")]
             public void WhenBaseInterfaceHasTagsThenConcreteTypeReturnsTrue()
             {
-                _default.TypeHasMatchingTags(typeof(TaggedMigrationBySingleInterfaceTaggedWithUk), new[] { "UK" })
+                _tagConventions.TypeHasMatchingTags(typeof(TaggedMigrationBySingleInterfaceTaggedWithUk), new[] { "UK" })
                     .ShouldBeTrue();
             }
 
@@ -445,13 +446,13 @@ namespace FluentMigrator.Tests.Unit
             [Category("Tagging")]
             public void WhenBaseInterfacesHaveTagsThenConcreteTypeReturnsTrue()
             {
-                _default.TypeHasMatchingTags(typeof(TaggedMigrationByMultipleInterfacesTaggedWithUsAndNy), new[] { "US" })
+                _tagConventions.TypeHasMatchingTags(typeof(TaggedMigrationByMultipleInterfacesTaggedWithUsAndNy), new[] { "US" })
                     .ShouldBeTrue();
 
-                _default.TypeHasMatchingTags(typeof(TaggedMigrationByMultipleInterfacesTaggedWithUsAndNy), new[] { "NY" })
+                _tagConventions.TypeHasMatchingTags(typeof(TaggedMigrationByMultipleInterfacesTaggedWithUsAndNy), new[] { "NY" })
                     .ShouldBeTrue();
 
-                _default.TypeHasMatchingTags(typeof(TaggedMigrationByMultipleInterfacesTaggedWithUsAndNy), new[] { "US", "NY" })
+                _tagConventions.TypeHasMatchingTags(typeof(TaggedMigrationByMultipleInterfacesTaggedWithUsAndNy), new[] { "US", "NY" })
                     .ShouldBeTrue();
             }
 
@@ -459,7 +460,7 @@ namespace FluentMigrator.Tests.Unit
             [Category("Tagging")]
             public void WhenBaseInterfaceInheritsTagsThenConcreteTypeReturnsTrue()
             {
-                _default.TypeHasMatchingTags(typeof(TaggedMigrationByCompositeInterfaceTaggedWithDev), new[] { "DEV" })
+                _tagConventions.TypeHasMatchingTags(typeof(TaggedMigrationByCompositeInterfaceTaggedWithDev), new[] { "DEV" })
                     .ShouldBeTrue();
             }
 
@@ -467,13 +468,13 @@ namespace FluentMigrator.Tests.Unit
             [Category("Tagging")]
             public void WhenBaseTypesAndInterfacesHaveTagsThenConcreteTypeReturnsTrue()
             {
-                _default.TypeHasMatchingTags(typeof(TaggedMigrationByCompositeInheritanceTaggedWithBetaAndQa), new[] { "Beta" })
+                _tagConventions.TypeHasMatchingTags(typeof(TaggedMigrationByCompositeInheritanceTaggedWithBetaAndQa), new[] { "Beta" })
                     .ShouldBeTrue();
 
-                _default.TypeHasMatchingTags(typeof(TaggedMigrationByCompositeInheritanceTaggedWithBetaAndQa), new[] { "QA" })
+                _tagConventions.TypeHasMatchingTags(typeof(TaggedMigrationByCompositeInheritanceTaggedWithBetaAndQa), new[] { "QA" })
                     .ShouldBeTrue();
 
-                _default.TypeHasMatchingTags(typeof(TaggedMigrationByCompositeInheritanceTaggedWithBetaAndQa), new[] { "Beta", "QA" })
+                _tagConventions.TypeHasMatchingTags(typeof(TaggedMigrationByCompositeInheritanceTaggedWithBetaAndQa), new[] { "Beta", "QA" })
                     .ShouldBeTrue();
             }
 
@@ -481,25 +482,25 @@ namespace FluentMigrator.Tests.Unit
             [Category("Tagging")]
             public void WhenAttributionAndBaseTypesAndInterfacesHaveTagsThenConcreteTypeReturnsTrue()
             {
-                _default.TypeHasMatchingTags(typeof(TaggedMigrationByAttributionAndCompositeInheritanceTaggedWithStagingAndBetaAndDev), new[] { "Staging" })
+                _tagConventions.TypeHasMatchingTags(typeof(TaggedMigrationByAttributionAndCompositeInheritanceTaggedWithStagingAndBetaAndDev), new[] { "Staging" })
                     .ShouldBeTrue();
 
-                _default.TypeHasMatchingTags(typeof(TaggedMigrationByAttributionAndCompositeInheritanceTaggedWithStagingAndBetaAndDev), new[] { "Beta" })
+                _tagConventions.TypeHasMatchingTags(typeof(TaggedMigrationByAttributionAndCompositeInheritanceTaggedWithStagingAndBetaAndDev), new[] { "Beta" })
                     .ShouldBeTrue();
 
-                _default.TypeHasMatchingTags(typeof(TaggedMigrationByAttributionAndCompositeInheritanceTaggedWithStagingAndBetaAndDev), new[] { "DEV" })
+                _tagConventions.TypeHasMatchingTags(typeof(TaggedMigrationByAttributionAndCompositeInheritanceTaggedWithStagingAndBetaAndDev), new[] { "DEV" })
                     .ShouldBeTrue();
 
-                _default.TypeHasMatchingTags(typeof(TaggedMigrationByAttributionAndCompositeInheritanceTaggedWithStagingAndBetaAndDev), new[] { "Staging", "Beta" })
+                _tagConventions.TypeHasMatchingTags(typeof(TaggedMigrationByAttributionAndCompositeInheritanceTaggedWithStagingAndBetaAndDev), new[] { "Staging", "Beta" })
                     .ShouldBeTrue();
 
-                _default.TypeHasMatchingTags(typeof(TaggedMigrationByAttributionAndCompositeInheritanceTaggedWithStagingAndBetaAndDev), new[] { "Staging", "DEV" })
+                _tagConventions.TypeHasMatchingTags(typeof(TaggedMigrationByAttributionAndCompositeInheritanceTaggedWithStagingAndBetaAndDev), new[] { "Staging", "DEV" })
                     .ShouldBeTrue();
 
-                _default.TypeHasMatchingTags(typeof(TaggedMigrationByAttributionAndCompositeInheritanceTaggedWithStagingAndBetaAndDev), new[] { "Beta", "DEV" })
+                _tagConventions.TypeHasMatchingTags(typeof(TaggedMigrationByAttributionAndCompositeInheritanceTaggedWithStagingAndBetaAndDev), new[] { "Beta", "DEV" })
                     .ShouldBeTrue();
 
-                _default.TypeHasMatchingTags(typeof(TaggedMigrationByAttributionAndCompositeInheritanceTaggedWithStagingAndBetaAndDev), new[] { "Staging", "Beta", "DEV" })
+                _tagConventions.TypeHasMatchingTags(typeof(TaggedMigrationByAttributionAndCompositeInheritanceTaggedWithStagingAndBetaAndDev), new[] { "Staging", "Beta", "DEV" })
                     .ShouldBeTrue();
             }
 
@@ -507,25 +508,25 @@ namespace FluentMigrator.Tests.Unit
             [Category("Tagging")]
             public void WhenBaseInterfacesHaveOverlappingTagsThenConcreteTypeReturnsTrue()
             {
-                _default.TypeHasMatchingTags(typeof(TaggedMigrationByCompositeOverlappingTagsTaggedWithCaAndNvOnceAndTxTwice), new[] { "CA" })
+                _tagConventions.TypeHasMatchingTags(typeof(TaggedMigrationByCompositeOverlappingTagsTaggedWithCaAndNvOnceAndTxTwice), new[] { "CA" })
                     .ShouldBeTrue();
 
-                _default.TypeHasMatchingTags(typeof(TaggedMigrationByCompositeOverlappingTagsTaggedWithCaAndNvOnceAndTxTwice), new[] { "NV" })
+                _tagConventions.TypeHasMatchingTags(typeof(TaggedMigrationByCompositeOverlappingTagsTaggedWithCaAndNvOnceAndTxTwice), new[] { "NV" })
                     .ShouldBeTrue();
 
-                _default.TypeHasMatchingTags(typeof(TaggedMigrationByCompositeOverlappingTagsTaggedWithCaAndNvOnceAndTxTwice), new[] { "TX" })
+                _tagConventions.TypeHasMatchingTags(typeof(TaggedMigrationByCompositeOverlappingTagsTaggedWithCaAndNvOnceAndTxTwice), new[] { "TX" })
                     .ShouldBeTrue();
 
-                _default.TypeHasMatchingTags(typeof(TaggedMigrationByCompositeOverlappingTagsTaggedWithCaAndNvOnceAndTxTwice), new[] { "CA", "NV" })
+                _tagConventions.TypeHasMatchingTags(typeof(TaggedMigrationByCompositeOverlappingTagsTaggedWithCaAndNvOnceAndTxTwice), new[] { "CA", "NV" })
                     .ShouldBeTrue();
 
-                _default.TypeHasMatchingTags(typeof(TaggedMigrationByCompositeOverlappingTagsTaggedWithCaAndNvOnceAndTxTwice), new[] { "CA", "TX" })
+                _tagConventions.TypeHasMatchingTags(typeof(TaggedMigrationByCompositeOverlappingTagsTaggedWithCaAndNvOnceAndTxTwice), new[] { "CA", "TX" })
                     .ShouldBeTrue();
 
-                _default.TypeHasMatchingTags(typeof(TaggedMigrationByCompositeOverlappingTagsTaggedWithCaAndNvOnceAndTxTwice), new[] { "NV", "TX" })
+                _tagConventions.TypeHasMatchingTags(typeof(TaggedMigrationByCompositeOverlappingTagsTaggedWithCaAndNvOnceAndTxTwice), new[] { "NV", "TX" })
                     .ShouldBeTrue();
 
-                _default.TypeHasMatchingTags(typeof(TaggedMigrationByCompositeOverlappingTagsTaggedWithCaAndNvOnceAndTxTwice), new[] { "CA", "NV", "TX" })
+                _tagConventions.TypeHasMatchingTags(typeof(TaggedMigrationByCompositeOverlappingTagsTaggedWithCaAndNvOnceAndTxTwice), new[] { "CA", "NV", "TX" })
                     .ShouldBeTrue();
             }
         }

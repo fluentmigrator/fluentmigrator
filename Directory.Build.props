@@ -1,5 +1,8 @@
 <Project>
- <PropertyGroup>
-   <Deterministic>true</Deterministic>
- </PropertyGroup>
+  <PropertyGroup>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TestingAot)' == 'true'">
+    <DefineConstants>$(DefineConstants);TESTING_AOT</DefineConstants>
+  </PropertyGroup>
 </Project>
