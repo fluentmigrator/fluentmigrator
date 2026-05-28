@@ -126,15 +126,24 @@ jobs:
         FM_TestConnectionStrings__SqlServer2016__ContainerEnabled: ${{ matrix.os == 'ubuntu-latest' }}
         FM_TestConnectionStrings__SqlServer2016__IsEnabled: ${{ matrix.os == 'ubuntu-latest' }}
 
-    - name: Verify test results coverage files exists
+    - name: Verify Cobertura files are generated
       if: matrix.os == 'ubuntu-latest' && (!cancelled())
       run: |
         echo "=== Runner variable github.workspace ==="
         echo "${{ github.workspace }}"
         echo "=== Environment variable GITHUB_WORKSPACE ==="
         echo $GITHUB_WORKSPACE
-        echo "=== Coverage directory listing ==="
-        find . -name "*Cobertura.xml" || true
+        echo "=== Cobertura file listing ==="
+        find . -type f -iname "*.cobertura.xml" -print > /tmp/cobertura-files.txt || true
+        if [ -s /tmp/cobertura-files.txt ]; then
+          cat /tmp/cobertura-files.txt
+        else
+          echo "::warning::No Cobertura files were found."
+          echo "=== Troubleshooting: TestResults directories ==="
+          find . -type d -name "TestResults-*" || true
+          echo "=== Troubleshooting: files under TestResults directories (first 200) ==="
+          find . -type f -path "*/TestResults-*/*" | head -n 200 || true
+        fi
 
     - name: Combine Coverage Reports
       uses: danielpalme/ReportGenerator-GitHub-Action@v5.5.10
