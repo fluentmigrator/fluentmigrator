@@ -178,7 +178,7 @@ jobs:
       # and this particular GitHub action from EnricoMi is a containerized action
       if: matrix.os == 'ubuntu-latest' && (!cancelled())
       with:
-        files: "$GITHUB_WORKSPACE/**/*.trx"
+        files: "**/*.trx"
 
     - name: Diagnostics (Linux)
       if: matrix.os == 'ubuntu-latest' && failure()
