@@ -142,9 +142,9 @@ jobs:
       if: matrix.os == 'windows-latest' && (!cancelled())
       shell: pwsh
       run: |
-        dotnet build ${{ env.solution }} --configuration ${{ env.buildConfiguration }} --verbosity minimal -p:Version=${{ steps.gitversion.outputs.fullSemVer }}
+        dotnet build ${{ env.solution }} --configuration ${{ env.buildConfiguration }} --verbosity minimal -p:Version=${{ steps.gitversion.outputs.majorMinorPatch }}
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-        dotnet pack ${{ env.solution }} --configuration ${{ env.buildConfiguration }} --no-build --verbosity minimal -p:Version=${{ steps.gitversion.outputs.fullSemVer }}
+        dotnet pack ${{ env.solution }} --configuration ${{ env.buildConfiguration }} --no-build --verbosity minimal -p:Version=${{ steps.gitversion.outputs.majorMinorPatch }}
 
     - name: Verify test results coverage files exists
       if: matrix.os == 'ubuntu-latest' && (!cancelled())

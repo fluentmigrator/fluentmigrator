@@ -72,12 +72,7 @@ public partial class AnonSecurityLabelBuilder
     [EditorBrowsable(EditorBrowsableState.Never)]
     public AnonSecurityLabelBuilder MaskedWithRandomInt(int min, int max)
     {
-        if (min > max)
-        {
-            throw new ArgumentException("Min value cannot be greater than max value.", nameof(min));
-        }
-        RawLabel($"MASKED WITH FUNCTION anon.random_int_between({min}, {max})");
-        return this;
+        return MaskedWithRandomIntBetween(min, max);
     }
 
     /// <summary>
