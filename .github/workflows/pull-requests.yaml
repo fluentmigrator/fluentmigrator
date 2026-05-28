@@ -169,7 +169,7 @@ jobs:
       if: '!cancelled()'
       with:
         name: test-results-${{ matrix.os }}-${{ matrix.dotnet-tfm }}
-        path: $GITHUB_WORKSPACE/**/TestResults-${{ matrix.dotnet-tfm }}/**/*
+        path: "**/TestResults-${{ matrix.dotnet-tfm }}/**/*"
         retention-days: 5
 
     - name: Publish Test Results
