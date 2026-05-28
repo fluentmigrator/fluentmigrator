@@ -37,7 +37,7 @@ namespace FluentMigrator.Runner.Processors.Postgres
     {
         /// <inheritdoc />
         public Postgres15_0Processor(
-            [NotNull] PostgresDbFactory factory,
+            [NotNull] IPostgresDbFactory factory,
             [NotNull] Postgres15_0Generator generator,
             [NotNull] ILogger<Postgres15_0Processor> logger,
             [NotNull] IOptionsSnapshot<ProcessorOptions> options,
