@@ -30,6 +30,9 @@ namespace FluentMigrator.Builders.Delete
         /// </summary>
         /// <param name="dataAsAnonymousType">An anonymous type whose member names will be trated as column names and their values as values for the condition</param>
         /// <returns>The next step</returns>
+#if NET
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("The properties of the anonymous type cannot be statically analyzed.")]
+#endif
         IDeleteDataSyntax Row(object dataAsAnonymousType);
 
         /// <summary>

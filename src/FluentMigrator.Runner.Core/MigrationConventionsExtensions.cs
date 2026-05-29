@@ -19,7 +19,7 @@ using System;
 namespace FluentMigrator.Runner
 {
     /// <summary>
-    /// Extension methods for <see cref="IMigrationRunnerConventions"/>.
+    /// Extension methods for <see cref="IMigrationRunnerConventions"/> and <see cref="IMigrationRunnerTagConventions"/>.
     /// </summary>
     public static class MigrationConventionsExtensions
     {
@@ -33,6 +33,47 @@ namespace FluentMigrator.Runner
         /// <returns><see langword="true"/> when the requested tags match the tags attached to the type.</returns>
         public static bool HasRequestedTags(
             this IMigrationRunnerConventions conventions,
+#if NET
+            [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.Interfaces)]
+#endif
+            Type type,
+            string[] tagsList,
+            bool includeUntagged)
+        {
+            if (conventions is IMigrationRunnerTagConventions tagConventions)
+            {
+                return HasRequestedTags(tagConventions, type, tagsList, includeUntagged);
+            }
+
+#pragma warning disable CS0618
+            if (tagsList.Length > 0)
+            {
+                if (includeUntagged)
+                {
+                    return conventions.TypeHasMatchingTags(type, tagsList)
+                     || !conventions.TypeHasTags(type);
+                }
+
+                return conventions.TypeHasMatchingTags(type, tagsList);
+            }
+
+            return !conventions.TypeHasTags(type);
+#pragma warning restore CS0618
+        }
+
+        /// <summary>
+        /// Returns a value indicating whether the type matches the given tag list.
+        /// </summary>
+        /// <param name="conventions">The tag conventions to use.</param>
+        /// <param name="type">The type to validate.</param>
+        /// <param name="tagsList">The list of tags to check against.</param>
+        /// <param name="includeUntagged">Allow untagged entries.</param>
+        /// <returns><see langword="true"/> when the requested tags match the tags attached to the type.</returns>
+        public static bool HasRequestedTags(
+            this IMigrationRunnerTagConventions conventions,
+#if NET
+            [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.Interfaces)]
+#endif
             Type type,
             string[] tagsList,
             bool includeUntagged)

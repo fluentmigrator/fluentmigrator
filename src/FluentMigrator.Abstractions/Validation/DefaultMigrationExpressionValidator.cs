@@ -53,10 +53,15 @@ namespace FluentMigrator.Validation
             }
 
             var result = new List<ValidationResult>();
+
+            // Expression and model types with [Required] attributes are preserved
+            // in AOT/trimmed builds via ILLink.Descriptors.xml.
+#pragma warning disable IL2026
             if (!ValidationUtilities.TryCollectResults(context, expression, result))
             {
                 return result;
             }
+#pragma warning restore IL2026
 
             return Enumerable.Empty<ValidationResult>();
         }

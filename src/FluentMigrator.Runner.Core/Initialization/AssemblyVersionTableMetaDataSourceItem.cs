@@ -28,6 +28,9 @@ namespace FluentMigrator.Runner.Initialization
     /// <summary>
     /// Implementation of <see cref="IVersionTableMetaDataSourceItem"/> that uses assemblies as source
     /// </summary>
+#if NET
+    [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This type uses the AppDomain to load assemblies, which may not be preserved in trimmed applications.")]
+#endif
     public class AssemblyVersionTableMetaDataSourceItem : IVersionTableMetaDataSourceItem
     {
         [NotNull, ItemNotNull]

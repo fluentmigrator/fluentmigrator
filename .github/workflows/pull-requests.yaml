@@ -12,6 +12,7 @@ env:
   solution: 'FluentMigrator.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: Release
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   build:
@@ -32,29 +33,29 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         fetch-depth: 0
 
     - name: Install GitVersion
-      uses: gittools/actions/gitversion/setup@v4.1.0
+      uses: gittools/actions/gitversion/setup@v4.5.0
       with:
         versionSpec: 6.3.x
 
     - name: Execute GitVersion
-      uses: gittools/actions/gitversion/execute@v4.1.0
+      uses: gittools/actions/gitversion/execute@v4.5.0
       env:
         BUILD_BUILDNUMBER: ${{ env.GitVersion.NuGetVersionV2 }}
       with:
         updateAssemblyInfo: false
 
     - name: Setup dotnet SDK
-      uses: actions/setup-dotnet@v4
+      uses: actions/setup-dotnet@v5
       with:
         dotnet-version: '9.0.x'
 
     - name: Setup dotnet SDK
-      uses: actions/setup-dotnet@v4
+      uses: actions/setup-dotnet@v5
       with:
         dotnet-version: '10.0.x'
 
@@ -126,7 +127,11 @@ jobs:
         FM_TestConnectionStrings__SqlServer2016__ContainerEnabled: ${{ matrix.os == 'ubuntu-latest' }}
         FM_TestConnectionStrings__SqlServer2016__IsEnabled: ${{ matrix.os == 'ubuntu-latest' }}
 
-    - name: Verify Cobertura files are generated
+    - name: AOT Smoke Tests
+      if: matrix.dotnet-tfm == 'net8.0'
+      run: dotnet run --project test/FluentMigrator.Tests.Aot/FluentMigrator.Tests.Aot.csproj --configuration ${{ env.buildConfiguration }} --verbosity quiet\
+
+    - name: Verify test results coverage files exists
       if: matrix.os == 'ubuntu-latest' && (!cancelled())
       run: |
         echo "=== Runner variable github.workspace ==="
@@ -159,7 +164,7 @@ jobs:
     - run: cat coveragereport/SummaryGithub.md >> $GITHUB_STEP_SUMMARY
 
     - name: Upload Combined Coverage XML
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       if: '!cancelled()'
       with:
         name: coverage-${{ matrix.os }}-${{ matrix.dotnet-tfm }}
@@ -174,7 +179,7 @@ jobs:
         path: coveragereport/SummaryGithub.md
 
     - name: Upload Test Result Files
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       if: '!cancelled()'
       with:
         name: test-results-${{ matrix.os }}-${{ matrix.dotnet-tfm }}
