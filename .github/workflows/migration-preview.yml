@@ -155,8 +155,10 @@ jobs:
 
       - name: Post pull request comment
         if: github.event_name == 'pull_request'
-        uses: marocchino/sticky-pull-request-comment@v2
+        uses: ./.github/actions/sticky-pr-comment
         with:
+          github_token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          pull_request_number: ${{ github.event.pull_request.number }}
           header: ${{ inputs.comment_header }}
-          recreate: true
-          path: ${{ steps.generate.outputs.comment_path }}
+          body_path: ${{ steps.generate.outputs.comment_path }}

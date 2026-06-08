@@ -276,7 +276,8 @@ jobs:
 FluentMigrator includes a reusable workflow at
 `.github/workflows/migration-preview.yml` that generates SQL previews for the
 base and PR refs, computes a schema SQL diff, and posts it as a sticky pull
-request comment.
+request comment using the repository-owned .NET action at
+`.github/actions/sticky-pr-comment`.
 
 ```yaml
 name: Migration Preview
