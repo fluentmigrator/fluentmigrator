@@ -272,6 +272,43 @@ jobs:
           -a "./bin/Release/net6.0/MyApp.dll"
 ```
 
+### GitHub Pull Request Schema Preview
+FluentMigrator includes a reusable workflow at
+`.github/workflows/migration-preview.yml` that generates SQL previews for the
+base and PR refs, computes a schema SQL diff, and posts it as a sticky pull
+request comment.
+
+```yaml
+name: Migration Preview
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  preview:
+    strategy:
+      matrix:
+        include:
+          - processor: postgres
+            connectionStringSecret: POSTGRES_PREVIEW_CONNECTION_STRING
+          - processor: mysql8
+            connectionStringSecret: MYSQL_PREVIEW_CONNECTION_STRING
+          - processor: sqlite
+            connectionStringSecret: SQLITE_PREVIEW_CONNECTION_STRING
+          - processor: sqlserver2016
+            connectionStringSecret: SQLSERVER_PREVIEW_CONNECTION_STRING
+
+    uses: fluentmigrator/fluentmigrator/.github/workflows/migration-preview.yml@main
+    with:
+      processor: ${{ matrix.processor }}
+      migration_project: src/MyApp.Migrations/MyApp.Migrations.csproj
+      migration_assembly: src/MyApp.Migrations/bin/Release/net8.0/MyApp.Migrations.dll
+      comment_header: fluentmigrator-preview-${{ matrix.processor }}
+    secrets:
+      connection_string: ${{ secrets[matrix.connectionStringSecret] }}
+```
+
 ### Azure DevOps Pipeline
 ```yaml
 trigger:

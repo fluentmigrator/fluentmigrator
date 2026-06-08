@@ -1,0 +1,162 @@
+name: FluentMigrator Preview
+
+on:
+  workflow_call:
+    inputs:
+      processor:
+        description: FluentMigrator processor id (for example postgres, mysql8, sqlite, sqlserver2016)
+        required: true
+        type: string
+      migration_project:
+        description: Path to the migration project (.csproj or .sln) to build
+        required: true
+        type: string
+      migration_assembly:
+        description: Path to the migration assembly used with dotnet fm -a
+        required: true
+        type: string
+      base_ref:
+        description: Git ref/SHA for the base branch (defaults to pull_request.base.sha)
+        required: false
+        type: string
+        default: ""
+      head_ref:
+        description: Git ref/SHA for the PR branch (defaults to github.sha)
+        required: false
+        type: string
+        default: ""
+      dotnet_version:
+        description: .NET SDK version
+        required: false
+        type: string
+        default: 9.0.x
+      build_configuration:
+        description: Build configuration
+        required: false
+        type: string
+        default: Release
+      additional_args:
+        description: Extra arguments passed to dotnet fm migrate
+        required: false
+        type: string
+        default: ""
+      comment_header:
+        description: Sticky comment header identifier
+        required: false
+        type: string
+        default: fluentmigrator-preview
+    secrets:
+      connection_string:
+        description: Connection string used to generate migration SQL preview
+        required: true
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  preview:
+    name: Generate migration preview
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ inputs.dotnet_version }}
+
+      - name: Install dotnet-fm
+        run: dotnet tool install -g FluentMigrator.DotNet.Cli
+
+      - name: Generate base/head SQL previews
+        id: generate
+        shell: bash
+        env:
+          PATH: ${{ env.PATH }}:/home/runner/.dotnet/tools
+          PROCESSOR: ${{ inputs.processor }}
+          MIGRATION_PROJECT: ${{ inputs.migration_project }}
+          MIGRATION_ASSEMBLY: ${{ inputs.migration_assembly }}
+          BUILD_CONFIGURATION: ${{ inputs.build_configuration }}
+          ADDITIONAL_ARGS: ${{ inputs.additional_args }}
+          CONNECTION_STRING: ${{ secrets.connection_string }}
+          BASE_REF_INPUT: ${{ inputs.base_ref }}
+          HEAD_REF_INPUT: ${{ inputs.head_ref }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          GITHUB_SHA_VALUE: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+
+          BASE_REF="${BASE_REF_INPUT:-$PR_BASE_SHA}"
+          HEAD_REF="${HEAD_REF_INPUT:-$GITHUB_SHA_VALUE}"
+
+          if [ -z "${BASE_REF}" ]; then
+            echo "Unable to resolve base ref. Provide inputs.base_ref when calling this workflow." >&2
+            exit 1
+          fi
+
+          temp_dir="$(mktemp -d)"
+          base_sql="${temp_dir}/base.sql"
+          head_sql="${temp_dir}/head.sql"
+          diff_sql="${temp_dir}/diff.sql"
+          comment_md="${temp_dir}/comment.md"
+
+          generate_preview() {
+            local ref="$1"
+            local output_file="$2"
+
+            git checkout --force "$ref"
+            dotnet restore "$MIGRATION_PROJECT"
+            dotnet build "$MIGRATION_PROJECT" --configuration "$BUILD_CONFIGURATION" --no-restore
+            dotnet fm migrate \
+              -p "$PROCESSOR" \
+              -c "$CONNECTION_STRING" \
+              -a "$MIGRATION_ASSEMBLY" \
+              --preview \
+              --verbose \
+              --output \
+              --outputFileName "$output_file" \
+              $ADDITIONAL_ARGS
+          }
+
+          generate_preview "$BASE_REF" "$base_sql"
+          generate_preview "$HEAD_REF" "$head_sql"
+
+          git checkout --force "$HEAD_REF"
+
+          diff -u "$base_sql" "$head_sql" > "$diff_sql" || true
+
+          if [ ! -s "$diff_sql" ]; then
+            printf 'No schema SQL changes detected between %s and %s.\n' "$BASE_REF" "$HEAD_REF" > "$diff_sql"
+          fi
+
+          {
+            echo "## FluentMigrator schema preview"
+            echo
+            echo "Base ref: \\`$BASE_REF\\`"
+            echo "Head ref: \\`$HEAD_REF\\`"
+            echo
+            echo "\\`\\`\\`sql"
+            cat "$diff_sql"
+            echo "\\`\\`\\`"
+          } > "$comment_md"
+
+          echo "comment_path=$comment_md" >> "$GITHUB_OUTPUT"
+
+      - name: Publish preview artifact
+        uses: actions/upload-artifact@v5
+        with:
+          name: fluentmigrator-preview-${{ github.run_id }}
+          path: ${{ steps.generate.outputs.comment_path }}
+
+      - name: Post pull request comment
+        if: github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: ${{ inputs.comment_header }}
+          recreate: true
+          path: ${{ steps.generate.outputs.comment_path }}
