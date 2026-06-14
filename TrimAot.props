@@ -6,7 +6,7 @@
     -->
     <TargetFrameworks>$(TargetFrameworks);net8.0</TargetFrameworks>
   </PropertyGroup>
-  <PropertyGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net8.0'))">
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
     <IsTrimmable>true</IsTrimmable>
     <IsAotCompatible>true</IsAotCompatible>
     <VerifyReferenceAotCompatibility>true</VerifyReferenceAotCompatibility>
