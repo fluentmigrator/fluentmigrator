@@ -94,8 +94,14 @@ namespace FluentMigrator.Analyzers
         }
 
         private static long? GetMigrationAttributeVersion(FluentMigratorContext fluentMigratorContext, IEnumerable<AttributeData> attributes)
-            => attributes
-                .FirstOrDefault(a => fluentMigratorContext.MigrationAttributeType.IsAssignableFrom(a.AttributeClass))
-                ?.ConstructorArguments[0].Value as long?;
+        {
+            var attribute = attributes.FirstOrDefault(a => fluentMigratorContext.MigrationAttributeType.IsAssignableFrom(a.AttributeClass));
+            if (attribute == null || attribute.ConstructorArguments.Length == 0)
+            {
+                return null;
+            }
+
+            return attribute.ConstructorArguments[0].Value as long?;
+        }
     }
 }
