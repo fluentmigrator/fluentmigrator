@@ -33,7 +33,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\FluentMigrator.Abstractions\FluentMigrator.Abstractions.csproj" />
     <ProjectReference Include="..\..\src\FluentMigrator.Analyzers\FluentMigrator.Analyzers.csproj" OutputItemType="Analyzer" />
   </ItemGroup>
 
