@@ -48,6 +48,11 @@ namespace FluentMigrator.Expressions
         public virtual ColumnDefinition Column { get; set; }
             = new ColumnDefinition() { ModificationType = ColumnModificationType.Alter };
 
+        /// <summary>
+        /// Specifies the command should only be applied if the table exists.
+        /// </summary>
+        public virtual bool IfExists { get; set; }
+
         /// <inheritdoc />
         public override void ExecuteWith(IMigrationProcessor processor)
         {

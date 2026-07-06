@@ -63,6 +63,16 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         }
 
         [Test]
+        public void CanCreateTableIfNotExistsWithDefaultSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableExpression();
+            expression.IfNotExists = true;
+
+            var result = Generator.Generate(expression);
+            result.ShouldBeEmpty();
+        }
+
+        [Test]
         public override void CanCreateTableWithDefaultValueExplicitlySetToNullWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithDefaultValue();

@@ -77,6 +77,17 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
         }
 
         [Test]
+        public void CanAlterColumnIfExistsWithDefaultSchema()
+        {
+            var expression = GeneratorTestHelper.GetAlterColumnExpression();
+            expression.Column.IsNullable = null;
+            expression.IfExists = true;
+
+            var result = _generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE IF EXISTS \"public\".\"TestTable1\" ALTER \"TestColumn1\" TYPE varchar(20);");
+        }
+
+        [Test]
         public override void CanCreateAutoIncrementColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetAlterColumnAddAutoIncrementExpression();
@@ -112,6 +123,16 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
 
             var result = _generator.Generate(expression);
             result.ShouldBe("ALTER TABLE \"public\".\"TestTable1\" ADD \"TestColumn1\" varchar(5) NOT NULL;");
+        }
+
+        [Test]
+        public void CanCreateColumnIfExistsWithDefaultSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateColumnExpression();
+            expression.IfExists = true;
+
+            var result = _generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE IF EXISTS \"public\".\"TestTable1\" ADD \"TestColumn1\" varchar(5) NOT NULL;");
         }
 
         [Test]

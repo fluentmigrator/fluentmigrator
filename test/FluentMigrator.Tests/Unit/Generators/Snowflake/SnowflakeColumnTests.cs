@@ -86,6 +86,15 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         }
 
         [Test]
+        public void CanAlterColumnIfExistsWithDefaultSchema()
+        {
+            var expression = GeneratorTestHelper.GetAlterColumnExpression();
+            expression.IfExists = true;
+            var result = Generator.Generate(expression);
+            result.ShouldBe(@"ALTER TABLE IF EXISTS ""PUBLIC"".""TestTable1"" ALTER COLUMN ""TestColumn1"" SET NOT NULL, COLUMN ""TestColumn1"" VARCHAR(20), COLUMN ""TestColumn1"" COMMENT '';", _quotingEnabled);
+        }
+
+        [Test]
         public override void CanCreateAutoIncrementColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetAlterColumnAddAutoIncrementExpression();
@@ -119,6 +128,15 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
             var result = Generator.Generate(expression);
             result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ADD COLUMN ""TestColumn1"" VARCHAR(5) NOT NULL;", _quotingEnabled);
+        }
+
+        [Test]
+        public void CanCreateColumnIfExistsWithDefaultSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateColumnExpression();
+            expression.IfExists = true;
+            var result = Generator.Generate(expression);
+            result.ShouldBe(@"ALTER TABLE IF EXISTS ""PUBLIC"".""TestTable1"" ADD COLUMN ""TestColumn1"" VARCHAR(5) NOT NULL;", _quotingEnabled);
         }
 
         [Test]

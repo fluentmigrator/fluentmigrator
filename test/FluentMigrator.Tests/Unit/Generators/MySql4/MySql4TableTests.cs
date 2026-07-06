@@ -58,6 +58,16 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
         }
 
         [Test]
+        public void CanCreateTableIfNotExistsWithDefaultSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableExpression();
+            expression.IfNotExists = true;
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE IF NOT EXISTS `TestTable1` (`TestColumn1` VARCHAR(255) NOT NULL, `TestColumn2` INTEGER NOT NULL) ENGINE = INNODB;");
+        }
+
+        [Test]
         public override void CanCreateTableWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
