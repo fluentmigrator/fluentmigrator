@@ -63,6 +63,9 @@ SAP HANA is an in-memory database platform.
 ```bash
 # For .NET CLI
 dotnet add package FluentMigrator.Runner.Hana
+
+# For Package Manager Console
+Install-Package FluentMigrator.Runner.Hana
 ```
 
 Also install the SAP HANA ADO.NET driver NuGet package appropriate for your .NET version:

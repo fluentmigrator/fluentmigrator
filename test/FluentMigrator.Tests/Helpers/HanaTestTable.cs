@@ -136,7 +136,7 @@ namespace FluentMigrator.Tests.Helpers
         {
             using (var command = Connection.CreateCommand())
             {
-                command.CommandText = string.Format("ALTER TABLE {0} ADD CONSTRAINT {1} UNIQUE ({2})", _quoter.QuoteTableName(Name), _quoter.QuoteConstraintName(name), _quoter.QuoteColumnName(column));
+                command.CommandText = string.Format("ALTER TABLE {0} ADD CONSTRAINT {1} UNIQUE ({2})", _quoter.QuoteTableName(Name, _schemaName), _quoter.QuoteConstraintName(name), _quoter.QuoteColumnName(column));
                 command.Transaction = Transaction;
                 command.ExecuteNonQuery();
             }
