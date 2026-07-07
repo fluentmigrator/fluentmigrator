@@ -80,6 +80,15 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         }
 
         [Test]
+        public void CanCreateTableIfNotExistsWithDefaultSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableExpression();
+            expression.IfNotExists = true;
+            var result = Generator.Generate(expression);
+            result.ShouldBe(@"CREATE TABLE IF NOT EXISTS ""PUBLIC"".""TestTable1"" (""TestColumn1"" VARCHAR NOT NULL, ""TestColumn2"" NUMBER NOT NULL);", _quotingEnabled);
+        }
+
+        [Test]
         public override void CanCreateTableWithDefaultValueExplicitlySetToNullWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();

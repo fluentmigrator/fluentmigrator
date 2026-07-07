@@ -19,6 +19,7 @@
 using FluentMigrator.Exceptions;
 using FluentMigrator.Runner.Generators.Oracle;
 using NUnit.Framework;
+using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Generators.Oracle
 {
@@ -38,6 +39,16 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         public override void CanCreateTableWithIdentityWithDefaultSchema()
         {
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression()));
+        }
+
+        [Test]
+        public void CanCreateTableIfNotExistsWithDefaultSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableExpression();
+            expression.IfNotExists = true;
+
+            var result = Generator.Generate(expression);
+            result.ShouldBeEmpty();
         }
     }
 }
