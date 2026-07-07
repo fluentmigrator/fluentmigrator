@@ -79,6 +79,46 @@ namespace FluentMigrator.Runner
         /// <summary>
         /// Initializes a new instance of the <see cref="MaintenanceLoader"/> class.
         /// </summary>
+        /// <param name="assemblySource">
+        /// The source of assemblies containing migration and maintenance classes.
+        /// </param>
+        /// <param name="options">
+        /// The options for configuring the migration runner.
+        /// </param>
+        /// <param name="filterOptions">
+        /// The options used to filter maintenance migrations by namespace and nested namespaces.
+        /// </param>
+        /// <param name="conventions">
+        /// The conventions used to identify and process migrations and maintenance stages.
+        /// </param>
+        /// <param name="serviceProvider">
+        /// The service provider used to resolve dependencies for migration and maintenance instances.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if any of the required parameters are <c>null</c>.
+        /// </exception>
+        [Obsolete("Use the constructor that accepts ITypeSource instead")]
+#if NET
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This constructor uses reflection-based assembly scanning via AssemblyTypeSource. Use the constructor that accepts ITypeSource for AOT-compatible usage.")]
+#endif
+        public MaintenanceLoader(
+            [NotNull] IAssemblySource assemblySource,
+            [NotNull] IOptions<RunnerOptions> options,
+            [NotNull] IOptions<TypeFilterOptions> filterOptions,
+            [NotNull] IMigrationRunnerConventions conventions,
+            [NotNull] IServiceProvider serviceProvider)
+            : this(
+                new AssemblyTypeSource(assemblySource),
+                options,
+                filterOptions,
+                conventions,
+                serviceProvider)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MaintenanceLoader"/> class.
+        /// </summary>
         /// <param name="typeSource">
         /// The source of types containing migration and maintenance classes.
         /// </param>
