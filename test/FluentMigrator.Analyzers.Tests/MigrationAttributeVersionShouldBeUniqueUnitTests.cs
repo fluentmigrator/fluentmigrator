@@ -77,6 +77,13 @@ namespace FluentMigrator.Analyzers.Tests
                 },
             };
 
+            ut.TestState.AdditionalReferences.Add(typeof(IMigration).Assembly);
+#if NET
+            // The referenced FluentMigrator assembly is loaded against the modern runtime, so align the
+            // compilation reference set to match and avoid CS1705 assembly-version conflicts.
+            ut.ReferenceAssemblies = ReferenceAssemblies.Net.Net80;
+#endif
+
             await ut.RunAsync();
         }
 
@@ -115,6 +122,12 @@ namespace FluentMigrator.Analyzers.Tests
             };
 
             ut.TestState.ExpectedDiagnostics.AddRange(expected);
+            ut.TestState.AdditionalReferences.Add(typeof(IMigration).Assembly);
+#if NET
+            // The referenced FluentMigrator assembly is loaded against the modern runtime, so align the
+            // compilation reference set to match and avoid CS1705 assembly-version conflicts.
+            ut.ReferenceAssemblies = ReferenceAssemblies.Net.Net80;
+#endif
 
             await ut.RunAsync();
         }

@@ -93,6 +93,13 @@ namespace FluentMigrator.Builders.Alter.Table
         }
 
         /// <inheritdoc />
+        public IAlterTableAddColumnOrAlterColumnOrSchemaSyntax IfExists()
+        {
+            Expression.IfExists = true;
+            return this;
+        }
+
+        /// <inheritdoc />
         public IAlterTableColumnAsTypeSyntax AddColumn(string name)
         {
             var column = new ColumnDefinition { Name = name, ModificationType = ColumnModificationType.Create };
@@ -100,7 +107,8 @@ namespace FluentMigrator.Builders.Alter.Table
                                    {
                                        Column = column,
                                        SchemaName = Expression.SchemaName,
-                                       TableName = Expression.TableName
+                                       TableName = Expression.TableName,
+                                       IfExists = Expression.IfExists
                                    };
 
             CurrentColumn = column;
@@ -117,7 +125,8 @@ namespace FluentMigrator.Builders.Alter.Table
                                   {
                                       Column = column,
                                       SchemaName = Expression.SchemaName,
-                                      TableName = Expression.TableName
+                                      TableName = Expression.TableName,
+                                      IfExists = Expression.IfExists
                                   };
 
             CurrentColumn = column;

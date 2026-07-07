@@ -71,6 +71,16 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         }
 
         [Test]
+        public void CanCreateTableIfNotExistsWithDefaultSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableExpression();
+            expression.IfNotExists = true;
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE IF NOT EXISTS \"TestTable1\" (\"TestColumn1\" TEXT NOT NULL, \"TestColumn2\" INTEGER NOT NULL);");
+        }
+
+        [Test]
         public override void CanCreateTableWithDefaultValueExplicitlySetToNullWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithDefaultValue();

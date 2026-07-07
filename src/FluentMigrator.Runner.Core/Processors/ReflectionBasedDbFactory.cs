@@ -807,6 +807,26 @@ namespace FluentMigrator.Runner.Processors
             /// <param name="dbProviderFactoryTypeName">
             /// The fully qualified name of the database provider factory type.
             /// </param>
+            /// <remarks>
+            /// The factory type is resolved via reflection-based assembly loading. For AOT-compatible usage,
+            /// use the overload that accepts a <see cref="GetTypeDelegate"/>.
+            /// </remarks>
+            public TestEntry(
+                [NotNull] string assemblyName,
+                [NotNull] string dbProviderFactoryTypeName)
+                : this(assemblyName, dbProviderFactoryTypeName, null)
+            {
+            }
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="ReflectionBasedDbFactory.TestEntry"/> class.
+            /// </summary>
+            /// <param name="assemblyName">
+            /// The name of the assembly containing the database provider factory type.
+            /// </param>
+            /// <param name="dbProviderFactoryTypeName">
+            /// The fully qualified name of the database provider factory type.
+            /// </param>
             /// <param name="typeFactory">
             /// An optional delegate that returns the pre-loaded <see cref="Type"/> for the database provider factory.
             /// When provided, this delegate is invoked first to resolve the factory type without relying on reflection-based assembly loading.

@@ -46,6 +46,11 @@ namespace FluentMigrator.Expressions
         /// </summary>
         public virtual ColumnDefinition Column { get; set; } = new ColumnDefinition { ModificationType = ColumnModificationType.Create };
 
+        /// <summary>
+        /// Specifies the command should only be applied if the table exists.
+        /// </summary>
+        public virtual bool IfExists { get; set; }
+
         /// <inheritdoc />
         IEnumerable<ColumnDefinition> IColumnsExpression.Columns => new[] { Column };
 

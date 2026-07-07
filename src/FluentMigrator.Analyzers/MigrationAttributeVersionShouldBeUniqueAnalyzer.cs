@@ -95,8 +95,13 @@ namespace FluentMigrator.Analyzers
 
         private static long? GetMigrationAttributeVersion(FluentMigratorContext fluentMigratorContext, IEnumerable<AttributeData> attributes)
         {
-            var attribute = attributes.FirstOrDefault(a => fluentMigratorContext.MigrationAttributeType.IsAssignableFrom(a.AttributeClass));
-            if (attribute == null || attribute.ConstructorArguments.Length == 0)
+
+            var attribute = attributes
+                .FirstOrDefault(a => fluentMigratorContext.MigrationAttributeType.IsAssignableFrom(a.AttributeClass));
+
+            // ConstructorArguments can be empty when the attribute fails to bind (e.g. the compilation
+            // has errors). Guard against it so the analyzer degrades gracefully instead of throwing.
+            if (attribute is null || attribute.ConstructorArguments.Length == 0)
             {
                 return null;
             }

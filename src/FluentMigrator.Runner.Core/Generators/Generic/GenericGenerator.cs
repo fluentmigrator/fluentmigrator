@@ -55,6 +55,8 @@ namespace FluentMigrator.Runner.Generators.Generic
         /// <inheritdoc />
         public virtual string CreateTable => "CREATE TABLE {0} ({1})";
         /// <inheritdoc />
+        public virtual string CreateTableIfNotExists => "CREATE TABLE IF NOT EXISTS {0} ({1})";
+        /// <inheritdoc />
         public virtual string DropTable => "DROP TABLE {0}";
         /// <inheritdoc />
         public virtual string DropTableIfExists => "DROP TABLE IF EXISTS {0}";
@@ -62,9 +64,13 @@ namespace FluentMigrator.Runner.Generators.Generic
         /// <inheritdoc />
         public virtual string AddColumn => "ALTER TABLE {0} ADD COLUMN {1}";
         /// <inheritdoc />
+        public virtual string AddColumnIfExists => "ALTER TABLE IF EXISTS {0} ADD COLUMN {1}";
+        /// <inheritdoc />
         public virtual string DropColumn => "ALTER TABLE {0} DROP COLUMN {1}";
         /// <inheritdoc />
         public virtual string AlterColumn => "ALTER TABLE {0} ALTER COLUMN {1}";
+        /// <inheritdoc />
+        public virtual string AlterColumnIfExists => "ALTER TABLE IF EXISTS {0} ALTER COLUMN {1}";
         /// <inheritdoc />
         public virtual string RenameColumn => "ALTER TABLE {0} RENAME COLUMN {1} TO {2}";
 
@@ -96,6 +102,12 @@ namespace FluentMigrator.Runner.Generators.Generic
         public virtual string DeleteConstraint => "ALTER TABLE {0} DROP CONSTRAINT {1}";
         /// <inheritdoc />
         public virtual string CreateForeignKeyConstraint => "ALTER TABLE {0} ADD {1}";
+
+        /// <summary>
+        /// Gets a value indicating whether the target database supports guarding
+        /// <c>ALTER TABLE ... ADD/ALTER COLUMN</c> statements with an <c>IF EXISTS</c> table existence check.
+        /// </summary>
+        protected virtual bool SupportsAlterTableIfExistsForColumns => false;
 
         /// <inheritdoc />
         [StringFormatMethod("format")]
@@ -141,6 +153,11 @@ namespace FluentMigrator.Runner.Generators.Generic
                 return errors;
             }
 
+            if (expression.IfNotExists)
+            {
+                return FormatStatement(CreateTableIfNotExists, quotedTableName, Column.Generate(expression.Columns, quotedTableName));
+            }
+
             return FormatStatement(CreateTable, quotedTableName, Column.Generate(expression.Columns, quotedTableName));
         }
 
@@ -170,6 +187,16 @@ namespace FluentMigrator.Runner.Generators.Generic
                 return errors;
             }
 
+            if (expression.IfExists)
+            {
+                if (!SupportsAlterTableIfExistsForColumns)
+                {
+                    return CompatibilityMode.HandleCompatibility("Alter.Table(...).IfExists() is not supported");
+                }
+
+                return FormatStatement(AddColumnIfExists, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), Column.Generate(expression.Column));
+            }
+
             return FormatStatement(AddColumn, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), Column.Generate(expression.Column));
         }
 
@@ -180,6 +207,16 @@ namespace FluentMigrator.Runner.Generators.Generic
             if (!string.IsNullOrEmpty(errors))
             {
                 return errors;
+            }
+
+            if (expression.IfExists)
+            {
+                if (!SupportsAlterTableIfExistsForColumns)
+                {
+                    return CompatibilityMode.HandleCompatibility("Alter.Table(...).IfExists() is not supported");
+                }
+
+                return FormatStatement(AlterColumnIfExists, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), Column.Generate(expression.Column));
             }
 
             return FormatStatement(AlterColumn, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), Column.Generate(expression.Column));
