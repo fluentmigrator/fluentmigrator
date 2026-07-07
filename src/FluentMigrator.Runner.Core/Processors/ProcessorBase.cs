@@ -278,6 +278,9 @@ namespace FluentMigrator.Runner.Processors
         }
 
         /// <inheritdoc />
+        public abstract bool HasTransaction();
+
+        /// <inheritdoc />
         public abstract DataSet ReadTableData(string schemaName, string tableName);
 
         /// <inheritdoc />
