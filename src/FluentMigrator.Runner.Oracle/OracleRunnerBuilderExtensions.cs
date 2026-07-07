@@ -58,6 +58,17 @@ namespace FluentMigrator.Runner
         }
 
         /// <summary>
+        /// Register Oracle Managed generator
+        /// </summary>
+        /// <param name="builder">The builder to add the Oracle-specific services to</param>
+        private static void RegisterOracleManagedGenerator(IMigrationRunnerBuilder builder)
+        {
+            builder.Services
+                .AddScoped<IOracleTypeMap>(sp => new OracleTypeMap())
+                .TryAddScoped<IOracleManagedGenerator, OracleManagedGenerator>();
+        }
+
+        /// <summary>
         /// Register Oracle 12c generator
         /// </summary>
         /// <param name="builder">The builder to add the Oracle-specific services to</param>
@@ -149,11 +160,11 @@ namespace FluentMigrator.Runner
         /// <returns>The migration runner builder</returns>
         public static IMigrationRunnerBuilder AddOracleManaged(this IMigrationRunnerBuilder builder)
         {
-            RegisterOracleGenerator(builder);
+            RegisterOracleManagedGenerator(builder);
 
             RegisterOracleManagedProcessor<OracleManagedProcessor>(builder);
 
-            builder.Services.AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<IOracleGenerator>());
+            builder.Services.AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<IOracleManagedGenerator>());
 
             return builder;
         }
