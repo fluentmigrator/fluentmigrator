@@ -474,7 +474,6 @@ namespace FluentMigrator.Console
                         .AddDotConnectOracle()
                         .AddDotConnectOracle12C()
                         .AddFirebird()
-                        .AddHana()
                         .AddMySql()
                         .AddMySql4()
                         .AddMySql5()

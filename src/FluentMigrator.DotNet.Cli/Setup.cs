@@ -79,7 +79,13 @@ namespace FluentMigrator.DotNet.Cli
                         .AddDotConnectOracle()
                         .AddDotConnectOracle12C()
                         .AddFirebird()
-                        .AddHana()
+#if NET8_0
+                        .AddHana8()
+#elif NET9_0
+                        .AddHana8()
+#elif NET10_0_OR_GREATER
+                        .AddHana10()
+#endif
                         .AddMySql4()
                         .AddMySql5()
                         .AddMySql8()

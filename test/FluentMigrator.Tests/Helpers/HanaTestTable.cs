@@ -114,7 +114,7 @@ namespace FluentMigrator.Tests.Helpers
         {
             var indexName = string.Format("idx_{0}", column);
 
-            var quotedObjectName = _quoter.QuoteTableName(Name);
+            var quotedObjectName = _quoter.QuoteTableName(Name, _schemaName);
 
             var quotedIndexName = _quoter.QuoteIndexName(indexName);
 
