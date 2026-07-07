@@ -87,18 +87,19 @@ public interface IWellKnownTokenMapProvider
 
 public class DefaultWellKnownTokenMapProvider : IWellKnownTokenMapProvider
 {
-    private readonly IConventionSet _conventionSet;
+    private readonly IConventionSetAccessor _conventionSetAccessor;
 
-    public DefaultWellKnownTokenMapProvider(IConventionSet conventionSet)
+    public DefaultWellKnownTokenMapProvider(IConventionSetAccessor conventionSetAccessor)
     {
-        _conventionSet = conventionSet;
+        _conventionSetAccessor = conventionSetAccessor;
     }
 
     public IDictionary<string, string> GetWellKnownTokenMap()
     {
+        var conventionSet = _conventionSetAccessor.GetConventionSet();
         return new Dictionary<string, string>
         {
-            ["DefaultSchema"] = _conventionSet.SchemaConvention.SchemaNameConvention.GetSchemaName(null),
+            ["DefaultSchema"] = conventionSet?.SchemaConvention?.SchemaNameConvention.GetSchemaName(null),
         };
     }
 }
@@ -129,7 +130,35 @@ the runner (see `DependencyInjection.md`).
    instead of ad hoc dictionaries) is a possible follow-up, tracked separately.
 2. **Templating engines** (Jinja2.NET or similar) remain a candidate for a future,
    larger ADR if simple token substitution proves insufficient, but are out of
-   scope here because of the control-flow expressiveness gap described in #1263.
+   scope here because of the control-flow expressiveness gap described in
+   [#1263](https://github.com/fluentmigrator/fluentmigrator/issues/1263).
+
+   **Not a blocker for this MVP.** [#1263](https://github.com/fluentmigrator/fluentmigrator/issues/1263)
+   is fundamentally about *when* a conditional is evaluated relative to a
+   migration's two-phase plan/execute model: `Schema.Table(...).Exists()`
+   queries live database state at the moment the `Up()`/`Down()` method runs,
+   so the same migration can branch differently depending on run order,
+   transaction isolation level, or whether it is being previewed vs. actually
+   executed. That is a *control-flow* problem &mdash; it only arises once a
+   templating layer offers `{% if %}` / `{% for %}` constructs that need to
+   decide, ahead of or during SQL generation, whether to include a block of
+   SQL at all.
+
+   The `IWellKnownTokenMapProvider` mechanism proposed here does not introduce
+   any control flow. It is a straight, non-branching string substitution:
+   every well-known token is resolved to a single string value once, at the
+   moment `Execute.Sql`/`Execute.Script`/`Execute.EmbeddedScript` runs, using
+   the same `SqlScriptTokenReplacer.ReplaceSqlScriptTokens` code path that
+   already handles user-supplied `Parameters` today. There is no notion of a
+   token being conditionally present, no loop/repetition, and no dependency on
+   evaluating live database state ahead of execution &mdash; the exact
+   ambiguity #1263 raises simply does not apply to `$(name)`/`$[name]`
+   substitution. Consequently, design question 2 (whether/how to adopt a full
+   templating engine with control flow) can be deferred indefinitely without
+   blocking or reworking the MVP described in this ADR; if a templating engine
+   is adopted later, it can layer `{% if %}`/`{% for %}` support on top of (or
+   independently of) the token map without changing the
+   `IWellKnownTokenMapProvider` contract.
 
 ## Consequences
 
