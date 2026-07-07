@@ -33,6 +33,23 @@ namespace FluentMigrator.Analyzers.Tests
 {
     public class MigrationAttributeVersionShouldBeUniqueUnitTests
     {
+        private const string StubDefinitions = @"
+    namespace FluentMigrator
+    {
+        [System.AttributeUsage(System.AttributeTargets.Class, Inherited = false)]
+        public class MigrationAttribute : System.Attribute
+        {
+            public MigrationAttribute(long version, string description) { Version = version; }
+            public MigrationAttribute(long version, TransactionBehavior transactionBehavior = TransactionBehavior.Default, string description = null) { Version = version; }
+            public long Version { get; }
+            public TransactionBehavior TransactionBehavior { get; }
+            public string Description { get; }
+        }
+
+        public enum TransactionBehavior { Default, None }
+    }
+";
+
         [Test]
         public async Task Doesnt_Warns_On_Unique_Migration_Version()
         {
@@ -52,7 +69,7 @@ namespace FluentMigrator.Analyzers.Tests
             {
                 TestState =
                 {
-                    Sources = { source },
+                    Sources = { source, StubDefinitions },
                     ExpectedDiagnostics =
                     {
                         Capacity = 0
@@ -100,7 +117,7 @@ namespace FluentMigrator.Analyzers.Tests
             {
                 TestState =
                 {
-                    Sources = { source },
+                    Sources = { source, StubDefinitions },
                 },
             };
 
