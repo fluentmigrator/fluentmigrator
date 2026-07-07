@@ -95,7 +95,6 @@ namespace FluentMigrator.Analyzers
 
         private static long? GetMigrationAttributeVersion(FluentMigratorContext fluentMigratorContext, IEnumerable<AttributeData> attributes)
         {
-
             var attribute = attributes
                 .FirstOrDefault(a => fluentMigratorContext.MigrationAttributeType.IsAssignableFrom(a.AttributeClass));
 
