@@ -151,6 +151,12 @@ namespace FluentMigrator.Runner.Processors
         }
 
         /// <inheritdoc />
+        public override bool HasTransaction()
+        {
+            return Transaction is not null;
+        }
+
+        /// <inheritdoc />
         protected override void Dispose(bool isDisposing)
         {
             if (!isDisposing || _disposed)

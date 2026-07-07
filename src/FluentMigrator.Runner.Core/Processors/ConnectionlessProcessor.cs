@@ -159,6 +159,12 @@ namespace FluentMigrator.Runner.Processors
 
         }
 
+        /// <inheritdoc />
+        public bool HasTransaction()
+        {
+            return false;
+        }
+
         /// <summary>
         /// Executes the specified SQL statement using the connectionless processor.
         /// </summary>

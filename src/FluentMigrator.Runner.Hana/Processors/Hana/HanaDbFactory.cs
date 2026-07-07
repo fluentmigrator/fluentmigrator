@@ -60,10 +60,10 @@ namespace FluentMigrator.Runner.Processors.Hana
         /// </remarks>
         private static IEnumerable<TestEntry> GetTestEntries()
         {
-            yield return new TestEntry("Sap.Data.Hana", "Sap.Data.Hana.HanaFactory");
-            yield return new TestEntry("Sap.Data.Hana.v4.5", "Sap.Data.Hana.HanaFactory");
-            yield return new TestEntry("Sap.Data.Hana.v8.0", "Sap.Data.Hana.HanaFactory");
-            yield return new TestEntry("Sap.Data.Hana.v10.0", "Sap.Data.Hana.HanaFactory");
+            yield return new TestEntry("Sap.Data.Hana", "Sap.Data.Hana.HanaFactory", () => Type.GetType("Sap.Data.Hana.HanaFactory, Sap.Data.Hana"));
+            yield return new TestEntry("Sap.Data.Hana.v4.5", "Sap.Data.Hana.HanaFactory", () => Type.GetType("Sap.Data.Hana.HanaFactory, Sap.Data.Hana.v4.5"));
+            yield return new TestEntry("Sap.Data.Hana.v8.0", "Sap.Data.Hana.HanaFactory", () => Type.GetType("Sap.Data.Hana.HanaFactory, Sap.Data.Hana.v8.0"));
+            yield return new TestEntry("Sap.Data.Hana.v10.0", "Sap.Data.Hana.HanaFactory", () => Type.GetType("Sap.Data.Hana.HanaFactory, Sap.Data.Hana.v10.0"));
         }
     }
 }

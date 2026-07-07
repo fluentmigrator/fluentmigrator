@@ -227,3 +227,9 @@ namespace YourProject.Migrations.Extensions
 ```
 
 Custom extensions are a powerful way to make your migrations more maintainable and reduce duplication while ensuring consistency across your database schema evolution.
+
+## Going Further: Generator-Pipeline Extensions
+
+When a simple extension method isn't enough and you need to pass database-specific options all the way through to the SQL generator, see the dedicated tutorial:
+
+[**Tutorial: Extending the Generator Pipeline with `ISupportAdditionalFeatures`**](./generator-pipeline-extensions.md)

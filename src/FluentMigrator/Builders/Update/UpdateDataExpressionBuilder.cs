@@ -43,6 +43,9 @@ namespace FluentMigrator.Builders.Update
         }
 
         /// <inheritdoc />
+#if NET
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("The properties of the anonymous type cannot be statically analyzed.")]
+#endif
         public IUpdateWhereSyntax Set(object dataAsAnonymousType)
         {
             Expression.Set = GetData<List<KeyValuePair<string, object>>>(dataAsAnonymousType);
@@ -52,11 +55,16 @@ namespace FluentMigrator.Builders.Update
         /// <inheritdoc />
         public IUpdateWhereSyntax Set(IDictionary<string, object> data)
         {
+#pragma warning disable IL2026 // GetData handles IDictionary<string, object> without reflection
             Expression.Set = GetData<List<KeyValuePair<string, object>>>(data);
+#pragma warning restore IL2026
             return this;
         }
 
         /// <inheritdoc />
+#if NET
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("The properties of the anonymous type cannot be statically analyzed.")]
+#endif
         public void Where(object dataAsAnonymousType)
         {
             Expression.Where = GetData<List<KeyValuePair<string, object>>>(dataAsAnonymousType);
@@ -65,7 +73,9 @@ namespace FluentMigrator.Builders.Update
         /// <inheritdoc />
         public void Where(IDictionary<string, object> data)
         {
+#pragma warning disable IL2026 // GetData handles IDictionary<string, object> without reflection
             Expression.Where = GetData<List<KeyValuePair<string, object>>>(data);
+#pragma warning restore IL2026
         }
 
         /// <inheritdoc />

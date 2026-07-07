@@ -29,6 +29,9 @@ namespace FluentMigrator.Runner.Initialization
     /// <summary>
     /// Provides access to delay-loaded assemblies
     /// </summary>
+#if NET
+    [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This type gets the exported types from assemblies, which may not be preserved in trimmed applications.")]
+#endif
     public class AssemblySource : IAssemblySource
     {
         private readonly Lazy<IReadOnlyCollection<Assembly>> _assemblies;

@@ -29,5 +29,11 @@ namespace FluentMigrator.Builders.Alter.Table
         /// <param name="description">The description to set</param>
         /// <returns>Interface providing ways for other modifications</returns>
         IAlterTableAddColumnOrAlterColumnOrSchemaSyntax WithDescription(string description);
+
+        /// <summary>
+        /// Specifies that any subsequent add/alter column operations should only be applied if the table exists.
+        /// </summary>
+        /// <returns>Interface providing ways for other modifications</returns>
+        IAlterTableAddColumnOrAlterColumnOrSchemaSyntax IfExists();
     }
 }

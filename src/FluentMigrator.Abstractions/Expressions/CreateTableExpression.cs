@@ -47,6 +47,11 @@ namespace FluentMigrator.Expressions
         /// </summary>
         public virtual string TableDescription { get; set; }
 
+        /// <summary>
+        /// Specifies the command should only be applied if the table does not already exist.
+        /// </summary>
+        public virtual bool IfNotExists { get; set; }
+
         /// <inheritdoc />
         IEnumerable<ColumnDefinition> IColumnsExpression.Columns => Columns;
 

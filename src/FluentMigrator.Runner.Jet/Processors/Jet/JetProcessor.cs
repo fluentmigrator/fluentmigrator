@@ -52,8 +52,8 @@ namespace FluentMigrator.Runner.Processors.Jet
         /// Gets the current transaction associated with the Jet database connection.
         /// </summary>
         /// <remarks>
-        /// This property provides access to the <see cref="System.Data.OleDb.OleDbTransaction"/> 
-        /// used for executing commands within a transactional context. Ensure that the connection 
+        /// This property provides access to the <see cref="System.Data.OleDb.OleDbTransaction"/>
+        /// used for executing commands within a transactional context. Ensure that the connection
         /// is open before accessing this property.
         /// </remarks>
         public OleDbTransaction Transaction => _transaction;
@@ -109,8 +109,8 @@ namespace FluentMigrator.Runner.Processors.Jet
         /// <inheritdoc />
         public override void Process(PerformDBOperationExpression expression)
         {
-            var message = string.IsNullOrEmpty(expression.Description) 
-                ? "Performing DB Operation" 
+            var message = string.IsNullOrEmpty(expression.Description)
+                ? "Performing DB Operation"
                 : $"Performing DB Operation: {expression.Description}";
             Logger.LogSay(message);
 
@@ -301,6 +301,12 @@ namespace FluentMigrator.Runner.Processors.Jet
             _transaction.Commit();
             WasCommitted = true;
             _transaction = null;
+        }
+
+        /// <inheritdoc />
+        public override bool HasTransaction()
+        {
+            return _transaction is not null;
         }
 
         /// <inheritdoc />

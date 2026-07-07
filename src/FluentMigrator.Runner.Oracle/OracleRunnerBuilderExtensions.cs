@@ -58,6 +58,17 @@ namespace FluentMigrator.Runner
         }
 
         /// <summary>
+        /// Register Oracle Managed generator
+        /// </summary>
+        /// <param name="builder">The builder to add the Oracle-specific services to</param>
+        private static void RegisterOracleManagedGenerator(IMigrationRunnerBuilder builder)
+        {
+            builder.Services
+                .AddScoped<IOracleTypeMap>(sp => new OracleTypeMap())
+                .TryAddScoped<IOracleManagedGenerator, OracleManagedGenerator>();
+        }
+
+        /// <summary>
         /// Register Oracle 12c generator
         /// </summary>
         /// <param name="builder">The builder to add the Oracle-specific services to</param>
@@ -70,7 +81,11 @@ namespace FluentMigrator.Runner
         /// Register Oracle processor dependencies
         /// </summary>
         /// <param name="builder">The builder to add the Oracle-specific services to</param>
-        private static void RegisterOracleProcessor<T>(IMigrationRunnerBuilder builder)
+        private static void RegisterOracleProcessor<
+#if NET
+            [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]
+#endif
+            T>(IMigrationRunnerBuilder builder)
             where T : OracleProcessor
         {
             RegisterOracleQuoter(builder);
@@ -86,7 +101,11 @@ namespace FluentMigrator.Runner
         /// Register Oracle managed processor dependencies
         /// </summary>
         /// <param name="builder">The builder to add the Oracle-specific services to</param>
-        private static void RegisterOracleManagedProcessor<T>(IMigrationRunnerBuilder builder)
+        private static void RegisterOracleManagedProcessor<
+#if NET
+            [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]
+#endif
+            T>(IMigrationRunnerBuilder builder)
             where T : OracleManagedProcessor
         {
             RegisterOracleQuoter(builder);
@@ -103,7 +122,11 @@ namespace FluentMigrator.Runner
         /// Register dotConnection Oracle processor dependencies
         /// </summary>
         /// <param name="builder">The builder to add the Oracle-specific services to</param>
-        private static void RegisterDotConnectOracleProcessor<T>(IMigrationRunnerBuilder builder)
+        private static void RegisterDotConnectOracleProcessor<
+#if NET
+            [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]
+#endif
+            T>(IMigrationRunnerBuilder builder)
             where T : DotConnectOracleProcessor
         {
             RegisterOracleQuoter(builder);
@@ -137,11 +160,11 @@ namespace FluentMigrator.Runner
         /// <returns>The migration runner builder</returns>
         public static IMigrationRunnerBuilder AddOracleManaged(this IMigrationRunnerBuilder builder)
         {
-            RegisterOracleGenerator(builder);
+            RegisterOracleManagedGenerator(builder);
 
             RegisterOracleManagedProcessor<OracleManagedProcessor>(builder);
 
-            builder.Services.AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<IOracleGenerator>());
+            builder.Services.AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<IOracleManagedGenerator>());
 
             return builder;
         }

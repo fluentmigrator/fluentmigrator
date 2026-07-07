@@ -759,13 +759,13 @@ namespace FluentMigrator.Runner
                 throw new InvalidOperationException(
                     $"The caller forgot to configure an {nameof(IServiceProvider)} in the constructor of this class.");
             }
-            
+
             var connectionStringAccessor = _serviceProvider.GetRequiredService<IConnectionStringAccessor>();
             context = new MigrationContext(
                 Processor,
                 _serviceProvider,
                 connectionStringAccessor.ConnectionString);
-            
+
 
             getExpressions(migration, context);
 
@@ -935,6 +935,12 @@ namespace FluentMigrator.Runner
         {
             // Skip connection validation in preview mode as no actual database connection is needed
             if (_processorOptions.PreviewOnly)
+            {
+                return;
+            }
+
+            // Connection is fine, if we already have a transaction
+            if (Processor.HasTransaction())
             {
                 return;
             }
