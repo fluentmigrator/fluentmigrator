@@ -34,7 +34,7 @@ namespace FluentMigrator.Runner.Initialization
             }
             catch (ReflectionTypeLoadException ex)
             {
-                return ex.Types.Where(t => t != null);
+                return ex.Types.OfType<Type>();
             }
         }
     }
