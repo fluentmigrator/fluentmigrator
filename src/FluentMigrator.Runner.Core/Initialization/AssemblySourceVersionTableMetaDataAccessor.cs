@@ -87,7 +87,7 @@ namespace FluentMigrator.Runner.Initialization
                 return Enumerable.Empty<Type>();
 
 #pragma warning disable IL2026 // Requires unreferenced code
-            return assemblySource.Assemblies.SelectMany(a => a.GetExportedTypes())
+            return assemblySource.Assemblies.SelectMany(a => a.GetLoadableExportedTypes())
                 .Where(t => !t.IsAbstract && t.IsClass)
                 .Where(t => typeof(IVersionTableMetaData).IsAssignableFrom(t))
                 .Where(t => predicate(t));

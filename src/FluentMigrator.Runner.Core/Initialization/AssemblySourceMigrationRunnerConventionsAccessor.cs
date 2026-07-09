@@ -50,7 +50,7 @@ namespace FluentMigrator.Runner.Initialization
                     if (assemblySource == null)
                         return DefaultMigrationRunnerConventions.Instance;
 
-                    var matchedType = assemblySource.Assemblies.SelectMany(a => a.GetExportedTypes())
+                    var matchedType = assemblySource.Assemblies.SelectMany(a => a.GetLoadableExportedTypes())
                         .FirstOrDefault(t => typeof(IMigrationRunnerConventions).IsAssignableFrom(t));
 
                     if (matchedType != null)

@@ -44,7 +44,7 @@ namespace FluentMigrator.Runner.Initialization
 
         /// <inheritdoc />
         public IEnumerable<Type> MigrationTypeCandidates => _assemblies
-            .SelectMany(a => a.GetExportedTypes())
+            .SelectMany(a => a.GetLoadableExportedTypes())
             .Where(t => typeof(IMigration).IsAssignableFrom(t) && !t.IsAbstract);
     }
 }

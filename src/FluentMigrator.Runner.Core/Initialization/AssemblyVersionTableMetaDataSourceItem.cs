@@ -48,7 +48,7 @@ namespace FluentMigrator.Runner.Initialization
         /// <inheritdoc />
         public IEnumerable<Type> GetCandidates(Predicate<Type> predicate)
         {
-            return _assemblies.SelectMany(a => a.GetExportedTypes())
+            return _assemblies.SelectMany(a => a.GetLoadableExportedTypes())
                 .Where(t => !t.IsAbstract && t.IsClass)
                 .Where(t => typeof(IVersionTableMetaData).IsAssignableFrom(t))
                 .Where(t => predicate(t));

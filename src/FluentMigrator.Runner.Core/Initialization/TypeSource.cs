@@ -44,7 +44,7 @@ namespace FluentMigrator.Runner.Initialization
         /// <inheritdoc />
         public IEnumerable<Type> GetTypes()
         {
-            return _source.Assemblies.SelectMany(a => a.GetExportedTypes());
+            return _source.Assemblies.SelectMany(a => a.GetLoadableExportedTypes());
         }
     }
 }

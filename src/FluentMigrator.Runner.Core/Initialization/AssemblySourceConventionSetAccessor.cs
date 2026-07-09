@@ -89,7 +89,7 @@ namespace FluentMigrator.Runner.Initialization
         {
             if (assemblySource == null)
                 return Enumerable.Empty<Type>();
-            return assemblySource.Assemblies.SelectMany(a => a.GetExportedTypes())
+            return assemblySource.Assemblies.SelectMany(a => a.GetLoadableExportedTypes())
                 .Where(t => !t.IsAbstract && t.IsClass)
                 .Where(t => typeof(IConventionSet).IsAssignableFrom(t))
                 .Where(t => predicate(t));
