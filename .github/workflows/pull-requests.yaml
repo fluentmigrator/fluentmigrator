@@ -116,7 +116,7 @@ jobs:
         if (Test-Path $installerPath) { Remove-Item $installerPath -Force -ErrorAction SilentlyContinue }
 
     - name: Restore, Build, Test
-      run: dotnet test --framework ${{ matrix.dotnet-tfm }} --configuration ${{ env.buildConfiguration }} --verbosity quiet --logger trx --collect:"XPlat Code Coverage" --results-directory "TestResults-${{ matrix.dotnet-tfm }}" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura
+      run: dotnet test --framework ${{ matrix.dotnet-tfm }} --configuration ${{ env.buildConfiguration }} --verbosity quiet --logger trx --collect:"XPlat Code Coverage" --results-directory "TestResults-${{ matrix.dotnet-tfm }}" --settings coverage.runsettings
       env:
         # Enable containers for integration tests only on Linux
         FM_TestConnectionStrings__MySql__ContainerEnabled: ${{ matrix.os == 'ubuntu-latest' }}
@@ -153,8 +153,17 @@ jobs:
         echo "${{ github.workspace }}"
         echo "=== Environment variable GITHUB_WORKSPACE ==="
         echo $GITHUB_WORKSPACE
-        echo "=== Coverage directory listing ==="
-        find . -name "*Cobertura.xml" || true
+        echo "=== Cobertura file listing ==="
+        find . -type f -iname "*.cobertura.xml" -print > /tmp/cobertura-files.txt || true
+        if [ -s /tmp/cobertura-files.txt ]; then
+          cat /tmp/cobertura-files.txt
+        else
+          echo "::warning::No Cobertura files were found."
+          echo "=== Troubleshooting: TestResults directories ==="
+          find . -type d -name "TestResults-*" || true
+          echo "=== Troubleshooting: files under TestResults directories (first 200) ==="
+          find . -type f -path "*/TestResults-*/*" | head -n 200 || true
+        fi
 
     - name: Combine Coverage Reports
       uses: danielpalme/ReportGenerator-GitHub-Action@v5.5.10
@@ -174,7 +183,7 @@ jobs:
       if: '!cancelled()'
       with:
         name: coverage-${{ matrix.os }}-${{ matrix.dotnet-tfm }}
-        path: coverage/Cobertura.xml
+        path: coveragereport/cobertura.xml
         retention-days: 5
 
     - name: Add Coverage PR Comment
@@ -189,7 +198,7 @@ jobs:
       if: '!cancelled()'
       with:
         name: test-results-${{ matrix.os }}-${{ matrix.dotnet-tfm }}
-        path: $GITHUB_WORKSPACE/**/TestResults-${{ matrix.dotnet-tfm }}/**/*
+        path: "**/TestResults-${{ matrix.dotnet-tfm }}/**/*"
         retention-days: 5
 
     - name: Publish Test Results
@@ -198,7 +207,7 @@ jobs:
       # and this particular GitHub action from EnricoMi is a containerized action
       if: matrix.os == 'ubuntu-latest' && (!cancelled())
       with:
-        files: "$GITHUB_WORKSPACE/**/*.trx"
+        files: "**/*.trx"
 
     - name: Diagnostics (Linux)
       if: matrix.os == 'ubuntu-latest' && failure()
