@@ -244,7 +244,7 @@ Create.Table("Employees").InSchema("hr")
 ### Create Table If Not Exists
 ```csharp
 [Migration(1)]
-public class CreateProjectsTable : Migration
+public class CreateProjectsTable : ForwardOnlyMigration
 {
     public override void Up()
     {
@@ -255,15 +255,12 @@ public class CreateProjectsTable : Migration
             .WithColumn("Position").AsInt32().NotNullable()
             .WithColumn("Done").AsBoolean().NotNullable();
     }
-
-    public override void Down()
-    {
-        Delete.Table("Projects").IfExists();
-    }
 }
 ```
 
 `IfNotExists()` avoids errors when the table might already exist, removing the need for a manual `Schema.Table(...).Exists()` check before creating the table. Support for `CREATE TABLE IF NOT EXISTS` varies by database provider; where a provider lacks native support (for example Oracle, Firebird, Jet, and SQL Server), the clause is silently ignored (in `LOOSE` compatibility mode) or throws a `DatabaseOperationNotSupportedException` (in `STRICT` compatibility mode).
+
+Conditional table creation cannot be automatically reversed safely. If the table already existed, dropping it during rollback would delete an object the migration did not create. Use a `ForwardOnlyMigration`, or avoid `IfNotExists()` when the migration must support automatic reversal.
 
 ### Database-Specific Tables
 ```csharp
