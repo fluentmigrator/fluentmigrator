@@ -901,7 +901,7 @@ namespace FluentMigrator.Tests.Unit
                 .Setup(x => x.LoadMaintenance(MigrationStage.BeforeAll))
                 .Returns(() => new List<IMigrationInfo>
                 {
-                    new MigrationInfo(0, TransactionBehavior.Default, new AcquireLockAndApplyMigrationsElsewhereMigration(
+                    new NonAttributedMigrationToMigrationInfoAdapter(new AcquireLockAndApplyMigrationsElsewhereMigration(
                         () => _fakeVersionLoader.Versions.Add(migrationVersion)))
                 });
             maintenanceLoaderMock
