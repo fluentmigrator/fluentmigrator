@@ -141,14 +141,14 @@ public class DbMigrationLockBefore : Migration
     public override void Up()
     {
         Execute.Sql(@"
-            DECLARE @result INT
-            EXEC @result = sp_getapplock 'MyApp', 'Exclusive', 'Session'
+            DECLARE @result INT;
+            EXEC @result = sp_getapplock 'MyApp', 'Exclusive', 'Session';
 
             IF @result < 0
             BEGIN
                 DECLARE @msg NVARCHAR(1000) = 'Received error code ' +
-                    CAST(@result AS VARCHAR(10)) + ' from sp_getapplock during migrations'
-                THROW 99999, @msg, 1
+                    CAST(@result AS VARCHAR(10)) + ' from sp_getapplock during migrations';
+                THROW 99999, @msg, 1;
             END
         ");
     }
