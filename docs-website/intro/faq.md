@@ -198,6 +198,19 @@ async Task RunMigrationsWithDistributedLock(IMigrationRunner runner)
 }
 ```
 
+#### Notes for the In-Process Runner
+
+- `MigrateUp` now computes the list of pending migrations **after** the `BeforeAll`
+  maintenance migrations have run, and reloads the applied-migration version info
+  beforehand. This means a lock acquired in a `BeforeAll` maintenance migration (as
+  shown above) correctly prevents a second server from re-running a migration that
+  was already applied by another server while it was waiting for the lock.
+- Maintenance migrations aren't found unless you scan with `.For.All()` instead of
+  `.For.Migrations()` &mdash; see [Why aren't my Maintenance Migrations found by the
+  In-Process Runner?](#why-aren-t-my-maintenance-migrations-found-by-the-in-process-runner)
+- Use `TransactionBehavior.None` on lock/unlock maintenance migrations (as shown
+  above) so the lock isn't tied to, and released early by, the migration transaction.
+
 ## Database-Specific Issues
 
 ### SQL Server Certificate Errors
