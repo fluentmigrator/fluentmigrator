@@ -26,7 +26,7 @@ namespace FluentMigrator.Expressions
         /// <summary>
         /// Gets or sets parameters to be replaced before script execution
         /// </summary>
-        public IDictionary<string, string> Parameters { get; set; }
+        public IDictionary<string, object> Parameters { get; set; }
 
         /// <summary>
         /// Executes the <paramref name="sqlScript"/> with the given <paramref name="processor"/>
@@ -35,7 +35,7 @@ namespace FluentMigrator.Expressions
         /// <param name="sqlScript">The SQL script to execute</param>
         protected void Execute(IMigrationProcessor processor, string sqlScript)
         {
-            var finalSqlScript = SqlScriptTokenReplacer.ReplaceSqlScriptTokens(sqlScript, Parameters);
+            var finalSqlScript = SqlScriptTokenReplacer.ReplaceSqlScriptTokens(sqlScript, Parameters, processor?.Quoter);
             processor.Execute(finalSqlScript);
         }
     }

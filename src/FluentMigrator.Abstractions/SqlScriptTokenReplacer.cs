@@ -17,6 +17,8 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
+using FluentMigrator.Generation;
+
 namespace FluentMigrator
 {
     /// <summary>
@@ -29,6 +31,11 @@ namespace FluentMigrator
         /// </summary>
         /// <param name="sqlText">The SQL script where the tokens will be replaced</param>
         /// <param name="parameters">The tokens to be replaced</param>
+        /// <param name="quoter">
+        /// The <see cref="IQuoter"/> used to safely quote/format <c>$[name]</c> parameter values
+        /// (e.g. numbers, dates, booleans, <see langword="null"/>, strings). When <see langword="null"/>,
+        /// a basic string-literal quoting fallback is used, which treats every value as a string.
+        /// </param>
         /// <returns>The SQL script with the replaced tokens</returns>
         /// <remarks>
         /// Two token styles are supported:
@@ -43,22 +50,25 @@ namespace FluentMigrator
         /// </item>
         /// <item>
         /// <description>
-        /// <c>$[name]</c> is replaced with the parameter value rendered as a safely quoted SQL string
-        /// literal (wrapped in single quotes, with any embedded single quotes escaped by doubling them).
-        /// Use this style whenever a value should be treated as string data instead of raw SQL.
+        /// <c>$[name]</c> is replaced with the parameter value rendered as a safely quoted SQL literal
+        /// using <paramref name="quoter"/> (falling back to a quoted/escaped string literal when no
+        /// <paramref name="quoter"/> is supplied). Use this style whenever a value should be treated as
+        /// data instead of raw SQL. Any value type supported by <see cref="IQuoter.QuoteValue"/> can be
+        /// used, e.g. <see cref="string"/>, numbers, <see cref="System.DateTime"/>, <see cref="bool"/>,
+        /// <see cref="System.Guid"/>, or <see langword="null"/>.
         /// </description>
         /// </item>
         /// </list>
         /// The literal text <c>$(name)</c> or <c>$[name]</c> can be produced (without substitution) by
         /// escaping it as <c>$$((name))</c> or <c>$$[[name]]</c> respectively.
         /// </remarks>
-        public static string ReplaceSqlScriptTokens(string sqlText, IDictionary<string, string> parameters)
+        public static string ReplaceSqlScriptTokens(string sqlText, IDictionary<string, object> parameters, IQuoter quoter = null)
         {
             // Are parameters set?
             if (parameters != null && parameters.Count != 0)
             {
                 // Replace $[word] elements with the values stored in the Parameters
-                // dictionary, rendered as a safely quoted/escaped SQL string literal.
+                // dictionary, rendered as a safely quoted/escaped SQL literal.
                 sqlText = Regex.Replace(
                     sqlText,
                     @"\$\[(?<token>\w+)\]",
@@ -67,7 +77,9 @@ namespace FluentMigrator
                         var key = m.Groups["token"].Value;
                         if (parameters.TryGetValue(key, out var keyValue))
                         {
-                            return QuoteSqlStringLiteral(keyValue);
+                            return quoter != null
+                                ? quoter.QuoteValue(keyValue)
+                                : QuoteSqlStringLiteral(keyValue?.ToString());
                         }
 
                         // Return the whole match value when the key
@@ -87,7 +99,7 @@ namespace FluentMigrator
                         var key = m.Groups["token"].Value;
                         if (parameters.TryGetValue(key, out var keyValue))
                         {
-                            return keyValue;
+                            return keyValue?.ToString();
                         }
 
                         // Return the whole match value when the key

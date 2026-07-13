@@ -55,7 +55,7 @@ namespace FluentMigrator.Builders.Execute
         }
 
         /// <inheritdoc />
-        public void Sql(string sqlStatement, IDictionary<string, string> parameters)
+        public void Sql(string sqlStatement, IDictionary<string, object> parameters)
         {
             var expression = new ExecuteSqlStatementExpression
             {
@@ -79,7 +79,7 @@ namespace FluentMigrator.Builders.Execute
         }
 
         /// <inheritdoc />
-        public void Sql(string sqlStatement, string description, IDictionary<string, string> parameters)
+        public void Sql(string sqlStatement, string description, IDictionary<string, object> parameters)
         {
             var expression = new ExecuteSqlStatementExpression
             {
@@ -92,7 +92,7 @@ namespace FluentMigrator.Builders.Execute
         }
 
         /// <inheritdoc />
-        public void Script(string pathToSqlScript, IDictionary<string, string> parameters)
+        public void Script(string pathToSqlScript, IDictionary<string, object> parameters)
         {
             var expression = new ExecuteSqlScriptExpression
             {
@@ -144,7 +144,7 @@ namespace FluentMigrator.Builders.Execute
         }
 
         /// <inheritdoc />
-        public void EmbeddedScript(string embeddedSqlScriptName, IDictionary<string, string> parameters)
+        public void EmbeddedScript(string embeddedSqlScriptName, IDictionary<string, object> parameters)
         {
             var embeddedResourceProviders = _context.ServiceProvider.GetService<IEnumerable<IEmbeddedResourceProvider>>();
             if (embeddedResourceProviders == null)
