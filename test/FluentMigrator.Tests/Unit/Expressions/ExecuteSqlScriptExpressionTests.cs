@@ -56,7 +56,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             var expression = new ExecuteSqlScriptExpression()
             {
                 SqlScript = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TestScriptWithParameters.sql"),
-                Parameters = new Dictionary<string, string> { { "parameter", "ParameterValue" } }
+                Parameters = new Dictionary<string, object> { { "parameter", "ParameterValue" } }
             };
 
             var processor = new Mock<IMigrationProcessor>();

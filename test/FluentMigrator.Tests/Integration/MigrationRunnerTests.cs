@@ -2277,7 +2277,7 @@ namespace FluentMigrator.Tests.Integration
     {
         public override void Up()
         {
-            Execute.Sql("SELECT 1 FROM FOO WHERE BAR = $(BAZ)", new Dictionary<string, string>()
+            Execute.Sql("SELECT 1 FROM FOO WHERE BAR = $(BAZ)", new Dictionary<string, object>()
             {
                 ["BAZ"] = "'test'"
             });

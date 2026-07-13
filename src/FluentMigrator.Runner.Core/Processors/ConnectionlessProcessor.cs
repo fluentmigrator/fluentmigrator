@@ -22,6 +22,7 @@ using System.Data;
 using System.Linq;
 
 using FluentMigrator.Expressions;
+using FluentMigrator.Generation;
 using FluentMigrator.Runner.Generators;
 
 using JetBrains.Annotations;
@@ -110,6 +111,9 @@ namespace FluentMigrator.Runner.Processors
         /// to generate SQL for various migration expressions.
         /// </value>
         public IMigrationGenerator Generator { get; set; }
+
+        /// <inheritdoc />
+        public IQuoter Quoter => Generator.Quoter;
 
         /// <inheritdoc />
         public void Execute(string sql)
