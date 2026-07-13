@@ -16,6 +16,8 @@
 //
 #endregion
 
+using System.Collections.Generic;
+
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Tests.Helpers;
@@ -48,6 +50,49 @@ namespace FluentMigrator.Tests.Unit.Expressions
 
             var processor = new Mock<IMigrationProcessor>();
             processor.Setup(x => x.Execute(expression.SqlStatement)).Verifiable();
+
+            expression.ExecuteWith(processor.Object);
+            processor.Verify();
+        }
+
+        [Test]
+        public void ExecutesTheStatementWithWellKnownTokens()
+        {
+            var wellKnownTokenMapProvider = new Mock<IWellKnownTokenMapProvider>();
+            wellKnownTokenMapProvider
+                .Setup(x => x.GetWellKnownTokenMap())
+                .Returns(new Dictionary<string, string> { { "DefaultSchema", "dbo" } });
+
+            var expression = new ExecuteSqlStatementExpression()
+            {
+                SqlStatement = "ALTER TABLE $(DefaultSchema).BLAH ADD COLUMN Foo INT",
+                WellKnownTokenMapProviders = new[] { wellKnownTokenMapProvider.Object },
+            };
+
+            var processor = new Mock<IMigrationProcessor>();
+            processor.Setup(x => x.Execute("ALTER TABLE dbo.BLAH ADD COLUMN Foo INT")).Verifiable();
+
+            expression.ExecuteWith(processor.Object);
+            processor.Verify();
+        }
+
+        [Test]
+        public void ParametersOverrideWellKnownTokensWithTheSameName()
+        {
+            var wellKnownTokenMapProvider = new Mock<IWellKnownTokenMapProvider>();
+            wellKnownTokenMapProvider
+                .Setup(x => x.GetWellKnownTokenMap())
+                .Returns(new Dictionary<string, string> { { "DefaultSchema", "dbo" } });
+
+            var expression = new ExecuteSqlStatementExpression()
+            {
+                SqlStatement = "ALTER TABLE $(DefaultSchema).BLAH ADD COLUMN Foo INT",
+                Parameters = new Dictionary<string, string> { { "DefaultSchema", "tenant1" } },
+                WellKnownTokenMapProviders = new[] { wellKnownTokenMapProvider.Object },
+            };
+
+            var processor = new Mock<IMigrationProcessor>();
+            processor.Setup(x => x.Execute("ALTER TABLE tenant1.BLAH ADD COLUMN Foo INT")).Verifiable();
 
             expression.ExecuteWith(processor.Object);
             processor.Verify();

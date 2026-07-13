@@ -1,6 +1,6 @@
 # Well-Known Token Variables for `Execute.Sql`, `Execute.Script`, `Execute.EmbeddedScript`
 
-* Status: proposed
+* Status: implemented
 * Related issue: [#2300](https://github.com/fluentmigrator/fluentmigrator/issues/2300)
 
 ## Context and Problem Statement

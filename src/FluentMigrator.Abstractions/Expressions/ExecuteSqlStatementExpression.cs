@@ -41,7 +41,7 @@ namespace FluentMigrator.Expressions
         /// <inheritdoc />
         public override void ExecuteWith(IMigrationProcessor processor)
         {
-            var finalSqlScript = SqlScriptTokenReplacer.ReplaceSqlScriptTokens(SqlStatement, Parameters);
+            var finalSqlScript = SqlScriptTokenReplacer.ReplaceSqlScriptTokens(SqlStatement, GetMergedParameters());
             processor.Execute(finalSqlScript);
         }
 

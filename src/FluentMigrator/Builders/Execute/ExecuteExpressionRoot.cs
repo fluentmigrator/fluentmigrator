@@ -50,7 +50,11 @@ namespace FluentMigrator.Builders.Execute
         /// <inheritdoc />
         public void Sql(string sqlStatement)
         {
-            var expression = new ExecuteSqlStatementExpression { SqlStatement = sqlStatement };
+            var expression = new ExecuteSqlStatementExpression
+            {
+                SqlStatement = sqlStatement,
+                WellKnownTokenMapProviders = GetWellKnownTokenMapProviders(),
+            };
             _context.Expressions.Add(expression);
         }
 
@@ -61,6 +65,7 @@ namespace FluentMigrator.Builders.Execute
             {
                 SqlStatement = sqlStatement,
                 Parameters = parameters,
+                WellKnownTokenMapProviders = GetWellKnownTokenMapProviders(),
             };
 
             _context.Expressions.Add(expression);
@@ -73,6 +78,7 @@ namespace FluentMigrator.Builders.Execute
             {
                 SqlStatement = sqlStatement,
                 Description = description,
+                WellKnownTokenMapProviders = GetWellKnownTokenMapProviders(),
             };
 
             _context.Expressions.Add(expression);
@@ -86,6 +92,7 @@ namespace FluentMigrator.Builders.Execute
                 SqlStatement = sqlStatement,
                 Description = description,
                 Parameters = parameters,
+                WellKnownTokenMapProviders = GetWellKnownTokenMapProviders(),
             };
 
             _context.Expressions.Add(expression);
@@ -98,6 +105,7 @@ namespace FluentMigrator.Builders.Execute
             {
                 SqlScript = pathToSqlScript,
                 Parameters = parameters,
+                WellKnownTokenMapProviders = GetWellKnownTokenMapProviders(),
             };
 
             _context.Expressions.Add(expression);
@@ -106,7 +114,11 @@ namespace FluentMigrator.Builders.Execute
         /// <inheritdoc />
         public void Script(string pathToSqlScript)
         {
-            var expression = new ExecuteSqlScriptExpression { SqlScript = pathToSqlScript };
+            var expression = new ExecuteSqlScriptExpression
+            {
+                SqlScript = pathToSqlScript,
+                WellKnownTokenMapProviders = GetWellKnownTokenMapProviders(),
+            };
             _context.Expressions.Add(expression);
         }
 
@@ -138,7 +150,11 @@ namespace FluentMigrator.Builders.Execute
                     $"The caller forgot to configure the service provider with at least one {nameof(IEmbeddedResourceProvider)}");
             }
 
-            var expression = new ExecuteEmbeddedSqlScriptExpression(embeddedResourceProviders) { SqlScript = embeddedSqlScriptName };
+            var expression = new ExecuteEmbeddedSqlScriptExpression(embeddedResourceProviders)
+            {
+                SqlScript = embeddedSqlScriptName,
+                WellKnownTokenMapProviders = GetWellKnownTokenMapProviders(),
+            };
             _context.Expressions.Add(expression);
 
         }
@@ -157,9 +173,20 @@ namespace FluentMigrator.Builders.Execute
             {
                 SqlScript = embeddedSqlScriptName,
                 Parameters = parameters,
+                WellKnownTokenMapProviders = GetWellKnownTokenMapProviders(),
             };
 
             _context.Expressions.Add(expression);
+        }
+
+        /// <summary>
+        /// Resolves the registered <see cref="IWellKnownTokenMapProvider"/> instances from the
+        /// current migration context's service provider
+        /// </summary>
+        /// <returns>The registered well-known token map providers, or <c>null</c> when none are registered</returns>
+        private IEnumerable<IWellKnownTokenMapProvider> GetWellKnownTokenMapProviders()
+        {
+            return _context.ServiceProvider.GetService<IEnumerable<IWellKnownTokenMapProvider>>();
         }
     }
 }
