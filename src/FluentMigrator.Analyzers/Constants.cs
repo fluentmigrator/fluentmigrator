@@ -21,6 +21,7 @@ namespace FluentMigrator.Analyzers
         internal static class Types
         {
             internal const string FluentMigratorMigrationAttribute = "FluentMigrator.MigrationAttribute";
+            internal const string FluentMigratorIExecuteExpressionRoot = "FluentMigrator.Builders.Execute.IExecuteExpressionRoot";
         }
     }
 }
