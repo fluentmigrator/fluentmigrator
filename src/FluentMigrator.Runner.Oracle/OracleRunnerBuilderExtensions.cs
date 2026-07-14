@@ -66,6 +66,7 @@ namespace FluentMigrator.Runner
             builder.Services
                 .AddScoped<IOracleTypeMap>(sp => new OracleTypeMap())
                 .TryAddScoped<IOracleManagedGenerator, OracleManagedGenerator>();
+            builder.Services.TryAddScoped<IOracleGenerator>(sp => sp.GetRequiredService<IOracleManagedGenerator>());
         }
 
         /// <summary>
