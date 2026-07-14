@@ -19,6 +19,7 @@ using System.Linq;
 
 using AutoMapper;
 
+using FluentMigrator.DotNet.Cli.VersionTableMetadata;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Initialization;
@@ -102,6 +103,7 @@ namespace FluentMigrator.DotNet.Cli
                         .AddSqlServer2012()
                         .AddSqlServer2014()
                         .AddSqlServer2016()
+                        .AddCustomVersionTableInfo(options.VersionInfoTableMetadataJson)
                         );
 
             services
