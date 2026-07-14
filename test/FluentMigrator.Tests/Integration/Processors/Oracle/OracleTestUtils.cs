@@ -15,6 +15,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 using FluentMigrator.Runner.Processors.Oracle;
@@ -31,9 +32,46 @@ public static class OracleTestUtils
         {
             _ = oracleProcessor.Connection;
         }
-        catch (AggregateException e) when (e.InnerException is FileNotFoundException)
+        catch (Exception e) when (IsMissingNativeClientException(e))
         {
             Assert.Ignore("Oracle Data Access Client not installed");
+        }
+    }
+
+    private static bool IsMissingNativeClientException(Exception exception)
+    {
+        foreach (var e in Flatten(exception))
+        {
+            if (e is FileNotFoundException or DllNotFoundException or BadImageFormatException or TypeLoadException)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static IEnumerable<Exception> Flatten(Exception exception)
+    {
+        var current = exception;
+        while (current != null)
+        {
+            yield return current;
+
+            if (current is AggregateException aggregate)
+            {
+                foreach (var inner in aggregate.InnerExceptions)
+                {
+                    foreach (var flattened in Flatten(inner))
+                    {
+                        yield return flattened;
+                    }
+                }
+
+                yield break;
+            }
+
+            current = current.InnerException;
         }
     }
 }
