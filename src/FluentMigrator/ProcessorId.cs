@@ -21,6 +21,7 @@ namespace FluentMigrator
         public const string Oracle = nameof(Oracle);
         public const string OracleManaged = nameof(OracleManaged);
         public const string Oracle12c = nameof(Oracle12c);
+        public const string Oracle12cManaged = nameof(Oracle12cManaged);
         public const string Postgres = nameof(Postgres);
         public const string PostgreSQL = nameof(PostgreSQL);
         public const string Postgres92 = nameof(Postgres92);
