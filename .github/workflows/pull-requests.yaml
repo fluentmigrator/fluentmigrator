@@ -174,7 +174,7 @@ jobs:
       if: '!cancelled()'
       with:
         name: coverage-${{ matrix.os }}-${{ matrix.dotnet-tfm }}
-        path: coverage/Cobertura.xml
+        path: coveragereport/Cobertura.xml
         retention-days: 5
 
     - name: Add Coverage PR Comment
