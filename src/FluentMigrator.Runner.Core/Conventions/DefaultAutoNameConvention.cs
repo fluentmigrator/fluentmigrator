@@ -56,7 +56,7 @@ namespace FluentMigrator.Runner.Conventions
                 .FirstOrDefault();
             if (migrationAttribute != null)
             {
-                var version = migrationAttribute.Version;
+                var version = migrationAttribute.VersionAsString;
                 foreach (var databaseType in databaseTypes)
                 {
                     yield return string.Format("Scripts.Up.{0}_{1}_{2}.sql"
@@ -75,7 +75,7 @@ namespace FluentMigrator.Runner.Conventions
                 .FirstOrDefault();
             if (migrationAttribute != null)
             {
-                var version = migrationAttribute.Version;
+                var version = migrationAttribute.VersionAsString;
                 foreach (var databaseType in databaseTypes)
                 {
                     yield return string.Format("Scripts.Down.{0}_{1}_{2}.sql"
