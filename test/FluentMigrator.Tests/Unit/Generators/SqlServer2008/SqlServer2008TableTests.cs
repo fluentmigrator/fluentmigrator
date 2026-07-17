@@ -1,10 +1,12 @@
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 
 using FluentMigrator.Builders.Create;
 using FluentMigrator.Builders.Create.Table;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
+using FluentMigrator.Model;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.SqlServer;
@@ -374,6 +376,32 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
 
             var result = Generator.Generate(expression);
             result.ShouldBe("sp_rename N'[dbo].[TestTable1]', N'TestTable2';");
+        }
+
+        [Test]
+        public override void CanCreateTableWithFluentMultiColumnForeignKey()
+        {
+            // Test the new fluent API for multi-column foreign keys
+            // SQL Server doesn't support inline foreign keys in CREATE TABLE, so they are created as separate ALTER TABLE statements
+            var expressions = new List<IMigrationExpression>();
+            var migrationContextMock = new Mock<IMigrationContext>();
+            migrationContextMock.SetupGet(mc => mc.Expressions).Returns(expressions);
+            var migrationContext = migrationContextMock.Object;
+            
+            new CreateExpressionRoot(migrationContext)
+                .Table("Area").InSchema("dbo")
+                .WithColumn("ArticleId").AsString()
+                .WithColumn("AreaGroupIndex").AsInt32()
+                .WithColumn("Index").AsInt32().ForeignKey("FK_Area_AreaGroup", ["ArticleId", "AreaGroupIndex"], "dbo", "AreaGroup", ["ArticleId", "Index"]);
+            
+            var createTableExpression = migrationContext.Expressions.OfType<CreateTableExpression>().First();
+            var createForeignKeyExpression = migrationContext.Expressions.OfType<CreateForeignKeyExpression>().First();
+
+            string createTableResult = Generator.Generate(createTableExpression);
+            string createForeignKeyResult = Generator.Generate(createForeignKeyExpression);
+            
+            createTableResult.ShouldBe("CREATE TABLE [dbo].[Area] ([ArticleId] NVARCHAR(255) NOT NULL, [AreaGroupIndex] INT NOT NULL, [Index] INT NOT NULL);");
+            createForeignKeyResult.ShouldBe("ALTER TABLE [dbo].[Area] ADD CONSTRAINT [FK_Area_AreaGroup] FOREIGN KEY ([ArticleId], [AreaGroupIndex]) REFERENCES [dbo].[AreaGroup] ([ArticleId], [Index]);");
         }
 
         #endregion

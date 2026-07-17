@@ -1,4 +1,8 @@
+using System.Data;
+
 using FluentMigrator.Exceptions;
+using FluentMigrator.Expressions;
+using FluentMigrator.Model;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Generators.Oracle;
 using NUnit.Framework;
@@ -262,6 +266,30 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
 
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE TestTable1 RENAME TO TestTable2;");
+        }
+
+        [Test]
+        public override void CanCreateTableWithFluentMultiColumnForeignKey()
+        {
+            // Test the new fluent API for multi-column foreign keys
+            // Oracle doesn't support inline foreign keys in CREATE TABLE, so the foreign key definition is ignored
+            var expression = new CreateTableExpression { TableName = "Area" };
+            expression.Columns.Add(new ColumnDefinition { Name = "ArticleId", Type = DbType.String });
+            expression.Columns.Add(new ColumnDefinition { Name = "AreaGroupIndex", Type = DbType.Int32 });
+            expression.Columns.Add(new ColumnDefinition { Name = "Index", Type = DbType.Int32, 
+                IsForeignKey = true,
+                ForeignKey = new ForeignKeyDefinition
+                {
+                    Name = "FK_Area_AreaGroup",
+                    PrimaryTable = "AreaGroup",
+                    ForeignTable = "Area",
+                    PrimaryColumns = ["ArticleId", "Index"],
+                    ForeignColumns = ["ArticleId", "AreaGroupIndex"]
+                }
+            });
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE Area (ArticleId NVARCHAR2(255) NOT NULL, AreaGroupIndex NUMBER(10,0) NOT NULL, Index NUMBER(10,0) NOT NULL);");
         }
     }
 }
