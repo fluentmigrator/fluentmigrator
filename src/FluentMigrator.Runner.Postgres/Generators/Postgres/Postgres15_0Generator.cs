@@ -50,7 +50,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
 
         /// <inheritdoc />
         public override List<string> GeneratorIdAliases =>
-            [GeneratorIdConstants.PostgreSQL15_0, GeneratorIdConstants.PostgreSQL];
+            [GeneratorIdConstants.PostgreSQL15_0, GeneratorIdConstants.PostgreSQL, GeneratorIdConstants.Postgres];
 
         /// <inheritdoc />
         protected override string GetWithNullsDistinctStringInWhere(IndexDefinition index)

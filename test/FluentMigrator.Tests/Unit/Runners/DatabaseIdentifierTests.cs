@@ -113,6 +113,7 @@ namespace FluentMigrator.Tests.Unit.Runners
         [TestCase(typeof(Postgres10_0Processor), typeof(Postgres10_0Generator), ProcessorIdConstants.PostgreSQL10_0, GeneratorIdConstants.PostgreSQL10_0, ProcessorIdConstants.PostgreSQL, GeneratorIdConstants.PostgreSQL, false)]
         [TestCase(typeof(Postgres11_0Processor), typeof(Postgres11_0Generator), ProcessorIdConstants.PostgreSQL11_0, GeneratorIdConstants.PostgreSQL11_0, ProcessorIdConstants.PostgreSQL, GeneratorIdConstants.PostgreSQL, false)]
         [TestCase(typeof(Postgres15_0Processor), typeof(Postgres15_0Generator), ProcessorIdConstants.PostgreSQL15_0, GeneratorIdConstants.PostgreSQL15_0, ProcessorIdConstants.PostgreSQL, GeneratorIdConstants.PostgreSQL, true)]
+        [TestCase(typeof(Postgres15_0Processor), typeof(Postgres15_0Generator), ProcessorIdConstants.PostgreSQL15_0, GeneratorIdConstants.PostgreSQL15_0, ProcessorIdConstants.Postgres, GeneratorIdConstants.Postgres, true)]
         // SQL Server
         [TestCase(typeof(SqlServer2000Processor), typeof(SqlServer2000Generator), ProcessorIdConstants.SqlServer2000, GeneratorIdConstants.SqlServer2000, ProcessorIdConstants.SqlServer, GeneratorIdConstants.SqlServer,  false)]
         [TestCase(typeof(SqlServer2005Processor), typeof(SqlServer2005Generator), ProcessorIdConstants.SqlServer2005, GeneratorIdConstants.SqlServer2005, ProcessorIdConstants.SqlServer, GeneratorIdConstants.SqlServer, false)]
