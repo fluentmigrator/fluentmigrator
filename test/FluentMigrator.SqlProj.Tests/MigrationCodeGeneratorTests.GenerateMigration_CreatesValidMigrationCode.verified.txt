@@ -1,0 +1,22 @@
+﻿using FluentMigrator;
+
+namespace TestNamespace
+{
+    [Migration(123456789)]
+    public class TestMigration : Migration
+    {
+        public override void Up()
+        {
+            Create.Table("TestTable")
+                .WithColumn("Id").AsInt32().NotNullable().Identity()
+                .WithColumn("Name").AsString(100).NotNullable()
+                ;
+
+        }
+
+        public override void Down()
+        {
+            Delete.Table("TestTable");
+        }
+    }
+}

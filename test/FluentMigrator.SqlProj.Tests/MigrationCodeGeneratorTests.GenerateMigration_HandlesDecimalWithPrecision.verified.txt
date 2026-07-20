@@ -1,0 +1,21 @@
+﻿using FluentMigrator;
+
+namespace Migrations
+{
+    [Migration(123)]
+    public class DecimalMigration : Migration
+    {
+        public override void Up()
+        {
+            Create.Table("PriceTable")
+                .WithColumn("Amount").AsDecimal(18, 2).NotNullable()
+                ;
+
+        }
+
+        public override void Down()
+        {
+            Delete.Table("PriceTable");
+        }
+    }
+}
