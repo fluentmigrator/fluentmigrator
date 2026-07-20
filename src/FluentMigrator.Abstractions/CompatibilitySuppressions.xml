@@ -30,4 +30,18 @@
     <Right>lib/netstandard2.0/FluentMigrator.Abstractions.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>
   </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0006</DiagnosticId>
+    <Target>M:FluentMigrator.IMigrationProcessor.HasTransaction</Target>
+    <Left>lib/net48/FluentMigrator.Abstractions.dll</Left>
+    <Right>lib/net48/FluentMigrator.Abstractions.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
+  <Suppression>
+    <DiagnosticId>CP0006</DiagnosticId>
+    <Target>M:FluentMigrator.IMigrationProcessor.HasTransaction</Target>
+    <Left>lib/netstandard2.0/FluentMigrator.Abstractions.dll</Left>
+    <Right>lib/netstandard2.0/FluentMigrator.Abstractions.dll</Right>
+    <IsBaselineSuppression>true</IsBaselineSuppression>
+  </Suppression>
 </Suppressions>
