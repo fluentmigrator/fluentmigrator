@@ -34,7 +34,6 @@ This ADR addresses issue #1228 and proposes a unified approach to sequence manag
 | **MariaDB** | ✅ Yes | `CREATE SEQUENCE [schema.]name` | Native sequence support via SEQUENCE Engine |
 | **MySQL 5.x/8.x** | ❌ No | N/A | No native sequence support |
 | **SQLite** | ❌ No | N/A | No native sequence support |
-| **Jet (MS Access)** | ❌ No | N/A | No native sequence support; uses AutoNumber |
 
 ### Workarounds for Non-Supporting Databases
 
@@ -57,10 +56,6 @@ SQLite doesn't support sequences but provides AUTOINCREMENT:
 - **Option 1**: Use AUTOINCREMENT for INTEGER PRIMARY KEY
 - **Option 2**: Use sqlite_sequence system table (automatically managed)
 - **Recommendation**: Document that sequences are not portable to SQLite
-
-#### Jet (MS Access) Workaround
-- Use AutoNumber data type
-- Limited control over sequence behavior
 
 ## Current State
 
@@ -456,7 +451,6 @@ public override void Up()
 - [ ] Redshift generator
 - [ ] MySQL generator (error/warning path)
 - [ ] SQLite generator (error/warning path)
-- [ ] Jet generator (error/warning path)
 
 ### Phase 3: Testing
 - [ ] Unit tests for expression builders
