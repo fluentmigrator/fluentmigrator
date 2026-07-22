@@ -16,15 +16,15 @@
 //
 #endregion
 
+using System;
+using System.CommandLine;
 using System.Linq;
-using FluentMigrator.Runner;
-using FluentMigrator.DotNet.Cli.Commands;
 
-using McMaster.Extensions.CommandLineUtils;
+using FluentMigrator.Hosting.Commands.CommandBuilders;
+using FluentMigrator.Runner;
 
 namespace FluentMigrator.DotNet.Cli
 {
-    [Microsoft.FSharp.Core.Sealed]
     public static class Program
     {
         static Program()
@@ -34,14 +34,24 @@ namespace FluentMigrator.DotNet.Cli
 
         public static int Main(string[] args)
         {
-            if (args.Contains("--allowDirtyAssemblies"))
+            // Pre-check for --allow-dirty-assemblies / legacy --allowDirtyAssemblies so that the
+            // assembly resolver is in place before System.CommandLine triggers any assembly loads.
+            bool useDirtyHelper = args.Any(a =>
+                string.Equals(a, "--allow-dirty-assemblies", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(a, "--allowDirtyAssemblies", StringComparison.OrdinalIgnoreCase));
+
+            var rootCommand = FluentMigratorCommandBuilder.BuildRootCommand();
+            var parseResult = rootCommand.Parse(args);
+
+            if (useDirtyHelper)
             {
                 using (DirtyAssemblyResolveHelper.Create())
                 {
-                    return CommandLineApplication.Execute<Root>(args);
+                    return parseResult.Invoke(new InvocationConfiguration());
                 }
             }
-            return CommandLineApplication.Execute<Root>(args);
+
+            return parseResult.Invoke(new InvocationConfiguration());
         }
     }
 }

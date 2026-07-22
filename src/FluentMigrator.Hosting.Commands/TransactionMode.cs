@@ -14,20 +14,14 @@
 // limitations under the License.
 #endregion
 
-using McMaster.Extensions.CommandLineUtils;
-
-namespace FluentMigrator.DotNet.Cli.Commands
+namespace FluentMigrator.Hosting.Commands
 {
-    [HelpOption(Description = "Execute FluentMigrator actions")]
-    [Command("dotnet-fm", Description = "The external FluentMigrator runner that integrates into the .NET Core CLI tooling")]
-    [Subcommand(typeof(Migrate), typeof(Rollback), typeof(Validate), typeof(ListCommand))]
-    public class Root
+    /// <summary>Transaction behaviour when executing migrations.</summary>
+    public enum TransactionMode
     {
-        protected int OnExecute(CommandLineApplication app, IConsole console)
-        {
-            console.Error.WriteLine("You must specify a subcommand.");
-            app.ShowHelp();
-            return 1;
-        }
+        /// <summary>Each migration runs in its own transaction (default).</summary>
+        Migration,
+        /// <summary>All migrations in the run share a single transaction.</summary>
+        Session,
     }
 }
