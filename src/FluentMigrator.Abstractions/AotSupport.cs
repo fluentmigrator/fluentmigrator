@@ -20,15 +20,26 @@ using System.Runtime.CompilerServices;
 
 namespace FluentMigrator
 {
+#if NETCOREAPP
     /// <summary>
     /// Provides a centralized check for whether dynamic code (reflection emit, etc.) is supported
     /// at runtime. In production builds this delegates directly to
-    /// <c>System.Runtime.CompilerServices.RuntimeFeature.IsDynamicCodeSupported</c>
-    /// (not a <c>cref</c>: the property does not exist on net48/netstandard2.0),
+    /// <see cref="System.Runtime.CompilerServices.RuntimeFeature.IsDynamicCodeSupported"/>,
     /// preserving the trimmer's ability to eliminate unreachable code paths.
     /// When <c>TESTING_AOT</c> is defined (via <c>-p:TestingAot=true</c>), the property
     /// returns <c>false</c> so that unit tests can exercise AOT code paths on a normal runtime.
     /// </summary>
+#else
+    /// <summary>
+    /// Provides a centralized check for whether dynamic code (reflection emit, etc.) is supported
+    /// at runtime. In production builds this uses
+    /// <c>System.Runtime.CompilerServices.RuntimeFeature.IsDynamicCodeSupported</c> where available
+    /// (not a <c>cref</c> on net48/netstandard2.0, where the property does not exist),
+    /// preserving the trimmer's ability to eliminate unreachable code paths.
+    /// When <c>TESTING_AOT</c> is defined (via <c>-p:TestingAot=true</c>), the property
+    /// returns <c>false</c> so that unit tests can exercise AOT code paths on a normal runtime.
+    /// </summary>
+#endif
     internal static class AotSupport
     {
 #if TESTING_AOT
@@ -37,7 +48,7 @@ namespace FluentMigrator
         /// simulating an AOT environment for testing purposes.
         /// </summary>
         internal static bool IsDynamicCodeSupported => false;
-#elif NET
+#elif NETCOREAPP
         /// <summary>
         /// Returns the runtime value of
         /// <see cref="System.Runtime.CompilerServices.RuntimeFeature.IsDynamicCodeSupported"/>.
