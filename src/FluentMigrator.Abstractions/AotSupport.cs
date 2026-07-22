@@ -23,7 +23,8 @@ namespace FluentMigrator
     /// <summary>
     /// Provides a centralized check for whether dynamic code (reflection emit, etc.) is supported
     /// at runtime. In production builds this delegates directly to
-    /// <see cref="System.Runtime.CompilerServices.RuntimeFeature.IsDynamicCodeSupported"/>,
+    /// <c>System.Runtime.CompilerServices.RuntimeFeature.IsDynamicCodeSupported</c>
+    /// (not a <c>cref</c>: the property does not exist on net48/netstandard2.0),
     /// preserving the trimmer's ability to eliminate unreachable code paths.
     /// When <c>TESTING_AOT</c> is defined (via <c>-p:TestingAot=true</c>), the property
     /// returns <c>false</c> so that unit tests can exercise AOT code paths on a normal runtime.
