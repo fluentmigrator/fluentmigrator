@@ -26,6 +26,7 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators;
 
 using JetBrains.Annotations;
+using NotNullAttribute = JetBrains.Annotations.NotNullAttribute;
 
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -113,13 +114,13 @@ namespace FluentMigrator.Runner.Processors
         public IMigrationGenerator Generator { get; set; }
 
         /// <inheritdoc />
-        public void Execute([StringSyntax(StringSyntaxAttribute.Sql)] string sql)
+        public void Execute([StringSyntax("sql")] string sql)
         {
             Process(sql);
         }
 
         /// <inheritdoc />
-        public void Execute([StringSyntax(StringSyntaxAttribute.Sql)] string template, params object[] args)
+        public void Execute([StringSyntax("sql")] string template, params object[] args)
         {
             Process(string.Format(template, args));
         }
@@ -131,13 +132,13 @@ namespace FluentMigrator.Runner.Processors
         }
 
         /// <inheritdoc />
-        public DataSet Read([StringSyntax(StringSyntaxAttribute.Sql)] string template, params object[] args)
+        public DataSet Read([StringSyntax("sql")] string template, params object[] args)
         {
             throw new NotImplementedException($"Method {nameof(Read)} is not supported by the connectionless processor");
         }
 
         /// <inheritdoc />
-        public bool Exists([StringSyntax(StringSyntaxAttribute.Sql)] string template, params object[] args)
+        public bool Exists([StringSyntax("sql")] string template, params object[] args)
         {
             throw new NotImplementedException($"Method {nameof(Exists)} is not supported by the connectionless processor");
         }
@@ -160,6 +161,12 @@ namespace FluentMigrator.Runner.Processors
 
         }
 
+        /// <inheritdoc />
+        public bool HasTransaction()
+        {
+            return false;
+        }
+
         /// <summary>
         /// Executes the specified SQL statement using the connectionless processor.
         /// </summary>
@@ -167,7 +174,7 @@ namespace FluentMigrator.Runner.Processors
         /// <remarks>
         /// This method logs the provided SQL statement using the associated <see cref="ILogger"/> instance.
         /// </remarks>
-        protected void Process([StringSyntax(StringSyntaxAttribute.Sql)] string sql)
+        protected void Process([StringSyntax("sql")] string sql)
         {
             _logger.LogSql(sql);
         }

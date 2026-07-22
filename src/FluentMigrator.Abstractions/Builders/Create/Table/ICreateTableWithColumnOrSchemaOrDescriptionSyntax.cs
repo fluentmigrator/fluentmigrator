@@ -29,5 +29,11 @@ namespace FluentMigrator.Builders.Create.Table
         /// <param name="description">The description</param>
         /// <returns>Define the table schema or a new column</returns>
         ICreateTableWithColumnOrSchemaSyntax WithDescription(string description);
+
+        /// <summary>
+        /// Specifies the command should only be applied if the table does not already exist.
+        /// </summary>
+        /// <returns>Define the table schema, description or a new column</returns>
+        ICreateTableWithColumnOrSchemaOrDescriptionSyntax IfNotExists();
     }
 }

@@ -29,7 +29,7 @@ namespace FluentMigrator.Runner.Infrastructure
     /// <summary>
     /// Provides default conventions for migration runner.
     /// </summary>
-    public class DefaultMigrationRunnerConventions : IMigrationRunnerConventions
+    public class DefaultMigrationRunnerConventions : IMigrationRunnerConventions, IMigrationRunnerTagConventions
     {
         private DefaultMigrationRunnerConventions()
         {
@@ -54,10 +54,33 @@ namespace FluentMigrator.Runner.Infrastructure
         /// <inheritdoc />
         public Func<IMigration, IMigrationInfo> GetMigrationInfoForMigration => GetMigrationInfoForMigrationImpl;
 
-        /// <inheritdoc />
+#if NET
+#pragma warning disable IL2111 // Replaced by IMigrationRunnerTagConventions
+#endif
+        /// <inheritdoc cref="IMigrationRunnerConventions.TypeHasTags" />
+        [Obsolete("Use IMigrationRunnerTagConventions.TypeHasTags instead.")]
         public Func<Type, bool> TypeHasTags => TypeHasTagsImpl;
-        /// <inheritdoc />
+        /// <inheritdoc cref="IMigrationRunnerConventions.TypeHasMatchingTags" />
+        [Obsolete("Use IMigrationRunnerTagConventions.TypeHasMatchingTags instead.")]
         public Func<Type, IEnumerable<string>, bool> TypeHasMatchingTags => TypeHasMatchingTagsImpl;
+#if NET
+#pragma warning restore IL2111
+#endif
+
+        /// <inheritdoc />
+        bool IMigrationRunnerTagConventions.TypeHasTags(
+#if NET
+            [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.Interfaces)]
+#endif
+            Type type) => TypeHasTagsImpl(type);
+
+        /// <inheritdoc />
+        bool IMigrationRunnerTagConventions.TypeHasMatchingTags(
+#if NET
+            [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.Interfaces)]
+#endif
+            Type type,
+            IEnumerable<string> tagsToMatch) => TypeHasMatchingTagsImpl(type, tagsToMatch);
 
         private static bool TypeIsMigrationImpl(Type type)
         {
@@ -95,18 +118,30 @@ namespace FluentMigrator.Runner.Infrastructure
             return migrationInfo;
         }
 
-        private IMigrationInfo GetMigrationInfoForImpl(Type migrationType)
+        private IMigrationInfo GetMigrationInfoForImpl(
+#if NET
+            [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
+#endif
+            Type migrationType)
         {
             var migration = (IMigration) Activator.CreateInstance(migrationType);
             return GetMigrationInfoForMigration(migration);
         }
 
-        private static bool TypeHasTagsImpl(Type type)
+        private static bool TypeHasTagsImpl(
+#if NET
+            [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.Interfaces)]
+#endif
+            Type type)
         {
             return GetInheritedCustomAttributes<TagsAttribute>(type).Any();
         }
 
-        private static IEnumerable<T> GetInheritedCustomAttributes<T>(Type type)
+        private static IEnumerable<T> GetInheritedCustomAttributes<T>(
+    #if NET
+            [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.Interfaces)]
+    #endif
+            Type type)
         {
             var attributeType = typeof(T);
 
@@ -119,7 +154,11 @@ namespace FluentMigrator.Runner.Infrastructure
                 .Cast<T>();
         }
 
-        private static bool TypeHasMatchingTagsImpl(Type type, IEnumerable<string> tagsToMatch)
+        private static bool TypeHasMatchingTagsImpl(
+#if NET
+            [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.Interfaces)]
+#endif
+            Type type, IEnumerable<string> tagsToMatch)
         {
             var tags = GetInheritedCustomAttributes<TagsAttribute>(type).ToList();
             var matchTagsList = tagsToMatch.ToList();

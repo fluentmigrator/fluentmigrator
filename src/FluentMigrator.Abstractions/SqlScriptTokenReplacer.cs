@@ -31,11 +31,53 @@ namespace FluentMigrator
         /// <param name="sqlText">The SQL script where the tokens will be replaced</param>
         /// <param name="parameters">The tokens to be replaced</param>
         /// <returns>The SQL script with the replaced tokens</returns>
+        /// <remarks>
+        /// Two token styles are supported:
+        /// <list type="bullet">
+        /// <item>
+        /// <description>
+        /// <c>$(name)</c> is replaced with the raw, unmodified parameter value. This is intended for
+        /// substituting identifiers (table/column names) or SQL fragments/keywords that must not be
+        /// quoted. Since the value is inserted verbatim, callers are responsible for validating/sanitizing
+        /// any value used with this token style to avoid SQL injection.
+        /// </description>
+        /// </item>
+        /// <item>
+        /// <description>
+        /// <c>$[name]</c> is replaced with the parameter value rendered as a safely quoted SQL string
+        /// literal (wrapped in single quotes, with any embedded single quotes escaped by doubling them).
+        /// Use this style whenever a value should be treated as string data instead of raw SQL.
+        /// </description>
+        /// </item>
+        /// </list>
+        /// The literal text <c>$(name)</c> or <c>$[name]</c> can be produced (without substitution) by
+        /// escaping it as <c>$$((name))</c> or <c>$$[[name]]</c> respectively.
+        /// </remarks>
         public static string ReplaceSqlScriptTokens([StringSyntax("sql")] string sqlText, IDictionary<string, string> parameters)
         {
             // Are parameters set?
             if (parameters != null && parameters.Count != 0)
             {
+                // Replace $[word] elements with the values stored in the Parameters
+                // dictionary, rendered as a safely quoted/escaped SQL string literal.
+                sqlText = Regex.Replace(
+                    sqlText,
+                    @"\$\[(?<token>\w+)\]",
+                    m =>
+                    {
+                        var key = m.Groups["token"].Value;
+                        if (parameters.TryGetValue(key, out var keyValue))
+                        {
+                            return QuoteSqlStringLiteral(keyValue);
+                        }
+
+                        // Return the whole match value when the key
+                        // wasn't found in the Parameters dictionary.
+                        // This might help finding unset variables.
+                        return m.Value;
+                    }
+                );
+
                 // Replace $(word) elements with values stored
                 // in the Parameters dictionary.
                 sqlText = Regex.Replace(
@@ -58,9 +100,30 @@ namespace FluentMigrator
 
                 // Replace $$((word)) with $(word)
                 sqlText = Regex.Replace(sqlText, @"\${2}\({2}(\w+)\){2}", @"$$($1)");
+
+                // Replace $$[[word]] with $[word]
+                sqlText = Regex.Replace(sqlText, @"\${2}\[{2}(\w+)\]{2}", @"$$[$1]");
             }
 
             return sqlText;
+        }
+
+        /// <summary>
+        /// Renders a value as a safely quoted/escaped SQL string literal.
+        /// </summary>
+        /// <param name="value">The value to quote</param>
+        /// <returns>
+        /// <c>NULL</c> when <paramref name="value"/> is <see langword="null"/>, otherwise the value
+        /// wrapped in single quotes with any embedded single quotes escaped by doubling them.
+        /// </returns>
+        private static string QuoteSqlStringLiteral(string value)
+        {
+            if (value is null)
+            {
+                return "NULL";
+            }
+
+            return "'" + value.Replace("'", "''") + "'";
         }
     }
 }

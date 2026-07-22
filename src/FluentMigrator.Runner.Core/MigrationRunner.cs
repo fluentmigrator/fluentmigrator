@@ -342,13 +342,19 @@ namespace FluentMigrator.Runner
             // Validate connection early to catch invalid connection strings before attempting migrations
             ValidateConnection();
 
-            var migrationInfos = GetUpMigrationsToApply(targetVersion);
-
             using (IMigrationScope scope = _migrationScopeManager.CreateOrWrapMigrationScope(useAutomaticTransactionManagement && TransactionPerSession))
             {
                 try
                 {
                     ApplyMaintenance(MigrationStage.BeforeAll, useAutomaticTransactionManagement);
+
+                    // The list of migrations to apply must be computed after the BeforeAll maintenance
+                    // migrations have run (e.g. after acquiring a lock), so that any migrations already
+                    // applied by another process in the meantime are correctly excluded. Reload the
+                    // version info to reflect any changes made while waiting for the lock.
+                    VersionLoader.LoadVersionInfo();
+
+                    var migrationInfos = GetUpMigrationsToApply(targetVersion);
 
                     foreach (var migrationInfo in migrationInfos)
                     {
@@ -759,13 +765,13 @@ namespace FluentMigrator.Runner
                 throw new InvalidOperationException(
                     $"The caller forgot to configure an {nameof(IServiceProvider)} in the constructor of this class.");
             }
-            
+
             var connectionStringAccessor = _serviceProvider.GetRequiredService<IConnectionStringAccessor>();
             context = new MigrationContext(
                 Processor,
                 _serviceProvider,
                 connectionStringAccessor.ConnectionString);
-            
+
 
             getExpressions(migration, context);
 
@@ -935,6 +941,12 @@ namespace FluentMigrator.Runner
         {
             // Skip connection validation in preview mode as no actual database connection is needed
             if (_processorOptions.PreviewOnly)
+            {
+                return;
+            }
+
+            // Connection is fine, if we already have a transaction
+            if (Processor.HasTransaction())
             {
                 return;
             }

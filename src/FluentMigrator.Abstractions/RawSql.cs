@@ -23,7 +23,7 @@ namespace FluentMigrator
         /// <summary>
         /// Gets the underlying SQL value
         /// </summary>
-        [StringSyntax(StringSyntaxAttribute.Sql)]
+        [StringSyntax("sql")]
         public string Value { get; }
 
         /// <summary>
@@ -31,7 +31,7 @@ namespace FluentMigrator
         /// </summary>
         /// <param name="sqlToRun">The SQL value</param>
         /// <returns>The new <see cref="RawSql"/> instance</returns>
-        public static RawSql Insert([StringSyntax(StringSyntaxAttribute.Sql)] string sqlToRun)
+        public static RawSql Insert([StringSyntax("sql")] string sqlToRun)
         {
             return new RawSql(sqlToRun);
         }

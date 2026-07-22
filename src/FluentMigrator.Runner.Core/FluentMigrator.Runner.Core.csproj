@@ -6,6 +6,7 @@
     <AssemblyOriginatorKeyFile>..\..\FluentMigrator.snk</AssemblyOriginatorKeyFile>
     <RootNamespace>FluentMigrator.Runner</RootNamespace>
   </PropertyGroup>
+  <Import Project="$(MSBuildThisFileDirectory)../../TrimAot.props" />
   <Import Project="$(MSBuildThisFileDirectory)../../PackageLibrary.props" />
   <ItemGroup Condition=" '$(TargetFramework)' == 'net48' ">
     <Reference Include="System.Configuration" />

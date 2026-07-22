@@ -37,14 +37,14 @@ namespace FluentMigrator
         /// Execute an SQL statement (escaping not needed)
         /// </summary>
         /// <param name="sql">The SQL statement</param>
-        void Execute([StringSyntax(StringSyntaxAttribute.Sql)] string sql);
+        void Execute([StringSyntax("sql")] string sql);
 
         /// <summary>
         /// Execute an SQL statement
         /// </summary>
         /// <param name="template">The SQL statement</param>
         /// <param name="args">The arguments to replace in the SQL statement</param>
-        void Execute([StringSyntax(StringSyntaxAttribute.Sql)] string template, params object[] args);
+        void Execute([StringSyntax("sql")] string template, params object[] args);
 
         /// <summary>
         /// Reads all data from all rows from a table
@@ -60,7 +60,7 @@ namespace FluentMigrator
         /// <param name="template">The SQL query</param>
         /// <param name="args">The arguments of the SQL query</param>
         /// <returns>The data from the specified SQL query</returns>
-        DataSet Read([StringSyntax(StringSyntaxAttribute.Sql)] string template, params object[] args);
+        DataSet Read([StringSyntax("sql")] string template, params object[] args);
 
         /// <summary>
         /// Returns <c>true</c> if data could be found for the given SQL query
@@ -68,7 +68,7 @@ namespace FluentMigrator
         /// <param name="template">The SQL query</param>
         /// <param name="args">The arguments of the SQL query</param>
         /// <returns><c>true</c> when the SQL query returned data</returns>
-        bool Exists([StringSyntax(StringSyntaxAttribute.Sql)] string template, params object[] args);
+        bool Exists([StringSyntax("sql")] string template, params object[] args);
 
         /// <summary>
         /// Begins a transaction
@@ -84,6 +84,12 @@ namespace FluentMigrator
         /// Rollback of a transaction
         /// </summary>
         void RollbackTransaction();
+
+        /// <summary>
+        /// Checks for active transaction
+        /// </summary>
+        /// <returns><c>true</c> when a transaction exists</returns>
+        bool HasTransaction();
 
         /// <summary>
         /// Executes a <c>CREATE SCHEMA</c> SQL expression

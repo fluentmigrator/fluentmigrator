@@ -94,6 +94,10 @@ namespace FluentMigrator.Runner.Generators.Jet
         /// <inheritdoc />
         public override string Generate(CreateTableExpression expression)
         {
+            if (expression.IfNotExists)
+            {
+                return CompatibilityMode.HandleCompatibility("If Not Exists logic is not supported for Jet");
+            }
             if (expression.Columns.Any(x => x.Expression != null))
             {
                 return CompatibilityMode.HandleCompatibility("Computed columns are not supported for Jet");

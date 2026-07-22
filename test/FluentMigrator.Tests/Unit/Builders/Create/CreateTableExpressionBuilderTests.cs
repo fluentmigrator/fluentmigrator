@@ -720,5 +720,33 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 
             columnMock.VerifySet(c => c.Precision = expected);
         }
+
+        [Test]
+        public void CallingIfNotExistsSetsIfNotExistsToTrue()
+        {
+            var contextMock = new Mock<IMigrationContext>();
+
+            var expression = new CreateTableExpression { TableName = "TestTable" };
+
+            var builder = new CreateTableExpressionBuilder(expression, contextMock.Object);
+            builder.IfNotExists();
+
+            expression.IfNotExists.ShouldBeTrue();
+        }
+
+        [Test]
+        public void CallingIfNotExistsAllowsFurtherChaining()
+        {
+            var contextMock = new Mock<IMigrationContext>();
+
+            var expression = new CreateTableExpression { TableName = "TestTable" };
+
+            var builder = new CreateTableExpressionBuilder(expression, contextMock.Object);
+            builder.IfNotExists().WithColumn("Name").AsString();
+
+            expression.IfNotExists.ShouldBeTrue();
+            expression.Columns.Count.ShouldBe(1);
+            expression.Columns[0].Name.ShouldBe("Name");
+        }
     }
 }

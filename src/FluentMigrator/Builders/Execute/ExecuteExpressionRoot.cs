@@ -49,14 +49,14 @@ namespace FluentMigrator.Builders.Execute
         IMigrationContext IMigrationContextAccessor.GetMigrationContext() => _context;
 
         /// <inheritdoc />
-        public void Sql([StringSyntax(StringSyntaxAttribute.Sql)] string sqlStatement)
+        public void Sql([StringSyntax("sql")] string sqlStatement)
         {
             var expression = new ExecuteSqlStatementExpression { SqlStatement = sqlStatement };
             _context.Expressions.Add(expression);
         }
 
         /// <inheritdoc />
-        public void Sql([StringSyntax(StringSyntaxAttribute.Sql)] string sqlStatement, IDictionary<string, string> parameters)
+        public void Sql([StringSyntax("sql")] string sqlStatement, IDictionary<string, string> parameters)
         {
             var expression = new ExecuteSqlStatementExpression
             {
@@ -68,7 +68,7 @@ namespace FluentMigrator.Builders.Execute
         }
 
         /// <inheritdoc />
-        public void Sql([StringSyntax(StringSyntaxAttribute.Sql)] string sqlStatement, string description)
+        public void Sql([StringSyntax("sql")] string sqlStatement, string description)
         {
             var expression = new ExecuteSqlStatementExpression
             {
@@ -80,7 +80,7 @@ namespace FluentMigrator.Builders.Execute
         }
 
         /// <inheritdoc />
-        public void Sql([StringSyntax(StringSyntaxAttribute.Sql)] string sqlStatement, string description, IDictionary<string, string> parameters)
+        public void Sql([StringSyntax("sql")] string sqlStatement, string description, IDictionary<string, string> parameters)
         {
             var expression = new ExecuteSqlStatementExpression
             {

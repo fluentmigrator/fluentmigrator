@@ -54,7 +54,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
         }
 
         /// <inheritdoc />
-        public override string DatabaseType => "Oracle12cManaged";
+        public override string DatabaseType => ProcessorIdConstants.Oracle12cManaged;
 
         /// <inheritdoc />
         public override IList<string> DatabaseTypeAliases { get; } = new List<string>()
