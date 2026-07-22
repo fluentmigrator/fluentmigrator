@@ -2,7 +2,10 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net8.0;net9.0;net10.0</TargetFrameworks>
     <Description>Assembly containing migrations for the example project</Description>
-    <!-- Copying local lock file assemblies is only needed if using FluentMigrator.MSBuild.dll -->
+    <!-- Copying local lock file assemblies is needed if using FluentMigrator.MSBuild.dll;
+         under certain conditions (FluentMigrator.DotNet.Cli and other out-of-process runners
+         that load migration assemblies without a deps.json file),
+         you may also need this to copy your package references -->
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <!-- By default, *.cs files will be automatically included as compile items,
     but *.sql files will be automatically included as None items.  This disables that behavior. -->
