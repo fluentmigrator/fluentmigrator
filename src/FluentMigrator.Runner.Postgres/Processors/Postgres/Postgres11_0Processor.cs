@@ -51,7 +51,7 @@ namespace FluentMigrator.Runner.Processors.Postgres
         public override string DatabaseType => ProcessorIdConstants.PostgreSQL11_0;
 
         /// <inheritdoc />
-        public override IList<string> DatabaseTypeAliases { get; } = new List<string> { ProcessorIdConstants.PostgreSQL11_0, ProcessorIdConstants.PostgreSQL };
+        public override IList<string> DatabaseTypeAliases { get; } = new List<string> { ProcessorIdConstants.PostgreSQL11_0, ProcessorIdConstants.PostgreSQL, ProcessorIdConstants.Postgres };
 
     }
 }
