@@ -85,6 +85,12 @@ namespace FluentMigrator
         void RollbackTransaction();
 
         /// <summary>
+        /// Checks for active transaction
+        /// </summary>
+        /// <returns><c>true</c> when a transaction exists</returns>
+        bool HasTransaction();
+
+        /// <summary>
         /// Executes a <c>CREATE SCHEMA</c> SQL expression
         /// </summary>
         /// <param name="expression">The expression to execute</param>

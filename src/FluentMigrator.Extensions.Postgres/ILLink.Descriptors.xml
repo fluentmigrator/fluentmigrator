@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<linker>
+  <assembly fullname="FluentMigrator.Extensions.Postgres">
+    <type fullname="FluentMigrator.Model.PostgresIndexIncludeDefinition" preserve="all" />
+    <type fullname="FluentMigrator.Model.PostgresIndexConcurrentlyDefinition" preserve="all" />
+  </assembly>
+</linker>

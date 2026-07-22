@@ -241,6 +241,30 @@ Create.Table("Employees").InSchema("hr")
 
 ## Conditional Table Creation
 
+### Create Table If Not Exists
+```csharp
+[Migration(1)]
+public class CreateProjectsTable : Migration
+{
+    public override void Up()
+    {
+        Create.Table("Projects")
+            .IfNotExists()
+            .WithColumn("Id").AsInt32().NotNullable().PrimaryKey().Identity()
+            .WithColumn("Name").AsString(100).NotNullable()
+            .WithColumn("Position").AsInt32().NotNullable()
+            .WithColumn("Done").AsBoolean().NotNullable();
+    }
+
+    public override void Down()
+    {
+        Delete.Table("Projects").IfExists();
+    }
+}
+```
+
+`IfNotExists()` avoids errors when the table might already exist, removing the need for a manual `Schema.Table(...).Exists()` check before creating the table. Support for `CREATE TABLE IF NOT EXISTS` varies by database provider; where a provider lacks native support (for example Oracle, Firebird, Jet, and SQL Server), the clause is silently ignored (in `LOOSE` compatibility mode) or throws a `DatabaseOperationNotSupportedException` (in `STRICT` compatibility mode).
+
 ### Database-Specific Tables
 ```csharp
 [Migration(1)]

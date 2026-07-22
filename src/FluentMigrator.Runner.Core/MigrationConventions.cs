@@ -33,7 +33,7 @@ namespace FluentMigrator.Runner
     /// version table metadata, and other migration-related components. It also allows customization
     /// of these conventions by modifying its properties.
     /// </remarks>
-    public class MigrationRunnerConventions : IMigrationRunnerConventions
+    public class MigrationRunnerConventions : IMigrationRunnerConventions, IMigrationRunnerTagConventions
     {
         private static readonly IMigrationRunnerConventions _default = DefaultMigrationRunnerConventions.Instance;
 
@@ -52,10 +52,37 @@ namespace FluentMigrator.Runner
 
         /// <inheritdoc />
         public Func<IMigration, IMigrationInfo> GetMigrationInfoForMigration { get; }
-        /// <inheritdoc />
+        /// <inheritdoc cref="IMigrationRunnerConventions.TypeHasTags" />
+        [Obsolete("Use IMigrationRunnerTagConventions.TypeHasTags instead.")]
         public Func<Type, bool> TypeHasTags { get; set; }
-        /// <inheritdoc />
+        /// <inheritdoc cref="IMigrationRunnerConventions.TypeHasMatchingTags" />
+        [Obsolete("Use IMigrationRunnerTagConventions.TypeHasMatchingTags instead.")]
         public Func<Type, IEnumerable<string>, bool> TypeHasMatchingTags { get; set; }
+
+        /// <inheritdoc />
+        bool IMigrationRunnerTagConventions.TypeHasTags(
+#if NET
+            [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.Interfaces)]
+#endif
+            Type type)
+        {
+#pragma warning disable CS0618
+            return TypeHasTags(type);
+#pragma warning restore CS0618
+        }
+
+        /// <inheritdoc />
+        bool IMigrationRunnerTagConventions.TypeHasMatchingTags(
+#if NET
+            [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.Interfaces)]
+#endif
+            Type type,
+            IEnumerable<string> tagsToMatch)
+        {
+#pragma warning disable CS0618
+            return TypeHasMatchingTags(type, tagsToMatch);
+#pragma warning restore CS0618
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MigrationRunnerConventions"/> class.
@@ -74,8 +101,10 @@ namespace FluentMigrator.Runner
             TypeIsProfile = _default.TypeIsProfile;
             GetMaintenanceStage = _default.GetMaintenanceStage;
             GetMigrationInfoForMigration = _default.GetMigrationInfoForMigration;
+#pragma warning disable CS0618
             TypeHasTags = _default.TypeHasTags;
             TypeHasMatchingTags = _default.TypeHasMatchingTags;
+#pragma warning restore CS0618
         }
     }
 }

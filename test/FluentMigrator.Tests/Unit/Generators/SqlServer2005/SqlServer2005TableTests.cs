@@ -318,6 +318,16 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
+        public void CanCreateTableIfNotExistsWithDefaultSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableExpression();
+            expression.IfNotExists = true;
+
+            var result = Generator.Generate(expression);
+            result.ShouldBeEmpty();
+        }
+
+        [Test]
         public override void CanRenameTableWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetRenameTableExpression();

@@ -66,6 +66,7 @@ namespace FluentMigrator.Tests.Unit.Runners
         [TestCase(typeof(MySql5Processor), typeof(MySql5Generator), ProcessorIdConstants.MySql5, GeneratorIdConstants.MySql5)]
         [TestCase(typeof(MySql8Processor), typeof(MySql8Generator), ProcessorIdConstants.MySql8, GeneratorIdConstants.MySql8)]
         [TestCase(typeof(OracleProcessor), typeof(IOracleGenerator), ProcessorIdConstants.Oracle, GeneratorIdConstants.Oracle)]
+        [TestCase(typeof(OracleManagedProcessor), typeof(IOracleManagedGenerator), ProcessorIdConstants.OracleManaged, GeneratorIdConstants.OracleManaged)]
         [TestCase(typeof(Oracle12CProcessor), typeof(IOracle12CGenerator), ProcessorIdConstants.Oracle12c, GeneratorIdConstants.Oracle12c)]
         [TestCase(typeof(Postgres92Processor), typeof(Postgres92Generator), ProcessorIdConstants.Postgres92, GeneratorIdConstants.Postgres92)]
         [TestCase(typeof(Postgres10_0Processor), typeof(Postgres10_0Generator), ProcessorIdConstants.PostgreSQL10_0, GeneratorIdConstants.PostgreSQL10_0)]
@@ -102,6 +103,10 @@ namespace FluentMigrator.Tests.Unit.Runners
         [TestCase(typeof(MySql8Processor), typeof(MySql8Generator), ProcessorIdConstants.MySql8, GeneratorIdConstants.MySql8, ProcessorIdConstants.MySql, GeneratorIdConstants.MySql, true)]
         // PostgreSQL
         [TestCase(typeof(Postgres92Processor), typeof(Postgres92Generator), ProcessorIdConstants.Postgres92, GeneratorIdConstants.Postgres92, ProcessorIdConstants.PostgreSQL, GeneratorIdConstants.PostgreSQL, false)]
+        // PostgreSQL, generic "Postgres" alias (issue #2305: "dotnet fm migrate -p Postgres" must select the latest version)
+        [TestCase(typeof(Postgres10_0Processor), typeof(Postgres10_0Generator), ProcessorIdConstants.PostgreSQL10_0, GeneratorIdConstants.PostgreSQL10_0, ProcessorIdConstants.Postgres, GeneratorIdConstants.Postgres, false)]
+        [TestCase(typeof(Postgres11_0Processor), typeof(Postgres11_0Generator), ProcessorIdConstants.PostgreSQL11_0, GeneratorIdConstants.PostgreSQL11_0, ProcessorIdConstants.Postgres, GeneratorIdConstants.Postgres, false)]
+        [TestCase(typeof(Postgres15_0Processor), typeof(Postgres15_0Generator), ProcessorIdConstants.PostgreSQL15_0, GeneratorIdConstants.PostgreSQL15_0, ProcessorIdConstants.Postgres, GeneratorIdConstants.Postgres, true)]
         [TestCase(typeof(Postgres10_0Processor), typeof(Postgres10_0Generator), ProcessorIdConstants.PostgreSQL10_0, GeneratorIdConstants.PostgreSQL10_0, ProcessorIdConstants.PostgreSQL, GeneratorIdConstants.PostgreSQL, false)]
         [TestCase(typeof(Postgres11_0Processor), typeof(Postgres11_0Generator), ProcessorIdConstants.PostgreSQL11_0, GeneratorIdConstants.PostgreSQL11_0, ProcessorIdConstants.PostgreSQL, GeneratorIdConstants.PostgreSQL, false)]
         [TestCase(typeof(Postgres15_0Processor), typeof(Postgres15_0Generator), ProcessorIdConstants.PostgreSQL15_0, GeneratorIdConstants.PostgreSQL15_0, ProcessorIdConstants.PostgreSQL, GeneratorIdConstants.PostgreSQL, true)]

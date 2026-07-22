@@ -236,6 +236,11 @@ namespace FluentMigrator.Runner.Generators.Oracle
         /// <inheritdoc />
         public override string Generate(CreateTableExpression expression)
         {
+            if (expression.IfNotExists)
+            {
+                return CompatibilityMode.HandleCompatibility("Create.Table(...).IfNotExists() is not supported");
+            }
+
             if (expression.Columns.Any(x => x.ExpressionStored))
             {
                 CompatibilityMode.HandleCompatibility("Stored computed columns are not supported");

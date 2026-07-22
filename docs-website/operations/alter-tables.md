@@ -72,6 +72,30 @@ public class RemoveColumns : Migration
 
 ## Advanced Column Modifications
 
+### Conditional Table Alterations
+
+Use `IfExists()` to skip an `ALTER TABLE` statement when the target table doesn't exist. This avoids the boilerplate of manually checking `Schema.Table(...).Exists()` before altering a table, and is especially useful when a migration touches an optional or database-specific table.
+
+```csharp
+public class AddColumnIfTableExists : Migration
+{
+    public override void Up()
+    {
+        Alter.Table("Products")
+            .IfExists()
+            .AddColumn("Total").AsDecimal(10, 2).Nullable();
+    }
+
+    public override void Down()
+    {
+        Delete.Column("Total").FromTable("Products");
+    }
+}
+```
+
+`IfExists()` applies to the columns added or altered via the same `Alter.Table(...)` call (`AddColumn`/`AlterColumn`). Support for a conditional `ALTER TABLE` varies by database provider; where a provider lacks native support, the clause is silently ignored (in `LOOSE` compatibility mode) or throws a `DatabaseOperationNotSupportedException` (in `STRICT` compatibility mode).
+
+
 ### Changing Column Properties
 
 ```csharp

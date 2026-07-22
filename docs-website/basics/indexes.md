@@ -26,7 +26,7 @@ public class BasicIndexes : Migration
         // Multi-column index
         Create.Index("IX_Users_FirstName_LastName")
             .OnTable("Users")
-            .OnColumn("FirstName")
+            .OnColumn("FirstName").Ascending()
             .OnColumn("LastName");
 
         // Index with sort order
@@ -68,7 +68,7 @@ public class UniqueIndexes : Migration
         // Composite unique index
         Create.Index("UQ_Products_CompanyId_InternalCode")
             .OnTable("Products")
-            .OnColumn("CompanyId")
+            .OnColumn("CompanyId").Ascending()
             .OnColumn("InternalCode")
             .Unique();
     }
@@ -101,14 +101,14 @@ public class FilteredIndexes : Migration
         {
             Create.Index("IX_Orders_CustomerId_Active")
                 .OnTable("Orders")
-                .OnColumn("CustomerId")
+                .OnColumn("CustomerId").Ascending()
                 .WithOptions()
                 .Filter("Status = 'Active'");
 
             // Filtered index excluding NULL values
             Create.Index("IX_Orders_CompletedDate")
                 .OnTable("Orders")
-                .OnColumn("CompletedDate")
+                .OnColumn("CompletedDate").Ascending()
                 .WithOptions()
                 .Filter("CompletedDate IS NOT NULL");
         });
