@@ -1,9 +1,16 @@
 name: Pull Requests
 
+# NOTE: use `pull_request`, not `pull_request_target`.
+# `pull_request_target` checks out the BASE branch by default, so this job was
+# building `main` on every PR instead of the contributor's code. It also runs
+# with a read/write token and access to secrets, which is why it must never be
+# combined with checking out PR code (the "pwn request" vulnerability).
+# `pull_request` checks out the PR merge ref and hands fork PRs a read-only
+# token with no secrets, which is what a build/test job wants.
 on:
-  pull_request_target:
+  pull_request:
     branches:
-    - '*'
+    - '**'
   push:
     branches:
     - 'main'
@@ -130,7 +137,7 @@ jobs:
 
     - name: AOT Smoke Tests
       if: matrix.dotnet-tfm == 'net8.0'
-      run: dotnet run --project test/FluentMigrator.Tests.Aot/FluentMigrator.Tests.Aot.csproj --configuration ${{ env.buildConfiguration }} --verbosity quiet\
+      run: dotnet run --project test/FluentMigrator.Tests.Aot/FluentMigrator.Tests.Aot.csproj --configuration ${{ env.buildConfiguration }} --verbosity quiet
 
     # Pack triggers .NET package validation (EnablePackageValidation in PackageLibrary.props),
     # which fails the build on breaking public-API changes against PackageValidationBaselineVersion.
@@ -154,7 +161,9 @@ jobs:
         echo "=== Environment variable GITHUB_WORKSPACE ==="
         echo $GITHUB_WORKSPACE
         echo "=== Coverage directory listing ==="
-        find . -name "*Cobertura.xml" || true
+        # -iname: the collector writes `coverage.cobertura.xml` (lowercase),
+        # so a case-sensitive -name "*Cobertura.xml" never matched on Linux.
+        find . -type f -iname "*cobertura.xml" || true
 
     - name: Combine Coverage Reports
       uses: danielpalme/ReportGenerator-GitHub-Action@v5.5.10
@@ -167,20 +176,31 @@ jobs:
         title: "Code Coverage"
         tag: "${{ github.run_number }}_${{ github.run_id }}"
         toolpath: "reportgeneratortool"
-    - run: cat coveragereport/SummaryGithub.md >> $GITHUB_STEP_SUMMARY
+    # Needs shell: bash — the default shell on Windows runners is pwsh, where
+    # $GITHUB_STEP_SUMMARY is not a variable (it would be $env:GITHUB_STEP_SUMMARY)
+    # and the redirect target expands to null.
+    - name: Write Coverage Summary to Job Summary
+      if: '!cancelled()'
+      shell: bash
+      run: cat coveragereport/SummaryGithub.md >> "$GITHUB_STEP_SUMMARY"
 
     - name: Upload Combined Coverage XML
       uses: actions/upload-artifact@v5
       if: '!cancelled()'
       with:
         name: coverage-${{ matrix.os }}-${{ matrix.dotnet-tfm }}
-        path: coverage/Cobertura.xml
+        path: coveragereport/Cobertura.xml
         retention-days: 5
 
     - name: Add Coverage PR Comment
       uses: marocchino/sticky-pull-request-comment@v2
-      if: github.event_name == 'pull_request'
+      # Only the Linux leg comments: both matrix legs share one sticky comment
+      # id, so without this they race and clobber each other.
+      # Fork PRs get a read-only token, so commenting is best-effort.
+      continue-on-error: true
+      if: github.event_name == 'pull_request' && matrix.os == 'ubuntu-latest' && !cancelled()
       with:
+        header: code-coverage
         recreate: true
         path: coveragereport/SummaryGithub.md
 
@@ -189,7 +209,10 @@ jobs:
       if: '!cancelled()'
       with:
         name: test-results-${{ matrix.os }}-${{ matrix.dotnet-tfm }}
-        path: $GITHUB_WORKSPACE/**/TestResults-${{ matrix.dotnet-tfm }}/**/*
+        # Action inputs are NOT shell-expanded: "$GITHUB_WORKSPACE/..." was
+        # matched literally and never found anything. Globs are already
+        # relative to the workspace.
+        path: "**/TestResults-${{ matrix.dotnet-tfm }}/**/*"
         retention-days: 5
 
     - name: Publish Test Results
@@ -197,8 +220,11 @@ jobs:
       # GitHub Actions initially only supported containerized actions, which is not supported on Windows
       # and this particular GitHub action from EnricoMi is a containerized action
       if: matrix.os == 'ubuntu-latest' && (!cancelled())
+      # Fork PRs get a read-only token, so publishing the check is best-effort.
+      continue-on-error: true
       with:
-        files: "$GITHUB_WORKSPACE/**/*.trx"
+        # Relative glob, not "$GITHUB_WORKSPACE/..." — see note above.
+        files: "**/*.trx"
 
     - name: Diagnostics (Linux)
       if: matrix.os == 'ubuntu-latest' && failure()
