@@ -139,14 +139,44 @@ public class FluentMigratorCSharpMigrationsGenerator : CSharpMigrationsGenerator
                 case AlterColumnOperation alterColumnOp:
                     operationGenerator.GenerateAlterColumn(alterColumnOp, builder);
                     break;
+                case RenameTableOperation renameTableOp:
+                    operationGenerator.GenerateRenameTable(renameTableOp, builder);
+                    break;
+                case RenameColumnOperation renameColumnOp:
+                    operationGenerator.GenerateRenameColumn(renameColumnOp, builder);
+                    break;
                 case AddForeignKeyOperation addFkOp:
                     operationGenerator.GenerateAddForeignKey(addFkOp, builder);
+                    break;
+                case DropForeignKeyOperation dropFkOp:
+                    operationGenerator.GenerateDropForeignKey(dropFkOp, builder);
+                    break;
+                case AddPrimaryKeyOperation addPkOp:
+                    operationGenerator.GenerateAddPrimaryKey(addPkOp, builder);
+                    break;
+                case DropPrimaryKeyOperation dropPkOp:
+                    operationGenerator.GenerateDropPrimaryKey(dropPkOp, builder);
+                    break;
+                case AddUniqueConstraintOperation addUniqueOp:
+                    operationGenerator.GenerateAddUniqueConstraint(addUniqueOp, builder);
+                    break;
+                case DropUniqueConstraintOperation dropUniqueOp:
+                    operationGenerator.GenerateDropUniqueConstraint(dropUniqueOp, builder);
                     break;
                 case CreateIndexOperation createIndexOp:
                     operationGenerator.GenerateCreateIndex(createIndexOp, builder);
                     break;
                 case DropIndexOperation dropIndexOp:
                     operationGenerator.GenerateDropIndex(dropIndexOp, builder);
+                    break;
+                case EnsureSchemaOperation ensureSchemaOp:
+                    operationGenerator.GenerateEnsureSchema(ensureSchemaOp, builder);
+                    break;
+                case DropSchemaOperation dropSchemaOp:
+                    operationGenerator.GenerateDropSchema(dropSchemaOp, builder);
+                    break;
+                case SqlOperation sqlOp:
+                    operationGenerator.GenerateSql(sqlOp, builder);
                     break;
                 case InsertDataOperation insertDataOp:
                     operationGenerator.GenerateInsertData(insertDataOp, builder);
