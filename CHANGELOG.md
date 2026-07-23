@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+### Changed
+
+- SAP HANA support now uses the `Sap.Data.Hana.Net.v8.0` and `Sap.Data.Hana.Net.v10.0` NuGet packages, and HANA registration was removed from the .NET Framework console and MSBuild runners.
+
 ## 3.2.1
 
 - Stripping comments can be disabled in _dotnet-fm_ runner. Default is true, will become false in 4.x (#956)

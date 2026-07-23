@@ -14,8 +14,6 @@
 // limitations under the License.
 #endregion
 
-using System;
-
 namespace FluentMigrator
 {
     public static class GeneratorIdConstants
@@ -23,7 +21,6 @@ namespace FluentMigrator
         public const string DB2 = nameof(DB2);
         public const string Db2ISeries = "DB2 iSeries";
         public const string Firebird = nameof(Firebird);
-        [Obsolete("Hana support will go away unless someone in the community steps up to provide support.")]
         public const string Hana = nameof(Hana);
         public const string MariaDB = nameof(MariaDB);
         public const string MySql = nameof(MySql);

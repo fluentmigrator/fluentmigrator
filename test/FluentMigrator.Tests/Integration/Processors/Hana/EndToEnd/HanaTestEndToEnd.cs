@@ -51,7 +51,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana.EndToEnd
         protected ServiceProvider CreateTaskServices(string task, string migrationsNamespace)
         {
             var serivces = ServiceCollectionExtensions.CreateServices()
-                .ConfigureRunner(builder => builder.AddHana())
+                .ConfigureRunner(builder => builder.AddHana8())
                 .Configure<RunnerOptions>(
                     opt => { opt.Task = task; })
                 .Configure<TypeFilterOptions>(opt =>  opt.Namespace = migrationsNamespace)
@@ -72,7 +72,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana.EndToEnd
                 IntegrationTestOptions.Hana.IgnoreIfNotEnabled();
 
                 var serivces = ServiceCollectionExtensions.CreateServices()
-                    .ConfigureRunner(builder => builder.AddHana())
+                    .ConfigureRunner(builder => builder.AddHana8())
                     .AddScoped<IConnectionStringReader>(
                         _ => new PassThroughConnectionStringReader(IntegrationTestOptions.Hana.ConnectionString))
                     .AddScoped<TaskExecutor>();

@@ -41,17 +41,6 @@
   <ItemGroup Condition=" '$(Platform)' == 'x86' ">
     <PackageReference Include="Oracle.DataAccess.x86.4" Version="4.112.3" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net48' and '$(Platform)' == 'x64' ">
-    <Reference Include="Sap.Data.Hana.v4.5, Version=2.2.36.0, Culture=neutral, PublicKeyToken=0326b8ea63db4bc4">
-      <HintPath>..\..\lib\Hana\ado.net\v4.5\Sap.Data.Hana.v4.5.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup Condition=" '$(Platform)' == 'x64' ">
-    <Content Include="../../lib/Hana/*.*">
-      <Link>%(Filename)%(Extension)</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging" Version="$(MicrosoftPackageVersion)" />
   </ItemGroup>

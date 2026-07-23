@@ -34,7 +34,6 @@ namespace FluentMigrator.Runner
                 .AddDotConnectOracle()
                 .AddDotConnectOracle12C()
                 .AddFirebird()
-                .AddHana()
                 .AddMySql4()
                 .AddMySql5()
                 .AddMySql8()
