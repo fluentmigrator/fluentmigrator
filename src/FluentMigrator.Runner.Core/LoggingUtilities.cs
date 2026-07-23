@@ -15,6 +15,7 @@
 #endregion
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 
@@ -62,7 +63,7 @@ namespace FluentMigrator.Runner
         /// </summary>
         /// <param name="logger">The logger</param>
         /// <param name="sql">The SQL code</param>
-        public static void LogSql(this ILogger logger, string sql)
+        public static void LogSql(this ILogger logger, [StringSyntax("sql")] string sql)
         {
             logger.LogInformation(RunnerEventIds.Sql, sql);
         }
