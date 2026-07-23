@@ -21,9 +21,6 @@
     <ProjectReference Include="..\FluentMigrator.Runner.SQLite\FluentMigrator.Runner.SQLite.csproj" />
     <ProjectReference Include="..\FluentMigrator.Runner.SqlServer\FluentMigrator.Runner.SqlServer.csproj" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net48' ">
-    <ProjectReference Include="..\FluentMigrator.Runner.Jet\FluentMigrator.Runner.Jet.csproj" />
-  </ItemGroup>
   <ItemGroup>
     <None Include="..\..\FluentMigrator.snk" Link="FluentMigrator.snk" />
   </ItemGroup>

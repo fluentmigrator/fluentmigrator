@@ -10,7 +10,6 @@ namespace FluentMigrator
         public const string Db2ISeries = "DB2 iSeries";
         public const string Firebird = nameof(Firebird);
         public const string Hana = nameof(Hana);
-        public const string Jet = nameof(Jet);
         public const string MariaDB = nameof(MariaDB);
         public const string MySql = nameof(MySql);
         public const string MySql4 = nameof(MySql4);
@@ -47,7 +46,6 @@ namespace FluentMigrator
         public const string Db2ISeries = nameof(Db2ISeries);
         public const string Firebird = nameof(Firebird);
         public const string Hana = nameof(Hana);
-        public const string Jet = nameof(Jet);
         public const string MariaDB = nameof(MariaDB);
         public const string MySql = nameof(MySql);
         public const string MySql4 = nameof(MySql4);
