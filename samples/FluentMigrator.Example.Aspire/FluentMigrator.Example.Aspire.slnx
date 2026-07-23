@@ -1,6 +1,7 @@
 <Solution>
-  <Project Path="Aspire.Hosting.FluentMigrator/Aspire.Hosting.FluentMigrator.csproj" />
+  <Project Path="FluentMigrator.Example.Host.Aspire/FluentMigrator.Example.Host.Aspire.csproj" />
   <Project Path="AspireFluentMigrator.ApiService/AspireFluentMigrator.ApiService.csproj" />
   <Project Path="AspireFluentMigrator.MigrationService/AspireFluentMigrator.MigrationService.csproj" />
   <Project Path="AspireFluentMigrator.ServiceDefaults/AspireFluentMigrator.ServiceDefaults.csproj" />
+  <Project Path="../FluentMigrator.Example.Migrations/FluentMigrator.Example.Migrations.csproj" />
 </Solution>

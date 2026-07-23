@@ -8,11 +8,13 @@ The sample has three important projects:
 - `AspireFluentMigrator.MigrationService` — A background worker that applies FluentMigrator migrations on startup, then exits.
 - `AspireFluentMigrator.ServiceDefaults` — Shared Aspire service defaults (OpenTelemetry, health checks, service discovery).
 
+The migration classes themselves are **not** duplicated in this sample. `AspireFluentMigrator.MigrationService` references the shared [`FluentMigrator.Example.Migrations`](../FluentMigrator.Example.Migrations) project and scans it for migrations, so the same migrations are reused across the FluentMigrator samples.
+
 `AspireFluentMigrator.ApiService` and `AspireFluentMigrator.MigrationService` each connect to a PostgreSQL database resource. During local development, the PostgreSQL resource is launched in a container by Aspire.
 
 ## How it works
 
-The `Aspire.Hosting.FluentMigrator` project orchestrates everything:
+The `FluentMigrator.Example.Host.Aspire` project orchestrates everything:
 
 1. A PostgreSQL container is started.
 2. `AspireFluentMigrator.MigrationService` waits for the database to be ready, then runs all pending FluentMigrator migrations and calls `IHostApplicationLifetime.StopApplication()` to signal completion.
@@ -30,27 +32,28 @@ The migration resource appears in the Aspire Dashboard with a custom command:
 
 ## Adding a new migration
 
-Migrations are defined in the `AspireFluentMigrator.MigrationService/Migrations/` folder as classes that inherit from `FluentMigrator.Migration`.
+Migrations live in the shared [`FluentMigrator.Example.Migrations`](../FluentMigrator.Example.Migrations) project as classes that inherit from `FluentMigrator.Migration`.
 
-1. Create a new migration class with an incremented `[Migration(N)]` attribute:
+1. Add a new migration class to that project with an incremented `[Migration(N)]` attribute:
 
     ```csharp
     using FluentMigrator;
 
-    namespace AspireFluentMigrator.MigrationService.Migrations;
-
-    [Migration(2, "Add name column to entries")]
-    public class M002_AddNameToEntries : Migration
+    namespace FluentMigrator.Example.Migrations
     {
-        public override void Up()
+        [Migration(20240101000000)]
+        public class AddArchivedToNotes : Migration
         {
-            Alter.Table("entries")
-                .AddColumn("name").AsString(200).Nullable();
-        }
+            public override void Up()
+            {
+                Alter.Table("Notes")
+                    .AddColumn("Archived").AsBoolean().NotNullable().WithDefaultValue(false);
+            }
 
-        public override void Down()
-        {
-            Delete.Column("name").FromTable("entries");
+            public override void Down()
+            {
+                Delete.Column("Archived").FromTable("Notes");
+            }
         }
     }
     ```
@@ -73,12 +76,12 @@ dotnet workload install aspire
 **Using the .NET CLI:**
 
 ```shell
-dotnet run --project Aspire.Hosting.FluentMigrator
+dotnet run --project FluentMigrator.Example.Host.Aspire
 ```
 
 **Using Visual Studio:**
 
-Open `FluentMigrator.Example.Aspire.slnx` and set `Aspire.Hosting.FluentMigrator` as the startup project.
+Open `FluentMigrator.Example.Aspire.slnx` and set `FluentMigrator.Example.Host.Aspire` as the startup project.
 
 When the app starts, the Aspire dashboard opens in your browser. You will see:
 
@@ -86,8 +89,8 @@ When the app starts, the Aspire dashboard opens in your browser. You will see:
 - The `migration` service running, applying the schema migrations, and then completing.
 - The `api` service starting after the migration completes.
 
-Navigate to the `api` service endpoint (shown in the Aspire dashboard) and browse to `/` to see entries being inserted and returned.
+Navigate to the `api` service endpoint (shown in the Aspire dashboard) and browse to `/` to see context rows being inserted and returned.
 
 ## Next step for Aspire community plug-in acceptance
 
-To publish this as an Aspire community plug-in (`Aspire.Hosting.FluentMigrator`) outside the sample, the next step is to follow the Aspire community contribution process and propose the package in the community toolkit with documentation, tests, and API review, rather than requesting ad-hoc approval through social media mentions.
+To publish the AppHost integration as an Aspire community plug-in (for example `Aspire.Hosting.FluentMigrator`) outside the sample, the next step is to follow the Aspire community contribution process and propose the package in the community toolkit with documentation, tests, and API review, rather than requesting ad-hoc approval through social media mentions.

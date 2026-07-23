@@ -1,4 +1,5 @@
 using AspireFluentMigrator.MigrationService;
+using FluentMigrator.Example.Migrations;
 using FluentMigrator.Runner;
 
 var builder = Host.CreateApplicationBuilder(args);
@@ -13,7 +14,7 @@ builder.Services
         .AddPostgres()
         .WithGlobalConnectionString(
             builder.Configuration.GetConnectionString("migrationdb"))
-        .ScanIn(typeof(Program).Assembly).For.Migrations())
+        .ScanIn(typeof(AddGTDTables).Assembly).For.Migrations())
     .AddLogging(lb => lb.AddFluentMigratorConsole());
 
 var app = builder.Build();

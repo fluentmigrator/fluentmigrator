@@ -1,6 +1,8 @@
 using Aspire.Hosting.ApplicationModel;
 using Microsoft.Extensions.DependencyInjection;
 
+namespace FluentMigrator.Example.Host.Aspire;
+
 internal static class FluentMigratorMigrationResourceExtensions
 {
     public static IResourceBuilder<ProjectResource> AddFluentMigratorMigrations(
