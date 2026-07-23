@@ -141,14 +141,14 @@ public class DbMigrationLockBefore : Migration
     public override void Up()
     {
         Execute.Sql(@"
-            DECLARE @result INT
-            EXEC @result = sp_getapplock 'MyApp', 'Exclusive', 'Session'
+            DECLARE @result INT;
+            EXEC @result = sp_getapplock 'MyApp', 'Exclusive', 'Session';
 
             IF @result < 0
             BEGIN
                 DECLARE @msg NVARCHAR(1000) = 'Received error code ' +
-                    CAST(@result AS VARCHAR(10)) + ' from sp_getapplock during migrations'
-                THROW 99999, @msg, 1
+                    CAST(@result AS VARCHAR(10)) + ' from sp_getapplock during migrations';
+                THROW 99999, @msg, 1;
             END
         ");
     }
@@ -197,6 +197,19 @@ async Task RunMigrationsWithDistributedLock(IMigrationRunner runner)
     }
 }
 ```
+
+#### Notes for the In-Process Runner
+
+- `MigrateUp` now computes the list of pending migrations **after** the `BeforeAll`
+  maintenance migrations have run, and reloads the applied-migration version info
+  beforehand. This means a lock acquired in a `BeforeAll` maintenance migration (as
+  shown above) correctly prevents a second server from re-running a migration that
+  was already applied by another server while it was waiting for the lock.
+- Maintenance migrations aren't found unless you scan with `.For.All()` instead of
+  `.For.Migrations()` &mdash; see [Why aren't my Maintenance Migrations found by the
+  In-Process Runner?](#why-aren-t-my-maintenance-migrations-found-by-the-in-process-runner)
+- Use `TransactionBehavior.None` on lock/unlock maintenance migrations (as shown
+  above) so the lock isn't tied to, and released early by, the migration transaction.
 
 ## Database-Specific Issues
 

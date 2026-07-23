@@ -14,8 +14,6 @@
 // limitations under the License.
 #endregion
 
-using System;
-
 namespace FluentMigrator.Runner.Generators.Hana
 {
     /// <summary>
@@ -26,7 +24,6 @@ namespace FluentMigrator.Runner.Generators.Hana
     /// This interface extends <see cref="FluentMigrator.Runner.Generators.ITypeMap"/> to
     /// include HANA-specific type mapping functionality.
     /// </remarks>
-    [Obsolete("Hana support will go away unless someone in the community steps up to provide support.")]
     public interface IHanaTypeMap : ITypeMap
     {
         

@@ -43,18 +43,19 @@ The `ConfigureRunner` method provides a fluent interface for all configuration o
 
 ### Available Database Providers
 
-| Provider   | Method               | Package Required                |
-|------------|----------------------|---------------------------------|
-| SQL Server | `.AddSqlServerXXX()` | FluentMigrator.Runner.SqlServer |
-| PostgreSQL | `.AddPostgresXXX()`  | FluentMigrator.Runner.Postgres  |
-| MySQL      | `.AddMySqlXXX()`     | FluentMigrator.Runner.MySql     |
-| SQLite     | `.AddSQLite()`       | FluentMigrator.Runner.SQLite    |
-| Oracle     | `.AddOracleXXX()`    | FluentMigrator.Runner.Oracle    |
-| Firebird   | `.AddFirebird()`     | FluentMigrator.Runner.Firebird  |
-| IBM DB2    | `.AddDb2()`          | FluentMigrator.Runner.Db2       |
-| SAP HANA   | `.AddHana()`         | FluentMigrator.Runner.Hana      |
-| Snowflake  | `.AddSnowflake()`    | FluentMigrator.Runner.Snowflake |
-| Redshift   | `.AddRedshift()`     | FluentMigrator.Runner.Redshift  |
+| Provider            | Method               | Package Required                                 |
+|---------------------|----------------------|--------------------------------------------------|
+| SQL Server          | `.AddSqlServerXXX()` | FluentMigrator.Runner.SqlServer                  |
+| PostgreSQL          | `.AddPostgresXXX()`  | FluentMigrator.Runner.Postgres                   |
+| MySQL               | `.AddMySqlXXX()`     | FluentMigrator.Runner.MySql                      |
+| SQLite              | `.AddSQLite()`       | FluentMigrator.Runner.SQLite                     |
+| Oracle              | `.AddOracleXXX()`    | FluentMigrator.Runner.Oracle                     |
+| Firebird            | `.AddFirebird()`     | FluentMigrator.Runner.Firebird                   |
+| IBM DB2             | `.AddDb2()`          | FluentMigrator.Runner.Db2                        |
+| SAP HANA (.NET 8)   | `.AddHana8()`        | FluentMigrator.Runner.Hana + Sap.Data.Hana.Net.v8.0  |
+| SAP HANA (.NET 10)  | `.AddHana10()`       | FluentMigrator.Runner.Hana + Sap.Data.Hana.Net.v10.0 |
+| Snowflake           | `.AddSnowflake()`    | FluentMigrator.Runner.Snowflake                  |
+| Redshift            | `.AddRedshift()`     | FluentMigrator.Runner.Redshift                   |
 
 ## Assembly Scanning Configuration
 

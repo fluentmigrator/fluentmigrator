@@ -881,6 +881,41 @@ namespace FluentMigrator.Tests.Unit
             Assert.That(exception.InnerException.Message, Does.Contain("Invalid connection string"));
         }
 
+        [Test]
+        public void MigrationsToApplyAreDeterminedAfterBeforeAllMaintenanceMigrationsRun()
+        {
+            // Regression test for https://github.com/fluentmigrator/fluentmigrator/issues/2220
+            //
+            // The list of migrations to apply must be computed *after* the BeforeAll maintenance
+            // migrations have run, since those migrations may be used (e.g. via a database lock) to
+            // coordinate multiple application servers running migrations concurrently. If another
+            // process applies a migration while this process is waiting for the lock to be acquired,
+            // that migration must not be re-applied once the lock is obtained.
+            const long migrationVersion = 2011010101;
+
+            _migrationList.Clear();
+            _migrationList.Add(migrationVersion, new MigrationInfo(migrationVersion, TransactionBehavior.Default, new TestMigration()));
+
+            var maintenanceLoaderMock = new Mock<IMaintenanceLoader>(MockBehavior.Loose);
+            maintenanceLoaderMock
+                .Setup(x => x.LoadMaintenance(MigrationStage.BeforeAll))
+                .Returns(() => new List<IMigrationInfo>
+                {
+                    new NonAttributedMigrationToMigrationInfoAdapter(new AcquireLockAndApplyMigrationsElsewhereMigration(
+                        () => _fakeVersionLoader.Versions.Add(migrationVersion)))
+                });
+            maintenanceLoaderMock
+                .Setup(x => x.LoadMaintenance(It.Is<MigrationStage>(s => s != MigrationStage.BeforeAll)))
+                .Returns(() => new List<IMigrationInfo>());
+
+            var runner = CreateRunner(services => services.AddSingleton(maintenanceLoaderMock.Object));
+
+            runner.MigrateUp();
+
+            Assert.That(_fakeVersionLoader.Versions, Does.Contain(migrationVersion));
+            _logMessages.ShouldNotContain(l => LineContainsAll(l, "Test", "migrating"));
+        }
+
         private static bool LineContainsAll(string line, params string[] words)
         {
             var pattern = string.Join(".*?", words.Select(Regex.Escape));
@@ -889,6 +924,25 @@ namespace FluentMigrator.Tests.Unit
 
         public class CustomMigrationConventions : MigrationRunnerConventions
         {
+        }
+
+        private class AcquireLockAndApplyMigrationsElsewhereMigration : Migration
+        {
+            private readonly Action _onUp;
+
+            public AcquireLockAndApplyMigrationsElsewhereMigration(Action onUp)
+            {
+                _onUp = onUp;
+            }
+
+            public override void Up()
+            {
+                _onUp();
+            }
+
+            public override void Down()
+            {
+            }
         }
     }
 }

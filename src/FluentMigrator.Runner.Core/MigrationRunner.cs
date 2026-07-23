@@ -342,13 +342,19 @@ namespace FluentMigrator.Runner
             // Validate connection early to catch invalid connection strings before attempting migrations
             ValidateConnection();
 
-            var migrationInfos = GetUpMigrationsToApply(targetVersion);
-
             using (IMigrationScope scope = _migrationScopeManager.CreateOrWrapMigrationScope(useAutomaticTransactionManagement && TransactionPerSession))
             {
                 try
                 {
                     ApplyMaintenance(MigrationStage.BeforeAll, useAutomaticTransactionManagement);
+
+                    // The list of migrations to apply must be computed after the BeforeAll maintenance
+                    // migrations have run (e.g. after acquiring a lock), so that any migrations already
+                    // applied by another process in the meantime are correctly excluded. Reload the
+                    // version info to reflect any changes made while waiting for the lock.
+                    VersionLoader.LoadVersionInfo();
+
+                    var migrationInfos = GetUpMigrationsToApply(targetVersion);
 
                     foreach (var migrationInfo in migrationInfos)
                     {

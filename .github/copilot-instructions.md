@@ -18,7 +18,6 @@ FluentMigrator supports multiple database providers including:
 - Firebird
 - Snowflake
 - SAP HANA
-- Jet (MS Access)
 - Redshift
 - DB2
 

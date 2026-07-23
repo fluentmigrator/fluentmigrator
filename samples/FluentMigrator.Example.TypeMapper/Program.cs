@@ -28,9 +28,6 @@ using FluentMigrator.Runner;
 using FluentMigrator.Runner.Generators.DB2;
 using FluentMigrator.Runner.Generators.Firebird;
 using FluentMigrator.Runner.Generators.Hana;
-#if NETFRAMEWORK
-using FluentMigrator.Runner.Generators.Jet;
-#endif
 using FluentMigrator.Runner.Generators.MySql;
 using FluentMigrator.Runner.Generators.Oracle;
 using FluentMigrator.Runner.Generators.Postgres;
@@ -60,9 +57,6 @@ namespace FluentMigrator.Example.TypeMapper
                 .Union(serviceProvider.GetServices<IDb2TypeMap>())
                 .Union(serviceProvider.GetServices<IFirebirdTypeMap>())
                 .Union(serviceProvider.GetServices<IHanaTypeMap>())
-#if NETFRAMEWORK
-                .Union(serviceProvider.GetServices<IJetTypeMap>())
-#endif
                 .Union(serviceProvider.GetServices<IMySqlTypeMap>())
                 .Union(serviceProvider.GetServices<IPostgresTypeMap>())
                 .Union(serviceProvider.GetServices<IOracleTypeMap>())
