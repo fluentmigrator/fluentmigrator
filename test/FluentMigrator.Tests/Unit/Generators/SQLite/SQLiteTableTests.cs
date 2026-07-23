@@ -3,6 +3,7 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Generators.SQLite;
+using FluentMigrator.SQLite;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -275,6 +276,42 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
 
             var result = Generator.Generate(expression);
             result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" TEXT NOT NULL, \"TestColumn2\" INTEGER NOT NULL, CONSTRAINT \"FK_Test\" FOREIGN KEY (\"TestColumn1\", \"TestColumn3\") REFERENCES \"TestTable2\" (\"TestColumn2\", \"TestColumn4\"));");
+        }
+
+        [Test]
+        public void CanCreateTableWithoutRowId()
+        {
+            var serviceProvider = new ServiceCollection().BuildServiceProvider();
+            var querySchema = new Mock<IQuerySchema>();
+            var context = new MigrationContext(querySchema.Object, serviceProvider, null);
+
+            var expression = new CreateTableExpression { TableName = "TestTable1" };
+            var builder = new CreateTableExpressionBuilder(expression, context);
+            builder
+                .WithColumn("word").AsString().NotNullable().PrimaryKey()
+                .WithColumn("idx").AsInt64().NotNullable().PrimaryKey()
+                .WithoutRowId();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"word\" TEXT NOT NULL, \"idx\" INTEGER NOT NULL, PRIMARY KEY (\"word\", \"idx\")) WITHOUT ROWID;");
+        }
+
+        [Test]
+        public void CanCreateTableWithoutRowIdWithCustomSchema()
+        {
+            var serviceProvider = new ServiceCollection().BuildServiceProvider();
+            var querySchema = new Mock<IQuerySchema>();
+            var context = new MigrationContext(querySchema.Object, serviceProvider, null);
+
+            var expression = new CreateTableExpression { TableName = "TestTable1", SchemaName = "TestSchema" };
+            var builder = new CreateTableExpressionBuilder(expression, context);
+            builder
+                .WithColumn("word").AsString().NotNullable().PrimaryKey()
+                .WithColumn("idx").AsInt64().NotNullable().PrimaryKey()
+                .WithoutRowId();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE \"TestSchema\".\"TestTable1\" (\"word\" TEXT NOT NULL, \"idx\" INTEGER NOT NULL, PRIMARY KEY (\"word\", \"idx\")) WITHOUT ROWID;");
         }
 
         [Test]
