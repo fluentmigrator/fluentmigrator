@@ -17,10 +17,12 @@
 //
 #endregion
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 using FluentMigrator.Expressions;
+using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Generic;
 
@@ -81,10 +83,67 @@ namespace FluentMigrator.Runner.Generators.SQLite
         public override string RenameTable => "ALTER TABLE {0} RENAME TO {1}";
 
         /// <inheritdoc />
+        public override string CreateTable => "CREATE TABLE {0} ({1}){2}";
+
+        /// <inheritdoc />
         public override string GeneratorId => GeneratorIdConstants.SQLite;
 
         /// <inheritdoc />
         public override List<string> GeneratorIdAliases => new List<string> { GeneratorIdConstants.SQLite };
+
+        /// <inheritdoc />
+        public override string Generate(CreateTableExpression expression)
+        {
+            if (string.IsNullOrEmpty(expression.TableName))
+            {
+                throw new ArgumentNullException(nameof(expression), ErrorMessages.ExpressionTableNameMissing);
+            }
+
+            if (expression.Columns.Count == 0)
+            {
+                throw new ArgumentException("You must specify at least one column");
+            }
+
+            var quotedTableName = Quoter.QuoteTableName(expression.TableName, expression.SchemaName);
+
+            var errors = ValidateAdditionalFeatureCompatibility(expression.Columns.SelectMany(x => x.AdditionalFeatures));
+            if (!string.IsNullOrEmpty(errors))
+            {
+                return errors;
+            }
+
+            var withoutRowId = expression.AdditionalFeatures.TryGetValue(SQLiteExtensions.WithoutRowIdTable, out var value)
+                && value is true;
+
+            if (withoutRowId)
+            {
+                var hasPrimaryKeyColumn = expression.Columns.Any(column => column.IsPrimaryKey);
+                var hasPrimaryKeyConstraint = expression.Constraints is not null
+                    && expression.Constraints.Any(constraint => constraint.IsPrimaryKeyConstraint);
+
+                if (!hasPrimaryKeyColumn && !hasPrimaryKeyConstraint)
+                {
+                    return CompatibilityMode.HandleCompatibility(
+                        "SQLite requires a PRIMARY KEY on tables created WITHOUT ROWID. " +
+                        $"Table '{expression.TableName}' is marked WITHOUT ROWID but defines no primary key.");
+                }
+
+                var identityColumns = expression.Columns
+                    .Where(column => column.IsIdentity)
+                    .ToList();
+
+                if (identityColumns.Count > 0)
+                {
+                    var identityColumnNames = string.Join(", ", identityColumns.Select(column => column.Name));
+                    return CompatibilityMode.HandleCompatibility(
+                        "SQLite does not allow AUTOINCREMENT or IDENTITY columns on WITHOUT ROWID tables. " +
+                        $"Table '{expression.TableName}' defines identity column(s): {identityColumnNames}.");
+                }
+            }
+            var withoutRowIdCommand = withoutRowId ? " WITHOUT ROWID" : string.Empty;
+
+            return FormatStatement(CreateTable, quotedTableName, Column.Generate(expression.Columns, quotedTableName), withoutRowIdCommand);
+        }
 
         /// <inheritdoc />
         public override string Generate(AlterColumnExpression expression)

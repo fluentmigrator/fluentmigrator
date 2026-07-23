@@ -161,5 +161,32 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE \"TestTable1\" RENAME COLUMN \"TestColumn1\" TO \"TestColumn2\";");
         }
+
+        [Test]
+        public void CanCreateTableWithoutRowId()
+        {
+            var expression = new CreateTableExpression { TableName = "TestTable1" };
+            expression.Columns.Add(new ColumnDefinition { Name = "Id", Type = System.Data.DbType.Int32, IsPrimaryKey = true, IsNullable = false });
+            expression.AdditionalFeatures[SQLiteExtensions.WithoutRowIdTable] = true;
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"Id\" INTEGER NOT NULL, PRIMARY KEY (\"Id\")) WITHOUT ROWID;");
+        }
+
+        [Test]
+        public void CanCreateTableWithoutRowIdUsingFluentApi()
+        {
+            var expression = new CreateTableExpression { TableName = "TestTable1" };
+            expression.Columns.Add(new ColumnDefinition { Name = "Id", Type = System.Data.DbType.Int32, IsPrimaryKey = true, IsNullable = false });
+
+            var builder = new global::FluentMigrator.Builders.Create.Table.CreateTableExpressionBuilder(
+                expression,
+                root: null);
+
+            global::FluentMigrator.SqlServer.SQLiteExtensions.WithoutRowId(builder);
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"Id\" INTEGER NOT NULL, PRIMARY KEY (\"Id\")) WITHOUT ROWID;");
+        }
     }
 }

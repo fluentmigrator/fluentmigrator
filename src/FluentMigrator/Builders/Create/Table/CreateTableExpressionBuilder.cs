@@ -35,7 +35,8 @@ namespace FluentMigrator.Builders.Create.Table
                                                 ICreateTableColumnAsTypeSyntax,
                                                 ICreateTableColumnOptionOrForeignKeyCascadeOrWithColumnSyntax,
                                                 IColumnExpressionBuilder,
-                                                IMigrationContextAccessor
+                                                IMigrationContextAccessor,
+                                                ISupportAdditionalFeatures
     {
         private readonly IMigrationContext _context;
 
@@ -360,5 +361,16 @@ namespace FluentMigrator.Builders.Create.Table
 
         /// <inheritdoc />
         ColumnDefinition IColumnExpressionBuilder.Column => CurrentColumn;
+
+        /// <summary>
+        /// Gets the additional features associated with this <see cref="CreateTableExpression"/>.
+        /// </summary>
+        /// <remarks>
+        /// See <see cref="ISupportAdditionalFeatures"/> for general information about additional features.
+        /// </remarks>
+        public IDictionary<string, object> AdditionalFeatures => Expression.AdditionalFeatures;
+
+        /// <inheritdoc />
+        IDictionary<string, object> ISupportAdditionalFeatures.AdditionalFeatures => AdditionalFeatures;
     }
 }
