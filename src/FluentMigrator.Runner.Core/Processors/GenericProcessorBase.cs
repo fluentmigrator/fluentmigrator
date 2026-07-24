@@ -43,6 +43,8 @@ namespace FluentMigrator.Runner.Processors
         [CanBeNull]
         private IDbConnection _connection;
 
+        private readonly bool _ownsFactoryConnection;
+
         private bool _disposed;
 
         /// <inheritdoc />
@@ -66,7 +68,13 @@ namespace FluentMigrator.Runner.Processors
             [NotNull] IMigrationConnectionFactory connectionFactory)
             : base(generator, logger, options)
         {
+            if (connectionFactory == null)
+            {
+                throw new ArgumentNullException(nameof(connectionFactory));
+            }
+
             _dbProviderFactory = new Lazy<DbProviderFactory>(factoryAccessor.Invoke);
+            _ownsFactoryConnection = connectionFactory.OwnsConnection;
 
             _lazyConnection = new Lazy<IDbConnection>(
                 () =>
@@ -176,6 +184,14 @@ namespace FluentMigrator.Runner.Processors
             _disposed = true;
 
             RollbackTransaction();
+
+            if (!_ownsFactoryConnection)
+            {
+                // The connection is owned by the caller (for example an application-managed
+                // connection handed to the runner), so it must neither be closed nor disposed.
+                return;
+            }
+
             EnsureConnectionIsClosed();
             if ((_connection != null || (_lazyConnection.IsValueCreated && Connection != null)))
             {
@@ -202,20 +218,11 @@ namespace FluentMigrator.Runner.Processors
         /// <returns>The database command.</returns>
         protected virtual IDbCommand CreateCommand(string commandText, IDbConnection connection, IDbTransaction transaction)
         {
-            IDbCommand result;
-            if (DbProviderFactory != null)
-            {
-                result = DbProviderFactory.CreateCommand();
-                Debug.Assert(result != null, nameof(result) + " != null");
-                result!.Connection = connection;
-                if (transaction != null)
-                    result.Transaction = transaction;
-                result.CommandText = commandText;
-            }
-            else
-            {
-                throw new InvalidOperationException("DbProviderFactory not initialized.");
-            }
+            var result = CreateCommandCore(connection);
+
+            if (transaction != null)
+                result.Transaction = transaction;
+            result.CommandText = commandText;
 
             if (Options.Timeout != null)
             {
@@ -223,6 +230,49 @@ namespace FluentMigrator.Runner.Processors
             }
 
             return result;
+        }
+
+        [NotNull]
+        private IDbCommand CreateCommandCore([CanBeNull] IDbConnection connection)
+        {
+            var providerFactory = DbProviderFactory;
+
+            if (providerFactory != null)
+            {
+                var command = providerFactory.CreateCommand();
+                Debug.Assert(command != null, nameof(command) + " != null");
+
+                if (connection == null || TryAssignConnection(command, connection))
+                {
+                    return command;
+                }
+
+                // The connection was created by a custom IMigrationConnectionFactory for a
+                // different ADO.NET provider than the one configured for this processor. Fall
+                // back to a command created by the connection itself, so that the mismatch
+                // doesn't surface as an obscure cast exception.
+                command.Dispose();
+            }
+
+            if (connection == null)
+            {
+                throw new InvalidOperationException("DbProviderFactory not initialized.");
+            }
+
+            return connection.CreateCommand();
+        }
+
+        private static bool TryAssignConnection([NotNull] IDbCommand command, [NotNull] IDbConnection connection)
+        {
+            try
+            {
+                command.Connection = connection;
+                return true;
+            }
+            catch (Exception ex) when (ex is InvalidCastException or ArgumentException or NotSupportedException)
+            {
+                return false;
+            }
         }
     }
 }

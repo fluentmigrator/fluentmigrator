@@ -339,13 +339,58 @@ namespace FluentMigrator.Runner
         /// <param name="builder">The runner builder</param>
         /// <param name="connectionFactory">The function that creates the database connection.</param>
         /// <returns>The runner builder</returns>
+        /// <remarks>
+        /// The connection factory is registered with a scoped lifetime, which means it is asked
+        /// for a connection once per migration processor (per connection), not once per command.
+        /// The returned connection is closed and disposed by the migration processor. Use the
+        /// <see cref="WithConnectionFactory(IMigrationRunnerBuilder,Func{IServiceProvider,IDbConnection},bool)"/>
+        /// overload to hand over an externally owned connection instead.
+        /// </remarks>
+        /// <example>
+        /// <code>
+        /// services.ConfigureRunner(rb => rb
+        ///     .AddSqlServer()
+        ///     .WithConnectionFactory(sp => new SqlConnection(connectionString)
+        ///     {
+        ///         AccessToken = sp.GetRequiredService&lt;ITokenProvider&gt;().GetToken()
+        ///     }));
+        /// </code>
+        /// </example>
         public static IMigrationRunnerBuilder WithConnectionFactory(
             this IMigrationRunnerBuilder builder,
             [NotNull] Func<IServiceProvider, IDbConnection> connectionFactory)
         {
+            return builder.WithConnectionFactory(connectionFactory, ownsConnection: true);
+        }
+
+        /// <summary>
+        /// Sets the global connection factory
+        /// </summary>
+        /// <param name="builder">The runner builder</param>
+        /// <param name="connectionFactory">The function that creates the database connection.</param>
+        /// <param name="ownsConnection">
+        /// <c>true</c> when the migration processor should close and dispose the created connection;
+        /// <c>false</c> when the connection is owned by the caller and must be left open.
+        /// </param>
+        /// <returns>The runner builder</returns>
+        public static IMigrationRunnerBuilder WithConnectionFactory(
+            this IMigrationRunnerBuilder builder,
+            [NotNull] Func<IServiceProvider, IDbConnection> connectionFactory,
+            bool ownsConnection)
+        {
+            if (builder == null)
+            {
+                throw new ArgumentNullException(nameof(builder));
+            }
+
+            if (connectionFactory == null)
+            {
+                throw new ArgumentNullException(nameof(connectionFactory));
+            }
+
             builder.Services.Replace(
                 ServiceDescriptor.Scoped<IMigrationConnectionFactory>(
-                    sp => new DelegateMigrationConnectionFactory(() => connectionFactory(sp))));
+                    sp => new DelegateMigrationConnectionFactory(() => connectionFactory(sp), ownsConnection)));
 
             return builder;
         }
@@ -354,12 +399,15 @@ namespace FluentMigrator.Runner
         {
             private readonly Func<IDbConnection> _connectionFactory;
 
-            public DelegateMigrationConnectionFactory([NotNull] Func<IDbConnection> connectionFactory)
+            public DelegateMigrationConnectionFactory([NotNull] Func<IDbConnection> connectionFactory, bool ownsConnection)
             {
                 _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
+                OwnsConnection = ownsConnection;
             }
 
             public bool HasConnection => true;
+
+            public bool OwnsConnection { get; }
 
             public IDbConnection CreateConnection(DbProviderFactory providerFactory)
             {

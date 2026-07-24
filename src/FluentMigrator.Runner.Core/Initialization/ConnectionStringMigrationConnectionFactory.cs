@@ -22,10 +22,18 @@ using JetBrains.Annotations;
 
 namespace FluentMigrator.Runner.Initialization
 {
+    /// <summary>
+    /// The default <see cref="IMigrationConnectionFactory"/> implementation, which creates
+    /// connections from the configured connection string.
+    /// </summary>
     public sealed class ConnectionStringMigrationConnectionFactory : IMigrationConnectionFactory
     {
         private readonly IConnectionStringAccessor _connectionStringAccessor;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ConnectionStringMigrationConnectionFactory"/> class.
+        /// </summary>
+        /// <param name="connectionStringAccessor">The accessor for the configured connection string</param>
         public ConnectionStringMigrationConnectionFactory(
             [NotNull] IConnectionStringAccessor connectionStringAccessor)
         {
@@ -33,9 +41,14 @@ namespace FluentMigrator.Runner.Initialization
                 ?? throw new ArgumentNullException(nameof(connectionStringAccessor));
         }
 
+        /// <inheritdoc />
         public bool HasConnection =>
             !string.IsNullOrWhiteSpace(_connectionStringAccessor.ConnectionString);
 
+        /// <inheritdoc />
+        public bool OwnsConnection => true;
+
+        /// <inheritdoc />
         public IDbConnection CreateConnection(DbProviderFactory providerFactory)
         {
             if (providerFactory == null)

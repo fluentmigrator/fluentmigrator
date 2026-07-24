@@ -121,6 +121,7 @@ namespace FluentMigrator.Runner
         /// Register dotConnection Oracle processor dependencies
         /// </summary>
         /// <param name="builder">The builder to add the Oracle-specific services to</param>
+        /// <param name="implementationFactory">The factory that creates the processor</param>
         private static void RegisterDotConnectOracleProcessor<T>(IMigrationRunnerBuilder builder, Func<IServiceProvider, T> implementationFactory)
             where T : DotConnectOracleProcessor
         {

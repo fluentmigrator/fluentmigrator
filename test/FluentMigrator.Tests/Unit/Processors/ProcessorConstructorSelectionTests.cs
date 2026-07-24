@@ -30,7 +30,6 @@ using FluentMigrator.Runner.Processors.DB2.iSeries;
 using FluentMigrator.Runner.Processors.DotConnectOracle;
 using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Runner.Processors.Hana;
-using FluentMigrator.Runner.Processors.Jet;
 using FluentMigrator.Runner.Processors.MySql;
 using FluentMigrator.Runner.Processors.Oracle;
 using FluentMigrator.Runner.Processors.Postgres;
@@ -56,7 +55,6 @@ namespace FluentMigrator.Tests.Unit.Processors
             yield return typeof(Db2Processor);
             yield return typeof(FirebirdProcessor);
             yield return typeof(HanaProcessor);
-            yield return typeof(JetProcessor);
             yield return typeof(MySql4Processor);
             yield return typeof(MySql5Processor);
             yield return typeof(MySql8Processor);

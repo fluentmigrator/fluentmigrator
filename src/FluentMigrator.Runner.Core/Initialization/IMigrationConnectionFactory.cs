@@ -21,6 +21,16 @@ using JetBrains.Annotations;
 
 namespace FluentMigrator.Runner.Initialization
 {
+    /// <summary>
+    /// Creates the <see cref="IDbConnection"/> used by a migration processor.
+    /// </summary>
+    /// <remarks>
+    /// Implementations are resolved from the dependency injection container with a scoped
+    /// lifetime, which means <see cref="CreateConnection"/> is called at most once per
+    /// migration processor (that is, per connection) and never once per command. This makes
+    /// the abstraction suitable for rotating credentials such as Azure Entra ID access tokens,
+    /// AWS RDS IAM authentication tokens or secrets fetched from a secret store.
+    /// </remarks>
     [PublicAPI]
     public interface IMigrationConnectionFactory
     {
@@ -28,6 +38,18 @@ namespace FluentMigrator.Runner.Initialization
         /// Gets a value indicating whether this factory can create a database connection.
         /// </summary>
         bool HasConnection { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether the migration processor owns the connections
+        /// returned by <see cref="CreateConnection"/>.
+        /// </summary>
+        /// <remarks>
+        /// When <c>true</c> (the default for the built-in implementations) the processor closes
+        /// and disposes the connection when the processor itself is disposed. Return <c>false</c>
+        /// when the connection is owned by the caller, for example when an application hands an
+        /// externally managed, possibly already open, connection to the migration runner.
+        /// </remarks>
+        bool OwnsConnection { get; }
 
         /// <summary>
         /// Creates a database connection.
