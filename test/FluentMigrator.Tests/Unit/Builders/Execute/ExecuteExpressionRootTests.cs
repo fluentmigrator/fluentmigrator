@@ -123,12 +123,12 @@ namespace FluentMigrator.Tests.Unit.Builders.Execute
         [Test]
         public void SqlResolvesSqlScriptTokenProvidersFromServiceProvider()
         {
-            var tokenProvider = new Mock<ISqlScriptTokenProvider>();
-            var providers = new List<ISqlScriptTokenProvider> { tokenProvider.Object };
+            var tokenProvider = new Mock<ISqlTokenProvider>();
+            var providers = new List<ISqlTokenProvider> { tokenProvider.Object };
 
             var serviceProviderMock = new Mock<IServiceProvider>();
             serviceProviderMock
-                .Setup(x => x.GetService(typeof(IEnumerable<ISqlScriptTokenProvider>)))
+                .Setup(x => x.GetService(typeof(IEnumerable<ISqlTokenProvider>)))
                 .Returns(providers);
             _contextMock.SetupGet(x => x.ServiceProvider).Returns(serviceProviderMock.Object);
 
@@ -143,12 +143,12 @@ namespace FluentMigrator.Tests.Unit.Builders.Execute
         [Test]
         public void ScriptResolvesSqlScriptTokenProvidersFromServiceProvider()
         {
-            var tokenProvider = new Mock<ISqlScriptTokenProvider>();
-            var providers = new List<ISqlScriptTokenProvider> { tokenProvider.Object };
+            var tokenProvider = new Mock<ISqlTokenProvider>();
+            var providers = new List<ISqlTokenProvider> { tokenProvider.Object };
 
             var serviceProviderMock = new Mock<IServiceProvider>();
             serviceProviderMock
-                .Setup(x => x.GetService(typeof(IEnumerable<ISqlScriptTokenProvider>)))
+                .Setup(x => x.GetService(typeof(IEnumerable<ISqlTokenProvider>)))
                 .Returns(providers);
             _contextMock.SetupGet(x => x.ServiceProvider).Returns(serviceProviderMock.Object);
 
@@ -163,13 +163,13 @@ namespace FluentMigrator.Tests.Unit.Builders.Execute
         [Test]
         public void EmbeddedScriptResolvesSqlScriptTokenProvidersFromServiceProvider()
         {
-            var tokenProvider = new Mock<ISqlScriptTokenProvider>();
-            var providers = new List<ISqlScriptTokenProvider> { tokenProvider.Object };
+            var tokenProvider = new Mock<ISqlTokenProvider>();
+            var providers = new List<ISqlTokenProvider> { tokenProvider.Object };
             var embeddedResourceProviders = new List<IEmbeddedResourceProvider>();
 
             var serviceProviderMock = new Mock<IServiceProvider>();
             serviceProviderMock
-                .Setup(x => x.GetService(typeof(IEnumerable<ISqlScriptTokenProvider>)))
+                .Setup(x => x.GetService(typeof(IEnumerable<ISqlTokenProvider>)))
                 .Returns(providers);
             serviceProviderMock
                 .Setup(x => x.GetService(typeof(IEnumerable<IEmbeddedResourceProvider>)))

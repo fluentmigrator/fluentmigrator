@@ -30,7 +30,7 @@ namespace FluentMigrator.Infrastructure
     /// <c>Parameters</c> dictionary passed to <c>Execute.Sql</c>/<c>Execute.Script</c>/
     /// <c>Execute.EmbeddedScript</c> takes precedence over well-known tokens with the same name.
     /// </remarks>
-    public interface ISqlScriptTokenProvider
+    public interface ISqlTokenProvider
     {
         /// <summary>
         /// Gets the map of token names to their values

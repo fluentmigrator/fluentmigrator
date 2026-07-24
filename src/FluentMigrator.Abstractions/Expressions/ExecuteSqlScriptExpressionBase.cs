@@ -38,7 +38,7 @@ namespace FluentMigrator.Expressions
         /// Tokens are merged in registration order and are overridden by any
         /// entry with the same name in <see cref="Parameters"/>.
         /// </remarks>
-        public IEnumerable<ISqlScriptTokenProvider> SqlScriptTokenProviders { get; set; }
+        public IEnumerable<ISqlTokenProvider> SqlScriptTokenProviders { get; set; }
 
         /// <summary>
         /// Executes the <paramref name="sqlScript"/> with the given <paramref name="processor"/>

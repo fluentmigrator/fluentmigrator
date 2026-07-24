@@ -27,13 +27,13 @@ namespace FluentMigrator.Tests.Unit.Infrastructure
     [TestFixture]
     [Category("Infrastructure")]
     [Category("SqlScriptTokenProvider")]
-    public class DefaultSqlScriptTokenProviderTests
+    public class DefaultSqlTokenProviderTests
     {
         [Test]
         public void GetTokensReturnsDefaultSchemaFromConventionSet()
         {
             var conventionSet = ConventionSets.CreateTestSchemaName(null);
-            var provider = new DefaultSqlScriptTokenProvider(conventionSet);
+            var provider = new DefaultSqlTokenProvider(conventionSet);
 
             var tokenMap = provider.GetTokens();
 
@@ -44,7 +44,7 @@ namespace FluentMigrator.Tests.Unit.Infrastructure
         public void GetTokensDoesNotContainDefaultSchemaWhenNoDefaultSchemaConfigured()
         {
             var conventionSet = ConventionSets.CreateNoSchemaName(null);
-            var provider = new DefaultSqlScriptTokenProvider(conventionSet);
+            var provider = new DefaultSqlTokenProvider(conventionSet);
 
             var tokenMap = provider.GetTokens();
 

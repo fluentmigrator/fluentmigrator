@@ -54,7 +54,7 @@ requiring every migration author to look up and pass the value by hand.
 1. **Do nothing** &mdash; keep requiring callers to pass every token explicitly.
 2. **Hard-code `DefaultSchema` substitution** directly inside `SqlScriptTokenReplacer`
    or the `Execute*` expressions.
-3. **Introduce an injectable `ISqlScriptTokenProvider`** service that supplies a
+3. **Introduce an injectable `ISqlTokenProvider`** service that supplies a
    `IDictionary<string, string>` of well-known tokens, merged with the
    caller-supplied `Parameters` at execution time.
 4. **Adopt a general-purpose templating engine** (e.g. Jinja2.NET) to replace the
@@ -62,7 +62,7 @@ requiring every migration author to look up and pass the value by hand.
 
 ## Decision Outcome
 
-Chosen option: **3, introduce an injectable `ISqlScriptTokenProvider`.**
+Chosen option: **3, introduce an injectable `ISqlTokenProvider`.**
 
 ### Rationale
 
@@ -80,16 +80,16 @@ Chosen option: **3, introduce an injectable `ISqlScriptTokenProvider`.**
   DI-friendly:
 
 ```csharp
-public interface ISqlScriptTokenProvider
+public interface ISqlTokenProvider
 {
     IDictionary<string, string> GetTokens();
 }
 
-public class DefaultSqlScriptTokenProvider : ISqlScriptTokenProvider
+public class DefaultSqlTokenProvider : ISqlTokenProvider
 {
     private readonly IConventionSet _conventionSet;
 
-    public DefaultSqlScriptTokenProvider(IConventionSet conventionSet)
+    public DefaultSqlTokenProvider(IConventionSet conventionSet)
     {
         _conventionSet = conventionSet;
     }
@@ -109,15 +109,15 @@ public class DefaultSqlScriptTokenProvider : ISqlScriptTokenProvider
 ```
 
 `ExecuteSqlScriptExpressionBase` (or its `IMigrationProcessor`-facing execution
-path) resolves `ISqlScriptTokenProvider` from DI, merges its map with the
+path) resolves `ISqlTokenProvider` from DI, merges its map with the
 user-supplied `Parameters`, and passes the merged dictionary to
 `SqlScriptTokenReplacer.ReplaceSqlScriptTokens`. User-supplied `Parameters` values
 take precedence over well-known tokens of the same name, so users can always
 override or shadow a well-known token (including effectively "removing"
 `DefaultSchema` by mapping it to an empty/other value, or by replacing the whole
-`ISqlScriptTokenProvider` registration with one that omits it).
+`ISqlTokenProvider` registration with one that omits it).
 
-Multiple providers can be registered (`IEnumerable<ISqlScriptTokenProvider>`)
+Multiple providers can be registered (`IEnumerable<ISqlTokenProvider>`)
 and merged in registration order, so users can add their own well-known tokens
 (e.g. tenant id, root path) alongside or instead of the built-in ones, following
 the same "type getter / type instantiator" DI pattern already used elsewhere in
@@ -147,7 +147,7 @@ the runner (see `DependencyInjection.md`).
    decide, ahead of or during SQL generation, whether to include a block of
    SQL at all.
 
-   The `ISqlScriptTokenProvider` mechanism proposed here does not introduce
+   The `ISqlTokenProvider` mechanism proposed here does not introduce
    any control flow. It is a straight, non-branching string substitution:
    every well-known token is resolved to a single string value once, at the
    moment `Execute.Sql`/`Execute.Script`/`Execute.EmbeddedScript` runs, using
@@ -161,16 +161,16 @@ the runner (see `DependencyInjection.md`).
    blocking or reworking the MVP described in this ADR; if a templating engine
    is adopted later, it can layer `{% if %}`/`{% for %}` support on top of (or
    independently of) the token map without changing the
-   `ISqlScriptTokenProvider` contract.
+   `ISqlTokenProvider` contract.
 
 ## Consequences
 
 * Additive change: no existing `Execute.Sql`/`Execute.Script`/`Execute.EmbeddedScript`
-  call sites break, since `ISqlScriptTokenProvider` contributes additional
+  call sites break, since `ISqlTokenProvider` contributes additional
   tokens on top of (and overridable by) the existing `Parameters` dictionary.
 * Users gain a supported, DI-based extension point for adding their own
   well-known tokens or removing/replacing the built-in `DefaultSchema` token.
 * Future well-known tokens (e.g. derived from `IMigrationRunnerConventions` or a
   root path convention) can be added by registering additional
-  `ISqlScriptTokenProvider` implementations, without further changes to
+  `ISqlTokenProvider` implementations, without further changes to
   `SqlScriptTokenReplacer`.

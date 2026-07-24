@@ -58,7 +58,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         [Test]
         public void ExecutesTheStatementWithWellKnownTokens()
         {
-            var tokenProvider = new Mock<ISqlScriptTokenProvider>();
+            var tokenProvider = new Mock<ISqlTokenProvider>();
             tokenProvider
                 .Setup(x => x.GetTokens())
                 .Returns(new Dictionary<string, string> { { "DefaultSchema", "dbo" } });
@@ -79,7 +79,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         [Test]
         public void ParametersOverrideWellKnownTokensWithTheSameName()
         {
-            var tokenProvider = new Mock<ISqlScriptTokenProvider>();
+            var tokenProvider = new Mock<ISqlTokenProvider>();
             tokenProvider
                 .Setup(x => x.GetTokens())
                 .Returns(new Dictionary<string, string> { { "DefaultSchema", "dbo" } });

@@ -180,13 +180,13 @@ namespace FluentMigrator.Builders.Execute
         }
 
         /// <summary>
-        /// Resolves the registered <see cref="ISqlScriptTokenProvider"/> instances from the
+        /// Resolves the registered <see cref="ISqlTokenProvider"/> instances from the
         /// current migration context's service provider
         /// </summary>
         /// <returns>The registered SQL script token providers, or <c>null</c> when none are registered</returns>
-        private IEnumerable<ISqlScriptTokenProvider> GetSqlScriptTokenProviders()
+        private IEnumerable<ISqlTokenProvider> GetSqlScriptTokenProviders()
         {
-            return _context.ServiceProvider.GetService<IEnumerable<ISqlScriptTokenProvider>>();
+            return _context.ServiceProvider.GetService<IEnumerable<ISqlTokenProvider>>();
         }
     }
 }

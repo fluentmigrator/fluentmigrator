@@ -70,7 +70,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         public void ExecutesTheStatementWithWellKnownTokens()
         {
             const string scriptContentsWithParameters = "TEST SCRIPT ParameterValue $(escaped_parameter) $(missing_parameter)";
-            var tokenProvider = new Mock<ISqlScriptTokenProvider>();
+            var tokenProvider = new Mock<ISqlTokenProvider>();
             tokenProvider
                 .Setup(x => x.GetTokens())
                 .Returns(new Dictionary<string, string> { { "parameter", "ParameterValue" } });
@@ -92,7 +92,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         public void ParametersTakePrecedenceOverWellKnownTokens()
         {
             const string scriptContentsWithParameters = "TEST SCRIPT ParameterValue $(escaped_parameter) $(missing_parameter)";
-            var tokenProvider = new Mock<ISqlScriptTokenProvider>();
+            var tokenProvider = new Mock<ISqlTokenProvider>();
             tokenProvider
                 .Setup(x => x.GetTokens())
                 .Returns(new Dictionary<string, string> { { "parameter", "WellKnownValue" } });

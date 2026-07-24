@@ -24,19 +24,19 @@ using JetBrains.Annotations;
 namespace FluentMigrator.Runner.Infrastructure
 {
     /// <summary>
-    /// The default <see cref="ISqlScriptTokenProvider"/> implementation, exposing the
+    /// The default <see cref="ISqlTokenProvider"/> implementation, exposing the
     /// <c>DefaultSchema</c> token derived from the currently configured
     /// <see cref="IConventionSet.SchemaConvention"/>.
     /// </summary>
-    public class DefaultSqlScriptTokenProvider : ISqlScriptTokenProvider
+    public class DefaultSqlTokenProvider : ISqlTokenProvider
     {
         private readonly IConventionSet _conventionSet;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DefaultSqlScriptTokenProvider"/> class.
+        /// Initializes a new instance of the <see cref="DefaultSqlTokenProvider"/> class.
         /// </summary>
         /// <param name="conventionSet">The convention set used to resolve the default schema name</param>
-        public DefaultSqlScriptTokenProvider([NotNull] IConventionSet conventionSet)
+        public DefaultSqlTokenProvider([NotNull] IConventionSet conventionSet)
         {
             _conventionSet = conventionSet;
         }
