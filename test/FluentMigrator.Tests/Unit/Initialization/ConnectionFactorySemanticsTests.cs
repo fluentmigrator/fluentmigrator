@@ -186,6 +186,38 @@ namespace FluentMigrator.Tests.Unit.Initialization
         }
 
         [Test]
+        public void EnsureConnectionIsClosedLeavesExternallyOwnedConnectionsOpen()
+        {
+            // Processors such as FirebirdProcessor close the connection outside of Dispose,
+            // which must not affect connections owned by the caller.
+            var connectionFactory = new RecordingMigrationConnectionFactory { OwnsConnection = false };
+
+            using var processor = new TestGenericProcessor(connectionFactory);
+
+            processor.GetConnection();
+            processor.CloseConnection();
+
+            processor.OwnsItsConnection.ShouldBeFalse();
+            connectionFactory.Connections[0].CloseCount.ShouldBe(0);
+            connectionFactory.Connections[0].State.ShouldBe(ConnectionState.Open);
+        }
+
+        [Test]
+        public void EnsureConnectionIsClosedClosesOwnedConnections()
+        {
+            var connectionFactory = new RecordingMigrationConnectionFactory { OwnsConnection = true };
+
+            using var processor = new TestGenericProcessor(connectionFactory);
+
+            processor.GetConnection();
+            processor.CloseConnection();
+
+            processor.OwnsItsConnection.ShouldBeTrue();
+            connectionFactory.Connections[0].CloseCount.ShouldBe(1);
+            connectionFactory.Connections[0].State.ShouldBe(ConnectionState.Closed);
+        }
+
+        [Test]
         public void PreOpenedConnectionsAreNotReopened()
         {
             var connectionFactory = new RecordingMigrationConnectionFactory { OpenConnectionBeforeReturning = true };
@@ -370,6 +402,10 @@ namespace FluentMigrator.Tests.Unit.Initialization
             public override IList<string> DatabaseTypeAliases { get; } = new List<string>();
 
             public IDbConnection GetConnection() => Connection;
+
+            public void CloseConnection() => EnsureConnectionIsClosed();
+
+            public bool OwnsItsConnection => OwnsConnection;
 
             public IDbCommand CreateTestCommand(string commandText) => CreateCommand(commandText);
 

@@ -123,10 +123,29 @@ namespace FluentMigrator.Runner.Processors
         }
 
         /// <summary>
+        /// Gets a value indicating whether this processor owns the connection it uses, and
+        /// therefore may close and dispose it.
+        /// </summary>
+        /// <remarks>
+        /// This is <c>false</c> when the connection was handed over by an
+        /// <see cref="IMigrationConnectionFactory"/> whose
+        /// <see cref="IMigrationConnectionFactory.OwnsConnection"/> is <c>false</c>.
+        /// </remarks>
+        protected bool OwnsConnection => _ownsFactoryConnection;
+
+        /// <summary>
         /// Ensures the database connection is closed.
         /// </summary>
+        /// <remarks>
+        /// Connections owned by the caller are never closed.
+        /// </remarks>
         protected virtual void EnsureConnectionIsClosed()
         {
+            if (!_ownsFactoryConnection)
+            {
+                return;
+            }
+
             if ((_connection != null || (_lazyConnection.IsValueCreated && Connection != null)) && Connection.State != ConnectionState.Closed)
             {
                 Connection.Close();

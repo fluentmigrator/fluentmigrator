@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### New
 
 - Custom connections: `IMigrationConnectionFactory` allows applications to supply fully configured `IDbConnection` instances to the migration runner (PR #2268, Issue #1981)
-  - Configure with `WithConnectionFactory(sp => ...)`, or with `WithDataSource(sp => ...)` when a `DbDataSource` is available (.NET 7+)
+  - Configure with `WithConnectionFactory(sp => ...)`, or with `WithDataSource(sp => ...)` when a `DbDataSource` is available (.NET 8+)
   - The factory is asked for a connection once per migration processor (per connection), not once per command, which makes rotating credentials such as Azure Entra ID or AWS RDS IAM tokens work as expected
   - Pass `ownsConnection: false` to `WithConnectionFactory` when the application keeps ownership of the connection, in which case the processor neither closes nor disposes it
 
