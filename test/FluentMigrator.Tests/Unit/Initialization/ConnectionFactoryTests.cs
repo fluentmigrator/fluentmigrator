@@ -501,6 +501,8 @@ namespace FluentMigrator.Tests.Unit.Initialization
 
             public bool HasConnection => true;
 
+            public bool OwnsConnection { get; set; } = true;
+
             public IDbConnection CreateConnection(DbProviderFactory providerFactory)
             {
                 CreateConnectionCount++;
@@ -625,6 +627,8 @@ namespace FluentMigrator.Tests.Unit.Initialization
             public int CreateConnectionCount { get; private set; }
 
             public bool HasConnection => true;
+
+            public bool OwnsConnection => true;
 
             public IDbConnection CreateConnection(DbProviderFactory providerFactory)
             {

@@ -64,6 +64,10 @@ namespace FluentMigrator.Tests.Unit.Processors
                 .Returns(true);
 
             MockedMigrationConnectionFactory
+                .SetupGet(factory => factory.OwnsConnection)
+                .Returns(true);
+
+            MockedMigrationConnectionFactory
                 .Setup(factory => factory.CreateConnection(It.IsAny<DbProviderFactory>()))
                 .Returns((DbProviderFactory providerFactory) => providerFactory.CreateConnection());
 

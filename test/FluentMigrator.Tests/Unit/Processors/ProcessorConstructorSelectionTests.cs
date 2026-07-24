@@ -238,6 +238,8 @@ namespace FluentMigrator.Tests.Unit.Processors
         {
             public bool HasConnection => true;
 
+            public bool OwnsConnection => true;
+
             public IDbConnection CreateConnection(DbProviderFactory providerFactory)
             {
                 throw new NotSupportedException();
