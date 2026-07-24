@@ -64,6 +64,39 @@ class Program
 > [!NOTE]
 > For .NET 8 and later, prefer configuring a provider `DbDataSource` and passing it to FluentMigrator with `WithDataSource(...)`. `WithGlobalConnectionString(...)` remains supported for existing applications and simpler setups.
 
+### Custom connections and rotating credentials
+
+Use `WithConnectionFactory(...)` when the connection has to be built by your own code, for example
+when the credential is an access token that is resolved per connection (Azure Entra ID, AWS RDS IAM,
+Vault-issued secrets) or when the target database depends on the current tenant:
+
+```csharp
+services
+    .AddFluentMigratorCore()
+    .ConfigureRunner(runner => runner
+        .AddSqlServer()
+        .WithConnectionFactory(sp => new SqlConnection(connectionString)
+        {
+            AccessToken = sp.GetRequiredService<ITokenProvider>().GetToken()
+        })
+        .ScanIn(typeof(MyMigration).Assembly).For.Migrations());
+```
+
+The factory is registered with a scoped lifetime and is asked for a connection **once per migration
+processor** - that is, once per connection and never once per command - so each migration scope
+observes the credential that is current at that moment.
+
+By default the migration processor closes and disposes the connection it receives. Pass
+`ownsConnection: false` when the application keeps ownership of the connection:
+
+```csharp
+.WithConnectionFactory(sp => sp.GetRequiredService<MyConnectionHolder>().Connection, ownsConnection: false)
+```
+
+Both `WithConnectionFactory(...)` and `WithDataSource(...)` take precedence over
+`WithGlobalConnectionString(...)` regardless of the order in which they are configured, and the last
+configured factory wins.
+
 The in-process runner offers extensive configuration options for database providers, assembly scanning, processor options, and more.
 
 For comprehensive configuration details, see the [Configuration Guide](/intro/configuration.md).

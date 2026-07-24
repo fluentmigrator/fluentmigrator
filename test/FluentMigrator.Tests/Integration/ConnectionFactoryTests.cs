@@ -17,10 +17,13 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Data.Common;
 
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Initialization;
+using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Runner.Processors.MySql;
 using FluentMigrator.Runner.Processors.Oracle;
@@ -99,6 +102,149 @@ namespace FluentMigrator.Tests.Integration
                 },
                 serverOptionsGetter,
                 tryRollback: true);
+        }
+
+        /// <summary>
+        /// Verifies that the connection factory is asked for a connection once per connection
+        /// (that is, once per processor scope) and not once per executed command. This is the
+        /// behavior applications rely on when the factory acquires a rotating credential such as
+        /// an Azure Entra ID access token or an AWS RDS IAM authentication token.
+        /// </summary>
+        /// <remarks>
+        /// Enable the TestContainers-backed databases with
+        /// <c>FM_TestConnectionStrings__&lt;Db&gt;__IsEnabled=true</c> and
+        /// <c>FM_TestConnectionStrings__&lt;Db&gt;__ContainerEnabled=true</c>.
+        /// </remarks>
+        [Test]
+        [TestCaseSource(typeof(ProcessorTestCaseSource))]
+        public void ConnectionFactoryIsInvokedPerConnectionAndNotPerCommand(
+            Type processorType,
+            Func<IntegrationTestOptions.DatabaseServerOptions> serverOptionsGetter)
+        {
+            var serverOptions = serverOptionsGetter();
+            var createdConnections = new List<DbConnection>();
+
+            ExecuteWithProcessor(
+                processorType,
+                services =>
+                {
+                    services.WithMigrationsIn(RootNamespace);
+
+                    services.Replace(
+                        ServiceDescriptor.Scoped<IConnectionStringReader>(
+                            _ => new PassThroughConnectionStringReader(string.Empty)));
+
+                    services.ConfigureRunner(
+                        runnerBuilder => runnerBuilder.WithConnectionFactory(
+                            _ =>
+                            {
+                                var connection = CreateConnection(processorType, serverOptions.ConnectionString);
+                                createdConnections.Add(connection);
+                                return connection;
+                            }));
+                },
+                (serviceProvider, processor) =>
+                {
+                    var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
+
+                    try
+                    {
+                        runner.Up(new TestCreateAndDropTableMigration());
+
+                        // Several additional round-trips through the same processor.
+                        processor.TableExists(null, "TestTable").ShouldBeTrue();
+                        processor.ColumnExists(null, "TestTable", "Id").ShouldBeTrue();
+                        processor.TableExists(null, "TestTable").ShouldBeTrue();
+
+                        createdConnections.Count.ShouldBe(
+                            1,
+                            "The connection factory must be invoked once per connection, not once per command.");
+                    }
+                    finally
+                    {
+                        if (processor.TableExists(null, "TestTable"))
+                        {
+                            runner.Down(new TestCreateAndDropTableMigration());
+                        }
+                    }
+                },
+                serverOptionsGetter,
+                tryRollback: true);
+        }
+
+        /// <summary>
+        /// Verifies that every migration scope gets a freshly created connection, so a factory
+        /// backed by a rotating credential provider hands out the current token instead of an
+        /// expired, cached one.
+        /// </summary>
+        [Test]
+        [TestCaseSource(typeof(ProcessorTestCaseSource))]
+        public void EachMigrationScopeGetsAFreshlyCreatedConnection(
+            Type processorType,
+            Func<IntegrationTestOptions.DatabaseServerOptions> serverOptionsGetter)
+        {
+            var serverOptions = serverOptionsGetter();
+            var createdConnections = new List<DbConnection>();
+            var tokenVersions = new List<int>();
+            var tokenVersion = 0;
+
+            void RunScope(Action<IMigrationRunner, ProcessorBase> testAction)
+            {
+                ExecuteWithProcessor(
+                    processorType,
+                    services =>
+                    {
+                        services.WithMigrationsIn(RootNamespace);
+
+                        services.Replace(
+                            ServiceDescriptor.Scoped<IConnectionStringReader>(
+                                _ => new PassThroughConnectionStringReader(string.Empty)));
+
+                        services.ConfigureRunner(
+                            runnerBuilder => runnerBuilder.WithConnectionFactory(
+                                _ =>
+                                {
+                                    // Stands in for acquiring a rotating credential.
+                                    tokenVersions.Add(++tokenVersion);
+
+                                    var connection = CreateConnection(processorType, serverOptions.ConnectionString);
+                                    createdConnections.Add(connection);
+                                    return connection;
+                                }));
+                    },
+                    (serviceProvider, processor) => testAction(
+                        serviceProvider.GetRequiredService<IMigrationRunner>(),
+                        processor),
+                    serverOptionsGetter,
+                    tryRollback: true);
+            }
+
+            try
+            {
+                RunScope((runner, processor) =>
+                {
+                    runner.Up(new TestCreateAndDropTableMigration());
+                    processor.TableExists(null, "TestTable").ShouldBeTrue();
+                });
+
+                RunScope((runner, processor) =>
+                {
+                    processor.TableExists(null, "TestTable").ShouldBeTrue();
+                    runner.Down(new TestCreateAndDropTableMigration());
+                });
+
+                tokenVersions.ShouldBe(new[] { 1, 2 });
+                createdConnections.Count.ShouldBe(2);
+                ReferenceEquals(createdConnections[0], createdConnections[1]).ShouldBeFalse();
+                createdConnections.ShouldAllBe(connection => connection.State == ConnectionState.Closed);
+            }
+            finally
+            {
+                foreach (var connection in createdConnections)
+                {
+                    connection.Dispose();
+                }
+            }
         }
 
         private DbConnection CreateConnection(Type processorType, string connectionString)
