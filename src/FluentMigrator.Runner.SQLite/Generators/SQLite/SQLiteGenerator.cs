@@ -90,21 +90,44 @@ namespace FluentMigrator.Runner.Generators.SQLite
         /// <inheritdoc />
         public override string Generate(CreateTableExpression expression)
         {
-            var createTable = base.Generate(expression);
+            var withoutRowId = expression.AdditionalFeatures.TryGetValue(SQLiteExtensions.WithoutRowIdTable, out var value)
+                && value is true;
 
-            if (expression.AdditionalFeatures.TryGetValue(SQLiteExtensions.WithoutRowIdTable, out var withoutRowId)
-                && withoutRowId is true)
+            if (withoutRowId)
             {
-                // Remove trailing semicolon (if any) before appending WITHOUT ROWID
-                var trimmed = createTable.TrimEnd();
-                if (trimmed.EndsWith(";"))
+                if (!expression.Columns.Any(column => column.IsPrimaryKey))
                 {
-                    trimmed = trimmed.Substring(0, trimmed.Length - 1);
+                    return CompatibilityMode.HandleCompatibility(
+                        $"SQLite requires a PRIMARY KEY on tables created WITHOUT ROWID. Table '{expression.TableName}' is marked WITHOUT ROWID but defines no primary key.");
                 }
-                return trimmed + " WITHOUT ROWID;";
+
+                var identityColumns = expression.Columns
+                    .Where(column => column.IsIdentity)
+                    .Select(column => column.Name)
+                    .ToList();
+
+                if (identityColumns.Count > 0)
+                {
+                    return CompatibilityMode.HandleCompatibility(
+                        $"SQLite does not allow AUTOINCREMENT (identity) columns on tables created WITHOUT ROWID. Table '{expression.TableName}' defines identity column(s): {string.Join(", ", identityColumns)}.");
+                }
             }
 
-            return createTable;
+            var createTable = base.Generate(expression);
+
+            if (!withoutRowId || string.IsNullOrEmpty(createTable))
+            {
+                return createTable;
+            }
+
+            // Remove trailing semicolon (if any) before appending WITHOUT ROWID
+            var trimmed = createTable.TrimEnd();
+            if (trimmed.EndsWith(";"))
+            {
+                trimmed = trimmed.Substring(0, trimmed.Length - 1);
+            }
+
+            return trimmed + " WITHOUT ROWID;";
         }
 
         /// <inheritdoc />
