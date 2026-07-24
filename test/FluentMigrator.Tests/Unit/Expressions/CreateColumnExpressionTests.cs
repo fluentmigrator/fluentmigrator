@@ -85,6 +85,19 @@ namespace FluentMigrator.Tests.Unit.Expressions
         }
 
         [Test]
+        public void ReverseThrowsWhenTableAlterIsConditional()
+        {
+            var expression = new CreateColumnExpression
+            {
+                TableName = "Bacon",
+                Column = { Name = "BaconId" },
+                IfExists = true
+            };
+
+            Should.Throw<System.NotSupportedException>(() => expression.Reverse());
+        }
+
+        [Test]
         public void ToStringIsDescriptive()
         {
             var expression = new CreateColumnExpression { TableName = "Bacon", Column = { Name = "BaconId", Type = DbType.Int32 } };
