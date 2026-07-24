@@ -64,6 +64,11 @@ namespace FluentMigrator.Expressions
         /// <inheritdoc />
         public override IMigrationExpression Reverse()
         {
+            if (IfNotExists)
+            {
+                return base.Reverse();
+            }
+
             return new DeleteTableExpression
                     {
                         TableName = TableName,

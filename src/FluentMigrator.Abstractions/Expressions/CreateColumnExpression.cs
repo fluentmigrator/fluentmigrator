@@ -64,6 +64,11 @@ namespace FluentMigrator.Expressions
         /// <inheritdoc />
         public override IMigrationExpression Reverse()
         {
+            if (IfExists)
+            {
+                return base.Reverse();
+            }
+
             return new DeleteColumnExpression
                     {
                         SchemaName = SchemaName,

@@ -15,6 +15,7 @@
 #endregion
 
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 
 using FluentMigrator.Generation;
@@ -62,7 +63,7 @@ namespace FluentMigrator
         /// The literal text <c>$(name)</c> or <c>$[name]</c> can be produced (without substitution) by
         /// escaping it as <c>$$((name))</c> or <c>$$[[name]]</c> respectively.
         /// </remarks>
-        public static string ReplaceSqlScriptTokens(string sqlText, IDictionary<string, object> parameters, IQuoter quoter = null)
+        public static string ReplaceSqlScriptTokens([StringSyntax("sql")] string sqlText, IDictionary<string, object> parameters, IQuoter quoter = null)
         {
             // Are parameters set?
             if (parameters != null && parameters.Count != 0)

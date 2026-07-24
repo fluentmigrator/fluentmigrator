@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 using FluentMigrator.Expressions;
@@ -26,6 +27,7 @@ using FluentMigrator.Generation;
 using FluentMigrator.Runner.Generators;
 
 using JetBrains.Annotations;
+using NotNullAttribute = JetBrains.Annotations.NotNullAttribute;
 
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -116,13 +118,13 @@ namespace FluentMigrator.Runner.Processors
         public IQuoter Quoter => Generator.Quoter;
 
         /// <inheritdoc />
-        public void Execute(string sql)
+        public void Execute([StringSyntax("sql")] string sql)
         {
             Process(sql);
         }
 
         /// <inheritdoc />
-        public void Execute(string template, params object[] args)
+        public void Execute([StringSyntax("sql")] string template, params object[] args)
         {
             Process(string.Format(template, args));
         }
@@ -134,13 +136,13 @@ namespace FluentMigrator.Runner.Processors
         }
 
         /// <inheritdoc />
-        public DataSet Read(string template, params object[] args)
+        public DataSet Read([StringSyntax("sql")] string template, params object[] args)
         {
             throw new NotImplementedException($"Method {nameof(Read)} is not supported by the connectionless processor");
         }
 
         /// <inheritdoc />
-        public bool Exists(string template, params object[] args)
+        public bool Exists([StringSyntax("sql")] string template, params object[] args)
         {
             throw new NotImplementedException($"Method {nameof(Exists)} is not supported by the connectionless processor");
         }
@@ -176,7 +178,7 @@ namespace FluentMigrator.Runner.Processors
         /// <remarks>
         /// This method logs the provided SQL statement using the associated <see cref="ILogger"/> instance.
         /// </remarks>
-        protected void Process(string sql)
+        protected void Process([StringSyntax("sql")] string sql)
         {
             _logger.LogSql(sql);
         }

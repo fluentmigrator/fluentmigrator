@@ -27,6 +27,7 @@ using System.Text.RegularExpressions;
 
 using FluentMigrator.Builder.SecurityLabel.Provider;
 using FluentMigrator.Expressions;
+using FluentMigrator.Infrastructure;
 using FluentMigrator.Postgres;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Exceptions;
@@ -86,6 +87,43 @@ namespace FluentMigrator.Tests.Integration
                     processor.TableExists(null, "TestTable").ShouldBeFalse();
                 },
                 serverOptions);
+        }
+
+        [Test]
+        public void AutoReversingConditionalCreatePreservesAPreExistingTable()
+        {
+            ExecuteWithProcessor(
+                typeof(SQLiteProcessor),
+                services => services.WithMigrationsIn(RootNamespace),
+                (serviceProvider, processor) =>
+                {
+                    const long version = 999999999;
+                    const string tableName = "ConditionalProjects";
+
+                    processor.Execute($"CREATE TABLE {tableName} (Id INTEGER NOT NULL PRIMARY KEY, Value TEXT NOT NULL)");
+                    processor.Execute($"INSERT INTO {tableName} (Id, Value) VALUES (1, 'keep me')");
+
+                    var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
+                    runner.LoadVersionInfoIfRequired();
+                    var migrationInfo = new MigrationInfo(
+                        version,
+                        TransactionBehavior.Default,
+                        new TestConditionalCreateAutoReversingMigration());
+
+                    runner.ApplyMigrationUp(migrationInfo, true);
+
+                    processor.ReadTableData(null, "VersionInfo").Tables[0]
+                        .Select($"Version = {version}").Length.ShouldBe(1);
+                    processor.ReadTableData(null, tableName).Tables[0].Rows.Count.ShouldBe(1);
+
+                    Should.Throw<NotSupportedException>(() => runner.ApplyMigrationDown(migrationInfo, true));
+
+                    processor.TableExists(null, tableName).ShouldBeTrue();
+                    processor.ReadTableData(null, tableName).Tables[0].Rows.Count.ShouldBe(1);
+                    processor.ReadTableData(null, "VersionInfo").Tables[0]
+                        .Select($"Version = {version}").Length.ShouldBe(1);
+                },
+                () => IntegrationTestOptions.SQLite);
         }
 
         [Test]
@@ -2257,6 +2295,17 @@ namespace FluentMigrator.Tests.Integration
         public override void Up()
         {
             Create.UniqueConstraint("TestUnique").OnTable("TestTable2").WithSchema("TestSchema").Column("Name");
+        }
+    }
+
+    internal class TestConditionalCreateAutoReversingMigration : AutoReversingMigration
+    {
+        public override void Up()
+        {
+            Create.Table("ConditionalProjects")
+                .IfNotExists()
+                .WithColumn("Id").AsInt32().NotNullable().PrimaryKey()
+                .WithColumn("Value").AsString().NotNullable();
         }
     }
 

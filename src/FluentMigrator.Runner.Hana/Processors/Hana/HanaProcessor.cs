@@ -40,7 +40,7 @@ namespace FluentMigrator.Runner.Processors.Hana
         public override IList<string> DatabaseTypeAliases { get; } = new List<string>();
 
         /// <inheritdoc />
-        public IQuoter Quoter => ((HanaGenerator)Generator).Quoter;
+        public new IQuoter Quoter => ((HanaGenerator)Generator).Quoter;
 
         /// <inheritdoc />
         public override bool SchemaExists(string schemaName)
