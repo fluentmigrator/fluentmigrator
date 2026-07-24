@@ -210,7 +210,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 // Provides well-known token variables (e.g. DefaultSchema) usable from
                 // Execute.Sql/Script/EmbeddedScript. Additional providers may be registered
                 // alongside this one.
-                .AddScoped<IWellKnownTokenMapProvider, DefaultWellKnownTokenMapProvider>();
+                .AddScoped<ISqlScriptTokenProvider, DefaultSqlScriptTokenProvider>();
 
             services
                 // Configure the accessor for the version table metadata

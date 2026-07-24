@@ -121,14 +121,14 @@ namespace FluentMigrator.Tests.Unit.Builders.Execute
             expression.Description.ShouldBe(emptyDescription);
         }
         [Test]
-        public void SqlResolvesWellKnownTokenMapProvidersFromServiceProvider()
+        public void SqlResolvesSqlScriptTokenProvidersFromServiceProvider()
         {
-            var wellKnownTokenMapProvider = new Mock<IWellKnownTokenMapProvider>();
-            var providers = new List<IWellKnownTokenMapProvider> { wellKnownTokenMapProvider.Object };
+            var tokenProvider = new Mock<ISqlScriptTokenProvider>();
+            var providers = new List<ISqlScriptTokenProvider> { tokenProvider.Object };
 
             var serviceProviderMock = new Mock<IServiceProvider>();
             serviceProviderMock
-                .Setup(x => x.GetService(typeof(IEnumerable<IWellKnownTokenMapProvider>)))
+                .Setup(x => x.GetService(typeof(IEnumerable<ISqlScriptTokenProvider>)))
                 .Returns(providers);
             _contextMock.SetupGet(x => x.ServiceProvider).Returns(serviceProviderMock.Object);
 
@@ -137,18 +137,18 @@ namespace FluentMigrator.Tests.Unit.Builders.Execute
             _expressions.Count.ShouldBe(1);
             var expression = _expressions.First() as ExecuteSqlStatementExpression;
             expression.ShouldNotBeNull();
-            expression.WellKnownTokenMapProviders.ShouldBe(providers);
+            expression.SqlScriptTokenProviders.ShouldBe(providers);
         }
 
         [Test]
-        public void ScriptResolvesWellKnownTokenMapProvidersFromServiceProvider()
+        public void ScriptResolvesSqlScriptTokenProvidersFromServiceProvider()
         {
-            var wellKnownTokenMapProvider = new Mock<IWellKnownTokenMapProvider>();
-            var providers = new List<IWellKnownTokenMapProvider> { wellKnownTokenMapProvider.Object };
+            var tokenProvider = new Mock<ISqlScriptTokenProvider>();
+            var providers = new List<ISqlScriptTokenProvider> { tokenProvider.Object };
 
             var serviceProviderMock = new Mock<IServiceProvider>();
             serviceProviderMock
-                .Setup(x => x.GetService(typeof(IEnumerable<IWellKnownTokenMapProvider>)))
+                .Setup(x => x.GetService(typeof(IEnumerable<ISqlScriptTokenProvider>)))
                 .Returns(providers);
             _contextMock.SetupGet(x => x.ServiceProvider).Returns(serviceProviderMock.Object);
 
@@ -157,19 +157,19 @@ namespace FluentMigrator.Tests.Unit.Builders.Execute
             _expressions.Count.ShouldBe(1);
             var expression = _expressions.First() as ExecuteSqlScriptExpression;
             expression.ShouldNotBeNull();
-            expression.WellKnownTokenMapProviders.ShouldBe(providers);
+            expression.SqlScriptTokenProviders.ShouldBe(providers);
         }
 
         [Test]
-        public void EmbeddedScriptResolvesWellKnownTokenMapProvidersFromServiceProvider()
+        public void EmbeddedScriptResolvesSqlScriptTokenProvidersFromServiceProvider()
         {
-            var wellKnownTokenMapProvider = new Mock<IWellKnownTokenMapProvider>();
-            var providers = new List<IWellKnownTokenMapProvider> { wellKnownTokenMapProvider.Object };
+            var tokenProvider = new Mock<ISqlScriptTokenProvider>();
+            var providers = new List<ISqlScriptTokenProvider> { tokenProvider.Object };
             var embeddedResourceProviders = new List<IEmbeddedResourceProvider>();
 
             var serviceProviderMock = new Mock<IServiceProvider>();
             serviceProviderMock
-                .Setup(x => x.GetService(typeof(IEnumerable<IWellKnownTokenMapProvider>)))
+                .Setup(x => x.GetService(typeof(IEnumerable<ISqlScriptTokenProvider>)))
                 .Returns(providers);
             serviceProviderMock
                 .Setup(x => x.GetService(typeof(IEnumerable<IEmbeddedResourceProvider>)))
@@ -181,7 +181,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Execute
             _expressions.Count.ShouldBe(1);
             var expression = _expressions.First() as ExecuteEmbeddedSqlScriptExpression;
             expression.ShouldNotBeNull();
-            expression.WellKnownTokenMapProviders.ShouldBe(providers);
+            expression.SqlScriptTokenProviders.ShouldBe(providers);
         }
     }
 }

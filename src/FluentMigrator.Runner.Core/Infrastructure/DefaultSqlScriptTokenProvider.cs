@@ -24,30 +24,35 @@ using JetBrains.Annotations;
 namespace FluentMigrator.Runner.Infrastructure
 {
     /// <summary>
-    /// The default <see cref="IWellKnownTokenMapProvider"/> implementation, exposing the
+    /// The default <see cref="ISqlScriptTokenProvider"/> implementation, exposing the
     /// <c>DefaultSchema</c> token derived from the currently configured
     /// <see cref="IConventionSet.SchemaConvention"/>.
     /// </summary>
-    public class DefaultWellKnownTokenMapProvider : IWellKnownTokenMapProvider
+    public class DefaultSqlScriptTokenProvider : ISqlScriptTokenProvider
     {
         private readonly IConventionSet _conventionSet;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DefaultWellKnownTokenMapProvider"/> class.
+        /// Initializes a new instance of the <see cref="DefaultSqlScriptTokenProvider"/> class.
         /// </summary>
         /// <param name="conventionSet">The convention set used to resolve the default schema name</param>
-        public DefaultWellKnownTokenMapProvider([NotNull] IConventionSet conventionSet)
+        public DefaultSqlScriptTokenProvider([NotNull] IConventionSet conventionSet)
         {
             _conventionSet = conventionSet;
         }
 
         /// <inheritdoc />
-        public IDictionary<string, string> GetWellKnownTokenMap()
+        public IDictionary<string, string> GetTokens()
         {
-            return new Dictionary<string, string>
+            var tokens = new Dictionary<string, string>();
+
+            var defaultSchema = _conventionSet?.SchemaConvention?.SchemaNameConvention?.GetSchemaName(null);
+            if (!string.IsNullOrEmpty(defaultSchema))
             {
-                ["DefaultSchema"] = _conventionSet?.SchemaConvention?.SchemaNameConvention?.GetSchemaName(null),
-            };
+                tokens["DefaultSchema"] = defaultSchema;
+            }
+
+            return tokens;
         }
     }
 }

@@ -31,14 +31,14 @@ namespace FluentMigrator.Expressions
         public IDictionary<string, string> Parameters { get; set; }
 
         /// <summary>
-        /// Gets or sets the well-known token map providers used to resolve additional tokens
+        /// Gets or sets the token providers used to resolve additional tokens
         /// (e.g. <c>DefaultSchema</c>) that can be referenced from the SQL script/statement.
         /// </summary>
         /// <remarks>
-        /// Well-known tokens are merged in registration order and are overridden by any
+        /// Tokens are merged in registration order and are overridden by any
         /// entry with the same name in <see cref="Parameters"/>.
         /// </remarks>
-        public IEnumerable<IWellKnownTokenMapProvider> WellKnownTokenMapProviders { get; set; }
+        public IEnumerable<ISqlScriptTokenProvider> SqlScriptTokenProviders { get; set; }
 
         /// <summary>
         /// Executes the <paramref name="sqlScript"/> with the given <paramref name="processor"/>
@@ -52,23 +52,23 @@ namespace FluentMigrator.Expressions
         }
 
         /// <summary>
-        /// Merges the well-known tokens supplied by <see cref="WellKnownTokenMapProviders"/> with
+        /// Merges the tokens supplied by <see cref="SqlScriptTokenProviders"/> with
         /// the user-supplied <see cref="Parameters"/>, giving precedence to <see cref="Parameters"/>
         /// whenever a token name is defined in both.
         /// </summary>
         /// <returns>The merged token map, or <see cref="Parameters"/> unchanged when there are no
-        /// well-known tokens to merge</returns>
+        /// tokens to merge</returns>
         protected IDictionary<string, string> GetMergedParameters()
         {
-            if (WellKnownTokenMapProviders == null)
+            if (SqlScriptTokenProviders == null)
             {
                 return Parameters;
             }
 
             var mergedParameters = new Dictionary<string, string>();
-            foreach (var provider in WellKnownTokenMapProviders)
+            foreach (var provider in SqlScriptTokenProviders)
             {
-                var tokenMap = provider?.GetWellKnownTokenMap();
+                var tokenMap = provider?.GetTokens();
                 if (tokenMap == null)
                 {
                     continue;

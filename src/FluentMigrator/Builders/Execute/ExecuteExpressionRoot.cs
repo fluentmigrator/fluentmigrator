@@ -53,7 +53,7 @@ namespace FluentMigrator.Builders.Execute
             var expression = new ExecuteSqlStatementExpression
             {
                 SqlStatement = sqlStatement,
-                WellKnownTokenMapProviders = GetWellKnownTokenMapProviders(),
+                SqlScriptTokenProviders = GetSqlScriptTokenProviders(),
             };
             _context.Expressions.Add(expression);
         }
@@ -65,7 +65,7 @@ namespace FluentMigrator.Builders.Execute
             {
                 SqlStatement = sqlStatement,
                 Parameters = parameters,
-                WellKnownTokenMapProviders = GetWellKnownTokenMapProviders(),
+                SqlScriptTokenProviders = GetSqlScriptTokenProviders(),
             };
 
             _context.Expressions.Add(expression);
@@ -78,7 +78,7 @@ namespace FluentMigrator.Builders.Execute
             {
                 SqlStatement = sqlStatement,
                 Description = description,
-                WellKnownTokenMapProviders = GetWellKnownTokenMapProviders(),
+                SqlScriptTokenProviders = GetSqlScriptTokenProviders(),
             };
 
             _context.Expressions.Add(expression);
@@ -92,7 +92,7 @@ namespace FluentMigrator.Builders.Execute
                 SqlStatement = sqlStatement,
                 Description = description,
                 Parameters = parameters,
-                WellKnownTokenMapProviders = GetWellKnownTokenMapProviders(),
+                SqlScriptTokenProviders = GetSqlScriptTokenProviders(),
             };
 
             _context.Expressions.Add(expression);
@@ -105,7 +105,7 @@ namespace FluentMigrator.Builders.Execute
             {
                 SqlScript = pathToSqlScript,
                 Parameters = parameters,
-                WellKnownTokenMapProviders = GetWellKnownTokenMapProviders(),
+                SqlScriptTokenProviders = GetSqlScriptTokenProviders(),
             };
 
             _context.Expressions.Add(expression);
@@ -117,7 +117,7 @@ namespace FluentMigrator.Builders.Execute
             var expression = new ExecuteSqlScriptExpression
             {
                 SqlScript = pathToSqlScript,
-                WellKnownTokenMapProviders = GetWellKnownTokenMapProviders(),
+                SqlScriptTokenProviders = GetSqlScriptTokenProviders(),
             };
             _context.Expressions.Add(expression);
         }
@@ -153,7 +153,7 @@ namespace FluentMigrator.Builders.Execute
             var expression = new ExecuteEmbeddedSqlScriptExpression(embeddedResourceProviders)
             {
                 SqlScript = embeddedSqlScriptName,
-                WellKnownTokenMapProviders = GetWellKnownTokenMapProviders(),
+                SqlScriptTokenProviders = GetSqlScriptTokenProviders(),
             };
             _context.Expressions.Add(expression);
 
@@ -173,20 +173,20 @@ namespace FluentMigrator.Builders.Execute
             {
                 SqlScript = embeddedSqlScriptName,
                 Parameters = parameters,
-                WellKnownTokenMapProviders = GetWellKnownTokenMapProviders(),
+                SqlScriptTokenProviders = GetSqlScriptTokenProviders(),
             };
 
             _context.Expressions.Add(expression);
         }
 
         /// <summary>
-        /// Resolves the registered <see cref="IWellKnownTokenMapProvider"/> instances from the
+        /// Resolves the registered <see cref="ISqlScriptTokenProvider"/> instances from the
         /// current migration context's service provider
         /// </summary>
-        /// <returns>The registered well-known token map providers, or <c>null</c> when none are registered</returns>
-        private IEnumerable<IWellKnownTokenMapProvider> GetWellKnownTokenMapProviders()
+        /// <returns>The registered SQL script token providers, or <c>null</c> when none are registered</returns>
+        private IEnumerable<ISqlScriptTokenProvider> GetSqlScriptTokenProviders()
         {
-            return _context.ServiceProvider.GetService<IEnumerable<IWellKnownTokenMapProvider>>();
+            return _context.ServiceProvider.GetService<IEnumerable<ISqlScriptTokenProvider>>();
         }
     }
 }

@@ -30,12 +30,12 @@ namespace FluentMigrator.Infrastructure
     /// <c>Parameters</c> dictionary passed to <c>Execute.Sql</c>/<c>Execute.Script</c>/
     /// <c>Execute.EmbeddedScript</c> takes precedence over well-known tokens with the same name.
     /// </remarks>
-    public interface IWellKnownTokenMapProvider
+    public interface ISqlScriptTokenProvider
     {
         /// <summary>
-        /// Gets the map of well-known token names to their values
+        /// Gets the map of token names to their values
         /// </summary>
-        /// <returns>The well-known token map</returns>
-        IDictionary<string, string> GetWellKnownTokenMap();
+        /// <returns>The token map</returns>
+        IDictionary<string, string> GetTokens();
     }
 }

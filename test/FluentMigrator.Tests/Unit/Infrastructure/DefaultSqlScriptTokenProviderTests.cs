@@ -26,30 +26,29 @@ namespace FluentMigrator.Tests.Unit.Infrastructure
 {
     [TestFixture]
     [Category("Infrastructure")]
-    [Category("WellKnownTokenMapProvider")]
-    public class DefaultWellKnownTokenMapProviderTests
+    [Category("SqlScriptTokenProvider")]
+    public class DefaultSqlScriptTokenProviderTests
     {
         [Test]
-        public void GetWellKnownTokenMapReturnsDefaultSchemaFromConventionSet()
+        public void GetTokensReturnsDefaultSchemaFromConventionSet()
         {
             var conventionSet = ConventionSets.CreateTestSchemaName(null);
-            var provider = new DefaultWellKnownTokenMapProvider(conventionSet);
+            var provider = new DefaultSqlScriptTokenProvider(conventionSet);
 
-            var tokenMap = provider.GetWellKnownTokenMap();
+            var tokenMap = provider.GetTokens();
 
             tokenMap.ShouldContainKeyAndValue("DefaultSchema", "testdefault");
         }
 
         [Test]
-        public void GetWellKnownTokenMapReturnsNullDefaultSchemaWhenNoDefaultSchemaConfigured()
+        public void GetTokensDoesNotContainDefaultSchemaWhenNoDefaultSchemaConfigured()
         {
             var conventionSet = ConventionSets.CreateNoSchemaName(null);
-            var provider = new DefaultWellKnownTokenMapProvider(conventionSet);
+            var provider = new DefaultSqlScriptTokenProvider(conventionSet);
 
-            var tokenMap = provider.GetWellKnownTokenMap();
+            var tokenMap = provider.GetTokens();
 
-            tokenMap.ShouldContainKey("DefaultSchema");
-            tokenMap["DefaultSchema"].ShouldBeNull();
+            tokenMap.ShouldNotContainKey("DefaultSchema");
         }
     }
 }
