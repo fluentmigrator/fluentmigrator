@@ -16,6 +16,7 @@
 //
 #endregion
 
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -118,6 +119,155 @@ namespace FluentMigrator.Tests.Unit.Builders.Execute
             expression.ShouldNotBeNull();
             expression.Operation.ShouldBe(TestOperation);
             expression.Description.ShouldBe(emptyDescription);
+        }
+        [Test]
+        public void SqlResolvesSqlScriptTokenProvidersFromServiceProvider()
+        {
+            var tokenProvider = new Mock<ISqlTokenProvider>();
+            var providers = new List<ISqlTokenProvider> { tokenProvider.Object };
+
+            var serviceProviderMock = new Mock<IServiceProvider>();
+            serviceProviderMock
+                .Setup(x => x.GetService(typeof(IEnumerable<ISqlTokenProvider>)))
+                .Returns(providers);
+            _contextMock.SetupGet(x => x.ServiceProvider).Returns(serviceProviderMock.Object);
+
+            _root.Sql("INSERT INTO BLAH");
+
+            _expressions.Count.ShouldBe(1);
+            var expression = _expressions.First() as ExecuteSqlStatementExpression;
+            expression.ShouldNotBeNull();
+            expression.SqlScriptTokenProviders.ShouldBe(providers);
+        }
+
+        [Test]
+        public void ScriptResolvesSqlScriptTokenProvidersFromServiceProvider()
+        {
+            var tokenProvider = new Mock<ISqlTokenProvider>();
+            var providers = new List<ISqlTokenProvider> { tokenProvider.Object };
+
+            var serviceProviderMock = new Mock<IServiceProvider>();
+            serviceProviderMock
+                .Setup(x => x.GetService(typeof(IEnumerable<ISqlTokenProvider>)))
+                .Returns(providers);
+            _contextMock.SetupGet(x => x.ServiceProvider).Returns(serviceProviderMock.Object);
+
+            _root.Script("script.sql");
+
+            _expressions.Count.ShouldBe(1);
+            var expression = _expressions.First() as ExecuteSqlScriptExpression;
+            expression.ShouldNotBeNull();
+            expression.SqlScriptTokenProviders.ShouldBe(providers);
+        }
+
+        [Test]
+        public void EmbeddedScriptResolvesSqlScriptTokenProvidersFromServiceProvider()
+        {
+            var tokenProvider = new Mock<ISqlTokenProvider>();
+            var providers = new List<ISqlTokenProvider> { tokenProvider.Object };
+            var embeddedResourceProviders = new List<IEmbeddedResourceProvider>();
+
+            var serviceProviderMock = new Mock<IServiceProvider>();
+            serviceProviderMock
+                .Setup(x => x.GetService(typeof(IEnumerable<ISqlTokenProvider>)))
+                .Returns(providers);
+            serviceProviderMock
+                .Setup(x => x.GetService(typeof(IEnumerable<IEmbeddedResourceProvider>)))
+                .Returns(embeddedResourceProviders);
+            _contextMock.SetupGet(x => x.ServiceProvider).Returns(serviceProviderMock.Object);
+
+            _root.EmbeddedScript("script.sql");
+
+            _expressions.Count.ShouldBe(1);
+            var expression = _expressions.First() as ExecuteEmbeddedSqlScriptExpression;
+            expression.ShouldNotBeNull();
+            expression.SqlScriptTokenProviders.ShouldBe(providers);
+        }
+
+        [Test]
+        public void SqlWithDescriptionAndParametersResolvesSqlScriptTokenProvidersFromServiceProvider()
+        {
+            var tokenProvider = new Mock<ISqlTokenProvider>();
+            var providers = new List<ISqlTokenProvider> { tokenProvider.Object };
+
+            var serviceProviderMock = new Mock<IServiceProvider>();
+            serviceProviderMock
+                .Setup(x => x.GetService(typeof(IEnumerable<ISqlTokenProvider>)))
+                .Returns(providers);
+            _contextMock.SetupGet(x => x.ServiceProvider).Returns(serviceProviderMock.Object);
+
+            _root.Sql("INSERT INTO BLAH", "description", new Dictionary<string, string>());
+
+            _expressions.Count.ShouldBe(1);
+            var expression = _expressions.First() as ExecuteSqlStatementExpression;
+            expression.ShouldNotBeNull();
+            expression.SqlScriptTokenProviders.ShouldBe(providers);
+        }
+
+        [Test]
+        public void ScriptWithParametersResolvesSqlScriptTokenProvidersFromServiceProvider()
+        {
+            var tokenProvider = new Mock<ISqlTokenProvider>();
+            var providers = new List<ISqlTokenProvider> { tokenProvider.Object };
+
+            var serviceProviderMock = new Mock<IServiceProvider>();
+            serviceProviderMock
+                .Setup(x => x.GetService(typeof(IEnumerable<ISqlTokenProvider>)))
+                .Returns(providers);
+            _contextMock.SetupGet(x => x.ServiceProvider).Returns(serviceProviderMock.Object);
+
+            _root.Script("script.sql", new Dictionary<string, string>());
+
+            _expressions.Count.ShouldBe(1);
+            var expression = _expressions.First() as ExecuteSqlScriptExpression;
+            expression.ShouldNotBeNull();
+            expression.SqlScriptTokenProviders.ShouldBe(providers);
+        }
+
+        [Test]
+        public void EmbeddedScriptWithParametersResolvesSqlScriptTokenProvidersFromServiceProvider()
+        {
+            var tokenProvider = new Mock<ISqlTokenProvider>();
+            var providers = new List<ISqlTokenProvider> { tokenProvider.Object };
+            var embeddedResourceProviders = new List<IEmbeddedResourceProvider>();
+
+            var serviceProviderMock = new Mock<IServiceProvider>();
+            serviceProviderMock
+                .Setup(x => x.GetService(typeof(IEnumerable<ISqlTokenProvider>)))
+                .Returns(providers);
+            serviceProviderMock
+                .Setup(x => x.GetService(typeof(IEnumerable<IEmbeddedResourceProvider>)))
+                .Returns(embeddedResourceProviders);
+            _contextMock.SetupGet(x => x.ServiceProvider).Returns(serviceProviderMock.Object);
+
+            _root.EmbeddedScript("script.sql", new Dictionary<string, string>());
+
+            _expressions.Count.ShouldBe(1);
+            var expression = _expressions.First() as ExecuteEmbeddedSqlScriptExpression;
+            expression.ShouldNotBeNull();
+            expression.SqlScriptTokenProviders.ShouldBe(providers);
+        }
+
+        [Test]
+        public void SqlHandlesUnregisteredSqlScriptTokenProvidersGracefully()
+        {
+            var serviceProviderMock = new Mock<IServiceProvider>();
+            serviceProviderMock
+                .Setup(x => x.GetService(typeof(IEnumerable<ISqlTokenProvider>)))
+                .Returns((object)null);
+            _contextMock.SetupGet(x => x.ServiceProvider).Returns(serviceProviderMock.Object);
+
+            _root.Sql("INSERT INTO BLAH");
+
+            _expressions.Count.ShouldBe(1);
+            var expression = _expressions.First() as ExecuteSqlStatementExpression;
+            expression.ShouldNotBeNull();
+            expression.SqlScriptTokenProviders.ShouldBeNull();
+
+            var processor = new Mock<IMigrationProcessor>();
+            processor.Setup(x => x.Execute("INSERT INTO BLAH")).Verifiable();
+            expression.ExecuteWith(processor.Object);
+            processor.Verify();
         }
     }
 }
