@@ -58,6 +58,11 @@ namespace FluentMigrator.Runner.Conventions
         }
 
         /// <summary>
+        /// Gets the convention used to determine the default schema name
+        /// </summary>
+        public IDefaultSchemaNameConvention SchemaNameConvention => _defaultSchemaNameConvention;
+
+        /// <summary>
         /// Returns the default schema name depending on the original schema name
         /// </summary>
         /// <param name="originalSchemaName">The original schema name</param>

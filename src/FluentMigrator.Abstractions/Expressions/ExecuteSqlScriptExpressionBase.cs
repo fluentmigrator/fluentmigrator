@@ -16,6 +16,8 @@
 
 using System.Collections.Generic;
 
+using FluentMigrator.Infrastructure;
+
 namespace FluentMigrator.Expressions
 {
     /// <summary>
@@ -29,14 +31,69 @@ namespace FluentMigrator.Expressions
         public IDictionary<string, string> Parameters { get; set; }
 
         /// <summary>
+        /// Gets or sets the token providers used to resolve additional tokens
+        /// (e.g. <c>DefaultSchema</c>) that can be referenced from the SQL script/statement.
+        /// </summary>
+        /// <remarks>
+        /// Tokens are merged in registration order and are overridden by any
+        /// entry with the same name in <see cref="Parameters"/>.
+        /// </remarks>
+        public IEnumerable<ISqlScriptTokenProvider> SqlScriptTokenProviders { get; set; }
+
+        /// <summary>
         /// Executes the <paramref name="sqlScript"/> with the given <paramref name="processor"/>
         /// </summary>
         /// <param name="processor">The processor to execute the script with</param>
         /// <param name="sqlScript">The SQL script to execute</param>
         protected void Execute(IMigrationProcessor processor, string sqlScript)
         {
-            var finalSqlScript = SqlScriptTokenReplacer.ReplaceSqlScriptTokens(sqlScript, Parameters);
+            var finalSqlScript = SqlScriptTokenReplacer.ReplaceSqlScriptTokens(sqlScript, GetMergedParameters());
             processor.Execute(finalSqlScript);
+        }
+
+        /// <summary>
+        /// Merges the tokens supplied by <see cref="SqlScriptTokenProviders"/> with
+        /// the user-supplied <see cref="Parameters"/>, giving precedence to <see cref="Parameters"/>
+        /// whenever a token name is defined in both.
+        /// </summary>
+        /// <returns>The merged token map, or <see cref="Parameters"/> unchanged when there are no
+        /// tokens to merge</returns>
+        protected IDictionary<string, string> GetMergedParameters()
+        {
+            if (SqlScriptTokenProviders == null)
+            {
+                return Parameters;
+            }
+
+            var mergedParameters = new Dictionary<string, string>();
+            foreach (var provider in SqlScriptTokenProviders)
+            {
+                var tokenMap = provider?.GetTokens();
+                if (tokenMap == null)
+                {
+                    continue;
+                }
+
+                foreach (var token in tokenMap)
+                {
+                    mergedParameters[token.Key] = token.Value;
+                }
+            }
+
+            if (mergedParameters.Count == 0)
+            {
+                return Parameters;
+            }
+
+            if (Parameters != null)
+            {
+                foreach (var parameter in Parameters)
+                {
+                    mergedParameters[parameter.Key] = parameter.Value;
+                }
+            }
+
+            return mergedParameters;
         }
     }
 }
