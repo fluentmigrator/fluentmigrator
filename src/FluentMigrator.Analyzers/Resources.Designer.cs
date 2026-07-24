@@ -85,5 +85,41 @@ namespace FluentMigrator.Analyzers {
                 return ResourceManager.GetString("MigrationAttributeVersionShouldBeUniqueAnalyzerTitle", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The $(name) token style substitutes its value verbatim/unquoted, so it can be a SQL injection risk when the value comes from outside the migration itself. Prefer the $[name] token style, which substitutes a safely quoted SQL string literal via IQuoter. Use $(name) only when the raw, unquoted value is truly required (for example, when concatenating two similar queries with UNION/UNION ALL, or substituting identifiers/SQL keywords)..
+        /// </summary>
+        internal static string RawSqlTokenInterpolationAnalyzerDescription {
+            get {
+                return ResourceManager.GetString("RawSqlTokenInterpolationAnalyzerDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Replace raw variable interpolation token &apos;{0}&apos; with the automatically quoted &apos;{1}&apos; token, unless the raw substitution is intentional.
+        /// </summary>
+        internal static string RawSqlTokenInterpolationAnalyzerMessageFormat {
+            get {
+                return ResourceManager.GetString("RawSqlTokenInterpolationAnalyzerMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Prefer $[name] over $(name) for SQL token substitution.
+        /// </summary>
+        internal static string RawSqlTokenInterpolationAnalyzerTitle {
+            get {
+                return ResourceManager.GetString("RawSqlTokenInterpolationAnalyzerTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Replace with automatically quoted token.
+        /// </summary>
+        internal static string RawSqlTokenInterpolationCodeFixTitle {
+            get {
+                return ResourceManager.GetString("RawSqlTokenInterpolationCodeFixTitle", resourceCulture);
+            }
+        }
     }
 }

@@ -11,6 +11,14 @@
     <PackageTags>fluent;migrator;fluentmigrator;migration;database;analyzer</PackageTags>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\FluentMigrator.snk</AssemblyOriginatorKeyFile>
+    <!--
+      RawSqlTokenInterpolationCodeFixProvider (in this same assembly) requires
+      Microsoft.CodeAnalysis.CSharp.Workspaces to implement CodeFixProvider. That reference is only
+      exercised by IDEs during design-time builds (which provide Workspaces); it is never loaded during
+      plain command-line/CI compilations, so RS1038's concern about unpredictable behavior in that
+      scenario does not apply here.
+    -->
+    <NoWarn>$(NoWarn);RS1038</NoWarn>
   </PropertyGroup>
   <Import Project="$(MSBuildThisFileDirectory)../../PackageLibrary.props" />
   <ItemGroup>
@@ -20,6 +28,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.0.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="5.0.0" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>

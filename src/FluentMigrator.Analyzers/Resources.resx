@@ -126,4 +126,16 @@
   <data name="MigrationAttributeVersionShouldBeUniqueAnalyzerTitle" xml:space="preserve">
     <value>Migration version isn't unique</value>
   </data>
+  <data name="RawSqlTokenInterpolationAnalyzerDescription" xml:space="preserve">
+    <value>The $(name) token style substitutes its value verbatim/unquoted, so it can be a SQL injection risk when the value comes from outside the migration itself. Prefer the $[name] token style, which substitutes a safely quoted SQL string literal via IQuoter. Use $(name) only when the raw, unquoted value is truly required (for example, when concatenating two similar queries with UNION/UNION ALL, or substituting identifiers/SQL keywords).</value>
+  </data>
+  <data name="RawSqlTokenInterpolationAnalyzerMessageFormat" xml:space="preserve">
+    <value>Replace raw variable interpolation token '{0}' with the automatically quoted '{1}' token, unless the raw substitution is intentional</value>
+  </data>
+  <data name="RawSqlTokenInterpolationAnalyzerTitle" xml:space="preserve">
+    <value>Prefer $[name] over $(name) for SQL token substitution</value>
+  </data>
+  <data name="RawSqlTokenInterpolationCodeFixTitle" xml:space="preserve">
+    <value>Replace with automatically quoted token</value>
+  </data>
 </root>
