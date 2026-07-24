@@ -88,3 +88,8 @@ Right now, the way we do journaling has a couple of limitations.
 ### 11. Connections/connection strings
 See: https://github.com/fluentmigrator/fluentmigrator/issues/1075 - Ability to configure runner with multiple connections
 
+
+### 13. Connections
+Database connections are treated as a dependency-injected concept represented by `IDbConnection`.  The runner obtains connections through `IMigrationConnectionFactory`, allowing connection creation to be configured independently from connection string resolution.
+
+See the [Connection Management ADR](ConnectionManagement.md) for the rationale, the ownership semantics, and how a `DbDataSource`-based design would work.
