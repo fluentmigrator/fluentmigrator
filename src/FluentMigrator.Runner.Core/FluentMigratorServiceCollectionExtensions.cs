@@ -267,9 +267,9 @@ namespace Microsoft.Extensions.DependencyInjection
                     sp =>
                     {
                         var options = sp.GetRequiredService<IOptions<RunnerOptions>>();
-                        var connAccessor = sp.GetRequiredService<IConnectionStringAccessor>();
-                        var hasConnection = !string.IsNullOrEmpty(connAccessor.ConnectionString);
-                        if (options.Value.NoConnection || !hasConnection)
+                        var connectionFactory = sp.GetRequiredService<IMigrationConnectionFactory>();
+
+                        if (options.Value.NoConnection || !connectionFactory.HasConnection)
                         {
                             return ActivatorUtilities.CreateInstance<ConnectionlessVersionLoader>(sp);
                         }
@@ -295,6 +295,10 @@ namespace Microsoft.Extensions.DependencyInjection
                         var connectionString = connectionStringAccessor.ConnectionString;
                         return new MigrationContext(querySchema, sp, connectionString);
                     });
+
+            services
+                // Connection Factory
+                .TryAddScoped<IMigrationConnectionFactory, ConnectionStringMigrationConnectionFactory>();
 
             return services;
         }

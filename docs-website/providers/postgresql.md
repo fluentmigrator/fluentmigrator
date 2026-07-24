@@ -34,6 +34,37 @@ services.AddFluentMigratorCore()
         .WithGlobalConnectionString("Host=localhost;Database=myapp;Username=myuser;Password=mypass")
         .ScanIn(typeof(MyMigration).Assembly).For.Migrations());
 ```
+### Dynamic Passwords
+
+For scenarios where the password or authentication token is generated at runtime, configure an `NpgsqlDataSource` and pass it to FluentMigrator with `WithDataSource(...)` or `.WithConnectionFactory(...)`.
+This is useful for cloud-hosted databases that use rotating credentials or short-lived authentication tokens.
+
+```csharp
+services.AddSingleton(sp =>
+{
+    var connectionString = "Host=localhost;Database=myapp;Username=myuser";
+    var builder = new NpgsqlDataSourceBuilder(connectionString);
+
+    builder.UsePasswordProvider(
+        passwordProvider: settings => GetPassword(),
+        passwordProviderAsync: (settings, cancellationToken) => GetPasswordAsync(cancellationToken));
+
+    return builder.Build();
+});
+
+services
+    .AddFluentMigratorCore()
+    .ConfigureRunner(runner => runner
+        .AddPostgres()
+        // Preferred when using a provider data source.
+        .WithDataSource(sp => sp.GetRequiredService<NpgsqlDataSource>())
+        // Use WithConnectionFactory when you need full control over how the
+        // IDbConnection is created, for example from a tenant resolver, secret
+        // provider, token service, or an existing provider-specific data source.
+        // .WithConnectionFactory(sp =>
+        //     sp.GetRequiredService<NpgsqlDataSource>().CreateConnection())
+        .ScanIn(typeof(SomeMigration).Assembly).For.Migrations());
+```
 
 ## Column types
 

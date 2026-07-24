@@ -21,6 +21,7 @@ using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -51,6 +52,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         /// utilizing the <see cref="SqlServer2012Generator"/> for SQL generation and
         /// <see cref="SqlServer2008Quoter"/> for quoting.
         /// </remarks>
+        [Obsolete("Use the constructor that accepts IMigrationConnectionFactory instead.")]
         public SqlServer2012Processor(
             [NotNull] ILogger<SqlServer2012Processor> logger,
             [NotNull] SqlServer2008Quoter quoter,
@@ -59,6 +61,32 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             [NotNull] IConnectionStringAccessor connectionStringAccessor,
             [NotNull] IServiceProvider serviceProvider)
             : base(new[] { ProcessorIdConstants.SqlServer2012, ProcessorIdConstants.SqlServer }, generator, quoter, logger, options, connectionStringAccessor, serviceProvider)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SqlServer2012Processor"/> class.
+        /// </summary>
+        /// <param name="logger">The logger used for logging migration operations.</param>
+        /// <param name="quoter">The SQL quoter specific to SQL Server 2008.</param>
+        /// <param name="generator">The SQL generator specific to SQL Server 2012.</param>
+        /// <param name="options">The processor options for configuring migration behavior.</param>
+        /// <param name="connectionFactory">The migration connection factory.</param>
+        /// <param name="serviceProvider">The service provider for resolving dependencies.</param>
+        /// <remarks>
+        /// This constructor sets up the processor to handle migrations for SQL Server 2012,
+        /// utilizing the <see cref="SqlServer2012Generator"/> for SQL generation and
+        /// <see cref="SqlServer2008Quoter"/> for quoting.
+        /// </remarks>
+        [ActivatorUtilitiesConstructor]
+        public SqlServer2012Processor(
+            [NotNull] ILogger<SqlServer2012Processor> logger,
+            [NotNull] SqlServer2008Quoter quoter,
+            [NotNull] SqlServer2012Generator generator,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> options,
+            [NotNull] IMigrationConnectionFactory connectionFactory,
+            [NotNull] IServiceProvider serviceProvider)
+            : base(new[] { ProcessorIdConstants.SqlServer2012, ProcessorIdConstants.SqlServer }, generator, quoter, logger, options, connectionFactory, serviceProvider)
         {
         }
     }

@@ -18,9 +18,13 @@
 
 using FluentMigrator.Runner.BatchParser;
 using FluentMigrator.Runner.Generators.Snowflake;
+using FluentMigrator.Runner.Initialization;
+using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Snowflake;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner
 {
@@ -52,7 +56,16 @@ namespace FluentMigrator.Runner
                 .AddScoped<SnowflakeOptions>()
                 .AddTransient<SnowflakeBatchParser>()
                 .AddScoped<SnowflakeDbFactory>()
-                .AddScoped<SnowflakeProcessor>()
+                .AddScoped<SnowflakeProcessor>(sp =>
+                    new SnowflakeProcessor(
+                        sp.GetRequiredService<SnowflakeDbFactory>(),
+                        sp.GetRequiredService<SnowflakeGenerator>(),
+                        sp.GetRequiredService<SnowflakeQuoter>(),
+                        sp.GetRequiredService<ILogger<SnowflakeProcessor>>(),
+                        sp.GetRequiredService<IOptionsSnapshot<ProcessorOptions>>(),
+                        sp.GetRequiredService<IMigrationConnectionFactory>(),
+                        sp.GetRequiredService<SnowflakeOptions>(),
+                        sp))
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<SnowflakeProcessor>())
                 .AddScoped<SnowflakeQuoter>()
                 .AddScoped<ISnowflakeTypeMap>(sp => new SnowflakeTypeMap())

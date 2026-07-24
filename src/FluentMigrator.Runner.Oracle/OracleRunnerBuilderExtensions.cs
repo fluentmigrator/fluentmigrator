@@ -14,13 +14,17 @@
 // limitations under the License.
 #endregion
 
+using System;
+
 using FluentMigrator.Runner.Generators.Oracle;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.DotConnectOracle;
 using FluentMigrator.Runner.Processors.Oracle;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner
@@ -82,18 +86,15 @@ namespace FluentMigrator.Runner
         /// Register Oracle processor dependencies
         /// </summary>
         /// <param name="builder">The builder to add the Oracle-specific services to</param>
-        private static void RegisterOracleProcessor<
-#if NET
-            [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]
-#endif
-            T>(IMigrationRunnerBuilder builder)
+        /// <param name="implementationFactory">The factory that creates the processor</param>
+        private static void RegisterOracleProcessor<T>(IMigrationRunnerBuilder builder, Func<IServiceProvider, T> implementationFactory)
             where T : OracleProcessor
         {
             RegisterOracleQuoter(builder);
 
             builder.Services
                 .AddScoped<OracleDbFactory>()
-                .AddScoped<T>()
+                .AddScoped<T>(implementationFactory)
                 .AddScoped<OracleProcessorBase>(sp => sp.GetRequiredService<T>())
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<T>());
         }
@@ -102,18 +103,15 @@ namespace FluentMigrator.Runner
         /// Register Oracle managed processor dependencies
         /// </summary>
         /// <param name="builder">The builder to add the Oracle-specific services to</param>
-        private static void RegisterOracleManagedProcessor<
-#if NET
-            [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]
-#endif
-            T>(IMigrationRunnerBuilder builder)
+        /// <param name="implementationFactory">The factory that creates the processor</param>
+        private static void RegisterOracleManagedProcessor<T>(IMigrationRunnerBuilder builder, Func<IServiceProvider, T> implementationFactory)
             where T : OracleManagedProcessor
         {
             RegisterOracleQuoter(builder);
 
             builder.Services
                 .AddScoped<OracleManagedDbFactory>()
-                .AddScoped<T>()
+                .AddScoped<T>(implementationFactory)
                 .AddScoped<OracleProcessorBase>(sp => sp.GetRequiredService<T>())
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<T>());
 
@@ -123,18 +121,14 @@ namespace FluentMigrator.Runner
         /// Register dotConnection Oracle processor dependencies
         /// </summary>
         /// <param name="builder">The builder to add the Oracle-specific services to</param>
-        private static void RegisterDotConnectOracleProcessor<
-#if NET
-            [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]
-#endif
-            T>(IMigrationRunnerBuilder builder)
+        private static void RegisterDotConnectOracleProcessor<T>(IMigrationRunnerBuilder builder, Func<IServiceProvider, T> implementationFactory)
             where T : DotConnectOracleProcessor
         {
             RegisterOracleQuoter(builder);
 
             builder.Services
                 .AddScoped<DotConnectOracleDbFactory>()
-                .AddScoped<T>()
+                .AddScoped<T>(implementationFactory)
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<T>());
         }
 
@@ -147,7 +141,13 @@ namespace FluentMigrator.Runner
         {
             RegisterOracleGenerator(builder);
 
-            RegisterOracleProcessor<OracleProcessor>(builder);
+            RegisterOracleProcessor<OracleProcessor>(builder, sp =>
+                new OracleProcessor(
+                    sp.GetRequiredService<OracleDbFactory>(),
+                    sp.GetRequiredService<IOracleGenerator>(),
+                    sp.GetRequiredService<ILogger<OracleProcessor>>(),
+                    sp.GetRequiredService<IOptionsSnapshot<ProcessorOptions>>(),
+                    sp.GetRequiredService<IMigrationConnectionFactory>()));
 
             builder.Services.AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<IOracleGenerator>());
 
@@ -163,7 +163,13 @@ namespace FluentMigrator.Runner
         {
             RegisterOracleManagedGenerator(builder);
 
-            RegisterOracleManagedProcessor<OracleManagedProcessor>(builder);
+            RegisterOracleManagedProcessor<OracleManagedProcessor>(builder, sp =>
+                new OracleManagedProcessor(
+                    sp.GetRequiredService<OracleManagedDbFactory>(),
+                    sp.GetRequiredService<IOracleGenerator>(),
+                    sp.GetRequiredService<ILogger<OracleManagedProcessor>>(),
+                    sp.GetRequiredService<IOptionsSnapshot<ProcessorOptions>>(),
+                    sp.GetRequiredService<IMigrationConnectionFactory>()));
 
             builder.Services.AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<IOracleManagedGenerator>());
 
@@ -179,7 +185,13 @@ namespace FluentMigrator.Runner
         {
             RegisterOracleGenerator(builder);
 
-            RegisterDotConnectOracleProcessor<DotConnectOracleProcessor>(builder);
+            RegisterDotConnectOracleProcessor<DotConnectOracleProcessor>(builder, sp =>
+                new DotConnectOracleProcessor(
+                    sp.GetRequiredService<DotConnectOracleDbFactory>(),
+                    sp.GetRequiredService<IOracleGenerator>(),
+                    sp.GetRequiredService<ILogger<DotConnectOracleProcessor>>(),
+                    sp.GetRequiredService<IOptionsSnapshot<ProcessorOptions>>(),
+                    sp.GetRequiredService<IMigrationConnectionFactory>()));
 
             builder.Services.AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<IOracleGenerator>());
 
@@ -195,7 +207,13 @@ namespace FluentMigrator.Runner
         {
             RegisterOracle12CGenerator(builder);
 
-            RegisterOracleProcessor<Oracle12CProcessor>(builder);
+            RegisterOracleProcessor<Oracle12CProcessor>(builder, sp =>
+                new Oracle12CProcessor(
+                    sp.GetRequiredService<OracleDbFactory>(),
+                    sp.GetRequiredService<IOracle12CGenerator>(),
+                    sp.GetRequiredService<ILogger<Oracle12CProcessor>>(),
+                    sp.GetRequiredService<IOptionsSnapshot<ProcessorOptions>>(),
+                    sp.GetRequiredService<IMigrationConnectionFactory>()));
 
             builder.Services.AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<IOracle12CGenerator>());
 
@@ -211,7 +229,13 @@ namespace FluentMigrator.Runner
         {
             RegisterOracle12CGenerator(builder);
 
-            RegisterOracleManagedProcessor<Oracle12CManagedProcessor>(builder);
+            RegisterOracleManagedProcessor<Oracle12CManagedProcessor>(builder, sp =>
+                new Oracle12CManagedProcessor(
+                    sp.GetRequiredService<OracleManagedDbFactory>(),
+                    sp.GetRequiredService<IOracle12CGenerator>(),
+                    sp.GetRequiredService<ILogger<Oracle12CManagedProcessor>>(),
+                    sp.GetRequiredService<IOptionsSnapshot<ProcessorOptions>>(),
+                    sp.GetRequiredService<IMigrationConnectionFactory>()));
 
             builder.Services.AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<IOracle12CGenerator>());
 
@@ -227,7 +251,13 @@ namespace FluentMigrator.Runner
         {
             RegisterOracle12CGenerator(builder);
 
-            RegisterDotConnectOracleProcessor<DotConnectOracle12CProcessor>(builder);
+            RegisterDotConnectOracleProcessor<DotConnectOracle12CProcessor>(builder, sp =>
+                new DotConnectOracle12CProcessor(
+                    sp.GetRequiredService<DotConnectOracleDbFactory>(),
+                    sp.GetRequiredService<IOracle12CGenerator>(),
+                    sp.GetRequiredService<ILogger<DotConnectOracle12CProcessor>>(),
+                    sp.GetRequiredService<IOptionsSnapshot<ProcessorOptions>>(),
+                    sp.GetRequiredService<IMigrationConnectionFactory>()));
 
             builder.Services.AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<IOracle12CGenerator>());
 

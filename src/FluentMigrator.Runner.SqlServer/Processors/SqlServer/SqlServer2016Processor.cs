@@ -23,6 +23,7 @@ using FluentMigrator.Runner.Initialization;
 using JetBrains.Annotations;
 
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -54,6 +55,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         /// <exception cref="ArgumentNullException">
         /// Thrown if any of the required parameters are <c>null</c>.
         /// </exception>
+        [Obsolete("Use the constructor that accepts IMigrationConnectionFactory instead.")]
         public SqlServer2016Processor(
             [NotNull] ILogger<SqlServer2016Processor> logger,
             [NotNull] SqlServer2008Quoter quoter,
@@ -72,7 +74,43 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SqlServer2016Processor"/> class.
+        /// </summary>
+        /// <param name="logger">The logger used to log messages and errors.</param>
+        /// <param name="quoter">The SQL quoter used for quoting SQL identifiers and literals.</param>
+        /// <param name="generator">The SQL generator used to generate SQL scripts for SQL Server 2016.</param>
+        /// <param name="options">The processor options that define configuration settings.</param>
+        /// <param name="connectionFactory">The migration connection factory.</param>
+        /// <param name="serviceProvider">The service provider used for dependency injection.</param>
+        /// <remarks>
+        /// This constructor initializes the processor with the specified dependencies, enabling it to execute
+        /// database migrations targeting SQL Server 2016.
+        /// </remarks>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if any of the required parameters are <c>null</c>.
+        /// </exception>
+        [ActivatorUtilitiesConstructor]
+        public SqlServer2016Processor(
+            [NotNull] ILogger<SqlServer2016Processor> logger,
+            [NotNull] SqlServer2008Quoter quoter,
+            [NotNull] SqlServer2016Generator generator,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> options,
+            [NotNull] IMigrationConnectionFactory connectionFactory,
+            [NotNull] IServiceProvider serviceProvider)
+            : this(
+                SqlClientFactory.Instance,
+                logger,
+                quoter,
+                generator,
+                options,
+                connectionFactory,
+                serviceProvider)
+        {
+        }
+
         /// <inheritdoc />
+        [Obsolete("Use the constructor that accepts IMigrationConnectionFactory instead.")]
         protected SqlServer2016Processor(
             [NotNull] DbProviderFactory factory,
             [NotNull] ILogger logger,
@@ -89,6 +127,27 @@ namespace FluentMigrator.Runner.Processors.SqlServer
                 logger,
                 options,
                 connectionStringAccessor,
+                serviceProvider)
+        {
+        }
+
+        /// <inheritdoc />
+        protected SqlServer2016Processor(
+            [NotNull] DbProviderFactory factory,
+            [NotNull] ILogger logger,
+            [NotNull] SqlServer2008Quoter quoter,
+            [NotNull] SqlServer2016Generator generator,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> options,
+            [NotNull] IMigrationConnectionFactory connectionFactory,
+            [NotNull] IServiceProvider serviceProvider)
+            : base(
+                new[] { ProcessorIdConstants.SqlServer2016, ProcessorIdConstants.SqlServer },
+                factory,
+                generator,
+                quoter,
+                logger,
+                options,
+                connectionFactory,
                 serviceProvider)
         {
         }
