@@ -41,7 +41,7 @@ namespace FluentMigrator.Runner.Processors.DB2.iSeries
         /// <summary>
         /// Gets or sets the quoter for iSeries SQL.
         /// </summary>
-        public IQuoter Quoter { get; set; }
+        public new IQuoter Quoter { get; set; }
 
         /// <inheritdoc />
         public override string DatabaseType => ProcessorIdConstants.Db2ISeries;
