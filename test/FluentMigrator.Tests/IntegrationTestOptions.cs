@@ -16,7 +16,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Data.OleDb;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
@@ -82,8 +81,6 @@ namespace FluentMigrator.Tests
         public static DatabaseServerOptions SqlServer2014 => GetOptions(ProcessorIdConstants.SqlServer2014);
 
         public static DatabaseServerOptions SqlServer2016 => GetOptions(ProcessorIdConstants.SqlServer2016);
-
-        public static DatabaseServerOptions Jet => GetOptions(ProcessorIdConstants.Jet);
 
         // ReSharper disable once InconsistentNaming
         public static DatabaseServerOptions SQLite => GetOptions(ProcessorIdConstants.SQLite).ReplaceConnectionStringDataDirectory();

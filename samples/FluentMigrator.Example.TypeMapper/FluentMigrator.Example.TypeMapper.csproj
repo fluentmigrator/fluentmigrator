@@ -14,7 +14,6 @@
     <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.11" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\FluentMigrator.Runner.Jet\FluentMigrator.Runner.Jet.csproj" Condition="$(TargetFramework) == 'net48'"/>
     <ProjectReference Include="..\..\src\FluentMigrator.Runner\FluentMigrator.Runner.csproj" />
     <ProjectReference Include="..\FluentMigrator.Example.Migrations\FluentMigrator.Example.Migrations.csproj" />
   </ItemGroup>

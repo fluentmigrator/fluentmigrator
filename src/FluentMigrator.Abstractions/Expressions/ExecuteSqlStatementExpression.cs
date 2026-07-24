@@ -17,6 +17,7 @@
 #endregion
 
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 
 using FluentMigrator.Infrastructure;
 
@@ -31,6 +32,7 @@ namespace FluentMigrator.Expressions
         /// Gets or sets the SQL statement to be executed
         /// </summary>
         [Required(ErrorMessageResourceType = typeof(ErrorMessages), ErrorMessageResourceName = nameof(ErrorMessages.SqlStatementCannotBeNullOrEmpty))]
+        [StringSyntax("sql")]
         public virtual string SqlStatement { get; set; }
 
         /// <summary>

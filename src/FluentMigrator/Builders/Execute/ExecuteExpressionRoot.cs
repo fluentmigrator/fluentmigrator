@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
@@ -48,7 +49,7 @@ namespace FluentMigrator.Builders.Execute
         IMigrationContext IMigrationContextAccessor.GetMigrationContext() => _context;
 
         /// <inheritdoc />
-        public void Sql(string sqlStatement)
+        public void Sql([StringSyntax("sql")] string sqlStatement)
         {
             var expression = new ExecuteSqlStatementExpression
             {
@@ -59,7 +60,7 @@ namespace FluentMigrator.Builders.Execute
         }
 
         /// <inheritdoc />
-        public void Sql(string sqlStatement, IDictionary<string, string> parameters)
+        public void Sql([StringSyntax("sql")] string sqlStatement, IDictionary<string, string> parameters)
         {
             var expression = new ExecuteSqlStatementExpression
             {
@@ -72,7 +73,7 @@ namespace FluentMigrator.Builders.Execute
         }
 
         /// <inheritdoc />
-        public void Sql(string sqlStatement, string description)
+        public void Sql([StringSyntax("sql")] string sqlStatement, string description)
         {
             var expression = new ExecuteSqlStatementExpression
             {
@@ -85,7 +86,7 @@ namespace FluentMigrator.Builders.Execute
         }
 
         /// <inheritdoc />
-        public void Sql(string sqlStatement, string description, IDictionary<string, string> parameters)
+        public void Sql([StringSyntax("sql")] string sqlStatement, string description, IDictionary<string, string> parameters)
         {
             var expression = new ExecuteSqlStatementExpression
             {

@@ -64,14 +64,6 @@ namespace FluentMigrator.Tests.Unit.Runners
 
             foreach (var field in fields)
             {
-#if !NETFRAMEWORK
-                // The Jet provider is only functional on the .NET Framework; its test cases in
-                // DatabaseIdentifierTests are guarded the same way.
-                if (field.Name == "Jet")
-                {
-                    continue;
-                }
-#endif
                 var value = (string)field.GetRawConstantValue();
                 yield return new TestCaseData(value).SetArgDisplayNames($"{field.Name} (\"{value}\")");
             }
@@ -140,7 +132,6 @@ namespace FluentMigrator.Tests.Unit.Runners
                         .AddDotConnectOracle12C()
                         .AddFirebird()
                         .AddHana()
-                        .AddJet()
                         .AddMySql()
                         .AddMySql4()
                         .AddMySql5()

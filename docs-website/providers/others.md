@@ -68,12 +68,35 @@ dotnet add package FluentMigrator.Runner.Hana
 Install-Package FluentMigrator.Runner.Hana
 ```
 
+Also install the SAP HANA ADO.NET driver NuGet package appropriate for your .NET version:
+
+```bash
+# For .NET 8
+dotnet add package Sap.Data.Hana.Net.v8.0
+
+# For .NET 10
+dotnet add package Sap.Data.Hana.Net.v10.0
+```
+
 #### Configuration
+
+For .NET 8, use `AddHana8()`:
 
 ```csharp
 services.AddFluentMigratorCore()
     .ConfigureRunner(rb => rb
-        .AddHana()
+        .AddHana8()
+        .WithGlobalConnectionString(connectionString)
+        .ScanIn(Assembly.GetExecutingAssembly()).For.Migrations())
+    .AddLogging(lb => lb.AddFluentMigratorConsole());
+```
+
+For .NET 10, use `AddHana10()`:
+
+```csharp
+services.AddFluentMigratorCore()
+    .ConfigureRunner(rb => rb
+        .AddHana10()
         .WithGlobalConnectionString(connectionString)
         .ScanIn(Assembly.GetExecutingAssembly()).For.Migrations())
     .AddLogging(lb => lb.AddFluentMigratorConsole());

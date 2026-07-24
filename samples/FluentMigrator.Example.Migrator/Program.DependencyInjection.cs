@@ -33,9 +33,6 @@ namespace FluentMigrator.Example.Migrator
                 .AddFluentMigratorCore()
                 .ConfigureRunner(
                     builder => builder
-#if NETFRAMEWORK
-                        .AddJet()
-#endif
                         .AddSqlServer()
                         .AddSQLite()
                         .WithGlobalConnectionString(dbConfig.ConnectionString)

@@ -15,6 +15,7 @@
 #endregion
 
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 using FluentMigrator.Infrastructure;
 
@@ -45,7 +46,7 @@ namespace FluentMigrator.Expressions
         /// </summary>
         /// <param name="processor">The processor to execute the script with</param>
         /// <param name="sqlScript">The SQL script to execute</param>
-        protected void Execute(IMigrationProcessor processor, string sqlScript)
+        protected void Execute(IMigrationProcessor processor, [StringSyntax("sql")] string sqlScript)
         {
             var finalSqlScript = SqlScriptTokenReplacer.ReplaceSqlScriptTokens(sqlScript, GetMergedParameters());
             processor.Execute(finalSqlScript);

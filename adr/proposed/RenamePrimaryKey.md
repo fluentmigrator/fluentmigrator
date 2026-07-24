@@ -30,7 +30,6 @@ The following table summarizes the capabilities of each supported database provi
 | **DB2** | `RENAME TABLE old_constraint TO new_constraint` for constraints (DB2 11.5+) | **Supported But Version-Dependent** | Support added in DB2 11.5 for z/OS and 11.5.4 for LUW; older versions not supported |
 | **Snowflake** | `ALTER TABLE table_name RENAME CONSTRAINT old_name TO new_name` | **Supported** | Native support similar to PostgreSQL syntax |
 | **SAP HANA** | `RENAME CONSTRAINT old_name TO new_name` on table | **Supported** | Uses `ALTER TABLE table_name RENAME CONSTRAINT` syntax |
-| **Jet (MS Access)** | Not supported | **Not Supported** | MS Access has very limited ALTER TABLE capabilities; no constraint renaming |
 | **Redshift** | `ALTER TABLE table_name RENAME CONSTRAINT old_name TO new_name` | **Supported** | PostgreSQL-compatible syntax; supported in recent versions |
 
 ### Detailed Provider Analysis
@@ -111,14 +110,6 @@ The following table summarizes the capabilities of each supported database provi
   - Part of standard ALTER TABLE syntax
 - **Auto-rename on table rename**: No
 
-#### Jet (MS Access)
-- **Syntax**: N/A
-- **Support**: Not supported
-- **Considerations**: 
-  - MS Access has minimal DDL capabilities
-  - No programmatic constraint renaming
-- **Auto-rename on table rename**: N/A
-
 #### Redshift
 - **Syntax**: `ALTER TABLE table_name RENAME CONSTRAINT old_name TO new_name`
 - **Support**: Full support (added in recent versions)
@@ -131,14 +122,14 @@ The following table summarizes the capabilities of each supported database provi
 
 - **Fully Supported**: 7 providers (SQL Server, PostgreSQL, Oracle, Snowflake, SAP HANA, Redshift, and conditionally DB2)
 - **Supported with Limitations**: 1 provider (MySQL - RENAME INDEX syntax exists but primary keys are typically named "PRIMARY" and cannot be renamed if foreign keys reference them)
-- **Not Supported**: 3 providers (SQLite, Firebird, Jet)
+- **Not Supported**: 2 providers (SQLite, Firebird)
 
 ## Recommendations
 
 ### Option 1: Implement with Compatibility Checking
 Implement `Rename.PrimaryKey()` syntax that:
 - Generates appropriate SQL for providers that support it
-- Throws a `DatabaseOperationNotSupportedException` for unsupported providers (SQLite, Firebird, Jet)
+- Throws a `DatabaseOperationNotSupportedException` for unsupported providers (SQLite, Firebird)
 - Uses `RENAME INDEX` for MySQL 5.7+ with validation for foreign key constraints
 - Checks version requirements for DB2
 

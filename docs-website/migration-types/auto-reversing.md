@@ -353,6 +353,7 @@ public class CustomReversalLogic : AutoReversingMigration
 2. **Don't assume auto-reversal works for custom SQL** - it only applies to fluent API operations
 3. **Don't forget to test rollback scenarios** even with auto-reversible migrations
 4. **Don't mix auto-reversal with partial custom Down() methods** without understanding the interaction
+5. **Don't use conditional DDL such as `IfNotExists()` or `IfExists()`** because FluentMigrator cannot know whether the database applied or skipped the operation
 
 ## Complex Scenarios
 
