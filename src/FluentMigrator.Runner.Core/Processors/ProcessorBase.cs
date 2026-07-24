@@ -22,6 +22,7 @@ using System.Data;
 using System.IO;
 
 using FluentMigrator.Expressions;
+using FluentMigrator.Generation;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Logging;
 
@@ -38,6 +39,9 @@ namespace FluentMigrator.Runner.Processors
     {
         /// <inheritdoc />
         protected internal readonly IMigrationGenerator Generator;
+
+        /// <inheritdoc />
+        public IQuoter Quoter => Generator.Quoter;
 
         /// <inheritdoc />
 #pragma warning disable 612

@@ -70,7 +70,7 @@ namespace FluentMigrator.Runner.Processors.Snowflake
         /// <summary>
         /// Gets the quoter for Snowflake SQL.
         /// </summary>
-        public SnowflakeQuoter Quoter { get; }
+        public new SnowflakeQuoter Quoter { get; }
 
         /// <inheritdoc />
         public override void Process(PerformDBOperationExpression expression)

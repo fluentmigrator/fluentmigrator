@@ -57,7 +57,7 @@ namespace FluentMigrator.Runner.Processors.DB2
         public override IList<string> DatabaseTypeAliases { get; } = new List<string> { ProcessorIdConstants.IbmDb2, ProcessorIdConstants.DB2 };
 
         /// <inheritdoc />
-        public IQuoter Quoter { get; set; }
+        public new IQuoter Quoter { get; set; }
 
         /// <inheritdoc />
         public override bool ColumnExists(string schemaName, string tableName, string columnName)

@@ -64,7 +64,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         /// <summary>
         /// Gets the quoter for SQL Server.
         /// </summary>
-        public IQuoter Quoter { get; }
+        public new IQuoter Quoter { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SqlServerProcessor"/> class.

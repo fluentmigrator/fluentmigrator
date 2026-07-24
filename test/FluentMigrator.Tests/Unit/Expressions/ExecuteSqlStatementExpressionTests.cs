@@ -16,8 +16,11 @@
 //
 #endregion
 
+using System.Collections.Generic;
+
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
+using FluentMigrator.Runner.Generators.Generic;
 using FluentMigrator.Tests.Helpers;
 
 using Moq;
@@ -54,6 +57,27 @@ namespace FluentMigrator.Tests.Unit.Expressions
         }
 
         [Test]
+        public void ExecutesTheStatementWithTypedParametersUsingProcessorQuoter()
+        {
+            var expression = new ExecuteSqlStatementExpression()
+            {
+                SqlStatement = "SELECT 1 WHERE Count = $[Count] AND IsActive = $[IsActive]",
+                Parameters = new Dictionary<string, object>
+                {
+                    ["Count"] = 42,
+                    ["IsActive"] = true,
+                },
+            };
+
+            var processor = new Mock<IMigrationProcessor>();
+            processor.SetupGet(x => x.Quoter).Returns(new GenericQuoter());
+            processor.Setup(x => x.Execute("SELECT 1 WHERE Count = 42 AND IsActive = 1")).Verifiable();
+
+            expression.ExecuteWith(processor.Object);
+            processor.Verify();
+        }
+
+        [Test]
         public void ToStringIsDescriptive()
         {
             var expression = new ExecuteSqlStatementExpression() { SqlStatement = "INSERT INTO BLAH" };
@@ -68,3 +92,4 @@ namespace FluentMigrator.Tests.Unit.Expressions
         }
     }
 }
+
