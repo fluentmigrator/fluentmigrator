@@ -60,6 +60,18 @@ namespace FluentMigrator.Tests.Unit.Expressions
         }
 
         [Test]
+        public void ReverseThrowsWhenCreateIsConditional()
+        {
+            var expression = new CreateTableExpression
+            {
+                TableName = "table1",
+                IfNotExists = true
+            };
+
+            Should.Throw<System.NotSupportedException>(() => expression.Reverse());
+        }
+
+        [Test]
         public void WhenDefaultSchemaConventionIsAppliedAndSchemaIsNotSetThenSchemaShouldBeNull()
         {
             var expression = new CreateTableExpression { TableName = "table1" };
