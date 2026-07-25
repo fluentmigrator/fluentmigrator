@@ -265,22 +265,44 @@ which the seed design below depends on.
 contract is available to a source generator and to the runner without dragging
 in `FluentMigrator.Runner.Core`.
 
-**The signature cannot take `Migration`.** `Migration` and `MigrationBase` live
-in the `FluentMigrator` project, which references `Abstractions`, not the other
-way round. `IInsertExpressionRoot` *is* in `Abstractions`
-(`Builders/Insert/IInsertExpressionRoot.cs`), and it is the better parameter
-anyway: it constrains a seed to data operations, which is what distinguishes a
-seed from a migration, and it is trivial to fake in a unit test.
+**`AddData` takes no parameter at all.** Passing something in was the wrong
+question. The expression roots are not on any interface — they are properties on
+concrete classes, split across two assemblies: `Alter`, `Create`, `Rename`,
+`Insert`, `Schema` and `IfDatabase` on `MigrationBase`, and `Delete`, `Execute`
+and `Update` on `Migration`. `IMigration` itself carries only `ConnectionString`,
+`GetUpExpressions` and `GetDownExpressions`, so a seed handed an `IMigration`
+would have nothing to author against. Narrowing to `IInsertExpressionRoot` is
+the opposite error: a seed that truncates and reloads, or upserts, needs
+`Delete`, `Update` and `Execute` too, and *how* a seed lands its rows is its own
+business.
+
+`Migration.Up()` already solves this by inheritance rather than by parameter.
+Seeds do the same:
 
 ```csharp
-namespace FluentMigrator;
-
-public interface ISeed
+// FluentMigrator.Abstractions — depends only on IMigration
+public interface ISeed : IMigration
 {
     int Order { get; }
-    void AddData(IInsertExpressionRoot insert);
+    void AddData();
+}
+
+// FluentMigrator — where the expression roots actually live
+public abstract class Seed : Migration, ISeed
+{
+    public virtual int Order => 0;
+    public abstract void AddData();
+    public sealed override void Up() => AddData();
+    public sealed override void Down() { }
 }
 ```
+
+Deriving from `Seed` gives an author the full surface — `Insert`, `Delete`,
+`Update`, `Execute`, `IfDatabase` — with no new coupling, and `ISeed : IMigration`
+lets the runner stage a seed like any other migration instead of needing a
+parallel execution path. It also retires the pattern this replaces: a seed no
+longer has to be invoked from inside some *other* migration's `Up()` in order to
+borrow its expression surface.
 
 ### Lifecycle: reuse `MigrationStage`, do not invent a scheduler
 
@@ -300,12 +322,50 @@ Seeds are then materialized into the *existing* maintenance pipeline rather than
 run by anything new. This also gives the pivot metadata somewhere real to land:
 the SDK already stamps `Stage=seed` on both seed pivots.
 
-**Ordering has to be a composite key.** `int Order` is only a local sort key.
-Under `FluentMigrator.Net.Sdk.Host`, several modules contribute seeds to one
-database, and two modules independently using `Order = 1` is otherwise
-unresolvable. The effective order is (module index in the target's plan, then
-`Order`, then type name) — the module index comes from the host manifest, which
-is exactly the composition problem that manifest exists to answer.
+**Seeding must also be invocable on its own.** dbt exposes `dbt seed` as a
+first-class command, and the equivalent here is not a new entry point but an
+`IMigrationCommand` named `seed` in `FluentMigrator.Runner.Commands` — at which
+point `dotnet fm seed` exists, and so does the TUI entry, the Aspire dashboard
+button and the MCP tool, because every consumer builds itself from `Discover()`.
+This is the clearest case yet for the Host ADR's central claim. Worth carrying
+across from dbt: a `--select` argument, and a `--full-refresh` that forces
+re-application of seeds the execution facet would otherwise skip.
+
+**Ordering: dependencies, not a global counter.** A single `int Order` is a
+local sort key, and under `FluentMigrator.Net.Sdk.Host` several modules
+contribute seeds to one database, so two modules independently choosing
+`Order = 1` has no answer. Declared dependencies plus a topological sort are the
+better semantics — they express the actual constraint (this lookup table must
+exist before that one references it) instead of a number whose meaning is a
+convention nobody wrote down.
+
+The scope of a dependency has to be the module, though, and that is a
+consequence of composition rather than a preference: a module references its
+peers with `ReferenceOutputAssembly="false"`, precisely so a deployment
+dependency does not become a compile-time one. `DependsOn = [typeof(ZipCodeSeed)]`
+across modules would reintroduce exactly that coupling. So the total order is
+two-level, and both levels already exist:
+
+- **Between modules** — module index in the target's plan, from the host manifest.
+- **Within a module** — topological sort over declared dependencies, ascending;
+  ties broken by `Order`, then by type name, so the result is stable and
+  reviewable rather than incidentally dependent on file enumeration.
+
+Cycles are a build-time diagnostic, not a runtime failure — the generator sees
+the whole graph.
+
+**Parallelism is a separate decision, and a more expensive one than it looks.**
+No-declared-dependencies means *unordered*, which is not the same as
+*concurrent*. A processor holds one connection and one transaction, so genuinely
+parallel seeding needs a connection per seed and forfeits single-transaction
+atomicity for the whole seed set — a real cost right after the connection
+factory work hardened per-connection semantics. dbt parallelizes its DAG through
+the `threads` profile setting and seeds are ordinary DAG nodes, so it gets this
+for free; dbt is also loading into warehouses where each seed is an independent
+bulk load, not participating in one migration transaction. Recommend taking the
+determinism now and treating concurrency as opt-in later, with the atomicity
+trade stated at the point of opt-in. (Worth confirming dbt's exact seed
+concurrency semantics against their docs before citing it as precedent.)
 
 **Seeds need an execution facet, and today's pivots omit one.** The seed pivots
 declare `Stage` but no `Execution`, so the manifest carries none. That is a gap,
@@ -314,6 +374,38 @@ tables — the enum case — are `onChange`, re-applied when the checksum moves.
 `onChange` for seed data is arguably the single most useful thing the `checksum`
 field buys, and it should be the default for `seed-data` with a per-item
 override.
+
+### Layout: what belongs in the path, what belongs in metadata
+
+A C# seed can carry its stage in an attribute. A CSV cannot, so the stage has to
+come from somewhere — and there is a principled line here, worth stating because
+it decides several future questions at once:
+
+> The path expresses **classification** — one value per file, hierarchical.
+> Metadata expresses **relations** — many values, cross-cutting.
+
+By that rule `Seed/<Stage>/Addresses.csv` is fine. It is one value per file, and
+it is a *declared* pivot rather than a revival of the v0.1 directory inference
+this design deleted — you would declare one pivot per stage, or ship it as a
+convention pack (`fluentmigrator-staged`) so projects that want a flat `Seed/`
+keep it. Path supplies the bulk default and per-item metadata overrides it,
+exactly the arrangement `ContentType=Embedded|External` already uses for
+migration scripts.
+
+By the same rule, dependencies must **not** be path-encoded. A layout like
+`Seed/<Stage>/Addresses/Dependencies/ZipCodes.csv` expresses a graph as a tree,
+and the two are not the same shape: the moment a second seed also depends on
+`ZipCodes.csv` you need the file in two places, or a link, and the manifest's
+duplicate-identity check (`FMSDK001`) is right to complain. Dependencies are
+item metadata:
+
+```xml
+<SeedData Update="Seed/AfterAll/Addresses.csv" DependsOn="ZipCodes" />
+```
+
+with the attribute playing the same role for C# seeds. That is also why the
+`AdditionalFiles` finding above matters — a generator reading `DependsOn` off a
+CSV needs the project body's `Update` to reach it, which it now does.
 
 ### Native AOT
 
@@ -350,6 +442,26 @@ The generator reads the enum's members and their `[Display]` values from the
 runtime reflection, and as a bonus the resulting values are declared state the
 manifest can checksum, so a renamed enum member shows up as a reviewable diff
 rather than as silent drift.
+
+**Getting the enum into the compilation: reference it, or link it.** A normal
+assembly reference is enough — a generator reads attributes off referenced
+metadata as happily as off source — and it is the right default when the
+migrations project may depend on the domain assembly. When it may not, and the
+usual reason is wanting migrations to stand alone, `<Compile Include="…/OrderStatus.cs" Link="…" />`
+puts the source in this compilation instead. That normally risks a duplicated
+type in two assemblies, but it is safe *here* on one condition, which the
+generator should enforce: the generated seed emits literal rows and must not
+expose the enum type in its own public surface. Nothing then depends on the two
+copies being the same type.
+
+**Checksum the extracted data, not the file.** This is the wrinkle in combining
+generated seeds with the `onChange` facet. The manifest checksums file bytes, so
+a linked enum's checksum moves when a comment or reformat moves — and a seed
+that re-applies because someone fixed a typo in a doc comment is exactly the
+noise `onChange` exists to avoid. Generated seeds therefore need the generator to
+emit a digest over the *extracted rows* — member name, value, `[Display]` text —
+which the manifest records in place of the source checksum. This is also what
+makes the enum case genuinely incremental rather than approximately so.
 
 ## Lock file
 
