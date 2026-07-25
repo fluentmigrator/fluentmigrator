@@ -11,6 +11,10 @@
     <noWarn>1591</noWarn>
   </PropertyGroup>
   <Import Project="$(MSBuildThisFileDirectory)../../PackageLibrary.props" />
+  <PropertyGroup>
+    <!-- This is a new package with no previously released baseline, so package validation must be disabled until a baseline version exists. -->
+    <EnablePackageValidation>false</EnablePackageValidation>
+  </PropertyGroup>
   <ItemGroup>
     <None Include="..\..\FluentMigrator.snk" Link="FluentMigrator.snk" />
   </ItemGroup>
