@@ -269,5 +269,91 @@ namespace FluentMigrator.Tests.Unit.Builders.Execute
             expression.ExecuteWith(processor.Object);
             processor.Verify();
         }
+
+#pragma warning disable CS0618 // Type or member is obsolete
+        [Test]
+        public void SqlWithLegacyStringParametersConvertsToObjectParameters()
+        {
+            _contextMock.SetupGet(x => x.ServiceProvider).Returns(new Mock<IServiceProvider>().Object);
+
+            var parameters = new Dictionary<string, string> { { "name", "value" } };
+
+            _root.Sql("SELECT $[name]", parameters);
+
+            _expressions.Count.ShouldBe(1);
+            var expression = _expressions.First() as ExecuteSqlStatementExpression;
+            expression.ShouldNotBeNull();
+            expression.SqlStatement.ShouldBe("SELECT $[name]");
+            expression.Parameters.ShouldNotBeNull();
+            expression.Parameters.ShouldContainKeyAndValue("name", "value");
+        }
+
+        [Test]
+        public void SqlWithDescriptionAndLegacyStringParametersConvertsToObjectParameters()
+        {
+            _contextMock.SetupGet(x => x.ServiceProvider).Returns(new Mock<IServiceProvider>().Object);
+
+            var parameters = new Dictionary<string, string> { { "name", "value" } };
+
+            _root.Sql("SELECT $[name]", "description", parameters);
+
+            _expressions.Count.ShouldBe(1);
+            var expression = _expressions.First() as ExecuteSqlStatementExpression;
+            expression.ShouldNotBeNull();
+            expression.Description.ShouldBe("description");
+            expression.Parameters.ShouldNotBeNull();
+            expression.Parameters.ShouldContainKeyAndValue("name", "value");
+        }
+
+        [Test]
+        public void ScriptWithLegacyStringParametersConvertsToObjectParameters()
+        {
+            _contextMock.SetupGet(x => x.ServiceProvider).Returns(new Mock<IServiceProvider>().Object);
+
+            var parameters = new Dictionary<string, string> { { "name", "value" } };
+
+            _root.Script("script.sql", parameters);
+
+            _expressions.Count.ShouldBe(1);
+            var expression = _expressions.First() as ExecuteSqlScriptExpression;
+            expression.ShouldNotBeNull();
+            expression.Parameters.ShouldNotBeNull();
+            expression.Parameters.ShouldContainKeyAndValue("name", "value");
+        }
+
+        [Test]
+        public void EmbeddedScriptWithLegacyStringParametersConvertsToObjectParameters()
+        {
+            var embeddedResourceProviders = new List<IEmbeddedResourceProvider>();
+            var serviceProviderMock = new Mock<IServiceProvider>();
+            serviceProviderMock
+                .Setup(x => x.GetService(typeof(IEnumerable<IEmbeddedResourceProvider>)))
+                .Returns(embeddedResourceProviders);
+            _contextMock.SetupGet(x => x.ServiceProvider).Returns(serviceProviderMock.Object);
+
+            var parameters = new Dictionary<string, string> { { "name", "value" } };
+
+            _root.EmbeddedScript("script.sql", parameters);
+
+            _expressions.Count.ShouldBe(1);
+            var expression = _expressions.First() as ExecuteEmbeddedSqlScriptExpression;
+            expression.ShouldNotBeNull();
+            expression.Parameters.ShouldNotBeNull();
+            expression.Parameters.ShouldContainKeyAndValue("name", "value");
+        }
+
+        [Test]
+        public void SqlWithNullLegacyStringParametersLeavesParametersNull()
+        {
+            _contextMock.SetupGet(x => x.ServiceProvider).Returns(new Mock<IServiceProvider>().Object);
+
+            _root.Sql("SELECT 1", (IDictionary<string, string>)null);
+
+            _expressions.Count.ShouldBe(1);
+            var expression = _expressions.First() as ExecuteSqlStatementExpression;
+            expression.ShouldNotBeNull();
+            expression.Parameters.ShouldBeNull();
+        }
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 }

@@ -35,7 +35,7 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void ReturnsOriginalTextWhenParametersAreNull()
         {
-            SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT $(Foo)", null)
+            SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT $(Foo)", (IDictionary<string, object>)null)
                 .ShouldBe("SELECT $(Foo)");
         }
 
@@ -190,5 +190,32 @@ namespace FluentMigrator.Tests.Unit
             SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT $[Value]", parameters, new GenericQuoter())
                 .ShouldBe("SELECT NULL");
         }
+
+#pragma warning disable CS0618 // Type or member is obsolete
+        [Test]
+        public void LegacyStringDictionaryOverloadReplacesRawToken()
+        {
+            var parameters = new Dictionary<string, string> { ["TablePrefix"] = "App_" };
+
+            SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT * FROM $(TablePrefix)Users", parameters)
+                .ShouldBe("SELECT * FROM App_Users");
+        }
+
+        [Test]
+        public void LegacyStringDictionaryOverloadReplacesSafeTokenWithQuotedLiteral()
+        {
+            var parameters = new Dictionary<string, string> { ["Name"] = "isn't" };
+
+            SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT $[Name]", parameters)
+                .ShouldBe("SELECT 'isn''t'");
+        }
+
+        [Test]
+        public void LegacyStringDictionaryOverloadReturnsOriginalTextWhenParametersAreNull()
+        {
+            SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT $(Foo)", (IDictionary<string, string>)null)
+                .ShouldBe("SELECT $(Foo)");
+        }
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 }
