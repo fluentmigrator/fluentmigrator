@@ -243,13 +243,139 @@ all without introducing an SDK-version × runtime-version matrix.
 
 Open questions before this moves to `implemented`:
 
-- Whether `ISeed` (`int Order`, `void AddData(Migration)`) becomes a real
-  FluentMigrator interface. The `Seed/**/*.cs` pivot classifies it today, but
-  nothing enforces conformance; the samples use dependency-free stubs.
-- `AdditionalFiles` are snapshots of pivot items taken at evaluation time, so
-  body-level `Update` metadata edits do not reflect into the compiler-visible
-  copies. Acceptable at preview; it matters the moment a generator depends on
-  that metadata.
-- Whether the source-model manifest should be committed by convention (the
-  design assumes yes — clean diffs *are* the source control model) or treated
-  purely as a build artifact.
+- The `Seed/**/*.cs` pivot classifies seeds today but nothing enforces
+  conformance, because `ISeed` does not exist yet. Its design is settled and
+  written up below; the implementation is not in this change.
+- The manifest's relationship to a committed baseline is settled (see *Lock
+  file*) but not implemented.
+
+`AdditionalFiles` metadata was an open question here and is now closed:
+moving the `AdditionalFiles` include into `SelectSourceModelConvention` (a
+target, so post-body) as part of the convention fix also made body-level
+`Update` edits visible to source generators. Verified — an
+`<SeedData Update="Seed/seed_customers.csv" ObjectType="reference-data" />` in
+the project body lands in the generated editor config as
+`build_metadata.AdditionalFiles.ObjectType = reference-data`. That matters
+because it means a generator can be *steered per file from the project body*,
+which the seed design below depends on.
+
+## `ISeed`
+
+`ISeed` belongs in `FluentMigrator.Abstractions` alongside `IMigration`, so the
+contract is available to a source generator and to the runner without dragging
+in `FluentMigrator.Runner.Core`.
+
+**The signature cannot take `Migration`.** `Migration` and `MigrationBase` live
+in the `FluentMigrator` project, which references `Abstractions`, not the other
+way round. `IInsertExpressionRoot` *is* in `Abstractions`
+(`Builders/Insert/IInsertExpressionRoot.cs`), and it is the better parameter
+anyway: it constrains a seed to data operations, which is what distinguishes a
+seed from a migration, and it is trivial to fake in a unit test.
+
+```csharp
+namespace FluentMigrator;
+
+public interface ISeed
+{
+    int Order { get; }
+    void AddData(IInsertExpressionRoot insert);
+}
+```
+
+### Lifecycle: reuse `MigrationStage`, do not invent a scheduler
+
+The established usage is a maintenance migration whose `Up()` resolves
+`IEnumerable<ISeed>` and calls each one. dbt generalizes further: seeds are
+invocable at an arbitrary point in the lifecycle. FluentMigrator already has the
+vocabulary for that in `MigrationStage` (`BeforeAll`, `BeforeEach`, `AfterEach`,
+`BeforeProfiles`, `AfterAll`), so the generalization is an attribute, not a
+second execution engine:
+
+```csharp
+[Seed(MigrationStage.AfterAll, Order = 10)]
+public sealed class OrderStatusSeed : ISeed { … }
+```
+
+Seeds are then materialized into the *existing* maintenance pipeline rather than
+run by anything new. This also gives the pivot metadata somewhere real to land:
+the SDK already stamps `Stage=seed` on both seed pivots.
+
+**Ordering has to be a composite key.** `int Order` is only a local sort key.
+Under `FluentMigrator.Net.Sdk.Host`, several modules contribute seeds to one
+database, and two modules independently using `Order = 1` is otherwise
+unresolvable. The effective order is (module index in the target's plan, then
+`Order`, then type name) — the module index comes from the host manifest, which
+is exactly the composition problem that manifest exists to answer.
+
+**Seeds need an execution facet, and today's pivots omit one.** The seed pivots
+declare `Stage` but no `Execution`, so the manifest carries none. That is a gap,
+not a neutral default: test-data seeding is `always`, while lookup/reference
+tables — the enum case — are `onChange`, re-applied when the checksum moves.
+`onChange` for seed data is arguably the single most useful thing the `checksum`
+field buys, and it should be the default for `seed-data` with a per-item
+override.
+
+### Native AOT
+
+Three distinct reflection hazards, each with a compile-time answer:
+
+**Discovery.** `IEnumerable<ISeed>` from DI requires the concrete types to be
+registered. `WithMigrationsIn(assembly)` is `[RequiresUnreferencedCode]`; the
+AOT-safe seam added in 9.0.0 is `ITypeSource`/`WithTypes(…)`. Seeds must go
+through it. The SDK's generator already knows every seed type at compile time —
+the `Seed/**/*.cs` pivot told it — so it can emit the registration:
+`.WithGeneratedSeeds()`. No `Assembly.GetTypes()`, which is the same conclusion,
+for the same reason, that the Host ADR reaches for command discovery.
+
+**CSV seeds.** dbt-style CSV lookup tables become a generated `[Seed]` class per
+file, emitting literal `Insert.IntoTable(…).Row(…)` calls. The CSV is already an
+`AdditionalFile` carrying `ObjectType`/`Stage`, so the generator has everything
+it needs. Runtime CSV parsing is *not* itself an AOT problem, so this stays a
+per-file choice — `SeedLoading=Generated|Runtime` metadata, the same idiom as
+`ContentType=Embedded|External` on migration scripts — because a large seed file
+is better embedded than turned into a million lines of C#.
+
+**The enum + `[Display]` case.** Reading `[Display(Name = …)]` off enum members
+with `GetCustomAttribute` is the genuinely trim-unsafe part: attributes can be
+trimmed away even when the enum itself is rooted. The compile-time equivalent is
+a generator attribute:
+
+```csharp
+[SeedFromEnum(typeof(OrderStatus), Table = "order_statuses")]
+public sealed partial class OrderStatusSeed;
+```
+
+The generator reads the enum's members and their `[Display]` values from the
+*compilation* — where attributes always exist — and emits literal rows. No
+runtime reflection, and as a bonus the resulting values are declared state the
+manifest can checksum, so a renamed enum member shows up as a reviewable diff
+rather than as silent drift.
+
+## Lock file
+
+The manifest plays the `project.deps.json` role: a build output describing what
+was resolved. What is missing is the `packages.lock.json` role — a *committed*
+baseline that a build can be held to. Both should exist, with distinct names and
+distinct lifecycles:
+
+| Artifact | Analogue | Location | Committed |
+|---|---|---|---|
+| `$(MSBuildProjectName).sourcemodel.json` | `project.deps.json` | `bin/` | no |
+| `$(MSBuildProjectName).sourcemodel.lock.json` | `packages.lock.json` | next to the project | yes |
+
+NuGet's knobs map across directly, which is the point — the UX is already
+understood:
+
+| NuGet | Here |
+|---|---|
+| `RestorePackagesWithLockFile` | `GenerateSourceModelLockFile` |
+| `RestoreLockedMode` (CI: fail if the lock would change) | `SourceModelLockedMode` |
+| `--force-evaluate` | `-t:RewriteSourceModelLock` |
+
+This resolves what was the third open question — "commit the manifest or not?"
+— as *both, with different jobs*. It also supplies the missing half of the Host
+ADR's *Schema versioning, applied* section, which calls for "compare current
+against a stored baseline, fail on incompatible removal" applied to the JSON
+manifest as a CI gate: the lock file is that stored baseline. And it is where
+`onChange` semantics become reviewable — a changed view checksum appears in a
+pull request diff instead of only at deploy time.
