@@ -51,7 +51,11 @@ namespace FluentMigrator.Builders.Execute
         /// <inheritdoc />
         public void Sql([StringSyntax("sql")] string sqlStatement)
         {
-            var expression = new ExecuteSqlStatementExpression { SqlStatement = sqlStatement };
+            var expression = new ExecuteSqlStatementExpression
+            {
+                SqlStatement = sqlStatement,
+                SqlScriptTokenProviders = GetSqlScriptTokenProviders(),
+            };
             _context.Expressions.Add(expression);
         }
 
@@ -62,6 +66,7 @@ namespace FluentMigrator.Builders.Execute
             {
                 SqlStatement = sqlStatement,
                 Parameters = parameters,
+                SqlScriptTokenProviders = GetSqlScriptTokenProviders(),
             };
 
             _context.Expressions.Add(expression);
@@ -74,6 +79,7 @@ namespace FluentMigrator.Builders.Execute
             {
                 SqlStatement = sqlStatement,
                 Description = description,
+                SqlScriptTokenProviders = GetSqlScriptTokenProviders(),
             };
 
             _context.Expressions.Add(expression);
@@ -87,6 +93,7 @@ namespace FluentMigrator.Builders.Execute
                 SqlStatement = sqlStatement,
                 Description = description,
                 Parameters = parameters,
+                SqlScriptTokenProviders = GetSqlScriptTokenProviders(),
             };
 
             _context.Expressions.Add(expression);
@@ -99,6 +106,7 @@ namespace FluentMigrator.Builders.Execute
             {
                 SqlScript = pathToSqlScript,
                 Parameters = parameters,
+                SqlScriptTokenProviders = GetSqlScriptTokenProviders(),
             };
 
             _context.Expressions.Add(expression);
@@ -107,7 +115,11 @@ namespace FluentMigrator.Builders.Execute
         /// <inheritdoc />
         public void Script(string pathToSqlScript)
         {
-            var expression = new ExecuteSqlScriptExpression { SqlScript = pathToSqlScript };
+            var expression = new ExecuteSqlScriptExpression
+            {
+                SqlScript = pathToSqlScript,
+                SqlScriptTokenProviders = GetSqlScriptTokenProviders(),
+            };
             _context.Expressions.Add(expression);
         }
 
@@ -139,7 +151,11 @@ namespace FluentMigrator.Builders.Execute
                     $"The caller forgot to configure the service provider with at least one {nameof(IEmbeddedResourceProvider)}");
             }
 
-            var expression = new ExecuteEmbeddedSqlScriptExpression(embeddedResourceProviders) { SqlScript = embeddedSqlScriptName };
+            var expression = new ExecuteEmbeddedSqlScriptExpression(embeddedResourceProviders)
+            {
+                SqlScript = embeddedSqlScriptName,
+                SqlScriptTokenProviders = GetSqlScriptTokenProviders(),
+            };
             _context.Expressions.Add(expression);
 
         }
@@ -158,9 +174,20 @@ namespace FluentMigrator.Builders.Execute
             {
                 SqlScript = embeddedSqlScriptName,
                 Parameters = parameters,
+                SqlScriptTokenProviders = GetSqlScriptTokenProviders(),
             };
 
             _context.Expressions.Add(expression);
+        }
+
+        /// <summary>
+        /// Resolves the registered <see cref="ISqlTokenProvider"/> instances from the
+        /// current migration context's service provider
+        /// </summary>
+        /// <returns>The registered SQL script token providers, or <c>null</c> when none are registered</returns>
+        private IEnumerable<ISqlTokenProvider> GetSqlScriptTokenProviders()
+        {
+            return _context.ServiceProvider.GetService<IEnumerable<ISqlTokenProvider>>();
         }
     }
 }

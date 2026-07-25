@@ -78,6 +78,160 @@ namespace FluentMigrator.Tests.Unit.Expressions
         }
 
         [Test]
+        public void ExecutesTheStatementWithWellKnownTokens()
+        {
+            var tokenProvider = new Mock<ISqlTokenProvider>();
+            tokenProvider
+                .Setup(x => x.GetTokens())
+                .Returns(new Dictionary<string, string> { { "DefaultSchema", "dbo" } });
+
+            var expression = new ExecuteSqlStatementExpression()
+            {
+                SqlStatement = "ALTER TABLE $(DefaultSchema).BLAH ADD COLUMN Foo INT",
+                SqlScriptTokenProviders = new[] { tokenProvider.Object },
+            };
+
+            var processor = new Mock<IMigrationProcessor>();
+            processor.Setup(x => x.Execute("ALTER TABLE dbo.BLAH ADD COLUMN Foo INT")).Verifiable();
+
+            expression.ExecuteWith(processor.Object);
+            processor.Verify();
+        }
+
+        [Test]
+        public void ParametersOverrideWellKnownTokensWithTheSameName()
+        {
+            var tokenProvider = new Mock<ISqlTokenProvider>();
+            tokenProvider
+                .Setup(x => x.GetTokens())
+                .Returns(new Dictionary<string, string> { { "DefaultSchema", "dbo" } });
+
+            var expression = new ExecuteSqlStatementExpression()
+            {
+                SqlStatement = "ALTER TABLE $(DefaultSchema).BLAH ADD COLUMN Foo INT",
+                Parameters = new Dictionary<string, object> { { "DefaultSchema", "tenant1" } },
+                SqlScriptTokenProviders = new[] { tokenProvider.Object },
+            };
+
+            var processor = new Mock<IMigrationProcessor>();
+            processor.Setup(x => x.Execute("ALTER TABLE tenant1.BLAH ADD COLUMN Foo INT")).Verifiable();
+
+            expression.ExecuteWith(processor.Object);
+            processor.Verify();
+        }
+
+        [Test]
+        public void ExecutesTheStatementWithWellKnownTokensUsingQuotedTokenSyntax()
+        {
+            var tokenProvider = new Mock<ISqlTokenProvider>();
+            tokenProvider
+                .Setup(x => x.GetTokens())
+                .Returns(new Dictionary<string, string> { { "DefaultSchema", "te'nant" } });
+
+            var expression = new ExecuteSqlStatementExpression()
+            {
+                SqlStatement = "SELECT * FROM Users WHERE SchemaName = $[DefaultSchema]",
+                SqlScriptTokenProviders = new[] { tokenProvider.Object },
+            };
+
+            var processor = new Mock<IMigrationProcessor>();
+            processor.Setup(x => x.Execute("SELECT * FROM Users WHERE SchemaName = 'te''nant'")).Verifiable();
+
+            expression.ExecuteWith(processor.Object);
+            processor.Verify();
+        }
+
+        [Test]
+        public void ParametersOverrideWellKnownTokensWithTheSameNameUsingQuotedTokenSyntax()
+        {
+            var tokenProvider = new Mock<ISqlTokenProvider>();
+            tokenProvider
+                .Setup(x => x.GetTokens())
+                .Returns(new Dictionary<string, string> { { "DefaultSchema", "dbo" } });
+
+            var expression = new ExecuteSqlStatementExpression()
+            {
+                SqlStatement = "SELECT * FROM Users WHERE SchemaName = $[DefaultSchema]",
+                Parameters = new Dictionary<string, object> { { "DefaultSchema", "tenant1" } },
+                SqlScriptTokenProviders = new[] { tokenProvider.Object },
+            };
+
+            var processor = new Mock<IMigrationProcessor>();
+            processor.Setup(x => x.Execute("SELECT * FROM Users WHERE SchemaName = 'tenant1'")).Verifiable();
+
+            expression.ExecuteWith(processor.Object);
+            processor.Verify();
+        }
+
+        [Test]
+        public void MergesTokensFromMultipleProvidersWithLaterProvidersTakingPrecedence()
+        {
+            var firstTokenProvider = new Mock<ISqlTokenProvider>();
+            firstTokenProvider
+                .Setup(x => x.GetTokens())
+                .Returns(new Dictionary<string, string> { { "DefaultSchema", "dbo" }, { "TablePrefix", "tbl_" } });
+
+            var secondTokenProvider = new Mock<ISqlTokenProvider>();
+            secondTokenProvider
+                .Setup(x => x.GetTokens())
+                .Returns(new Dictionary<string, string> { { "DefaultSchema", "tenant1" } });
+
+            var expression = new ExecuteSqlStatementExpression()
+            {
+                SqlStatement = "ALTER TABLE $(DefaultSchema).$(TablePrefix)BLAH ADD COLUMN Foo INT",
+                SqlScriptTokenProviders = new[] { firstTokenProvider.Object, secondTokenProvider.Object },
+            };
+
+            var processor = new Mock<IMigrationProcessor>();
+            processor.Setup(x => x.Execute("ALTER TABLE tenant1.tbl_BLAH ADD COLUMN Foo INT")).Verifiable();
+
+            expression.ExecuteWith(processor.Object);
+            processor.Verify();
+        }
+
+        [Test]
+        public void IgnoresNullTokenProvidersAndNullTokenMaps()
+        {
+            var nullTokenMapProvider = new Mock<ISqlTokenProvider>();
+            nullTokenMapProvider
+                .Setup(x => x.GetTokens())
+                .Returns((IDictionary<string, string>)null);
+
+            var tokenProvider = new Mock<ISqlTokenProvider>();
+            tokenProvider
+                .Setup(x => x.GetTokens())
+                .Returns(new Dictionary<string, string> { { "DefaultSchema", "dbo" } });
+
+            var expression = new ExecuteSqlStatementExpression()
+            {
+                SqlStatement = "ALTER TABLE $(DefaultSchema).BLAH ADD COLUMN Foo INT",
+                SqlScriptTokenProviders = new ISqlTokenProvider[] { null, nullTokenMapProvider.Object, tokenProvider.Object },
+            };
+
+            var processor = new Mock<IMigrationProcessor>();
+            processor.Setup(x => x.Execute("ALTER TABLE dbo.BLAH ADD COLUMN Foo INT")).Verifiable();
+
+            expression.ExecuteWith(processor.Object);
+            processor.Verify();
+        }
+
+        [Test]
+        public void ExecutesTheStatementUnchangedWhenNoTokenProvidersAndNoParameters()
+        {
+            var expression = new ExecuteSqlStatementExpression()
+            {
+                SqlStatement = "SELECT '$(NotAToken)' FROM $[AlsoNotAToken]",
+                SqlScriptTokenProviders = new ISqlTokenProvider[0],
+            };
+
+            var processor = new Mock<IMigrationProcessor>();
+            processor.Setup(x => x.Execute("SELECT '$(NotAToken)' FROM $[AlsoNotAToken]")).Verifiable();
+
+            expression.ExecuteWith(processor.Object);
+            processor.Verify();
+        }
+
+        [Test]
         public void ToStringIsDescriptive()
         {
             var expression = new ExecuteSqlStatementExpression() { SqlStatement = "INSERT INTO BLAH" };
@@ -92,4 +246,3 @@ namespace FluentMigrator.Tests.Unit.Expressions
         }
     }
 }
-
