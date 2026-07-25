@@ -24,6 +24,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - New ADR: Connection Management (`adr/proposed/ConnectionManagement.md`)
 
+### New
+
+- Preview MSBuild project SDKs for a source-controlled database model:
+  - `FluentMigrator.Net.Sdk` (0.4.0) builds a migrations project as a normal class library and additionally emits a deterministic, dialect-neutral manifest (`$(MSBuildProjectName).sourcemodel.json`) describing the database object model. Layout is declared through pivots rather than inferred, with built-in `fluentmigrator` and `flyway` convention packs that normalize onto one execution-facet vocabulary (`once`/`onChange`/`always`), so manifests from different layouts stay comparable
+  - `FluentMigrator.Net.Sdk.Host` (0.1.0) composes module projects into a host: deployment targets in declared order (linted against the module reference graph), a `FluentMigrator.Runner.*` package resolved per target from its dialect, and the hosting contexts those commands are exposed through — emitted as `$(MSBuildProjectName).host.json`
+  - Both SDKs are versioned independently of the runtime libraries and are deliberately not part of `FluentMigrator.sln`, since CI packs the solution with an overriding `-p:Version`. Build and test them with `test/FluentMigrator.Net.Sdk.SmokeTests/smoke-test.sh`; samples are under `samples/FluentMigrator.Net.Sdk/`
+
 ### Changed
 
 - SAP HANA support now uses the `Sap.Data.Hana.Net.v8.0` and `Sap.Data.Hana.Net.v10.0` NuGet packages, and HANA registration was removed from the .NET Framework console and MSBuild runners.
@@ -35,6 +42,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Sherif-Ahmed (PR #2268)
 - fubar-coder
 - jzabroski
+
+### Documentation
+
+- New ADR: FluentMigrator.Runner.Host — a general command-hosting framework (`adr/proposed/FluentMigrator-Host-Design.md`)
+- New ADR: A source-controlled database model (`adr/proposed/SourceControlledDatabaseModel.md`)
 
 ## 3.2.1
 

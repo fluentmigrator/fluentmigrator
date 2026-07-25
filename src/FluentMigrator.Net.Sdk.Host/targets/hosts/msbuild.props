@@ -1,0 +1,34 @@
+<Project>
+
+  <!--
+    FluentMigrator.MSBuild. A shipping package, so the full mode matrix
+    applies — identical to FluentMigrator.Net.Sdk's implicit FluentMigrator
+    reference, deliberately, so one rule covers both SDKs:
+
+      $(MsBuildHostContextVersion) + CPM      -> VersionOverride (plain Version is NU1008)
+      $(MsBuildHostContextVersion), no CPM    -> classic versioned reference
+      unset + CPM                             -> versionless; Directory.Packages.props supplies it
+      unset, no CPM                           -> no reference; manifest metadata only
+  -->
+
+  <ItemGroup>
+    <HostContextDefinition Include="msbuild"
+                           Package="FluentMigrator.MSBuild"
+                           ReferenceKind="package"
+                           Invocation="task-properties"
+                           Availability="shipping"
+                           Discovery="false"
+                           Version="$(MsBuildHostContextVersion)"
+                           Description="ITask properties as structured arguments; the only context with no ILogger path." />
+  </ItemGroup>
+
+  <ItemGroup Condition="$(_HostContextSelection.Contains(';msbuild;'))">
+    <PackageReference Include="FluentMigrator.MSBuild"
+                      Condition="'$(ManagePackageVersionsCentrally)' == 'true' and '$(MsBuildHostContextVersion)' == ''" />
+    <PackageReference Include="FluentMigrator.MSBuild" VersionOverride="$(MsBuildHostContextVersion)"
+                      Condition="'$(ManagePackageVersionsCentrally)' == 'true' and '$(MsBuildHostContextVersion)' != ''" />
+    <PackageReference Include="FluentMigrator.MSBuild" Version="$(MsBuildHostContextVersion)"
+                      Condition="'$(ManagePackageVersionsCentrally)' != 'true' and '$(MsBuildHostContextVersion)' != ''" />
+  </ItemGroup>
+
+</Project>

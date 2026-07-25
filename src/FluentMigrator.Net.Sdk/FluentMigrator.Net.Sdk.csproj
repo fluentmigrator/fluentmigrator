@@ -1,0 +1,49 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Packaging-only project. The SDK itself is the Sdk/, targets/ and tasks/
+    payload; this csproj exists to produce the .nupkg. Pack with:
+
+      dotnet pack src/FluentMigrator.Net.Sdk -c Release
+
+    Versioned independently of the FluentMigrator runtime libraries: an
+    MSBuild project SDK is consumed by version in the Sdk attribute
+    (or global.json's msbuild-sdks), not by the runner's release train.
+    Global.props is deliberately not imported — this package carries no
+    assembly, so the shared assembly-level metadata there does not apply.
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Version>0.4.0</Version>
+    <PackageId>FluentMigrator.Net.Sdk</PackageId>
+    <PackageType>MSBuildSdk</PackageType>
+    <Description>MSBuild project SDK providing a dialect-neutral SQL source control model for csproj projects containing .sql files. Builds a deterministic source model manifest describing the database object model.</Description>
+    <PackageTags>msbuild;sdk;sql;database;source-control;fluentmigrator</PackageTags>
+    <Product>FluentMigrator</Product>
+    <Company>FluentMigrator Project</Company>
+    <Authors>FluentMigrator Project</Authors>
+    <Copyright>FluentMigrator project 2008-2026</Copyright>
+    <PackageProjectUrl>https://github.com/fluentmigrator/fluentmigrator/wiki</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/fluentmigrator/fluentmigrator.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>logo.png</PackageIcon>
+
+    <IsPackable>true</IsPackable>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    <NoWarn>$(NoWarn);NU5128</NoWarn>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="Sdk/**" Pack="true" PackagePath="Sdk/" />
+    <None Include="targets/**" Pack="true" PackagePath="targets/" />
+    <None Include="tasks/**" Pack="true" PackagePath="tasks/" />
+    <None Include="README.md" Pack="true" PackagePath="/" />
+    <None Include="../../docs/logo.png" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+</Project>

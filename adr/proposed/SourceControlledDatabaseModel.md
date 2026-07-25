@@ -1,0 +1,247 @@
+# A source-controlled database model — `FluentMigrator.Net.Sdk`
+
+## Context
+
+FluentMigrator describes *change* extremely well and *state* not at all. A
+repository of migrations tells you how the database got where it is; nothing in
+the build tells you what is actually declared to exist. Everything downstream
+that wants declared state — drift detection, migration testing, an MCP server
+diffing source control against a live database, an Aspire dashboard listing
+what a deployment will touch — has to either reimplement discovery or read the
+database it was supposed to be checking.
+
+Meanwhile the layout question keeps being answered privately. ReadyRoll,
+RoundhousE, Flyway and SSDT are all *the same idea* — SQL files in a directory
+tree, classified by where they sit — with four incompatible conventions and
+four bespoke runners. A team adopting FluentMigrator alongside any of them has
+no shared vocabulary for "this file is a view, that one is a versioned
+migration."
+
+## Decision
+
+Ship an MSBuild project SDK whose build produces, alongside the ordinary class
+library, a deterministic, dialect-neutral manifest of the database object
+model: `$(MSBuildProjectName).sourcemodel.json`.
+
+```xml
+<Project Sdk="FluentMigrator.Net.Sdk/0.4.0">
+  <PropertyGroup>
+    <DatabaseDialect>sqlserver</DatabaseDialect>
+    <DefaultSchema>dbo</DefaultSchema>
+    <FluentMigratorVersion>7.1.0</FluentMigratorVersion>
+  </PropertyGroup>
+</Project>
+```
+
+The project is a *real* class library: migrations, maintenance migrations and
+seed implementations compile into the assembly through the normal `Compile`
+glob; scripts and data embed as resources. The manifest classifies rather than
+duplicates them.
+
+A companion SDK, `FluentMigrator.Net.Sdk.Host`, composes module projects into a
+deployable host and is covered in
+[`FluentMigrator-Host-Design.md`](FluentMigrator-Host-Design.md).
+
+## Three levels, named precisely because they are different things
+
+1. **Provider model** — the contract everything plugs into: pivot items
+   carrying classification metadata (`ObjectType`, `NamePolicy`, `Execution`,
+   `Stage`, `UniqueIdentity`, …), the `CollectSourceModel` hook, and the open
+   manifest vocabulary. In the ADO.NET sense of the term.
+2. **Provider** — the content kind: `sql` (default), future `dbt`, `lookml`,
+   `poco`. *Not* `filesystem` — that names the transport, and everything in an
+   MSBuild project lives on the filesystem; what distinguishes this provider is
+   that its sources are SQL text.
+3. **Convention** — a layout dialect *within* a provider: how paths and
+   filenames map to the object model.
+
+The proof that these axes are orthogonal: ReadyRoll/SCA, RoundhousE, Flyway and
+SSDT are all the *same provider* with different conventions.
+
+| Tool | Layout signature | As a convention pack |
+|---|---|---|
+| **fluentmigrator** (default) | `Migrations/`, `Schema/<Type>/<schema>.<object>.sql`, `Tools/` | built-in |
+| **flyway** | flat `sql/`, `V__`/`U__`/`R__`/`B__` prefixes, `callback/` | built-in (`NamePolicy=FlywayPrefixed` parses version + description) |
+| **readyroll / sca** | `Deploy-Changes/` numbered + `Programmable-Objects/<Type>/dbo.usp_X.sql` | roadmap — `Programmable-Objects` is `SchemaDotObject` verbatim |
+| **roundhouse** | folder-per-pipeline-stage (`alterations/`, `views/`, `permissions/`, `runAfterOtherAnyTimeScripts/`) | roadmap — folder → `Execution`/`Stage` metadata map |
+| **ssdt** | schema-first tree `dbo/Tables/Users.sql`, everything state-based | roadmap — a `SchemaFromPath` NamePolicy |
+
+The unifying observation across all five: every artifact classifies on a
+normalized **execution facet** — `once` (journaled, ordered: V migrations,
+`alterations/`, `Deploy-Changes/`, `Migrations/*.cs`), `onChange` (idempotent,
+checksum-driven: `R__`, `Programmable-Objects/`, `views|sprocs|functions/`,
+`Schema/*`), or `always` (staged: callbacks, `permissions/`, maintenance).
+Convention packs declare it per pivot; the manifest carries it in
+`properties.execution`/`properties.stage`; the `checksum` field is what makes
+`onChange` mechanically real. Two repositories in different conventions
+therefore produce *comparable manifests* — which is what lets downstream
+tooling stay convention-agnostic.
+
+## Layout pivots
+
+Analogous in spirit to [.NET artifacts-output pivots](https://learn.microsoft.com/en-us/dotnet/core/sdk/artifacts-output),
+but for inputs: **one fixed, deterministic layout** — a single glob per role
+carrying its own classification metadata — rather than inference over multiple
+possible matches. Extension means declaring more pivots, never teaching the SDK
+new heuristics. The full table is in the package README; the shape is:
+
+```
+Maintenance/**/*.cs                       maintenance migrations   (compiled)
+Migrations/**/*.cs                        migrations               (compiled)
+Migrations/Data/**/*.csv                  data loaded by migrations (embedded)
+Migrations/Scripts/**/*.sql               scripts run by migrations (embedded,
+                                          or copied when ContentType=External)
+Schema/{Functions,StoredProcedures,Triggers,Views,Types}/<schema>.<object>.sql
+                                          programmable objects     (modeled)
+Seed/**/*.{cs,csv}                        seed implementations and data
+Tools/CreateDatabase.sql                  creates the database container
+Tools/DatabaseSchema.sql                  baseline: transitive closure
+```
+
+There is deliberately **no `Schema/Tables` pivot**: tables evolve through
+migrations; `Schema/` holds idempotently re-creatable programmable objects.
+
+The v0.1 directory-name inference (alias tables, singularization) was deleted,
+not deprecated. Classification is pivot metadata; the only parsing the task does
+is the `SchemaDotObject` filename policy.
+
+## Consequences and constraints discovered while implementing
+
+Three MSBuild evaluation-order constraints shape the design, and each one, if
+ignored, fails *silently* — which for a document whose value is being committed
+and diffed is the one unacceptable failure mode.
+
+**Pivots must be declared before the project body; convention selection cannot
+be.** Body-level edits like `<MigrationScript Update="…" ContentType="External" />`
+require the item to already exist, so pivots are declared in props. But
+`$(SourceModelConvention)` is naturally set *in* that body, after the props
+have been evaluated — so it cannot be an import condition without silently
+producing an empty model. Resolution: import every built-in pack, stamp each
+item with `Convention` metadata, and filter the unselected packs out at build
+time. This is how the .NET SDK handles `EnableDefaultCompileItems`, for exactly
+the same reason. Custom packs are imported by path from
+`$(CustomSourceModelConventionPacks)`, which — being read at import time — must
+be set in `Directory.Build.props` or as a global property.
+
+**Properties that derive from other body-settable properties must resolve at
+target time.** `$(VersionTableSchema)` falls back to `$(DefaultSchema)`; resolved
+in props it captures the empty pre-body value, and the host manifest ends up
+with an empty schema. It is resolved in the targets instead.
+
+**A timestamp-based up-to-date check cannot see a deleted input.** Remove a view
+from `Schema/` and every surviving input is still older than the manifest, so
+the target is skipped and the manifest keeps describing an object that no longer
+exists. The manifest target's `Inputs` therefore include a stamp file whose
+*content* is the input list, written with `WriteOnlyWhenDifferent`, so the set
+changing — additions and removals alike — invalidates the manifest without
+giving up incrementality.
+
+## Manifest format (v1)
+
+```json
+{
+  "manifestVersion": 1,
+  "project": "AdventureLite",
+  "dialect": "sqlserver",
+  "convention": "fluentmigrator",
+  "defaultSchema": "dbo",
+  "role": "root",
+  "providers": ["sql"],
+  "objects": [
+    {
+      "provider": "sql",
+      "type": "view",
+      "schema": "sales",
+      "name": "open_orders",
+      "path": "Schema/Views/sales.open_orders.sql",
+      "checksum": "sha256:…",
+      "properties": {"execution": "onChange"}
+    }
+  ]
+}
+```
+
+Determinism is a design requirement: objects sorted (type, schema, name, path),
+lowercase hex, `\n` line endings, rewritten only on change. `type` is an open
+vocabulary and `properties` an open bag, so future providers need no schema
+change. `dependsOn` deliberately does not exist in v1 rather than existing and
+lying — populating it is a per-dialect parsing problem (see below).
+
+## Alternatives considered
+
+**A separate `.sqlproj`-style project type.** Rejected: SSDT's model requires
+its own project system, its own build, and its own tooling story, and the whole
+point here is that a migrations project is already a class library. Layering on
+`Microsoft.NET.Sdk` resolves in-box with no `global.json` SDK pinning.
+
+**A compiled MSBuild task assembly.** Rejected for v1 in favour of an inline
+task via `RoslynCodeTaskFactory`: no bootstrap problem, and it runs under both
+Framework MSBuild (Visual Studio) and the dotnet CLI. The cost is a
+conservative dialect — no LINQ, no `System.Text.Json` — to stay inside the
+factory's default reference set on both runtimes. It graduates to a compiled
+assembly when dependency extraction lands.
+
+**Inferring classification from directory names.** Rejected — this was the v0.1
+design. Heuristics are unbounded, undiscoverable and untestable; pivot metadata
+is none of those.
+
+## Roadmap
+
+- **New object kinds** (sequences, RLS policies, Snowflake stages/pipes):
+  declare a pivot — `<SqlObject Include="Schema/Sequences/**/*.sql"
+  ObjectType="sequence" NamePolicy="SchemaDotObject" UniqueIdentity="true" />`
+  — no SDK change.
+- **dbt** (`FluentMigrator.Net.Sdk.Dbt`): a provider package declaring its own
+  pivots (`models/**/*.yml`, `models/**/*.sql` → `type=model|source|seed|test`)
+  and a target hooked `BeforeTargets="CollectSourceModel"` mapping them into
+  `SourceModelFile` with `Provider=dbt`. The manifest task never changes.
+  **LookML** (`…Sdk.LookML`) is the same shape.
+- **Dependency extraction**: per-dialect parsing of view/procedure bodies,
+  emitting object references, topologically ordered. Requires graduating the
+  inline task to a compiled assembly.
+- **An `ISchemaProvider` adapter over `.sourcemodel.json`** gives an MCP server
+  a declared-state source to diff against live snapshots — drift between
+  *source control* and *database*, not just database-to-database.
+
+### The longer arc, in dependency order
+
+1. The source-model and host manifests are a proto-metadata layer — checksummed
+   declared state per version.
+2. That makes migration testing tractable, because a migration's implicit
+   world-state assumption becomes an assertable fixture ("given the manifest at
+   version N, applying M yields manifest N+1") instead of a full database.
+3. An Atlan-style unified metadata layer is the same idea with an org-wide
+   registry as the fixture store, letting tests assert *partial* world-state
+   facts.
+4. At which point dbt-style declarative models and EasyMigrator-style
+   POCO-as-schema are just additional providers — a `Provider=poco` pivot whose
+   "source files" are types the Roslyn generator reads, diffed against declared
+   state to synthesize migrations.
+
+The open `type` vocabulary, open `properties` bag, and provider seam exist so
+none of these require a manifest v2.
+
+## Status
+
+Proposed. Implemented as a preview (`0.4.0`) under
+[`src/FluentMigrator.Net.Sdk`](../../src/FluentMigrator.Net.Sdk), with samples
+under `samples/FluentMigrator.Net.Sdk/` and a build-level test suite at
+`test/FluentMigrator.Net.Sdk.SmokeTests/smoke-test.sh`.
+
+Both SDK projects are deliberately **not** in `FluentMigrator.sln`: CI packs the
+solution with `-p:Version=$(semVer)`, which would override their independent
+`0.x` versions and publish a preview SDK on the runtime libraries' release
+train. Adding them is a release-process decision, not a build one.
+
+Open questions before this moves to `implemented`:
+
+- Whether `ISeed` (`int Order`, `void AddData(Migration)`) becomes a real
+  FluentMigrator interface. The `Seed/**/*.cs` pivot classifies it today, but
+  nothing enforces conformance; the samples use dependency-free stubs.
+- `AdditionalFiles` are snapshots of pivot items taken at evaluation time, so
+  body-level `Update` metadata edits do not reflect into the compiler-visible
+  copies. Acceptable at preview; it matters the moment a generator depends on
+  that metadata.
+- Whether the source-model manifest should be committed by convention (the
+  design assumes yes — clean diffs *are* the source control model) or treated
+  purely as a build artifact.

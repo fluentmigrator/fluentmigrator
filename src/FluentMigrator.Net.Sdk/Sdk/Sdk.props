@@ -1,0 +1,64 @@
+<Project>
+
+  <!--
+    FluentMigrator.Net.Sdk
+    ======================
+    An MSBuild project SDK for a source-controlled database model. The
+    project is a real class library: migrations, maintenance migrations and
+    ISeed implementations compile into the assembly; migration scripts and
+    data files embed as resources; Schema/* programmable objects are modeled
+    and validated. The build additionally produces a deterministic,
+    dialect-neutral manifest ($(MSBuildProjectName).sourcemodel.json).
+  -->
+
+  <PropertyGroup>
+    <UsingFluentMigratorNetSdk>true</UsingFluentMigratorNetSdk>
+    <FluentMigratorNetSdkVersion>0.4.0</FluentMigratorNetSdkVersion>
+  </PropertyGroup>
+
+  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+
+  <PropertyGroup>
+    <TargetFramework Condition="'$(TargetFramework)' == '' and '$(TargetFrameworks)' == ''">netstandard2.0</TargetFramework>
+    <IsPackable Condition="'$(IsPackable)' == ''">false</IsPackable>
+  </PropertyGroup>
+
+  <!--
+    Implicit FluentMigrator reference, Central Package Management aware.
+
+    Modes:
+      - CPM (ManagePackageVersionsCentrally=true): a VERSIONLESS
+        PackageReference is added by default; Directory.Packages.props
+        supplies the version via the normal CPM join at restore. The SDK
+        never needs to know the number. If no PackageVersion entry exists,
+        restore fails with NU1010, whose message says exactly what to add.
+      - CPM + $(FluentMigratorVersion): emitted as VersionOverride (a plain
+        Version under CPM would be error NU1008).
+      - Classic: opt-in by setting $(FluentMigratorVersion).
+
+    Set IncludeFluentMigratorReference=false to suppress in all modes (e.g.
+    a pure source-model project with no migrations assembly).
+
+    Evaluation-order note: item conditions see final property values (items
+    evaluate after all property passes), so these react correctly to
+    properties set in Directory.Packages.props, Directory.Build.props, or
+    the project body.
+  -->
+  <PropertyGroup>
+    <IncludeFluentMigratorReference Condition="'$(IncludeFluentMigratorReference)' == '' and '$(FluentMigratorVersion)' != ''">true</IncludeFluentMigratorReference>
+    <IncludeFluentMigratorReference Condition="'$(IncludeFluentMigratorReference)' == '' and '$(ManagePackageVersionsCentrally)' == 'true'">true</IncludeFluentMigratorReference>
+    <IncludeFluentMigratorReference Condition="'$(IncludeFluentMigratorReference)' == ''">false</IncludeFluentMigratorReference>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(IncludeFluentMigratorReference)' == 'true'">
+    <PackageReference Include="FluentMigrator"
+                      Condition="'$(ManagePackageVersionsCentrally)' == 'true' and '$(FluentMigratorVersion)' == ''" />
+    <PackageReference Include="FluentMigrator" VersionOverride="$(FluentMigratorVersion)"
+                      Condition="'$(ManagePackageVersionsCentrally)' == 'true' and '$(FluentMigratorVersion)' != ''" />
+    <PackageReference Include="FluentMigrator" Version="$(FluentMigratorVersion)"
+                      Condition="'$(ManagePackageVersionsCentrally)' != 'true'" />
+  </ItemGroup>
+
+  <Import Project="$(MSBuildThisFileDirectory)../targets/FluentMigrator.Net.Sdk.Conventions.props" />
+
+</Project>
