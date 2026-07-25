@@ -50,7 +50,7 @@ result to `$(MSBuildProjectName).host.json`. It is the build-time counterpart of
 source model is in [`SourceControlledDatabaseModel.md`](SourceControlledDatabaseModel.md).
 
 ```xml
-<Project Sdk="FluentMigrator.Net.Sdk.Host/0.1.0">
+<Project Sdk="FluentMigrator.Net.Sdk.Host">
   <PropertyGroup>
     <HostContexts>dotnet-cli;aspire</HostContexts>
   </PropertyGroup>

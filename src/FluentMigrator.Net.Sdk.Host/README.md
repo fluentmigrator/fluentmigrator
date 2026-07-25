@@ -11,8 +11,15 @@ button, an MCP tool. Its build output is a single manifest,
 `$(MSBuildProjectName).host.json`, that a runner consumes instead of each front
 door reinventing composition.
 
+Both SDKs ship on the same release train as the FluentMigrator runtime
+libraries and must be pinned to the same version as each other — they share a
+manifest contract (`GetDeploymentModuleInfo`) with no other version
+negotiation. Pin them together in `global.json`; see the
+[`FluentMigrator.Net.Sdk`](https://www.nuget.org/packages/FluentMigrator.Net.Sdk)
+readme.
+
 ```xml
-<Project Sdk="FluentMigrator.Net.Sdk.Host/0.1.0">
+<Project Sdk="FluentMigrator.Net.Sdk.Host">
   <PropertyGroup>
     <HostContexts>dotnet-cli;aspire</HostContexts>
   </PropertyGroup>

@@ -11,9 +11,15 @@
     dialect-neutral manifest ($(MSBuildProjectName).sourcemodel.json).
   -->
 
+  <!--
+    A marker a project or a Directory.Build.targets can test for. There is
+    deliberately no version property alongside it: the payload cannot know
+    the version of the package it was restored from, and a hardcoded number
+    would go stale on the first release. The version lives where it is
+    authoritative — the Sdk attribute, or global.json's msbuild-sdks.
+  -->
   <PropertyGroup>
     <UsingFluentMigratorNetSdk>true</UsingFluentMigratorNetSdk>
-    <FluentMigratorNetSdkVersion>0.4.0</FluentMigratorNetSdkVersion>
   </PropertyGroup>
 
   <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />

@@ -6,36 +6,32 @@
 
       dotnet pack src/FluentMigrator.Net.Sdk -c Release
 
-    Versioned independently of the FluentMigrator runtime libraries: an
-    MSBuild project SDK is consumed by version in the Sdk attribute
-    (or global.json's msbuild-sdks), not by the runner's release train.
-    Global.props is deliberately not imported — this package carries no
-    assembly, so the shared assembly-level metadata there does not apply.
+    Versioned on the runtime libraries' release train, the way
+    Microsoft.NET.Sdk ships with the .NET SDK it belongs to: a project
+    pinning FluentMigrator.Net.Sdk pins one number, and the implicit
+    FluentMigrator reference it emits lines up with it. Hence no <Version>
+    here — Global.props supplies VersionPrefix, and CI's -p:Version wins.
   -->
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Version>0.4.0</Version>
     <PackageId>FluentMigrator.Net.Sdk</PackageId>
     <PackageType>MSBuildSdk</PackageType>
     <Description>MSBuild project SDK providing a dialect-neutral SQL source control model for csproj projects containing .sql files. Builds a deterministic source model manifest describing the database object model.</Description>
     <PackageTags>msbuild;sdk;sql;database;source-control;fluentmigrator</PackageTags>
-    <Product>FluentMigrator</Product>
-    <Company>FluentMigrator Project</Company>
-    <Authors>FluentMigrator Project</Authors>
-    <Copyright>FluentMigrator project 2008-2026</Copyright>
-    <PackageProjectUrl>https://github.com/fluentmigrator/fluentmigrator/wiki</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/fluentmigrator/fluentmigrator.git</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageIcon>logo.png</PackageIcon>
+  </PropertyGroup>
 
-    <IsPackable>true</IsPackable>
+  <Import Project="$(MSBuildThisFileDirectory)../../PackageTool.props" />
+
+  <PropertyGroup>
+    <!-- This package's own README, not the shared docs/README-nuget.md. -->
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <DevelopmentDependency>true</DevelopmentDependency>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
-    <NoWarn>$(NoWarn);NU5128</NoWarn>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <!-- NU5128: no lib/ or ref/ folder, which is exactly right for an MSBuild SDK. -->
+    <NoWarn>$(NoWarn);NU5128</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -43,7 +39,6 @@
     <None Include="targets/**" Pack="true" PackagePath="targets/" />
     <None Include="tasks/**" Pack="true" PackagePath="tasks/" />
     <None Include="README.md" Pack="true" PackagePath="/" />
-    <None Include="../../docs/logo.png" Pack="true" PackagePath="/" />
   </ItemGroup>
 
 </Project>

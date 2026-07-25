@@ -7,14 +7,35 @@ deterministic, dialect-neutral manifest (`$(MSBuildProjectName).sourcemodel.json
 describing the full database object model.
 
 ```xml
-<Project Sdk="FluentMigrator.Net.Sdk/0.4.0">
+<Project Sdk="FluentMigrator.Net.Sdk">
   <PropertyGroup>
     <DatabaseDialect>sqlserver</DatabaseDialect>
     <DefaultSchema>dbo</DefaultSchema>
-    <FluentMigratorVersion>7.1.0</FluentMigratorVersion>
   </PropertyGroup>
 </Project>
 ```
+
+## Versioning
+
+This SDK ships on the same release train as the FluentMigrator runtime
+libraries, the way `Microsoft.NET.Sdk` ships with the .NET SDK it belongs to.
+Pin it once in `global.json` and every project gets it without repeating a
+version:
+
+```json
+{
+  "msbuild-sdks": {
+    "FluentMigrator.Net.Sdk": "9.0.0",
+    "FluentMigrator.Net.Sdk.Host": "9.0.0"
+  }
+}
+```
+
+Use the same version as the `FluentMigrator` packages you reference. Pinning
+inline instead — `<Project Sdk="FluentMigrator.Net.Sdk/9.0.0">` — works too and
+is the right choice for a single project. Because the version matches the
+runtime libraries, the implicit `FluentMigrator` reference this SDK emits (see
+Central Package Management below) lines up with the SDK by construction.
 
 Design rationale is recorded in
 [`adr/proposed/SourceControlledDatabaseModel.md`](https://github.com/fluentmigrator/fluentmigrator/blob/main/adr/proposed/SourceControlledDatabaseModel.md).

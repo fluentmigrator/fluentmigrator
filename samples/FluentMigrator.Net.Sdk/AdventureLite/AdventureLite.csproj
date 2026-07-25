@@ -4,15 +4,16 @@
 
   Real-world form, once the package is on a feed:
 
-    <Project Sdk="FluentMigrator.Net.Sdk/0.4.0">
+    <Project Sdk="FluentMigrator.Net.Sdk">
       <PropertyGroup>
         <DatabaseDialect>sqlserver</DatabaseDialect>
         <DefaultSchema>dbo</DefaultSchema>
-        <FluentMigratorVersion>7.1.0</FluentMigratorVersion>
       </PropertyGroup>
     </Project>
 
-  (version pin optional if declared in global.json under "msbuild-sdks")
+  with the version pinned once in global.json under "msbuild-sdks" — the SDK
+  ships on the FluentMigrator release train, so it is the same version as the
+  FluentMigrator packages the project references.
 
   The migration/seed classes here are deliberately dependency-free stubs:
   the sample exercises the SDK's classification and manifest pipeline, not

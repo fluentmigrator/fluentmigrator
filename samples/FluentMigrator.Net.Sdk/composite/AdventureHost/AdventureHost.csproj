@@ -1,5 +1,6 @@
 <!--
-  Real-world form: <Project Sdk="FluentMigrator.Net.Sdk.Host/0.1.0">
+  Real-world form: <Project Sdk="FluentMigrator.Net.Sdk.Host">
+  (version pinned in global.json under "msbuild-sdks", same as the modules')
 -->
 <Project>
   <Import Project="../../../../src/FluentMigrator.Net.Sdk.Host/Sdk/Sdk.props" />

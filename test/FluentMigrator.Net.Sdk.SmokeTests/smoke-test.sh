@@ -261,19 +261,18 @@ assert_not_contains "$FLY" '"type": "migration"' "non-selected convention's pivo
 # --------------------------------------------------------------------- pack
 
 section "pack"
-dotnet pack src/FluentMigrator.Net.Sdk      -c Release -o "$FEED" -v:minimal
-dotnet pack src/FluentMigrator.Net.Sdk.Host -c Release -o "$FEED" -v:minimal
+# Both SDKs ship on the runtime libraries' release train, so neither carries a
+# <Version> of its own. Packing with an explicit -p:Version, the way CI does,
+# is therefore also the regression test for that: a reintroduced hardcoded
+# version would win over this and the assertions below would name the wrong file.
+PACK_VERSION=9.9.9-smoketest
+dotnet pack src/FluentMigrator.Net.Sdk      -c Release -o "$FEED" -v:minimal -p:Version=$PACK_VERSION
+dotnet pack src/FluentMigrator.Net.Sdk.Host -c Release -o "$FEED" -v:minimal -p:Version=$PACK_VERSION
 ls -la "$FEED"
-if ls "$FEED"/FluentMigrator.Net.Sdk.0.*.nupkg > /dev/null 2>&1; then
-  pass "FluentMigrator.Net.Sdk packs"
-else
-  fail "FluentMigrator.Net.Sdk did not pack"
-fi
-if ls "$FEED"/FluentMigrator.Net.Sdk.Host.0.*.nupkg > /dev/null 2>&1; then
-  pass "FluentMigrator.Net.Sdk.Host packs"
-else
-  fail "FluentMigrator.Net.Sdk.Host did not pack"
-fi
+assert_file "$FEED/FluentMigrator.Net.Sdk.$PACK_VERSION.nupkg" \
+  "FluentMigrator.Net.Sdk packs on the version the build was given"
+assert_file "$FEED/FluentMigrator.Net.Sdk.Host.$PACK_VERSION.nupkg" \
+  "FluentMigrator.Net.Sdk.Host packs on the version the build was given"
 
 # ------------------------------------------------------------------ summary
 

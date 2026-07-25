@@ -24,14 +24,20 @@ library, a deterministic, dialect-neutral manifest of the database object
 model: `$(MSBuildProjectName).sourcemodel.json`.
 
 ```xml
-<Project Sdk="FluentMigrator.Net.Sdk/0.4.0">
+<Project Sdk="FluentMigrator.Net.Sdk">
   <PropertyGroup>
     <DatabaseDialect>sqlserver</DatabaseDialect>
     <DefaultSchema>dbo</DefaultSchema>
-    <FluentMigratorVersion>7.1.0</FluentMigratorVersion>
   </PropertyGroup>
 </Project>
 ```
+
+The SDK ships on the FluentMigrator release train and is pinned in
+`global.json` under `msbuild-sdks`, the way `Microsoft.NET.Sdk` ships with the
+.NET SDK it belongs to. That is not just tidiness: this SDK emits an implicit
+`FluentMigrator` package reference, so a separately-versioned SDK would give a
+project two numbers to reconcile and a matrix to support. One number, and the
+reference it emits lines up by construction.
 
 The project is a *real* class library: migrations, maintenance migrations and
 seed implementations compile into the assembly through the normal `Compile`
@@ -223,15 +229,17 @@ none of these require a manifest v2.
 
 ## Status
 
-Proposed. Implemented as a preview (`0.4.0`) under
+Proposed. Implemented under
 [`src/FluentMigrator.Net.Sdk`](../../src/FluentMigrator.Net.Sdk), with samples
 under `samples/FluentMigrator.Net.Sdk/` and a build-level test suite at
 `test/FluentMigrator.Net.Sdk.SmokeTests/smoke-test.sh`.
 
-Both SDK projects are deliberately **not** in `FluentMigrator.sln`: CI packs the
-solution with `-p:Version=$(semVer)`, which would override their independent
-`0.x` versions and publish a preview SDK on the runtime libraries' release
-train. Adding them is a release-process decision, not a build one.
+Both SDK projects are in `FluentMigrator.sln` and carry no `<Version>` of their
+own, so `VersionPrefix` from `Global.props` and CI's `-p:Version=$(semVer)`
+govern them exactly as they govern the runtime libraries. This is the
+`Microsoft.NET.Sdk` model — an MSBuild SDK ships with the thing it targets —
+and it is the reason the SDK can emit an implicit `FluentMigrator` reference at
+all without introducing an SDK-version × runtime-version matrix.
 
 Open questions before this moves to `implemented`:
 
