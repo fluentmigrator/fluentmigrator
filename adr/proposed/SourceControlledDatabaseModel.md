@@ -292,14 +292,16 @@ Seeds do the same:
 // FluentMigrator.Abstractions — depends only on IMigration
 public interface ISeed : IMigration
 {
-    int Order { get; }
+    int TierOrder { get; }    // tiebreak within a topological tier; see Ordering
+    string? Source { get; }   // provenance; see Provenance
     void AddData();
 }
 
 // FluentMigrator — where the expression roots actually live
 public abstract class Seed : Migration, ISeed
 {
-    public virtual int Order => 0;
+    public virtual int TierOrder => 0;
+    public virtual string? Source => null;
     public abstract void AddData();
     public sealed override void Up() => AddData();
     public sealed override void Down() { }
@@ -313,6 +315,74 @@ parallel execution path. It also retires the pattern this replaces: a seed no
 longer has to be invoked from inside some *other* migration's `Up()` in order to
 borrow its expression surface.
 
+### Lifecycle hooks: partial methods, on the generated class
+
+Zero-cost hooks around a seed's work are worth having, and partial methods are
+the right mechanism — but **not on the shipped `Seed` base class**. A partial
+type cannot span assemblies, so a partial method declared in `FluentMigrator`
+can never be implemented in a consumer's project. The hooks belong on the
+*generated* seed class, which is emitted into the consumer's own compilation:
+
+```csharp
+// generated
+public partial class AddressesSeed : Seed
+{
+    partial void BeforeAddData();
+    partial void AfterAddData();
+
+    public override void AddData()
+    {
+        BeforeAddData();
+        Insert.IntoTable("addresses")./* … generated rows … */;
+        AfterAddData();
+    }
+}
+
+// hand-written, same project, optional
+public partial class AddressesSeed
+{
+    partial void AfterAddData() => /* … */;
+}
+```
+
+Write nothing and the compiler removes the declarations *and every call site*,
+including argument evaluation. Write a body and it is an ordinary direct call.
+
+**Never give these hooks a modifier — and note that the compiler enforces it.**
+Elision is a property of the classic partial-method form only: implicitly
+private, `void`, no `out` parameters, and no `virtual`/`override`/`abstract`/
+`extern`/access modifier. Adding any of those opts into the C# 9 *extended*
+partial method, which **requires** an implementing declaration — so the moment
+someone marks a hook `virtual`, the build breaks for every consumer who did not
+implement it, and if they then supply an empty body to fix the build, the call
+is now an un-elidable virtual dispatch on every seed. Beyond the cost, `virtual`
+would reintroduce the fragile-base-class problem that `Up()` being
+`sealed override` in `Seed` exists to prevent: an override that forgets to call
+base, or throws, silently changes seeding semantics. The guardrail is not a
+convention to remember; it is the language refusing to elide anything it might
+have to dispatch.
+
+### Provenance: say which file the rows came from
+
+A seed should be able to announce that it loaded `Seed/AfterAll/Addresses.csv`,
+and provenance is compile-time known, so it should not be discovered by
+reflection — reading it from an attribute at run time is the same trimming
+hazard as the `[Display]` case below. It is an interface member the generator
+implements:
+
+```csharp
+public interface ISeed : IMigration
+{
+    int TierOrder { get; }
+    string? Source { get; }   // "Seed/AfterAll/Addresses.csv", or null when hand-written
+    void AddData();
+}
+```
+
+The runner logs it once per seed through `ILogger`, rather than every seed
+hand-rolling an announcement — which keeps this on the right side of the
+`IAnnouncer`-collapsed-into-`ILogger` lesson the Host ADR records.
+
 ### Lifecycle: reuse `MigrationStage`, do not invent a scheduler
 
 The established usage is a maintenance migration whose `Up()` resolves
@@ -323,7 +393,7 @@ vocabulary for that in `MigrationStage` (`BeforeAll`, `BeforeEach`, `AfterEach`,
 second execution engine:
 
 ```csharp
-[Seed(MigrationStage.AfterAll, Order = 10)]
+[Seed(MigrationStage.AfterAll, TierOrder = 10)]
 public sealed class OrderStatusSeed : ISeed { … }
 ```
 
@@ -348,33 +418,99 @@ better semantics — they express the actual constraint (this lookup table must
 exist before that one references it) instead of a number whose meaning is a
 convention nobody wrote down.
 
-The scope of a dependency has to be the module, though, and that is a
-consequence of composition rather than a preference: a module references its
-peers with `ReferenceOutputAssembly="false"`, precisely so a deployment
-dependency does not become a compile-time one. `DependsOn = [typeof(ZipCodeSeed)]`
-across modules would reintroduce exactly that coupling. So the total order is
-two-level, and both levels already exist:
+**A typed dependency is intra-module; a named one crosses modules.** The reason
+is not a policy an analyzer could enforce — it is that the code does not
+compile. A module references its peers with `ReferenceOutputAssembly="false"`,
+precisely so a deployment dependency does not become a compile-time one, and
+`DependsOn = [typeof(ZipCodeSeed)]` against a module whose assembly is not
+referenced is a build error, not a smell. The interesting case is the legitimate
+one: a lookup table genuinely shared across module projects. That needs an
+expression the compiler is not involved in:
+
+```xml
+<SeedData Update="Seed/AfterAll/Addresses.csv" DependsOn="Core:ZipCodes" />
+```
+
+Module-qualified, resolved by `FluentMigrator.Net.Sdk.Host` at composition time
+against the module manifests it already reads, and diagnosed there (an
+`FMSDK2xx`) when the named seed or module is absent. So the two forms are not a
+concession to each other — typed is compile-time-checked within a module, named
+is manifest-checked across them, and the deploy-time decoupling survives both.
+
+*This* is where an analyzer earns its keep: warn when a typed `DependsOn`
+resolves into another module's assembly, which is only reachable if someone
+raised `ReferenceOutputAssembly` to `true`, and point them at the named form.
+The analyzer catches the case the compiler happily accepts and the architecture
+does not want.
+
+So the total order is two-level, and both levels already exist:
 
 - **Between modules** — module index in the target's plan, from the host manifest.
 - **Within a module** — topological sort over declared dependencies, ascending;
-  ties broken by `Order`, then by type name, so the result is stable and
+  ties broken by `TierOrder`, then by type name, so the result is stable and
   reviewable rather than incidentally dependent on file enumeration.
 
 Cycles are a build-time diagnostic, not a runtime failure — the generator sees
 the whole graph.
 
-**Parallelism is a separate decision, and a more expensive one than it looks.**
-No-declared-dependencies means *unordered*, which is not the same as
-*concurrent*. A processor holds one connection and one transaction, so genuinely
-parallel seeding needs a connection per seed and forfeits single-transaction
-atomicity for the whole seed set — a real cost right after the connection
-factory work hardened per-connection semantics. dbt parallelizes its DAG through
-the `threads` profile setting and seeds are ordinary DAG nodes, so it gets this
-for free; dbt is also loading into warehouses where each seed is an independent
-bulk load, not participating in one migration transaction. Recommend taking the
-determinism now and treating concurrency as opt-in later, with the atomicity
-trade stated at the point of opt-in. (Worth confirming dbt's exact seed
-concurrency semantics against their docs before citing it as precedent.)
+**`TierOrder`, not `Order`.** Renaming it is not cosmetic: `Order` invites
+exactly the global-counter reading the graph replaces, and the semantics are
+narrower than the old name implies. It is compared **only among seeds in the
+same topological tier** and cannot move a seed across tiers — a seed that
+depends on another will never precede it however the numbers are set. Documented
+that way, it stays a tiebreaker for the real case it exists to serve: several
+lookup tables sharing one dependency list, where the author has a preferred
+order among equals.
+
+**Do not bake the final order into the assembly.** Lowering the graph to a
+single precomputed integer at build time is tempting and is wrong at exactly one
+point: a host project can compose *different module sets, in different orders,
+per deployment target*, so any number that encodes cross-module position is
+correct for one target and wrong for the next. The intra-module tier is
+target-independent and may be precomputed; the module dimension has to be
+applied after composition. Keeping the graph as the user-visible model is also
+simply the more honest documentation — the constraint an author knows is "this
+table needs that one first", not "this table is number 40".
+
+**Concurrency: seeding is the right first workload for it, and the graph is the
+schedule.** The usual argument against concurrent migration execution does not
+apply here. DDL serializes itself — SQL Server takes schema locks on the system
+catalog, so `Create.Table` and `Alter.Column` gain nothing from extra
+connections — but seeding is DML, and a tier of seeds with no edges between them
+is *declared* independent. A topological sort produces the schedule for free:
+every seed in tier N may run concurrently, tiers run in sequence. That is the
+second thing the dependency graph buys beyond determinism, and it is why the
+graph is worth having even for authors who never hit an ordering bug.
+
+The prerequisite is connection-level, not seed-level. Concurrency needs a
+connection per worker, which is what `DbDataSource`/`WithDataSource` exists to
+provide — **and that work is not on `main`; it currently lives on the
+`copilot/create-claude-fable-5-sub-agent` branch alongside
+`IMigrationConnectionFactory`.** Concurrent seeding is therefore sequenced
+behind it and should not be designed as if the foundation were already present.
+
+Transaction semantics follow from the facet rather than needing a new decision.
+N connections means N transactions, so a whole-seed-set transaction and
+concurrency are mutually exclusive; but seeds carrying `onChange` or `always`
+are by construction re-appliable, which makes per-seed transactions the honest
+default, and `MaintenanceAttribute` already establishes per-item
+`TransactionBehavior` as a precedent to follow.
+
+Two consequences worth writing down now, because both are cheap to design in and
+expensive to retrofit:
+
+- **`--full-refresh` walks the graph in reverse.** Truncating in insertion order
+  hits foreign keys immediately; the reverse topological order is the correct
+  teardown order, and it is the same graph. Parallel truncation across
+  FK-related tables without it is a deadlock generator.
+- **A seed that opts out of concurrency is a per-seed fact**, not a global
+  switch — the same shape as `TransactionBehavior`.
+
+dbt is a useful precedent for the schedule (its `threads` setting parallelizes
+the DAG, and seeds are ordinary DAG nodes) but a weak one for the transaction
+question, since it loads into warehouses where each seed is an independent bulk
+load rather than a participant in a migration transaction. Its exact seed
+concurrency semantics are worth reading properly before being cited as support.
 
 **Seeds need an execution facet, and today's pivots omit one.** The seed pivots
 declare `Stage` but no `Execution`, so the manifest carries none. That is a gap,
@@ -415,6 +551,12 @@ item metadata:
 with the attribute playing the same role for C# seeds. That is also why the
 `AdditionalFiles` finding above matters — a generator reading `DependsOn` off a
 CSV needs the project body's `Update` to reach it, which it now does.
+
+The one case this does not *obviously* cover is a lookup table shared across
+several module projects, where the dependency has no type to point at and no
+file inside this project. That is the module-qualified `DependsOn="Core:ZipCodes"`
+form under *Ordering* above — same metadata, resolved by the host against the
+module manifests rather than by the compiler.
 
 ### Native AOT
 
