@@ -69,7 +69,7 @@ namespace FluentMigrator.Tests.Unit.Processors.Snowflake
                 new SnowflakeQuoter(sfOptions), 
                 logger,
                 opt,
-                MockedConnectionStringAccessor.Object,
+                MockedMigrationConnectionFactory.Object,
                 sfOptions,
                 serviceProvider);
         }

@@ -56,6 +56,7 @@ namespace FluentMigrator.Runner.Processors.SQLite
         public override IList<string> DatabaseTypeAliases { get; } = new List<string>();
 
         /// <inheritdoc />
+        [Obsolete("Use the constructor that accepts IMigrationConnectionFactory instead.")]
         public SQLiteProcessor(
             [NotNull] SQLiteDbFactory factory,
             [NotNull] SQLiteGenerator generator,
@@ -65,6 +66,22 @@ namespace FluentMigrator.Runner.Processors.SQLite
             [NotNull] IServiceProvider serviceProvider,
             [NotNull] SQLiteQuoter quoter)
             : base(() => factory.Factory, generator, logger, options.Value, connectionStringAccessor)
+        {
+            _serviceProvider = serviceProvider;
+            _quoter = quoter;
+        }
+
+        /// <inheritdoc />
+        [ActivatorUtilitiesConstructor]
+        public SQLiteProcessor(
+            [NotNull] SQLiteDbFactory factory,
+            [NotNull] SQLiteGenerator generator,
+            [NotNull] ILogger<SQLiteProcessor> logger,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> options,
+            [NotNull] IMigrationConnectionFactory connectionFactory,
+            [NotNull] IServiceProvider serviceProvider,
+            [NotNull] SQLiteQuoter quoter)
+            : base(() => factory.Factory, generator, logger, options.Value, connectionFactory)
         {
             _serviceProvider = serviceProvider;
             _quoter = quoter;
@@ -159,8 +176,8 @@ namespace FluentMigrator.Runner.Processors.SQLite
         /// <inheritdoc />
         public override void Process(PerformDBOperationExpression expression)
         {
-            var message = string.IsNullOrEmpty(expression.Description) 
-                ? "Performing DB Operation" 
+            var message = string.IsNullOrEmpty(expression.Description)
+                ? "Performing DB Operation"
                 : $"Performing DB Operation: {expression.Description}";
             Logger.LogSay(message);
 

@@ -16,11 +16,14 @@
 
 using FluentMigrator.Runner.Generators.DB2;
 using FluentMigrator.Runner.Generators.DB2.iSeries;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.DB2;
 using FluentMigrator.Runner.Processors.DB2.iSeries;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner
 {
@@ -38,7 +41,14 @@ namespace FluentMigrator.Runner
         {
             builder.Services
                 .AddScoped<Db2DbFactory>()
-                .AddScoped<Db2Processor>()
+                .AddScoped<Db2Processor>(sp =>
+                    new Db2Processor(
+                        sp.GetRequiredService<Db2DbFactory>(),
+                        sp.GetRequiredService<Db2Generator>(),
+                        sp.GetRequiredService<Db2Quoter>(),
+                        sp.GetRequiredService<ILogger<Db2Processor>>(),
+                        sp.GetRequiredService<IOptionsSnapshot<ProcessorOptions>>(),
+                        sp.GetRequiredService<IMigrationConnectionFactory>()))
                 .AddScoped<IDb2TypeMap>(sp => new Db2TypeMap())
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<Db2Processor>())
                 .AddScoped<Db2Quoter>()
@@ -57,7 +67,14 @@ namespace FluentMigrator.Runner
         {
             builder.Services
                 .AddScoped<Db2ISeriesDbFactory>()
-                .AddScoped<Db2ISeriesProcessor>()
+                .AddScoped<Db2ISeriesProcessor>(sp =>
+                    new Db2ISeriesProcessor(
+                        sp.GetRequiredService<Db2ISeriesDbFactory>(),
+                        sp.GetRequiredService<Db2ISeriesGenerator>(),
+                        sp.GetRequiredService<Db2ISeriesQuoter>(),
+                        sp.GetRequiredService<ILogger<Db2ISeriesProcessor>>(),
+                        sp.GetRequiredService<IOptionsSnapshot<ProcessorOptions>>(),
+                        sp.GetRequiredService<IMigrationConnectionFactory>()))
                 .AddScoped<IDb2TypeMap>(sp => new Db2TypeMap())
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<Db2ISeriesProcessor>())
                 .AddScoped<Db2ISeriesQuoter>()
