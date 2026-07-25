@@ -21,6 +21,7 @@ using System.Data;
 using System.Diagnostics.CodeAnalysis;
 
 using FluentMigrator.Expressions;
+using FluentMigrator.Generation;
 
 namespace FluentMigrator
 {
@@ -33,6 +34,12 @@ namespace FluentMigrator
     /// </remarks>
     public interface IMigrationProcessor : IQuerySchema, IDisposable
     {
+        /// <summary>
+        /// Gets the <see cref="IQuoter"/> used by the underlying <see cref="IMigrationGenerator"/> to
+        /// quote/format values and identifiers for the target database.
+        /// </summary>
+        IQuoter Quoter { get; }
+
         /// <summary>
         /// Execute an SQL statement (escaping not needed)
         /// </summary>

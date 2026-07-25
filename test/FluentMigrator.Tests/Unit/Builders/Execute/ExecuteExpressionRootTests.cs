@@ -196,7 +196,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Execute
                 .Returns(providers);
             _contextMock.SetupGet(x => x.ServiceProvider).Returns(serviceProviderMock.Object);
 
-            _root.Sql("INSERT INTO BLAH", "description", new Dictionary<string, string>());
+            _root.Sql("INSERT INTO BLAH", "description", new Dictionary<string, object>());
 
             _expressions.Count.ShouldBe(1);
             var expression = _expressions.First() as ExecuteSqlStatementExpression;
@@ -216,7 +216,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Execute
                 .Returns(providers);
             _contextMock.SetupGet(x => x.ServiceProvider).Returns(serviceProviderMock.Object);
 
-            _root.Script("script.sql", new Dictionary<string, string>());
+            _root.Script("script.sql", new Dictionary<string, object>());
 
             _expressions.Count.ShouldBe(1);
             var expression = _expressions.First() as ExecuteSqlScriptExpression;
@@ -240,7 +240,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Execute
                 .Returns(embeddedResourceProviders);
             _contextMock.SetupGet(x => x.ServiceProvider).Returns(serviceProviderMock.Object);
 
-            _root.EmbeddedScript("script.sql", new Dictionary<string, string>());
+            _root.EmbeddedScript("script.sql", new Dictionary<string, object>());
 
             _expressions.Count.ShouldBe(1);
             var expression = _expressions.First() as ExecuteEmbeddedSqlScriptExpression;

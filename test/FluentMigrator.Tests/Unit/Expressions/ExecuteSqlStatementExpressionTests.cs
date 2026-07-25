@@ -20,6 +20,7 @@ using System.Collections.Generic;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
+using FluentMigrator.Runner.Generators.Generic;
 using FluentMigrator.Tests.Helpers;
 
 using Moq;
@@ -50,6 +51,27 @@ namespace FluentMigrator.Tests.Unit.Expressions
 
             var processor = new Mock<IMigrationProcessor>();
             processor.Setup(x => x.Execute(expression.SqlStatement)).Verifiable();
+
+            expression.ExecuteWith(processor.Object);
+            processor.Verify();
+        }
+
+        [Test]
+        public void ExecutesTheStatementWithTypedParametersUsingProcessorQuoter()
+        {
+            var expression = new ExecuteSqlStatementExpression()
+            {
+                SqlStatement = "SELECT 1 WHERE Count = $[Count] AND IsActive = $[IsActive]",
+                Parameters = new Dictionary<string, object>
+                {
+                    ["Count"] = 42,
+                    ["IsActive"] = true,
+                },
+            };
+
+            var processor = new Mock<IMigrationProcessor>();
+            processor.SetupGet(x => x.Quoter).Returns(new GenericQuoter());
+            processor.Setup(x => x.Execute("SELECT 1 WHERE Count = 42 AND IsActive = 1")).Verifiable();
 
             expression.ExecuteWith(processor.Object);
             processor.Verify();
@@ -87,7 +109,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             var expression = new ExecuteSqlStatementExpression()
             {
                 SqlStatement = "ALTER TABLE $(DefaultSchema).BLAH ADD COLUMN Foo INT",
-                Parameters = new Dictionary<string, string> { { "DefaultSchema", "tenant1" } },
+                Parameters = new Dictionary<string, object> { { "DefaultSchema", "tenant1" } },
                 SqlScriptTokenProviders = new[] { tokenProvider.Object },
             };
 
@@ -130,7 +152,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             var expression = new ExecuteSqlStatementExpression()
             {
                 SqlStatement = "SELECT * FROM Users WHERE SchemaName = $[DefaultSchema]",
-                Parameters = new Dictionary<string, string> { { "DefaultSchema", "tenant1" } },
+                Parameters = new Dictionary<string, object> { { "DefaultSchema", "tenant1" } },
                 SqlScriptTokenProviders = new[] { tokenProvider.Object },
             };
 

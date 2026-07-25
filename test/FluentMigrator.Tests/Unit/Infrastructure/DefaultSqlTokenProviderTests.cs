@@ -16,6 +16,9 @@
 //
 #endregion
 
+using System.Collections.Generic;
+using System.Linq;
+
 using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Infrastructure;
 
@@ -60,7 +63,7 @@ namespace FluentMigrator.Tests.Unit.Infrastructure
 
             var result = SqlScriptTokenReplacer.ReplaceSqlScriptTokens(
                 "ALTER TABLE $(DefaultSchema).Users ADD COLUMN Foo INT",
-                provider.GetTokens());
+                ToObjectDictionary(provider.GetTokens()));
 
             result.ShouldBe("ALTER TABLE testdefault.Users ADD COLUMN Foo INT");
         }
@@ -73,7 +76,7 @@ namespace FluentMigrator.Tests.Unit.Infrastructure
 
             var result = SqlScriptTokenReplacer.ReplaceSqlScriptTokens(
                 "SELECT * FROM Users WHERE SchemaName = $[DefaultSchema]",
-                provider.GetTokens());
+                ToObjectDictionary(provider.GetTokens()));
 
             result.ShouldBe("SELECT * FROM Users WHERE SchemaName = 'testdefault'");
         }
@@ -86,7 +89,7 @@ namespace FluentMigrator.Tests.Unit.Infrastructure
 
             var result = SqlScriptTokenReplacer.ReplaceSqlScriptTokens(
                 "SELECT * FROM Users WHERE SchemaName = $[DefaultSchema]",
-                provider.GetTokens());
+                ToObjectDictionary(provider.GetTokens()));
 
             result.ShouldBe("SELECT * FROM Users WHERE SchemaName = 'te''st'");
         }
@@ -99,9 +102,14 @@ namespace FluentMigrator.Tests.Unit.Infrastructure
 
             var result = SqlScriptTokenReplacer.ReplaceSqlScriptTokens(
                 "ALTER TABLE $(DefaultSchema).Users ADD COLUMN Foo INT; SELECT $[DefaultSchema]",
-                provider.GetTokens());
+                ToObjectDictionary(provider.GetTokens()));
 
             result.ShouldBe("ALTER TABLE $(DefaultSchema).Users ADD COLUMN Foo INT; SELECT $[DefaultSchema]");
+        }
+
+        private static IDictionary<string, object> ToObjectDictionary(IDictionary<string, string> tokens)
+        {
+            return tokens.ToDictionary(x => x.Key, x => (object)x.Value);
         }
     }
 }

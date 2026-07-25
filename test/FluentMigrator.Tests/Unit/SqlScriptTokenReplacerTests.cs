@@ -16,7 +16,10 @@
 //
 #endregion
 
+using System;
 using System.Collections.Generic;
+
+using FluentMigrator.Runner.Generators.Generic;
 
 using NUnit.Framework;
 
@@ -38,14 +41,14 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void ReturnsOriginalTextWhenParametersAreEmpty()
         {
-            SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT $(Foo)", new Dictionary<string, string>())
+            SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT $(Foo)", new Dictionary<string, object>())
                 .ShouldBe("SELECT $(Foo)");
         }
 
         [Test]
         public void ReplacesRawTokenWithValueVerbatim()
         {
-            var parameters = new Dictionary<string, string> { ["TablePrefix"] = "App_" };
+            var parameters = new Dictionary<string, object> { ["TablePrefix"] = "App_" };
 
             SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT * FROM $(TablePrefix)Users", parameters)
                 .ShouldBe("SELECT * FROM App_Users");
@@ -54,7 +57,7 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void LeavesUnknownRawTokenUnchanged()
         {
-            var parameters = new Dictionary<string, string> { ["Known"] = "Value" };
+            var parameters = new Dictionary<string, object> { ["Known"] = "Value" };
 
             SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT $(Unknown)", parameters)
                 .ShouldBe("SELECT $(Unknown)");
@@ -63,7 +66,7 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void UnescapesDoubleDollarRawToken()
         {
-            var parameters = new Dictionary<string, string> { ["Foo"] = "Bar" };
+            var parameters = new Dictionary<string, object> { ["Foo"] = "Bar" };
 
             SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT '$$((Foo))'", parameters)
                 .ShouldBe("SELECT '$(Foo)'");
@@ -72,7 +75,7 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void ReplacesSafeTokenWithQuotedAndEscapedStringLiteral()
         {
-            var parameters = new Dictionary<string, string> { ["DefaultStatus"] = "isn't active" };
+            var parameters = new Dictionary<string, object> { ["DefaultStatus"] = "isn't active" };
 
             SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT $[DefaultStatus]", parameters)
                 .ShouldBe("SELECT 'isn''t active'");
@@ -81,7 +84,7 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void ReplacesSafeTokenWithNullLiteralWhenValueIsNull()
         {
-            var parameters = new Dictionary<string, string> { ["Value"] = null };
+            var parameters = new Dictionary<string, object> { ["Value"] = null };
 
             SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT $[Value]", parameters)
                 .ShouldBe("SELECT NULL");
@@ -90,7 +93,7 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void LeavesUnknownSafeTokenUnchanged()
         {
-            var parameters = new Dictionary<string, string> { ["Known"] = "Value" };
+            var parameters = new Dictionary<string, object> { ["Known"] = "Value" };
 
             SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT $[Unknown]", parameters)
                 .ShouldBe("SELECT $[Unknown]");
@@ -99,7 +102,7 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void UnescapesDoubleDollarSafeToken()
         {
-            var parameters = new Dictionary<string, string> { ["Foo"] = "Bar" };
+            var parameters = new Dictionary<string, object> { ["Foo"] = "Bar" };
 
             SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT '$$[[Foo]]'", parameters)
                 .ShouldBe("SELECT '$[Foo]'");
@@ -108,7 +111,7 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void SupportsMixOfRawAndSafeTokens()
         {
-            var parameters = new Dictionary<string, string>
+            var parameters = new Dictionary<string, object>
             {
                 ["TablePrefix"] = "App_",
                 ["DefaultStatus"] = "isn't active",
@@ -120,6 +123,52 @@ namespace FluentMigrator.Tests.Unit
                 parameters);
 
             sql.ShouldBe("INSERT INTO App_Users (Status, CreatedAt) VALUES ('isn''t active', GETDATE());");
+        }
+
+        [Test]
+        public void ReplacesSafeTokenWithUnquotedNumberWhenQuoterIsSupplied()
+        {
+            var parameters = new Dictionary<string, object> { ["Count"] = 42 };
+
+            SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT $[Count]", parameters, new GenericQuoter())
+                .ShouldBe("SELECT 42");
+        }
+
+        [Test]
+        public void ReplacesSafeTokenWithFormattedDateTimeWhenQuoterIsSupplied()
+        {
+            var value = new DateTime(2024, 1, 2, 3, 4, 5);
+            var parameters = new Dictionary<string, object> { ["CreatedAt"] = value };
+
+            SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT $[CreatedAt]", parameters, new GenericQuoter())
+                .ShouldBe("SELECT '2024-01-02T03:04:05'");
+        }
+
+        [Test]
+        public void ReplacesSafeTokenWithBoolWhenQuoterIsSupplied()
+        {
+            var parameters = new Dictionary<string, object> { ["IsActive"] = true };
+
+            SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT $[IsActive]", parameters, new GenericQuoter())
+                .ShouldBe("SELECT 1");
+        }
+
+        [Test]
+        public void ReplacesSafeTokenWithQuotedAndEscapedStringWhenQuoterIsSupplied()
+        {
+            var parameters = new Dictionary<string, object> { ["DefaultStatus"] = "isn't active" };
+
+            SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT $[DefaultStatus]", parameters, new GenericQuoter())
+                .ShouldBe("SELECT 'isn''t active'");
+        }
+
+        [Test]
+        public void ReplacesSafeTokenWithNullLiteralWhenValueIsNullAndQuoterIsSupplied()
+        {
+            var parameters = new Dictionary<string, object> { ["Value"] = null };
+
+            SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT $[Value]", parameters, new GenericQuoter())
+                .ShouldBe("SELECT NULL");
         }
     }
 }

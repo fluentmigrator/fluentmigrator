@@ -66,7 +66,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
         /// <summary>
         /// Gets the quoter for Oracle SQL.
         /// </summary>
-        public IQuoter Quoter => ((OracleGenerator) Generator).Quoter;
+        public new IQuoter Quoter => ((OracleGenerator) Generator).Quoter;
 
         /// <inheritdoc />
         public override bool SchemaExists(string schemaName)

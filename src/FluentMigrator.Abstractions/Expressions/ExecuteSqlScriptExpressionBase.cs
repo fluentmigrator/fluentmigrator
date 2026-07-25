@@ -29,7 +29,7 @@ namespace FluentMigrator.Expressions
         /// <summary>
         /// Gets or sets parameters to be replaced before script execution
         /// </summary>
-        public IDictionary<string, string> Parameters { get; set; }
+        public IDictionary<string, object> Parameters { get; set; }
 
         /// <summary>
         /// Gets or sets the token providers used to resolve additional tokens
@@ -48,7 +48,7 @@ namespace FluentMigrator.Expressions
         /// <param name="sqlScript">The SQL script to execute</param>
         protected void Execute(IMigrationProcessor processor, [StringSyntax("sql")] string sqlScript)
         {
-            var finalSqlScript = SqlScriptTokenReplacer.ReplaceSqlScriptTokens(sqlScript, GetMergedParameters());
+            var finalSqlScript = SqlScriptTokenReplacer.ReplaceSqlScriptTokens(sqlScript, GetMergedParameters(), processor?.Quoter);
             processor.Execute(finalSqlScript);
         }
 
@@ -59,14 +59,14 @@ namespace FluentMigrator.Expressions
         /// </summary>
         /// <returns>The merged token map, or <see cref="Parameters"/> unchanged when there are no
         /// tokens to merge</returns>
-        protected IDictionary<string, string> GetMergedParameters()
+        protected IDictionary<string, object> GetMergedParameters()
         {
             if (SqlScriptTokenProviders == null)
             {
                 return Parameters;
             }
 
-            var mergedParameters = new Dictionary<string, string>();
+            var mergedParameters = new Dictionary<string, object>();
             foreach (var provider in SqlScriptTokenProviders)
             {
                 var tokenMap = provider?.GetTokens();
