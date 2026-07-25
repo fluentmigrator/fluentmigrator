@@ -14,8 +14,10 @@
 // limitations under the License.
 #endregion
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Text.RegularExpressions;
 
 using FluentMigrator.Generation;
@@ -100,7 +102,7 @@ namespace FluentMigrator
                         var key = m.Groups["token"].Value;
                         if (parameters.TryGetValue(key, out var keyValue))
                         {
-                            return keyValue?.ToString();
+                            return FormatRawTokenValue(keyValue);
                         }
 
                         // Return the whole match value when the key
@@ -118,6 +120,16 @@ namespace FluentMigrator
             }
 
             return sqlText;
+        }
+
+        private static string FormatRawTokenValue(object value)
+        {
+            return value switch
+            {
+                null => null,
+                IFormattable formattable => formattable.ToString(null, CultureInfo.InvariantCulture),
+                _ => value.ToString(),
+            };
         }
 
         /// <summary>

@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 using FluentMigrator.Runner.Generators.Generic;
 
@@ -52,6 +53,25 @@ namespace FluentMigrator.Tests.Unit
 
             SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT * FROM $(TablePrefix)Users", parameters)
                 .ShouldBe("SELECT * FROM App_Users");
+        }
+
+        [Test]
+        public void ReplacesRawTokenWithInvariantCultureForDecimalValue()
+        {
+            var originalCulture = CultureInfo.CurrentCulture;
+
+            try
+            {
+                CultureInfo.CurrentCulture = new CultureInfo("fr-FR");
+                var parameters = new Dictionary<string, object> { ["Price"] = 12.34m };
+
+                SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT $(Price)", parameters)
+                    .ShouldBe("SELECT 12.34");
+            }
+            finally
+            {
+                CultureInfo.CurrentCulture = originalCulture;
+            }
         }
 
         [Test]
