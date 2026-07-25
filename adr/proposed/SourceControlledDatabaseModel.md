@@ -266,15 +266,24 @@ contract is available to a source generator and to the runner without dragging
 in `FluentMigrator.Runner.Core`.
 
 **`AddData` takes no parameter at all.** Passing something in was the wrong
-question. The expression roots are not on any interface — they are properties on
-concrete classes, split across two assemblies: `Alter`, `Create`, `Rename`,
-`Insert`, `Schema` and `IfDatabase` on `MigrationBase`, and `Delete`, `Execute`
-and `Update` on `Migration`. `IMigration` itself carries only `ConnectionString`,
-`GetUpExpressions` and `GetDownExpressions`, so a seed handed an `IMigration`
-would have nothing to author against. Narrowing to `IInsertExpressionRoot` is
-the opposite error: a seed that truncates and reloads, or upserts, needs
-`Delete`, `Update` and `Execute` too, and *how* a seed lands its rows is its own
-business.
+question.
+
+Every expression-root *interface* already lives in `Abstractions` —
+`Builders/{Alter,Create,Delete,Execute,IfDatabase,Insert,Rename,Schema,Update}`.
+What does not exist is an interface aggregating them: they are surfaced as
+properties on concrete classes, split across two assemblies, with `Alter`,
+`Create`, `Rename`, `Insert`, `Schema` and `IfDatabase` on `MigrationBase` and
+`Delete`, `Execute` and `Update` on `Migration`. (`IFluentSyntax` is unrelated —
+it only hides `Equals`/`GetHashCode`/`GetType`/`ToString` from IntelliSense.)
+
+So the candidate parameters are all wrong in different ways. `IMigration`
+carries only `ConnectionString`, `GetUpExpressions` and `GetDownExpressions`, so
+a seed handed one has nothing to author against. `IInsertExpressionRoot` is the
+opposite error: a seed that truncates and reloads, or upserts, needs `Delete`,
+`Update` and `Execute` too, and *how* a seed lands its rows is its own business.
+The remaining option — invent an aggregate interface in `Abstractions` for the
+seed to receive — adds public API to solve a problem the class hierarchy already
+solves.
 
 `Migration.Up()` already solves this by inheritance rather than by parameter.
 Seeds do the same:
