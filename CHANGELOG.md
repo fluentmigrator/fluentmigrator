@@ -5,7 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## 9.0.0-prerelease
+
+### Breaking
+
+- A connection string that consists only of whitespace is now treated like an empty connection string: the runner switches to connectionless mode instead of handing the connection string to the ADO.NET provider (which previously failed when the connection was opened). Requesting a connection while no connection string is configured now fails with an `InvalidOperationException` when the connection is created, instead of a provider-specific error when it is opened.
+- The Firebird processor rejects connection factories whose `OwnsConnection` is `false`: it must close and reopen its connection when committing transactions to release Firebird metadata locks, which is not possible with an externally owned connection.
 
 ### New
 

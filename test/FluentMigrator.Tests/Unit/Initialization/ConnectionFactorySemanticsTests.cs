@@ -25,14 +25,17 @@ using System.Threading.Tasks;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner;
+using FluentMigrator.Runner.Generators.Firebird;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
+using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Runner.VersionTableInfo;
 using FluentMigrator.Tests.Unit.Initialization.Migrations.ConnectionFactory;
 
 using Microsoft.Data.Sqlite;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 
 using Moq;
 
@@ -338,6 +341,65 @@ namespace FluentMigrator.Tests.Unit.Initialization
                 .ShouldBeOfType<ConnectionlessVersionLoader>();
         }
 
+        [Test]
+        public void EmptyConnectionStringFailsWhenTheConnectionIsCreated()
+        {
+            // Regression test: an empty connection string must fail loudly when a connection is
+            // requested, not reach the ADO.NET provider with an empty connection string.
+            using var processor = new TestGenericProcessor(
+                new ConnectionStringMigrationConnectionFactory(
+                    new PassThroughConnectionStringAccessor(string.Empty)));
+
+            var ex = Should.Throw<InvalidOperationException>(() => processor.GetConnection());
+            ex.Message.ShouldContain("connection string");
+        }
+
+        [Test]
+        public void WhitespaceOnlyConnectionStringIsTreatedAsNoConnection()
+        {
+            // Breaking change in 9.0.0: whitespace-only connection strings are treated like empty
+            // ones (connectionless mode) instead of being handed to the provider's Open().
+            var connectionFactory = new ConnectionStringMigrationConnectionFactory(
+                new PassThroughConnectionStringAccessor("   "));
+
+            connectionFactory.HasConnection.ShouldBeFalse();
+
+            using var processor = new TestGenericProcessor(connectionFactory);
+            Should.Throw<InvalidOperationException>(() => processor.GetConnection());
+        }
+
+        [Test]
+        public void NullConnectionFromFactoryFailsWithDescriptiveException()
+        {
+            using var processor = new TestGenericProcessor(new NullReturningMigrationConnectionFactory());
+
+            var ex = Should.Throw<InvalidOperationException>(() => processor.GetConnection());
+            ex.Message.ShouldContain(nameof(NullReturningMigrationConnectionFactory));
+        }
+
+        [Test]
+        public void FirebirdProcessorRejectsExternallyOwnedConnections()
+        {
+            // The Firebird processor closes and reopens its connection when committing
+            // transactions to release Firebird metadata locks, so it cannot work with a
+            // connection it does not own.
+            var fbOptions = new FirebirdOptions();
+            var processorOptions = Mock.Of<IOptionsSnapshot<ProcessorOptions>>(
+                snapshot => snapshot.Value == new ProcessorOptions());
+
+            var ex = Should.Throw<ArgumentException>(
+                () => new FirebirdProcessor(
+                    new FirebirdDbFactory(serviceProvider: null),
+                    new FirebirdGenerator(fbOptions),
+                    new FirebirdQuoter(fbOptions.ForceQuote),
+                    NullLogger<FirebirdProcessor>.Instance,
+                    processorOptions,
+                    new RecordingMigrationConnectionFactory { OwnsConnection = false },
+                    fbOptions));
+
+            ex.ParamName.ShouldBe("connectionFactory");
+        }
+
         private static string BuildConnectionString(string databaseName)
         {
             return new SqliteConnectionStringBuilder
@@ -482,6 +544,15 @@ namespace FluentMigrator.Tests.Unit.Initialization
                 Connections.Add(connection);
                 return connection;
             }
+        }
+
+        private sealed class NullReturningMigrationConnectionFactory : IMigrationConnectionFactory
+        {
+            public bool HasConnection => true;
+
+            public bool OwnsConnection => true;
+
+            public IDbConnection CreateConnection(DbProviderFactory providerFactory) => null;
         }
 
         private sealed class NoConnectionMigrationConnectionFactory : IMigrationConnectionFactory

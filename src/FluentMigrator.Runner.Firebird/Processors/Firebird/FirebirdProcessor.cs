@@ -104,6 +104,16 @@ namespace FluentMigrator.Runner.Processors.Firebird
         }
 
         /// <inheritdoc />
+        /// <remarks>
+        /// The Firebird processor must own its connection: it closes and reopens the connection
+        /// when committing or rolling back transactions to release Firebird metadata locks
+        /// (see <see cref="CommitTransaction"/> and <see cref="CommitRetaining"/>), which must
+        /// not be done to an externally owned connection.
+        /// </remarks>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="connectionFactory"/> reports
+        /// <see cref="FluentMigrator.Runner.Initialization.IMigrationConnectionFactory.OwnsConnection"/> as <c>false</c>.
+        /// </exception>
         [ActivatorUtilitiesConstructor]
         public FirebirdProcessor(
             [NotNull] FirebirdDbFactory factory,
@@ -115,6 +125,16 @@ namespace FluentMigrator.Runner.Processors.Firebird
             [NotNull] FirebirdOptions fbOptions)
             : base(() => factory.Factory, generator, logger, options.Value, connectionFactory)
         {
+            if (!connectionFactory.OwnsConnection)
+            {
+                throw new ArgumentException(
+                    "The Firebird processor must own its connection: it closes and reopens the connection " +
+                    "when committing transactions to release Firebird metadata locks, which must not be done " +
+                    "to an externally owned connection. Use a connection factory whose OwnsConnection is true " +
+                    "(for example WithConnectionFactory(..., ownsConnection: true)).",
+                    nameof(connectionFactory));
+            }
+
             FBOptions = fbOptions ?? throw new ArgumentNullException(nameof(fbOptions));
             _firebirdVersionFunc = new Lazy<Version>(GetFirebirdVersion);
             _quoter = quoter;

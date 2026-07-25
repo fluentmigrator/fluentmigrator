@@ -6,7 +6,9 @@ The in-process runner is the **recommended approach** for most applications. It 
 
 ### Basic Setup
 
-```csharp
+::: code-group
+
+```csharp [.NET 8+]
 using System.Data.Common;
 using FluentMigrator.Runner;
 using Microsoft.Data.SqlClient;
@@ -59,10 +61,57 @@ class Program
 }
 ```
 
+```csharp [.NET Framework / .NET Standard]
+using FluentMigrator.Runner;
+using Microsoft.Extensions.DependencyInjection;
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        using (var serviceProvider = CreateServices())
+        using (var scope = serviceProvider.CreateScope())
+        {
+            // Run migrations
+            UpdateDatabase(scope.ServiceProvider);
+        }
+    }
+
+    private static ServiceProvider CreateServices()
+    {
+        return new ServiceCollection()
+            // Add common FluentMigrator services
+            .AddFluentMigratorCore()
+            .ConfigureRunner(rb => rb
+                // Add database support (choose your provider)
+                .AddSqlServer()
+                // Set the connection string
+                .WithGlobalConnectionString("Server=.;Database=MyDb;Integrated Security=true")
+                // Define the assembly containing the migrations
+                .ScanIn(typeof(AddLogTable).Assembly).For.All())
+            // Enable logging to console
+            .AddLogging(lb => lb.AddFluentMigratorConsole())
+            // Build the service provider
+            .BuildServiceProvider(false);
+    }
+
+    private static void UpdateDatabase(IServiceProvider serviceProvider)
+    {
+        // Instantiate the runner
+        var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
+
+        // Execute the migrations
+        runner.MigrateUp();
+    }
+}
+```
+
+:::
+
 ## Configuration
 
 > [!NOTE]
-> For .NET 8 and later, prefer configuring a provider `DbDataSource` and passing it to FluentMigrator with `WithDataSource(...)`. `WithGlobalConnectionString(...)` remains supported for existing applications and simpler setups.
+> For .NET 8 and later, prefer configuring a provider `DbDataSource` and passing it to FluentMigrator with `WithDataSource(...)`. `WithDataSource(...)` is only available when targeting .NET 8+; on .NET Framework and .NET Standard use `WithGlobalConnectionString(...)`, which also remains supported everywhere for existing applications and simpler setups. The examples on this page show both variants — pick the tab that matches your target framework.
 
 ### Custom connections and rotating credentials
 
@@ -102,7 +151,10 @@ The in-process runner offers extensive configuration options for database provid
 For comprehensive configuration details, see the [Configuration Guide](/intro/configuration.md).
 
 ### Basic Provider Setup
-```csharp
+
+::: code-group
+
+```csharp [.NET 8+]
 const string connectionString = "Server=.;Database=MyDb;Integrated Security=true";
 
 services
@@ -122,8 +174,27 @@ services
         .ScanIn(typeof(MyMigration).Assembly).For.Migrations());
 ```
 
+```csharp [.NET Framework / .NET Standard]
+const string connectionString = "Server=.;Database=MyDb;Integrated Security=true";
+
+services
+    .AddFluentMigratorCore()
+    .ConfigureRunner(runner => runner
+        // Database provider
+        .AddSqlServer()
+        // Connection string
+        .WithGlobalConnectionString(connectionString)
+        // Assembly scanning
+        .ScanIn(typeof(MyMigration).Assembly).For.Migrations());
+```
+
+:::
+
 ### Common Configuration Patterns
-```csharp
+
+::: code-group
+
+```csharp [.NET 8+]
 const string connectionString = "Server=.;Database=MyDb;Integrated Security=true";
 
 services
@@ -144,11 +215,30 @@ services
         .For.All());
 ```
 
+```csharp [.NET Framework / .NET Standard]
+const string connectionString = "Server=.;Database=MyDb;Integrated Security=true";
+
+services
+    .AddFluentMigratorCore()
+    .ConfigureRunner(runner => runner
+        // Database provider
+        .AddSqlServer()
+        // Connection string
+        .WithGlobalConnectionString(connectionString)
+        // Scan multiple assemblies for migrations.
+        .ScanIn(typeof(Migration1).Assembly, typeof(Migration2).Assembly)
+        .For.All());
+```
+
+:::
+
 ## Application Integration
 
 ### ASP.NET Core Startup
 
-```csharp
+::: code-group
+
+```csharp [.NET 8+]
 public class Startup
 {
     public void ConfigureServices(IServiceCollection services)
@@ -184,8 +274,44 @@ public class Startup
 }
 ```
 
+```csharp [.NET Framework / .NET Standard]
+public class Startup
+{
+    public void ConfigureServices(IServiceCollection services)
+    {
+        // Add FluentMigrator
+        services.AddFluentMigratorCore()
+            .ConfigureRunner(rb => rb
+                .AddSqlServer()
+                .WithGlobalConnectionString(Configuration.GetConnectionString("DefaultConnection"))
+                .ScanIn(typeof(AddUserTable).Assembly).For.All())
+            .AddLogging(lb => lb.AddFluentMigratorConsole());
+    }
+
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    {
+        // Run migrations on startup
+        MigrateDatabase(app);
+    }
+
+    private void MigrateDatabase(IApplicationBuilder app)
+    {
+        using (var scope = app.ApplicationServices.CreateScope())
+        {
+            var runner = scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
+            runner.MigrateUp();
+        }
+    }
+}
+```
+
+:::
+
 ### Console Application with Hosting
-```csharp
+
+::: code-group
+
+```csharp [.NET 8+]
 using Microsoft.Extensions.Hosting;
 
 class Program
@@ -222,6 +348,41 @@ class Program
             });
 }
 ```
+
+```csharp [.NET Framework / .NET Standard]
+using Microsoft.Extensions.Hosting;
+
+class Program
+{
+    static async Task Main(string[] args)
+    {
+        var host = CreateHostBuilder(args).Build();
+
+        // Run migrations
+        using (var scope = host.Services.CreateScope())
+        {
+            var runner = scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
+            runner.MigrateUp();
+        }
+
+        await host.RunAsync();
+    }
+
+    static IHostBuilder CreateHostBuilder(string[] args) =>
+        Host.CreateDefaultBuilder(args)
+            .ConfigureServices((context, services) =>
+            {
+                services.AddFluentMigratorCore()
+                    .ConfigureRunner(rb => rb
+                        .AddSqlServer()
+                        .WithGlobalConnectionString(
+                            context.Configuration.GetConnectionString("DefaultConnection"))
+                        .ScanIn(typeof(MyMigration).Assembly).For.All());
+            });
+}
+```
+
+:::
 
 ## Migration Operations
 

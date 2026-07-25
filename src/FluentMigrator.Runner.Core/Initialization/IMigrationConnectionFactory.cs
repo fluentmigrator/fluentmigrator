@@ -58,7 +58,9 @@ namespace FluentMigrator.Runner.Initialization
         /// The provider factory configured for the selected processor.
         /// </param>
         /// <returns>
-        /// A database connection. The caller owns the returned connection.
+        /// A database connection. Whether the migration processor may close and dispose the
+        /// returned connection is governed by <see cref="OwnsConnection"/>; when it is
+        /// <c>false</c>, ownership remains with the component that produced the connection.
         /// </returns>
         [NotNull]
         IDbConnection CreateConnection([NotNull] DbProviderFactory providerFactory);

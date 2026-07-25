@@ -340,11 +340,20 @@ namespace FluentMigrator.Runner
         /// <param name="connectionFactory">The function that creates the database connection.</param>
         /// <returns>The runner builder</returns>
         /// <remarks>
+        /// <para>
         /// The connection factory is registered with a scoped lifetime, which means it is asked
         /// for a connection once per migration processor (per connection), not once per command.
         /// The returned connection is closed and disposed by the migration processor. Use the
         /// <see cref="WithConnectionFactory(IMigrationRunnerBuilder,Func{IServiceProvider,IDbConnection},bool)"/>
         /// overload to hand over an externally owned connection instead.
+        /// </para>
+        /// <para>
+        /// A configured connection factory always reports
+        /// <see cref="FluentMigrator.Runner.Initialization.IMigrationConnectionFactory.HasConnection"/> as <c>true</c>. To run without a
+        /// database connection (for example to preview the generated SQL), set
+        /// <see cref="RunnerOptions.NoConnection"/> (the <c>--no-connection</c> command line option),
+        /// which takes precedence over any configured connection factory.
+        /// </para>
         /// </remarks>
         /// <example>
         /// <code>
@@ -373,6 +382,13 @@ namespace FluentMigrator.Runner
         /// <c>false</c> when the connection is owned by the caller and must be left open.
         /// </param>
         /// <returns>The runner builder</returns>
+        /// <remarks>
+        /// A configured connection factory always reports
+        /// <see cref="FluentMigrator.Runner.Initialization.IMigrationConnectionFactory.HasConnection"/> as <c>true</c>. To run without a
+        /// database connection (for example to preview the generated SQL), set
+        /// <see cref="RunnerOptions.NoConnection"/> (the <c>--no-connection</c> command line option),
+        /// which takes precedence over any configured connection factory.
+        /// </remarks>
         public static IMigrationRunnerBuilder WithConnectionFactory(
             this IMigrationRunnerBuilder builder,
             [NotNull] Func<IServiceProvider, IDbConnection> connectionFactory,
@@ -433,6 +449,14 @@ namespace FluentMigrator.Runner
         /// A factory delegate used to resolve the <see cref="DbDataSource"/>
         /// that will be used to create connections.</param>
         /// <returns>The runner builder</returns>
+        /// <remarks>
+        /// The data source is consulted for a connection once per migration processor (per
+        /// connection), not once per command. A configured data source always reports
+        /// <see cref="FluentMigrator.Runner.Initialization.IMigrationConnectionFactory.HasConnection"/> as <c>true</c>; to run without a
+        /// database connection (for example to preview the generated SQL), set
+        /// <see cref="RunnerOptions.NoConnection"/> (the <c>--no-connection</c> command line option),
+        /// which takes precedence over any configured data source.
+        /// </remarks>
         public static IMigrationRunnerBuilder WithDataSource(
             this IMigrationRunnerBuilder builder,
             [NotNull] Func<IServiceProvider, DbDataSource> dataSourceFactory)

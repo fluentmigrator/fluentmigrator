@@ -83,7 +83,12 @@ namespace FluentMigrator.Runner.Processors
                         return null;
                     
                     var connection = connectionFactory.CreateConnection(DbProviderFactory);
-                    Debug.Assert(connection != null, nameof(Connection) + " != null");
+                    if (connection == null)
+                    {
+                        throw new InvalidOperationException(
+                            $"The connection factory '{connectionFactory.GetType().FullName}' returned null from {nameof(IMigrationConnectionFactory.CreateConnection)}().");
+                    }
+
                     if (connection.State != ConnectionState.Open)
                         connection.Open();
                     return connection;
@@ -128,8 +133,8 @@ namespace FluentMigrator.Runner.Processors
         /// </summary>
         /// <remarks>
         /// This is <c>false</c> when the connection was handed over by an
-        /// <see cref="IMigrationConnectionFactory"/> whose
-        /// <see cref="IMigrationConnectionFactory.OwnsConnection"/> is <c>false</c>.
+        /// <see cref="FluentMigrator.Runner.Initialization.IMigrationConnectionFactory"/> whose
+        /// <see cref="FluentMigrator.Runner.Initialization.IMigrationConnectionFactory.OwnsConnection"/> is <c>false</c>.
         /// </remarks>
         protected bool OwnsConnection => _ownsFactoryConnection;
 

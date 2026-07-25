@@ -191,6 +191,10 @@ to group statements. That is a separate ADR.
   .NET 8+.
 * Negative: `GenericProcessorBase` must tolerate connections that do not match its
   `DbProviderFactory`.
+* Negative: the Firebird processor cannot honor `ownsConnection: false`. It closes and
+  reopens its connection when committing transactions to release Firebird metadata locks,
+  which must not be done to an externally owned connection, so it rejects such factories
+  with a descriptive exception at construction time.
 * Neutral: processor constructors taking `IConnectionStringAccessor` are obsolete but kept,
   so no consumer breaks.
 
