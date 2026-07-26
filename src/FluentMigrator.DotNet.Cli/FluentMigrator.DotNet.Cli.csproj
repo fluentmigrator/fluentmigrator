@@ -21,8 +21,13 @@
     <PackageReference Include="FSharp.Core" />
     <PackageReference Include="McMaster.Extensions.CommandLineUtils" />
     <PackageReference Include="Microsoft.Data.Sqlite" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
-    <PackageReference Include="Microsoft.Extensions.Logging" />
+    <!--
+      Snowflake.Data 5.x requires Microsoft.Extensions.Logging 9.0.5. Overriding here rather than
+      raising the shared floors in Directory.Packages.props keeps the shipped libraries on their
+      8.0.0 minimum; dotnet-fm is a self-contained tool, so its own floor binds nobody.
+    -->
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" VersionOverride="9.0.5" />
+    <PackageReference Include="Microsoft.Extensions.Logging" VersionOverride="9.0.5" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" />
     <PackageReference Include="MySqlConnector" />

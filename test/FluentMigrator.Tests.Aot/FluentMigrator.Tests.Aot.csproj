@@ -13,6 +13,9 @@
   <ItemGroup>
     <!-- Overrides the shipped minimum-version range; the AOT tests run against a concrete build. -->
     <PackageReference Include="Microsoft.Data.Sqlite" VersionOverride="9.0.6" />
+    <!-- Lifts the SQLitePCLRaw that Microsoft.Data.Sqlite would otherwise pin to a version
+         affected by GHSA-2m69-gcr7-jv3q, matching the other projects that use SQLite. -->
+    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" />
     <PackageReference Include="TUnit" />
   </ItemGroup>
   <ItemGroup>

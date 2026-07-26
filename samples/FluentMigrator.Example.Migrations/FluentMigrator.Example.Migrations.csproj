@@ -14,6 +14,16 @@
 
   <Import Project="$(MSBuildThisFileDirectory)../../Global.props" />
 
+  <!--
+    Inherited from FluentMigrator.Runner: its netstandard2.0 leg pulls in the net48 output of
+    FluentMigrator.Runner.SqlServer, which cannot target netstandard2.0 while Microsoft.Data.SqlClient
+    6.x ships only net462/net8.0/net9.0 assets. See the matching note in FluentMigrator.Runner.csproj.
+  -->
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+    <NoWarn>$(NoWarn);NU1702</NoWarn>
+    <MSBuildWarningsAsMessages>$(MSBuildWarningsAsMessages);MSB3277</MSBuildWarningsAsMessages>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\..\src\FluentMigrator\FluentMigrator.csproj" />
     <ProjectReference Include="..\..\src\FluentMigrator.Runner\FluentMigrator.Runner.csproj" />

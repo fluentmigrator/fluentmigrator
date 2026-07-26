@@ -58,8 +58,18 @@
     <PackageVersion Include="Oracle.DataAccess.x86.4" Version="4.112.3" />
     <PackageVersion Include="Oracle.ManagedDataAccess" Version="23.8.0" />
     <PackageVersion Include="Oracle.ManagedDataAccess.Core" Version="23.8.0" />
-    <PackageVersion Include="Snowflake.Data" Version="4.4.1" />
-    <PackageVersion Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.11" />
+    <!--
+      5.0.0 replaced Snowflake.Data's log4net dependency with Microsoft.Extensions.Logging, which is
+      what clears the NU1902 advisory against log4net 2.0.12 (GHSA-4f7c-pmjv-c25w, fixed in log4net
+      3.3.0 - a version 4.4.1 cannot consume). Only the tools and tests reference this package; the
+      runner loads the driver through ReflectionBasedDbFactory.
+    -->
+    <PackageVersion Include="Snowflake.Data" Version="5.7.0" />
+    <!--
+      2.1.12 is the first release whose SQLitePCLRaw.lib.e_sqlite3 is outside the range of
+      GHSA-2m69-gcr7-jv3q (NU1903); the advisory covers everything up to and including 2.1.11.
+    -->
+    <PackageVersion Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.12" />
   </ItemGroup>
 
   <ItemGroup Label="Runner and tooling">
