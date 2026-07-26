@@ -61,12 +61,12 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@v6
         with:
           dotnet-version: ${{ inputs.dotnet_version }}
 
@@ -148,7 +148,7 @@ jobs:
           echo "comment_path=$comment_md" >> "$GITHUB_OUTPUT"
 
       - name: Publish preview artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: fluentmigrator-preview-${{ github.run_id }}
           path: ${{ steps.generate.outputs.comment_path }}
