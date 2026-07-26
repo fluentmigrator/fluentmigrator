@@ -483,11 +483,13 @@ second thing the dependency graph buys beyond determinism, and it is why the
 graph is worth having even for authors who never hit an ordering bug.
 
 The prerequisite is connection-level, not seed-level. Concurrency needs a
-connection per worker, which is what `DbDataSource`/`WithDataSource` exists to
-provide — **and that work is not on `main`; it currently lives on the
-`copilot/create-claude-fable-5-sub-agent` branch alongside
-`IMigrationConnectionFactory`.** Concurrent seeding is therefore sequenced
-behind it and should not be designed as if the foundation were already present.
+connection per worker, which is what `IMigrationConnectionFactory` and
+`WithDataSource` provide — landed for 9.0.0 and documented in
+[`ConnectionManagement.md`](ConnectionManagement.md). Two details from that
+design matter directly here: a factory is asked for a connection *once per
+processor*, not once per command, which is exactly the granularity a worker
+needs; and `ownsConnection: false` exists for connections the application
+retains, which a seed scheduler must not close.
 
 Transaction semantics follow from the facet rather than needing a new decision.
 N connections means N transactions, so a whole-seed-set transaction and
@@ -506,11 +508,65 @@ expensive to retrofit:
 - **A seed that opts out of concurrency is a per-seed fact**, not a global
   switch — the same shape as `TransactionBehavior`.
 
-dbt is a useful precedent for the schedule (its `threads` setting parallelizes
-the DAG, and seeds are ordinary DAG nodes) but a weak one for the transaction
+dbt is a useful precedent for the schedule but a weak one for the transaction
 question, since it loads into warehouses where each seed is an independent bulk
-load rather than a participant in a migration transaction. Its exact seed
-concurrency semantics are worth reading properly before being cited as support.
+load rather than a participant in a migration transaction.
+
+### `--tasks <N>`: the width knob
+
+Concurrency is the default; the knob bounds it. `--tasks` rather than dbt's
+`--threads`, because with async-all-the-way in 10.0.0 the unit of concurrency is
+a task, not a thread — and the case that proves the distinction is the REPL,
+where WebAssembly gives one thread and any number of pending tasks. A flag named
+`threads` would be describing something that isn't there.
+
+- `--tasks 0` (default) — the scheduler decides.
+- `--tasks 1` — strictly sequential.
+- `--tasks N` — at most N concurrent seeds.
+
+The schedule is the work/span model over the dependency DAG: the toposort's
+tiers are the spans, every seed in a tier is a unit of available parallelism,
+and a work-stealing deque keeps workers fed as tiers open up unevenly. The graph
+authors already write for correctness is the same graph the scheduler consumes,
+which is the payoff for having made dependencies explicit rather than an `int`.
+
+**What "the scheduler decides" should decide from — not core count.** Work
+stealing is a CPU-parallelism model and the intuition it carries with it is
+`Environment.ProcessorCount`; that is the wrong number here. Seeding is I/O
+bound against a shared external resource, so the binding constraint is
+connections and what the server will tolerate, not local cores. Concretely, the
+default should derive from the connection pool's `Max Pool Size` (100 on SQL
+Server by default) with a conservative cap, never from processor count. The span
+of a seed DAG reinforces this: lookup tables are mostly independent roots, so
+the critical path is short and available parallelism is high — the limit will
+essentially always be the pool, not the graph.
+
+**The hosting context can lower it, and knows to.** `FluentMigrator.Repl` has a
+single in-browser database and cooperative scheduling on the UI thread, so its
+effective ceiling is 1 regardless of what the DAG allows. That is a per-context
+default rather than something the user should have to know, and the host
+manifest already records which contexts a host offers.
+
+**`--tasks 1` is a debugging contract, not just a fallback.** It must reproduce
+exactly the documented deterministic order — module index, then tier, then
+`TierOrder`, then type name — so "run it sequentially and see" is a reliable way
+to reproduce a failure seen under concurrency.
+
+**Report deterministically even when executing concurrently.** Interleaved
+per-seed output turns a parallel run into an unreadable log. Buffer per seed and
+emit in canonical order once each completes its tier, the way parallel test
+runners do; concurrency should change the wall clock, not the transcript.
+
+**Failure semantics: cancel unstarted, drain in-flight, report all.** With
+per-seed transactions a failure does not corrupt its neighbours, so the useful
+behaviour is to stop scheduling new work, let running seeds finish, and report
+every failure rather than only the first — an author fixing seed data wants the
+whole list.
+
+`--tasks` is an ordinary `MigrationArgument` on `SeedCommand` (`int?`, default
+`0`, with a `Validate` rejecting negatives), which means the Aspire dashboard
+gets a numeric prompt and the MCP tool gets an integer schema property with no
+per-consumer work — the argument-metadata claim in the Host ADR, doing its job.
 
 **Seeds need an execution facet, and today's pivots omit one.** The seed pivots
 declare `Stage` but no `Execution`, so the manifest carries none. That is a gap,
