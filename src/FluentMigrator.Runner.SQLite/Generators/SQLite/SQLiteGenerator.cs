@@ -23,6 +23,7 @@ using System.Linq;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Generic;
+using FluentMigrator.SQLite;
 
 using JetBrains.Annotations;
 
@@ -85,6 +86,49 @@ namespace FluentMigrator.Runner.Generators.SQLite
 
         /// <inheritdoc />
         public override List<string> GeneratorIdAliases => new List<string> { GeneratorIdConstants.SQLite };
+
+        /// <inheritdoc />
+        public override string Generate(CreateTableExpression expression)
+        {
+            var withoutRowId = expression.AdditionalFeatures.TryGetValue(SQLiteExtensions.WithoutRowIdTable, out var value)
+                && value is true;
+
+            if (withoutRowId)
+            {
+                if (!expression.Columns.Any(column => column.IsPrimaryKey))
+                {
+                    return CompatibilityMode.HandleCompatibility(
+                        $"SQLite requires a PRIMARY KEY on tables created WITHOUT ROWID. Table '{expression.TableName}' is marked WITHOUT ROWID but defines no primary key.");
+                }
+
+                var identityColumns = expression.Columns
+                    .Where(column => column.IsIdentity)
+                    .Select(column => column.Name)
+                    .ToList();
+
+                if (identityColumns.Count > 0)
+                {
+                    return CompatibilityMode.HandleCompatibility(
+                        $"SQLite does not allow AUTOINCREMENT (identity) columns on tables created WITHOUT ROWID. Table '{expression.TableName}' defines identity column(s): {string.Join(", ", identityColumns)}.");
+                }
+            }
+
+            var createTable = base.Generate(expression);
+
+            if (!withoutRowId || string.IsNullOrEmpty(createTable))
+            {
+                return createTable;
+            }
+
+            // Remove trailing semicolon (if any) before appending WITHOUT ROWID
+            var trimmed = createTable.TrimEnd();
+            if (trimmed.EndsWith(";"))
+            {
+                trimmed = trimmed.Substring(0, trimmed.Length - 1);
+            }
+
+            return trimmed + " WITHOUT ROWID;";
+        }
 
         /// <inheritdoc />
         public override string Generate(AlterColumnExpression expression)
