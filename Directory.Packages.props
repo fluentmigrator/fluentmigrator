@@ -63,10 +63,11 @@
   </ItemGroup>
 
   <ItemGroup Label="Runner and tooling">
-    <PackageVersion Include="AutoMapper" Version="15.0.1" />
     <PackageVersion Include="FSharp.Core" Version="9.0.303" />
     <PackageVersion Include="McMaster.Extensions.CommandLineUtils" Version="4.1.1" />
     <PackageVersion Include="Microsoft.Build.Utilities.Core" Version="17.14.28" />
+    <!-- Compile-time only source generator; replaces the reflection-based AutoMapper. -->
+    <PackageVersion Include="Riok.Mapperly" Version="4.3.1" />
   </ItemGroup>
 
   <ItemGroup Label="Roslyn analyzers">

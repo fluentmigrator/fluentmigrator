@@ -12,7 +12,11 @@
   </ItemGroup>
   <!-- Package versions come from Directory.Packages.props in the repository root. -->
   <ItemGroup>
-    <PackageReference Include="AutoMapper" />
+    <!--
+      Mapperly is a compile-time source generator. ExcludeAssets="runtime" and PrivateAssets="all"
+      keep it out of the shipped tool entirely, so dotnet-fm gains no runtime mapping dependency.
+    -->
+    <PackageReference Include="Riok.Mapperly" ExcludeAssets="runtime" PrivateAssets="all" />
     <PackageReference Include="FirebirdSql.Data.FirebirdClient" />
     <PackageReference Include="FSharp.Core" />
     <PackageReference Include="McMaster.Extensions.CommandLineUtils" />
