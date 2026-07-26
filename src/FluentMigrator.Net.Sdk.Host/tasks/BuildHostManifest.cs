@@ -1,3 +1,21 @@
+#region License
+//
+// Copyright (c) 2007-2024, Fluent Migrator Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+#endregion
+
 // Compiled at build time by RoslynCodeTaskFactory. Same constraints as
 // BuildSourceModel.cs: no LINQ, no System.Text.Json, deterministic output.
 //
@@ -22,7 +40,6 @@
 //   FMSDK205 (warn)  no root module: database creation/baseline unmanaged
 //   FMSDK207 (error) unknown host context
 //   FMSDK208 (warn)  no runner package registered for a target's dialect
-
 using System;
 using System.Collections.Generic;
 using System.IO;
