@@ -27,12 +27,14 @@ namespace FluentMigrator.Analyzers.Analysis
     public class FluentMigratorContext
     {
         private readonly Lazy<INamedTypeSymbol> _lazyMigrationAttributeType;
+        private readonly Lazy<INamedTypeSymbol> _lazyExecuteExpressionRootType;
 
         internal FluentMigratorContext(Compilation compilation)
         {
             Compilation = compilation;
 
             _lazyMigrationAttributeType = new Lazy<INamedTypeSymbol>(() => compilation.GetTypeByMetadataName(Constants.Types.FluentMigratorMigrationAttribute));
+            _lazyExecuteExpressionRootType = new Lazy<INamedTypeSymbol>(() => compilation.GetTypeByMetadataName(Constants.Types.FluentMigratorIExecuteExpressionRoot));
         }
 
         /// <summary>
@@ -44,6 +46,12 @@ namespace FluentMigrator.Analyzers.Analysis
         /// Gets the <see cref="INamedTypeSymbol"/> representing the Migration attribute type.
         /// </summary>
         public INamedTypeSymbol MigrationAttributeType => _lazyMigrationAttributeType?.Value;
+
+        /// <summary>
+        /// Gets the <see cref="INamedTypeSymbol"/> representing the <c>IExecuteExpressionRoot</c> interface,
+        /// which declares the <c>Sql(string, ...)</c> overloads that support SQL script token substitution.
+        /// </summary>
+        public INamedTypeSymbol ExecuteExpressionRootType => _lazyExecuteExpressionRootType?.Value;
 
         /// <summary>
         /// Gets the collection of migration class declarations found during analysis.

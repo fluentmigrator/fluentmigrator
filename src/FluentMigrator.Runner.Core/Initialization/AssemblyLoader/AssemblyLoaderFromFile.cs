@@ -32,6 +32,9 @@ namespace FluentMigrator.Runner.Initialization.AssemblyLoader
     /// based on their file paths. It resolves the file path if it is not rooted and attempts to locate
     /// the assembly in the current runtime's base directory or other possible locations.
     /// </remarks>
+#if NET
+    [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This type uses AppDomain to load assemblies, which may not be preserved in trimmed applications.")]
+#endif
     public class AssemblyLoaderFromFile : IAssemblyLoader
     {
         private readonly string _name;

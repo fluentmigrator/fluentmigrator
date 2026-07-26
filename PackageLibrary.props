@@ -9,6 +9,9 @@
     <DebugType Condition=" '$(Configuration)' == 'Release' ">portable</DebugType> <!-- Required for EmbedSources -->
     <DebugType Condition=" '$(Configuration)' == 'Debug' ">full</DebugType> <!-- Required for EmbedSources -->
     <IsPackable>true</IsPackable>
+    <!-- Validate that the public API does not introduce breaking changes against the last released version. See https://learn.microsoft.com/en-us/dotnet/fundamentals/apicompat/package-validation/overview -->
+    <EnablePackageValidation>true</EnablePackageValidation>
+    <PackageValidationBaselineVersion>8.0.1</PackageValidationBaselineVersion>
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(Configuration)' == 'Release' ">

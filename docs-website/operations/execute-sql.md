@@ -43,7 +43,14 @@ Execute.Sql(@"
 
 ## Using Parameters in SQL Scripts
 
-FluentMigrator supports parameterized SQL scripts through the `parameters` argument available in `Execute.Sql`, `Execute.Script`, and `Execute.EmbeddedScript` methods. Parameters use token replacement with the `$(parameterName)` syntax.
+FluentMigrator supports parameterized SQL scripts through the `parameters` argument available in `Execute.Sql`, `Execute.Script`, and `Execute.EmbeddedScript` methods. Parameters use token replacement and come in two flavors:
+
+- `$(parameterName)` performs a **raw, unescaped** substitution. The parameter value is inserted verbatim, so it is appropriate for identifiers (table/column names) and SQL fragments/keywords (e.g. `GETDATE()`) that must not be quoted. Because the value is not escaped in any way, **you are responsible for validating/sanitizing** any value used with this syntax to avoid SQL injection.
+- `$[parameterName]` performs a **safely quoted** substitution. The parameter value is wrapped in single quotes and any embedded single quotes are escaped by doubling them (the standard ANSI SQL escaping mechanism), producing a valid SQL string literal. Prefer this syntax whenever a parameter represents string data rather than raw SQL.
+
+::: warning
+`$(parameterName)` does **not** sanitize its value in any way - it is a plain text substitution, not a parameterized query. Only use it with trusted values (e.g. hard-coded constants or values validated against an allow-list). Use `$[parameterName]` for any value that should be treated as data rather than SQL.
+:::
 
 ### Basic Parameter Usage with Execute.Sql
 
@@ -61,15 +68,17 @@ public override void Up()
         CREATE TABLE $(TablePrefix)Users (
             Id INT IDENTITY(1,1) PRIMARY KEY,
             Username NVARCHAR(50) NOT NULL,
-            Status NVARCHAR(20) DEFAULT '$(DefaultStatus)',
+            Status NVARCHAR(20) DEFAULT $[DefaultStatus],
             CreatedAt DATETIME DEFAULT $(CurrentDate)
         );
 
         INSERT INTO $(TablePrefix)Users (Username, Status, CreatedAt)
-        VALUES ('admin', '$(DefaultStatus)', $(CurrentDate));
+        VALUES ('admin', $[DefaultStatus], $(CurrentDate));
     ", parameters);
 }
 ```
+
+Note that `$[DefaultStatus]` is rendered as a quoted string literal (e.g. `'Active'`), so it isn't wrapped in additional quotes in the SQL - unlike `$(TablePrefix)` and `$(CurrentDate)`, which are inserted as raw SQL.
 
 ### Parameter Usage with Execute.Script
 
@@ -179,7 +188,7 @@ public override void Up()
 
 ### Parameter Escaping
 
-When you need to include the literal text `$(parameterName)` in your SQL (not as a parameter), use double dollar signs and double parentheses:
+When you need to include the literal text `$(parameterName)` or `$[parameterName]` in your SQL (not as a parameter), double the dollar sign and brackets/parentheses:
 
 ```csharp
 public override void Up()
@@ -197,6 +206,10 @@ public override void Up()
         -- This will NOT be replaced: $$((ParameterName)) becomes '$(ParameterName)' literally
         INSERT INTO DocumentationTable (Description) 
         VALUES ('Use $$((ParameterName)) syntax to include literal parameter syntax');
+
+        -- Likewise, $$[[ParameterName]] becomes '$[ParameterName]' literally
+        INSERT INTO DocumentationTable (Description) 
+        VALUES ('Use $$[[ParameterName]] syntax to include literal safe-parameter syntax');
 
         -- Mixed example:
         COMMENT ON COLUMN $(ActualTableName).$(ActualColumnName) 
@@ -279,6 +292,7 @@ public class CreateMultiTenantSchema : Migration
 
 **✅ Good practices:**
 - Use descriptive parameter names that clearly indicate their purpose
+- Use the `$[name]` syntax for string data so values are safely quoted/escaped, and reserve `$(name)` for identifiers/raw SQL that has been validated
 - Validate parameter values before passing them to avoid SQL injection
 - Use parameters for table names, column names, and configuration values that change between environments
 - Keep parameter dictionaries organized and well-documented
@@ -622,6 +636,26 @@ public override void Up()
     }
 }
 ```
+
+::: warning
+The `$(parameterName)` token syntax is a plain text substitution and provides **no protection against SQL injection** on its own - it is functionally equivalent to string interpolation. Only use it for trusted, validated values such as identifiers checked against an allow-list.
+
+When a parameter represents string data (rather than an identifier or raw SQL fragment), use the `$[parameterName]` syntax instead. It renders the value as a properly quoted and escaped SQL string literal, so values containing single quotes (e.g. `isn't active`) are handled safely:
+
+```csharp
+public override void Up()
+{
+    var parameters = new Dictionary<string, string>
+    {
+        ["Status"] = "isn't active"
+    };
+
+    // $[Status] becomes 'isn''t active', which is safe for SQL Server, PostgreSQL,
+    // MySQL, SQLite, and other databases that follow the ANSI SQL escaping convention.
+    Execute.Sql("UPDATE Users SET Status = $[Status]", parameters);
+}
+```
+:::
 
 ## Integration with Migration Features
 

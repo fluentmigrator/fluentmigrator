@@ -34,6 +34,78 @@ services.AddFluentMigratorCore()
         .WithGlobalConnectionString("Host=localhost;Database=myapp;Username=myuser;Password=mypass")
         .ScanIn(typeof(MyMigration).Assembly).For.Migrations());
 ```
+### Dynamic Passwords
+
+For scenarios where the password or authentication token is generated at runtime, configure an `NpgsqlDataSource` and pass it to FluentMigrator with `WithDataSource(...)` or `.WithConnectionFactory(...)`.
+This is useful for cloud-hosted databases that use rotating credentials or short-lived authentication tokens.
+
+```csharp
+services.AddSingleton(sp =>
+{
+    var connectionString = "Host=localhost;Database=myapp;Username=myuser";
+    var builder = new NpgsqlDataSourceBuilder(connectionString);
+
+    builder.UsePasswordProvider(
+        passwordProvider: settings => GetPassword(),
+        passwordProviderAsync: (settings, cancellationToken) => GetPasswordAsync(cancellationToken));
+
+    return builder.Build();
+});
+
+services
+    .AddFluentMigratorCore()
+    .ConfigureRunner(runner => runner
+        .AddPostgres()
+        // Preferred when using a provider data source.
+        .WithDataSource(sp => sp.GetRequiredService<NpgsqlDataSource>())
+        // Use WithConnectionFactory when you need full control over how the
+        // IDbConnection is created, for example from a tenant resolver, secret
+        // provider, token service, or an existing provider-specific data source.
+        // .WithConnectionFactory(sp =>
+        //     sp.GetRequiredService<NpgsqlDataSource>().CreateConnection())
+        .ScanIn(typeof(SomeMigration).Assembly).For.Migrations());
+```
+
+### AWS RDS IAM authentication
+
+The same abstraction covers AWS RDS/Aurora IAM authentication, where the password is a short-lived
+authentication token that has to be regenerated periodically:
+
+```csharp
+services.AddSingleton(sp =>
+{
+    var builder = new NpgsqlDataSourceBuilder("Host=my-cluster.eu-west-1.rds.amazonaws.com;Database=myapp;Username=myuser");
+
+    builder.UsePeriodicPasswordProvider(
+        (settings, cancellationToken) => new ValueTask<string>(
+            RDSAuthTokenGenerator.GenerateAuthToken(settings.Host, settings.Port, settings.Username)),
+        TimeSpan.FromMinutes(10),
+        TimeSpan.FromSeconds(5));
+
+    return builder.Build();
+});
+
+services
+    .AddFluentMigratorCore()
+    .ConfigureRunner(runner => runner
+        .AddPostgres()
+        .WithDataSource(sp => sp.GetRequiredService<NpgsqlDataSource>())
+        .ScanIn(typeof(SomeMigration).Assembly).For.Migrations());
+```
+
+FluentMigrator asks the configured factory or data source for a connection **once per migration
+processor** (that is, once per connection and never once per command), so every new migration scope
+picks up the token that is current at that moment.
+
+### Connection ownership
+
+By default the migration processor closes and disposes the connection it received from the factory.
+When the connection is owned by the application - for example an already open connection that is
+shared with the rest of the application - opt out of that behavior:
+
+```csharp
+.WithConnectionFactory(sp => sp.GetRequiredService<MyConnectionHolder>().Connection, ownsConnection: false)
+```
 
 ## Column types
 

@@ -47,6 +47,9 @@ namespace FluentMigrator.Builders.Delete
         }
 
         /// <inheritdoc />
+#if NET
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("The properties of the anonymous type cannot be statically analyzed.")]
+#endif
         public IDeleteDataSyntax Row(object dataAsAnonymousType)
         {
             Expression.Rows.Add(GetData<DeletionDataDefinition>(dataAsAnonymousType));

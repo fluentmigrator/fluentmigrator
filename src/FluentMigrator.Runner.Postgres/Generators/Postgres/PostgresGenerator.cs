@@ -91,9 +91,16 @@ namespace FluentMigrator.Runner.Generators.Postgres
         /// <inheritdoc />
         public override string AddColumn => "ALTER TABLE {0} ADD {1}";
         /// <inheritdoc />
+        public override string AddColumnIfExists => "ALTER TABLE IF EXISTS {0} ADD {1}";
+        /// <inheritdoc />
         public override string AlterColumn => "ALTER TABLE {0} {1}";
         /// <inheritdoc />
+        public override string AlterColumnIfExists => "ALTER TABLE IF EXISTS {0} {1}";
+        /// <inheritdoc />
         public override string RenameTable => "ALTER TABLE {0} RENAME TO {1}";
+
+        /// <inheritdoc />
+        protected override bool SupportsAlterTableIfExistsForColumns => true;
 
         /// <inheritdoc />
         public override string GeneratorId => GeneratorIdConstants.PostgreSQL;
@@ -134,7 +141,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
             }
             var alterStatement = new StringBuilder();
             alterStatement.AppendFormat(
-                AlterColumn,
+                expression.IfExists ? AlterColumnIfExists : AlterColumn,
                 Quoter.QuoteTableName(expression.TableName, expression.SchemaName),
                 ((PostgresColumn)Column).GenerateAlterClauses(expression.Column));
 

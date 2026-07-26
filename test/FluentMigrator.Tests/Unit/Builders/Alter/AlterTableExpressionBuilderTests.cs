@@ -723,5 +723,52 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
 
             columnMock.VerifySet(c => c.Precision = expected);
         }
+
+        [Test]
+        public void CallingIfExistsSetsIfExistsToTrue()
+        {
+            var expressions = new List<IMigrationExpression>();
+            var contextMock = new Mock<IMigrationContext>();
+            contextMock.Setup(x => x.Expressions).Returns(expressions);
+
+            var expression = new AlterTableExpression { TableName = "TestTable" };
+
+            var builder = new AlterTableExpressionBuilder(expression, contextMock.Object);
+            builder.IfExists();
+
+            expression.IfExists.ShouldBeTrue();
+        }
+
+        [Test]
+        public void CallingIfExistsPropagatesToAddColumn()
+        {
+            var expressions = new List<IMigrationExpression>();
+            var contextMock = new Mock<IMigrationContext>();
+            contextMock.Setup(x => x.Expressions).Returns(expressions);
+
+            var expression = new AlterTableExpression { TableName = "TestTable" };
+
+            var builder = new AlterTableExpressionBuilder(expression, contextMock.Object);
+            builder.IfExists().AddColumn("Total").AsDecimal(10, 2).Nullable();
+
+            var createColumnExpression = expressions.OfType<CreateColumnExpression>().Single();
+            createColumnExpression.IfExists.ShouldBeTrue();
+        }
+
+        [Test]
+        public void CallingIfExistsPropagatesToAlterColumn()
+        {
+            var expressions = new List<IMigrationExpression>();
+            var contextMock = new Mock<IMigrationContext>();
+            contextMock.Setup(x => x.Expressions).Returns(expressions);
+
+            var expression = new AlterTableExpression { TableName = "TestTable" };
+
+            var builder = new AlterTableExpressionBuilder(expression, contextMock.Object);
+            builder.IfExists().AlterColumn("Total").AsDecimal(10, 2).Nullable();
+
+            var alterColumnExpression = expressions.OfType<AlterColumnExpression>().Single();
+            alterColumnExpression.IfExists.ShouldBeTrue();
+        }
     }
 }

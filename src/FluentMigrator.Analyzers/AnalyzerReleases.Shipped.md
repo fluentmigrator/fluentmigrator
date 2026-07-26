@@ -2,6 +2,7 @@
 
 ### New Rules
 
-| Rule ID | Category       | Severity | Notes                              |
-|---------|----------------|----------|------------------------------------|
-| FM0001  | FluentMigrator | Warning  | Migration version should be unique |
+| Rule ID | Category       | Severity | Notes                                        |
+|---------|----------------|----------|-----------------------------------------------|
+| FM0001  | FluentMigrator | Warning  | Migration version should be unique           |
+| FM0002  | FluentMigrator | Warning  | Prefer $[name] over $(name) for SQL token substitution |

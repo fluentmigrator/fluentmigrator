@@ -46,6 +46,7 @@ namespace FluentMigrator.Runner.Processors.Snowflake
         private readonly bool _quoteIdentifiers;
 
         /// <inheritdoc />
+        [Obsolete("Use the constructor that accepts IMigrationConnectionFactory instead.")]
         public SnowflakeProcessor(
             [NotNull] SnowflakeDbFactory factory,
             [NotNull] SnowflakeGenerator generator,
@@ -62,6 +63,23 @@ namespace FluentMigrator.Runner.Processors.Snowflake
         }
 
         /// <inheritdoc />
+        [ActivatorUtilitiesConstructor]
+        public SnowflakeProcessor(
+            [NotNull] SnowflakeDbFactory factory,
+            [NotNull] SnowflakeGenerator generator,
+            [NotNull] SnowflakeQuoter quoter,
+            [NotNull] ILogger<SnowflakeProcessor> logger,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> options,
+            [NotNull] IMigrationConnectionFactory connectionFactory,
+            [NotNull] SnowflakeOptions sfOptions,
+            [NotNull] IServiceProvider serviceProvider) : base(() => factory.Factory, generator, logger, options.Value, connectionFactory)
+        {
+            _quoteIdentifiers = sfOptions.QuoteIdentifiers;
+            Quoter = quoter;
+            _serviceProvider = serviceProvider;
+        }
+
+        /// <inheritdoc />
         public override string DatabaseType => "Snowflake";
 
         /// <inheritdoc />
@@ -70,7 +88,7 @@ namespace FluentMigrator.Runner.Processors.Snowflake
         /// <summary>
         /// Gets the quoter for Snowflake SQL.
         /// </summary>
-        public SnowflakeQuoter Quoter { get; }
+        public new SnowflakeQuoter Quoter { get; }
 
         /// <inheritdoc />
         public override void Process(PerformDBOperationExpression expression)

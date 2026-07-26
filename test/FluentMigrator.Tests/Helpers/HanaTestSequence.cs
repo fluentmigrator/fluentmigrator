@@ -20,26 +20,24 @@ using System.Data;
 using FluentMigrator.Runner.Generators.Hana;
 using FluentMigrator.Runner.Processors.Hana;
 
-using Sap.Data.Hana;
-
 namespace FluentMigrator.Tests.Helpers
 {
     public class HanaTestSequence: IDisposable
     {
         private readonly HanaQuoter _quoter = new HanaQuoter();
         private readonly string _schemaName;
-        private HanaConnection Connection { get; }
+        private IDbConnection Connection { get; }
         public string Name { get; set; }
         public string NameWithSchema { get; set; }
-        private HanaTransaction Transaction { get; }
+        private IDbTransaction Transaction { get; }
 
         public HanaTestSequence(HanaProcessor processor, string schemaName, string sequenceName)
         {
             _schemaName = schemaName;
             Name = _quoter.QuoteSequenceName(sequenceName, null);
 
-            Connection = (HanaConnection)processor.Connection;
-            Transaction = (HanaTransaction)processor.Transaction;
+            Connection = processor.Connection;
+            Transaction = processor.Transaction;
             NameWithSchema = _quoter.QuoteSequenceName(sequenceName, schemaName);
             Create();
         }
@@ -56,24 +54,40 @@ namespace FluentMigrator.Tests.Helpers
 
             if (!string.IsNullOrEmpty(_schemaName))
             {
-                using (var command = new HanaCommand($"CREATE SCHEMA \"{_schemaName}\";", Connection, Transaction))
+                using (var command = Connection.CreateCommand())
+                {
+                    command.CommandText = $"CREATE SCHEMA \"{_schemaName}\";";
+                    command.Transaction = Transaction;
                     command.ExecuteNonQuery();
+                }
             }
 
             string createCommand = $"CREATE SEQUENCE {NameWithSchema} INCREMENT BY 2 MINVALUE 0 MAXVALUE 100 START WITH 2 CACHE 10 CYCLE";
-            using (var command = new HanaCommand(createCommand, Connection, Transaction))
+            using (var command = Connection.CreateCommand())
+            {
+                command.CommandText = createCommand;
+                command.Transaction = Transaction;
                 command.ExecuteNonQuery();
+            }
         }
 
         public void Drop()
         {
-            using (var command = new HanaCommand("DROP SEQUENCE " + NameWithSchema, Connection, Transaction))
+            using (var command = Connection.CreateCommand())
+            {
+                command.CommandText = "DROP SEQUENCE " + NameWithSchema;
+                command.Transaction = Transaction;
                 command.ExecuteNonQuery();
+            }
 
             if (!string.IsNullOrEmpty(_schemaName))
             {
-                using (var command = new HanaCommand($"DROP SCHEMA \"{_schemaName}\"", Connection, Transaction))
+                using (var command = Connection.CreateCommand())
+                {
+                    command.CommandText = $"DROP SCHEMA \"{_schemaName}\"";
+                    command.Transaction = Transaction;
                     command.ExecuteNonQuery();
+                }
             }
         }
     }

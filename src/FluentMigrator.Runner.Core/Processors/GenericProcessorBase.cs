@@ -43,7 +43,21 @@ namespace FluentMigrator.Runner.Processors
         [CanBeNull]
         private IDbConnection _connection;
 
+        private readonly bool _ownsFactoryConnection;
+
         private bool _disposed;
+
+        /// <inheritdoc />
+        [Obsolete("Use the constructor that accepts IMigrationConnectionFactory instead.")]
+        protected GenericProcessorBase(
+            [NotNull] Func<DbProviderFactory> factoryAccessor,
+            [NotNull] IMigrationGenerator generator,
+            [NotNull] ILogger logger,
+            [NotNull] ProcessorOptions options,
+            [NotNull] IConnectionStringAccessor connectionStringAccessor)
+            : this(factoryAccessor, generator, logger, options, new ConnectionStringMigrationConnectionFactory(connectionStringAccessor))
+        {
+        }
 
         /// <inheritdoc />
         protected GenericProcessorBase(
@@ -51,22 +65,32 @@ namespace FluentMigrator.Runner.Processors
             [NotNull] IMigrationGenerator generator,
             [NotNull] ILogger logger,
             [NotNull] ProcessorOptions options,
-            [NotNull] IConnectionStringAccessor connectionStringAccessor)
+            [NotNull] IMigrationConnectionFactory connectionFactory)
             : base(generator, logger, options)
         {
-            _dbProviderFactory = new Lazy<DbProviderFactory>(factoryAccessor.Invoke);
+            if (connectionFactory == null)
+            {
+                throw new ArgumentNullException(nameof(connectionFactory));
+            }
 
-            var connectionString = connectionStringAccessor.ConnectionString;
+            _dbProviderFactory = new Lazy<DbProviderFactory>(factoryAccessor.Invoke);
+            _ownsFactoryConnection = connectionFactory.OwnsConnection;
 
             _lazyConnection = new Lazy<IDbConnection>(
                 () =>
                 {
                     if (DbProviderFactory == null)
                         return null;
-                    var connection = DbProviderFactory.CreateConnection();
-                    Debug.Assert(connection != null, nameof(Connection) + " != null");
-                    connection!.ConnectionString = connectionString;
-                    connection.Open();
+                    
+                    var connection = connectionFactory.CreateConnection(DbProviderFactory);
+                    if (connection == null)
+                    {
+                        throw new InvalidOperationException(
+                            $"The connection factory '{connectionFactory.GetType().FullName}' returned null from {nameof(IMigrationConnectionFactory.CreateConnection)}().");
+                    }
+
+                    if (connection.State != ConnectionState.Open)
+                        connection.Open();
                     return connection;
                 });
         }
@@ -104,10 +128,29 @@ namespace FluentMigrator.Runner.Processors
         }
 
         /// <summary>
+        /// Gets a value indicating whether this processor owns the connection it uses, and
+        /// therefore may close and dispose it.
+        /// </summary>
+        /// <remarks>
+        /// This is <c>false</c> when the connection was handed over by an
+        /// <see cref="FluentMigrator.Runner.Initialization.IMigrationConnectionFactory"/> whose
+        /// <see cref="FluentMigrator.Runner.Initialization.IMigrationConnectionFactory.OwnsConnection"/> is <c>false</c>.
+        /// </remarks>
+        protected bool OwnsConnection => _ownsFactoryConnection;
+
+        /// <summary>
         /// Ensures the database connection is closed.
         /// </summary>
+        /// <remarks>
+        /// Connections owned by the caller are never closed.
+        /// </remarks>
         protected virtual void EnsureConnectionIsClosed()
         {
+            if (!_ownsFactoryConnection)
+            {
+                return;
+            }
+
             if ((_connection != null || (_lazyConnection.IsValueCreated && Connection != null)) && Connection.State != ConnectionState.Closed)
             {
                 Connection.Close();
@@ -151,6 +194,12 @@ namespace FluentMigrator.Runner.Processors
         }
 
         /// <inheritdoc />
+        public override bool HasTransaction()
+        {
+            return Transaction is not null;
+        }
+
+        /// <inheritdoc />
         protected override void Dispose(bool isDisposing)
         {
             if (!isDisposing || _disposed)
@@ -159,6 +208,14 @@ namespace FluentMigrator.Runner.Processors
             _disposed = true;
 
             RollbackTransaction();
+
+            if (!_ownsFactoryConnection)
+            {
+                // The connection is owned by the caller (for example an application-managed
+                // connection handed to the runner), so it must neither be closed nor disposed.
+                return;
+            }
+
             EnsureConnectionIsClosed();
             if ((_connection != null || (_lazyConnection.IsValueCreated && Connection != null)))
             {
@@ -185,27 +242,61 @@ namespace FluentMigrator.Runner.Processors
         /// <returns>The database command.</returns>
         protected virtual IDbCommand CreateCommand(string commandText, IDbConnection connection, IDbTransaction transaction)
         {
-            IDbCommand result;
-            if (DbProviderFactory != null)
+            var result = CreateCommandCore(connection);
+
+            if (transaction != null)
+                result.Transaction = transaction;
+            result.CommandText = commandText;
+
+            if (Options.Timeout != null)
             {
-                result = DbProviderFactory.CreateCommand();
-                Debug.Assert(result != null, nameof(result) + " != null");
-                result!.Connection = connection;
-                if (transaction != null)
-                    result.Transaction = transaction;
-                result.CommandText = commandText;
+                result.CommandTimeout = (int)Options.Timeout.Value.TotalSeconds;
             }
-            else
+
+            return result;
+        }
+
+        [NotNull]
+        private IDbCommand CreateCommandCore([CanBeNull] IDbConnection connection)
+        {
+            var providerFactory = DbProviderFactory;
+
+            if (providerFactory != null)
+            {
+                var command = providerFactory.CreateCommand();
+                Debug.Assert(command != null, nameof(command) + " != null");
+
+                if (connection == null || TryAssignConnection(command, connection))
+                {
+                    return command;
+                }
+
+                // The connection was created by a custom IMigrationConnectionFactory for a
+                // different ADO.NET provider than the one configured for this processor. Fall
+                // back to a command created by the connection itself, so that the mismatch
+                // doesn't surface as an obscure cast exception.
+                command.Dispose();
+            }
+
+            if (connection == null)
             {
                 throw new InvalidOperationException("DbProviderFactory not initialized.");
             }
 
-            if (Options.Timeout != null)
-            {
-                result.CommandTimeout = (int) Options.Timeout.Value.TotalSeconds;
-            }
+            return connection.CreateCommand();
+        }
 
-            return result;
+        private static bool TryAssignConnection([NotNull] IDbCommand command, [NotNull] IDbConnection connection)
+        {
+            try
+            {
+                command.Connection = connection;
+                return true;
+            }
+            catch (Exception ex) when (ex is InvalidCastException or ArgumentException or NotSupportedException)
+            {
+                return false;
+            }
         }
     }
 }

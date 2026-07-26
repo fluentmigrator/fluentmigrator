@@ -138,8 +138,10 @@ namespace FluentMigrator.Tests.Unit
             var conventionsMock = new Mock<IMigrationRunnerConventions>();
             conventionsMock.SetupGet(m => m.GetMigrationInfoForMigration).Returns(DefaultMigrationRunnerConventions.Instance.GetMigrationInfoForMigration);
             conventionsMock.SetupGet(m => m.TypeIsMigration).Returns(t => true);
+#pragma warning disable CS0618
             conventionsMock.SetupGet(m => m.TypeHasTags).Returns(t => migrationType == t);
             conventionsMock.SetupGet(m => m.TypeHasMatchingTags).Returns((type, tags) => (migrationType == type && tagsToMatch == tags));
+#pragma warning restore CS0618
 
             var loader = ServiceCollectionExtensions.CreateServices()
                 .WithMigrationsIn(migrationType.Namespace)
@@ -164,8 +166,10 @@ namespace FluentMigrator.Tests.Unit
             var conventionsMock = new Mock<IMigrationRunnerConventions>();
             conventionsMock.SetupGet(m => m.GetMigrationInfoForMigration).Returns(DefaultMigrationRunnerConventions.Instance.GetMigrationInfoForMigration);
             conventionsMock.SetupGet(m => m.TypeIsMigration).Returns(t => true);
+#pragma warning disable CS0618
             conventionsMock.SetupGet(m => m.TypeHasTags).Returns(t => migrationType == t);
             conventionsMock.SetupGet(m => m.TypeHasMatchingTags).Returns((type, tags) => false);
+#pragma warning restore CS0618
 
             var loader = ServiceCollectionExtensions.CreateServices()
                 .WithMigrationsIn(migrationType.Namespace)

@@ -35,6 +35,7 @@ namespace FluentMigrator.Builders.Create.Table
                                                 ICreateTableColumnAsTypeSyntax,
                                                 ICreateTableColumnOptionOrForeignKeyCascadeOrWithColumnSyntax,
                                                 IColumnExpressionBuilder,
+                                                ISupportAdditionalFeatures,
                                                 IMigrationContextAccessor
     {
         private readonly IMigrationContext _context;
@@ -89,6 +90,13 @@ namespace FluentMigrator.Builders.Create.Table
         public ICreateTableWithColumnOrSchemaSyntax WithDescription(string description)
         {
             Expression.TableDescription = description;
+            return this;
+        }
+
+        /// <inheritdoc />
+        public ICreateTableWithColumnOrSchemaOrDescriptionSyntax IfNotExists()
+        {
+            Expression.IfNotExists = true;
             return this;
         }
 
@@ -353,5 +361,8 @@ namespace FluentMigrator.Builders.Create.Table
 
         /// <inheritdoc />
         ColumnDefinition IColumnExpressionBuilder.Column => CurrentColumn;
+
+        /// <inheritdoc />
+        IDictionary<string, object> ISupportAdditionalFeatures.AdditionalFeatures => Expression.AdditionalFeatures;
     }
 }

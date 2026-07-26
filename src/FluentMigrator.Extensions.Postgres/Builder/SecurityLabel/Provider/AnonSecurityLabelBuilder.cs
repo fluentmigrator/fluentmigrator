@@ -121,6 +121,17 @@ public partial class AnonSecurityLabelBuilder : SecurityLabelSyntaxBuilderBase
         return this;
     }
 
+    /// <summary>
+    /// Masks the column with a custom function call.
+    /// </summary>
+    /// <param name="functionCall">The function call expression (e.g., "anon.my_function()").</param>
+    /// <returns>The current builder instance for method chaining.</returns>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="functionCall"/> is null or whitespace.</exception>
+    public AnonSecurityLabelBuilder MaskedWithFunction(string functionCall)
+    {
+        return MaskedWithFunction(functionCall, Array.Empty<object>());
+    }
+
 
     /// <summary>
     /// Marks the column as masked without specifying a masking function.

@@ -17,30 +17,69 @@
 using System;
 
 using FluentMigrator.Runner.Generators.Hana;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Hana;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner
 {
     /// <summary>
     /// Extension methods for <see cref="IMigrationRunnerBuilder"/>
     /// </summary>
-    [Obsolete("Hana support will go away unless someone in the community steps up to provide support.")]
     public static class HanaRunnerBuilderExtensions
     {
+        /// <summary>
+        /// Adds SAP Hana support using the <c>Sap.Data.Hana.Net.v8.0</c> NuGet package
+        /// </summary>
+        /// <param name="builder">The builder to add the SAP Hana-specific services to</param>
+        /// <returns>The migration runner builder</returns>
+        /// <remarks>
+        /// Requires the <c>Sap.Data.Hana.Net.v8.0</c> NuGet package to be installed.
+        /// </remarks>
+        public static IMigrationRunnerBuilder AddHana8(this IMigrationRunnerBuilder builder)
+        {
+            return builder.RegisterHanaServices();
+        }
+
+        /// <summary>
+        /// Adds SAP Hana support using the <c>Sap.Data.Hana.Net.v10.0</c> NuGet package
+        /// </summary>
+        /// <param name="builder">The builder to add the SAP Hana-specific services to</param>
+        /// <returns>The migration runner builder</returns>
+        /// <remarks>
+        /// Requires the <c>Sap.Data.Hana.Net.v10.0</c> NuGet package to be installed.
+        /// </remarks>
+        public static IMigrationRunnerBuilder AddHana10(this IMigrationRunnerBuilder builder)
+        {
+            return builder.RegisterHanaServices();
+        }
+
         /// <summary>
         /// Adds SAP Hana support
         /// </summary>
         /// <param name="builder">The builder to add the SAP Hana-specific services to</param>
         /// <returns>The migration runner builder</returns>
-        [Obsolete("Hana support will go away unless someone in the community steps up to provide support.")]
+        [Obsolete("Use AddHana8() for .NET 8 with the Sap.Data.Hana.Net.v8.0 NuGet package, or AddHana10() for .NET 10 with the Sap.Data.Hana.Net.v10.0 NuGet package.")]
         public static IMigrationRunnerBuilder AddHana(this IMigrationRunnerBuilder builder)
+        {
+            return builder.RegisterHanaServices();
+        }
+
+        private static IMigrationRunnerBuilder RegisterHanaServices(this IMigrationRunnerBuilder builder)
         {
             builder.Services
                 .AddScoped<HanaDbFactory>()
-                .AddScoped<HanaProcessor>()
+                .AddScoped<HanaProcessor>(sp =>
+                    new HanaProcessor(
+                        sp.GetRequiredService<HanaDbFactory>(),
+                        sp.GetRequiredService<HanaGenerator>(),
+                        sp.GetRequiredService<ILogger<HanaProcessor>>(),
+                        sp.GetRequiredService<IOptionsSnapshot<ProcessorOptions>>(),
+                        sp.GetRequiredService<IMigrationConnectionFactory>()))
                 .AddScoped<IMigrationProcessor>(sp => sp.GetRequiredService<HanaProcessor>())
                 .AddScoped<HanaQuoter>()
                 .AddScoped<IHanaTypeMap>(sp => new HanaTypeMap())

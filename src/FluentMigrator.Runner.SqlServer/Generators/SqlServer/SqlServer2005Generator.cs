@@ -218,6 +218,11 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         /// <inheritdoc />
         public override string Generate(CreateTableExpression expression)
         {
+            if (expression.IfNotExists)
+            {
+                return CompatibilityMode.HandleCompatibility("Create.Table(...).IfNotExists() is not supported");
+            }
+
             var descriptionStatements = DescriptionGenerator.GenerateDescriptionStatements(expression);
             var createTableStatement = base.Generate(expression);
             var descriptionStatementsArray = descriptionStatements as string[] ?? descriptionStatements.ToArray();
@@ -253,7 +258,18 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         /// <inheritdoc />
         public override string Generate(CreateColumnExpression expression)
         {
-            var alterTableStatement = base.Generate(expression);
+            string alterTableStatement;
+            if (expression.IfExists)
+            {
+                alterTableStatement = FormatStatement(
+                    "IF OBJECT_ID('{0}','U') IS NOT NULL " + AddColumn,
+                    Quoter.QuoteTableName(expression.TableName, expression.SchemaName),
+                    Column.Generate(expression.Column));
+            }
+            else
+            {
+                alterTableStatement = base.Generate(expression);
+            }
 
             if (expression.Column.IsPrimaryKey)
             {
@@ -280,7 +296,19 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         /// <inheritdoc />
         public override string Generate(AlterColumnExpression expression)
         {
-            var alterTableStatement = base.Generate(expression);
+            string alterTableStatement;
+            if (expression.IfExists)
+            {
+                alterTableStatement = FormatStatement(
+                    "IF OBJECT_ID('{0}','U') IS NOT NULL " + AlterColumn,
+                    Quoter.QuoteTableName(expression.TableName, expression.SchemaName),
+                    Column.Generate(expression.Column));
+            }
+            else
+            {
+                alterTableStatement = base.Generate(expression);
+            }
+
             var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatement(expression);
 
             if (string.IsNullOrEmpty(descriptionStatement))

@@ -83,6 +83,16 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
         }
 
         [Test]
+        public void CanCreateTableIfNotExistsWithDefaultSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableExpression();
+            expression.IfNotExists = true;
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE COLUMN TABLE IF NOT EXISTS \"TestTable1\" (\"TestColumn1\" NVARCHAR(255), \"TestColumn2\" INTEGER);");
+        }
+
+        [Test]
         public override void CanCreateTableWithDefaultValueExplicitlySetToNullWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithDefaultValue();

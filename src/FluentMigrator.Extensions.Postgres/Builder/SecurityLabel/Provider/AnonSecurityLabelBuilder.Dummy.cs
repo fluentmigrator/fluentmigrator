@@ -63,9 +63,18 @@ public partial class AnonSecurityLabelBuilder
     /// <summary>
     /// Masks the column with a dummy last name.
     /// </summary>
-    /// <param name="locale">Optional locale code (e.g., "en_US", "fr_FR"). If null, uses default locale.</param>
     /// <returns>The current builder instance for method chaining.</returns>
-    public AnonSecurityLabelBuilder MaskedWithDummyLastName(string locale = null)
+    public AnonSecurityLabelBuilder MaskedWithDummyLastName()
+    {
+        return MaskedWithDummyLastName(null);
+    }
+
+    /// <summary>
+    /// Masks the column with a dummy last name.
+    /// </summary>
+    /// <param name="locale">Locale code (e.g., "en_US", "fr_FR"). If null, uses default locale.</param>
+    /// <returns>The current builder instance for method chaining.</returns>
+    public AnonSecurityLabelBuilder MaskedWithDummyLastName(string locale)
     {
         return MaskedWithLocale("anon.dummy_last_name", locale);
     }

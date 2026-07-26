@@ -25,7 +25,6 @@ The following table summarizes column visibility support across different databa
 | Snowflake      | ✗ | N/A | N/A | N/A | N/A | No native support for column visibility. Uses tagging and masking policies for similar use cases. |
 | SAP HANA       | ✗ | N/A | N/A | N/A | N/A | No native support for column visibility. |
 | Redshift       | ✗ | N/A | N/A | N/A | N/A | Based on PostgreSQL; no native support for column visibility. |
-| Jet (MS Access)| ✗ | N/A | N/A | N/A | N/A | No native support for column visibility. |
 
 ### References
 

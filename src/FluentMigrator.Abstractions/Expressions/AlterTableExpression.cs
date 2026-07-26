@@ -42,6 +42,11 @@ namespace FluentMigrator.Expressions
         /// </summary>
         public virtual string TableDescription { get; set; }
 
+        /// <summary>
+        /// Specifies that any subsequent add/alter column operations should only be applied if the table exists.
+        /// </summary>
+        public virtual bool IfExists { get; set; }
+
         /// <inheritdoc />
         public override void ExecuteWith(IMigrationProcessor processor)
         {
@@ -55,7 +60,8 @@ namespace FluentMigrator.Expressions
             {
                 SchemaName = SchemaName,
                 TableName = TableName,
-                TableDescription = TableDescription
+                TableDescription = TableDescription,
+                IfExists = IfExists
             };
         }
 

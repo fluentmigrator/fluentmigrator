@@ -49,6 +49,9 @@ namespace FluentMigrator.Builders
         /// </summary>
         /// <param name="dataAsAnonymousType">The data, can be an anonymous object, string or RawSql instance</param>
         /// <typeparam name="TOut">The output key/value pair list</typeparam>
+#if NET
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("The properties of the anonymous type cannot be statically analyzed.")]
+#endif
         protected static TOut GetData<TOut>(object dataAsAnonymousType)
             where TOut : IList<KeyValuePair<string, object>>, new()
         {

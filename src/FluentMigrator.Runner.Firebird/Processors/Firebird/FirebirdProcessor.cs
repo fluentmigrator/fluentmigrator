@@ -32,6 +32,7 @@ using FluentMigrator.Runner.Models;
 
 using JetBrains.Annotations;
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -81,6 +82,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
         protected Dictionary<string, List<string>> DDLTouchedColumns;
 
         /// <inheritdoc />
+        [Obsolete("Use the constructor that accepts IMigrationConnectionFactory instead.")]
         public FirebirdProcessor(
             [NotNull] FirebirdDbFactory factory,
             [NotNull] FirebirdGenerator generator,
@@ -91,6 +93,48 @@ namespace FluentMigrator.Runner.Processors.Firebird
             [NotNull] FirebirdOptions fbOptions)
             : base(() => factory.Factory, generator, logger, options.Value, connectionStringAccessor)
         {
+            FBOptions = fbOptions ?? throw new ArgumentNullException(nameof(fbOptions));
+            _firebirdVersionFunc = new Lazy<Version>(GetFirebirdVersion);
+            _quoter = quoter;
+#pragma warning disable 618
+            truncator = new FirebirdTruncator(FBOptions.TruncateLongNames, FBOptions.PackKeyNames);
+#pragma warning restore 618
+            ClearLocks();
+            ClearDDLFollowers();
+        }
+
+        /// <inheritdoc />
+        /// <remarks>
+        /// The Firebird processor must own its connection: it closes and reopens the connection
+        /// when committing or rolling back transactions to release Firebird metadata locks
+        /// (see <see cref="CommitTransaction"/> and <see cref="CommitRetaining"/>), which must
+        /// not be done to an externally owned connection.
+        /// </remarks>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="connectionFactory"/> reports
+        /// <see cref="FluentMigrator.Runner.Initialization.IMigrationConnectionFactory.OwnsConnection"/> as <c>false</c>.
+        /// </exception>
+        [ActivatorUtilitiesConstructor]
+        public FirebirdProcessor(
+            [NotNull] FirebirdDbFactory factory,
+            [NotNull] FirebirdGenerator generator,
+            [NotNull] FirebirdQuoter quoter,
+            [NotNull] ILogger<FirebirdProcessor> logger,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> options,
+            [NotNull] IMigrationConnectionFactory connectionFactory,
+            [NotNull] FirebirdOptions fbOptions)
+            : base(() => factory.Factory, generator, logger, options.Value, connectionFactory)
+        {
+            if (!connectionFactory.OwnsConnection)
+            {
+                throw new ArgumentException(
+                    "The Firebird processor must own its connection: it closes and reopens the connection " +
+                    "when committing transactions to release Firebird metadata locks, which must not be done " +
+                    "to an externally owned connection. Use a connection factory whose OwnsConnection is true " +
+                    "(for example WithConnectionFactory(..., ownsConnection: true)).",
+                    nameof(connectionFactory));
+            }
+
             FBOptions = fbOptions ?? throw new ArgumentNullException(nameof(fbOptions));
             _firebirdVersionFunc = new Lazy<Version>(GetFirebirdVersion);
             _quoter = quoter;

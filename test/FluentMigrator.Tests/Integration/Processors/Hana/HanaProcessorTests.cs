@@ -76,7 +76,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
 
             Output = new StringWriter();
             var serivces = ServiceCollectionExtensions.CreateServices()
-                .ConfigureRunner(builder => builder.AddHana().AsGlobalPreview())
+                .ConfigureRunner(builder => builder.AddHana8().AsGlobalPreview())
                 .AddSingleton<ILoggerProvider>(new SqlScriptFluentMigratorLoggerProvider(Output))
                 .AddScoped<IConnectionStringReader>(
                     _ => new PassThroughConnectionStringReader(IntegrationTestOptions.Hana.ConnectionString));

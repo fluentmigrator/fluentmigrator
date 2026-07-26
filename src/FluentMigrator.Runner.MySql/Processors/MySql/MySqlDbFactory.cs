@@ -31,9 +31,9 @@ namespace FluentMigrator.Runner.Processors.MySql
     {
         private static readonly TestEntry[] _entries =
         {
-            new TestEntry("MySql.Data", "MySql.Data.MySqlClient.MySqlClientFactory"),
-            new TestEntry("MySqlConnector", "MySql.Data.MySqlClient.MySqlClientFactory"),
-            new TestEntry("MySqlConnector", "MySqlConnector.MySqlConnectorFactory"),
+            new TestEntry("MySql.Data", "MySql.Data.MySqlClient.MySqlClientFactory", () => Type.GetType("MySql.Data.MySqlClient.MySqlClientFactory, MySql.Data")),
+            new TestEntry("MySqlConnector", "MySql.Data.MySqlClient.MySqlClientFactory", () => Type.GetType("MySql.Data.MySqlClient.MySqlClientFactory, MySqlConnector")),
+            new TestEntry("MySqlConnector", "MySqlConnector.MySqlConnectorFactory", () => Type.GetType("MySqlConnector.MySqlConnectorFactory, MySqlConnector"))
         };
 
         /// <summary>

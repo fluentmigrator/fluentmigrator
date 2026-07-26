@@ -21,6 +21,7 @@ using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -32,6 +33,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
     public class SqlServer2008Processor : SqlServerProcessor
     {
         /// <inheritdoc />
+        [Obsolete("Use the constructor that accepts IMigrationConnectionFactory instead.")]
         public SqlServer2008Processor(
             [NotNull] ILogger<SqlServer2008Processor> logger,
             [NotNull] SqlServer2008Quoter quoter,
@@ -40,6 +42,19 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             [NotNull] IConnectionStringAccessor connectionStringAccessor,
             [NotNull] IServiceProvider serviceProvider)
             : base(new[] { ProcessorIdConstants.SqlServer2008, ProcessorIdConstants.SqlServer }, generator, quoter, logger, options, connectionStringAccessor, serviceProvider)
+        {
+        }
+
+        /// <inheritdoc />
+        [ActivatorUtilitiesConstructor]
+        public SqlServer2008Processor(
+            [NotNull] ILogger<SqlServer2008Processor> logger,
+            [NotNull] SqlServer2008Quoter quoter,
+            [NotNull] SqlServer2008Generator generator,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> options,
+            [NotNull] IMigrationConnectionFactory connectionFactory,
+            [NotNull] IServiceProvider serviceProvider)
+            : base(new[] { ProcessorIdConstants.SqlServer2008, ProcessorIdConstants.SqlServer }, generator, quoter, logger, options, connectionFactory, serviceProvider)
         {
         }
     }

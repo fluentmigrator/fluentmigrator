@@ -24,9 +24,6 @@ using FluentMigrator.Runner.Generators.DB2;
 using FluentMigrator.Runner.Generators.DB2.iSeries;
 using FluentMigrator.Runner.Generators.Firebird;
 using FluentMigrator.Runner.Generators.Hana;
-#if NETFRAMEWORK
-using FluentMigrator.Runner.Generators.Jet;
-#endif
 using FluentMigrator.Runner.Generators.MySql;
 using FluentMigrator.Runner.Generators.Oracle;
 using FluentMigrator.Runner.Generators.Postgres;
@@ -40,7 +37,6 @@ using FluentMigrator.Runner.Processors.DB2;
 using FluentMigrator.Runner.Processors.DB2.iSeries;
 using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Runner.Processors.Hana;
-using FluentMigrator.Runner.Processors.Jet;
 using FluentMigrator.Runner.Processors.MySql;
 using FluentMigrator.Runner.Processors.Oracle;
 using FluentMigrator.Runner.Processors.Postgres;
@@ -66,13 +62,11 @@ namespace FluentMigrator.Tests.Unit.Runners
         [TestCase(typeof(Db2ISeriesProcessor), typeof(Db2ISeriesGenerator), ProcessorIdConstants.Db2ISeries, GeneratorIdConstants.Db2ISeries)]
         [TestCase(typeof(FirebirdProcessor), typeof(FirebirdGenerator), ProcessorIdConstants.Firebird, GeneratorIdConstants.Firebird)]
         [TestCase(typeof(HanaProcessor), typeof(HanaGenerator), ProcessorIdConstants.Hana, GeneratorIdConstants.Hana)]
-#if NETFRAMEWORK
-        [TestCase(typeof(JetProcessor), typeof(JetGenerator), ProcessorIdConstants.Jet, GeneratorIdConstants.Jet)]
-#endif
         [TestCase(typeof(MySql4Processor), typeof(MySql4Generator), ProcessorIdConstants.MySql4, GeneratorIdConstants.MySql4)]
         [TestCase(typeof(MySql5Processor), typeof(MySql5Generator), ProcessorIdConstants.MySql5, GeneratorIdConstants.MySql5)]
         [TestCase(typeof(MySql8Processor), typeof(MySql8Generator), ProcessorIdConstants.MySql8, GeneratorIdConstants.MySql8)]
         [TestCase(typeof(OracleProcessor), typeof(IOracleGenerator), ProcessorIdConstants.Oracle, GeneratorIdConstants.Oracle)]
+        [TestCase(typeof(OracleManagedProcessor), typeof(IOracleManagedGenerator), ProcessorIdConstants.OracleManaged, GeneratorIdConstants.OracleManaged)]
         [TestCase(typeof(Oracle12CProcessor), typeof(IOracle12CGenerator), ProcessorIdConstants.Oracle12c, GeneratorIdConstants.Oracle12c)]
         [TestCase(typeof(Postgres92Processor), typeof(Postgres92Generator), ProcessorIdConstants.Postgres92, GeneratorIdConstants.Postgres92)]
         [TestCase(typeof(Postgres10_0Processor), typeof(Postgres10_0Generator), ProcessorIdConstants.PostgreSQL10_0, GeneratorIdConstants.PostgreSQL10_0)]
@@ -109,6 +103,10 @@ namespace FluentMigrator.Tests.Unit.Runners
         [TestCase(typeof(MySql8Processor), typeof(MySql8Generator), ProcessorIdConstants.MySql8, GeneratorIdConstants.MySql8, ProcessorIdConstants.MySql, GeneratorIdConstants.MySql, true)]
         // PostgreSQL
         [TestCase(typeof(Postgres92Processor), typeof(Postgres92Generator), ProcessorIdConstants.Postgres92, GeneratorIdConstants.Postgres92, ProcessorIdConstants.PostgreSQL, GeneratorIdConstants.PostgreSQL, false)]
+        // PostgreSQL, generic "Postgres" alias (issue #2305: "dotnet fm migrate -p Postgres" must select the latest version)
+        [TestCase(typeof(Postgres10_0Processor), typeof(Postgres10_0Generator), ProcessorIdConstants.PostgreSQL10_0, GeneratorIdConstants.PostgreSQL10_0, ProcessorIdConstants.Postgres, GeneratorIdConstants.Postgres, false)]
+        [TestCase(typeof(Postgres11_0Processor), typeof(Postgres11_0Generator), ProcessorIdConstants.PostgreSQL11_0, GeneratorIdConstants.PostgreSQL11_0, ProcessorIdConstants.Postgres, GeneratorIdConstants.Postgres, false)]
+        [TestCase(typeof(Postgres15_0Processor), typeof(Postgres15_0Generator), ProcessorIdConstants.PostgreSQL15_0, GeneratorIdConstants.PostgreSQL15_0, ProcessorIdConstants.Postgres, GeneratorIdConstants.Postgres, true)]
         [TestCase(typeof(Postgres10_0Processor), typeof(Postgres10_0Generator), ProcessorIdConstants.PostgreSQL10_0, GeneratorIdConstants.PostgreSQL10_0, ProcessorIdConstants.PostgreSQL, GeneratorIdConstants.PostgreSQL, false)]
         [TestCase(typeof(Postgres11_0Processor), typeof(Postgres11_0Generator), ProcessorIdConstants.PostgreSQL11_0, GeneratorIdConstants.PostgreSQL11_0, ProcessorIdConstants.PostgreSQL, GeneratorIdConstants.PostgreSQL, false)]
         [TestCase(typeof(Postgres15_0Processor), typeof(Postgres15_0Generator), ProcessorIdConstants.PostgreSQL15_0, GeneratorIdConstants.PostgreSQL15_0, ProcessorIdConstants.PostgreSQL, GeneratorIdConstants.PostgreSQL, true)]
@@ -142,8 +140,7 @@ namespace FluentMigrator.Tests.Unit.Runners
                         .AddDotConnectOracle()
                         .AddDotConnectOracle12C()
                         .AddFirebird()
-                        .AddHana()
-                        .AddJet()
+                        .AddHana8()
                         .AddMySql()
                         .AddMySql4()
                         .AddMySql5()

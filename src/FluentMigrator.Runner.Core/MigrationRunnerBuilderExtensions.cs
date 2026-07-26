@@ -15,6 +15,8 @@
 #endregion
 
 using System;
+using System.Data;
+using System.Data.Common;
 using System.Linq;
 using System.Reflection;
 
@@ -27,6 +29,7 @@ using FluentMigrator.Runner.VersionTableInfo;
 using JetBrains.Annotations;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 
 namespace FluentMigrator.Runner
@@ -165,6 +168,9 @@ namespace FluentMigrator.Runner
         /// <param name="builder">The runner builder</param>
         /// <param name="assemblies">The target assemblies</param>
         /// <returns>The runner builder</returns>
+#if NET
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This method uses gets the exported types from assemblies, which may not be preserved in trimmed applications.")]
+#endif
         public static IMigrationRunnerBuilder WithMigrationsIn(
             this IMigrationRunnerBuilder builder,
             [NotNull, ItemNotNull] params Assembly[] assemblies)
@@ -175,11 +181,29 @@ namespace FluentMigrator.Runner
         }
 
         /// <summary>
+        /// Registers specific types as migration sources.
+        /// </summary>
+        /// <param name="builder">The runner builder</param>
+        /// <param name="types">The types to register as migration sources</param>
+        /// <returns>The runner builder</returns>
+        public static IMigrationRunnerBuilder WithTypes(
+            this IMigrationRunnerBuilder builder,
+            [NotNull] params Type[] types)
+        {
+            builder.Services
+                .AddSingleton<ITypeSource>(new ArrayTypeSource(types));
+            return builder;
+        }
+
+        /// <summary>
         /// Scans for types in the given assemblies
         /// </summary>
         /// <param name="builder">The runner builder</param>
         /// <param name="assemblies">The assemblies to scan</param>
         /// <returns>The next step</returns>
+#if NET
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This method uses reflection to load types, which may not be preserved in trimmed applications.")]
+#endif
         public static IScanInBuilder ScanIn(
             this IMigrationRunnerBuilder builder,
             [NotNull, ItemNotNull] params Assembly[] assemblies)
@@ -188,6 +212,9 @@ namespace FluentMigrator.Runner
             return new ScanInBuilder(builder, sourceItem);
         }
 
+#if NET
+        [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This type uses reflection to load types, which may not be preserved in trimmed applications.")]
+#endif
         private class ScanInBuilder : IScanInBuilder, IScanInForBuilder
         {
             private readonly IMigrationRunnerBuilder _builder;
@@ -305,5 +332,156 @@ namespace FluentMigrator.Runner
                 return _builder;
             }
         }
+
+        /// <summary>
+        /// Sets the global connection factory
+        /// </summary>
+        /// <param name="builder">The runner builder</param>
+        /// <param name="connectionFactory">The function that creates the database connection.</param>
+        /// <returns>The runner builder</returns>
+        /// <remarks>
+        /// <para>
+        /// The connection factory is registered with a scoped lifetime, which means it is asked
+        /// for a connection once per migration processor (per connection), not once per command.
+        /// The returned connection is closed and disposed by the migration processor. Use the
+        /// <see cref="WithConnectionFactory(IMigrationRunnerBuilder,Func{IServiceProvider,IDbConnection},bool)"/>
+        /// overload to hand over an externally owned connection instead.
+        /// </para>
+        /// <para>
+        /// A configured connection factory always reports
+        /// <see cref="FluentMigrator.Runner.Initialization.IMigrationConnectionFactory.HasConnection"/> as <c>true</c>. To run without a
+        /// database connection (for example to preview the generated SQL), set
+        /// <see cref="RunnerOptions.NoConnection"/> (the <c>--no-connection</c> command line option),
+        /// which takes precedence over any configured connection factory.
+        /// </para>
+        /// </remarks>
+        /// <example>
+        /// <code>
+        /// services.ConfigureRunner(rb => rb
+        ///     .AddSqlServer()
+        ///     .WithConnectionFactory(sp => new SqlConnection(connectionString)
+        ///     {
+        ///         AccessToken = sp.GetRequiredService&lt;ITokenProvider&gt;().GetToken()
+        ///     }));
+        /// </code>
+        /// </example>
+        public static IMigrationRunnerBuilder WithConnectionFactory(
+            this IMigrationRunnerBuilder builder,
+            [NotNull] Func<IServiceProvider, IDbConnection> connectionFactory)
+        {
+            return builder.WithConnectionFactory(connectionFactory, ownsConnection: true);
+        }
+
+        /// <summary>
+        /// Sets the global connection factory
+        /// </summary>
+        /// <param name="builder">The runner builder</param>
+        /// <param name="connectionFactory">The function that creates the database connection.</param>
+        /// <param name="ownsConnection">
+        /// <c>true</c> when the migration processor should close and dispose the created connection;
+        /// <c>false</c> when the connection is owned by the caller and must be left open.
+        /// </param>
+        /// <returns>The runner builder</returns>
+        /// <remarks>
+        /// A configured connection factory always reports
+        /// <see cref="FluentMigrator.Runner.Initialization.IMigrationConnectionFactory.HasConnection"/> as <c>true</c>. To run without a
+        /// database connection (for example to preview the generated SQL), set
+        /// <see cref="RunnerOptions.NoConnection"/> (the <c>--no-connection</c> command line option),
+        /// which takes precedence over any configured connection factory.
+        /// </remarks>
+        public static IMigrationRunnerBuilder WithConnectionFactory(
+            this IMigrationRunnerBuilder builder,
+            [NotNull] Func<IServiceProvider, IDbConnection> connectionFactory,
+            bool ownsConnection)
+        {
+            if (builder == null)
+            {
+                throw new ArgumentNullException(nameof(builder));
+            }
+
+            if (connectionFactory == null)
+            {
+                throw new ArgumentNullException(nameof(connectionFactory));
+            }
+
+            builder.Services.Replace(
+                ServiceDescriptor.Scoped<IMigrationConnectionFactory>(
+                    sp => new DelegateMigrationConnectionFactory(() => connectionFactory(sp), ownsConnection)));
+
+            return builder;
+        }
+
+        private sealed class DelegateMigrationConnectionFactory : IMigrationConnectionFactory
+        {
+            private readonly Func<IDbConnection> _connectionFactory;
+
+            public DelegateMigrationConnectionFactory([NotNull] Func<IDbConnection> connectionFactory, bool ownsConnection)
+            {
+                _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
+                OwnsConnection = ownsConnection;
+            }
+
+            public bool HasConnection => true;
+
+            public bool OwnsConnection { get; }
+
+            public IDbConnection CreateConnection(DbProviderFactory providerFactory)
+            {
+                var connection = _connectionFactory();
+
+                if (connection == null)
+                {
+                    throw new InvalidOperationException("The configured connection factory returned null.");
+                }
+
+                return connection;
+            }
+        }
+
+        // DbDataSource was introduced in .NET 7 and is not supported on .NET Framework.
+#if NET7_0_OR_GREATER
+        /// <summary>
+        /// Configures the migration runner to create database connections
+        /// from the specified <see cref="DbDataSource"/>.
+        /// </summary>
+        /// <param name="builder">The runner builder</param>
+        /// <param name="dataSourceFactory">
+        /// A factory delegate used to resolve the <see cref="DbDataSource"/>
+        /// that will be used to create connections.</param>
+        /// <returns>The runner builder</returns>
+        /// <remarks>
+        /// The data source is consulted for a connection once per migration processor (per
+        /// connection), not once per command. A configured data source always reports
+        /// <see cref="FluentMigrator.Runner.Initialization.IMigrationConnectionFactory.HasConnection"/> as <c>true</c>; to run without a
+        /// database connection (for example to preview the generated SQL), set
+        /// <see cref="RunnerOptions.NoConnection"/> (the <c>--no-connection</c> command line option),
+        /// which takes precedence over any configured data source.
+        /// </remarks>
+        public static IMigrationRunnerBuilder WithDataSource(
+            this IMigrationRunnerBuilder builder,
+            [NotNull] Func<IServiceProvider, DbDataSource> dataSourceFactory)
+        {
+            if (builder == null)
+            {
+                throw new ArgumentNullException(nameof(builder));
+            }
+
+            if (dataSourceFactory == null)
+            {
+                throw new ArgumentNullException(nameof(dataSourceFactory));
+            }
+
+            return builder.WithConnectionFactory(sp =>
+            {
+                var dataSource = dataSourceFactory(sp);
+                if (dataSource == null)
+                {
+                    throw new InvalidOperationException("The configured data source factory returned null.");
+                }
+
+                return dataSource.CreateConnection();
+            });
+        }
+#endif
     }
 }

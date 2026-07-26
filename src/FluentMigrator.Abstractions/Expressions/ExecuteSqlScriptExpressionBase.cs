@@ -15,6 +15,9 @@
 #endregion
 
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+
+using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Expressions
 {
@@ -26,17 +29,72 @@ namespace FluentMigrator.Expressions
         /// <summary>
         /// Gets or sets parameters to be replaced before script execution
         /// </summary>
-        public IDictionary<string, string> Parameters { get; set; }
+        public IDictionary<string, object> Parameters { get; set; }
+
+        /// <summary>
+        /// Gets or sets the token providers used to resolve additional tokens
+        /// (e.g. <c>DefaultSchema</c>) that can be referenced from the SQL script/statement.
+        /// </summary>
+        /// <remarks>
+        /// Tokens are merged in registration order and are overridden by any
+        /// entry with the same name in <see cref="Parameters"/>.
+        /// </remarks>
+        public IEnumerable<ISqlTokenProvider> SqlScriptTokenProviders { get; set; }
 
         /// <summary>
         /// Executes the <paramref name="sqlScript"/> with the given <paramref name="processor"/>
         /// </summary>
         /// <param name="processor">The processor to execute the script with</param>
         /// <param name="sqlScript">The SQL script to execute</param>
-        protected void Execute(IMigrationProcessor processor, string sqlScript)
+        protected void Execute(IMigrationProcessor processor, [StringSyntax("sql")] string sqlScript)
         {
-            var finalSqlScript = SqlScriptTokenReplacer.ReplaceSqlScriptTokens(sqlScript, Parameters);
+            var finalSqlScript = SqlScriptTokenReplacer.ReplaceSqlScriptTokens(sqlScript, GetMergedParameters(), processor?.Quoter);
             processor.Execute(finalSqlScript);
+        }
+
+        /// <summary>
+        /// Merges the tokens supplied by <see cref="SqlScriptTokenProviders"/> with
+        /// the user-supplied <see cref="Parameters"/>, giving precedence to <see cref="Parameters"/>
+        /// whenever a token name is defined in both.
+        /// </summary>
+        /// <returns>The merged token map, or <see cref="Parameters"/> unchanged when there are no
+        /// tokens to merge</returns>
+        protected IDictionary<string, object> GetMergedParameters()
+        {
+            if (SqlScriptTokenProviders == null)
+            {
+                return Parameters;
+            }
+
+            var mergedParameters = new Dictionary<string, object>();
+            foreach (var provider in SqlScriptTokenProviders)
+            {
+                var tokenMap = provider?.GetTokens();
+                if (tokenMap == null)
+                {
+                    continue;
+                }
+
+                foreach (var token in tokenMap)
+                {
+                    mergedParameters[token.Key] = token.Value;
+                }
+            }
+
+            if (mergedParameters.Count == 0)
+            {
+                return Parameters;
+            }
+
+            if (Parameters != null)
+            {
+                foreach (var parameter in Parameters)
+                {
+                    mergedParameters[parameter.Key] = parameter.Value;
+                }
+            }
+
+            return mergedParameters;
         }
     }
 }

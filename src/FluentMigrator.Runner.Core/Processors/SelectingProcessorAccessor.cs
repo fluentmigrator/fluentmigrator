@@ -74,10 +74,9 @@ namespace FluentMigrator.Runner.Processors
                 foundProcessor = FindProcessor(procs, processorId);
             }
 
-            // Special handling when no connection string could be found
-            var connectionStringAccessor = serviceProvider.GetRequiredService<IConnectionStringAccessor>();
-            var connectionString = connectionStringAccessor.ConnectionString;
-            if (string.IsNullOrEmpty(connectionString))
+            // Special handling when no connection could be found
+            var connectionFactory = serviceProvider.GetRequiredService<IMigrationConnectionFactory>();
+            if (!connectionFactory.HasConnection)
             {
                 if (foundProcessor is ProcessorBase processorBase)
                 {

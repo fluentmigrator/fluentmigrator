@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<linker>
+  <assembly fullname="FluentMigrator.Extensions.MySql">
+    <type fullname="FluentMigrator.Model.MySqlIndexTypeDefinition" preserve="all" />
+  </assembly>
+</linker>

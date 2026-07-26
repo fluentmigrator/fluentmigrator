@@ -56,7 +56,7 @@ namespace FluentMigrator.Tests.Unit.Processors.SQLite
                 new SQLiteGenerator(),
                 logger,
                 opt,
-                MockedConnectionStringAccessor.Object,
+                MockedMigrationConnectionFactory.Object,
                 serviceProvider,
                 new SQLiteQuoter());
         }

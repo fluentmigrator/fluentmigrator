@@ -5,6 +5,37 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## 9.0.0-prerelease
+
+### Breaking
+
+- A connection string that consists only of whitespace is now treated like an empty connection string: the runner switches to connectionless mode instead of handing the connection string to the ADO.NET provider (which previously failed when the connection was opened). Requesting a connection while no connection string is configured now fails with an `InvalidOperationException` when the connection is created, instead of a provider-specific error when it is opened.
+- The Firebird processor rejects connection factories whose `OwnsConnection` is `false`: it must close and reopen its connection when committing transactions to release Firebird metadata locks, which is not possible with an externally owned connection.
+
+### New
+
+- Custom connections: `IMigrationConnectionFactory` allows applications to supply fully configured `IDbConnection` instances to the migration runner (PR #2268 by @Sherif-Ahmed, building on PR #2002 by @Merlin-Taylor, Issue #1981)
+  - Configure with `WithConnectionFactory(sp => ...)`, or with `WithDataSource(sp => ...)` when a `DbDataSource` is available (.NET 8+)
+  - The factory is asked for a connection once per migration processor (per connection), not once per command, which makes rotating credentials such as Azure Entra ID or AWS RDS IAM tokens work as expected
+  - Pass `ownsConnection: false` to `WithConnectionFactory` when the application keeps ownership of the connection, in which case the processor neither closes nor disposes it
+  - Design rationale is recorded in [`adr/proposed/ConnectionManagement.md`](adr/proposed/ConnectionManagement.md), including how a `DbDataSource`-based design would work
+
+### Documentation
+
+- New ADR: Connection Management (`adr/proposed/ConnectionManagement.md`)
+
+### Changed
+
+- SAP HANA support now uses the `Sap.Data.Hana.Net.v8.0` and `Sap.Data.Hana.Net.v10.0` NuGet packages, and HANA registration was removed from the .NET Framework console and MSBuild runners.
+- Processor constructors taking an `IConnectionStringAccessor` are obsolete; use the overloads taking an `IMigrationConnectionFactory` instead.
+
+### Contributors
+
+- Merlin-Taylor (PR #2002)
+- Sherif-Ahmed (PR #2268)
+- fubar-coder
+- jzabroski
+
 ## 3.2.1
 
 - Stripping comments can be disabled in _dotnet-fm_ runner. Default is true, will become false in 4.x (#956)

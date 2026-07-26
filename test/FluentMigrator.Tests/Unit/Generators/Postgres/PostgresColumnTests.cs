@@ -121,6 +121,27 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
+        public void CanCreateColumnIfExistsWithDefaultSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateColumnExpression();
+            expression.IfExists = true;
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE IF EXISTS \"public\".\"TestTable1\" ADD \"TestColumn1\" varchar(5) NOT NULL;");
+        }
+
+        [Test]
+        public void CanAlterColumnIfExistsWithDefaultSchema()
+        {
+            var expression = GeneratorTestHelper.GetAlterColumnExpression();
+            expression.Column.IsNullable = null;
+            expression.IfExists = true;
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE IF EXISTS \"public\".\"TestTable1\" ALTER \"TestColumn1\" TYPE varchar(20);");
+        }
+
+        [Test]
         public override void CanCreateColumnWithSystemMethodAndCustomSchema()
         {
             var expressions = GeneratorTestHelper.GetCreateColumnWithSystemMethodExpression("TestSchema");

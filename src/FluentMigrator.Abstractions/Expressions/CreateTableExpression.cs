@@ -28,7 +28,7 @@ namespace FluentMigrator.Expressions
     /// <summary>
     /// Expression to create a table
     /// </summary>
-    public class CreateTableExpression : MigrationExpressionBase, ISchemaExpression, IColumnsExpression, IValidationChildren
+    public class CreateTableExpression : MigrationExpressionBase, ISchemaExpression, IColumnsExpression, ISupportAdditionalFeatures, IValidationChildren
     {
         /// <inheritdoc />
         public virtual string SchemaName { get; set; }
@@ -47,6 +47,14 @@ namespace FluentMigrator.Expressions
         /// </summary>
         public virtual string TableDescription { get; set; }
 
+        /// <summary>
+        /// Specifies the command should only be applied if the table does not already exist.
+        /// </summary>
+        public virtual bool IfNotExists { get; set; }
+
+        /// <inheritdoc />
+        public IDictionary<string, object> AdditionalFeatures { get; } = new Dictionary<string, object>();
+
         /// <inheritdoc />
         IEnumerable<ColumnDefinition> IColumnsExpression.Columns => Columns;
 
@@ -59,6 +67,11 @@ namespace FluentMigrator.Expressions
         /// <inheritdoc />
         public override IMigrationExpression Reverse()
         {
+            if (IfNotExists)
+            {
+                return base.Reverse();
+            }
+
             return new DeleteTableExpression
                     {
                         TableName = TableName,

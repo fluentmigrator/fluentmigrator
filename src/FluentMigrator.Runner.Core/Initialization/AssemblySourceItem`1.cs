@@ -27,6 +27,9 @@ namespace FluentMigrator.Runner.Initialization
     /// Represents a source of assemblies that provides types implementing the interface of type <typeparamref name="T"/>.
     /// </summary>
     /// <typeparam name="T">The type of the interface to implement.</typeparam>
+#if NET
+    [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This type uses gets the exported types from assemblies, which may not be preserved in trimmed applications.")]
+#endif
     public class AssemblySourceItem<T> : ITypeSourceItem<T>
         where T : class
     {

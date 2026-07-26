@@ -70,7 +70,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             var expression = new ExecuteEmbeddedSqlScriptExpression(new[] { provider })
             {
                 SqlScript = "EmbeddedTestScriptWithParameters.sql",
-                Parameters = new Dictionary<string, string> { { "parameter", "ParameterValue" } }
+                Parameters = new Dictionary<string, object> { { "parameter", "ParameterValue" } }
             };
 
             var processor = new Mock<IMigrationProcessor>();

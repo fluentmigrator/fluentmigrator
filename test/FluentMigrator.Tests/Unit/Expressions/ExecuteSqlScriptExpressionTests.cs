@@ -56,7 +56,52 @@ namespace FluentMigrator.Tests.Unit.Expressions
             var expression = new ExecuteSqlScriptExpression()
             {
                 SqlScript = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TestScriptWithParameters.sql"),
-                Parameters = new Dictionary<string, string> { { "parameter", "ParameterValue" } }
+                Parameters = new Dictionary<string, object> { { "parameter", "ParameterValue" } }
+            };
+
+            var processor = new Mock<IMigrationProcessor>();
+            processor.Setup(x => x.Execute(scriptContentsWithParameters)).Verifiable();
+
+            expression.ExecuteWith(processor.Object);
+            processor.Verify();
+        }
+
+        [Test]
+        public void ExecutesTheStatementWithWellKnownTokens()
+        {
+            const string scriptContentsWithParameters = "TEST SCRIPT ParameterValue $(escaped_parameter) $(missing_parameter)";
+            var tokenProvider = new Mock<ISqlTokenProvider>();
+            tokenProvider
+                .Setup(x => x.GetTokens())
+                .Returns(new Dictionary<string, string> { { "parameter", "ParameterValue" } });
+
+            var expression = new ExecuteSqlScriptExpression()
+            {
+                SqlScript = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TestScriptWithParameters.sql"),
+                SqlScriptTokenProviders = new[] { tokenProvider.Object },
+            };
+
+            var processor = new Mock<IMigrationProcessor>();
+            processor.Setup(x => x.Execute(scriptContentsWithParameters)).Verifiable();
+
+            expression.ExecuteWith(processor.Object);
+            processor.Verify();
+        }
+
+        [Test]
+        public void ParametersTakePrecedenceOverWellKnownTokens()
+        {
+            const string scriptContentsWithParameters = "TEST SCRIPT ParameterValue $(escaped_parameter) $(missing_parameter)";
+            var tokenProvider = new Mock<ISqlTokenProvider>();
+            tokenProvider
+                .Setup(x => x.GetTokens())
+                .Returns(new Dictionary<string, string> { { "parameter", "WellKnownValue" } });
+
+            var expression = new ExecuteSqlScriptExpression()
+            {
+                SqlScript = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TestScriptWithParameters.sql"),
+                Parameters = new Dictionary<string, object> { { "parameter", "ParameterValue" } },
+                SqlScriptTokenProviders = new[] { tokenProvider.Object },
             };
 
             var processor = new Mock<IMigrationProcessor>();

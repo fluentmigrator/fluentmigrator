@@ -59,6 +59,9 @@ namespace FluentMigrator.Runner.Generators.Snowflake
         public override string AlterColumn => "ALTER TABLE {0} ALTER {1}";
 
         /// <inheritdoc />
+        protected override bool SupportsAlterTableIfExistsForColumns => true;
+
+        /// <inheritdoc />
         public override string Generate(AlterDefaultConstraintExpression expression)
         {
             throw new DatabaseOperationNotSupportedException("Snowflake database does not support adding or changing default constraint after column has been created.");
@@ -132,7 +135,7 @@ namespace FluentMigrator.Runner.Generators.Snowflake
                 return errors;
             }
 
-            return FormatStatement(AlterColumn, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), ((SnowflakeColumn)Column).GenerateAlterColumn(expression.Column));
+            return FormatStatement(expression.IfExists ? "ALTER TABLE IF EXISTS {0} ALTER {1}" : AlterColumn, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), ((SnowflakeColumn)Column).GenerateAlterColumn(expression.Column));
         }
 
         /// <inheritdoc />

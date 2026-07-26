@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace FluentMigrator
 {
@@ -22,6 +23,7 @@ namespace FluentMigrator
         /// <summary>
         /// Gets the underlying SQL value
         /// </summary>
+        [StringSyntax("sql")]
         public string Value { get; }
 
         /// <summary>
@@ -29,7 +31,7 @@ namespace FluentMigrator
         /// </summary>
         /// <param name="sqlToRun">The SQL value</param>
         /// <returns>The new <see cref="RawSql"/> instance</returns>
-        public static RawSql Insert(string sqlToRun)
+        public static RawSql Insert([StringSyntax("sql")] string sqlToRun)
         {
             return new RawSql(sqlToRun);
         }

@@ -78,6 +78,16 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
+        public void CanAlterColumnIfExistsWithDefaultSchema()
+        {
+            var expression = GeneratorTestHelper.GetAlterColumnExpression();
+            expression.IfExists = true;
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("IF OBJECT_ID('[dbo].[TestTable1]','U') IS NOT NULL ALTER TABLE [dbo].[TestTable1] ALTER COLUMN [TestColumn1] NVARCHAR(20) NOT NULL;");
+        }
+
+        [Test]
         public override void CanCreateAutoIncrementColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetAlterColumnAddAutoIncrementExpression();
@@ -113,6 +123,16 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD [TestColumn1] NVARCHAR(5) NOT NULL;");
+        }
+
+        [Test]
+        public void CanCreateColumnIfExistsWithDefaultSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateColumnExpression();
+            expression.IfExists = true;
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("IF OBJECT_ID('[dbo].[TestTable1]','U') IS NOT NULL ALTER TABLE [dbo].[TestTable1] ADD [TestColumn1] NVARCHAR(5) NOT NULL;");
         }
 
         [Test]

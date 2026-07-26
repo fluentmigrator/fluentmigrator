@@ -99,6 +99,7 @@ namespace FluentMigrator.Runner
         /// A function that takes a <see cref="Type"/> as input and returns <c>true</c> if the type
         /// has tags; otherwise, <c>false</c>.
         /// </value>
+        [Obsolete("Use IMigrationRunnerTagConventions.TypeHasTags instead.")]
         Func<Type, bool> TypeHasTags { get; }
 
         /// <summary>
@@ -112,6 +113,7 @@ namespace FluentMigrator.Runner
         /// A function that takes a <see cref="Type"/> and an <see cref="IEnumerable{T}"/> of <see cref="string"/> 
         /// representing the tags to match, and returns <c>true</c> if the type has matching tags; otherwise, <c>false</c>.
         /// </value>
+        [Obsolete("Use IMigrationRunnerTagConventions.TypeHasMatchingTags instead.")]
         Func<Type, IEnumerable<string>, bool> TypeHasMatchingTags { get; }
     }
 }

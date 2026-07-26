@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<linker>
+  <assembly fullname="FluentMigrator.Extensions.SqlServer">
+    <type fullname="FluentMigrator.Model.IndexIncludeDefinition" preserve="all" />
+  </assembly>
+</linker>

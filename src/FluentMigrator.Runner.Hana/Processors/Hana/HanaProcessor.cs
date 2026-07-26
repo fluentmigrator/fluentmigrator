@@ -12,6 +12,7 @@ using FluentMigrator.Runner.Initialization;
 
 using JetBrains.Annotations;
 
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -20,10 +21,10 @@ namespace FluentMigrator.Runner.Processors.Hana
     /// <summary>
     /// The SAP Hana processor for FluentMigrator.
     /// </summary>
-    [Obsolete("Hana support will go away unless someone in the community steps up to provide support.")]
     public class HanaProcessor : GenericProcessorBase
     {
         /// <inheritdoc />
+        [Obsolete("Use the constructor that accepts IMigrationConnectionFactory instead.")]
         public HanaProcessor(
             [NotNull] HanaDbFactory factory,
             [NotNull] HanaGenerator generator,
@@ -35,13 +36,25 @@ namespace FluentMigrator.Runner.Processors.Hana
         }
 
         /// <inheritdoc />
+        [ActivatorUtilitiesConstructor]
+        public HanaProcessor(
+            [NotNull] HanaDbFactory factory,
+            [NotNull] HanaGenerator generator,
+            [NotNull] ILogger<HanaProcessor> logger,
+            [NotNull] IOptionsSnapshot<ProcessorOptions> options,
+            [NotNull] IMigrationConnectionFactory connectionFactory)
+            : base(() => factory.Factory, generator, logger, options.Value, connectionFactory)
+        {
+        }
+
+        /// <inheritdoc />
         public override string DatabaseType => ProcessorIdConstants.Hana;
 
         /// <inheritdoc />
         public override IList<string> DatabaseTypeAliases { get; } = new List<string>();
 
         /// <inheritdoc />
-        public IQuoter Quoter => ((HanaGenerator)Generator).Quoter;
+        public new IQuoter Quoter => ((HanaGenerator)Generator).Quoter;
 
         /// <inheritdoc />
         public override bool SchemaExists(string schemaName)

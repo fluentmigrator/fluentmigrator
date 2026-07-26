@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  This file instructs the .NET trimmer/NativeAOT compiler to preserve metadata
+  on types that are validated via System.ComponentModel.DataAnnotations.Validator.
+  Without this, [Required] and other validation attributes would be stripped in
+  trimmed/AOT builds, breaking expression validation.
+-->
+<linker>
+  <assembly fullname="FluentMigrator.Abstractions">
+    <!-- Expression types with [Required] attributes -->
+    <type fullname="FluentMigrator.Expressions.AlterColumnExpression" preserve="all" />
+    <type fullname="FluentMigrator.Expressions.AlterDefaultConstraintExpression" preserve="all" />
+    <type fullname="FluentMigrator.Expressions.AlterSchemaExpression" preserve="all" />
+    <type fullname="FluentMigrator.Expressions.AlterTableExpression" preserve="all" />
+    <type fullname="FluentMigrator.Expressions.CreateColumnExpression" preserve="all" />
+    <type fullname="FluentMigrator.Expressions.CreateSchemaExpression" preserve="all" />
+    <type fullname="FluentMigrator.Expressions.CreateTableExpression" preserve="all" />
+    <type fullname="FluentMigrator.Expressions.DeleteColumnExpression" preserve="all" />
+    <type fullname="FluentMigrator.Expressions.DeleteDataExpression" preserve="all" />
+    <type fullname="FluentMigrator.Expressions.DeleteDefaultConstraintExpression" preserve="all" />
+    <type fullname="FluentMigrator.Expressions.DeleteSchemaExpression" preserve="all" />
+    <type fullname="FluentMigrator.Expressions.DeleteSequenceExpression" preserve="all" />
+    <type fullname="FluentMigrator.Expressions.DeleteTableExpression" preserve="all" />
+    <type fullname="FluentMigrator.Expressions.ExecuteEmbeddedSqlScriptExpression" preserve="all" />
+    <type fullname="FluentMigrator.Expressions.ExecuteSqlScriptExpression" preserve="all" />
+    <type fullname="FluentMigrator.Expressions.ExecuteSqlStatementExpression" preserve="all" />
+    <type fullname="FluentMigrator.Expressions.InsertDataExpression" preserve="all" />
+    <type fullname="FluentMigrator.Expressions.PerformDBOperationExpression" preserve="all" />
+    <type fullname="FluentMigrator.Expressions.RenameColumnExpression" preserve="all" />
+    <type fullname="FluentMigrator.Expressions.RenameTableExpression" preserve="all" />
+    <type fullname="FluentMigrator.Expressions.UpdateDataExpression" preserve="all" />
+
+    <!-- Model types with [Required] attributes (validated as children) -->
+    <type fullname="FluentMigrator.Model.ColumnDefinition" preserve="all" />
+    <type fullname="FluentMigrator.Model.ConstraintDefinition" preserve="all" />
+    <type fullname="FluentMigrator.Model.ForeignKeyDefinition" preserve="all" />
+    <type fullname="FluentMigrator.Model.IndexColumnDefinition" preserve="all" />
+    <type fullname="FluentMigrator.Model.IndexDefinition" preserve="all" />
+    <type fullname="FluentMigrator.Model.SequenceDefinition" preserve="all" />
+  </assembly>
+</linker>

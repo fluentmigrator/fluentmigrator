@@ -43,7 +43,7 @@ namespace FluentMigrator.Runner.Exceptions
         /// </summary>
         /// <param name="message">The error message that explains the reason for the exception.</param>
         /// <remarks>
-        /// This constructor is used to create an exception instance when no migrations are found, 
+        /// This constructor is used to create an exception instance when no migrations are found,
         /// providing a custom error message to describe the issue.
         /// </remarks>
         public MissingMigrationsException(string message) : base(message)
@@ -57,7 +57,7 @@ namespace FluentMigrator.Runner.Exceptions
         /// <param name="message">The error message that explains the reason for the exception.</param>
         /// <param name="innerException">The exception that is the cause of the current exception, or a null reference if no inner exception is specified.</param>
         /// <remarks>
-        /// This constructor is used to create an exception instance when no migrations are found, 
+        /// This constructor is used to create an exception instance when no migrations are found,
         /// providing a custom error message and an inner exception to describe the issue in more detail.
         /// </remarks>
         public MissingMigrationsException(string message, Exception innerException) : base(message, innerException)
@@ -74,6 +74,9 @@ namespace FluentMigrator.Runner.Exceptions
         /// </remarks>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="info"/> is <c>null</c>.</exception>
         /// <exception cref="SerializationException">Thrown when the class name is <c>null</c> or <see cref="Exception.HResult"/> is zero.</exception>
+#if NET
+        [Obsolete("Formatter-based serialization is obsolete")]
+#endif
         public MissingMigrationsException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }

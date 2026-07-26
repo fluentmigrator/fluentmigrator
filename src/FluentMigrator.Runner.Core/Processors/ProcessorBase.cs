@@ -19,13 +19,16 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
 using FluentMigrator.Expressions;
+using FluentMigrator.Generation;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Logging;
 
 using JetBrains.Annotations;
+using NotNullAttribute = JetBrains.Annotations.NotNullAttribute;
 
 using Microsoft.Extensions.Logging;
 
@@ -38,6 +41,9 @@ namespace FluentMigrator.Runner.Processors
     {
         /// <inheritdoc />
         protected internal readonly IMigrationGenerator Generator;
+
+        /// <inheritdoc />
+        public IQuoter Quoter => Generator.Quoter;
 
         /// <inheritdoc />
 #pragma warning disable 612
@@ -260,7 +266,7 @@ namespace FluentMigrator.Runner.Processors
         }
 
         /// <inheritdoc />
-        protected abstract void Process(string sql);
+        protected abstract void Process([StringSyntax("sql")] string sql);
 
         /// <inheritdoc />
         public virtual void BeginTransaction()
@@ -278,22 +284,25 @@ namespace FluentMigrator.Runner.Processors
         }
 
         /// <inheritdoc />
+        public virtual bool HasTransaction() => false;
+
+        /// <inheritdoc />
         public abstract DataSet ReadTableData(string schemaName, string tableName);
 
         /// <inheritdoc />
-        public abstract DataSet Read(string template, params object[] args);
+        public abstract DataSet Read([StringSyntax("sql")] string template, params object[] args);
 
         /// <inheritdoc />
-        public abstract bool Exists(string template, params object[] args);
+        public abstract bool Exists([StringSyntax("sql")] string template, params object[] args);
 
         /// <inheritdoc />
-        public virtual void Execute(string sql)
+        public virtual void Execute([StringSyntax("sql")] string sql)
         {
             Execute(sql.Replace("{", "{{").Replace("}", "}}"), Array.Empty<object>());
         }
 
         /// <inheritdoc />
-        public abstract void Execute(string template, params object[] args);
+        public abstract void Execute([StringSyntax("sql")] string template, params object[] args);
 
         /// <inheritdoc />
         public abstract bool SchemaExists(string schemaName);
@@ -326,7 +335,7 @@ namespace FluentMigrator.Runner.Processors
         protected abstract void Dispose(bool isDisposing);
 
         /// <inheritdoc />
-        protected virtual void ReThrowWithSql(Exception ex, string sql)
+        protected virtual void ReThrowWithSql(Exception ex, [StringSyntax("sql")] string sql)
         {
             using (var message = new StringWriter())
             {

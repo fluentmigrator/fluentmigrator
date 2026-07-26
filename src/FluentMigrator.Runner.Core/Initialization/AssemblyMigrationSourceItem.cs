@@ -26,6 +26,9 @@ namespace FluentMigrator.Runner.Initialization
     /// <summary>
     /// Implementation of <see cref="IMigrationSourceItem"/> that accepts a collection of assemblies
     /// </summary>
+#if NET
+    [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This type uses gets the exported types from assemblies, which may not be preserved in trimmed applications.")]
+#endif
     public class AssemblyMigrationSourceItem : IMigrationSourceItem
     {
         private readonly IReadOnlyCollection<Assembly> _assemblies;

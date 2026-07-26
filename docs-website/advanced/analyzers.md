@@ -111,6 +111,88 @@ public class CreateProductsTable : Migration
    [Migration(20240322140200)]  // Runs third
    ```
 
+### FM0002: Prefer $[name] Over $(name) For SQL Token Substitution
+
+**Category**: FluentMigrator
+**Severity**: Warning
+
+`Execute.Sql(...)` supports token substitution via [`SqlScriptTokenReplacer`](https://github.com/fluentmigrator/fluentmigrator/blob/main/src/FluentMigrator.Abstractions/SqlScriptTokenReplacer.cs),
+which offers two token styles:
+
+- `$(name)` substitutes the parameter value **verbatim/unquoted**. Since the value is inserted as-is,
+  it can be a SQL injection risk if the value originates from outside the migration itself (for
+  example, user input, environment variables, or other external/untrusted sources).
+- `$[name]` substitutes the parameter value as a **safely quoted SQL string literal** (wrapped in
+  single quotes, with embedded single quotes escaped by doubling them), rendered via `IQuoter`.
+
+This analyzer flags uses of the raw `$(name)` token style (and its escaped form, `$$((name))`,
+which renders the literal text `$(name)` without substitution) and recommends switching to the
+automatically quoted `$[name]`/`$$[[name]]` forms instead, to reduce the software supply-chain risk
+of accidentally interpolating untrusted data unquoted into SQL.
+
+#### Example Problem
+
+```csharp
+[Migration(20240101120000)]
+public class UpdateUserEmail : Migration
+{
+    public override void Up()
+    {
+        // ❌ This will trigger FM0002: the value is substituted unquoted.
+        Execute.Sql(
+            "UPDATE Users SET Email = $(email) WHERE Id = $(id)",
+            new Dictionary<string, string> { ["email"] = email, ["id"] = id });
+    }
+
+    public override void Down()
+    {
+    }
+}
+```
+
+**Diagnostic Message**:
+```
+FM0002: Replace raw variable interpolation token '$(email)' with the automatically quoted '$[email]' token, unless the raw substitution is intentional
+```
+
+#### Solution
+
+Use the `$[name]` token style so the value is safely quoted for you:
+
+```csharp
+// ✅ The value is safely quoted as a SQL string literal.
+Execute.Sql(
+    "UPDATE Users SET Email = $[email] WHERE Id = $[id]",
+    new Dictionary<string, string> { ["email"] = email, ["id"] = id });
+```
+
+A code fix is available (in supporting IDEs) to automatically replace `$(name)` with `$[name]`
+(and `$$((name))` with `$$[[name]]`).
+
+#### When Raw Substitution Is Legitimate
+
+The `$(name)` token style still has legitimate uses, since it is not always desirable (or valid
+SQL) to quote the substituted value &mdash; for example, when substituting an identifier, a SQL
+keyword/fragment, or when concatenating two similar queries that differ only in a clause, using
+`UNION`/`UNION ALL`:
+
+```csharp
+// $(whereClause) intentionally substitutes a raw SQL fragment, not string data.
+Execute.Sql(
+    "SELECT Id, Name FROM Users WHERE $(whereClause1) " +
+    "UNION ALL " +
+    "SELECT Id, Name FROM Users WHERE $(whereClause2)",
+    new Dictionary<string, string>
+    {
+        ["whereClause1"] = "IsActive = 1",
+        ["whereClause2"] = "IsActive = 0 AND LastLoginDate > '2024-01-01'",
+    });
+```
+
+In such cases, since the value being substituted is trusted, fixed, developer-authored SQL (not
+external/untrusted data), the FM0002 warning can be suppressed for that call &mdash; see
+[Suppressing Analyzer Warnings](#suppressing-analyzer-warnings) below.
+
 ## IDE Integration
 
 The analyzers work seamlessly with popular IDEs:

@@ -1,9 +1,16 @@
 name: Pull Requests
 
+# NOTE: use `pull_request`, not `pull_request_target`.
+# `pull_request_target` checks out the BASE branch by default, so this job was
+# building `main` on every PR instead of the contributor's code. It also runs
+# with a read/write token and access to secrets, which is why it must never be
+# combined with checking out PR code (the "pwn request" vulnerability).
+# `pull_request` checks out the PR merge ref and hands fork PRs a read-only
+# token with no secrets, which is what a build/test job wants.
 on:
-  pull_request_target:
+  pull_request:
     branches:
-    - '*'
+    - '**'
   push:
     branches:
     - 'main'
@@ -12,6 +19,7 @@ env:
   solution: 'FluentMigrator.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: Release
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   build:
@@ -32,29 +40,30 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         fetch-depth: 0
 
     - name: Install GitVersion
-      uses: gittools/actions/gitversion/setup@v4.1.0
+      uses: gittools/actions/gitversion/setup@v4.5.0
       with:
         versionSpec: 6.3.x
 
     - name: Execute GitVersion
-      uses: gittools/actions/gitversion/execute@v4.1.0
+      id: gitversion
+      uses: gittools/actions/gitversion/execute@v4.5.0
       env:
         BUILD_BUILDNUMBER: ${{ env.GitVersion.NuGetVersionV2 }}
       with:
         updateAssemblyInfo: false
 
     - name: Setup dotnet SDK
-      uses: actions/setup-dotnet@v4
+      uses: actions/setup-dotnet@v5
       with:
         dotnet-version: '9.0.x'
 
     - name: Setup dotnet SDK
-      uses: actions/setup-dotnet@v4
+      uses: actions/setup-dotnet@v5
       with:
         dotnet-version: '10.0.x'
 
@@ -114,7 +123,7 @@ jobs:
         if (Test-Path $installerPath) { Remove-Item $installerPath -Force -ErrorAction SilentlyContinue }
 
     - name: Restore, Build, Test
-      run: dotnet test --framework ${{ matrix.dotnet-tfm }} --configuration ${{ env.buildConfiguration }} --verbosity quiet --logger trx --collect:"XPlat Code Coverage" --results-directory "TestResults-${{ matrix.dotnet-tfm }}"
+      run: dotnet test --framework ${{ matrix.dotnet-tfm }} --configuration ${{ env.buildConfiguration }} --verbosity quiet --logger trx --collect:"XPlat Code Coverage" --results-directory "TestResults-${{ matrix.dotnet-tfm }}" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura
       env:
         # Enable containers for integration tests only on Linux
         FM_TestConnectionStrings__MySql__ContainerEnabled: ${{ matrix.os == 'ubuntu-latest' }}
@@ -126,6 +135,24 @@ jobs:
         FM_TestConnectionStrings__SqlServer2016__ContainerEnabled: ${{ matrix.os == 'ubuntu-latest' }}
         FM_TestConnectionStrings__SqlServer2016__IsEnabled: ${{ matrix.os == 'ubuntu-latest' }}
 
+    - name: AOT Smoke Tests
+      if: matrix.dotnet-tfm == 'net8.0'
+      run: dotnet run --project test/FluentMigrator.Tests.Aot/FluentMigrator.Tests.Aot.csproj --configuration ${{ env.buildConfiguration }} --verbosity quiet
+
+    # Pack triggers .NET package validation (EnablePackageValidation in PackageLibrary.props),
+    # which fails the build on breaking public-API changes against PackageValidationBaselineVersion.
+    # Windows-only because the libraries multi-target net48, which builds natively there.
+    # Version must be >= the baseline, so use the GitVersion-computed package version.
+    # Build first, then pack --no-build: the analyzer packs (and is validated) during build via
+    # GeneratePackageOnBuild, and --no-build avoids its NU5019 on a subsequent CLI pack.
+    - name: Validate package API compatibility
+      if: matrix.os == 'windows-latest' && (!cancelled())
+      shell: pwsh
+      run: |
+        dotnet build ${{ env.solution }} --configuration ${{ env.buildConfiguration }} --verbosity minimal -p:Version=${{ steps.gitversion.outputs.majorMinorPatch }}
+        if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+        dotnet pack ${{ env.solution }} --configuration ${{ env.buildConfiguration }} --no-build --verbosity minimal -p:Version=${{ steps.gitversion.outputs.majorMinorPatch }}
+
     - name: Verify test results coverage files exists
       if: matrix.os == 'ubuntu-latest' && (!cancelled())
       run: |
@@ -134,62 +161,58 @@ jobs:
         echo "=== Environment variable GITHUB_WORKSPACE ==="
         echo $GITHUB_WORKSPACE
         echo "=== Coverage directory listing ==="
-        find . -name "*Cobertura.xml" || true
+        # -iname: the collector writes `coverage.cobertura.xml` (lowercase),
+        # so a case-sensitive -name "*Cobertura.xml" never matched on Linux.
+        find . -type f -iname "*cobertura.xml" || true
 
     - name: Combine Coverage Reports
-      uses: danielpalme/ReportGenerator-GitHub-Action@v5.5.7
+      uses: danielpalme/ReportGenerator-GitHub-Action@v5.5.10
       if: '!cancelled()'
       with:
-        reports: "$GITHUB_WORKSPACE/**/TestResults-${{ matrix.dotnet-tfm }}/**/*Cobertura.xml"
-        targetdir: "$GITHUB_WORKSPACE/coverage"
-        reporttypes: "Cobertura"
+        reports: "**/*.cobertura.xml"
+        targetdir: "coveragereport"
+        reporttypes: "Cobertura,MarkdownSummaryGithub"
         verbosity: "Info"
         title: "Code Coverage"
         tag: "${{ github.run_number }}_${{ github.run_id }}"
         toolpath: "reportgeneratortool"
-
-    - name: Verify coverage file exists
-      if: matrix.os == 'ubuntu-latest' && (!cancelled())
-      run: |
-        echo "=== Coverage directory listing ==="
-        ls -la "$GITHUB_WORKSPACE/coverage/" || true
-        test -f "$GITHUB_WORKSPACE/coverage/Cobertura.xml"
+    # Needs shell: bash — the default shell on Windows runners is pwsh, where
+    # $GITHUB_STEP_SUMMARY is not a variable (it would be $env:GITHUB_STEP_SUMMARY)
+    # and the redirect target expands to null.
+    - name: Write Coverage Summary to Job Summary
+      if: '!cancelled()'
+      shell: bash
+      run: cat coveragereport/SummaryGithub.md >> "$GITHUB_STEP_SUMMARY"
 
     - name: Upload Combined Coverage XML
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       if: '!cancelled()'
       with:
         name: coverage-${{ matrix.os }}-${{ matrix.dotnet-tfm }}
-        path: $GITHUB_WORKSPACE/coverage/Cobertura.xml
+        path: coveragereport/Cobertura.xml
         retention-days: 5
-
-    - name: Publish Code Coverage Report
-      uses: irongut/CodeCoverageSummary@v1.3.0
-      if: matrix.os == 'ubuntu-latest' && (!cancelled())
-      with:
-        filename: "$GITHUB_WORKSPACE/coverage/Cobertura.xml"
-        badge: true
-        fail_below_min: false
-        format: markdown
-        hide_branch_rate: false
-        hide_complexity: false
-        indicators: true
-        output: both
-        thresholds: "10 30"
 
     - name: Add Coverage PR Comment
       uses: marocchino/sticky-pull-request-comment@v2
-      if: github.event_name == 'pull_request'
+      # Only the Linux leg comments: both matrix legs share one sticky comment
+      # id, so without this they race and clobber each other.
+      # Fork PRs get a read-only token, so commenting is best-effort.
+      continue-on-error: true
+      if: github.event_name == 'pull_request' && matrix.os == 'ubuntu-latest' && !cancelled()
       with:
+        header: code-coverage
         recreate: true
-        path: $GITHUB_WORKSPACE/code-coverage-results.md
+        path: coveragereport/SummaryGithub.md
 
     - name: Upload Test Result Files
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       if: '!cancelled()'
       with:
         name: test-results-${{ matrix.os }}-${{ matrix.dotnet-tfm }}
-        path: $GITHUB_WORKSPACE/**/TestResults-${{ matrix.dotnet-tfm }}/**/*
+        # Action inputs are NOT shell-expanded: "$GITHUB_WORKSPACE/..." was
+        # matched literally and never found anything. Globs are already
+        # relative to the workspace.
+        path: "**/TestResults-${{ matrix.dotnet-tfm }}/**/*"
         retention-days: 5
 
     - name: Publish Test Results
@@ -197,8 +220,11 @@ jobs:
       # GitHub Actions initially only supported containerized actions, which is not supported on Windows
       # and this particular GitHub action from EnricoMi is a containerized action
       if: matrix.os == 'ubuntu-latest' && (!cancelled())
+      # Fork PRs get a read-only token, so publishing the check is best-effort.
+      continue-on-error: true
       with:
-        files: "$GITHUB_WORKSPACE/**/*.trx"
+        # Relative glob, not "$GITHUB_WORKSPACE/..." — see note above.
+        files: "**/*.trx"
 
     - name: Diagnostics (Linux)
       if: matrix.os == 'ubuntu-latest' && failure()

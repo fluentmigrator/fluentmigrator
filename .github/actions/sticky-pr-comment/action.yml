@@ -1,0 +1,24 @@
+name: FluentMigrator Sticky PR Comment
+description: Create or update a pull request comment identified by a header marker.
+inputs:
+  github_token:
+    description: GitHub token with pull request write permissions.
+    required: true
+  repository:
+    description: Repository in owner/name format.
+    required: true
+  pull_request_number:
+    description: Pull request number.
+    required: true
+  header:
+    description: Header marker for sticky updates.
+    required: true
+  body_path:
+    description: Path to markdown file used as comment body.
+    required: true
+outputs:
+  comment_id:
+    description: ID of created or updated comment.
+runs:
+  using: docker
+  image: Dockerfile

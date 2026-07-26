@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net48;netstandard2.0</TargetFrameworks>
     <RootNamespace>FluentMigrator.Runner</RootNamespace>
@@ -7,6 +7,7 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\FluentMigrator.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
+  <Import Project="$(MSBuildThisFileDirectory)../../TrimAot.props" />
   <Import Project="$(MSBuildThisFileDirectory)../../PackageLibrary.props" />
   <ItemGroup>
     <None Include="..\..\FluentMigrator.snk" Link="FluentMigrator.snk" />
@@ -14,5 +15,6 @@
   <ItemGroup>
     <ProjectReference Include="..\FluentMigrator.Runner.Core\FluentMigrator.Runner.Core.csproj" />
     <ProjectReference Include="..\FluentMigrator\FluentMigrator.csproj" />
+    <ProjectReference Include="..\FluentMigrator.Extensions.SQLite\FluentMigrator.Extensions.SQLite.csproj" />
   </ItemGroup>
 </Project>

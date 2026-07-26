@@ -9,9 +9,7 @@ namespace FluentMigrator
         public const string IbmDb2ISeries = "IBM DB2 iSeries";
         public const string Db2ISeries = "DB2 iSeries";
         public const string Firebird = nameof(Firebird);
-        [Obsolete("Hana support will go away unless someone in the community steps up to provide support.")]
         public const string Hana = nameof(Hana);
-        public const string Jet = nameof(Jet);
         public const string MariaDB = nameof(MariaDB);
         public const string MySql = nameof(MySql);
         public const string MySql4 = nameof(MySql4);
@@ -21,6 +19,7 @@ namespace FluentMigrator
         public const string Oracle = nameof(Oracle);
         public const string OracleManaged = nameof(OracleManaged);
         public const string Oracle12c = nameof(Oracle12c);
+        public const string Oracle12cManaged = nameof(Oracle12cManaged);
         public const string Postgres = nameof(Postgres);
         public const string PostgreSQL = nameof(PostgreSQL);
         public const string Postgres92 = nameof(Postgres92);
@@ -46,9 +45,7 @@ namespace FluentMigrator
         public const string DB2 = nameof(DB2);
         public const string Db2ISeries = nameof(Db2ISeries);
         public const string Firebird = nameof(Firebird);
-        [Obsolete("Hana support will go away unless someone in the community steps up to provide support.")]
         public const string Hana = nameof(Hana);
-        public const string Jet = nameof(Jet);
         public const string MariaDB = nameof(MariaDB);
         public const string MySql = nameof(MySql);
         public const string MySql4 = nameof(MySql4);

@@ -33,7 +33,6 @@ namespace FluentMigrator.Runner.Generators.Hana
     /// <summary>
     /// The SAP Hana SQL generator for FluentMigrator.
     /// </summary>
-    [Obsolete("Hana support will go away unless someone in the community steps up to provide support.")]
     public class HanaGenerator : GenericGenerator
     {
         /// <inheritdoc />
@@ -131,7 +130,8 @@ namespace FluentMigrator.Runner.Generators.Hana
         private string InnerGenerate(CreateTableExpression expression)
         {
             var tableName = Quoter.QuoteTableName(expression.TableName);
-            return FormatStatement("CREATE COLUMN TABLE {0} ({1})", tableName, Column.Generate(expression.Columns, tableName));
+            var createTable = expression.IfNotExists ? "CREATE COLUMN TABLE IF NOT EXISTS {0} ({1})" : "CREATE COLUMN TABLE {0} ({1})";
+            return FormatStatement(createTable, tableName, Column.Generate(expression.Columns, tableName));
         }
 
         /// <inheritdoc />

@@ -86,23 +86,24 @@ namespace FluentMigrator.Expressions
         {
             var results = new List<ValidationResult>();
 
+            if (string.IsNullOrEmpty(ForeignKey.Name))
+            {
+                results.Add(new ValidationResult(ErrorMessages.ForeignKeyNameCannotBeNullOrEmpty));
+            }
+
+            if (string.IsNullOrEmpty(ForeignKey.ForeignTable))
+            {
+                results.Add(new ValidationResult(ErrorMessages.ForeignTableNameCannotBeNullOrEmpty));
+            }
+
             if (ForeignKey.ForeignColumns.Count > 0)
             {
-                var context = new ValidationContext(ForeignKey, validationContext.Items);
-                context.InitializeServiceProvider(validationContext.GetService);
-                ValidationUtilities.TryCollectResults(context, ForeignKey, results);
-            }
-            else
-            {
-                if (string.IsNullOrEmpty(ForeignKey.Name))
+                if (string.IsNullOrEmpty(ForeignKey.PrimaryTable))
                 {
-                    results.Add(new ValidationResult(ErrorMessages.ForeignKeyNameCannotBeNullOrEmpty));
+                    results.Add(new ValidationResult(ErrorMessages.PrimaryTableNameCannotBeNullOrEmpty));
                 }
 
-                if (string.IsNullOrEmpty(ForeignKey.ForeignTable))
-                {
-                    results.Add(new ValidationResult(ErrorMessages.ForeignTableNameCannotBeNullOrEmpty));
-                }
+                results.AddRange(ForeignKey.Validate(validationContext));
             }
 
             return results;

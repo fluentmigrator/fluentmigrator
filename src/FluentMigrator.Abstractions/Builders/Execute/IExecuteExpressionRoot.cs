@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics.CodeAnalysis;
 
 using FluentMigrator.Infrastructure;
 
@@ -33,21 +34,21 @@ namespace FluentMigrator.Builders.Execute
         /// Executes an SQL statement
         /// </summary>
         /// <param name="sqlStatement">The SQL statement to execute</param>
-        void Sql(string sqlStatement);
+        void Sql([StringSyntax("sql")] string sqlStatement);
 
         /// <summary>
         /// Executes an SQL statement
         /// </summary>
         /// <param name="sqlStatement">The SQL statement to execute</param>
         /// <param name="parameters">The parameters to be replaced in the SQL script</param>
-        void Sql(string sqlStatement, IDictionary<string, string> parameters);
+        void Sql([StringSyntax("sql")] string sqlStatement, IDictionary<string, object> parameters);
 
         /// <summary>
         /// Executes an SQL statement
         /// </summary>
         /// <param name="sqlStatement">The SQL statement to execute</param>
         /// <param name="description">Description for this SQL statement for logging purposes</param>
-        void Sql(string sqlStatement, string description);
+        void Sql([StringSyntax("sql")] string sqlStatement, string description);
 
         /// <summary>
         /// Executes an SQL statement
@@ -55,7 +56,7 @@ namespace FluentMigrator.Builders.Execute
         /// <param name="sqlStatement">The SQL statement to execute</param>
         /// <param name="description">Description for this SQL statement for logging purposes</param>
         /// <param name="parameters">The parameters to be replaced in the SQL script</param>
-        void Sql(string sqlStatement, string description, IDictionary<string, string> parameters);
+        void Sql([StringSyntax("sql")] string sqlStatement, string description, IDictionary<string, object> parameters);
 
         /// <summary>
         /// Executes an SQL script loaded from the given file
@@ -68,7 +69,7 @@ namespace FluentMigrator.Builders.Execute
         /// </summary>
         /// <param name="pathToSqlScript">The file to read the SQL script from</param>
         /// <param name="parameters">The parameters to be replaced in the SQL script</param>
-        void Script(string pathToSqlScript, IDictionary<string, string> parameters);
+        void Script(string pathToSqlScript, IDictionary<string, object> parameters);
 
         /// <summary>
         /// Calls an action to execute dynamically generated SQL statements
@@ -94,6 +95,6 @@ namespace FluentMigrator.Builders.Execute
         /// </summary>
         /// <param name="embeddedSqlScriptName">The name of the embedded SQL script (partial matches allowed)</param>
         /// <param name="parameters">The parameters to be replaced in the SQL script</param>
-        void EmbeddedScript(string embeddedSqlScriptName, IDictionary<string, string> parameters);
+        void EmbeddedScript(string embeddedSqlScriptName, IDictionary<string, object> parameters);
     }
 }

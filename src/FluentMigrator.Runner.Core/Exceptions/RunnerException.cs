@@ -77,6 +77,9 @@ namespace FluentMigrator.Runner.Exceptions
         /// </remarks>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="info"/> is <c>null</c>.</exception>
         /// <exception cref="SerializationException">Thrown when the class name is <c>null</c> or <see cref="Exception.HResult"/> is zero.</exception>
+#if NET
+        [Obsolete("Formatter-based serialization is obsolete")]
+#endif
         protected RunnerException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }

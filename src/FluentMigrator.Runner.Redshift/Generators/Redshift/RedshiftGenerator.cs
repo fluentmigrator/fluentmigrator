@@ -106,7 +106,8 @@ namespace FluentMigrator.Runner.Generators.Redshift
             }
             var createStatement = new StringBuilder();
             var tableName = Quoter.Quote(expression.TableName);
-            createStatement.AppendFormat(CreateTable, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), Column.Generate(expression.Columns, tableName));
+            var createTableFormat = expression.IfNotExists ? CreateTableIfNotExists : CreateTable;
+            createStatement.AppendFormat(createTableFormat, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), Column.Generate(expression.Columns, tableName));
             var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatements(expression)
                 ?.ToList();
 
@@ -132,7 +133,8 @@ namespace FluentMigrator.Runner.Generators.Redshift
                 CompatibilityMode.HandleCompatibility("Computed columns are not supported");
             }
             var alterStatement = new StringBuilder();
-            alterStatement.AppendFormat(AlterColumn, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), ((RedshiftColumn)Column).GenerateAlterClauses(expression.Column));
+            var alterColumnFormat = expression.IfExists ? "ALTER TABLE IF EXISTS {0} {1}" : AlterColumn;
+            alterStatement.AppendFormat(alterColumnFormat, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), ((RedshiftColumn)Column).GenerateAlterClauses(expression.Column));
             var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatement(expression);
 
             AppendSqlStatementEndToken(alterStatement);
@@ -154,7 +156,8 @@ namespace FluentMigrator.Runner.Generators.Redshift
                 CompatibilityMode.HandleCompatibility("Computed columns are not supported");
             }
             var createStatement = new StringBuilder();
-            createStatement.AppendFormat(AddColumn, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), Column.Generate(expression.Column));
+            var addColumnFormat = expression.IfExists ? "ALTER TABLE IF EXISTS {0} ADD {1}" : AddColumn;
+            createStatement.AppendFormat(addColumnFormat, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), Column.Generate(expression.Column));
             var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatement(expression);
 
             AppendSqlStatementEndToken(createStatement);
