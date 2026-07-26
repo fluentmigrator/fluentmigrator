@@ -9,9 +9,11 @@
     <AssemblyOriginatorKeyFile>..\..\FluentMigrator.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <Import Project="$(MSBuildThisFileDirectory)../../Global.props" />
+  <!-- Package versions come from Directory.Packages.props in the repository root. -->
   <ItemGroup>
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.6" />
-    <PackageReference Include="TUnit" Version="1.18.21" />
+    <!-- Overrides the shipped minimum-version range; the AOT tests run against a concrete build. -->
+    <PackageReference Include="Microsoft.Data.Sqlite" VersionOverride="9.0.6" />
+    <PackageReference Include="TUnit" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\FluentMigrator\FluentMigrator.csproj" />

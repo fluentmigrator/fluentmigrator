@@ -15,21 +15,24 @@
   <PropertyGroup>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
-
-    <MsCodeAnalysisCoreVersion>5.0.0</MsCodeAnalysisCoreVersion>
-    <MsCodeAnalysisAnalyzerTestingVersion>1.1.2</MsCodeAnalysisAnalyzerTestingVersion>
   </PropertyGroup>
 
+  <!-- Package versions come from Directory.Packages.props in the repository root. -->
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="$(MsCodeAnalysisCoreVersion)" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="$(MsCodeAnalysisCoreVersion)" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="$(MsCodeAnalysisCoreVersion)" />
-    <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="$(MsCodeAnalysisCoreVersion)" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Analyzer.Testing" Version="$(MsCodeAnalysisAnalyzerTestingVersion)" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.CodeFix.Testing" Version="$(MsCodeAnalysisAnalyzerTestingVersion)" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
-    <PackageReference Include="NUnit" Version="3.12.0" />
-    <PackageReference Include="NUnit3TestAdapter" Version="5.2.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Common" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Analyzer.Testing" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.CodeFix.Testing" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <!--
+      TODO: this project is still on NUnit 3 while FluentMigrator.Tests is on NUnit 4. Migrating it
+      means rewriting the classic asserts that NUnit 4 removed, so the two versions are pinned apart
+      here until that happens. Drop these overrides once this project moves to NUnit 4.
+    -->
+    <PackageReference Include="NUnit" VersionOverride="3.12.0" />
+    <PackageReference Include="NUnit3TestAdapter" VersionOverride="5.2.0" />
   </ItemGroup>
 
   <ItemGroup>
