@@ -354,6 +354,38 @@ namespace FluentMigrator.Tests.Unit.Builders.Execute
             expression.ShouldNotBeNull();
             expression.Parameters.ShouldBeNull();
         }
+
+        [Test]
+        public void SqlWithLegacyStringParametersPreservesKeyComparer()
+        {
+            _contextMock.SetupGet(x => x.ServiceProvider).Returns(new Mock<IServiceProvider>().Object);
+
+            var parameters = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { { "Name", "value" } };
+
+            _root.Sql("SELECT $(name)", parameters);
+
+            _expressions.Count.ShouldBe(1);
+            var expression = _expressions.First() as ExecuteSqlStatementExpression;
+            expression.ShouldNotBeNull();
+            expression.Parameters.ShouldNotBeNull();
+            expression.Parameters.ShouldContainKeyAndValue("name", "value");
+        }
+
+        [Test]
+        public void ScriptWithLegacyStringParametersPreservesKeyComparer()
+        {
+            _contextMock.SetupGet(x => x.ServiceProvider).Returns(new Mock<IServiceProvider>().Object);
+
+            var parameters = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { { "Name", "value" } };
+
+            _root.Script("script.sql", parameters);
+
+            _expressions.Count.ShouldBe(1);
+            var expression = _expressions.First() as ExecuteSqlScriptExpression;
+            expression.ShouldNotBeNull();
+            expression.Parameters.ShouldNotBeNull();
+            expression.Parameters.ShouldContainKeyAndValue("name", "value");
+        }
 #pragma warning restore CS0618 // Type or member is obsolete
     }
 }

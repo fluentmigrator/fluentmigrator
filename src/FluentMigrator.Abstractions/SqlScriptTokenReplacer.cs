@@ -143,6 +143,12 @@ namespace FluentMigrator
         /// <see cref="ReplaceSqlScriptTokens(string, IDictionary{string, object}, IQuoter)"/> overload,
         /// which supports non-string parameter values and safe SQL literal quoting via an
         /// <see cref="IQuoter"/>.
+        /// <para>
+        /// The key comparer of <paramref name="parameters"/> is carried over when it is a
+        /// <see cref="Dictionary{TKey,TValue}"/>, so that callers passing e.g. a
+        /// <see cref="StringComparer.OrdinalIgnoreCase"/> dictionary keep the token lookup
+        /// semantics they had before the conversion.
+        /// </para>
         /// </remarks>
         [Obsolete("Use the IDictionary<string, object> overload instead. The IDictionary<string, string> overload is kept for backwards compatibility and will be removed in a future major version.")]
         public static string ReplaceSqlScriptTokens([StringSyntax("sql")] string sqlText, IDictionary<string, string> parameters)
@@ -150,7 +156,8 @@ namespace FluentMigrator
             IDictionary<string, object> objectParameters = null;
             if (parameters != null)
             {
-                objectParameters = new Dictionary<string, object>(parameters.Count);
+                var comparer = (parameters as Dictionary<string, string>)?.Comparer;
+                objectParameters = new Dictionary<string, object>(parameters.Count, comparer);
                 foreach (var parameter in parameters)
                 {
                     objectParameters[parameter.Key] = parameter.Value;

@@ -219,6 +219,12 @@ namespace FluentMigrator.Builders.Execute
         /// <param name="parameters">The legacy string-valued parameters, or <c>null</c></param>
         /// <returns>An object-valued copy of <paramref name="parameters"/>, or <c>null</c> when
         /// <paramref name="parameters"/> is <c>null</c></returns>
+        /// <remarks>
+        /// The key comparer of <paramref name="parameters"/> is carried over when it is a
+        /// <see cref="Dictionary{TKey,TValue}"/>, so that callers passing e.g. a
+        /// <see cref="StringComparer.OrdinalIgnoreCase"/> dictionary keep the token lookup
+        /// semantics they had before the conversion.
+        /// </remarks>
         private static IDictionary<string, object> ToObjectParameters(IDictionary<string, string> parameters)
         {
             if (parameters == null)
@@ -226,7 +232,8 @@ namespace FluentMigrator.Builders.Execute
                 return null;
             }
 
-            var converted = new Dictionary<string, object>(parameters.Count);
+            var comparer = (parameters as Dictionary<string, string>)?.Comparer;
+            var converted = new Dictionary<string, object>(parameters.Count, comparer);
             foreach (var parameter in parameters)
             {
                 converted[parameter.Key] = parameter.Value;

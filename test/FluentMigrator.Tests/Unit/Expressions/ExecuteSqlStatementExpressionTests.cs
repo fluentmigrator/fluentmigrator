@@ -16,6 +16,7 @@
 //
 #endregion
 
+using System;
 using System.Collections.Generic;
 
 using FluentMigrator.Expressions;
@@ -115,6 +116,31 @@ namespace FluentMigrator.Tests.Unit.Expressions
 
             var processor = new Mock<IMigrationProcessor>();
             processor.Setup(x => x.Execute("ALTER TABLE tenant1.BLAH ADD COLUMN Foo INT")).Verifiable();
+
+            expression.ExecuteWith(processor.Object);
+            processor.Verify();
+        }
+
+        [Test]
+        public void MergingWellKnownTokensPreservesTheParameterKeyComparer()
+        {
+            var tokenProvider = new Mock<ISqlTokenProvider>();
+            tokenProvider
+                .Setup(x => x.GetTokens())
+                .Returns(new Dictionary<string, string> { { "DefaultSchema", "dbo" } });
+
+            var expression = new ExecuteSqlStatementExpression()
+            {
+                SqlStatement = "ALTER TABLE $(defaultschema).$(tableprefix)BLAH ADD COLUMN Foo INT",
+                Parameters = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+                {
+                    { "TablePrefix", "App_" },
+                },
+                SqlScriptTokenProviders = new[] { tokenProvider.Object },
+            };
+
+            var processor = new Mock<IMigrationProcessor>();
+            processor.Setup(x => x.Execute("ALTER TABLE dbo.App_BLAH ADD COLUMN Foo INT")).Verifiable();
 
             expression.ExecuteWith(processor.Object);
             processor.Verify();

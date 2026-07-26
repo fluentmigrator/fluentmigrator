@@ -216,6 +216,27 @@ namespace FluentMigrator.Tests.Unit
             SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT $(Foo)", (IDictionary<string, string>)null)
                 .ShouldBe("SELECT $(Foo)");
         }
+
+        [Test]
+        public void LegacyStringDictionaryOverloadPreservesCaseInsensitiveKeyComparer()
+        {
+            var parameters = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["TablePrefix"] = "App_",
+            };
+
+            SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT * FROM $(tableprefix)Users", parameters)
+                .ShouldBe("SELECT * FROM App_Users");
+        }
+
+        [Test]
+        public void LegacyStringDictionaryOverloadKeepsCaseSensitiveLookupForDefaultComparer()
+        {
+            var parameters = new Dictionary<string, string> { ["TablePrefix"] = "App_" };
+
+            SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT * FROM $(tableprefix)Users", parameters)
+                .ShouldBe("SELECT * FROM $(tableprefix)Users");
+        }
 #pragma warning restore CS0618 // Type or member is obsolete
     }
 }
