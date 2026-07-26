@@ -121,5 +121,41 @@ namespace FluentMigrator.Analyzers {
                 return ResourceManager.GetString("RawSqlTokenInterpolationCodeFixTitle", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Execute.Sql, Execute.Script and Execute.EmbeddedScript no longer require the parameter values to be strings....
+        /// </summary>
+        internal static string LegacyStringDictionaryParameterAnalyzerDescription {
+            get {
+                return ResourceManager.GetString("LegacyStringDictionaryParameterAnalyzerDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; uses the obsolete IDictionary&lt;string, string&gt; parameter overload; use the IDictionary&lt;string, object&gt; overload instead.
+        /// </summary>
+        internal static string LegacyStringDictionaryParameterAnalyzerMessageFormat {
+            get {
+                return ResourceManager.GetString("LegacyStringDictionaryParameterAnalyzerMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Prefer IDictionary&lt;string, object&gt; over IDictionary&lt;string, string&gt; for Execute parameters.
+        /// </summary>
+        internal static string LegacyStringDictionaryParameterAnalyzerTitle {
+            get {
+                return ResourceManager.GetString("LegacyStringDictionaryParameterAnalyzerTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Use IDictionary&lt;string, object&gt; parameter values.
+        /// </summary>
+        internal static string LegacyStringDictionaryParameterCodeFixTitle {
+            get {
+                return ResourceManager.GetString("LegacyStringDictionaryParameterCodeFixTitle", resourceCulture);
+            }
+        }
     }
 }

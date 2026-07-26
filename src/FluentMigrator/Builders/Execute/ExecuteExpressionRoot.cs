@@ -34,6 +34,9 @@ namespace FluentMigrator.Builders.Execute
     /// </summary>
     public class ExecuteExpressionRoot : IExecuteExpressionRoot, IMigrationContextAccessor
     {
+        private const string ObsoleteParameterDictionaryMessage =
+            "Use the IDictionary<string, object> parameter overload instead. The IDictionary<string, string> overload is kept for backwards compatibility and will be removed in a future major version.";
+
         private readonly IMigrationContext _context;
 
         /// <summary>
@@ -73,6 +76,13 @@ namespace FluentMigrator.Builders.Execute
         }
 
         /// <inheritdoc />
+        [Obsolete(ObsoleteParameterDictionaryMessage)]
+        public void Sql([StringSyntax("sql")] string sqlStatement, IDictionary<string, string> parameters)
+        {
+            Sql(sqlStatement, ToObjectParameters(parameters));
+        }
+
+        /// <inheritdoc />
         public void Sql([StringSyntax("sql")] string sqlStatement, string description)
         {
             var expression = new ExecuteSqlStatementExpression
@@ -100,6 +110,13 @@ namespace FluentMigrator.Builders.Execute
         }
 
         /// <inheritdoc />
+        [Obsolete(ObsoleteParameterDictionaryMessage)]
+        public void Sql([StringSyntax("sql")] string sqlStatement, string description, IDictionary<string, string> parameters)
+        {
+            Sql(sqlStatement, description, ToObjectParameters(parameters));
+        }
+
+        /// <inheritdoc />
         public void Script(string pathToSqlScript, IDictionary<string, object> parameters)
         {
             var expression = new ExecuteSqlScriptExpression
@@ -110,6 +127,13 @@ namespace FluentMigrator.Builders.Execute
             };
 
             _context.Expressions.Add(expression);
+        }
+
+        /// <inheritdoc />
+        [Obsolete(ObsoleteParameterDictionaryMessage)]
+        public void Script(string pathToSqlScript, IDictionary<string, string> parameters)
+        {
+            Script(pathToSqlScript, ToObjectParameters(parameters));
         }
 
         /// <inheritdoc />
@@ -178,6 +202,44 @@ namespace FluentMigrator.Builders.Execute
             };
 
             _context.Expressions.Add(expression);
+        }
+
+        /// <inheritdoc />
+        [Obsolete(ObsoleteParameterDictionaryMessage)]
+        public void EmbeddedScript(string embeddedSqlScriptName, IDictionary<string, string> parameters)
+        {
+            EmbeddedScript(embeddedSqlScriptName, ToObjectParameters(parameters));
+        }
+
+        /// <summary>
+        /// Converts a legacy <see cref="IDictionary{TKey,TValue}"/> of <see cref="string"/> values
+        /// into the <see cref="IDictionary{TKey,TValue}"/> of <see cref="object"/> values expected by
+        /// the current parameter overloads.
+        /// </summary>
+        /// <param name="parameters">The legacy string-valued parameters, or <c>null</c></param>
+        /// <returns>An object-valued copy of <paramref name="parameters"/>, or <c>null</c> when
+        /// <paramref name="parameters"/> is <c>null</c></returns>
+        /// <remarks>
+        /// The key comparer of <paramref name="parameters"/> is carried over when it is a
+        /// <see cref="Dictionary{TKey,TValue}"/>, so that callers passing e.g. a
+        /// <see cref="StringComparer.OrdinalIgnoreCase"/> dictionary keep the token lookup
+        /// semantics they had before the conversion.
+        /// </remarks>
+        private static IDictionary<string, object> ToObjectParameters(IDictionary<string, string> parameters)
+        {
+            if (parameters == null)
+            {
+                return null;
+            }
+
+            var comparer = (parameters as Dictionary<string, string>)?.Comparer;
+            var converted = new Dictionary<string, object>(parameters.Count, comparer);
+            foreach (var parameter in parameters)
+            {
+                converted[parameter.Key] = parameter.Value;
+            }
+
+            return converted;
         }
 
         /// <summary>

@@ -133,6 +133,41 @@ namespace FluentMigrator
         }
 
         /// <summary>
+        /// Replace tokens in an SQL script
+        /// </summary>
+        /// <param name="sqlText">The SQL script where the tokens will be replaced</param>
+        /// <param name="parameters">The tokens to be replaced</param>
+        /// <returns>The SQL script with the replaced tokens</returns>
+        /// <remarks>
+        /// This overload is kept for backwards compatibility. Prefer the
+        /// <see cref="ReplaceSqlScriptTokens(string, IDictionary{string, object}, IQuoter)"/> overload,
+        /// which supports non-string parameter values and safe SQL literal quoting via an
+        /// <see cref="IQuoter"/>.
+        /// <para>
+        /// The key comparer of <paramref name="parameters"/> is carried over when it is a
+        /// <see cref="Dictionary{TKey,TValue}"/>, so that callers passing e.g. a
+        /// <see cref="StringComparer.OrdinalIgnoreCase"/> dictionary keep the token lookup
+        /// semantics they had before the conversion.
+        /// </para>
+        /// </remarks>
+        [Obsolete("Use the IDictionary<string, object> overload instead. The IDictionary<string, string> overload is kept for backwards compatibility and will be removed in a future major version.")]
+        public static string ReplaceSqlScriptTokens([StringSyntax("sql")] string sqlText, IDictionary<string, string> parameters)
+        {
+            IDictionary<string, object> objectParameters = null;
+            if (parameters != null)
+            {
+                var comparer = (parameters as Dictionary<string, string>)?.Comparer;
+                objectParameters = new Dictionary<string, object>(parameters.Count, comparer);
+                foreach (var parameter in parameters)
+                {
+                    objectParameters[parameter.Key] = parameter.Value;
+                }
+            }
+
+            return ReplaceSqlScriptTokens(sqlText, objectParameters);
+        }
+
+        /// <summary>
         /// Renders a value as a safely quoted/escaped SQL string literal.
         /// </summary>
         /// <param name="value">The value to quote</param>
