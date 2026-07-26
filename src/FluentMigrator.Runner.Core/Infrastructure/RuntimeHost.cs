@@ -194,7 +194,13 @@ namespace FluentMigrator.Runner.Infrastructure
                 return GetFullGacDirectoriesOnWindows(winDir);
             }
 
+            // Assembly.Location is empty for assemblies embedded in a single-file app.
+            // AppContext.BaseDirectory is not a substitute here: this probes for the
+            // *framework* directory, not the app directory. An empty location simply means
+            // there is no on-disk Mono GAC to look at, which the isMono check below handles.
+#pragma warning disable IL3000
             var asmPath = typeof(int).Assembly.Location;
+#pragma warning restore IL3000
             var isMono = asmPath.Contains("/mono/");
             if (!isMono)
                 return _noNames;

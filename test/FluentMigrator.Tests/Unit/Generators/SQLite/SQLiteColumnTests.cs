@@ -29,7 +29,9 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
 {
     [TestFixture]
     // ReSharper disable once InconsistentNaming
+#pragma warning disable NUnit1034 // Class is used as base class but also contains tests to execute
     public class SQLiteColumnTests : BaseColumnTests
+#pragma warning restore NUnit1034
     {
         protected SQLiteGenerator Generator;
         private SQLiteQuoter quoter = new SQLiteQuoter();
