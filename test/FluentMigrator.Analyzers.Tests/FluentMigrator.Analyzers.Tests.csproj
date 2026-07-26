@@ -26,13 +26,10 @@
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Analyzer.Testing" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.CodeFix.Testing" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
-    <!--
-      TODO: this project is still on NUnit 3 while FluentMigrator.Tests is on NUnit 4. Migrating it
-      means rewriting the classic asserts that NUnit 4 removed, so the two versions are pinned apart
-      here until that happens. Drop these overrides once this project moves to NUnit 4.
-    -->
-    <PackageReference Include="NUnit" VersionOverride="3.12.0" />
-    <PackageReference Include="NUnit3TestAdapter" VersionOverride="5.2.0" />
+    <PackageReference Include="NUnit" />
+    <!-- Guards against classic asserts (NUnit2xxx) creeping back in; see FluentMigrator.Tests. -->
+    <PackageReference Include="NUnit.Analyzers" />
+    <PackageReference Include="NUnit3TestAdapter" />
   </ItemGroup>
 
   <ItemGroup>
