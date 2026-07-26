@@ -178,19 +178,26 @@ namespace FluentMigrator.Net.Sdk.Host.Tasks
 
             foreach (ITaskItem item in SelectedContexts ?? new ITaskItem[0])
             {
-                if (seen.ContainsKey(item.ItemSpec))
+                string selectedName = (item.ItemSpec ?? string.Empty).Trim();
+                if (selectedName.Length == 0)
                 {
                     continue;
                 }
-                seen.Add(item.ItemSpec, true);
+
+                if (seen.ContainsKey(selectedName))
+                {
+                    continue;
+                }
+                seen.Add(selectedName, true);
 
                 ITaskItem definition;
-                if (!known.TryGetValue(item.ItemSpec, out definition))
+                if (!known.TryGetValue(selectedName, out definition))
                 {
                     Log.LogError(null, "FMSDK207", null, null, 0, 0, 0, 0,
-                        "Unknown host context '" + item.ItemSpec + "'. Known contexts: " +
+                        "Unknown host context '" + selectedName + "'. Known contexts: " +
                         string.Join(", ", knownNames.ToArray()) +
-                        ". Contribute your own with a pack listed in $(CustomHostContextPacks).");
+                        ". Contribute your own with a pack listed in $(CustomHostContextPacks)."
+                    );
                     continue;
                 }
 
