@@ -66,10 +66,14 @@
     -->
     <PackageVersion Include="Snowflake.Data" Version="5.7.0" />
     <!--
-      2.1.12 is the first release whose SQLitePCLRaw.lib.e_sqlite3 is outside the range of
-      GHSA-2m69-gcr7-jv3q (NU1903); the advisory covers everything up to and including 2.1.11.
+      Held at 2.1.11 despite NU1903 (GHSA-2m69-gcr7-jv3q), which lists no patched version:
+      - 2.1.12 drops the win-arm native asset but its buildTransitive/net461 targets still copies
+        runtimes/win-arm/native/e_sqlite3.dll, so every net48 build fails with MSB3030.
+      - 3.0.x replaces SQLitePCLRaw.lib.e_sqlite3 with SourceGear.sqlite3 and is netstandard2.0
+        only, which is a larger change than a warning cleanup should make unreviewed.
+      Revisit when a 2.1.x ships with the net461 targets fixed, or take the 3.0.x move deliberately.
     -->
-    <PackageVersion Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.12" />
+    <PackageVersion Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.11" />
   </ItemGroup>
 
   <ItemGroup Label="Runner and tooling">
