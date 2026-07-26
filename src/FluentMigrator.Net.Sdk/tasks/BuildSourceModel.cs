@@ -327,8 +327,8 @@ namespace FluentMigrator.Net.Sdk.Tasks
             sb.Append("{\n");
             sb.Append("  \"manifestVersion\": 1,\n");
             sb.Append("  \"project\": ").Append(Quote(ProjectName)).Append(",\n");
-            sb.Append("  \"dialect\": ").Append(Quote(string.IsNullOrEmpty(Dialect) ? "generic" : Dialect)).Append(",\n");
-            sb.Append("  \"convention\": ").Append(Quote(string.IsNullOrEmpty(Convention) ? "fluentmigrator" : Convention)).Append(",\n");
+            sb.Append("  \"dialect\": ").Append(Quote(string.IsNullOrEmpty(Dialect) ? "generic" : Dialect.ToLowerInvariant())).Append(",\n");
+            sb.Append("  \"convention\": ").Append(Quote(string.IsNullOrEmpty(Convention) ? "fluentmigrator" : Convention.ToLowerInvariant())).Append(",\n");
             sb.Append("  \"defaultSchema\": ").Append(Quote(DefaultSchema ?? string.Empty)).Append(",\n");
             if (IsRootModule)
             {
