@@ -36,30 +36,33 @@ namespace FluentMigrator.DotNet.Cli
         }
 
         public string Task { get; }
-        public string ConnectionString { get; private set; }
-        public string ProcessorType { get; private set; }
-        public string ProcessorSwitches { get; private set; }
-        public IReadOnlyCollection<string> TargetAssemblies { get; private set; }
-        public long? TargetVersion { get; private set; }
-        public int? Steps { get; private set; }
-        public string Namespace { get; private set; }
-        public bool NestedNamespaces { get; private set; }
-        public long? StartVersion { get; private set; }
-        public bool NoConnection { get; private set; }
-        public string WorkingDirectory { get; private set; }
-        public IEnumerable<string> Tags { get; private set; }
-        public bool Preview { get; private set; }
-        public bool Verbose { get; private set; }
-        public string Profile { get; private set; }
-        public int? Timeout { get; private set; }
-        public TransactionMode TransactionMode { get; private set; }
-        public bool Output { get; private set; }
-        public string OutputFileName { get; private set; }
-        public bool AllowBreakingChanges { get; private set; }
-        public string SchemaName { get; private set; }
-        public bool StripComments { get; private set; }
-        public bool IncludeUntaggedMaintenances { get; private set; }
-        public bool IncludeUntaggedMigrations { get; private set; } = true;
+
+        // The setters below are internal rather than private so that the Mapperly-generated
+        // MigratorOptionsMapper can assign them. They remain invisible outside this assembly.
+        public string ConnectionString { get; internal set; }
+        public string ProcessorType { get; internal set; }
+        public string ProcessorSwitches { get; internal set; }
+        public IReadOnlyCollection<string> TargetAssemblies { get; internal set; }
+        public long? TargetVersion { get; internal set; }
+        public int? Steps { get; internal set; }
+        public string Namespace { get; internal set; }
+        public bool NestedNamespaces { get; internal set; }
+        public long? StartVersion { get; internal set; }
+        public bool NoConnection { get; internal set; }
+        public string WorkingDirectory { get; internal set; }
+        public IEnumerable<string> Tags { get; internal set; }
+        public bool Preview { get; internal set; }
+        public bool Verbose { get; internal set; }
+        public string Profile { get; internal set; }
+        public int? Timeout { get; internal set; }
+        public TransactionMode TransactionMode { get; internal set; }
+        public bool Output { get; internal set; }
+        public string OutputFileName { get; internal set; }
+        public bool AllowBreakingChanges { get; internal set; }
+        public string SchemaName { get; internal set; }
+        public bool StripComments { get; internal set; }
+        public bool IncludeUntaggedMaintenances { get; internal set; }
+        public bool IncludeUntaggedMigrations { get; internal set; } = true;
 
         public static MigratorOptions CreateListMigrations(ListMigrations cmd)
         {

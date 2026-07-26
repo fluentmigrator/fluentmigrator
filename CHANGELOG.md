@@ -27,6 +27,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Changed
 
 - SAP HANA support now uses the `Sap.Data.Hana.Net.v8.0` and `Sap.Data.Hana.Net.v10.0` NuGet packages, and HANA registration was removed from the .NET Framework console and MSBuild runners.
+- `FluentMigrator.DotNet.Cli` no longer depends on AutoMapper. The single `MigratorOptions` copy it performed is now generated at compile time by [Mapperly](https://mapperly.riok.app/), which removes a runtime dependency from `dotnet-fm` along with AutoMapper 15's commercial licence requirement and [CVE-2026-32933](https://github.com/advisories/GHSA-rvv3-g6hj-g44x). `Setup.BuildServiceProvider` no longer registers `AutoMapper.IMapper` in the service collection.
+- The repository moved to NuGet Central Package Management. All package versions now live in `Directory.Packages.props` at the repository root; project files declare package references without a `Version` attribute. This is a build-infrastructure change only - the versions the shipped packages depend on are unchanged.
 - Processor constructors taking an `IConnectionStringAccessor` are obsolete; use the overloads taking an `IMigrationConnectionFactory` instead.
 
 ### Contributors

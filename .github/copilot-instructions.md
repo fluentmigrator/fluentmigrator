@@ -201,6 +201,22 @@ public class SqlServerMigrationTests
 - Follow Azure Pipelines configuration for CI/CD patterns
 - Use GitVersion for versioning (configured in `GitVersion.yml`)
 
+## NuGet Dependencies
+
+- The repository uses Central Package Management: every version lives in `Directory.Packages.props`
+  at the repository root
+- Project files declare `<PackageReference Include="..." />` with **no** `Version` attribute; adding
+  one is an error (NU1008)
+- To add a package: add a `<PackageVersion Include="..." Version="..." />` entry to
+  `Directory.Packages.props` and a bare `<PackageReference>` to the project
+- Never introduce an MSBuild property to hold a version - property indirection is invisible to
+  Dependabot, which is the reason the versions were centralized in the first place
+- `VersionOverride` is the escape hatch for the rare project that needs a different version; keep
+  it rare and explain why in a comment
+- The `Microsoft.Extensions.*` and `Microsoft.Data.Sqlite` entries are written as open-ended ranges
+  (`[8.0.0,)`) on purpose: they are the published dependency floors of the shipped packages, and
+  raising them is a breaking change for consumers still on .NET 8
+
 ## Dependency Injection
 
 - FluentMigrator uses Microsoft.Extensions.DependencyInjection

@@ -28,20 +28,20 @@
     <ProjectReference Include="..\FluentMigrator.Runner\FluentMigrator.Runner.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Npgsql" Version="8.0.7" />
-    <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="10.3.3" />
-    <PackageReference Include="FSharp.Core" Version="9.0.202" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="$(MicrosoftPackageVersion)" />
-    <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="23.8.0" Condition="'$(TargetFramework)' == 'net8.0'" />
-    <PackageReference Include="Oracle.ManagedDataAccess" Version="23.8.0" Condition="'$(TargetFramework)' == 'net48'" />
-    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.11" />
-    <PackageReference Include="MySqlConnector" Version="2.4.0" />
-    <PackageReference Include="Snowflake.Data" Version="4.4.1" />
+    <PackageReference Include="Npgsql" />
+    <PackageReference Include="FirebirdSql.Data.FirebirdClient" />
+    <PackageReference Include="FSharp.Core" />
+    <PackageReference Include="Microsoft.Data.Sqlite" />
+    <PackageReference Include="Oracle.ManagedDataAccess.Core" Condition="'$(TargetFramework)' == 'net8.0'" />
+    <PackageReference Include="Oracle.ManagedDataAccess" Condition="'$(TargetFramework)' == 'net48'" />
+    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" />
+    <PackageReference Include="MySqlConnector" />
+    <PackageReference Include="Snowflake.Data" />
   </ItemGroup>
   <ItemGroup Condition=" '$(Platform)' == 'x86' ">
-    <PackageReference Include="Oracle.DataAccess.x86.4" Version="4.112.3" />
+    <PackageReference Include="Oracle.DataAccess.x86.4" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="$(MicrosoftPackageVersion)" />
+    <PackageReference Include="Microsoft.Extensions.Logging" />
   </ItemGroup>
 </Project>

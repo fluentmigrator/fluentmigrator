@@ -17,8 +17,6 @@
 using System;
 using System.Linq;
 
-using AutoMapper;
-
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Initialization;
@@ -54,8 +52,7 @@ namespace FluentMigrator.DotNet.Cli
                     lb.AddFluentMigratorConsole();
                     lb.AddDebug();
                 })
-                .AddOptions()
-                .AddSingleton(ConfigureMapper);
+                .AddOptions();
 
             if (options.Output)
             {
@@ -147,12 +144,7 @@ namespace FluentMigrator.DotNet.Cli
 
             services
                 .AddOptions<MigratorOptions>()
-                .Configure(
-                    (MigratorOptions optionsConfig, IServiceProvider serviceProvider) =>
-                    {
-                        var mapper = serviceProvider.GetRequiredService<IMapper>();
-                        mapper.Map(options, optionsConfig);
-                    });
+                .Configure((MigratorOptions optionsConfig) => MigratorOptionsMapper.Apply(options, optionsConfig));
 
             services
                 .Configure<FluentMigratorLoggerOptions>(
@@ -166,14 +158,6 @@ namespace FluentMigrator.DotNet.Cli
                 .AddSingleton(console);
 
             return services.BuildServiceProvider();
-        }
-
-        private static IMapper ConfigureMapper(IServiceProvider serviceProvider)
-        {
-            var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
-            var mapperConfig = new MapperConfiguration(cfg => cfg.CreateMap<MigratorOptions, MigratorOptions>(), loggerFactory);
-            mapperConfig.AssertConfigurationIsValid();
-            return new Mapper(mapperConfig);
         }
     }
 }

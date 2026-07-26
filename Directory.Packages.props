@@ -1,0 +1,120 @@
+<Project>
+
+  <!--
+    Central Package Management (CPM).
+
+    Every NuGet version used anywhere in this repository lives in this one file. Projects declare
+    *what* they depend on (<PackageReference Include="..." />); this file declares *which version*.
+    That gives Dependabot a single, property-free place to look, instead of ~15 project files with
+    versions hidden behind MSBuild properties such as the old $(MicrosoftPackageVersion).
+
+    See https://learn.microsoft.com/nuget/consume-packages/central-package-management
+  -->
+
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <!--
+      Deliberately OFF. Transitive pinning would promote every transitive dependency of the shipped
+      FluentMigrator packages into an explicit, exact dependency, which would tighten the dependency
+      graph we publish to consumers. See the note on minimum-version ranges below.
+    -->
+    <CentralPackageTransitivePinningEnabled>false</CentralPackageTransitivePinningEnabled>
+  </PropertyGroup>
+
+  <!--
+    ============================================================================================
+    Public dependency floors of the shipped FluentMigrator packages.
+
+    These versions become the *minimum* version constraints published in the .nuspec of
+    FluentMigrator, FluentMigrator.Runner*, FluentMigrator.Console and FluentMigrator.DotNet.Cli.
+    They are written as open-ended ranges to make that intent explicit: consumers are free to use
+    any 8.x/9.x/10.x, and raising the floor is a *breaking change* for anyone still on .NET 8.
+
+    Do not "upgrade" these just because a newer version exists.
+    ============================================================================================
+  -->
+  <ItemGroup Label="Shipped dependency floors - raising these is a breaking change">
+    <PackageVersion Include="Microsoft.Data.Sqlite" Version="[8.0.0,)" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="[8.0.0,)" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="[8.0.0,)" />
+    <PackageVersion Include="Microsoft.Extensions.Logging" Version="[8.0.0,)" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="[8.0.0,)" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Debug" Version="[8.0.0,)" />
+    <PackageVersion Include="Microsoft.Extensions.Options" Version="[8.0.0,)" />
+    <PackageVersion Include="System.ComponentModel.Annotations" Version="5.0.0" />
+    <PackageVersion Include="System.ValueTuple" Version="4.6.1" />
+  </ItemGroup>
+
+  <ItemGroup Label="Database drivers">
+    <PackageVersion Include="FirebirdSql.Data.FirebirdClient" Version="10.3.3" />
+    <PackageVersion Include="Microsoft.Data.SqlClient" Version="6.0.1" />
+    <PackageVersion Include="MySql.Data" Version="9.3.0" />
+    <PackageVersion Include="MySqlConnector" Version="2.4.0" />
+    <!-- Net.IBM.Data.Db2 is Windows-only; the -lnx variant is its Linux counterpart. -->
+    <PackageVersion Include="Net.IBM.Data.Db2" Version="9.0.0.300" />
+    <PackageVersion Include="Net.IBM.Data.Db2-lnx" Version="9.0.0.300" />
+    <PackageVersion Include="Npgsql" Version="8.0.7" />
+    <!-- Oracle.DataAccess.x86.4 is the legacy unmanaged x86 driver used by the x86 Console build. -->
+    <PackageVersion Include="Oracle.DataAccess.x86.4" Version="4.112.3" />
+    <PackageVersion Include="Oracle.ManagedDataAccess" Version="23.8.0" />
+    <PackageVersion Include="Oracle.ManagedDataAccess.Core" Version="23.8.0" />
+    <PackageVersion Include="Snowflake.Data" Version="4.4.1" />
+    <PackageVersion Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.11" />
+  </ItemGroup>
+
+  <ItemGroup Label="Runner and tooling">
+    <PackageVersion Include="FSharp.Core" Version="9.0.303" />
+    <PackageVersion Include="McMaster.Extensions.CommandLineUtils" Version="4.1.1" />
+    <PackageVersion Include="Microsoft.Build.Utilities.Core" Version="17.14.28" />
+    <!-- Compile-time only source generator; replaces the reflection-based AutoMapper. -->
+    <PackageVersion Include="Riok.Mapperly" Version="4.3.1" />
+  </ItemGroup>
+
+  <ItemGroup Label="Roslyn analyzers">
+    <PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.Common" Version="5.0.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="5.0.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="5.0.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="5.0.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Analyzer.Testing" Version="1.1.2" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.CodeFix.Testing" Version="1.1.2" />
+  </ItemGroup>
+
+  <ItemGroup Label="Packaging">
+    <PackageVersion Include="JetBrains.Annotations" Version="2025.2.4" />
+    <PackageVersion Include="SourceLink.Copy.PdbFiles" Version="2.8.3" />
+    <PackageVersion Include="SourceLink.Create.CommandLine" Version="2.8.3" />
+    <PackageVersion Include="SourceLink.Embed.AllSourceFiles" Version="2.8.3" />
+  </ItemGroup>
+
+  <ItemGroup Label="Tests">
+    <PackageVersion Include="Autofac" Version="8.3.0" />
+    <PackageVersion Include="Autofac.Extensions.DependencyInjection" Version="10.0.0" />
+    <PackageVersion Include="Brutal.Dev.StrongNameSigner" Version="3.5.1" />
+    <PackageVersion Include="coverlet.collector" Version="6.0.4" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.7" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="9.0.7" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.UserSecrets" Version="9.0.7" />
+    <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.7" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageVersion Include="Moq" Version="4.20.72" />
+    <PackageVersion Include="NUnit" Version="4.3.2" />
+    <PackageVersion Include="NUnit.Analyzers" Version="4.9.2" />
+    <PackageVersion Include="NUnit.Console" Version="3.20.1" />
+    <PackageVersion Include="NUnit3TestAdapter" Version="5.0.0" />
+    <PackageVersion Include="Shouldly" Version="4.3.0" />
+    <PackageVersion Include="Testcontainers" Version="4.6.0" />
+    <PackageVersion Include="Testcontainers.Db2" Version="4.6.0" />
+    <PackageVersion Include="Testcontainers.FirebirdSql" Version="4.6.0" />
+    <PackageVersion Include="Testcontainers.MsSql" Version="4.6.0" />
+    <PackageVersion Include="Testcontainers.MySql" Version="4.6.0" />
+    <PackageVersion Include="Testcontainers.Oracle" Version="4.6.0" />
+    <PackageVersion Include="Testcontainers.PostgreSql" Version="4.6.0" />
+    <PackageVersion Include="TUnit" Version="1.18.21" />
+  </ItemGroup>
+
+  <ItemGroup Label="Samples - consumed as a real NuGet package on purpose">
+    <PackageVersion Include="FluentMigrator.MSBuild" Version="7.1.0" />
+  </ItemGroup>
+
+</Project>

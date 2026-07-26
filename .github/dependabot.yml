@@ -1,16 +1,37 @@
 version: 2
+
+# Every NuGet version in this repository now lives in a single Directory.Packages.props at the root
+# (Central Package Management), so the `nuget` entry below only has one file to read instead of
+# ~15 project files, several of which hid their versions behind MSBuild properties that Dependabot
+# could not resolve. Non-NuGet ecosystems that previously went unwatched are configured too:
+# GitHub Actions workflows, the docs website's npm packages, the sticky-pr-comment action's
+# Dockerfile, and the dev container.
+
 updates:
+
+# --------------------------------------------------------------------------------------------
+# .NET / NuGet - versions all live in /Directory.Packages.props
+# --------------------------------------------------------------------------------------------
 - package-ecosystem: nuget
+  directory: "/"
+  schedule:
+    interval: daily
+  open-pull-requests-limit: 20
+  # 3 days is Dependabot's own default since 2026-07-14; stated here so the longer major-version
+  # window next to it reads as a deliberate choice rather than an accident. Security updates are
+  # never delayed by cooldown.
+  cooldown:
+    default-days: 3
+    semver-major-days: 7
   groups:
     database-driver-dependencies:
       patterns:
         - "*Sqlite*"
         - "*Pgsql*"
         - "Microsoft.Data.SqlClient"
-        - "Net.IBM.Data.Db2"
+        - "Net.IBM.Data.Db2*" # matches both the Windows package and its -lnx counterpart
         - "*Firebird*"
-        - "Oracle.ManagedDataAccess" # .NET Framework dependency for FluentMigrator.Console
-        - "Oracle.ManagedDataAccess.Core" # .NET dependency for FluentMigrator.DotNet.Cli
+        - "Oracle*" # Oracle.ManagedDataAccess (net48), .Core (net8.0+) and the legacy x86 driver
         - "*Sql*"
         - "Snowflake*"
     # Dependency Injection and Microsoft Out-of-Box Dependencies (not included in the SDK)
@@ -29,6 +50,8 @@ updates:
         - "Microsoft.Extensions.Logging.Debug"
         - "Microsoft.Extensions.Options"
         - "Microsoft.Extensions.Options.ConfigurationExtensions"
+        - "System.ComponentModel.Annotations"
+        - "System.ValueTuple"
 
     test-dependencies:
       patterns:
@@ -38,10 +61,12 @@ updates:
         - "Microsoft.NET.Test.Sdk"
         - "Brutal.Dev.StrongNameSigner"
         - "Testcontainers*"
+        - "coverlet.collector"
+        - "TUnit"
     runner-dependencies:
       patterns:
         - "McMaster.Extensions.CommandLineUtils"
-        - "AutoMapper"
+        - "Riok.Mapperly" # replaced AutoMapper, which went commercial and shipped CVE-2026-32933
     packaging-dependencies:
       patterns:
         - "SourceLink*"
@@ -55,12 +80,52 @@ updates:
       patterns:
         - "FSharp*"
         - "JetBrains.Annotations"
+  ignore:
+    # We build FluentMigrator from source here; never take a PR that pins us to a published build
+    # of ourselves. FluentMigrator.MSBuild is deliberately excluded - the MSBuild sample consumes
+    # it as a real package so it exercises the same path a consumer would.
+    - dependency-name: FluentMigrator
+
+# --------------------------------------------------------------------------------------------
+# GitHub Actions used by the workflows in .github/workflows
+# --------------------------------------------------------------------------------------------
+- package-ecosystem: github-actions
   directory: "/"
   schedule:
-    interval: daily
-  open-pull-requests-limit: 20
-  ignore:
-    # Don't update ourselves, even for the Sample project
-    - dependency-name: FluentMigrator
-      versions:
-        - 5.0.0
+    interval: weekly
+  open-pull-requests-limit: 5
+  groups:
+    github-actions:
+      patterns:
+        - "*"
+
+# --------------------------------------------------------------------------------------------
+# Documentation website (VitePress)
+# --------------------------------------------------------------------------------------------
+- package-ecosystem: npm
+  directory: "/docs-website"
+  schedule:
+    interval: weekly
+  open-pull-requests-limit: 5
+  groups:
+    docs-dependencies:
+      patterns:
+        - "*"
+
+# --------------------------------------------------------------------------------------------
+# Base images for the sticky-pr-comment action's Dockerfile
+# --------------------------------------------------------------------------------------------
+- package-ecosystem: docker
+  directory: "/.github/actions/sticky-pr-comment"
+  schedule:
+    interval: weekly
+  open-pull-requests-limit: 5
+
+# --------------------------------------------------------------------------------------------
+# Dev container features
+# --------------------------------------------------------------------------------------------
+- package-ecosystem: devcontainers
+  directory: "/"
+  schedule:
+    interval: weekly
+  open-pull-requests-limit: 5
