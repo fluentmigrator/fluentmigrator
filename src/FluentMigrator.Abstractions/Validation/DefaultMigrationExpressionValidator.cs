@@ -46,6 +46,12 @@ namespace FluentMigrator.Validation
         public virtual IEnumerable<ValidationResult> Validate(IMigrationExpression expression)
         {
             var items = new Dictionary<object, object>();
+
+            // Expression and model types with [Required] attributes are preserved
+            // in AOT/trimmed builds via ILLink.Descriptors.xml. That covers both the
+            // ValidationContext constructor, which reflects over the instance type, and
+            // TryCollectResults below.
+#pragma warning disable IL2026
             var context = new ValidationContext(expression, items);
             if (_serviceProvider != null)
             {
@@ -54,9 +60,6 @@ namespace FluentMigrator.Validation
 
             var result = new List<ValidationResult>();
 
-            // Expression and model types with [Required] attributes are preserved
-            // in AOT/trimmed builds via ILLink.Descriptors.xml.
-#pragma warning disable IL2026
             if (!ValidationUtilities.TryCollectResults(context, expression, result))
             {
                 return result;

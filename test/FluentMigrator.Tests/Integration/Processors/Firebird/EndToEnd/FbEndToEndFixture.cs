@@ -34,7 +34,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird.EndToEnd
 {
     [Category("Integration")]
     [Category("Firebird")]
-    public class FbEndToEndFixture
+    public abstract class FbEndToEndFixture
     {
         private static readonly FirebirdLibraryProber _firebirdLibraryProber = new FirebirdLibraryProber();
         private TemporaryDatabase _temporaryDatabase;

@@ -16,7 +16,9 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Generators.Postgres
 {
     [TestFixture]
+#pragma warning disable NUnit1034 // Class is used as base class but also contains tests to execute
     public class PostgresIndexTests : BaseIndexTests
+#pragma warning restore NUnit1034
     {
         protected PostgresGenerator Generator;
 

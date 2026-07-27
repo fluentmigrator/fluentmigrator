@@ -58,7 +58,21 @@
     <PackageVersion Include="Oracle.DataAccess.x86.4" Version="4.112.3" />
     <PackageVersion Include="Oracle.ManagedDataAccess" Version="23.8.0" />
     <PackageVersion Include="Oracle.ManagedDataAccess.Core" Version="23.8.0" />
-    <PackageVersion Include="Snowflake.Data" Version="4.4.1" />
+    <!--
+      5.0.0 replaced Snowflake.Data's log4net dependency with Microsoft.Extensions.Logging, which is
+      what clears the NU1902 advisory against log4net 2.0.12 (GHSA-4f7c-pmjv-c25w, fixed in log4net
+      3.3.0 - a version 4.4.1 cannot consume). Only the tools and tests reference this package; the
+      runner loads the driver through ReflectionBasedDbFactory.
+    -->
+    <PackageVersion Include="Snowflake.Data" Version="5.7.0" />
+    <!--
+      Held at 2.1.11 despite NU1903 (GHSA-2m69-gcr7-jv3q), which lists no patched version:
+      - 2.1.12 drops the win-arm native asset but its buildTransitive/net461 targets still copies
+        runtimes/win-arm/native/e_sqlite3.dll, so every net48 build fails with MSB3030.
+      - 3.0.x replaces SQLitePCLRaw.lib.e_sqlite3 with SourceGear.sqlite3 and is netstandard2.0
+        only, which is a larger change than a warning cleanup should make unreviewed.
+      Revisit when a 2.1.x ships with the net461 targets fixed, or take the 3.0.x move deliberately.
+    -->
     <PackageVersion Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.11" />
   </ItemGroup>
 

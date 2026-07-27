@@ -43,6 +43,16 @@ namespace FluentMigrator.Runner.Processors
 
         private DbProviderFactory _instance;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ReflectionBasedDbFactory"/> class from a
+        /// single assembly and provider factory type name.
+        /// </summary>
+        /// <param name="assemblyName">
+        /// The name of the assembly containing the database provider factory type.
+        /// </param>
+        /// <param name="dbProviderFactoryTypeName">
+        /// The fully qualified name of the database provider factory type.
+        /// </param>
         [Obsolete("Use the constructor that accepts IServiceProvider for proper dependency injection support.")]
 #if NET
         [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This constructor uses reflection to load DbProviderFactory types, which may not be preserved in trimmed applications.")]
@@ -52,6 +62,15 @@ namespace FluentMigrator.Runner.Processors
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ReflectionBasedDbFactory"/> class.
+        /// </summary>
+        /// <param name="testEntries">
+        /// An array of <see cref="TestEntry"/> instances representing the test entries.
+        /// </param>
+        /// <exception cref="ArgumentException">
+        /// Thrown when <paramref name="testEntries"/> is empty.
+        /// </exception>
         [Obsolete("Use the constructor that accepts IServiceProvider for proper dependency injection support.")]
         protected ReflectionBasedDbFactory(params TestEntry[] testEntries)
         {
@@ -124,6 +143,22 @@ namespace FluentMigrator.Runner.Processors
 #pragma warning restore IL2026
 #endif
 
+        /// <summary>
+        /// Attempts to create a <see cref="DbProviderFactory"/> instance without a service provider.
+        /// </summary>
+        /// <param name="entries">
+        /// A collection of <see cref="TestEntry"/> objects representing the assemblies and types to be tested for creating the factory.
+        /// </param>
+        /// <param name="exceptions">
+        /// A collection to store any exceptions encountered during the factory creation process.
+        /// </param>
+        /// <param name="factory">
+        /// When this method returns, contains the created <see cref="DbProviderFactory"/> instance if the creation was successful;
+        /// otherwise, <c>null</c>.
+        /// </param>
+        /// <returns>
+        /// <c>true</c> if a <see cref="DbProviderFactory"/> instance was successfully created; otherwise, <c>false</c>.
+        /// </returns>
         [Obsolete]
 #if NET
         [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("This method uses reflection to load DbProviderFactory types, which may not be preserved in trimmed applications.")]
@@ -223,6 +258,23 @@ namespace FluentMigrator.Runner.Processors
             return false;
         }
 
+        /// <summary>
+        /// Attempts to create a <see cref="DbProviderFactory"/> from a type the entry can resolve
+        /// without any assembly probing, which is the only path available in AOT builds.
+        /// </summary>
+        /// <param name="exceptions">
+        /// A collection to store any exceptions encountered while instantiating the factory.
+        /// </param>
+        /// <param name="item">
+        /// The <see cref="TestEntry"/> whose type factory is used to resolve the provider factory type.
+        /// </param>
+        /// <param name="factory">
+        /// When this method returns, contains the created <see cref="DbProviderFactory"/> instance if the creation was successful;
+        /// otherwise, <c>null</c>.
+        /// </param>
+        /// <returns>
+        /// <c>true</c> if a <see cref="DbProviderFactory"/> instance was successfully created; otherwise, <c>false</c>.
+        /// </returns>
         protected static bool TryCreateFromPreloadedType(
             ICollection<Exception> exceptions,
             TestEntry item,
@@ -768,7 +820,17 @@ namespace FluentMigrator.Runner.Processors
                 string assemblyDirectory;
                 try
                 {
-                    assemblyDirectory = Path.GetDirectoryName(assembly.Location);
+                    // Empty for dynamic assemblies and for assemblies embedded in a
+                    // single-file app; neither contributes a probing directory.
+#pragma warning disable IL3000
+                    var location = assembly.Location;
+#pragma warning restore IL3000
+                    if (string.IsNullOrEmpty(location))
+                    {
+                        continue;
+                    }
+
+                    assemblyDirectory = Path.GetDirectoryName(location);
                     if (assemblyDirectory == null)
                     {
                         continue;
@@ -783,6 +845,14 @@ namespace FluentMigrator.Runner.Processors
                 yield return assemblyDirectory;
             }
         }
+
+        /// <summary>
+        /// Resolves the <see cref="DbProviderFactory"/> type for a <see cref="TestEntry"/> without
+        /// reflection-based assembly probing, keeping the entry usable in trimmed and AOT builds.
+        /// </summary>
+        /// <returns>
+        /// The database provider factory type, or <c>null</c> when it cannot be resolved.
+        /// </returns>
 #if NET
         [return: System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicParameterlessConstructor | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicFields | System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicProperties)]
 #endif
