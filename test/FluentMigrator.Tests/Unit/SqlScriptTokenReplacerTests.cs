@@ -75,6 +75,18 @@ namespace FluentMigrator.Tests.Unit
         }
 
         [Test]
+        public void ReplacesRawTokenWithRawSqlValue()
+        {
+            var parameters = new Dictionary<string, object>
+            {
+                ["CurrentTimestamp"] = RawSql.Insert("CURRENT_TIMESTAMP")
+            };
+
+            SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT $(CurrentTimestamp)", parameters)
+                .ShouldBe("SELECT CURRENT_TIMESTAMP");
+        }
+
+        [Test]
         public void LeavesUnknownRawTokenUnchanged()
         {
             var parameters = new Dictionary<string, object> { ["Known"] = "Value" };

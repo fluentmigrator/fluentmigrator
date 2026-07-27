@@ -127,6 +127,7 @@ namespace FluentMigrator
             return value switch
             {
                 null => null,
+                RawSql rawSql => rawSql.Value,
                 IFormattable formattable => formattable.ToString(null, CultureInfo.InvariantCulture),
                 _ => value.ToString(),
             };
