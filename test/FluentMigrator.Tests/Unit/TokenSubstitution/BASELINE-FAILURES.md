@@ -57,6 +57,49 @@ non-string values as string literals:
 These are visible in the golden tables rather than asserted individually, because the correct
 behaviour of the fallback is an API decision (see #2336) rather than an unambiguous bug.
 
+## After the fixes
+
+Same matrix, same host, after the fix commit on this branch:
+
+```
+Passed!  - Failed: 0, Passed: 199, Skipped: 0, Total: 199 - FluentMigrator.Tests.dll (net48)
+```
+
+Full `FluentMigrator.Tests` suite: `Failed: 0, Passed: 5406, Skipped: 940, Total: 6346`.
+
+The `*.verified.md` snapshots were regenerated in that commit, so its diff is the precise list of
+cells the fixes moved. For MySQL:
+
+| Value | `$[x]` no quoter, before | after | `$[x]` w/ quoter, before | after |
+|---|---|---|---|---|
+| `DBNull.Value` | `''` | `NULL` | `NULL` | `NULL` |
+| `true` | `'True'` | `1` | `1` | `1` |
+| `1234.5678d` | `'1234.5678'` | `1234.5678` | `1234.5678` | `1234.5678` |
+| `DateTime` | `'7/28/2026 1:45:06 PM'` | `'2026-07-28T13:45:06'` | `'2026-07-28T13:45:06'` | unchanged |
+| `byte[]` | `'System.Byte[]'` | `0xdead` | `0xdead` | unchanged |
+| `RawSql` | `'FluentMigrator.RawSql'` | `CURRENT_TIMESTAMP` | `CURRENT_TIMESTAMP` | unchanged |
+| `RawSql` + `\d` | `'FluentMigrator.RawSql'` | `c REGEXP '\d+'` | `c REGEXP '\\d+'` | `c REGEXP '\d+'` |
+
+The last row is #2335: the corruption was in the *with-quoter* column, i.e. the path real migrations
+take, and it is also what `Insert`/`Update`/`Delete` emit.
+
+One cell deliberately not changed: `$(x)` still renders a `DateTime` as `07/28/2026 13:45:06`. The
+raw token style is documented as verbatim `ToString()`, and it is invariant-culture, so this is
+consistent - but it is not a portable SQL datetime literal. Callers wanting one should use `$[x]`.
+Noted in #2336 rather than changed here.
+
+One cell changed to a throw rather than a value:
+
+| Value | `$[x]` no quoter, before | after |
+|---|---|---|
+| `SystemMethods.CurrentDateTime` | `'CurrentDateTime'` | `<throws NotSupportedException>` |
+
+`CURRENT_TIMESTAMP`, `GETDATE()`, `SYSDATE` and `NOW()` are all spelled differently, so there is no
+dialect-independent rendering to fall back to - which is why `GenericQuoter.FormatSystemMethods`
+throws by default and every provider overrides it. Emitting the string literal `'CurrentDateTime'`
+was syntactically valid SQL that silently meant the wrong thing. Failing tells the caller to supply
+an `IQuoter`.
+
 ## Two claims this run disproved
 
 Recorded because both were asserted in the analysis on #2332 before being measured.
