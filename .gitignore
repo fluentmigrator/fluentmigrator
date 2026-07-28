@@ -281,3 +281,6 @@ launchSettings.json
 /**/DROP/
 /**/TEMP/
 _site
+
+# Verify snapshot output from a failing run
+*.received.*

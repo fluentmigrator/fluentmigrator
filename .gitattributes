@@ -63,3 +63,15 @@
 #*.RTF   diff=astextplain
 
 *.sh	eol=lf
+
+###############################################################################
+# Verify snapshot files.
+#
+# Verify refuses to read a *.verified.* file containing CR, and the `* text=auto`
+# rule above would otherwise hand it CRLF on a Windows checkout. Without this the
+# snapshot tests pass on a LF working tree and fail on Windows CI.
+# See https://github.com/verifytests/verify#text-file-settings
+###############################################################################
+*.verified.md   text eol=lf working-tree-encoding=UTF-8
+*.verified.txt  text eol=lf working-tree-encoding=UTF-8
+*.verified.json text eol=lf working-tree-encoding=UTF-8
