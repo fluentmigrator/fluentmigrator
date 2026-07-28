@@ -157,5 +157,29 @@ namespace FluentMigrator.Analyzers {
                 return ResourceManager.GetString("LegacyStringDictionaryParameterCodeFixTitle", resourceCulture);
             }
         }
+
+        internal static string QuotedSqlTokenAnalyzerDescription {
+            get {
+                return ResourceManager.GetString("QuotedSqlTokenAnalyzerDescription", resourceCulture);
+            }
+        }
+
+        internal static string QuotedSqlTokenAnalyzerMessageFormat {
+            get {
+                return ResourceManager.GetString("QuotedSqlTokenAnalyzerMessageFormat", resourceCulture);
+            }
+        }
+
+        internal static string QuotedSqlTokenAnalyzerTitle {
+            get {
+                return ResourceManager.GetString("QuotedSqlTokenAnalyzerTitle", resourceCulture);
+            }
+        }
+
+        internal static string QuotedSqlTokenCodeFixTitle {
+            get {
+                return ResourceManager.GetString("QuotedSqlTokenCodeFixTitle", resourceCulture);
+            }
+        }
     }
 }

@@ -158,8 +158,14 @@ namespace FluentMigrator.Analyzers.Tests
             await ut.RunAsync();
         }
 
+        /// <summary>
+        /// The escaped form performs no substitution - it renders as the literal text
+        /// <c>$(name)</c> - so it carries no injection risk. Reporting it also invited a code fix
+        /// that changed the emitted SQL from <c>$(name)</c> to <c>$[name]</c>, corrupting output for
+        /// anyone deliberately emitting token syntax.
+        /// </summary>
         [Test]
-        public async Task Warns_On_Escaped_Raw_Token()
+        public async Task Doesnt_Warn_On_Escaped_Raw_Token()
         {
             //language=csharp
             const string source = @"
@@ -176,6 +182,49 @@ namespace FluentMigrator.Analyzers.Tests
         }
     }";
 
+            var ut = new VerifyTest
+            {
+                TestState =
+                {
+                    Sources = { source, StubDefinitions },
+                    MarkupHandling = MarkupMode.None,
+                    ExpectedDiagnostics =
+                    {
+                        Capacity = 0
+                    },
+                },
+            };
+
+#if NET
+            ut.ReferenceAssemblies = ReferenceAssemblies.Net.Net80;
+#endif
+
+            await ut.RunAsync();
+        }
+
+        /// <summary>
+        /// The code fix has to remove the surrounding quotes: <c>$[name]</c> already expands to a
+        /// complete, quoted literal, so rewriting the token alone produced <c>'$[name]'</c> and
+        /// quoted the value twice.
+        /// </summary>
+        [Test]
+        public async Task Fix_Removes_Enclosing_Quotes_When_Token_Is_The_Whole_Literal()
+        {
+            //language=csharp
+            const string source = @"
+    using ConsoleApplication1;
+
+    namespace ConsoleApplication1
+    {
+        public class TypeName
+        {
+            public void Up()
+            {
+                new FakeExecuteExpressionRoot().Sql(""UPDATE Foo SET Name = '$(name)'"");
+            }
+        }
+    }";
+
             //language=csharp
             const string fixedSource = @"
     using ConsoleApplication1;
@@ -186,14 +235,14 @@ namespace FluentMigrator.Analyzers.Tests
         {
             public void Up()
             {
-                new FakeExecuteExpressionRoot().Sql(""SELECT '$$[[name]]' AS Literal"");
+                new FakeExecuteExpressionRoot().Sql(""UPDATE Foo SET Name = $[name]"");
             }
         }
     }";
 
             var expected = Verify.Diagnostic(RawSqlTokenInterpolationAnalyzer.DiagnosticId)
-                .WithSpan(10, 62, 10, 72)
-                .WithArguments("$$((name))", "$$[[name]]");
+                .WithSpan(10, 77, 10, 84)
+                .WithArguments("$(name)", "$[name]");
 
             var ut = new VerifyTest
             {
@@ -210,6 +259,97 @@ namespace FluentMigrator.Analyzers.Tests
             };
 
             ut.TestState.ExpectedDiagnostics.Add(expected);
+#if NET
+            ut.ReferenceAssemblies = ReferenceAssemblies.Net.Net80;
+#endif
+
+            await ut.RunAsync();
+        }
+
+        /// <summary>
+        /// When the token is only part of a literal there is no mechanical rewrite, so the
+        /// diagnostic is still reported but no code fix is offered.
+        /// </summary>
+        [Test]
+        public async Task Offers_No_Fix_When_Token_Is_Embedded_In_A_Literal()
+        {
+            //language=csharp
+            const string source = @"
+    using ConsoleApplication1;
+
+    namespace ConsoleApplication1
+    {
+        public class TypeName
+        {
+            public void Up()
+            {
+                new FakeExecuteExpressionRoot().Sql(""SELECT * FROM Foo WHERE Name LIKE '%$(name)%'"");
+            }
+        }
+    }";
+
+            var expected = Verify.Diagnostic(RawSqlTokenInterpolationAnalyzer.DiagnosticId)
+                .WithSpan(10, 90, 10, 97)
+                .WithArguments("$(name)", "$[name]");
+
+            var ut = new VerifyTest
+            {
+                TestState =
+                {
+                    Sources = { source, StubDefinitions },
+                    MarkupHandling = MarkupMode.None,
+                },
+                FixedState =
+                {
+                    // Unchanged: the analyzer reports, but the fix provider declines to rewrite.
+                    Sources = { source, StubDefinitions },
+                    MarkupHandling = MarkupMode.None,
+                },
+            };
+
+            ut.TestState.ExpectedDiagnostics.Add(expected);
+            ut.FixedState.ExpectedDiagnostics.Add(expected);
+#if NET
+            ut.ReferenceAssemblies = ReferenceAssemblies.Net.Net80;
+#endif
+
+            await ut.RunAsync();
+        }
+
+        /// <summary>
+        /// A token in a comment is never executed, so there is nothing to warn about.
+        /// </summary>
+        [Test]
+        public async Task Doesnt_Warn_Inside_A_Comment()
+        {
+            //language=csharp
+            const string source = @"
+    using ConsoleApplication1;
+
+    namespace ConsoleApplication1
+    {
+        public class TypeName
+        {
+            public void Up()
+            {
+                new FakeExecuteExpressionRoot().Sql(""SELECT 1 -- $(name)"");
+            }
+        }
+    }";
+
+            var ut = new VerifyTest
+            {
+                TestState =
+                {
+                    Sources = { source, StubDefinitions },
+                    MarkupHandling = MarkupMode.None,
+                    ExpectedDiagnostics =
+                    {
+                        Capacity = 0
+                    },
+                },
+            };
+
 #if NET
             ut.ReferenceAssemblies = ReferenceAssemblies.Net.Net80;
 #endif

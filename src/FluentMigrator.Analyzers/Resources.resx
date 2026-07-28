@@ -150,4 +150,16 @@
   <data name="LegacyStringDictionaryParameterCodeFixTitle" xml:space="preserve">
     <value>Use IDictionary&lt;string, object&gt; parameter values</value>
   </data>
+  <data name="QuotedSqlTokenAnalyzerDescription" xml:space="preserve">
+    <value>The $[name] token style expands to a complete SQL literal, already quoted - 'O''Brien', NULL, 1, 0xdead. Placing it inside a string literal therefore quotes the value twice, and only the string case fails loudly: a number silently becomes a string literal, null silently becomes the four-character text 'NULL', and a RawSql value silently becomes text so its SQL never runs. Inside a string literal, use the raw $(name) style, which is designed to supply the content while the surrounding quotes supply the literal.</value>
+  </data>
+  <data name="QuotedSqlTokenAnalyzerMessageFormat" xml:space="preserve">
+    <value>Token '{0}' is inside a {1} string literal and will be quoted twice; use '{2}' instead, or remove the surrounding quotes</value>
+  </data>
+  <data name="QuotedSqlTokenAnalyzerTitle" xml:space="preserve">
+    <value>Automatically quoted token is inside a string literal</value>
+  </data>
+  <data name="QuotedSqlTokenCodeFixTitle" xml:space="preserve">
+    <value>Replace with raw token to substitute inside the string literal</value>
+  </data>
 </root>
