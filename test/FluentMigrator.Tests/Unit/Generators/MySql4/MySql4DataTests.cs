@@ -16,6 +16,10 @@
 //
 #endregion
 
+using System.Collections.Generic;
+
+using FluentMigrator.Expressions;
+using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.MySql;
 
 using NUnit.Framework;
@@ -191,5 +195,70 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
             var result = Generator.Generate(expression);
             result.ShouldBe("UPDATE `TestTable1` SET `Name` = 'Just''in', `Age` = 25 WHERE `Id` = 9 AND `Homepage` IS NULL;");
         }
+
+        #region RawSql backslash regression (#2335)
+
+        // Insert/Update/Delete all render their values through IQuoter.QuoteValue, so the MySQL
+        // string-literal backslash escaping reached RawSql values that were meant to pass through
+        // untouched. These reproduce the defect on the DML path alone - no SQL script token
+        // substitution is involved.
+
+        [Test]
+        public void CanUpdateDataWithRawSqlContainingBackslash()
+        {
+            var expression = new UpdateDataExpression
+            {
+                TableName = "TestTable1",
+                Set = new List<KeyValuePair<string, object>>
+                {
+                    new KeyValuePair<string, object>("Flagged", RawSql.Insert(@"`Code` REGEXP '\\d+'"))
+                },
+                Where = new List<KeyValuePair<string, object>>
+                {
+                    new KeyValuePair<string, object>("Id", 9)
+                }
+            };
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe(@"UPDATE `TestTable1` SET `Flagged` = `Code` REGEXP '\\d+' WHERE `Id` = 9;");
+        }
+
+        [Test]
+        public void CanDeleteDataWithRawSqlContainingBackslash()
+        {
+            var expression = new DeleteDataExpression
+            {
+                TableName = "TestTable1",
+                Rows =
+                {
+                    new DeletionDataDefinition
+                    {
+                        new KeyValuePair<string, object>("Path", RawSql.Insert(@"LIKE 'C:\\Temp\\%'"))
+                    }
+                }
+            };
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe(@"DELETE FROM `TestTable1` WHERE `Path` LIKE 'C:\\Temp\\%';");
+        }
+
+        [Test]
+        public void CanInsertDataWithRawSqlContainingBackslash()
+        {
+            var expression = new InsertDataExpression { TableName = "TestTable1" };
+            expression.Rows.Add(new InsertionDataDefinition
+            {
+                new KeyValuePair<string, object>("Pattern", RawSql.Insert(@"'\\d+'")),
+                new KeyValuePair<string, object>("Literal", @"a\b")
+            });
+
+            var result = Generator.Generate(expression);
+
+            // The RawSql column passes through untouched; the ordinary string column beside it is
+            // still escaped, which is what the escaping was written for.
+            result.ShouldBe(@"INSERT INTO `TestTable1` (`Pattern`, `Literal`) VALUES ('\\d+', 'a\\b');");
+        }
+
+        #endregion
     }
 }
