@@ -44,12 +44,15 @@ namespace FluentMigrator.Runner.Generators.MySql
             if (string.IsNullOrEmpty(column.ColumnDescription))
                 return string.Empty;
 
+            // No label. The "Description:" prefix exists only to tell the main description apart
+            // from the additional named ones; with none of those it is noise in the column comment.
+            // See #1783.
             if (column.AdditionalColumnDescriptions.Count == 0)
-                return string.Format("COMMENT {0}", Quoter.QuoteValue("Description:"+column.ColumnDescription));
+                return string.Format("COMMENT {0}", Quoter.QuoteValue(column.ColumnDescription));
 
             var descriptionsList = new List<string>
             {
-                string.Format("Description:" + column.ColumnDescription)
+                "Description:" + column.ColumnDescription
             };
             descriptionsList.AddRange(from descriptionItem in column.AdditionalColumnDescriptions
                                       select descriptionItem.Key + ":" + descriptionItem.Value);

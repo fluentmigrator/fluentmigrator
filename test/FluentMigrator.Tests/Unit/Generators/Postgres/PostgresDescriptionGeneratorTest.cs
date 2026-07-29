@@ -57,7 +57,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             var statements = DescriptionGenerator.GenerateDescriptionStatements(createTableExpression).ToArray();
 
             var result = string.Join("", statements);
-            result.ShouldBe("COMMENT ON TABLE \"public\".\"TestTable1\" IS 'TestDescription';COMMENT ON COLUMN \"public\".\"TestTable1\".\"TestColumn1\" IS 'Description:TestColumn1Description';COMMENT ON COLUMN \"public\".\"TestTable1\".\"TestColumn2\" IS 'Description:TestColumn2Description';");
+            result.ShouldBe("COMMENT ON TABLE \"public\".\"TestTable1\" IS 'TestDescription';COMMENT ON COLUMN \"public\".\"TestTable1\".\"TestColumn1\" IS 'TestColumn1Description';COMMENT ON COLUMN \"public\".\"TestTable1\".\"TestColumn2\" IS 'TestColumn2Description';");
         }
 
         [Test]
@@ -87,7 +87,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             var createColumnExpression = GeneratorTestHelper.GetCreateColumnExpressionWithDescription();
             var statement = DescriptionGenerator.GenerateDescriptionStatement(createColumnExpression);
 
-            statement.ShouldBe("COMMENT ON COLUMN \"public\".\"TestTable1\".\"TestColumn1\" IS 'Description:TestColumn1Description';");
+            statement.ShouldBe("COMMENT ON COLUMN \"public\".\"TestTable1\".\"TestColumn1\" IS 'TestColumn1Description';");
         }
 
         [Test]
@@ -117,7 +117,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             var alterColumnExpression = GeneratorTestHelper.GetAlterColumnExpressionWithDescription();
             var statement = DescriptionGenerator.GenerateDescriptionStatement(alterColumnExpression);
 
-            statement.ShouldBe("COMMENT ON COLUMN \"public\".\"TestTable1\".\"TestColumn1\" IS 'Description:TestColumn1Description';");
+            statement.ShouldBe("COMMENT ON COLUMN \"public\".\"TestTable1\".\"TestColumn1\" IS 'TestColumn1Description';");
         }
 
         [Test]
@@ -129,5 +129,38 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             statement.ShouldBe("COMMENT ON COLUMN \"public\".\"TestTable1\".\"TestColumn1\" IS 'Description:TestColumn1Description" + Environment.NewLine +
                 "AdditionalColumnDescriptionKey1:AdditionalColumnDescriptionValue1';");
         }
+
+        #region "Description:" label regression (#1783)
+
+        /// <summary>
+        /// The label exists to separate the main description from the additional named ones. With
+        /// none of those there is nothing to separate it from, so it must not appear - it was
+        /// landing in every user's column comment as of 5.2.0.
+        /// </summary>
+        [Test]
+        public void ColumnDescriptionIsNotLabelledWhenThereAreNoAdditionalDescriptions()
+        {
+            var createColumnExpression = GeneratorTestHelper.GetCreateColumnExpressionWithDescription();
+            var statement = DescriptionGenerator.GenerateDescriptionStatement(createColumnExpression);
+
+            statement.ShouldNotContain("Description:");
+            statement.ShouldBe("COMMENT ON COLUMN \"public\".\"TestTable1\".\"TestColumn1\" IS 'TestColumn1Description';");
+        }
+
+        /// <summary>
+        /// The counterpart: once there is more than one description the labels are load-bearing,
+        /// because they are the only thing telling the entries apart in a single comment.
+        /// </summary>
+        [Test]
+        public void ColumnDescriptionKeepsItsLabelWhenAdditionalDescriptionsArePresent()
+        {
+            var createColumnExpression = GeneratorTestHelper.GetCreateColumnExpressionWithDescriptionWithAdditionalDescriptions();
+            var statement = DescriptionGenerator.GenerateDescriptionStatement(createColumnExpression);
+
+            statement.ShouldContain("Description:TestColumn1Description");
+            statement.ShouldContain("AdditionalColumnDescriptionKey1:AdditionalColumnDescriptionValue1");
+        }
+
+        #endregion
     }
 }
