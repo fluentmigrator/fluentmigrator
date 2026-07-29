@@ -150,8 +150,8 @@ Specifically:
    and a `Named(string)` for an explicit constraint name.
 2. Populate the existing `ForeignKeyDefinition` and attach it to `CreateTableExpression`
    as a new `ForeignKeys` collection, rather than inventing a parallel model.
-3. Generate the clauses in `GenericColumn.Generate(columns, tableName)` — the same place
-   `SQLiteColumn` already appends its per-column clauses — so every provider inherits the
+3. Generate the clauses in `ColumnBase.Generate(IEnumerable<ColumnDefinition> columns, string tableName)` — the same method
+   `SQLiteColumn` overrides to append its FK clauses — so every provider inherits the
    behaviour and SQLite's existing path becomes a special case of the general one.
 4. Keep `$$IGNORE$$_` semantics for the column-level route so existing migrations are
    untouched.
