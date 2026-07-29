@@ -249,6 +249,18 @@ namespace FluentMigrator.Tests.Unit
             SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT * FROM $(tableprefix)Users", parameters)
                 .ShouldBe("SELECT * FROM $(tableprefix)Users");
         }
+
+        [Test]
+        public void LegacyStringSortedDictionaryOverloadPreservesCaseInsensitiveLookup()
+        {
+            IDictionary<string, string> parameters = new SortedDictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["TablePrefix"] = "App_",
+            };
+
+            SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT * FROM $(tableprefix)Users", parameters)
+                .ShouldBe("SELECT * FROM App_Users");
+        }
 #pragma warning restore CS0618 // Type or member is obsolete
     }
 }
