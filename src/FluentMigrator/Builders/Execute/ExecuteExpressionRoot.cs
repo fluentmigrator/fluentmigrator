@@ -220,10 +220,10 @@ namespace FluentMigrator.Builders.Execute
         /// <returns>An object-valued copy of <paramref name="parameters"/>, or <c>null</c> when
         /// <paramref name="parameters"/> is <c>null</c></returns>
         /// <remarks>
-        /// The key comparer of <paramref name="parameters"/> is carried over when it is a
-        /// <see cref="Dictionary{TKey,TValue}"/>, so that callers passing e.g. a
-        /// <see cref="StringComparer.OrdinalIgnoreCase"/> dictionary keep the token lookup
-        /// semantics they had before the conversion.
+        /// The key comparer of <paramref name="parameters"/> is carried over for the built-in
+        /// dictionary implementations that expose an <see cref="IEqualityComparer{T}"/>, so
+        /// that callers passing e.g. a <see cref="StringComparer.OrdinalIgnoreCase"/> dictionary
+        /// keep the token lookup semantics they had before the conversion.
         /// </remarks>
         private static IDictionary<string, object> ToObjectParameters(IDictionary<string, string> parameters)
         {
@@ -232,7 +232,7 @@ namespace FluentMigrator.Builders.Execute
                 return null;
             }
 
-            var comparer = (parameters as Dictionary<string, string>)?.Comparer;
+            var comparer = GetKeyComparer(parameters);
             var converted = new Dictionary<string, object>(parameters.Count, comparer);
             foreach (var parameter in parameters)
             {
@@ -240,6 +240,16 @@ namespace FluentMigrator.Builders.Execute
             }
 
             return converted;
+        }
+
+        private static IEqualityComparer<string> GetKeyComparer(IDictionary<string, string> parameters)
+        {
+            return parameters switch
+            {
+                Dictionary<string, string> dictionary => dictionary.Comparer,
+                SortedDictionary<string, string> dictionary => dictionary.Comparer as IEqualityComparer<string>,
+                _ => null,
+            };
         }
 
         /// <summary>

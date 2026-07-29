@@ -67,6 +67,11 @@ namespace FluentMigrator
         /// </remarks>
         public static string ReplaceSqlScriptTokens([StringSyntax("sql")] string sqlText, IDictionary<string, object> parameters, IQuoter quoter = null)
         {
+            return ReplaceSqlScriptTokensCore(sqlText, parameters, quoter);
+        }
+
+        private static string ReplaceSqlScriptTokensCore<TValue>([StringSyntax("sql")] string sqlText, IDictionary<string, TValue> parameters, IQuoter quoter)
+        {
             // Are parameters set?
             if (parameters != null && parameters.Count != 0)
             {
@@ -80,9 +85,10 @@ namespace FluentMigrator
                         var key = m.Groups["token"].Value;
                         if (parameters.TryGetValue(key, out var keyValue))
                         {
+                            object value = keyValue;
                             return quoter != null
-                                ? quoter.QuoteValue(keyValue)
-                                : QuoteSqlStringLiteral(keyValue?.ToString());
+                                ? quoter.QuoteValue(value)
+                                : QuoteSqlStringLiteral(value?.ToString());
                         }
 
                         // Return the whole match value when the key
@@ -145,27 +151,13 @@ namespace FluentMigrator
         /// which supports non-string parameter values and safe SQL literal quoting via an
         /// <see cref="IQuoter"/>.
         /// <para>
-        /// The key comparer of <paramref name="parameters"/> is carried over when it is a
-        /// <see cref="Dictionary{TKey,TValue}"/>, so that callers passing e.g. a
-        /// <see cref="StringComparer.OrdinalIgnoreCase"/> dictionary keep the token lookup
-        /// semantics they had before the conversion.
+        /// The supplied dictionary is queried directly, preserving its key lookup semantics.
         /// </para>
         /// </remarks>
         [Obsolete("Use the IDictionary<string, object> overload instead. The IDictionary<string, string> overload is kept for backwards compatibility and will be removed in a future major version.")]
         public static string ReplaceSqlScriptTokens([StringSyntax("sql")] string sqlText, IDictionary<string, string> parameters)
         {
-            IDictionary<string, object> objectParameters = null;
-            if (parameters != null)
-            {
-                var comparer = (parameters as Dictionary<string, string>)?.Comparer;
-                objectParameters = new Dictionary<string, object>(parameters.Count, comparer);
-                foreach (var parameter in parameters)
-                {
-                    objectParameters[parameter.Key] = parameter.Value;
-                }
-            }
-
-            return ReplaceSqlScriptTokens(sqlText, objectParameters);
+            return ReplaceSqlScriptTokensCore(sqlText, parameters, null);
         }
 
         /// <summary>

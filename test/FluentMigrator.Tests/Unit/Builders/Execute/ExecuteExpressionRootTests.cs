@@ -372,6 +372,22 @@ namespace FluentMigrator.Tests.Unit.Builders.Execute
         }
 
         [Test]
+        public void SqlWithLegacySortedStringParametersPreservesKeyComparer()
+        {
+            _contextMock.SetupGet(x => x.ServiceProvider).Returns(new Mock<IServiceProvider>().Object);
+
+            var parameters = new SortedDictionary<string, string>(StringComparer.OrdinalIgnoreCase) { { "Name", "value" } };
+
+            _root.Sql("SELECT $(name)", parameters);
+
+            _expressions.Count.ShouldBe(1);
+            var expression = _expressions.First() as ExecuteSqlStatementExpression;
+            expression.ShouldNotBeNull();
+            expression.Parameters.ShouldNotBeNull();
+            expression.Parameters.ShouldContainKeyAndValue("name", "value");
+        }
+
+        [Test]
         public void ScriptWithLegacyStringParametersPreservesKeyComparer()
         {
             _contextMock.SetupGet(x => x.ServiceProvider).Returns(new Mock<IServiceProvider>().Object);
