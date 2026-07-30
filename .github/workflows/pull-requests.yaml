@@ -166,7 +166,7 @@ jobs:
         find . -type f -iname "*cobertura.xml" || true
 
     - name: Combine Coverage Reports
-      uses: danielpalme/ReportGenerator-GitHub-Action@v5.5.10
+      uses: danielpalme/ReportGenerator-GitHub-Action@5.5.11
       if: '!cancelled()'
       with:
         reports: "**/*.cobertura.xml"
