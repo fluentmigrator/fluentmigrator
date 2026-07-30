@@ -211,8 +211,8 @@ namespace FluentMigrator.Runner.Generators.SQLite
         }
 
         /// <summary>
-        /// The trailing sentence pointing at LOOSE compatibility mode, which downgrades these
-        /// failures to a warning.
+        /// The trailing sentence pointing at LOOSE compatibility mode, which skips these statements
+        /// instead of failing.
         /// </summary>
         private const string CompatibilityModeHint =
             "If you would rather these statements be skipped than fail, register SQLite with " +
