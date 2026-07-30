@@ -120,6 +120,18 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         }
 
         [Test]
+        public void GenerateDescriptionStatementForCreateColumnReturnColumnDescriptionStatementWithMultipleAdditionalDescriptions()
+        {
+            var createColumnExpression = GeneratorTestHelper.GetCreateColumnExpressionWithDescriptionWithMultipleAdditionalDescriptions();
+            createColumnExpression.SchemaName = TestSchema;
+            var statement = DescriptionGenerator.GenerateDescriptionStatement(createColumnExpression);
+
+            statement.ShouldBe($@"COMMENT ON COLUMN ""{TestSchema}"".""TestTable1"".""TestColumn1"" IS 'Description:TestColumn1Description" + Environment.NewLine +
+                "AdditionalColumnDescriptionKey1:AdditionalColumnDescriptionValue1" + Environment.NewLine +
+                "AdditionalColumnDescriptionKey2:AdditionalColumnDescriptionValue2';", _quotingEnabled);
+        }
+
+        [Test]
         public override void GenerateDescriptionStatementForAlterColumnReturnColumnDescriptionStatement()
         {
             var alterColumnExpression = GeneratorTestHelper.GetAlterColumnExpressionWithDescription();

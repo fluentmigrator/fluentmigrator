@@ -67,7 +67,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             var statements = DescriptionGenerator.GenerateDescriptionStatements(createTableExpression).ToArray();
 
             var result = string.Join("", statements);
-            result.ShouldBe("COMMENT ON TABLE \"public\".\"TestTable1\" IS 'TestDescription';COMMENT ON COLUMN \"public\".\"TestTable1\".\"TestColumn1\" IS 'Description:TestColumn1Description"+Environment.NewLine+
+            result.ShouldBe("COMMENT ON TABLE \"public\".\"TestTable1\" IS 'TestDescription';COMMENT ON COLUMN \"public\".\"TestTable1\".\"TestColumn1\" IS 'Description:TestColumn1Description" + Environment.NewLine +
                 "AdditionalColumnDescriptionKey1:AdditionalColumnDescriptionValue1';COMMENT ON COLUMN \"public\".\"TestTable1\".\"TestColumn2\" IS 'Description:TestColumn2Description" + Environment.NewLine +
                 "AdditionalColumnDescriptionKey2:AdditionalColumnDescriptionValue2';");
         }
@@ -96,8 +96,19 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             var createColumnExpression = GeneratorTestHelper.GetCreateColumnExpressionWithDescriptionWithAdditionalDescriptions();
             var statement = DescriptionGenerator.GenerateDescriptionStatement(createColumnExpression);
 
-            statement.ShouldBe("COMMENT ON COLUMN \"public\".\"TestTable1\".\"TestColumn1\" IS 'Description:TestColumn1Description"+Environment.NewLine +
+            statement.ShouldBe("COMMENT ON COLUMN \"public\".\"TestTable1\".\"TestColumn1\" IS 'Description:TestColumn1Description" + Environment.NewLine +
                 "AdditionalColumnDescriptionKey1:AdditionalColumnDescriptionValue1';");
+        }
+
+        [Test]
+        public void GenerateDescriptionStatementForCreateColumnReturnColumnDescriptionStatementWithMultipleAdditionalDescriptions()
+        {
+            var createColumnExpression = GeneratorTestHelper.GetCreateColumnExpressionWithDescriptionWithMultipleAdditionalDescriptions();
+            var statement = DescriptionGenerator.GenerateDescriptionStatement(createColumnExpression);
+
+            statement.ShouldBe("COMMENT ON COLUMN \"public\".\"TestTable1\".\"TestColumn1\" IS 'Description:TestColumn1Description" + Environment.NewLine +
+                "AdditionalColumnDescriptionKey1:AdditionalColumnDescriptionValue1" + Environment.NewLine +
+                "AdditionalColumnDescriptionKey2:AdditionalColumnDescriptionValue2';");
         }
 
         [Test]
@@ -115,7 +126,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             var alterColumnExpression = GeneratorTestHelper.GetAlterColumnExpressionWithDescriptionWithAdditionalDescriptions();
             var statement = DescriptionGenerator.GenerateDescriptionStatement(alterColumnExpression);
 
-            statement.ShouldBe("COMMENT ON COLUMN \"public\".\"TestTable1\".\"TestColumn1\" IS 'Description:TestColumn1Description"+Environment.NewLine+
+            statement.ShouldBe("COMMENT ON COLUMN \"public\".\"TestTable1\".\"TestColumn1\" IS 'Description:TestColumn1Description" + Environment.NewLine +
                 "AdditionalColumnDescriptionKey1:AdditionalColumnDescriptionValue1';");
         }
     }
