@@ -185,7 +185,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         [Test]
         public void CanDropDefaultExpression()
         {
-            var expression = new DeleteDefaultConstraintExpression {ColumnName = "Name", SchemaName = "Personalia", TableName = "Person"};
+            var expression = new DeleteDefaultConstraintExpression { ColumnName = "Name", SchemaName = "Personalia", TableName = "Person" };
 
             string expected = "DECLARE @default sysname, @sql nvarchar(max);" + Environment.NewLine + Environment.NewLine +
                                     "-- get name of default constraint" + Environment.NewLine +
@@ -284,14 +284,15 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         public void CanUseSystemMethodNewGuidAsADefaultValueForAColumn()
         {
             var expression = new CreateColumnExpression
+            {
+                Column = new ColumnDefinition
                 {
-                    Column = new ColumnDefinition
-                        {
-                            Name = "NewColumn",
-                            Type = DbType.Guid,
-                            DefaultValue = SystemMethods.NewGuid
-                        }, TableName = "NewTable"
-                };
+                    Name = "NewColumn",
+                    Type = DbType.Guid,
+                    DefaultValue = SystemMethods.NewGuid
+                },
+                TableName = "NewTable"
+            };
 
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE [dbo].[NewTable] ADD [NewColumn] UNIQUEIDENTIFIER NOT NULL CONSTRAINT [DF__NewColumn] DEFAULT NEWID();");
@@ -301,14 +302,15 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         public void CanUseSystemMethodNewSequentialIdAsADefaultValueForAColumn()
         {
             var expression = new CreateColumnExpression
+            {
+                Column = new ColumnDefinition
                 {
-                    Column = new ColumnDefinition
-                        {
-                            Name = "NewColumn",
-                            Type = DbType.Guid,
-                            DefaultValue = SystemMethods.NewSequentialId
-                        }, TableName = "NewTable"
-                };
+                    Name = "NewColumn",
+                    Type = DbType.Guid,
+                    DefaultValue = SystemMethods.NewSequentialId
+                },
+                TableName = "NewTable"
+            };
 
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE [dbo].[NewTable] ADD [NewColumn] UNIQUEIDENTIFIER NOT NULL CONSTRAINT [DF__NewColumn] DEFAULT NEWSEQUENTIALID();");
@@ -371,8 +373,22 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 
             result.ShouldBe(@"ALTER TABLE [dbo].[TestTable1] ADD [TestColumn1] NVARCHAR(5) NOT NULL;" + Environment.NewLine +
                             "GO" + Environment.NewLine +
-                            "EXEC sys.sp_addextendedproperty @name = N'MS_Description', @value = N'Description:TestColumn1Description"+Environment.NewLine+
+                            "EXEC sys.sp_addextendedproperty @name = N'MS_Description', @value = N'Description:TestColumn1Description" + Environment.NewLine +
                             "AdditionalColumnDescriptionKey1:AdditionalColumnDescriptionValue1', @level0type = N'SCHEMA', @level0name = 'dbo', @level1type = N'Table', @level1name = 'TestTable1', @level2type = N'Column',  @level2name = 'TestColumn1';");
+        }
+
+        [Test]
+        public void CanCreateColumnWithDescriptionWithMultipleAdditionalDescriptions()
+        {
+            var expression = GeneratorTestHelper.GetCreateColumnExpressionWithDescriptionWithMultipleAdditionalDescriptions();
+
+            var result = Generator.Generate(expression);
+
+            result.ShouldBe(@"ALTER TABLE [dbo].[TestTable1] ADD [TestColumn1] NVARCHAR(5) NOT NULL;" + Environment.NewLine +
+                            "GO" + Environment.NewLine +
+                            "EXEC sys.sp_addextendedproperty @name = N'MS_Description', @value = N'Description:TestColumn1Description" + Environment.NewLine +
+                            "AdditionalColumnDescriptionKey1:AdditionalColumnDescriptionValue1" + Environment.NewLine +
+                            "AdditionalColumnDescriptionKey2:AdditionalColumnDescriptionValue2', @level0type = N'SCHEMA', @level0name = 'dbo', @level1type = N'Table', @level1name = 'TestTable1', @level2type = N'Column',  @level2name = 'TestColumn1';");
         }
 
         [Test]

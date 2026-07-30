@@ -806,6 +806,58 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             helperMock.Verify(expectedHelperAction);
         }
 
+        [Test]
+        public void CallingWithColumnAdditionalDescriptionsPersistsEveryPair()
+        {
+            var expression = new CreateColumnExpression { Column = new ColumnDefinition { Name = "TestColumn" } };
+            var contextMock = new Mock<IMigrationContext>();
+
+            var builder = new CreateColumnExpressionBuilder(expression, contextMock.Object);
+            builder.WithColumnAdditionalDescriptions(new Dictionary<string, string>
+            {
+                { "AdditionalDescription1", "Description1" },
+                { "AdditionalDescription2", "Description2" },
+            });
+
+            expression.Column.AdditionalColumnDescriptions.Count.ShouldBe(2);
+            expression.Column.AdditionalColumnDescriptions["AdditionalDescription1"].ShouldBe("Description1");
+            expression.Column.AdditionalColumnDescriptions["AdditionalDescription2"].ShouldBe("Description2");
+        }
+
+        [Test]
+        public void CallingWithColumnAdditionalDescriptionsWithNullThrows()
+        {
+            var expression = new CreateColumnExpression { Column = new ColumnDefinition { Name = "TestColumn" } };
+            var contextMock = new Mock<IMigrationContext>();
+            var builder = new CreateColumnExpressionBuilder(expression, contextMock.Object);
+
+            Should.Throw<ArgumentException>(() => builder.WithColumnAdditionalDescriptions(null));
+        }
+
+        [Test]
+        public void CallingWithColumnAdditionalDescriptionsWithEmptyDictionaryThrows()
+        {
+            var expression = new CreateColumnExpression { Column = new ColumnDefinition { Name = "TestColumn" } };
+            var contextMock = new Mock<IMigrationContext>();
+            var builder = new CreateColumnExpressionBuilder(expression, contextMock.Object);
+
+            Should.Throw<ArgumentException>(() => builder.WithColumnAdditionalDescriptions(new Dictionary<string, string>()));
+        }
+
+        [Test]
+        public void CallingWithColumnAdditionalDescriptionsWithDuplicateKeyThrows()
+        {
+            var expression = new CreateColumnExpression { Column = new ColumnDefinition { Name = "TestColumn" } };
+            expression.Column.AdditionalColumnDescriptions.Add("Existing", "Value");
+            var contextMock = new Mock<IMigrationContext>();
+            var builder = new CreateColumnExpressionBuilder(expression, contextMock.Object);
+
+            Should.Throw<InvalidOperationException>(() => builder.WithColumnAdditionalDescriptions(new Dictionary<string, string>
+            {
+                { "Existing", "AnotherValue" },
+            }));
+        }
+
         private void VerifyColumnProperty(Action<ColumnDefinition> columnExpression, Action<CreateColumnExpressionBuilder> callToTest)
         {
             var columnMock = new Mock<ColumnDefinition>();
