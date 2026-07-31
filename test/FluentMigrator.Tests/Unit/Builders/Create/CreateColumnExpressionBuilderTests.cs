@@ -858,6 +858,23 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             }));
         }
 
+        [Test]
+        public void CallingWithColumnAdditionalDescriptionsWithLaterDuplicateKeyDoesNotMutateColumn()
+        {
+            var expression = new CreateColumnExpression { Column = new ColumnDefinition { Name = "TestColumn" } };
+            expression.Column.AdditionalColumnDescriptions.Add("Existing", "Value");
+            var builder = new CreateColumnExpressionBuilder(expression, new Mock<IMigrationContext>().Object);
+
+            Should.Throw<InvalidOperationException>(() => builder.WithColumnAdditionalDescriptions(new Dictionary<string, string>
+            {
+                { "New", "NewValue" },
+                { "Existing", "AnotherValue" },
+            }));
+
+            expression.Column.AdditionalColumnDescriptions.Count.ShouldBe(1);
+            expression.Column.AdditionalColumnDescriptions.ShouldNotContainKey("New");
+        }
+
         private void VerifyColumnProperty(Action<ColumnDefinition> columnExpression, Action<CreateColumnExpressionBuilder> callToTest)
         {
             var columnMock = new Mock<ColumnDefinition>();

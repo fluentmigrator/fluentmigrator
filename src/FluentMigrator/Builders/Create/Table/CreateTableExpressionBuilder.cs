@@ -124,6 +124,15 @@ namespace FluentMigrator.Builders.Create.Table
         /// <inheritdoc />
         public ICreateTableColumnOptionOrWithColumnSyntax WithColumnAdditionalDescription(string descriptionName, string description)
         {
+            ValidateColumnAdditionalDescription(descriptionName, description);
+
+            CurrentColumn.AdditionalColumnDescriptions.Add(descriptionName, description);
+
+            return this;
+        }
+
+        private void ValidateColumnAdditionalDescription(string descriptionName, string description)
+        {
             if (string.IsNullOrWhiteSpace(descriptionName))
                 throw new ArgumentException("Cannot be the empty string.", nameof(descriptionName));
 
@@ -135,10 +144,6 @@ namespace FluentMigrator.Builders.Create.Table
 
             if (CurrentColumn.AdditionalColumnDescriptions.Keys.Any(i => i.Equals(descriptionName)))
                 throw new InvalidOperationException("The given descriptionName is already present in the columnDescription list.");
-
-            CurrentColumn.AdditionalColumnDescriptions.Add(descriptionName, description);
-
-            return this;
         }
 
         /// <inheritdoc />
@@ -152,7 +157,12 @@ namespace FluentMigrator.Builders.Create.Table
 
             foreach (var newDescription in columnDescriptions)
             {
-                WithColumnAdditionalDescription(newDescription.Key, newDescription.Value);
+                ValidateColumnAdditionalDescription(newDescription.Key, newDescription.Value);
+            }
+
+            foreach (var newDescription in columnDescriptions)
+            {
+                CurrentColumn.AdditionalColumnDescriptions.Add(newDescription.Key, newDescription.Value);
             }
 
             return this;

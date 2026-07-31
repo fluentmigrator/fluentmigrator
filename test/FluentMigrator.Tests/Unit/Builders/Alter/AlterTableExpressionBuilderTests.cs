@@ -401,6 +401,26 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
         }
 
         [Test]
+        public void CallingWithColumnAdditionalDescriptionsWithLaterDuplicateKeyDoesNotMutateColumn()
+        {
+            var currentColumn = new ColumnDefinition { Name = "TestColumn" };
+            currentColumn.AdditionalColumnDescriptions.Add("Existing", "Value");
+            var builder = new AlterTableExpressionBuilder(new Mock<AlterTableExpression>().Object, new Mock<IMigrationContext>().Object)
+            {
+                CurrentColumn = currentColumn
+            };
+
+            Should.Throw<InvalidOperationException>(() => builder.WithColumnAdditionalDescriptions(new Dictionary<string, string>
+            {
+                { "New", "NewValue" },
+                { "Existing", "AnotherValue" },
+            }));
+
+            currentColumn.AdditionalColumnDescriptions.Count.ShouldBe(1);
+            currentColumn.AdditionalColumnDescriptions.ShouldNotContainKey("New");
+        }
+
+        [Test]
         public void CallingWithDefaultSetsDefaultValue()
         {
             var contextMock = new Mock<IMigrationContext>();
