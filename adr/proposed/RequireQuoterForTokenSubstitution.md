@@ -257,26 +257,8 @@ supports it.
 
 ## Decision
 
-## Amendment: Option G superseded by Option I
-
-The original decision was **Option G**. Implementation surfaced two problems with it, both
-recorded above rather than quietly corrected:
-
-1. **It does not remove the duplication it was adopted for.** `StandardSqlQuoter.QuoteValue` and
-   `GenericQuoter.QuoteValue` would both exist and both have to agree. The private duplicate
-   becomes a public one; the count stays at two.
-2. **The name was wrong.** `GenericQuoter` is not ANSI SQL — `FormatBool` emits `1`/`0` where the
-   standard has `TRUE`/`FALSE`, `FormatByteArray` emits `0xdead` where the standard has `X'DEAD'`,
-   and `FormatDateTime` emits `'2026-07-28T13:45:06'` where the standard has
-   `TIMESTAMP '2026-07-28 13:45:06'`. Providers override precisely these to correct them. A type
-   mirroring those defaults is the *FluentMigrator default*, not a standard-SQL quoter, and naming
-   it `StandardSqlQuoter` would have claimed a conformance it does not have.
-
-Both dissolve once the string-dictionary overload is recognised as eight years old rather than
-newly restored, and once it is accepted that in 8.0.1 that overload never expanded `$[name]` at
-all. It does not need a quoter. It needs its old behaviour back.
-
-**Adopt Option I.**
+**Adopt Option I.** This supersedes the original decision, Option G; see
+[Amendment](#amendment-option-g-superseded-by-option-i) below for why.
 
 1. Delete `QuoteSqlLiteral`. Add nothing to `FluentMigrator.Abstractions`.
 2. Make `quoter` required on the `IDictionary<string, object>` overload by dropping the
@@ -297,6 +279,27 @@ all. It does not need a quoter. It needs its old behaviour back.
 8.0.1 users are unaffected — more precisely than under Option G. Their entry point is the
 string-dictionary overload, which returns to doing exactly what it did in 8.0.1, including for
 scripts whose text happens to contain `$[...]`.
+
+### Amendment: Option G superseded by Option I
+
+The original decision was **Option G**. Implementation surfaced two problems with it, both
+recorded above rather than quietly corrected:
+
+1. **It does not remove the duplication it was adopted for.** `StandardSqlQuoter.QuoteValue` and
+   `GenericQuoter.QuoteValue` would both exist and both have to agree. The private duplicate
+   becomes a public one; the count stays at two.
+2. **The name was wrong.** `GenericQuoter` is not ANSI SQL — `FormatBool` emits `1`/`0` where the
+   standard has `TRUE`/`FALSE`, `FormatByteArray` emits `0xdead` where the standard has `X'DEAD'`,
+   and `FormatDateTime` emits `'2026-07-28T13:45:06'` where the standard has
+   `TIMESTAMP '2026-07-28 13:45:06'`. Providers override precisely these to correct them. A type
+   mirroring those defaults is the *FluentMigrator default*, not a standard-SQL quoter, and naming
+   it `StandardSqlQuoter` would have claimed a conformance it does not have.
+
+Both dissolve once the string-dictionary overload is recognised as eight years old rather than
+newly restored, and once it is accepted that in 8.0.1 that overload never expanded `$[name]` at
+all. It does not need a quoter. It needs its old behaviour back.
+
+Option I above records what was adopted in its place.
 
 ### A processor returning a null quoter
 
