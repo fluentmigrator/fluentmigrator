@@ -147,6 +147,31 @@ namespace FluentMigrator.Tests.Unit.Expressions
         }
 
         [Test]
+        public void MergingWellKnownTokensPreservesSortedParameterKeyComparer()
+        {
+            var tokenProvider = new Mock<ISqlTokenProvider>();
+            tokenProvider
+                .Setup(x => x.GetTokens())
+                .Returns(new Dictionary<string, string> { { "DefaultSchema", "dbo" } });
+
+            var expression = new ExecuteSqlStatementExpression()
+            {
+                SqlStatement = "ALTER TABLE $(defaultschema).$(tableprefix)BLAH ADD COLUMN Foo INT",
+                Parameters = new SortedDictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+                {
+                    { "TablePrefix", "App_" },
+                },
+                SqlScriptTokenProviders = new[] { tokenProvider.Object },
+            };
+
+            var processor = new Mock<IMigrationProcessor>();
+            processor.Setup(x => x.Execute("ALTER TABLE dbo.App_BLAH ADD COLUMN Foo INT")).Verifiable();
+
+            expression.ExecuteWith(processor.Object);
+            processor.Verify();
+        }
+
+        [Test]
         public void ExecutesTheStatementWithWellKnownTokensUsingQuotedTokenSyntax()
         {
             var tokenProvider = new Mock<ISqlTokenProvider>();

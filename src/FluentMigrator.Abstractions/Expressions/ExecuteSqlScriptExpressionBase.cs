@@ -60,9 +60,9 @@ namespace FluentMigrator.Expressions
         /// <returns>The merged token map, or <see cref="Parameters"/> unchanged when there are no
         /// tokens to merge</returns>
         /// <remarks>
-        /// The merged map reuses the key comparer of <see cref="Parameters"/> when it is a
-        /// <see cref="Dictionary{TKey,TValue}"/>, so that merging in provider tokens does not
-        /// silently change token lookup semantics for callers who supplied e.g. a
+        /// The merged map reuses the key comparer of built-in dictionary implementations that
+        /// expose an <see cref="IEqualityComparer{T}"/>, so that merging in provider tokens does
+        /// not silently change token lookup semantics for callers who supplied e.g. a
         /// <see cref="System.StringComparer.OrdinalIgnoreCase"/> dictionary.
         /// </remarks>
         protected IDictionary<string, object> GetMergedParameters()
@@ -72,7 +72,7 @@ namespace FluentMigrator.Expressions
                 return Parameters;
             }
 
-            var comparer = (Parameters as Dictionary<string, object>)?.Comparer;
+            var comparer = GetKeyComparer(Parameters);
             var mergedParameters = new Dictionary<string, object>(comparer);
             foreach (var provider in SqlScriptTokenProviders)
             {
@@ -102,6 +102,16 @@ namespace FluentMigrator.Expressions
             }
 
             return mergedParameters;
+        }
+
+        private static IEqualityComparer<string> GetKeyComparer(IDictionary<string, object> parameters)
+        {
+            return parameters switch
+            {
+                Dictionary<string, object> dictionary => dictionary.Comparer,
+                SortedDictionary<string, object> dictionary => dictionary.Comparer as IEqualityComparer<string>,
+                _ => null,
+            };
         }
     }
 }
