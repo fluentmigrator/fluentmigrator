@@ -6,7 +6,7 @@
 
 ## Design goals
 
-Eight consumers (DotNet.Cli, Console, MSBuild, TUI, Aspire, CopilotCanvas, wasm-based REPL, MCP plug-in) all need to do the same underlying thing — configure FluentMigrator, resolve which migration operation to run, run it, and report the outcome — but each arrives at "which operation" through a completely different front door: a command line, an MSBuild task's properties, an Aspire dashboard button, an MCP tool call, a browser's JS interop bridge. Building eight independent implementations of "run migrations up" means eight independent places for behavior to drift.
+Ten consumers (DotNet.Cli, Console, MSBuild, TUI, Aspire, CopilotCanvas, wasm-based REPL, MCP plug-in, GitHub Action, EF Core migration generator) all need to do the same underlying thing — configure FluentMigrator, resolve which migration operation to run, run it, and report the outcome — but each arrives at "which operation" through a completely different front door: a command line, an MSBuild task's properties, an Aspire dashboard button, an MCP tool call, a browser's JS interop bridge. Building ten independent implementations of "run migrations up" means ten independent places for behavior to drift.
 
 The host needs three things, cleanly separated:
 
@@ -14,7 +14,7 @@ The host needs three things, cleanly separated:
 2. A **discoverable, composable unit of work** — a `Command` — enumerable and invocable by the host, so new operations show up in every consumer without each consumer being modified by hand.
 3. A terminal entry point that turns whatever the caller provides — `string[] argv`, MSBuild task properties, an Aspire command payload, a Canvas/MCP request, a JS interop call from a browser — into "run this command with these arguments," executes setup → command → teardown, and reports a result in whatever shape that consumer needs. This can't assume `string[] argv` — more than half of these consumers never see a command line at all.
 
-The fix that makes all three of these clean: split "what a migration operation is" (an `IMigrationCommand` with typed, self-describing arguments) from "how it's invoked" (argv parsing is just *one* adapter over that abstraction). Everything else — MSBuild task properties, Aspire `WithCommand` metadata, a Copilot Canvas JSON schema, Spectre.Console prompts, WebAssembly browser navigation/prompts, and MCP request/response handling — becomes another adapter over the same commands, instead of eight reimplementations of "run migrations up."
+The fix that makes all three of these clean: split "what a migration operation is" (an `IMigrationCommand` with typed, self-describing arguments) from "how it's invoked" (argv parsing is just *one* adapter over that abstraction). Everything else — MSBuild task properties, Aspire `WithCommand` metadata, a Copilot Canvas JSON schema, Spectre.Console prompts, WebAssembly browser navigation/prompts, and MCP request/response handling — becomes another adapter over the same commands, instead of ten reimplementations of "run migrations up."
 
 ## Package layout
 
@@ -29,6 +29,8 @@ FluentMigrator.Aspire             <- thin: exposes each IMigrationCommand as an 
 FluentMigrator.CopilotCanvas      <- thin: emits a JSON schema of commands/arguments; executes via structured invocation
 FluentMigrator.Repl               <- thin: provides a C# IDE like dotnetfiddle to run migrations against wasm-embedded databases like pglite and sqlite
 FluentMigrator.Mcp                <- thin: hosts an MCP server exposing Discover()/RunAsync as MCP tools, plus lightweight client contracts for talking to it
+FluentMigrator.GitHubAction       <- thin: maps workflow with: inputs to a structured invocation; previews rather than applies
+FluentMigrator.EFCoreMigrationGenerator <- thin: contributes a command that writes migrations from an EF Core model snapshot
 
 FluentMigrator.Net.Sdk            <- MSBuild project SDK: a migrations project's source-controlled database model
 FluentMigrator.Net.Sdk.Host       <- MSBuild project SDK: the composition root; selects hosting contexts and runners
@@ -645,9 +647,50 @@ A few things specific to the MCP surface:
 - **Cancellation and logging are closer to first-class here than for most consumers.** MCP has an explicit cancellation notification (maps directly onto `CancellationToken`) and a logging capability (structured log messages sent to the client) — meaning `FluentMigrator.Mcp` can plausibly get the richest `CommandOutcome` translation of any consumer: not just a final `{ success, message }`, but progress notifications streamed while a long migration runs, which is a genuinely good fit for an agent that's expected to narrate what it's doing.
 - **Tools aren't the only MCP primitive.** Resources (readable data) and Prompts (reusable templates) are natural Post-MVP extensions once Tools are solid — a "pending migrations" Resource an agent can read without invoking a command, or a Prompt template for "help me write a migration that does X" leaning on FluentMigrator's own conventions. Worth keeping in view given this package's origin in a broader AI-assistance conversation, but scoping the first cut to Tools, where the direct `Discover()`/`RunAsync` mapping already does most of the work.
 
+## Consumer 9: — FluentMigrator.GitHubAction
+
+The front door here is a workflow step, and its inputs arrive as `with:` entries that the Actions runner hands over as environment variables — structured key/value pairs, never argv. That makes it the same adapter shape as MSBuild: map the inputs onto a `MigrationArgumentBag` and call `RunAsync(commandName, bag, ct)`.
+
+What makes it worth calling out separately is that it is deliberately *thin in scope as well as in code*: its job is **preview**, not application. A pull request wants to see the SQL a merge would run, and it wants to see it without anything being granted permission to run it. No new command is needed — preview is an argument on the commands that already exist — so the whole package is an input mapping plus a renderer:
+
+```yaml
+- uses: fluentmigrator/preview-action@v1
+  with:
+    command: migrate:up
+    assembly: ./artifacts/MyApp.Migrations.dll
+    dialect: sqlserver
+```
+
+The sharp edge worth designing for is credentials. FluentMigrator's connectionless mode already generates a script with no connection string at all, so the preview path should default to it: a pull request from a fork then produces a reviewable script without a database secret ever entering CI. Preview *with* a connection remains available for the cases that need the live schema to generate faithfully, but it should be the opt-in, not the default — the reverse of that arrangement is how preview jobs quietly become the most over-privileged step in a pipeline.
+
+Output is where this consumer differs most from the CLI. GitHub gives two distinct surfaces and `CommandOutcome` maps onto both: the generated script belongs in `$GITHUB_STEP_SUMMARY` as a fenced block, where a reviewer reads it as part of the check, while failures additionally emit `::error::` workflow commands so they surface as annotations against the diff. The exit code still decides whether the step passes, so the existing `ExitCode` contract needs no special casing.
+
+## Consumer 10: — FluentMigrator.EFCoreMigrationGenerator
+
+Every consumer above *runs* a migration. This one **writes** one: it reads an EF Core model snapshot and emits FluentMigrator migration source, so a team already doing code-first modelling keeps `dotnet ef migrations add` as the authoring gesture while FluentMigrator owns application, ordering, and the version table.
+
+```csharp
+public sealed class GenerateFromModelCommand : IMigrationCommand
+{
+    public string Name => "generate:migration";
+    public string Description => "Emits a FluentMigrator migration from an EF Core model snapshot.";
+    // arguments: ModelAssembly, ContextType, OutputDirectory, MigrationName, Version
+}
+```
+
+This is the consumer that stretches the abstraction, and that is precisely why it belongs in the document rather than being discovered later. Three consequences:
+
+**A command must be able to run without a database.** `MigrationExecutionContext` gives a command an `IServiceProvider` and `IMigrationRunnerConventions`; a generator needs the conventions — that is where migration naming and version-number policy live, and generated files must obey the same ones a hand-written migration does — but it has no use for an `IMigrationProcessor` and no connection to open. So resolving a processor has to remain the *command's* choice, not something the host does eagerly on every invocation. A host configured with no provider at all should still be able to run `generate:migration`.
+
+**The outcome is files, not statements.** `CommandOutcome` currently answers "did it work and what do I print". A generator's useful result is the set of paths it wrote, which a CLI prints, a GitHub Action turns into a diff, and an agent reads before deciding what to do next. That argues for the outcome carrying produced artifacts rather than each consumer scraping them out of log lines.
+
+**Generation is idempotent in a way execution is not.** Re-running the generator against an unchanged model should produce no new migration, which makes it safe to put in a pre-commit hook or a CI check that fails when the model and the migrations have drifted apart. That check is the real prize here — model-versus-migration drift is otherwise found at deploy time.
+
+It also closes a loop with the source-control model: generated migrations land in the `Migrations/` pivot, so the next build classifies and checksums them exactly like hand-written ones, and nothing downstream needs to know which of the two a given migration was.
+
 ## Why this holds up as FluentMigrator evolves
 
-- **New built-in command → zero consumer changes.** Add `GenerateSqlScriptCommand` to `FluentMigrator.Runner.Commands`, and DotNet.Cli, TUI, Aspire, Copilot Canvas, the REPL, and the MCP server all pick it up via `Discover()`. Only Console/MSBuild need explicit opt-in if you want it exposed there (reasonable, since those are argument-shaped tools already).
+- **New built-in command → zero consumer changes.** Add `GenerateSqlScriptCommand` to `FluentMigrator.Runner.Commands`, and DotNet.Cli, TUI, Aspire, Copilot Canvas, the REPL, and the MCP server all pick it up via `Discover()`. Only Console/MSBuild/GitHubAction need explicit opt-in if you want it exposed there (reasonable, since those are argument-shaped tools already). The EF Core generator is that same property running backwards: it *contributes* a command, and every discovery-driven consumer gains it without that package knowing they exist.
 - **Argument metadata is the single source of truth for validation.** Put `Validate` funcs on `MigrationArgument` once; argv parser, MSBuild task, Aspire dashboard, and Canvas all reject bad input the same way, with the same message.
 - **Testing surface shrinks.** You test `IMigrationCommand` implementations once, against `MigrationExecutionContext`, independent of any host. Consumer-specific tests reduce to "does argv/ITaskItem/Aspire params map to the right `MigrationArgumentBag`."
 - **Third-party commands become a real extension point** — a plugin package can ship an `ICommandFactory`, and `UseCommandFactory` composes it into any host, including ones you didn't write (community TUI themes, a hypothetical VS Code extension, etc.), with sidecar loading at run time available specifically where it makes sense (Command discovery).
@@ -754,6 +797,8 @@ On resurrecting something like the old `IAnnouncer`: the lesson from its collaps
 | **CopilotCanvas** | Structured JSON / MCP tool result content | `{ "success": true, "exitCode": 0 }` | `{ "success": false, "message": ..., "exitCode": ... }`, `isError: true` if MCP | Exception details go in an optional `debug` field, not the primary message — Canvas is agent-facing, the message should be directly actionable; see Post-MVP on consolidating onto `FluentMigrator.Mcp` |
 | **Repl** | `ILogger` via a custom provider forwarding to the JS interop bridge | `ILogger.LogInformation`, forwarded to Vue's output panel | `ILogger.LogError`, forwarded the same way, with `CommandOutcome.Exception` available for a stack-trace-style detail view | Reuses the `ILogger`-based adapter with only the sink swapped — see Consumer 7 |
 | **Mcp** | MCP tool result content + MCP's logging/progress notifications | `{ success: true, exitCode: 0 }`, optionally preceded by progress notifications during a long run | `{ success: false, message: ..., exitCode: ... }`, `isError: true` | Closest to first-class of any consumer, since MCP has explicit cancellation and logging capabilities — see Consumer 8 |
+| **GitHubAction** | `$GITHUB_STEP_SUMMARY` markdown + `::error::` workflow commands + the step exit code | Script rendered into the job summary, step exits `0` | `::error::` annotation against the diff, step exits `ExitCode` | Preview-only by design, and connectionless by default, so no database secret need enter CI — see Consumer 9 |
+| **EFCoreMigrationGenerator** | `ILogger`, plus the generated files themselves | Paths written, logged at `Information`, exit `0` | Log at `Error`, exit `ExitCode`, leaving nothing partially written | The only consumer whose result is artifacts rather than statements — see Consumer 10 |
 
 The row that matters most architecturally is MSBuild's — it's the only consumer with no `ILogger` path at all. Every other host can share one `ILogger`-based adapter and differ only in formatting or in also producing a secondary structured result (`CommandResults`, JSON). That argues for building exactly one non-`ILogger` adapter (`TaskLoggingHelper`), not a bespoke logging abstraction spanning every consumer.
 
