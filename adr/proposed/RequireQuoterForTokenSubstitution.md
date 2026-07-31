@@ -137,10 +137,16 @@ Options D and F are complementary rather than competing: F fixes the contract, D
 duplication. Applying the unreleased-API fact to both collapses them, and the flag disappears:
 
 ```csharp
+// no `= null` default: every caller states its quoter
 public static string ReplaceSqlScriptTokens(string sqlText, IDictionary<string, object> parameters, IQuoter quoter)
+
+// ... and inside the $[name] branch only:
+if (quoter is null)
 {
-    if (quoter is null) throw new ArgumentNullException(nameof(quoter));
-    ...
+    throw new ArgumentNullException(
+        nameof(quoter),
+        $"Expanding the $[{key}] token requires an IQuoter. Pass the processor's Quoter, " +
+        "or StandardSqlQuoter.Instance if no provider-specific quoter is available.");
 }
 
 [Obsolete("Use the IDictionary<string, object> overload instead...")]
@@ -151,12 +157,23 @@ public static string ReplaceSqlScriptTokens(string sqlText, IDictionary<string, 
 ```
 
 The legacy overload names the quoter it uses, instead of passing null and a flag meaning
-"you know the one". No null branch, no boolean, no `QuoteSqlLiteral`, one implementation of
-value rendering.
+"you know the one". No silent fallback, no boolean, no `QuoteSqlLiteral`, one implementation
+of value rendering.
 
-This is Option C with its blocker removed. The obsolete overload never lacked a *quoter*; it
-lacked a quoter it could *name*. Option D supplies one, and the fact that the signature is
-still unreleased supplies the rest.
+**The guard belongs at the point of use, not at method entry.** A script containing only
+`$(name)` tokens never consults the quoter, so rejecting it on entry would fail callers that
+have no need of one. That is not hypothetical: four of the five mock-based expression test
+files use `$(name)` exclusively, and an entry guard would break all of them for a facility
+they do not touch.
+
+This makes `null` a legal argument meaning "I have no quoter", which fails only where it
+actually matters. That is **not** Option B: B keeps the silent fallback, so a null still
+renders — just differently and invisibly. Here a null never renders. It is either irrelevant
+or fatal, and the message says which token forced the issue.
+
+This is Option C with its blocker removed, and its guard narrowed. The obsolete overload never
+lacked a *quoter*; it lacked a quoter it could *name*. Option D supplies one, and the fact
+that the signature is still unreleased supplies the rest.
 
 ## Decision
 
@@ -165,17 +182,37 @@ still unreleased supplies the rest.
 1. Add `StandardSqlQuoter` to `FluentMigrator.Abstractions`, implementing `IQuoter.QuoteValue`
    with the current `QuoteSqlLiteral` semantics and throwing `NotSupportedException` from the
    identifier-quoting members, with a message directing callers to the processor's quoter.
-2. Make `quoter` required and guarded on the `IDictionary<string, object>` overload; drop the
-   `= null` default.
+2. Make `quoter` required on the `IDictionary<string, object>` overload by dropping the
+   `= null` default, and guard it **inside the `$[name]` branch** rather than at method entry.
 3. Route the obsolete string-dictionary overload through `StandardSqlQuoter.Instance`
    explicitly.
 4. Delete `QuoteSqlLiteral`.
-5. Update the 23 two-arg call sites in the test suite.
-6. Leave `processor?.Quoter` alone. It guards third-party processors and is a separate
-   question from this parameter.
+5. Update the 23 two-arg call sites in the test suite to state their quoter. Those expanding
+   only `$(name)` may state `null`; the rest pass a real one.
+6. Change the two production call sites from `processor?.Quoter` to `processor.Quoter`. The
+   `?.` is vestigial — `ExecuteSqlStatementExpression.ExecuteWith` dereferences `processor`
+   unconditionally on the very next line, so it never guarded a null processor. Audit confirms
+   every in-tree `IMigrationProcessor` supplies a non-null quoter.
+7. Add a `Quoter` stub to the mock-based tests that expand `$[name]`. Today exactly one of
+   twenty-two mock-processor call sites stubs it, and Moq returns null for the rest.
 
 8.0.1 users are unaffected: their entry point is the string-dictionary overload, which keeps
 working — now with behaviour that is named rather than implied.
+
+### A processor returning a null quoter
+
+With item 6, a third-party `IMigrationProcessor` whose `Quoter` returns null hands that null
+straight to the replacer, where it is inert for `$(name)` and fatal for `$[name]`.
+
+That is acceptable, and rests on the same fact as the rest of this decision: `IMigrationProcessor.Quoter`
+does not exist in 8.0.1. No shipped implementation can be relying on returning null, because
+no shipped implementation has the member at all. Any processor compiled against 9.0 must add
+it, and returning null would be a deliberate choice to opt out of `$[name]` support.
+
+The alternative — defaulting at the call site with `processor.Quoter ?? StandardSqlQuoter.Instance` —
+was rejected. It would silently substitute standard-SQL rendering for a provider-specific
+quoter, which is precisely the invisible behaviour this ADR exists to remove, merely relocated
+from the replacer to the call site.
 
 ## Consequences
 
@@ -199,9 +236,10 @@ fallback does.
   adoption by third-party processors, which is a separate compatibility question.
 - **`$(name)` DateTime portability** ([#2354](https://github.com/fluentmigrator/fluentmigrator/issues/2354)). Concerns the raw token style and is unaffected
   either way.
-- **Stubbing `Quoter` across mock-based tests.** Those tests pass a mock processor whose
-  `Quoter` is null; the call sites still use `processor?.Quoter`, so they are unaffected by
-  this change.
+- **Making `IMigrationProcessor.Quoter` non-nullable by contract.** Decision item 6 stops the
+  call sites from tolerating a null, but does not stop a processor from returning one. Whether
+  the interface should forbid it — by documentation, by analyzer, or by a default interface
+  member — is a separate question.
 
 ## Validation Plan
 
@@ -210,7 +248,12 @@ fallback does.
   and the diff identifies exactly where.
 - A test that the obsolete string-dictionary overload still round-trips, since it is the
   reason a named default is needed at all.
-- A test that `ReplaceSqlScriptTokens(sql, parameters, null)` throws `ArgumentNullException`.
+- A test that `ReplaceSqlScriptTokens(sql, parameters, quoter: null)` throws
+  `ArgumentNullException` **when the script contains `$[name]`**, and the message names the
+  offending token.
+- A test that the same call **succeeds** when the script contains only `$(name)`. This is the
+  narrowed guard's whole point and the easiest thing to regress by "tidying" the check up to
+  method entry.
 - A test that `StandardSqlQuoter`'s identifier-quoting members throw with an actionable
   message.
 
