@@ -22,8 +22,6 @@ using System.Linq;
 using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Infrastructure;
 
-using FluentMigrator.Runner.Generators.Generic;
-
 using NUnit.Framework;
 
 using Shouldly;
@@ -65,7 +63,7 @@ namespace FluentMigrator.Tests.Unit.Infrastructure
 
             var result = SqlScriptTokenReplacer.ReplaceSqlScriptTokens(
                 "ALTER TABLE $(DefaultSchema).Users ADD COLUMN Foo INT",
-                ToObjectDictionary(provider.GetTokens()), null);
+                ToObjectDictionary(provider.GetTokens()));
 
             result.ShouldBe("ALTER TABLE testdefault.Users ADD COLUMN Foo INT");
         }
@@ -78,7 +76,7 @@ namespace FluentMigrator.Tests.Unit.Infrastructure
 
             var result = SqlScriptTokenReplacer.ReplaceSqlScriptTokens(
                 "SELECT * FROM Users WHERE SchemaName = $[DefaultSchema]",
-                ToObjectDictionary(provider.GetTokens()), new GenericQuoter());
+                ToObjectDictionary(provider.GetTokens()));
 
             result.ShouldBe("SELECT * FROM Users WHERE SchemaName = 'testdefault'");
         }
@@ -91,7 +89,7 @@ namespace FluentMigrator.Tests.Unit.Infrastructure
 
             var result = SqlScriptTokenReplacer.ReplaceSqlScriptTokens(
                 "SELECT * FROM Users WHERE SchemaName = $[DefaultSchema]",
-                ToObjectDictionary(provider.GetTokens()), new GenericQuoter());
+                ToObjectDictionary(provider.GetTokens()));
 
             result.ShouldBe("SELECT * FROM Users WHERE SchemaName = 'te''st'");
         }
@@ -104,7 +102,7 @@ namespace FluentMigrator.Tests.Unit.Infrastructure
 
             var result = SqlScriptTokenReplacer.ReplaceSqlScriptTokens(
                 "ALTER TABLE $(DefaultSchema).Users ADD COLUMN Foo INT; SELECT $[DefaultSchema]",
-                ToObjectDictionary(provider.GetTokens()), new GenericQuoter());
+                ToObjectDictionary(provider.GetTokens()));
 
             result.ShouldBe("ALTER TABLE $(DefaultSchema).Users ADD COLUMN Foo INT; SELECT $[DefaultSchema]");
         }

@@ -22,7 +22,7 @@ markdown table rather than one of 35,000 opaque case names.
 | # | Axis | Values | Why it matters |
 |---|---|---|---|
 | 1 | Token style | `$(name)` raw, `$[name]` safe-quoted | Different code paths: raw bypasses the quoter entirely |
-| 2 | Quoter presence | supplied only | A `null` quoter no longer renders anything - it throws when `$[name]` is expanded, identically for every value and dialect. Covered once in `SqlScriptTokenReplacerTests` rather than as a matrix column; see `adr/proposed/RequireQuoterForTokenSubstitution.md` |
+| 2 | Quoter presence | supplied vs `null` | The `IQuoter` parameter is optional and the fallback has its own semantics |
 | 3 | Value type | every branch of `GenericQuoter.QuoteValue`, plus uncased fall-through, plus `RawSql` | The reported defects are all value-type specific |
 | 4 | Dialect | ~30 `Add*()` registrations on `IMigrationRunnerBuilder` | Each wires a different quoter/typemap/generator triple |
 | 5 | `IQuoter` switch | `binaryGuid`, `QuoteIdentifiers`, `ForceQuote`, quoted-identifier variants | Orthogonal to dialect; changes value rendering |

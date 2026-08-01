@@ -5,13 +5,6 @@ the next commit's diff shows exactly which cells the fixes move.
 
 Run against `e25bf5ef` ("Fix RawSql script token replacement (#2333)") on `net48`, `en-US` host.
 
-> **Historical note.** The `$[x] no quoter` column referenced throughout this document no longer
-> exists. The private fallback it recorded was deleted when the quoter became required — a null
-> quoter now throws, identically for every value and dialect, so the column carried one fact
-> repeated 161 times. See `adr/proposed/RequireQuoterForTokenSubstitution.md` and the three
-> dedicated tests in `SqlScriptTokenReplacerTests`. This file is kept as the record of what the
-> matrix found, not as a description of the current fixture.
-
 ```
 Failed!  - Failed: 48, Passed: 151, Skipped: 0, Total: 199 - FluentMigrator.Tests.dll (net48)
 ```

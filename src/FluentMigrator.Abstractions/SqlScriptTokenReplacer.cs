@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Text;
 using System.Text.RegularExpressions;
 
 using FluentMigrator.Generation;
@@ -36,15 +37,10 @@ namespace FluentMigrator
         /// <param name="parameters">The tokens to be replaced</param>
         /// <param name="quoter">
         /// The <see cref="IQuoter"/> used to safely quote/format <c>$[name]</c> parameter values
-/// (e.g. numbers, dates, booleans, <see langword="null"/>, strings). Pass the processor's
-/// <c>Quoter</c>. May be <see langword="null"/> only when <paramref name="sqlText"/>
-/// contains no <c>$[name]</c> token that matches a key in <paramref name="parameters"/>, since nothing else consults it.
+        /// (e.g. numbers, dates, booleans, <see langword="null"/>, strings). When <see langword="null"/>,
+        /// a basic string-literal quoting fallback is used, which treats every value as a string.
         /// </param>
         /// <returns>The SQL script with the replaced tokens</returns>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="quoter"/> is <see langword="null"/> and <paramref name="sqlText"/>
-        /// contains a <c>$[name]</c> token.
-        /// </exception>
         /// <remarks>
         /// Two token styles are supported:
         /// <list type="bullet">
@@ -62,14 +58,12 @@ namespace FluentMigrator
         /// using <paramref name="quoter"/>. Use this style whenever a value should be treated as
         /// data instead of raw SQL. Any value type supported by <see cref="IQuoter.QuoteValue"/> can be
         /// used, e.g. <see cref="string"/>, numbers, <see cref="System.DateTime"/>, <see cref="bool"/>,
-        /// <see cref="System.Guid"/>, or <see langword="null"/>.
+        /// <see cref="System.Guid"/>, or <see langword="null"/>. When no <paramref name="quoter"/> is
+        /// supplied, an invariant-culture rendering equivalent to the default
+        /// <c>GenericQuoter.QuoteValue</c> is used.
         /// </description>
         /// </item>
         /// </list>
-        /// <para>
-        /// A <paramref name="quoter"/> is needed only for <c>$[name]</c>. A script using nothing but
-        /// <c>$(name)</c> never consults it and may pass <see langword="null"/>.
-        /// </para>
         /// <para>
         /// <strong><see cref="RawSql"/> is exempt from quoting in both styles.</strong> It is an
         /// explicit opt-in escape hatch, so a <see cref="RawSql"/> value is emitted verbatim even via
@@ -82,60 +76,38 @@ namespace FluentMigrator
         /// escaping it as <c>$$((name))</c> or <c>$$[[name]]</c> respectively.
         /// </para>
         /// </remarks>
-        public static string ReplaceSqlScriptTokens([StringSyntax("sql")] string sqlText, IDictionary<string, object> parameters, IQuoter quoter)
+        public static string ReplaceSqlScriptTokens([StringSyntax("sql")] string sqlText, IDictionary<string, object> parameters, IQuoter quoter = null)
         {
             return ReplaceSqlScriptTokensCore(sqlText, parameters, quoter);
         }
 
-        /// <param name="expandSafeTokens">
-        /// Whether to expand the <c>$[name]</c> token style. The obsolete
-        /// <see cref="IDictionary{TKey,TValue}"/> of <see cref="string"/> overload passes
-        /// <see langword="false"/>, because that token style did not exist when it was the only
-        /// API and 8.0.1 left such text untouched.
-        /// </param>
-        private static string ReplaceSqlScriptTokensCore<TValue>(
-            [StringSyntax("sql")] string sqlText,
-            IDictionary<string, TValue> parameters,
-            IQuoter quoter,
-            bool expandSafeTokens = true)
+        private static string ReplaceSqlScriptTokensCore<TValue>([StringSyntax("sql")] string sqlText, IDictionary<string, TValue> parameters, IQuoter quoter)
         {
             // Are parameters set?
             if (parameters != null && parameters.Count != 0)
             {
                 // Replace $[word] elements with the values stored in the Parameters
                 // dictionary, rendered as a safely quoted/escaped SQL literal.
-                if (expandSafeTokens)
-                {
-                    sqlText = Regex.Replace(
-                        sqlText,
-                        @"\$\[(?<token>\w+)\]",
-                        m =>
+                sqlText = Regex.Replace(
+                    sqlText,
+                    @"\$\[(?<token>\w+)\]",
+                    m =>
+                    {
+                        var key = m.Groups["token"].Value;
+                        if (parameters.TryGetValue(key, out var keyValue))
                         {
-                            var key = m.Groups["token"].Value;
-                            if (parameters.TryGetValue(key, out var keyValue))
-                            {
-                                // Guarded here rather than at method entry on purpose: a script
-                                // using only $(name) never consults the quoter, so rejecting it up
-                                // front would fail callers that have no need of one.
-                                if (quoter is null)
-                                {
-                                    throw new ArgumentNullException(
-                                        nameof(quoter),
-                                        $"Expanding the $[{key}] token requires an IQuoter. Pass the " +
-                                        "processor's Quoter.");
-                                }
-
-                                object value = keyValue;
-                                return quoter.QuoteValue(value);
-                            }
-
-                            // Return the whole match value when the key
-                            // wasn't found in the Parameters dictionary.
-                            // This might help finding unset variables.
-                            return m.Value;
+                            object value = keyValue;
+                            return quoter != null
+                                ? quoter.QuoteValue(value)
+                                : QuoteSqlLiteral(value);
                         }
-                    );
-                }
+
+                        // Return the whole match value when the key
+                        // wasn't found in the Parameters dictionary.
+                        // This might help finding unset variables.
+                        return m.Value;
+                    }
+                );
 
                 // Replace $(word) elements with values stored
                 // in the Parameters dictionary.
@@ -160,13 +132,8 @@ namespace FluentMigrator
                 // Replace $$((word)) with $(word)
                 sqlText = Regex.Replace(sqlText, @"\${2}\({2}(\w+)\){2}", @"$$($1)");
 
-                // Replace $$[[word]] with $[word]. Gated with the token it escapes: both arrived
-                // together, so a caller that does not get $[name] should not get its escape form
-                // rewritten either.
-                if (expandSafeTokens)
-                {
-                    sqlText = Regex.Replace(sqlText, @"\${2}\[{2}(\w+)\]{2}", @"$$[$1]");
-                }
+                // Replace $$[[word]] with $[word]
+                sqlText = Regex.Replace(sqlText, @"\${2}\[{2}(\w+)\]{2}", @"$$[$1]");
             }
 
             return sqlText;
@@ -197,19 +164,128 @@ namespace FluentMigrator
         /// <para>
         /// The supplied dictionary is queried directly, preserving its key lookup semantics.
         /// </para>
-        /// <para>
-        /// <strong>This overload does not expand <c>$[name]</c>.</strong> That token style did not
-        /// exist when this was the only API - 8.0.1 returned such text unchanged - and there is no
-        /// quoter here to render it with. <c>$[name]</c> and its <c>$$[[name]]</c> escape are left
-        /// verbatim, exactly as in 8.0.1. Callers wanting safely quoted literals should move to the
-        /// <see cref="ReplaceSqlScriptTokens(string, IDictionary{string, object}, IQuoter)"/>
-        /// overload and pass the processor's <c>Quoter</c>.
-        /// </para>
         /// </remarks>
         [Obsolete("Use the IDictionary<string, object> overload instead. The IDictionary<string, string> overload is kept for backwards compatibility and will be removed in a future major version.")]
         public static string ReplaceSqlScriptTokens([StringSyntax("sql")] string sqlText, IDictionary<string, string> parameters)
         {
-            return ReplaceSqlScriptTokensCore(sqlText, parameters, quoter: null, expandSafeTokens: false);
+            return ReplaceSqlScriptTokensCore(sqlText, parameters, null);
+        }
+
+        /// <summary>
+        /// Renders a value as a SQL literal when no <see cref="IQuoter"/> was supplied.
+        /// </summary>
+        /// <param name="value">The value to render</param>
+        /// <returns>The value as a SQL literal</returns>
+        /// <exception cref="NotSupportedException">
+        /// <paramref name="value"/> is a <see cref="SystemMethods"/>, which has no dialect-independent
+        /// rendering.
+        /// </exception>
+        /// <remarks>
+        /// <para>
+        /// Deliberately mirrors the default rendering of <c>GenericQuoter.QuoteValue</c>, which lives
+        /// in <c>FluentMigrator.Runner.Core</c> and so cannot be referenced from this assembly. The
+        /// two must agree: a token expanded without a quoter and the same value written by
+        /// <c>Insert</c>/<c>Update</c>/<c>Delete</c> should produce the same literal. That agreement
+        /// is asserted by <c>TokenSubstitutionMatrixTests</c>.
+        /// </para>
+        /// <para>
+        /// Culture handling, precisely: numbers, <see cref="DateTime"/> and <see cref="DateTimeOffset"/>
+        /// are formatted with <see cref="CultureInfo.InvariantCulture"/>, as is any other
+        /// <see cref="IFormattable"/>. Enums render by name, which is culture-independent. Anything
+        /// else falls back to <see cref="object.ToString"/> and therefore renders however that type
+        /// chooses - <c>GenericQuoter.QuoteValue</c> has the same fallback. Before this, *every* value
+        /// was stringified with the ambient culture, so a German build agent emitted <c>'1234,5678'</c>
+        /// for a <see cref="double"/>.
+        /// </para>
+        /// </remarks>
+        private static string QuoteSqlLiteral(object value)
+        {
+            switch (value)
+            {
+                case null:
+                case DBNull _:
+                    return "NULL";
+
+                // An explicit opt-in escape hatch: the caller owns this SQL, so it must not be
+                // quoted, escaped or otherwise altered.
+                case RawSql rawSql:
+                    return rawSql.Value;
+
+                // Matched ahead of Enum, which would otherwise render it as the string literal
+                // 'CurrentDateTime' - valid SQL syntax that silently means the wrong thing. There is
+                // no dialect-independent rendering for these: CURRENT_TIMESTAMP, GETDATE(), SYSDATE
+                // and NOW() are all spelled differently, which is why GenericQuoter delegates to
+                // FormatSystemMethods and throws by default. Failing here says "supply an IQuoter"
+                // instead of emitting a string that looks like it worked.
+                case SystemMethods systemMethod:
+                    throw new NotSupportedException(
+                        $"The system method {systemMethod} cannot be rendered without an IQuoter, because its SQL " +
+                        "spelling is dialect-specific. Pass the processor's IQuoter to ReplaceSqlScriptTokens, " +
+                        "or substitute an explicit RawSql value.");
+
+                case bool b:
+                    return b ? "1" : "0";
+
+                case byte[] bytes:
+                    return FormatByteArray(bytes);
+
+                case DateTime dateTime:
+                    return QuoteString(dateTime.ToString("yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture));
+
+                case DateTimeOffset dateTimeOffset:
+                    return QuoteString(dateTimeOffset.ToString("yyyy-MM-ddTHH:mm:sszzz", CultureInfo.InvariantCulture));
+
+                // Numeric literals are emitted unquoted so they keep their SQL type. Enum is
+                // deliberately matched before the integral types, since it renders as a string.
+                case Enum _:
+                    return QuoteString(value.ToString());
+
+                case sbyte _:
+                case byte _:
+                case short _:
+                case ushort _:
+                case int _:
+                case uint _:
+                case long _:
+                case ulong _:
+                case float _:
+                case double _:
+                case decimal _:
+                    return ((IFormattable)value).ToString(null, CultureInfo.InvariantCulture);
+
+                case IFormattable formattable:
+                    return QuoteString(formattable.ToString(null, CultureInfo.InvariantCulture));
+
+                default:
+                    return QuoteString(value.ToString());
+            }
+        }
+
+        /// <summary>
+        /// Wraps a value in single quotes, escaping embedded single quotes by doubling them.
+        /// </summary>
+        /// <param name="value">The value to quote</param>
+        /// <returns>The quoted value</returns>
+        private static string QuoteString(string value)
+        {
+            return "'" + value.Replace("'", "''") + "'";
+        }
+
+        /// <summary>
+        /// Renders a byte array as a hexadecimal SQL literal, matching <c>GenericQuoter</c>.
+        /// </summary>
+        /// <param name="value">The bytes to render</param>
+        /// <returns>The hexadecimal literal</returns>
+        private static string FormatByteArray(byte[] value)
+        {
+            var hex = new StringBuilder((value.Length * 2) + 2);
+            hex.Append("0x");
+            foreach (var b in value)
+            {
+                hex.AppendFormat(CultureInfo.InvariantCulture, "{0:x2}", b);
+            }
+
+            return hex.ToString();
         }
     }
 }
