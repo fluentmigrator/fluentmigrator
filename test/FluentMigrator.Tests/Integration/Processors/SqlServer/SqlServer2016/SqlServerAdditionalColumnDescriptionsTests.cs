@@ -66,6 +66,9 @@ public class SqlServerAdditionalColumnDescriptionsTests : SqlServerIntegrationTe
             AssertConcatenatedAdditionalDescriptions("Col1", expectedAdditionalDescriptions); // Create.Table
             AssertConcatenatedAdditionalDescriptions("Col2", expectedAdditionalDescriptions); // Create.Column
             AssertConcatenatedAdditionalDescriptions("Col3", expectedAdditionalDescriptions); // Alter.Table / AddColumn
+
+            // Alter.Column emits one dedicated MS_<key> extended property per additional description.
+            AssertPerKeyAdditionalDescriptions("Col4", expectedAdditionalDescriptions); // Alter.Column
         }
         finally
         {
