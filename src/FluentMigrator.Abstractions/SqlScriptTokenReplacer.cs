@@ -36,14 +36,16 @@ namespace FluentMigrator
         /// <param name="parameters">The tokens to be replaced</param>
         /// <param name="quoter">
         /// The <see cref="IQuoter"/> used to safely quote/format <c>$[name]</c> parameter values
-/// (e.g. numbers, dates, booleans, <see langword="null"/>, strings). Pass the processor's
-/// <c>Quoter</c>. May be <see langword="null"/> only when <paramref name="sqlText"/>
-/// contains no <c>$[name]</c> token that matches a key in <paramref name="parameters"/>, since nothing else consults it.
+        /// (e.g. numbers, dates, booleans, <see langword="null"/>, strings). Pass the processor's
+        /// <c>Quoter</c>. May be <see langword="null"/> when no <c>$[name]</c> token is actually
+        /// expanded, since nothing else consults it - that includes a <c>$[name]</c> whose key is
+        /// absent from <paramref name="parameters"/>, which is left verbatim without rendering.
         /// </param>
         /// <returns>The SQL script with the replaced tokens</returns>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="quoter"/> is <see langword="null"/> and <paramref name="sqlText"/>
-        /// contains a <c>$[name]</c> token.
+        /// contains a <c>$[name]</c> token whose key is present in <paramref name="parameters"/>,
+        /// so a value has to be rendered.
         /// </exception>
         /// <remarks>
         /// Two token styles are supported:
@@ -67,8 +69,10 @@ namespace FluentMigrator
         /// </item>
         /// </list>
         /// <para>
-        /// A <paramref name="quoter"/> is needed only for <c>$[name]</c>. A script using nothing but
-        /// <c>$(name)</c> never consults it and may pass <see langword="null"/>.
+        /// A <paramref name="quoter"/> is needed only where a <c>$[name]</c> value is actually
+        /// rendered. A script using nothing but <c>$(name)</c> never consults it, and neither does a
+        /// <c>$[name]</c> whose key is absent from <paramref name="parameters"/>; both may pass
+        /// <see langword="null"/>.
         /// </para>
         /// <para>
         /// <strong><see cref="RawSql"/> is exempt from quoting in both styles.</strong> It is an
@@ -87,12 +91,9 @@ namespace FluentMigrator
             return ReplaceSqlScriptTokensCore(sqlText, parameters, quoter);
         }
 
-        /// <param name="expandSafeTokens">
-        /// Whether to expand the <c>$[name]</c> token style. The obsolete
-        /// <see cref="IDictionary{TKey,TValue}"/> of <see cref="string"/> overload passes
-        /// <see langword="false"/>, because that token style did not exist when it was the only
-        /// API and 8.0.1 left such text untouched.
-        /// </param>
+        // expandSafeTokens: whether to expand the $[name] token style. The obsolete
+        // IDictionary<string, string> overload passes false, because that token style did not exist
+        // when it was the only API and 8.0.1 left such text untouched.
         private static string ReplaceSqlScriptTokensCore<TValue>(
             [StringSyntax("sql")] string sqlText,
             IDictionary<string, TValue> parameters,
