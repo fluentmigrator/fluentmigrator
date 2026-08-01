@@ -1,7 +1,8 @@
 # ADR: Require an IQuoter for SQL Script Token Substitution
 
 ## Status
-Proposed
+Proposed — **amended**. The original decision (Option G) was superseded during implementation; see
+[Amendment](#amendment-option-g-superseded-by-option-i) and the revised [Decision](#decision).
 
 Follows the coverage work in [#2336](https://github.com/fluentmigrator/fluentmigrator/issues/2336), which recorded the correct behaviour of the no-quoter fallback as "an API decision" rather than resolving it.
 
@@ -83,6 +84,27 @@ confirmed by reflecting over the released `FluentMigrator.Abstractions` package.
 So the entire quoter-threading design is unreleased. Changing its signature costs shipped
 users nothing, and this is the last release in which that is true.
 
+### The other half: the string-dictionary overload is genuinely old (amendment)
+
+The converse is equally load-bearing and was not stated originally.
+`ReplaceSqlScriptTokens(string, IDictionary<string, string>)` dates from `ce4d9428`, 2018-04-04,
+and appears in tags from `v2.0.0` onward. It is the only public overload in 8.0.1.
+
+The git history disguises this: #2312 *replaced* it rather than adding beside it, and #2322 then
+*restored* it, so it reads as recently added when it is recently re-added.
+
+Two consequences:
+
+1. Its behaviour is a compatibility surface eight years wide. It cannot simply be deleted to make
+   the quoter question go away.
+2. **In 8.0.1, `$[name]` was not a token at all.** Running the released package on
+   `"SELECT $[CurrentTimestamp]"` returns it unchanged. Today's `main` routes that overload through
+   the shared core, so the same input is now *substituted* — an unannounced behaviour change on the
+   oldest API in the file.
+
+The cheapest correct behaviour for that overload is therefore not "find it a quoter" but "restore
+what it did in 8.0.1": expand `$(name)`, leave `$[name]` alone, and need no quoter at all.
+
 ## Options Considered
 
 ### Option A — status quo
@@ -109,9 +131,17 @@ identifier-quoting members of `IQuoter` throw `NotSupportedException`. That asym
 honest cost.
 
 ### Option E — move `GenericQuoter` into Abstractions
-Removes the duplication with no new type. Rejected: `GenericQuoter` carries generator-facing
-concerns and a large public surface, and relocating it across assemblies is a far larger
-break than the problem justifies.
+Removes the duplication with no new type.
+
+> **Correction (amendment).** This was originally rejected on the grounds that `GenericQuoter`
+> "carries generator-facing concerns and a large public surface". That was asserted without
+> checking. Its entire dependency set is `System.Globalization`, `JetBrains.Annotations`, and
+> `IQuoter` / `SystemMethods` / `RawSql` / `NonUnicodeString` — all already in Abstractions. It
+> *could* move. The real objections are that `GenericQuoter` has shipped publicly from
+> `Runner.Core` since 2018, so relocating it is a binary break needing `[TypeForwardedTo]`, and
+> that moving a concrete generator into Abstractions sets a precedent for putting implementation
+> in the contract assembly. Both are judgement calls rather than the mechanical impossibility
+> originally implied.
 
 ### Option F — keep the null path for 9.0, but deprecate it
 Keep the null path working so 8.0.1 users have a step-up rather than a wall, and mark it
@@ -175,60 +205,132 @@ This is Option C with its blocker removed, and its guard narrowed. The obsolete 
 lacked a *quoter*; it lacked a quoter it could *name*. Option D supplies one, and the fact
 that the signature is still unreleased supplies the rest.
 
+> **Superseded (amendment).** Option G does not deliver what this ADR claimed for it. It replaces
+> a private duplicate with a *public* one: `StandardSqlQuoter.QuoteValue` in Abstractions and
+> `GenericQuoter.QuoteValue` in `Runner.Core` still both exist, still must agree. The count of
+> value-rendering implementations stays at two; only its visibility changes. The name was also
+> wrong — see Option H.
+
+### Option H — a shared static formatter in Abstractions (amendment)
+Put the default rendering in a public static helper in Abstractions; `SqlScriptTokenReplacer` uses
+it, and `GenericQuoter` delegates to it.
+
+**`GenericQuoter.QuoteValue` cannot delegate wholesale.** It is a type-dispatch switch over
+*virtual* `Format*` members, and providers override roughly thirty of them —
+`FormatSystemMethods` ×11, `FormatDateTime` ×4, `FormatByteArray` ×3, `FormatNationalString` ×3,
+`FormatBool` ×2, `FormatGuid` ×2, and more. Delegating `QuoteValue` to a static would bypass every
+one, silently regressing each provider to the defaults.
+
+Delegation therefore only works one level down, with each virtual's *default body* calling the
+static. That shares the per-type rules but leaves the switch duplicated, and moves roughly fifteen
+formatting methods into Abstractions — the same slippery slope as Option E, at a gentler gradient.
+
+Rejected on that basis, but retained because it is the right shape *if* the legacy overload must
+keep expanding `$[name]`.
+
+### Option I — add nothing to Abstractions; restore 8.0.1 behaviour on the legacy overload (amendment)
+Delete `QuoteSqlLiteral` outright. Require the quoter on the object overload, guarded inside the
+`$[name]` branch as in Option G. Then let the string-dictionary overload do exactly what 8.0.1 did:
+expand `$(name)`, leave `$[name]` untouched, consult no quoter.
+
+```csharp
+public static string ReplaceSqlScriptTokens(string sqlText, IDictionary<string, object> parameters, IQuoter quoter)
+
+[Obsolete("Use the IDictionary<string, object> overload instead...")]
+public static string ReplaceSqlScriptTokens(string sqlText, IDictionary<string, string> parameters)
+{
+    // 8.0.1 had no $[name] token and left such text alone. Preserved deliberately: this overload
+    // has no quoter, and inventing one would change what eight years of scripts emit.
+    return ReplaceSqlScriptTokensCore(sqlText, parameters, quoter: null, expandSafeTokens: false);
+}
+```
+
+`expandSafeTokens` is a parameter on the **private** core, so no public surface grows.
+
+The count of fallback implementations goes to **zero**, not one. `GenericQuoter` is untouched and
+keeps its virtual dispatch. Abstractions gains nothing. And the legacy overload becomes *more*
+faithful to 8.0.1 than `main` currently is.
+
+The cost: `$[name]` is unavailable through the obsolete overload. It always was — that token did
+not exist when the overload was the only API — and the obsolete message points at the overload that
+supports it.
+
 ## Decision
 
-**Adopt Option G.**
+**Adopt Option I.** This supersedes the original decision, Option G; see
+[Amendment](#amendment-option-g-superseded-by-option-i) below for why.
 
-1. Add `StandardSqlQuoter` to `FluentMigrator.Abstractions`, implementing `IQuoter.QuoteValue`
-   with the current `QuoteSqlLiteral` semantics and throwing `NotSupportedException` from the
-   identifier-quoting members, with a message directing callers to the processor's quoter.
+1. Delete `QuoteSqlLiteral`. Add nothing to `FluentMigrator.Abstractions`.
 2. Make `quoter` required on the `IDictionary<string, object>` overload by dropping the
    `= null` default, and guard it **inside the `$[name]` branch** rather than at method entry.
-3. Route the obsolete string-dictionary overload through `StandardSqlQuoter.Instance`
-   explicitly.
-4. Delete `QuoteSqlLiteral`.
-5. Update the 23 two-arg call sites in the test suite to state their quoter. Those expanding
+3. Give the private core an `expandSafeTokens` parameter. The string-dictionary overload passes
+   `false`, restoring 8.0.1 behaviour: `$(name)` expands, `$[name]` passes through untouched, no
+   quoter consulted. No public surface grows.
+4. Update the 23 two-arg call sites in the test suite to state their quoter. Those expanding
    only `$(name)` may state `null`; the rest pass a real one.
-6. Change the two production call sites from `processor?.Quoter` to `processor.Quoter`. The
+5. Change the two production call sites from `processor?.Quoter` to `processor.Quoter`. The
    `?.` is vestigial — `ExecuteSqlStatementExpression.ExecuteWith` dereferences `processor`
    unconditionally on the very next line, so it never guarded a null processor. Audit confirms
    every in-tree `IMigrationProcessor` supplies a non-null quoter.
-7. Add a `Quoter` stub to the mock-based tests that expand `$[name]`. Today exactly one of
+6. Add a `Quoter` stub to the mock-based tests that expand `$[name]`. Today exactly one of
    twenty-two mock-processor call sites stubs it, and Moq returns null for the rest.
+7. `GenericQuoter` is untouched, keeping its virtual dispatch and its ~30 provider overrides.
 
-8.0.1 users are unaffected: their entry point is the string-dictionary overload, which keeps
-working — now with behaviour that is named rather than implied.
+8.0.1 users are unaffected — more precisely than under Option G. Their entry point is the
+string-dictionary overload, which returns to doing exactly what it did in 8.0.1, including for
+scripts whose text happens to contain `$[...]`.
+
+### Amendment: Option G superseded by Option I
+
+The original decision was **Option G**. Implementation surfaced two problems with it, both
+recorded above rather than quietly corrected:
+
+1. **It does not remove the duplication it was adopted for.** `StandardSqlQuoter.QuoteValue` and
+   `GenericQuoter.QuoteValue` would both exist and both have to agree. The private duplicate
+   becomes a public one; the count stays at two.
+2. **The name was wrong.** `GenericQuoter` is not ANSI SQL — `FormatBool` emits `1`/`0` where the
+   standard has `TRUE`/`FALSE`, `FormatByteArray` emits `0xdead` where the standard has `X'DEAD'`,
+   and `FormatDateTime` emits `'2026-07-28T13:45:06'` where the standard has
+   `TIMESTAMP '2026-07-28 13:45:06'`. Providers override precisely these to correct them. A type
+   mirroring those defaults is the *FluentMigrator default*, not a standard-SQL quoter, and naming
+   it `StandardSqlQuoter` would have claimed a conformance it does not have.
+
+Both dissolve once the string-dictionary overload is recognised as eight years old rather than
+newly restored, and once it is accepted that in 8.0.1 that overload never expanded `$[name]` at
+all. It does not need a quoter. It needs its old behaviour back.
+
+Option I above records what was adopted in its place.
 
 ### A processor returning a null quoter
 
-With item 6, a third-party `IMigrationProcessor` whose `Quoter` returns null hands that null
-straight to the replacer, where it is inert for `$(name)` and fatal for `$[name]`.
+With decision item 5, a third-party `IMigrationProcessor` whose `Quoter` returns null hands that
+null straight to the replacer, where it is inert for `$(name)` and fatal for `$[name]`.
 
 That is acceptable, and rests on the same fact as the rest of this decision: `IMigrationProcessor.Quoter`
 does not exist in 8.0.1. No shipped implementation can be relying on returning null, because
 no shipped implementation has the member at all. Any processor compiled against 9.0 must add
 it, and returning null would be a deliberate choice to opt out of `$[name]` support.
 
-The alternative — defaulting at the call site with `processor.Quoter ?? StandardSqlQuoter.Instance` —
-was rejected. It would silently substitute standard-SQL rendering for a provider-specific
-quoter, which is precisely the invisible behaviour this ADR exists to remove, merely relocated
-from the replacer to the call site.
+The alternative — defaulting at the call site with `processor.Quoter ?? someFallbackQuoter` — was
+rejected. It would silently substitute default rendering for a provider-specific quoter, which is
+precisely the invisible behaviour this ADR exists to remove, merely relocated from the replacer to
+the call site.
 
 ## Consequences
 
-**Positive.** One implementation of value rendering instead of two. No null-as-mode. The
-break is taken in the only release where it is free. The compatibility path keeps working and
-its behaviour becomes explicit at the call site.
+**Positive.** Value rendering has **one** implementation, `GenericQuoter`, reached through the
+providers' own virtual dispatch. Nothing is added to `FluentMigrator.Abstractions`, so the contract
+assembly does not acquire a concrete quoter or a set of formatting helpers. No null-as-mode: a null
+quoter is either irrelevant or an error. The break is taken in the only release where it is free.
 
-**Negative.** A new public type in Abstractions whose `IQuoter` implementation is deliberately
-partial — the identifier-quoting members exist only to satisfy the interface. Reviewers should
-weigh that against the current wart of a private method shadowing `GenericQuoter` from another
-assembly. `ReplaceSqlScriptTokens(sqlText, parameters)` stops compiling: free externally,
-23 call sites internally.
+**Negative.** `$[name]` cannot be used through the obsolete string-dictionary overload. This is a
+restoration rather than a regression — that token did not exist when the overload was the only API —
+but it does mean a caller who adopted `$[name]` on the legacy overload against unreleased `main`
+must move to the object overload. `ReplaceSqlScriptTokens(sqlText, parameters)` stops compiling:
+free externally, 23 call sites internally.
 
-**Neutral.** `SystemMethods` continues to throw from this path. Its SQL spelling is
-dialect-specific and a standard-SQL quoter has no more basis to render it than the current
-fallback does.
+**Neutral.** `SystemMethods` continues to throw from `GenericQuoter.FormatSystemMethods` by
+default, as it always has. Its SQL spelling is dialect-specific, and providers override it.
 
 ## Out of Scope
 
@@ -236,32 +338,36 @@ fallback does.
   adoption by third-party processors, which is a separate compatibility question.
 - **`$(name)` DateTime portability** ([#2354](https://github.com/fluentmigrator/fluentmigrator/issues/2354)). Concerns the raw token style and is unaffected
   either way.
-- **Making `IMigrationProcessor.Quoter` non-nullable by contract.** Decision item 6 stops the
+- **Making `IMigrationProcessor.Quoter` non-nullable by contract.** Decision item 5 stops the
   call sites from tolerating a null, but does not stop a processor from returning one. Whether
   the interface should forbid it — by documentation, by analyzer, or by a default interface
   member — is a separate question.
+- **Restoring `$[name]` to the string-dictionary overload.** If that is ever wanted, Option H is
+  the right shape, and it should be decided on its own merits rather than smuggled in here.
 
 ## Validation Plan
 
 - The token substitution matrix should produce **byte-identical snapshots** before and after.
   Any moved cell means `QuoteSqlLiteral` and `GenericQuoter.QuoteValue` had already drifted,
   and the diff identifies exactly where.
-- A test that the obsolete string-dictionary overload still round-trips, since it is the
-  reason a named default is needed at all.
+- A test that the string-dictionary overload expands `$(name)` and leaves `$[name]` **verbatim**,
+  matching 8.0.1. This is the behaviour the amendment restores, and the reason no fallback quoter
+  is needed.
 - A test that `ReplaceSqlScriptTokens(sql, parameters, quoter: null)` throws
   `ArgumentNullException` **when the script contains `$[name]`**, and the message names the
   offending token.
 - A test that the same call **succeeds** when the script contains only `$(name)`. This is the
   narrowed guard's whole point and the easiest thing to regress by "tidying" the check up to
   method entry.
-- A test that `StandardSqlQuoter`'s identifier-quoting members throw with an actionable
-  message.
 
 ## References
 
+- `ce4d9428`, 2018-04-04 — introduced the string-dictionary overload, present from `v2.0.0`
 - `cdf0ff74` ([#2312](https://github.com/fluentmigrator/fluentmigrator/pull/2312)) — introduced the optional parameter, the
   `IMigrationProcessor.Quoter` member and the compatibility suppressions
 - [#2322](https://github.com/fluentmigrator/fluentmigrator/pull/2322) — restored the obsolete string-dictionary overload
 - [#2343](https://github.com/fluentmigrator/fluentmigrator/pull/2343) — refactored the body into `ReplaceSqlScriptTokensCore<TValue>`
 - [#2336](https://github.com/fluentmigrator/fluentmigrator/issues/2336) — coverage work that deferred this decision
+- [#2355](https://github.com/fluentmigrator/fluentmigrator/pull/2355) — the original ADR, adopting Option G
+- [#2362](https://github.com/fluentmigrator/fluentmigrator/issues/2362) — the implementation task, which this amendment rescopes
 - `test/FluentMigrator.Tests/Unit/TokenSubstitution/BASELINE-FAILURES.md` — records the deferral
