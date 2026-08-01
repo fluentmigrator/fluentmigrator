@@ -36,9 +36,9 @@ namespace FluentMigrator
         /// <param name="parameters">The tokens to be replaced</param>
         /// <param name="quoter">
         /// The <see cref="IQuoter"/> used to safely quote/format <c>$[name]</c> parameter values
-        /// (e.g. numbers, dates, booleans, <see langword="null"/>, strings). Pass the processor's
-        /// <c>Quoter</c>. May be <see langword="null"/> only when <paramref name="sqlText"/>
-        /// contains no <c>$[name]</c> token, since nothing else consults it.
+/// (e.g. numbers, dates, booleans, <see langword="null"/>, strings). Pass the processor's
+/// <c>Quoter</c>. May be <see langword="null"/> only when <paramref name="sqlText"/>
+/// contains no <c>$[name]</c> token that matches a key in <paramref name="parameters"/>, since nothing else consults it.
         /// </param>
         /// <returns>The SQL script with the replaced tokens</returns>
         /// <exception cref="ArgumentNullException">
