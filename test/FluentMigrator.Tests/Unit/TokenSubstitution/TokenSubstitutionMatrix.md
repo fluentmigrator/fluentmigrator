@@ -9,7 +9,7 @@ Tracking issue: [#2336](https://github.com/fluentmigrator/fluentmigrator/issues/
 
 `SqlScriptTokenReplacer` is reached from `Execute.Sql`, `Execute.Script` and `Execute.EmbeddedScript`
 (`ExecuteSqlStatementExpression.ExecuteWith` and `ExecuteSqlScriptExpressionBase.ExecuteWith` are its
-only callers in `src/`). Those call sites pass `processor?.Quoter`, so token output depends on the
+only callers in `src/`). Those call sites pass `processor.Quoter`, so token output depends on the
 whole DI graph, not just on the replacer.
 
 The axes multiply out to roughly 35,000 combinations. Enumerating each as an NUnit case would be
