@@ -62,7 +62,7 @@ non-string values as string literals:
 | `RawSql.Insert("CURRENT_TIMESTAMP")` | `'FluentMigrator.RawSql'` | `CURRENT_TIMESTAMP` |
 
 These are visible in the golden tables rather than asserted individually, because the correct
-behaviour of the fallback is an API decision (see #2336) rather than an unambiguous bug.
+behaviour of the fallback is an API decision (resolved by adr/proposed/RequireQuoterForTokenSubstitution.md, implemented in #2365) rather than an unambiguous bug.
 
 ## After the fixes
 
@@ -93,7 +93,7 @@ take, and it is also what `Insert`/`Update`/`Delete` emit.
 One cell deliberately not changed: `$(x)` still renders a `DateTime` as `07/28/2026 13:45:06`. The
 raw token style is documented as verbatim `ToString()`, and it is invariant-culture, so this is
 consistent - but it is not a portable SQL datetime literal. Callers wanting one should use `$[x]`.
-Noted in #2336 rather than changed here.
+Noted for follow-up rather than changed here; now tracked as #2354.
 
 One cell changed to a throw rather than a value:
 

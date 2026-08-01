@@ -3,7 +3,7 @@
 Reference document for `TokenSubstitutionMatrixTests`. Describes *what* the matrix covers and *why*
 each axis exists. The measured output lives in the `*.verified.md` snapshots beside this file.
 
-Tracking issue: [#2336](https://github.com/fluentmigrator/fluentmigrator/issues/2336).
+Origin: [#2336](https://github.com/fluentmigrator/fluentmigrator/issues/2336), the coverage request this fixture answers. Design decisions since then live in `adr/proposed/RequireQuoterForTokenSubstitution.md`.
 
 ## Why a matrix
 
@@ -104,8 +104,31 @@ because token substitution reads `processor.Quoter` while DML generation reads `
 type strings for DDL. The orthogonality is therefore true by construction today, and this test exists
 so that a future refactor cannot quietly couple them.
 
+## What this fixture does *not* cover
+
+The matrix calls `SqlScriptTokenReplacer` directly with a quoter resolved from a real container. It
+therefore proves what the replacer does with a given quoter, but not that the production call sites
+hand it the right one. That is covered separately, and deliberately, because the two call sites are
+distinct pieces of code:
+
+| Entry point | Call site | Covered by |
+|---|---|---|
+| `Execute.Sql` | `ExecuteSqlStatementExpression.ExecuteWith` | `ExecuteSqlStatementExpressionTests` |
+| `Execute.Script` | `ExecuteSqlScriptExpressionBase.ExecuteWith` | `ExecuteSqlScriptExpressionTests` |
+| `Execute.EmbeddedScript` | same base | `ExecuteEmbeddedSqlExpressionTests` |
+
+Each has a test that expands a `$[name]` token through a mock processor with a stubbed `Quoter`, so
+reverting a call site to `null` fails rather than silently degrading. Before those existed, only
+`Execute.Sql` was pinned - the script paths used `$(name)` exclusively and would have stayed green.
+
 ## Known-wrong cells
 
-Cells that are wrong at the time of writing are marked in the snapshots and tracked in #2336. The
-snapshot is a record of *current* behaviour, not of *desired* behaviour; the assertion tests above
-encode desired behaviour and are the ones that fail while a defect is open.
+The snapshot is a record of *current* behaviour, not of *desired* behaviour; the assertion tests
+above encode desired behaviour and are the ones that fail while a defect is open.
+
+One cell is knowingly wrong today: `$(x)` renders a `DateTime` as `07/28/2026 13:45:06`, which is
+invariant but not a portable SQL datetime literal. Tracked in
+[#2354](https://github.com/fluentmigrator/fluentmigrator/issues/2354). The defects the matrix was
+built to find - [#2332](https://github.com/fluentmigrator/fluentmigrator/issues/2332),
+[#2335](https://github.com/fluentmigrator/fluentmigrator/issues/2335) and the culture and
+fallback bugs - are fixed, so no other cell is pending.
