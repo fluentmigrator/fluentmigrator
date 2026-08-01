@@ -138,4 +138,28 @@
   <data name="RawSqlTokenInterpolationCodeFixTitle" xml:space="preserve">
     <value>Replace with automatically quoted token</value>
   </data>
+  <data name="LegacyStringDictionaryParameterAnalyzerDescription" xml:space="preserve">
+    <value>Execute.Sql, Execute.Script and Execute.EmbeddedScript no longer require the parameter values to be strings. The IDictionary&lt;string, string&gt; overloads are obsolete and are kept only for backwards compatibility; migrate to the IDictionary&lt;string, object&gt; overloads, which support non-string parameter values (numbers, dates, booleans, GUIDs, null) and safe SQL literal quoting.</value>
+  </data>
+  <data name="LegacyStringDictionaryParameterAnalyzerMessageFormat" xml:space="preserve">
+    <value>'{0}' uses the obsolete IDictionary&lt;string, string&gt; parameter overload; use the IDictionary&lt;string, object&gt; overload instead</value>
+  </data>
+  <data name="LegacyStringDictionaryParameterAnalyzerTitle" xml:space="preserve">
+    <value>Prefer IDictionary&lt;string, object&gt; over IDictionary&lt;string, string&gt; for Execute parameters</value>
+  </data>
+  <data name="LegacyStringDictionaryParameterCodeFixTitle" xml:space="preserve">
+    <value>Use IDictionary&lt;string, object&gt; parameter values</value>
+  </data>
+  <data name="QuotedSqlTokenAnalyzerDescription" xml:space="preserve">
+    <value>The $[name] token style expands to a complete SQL literal, already quoted - 'O''Brien', NULL, 1, 0xdead. Placing it inside a string literal therefore quotes the value twice, and only the string case fails loudly: a number silently becomes a string literal, null silently becomes the four-character text 'NULL', and a RawSql value silently becomes text so its SQL never runs. Inside a string literal, use the raw $(name) style, which is designed to supply the content while the surrounding quotes supply the literal.</value>
+  </data>
+  <data name="QuotedSqlTokenAnalyzerMessageFormat" xml:space="preserve">
+    <value>Token '{0}' is inside a {1} string literal and will be quoted twice; use '{2}' instead, or remove the surrounding quotes</value>
+  </data>
+  <data name="QuotedSqlTokenAnalyzerTitle" xml:space="preserve">
+    <value>Automatically quoted token is inside a string literal</value>
+  </data>
+  <data name="QuotedSqlTokenCodeFixTitle" xml:space="preserve">
+    <value>Replace with raw token to substitute inside the string literal</value>
+  </data>
 </root>

@@ -7,6 +7,20 @@
   </PropertyGroup>
   <Import Project="$(MSBuildThisFileDirectory)../../TrimAot.props" />
   <Import Project="$(MSBuildThisFileDirectory)../../PackageLibrary.props" />
+  <!--
+    FluentMigrator.Runner.SqlServer cannot target netstandard2.0, because Microsoft.Data.SqlClient 6.x
+    ships only net462/net8.0/net9.0 assets and this project compiles against SqlClient types. The
+    netstandard2.0 leg therefore resolves that ProjectReference against its net48 output (NU1702), and
+    mixing a net48 assembly into a netstandard2.0 compilation surfaces Microsoft.Extensions.* assembly
+    version conflicts between the net462 and netstandard2.0 assets of the same package (MSB3277).
+    Package consumers are unaffected: NuGet picks the FluentMigrator.Runner.SqlServer asset that
+    matches their own target framework. Drop these once SqlClient ships a netstandard2.0 asset again
+    or FluentMigrator.Runner stops targeting netstandard2.0.
+  -->
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+    <NoWarn>$(NoWarn);NU1702</NoWarn>
+    <MSBuildWarningsAsMessages>$(MSBuildWarningsAsMessages);MSB3277</MSBuildWarningsAsMessages>
+  </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\FluentMigrator.Runner.Core\FluentMigrator.Runner.Core.csproj" />
     <ProjectReference Include="..\FluentMigrator.Runner.Db2\FluentMigrator.Runner.Db2.csproj" />
@@ -25,7 +39,6 @@
     <None Include="..\..\FluentMigrator.snk" Link="FluentMigrator.snk" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="10.3.4" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="$(MicrosoftPackageVersion)" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" />
   </ItemGroup>
 </Project>

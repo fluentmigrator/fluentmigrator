@@ -54,6 +54,11 @@ namespace FluentMigrator.Tests.Unit.Generators
         {
             {"AdditionalColumnDescriptionKey2", "AdditionalColumnDescriptionValue2" }
         };
+        public static Dictionary<string, string> TestMultipleAdditionalColumnDescriptions = new Dictionary<string, string>()
+        {
+            {"AdditionalColumnDescriptionKey1", "AdditionalColumnDescriptionValue1" },
+            {"AdditionalColumnDescriptionKey2", "AdditionalColumnDescriptionValue2" }
+        };
 
         public static Guid TestGuid = Guid.NewGuid();
 
@@ -540,6 +545,14 @@ namespace FluentMigrator.Tests.Unit.Generators
             CreateColumnExpression columnExpression = GetCreateColumnExpression();
             columnExpression.Column.ColumnDescription = TestColumn1Description;
             columnExpression.Column.AdditionalColumnDescriptions = TestAdditionalColumnDescriptions1;
+            return columnExpression;
+        }
+
+        public static CreateColumnExpression GetCreateColumnExpressionWithDescriptionWithMultipleAdditionalDescriptions()
+        {
+            CreateColumnExpression columnExpression = GetCreateColumnExpression();
+            columnExpression.Column.ColumnDescription = TestColumn1Description;
+            columnExpression.Column.AdditionalColumnDescriptions = TestMultipleAdditionalColumnDescriptions;
             return columnExpression;
         }
 

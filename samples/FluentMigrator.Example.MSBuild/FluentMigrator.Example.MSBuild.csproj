@@ -11,6 +11,24 @@
   <ItemGroup>
     <ProjectReference Include="..\FluentMigrator.Example.Migrations\FluentMigrator.Example.Migrations.csproj" />
   </ItemGroup>
+
+  <!--
+    This sample deliberately consumes FluentMigrator.MSBuild as a published NuGet package rather
+    than as a project reference, so that it exercises the same code path a real consumer would.
+    The version lives in Directory.Packages.props in the repository root.
+  -->
+  <ItemGroup>
+    <PackageReference Include="FluentMigrator.MSBuild" GeneratePathProperty="true" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <FluentMigratorTfm Condition="'$(MSBuildRuntimeType)' == 'Core' And '$(TargetFramework)' == 'net8.0'">net8.0</FluentMigratorTfm>
+    <FluentMigratorTfm Condition="'$(MSBuildRuntimeType)' == 'Core' And '$(TargetFramework)' == 'net9.0'">net9.0</FluentMigratorTfm>
+    <FluentMigratorTfm Condition="'$(MSBuildRuntimeType)' == 'Core' And '$(TargetFramework)' == 'net10.0'">net10.0</FluentMigratorTfm>
+    <FluentMigratorTfm Condition="'$(MSBuildRuntimeType)' == 'Full'">net48</FluentMigratorTfm>
+    <FluentMigratorMSBuildAssemblyPath>$(PKGFluentMigrator_MSBuild)\tasks\$(FluentMigratorTfm)\FluentMigrator.MSBuild.dll</FluentMigratorMSBuildAssemblyPath>
+  </PropertyGroup>
+
   <Choose>
     <When Condition="'$(TargetFramework)' == 'net48' ">
       <PropertyGroup>

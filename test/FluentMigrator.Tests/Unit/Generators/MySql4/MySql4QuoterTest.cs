@@ -54,5 +54,33 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
             _quoter.QuoteValue(new TimeSpan(1,2, 13, 65))
                 .ShouldBe("'26:14:05'");
         }
+
+        /// <summary>
+        /// MySQL needs backslashes doubled inside a string literal, and that escaping is what
+        /// <see cref="MySqlQuoter.QuoteValue"/> adds on top of the generic quoter.
+        /// </summary>
+        [Test]
+        public void BackslashInStringIsEscaped()
+        {
+            _quoter.QuoteValue(@"a\b")
+                .ShouldBe(@"'a\\b'");
+        }
+
+        /// <summary>
+        /// Regression test for #2335. <see cref="RawSql"/> is an opt-in escape hatch: the caller has
+        /// taken responsibility for the SQL, so it must reach the server byte-for-byte. The
+        /// string-literal backslash escaping was being applied to it as well, which silently
+        /// corrupted regex predicates, LIKE patterns and JSON paths.
+        /// </summary>
+        [TestCase("CURRENT_TIMESTAMP")]
+        [TestCase(@"c REGEXP '\d+'")]
+        [TestCase(@"path LIKE 'C:\Temp\%'")]
+        [TestCase(@"json_col->'$.a\b'")]
+        [TestCase("name = 'O''Brien'")]
+        public void RawSqlIsPassedThroughVerbatim(string sql)
+        {
+            _quoter.QuoteValue(RawSql.Insert(sql))
+                .ShouldBe(sql);
+        }
     }
 }

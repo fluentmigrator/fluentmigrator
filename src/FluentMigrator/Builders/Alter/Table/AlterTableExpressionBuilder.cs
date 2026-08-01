@@ -76,11 +76,11 @@ namespace FluentMigrator.Builders.Alter.Table
         public void ToSchema(string schemaName)
         {
             var alterSchema = new AlterSchemaExpression
-                                  {
-                                      SourceSchemaName = Expression.SchemaName,
-                                      TableName = Expression.TableName,
-                                      DestinationSchemaName = schemaName
-                                  };
+            {
+                SourceSchemaName = Expression.SchemaName,
+                TableName = Expression.TableName,
+                DestinationSchemaName = schemaName
+            };
 
             _context.Expressions.Add(alterSchema);
         }
@@ -104,12 +104,12 @@ namespace FluentMigrator.Builders.Alter.Table
         {
             var column = new ColumnDefinition { Name = name, ModificationType = ColumnModificationType.Create };
             var createColumn = new CreateColumnExpression
-                                   {
-                                       Column = column,
-                                       SchemaName = Expression.SchemaName,
-                                       TableName = Expression.TableName,
-                                       IfExists = Expression.IfExists
-                                   };
+            {
+                Column = column,
+                SchemaName = Expression.SchemaName,
+                TableName = Expression.TableName,
+                IfExists = Expression.IfExists
+            };
 
             CurrentColumn = column;
 
@@ -122,12 +122,12 @@ namespace FluentMigrator.Builders.Alter.Table
         {
             var column = new ColumnDefinition { Name = name, ModificationType = ColumnModificationType.Alter };
             var alterColumn = new AlterColumnExpression
-                                  {
-                                      Column = column,
-                                      SchemaName = Expression.SchemaName,
-                                      TableName = Expression.TableName,
-                                      IfExists = Expression.IfExists
-                                  };
+            {
+                Column = column,
+                SchemaName = Expression.SchemaName,
+                TableName = Expression.TableName,
+                IfExists = Expression.IfExists
+            };
 
             CurrentColumn = column;
 
@@ -149,12 +149,12 @@ namespace FluentMigrator.Builders.Alter.Table
                 // TODO: This is code duplication from the AlterColumnExpressionBuilder
                 // we need to do a drop constraint and then add constraint to change the default value
                 var dc = new AlterDefaultConstraintExpression
-                             {
-                                 TableName = Expression.TableName,
-                                 SchemaName = Expression.SchemaName,
-                                 ColumnName = CurrentColumn.Name,
-                                 DefaultValue = value
-                             };
+                {
+                    TableName = Expression.TableName,
+                    SchemaName = Expression.SchemaName,
+                    ColumnName = CurrentColumn.Name,
+                    DefaultValue = value
+                };
 
                 _context.Expressions.Add(dc);
             }
@@ -166,8 +166,8 @@ namespace FluentMigrator.Builders.Alter.Table
         /// <inheritdoc />
         public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax SetExistingRowsTo(object value)
         {
-           ColumnHelper.SetExistingRowsTo(value);
-           return this;
+            ColumnHelper.SetExistingRowsTo(value);
+            return this;
         }
 
         /// <inheritdoc />
@@ -180,20 +180,26 @@ namespace FluentMigrator.Builders.Alter.Table
         /// <inheritdoc />
         public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax WithColumnAdditionalDescription(string descriptionName, string description)
         {
+            ValidateColumnAdditionalDescription(descriptionName, description);
+
+            CurrentColumn.AdditionalColumnDescriptions.Add(descriptionName, description);
+
+            return this;
+        }
+
+        private void ValidateColumnAdditionalDescription(string descriptionName, string description)
+        {
             if (string.IsNullOrWhiteSpace(descriptionName))
                 throw new ArgumentException(@"Cannot be a null or empty string.", nameof(descriptionName));
 
-            if (description.Equals("Description"))
+            if (descriptionName.Equals("Description"))
                 throw new InvalidOperationException("The given descriptionName is already used as a keyword to create a description, please choose another descriptionName.");
 
             if (string.IsNullOrWhiteSpace(description))
                 throw new ArgumentException(@"Cannot be a null or empty string.", nameof(description));
 
-            if (CurrentColumn.AdditionalColumnDescriptions.Keys.Count(i => i.Equals(descriptionName)) > 0)
+            if (CurrentColumn.AdditionalColumnDescriptions.Keys.Any(i => i.Equals(descriptionName)))
                 throw new InvalidOperationException("The given descriptionName is already present in the columnDescription list.");
-
-            CurrentColumn.AdditionalColumnDescriptions.Add(descriptionName, description);
-            return this;
         }
 
         /// <inheritdoc />
@@ -202,23 +208,18 @@ namespace FluentMigrator.Builders.Alter.Table
             if (columnDescriptions == null)
                 throw new ArgumentNullException(nameof(columnDescriptions));
 
-            if (!columnDescriptions.Any())
+            if (columnDescriptions.Count == 0)
                 throw new ArgumentException(@"Cannot be empty.", nameof(columnDescriptions));
 
-            if (CurrentColumn.AdditionalColumnDescriptions.Keys.Count(i => i.Equals("Description")) > 0)
-                throw new InvalidOperationException("The given descriptionName is already present in the columnDescription list.");
-
-            var isPresent = false;
             foreach (var newDescription in columnDescriptions)
             {
-                if (!isPresent)
-                {
-                    isPresent = CurrentColumn.AdditionalColumnDescriptions.Keys.Count(i => i.Equals(newDescription.Key)) > 0;
-                }
+                ValidateColumnAdditionalDescription(newDescription.Key, newDescription.Value);
             }
 
-            if (isPresent)
-                throw new ArgumentException(@"At least one of new keys provided is already present in the columnDescription list.", nameof(columnDescriptions));
+            foreach (var newDescription in columnDescriptions)
+            {
+                CurrentColumn.AdditionalColumnDescriptions.Add(newDescription.Key, newDescription.Value);
+            }
 
             return this;
         }
@@ -353,16 +354,16 @@ namespace FluentMigrator.Builders.Alter.Table
                                                                                                      string foreignTableName, string foreignColumnName)
         {
             var fk = new CreateForeignKeyExpression
-                         {
-                             ForeignKey = new ForeignKeyDefinition
-                                              {
-                                                  Name = foreignKeyName,
-                                                  PrimaryTable = Expression.TableName,
-                                                  PrimaryTableSchema = Expression.SchemaName,
-                                                  ForeignTable = foreignTableName,
-                                                  ForeignTableSchema = foreignTableSchema
-                                              }
-                         };
+            {
+                ForeignKey = new ForeignKeyDefinition
+                {
+                    Name = foreignKeyName,
+                    PrimaryTable = Expression.TableName,
+                    PrimaryTableSchema = Expression.SchemaName,
+                    ForeignTable = foreignTableName,
+                    ForeignTableSchema = foreignTableSchema
+                }
+            };
 
             fk.ForeignKey.PrimaryColumns.Add(CurrentColumn.Name);
             fk.ForeignKey.ForeignColumns.Add(foreignColumnName);

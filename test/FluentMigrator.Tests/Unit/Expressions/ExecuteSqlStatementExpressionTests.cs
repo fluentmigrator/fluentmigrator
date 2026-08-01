@@ -16,6 +16,7 @@
 //
 #endregion
 
+using System;
 using System.Collections.Generic;
 
 using FluentMigrator.Expressions;
@@ -121,6 +122,56 @@ namespace FluentMigrator.Tests.Unit.Expressions
         }
 
         [Test]
+        public void MergingWellKnownTokensPreservesTheParameterKeyComparer()
+        {
+            var tokenProvider = new Mock<ISqlTokenProvider>();
+            tokenProvider
+                .Setup(x => x.GetTokens())
+                .Returns(new Dictionary<string, string> { { "DefaultSchema", "dbo" } });
+
+            var expression = new ExecuteSqlStatementExpression()
+            {
+                SqlStatement = "ALTER TABLE $(defaultschema).$(tableprefix)BLAH ADD COLUMN Foo INT",
+                Parameters = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+                {
+                    { "TablePrefix", "App_" },
+                },
+                SqlScriptTokenProviders = new[] { tokenProvider.Object },
+            };
+
+            var processor = new Mock<IMigrationProcessor>();
+            processor.Setup(x => x.Execute("ALTER TABLE dbo.App_BLAH ADD COLUMN Foo INT")).Verifiable();
+
+            expression.ExecuteWith(processor.Object);
+            processor.Verify();
+        }
+
+        [Test]
+        public void MergingWellKnownTokensPreservesSortedParameterKeyComparer()
+        {
+            var tokenProvider = new Mock<ISqlTokenProvider>();
+            tokenProvider
+                .Setup(x => x.GetTokens())
+                .Returns(new Dictionary<string, string> { { "DefaultSchema", "dbo" } });
+
+            var expression = new ExecuteSqlStatementExpression()
+            {
+                SqlStatement = "ALTER TABLE $(defaultschema).$(tableprefix)BLAH ADD COLUMN Foo INT",
+                Parameters = new SortedDictionary<string, object>(StringComparer.OrdinalIgnoreCase)
+                {
+                    { "TablePrefix", "App_" },
+                },
+                SqlScriptTokenProviders = new[] { tokenProvider.Object },
+            };
+
+            var processor = new Mock<IMigrationProcessor>();
+            processor.Setup(x => x.Execute("ALTER TABLE dbo.App_BLAH ADD COLUMN Foo INT")).Verifiable();
+
+            expression.ExecuteWith(processor.Object);
+            processor.Verify();
+        }
+
+        [Test]
         public void ExecutesTheStatementWithWellKnownTokensUsingQuotedTokenSyntax()
         {
             var tokenProvider = new Mock<ISqlTokenProvider>();
@@ -135,6 +186,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             };
 
             var processor = new Mock<IMigrationProcessor>();
+            processor.SetupGet(x => x.Quoter).Returns(new GenericQuoter());
             processor.Setup(x => x.Execute("SELECT * FROM Users WHERE SchemaName = 'te''nant'")).Verifiable();
 
             expression.ExecuteWith(processor.Object);
@@ -157,6 +209,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             };
 
             var processor = new Mock<IMigrationProcessor>();
+            processor.SetupGet(x => x.Quoter).Returns(new GenericQuoter());
             processor.Setup(x => x.Execute("SELECT * FROM Users WHERE SchemaName = 'tenant1'")).Verifiable();
 
             expression.ExecuteWith(processor.Object);

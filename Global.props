@@ -34,8 +34,9 @@
     <MicrosoftPackageVersion>10.0.8</MicrosoftPackageVersion>
   </PropertyGroup>
 
+  <!-- Package versions are managed centrally; see Directory.Packages.props in the repository root. -->
   <ItemGroup>
-    <PackageReference Include="JetBrains.Annotations" Version="2025.2.4" PrivateAssets="All" />
+    <PackageReference Include="JetBrains.Annotations" PrivateAssets="All" />
   </ItemGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)'=='net48'">

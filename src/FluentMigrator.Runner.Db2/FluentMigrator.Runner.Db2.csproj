@@ -17,7 +17,7 @@
     <ProjectReference Include="..\FluentMigrator\FluentMigrator.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Net.IBM.Data.Db2" Version="9.0.0.300" Condition=" '$(OS)' == 'Windows_NT' " />
-    <PackageReference Include="Net.IBM.Data.Db2-lnx" Version="9.0.0.300" Condition=" '$(OS)' != 'Windows_NT' " />
+    <PackageReference Include="Net.IBM.Data.Db2" Condition=" '$(OS)' == 'Windows_NT' " />
+    <PackageReference Include="Net.IBM.Data.Db2-lnx" Condition=" '$(OS)' != 'Windows_NT' " />
   </ItemGroup>
 </Project>

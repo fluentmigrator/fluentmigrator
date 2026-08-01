@@ -40,30 +40,30 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v5
+      uses: actions/checkout@v7
       with:
         fetch-depth: 0
 
     - name: Install GitVersion
-      uses: gittools/actions/gitversion/setup@v4.5.0
+      uses: gittools/actions/gitversion/setup@v4.7.0
       with:
         versionSpec: 6.3.x
 
     - name: Execute GitVersion
       id: gitversion
-      uses: gittools/actions/gitversion/execute@v4.5.0
+      uses: gittools/actions/gitversion/execute@v4.7.0
       env:
         BUILD_BUILDNUMBER: ${{ env.GitVersion.NuGetVersionV2 }}
       with:
         updateAssemblyInfo: false
 
     - name: Setup dotnet SDK
-      uses: actions/setup-dotnet@v5
+      uses: actions/setup-dotnet@v6
       with:
         dotnet-version: '9.0.x'
 
     - name: Setup dotnet SDK
-      uses: actions/setup-dotnet@v5
+      uses: actions/setup-dotnet@v6
       with:
         dotnet-version: '10.0.x'
 
@@ -166,7 +166,7 @@ jobs:
         find . -type f -iname "*cobertura.xml" || true
 
     - name: Combine Coverage Reports
-      uses: danielpalme/ReportGenerator-GitHub-Action@v5.5.10
+      uses: danielpalme/ReportGenerator-GitHub-Action@5.5.11
       if: '!cancelled()'
       with:
         reports: "**/*.cobertura.xml"
@@ -185,7 +185,7 @@ jobs:
       run: cat coveragereport/SummaryGithub.md >> "$GITHUB_STEP_SUMMARY"
 
     - name: Upload Combined Coverage XML
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v7
       if: '!cancelled()'
       with:
         name: coverage-${{ matrix.os }}-${{ matrix.dotnet-tfm }}
@@ -193,7 +193,7 @@ jobs:
         retention-days: 5
 
     - name: Add Coverage PR Comment
-      uses: marocchino/sticky-pull-request-comment@v2
+      uses: marocchino/sticky-pull-request-comment@v3
       # Only the Linux leg comments: both matrix legs share one sticky comment
       # id, so without this they race and clobber each other.
       # Fork PRs get a read-only token, so commenting is best-effort.
@@ -205,7 +205,7 @@ jobs:
         path: coveragereport/SummaryGithub.md
 
     - name: Upload Test Result Files
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v7
       if: '!cancelled()'
       with:
         name: test-results-${{ matrix.os }}-${{ matrix.dotnet-tfm }}

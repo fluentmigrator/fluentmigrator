@@ -10,21 +10,31 @@
   <ItemGroup>
     <Compile Include="..\FluentMigrator.Runner.Core\DirtyAssemblyResolveHelper.cs" Link="DirtyAssemblyResolveHelper.cs" />
   </ItemGroup>
+  <!-- Package versions come from Directory.Packages.props in the repository root. -->
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="15.0.1" />
-    <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="10.3.4" />
-    <PackageReference Include="FSharp.Core" Version="9.0.303" />
-    <PackageReference Include="McMaster.Extensions.CommandLineUtils" Version="4.1.1" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="$(MicrosoftPackageVersion)" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="$(MicrosoftPackageVersion)" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="$(MicrosoftPackageVersion)" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="$(MicrosoftPackageVersion)" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="$(MicrosoftPackageVersion)" />
-    <PackageReference Include="MySqlConnector" Version="2.5.0" />
-    <PackageReference Include="Npgsql" Version="10.0.2" />
-    <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="23.26.200" />
-    <PackageReference Include="Snowflake.Data" Version="5.6.0" />
-    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="3.0.3" />
+    <!--
+      Mapperly is a compile-time source generator. ExcludeAssets="runtime" and PrivateAssets="all"
+      keep it out of the shipped tool entirely, so dotnet-fm gains no runtime mapping dependency.
+    -->
+    <PackageReference Include="Riok.Mapperly" ExcludeAssets="runtime" PrivateAssets="all" />
+    <PackageReference Include="FirebirdSql.Data.FirebirdClient" />
+    <PackageReference Include="FSharp.Core" />
+    <PackageReference Include="McMaster.Extensions.CommandLineUtils" />
+    <PackageReference Include="Microsoft.Data.Sqlite" />
+    <!--
+      Snowflake.Data 5.x requires Microsoft.Extensions.Logging 9.0.5. Overriding here rather than
+      raising the shared floors in Directory.Packages.props keeps the shipped libraries on their
+      8.0.0 minimum; dotnet-fm is a self-contained tool, so its own floor binds nobody.
+    -->
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" VersionOverride="9.0.5" />
+    <PackageReference Include="Microsoft.Extensions.Logging" VersionOverride="9.0.5" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" />
+    <PackageReference Include="MySqlConnector" />
+    <PackageReference Include="Npgsql" />
+    <PackageReference Include="Oracle.ManagedDataAccess.Core" />
+    <PackageReference Include="Snowflake.Data" />
+    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FluentMigrator.Runner\FluentMigrator.Runner.csproj" />
