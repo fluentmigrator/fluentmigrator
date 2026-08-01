@@ -351,8 +351,13 @@ namespace FluentMigrator.Tests.Unit.TokenSubstitution
             sb.AppendLine($"- generator.Quoter: `{r.GeneratorQuoter.GetType().Name}`");
             sb.AppendLine($"- processor.Quoter: `{r.ProcessorQuoter.GetType().Name}`");
             sb.AppendLine();
-            sb.AppendLine("| value | `$(x)` | `$[x]` no quoter | `$[x]` w/ quoter | QuoteValue (DML) |");
-            sb.AppendLine("|---|---|---|---|---|");
+            // There was once a "no quoter" column here, recording what the private QuoteSqlLiteral
+            // fallback rendered. That fallback is gone: a null quoter now throws, identically for
+            // every value and every dialect, so the column carried one fact repeated 161 times.
+            // The contract it documented is covered once, in SqlScriptTokenReplacerTests, by
+            // ThrowsWhenSafeTokenIsExpandedWithoutAQuoter and its two companions.
+            sb.AppendLine("| value | `$(x)` | `$[x]` w/ quoter | QuoteValue (DML) |");
+            sb.AppendLine("|---|---|---|---|");
 
             foreach (var v in ValueCases())
             {
@@ -360,7 +365,6 @@ namespace FluentMigrator.Tests.Unit.TokenSubstitution
                     " | ",
                     "| " + v.Label,
                     Cell(Expand(RawToken, v.Value, r.ProcessorQuoter)),
-                    Cell(Expand(SafeToken, v.Value, null)),
                     Cell(Expand(SafeToken, v.Value, r.ProcessorQuoter)),
                     Cell(QuoteValueOrThrow(r.GeneratorQuoter, v.Value)) + " |"));
             }

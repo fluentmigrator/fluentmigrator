@@ -35,14 +35,14 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void ReturnsOriginalTextWhenParametersAreNull()
         {
-            SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT $(Foo)", (IDictionary<string, object>)null)
+            SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT $(Foo)", (IDictionary<string, object>)null, null)
                 .ShouldBe("SELECT $(Foo)");
         }
 
         [Test]
         public void ReturnsOriginalTextWhenParametersAreEmpty()
         {
-            SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT $(Foo)", new Dictionary<string, object>())
+            SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT $(Foo)", new Dictionary<string, object>(), null)
                 .ShouldBe("SELECT $(Foo)");
         }
 
@@ -51,7 +51,7 @@ namespace FluentMigrator.Tests.Unit
         {
             var parameters = new Dictionary<string, object> { ["TablePrefix"] = "App_" };
 
-            SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT * FROM $(TablePrefix)Users", parameters)
+            SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT * FROM $(TablePrefix)Users", parameters, null)
                 .ShouldBe("SELECT * FROM App_Users");
         }
 
@@ -65,7 +65,7 @@ namespace FluentMigrator.Tests.Unit
                 CultureInfo.CurrentCulture = new CultureInfo("fr-FR");
                 var parameters = new Dictionary<string, object> { ["Price"] = 12.34m };
 
-                SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT $(Price)", parameters)
+                SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT $(Price)", parameters, null)
                     .ShouldBe("SELECT 12.34");
             }
             finally
@@ -82,7 +82,7 @@ namespace FluentMigrator.Tests.Unit
                 ["CurrentTimestamp"] = RawSql.Insert("CURRENT_TIMESTAMP")
             };
 
-            SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT $(CurrentTimestamp)", parameters)
+            SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT $(CurrentTimestamp)", parameters, null)
                 .ShouldBe("SELECT CURRENT_TIMESTAMP");
         }
 
@@ -91,7 +91,7 @@ namespace FluentMigrator.Tests.Unit
         {
             var parameters = new Dictionary<string, object> { ["Known"] = "Value" };
 
-            SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT $(Unknown)", parameters)
+            SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT $(Unknown)", parameters, null)
                 .ShouldBe("SELECT $(Unknown)");
         }
 
@@ -100,7 +100,7 @@ namespace FluentMigrator.Tests.Unit
         {
             var parameters = new Dictionary<string, object> { ["Foo"] = "Bar" };
 
-            SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT '$$((Foo))'", parameters)
+            SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT '$$((Foo))'", parameters, null)
                 .ShouldBe("SELECT '$(Foo)'");
         }
 
@@ -109,7 +109,7 @@ namespace FluentMigrator.Tests.Unit
         {
             var parameters = new Dictionary<string, object> { ["DefaultStatus"] = "isn't active" };
 
-            SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT $[DefaultStatus]", parameters)
+            SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT $[DefaultStatus]", parameters, new GenericQuoter())
                 .ShouldBe("SELECT 'isn''t active'");
         }
 
@@ -118,7 +118,7 @@ namespace FluentMigrator.Tests.Unit
         {
             var parameters = new Dictionary<string, object> { ["Value"] = null };
 
-            SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT $[Value]", parameters)
+            SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT $[Value]", parameters, new GenericQuoter())
                 .ShouldBe("SELECT NULL");
         }
 
@@ -127,7 +127,7 @@ namespace FluentMigrator.Tests.Unit
         {
             var parameters = new Dictionary<string, object> { ["Known"] = "Value" };
 
-            SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT $[Unknown]", parameters)
+            SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT $[Unknown]", parameters, new GenericQuoter())
                 .ShouldBe("SELECT $[Unknown]");
         }
 
@@ -136,7 +136,7 @@ namespace FluentMigrator.Tests.Unit
         {
             var parameters = new Dictionary<string, object> { ["Foo"] = "Bar" };
 
-            SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT '$$[[Foo]]'", parameters)
+            SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT '$$[[Foo]]'", parameters, new GenericQuoter())
                 .ShouldBe("SELECT '$[Foo]'");
         }
 
@@ -152,7 +152,7 @@ namespace FluentMigrator.Tests.Unit
 
             var sql = SqlScriptTokenReplacer.ReplaceSqlScriptTokens(
                 "INSERT INTO $(TablePrefix)Users (Status, CreatedAt) VALUES ($[DefaultStatus], $(CurrentDate));",
-                parameters);
+                parameters, new GenericQuoter());
 
             sql.ShouldBe("INSERT INTO App_Users (Status, CreatedAt) VALUES ('isn''t active', GETDATE());");
         }
@@ -213,13 +213,44 @@ namespace FluentMigrator.Tests.Unit
                 .ShouldBe("SELECT * FROM App_Users");
         }
 
+        /// <summary>
+        /// The obsolete overload does not expand <c>$[name]</c>, and never did: that token style
+        /// arrived long after this overload, and 8.0.1 returned such text unchanged. There is also
+        /// no quoter here to render it with. Restoring that is deliberate - see
+        /// <c>adr/proposed/RequireQuoterForTokenSubstitution.md</c>.
+        /// </summary>
         [Test]
-        public void LegacyStringDictionaryOverloadReplacesSafeTokenWithQuotedLiteral()
+        public void LegacyStringDictionaryOverloadLeavesSafeTokenVerbatim()
         {
             var parameters = new Dictionary<string, string> { ["Name"] = "isn't" };
 
             SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT $[Name]", parameters)
-                .ShouldBe("SELECT 'isn''t'");
+                .ShouldBe("SELECT $[Name]");
+        }
+
+        /// <summary>
+        /// The escape form travels with the token it escapes. Both arrived together, so an overload
+        /// that does not expand <c>$[name]</c> must not rewrite <c>$$[[name]]</c> either.
+        /// </summary>
+        [Test]
+        public void LegacyStringDictionaryOverloadLeavesSafeTokenEscapeVerbatim()
+        {
+            var parameters = new Dictionary<string, string> { ["Foo"] = "Bar" };
+
+            SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT '$$[[Foo]]'", parameters)
+                .ShouldBe("SELECT '$$[[Foo]]'");
+        }
+
+        /// <summary>
+        /// The raw token style is unaffected, which is what 8.0.1 callers actually use.
+        /// </summary>
+        [Test]
+        public void LegacyStringDictionaryOverloadStillExpandsRawTokenAndItsEscape()
+        {
+            var parameters = new Dictionary<string, string> { ["Foo"] = "Bar" };
+
+            SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT $(Foo), '$$((Foo))'", parameters)
+                .ShouldBe("SELECT Bar, '$(Foo)'");
         }
 
         [Test]
@@ -262,5 +293,53 @@ namespace FluentMigrator.Tests.Unit
                 .ShouldBe("SELECT * FROM App_Users");
         }
 #pragma warning restore CS0618 // Type or member is obsolete
+
+        #region Quoter is required only where $[name] is expanded
+
+        // The guard lives inside the $[name] branch rather than at method entry. These two tests
+        // are the pair that makes that visible; the second is the one that regresses if someone
+        // "tidies" the check up to the top of the method.
+        // See adr/proposed/RequireQuoterForTokenSubstitution.md.
+
+        [Test]
+        public void ThrowsWhenSafeTokenIsExpandedWithoutAQuoter()
+        {
+            var parameters = new Dictionary<string, object> { ["DefaultStatus"] = "active" };
+
+            var exception = Assert.Throws<ArgumentNullException>(
+                () => SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT $[DefaultStatus]", parameters, quoter: null));
+
+            Assert.Multiple(() =>
+            {
+                exception.ParamName.ShouldBe("quoter");
+
+                // Names the token that forced the failure, so a long script points at one place.
+                exception.Message.ShouldContain("$[DefaultStatus]");
+            });
+        }
+
+        [Test]
+        public void DoesNotRequireAQuoterWhenOnlyRawTokensAreExpanded()
+        {
+            var parameters = new Dictionary<string, object> { ["TablePrefix"] = "App_" };
+
+            SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT * FROM $(TablePrefix)Users", parameters, quoter: null)
+                .ShouldBe("SELECT * FROM App_Users");
+        }
+
+        /// <summary>
+        /// An unresolved <c>$[name]</c> is left verbatim without consulting the quoter, so it never
+        /// reaches the guard.
+        /// </summary>
+        [Test]
+        public void DoesNotRequireAQuoterForAnUnknownSafeToken()
+        {
+            var parameters = new Dictionary<string, object> { ["Known"] = "Value" };
+
+            SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT $[Unknown]", parameters, quoter: null)
+                .ShouldBe("SELECT $[Unknown]");
+        }
+
+        #endregion
     }
 }

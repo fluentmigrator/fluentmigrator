@@ -186,6 +186,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             };
 
             var processor = new Mock<IMigrationProcessor>();
+            processor.SetupGet(x => x.Quoter).Returns(new GenericQuoter());
             processor.Setup(x => x.Execute("SELECT * FROM Users WHERE SchemaName = 'te''nant'")).Verifiable();
 
             expression.ExecuteWith(processor.Object);
@@ -208,6 +209,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             };
 
             var processor = new Mock<IMigrationProcessor>();
+            processor.SetupGet(x => x.Quoter).Returns(new GenericQuoter());
             processor.Setup(x => x.Execute("SELECT * FROM Users WHERE SchemaName = 'tenant1'")).Verifiable();
 
             expression.ExecuteWith(processor.Object);
