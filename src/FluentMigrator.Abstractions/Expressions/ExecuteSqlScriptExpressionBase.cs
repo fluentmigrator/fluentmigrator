@@ -48,7 +48,7 @@ namespace FluentMigrator.Expressions
         /// <param name="sqlScript">The SQL script to execute</param>
         protected void Execute(IMigrationProcessor processor, [StringSyntax("sql")] string sqlScript)
         {
-            var finalSqlScript = SqlScriptTokenReplacer.ReplaceSqlScriptTokens(sqlScript, GetMergedParameters(), processor?.Quoter);
+            var finalSqlScript = SqlScriptTokenReplacer.ReplaceSqlScriptTokens(sqlScript, GetMergedParameters(), processor.Quoter);
             processor.Execute(finalSqlScript);
         }
 
