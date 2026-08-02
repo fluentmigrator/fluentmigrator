@@ -131,6 +131,26 @@ This allows loading migration assemblies (e.g., .NET 6.0) in a different runtime
 
 When running multiple instances of your application (load-balanced scenarios), you need to prevent concurrent migration execution.
 
+#### Application Locker API
+
+Implement `IApplicationLocker` with your preferred coordination mechanism, such as Kubernetes leader election or a distributed store, and register it with the runner:
+
+```csharp
+public sealed class MigrationApplicationLocker : IApplicationLocker
+{
+    public IDisposable AcquireLock()
+    {
+        return distributedLock.Acquire("my-app-migrations");
+    }
+}
+
+services
+    .AddFluentMigratorCore()
+    .ConfigureApplicationLocker<MigrationApplicationLocker>();
+```
+
+The runner holds the lock while it initializes the version table and executes the requested operation. `AcquireLock()` must wait until the application-wide lock is acquired, and disposing its returned handle must release the lock. A database-backed implementation should use a dedicated connection so that migration transactions cannot release the lock early.
+
 #### Database-Dependent Application Locking (SQL Server)
 
 **Acquire lock before all migrations:**
