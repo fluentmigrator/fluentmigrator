@@ -1,0 +1,11 @@
+﻿-- Processor: DB2 iSeries
+-- Generator: Db2ISeriesGenerator
+
+CREATE TABLE VersionInfo (Version BIGINT NOT NULL);
+CREATE UNIQUE INDEX UC_Version ON VersionInfo (Version);
+
+ALTER TABLE VersionInfo ADD COLUMN AppliedOn TIMESTAMP DEFAULT;
+
+ALTER TABLE VersionInfo ADD COLUMN Description VARGRAPHIC(1024) CCSID 1200 DEFAULT;
+CREATE TABLE Users (Id INTEGER NOT NULL, Name VARGRAPHIC(100) CCSID 1200 NOT NULL, CONSTRAINT PK_Users PRIMARY KEY (Id));
+INSERT INTO VersionInfo (Version, AppliedOn, Description) VALUES (1, (CURRENT_TIMESTAMP - CURRENT_TIMEZONE), 'CreateTableMigration');
