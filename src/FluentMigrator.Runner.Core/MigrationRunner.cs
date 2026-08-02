@@ -28,6 +28,7 @@ using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Exceptions;
 using FluentMigrator.Runner.Exceptions;
 using FluentMigrator.Runner.Processors;
+using FluentMigrator.Runner.Versioning;
 
 using JetBrains.Annotations;
 
@@ -346,6 +347,14 @@ namespace FluentMigrator.Runner
             {
                 try
                 {
+                    if (_processorOptions.PreviewOnly && _options.NoConnection && _options.PreviewFromNothing)
+                    {
+                        Up(new VersionSchemaMigration(VersionLoader.VersionTableMetaData));
+                        Up(new VersionMigration(VersionLoader.VersionTableMetaData));
+                        Up(new VersionUniqueMigration(VersionLoader.VersionTableMetaData));
+                        Up(new VersionDescriptionMigration(VersionLoader.VersionTableMetaData));
+                    }
+
                     ApplyMaintenance(MigrationStage.BeforeAll, useAutomaticTransactionManagement);
 
                     // The list of migrations to apply must be computed after the BeforeAll maintenance
@@ -982,5 +991,3 @@ namespace FluentMigrator.Runner
         }
     }
 }
-
-
