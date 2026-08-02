@@ -15,6 +15,8 @@
 #endregion
 
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 using FluentMigrator.Generation;
 using FluentMigrator.Infrastructure;
@@ -113,6 +115,37 @@ namespace FluentMigrator.Tests.Unit
             migrationScope.Verify(x => x.Dispose(), Times.Once());
             locker.DisposalCount.ShouldBe(1);
             locker.IsLocked.ShouldBeFalse();
+        }
+
+        [Test]
+        public void DeferredChildTaskReacquiresReleasedLock()
+        {
+            var locker = new TrackingApplicationLocker();
+            var migrationScope = new Mock<IMigrationScope>();
+            var innerRunner = new Mock<IMigrationRunner>();
+            innerRunner.Setup(x => x.BeginScope()).Returns(migrationScope.Object);
+            var runner = new ApplicationLockingMigrationRunner(innerRunner.Object, locker);
+            using var childStarted = new ManualResetEventSlim();
+            using var runChild = new ManualResetEventSlim();
+            Task childTask;
+
+            using (runner.BeginScope())
+            {
+                childTask = Task.Run(
+                    () =>
+                    {
+                        childStarted.Set();
+                        runChild.Wait();
+                        runner.MigrateUp();
+                    });
+                childStarted.Wait();
+            }
+
+            runChild.Set();
+            childTask.Wait();
+
+            locker.AcquisitionCount.ShouldBe(2);
+            locker.DisposalCount.ShouldBe(2);
         }
 
         [Test]

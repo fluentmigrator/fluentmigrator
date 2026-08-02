@@ -26,7 +26,7 @@ namespace FluentMigrator.Runner.Infrastructure
     {
         private readonly IMigrationRunner _runner;
         private readonly IApplicationLocker _applicationLocker;
-        private readonly AsyncLocal<int> _lockDepth = new AsyncLocal<int>();
+        private readonly ThreadLocal<LockContext> _lockContext = new ThreadLocal<LockContext>();
 
         public ApplicationLockingMigrationRunner(
             IMigrationRunner runner,
@@ -107,23 +107,25 @@ namespace FluentMigrator.Runner.Infrastructure
 
         public IMigrationScope BeginScope()
         {
-            if (_lockDepth.Value != 0)
+            var previousContext = _lockContext.Value;
+            if (previousContext?.IsActive == true)
             {
                 return _runner.BeginScope();
             }
 
             var applicationLock = _applicationLocker.AcquireLock();
-            ++_lockDepth.Value;
+            var lockContext = new LockContext();
+            _lockContext.Value = lockContext;
             try
             {
                 return new ApplicationLockingMigrationScope(
                     _runner.BeginScope(),
                     applicationLock,
-                    () => --_lockDepth.Value);
+                    () => ReleaseContext(lockContext, previousContext));
             }
             catch
             {
-                --_lockDepth.Value;
+                ReleaseContext(lockContext, previousContext);
                 applicationLock.Dispose();
                 throw;
             }
@@ -141,23 +143,39 @@ namespace FluentMigrator.Runner.Infrastructure
 
         private T ExecuteWithLock<T>(Func<T> action)
         {
-            if (_lockDepth.Value != 0)
+            var previousContext = _lockContext.Value;
+            if (previousContext?.IsActive == true)
             {
                 return action();
             }
 
             using (_applicationLocker.AcquireLock())
             {
-                ++_lockDepth.Value;
+                var lockContext = new LockContext();
+                _lockContext.Value = lockContext;
                 try
                 {
                     return action();
                 }
                 finally
                 {
-                    --_lockDepth.Value;
+                    ReleaseContext(lockContext, previousContext);
                 }
             }
+        }
+
+        private void ReleaseContext(LockContext lockContext, LockContext previousContext)
+        {
+            lockContext.IsActive = false;
+            if (ReferenceEquals(_lockContext.Value, lockContext))
+            {
+                _lockContext.Value = previousContext;
+            }
+        }
+
+        private sealed class LockContext
+        {
+            public volatile bool IsActive = true;
         }
 
         private sealed class ApplicationLockingMigrationScope : IMigrationScope
