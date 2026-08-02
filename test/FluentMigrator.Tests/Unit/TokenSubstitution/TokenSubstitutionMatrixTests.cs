@@ -60,7 +60,7 @@ namespace FluentMigrator.Tests.Unit.TokenSubstitution
     /// while the value x token-style grid becomes a snapshot payload. A regression surfaces as a
     /// one-cell diff in a markdown table rather than one of 35,000 opaque case names.
     /// </para>
-    /// <para>Tracking issue: https://github.com/fluentmigrator/fluentmigrator/issues/2336</para>
+    /// <para>Origin: https://github.com/fluentmigrator/fluentmigrator/issues/2336</para>
     /// </remarks>
     [TestFixture]
     [Category("SqlScriptTokenReplacer")]
@@ -103,6 +103,11 @@ namespace FluentMigrator.Tests.Unit.TokenSubstitution
         private static IEnumerable<DialectCase> DialectCases()
         {
             // --- SQL Server -------------------------------------------------------------------
+            // The unversioned entry point is a separate registration block, not a delegation to the
+            // versioned one - AddSqlServer() wires SqlServer2016Processor/Generator and
+            // SqlServer2008Quoter in its own body. It is also the form most user code calls, so it
+            // is pinned here rather than assumed to match AddSqlServer2016().
+            yield return new DialectCase("SqlServer(unversioned)", "SqlServer", b => b.AddSqlServer());
             yield return new DialectCase("SqlServer2000", "SqlServer", b => b.AddSqlServer2000());
             yield return new DialectCase("SqlServer2005", "SqlServer", b => b.AddSqlServer2005());
             yield return new DialectCase("SqlServer2008", "SqlServer", b => b.AddSqlServer2008());
@@ -111,6 +116,8 @@ namespace FluentMigrator.Tests.Unit.TokenSubstitution
             yield return new DialectCase("SqlServer2016", "SqlServer", b => b.AddSqlServer2016());
 
             // --- MySQL: MySql4/5/8 differ only by ITypeMap, so their matrices must be identical.
+            // Likewise its own block, wiring MySql8Processor/Generator.
+            yield return new DialectCase("MySql(unversioned)", "MySql", b => b.AddMySql());
             yield return new DialectCase("MySql4", "MySql", b => b.AddMySql4());
             yield return new DialectCase("MySql5", "MySql", b => b.AddMySql5(), typeMapVariantOf: "MySql4");
             yield return new DialectCase("MySql8", "MySql", b => b.AddMySql8(), typeMapVariantOf: "MySql4");
@@ -185,6 +192,7 @@ namespace FluentMigrator.Tests.Unit.TokenSubstitution
             yield return new DialectCase("Db2", "Other", b => b.AddDb2());
             yield return new DialectCase("Db2ISeries", "Other", b => b.AddDb2ISeries());
             yield return new DialectCase("Firebird", "Other", b => b.AddFirebird());
+            yield return new DialectCase("Hana(unversioned)", "Other", b => b.AddHana());
             yield return new DialectCase("Hana8", "Other", b => b.AddHana8());
             yield return new DialectCase("Hana10", "Other", b => b.AddHana10());
             yield return new DialectCase("Redshift", "Other", b => b.AddRedshift());

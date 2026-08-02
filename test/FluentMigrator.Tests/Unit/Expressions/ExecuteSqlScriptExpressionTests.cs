@@ -25,6 +25,8 @@ using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner;
 using FluentMigrator.Tests.Helpers;
 
+using FluentMigrator.Runner.Generators.Generic;
+
 using Moq;
 
 using NUnit.Framework;
@@ -143,6 +145,58 @@ namespace FluentMigrator.Tests.Unit.Expressions
             var processed = expression.Apply(conventionSet);
 
             processed.SqlScript.ShouldBe(scriptOnAnotherDrive);
+        }
+
+        /// <summary>
+        /// <c>Execute.Script</c> reaches the token replacer through
+        /// <c>ExecuteSqlScriptExpressionBase.ExecuteWith</c>, which is a different call site from the
+        /// one <c>Execute.Sql</c> uses. Every other test on this path uses <c>$(name)</c> only, so
+        /// nothing proved this call site passes the processor's quoter - it could have been reverted
+        /// to <see langword="null"/> and the suite would have stayed green.
+        /// </summary>
+        [Test]
+        public void ExecutesTheScriptWithSafeTokenUsingProcessorQuoter()
+        {
+            var expression = new ExecuteSqlScriptExpression
+            {
+                SqlScript = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TestScriptWithSafeToken.sql"),
+                Parameters = new Dictionary<string, object>
+                {
+                    { "parameter", "ParameterValue" },
+                    { "safe_parameter", "isn't safe" },
+                },
+            };
+
+            var processor = new Mock<IMigrationProcessor>();
+            processor.SetupGet(x => x.Quoter).Returns(new GenericQuoter());
+            processor.Setup(x => x.Execute("TEST SCRIPT ParameterValue 'isn''t safe'")).Verifiable();
+
+            expression.ExecuteWith(processor.Object);
+            processor.Verify();
+        }
+
+        /// <summary>
+        /// The counterpart: without a quoter the same script must fail loudly rather than emit
+        /// something unquoted.
+        /// </summary>
+        [Test]
+        public void ExecutingTheScriptWithSafeTokenAndNoQuoterThrows()
+        {
+            var expression = new ExecuteSqlScriptExpression
+            {
+                SqlScript = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TestScriptWithSafeToken.sql"),
+                Parameters = new Dictionary<string, object>
+                {
+                    { "parameter", "ParameterValue" },
+                    { "safe_parameter", "isn't safe" },
+                },
+            };
+
+            // Quoter deliberately unstubbed, so the mock returns null.
+            var processor = new Mock<IMigrationProcessor>();
+
+            var exception = Assert.Throws<ArgumentNullException>(() => expression.ExecuteWith(processor.Object));
+            exception.Message.ShouldContain("$[safe_parameter]");
         }
     }
 }
