@@ -52,6 +52,7 @@ namespace FluentMigrator.DotNet.Cli
         public string WorkingDirectory { get; internal set; }
         public IEnumerable<string> Tags { get; internal set; }
         public bool Preview { get; internal set; }
+        public bool PreviewFromNothing { get; internal set; }
         public bool Verbose { get; internal set; }
         public string Profile { get; internal set; }
         public int? Timeout { get; internal set; }
@@ -128,6 +129,7 @@ namespace FluentMigrator.DotNet.Cli
             ProcessorType = cmd.ProcessorType;
             ProcessorSwitches = cmd.ProcessorSwitches;
             Preview = cmd.Preview;
+            PreviewFromNothing = cmd.PreviewFromNothing;
             Verbose = cmd.Verbose;
             Profile = cmd.Profile;
             Timeout = cmd.Timeout;

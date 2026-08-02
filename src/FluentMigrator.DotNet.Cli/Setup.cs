@@ -124,6 +124,7 @@ namespace FluentMigrator.DotNet.Cli
                         opt.Version = options.TargetVersion ?? 0;
                         opt.StartVersion = options.StartVersion ?? 0;
                         opt.NoConnection = options.NoConnection;
+                        opt.PreviewFromNothing = options.PreviewFromNothing;
                         opt.Steps = options.Steps ?? 1;
                         opt.Profile = options.Profile;
                         opt.Tags = options.Tags.ToArray();

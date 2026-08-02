@@ -44,6 +44,9 @@ namespace FluentMigrator.DotNet.Cli.Commands
         [Option("--preview", Description = "Only output the migration steps - do not execute them. Add the `--verbose` switch to also see the SQL statements. Default is false.")]
         public bool Preview { get; }
 
+        [Option("--preview-from-nothing", Description = "Include creation of the VersionInfo table when previewing migrations without a connection.")]
+        public bool PreviewFromNothing { get; }
+
         [Option("-V|--verbose", Description = "Show the SQL statements generated and execution time in the console. Default is false.")]
         public bool Verbose { get; }
 

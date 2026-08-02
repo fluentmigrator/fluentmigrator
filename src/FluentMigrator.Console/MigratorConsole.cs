@@ -50,6 +50,7 @@ namespace FluentMigrator.Console
         public string OutputFilename;
         public bool OutputSemicolonDelimiter = false;
         public bool PreviewOnly;
+        public bool PreviewFromNothing;
         public string ProcessorType;
         public string Profile;
         public bool ShowHelp;
@@ -148,6 +149,11 @@ namespace FluentMigrator.Console
                         "preview|p",
                         "Only output the migration steps - do not execute them. Add the `--verbose` switch to also see the SQL statements. Default is false.",
                         v => { PreviewOnly = v != null; }
+                    },
+                    {
+                        "previewFromNothing",
+                        "Include creation of the VersionInfo table when previewing migrations without a connection.",
+                        v => { PreviewFromNothing = v != null; }
                     },
                     {
                         "steps=",
@@ -401,6 +407,7 @@ namespace FluentMigrator.Console
                         opt.Version = Version;
                         opt.StartVersion = StartVersion;
                         opt.NoConnection = NoConnection;
+                        opt.PreviewFromNothing = PreviewFromNothing;
                         opt.Steps = Steps;
                         opt.Profile = Profile;
                         opt.Tags = Tags.ToArray();
