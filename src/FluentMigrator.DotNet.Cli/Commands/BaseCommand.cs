@@ -28,15 +28,17 @@ namespace FluentMigrator.DotNet.Cli.Commands
     {
         protected int ExecuteMigrations(MigratorOptions options, IConsole console)
         {
-            using var serviceProvider = Setup.BuildServiceProvider(options, console);
-            var executor = serviceProvider.GetRequiredService<TaskExecutor>();
             try
             {
-                return executor.Execute();
+                using var serviceProvider = Setup.BuildServiceProvider(options, console);
+                var executor = serviceProvider.GetRequiredService<TaskExecutor>();
+                executor.Execute();
+                return 0;
             }
             catch (Exception ex)
             {
-                console.Error.WriteLine(ex);
+                console.Error.WriteLine($"Error executing migrations: {ex.Message}");
+                console.Error.WriteLine(ex.ToString());
                 return 1;
             }
         }

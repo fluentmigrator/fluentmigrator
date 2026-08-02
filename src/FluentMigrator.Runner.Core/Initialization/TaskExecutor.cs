@@ -125,7 +125,6 @@ namespace FluentMigrator.Runner.Initialization
         /// <summary>
         /// Executes the specified migration task based on the configured options.
         /// </summary>
-        /// <returns>Zero when the migration task completes successfully.</returns>
         /// <remarks>
         /// This method determines the type of migration task to execute (e.g., migrate, rollback, validate version order, etc.)
         /// and performs the corresponding operation using the <see cref="IMigrationRunner"/>.
@@ -140,7 +139,7 @@ namespace FluentMigrator.Runner.Initialization
         /// executor.Execute();
         /// </code>
         /// </example>
-        public int Execute()
+        public void Execute()
         {
             using (var scope = new RunnerScope(this))
             {
@@ -179,7 +178,6 @@ namespace FluentMigrator.Runner.Initialization
             }
 
             _logger.LogSay("Task completed.");
-            return 0;
         }
 
         /// <summary>

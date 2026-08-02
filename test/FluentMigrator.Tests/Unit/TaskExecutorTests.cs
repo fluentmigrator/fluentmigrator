@@ -85,7 +85,7 @@ namespace FluentMigrator.Tests.Unit
 
             var taskExecutor = serviceProvider.GetRequiredService<TaskExecutor>();
 
-            Assert.That(taskExecutor.Execute(), Is.Zero);
+            taskExecutor.Execute();
 
             _migrationRunner.VerifyAll();
         }
