@@ -14,6 +14,8 @@
 // limitations under the License.
 #endregion
 
+using System;
+
 using FluentMigrator.Runner.Initialization;
 
 using McMaster.Extensions.CommandLineUtils;
@@ -28,8 +30,15 @@ namespace FluentMigrator.DotNet.Cli.Commands
         {
             using var serviceProvider = Setup.BuildServiceProvider(options, console);
             var executor = serviceProvider.GetRequiredService<TaskExecutor>();
-            executor.Execute();
-            return 0;
+            try
+            {
+                return executor.Execute();
+            }
+            catch (Exception ex)
+            {
+                console.Error.WriteLine(ex);
+                return 1;
+            }
         }
     }
 }
