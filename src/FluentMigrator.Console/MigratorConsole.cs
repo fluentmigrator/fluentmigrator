@@ -227,7 +227,7 @@ namespace FluentMigrator.Console
                                             return new
                                             {
                                                 FullName = x,
-                                                ShortName = name.Substring(Math.Min(2, name.Length)),
+                                                ShortName = name.Substring(0, Math.Min(2, name.Length)),
                                                 Enable = enable,
                                             };
                                         });
@@ -426,7 +426,7 @@ namespace FluentMigrator.Console
                         opt.PreviewOnly = PreviewOnly;
                         opt.ProviderSwitches = ProviderSwitches;
                         opt.StripComments = StripComments;
-                        opt.Timeout = Timeout == null ? null : (TimeSpan?) TimeSpan.FromSeconds(Timeout.Value);
+                        opt.Timeout = Timeout == null ? null : (TimeSpan?)TimeSpan.FromSeconds(Timeout.Value);
                     });
 
             if (StopOnError)

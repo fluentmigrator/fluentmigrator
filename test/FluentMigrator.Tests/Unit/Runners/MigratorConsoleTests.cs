@@ -78,6 +78,97 @@ namespace FluentMigrator.Tests.Unit.Runners
         }
 
         [Test]
+        public void IncludeUntaggedIsMigrationsOnlyByDefault()
+        {
+            var console = new MigratorConsole();
+            console.IncludeUntaggedMigrations.ShouldBeTrue();
+            console.IncludeUntaggedMaintenances.ShouldBeFalse();
+        }
+
+        [TestCase(null, true, true, TestName = "IncludeUntagged_Absent_EnablesBoth")]
+        [TestCase("", true, true, TestName = "IncludeUntagged_Empty_EnablesBoth")]
+        [TestCase(",", true, false, TestName = "IncludeUntagged_OnlySeparators_LeavesDefaults")]
+        // migrations token, every suffix
+        [TestCase("mi", true, false)]
+        [TestCase("mi+", true, false)]
+        [TestCase("mi-", false, false)]
+        [TestCase("migrations", true, false)]
+        [TestCase("migrations+", true, false)]
+        [TestCase("migrations-", false, false)]
+        // maintenance token, every suffix
+        [TestCase("ma", true, true)]
+        [TestCase("ma+", true, true)]
+        [TestCase("ma-", true, false)]
+        [TestCase("maintenance", true, true)]
+        [TestCase("maintenance+", true, true)]
+        [TestCase("maintenance-", true, false)]
+        // every combination of the two toggles
+        [TestCase("mi+,ma+", true, true)]
+        [TestCase("mi+,ma-", true, false)]
+        [TestCase("mi-,ma+", false, true)]
+        [TestCase("mi-,ma-", false, false)]
+        // order independence
+        [TestCase("ma+,mi-", false, true)]
+        // case-insensitive
+        [TestCase("MI-", false, false)]
+        [TestCase("MA+", true, true)]
+        [TestCase("Migrations-,Maintenance+", false, true)]
+        // whitespace trimming and empty entries removed
+        [TestCase(" mi- , ma+ ", false, true)]
+        [TestCase("mi-,,ma+", false, true)]
+        // long-form combinations, every combination of the two signs
+        [TestCase("migrations+,maintenance+", true, true)]
+        [TestCase("migrations+,maintenance-", true, false)]
+        [TestCase("migrations-,maintenance+", false, true)]
+        [TestCase("migrations-,maintenance-", false, false)]
+        // long-form order independence
+        [TestCase("maintenance+,migrations-", false, true)]
+        [TestCase("maintenance-,migrations+", true, false)]
+        // long-form / short-form mixed
+        [TestCase("migrations-,ma+", false, true)]
+        [TestCase("mi+,maintenance-", true, false)]
+        public void IncludeUntaggedParsesValue(string value, bool expectedMigrations, bool expectedMaintenances)
+        {
+            var (console, exitCode) = RunWithIncludeUntagged(value);
+
+            exitCode.ShouldBe(0);
+            console.IncludeUntaggedMigrations.ShouldBe(expectedMigrations);
+            console.IncludeUntaggedMaintenances.ShouldBe(expectedMaintenances);
+        }
+
+        [TestCase("mo")]
+        [TestCase("foo-")]
+        [TestCase("z+")]
+        [TestCase("mi-,zz")]
+        public void IncludeUntaggedRejectsUnknownValue(string value)
+        {
+            var (_, exitCode) = RunWithIncludeUntagged(value);
+
+            exitCode.ShouldBe(3);
+        }
+
+        private static (MigratorConsole Console, int ExitCode) RunWithIncludeUntagged(string value)
+        {
+            var stringWriter = new StringWriter(new StringBuilder());
+            System.Console.SetOut(stringWriter);
+            System.Console.SetError(stringWriter);
+
+            var includeUntagged = value == null ? "/include-untagged" : "/include-untagged=" + value;
+            var console = new MigratorConsole();
+
+            var exitCode = console.Run(
+                "/db", Database,
+                "/connection", Connection,
+                "/target", Target,
+                "/namespace", "FluentMigrator.Tests.Unit.Runners.Migrations",
+                "/task", "migrate:up",
+                "/version", "0",
+                includeUntagged);
+
+            return (console, exitCode);
+        }
+
+        [Test]
         public void ConsoleAnnouncerHasMoreOutputWhenVerbose()
         {
             var sbNonVerbose = new StringBuilder();
