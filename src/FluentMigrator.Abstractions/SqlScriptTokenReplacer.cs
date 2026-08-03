@@ -182,6 +182,12 @@ namespace FluentMigrator
             {
                 null => null,
                 RawSql rawSql => rawSql.Value,
+                // .NET's invariant *general* format for DateTime/DateTimeOffset is culture-independent
+                // but not portable - it is US-style MM/dd/yyyy, which most database engines either
+                // reject or parse ambiguously. ISO 8601 is accepted by every supported provider, so it
+                // is used here even though every other IFormattable is passed through as-is.
+                DateTime dateTime => dateTime.ToString("yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture),
+                DateTimeOffset dateTimeOffset => dateTimeOffset.ToString("yyyy-MM-ddTHH:mm:sszzz", CultureInfo.InvariantCulture),
                 IFormattable formattable => formattable.ToString(null, CultureInfo.InvariantCulture),
                 _ => value.ToString(),
             };
