@@ -30,9 +30,7 @@ namespace FluentMigrator.DotNet.Cli.Commands
         {
             try
             {
-                using var serviceProvider = Setup.BuildServiceProvider(options, console);
-                var executor = serviceProvider.GetRequiredService<TaskExecutor>();
-                executor.Execute();
+                RunMigrations(options, console);
                 return 0;
             }
             catch (Exception ex)
@@ -41,6 +39,13 @@ namespace FluentMigrator.DotNet.Cli.Commands
                 console.Error.WriteLine(ex.ToString());
                 return 1;
             }
+        }
+
+        protected virtual void RunMigrations(MigratorOptions options, IConsole console)
+        {
+            using var serviceProvider = Setup.BuildServiceProvider(options, console);
+            var executor = serviceProvider.GetRequiredService<TaskExecutor>();
+            executor.Execute();
         }
     }
 }
