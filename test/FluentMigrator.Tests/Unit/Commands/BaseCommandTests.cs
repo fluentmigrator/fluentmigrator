@@ -14,6 +14,7 @@
 // limitations under the License.
 #endregion
 
+#if !NETFRAMEWORK
 using System;
 using System.IO;
 
@@ -103,3 +104,4 @@ namespace FluentMigrator.Tests.Unit.Commands
         }
     }
 }
+#endif
