@@ -279,7 +279,16 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services
                 // Configure the runner
-                .TryAddScoped<IMigrationRunner, MigrationRunner>();
+                .TryAddScoped<IMigrationRunner>(
+                    sp =>
+                    {
+                        var runner = ActivatorUtilities.CreateInstance<MigrationRunner>(sp);
+                        var applicationLocker = sp.GetService<IApplicationLocker>();
+
+                        return applicationLocker is null
+                            ? runner
+                            : new ApplicationLockingMigrationRunner(runner, applicationLocker);
+                    });
 
             services
                 // Configure the task executor
@@ -299,6 +308,43 @@ namespace Microsoft.Extensions.DependencyInjection
             services
                 // Connection Factory
                 .TryAddScoped<IMigrationConnectionFactory, ConnectionStringMigrationConnectionFactory>();
+
+            return services;
+        }
+
+        /// <summary>
+        /// Configures the application-wide lock used to coordinate migration runners.
+        /// </summary>
+        /// <typeparam name="TApplicationLocker">The application locker implementation.</typeparam>
+        /// <param name="services">The <see cref="IServiceCollection"/> to configure.</param>
+        /// <returns>The updated service collection.</returns>
+        /// <remarks>
+        /// Call this method after <see cref="AddFluentMigratorCore(IServiceCollection)"/> or
+        /// <see cref="AddFluentMigratorSlim(IServiceCollection)"/>. The lock encompasses version-table
+        /// initialization as well as migration execution.
+        /// </remarks>
+        /// <example>
+        /// <code>
+        /// services
+        ///     .AddFluentMigratorCore()
+        ///     .ConfigureApplicationLocker&lt;KubernetesApplicationLocker&gt;();
+        /// </code>
+        /// </example>
+        public static IServiceCollection ConfigureApplicationLocker<
+#if NET
+            [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]
+#endif
+            TApplicationLocker>(
+            [NotNull] this IServiceCollection services)
+            where TApplicationLocker : class, IApplicationLocker
+        {
+            if (services is null)
+            {
+                throw new ArgumentNullException(nameof(services));
+            }
+
+            services.RemoveAll<IApplicationLocker>();
+            services.AddScoped<IApplicationLocker, TApplicationLocker>();
 
             return services;
         }
