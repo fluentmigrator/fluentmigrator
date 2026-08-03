@@ -83,8 +83,9 @@ namespace FluentMigrator.Model
         {
             var result = new ConstraintDefinition(_constraintType)
             {
-                Columns = Columns,
+                Columns = new HashSet<string>(Columns),
                 ConstraintName = ConstraintName,
+                SchemaName = SchemaName,
                 TableName = TableName
             };
 
