@@ -19,6 +19,7 @@
 using System;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 
 using FluentMigrator.Console;
 
@@ -145,6 +146,37 @@ namespace FluentMigrator.Tests.Unit.Runners
             var (_, exitCode) = RunWithIncludeUntagged(value);
 
             exitCode.ShouldBe(3);
+        }
+
+        // Smoke test for the --help output.
+        //
+        // It is intended as the home for verifying any option's help text:
+        // when you add or change an option description in MigratorConsole, add another
+        // `normalized.ShouldContain(...)` assertion here for that option.
+        [Test]
+        public void HelpOutputContainsOptionDescriptions()
+        {
+            var sb = new StringBuilder();
+            var stringWriter = new StringWriter(sb);
+            System.Console.SetOut(stringWriter);
+            System.Console.SetError(stringWriter);
+
+            var exitCode = new MigratorConsole().Run(
+                "/db", Database,
+                "/target", Target,
+                "/help");
+
+            exitCode.ShouldBe(0);
+
+            // WriteOptionDescriptions word-wraps long descriptions across lines,
+            // so collapse whitespace before asserting the description is present.
+            var normalized = Regex.Replace(sb.ToString(), @"\s+", " ");
+
+            // --include-untagged
+            normalized.ShouldContain(
+                "Available values are: ma, maintenance, mi, migrations with an optional '+' or '-' "
+                + "at the end to enable or disable the option. "
+                + "Multiple values may be given when separated by a comma.");
         }
 
         private static (MigratorConsole Console, int ExitCode) RunWithIncludeUntagged(string value)

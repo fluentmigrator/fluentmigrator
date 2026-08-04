@@ -206,7 +206,7 @@ namespace FluentMigrator.Console
                     },
                     {
                         "include-untagged:",
-                        "Include untagged migrations and/or maintenance objects.",
+                        "Include untagged migrations and/or maintenance objects. Available values are: ma, maintenance, mi, migrations with an optional '+' or '-' at the end to enable or disable the option. Multiple values may be given when separated by a comma.",
                         v =>
                         {
                             if (string.IsNullOrEmpty(v))
