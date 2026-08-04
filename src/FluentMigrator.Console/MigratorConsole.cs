@@ -215,38 +215,23 @@ namespace FluentMigrator.Console
                             }
                             else
                             {
-                                var items = v.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
-                                    .Select(x => x.ToLowerInvariant().Trim())
-                                    .Where(x => !string.IsNullOrEmpty(x))
-                                    .Select(
-                                        x =>
-                                        {
-                                            var hasOption = x.EndsWith("+") || x.EndsWith("-");
-                                            var enable = !x.EndsWith("-");
-                                            var name = hasOption ? x.Substring(0, x.Length - 1) : x;
-                                            return new
-                                            {
-                                                FullName = x,
-                                                ShortName = name.Substring(0, Math.Min(2, name.Length)),
-                                                Enable = enable,
-                                            };
-                                        });
-                                foreach (var item in items)
+                                foreach (var raw in v.Split([','], StringSplitOptions.RemoveEmptyEntries))
                                 {
-                                    switch (item.ShortName)
-                                    {
-                                        case "ma":
-                                            IncludeUntaggedMaintenances = item.Enable;
-                                            break;
-                                        case "mi":
-                                            IncludeUntaggedMigrations = item.Enable;
-                                            break;
-                                        default:
-                                            throw new ArgumentOutOfRangeException(
-                                                $"The argument {item.FullName} is not supported. "
-                                              + "Valid values are: ma, maintenance, mi, migrations with an optional '+' or '-' at the end to enable or disable the option. "
-                                              + "Multiple values may be given when separated by a comma.");
-                                    }
+                                    var token = raw.Trim();
+                                    if (token.Length == 0)
+                                        continue;
+
+                                    var enable = !token.EndsWith("-", StringComparison.Ordinal);
+
+                                    if (token.StartsWith("ma", StringComparison.OrdinalIgnoreCase))
+                                        IncludeUntaggedMaintenances = enable;
+                                    else if (token.StartsWith("mi", StringComparison.OrdinalIgnoreCase))
+                                        IncludeUntaggedMigrations = enable;
+                                    else
+                                        throw new ArgumentOutOfRangeException(
+                                            $"The argument {token} is not supported. "
+                                          + "Valid values are: ma, maintenance, mi, migrations with an optional '+' or '-' at the end to enable or disable the option. "
+                                          + "Multiple values may be given when separated by a comma.");
                                 }
                             }
                         }
@@ -426,7 +411,7 @@ namespace FluentMigrator.Console
                         opt.PreviewOnly = PreviewOnly;
                         opt.ProviderSwitches = ProviderSwitches;
                         opt.StripComments = StripComments;
-                        opt.Timeout = Timeout == null ? null : (TimeSpan?)TimeSpan.FromSeconds(Timeout.Value);
+                        opt.Timeout = Timeout == null ? null : (TimeSpan?) TimeSpan.FromSeconds(Timeout.Value);
                     });
 
             if (StopOnError)
