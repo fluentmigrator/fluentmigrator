@@ -1,0 +1,46 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Packaging-only project. The SDK itself is the Sdk/, targets/ and tasks/
+    payload; this csproj exists to produce the .nupkg. Pack with:
+
+      dotnet pack src/FluentMigrator.Net.Sdk.Host -c Release
+
+    Versioned on the runtime libraries' release train, the way
+    Microsoft.NET.Sdk ships with the .NET SDK it belongs to. Hence no
+    <Version> here — Global.props supplies VersionPrefix, and CI's
+    -p:Version wins. It also means this SDK and FluentMigrator.Net.Sdk are
+    always pinned to the same number, which matters: the two halves share a
+    manifest contract (GetDeploymentModuleInfo) that has no other version
+    negotiation.
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <PackageId>FluentMigrator.Net.Sdk.Host</PackageId>
+    <PackageType>MSBuildSdk</PackageType>
+    <Description>MSBuild project SDK for FluentMigrator host projects: the composition root that references FluentMigrator.Net.Sdk modules, selects hosting contexts and runners, validates deployment order against the reference graph, and serializes a host manifest.</Description>
+    <PackageTags>msbuild;sdk;sql;database;source-control;fluentmigrator</PackageTags>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildThisFileDirectory)../../PackageTool.props" />
+
+  <PropertyGroup>
+    <!-- This package's own README, not the shared docs/README-nuget.md. -->
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <DevelopmentDependency>true</DevelopmentDependency>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <!-- NU5128: no lib/ or ref/ folder, which is exactly right for an MSBuild SDK. -->
+    <NoWarn>$(NoWarn);NU5128</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="Sdk/**" Pack="true" PackagePath="Sdk/" />
+    <None Include="targets/**" Pack="true" PackagePath="targets/" />
+    <None Include="tasks/**" Pack="true" PackagePath="tasks/" />
+    <None Include="README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+</Project>

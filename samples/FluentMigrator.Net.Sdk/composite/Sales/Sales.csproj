@@ -1,0 +1,14 @@
+<Project>
+  <Import Project="../../../../src/FluentMigrator.Net.Sdk/Sdk/Sdk.props" />
+  <PropertyGroup>
+    <DatabaseDialect>sqlserver</DatabaseDialect>
+    <DefaultSchema>sales</DefaultSchema>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Module dependency: Sales builds after Core AND the host linter
+         knows Core must deploy first. No compile-time need for Core's types,
+         hence ReferenceOutputAssembly=false. -->
+    <ProjectReference Include="../Core/Core.csproj" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+  <Import Project="../../../../src/FluentMigrator.Net.Sdk/Sdk/Sdk.targets" />
+</Project>
