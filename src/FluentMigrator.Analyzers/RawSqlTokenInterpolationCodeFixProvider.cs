@@ -131,14 +131,58 @@ namespace FluentMigrator.Analyzers
                 return tokenSpan;
             }
 
-            // Walk back over a literal prefix: N'...', E'...', U&'...', _utf8mb4'...'.
-            var prefixStart = start;
-            while (prefixStart > 0 && (char.IsLetterOrDigit(text[prefixStart - 1]) || text[prefixStart - 1] == '_' || text[prefixStart - 1] == '&'))
+            // Consider the entire identifier-like run before the quote. It is part of the
+            // replacement only when that whole run is a recognized literal prefix; SQL such as
+            // LIKE'...' and columnN'...' must keep the adjacent keyword or identifier intact.
+            var candidateStart = start;
+            if (candidateStart >= 2 && text[candidateStart - 1] == '&' &&
+                (text[candidateStart - 2] == 'U' || text[candidateStart - 2] == 'u'))
             {
-                prefixStart--;
+                candidateStart -= 2;
+            }
+            else
+            {
+                while (candidateStart > 0 &&
+                       (char.IsLetterOrDigit(text[candidateStart - 1]) || text[candidateStart - 1] == '_'))
+                {
+                    candidateStart--;
+                }
             }
 
+            var candidate = text.ToString(TextSpan.FromBounds(candidateStart, start));
+            var hasIdentifierBoundary = candidateStart == 0 ||
+                                        !(char.IsLetterOrDigit(text[candidateStart - 1]) || text[candidateStart - 1] == '_');
+            var prefixStart = hasIdentifierBoundary && IsKnownLiteralPrefix(candidate) ? candidateStart : start;
+
             return TextSpan.FromBounds(prefixStart, end + 1);
+        }
+
+        private static bool IsKnownLiteralPrefix(string candidate)
+        {
+            if (candidate.Length == 0)
+            {
+                return false;
+            }
+
+            // MySQL character-set introducers use the open-ended _charset_name form, for
+            // example _utf8mb4'...' or _custom_charset'...'.
+            if (candidate[0] == '_')
+            {
+                return candidate.Length > 1 &&
+                       candidate.Skip(1).All(c => char.IsLetterOrDigit(c) || c == '_');
+            }
+
+            switch (candidate.ToUpperInvariant())
+            {
+                case "N":   // national character literal - T-SQL, Oracle, MySQL, standard
+                case "E":   // PostgreSQL escape-string literal
+                case "B":   // bit-string literal
+                case "X":   // hex-string literal
+                case "U&":  // Unicode escape literal
+                    return true;
+                default:
+                    return false;
+            }
         }
     }
 }
