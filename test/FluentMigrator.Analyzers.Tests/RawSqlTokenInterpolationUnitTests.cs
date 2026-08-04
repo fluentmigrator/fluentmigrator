@@ -61,6 +61,52 @@ namespace FluentMigrator.Analyzers.Tests
     }
 ";
 
+        private static string Source(string sql) => @"
+    using ConsoleApplication1;
+
+    namespace ConsoleApplication1
+    {
+        public class TypeName
+        {
+            public void Up()
+            {
+                new FakeExecuteExpressionRoot().Sql(""" + sql + @""");
+            }
+        }
+    }";
+
+        private static async Task VerifyCodeFixAsync(string sql, string fixedSql)
+        {
+            var source = Source(sql);
+            var fixedSource = Source(fixedSql);
+            var sourceLine = "                new FakeExecuteExpressionRoot().Sql(\"" + sql + "\");";
+            var tokenColumn = sourceLine.IndexOf("$(name)") + 1;
+            var expected = Verify.Diagnostic(RawSqlTokenInterpolationAnalyzer.DiagnosticId)
+                .WithSpan(10, tokenColumn, 10, tokenColumn + "$(name)".Length)
+                .WithArguments("$(name)", "$[name]");
+
+            var ut = new VerifyTest
+            {
+                TestState =
+                {
+                    Sources = { source, StubDefinitions },
+                    MarkupHandling = MarkupMode.None,
+                },
+                FixedState =
+                {
+                    Sources = { fixedSource, StubDefinitions },
+                    MarkupHandling = MarkupMode.None,
+                },
+            };
+
+            ut.TestState.ExpectedDiagnostics.Add(expected);
+#if NET
+            ut.ReferenceAssemblies = ReferenceAssemblies.Net.Net80;
+#endif
+
+            await ut.RunAsync();
+        }
+
         [Test]
         public async Task Doesnt_Warn_On_Quoted_Token()
         {
@@ -264,6 +310,56 @@ namespace FluentMigrator.Analyzers.Tests
 #endif
 
             await ut.RunAsync();
+        }
+
+        /// <summary>
+        /// SQL keywords and identifiers may be adjacent to a string literal. The code fix must
+        /// remove only the literal delimiter, without consuming the preceding SQL text as a prefix.
+        /// </summary>
+        [Test]
+        public async Task Fix_Preserves_Sql_Text_Adjacent_To_A_Literal()
+        {
+            await VerifyCodeFixAsync(
+                "SELECT * FROM Foo WHERE Name LIKE'$(name)'",
+                "SELECT * FROM Foo WHERE Name LIKE$[name]");
+        }
+
+        [TestCase("N")]
+        [TestCase("n")]
+        [TestCase("E")]
+        [TestCase("e")]
+        [TestCase("B")]
+        [TestCase("b")]
+        [TestCase("X")]
+        [TestCase("x")]
+        [TestCase("_utf8mb4")]
+        [TestCase("_custom_charset")]
+        [TestCase("U&")]
+        [TestCase("u&")]
+        public async Task Fix_Removes_Known_Literal_Prefix(string prefix)
+        {
+            await VerifyCodeFixAsync("SELECT " + prefix + "'$(name)'", "SELECT $[name]");
+        }
+
+        [TestCase("1&N", "1&")]
+        [TestCase("1&U&", "1&")]
+        public async Task Fix_Removes_Literal_Prefix_After_NonIdentifier_Boundary(
+            string sqlBeforeQuote,
+            string fixedSqlBeforeToken)
+        {
+            await VerifyCodeFixAsync(
+                "SELECT " + sqlBeforeQuote + "'$(name)'",
+                "SELECT " + fixedSqlBeforeToken + "$[name]");
+        }
+
+        [TestCase("columnN")]
+        [TestCase("columnU&")]
+        [TestCase("column_utf8mb4")]
+        public async Task Fix_Preserves_Identifier_Text_Adjacent_To_A_Literal(string adjacentText)
+        {
+            await VerifyCodeFixAsync(
+                "SELECT " + adjacentText + "'$(name)'",
+                "SELECT " + adjacentText + "$[name]");
         }
 
         /// <summary>
