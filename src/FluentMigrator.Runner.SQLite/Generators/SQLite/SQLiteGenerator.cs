@@ -277,8 +277,14 @@ namespace FluentMigrator.Runner.Generators.SQLite
         }
 
         /// <inheritdoc />
+        /// <remarks>SQLite treats NULLs as distinct natively and cannot express the opposite.</remarks>
+        protected override bool IsUniqueIndexNullsDistinctSupported(bool nullsDistinct) => nullsDistinct;
+
+        /// <inheritdoc />
         public override string Generate(CreateIndexExpression expression)
         {
+            ValidateUniqueIndexNullsDistinct(expression);
+
             // SQLite prefixes the index name, rather than the table name with the schema
 
             var indexColumns = new string[expression.Index.Columns.Count];

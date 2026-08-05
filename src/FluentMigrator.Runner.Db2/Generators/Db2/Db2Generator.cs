@@ -159,8 +159,14 @@ namespace FluentMigrator.Runner.Generators.DB2
         }
 
         /// <inheritdoc />
+        /// <remarks>Db2 treats NULLs as equal in a unique index, so at most one NULL row is permitted natively. The opposite direction cannot be expressed.</remarks>
+        protected override bool IsUniqueIndexNullsDistinctSupported(bool nullsDistinct) => !nullsDistinct;
+
+        /// <inheritdoc />
         public override string Generate(Expressions.CreateIndexExpression expression)
         {
+            ValidateUniqueIndexNullsDistinct(expression);
+
             var indexWithSchema = Quoter.QuoteIndexName(expression.Index.Name, expression.Index.SchemaName);
 
             var columnList = expression.Index.Columns.Aggregate(new StringBuilder(), (item, itemToo) =>

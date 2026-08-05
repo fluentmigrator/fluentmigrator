@@ -53,6 +53,10 @@ namespace FluentMigrator.Runner.Generators.Postgres
             [GeneratorIdConstants.PostgreSQL15_0, GeneratorIdConstants.PostgreSQL, GeneratorIdConstants.Postgres];
 
         /// <inheritdoc />
+        /// <remarks>PostgreSQL 15 expresses both directions: distinct natively, equal via NULLS NOT DISTINCT.</remarks>
+        protected override bool IsUniqueIndexNullsDistinctSupported(bool nullsDistinct) => true;
+
+        /// <inheritdoc />
         protected override string GetWithNullsDistinctStringInWhere(IndexDefinition index)
         {
             return string.Empty;
@@ -66,7 +70,9 @@ namespace FluentMigrator.Runner.Generators.Postgres
 
             var indexNullsDistinct = index.GetAdditionalFeature(PostgresExtensions.IndexColumnNullsDistinct, (bool?)null);
             var columnNullsDistinct = index.Columns.Select(c => GetNullsDistinct(c)).FirstOrDefault(nd => nd != null);
-            var nullsDistinct = columnNullsDistinct ?? indexNullsDistinct;
+            var nullsDistinct = columnNullsDistinct ?? indexNullsDistinct
+                ?? index.GetAdditionalFeature(
+                    CreateIndexNullSemanticsExtensions.UniqueIndexNullsDistinct, (bool?)null);
 
             if (nullsDistinct != null && !index.IsUnique)
             {

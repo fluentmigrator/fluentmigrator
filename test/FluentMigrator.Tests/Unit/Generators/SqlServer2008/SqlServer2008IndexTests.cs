@@ -284,5 +284,95 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
             var result = _generator.Generate(expression);
             result.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) WITH (DATA_COMPRESSION = PAGE);");
         }
+
+        [Test]
+        public void CanCreateUniqueIndexTreatingNullsAsDistinct()
+        {
+            var expression = new CreateIndexExpression()
+            {
+                Index =
+                {
+                    Name = GeneratorTestHelper.TestIndexName,
+                }
+            };
+
+            var builder = new CreateIndexExpressionBuilder(expression);
+            builder
+                .OnTable(GeneratorTestHelper.TestTableName1)
+                .OnColumn(GeneratorTestHelper.TestColumnName1).Ascending()
+                .WithOptions().UniqueTreatNullsAsDistinct();
+
+            var result = _generator.Generate(expression);
+            result.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) WHERE [TestColumn1] IS NOT NULL;");
+        }
+
+        [Test]
+        public void CanCreateUniqueIndexTreatingNullsAsEqual()
+        {
+            var expression = new CreateIndexExpression()
+            {
+                Index =
+                {
+                    Name = GeneratorTestHelper.TestIndexName,
+                }
+            };
+
+            var builder = new CreateIndexExpressionBuilder(expression);
+            builder
+                .OnTable(GeneratorTestHelper.TestTableName1)
+                .OnColumn(GeneratorTestHelper.TestColumnName1).Ascending()
+                .WithOptions().UniqueTreatNullsAsEqual();
+
+            var result = _generator.Generate(expression);
+
+            // SQL Server already treats NULLs as equal, so nothing extra is emitted.
+            result.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC);");
+        }
+
+        [Test]
+        public void CanCreateMultiColumnUniqueIndexTreatingNullsAsDistinct()
+        {
+            var expression = new CreateIndexExpression()
+            {
+                Index =
+                {
+                    Name = GeneratorTestHelper.TestIndexName,
+                }
+            };
+
+            var builder = new CreateIndexExpressionBuilder(expression);
+            builder
+                .OnTable(GeneratorTestHelper.TestTableName1)
+                .OnColumn(GeneratorTestHelper.TestColumnName1).Ascending()
+                .OnColumn(GeneratorTestHelper.TestColumnName2).Descending()
+                .WithOptions().UniqueTreatNullsAsDistinct();
+
+            var result = _generator.Generate(expression);
+            result.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC, [TestColumn2] DESC) WHERE [TestColumn1] IS NOT NULL AND [TestColumn2] IS NOT NULL;");
+        }
+
+        [Test]
+        public void ProviderSpecificNullsDistinctTakesPrecedenceOverPortableOption()
+        {
+            var expression = new CreateIndexExpression()
+            {
+                Index =
+                {
+                    Name = GeneratorTestHelper.TestIndexName,
+                }
+            };
+
+            var builder = new CreateIndexExpressionBuilder(expression);
+            builder
+                .OnTable(GeneratorTestHelper.TestTableName1)
+                .OnColumn(GeneratorTestHelper.TestColumnName1).Ascending()
+                .WithOptions().UniqueTreatNullsAsDistinct()
+                .WithOptions().UniqueNullsDistinct();
+
+            var result = _generator.Generate(expression);
+
+            // The provider-specific key wins, so no filter is emitted.
+            result.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC);");
+        }
     }
 }
