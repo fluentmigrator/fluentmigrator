@@ -140,6 +140,10 @@ namespace FluentMigrator.Tests.Unit.Runners
         [TestCase("mo")]
         [TestCase("foo-")]
         [TestCase("z+")]
+        [TestCase("maintenance-typo")]
+        [TestCase("migrationx+")]
+        [TestCase("ma++")]
+        [TestCase("mi--")]
         [TestCase("mi-,zz")]
         public void IncludeUntaggedRejectsUnknownValue(string value)
         {
