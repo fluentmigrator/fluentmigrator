@@ -269,6 +269,16 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
+        public void CanDropTableIfExistsWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetDeleteTableIfExistsExpression();
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("DROP TABLE IF EXISTS \"TestSchema\".\"TestTable1\";");
+        }
+
+        [Test]
         public void CanCreateTableIfNotExistsWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
