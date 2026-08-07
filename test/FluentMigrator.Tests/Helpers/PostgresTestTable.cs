@@ -74,10 +74,12 @@ namespace FluentMigrator.Tests.Helpers
 
         public void Drop()
         {
+            // Use IF EXISTS so cleanup stays robust even when the table under test was
+            // already dropped by the migration/expression being executed.
             var sb = new StringBuilder();
-            sb.AppendFormat("DROP TABLE {0}", NameWithSchema);
+            sb.AppendFormat("DROP TABLE IF EXISTS {0}", NameWithSchema);
             if (!string.IsNullOrEmpty(_schemaName))
-                sb.AppendFormat(";DROP SCHEMA \"{0}\"", _schemaName);
+                sb.AppendFormat(";DROP SCHEMA IF EXISTS \"{0}\"", _schemaName);
 
             using (var command = new NpgsqlCommand(sb.ToString(), Connection, Transaction))
                 command.ExecuteNonQuery();
