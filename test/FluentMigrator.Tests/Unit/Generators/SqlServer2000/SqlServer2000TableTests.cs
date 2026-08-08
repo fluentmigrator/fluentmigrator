@@ -293,6 +293,16 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
         }
 
         [Test]
+        public void CanDropTableIfExistsWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetDeleteTableIfExistsExpression();
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("IF OBJECT_ID('[TestTable1]') IS NOT NULL DROP TABLE [TestTable1];");
+        }
+
+        [Test]
         public override void CanRenameTableWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetRenameTableExpression();

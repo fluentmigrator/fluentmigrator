@@ -264,6 +264,16 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
         }
 
         [Test]
+        public void CanDropTableIfExistsWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetDeleteTableIfExistsExpression();
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("DROP TABLE IF EXISTS `TestTable1`;");
+        }
+
+        [Test]
         public override void CanRenameTableWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetRenameTableExpression();

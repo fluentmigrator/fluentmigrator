@@ -166,7 +166,7 @@ namespace FluentMigrator.Runner.Generators.Generic
         {
             if (expression.IfExists)
             {
-                return FormatStatement(DropTableIfExists, Quoter.QuoteTableName(expression.TableName));
+                return FormatStatement(DropTableIfExists, Quoter.QuoteTableName(expression.TableName, expression.SchemaName));
             }
 
             return FormatStatement(DropTable, Quoter.QuoteTableName(expression.TableName, expression.SchemaName));
