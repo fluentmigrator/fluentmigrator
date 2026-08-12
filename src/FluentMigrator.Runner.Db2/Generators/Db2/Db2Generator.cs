@@ -23,6 +23,7 @@ using System.Text;
 
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Generic;
+using FluentMigrator.Runner.Helpers;
 
 using Microsoft.Extensions.Options;
 
@@ -202,14 +203,25 @@ namespace FluentMigrator.Runner.Generators.DB2
                 }
 
                 return FormatStatement(
-                    "IF( EXISTS(SELECT 1 FROM SYSCAT.TABLES WHERE TABSCHEMA = '{0}' AND TABNAME = '{1}')) THEN DROP TABLE {2} END IF",
-                    Quoter.QuoteSchemaName(expression.SchemaName),
-                    Quoter.QuoteTableName(expression.TableName),
+                    "IF( EXISTS(SELECT 1 FROM SYSCAT.TABLES WHERE {0} AND {1})) THEN DROP TABLE {2} END IF",
+                    BuildCatalogNameComparison("TABSCHEMA", expression.SchemaName),
+                    BuildCatalogNameComparison("TABNAME", expression.TableName),
                     Quoter.QuoteTableName(expression.TableName, expression.SchemaName)
                 );
             }
 
             return FormatStatement(DropTable, Quoter.QuoteTableName(expression.TableName, expression.SchemaName));
+        }
+
+        private string BuildCatalogNameComparison(string catalogColumn, string identifier)
+        {
+            var name = FormatHelper.FormatSqlEscape(Quoter.UnQuote(identifier));
+            if (Quoter.IsQuoted(identifier))
+            {
+                return $"{Quoter.QuoteColumnName(catalogColumn)} = '{name}'";
+            }
+
+            return $"LCASE({Quoter.QuoteColumnName(catalogColumn)})=LCASE('{name}')";
         }
 
         /// <inheritdoc />
