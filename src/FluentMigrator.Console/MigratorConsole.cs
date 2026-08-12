@@ -221,11 +221,16 @@ namespace FluentMigrator.Console
                                     if (token.Length == 0)
                                         continue;
 
+                                    var hasSign = token.EndsWith("+", StringComparison.Ordinal)
+                                                  || token.EndsWith("-", StringComparison.Ordinal);
+                                    var name = hasSign ? token.Substring(0, token.Length - 1) : token;
                                     var enable = !token.EndsWith("-", StringComparison.Ordinal);
 
-                                    if (token.StartsWith("ma", StringComparison.OrdinalIgnoreCase))
+                                    if (string.Equals(name, "ma", StringComparison.OrdinalIgnoreCase)
+                                        || string.Equals(name, "maintenance", StringComparison.OrdinalIgnoreCase))
                                         IncludeUntaggedMaintenances = enable;
-                                    else if (token.StartsWith("mi", StringComparison.OrdinalIgnoreCase))
+                                    else if (string.Equals(name, "mi", StringComparison.OrdinalIgnoreCase)
+                                             || string.Equals(name, "migrations", StringComparison.OrdinalIgnoreCase))
                                         IncludeUntaggedMigrations = enable;
                                     else
                                         throw new ArgumentOutOfRangeException(
