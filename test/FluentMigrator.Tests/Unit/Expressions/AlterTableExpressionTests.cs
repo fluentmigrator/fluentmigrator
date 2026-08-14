@@ -81,7 +81,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         }
 
         [Test]
-        public void ReverseReturnsAlterTableExpression()
+        public void ReverseThrowsWhenTableDescriptionIsSet()
         {
             var expression = new AlterTableExpression
             {
@@ -90,13 +90,26 @@ namespace FluentMigrator.Tests.Unit.Expressions
                 TableDescription = "TestDescription"
             };
 
+            Should.Throw<System.NotSupportedException>(() => expression.Reverse());
+        }
+
+        [Test]
+        public void ReverseReturnsAlterTableExpressionWhenTableDescriptionIsNotSet()
+        {
+            var expression = new AlterTableExpression
+            {
+                TableName = "TestTable",
+                SchemaName = "TestSchema",
+                IfExists = true
+            };
+
             var reversed = expression.Reverse();
 
             Assert.That(reversed, Is.TypeOf<AlterTableExpression>());
             var reversedExpression = (AlterTableExpression)reversed;
             Assert.That(reversedExpression.TableName, Is.EqualTo("TestTable"));
             Assert.That(reversedExpression.SchemaName, Is.EqualTo("TestSchema"));
-            Assert.That(reversedExpression.TableDescription, Is.EqualTo("TestDescription"));
+            Assert.That(reversedExpression.IfExists, Is.True);
         }
     }
 }
