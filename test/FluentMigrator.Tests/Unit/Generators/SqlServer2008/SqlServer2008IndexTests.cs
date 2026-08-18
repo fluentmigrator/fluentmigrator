@@ -241,6 +241,56 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
         }
 
         [Test]
+        public void CanCreateUniqueIndexWithNonDistinctNullsAndFilter()
+        {
+            var expression = new CreateIndexExpression()
+            {
+                Index =
+                {
+                    Name = GeneratorTestHelper.TestIndexName,
+                }
+            };
+
+            var builder = new CreateIndexExpressionBuilder(expression);
+            builder
+                .OnTable(GeneratorTestHelper.TestTableName1)
+                .OnColumn(GeneratorTestHelper.TestColumnName1)
+                .Ascending()
+                .NullsNotDistinct()
+                .WithOptions().Unique();
+            builder.Filter("TestColumn2 = 1");
+
+            var result = _generator.Generate(expression);
+            result.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) WHERE (TestColumn2 = 1) AND [TestColumn1] IS NOT NULL;");
+        }
+
+        [Test]
+        public void CanCreateUniqueIndexWithNonDistinctNullsAndFilterContainingOr()
+        {
+            var expression = new CreateIndexExpression()
+            {
+                Index =
+                {
+                    Name = GeneratorTestHelper.TestIndexName,
+                }
+            };
+
+            var builder = new CreateIndexExpressionBuilder(expression);
+            builder
+                .OnTable(GeneratorTestHelper.TestTableName1)
+                .OnColumn(GeneratorTestHelper.TestColumnName1)
+                .Ascending()
+                .NullsNotDistinct()
+                .WithOptions().Unique();
+            builder.Filter("TestColumn2 = 1 OR TestColumn3 = 2");
+
+            // Without the parentheses the appended AND would bind tighter than the OR
+            // and the index would cover a different set of rows than the filter asks for.
+            var result = _generator.Generate(expression);
+            result.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) WHERE (TestColumn2 = 1 OR TestColumn3 = 2) AND [TestColumn1] IS NOT NULL;");
+        }
+
+        [Test]
         public void CanCreateIndexWithFilter()
         {
             var expression = GeneratorTestHelper.GetCreateIndexExpression();

@@ -16,6 +16,7 @@
 //
 #endregion
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -37,6 +38,8 @@ namespace FluentMigrator.Runner.Generators.SqlServer
     /// </summary>
     public class SqlServer2008Generator : SqlServer2005Generator
     {
+        private const string WhereClause = " WHERE ";
+
         private static readonly HashSet<string> _supportedAdditionalFeatures = new HashSet<string>
         {
             SqlServerExtensions.IndexColumnNullsDistinct,
@@ -97,21 +100,25 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             var baseFilter = base.GetFilterString(createIndexExpression);
             var nullsDistinct = GetWithNullsDistinctString(createIndexExpression.Index);
 
-            if (string.IsNullOrEmpty(baseFilter) && string.IsNullOrEmpty(nullsDistinct))
-            {
-                return string.Empty;
-            }
-
             if (string.IsNullOrEmpty(nullsDistinct))
             {
                 return baseFilter;
             }
 
-            baseFilter = string.IsNullOrEmpty(baseFilter) ?
-                $" WHERE {nullsDistinct}" :
-                $" AND  {nullsDistinct}";
+            if (string.IsNullOrEmpty(baseFilter))
+            {
+                return $" WHERE {nullsDistinct}";
+            }
 
-            return baseFilter;
+            // The base filter is the user's own predicate, already prefixed with WHERE.
+            // It is arbitrary SQL, so it is parenthesised before the generated predicate
+            // is appended: an OR inside it would otherwise bind more loosely than the
+            // appended AND and the index would cover the wrong rows.
+            var userFilter = baseFilter.StartsWith(WhereClause, StringComparison.Ordinal)
+                ? baseFilter.Substring(WhereClause.Length)
+                : baseFilter;
+
+            return $" WHERE ({userFilter}) AND {nullsDistinct}";
         }
 
         /// <summary>
