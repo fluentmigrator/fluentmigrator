@@ -87,6 +87,30 @@ namespace FluentMigrator.Tests.Unit
         }
 
         [Test]
+        public void ReplacesRawTokenWithIso8601DateTime()
+        {
+            var parameters = new Dictionary<string, object>
+            {
+                ["Cutoff"] = new DateTime(2026, 7, 28, 13, 45, 6)
+            };
+
+            SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT '$(Cutoff)'", parameters, null)
+                .ShouldBe("SELECT '2026-07-28T13:45:06'");
+        }
+
+        [Test]
+        public void ReplacesRawTokenWithIso8601DateTimeOffset()
+        {
+            var parameters = new Dictionary<string, object>
+            {
+                ["Cutoff"] = new DateTimeOffset(2026, 7, 28, 13, 45, 6, TimeSpan.FromHours(-4))
+            };
+
+            SqlScriptTokenReplacer.ReplaceSqlScriptTokens("SELECT '$(Cutoff)'", parameters, null)
+                .ShouldBe("SELECT '2026-07-28T13:45:06-04:00'");
+        }
+
+        [Test]
         public void LeavesUnknownRawTokenUnchanged()
         {
             var parameters = new Dictionary<string, object> { ["Known"] = "Value" };

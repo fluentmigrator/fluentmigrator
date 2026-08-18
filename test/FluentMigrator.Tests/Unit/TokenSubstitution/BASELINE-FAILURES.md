@@ -90,10 +90,10 @@ cells the fixes moved. For MySQL:
 The last row is #2335: the corruption was in the *with-quoter* column, i.e. the path real migrations
 take, and it is also what `Insert`/`Update`/`Delete` emit.
 
-One cell deliberately not changed: `$(x)` still renders a `DateTime` as `07/28/2026 13:45:06`. The
-raw token style is documented as verbatim `ToString()`, and it is invariant-culture, so this is
-consistent - but it is not a portable SQL datetime literal. Callers wanting one should use `$[x]`.
-Noted for follow-up rather than changed here; now tracked as #2354.
+One cell was deferred here and has since been changed: `$(x)` rendered a `DateTime` as
+`07/28/2026 13:45:06`, invariant-culture but not a portable SQL datetime literal. #2354 resolved it
+by rendering `DateTime` and `DateTimeOffset` in the same ISO 8601 form the quoter already emits for
+`$[x]`, so the matrix rows above now read `2026-07-28T13:45:06`.
 
 One cell changed to a throw rather than a value:
 

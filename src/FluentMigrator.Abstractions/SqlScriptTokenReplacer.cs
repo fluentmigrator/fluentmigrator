@@ -182,6 +182,11 @@ namespace FluentMigrator
             {
                 null => null,
                 RawSql rawSql => rawSql.Value,
+                // The invariant general format for these is MM/dd/yyyy HH:mm:ss, which is
+                // culture-independent without being a datetime literal every provider reads
+                // the same way. Use the ISO 8601 form the quoter already emits for $[name].
+                DateTime dateTime => dateTime.ToString("yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture),
+                DateTimeOffset dateTimeOffset => dateTimeOffset.ToString("yyyy-MM-ddTHH:mm:sszzz", CultureInfo.InvariantCulture),
                 IFormattable formattable => formattable.ToString(null, CultureInfo.InvariantCulture),
                 _ => value.ToString(),
             };
