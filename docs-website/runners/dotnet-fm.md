@@ -81,7 +81,6 @@ dotnet fm migrate [options]
 | `--timeout` | | Command timeout (seconds) | No |
 | `--transaction-mode` | | Transaction behavior | No |
 | `--allowDirtyAssemblies` | | Allow version mismatches | No |
-| `--context` | | Application context | No |
 | `--startVersion` | | Start from version | No |
 | `--noConnection` | | Validate without connecting | No |
 | `--help` | `-h` | Show help | No |
