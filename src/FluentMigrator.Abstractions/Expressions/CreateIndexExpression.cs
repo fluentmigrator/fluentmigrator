@@ -43,9 +43,17 @@ namespace FluentMigrator.Expressions
         }
 
         /// <inheritdoc />
+        /// <remarks>
+        /// The additional features of the index are intentionally not carried over to the
+        /// reversed expression. They describe how the index gets created (for example
+        /// ONLINE or DATA_COMPRESSION on SQL Server) and are not necessarily valid
+        /// options for the DROP INDEX statement.
+        /// </remarks>
         public override IMigrationExpression Reverse()
         {
-            return new DeleteIndexExpression { Index = Index.Clone() as IndexDefinition };
+            var index = (IndexDefinition)Index.Clone();
+            index.AdditionalFeatures.Clear();
+            return new DeleteIndexExpression { Index = index };
         }
 
         /// <inheritdoc />
