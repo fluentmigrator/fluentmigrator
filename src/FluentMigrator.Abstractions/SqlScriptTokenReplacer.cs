@@ -184,7 +184,10 @@ namespace FluentMigrator
                 RawSql rawSql => rawSql.Value,
                 // The invariant general format for these is MM/dd/yyyy HH:mm:ss, which is
                 // culture-independent without being a datetime literal every provider reads
-                // the same way. Use the ISO 8601 form the quoter already emits for $[name].
+                // the same way. Use the same ISO 8601 form GenericQuoter.FormatDateTime and
+                // FormatDateTimeOffset produce, which is what $[name] emits for every provider
+                // that does not override them. Db2, Firebird, Oracle and Snowflake do override
+                // them, and a raw token has no quoter to follow there.
                 DateTime dateTime => dateTime.ToString("yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture),
                 DateTimeOffset dateTimeOffset => dateTimeOffset.ToString("yyyy-MM-ddTHH:mm:sszzz", CultureInfo.InvariantCulture),
                 IFormattable formattable => formattable.ToString(null, CultureInfo.InvariantCulture),
