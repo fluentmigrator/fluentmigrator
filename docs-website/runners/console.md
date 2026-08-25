@@ -81,7 +81,6 @@ Migrate.exe -p sqlserver -c "Server=.;Database=MyDb;Integrated Security=true" -a
 | `--steps`                | `-s`  | Number of versions to migrate         | All             |
 | `--workingDirectory`     | `-w`  | Working directory                     | Current         |
 | `--timeout`              |       | Command timeout in seconds            | `60`            |
-| `--context`              |       | Application context                   | None            |
 | `--transaction-mode`     |       | Transaction behavior                  | `true`          |
 | `--allowDirtyAssemblies` |       | Allow loading different .NET versions | `false`         |
 
