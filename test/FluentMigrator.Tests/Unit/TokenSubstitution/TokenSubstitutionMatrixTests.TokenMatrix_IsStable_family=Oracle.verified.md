@@ -132,7 +132,7 @@ See `TokenSubstitutionMatrix.md` for what each column means.
 
 ### Oracle12CManaged
 
-- generator: `Oracle12CGenerator`
+- generator: `Oracle12CManagedGenerator`
 - generator.Quoter: `OracleQuoter`
 - processor.Quoter: `OracleQuoter`
 
