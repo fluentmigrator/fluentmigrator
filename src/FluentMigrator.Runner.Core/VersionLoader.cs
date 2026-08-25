@@ -163,6 +163,26 @@ namespace FluentMigrator.Runner
         /// <inheritdoc />
         public bool AlreadyCreatedVersionTable => _processor.TableExists(VersionTableMetaData.SchemaName, VersionTableMetaData.TableName);
 
+        /// <summary>
+        /// Gets a value indicating whether this version loader had to create the schema for the version table
+        /// </summary>
+        /// <remarks>
+        /// The schema is created while the version loader is being constructed, so a live existence check
+        /// such as <see cref="AlreadyCreatedVersionSchema"/> cannot tell a pre-existing schema from one this
+        /// loader just created. This property keeps that distinction.
+        /// </remarks>
+        public bool HasCreatedVersionSchema => _versionSchemaMigrationAlreadyRun;
+
+        /// <summary>
+        /// Gets a value indicating whether this version loader had to create the version table
+        /// </summary>
+        /// <remarks>
+        /// The table is created while the version loader is being constructed, so a live existence check
+        /// such as <see cref="AlreadyCreatedVersionTable"/> cannot tell a pre-existing table from one this
+        /// loader just created. This property keeps that distinction.
+        /// </remarks>
+        public bool HasCreatedVersionTable => _versionMigrationAlreadyRun;
+
         /// <inheritdoc />
         public bool AlreadyMadeVersionUnique => _processor.ColumnExists(VersionTableMetaData.SchemaName, VersionTableMetaData.TableName, VersionTableMetaData.AppliedOnColumnName);
 

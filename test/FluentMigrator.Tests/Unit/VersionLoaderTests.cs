@@ -16,6 +16,7 @@
 //
 #endregion
 
+using System.Data;
 using System.Linq;
 
 using FluentMigrator.Expressions;
@@ -374,6 +375,70 @@ namespace FluentMigrator.Tests.Unit
             loader.LoadVersionInfo();
 
             runner.Verify(r => r.Up(loader.VersionDescriptionMigration), Times.Once());
+        }
+
+        [Test]
+        public void LoadVersionInfoIfRequiredReportsCreationPerformedByVersionLoaderInitialization()
+        {
+            var processor = CreateStatefulProcessorMock(schemaExists: false, tableExists: false);
+            var serviceProvider = CreateRunnerServiceProvider(processor);
+
+            var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
+
+            runner.LoadVersionInfoIfRequired().ShouldBeTrue();
+            runner.LoadVersionInfoIfRequired().ShouldBeFalse();
+        }
+
+        [Test]
+        public void LoadVersionInfoIfRequiredReturnsFalseWhenVersionTableAlreadyExists()
+        {
+            var processor = CreateStatefulProcessorMock(schemaExists: true, tableExists: true);
+            var serviceProvider = CreateRunnerServiceProvider(processor);
+
+            var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
+
+            runner.LoadVersionInfoIfRequired().ShouldBeFalse();
+        }
+
+        private static Mock<IMigrationProcessor> CreateStatefulProcessorMock(bool schemaExists, bool tableExists)
+        {
+            var processor = new Mock<IMigrationProcessor>();
+
+            processor.Setup(p => p.SchemaExists(It.IsAny<string>())).Returns(() => schemaExists);
+            processor.Setup(p => p.TableExists(It.IsAny<string>(), It.IsAny<string>())).Returns(() => tableExists);
+            processor.Setup(p => p.ColumnExists(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns(true);
+            processor.Setup(p => p.Process(It.IsAny<CreateSchemaExpression>())).Callback(() => schemaExists = true);
+            processor.Setup(p => p.Process(It.IsAny<CreateTableExpression>())).Callback(() => tableExists = true);
+            processor.Setup(p => p.ReadTableData(It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(
+                    () =>
+                    {
+                        var dataSet = new DataSet();
+                        dataSet.Tables.Add(new DataTable(TestVersionTableMetaData.TABLE_NAME));
+                        return dataSet;
+                    });
+
+            return processor;
+        }
+
+        private static ServiceProvider CreateRunnerServiceProvider(Mock<IMigrationProcessor> processor)
+        {
+            var generatorMock = new Mock<IMigrationGenerator>(MockBehavior.Loose);
+            generatorMock.SetupGet(x => x.Quoter)
+                .Returns(new GenericQuoter());
+            var generatorAccessorMock = new Mock<IGeneratorAccessor>(MockBehavior.Loose);
+
+            generatorAccessorMock.SetupGet(x => x.Generator)
+                .Returns(generatorMock.Object);
+
+            return ServiceCollectionExtensions.CreateServices()
+                .WithProcessor(processor)
+                .AddScoped(_ => generatorAccessorMock.Object)
+                .AddScoped(_ => ConventionSets.NoSchemaName)
+                .AddScoped<IMigrationRunnerConventionsAccessor>(
+                    _ => new PassThroughMigrationRunnerConventionsAccessor(new MigrationRunnerConventions()))
+                .AddScoped<IConnectionStringReader>(_ => new PassThroughConnectionStringReader("No connection"))
+                .BuildServiceProvider();
         }
     }
 }

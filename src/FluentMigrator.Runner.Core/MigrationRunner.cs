@@ -505,15 +505,24 @@ namespace FluentMigrator.Runner
         /// <inheritdoc />
         public bool LoadVersionInfoIfRequired()
         {
+            // Reading the VersionLoader property below may instantiate the version loader,
+            // and the default VersionLoader implementation creates any missing version table
+            // from its constructor. Capture whether the loader already existed so a creation
+            // triggered by that instantiation can still be reported to the caller (see #2170).
+            var versionLoaderWasInstantiated = _currentVersionLoader != null || _versionLoader.IsValueCreated;
+
             if (VersionLoader.AlreadyCreatedVersionTable && VersionLoader.AlreadyCreatedVersionSchema)
             {
+                if (!versionLoaderWasInstantiated && VersionLoader is VersionLoader versionLoader)
+                {
+                    return versionLoader.HasCreatedVersionTable || versionLoader.HasCreatedVersionSchema;
+                }
+
                 return false;
             }
-            else
-            {
-                VersionLoader.LoadVersionInfo();
-                return true;
-            }
+
+            VersionLoader.LoadVersionInfo();
+            return true;
         }
 
         /// <summary>
