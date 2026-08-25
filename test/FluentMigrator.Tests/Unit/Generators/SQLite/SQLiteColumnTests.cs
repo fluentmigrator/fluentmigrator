@@ -17,9 +17,12 @@
 #endregion
 
 using System;
+using System.Data;
 using System.Linq;
 
 using FluentMigrator.Exceptions;
+using FluentMigrator.Expressions;
+using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.SQLite;
 using NUnit.Framework;
 
@@ -268,9 +271,85 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         public override void CanAlterColumnToAddStoredComputedExpression()
         {
             var expression = GeneratorTestHelper.GetAlterColumnExpressionWithStoredComputed();
-            
+
             // SQLite doesn't support altering columns
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
+        }
+
+        /// <summary>
+        /// The expression pair produced by Alter.Table("TestTable1").AddColumn("TestColumn1")
+        /// .AsInt32().Nullable().ForeignKey("TestTable2", "TestColumn2"); see issue #2388.
+        /// </summary>
+        private static (CreateColumnExpression AddColumn, CreateForeignKeyExpression ForeignKey) GetCreateColumnWithForeignKeyExpressions(string foreignKeyName = null)
+        {
+            var foreignKey = new ForeignKeyDefinition
+            {
+                Name = foreignKeyName,
+                PrimaryTable = GeneratorTestHelper.TestTableName2,
+                ForeignTable = GeneratorTestHelper.TestTableName1,
+                PrimaryColumns = new[] { GeneratorTestHelper.TestColumnName2 },
+                ForeignColumns = new[] { GeneratorTestHelper.TestColumnName1 }
+            };
+
+            var addColumn = new CreateColumnExpression
+            {
+                TableName = GeneratorTestHelper.TestTableName1,
+                Column = new ColumnDefinition
+                {
+                    Name = GeneratorTestHelper.TestColumnName1,
+                    Type = DbType.Int32,
+                    IsNullable = true,
+                    IsForeignKey = true,
+                    ForeignKey = foreignKey
+                }
+            };
+
+            var createForeignKey = new CreateForeignKeyExpression { ForeignKey = foreignKey };
+
+            return (addColumn, createForeignKey);
+        }
+
+        [Test]
+        public void CanCreateColumnWithForeignKey()
+        {
+            var (addColumn, _) = GetCreateColumnWithForeignKeyExpressions();
+
+            var result = Generator.Generate(addColumn);
+            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD COLUMN \"TestColumn1\" INTEGER REFERENCES \"TestTable2\" (\"TestColumn2\");");
+        }
+
+        [Test]
+        public void CanCreateColumnWithNamedForeignKey()
+        {
+            var (addColumn, _) = GetCreateColumnWithForeignKeyExpressions("FK_TestTable1_TestColumn1");
+
+            var result = Generator.Generate(addColumn);
+            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD COLUMN \"TestColumn1\" INTEGER CONSTRAINT \"FK_TestTable1_TestColumn1\" REFERENCES \"TestTable2\" (\"TestColumn2\");");
+        }
+
+        [Test]
+        public void CanCreateColumnWithForeignKeyWithOnDeleteAndOnUpdateOptions()
+        {
+            var (addColumn, _) = GetCreateColumnWithForeignKeyExpressions();
+            addColumn.Column.ForeignKey.OnDelete = Rule.Cascade;
+            addColumn.Column.ForeignKey.OnUpdate = Rule.SetNull;
+
+            var result = Generator.Generate(addColumn);
+            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD COLUMN \"TestColumn1\" INTEGER REFERENCES \"TestTable2\" (\"TestColumn2\") ON DELETE CASCADE ON UPDATE SET NULL;");
+        }
+
+        [Test]
+        public void CreatingColumnWithForeignKeyMarksTheForeignKeyExpressionAsHandled()
+        {
+            // The fluent builder queues a CreateForeignKeyExpression alongside the
+            // CreateColumnExpression; once the column is generated with its inline
+            // REFERENCES clause, the standalone expression must not throw.
+            var (addColumn, createForeignKey) = GetCreateColumnWithForeignKeyExpressions("FK_TestTable1_TestColumn1");
+
+            Generator.Generate(addColumn);
+
+            var result = Generator.Generate(createForeignKey);
+            result.ShouldBe(string.Empty);
         }
     }
 }

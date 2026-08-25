@@ -80,6 +80,31 @@ namespace FluentMigrator.Runner.Generators.SQLite
             return base.FormatForeignKey(fk2, fkNameGeneration);
         }
 
+        /// <summary>
+        /// Formats a foreign key as a column-level constraint, e.g. <c>REFERENCES "Parent" ("Id")</c>.
+        /// </summary>
+        /// <param name="foreignKey">The foreign key to format</param>
+        /// <returns>The column constraint fragment</returns>
+        /// <remarks>
+        /// This is the only foreign key form SQLite accepts in <c>ALTER TABLE ... ADD COLUMN</c>;
+        /// the table-level <c>FOREIGN KEY (...) REFERENCES</c> clause is valid in CREATE TABLE only.
+        /// The referenced table's schema is omitted because SQLite foreign keys must stay within
+        /// the schema of the table itself (see <see cref="FormatForeignKey"/>).
+        /// </remarks>
+        public string FormatColumnLevelForeignKey(ForeignKeyDefinition foreignKey)
+        {
+            var constraintClause = string.IsNullOrEmpty(foreignKey.Name)
+                ? string.Empty
+                : $"CONSTRAINT {Quoter.QuoteConstraintName(foreignKey.Name)} ";
+
+            var primaryColumns = string.Join(", ", foreignKey.PrimaryColumns.Select(Quoter.QuoteColumnName));
+
+            return constraintClause
+                + $"REFERENCES {Quoter.QuoteTableName(foreignKey.PrimaryTable)} ({primaryColumns})"
+                + FormatCascade("DELETE", foreignKey.OnDelete)
+                + FormatCascade("UPDATE", foreignKey.OnUpdate);
+        }
+
         /// <inheritdoc />
         protected override string FormatIdentity(ColumnDefinition column)
         {
