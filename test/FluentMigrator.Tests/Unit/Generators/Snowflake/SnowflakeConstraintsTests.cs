@@ -116,7 +116,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
 
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
-            result.ShouldBe($@"ALTER TABLE ""{TestSchema}"".""TestTable1"" ADD CONSTRAINT ""PK_TestTable1"" PRIMARY KEY (""TestColumn1"", ""TestColumn2"");", _quotingEnabled);
+            result.ShouldBe($@"ALTER TABLE ""{TestSchema}"".""TestTable1"" ADD CONSTRAINT ""PK_TestTable1_TestColumn1_TestColumn2"" PRIMARY KEY (""TestColumn1"", ""TestColumn2"");", _quotingEnabled);
         }
 
         [Test]
@@ -126,7 +126,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
 
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ADD CONSTRAINT ""PK_TestTable1"" PRIMARY KEY (""TestColumn1"", ""TestColumn2"");", _quotingEnabled);
+            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ADD CONSTRAINT ""PK_TestTable1_TestColumn1_TestColumn2"" PRIMARY KEY (""TestColumn1"", ""TestColumn2"");", _quotingEnabled);
         }
 
         [Test]
@@ -330,7 +330,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
 
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
-            result.ShouldBe($@"ALTER TABLE ""{TestSchema}"".""TestTable1"" ADD CONSTRAINT ""PK_TestTable1"" PRIMARY KEY (""TestColumn1"");", _quotingEnabled);
+            result.ShouldBe($@"ALTER TABLE ""{TestSchema}"".""TestTable1"" ADD CONSTRAINT ""PK_TestTable1_TestColumn1"" PRIMARY KEY (""TestColumn1"");", _quotingEnabled);
         }
 
         [Test]
@@ -340,7 +340,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
 
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ADD CONSTRAINT ""PK_TestTable1"" PRIMARY KEY (""TestColumn1"");", _quotingEnabled);
+            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ADD CONSTRAINT ""PK_TestTable1_TestColumn1"" PRIMARY KEY (""TestColumn1"");", _quotingEnabled);
         }
 
         [Test]
