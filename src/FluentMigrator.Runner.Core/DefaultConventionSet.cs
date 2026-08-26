@@ -61,16 +61,13 @@ namespace FluentMigrator.Runner
             var schemaConvention =
                 new DefaultSchemaConvention(new DefaultSchemaNameConvention(defaultSchemaName));
 
-            var primaryKeyNameConvention = new DefaultPrimaryKeyNameConvention();
-
             ColumnsConventions = new List<IColumnsConvention>()
             {
-                primaryKeyNameConvention,
+                new DefaultPrimaryKeyNameConvention(),
             };
 
             ConstraintConventions = new List<IConstraintConvention>()
             {
-                primaryKeyNameConvention,
                 new DefaultConstraintNameConvention(),
                 schemaConvention,
             };
