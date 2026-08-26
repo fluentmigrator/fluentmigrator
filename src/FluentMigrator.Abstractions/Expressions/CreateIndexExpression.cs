@@ -44,15 +44,20 @@ namespace FluentMigrator.Expressions
 
         /// <inheritdoc />
         /// <remarks>
-        /// The additional features of the index are intentionally not carried over to the
-        /// reversed expression. They describe how the index gets created (for example
-        /// ONLINE or DATA_COMPRESSION on SQL Server) and are not necessarily valid
-        /// options for the DROP INDEX statement.
+        /// For a non-clustered index the additional features are intentionally not carried
+        /// over to the reversed expression. They describe how the index gets created (for
+        /// example ONLINE or DATA_COMPRESSION on SQL Server) and are not valid options for
+        /// dropping one. A clustered index keeps them, since SQL Server can drop a
+        /// clustered index online and the reversal would otherwise lose that option.
         /// </remarks>
         public override IMigrationExpression Reverse()
         {
             var index = (IndexDefinition)Index.Clone();
-            index.AdditionalFeatures.Clear();
+            if (!index.IsClustered)
+            {
+                index.AdditionalFeatures.Clear();
+            }
+
             return new DeleteIndexExpression { Index = index };
         }
 

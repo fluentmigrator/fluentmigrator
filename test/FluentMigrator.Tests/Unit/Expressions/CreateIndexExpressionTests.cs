@@ -176,5 +176,29 @@ namespace FluentMigrator.Tests.Unit.Expressions
             Assert.That(reversed.AdditionalFeatures, Is.Empty);
             Assert.That(expression.AdditionalFeatures, Is.Not.Empty);
         }
+
+        [Test]
+        public void ReverseKeepsAdditionalFeaturesForAClusteredIndex()
+        {
+            var expression = new CreateIndexExpression
+            {
+                Index = new IndexDefinition
+                {
+                    Name = "IX_Name",
+                    TableName = "Table",
+                    IsClustered = true,
+                    Columns = new Collection<IndexColumnDefinition>
+                    {
+                        new IndexColumnDefinition { Name = "Name" },
+                    },
+                },
+            };
+
+            expression.AdditionalFeatures["SomeCreateOption"] = true;
+
+            var reversed = (DeleteIndexExpression)expression.Reverse();
+
+            Assert.That(reversed.AdditionalFeatures["SomeCreateOption"], Is.True);
+        }
     }
 }

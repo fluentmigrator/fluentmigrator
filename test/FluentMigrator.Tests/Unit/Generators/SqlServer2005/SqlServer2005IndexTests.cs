@@ -168,6 +168,18 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
+        public void CanDropAutoReversedCreateClusteredIndexWithOnlineOnOptionWithOnlineOption()
+        {
+            var expression = GeneratorTestHelper.GetCreateIndexExpression();
+            var builder = new CreateIndexExpressionBuilder(expression);
+            builder.Clustered();
+            builder.Online();
+            var reversed = (DeleteIndexExpression)expression.Reverse();
+            var result = Generator.Generate(reversed);
+            result.ShouldBe("DROP INDEX [TestIndex] ON [dbo].[TestTable1] WITH (ONLINE=ON);");
+        }
+
+        [Test]
         public void CanDropIndexWithOnlineOn()
         {
             var expression = GeneratorTestHelper.GetDeleteIndexExpression();
