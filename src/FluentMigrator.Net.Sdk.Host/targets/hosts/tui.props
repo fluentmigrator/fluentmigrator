@@ -1,0 +1,24 @@
+<Project>
+
+  <!-- Planned (Host ADR, Consumer 4). See aspire.props for why a planned
+       pack never takes the CPM-versionless path. -->
+
+  <ItemGroup>
+    <HostContextDefinition Include="tui"
+                           Package="FluentMigrator.TUI"
+                           ReferenceKind="package"
+                           Invocation="interactive-prompt"
+                           Availability="planned"
+                           Discovery="true"
+                           Version="$(TuiHostContextVersion)"
+                           Description="Spectre.Console menus built entirely from Discover(); no hand-maintained command list." />
+  </ItemGroup>
+
+  <ItemGroup Condition="$(_HostContextSelection.Contains(';tui;')) and '$(TuiHostContextVersion)' != ''">
+    <PackageReference Include="FluentMigrator.TUI" VersionOverride="$(TuiHostContextVersion)"
+                      Condition="'$(ManagePackageVersionsCentrally)' == 'true'" />
+    <PackageReference Include="FluentMigrator.TUI" Version="$(TuiHostContextVersion)"
+                      Condition="'$(ManagePackageVersionsCentrally)' != 'true'" />
+  </ItemGroup>
+
+</Project>

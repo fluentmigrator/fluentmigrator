@@ -1,0 +1,204 @@
+<Project>
+
+  <PropertyGroup>
+    <SourceModelIntermediateManifestPath>$(IntermediateOutputPath)$(SourceModelManifestFileName)</SourceModelIntermediateManifestPath>
+    <SourceModelManifestPath>$(OutputPath)$(SourceModelManifestFileName)</SourceModelManifestPath>
+    <SourceModelInputsStampPath>$(IntermediateOutputPath)sourcemodel.inputs.txt</SourceModelInputsStampPath>
+
+    <!--
+      Resolved here, not in the Conventions props: the fallback is
+      $(DefaultSchema), which the project body sets after the props have
+      already been evaluated. Getting this wrong is silent — the host
+      manifest simply carries an empty versionTable schema.
+    -->
+    <VersionTableName Condition="'$(VersionTableName)' == ''">VersionInfo</VersionTableName>
+    <VersionTableSchema Condition="'$(VersionTableSchema)' == ''">$(DefaultSchema)</VersionTableSchema>
+  </PropertyGroup>
+
+  <UsingTask TaskName="FluentMigrator.Net.Sdk.Tasks.BuildSourceModel"
+             TaskFactory="RoslynCodeTaskFactory"
+             AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <Task>
+      <Code Type="Class" Language="cs" Source="$(MSBuildThisFileDirectory)../tasks/BuildSourceModel.cs" />
+    </Task>
+  </UsingTask>
+
+  <!--
+    Convention selection. Every built-in pack was imported before the
+    project body so that body-level `Update` edits have items to update;
+    this is where the packs the project did not select are dropped, by the
+    Convention metadata each pivot carries.
+
+    Filtering (rather than a conditional import) is what makes
+    $(SourceModelConvention) settable in the project body at all. Items
+    without Convention metadata are user-declared pivots and are always
+    kept — the property selects among *packs*, it does not police
+    hand-written items.
+  -->
+  <Target Name="SelectSourceModelConvention" BeforeTargets="CoreCompile">
+    <ItemGroup>
+      <SqlObject Remove="@(SqlObject)"
+                 Condition="'%(SqlObject.Convention)' != '' and '%(SqlObject.Convention)' != '$(SourceModelConvention)'" />
+      <MigrationSource Remove="@(MigrationSource)"
+                       Condition="'%(MigrationSource.Convention)' != '' and '%(MigrationSource.Convention)' != '$(SourceModelConvention)'" />
+      <MaintenanceSource Remove="@(MaintenanceSource)"
+                         Condition="'%(MaintenanceSource.Convention)' != '' and '%(MaintenanceSource.Convention)' != '$(SourceModelConvention)'" />
+      <MigrationScript Remove="@(MigrationScript)"
+                       Condition="'%(MigrationScript.Convention)' != '' and '%(MigrationScript.Convention)' != '$(SourceModelConvention)'" />
+      <MigrationData Remove="@(MigrationData)"
+                     Condition="'%(MigrationData.Convention)' != '' and '%(MigrationData.Convention)' != '$(SourceModelConvention)'" />
+      <SeedSource Remove="@(SeedSource)"
+                  Condition="'%(SeedSource.Convention)' != '' and '%(SeedSource.Convention)' != '$(SourceModelConvention)'" />
+      <SeedData Remove="@(SeedData)"
+                Condition="'%(SeedData.Convention)' != '' and '%(SeedData.Convention)' != '$(SourceModelConvention)'" />
+      <DatabaseTool Remove="@(DatabaseTool)"
+                    Condition="'%(DatabaseTool.Convention)' != '' and '%(DatabaseTool.Convention)' != '$(SourceModelConvention)'" />
+    </ItemGroup>
+
+    <!-- Only the surviving pivots reach the compiler as AdditionalFiles. -->
+    <ItemGroup>
+      <AdditionalFiles Include="@(SqlObject);@(MigrationScript);@(MigrationData);@(SeedData);@(DatabaseTool)" />
+      <UpToDateCheckInput Include="@(SqlObject);@(MigrationScript);@(MigrationData);@(SeedData);@(DatabaseTool)" />
+    </ItemGroup>
+  </Target>
+
+  <!--
+    Map content pivots to build actions. Runs at target time (after the
+    project body has evaluated) so per-item Update edits (e.g. flipping a
+    script's ContentType to External) are respected. AssignTargetPaths is
+    the canonical pre-embed/pre-copy hook.
+  -->
+  <Target Name="MapSourceModelContent" BeforeTargets="AssignTargetPaths"
+          DependsOnTargets="SelectSourceModelConvention">
+    <ItemGroup>
+      <None Remove="@(MigrationScript);@(MigrationData);@(SeedData)" />
+
+      <EmbeddedResource Include="@(MigrationScript)"
+                        Condition="'%(MigrationScript.ContentType)' != 'External'" />
+      <Content Include="@(MigrationScript)"
+               CopyToOutputDirectory="PreserveNewest"
+               Condition="'%(MigrationScript.ContentType)' == 'External'" />
+
+      <EmbeddedResource Include="@(MigrationData)" />
+      <EmbeddedResource Include="@(SeedData)" />
+    </ItemGroup>
+  </Target>
+
+  <!--
+    Provider aggregation seam. A future dbt/LookML provider package declares
+    its own pivot items and hooks BeforeTargets="CollectSourceModel" to map
+    them into SourceModelFile with Provider metadata set. The manifest task
+    treats providers uniformly; ObjectType is an open vocabulary.
+  -->
+  <Target Name="CollectSourceModel" DependsOnTargets="SelectSourceModelConvention">
+    <ItemGroup>
+      <SourceModelFile Include="@(SqlObject)"          Provider="sql" />
+      <SourceModelFile Include="@(MigrationSource)"    Provider="sql" />
+      <SourceModelFile Include="@(MaintenanceSource)"  Provider="sql" />
+      <SourceModelFile Include="@(MigrationScript)"    Provider="sql" />
+      <SourceModelFile Include="@(MigrationData)"      Provider="sql" />
+      <SourceModelFile Include="@(SeedSource)"         Provider="sql" />
+      <SourceModelFile Include="@(SeedData)"           Provider="sql" />
+      <SourceModelFile Include="@(DatabaseTool)"       Provider="sql" />
+    </ItemGroup>
+  </Target>
+
+  <!--
+    A timestamp-based up-to-date check cannot see a *deleted* input: remove a
+    view from Schema/ and every surviving input is still older than the
+    manifest, so the target is skipped and the manifest keeps describing an
+    object that no longer exists. For a document whose entire purpose is to be
+    committed and diffed, silently stale is the one unacceptable outcome.
+
+    This stamp file's content is the input list, so WriteOnlyWhenDifferent
+    touches it exactly when the *set* of inputs changes — additions and
+    removals alike — and it joins Inputs below to make removals invalidate the
+    manifest without giving up incrementality.
+  -->
+  <Target Name="WriteSourceModelInputsStamp"
+          Condition="'$(GenerateSourceModelManifest)' == 'true'"
+          DependsOnTargets="CollectSourceModel">
+    <WriteLinesToFile File="$(SourceModelInputsStampPath)"
+                      Lines="@(SourceModelFile->'%(Identity)')"
+                      Overwrite="true"
+                      WriteOnlyWhenDifferent="true" />
+    <ItemGroup>
+      <FileWrites Include="$(SourceModelInputsStampPath)" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="BuildSourceModelManifest"
+          Condition="'$(GenerateSourceModelManifest)' == 'true'"
+          AfterTargets="CoreBuild"
+          DependsOnTargets="CollectSourceModel;WriteSourceModelInputsStamp"
+          Inputs="@(SourceModelFile);$(MSBuildProjectFullPath);$(SourceModelInputsStampPath)"
+          Outputs="$(SourceModelIntermediateManifestPath)">
+
+    <BuildSourceModel SourceFiles="@(SourceModelFile)"
+                      ProjectName="$(MSBuildProjectName)"
+                      SourceModelRoot="$(SourceModelRoot)"
+                      Dialect="$(DatabaseDialect)"
+                      DefaultSchema="$(DefaultSchema)"
+                      IsRootModule="$(IsDatabaseRootModule)"
+                      Convention="$(SourceModelConvention)"
+                      ManifestPath="$(SourceModelIntermediateManifestPath)"
+                      TreatValidationWarningsAsErrors="$(TreatSourceModelWarningsAsErrors)" />
+
+    <ItemGroup>
+      <FileWrites Include="$(SourceModelIntermediateManifestPath)" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="CopySourceModelManifestToOutput"
+          Condition="'$(GenerateSourceModelManifest)' == 'true'"
+          AfterTargets="BuildSourceModelManifest"
+          Inputs="$(SourceModelIntermediateManifestPath)"
+          Outputs="$(SourceModelManifestPath)">
+
+    <Copy SourceFiles="$(SourceModelIntermediateManifestPath)"
+          DestinationFiles="$(SourceModelManifestPath)"
+          SkipUnchangedFiles="true" />
+
+    <ItemGroup>
+      <FileWrites Include="$(SourceModelManifestPath)" />
+    </ItemGroup>
+
+    <Message Importance="normal" Text="Source model manifest -> $(SourceModelManifestPath)" />
+  </Target>
+
+  <!-- Friendly standalone entry point: dotnet msbuild -t:SourceModel -->
+  <Target Name="SourceModel"
+          DependsOnTargets="BuildSourceModelManifest;CopySourceModelManifestToOutput" />
+
+  <!--
+    Composition protocol for FluentMigrator.Net.Sdk.Host (same pattern as
+    GetTargetPath). Returns this module's identity, artifacts, and its own
+    ProjectReference names so the host-side validator can lint declared
+    deployment order against the reference graph without parsing projects.
+    Non-module references simply lack this target; the Host SDK calls with
+    SkipNonexistentTargets.
+  -->
+  <Target Name="GetDeploymentModuleInfo"
+          DependsOnTargets="BuildSourceModelManifest;CopySourceModelManifestToOutput"
+          Returns="@(DeploymentModuleInfo)">
+    <ItemGroup>
+      <_FmModuleReference Include="@(ProjectReference->'%(Filename)')" />
+    </ItemGroup>
+    <PropertyGroup>
+      <_FmModuleReferenceList>@(_FmModuleReference)</_FmModuleReferenceList>
+    </PropertyGroup>
+    <ItemGroup>
+      <DeploymentModuleInfo Include="$(MSBuildProjectName)">
+        <ManifestPath>$(SourceModelManifestPath)</ManifestPath>
+        <AssemblyPath>$(TargetPath)</AssemblyPath>
+        <IsRoot>$(IsDatabaseRootModule)</IsRoot>
+        <References>$(_FmModuleReferenceList)</References>
+        <DefaultSchema>$(DefaultSchema)</DefaultSchema>
+        <Dialect>$(DatabaseDialect)</Dialect>
+        <VersionTableName>$(VersionTableName)</VersionTableName>
+        <VersionTableSchema>$(VersionTableSchema)</VersionTableSchema>
+      </DeploymentModuleInfo>
+    </ItemGroup>
+  </Target>
+
+</Project>

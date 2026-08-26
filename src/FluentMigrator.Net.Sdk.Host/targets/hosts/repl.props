@@ -1,0 +1,24 @@
+<Project>
+
+  <!-- Planned (Host ADR, Consumer 7). The one context whose host outlives a
+       single run, and the one where RunAOTCompilation disables execute:source. -->
+
+  <ItemGroup>
+    <HostContextDefinition Include="repl"
+                           Package="FluentMigrator.Repl"
+                           ReferenceKind="package"
+                           Invocation="js-interop"
+                           Availability="planned"
+                           Discovery="true"
+                           Version="$(ReplHostContextVersion)"
+                           Description="Blazor WebAssembly REPL against wasm-embedded databases; the host outlives any single run." />
+  </ItemGroup>
+
+  <ItemGroup Condition="$(_HostContextSelection.Contains(';repl;')) and '$(ReplHostContextVersion)' != ''">
+    <PackageReference Include="FluentMigrator.Repl" VersionOverride="$(ReplHostContextVersion)"
+                      Condition="'$(ManagePackageVersionsCentrally)' == 'true'" />
+    <PackageReference Include="FluentMigrator.Repl" Version="$(ReplHostContextVersion)"
+                      Condition="'$(ManagePackageVersionsCentrally)' != 'true'" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,53 @@
+<!--
+  Real-world form: <Project Sdk="FluentMigrator.Net.Sdk.Host">
+  (version pinned in global.json under "msbuild-sdks", same as the modules')
+-->
+<Project>
+  <Import Project="../../../../src/FluentMigrator.Net.Sdk.Host/Sdk/Sdk.props" />
+
+  <ItemGroup>
+    <ProjectReference Include="../Core/Core.csproj" />
+    <ProjectReference Include="../Sales/Sales.csproj" />
+  </ItemGroup>
+
+  <!--
+    Hosting contexts: the front doors this host offers. Omit the property
+    entirely and you get dotnet-cli, the reference adapter. Contexts the
+    Host ADR describes but that have not shipped yet are legal to declare —
+    they land in the manifest and add no package reference until a version
+    property (here, $(AspireHostContextVersion)) names one.
+  -->
+  <PropertyGroup>
+    <HostContexts>dotnet-cli;msbuild;aspire</HostContexts>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Discovery mode: all referenced modules, root first, then
+         ProjectReference declaration order. -->
+    <DeploymentTarget Include="primary">
+      <ConnectionStringName>Primary</ConnectionStringName>
+      <Dialect>sqlserver</Dialect>
+    </DeploymentTarget>
+
+    <!-- Explicit mode: full module order override, still linted. The
+         dialect differs from primary's, so the manifest resolves a
+         different runner for it — contexts and runners are independent. -->
+    <DeploymentTarget Include="reporting">
+      <ConnectionStringName>Reporting</ConnectionStringName>
+      <Dialect>postgres</Dialect>
+      <Modules>Core;Sales</Modules>
+      <Tags>readonly-replica-seed</Tags>
+    </DeploymentTarget>
+  </ItemGroup>
+
+  <!--
+    Escape hatch (Rails database.yml style): uncomment to ship a
+    hand-authored manifest verbatim; generation and linting are skipped.
+
+    <PropertyGroup>
+      <HostManifestFile>host.custom.json</HostManifestFile>
+    </PropertyGroup>
+  -->
+
+  <Import Project="../../../../src/FluentMigrator.Net.Sdk.Host/Sdk/Sdk.targets" />
+</Project>
