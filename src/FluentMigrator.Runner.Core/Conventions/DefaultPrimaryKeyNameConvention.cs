@@ -19,13 +19,12 @@ using FluentMigrator.Expressions;
 namespace FluentMigrator.Runner.Conventions
 {
     /// <summary>
-    /// The default implementation of a <see cref="IPrimaryKeyNameConvention"/>
+    /// The default implementation of a <see cref="IColumnsConvention"/>
     /// </summary>
     /// <remarks>
-    /// It sets the default constraint name of a primary key column or of a
-    /// standalone primary key constraint to <c>PK_&lt;table name&gt;</c>.
+    /// It sets the default constraint name of a primary key column.
     /// </remarks>
-    public class DefaultPrimaryKeyNameConvention : IPrimaryKeyNameConvention
+    public class DefaultPrimaryKeyNameConvention : IColumnsConvention
     {
         /// <inheritdoc />
         public IColumnsExpression Apply(IColumnsExpression expression)
@@ -39,18 +38,6 @@ namespace FluentMigrator.Runner.Conventions
                         : columnDefinition.TableName;
                     columnDefinition.PrimaryKeyName = GetPrimaryKeyName(tableName);
                 }
-            }
-
-            return expression;
-        }
-
-        /// <inheritdoc />
-        public IConstraintExpression Apply(IConstraintExpression expression)
-        {
-            if (expression.Constraint.IsPrimaryKeyConstraint
-                && string.IsNullOrEmpty(expression.Constraint.ConstraintName))
-            {
-                expression.Constraint.ConstraintName = GetPrimaryKeyName(expression.Constraint.TableName);
             }
 
             return expression;
