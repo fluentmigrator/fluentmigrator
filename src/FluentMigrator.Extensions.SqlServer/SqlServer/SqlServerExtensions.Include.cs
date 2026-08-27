@@ -60,7 +60,7 @@ namespace FluentMigrator.SqlServer
         {
             if (additionalFeatures == null)
                 throw new InvalidOperationException(UnsupportedMethodMessage(nameof(CreateUniqueConstraintInclude), nameof(ISupportAdditionalFeatures)));
-            var includes = additionalFeatures.GetAdditionalFeature<IList<IndexIncludeDefinition>>(IncludesList, () => new List<IndexIncludeDefinition>());
+            var includes = additionalFeatures.GetAdditionalFeature<IList<IndexIncludeDefinition>>(UniqueConstraintIncludesList, () => new List<IndexIncludeDefinition>());
             includes.Add(new IndexIncludeDefinition { Name = columnName });
         }
     }

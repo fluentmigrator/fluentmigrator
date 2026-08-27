@@ -470,6 +470,20 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
+        public void UniqueConstraintIncludeExtensionRoutesToUniqueConstraintIncludesList()
+        {
+            var expression = GeneratorTestHelper.GetCreateMultiColumnUniqueConstraintExpression();
+            var builder = new CreateConstraintExpressionBuilder(expression);
+            builder.Include("TestColumn3");
+
+            expression.Constraint.AdditionalFeatures.ShouldContainKey(SqlServerExtensions.UniqueConstraintIncludesList);
+            expression.Constraint.AdditionalFeatures.ShouldNotContainKey(SqlServerExtensions.IncludesList);
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE UNIQUE INDEX [UC_TestTable1_TestColumn1_TestColumn2] ON [dbo].[TestTable1] ([TestColumn1], [TestColumn2]) INCLUDE ([TestColumn3]);");
+        }
+
+        [Test]
         public virtual void CanCreateMultiColumnUniqueConstraintWithDefaultSchemaAndFilterAndInclude()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnUniqueConstraintExpression();
