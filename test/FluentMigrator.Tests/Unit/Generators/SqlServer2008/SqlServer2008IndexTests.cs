@@ -152,6 +152,18 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
         }
 
         [Test]
+        public void CanCreateUniqueIndexWithFilterAndNonDistinctNulls()
+        {
+            var expression = GeneratorTestHelper.GetCreateUniqueIndexExpression();
+            expression.Index.Columns.First().SetAdditionalFeature(SqlServerExtensions.IndexColumnNullsDistinct, false);
+            new CreateIndexExpressionBuilder(expression).Filter("TestColumn2 = 1");
+
+            var result = _generator.Generate(expression);
+
+            result.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) WHERE TestColumn2 = 1 AND [TestColumn1] IS NOT NULL;");
+        }
+
+        [Test]
         public void CanCreateUniqueIndexWithNonDistinctNullsAlternativeSyntax()
         {
             var expression = new CreateIndexExpression()

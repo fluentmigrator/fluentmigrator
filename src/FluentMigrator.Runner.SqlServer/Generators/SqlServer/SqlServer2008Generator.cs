@@ -107,9 +107,9 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                 return baseFilter;
             }
 
-            baseFilter = string.IsNullOrEmpty(baseFilter) ?
-                $" WHERE {nullsDistinct}" :
-                $" AND  {nullsDistinct}";
+            baseFilter = string.IsNullOrEmpty(baseFilter)
+                ? $" WHERE {nullsDistinct}"
+                : $"{baseFilter} AND {nullsDistinct}";
 
             return baseFilter;
         }
