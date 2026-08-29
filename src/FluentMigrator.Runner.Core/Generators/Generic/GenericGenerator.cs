@@ -24,6 +24,7 @@ using System.Text;
 using FluentMigrator.Expressions;
 using FluentMigrator.Generation;
 using FluentMigrator.Infrastructure;
+using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Base;
 
@@ -249,9 +250,39 @@ namespace FluentMigrator.Runner.Generators.Generic
             );
         }
 
+        /// <summary>
+        /// Whether this provider can express the requested unique-index NULL semantics.
+        /// </summary>
+        /// <param name="nullsDistinct"><c>true</c> when NULLs should be distinct</param>
+        /// <returns><c>true</c> when the provider can express it</returns>
+        protected virtual bool IsUniqueIndexNullsDistinctSupported(bool nullsDistinct) => false;
+
+        /// <summary>
+        /// Routes an unsupported unique-index NULL semantics request through the compatibility
+        /// mode, so a provider that cannot express it fails loudly under STRICT rather than
+        /// silently emitting a weaker constraint.
+        /// </summary>
+        /// <param name="expression">The create index expression</param>
+        /// <returns>An empty string, or whatever the compatibility mode returns</returns>
+        protected string ValidateUniqueIndexNullsDistinct(CreateIndexExpression expression)
+        {
+            var nullsDistinct = expression.Index.GetAdditionalFeature(
+                CreateIndexNullSemanticsExtensions.UniqueIndexNullsDistinct, (bool?)null);
+
+            if (nullsDistinct == null || IsUniqueIndexNullsDistinctSupported(nullsDistinct.Value))
+            {
+                return string.Empty;
+            }
+
+            return CompatibilityMode.HandleCompatibility(
+                $"The requested unique index NULL handling (nulls {(nullsDistinct.Value ? "distinct" : "not distinct")}) is not supported by {GeneratorId}");
+        }
+
         /// <inheritdoc />
         public override string Generate(CreateIndexExpression expression)
         {
+            ValidateUniqueIndexNullsDistinct(expression);
+
             var indexColumns = new string[expression.Index.Columns.Count];
             IndexColumnDefinition columnDef;
 

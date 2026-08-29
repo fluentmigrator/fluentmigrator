@@ -35,6 +35,13 @@ namespace FluentMigrator.Runner.Generators.MySql
     /// </summary>
     public class MySql4Generator : GenericGenerator
     {
+
+        /// <inheritdoc />
+        /// <remarks>
+        /// MySQL treats NULLs as distinct in a unique index natively and cannot express the
+        /// opposite without rewriting the schema, so only that direction is supported.
+        /// </remarks>
+        protected override bool IsUniqueIndexNullsDistinctSupported(bool nullsDistinct) => nullsDistinct;
         /// <inheritdoc />
         public MySql4Generator()
             : this(new MySqlQuoter())

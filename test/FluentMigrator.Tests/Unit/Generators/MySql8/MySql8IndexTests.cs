@@ -1,9 +1,12 @@
 using System;
 
+using FluentMigrator.Builders.Create.Index;
+using FluentMigrator.Exceptions;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Model;
 using FluentMigrator.MySql;
+using FluentMigrator.Runner;
 using FluentMigrator.Runner.Generators.MySql;
 
 using NUnit.Framework;
@@ -141,6 +144,38 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql8
             additionalFeature(expression);
 
             return expression;
+        }
+
+        [Test]
+        public void CreatingUniqueIndexTreatingNullsAsEqualThrowsInStrictMode()
+        {
+            Generator.CompatibilityMode = CompatibilityMode.STRICT;
+
+            var expression = new CreateIndexExpression { Index = { Name = GeneratorTestHelper.TestIndexName } };
+            new CreateIndexExpressionBuilder(expression)
+                .OnTable(GeneratorTestHelper.TestTableName1)
+                .OnColumn(GeneratorTestHelper.TestColumnName1).Ascending()
+                .WithOptions().UniqueTreatNullsAsEqual();
+
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
+        }
+
+        [Test]
+        public void CreatingUniqueIndexTreatingNullsAsEqualIsIgnoredByDefault()
+        {
+            var plain = new CreateIndexExpression { Index = { Name = GeneratorTestHelper.TestIndexName } };
+            new CreateIndexExpressionBuilder(plain)
+                .OnTable(GeneratorTestHelper.TestTableName1)
+                .OnColumn(GeneratorTestHelper.TestColumnName1).Ascending()
+                .WithOptions().Unique();
+
+            var withOption = new CreateIndexExpression { Index = { Name = GeneratorTestHelper.TestIndexName } };
+            new CreateIndexExpressionBuilder(withOption)
+                .OnTable(GeneratorTestHelper.TestTableName1)
+                .OnColumn(GeneratorTestHelper.TestColumnName1).Ascending()
+                .WithOptions().UniqueTreatNullsAsEqual();
+
+            Generator.Generate(withOption).ShouldBe(Generator.Generate(plain));
         }
     }
 }
