@@ -14,6 +14,8 @@
 // limitations under the License.
 #endregion
 
+using System;
+
 using FluentMigrator.Runner.Constraints;
 
 namespace FluentMigrator.Example.Migrations
@@ -35,7 +37,13 @@ namespace FluentMigrator.Example.Migrations
                 .Execute.Sql(@"/* this is a test script */
 update Notes set body=body || ' (modified)';
 ");
-            IfDatabase(processorId=> processorId != ProcessorIdConstants.SQLite)
+            // PostgreSQL quotes identifiers (preserving case) and concatenates strings with ||.
+            IfDatabase(processorId => processorId.StartsWith(ProcessorIdConstants.Postgres, StringComparison.OrdinalIgnoreCase))
+                .Execute.Sql(@"/* this is a test script */
+update ""Notes"" set ""Body"" = ""Body"" || ' (modified)';
+");
+            IfDatabase(processorId => processorId != ProcessorIdConstants.SQLite
+                                      && !processorId.StartsWith(ProcessorIdConstants.Postgres, StringComparison.OrdinalIgnoreCase))
                 .Execute.Sql(@"/* this is a test script */
 update Notes set body=body + ' (modified)';
 ");
