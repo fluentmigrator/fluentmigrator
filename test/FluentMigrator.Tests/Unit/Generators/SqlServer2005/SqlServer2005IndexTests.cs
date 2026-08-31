@@ -2,6 +2,7 @@ using System.Linq;
 
 using FluentMigrator.Builders.Create.Index;
 using FluentMigrator.Builders.Delete.Index;
+using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.SqlServer;
@@ -154,6 +155,28 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             new CreateIndexExpressionBuilder(expression).Online(false);
             var result = Generator.Generate(expression);
             result.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) WITH (ONLINE=OFF);");
+        }
+
+        [Test]
+        public void CanDropAutoReversedCreateIndexWithOnlineOnOptionWithoutOnlineOption()
+        {
+            var expression = GeneratorTestHelper.GetCreateIndexExpression();
+            new CreateIndexExpressionBuilder(expression).Online();
+            var reversed = (DeleteIndexExpression)expression.Reverse();
+            var result = Generator.Generate(reversed);
+            result.ShouldBe("DROP INDEX [TestIndex] ON [dbo].[TestTable1];");
+        }
+
+        [Test]
+        public void CanDropAutoReversedCreateClusteredIndexWithOnlineOnOptionWithOnlineOption()
+        {
+            var expression = GeneratorTestHelper.GetCreateIndexExpression();
+            var builder = new CreateIndexExpressionBuilder(expression);
+            builder.Clustered();
+            builder.Online();
+            var reversed = (DeleteIndexExpression)expression.Reverse();
+            var result = Generator.Generate(reversed);
+            result.ShouldBe("DROP INDEX [TestIndex] ON [dbo].[TestTable1] WITH (ONLINE=ON);");
         }
 
         [Test]
