@@ -116,6 +116,13 @@ namespace FluentMigrator.Runner
         /// <summary>
         /// Creates the required version info database tables
         /// </summary>
+        /// <remarks>
+        /// The default <see cref="IVersionLoader"/> implementation creates any missing version table while it
+        /// is being initialized, which happens on first use. A creation performed by that initialization is
+        /// reported as <c>true</c> as well. Custom <see cref="IVersionLoader"/> implementations that create
+        /// the table during their own initialization cannot report that creation, so <c>false</c> is returned
+        /// for them when the table exists by the time this method checks.
+        /// </remarks>
         /// <returns><c>true</c> if the table had to be created or <c>false</c> when it already existed</returns>
         bool LoadVersionInfoIfRequired();
     }
