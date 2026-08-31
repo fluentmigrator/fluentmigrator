@@ -131,6 +131,44 @@ namespace FluentMigrator.Runner.Generators.SQLite
         }
 
         /// <inheritdoc />
+        /// <remarks>
+        /// SQLite accepts a column-level <c>REFERENCES</c> clause in <c>ALTER TABLE ... ADD COLUMN</c>,
+        /// so a column added with a foreign key declared through the fluent syntax, for example
+        /// <c>Alter.Table("Child").AddColumn("ParentId").AsInt32().ForeignKey("Parent", "Id")</c>,
+        /// gets the clause generated inline. The standalone <see cref="CreateForeignKeyExpression"/>
+        /// the builder queues for the same key is marked as handled so it does not fail afterwards,
+        /// mirroring what <see cref="SQLiteColumn"/> does for keys declared in CREATE TABLE.
+        /// </remarks>
+        public override string Generate(CreateColumnExpression expression)
+        {
+            var foreignKey = expression.Column.ForeignKey;
+            if (!expression.Column.IsForeignKey || foreignKey == null)
+            {
+                return base.Generate(expression);
+            }
+
+            var statement = base.Generate(expression);
+            if (string.IsNullOrEmpty(statement))
+            {
+                return statement;
+            }
+
+            var referencesClause = ((SQLiteColumn)Column).FormatColumnLevelForeignKey(foreignKey);
+
+            // The fluent builder also queues a standalone CreateForeignKeyExpression for this key.
+            // Prefix its name so Generate(CreateForeignKeyExpression) knows it has been handled here.
+            foreignKey.Name = "$$IGNORE$$_" + foreignKey.Name;
+
+            var trimmed = statement.TrimEnd();
+            if (trimmed.EndsWith(";"))
+            {
+                return trimmed.Substring(0, trimmed.Length - 1) + " " + referencesClause + ";";
+            }
+
+            return trimmed + " " + referencesClause;
+        }
+
+        /// <inheritdoc />
         public override string Generate(AlterColumnExpression expression)
         {
             return CompatibilityMode.HandleCompatibility("SQLite does not support alter column");
@@ -144,9 +182,10 @@ namespace FluentMigrator.Runner.Generators.SQLite
 
         /// <inheritdoc />
         /// <remarks>
-        /// SQLite accepts foreign keys only as part of a <c>CREATE TABLE</c> statement - there is no
-        /// <c>ALTER TABLE ... ADD CONSTRAINT</c>. Declaring the key on the column when the table is
-        /// created does work and is generated inline; see <see cref="SQLiteColumn"/>.
+        /// SQLite accepts foreign keys only declared inline on a column or table definition - there is
+        /// no <c>ALTER TABLE ... ADD CONSTRAINT</c>. Declaring the key on the column when the table is
+        /// created, or when the column is added, does work and is generated inline; see
+        /// <see cref="SQLiteColumn"/> and <see cref="Generate(CreateColumnExpression)"/>.
         /// </remarks>
         public override string Generate(CreateForeignKeyExpression expression)
         {
@@ -205,7 +244,9 @@ namespace FluentMigrator.Runner.Generators.SQLite
                 $"Foreign key {name}cannot be created with Create.ForeignKey on SQLite. SQLite accepts foreign keys " +
                 "only inside a CREATE TABLE statement; it has no ALTER TABLE ... ADD CONSTRAINT. " +
                 $"Declare the key on the column when the table is created - {example} - which FluentMigrator " +
-                "generates inline and SQLite accepts. To add one to a table that already exists, rebuild the table: " +
+                "generates inline and SQLite accepts. A new column can also be added with its key declared, " +
+                "using Alter.Table(...).AddColumn(...).ForeignKey(...). To add a key to a column that already " +
+                "exists, rebuild the table: " +
                 "create a replacement with the key declared, copy the rows across, drop the original and rename. " +
                 CompatibilityModeHint;
         }
