@@ -26,11 +26,6 @@ namespace FluentMigrator.Runner.Conventions
     /// </summary>
     /// <remarks>
     /// It sets the default name of a constraint.
-    /// <para>
-    /// In the <see cref="FluentMigrator.Runner.DefaultConventionSet"/>, primary key constraints are named by the
-    /// <see cref="DefaultPrimaryKeyNameConvention"/>, which runs first. This convention only names
-    /// primary key constraints when the primary key name convention isn't part of the convention set.
-    /// </para>
     /// </remarks>
     public class DefaultConstraintNameConvention : IConstraintConvention
     {

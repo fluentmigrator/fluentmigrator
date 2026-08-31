@@ -104,7 +104,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             Generator.CompatibilityMode = compatibilityMode;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ADD CONSTRAINT \"PK_TestTable1\" PRIMARY KEY (\"TestColumn1\", \"TestColumn2\");");
+            result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ADD CONSTRAINT \"PK_TestTable1_TestColumn1_TestColumn2\" PRIMARY KEY (\"TestColumn1\", \"TestColumn2\");");
         }
 
         [Test]
@@ -114,7 +114,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
 
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD CONSTRAINT \"PK_TestTable1\" PRIMARY KEY (\"TestColumn1\", \"TestColumn2\");");
+            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD CONSTRAINT \"PK_TestTable1_TestColumn1_TestColumn2\" PRIMARY KEY (\"TestColumn1\", \"TestColumn2\");");
         }
 
         [Test]
@@ -307,7 +307,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
 
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ADD CONSTRAINT \"PK_TestTable1\" PRIMARY KEY (\"TestColumn1\");");
+            result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ADD CONSTRAINT \"PK_TestTable1_TestColumn1\" PRIMARY KEY (\"TestColumn1\");");
         }
 
         [Test]
@@ -318,7 +318,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
 
-            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD CONSTRAINT \"PK_TestTable1\" PRIMARY KEY (\"TestColumn1\");");
+            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD CONSTRAINT \"PK_TestTable1_TestColumn1\" PRIMARY KEY (\"TestColumn1\");");
         }
 
         [Test]
