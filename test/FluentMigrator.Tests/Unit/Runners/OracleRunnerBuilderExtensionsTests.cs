@@ -20,8 +20,10 @@ using System;
 using System.Collections.Generic;
 
 using FluentMigrator.Runner;
+using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Oracle;
 using FluentMigrator.Runner.Initialization;
+using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Oracle;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -91,7 +93,7 @@ namespace FluentMigrator.Tests.Unit.Runners
                     (Action<IMigrationRunnerBuilder>)(r => r.AddOracle12CManaged()),
                     typeof(Oracle12CManagedProcessor),
                     ProcessorIdConstants.Oracle12cManaged,
-                    GeneratorIdConstants.Oracle12c)
+                    GeneratorIdConstants.Oracle12cManaged)
                 .SetArgDisplayNames(nameof(OracleRunnerBuilderExtensions.AddOracle12CManaged));
         }
 
@@ -137,6 +139,58 @@ namespace FluentMigrator.Tests.Unit.Runners
                     Assert.That(oracleGenerator, Is.SameAs(managedGenerator));
                     Assert.That(oracleGenerator.GeneratorId, Is.EqualTo(GeneratorIdConstants.OracleManaged));
                 });
+            }
+        }
+
+        [TestCase(ProcessorIdConstants.Oracle, GeneratorIdConstants.Oracle)]
+        [TestCase(ProcessorIdConstants.OracleManaged, GeneratorIdConstants.OracleManaged)]
+        [TestCase(ProcessorIdConstants.Oracle12c, GeneratorIdConstants.Oracle12c)]
+        [TestCase(ProcessorIdConstants.Oracle12cManaged, GeneratorIdConstants.Oracle12cManaged)]
+        public void EveryOracleProcessorIdSelectsAGenerator(string processorId, string expectedGeneratorId)
+        {
+            // The runner falls back to the processor id when no generator id is configured, which is
+            // what -p does, so every id a processor answers to has to be claimed by a generator.
+            var services = new ServiceCollection()
+                .AddFluentMigratorCore()
+                .ConfigureRunner(r => r
+                    .AddOracle()
+                    .AddOracle12C()
+                    .AddOracleManaged()
+                    .AddOracle12CManaged())
+                .Configure<SelectingProcessorAccessorOptions>(opt => opt.ProcessorId = processorId)
+                .AddScoped<IConnectionStringReader>(
+                    _ => new PassThroughConnectionStringReader("Data Source=fake;User Id=fake;Password=fake"));
+
+            using (var serviceProvider = services.BuildServiceProvider(validateScopes: true))
+            using (var scope = serviceProvider.CreateScope())
+            {
+                var generator = scope.ServiceProvider.GetRequiredService<IGeneratorAccessor>().Generator;
+
+                Assert.That(generator.GeneratorId, Is.EqualTo(expectedGeneratorId));
+            }
+        }
+
+        [TestCase(GeneratorIdConstants.Oracle12cManaged)]
+        [TestCase(GeneratorIdConstants.Oracle12c)]
+        [TestCase(GeneratorIdConstants.Oracle)]
+        public void Oracle12CManagedGeneratorAnswersToTheUnmanagedIds(string generatorId)
+        {
+            // An application that pins the generator explicitly must keep resolving after the
+            // managed 12c generator took over the registration, which is what the unmanaged
+            // aliases are for. OracleManagedGenerator answers to Oracle for the same reason.
+            var services = new ServiceCollection()
+                .AddFluentMigratorCore()
+                .ConfigureRunner(r => r.AddOracle12CManaged())
+                .Configure<SelectingGeneratorAccessorOptions>(opt => opt.GeneratorId = generatorId)
+                .AddScoped<IConnectionStringReader>(
+                    _ => new PassThroughConnectionStringReader("Data Source=fake;User Id=fake;Password=fake"));
+
+            using (var serviceProvider = services.BuildServiceProvider(validateScopes: true))
+            using (var scope = serviceProvider.CreateScope())
+            {
+                var generator = scope.ServiceProvider.GetRequiredService<IGeneratorAccessor>().Generator;
+
+                Assert.That(generator, Is.TypeOf<Oracle12CManagedGenerator>());
             }
         }
 

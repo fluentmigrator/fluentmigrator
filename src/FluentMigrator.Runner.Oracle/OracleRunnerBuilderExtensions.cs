@@ -83,6 +83,16 @@ namespace FluentMigrator.Runner
         }
 
         /// <summary>
+        /// Register Oracle 12c Managed generator
+        /// </summary>
+        /// <param name="builder">The builder to add the Oracle-specific services to</param>
+        private static void RegisterOracle12CManagedGenerator(IMigrationRunnerBuilder builder)
+        {
+            builder.Services.TryAddScoped<IOracle12CManagedGenerator, Oracle12CManagedGenerator>();
+            builder.Services.TryAddScoped<IOracle12CGenerator>(sp => sp.GetRequiredService<IOracle12CManagedGenerator>());
+        }
+
+        /// <summary>
         /// Register Oracle processor dependencies
         /// </summary>
         /// <param name="builder">The builder to add the Oracle-specific services to</param>
@@ -228,7 +238,7 @@ namespace FluentMigrator.Runner
         /// <returns>The migration runner builder</returns>
         public static IMigrationRunnerBuilder AddOracle12CManaged(this IMigrationRunnerBuilder builder)
         {
-            RegisterOracle12CGenerator(builder);
+            RegisterOracle12CManagedGenerator(builder);
 
             RegisterOracleManagedProcessor<Oracle12CManagedProcessor>(builder, sp =>
                 new Oracle12CManagedProcessor(
@@ -238,7 +248,7 @@ namespace FluentMigrator.Runner
                     sp.GetRequiredService<IOptionsSnapshot<ProcessorOptions>>(),
                     sp.GetRequiredService<IMigrationConnectionFactory>()));
 
-            builder.Services.AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<IOracle12CGenerator>());
+            builder.Services.AddScoped<IMigrationGenerator>(sp => sp.GetRequiredService<IOracle12CManagedGenerator>());
 
             return builder;
         }
