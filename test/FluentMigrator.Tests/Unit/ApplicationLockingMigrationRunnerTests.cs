@@ -149,6 +149,28 @@ namespace FluentMigrator.Tests.Unit
         }
 
         [Test]
+        public void ScopeDisposedOnAnotherThreadDoesNotLeaveCreatorContextStuck()
+        {
+            var locker = new TrackingApplicationLocker();
+            var migrationScope = new Mock<IMigrationScope>();
+            var innerRunner = new Mock<IMigrationRunner>();
+            innerRunner.Setup(x => x.BeginScope()).Returns(migrationScope.Object);
+            var runner = new ApplicationLockingMigrationRunner(innerRunner.Object, locker);
+
+            var scope = runner.BeginScope();
+            var disposalThread = new Thread(scope.Dispose);
+            disposalThread.Start();
+            disposalThread.Join();
+
+            locker.IsLocked.ShouldBeFalse();
+
+            runner.MigrateUp();
+
+            locker.AcquisitionCount.ShouldBe(2);
+            locker.DisposalCount.ShouldBe(2);
+        }
+
+        [Test]
         public void ConfiguredLockerEncompassesVersionLoaderInitialization()
         {
             var processor = new Mock<IMigrationProcessor>(MockBehavior.Loose);
