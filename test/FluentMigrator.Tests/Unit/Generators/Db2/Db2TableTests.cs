@@ -257,7 +257,18 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"IF( EXISTS(SELECT 1 FROM SYSCAT.TABLES WHERE TABSCHEMA = 'TestSchema' AND TABNAME = 'TestTable1')) THEN DROP TABLE TestSchema.TestTable1 END IF;");
+            result.ShouldBe(@"IF( EXISTS(SELECT 1 FROM SYSCAT.TABLES WHERE LCASE(TABSCHEMA)=LCASE('TestSchema') AND LCASE(TABNAME)=LCASE('TestTable1'))) THEN DROP TABLE TestSchema.TestTable1 END IF;");
+        }
+
+        [Test]
+        public void CanDropTableIfExistsWithQuotedIdentifiers()
+        {
+            var expression = GeneratorTestHelper.GetDeleteTableIfExistsExpression();
+            expression.SchemaName = "\"TestSchema\"";
+            expression.TableName = "\"TestTable1\"";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe(@"IF( EXISTS(SELECT 1 FROM SYSCAT.TABLES WHERE TABSCHEMA = 'TestSchema' AND TABNAME = 'TestTable1')) THEN DROP TABLE ""TestSchema"".""TestTable1"" END IF;");
         }
 
         [Test]
