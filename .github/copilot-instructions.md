@@ -232,6 +232,12 @@ public class SqlServerMigrationTests
 - Consider impact on large databases and tables
 - Test performance with realistic data volumes
 
+## Code Review
+
+- When performing a code review, apply the `code-review` agent skill in
+  `.github/skills/code-review/SKILL.md`, which lists the FluentMigrator-specific invariants
+  and compatibility rules to check
+
 ## Documentation
 
 - Update documentation in `docs-website/` for user-facing changes
