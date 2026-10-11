@@ -26,7 +26,12 @@ namespace FluentMigrator.Runner.Infrastructure
     {
         private readonly IMigrationRunner _runner;
         private readonly IApplicationLocker _applicationLocker;
-        private readonly ThreadLocal<LockContext> _lockContext = new ThreadLocal<LockContext>();
+        // Tracks lock ownership for the current logical flow. AsyncLocal flows across awaits and
+        // into child tasks, so code resuming on another thread still sees the active context and
+        // does not reacquire the (possibly non-reentrant) application lock. The context is a shared
+        // mutable reference: releasing it flips IsActive so flows holding an inherited snapshot
+        // observe the release and reacquire instead of skipping the lock.
+        private readonly AsyncLocal<LockContext> _lockContext = new AsyncLocal<LockContext>();
 
         public ApplicationLockingMigrationRunner(
             IMigrationRunner runner,

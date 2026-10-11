@@ -149,6 +149,29 @@ namespace FluentMigrator.Tests.Unit
         }
 
         [Test]
+        public void OperationFlowedToAnotherThreadInsideActiveScopeDoesNotReacquireLock()
+        {
+            var locker = new TrackingApplicationLocker();
+            var migrationScope = new Mock<IMigrationScope>();
+            var innerRunner = new Mock<IMigrationRunner>();
+            innerRunner.Setup(x => x.BeginScope()).Returns(migrationScope.Object);
+            var runner = new ApplicationLockingMigrationRunner(innerRunner.Object, locker);
+
+            using (runner.BeginScope())
+            {
+                var operationThread = new Thread(() => runner.MigrateUp());
+                operationThread.Start();
+                operationThread.Join();
+
+                locker.AcquisitionCount.ShouldBe(1);
+            }
+
+            locker.AcquisitionCount.ShouldBe(1);
+            locker.DisposalCount.ShouldBe(1);
+            locker.IsLocked.ShouldBeFalse();
+        }
+
+        [Test]
         public void ScopeDisposedOnAnotherThreadDoesNotLeaveCreatorContextStuck()
         {
             var locker = new TrackingApplicationLocker();
