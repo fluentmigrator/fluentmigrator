@@ -14,6 +14,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### New
 
+- Application locking: `IApplicationLocker` lets concurrent application instances coordinate so only one runs migrations at a time, covering version-table initialization as well as migration execution
+  - Implement the interface with your preferred coordination mechanism (database lock, distributed store, or platform leader election) and register it with `ConfigureApplicationLocker<TApplicationLocker>()`
+  - The lock is re-entrant per logical flow and is held across manual migration scopes (`BeginScope()`)
 - Custom connections: `IMigrationConnectionFactory` allows applications to supply fully configured `IDbConnection` instances to the migration runner (PR #2268 by @Sherif-Ahmed, building on PR #2002 by @Merlin-Taylor, Issue #1981)
   - Configure with `WithConnectionFactory(sp => ...)`, or with `WithDataSource(sp => ...)` when a `DbDataSource` is available (.NET 8+)
   - The factory is asked for a connection once per migration processor (per connection), not once per command, which makes rotating credentials such as Azure Entra ID or AWS RDS IAM tokens work as expected
