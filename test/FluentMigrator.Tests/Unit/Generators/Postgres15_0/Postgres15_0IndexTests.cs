@@ -48,31 +48,28 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres15_0
         }
 
         [Test]
-        public void CanCreateUniqueIndexTreatingNullsAsEqualWithPortableOption()
+        public void CanCreateUniqueIndexWithPortableNullsNotDistinct()
         {
             var expression = new CreateIndexExpression { Index = { Name = GeneratorTestHelper.TestIndexName } };
             new CreateIndexExpressionBuilder(expression)
                 .OnTable(GeneratorTestHelper.TestTableName1)
-                .OnColumn(GeneratorTestHelper.TestColumnName1).Ascending()
-                .WithOptions().UniqueTreatNullsAsEqual();
+                .OnColumn(GeneratorTestHelper.TestColumnName1).Unique().NullsNotDistinct();
 
             var result = Generator.Generate(expression);
             result.ShouldBe("CREATE UNIQUE INDEX \"TestIndex\" ON \"public\".\"TestTable1\" (\"TestColumn1\" ASC) NULLS NOT DISTINCT;");
         }
 
         [Test]
-        public void CanCreateUniqueIndexTreatingNullsAsDistinctWithPortableOption()
+        public void CanCreateUniqueIndexWithPortableNullsDistinct()
         {
             var expression = new CreateIndexExpression { Index = { Name = GeneratorTestHelper.TestIndexName } };
             new CreateIndexExpressionBuilder(expression)
                 .OnTable(GeneratorTestHelper.TestTableName1)
-                .OnColumn(GeneratorTestHelper.TestColumnName1).Ascending()
-                .WithOptions().UniqueTreatNullsAsDistinct();
+                .OnColumn(GeneratorTestHelper.TestColumnName1).Unique().NullsDistinct();
 
             var result = Generator.Generate(expression);
 
-            // PostgreSQL is natively nulls-distinct, so nothing extra is emitted.
-            result.ShouldBe("CREATE UNIQUE INDEX \"TestIndex\" ON \"public\".\"TestTable1\" (\"TestColumn1\" ASC);");
+            result.ShouldBe("CREATE UNIQUE INDEX \"TestIndex\" ON \"public\".\"TestTable1\" (\"TestColumn1\" ASC) NULLS DISTINCT;");
         }
     }
 }

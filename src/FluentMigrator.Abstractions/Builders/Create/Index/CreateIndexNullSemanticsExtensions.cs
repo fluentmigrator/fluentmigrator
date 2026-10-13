@@ -31,57 +31,60 @@ namespace FluentMigrator
     /// migration that relies on the default therefore means different things on different
     /// engines.
     ///
-    /// These methods state the intent instead, and each provider maps it to whatever native
-    /// syntax expresses it. Where an engine cannot express the requested semantics the request
-    /// is routed through the runner's compatibility mode rather than silently emitting a
-    /// weaker constraint.
+    /// These methods state the intent using the SQL:2023 <c>NULLS [NOT] DISTINCT</c> meaning,
+    /// and each provider maps it to whatever native syntax expresses it. Where an engine cannot
+    /// express the requested semantics the request is routed through the generator's
+    /// compatibility mode rather than silently emitting a weaker constraint.
     ///
-    /// The provider-specific extensions in <c>FluentMigrator.Postgres</c> and
-    /// <c>FluentMigrator.SqlServer</c> are unaffected and take precedence when both are set.
+    /// The setting applies to the whole index, even though it is called from a column of the
+    /// index. Requesting conflicting values on two columns of the same index throws.
     ///
     /// For the SQL that each provider emits, and what happens when a provider cannot express
     /// the request, see
-    /// <see href="https://fluentmigrator.github.io/basics/unique-index-nulls.html">NULL handling in unique indexes</see>.
+    /// <see href="https://fluentmigrator.github.io/basics/indexes.html#null-handling-in-unique-indexes">NULL handling in unique indexes</see>.
     /// </remarks>
     public static class CreateIndexNullSemanticsExtensions
     {
         /// <summary>
         /// The additional-feature key carrying the requested NULL semantics.
-        /// <c>true</c> means NULLs are distinct; <c>false</c> means NULLs compare equal.
+        /// <c>true</c> means NULLs are distinct; <c>false</c> means NULLs are not distinct.
         /// </summary>
         public const string UniqueIndexNullsDistinct = "UniqueIndexNullsDistinct";
 
         /// <summary>
-        /// Index values must be unique, and rows containing NULL in an indexed column never
-        /// conflict with one another, so any number of them may exist.
+        /// NULLs are distinct: rows containing NULL in an indexed column never conflict with
+        /// one another, so any number of them may exist.
         /// </summary>
         /// <remarks>
-        /// Native on PostgreSQL, SQLite, MySQL and Firebird. On SQL Server 2008 and later this
-        /// is emitted as a filtered index excluding NULL rows. Other providers route the request
-        /// through the compatibility mode. See
-        /// <see href="https://fluentmigrator.github.io/basics/unique-index-nulls.html#semantics-per-provider">semantics per provider</see>.
+        /// Native on PostgreSQL, SQLite, MySQL and Firebird; emitted as <c>NULLS DISTINCT</c> on
+        /// PostgreSQL 15 and later. On SQL Server 2008 and later this is emitted as a filtered
+        /// index with <c>WHERE [column] IS NOT NULL</c> for each index column, combined with any
+        /// <c>Filter()</c>. Other providers route the request through the compatibility mode. See
+        /// <see href="https://fluentmigrator.github.io/basics/indexes.html#semantics-per-provider">semantics per provider</see>.
         /// </remarks>
         /// <param name="expression">The expression to set this option for</param>
         /// <returns>The <paramref name="expression"/></returns>
-        public static ICreateIndexOnColumnSyntax UniqueTreatNullsAsDistinct(this ICreateIndexOptionsSyntax expression)
+        /// <exception cref="InvalidOperationException">Another column of the same index requested <c>NullsNotDistinct()</c>.</exception>
+        public static ICreateIndexColumnUniqueOptionsSyntax NullsDistinct(this ICreateIndexColumnUniqueOptionsSyntax expression)
             => SetNullsDistinct(expression, true);
 
         /// <summary>
-        /// Index values must be unique, and NULLs compare equal to one another, so at most one
-        /// row may hold NULL in the indexed columns.
+        /// NULLs are not distinct: NULLs compare equal to one another, so at most one row may
+        /// hold a given combination of values that includes NULL.
         /// </summary>
         /// <remarks>
-        /// Native on SQL Server 2005 and later and on Db2. On PostgreSQL 15 and later this is
-        /// emitted as <c>NULLS NOT DISTINCT</c>. Other providers route the request through the
-        /// compatibility mode. See
-        /// <see href="https://fluentmigrator.github.io/basics/unique-index-nulls.html#semantics-per-provider">semantics per provider</see>.
+        /// Native on SQL Server and Db2, where a plain <c>CREATE UNIQUE INDEX</c> is emitted. On
+        /// PostgreSQL 15 and later this is emitted as <c>NULLS NOT DISTINCT</c>. Other providers
+        /// route the request through the compatibility mode. See
+        /// <see href="https://fluentmigrator.github.io/basics/indexes.html#semantics-per-provider">semantics per provider</see>.
         /// </remarks>
         /// <param name="expression">The expression to set this option for</param>
         /// <returns>The <paramref name="expression"/></returns>
-        public static ICreateIndexOnColumnSyntax UniqueTreatNullsAsEqual(this ICreateIndexOptionsSyntax expression)
+        /// <exception cref="InvalidOperationException">Another column of the same index requested <c>NullsDistinct()</c>.</exception>
+        public static ICreateIndexColumnUniqueOptionsSyntax NullsNotDistinct(this ICreateIndexColumnUniqueOptionsSyntax expression)
             => SetNullsDistinct(expression, false);
 
-        private static ICreateIndexOnColumnSyntax SetNullsDistinct(ICreateIndexOptionsSyntax expression, bool nullsAreDistinct)
+        private static ICreateIndexColumnUniqueOptionsSyntax SetNullsDistinct(ICreateIndexColumnUniqueOptionsSyntax expression, bool nullsDistinct)
         {
             if (expression is not ISupportAdditionalFeatures additionalFeatures)
             {
@@ -89,8 +92,16 @@ namespace FluentMigrator
                     $"The used object does not implement {nameof(ISupportAdditionalFeatures)}.");
             }
 
-            additionalFeatures.AdditionalFeatures[UniqueIndexNullsDistinct] = nullsAreDistinct;
-            return expression.Unique();
+            if (additionalFeatures.AdditionalFeatures.TryGetValue(UniqueIndexNullsDistinct, out var existing)
+                && existing is bool existingValue
+                && existingValue != nullsDistinct)
+            {
+                throw new InvalidOperationException(
+                    "NULLS DISTINCT and NULLS NOT DISTINCT apply to the whole index, so they can't both be requested on the same index.");
+            }
+
+            additionalFeatures.AdditionalFeatures[UniqueIndexNullsDistinct] = nullsDistinct;
+            return expression;
         }
     }
 }

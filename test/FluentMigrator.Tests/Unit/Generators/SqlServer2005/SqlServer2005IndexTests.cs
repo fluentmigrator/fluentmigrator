@@ -2,8 +2,10 @@ using System.Linq;
 
 using FluentMigrator.Builders.Create.Index;
 using FluentMigrator.Builders.Delete.Index;
+using FluentMigrator.Exceptions;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure.Extensions;
+using FluentMigrator.Runner;
 using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.SqlServer;
 
@@ -137,6 +139,33 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 
             var result = Generator.Generate(expression);
             result.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC);");
+        }
+
+        [Test]
+        public void CanCreateUniqueIndexWithPortableNullsNotDistinctInStrictMode()
+        {
+            Generator.CompatibilityMode = CompatibilityMode.STRICT;
+
+            var expression = new CreateIndexExpression { Index = { Name = GeneratorTestHelper.TestIndexName } };
+            new CreateIndexExpressionBuilder(expression)
+                .OnTable(GeneratorTestHelper.TestTableName1)
+                .OnColumn(GeneratorTestHelper.TestColumnName1).Unique().NullsNotDistinct();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC);");
+        }
+
+        [Test]
+        public void CreatingUniqueIndexWithPortableNullsDistinctThrowsInStrictMode()
+        {
+            Generator.CompatibilityMode = CompatibilityMode.STRICT;
+
+            var expression = new CreateIndexExpression { Index = { Name = GeneratorTestHelper.TestIndexName } };
+            new CreateIndexExpressionBuilder(expression)
+                .OnTable(GeneratorTestHelper.TestTableName1)
+                .OnColumn(GeneratorTestHelper.TestColumnName1).Unique().NullsDistinct();
+
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
 
         [Test]

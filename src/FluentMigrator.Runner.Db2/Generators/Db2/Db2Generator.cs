@@ -160,7 +160,7 @@ namespace FluentMigrator.Runner.Generators.DB2
         }
 
         /// <inheritdoc />
-        /// <remarks>Db2 treats NULLs as equal in a unique index, so at most one NULL row is permitted natively. This generator emits no NULL-related index clause, so the distinct direction is not supported. <c>EXCLUDE NULL KEYS</c> would not express it either: it only skips keys in which every column is NULL. See <see href="https://fluentmigrator.github.io/basics/unique-index-nulls.html#db2">NULL handling in unique indexes</see>.</remarks>
+        /// <remarks>Db2 treats NULLs as equal in a unique index, so at most one NULL row is permitted natively. This generator emits no NULL-related index clause, so the distinct direction is not supported. <c>EXCLUDE NULL KEYS</c> would not express it either: it only skips keys in which every column is NULL. See <see href="https://fluentmigrator.github.io/basics/indexes.html#provider-notes">NULL handling in unique indexes</see>.</remarks>
         protected override bool IsUniqueIndexNullsDistinctSupported(bool nullsDistinct) => !nullsDistinct;
 
         /// <inheritdoc />

@@ -147,21 +147,20 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql8
         }
 
         [Test]
-        public void CreatingUniqueIndexTreatingNullsAsEqualThrowsInStrictMode()
+        public void CreatingUniqueIndexWithPortableNullsNotDistinctThrowsInStrictMode()
         {
             Generator.CompatibilityMode = CompatibilityMode.STRICT;
 
             var expression = new CreateIndexExpression { Index = { Name = GeneratorTestHelper.TestIndexName } };
             new CreateIndexExpressionBuilder(expression)
                 .OnTable(GeneratorTestHelper.TestTableName1)
-                .OnColumn(GeneratorTestHelper.TestColumnName1).Ascending()
-                .WithOptions().UniqueTreatNullsAsEqual();
+                .OnColumn(GeneratorTestHelper.TestColumnName1).Unique().NullsNotDistinct();
 
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
 
         [Test]
-        public void CreatingUniqueIndexTreatingNullsAsEqualIsIgnoredByDefault()
+        public void CreatingUniqueIndexWithPortableNullsNotDistinctIsIgnoredByDefault()
         {
             var plain = new CreateIndexExpression { Index = { Name = GeneratorTestHelper.TestIndexName } };
             new CreateIndexExpressionBuilder(plain)
@@ -172,8 +171,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql8
             var withOption = new CreateIndexExpression { Index = { Name = GeneratorTestHelper.TestIndexName } };
             new CreateIndexExpressionBuilder(withOption)
                 .OnTable(GeneratorTestHelper.TestTableName1)
-                .OnColumn(GeneratorTestHelper.TestColumnName1).Ascending()
-                .WithOptions().UniqueTreatNullsAsEqual();
+                .OnColumn(GeneratorTestHelper.TestColumnName1).Unique().NullsNotDistinct();
 
             Generator.Generate(withOption).ShouldBe(Generator.Generate(plain));
         }
