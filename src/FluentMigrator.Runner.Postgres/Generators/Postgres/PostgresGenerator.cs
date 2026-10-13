@@ -536,8 +536,14 @@ namespace FluentMigrator.Runner.Generators.Postgres
         }
 
         /// <inheritdoc />
+        /// <remarks>PostgreSQL treats NULLs as distinct natively. Expressing the opposite needs NULLS NOT DISTINCT, added in PostgreSQL 15.</remarks>
+        protected override bool IsUniqueIndexNullsDistinctSupported(bool nullsDistinct) => nullsDistinct;
+
+        /// <inheritdoc />
         public override string Generate(CreateIndexExpression expression)
         {
+            ValidateUniqueIndexNullsDistinct(expression);
+
             var result = new StringBuilder("CREATE");
 
             if (expression.Index.IsUnique)
