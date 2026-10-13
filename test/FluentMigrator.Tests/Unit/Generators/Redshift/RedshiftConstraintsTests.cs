@@ -111,7 +111,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
             result.ShouldBe(
-                "ALTER TABLE \"TestSchema\".\"TestTable1\" ADD CONSTRAINT \"PK_TestTable1\" PRIMARY KEY (\"TestColumn1\", \"TestColumn2\");");
+                "ALTER TABLE \"TestSchema\".\"TestTable1\" ADD CONSTRAINT \"PK_TestTable1_TestColumn1_TestColumn2\" PRIMARY KEY (\"TestColumn1\", \"TestColumn2\");");
         }
 
         [Test]
@@ -121,7 +121,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
 
             var result = Generator.Generate(expression);
             result.ShouldBe(
-                "ALTER TABLE \"public\".\"TestTable1\" ADD CONSTRAINT \"PK_TestTable1\" PRIMARY KEY (\"TestColumn1\", \"TestColumn2\");");
+                "ALTER TABLE \"public\".\"TestTable1\" ADD CONSTRAINT \"PK_TestTable1_TestColumn1_TestColumn2\" PRIMARY KEY (\"TestColumn1\", \"TestColumn2\");");
         }
 
         [Test]
@@ -346,7 +346,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
             result.ShouldBe(
-                "ALTER TABLE \"TestSchema\".\"TestTable1\" ADD CONSTRAINT \"PK_TestTable1\" PRIMARY KEY (\"TestColumn1\");");
+                "ALTER TABLE \"TestSchema\".\"TestTable1\" ADD CONSTRAINT \"PK_TestTable1_TestColumn1\" PRIMARY KEY (\"TestColumn1\");");
         }
 
         [Test]
@@ -357,7 +357,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
             result.ShouldBe(
-                "ALTER TABLE \"public\".\"TestTable1\" ADD CONSTRAINT \"PK_TestTable1\" PRIMARY KEY (\"TestColumn1\");");
+                "ALTER TABLE \"public\".\"TestTable1\" ADD CONSTRAINT \"PK_TestTable1_TestColumn1\" PRIMARY KEY (\"TestColumn1\");");
         }
 
         [Test]

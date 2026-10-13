@@ -309,7 +309,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [PK_TestTable1] PRIMARY KEY ([TestColumn1], [TestColumn2]);");
+            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [PK_TestTable1_TestColumn1_TestColumn2] PRIMARY KEY ([TestColumn1], [TestColumn2]);");
         }
 
         [Test]
@@ -319,7 +319,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [PK_TestTable1] PRIMARY KEY ([TestColumn1], [TestColumn2]);");
+            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [PK_TestTable1_TestColumn1_TestColumn2] PRIMARY KEY ([TestColumn1], [TestColumn2]);");
         }
 
         [Test]
@@ -843,7 +843,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [PK_TestTable1] PRIMARY KEY ([TestColumn1]);");
+            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [PK_TestTable1_TestColumn1] PRIMARY KEY ([TestColumn1]);");
         }
 
         [Test]
@@ -853,7 +853,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [PK_TestTable1] PRIMARY KEY ([TestColumn1]);");
+            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [PK_TestTable1_TestColumn1] PRIMARY KEY ([TestColumn1]);");
         }
 
         [Test]
@@ -1000,7 +1000,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             new CreateConstraintExpressionBuilder(expression).Online();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [PK_TestTable1] PRIMARY KEY ([TestColumn1]) WITH (ONLINE=ON);");
+            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [PK_TestTable1_TestColumn1] PRIMARY KEY ([TestColumn1]) WITH (ONLINE=ON);");
         }
 
         [Test]
@@ -1010,7 +1010,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             new CreateConstraintExpressionBuilder(expression).Online(false);
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [PK_TestTable1] PRIMARY KEY ([TestColumn1]) WITH (ONLINE=OFF);");
+            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [PK_TestTable1_TestColumn1] PRIMARY KEY ([TestColumn1]) WITH (ONLINE=OFF);");
         }
 
         [Test]
