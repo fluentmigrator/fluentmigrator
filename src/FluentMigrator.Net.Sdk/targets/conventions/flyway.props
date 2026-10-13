@@ -1,0 +1,40 @@
+<Project>
+
+  <!--
+    Convention pack: flyway.
+    Flat sql/ directory, filename prefixes carry the semantics:
+      V{version}__{description}.sql   versioned migration   (once)
+      U{version}__{description}.sql   undo migration        (once)
+      R__{description}.sql            repeatable            (onChange)
+      B{version}__{description}.sql   baseline              (once)
+      callback/*.sql                  lifecycle callbacks   (always)
+
+    Same provider (sql), same manifest vocabulary as the fluentmigrator
+    pack; only the mapping from layout to object model differs. Flyway's R__
+    repeatables land as execution=onChange exactly like Schema/* objects do
+    in the default pack; the checksum field drives both.
+
+    Layout root and separator are properties, mirroring flyway.locations /
+    flyway.sqlMigrationSeparator. $(FlywayLocationRoot) is read at import
+    time, so unlike $(SourceModelConvention) it has to be set before the
+    SDK's props are evaluated (Directory.Build.props or a global property).
+  -->
+
+  <PropertyGroup>
+    <FlywayLocationRoot Condition="'$(FlywayLocationRoot)' == ''">sql/</FlywayLocationRoot>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <SqlObject Include="$(FlywayLocationRoot)V*__*.sql" Convention="flyway"
+               ObjectType="migration-script" NamePolicy="FlywayPrefixed" Execution="once" />
+    <SqlObject Include="$(FlywayLocationRoot)U*__*.sql" Convention="flyway"
+               ObjectType="undo-script" NamePolicy="FlywayPrefixed" Execution="once" />
+    <SqlObject Include="$(FlywayLocationRoot)R__*.sql" Convention="flyway"
+               ObjectType="repeatable" NamePolicy="FlywayPrefixed" Execution="onChange" UniqueIdentity="true" />
+    <SqlObject Include="$(FlywayLocationRoot)B*__*.sql" Convention="flyway"
+               ObjectType="baseline" NamePolicy="FlywayPrefixed" Execution="once" />
+    <SqlObject Include="$(FlywayLocationRoot)callback/**/*.sql" Convention="flyway"
+               ObjectType="script" Execution="always" Stage="callback" />
+  </ItemGroup>
+
+</Project>

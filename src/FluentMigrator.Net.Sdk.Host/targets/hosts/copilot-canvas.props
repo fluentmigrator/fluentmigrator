@@ -1,0 +1,25 @@
+<Project>
+
+  <!-- Planned (Host ADR, Consumer 6). Its data and execution layer is an
+       MCP client of the mcp context rather than a second schema; select
+       both when you want the dashboard and the server in one host. -->
+
+  <ItemGroup>
+    <HostContextDefinition Include="copilot-canvas"
+                           Package="FluentMigrator.CopilotCanvas"
+                           ReferenceKind="package"
+                           Invocation="structured-request"
+                           Availability="planned"
+                           Discovery="true"
+                           Version="$(CopilotCanvasHostContextVersion)"
+                           Description="Agent-facing dashboard; consumes the mcp context rather than defining its own schema." />
+  </ItemGroup>
+
+  <ItemGroup Condition="$(_HostContextSelection.Contains(';copilot-canvas;')) and '$(CopilotCanvasHostContextVersion)' != ''">
+    <PackageReference Include="FluentMigrator.CopilotCanvas" VersionOverride="$(CopilotCanvasHostContextVersion)"
+                      Condition="'$(ManagePackageVersionsCentrally)' == 'true'" />
+    <PackageReference Include="FluentMigrator.CopilotCanvas" Version="$(CopilotCanvasHostContextVersion)"
+                      Condition="'$(ManagePackageVersionsCentrally)' != 'true'" />
+  </ItemGroup>
+
+</Project>

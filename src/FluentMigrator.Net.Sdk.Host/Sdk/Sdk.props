@@ -1,0 +1,68 @@
+<Project>
+
+  <!--
+    FluentMigrator.Net.Sdk.Host
+    ===========================
+    The composition root for one or more FluentMigrator.Net.Sdk module
+    projects. A host project owns everything a module must not: deployment
+    targets, connection-string names, deployment order, tenancy — and which
+    hosting contexts (front doors) the resulting commands are exposed
+    through. Its build output is a host manifest
+    ($(MSBuildProjectName).host.json) serializing the final, validated plan.
+
+    Ordering contract (the ADR in one paragraph): DeploymentTarget document
+    order is the contract; the module reference graph is the linter. MSBuild
+    build order stays graph-driven; deploy order stays declared. When they
+    disagree, FMSDK201 tells you; it never silently reorders. The escape
+    hatch, Rails-database.yml style: set $(HostManifestFile) to a
+    hand-authored manifest and the SDK ships yours instead of generating.
+
+    Hosting contexts (see adr/proposed/FluentMigrator-Host-Design.md): the
+    same IMigrationCommand set is reachable through a CLI, an MSBuild task,
+    an Aspire dashboard command, a TUI, an MCP tool, or a browser REPL.
+    Which of those a given host project offers is a declaration, not eight
+    reimplementations:
+
+      <HostContexts>dotnet-cli;aspire</HostContexts>
+
+    Each context is described by a pack under targets/hosts/, imported from
+    Sdk.targets so a pack can react to properties set in the project body.
+    The runner is selected per deployment target, from that target's dialect
+    — so "multiple hosting contexts based on the runner you select" is two
+    orthogonal axes recorded in one manifest: contexts x targets.
+  -->
+
+  <!--
+    A marker a project or a Directory.Build.targets can test for. There is
+    deliberately no version property alongside it: the payload cannot know
+    the version of the package it was restored from, and a hardcoded number
+    would go stale on the first release. The version lives where it is
+    authoritative — the Sdk attribute, or global.json's msbuild-sdks.
+  -->
+  <PropertyGroup>
+    <UsingFluentMigratorNetSdkHost>true</UsingFluentMigratorNetSdkHost>
+  </PropertyGroup>
+
+  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+
+  <PropertyGroup>
+    <TargetFramework Condition="'$(TargetFramework)' == '' and '$(TargetFrameworks)' == ''">netstandard2.0</TargetFramework>
+    <IsPackable Condition="'$(IsPackable)' == ''">false</IsPackable>
+
+    <GenerateHostManifest Condition="'$(GenerateHostManifest)' == ''">true</GenerateHostManifest>
+    <TreatHostWarningsAsErrors Condition="'$(TreatHostWarningsAsErrors)' == ''">false</TreatHostWarningsAsErrors>
+    <HostManifestFileName Condition="'$(HostManifestFileName)' == ''">$(MSBuildProjectName).host.json</HostManifestFileName>
+
+    <!--
+      Escape hatch: point at your own manifest and generation is skipped
+      entirely (validation included: your file, your order, your rules).
+    -->
+    <HostManifestFile Condition="'$(HostManifestFile)' == ''"></HostManifestFile>
+
+    <!-- Reserved: OutputType=Exe entry-point generation over FluentMigrator.Runner.Host. -->
+    <GenerateMigrationHost Condition="'$(GenerateMigrationHost)' == ''">false</GenerateMigrationHost>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildThisFileDirectory)../targets/FluentMigrator.Net.Sdk.Host.Runners.props" />
+
+</Project>

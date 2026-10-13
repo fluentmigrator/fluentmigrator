@@ -1,0 +1,37 @@
+<Project>
+
+  <!--
+    Runner registry: dialect -> the FluentMigrator.Runner.* package that
+    provides IMigrationProcessor for it.
+
+    This is the second axis of "multiple hosting contexts based on the
+    runner you select". A hosting context is *how* a command is invoked; a
+    runner is *what* executes the resulting SQL. They are independent: the
+    same aspire context drives a sqlserver target and a postgres target in
+    the same host project, and the manifest records the resolved runner per
+    deployment target so a consumer never has to re-derive it from a
+    connection string.
+
+    A target whose dialect is not in this registry still builds — the
+    manifest simply carries no runner for it (FMSDK208), which is the
+    correct outcome for 'generic' and for third-party processors. Add your
+    own by declaring another MigrationRunnerPackage item anywhere before
+    the manifest is built.
+  -->
+
+  <ItemGroup>
+    <MigrationRunnerPackage Include="sqlserver"  Package="FluentMigrator.Runner.SqlServer" />
+    <MigrationRunnerPackage Include="postgres"   Package="FluentMigrator.Runner.Postgres" />
+    <MigrationRunnerPackage Include="postgresql" Package="FluentMigrator.Runner.Postgres" />
+    <MigrationRunnerPackage Include="redshift"   Package="FluentMigrator.Runner.Redshift" />
+    <MigrationRunnerPackage Include="mysql"      Package="FluentMigrator.Runner.MySql" />
+    <MigrationRunnerPackage Include="sqlite"     Package="FluentMigrator.Runner.SQLite" />
+    <MigrationRunnerPackage Include="oracle"     Package="FluentMigrator.Runner.Oracle" />
+    <MigrationRunnerPackage Include="db2"        Package="FluentMigrator.Runner.Db2" />
+    <MigrationRunnerPackage Include="firebird"   Package="FluentMigrator.Runner.Firebird" />
+    <MigrationRunnerPackage Include="hana"       Package="FluentMigrator.Runner.Hana" />
+    <MigrationRunnerPackage Include="jet"        Package="FluentMigrator.Runner.Jet" />
+    <MigrationRunnerPackage Include="snowflake"  Package="FluentMigrator.Runner.Snowflake" />
+  </ItemGroup>
+
+</Project>

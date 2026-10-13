@@ -1,0 +1,47 @@
+<Project>
+
+  <!--
+    Convention pack: fluentmigrator (default).
+    Pivot layout as designed for FluentMigrator projects; see README.
+    Execution facet vocabulary (normalized across conventions so manifests
+    from different layouts are comparable):
+      once     - journaled, runs exactly once in order (versioned migrations)
+      onChange - idempotent, re-applied when checksum changes (Schema/*)
+      always   - runs per deployment at its stage (maintenance)
+
+    Every item carries Convention metadata naming the pack that declared it:
+    all packs are imported, and SelectSourceModelConvention keeps only the
+    selected one. A custom pack must stamp the same value the project puts
+    in $(SourceModelConvention), or its items are filtered right back out.
+  -->
+
+  <ItemGroup>
+
+    <!-- Schema/* : programmable objects, one file per object, dup-checked. -->
+    <SqlObject Include="Schema/Functions/**/*.sql"        Convention="fluentmigrator" ObjectType="function"  NamePolicy="SchemaDotObject" UniqueIdentity="true" Execution="onChange" />
+    <SqlObject Include="Schema/StoredProcedures/**/*.sql" Convention="fluentmigrator" ObjectType="procedure" NamePolicy="SchemaDotObject" UniqueIdentity="true" Execution="onChange" />
+    <SqlObject Include="Schema/Triggers/**/*.sql"         Convention="fluentmigrator" ObjectType="trigger"   NamePolicy="SchemaDotObject" UniqueIdentity="true" Execution="onChange" />
+    <SqlObject Include="Schema/Views/**/*.sql"            Convention="fluentmigrator" ObjectType="view"      NamePolicy="SchemaDotObject" UniqueIdentity="true" Execution="onChange" />
+    <SqlObject Include="Schema/Types/**/*.sql"            Convention="fluentmigrator" ObjectType="type"      NamePolicy="SchemaDotObject" UniqueIdentity="true" Execution="onChange" />
+
+    <!-- Migrations: .cs files compile via the normal default Compile glob;
+         these items classify them for the source model. -->
+    <MigrationSource Include="Migrations/**/*.cs" Convention="fluentmigrator" ObjectType="migration" Execution="once" />
+    <MaintenanceSource Include="Maintenance/**/*.cs" Convention="fluentmigrator" ObjectType="maintenance-migration" Execution="always" Stage="maintenance" />
+
+    <MigrationScript Include="Migrations/Scripts/**/*.sql" Convention="fluentmigrator" ObjectType="migration-script" ContentType="Embedded" Execution="once" />
+    <MigrationData Include="Migrations/Data/**/*.csv" Convention="fluentmigrator" ObjectType="migration-data" Execution="once" />
+
+    <!-- Seed: csv embedded; .cs (ISeed implementations) compile via the
+         default Compile glob. Interface conformance is the FluentMigrator
+         analyzer's job, not MSBuild's. -->
+    <SeedData Include="Seed/**/*.csv" Convention="fluentmigrator" ObjectType="seed-data" Stage="seed" />
+    <SeedSource Include="Seed/**/*.cs" Convention="fluentmigrator" ObjectType="seed" Stage="seed" />
+
+    <DatabaseTool Include="Tools/CreateDatabase.sql" Condition="Exists('Tools/CreateDatabase.sql')"
+                  Convention="fluentmigrator" ObjectType="tool" Role="create-database" Stage="provision" />
+    <DatabaseTool Include="Tools/DatabaseSchema.sql" Condition="Exists('Tools/DatabaseSchema.sql')"
+                  Convention="fluentmigrator" ObjectType="tool" Role="baseline" Stage="provision" />
+  </ItemGroup>
+
+</Project>
