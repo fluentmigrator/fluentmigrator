@@ -72,7 +72,6 @@ export default defineConfig({
                     items: [
                         {text: 'Columns', link: '/basics/columns'},
                         {text: 'Indexes', link: '/basics/indexes'},
-                        {text: 'NULLs in Unique Indexes', link: '/basics/unique-index-nulls'},
                         {text: 'Constraints', link: '/basics/constraints'},
                         {text: 'Foreign Keys', link: '/basics/foreign-keys'},
                         {text: 'Raw SQL Helper', link: '/basics/raw-sql'}

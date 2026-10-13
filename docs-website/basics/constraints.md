@@ -142,6 +142,8 @@ Different database providers offer specialized constraint options and advanced f
 - **Filtered Unique Constraints**: Conditional unique constraints with WHERE clauses - [SQL Server Provider](../providers/sql-server.md)
 - **Include Columns**: Covering constraint optimizations - [SQL Server Provider](../providers/sql-server.md)
 
+If you use a filtered unique constraint only to allow any number of rows with NULL (`WHERE col IS NOT NULL`), use a unique index with the provider-agnostic `NullsDistinct()` instead. For details, see [NULL handling in unique indexes](./indexes.md#null-handling-in-unique-indexes). For arbitrary filters, you still need `Filter()`.
+
 ## Troubleshooting
 
 ### Common Issues
