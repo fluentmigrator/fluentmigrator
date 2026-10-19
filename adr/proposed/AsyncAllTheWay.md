@@ -17,8 +17,26 @@ FluentMigrator executes everything synchronously. Shipped `src/` contains no `as
 matches are Roslyn plumbing in `FluentMigrator.Analyzers`.
 
 The discussion on #854 comes down to two use cases that a sequential, single-connection migration
-runner actually benefits from. Throughput is not one of them: FluentMigrator opens one connection
-and never runs SQL in parallel, by design.
+runner actually benefits from. Throughput is not one of them *today*: FluentMigrator opens one
+connection and never runs SQL in parallel, by design.
+
+Two future features could change that, and this ADR must not rule them out:
+
+* **Seeding.** Bulk data loads, typically through Profiles, into independent tables.
+* **[#1221](https://github.com/fluentmigrator/fluentmigrator/issues/1221), `With.Databases` /
+  `With.Tables`.** A fluent replacement for `sp_MSforeachdb` and `sp_MSforeachtable` that fans one
+  operation out over many databases or tables. Fanning out per database maps naturally onto one
+  connection per database.
+
+Both would need **more than one connection**. That takes them outside the
+one-connection, one-transaction model that this ADR's rollback and journal rules (D2) are written
+for. Parallel execution is therefore out of scope here and needs its own ADR. What this ADR
+guarantees is that the async surface is a sound foundation for it:
+
+* Everything returns `ValueTask` and takes an explicit `CancellationToken`.
+* Nothing relies on thread affinity.
+* A future fan-out can be built as `Task.WhenAll` over per-connection processors linked to the
+  run's token, without another API change.
 
 1. **Composing with async code.** `Execute.WithConnection` takes an
    `Action<IDbConnection, IDbTransaction>`. Anyone who wants to reuse an async data-access layer
