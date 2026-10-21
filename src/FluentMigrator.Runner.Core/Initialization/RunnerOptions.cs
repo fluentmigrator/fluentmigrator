@@ -93,6 +93,11 @@ namespace FluentMigrator.Runner.Initialization
         public bool NoConnection { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether a connectionless preview should include creation of the version table
+        /// </summary>
+        public bool PreviewFromNothing { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether untagged maintenance items should always be loaded/executed.
         /// </summary>
         public bool IncludeUntaggedMaintenances { get; set; } = true;

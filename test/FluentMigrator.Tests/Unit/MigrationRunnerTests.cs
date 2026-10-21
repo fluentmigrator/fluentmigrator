@@ -274,6 +274,43 @@ namespace FluentMigrator.Tests.Unit
         }
 
         [Test]
+        public void PreviewFromNothingCreatesVersionInfoTable()
+        {
+            var runner = CreateRunner(
+                services => services
+                    .Configure<RunnerOptions>(
+                        options =>
+                        {
+                            options.NoConnection = true;
+                            options.PreviewFromNothing = true;
+                        })
+                    .Configure<ProcessorOptions>(options => options.PreviewOnly = true));
+
+            runner.MigrateUp();
+
+            _processorMock.Verify(
+                processor => processor.Process(
+                    It.Is<CreateTableExpression>(
+                        expression => expression.TableName == runner.VersionLoader.VersionTableMetaData.TableName)),
+                Times.Once);
+        }
+
+        [Test]
+        public void ConnectionlessPreviewDoesNotCreateVersionInfoTableByDefault()
+        {
+            var runner = CreateRunner(
+                services => services
+                    .Configure<RunnerOptions>(options => options.NoConnection = true)
+                    .Configure<ProcessorOptions>(options => options.PreviewOnly = true));
+
+            runner.MigrateUp();
+
+            _processorMock.Verify(
+                processor => processor.Process(It.IsAny<CreateTableExpression>()),
+                Times.Never);
+        }
+
+        [Test]
         public void CanTimeExpression()
         {
             var ts = new TimeSpan(0, 0, 0, 1, 3);
