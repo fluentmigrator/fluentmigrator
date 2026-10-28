@@ -196,6 +196,13 @@ namespace FluentMigrator.Runner.Generators.Oracle
                 return string.Empty;
             }
 
+            // Dynamic SQL must not carry the statement end token, otherwise Oracle raises ORA-00922/ORA-00911
+            statement = statement.TrimEnd();
+            if (statement.EndsWith(";"))
+            {
+                statement = statement.Substring(0, statement.Length - 1);
+            }
+
             return FormatStatement("EXECUTE IMMEDIATE '{0}'", FormatHelper.FormatSqlEscape(statement));
         }
 
