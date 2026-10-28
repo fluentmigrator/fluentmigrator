@@ -144,7 +144,13 @@ services.Configure<GeneratorOptions>(opt => opt.CompatibilityMode = Compatibilit
 
 **Oracle.** Oracle doesn't index a key in which every column is NULL, so any number of such rows may exist. A composite key with only some NULL columns is indexed, and those NULLs compare equal. Neither option describes this behavior for every index, so both go through compatibility mode.
 
-**Snowflake.** Snowflake doesn't support indexes, so the whole index goes through compatibility mode. If you need the rows that a filtered unique index would cover for reads, create a materialized view in an `IfDatabase` block:
+**Snowflake.** Snowflake doesn't support indexes, so the whole index goes through compatibility mode. With `CompatibilityMode.STRICT`, the generator throws a `DatabaseOperationNotSupportedException` with this message:
+
+```text
+Indices not supported. To read the rows that a filtered unique index would cover, create a materialized view in an IfDatabase(ProcessorIdConstants.Snowflake) block. A materialized view doesn't enforce uniqueness on writes.
+```
+
+If you need the rows that a filtered unique index would cover for reads, create a materialized view in an `IfDatabase` block:
 
 ```csharp
 IfDatabase(ProcessorIdConstants.Snowflake).Execute.Sql(@"
