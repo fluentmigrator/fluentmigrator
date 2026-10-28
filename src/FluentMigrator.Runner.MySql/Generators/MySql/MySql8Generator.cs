@@ -89,6 +89,8 @@ namespace FluentMigrator.Runner.Generators.MySql
         /// <inheritdoc />
         public override string Generate(CreateIndexExpression expression)
         {
+            ValidateUniqueIndexNullsDistinct(expression);
+
             var query = new StringBuilder("CREATE");
 
             if (expression.Index.IsUnique)

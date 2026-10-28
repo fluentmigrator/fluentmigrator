@@ -153,7 +153,10 @@ namespace FluentMigrator.Runner.Generators.Snowflake
         /// <inheritdoc />
         public override string Generate(CreateIndexExpression expression)
         {
-            return CompatibilityMode.HandleCompatibility("Indices not supported");
+            return CompatibilityMode.HandleCompatibility(
+                "Indices not supported. To read the rows that a filtered unique index would cover, "
+                + "create a materialized view in an IfDatabase(ProcessorIdConstants.Snowflake) block. "
+                + "A materialized view doesn't enforce uniqueness on writes.");
         }
 
         /// <inheritdoc />

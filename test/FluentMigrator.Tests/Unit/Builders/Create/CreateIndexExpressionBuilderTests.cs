@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using FluentMigrator.Builder.Create.Index;
 using FluentMigrator.Builders.Create.Index;
@@ -558,6 +559,59 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             collectionMock.VerifySet(x => x.IndexType = indexType);
             indexMock.VerifyGet(x => x.AdditionalFeatures);
             expressionMock.VerifyGet(e => e.Index);
+        }
+
+        [TestCase(true)]
+        [TestCase(false)]
+        public void CallingNullsDistinctOrNullsNotDistinctSetsIndexLevelFeature(bool nullsDistinct)
+        {
+            var expression = new CreateIndexExpression();
+            var unique = new CreateIndexExpressionBuilder(expression)
+                .OnTable("Bacon")
+                .OnColumn("BaconId").Unique();
+
+            var result = nullsDistinct ? unique.NullsDistinct() : unique.NullsNotDistinct();
+
+            Assert.That(result, Is.SameAs(unique));
+            Assert.That(expression.Index.IsUnique, Is.True);
+            Assert.That(expression.Index.AdditionalFeatures[CreateIndexNullSemanticsExtensions.UniqueIndexNullsDistinct], Is.EqualTo(nullsDistinct));
+            Assert.That(expression.Index.Columns.First().AdditionalFeatures, Does.Not.ContainKey(CreateIndexNullSemanticsExtensions.UniqueIndexNullsDistinct));
+        }
+
+        [Test]
+        public void CallingNullsDistinctOnTwoColumnsOfTheSameIndexIsAllowed()
+        {
+            var expression = new CreateIndexExpression();
+            new CreateIndexExpressionBuilder(expression)
+                .OnTable("Bacon")
+                .OnColumn("BaconId").Unique().NullsDistinct()
+                .OnColumn("BaconName").Unique().NullsDistinct();
+
+            Assert.That(expression.Index.AdditionalFeatures[CreateIndexNullSemanticsExtensions.UniqueIndexNullsDistinct], Is.EqualTo(true));
+        }
+
+        [TestCase(true)]
+        [TestCase(false)]
+        public void CallingConflictingNullsDistinctOnTwoColumnsOfTheSameIndexThrows(bool firstNullsDistinct)
+        {
+            var expression = new CreateIndexExpression();
+            var second = new CreateIndexExpressionBuilder(expression)
+                .OnTable("Bacon")
+                .OnColumn("BaconId").Unique();
+            second = firstNullsDistinct ? second.NullsDistinct() : second.NullsNotDistinct();
+            var unique = second.OnColumn("BaconName").Unique();
+
+            Assert.Throws<InvalidOperationException>(() =>
+            {
+                if (firstNullsDistinct)
+                {
+                    unique.NullsNotDistinct();
+                }
+                else
+                {
+                    unique.NullsDistinct();
+                }
+            });
         }
     }
 }
