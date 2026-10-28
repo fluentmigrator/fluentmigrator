@@ -1,0 +1,30 @@
+<Project>
+
+  <!--
+    Planned (see the Host ADR, Consumer 5). Selecting it is legal: the
+    manifest records it so an AppHost can already be generated against it.
+    A planned pack references its package only when its version property is
+    set explicitly — never the CPM-versionless path, because a package that
+    has not shipped has no PackageVersion entry to join against, and NU1010
+    is a worse diagnostic than no reference at all.
+  -->
+
+  <ItemGroup>
+    <HostContextDefinition Include="aspire"
+                           Package="FluentMigrator.Aspire"
+                           ReferenceKind="package"
+                           Invocation="command-payload"
+                           Availability="planned"
+                           Discovery="true"
+                           Version="$(AspireHostContextVersion)"
+                           Description="Each command exposed as an interactive Aspire dashboard Command via WithCommand." />
+  </ItemGroup>
+
+  <ItemGroup Condition="$(_HostContextSelection.Contains(';aspire;')) and '$(AspireHostContextVersion)' != ''">
+    <PackageReference Include="FluentMigrator.Aspire" VersionOverride="$(AspireHostContextVersion)"
+                      Condition="'$(ManagePackageVersionsCentrally)' == 'true'" />
+    <PackageReference Include="FluentMigrator.Aspire" Version="$(AspireHostContextVersion)"
+                      Condition="'$(ManagePackageVersionsCentrally)' != 'true'" />
+  </ItemGroup>
+
+</Project>

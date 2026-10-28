@@ -1,0 +1,48 @@
+<!--
+  In-repo form: imports the SDK payload directly so the sample builds
+  without packing/publishing first.
+
+  Real-world form, once the package is on a feed:
+
+    <Project Sdk="FluentMigrator.Net.Sdk">
+      <PropertyGroup>
+        <DatabaseDialect>sqlserver</DatabaseDialect>
+        <DefaultSchema>dbo</DefaultSchema>
+      </PropertyGroup>
+    </Project>
+
+  with the version pinned once in global.json under "msbuild-sdks" — the SDK
+  ships on the FluentMigrator release train, so it is the same version as the
+  FluentMigrator packages the project references.
+
+  The migration/seed classes here are deliberately dependency-free stubs:
+  the sample exercises the SDK's classification and manifest pipeline, not
+  the runner, and so stays buildable offline with no package restore.
+-->
+<Project>
+
+  <Import Project="../../../src/FluentMigrator.Net.Sdk/Sdk/Sdk.props" />
+
+  <PropertyGroup>
+    <DatabaseDialect>sqlserver</DatabaseDialect>
+    <!--
+      DefaultSchema flows to Roslyn source generators as
+      build_property.DefaultSchema, letting the FluentMigrator generator
+      emit a convention set matching this override. It also resolves
+      Schema/* filenames without a schema segment (Schema/Types/ZipCode.sql
+      becomes dbo.ZipCode here).
+    -->
+    <DefaultSchema>dbo</DefaultSchema>
+    <!-- Owns Tools/ (CreateDatabase, baseline), so it is the root module. -->
+    <IsDatabaseRootModule>true</IsDatabaseRootModule>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Ship this script beside the assembly instead of embedding it. -->
+    <MigrationScript Update="Migrations/Scripts/V002_rebuild_stats.sql"
+                     ContentType="External" />
+  </ItemGroup>
+
+  <Import Project="../../../src/FluentMigrator.Net.Sdk/Sdk/Sdk.targets" />
+
+</Project>

@@ -1,0 +1,10 @@
+<Project>
+  <Import Project="../../../../src/FluentMigrator.Net.Sdk/Sdk/Sdk.props" />
+  <PropertyGroup>
+    <DatabaseDialect>sqlserver</DatabaseDialect>
+    <DefaultSchema>core</DefaultSchema>
+    <IsDatabaseRootModule>true</IsDatabaseRootModule>
+    <!-- VersionTableSchema defaults to $(DefaultSchema); VersionTableName to VersionInfo -->
+  </PropertyGroup>
+  <Import Project="../../../../src/FluentMigrator.Net.Sdk/Sdk/Sdk.targets" />
+</Project>

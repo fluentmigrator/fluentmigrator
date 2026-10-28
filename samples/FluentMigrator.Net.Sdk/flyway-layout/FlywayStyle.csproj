@@ -1,0 +1,9 @@
+<Project>
+  <Import Project="../../../src/FluentMigrator.Net.Sdk/Sdk/Sdk.props" />
+  <PropertyGroup>
+    <DatabaseDialect>postgres</DatabaseDialect>
+    <SourceModelConvention>flyway</SourceModelConvention>
+    <IsDatabaseRootModule>true</IsDatabaseRootModule>
+  </PropertyGroup>
+  <Import Project="../../../src/FluentMigrator.Net.Sdk/Sdk/Sdk.targets" />
+</Project>
