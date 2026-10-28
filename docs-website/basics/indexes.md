@@ -144,6 +144,18 @@ services.Configure<GeneratorOptions>(opt => opt.CompatibilityMode = Compatibilit
 
 **Oracle.** Oracle doesn't index a key in which every column is NULL, so any number of such rows may exist. A composite key with only some NULL columns is indexed, and those NULLs compare equal. Neither option describes this behavior for every index, so both go through compatibility mode.
 
+**Snowflake.** Snowflake doesn't support indexes, so the whole index goes through compatibility mode. If you need the rows that a filtered unique index would cover for reads, create a materialized view in an `IfDatabase` block:
+
+```csharp
+IfDatabase(ProcessorIdConstants.Snowflake).Execute.Sql(@"
+    CREATE OR REPLACE MATERIALIZED VIEW mv_active_records AS
+    SELECT unique_column
+    FROM my_table
+    WHERE is_active = true;");
+```
+
+A materialized view covers read scenarios only. It doesn't enforce uniqueness when rows are inserted or updated, so it doesn't replace a filtered unique index for read-write scenarios. Materialized views require Snowflake Enterprise Edition or higher.
+
 #### Provider-specific options
 
 The `NullsDistinct()` and `NullsNotDistinct()` extensions after `Unique()`, and the `UniqueNullsDistinct()` and `UniqueNullsNotDistinct()` index options, in `FluentMigrator.SqlServer` and `FluentMigrator.Postgres` are obsolete. The per-column overloads after `Ascending()` or `Descending()` aren't affected. When you set both a provider-specific option and one of the provider-agnostic options on the same index, the provider-specific option takes precedence.
