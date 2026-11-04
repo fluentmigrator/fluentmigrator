@@ -464,7 +464,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
             var buffering = GetIndexStorageParameters<GistBuffering?>(PostgresExtensions.IndexBuffering, "Buffering");
             if (buffering.HasValue)
             {
-                parameters.Add($"BUFFERING = {buffering.Value.ToString().ToUpper()}");
+                parameters.Add($"BUFFERING = {buffering.Value.ToString().ToUpperInvariant()}");
             }
 
             var pendingList = GetIndexStorageParameters<long?>(PostgresExtensions.IndexGinPendingListLimit, "GinPendingListLimit");
@@ -559,7 +559,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
                 GetAsOnly(expression),
                 Quoter.QuoteTableName(expression.Index.TableName, expression.Index.SchemaName),
                 // B-Tree is default index method
-                indexMethod == Algorithm.BTree ? string.Empty : $" USING {indexMethod.ToString().ToUpper()}");
+                indexMethod == Algorithm.BTree ? string.Empty : $" USING {indexMethod.ToString().ToUpperInvariant()}");
 
             var first = true;
             foreach (var column in expression.Index.Columns)
