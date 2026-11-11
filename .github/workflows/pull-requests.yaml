@@ -158,6 +158,19 @@ jobs:
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
         dotnet pack ${{ env.solution }} --configuration ${{ env.buildConfiguration }} --no-build --verbosity minimal -p:Version=${{ steps.gitversion.outputs.majorMinorPatch }}
 
+    # Consume the FluentMigrator.MSBuild package just packed above, the way users do: a fresh project per
+    # target framework references it, NuGet auto-imports build/<tfm>/FluentMigrator.MSBuild.targets, and
+    # <Migrate> must load from tasks/<tfm>/. Also checks Visual Studio's MSBuild.exe with a net48 consumer.
+    # Every release through 8.x would have failed this (MSB4062).
+    - name: FluentMigrator.MSBuild package smoke test
+      if: matrix.os == 'windows-latest'
+      shell: pwsh
+      run: |
+        $package = Get-ChildItem src/FluentMigrator.MSBuild/bin/${{ env.buildConfiguration }} -Filter 'FluentMigrator.MSBuild.*.nupkg' |
+          Where-Object Name -notlike '*.symbols.nupkg' | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+        if (-not $package) { throw 'FluentMigrator.MSBuild nupkg not found; the pack step must run first.' }
+        ./test/FluentMigrator.MSBuild.PackageSmoke/Invoke-PackageSmoke.ps1 -PackagePath $package.FullName -FullFramework
+
     - name: Verify test results coverage files exists
       if: matrix.os == 'ubuntu-latest' && (!cancelled())
       run: |
