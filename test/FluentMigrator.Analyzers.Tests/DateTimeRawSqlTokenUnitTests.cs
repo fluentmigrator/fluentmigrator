@@ -235,6 +235,129 @@ namespace FluentMigrator.Analyzers.Tests
             await RunAsync(source, source);
         }
 
+        // Review of #2433: anything that could change what the token receives must silence FM0007, because its
+        // fix would otherwise turn a SQL expression such as CURRENT_TIMESTAMP into a quoted string.
+
+        [Test]
+        public async Task Doesnt_Warn_When_A_Non_Constant_Key_Could_Overwrite_The_Date()
+        {
+            var source = Migration(@"
+                string key = ""cutoff"";
+                new FakeExecuteExpressionRoot().Sql(""SELECT $(cutoff)"", new Dictionary<string, object>
+                {
+                    [""cutoff""] = DateTime.UtcNow,
+                    [key] = ""CURRENT_TIMESTAMP"",
+                });");
+
+            await RunAsync(source, source);
+        }
+
+        [Test]
+        public async Task Doesnt_Warn_When_The_Local_Is_Reassigned()
+        {
+            var source = Migration(@"
+                var parameters = new Dictionary<string, object> { [""cutoff""] = DateTime.UtcNow };
+                parameters = new Dictionary<string, object> { [""cutoff""] = ""CURRENT_TIMESTAMP"" };
+                new FakeExecuteExpressionRoot().Sql(""SELECT $(cutoff)"", parameters);");
+
+            await RunAsync(source, source);
+        }
+
+        [Test]
+        public async Task Doesnt_Warn_When_An_Entry_Is_Overwritten_After_Initialization()
+        {
+            var source = Migration(@"
+                var parameters = new Dictionary<string, object> { [""cutoff""] = DateTime.UtcNow };
+                parameters[""cutoff""] = ""CURRENT_TIMESTAMP"";
+                new FakeExecuteExpressionRoot().Sql(""SELECT $(cutoff)"", parameters);");
+
+            await RunAsync(source, source);
+        }
+
+        [Test]
+        public async Task Doesnt_Warn_When_The_Local_Is_Modified_Through_A_Method()
+        {
+            var source = Migration(@"
+                var parameters = new Dictionary<string, object> { [""cutoff""] = DateTime.UtcNow };
+                parameters.Remove(""cutoff"");
+                new FakeExecuteExpressionRoot().Sql(""SELECT $(cutoff)"", parameters);");
+
+            await RunAsync(source, source);
+        }
+
+        [Test]
+        public async Task Doesnt_Warn_When_The_Local_Escapes_To_Another_Method()
+        {
+            var source = Migration(@"
+                var parameters = new Dictionary<string, object> { [""cutoff""] = DateTime.UtcNow };
+                Prepare(parameters);
+                new FakeExecuteExpressionRoot().Sql(""SELECT $(cutoff)"", parameters);
+            }
+
+            private static void Prepare(IDictionary<string, object> parameters)
+            {
+                parameters[""cutoff""] = ""CURRENT_TIMESTAMP"";");
+
+            await RunAsync(source, source);
+        }
+
+        [Test]
+        public async Task Warns_When_The_Local_Is_Only_Passed_To_Sql_Calls()
+        {
+            var source = Migration(@"
+                var parameters = new Dictionary<string, object> { [""cutoff""] = DateTime.UtcNow };
+                new FakeExecuteExpressionRoot().Sql(""DELETE FROM Audit WHERE CreatedAt < $(cutoff)"", parameters);
+                new FakeExecuteExpressionRoot().Sql(""DELETE FROM Log WHERE CreatedAt < $(cutoff)"", parameters);");
+            var fixedSource = Migration(@"
+                var parameters = new Dictionary<string, object> { [""cutoff""] = DateTime.UtcNow };
+                new FakeExecuteExpressionRoot().Sql(""DELETE FROM Audit WHERE CreatedAt < $[cutoff]"", parameters);
+                new FakeExecuteExpressionRoot().Sql(""DELETE FROM Log WHERE CreatedAt < $[cutoff]"", parameters);");
+
+            await RunAsync(
+                source,
+                fixedSource,
+                Expect(source, "$(cutoff)", "DateTime"),
+                Expect(source, "$(cutoff)", "DateTime", call: 1));
+        }
+
+        [TestCase("StringComparer.CurrentCultureIgnoreCase")]
+        [TestCase("StringComparer.InvariantCultureIgnoreCase")]
+        [TestCase("StringComparer.CurrentCulture")]
+        [TestCase("comparer")]
+        public async Task Doesnt_Warn_When_The_Comparer_Is_Culture_Sensitive_Or_Unknown(string comparer)
+        {
+            // Under tr-TR, CurrentCultureIgnoreCase keeps "i" and "I" apart, so $(i) receives "CreatedAt" there; under
+            // en-US the two keys are one and $(i) receives the date. Ordinal ignore-case matching would always see
+            // the date and offer a fix that turns CreatedAt into a quoted string. Equality the analyzer cannot model
+            // exactly is not analyzed at all.
+            var source = Migration(@"
+                IEqualityComparer<string> comparer = StringComparer.Ordinal;
+                new FakeExecuteExpressionRoot().Sql(""SELECT $(i)"", new Dictionary<string, object>(" + comparer + @")
+                {
+                    [""i""] = ""CreatedAt"",
+                    [""I""] = DateTime.UtcNow,
+                });");
+
+            await RunAsync(source, source);
+        }
+
+        [Test]
+        public async Task Warns_With_A_Capacity_Argument()
+        {
+            var source = Migration(@"
+                new FakeExecuteExpressionRoot().Sql(""SELECT $(cutoff)"", new Dictionary<string, object>(4)
+                {
+                    [""cutoff""] = DateTime.UtcNow,
+                });");
+            var fixedSource = Migration(@"
+                new FakeExecuteExpressionRoot().Sql(""SELECT $[cutoff]"", new Dictionary<string, object>(4)
+                {
+                    [""cutoff""] = DateTime.UtcNow,
+                });");
+
+            await RunAsync(source, fixedSource, Expect(source, "$(cutoff)", "DateTime"));
+        }
+
         private static string Migration(string body)
         {
             return @"
@@ -254,12 +377,18 @@ namespace FluentMigrator.Analyzers.Tests
         }
 
         /// <summary>
-        /// Builds the expected diagnostic for the first occurrence of <paramref name="token"/> inside a
-        /// <c>Sql(</c> call in <paramref name="source"/>.
+        /// Builds the expected diagnostic for the first occurrence of <paramref name="token"/> inside the
+        /// <paramref name="call"/>-th (zero-based) <c>Sql(</c> call in <paramref name="source"/>.
         /// </summary>
-        private static DiagnosticResult Expect(string source, string token, string typeName)
+        private static DiagnosticResult Expect(string source, string token, string typeName, int call = 0)
         {
-            var index = source.IndexOf(token, source.IndexOf(".Sql(", StringComparison.Ordinal), StringComparison.Ordinal);
+            var callIndex = -1;
+            for (var i = 0; i <= call; i++)
+            {
+                callIndex = source.IndexOf(".Sql(", callIndex + 1, StringComparison.Ordinal);
+            }
+
+            var index = source.IndexOf(token, callIndex, StringComparison.Ordinal);
             var lineStart = source.LastIndexOf('\n', index) + 1;
             var line = 1;
             for (var i = 0; i < index; i++)

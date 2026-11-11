@@ -163,15 +163,15 @@
     <value>Replace with raw token to substitute inside the string literal</value>
   </data>
   <data name="DateTimeRawSqlTokenAnalyzerDescription" xml:space="preserve">
-    <value>The raw $(name) token inserts the value's invariant ToString() result, which for a DateTime is 07/28/2026 13:45:06 and for a DateTimeOffset is 07/28/2026 13:45:06 -04:00. Databases read that form differently: on SQL Server it depends on the session's DATEFORMAT and language, so a day of the month up to 12 can silently become a different date on another server; PostgreSQL depends on DateStyle; MySQL and Oracle usually reject it; SQLite stores it as text, so date comparisons stop working. The $[name] token renders the value as an ISO 8601 literal through the provider's quoter, which every supported database reads the same way. FluentMigrator does not change what $(name) emits, because that would silently change the SQL of existing migrations.</value>
+    <value>The raw $(name) token inserts the value's invariant ToString() result, which for a DateTime is 07/28/2026 13:45:06 and for a DateTimeOffset is 07/28/2026 13:45:06 -04:00. Databases read that form differently: on SQL Server it depends on the session's DATEFORMAT and language, so a day of the month up to 12 can silently become a different date on another server; PostgreSQL depends on DateStyle; MySQL and Oracle usually reject it; SQLite stores it as text, so date comparisons stop working. The $[name] token renders the value through the provider's quoter instead: an ISO 8601 literal on SQL Server, PostgreSQL, MySQL, SQLite, Redshift and SAP HANA, TO_DATE(...) with an explicit format on Oracle, and each provider's own literal form on Db2, Firebird and Snowflake. One gap remains: Oracle has no explicit conversion for DateTimeOffset, which is emitted as a quoted ISO 8601 string and so still read according to NLS_TIMESTAMP_TZ_FORMAT. FluentMigrator does not change what $(name) emits, because that would silently change the SQL of existing migrations.</value>
   </data>
   <data name="DateTimeRawSqlTokenAnalyzerMessageFormat" xml:space="preserve">
-    <value>Token '{0}' receives a {1} value, which $(name) renders in a format databases read differently; use '{2}', which renders an ISO 8601 literal</value>
+    <value>Token '{0}' receives a {1} value, which $(name) renders in a format databases read differently; use '{2}', which formats it through the provider's quoter</value>
   </data>
   <data name="DateTimeRawSqlTokenAnalyzerTitle" xml:space="preserve">
     <value>Date/time value substituted through a raw $(name) token</value>
   </data>
   <data name="DateTimeRawSqlTokenCodeFixTitle" xml:space="preserve">
-    <value>Replace with $[name], which renders an ISO 8601 literal</value>
+    <value>Replace with $[name], which formats the value through the provider's quoter</value>
   </data>
 </root>

@@ -209,8 +209,22 @@ that form differently:
 - **MySQL and Oracle:** usually reject it.
 - **SQLite:** stores it as text, so date comparisons stop working.
 
-`$[name]` renders an ISO 8601 literal (`'2026-07-28T13:45:06'`) through the provider's quoter, which
-every supported database reads the same way.
+`$[name]` formats the value through the provider's quoter instead:
+
+| Provider | `DateTime` | `DateTimeOffset` |
+|---|---|---|
+| SQL Server, PostgreSQL, MySQL, SQLite, Redshift, SAP HANA | `'2026-07-28T13:45:06'` (ISO 8601) | `'2026-07-28T13:45:06-04:00'` (ISO 8601) |
+| Oracle | `to_date('2026-07-28 13:45:06', 'yyyy-mm-dd hh24:mi:ss')` | `'2026-07-28T13:45:06-04:00'`, with no conversion function |
+| Db2 | `'2026-07-28-13.45.06'` | `'2026-07-28T13:45:06-04:00'` |
+| Firebird | `'2026-07-28 13:45:06'` | `'2026-07-28T13:45:06-04:00'` |
+| Snowflake | `'2026-07-28 13:45:06'` | `'2026-07-28 13:45:06 -04:00'` |
+
+::: warning DateTimeOffset on Oracle
+The quoter has no explicit conversion for `DateTimeOffset` on Oracle, so the value still reaches the
+server as a string, and Oracle reads it according to the session's `NLS_TIMESTAMP_TZ_FORMAT`. `$[name]`
+is still clearer than `07/28/2026 13:45:06 -04:00`, but it is not session-independent. Wrap the token in
+`TO_TIMESTAMP_TZ($[name], 'YYYY-MM-DD"T"HH24:MI:SSTZH:TZM')`, or pass a `DateTime`.
+:::
 
 FluentMigrator deliberately does **not** change what `$(name)` emits, because that would silently
 change the SQL of existing migrations. FM0007 points at the affected calls instead. It is separate from
@@ -242,16 +256,20 @@ rewrite, so FM0007 reports without offering a fix.
 
 #### What FM0007 Can See
 
-The analyzer sees the SQL and the parameters separately, so it reports only when it can match them up:
+The analyzer sees the SQL and the parameters separately, and its fix rewrites SQL. So it reports only
+when it knows exactly what the token will receive:
 
 - the call is `Execute.Sql` with a SQL string literal;
-- the parameters are a dictionary created in the call, or a local variable initialized with one; and
-- the keys are constants.
+- the parameters are a `Dictionary<string, ...>` created in the call, or a local variable initialized
+  with one that is never reassigned, modified (indexer writes, `Add`, `Remove`, ...) or passed anywhere
+  except `Execute.Sql`;
+- every key in the initializer is a constant string; and
+- the comparer is the default, `StringComparer.Ordinal` or `StringComparer.OrdinalIgnoreCase`.
+  Culture-sensitive comparers such as `CurrentCultureIgnoreCase` match keys differently depending on the
+  culture the migration runs under, so they are not analyzed.
 
-It honours a case-insensitive comparer such as `StringComparer.OrdinalIgnoreCase`. Values added after
-initialization, dictionaries passed in from elsewhere, and `Execute.Script`/`EmbeddedScript` (whose SQL
-is not in your source) are not analyzed. See also
-[Date and time values](../operations/execute-sql.md#date-and-time-values).
+Anything else is not reported, and neither is `Execute.Script`/`EmbeddedScript`, whose SQL is not in
+your source. See also [Date and time values](../operations/execute-sql.md#date-and-time-values).
 
 ## IDE Integration
 

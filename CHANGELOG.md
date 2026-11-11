@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### New
 
-- Analyzer `FM0007` warns when a raw `$(name)` token in `Execute.Sql` receives a `DateTime` or `DateTimeOffset` value, which renders as `07/28/2026 13:45:06` and is read differently by different databases. Its code fix rewrites the token to `$[name]`, which renders an ISO 8601 literal. What `$(name)` emits is unchanged (Issue #2354 by @jzabroski; documented in PR #2401 by @RaphaelFakhri)
+- Analyzer `FM0007` warns when a raw `$(name)` token in `Execute.Sql` receives a `DateTime` or `DateTimeOffset` value, which renders as `07/28/2026 13:45:06` and is read differently by different databases. Its code fix rewrites the token to `$[name]`, which formats the value through the provider's quoter (ISO 8601 on most providers, `to_date(...)` on Oracle; an Oracle `DateTimeOffset` still depends on `NLS_TIMESTAMP_TZ_FORMAT`). What `$(name)` emits is unchanged (Issue #2354 by @jzabroski; documented in PR #2401 by @RaphaelFakhri)
 - New `IPrimaryKeyNameConvention` (implemented by `DefaultPrimaryKeyNameConvention`) applies the primary key naming convention to both column-level primary keys and standalone primary key constraints, and makes the convention easier to discover and replace (Issue #1800)
 - Custom connections: `IMigrationConnectionFactory` allows applications to supply fully configured `IDbConnection` instances to the migration runner (PR #2268 by @Sherif-Ahmed, building on PR #2002 by @Merlin-Taylor, Issue #1981)
   - Configure with `WithConnectionFactory(sp => ...)`, or with `WithDataSource(sp => ...)` when a `DbDataSource` is available (.NET 8+)
