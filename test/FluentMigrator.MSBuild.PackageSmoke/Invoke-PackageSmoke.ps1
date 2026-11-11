@@ -173,3 +173,7 @@ if ($failures -gt 0) {
 }
 
 Write-Host 'All FluentMigrator.MSBuild package smoke checks passed.'
+
+# Exit explicitly: the last native command was a <Migrate> run that fails by design, and callers such as
+# GitHub Actions' pwsh shell otherwise propagate its $LASTEXITCODE.
+exit 0
