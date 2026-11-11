@@ -271,12 +271,23 @@ namespace FluentMigrator.Analyzers.Analysis
         {
             var start = quoteIndex;
 
-            // U&'...' - the ampersand is part of the prefix.
+            // U&'...' - the ampersand is part of the prefix. The character before the "U" must not
+            // be an identifier character: in FOO_U&'x' the "U" is the tail of the identifier FOO_U
+            // and the ampersand an operator, not a Unicode-escape prefix.
             if (quoteIndex >= 2 && sql[quoteIndex - 1] == '&' && (sql[quoteIndex - 2] == 'U' || sql[quoteIndex - 2] == 'u'))
             {
-                return quoteIndex - 2;
+                var beforePrefix = quoteIndex - 3;
+                if (beforePrefix < 0 || !(char.IsLetterOrDigit(sql[beforePrefix]) || sql[beforePrefix] == '_'))
+                {
+                    return quoteIndex - 2;
+                }
+
+                return start;
             }
 
+            // Walking back over the whole adjacent identifier run is what gives the boundary rule
+            // for the other prefixes: ColumnN'x' yields the candidate "ColumnN", which is not a
+            // known prefix, so the literal is reported without one.
             var i = quoteIndex - 1;
             while (i >= 0 && (char.IsLetterOrDigit(sql[i]) || sql[i] == '_'))
             {
@@ -289,18 +300,11 @@ namespace FluentMigrator.Analyzers.Analysis
                 return start;
             }
 
-            // Only treat the run as a prefix when it is not preceded by something that would make it
-            // an identifier, e.g. `col='x'` has no prefix but `WHERE N'x'` does.
-            if (i >= 0 && (char.IsLetterOrDigit(sql[i]) || sql[i] == '_'))
-            {
-                return start;
-            }
-
             var candidate = sql.Substring(i + 1, candidateLength);
             return IsKnownLiteralPrefix(candidate) ? i + 1 : start;
         }
 
-        private static bool IsKnownLiteralPrefix(string candidate)
+        internal static bool IsKnownLiteralPrefix(string candidate)
         {
             if (candidate.Length == 0)
             {

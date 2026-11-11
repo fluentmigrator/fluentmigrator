@@ -136,6 +136,18 @@ namespace FluentMigrator.Analyzers
         {
             var location = Location.Create(token.SyntaxTree, new TextSpan(match.SourceStart, match.SourceLength));
             var quotedTokenText = ToQuotedTokenText(match.Text);
+            var properties = GetCodeFixProperties(match, region, sql);
+
+            context.ReportDiagnostic(Diagnostic.Create(Rule, location, properties, match.Text, quotedTokenText));
+        }
+
+        /// <summary>
+        /// Gets the diagnostic properties that tell <see cref="RawSqlTokenInterpolationCodeFixProvider"/>
+        /// how to rewrite a raw token: whether the enclosing quotes go with it, or whether no mechanical
+        /// rewrite exists. Shared with <see cref="DateTimeRawSqlTokenAnalyzer"/>, whose fix is the same.
+        /// </summary>
+        internal static ImmutableDictionary<string, string> GetCodeFixProperties(SqlTokenMatch match, SqlRegion region, string sql)
+        {
             var properties = ImmutableDictionary<string, string>.Empty;
 
             if (IsStringLiteral(region.Kind))
@@ -158,7 +170,7 @@ namespace FluentMigrator.Analyzers
                     : properties.Add(EmbeddedInLiteralProperty, "true");
             }
 
-            context.ReportDiagnostic(Diagnostic.Create(Rule, location, properties, match.Text, quotedTokenText));
+            return properties;
         }
 
         private static bool IsStringLiteral(SqlRegionKind kind)
