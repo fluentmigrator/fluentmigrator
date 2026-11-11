@@ -86,11 +86,15 @@ steps:
     projects: '$(solution)'
     arguments: '--configuration $(buildConfiguration) -p:Version=$(version_step.semVer) --no-restore'
 
-- task: VSTest@2
+# dotnet test, as in azure-pipelines-pullrequests.yml. VSTest@2 (2.281) only looks for vstest.console in
+# Visual Studio 15.x-17.x, and windows-latest images from 20261021 on fail it with the misleading
+# "Visual Studio 2015 is not found". dotnet test needs no Visual Studio at all.
+- task: DotNetCoreCLI@2
+  displayName: 'Run tests'
   inputs:
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
-    diagnosticsEnabled: true
+    command: 'test'
+    projects: '$(solution)'
+    arguments: '--configuration $(buildConfiguration) --no-build'
 
 - task: CmdLine@2
   inputs:
