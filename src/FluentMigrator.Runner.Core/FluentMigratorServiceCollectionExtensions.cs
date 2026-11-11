@@ -289,10 +289,11 @@ namespace Microsoft.Extensions.DependencyInjection
                     sp =>
                     {
                         var options = sp.GetRequiredService<IOptions<RunnerOptions>>();
+                        var processorOptions = sp.GetRequiredService<IOptionsSnapshot<ProcessorOptions>>();
                         var connectionFactory = sp.GetRequiredService<IMigrationConnectionFactory>();
 
-                        // Without a connection (preview mode) nothing is written, so no lock is taken.
-                        var locker = options.Value.NoConnection || !connectionFactory.HasConnection
+                        // In preview mode, with or without a connection, nothing is written, so no lock is taken.
+                        var locker = options.Value.NoConnection || processorOptions.Value.PreviewOnly || !connectionFactory.HasConnection
                             ? null
                             : sp.GetService<IApplicationLocker>();
 
@@ -303,17 +304,19 @@ namespace Microsoft.Extensions.DependencyInjection
                     });
 
             services
-                // Configure the runner
-                .TryAddScoped<MigrationRunner>();
-
-            services
-                // Wrap the runner in the application lock only when a locker is configured, so applications
-                // without one still receive the MigrationRunner instance itself.
+                // Configure the runner. Wrap it in the application lock only when a locker is configured, so
+                // applications without one still receive the MigrationRunner instance itself.
+                //
+                // MigrationRunner is deliberately not registered as a service of its own: resolving it
+                // would hand out a runner that bypasses the lock.
                 .TryAddScoped<IMigrationRunner>(
                     sp =>
                     {
-                        var runner = sp.GetRequiredService<MigrationRunner>();
+                        // Resolve the lease before the runner. The runner creates the processor, and a scope
+                        // disposes its services in reverse order of creation, so the processor rolls back any
+                        // transaction left open by an undisposed BeginScope() before the lease releases the lock.
                         var lease = sp.GetRequiredService<IApplicationLockLease>();
+                        var runner = ActivatorUtilities.CreateInstance<MigrationRunner>(sp);
 
                         return lease.IsEnabled
                             ? new ApplicationLockingMigrationRunner(runner, lease)

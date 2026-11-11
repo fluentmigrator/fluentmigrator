@@ -381,6 +381,67 @@ namespace FluentMigrator.Tests.Unit.ApplicationLocking
             scope.ServiceProvider.GetRequiredService<IApplicationLockLease>().IsEnabled.ShouldBeFalse();
         }
 
+        /// <summary>
+        /// Review of #2432: <c>AsGlobalPreview()</c> sets <see cref="ProcessorOptions.PreviewOnly"/> and keeps the
+        /// connection, so checking only <see cref="RunnerOptions.NoConnection"/> still took the lock.
+        /// </summary>
+        [Test]
+        public void ConnectedPreviewDoesNotTakeTheLock()
+        {
+            var services = CreateConnectedServices(new Mock<IMigrationProcessor>())
+                .Configure<ProcessorOptions>(o => o.PreviewOnly = true)
+                .ConfigureApplicationLocker(_ => throw new AssertionException("The locker must not be created in preview mode."));
+            using var serviceProvider = services.BuildServiceProvider();
+            using var scope = serviceProvider.CreateScope();
+
+            scope.ServiceProvider.GetRequiredService<IMigrationRunner>().ShouldBeOfType<MigrationRunner>();
+            scope.ServiceProvider.GetRequiredService<IApplicationLockLease>().IsEnabled.ShouldBeFalse();
+        }
+
+        /// <summary>
+        /// Review of #2432: a resolvable concrete <see cref="MigrationRunner"/> would be a second, unlocked entry
+        /// point to the same database.
+        /// </summary>
+        [Test]
+        public void ConcreteMigrationRunnerIsNotAServiceThatBypassesTheLock()
+        {
+            var services = CreateConnectedServices(new Mock<IMigrationProcessor>())
+                .ConfigureApplicationLocker<TrackingApplicationLocker>();
+            using var serviceProvider = services.BuildServiceProvider();
+            using var scope = serviceProvider.CreateScope();
+
+            scope.ServiceProvider.GetService<MigrationRunner>().ShouldBeNull();
+            scope.ServiceProvider.GetRequiredService<IMigrationRunner>().ShouldBeOfType<ApplicationLockingMigrationRunner>();
+        }
+
+        /// <summary>
+        /// Review of #2432: the scope disposes its services in reverse order of creation. When the processor was
+        /// created before the lease, the lease released the lock first, and another instance could take it
+        /// before the processor rolled back the transaction of a migration scope that was never disposed.
+        /// </summary>
+        [Test]
+        public void ProcessorRollsBackALeakedScopeBeforeTheLockIsReleased()
+        {
+            var processor = new Mock<IMigrationProcessor>();
+            var locker = new TrackingApplicationLocker();
+            bool? lockedWhenProcessorDisposed = null;
+            processor.Setup(x => x.Dispose()).Callback(() => lockedWhenProcessorDisposed ??= locker.IsLocked);
+            var services = CreateConnectedServices(processor)
+                .AddScoped(_ => processor.Object)
+                .AddScoped<IProcessorAccessor>(sp => Mock.Of<IProcessorAccessor>(a => a.Processor == sp.GetRequiredService<IMigrationProcessor>()))
+                .ConfigureApplicationLocker(_ => locker);
+            using var serviceProvider = services.BuildServiceProvider();
+
+            using (var scope = serviceProvider.CreateScope())
+            {
+                scope.ServiceProvider.GetRequiredService<IMigrationRunner>().BeginScope();
+                locker.IsLocked.ShouldBeTrue();
+            }
+
+            lockedWhenProcessorDisposed.ShouldBe(true);
+            locker.IsLocked.ShouldBeFalse();
+        }
+
         [Test]
         public void FactoryOverloadRegistersTheLockerAndItsOptions()
         {

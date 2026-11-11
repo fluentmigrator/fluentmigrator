@@ -38,8 +38,8 @@ namespace FluentMigrator.Runner
     /// on any thread, and a scope begun inside an <c>async</c> method or <c>Task.Run</c> is honoured by the caller.
     /// </para>
     /// <para>
-    /// When no <see cref="IApplicationLocker"/> is registered, or the runner has no connection (for example in
-    /// preview mode), entering the lease does nothing.
+    /// When no <see cref="IApplicationLocker"/> is registered, the runner has no connection, or the runner is in
+    /// preview mode (with or without a connection), entering the lease does nothing.
     /// </para>
     /// </remarks>
     public interface IApplicationLockLease

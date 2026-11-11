@@ -151,7 +151,9 @@ What an implementation must do:
 - **Throw when the lock can't be taken.** The runner wraps any other exception in `ApplicationLockException`, so you can tell a locking failure apart from a failed migration.
 - **Prefer a lock in the database you are migrating, held on a dedicated connection.** A lock owned by a migration transaction would be released when that transaction commits.
 
-Nothing is locked in preview or connectionless mode. Code that resolves `IVersionLoader` or the processor directly can share the scope's lock with `IApplicationLockLease`:
+Nothing is locked in preview mode, with or without a connection, or in connectionless mode.
+
+The lock is applied by the `IMigrationRunner` that `AddFluentMigratorCore()` registers. If you register your own `IMigrationRunner` before calling `AddFluentMigratorCore()`, it is not wrapped. Code that resolves `IVersionLoader` or the processor directly, or that uses a runner of its own, can share the scope's lock with `IApplicationLockLease`:
 
 ```csharp
 using (scope.ServiceProvider.GetRequiredService<IApplicationLockLease>().Enter())
@@ -178,13 +180,17 @@ public sealed class SqlServerApplicationLocker : IApplicationLocker
         {
             connection.Open();
             using var command = CreateGetAppLock(connection);
-            using (cancellationToken.Register(command.Cancel))
+
+            // Wait on the server one second at a time and check the token in between. Cancellation (and
+            // AcquireTimeout) then takes effect within a second as an OperationCanceledException, without
+            // cancelling a running command, which surfaces as a provider-specific exception instead.
+            do
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 command.ExecuteNonQuery();
             }
+            while (!IsGranted(command));
 
-            cancellationToken.ThrowIfCancellationRequested();
-            ThrowIfNotGranted(command);
             return new Handle(connection);
         }
         catch
@@ -201,8 +207,13 @@ public sealed class SqlServerApplicationLocker : IApplicationLocker
         {
             await connection.OpenAsync(cancellationToken);
             using var command = CreateGetAppLock(connection);
-            await command.ExecuteNonQueryAsync(cancellationToken);
-            ThrowIfNotGranted(command);
+            do
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                await command.ExecuteNonQueryAsync();
+            }
+            while (!IsGranted(command));
+
             return new Handle(connection);
         }
         catch
@@ -214,23 +225,30 @@ public sealed class SqlServerApplicationLocker : IApplicationLocker
 
     private static SqlCommand CreateGetAppLock(SqlConnection connection)
     {
-        // Wait indefinitely on the server; the cancellation token (and AcquireTimeout) ends the wait.
-        var command = new SqlCommand("sp_getapplock", connection) { CommandType = CommandType.StoredProcedure, CommandTimeout = 0 };
+        var command = new SqlCommand("sp_getapplock", connection) { CommandType = CommandType.StoredProcedure };
         command.Parameters.AddWithValue("@Resource", Resource);
         command.Parameters.AddWithValue("@LockMode", "Exclusive");
         command.Parameters.AddWithValue("@LockOwner", "Session");
-        command.Parameters.AddWithValue("@LockTimeout", -1);
+        command.Parameters.AddWithValue("@LockTimeout", 1000);
         command.Parameters.Add(new SqlParameter("@Result", SqlDbType.Int) { Direction = ParameterDirection.ReturnValue });
         return command;
     }
 
-    private static void ThrowIfNotGranted(SqlCommand command)
+    private static bool IsGranted(SqlCommand command)
     {
+        // 0 or 1: granted. -1: timed out, so wait again. Anything else is an error.
         var result = (int)command.Parameters["@Result"].Value;
+        if (result == -1)
+        {
+            return false;
+        }
+
         if (result < 0)
         {
             throw new InvalidOperationException($"sp_getapplock returned {result}.");
         }
+
+        return true;
     }
 
     private sealed class Handle : IDisposable, IAsyncDisposable
