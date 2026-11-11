@@ -133,7 +133,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
             var potentiallyQuoted = Quote(objName);
             if (IsQuoted(potentiallyQuoted))
                 return objName;
-            return objName.ToUpper();
+            return objName.ToUpperInvariant();
         }
 
         /// <inheritdoc />
