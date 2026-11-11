@@ -34,6 +34,12 @@
     ============================================================================================
   -->
   <ItemGroup Label="Shipped dependency floors - raising these is a breaking change">
+    <!--
+      IAsyncDisposable and ValueTask for net48/netstandard2.0 (inbox on net8.0+). Microsoft.Extensions.*
+      8.x already brings it in transitively; the explicit reference makes the dependency deliberate
+      (adr/proposed/AsyncAllTheWay.md, "IAsyncDisposable placement").
+    -->
+    <PackageVersion Include="Microsoft.Bcl.AsyncInterfaces" Version="[8.0.0,)" />
     <PackageVersion Include="Microsoft.Data.Sqlite" Version="[8.0.0,)" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="[8.0.0,)" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="[8.0.0,)" />

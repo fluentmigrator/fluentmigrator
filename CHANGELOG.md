@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### New
 
+- Application locking: register an `IApplicationLocker` with `ConfigureApplicationLocker<T>()` so that only one application instance migrates a database at a time. The lock covers version-table creation as well as every runner operation and migration scope (Issue #1949 by @cristiproj; design review by @RaphaelFakhri)
+  - Ownership is per dependency-injection scope (`IApplicationLockLease`), counted, and independent of threads and `ExecutionContext`, so implementations do not need to be reentrant
+  - Synchronous and asynchronous acquisition with cancellation; `ApplicationLockerOptions.AcquireTimeout`; failures surface as `ApplicationLockException`
 - New `IPrimaryKeyNameConvention` (implemented by `DefaultPrimaryKeyNameConvention`) applies the primary key naming convention to both column-level primary keys and standalone primary key constraints, and makes the convention easier to discover and replace (Issue #1800)
 - Custom connections: `IMigrationConnectionFactory` allows applications to supply fully configured `IDbConnection` instances to the migration runner (PR #2268 by @Sherif-Ahmed, building on PR #2002 by @Merlin-Taylor, Issue #1981)
   - Configure with `WithConnectionFactory(sp => ...)`, or with `WithDataSource(sp => ...)` when a `DbDataSource` is available (.NET 8+)

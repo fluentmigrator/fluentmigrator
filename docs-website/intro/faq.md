@@ -131,6 +131,138 @@ This allows loading migration assemblies (e.g., .NET 6.0) in a different runtime
 
 When running multiple instances of your application (load-balanced scenarios), you need to prevent concurrent migration execution.
 
+#### Application Locker API (9.0+)
+
+Register an `IApplicationLocker`. The runner then holds the lock for every runner operation and every `BeginScope()` scope, and also while it creates the version table. When several instances start at once, only the first creates `VersionInfo`, and the others wait instead of failing on the duplicate table or index ([#1949](https://github.com/fluentmigrator/fluentmigrator/issues/1949)). A `BeforeAll` maintenance migration (shown in the next section) only protects `MigrateUp`. Other entry points create the version table on first use without running maintenance migrations: `HasMigrationsToApplyUp()`, `ListMigrations()`, `LoadVersionInfoIfRequired()`, or resolving `IVersionLoader`.
+
+```csharp
+services
+    .AddFluentMigratorCore()
+    .ConfigureRunner(rb => rb.AddSqlServer().WithGlobalConnectionString(connectionString))
+    .ConfigureApplicationLocker<SqlServerApplicationLocker>(
+        options => options.AcquireTimeout = TimeSpan.FromMinutes(10));
+```
+
+What an implementation must do:
+
+- **Return only once the lock is held.** The returned handle releases the lock when it is disposed.
+- **It doesn't have to be reentrant.** FluentMigrator acquires the lock at most once per dependency-injection scope and shares it among nested operations, open scopes, and work on other threads in that scope.
+- **Honour the cancellation token.** Throw `OperationCanceledException` when it is cancelled, and don't hold the lock afterwards. `AcquireTimeout` (infinite by default) works by cancelling the token. When it elapses, the runner throws `ApplicationLockException`, whose inner exception is a `TimeoutException`.
+- **Throw when the lock can't be taken.** The runner wraps any other exception in `ApplicationLockException`, so you can tell a locking failure apart from a failed migration.
+- **Prefer a lock in the database you are migrating, held on a dedicated connection.** A lock owned by a migration transaction would be released when that transaction commits.
+
+Nothing is locked in preview or connectionless mode. Code that resolves `IVersionLoader` or the processor directly can share the scope's lock with `IApplicationLockLease`:
+
+```csharp
+using (scope.ServiceProvider.GetRequiredService<IApplicationLockLease>().Enter())
+{
+    // ...
+}
+```
+
+A SQL Server implementation using `sp_getapplock`:
+
+```csharp
+public sealed class SqlServerApplicationLocker : IApplicationLocker
+{
+    private const string Resource = "MyApp.Migrations";
+    private readonly string _connectionString;
+
+    public SqlServerApplicationLocker(IConnectionStringAccessor connectionStringAccessor)
+        => _connectionString = connectionStringAccessor.ConnectionString;
+
+    public IDisposable AcquireLock(CancellationToken cancellationToken)
+    {
+        var connection = new SqlConnection(_connectionString);
+        try
+        {
+            connection.Open();
+            using var command = CreateGetAppLock(connection);
+            using (cancellationToken.Register(command.Cancel))
+            {
+                command.ExecuteNonQuery();
+            }
+
+            cancellationToken.ThrowIfCancellationRequested();
+            ThrowIfNotGranted(command);
+            return new Handle(connection);
+        }
+        catch
+        {
+            connection.Dispose();
+            throw;
+        }
+    }
+
+    public async ValueTask<IAsyncDisposable> AcquireLockAsync(CancellationToken cancellationToken)
+    {
+        var connection = new SqlConnection(_connectionString);
+        try
+        {
+            await connection.OpenAsync(cancellationToken);
+            using var command = CreateGetAppLock(connection);
+            await command.ExecuteNonQueryAsync(cancellationToken);
+            ThrowIfNotGranted(command);
+            return new Handle(connection);
+        }
+        catch
+        {
+            await connection.DisposeAsync();
+            throw;
+        }
+    }
+
+    private static SqlCommand CreateGetAppLock(SqlConnection connection)
+    {
+        // Wait indefinitely on the server; the cancellation token (and AcquireTimeout) ends the wait.
+        var command = new SqlCommand("sp_getapplock", connection) { CommandType = CommandType.StoredProcedure, CommandTimeout = 0 };
+        command.Parameters.AddWithValue("@Resource", Resource);
+        command.Parameters.AddWithValue("@LockMode", "Exclusive");
+        command.Parameters.AddWithValue("@LockOwner", "Session");
+        command.Parameters.AddWithValue("@LockTimeout", -1);
+        command.Parameters.Add(new SqlParameter("@Result", SqlDbType.Int) { Direction = ParameterDirection.ReturnValue });
+        return command;
+    }
+
+    private static void ThrowIfNotGranted(SqlCommand command)
+    {
+        var result = (int)command.Parameters["@Result"].Value;
+        if (result < 0)
+        {
+            throw new InvalidOperationException($"sp_getapplock returned {result}.");
+        }
+    }
+
+    private sealed class Handle : IDisposable, IAsyncDisposable
+    {
+        private SqlConnection _connection;
+
+        public Handle(SqlConnection connection) => _connection = connection;
+
+        public void Dispose()
+        {
+            var connection = Interlocked.Exchange(ref _connection, null);
+            if (connection == null) return;
+            using (connection)
+            using (var release = new SqlCommand("sp_releaseapplock", connection) { CommandType = CommandType.StoredProcedure })
+            {
+                release.Parameters.AddWithValue("@Resource", Resource);
+                release.Parameters.AddWithValue("@LockOwner", "Session");
+                release.ExecuteNonQuery();
+            }
+        }
+
+        public ValueTask DisposeAsync()
+        {
+            Dispose();
+            return default;
+        }
+    }
+}
+```
+
+The same pattern works with `pg_advisory_lock`/`pg_advisory_unlock` on PostgreSQL, `GET_LOCK`/`RELEASE_LOCK` on MySQL, and `DBMS_LOCK` on Oracle. A Kubernetes lease or a Redis lock works too, but the database's deadlock detector can't see waits on those.
+
 #### Database-Dependent Application Locking (SQL Server)
 
 **Acquire lock before all migrations:**
