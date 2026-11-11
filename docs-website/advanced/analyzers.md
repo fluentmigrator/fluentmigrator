@@ -193,6 +193,66 @@ In such cases, since the value being substituted is trusted, fixed, developer-au
 external/untrusted data), the FM0002 warning can be suppressed for that call &mdash; see
 [Suppressing Analyzer Warnings](#suppressing-analyzer-warnings) below.
 
+### FM0007: Date/Time Value Substituted Through a Raw $(name) Token
+
+**Category**: FluentMigrator
+**Severity**: Warning
+**Available since**: 9.0.0
+
+`$(name)` inserts the value's invariant `ToString()` result. For a `DateTime` that is
+`07/28/2026 13:45:06`, and for a `DateTimeOffset` it is `07/28/2026 13:45:06 -04:00`. Databases read
+that form differently:
+
+- **SQL Server:** the result depends on the session's `DATEFORMAT` and language, so a day of the month
+  up to 12 can silently become a different date on another server.
+- **PostgreSQL:** depends on `DateStyle`.
+- **MySQL and Oracle:** usually reject it.
+- **SQLite:** stores it as text, so date comparisons stop working.
+
+`$[name]` renders an ISO 8601 literal (`'2026-07-28T13:45:06'`) through the provider's quoter, which
+every supported database reads the same way.
+
+FluentMigrator deliberately does **not** change what `$(name)` emits, because that would silently
+change the SQL of existing migrations. FM0007 points at the affected calls instead. It is separate from
+FM0002, so it stays on in projects that suppress FM0002 because they use raw tokens on purpose.
+
+#### Example Problem
+
+```csharp
+Execute.Sql("DELETE FROM Audit WHERE CreatedAt < '$(cutoff)'", new Dictionary<string, object>
+{
+    ["cutoff"] = new DateTime(2026, 7, 28, 13, 45, 6),   // FM0007
+});
+```
+
+#### Solution
+
+The code fix replaces the token with `$[cutoff]`. When the token was the whole SQL string literal, as
+above, it also removes the surrounding quotes, because `$[name]` supplies its own:
+
+```csharp
+Execute.Sql("DELETE FROM Audit WHERE CreatedAt < $[cutoff]", new Dictionary<string, object>
+{
+    ["cutoff"] = new DateTime(2026, 7, 28, 13, 45, 6),
+});
+```
+
+When the token is only part of a literal, for example `'$(day) 00:00'`, there is no mechanical
+rewrite, so FM0007 reports without offering a fix.
+
+#### What FM0007 Can See
+
+The analyzer sees the SQL and the parameters separately, so it reports only when it can match them up:
+
+- the call is `Execute.Sql` with a SQL string literal;
+- the parameters are a dictionary created in the call, or a local variable initialized with one; and
+- the keys are constants.
+
+It honours a case-insensitive comparer such as `StringComparer.OrdinalIgnoreCase`. Values added after
+initialization, dictionaries passed in from elsewhere, and `Execute.Script`/`EmbeddedScript` (whose SQL
+is not in your source) are not analyzed. See also
+[Date and time values](../operations/execute-sql.md#date-and-time-values).
+
 ## IDE Integration
 
 The analyzers work seamlessly with popular IDEs:

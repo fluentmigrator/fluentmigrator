@@ -7,6 +7,7 @@ Roslyn analyzers for FluentMigrator migrations.
 | `FM0001` | Warning | Migration version should be unique |
 | `FM0002` | Warning | Prefer `$[name]` over `$(name)` for SQL token substitution |
 | `FM0003` | Warning | Automatically quoted token is inside a string literal |
+| `FM0007` | Warning | Date/time value substituted through a raw `$(name)` token |
 | `FMUP0001` | Warning | Prefer `IDictionary<string, object>` over `IDictionary<string, string>` for `Execute` parameters |
 
 ## Token substitution rules
@@ -25,6 +26,12 @@ and a `RawSql` value silently becomes text so its SQL never runs.
 
 `FM0002` does not report the escaped form `$$((name))`, which performs no substitution and so carries
 no injection risk, nor tokens inside comments, which are never executed.
+
+`FM0007` is the one case where `$(name)` is wrong even with trusted data: a `DateTime` or
+`DateTimeOffset` value renders as `07/28/2026 13:45:06`, which databases read differently (#2354). It
+fires only when it can see that the dictionary value for the token is a date, and it stays on when
+`FM0002` is suppressed. Its code fix is FM0002's rewrite. FM0004–FM0006 are reserved by the
+AsyncAllTheWay and ParallelAsyncAllTheWay ADRs.
 
 ## Configuring the SQL dialect
 

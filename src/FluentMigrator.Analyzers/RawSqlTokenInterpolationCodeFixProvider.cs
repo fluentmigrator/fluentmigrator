@@ -81,7 +81,12 @@ namespace FluentMigrator.Analyzers
             }
         }
 
-        private static async Task<Document> ReplaceWithQuotedTokenAsync(
+        /// <summary>
+        /// Rewrites the raw token at <paramref name="diagnosticSpan"/> to its quoted form, removing the
+        /// enclosing SQL quotes when <paramref name="stripEnclosingQuotes"/> is set. Shared with
+        /// <see cref="DateTimeRawSqlTokenCodeFixProvider"/>.
+        /// </summary>
+        internal static async Task<Document> ReplaceWithQuotedTokenAsync(
             Document document,
             TextSpan diagnosticSpan,
             bool stripEnclosingQuotes,
