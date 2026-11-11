@@ -103,6 +103,22 @@ namespace FluentMigrator.Analyzers.Analysis
         }
 
         /// <summary>
+        /// Determines whether <paramref name="invocation"/> calls an <c>Execute.Sql(...)</c> overload, whatever
+        /// its arguments.
+        /// </summary>
+        public static bool IsExecuteSqlInvocation(
+            InvocationExpressionSyntax invocation,
+            SemanticModel semanticModel,
+            INamedTypeSymbol executeExpressionRootType,
+            System.Threading.CancellationToken cancellationToken)
+        {
+            return executeExpressionRootType != null &&
+                   semanticModel.GetSymbolInfo(invocation, cancellationToken).Symbol is IMethodSymbol methodSymbol &&
+                   methodSymbol.Name == "Sql" &&
+                   IsSqlExecuteMethod(methodSymbol, executeExpressionRootType);
+        }
+
+        /// <summary>
         /// Matches <paramref name="pattern"/> against the SQL a literal actually produces, while
         /// reporting spans in the C# source.
         /// </summary>

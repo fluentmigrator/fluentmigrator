@@ -158,6 +158,30 @@ namespace FluentMigrator.Analyzers {
             }
         }
 
+        internal static string DateTimeRawSqlTokenAnalyzerDescription {
+            get {
+                return ResourceManager.GetString("DateTimeRawSqlTokenAnalyzerDescription", resourceCulture);
+            }
+        }
+
+        internal static string DateTimeRawSqlTokenAnalyzerMessageFormat {
+            get {
+                return ResourceManager.GetString("DateTimeRawSqlTokenAnalyzerMessageFormat", resourceCulture);
+            }
+        }
+
+        internal static string DateTimeRawSqlTokenAnalyzerTitle {
+            get {
+                return ResourceManager.GetString("DateTimeRawSqlTokenAnalyzerTitle", resourceCulture);
+            }
+        }
+
+        internal static string DateTimeRawSqlTokenCodeFixTitle {
+            get {
+                return ResourceManager.GetString("DateTimeRawSqlTokenCodeFixTitle", resourceCulture);
+            }
+        }
+
         internal static string QuotedSqlTokenAnalyzerDescription {
             get {
                 return ResourceManager.GetString("QuotedSqlTokenAnalyzerDescription", resourceCulture);
