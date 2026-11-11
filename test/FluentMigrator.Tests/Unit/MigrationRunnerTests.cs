@@ -385,6 +385,51 @@ namespace FluentMigrator.Tests.Unit
             runner.HasMigrationsToApplyDown(fakeMigrationVersion1).ShouldBeTrue();
         }
 
+        /// <summary>
+        /// Loads versions 1 and 2, then records version 3 as applied without reloading, as another instance
+        /// would while this one waited for the application lock (review of #2432).
+        /// </summary>
+        private void LoadVersionDataThenApplyNewerMigrationElsewhere()
+        {
+            LoadVersionData(2011010101, 2011010102, 2011010103);
+            _fakeVersionLoader.Versions.Remove(2011010103);
+            _fakeVersionLoader.LoadVersionInfo();
+            _fakeVersionLoader.Versions.Add(2011010103);
+        }
+
+        [Test]
+        public void RollbackRevertsTheLatestMigrationInTheDatabaseRatherThanAStaleOne()
+        {
+            var runner = CreateRunner();
+            LoadVersionDataThenApplyNewerMigrationElsewhere();
+
+            runner.Rollback(1);
+
+            _fakeVersionLoader.Versions.ShouldBe(new long[] { 2011010101, 2011010102 }, ignoreOrder: true);
+        }
+
+        [Test]
+        public void RollbackToVersionRevertsMigrationsAppliedSinceTheVersionInfoWasLoaded()
+        {
+            var runner = CreateRunner();
+            LoadVersionDataThenApplyNewerMigrationElsewhere();
+
+            runner.RollbackToVersion(2011010101);
+
+            _fakeVersionLoader.Versions.ShouldBe(new long[] { 2011010101 });
+        }
+
+        [Test]
+        public void MigrateDownRevertsMigrationsAppliedSinceTheVersionInfoWasLoaded()
+        {
+            var runner = CreateRunner();
+            LoadVersionDataThenApplyNewerMigrationElsewhere();
+
+            runner.MigrateDown(2011010101);
+
+            _fakeVersionLoader.Versions.ShouldBe(new long[] { 2011010101 });
+        }
+
         [Test]
         public void RollbackOnlyOneStepsOfTwoShouldNotDeleteVersionInfoTable()
         {
