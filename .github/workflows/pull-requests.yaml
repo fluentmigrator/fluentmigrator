@@ -67,6 +67,11 @@ jobs:
       with:
         dotnet-version: '10.0.x'
 
+    - name: Setup dotnet SDK
+      uses: actions/setup-dotnet@v6
+      with:
+        dotnet-version: '11.0.x'
+
     - name: Setup .NET Framework 4.8 Developer Pack (Windows)
       if: matrix.os == 'windows-latest'
       shell: pwsh
