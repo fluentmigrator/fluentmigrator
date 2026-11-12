@@ -255,6 +255,15 @@ namespace FluentMigrator.Tests.Unit.Generators.GenericGenerator
         }
 
         [Test]
+        public void ShouldFormatFirebirdDatesWithoutATimeOfDayAsDates()
+        {
+            // Firebird 4 won't convert '1991-08-25 00:00:00' to a DATE column.
+            var quoter = new Runner.Generators.Firebird.FirebirdQuoter(false);
+            quoter.QuoteValue(new DateTime(1991, 8, 25)).ShouldBe("'1991-08-25'");
+            quoter.QuoteValue(new DateTime(1991, 8, 25, 13, 45, 6)).ShouldBe("'1991-08-25 13:45:06'");
+        }
+
+        [Test]
         public void ShouldUnQuoteSqlServerObjectNames()
         {
             // SQL Server has no escape for '[', which used to make UnQuote throw.
