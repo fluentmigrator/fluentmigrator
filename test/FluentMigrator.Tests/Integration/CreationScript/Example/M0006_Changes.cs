@@ -25,7 +25,7 @@ namespace FluentMigrator.Tests.Integration.CreationScript.Example
     /// </summary>
     /// <remarks>
     /// Firebird alters columns and renames tables in its processor, not its generator, so a script without a
-    /// connection leaves them out. The Db2 generator can't rename a column, and its ALTER COLUMN isn't valid Db2.
+    /// connection leaves them out (#2440). The Db2 generator can't rename a column, and its ALTER COLUMN isn't valid Db2.
     /// </remarks>
     [Migration(6, "Changes")]
     public class M0006_Changes : Migration
@@ -103,7 +103,7 @@ namespace FluentMigrator.Tests.Integration.CreationScript.Example
     }
 
     /// <summary>
-    /// Sequences with every option. MySQL has none; Firebird's generator writes only the name.
+    /// Sequences with every option. MySQL has none; Firebird's generator writes only the name (#2440).
     /// </summary>
     [Migration(8, "Sequences")]
     public class M0008_Sequences : Migration
@@ -187,7 +187,7 @@ namespace FluentMigrator.Tests.Integration.CreationScript.Example
     /// </summary>
     /// <remarks>
     /// Firebird's identity is a sequence and a trigger that its processor creates, so a script without a connection
-    /// has neither, and an insert without an id fails.
+    /// has neither, and an insert without an id fails (#2440).
     /// </remarks>
     [Migration(10, "Identity")]
     public class M0010_Identity : Migration

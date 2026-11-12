@@ -104,7 +104,7 @@ namespace FluentMigrator.Tests.Integration.CreationScript.Example
 
             // PostgreSQL's NewGuid needs the uuid-ossp extension. MySQL rejects ADD COLUMN with a UUID() default
             // while binary logging is on (error 1674), so its NewGuid default is in a CREATE TABLE (M0023). Firebird
-            // allows only literals and context variables as defaults, so its gen_uuid() is rejected. MySQL has no
+            // allows only literals and context variables as defaults, so its gen_uuid() is rejected (#2440). MySQL has no
             // CURRENT_USER default; Db2's UTC expression isn't allowed as a default.
             IfDatabase(Db.SqlServer, Db.Oracle)
                 .Create.Column("TraceId").OnTable("Product").AsGuid().NotNullable().WithDefault(SystemMethods.NewGuid);
