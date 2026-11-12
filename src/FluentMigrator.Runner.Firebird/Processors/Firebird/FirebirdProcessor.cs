@@ -1117,7 +1117,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             if (_quoter.IsQuoted(sqlName))
                 return FormatHelper.FormatSqlEscape(_quoter.UnQuote(sqlName));
             else
-                return FormatHelper.FormatSqlEscape(sqlName).ToUpper();
+                return FormatHelper.FormatSqlEscape(sqlName).ToUpperInvariant();
         }
 
         /// <summary>
@@ -1279,7 +1279,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
                     {4}
                     ", _quoter.Quote(triggerName), _quoter.Quote(tableName),
                      onBefore ? "before" : "after",
-                     onEvent.ToString().ToLower(),
+                     onEvent.ToString().ToLowerInvariant(),
                      triggerBody
                      );
                 Logger.LogSql(triggerSql);

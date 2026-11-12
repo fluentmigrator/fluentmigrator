@@ -464,7 +464,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
             var buffering = GetIndexStorageParameters<GistBuffering?>(PostgresExtensions.IndexBuffering, "Buffering");
             if (buffering.HasValue)
             {
-                parameters.Add($"BUFFERING = {buffering.Value.ToString().ToUpper()}");
+                parameters.Add($"BUFFERING = {buffering.Value.ToString().ToUpperInvariant()}");
             }
 
             var pendingList = GetIndexStorageParameters<long?>(PostgresExtensions.IndexGinPendingListLimit, "GinPendingListLimit");
@@ -536,8 +536,14 @@ namespace FluentMigrator.Runner.Generators.Postgres
         }
 
         /// <inheritdoc />
+        /// <remarks>PostgreSQL treats NULLs as distinct natively. Expressing the opposite needs NULLS NOT DISTINCT, added in PostgreSQL 15.</remarks>
+        protected override bool IsUniqueIndexNullsDistinctSupported(bool nullsDistinct) => nullsDistinct;
+
+        /// <inheritdoc />
         public override string Generate(CreateIndexExpression expression)
         {
+            ValidateUniqueIndexNullsDistinct(expression);
+
             var result = new StringBuilder("CREATE");
 
             if (expression.Index.IsUnique)
@@ -553,7 +559,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
                 GetAsOnly(expression),
                 Quoter.QuoteTableName(expression.Index.TableName, expression.Index.SchemaName),
                 // B-Tree is default index method
-                indexMethod == Algorithm.BTree ? string.Empty : $" USING {indexMethod.ToString().ToUpper()}");
+                indexMethod == Algorithm.BTree ? string.Empty : $" USING {indexMethod.ToString().ToUpperInvariant()}");
 
             var first = true;
             foreach (var column in expression.Index.Columns)

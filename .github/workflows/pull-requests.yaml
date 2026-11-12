@@ -67,6 +67,11 @@ jobs:
       with:
         dotnet-version: '10.0.x'
 
+    - name: Setup dotnet SDK
+      uses: actions/setup-dotnet@v6
+      with:
+        dotnet-version: '11.0.x'
+
     - name: Setup .NET Framework 4.8 Developer Pack (Windows)
       if: matrix.os == 'windows-latest'
       shell: pwsh
@@ -153,6 +158,19 @@ jobs:
         if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
         dotnet pack ${{ env.solution }} --configuration ${{ env.buildConfiguration }} --no-build --verbosity minimal -p:Version=${{ steps.gitversion.outputs.majorMinorPatch }}
 
+    # Consume the FluentMigrator.MSBuild package just packed above, the way users do: a fresh project per
+    # target framework references it, NuGet auto-imports build/<tfm>/FluentMigrator.MSBuild.targets, and
+    # <Migrate> must load from tasks/<tfm>/. Also checks Visual Studio's MSBuild.exe with a net48 consumer.
+    # Every release through 8.x would have failed this (MSB4062).
+    - name: FluentMigrator.MSBuild package smoke test
+      if: matrix.os == 'windows-latest'
+      shell: pwsh
+      run: |
+        $package = Get-ChildItem src/FluentMigrator.MSBuild/bin/${{ env.buildConfiguration }} -Filter 'FluentMigrator.MSBuild.*.nupkg' |
+          Where-Object Name -notlike '*.symbols.nupkg' | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+        if (-not $package) { throw 'FluentMigrator.MSBuild nupkg not found; the pack step must run first.' }
+        ./test/FluentMigrator.MSBuild.PackageSmoke/Invoke-PackageSmoke.ps1 -PackagePath $package.FullName -FullFramework
+
     - name: Verify test results coverage files exists
       if: matrix.os == 'ubuntu-latest' && (!cancelled())
       run: |
@@ -166,7 +184,7 @@ jobs:
         find . -type f -iname "*cobertura.xml" || true
 
     - name: Combine Coverage Reports
-      uses: danielpalme/ReportGenerator-GitHub-Action@5.5.11
+      uses: danielpalme/ReportGenerator-GitHub-Action@5.5.12
       if: '!cancelled()'
       with:
         reports: "**/*.cobertura.xml"

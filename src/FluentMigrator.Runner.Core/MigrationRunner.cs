@@ -437,6 +437,10 @@ namespace FluentMigrator.Runner
         /// <param name="useAutomaticTransactionManagement"><c>true</c> if automatic transaction management should be used</param>
         public void MigrateDown(long targetVersion, bool useAutomaticTransactionManagement)
         {
+            // Another process may have applied or reverted migrations since the version info was last loaded,
+            // for example while this one waited for the application lock.
+            VersionLoader.LoadVersionInfo();
+
             var migrationInfos = GetDownMigrationsToApply(targetVersion);
 
             using (IMigrationScope scope = _migrationScopeManager.CreateOrWrapMigrationScope(useAutomaticTransactionManagement && TransactionPerSession))
@@ -664,6 +668,10 @@ namespace FluentMigrator.Runner
         /// <param name="useAutomaticTransactionManagement"><c>true</c> if automatic transaction management should be used</param>
         public void Rollback(int steps, bool useAutomaticTransactionManagement)
         {
+            // Another process may have applied or reverted migrations since the version info was last loaded,
+            // for example while this one waited for the application lock.
+            VersionLoader.LoadVersionInfo();
+
             var availableMigrations = MigrationLoader.LoadMigrations();
             var migrationsToRollback = new List<IMigrationInfo>();
 
@@ -718,6 +726,10 @@ namespace FluentMigrator.Runner
         /// <param name="useAutomaticTransactionManagement"><c>true</c> if automatic transaction management should be used</param>
         public void RollbackToVersion(long version, bool useAutomaticTransactionManagement)
         {
+            // Another process may have applied or reverted migrations since the version info was last loaded,
+            // for example while this one waited for the application lock.
+            VersionLoader.LoadVersionInfo();
+
             var availableMigrations = MigrationLoader.LoadMigrations();
             var migrationsToRollback = new List<IMigrationInfo>();
 

@@ -28,6 +28,7 @@ namespace FluentMigrator.SqlServer
         /// </summary>
         /// <param name="expression">The expression to set this option for</param>
         /// <returns>The <paramref name="expression"/></returns>
+        [Obsolete("This legacy NullsNotDistinct() emits a WHERE [column] IS NOT NULL filter, which is the opposite of the provider-agnostic FluentMigrator.CreateIndexNullSemanticsExtensions.NullsNotDistinct(). To keep this behavior, use FluentMigrator.CreateIndexNullSemanticsExtensions.NullsDistinct(), which emits the same filter.")]
         public static ICreateIndexColumnUniqueOptionsSyntax NullsNotDistinct(
             this ICreateIndexColumnUniqueOptionsSyntax expression)
         {
@@ -40,6 +41,7 @@ namespace FluentMigrator.SqlServer
         /// <param name="expression">The expression to set this option for</param>
         /// <param name="nullsAreDistinct"><c>true</c> when nulls should be distinct</param>
         /// <returns>The <paramref name="expression"/></returns>
+        [Obsolete("Use FluentMigrator.CreateIndexNullSemanticsExtensions.NullsNotDistinct() or FluentMigrator.CreateIndexNullSemanticsExtensions.NullsDistinct(). The legacy NullsDistinct(true) emits no filter, like the new NullsNotDistinct(); the legacy NullsDistinct(false) emits a WHERE [column] IS NOT NULL filter, like the new NullsDistinct().")]
         public static ICreateIndexColumnUniqueOptionsSyntax NullsDistinct(
             this ICreateIndexColumnUniqueOptionsSyntax expression,
             bool nullsAreDistinct = true)
@@ -78,6 +80,7 @@ namespace FluentMigrator.SqlServer
         /// </summary>
         /// <param name="expression">The expression to set this option for</param>
         /// <returns>The <paramref name="expression"/></returns>
+        [Obsolete("This legacy UniqueNullsNotDistinct() emits a WHERE [column] IS NOT NULL filter, which is the opposite of the provider-agnostic FluentMigrator.CreateIndexNullSemanticsExtensions.NullsNotDistinct(). To keep this behavior, use FluentMigrator.CreateIndexNullSemanticsExtensions.NullsDistinct() after .Unique() on a column of the index, which emits the same filter.")]
         public static ICreateIndexOnColumnSyntax UniqueNullsNotDistinct(
             this ICreateIndexOptionsSyntax expression)
         {
@@ -90,6 +93,7 @@ namespace FluentMigrator.SqlServer
         /// <param name="expression">The expression to set this option for</param>
         /// <param name="nullsAreDistinct"><c>true</c> when nulls should be distinct</param>
         /// <returns>The <paramref name="expression"/></returns>
+        [Obsolete("Use FluentMigrator.CreateIndexNullSemanticsExtensions.NullsNotDistinct() or FluentMigrator.CreateIndexNullSemanticsExtensions.NullsDistinct() after .Unique() on a column of the index. The legacy UniqueNullsDistinct(true) emits no filter, like the new NullsNotDistinct(); the legacy UniqueNullsDistinct(false) emits a WHERE [column] IS NOT NULL filter, like the new NullsDistinct().")]
         public static ICreateIndexOnColumnSyntax UniqueNullsDistinct(
             this ICreateIndexOptionsSyntax expression,
             bool nullsAreDistinct = true)

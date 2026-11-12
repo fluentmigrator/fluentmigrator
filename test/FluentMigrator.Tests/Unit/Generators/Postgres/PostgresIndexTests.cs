@@ -148,6 +148,24 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe($"CREATE INDEX \"TestIndex\" ON \"public\".\"TestTable1\" USING {algorithm.ToString().ToUpper()} (\"TestColumn1\");");
         }
 
+        [TestCase(Algorithm.Brin, "BRIN")]
+        [TestCase(Algorithm.Gin, "GIN")]
+        [TestCase(Algorithm.Gist, "GIST")]
+        [TestCase(Algorithm.Hash, "HASH")]
+        [TestCase(Algorithm.Spgist, "SPGIST")]
+        [SetCulture("tr-TR")]
+        public void CanCreateIndexUsingIndexAlgorithmWithTurkishCulture(Algorithm algorithm, string expectedIndexMethod)
+        {
+            var expression = GetCreateIndexWithExpression(x =>
+            {
+                var definition = x.Index.GetAdditionalFeature(PostgresExtensions.IndexAlgorithm, () => new PostgresIndexAlgorithmDefinition());
+                definition.Algorithm = algorithm;
+            });
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe($"CREATE INDEX \"TestIndex\" ON \"public\".\"TestTable1\" USING {expectedIndexMethod} (\"TestColumn1\");");
+        }
+
         [Test]
         public void CanCreateIndexWithFilter()
         {

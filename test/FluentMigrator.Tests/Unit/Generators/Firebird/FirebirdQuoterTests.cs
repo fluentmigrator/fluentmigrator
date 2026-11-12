@@ -102,6 +102,13 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             actual.ShouldBe("\"similar\"");
         }
 
+        [Test, SetCulture("tr-TR")]
+        public void ToFbObjectName_PassesTurkishTest()
+        {
+            var actual = new FirebirdQuoter(false).ToFbObjectName("invoices");
+            actual.ShouldBe("INVOICES");
+        }
+
         [Test, TestCaseSource(nameof(_fbKeywords))]
         public void Quote_ArgIsKeywordInLowercase_ArgShouldBeQuoted(string quoteArg)
         {

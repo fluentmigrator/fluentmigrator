@@ -56,6 +56,8 @@ FluentMigrator supports parameterized SQL scripts through the `parameters` argum
 
 `$(parameterName)` inserts the value's `ToString()` result under the invariant culture. It does not format the value as a SQL date literal. A `DateTime` renders as `MM/dd/yyyy HH:mm:ss` (for example `07/28/2026 13:45:06`), and a `DateTimeOffset` renders as `MM/dd/yyyy HH:mm:ss zzz` (for example `07/28/2026 13:45:06 -04:00`). Database engines read that form differently. On SQL Server, for example, the result depends on the `DATEFORMAT` and language settings of the session, so the same migration can produce different dates on different servers.
 
+FluentMigrator keeps this behavior, because changing it would silently change the SQL that existing migrations emit. From 9.0.0, the `FluentMigrator.Analyzers` package reports [FM0007](../advanced/analyzers.md#fm0007-date-time-value-substituted-through-a-raw-name-token) when it can see that a `$(name)` token receives a `DateTime` or `DateTimeOffset`. Its code fix rewrites the token to `$[name]`.
+
 To pass a date or time value, use one of these approaches:
 
 - Use `$[parameterName]`, which formats the value as a quoted literal through the provider's quoter.

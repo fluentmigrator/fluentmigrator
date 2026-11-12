@@ -82,8 +82,8 @@ namespace FluentMigrator.Runner.Processors.Hana
                 throw new ArgumentNullException(nameof(columnName));
 
             return Exists("SELECT 1 FROM TABLE_COLUMNS WHERE SCHEMA_NAME = CURRENT_SCHEMA AND upper(TABLE_NAME) = '{0}' AND upper(COLUMN_NAME) = '{1}'",
-                FormatHelper.FormatSqlEscape(Quoter.UnQuote(tableName).ToUpper()),
-                FormatHelper.FormatSqlEscape(Quoter.UnQuote(columnName).ToUpper()));
+                FormatHelper.FormatSqlEscape(Quoter.UnQuote(tableName).ToUpperInvariant()),
+                FormatHelper.FormatSqlEscape(Quoter.UnQuote(columnName).ToUpperInvariant()));
         }
 
         /// <inheritdoc />
@@ -98,7 +98,7 @@ namespace FluentMigrator.Runner.Processors.Hana
                 return false;
 
             return Exists("SELECT 1 FROM CONSTRAINTS WHERE SCHEMA_NAME = CURRENT_SCHEMA and upper(CONSTRAINT_NAME) = '{0}'",
-                FormatHelper.FormatSqlEscape(Quoter.UnQuote(constraintName).ToUpper()));
+                FormatHelper.FormatSqlEscape(Quoter.UnQuote(constraintName).ToUpperInvariant()));
         }
 
         /// <inheritdoc />
@@ -113,7 +113,7 @@ namespace FluentMigrator.Runner.Processors.Hana
                 return false;
 
             return Exists("SELECT 1 FROM INDEXES WHERE SCHEMA_NAME = CURRENT_SCHEMA AND upper(INDEX_NAME) = '{0}'",
-                    FormatHelper.FormatSqlEscape(Quoter.UnQuote(indexName).ToUpper()));
+                    FormatHelper.FormatSqlEscape(Quoter.UnQuote(indexName).ToUpperInvariant()));
         }
 
         /// <inheritdoc />
@@ -126,7 +126,7 @@ namespace FluentMigrator.Runner.Processors.Hana
                 return false;
 
             return Exists("SELECT 1 FROM SEQUENCES WHERE SCHEMA_NAME = CURRENT_SCHEMA and upper(SEQUENCE_NAME) = '{0}'",
-                FormatHelper.FormatSqlEscape(Quoter.UnQuote(sequenceName).ToUpper()));
+                FormatHelper.FormatSqlEscape(Quoter.UnQuote(sequenceName).ToUpperInvariant()));
         }
 
         /// <inheritdoc />

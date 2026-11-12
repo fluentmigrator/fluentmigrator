@@ -196,6 +196,13 @@ namespace FluentMigrator.Runner.Generators.Oracle
                 return string.Empty;
             }
 
+            // Dynamic SQL must not carry the statement end token, otherwise Oracle raises ORA-00922/ORA-00911
+            statement = statement.TrimEnd();
+            if (statement.EndsWith(";"))
+            {
+                statement = statement.Substring(0, statement.Length - 1);
+            }
+
             return FormatStatement("EXECUTE IMMEDIATE '{0}'", FormatHelper.FormatSqlEscape(statement));
         }
 
@@ -322,8 +329,14 @@ namespace FluentMigrator.Runner.Generators.Oracle
         }
 
         /// <inheritdoc />
+        /// <remarks>Oracle's unique-index NULL handling is mixed: keys whose indexed columns are all NULL are not indexed at all, while composite keys with only some NULL columns treat those NULLs as equal. Neither portable semantics can be promised.</remarks>
+        protected override bool IsUniqueIndexNullsDistinctSupported(bool nullsDistinct) => false;
+
+        /// <inheritdoc />
         public override string Generate(CreateIndexExpression expression)
         {
+            ValidateUniqueIndexNullsDistinct(expression);
+
             var indexColumns = new string[expression.Index.Columns.Count];
 
             for (var i = 0; i < expression.Index.Columns.Count; i++)

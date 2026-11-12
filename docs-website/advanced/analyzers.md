@@ -193,6 +193,84 @@ In such cases, since the value being substituted is trusted, fixed, developer-au
 external/untrusted data), the FM0002 warning can be suppressed for that call &mdash; see
 [Suppressing Analyzer Warnings](#suppressing-analyzer-warnings) below.
 
+### FM0007: Date/Time Value Substituted Through a Raw $(name) Token
+
+**Category**: FluentMigrator
+**Severity**: Warning
+**Available since**: 9.0.0
+
+`$(name)` inserts the value's invariant `ToString()` result. For a `DateTime` that is
+`07/28/2026 13:45:06`, and for a `DateTimeOffset` it is `07/28/2026 13:45:06 -04:00`. Databases read
+that form differently:
+
+- **SQL Server:** the result depends on the session's `DATEFORMAT` and language, so a day of the month
+  up to 12 can silently become a different date on another server.
+- **PostgreSQL:** depends on `DateStyle`.
+- **MySQL and Oracle:** usually reject it.
+- **SQLite:** stores it as text, so date comparisons stop working.
+
+`$[name]` formats the value through the provider's quoter instead:
+
+| Provider | `DateTime` | `DateTimeOffset` |
+|---|---|---|
+| SQL Server, PostgreSQL, MySQL, SQLite, Redshift, SAP HANA | `'2026-07-28T13:45:06'` (ISO 8601) | `'2026-07-28T13:45:06-04:00'` (ISO 8601) |
+| Oracle | `to_date('2026-07-28 13:45:06', 'yyyy-mm-dd hh24:mi:ss')` | `'2026-07-28T13:45:06-04:00'`, with no conversion function |
+| Db2 | `'2026-07-28-13.45.06'` | `'2026-07-28T13:45:06-04:00'` |
+| Firebird | `'2026-07-28 13:45:06'` | `'2026-07-28T13:45:06-04:00'` |
+| Snowflake | `'2026-07-28 13:45:06'` | `'2026-07-28 13:45:06 -04:00'` |
+
+::: warning DateTimeOffset on Oracle
+The quoter has no explicit conversion for `DateTimeOffset` on Oracle, so the value still reaches the
+server as a string, and Oracle reads it according to the session's `NLS_TIMESTAMP_TZ_FORMAT`. `$[name]`
+is still clearer than `07/28/2026 13:45:06 -04:00`, but it is not session-independent. Wrap the token in
+`TO_TIMESTAMP_TZ($[name], 'YYYY-MM-DD"T"HH24:MI:SSTZH:TZM')`, or pass a `DateTime`.
+:::
+
+FluentMigrator deliberately does **not** change what `$(name)` emits, because that would silently
+change the SQL of existing migrations. FM0007 points at the affected calls instead. It is separate from
+FM0002, so it stays on in projects that suppress FM0002 because they use raw tokens on purpose.
+
+#### Example Problem
+
+```csharp
+Execute.Sql("DELETE FROM Audit WHERE CreatedAt < '$(cutoff)'", new Dictionary<string, object>
+{
+    ["cutoff"] = new DateTime(2026, 7, 28, 13, 45, 6),   // FM0007
+});
+```
+
+#### Solution
+
+The code fix replaces the token with `$[cutoff]`. When the token was the whole SQL string literal, as
+above, it also removes the surrounding quotes, because `$[name]` supplies its own:
+
+```csharp
+Execute.Sql("DELETE FROM Audit WHERE CreatedAt < $[cutoff]", new Dictionary<string, object>
+{
+    ["cutoff"] = new DateTime(2026, 7, 28, 13, 45, 6),
+});
+```
+
+When the token is only part of a literal, for example `'$(day) 00:00'`, there is no mechanical
+rewrite, so FM0007 reports without offering a fix.
+
+#### What FM0007 Can See
+
+The analyzer sees the SQL and the parameters separately, and its fix rewrites SQL. So it reports only
+when it knows exactly what the token will receive:
+
+- the call is `Execute.Sql` with a SQL string literal;
+- the parameters are a `Dictionary<string, ...>` created in the call, or a local variable initialized
+  with one that is never reassigned, modified (indexer writes, `Add`, `Remove`, ...) or passed anywhere
+  except `Execute.Sql`;
+- every key in the initializer is a constant string; and
+- the comparer is the default, `StringComparer.Ordinal` or `StringComparer.OrdinalIgnoreCase`.
+  Culture-sensitive comparers such as `CurrentCultureIgnoreCase` match keys differently depending on the
+  culture the migration runs under, so they are not analyzed.
+
+Anything else is not reported, and neither is `Execute.Script`/`EmbeddedScript`, whose SQL is not in
+your source. See also [Date and time values](../operations/execute-sql.md#date-and-time-values).
+
 ## IDE Integration
 
 The analyzers work seamlessly with popular IDEs:

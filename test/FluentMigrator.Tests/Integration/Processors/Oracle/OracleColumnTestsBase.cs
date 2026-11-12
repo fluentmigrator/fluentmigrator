@@ -22,6 +22,7 @@ using System.IO;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.Oracle;
 using FluentMigrator.Tests.Helpers;
+using FluentMigrator.Tests.Unit.Generators;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -107,6 +108,44 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle
             {
                 Processor.ColumnExists(SchemaName, table.Name, "id").ShouldBeTrue();
             }
+        }
+
+        [Test]
+        public void CanCreateColumnWithDescription()
+        {
+            using (var table = new OracleTestTable("COLUMN_DESCRIPTIONS", Processor, null, "id int"))
+            {
+                var expression = GeneratorTestHelper.GetCreateColumnExpressionWithDescription();
+                expression.TableName = table.Name;
+
+                Processor.Process(expression);
+
+                Processor.ColumnExists(null, table.Name, expression.Column.Name).ShouldBeTrue();
+                ReadColumnComment(table.Name, expression.Column.Name).ShouldBe(GeneratorTestHelper.TestColumn1Description);
+            }
+        }
+
+        [Test]
+        public void CanAlterColumnWithDescription()
+        {
+            using (var table = new OracleTestTable("COLUMN_DESCRIPTIONS", Processor, null, "id int, TestColumn1 NVARCHAR2(5)"))
+            {
+                var expression = GeneratorTestHelper.GetAlterColumnExpressionWithDescription();
+                expression.TableName = table.Name;
+
+                Processor.Process(expression);
+
+                ReadColumnComment(table.Name, expression.Column.Name).ShouldBe(GeneratorTestHelper.TestColumn1Description);
+            }
+        }
+
+        private object ReadColumnComment(string tableName, string columnName)
+        {
+            return Processor.Read(
+                    "SELECT COMMENTS FROM USER_COL_COMMENTS WHERE UPPER(TABLE_NAME) = UPPER('{0}') AND UPPER(COLUMN_NAME) = UPPER('{1}')",
+                    tableName,
+                    columnName)
+                .Tables[0].Rows[0][0];
         }
 
         [OneTimeSetUp]

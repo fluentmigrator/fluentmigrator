@@ -28,6 +28,7 @@ namespace FluentMigrator.Postgres
         /// </summary>
         /// <param name="expression">The expression to set this option for</param>
         /// <returns>The <paramref name="expression"/></returns>
+        [Obsolete("Use the provider-agnostic FluentMigrator.CreateIndexNullSemanticsExtensions.NullsNotDistinct(), which emits the same NULLS NOT DISTINCT clause on PostgreSQL 15 and later. On PostgreSQL 14 and earlier this legacy method emits a WHERE column IS NOT NULL partial index instead, which is the opposite; the new NullsNotDistinct() goes through the compatibility mode there.")]
         public static ICreateIndexColumnUniqueOptionsSyntax NullsNotDistinct(this ICreateIndexColumnUniqueOptionsSyntax expression)
         {
             return NullsDistinct(expression, false);
@@ -39,6 +40,7 @@ namespace FluentMigrator.Postgres
         /// <param name="expression">The expression to set this option for</param>
         /// <param name="nullsAreDistinct"><c>true</c> when nulls should be distinct</param>
         /// <returns>The <paramref name="expression"/></returns>
+        [Obsolete("Use the provider-agnostic FluentMigrator.CreateIndexNullSemanticsExtensions.NullsDistinct() or FluentMigrator.CreateIndexNullSemanticsExtensions.NullsNotDistinct(), which have the same meaning on PostgreSQL 15 and later. On PostgreSQL 14 and earlier the legacy false value emits a WHERE column IS NOT NULL partial index, which is the opposite of the new NullsNotDistinct().")]
         public static ICreateIndexColumnUniqueOptionsSyntax NullsDistinct(this ICreateIndexColumnUniqueOptionsSyntax expression,
             bool nullsAreDistinct = true)
         {
@@ -75,6 +77,7 @@ namespace FluentMigrator.Postgres
         /// </summary>
         /// <param name="expression">The expression to set this option for</param>
         /// <returns>The <paramref name="expression"/></returns>
+        [Obsolete("Use the provider-agnostic FluentMigrator.CreateIndexNullSemanticsExtensions.NullsNotDistinct() after .Unique() on a column of the index, which emits the same NULLS NOT DISTINCT clause on PostgreSQL 15 and later. On PostgreSQL 14 and earlier this legacy method emits a WHERE column IS NOT NULL partial index instead, which is the opposite; the new NullsNotDistinct() goes through the compatibility mode there.")]
         public static ICreateIndexOnColumnSyntax UniqueNullsNotDistinct(this ICreateIndexOptionsSyntax expression)
         {
             return UniqueNullsDistinct(expression, false);
@@ -86,6 +89,7 @@ namespace FluentMigrator.Postgres
         /// <param name="expression">The expression to set this option for</param>
         /// <param name="nullsAreDistinct"><c>true</c> when nulls should be distinct</param>
         /// <returns>The <paramref name="expression"/></returns>
+        [Obsolete("Use the provider-agnostic FluentMigrator.CreateIndexNullSemanticsExtensions.NullsDistinct() or FluentMigrator.CreateIndexNullSemanticsExtensions.NullsNotDistinct() after .Unique() on a column of the index, which have the same meaning on PostgreSQL 15 and later. On PostgreSQL 14 and earlier the legacy false value emits a WHERE column IS NOT NULL partial index, which is the opposite of the new NullsNotDistinct().")]
         public static ICreateIndexOnColumnSyntax UniqueNullsDistinct(this ICreateIndexOptionsSyntax expression,
             bool nullsAreDistinct = true)
         {

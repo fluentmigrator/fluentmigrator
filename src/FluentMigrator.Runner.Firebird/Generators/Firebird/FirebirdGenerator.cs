@@ -137,8 +137,14 @@ namespace FluentMigrator.Runner.Generators.Firebird
         }
 
         /// <inheritdoc />
+        /// <remarks>Firebird treats NULLs as distinct in a unique index natively and cannot express the opposite.</remarks>
+        protected override bool IsUniqueIndexNullsDistinctSupported(bool nullsDistinct) => nullsDistinct;
+
+        /// <inheritdoc />
         public override string Generate(CreateIndexExpression expression)
         {
+            ValidateUniqueIndexNullsDistinct(expression);
+
             //Firebird doesn't have particular asc or desc order per column, only per the whole index
             // CREATE [UNIQUE] [ASC[ENDING] | [DESC[ENDING]] INDEX indexname
             //  ON tablename  { (<col> [, <col> ...]) | COMPUTED BY (expression) }

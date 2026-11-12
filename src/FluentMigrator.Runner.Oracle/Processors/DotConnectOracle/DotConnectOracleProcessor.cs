@@ -76,7 +76,7 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
             if (schemaName.Length == 0)
                 return false;
 
-            return Exists("SELECT 1 FROM ALL_USERS WHERE USERNAME = '{0}'", schemaName.ToUpper());
+            return Exists("SELECT 1 FROM ALL_USERS WHERE USERNAME = '{0}'", schemaName.ToUpperInvariant());
         }
 
         /// <inheritdoc />
@@ -89,9 +89,9 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
                 return false;
 
             if (string.IsNullOrEmpty(schemaName))
-                return Exists("SELECT 1 FROM USER_TABLES WHERE TABLE_NAME = '{0}'", tableName.ToUpper());
+                return Exists("SELECT 1 FROM USER_TABLES WHERE TABLE_NAME = '{0}'", tableName.ToUpperInvariant());
 
-            return Exists("SELECT 1 FROM ALL_TABLES WHERE OWNER = '{0}' AND TABLE_NAME = '{1}'", schemaName.ToUpper(), tableName.ToUpper());
+            return Exists("SELECT 1 FROM ALL_TABLES WHERE OWNER = '{0}' AND TABLE_NAME = '{1}'", schemaName.ToUpperInvariant(), tableName.ToUpperInvariant());
         }
 
         /// <inheritdoc />
@@ -106,9 +106,9 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
                 return false;
 
             if (string.IsNullOrEmpty(schemaName))
-                return Exists("SELECT 1 FROM USER_TAB_COLUMNS WHERE TABLE_NAME = '{0}' AND COLUMN_NAME = '{1}'", tableName.ToUpper(), columnName.ToUpper());
+                return Exists("SELECT 1 FROM USER_TAB_COLUMNS WHERE TABLE_NAME = '{0}' AND COLUMN_NAME = '{1}'", tableName.ToUpperInvariant(), columnName.ToUpperInvariant());
 
-            return Exists("SELECT 1 FROM ALL_TAB_COLUMNS WHERE OWNER = '{0}' AND TABLE_NAME = '{1}' AND COLUMN_NAME = '{2}'", schemaName.ToUpper(), tableName.ToUpper(), columnName.ToUpper());
+            return Exists("SELECT 1 FROM ALL_TAB_COLUMNS WHERE OWNER = '{0}' AND TABLE_NAME = '{1}' AND COLUMN_NAME = '{2}'", schemaName.ToUpperInvariant(), tableName.ToUpperInvariant(), columnName.ToUpperInvariant());
         }
 
         /// <inheritdoc />
@@ -125,9 +125,9 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
                 return false;
 
             if (string.IsNullOrEmpty(schemaName))
-                return Exists("SELECT 1 FROM USER_CONSTRAINTS WHERE CONSTRAINT_NAME = '{0}'", constraintName.ToUpper());
+                return Exists("SELECT 1 FROM USER_CONSTRAINTS WHERE CONSTRAINT_NAME = '{0}'", constraintName.ToUpperInvariant());
 
-            return Exists("SELECT 1 FROM ALL_CONSTRAINTS WHERE OWNER = '{0}' AND CONSTRAINT_NAME = '{1}'", schemaName.ToUpper(), constraintName.ToUpper());
+            return Exists("SELECT 1 FROM ALL_CONSTRAINTS WHERE OWNER = '{0}' AND CONSTRAINT_NAME = '{1}'", schemaName.ToUpperInvariant(), constraintName.ToUpperInvariant());
         }
 
         /// <inheritdoc />
@@ -144,9 +144,9 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
                 return false;
 
             if (string.IsNullOrEmpty(schemaName))
-                return Exists("SELECT 1 FROM USER_INDEXES WHERE INDEX_NAME = '{0}'", indexName.ToUpper());
+                return Exists("SELECT 1 FROM USER_INDEXES WHERE INDEX_NAME = '{0}'", indexName.ToUpperInvariant());
 
-            return Exists("SELECT 1 FROM ALL_INDEXES WHERE OWNER = '{0}' AND INDEX_NAME = '{1}'", schemaName.ToUpper(), indexName.ToUpper());
+            return Exists("SELECT 1 FROM ALL_INDEXES WHERE OWNER = '{0}' AND INDEX_NAME = '{1}'", schemaName.ToUpperInvariant(), indexName.ToUpperInvariant());
         }
 
         /// <inheritdoc />
@@ -189,9 +189,9 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
                 throw new ArgumentNullException(nameof(tableName));
 
             if (string.IsNullOrEmpty(schemaName))
-                return Read("SELECT * FROM {0}", tableName.ToUpper());
+                return Read("SELECT * FROM {0}", tableName.ToUpperInvariant());
 
-            return Read("SELECT * FROM {0}.{1}", schemaName.ToUpper(), tableName.ToUpper());
+            return Read("SELECT * FROM {0}.{1}", schemaName.ToUpperInvariant(), tableName.ToUpperInvariant());
         }
 
         /// <inheritdoc />

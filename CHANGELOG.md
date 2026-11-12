@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### New
 
+- Application locking: register an `IApplicationLocker` with `ConfigureApplicationLocker<T>()` so that only one application instance migrates a database at a time. The lock covers version-table creation as well as every runner operation and migration scope (Issue #1949 by @cristiproj; design review by @RaphaelFakhri)
+  - Ownership is per dependency-injection scope (`IApplicationLockLease`), counted, and independent of threads and `ExecutionContext`, so implementations do not need to be reentrant
+  - Synchronous and asynchronous acquisition with cancellation; `ApplicationLockerOptions.AcquireTimeout`; failures surface as `ApplicationLockException`
+  - `Rollback`, `RollbackToVersion` and `MigrateDown` now reload the version info before choosing which migrations to revert, as `MigrateUp` already did, so they act on what the database holds once the lock is taken rather than on what an earlier load saw
+- Analyzer `FM0007` warns when a raw `$(name)` token in `Execute.Sql` receives a `DateTime` or `DateTimeOffset` value, which renders as `07/28/2026 13:45:06` and is read differently by different databases. Its code fix rewrites the token to `$[name]`, which formats the value through the provider's quoter (ISO 8601 on most providers, `to_date(...)` on Oracle; an Oracle `DateTimeOffset` still depends on `NLS_TIMESTAMP_TZ_FORMAT`). What `$(name)` emits is unchanged (Issue #2354 by @jzabroski; documented in PR #2401 by @RaphaelFakhri)
 - New `IPrimaryKeyNameConvention` (implemented by `DefaultPrimaryKeyNameConvention`) applies the primary key naming convention to both column-level primary keys and standalone primary key constraints, and makes the convention easier to discover and replace (Issue #1800)
 - Custom connections: `IMigrationConnectionFactory` allows applications to supply fully configured `IDbConnection` instances to the migration runner (PR #2268 by @Sherif-Ahmed, building on PR #2002 by @Merlin-Taylor, Issue #1981)
   - Configure with `WithConnectionFactory(sp => ...)`, or with `WithDataSource(sp => ...)` when a `DbDataSource` is available (.NET 8+)
@@ -28,6 +33,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Changed
 
+- .NET 11: `FluentMigrator.DotNet.Cli`, `FluentMigrator.MSBuild` and `FluentMigrator.Runner.SqlServer` target `net11.0` (Issue #2430)
+- `FluentMigrator.MSBuild`: the build targets that NuGet imports automatically now load the `Migrate` task. They pointed at `build/tasks/<tfm>/` instead of `tasks/<tfm>/` in the package, so `<Migrate>` failed with MSB4062 unless the project declared its own `UsingTask`. The package also gains the missing `build/net10.0` targets. Found by Copilot review on PR #2431
 - SAP HANA support now uses the `Sap.Data.Hana.Net.v8.0` and `Sap.Data.Hana.Net.v10.0` NuGet packages, and HANA registration was removed from the .NET Framework console and MSBuild runners.
 - `FluentMigrator.DotNet.Cli` no longer depends on AutoMapper. The single `MigratorOptions` copy it performed is now generated at compile time by [Mapperly](https://mapperly.riok.app/), which removes a runtime dependency from `dotnet-fm` along with AutoMapper 15's commercial licence requirement and [CVE-2026-32933](https://github.com/advisories/GHSA-rvv3-g6hj-g44x). `Setup.BuildServiceProvider` no longer registers `AutoMapper.IMapper` in the service collection.
 - The repository moved to NuGet Central Package Management. All package versions now live in `Directory.Packages.props` at the repository root; project files declare package references without a `Version` attribute. This is a build-infrastructure change only - the versions the shipped packages depend on are unchanged.

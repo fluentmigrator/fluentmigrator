@@ -4,7 +4,7 @@
 
   <PropertyGroup>
     <!-- In the real world, you would typically not have multiple target frameworks. However, this sample demonstrates it working against .NET Framework and .NET. -->
-    <TargetFrameworks>net48;net8.0;net9.0;net10.0</TargetFrameworks>
+    <TargetFrameworks>net48;net8.0;net9.0;net10.0;net11.0</TargetFrameworks>
     <OutputType>Library</OutputType>
   </PropertyGroup>
 
@@ -25,6 +25,7 @@
     <FluentMigratorTfm Condition="'$(MSBuildRuntimeType)' == 'Core' And '$(TargetFramework)' == 'net8.0'">net8.0</FluentMigratorTfm>
     <FluentMigratorTfm Condition="'$(MSBuildRuntimeType)' == 'Core' And '$(TargetFramework)' == 'net9.0'">net9.0</FluentMigratorTfm>
     <FluentMigratorTfm Condition="'$(MSBuildRuntimeType)' == 'Core' And '$(TargetFramework)' == 'net10.0'">net10.0</FluentMigratorTfm>
+    <FluentMigratorTfm Condition="'$(MSBuildRuntimeType)' == 'Core' And '$(TargetFramework)' == 'net11.0'">net11.0</FluentMigratorTfm>
     <FluentMigratorTfm Condition="'$(MSBuildRuntimeType)' == 'Full'">net48</FluentMigratorTfm>
     <FluentMigratorMSBuildAssemblyPath>$(PKGFluentMigrator_MSBuild)\tasks\$(FluentMigratorTfm)\FluentMigrator.MSBuild.dll</FluentMigratorMSBuildAssemblyPath>
   </PropertyGroup>
