@@ -54,6 +54,37 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             }
         }
 
+        [Test]
+        public void SnowflakeOptionsArePassedToTheGenerator()
+        {
+            var services = new ServiceCollection()
+                .AddFluentMigratorCore()
+                .ConfigureRunner(rb => rb.AddSnowflake(SnowflakeOptions.QuotingEnabled()))
+                .BuildServiceProvider(true);
+
+            using (var scope = services.CreateScope())
+            {
+                var generator = scope.ServiceProvider.GetRequiredService<IMigrationGenerator>();
+                var expression = new CreateTableExpression { TableName = "MyTable" };
+                expression.Columns.Add(new ColumnDefinition { Name = "MyColumn", Type = DbType.Int32, TableName = "MyTable" });
+
+                var statement = generator.Generate(expression);
+
+                Assert.That(scope.ServiceProvider.GetRequiredService<SnowflakeOptions>().ForceQuote, Is.True);
+                Assert.That(statement, Is.EqualTo("CREATE TABLE \"PUBLIC\".\"MyTable\" (\"MyColumn\" NUMBER NOT NULL);"));
+            }
+        }
+
+        [Test]
+        public void ObsoleteQuoteIdentifiersSetsForceQuote()
+        {
+#pragma warning disable CS0618 // Type or member is obsolete
+            var options = new SnowflakeOptions { QuoteIdentifiers = true };
+#pragma warning restore CS0618 // Type or member is obsolete
+
+            Assert.That(options.ForceQuote, Is.True);
+        }
+
         /// <summary>
         /// Quoter that lowercases unquoted names instead of quoting them.
         /// </summary>
