@@ -340,6 +340,8 @@ namespace FluentMigrator.Runner
         /// <param name="useAutomaticTransactionManagement"><c>true</c> if automatic transaction management should be used</param>
         public void MigrateUp(long targetVersion, bool useAutomaticTransactionManagement)
         {
+            var previewFromNothing = IsPreviewFromNothing();
+
             // Validate connection early to catch invalid connection strings before attempting migrations
             ValidateConnection();
 
@@ -347,12 +349,9 @@ namespace FluentMigrator.Runner
             {
                 try
                 {
-                    if (_processorOptions.PreviewOnly && _options.NoConnection && _options.PreviewFromNothing)
+                    if (previewFromNothing)
                     {
-                        Up(new VersionSchemaMigration(VersionLoader.VersionTableMetaData));
-                        Up(new VersionMigration(VersionLoader.VersionTableMetaData));
-                        Up(new VersionUniqueMigration(VersionLoader.VersionTableMetaData));
-                        Up(new VersionDescriptionMigration(VersionLoader.VersionTableMetaData));
+                        ApplyVersionTableMigrationsFromNothing();
                     }
 
                     ApplyMaintenance(MigrationStage.BeforeAll, useAutomaticTransactionManagement);
@@ -1001,6 +1000,61 @@ namespace FluentMigrator.Runner
             return _migrationScopeManager.BeginScope();
         }
 
+        /// <summary>
+        /// Gets a value indicating whether <see cref="RunnerOptions.PreviewFromNothing"/> applies to this run.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// The option is combined with something that contradicts its assumption of an empty database.
+        /// </exception>
+        private bool IsPreviewFromNothing()
+        {
+            if (!_options.PreviewFromNothing)
+            {
+                return false;
+            }
+
+            // Same test as the one that selects the connectionless processor and version loader.
+            var isConnectionless = _options.NoConnection
+             || _serviceProvider?.GetService<IMigrationConnectionFactory>()?.HasConnection == false;
+
+            if (!isConnectionless)
+            {
+                throw new InvalidOperationException(
+                    $"{nameof(RunnerOptions.PreviewFromNothing)} previews the script for an empty database, so it requires connectionless mode. "
+                  + $"Set {nameof(RunnerOptions.NoConnection)} (--no-connection) or remove the connection string.");
+            }
+
+            if (_options.StartVersion > 0)
+            {
+                throw new InvalidOperationException(
+                    $"{nameof(RunnerOptions.PreviewFromNothing)} previews the script for an empty database, but "
+                  + $"{nameof(RunnerOptions.StartVersion)} {_options.StartVersion} treats the migrations before it as applied. Use one or the other.");
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Emits what <see cref="FluentMigrator.Runner.VersionLoader.LoadVersionInfo"/> would create in an empty database: the version
+        /// schema (only when the version table owns it), the table, its unique index and its extra columns.
+        /// </summary>
+        /// <remarks>
+        /// Goes through <see cref="Up(IMigration)"/>, so no version rows are recorded for these migrations.
+        /// </remarks>
+        private void ApplyVersionTableMigrationsFromNothing()
+        {
+            var metaData = VersionLoader.VersionTableMetaData;
+
+            if (metaData.OwnsSchema)
+            {
+                Up(new VersionSchemaMigration(metaData));
+            }
+
+            Up(new VersionMigration(metaData));
+            Up(new VersionUniqueMigration(metaData));
+            Up(new VersionDescriptionMigration(metaData));
+        }
+
         [Flags]
         private enum MigrationStatus
         {
@@ -1012,3 +1066,5 @@ namespace FluentMigrator.Runner
         }
     }
 }
+
+

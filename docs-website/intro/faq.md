@@ -560,11 +560,25 @@ dotnet fm migrate -p sqlserver -c "..." -a "MyApp.dll" --preview
 dotnet fm migrate -p sqlserver -c "..." -a "MyApp.dll" --output --outputFileName "migration.sql"
 ```
 
+### Why isn't the VersionInfo table in the script when I use `--no-connection`?
+
+Without a connection the runner can't see the database, so it assumes the version table already exists and scripts only your migrations and the rows they add to it. To script a brand-new database, add `--preview-from-nothing` (9.0+). The script then starts with the version table, its unique index and its columns, followed by every migration ([#2087](https://github.com/fluentmigrator/fluentmigrator/issues/2087)):
+
+```bash
+# dotnet-fm
+dotnet fm migrate -p SqlServer2016 -a "MyApp.dll" --no-connection --preview-from-nothing --output=create-database.sql
+
+# Console runner
+Migrate.exe --db SqlServer2016 --target "MyApp.dll" --task migrate:up --noConnection --previewFromNothing --output --outputFilename create-database.sql
+```
+
+In code, set `RunnerOptions.PreviewFromNothing`. It applies to any connectionless run, including one without a connection string. It throws when combined with a connection or with a start version, because both contradict an empty database. The version table's schema is created only when your `IVersionTableMetaData.OwnsSchema` is `true`.
+
 ### Validate Migrations
 
 ```bash
 # Validate without connecting to database
-dotnet fm validate -p sqlserver -c "..." -a "MyApp.dll" --noConnection
+dotnet fm validate -p sqlserver -c "..." -a "MyApp.dll" --no-connection
 ```
 
 ## Common Error Messages

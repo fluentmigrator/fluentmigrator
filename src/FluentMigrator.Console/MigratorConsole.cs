@@ -152,7 +152,7 @@ namespace FluentMigrator.Console
                     },
                     {
                         "previewFromNothing",
-                        "Include creation of the VersionInfo table when previewing migrations without a connection.",
+                        "Also emit the SQL that creates the version table, as if the database were empty. Requires connectionless mode (--noConnection, or no connection string). Default is false.",
                         v => { PreviewFromNothing = v != null; }
                     },
                     {

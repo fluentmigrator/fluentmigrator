@@ -93,8 +93,23 @@ namespace FluentMigrator.Runner.Initialization
         public bool NoConnection { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether a connectionless preview should include creation of the version table
+        /// Gets or sets a value indicating whether a connectionless run should also emit the SQL that creates the
+        /// version table, as if the target database were empty
         /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Without a connection the runner cannot see the database, so by default its script assumes the version
+        /// table already exists. Set this to get a complete script for a new database: the version table, its
+        /// unique index and columns, then every migration. The version table's schema is created only when
+        /// <see cref="VersionTableInfo.IVersionTableMetaData.OwnsSchema"/> is <c>true</c>.
+        /// </para>
+        /// <para>
+        /// It applies only in connectionless mode, that is with <see cref="NoConnection"/> or without a connection
+        /// string. <c>MigrateUp</c> throws <see cref="System.InvalidOperationException"/> when it is combined with a
+        /// connection, or with a <see cref="StartVersion"/> greater than zero, because both contradict an empty
+        /// database.
+        /// </para>
+        /// </remarks>
         public bool PreviewFromNothing { get; set; }
 
         /// <summary>

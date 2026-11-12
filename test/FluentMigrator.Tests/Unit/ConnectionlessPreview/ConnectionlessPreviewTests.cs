@@ -33,10 +33,10 @@ using NUnit.Framework;
 
 using VerifyNUnit;
 
-namespace FluentMigrator.Tests.Integration.Connectionless
+namespace FluentMigrator.Tests.Unit.ConnectionlessPreview
 {
     [TestFixture]
-    [Category("Integration")]
+    [Category("ConnectionlessPreview")]
     public class ConnectionlessPreviewTests
     {
         private static IEnumerable<TestCaseData> ProviderCases()
@@ -76,23 +76,52 @@ namespace FluentMigrator.Tests.Integration.Connectionless
         [TestCaseSource(nameof(ProviderCases))]
         public Task GeneratesCompleteScriptFromEmptyDatabase(ProviderCase provider)
         {
+            var script = GenerateScript(
+                provider.Configure,
+                options =>
+                {
+                    options.NoConnection = true;
+                    options.PreviewFromNothing = true;
+                },
+                previewOnly: true);
+
+            return Verifier.Verify(script, "sql").UseParameters(provider.Name);
+        }
+
+        /// <summary>
+        /// Without a connection string the runner is connectionless even when <see cref="RunnerOptions.NoConnection"/>
+        /// is not set (for example the MSBuild task or an in-process runner), and preview mode isn't needed either,
+        /// because the connectionless processor never executes anything.
+        /// </summary>
+        [Test]
+        public void EmitsTheVersionTableWithoutAConnectionStringOrPreviewMode()
+        {
+            var script = GenerateScript(
+                builder => builder.AddSqlServer2016(),
+                options => options.PreviewFromNothing = true,
+                previewOnly: false);
+
+            Assert.That(script, Does.Contain("CREATE TABLE [dbo].[VersionInfo]"));
+            Assert.That(script, Does.Contain("CREATE TABLE [dbo].[Users]"));
+        }
+
+        private static string GenerateScript(
+            Action<IMigrationRunnerBuilder> configureProvider,
+            Action<RunnerOptions> configureRunner,
+            bool previewOnly)
+        {
             var sql = new StringBuilder();
             var services = new ServiceCollection()
                 .AddFluentMigratorCore()
                 .AddSingleton<ILoggerProvider>(new SqlCaptureLoggerProvider(sql))
-                .Configure<RunnerOptions>(
-                    options =>
-                    {
-                        options.NoConnection = true;
-                        options.PreviewFromNothing = true;
-                    })
-                .Configure<ProcessorOptions>(options => options.PreviewOnly = true)
+                .Configure(configureRunner)
+                .Configure<ProcessorOptions>(options => options.PreviewOnly = previewOnly)
                 .Configure<TypeFilterOptions>(
                     options => options.Namespace = typeof(CreateTableMigration).Namespace)
                 .ConfigureRunner(
                     builder =>
                     {
-                        provider.Configure(builder);
+                        configureProvider(builder);
                         builder.WithMigrationsIn(typeof(CreateTableMigration).Assembly);
                     });
 
@@ -105,13 +134,12 @@ namespace FluentMigrator.Tests.Integration.Connectionless
 
             scope.ServiceProvider.GetRequiredService<IMigrationRunner>().MigrateUp();
 
-            var script = $"""
+            return $"""
                 -- Processor: {processor.DatabaseType}
                 -- Generator: {connectionlessProcessor.Generator.GetType().Name}
 
                 {sql}
                 """;
-            return Verifier.Verify(script, "sql").UseParameters(provider.Name);
         }
 
         private static TestCaseData Case(string name, Action<IMigrationRunnerBuilder> configure)
@@ -183,21 +211,23 @@ namespace FluentMigrator.Tests.Integration.Connectionless
                 }
             }
         }
-    }
 
-    [Migration(1)]
-    public class CreateTableMigration : Migration
-    {
-        public override void Up()
+        // Nested, so it doesn't add a top-level CreateTableMigration to the test assembly. The namespace filter
+        // in GenerateScript is what keeps other migrations out of these scripts.
+        [Migration(1)]
+        public class CreateTableMigration : Migration
         {
-            Create.Table("Users")
-                .WithColumn("Id").AsInt32().NotNullable().PrimaryKey()
-                .WithColumn("Name").AsString(100).NotNullable();
-        }
+            public override void Up()
+            {
+                Create.Table("Users")
+                    .WithColumn("Id").AsInt32().NotNullable().PrimaryKey()
+                    .WithColumn("Name").AsString(100).NotNullable();
+            }
 
-        public override void Down()
-        {
-            Delete.Table("Users");
+            public override void Down()
+            {
+                Delete.Table("Users");
+            }
         }
     }
 }

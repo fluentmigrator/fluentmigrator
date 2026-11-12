@@ -34,6 +34,7 @@ using FluentMigrator.Runner.Generators.Generic;
 using FluentMigrator.Runner.Infrastructure;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
+using FluentMigrator.Runner.VersionTableInfo;
 using FluentMigrator.Tests.Integration.Migrations;
 using FluentMigrator.Tests.Integration.Migrations.Constrained.Constraints;
 using FluentMigrator.Tests.Integration.Migrations.Constrained.ConstraintsMultiple;
@@ -308,6 +309,107 @@ namespace FluentMigrator.Tests.Unit
             _processorMock.Verify(
                 processor => processor.Process(It.IsAny<CreateTableExpression>()),
                 Times.Never);
+        }
+
+        [Test]
+        public void PreviewFromNothingDoesNotNeedPreviewOnlyBecauseConnectionlessRunsNeverExecute()
+        {
+            var runner = CreateRunner(
+                services => services.Configure<RunnerOptions>(
+                    options =>
+                    {
+                        options.NoConnection = true;
+                        options.PreviewFromNothing = true;
+                    }));
+
+            runner.MigrateUp();
+
+            _processorMock.Verify(
+                processor => processor.Process(
+                    It.Is<CreateTableExpression>(
+                        expression => expression.TableName == runner.VersionLoader.VersionTableMetaData.TableName)),
+                Times.Once);
+        }
+
+        [Test]
+        public void PreviewFromNothingWithAConnectionThrows()
+        {
+            var runner = CreateRunner(
+                services => services.Configure<RunnerOptions>(options => options.PreviewFromNothing = true));
+
+            // With a connection, creating the runner's version loader already processed its own expressions.
+            _processorMock.Invocations.Clear();
+
+            var ex = Should.Throw<InvalidOperationException>(() => runner.MigrateUp());
+
+            ex.Message.ShouldContain("connectionless");
+            _processorMock.Verify(processor => processor.Process(It.IsAny<CreateTableExpression>()), Times.Never);
+        }
+
+        [Test]
+        public void PreviewFromNothingWithAStartVersionThrows()
+        {
+            var runner = CreateRunner(
+                services => services.Configure<RunnerOptions>(
+                    options =>
+                    {
+                        options.NoConnection = true;
+                        options.PreviewFromNothing = true;
+                        options.StartVersion = 2;
+                    }));
+
+            var ex = Should.Throw<InvalidOperationException>(() => runner.MigrateUp());
+
+            ex.Message.ShouldContain(nameof(RunnerOptions.StartVersion));
+            _processorMock.Verify(processor => processor.Process(It.IsAny<CreateTableExpression>()), Times.Never);
+        }
+
+        [TestCase(true, 1)]
+        [TestCase(false, 0)]
+        public void PreviewFromNothingCreatesTheVersionSchemaOnlyWhenTheVersionTableOwnsIt(bool ownsSchema, int expectedSchemaCreations)
+        {
+            var metaData = new SchemaVersionTableMetaData(ownsSchema);
+            var runner = CreateRunner(
+                services => services
+                    .Configure<RunnerOptions>(
+                        options =>
+                        {
+                            options.NoConnection = true;
+                            options.PreviewFromNothing = true;
+                        })
+                    .ConfigureRunner(builder => builder.WithVersionTable(metaData)));
+
+            runner.MigrateUp();
+
+            _processorMock.Verify(
+                processor => processor.Process(It.Is<CreateSchemaExpression>(expression => expression.SchemaName == metaData.SchemaName)),
+                Times.Exactly(expectedSchemaCreations));
+            _processorMock.Verify(
+                processor => processor.Process(
+                    It.Is<CreateTableExpression>(
+                        expression => expression.SchemaName == metaData.SchemaName && expression.TableName == metaData.TableName)),
+                Times.Once);
+        }
+
+        private sealed class SchemaVersionTableMetaData : IVersionTableMetaData
+        {
+            public SchemaVersionTableMetaData(bool ownsSchema) => OwnsSchema = ownsSchema;
+
+            public bool OwnsSchema { get; }
+
+            public string SchemaName => "audit";
+
+            public string TableName => "VersionInfo";
+
+            public string ColumnName => "Version";
+
+            public string DescriptionColumnName => "Description";
+
+            public string UniqueIndexName => "UC_Version";
+
+            public string AppliedOnColumnName => "AppliedOn";
+
+            public bool CreateWithPrimaryKey => false;
         }
 
         [Test]

@@ -78,6 +78,8 @@ Migrate.exe -p sqlserver -c "Server=.;Database=MyDb;Integrated Security=true" -a
 | `--output`               | `-o`  | Output generated SQL to file          | None            |
 | `--outputFileName`       |       | Name of output file                   | `migration.sql` |
 | `--preview`              |       | Preview SQL without execution         | `false`         |
+| `--noConnection`         |       | Generate SQL without connecting       | `false`         |
+| `--previewFromNothing`   |       | With `--noConnection`, also emit the version table SQL, as for an empty database | `false` |
 | `--steps`                | `-s`  | Number of versions to migrate         | All             |
 | `--workingDirectory`     | `-w`  | Working directory                     | Current         |
 | `--timeout`              |       | Command timeout in seconds            | `60`            |
