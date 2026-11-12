@@ -103,9 +103,10 @@ namespace FluentMigrator.Tests.Integration.CreationScript.Example
             IfDatabase(Db.SqlServer, Db.Postgres, Db.Oracle, Db.Db2).Create.Column("Spec").OnTable("Product").AsXml().Nullable();
 
             // PostgreSQL's NewGuid needs the uuid-ossp extension. MySQL rejects ADD COLUMN with a UUID() default
-            // while binary logging is on (error 1674), so its NewGuid default is in a CREATE TABLE (M0023). MySQL has
-            // no CURRENT_USER default; Db2's UTC expression isn't allowed as a default.
-            IfDatabase(Db.SqlServer, Db.Oracle, Db.Firebird)
+            // while binary logging is on (error 1674), so its NewGuid default is in a CREATE TABLE (M0023). Firebird
+            // allows only literals and context variables as defaults, so its gen_uuid() is rejected. MySQL has no
+            // CURRENT_USER default; Db2's UTC expression isn't allowed as a default.
+            IfDatabase(Db.SqlServer, Db.Oracle)
                 .Create.Column("TraceId").OnTable("Product").AsGuid().NotNullable().WithDefault(SystemMethods.NewGuid);
             IfDatabase(Db.SqlServer, Db.Postgres, Db.Oracle)
                 .Create.Column("CheckedAt").OnTable("Product").AsDateTimeOffset().NotNullable().WithDefault(SystemMethods.CurrentDateTimeOffset);
