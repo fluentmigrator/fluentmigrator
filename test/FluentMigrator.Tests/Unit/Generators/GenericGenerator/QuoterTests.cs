@@ -241,6 +241,15 @@ namespace FluentMigrator.Tests.Unit.Generators.GenericGenerator
         }
 
         [Test]
+        public void ShouldUnQuoteSqlServerObjectNames()
+        {
+            // SQL Server has no escape for '[', which used to make UnQuote throw.
+            SqlServer2000Quoter quoter = new SqlServer2000Quoter();
+            quoter.UnQuote("[dbo]").ShouldBe("dbo");
+            quoter.UnQuote("[[Table]]Name]").ShouldBe("[Table]Name");
+        }
+
+        [Test]
         public void ShouldEscapeSqliteObjectNames()
         {
             SQLiteQuoter quoter = new SQLiteQuoter();
