@@ -557,7 +557,7 @@ dotnet fm migrate -p sqlserver -c "..." -a "MyApp.dll" --preview
 
 ```bash
 # Output SQL to file without executing
-dotnet fm migrate -p sqlserver -c "..." -a "MyApp.dll" --output --outputFileName "migration.sql"
+dotnet fm migrate -p sqlserver -c "..." -a "MyApp.dll" --output=migration.sql
 ```
 
 ### Why isn't the VersionInfo table in the script when I use `--no-connection`?
@@ -571,6 +571,14 @@ dotnet fm migrate -p SqlServer2016 -a "MyApp.dll" --no-connection --preview --pr
 # Console runner
 Migrate.exe --db SqlServer2016 --target "MyApp.dll" --task migrate:up --noConnection --preview --previewFromNothing --output --outputFilename create-database.sql
 ```
+
+```xml
+<!-- MSBuild task: Connection is required but never opened -->
+<Migrate Database="SqlServer2016" Connection="Server=.;Database=MyApp" Target="MyApp.dll" NoConnection="true"
+         PreviewOnly="true" PreviewFromNothing="true" Output="true" OutputFilename="create-database.sql" />
+```
+
+The [migration preview workflow](../runners/dotnet-fm.md#github-pull-request-schema-preview) has the same switch: `preview_from_nothing: true`.
 
 In code, set `RunnerOptions.PreviewFromNothing` together with `NoConnection` and `ProcessorOptions.PreviewOnly`. Leaving out the connection string also makes the run connectionless, and then preview mode is optional because nothing can be executed. It throws when the run could execute SQL against a database, or with a start version, because a start version contradicts an empty database. The version table's schema is created only when your `IVersionTableMetaData.OwnsSchema` is `true`.
 

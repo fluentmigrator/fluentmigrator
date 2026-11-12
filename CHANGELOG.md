@@ -20,7 +20,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - Synchronous and asynchronous acquisition with cancellation; `ApplicationLockerOptions.AcquireTimeout`; failures surface as `ApplicationLockException`
   - `Rollback`, `RollbackToVersion` and `MigrateDown` now reload the version info before choosing which migrations to revert, as `MigrateUp` already did, so they act on what the database holds once the lock is taken rather than on what an earlier load saw
 - Analyzer `FM0007` warns when a raw `$(name)` token in `Execute.Sql` receives a `DateTime` or `DateTimeOffset` value, which renders as `07/28/2026 13:45:06` and is read differently by different databases. Its code fix rewrites the token to `$[name]`, which formats the value through the provider's quoter (ISO 8601 on most providers, `to_date(...)` on Oracle; an Oracle `DateTimeOffset` still depends on `NLS_TIMESTAMP_TZ_FORMAT`). What `$(name)` emits is unchanged (Issue #2354 by @jzabroski; documented in PR #2401 by @RaphaelFakhri)
-- Connectionless scripts for a new database: `RunnerOptions.PreviewFromNothing` (`--preview-from-nothing` in dotnet-fm, `/previewFromNothing` in Migrate.exe) also emits the SQL that creates the version table, so a `--no-connection --preview` script can be run against an empty database. It creates the version schema only when `IVersionTableMetaData.OwnsSchema` is `true`, and throws when the run could execute SQL against a database or has a `StartVersion` (Issue #2087 by @stambunan; PR #2370 by @Copilot)
+- Connectionless scripts for a new database: `RunnerOptions.PreviewFromNothing` also emits the SQL that creates the version table, so a `--no-connection --preview` script can be run against an empty database. It creates the version schema only when `IVersionTableMetaData.OwnsSchema` is `true`, and throws when the run could execute SQL against a database or has a `StartVersion` (Issue #2087 by @stambunan; PR #2370 by @Copilot)
+  - dotnet-fm: `--preview-from-nothing`; Migrate.exe: `/previewFromNothing`
+  - MSBuild `Migrate` task: `PreviewFromNothing`, and the `NoConnection` property it needs, which the task did not expose before
+  - Reusable `migration-preview.yml` workflow: the `preview_from_nothing` input scripts each ref for an empty database, and makes the `connection_string` secret optional
 - New `IPrimaryKeyNameConvention` (implemented by `DefaultPrimaryKeyNameConvention`) applies the primary key naming convention to both column-level primary keys and standalone primary key constraints, and makes the convention easier to discover and replace (Issue #1800)
 - Custom connections: `IMigrationConnectionFactory` allows applications to supply fully configured `IDbConnection` instances to the migration runner (PR #2268 by @Sherif-Ahmed, building on PR #2002 by @Merlin-Taylor, Issue #1981)
   - Configure with `WithConnectionFactory(sp => ...)`, or with `WithDataSource(sp => ...)` when a `DbDataSource` is available (.NET 8+)
@@ -31,6 +34,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Documentation
 
 - New ADR: Connection Management (`adr/proposed/ConnectionManagement.md`)
+- ADRs AsyncAllTheWay (D4) and ParallelAsyncAllTheWay (§4.5) note where `PreviewFromNothing`'s version-table step must go in 10.0, so the async runner and the `VersionInfoStep` table keep the script complete (PR #2370)
 
 ### Changed
 
@@ -40,6 +44,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - `FluentMigrator.DotNet.Cli` no longer depends on AutoMapper. The single `MigratorOptions` copy it performed is now generated at compile time by [Mapperly](https://mapperly.riok.app/), which removes a runtime dependency from `dotnet-fm` along with AutoMapper 15's commercial licence requirement and [CVE-2026-32933](https://github.com/advisories/GHSA-rvv3-g6hj-g44x). `Setup.BuildServiceProvider` no longer registers `AutoMapper.IMapper` in the service collection.
 - The repository moved to NuGet Central Package Management. All package versions now live in `Directory.Packages.props` at the repository root; project files declare package references without a `Version` attribute. This is a build-infrastructure change only - the versions the shipped packages depend on are unchanged.
 - Processor constructors taking an `IConnectionStringAccessor` are obsolete; use the overloads taking an `IMigrationConnectionFactory` instead.
+- The reusable `migration-preview.yml` workflow passed `--outputFileName`, which dotnet-fm does not have, so every run failed with "Unrecognized option '--outputFileName'". It now passes `--output=<file>`. The dotnet-fm docs that showed the same option are corrected (PR #2370)
 
 ### Contributors
 
