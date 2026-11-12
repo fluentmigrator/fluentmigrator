@@ -311,8 +311,12 @@ namespace FluentMigrator.Tests.Unit
                 Times.Never);
         }
 
+        /// <summary>
+        /// <see cref="RunnerOptions.NoConnection"/> replaces only the version loader. With a connection string still
+        /// present the processor is a real one, so without preview mode the version table DDL would be executed.
+        /// </summary>
         [Test]
-        public void PreviewFromNothingDoesNotNeedPreviewOnlyBecauseConnectionlessRunsNeverExecute()
+        public void PreviewFromNothingWithARealProcessorAndNoPreviewThrows()
         {
             var runner = CreateRunner(
                 services => services.Configure<RunnerOptions>(
@@ -322,13 +326,10 @@ namespace FluentMigrator.Tests.Unit
                         options.PreviewFromNothing = true;
                     }));
 
-            runner.MigrateUp();
+            var ex = Should.Throw<InvalidOperationException>(() => runner.MigrateUp());
 
-            _processorMock.Verify(
-                processor => processor.Process(
-                    It.Is<CreateTableExpression>(
-                        expression => expression.TableName == runner.VersionLoader.VersionTableMetaData.TableName)),
-                Times.Once);
+            ex.Message.ShouldContain(nameof(ProcessorOptions.PreviewOnly));
+            _processorMock.Verify(processor => processor.Process(It.IsAny<CreateTableExpression>()), Times.Never);
         }
 
         [Test]
@@ -356,7 +357,8 @@ namespace FluentMigrator.Tests.Unit
                         options.NoConnection = true;
                         options.PreviewFromNothing = true;
                         options.StartVersion = 2;
-                    }));
+                    })
+                    .Configure<ProcessorOptions>(options => options.PreviewOnly = true));
 
             var ex = Should.Throw<InvalidOperationException>(() => runner.MigrateUp());
 
@@ -377,6 +379,7 @@ namespace FluentMigrator.Tests.Unit
                             options.NoConnection = true;
                             options.PreviewFromNothing = true;
                         })
+                    .Configure<ProcessorOptions>(options => options.PreviewOnly = true)
                     .ConfigureRunner(builder => builder.WithVersionTable(metaData)));
 
             runner.MigrateUp();

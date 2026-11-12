@@ -105,9 +105,13 @@ namespace FluentMigrator.Runner.Initialization
         /// </para>
         /// <para>
         /// It applies only in connectionless mode, that is with <see cref="NoConnection"/> or without a connection
-        /// string. <c>MigrateUp</c> throws <see cref="System.InvalidOperationException"/> when it is combined with a
-        /// connection, or with a <see cref="StartVersion"/> greater than zero, because both contradict an empty
-        /// database.
+        /// string, and only when nothing can be executed: in preview mode (<see cref="Processors.ProcessorOptions.PreviewOnly"/>),
+        /// or without a connection string, where the processor is connectionless. <see cref="NoConnection"/> on its own
+        /// is not enough, because with a connection string the processor is still a real one.
+        /// </para>
+        /// <para>
+        /// <c>MigrateUp</c> throws <see cref="System.InvalidOperationException"/> otherwise, and also with a
+        /// <see cref="StartVersion"/> greater than zero, which contradicts an empty database.
         /// </para>
         /// </remarks>
         public bool PreviewFromNothing { get; set; }

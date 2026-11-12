@@ -1013,7 +1013,8 @@ namespace FluentMigrator.Runner
                 return false;
             }
 
-            // Same test as the one that selects the connectionless processor and version loader.
+            // Same test as the one that selects the connectionless version loader. With a connection, the version
+            // table that the database actually has is used instead.
             var isConnectionless = _options.NoConnection
              || _serviceProvider?.GetService<IMigrationConnectionFactory>()?.HasConnection == false;
 
@@ -1022,6 +1023,16 @@ namespace FluentMigrator.Runner
                 throw new InvalidOperationException(
                     $"{nameof(RunnerOptions.PreviewFromNothing)} previews the script for an empty database, so it requires connectionless mode. "
                   + $"Set {nameof(RunnerOptions.NoConnection)} (--no-connection) or remove the connection string.");
+            }
+
+            // NoConnection only replaces the version loader. When a connection string is still present (the console
+            // runner falls back to one), the processor is a real one and would run the version table DDL against
+            // that database. Only the connectionless processor, or preview mode, guarantees nothing is executed.
+            if (!_processorOptions.PreviewOnly && !(Processor is ConnectionlessProcessor))
+            {
+                throw new InvalidOperationException(
+                    $"{nameof(RunnerOptions.PreviewFromNothing)} only previews SQL, but this run would execute it against a database. "
+                  + $"Set {nameof(ProcessorOptions.PreviewOnly)} (--preview).");
             }
 
             if (_options.StartVersion > 0)

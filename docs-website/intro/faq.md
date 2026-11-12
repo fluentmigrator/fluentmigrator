@@ -566,13 +566,13 @@ Without a connection the runner can't see the database, so it assumes the versio
 
 ```bash
 # dotnet-fm
-dotnet fm migrate -p SqlServer2016 -a "MyApp.dll" --no-connection --preview-from-nothing --output=create-database.sql
+dotnet fm migrate -p SqlServer2016 -a "MyApp.dll" --no-connection --preview --preview-from-nothing --output=create-database.sql
 
 # Console runner
-Migrate.exe --db SqlServer2016 --target "MyApp.dll" --task migrate:up --noConnection --previewFromNothing --output --outputFilename create-database.sql
+Migrate.exe --db SqlServer2016 --target "MyApp.dll" --task migrate:up --noConnection --preview --previewFromNothing --output --outputFilename create-database.sql
 ```
 
-In code, set `RunnerOptions.PreviewFromNothing`. It applies to any connectionless run, including one without a connection string. It throws when combined with a connection or with a start version, because both contradict an empty database. The version table's schema is created only when your `IVersionTableMetaData.OwnsSchema` is `true`.
+In code, set `RunnerOptions.PreviewFromNothing` together with `NoConnection` and `ProcessorOptions.PreviewOnly`. Leaving out the connection string also makes the run connectionless, and then preview mode is optional because nothing can be executed. It throws when the run could execute SQL against a database, or with a start version, because a start version contradicts an empty database. The version table's schema is created only when your `IVersionTableMetaData.OwnsSchema` is `true`.
 
 ### Validate Migrations
 

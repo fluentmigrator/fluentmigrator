@@ -461,6 +461,7 @@ namespace FluentMigrator.Tests.Unit.Runners
                 "/db", Database,
                 "/target", Target,
                 "/noConnection",
+                "/preview",
                 "/output",
                 "/outputFilename", outputFileName,
                 "/namespace", "FluentMigrator.Tests.Unit.ConnectionlessPreview",

@@ -152,7 +152,7 @@ namespace FluentMigrator.Console
                     },
                     {
                         "previewFromNothing",
-                        "Also emit the SQL that creates the version table, as if the database were empty. Requires connectionless mode (--noConnection, or no connection string). Default is false.",
+                        "Also emit the SQL that creates the version table, as if the database were empty. Use with --noConnection and --preview. Default is false.",
                         v => { PreviewFromNothing = v != null; }
                     },
                     {
