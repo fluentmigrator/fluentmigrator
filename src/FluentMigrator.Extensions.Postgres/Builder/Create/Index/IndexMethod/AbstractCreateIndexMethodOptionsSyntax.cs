@@ -15,6 +15,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 
 using FluentMigrator.Builders.Create.Index;
 using FluentMigrator.Infrastructure;
@@ -33,8 +34,17 @@ namespace FluentMigrator.Builder.Create.Index
     /// for various database systems. It encapsulates common functionality and delegates
     /// specific operations to the underlying <see cref="ICreateIndexOptionsSyntax"/> implementation.
     /// </remarks>
-    public abstract class AbstractCreateIndexMethodOptionsSyntax : ICreateIndexMethodOptionsSyntax
+    public abstract class AbstractCreateIndexMethodOptionsSyntax : ICreateIndexMethodOptionsSyntax, ISupportAdditionalFeatures
     {
+        /// <summary>
+        /// The additional features of the index being built, so that the other index extensions (for example
+        /// <c>AsConcurrently</c>, <c>Include</c> or <c>Filter</c>) can follow <c>UsingBrin()</c> and the like.
+        /// </summary>
+        IDictionary<string, object> ISupportAdditionalFeatures.AdditionalFeatures =>
+            (CreateIndexOptionsSyntax as ISupportAdditionalFeatures)?.AdditionalFeatures
+            ?? throw new InvalidOperationException(
+                $"The index options this builder wraps ({CreateIndexOptionsSyntax.GetType().Name}) don't implement {nameof(ISupportAdditionalFeatures)}.");
+
         /// <summary>
         /// Gets the underlying <see cref="ICreateIndexOptionsSyntax"/> implementation used to define index creation options.
         /// </summary>

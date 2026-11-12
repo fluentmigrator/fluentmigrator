@@ -54,7 +54,7 @@ namespace FluentMigrator.Postgres
         {
             if (additionalFeatures == null)
             {
-                throw new InvalidOperationException(UnsupportedMethodMessage(nameof(Include), nameof(ISupportAdditionalFeatures)));
+                throw new InvalidOperationException(UnsupportedMethodMessage(nameof(AsOnly), nameof(ISupportAdditionalFeatures)));
             }
 
             var asOnly = additionalFeatures.GetAdditionalFeature(Only, () => new PostgresIndexOnlyDefinition());

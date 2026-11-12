@@ -481,6 +481,26 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             Assert.That(additionalFeatures[PostgresExtensions.IndexPagesPerRange], Is.EqualTo(90));
         }
 
+        [Test]
+        public void CallingOtherPostgresExtensionsAfterAnIndexMethod()
+        {
+            var additionalFeatures = new Dictionary<string, object>();
+
+            var indexMock = new Mock<IndexDefinition>();
+            indexMock.Setup(x => x.AdditionalFeatures).Returns(additionalFeatures);
+
+            var expressionMock = new Mock<CreateIndexExpression>();
+            expressionMock.SetupGet(e => e.Index).Returns(indexMock.Object);
+
+            ICreateIndexOnColumnOrInSchemaSyntax builder = new CreateIndexExpressionBuilder(expressionMock.Object);
+
+            // UsingBrin() returns its own options builder, which used to throw for every other extension.
+            builder.WithOptions().UsingBrin().AsConcurrently();
+
+            Assert.That(additionalFeatures[PostgresExtensions.IndexAlgorithm], Is.InstanceOf<PostgresIndexAlgorithmDefinition>());
+            Assert.That(((PostgresIndexConcurrentlyDefinition)additionalFeatures[PostgresExtensions.Concurrently]).IsConcurrently, Is.True);
+        }
+
         [TestCase(true)]
         [TestCase(false)]
         public void CallingWithAutosummarizeInPostgres(bool autosummarize)

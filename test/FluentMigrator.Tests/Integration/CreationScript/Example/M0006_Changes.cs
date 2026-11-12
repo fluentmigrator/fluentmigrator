@@ -38,6 +38,8 @@ namespace FluentMigrator.Tests.Integration.CreationScript.Example
 
             Create.Column("Barcode").OnTable("Product").AsAnsiString(13).Nullable();
 
+            Alter.Table("Product").WithDescription("Things we sell");
+
             // Widening, with rows in the table. Nullability isn't restated: Oracle rejects MODIFY to the
             // nullability a column already has.
             IfDatabase(Db.Except(Db.Firebird, Db.Db2)).Alter.Column("Quantity").OnTable("OrderLine").AsInt64();

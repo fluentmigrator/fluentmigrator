@@ -134,7 +134,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
 
             var result = Generator.Generate(expression);
 
-            result.ShouldBe("COMMENT ON TABLE TestTable1 IS 'TestDescription'");
+            result.ShouldBe("COMMENT ON TABLE TestTable1 IS 'TestDescription';");
         }
 
         [Test]
