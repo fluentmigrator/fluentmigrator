@@ -438,6 +438,8 @@ namespace FluentMigrator.Runner
         /// <param name="useAutomaticTransactionManagement"><c>true</c> if automatic transaction management should be used</param>
         public void MigrateDown(long targetVersion, bool useAutomaticTransactionManagement)
         {
+            RejectPreviewFromNothing("migrate down");
+
             // Another process may have applied or reverted migrations since the version info was last loaded,
             // for example while this one waited for the application lock.
             VersionLoader.LoadVersionInfo();
@@ -669,6 +671,8 @@ namespace FluentMigrator.Runner
         /// <param name="useAutomaticTransactionManagement"><c>true</c> if automatic transaction management should be used</param>
         public void Rollback(int steps, bool useAutomaticTransactionManagement)
         {
+            RejectPreviewFromNothing("roll back");
+
             // Another process may have applied or reverted migrations since the version info was last loaded,
             // for example while this one waited for the application lock.
             VersionLoader.LoadVersionInfo();
@@ -727,6 +731,8 @@ namespace FluentMigrator.Runner
         /// <param name="useAutomaticTransactionManagement"><c>true</c> if automatic transaction management should be used</param>
         public void RollbackToVersion(long version, bool useAutomaticTransactionManagement)
         {
+            RejectPreviewFromNothing("roll back");
+
             // Another process may have applied or reverted migrations since the version info was last loaded,
             // for example while this one waited for the application lock.
             VersionLoader.LoadVersionInfo();
@@ -1048,6 +1054,27 @@ namespace FluentMigrator.Runner
         }
 
         /// <summary>
+        /// Rejects <see cref="RunnerOptions.PreviewFromNothing"/> for an operation that reverts migrations.
+        /// </summary>
+        /// <remarks>
+        /// An empty database has nothing to revert, and none of the checks in <see cref="IsPreviewFromNothing"/> run
+        /// here, so with a connection string and without preview mode the operation would otherwise run against the
+        /// database. Called before the version loader is first used, because a live version loader creates the version
+        /// table.
+        /// </remarks>
+        /// <param name="operation">What the caller does, for the message: "roll back", "migrate down".</param>
+        /// <exception cref="InvalidOperationException"><see cref="RunnerOptions.PreviewFromNothing"/> is set.</exception>
+        private void RejectPreviewFromNothing(string operation)
+        {
+            if (_options.PreviewFromNothing)
+            {
+                throw new InvalidOperationException(
+                    $"{nameof(RunnerOptions.PreviewFromNothing)} previews migrating an empty database up, so it can't be used to {operation}. "
+                  + $"Remove {nameof(RunnerOptions.PreviewFromNothing)} (--preview-from-nothing).");
+            }
+        }
+
+        /// <summary>
         /// Emits what <see cref="FluentMigrator.Runner.VersionLoader.LoadVersionInfo"/> would create in an empty database: the version
         /// schema (only when the version table owns it and the database doesn't already have it), the table, its unique
         /// index and its extra columns.
@@ -1075,8 +1102,16 @@ namespace FluentMigrator.Runner
         /// <c>PUBLIC</c> on Snowflake. A live run checks whether the schema exists; a run from nothing can't.
         /// </summary>
         /// <remarks>
+        /// <para>
         /// <see cref="VersionTableInfo.DefaultVersionTableMetaData"/> claims to own whatever schema the default schema
         /// convention gives it, so setting the default schema to <c>dbo</c> would otherwise emit <c>CREATE SCHEMA [dbo]</c>.
+        /// </para>
+        /// <para>
+        /// The name is compared as the database will read it. A quoted name is case-sensitive; an unquoted one is
+        /// folded, to lower case on PostgreSQL and Redshift and to upper case on Snowflake. So with quoting off,
+        /// <c>PUBLIC</c> on PostgreSQL and <c>public</c> on Snowflake are the built-in schema, and with quoting on they
+        /// are new schemas. SQL Server compares names by the database collation, which is usually case-insensitive.
+        /// </para>
         /// </remarks>
         private bool IsBuiltInSchema(string schemaName)
         {
@@ -1093,9 +1128,28 @@ namespace FluentMigrator.Runner
             bool Is(string prefix) => databaseTypes.Any(
                 t => t != null && t.StartsWith(prefix, StringComparison.OrdinalIgnoreCase));
 
-            return (Is("SqlServer") && string.Equals(schemaName, "dbo", StringComparison.OrdinalIgnoreCase))
-                || ((Is("Postgres") || Is("Redshift")) && schemaName == "public")
-                || (Is("Snowflake") && schemaName == "PUBLIC");
+            // Without a quoter (a mocked processor), take the name as written.
+            var quoter = Processor.Quoter;
+            var rendered = quoter?.QuoteSchemaName(schemaName);
+            var isQuoted = rendered == null || quoter.IsQuoted(rendered);
+            var name = rendered == null ? schemaName : quoter.UnQuote(rendered);
+
+            if (Is("SqlServer"))
+            {
+                return string.Equals(name, "dbo", StringComparison.OrdinalIgnoreCase);
+            }
+
+            if (Is("Postgres") || Is("Redshift"))
+            {
+                return (isQuoted ? name : name.ToLowerInvariant()) == "public";
+            }
+
+            if (Is("Snowflake"))
+            {
+                return (isQuoted ? name : name.ToUpperInvariant()) == "PUBLIC";
+            }
+
+            return false;
         }
 
         [Flags]

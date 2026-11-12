@@ -26,6 +26,7 @@ using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Logging;
 using FluentMigrator.Runner.Processors;
+using FluentMigrator.Runner.Processors.Snowflake;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -106,40 +107,162 @@ namespace FluentMigrator.Tests.Unit.ConnectionlessPreview
             Assert.That(script, Does.Contain("CREATE TABLE [dbo].[Users]"));
         }
 
+        private static IEnumerable<TestCaseData> BuiltInSchemaCases()
+        {
+            yield return SchemaCase("SqlServer2016 dbo", builder => builder.AddSqlServer2016(), null, "dbo", "CREATE TABLE [dbo].[VersionInfo]");
+            yield return SchemaCase("SqlServer2016 DBO", builder => builder.AddSqlServer2016(), null, "DBO", "CREATE TABLE [DBO].[VersionInfo]");
+            yield return SchemaCase("Postgres15_0 public", builder => builder.AddPostgres15_0(), null, "public", "CREATE TABLE \"public\".\"VersionInfo\"");
+            yield return SchemaCase("Postgres15_0 unquoted PUBLIC", builder => builder.AddPostgres15_0(), PostgresQuotingOff, "PUBLIC", "CREATE TABLE PUBLIC.VersionInfo");
+            yield return SchemaCase("Snowflake unquoted public", builder => builder.AddSnowflake(), null, "public", "CREATE TABLE public.VersionInfo");
+        }
+
+        private static IEnumerable<TestCaseData> NewSchemaCases()
+        {
+            yield return SchemaCase("SqlServer2016 app", builder => builder.AddSqlServer2016(), null, "app", "CREATE TABLE [app].[VersionInfo]", "CREATE SCHEMA [app]");
+            yield return SchemaCase("Postgres15_0 quoted PUBLIC", builder => builder.AddPostgres15_0(), null, "PUBLIC", "CREATE TABLE \"PUBLIC\".\"VersionInfo\"", "CREATE SCHEMA \"PUBLIC\"");
+            yield return SchemaCase("Snowflake quoted public", builder => builder.AddSnowflake(), SnowflakeQuotingOn, "public", "CREATE TABLE \"public\".\"VersionInfo\"", "CREATE SCHEMA \"public\"");
+        }
+
         /// <summary>
         /// A new database already has its built-in default schema, so <c>CREATE SCHEMA</c> for it would fail. The
-        /// default version table metadata claims to own whatever the default schema convention gives it.
+        /// default version table metadata claims to own whatever the default schema convention gives it. An unquoted
+        /// name is folded the way the database folds it.
         /// </summary>
-        [TestCase("SqlServer2016", "dbo", "CREATE TABLE [dbo].[VersionInfo]")]
-        [TestCase("Postgres15_0", "public", "CREATE TABLE \"public\".\"VersionInfo\"")]
-        public void DoesNotCreateTheBuiltInDefaultSchema(string provider, string schema, string createVersionTable)
+        [TestCaseSource(nameof(BuiltInSchemaCases))]
+        public void DoesNotCreateTheBuiltInDefaultSchema(
+            Action<IMigrationRunnerBuilder> configureProvider,
+            Action<IServiceCollection> configureServices,
+            string schema,
+            string createVersionTable,
+            string createSchema)
         {
-            Action<IMigrationRunnerBuilder> configureProvider = provider == "SqlServer2016"
-                ? builder => builder.AddSqlServer2016()
-                : builder => builder.AddPostgres15_0();
-
             var script = GenerateScript(
                 configureProvider,
                 PreviewFromNothingWithoutConnection,
                 previewOnly: true,
-                configureServices: services => services.AddSingleton<IConventionSet>(new DefaultConventionSet(schema, null)));
+                configureServices: services =>
+                {
+                    services.AddSingleton<IConventionSet>(new DefaultConventionSet(schema, null));
+                    configureServices?.Invoke(services);
+                });
 
             Assert.That(script, Does.Not.Contain("CREATE SCHEMA"));
             Assert.That(script, Does.Contain(createVersionTable));
         }
 
-        [Test]
-        public void CreatesAnOwnedDefaultSchemaThatIsNotBuiltIn()
+        /// <summary>
+        /// Any other owned schema is created before the version table, including a quoted name that differs from
+        /// the built-in one only in case.
+        /// </summary>
+        [TestCaseSource(nameof(NewSchemaCases))]
+        public void CreatesAnOwnedDefaultSchemaThatIsNotBuiltIn(
+            Action<IMigrationRunnerBuilder> configureProvider,
+            Action<IServiceCollection> configureServices,
+            string schema,
+            string createVersionTable,
+            string createSchema)
         {
             var script = GenerateScript(
-                builder => builder.AddSqlServer2016(),
+                configureProvider,
                 PreviewFromNothingWithoutConnection,
                 previewOnly: true,
-                configureServices: services => services.AddSingleton<IConventionSet>(new DefaultConventionSet("app", null)));
+                configureServices: services =>
+                {
+                    services.AddSingleton<IConventionSet>(new DefaultConventionSet(schema, null));
+                    configureServices?.Invoke(services);
+                });
 
-            var createSchema = script.IndexOf("CREATE SCHEMA [app]", StringComparison.Ordinal);
-            Assert.That(createSchema, Is.GreaterThanOrEqualTo(0), script);
-            Assert.That(script.IndexOf("CREATE TABLE [app].[VersionInfo]", StringComparison.Ordinal), Is.GreaterThan(createSchema), script);
+            var createSchemaIndex = script.IndexOf(createSchema, StringComparison.Ordinal);
+            Assert.That(createSchemaIndex, Is.GreaterThanOrEqualTo(0), script);
+            Assert.That(script.IndexOf(createVersionTable, StringComparison.Ordinal), Is.GreaterThan(createSchemaIndex), script);
+        }
+
+        /// <summary>
+        /// The primary key carries <c>UniqueIndexName</c>, so a unique index with the same name would fail on SQL
+        /// Server and PostgreSQL (#2051).
+        /// </summary>
+        [TestCase("SqlServer2016")]
+        [TestCase("Postgres15_0")]
+        public void DoesNotAddAUniqueIndexToAPrimaryKeyVersionTable(string provider)
+        {
+            var script = GenerateScript(
+                builder =>
+                {
+                    if (provider == "SqlServer2016")
+                    {
+                        builder.AddSqlServer2016();
+                    }
+                    else
+                    {
+                        builder.AddPostgres15_0();
+                    }
+
+                    builder.WithVersionTable(new PrimaryKeyVersionTableMetaData());
+                },
+                PreviewFromNothingWithoutConnection,
+                previewOnly: true);
+
+            // Only the version table's primary key has this name.
+            Assert.That(script, Does.Contain("UC_Version\" PRIMARY KEY").Or.Contain("UC_Version] PRIMARY KEY"), script);
+            Assert.That(script, Does.Not.Contain("INDEX"), script);
+            Assert.That(script, Does.Contain("AppliedOn"), script);
+        }
+
+        /// <summary>
+        /// An empty database has nothing to revert. With a connection string and without preview mode, the revert
+        /// would otherwise run against the database.
+        /// </summary>
+        [TestCase("rollback")]
+        [TestCase("rollback:toversion")]
+        [TestCase("migrate:down")]
+        public void RejectsRevertingMigrationsWithAConnection(string task)
+        {
+            Action<IMigrationRunner> run = task switch
+            {
+                "rollback" => runner => runner.Rollback(1),
+                "rollback:toversion" => runner => runner.RollbackToVersion(0),
+                _ => runner => runner.MigrateDown(0),
+            };
+
+            using var serviceProvider = new ServiceCollection()
+                .AddFluentMigratorCore()
+                .Configure<RunnerOptions>(options => options.PreviewFromNothing = true)
+                .Configure<TypeFilterOptions>(options => options.Namespace = typeof(CreateTableMigration).Namespace)
+                .ConfigureRunner(
+                    builder => builder
+                        .AddSQLite()
+                        .WithGlobalConnectionString("Data Source=:memory:")
+                        .WithMigrationsIn(typeof(CreateTableMigration).Assembly))
+                .BuildServiceProvider();
+            using var scope = serviceProvider.CreateScope();
+            var runner = scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
+
+            var exception = Assert.Throws<InvalidOperationException>(() => run(runner));
+
+            Assert.That(exception.Message, Does.Contain(nameof(RunnerOptions.PreviewFromNothing)));
+        }
+
+        private static void PostgresQuotingOff(IServiceCollection services)
+        {
+            services.Configure<ProcessorOptions>(options => options.ProviderSwitches = "Force Quote=false");
+        }
+
+        private static void SnowflakeQuotingOn(IServiceCollection services)
+        {
+            // Registered after AddSnowflake, so it replaces the options that method registers.
+            services.AddScoped(_ => SnowflakeOptions.QuotingEnabled());
+        }
+
+        private static TestCaseData SchemaCase(
+            string name,
+            Action<IMigrationRunnerBuilder> configureProvider,
+            Action<IServiceCollection> configureServices,
+            string schema,
+            string createVersionTable,
+            string createSchema = null)
+        {
+            return new TestCaseData(configureProvider, configureServices, schema, createVersionTable, createSchema)
+                .SetArgDisplayNames(name);
         }
 
         /// <summary>
@@ -350,5 +473,27 @@ namespace FluentMigrator.Tests.Unit.ConnectionlessPreview.WithBeforeAllMaintenan
         public string AppliedOnColumnName => "AppliedOn";
 
         public bool CreateWithPrimaryKey => false;
+    }
+}
+
+namespace FluentMigrator.Tests.Unit.ConnectionlessPreview
+{
+    public sealed class PrimaryKeyVersionTableMetaData : FluentMigrator.Runner.VersionTableInfo.IVersionTableMetaData
+    {
+        public bool OwnsSchema => false;
+
+        public string SchemaName => null;
+
+        public string TableName => "VersionInfo";
+
+        public string ColumnName => "Version";
+
+        public string DescriptionColumnName => "Description";
+
+        public string UniqueIndexName => "UC_Version";
+
+        public string AppliedOnColumnName => "AppliedOn";
+
+        public bool CreateWithPrimaryKey => true;
     }
 }
