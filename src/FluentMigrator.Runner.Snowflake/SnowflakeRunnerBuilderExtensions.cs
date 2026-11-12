@@ -53,7 +53,7 @@ namespace FluentMigrator.Runner
         public static IMigrationRunnerBuilder AddSnowflake(this IMigrationRunnerBuilder builder, SnowflakeOptions sfOptions)
         {
             builder.Services
-                .AddScoped<SnowflakeOptions>()
+                .AddScoped(_ => (SnowflakeOptions)sfOptions.Clone())
                 .AddTransient<SnowflakeBatchParser>()
                 .AddScoped<SnowflakeDbFactory>()
                 .AddScoped<SnowflakeProcessor>(sp =>
