@@ -131,6 +131,8 @@ jobs:
       run: dotnet test --framework ${{ matrix.dotnet-tfm }} --configuration ${{ env.buildConfiguration }} --verbosity quiet --logger trx --collect:"XPlat Code Coverage" --results-directory "TestResults-${{ matrix.dotnet-tfm }}" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura
       env:
         # Enable containers for integration tests only on Linux
+        FM_TestConnectionStrings__Firebird__ContainerEnabled: ${{ matrix.os == 'ubuntu-latest' }}
+        FM_TestConnectionStrings__Firebird__IsEnabled: ${{ matrix.os == 'ubuntu-latest' }}
         FM_TestConnectionStrings__MySql__ContainerEnabled: ${{ matrix.os == 'ubuntu-latest' }}
         FM_TestConnectionStrings__MySql__IsEnabled: ${{ matrix.os == 'ubuntu-latest' }}
         FM_TestConnectionStrings__Oracle__ContainerEnabled: ${{ matrix.os == 'ubuntu-latest' }}
