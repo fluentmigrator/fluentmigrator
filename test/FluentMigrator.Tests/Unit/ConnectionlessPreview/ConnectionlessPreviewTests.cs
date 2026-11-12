@@ -150,7 +150,10 @@ namespace FluentMigrator.Tests.Unit.ConnectionlessPreview
         public void EmitsTheVersionTableAfterBeforeAllMaintenance()
         {
             var script = GenerateScript(
-                builder => builder.AddSqlServer2016().WithVersionTable(new WithBeforeAllMaintenance.AuditVersionTableMetaData()),
+                // WithMigrationsIn only feeds versioned migrations; maintenance comes from the type source.
+                builder => builder.AddSqlServer2016()
+                    .WithVersionTable(new WithBeforeAllMaintenance.AuditVersionTableMetaData())
+                    .WithTypes(typeof(WithBeforeAllMaintenance.CreateAuditSchema)),
                 PreviewFromNothingWithoutConnection,
                 previewOnly: true,
                 typeFilterNamespace: typeof(WithBeforeAllMaintenance.CreateAuditSchema).Namespace);
