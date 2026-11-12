@@ -92,7 +92,7 @@ See `TokenSubstitutionMatrix.md` for what each column means.
 | byte(uncased) | `7` | `7` | `7` |
 | SystemMethods | `CurrentDateTime` | `LOCALTIMESTAMP` | `LOCALTIMESTAMP` |
 | Enum | `Tuesday` | `'Tuesday'` | `'Tuesday'` |
-| byte[] | `System.Byte[]` | `0xdead` | `0xdead` |
+| byte[] | `System.Byte[]` | `X'DEAD'` | `X'DEAD'` |
 | TimeSpan | `01:02:03` | `'01:02:03'` | `'01:02:03'` |
 | RawSql | `CURRENT_TIMESTAMP` | `CURRENT_TIMESTAMP` | `CURRENT_TIMESTAMP` |
 | RawSql+backslash | `c REGEXP '\d+'` | `c REGEXP '\d+'` | `c REGEXP '\d+'` |

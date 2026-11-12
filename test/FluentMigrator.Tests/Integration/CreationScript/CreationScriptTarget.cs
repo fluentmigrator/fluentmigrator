@@ -373,7 +373,6 @@ namespace FluentMigrator.Tests.Integration.CreationScript
                 {
                     if (IsOnlyComments(e.Statement.Text))
                     {
-                        e.Handled = true;
                         e.Ignore = true;
                     }
                 };
