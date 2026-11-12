@@ -18,6 +18,7 @@ using System.Collections.Generic;
 
 using FluentMigrator.Exceptions;
 using FluentMigrator.Infrastructure.Extensions;
+using FluentMigrator.Generation;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Base;
 using FluentMigrator.Runner.Processors.Snowflake;
@@ -29,9 +30,9 @@ namespace FluentMigrator.Runner.Generators.Snowflake
 {
     internal class SnowflakeColumn : ColumnBase<ISnowflakeTypeMap>
     {
-        public SnowflakeColumn([NotNull] SnowflakeOptions sfOptions) : base(
+        public SnowflakeColumn([NotNull] IQuoter quoter) : base(
             new SnowflakeTypeMap(),
-            new SnowflakeQuoter(sfOptions.QuoteIdentifiers))
+            quoter)
         {
         }
 

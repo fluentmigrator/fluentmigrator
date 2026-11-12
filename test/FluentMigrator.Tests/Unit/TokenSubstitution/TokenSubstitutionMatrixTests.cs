@@ -170,14 +170,14 @@ namespace FluentMigrator.Tests.Unit.TokenSubstitution
                 }
             }
 
-            // --- Snowflake: QuoteIdentifiers is an IQuoter switch.
-            foreach (var quoteIdentifiers in new[] { true, false })
+            // --- Snowflake: ForceQuote is an IQuoter switch.
+            foreach (var forceQuote in new[] { true, false })
             {
-                var qi = quoteIdentifiers;
+                var fq = forceQuote;
                 yield return new DialectCase(
-                    $"Snowflake(QuoteIdentifiers={qi})",
+                    $"Snowflake(ForceQuote={fq})",
                     "Snowflake",
-                    b => b.AddSnowflake(new SnowflakeOptions { QuoteIdentifiers = qi }));
+                    b => b.AddSnowflake(new SnowflakeOptions { ForceQuote = fq }));
             }
 
             // --- Oracle: OracleQuoter vs OracleQuoterQuotedIdentifier are distinct registrations.

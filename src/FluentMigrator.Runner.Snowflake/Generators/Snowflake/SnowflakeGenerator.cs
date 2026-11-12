@@ -44,14 +44,14 @@ namespace FluentMigrator.Runner.Generators.Snowflake
         public SnowflakeGenerator(
             [NotNull] SnowflakeOptions sfOptions,
             [NotNull] IOptions<GeneratorOptions> generatorOptions)
-            : this(new SnowflakeQuoter(sfOptions.QuoteIdentifiers), sfOptions, generatorOptions) { }
+            : this(new SnowflakeQuoter(sfOptions.ForceQuote), sfOptions, generatorOptions) { }
 
         /// <inheritdoc />
         public SnowflakeGenerator(
             [NotNull] SnowflakeQuoter quoter,
             [NotNull] SnowflakeOptions sfOptions,
             [NotNull] IOptions<GeneratorOptions> generatorOptions)
-            : base(new SnowflakeColumn(sfOptions), quoter, new SnowflakeDescriptionGenerator(quoter), generatorOptions)
+            : base(new SnowflakeColumn(quoter), quoter, new SnowflakeDescriptionGenerator(quoter), generatorOptions)
         {
         }
 
