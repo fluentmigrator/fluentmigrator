@@ -314,6 +314,22 @@ namespace FluentMigrator.Tests.Unit.ConnectionlessPreview.WithBeforeAllMaintenan
         }
     }
 
+    // The connectionless version loader requires at least one versioned migration.
+    [Migration(1)]
+    public class CreateOrdersTable : Migration
+    {
+        public override void Up()
+        {
+            Create.Table("Orders")
+                .WithColumn("Id").AsInt32().NotNullable().PrimaryKey();
+        }
+
+        public override void Down()
+        {
+            Delete.Table("Orders");
+        }
+    }
+
     public sealed class AuditVersionTableMetaData : FluentMigrator.Runner.VersionTableInfo.IVersionTableMetaData
     {
         public bool OwnsSchema => false;
