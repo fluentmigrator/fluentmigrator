@@ -22,6 +22,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using FluentMigrator.Runner;
+using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Logging;
 using FluentMigrator.Runner.Processors;
@@ -105,10 +106,73 @@ namespace FluentMigrator.Tests.Unit.ConnectionlessPreview
             Assert.That(script, Does.Contain("CREATE TABLE [dbo].[Users]"));
         }
 
+        /// <summary>
+        /// A new database already has its built-in default schema, so <c>CREATE SCHEMA</c> for it would fail. The
+        /// default version table metadata claims to own whatever the default schema convention gives it.
+        /// </summary>
+        [TestCase("SqlServer2016", "dbo", "CREATE TABLE [dbo].[VersionInfo]")]
+        [TestCase("Postgres15_0", "public", "CREATE TABLE \"public\".\"VersionInfo\"")]
+        public void DoesNotCreateTheBuiltInDefaultSchema(string provider, string schema, string createVersionTable)
+        {
+            Action<IMigrationRunnerBuilder> configureProvider = provider == "SqlServer2016"
+                ? builder => builder.AddSqlServer2016()
+                : builder => builder.AddPostgres15_0();
+
+            var script = GenerateScript(
+                configureProvider,
+                PreviewFromNothingWithoutConnection,
+                previewOnly: true,
+                configureServices: services => services.AddSingleton<IConventionSet>(new DefaultConventionSet(schema, null)));
+
+            Assert.That(script, Does.Not.Contain("CREATE SCHEMA"));
+            Assert.That(script, Does.Contain(createVersionTable));
+        }
+
+        [Test]
+        public void CreatesAnOwnedDefaultSchemaThatIsNotBuiltIn()
+        {
+            var script = GenerateScript(
+                builder => builder.AddSqlServer2016(),
+                PreviewFromNothingWithoutConnection,
+                previewOnly: true,
+                configureServices: services => services.AddSingleton<IConventionSet>(new DefaultConventionSet("app", null)));
+
+            var createSchema = script.IndexOf("CREATE SCHEMA [app]", StringComparison.Ordinal);
+            Assert.That(createSchema, Is.GreaterThanOrEqualTo(0), script);
+            Assert.That(script.IndexOf("CREATE TABLE [app].[VersionInfo]", StringComparison.Ordinal), Is.GreaterThan(createSchema), script);
+        }
+
+        /// <summary>
+        /// A live run creates the version table when the version loader is first used, after <c>BeforeAll</c>
+        /// maintenance, which may create the schema the table lives in. The script keeps that order.
+        /// </summary>
+        [Test]
+        public void EmitsTheVersionTableAfterBeforeAllMaintenance()
+        {
+            var script = GenerateScript(
+                builder => builder.AddSqlServer2016().WithVersionTable(new WithBeforeAllMaintenance.AuditVersionTableMetaData()),
+                PreviewFromNothingWithoutConnection,
+                previewOnly: true,
+                typeFilterNamespace: typeof(WithBeforeAllMaintenance.CreateAuditSchema).Namespace);
+
+            var createSchema = script.IndexOf("CREATE SCHEMA [audit]", StringComparison.Ordinal);
+            Assert.That(createSchema, Is.GreaterThanOrEqualTo(0), script);
+            Assert.That(script.IndexOf("CREATE TABLE [audit].[VersionInfo]", StringComparison.Ordinal), Is.GreaterThan(createSchema), script);
+            Assert.That(script.IndexOf("CREATE SCHEMA [audit]", createSchema + 1, StringComparison.Ordinal), Is.EqualTo(-1), script);
+        }
+
+        private static void PreviewFromNothingWithoutConnection(RunnerOptions options)
+        {
+            options.NoConnection = true;
+            options.PreviewFromNothing = true;
+        }
+
         private static string GenerateScript(
             Action<IMigrationRunnerBuilder> configureProvider,
             Action<RunnerOptions> configureRunner,
-            bool previewOnly)
+            bool previewOnly,
+            Action<IServiceCollection> configureServices = null,
+            string typeFilterNamespace = null)
         {
             var sql = new StringBuilder();
             var services = new ServiceCollection()
@@ -117,13 +181,14 @@ namespace FluentMigrator.Tests.Unit.ConnectionlessPreview
                 .Configure(configureRunner)
                 .Configure<ProcessorOptions>(options => options.PreviewOnly = previewOnly)
                 .Configure<TypeFilterOptions>(
-                    options => options.Namespace = typeof(CreateTableMigration).Namespace)
+                    options => options.Namespace = typeFilterNamespace ?? typeof(CreateTableMigration).Namespace)
                 .ConfigureRunner(
                     builder =>
                     {
                         configureProvider(builder);
                         builder.WithMigrationsIn(typeof(CreateTableMigration).Assembly);
                     });
+            configureServices?.Invoke(services);
 
             using var serviceProvider = services.BuildServiceProvider();
             using var scope = serviceProvider.CreateScope();
@@ -229,5 +294,42 @@ namespace FluentMigrator.Tests.Unit.ConnectionlessPreview
                 Delete.Table("Users");
             }
         }
+    }
+}
+
+namespace FluentMigrator.Tests.Unit.ConnectionlessPreview.WithBeforeAllMaintenance
+{
+    // A separate namespace, so the provider snapshots above don't pick these up.
+
+    [Maintenance(MigrationStage.BeforeAll)]
+    public class CreateAuditSchema : Migration
+    {
+        public override void Up()
+        {
+            Create.Schema("audit");
+        }
+
+        public override void Down()
+        {
+        }
+    }
+
+    public sealed class AuditVersionTableMetaData : FluentMigrator.Runner.VersionTableInfo.IVersionTableMetaData
+    {
+        public bool OwnsSchema => false;
+
+        public string SchemaName => "audit";
+
+        public string TableName => "VersionInfo";
+
+        public string ColumnName => "Version";
+
+        public string DescriptionColumnName => "Description";
+
+        public string UniqueIndexName => "UC_Version";
+
+        public string AppliedOnColumnName => "AppliedOn";
+
+        public bool CreateWithPrimaryKey => false;
     }
 }

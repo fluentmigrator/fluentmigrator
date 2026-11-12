@@ -557,12 +557,12 @@ dotnet fm migrate -p sqlserver -c "..." -a "MyApp.dll" --preview
 
 ```bash
 # Output SQL to file without executing
-dotnet fm migrate -p sqlserver -c "..." -a "MyApp.dll" --output=migration.sql
+dotnet fm migrate -p sqlserver -c "..." -a "MyApp.dll" --preview --output=migration.sql
 ```
 
 ### Why isn't the VersionInfo table in the script when I use `--no-connection`?
 
-Without a connection the runner can't see the database, so it assumes the version table already exists and scripts only your migrations and the rows they add to it. To script a brand-new database, add `--preview-from-nothing` (9.0+). The script then starts with the version table, its unique index and its columns, followed by every migration ([#2087](https://github.com/fluentmigrator/fluentmigrator/issues/2087)):
+Without a connection the runner can't see the database, so it assumes the version table already exists and scripts only your migrations and the rows they add to it. To script a brand-new database, add `--preview-from-nothing` (9.0+). The script then runs your `BeforeAll` maintenance migrations, creates the version table, its unique index and its columns, and then runs every migration ([#2087](https://github.com/fluentmigrator/fluentmigrator/issues/2087)):
 
 ```bash
 # dotnet-fm
@@ -580,7 +580,7 @@ Migrate.exe --db SqlServer2016 --target "MyApp.dll" --task migrate:up --noConnec
 
 The [migration preview workflow](../runners/dotnet-fm.md#github-pull-request-schema-preview) has the same switch: `preview_from_nothing: true`.
 
-In code, set `RunnerOptions.PreviewFromNothing` together with `NoConnection` and `ProcessorOptions.PreviewOnly`. Leaving out the connection string also makes the run connectionless, and then preview mode is optional because nothing can be executed. It throws when the run could execute SQL against a database, or with a start version, because a start version contradicts an empty database. The version table's schema is created only when your `IVersionTableMetaData.OwnsSchema` is `true`.
+In code, set `RunnerOptions.PreviewFromNothing` together with `NoConnection` and `ProcessorOptions.PreviewOnly`. Leaving out the connection string also makes the run connectionless, and then preview mode is optional because nothing can be executed. It throws when the run could execute SQL against a database, or with a start version, because a start version contradicts an empty database. The version table's schema is created only when your `IVersionTableMetaData.OwnsSchema` is `true`, and never when it is one every new database already has (`dbo` on SQL Server, `public` on PostgreSQL and Redshift, `PUBLIC` on Snowflake). To put the version table in a schema something else owns, create that schema in a `BeforeAll` maintenance migration.
 
 ### Validate Migrations
 

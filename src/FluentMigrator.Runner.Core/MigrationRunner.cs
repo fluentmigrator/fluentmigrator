@@ -349,12 +349,14 @@ namespace FluentMigrator.Runner
             {
                 try
                 {
+                    ApplyMaintenance(MigrationStage.BeforeAll, useAutomaticTransactionManagement);
+
+                    // After BeforeAll, as in a live run, where the version table is created when the version
+                    // loader is first used below. A BeforeAll migration may create the schema the table lives in.
                     if (previewFromNothing)
                     {
                         ApplyVersionTableMigrationsFromNothing();
                     }
-
-                    ApplyMaintenance(MigrationStage.BeforeAll, useAutomaticTransactionManagement);
 
                     // The list of migrations to apply must be computed after the BeforeAll maintenance
                     // migrations have run (e.g. after acquiring a lock), so that any migrations already
@@ -1047,7 +1049,8 @@ namespace FluentMigrator.Runner
 
         /// <summary>
         /// Emits what <see cref="FluentMigrator.Runner.VersionLoader.LoadVersionInfo"/> would create in an empty database: the version
-        /// schema (only when the version table owns it), the table, its unique index and its extra columns.
+        /// schema (only when the version table owns it and the database doesn't already have it), the table, its unique
+        /// index and its extra columns.
         /// </summary>
         /// <remarks>
         /// Goes through <see cref="Up(IMigration)"/>, so no version rows are recorded for these migrations.
@@ -1056,7 +1059,7 @@ namespace FluentMigrator.Runner
         {
             var metaData = VersionLoader.VersionTableMetaData;
 
-            if (metaData.OwnsSchema)
+            if (metaData.OwnsSchema && !IsBuiltInSchema(metaData.SchemaName))
             {
                 Up(new VersionSchemaMigration(metaData));
             }
@@ -1064,6 +1067,35 @@ namespace FluentMigrator.Runner
             Up(new VersionMigration(metaData));
             Up(new VersionUniqueMigration(metaData));
             Up(new VersionDescriptionMigration(metaData));
+        }
+
+        /// <summary>
+        /// Whether <paramref name="schemaName"/> is a schema that every new database of this type already has, so
+        /// <c>CREATE SCHEMA</c> would fail: <c>dbo</c> on SQL Server, <c>public</c> on PostgreSQL and Redshift, and
+        /// <c>PUBLIC</c> on Snowflake. A live run checks whether the schema exists; a run from nothing can't.
+        /// </summary>
+        /// <remarks>
+        /// <see cref="VersionTableInfo.DefaultVersionTableMetaData"/> claims to own whatever schema the default schema
+        /// convention gives it, so setting the default schema to <c>dbo</c> would otherwise emit <c>CREATE SCHEMA [dbo]</c>.
+        /// </remarks>
+        private bool IsBuiltInSchema(string schemaName)
+        {
+            if (string.IsNullOrEmpty(schemaName))
+            {
+                return false;
+            }
+
+            // The connectionless processor reports the generator's id (SqlServer2016, PostgreSQL15_0, ...) or the
+            // selected processor id; live processors report their own (Postgres, Redshift, Snowflake, ...).
+            var databaseTypes = new List<string> { Processor.DatabaseType };
+            databaseTypes.AddRange(Processor.DatabaseTypeAliases ?? Enumerable.Empty<string>());
+
+            bool Is(string prefix) => databaseTypes.Any(
+                t => t != null && t.StartsWith(prefix, StringComparison.OrdinalIgnoreCase));
+
+            return (Is("SqlServer") && string.Equals(schemaName, "dbo", StringComparison.OrdinalIgnoreCase))
+                || ((Is("Postgres") || Is("Redshift")) && schemaName == "public")
+                || (Is("Snowflake") && schemaName == "PUBLIC");
         }
 
         [Flags]

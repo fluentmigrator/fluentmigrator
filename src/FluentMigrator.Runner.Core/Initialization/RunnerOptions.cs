@@ -99,9 +99,11 @@ namespace FluentMigrator.Runner.Initialization
         /// <remarks>
         /// <para>
         /// Without a connection the runner cannot see the database, so by default its script assumes the version
-        /// table already exists. Set this to get a complete script for a new database: the version table, its
-        /// unique index and columns, then every migration. The version table's schema is created only when
-        /// <see cref="VersionTableInfo.IVersionTableMetaData.OwnsSchema"/> is <c>true</c>.
+        /// table already exists. Set this to get a complete script for a new database: <c>BeforeAll</c> maintenance,
+        /// then the version table, its unique index and columns, then every migration. The version table's schema is
+        /// created only when <see cref="VersionTableInfo.IVersionTableMetaData.OwnsSchema"/> is <c>true</c>, and never
+        /// when it is a schema every new database already has (<c>dbo</c> on SQL Server, <c>public</c> on PostgreSQL
+        /// and Redshift, <c>PUBLIC</c> on Snowflake).
         /// </para>
         /// <para>
         /// It applies only in connectionless mode, that is with <see cref="NoConnection"/> or without a connection

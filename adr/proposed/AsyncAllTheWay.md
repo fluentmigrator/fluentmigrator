@@ -314,7 +314,8 @@ constraints follow:
 * The four version-table migrations (`VersionSchemaMigration`, `VersionMigration`,
   `VersionUniqueMigration` and `VersionDescriptionMigration`) are listed twice, with different
   guards. `VersionLoader.LoadVersionInfo()` runs each one the database doesn't have yet. The runner
-  helper runs all of them, and the schema step only when `IVersionTableMetaData.OwnsSchema` is true.
+  helper runs all of them, after `BeforeAll` maintenance, and the schema step only when
+  `IVersionTableMetaData.OwnsSchema` is true and the schema is not a built-in one such as `dbo` or `public`.
   Phase 0 moves `LoadVersionInfo()` out of the constructor, and that is the natural point to give
   both a single, internal list.
 * Keep the step private or internal. A public `IVersionLoader.EnsureVersionTable()` would need an
