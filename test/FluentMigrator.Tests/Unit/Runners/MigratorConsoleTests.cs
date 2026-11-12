@@ -471,18 +471,30 @@ namespace FluentMigrator.Tests.Unit.Runners
                 args.Add("/previewFromNothing");
             }
 
+            var originalOut = System.Console.Out;
+            var originalError = System.Console.Error;
+            var output = new StringWriter();
             try
             {
-                var console = new MigratorConsole();
-                console.Run(args.ToArray());
+                System.Console.SetOut(output);
+                System.Console.SetError(output);
 
+                var console = new MigratorConsole();
+                var exitCode = console.Run(args.ToArray());
+
+                System.Console.SetOut(originalOut);
+                System.Console.SetError(originalError);
+
+                exitCode.ShouldBe(0, output.ToString());
                 console.PreviewFromNothing.ShouldBe(previewFromNothing);
                 var script = File.ReadAllText(outputFileName);
-                script.ShouldContain("CREATE TABLE \"Users\"");
+                script.ShouldContain("CREATE TABLE \"Users\"", customMessage: output.ToString());
                 script.Contains("CREATE TABLE \"VersionInfo\"").ShouldBe(previewFromNothing);
             }
             finally
             {
+                System.Console.SetOut(originalOut);
+                System.Console.SetError(originalError);
                 File.Delete(outputFileName);
             }
         }
