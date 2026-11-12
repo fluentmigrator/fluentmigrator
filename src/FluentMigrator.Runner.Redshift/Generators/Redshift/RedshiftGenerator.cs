@@ -59,7 +59,7 @@ namespace FluentMigrator.Runner.Generators.Redshift
         public RedshiftGenerator(
             [NotNull] RedshiftQuoter quoter,
             [NotNull] IOptions<GeneratorOptions> generatorOptions)
-            : base(new RedshiftColumn(), quoter, new RedshiftDescriptionGenerator(), generatorOptions)
+            : base(new RedshiftColumn(quoter), quoter, new RedshiftDescriptionGenerator(), generatorOptions)
         {
         }
 

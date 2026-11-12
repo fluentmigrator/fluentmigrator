@@ -51,7 +51,7 @@ namespace FluentMigrator.Runner.Generators.Snowflake
             [NotNull] SnowflakeQuoter quoter,
             [NotNull] SnowflakeOptions sfOptions,
             [NotNull] IOptions<GeneratorOptions> generatorOptions)
-            : base(new SnowflakeColumn(sfOptions), quoter, new SnowflakeDescriptionGenerator(quoter), generatorOptions)
+            : base(new SnowflakeColumn(quoter), quoter, new SnowflakeDescriptionGenerator(quoter), generatorOptions)
         {
         }
 
