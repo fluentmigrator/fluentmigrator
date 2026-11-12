@@ -126,6 +126,13 @@ namespace FluentMigrator.Runner.Generators.Firebird
         }
 
         /// <inheritdoc />
+        /// <remarks>Firebird reads <c>0x...</c> as an integer; <c>X'...'</c> is its binary string literal.</remarks>
+        protected override string FormatByteArray(byte[] value)
+        {
+            return "X" + ValueQuote + BitConverter.ToString(value).Replace("-", string.Empty) + ValueQuote;
+        }
+
+        /// <inheritdoc />
         public string ToFbObjectName(string objName)
         {
             if (IsQuoted(objName))

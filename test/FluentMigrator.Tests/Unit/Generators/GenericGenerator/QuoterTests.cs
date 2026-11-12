@@ -241,6 +241,20 @@ namespace FluentMigrator.Tests.Unit.Generators.GenericGenerator
         }
 
         [Test]
+        public void ShouldFormatOracleBinaryLiterals()
+        {
+            // Oracle has no 0x literal.
+            new OracleQuoterQuotedIdentifier().QuoteValue(new byte[] { 1, 2, 0xAB }).ShouldBe("hextoraw('0102AB')");
+        }
+
+        [Test]
+        public void ShouldFormatFirebirdBinaryLiterals()
+        {
+            // Firebird reads 0x0102AB as an integer.
+            new Runner.Generators.Firebird.FirebirdQuoter(false).QuoteValue(new byte[] { 1, 2, 0xAB }).ShouldBe("X'0102AB'");
+        }
+
+        [Test]
         public void ShouldUnQuoteSqlServerObjectNames()
         {
             // SQL Server has no escape for '[', which used to make UnQuote throw.

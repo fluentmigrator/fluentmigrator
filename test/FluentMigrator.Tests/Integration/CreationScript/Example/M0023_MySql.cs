@@ -32,7 +32,9 @@ namespace FluentMigrator.Tests.Integration.CreationScript.Example
 
             mySql.Create.Table("Session")
                 .WithColumn("Token").AsFixedLengthAnsiString(32).NotNullable().PrimaryKey("PK_Session")
-                .WithColumn("UserName").AsString(100).NotNullable();
+                .WithColumn("UserName").AsString(100).NotNullable()
+                // In CREATE TABLE, not ADD COLUMN: see M0002.
+                .WithColumn("TraceId").AsGuid().NotNullable().WithDefault(SystemMethods.NewGuid);
 
             // InnoDB keeps a B-tree and warns; the statement is still valid.
             mySql.Create.Index("IX_Session_User").OnTable("Session")

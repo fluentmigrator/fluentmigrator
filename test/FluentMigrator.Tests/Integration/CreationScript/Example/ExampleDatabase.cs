@@ -100,7 +100,8 @@ namespace FluentMigrator.Tests.Integration.CreationScript.Example
                         Table(table);
                     }
 
-                    Constraint("Customer", "UQ_Customer_Email");
+                    // A column's Unique(name) is a unique index; Create.UniqueConstraint is a constraint.
+                    Index("Customer", "UQ_Customer_Email");
                     Constraint("Supplier", "UQ_Supplier_Name");
                     Constraint("CustomerOrder", "FK_Order_Customer");
                     Constraint("OrderLine", "FK_OrderLine_Order");
@@ -172,8 +173,13 @@ namespace FluentMigrator.Tests.Integration.CreationScript.Example
             Assert.That(lines, Has.Count.EqualTo(3), "OrderLine rows, after deleting the one without a product");
             Assert.That(lines.Select(r => Long(r, "Quantity")), Is.All.EqualTo(2), "OrderLine.Quantity after updating all rows");
 
-            var retired = Rows(processor, "Product").Single(r => r["Sku"].ToString().Trim() == "SKU-0003");
+            var products = Rows(processor, "Product");
+            var retired = products.Single(r => r["Sku"].ToString().Trim() == "SKU-0003");
             Assert.That(Long(retired, "IsActive"), Is.EqualTo(0), "SKU-0003 retired");
+
+            // The bytes, not just a value: Firebird used to read the binary literal as an integer.
+            var engine = products.Single(r => Long(r, "Id") == 1);
+            Assert.That(engine["Thumbnail"], Is.EqualTo(new byte[] { 1, 2, 3 }), "Product.Thumbnail bytes");
 
             Assert.That(Rows(processor, "note").Select(r => Long(r, "id")), Is.EquivalentTo(NoteIds), "note ids");
 

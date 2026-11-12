@@ -367,6 +367,17 @@ namespace FluentMigrator.Tests.Integration.CreationScript
             public override void RunScript(string connectionString, string script)
             {
                 var parsed = new FbScript(script);
+
+                // The runner's closing messages are comments after the last ';', which the parser can't classify.
+                parsed.UnknownStatement += (_, e) =>
+                {
+                    if (IsOnlyComments(e.Statement.Text))
+                    {
+                        e.Handled = true;
+                        e.Ignore = true;
+                    }
+                };
+
                 parsed.Parse();
 
                 using var connection = new FbConnection(connectionString);
