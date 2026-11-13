@@ -152,7 +152,7 @@ jobs:
       shell: bash
       env:
         # Through the environment, not ${{ }} in the script: the input is free text.
-        CONTAINERS: ${{ inputs.containers || 'default' }}
+        CONTAINERS: ${{ inputs.containers || 'all' }} # TEMPORARY: see what all containers do before this merges
       run: |
         default=(SqlServer2016 Postgres MySql Oracle)
         all=(SqlServer2016 Postgres MySql Oracle Firebird DB2)
