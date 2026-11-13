@@ -56,7 +56,7 @@ grep -rln "Snowflake" --include=*.cs --include=*.csproj --include=*.props \
 
 | File | Change |
 |---|---|
-| `.github/workflows/pull-requests.yaml` | `FM_TestConnectionStrings__<Db>__IsEnabled` / `__ContainerEnabled` env vars on the Linux leg. |
+| `.github/workflows/pull-requests.yaml` | The `appsettings.json` key in the `Choose database containers` step: in `all`, and in `default` to run on every pull request. |
 | `azure-pipelines*.yml` | Same, if those pipelines still run integration tests. |
 | `adr/proposed/<Db>.md` | The ADR (written first). |
 | `docs-website/providers/<db>.md` or `others.md` | Provider docs: install, `Add<Db>()`, connection string, options, unsupported-operations table, container notes for contributors. |

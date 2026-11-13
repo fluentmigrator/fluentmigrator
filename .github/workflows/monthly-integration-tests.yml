@@ -1,0 +1,22 @@
+name: Monthly Integration Tests
+
+# The full build and test run of pull-requests.yaml, with every database container, including the ones too slow
+# or too large to start for each pull request (Db2).
+#
+# GitHub emails a failed scheduled run to whoever last changed the cron line below.
+on:
+  schedule:
+    # 04:17 UTC on the first of the month (off the hour, when scheduled runs queue the longest).
+    - cron: '17 4 1 * *'
+  workflow_dispatch:
+
+jobs:
+  build:
+    uses: ./.github/workflows/pull-requests.yaml
+    with:
+      containers: all
+    # What the called job asks for; a called workflow can't have more than its caller grants.
+    permissions:
+      checks: write
+      issues: write
+      pull-requests: write

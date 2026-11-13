@@ -130,9 +130,8 @@ Options, in order of preference:
   `TestSchema`), create it via the builder (`WithUsername`, `WithDatabase`) or via a
   `WithResourceMapping` init script executed by the image's entrypoint hook
   (`/docker-entrypoint-initdb.d/` for Postgres/MySQL-style images).
-- **Windows CI.** Containers only run on the `ubuntu-latest` matrix leg. The
-  `pull-requests.yaml` env vars use `${{ matrix.os == 'ubuntu-latest' }}` for exactly
-  this reason; copy that pattern.
+- **Windows CI.** Containers only run on the `ubuntu-latest` matrix leg: the
+  `Choose database containers` step in `pull-requests.yaml` runs only there.
 - **Docker socket in CI.** GitHub-hosted Ubuntu runners have Docker preinstalled;
   Testcontainers auto-detects it. Nothing else is needed. If a self-hosted runner is
   used, `TESTCONTAINERS_HOST_OVERRIDE` / `DOCKER_HOST` may be required.
@@ -160,11 +159,15 @@ dotnet test test/FluentMigrator.Tests --framework net8.0 --filter "Category=<Db>
 Or via `dotnet user-secrets set "TestConnectionStrings:<Db>:IsEnabled" true --id FluentMigrator.Tests`
 for a persistent local setting.
 
-CI (`.github/workflows/pull-requests.yaml`, in the `Restore, Build, Test` step `env:`):
+CI (`.github/workflows/pull-requests.yaml`, the `Choose database containers` step): add
+the `appsettings.json` key to `all`, and to `default` if every pull request should start
+the container. A slow or very large image can stay out of `default`; the monthly workflow
+(`monthly-integration-tests.yml`) runs `all`, and anyone can run the pull-request workflow
+by hand with `containers` set to, say, `default,<Db>`.
 
-```yaml
-FM_TestConnectionStrings__<Db>__ContainerEnabled: ${{ matrix.os == 'ubuntu-latest' }}
-FM_TestConnectionStrings__<Db>__IsEnabled: ${{ matrix.os == 'ubuntu-latest' }}
+```bash
+default=(SqlServer2016 Postgres MySql Oracle <Db>)
+all=(SqlServer2016 Postgres MySql Oracle Firebird DB2 <Db>)
 ```
 
 Also check `azure-pipelines*.yml` if the engine should run there too.

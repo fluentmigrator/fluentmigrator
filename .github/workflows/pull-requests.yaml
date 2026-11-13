@@ -14,6 +14,24 @@ on:
   push:
     branches:
     - 'main'
+  # Run by hand from the Actions tab (or `gh workflow run pull-requests.yaml -f containers=default,DB2`),
+  # to test with database containers a pull request doesn't start.
+  workflow_dispatch:
+    inputs:
+      containers:
+        description: >-
+          Database containers for the Linux integration tests, comma-separated. Names: SqlServer2016, Postgres,
+          MySql, Oracle, Firebird, DB2 (the keys in test/FluentMigrator.Tests/appsettings.json), plus default (the
+          ones a pull request runs), all and none. "default,DB2" adds Db2; "DB2" runs Db2 alone.
+        type: string
+        default: default
+  # Called by monthly-integration-tests.yml.
+  workflow_call:
+    inputs:
+      containers:
+        description: As for workflow_dispatch.
+        type: string
+        default: default
 
 env:
   solution: 'FluentMigrator.sln'
@@ -127,18 +145,45 @@ jobs:
         # Cleanup
         if (Test-Path $installerPath) { Remove-Item $installerPath -Force -ErrorAction SilentlyContinue }
 
+    # Containers run only on Linux. Each chosen one gets the two settings that start it:
+    # FM_TestConnectionStrings__<Name>__IsEnabled and __ContainerEnabled.
+    - name: Choose database containers
+      if: matrix.os == 'ubuntu-latest'
+      shell: bash
+      env:
+        # Through the environment, not ${{ }} in the script: the input is free text.
+        CONTAINERS: ${{ inputs.containers || 'default' }}
+      run: |
+        default=(SqlServer2016 Postgres MySql Oracle)
+        all=(SqlServer2016 Postgres MySql Oracle Firebird DB2)
+        chosen=()
+        set -f # A '*' in the input is a typo, not a glob.
+        for token in ${CONTAINERS//,/ }; do
+          case "${token,,}" in
+            default) chosen+=("${default[@]}") ;;
+            all) chosen+=("${all[@]}") ;;
+            none) ;;
+            *)
+              match=
+              for name in "${all[@]}"; do
+                if [ "${name,,}" = "${token,,}" ]; then match=$name; fi
+              done
+              if [ -z "$match" ]; then
+                echo "::error::Unknown database container '$token'. Use ${all[*]}, default, all or none."
+                exit 1
+              fi
+              chosen+=("$match") ;;
+          esac
+        done
+        names=$(printf '%s\n' "${chosen[@]}" | sed '/^$/d' | sort -u)
+        for name in $names; do
+          echo "FM_TestConnectionStrings__${name}__IsEnabled=true" >> "$GITHUB_ENV"
+          echo "FM_TestConnectionStrings__${name}__ContainerEnabled=true" >> "$GITHUB_ENV"
+        done
+        echo "Database containers: $(echo ${names:-none} | sed 's/ /, /g')" | tee -a "$GITHUB_STEP_SUMMARY"
+
     - name: Restore, Build, Test
       run: dotnet test --framework ${{ matrix.dotnet-tfm }} --configuration ${{ env.buildConfiguration }} --verbosity quiet --logger trx --collect:"XPlat Code Coverage" --results-directory "TestResults-${{ matrix.dotnet-tfm }}" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura
-      env:
-        # Enable containers for integration tests only on Linux
-        FM_TestConnectionStrings__MySql__ContainerEnabled: ${{ matrix.os == 'ubuntu-latest' }}
-        FM_TestConnectionStrings__MySql__IsEnabled: ${{ matrix.os == 'ubuntu-latest' }}
-        FM_TestConnectionStrings__Oracle__ContainerEnabled: ${{ matrix.os == 'ubuntu-latest' }}
-        FM_TestConnectionStrings__Oracle__IsEnabled: ${{ matrix.os == 'ubuntu-latest' }}
-        FM_TestConnectionStrings__Postgres__ContainerEnabled: ${{ matrix.os == 'ubuntu-latest' }}
-        FM_TestConnectionStrings__Postgres__IsEnabled: ${{ matrix.os == 'ubuntu-latest' }}
-        FM_TestConnectionStrings__SqlServer2016__ContainerEnabled: ${{ matrix.os == 'ubuntu-latest' }}
-        FM_TestConnectionStrings__SqlServer2016__IsEnabled: ${{ matrix.os == 'ubuntu-latest' }}
 
     - name: AOT Smoke Tests
       if: matrix.dotnet-tfm == 'net8.0'
