@@ -40,6 +40,19 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
         }
 
         [Test]
+        public void CanCreateXmlColumnWithoutADefault()
+        {
+            // An XML column can't have a default, not even the bare DEFAULT (SQL0628N).
+            var expression = GeneratorTestHelper.GetCreateColumnExpression();
+            expression.Column.Type = System.Data.DbType.Xml;
+            expression.Column.Size = null;
+            expression.Column.IsNullable = true;
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE TestTable1 ADD COLUMN TestColumn1 XML;");
+        }
+
+        [Test]
         public override void CanCreateNullableColumnWithCustomDomainTypeAndCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpressionWithNullableCustomType();

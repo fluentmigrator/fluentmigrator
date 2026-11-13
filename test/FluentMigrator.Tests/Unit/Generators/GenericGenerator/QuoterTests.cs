@@ -255,6 +255,13 @@ namespace FluentMigrator.Tests.Unit.Generators.GenericGenerator
         }
 
         [Test]
+        public void ShouldFormatDb2BinaryLiterals()
+        {
+            // Db2 has no 0x literal.
+            new Runner.Generators.DB2.Db2Quoter().QuoteValue(new byte[] { 1, 2, 0xAB }).ShouldBe("BX'0102AB'");
+        }
+
+        [Test]
         public void ShouldFormatFirebirdDatesWithoutATimeOfDayAsDates()
         {
             // Firebird 4 won't convert '1991-08-25 00:00:00' to a DATE column.

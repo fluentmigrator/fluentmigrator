@@ -106,7 +106,8 @@ namespace FluentMigrator.Runner.Generators.DB2
 
             if (isCreate && (column.DefaultValue is ColumnDefinition.UndefinedDefaultValue))
             {
-                return "DEFAULT";
+                // An XML column can't have a default (SQL0628N).
+                return column.Type == DbType.Xml ? string.Empty : "DEFAULT";
             }
 
             if (column.DefaultValue is ColumnDefinition.UndefinedDefaultValue)

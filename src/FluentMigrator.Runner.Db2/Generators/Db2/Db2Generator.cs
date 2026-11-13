@@ -217,6 +217,20 @@ namespace FluentMigrator.Runner.Generators.DB2
         }
 
         /// <inheritdoc />
+        /// <remarks>Db2 requires <c>INCREMENT BY</c>; the generic <c>INCREMENT</c> without <c>BY</c> is PostgreSQL's.</remarks>
+        public override string Generate(Expressions.CreateSequenceExpression expression)
+        {
+            var sql = base.Generate(expression);
+            var sequence = expression.Sequence;
+
+            // The increment, when there is one, comes straight after the name.
+            var increment = $"CREATE SEQUENCE {Quoter.QuoteSequenceName(sequence.Name, sequence.SchemaName)} INCREMENT ";
+            return sequence.Increment.HasValue && sql.StartsWith(increment, StringComparison.Ordinal)
+                ? increment + "BY " + sql.Substring(increment.Length)
+                : sql;
+        }
+
+        /// <inheritdoc />
         public override string Generate(Expressions.DeleteTableExpression expression)
         {
             if (expression.IfExists)

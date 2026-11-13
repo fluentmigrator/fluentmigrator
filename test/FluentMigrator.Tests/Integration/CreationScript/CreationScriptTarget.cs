@@ -446,10 +446,26 @@ namespace FluentMigrator.Tests.Integration.CreationScript
                 {
                     using var command = connection.CreateCommand();
                     command.CommandText = $"SELECT 1 FROM SYSCAT.SCHEMATA WHERE SCHEMANAME = '{schema}'";
-                    if (command.ExecuteScalar() != null)
+                    if (command.ExecuteScalar() == null)
                     {
-                        Execute(connection, $"CALL SYSPROC.ADMIN_DROP_SCHEMA('{schema}', NULL, 'ERRORSCHEMA', 'ERRORTABLE')");
+                        continue;
                     }
+
+                    // The error table's schema and name are INOUT parameters, which take markers, not literals
+                    // (SQL0469N). The procedure sets them to NULL when it drops everything.
+                    using var drop = connection.CreateCommand();
+                    drop.CommandText = $"CALL SYSPROC.ADMIN_DROP_SCHEMA('{schema}', NULL, ?, ?)";
+                    foreach (var value in new[] { "ERRORSCHEMA", "ERRORTABLE" })
+                    {
+                        var parameter = drop.CreateParameter();
+                        parameter.Direction = System.Data.ParameterDirection.InputOutput;
+                        parameter.DbType = System.Data.DbType.String;
+                        parameter.Size = 128;
+                        parameter.Value = value;
+                        drop.Parameters.Add(parameter);
+                    }
+
+                    drop.ExecuteNonQuery();
                 }
             }
 
