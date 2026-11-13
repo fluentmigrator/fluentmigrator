@@ -439,34 +439,45 @@ namespace FluentMigrator.Tests.Integration.CreationScript
                     });
             }
 
-            // With everything in them.
+            // With what the example puts in them: tables (their indexes, keys and identity sequences go with them) and
+            // sequences. Not SYSPROC.ADMIN_DROP_SCHEMA: it needs the SYSTOOLSPACE tablespace, which the container's
+            // database doesn't have.
             private static void DropSchemas(DbConnection connection, IEnumerable<string> schemas)
             {
                 foreach (var schema in schemas)
                 {
-                    using var command = connection.CreateCommand();
-                    command.CommandText = $"SELECT 1 FROM SYSCAT.SCHEMATA WHERE SCHEMANAME = '{schema}'";
-                    if (command.ExecuteScalar() == null)
+                    if (Names(connection, $"SELECT SCHEMANAME FROM SYSCAT.SCHEMATA WHERE SCHEMANAME = '{schema}'").Count == 0)
                     {
                         continue;
                     }
 
-                    // The error table's schema and name are INOUT parameters, which take markers, not literals
-                    // (SQL0469N). The procedure sets them to NULL when it drops everything.
-                    using var drop = connection.CreateCommand();
-                    drop.CommandText = $"CALL SYSPROC.ADMIN_DROP_SCHEMA('{schema}', NULL, ?, ?)";
-                    foreach (var value in new[] { "ERRORSCHEMA", "ERRORTABLE" })
+                    foreach (var table in Names(connection, $"SELECT TABNAME FROM SYSCAT.TABLES WHERE TABSCHEMA = '{schema}' AND TYPE = 'T'"))
                     {
-                        var parameter = drop.CreateParameter();
-                        parameter.Direction = System.Data.ParameterDirection.InputOutput;
-                        parameter.DbType = System.Data.DbType.String;
-                        parameter.Size = 128;
-                        parameter.Value = value;
-                        drop.Parameters.Add(parameter);
+                        Execute(connection, $"DROP TABLE \"{schema}\".\"{table}\"");
                     }
 
-                    drop.ExecuteNonQuery();
+                    foreach (var sequence in Names(connection, $"SELECT SEQNAME FROM SYSCAT.SEQUENCES WHERE SEQSCHEMA = '{schema}' AND SEQTYPE = 'S'"))
+                    {
+                        Execute(connection, $"DROP SEQUENCE \"{schema}\".\"{sequence}\"");
+                    }
+
+                    Execute(connection, $"DROP SCHEMA \"{schema}\" RESTRICT");
                 }
+            }
+
+            private static List<string> Names(DbConnection connection, string query)
+            {
+                using var command = connection.CreateCommand();
+                command.CommandText = query;
+                using var reader = command.ExecuteReader();
+
+                var names = new List<string>();
+                while (reader.Read())
+                {
+                    names.Add(reader.GetString(0).TrimEnd());
+                }
+
+                return names;
             }
 
             // The Db2 command line processor runs one ';'-terminated statement at a time.
