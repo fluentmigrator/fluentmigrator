@@ -187,7 +187,9 @@ jobs:
         done
         # IBM's provider loads libdb2.so from clidriver/lib, which the loader doesn't search unless told to.
         if grep -qx DB2 <<< "$names"; then
-          if ! ldconfig -p | grep -q 'libxml2\.so\.2 '; then
+          # Not grep -q: it stops reading at the first match, ldconfig can then die of SIGPIPE, and pipefail
+          # (on in GitHub's bash) would turn that into a missing library.
+          if ! ldconfig -p | grep 'libxml2\.so\.2 ' > /dev/null; then
             echo "::error::Db2's client needs libxml2.so.2, which $(. /etc/os-release; echo "$PRETTY_NAME") doesn't have. See runs-on."
             exit 1
           fi
