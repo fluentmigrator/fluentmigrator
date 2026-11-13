@@ -227,8 +227,12 @@ namespace FluentMigrator.Runner.Processors.DB2
                 "SEQTYPE='S'",
             };
 
-            if (!string.IsNullOrEmpty(schemaName))
-                conditions.Add(BuildEqualityComparison("SEQSCHEMA", schemaName));
+            // Without a schema, the one an unqualified CREATE SEQUENCE would use, so a sequence of the same name in
+            // another schema doesn't count.
+            conditions.Add(
+                string.IsNullOrEmpty(schemaName)
+                    ? "SEQSCHEMA=CURRENT SCHEMA"
+                    : BuildEqualityComparison("SEQSCHEMA", schemaName));
 
             var condition = string.Join(" AND ", conditions);
 

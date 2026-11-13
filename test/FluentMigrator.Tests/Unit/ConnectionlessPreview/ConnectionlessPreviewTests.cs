@@ -144,6 +144,23 @@ namespace FluentMigrator.Tests.Unit.ConnectionlessPreview
             Assert.That(script.Replace(createSchema, ""), Does.Not.Contain("CREATE SCHEMA"), script);
         }
 
+        /// <summary>
+        /// SQL Server 2000 has no <c>SCHEMA_ID</c> and no schemas to create, so it gets no conditional either.
+        /// </summary>
+        [Test]
+        public void LeavesSqlServer2000WithoutSchemaDdl()
+        {
+            var script = GenerateScript(
+                builder => builder.AddSqlServer2000(),
+                PreviewFromNothingWithoutConnection,
+                previewOnly: true,
+                configureServices: services => services.AddSingleton<IConventionSet>(new DefaultConventionSet("DBO", null)));
+
+            Assert.That(script, Does.Not.Contain("SCHEMA_ID"), script);
+            Assert.That(script, Does.Not.Contain("CREATE SCHEMA"), script);
+            Assert.That(script, Does.Contain("VersionInfo"), script);
+        }
+
         private static IEnumerable<TestCaseData> BuiltInSchemaCases()
         {
             yield return SchemaCase("SqlServer2016 dbo", builder => builder.AddSqlServer2016(), null, "dbo", "CREATE TABLE [dbo].[VersionInfo]");
@@ -245,19 +262,24 @@ namespace FluentMigrator.Tests.Unit.ConnectionlessPreview
         }
 
         /// <summary>
-        /// An empty database has nothing to revert. With a connection string and without preview mode, the revert
-        /// would otherwise run against the database.
+        /// An empty database has nothing to revert, list or validate. With a connection string and without preview
+        /// mode, the operation would otherwise run against the database, and its version loader would create the
+        /// version table there.
         /// </summary>
         [TestCase("rollback")]
         [TestCase("rollback:toversion")]
         [TestCase("migrate:down")]
-        public void RejectsRevertingMigrationsWithAConnection(string task)
+        [TestCase("listmigrations")]
+        [TestCase("validateversionorder")]
+        public void RejectsAnythingButMigratingUpWithAConnection(string task)
         {
             Action<IMigrationRunner> run = task switch
             {
                 "rollback" => runner => runner.Rollback(1),
                 "rollback:toversion" => runner => runner.RollbackToVersion(0),
-                _ => runner => runner.MigrateDown(0),
+                "migrate:down" => runner => runner.MigrateDown(0),
+                "listmigrations" => runner => runner.ListMigrations(),
+                _ => runner => runner.ValidateVersionOrder(),
             };
 
             using var serviceProvider = new ServiceCollection()

@@ -411,8 +411,9 @@ namespace FluentMigrator.Tests.Integration.CreationScript
             private static readonly string[] _exampleSchemas = ["REPORTING"];
 
             // Creating a Db2 database takes minutes, so the unit of isolation is a schema: unqualified names go to the
-            // connection's CurrentSchema. The example's own schemas are outside it, so two runs against one Db2
-            // server at the same time collide; CI starts a new container for each run.
+            // connection's CurrentSchema. The example's own schemas are outside it, so the run stops if one already
+            // exists, rather than build on it or drop what's in it: it may be someone's, on a configured Db2 server,
+            // or left by a run that stopped before its cleanup. CI starts a new container for each run.
             public override EmptyDatabase CreateEmptyDatabase(string configuredConnectionString)
             {
                 var name = NewDatabaseName().ToUpperInvariant();
@@ -420,8 +421,15 @@ namespace FluentMigrator.Tests.Integration.CreationScript
                 {
                     connection.Open();
 
-                    // Left by a run that stopped before its cleanup, on a reused container.
-                    DropSchemas(connection, _exampleSchemas);
+                    foreach (var schema in _exampleSchemas)
+                    {
+                        if (Names(connection, $"SELECT SCHEMANAME FROM SYSCAT.SCHEMATA WHERE SCHEMANAME = '{schema}'").Count > 0)
+                        {
+                            throw new InvalidOperationException(
+                                $"The Db2 schema {schema} already exists. The example creates it, and this test drops it afterwards, "
+                              + "so it won't run against a database that has one. Drop it if an earlier run left it.");
+                        }
+                    }
 
                     Execute(connection, $"CREATE SCHEMA {name}");
                 }
@@ -439,7 +447,7 @@ namespace FluentMigrator.Tests.Integration.CreationScript
                     });
             }
 
-            // With what the example puts in them: tables (their indexes, keys and identity sequences go with them) and
+            // Only schemas this run created. With what the example puts in them: tables (their indexes, keys and identity sequences go with them) and
             // sequences. Not SYSPROC.ADMIN_DROP_SCHEMA: it needs the SYSTOOLSPACE tablespace, which the container's
             // database doesn't have.
             private static void DropSchemas(DbConnection connection, IEnumerable<string> schemas)

@@ -116,8 +116,9 @@ namespace FluentMigrator.Runner.Initialization
         /// <see cref="StartVersion"/> greater than zero, which contradicts an empty database.
         /// </para>
         /// <para>
-        /// It only applies to migrating up. An empty database has nothing to revert, so <c>MigrateDown</c>,
-        /// <c>Rollback</c> and <c>RollbackToVersion</c> throw <see cref="System.InvalidOperationException"/> when it is set.
+        /// It only applies to migrating up. An empty database has nothing to revert, list or validate, so
+        /// <c>MigrateDown</c>, <c>Rollback</c>, <c>RollbackToVersion</c>, <c>ListMigrations</c> and
+        /// <c>ValidateVersionOrder</c> throw <see cref="System.InvalidOperationException"/> when it is set.
         /// </para>
         /// </remarks>
         public bool PreviewFromNothing { get; set; }

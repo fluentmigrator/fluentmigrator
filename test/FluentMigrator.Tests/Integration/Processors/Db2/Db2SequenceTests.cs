@@ -74,6 +74,9 @@ namespace FluentMigrator.Tests.Integration.Processors.Db2
             {
                 Processor.SequenceExists("TstSchma", "TstSeq").ShouldBeTrue();
                 Processor.SequenceExists("OtherSchma", "TstSeq").ShouldBeFalse();
+
+                // Without a schema, only the current one counts.
+                Processor.SequenceExists(null, "TstSeq").ShouldBeFalse();
             }
             finally
             {

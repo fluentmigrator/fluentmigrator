@@ -83,7 +83,7 @@ dotnet fm migrate [options]
 | `--allowDirtyAssemblies` | | Allow version mismatches | No |
 | `--start-version` | | Start from version (connectionless only) | No |
 | `--no-connection` | | Generate SQL without connecting to a database | No |
-| `--preview-from-nothing` | | With `--no-connection --preview`, also emit the SQL that creates the version table, as for an empty database. `migrate` only: `rollback` and `migrate down` reject it | No |
+| `--preview-from-nothing` | | With `--no-connection --preview`, also emit the SQL that creates the version table, as for an empty database. `migrate` only: `rollback`, `migrate down`, `list migrations` and `validate versions` reject it | No |
 | `--help` | `-h` | Show help | No |
 
 ### Processor and generator selection

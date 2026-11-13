@@ -884,6 +884,8 @@ namespace FluentMigrator.Runner
         /// <inheritdoc />
         public void ValidateVersionOrder()
         {
+            RejectPreviewFromNothing("validate the version order");
+
             var unappliedVersions = MigrationLoader.LoadMigrations().Where(kvp => MigrationVersionLessThanGreatestAppliedMigration(kvp.Key)).ToList();
             if (unappliedVersions.Any())
             {
@@ -896,6 +898,8 @@ namespace FluentMigrator.Runner
         /// <inheritdoc />
         public void ListMigrations()
         {
+            RejectPreviewFromNothing("list migrations");
+
             var currentVersionInfo = VersionLoader.VersionInfo;
             var currentVersion = currentVersionInfo.Latest();
 
@@ -1061,15 +1065,16 @@ namespace FluentMigrator.Runner
         }
 
         /// <summary>
-        /// Rejects <see cref="RunnerOptions.PreviewFromNothing"/> for an operation that reverts migrations.
+        /// Rejects <see cref="RunnerOptions.PreviewFromNothing"/> for an operation other than migrating up: reverting
+        /// migrations, listing them or validating their order.
         /// </summary>
         /// <remarks>
-        /// An empty database has nothing to revert, and none of the checks in <see cref="IsPreviewFromNothing"/> run
-        /// here, so with a connection string and without preview mode the operation would otherwise run against the
-        /// database. Called before the version loader is first used, because a live version loader creates the version
-        /// table.
+        /// An empty database has nothing to revert, list or validate, and none of the checks in
+        /// <see cref="IsPreviewFromNothing"/> run here, so with a connection string and without preview mode the
+        /// operation would otherwise run against the database. Called before the version loader is first used,
+        /// because a live version loader creates the version table.
         /// </remarks>
-        /// <param name="operation">What the caller does, for the message: "roll back", "migrate down".</param>
+        /// <param name="operation">What the caller does, for the message: "roll back", "list migrations".</param>
         /// <exception cref="InvalidOperationException"><see cref="RunnerOptions.PreviewFromNothing"/> is set.</exception>
         private void RejectPreviewFromNothing(string operation)
         {
@@ -1174,7 +1179,9 @@ namespace FluentMigrator.Runner
                     return SchemaInANewDatabase.BuiltIn;
                 }
 
-                return string.Equals(name, "dbo", StringComparison.OrdinalIgnoreCase)
+                // SQL Server 2000 has neither SCHEMA_ID nor schemas of its own to create; its generator handles
+                // CREATE SCHEMA as unsupported.
+                return string.Equals(name, "dbo", StringComparison.OrdinalIgnoreCase) && !Is("SqlServer2000")
                     ? SchemaInANewDatabase.DboByCollation
                     : SchemaInANewDatabase.Missing;
             }
