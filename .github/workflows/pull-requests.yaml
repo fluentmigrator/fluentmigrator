@@ -153,6 +153,8 @@ jobs:
       env:
         # Through the environment, not ${{ }} in the script: the input is free text.
         CONTAINERS: ${{ inputs.containers || 'all' }} # TEMPORARY: see what all containers do before this merges
+        # Where Net.IBM.Data.Db2-lnx copies IBM's native client (clidriver) when the tests are built.
+        DB2_CLIDRIVER_LIB: ${{ github.workspace }}/test/FluentMigrator.Tests/bin/${{ env.buildConfiguration }}/${{ matrix.dotnet-tfm }}/clidriver/lib
       run: |
         default=(SqlServer2016 Postgres MySql Oracle)
         all=(SqlServer2016 Postgres MySql Oracle Firebird DB2)
@@ -180,6 +182,10 @@ jobs:
           echo "FM_TestConnectionStrings__${name}__IsEnabled=true" >> "$GITHUB_ENV"
           echo "FM_TestConnectionStrings__${name}__ContainerEnabled=true" >> "$GITHUB_ENV"
         done
+        # IBM's provider loads libdb2.so from clidriver/lib, which the loader doesn't search unless told to.
+        if grep -qx DB2 <<< "$names"; then
+          echo "LD_LIBRARY_PATH=$DB2_CLIDRIVER_LIB${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" >> "$GITHUB_ENV"
+        fi
         echo "Database containers: $(echo ${names:-none} | sed 's/ /, /g')" | tee -a "$GITHUB_STEP_SUMMARY"
 
     - name: Restore, Build, Test

@@ -40,7 +40,8 @@ Integration tests for the following databases can be enabled:
 * MySQL (`TestConnectionStrings:MySql`)
 * Oracle (`TestConnectionStrings:Oracle`)
 * Firebird (`TestConnectionStrings:Firebird`)
-* Db2 (`TestConnectionStrings:DB2`; 64-bit only)
+* Db2 (`TestConnectionStrings:DB2`; 64-bit only). On Linux, IBM's provider needs its native client on the library
+  path: `export LD_LIBRARY_PATH=$PWD/test/FluentMigrator.Tests/bin/Debug/net8.0/clidriver/lib`
 
 ### User secrets usage
 
