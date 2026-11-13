@@ -63,6 +63,19 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             );
         }
 
+        [Test, SetCulture("nb-NO")]
+        public void CanCreateSequenceWithNegativeValuesInAnyCulture()
+        {
+            var expression = GeneratorTestHelper.GetCreateSequenceExpression();
+            expression.Sequence.Increment = -1;
+            expression.Sequence.MinValue = -100;
+            expression.Sequence.MaxValue = -1;
+            expression.Sequence.StartWith = -1;
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE SEQUENCE Sequence INCREMENT BY -1 MINVALUE -100 MAXVALUE -1 START WITH -1 CACHE 10 CYCLE;");
+        }
+
         [Test]
         public override void CanDropSequenceWithCustomSchema()
         {

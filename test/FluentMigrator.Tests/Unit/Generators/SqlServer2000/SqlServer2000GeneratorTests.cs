@@ -142,6 +142,17 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] INT NOT NULL IDENTITY(45,23), [TestColumn2] INT NOT NULL);");
         }
 
+        [Test, SetCulture("nb-NO")]
+        public void CanCreateTableWithNegativeSeededIdentityInAnyCulture()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();
+            expression.Columns[0].AdditionalFeatures.Add(SqlServerExtensions.IdentitySeed, -1);
+            expression.Columns[0].AdditionalFeatures.Add(SqlServerExtensions.IdentityIncrement, -1);
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] INT NOT NULL IDENTITY(-1,-1), [TestColumn2] INT NOT NULL);");
+        }
+
         [Test]
         public void CanDropSchemaInStrictMode()
         {

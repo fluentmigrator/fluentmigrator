@@ -212,6 +212,16 @@ namespace FluentMigrator.Tests.Unit.Generators.GenericGenerator
         }
 
         [Test]
+        public void NegativeIntegersAreFormattedWithInvariantCulture()
+        {
+            ChangeCulture();
+            _quoter.QuoteValue(-1234L).ShouldBe("-1234");
+            _quoter.QuoteValue((short)-12).ShouldBe("-12");
+            _quoter.QuoteValue((sbyte)-1).ShouldBe("-1");
+            RestoreCulture();
+        }
+
+        [Test]
         public void NullIsFormattedAsLiteral()
         {
             _quoter.QuoteValue(null)
