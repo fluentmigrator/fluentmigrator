@@ -66,7 +66,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestSchema.TestTable1 ALTER COLUMN TestColumn1 SET DATA TYPE VARGRAPHIC(20) CCSID 1200 NOT NULL;");
+            result.ShouldBe("ALTER TABLE TestSchema.TestTable1 ALTER COLUMN TestColumn1 SET DATA TYPE VARGRAPHIC(20) NOT NULL;");
         }
 
         [Test]
@@ -76,7 +76,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             expression.Column.IsNullable = null;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestTable1 ALTER COLUMN TestColumn1 SET DATA TYPE VARGRAPHIC(20) CCSID 1200 NOT NULL;");
+            result.ShouldBe("ALTER TABLE TestTable1 ALTER COLUMN TestColumn1 SET DATA TYPE VARGRAPHIC(20) NOT NULL;");
         }
 
         [Test]
@@ -105,7 +105,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestSchema.TestTable1 ADD COLUMN TestColumn1 VARGRAPHIC(5) CCSID 1200 NOT NULL DEFAULT;");
+            result.ShouldBe("ALTER TABLE TestSchema.TestTable1 ADD COLUMN TestColumn1 VARGRAPHIC(5) NOT NULL DEFAULT;");
         }
 
         [Test]
@@ -114,7 +114,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestTable1 ADD COLUMN TestColumn1 VARGRAPHIC(5) CCSID 1200 NOT NULL DEFAULT;");
+            result.ShouldBe("ALTER TABLE TestTable1 ADD COLUMN TestColumn1 VARGRAPHIC(5) NOT NULL DEFAULT;");
         }
 
         [Test]

@@ -53,7 +53,25 @@ namespace FluentMigrator.Runner.Generators.DB2
         public Db2Generator(
             Db2Quoter quoter,
             IOptions<GeneratorOptions> generatorOptions)
-            : base(new Db2Column(quoter), quoter, new EmptyDescriptionGenerator(), generatorOptions)
+            : this(quoter, generatorOptions, writeUnicodeCcsid: false)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Db2Generator"/> class for Db2 LUW or, through
+        /// <see cref="iSeries.Db2ISeriesGenerator"/>, Db2 for i.
+        /// </summary>
+        /// <param name="quoter">The quoter.</param>
+        /// <param name="generatorOptions">The generator options.</param>
+        /// <param name="writeUnicodeCcsid">
+        /// Whether Unicode string columns get <c>CCSID 1200</c>: Db2 for i needs it, Db2 LUW rejects it (SQL0622N) in a
+        /// Unicode database, where graphic strings are UTF-16 already.
+        /// </param>
+        private protected Db2Generator(
+            Db2Quoter quoter,
+            IOptions<GeneratorOptions> generatorOptions,
+            bool writeUnicodeCcsid)
+            : base(new Db2Column(quoter, writeUnicodeCcsid), quoter, new EmptyDescriptionGenerator(), generatorOptions)
         {
         }
 

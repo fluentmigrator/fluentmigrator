@@ -31,9 +31,14 @@ namespace FluentMigrator.Runner.Generators.DB2
 
     internal class Db2Column : ColumnBase<Db2TypeMap>
     {
-        public Db2Column(IQuoter quoter)
+        private readonly bool _writeUnicodeCcsid;
+
+        /// <param name="quoter">The quoter.</param>
+        /// <param name="writeUnicodeCcsid">Whether Unicode string columns get <c>CCSID 1200</c> (Db2 for i).</param>
+        public Db2Column(IQuoter quoter, bool writeUnicodeCcsid)
             : base(new Db2TypeMap(), quoter)
         {
+            _writeUnicodeCcsid = writeUnicodeCcsid;
             ClauseOrder = new List<Func<ColumnDefinition, string>> { FormatString, FormatType, FormatCCSID, FormatExpression, FormatNullable, FormatDefaultValue, FormatIdentity };
             AlterClauseOrder = new List<Func<ColumnDefinition, string>> { FormatType, FormatCCSID, FormatExpression, FormatNullable, FormatDefaultValue, FormatIdentity };
         }
@@ -78,7 +83,8 @@ namespace FluentMigrator.Runner.Generators.DB2
 
         protected virtual string FormatCCSID(ColumnDefinition column)
         {
-            if (column.Type == null)
+            // Db2 LUW rejects the clause in a Unicode database (SQL0622N), where graphic strings are UTF-16 already.
+            if (!_writeUnicodeCcsid || column.Type == null)
             {
                 return string.Empty;
             }
