@@ -255,9 +255,9 @@ Wire the options: add a `<Db>` block to `appsettings.json` with `IsEnabled: fals
 
 For server engines, add `test/FluentMigrator.Tests/Containers/<Db>Container.cs`
 extending `ContainerBase` (three overrides: `ServerOptions`, `Port`, `Build()`), add it to
-the `Task.WhenAll` list in `IntegrationTestsSetup.cs`, and enable it in
-`.github/workflows/pull-requests.yaml` via the `FM_TestConnectionStrings__<Db>__*`
-environment variables on the Linux matrix leg. Everything about choosing and configuring
+the `Task.WhenAll` list in `IntegrationTestsSetup.cs`, and enable it in CI by adding its
+name to the `Choose database containers` step of `.github/workflows/pull-requests.yaml`
+(see `references/testcontainers.md`). Everything about choosing and configuring
 the image is in `references/testcontainers.md` — read it before writing `Build()`.
 Embedded engines skip the container entirely and follow the SQLite pattern.
 

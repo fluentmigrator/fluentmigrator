@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using FluentMigrator.Generation;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Base;
 using FluentMigrator.Runner.Processors.Firebird;
@@ -30,7 +31,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
 {
     internal class FirebirdColumn : ColumnBase<IFirebirdTypeMap>
     {
-        public FirebirdColumn([NotNull] FirebirdOptions fbOptions) : base(new FirebirdTypeMap(), new FirebirdQuoter(fbOptions.ForceQuote))
+        public FirebirdColumn([NotNull] FirebirdOptions fbOptions, [NotNull] IQuoter quoter) : base(new FirebirdTypeMap(), quoter)
         {
             FBOptions = fbOptions;
 

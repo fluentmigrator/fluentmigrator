@@ -2,7 +2,7 @@
 
 See `TokenSubstitutionMatrix.md` for what each column means.
 
-### Snowflake(QuoteIdentifiers=True)
+### Snowflake(ForceQuote=True)
 
 - generator: `SnowflakeGenerator`
 - generator.Quoter: `SnowflakeQuoter`
@@ -34,7 +34,7 @@ See `TokenSubstitutionMatrix.md` for what each column means.
 | RawSql+backslash | `c REGEXP '\d+'` | `c REGEXP '\d+'` | `c REGEXP '\d+'` |
 | RawSql+quote | `name = 'O''Brien'` | `name = 'O''Brien'` | `name = 'O''Brien'` |
 
-### Snowflake(QuoteIdentifiers=False)
+### Snowflake(ForceQuote=False)
 
 - generator: `SnowflakeGenerator`
 - generator.Quoter: `SnowflakeQuoter`

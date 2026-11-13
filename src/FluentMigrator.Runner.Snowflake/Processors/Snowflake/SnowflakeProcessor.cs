@@ -57,7 +57,7 @@ namespace FluentMigrator.Runner.Processors.Snowflake
             [NotNull] SnowflakeOptions sfOptions,
             [NotNull] IServiceProvider serviceProvider) : base(() => factory.Factory, generator, logger, options.Value, connectionStringAccessor)
         {
-            _quoteIdentifiers = sfOptions.QuoteIdentifiers;
+            _quoteIdentifiers = sfOptions.ForceQuote;
             Quoter = quoter;
             _serviceProvider = serviceProvider;
         }
@@ -74,7 +74,7 @@ namespace FluentMigrator.Runner.Processors.Snowflake
             [NotNull] SnowflakeOptions sfOptions,
             [NotNull] IServiceProvider serviceProvider) : base(() => factory.Factory, generator, logger, options.Value, connectionFactory)
         {
-            _quoteIdentifiers = sfOptions.QuoteIdentifiers;
+            _quoteIdentifiers = sfOptions.ForceQuote;
             Quoter = quoter;
             _serviceProvider = serviceProvider;
         }

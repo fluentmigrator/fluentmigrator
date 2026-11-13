@@ -25,7 +25,7 @@ markdown table rather than one of 35,000 opaque case names.
 | 2 | Quoter presence | supplied only | A `null` quoter no longer renders anything - it throws when `$[name]` is expanded, identically for every value and dialect. Covered once in `SqlScriptTokenReplacerTests` rather than as a matrix column; see `adr/proposed/RequireQuoterForTokenSubstitution.md` |
 | 3 | Value type | every branch of `GenericQuoter.QuoteValue`, plus uncased fall-through, plus `RawSql` | The reported defects are all value-type specific |
 | 4 | Dialect | ~30 `Add*()` registrations on `IMigrationRunnerBuilder` | Each wires a different quoter/typemap/generator triple |
-| 5 | `IQuoter` switch | `binaryGuid`, `QuoteIdentifiers`, `ForceQuote`, quoted-identifier variants | Orthogonal to dialect; changes value rendering |
+| 5 | `IQuoter` switch | `binaryGuid`, `ForceQuote`, quoted-identifier variants | Orthogonal to dialect; changes value rendering |
 | 6 | `ITypeMap` switch | `useStrictTables`, version lineage | Orthogonal to dialect; must *not* change value rendering |
 | 7 | `IGenerator` switch | `GeneratorOptions.CompatibilityMode` | Orthogonal to both |
 | 8 | `CurrentCulture` | `en-US`, `de-DE` | Invariant-culture regressions are invisible on an en-US agent |
