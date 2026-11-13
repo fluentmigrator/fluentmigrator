@@ -284,6 +284,12 @@ namespace FluentMigrator.Runner
             set => _currentVersionLoader = value;
         }
 
+        /// <summary>
+        /// Whether this run only logs SQL: preview mode, or the connectionless processor, which has no database to
+        /// run it against.
+        /// </summary>
+        private bool ExecutesNothing => _processorOptions.PreviewOnly || Processor is ConnectionlessProcessor;
+
         private bool AllowBreakingChanges =>
 #pragma warning disable 612
             _options?.AllowBreakingChange ?? false;
@@ -570,8 +576,9 @@ namespace FluentMigrator.Runner
                 {
                     try
                     {
+                        // Scripting a breaking change doesn't break anything.
                         if (migrationInfo.IsAttributed() && migrationInfo.IsBreakingChange &&
-                            !_processorOptions.PreviewOnly && !AllowBreakingChanges)
+                            !ExecutesNothing && !AllowBreakingChanges)
                         {
                             throw new InvalidOperationException(
                                 string.Format(
@@ -1036,7 +1043,7 @@ namespace FluentMigrator.Runner
             // NoConnection only replaces the version loader. When a connection string is still present (the console
             // runner falls back to one), the processor is a real one and would run the version table DDL against
             // that database. Only the connectionless processor, or preview mode, guarantees nothing is executed.
-            if (!_processorOptions.PreviewOnly && !(Processor is ConnectionlessProcessor))
+            if (!ExecutesNothing)
             {
                 throw new InvalidOperationException(
                     $"{nameof(RunnerOptions.PreviewFromNothing)} only previews SQL, but this run would execute it against a database. "
@@ -1086,9 +1093,17 @@ namespace FluentMigrator.Runner
         {
             var metaData = VersionLoader.VersionTableMetaData;
 
-            if (metaData.OwnsSchema && !IsBuiltInSchema(metaData.SchemaName))
+            if (metaData.OwnsSchema)
             {
-                Up(new VersionSchemaMigration(metaData));
+                switch (GetSchemaInANewDatabase(metaData.SchemaName))
+                {
+                    case SchemaInANewDatabase.Missing:
+                        Up(new VersionSchemaMigration(metaData));
+                        break;
+                    case SchemaInANewDatabase.DboByCollation:
+                        Up(new CreateSqlServerSchemaUnlessItExists(metaData.SchemaName, Processor.Quoter));
+                        break;
+                }
             }
 
             Up(new VersionMigration(metaData));
@@ -1096,10 +1111,25 @@ namespace FluentMigrator.Runner
             Up(new VersionDescriptionMigration(metaData));
         }
 
+        private enum SchemaInANewDatabase
+        {
+            /// <summary>The script creates it.</summary>
+            Missing,
+
+            /// <summary>Every new database has it, so <c>CREATE SCHEMA</c> would fail.</summary>
+            BuiltIn,
+
+            /// <summary>
+            /// SQL Server, and <c>dbo</c> in another case: the same schema in a case-insensitive database, a new one in
+            /// a case-sensitive database.
+            /// </summary>
+            DboByCollation,
+        }
+
         /// <summary>
-        /// Whether <paramref name="schemaName"/> is a schema that every new database of this type already has, so
-        /// <c>CREATE SCHEMA</c> would fail: <c>dbo</c> on SQL Server, <c>public</c> on PostgreSQL and Redshift, and
-        /// <c>PUBLIC</c> on Snowflake. A live run checks whether the schema exists; a run from nothing can't.
+        /// Whether a new database already has <paramref name="schemaName"/>: <c>dbo</c> on SQL Server, <c>public</c>
+        /// on PostgreSQL and Redshift, and <c>PUBLIC</c> on Snowflake. A live run checks whether the schema exists; a
+        /// run from nothing can't.
         /// </summary>
         /// <remarks>
         /// <para>
@@ -1110,14 +1140,15 @@ namespace FluentMigrator.Runner
         /// The name is compared as the database will read it. A quoted name is case-sensitive; an unquoted one is
         /// folded, to lower case on PostgreSQL and Redshift and to upper case on Snowflake. So with quoting off,
         /// <c>PUBLIC</c> on PostgreSQL and <c>public</c> on Snowflake are the built-in schema, and with quoting on they
-        /// are new schemas. SQL Server compares names by the database collation, which is usually case-insensitive.
+        /// are new schemas. SQL Server compares names by the database collation, which the script can't know, so
+        /// <c>DBO</c> is left for the database to decide.
         /// </para>
         /// </remarks>
-        private bool IsBuiltInSchema(string schemaName)
+        private SchemaInANewDatabase GetSchemaInANewDatabase(string schemaName)
         {
             if (string.IsNullOrEmpty(schemaName))
             {
-                return false;
+                return SchemaInANewDatabase.Missing;
             }
 
             // The connectionless processor reports the generator's id (SqlServer2016, PostgreSQL15_0, ...) or the
@@ -1134,22 +1165,62 @@ namespace FluentMigrator.Runner
             var isQuoted = rendered == null || quoter.IsQuoted(rendered);
             var name = rendered == null ? schemaName : quoter.UnQuote(rendered);
 
+            bool isBuiltIn;
+
             if (Is("SqlServer"))
             {
-                return string.Equals(name, "dbo", StringComparison.OrdinalIgnoreCase);
+                if (name == "dbo")
+                {
+                    return SchemaInANewDatabase.BuiltIn;
+                }
+
+                return string.Equals(name, "dbo", StringComparison.OrdinalIgnoreCase)
+                    ? SchemaInANewDatabase.DboByCollation
+                    : SchemaInANewDatabase.Missing;
             }
 
             if (Is("Postgres") || Is("Redshift"))
             {
-                return (isQuoted ? name : name.ToLowerInvariant()) == "public";
+                isBuiltIn = (isQuoted ? name : name.ToLowerInvariant()) == "public";
             }
-
-            if (Is("Snowflake"))
+            else if (Is("Snowflake"))
             {
-                return (isQuoted ? name : name.ToUpperInvariant()) == "PUBLIC";
+                isBuiltIn = (isQuoted ? name : name.ToUpperInvariant()) == "PUBLIC";
+            }
+            else
+            {
+                isBuiltIn = false;
             }
 
-            return false;
+            return isBuiltIn ? SchemaInANewDatabase.BuiltIn : SchemaInANewDatabase.Missing;
+        }
+
+        /// <summary>
+        /// <c>CREATE SCHEMA</c> unless the database already has one by that name, as its collation compares names.
+        /// </summary>
+        private sealed class CreateSqlServerSchemaUnlessItExists : Migration
+        {
+            private readonly string _sql;
+
+            public CreateSqlServerSchemaUnlessItExists(string schemaName, FluentMigrator.Generation.IQuoter quoter)
+            {
+                static string Literal(string value) => "N'" + value.Replace("'", "''") + "'";
+
+                var name = quoter?.UnQuote(quoter.QuoteSchemaName(schemaName)) ?? schemaName;
+                var create = "CREATE SCHEMA " + (quoter?.QuoteSchemaName(schemaName) ?? schemaName);
+
+                // CREATE SCHEMA must be alone in its batch, hence EXEC.
+                _sql = $"IF SCHEMA_ID({Literal(name)}) IS NULL EXEC({Literal(create)});";
+            }
+
+            public override void Up()
+            {
+                Execute.Sql(_sql);
+            }
+
+            public override void Down()
+            {
+            }
         }
 
         [Flags]

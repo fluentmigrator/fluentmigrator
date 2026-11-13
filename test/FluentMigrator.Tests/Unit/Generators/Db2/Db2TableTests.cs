@@ -114,7 +114,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE TestSchema.TestTable1 (TestColumn1 INTEGER NOT NULL AS IDENTITY, TestColumn2 INTEGER NOT NULL);");
+            result.ShouldBe("CREATE TABLE TestSchema.TestTable1 (TestColumn1 INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY, TestColumn2 INTEGER NOT NULL);");
         }
 
         [Test]
@@ -123,7 +123,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 INTEGER NOT NULL AS IDENTITY, TestColumn2 INTEGER NOT NULL);");
+            result.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY, TestColumn2 INTEGER NOT NULL);");
         }
 
         [Test]

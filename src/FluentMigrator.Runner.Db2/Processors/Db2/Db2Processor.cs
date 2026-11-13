@@ -220,7 +220,19 @@ namespace FluentMigrator.Runner.Processors.DB2
         /// <inheritdoc />
         public override bool SequenceExists(string schemaName, string sequenceName)
         {
-            return false;
+            var conditions = new List<string>
+            {
+                BuildEqualityComparison("SEQNAME", sequenceName),
+                // Not the sequence behind an identity column (SEQTYPE 'I').
+                "SEQTYPE='S'",
+            };
+
+            if (!string.IsNullOrEmpty(schemaName))
+                conditions.Add(BuildEqualityComparison("SEQSCHEMA", schemaName));
+
+            var condition = string.Join(" AND ", conditions);
+
+            return Exists("SELECT SEQNAME FROM SYSCAT.SEQUENCES WHERE {0}", condition);
         }
 
         /// <inheritdoc />

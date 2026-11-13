@@ -407,14 +407,22 @@ namespace FluentMigrator.Tests.Integration.CreationScript
 
             public override void AddProcessor(IMigrationRunnerBuilder builder) => builder.AddDb2();
 
+            // The schemas the example names itself (M0009), folded to upper case as Db2 does with unquoted names.
+            private static readonly string[] _exampleSchemas = ["REPORTING"];
+
             // Creating a Db2 database takes minutes, so the unit of isolation is a schema: unqualified names go to the
-            // connection's CurrentSchema.
+            // connection's CurrentSchema. The example's own schemas are outside it, so two runs against one Db2
+            // server at the same time collide; CI starts a new container for each run.
             public override EmptyDatabase CreateEmptyDatabase(string configuredConnectionString)
             {
                 var name = NewDatabaseName().ToUpperInvariant();
                 using (var connection = CreateConnection(configuredConnectionString))
                 {
                     connection.Open();
+
+                    // Left by a run that stopped before its cleanup, on a reused container.
+                    DropSchemas(connection, _exampleSchemas);
+
                     Execute(connection, $"CREATE SCHEMA {name}");
                 }
 
@@ -427,8 +435,22 @@ namespace FluentMigrator.Tests.Integration.CreationScript
                     {
                         using var connection = CreateConnection(configuredConnectionString);
                         connection.Open();
-                        Execute(connection, $"CALL SYSPROC.ADMIN_DROP_SCHEMA('{name}', NULL, 'ERRORSCHEMA', 'ERRORTABLE')");
+                        DropSchemas(connection, [name, .. _exampleSchemas]);
                     });
+            }
+
+            // With everything in them.
+            private static void DropSchemas(DbConnection connection, IEnumerable<string> schemas)
+            {
+                foreach (var schema in schemas)
+                {
+                    using var command = connection.CreateCommand();
+                    command.CommandText = $"SELECT 1 FROM SYSCAT.SCHEMATA WHERE SCHEMANAME = '{schema}'";
+                    if (command.ExecuteScalar() != null)
+                    {
+                        Execute(connection, $"CALL SYSPROC.ADMIN_DROP_SCHEMA('{schema}', NULL, 'ERRORSCHEMA', 'ERRORTABLE')");
+                    }
+                }
             }
 
             // The Db2 command line processor runs one ';'-terminated statement at a time.

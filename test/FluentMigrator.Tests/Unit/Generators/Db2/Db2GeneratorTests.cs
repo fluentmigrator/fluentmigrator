@@ -55,7 +55,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             expression.Columns[0].Type = DbType.Int64;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 BIGINT NOT NULL AS IDENTITY, TestColumn2 INTEGER NOT NULL);");
+            result.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY, TestColumn2 INTEGER NOT NULL);");
         }
 
         [Test]

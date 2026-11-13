@@ -107,10 +107,46 @@ namespace FluentMigrator.Tests.Unit.ConnectionlessPreview
             Assert.That(script, Does.Contain("CREATE TABLE [dbo].[Users]"));
         }
 
+        /// <summary>
+        /// Nothing runs, so there is nothing to protect from a breaking change, as in preview mode.
+        /// </summary>
+        [Test]
+        public void ScriptsABreakingChangeWithoutPreviewMode()
+        {
+            var script = GenerateScript(
+                builder => builder.AddSqlServer2016(),
+                options => options.PreviewFromNothing = true,
+                previewOnly: false,
+                typeFilterNamespace: typeof(WithBreakingChange.DropLegacyTable).Namespace);
+
+            Assert.That(script, Does.Contain("CREATE TABLE [dbo].[VersionInfo]"));
+            Assert.That(script, Does.Contain("DROP TABLE [dbo].[Legacy]"));
+        }
+
+        /// <summary>
+        /// SQL Server compares schema names by the database collation, which a script can't know: <c>DBO</c> is
+        /// <c>dbo</c> in a case-insensitive database and a new schema in a case-sensitive one. So the script asks the
+        /// database.
+        /// </summary>
+        [Test]
+        public void LeavesDboInAnotherCaseToTheDatabaseCollation()
+        {
+            var script = GenerateScript(
+                builder => builder.AddSqlServer2016(),
+                PreviewFromNothingWithoutConnection,
+                previewOnly: true,
+                configureServices: services => services.AddSingleton<IConventionSet>(new DefaultConventionSet("DBO", null)));
+
+            const string createSchema = "IF SCHEMA_ID(N'DBO') IS NULL EXEC(N'CREATE SCHEMA [DBO]');";
+            var createSchemaIndex = script.IndexOf(createSchema, StringComparison.Ordinal);
+            Assert.That(createSchemaIndex, Is.GreaterThanOrEqualTo(0), script);
+            Assert.That(script.IndexOf("CREATE TABLE [DBO].[VersionInfo]", StringComparison.Ordinal), Is.GreaterThan(createSchemaIndex), script);
+            Assert.That(script.Replace(createSchema, ""), Does.Not.Contain("CREATE SCHEMA"), script);
+        }
+
         private static IEnumerable<TestCaseData> BuiltInSchemaCases()
         {
             yield return SchemaCase("SqlServer2016 dbo", builder => builder.AddSqlServer2016(), null, "dbo", "CREATE TABLE [dbo].[VersionInfo]");
-            yield return SchemaCase("SqlServer2016 DBO", builder => builder.AddSqlServer2016(), null, "DBO", "CREATE TABLE [DBO].[VersionInfo]");
             yield return SchemaCase("Postgres15_0 public", builder => builder.AddPostgres15_0(), null, "public", "CREATE TABLE \"public\".\"VersionInfo\"");
             yield return SchemaCase("Postgres15_0 unquoted PUBLIC", builder => builder.AddPostgres15_0(), PostgresQuotingOff, "PUBLIC", "CREATE TABLE PUBLIC.VersionInfo");
             yield return SchemaCase("Snowflake unquoted public", builder => builder.AddSnowflake(), null, "public", "CREATE TABLE public.VersionInfo");
@@ -473,6 +509,24 @@ namespace FluentMigrator.Tests.Unit.ConnectionlessPreview.WithBeforeAllMaintenan
         public string AppliedOnColumnName => "AppliedOn";
 
         public bool CreateWithPrimaryKey => false;
+    }
+}
+
+namespace FluentMigrator.Tests.Unit.ConnectionlessPreview.WithBreakingChange
+{
+    // A separate namespace, so the provider snapshots above don't pick it up.
+
+    [Migration(1, BreakingChange = true)]
+    public class DropLegacyTable : Migration
+    {
+        public override void Up()
+        {
+            Delete.Table("Legacy");
+        }
+
+        public override void Down()
+        {
+        }
     }
 }
 

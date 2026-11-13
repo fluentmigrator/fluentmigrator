@@ -119,7 +119,8 @@ namespace FluentMigrator.Runner.Generators.DB2
 
         protected override string FormatIdentity(ColumnDefinition column)
         {
-            return column.IsIdentity ? "AS IDENTITY" : string.Empty;
+            // As Oracle 12c and PostgreSQL 10 have it. Db2 has no bare AS IDENTITY.
+            return column.IsIdentity ? "GENERATED ALWAYS AS IDENTITY" : string.Empty;
         }
 
         protected override string FormatNullable(ColumnDefinition column)
