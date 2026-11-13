@@ -41,7 +41,8 @@ Integration tests for the following databases can be enabled:
 * Oracle (`TestConnectionStrings:Oracle`)
 * Firebird (`TestConnectionStrings:Firebird`)
 * Db2 (`TestConnectionStrings:DB2`; 64-bit only). On Linux, IBM's provider needs its native client on the library
-  path: `export LD_LIBRARY_PATH=$PWD/test/FluentMigrator.Tests/bin/Debug/net8.0/clidriver/lib`
+  path, `export LD_LIBRARY_PATH=$PWD/test/FluentMigrator.Tests/bin/Debug/net8.0/clidriver/lib`, and that client
+  needs `libxml2.so.2`, which Ubuntu 26.04 no longer has (24.04 does)
 
 ### User secrets usage
 

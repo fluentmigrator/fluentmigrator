@@ -42,7 +42,10 @@ env:
 jobs:
   build:
     name: Build & Test
-    runs-on: ${{ matrix.os }}
+    # With Db2 (named, or in "all"), the Linux leg runs on Ubuntu 24.04: IBM's Db2 client links libxml2.so.2,
+    # and Ubuntu 26.04 ships only libxml2.so.16. contains() ignores case. The fallback must match the one in the
+    # "Choose database containers" step.
+    runs-on: ${{ (matrix.os == 'ubuntu-latest' && (contains(inputs.containers || 'default', 'db2') || contains(inputs.containers || 'default', 'all'))) && 'ubuntu-24.04' || matrix.os }}
     permissions:
       checks: write
       issues: write
@@ -184,6 +187,10 @@ jobs:
         done
         # IBM's provider loads libdb2.so from clidriver/lib, which the loader doesn't search unless told to.
         if grep -qx DB2 <<< "$names"; then
+          if ! ldconfig -p | grep -q 'libxml2\.so\.2 '; then
+            echo "::error::Db2's client needs libxml2.so.2, which $(. /etc/os-release; echo "$PRETTY_NAME") doesn't have. See runs-on."
+            exit 1
+          fi
           echo "LD_LIBRARY_PATH=$DB2_CLIDRIVER_LIB${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" >> "$GITHUB_ENV"
         fi
         echo "Database containers: $(echo ${names:-none} | sed 's/ /, /g')" | tee -a "$GITHUB_STEP_SUMMARY"
