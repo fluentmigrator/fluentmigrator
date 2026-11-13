@@ -38,6 +38,13 @@ The built site will be in `.vitepress/dist/`
 npm run docs:preview
 ```
 
+### Dependency overrides
+
+VitePress 1.x depends on Vite 5, which (together with its bundled esbuild) has known
+security advisories that are only fixed in Vite 6.4.6+. `package.json` therefore uses an
+npm `overrides` entry to force a patched Vite 6 release. Remove the override once
+VitePress ships a stable release that depends on a patched Vite on its own.
+
 ## Contributing
 
 To contribute to the documentation:
