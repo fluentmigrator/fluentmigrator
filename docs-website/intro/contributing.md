@@ -39,6 +39,10 @@ Integration tests for the following databases can be enabled:
 * SQL Server (`TestConnectionStrings:SqlServer2016`)
 * MySQL (`TestConnectionStrings:MySql`)
 * Oracle (`TestConnectionStrings:Oracle`)
+* Firebird (`TestConnectionStrings:Firebird`)
+* Db2 (`TestConnectionStrings:DB2`; 64-bit only). On Linux, IBM's provider needs its native client on the library
+  path, `export LD_LIBRARY_PATH=$PWD/test/FluentMigrator.Tests/bin/Debug/net8.0/clidriver/lib`, and that client
+  needs `libxml2.so.2`, which Ubuntu 26.04 no longer has (24.04 does)
 
 ### User secrets usage
 
@@ -61,6 +65,23 @@ export FM_TestConnectionStrings__Postgres__IsEnabled=true
 ```
 
 When you run the unit tests, the enabled integration tests are run as well.
+
+### In CI
+
+The pull-request workflow (`.github/workflows/pull-requests.yaml`) starts the SQL Server, PostgreSQL, MySQL and Oracle
+containers on its Linux leg. To run it with other containers, start it from the Actions tab (**Pull Requests**, **Run
+workflow**) or with the GitHub CLI, and list them in `containers`:
+
+```bash
+# The pull-request containers, plus Db2
+gh workflow run pull-requests.yaml --ref my-branch -f containers=default,DB2
+
+# Db2 alone
+gh workflow run pull-requests.yaml --ref my-branch -f containers=DB2
+```
+
+The names are the `TestConnectionStrings` keys above. `default` stands for the pull-request set, `all` for every
+container, and `none` for none. The **Monthly Integration Tests** workflow runs with `all` on the first of each month.
 
 # How to create NuGet packages
 

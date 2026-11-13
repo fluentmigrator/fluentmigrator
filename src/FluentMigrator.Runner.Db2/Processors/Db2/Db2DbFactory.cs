@@ -32,13 +32,17 @@ namespace FluentMigrator.Runner.Processors.DB2
     {
         private static readonly TestEntry[] _testEntries =
         {
-            // We no longer ship assemblies for DB2 on .NET Framework, as we are moving away from saving third party assemblies in the repository,
-            // but we will attempt to provide loading support.
+            // Assembly names, not package names: the Net.IBM.Data.Db2 package and its -lnx and -osx variants all
+            // ship IBM.Data.Db2.dll. We no longer ship assemblies for DB2 on .NET Framework, as we are moving away
+            // from saving third party assemblies in the repository, but we will attempt to provide loading support.
 #if NETFRAMEWORK
-            new TestEntry("Net.IBM.Data.Db2", "Net.IBM.Data.Db2.DB2Factory", () => Type.GetType("Net.IBM.Data.Db2.DB2Factory, Net.IBM.Data.Db2")),
+            // The Db2 client's .NET Framework provider.
+            new TestEntry("IBM.Data.DB2", "IBM.Data.DB2.DB2Factory", () => Type.GetType("IBM.Data.DB2.DB2Factory, IBM.Data.DB2")),
 #else
-            new TestEntry("Net.IBM.Data.DB2.Core", "Net.IBM.Data.DB2.Core.DB2Factory", () => Type.GetType("Net.IBM.Data.DB2.Core.DB2Factory, Net.IBM.Data.DB2.Core")),
-            new TestEntry("Net.IBM.Data.DB2", "Net.IBM.Data.DB2.DB2Factory", () => Type.GetType("Net.IBM.Data.DB2.DB2Factory, Net.IBM.Data.DB2")),
+            // Net.IBM.Data.Db2, IBM's current provider.
+            new TestEntry("IBM.Data.Db2", "IBM.Data.Db2.DB2Factory", () => Type.GetType("IBM.Data.Db2.DB2Factory, IBM.Data.Db2")),
+            // The older IBM.Data.DB2.Core package it replaced.
+            new TestEntry("IBM.Data.DB2.Core", "IBM.Data.DB2.Core.DB2Factory", () => Type.GetType("IBM.Data.DB2.Core.DB2Factory, IBM.Data.DB2.Core")),
 #endif
         };
 

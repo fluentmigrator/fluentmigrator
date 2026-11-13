@@ -39,6 +39,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - `FluentMigrator.DotNet.Cli` no longer depends on AutoMapper. The single `MigratorOptions` copy it performed is now generated at compile time by [Mapperly](https://mapperly.riok.app/), which removes a runtime dependency from `dotnet-fm` along with AutoMapper 15's commercial licence requirement and [CVE-2026-32933](https://github.com/advisories/GHSA-rvv3-g6hj-g44x). `Setup.BuildServiceProvider` no longer registers `AutoMapper.IMapper` in the service collection.
 - The repository moved to NuGet Central Package Management. All package versions now live in `Directory.Packages.props` at the repository root; project files declare package references without a `Version` attribute. This is a build-infrastructure change only - the versions the shipped packages depend on are unchanged.
 - Processor constructors taking an `IConnectionStringAccessor` are obsolete; use the overloads taking an `IMigrationConnectionFactory` instead.
+- Db2 finds its provider again. The factory looked for assemblies named `Net.IBM.Data.DB2.Core` and `Net.IBM.Data.DB2`, but `Net.IBM.Data.Db2` is the package name; the package (and its `-lnx` and `-osx` variants) ships `IBM.Data.Db2.dll`. On .NET it now loads `IBM.Data.Db2`, then the older `IBM.Data.DB2.Core`; on .NET Framework, the Db2 client's `IBM.Data.DB2`; and Db2 for i, `IBM.Data.DB2.iSeries` again. Not in a release: the names changed during 9.0 development. Found by the Db2 container that PR #2441 runs monthly
 
 ### Contributors
 
