@@ -159,7 +159,7 @@ jobs:
         # Where Net.IBM.Data.Db2-lnx copies IBM's native client (clidriver) when the tests are built.
         DB2_CLIDRIVER_LIB: ${{ github.workspace }}/test/FluentMigrator.Tests/bin/${{ env.buildConfiguration }}/${{ matrix.dotnet-tfm }}/clidriver/lib
       run: |
-        default=(SqlServer2016 Postgres MySql Oracle)
+        default=(SqlServer2016 Postgres MySql Oracle Firebird)
         all=(SqlServer2016 Postgres MySql Oracle Firebird DB2)
         chosen=()
         set -f # A '*' in the input is a typo, not a glob.
@@ -303,6 +303,9 @@ jobs:
       with:
         # Relative glob, not "$GITHUB_WORKSPACE/..." — see note above.
         files: "**/*.trx"
+        # A run started by hand or by the monthly workflow publishes under its own name, e.g. "Test Results (DB2)",
+        # so it doesn't replace the "Test Results" check of a pull request on the same commit.
+        check_name: ${{ (github.event_name == 'pull_request' || github.event_name == 'push') && 'Test Results' || format('Test Results ({0})', inputs.containers || 'default') }}
 
     - name: Diagnostics (Linux)
       if: matrix.os == 'ubuntu-latest' && failure()

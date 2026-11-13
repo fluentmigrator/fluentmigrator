@@ -74,16 +74,16 @@ dotnet fm migrate [options]
 | `--version` | `-v` | Target version | No |
 | `--profile` | | Profile name to execute | No |
 | `--tag` | `-t` | Filter by tag | No |
-| `--output` | `-o` | Output SQL to console | No |
-| `--outputFileName` | | Output file name | No |
+| `--output[=<FILENAME>]` | `-o` | Write the SQL to a file, `<assembly name>.sql` unless a file name is given | No |
 | `--preview` | | Preview without execution | No |
 | `--steps` | `-s` | Number of migration steps | No |
 | `--workingDirectory` | `-w` | Working directory | No |
 | `--timeout` | | Command timeout (seconds) | No |
 | `--transaction-mode` | | Transaction behavior | No |
 | `--allowDirtyAssemblies` | | Allow version mismatches | No |
-| `--startVersion` | | Start from version | No |
-| `--noConnection` | | Validate without connecting | No |
+| `--start-version` | | Start from version (connectionless only) | No |
+| `--no-connection` | | Generate SQL without connecting to a database | No |
+| `--preview-from-nothing` | | With `--no-connection --preview`, also emit the SQL that creates the version table, as for an empty database. `migrate` only: `rollback`, `migrate down`, `list migrations` and `validate versions` reject it | No |
 | `--help` | `-h` | Show help | No |
 
 ### Processor and generator selection
@@ -236,7 +236,7 @@ dotnet fm migrate -p sqlserver -c "$PROD_CONNECTION_STRING" -a "MyApp.dll" --pro
 ### Output SQL Script
 ```bash
 # Generate SQL script without execution
-dotnet fm migrate -p sqlserver -c "..." -a "MyApp.dll" --output --outputFileName "migration-script.sql"
+dotnet fm migrate -p sqlserver -c "..." -a "MyApp.dll" --preview --output=migration-script.sql
 ```
 
 ### Preview Mode
@@ -334,6 +334,22 @@ jobs:
       comment_header: fluentmigrator-preview-${{ matrix.processor }}
     secrets:
       connection_string: ${{ secrets[matrix.connectionStringSecret] }}
+```
+
+By default each preview reads the database behind `connection_string`, so it shows only the migrations that
+database hasn't applied yet. To preview without a database, set `preview_from_nothing: true` (dotnet-fm 9.0+).
+The workflow then adds `--no-connection --preview-from-nothing`, so each preview is the full script for an
+empty database: the version table, then every migration. The connection string becomes optional:
+
+```yaml
+jobs:
+  preview:
+    uses: fluentmigrator/fluentmigrator/.github/workflows/migration-preview.yml@main
+    with:
+      processor: postgres
+      migration_project: src/MyApp.Migrations/MyApp.Migrations.csproj
+      migration_assembly: src/MyApp.Migrations/bin/Release/net8.0/MyApp.Migrations.dll
+      preview_from_nothing: true
 ```
 
 ### Azure DevOps Pipeline

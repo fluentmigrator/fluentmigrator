@@ -28,7 +28,7 @@ See `TokenSubstitutionMatrix.md` for what each column means.
 | byte(uncased) | `7` | `7` | `7` |
 | SystemMethods | `CurrentDateTime` | `LOCALTIMESTAMP` | `LOCALTIMESTAMP` |
 | Enum | `Tuesday` | `'Tuesday'` | `'Tuesday'` |
-| byte[] | `System.Byte[]` | `0xdead` | `0xdead` |
+| byte[] | `System.Byte[]` | `hextoraw('DEAD')` | `hextoraw('DEAD')` |
 | TimeSpan | `01:02:03` | `'0 1:2:3.0'` | `'0 1:2:3.0'` |
 | RawSql | `CURRENT_TIMESTAMP` | `CURRENT_TIMESTAMP` | `CURRENT_TIMESTAMP` |
 | RawSql+backslash | `c REGEXP '\d+'` | `c REGEXP '\d+'` | `c REGEXP '\d+'` |
@@ -60,7 +60,7 @@ See `TokenSubstitutionMatrix.md` for what each column means.
 | byte(uncased) | `7` | `7` | `7` |
 | SystemMethods | `CurrentDateTime` | `LOCALTIMESTAMP` | `LOCALTIMESTAMP` |
 | Enum | `Tuesday` | `'Tuesday'` | `'Tuesday'` |
-| byte[] | `System.Byte[]` | `0xdead` | `0xdead` |
+| byte[] | `System.Byte[]` | `hextoraw('DEAD')` | `hextoraw('DEAD')` |
 | TimeSpan | `01:02:03` | `'0 1:2:3.0'` | `'0 1:2:3.0'` |
 | RawSql | `CURRENT_TIMESTAMP` | `CURRENT_TIMESTAMP` | `CURRENT_TIMESTAMP` |
 | RawSql+backslash | `c REGEXP '\d+'` | `c REGEXP '\d+'` | `c REGEXP '\d+'` |
@@ -92,7 +92,7 @@ See `TokenSubstitutionMatrix.md` for what each column means.
 | byte(uncased) | `7` | `7` | `7` |
 | SystemMethods | `CurrentDateTime` | `LOCALTIMESTAMP` | `LOCALTIMESTAMP` |
 | Enum | `Tuesday` | `'Tuesday'` | `'Tuesday'` |
-| byte[] | `System.Byte[]` | `0xdead` | `0xdead` |
+| byte[] | `System.Byte[]` | `hextoraw('DEAD')` | `hextoraw('DEAD')` |
 | TimeSpan | `01:02:03` | `'0 1:2:3.0'` | `'0 1:2:3.0'` |
 | RawSql | `CURRENT_TIMESTAMP` | `CURRENT_TIMESTAMP` | `CURRENT_TIMESTAMP` |
 | RawSql+backslash | `c REGEXP '\d+'` | `c REGEXP '\d+'` | `c REGEXP '\d+'` |
@@ -124,7 +124,7 @@ See `TokenSubstitutionMatrix.md` for what each column means.
 | byte(uncased) | `7` | `7` | `7` |
 | SystemMethods | `CurrentDateTime` | `LOCALTIMESTAMP` | `LOCALTIMESTAMP` |
 | Enum | `Tuesday` | `'Tuesday'` | `'Tuesday'` |
-| byte[] | `System.Byte[]` | `0xdead` | `0xdead` |
+| byte[] | `System.Byte[]` | `hextoraw('DEAD')` | `hextoraw('DEAD')` |
 | TimeSpan | `01:02:03` | `'0 1:2:3.0'` | `'0 1:2:3.0'` |
 | RawSql | `CURRENT_TIMESTAMP` | `CURRENT_TIMESTAMP` | `CURRENT_TIMESTAMP` |
 | RawSql+backslash | `c REGEXP '\d+'` | `c REGEXP '\d+'` | `c REGEXP '\d+'` |
@@ -156,7 +156,7 @@ See `TokenSubstitutionMatrix.md` for what each column means.
 | byte(uncased) | `7` | `7` | `7` |
 | SystemMethods | `CurrentDateTime` | `LOCALTIMESTAMP` | `LOCALTIMESTAMP` |
 | Enum | `Tuesday` | `'Tuesday'` | `'Tuesday'` |
-| byte[] | `System.Byte[]` | `0xdead` | `0xdead` |
+| byte[] | `System.Byte[]` | `hextoraw('DEAD')` | `hextoraw('DEAD')` |
 | TimeSpan | `01:02:03` | `'0 1:2:3.0'` | `'0 1:2:3.0'` |
 | RawSql | `CURRENT_TIMESTAMP` | `CURRENT_TIMESTAMP` | `CURRENT_TIMESTAMP` |
 | RawSql+backslash | `c REGEXP '\d+'` | `c REGEXP '\d+'` | `c REGEXP '\d+'` |
@@ -188,7 +188,7 @@ See `TokenSubstitutionMatrix.md` for what each column means.
 | byte(uncased) | `7` | `7` | `7` |
 | SystemMethods | `CurrentDateTime` | `LOCALTIMESTAMP` | `LOCALTIMESTAMP` |
 | Enum | `Tuesday` | `'Tuesday'` | `'Tuesday'` |
-| byte[] | `System.Byte[]` | `0xdead` | `0xdead` |
+| byte[] | `System.Byte[]` | `hextoraw('DEAD')` | `hextoraw('DEAD')` |
 | TimeSpan | `01:02:03` | `'0 1:2:3.0'` | `'0 1:2:3.0'` |
 | RawSql | `CURRENT_TIMESTAMP` | `CURRENT_TIMESTAMP` | `CURRENT_TIMESTAMP` |
 | RawSql+backslash | `c REGEXP '\d+'` | `c REGEXP '\d+'` | `c REGEXP '\d+'` |

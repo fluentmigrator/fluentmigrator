@@ -28,6 +28,7 @@ using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Exceptions;
 using FluentMigrator.Runner.Exceptions;
 using FluentMigrator.Runner.Processors;
+using FluentMigrator.Runner.Versioning;
 
 using JetBrains.Annotations;
 
@@ -283,6 +284,12 @@ namespace FluentMigrator.Runner
             set => _currentVersionLoader = value;
         }
 
+        /// <summary>
+        /// Whether this run only logs SQL: preview mode, or the connectionless processor, which has no database to
+        /// run it against.
+        /// </summary>
+        private bool ExecutesNothing => _processorOptions.PreviewOnly || Processor is ConnectionlessProcessor;
+
         private bool AllowBreakingChanges =>
 #pragma warning disable 612
             _options?.AllowBreakingChange ?? false;
@@ -339,6 +346,8 @@ namespace FluentMigrator.Runner
         /// <param name="useAutomaticTransactionManagement"><c>true</c> if automatic transaction management should be used</param>
         public void MigrateUp(long targetVersion, bool useAutomaticTransactionManagement)
         {
+            var previewFromNothing = IsPreviewFromNothing();
+
             // Validate connection early to catch invalid connection strings before attempting migrations
             ValidateConnection();
 
@@ -347,6 +356,13 @@ namespace FluentMigrator.Runner
                 try
                 {
                     ApplyMaintenance(MigrationStage.BeforeAll, useAutomaticTransactionManagement);
+
+                    // After BeforeAll, as in a live run, where the version table is created when the version
+                    // loader is first used below. A BeforeAll migration may create the schema the table lives in.
+                    if (previewFromNothing)
+                    {
+                        ApplyVersionTableMigrationsFromNothing();
+                    }
 
                     // The list of migrations to apply must be computed after the BeforeAll maintenance
                     // migrations have run (e.g. after acquiring a lock), so that any migrations already
@@ -428,6 +444,8 @@ namespace FluentMigrator.Runner
         /// <param name="useAutomaticTransactionManagement"><c>true</c> if automatic transaction management should be used</param>
         public void MigrateDown(long targetVersion, bool useAutomaticTransactionManagement)
         {
+            RejectPreviewFromNothing("migrate down");
+
             // Another process may have applied or reverted migrations since the version info was last loaded,
             // for example while this one waited for the application lock.
             VersionLoader.LoadVersionInfo();
@@ -558,8 +576,9 @@ namespace FluentMigrator.Runner
                 {
                     try
                     {
+                        // Scripting a breaking change doesn't break anything.
                         if (migrationInfo.IsAttributed() && migrationInfo.IsBreakingChange &&
-                            !_processorOptions.PreviewOnly && !AllowBreakingChanges)
+                            !ExecutesNothing && !AllowBreakingChanges)
                         {
                             throw new InvalidOperationException(
                                 string.Format(
@@ -659,6 +678,8 @@ namespace FluentMigrator.Runner
         /// <param name="useAutomaticTransactionManagement"><c>true</c> if automatic transaction management should be used</param>
         public void Rollback(int steps, bool useAutomaticTransactionManagement)
         {
+            RejectPreviewFromNothing("roll back");
+
             // Another process may have applied or reverted migrations since the version info was last loaded,
             // for example while this one waited for the application lock.
             VersionLoader.LoadVersionInfo();
@@ -717,6 +738,8 @@ namespace FluentMigrator.Runner
         /// <param name="useAutomaticTransactionManagement"><c>true</c> if automatic transaction management should be used</param>
         public void RollbackToVersion(long version, bool useAutomaticTransactionManagement)
         {
+            RejectPreviewFromNothing("roll back");
+
             // Another process may have applied or reverted migrations since the version info was last loaded,
             // for example while this one waited for the application lock.
             VersionLoader.LoadVersionInfo();
@@ -861,6 +884,8 @@ namespace FluentMigrator.Runner
         /// <inheritdoc />
         public void ValidateVersionOrder()
         {
+            RejectPreviewFromNothing("validate the version order");
+
             var unappliedVersions = MigrationLoader.LoadMigrations().Where(kvp => MigrationVersionLessThanGreatestAppliedMigration(kvp.Key)).ToList();
             if (unappliedVersions.Any())
             {
@@ -873,6 +898,8 @@ namespace FluentMigrator.Runner
         /// <inheritdoc />
         public void ListMigrations()
         {
+            RejectPreviewFromNothing("list migrations");
+
             var currentVersionInfo = VersionLoader.VersionInfo;
             var currentVersion = currentVersionInfo.Latest();
 
@@ -990,6 +1017,217 @@ namespace FluentMigrator.Runner
         public IMigrationScope BeginScope()
         {
             return _migrationScopeManager.BeginScope();
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether <see cref="RunnerOptions.PreviewFromNothing"/> applies to this run.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// The option is combined with something that contradicts its assumption of an empty database.
+        /// </exception>
+        private bool IsPreviewFromNothing()
+        {
+            if (!_options.PreviewFromNothing)
+            {
+                return false;
+            }
+
+            // Same test as the one that selects the connectionless version loader. With a connection, the version
+            // table that the database actually has is used instead.
+            var isConnectionless = _options.NoConnection
+             || _serviceProvider?.GetService<IMigrationConnectionFactory>()?.HasConnection == false;
+
+            if (!isConnectionless)
+            {
+                throw new InvalidOperationException(
+                    $"{nameof(RunnerOptions.PreviewFromNothing)} previews the script for an empty database, so it requires connectionless mode. "
+                  + $"Set {nameof(RunnerOptions.NoConnection)} (--no-connection) or remove the connection string.");
+            }
+
+            // NoConnection only replaces the version loader. When a connection string is still present (the console
+            // runner falls back to one), the processor is a real one and would run the version table DDL against
+            // that database. Only the connectionless processor, or preview mode, guarantees nothing is executed.
+            if (!ExecutesNothing)
+            {
+                throw new InvalidOperationException(
+                    $"{nameof(RunnerOptions.PreviewFromNothing)} only previews SQL, but this run would execute it against a database. "
+                  + $"Set {nameof(ProcessorOptions.PreviewOnly)} (--preview).");
+            }
+
+            if (_options.StartVersion > 0)
+            {
+                throw new InvalidOperationException(
+                    $"{nameof(RunnerOptions.PreviewFromNothing)} previews the script for an empty database, but "
+                  + $"{nameof(RunnerOptions.StartVersion)} {_options.StartVersion} treats the migrations before it as applied. Use one or the other.");
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Rejects <see cref="RunnerOptions.PreviewFromNothing"/> for an operation other than migrating up: reverting
+        /// migrations, listing them or validating their order.
+        /// </summary>
+        /// <remarks>
+        /// An empty database has nothing to revert, list or validate, and none of the checks in
+        /// <see cref="IsPreviewFromNothing"/> run here, so with a connection string and without preview mode the
+        /// operation would otherwise run against the database. Called before the version loader is first used,
+        /// because a live version loader creates the version table.
+        /// </remarks>
+        /// <param name="operation">What the caller does, for the message: "roll back", "list migrations".</param>
+        /// <exception cref="InvalidOperationException"><see cref="RunnerOptions.PreviewFromNothing"/> is set.</exception>
+        private void RejectPreviewFromNothing(string operation)
+        {
+            if (_options.PreviewFromNothing)
+            {
+                throw new InvalidOperationException(
+                    $"{nameof(RunnerOptions.PreviewFromNothing)} previews migrating an empty database up, so it can't be used to {operation}. "
+                  + $"Remove {nameof(RunnerOptions.PreviewFromNothing)} (--preview-from-nothing).");
+            }
+        }
+
+        /// <summary>
+        /// Emits what <see cref="FluentMigrator.Runner.VersionLoader.LoadVersionInfo"/> would create in an empty database: the version
+        /// schema (only when the version table owns it and the database doesn't already have it), the table, its unique
+        /// index and its extra columns.
+        /// </summary>
+        /// <remarks>
+        /// Goes through <see cref="Up(IMigration)"/>, so no version rows are recorded for these migrations.
+        /// </remarks>
+        private void ApplyVersionTableMigrationsFromNothing()
+        {
+            var metaData = VersionLoader.VersionTableMetaData;
+
+            if (metaData.OwnsSchema)
+            {
+                switch (GetSchemaInANewDatabase(metaData.SchemaName))
+                {
+                    case SchemaInANewDatabase.Missing:
+                        Up(new VersionSchemaMigration(metaData));
+                        break;
+                    case SchemaInANewDatabase.DboByCollation:
+                        Up(new CreateSqlServerSchemaUnlessItExists(metaData.SchemaName, Processor.Quoter));
+                        break;
+                }
+            }
+
+            Up(new VersionMigration(metaData));
+            Up(new VersionUniqueMigration(metaData));
+            Up(new VersionDescriptionMigration(metaData));
+        }
+
+        private enum SchemaInANewDatabase
+        {
+            /// <summary>The script creates it.</summary>
+            Missing,
+
+            /// <summary>Every new database has it, so <c>CREATE SCHEMA</c> would fail.</summary>
+            BuiltIn,
+
+            /// <summary>
+            /// SQL Server, and <c>dbo</c> in another case: the same schema in a case-insensitive database, a new one in
+            /// a case-sensitive database.
+            /// </summary>
+            DboByCollation,
+        }
+
+        /// <summary>
+        /// Whether a new database already has <paramref name="schemaName"/>: <c>dbo</c> on SQL Server, <c>public</c>
+        /// on PostgreSQL and Redshift, and <c>PUBLIC</c> on Snowflake. A live run checks whether the schema exists; a
+        /// run from nothing can't.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// <see cref="VersionTableInfo.DefaultVersionTableMetaData"/> claims to own whatever schema the default schema
+        /// convention gives it, so setting the default schema to <c>dbo</c> would otherwise emit <c>CREATE SCHEMA [dbo]</c>.
+        /// </para>
+        /// <para>
+        /// The name is compared as the database will read it. A quoted name is case-sensitive; an unquoted one is
+        /// folded, to lower case on PostgreSQL and Redshift and to upper case on Snowflake. So with quoting off,
+        /// <c>PUBLIC</c> on PostgreSQL and <c>public</c> on Snowflake are the built-in schema, and with quoting on they
+        /// are new schemas. SQL Server compares names by the database collation, which the script can't know, so
+        /// <c>DBO</c> is left for the database to decide.
+        /// </para>
+        /// </remarks>
+        private SchemaInANewDatabase GetSchemaInANewDatabase(string schemaName)
+        {
+            if (string.IsNullOrEmpty(schemaName))
+            {
+                return SchemaInANewDatabase.Missing;
+            }
+
+            // The connectionless processor reports the generator's id (SqlServer2016, PostgreSQL15_0, ...) or the
+            // selected processor id; live processors report their own (Postgres, Redshift, Snowflake, ...).
+            var databaseTypes = new List<string> { Processor.DatabaseType };
+            databaseTypes.AddRange(Processor.DatabaseTypeAliases ?? Enumerable.Empty<string>());
+
+            bool Is(string prefix) => databaseTypes.Any(
+                t => t != null && t.StartsWith(prefix, StringComparison.OrdinalIgnoreCase));
+
+            // Without a quoter (a mocked processor), take the name as written.
+            var quoter = Processor.Quoter;
+            var rendered = quoter?.QuoteSchemaName(schemaName);
+            var isQuoted = rendered == null || quoter.IsQuoted(rendered);
+            var name = rendered == null ? schemaName : quoter.UnQuote(rendered);
+
+            bool isBuiltIn;
+
+            if (Is("SqlServer"))
+            {
+                if (name == "dbo")
+                {
+                    return SchemaInANewDatabase.BuiltIn;
+                }
+
+                // SQL Server 2000 has neither SCHEMA_ID nor schemas of its own to create; its generator handles
+                // CREATE SCHEMA as unsupported.
+                return string.Equals(name, "dbo", StringComparison.OrdinalIgnoreCase) && !Is("SqlServer2000")
+                    ? SchemaInANewDatabase.DboByCollation
+                    : SchemaInANewDatabase.Missing;
+            }
+
+            if (Is("Postgres") || Is("Redshift"))
+            {
+                isBuiltIn = (isQuoted ? name : name.ToLowerInvariant()) == "public";
+            }
+            else if (Is("Snowflake"))
+            {
+                isBuiltIn = (isQuoted ? name : name.ToUpperInvariant()) == "PUBLIC";
+            }
+            else
+            {
+                isBuiltIn = false;
+            }
+
+            return isBuiltIn ? SchemaInANewDatabase.BuiltIn : SchemaInANewDatabase.Missing;
+        }
+
+        /// <summary>
+        /// <c>CREATE SCHEMA</c> unless the database already has one by that name, as its collation compares names.
+        /// </summary>
+        private sealed class CreateSqlServerSchemaUnlessItExists : Migration
+        {
+            private readonly string _sql;
+
+            public CreateSqlServerSchemaUnlessItExists(string schemaName, FluentMigrator.Generation.IQuoter quoter)
+            {
+                static string Literal(string value) => "N'" + value.Replace("'", "''") + "'";
+
+                var name = quoter?.UnQuote(quoter.QuoteSchemaName(schemaName)) ?? schemaName;
+                var create = "CREATE SCHEMA " + (quoter?.QuoteSchemaName(schemaName) ?? schemaName);
+
+                // CREATE SCHEMA must be alone in its batch, hence EXEC.
+                _sql = $"IF SCHEMA_ID({Literal(name)}) IS NULL EXEC({Literal(create)});";
+            }
+
+            public override void Up()
+            {
+                Execute.Sql(_sql);
+            }
+
+            public override void Down()
+            {
+            }
         }
 
         [Flags]

@@ -55,7 +55,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             expression.Columns[0].Type = DbType.Int64;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 BIGINT NOT NULL AS IDENTITY, TestColumn2 INTEGER NOT NULL);");
+            result.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 BIGINT NOT NULL GENERATED ALWAYS AS IDENTITY, TestColumn2 INTEGER NOT NULL);");
         }
 
         [Test]
@@ -99,7 +99,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             var expression = new CreateColumnExpression { Column = columnDefinition, TableName = tableName };
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE NewTable ADD COLUMN NewColumn VARGRAPHIC(5) CCSID 1200 NOT NULL DEFAULT (CURRENT_TIMESTAMP - CURRENT_TIMEZONE);");
+            result.ShouldBe("ALTER TABLE NewTable ADD COLUMN NewColumn VARGRAPHIC(5) NOT NULL DEFAULT (CURRENT_TIMESTAMP - CURRENT_TIMEZONE);");
         }
 
         [Test]
@@ -127,7 +127,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             };
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestSchema.TestTable1 ALTER COLUMN TestColumn1 SET DATA TYPE DBCLOB(1048576) CCSID 1200;");
+            result.ShouldBe("ALTER TABLE TestSchema.TestTable1 ALTER COLUMN TestColumn1 SET DATA TYPE DBCLOB(1048576);");
         }
 
         [Test]
@@ -141,7 +141,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             };
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestSchema.TestTable1 ALTER COLUMN TestColumn1 SET DATA TYPE DBCLOB(1048576) CCSID 1200 NOT NULL;");
+            result.ShouldBe("ALTER TABLE TestSchema.TestTable1 ALTER COLUMN TestColumn1 SET DATA TYPE DBCLOB(1048576) NOT NULL;");
         }
 
         [Test]
@@ -202,7 +202,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             };
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestSchema.TestTable1 ALTER COLUMN TestColumn1 SET DATA TYPE DBCLOB(1048576) CCSID 1200 NOT NULL;");
+            result.ShouldBe("ALTER TABLE TestSchema.TestTable1 ALTER COLUMN TestColumn1 SET DATA TYPE DBCLOB(1048576) NOT NULL;");
         }
     }
 }

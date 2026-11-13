@@ -16,8 +16,10 @@
 //
 #endregion
 
+using System.Collections.Generic;
 using System.Linq;
 
+using FluentMigrator.Infrastructure;
 using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Infrastructure;
@@ -57,16 +59,16 @@ namespace FluentMigrator.Tests.Unit.Runners
             _migrationConventions.Setup(x => x.TypeHasMatchingTags).Returns(DefaultMigrationRunnerConventions.Instance.TypeHasMatchingTags);
 #pragma warning restore CS0618
 
-            _maintenanceLoader = ServiceCollectionExtensions.CreateServices()
+            _maintenanceLoader = new WithoutCreationScriptExample(ServiceCollectionExtensions.CreateServices()
                 .Configure<RunnerOptions>(opt => opt.Tags = _tags)
                 .AddSingleton<IMigrationRunnerConventionsAccessor>(new PassThroughMigrationRunnerConventionsAccessor(_migrationConventions.Object))
                 .BuildServiceProvider()
-                .GetRequiredService<IMaintenanceLoader>();
+                .GetRequiredService<IMaintenanceLoader>());
 
-            _maintenanceLoaderNoTags = ServiceCollectionExtensions.CreateServices()
+            _maintenanceLoaderNoTags = new WithoutCreationScriptExample(ServiceCollectionExtensions.CreateServices()
                 .AddSingleton<IMigrationRunnerConventionsAccessor>(new PassThroughMigrationRunnerConventionsAccessor(_migrationConventions.Object))
                 .BuildServiceProvider()
-                .GetRequiredService<IMaintenanceLoader>();
+                .GetRequiredService<IMaintenanceLoader>());
 
             _maintenanceLoaderTypeFilter = ServiceCollectionExtensions.CreateServices()
                 .Configure<TypeFilterOptions>(opt =>
@@ -217,6 +219,25 @@ namespace FluentMigrator.Tests.Unit.Runners
             }
 
             Assert.That(found);
+        }
+
+        /// <summary>
+        /// Two of these loaders scan the whole test assembly. The creation script integration test has an example
+        /// database with maintenance migrations of its own, which these tests don't know about.
+        /// </summary>
+        private sealed class WithoutCreationScriptExample : IMaintenanceLoader
+        {
+            private readonly IMaintenanceLoader _inner;
+
+            public WithoutCreationScriptExample(IMaintenanceLoader inner)
+            {
+                _inner = inner;
+            }
+
+            public IList<IMigrationInfo> LoadMaintenance(MigrationStage stage) =>
+                _inner.LoadMaintenance(stage)
+                    .Where(m => m.Migration.GetType().Namespace != typeof(Integration.CreationScript.Example.ExampleDatabase).Namespace)
+                    .ToList();
         }
     }
 

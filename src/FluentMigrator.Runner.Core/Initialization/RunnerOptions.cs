@@ -93,6 +93,37 @@ namespace FluentMigrator.Runner.Initialization
         public bool NoConnection { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether a connectionless run should also emit the SQL that creates the
+        /// version table, as if the target database were empty
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Without a connection the runner cannot see the database, so by default its script assumes the version
+        /// table already exists. Set this to get a complete script for a new database: <c>BeforeAll</c> maintenance,
+        /// then the version table, its unique index and columns, then every migration. The version table's schema is
+        /// created only when <see cref="VersionTableInfo.IVersionTableMetaData.OwnsSchema"/> is <c>true</c>, and never
+        /// when it is a schema every new database already has (<c>dbo</c> on SQL Server, <c>public</c> on PostgreSQL
+        /// and Redshift, <c>PUBLIC</c> on Snowflake).
+        /// </para>
+        /// <para>
+        /// It applies only in connectionless mode, that is with <see cref="NoConnection"/> or without a connection
+        /// string, and only when nothing can be executed: in preview mode (<see cref="Processors.ProcessorOptions.PreviewOnly"/>),
+        /// or without a connection string, where the processor is connectionless. <see cref="NoConnection"/> on its own
+        /// is not enough, because with a connection string the processor is still a real one.
+        /// </para>
+        /// <para>
+        /// <c>MigrateUp</c> throws <see cref="System.InvalidOperationException"/> otherwise, and also with a
+        /// <see cref="StartVersion"/> greater than zero, which contradicts an empty database.
+        /// </para>
+        /// <para>
+        /// It only applies to migrating up. An empty database has nothing to revert, list or validate, so
+        /// <c>MigrateDown</c>, <c>Rollback</c>, <c>RollbackToVersion</c>, <c>ListMigrations</c> and
+        /// <c>ValidateVersionOrder</c> throw <see cref="System.InvalidOperationException"/> when it is set.
+        /// </para>
+        /// </remarks>
+        public bool PreviewFromNothing { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether untagged maintenance items should always be loaded/executed.
         /// </summary>
         public bool IncludeUntaggedMaintenances { get; set; } = true;

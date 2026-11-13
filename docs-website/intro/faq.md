@@ -557,14 +557,36 @@ dotnet fm migrate -p sqlserver -c "..." -a "MyApp.dll" --preview
 
 ```bash
 # Output SQL to file without executing
-dotnet fm migrate -p sqlserver -c "..." -a "MyApp.dll" --output --outputFileName "migration.sql"
+dotnet fm migrate -p sqlserver -c "..." -a "MyApp.dll" --preview --output=migration.sql
 ```
+
+### Why isn't the VersionInfo table in the script when I use `--no-connection`?
+
+Without a connection the runner can't see the database, so it assumes the version table already exists and scripts only your migrations and the rows they add to it. To script a brand-new database, add `--preview-from-nothing` (9.0+). The script then runs your `BeforeAll` maintenance migrations, creates the version table, its unique index and its columns, and then runs every migration ([#2087](https://github.com/fluentmigrator/fluentmigrator/issues/2087)):
+
+```bash
+# dotnet-fm
+dotnet fm migrate -p SqlServer2016 -a "MyApp.dll" --no-connection --preview --preview-from-nothing --output=create-database.sql
+
+# Console runner
+Migrate.exe --db SqlServer2016 --target "MyApp.dll" --task migrate:up --noConnection --preview --previewFromNothing --output --outputFilename create-database.sql
+```
+
+```xml
+<!-- MSBuild task: Connection is required but never opened -->
+<Migrate Database="SqlServer2016" Connection="Server=.;Database=MyApp" Target="MyApp.dll" NoConnection="true"
+         PreviewOnly="true" PreviewFromNothing="true" Output="true" OutputFilename="create-database.sql" />
+```
+
+The [migration preview workflow](../runners/dotnet-fm.md#github-pull-request-schema-preview) has the same switch: `preview_from_nothing: true`.
+
+In code, set `RunnerOptions.PreviewFromNothing` together with `NoConnection` and `ProcessorOptions.PreviewOnly`. Leaving out the connection string also makes the run connectionless, and then preview mode is optional because nothing can be executed. It throws when the run could execute SQL against a database, with a start version, because a start version contradicts an empty database, and for rollback, migrate down, listing migrations and validating their order, because an empty database has nothing to revert, list or validate. The version table's schema is created only when your `IVersionTableMetaData.OwnsSchema` is `true`, and never when it is one every new database already has (`dbo` on SQL Server, `public` on PostgreSQL and Redshift, `PUBLIC` on Snowflake; an unquoted name counts in any case, because the database folds it). To put the version table in a schema something else owns, create that schema in a `BeforeAll` maintenance migration.
 
 ### Validate Migrations
 
 ```bash
 # Validate without connecting to database
-dotnet fm validate -p sqlserver -c "..." -a "MyApp.dll" --noConnection
+dotnet fm validate -p sqlserver -c "..." -a "MyApp.dll" --no-connection
 ```
 
 ## Common Error Messages

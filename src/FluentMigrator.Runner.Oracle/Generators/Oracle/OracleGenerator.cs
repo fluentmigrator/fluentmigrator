@@ -285,7 +285,9 @@ namespace FluentMigrator.Runner.Generators.Oracle
                 return base.Generate(expression);
             }
 
-            return descriptionStatement;
+            // Ended like every other statement, so a script can hold it. Inside EXECUTE IMMEDIATE, where the
+            // description generator's statements usually go, there is no ';'.
+            return descriptionStatement + ";";
         }
 
         /// <inheritdoc />

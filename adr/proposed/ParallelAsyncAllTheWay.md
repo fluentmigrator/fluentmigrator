@@ -396,6 +396,13 @@ idempotence** (Helland 2012). Therefore:
   idempotent explicitly (`.Idempotent()`), and it generates `IF NOT EXISTS` guards where the
   expressions permit.
 
+`VersionInfoStep` must join the version-table bootstrap list, not just `VersionLoader`. Since 9.0,
+`RunnerOptions.PreviewFromNothing` (`--preview-from-nothing`, #2087) makes a connectionless preview
+emit the journal DDL for an empty database through `MigrationRunner.ApplyVersionTableMigrationsFromNothing()`.
+If the step table is created only by the live loader, that script stops creating every table the run
+needs. AsyncAllTheWay D4 asks for one internal list of the journal-creating migrations, shared by both
+paths. Adding the step table to that list keeps the preview complete.
+
 On partial failure, the default is **forward recovery**: keep the targets that succeeded and retry
 the rest. The alternative is **backward recovery** through compensation, i.e. running `Down` on the
 succeeded targets, a saga (Garcia-Molina & Salem 1987). It is offered only when the migration's

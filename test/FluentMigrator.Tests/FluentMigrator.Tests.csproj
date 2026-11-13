@@ -73,6 +73,15 @@
     <ProjectReference Include="..\..\src\FluentMigrator.Console\FluentMigrator.Console.csproj" />
     <!-- FluentMigrator.DotNet.Cli only targets .NET (net8.0 and newer), so it cannot be referenced from the net48 test run. -->
     <ProjectReference Include="..\..\src\FluentMigrator.DotNet.Cli\FluentMigrator.DotNet.Cli.csproj" Condition=" '$(TargetFramework)' != 'net48' " />
+    <!--
+      The task project excludes MSBuild's runtime assets (MSBuild supplies them), so the tests reference the package
+      themselves to run the task in-process. Microsoft.Build 17.12 and later ship runtime assemblies only for net472
+      and net9.0+; on net8.0 they resolve to a reference-only netstandard2.0 assembly, so the net8.0 run uses 17.11,
+      the last release with a net8.0 runtime assembly. Both carry assembly version 15.1.0.0.
+    -->
+    <ProjectReference Include="..\..\src\FluentMigrator.MSBuild\FluentMigrator.MSBuild.csproj" />
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Condition=" '$(TargetFramework)' != 'net8.0' " />
+    <PackageReference Include="Microsoft.Build.Utilities.Core" VersionOverride="17.11.48" Condition=" '$(TargetFramework)' == 'net8.0' " />
     <ProjectReference Include="..\..\src\FluentMigrator.Runner\FluentMigrator.Runner.csproj" />
     <ProjectReference Include="..\..\src\FluentMigrator.Runner.Core\FluentMigrator.Runner.Core.csproj" />
     <ProjectReference Include="..\..\src\FluentMigrator.Runner.Db2\FluentMigrator.Runner.Db2.csproj" />
@@ -91,6 +100,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="*.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Integration\CreationScript\Example\*.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Unit\Initialization\Fixtures\*.*">

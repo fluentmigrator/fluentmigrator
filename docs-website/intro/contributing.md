@@ -68,7 +68,7 @@ When you run the unit tests, the enabled integration tests are run as well.
 
 ### In CI
 
-The pull-request workflow (`.github/workflows/pull-requests.yaml`) starts the SQL Server, PostgreSQL, MySQL and Oracle
+The pull-request workflow (`.github/workflows/pull-requests.yaml`) starts the SQL Server, PostgreSQL, MySQL, Oracle and Firebird
 containers on its Linux leg. To run it with other containers, start it from the Actions tab (**Pull Requests**, **Run
 workflow**) or with the GitHub CLI, and list them in `containers`:
 

@@ -59,7 +59,7 @@ namespace FluentMigrator.Tests.Unit.Versioning
         }
 
         [Test]
-        public void UpShouldCreateNonClusteredUniqueIndexWhenCreateWithPrimaryKeyIsTrue()
+        public void UpShouldNotCreateUniqueIndexWhenCreateWithPrimaryKeyIsTrue()
         {
             // Arrange
             var versionTableMetaData = new TestVersionTableMetaData { CreateWithPrimaryKey = true };
@@ -71,17 +71,14 @@ namespace FluentMigrator.Tests.Unit.Versioning
             migration.GetUpExpressions(contextMock.Object);
 
             // Assert
-            // Should create non-clustered unique index
-            collectionMock.Verify(x => x.Add(It.Is<CreateIndexExpression>(e => 
-                e.Index.Name == versionTableMetaData.UniqueIndexName &&
-                e.Index.IsUnique &&
-                !e.Index.IsClustered)), Times.Once);
-            
-            // Should add AppliedOn column
-            collectionMock.Verify(x => x.Add(It.Is<CreateColumnExpression>(e => 
+            // The primary key already makes the version unique, and carries the index name (#2051)
+            collectionMock.Verify(x => x.Add(It.IsAny<CreateIndexExpression>()), Times.Never);
+
+            // Should still add AppliedOn column
+            collectionMock.Verify(x => x.Add(It.Is<CreateColumnExpression>(e =>
                 e.Column.Name == versionTableMetaData.AppliedOnColumnName)), Times.Once);
-            
-            collectionMock.Verify(x => x.Add(It.IsAny<IMigrationExpression>()), Times.Exactly(3));
+
+            collectionMock.Verify(x => x.Add(It.IsAny<IMigrationExpression>()), Times.Exactly(2));
         }
 
         private Mock<IMigrationContext> CreateMigrationContext(Mock<ICollection<IMigrationExpression>> collectionMock)

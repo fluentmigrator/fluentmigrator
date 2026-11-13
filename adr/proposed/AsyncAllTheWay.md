@@ -304,6 +304,23 @@ The one unavoidable exception is **user-supplied async code on the sync path**: 
 is blocked on with `Task.Run(() => op(...)).GetAwaiter().GetResult()`, which escapes any captured
 `SynchronizationContext`. This is documented, and analyzer FM0004 flags it.
 
+**The connectionless version-table bootstrap goes into the shared core.** 9.0 added
+`RunnerOptions.PreviewFromNothing` (#2087, PR #2370). `MigrationRunner.MigrateUp(long, bool)` checks it
+in the private `IsPreviewFromNothing()` and then emits the version table through the private
+`ApplyVersionTableMigrationsFromNothing()`. The `MigrateUpCore(bool async, …)` from this decision must
+contain that step exactly once, so `MigrateUp()` and `MigrateUpAsync()` script the same table. Two
+constraints follow:
+
+* The four version-table migrations (`VersionSchemaMigration`, `VersionMigration`,
+  `VersionUniqueMigration` and `VersionDescriptionMigration`) are listed twice, with different
+  guards. `VersionLoader.LoadVersionInfo()` runs each one the database doesn't have yet. The runner
+  helper runs all of them, after `BeforeAll` maintenance, and the schema step only when
+  `IVersionTableMetaData.OwnsSchema` is true and the schema is not a built-in one such as `dbo` or `public`.
+  Phase 0 moves `LoadVersionInfo()` out of the constructor, and that is the natural point to give
+  both a single, internal list.
+* Keep the step private or internal. A public `IVersionLoader.EnsureVersionTable()` would need an
+  `…Async` twin and would break again when Phase 0 lands.
+
 ### D5. Drivers without async support
 
 Each processor declares a `ProcessorAsyncCapabilities` value (flags):
@@ -549,7 +566,10 @@ the test cancels it after one second.
 
 1. **Preview with DB-reading constraints.** Should preview fail (as proposed in D7.6), or should
    `--assume-constraints=true|false` let the DBA hand-off workflow proceed with an explicit,
-   printed assumption?
+   printed assumption? 9.0's `--preview-from-nothing` (#2087) is a precedent for the second option.
+   It is an explicit, named assumption ("the database is empty"). The run throws, rather than
+   ignoring the switch, when the assumption contradicts the run: a connection that could execute SQL,
+   or a start version. An `--assume-constraints` switch should behave the same way.
 2. **Exit code on Windows.** 130 is the POSIX convention. A Ctrl+C-killed process on Windows exits
    with `0xC000013A`. Should Windows use 130 too, for script portability?
 3. **Down and Rollback constraints.** Constraints don't apply to down-migrations today. Should

@@ -17,6 +17,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -439,6 +440,64 @@ namespace FluentMigrator.Tests.Unit.Runners
             const string expectedProviderSwitces = "QuotedIdentifiers=true";
 
             Assert.That(migratorConsole.ProviderSwitches, Is.EquivalentTo(expectedProviderSwitces));
+        }
+
+        /// <summary>
+        /// <c>/previewFromNothing</c> reaches the runner: a connectionless run writes the version table DDL ahead of
+        /// the migrations (#2087).
+        /// </summary>
+        [TestCase(true)]
+        [TestCase(false)]
+        public void PreviewFromNothingWritesTheVersionTableToTheOutputFile(bool previewFromNothing)
+        {
+            var outputFileName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"previewFromNothing-{previewFromNothing}.sql");
+            if (File.Exists(outputFileName))
+            {
+                File.Delete(outputFileName);
+            }
+
+            var args = new List<string>
+            {
+                "/db", Database,
+                "/target", Target,
+                "/noConnection",
+                "/preview",
+                "/output",
+                "/outputFilename", outputFileName,
+                "/namespace", "FluentMigrator.Tests.Unit.ConnectionlessPreview",
+                "/task", "migrate:up",
+            };
+            if (previewFromNothing)
+            {
+                args.Add("/previewFromNothing");
+            }
+
+            var originalOut = System.Console.Out;
+            var originalError = System.Console.Error;
+            var output = new StringWriter();
+            try
+            {
+                System.Console.SetOut(output);
+                System.Console.SetError(output);
+
+                var console = new MigratorConsole();
+                var exitCode = console.Run(args.ToArray());
+
+                System.Console.SetOut(originalOut);
+                System.Console.SetError(originalError);
+
+                exitCode.ShouldBe(0, output.ToString());
+                console.PreviewFromNothing.ShouldBe(previewFromNothing);
+                var script = File.ReadAllText(outputFileName);
+                script.ShouldContain("CREATE TABLE \"Users\"", customMessage: output.ToString());
+                script.Contains("CREATE TABLE \"VersionInfo\"").ShouldBe(previewFromNothing);
+            }
+            finally
+            {
+                System.Console.SetOut(originalOut);
+                System.Console.SetError(originalError);
+                File.Delete(outputFileName);
+            }
         }
     }
 }

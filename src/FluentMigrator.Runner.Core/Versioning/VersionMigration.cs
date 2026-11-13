@@ -113,9 +113,10 @@ namespace FluentMigrator.Runner.Versioning
     /// <remarks>
     /// This migration creates a unique clustered index on the version table (if no primary key exists)
     /// and adds a nullable column for storing the date and time when a version was applied. 
-    /// If the version table metadata specifies CreateWithPrimaryKey=true, no unique index is created 
-    /// as the primary key already provides the uniqueness constraint. This prevents SQL Server errors 
-    /// about multiple clustered indexes on the same table.
+    /// If the version table metadata specifies CreateWithPrimaryKey=true, no unique index is created,
+    /// because the primary key already makes the version unique, and <see cref="VersionMigration"/> names it
+    /// <see cref="IVersionTableMetaData.UniqueIndexName"/>: a second index with that name fails on SQL Server and
+    /// PostgreSQL (#2051).
     /// </remarks>
     public class VersionUniqueMigration : ForwardOnlyMigration
     {
@@ -139,25 +140,16 @@ namespace FluentMigrator.Runner.Versioning
         /// <inheritdoc />
         public override void Up()
         {
-            var createIndexBuilder = Create.Index(_versionTableMeta.UniqueIndexName)
-                .OnTable(_versionTableMeta.TableName)
-                .InSchema(_versionTableMeta.SchemaName)
-                .WithOptions().Unique();
-
+            // With a primary key, VersionMigration has already made the version unique, under this same name.
             if (!_versionTableMeta.CreateWithPrimaryKey)
             {
-                createIndexBuilder
-                    .WithOptions()
-                    .Clustered();
+                Create.Index(_versionTableMeta.UniqueIndexName)
+                    .OnTable(_versionTableMeta.TableName)
+                    .InSchema(_versionTableMeta.SchemaName)
+                    .WithOptions().Unique()
+                    .WithOptions().Clustered()
+                    .OnColumn(_versionTableMeta.ColumnName);
             }
-            else
-            {
-                createIndexBuilder
-                    .WithOptions()
-                    .NonClustered();
-            }
-
-            createIndexBuilder.OnColumn(_versionTableMeta.ColumnName);
 
             Alter.Table(_versionTableMeta.TableName).InSchema(_versionTableMeta.SchemaName)
                 .AddColumn(_versionTableMeta.AppliedOnColumnName).AsDateTime().Nullable();

@@ -284,9 +284,14 @@ namespace FluentMigrator.Runner.Generators.Generic
 
             var unquoted = quoted.Substring(1, quoted.Length - 2);
 
-            unquoted = unquoted.Replace(OpenQuoteEscapeString, OpenQuote);
+            // As in Quote: a quoter with no escape for a quote character (SQL Server's '[') leaves it alone.
+            // string.Replace throws on an empty search string.
+            if (!string.IsNullOrEmpty(OpenQuoteEscapeString))
+            {
+                unquoted = unquoted.Replace(OpenQuoteEscapeString, OpenQuote);
+            }
 
-            if (OpenQuote != CloseQuote)
+            if (OpenQuote != CloseQuote && !string.IsNullOrEmpty(CloseQuoteEscapeString))
             {
                 unquoted = unquoted.Replace(CloseQuoteEscapeString, CloseQuote);
             }

@@ -31,9 +31,14 @@ namespace FluentMigrator.Runner.Generators.DB2
 
     internal class Db2Column : ColumnBase<Db2TypeMap>
     {
-        public Db2Column(IQuoter quoter)
+        private readonly bool _writeUnicodeCcsid;
+
+        /// <param name="quoter">The quoter.</param>
+        /// <param name="writeUnicodeCcsid">Whether Unicode string columns get <c>CCSID 1200</c> (Db2 for i).</param>
+        public Db2Column(IQuoter quoter, bool writeUnicodeCcsid)
             : base(new Db2TypeMap(), quoter)
         {
+            _writeUnicodeCcsid = writeUnicodeCcsid;
             ClauseOrder = new List<Func<ColumnDefinition, string>> { FormatString, FormatType, FormatCCSID, FormatExpression, FormatNullable, FormatDefaultValue, FormatIdentity };
             AlterClauseOrder = new List<Func<ColumnDefinition, string>> { FormatType, FormatCCSID, FormatExpression, FormatNullable, FormatDefaultValue, FormatIdentity };
         }
@@ -78,7 +83,8 @@ namespace FluentMigrator.Runner.Generators.DB2
 
         protected virtual string FormatCCSID(ColumnDefinition column)
         {
-            if (column.Type == null)
+            // Db2 LUW rejects the clause in a Unicode database (SQL0622N), where graphic strings are UTF-16 already.
+            if (!_writeUnicodeCcsid || column.Type == null)
             {
                 return string.Empty;
             }
@@ -100,7 +106,8 @@ namespace FluentMigrator.Runner.Generators.DB2
 
             if (isCreate && (column.DefaultValue is ColumnDefinition.UndefinedDefaultValue))
             {
-                return "DEFAULT";
+                // An XML column can't have a default (SQL0628N).
+                return column.Type == DbType.Xml ? string.Empty : "DEFAULT";
             }
 
             if (column.DefaultValue is ColumnDefinition.UndefinedDefaultValue)
@@ -119,7 +126,8 @@ namespace FluentMigrator.Runner.Generators.DB2
 
         protected override string FormatIdentity(ColumnDefinition column)
         {
-            return column.IsIdentity ? "AS IDENTITY" : string.Empty;
+            // As Oracle 12c and PostgreSQL 10 have it. Db2 has no bare AS IDENTITY.
+            return column.IsIdentity ? "GENERATED ALWAYS AS IDENTITY" : string.Empty;
         }
 
         protected override string FormatNullable(ColumnDefinition column)
