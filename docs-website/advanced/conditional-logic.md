@@ -199,7 +199,7 @@ If your convention set has a default schema, both halves use it:
 services.AddSingleton<IConventionSet>(new DefaultConventionSet("app", workingDirectory: null));
 ```
 
-With `dotnet-fm`, use `--default-schema-name app`. Then `Schema.Table("Users").Exists()` checks `app.Users`, and `Create.Table("Users")` creates `app.Users`. The same goes for `Schema.Sequence(...)` and for the column, index and constraint checks under `Schema.Table(...)`.
+With `dotnet-fm`, use `--default-schema-name app`. Then `Schema.Table("Users").Exists()` checks `app.Users`, and `Create.Table("Users")` creates `app.Users`. The same goes for `Schema.Sequence(...)` and for the column, index and constraint checks under `Schema.Table(...)`. The `$(DefaultSchema)` token in `Execute.Sql` is `app` too, because the token and the checks get the schema from the same service, `IDefaultSchemaNameResolver`.
 
 This is the most reliable setup on every provider, because neither half falls back to a provider default.
 
