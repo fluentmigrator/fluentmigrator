@@ -187,6 +187,8 @@ if (!Schema.Table("Users").Exists())   // the check: a query the processor runs 
 }
 ```
 
+The two halves are handled differently. `Create.Table(...)` is an expression: the runner collects it, applies its conventions (such as the default schema), and the generator turns it into SQL after `Up()` returns. `Schema.Table(...).Exists()` is a processor-level check: it queries the database through the processor right away, while `Up()` is still running. The runner's conventions don't apply to it by themselves. Since 9.0 the check asks the runner for the schema the convention would use, as described below. If you call the processor yourself, for example `IMigrationProcessor.TableExists(schema, table)`, no convention is applied at all, so pass the schema you mean.
+
 If the check looks in one schema and the create writes to another, the check never finds the table. The first run is fine, and the next migration that repeats the check fails with "already exists". The opposite mismatch is worse: if the check finds a table of the same name in some other schema, the migration skips the create, and nothing reports that the table is missing.
 
 #### With a default schema (recommended)
