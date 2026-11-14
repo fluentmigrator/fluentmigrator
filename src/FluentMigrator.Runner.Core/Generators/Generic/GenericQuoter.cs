@@ -63,6 +63,14 @@ namespace FluentMigrator.Runner.Generators.Generic
                     return FormatDecimal(v);
                 case int v:
                     return FormatInteger(v);
+                case long _:
+                case short _:
+                case byte _:
+                case sbyte _:
+                case uint _:
+                case ulong _:
+                case ushort _:
+                    return ((System.IFormattable)value).ToString(null, CultureInfo.InvariantCulture);
                 case RawSql v:
                     return v.Value;
                 case byte[] v:

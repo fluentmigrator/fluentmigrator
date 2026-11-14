@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -210,7 +211,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
         {
             Truncator.Truncate(sequence);
             if (sequence.StartWith != null)
-                return FormatStatement("ALTER SEQUENCE {0} RESTART WITH {1}", Quoter.QuoteSequenceName(sequence.Name), sequence.StartWith.ToString());
+                return FormatStatement("ALTER SEQUENCE {0} RESTART WITH {1}", Quoter.QuoteSequenceName(sequence.Name), sequence.StartWith.Value.ToString(CultureInfo.InvariantCulture));
 
             return string.Empty;
         }

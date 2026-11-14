@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 using FluentMigrator.Generation;
 using FluentMigrator.Infrastructure.Extensions;
@@ -56,25 +57,25 @@ namespace FluentMigrator.Runner.Generators.Oracle
             var startWith = column.GetAdditionalFeature(OracleExtensions.IdentityStartWith, (long?)null);
             if (startWith != null)
             {
-                options.Add($"START WITH {startWith.Value:D}");
+                options.Add($"START WITH {startWith.Value.ToString("D", CultureInfo.InvariantCulture)}");
             }
 
             var incrementBy = column.GetAdditionalFeature(OracleExtensions.IdentityIncrementBy, (int?)null);
             if (incrementBy != null)
             {
-                options.Add($"INCREMENT BY {incrementBy.Value:D}");
+                options.Add($"INCREMENT BY {incrementBy.Value.ToString("D", CultureInfo.InvariantCulture)}");
             }
 
             var minValue = column.GetAdditionalFeature(OracleExtensions.IdentityMinValue, (long?)null);
             if (minValue != null)
             {
-                options.Add($"MINVALUE {minValue.Value:D}");
+                options.Add($"MINVALUE {minValue.Value.ToString("D", CultureInfo.InvariantCulture)}");
             }
 
             var maxValue = column.GetAdditionalFeature(OracleExtensions.IdentityMaxValue, (long?)null);
             if (maxValue != null)
             {
-                options.Add($"MAXVALUE {maxValue.Value:D}");
+                options.Add($"MAXVALUE {maxValue.Value.ToString("D", CultureInfo.InvariantCulture)}");
             }
 
             var optionsString = "";

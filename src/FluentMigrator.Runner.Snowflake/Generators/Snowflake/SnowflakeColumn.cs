@@ -69,7 +69,7 @@ namespace FluentMigrator.Runner.Generators.Snowflake
 
         private static string GetIdentityString(ColumnDefinition column)
         {
-            return $"IDENTITY({column.GetAdditionalFeature(SnowflakeExtensions.IdentitySeed, 1)},{column.GetAdditionalFeature(SnowflakeExtensions.IdentityIncrement, 1)})";
+            return System.FormattableString.Invariant($"IDENTITY({column.GetAdditionalFeature(SnowflakeExtensions.IdentitySeed, 1)},{column.GetAdditionalFeature(SnowflakeExtensions.IdentityIncrement, 1)})");
         }
     }
 }

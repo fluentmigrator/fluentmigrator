@@ -14,6 +14,8 @@
 // limitations under the License.
 #endregion
 
+using System.Globalization;
+
 using FluentMigrator.Generation;
 using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Model;
@@ -56,7 +58,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         private static string GetIdentityString(ColumnDefinition column)
         {
-            return string.Format("IDENTITY({0},{1})",
+            return string.Format(CultureInfo.InvariantCulture, "IDENTITY({0},{1})",
                 column.GetAdditionalFeature(SqlServerExtensions.IdentitySeed, 1),
                 column.GetAdditionalFeature(SqlServerExtensions.IdentityIncrement, 1));
         }

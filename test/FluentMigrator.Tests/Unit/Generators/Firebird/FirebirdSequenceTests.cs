@@ -1,4 +1,5 @@
-﻿using FluentMigrator.Runner.Processors.Firebird;
+﻿using FluentMigrator.Model;
+using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Runner.Generators.Firebird;
 using NUnit.Framework;
 
@@ -53,6 +54,15 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
 
             var result = Generator.Generate(expression);
             result.ShouldBe("DROP SEQUENCE \"Sequence\";");
+        }
+
+        [Test, SetCulture("nb-NO")]
+        public void CanAlterSequenceStartWithNegativeValueInAnyCulture()
+        {
+            var sequence = new SequenceDefinition { Name = "Sequence", StartWith = -1 };
+
+            var result = Generator.GenerateAlterSequence(sequence);
+            result.ShouldBe("ALTER SEQUENCE \"Sequence\" RESTART WITH -1;");
         }
     }
 }

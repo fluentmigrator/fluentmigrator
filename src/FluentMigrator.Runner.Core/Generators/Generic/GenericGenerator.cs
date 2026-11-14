@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -609,26 +610,26 @@ namespace FluentMigrator.Runner.Generators.Generic
         {
             var result = new StringBuilder("CREATE SEQUENCE ");
             var seq = expression.Sequence;
-            result.AppendFormat(Quoter.QuoteSequenceName(seq.Name, seq.SchemaName));
+            result.Append(Quoter.QuoteSequenceName(seq.Name, seq.SchemaName));
 
             if (seq.Increment.HasValue)
             {
-                result.AppendFormat(" INCREMENT {0}", seq.Increment);
+                result.AppendFormat(CultureInfo.InvariantCulture, " INCREMENT {0}", seq.Increment);
             }
 
             if (seq.MinValue.HasValue)
             {
-                result.AppendFormat(" MINVALUE {0}", seq.MinValue);
+                result.AppendFormat(CultureInfo.InvariantCulture, " MINVALUE {0}", seq.MinValue);
             }
 
             if (seq.MaxValue.HasValue)
             {
-                result.AppendFormat(" MAXVALUE {0}", seq.MaxValue);
+                result.AppendFormat(CultureInfo.InvariantCulture, " MAXVALUE {0}", seq.MaxValue);
             }
 
             if (seq.StartWith.HasValue)
             {
-                result.AppendFormat(" START WITH {0}", seq.StartWith);
+                result.AppendFormat(CultureInfo.InvariantCulture, " START WITH {0}", seq.StartWith);
             }
 
             const long MINIMUM_CACHE_VALUE = 2;
@@ -638,7 +639,7 @@ namespace FluentMigrator.Runner.Generators.Generic
                 {
                     return CompatibilityMode.HandleCompatibility("Cache size must be greater than 1; if you intended to disable caching, set Cache to null.");
                 }
-                result.AppendFormat(" CACHE {0}", seq.Cache);
+                result.AppendFormat(CultureInfo.InvariantCulture, " CACHE {0}", seq.Cache);
             }
             else
             {

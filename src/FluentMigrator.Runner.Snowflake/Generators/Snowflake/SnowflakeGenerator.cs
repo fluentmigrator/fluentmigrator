@@ -15,6 +15,7 @@
 #endregion
 
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -170,16 +171,16 @@ namespace FluentMigrator.Runner.Generators.Snowflake
         {
             var result = new StringBuilder("CREATE SEQUENCE ");
             var seq = expression.Sequence;
-            result.AppendFormat(Quoter.QuoteSequenceName(seq.Name, seq.SchemaName));
+            result.Append(Quoter.QuoteSequenceName(seq.Name, seq.SchemaName));
 
             if (seq.StartWith.HasValue)
             {
-                result.AppendFormat(" START {0}", seq.StartWith);
+                result.AppendFormat(CultureInfo.InvariantCulture, " START {0}", seq.StartWith);
             }
 
             if (seq.Increment.HasValue)
             {
-                result.AppendFormat(" INCREMENT {0}", seq.Increment);
+                result.AppendFormat(CultureInfo.InvariantCulture, " INCREMENT {0}", seq.Increment);
             }
 
             AppendSqlStatementEndToken(result);
