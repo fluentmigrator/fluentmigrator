@@ -110,16 +110,29 @@
     object that no longer exists. For a document whose entire purpose is to be
     committed and diffed, silently stale is the one unacceptable outcome.
 
-    This stamp file's content is the input list, so WriteOnlyWhenDifferent
-    touches it exactly when the *set* of inputs changes — additions and
-    removals alike — and it joins Inputs below to make removals invalidate the
-    manifest without giving up incrementality.
+    This stamp file's content is everything the manifest task reads apart from
+    the files' own bytes: the input list, each item's classification metadata,
+    and the task's property inputs. WriteOnlyWhenDifferent touches it exactly
+    when one of those changes, and it joins Inputs below. Timestamps can't see
+    any of them: not a deleted input, not a property passed with -p: or set in
+    Directory.Build.props or an imported .props file, and not an Update in a
+    shared props file that flips an item's ContentType or Execution. Each of
+    those used to leave the old manifest in place.
   -->
   <Target Name="WriteSourceModelInputsStamp"
           Condition="'$(GenerateSourceModelManifest)' == 'true'"
           DependsOnTargets="CollectSourceModel">
+    <ItemGroup>
+      <_SourceModelInputsStampLine Include="property:Root=$(SourceModelRoot)" />
+      <_SourceModelInputsStampLine Include="property:Dialect=$(DatabaseDialect)" />
+      <_SourceModelInputsStampLine Include="property:DefaultSchema=$(DefaultSchema)" />
+      <_SourceModelInputsStampLine Include="property:Convention=$(SourceModelConvention)" />
+      <_SourceModelInputsStampLine Include="property:IsRoot=$(IsDatabaseRootModule)" />
+      <_SourceModelInputsStampLine Include="property:WarningsAsErrors=$(TreatSourceModelWarningsAsErrors)" />
+      <_SourceModelInputsStampLine Include="@(SourceModelFile->'item:%(Identity)|Provider=%(Provider)|ObjectType=%(ObjectType)|UniqueIdentity=%(UniqueIdentity)|NamePolicy=%(NamePolicy)|Schema=%(Schema)|ObjectName=%(ObjectName)|Role=%(Role)|ContentType=%(ContentType)|Execution=%(Execution)|Stage=%(Stage)|Link=%(Link)')" />
+    </ItemGroup>
     <WriteLinesToFile File="$(SourceModelInputsStampPath)"
-                      Lines="@(SourceModelFile->'%(Identity)')"
+                      Lines="@(_SourceModelInputsStampLine)"
                       Overwrite="true"
                       WriteOnlyWhenDifferent="true" />
     <ItemGroup>
@@ -143,6 +156,14 @@
                       Convention="$(SourceModelConvention)"
                       ManifestPath="$(SourceModelIntermediateManifestPath)"
                       TreatValidationWarningsAsErrors="$(TreatSourceModelWarningsAsErrors)" />
+
+    <!--
+      The task leaves an unchanged manifest alone, so that an input change
+      which doesn't change the document (TreatSourceModelWarningsAsErrors, say)
+      doesn't churn it. Its timestamp still has to move past the stamp's, or
+      this target would run on every build from then on.
+    -->
+    <Touch Files="$(SourceModelIntermediateManifestPath)" />
 
     <ItemGroup>
       <FileWrites Include="$(SourceModelIntermediateManifestPath)" />

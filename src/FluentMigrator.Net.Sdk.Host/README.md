@@ -96,6 +96,12 @@ Dialect → runner package is a registry (`MigrationRunnerPackage` items) coveri
 every in-box FluentMigrator processor. A target whose dialect is not registered
 still builds; the manifest simply carries no runner for it (`FMSDK208`).
 
+A target without its own `Dialect` inherits the first one its modules declare,
+which is the root's, since the root deploys first. The manifest records the
+target's effective `dialect` either way, so a consumer can see which dialect
+chose the runner without repeating that rule. If the modules of such a target
+declare different dialects, `FMSDK210` says so; set `Dialect` on the target.
+
 ## Ordering contract
 
 **Declared order is the contract; the module reference graph is the linter.**
@@ -155,4 +161,6 @@ Diagnostics: `FMSDK201` declared order contradicts the reference graph (warn),
 `FMSDK202` multiple roots (error), `FMSDK203` root not first (error),
 `FMSDK204` unknown module in target (error), `FMSDK205` no root (warn),
 `FMSDK206` custom manifest file missing (error), `FMSDK207` unknown host
-context (error), `FMSDK208` no runner registered for a target's dialect (warn).
+context (error), `FMSDK208` no runner registered for a target's dialect (warn),
+`FMSDK209` a module listed twice in a target's `Modules` (error), `FMSDK210` the
+modules of a target without a `Dialect` declare different dialects (warn).

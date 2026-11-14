@@ -167,6 +167,25 @@ meant to be committed and diffed — clean diffs *are* the source control model.
 `type` is an open vocabulary and `properties` an open bag, so future providers
 need no schema change.
 
+It also has to hold across machines, so two things never depend on the
+checkout:
+
+- **Checksums are over normalized text.** `checksum` is the SHA-256 of the
+  file after dropping a leading UTF-8 BOM and replacing every CRLF with LF.
+  A Windows checkout with `core.autocrlf=true` and a Linux CI run produce the
+  same value, and so agree about `onChange`. To reproduce one, apply the same
+  two steps before hashing.
+- **Paths are relative.** `path` is relative to `SourceModelRoot` (the project
+  directory by default). A file outside it is recorded by its `Link`
+  metadata, or else relative to the root with `../` and an `FMSDK103` warning;
+  an absolute path never reaches the manifest.
+
+The manifest is rebuilt whenever anything it's made from changes: the set of
+files, a file's content, an item's classification metadata (even when an
+imported `.props` or `.targets` file sets it), or one of the properties in the
+table below (even from `-p:` or `Directory.Build.props`). Otherwise the build
+skips it.
+
 ## Properties and diagnostics
 
 | Property | Default | Purpose |
@@ -186,7 +205,10 @@ need no schema change.
 Diagnostics: `FMSDK001` duplicate object identity — case-insensitive, only for
 pivots declaring `UniqueIdentity` (error); `FMSDK002` missing file (error);
 `FMSDK100` file with no `ObjectType` (warning); `FMSDK101` empty file (warning);
-`FMSDK102` `Tools/` artifact in a non-root module (warning).
+`FMSDK102` `Tools/` artifact in a non-root module (warning); `FMSDK103` file
+outside `SourceModelRoot` without `Link` metadata (warning); `FMSDK104`
+`Execution` other than `once`, `onChange` or `always` (warning; a known value in
+another case is written in its canonical spelling instead).
 
 ## Building and testing
 
@@ -196,4 +218,5 @@ pivots declaring `UniqueIdentity` (error); `FMSDK002` missing file (error);
 
 builds the samples under `samples/FluentMigrator.Net.Sdk/` against the in-repo
 SDK payload and asserts the manifest contents, embed-vs-copy mapping,
-diagnostics, incrementality, the flyway convention pack, and packing.
+diagnostics, incrementality, the flyway convention pack, and packing. The
+pull request workflow runs it on Ubuntu.

@@ -25,16 +25,40 @@ FLYWAY=$SAMPLES/flyway-layout
 TFM=netstandard2.0
 
 FEED=$(mktemp -d)
+SCRATCH=$(mktemp -d)
+SHARED=$SAMPLES/shared-smoke
 FAILURES=0
+BACKUPS=()
+
+# Files a section edits in place are backed up first and put back on exit,
+# whether or not the section got as far as restoring them itself.
+backup() { cp "$1" "$1.smokebak"; BACKUPS+=("$1"); }
+restore() { if [ -f "$1.smokebak" ]; then mv "$1.smokebak" "$1"; fi; }
 
 cleanup() {
-  rm -rf "$FEED"
+  rm -rf "$FEED" "$SCRATCH" "$SHARED"
   rm -rf "$ADVENTURE/Schema/Views/legacy" "$ADVENTURE/Schema/Functions/sales.open_orders.sql"
   if [ -f "$COMPOSITE/AdventureHost/AdventureHost.csproj.bak" ]; then
     mv "$COMPOSITE/AdventureHost/AdventureHost.csproj.bak" "$COMPOSITE/AdventureHost/AdventureHost.csproj"
   fi
+  for f in ${BACKUPS[@]+"${BACKUPS[@]}"}; do restore "$f"; done
 }
 trap cleanup EXIT
+
+# MSBuild needs a native path; under Git Bash on Windows that isn't /c/...
+native_path() { if command -v cygpath > /dev/null; then cygpath -m "$1"; else printf '%s' "$1"; fi; }
+
+# Item and property edits that arrive from outside the project file, the way a
+# shared .props or .targets file would bring them. MSBuild imports this file
+# after the project body; the manifest's up-to-date check sees neither the
+# file nor the global property naming it, only what they change.
+EXTRA_TARGETS=$SCRATCH/extra.targets
+extra_targets() { printf '<Project>\n%s\n</Project>\n' "$1" > "$EXTRA_TARGETS"; }
+build_extra() { build "$@" -p:CustomAfterMicrosoftCommonTargets="$(native_path "$EXTRA_TARGETS")"; }
+
+checksum_of() { # manifest path-value
+  object_block "$1" "$2" | sed -n 's/.*"checksum": "\(sha256:[0-9a-f]*\)".*/\1/p'
+}
 
 pass() { printf '  ok   %s\n' "$1"; }
 fail() { printf '  FAIL %s\n' "$1"; FAILURES=$((FAILURES + 1)); }
@@ -174,6 +198,94 @@ else
   fail "manifest target should be skipped on an unchanged rebuild"
 fi
 
+section "the manifest follows properties and metadata, not only files"
+# Regression: the up-to-date check only saw the file set and the project
+# file, so a -p: property, or a metadata edit from an imported file, left the
+# previous manifest in place.
+build "$ADVENTURE" -p:DatabaseDialect=postgres > /dev/null
+assert_contains "$MANIFEST" '"dialect": "postgres"' "a -p: property rebuilds the manifest"
+build "$ADVENTURE" > /dev/null
+assert_contains "$MANIFEST" '"dialect": "sqlserver"' "dropping the -p: property rebuilds it again"
+
+extra_targets '<ItemGroup><SqlObject Update="Schema/Views/sales.open_orders.sql" Execution="always" /></ItemGroup>'
+build_extra "$ADVENTURE" > /dev/null
+assert_object "$MANIFEST" "Schema/Views/sales.open_orders.sql" '"execution": "always"' "metadata set in an imported file rebuilds the manifest"
+# Same global properties, same project file: only the imported file changed.
+extra_targets '<ItemGroup><SqlObject Update="Schema/Views/sales.open_orders.sql" Execution="once" /></ItemGroup>'
+build_extra "$ADVENTURE" > /dev/null
+assert_object "$MANIFEST" "Schema/Views/sales.open_orders.sql" '"execution": "once"' "editing only that file rebuilds it again"
+build "$ADVENTURE" > /dev/null
+assert_object "$MANIFEST" "Schema/Views/sales.open_orders.sql" '"execution": "onChange"' "and back without it"
+
+INC_OUT=$(dotnet build "$ADVENTURE" -v:normal 2>&1)
+if printf '%s' "$INC_OUT" | grep -qiE "BuildSourceModelManifest.*(skipping|up-to-date)"; then
+  pass "still skipped on the next unchanged rebuild"
+else
+  fail "the manifest target should be skipped again on an unchanged rebuild"
+fi
+
+section "checksums don't depend on line endings or a BOM"
+# Regression: the checksum was over raw bytes, so a Windows checkout with
+# core.autocrlf and Linux CI disagreed about an unchanged file, and with them
+# the onChange facet.
+VIEW_PATH=Schema/Views/sales.open_orders.sql
+VIEW=$ADVENTURE/$VIEW_PATH
+backup "$VIEW"
+tr -d '\r' < "$VIEW.smokebak" > "$VIEW"
+build "$ADVENTURE" > /dev/null
+LF_SUM=$(checksum_of "$MANIFEST" "$VIEW_PATH")
+EXPECTED_SUM="sha256:$(sha256sum "$VIEW" | cut -d' ' -f1)"
+if [ "$LF_SUM" = "$EXPECTED_SUM" ]; then pass "checksum is SHA-256 of the LF text"; else fail "checksum $LF_SUM, expected $EXPECTED_SUM"; fi
+
+sed 's/$/\r/' "$VIEW" > "$SCRATCH/crlf.sql" && cp "$SCRATCH/crlf.sql" "$VIEW"
+build "$ADVENTURE" > /dev/null
+CRLF_SUM=$(checksum_of "$MANIFEST" "$VIEW_PATH")
+if [ "$CRLF_SUM" = "$LF_SUM" ]; then pass "CRLF gives the same checksum"; else fail "CRLF changed the checksum: $LF_SUM -> $CRLF_SUM"; fi
+
+{ printf '\357\273\277'; tr -d '\r' < "$VIEW.smokebak"; } > "$VIEW"
+build "$ADVENTURE" > /dev/null
+BOM_SUM=$(checksum_of "$MANIFEST" "$VIEW_PATH")
+if [ "$BOM_SUM" = "$LF_SUM" ]; then pass "a UTF-8 BOM gives the same checksum"; else fail "a BOM changed the checksum: $LF_SUM -> $BOM_SUM"; fi
+
+printf 'SELECT 1;\n' >> "$VIEW"
+build "$ADVENTURE" > /dev/null
+EDIT_SUM=$(checksum_of "$MANIFEST" "$VIEW_PATH")
+if [ "$EDIT_SUM" != "$LF_SUM" ]; then pass "a content change still changes it"; else fail "a content change kept the checksum"; fi
+restore "$VIEW"
+build "$ADVENTURE" > /dev/null
+
+section "FMSDK103 paths outside SourceModelRoot"
+# Regression: a file outside the project was recorded by its absolute path,
+# so the committed manifest differed per machine and leaked local paths.
+mkdir -p "$SHARED"
+printf 'CREATE VIEW sales.v_shared AS SELECT 1 AS one;\n' > "$SHARED/sales.v_shared.sql"
+extra_targets '<ItemGroup><SqlObject Include="../shared-smoke/sales.v_shared.sql" ObjectType="view" NamePolicy="SchemaDotObject" UniqueIdentity="true" Execution="onChange" /></ItemGroup>'
+OUTSIDE_OUT=$(build_extra "$ADVENTURE" 2>&1 || true)
+assert_object "$MANIFEST" "../shared-smoke/sales.v_shared.sql" '"name": "v_shared"' "outside file recorded relative to the root"
+if grep -qaE '"path": "(/|[A-Za-z]:)' "$MANIFEST"; then fail "an absolute path reached the manifest"; else pass "no absolute path in the manifest"; fi
+if printf '%s' "$OUTSIDE_OUT" | grep -q "FMSDK103"; then pass "FMSDK103 raised for a file outside the root"; else fail "FMSDK103 expected for a file outside the root"; fi
+
+extra_targets '<ItemGroup><SqlObject Include="../shared-smoke/sales.v_shared.sql" Link="Schema/Views/sales.v_shared.sql" ObjectType="view" NamePolicy="SchemaDotObject" UniqueIdentity="true" Execution="onChange" /></ItemGroup>'
+LINK_OUT=$(build_extra "$ADVENTURE" 2>&1 || true)
+assert_object "$MANIFEST" "Schema/Views/sales.v_shared.sql" '"name": "v_shared"' "Link metadata gives the in-project path"
+if printf '%s' "$LINK_OUT" | grep -q "FMSDK103"; then fail "FMSDK103 should not fire for a linked item"; else pass "no FMSDK103 for a linked item"; fi
+rm -rf "$SHARED"
+build "$ADVENTURE" > /dev/null
+assert_count "$MANIFEST" '"provider": "sql"' 14 "back to 14 objects without the shared file"
+
+section "FMSDK104 execution facet spelling"
+# Regression: Execution was copied verbatim, so "OnChange" or a typo produced
+# a manifest that no longer compared with others.
+extra_targets '<ItemGroup>
+  <SqlObject Update="Schema/Views/sales.open_orders.sql" Execution="OnChange" />
+  <SqlObject Update="Schema/Functions/sales.fn_order_total.sql" Execution="sometimes" />
+</ItemGroup>'
+EXEC_OUT=$(build_extra "$ADVENTURE" 2>&1 || true)
+assert_object "$MANIFEST" "Schema/Views/sales.open_orders.sql" '"execution": "onChange"' "a known value in another case becomes the canonical spelling"
+if printf '%s' "$EXEC_OUT" | grep "FMSDK104" | grep -q "fn_order_total"; then pass "FMSDK104 raised for an unknown value"; else fail "FMSDK104 expected for Execution=sometimes"; fi
+if printf '%s' "$EXEC_OUT" | grep "FMSDK104" | grep -q "open_orders"; then fail "FMSDK104 should not fire for OnChange"; else pass "no FMSDK104 for a known value in another case"; fi
+build "$ADVENTURE" > /dev/null
+
 # -------------------------------------------------------------- host manifest
 
 section "FluentMigrator.Net.Sdk.Host: host manifest"
@@ -236,6 +348,62 @@ if printf '%s' "$UNKNOWN_OUT" | grep -q "FMSDK207"; then
 else
   fail "FMSDK207 expected for an unknown host context"
 fi
+
+HOSTPROJ=$COMPOSITE/AdventureHost/AdventureHost.csproj
+
+# The host manifest's targets use the same fixed indentation as source model
+# objects, so a target's block can be cut out the same way, by its name.
+target_block() { # file target-name
+  awk -v needle="\"name\": \"$2\"" '
+    /^    \{/       { buf = ""; inblk = 1 }
+    inblk           { buf = buf $0 "\n" }
+    /^    \}/       { if (inblk && index(buf, needle)) printf "%s", buf; inblk = 0 }
+  ' "$1"
+}
+
+assert_target() { # file target-name pattern message
+  if target_block "$1" "$2" | grep -q -- "$3"; then pass "$4"; else fail "$4 (target $2 lacks '$3')"; fi
+}
+
+section "FMSDK209 a module listed twice"
+# Regression: Modules="Core;Sales;Sales" deployed Sales twice without a word.
+backup "$HOSTPROJ"
+sed -i 's|<Modules>Core;Sales</Modules>|<Modules>Core;Sales;Sales</Modules>|' "$HOSTPROJ"
+DUPMOD_OUT=$(build "$COMPOSITE/AdventureHost" 2>&1 || true)
+restore "$HOSTPROJ"
+if printf '%s' "$DUPMOD_OUT" | grep -q "FMSDK209"; then pass "FMSDK209 raised for a module listed twice"; else fail "FMSDK209 expected for a module listed twice"; fi
+
+section "effective dialect"
+# Regression: a target without a Dialect inherited its modules' and got that
+# dialect's runner, but the manifest recorded the runner without the dialect.
+backup "$HOSTPROJ"
+sed -i '/<Dialect>sqlserver<\/Dialect>/d' "$HOSTPROJ"
+build "$COMPOSITE/AdventureHost" > /dev/null
+assert_target "$HOST" primary '"dialect": "sqlserver"' "an inherited dialect is recorded"
+assert_target "$HOST" primary '"runner": "FluentMigrator.Runner.SqlServer"' "with the runner it chose"
+assert_target "$HOST" reporting '"dialect": "postgres"' "an explicit dialect still wins for its target"
+
+# Sales now says postgres while Core says sqlserver; primary inherits Core's.
+cat > "$EXTRA_TARGETS" <<'XML'
+<Project>
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'Sales'">
+    <DatabaseDialect>postgres</DatabaseDialect>
+  </PropertyGroup>
+</Project>
+XML
+MIXED_OUT=$(build_extra "$COMPOSITE/AdventureHost" 2>&1 || true)
+if printf '%s' "$MIXED_OUT" | grep "FMSDK210" | grep -q "primary"; then
+  pass "FMSDK210 raised when the modules of a dialect-less target disagree"
+else
+  fail "FMSDK210 expected when the modules of a dialect-less target disagree"
+fi
+if printf '%s' "$MIXED_OUT" | grep "FMSDK210" | grep -q "reporting"; then
+  fail "FMSDK210 should not fire for a target with its own dialect"
+else
+  pass "no FMSDK210 for a target with its own dialect"
+fi
+restore "$HOSTPROJ"
+build "$COMPOSITE/AdventureHost" > /dev/null
 
 section "custom host manifest escape hatch"
 build "$COMPOSITE/AdventureHost" -p:HostManifestFile=host.custom.json

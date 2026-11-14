@@ -34,7 +34,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - `FluentMigrator.Net.Sdk` builds a migrations project as a normal class library and additionally emits a deterministic, dialect-neutral manifest (`$(MSBuildProjectName).sourcemodel.json`) describing the database object model. Layout is declared through pivots rather than inferred, with built-in `fluentmigrator` and `flyway` convention packs that normalize onto one execution-facet vocabulary (`once`/`onChange`/`always`), so manifests from different layouts stay comparable
   - `FluentMigrator.Net.Sdk.Host` composes module projects into a host: deployment targets in declared order (linted against the module reference graph), a `FluentMigrator.Runner.*` package resolved per target from its dialect, and the hosting contexts those commands are exposed through — emitted as `$(MSBuildProjectName).host.json`
   - Both SDKs ship on the FluentMigrator release train and carry no version of their own, the way `Microsoft.NET.Sdk` ships with the .NET SDK it belongs to. Pin them in `global.json` under `msbuild-sdks`, using the same version as the `FluentMigrator` packages you reference
-  - Build and test them with `test/FluentMigrator.Net.Sdk.SmokeTests/smoke-test.sh`; samples are under `samples/FluentMigrator.Net.Sdk/`
+  - Manifests are the same on every machine: object checksums are SHA-256 over normalized text (a leading UTF-8 BOM dropped, CRLF as LF), and paths are relative to the project, so a Windows checkout and Linux CI agree, including about which `onChange` objects changed
+  - Build and test them with `test/FluentMigrator.Net.Sdk.SmokeTests/smoke-test.sh`, which the pull request workflow runs on Ubuntu; samples are under `samples/FluentMigrator.Net.Sdk/`
 
 ### Documentation
 

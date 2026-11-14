@@ -38,8 +38,15 @@
 //   FMSDK203 (error) root module present but not deployed first
 //   FMSDK204 (error) target names a module that is not referenced
 //   FMSDK205 (warn)  no root module: database creation/baseline unmanaged
+//   FMSDK206 (error) HostManifestFile does not exist (raised by the targets)
 //   FMSDK207 (error) unknown host context
 //   FMSDK208 (warn)  no runner package registered for a target's dialect
+//   FMSDK209 (error) a target's explicit module list names a module twice
+//   FMSDK210 (warn)  a target without a dialect inherits one, but its modules
+//                    declare different dialects
+//
+// Every target records its effective dialect, the one its runner was chosen
+// by, whether the target declared it or inherited it from its modules.
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -80,6 +87,14 @@ namespace FluentMigrator.Net.Sdk.Host.Tasks
             public string Dialect;
             public string VersionTableName;
             public string VersionTableSchema;
+        }
+
+        private sealed class TargetPlan
+        {
+            public ITaskItem Target;
+            public List<Module> Modules;
+            public string Dialect;
+            public string Runner;
         }
 
         private sealed class HostContext
@@ -130,7 +145,7 @@ namespace FluentMigrator.Net.Sdk.Host.Tasks
                 }
             }
 
-            var targetPlans = new List<KeyValuePair<ITaskItem, List<Module>>>();
+            var targetPlans = new List<TargetPlan>();
 
             foreach (ITaskItem target in Targets ?? new ITaskItem[0])
             {
@@ -140,7 +155,15 @@ namespace FluentMigrator.Net.Sdk.Host.Tasks
                     continue; // errors already logged
                 }
                 ValidatePlan(target, plan);
-                targetPlans.Add(new KeyValuePair<ITaskItem, List<Module>>(target, plan));
+
+                // Resolved here, not while writing: FMSDK208 and FMSDK210 can be
+                // errors (TreatHostWarningsAsErrors), and must stop the manifest.
+                var targetPlan = new TargetPlan();
+                targetPlan.Target = target;
+                targetPlan.Modules = plan;
+                targetPlan.Dialect = ResolveDialect(target, plan);
+                targetPlan.Runner = ResolveRunner(target, targetPlan.Dialect);
+                targetPlans.Add(targetPlan);
             }
 
             if (Log.HasLoggedErrors)
@@ -229,23 +252,48 @@ namespace FluentMigrator.Net.Sdk.Host.Tasks
             return resolved;
         }
 
-        private string ResolveRunner(ITaskItem target, List<Module> plan)
+        /// The dialect a target runs against: its own, or else the first one its
+        /// modules declare (the root's, since the root deploys first per
+        /// FMSDK203). Recorded in the manifest either way, so a consumer doesn't
+        /// have to repeat this rule to know why the target got its runner.
+        private string ResolveDialect(ITaskItem target, List<Module> plan)
         {
             string dialect = target.GetMetadata("Dialect");
-            if (string.IsNullOrEmpty(dialect))
+            if (!string.IsNullOrEmpty(dialect))
             {
-                // A target without an explicit dialect inherits the root
-                // module's (the first in the plan, per FMSDK203).
-                for (int i = 0; i < plan.Count; i++)
+                return dialect;
+            }
+
+            string inherited = string.Empty;
+            string inheritedFrom = string.Empty;
+            for (int i = 0; i < plan.Count; i++)
+            {
+                string moduleDialect = plan[i].Dialect;
+                if (string.IsNullOrEmpty(moduleDialect))
                 {
-                    if (!string.IsNullOrEmpty(plan[i].Dialect))
-                    {
-                        dialect = plan[i].Dialect;
-                        break;
-                    }
+                    continue;
+                }
+
+                if (inherited.Length == 0)
+                {
+                    inherited = moduleDialect;
+                    inheritedFrom = plan[i].Name;
+                }
+                else if (!string.Equals(moduleDialect, inherited, StringComparison.OrdinalIgnoreCase))
+                {
+                    Report("FMSDK210",
+                        "DeploymentTarget '" + target.ItemSpec + "' declares no Dialect and inherits '" + inherited +
+                        "' from '" + inheritedFrom + "', but module '" + plan[i].Name + "' declares '" + moduleDialect +
+                        "'. Set Dialect on the target to say which one it runs against.");
+                    break;
                 }
             }
 
+            return inherited;
+        }
+
+        private string ResolveRunner(ITaskItem target, string dialect)
+        {
             if (string.IsNullOrEmpty(dialect))
             {
                 return string.Empty;
@@ -276,6 +324,7 @@ namespace FluentMigrator.Net.Sdk.Host.Tasks
 
             if (!string.IsNullOrEmpty(explicitList))
             {
+                var listed = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
                 foreach (string raw in explicitList.Split(';'))
                 {
                     string name = raw.Trim();
@@ -283,6 +332,18 @@ namespace FluentMigrator.Net.Sdk.Host.Tasks
                     {
                         continue;
                     }
+
+                    // Declared order is the contract, so a module listed twice
+                    // would deploy twice; that's never what the list means.
+                    if (listed.ContainsKey(name))
+                    {
+                        Log.LogError(null, "FMSDK209", null, null, 0, 0, 0, 0,
+                            "DeploymentTarget '" + target.ItemSpec + "' lists module '" + name +
+                            "' more than once in Modules. Each module deploys once per target.");
+                        return null;
+                    }
+                    listed.Add(name, true);
+
                     Module m;
                     if (!modules.TryGetValue(name, out m))
                     {
@@ -396,7 +457,7 @@ namespace FluentMigrator.Net.Sdk.Host.Tasks
             }
         }
 
-        private string WriteManifest(List<HostContext> contexts, List<KeyValuePair<ITaskItem, List<Module>>> targetPlans)
+        private string WriteManifest(List<HostContext> contexts, List<TargetPlan> targetPlans)
         {
             var sb = new StringBuilder();
             sb.Append("{\n");
@@ -427,15 +488,15 @@ namespace FluentMigrator.Net.Sdk.Host.Tasks
 
             for (int t = 0; t < targetPlans.Count; t++)
             {
-                ITaskItem target = targetPlans[t].Key;
-                List<Module> plan = targetPlans[t].Value;
+                ITaskItem target = targetPlans[t].Target;
+                List<Module> plan = targetPlans[t].Modules;
 
                 sb.Append(t == 0 ? "\n" : ",\n");
                 sb.Append("    {\n");
                 sb.Append("      \"name\": ").Append(Quote(target.ItemSpec)).Append(",\n");
                 AppendOptional(sb, "connectionStringName", target.GetMetadata("ConnectionStringName"));
-                AppendOptional(sb, "dialect", target.GetMetadata("Dialect"));
-                AppendOptional(sb, "runner", ResolveRunner(target, plan));
+                AppendOptional(sb, "dialect", targetPlans[t].Dialect);
+                AppendOptional(sb, "runner", targetPlans[t].Runner);
                 AppendOptional(sb, "tags", target.GetMetadata("Tags"));
                 sb.Append("      \"modules\": [");
 

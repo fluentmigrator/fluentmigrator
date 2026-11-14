@@ -25,6 +25,14 @@
 // deterministic (sorted objects, '\n' line endings, lowercase hex
 // checksums) -- clean diffs are the entire point of a source control model.
 //
+// Determinism also has to hold across machines. Two inputs used to break it:
+//  - Checksums are over normalized text: a leading UTF-8 BOM is dropped and
+//    CRLF becomes LF before hashing. A Windows checkout with core.autocrlf and
+//    a Linux CI run then agree, and so does the onChange facet keyed off them.
+//  - Paths never leak the build machine. A file outside SourceModelRoot is
+//    recorded by its Link metadata, or else relative to the root with '../'
+//    (FMSDK103 warns about the latter).
+//
 // Classification is driven entirely by pivot metadata on the items
 // (ObjectType, NamePolicy, Role, ContentType, UniqueIdentity), declared in
 // FluentMigrator.Net.Sdk.Conventions.props. This task contains no directory
@@ -97,7 +105,7 @@ namespace FluentMigrator.Net.Sdk.Tasks
                     continue;
                 }
 
-                string rel = MakeRelative(root, fullPath);
+                string rel = ManifestPathFor(item, root, fullPath);
                 ModelObject obj = Classify(item, rel);
                 obj.Path = rel;
                 obj.Checksum = "sha256:" + Sha256Hex(fullPath);
@@ -253,7 +261,7 @@ namespace FluentMigrator.Net.Sdk.Tasks
             string execution = item.GetMetadata("Execution");
             if (!string.IsNullOrEmpty(execution))
             {
-                obj.Properties["execution"] = execution;
+                obj.Properties["execution"] = NormalizeExecution(execution, relPath);
             }
             string stage = item.GetMetadata("Stage");
             if (!string.IsNullOrEmpty(stage))
@@ -262,6 +270,75 @@ namespace FluentMigrator.Net.Sdk.Tasks
             }
 
             return obj;
+        }
+
+        private static readonly string[] CanonicalExecutions = { "once", "onChange", "always" };
+
+        /// The execution facet is what makes manifests from different conventions
+        /// comparable, so its spelling is part of the contract: a known value in
+        /// any case becomes the canonical spelling, and anything else is reported
+        /// (FMSDK104) and recorded as written.
+        private string NormalizeExecution(string execution, string relPath)
+        {
+            string trimmed = execution.Trim();
+            foreach (string canonical in CanonicalExecutions)
+            {
+                if (string.Equals(trimmed, canonical, StringComparison.OrdinalIgnoreCase))
+                {
+                    return canonical;
+                }
+            }
+
+            Report("FMSDK104",
+                "'" + relPath + "' declares Execution '" + execution + "'. The execution facet is one of " +
+                "once, onChange or always; any other value makes this manifest incomparable with others.", true);
+            return trimmed;
+        }
+
+        /// The path the manifest records: relative to SourceModelRoot, with '/'
+        /// separators. A file outside the root is recorded by its Link metadata
+        /// (the item's path in the project, which MSBuild uses for exactly this),
+        /// or else relative to the root with '../' and an FMSDK103 warning. An
+        /// absolute path would make the committed manifest differ per machine.
+        private string ManifestPathFor(ITaskItem item, string rootWithSeparator, string fullPath)
+        {
+            if (fullPath.StartsWith(rootWithSeparator, StringComparison.OrdinalIgnoreCase))
+            {
+                return fullPath.Substring(rootWithSeparator.Length).Replace('\\', '/');
+            }
+
+            string link = item.GetMetadata("Link");
+            if (!string.IsNullOrEmpty(link))
+            {
+                return link.Replace('\\', '/');
+            }
+
+            string rel = RelativeTo(rootWithSeparator, fullPath);
+            Report("FMSDK103",
+                "'" + rel + "' is outside SourceModelRoot, so the manifest records it relative to the root. " +
+                "Set Link metadata on the item to give it a path inside the project.", true);
+            return rel;
+        }
+
+        private static string RelativeTo(string rootWithSeparator, string fullPath)
+        {
+            var rootUri = new Uri(rootWithSeparator);
+            var fileUri = new Uri(fullPath);
+            if (!string.Equals(rootUri.Scheme, fileUri.Scheme, StringComparison.OrdinalIgnoreCase)
+                || !string.Equals(rootUri.Host, fileUri.Host, StringComparison.OrdinalIgnoreCase))
+            {
+                return Path.GetFileName(fullPath);
+            }
+
+            Uri relative = rootUri.MakeRelativeUri(fileUri);
+            if (relative.IsAbsoluteUri)
+            {
+                // Another drive: no relative path exists, and the absolute one
+                // is exactly what must not reach the manifest.
+                return Path.GetFileName(fullPath);
+            }
+
+            return Uri.UnescapeDataString(relative.ToString()).Replace('\\', '/');
         }
 
         private static string Display(ModelObject obj)
@@ -283,20 +360,6 @@ namespace FluentMigrator.Net.Sdk.Tasks
             }
         }
 
-        private static string MakeRelative(string rootWithSeparator, string fullPath)
-        {
-            string rel;
-            if (fullPath.StartsWith(rootWithSeparator, StringComparison.OrdinalIgnoreCase))
-            {
-                rel = fullPath.Substring(rootWithSeparator.Length);
-            }
-            else
-            {
-                rel = fullPath;
-            }
-            return rel.Replace('\\', '/');
-        }
-
         private static bool IsEffectivelyEmpty(string path)
         {
             var info = new FileInfo(path);
@@ -306,12 +369,26 @@ namespace FluentMigrator.Net.Sdk.Tasks
             return text.Trim().Length == 0;
         }
 
+        /// SHA-256 of the file's normalized text: a leading UTF-8 BOM dropped and
+        /// every CRLF turned into LF. Consumers reproducing a checksum apply the
+        /// same two steps; see the README.
         private static string Sha256Hex(string path)
         {
-            using (SHA256 sha = SHA256.Create())
-            using (FileStream stream = File.OpenRead(path))
+            byte[] bytes = File.ReadAllBytes(path);
+            int start = bytes.Length >= 3 && bytes[0] == 0xEF && bytes[1] == 0xBB && bytes[2] == 0xBF ? 3 : 0;
+            var normalized = new MemoryStream(bytes.Length - start);
+            for (int i = start; i < bytes.Length; i++)
             {
-                byte[] hash = sha.ComputeHash(stream);
+                if (bytes[i] == (byte)'\r' && i + 1 < bytes.Length && bytes[i + 1] == (byte)'\n')
+                {
+                    continue;
+                }
+                normalized.WriteByte(bytes[i]);
+            }
+
+            using (SHA256 sha = SHA256.Create())
+            {
+                byte[] hash = sha.ComputeHash(normalized.ToArray());
                 var sb = new StringBuilder(hash.Length * 2);
                 for (int i = 0; i < hash.Length; i++)
                 {

@@ -204,6 +204,14 @@ jobs:
       if: matrix.dotnet-tfm == 'net8.0'
       run: dotnet run --project test/FluentMigrator.Tests.Aot/FluentMigrator.Tests.Aot.csproj --configuration ${{ env.buildConfiguration }} --verbosity quiet
 
+    # FluentMigrator.Net.Sdk and FluentMigrator.Net.Sdk.Host are MSBuild payload (props, targets and
+    # inline tasks), so the unit suite above never runs them. This builds their samples and asserts
+    # the manifests, diagnostics and incrementality. It needs only the SDK and bash.
+    - name: Net.Sdk smoke tests
+      if: matrix.os == 'ubuntu-latest' && (!cancelled())
+      shell: bash
+      run: bash test/FluentMigrator.Net.Sdk.SmokeTests/smoke-test.sh
+
     # Pack triggers .NET package validation (EnablePackageValidation in PackageLibrary.props),
     # which fails the build on breaking public-API changes against PackageValidationBaselineVersion.
     # Windows-only because the libraries multi-target net48, which builds natively there.
