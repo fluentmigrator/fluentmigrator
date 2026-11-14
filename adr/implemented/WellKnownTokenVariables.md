@@ -108,6 +108,12 @@ public class DefaultSqlTokenProvider : ISqlTokenProvider
 }
 ```
 
+> **Amendment (9.0, #2446):** `DefaultSqlTokenProvider` now takes `IDefaultSchemaNameResolver` instead of
+> `IConventionSet`, and `DefaultSchema` is `resolver.GetSchemaName(null)`. The resolver also gives
+> `Schema.Table(...).Exists()` and the other schema checks their schema (#1055). Taking the token from the same
+> service keeps `$(DefaultSchema)` and those checks identical, even when an application registers its own resolver.
+> By default, the resolver applies the convention set's schema name convention, so the value is the same as before.
+
 `ExecuteSqlScriptExpressionBase` (or its `IMigrationProcessor`-facing execution
 path) resolves `ISqlTokenProvider` from DI, merges its map with the
 user-supplied `Parameters`, and passes the merged dictionary to

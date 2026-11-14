@@ -45,19 +45,21 @@ namespace FluentMigrator.Builders.Schema
         /// <inheritdoc />
         public ISchemaTableSyntax Table(string tableName)
         {
-            return new SchemaTableQuery(_context, null, tableName);
+            return new SchemaTableQuery(_context, _context.GetObjectSchemaName(null), tableName);
         }
 
         /// <inheritdoc />
         public ISchemaSchemaSyntax Schema(string schemaName)
         {
+            // The schema itself as named: Create.Schema(...) doesn't go through the schema convention.
+            // Its tables and sequences do, so SchemaSchemaQuery resolves the name for those.
             return new SchemaSchemaQuery(_context, schemaName);
         }
 
         /// <inheritdoc />
         public ISchemaSequenceSyntax Sequence(string sequenceName)
         {
-            return new SchemaSequenceQuery(_context, null, sequenceName);
+            return new SchemaSequenceQuery(_context, _context.GetObjectSchemaName(null), sequenceName);
         }
     }
 }
