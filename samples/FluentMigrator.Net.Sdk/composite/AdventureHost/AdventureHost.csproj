@@ -5,6 +5,17 @@
 <Project>
   <Import Project="../../../../src/FluentMigrator.Net.Sdk.Host/Sdk/Sdk.props" />
 
+  <!--
+    Offline sample: this repository manages package versions centrally,
+    and the msbuild context would add a versionless FluentMigrator.MSBuild
+    reference that has no PackageVersion here (NU1010). Without central
+    management and without $(MsBuildHostContextVersion), a context records
+    its metadata in the manifest and adds no reference.
+  -->
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="../Core/Core.csproj" />
     <ProjectReference Include="../Sales/Sales.csproj" />
