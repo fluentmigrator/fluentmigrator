@@ -143,6 +143,19 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             Should.Throw<ArgumentException>(() => builder.MaskedWithValue(""));
         }
 
+        [Test, SetCulture("th-TH")]
+        public void CanBuildMaskedWithFunctionWithDateArgumentsInAnyCulture()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithFunction(
+                "anon.random_in_daterange",
+                new DateTime(2000, 1, 1),
+                new DateTimeOffset(2020, 1, 1, 0, 0, 0, TimeSpan.Zero));
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.random_in_daterange('2000-01-01 00:00:00', '2020-01-01 00:00:00 +00:00')");
+        }
+
         [Test]
         public void ThrowsWhenMaskedWithFunctionIsNull()
         {
