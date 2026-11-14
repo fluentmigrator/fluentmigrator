@@ -86,6 +86,15 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
         }
 
         [Test]
+        public void CanAlterColumnWithDescriptionContainingApostrophe()
+        {
+            var expression = GeneratorTestHelper.GetAlterColumnExpression();
+            expression.Column.ColumnDescription = "Customer's name";
+            var result = Generator.Generate(expression);
+            result.ShouldBe(@"ALTER TABLE ""PUBLIC"".""TestTable1"" ALTER COLUMN ""TestColumn1"" SET NOT NULL, COLUMN ""TestColumn1"" VARCHAR(20), COLUMN ""TestColumn1"" COMMENT 'Customer''s name';", _quotingEnabled);
+        }
+
+        [Test]
         public void CanAlterColumnIfExistsWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetAlterColumnExpression();

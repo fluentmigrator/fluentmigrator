@@ -144,6 +144,16 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
+        public void CanBuildMaskedWithFunctionWithApostropheCharArgument()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithFunction("anon.partial", "name", 1, '\'', 2);
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.partial(name, 1, '''', 2)");
+        }
+
+        [Test]
         public void ThrowsWhenMaskedWithFunctionIsNull()
         {
             var builder = new AnonSecurityLabelBuilder();
