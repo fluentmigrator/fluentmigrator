@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Packaging-only project. The SDK itself is the Sdk/, targets/ and tasks/
+    payload; this csproj exists to produce the .nupkg. Pack with:
+
+      dotnet pack src/FluentMigrator.Net.Sdk -c Release
+
+    Versioned on the runtime libraries' release train, the way
+    Microsoft.NET.Sdk ships with the .NET SDK it belongs to: a project
+    pinning FluentMigrator.Net.Sdk pins one number, and the implicit
+    FluentMigrator reference it emits lines up with it. Hence no <Version>
+    here — Global.props supplies VersionPrefix, and CI's -p:Version wins.
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <PackageId>FluentMigrator.Net.Sdk</PackageId>
+    <PackageType>MSBuildSdk</PackageType>
+    <Description>MSBuild project SDK providing a dialect-neutral SQL source control model for csproj projects containing .sql files. Builds a deterministic source model manifest describing the database object model.</Description>
+    <PackageTags>msbuild;sdk;sql;database;source-control;fluentmigrator</PackageTags>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildThisFileDirectory)../../PackageTool.props" />
+
+  <PropertyGroup>
+    <!-- This package's own README, not the shared docs/README-nuget.md. -->
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <DevelopmentDependency>true</DevelopmentDependency>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <!-- NU5128: no lib/ or ref/ folder, which is exactly right for an MSBuild SDK. -->
+    <NoWarn>$(NoWarn);NU5128</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="Sdk/**" Pack="true" PackagePath="Sdk/" />
+    <None Include="targets/**" Pack="true" PackagePath="targets/" />
+    <None Include="tasks/**" Pack="true" PackagePath="tasks/" />
+    <None Include="README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+</Project>

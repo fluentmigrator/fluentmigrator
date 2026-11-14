@@ -1,0 +1,19 @@
+<Project>
+  <Import Project="../../../src/FluentMigrator.Net.Sdk/Sdk/Sdk.props" />
+
+  <!--
+    The stubs here reference nothing, so no implicit FluentMigrator package:
+    this repository manages package versions centrally and has no
+    PackageVersion for its own package, so the default versionless
+    reference would fail restore with NU1010.
+  -->
+  <PropertyGroup>
+    <IncludeFluentMigratorReference>false</IncludeFluentMigratorReference>
+  </PropertyGroup>
+  <PropertyGroup>
+    <DatabaseDialect>postgres</DatabaseDialect>
+    <SourceModelConvention>flyway</SourceModelConvention>
+    <IsDatabaseRootModule>true</IsDatabaseRootModule>
+  </PropertyGroup>
+  <Import Project="../../../src/FluentMigrator.Net.Sdk/Sdk/Sdk.targets" />
+</Project>

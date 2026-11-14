@@ -30,10 +30,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - The factory is asked for a connection once per migration processor (per connection), not once per command, which makes rotating credentials such as Azure Entra ID or AWS RDS IAM tokens work as expected
   - Pass `ownsConnection: false` to `WithConnectionFactory` when the application keeps ownership of the connection, in which case the processor neither closes nor disposes it
   - Design rationale is recorded in [`adr/proposed/ConnectionManagement.md`](adr/proposed/ConnectionManagement.md), including how a `DbDataSource`-based design would work
+- Preview MSBuild project SDKs for a source-controlled database model:
+  - `FluentMigrator.Net.Sdk` builds a migrations project as a normal class library and additionally emits a deterministic, dialect-neutral manifest (`$(MSBuildProjectName).sourcemodel.json`) describing the database object model. Layout is declared through pivots rather than inferred, with built-in `fluentmigrator` and `flyway` convention packs that normalize onto one execution-facet vocabulary (`once`/`onChange`/`always`), so manifests from different layouts stay comparable
+  - `FluentMigrator.Net.Sdk.Host` composes module projects into a host: deployment targets in declared order (linted against the module reference graph), a `FluentMigrator.Runner.*` package resolved per target from its dialect, and the hosting contexts those commands are exposed through — emitted as `$(MSBuildProjectName).host.json`
+  - Both SDKs ship on the FluentMigrator release train and carry no version of their own, the way `Microsoft.NET.Sdk` ships with the .NET SDK it belongs to. Pin them in `global.json` under `msbuild-sdks`, using the same version as the `FluentMigrator` packages you reference
+  - Manifests are the same on every machine: object checksums are SHA-256 over normalized text (a leading UTF-8 BOM dropped, CRLF as LF), and paths are relative to the project, so a Windows checkout and Linux CI agree, including about which `onChange` objects changed
+  - Build and test them with `test/FluentMigrator.Net.Sdk.SmokeTests/smoke-test.sh`, which the pull request workflow runs on Ubuntu; samples are under `samples/FluentMigrator.Net.Sdk/`
 
 ### Documentation
 
 - New ADR: Connection Management (`adr/proposed/ConnectionManagement.md`)
+- New ADR: FluentMigrator.Runner.Host — a general command-hosting framework (`adr/proposed/FluentMigrator-Host-Design.md`)
+- New ADR: A source-controlled database model (`adr/proposed/SourceControlledDatabaseModel.md`)
 - ADRs AsyncAllTheWay (D4) and ParallelAsyncAllTheWay (§4.5) note where `PreviewFromNothing`'s version-table step must go in 10.0, so the async runner and the `VersionInfoStep` table keep the script complete (PR #2370)
 
 ### Changed

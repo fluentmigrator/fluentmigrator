@@ -1,0 +1,13 @@
+{
+  "manifestVersion": 1,
+  "project": "AdventureHost",
+  "hostContexts": [
+    { "name": "dotnet-cli", "package": "FluentMigrator.DotNet.Cli", "referenceKind": "tool",
+      "invocation": "argv", "availability": "shipping", "discovery": true }
+  ],
+  "targets": [
+    { "name": "primary", "connectionStringName": "Primary", "dialect": "sqlserver",
+      "runner": "FluentMigrator.Runner.SqlServer",
+      "modules": [ {"name": "Core", "role": "root"}, {"name": "Sales"} ] }
+  ]
+}

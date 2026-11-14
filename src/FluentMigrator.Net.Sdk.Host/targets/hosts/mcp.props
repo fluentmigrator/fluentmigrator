@@ -1,0 +1,24 @@
+<Project>
+
+  <!-- Planned (Host ADR, Consumer 8). See aspire.props for why a planned
+       pack never takes the CPM-versionless path. -->
+
+  <ItemGroup>
+    <HostContextDefinition Include="mcp"
+                           Package="FluentMigrator.Mcp"
+                           ReferenceKind="package"
+                           Invocation="mcp-tool"
+                           Availability="planned"
+                           Discovery="true"
+                           Version="$(McpHostContextVersion)"
+                           Description="One MCP tool per command, over stdio or a streamable HTTP transport." />
+  </ItemGroup>
+
+  <ItemGroup Condition="$(_HostContextSelection.Contains(';mcp;')) and '$(McpHostContextVersion)' != ''">
+    <PackageReference Include="FluentMigrator.Mcp" VersionOverride="$(McpHostContextVersion)"
+                      Condition="'$(ManagePackageVersionsCentrally)' == 'true'" />
+    <PackageReference Include="FluentMigrator.Mcp" Version="$(McpHostContextVersion)"
+                      Condition="'$(ManagePackageVersionsCentrally)' != 'true'" />
+  </ItemGroup>
+
+</Project>

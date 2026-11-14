@@ -1,0 +1,102 @@
+<Project>
+
+  <!--
+    Imported here rather than from Sdk.props on purpose: a host context pack
+    reacts to $(HostContexts) and to its own version property, both of which
+    a project body sets after Sdk.props has already been evaluated. Items a
+    pack contributes — including PackageReference — are still evaluation
+    scope, so restore sees them normally.
+  -->
+  <Import Project="$(MSBuildThisFileDirectory)FluentMigrator.Net.Sdk.Host.Contexts.props" />
+
+  <PropertyGroup>
+    <HostIntermediateManifestPath>$(IntermediateOutputPath)$(HostManifestFileName)</HostIntermediateManifestPath>
+    <HostManifestPath>$(OutputPath)$(HostManifestFileName)</HostManifestPath>
+  </PropertyGroup>
+
+  <UsingTask TaskName="FluentMigrator.Net.Sdk.Host.Tasks.BuildHostManifest"
+             TaskFactory="RoslynCodeTaskFactory"
+             AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <Task>
+      <Code Type="Class" Language="cs" Source="$(MSBuildThisFileDirectory)../tasks/BuildHostManifest.cs" />
+    </Task>
+  </UsingTask>
+
+  <!--
+    Collect module info from every ProjectReference that speaks the
+    GetDeploymentModuleInfo protocol (i.e. is a FluentMigrator.Net.Sdk
+    module). Non-module references are skipped, not failed. Item order
+    preserves ProjectReference declaration order, which is the default
+    module order (root hoisted first) when a DeploymentTarget does not
+    enumerate modules explicitly.
+  -->
+  <Target Name="CollectDeploymentModules">
+    <MSBuild Projects="@(ProjectReference)"
+             Targets="GetDeploymentModuleInfo"
+             SkipNonexistentTargets="true"
+             BuildInParallel="false">
+      <Output TaskParameter="TargetOutputs" ItemName="DeploymentModule" />
+    </MSBuild>
+  </Target>
+
+  <Target Name="BuildHostManifest"
+          Condition="'$(GenerateHostManifest)' == 'true' and '$(HostManifestFile)' == ''"
+          AfterTargets="CoreBuild"
+          DependsOnTargets="CollectDeploymentModules">
+
+    <BuildHostManifest Targets="@(DeploymentTarget)"
+                       Modules="@(DeploymentModule)"
+                       SelectedContexts="@(HostContext)"
+                       KnownContexts="@(HostContextDefinition)"
+                       RunnerPackages="@(MigrationRunnerPackage)"
+                       ProjectName="$(MSBuildProjectName)"
+                       ManifestPath="$(HostIntermediateManifestPath)"
+                       TreatValidationWarningsAsErrors="$(TreatHostWarningsAsErrors)" />
+
+    <Copy SourceFiles="$(HostIntermediateManifestPath)"
+          DestinationFiles="$(HostManifestPath)"
+          SkipUnchangedFiles="true" />
+
+    <ItemGroup>
+      <FileWrites Include="$(HostIntermediateManifestPath);$(HostManifestPath)" />
+    </ItemGroup>
+
+    <Message Importance="normal" Text="Host manifest -> $(HostManifestPath)" />
+  </Target>
+
+  <!--
+    Escape hatch (Rails database.yml style): the user's hand-authored
+    manifest is shipped verbatim. Their file, their order, their rules;
+    graph linting is deliberately not applied to it.
+  -->
+  <!--
+    Deliberately not Inputs/Outputs gated: switching a project onto a custom
+    manifest usually leaves a *newer* generated manifest sitting in the
+    output directory, and an up-to-date check would then skip the copy and
+    silently keep shipping the generated one. Copy is cheap and
+    SkipUnchangedFiles keeps the no-op case free.
+  -->
+  <Target Name="UseCustomHostManifest"
+          Condition="'$(HostManifestFile)' != ''"
+          AfterTargets="CoreBuild">
+
+    <Error Condition="!Exists('$(HostManifestFile)')"
+           Code="FMSDK206"
+           Text="HostManifestFile '$(HostManifestFile)' does not exist." />
+
+    <Copy SourceFiles="$(HostManifestFile)"
+          DestinationFiles="$(HostManifestPath)"
+          SkipUnchangedFiles="true" />
+
+    <ItemGroup>
+      <FileWrites Include="$(HostManifestPath)" />
+    </ItemGroup>
+
+    <Message Importance="normal" Text="Host manifest (custom) -> $(HostManifestPath)" />
+  </Target>
+
+  <!-- Friendly standalone entry point: dotnet msbuild -t:HostManifest -->
+  <Target Name="HostManifest"
+          DependsOnTargets="BuildHostManifest;UseCustomHostManifest" />
+
+</Project>

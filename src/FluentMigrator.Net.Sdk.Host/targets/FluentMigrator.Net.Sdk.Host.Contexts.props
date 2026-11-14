@@ -1,0 +1,56 @@
+<Project>
+
+  <!--
+    Host context registry.
+
+    A hosting context is a front door: the way a caller arrives at "run this
+    command with these arguments". adr/proposed/FluentMigrator-Host-Design.md
+    enumerates eight of them, all resolving to the same IMigrationCommand set
+    through MigrationHost — a CLI parses argv, MSBuild hands over task
+    properties, Aspire hands over a command payload, MCP hands over a tool
+    call. The framework difference between them is an adapter; the difference
+    *here* is one property.
+
+      <HostContexts>dotnet-cli;aspire</HostContexts>
+
+    Selection is a ';'-separated property rather than an item list for the
+    same reason $(SourceModelConvention) is: MSBuild evaluates all properties
+    before any item, so only a property can gate the imports below — and
+    gating imports is what lets a pack contribute its own PackageReference
+    instead of the SDK hardcoding one per front door.
+
+    Each pack under hosts/ contributes exactly one HostContextDefinition:
+
+      Package        the adapter package implementing this front door
+      ReferenceKind  package  - referenced by the host project
+                     tool     - invoked out of process (dotnet tool), never referenced
+      Invocation     how the caller supplies the command and its arguments
+      Availability   shipping - the package exists today
+                     planned  - described by the Host ADR, not yet shipped;
+                                selecting it is legal and recorded in the
+                                manifest, it simply adds no reference
+      Discovery      true when the context renders MigrationHost.Discover()
+                     metadata rather than hardcoding a command list
+      Version        resolved from that pack's version property, if set
+
+    Extension is declaring another pack, never teaching the SDK about a new
+    front door: point $(CustomHostContextPacks) (a ';'-separated list of
+    props file paths) at your own.
+  -->
+
+  <PropertyGroup>
+    <HostContexts Condition="'$(HostContexts)' == ''">dotnet-cli</HostContexts>
+
+    <!-- Delimited on both ends so a pack can test for ';name;' and not
+         match a context whose name merely contains its own. -->
+    <_HostContextSelection>;$(HostContexts);</_HostContextSelection>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildThisFileDirectory)hosts/*.props" />
+  <Import Project="$(CustomHostContextPacks)" Condition="'$(CustomHostContextPacks)' != ''" />
+
+  <ItemGroup>
+    <HostContext Include="$(HostContexts)" />
+  </ItemGroup>
+
+</Project>
