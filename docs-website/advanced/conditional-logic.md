@@ -177,9 +177,13 @@ public class SchemaStateConditionals : Migration
 
 ### Which schema the checks look in
 
-A check without a schema, such as `Schema.Table("Users").Exists()`, looks in the same schema that `Create.Table("Users")` creates the table in. If your convention set has a default schema (`new DefaultConventionSet("app", null)`, or `--default-schema-name app` in `dotnet-fm`), that's the default schema. Otherwise, it's the connection's default schema. `Schema.Schema("audit").Table("Users").Exists()` always looks in `audit`.
+A check without a schema, such as `Schema.Table("Users").Exists()`, uses your convention set's default schema if it has one (`new DefaultConventionSet("app", null)`, or `--default-schema-name app` in `dotnet-fm`). That's the schema `Create.Table("Users")` uses too.
 
-Before 9.0, checks without a schema ignored the convention set's default schema and always looked in the connection's default schema. So an idempotent migration could miss a table it had created itself and try to create it again (issue #1055).
+Without a default schema, the check passes no schema to the database provider, and the provider picks one. That isn't always the connection's current schema. PostgreSQL checks `public` and SQL Server checks `dbo`, whatever the connection's `search_path` or default schema is. The same two providers also create a table with no schema in `public` and `dbo`, so a table check and `Create.Table` still agree. Sequences on PostgreSQL are the exception: `Create.Sequence("Seq")` with no schema creates the sequence in the first schema on `search_path`, while `Schema.Sequence("Seq").Exists()` looks in `public`. If you work in a schema other than the provider's default, set it in the convention set or name it with `Schema.Schema("app")`.
+
+`Schema.Schema("audit").Table("Users").Exists()` looks in `audit`, after applying the same convention that `Create.Table("Users").InSchema("audit")` goes through. `Schema.Schema("audit").Exists()` checks `audit` exactly as written, because `Create.Schema("audit")` creates it under that name.
+
+Before 9.0, checks without a schema ignored the convention set's default schema and always used the provider's fallback. So with a default schema configured, an idempotent migration could miss a table it had created itself and try to create it again (issue #1055).
 
 ## Custom Conditional Logic
 

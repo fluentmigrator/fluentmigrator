@@ -199,17 +199,49 @@ namespace FluentMigrator.Tests.Unit.Builders.Schema
             _querySchemaMock.Verify(x => x.SequenceExists(null, _testSequence));
         }
 
+        [Test]
+        public void ASchemaCheckUsesTheNameAsGivenButItsObjectsGoThroughTheConvention()
+        {
+            // Create.Schema("audit") creates audit: CreateSchemaExpression doesn't go through the schema convention.
+            // Create.Table("Log").InSchema("audit") does, and creates tenant_audit.Log.
+            var conventionSet = new ConventionSet { SchemaConvention = new DefaultSchemaConvention(new TenantSchemaNameConvention()) };
+            UseResolver(new ConventionSetDefaultSchemaNameResolver(conventionSet));
+
+            _builder.Schema("audit").Exists();
+            _builder.Schema("audit").Table(_testTable).Exists();
+            _builder.Schema("audit").Sequence(_testSequence).Exists();
+
+            _querySchemaMock.Verify(x => x.SchemaExists("audit"));
+            _querySchemaMock.Verify(x => x.TableExists("tenant_audit", _testTable));
+            _querySchemaMock.Verify(x => x.SequenceExists("tenant_audit", _testSequence));
+        }
+
         /// <summary>
         /// What the runner registers: the default schema of the convention set.
         /// </summary>
         private void UseDefaultSchema(string defaultSchema)
         {
+            UseResolver(new ConventionSetDefaultSchemaNameResolver(new DefaultConventionSet(defaultSchema, workingDirectory: null)));
+        }
+
+        private void UseResolver(IDefaultSchemaNameResolver resolver)
+        {
             var serviceProvider = new ServiceCollection()
-                .AddSingleton<IDefaultSchemaNameResolver>(
-                    new ConventionSetDefaultSchemaNameResolver(new DefaultConventionSet(defaultSchema, workingDirectory: null)))
+                .AddSingleton(resolver)
                 .BuildServiceProvider();
 
             _migrationContextMock.Setup(x => x.ServiceProvider).Returns(serviceProvider);
+        }
+
+        /// <summary>
+        /// A convention that also renames schemas the migration names, as a multi-tenant setup might.
+        /// </summary>
+        private class TenantSchemaNameConvention : IDefaultSchemaNameConvention
+        {
+            public string GetSchemaName(string originalSchemaName)
+            {
+                return originalSchemaName == null ? "tenant" : "tenant_" + originalSchemaName;
+            }
         }
     }
 }
