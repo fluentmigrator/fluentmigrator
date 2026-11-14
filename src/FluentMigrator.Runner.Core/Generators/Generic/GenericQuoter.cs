@@ -149,7 +149,7 @@ namespace FluentMigrator.Runner.Generators.Generic
         /// <inheritdoc />
         public virtual string FormatChar(char value)
         {
-            return ValueQuote + value + ValueQuote;
+            return ValueQuote + value.ToString().Replace(ValueQuote, EscapeValueQuote) + ValueQuote;
         }
 
         /// <inheritdoc />
