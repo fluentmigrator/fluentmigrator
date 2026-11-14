@@ -177,13 +177,66 @@ public class SchemaStateConditionals : Migration
 
 ### Which schema the checks look in
 
-A check without a schema, such as `Schema.Table("Users").Exists()`, uses your convention set's default schema if it has one (`new DefaultConventionSet("app", null)`, or `--default-schema-name app` in `dotnet-fm`). That's the schema `Create.Table("Users")` uses too.
+An idempotent migration has two halves, and they only work together if they point at the same schema:
 
-Without a default schema, the check passes no schema to the database provider, and the provider picks one. That isn't always the connection's current schema. PostgreSQL checks `public` and SQL Server checks `dbo`, whatever the connection's `search_path` or default schema is. The same two providers also create a table with no schema in `public` and `dbo`, so a table check and `Create.Table` still agree. Sequences on PostgreSQL are the exception: `Create.Sequence("Seq")` with no schema creates the sequence in the first schema on `search_path`, while `Schema.Sequence("Seq").Exists()` looks in `public`. If you work in a schema other than the provider's default, set it in the convention set or name it with `Schema.Schema("app")`.
+```csharp
+if (!Schema.Table("Users").Exists())   // the check: a query the processor runs right away
+{
+    Create.Table("Users")              // the create: SQL the generator writes
+        .WithColumn("Id").AsInt32().PrimaryKey();
+}
+```
 
-`Schema.Schema("audit").Table("Users").Exists()` looks in `audit`, after applying the same convention that `Create.Table("Users").InSchema("audit")` goes through. `Schema.Schema("audit").Exists()` checks `audit` exactly as written, because `Create.Schema("audit")` creates it under that name.
+If the check looks in one schema and the create writes to another, the check never finds the table. The first run is fine, and the next migration that repeats the check fails with "already exists". The opposite mismatch is worse: if the check finds a table of the same name in some other schema, the migration skips the create, and nothing reports that the table is missing.
 
-Before 9.0, checks without a schema ignored the convention set's default schema and always used the provider's fallback. So with a default schema configured, an idempotent migration could miss a table it had created itself and try to create it again (issue #1055).
+#### With a default schema (recommended)
+
+If your convention set has a default schema, both halves use it:
+
+```csharp
+services.AddSingleton<IConventionSet>(new DefaultConventionSet("app", workingDirectory: null));
+```
+
+With `dotnet-fm`, use `--default-schema-name app`. Then `Schema.Table("Users").Exists()` checks `app.Users`, and `Create.Table("Users")` creates `app.Users`. The same goes for `Schema.Sequence(...)` and for the column, index and constraint checks under `Schema.Table(...)`.
+
+This is the most reliable setup on every provider, because neither half falls back to a provider default.
+
+#### Without a default schema
+
+The check passes no schema to the database provider, and the provider picks one. That isn't always the connection's current schema. What matters is whether the provider's check and its generated SQL pick the same one:
+
+| Provider | Check with no schema | Create with no schema | Agree? |
+|---|---|---|---|
+| PostgreSQL, tables | `public` | `"public"."Users"` | Yes |
+| PostgreSQL, sequences | `public` | `CREATE SEQUENCE "Seq"`, so the first schema on `search_path` | Only if that schema is `public` |
+| SQL Server | `dbo` | `[dbo].[Users]` | Yes |
+| Oracle | `USER_TABLES` / `USER_SEQUENCES`: the login's own schema | `CREATE TABLE Users`, so the session's current schema | Yes, unless the session changes `CURRENT_SCHEMA` |
+| Db2 | any schema: the check has no schema filter | `CREATE TABLE Users`, so `CURRENT SCHEMA` | Only if no other schema has an object with that name |
+
+On PostgreSQL and SQL Server, the connection's `search_path` or the login's default schema doesn't change where the check looks.
+
+Two cases fail:
+
+- **PostgreSQL sequences.** With the default `search_path` (`"$user", public`) and a schema named after the login, `Create.Sequence("Seq")` creates the sequence in that schema. `Schema.Sequence("Seq").Exists()` still looks in `public`, so a repeated check creates the sequence again and fails.
+- **Db2.** If another schema already has a `Users` table, `Schema.Table("Users").Exists()` returns `true`. The migration skips `Create.Table("Users")`, and the table is never created in your schema.
+
+In both cases, configure a default schema as shown above, or name the schema in both halves:
+
+```csharp
+if (!Schema.Schema("app").Sequence("Seq").Exists())
+{
+    Create.Sequence("Seq").InSchema("app");
+}
+```
+
+#### Naming a schema explicitly
+
+- `Schema.Schema("audit").Table("Users").Exists()` looks for `Users` in `audit`. The name goes through the same schema convention as `Create.Table("Users").InSchema("audit")`, so a custom convention that renames schemas applies to both.
+- `Schema.Schema("audit").Exists()` checks for `audit` exactly as written. `Create.Schema("audit")` doesn't go through the schema convention, so the check doesn't either.
+
+#### Before 9.0
+
+Checks without a schema ignored the convention set's default schema and always used the provider's choice from the table above. With a default schema configured, `Create.Table("Users")` created `app.Users` while `Schema.Table("Users").Exists()` looked in `public` or `dbo`. So an idempotent migration missed the table it had created itself and tried to create it again (issue #1055).
 
 ## Custom Conditional Logic
 
