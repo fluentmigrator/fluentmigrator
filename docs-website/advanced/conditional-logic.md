@@ -175,6 +175,12 @@ public class SchemaStateConditionals : Migration
 }
 ```
 
+### Which schema the checks look in
+
+A check without a schema, such as `Schema.Table("Users").Exists()`, looks in the same schema that `Create.Table("Users")` creates the table in. If your convention set has a default schema (`new DefaultConventionSet("app", null)`, or `--default-schema-name app` in `dotnet-fm`), that's the default schema. Otherwise, it's the connection's default schema. `Schema.Schema("audit").Table("Users").Exists()` always looks in `audit`.
+
+Before 9.0, checks without a schema ignored the convention set's default schema and always looked in the connection's default schema. So an idempotent migration could miss a table it had created itself and try to create it again (issue #1055).
+
 ## Custom Conditional Logic
 
 ### Feature Flag-Based Conditionals

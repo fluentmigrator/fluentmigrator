@@ -213,6 +213,11 @@ namespace Microsoft.Extensions.DependencyInjection
                 .TryAddEnumerable(ServiceDescriptor.Scoped<ISqlTokenProvider, DefaultSqlTokenProvider>());
 
             services
+                // Gives Schema.Table(...).Exists() and the other schema queries the convention set's
+                // default schema, as the runner gives it to expressions (#1055)
+                .TryAddScoped<IDefaultSchemaNameResolver, ConventionSetDefaultSchemaNameResolver>();
+
+            services
                 // Configure the accessor for the version table metadata
                 .TryAddScoped<IVersionTableMetaDataAccessor, AssemblySourceVersionTableMetaDataAccessor>();
 

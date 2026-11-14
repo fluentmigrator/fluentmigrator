@@ -45,19 +45,29 @@ namespace FluentMigrator.Builders.Schema
         /// <inheritdoc />
         public ISchemaTableSyntax Table(string tableName)
         {
-            return new SchemaTableQuery(_context, null, tableName);
+            return new SchemaTableQuery(_context, GetSchemaName(null), tableName);
         }
 
         /// <inheritdoc />
         public ISchemaSchemaSyntax Schema(string schemaName)
         {
-            return new SchemaSchemaQuery(_context, schemaName);
+            return new SchemaSchemaQuery(_context, GetSchemaName(schemaName));
         }
 
         /// <inheritdoc />
         public ISchemaSequenceSyntax Sequence(string sequenceName)
         {
-            return new SchemaSequenceQuery(_context, null, sequenceName);
+            return new SchemaSequenceQuery(_context, GetSchemaName(null), sequenceName);
+        }
+
+        /// <summary>
+        /// The schema the migration's expressions use, so that a query looks where <c>Create</c> puts things.
+        /// Without an <see cref="IDefaultSchemaNameResolver"/>, the schema as given.
+        /// </summary>
+        private string GetSchemaName(string schemaName)
+        {
+            var resolver = _context.ServiceProvider?.GetService(typeof(IDefaultSchemaNameResolver)) as IDefaultSchemaNameResolver;
+            return resolver == null ? schemaName : resolver.GetSchemaName(schemaName);
         }
     }
 }
