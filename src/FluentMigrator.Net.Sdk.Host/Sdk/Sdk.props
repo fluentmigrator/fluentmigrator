@@ -46,7 +46,6 @@
   <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
 
   <PropertyGroup>
-    <TargetFramework Condition="'$(TargetFramework)' == '' and '$(TargetFrameworks)' == ''">netstandard2.0</TargetFramework>
     <IsPackable Condition="'$(IsPackable)' == ''">false</IsPackable>
 
     <GenerateHostManifest Condition="'$(GenerateHostManifest)' == ''">true</GenerateHostManifest>

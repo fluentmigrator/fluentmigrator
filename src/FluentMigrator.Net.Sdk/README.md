@@ -162,10 +162,10 @@ full object model without reparsing the project file.
 ```
 
 Determinism is a design requirement: objects sorted (type, schema, name, path),
-lowercase hex, `\n` line endings, rewritten only on change. The manifest is
-meant to be committed and diffed — clean diffs *are* the source control model.
-`type` is an open vocabulary and `properties` an open bag, so future providers
-need no schema change.
+lowercase hex, `\n` line endings, rewritten only on change. Clean diffs *are*
+the source control model; the copy you commit and diff is the lock file
+(below), not this build output. `type` is an open vocabulary and `properties`
+an open bag, so future providers need no schema change.
 
 It also has to hold across machines, so two things never depend on the
 checkout:
@@ -183,8 +183,57 @@ checkout:
 The manifest is rebuilt whenever anything it's made from changes: the set of
 files, a file's content, an item's classification metadata (even when an
 imported `.props` or `.targets` file sets it), or one of the properties in the
-table below (even from `-p:` or `Directory.Build.props`). Otherwise the build
-skips it.
+table below (even from `-p:` or `Directory.Build.props`). The check compares
+content hashes, not timestamps, so a checkout, a `git stash pop` or a restored
+CI cache can't make it skip a changed file. Otherwise the build skips it.
+`dotnet clean` removes the manifest, and so does a build with
+`GenerateSourceModelManifest=false`, so an old one never lingers in `bin/`.
+
+## Committing the source model: the lock file
+
+The manifest is a build output in `obj/` and `bin/`, like `project.deps.json`.
+Don't commit it, and don't point `SourceModelManifestFileName` into the source
+tree: it is a file name only, and a path in it is error `FMSDK003`. In the
+source tree, git checkouts, merges, hand edits and several configurations or
+target frameworks writing one file would all defeat the incremental build.
+
+To commit the source model, so pull requests show which objects changed, turn
+on the lock file, the way `packages.lock.json` commits a restore:
+
+```xml
+<PropertyGroup>
+  <GenerateSourceModelLockFile>true</GenerateSourceModelLockFile>
+  <!-- In CI: fail instead of updating the lock. -->
+  <SourceModelLockedMode Condition="'$(CI)' == 'true'">true</SourceModelLockedMode>
+</PropertyGroup>
+```
+
+`$(MSBuildProjectName).sourcemodel.lock.json` then sits next to the project
+(`SourceModelLockFilePath` moves it). It has the manifest's content, and it
+works differently from the manifest because it lives in the source tree:
+
+- **It is compared on every build, by content.** There is no up-to-date check
+  to fool: a hand-edited or mis-merged lock is corrected by the next build, or
+  reported in locked mode.
+- **Line endings don't matter.** The comparison ignores CRLF and a BOM, so a
+  checkout with `core.autocrlf` isn't a change, and the build doesn't rewrite
+  the file. It writes LF.
+- **There is one writer per project.** With several target frameworks, the
+  outer build writes it, and only if every framework produced the same source
+  model (`FMSDK005` otherwise).
+- **Locked mode never writes.** A missing or different lock is `FMSDK004`,
+  which names the objects that were added, removed or changed. Without locked
+  mode, CI would quietly regenerate a stale lock and pass.
+- **`dotnet build -t:RewriteSourceModelLock`** is the explicit writer, even in
+  locked mode. Use it after resolving a merge conflict in the lock rather than
+  editing the file by hand.
+- **Clean never deletes it.** It isn't a build output.
+
+Recommended in `.gitattributes`, so the committed file is LF everywhere:
+
+```
+*.sourcemodel.lock.json text eol=lf
+```
 
 ## Properties and diagnostics
 
@@ -200,10 +249,16 @@ skips it.
 | `EnableDefaultSourceModelItems` | `true` | Disable built-in pivots for full manual control |
 | `GenerateSourceModelManifest` | `true` | Turn the manifest step off |
 | `TreatSourceModelWarningsAsErrors` | `false` | Promote FMSDK1xx warnings |
-| `SourceModelManifestFileName` | `$(MSBuildProjectName).sourcemodel.json` | Output name |
+| `SourceModelManifestFileName` | `$(MSBuildProjectName).sourcemodel.json` | Output file name, without a path (`FMSDK003`) |
+| `GenerateSourceModelLockFile` | `false` | Compare the lock file every build; create or update it |
+| `SourceModelLockedMode` | `false` | Fail (`FMSDK004`) instead of writing the lock; for CI |
+| `SourceModelLockFilePath` | `$(MSBuildProjectDirectory)/$(MSBuildProjectName).sourcemodel.lock.json` | Where the lock file goes |
 
 Diagnostics: `FMSDK001` duplicate object identity — case-insensitive, only for
 pivots declaring `UniqueIdentity` (error); `FMSDK002` missing file (error);
+`FMSDK003` path in `SourceModelManifestFileName` (error); `FMSDK004` locked
+mode: lock file missing or out of date (error); `FMSDK005` target frameworks
+produced different source models, so there is no single lock (error);
 `FMSDK100` file with no `ObjectType` (warning); `FMSDK101` empty file (warning);
 `FMSDK102` `Tools/` artifact in a non-root module (warning); `FMSDK103` file
 outside `SourceModelRoot` without `Link` metadata (warning); `FMSDK104`

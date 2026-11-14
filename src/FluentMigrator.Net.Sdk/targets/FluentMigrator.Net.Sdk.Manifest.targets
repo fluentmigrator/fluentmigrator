@@ -13,6 +13,14 @@
     -->
     <VersionTableName Condition="'$(VersionTableName)' == ''">VersionInfo</VersionTableName>
     <VersionTableSchema Condition="'$(VersionTableSchema)' == ''">$(DefaultSchema)</VersionTableSchema>
+
+    <!--
+      The lock file: the committed copy of the manifest, next to the project by
+      default. See the SourceModelLock targets below.
+    -->
+    <GenerateSourceModelLockFile Condition="'$(GenerateSourceModelLockFile)' == ''">false</GenerateSourceModelLockFile>
+    <SourceModelLockedMode Condition="'$(SourceModelLockedMode)' == ''">false</SourceModelLockedMode>
+    <SourceModelLockFilePath Condition="'$(SourceModelLockFilePath)' == ''">$(MSBuildProjectDirectory)/$(MSBuildProjectName).sourcemodel.lock.json</SourceModelLockFilePath>
   </PropertyGroup>
 
   <UsingTask TaskName="FluentMigrator.Net.Sdk.Tasks.BuildSourceModel"
@@ -20,6 +28,14 @@
              AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
     <Task>
       <Code Type="Class" Language="cs" Source="$(MSBuildThisFileDirectory)../tasks/BuildSourceModel.cs" />
+    </Task>
+  </UsingTask>
+
+  <UsingTask TaskName="FluentMigrator.Net.Sdk.Tasks.SourceModelLock"
+             TaskFactory="RoslynCodeTaskFactory"
+             AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <Task>
+      <Code Type="Class" Language="cs" Source="$(MSBuildThisFileDirectory)../tasks/SourceModelLock.cs" />
     </Task>
   </UsingTask>
 
@@ -110,18 +126,41 @@
     object that no longer exists. For a document whose entire purpose is to be
     committed and diffed, silently stale is the one unacceptable outcome.
 
-    This stamp file's content is everything the manifest task reads apart from
-    the files' own bytes: the input list, each item's classification metadata,
-    and the task's property inputs. WriteOnlyWhenDifferent touches it exactly
-    when one of those changes, and it joins Inputs below. Timestamps can't see
-    any of them: not a deleted input, not a property passed with -p: or set in
-    Directory.Build.props or an imported .props file, and not an Update in a
-    shared props file that flips an item's ContentType or Execution. Each of
-    those used to leave the old manifest in place.
+    This stamp file's content is everything the manifest task reads: the input
+    list, each item's classification metadata, the task's property inputs, and
+    each input's content hash. WriteOnlyWhenDifferent touches it exactly when
+    one of those changes, and it joins Inputs below. Timestamps can't be
+    trusted for any of them: not a deleted input, not a property passed with
+    -p: or set in Directory.Build.props or an imported .props file, not an
+    Update in a shared props file that flips an item's ContentType or
+    Execution, and not even a file's content, since a git checkout, a stash pop
+    or a restored CI cache can leave the manifest newer than an input that
+    changed. Each of those used to leave the old manifest in place.
+
+    Hashing reads every input on every build. Pivot files are small, and the
+    manifest task reads them all anyway whenever it runs.
   -->
   <Target Name="WriteSourceModelInputsStamp"
           Condition="'$(GenerateSourceModelManifest)' == 'true'"
           DependsOnTargets="CollectSourceModel">
+    <!--
+      The manifest is a build output; its file name is only a name. A path here
+      would put it in the source tree, where git and merges change it behind
+      the up-to-date check's back, and make the obj/ and bin/ copies collapse
+      onto one file. The committed copy is the lock file instead.
+    -->
+    <Error Code="FMSDK003"
+           Condition="$(SourceModelManifestFileName.Contains('/')) or $(SourceModelManifestFileName.Contains('\')) or $(SourceModelManifestFileName.Contains('..'))"
+           Text="SourceModelManifestFileName '$(SourceModelManifestFileName)' contains a path. It is a file name: the manifest is a build output in obj/ and bin/. To commit the source model, set GenerateSourceModelLockFile=true (and SourceModelLockFilePath to choose where the lock goes)." />
+    <ItemGroup>
+      <!-- A missing file is FMSDK002, reported by the manifest task; don't let
+           GetFileHash fail on it first with a less useful error. -->
+      <_SourceModelExistingFile Include="@(SourceModelFile)" Condition="Exists('%(FullPath)')" />
+    </ItemGroup>
+    <GetFileHash Files="@(_SourceModelExistingFile)" Algorithm="SHA256" HashEncoding="hex"
+                 Condition="'@(_SourceModelExistingFile)' != ''">
+      <Output TaskParameter="Items" ItemName="_SourceModelFileHash" />
+    </GetFileHash>
     <ItemGroup>
       <_SourceModelInputsStampLine Include="property:Root=$(SourceModelRoot)" />
       <_SourceModelInputsStampLine Include="property:Dialect=$(DatabaseDialect)" />
@@ -130,6 +169,7 @@
       <_SourceModelInputsStampLine Include="property:IsRoot=$(IsDatabaseRootModule)" />
       <_SourceModelInputsStampLine Include="property:WarningsAsErrors=$(TreatSourceModelWarningsAsErrors)" />
       <_SourceModelInputsStampLine Include="@(SourceModelFile->'item:%(Identity)|Provider=%(Provider)|ObjectType=%(ObjectType)|UniqueIdentity=%(UniqueIdentity)|NamePolicy=%(NamePolicy)|Schema=%(Schema)|ObjectName=%(ObjectName)|Role=%(Role)|ContentType=%(ContentType)|Execution=%(Execution)|Stage=%(Stage)|Link=%(Link)')" />
+      <_SourceModelInputsStampLine Include="@(_SourceModelFileHash->'hash:%(Identity)=%(FileHash)')" />
     </ItemGroup>
     <WriteLinesToFile File="$(SourceModelInputsStampPath)"
                       Lines="@(_SourceModelInputsStampLine)"
@@ -185,6 +225,96 @@
     </ItemGroup>
 
     <Message Importance="normal" Text="Source model manifest -> $(SourceModelManifestPath)" />
+  </Target>
+
+  <!--
+    IncrementalClean runs inside CoreBuild, before the targets above (they run
+    AfterTargets="CoreBuild"), so the FileWrites they add arrive too late to be
+    recorded: dotnet clean never removed a manifest, and turning generation off
+    left the last one in bin/. Registering the paths here, before
+    IncrementalClean and from properties alone, records them in every build
+    that generates them, including one where the manifest target is skipped
+    as up to date; IncrementalClean must never delete a manifest the build
+    still owns. A build that doesn't generate them doesn't register them, so
+    IncrementalClean removes the old ones.
+
+    The hook is CopyFilesToOutputDirectory, not BeforeTargets="IncrementalClean":
+    IncrementalClean takes its snapshot of FileWrites in a target it depends on,
+    and dependencies run before BeforeTargets, so that would be too late too.
+    CopyFilesToOutputDirectory is public and runs earlier in CoreBuild.
+  -->
+  <Target Name="RegisterSourceModelFileWrites"
+          BeforeTargets="CopyFilesToOutputDirectory"
+          Condition="'$(GenerateSourceModelManifest)' == 'true'">
+    <ItemGroup>
+      <FileWrites Include="$(SourceModelInputsStampPath);$(SourceModelIntermediateManifestPath);$(SourceModelManifestPath)" />
+    </ItemGroup>
+  </Target>
+
+  <!--
+    Lock file: the committed copy of the source model (packages.lock.json's
+    role; see adr/proposed/SourceControlledDatabaseModel.md, "Lock file").
+
+      GenerateSourceModelLockFile=true   compare on every build; create or update the lock
+      SourceModelLockedMode=true         CI: fail (FMSDK004) instead of writing
+      -t:RewriteSourceModelLock          the explicit writer, even in locked mode
+      SourceModelLockFilePath            where it goes (default: next to the project)
+
+    Unlike the manifest, the lock has no Inputs/Outputs and is never in
+    FileWrites. It lives in the source tree, where checkouts, merges and hand
+    edits change it, so it is compared by content every build and never
+    deleted by a clean. One writer per project: the build itself with one
+    target framework, the outer build with several, after checking that every
+    framework produced the same manifest (FMSDK005).
+  -->
+  <PropertyGroup>
+    <_SourceModelLockManifestsDependsOn Condition="'$(IsCrossTargetingBuild)' == 'true'">_CollectInnerSourceModelManifests</_SourceModelLockManifestsDependsOn>
+    <_SourceModelLockManifestsDependsOn Condition="'$(IsCrossTargetingBuild)' != 'true'">_CollectOwnSourceModelManifest</_SourceModelLockManifestsDependsOn>
+  </PropertyGroup>
+
+  <!-- Inner build protocol for the outer build's lock check. -->
+  <Target Name="GetSourceModelManifest"
+          DependsOnTargets="BuildSourceModelManifest"
+          Returns="@(_SourceModelOwnManifest)">
+    <ItemGroup>
+      <_SourceModelOwnManifest Include="$([MSBuild]::NormalizePath('$(MSBuildProjectDirectory)', '$(SourceModelIntermediateManifestPath)'))"
+                               TargetFramework="$(TargetFramework)" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="_CollectOwnSourceModelManifest" DependsOnTargets="GetSourceModelManifest">
+    <ItemGroup>
+      <_SourceModelLockManifest Include="@(_SourceModelOwnManifest)" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="_CollectInnerSourceModelManifests">
+    <ItemGroup>
+      <_SourceModelLockFramework Include="$(TargetFrameworks)" />
+    </ItemGroup>
+    <MSBuild Projects="$(MSBuildProjectFullPath)"
+             Targets="GetSourceModelManifest"
+             Properties="TargetFramework=%(_SourceModelLockFramework.Identity)">
+      <Output TaskParameter="TargetOutputs" ItemName="_SourceModelLockManifest" />
+    </MSBuild>
+  </Target>
+
+  <Target Name="CheckSourceModelLock"
+          AfterTargets="Build"
+          Condition="'$(GenerateSourceModelLockFile)' == 'true' and '$(GenerateSourceModelManifest)' == 'true' and ('$(IsCrossTargetingBuild)' == 'true' or '$(TargetFrameworks)' == '')"
+          DependsOnTargets="$(_SourceModelLockManifestsDependsOn)">
+    <SourceModelLock Manifests="@(_SourceModelLockManifest)"
+                     LockPath="$(SourceModelLockFilePath)"
+                     LockedMode="$(SourceModelLockedMode)" />
+  </Target>
+
+  <Target Name="RewriteSourceModelLock"
+          Condition="'$(GenerateSourceModelManifest)' == 'true'"
+          DependsOnTargets="$(_SourceModelLockManifestsDependsOn)">
+    <SourceModelLock Manifests="@(_SourceModelLockManifest)"
+                     LockPath="$(SourceModelLockFilePath)"
+                     LockedMode="$(SourceModelLockedMode)"
+                     Rewrite="true" />
   </Target>
 
   <!-- Friendly standalone entry point: dotnet msbuild -t:SourceModel -->

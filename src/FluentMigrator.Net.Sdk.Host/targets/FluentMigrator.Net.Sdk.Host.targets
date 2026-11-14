@@ -95,6 +95,22 @@
     <Message Importance="normal" Text="Host manifest (custom) -> $(HostManifestPath)" />
   </Target>
 
+  <!--
+    Same reason as RegisterSourceModelFileWrites in FluentMigrator.Net.Sdk: the
+    targets above run after CoreBuild, so after IncrementalClean, and their
+    FileWrites were never recorded. Registered here from properties alone, so
+    dotnet clean removes the host manifest, and switching to HostManifestFile
+    removes the generated intermediate copy.
+  -->
+  <Target Name="RegisterHostManifestFileWrites" BeforeTargets="CopyFilesToOutputDirectory">
+    <ItemGroup>
+      <FileWrites Include="$(HostIntermediateManifestPath);$(HostManifestPath)"
+                  Condition="'$(GenerateHostManifest)' == 'true' and '$(HostManifestFile)' == ''" />
+      <FileWrites Include="$(HostManifestPath)"
+                  Condition="'$(HostManifestFile)' != ''" />
+    </ItemGroup>
+  </Target>
+
   <!-- Friendly standalone entry point: dotnet msbuild -t:HostManifest -->
   <Target Name="HostManifest"
           DependsOnTargets="BuildHostManifest;UseCustomHostManifest" />

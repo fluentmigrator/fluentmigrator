@@ -698,3 +698,53 @@ against a stored baseline, fail on incompatible removal" applied to the JSON
 manifest as a CI gate: the lock file is that stored baseline. And it is where
 `onChange` semantics become reviewable — a changed view checksum appears in a
 pull request diff instead of only at deploy time.
+
+### Why not commit the manifest itself
+
+Considered and rejected during review of PR #2325: pointing
+`SourceModelManifestFileName` into the source tree and committing the build
+output. An adversarial review reproduced each of these:
+
+- **A wrong committed manifest is never repaired.** The manifest target's
+  up-to-date check asks whether its output is newer than its inputs. Any edit to
+  the output, including a hand-resolved merge conflict, makes it the newest
+  file, so the build skips and the wrong facets survive (and flow into
+  `host.json`).
+- **Several writers, one file.** Debug and Release, or several target
+  frameworks, each keep their own stamp in `obj/` but write the same file. Add
+  a view, build Debug, delete it, build Release: Release is "up to date" and
+  the file keeps the deleted view. With a framework-conditional item, the
+  committed content depended on which framework built last.
+- **CI repairs drift silently.** A fresh clone has no stamp, so CI regenerates
+  the file and passes, unless a separate `git diff --exit-code` step exists.
+- **Line endings.** Under `core.autocrlf`, the byte comparison saw every
+  checkout as a change and rewrote the file, leaving it permanently modified in
+  `git status`.
+- **The only spelling was `../../../`**, whose depth depends on runtime
+  identifiers, artifacts output and `AppendTargetFrameworkToOutputPath`.
+
+These are inherent to an incremental build output that lives in the source
+tree. So the manifest stays a file name in `obj/` and `bin/` (a path in
+`SourceModelManifestFileName` is `FMSDK003`), and the committed copy is the
+lock file, built to the opposite rules.
+
+### Requirements (implemented in PR #2325)
+
+- **No up-to-date check.** The lock is compared with the build's manifest on
+  every build, by content. A hand edit or a mis-merge is corrected, or
+  reported in locked mode.
+- **Line-ending-insensitive.** Both sides are compared without CRLF or a BOM;
+  an equal lock is never rewritten, so a CRLF checkout stays clean. The lock is
+  written with LF, and `*.sourcemodel.lock.json text eol=lf` is the
+  recommended `.gitattributes` line.
+- **One writer per project.** With one target framework, the build itself;
+  with several, the outer build, after requiring every framework's manifest to
+  be identical (`FMSDK005`). The lock has no meaning if its content depends on
+  build order.
+- **Locked mode never writes.** `SourceModelLockedMode=true` turns a missing or
+  different lock into `FMSDK004`, naming the added, removed and changed objects.
+  `-t:RewriteSourceModelLock` is the only writer in that mode.
+- **Never a build output.** The lock is not in `FileWrites`, so `dotnet clean`
+  never deletes a committed file.
+- **A dedicated path property**, `SourceModelLockFilePath`, defaulting to next
+  to the project, instead of path tricks in a file-name property.

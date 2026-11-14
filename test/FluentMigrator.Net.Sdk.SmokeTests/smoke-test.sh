@@ -38,6 +38,7 @@ restore() { if [ -f "$1.smokebak" ]; then mv "$1.smokebak" "$1"; fi; }
 cleanup() {
   rm -rf "$FEED" "$SCRATCH" "$SHARED"
   rm -rf "$ADVENTURE/Schema/Views/legacy" "$ADVENTURE/Schema/Functions/sales.open_orders.sql"
+  rm -f "$ADVENTURE/AdventureLite.sourcemodel.lock.json" "$ADVENTURE/Schema/Views/sales.tmp_lock.sql"
   if [ -f "$COMPOSITE/AdventureHost/AdventureHost.csproj.bak" ]; then
     mv "$COMPOSITE/AdventureHost/AdventureHost.csproj.bak" "$COMPOSITE/AdventureHost/AdventureHost.csproj"
   fi
@@ -286,6 +287,116 @@ if printf '%s' "$EXEC_OUT" | grep "FMSDK104" | grep -q "fn_order_total"; then pa
 if printf '%s' "$EXEC_OUT" | grep "FMSDK104" | grep -q "open_orders"; then fail "FMSDK104 should not fire for OnChange"; else pass "no FMSDK104 for a known value in another case"; fi
 build "$ADVENTURE" > /dev/null
 
+section "content changes behind a newer manifest"
+# Regression: the up-to-date check compared timestamps, so a manifest newer
+# than a changed input (a checkout, a stash pop, a restored CI cache) kept the
+# old checksum. The stamp now carries each input's content hash.
+INTERMEDIATE=$ADVENTURE/obj/Debug/$TFM/AdventureLite.sourcemodel.json
+backup "$VIEW"
+BEFORE_SUM=$(checksum_of "$MANIFEST" "$VIEW_PATH")
+printf -- '-- edited\n' >> "$VIEW"
+sleep 1
+touch "$INTERMEDIATE"
+build "$ADVENTURE" > /dev/null
+AFTER_SUM=$(checksum_of "$MANIFEST" "$VIEW_PATH")
+if [ "$AFTER_SUM" != "$BEFORE_SUM" ]; then pass "an edit is seen even when the manifest is newer"; else fail "manifest kept $BEFORE_SUM after an edit behind a newer manifest"; fi
+restore "$VIEW"
+build "$ADVENTURE" > /dev/null
+
+section "clean and generation off remove the manifest"
+# Regression: IncrementalClean runs inside CoreBuild, before the manifest
+# targets, so their FileWrites were never recorded and nothing removed them.
+STAMP=$ADVENTURE/obj/Debug/$TFM/sourcemodel.inputs.txt
+build "$ADVENTURE" > /dev/null
+assert_file "$MANIFEST" "an unchanged rebuild keeps the manifest"
+assert_file "$INTERMEDIATE" "and its intermediate copy"
+dotnet clean "$ADVENTURE" -v:minimal > /dev/null
+assert_no_file "$MANIFEST" "dotnet clean removes the manifest"
+assert_no_file "$INTERMEDIATE" "and its intermediate copy"
+assert_no_file "$STAMP" "and the inputs stamp"
+build "$ADVENTURE" > /dev/null
+build "$ADVENTURE" -p:GenerateSourceModelManifest=false > /dev/null
+assert_no_file "$MANIFEST" "turning generation off removes the old manifest"
+build "$ADVENTURE" > /dev/null
+assert_file "$MANIFEST" "and turning it back on regenerates it"
+
+section "FMSDK003 a path in SourceModelManifestFileName"
+# The manifest is a build output. A path would put it in the source tree,
+# where an up-to-date check can't be trusted; the lock file is for that.
+PATH_OUT=$(build "$ADVENTURE" -p:SourceModelManifestFileName=../../../AdventureLite.sourcemodel.json 2>&1 || true)
+if printf '%s' "$PATH_OUT" | grep -q "FMSDK003"; then pass "FMSDK003 raised for a path"; else fail "FMSDK003 expected for a path"; fi
+assert_no_file "$ADVENTURE/AdventureLite.sourcemodel.json" "nothing written into the source tree"
+
+section "lock file"
+LOCK=$ADVENTURE/AdventureLite.sourcemodel.lock.json
+LOCK_ON=-p:GenerateSourceModelLockFile=true
+LOCKED=-p:SourceModelLockedMode=true
+same_as_manifest() { # message
+  if [ "$(tr -d '\r' < "$LOCK")" = "$(tr -d '\r' < "$MANIFEST")" ]; then pass "$1"; else fail "$1 (lock and manifest differ)"; fi
+}
+tamper_lock() { sed -i '0,/"execution": "onChange"/s//"execution": "once"/' "$LOCK"; touch "$LOCK"; }
+
+build "$ADVENTURE" "$LOCK_ON" > /dev/null
+assert_file "$LOCK" "the lock is created next to the project"
+same_as_manifest "with the manifest's content"
+
+# A hand edit (or a mis-resolved merge) makes the lock the newest file in the
+# tree. An up-to-date check would skip; the lock is compared every build.
+tamper_lock
+build "$ADVENTURE" "$LOCK_ON" > /dev/null
+same_as_manifest "a hand-edited lock is corrected on the next build"
+
+tamper_lock
+LOCKED_OUT=$(build "$ADVENTURE" "$LOCK_ON" "$LOCKED" 2>&1 || true)
+if printf '%s' "$LOCKED_OUT" | grep "FMSDK004" | grep -q "changed"; then
+  pass "locked mode fails with FMSDK004 and says what changed"
+else
+  fail "FMSDK004 expected for a changed lock in locked mode"
+fi
+if [ "$(tr -d '\r' < "$LOCK")" != "$(tr -d '\r' < "$MANIFEST")" ]; then pass "locked mode doesn't write the lock"; else fail "locked mode wrote the lock"; fi
+
+dotnet build "$ADVENTURE" -v:minimal -t:RewriteSourceModelLock "$LOCK_ON" "$LOCKED" > /dev/null
+same_as_manifest "-t:RewriteSourceModelLock writes it, even in locked mode"
+
+# A checkout with core.autocrlf gives the committed lock CRLF line endings.
+sed -i 's/$/\r/' "$LOCK"
+if build "$ADVENTURE" "$LOCK_ON" "$LOCKED" > /dev/null 2>&1; then pass "a CRLF lock passes locked mode"; else fail "a CRLF lock should pass locked mode"; fi
+build "$ADVENTURE" "$LOCK_ON" > /dev/null
+# Counted with tr: grep under Git for Windows ignores carriage returns.
+if [ "$(tr -cd '\r' < "$LOCK" | wc -c)" -gt 0 ]; then pass "and isn't rewritten, so git sees no change"; else fail "a CRLF lock was rewritten"; fi
+
+rm -f "$LOCK"
+MISSING_OUT=$(build "$ADVENTURE" "$LOCK_ON" "$LOCKED" 2>&1 || true)
+if printf '%s' "$MISSING_OUT" | grep -q "FMSDK004"; then pass "locked mode fails when the lock is missing"; else fail "FMSDK004 expected for a missing lock"; fi
+assert_no_file "$LOCK" "and doesn't create it"
+
+# Each configuration has its own obj/ stamp, but there is one lock. Comparing
+# every build keeps it right whichever configuration built last.
+build "$ADVENTURE" "$LOCK_ON" > /dev/null
+build "$ADVENTURE" "$LOCK_ON" -c Release > /dev/null
+cp "$VIEW" "$ADVENTURE/Schema/Views/sales.tmp_lock.sql"
+build "$ADVENTURE" "$LOCK_ON" > /dev/null
+assert_contains "$LOCK" "sales.tmp_lock.sql" "a Debug build adds a new view to the lock"
+rm -f "$ADVENTURE/Schema/Views/sales.tmp_lock.sql"
+build "$ADVENTURE" "$LOCK_ON" -c Release > /dev/null
+assert_not_contains "$LOCK" "sales.tmp_lock.sql" "a Release build removes it again"
+
+# Several target frameworks: one writer, and only if they agree. Set in the
+# project file, as a real project would: a -p: value can't carry the ';'.
+ADVENTURE_PROJ=$ADVENTURE/AdventureLite.csproj
+backup "$ADVENTURE_PROJ"
+sed -i 's|<IncludeFluentMigratorReference>false</IncludeFluentMigratorReference>|&<TargetFrameworks>netstandard2.0;net11.0</TargetFrameworks>|' "$ADVENTURE_PROJ"
+rm -f "$LOCK"
+build "$ADVENTURE" "$LOCK_ON" > /dev/null
+same_as_manifest "with two target frameworks the outer build writes one lock"
+extra_targets '<ItemGroup Condition="'"'"'$(TargetFramework)'"'"' == '"'"'net11.0'"'"'"><SqlObject Remove="Schema/Views/sales.open_orders.sql" /></ItemGroup>'
+TFM_OUT=$(build_extra "$ADVENTURE" "$LOCK_ON" 2>&1 || true)
+if printf '%s' "$TFM_OUT" | grep -q "FMSDK005"; then pass "FMSDK005 when the frameworks' manifests differ"; else fail "FMSDK005 expected when the frameworks' manifests differ"; fi
+restore "$ADVENTURE_PROJ"
+
+rm -f "$LOCK"
+build "$ADVENTURE" > /dev/null
+
 # -------------------------------------------------------------- host manifest
 
 section "FluentMigrator.Net.Sdk.Host: host manifest"
@@ -406,8 +517,15 @@ restore "$HOSTPROJ"
 build "$COMPOSITE/AdventureHost" > /dev/null
 
 section "custom host manifest escape hatch"
+HOST_INTERMEDIATE=$COMPOSITE/AdventureHost/obj/Debug/$TFM/AdventureHost.host.json
 build "$COMPOSITE/AdventureHost" -p:HostManifestFile=host.custom.json
 assert_contains "$HOST" '"name": "Core", "role": "root"' "hand-authored manifest shipped verbatim"
+assert_no_file "$HOST_INTERMEDIATE" "the generated intermediate copy is cleaned up"
+build "$COMPOSITE/AdventureHost" > /dev/null
+assert_not_contains "$HOST" '"name": "Core", "role": "root"' "switching back ships the generated manifest again"
+assert_file "$HOST_INTERMEDIATE" "with its intermediate copy"
+dotnet clean "$COMPOSITE/AdventureHost" -v:minimal > /dev/null
+assert_no_file "$HOST" "dotnet clean removes the host manifest"
 build "$COMPOSITE/AdventureHost" > /dev/null
 
 # ------------------------------------------------------------------- flyway
