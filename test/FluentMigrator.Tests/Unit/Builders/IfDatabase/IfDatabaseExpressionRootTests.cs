@@ -179,7 +179,10 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
 
             context.Expressions.Count.ShouldBe(0);
 
-            unknownProcessorMock.Verify(x => x.TableExists(null, "Foo"));
+            // The check looks in the schema the runner's expressions use (#1055). Here that's the default schema of
+            // the convention set the runner found in this assembly.
+            var defaultSchema = context.ServiceProvider.GetRequiredService<IDefaultSchemaNameResolver>().GetSchemaName(null);
+            unknownProcessorMock.Verify(x => x.TableExists(defaultSchema, "Foo"));
         }
 
         [Test]
