@@ -1,0 +1,1 @@
+EMBEDDED TEST SCRIPT $(parameter) $[safe_parameter]

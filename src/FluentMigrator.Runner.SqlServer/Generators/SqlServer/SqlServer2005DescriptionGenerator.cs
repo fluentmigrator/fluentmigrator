@@ -100,7 +100,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                 // For this, we need to remove the extended property first if exists (or implement verification and use sp_updateextendedproperty)
                 columnVerificationStatement = string.Format(ColumnDescriptionVerificationTemplate, description.Key, formattedSchemaName, expression.TableName, expression.Column.Name);
                 removalStatement = GenerateColumnDescriptionRemoval(description.Key, formattedSchemaName, expression.TableName, expression.Column.Name);
-                newDescriptionStatement = GenerateColumnDescription(description.Key, formattedSchemaName, expression.TableName, expression.Column.Name, expression.Column.ColumnDescription);
+                newDescriptionStatement = GenerateColumnDescription(description.Key, formattedSchemaName, expression.TableName, expression.Column.Name, description.Value);
 
                 var newDescriptionStatementToAdd = string.Join("", new[] { columnVerificationStatement, removalStatement, newDescriptionStatement });
                 descriptionsList.Add(newDescriptionStatementToAdd);

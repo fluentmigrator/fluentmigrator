@@ -122,6 +122,10 @@ namespace FluentMigrator.Tests.Unit.Runners
         private static IServiceProvider GetServiceProvider(string processorId, string generatorId)
         {
             // Keep the provider list in sync with DatabaseIdentifierTests.GetServiceProvider.
+            // AddHana below is obsolete in favour of AddHana8/AddHana10, but the Hana database
+            // IDs are still selectable through it and must stay covered. The compiler reports
+            // CS0618 against the whole builder lambda, so the pragma has to wrap all of it.
+#pragma warning disable CS0618 // Type or member is obsolete
             var serviceProvider = new ServiceCollection()
                 .AddFluentMigratorCore()
                 .ConfigureRunner(
@@ -159,6 +163,7 @@ namespace FluentMigrator.Tests.Unit.Runners
                 .Configure<SelectingProcessorAccessorOptions>(opt => opt.ProcessorId = processorId)
                 .Configure<SelectingGeneratorAccessorOptions>(opt => opt.GeneratorId = generatorId)
                 .BuildServiceProvider();
+#pragma warning restore CS0618 // Type or member is obsolete
             return serviceProvider;
         }
     }

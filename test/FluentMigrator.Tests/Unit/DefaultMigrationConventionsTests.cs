@@ -60,6 +60,57 @@ namespace FluentMigrator.Tests.Unit
         }
 
         [Test]
+        public void GetPrimaryKeyConstraintNamePrefixesTableNameWithPKAndUnderscore()
+        {
+            var expr = new CreateConstraintExpression(ConstraintType.PrimaryKey)
+            {
+                Constraint =
+                {
+                    TableName = "Foo",
+                }
+            };
+            expr.Constraint.Columns.Add("Id");
+            expr.Constraint.Columns.Add("Name");
+
+            var processed = expr.Apply(ConventionSets.NoSchemaName);
+            processed.Constraint.ConstraintName.ShouldBe("PK_Foo");
+        }
+
+        [Test]
+        public void GetUniqueConstraintNameIncludesTheColumnNames()
+        {
+            var expr = new CreateConstraintExpression(ConstraintType.Unique)
+            {
+                Constraint =
+                {
+                    TableName = "Foo",
+                }
+            };
+            expr.Constraint.Columns.Add("Id");
+            expr.Constraint.Columns.Add("Name");
+
+            var processed = expr.Apply(ConventionSets.NoSchemaName);
+            processed.Constraint.ConstraintName.ShouldBe("UC_Foo_Id_Name");
+        }
+
+        [Test]
+        public void ExplicitPrimaryKeyConstraintNameIsNotOverwritten()
+        {
+            var expr = new CreateConstraintExpression(ConstraintType.PrimaryKey)
+            {
+                Constraint =
+                {
+                    TableName = "Foo",
+                    ConstraintName = "MyPrimaryKey",
+                }
+            };
+            expr.Constraint.Columns.Add("Id");
+
+            var processed = expr.Apply(ConventionSets.NoSchemaName);
+            processed.Constraint.ConstraintName.ShouldBe("MyPrimaryKey");
+        }
+
+        [Test]
         public void GetForeignKeyNameReturnsValidForeignKeyNameForSimpleForeignKey()
         {
             var expr = new CreateForeignKeyExpression()

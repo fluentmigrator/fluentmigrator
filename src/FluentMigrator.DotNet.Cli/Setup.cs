@@ -17,10 +17,9 @@
 using System;
 using System.Linq;
 
-using AutoMapper;
-
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Conventions;
+using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Logging;
 using FluentMigrator.Runner.Processors;
@@ -54,8 +53,7 @@ namespace FluentMigrator.DotNet.Cli
                     lb.AddFluentMigratorConsole();
                     lb.AddDebug();
                 })
-                .AddOptions()
-                .AddSingleton(ConfigureMapper);
+                .AddOptions();
 
             if (options.Output)
             {
@@ -113,6 +111,7 @@ namespace FluentMigrator.DotNet.Cli
             services
                 .AddSingleton<IConventionSet>(conventionSet)
                 .Configure<SelectingProcessorAccessorOptions>(opt => opt.ProcessorId = options.ProcessorType)
+                .Configure<SelectingGeneratorAccessorOptions>(opt => opt.GeneratorId = GeneratorSelection.Resolve(options.GeneratorType, options.ProcessorType))
                 .Configure<AssemblySourceOptions>(opt => opt.AssemblyNames = options.TargetAssemblies.ToArray())
                 .Configure<TypeFilterOptions>(
                     opt =>
@@ -127,6 +126,7 @@ namespace FluentMigrator.DotNet.Cli
                         opt.Version = options.TargetVersion ?? 0;
                         opt.StartVersion = options.StartVersion ?? 0;
                         opt.NoConnection = options.NoConnection;
+                        opt.PreviewFromNothing = options.PreviewFromNothing;
                         opt.Steps = options.Steps ?? 1;
                         opt.Profile = options.Profile;
                         opt.Tags = options.Tags.ToArray();
@@ -147,12 +147,7 @@ namespace FluentMigrator.DotNet.Cli
 
             services
                 .AddOptions<MigratorOptions>()
-                .Configure(
-                    (MigratorOptions optionsConfig, IServiceProvider serviceProvider) =>
-                    {
-                        var mapper = serviceProvider.GetRequiredService<IMapper>();
-                        mapper.Map(options, optionsConfig);
-                    });
+                .Configure((MigratorOptions optionsConfig) => MigratorOptionsMapper.Apply(options, optionsConfig));
 
             services
                 .Configure<FluentMigratorLoggerOptions>(
@@ -166,14 +161,6 @@ namespace FluentMigrator.DotNet.Cli
                 .AddSingleton(console);
 
             return services.BuildServiceProvider();
-        }
-
-        private static IMapper ConfigureMapper(IServiceProvider serviceProvider)
-        {
-            var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
-            var mapperConfig = new MapperConfiguration(cfg => cfg.CreateMap<MigratorOptions, MigratorOptions>(), loggerFactory);
-            mapperConfig.AssertConfigurationIsValid();
-            return new Mapper(mapperConfig);
         }
     }
 }

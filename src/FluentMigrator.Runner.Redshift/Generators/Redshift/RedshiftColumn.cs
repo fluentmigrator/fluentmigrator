@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using FluentMigrator.Generation;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Base;
 
@@ -27,7 +28,7 @@ namespace FluentMigrator.Runner.Generators.Redshift
 {
     internal class RedshiftColumn : ColumnBase<IRedshiftTypeMap>
     {
-        public RedshiftColumn() : base(new RedshiftTypeMap(), new RedshiftQuoter())
+        public RedshiftColumn(IQuoter quoter) : base(new RedshiftTypeMap(), quoter)
         {
             AlterClauseOrder = new List<Func<ColumnDefinition, string>> { FormatAlterType, FormatAlterNullable };
         }

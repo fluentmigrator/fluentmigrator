@@ -56,6 +56,11 @@ namespace FluentMigrator.Expressions
         /// <inheritdoc />
         public override IMigrationExpression Reverse()
         {
+            if (!string.IsNullOrEmpty(TableDescription))
+            {
+                return base.Reverse();
+            }
+
             return new AlterTableExpression
             {
                 SchemaName = SchemaName,

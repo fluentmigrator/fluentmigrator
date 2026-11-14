@@ -23,6 +23,7 @@ using System.Text;
 
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Generic;
+using FluentMigrator.Runner.Helpers;
 
 using Microsoft.Extensions.Options;
 
@@ -52,7 +53,25 @@ namespace FluentMigrator.Runner.Generators.DB2
         public Db2Generator(
             Db2Quoter quoter,
             IOptions<GeneratorOptions> generatorOptions)
-            : base(new Db2Column(quoter), quoter, new EmptyDescriptionGenerator(), generatorOptions)
+            : this(quoter, generatorOptions, writeUnicodeCcsid: false)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Db2Generator"/> class for Db2 LUW or, through
+        /// <see cref="iSeries.Db2ISeriesGenerator"/>, Db2 for i.
+        /// </summary>
+        /// <param name="quoter">The quoter.</param>
+        /// <param name="generatorOptions">The generator options.</param>
+        /// <param name="writeUnicodeCcsid">
+        /// Whether Unicode string columns get <c>CCSID 1200</c>: Db2 for i needs it, Db2 LUW rejects it (SQL0622N) in a
+        /// Unicode database, where graphic strings are UTF-16 already.
+        /// </param>
+        private protected Db2Generator(
+            Db2Quoter quoter,
+            IOptions<GeneratorOptions> generatorOptions,
+            bool writeUnicodeCcsid)
+            : base(new Db2Column(quoter, writeUnicodeCcsid), quoter, new EmptyDescriptionGenerator(), generatorOptions)
         {
         }
 
@@ -159,8 +178,14 @@ namespace FluentMigrator.Runner.Generators.DB2
         }
 
         /// <inheritdoc />
+        /// <remarks>Db2 treats NULLs as equal in a unique index, so at most one NULL row is permitted natively. This generator emits no NULL-related index clause, so the distinct direction is not supported. <c>EXCLUDE NULL KEYS</c> would not express it either: it only skips keys in which every column is NULL. See <see href="https://fluentmigrator.github.io/basics/indexes.html#provider-notes">NULL handling in unique indexes</see>.</remarks>
+        protected override bool IsUniqueIndexNullsDistinctSupported(bool nullsDistinct) => !nullsDistinct;
+
+        /// <inheritdoc />
         public override string Generate(Expressions.CreateIndexExpression expression)
         {
+            ValidateUniqueIndexNullsDistinct(expression);
+
             var indexWithSchema = Quoter.QuoteIndexName(expression.Index.Name, expression.Index.SchemaName);
 
             var columnList = expression.Index.Columns.Aggregate(new StringBuilder(), (item, itemToo) =>
@@ -192,6 +217,20 @@ namespace FluentMigrator.Runner.Generators.DB2
         }
 
         /// <inheritdoc />
+        /// <remarks>Db2 requires <c>INCREMENT BY</c>; the generic <c>INCREMENT</c> without <c>BY</c> is PostgreSQL's.</remarks>
+        public override string Generate(Expressions.CreateSequenceExpression expression)
+        {
+            var sql = base.Generate(expression);
+            var sequence = expression.Sequence;
+
+            // The increment, when there is one, comes straight after the name.
+            var increment = $"CREATE SEQUENCE {Quoter.QuoteSequenceName(sequence.Name, sequence.SchemaName)} INCREMENT ";
+            return sequence.Increment.HasValue && sql.StartsWith(increment, StringComparison.Ordinal)
+                ? increment + "BY " + sql.Substring(increment.Length)
+                : sql;
+        }
+
+        /// <inheritdoc />
         public override string Generate(Expressions.DeleteTableExpression expression)
         {
             if (expression.IfExists)
@@ -202,14 +241,25 @@ namespace FluentMigrator.Runner.Generators.DB2
                 }
 
                 return FormatStatement(
-                    "IF( EXISTS(SELECT 1 FROM SYSCAT.TABLES WHERE TABSCHEMA = '{0}' AND TABNAME = '{1}')) THEN DROP TABLE {2} END IF",
-                    Quoter.QuoteSchemaName(expression.SchemaName),
-                    Quoter.QuoteTableName(expression.TableName),
+                    "IF( EXISTS(SELECT 1 FROM SYSCAT.TABLES WHERE {0} AND {1})) THEN DROP TABLE {2} END IF",
+                    BuildCatalogNameComparison("TABSCHEMA", expression.SchemaName),
+                    BuildCatalogNameComparison("TABNAME", expression.TableName),
                     Quoter.QuoteTableName(expression.TableName, expression.SchemaName)
                 );
             }
 
             return FormatStatement(DropTable, Quoter.QuoteTableName(expression.TableName, expression.SchemaName));
+        }
+
+        private string BuildCatalogNameComparison(string catalogColumn, string identifier)
+        {
+            var name = FormatHelper.FormatSqlEscape(Quoter.UnQuote(identifier));
+            if (Quoter.IsQuoted(identifier))
+            {
+                return $"{Quoter.QuoteColumnName(catalogColumn)} = '{name}'";
+            }
+
+            return $"LCASE({Quoter.QuoteColumnName(catalogColumn)})=LCASE('{name}')";
         }
 
         /// <inheritdoc />

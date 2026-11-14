@@ -30,7 +30,9 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
 {
     [TestFixture]
     [Category("Postgres")]
+#pragma warning disable NUnit1034 // Class is used as base class but also contains tests to execute
     public class PostgresDataTests : BaseDataTests
+#pragma warning restore NUnit1034
     {
         protected PostgresGenerator Generator;
 

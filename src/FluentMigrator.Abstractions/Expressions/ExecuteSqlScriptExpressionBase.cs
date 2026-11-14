@@ -48,7 +48,7 @@ namespace FluentMigrator.Expressions
         /// <param name="sqlScript">The SQL script to execute</param>
         protected void Execute(IMigrationProcessor processor, [StringSyntax("sql")] string sqlScript)
         {
-            var finalSqlScript = SqlScriptTokenReplacer.ReplaceSqlScriptTokens(sqlScript, GetMergedParameters(), processor?.Quoter);
+            var finalSqlScript = SqlScriptTokenReplacer.ReplaceSqlScriptTokens(sqlScript, GetMergedParameters(), processor.Quoter);
             processor.Execute(finalSqlScript);
         }
 
@@ -59,6 +59,12 @@ namespace FluentMigrator.Expressions
         /// </summary>
         /// <returns>The merged token map, or <see cref="Parameters"/> unchanged when there are no
         /// tokens to merge</returns>
+        /// <remarks>
+        /// The merged map reuses the key comparer of built-in dictionary implementations that
+        /// expose an <see cref="IEqualityComparer{T}"/>, so that merging in provider tokens does
+        /// not silently change token lookup semantics for callers who supplied e.g. a
+        /// <see cref="System.StringComparer.OrdinalIgnoreCase"/> dictionary.
+        /// </remarks>
         protected IDictionary<string, object> GetMergedParameters()
         {
             if (SqlScriptTokenProviders == null)
@@ -66,7 +72,8 @@ namespace FluentMigrator.Expressions
                 return Parameters;
             }
 
-            var mergedParameters = new Dictionary<string, object>();
+            var comparer = GetKeyComparer(Parameters);
+            var mergedParameters = new Dictionary<string, object>(comparer);
             foreach (var provider in SqlScriptTokenProviders)
             {
                 var tokenMap = provider?.GetTokens();
@@ -95,6 +102,16 @@ namespace FluentMigrator.Expressions
             }
 
             return mergedParameters;
+        }
+
+        private static IEqualityComparer<string> GetKeyComparer(IDictionary<string, object> parameters)
+        {
+            return parameters switch
+            {
+                Dictionary<string, object> dictionary => dictionary.Comparer,
+                SortedDictionary<string, object> dictionary => dictionary.Comparer as IEqualityComparer<string>,
+                _ => null,
+            };
         }
     }
 }

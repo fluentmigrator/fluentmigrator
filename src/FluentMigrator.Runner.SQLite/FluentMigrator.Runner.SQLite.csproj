@@ -15,5 +15,6 @@
   <ItemGroup>
     <ProjectReference Include="..\FluentMigrator.Runner.Core\FluentMigrator.Runner.Core.csproj" />
     <ProjectReference Include="..\FluentMigrator\FluentMigrator.csproj" />
+    <ProjectReference Include="..\FluentMigrator.Extensions.SQLite\FluentMigrator.Extensions.SQLite.csproj" />
   </ItemGroup>
 </Project>

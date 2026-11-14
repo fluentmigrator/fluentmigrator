@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using FluentMigrator.Builder.Create.Index;
 using FluentMigrator.Builders.Create.Index;
@@ -480,6 +481,26 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             Assert.That(additionalFeatures[PostgresExtensions.IndexPagesPerRange], Is.EqualTo(90));
         }
 
+        [Test]
+        public void CallingOtherPostgresExtensionsAfterAnIndexMethod()
+        {
+            var additionalFeatures = new Dictionary<string, object>();
+
+            var indexMock = new Mock<IndexDefinition>();
+            indexMock.Setup(x => x.AdditionalFeatures).Returns(additionalFeatures);
+
+            var expressionMock = new Mock<CreateIndexExpression>();
+            expressionMock.SetupGet(e => e.Index).Returns(indexMock.Object);
+
+            ICreateIndexOnColumnOrInSchemaSyntax builder = new CreateIndexExpressionBuilder(expressionMock.Object);
+
+            // UsingBrin() returns its own options builder, which used to throw for every other extension.
+            builder.WithOptions().UsingBrin().AsConcurrently();
+
+            Assert.That(additionalFeatures[PostgresExtensions.IndexAlgorithm], Is.InstanceOf<PostgresIndexAlgorithmDefinition>());
+            Assert.That(((PostgresIndexConcurrentlyDefinition)additionalFeatures[PostgresExtensions.Concurrently]).IsConcurrently, Is.True);
+        }
+
         [TestCase(true)]
         [TestCase(false)]
         public void CallingWithAutosummarizeInPostgres(bool autosummarize)
@@ -558,6 +579,59 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             collectionMock.VerifySet(x => x.IndexType = indexType);
             indexMock.VerifyGet(x => x.AdditionalFeatures);
             expressionMock.VerifyGet(e => e.Index);
+        }
+
+        [TestCase(true)]
+        [TestCase(false)]
+        public void CallingNullsDistinctOrNullsNotDistinctSetsIndexLevelFeature(bool nullsDistinct)
+        {
+            var expression = new CreateIndexExpression();
+            var unique = new CreateIndexExpressionBuilder(expression)
+                .OnTable("Bacon")
+                .OnColumn("BaconId").Unique();
+
+            var result = nullsDistinct ? unique.NullsDistinct() : unique.NullsNotDistinct();
+
+            Assert.That(result, Is.SameAs(unique));
+            Assert.That(expression.Index.IsUnique, Is.True);
+            Assert.That(expression.Index.AdditionalFeatures[CreateIndexNullSemanticsExtensions.UniqueIndexNullsDistinct], Is.EqualTo(nullsDistinct));
+            Assert.That(expression.Index.Columns.First().AdditionalFeatures, Does.Not.ContainKey(CreateIndexNullSemanticsExtensions.UniqueIndexNullsDistinct));
+        }
+
+        [Test]
+        public void CallingNullsDistinctOnTwoColumnsOfTheSameIndexIsAllowed()
+        {
+            var expression = new CreateIndexExpression();
+            new CreateIndexExpressionBuilder(expression)
+                .OnTable("Bacon")
+                .OnColumn("BaconId").Unique().NullsDistinct()
+                .OnColumn("BaconName").Unique().NullsDistinct();
+
+            Assert.That(expression.Index.AdditionalFeatures[CreateIndexNullSemanticsExtensions.UniqueIndexNullsDistinct], Is.EqualTo(true));
+        }
+
+        [TestCase(true)]
+        [TestCase(false)]
+        public void CallingConflictingNullsDistinctOnTwoColumnsOfTheSameIndexThrows(bool firstNullsDistinct)
+        {
+            var expression = new CreateIndexExpression();
+            var second = new CreateIndexExpressionBuilder(expression)
+                .OnTable("Bacon")
+                .OnColumn("BaconId").Unique();
+            second = firstNullsDistinct ? second.NullsDistinct() : second.NullsNotDistinct();
+            var unique = second.OnColumn("BaconName").Unique();
+
+            Assert.Throws<InvalidOperationException>(() =>
+            {
+                if (firstNullsDistinct)
+                {
+                    unique.NullsNotDistinct();
+                }
+                else
+                {
+                    unique.NullsDistinct();
+                }
+            });
         }
     }
 }

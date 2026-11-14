@@ -642,6 +642,86 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             Assert.That(builderAsInterface.Column, Is.SameAs(curColumn));
         }
 
+        [Test]
+        public void CallingWithColumnAdditionalDescriptionsPersistsEveryPair()
+        {
+            var expressionMock = new Mock<CreateTableExpression>();
+            var contextMock = new Mock<IMigrationContext>();
+
+            var builder = new CreateTableExpressionBuilder(expressionMock.Object, contextMock.Object)
+            {
+                CurrentColumn = new ColumnDefinition { Name = "TestColumn" }
+            };
+
+            builder.WithColumnAdditionalDescriptions(new Dictionary<string, string>
+            {
+                { "AdditionalDescription1", "Description1" },
+                { "AdditionalDescription2", "Description2" },
+            });
+
+            builder.CurrentColumn.AdditionalColumnDescriptions.Count.ShouldBe(2);
+            builder.CurrentColumn.AdditionalColumnDescriptions["AdditionalDescription1"].ShouldBe("Description1");
+            builder.CurrentColumn.AdditionalColumnDescriptions["AdditionalDescription2"].ShouldBe("Description2");
+        }
+
+        [Test]
+        public void CallingWithColumnAdditionalDescriptionsWithNullThrows()
+        {
+            var builder = new CreateTableExpressionBuilder(new Mock<CreateTableExpression>().Object, new Mock<IMigrationContext>().Object)
+            {
+                CurrentColumn = new ColumnDefinition { Name = "TestColumn" }
+            };
+
+            Should.Throw<ArgumentException>(() => builder.WithColumnAdditionalDescriptions(null));
+        }
+
+        [Test]
+        public void CallingWithColumnAdditionalDescriptionsWithEmptyDictionaryThrows()
+        {
+            var builder = new CreateTableExpressionBuilder(new Mock<CreateTableExpression>().Object, new Mock<IMigrationContext>().Object)
+            {
+                CurrentColumn = new ColumnDefinition { Name = "TestColumn" }
+            };
+
+            Should.Throw<ArgumentException>(() => builder.WithColumnAdditionalDescriptions(new Dictionary<string, string>()));
+        }
+
+        [Test]
+        public void CallingWithColumnAdditionalDescriptionsWithDuplicateKeyThrows()
+        {
+            var currentColumn = new ColumnDefinition { Name = "TestColumn" };
+            currentColumn.AdditionalColumnDescriptions.Add("Existing", "Value");
+            var builder = new CreateTableExpressionBuilder(new Mock<CreateTableExpression>().Object, new Mock<IMigrationContext>().Object)
+            {
+                CurrentColumn = currentColumn
+            };
+
+            Should.Throw<InvalidOperationException>(() => builder.WithColumnAdditionalDescriptions(new Dictionary<string, string>
+            {
+                { "Existing", "AnotherValue" },
+            }));
+        }
+
+        [Test]
+        public void CallingWithColumnAdditionalDescriptionsWithLaterDuplicateKeyDoesNotMutateColumn()
+        {
+            var currentColumn = new ColumnDefinition { Name = "TestColumn" };
+            currentColumn.AdditionalColumnDescriptions.Add("Existing", "Value");
+            var builder = new CreateTableExpressionBuilder(new Mock<CreateTableExpression>().Object, new Mock<IMigrationContext>().Object)
+            {
+                CurrentColumn = currentColumn
+            };
+
+            Should.Throw<InvalidOperationException>(() => builder.WithColumnAdditionalDescriptions(new Dictionary<string, string>
+            {
+                { "New", "NewValue" },
+                { "Existing", "AnotherValue" },
+            }));
+
+            currentColumn.AdditionalColumnDescriptions.Count.ShouldBe(1);
+            currentColumn.AdditionalColumnDescriptions.ShouldNotContainKey("New");
+        }
+
         private void VerifyColumnHelperCall(Action<CreateTableExpressionBuilder> callToTest, System.Linq.Expressions.Expression<Action<ColumnExpressionBuilderHelper>> expectedHelperAction)
         {
             var expressionMock = new Mock<CreateTableExpression>();

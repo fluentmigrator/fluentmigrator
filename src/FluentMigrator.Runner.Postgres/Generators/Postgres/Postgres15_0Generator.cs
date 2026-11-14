@@ -53,6 +53,10 @@ namespace FluentMigrator.Runner.Generators.Postgres
             [GeneratorIdConstants.PostgreSQL15_0, GeneratorIdConstants.PostgreSQL, GeneratorIdConstants.Postgres];
 
         /// <inheritdoc />
+        /// <remarks>PostgreSQL 15 expresses both directions with NULLS DISTINCT and NULLS NOT DISTINCT.</remarks>
+        protected override bool IsUniqueIndexNullsDistinctSupported(bool nullsDistinct) => true;
+
+        /// <inheritdoc />
         protected override string GetWithNullsDistinctStringInWhere(IndexDefinition index)
         {
             return string.Empty;
@@ -66,7 +70,10 @@ namespace FluentMigrator.Runner.Generators.Postgres
 
             var indexNullsDistinct = index.GetAdditionalFeature(PostgresExtensions.IndexColumnNullsDistinct, (bool?)null);
             var columnNullsDistinct = index.Columns.Select(c => GetNullsDistinct(c)).FirstOrDefault(nd => nd != null);
-            var nullsDistinct = columnNullsDistinct ?? indexNullsDistinct;
+            var legacyNullsDistinct = columnNullsDistinct ?? indexNullsDistinct;
+            var portableNullsDistinct = index.GetAdditionalFeature(
+                CreateIndexNullSemanticsExtensions.UniqueIndexNullsDistinct, (bool?)null);
+            var nullsDistinct = legacyNullsDistinct ?? portableNullsDistinct;
 
             if (nullsDistinct != null && !index.IsUnique)
             {
@@ -75,7 +82,17 @@ namespace FluentMigrator.Runner.Generators.Postgres
                 return string.Empty;
             }
 
-            return nullsDistinct == false ? " NULLS NOT DISTINCT" : string.Empty;
+            if (nullsDistinct == false)
+            {
+                return " NULLS NOT DISTINCT";
+            }
+
+            // The provider-agnostic option states the intent explicitly, so the clause is
+            // emitted even though NULLS DISTINCT is the default. The legacy key keeps its
+            // existing output.
+            return legacyNullsDistinct == null && portableNullsDistinct == true
+                ? " NULLS DISTINCT"
+                : string.Empty;
         }
     }
 }

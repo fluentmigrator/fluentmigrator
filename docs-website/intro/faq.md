@@ -131,6 +131,156 @@ This allows loading migration assemblies (e.g., .NET 6.0) in a different runtime
 
 When running multiple instances of your application (load-balanced scenarios), you need to prevent concurrent migration execution.
 
+#### Application Locker API (9.0+)
+
+Register an `IApplicationLocker`. The runner then holds the lock for every runner operation and every `BeginScope()` scope, and also while it creates the version table. When several instances start at once, only the first creates `VersionInfo`, and the others wait instead of failing on the duplicate table or index ([#1949](https://github.com/fluentmigrator/fluentmigrator/issues/1949)). A `BeforeAll` maintenance migration (shown in the next section) only protects `MigrateUp`. Other entry points create the version table on first use without running maintenance migrations: `HasMigrationsToApplyUp()`, `ListMigrations()`, `LoadVersionInfoIfRequired()`, or resolving `IVersionLoader`.
+
+```csharp
+services
+    .AddFluentMigratorCore()
+    .ConfigureRunner(rb => rb.AddSqlServer().WithGlobalConnectionString(connectionString))
+    .ConfigureApplicationLocker<SqlServerApplicationLocker>(
+        options => options.AcquireTimeout = TimeSpan.FromMinutes(10));
+```
+
+What an implementation must do:
+
+- **Return only once the lock is held.** The returned handle releases the lock when it is disposed.
+- **It doesn't have to be reentrant.** FluentMigrator acquires the lock at most once per dependency-injection scope and shares it among nested operations, open scopes, and work on other threads in that scope.
+- **Honour the cancellation token.** Throw `OperationCanceledException` when it is cancelled, and don't hold the lock afterwards. `AcquireTimeout` (infinite by default) works by cancelling the token. When it elapses, the runner throws `ApplicationLockException`, whose inner exception is a `TimeoutException`.
+- **Throw when the lock can't be taken.** The runner wraps any other exception in `ApplicationLockException`, so you can tell a locking failure apart from a failed migration.
+- **Prefer a lock in the database you are migrating, held on a dedicated connection.** A lock owned by a migration transaction would be released when that transaction commits.
+
+Nothing is locked in preview mode, with or without a connection, or in connectionless mode.
+
+The lock is applied by the `IMigrationRunner` that `AddFluentMigratorCore()` registers. If you register your own `IMigrationRunner` before calling `AddFluentMigratorCore()`, it is not wrapped. Code that resolves `IVersionLoader` or the processor directly, or that uses a runner of its own, can share the scope's lock with `IApplicationLockLease`:
+
+```csharp
+using (scope.ServiceProvider.GetRequiredService<IApplicationLockLease>().Enter())
+{
+    // ...
+}
+```
+
+A SQL Server implementation using `sp_getapplock`:
+
+```csharp
+public sealed class SqlServerApplicationLocker : IApplicationLocker
+{
+    private const string Resource = "MyApp.Migrations";
+    private readonly string _connectionString;
+
+    public SqlServerApplicationLocker(IConnectionStringAccessor connectionStringAccessor)
+        => _connectionString = connectionStringAccessor.ConnectionString;
+
+    public IDisposable AcquireLock(CancellationToken cancellationToken)
+    {
+        var connection = new SqlConnection(_connectionString);
+        try
+        {
+            connection.Open();
+            using var command = CreateGetAppLock(connection);
+
+            // Wait on the server one second at a time and check the token in between. Cancellation (and
+            // AcquireTimeout) then takes effect within a second as an OperationCanceledException, without
+            // cancelling a running command, which surfaces as a provider-specific exception instead.
+            do
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                command.ExecuteNonQuery();
+            }
+            while (!IsGranted(command));
+
+            return new Handle(connection);
+        }
+        catch
+        {
+            connection.Dispose();
+            throw;
+        }
+    }
+
+    public async ValueTask<IAsyncDisposable> AcquireLockAsync(CancellationToken cancellationToken)
+    {
+        var connection = new SqlConnection(_connectionString);
+        try
+        {
+            await connection.OpenAsync(cancellationToken);
+            using var command = CreateGetAppLock(connection);
+            do
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                await command.ExecuteNonQueryAsync();
+            }
+            while (!IsGranted(command));
+
+            return new Handle(connection);
+        }
+        catch
+        {
+            await connection.DisposeAsync();
+            throw;
+        }
+    }
+
+    private static SqlCommand CreateGetAppLock(SqlConnection connection)
+    {
+        var command = new SqlCommand("sp_getapplock", connection) { CommandType = CommandType.StoredProcedure };
+        command.Parameters.AddWithValue("@Resource", Resource);
+        command.Parameters.AddWithValue("@LockMode", "Exclusive");
+        command.Parameters.AddWithValue("@LockOwner", "Session");
+        command.Parameters.AddWithValue("@LockTimeout", 1000);
+        command.Parameters.Add(new SqlParameter("@Result", SqlDbType.Int) { Direction = ParameterDirection.ReturnValue });
+        return command;
+    }
+
+    private static bool IsGranted(SqlCommand command)
+    {
+        // 0 or 1: granted. -1: timed out, so wait again. Anything else is an error.
+        var result = (int)command.Parameters["@Result"].Value;
+        if (result == -1)
+        {
+            return false;
+        }
+
+        if (result < 0)
+        {
+            throw new InvalidOperationException($"sp_getapplock returned {result}.");
+        }
+
+        return true;
+    }
+
+    private sealed class Handle : IDisposable, IAsyncDisposable
+    {
+        private SqlConnection _connection;
+
+        public Handle(SqlConnection connection) => _connection = connection;
+
+        public void Dispose()
+        {
+            var connection = Interlocked.Exchange(ref _connection, null);
+            if (connection == null) return;
+            using (connection)
+            using (var release = new SqlCommand("sp_releaseapplock", connection) { CommandType = CommandType.StoredProcedure })
+            {
+                release.Parameters.AddWithValue("@Resource", Resource);
+                release.Parameters.AddWithValue("@LockOwner", "Session");
+                release.ExecuteNonQuery();
+            }
+        }
+
+        public ValueTask DisposeAsync()
+        {
+            Dispose();
+            return default;
+        }
+    }
+}
+```
+
+The same pattern works with `pg_advisory_lock`/`pg_advisory_unlock` on PostgreSQL, `GET_LOCK`/`RELEASE_LOCK` on MySQL, and `DBMS_LOCK` on Oracle. A Kubernetes lease or a Redis lock works too, but the database's deadlock detector can't see waits on those.
+
 #### Database-Dependent Application Locking (SQL Server)
 
 **Acquire lock before all migrations:**
@@ -407,14 +557,36 @@ dotnet fm migrate -p sqlserver -c "..." -a "MyApp.dll" --preview
 
 ```bash
 # Output SQL to file without executing
-dotnet fm migrate -p sqlserver -c "..." -a "MyApp.dll" --output --outputFileName "migration.sql"
+dotnet fm migrate -p sqlserver -c "..." -a "MyApp.dll" --preview --output=migration.sql
 ```
+
+### Why isn't the VersionInfo table in the script when I use `--no-connection`?
+
+Without a connection the runner can't see the database, so it assumes the version table already exists and scripts only your migrations and the rows they add to it. To script a brand-new database, add `--preview-from-nothing` (9.0+). The script then runs your `BeforeAll` maintenance migrations, creates the version table, its unique index and its columns, and then runs every migration ([#2087](https://github.com/fluentmigrator/fluentmigrator/issues/2087)):
+
+```bash
+# dotnet-fm
+dotnet fm migrate -p SqlServer2016 -a "MyApp.dll" --no-connection --preview --preview-from-nothing --output=create-database.sql
+
+# Console runner
+Migrate.exe --db SqlServer2016 --target "MyApp.dll" --task migrate:up --noConnection --preview --previewFromNothing --output --outputFilename create-database.sql
+```
+
+```xml
+<!-- MSBuild task: Connection is required but never opened -->
+<Migrate Database="SqlServer2016" Connection="Server=.;Database=MyApp" Target="MyApp.dll" NoConnection="true"
+         PreviewOnly="true" PreviewFromNothing="true" Output="true" OutputFilename="create-database.sql" />
+```
+
+The [migration preview workflow](../runners/dotnet-fm.md#github-pull-request-schema-preview) has the same switch: `preview_from_nothing: true`.
+
+In code, set `RunnerOptions.PreviewFromNothing` together with `NoConnection` and `ProcessorOptions.PreviewOnly`. Leaving out the connection string also makes the run connectionless, and then preview mode is optional because nothing can be executed. It throws when the run could execute SQL against a database, with a start version, because a start version contradicts an empty database, and for rollback, migrate down, listing migrations and validating their order, because an empty database has nothing to revert, list or validate. The version table's schema is created only when your `IVersionTableMetaData.OwnsSchema` is `true`, and never when it is one every new database already has (`dbo` on SQL Server, `public` on PostgreSQL and Redshift, `PUBLIC` on Snowflake; an unquoted name counts in any case, because the database folds it). To put the version table in a schema something else owns, create that schema in a `BeforeAll` maintenance migration.
 
 ### Validate Migrations
 
 ```bash
 # Validate without connecting to database
-dotnet fm validate -p sqlserver -c "..." -a "MyApp.dll" --noConnection
+dotnet fm validate -p sqlserver -c "..." -a "MyApp.dll" --no-connection
 ```
 
 ## Common Error Messages

@@ -74,7 +74,7 @@ namespace FluentMigrator.Runner.Generators.DB2.iSeries
         public Db2ISeriesGenerator(
             Db2ISeriesQuoter quoter,
             IOptions<GeneratorOptions> generatorOptions)
-            : base(quoter, generatorOptions)
+            : base(quoter, generatorOptions, writeUnicodeCcsid: true)
         {
         }
 

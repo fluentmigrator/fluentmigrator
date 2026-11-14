@@ -274,12 +274,54 @@ namespace Microsoft.Extensions.DependencyInjection
                             return ActivatorUtilities.CreateInstance<ConnectionlessVersionLoader>(sp);
                         }
 
-                        return ActivatorUtilities.CreateInstance<VersionLoader>(sp);
+                        // The constructor checks for, and creates, the version table. Hold the application
+                        // lock so that instances starting together don't all try to create it (#1949), even
+                        // when IVersionLoader is resolved directly rather than through the runner.
+                        using (sp.GetRequiredService<IApplicationLockLease>().Enter())
+                        {
+                            return ActivatorUtilities.CreateInstance<VersionLoader>(sp);
+                        }
                     });
 
             services
-                // Configure the runner
-                .TryAddScoped<IMigrationRunner, MigrationRunner>();
+                // The scope's share of the application lock; a no-op unless an IApplicationLocker is registered
+                .TryAddScoped<IApplicationLockLease>(
+                    sp =>
+                    {
+                        var options = sp.GetRequiredService<IOptions<RunnerOptions>>();
+                        var processorOptions = sp.GetRequiredService<IOptionsSnapshot<ProcessorOptions>>();
+                        var connectionFactory = sp.GetRequiredService<IMigrationConnectionFactory>();
+
+                        // In preview mode, with or without a connection, nothing is written, so no lock is taken.
+                        var locker = options.Value.NoConnection || processorOptions.Value.PreviewOnly || !connectionFactory.HasConnection
+                            ? null
+                            : sp.GetService<IApplicationLocker>();
+
+                        return new ApplicationLockLease(
+                            locker,
+                            sp.GetRequiredService<IOptions<ApplicationLockerOptions>>().Value.AcquireTimeout,
+                            sp.GetService<ILogger<ApplicationLockLease>>());
+                    });
+
+            services
+                // Configure the runner. Wrap it in the application lock only when a locker is configured, so
+                // applications without one still receive the MigrationRunner instance itself.
+                //
+                // MigrationRunner is deliberately not registered as a service of its own: resolving it
+                // would hand out a runner that bypasses the lock.
+                .TryAddScoped<IMigrationRunner>(
+                    sp =>
+                    {
+                        // Resolve the lease before the runner. The runner creates the processor, and a scope
+                        // disposes its services in reverse order of creation, so the processor rolls back any
+                        // transaction left open by an undisposed BeginScope() before the lease releases the lock.
+                        var lease = sp.GetRequiredService<IApplicationLockLease>();
+                        var runner = ActivatorUtilities.CreateInstance<MigrationRunner>(sp);
+
+                        return lease.IsEnabled
+                            ? new ApplicationLockingMigrationRunner(runner, lease)
+                            : runner;
+                    });
 
             services
                 // Configure the task executor
@@ -299,6 +341,82 @@ namespace Microsoft.Extensions.DependencyInjection
             services
                 // Connection Factory
                 .TryAddScoped<IMigrationConnectionFactory, ConnectionStringMigrationConnectionFactory>();
+
+            return services;
+        }
+
+        /// <summary>
+        /// Registers the application-wide lock that keeps concurrent application instances from migrating
+        /// the same database at the same time.
+        /// </summary>
+        /// <typeparam name="TApplicationLocker">The <see cref="IApplicationLocker"/> implementation, registered scoped.</typeparam>
+        /// <param name="services">The <see cref="IServiceCollection"/> to configure.</param>
+        /// <param name="configure">Optionally configures <see cref="ApplicationLockerOptions"/>, such as the acquisition timeout.</param>
+        /// <returns>The updated service collection.</returns>
+        /// <remarks>
+        /// Once registered, every runner operation and every migration scope holds the lock, and so does
+        /// version-table creation. See <see cref="IApplicationLocker"/> for the contract an implementation must meet.
+        /// </remarks>
+        /// <example>
+        /// <code>
+        /// services
+        ///     .AddFluentMigratorCore()
+        ///     .ConfigureApplicationLocker&lt;SqlServerApplicationLocker&gt;(o => o.AcquireTimeout = TimeSpan.FromMinutes(5));
+        /// </code>
+        /// </example>
+        public static IServiceCollection ConfigureApplicationLocker<
+#if NET
+            [System.Diagnostics.CodeAnalysis.DynamicallyAccessedMembers(System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.PublicConstructors)]
+#endif
+            TApplicationLocker>(
+            [NotNull] this IServiceCollection services,
+            [CanBeNull] Action<ApplicationLockerOptions> configure = null)
+            where TApplicationLocker : class, IApplicationLocker
+        {
+            if (services == null)
+                throw new ArgumentNullException(nameof(services));
+
+            services.RemoveAll<IApplicationLocker>();
+            services.AddScoped<IApplicationLocker, TApplicationLocker>();
+            return ConfigureApplicationLockerOptions(services, configure);
+        }
+
+        /// <summary>
+        /// Registers the application-wide lock that keeps concurrent application instances from migrating
+        /// the same database at the same time.
+        /// </summary>
+        /// <param name="services">The <see cref="IServiceCollection"/> to configure.</param>
+        /// <param name="factory">Creates the <see cref="IApplicationLocker"/>, once per dependency-injection scope.</param>
+        /// <param name="configure">Optionally configures <see cref="ApplicationLockerOptions"/>, such as the acquisition timeout.</param>
+        /// <returns>The updated service collection.</returns>
+        /// <remarks>
+        /// Once registered, every runner operation and every migration scope holds the lock, and so does
+        /// version-table creation. See <see cref="IApplicationLocker"/> for the contract an implementation must meet.
+        /// </remarks>
+        public static IServiceCollection ConfigureApplicationLocker(
+            [NotNull] this IServiceCollection services,
+            [NotNull] Func<IServiceProvider, IApplicationLocker> factory,
+            [CanBeNull] Action<ApplicationLockerOptions> configure = null)
+        {
+            if (services == null)
+                throw new ArgumentNullException(nameof(services));
+            if (factory == null)
+                throw new ArgumentNullException(nameof(factory));
+
+            services.RemoveAll<IApplicationLocker>();
+            services.AddScoped(factory);
+            return ConfigureApplicationLockerOptions(services, configure);
+        }
+
+        private static IServiceCollection ConfigureApplicationLockerOptions(
+            IServiceCollection services,
+            Action<ApplicationLockerOptions> configure)
+        {
+            var optionsBuilder = services.AddOptions<ApplicationLockerOptions>();
+            if (configure != null)
+            {
+                optionsBuilder.Configure(configure);
+            }
 
             return services;
         }

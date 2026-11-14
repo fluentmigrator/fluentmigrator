@@ -34,6 +34,7 @@ using FluentMigrator.Runner.Generators.Generic;
 using FluentMigrator.Runner.Infrastructure;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
+using FluentMigrator.Runner.VersionTableInfo;
 using FluentMigrator.Tests.Integration.Migrations;
 using FluentMigrator.Tests.Integration.Migrations.Constrained.Constraints;
 using FluentMigrator.Tests.Integration.Migrations.Constrained.ConstraintsMultiple;
@@ -274,6 +275,147 @@ namespace FluentMigrator.Tests.Unit
         }
 
         [Test]
+        public void PreviewFromNothingCreatesVersionInfoTable()
+        {
+            var runner = CreateRunner(
+                services => services
+                    .Configure<RunnerOptions>(
+                        options =>
+                        {
+                            options.NoConnection = true;
+                            options.PreviewFromNothing = true;
+                        })
+                    .Configure<ProcessorOptions>(options => options.PreviewOnly = true));
+
+            runner.MigrateUp();
+
+            _processorMock.Verify(
+                processor => processor.Process(
+                    It.Is<CreateTableExpression>(
+                        expression => expression.TableName == runner.VersionLoader.VersionTableMetaData.TableName)),
+                Times.Once);
+        }
+
+        [Test]
+        public void ConnectionlessPreviewDoesNotCreateVersionInfoTableByDefault()
+        {
+            var runner = CreateRunner(
+                services => services
+                    .Configure<RunnerOptions>(options => options.NoConnection = true)
+                    .Configure<ProcessorOptions>(options => options.PreviewOnly = true));
+
+            runner.MigrateUp();
+
+            _processorMock.Verify(
+                processor => processor.Process(It.IsAny<CreateTableExpression>()),
+                Times.Never);
+        }
+
+        /// <summary>
+        /// <see cref="RunnerOptions.NoConnection"/> replaces only the version loader. With a connection string still
+        /// present the processor is a real one, so without preview mode the version table DDL would be executed.
+        /// </summary>
+        [Test]
+        public void PreviewFromNothingWithARealProcessorAndNoPreviewThrows()
+        {
+            var runner = CreateRunner(
+                services => services.Configure<RunnerOptions>(
+                    options =>
+                    {
+                        options.NoConnection = true;
+                        options.PreviewFromNothing = true;
+                    }));
+
+            var ex = Should.Throw<InvalidOperationException>(() => runner.MigrateUp());
+
+            ex.Message.ShouldContain(nameof(ProcessorOptions.PreviewOnly));
+            _processorMock.Verify(processor => processor.Process(It.IsAny<CreateTableExpression>()), Times.Never);
+        }
+
+        [Test]
+        public void PreviewFromNothingWithAConnectionThrows()
+        {
+            var runner = CreateRunner(
+                services => services.Configure<RunnerOptions>(options => options.PreviewFromNothing = true));
+
+            // With a connection, creating the runner's version loader already processed its own expressions.
+            _processorMock.Invocations.Clear();
+
+            var ex = Should.Throw<InvalidOperationException>(() => runner.MigrateUp());
+
+            ex.Message.ShouldContain("connectionless");
+            _processorMock.Verify(processor => processor.Process(It.IsAny<CreateTableExpression>()), Times.Never);
+        }
+
+        [Test]
+        public void PreviewFromNothingWithAStartVersionThrows()
+        {
+            var runner = CreateRunner(
+                services => services.Configure<RunnerOptions>(
+                    options =>
+                    {
+                        options.NoConnection = true;
+                        options.PreviewFromNothing = true;
+                        options.StartVersion = 2;
+                    })
+                    .Configure<ProcessorOptions>(options => options.PreviewOnly = true));
+
+            var ex = Should.Throw<InvalidOperationException>(() => runner.MigrateUp());
+
+            ex.Message.ShouldContain(nameof(RunnerOptions.StartVersion));
+            _processorMock.Verify(processor => processor.Process(It.IsAny<CreateTableExpression>()), Times.Never);
+        }
+
+        [TestCase(true, 1)]
+        [TestCase(false, 0)]
+        public void PreviewFromNothingCreatesTheVersionSchemaOnlyWhenTheVersionTableOwnsIt(bool ownsSchema, int expectedSchemaCreations)
+        {
+            var metaData = new SchemaVersionTableMetaData(ownsSchema);
+            var runner = CreateRunner(
+                services => services
+                    .Configure<RunnerOptions>(
+                        options =>
+                        {
+                            options.NoConnection = true;
+                            options.PreviewFromNothing = true;
+                        })
+                    .Configure<ProcessorOptions>(options => options.PreviewOnly = true)
+                    .ConfigureRunner(builder => builder.WithVersionTable(metaData)));
+
+            runner.MigrateUp();
+
+            _processorMock.Verify(
+                processor => processor.Process(It.Is<CreateSchemaExpression>(expression => expression.SchemaName == metaData.SchemaName)),
+                Times.Exactly(expectedSchemaCreations));
+            _processorMock.Verify(
+                processor => processor.Process(
+                    It.Is<CreateTableExpression>(
+                        expression => expression.SchemaName == metaData.SchemaName && expression.TableName == metaData.TableName)),
+                Times.Once);
+        }
+
+        private sealed class SchemaVersionTableMetaData : IVersionTableMetaData
+        {
+            public SchemaVersionTableMetaData(bool ownsSchema) => OwnsSchema = ownsSchema;
+
+            public bool OwnsSchema { get; }
+
+            public string SchemaName => "audit";
+
+            public string TableName => "VersionInfo";
+
+            public string ColumnName => "Version";
+
+            public string DescriptionColumnName => "Description";
+
+            public string UniqueIndexName => "UC_Version";
+
+            public string AppliedOnColumnName => "AppliedOn";
+
+            public bool CreateWithPrimaryKey => false;
+        }
+
+        [Test]
         public void CanTimeExpression()
         {
             var ts = new TimeSpan(0, 0, 0, 1, 3);
@@ -383,6 +525,51 @@ namespace FluentMigrator.Tests.Unit
             LoadVersionData(fakeMigrationVersion1, fakeMigrationVersion2);
 
             runner.HasMigrationsToApplyDown(fakeMigrationVersion1).ShouldBeTrue();
+        }
+
+        /// <summary>
+        /// Loads versions 1 and 2, then records version 3 as applied without reloading, as another instance
+        /// would while this one waited for the application lock (review of #2432).
+        /// </summary>
+        private void LoadVersionDataThenApplyNewerMigrationElsewhere()
+        {
+            LoadVersionData(2011010101, 2011010102, 2011010103);
+            _fakeVersionLoader.Versions.Remove(2011010103);
+            _fakeVersionLoader.LoadVersionInfo();
+            _fakeVersionLoader.Versions.Add(2011010103);
+        }
+
+        [Test]
+        public void RollbackRevertsTheLatestMigrationInTheDatabaseRatherThanAStaleOne()
+        {
+            var runner = CreateRunner();
+            LoadVersionDataThenApplyNewerMigrationElsewhere();
+
+            runner.Rollback(1);
+
+            _fakeVersionLoader.Versions.ShouldBe(new long[] { 2011010101, 2011010102 }, ignoreOrder: true);
+        }
+
+        [Test]
+        public void RollbackToVersionRevertsMigrationsAppliedSinceTheVersionInfoWasLoaded()
+        {
+            var runner = CreateRunner();
+            LoadVersionDataThenApplyNewerMigrationElsewhere();
+
+            runner.RollbackToVersion(2011010101);
+
+            _fakeVersionLoader.Versions.ShouldBe(new long[] { 2011010101 });
+        }
+
+        [Test]
+        public void MigrateDownRevertsMigrationsAppliedSinceTheVersionInfoWasLoaded()
+        {
+            var runner = CreateRunner();
+            LoadVersionDataThenApplyNewerMigrationElsewhere();
+
+            runner.MigrateDown(2011010101);
+
+            _fakeVersionLoader.Versions.ShouldBe(new long[] { 2011010101 });
         }
 
         [Test]

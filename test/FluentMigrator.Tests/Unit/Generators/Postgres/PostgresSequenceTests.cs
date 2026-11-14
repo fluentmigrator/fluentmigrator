@@ -65,6 +65,29 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
+        public void CanCreateSequenceWithBracesInName()
+        {
+            var expression = GeneratorTestHelper.GetCreateSequenceExpression();
+            expression.Sequence.Name = "Sequence{0}";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE SEQUENCE \"Sequence{0}\" INCREMENT BY 2 MINVALUE 0 MAXVALUE 100 START WITH 2 CACHE 10 CYCLE;");
+        }
+
+        [Test, SetCulture("nb-NO")]
+        public void CanCreateSequenceWithNegativeValuesInAnyCulture()
+        {
+            var expression = GeneratorTestHelper.GetCreateSequenceExpression();
+            expression.Sequence.Increment = -1;
+            expression.Sequence.MinValue = -100;
+            expression.Sequence.MaxValue = -1;
+            expression.Sequence.StartWith = -1;
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE SEQUENCE \"Sequence\" INCREMENT BY -1 MINVALUE -100 MAXVALUE -1 START WITH -1 CACHE 10 CYCLE;");
+        }
+
+        [Test]
         public override void CanDropSequenceWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteSequenceExpression();

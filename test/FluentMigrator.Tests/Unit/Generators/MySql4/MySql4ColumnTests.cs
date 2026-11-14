@@ -23,6 +23,7 @@ using System.Linq;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.MySql;
+
 using NUnit.Framework;
 
 using Shouldly;
@@ -252,7 +253,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
             var expression = GeneratorTestHelper.GetAlterColumnExpressionWithDescription();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE `TestTable1` MODIFY COLUMN `TestColumn1` VARCHAR(20) NOT NULL COMMENT 'Description:TestColumn1Description';");
+            result.ShouldBe("ALTER TABLE `TestTable1` MODIFY COLUMN `TestColumn1` VARCHAR(20) NOT NULL COMMENT 'TestColumn1Description';");
         }
 
         [Test]
@@ -261,7 +262,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
             var expression = GeneratorTestHelper.GetCreateColumnExpressionWithDescription();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE `TestTable1` ADD COLUMN `TestColumn1` VARCHAR(5) NOT NULL COMMENT 'Description:TestColumn1Description';");
+            result.ShouldBe("ALTER TABLE `TestTable1` ADD COLUMN `TestColumn1` VARCHAR(5) NOT NULL COMMENT 'TestColumn1Description';");
         }
 
         [Test]
@@ -284,6 +285,17 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
         }
 
         [Test]
+        public void CanCreateColumnWithDescriptionWithMultipleAdditionalDescriptions()
+        {
+            var expression = GeneratorTestHelper.GetCreateColumnExpressionWithDescriptionWithMultipleAdditionalDescriptions();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE `TestTable1` ADD COLUMN `TestColumn1` VARCHAR(5) NOT NULL COMMENT 'Description:TestColumn1Description" + Environment.NewLine +
+                            "AdditionalColumnDescriptionKey1:AdditionalColumnDescriptionValue1" + Environment.NewLine +
+                            "AdditionalColumnDescriptionKey2:AdditionalColumnDescriptionValue2';");
+        }
+
+        [Test]
         public void CanCreateColumnWithBinaryIntMax()
         {
             var column = new ColumnDefinition { Name = GeneratorTestHelper.TestColumnName1, Type = DbType.Binary, Size = int.MaxValue };
@@ -296,7 +308,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
         public override void CanCreateColumnWithComputedExpression()
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpressionWithComputed();
-            
+
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE `TestTable1` ADD COLUMN `TestColumn1` GENERATED ALWAYS AS (Price * Quantity) VIRTUAL NOT NULL;");
         }
@@ -305,7 +317,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
         public override void CanCreateColumnWithStoredComputedExpression()
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpressionWithStoredComputed();
-            
+
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE `TestTable1` ADD COLUMN `TestColumn1` GENERATED ALWAYS AS (Price * Quantity) STORED NOT NULL;");
         }
@@ -314,7 +326,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
         public override void CanAlterColumnToAddComputedExpression()
         {
             var expression = GeneratorTestHelper.GetAlterColumnExpressionWithComputed();
-            
+
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE `TestTable1` MODIFY COLUMN `TestColumn1` GENERATED ALWAYS AS (Price * Quantity) VIRTUAL NOT NULL;");
         }
@@ -323,7 +335,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
         public override void CanAlterColumnToAddStoredComputedExpression()
         {
             var expression = GeneratorTestHelper.GetAlterColumnExpressionWithStoredComputed();
-            
+
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE `TestTable1` MODIFY COLUMN `TestColumn1` GENERATED ALWAYS AS (Price * Quantity) STORED NOT NULL;");
         }

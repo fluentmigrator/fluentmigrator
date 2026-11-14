@@ -19,9 +19,11 @@
 using System;
 using System.IO;
 
+using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.Oracle;
 using FluentMigrator.Tests.Helpers;
+using FluentMigrator.Tests.Unit.Generators;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -79,6 +81,36 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle
             using (var table = new OracleTestTable(Processor, SchemaName, "id int"))
             {
                 Processor.TableExists(SchemaName, table.Name).ShouldBeTrue();
+            }
+        }
+
+        [Test]
+        public void CanCreateTableWithTableAndColumnDescriptions()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableWithTableDescriptionAndColumnDescriptions();
+            expression.TableName = "TableWithDescriptions";
+
+            try
+            {
+                Processor.Process(expression);
+
+                Processor.TableExists(null, expression.TableName).ShouldBeTrue();
+                Processor.Read(
+                        "SELECT COMMENTS FROM USER_TAB_COMMENTS WHERE UPPER(TABLE_NAME) = UPPER('{0}')",
+                        expression.TableName)
+                    .Tables[0].Rows[0][0].ShouldBe(GeneratorTestHelper.TestTableDescription);
+                Processor.Read(
+                        "SELECT COMMENTS FROM USER_COL_COMMENTS WHERE UPPER(TABLE_NAME) = UPPER('{0}') AND UPPER(COLUMN_NAME) = UPPER('{1}')",
+                        expression.TableName,
+                        GeneratorTestHelper.TestColumnName1)
+                    .Tables[0].Rows[0][0].ShouldBe(GeneratorTestHelper.TestColumn1Description);
+            }
+            finally
+            {
+                if (Processor.TableExists(null, expression.TableName))
+                {
+                    Processor.Process(new DeleteTableExpression { TableName = expression.TableName });
+                }
             }
         }
 

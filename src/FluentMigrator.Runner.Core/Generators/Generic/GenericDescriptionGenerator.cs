@@ -68,23 +68,23 @@ namespace FluentMigrator.Runner.Generators.Generic
                 if (string.IsNullOrEmpty(column.ColumnDescription))
                     continue;
 
-                string initialDescriptionStatement = GenerateColumnDescription(
-                    "Description",
-                    expression.SchemaName,
-                    expression.TableName,
-                    column.Name,
-                    "Description:" + column.ColumnDescription);
-
                 if (column.AdditionalColumnDescriptions.Count == 0)
                 {
-                    statements.Add(initialDescriptionStatement);
+                    // No label. The "Description:" prefix exists only to tell the main description
+                    // apart from the additional named ones below; with none of those, it is noise
+                    // in the user's column comment. See #1783.
+                    statements.Add(GenerateColumnDescription(
+                        "Description",
+                        expression.SchemaName,
+                        expression.TableName,
+                        column.Name,
+                        column.ColumnDescription));
                 }
                 else
                 {
-                    initialDescriptionStatement = "Description:" + column.ColumnDescription;
                     var descriptionsList = new List<string>
                     {
-                        initialDescriptionStatement
+                        "Description:" + column.ColumnDescription
                     };
                     descriptionsList.AddRange(from description in column.AdditionalColumnDescriptions
                                               let newDescriptionStatement = description.Key + ":" + description.Value
@@ -112,19 +112,17 @@ namespace FluentMigrator.Runner.Generators.Generic
             if (string.IsNullOrEmpty(expression.Column.ColumnDescription))
                 return string.Empty;
 
-            string initialDescriptionStatement = GenerateColumnDescription(
-                "Description", expression.SchemaName, expression.TableName, expression.Column.Name, "Description:" + expression.Column.ColumnDescription);
-
             if (expression.Column.AdditionalColumnDescriptions.Count == 0)
             {
-                return initialDescriptionStatement;
+                // Unlabelled: see the note in GenerateDescriptionStatements and #1783.
+                return GenerateColumnDescription(
+                    "Description", expression.SchemaName, expression.TableName, expression.Column.Name, expression.Column.ColumnDescription);
             }
             else
             {
-                initialDescriptionStatement = "Description:" + expression.Column.ColumnDescription;
                 var descriptionsList = new List<string>
                 {
-                    initialDescriptionStatement
+                    "Description:" + expression.Column.ColumnDescription
                 };
                 descriptionsList.AddRange(from description in expression.Column.AdditionalColumnDescriptions
                                           let newDescriptionStatement = description.Key + ":" + description.Value
@@ -139,17 +137,17 @@ namespace FluentMigrator.Runner.Generators.Generic
             if (string.IsNullOrEmpty(expression.Column.ColumnDescription))
                 return string.Empty;
 
-            string initialDescriptionStatement = GenerateColumnDescription(string.Empty, expression.SchemaName, expression.TableName, expression.Column.Name, "Description:"+expression.Column.ColumnDescription);
             if (expression.Column.AdditionalColumnDescriptions.Count == 0)
             {
-                return initialDescriptionStatement;
+                // Unlabelled: see the note in GenerateDescriptionStatements and #1783.
+                return GenerateColumnDescription(
+                    string.Empty, expression.SchemaName, expression.TableName, expression.Column.Name, expression.Column.ColumnDescription);
             }
             else
             {
-                initialDescriptionStatement = "Description:" + expression.Column.ColumnDescription;
                 var descriptionsList = new List<string>
                 {
-                    initialDescriptionStatement
+                    "Description:" + expression.Column.ColumnDescription
                 };
                 descriptionsList.AddRange(from description in expression.Column.AdditionalColumnDescriptions
                                           let newDescriptionStatement = description.Key + ":" + description.Value

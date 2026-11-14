@@ -20,7 +20,11 @@ using System.Data;
 
 using FluentMigrator.Exceptions;
 using FluentMigrator.Runner;
+using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.SQLite;
+
+using Microsoft.Extensions.Options;
+
 using NUnit.Framework;
 
 using Shouldly;
@@ -100,7 +104,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             Generator.CompatibilityMode = compatibilityMode;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ADD CONSTRAINT \"PK_TestTable1_TestColumn1_TestColumn2\" PRIMARY KEY (\"TestColumn1\", \"TestColumn2\");");
+            result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ADD CONSTRAINT \"PK_TestTable1\" PRIMARY KEY (\"TestColumn1\", \"TestColumn2\");");
         }
 
         [Test]
@@ -110,7 +114,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
 
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD CONSTRAINT \"PK_TestTable1_TestColumn1_TestColumn2\" PRIMARY KEY (\"TestColumn1\", \"TestColumn2\");");
+            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD CONSTRAINT \"PK_TestTable1\" PRIMARY KEY (\"TestColumn1\", \"TestColumn2\");");
         }
 
         [Test]
@@ -303,7 +307,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
 
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ADD CONSTRAINT \"PK_TestTable1_TestColumn1\" PRIMARY KEY (\"TestColumn1\");");
+            result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ADD CONSTRAINT \"PK_TestTable1\" PRIMARY KEY (\"TestColumn1\");");
         }
 
         [Test]
@@ -314,7 +318,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
 
-            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD CONSTRAINT \"PK_TestTable1_TestColumn1\" PRIMARY KEY (\"TestColumn1\");");
+            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD CONSTRAINT \"PK_TestTable1\" PRIMARY KEY (\"TestColumn1\");");
         }
 
         [Test]
@@ -388,5 +392,88 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var result = Generator.Generate(expression);
             result.ShouldBe("DROP INDEX \"TESTUNIQUECONSTRAINT\";");
         }
+
+        #region Foreign key diagnostics (#1784, #2117)
+
+        // SQLite accepts foreign keys only inside CREATE TABLE. The old message - "Foreign keys are
+        // not supported in SQLite" - read as though it had none at all, and reporters of both issues
+        // concluded FluentMigrator could not do foreign keys on SQLite when the working form was one
+        // call away. These pin the parts of the message a user has to act on.
+
+        [Test]
+        public void CreateForeignKeyExplainsWhyAndPointsAtTheInlineForm()
+        {
+            var expression = GeneratorTestHelper.GetCreateNamedForeignKeyExpression();
+
+            var exception = Assert.Throws<DatabaseOperationNotSupportedException>(
+                () => Generator.Generate(expression));
+
+            Assert.Multiple(() =>
+            {
+                // Names the offending key rather than failing anonymously.
+                exception.Message.ShouldContain("FK_Test");
+
+                // Says why, so it does not read as "SQLite has no foreign keys".
+                exception.Message.ShouldContain("only inside a CREATE TABLE statement");
+                exception.Message.ShouldContain("ALTER TABLE");
+
+                // Mentions the column-level form that is accepted when a column is added.
+                exception.Message.ShouldContain("REFERENCES clause on a column being added");
+
+                // Gives the form that does work, built from this key's own tables and columns.
+                exception.Message.ShouldContain(".ForeignKey(\"TestTable2\", \"TestColumn2\")");
+
+                // And the escape hatch, which is what the 5.0 default change actually took away.
+                exception.Message.ShouldContain("CompatibilityMode.LOOSE");
+            });
+        }
+
+        [Test]
+        public void CreateForeignKeyFallsBackToAGenericExampleForCompositeKeys()
+        {
+            // A composite key has no single-column fluent equivalent to suggest (#2090), so the
+            // message must not offer one that would not compile.
+            var expression = GeneratorTestHelper.GetCreateMultiColumnForeignKeyExpression();
+
+            var exception = Assert.Throws<DatabaseOperationNotSupportedException>(
+                () => Generator.Generate(expression));
+
+            exception.Message.ShouldContain("Create.Table(\"Child\").WithColumn(\"ParentId\")");
+        }
+
+        [Test]
+        public void DeleteForeignKeyExplainsTheTableRebuild()
+        {
+            var expression = GeneratorTestHelper.GetDeleteForeignKeyExpression();
+
+            var exception = Assert.Throws<DatabaseOperationNotSupportedException>(
+                () => Generator.Generate(expression));
+
+            Assert.Multiple(() =>
+            {
+                exception.Message.ShouldContain("DROP CONSTRAINT");
+                exception.Message.ShouldContain("rebuilding the table");
+                exception.Message.ShouldContain("CompatibilityMode.LOOSE");
+            });
+        }
+
+        [Test]
+        public void LooseCompatibilityModeSkipsForeignKeysInsteadOfFailing()
+        {
+            // The behaviour the message now advertises. CompatibilityMode became STRICT by default
+            // in 5.0, which is what turned a silent skip into the exception behind #1784.
+            var looseGenerator = new SQLiteGenerator(
+                new SQLiteQuoter(),
+                new SQLiteTypeMap(),
+                new OptionsWrapper<GeneratorOptions>(
+                    new GeneratorOptions { CompatibilityMode = CompatibilityMode.LOOSE }));
+
+            looseGenerator.Generate(GeneratorTestHelper.GetCreateNamedForeignKeyExpression())
+                .ShouldBe(string.Empty);
+            looseGenerator.Generate(GeneratorTestHelper.GetDeleteForeignKeyExpression())
+                .ShouldBe(string.Empty);
+        }
+
+        #endregion
     }
 }

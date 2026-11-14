@@ -15,6 +15,7 @@
 #endregion
 
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -44,14 +45,14 @@ namespace FluentMigrator.Runner.Generators.Snowflake
         public SnowflakeGenerator(
             [NotNull] SnowflakeOptions sfOptions,
             [NotNull] IOptions<GeneratorOptions> generatorOptions)
-            : this(new SnowflakeQuoter(sfOptions.QuoteIdentifiers), sfOptions, generatorOptions) { }
+            : this(new SnowflakeQuoter(sfOptions.ForceQuote), sfOptions, generatorOptions) { }
 
         /// <inheritdoc />
         public SnowflakeGenerator(
             [NotNull] SnowflakeQuoter quoter,
             [NotNull] SnowflakeOptions sfOptions,
             [NotNull] IOptions<GeneratorOptions> generatorOptions)
-            : base(new SnowflakeColumn(sfOptions), quoter, new SnowflakeDescriptionGenerator(quoter), generatorOptions)
+            : base(new SnowflakeColumn(quoter), quoter, new SnowflakeDescriptionGenerator(quoter), generatorOptions)
         {
         }
 
@@ -153,7 +154,10 @@ namespace FluentMigrator.Runner.Generators.Snowflake
         /// <inheritdoc />
         public override string Generate(CreateIndexExpression expression)
         {
-            return CompatibilityMode.HandleCompatibility("Indices not supported");
+            return CompatibilityMode.HandleCompatibility(
+                "Indices not supported. To read the rows that a filtered unique index would cover, "
+                + "create a materialized view in an IfDatabase(ProcessorIdConstants.Snowflake) block. "
+                + "A materialized view doesn't enforce uniqueness on writes.");
         }
 
         /// <inheritdoc />
@@ -167,16 +171,16 @@ namespace FluentMigrator.Runner.Generators.Snowflake
         {
             var result = new StringBuilder("CREATE SEQUENCE ");
             var seq = expression.Sequence;
-            result.AppendFormat(Quoter.QuoteSequenceName(seq.Name, seq.SchemaName));
+            result.Append(Quoter.QuoteSequenceName(seq.Name, seq.SchemaName));
 
             if (seq.StartWith.HasValue)
             {
-                result.AppendFormat(" START {0}", seq.StartWith);
+                result.AppendFormat(CultureInfo.InvariantCulture, " START {0}", seq.StartWith);
             }
 
             if (seq.Increment.HasValue)
             {
-                result.AppendFormat(" INCREMENT {0}", seq.Increment);
+                result.AppendFormat(CultureInfo.InvariantCulture, " INCREMENT {0}", seq.Increment);
             }
 
             AppendSqlStatementEndToken(result);

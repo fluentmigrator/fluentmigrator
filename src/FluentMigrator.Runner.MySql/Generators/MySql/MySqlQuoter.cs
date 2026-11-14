@@ -30,8 +30,21 @@ namespace FluentMigrator.Runner.Generators.MySql
         public override string CloseQuote => "`";
 
         /// <inheritdoc />
+        /// <remarks>
+        /// MySQL treats the backslash as an escape character inside string literals, so backslashes
+        /// in a quoted value have to be doubled. That escaping must not be applied to
+        /// <see cref="RawSql"/>, which <see cref="GenericQuoter.QuoteValue"/> returns verbatim: the
+        /// caller has taken responsibility for that SQL and it has to reach the server unmodified.
+        /// Escaping it corrupted regex predicates, <c>LIKE</c> patterns and JSON paths.
+        /// See https://github.com/fluentmigrator/fluentmigrator/issues/2335.
+        /// </remarks>
         public override string QuoteValue(object value)
         {
+            if (value is RawSql rawSql)
+            {
+                return rawSql.Value;
+            }
+
             return base.QuoteValue(value).Replace(@"\", @"\\");
         }
 

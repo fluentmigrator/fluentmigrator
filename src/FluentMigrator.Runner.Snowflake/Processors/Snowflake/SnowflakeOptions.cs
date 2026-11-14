@@ -13,7 +13,7 @@ namespace FluentMigrator.Runner.Processors.Snowflake
     public class SnowflakeOptions : ICloneable
     {
         /// <summary>
-        /// Gets or sets a value indicating whether identifiers should be quoted in SQL statements.
+        /// Gets or sets a value indicating whether all names should be quoted unconditionally.
         /// </summary>
         /// <value>
         /// <c>true</c> if identifiers should be quoted; otherwise, <c>false</c>.
@@ -23,13 +23,26 @@ namespace FluentMigrator.Runner.Processors.Snowflake
         /// are properly escaped in SQL statements. This option is particularly useful when working
         /// with database objects that have non-standard names.
         /// </remarks>
-        public bool QuoteIdentifiers { get; set; }
+        public bool ForceQuote { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether identifiers should be quoted in SQL statements.
+        /// </summary>
+        /// <remarks>
+        /// This is an alias for <see cref="ForceQuote"/>.
+        /// </remarks>
+        [Obsolete("Use ForceQuote instead.")]
+        public bool QuoteIdentifiers
+        {
+            get => ForceQuote;
+            set => ForceQuote = value;
+        }
 
         /// <summary>
         /// Creates a new instance of <see cref="SnowflakeOptions"/> with identifier quoting enabled.
         /// </summary>
         /// <returns>
-        /// A <see cref="SnowflakeOptions"/> instance where <see cref="SnowflakeOptions.QuoteIdentifiers"/> is set to <c>true</c>.
+        /// A <see cref="SnowflakeOptions"/> instance where <see cref="SnowflakeOptions.ForceQuote"/> is set to <c>true</c>.
         /// </returns>
         /// <remarks>
         /// This method is used to configure the Snowflake database processor to quote identifiers,
@@ -39,7 +52,7 @@ namespace FluentMigrator.Runner.Processors.Snowflake
         {
             return new SnowflakeOptions
             {
-                QuoteIdentifiers = true
+                ForceQuote = true
             };
         }
 
@@ -47,7 +60,7 @@ namespace FluentMigrator.Runner.Processors.Snowflake
         /// Creates a new instance of <see cref="SnowflakeOptions"/> with quoting of identifiers disabled.
         /// </summary>
         /// <returns>
-        /// A <see cref="SnowflakeOptions"/> instance where <see cref="SnowflakeOptions.QuoteIdentifiers"/> is set to <c>false</c>.
+        /// A <see cref="SnowflakeOptions"/> instance where <see cref="SnowflakeOptions.ForceQuote"/> is set to <c>false</c>.
         /// </returns>
         /// <remarks>
         /// This method is a factory method for creating a configuration where quoting of identifiers is explicitly disabled.
@@ -57,7 +70,7 @@ namespace FluentMigrator.Runner.Processors.Snowflake
         {
             return new SnowflakeOptions
             {
-                QuoteIdentifiers = false
+                ForceQuote = false
             };
         }
 

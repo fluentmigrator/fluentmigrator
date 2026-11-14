@@ -14,6 +14,7 @@
 // limitations under the License.
 #endregion
 
+using System;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -52,7 +53,17 @@ namespace FluentMigrator.Runner.Logging
                 return "fluentmigrator.sql";
 
             var assembly = assemblySource.Assemblies.First();
-            return assembly.Location + ".sql";
+
+            // Assembly.Location is empty for assemblies embedded in a single-file app, which
+            // would leave a bare ".sql" name in the current directory. Fall back to the app
+            // directory plus the simple assembly name.
+#pragma warning disable IL3000
+            var location = assembly.Location;
+#pragma warning restore IL3000
+
+            return string.IsNullOrEmpty(location)
+                ? Path.Combine(AppContext.BaseDirectory, assembly.GetName().Name + ".sql")
+                : location + ".sql";
         }
     }
 }

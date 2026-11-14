@@ -14,5 +14,8 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "vitepress": "^1.6.4"
+  },
+  "overrides": {
+    "vite": "^6.4.6"
   }
 }

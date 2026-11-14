@@ -17,12 +17,14 @@
 //
 #endregion
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Generic;
+using FluentMigrator.SQLite;
 
 using JetBrains.Annotations;
 
@@ -87,6 +89,111 @@ namespace FluentMigrator.Runner.Generators.SQLite
         public override List<string> GeneratorIdAliases => new List<string> { GeneratorIdConstants.SQLite };
 
         /// <inheritdoc />
+        public override string Generate(CreateTableExpression expression)
+        {
+            var withoutRowId = expression.AdditionalFeatures.TryGetValue(SQLiteExtensions.WithoutRowIdTable, out var value)
+                && value is true;
+
+            if (withoutRowId)
+            {
+                if (!expression.Columns.Any(column => column.IsPrimaryKey))
+                {
+                    return CompatibilityMode.HandleCompatibility(
+                        $"SQLite requires a PRIMARY KEY on tables created WITHOUT ROWID. Table '{expression.TableName}' is marked WITHOUT ROWID but defines no primary key.");
+                }
+
+                var identityColumns = expression.Columns
+                    .Where(column => column.IsIdentity)
+                    .Select(column => column.Name)
+                    .ToList();
+
+                if (identityColumns.Count > 0)
+                {
+                    return CompatibilityMode.HandleCompatibility(
+                        $"SQLite does not allow AUTOINCREMENT (identity) columns on tables created WITHOUT ROWID. Table '{expression.TableName}' defines identity column(s): {string.Join(", ", identityColumns)}.");
+                }
+            }
+
+            var createTable = base.Generate(expression);
+
+            if (!withoutRowId || string.IsNullOrEmpty(createTable))
+            {
+                return createTable;
+            }
+
+            // Remove trailing semicolon (if any) before appending WITHOUT ROWID
+            var trimmed = createTable.TrimEnd();
+            if (trimmed.EndsWith(";"))
+            {
+                trimmed = trimmed.Substring(0, trimmed.Length - 1);
+            }
+
+            return trimmed + " WITHOUT ROWID;";
+        }
+
+        /// <inheritdoc />
+        /// <remarks>
+        /// SQLite accepts a column-level <c>REFERENCES</c> clause in <c>ALTER TABLE ... ADD COLUMN</c>,
+        /// so a column added with a foreign key declared through the fluent syntax, for example
+        /// <c>Alter.Table("Child").AddColumn("ParentId").AsInt32().ForeignKey("Parent", "Id")</c>,
+        /// gets the clause generated inline. The standalone <see cref="CreateForeignKeyExpression"/>
+        /// the builder queues for the same key is marked as handled so it does not fail afterwards,
+        /// mirroring what <see cref="SQLiteColumn"/> does for keys declared in CREATE TABLE.
+        /// </remarks>
+        public override string Generate(CreateColumnExpression expression)
+        {
+            var foreignKey = expression.Column.ForeignKey;
+            if (!expression.Column.IsForeignKey || !IsSingleColumnKeyOn(foreignKey, expression.Column.Name))
+            {
+                return base.Generate(expression);
+            }
+
+            var statement = base.Generate(expression);
+            if (string.IsNullOrEmpty(statement))
+            {
+                return statement;
+            }
+
+            var referencesClause = ((SQLiteColumn)Column).FormatColumnLevelForeignKey(foreignKey);
+
+            // The fluent builder also queues a standalone CreateForeignKeyExpression for this key.
+            // Prefix its name so Generate(CreateForeignKeyExpression) knows it has been handled here.
+            foreignKey.Name = "$$IGNORE$$_" + foreignKey.Name;
+
+            var trimmed = statement.TrimEnd();
+            if (trimmed.EndsWith(";"))
+            {
+                return trimmed.Substring(0, trimmed.Length - 1) + " " + referencesClause + ";";
+            }
+
+            return trimmed + " " + referencesClause;
+        }
+
+        /// <summary>
+        /// Determines whether a foreign key is a single-column key declared on the given column, the only
+        /// shape that can be written as a column-level <c>REFERENCES</c> clause.
+        /// </summary>
+        /// <param name="foreignKey">The foreign key to inspect</param>
+        /// <param name="columnName">The name of the column being added</param>
+        /// <returns><c>true</c> when the key has one foreign and one primary column and the foreign column is <paramref name="columnName"/></returns>
+        private static bool IsSingleColumnKeyOn(ForeignKeyDefinition foreignKey, string columnName)
+        {
+            if (foreignKey == null)
+            {
+                return false;
+            }
+
+            var foreignColumns = foreignKey.ForeignColumns;
+            var primaryColumns = foreignKey.PrimaryColumns;
+
+            return foreignColumns != null
+                && primaryColumns != null
+                && foreignColumns.Count == 1
+                && primaryColumns.Count == 1
+                && string.Equals(foreignColumns.First(), columnName, StringComparison.Ordinal);
+        }
+
+        /// <inheritdoc />
         public override string Generate(AlterColumnExpression expression)
         {
             return CompatibilityMode.HandleCompatibility("SQLite does not support alter column");
@@ -99,6 +206,12 @@ namespace FluentMigrator.Runner.Generators.SQLite
         }
 
         /// <inheritdoc />
+        /// <remarks>
+        /// SQLite accepts foreign keys only declared inline on a column or table definition - there is
+        /// no <c>ALTER TABLE ... ADD CONSTRAINT</c>. Declaring the key on the column when the table is
+        /// created, or when the column is added, does work and is generated inline; see
+        /// <see cref="SQLiteColumn"/> and <see cref="Generate(CreateColumnExpression)"/>.
+        /// </remarks>
         public override string Generate(CreateForeignKeyExpression expression)
         {
             // If a FK name starts with $$IGNORE$$_ then it means it was handled by the CREATE TABLE
@@ -106,14 +219,71 @@ namespace FluentMigrator.Runner.Generators.SQLite
             if (expression.ForeignKey.Name.StartsWith("$$IGNORE$$_"))
                 return string.Empty;
 
-            return CompatibilityMode.HandleCompatibility("Foreign keys are not supported in SQLite");
+            return CompatibilityMode.HandleCompatibility(DescribeUnsupportedForeignKey(expression.ForeignKey));
         }
 
         /// <inheritdoc />
+        /// <remarks>
+        /// SQLite has no <c>ALTER TABLE ... DROP CONSTRAINT</c>, so an existing foreign key can only
+        /// be removed by rebuilding the table without it.
+        /// </remarks>
         public override string Generate(DeleteForeignKeyExpression expression)
         {
-            return CompatibilityMode.HandleCompatibility("Foreign keys are not supported in SQLite");
+            var foreignKey = expression.ForeignKey;
+            var name = string.IsNullOrEmpty(foreignKey?.Name) ? "The foreign key" : $"Foreign key '{foreignKey.Name}'";
+
+            return CompatibilityMode.HandleCompatibility(
+                $"{name} cannot be dropped: SQLite has no ALTER TABLE ... DROP CONSTRAINT. " +
+                "Removing a foreign key requires rebuilding the table without it - create a replacement table, " +
+                "copy the rows across, drop the original and rename. " +
+                CompatibilityModeHint);
         }
+
+        /// <summary>
+        /// Explains why a standalone foreign key cannot be created on SQLite, and what to do instead.
+        /// </summary>
+        /// <param name="foreignKey">The foreign key that could not be generated</param>
+        /// <returns>The message</returns>
+        /// <remarks>
+        /// The original message was just "Foreign keys are not supported in SQLite", which reads as
+        /// though SQLite has no foreign keys at all. It does - they simply have to be declared when
+        /// the table is created. Reporters of #1784 and #2117 both concluded FluentMigrator could not
+        /// do foreign keys on SQLite when the working form was one call away.
+        /// </remarks>
+        private static string DescribeUnsupportedForeignKey(ForeignKeyDefinition foreignKey)
+        {
+            var name = string.IsNullOrEmpty(foreignKey?.Name) ? null : $"'{foreignKey.Name}' ";
+
+            var foreignColumns = foreignKey?.ForeignColumns?.ToList() ?? new List<string>();
+            var primaryColumns = foreignKey?.PrimaryColumns?.ToList() ?? new List<string>();
+
+            // Only a single-column key can be shown as a concrete one-liner. A composite key needs
+            // the table-level syntax, which FluentMigrator has no fluent equivalent for yet (#2090),
+            // so the generic example is used rather than one that would not compile.
+            var example = foreignColumns.Count == 1 && primaryColumns.Count == 1
+                ? $"Create.Table(\"{foreignKey.ForeignTable}\").WithColumn(\"{foreignColumns[0]}\").AsInt32()" +
+                  $".ForeignKey(\"{foreignKey.PrimaryTable}\", \"{primaryColumns[0]}\")"
+                : "Create.Table(\"Child\").WithColumn(\"ParentId\").AsInt32().ForeignKey(\"Parent\", \"Id\")";
+
+            return
+                $"Foreign key {name}cannot be created with Create.ForeignKey on SQLite. SQLite accepts foreign keys " +
+                "only inside a CREATE TABLE statement or as a REFERENCES clause on a column being added; " +
+                "it has no ALTER TABLE ... ADD CONSTRAINT. " +
+                $"Declare the key on the column when the table is created - {example} - which FluentMigrator " +
+                "generates inline and SQLite accepts. A new column can also be added with its key declared, " +
+                "using Alter.Table(...).AddColumn(...).ForeignKey(...). To add a key to a column that already " +
+                "exists, rebuild the table: " +
+                "create a replacement with the key declared, copy the rows across, drop the original and rename. " +
+                CompatibilityModeHint;
+        }
+
+        /// <summary>
+        /// The trailing sentence pointing at LOOSE compatibility mode, which skips these statements
+        /// instead of failing.
+        /// </summary>
+        private const string CompatibilityModeHint =
+            "If you would rather these statements be skipped than fail, register SQLite with " +
+            "AddSQLite(compatibilityMode: CompatibilityMode.LOOSE).";
 
         /// <inheritdoc />
         public override string Generate(CreateSequenceExpression expression)
@@ -174,8 +344,14 @@ namespace FluentMigrator.Runner.Generators.SQLite
         }
 
         /// <inheritdoc />
+        /// <remarks>SQLite treats NULLs as distinct natively and cannot express the opposite.</remarks>
+        protected override bool IsUniqueIndexNullsDistinctSupported(bool nullsDistinct) => nullsDistinct;
+
+        /// <inheritdoc />
         public override string Generate(CreateIndexExpression expression)
         {
+            ValidateUniqueIndexNullsDistinct(expression);
+
             // SQLite prefixes the index name, rather than the table name with the schema
 
             var indexColumns = new string[expression.Index.Columns.Count];

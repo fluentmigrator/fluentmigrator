@@ -70,7 +70,7 @@ namespace FluentMigrator.Postgres
         {
             if (additionalFeatures == null)
             {
-                throw new InvalidOperationException(UnsupportedMethodMessage(nameof(Include), nameof(ISupportAdditionalFeatures)));
+                throw new InvalidOperationException(UnsupportedMethodMessage(nameof(AsConcurrently), nameof(ISupportAdditionalFeatures)));
             }
 
             var asConcurrently = additionalFeatures.GetAdditionalFeature(Concurrently, () => new PostgresIndexConcurrentlyDefinition());

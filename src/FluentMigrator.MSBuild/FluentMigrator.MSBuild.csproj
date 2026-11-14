@@ -2,7 +2,7 @@
   <!-- Much of this configuration is taken from Microsoft documentation on how to set-up custom MSBuild tasks: https://learn.microsoft.com/en-us/visualstudio/msbuild/tutorial-custom-task-code-generation?view=vs-2022#package-the-task-for-distribution -->
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFrameworks>net48;netstandard2.0;net8.0;net9.0;net10.0</TargetFrameworks>
+    <TargetFrameworks>net48;netstandard2.0;net8.0;net9.0;net10.0;net11.0</TargetFrameworks>
     <Description>MSBuild runner for FluentMigrator</Description>
     <!-- The property CopyLocalLockFileAssemblies is needed to make sure that dependencies are copied to the output directory. -->
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
@@ -26,6 +26,15 @@
     <!-- PKV006: .NET Framework 4.8 is not supported by package validation. -->
     <NoWarn>$(NoWarn);NU5100;NU5127;NU5129;PKV006</NoWarn>
   </PropertyGroup>
+  <!--
+    Inherited from FluentMigrator.Runner: its netstandard2.0 leg pulls in the net48 output of
+    FluentMigrator.Runner.SqlServer, which cannot target netstandard2.0 while Microsoft.Data.SqlClient
+    6.x ships only net462/net8.0/net9.0 assets. See the matching note in FluentMigrator.Runner.csproj.
+  -->
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
+    <NoWarn>$(NoWarn);NU1702</NoWarn>
+    <MSBuildWarningsAsMessages>$(MSBuildWarningsAsMessages);MSB3277</MSBuildWarningsAsMessages>
+  </PropertyGroup>
   <ItemGroup>
     <None Include="build/**/*.targets">
       <PackagePath>build/%(RecursiveDir)%(Filename)%(Extension)</PackagePath>
@@ -46,7 +55,7 @@
   <!-- Dependencies -->
   <!-- mark every dependency of this Task project, both PackageReference and ProjectReference with the PrivateAssets="all" attribute. -->
   <ItemGroup>
-    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.14.28" PrivateAssets="all" ExcludeAssets="Runtime" />
+    <PackageReference Include="Microsoft.Build.Utilities.Core" PrivateAssets="all" ExcludeAssets="Runtime" />
   </ItemGroup>
 
   <Target Name="PackBuildOutputs">

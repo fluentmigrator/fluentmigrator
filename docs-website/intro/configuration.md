@@ -423,7 +423,7 @@ For console and dotnet-fm runners:
 Migrate.exe -p sqlserver -c "..." -a "MyApp.dll" --output --outputFileName "migration.sql"
 
 # dotnet-fm runner
-dotnet fm migrate -p sqlserver -c "..." -a "MyApp.dll" --output --outputFileName "migration.sql"
+dotnet fm migrate -p sqlserver -c "..." -a "MyApp.dll" --output=migration.sql
 ```
 
 ## Advanced Configuration Scenarios

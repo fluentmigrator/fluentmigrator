@@ -349,8 +349,17 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         }
 
         /// <inheritdoc />
+        /// <remarks>
+        /// SQL Server treats NULLs as equal in a unique index, so that direction is native.
+        /// Expressing the opposite needs a filtered index, which arrived in SQL Server 2008.
+        /// </remarks>
+        protected override bool IsUniqueIndexNullsDistinctSupported(bool nullsDistinct) => !nullsDistinct;
+
+        /// <inheritdoc />
         public override string Generate(CreateIndexExpression expression)
         {
+            ValidateUniqueIndexNullsDistinct(expression);
+
             string[] indexColumns = new string[expression.Index.Columns.Count];
             IndexColumnDefinition columnDef;
 

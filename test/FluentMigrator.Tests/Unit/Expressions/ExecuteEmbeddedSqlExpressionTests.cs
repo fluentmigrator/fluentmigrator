@@ -24,6 +24,8 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Tests.Helpers;
 using FluentMigrator.Infrastructure;
 
+using FluentMigrator.Runner.Generators.Generic;
+
 using Moq;
 
 using NUnit.Framework;
@@ -132,6 +134,35 @@ namespace FluentMigrator.Tests.Unit.Expressions
         {
             var expression = new ExecuteSqlScriptExpression { SqlScript = TestSqlScript };
             expression.ToString().ShouldBe("ExecuteSqlScript embeddedtestscript.sql");
+        }
+
+        /// <summary>
+        /// <c>Execute.EmbeddedScript</c> shares
+        /// <c>ExecuteSqlScriptExpressionBase.ExecuteWith</c> with <c>Execute.Script</c>, so it
+        /// reaches the token replacer by the same call site. Pinned separately because the two
+        /// entry points resolve their script content differently, and only the resolved text
+        /// reaches the replacer.
+        /// </summary>
+        [Test]
+        public void ExecutesTheEmbeddedScriptWithSafeTokenUsingProcessorQuoter()
+        {
+            var provider = new DefaultEmbeddedResourceProvider(Assembly.GetExecutingAssembly());
+            var expression = new ExecuteEmbeddedSqlScriptExpression(new[] { provider })
+            {
+                SqlScript = "EmbeddedTestScriptWithSafeToken.sql",
+                Parameters = new Dictionary<string, object>
+                {
+                    { "parameter", "ParameterValue" },
+                    { "safe_parameter", "isn't safe" },
+                },
+            };
+
+            var processor = new Mock<IMigrationProcessor>();
+            processor.SetupGet(x => x.Quoter).Returns(new GenericQuoter());
+            processor.Setup(x => x.Execute("EMBEDDED TEST SCRIPT ParameterValue 'isn''t safe'")).Verifiable();
+
+            expression.ExecuteWith(processor.Object);
+            processor.Verify();
         }
     }
 }

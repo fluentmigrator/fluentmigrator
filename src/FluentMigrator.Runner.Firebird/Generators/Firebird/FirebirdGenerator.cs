@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -61,7 +62,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
             [NotNull] FirebirdQuoter quoter,
             [NotNull] FirebirdOptions fbOptions,
             [NotNull] IOptions<GeneratorOptions> generatorOptions)
-            : base(new FirebirdColumn(fbOptions), quoter, new EmptyDescriptionGenerator(), generatorOptions)
+            : base(new FirebirdColumn(fbOptions, quoter), quoter, new EmptyDescriptionGenerator(), generatorOptions)
         {
             FBOptions = fbOptions ?? throw new ArgumentNullException(nameof(fbOptions));
 #pragma warning disable 618
@@ -137,8 +138,14 @@ namespace FluentMigrator.Runner.Generators.Firebird
         }
 
         /// <inheritdoc />
+        /// <remarks>Firebird treats NULLs as distinct in a unique index natively and cannot express the opposite.</remarks>
+        protected override bool IsUniqueIndexNullsDistinctSupported(bool nullsDistinct) => nullsDistinct;
+
+        /// <inheritdoc />
         public override string Generate(CreateIndexExpression expression)
         {
+            ValidateUniqueIndexNullsDistinct(expression);
+
             //Firebird doesn't have particular asc or desc order per column, only per the whole index
             // CREATE [UNIQUE] [ASC[ENDING] | [DESC[ENDING]] INDEX indexname
             //  ON tablename  { (<col> [, <col> ...]) | COMPUTED BY (expression) }
@@ -204,7 +211,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
         {
             Truncator.Truncate(sequence);
             if (sequence.StartWith != null)
-                return FormatStatement("ALTER SEQUENCE {0} RESTART WITH {1}", Quoter.QuoteSequenceName(sequence.Name), sequence.StartWith.ToString());
+                return FormatStatement("ALTER SEQUENCE {0} RESTART WITH {1}", Quoter.QuoteSequenceName(sequence.Name), sequence.StartWith.Value.ToString(CultureInfo.InvariantCulture));
 
             return string.Empty;
         }
@@ -392,7 +399,8 @@ namespace FluentMigrator.Runner.Generators.Firebird
         /// <returns>True if types match; otherwise, false.</returns>
         public static bool ColumnTypesMatch(ColumnDefinition col1, ColumnDefinition col2)
         {
-            FirebirdColumn column = new FirebirdColumn(new FirebirdOptions());
+            var options = new FirebirdOptions();
+            FirebirdColumn column = new FirebirdColumn(options, new FirebirdQuoter(options.ForceQuote));
             string colDef1 = column.GenerateForTypeAlter(col1);
             string colDef2 = column.GenerateForTypeAlter(col2);
             return colDef1 == colDef2;
@@ -410,7 +418,8 @@ namespace FluentMigrator.Runner.Generators.Firebird
                 return true;
             if (col1.DefaultValue is ColumnDefinition.UndefinedDefaultValue || col2.DefaultValue is ColumnDefinition.UndefinedDefaultValue)
                 return true;
-            FirebirdColumn column = new FirebirdColumn(new FirebirdOptions());
+            var options = new FirebirdOptions();
+            FirebirdColumn column = new FirebirdColumn(options, new FirebirdQuoter(options.ForceQuote));
             string col1Value = column.GenerateForDefaultAlter(col1);
             string col2Value = column.GenerateForDefaultAlter(col2);
             return col1Value != col2Value;

@@ -88,6 +88,15 @@ namespace FluentMigrator.Tests.Unit
         }
 
         [Test]
+        public void DownMigrationWithTableDescriptionCannotBeAutoReversed()
+        {
+            var autoReversibleMigration = new TestAlterTableDescriptionAutoReversingMigration();
+            _context.Object.Expressions = new Collection<IMigrationExpression>();
+
+            Should.Throw<System.NotSupportedException>(() => autoReversibleMigration.GetDownExpressions(_context.Object));
+        }
+
+        [Test]
         public void AlterTableAddColumnAutoReversingMigrationGivesDeleteColumnDown()
         {
             var autoReversibleMigration = new TestAlterTableAddColumnAutoReversingMigration();
@@ -137,6 +146,14 @@ namespace FluentMigrator.Tests.Unit
                 .AddColumn("organization_details_ar").AsString(2000).Nullable()
                 .AddColumn("details_ar").AsString(2000).Nullable()
                 .AddColumn("address_ar").AsString(250).Nullable();
+        }
+    }
+
+    internal class TestAlterTableDescriptionAutoReversingMigration : AutoReversingMigration
+    {
+        public override void Up()
+        {
+            Alter.Table("Foo").WithDescription("Stores test data");
         }
     }
 }

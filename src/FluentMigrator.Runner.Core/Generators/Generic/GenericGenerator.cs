@@ -18,12 +18,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Generation;
 using FluentMigrator.Infrastructure;
+using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Base;
 
@@ -166,7 +168,7 @@ namespace FluentMigrator.Runner.Generators.Generic
         {
             if (expression.IfExists)
             {
-                return FormatStatement(DropTableIfExists, Quoter.QuoteTableName(expression.TableName));
+                return FormatStatement(DropTableIfExists, Quoter.QuoteTableName(expression.TableName, expression.SchemaName));
             }
 
             return FormatStatement(DropTable, Quoter.QuoteTableName(expression.TableName, expression.SchemaName));
@@ -249,9 +251,39 @@ namespace FluentMigrator.Runner.Generators.Generic
             );
         }
 
+        /// <summary>
+        /// Whether this provider can express the requested unique-index NULL semantics.
+        /// </summary>
+        /// <param name="nullsDistinct"><c>true</c> when NULLs should be distinct</param>
+        /// <returns><c>true</c> when the provider can express it</returns>
+        protected virtual bool IsUniqueIndexNullsDistinctSupported(bool nullsDistinct) => false;
+
+        /// <summary>
+        /// Routes an unsupported unique-index NULL semantics request through the compatibility
+        /// mode, so a provider that cannot express it fails loudly under STRICT rather than
+        /// silently emitting a weaker constraint.
+        /// </summary>
+        /// <param name="expression">The create index expression</param>
+        /// <returns>An empty string, or whatever the compatibility mode returns</returns>
+        protected string ValidateUniqueIndexNullsDistinct(CreateIndexExpression expression)
+        {
+            var nullsDistinct = expression.Index.GetAdditionalFeature(
+                CreateIndexNullSemanticsExtensions.UniqueIndexNullsDistinct, (bool?)null);
+
+            if (nullsDistinct == null || IsUniqueIndexNullsDistinctSupported(nullsDistinct.Value))
+            {
+                return string.Empty;
+            }
+
+            return CompatibilityMode.HandleCompatibility(
+                $"The requested unique index NULL handling (nulls {(nullsDistinct.Value ? "distinct" : "not distinct")}) is not supported by {GeneratorId}");
+        }
+
         /// <inheritdoc />
         public override string Generate(CreateIndexExpression expression)
         {
+            ValidateUniqueIndexNullsDistinct(expression);
+
             var indexColumns = new string[expression.Index.Columns.Count];
             IndexColumnDefinition columnDef;
 
@@ -578,26 +610,26 @@ namespace FluentMigrator.Runner.Generators.Generic
         {
             var result = new StringBuilder("CREATE SEQUENCE ");
             var seq = expression.Sequence;
-            result.AppendFormat(Quoter.QuoteSequenceName(seq.Name, seq.SchemaName));
+            result.Append(Quoter.QuoteSequenceName(seq.Name, seq.SchemaName));
 
             if (seq.Increment.HasValue)
             {
-                result.AppendFormat(" INCREMENT {0}", seq.Increment);
+                result.AppendFormat(CultureInfo.InvariantCulture, " INCREMENT {0}", seq.Increment);
             }
 
             if (seq.MinValue.HasValue)
             {
-                result.AppendFormat(" MINVALUE {0}", seq.MinValue);
+                result.AppendFormat(CultureInfo.InvariantCulture, " MINVALUE {0}", seq.MinValue);
             }
 
             if (seq.MaxValue.HasValue)
             {
-                result.AppendFormat(" MAXVALUE {0}", seq.MaxValue);
+                result.AppendFormat(CultureInfo.InvariantCulture, " MAXVALUE {0}", seq.MaxValue);
             }
 
             if (seq.StartWith.HasValue)
             {
-                result.AppendFormat(" START WITH {0}", seq.StartWith);
+                result.AppendFormat(CultureInfo.InvariantCulture, " START WITH {0}", seq.StartWith);
             }
 
             const long MINIMUM_CACHE_VALUE = 2;
@@ -607,7 +639,7 @@ namespace FluentMigrator.Runner.Generators.Generic
                 {
                     return CompatibilityMode.HandleCompatibility("Cache size must be greater than 1; if you intended to disable caching, set Cache to null.");
                 }
-                result.AppendFormat(" CACHE {0}", seq.Cache);
+                result.AppendFormat(CultureInfo.InvariantCulture, " CACHE {0}", seq.Cache);
             }
             else
             {

@@ -105,44 +105,45 @@ namespace FluentMigrator.Builders.Create.Column
         /// <inheritdoc />
         public ICreateColumnOptionSyntax WithColumnAdditionalDescription(string descriptionName, string description)
         {
-            if (string.IsNullOrWhiteSpace(descriptionName))
-                throw new ArgumentException("Cannot be the empty string.", "descriptionName");
-
-            if (description.Equals("Description"))
-                throw new InvalidOperationException("The given descriptionName is already used as a keyword to create a description, please choose another descriptionName.");
-
-            if (string.IsNullOrWhiteSpace(description))
-                throw new ArgumentException("Cannot be the empty string.", "description");
-
-            if (Expression.Column.AdditionalColumnDescriptions.Keys.Count(i => i.Equals(descriptionName)) > 0)
-                throw new InvalidOperationException("The given descriptionName is already present in the columnDescription list.");
+            ValidateColumnAdditionalDescription(descriptionName, description);
 
             Expression.Column.AdditionalColumnDescriptions.Add(descriptionName, description);
             return this;
+        }
+
+        private void ValidateColumnAdditionalDescription(string descriptionName, string description)
+        {
+            if (string.IsNullOrWhiteSpace(descriptionName))
+                throw new ArgumentException("Cannot be the empty string.", nameof(descriptionName));
+
+            if (descriptionName.Equals("Description"))
+                throw new InvalidOperationException("The given descriptionName is already used as a keyword to create a description, please choose another descriptionName.");
+
+            if (string.IsNullOrWhiteSpace(description))
+                throw new ArgumentException("Cannot be the empty string.", nameof(description));
+
+            if (Expression.Column.AdditionalColumnDescriptions.Keys.Any(i => i.Equals(descriptionName)))
+                throw new InvalidOperationException("The given descriptionName is already present in the columnDescription list.");
         }
 
         /// <inheritdoc />
         public ICreateColumnOptionSyntax WithColumnAdditionalDescriptions(Dictionary<string, string> columnDescriptions)
         {
             if (columnDescriptions == null)
-                throw new ArgumentException("Cannot be null.", "columnDescriptions");
+                throw new ArgumentException("Cannot be null.", nameof(columnDescriptions));
 
-            if (!columnDescriptions.Any())
-                throw new ArgumentException("Cannot be empty.", "columnDescriptions");
+            if (columnDescriptions.Count == 0)
+                throw new ArgumentException("Cannot be empty.", nameof(columnDescriptions));
 
-            if (Expression.Column.AdditionalColumnDescriptions.Keys.Count(i => i.Equals("Description")) > 0)
-                throw new InvalidOperationException("The given descriptionName is already present in the columnDescription list.");
-
-            var isPresent = false;
-            foreach (var newDescription in from newDescription in columnDescriptions
-                                           where !isPresent
-                                           select newDescription)
+            foreach (var newDescription in columnDescriptions)
             {
-                isPresent = Expression.Column.AdditionalColumnDescriptions.Keys.Count(i => i.Equals(newDescription.Key)) > 0;
+                ValidateColumnAdditionalDescription(newDescription.Key, newDescription.Value);
             }
 
-            if (isPresent)
-                throw new ArgumentException("At least one of new keys provided is already present in the columnDescription list.", "description");
+            foreach (var newDescription in columnDescriptions)
+            {
+                Expression.Column.AdditionalColumnDescriptions.Add(newDescription.Key, newDescription.Value);
+            }
 
             return this;
         }

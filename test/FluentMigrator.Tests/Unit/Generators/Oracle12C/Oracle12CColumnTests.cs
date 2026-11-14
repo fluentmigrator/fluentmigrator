@@ -102,6 +102,18 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle12C
             result.ShouldBe("ALTER TABLE TestTable1 MODIFY TestColumn1 NUMBER(10,0) GENERATED ALWAYS AS IDENTITY (MAXVALUE 7);");
         }
 
+        [Test, SetCulture("nb-NO")]
+        public void CanCreateAutoIncrementColumnWithNegativeIdentityOptionsInAnyCulture()
+        {
+            var expression = GeneratorTestHelper.GetAlterColumnAddAutoIncrementExpression();
+            expression.Column.AdditionalFeatures.Add("OracleIdentityStartWith", -1L);
+            expression.Column.AdditionalFeatures.Add("OracleIdentityIncrementBy", -1);
+            expression.Column.AdditionalFeatures.Add("OracleIdentityMinValue", -10L);
+            expression.Column.AdditionalFeatures.Add("OracleIdentityMaxValue", -1L);
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE TestTable1 MODIFY TestColumn1 NUMBER(10,0) GENERATED ALWAYS AS IDENTITY (START WITH -1 INCREMENT BY -1 MINVALUE -10 MAXVALUE -1);");
+        }
+
         [Test]
         public void CanCreateAutoIncrementColumnWithDefaultSchemaAndAllIdentityOptions()
         {

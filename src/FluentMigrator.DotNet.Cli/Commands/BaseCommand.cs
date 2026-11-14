@@ -14,6 +14,8 @@
 // limitations under the License.
 #endregion
 
+using System;
+
 using FluentMigrator.Runner.Initialization;
 
 using McMaster.Extensions.CommandLineUtils;
@@ -26,10 +28,24 @@ namespace FluentMigrator.DotNet.Cli.Commands
     {
         protected int ExecuteMigrations(MigratorOptions options, IConsole console)
         {
+            try
+            {
+                RunMigrations(options, console);
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                console.Error.WriteLine($"Error executing migrations: {ex.Message}");
+                console.Error.WriteLine(ex.ToString());
+                return 1;
+            }
+        }
+
+        protected virtual void RunMigrations(MigratorOptions options, IConsole console)
+        {
             using var serviceProvider = Setup.BuildServiceProvider(options, console);
             var executor = serviceProvider.GetRequiredService<TaskExecutor>();
             executor.Execute();
-            return 0;
         }
     }
 }

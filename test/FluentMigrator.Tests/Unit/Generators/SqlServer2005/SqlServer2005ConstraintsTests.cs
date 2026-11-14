@@ -23,6 +23,7 @@ using System.Linq;
 
 using FluentMigrator.Builders.Create.Constraint;
 using FluentMigrator.Builders.Delete.Constraint;
+using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Generators.SqlServer;
@@ -308,7 +309,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [PK_TestTable1_TestColumn1_TestColumn2] PRIMARY KEY ([TestColumn1], [TestColumn2]);");
+            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [PK_TestTable1] PRIMARY KEY ([TestColumn1], [TestColumn2]);");
         }
 
         [Test]
@@ -318,7 +319,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [PK_TestTable1_TestColumn1_TestColumn2] PRIMARY KEY ([TestColumn1], [TestColumn2]);");
+            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [PK_TestTable1] PRIMARY KEY ([TestColumn1], [TestColumn2]);");
         }
 
         [Test]
@@ -464,6 +465,20 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnUniqueConstraintExpression();
             expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.UniqueConstraintIncludesList, new List<IndexIncludeDefinition> { new IndexIncludeDefinition { Name = "TestColumn3" } });
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE UNIQUE INDEX [UC_TestTable1_TestColumn1_TestColumn2] ON [dbo].[TestTable1] ([TestColumn1], [TestColumn2]) INCLUDE ([TestColumn3]);");
+        }
+
+        [Test]
+        public void UniqueConstraintIncludeExtensionRoutesToUniqueConstraintIncludesList()
+        {
+            var expression = GeneratorTestHelper.GetCreateMultiColumnUniqueConstraintExpression();
+            var builder = new CreateConstraintExpressionBuilder(expression);
+            builder.Include("TestColumn3");
+
+            expression.Constraint.AdditionalFeatures.ShouldContainKey(SqlServerExtensions.UniqueConstraintIncludesList);
+            expression.Constraint.AdditionalFeatures.ShouldNotContainKey(SqlServerExtensions.IncludesList);
 
             var result = Generator.Generate(expression);
             result.ShouldBe("CREATE UNIQUE INDEX [UC_TestTable1_TestColumn1_TestColumn2] ON [dbo].[TestTable1] ([TestColumn1], [TestColumn2]) INCLUDE ([TestColumn3]);");
@@ -828,7 +843,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [PK_TestTable1_TestColumn1] PRIMARY KEY ([TestColumn1]);");
+            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [PK_TestTable1] PRIMARY KEY ([TestColumn1]);");
         }
 
         [Test]
@@ -838,7 +853,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 
             Generator.CompatibilityMode = compatibilityMode;
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [PK_TestTable1_TestColumn1] PRIMARY KEY ([TestColumn1]);");
+            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [PK_TestTable1] PRIMARY KEY ([TestColumn1]);");
         }
 
         [Test]
@@ -925,6 +940,18 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
+        public virtual void CanDropAutoReversedClusteredUniqueConstraintKeepingOnlineOption()
+        {
+            var expression = GeneratorTestHelper.GetCreateUniqueConstraintExpression();
+            new CreateConstraintExpressionBuilder(expression).Clustered().Online();
+
+            var reversed = expression.Reverse();
+
+            var result = Generator.Generate((DeleteConstraintExpression)reversed);
+            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] DROP CONSTRAINT [UC_TestTable1_TestColumn1] WITH (ONLINE=ON);");
+        }
+
+        [Test]
         public override void CanCreateUniqueConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueConstraintExpression();
@@ -973,7 +1000,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             new CreateConstraintExpressionBuilder(expression).Online();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [PK_TestTable1_TestColumn1] PRIMARY KEY ([TestColumn1]) WITH (ONLINE=ON);");
+            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [PK_TestTable1] PRIMARY KEY ([TestColumn1]) WITH (ONLINE=ON);");
         }
 
         [Test]
@@ -983,7 +1010,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             new CreateConstraintExpressionBuilder(expression).Online(false);
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [PK_TestTable1_TestColumn1] PRIMARY KEY ([TestColumn1]) WITH (ONLINE=OFF);");
+            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [PK_TestTable1] PRIMARY KEY ([TestColumn1]) WITH (ONLINE=OFF);");
         }
 
         [Test]

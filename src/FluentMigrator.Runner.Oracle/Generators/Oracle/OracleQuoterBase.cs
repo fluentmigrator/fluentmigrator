@@ -106,6 +106,13 @@ namespace FluentMigrator.Runner.Generators.Oracle
         }
 
         /// <inheritdoc />
+        /// <remarks>Oracle has no <c>0x</c> literal; <c>hextoraw</c> turns a hex string into RAW or BLOB.</remarks>
+        protected override string FormatByteArray(byte[] value)
+        {
+            return "hextoraw(" + ValueQuote + BitConverter.ToString(value).Replace("-", string.Empty) + ValueQuote + ")";
+        }
+
+        /// <inheritdoc />
         public override string FormatGuid(Guid value)
         {
             return string.Format("{0}{1}{0}", ValueQuote, BitConverter.ToString(value.ToByteArray()).Replace("-", string.Empty));

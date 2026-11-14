@@ -16,6 +16,7 @@
 //
 #endregion
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -37,10 +38,16 @@ namespace FluentMigrator.Runner.Generators.SqlServer
     /// </summary>
     public class SqlServer2008Generator : SqlServer2005Generator
     {
+        private const string WhereClause = " WHERE ";
+
         private static readonly HashSet<string> _supportedAdditionalFeatures = new HashSet<string>
         {
             SqlServerExtensions.IndexColumnNullsDistinct,
+            CreateIndexNullSemanticsExtensions.UniqueIndexNullsDistinct,
         };
+
+        /// <inheritdoc />
+        protected override bool IsUniqueIndexNullsDistinctSupported(bool nullsDistinct) => true;
 
         /// <inheritdoc />
         public SqlServer2008Generator()
@@ -97,21 +104,25 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             var baseFilter = base.GetFilterString(createIndexExpression);
             var nullsDistinct = GetWithNullsDistinctString(createIndexExpression.Index);
 
-            if (string.IsNullOrEmpty(baseFilter) && string.IsNullOrEmpty(nullsDistinct))
-            {
-                return string.Empty;
-            }
-
             if (string.IsNullOrEmpty(nullsDistinct))
             {
                 return baseFilter;
             }
 
-            baseFilter = string.IsNullOrEmpty(baseFilter) ?
-                $" WHERE {nullsDistinct}" :
-                $" AND  {nullsDistinct}";
+            if (string.IsNullOrEmpty(baseFilter))
+            {
+                return $" WHERE {nullsDistinct}";
+            }
 
-            return baseFilter;
+            // The base filter is the user's own predicate, already prefixed with WHERE.
+            // It is arbitrary SQL, so it is parenthesised before the generated predicate
+            // is appended: an OR inside it would otherwise bind more loosely than the
+            // appended AND and the index would cover the wrong rows.
+            var userFilter = baseFilter.StartsWith(WhereClause, StringComparison.Ordinal)
+                ? baseFilter.Substring(WhereClause.Length)
+                : baseFilter;
+
+            return $" WHERE ({userFilter}) AND {nullsDistinct}";
         }
 
         /// <summary>
@@ -127,6 +138,20 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             }
 
             var indexNullsDistinct = index.GetAdditionalFeature(SqlServerExtensions.IndexColumnNullsDistinct, (bool?)null);
+
+            // The provider-agnostic key means the opposite direction to the legacy provider
+            // key: on SQL Server NULLs already compare equal, so it is "treat as distinct"
+            // that needs emulating via a filtered index. The legacy key's polarity is left
+            // exactly as it was; it simply wins when both are present.
+            if (indexNullsDistinct == null)
+            {
+                var portable = index.GetAdditionalFeature(
+                    CreateIndexNullSemanticsExtensions.UniqueIndexNullsDistinct, (bool?)null);
+                if (portable == true)
+                {
+                    indexNullsDistinct = false;
+                }
+            }
 
             var nullDistinctColumns = index.Columns.Where(c => indexNullsDistinct != null || GetNullsDistinct(c) != null).ToList();
             if (nullDistinctColumns.Count != 0 && !index.IsUnique)

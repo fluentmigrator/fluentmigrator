@@ -1,0 +1,12 @@
+<Project>
+  <Target Name="VerifyNoDuplicateTargetFrameworks"
+          BeforeTargets="_ComputeTargetFrameworkItems"
+          Condition="'$(IsCrossTargetingBuild)' == 'true'">
+    <ItemGroup>
+      <_TfmCheck Include="$(TargetFrameworks)" />
+      <_TfmDistinct Include="@(_TfmCheck->Distinct())" />
+    </ItemGroup>
+    <Error Condition="@(_TfmCheck->Count()) != @(_TfmDistinct->Count())"
+           Text="Duplicate TargetFrameworks in $(MSBuildProjectName): '$(TargetFrameworks)'. Check TrimAot.props interaction — projects importing it should not declare net8.0 directly." />
+  </Target>
+</Project>

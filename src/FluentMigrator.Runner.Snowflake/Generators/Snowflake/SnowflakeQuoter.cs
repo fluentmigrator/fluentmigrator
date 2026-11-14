@@ -32,7 +32,7 @@ namespace FluentMigrator.Runner.Generators.Snowflake
         private readonly bool _quoteIdentifiers;
 
         /// <inheritdoc />
-        public SnowflakeQuoter(SnowflakeOptions sfOptions) : this(sfOptions.QuoteIdentifiers) { }
+        public SnowflakeQuoter(SnowflakeOptions sfOptions) : this(sfOptions.ForceQuote) { }
 
         /// <inheritdoc />
         public SnowflakeQuoter(bool quoteIdentifiers)

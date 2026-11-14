@@ -45,10 +45,20 @@ on:
         required: false
         type: string
         default: fluentmigrator-preview
+      preview_from_nothing:
+        description: >-
+          Script each ref for an empty database instead of reading one: passes --no-connection
+          --preview-from-nothing, so the preview also creates the version table and runs every migration.
+          The connection string becomes optional. Needs FluentMigrator.DotNet.Cli 9.0 or later.
+        required: false
+        type: boolean
+        default: false
     secrets:
       connection_string:
-        description: Connection string used to generate migration SQL preview
-        required: true
+        description: >-
+          Connection string used to generate migration SQL preview. Required unless preview_from_nothing is
+          true.
+        required: false
 
 permissions:
   contents: read
@@ -61,12 +71,12 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@v6
         with:
           dotnet-version: ${{ inputs.dotnet_version }}
 
@@ -83,6 +93,7 @@ jobs:
           MIGRATION_ASSEMBLY: ${{ inputs.migration_assembly }}
           BUILD_CONFIGURATION: ${{ inputs.build_configuration }}
           ADDITIONAL_ARGS: ${{ inputs.additional_args }}
+          PREVIEW_FROM_NOTHING: ${{ inputs.preview_from_nothing }}
           CONNECTION_STRING: ${{ secrets.connection_string }}
           BASE_REF_INPUT: ${{ inputs.base_ref }}
           HEAD_REF_INPUT: ${{ inputs.head_ref }}
@@ -99,6 +110,19 @@ jobs:
             exit 1
           fi
 
+          connection_args=()
+          if [ -n "${CONNECTION_STRING}" ]; then
+            connection_args=(-c "$CONNECTION_STRING")
+          fi
+
+          mode_args=()
+          if [ "${PREVIEW_FROM_NOTHING}" = "true" ]; then
+            mode_args=(--no-connection --preview-from-nothing)
+          elif [ -z "${CONNECTION_STRING}" ]; then
+            echo "Provide secrets.connection_string, or set inputs.preview_from_nothing to true." >&2
+            exit 1
+          fi
+
           temp_dir="$(mktemp -d)"
           base_sql="${temp_dir}/base.sql"
           head_sql="${temp_dir}/head.sql"
@@ -112,14 +136,15 @@ jobs:
             git checkout --force "$ref"
             dotnet restore "$MIGRATION_PROJECT"
             dotnet build "$MIGRATION_PROJECT" --configuration "$BUILD_CONFIGURATION" --no-restore
+            # --output takes its file name after "=". dotnet-fm has no --outputFileName option.
             dotnet fm migrate \
               -p "$PROCESSOR" \
-              -c "$CONNECTION_STRING" \
+              "${connection_args[@]}" \
               -a "$MIGRATION_ASSEMBLY" \
               --preview \
+              "${mode_args[@]}" \
               --verbose \
-              --output \
-              --outputFileName "$output_file" \
+              --output="$output_file" \
               $ADDITIONAL_ARGS
           }
 
@@ -148,7 +173,7 @@ jobs:
           echo "comment_path=$comment_md" >> "$GITHUB_OUTPUT"
 
       - name: Publish preview artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: fluentmigrator-preview-${{ github.run_id }}
           path: ${{ steps.generate.outputs.comment_path }}

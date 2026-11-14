@@ -63,6 +63,14 @@ namespace FluentMigrator.Runner.Generators.Generic
                     return FormatDecimal(v);
                 case int v:
                     return FormatInteger(v);
+                case long _:
+                case short _:
+                case byte _:
+                case sbyte _:
+                case uint _:
+                case ulong _:
+                case ushort _:
+                    return ((System.IFormattable)value).ToString(null, CultureInfo.InvariantCulture);
                 case RawSql v:
                     return v.Value;
                 case byte[] v:
@@ -284,9 +292,14 @@ namespace FluentMigrator.Runner.Generators.Generic
 
             var unquoted = quoted.Substring(1, quoted.Length - 2);
 
-            unquoted = unquoted.Replace(OpenQuoteEscapeString, OpenQuote);
+            // As in Quote: a quoter with no escape for a quote character (SQL Server's '[') leaves it alone.
+            // string.Replace throws on an empty search string.
+            if (!string.IsNullOrEmpty(OpenQuoteEscapeString))
+            {
+                unquoted = unquoted.Replace(OpenQuoteEscapeString, OpenQuote);
+            }
 
-            if (OpenQuote != CloseQuote)
+            if (OpenQuote != CloseQuote && !string.IsNullOrEmpty(CloseQuoteEscapeString))
             {
                 unquoted = unquoted.Replace(CloseQuoteEscapeString, CloseQuote);
             }

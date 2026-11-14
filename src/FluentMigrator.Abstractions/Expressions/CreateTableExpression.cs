@@ -28,7 +28,7 @@ namespace FluentMigrator.Expressions
     /// <summary>
     /// Expression to create a table
     /// </summary>
-    public class CreateTableExpression : MigrationExpressionBase, ISchemaExpression, IColumnsExpression, IValidationChildren
+    public class CreateTableExpression : MigrationExpressionBase, ISchemaExpression, IColumnsExpression, ISupportAdditionalFeatures, IValidationChildren
     {
         /// <inheritdoc />
         public virtual string SchemaName { get; set; }
@@ -51,6 +51,9 @@ namespace FluentMigrator.Expressions
         /// Specifies the command should only be applied if the table does not already exist.
         /// </summary>
         public virtual bool IfNotExists { get; set; }
+
+        /// <inheritdoc />
+        public IDictionary<string, object> AdditionalFeatures { get; } = new Dictionary<string, object>();
 
         /// <inheritdoc />
         IEnumerable<ColumnDefinition> IColumnsExpression.Columns => Columns;

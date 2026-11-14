@@ -16,9 +16,13 @@
 //
 #endregion
 
+using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 
 using FluentMigrator.Expressions;
+using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Generic;
@@ -374,6 +378,87 @@ namespace FluentMigrator.Tests.Unit
             loader.LoadVersionInfo();
 
             runner.Verify(r => r.Up(loader.VersionDescriptionMigration), Times.Once());
+        }
+
+        [TestCase(typeof(VersionLoader), false, false, false, true, false)]
+        [TestCase(typeof(VersionLoader), false, false, true, false, false)]
+        [TestCase(typeof(VersionLoader), true, false, false, true, false)]
+        [TestCase(typeof(VersionLoader), true, false, true, false, false)]
+        [TestCase(typeof(VersionLoader), true, true, false, false, false)]
+        [TestCase(typeof(VersionLoader), true, true, true, false, false)]
+        [TestCase(typeof(ConnectionlessVersionLoader), false, false, false, true, true)]
+        [TestCase(typeof(ConnectionlessVersionLoader), false, false, true, true, true)]
+        [TestCase(typeof(ConnectionlessVersionLoader), true, false, false, true, true)]
+        [TestCase(typeof(ConnectionlessVersionLoader), true, false, true, true, true)]
+        [TestCase(typeof(ConnectionlessVersionLoader), true, true, false, false, false)]
+        [TestCase(typeof(ConnectionlessVersionLoader), true, true, true, false, false)]
+        public void LoadVersionInfoIfRequiredReportsWhetherTheVersionTableWasCreated(
+            Type loaderType,
+            bool schemaExists,
+            bool tableExists,
+            bool loaderAlreadyInstantiated,
+            bool expectedFirstCall,
+            bool expectedSecondCall)
+        {
+            var processor = CreateStatefulProcessorMock(schemaExists, tableExists);
+            var serviceProvider = CreateRunnerServiceProvider(processor, loaderType);
+
+            var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
+
+            if (loaderAlreadyInstantiated)
+            {
+                Assert.That(((MigrationRunner)runner).VersionLoader, Is.InstanceOf(loaderType));
+            }
+
+            runner.LoadVersionInfoIfRequired().ShouldBe(expectedFirstCall);
+            runner.LoadVersionInfoIfRequired().ShouldBe(expectedSecondCall);
+        }
+
+        private static Mock<IMigrationProcessor> CreateStatefulProcessorMock(bool schemaExists, bool tableExists)
+        {
+            var processor = new Mock<IMigrationProcessor>();
+
+            processor.Setup(p => p.SchemaExists(It.IsAny<string>())).Returns(() => schemaExists);
+            processor.Setup(p => p.TableExists(It.IsAny<string>(), It.IsAny<string>())).Returns(() => tableExists);
+            processor.Setup(p => p.ColumnExists(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns(true);
+            processor.Setup(p => p.Process(It.IsAny<CreateSchemaExpression>())).Callback(() => schemaExists = true);
+            processor.Setup(p => p.Process(It.IsAny<CreateTableExpression>())).Callback(() => tableExists = true);
+            processor.Setup(p => p.ReadTableData(It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(
+                    () =>
+                    {
+                        var dataSet = new DataSet();
+                        dataSet.Tables.Add(new DataTable(TestVersionTableMetaData.TABLE_NAME));
+                        return dataSet;
+                    });
+
+            return processor;
+        }
+
+        private static ServiceProvider CreateRunnerServiceProvider(Mock<IMigrationProcessor> processor, Type loaderType)
+        {
+            var generatorMock = new Mock<IMigrationGenerator>(MockBehavior.Loose);
+            generatorMock.SetupGet(x => x.Quoter)
+                .Returns(new GenericQuoter());
+            var generatorAccessorMock = new Mock<IGeneratorAccessor>(MockBehavior.Loose);
+
+            generatorAccessorMock.SetupGet(x => x.Generator)
+                .Returns(generatorMock.Object);
+
+            var migrationInformationLoaderMock = new Mock<IMigrationInformationLoader>();
+            migrationInformationLoaderMock.Setup(l => l.LoadMigrations())
+                .Returns(new SortedList<long, IMigrationInfo>());
+
+            return ServiceCollectionExtensions.CreateServices()
+                .WithProcessor(processor)
+                .AddScoped(_ => generatorAccessorMock.Object)
+                .AddScoped(_ => ConventionSets.NoSchemaName)
+                .AddScoped<IMigrationRunnerConventionsAccessor>(
+                    _ => new PassThroughMigrationRunnerConventionsAccessor(new MigrationRunnerConventions()))
+                .AddScoped<IConnectionStringReader>(_ => new PassThroughConnectionStringReader("No connection"))
+                .AddScoped(_ => migrationInformationLoaderMock.Object)
+                .AddScoped(typeof(IVersionLoader), loaderType)
+                .BuildServiceProvider();
         }
     }
 }

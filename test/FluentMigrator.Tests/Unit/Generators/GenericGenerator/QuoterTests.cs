@@ -211,6 +211,14 @@ namespace FluentMigrator.Tests.Unit.Generators.GenericGenerator
                 .ShouldBe("1234");
         }
 
+        [Test, SetCulture("nb-NO")]
+        public void NegativeIntegersAreFormattedWithInvariantCulture()
+        {
+            _quoter.QuoteValue(-1234L).ShouldBe("-1234");
+            _quoter.QuoteValue((short)-12).ShouldBe("-12");
+            _quoter.QuoteValue((sbyte)-1).ShouldBe("-1");
+        }
+
         [Test]
         public void NullIsFormattedAsLiteral()
         {
@@ -238,6 +246,45 @@ namespace FluentMigrator.Tests.Unit.Generators.GenericGenerator
         {
             SqlServer2000Quoter quoter = new SqlServer2000Quoter();
             quoter.Quote("[Table]Name").ShouldBe("[[Table]]Name]");
+        }
+
+        [Test]
+        public void ShouldFormatOracleBinaryLiterals()
+        {
+            // Oracle has no 0x literal.
+            new OracleQuoterQuotedIdentifier().QuoteValue(new byte[] { 1, 2, 0xAB }).ShouldBe("hextoraw('0102AB')");
+        }
+
+        [Test]
+        public void ShouldFormatFirebirdBinaryLiterals()
+        {
+            // Firebird reads 0x0102AB as an integer.
+            new Runner.Generators.Firebird.FirebirdQuoter(false).QuoteValue(new byte[] { 1, 2, 0xAB }).ShouldBe("X'0102AB'");
+        }
+
+        [Test]
+        public void ShouldFormatDb2BinaryLiterals()
+        {
+            // Db2 has no 0x literal.
+            new Runner.Generators.DB2.Db2Quoter().QuoteValue(new byte[] { 1, 2, 0xAB }).ShouldBe("BX'0102AB'");
+        }
+
+        [Test]
+        public void ShouldFormatFirebirdDatesWithoutATimeOfDayAsDates()
+        {
+            // Firebird 4 won't convert '1991-08-25 00:00:00' to a DATE column.
+            var quoter = new Runner.Generators.Firebird.FirebirdQuoter(false);
+            quoter.QuoteValue(new DateTime(1991, 8, 25)).ShouldBe("'1991-08-25'");
+            quoter.QuoteValue(new DateTime(1991, 8, 25, 13, 45, 6)).ShouldBe("'1991-08-25 13:45:06'");
+        }
+
+        [Test]
+        public void ShouldUnQuoteSqlServerObjectNames()
+        {
+            // SQL Server has no escape for '[', which used to make UnQuote throw.
+            SqlServer2000Quoter quoter = new SqlServer2000Quoter();
+            quoter.UnQuote("[dbo]").ShouldBe("dbo");
+            quoter.UnQuote("[[Table]]Name]").ShouldBe("[Table]Name");
         }
 
         [Test]

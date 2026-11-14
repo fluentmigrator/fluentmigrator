@@ -16,6 +16,7 @@
 //
 #endregion
 
+using FluentMigrator.Expressions;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.Postgres;
@@ -69,6 +70,23 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
         {
             using (var table = new PostgresTestTable(Processor, "TestSchema", "id int"))
                 Processor.TableExists("TestSchema", table.Name).ShouldBeTrue();
+        }
+
+        [Test]
+        public void CanDropTableIfExistsInCustomSchema()
+        {
+            using var table = new PostgresTestTable(Processor, "TestSchema", "id int");
+
+            Processor.TableExists("TestSchema", table.Name).ShouldBeTrue();
+
+            Processor.Process(new DeleteTableExpression
+            {
+                TableName = table.Name,
+                SchemaName = "TestSchema",
+                IfExists = true,
+            });
+
+            Processor.TableExists("TestSchema", table.Name).ShouldBeFalse();
         }
 
         [OneTimeSetUp]

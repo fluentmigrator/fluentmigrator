@@ -38,11 +38,17 @@ namespace FluentMigrator.DotNet.Cli.Commands
         [Required]
         public string ProcessorType { get; set; }
 
+        [Option("--generator <GENERATOR_NAME>", Description = "The SQL dialect (database engine version) the migrations are generated for. Defaults to the one that matches the processor. Only needed to pick a different one, for example \"Oracle12c\" with a processor for another Oracle driver.")]
+        public string GeneratorType { get; set; }
+
         [Option("-s|--processor-switches <PROCESSOR_SWITCHES>", Description = "Provider specific switches.")]
         public string ProcessorSwitches { get; set; }
 
         [Option("--preview", Description = "Only output the migration steps - do not execute them. Add the `--verbose` switch to also see the SQL statements. Default is false.")]
         public bool Preview { get; }
+
+        [Option("--preview-from-nothing", Description = "Also emit the SQL that creates the version table, as if the database were empty. Use with --no-connection and --preview. Default is false.")]
+        public bool PreviewFromNothing { get; }
 
         [Option("-V|--verbose", Description = "Show the SQL statements generated and execution time in the console. Default is false.")]
         public bool Verbose { get; }

@@ -116,6 +116,19 @@ namespace FluentMigrator.MSBuild
 
         public bool PreviewOnly { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether migrations are generated without consulting the target database.
+        /// See <see cref="RunnerOptions.NoConnection"/>.
+        /// </summary>
+        public bool NoConnection { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether a connectionless preview also emits the SQL that creates the
+        /// version table, as if the database were empty. Use with <see cref="NoConnection"/> and
+        /// <see cref="PreviewOnly"/>. See <see cref="RunnerOptions.PreviewFromNothing"/>.
+        /// </summary>
+        public bool PreviewFromNothing { get; set; }
+
         public string Tags { get; set; }
 
         public bool Output { get; set; }
@@ -215,6 +228,8 @@ namespace FluentMigrator.MSBuild
                         opt.AllowBreakingChange = AllowBreakingChange;
                         opt.IncludeUntaggedMigrations = IncludeUntaggedMigrations;
                         opt.IncludeUntaggedMaintenances = IncludeUntaggedMaintenances;
+                        opt.NoConnection = NoConnection;
+                        opt.PreviewFromNothing = PreviewFromNothing;
                     })
                 .Configure<ProcessorOptions>(
                     opt =>

@@ -344,6 +344,83 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
         }
 
         [Test]
+        public void CallingWithColumnAdditionalDescriptionsPersistsEveryPair()
+        {
+            var builder = new AlterTableExpressionBuilder(new Mock<AlterTableExpression>().Object, new Mock<IMigrationContext>().Object)
+            {
+                CurrentColumn = new ColumnDefinition { Name = "TestColumn" }
+            };
+
+            builder.WithColumnAdditionalDescriptions(new Dictionary<string, string>
+            {
+                { "AdditionalDescription1", "Description1" },
+                { "AdditionalDescription2", "Description2" },
+            });
+
+            builder.CurrentColumn.AdditionalColumnDescriptions.Count.ShouldBe(2);
+            builder.CurrentColumn.AdditionalColumnDescriptions["AdditionalDescription1"].ShouldBe("Description1");
+            builder.CurrentColumn.AdditionalColumnDescriptions["AdditionalDescription2"].ShouldBe("Description2");
+        }
+
+        [Test]
+        public void CallingWithColumnAdditionalDescriptionsWithNullThrows()
+        {
+            var builder = new AlterTableExpressionBuilder(new Mock<AlterTableExpression>().Object, new Mock<IMigrationContext>().Object)
+            {
+                CurrentColumn = new ColumnDefinition { Name = "TestColumn" }
+            };
+
+            Should.Throw<ArgumentException>(() => builder.WithColumnAdditionalDescriptions(null));
+        }
+
+        [Test]
+        public void CallingWithColumnAdditionalDescriptionsWithEmptyDictionaryThrows()
+        {
+            var builder = new AlterTableExpressionBuilder(new Mock<AlterTableExpression>().Object, new Mock<IMigrationContext>().Object)
+            {
+                CurrentColumn = new ColumnDefinition { Name = "TestColumn" }
+            };
+
+            Should.Throw<ArgumentException>(() => builder.WithColumnAdditionalDescriptions(new Dictionary<string, string>()));
+        }
+
+        [Test]
+        public void CallingWithColumnAdditionalDescriptionsWithDuplicateKeyThrows()
+        {
+            var currentColumn = new ColumnDefinition { Name = "TestColumn" };
+            currentColumn.AdditionalColumnDescriptions.Add("Existing", "Value");
+            var builder = new AlterTableExpressionBuilder(new Mock<AlterTableExpression>().Object, new Mock<IMigrationContext>().Object)
+            {
+                CurrentColumn = currentColumn
+            };
+
+            Should.Throw<InvalidOperationException>(() => builder.WithColumnAdditionalDescriptions(new Dictionary<string, string>
+            {
+                { "Existing", "AnotherValue" },
+            }));
+        }
+
+        [Test]
+        public void CallingWithColumnAdditionalDescriptionsWithLaterDuplicateKeyDoesNotMutateColumn()
+        {
+            var currentColumn = new ColumnDefinition { Name = "TestColumn" };
+            currentColumn.AdditionalColumnDescriptions.Add("Existing", "Value");
+            var builder = new AlterTableExpressionBuilder(new Mock<AlterTableExpression>().Object, new Mock<IMigrationContext>().Object)
+            {
+                CurrentColumn = currentColumn
+            };
+
+            Should.Throw<InvalidOperationException>(() => builder.WithColumnAdditionalDescriptions(new Dictionary<string, string>
+            {
+                { "New", "NewValue" },
+                { "Existing", "AnotherValue" },
+            }));
+
+            currentColumn.AdditionalColumnDescriptions.Count.ShouldBe(1);
+            currentColumn.AdditionalColumnDescriptions.ShouldNotContainKey("New");
+        }
+
+        [Test]
         public void CallingWithDefaultSetsDefaultValue()
         {
             var contextMock = new Mock<IMigrationContext>();

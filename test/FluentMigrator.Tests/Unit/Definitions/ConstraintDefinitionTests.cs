@@ -28,6 +28,25 @@ namespace FluentMigrator.Tests.Unit.Definitions
     public class ConstraintDefinitionTests
     {
         [Test]
+        public void ClonePreservesSchemaAndDoesNotShareColumns()
+        {
+            var definition = new ConstraintDefinition(ConstraintType.PrimaryKey)
+            {
+                ConstraintName = "PK_Users",
+                SchemaName = "tenant",
+                TableName = "Users",
+            };
+            definition.Columns.Add("Id");
+
+            var clone = (ConstraintDefinition)definition.Clone();
+            clone.Columns.Add("TenantId");
+
+            Assert.That(clone.SchemaName, Is.EqualTo("tenant"));
+            Assert.That(definition.Columns, Is.EquivalentTo(new[] { "Id" }));
+            Assert.That(clone.Columns, Is.EquivalentTo(new[] { "Id", "TenantId" }));
+        }
+
+        [Test]
         public void WhenDefaultSchemaConventionIsAppliedAndSchemaIsNotSetThenSchemaShouldBeNull()
         {
             var expr = new CreateConstraintExpression(ConstraintType.PrimaryKey)

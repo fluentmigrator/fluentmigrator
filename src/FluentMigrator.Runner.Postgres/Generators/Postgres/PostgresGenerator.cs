@@ -464,7 +464,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
             var buffering = GetIndexStorageParameters<GistBuffering?>(PostgresExtensions.IndexBuffering, "Buffering");
             if (buffering.HasValue)
             {
-                parameters.Add($"BUFFERING = {buffering.Value.ToString().ToUpper()}");
+                parameters.Add($"BUFFERING = {buffering.Value.ToString().ToUpperInvariant()}");
             }
 
             var pendingList = GetIndexStorageParameters<long?>(PostgresExtensions.IndexGinPendingListLimit, "GinPendingListLimit");
@@ -536,8 +536,14 @@ namespace FluentMigrator.Runner.Generators.Postgres
         }
 
         /// <inheritdoc />
+        /// <remarks>PostgreSQL treats NULLs as distinct natively. Expressing the opposite needs NULLS NOT DISTINCT, added in PostgreSQL 15.</remarks>
+        protected override bool IsUniqueIndexNullsDistinctSupported(bool nullsDistinct) => nullsDistinct;
+
+        /// <inheritdoc />
         public override string Generate(CreateIndexExpression expression)
         {
+            ValidateUniqueIndexNullsDistinct(expression);
+
             var result = new StringBuilder("CREATE");
 
             if (expression.Index.IsUnique)
@@ -553,7 +559,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
                 GetAsOnly(expression),
                 Quoter.QuoteTableName(expression.Index.TableName, expression.Index.SchemaName),
                 // B-Tree is default index method
-                indexMethod == Algorithm.BTree ? string.Empty : $" USING {indexMethod.ToString().ToUpper()}");
+                indexMethod == Algorithm.BTree ? string.Empty : $" USING {indexMethod.ToString().ToUpperInvariant()}");
 
             var first = true;
             foreach (var column in expression.Index.Columns)
@@ -716,26 +722,26 @@ namespace FluentMigrator.Runner.Generators.Postgres
         {
             var result = new StringBuilder("CREATE SEQUENCE ");
             var seq = expression.Sequence;
-            result.AppendFormat(Quoter.QuoteSequenceName(seq.Name, seq.SchemaName));
+            result.Append(Quoter.QuoteSequenceName(seq.Name, seq.SchemaName));
 
             if (seq.Increment.HasValue)
             {
-                result.AppendFormat(" INCREMENT BY {0}", seq.Increment);
+                result.AppendFormat(CultureInfo.InvariantCulture, " INCREMENT BY {0}", seq.Increment);
             }
 
             if (seq.MinValue.HasValue)
             {
-                result.AppendFormat(" MINVALUE {0}", seq.MinValue);
+                result.AppendFormat(CultureInfo.InvariantCulture, " MINVALUE {0}", seq.MinValue);
             }
 
             if (seq.MaxValue.HasValue)
             {
-                result.AppendFormat(" MAXVALUE {0}", seq.MaxValue);
+                result.AppendFormat(CultureInfo.InvariantCulture, " MAXVALUE {0}", seq.MaxValue);
             }
 
             if (seq.StartWith.HasValue)
             {
-                result.AppendFormat(" START WITH {0}", seq.StartWith);
+                result.AppendFormat(CultureInfo.InvariantCulture, " START WITH {0}", seq.StartWith);
             }
 
             const long MINIMUM_CACHE_VALUE = 2;
@@ -745,7 +751,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
                 {
                     return CompatibilityMode.HandleCompatibility("Cache size must be greater than 1; if you intended to disable caching, set Cache to null.");
                 }
-                result.AppendFormat(" CACHE {0}", seq.Cache);
+                result.AppendFormat(CultureInfo.InvariantCulture, " CACHE {0}", seq.Cache);
             }
             else
             {

@@ -37,6 +37,13 @@ namespace FluentMigrator.Runner.Generators.DB2
         }
 
         /// <inheritdoc />
+        /// <remarks>Db2's binary string constant: <c>BX'0102'</c>. It has no <c>0x0102</c>.</remarks>
+        protected override string FormatByteArray(byte[] value)
+        {
+            return "BX" + ValueQuote + BitConverter.ToString(value).Replace("-", "") + ValueQuote;
+        }
+
+        /// <inheritdoc />
         protected override bool ShouldQuote(string name)
         {
             if (string.IsNullOrEmpty(name))

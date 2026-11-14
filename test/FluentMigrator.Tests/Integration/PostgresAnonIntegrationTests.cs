@@ -28,6 +28,8 @@ using FluentMigrator.Tests.Integration.TestCases;
 
 using Microsoft.Extensions.DependencyInjection;
 
+using Npgsql;
+
 using NUnit.Framework;
 
 using Shouldly;
@@ -37,6 +39,12 @@ namespace FluentMigrator.Tests.Integration
     /// <summary>
     /// Integration tests for PostgreSQL Anonymizer security label functionality.
     /// </summary>
+    /// <remarks>
+    /// PostgreSQL Anonymizer 3.2 and later default <c>anon.nosuperuser</c> to <c>on</c>, which rejects
+    /// static masking for superusers. The fixture creates the extension once as the superuser, then runs
+    /// every test as a dedicated non-superuser role that owns the tables it creates, which is the setup
+    /// users of the extension are expected to have.
+    /// </remarks>
     [TestFixture]
     [Category("Integration")]
     [Category("Postgres")]
@@ -44,6 +52,98 @@ namespace FluentMigrator.Tests.Integration
     public class PostgresAnonIntegrationTests : IntegrationTestBase
     {
         private const string RootNamespace = "FluentMigrator.Tests.Integration";
+
+        private const string AnonOwnerRole = "fm_anon_owner";
+
+        private const string AnonOwnerPassword = "fm_anon_owner";
+
+        /// <summary>
+        /// Creates the anon extension and the non-superuser owner role. Both need superuser rights.
+        /// </summary>
+        [OneTimeSetUp]
+        public void SetUpAnonExtensionAndOwnerRole()
+        {
+            if (!IntegrationTestOptions.Postgres.IsEnabled)
+            {
+                return;
+            }
+
+            ExecuteWithProcessor(
+                typeof(PostgresProcessor),
+                services => services.WithMigrationsIn(RootNamespace),
+                (serviceProvider, processor) =>
+                {
+                    var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
+
+                    runner.Up(new TestInitializeAnonExtension());
+                    CreateAnonOwnerRole(processor);
+                },
+                () => IntegrationTestOptions.Postgres,
+                true);
+        }
+
+        /// <summary>
+        /// Drops the owner role, anything it still owns, and the anon extension.
+        /// </summary>
+        [OneTimeTearDown]
+        public void TearDownAnonExtensionAndOwnerRole()
+        {
+            if (!IntegrationTestOptions.Postgres.IsEnabled)
+            {
+                return;
+            }
+
+            NpgsqlConnection.ClearAllPools();
+
+            ExecuteWithProcessor(
+                typeof(PostgresProcessor),
+                services => services.WithMigrationsIn(RootNamespace),
+                (serviceProvider, processor) =>
+                {
+                    var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
+
+                    try
+                    {
+                        DropAnonOwnerRole(processor);
+                    }
+                    finally
+                    {
+                        runner.Down(new TestInitializeAnonExtension());
+                    }
+                },
+                () => IntegrationTestOptions.Postgres,
+                true);
+        }
+
+        [Test]
+        [TestCaseSource(typeof(ProcessorTestCaseSourceOnly<PostgresProcessor>))]
+        public void StaticMaskingIsRejectedForSuperusersByDefault(Type processorType, Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
+        {
+            // Runs as the superuser from the test configuration on purpose.
+            ExecuteWithProcessor(
+                processorType,
+                services => services.WithMigrationsIn(RootNamespace),
+                (serviceProvider, processor) =>
+                {
+                    var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
+
+                    runner.Up(new TestCreateTableWithSecurityLabel());
+
+                    try
+                    {
+                        var exception = Should.Throw<Exception>(() => ValidateAnonymizationWorks(processor));
+
+                        var postgresException = exception.InnerException.ShouldBeOfType<PostgresException>();
+                        postgresException.MessageText.ShouldContain("superuser");
+                    }
+                    finally
+                    {
+                        runner.Down(new TestCreateTableWithSecurityLabel());
+                    }
+                },
+                serverOptions,
+                true);
+        }
 
         #region Base Tests (from MigrationRunnerTests)
 
@@ -58,29 +158,25 @@ namespace FluentMigrator.Tests.Integration
                 {
                     var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
 
-                    runner.Up(new TestInitializeAnonExtension());
+                    // Enable debug logging for better error diagnostics
+                    EnableDebugLogging(processor);
+
+                    runner.Up(new TestCreateTableWithSecurityLabel());
 
                     try
                     {
-                        // Enable debug logging for better error diagnostics
-                        EnableDebugLogging(processor);
-
-                        runner.Up(new TestCreateTableWithSecurityLabel());
-
                         // Validate using both pg_seclabels and anon.pg_masking_rules
                         ValidateMaskingRuleExists(processor, "SecureUsers", "email", "MASKED WITH FUNCTION anon.fake_email()");
 
                         // Validate that the anonymization actually works
                         ValidateAnonymizationWorks(processor);
-
-                        runner.Down(new TestCreateTableWithSecurityLabel());
                     }
                     finally
                     {
-                        runner.Down(new TestInitializeAnonExtension());
+                        runner.Down(new TestCreateTableWithSecurityLabel());
                     }
                 },
-                serverOptions,
+                AsAnonOwner(serverOptions),
                 true);
         }
 
@@ -95,15 +191,13 @@ namespace FluentMigrator.Tests.Integration
                 {
                     var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
 
-                    runner.Up(new TestInitializeAnonExtension());
+                    // Enable debug logging for better error diagnostics
+                    EnableDebugLogging(processor);
+
+                    runner.Up(new TestCreateTableWithMultipleSecurityLabels());
 
                     try
                     {
-                        // Enable debug logging for better error diagnostics
-                        EnableDebugLogging(processor);
-
-                        runner.Up(new TestCreateTableWithMultipleSecurityLabels());
-
                         // Validate masking rules
                         ValidateMaskingRuleExists(processor, "CustomerData", "email", "MASKED WITH FUNCTION anon.fake_email()");
                         ValidateMaskingRuleExists(processor, "CustomerData", "full_name", "MASKED WITH VALUE 'CONFIDENTIAL'");
@@ -111,15 +205,13 @@ namespace FluentMigrator.Tests.Integration
 
                         // Validate that the anonymization actually works
                         ValidateAnonymizationWorks(processor);
-
-                        runner.Down(new TestCreateTableWithMultipleSecurityLabels());
                     }
                     finally
                     {
-                        runner.Down(new TestInitializeAnonExtension());
+                        runner.Down(new TestCreateTableWithMultipleSecurityLabels());
                     }
                 },
-                serverOptions,
+                AsAnonOwner(serverOptions),
                 true);
         }
 
@@ -134,15 +226,13 @@ namespace FluentMigrator.Tests.Integration
                 {
                     var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
 
-                    runner.Up(new TestInitializeAnonExtension());
+                    // Enable debug logging for better error diagnostics
+                    EnableDebugLogging(processor);
+
+                    runner.Up(new TestCreateTableWithSecurityLabel());
 
                     try
                     {
-                        // Enable debug logging for better error diagnostics
-                        EnableDebugLogging(processor);
-
-                        runner.Up(new TestCreateTableWithSecurityLabel());
-
                         // Verify masking rule exists before deletion
                         var hasLabel = processor.Exists(@"
                             SELECT 1
@@ -179,15 +269,13 @@ namespace FluentMigrator.Tests.Integration
                             WHERE relname = 'SecureUsers'
                               AND attname = 'email'");
                         hasMaskingRule.ShouldBeFalse();
-
-                        runner.Down(new TestCreateTableWithSecurityLabel());
                     }
                     finally
                     {
-                        runner.Down(new TestInitializeAnonExtension());
+                        runner.Down(new TestCreateTableWithSecurityLabel());
                     }
                 },
-                serverOptions,
+                AsAnonOwner(serverOptions),
                 true);
         }
 
@@ -571,31 +659,101 @@ namespace FluentMigrator.Tests.Integration
                 {
                     var runner = (MigrationRunner)serviceProvider.GetRequiredService<IMigrationRunner>();
 
-                    runner.Up(new TestInitializeAnonExtension());
+                    // Enable debug logging for better error diagnostics
+                    EnableDebugLogging(processor);
+
+                    runner.Up(migration);
 
                     try
                     {
-                        // Enable debug logging for better error diagnostics
-                        EnableDebugLogging(processor);
-
-                        runner.Up(migration);
-
                         // Validate using both pg_seclabels and anon.pg_masking_rules
                         ValidateMaskingRuleExists(processor, tableName, columnName, expectedLabel);
 
                         // Validate that the anonymization actually works by calling anonymize_database()
                         // This is the ultimate test - if the rule is invalid, this will throw an error
                         ValidateAnonymizationWorks(processor);
-
-                        runner.Down(migration);
                     }
                     finally
                     {
-                        runner.Down(new TestInitializeAnonExtension());
+                        runner.Down(migration);
                     }
                 },
-                serverOptions,
+                AsAnonOwner(serverOptions),
                 true);
+        }
+
+        /// <summary>
+        /// Returns the server options with the credentials swapped for the non-superuser owner role.
+        /// </summary>
+        /// <param name="serverOptions">The server options of the test case.</param>
+        private static Func<IntegrationTestOptions.DatabaseServerOptions> AsAnonOwner(
+            Func<IntegrationTestOptions.DatabaseServerOptions> serverOptions)
+        {
+            return () =>
+            {
+                var options = serverOptions();
+
+                if (!options.IsEnabled)
+                {
+                    return options;
+                }
+
+                var builder = new NpgsqlConnectionStringBuilder(options.ConnectionString)
+                {
+                    Username = AnonOwnerRole,
+                    Password = AnonOwnerPassword,
+                };
+
+                return new IntegrationTestOptions.DatabaseServerOptions
+                {
+                    Name = options.Name,
+                    ConnectionString = builder.ConnectionString,
+                    IsEnabled = options.IsEnabled,
+                    ContainerEnabled = options.ContainerEnabled,
+                };
+            };
+        }
+
+        /// <summary>
+        /// Creates the non-superuser role the tests run as, if it does not exist yet, and grants it the
+        /// schema access the tests need. The container is reused between runs, so this is idempotent.
+        /// </summary>
+        /// <param name="processor">A processor connected as a superuser.</param>
+        /// <remarks>
+        /// The role creates the test tables, so it owns them, which PostgreSQL requires for
+        /// <c>SECURITY LABEL</c> and anon requires for static masking.
+        /// </remarks>
+        private static void CreateAnonOwnerRole(ProcessorBase processor)
+        {
+            processor.Execute($@"
+                DO $$
+                BEGIN
+                    IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = '{AnonOwnerRole}') THEN
+                        CREATE ROLE {AnonOwnerRole} LOGIN PASSWORD '{AnonOwnerPassword}'
+                            NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS;
+                    END IF;
+                END
+                $$;");
+            processor.Execute($"GRANT USAGE, CREATE ON SCHEMA public TO {AnonOwnerRole};");
+            processor.Execute($"GRANT USAGE ON SCHEMA anon TO {AnonOwnerRole};");
+        }
+
+        /// <summary>
+        /// Drops the owner role. <c>DROP OWNED BY</c> removes any table a failed test left behind and
+        /// revokes the role's grants, either of which would otherwise block <c>DROP ROLE</c>.
+        /// </summary>
+        /// <param name="processor">A processor connected as a superuser.</param>
+        private static void DropAnonOwnerRole(ProcessorBase processor)
+        {
+            processor.Execute($@"
+                DO $$
+                BEGIN
+                    IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = '{AnonOwnerRole}') THEN
+                        DROP OWNED BY {AnonOwnerRole};
+                        DROP ROLE {AnonOwnerRole};
+                    END IF;
+                END
+                $$;");
         }
 
         /// <summary>

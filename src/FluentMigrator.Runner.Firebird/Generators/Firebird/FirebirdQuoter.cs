@@ -120,9 +120,21 @@ namespace FluentMigrator.Runner.Generators.Firebird
         }
 
         /// <inheritdoc />
+        /// <remarks>
+        /// A value without a time of day is written as a date only: Firebird 4 won't convert a string with a time part
+        /// to a DATE column, and a date-only string still converts to TIMESTAMP.
+        /// </remarks>
         public override string FormatDateTime(DateTime value)
         {
-            return ValueQuote + (value).ToString("yyyy-MM-dd HH:mm:ss") + ValueQuote;
+            var format = value.TimeOfDay == TimeSpan.Zero ? "yyyy-MM-dd" : "yyyy-MM-dd HH:mm:ss";
+            return ValueQuote + value.ToString(format, System.Globalization.CultureInfo.InvariantCulture) + ValueQuote;
+        }
+
+        /// <inheritdoc />
+        /// <remarks>Firebird reads <c>0x...</c> as an integer; <c>X'...'</c> is its binary string literal.</remarks>
+        protected override string FormatByteArray(byte[] value)
+        {
+            return "X" + ValueQuote + BitConverter.ToString(value).Replace("-", string.Empty) + ValueQuote;
         }
 
         /// <inheritdoc />
@@ -133,7 +145,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
             var potentiallyQuoted = Quote(objName);
             if (IsQuoted(potentiallyQuoted))
                 return objName;
-            return objName.ToUpper();
+            return objName.ToUpperInvariant();
         }
 
         /// <inheritdoc />

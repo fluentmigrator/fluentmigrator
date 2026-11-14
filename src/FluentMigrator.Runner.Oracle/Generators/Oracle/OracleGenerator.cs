@@ -17,6 +17,7 @@
 #endregion
 
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -110,7 +111,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
             var seq = expression.Sequence;
             if (string.IsNullOrEmpty(seq.SchemaName))
             {
-                result.AppendFormat(Quoter.QuoteSequenceName(seq.Name));
+                result.Append(Quoter.QuoteSequenceName(seq.Name));
             }
             else
             {
@@ -119,22 +120,22 @@ namespace FluentMigrator.Runner.Generators.Oracle
 
             if (seq.Increment.HasValue)
             {
-                result.AppendFormat(" INCREMENT BY {0}", seq.Increment);
+                result.AppendFormat(CultureInfo.InvariantCulture, " INCREMENT BY {0}", seq.Increment);
             }
 
             if (seq.MinValue.HasValue)
             {
-                result.AppendFormat(" MINVALUE {0}", seq.MinValue);
+                result.AppendFormat(CultureInfo.InvariantCulture, " MINVALUE {0}", seq.MinValue);
             }
 
             if (seq.MaxValue.HasValue)
             {
-                result.AppendFormat(" MAXVALUE {0}", seq.MaxValue);
+                result.AppendFormat(CultureInfo.InvariantCulture, " MAXVALUE {0}", seq.MaxValue);
             }
 
             if (seq.StartWith.HasValue)
             {
-                result.AppendFormat(" START WITH {0}", seq.StartWith);
+                result.AppendFormat(CultureInfo.InvariantCulture, " START WITH {0}", seq.StartWith);
             }
 
             const long MINIMUM_CACHE_VALUE = 2;
@@ -144,7 +145,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
                 {
                     return CompatibilityMode.HandleCompatibility("Oracle does not support Cache value equal to 1; if you intended to disable caching, set Cache to null. For information on Oracle limitations, see: https://docs.oracle.com/en/database/oracle/oracle-database/18/sqlrf/CREATE-SEQUENCE.html#GUID-E9C78A8C-615A-4757-B2A8-5E6EFB130571__GUID-7E390BE1-2F6C-4E5A-9D5C-5A2567D636FB");
                 }
-                result.AppendFormat(" CACHE {0}", seq.Cache);
+                result.AppendFormat(CultureInfo.InvariantCulture, " CACHE {0}", seq.Cache);
             }
             else
             {
@@ -194,6 +195,13 @@ namespace FluentMigrator.Runner.Generators.Oracle
             if (string.IsNullOrEmpty(statement))
             {
                 return string.Empty;
+            }
+
+            // Dynamic SQL must not carry the statement end token, otherwise Oracle raises ORA-00922/ORA-00911
+            statement = statement.TrimEnd();
+            if (statement.EndsWith(";"))
+            {
+                statement = statement.Substring(0, statement.Length - 1);
             }
 
             return FormatStatement("EXECUTE IMMEDIATE '{0}'", FormatHelper.FormatSqlEscape(statement));
@@ -278,7 +286,9 @@ namespace FluentMigrator.Runner.Generators.Oracle
                 return base.Generate(expression);
             }
 
-            return descriptionStatement;
+            // Ended like every other statement, so a script can hold it. Inside EXECUTE IMMEDIATE, where the
+            // description generator's statements usually go, there is no ';'.
+            return descriptionStatement + ";";
         }
 
         /// <inheritdoc />
@@ -322,8 +332,14 @@ namespace FluentMigrator.Runner.Generators.Oracle
         }
 
         /// <inheritdoc />
+        /// <remarks>Oracle's unique-index NULL handling is mixed: keys whose indexed columns are all NULL are not indexed at all, while composite keys with only some NULL columns treat those NULLs as equal. Neither portable semantics can be promised.</remarks>
+        protected override bool IsUniqueIndexNullsDistinctSupported(bool nullsDistinct) => false;
+
+        /// <inheritdoc />
         public override string Generate(CreateIndexExpression expression)
         {
+            ValidateUniqueIndexNullsDistinct(expression);
+
             var indexColumns = new string[expression.Index.Columns.Count];
 
             for (var i = 0; i < expression.Index.Columns.Count; i++)

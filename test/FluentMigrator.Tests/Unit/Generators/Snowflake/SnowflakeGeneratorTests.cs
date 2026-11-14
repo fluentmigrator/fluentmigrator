@@ -96,6 +96,30 @@ namespace FluentMigrator.Tests.Unit.Generators.Snowflake
             result.ShouldBe(@"CREATE TABLE ""TestSchema"".""TestTable1"" (""TestColumn1"" NUMBER NOT NULL IDENTITY(45,23), ""TestColumn2"" NUMBER NOT NULL);", _quotingEnabled);
         }
 
+        [Test, SetCulture("nb-NO")]
+        public void CanCreateTableWithNegativeSeededIdentityInAnyCulture()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();
+            expression.SchemaName = "TestSchema";
+            expression.Columns[0].AdditionalFeatures.Add(SnowflakeExtensions.IdentitySeed, -1);
+            expression.Columns[0].AdditionalFeatures.Add(SnowflakeExtensions.IdentityIncrement, -1);
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe(@"CREATE TABLE ""TestSchema"".""TestTable1"" (""TestColumn1"" NUMBER NOT NULL IDENTITY(-1,-1), ""TestColumn2"" NUMBER NOT NULL);", _quotingEnabled);
+        }
+
+        [Test, SetCulture("nb-NO")]
+        public void CanCreateSequenceWithNegativeValuesInAnyCulture()
+        {
+            var expression = new CreateSequenceExpression
+            {
+                Sequence = { Name = "Sequence", SchemaName = "TestSchema", StartWith = -1, Increment = -1 }
+            };
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe(@"CREATE SEQUENCE ""TestSchema"".""Sequence"" START -1 INCREMENT -1;", _quotingEnabled);
+        }
+
         [Test]
         public void CanGenerateNecessaryStatementsForADeleteDefaultExpression()
         {

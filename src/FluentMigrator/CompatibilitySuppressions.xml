@@ -24,34 +24,6 @@
   </Suppression>
   <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:FluentMigrator.Builders.Execute.ExecuteExpressionRoot.EmbeddedScript(System.String,System.Collections.Generic.IDictionary{System.String,System.String})</Target>
-    <Left>lib/net48/FluentMigrator.dll</Left>
-    <Right>lib/net48/FluentMigrator.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:FluentMigrator.Builders.Execute.ExecuteExpressionRoot.Script(System.String,System.Collections.Generic.IDictionary{System.String,System.String})</Target>
-    <Left>lib/net48/FluentMigrator.dll</Left>
-    <Right>lib/net48/FluentMigrator.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:FluentMigrator.Builders.Execute.ExecuteExpressionRoot.Sql(System.String,System.Collections.Generic.IDictionary{System.String,System.String})</Target>
-    <Left>lib/net48/FluentMigrator.dll</Left>
-    <Right>lib/net48/FluentMigrator.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:FluentMigrator.Builders.Execute.ExecuteExpressionRoot.Sql(System.String,System.String,System.Collections.Generic.IDictionary{System.String,System.String})</Target>
-    <Left>lib/net48/FluentMigrator.dll</Left>
-    <Right>lib/net48/FluentMigrator.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
     <Target>F:FluentMigrator.GeneratorIdConstants.Jet</Target>
     <Left>lib/netstandard2.0/FluentMigrator.dll</Left>
     <Right>lib/netstandard2.0/FluentMigrator.dll</Right>
@@ -67,34 +39,6 @@
   <Suppression>
     <DiagnosticId>CP0002</DiagnosticId>
     <Target>F:FluentMigrator.ProcessorIdConstants.Jet</Target>
-    <Left>lib/netstandard2.0/FluentMigrator.dll</Left>
-    <Right>lib/netstandard2.0/FluentMigrator.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:FluentMigrator.Builders.Execute.ExecuteExpressionRoot.EmbeddedScript(System.String,System.Collections.Generic.IDictionary{System.String,System.String})</Target>
-    <Left>lib/netstandard2.0/FluentMigrator.dll</Left>
-    <Right>lib/netstandard2.0/FluentMigrator.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:FluentMigrator.Builders.Execute.ExecuteExpressionRoot.Script(System.String,System.Collections.Generic.IDictionary{System.String,System.String})</Target>
-    <Left>lib/netstandard2.0/FluentMigrator.dll</Left>
-    <Right>lib/netstandard2.0/FluentMigrator.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:FluentMigrator.Builders.Execute.ExecuteExpressionRoot.Sql(System.String,System.Collections.Generic.IDictionary{System.String,System.String})</Target>
-    <Left>lib/netstandard2.0/FluentMigrator.dll</Left>
-    <Right>lib/netstandard2.0/FluentMigrator.dll</Right>
-    <IsBaselineSuppression>true</IsBaselineSuppression>
-  </Suppression>
-  <Suppression>
-    <DiagnosticId>CP0002</DiagnosticId>
-    <Target>M:FluentMigrator.Builders.Execute.ExecuteExpressionRoot.Sql(System.String,System.String,System.Collections.Generic.IDictionary{System.String,System.String})</Target>
     <Left>lib/netstandard2.0/FluentMigrator.dll</Left>
     <Right>lib/netstandard2.0/FluentMigrator.dll</Right>
     <IsBaselineSuppression>true</IsBaselineSuppression>

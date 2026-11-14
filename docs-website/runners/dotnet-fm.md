@@ -68,23 +68,49 @@ dotnet fm migrate [options]
 | Option | Short | Description | Required |
 |--------|-------|-------------|----------|
 | `--provider` | `-p` | Database provider | Yes |
+| `--generator` | | SQL generator to use instead of the one that matches the provider | No |
 | `--connectionString` | `-c` | Connection string | Yes |
 | `--assembly` | `-a` | Migration assembly path | Yes |
 | `--version` | `-v` | Target version | No |
 | `--profile` | | Profile name to execute | No |
 | `--tag` | `-t` | Filter by tag | No |
-| `--output` | `-o` | Output SQL to console | No |
-| `--outputFileName` | | Output file name | No |
+| `--output[=<FILENAME>]` | `-o` | Write the SQL to a file, `<assembly name>.sql` unless a file name is given | No |
 | `--preview` | | Preview without execution | No |
 | `--steps` | `-s` | Number of migration steps | No |
 | `--workingDirectory` | `-w` | Working directory | No |
 | `--timeout` | | Command timeout (seconds) | No |
 | `--transaction-mode` | | Transaction behavior | No |
 | `--allowDirtyAssemblies` | | Allow version mismatches | No |
-| `--context` | | Application context | No |
-| `--startVersion` | | Start from version | No |
-| `--noConnection` | | Validate without connecting | No |
+| `--start-version` | | Start from version (connectionless only) | No |
+| `--no-connection` | | Generate SQL without connecting to a database | No |
+| `--preview-from-nothing` | | With `--no-connection --preview`, also emit the SQL that creates the version table, as for an empty database. `migrate` only: `rollback`, `migrate down`, `list migrations` and `validate versions` reject it | No |
 | `--help` | `-h` | Show help | No |
+
+### Processor and generator selection
+
+A migration runner uses two parts to talk to a database:
+
+- The **processor** wires in the database driver and runs the SQL. `-p` selects it.
+- The **generator** produces the SQL for one database engine version, such as `SqlServer2016` or `Oracle12c`. It does not depend on the driver.
+
+By default `-p` is a shorthand that selects both. The generator is the one whose id or alias matches the processor id. For most processors the ids are the same, so you only pass `-p`.
+
+When a processor id names a driver, the CLI selects the generator for the engine instead:
+
+| `-p` | Generator selected |
+|------|--------------------|
+| `Oracle` | `Oracle` |
+| `OracleManaged` | `OracleManaged` |
+| `Oracle12c` | `Oracle12c` |
+| `Oracle12cManaged` | `Oracle12c` |
+
+To choose the two parts independently, pass `--generator`. It overrides the default choice, and `-p` still selects the processor:
+
+```bash
+dotnet fm migrate -p Oracle12cManaged --generator Oracle12c -c "..." -a "MyApp.dll"
+```
+
+Run `dotnet fm list processors` to see the processor ids.
 
 ### list Command
 Lists migrations and their status.
@@ -210,7 +236,7 @@ dotnet fm migrate -p sqlserver -c "$PROD_CONNECTION_STRING" -a "MyApp.dll" --pro
 ### Output SQL Script
 ```bash
 # Generate SQL script without execution
-dotnet fm migrate -p sqlserver -c "..." -a "MyApp.dll" --output --outputFileName "migration-script.sql"
+dotnet fm migrate -p sqlserver -c "..." -a "MyApp.dll" --preview --output=migration-script.sql
 ```
 
 ### Preview Mode
@@ -308,6 +334,22 @@ jobs:
       comment_header: fluentmigrator-preview-${{ matrix.processor }}
     secrets:
       connection_string: ${{ secrets[matrix.connectionStringSecret] }}
+```
+
+By default each preview reads the database behind `connection_string`, so it shows only the migrations that
+database hasn't applied yet. To preview without a database, set `preview_from_nothing: true` (dotnet-fm 9.0+).
+The workflow then adds `--no-connection --preview-from-nothing`, so each preview is the full script for an
+empty database: the version table, then every migration. The connection string becomes optional:
+
+```yaml
+jobs:
+  preview:
+    uses: fluentmigrator/fluentmigrator/.github/workflows/migration-preview.yml@main
+    with:
+      processor: postgres
+      migration_project: src/MyApp.Migrations/MyApp.Migrations.csproj
+      migration_assembly: src/MyApp.Migrations/bin/Release/net8.0/MyApp.Migrations.dll
+      preview_from_nothing: true
 ```
 
 ### Azure DevOps Pipeline

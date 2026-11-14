@@ -29,7 +29,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             expression.Sequence.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE SEQUENCE TestSchema.Sequence INCREMENT 2 MINVALUE 0 MAXVALUE 100 START WITH 2 CACHE 10 CYCLE;");
+            result.ShouldBe("CREATE SEQUENCE TestSchema.Sequence INCREMENT BY 2 MINVALUE 0 MAXVALUE 100 START WITH 2 CACHE 10 CYCLE;");
         }
 
         [Test]
@@ -38,7 +38,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             var expression = GeneratorTestHelper.GetCreateSequenceExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE SEQUENCE Sequence INCREMENT 2 MINVALUE 0 MAXVALUE 100 START WITH 2 CACHE 10 CYCLE;");
+            result.ShouldBe("CREATE SEQUENCE Sequence INCREMENT BY 2 MINVALUE 0 MAXVALUE 100 START WITH 2 CACHE 10 CYCLE;");
         }
 
         [Test]
@@ -48,7 +48,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             expression.Sequence.Cache = null;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE SEQUENCE Sequence INCREMENT 2 MINVALUE 0 MAXVALUE 100 START WITH 2 NO CACHE CYCLE;");
+            result.ShouldBe("CREATE SEQUENCE Sequence INCREMENT BY 2 MINVALUE 0 MAXVALUE 100 START WITH 2 NO CACHE CYCLE;");
         }
 
         [Test]
@@ -61,6 +61,19 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
                 () => Generator.Generate(expression),
                 "Cache size must be greater than 1; if you intended to disable caching, set Cache to null."
             );
+        }
+
+        [Test, SetCulture("nb-NO")]
+        public void CanCreateSequenceWithNegativeValuesInAnyCulture()
+        {
+            var expression = GeneratorTestHelper.GetCreateSequenceExpression();
+            expression.Sequence.Increment = -1;
+            expression.Sequence.MinValue = -100;
+            expression.Sequence.MaxValue = -1;
+            expression.Sequence.StartWith = -1;
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE SEQUENCE Sequence INCREMENT BY -1 MINVALUE -100 MAXVALUE -1 START WITH -1 CACHE 10 CYCLE;");
         }
 
         [Test]

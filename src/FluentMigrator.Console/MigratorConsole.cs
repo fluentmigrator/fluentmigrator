@@ -50,6 +50,7 @@ namespace FluentMigrator.Console
         public string OutputFilename;
         public bool OutputSemicolonDelimiter = false;
         public bool PreviewOnly;
+        public bool PreviewFromNothing;
         public string ProcessorType;
         public string Profile;
         public bool ShowHelp;
@@ -150,6 +151,11 @@ namespace FluentMigrator.Console
                         v => { PreviewOnly = v != null; }
                     },
                     {
+                        "previewFromNothing",
+                        "Also emit the SQL that creates the version table, as if the database were empty. Use with --noConnection and --preview. Default is false.",
+                        v => { PreviewFromNothing = v != null; }
+                    },
+                    {
                         "steps=",
                         "The number of versions to rollback if the task is 'rollback'. Default is 1.",
                         v => { Steps = int.Parse(v); }
@@ -206,7 +212,7 @@ namespace FluentMigrator.Console
                     },
                     {
                         "include-untagged:",
-                        "Include untagged migrations and/or maintenance objects.",
+                        "Include untagged migrations and/or maintenance objects. Available values are: ma, maintenance, mi, migrations with an optional '+' or '-' at the end to enable or disable the option. Multiple values may be given when separated by a comma.",
                         v =>
                         {
                             if (string.IsNullOrEmpty(v))
@@ -215,38 +221,28 @@ namespace FluentMigrator.Console
                             }
                             else
                             {
-                                var items = v.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
-                                    .Select(x => x.ToLowerInvariant().Trim())
-                                    .Where(x => !string.IsNullOrEmpty(x))
-                                    .Select(
-                                        x =>
-                                        {
-                                            var hasOption = x.EndsWith("+") || x.EndsWith("-");
-                                            var enable = !x.EndsWith("-");
-                                            var name = hasOption ? x.Substring(0, x.Length - 1) : x;
-                                            return new
-                                            {
-                                                FullName = x,
-                                                ShortName = name.Substring(Math.Min(2, name.Length)),
-                                                Enable = enable,
-                                            };
-                                        });
-                                foreach (var item in items)
+                                foreach (var raw in v.Split([','], StringSplitOptions.RemoveEmptyEntries))
                                 {
-                                    switch (item.ShortName)
-                                    {
-                                        case "ma":
-                                            IncludeUntaggedMaintenances = item.Enable;
-                                            break;
-                                        case "mi":
-                                            IncludeUntaggedMigrations = item.Enable;
-                                            break;
-                                        default:
-                                            throw new ArgumentOutOfRangeException(
-                                                $"The argument {item.FullName} is not supported. "
-                                              + "Valid values are: ma, maintenance, mi, migrations with an optional '+' or '-' at the end to enable or disable the option. "
-                                              + "Multiple values may be given when separated by a comma.");
-                                    }
+                                    var token = raw.Trim();
+                                    if (token.Length == 0)
+                                        continue;
+
+                                    var hasSign = token.EndsWith("+", StringComparison.Ordinal)
+                                                  || token.EndsWith("-", StringComparison.Ordinal);
+                                    var name = hasSign ? token.Substring(0, token.Length - 1) : token;
+                                    var enable = !token.EndsWith("-", StringComparison.Ordinal);
+
+                                    if (string.Equals(name, "ma", StringComparison.OrdinalIgnoreCase)
+                                        || string.Equals(name, "maintenance", StringComparison.OrdinalIgnoreCase))
+                                        IncludeUntaggedMaintenances = enable;
+                                    else if (string.Equals(name, "mi", StringComparison.OrdinalIgnoreCase)
+                                             || string.Equals(name, "migrations", StringComparison.OrdinalIgnoreCase))
+                                        IncludeUntaggedMigrations = enable;
+                                    else
+                                        throw new ArgumentOutOfRangeException(
+                                            $"The argument {token} is not supported. "
+                                          + "Valid values are: ma, maintenance, mi, migrations with an optional '+' or '-' at the end to enable or disable the option. "
+                                          + "Multiple values may be given when separated by a comma.");
                                 }
                             }
                         }
@@ -411,6 +407,7 @@ namespace FluentMigrator.Console
                         opt.Version = Version;
                         opt.StartVersion = StartVersion;
                         opt.NoConnection = NoConnection;
+                        opt.PreviewFromNothing = PreviewFromNothing;
                         opt.Steps = Steps;
                         opt.Profile = Profile;
                         opt.Tags = Tags.ToArray();
