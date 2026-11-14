@@ -211,14 +211,12 @@ namespace FluentMigrator.Tests.Unit.Generators.GenericGenerator
                 .ShouldBe("1234");
         }
 
-        [Test]
+        [Test, SetCulture("nb-NO")]
         public void NegativeIntegersAreFormattedWithInvariantCulture()
         {
-            ChangeCulture();
             _quoter.QuoteValue(-1234L).ShouldBe("-1234");
             _quoter.QuoteValue((short)-12).ShouldBe("-12");
             _quoter.QuoteValue((sbyte)-1).ShouldBe("-1");
-            RestoreCulture();
         }
 
         [Test]
