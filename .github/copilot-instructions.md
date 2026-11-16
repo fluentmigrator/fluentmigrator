@@ -23,7 +23,7 @@ FluentMigrator supports multiple database providers including:
 
 ## C# Language Guidelines
 
-- Use the latest C# features (currently C# 13) when appropriate
+- Use the latest C# features (currently C# 15) when appropriate
 - Apply code-formatting style defined in `.editorconfig`
 - Insert a newline before the opening curly brace of any code block (per `.editorconfig`)
 - Use pattern matching and switch expressions wherever possible
