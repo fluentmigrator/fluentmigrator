@@ -48,7 +48,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
         public Oracle12CGenerator(
             [NotNull] OracleQuoterBase quoter,
             [NotNull] IOptions<GeneratorOptions> generatorOptions)
-            : base(new Oracle12CColumn(quoter), quoter, new OracleDescriptionGenerator(), generatorOptions)
+            : base(new Oracle12CColumn(quoter), quoter, new OracleDescriptionGenerator(quoter), generatorOptions)
         {
         }
 
