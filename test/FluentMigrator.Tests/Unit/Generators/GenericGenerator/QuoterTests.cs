@@ -262,6 +262,20 @@ namespace FluentMigrator.Tests.Unit.Generators.GenericGenerator
             new Runner.Generators.Firebird.FirebirdQuoter(false).QuoteValue(new byte[] { 1, 2, 0xAB }).ShouldBe("X'0102AB'");
         }
 
+        [Test, SetCulture("th-TH")]
+        public void OracleDateTimeIsFormattedWithInvariantCulture()
+        {
+            new OracleQuoter().QuoteValue(new DateTime(2024, 1, 2, 3, 4, 5))
+                .ShouldBe("to_date('2024-01-02 03:04:05', 'yyyy-mm-dd hh24:mi:ss')");
+        }
+
+        [Test, SetCulture("th-TH")]
+        public void Db2DateTimeIsFormattedWithInvariantCulture()
+        {
+            new Runner.Generators.DB2.Db2Quoter().QuoteValue(new DateTime(2024, 1, 2, 3, 4, 5))
+                .ShouldBe("'2024-01-02-03.04.05'");
+        }
+
         [Test]
         public void ShouldFormatDb2BinaryLiterals()
         {

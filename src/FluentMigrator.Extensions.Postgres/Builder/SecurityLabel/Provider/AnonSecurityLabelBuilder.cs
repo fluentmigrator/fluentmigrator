@@ -59,8 +59,8 @@ public partial class AnonSecurityLabelBuilder : SecurityLabelSyntaxBuilderBase
         string str => str, // Strings are handled as-is to allow column names
         char c => $"'{c}'",
         bool b => b ? "TRUE" : "FALSE",
-        DateTime dt => BuildSqlString(dt.ToString("yyyy-MM-dd HH:mm:ss")),
-        DateTimeOffset dto => BuildSqlString(dto.ToString("yyyy-MM-dd HH:mm:ss zzz")),
+        DateTime dt => BuildSqlString(dt.ToString("yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture)),
+        DateTimeOffset dto => BuildSqlString(dto.ToString("yyyy-MM-dd HH:mm:ss zzz", System.Globalization.CultureInfo.InvariantCulture)),
         int or long or short or byte or uint or ulong or ushort or sbyte or float or double or decimal => Convert.ToString(value, System.Globalization.CultureInfo.InvariantCulture),
         _ => BuildSqlValue(value.ToString()),
     };

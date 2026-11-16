@@ -15,6 +15,7 @@
 #endregion
 
 using System;
+using System.Globalization;
 
 using FluentMigrator.Runner.Generators.Generic;
 
@@ -33,7 +34,7 @@ namespace FluentMigrator.Runner.Generators.DB2
         /// <inheritdoc />
         public override string FormatDateTime(DateTime value)
         {
-            return ValueQuote + value.ToString("yyyy-MM-dd-HH.mm.ss") + ValueQuote;
+            return ValueQuote + value.ToString("yyyy-MM-dd-HH.mm.ss", CultureInfo.InvariantCulture) + ValueQuote;
         }
 
         /// <inheritdoc />
