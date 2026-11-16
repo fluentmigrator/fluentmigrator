@@ -44,13 +44,23 @@
 //   FMSDK209 (error) a target's explicit module list names a module twice
 //   FMSDK210 (warn)  a target without a dialect inherits one, but its modules
 //                    declare different dialects
+//   FMSDK211 (warn)  a module's manifest has no provenance beside it
+//   FMSDK212 (warn)  a module's manifest doesn't have the SHA-256 its
+//                    provenance records: it changed after the module's build
+//   (FMSDK211 and FMSDK212 are errors with RequireSourceModelProvenance=true.)
 //
 // Every target records its effective dialect, the one its runner was chosen
 // by, whether the target declared it or inherited it from its modules.
+//
+// Each module entry records its manifest's SHA-256 (sourceModelSha256), so the
+// chain of hashes reaches the host: host manifest -> module manifest, and
+// module manifest -> its provenance.
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using Microsoft.Build.Framework;
 
 namespace FluentMigrator.Net.Sdk.Host.Tasks
@@ -76,12 +86,17 @@ namespace FluentMigrator.Net.Sdk.Host.Tasks
 
         public bool TreatValidationWarningsAsErrors { get; set; }
 
+        /// FMSDK211 and FMSDK212 are errors instead of warnings.
+        public bool RequireSourceModelProvenance { get; set; }
+
         private sealed class Module
         {
             public string Name;
             public bool IsRoot;
             public List<string> References = new List<string>();
             public string ManifestPath;
+            public string ProvenancePath;
+            public string ManifestSha256;
             public string AssemblyPath;
             public string DefaultSchema;
             public string Dialect;
@@ -123,6 +138,7 @@ namespace FluentMigrator.Net.Sdk.Host.Tasks
                 m.Name = item.ItemSpec;
                 m.IsRoot = string.Equals(item.GetMetadata("IsRoot"), "true", StringComparison.OrdinalIgnoreCase);
                 m.ManifestPath = item.GetMetadata("ManifestPath");
+                m.ProvenancePath = item.GetMetadata("ProvenancePath");
                 m.AssemblyPath = item.GetMetadata("AssemblyPath");
                 m.DefaultSchema = item.GetMetadata("DefaultSchema");
                 m.Dialect = item.GetMetadata("Dialect");
@@ -142,6 +158,7 @@ namespace FluentMigrator.Net.Sdk.Host.Tasks
                 {
                     modules.Add(m.Name, m);
                     moduleOrder.Add(m.Name);
+                    CheckProvenance(m);
                 }
             }
 
@@ -445,6 +462,66 @@ namespace FluentMigrator.Net.Sdk.Host.Tasks
             return false;
         }
 
+        private static readonly Regex Sha256Value = new Regex("\"sha256\":\\s*\"([0-9a-f]{64})\"");
+
+        /// A module manifest is accepted only with its provenance beside it, and
+        /// only with the hash that provenance records (FluentMigrator.Net.Sdk,
+        /// tasks/SourceModelProvenance.cs). Warnings by default, so a module
+        /// with provenance turned off doesn't break the host build outright.
+        private void CheckProvenance(Module m)
+        {
+            if (string.IsNullOrEmpty(m.ManifestPath) || !File.Exists(m.ManifestPath))
+            {
+                return;
+            }
+            m.ManifestSha256 = Sha256Hex(m.ManifestPath);
+
+            if (string.IsNullOrEmpty(m.ProvenancePath) || !File.Exists(m.ProvenancePath))
+            {
+                ReportProvenance("FMSDK211",
+                    "Module '" + m.Name + "' has no provenance for its source model manifest '" +
+                    FileNameOnly(m.ManifestPath) + "', so where it came from can't be checked. " +
+                    "Leave GenerateSourceModelProvenance on in the module.");
+                return;
+            }
+
+            Match recorded = Sha256Value.Match(File.ReadAllText(m.ProvenancePath));
+            if (!recorded.Success || recorded.Groups[1].Value != m.ManifestSha256)
+            {
+                ReportProvenance("FMSDK212",
+                    "Module '" + m.Name + "': the source model manifest's SHA-256 is " + m.ManifestSha256 +
+                    ", but its provenance records " + (recorded.Success ? recorded.Groups[1].Value : "none") +
+                    ". The manifest changed after the module's build.");
+            }
+        }
+
+        private void ReportProvenance(string code, string message)
+        {
+            if (RequireSourceModelProvenance)
+            {
+                Log.LogError(null, code, null, null, 0, 0, 0, 0, message);
+            }
+            else
+            {
+                Report(code, message);
+            }
+        }
+
+        private static string Sha256Hex(string path)
+        {
+            using (SHA256 sha = SHA256.Create())
+            using (FileStream stream = File.OpenRead(path))
+            {
+                byte[] hash = sha.ComputeHash(stream);
+                var sb = new StringBuilder(hash.Length * 2);
+                foreach (byte b in hash)
+                {
+                    sb.Append(b.ToString("x2"));
+                }
+                return sb.ToString();
+            }
+        }
+
         private void Report(string code, string message)
         {
             if (TreatValidationWarningsAsErrors)
@@ -516,6 +593,10 @@ namespace FluentMigrator.Net.Sdk.Host.Tasks
                       .Append(", \"name\": ").Append(Quote(mod.VersionTableName ?? string.Empty))
                       .Append("},\n");
                     sb.Append("          \"sourceModel\": ").Append(Quote(FileNameOnly(mod.ManifestPath))).Append(",\n");
+                    if (mod.ManifestSha256 != null)
+                    {
+                        sb.Append("          \"sourceModelSha256\": ").Append(Quote(mod.ManifestSha256)).Append(",\n");
+                    }
                     sb.Append("          \"assembly\": ").Append(Quote(FileNameOnly(mod.AssemblyPath))).Append("\n");
                     sb.Append("        }");
                 }

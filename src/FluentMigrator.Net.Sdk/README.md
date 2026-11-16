@@ -238,6 +238,115 @@ Recommended in `.gitattributes`, so the committed file is LF everywhere:
 *.sourcemodel.lock.json text eol=lf
 ```
 
+## Provenance
+
+Every build writes `$(MSBuildProjectName).sourcemodel.provenance.json` beside
+the manifest, in `obj/` and `bin/`. The manifest says what the database model
+is; the provenance says how that manifest was produced, and carries the
+manifest's SHA-256. A manifest changed after the build no longer matches its
+provenance, and the Host SDK and `VerifySourceModel` both check that.
+
+What it records:
+
+- **The manifest:** its file name and SHA-256 (of the file as written).
+- **The invocation:** the project path, `Configuration`, `TargetFramework`, and
+  the build's global properties, which are the `-p:` values plus anything a
+  parent build passed down. MSBuild doesn't expose the command line itself.
+  Left out: build-host noise (`NuGetInteractive`, solution and Visual Studio
+  bookkeeping, names starting with `_`), any value that is an absolute path,
+  and the names in `SourceModelProvenanceExcludedGlobalProperties`.
+- **The resolved inputs:** dialect, default schema, convention, root module,
+  and `SourceModelRoot`.
+- **The source:** the git commit and branch, from the .NET SDK's SourceLink
+  data, so no git process starts during a normal build. The repository URL is
+  included only when `PublishRepositoryUrl` is `true` (the rule NuGet pack
+  follows), since it can be an internal address.
+- **The working tree:** `unchecked` by default. With
+  `SourceModelProvenanceCheckWorkingTree=true`, the build runs `git status` over
+  `SourceModelRoot` and any source model file outside it, and records `clean`,
+  or `modified` with the files that differ from the commit. If git fails, it
+  records `unknown` and warns (`FMSDK105`).
+- **The builder:** `SourceModelProvenanceBuilderId`.
+
+It contains no timestamps, machine names or absolute paths, so the same commit,
+inputs and global properties always give the same bytes.
+
+### Formats
+
+`SourceModelProvenanceFormat=slsa` (the default) writes an
+[in-toto Statement v1](https://github.com/in-toto/attestation/blob/main/spec/v1/statement.md)
+whose subject is the manifest, with a
+[SLSA Provenance v1](https://slsa.dev/spec/v1.0/provenance) predicate:
+
+| Field | Content |
+|---|---|
+| `subject[0]` | the manifest's name and `sha256` |
+| `buildDefinition.buildType` | this section's URL |
+| `buildDefinition.externalParameters` | `project`, `configuration`, `targetFramework`, `globalProperties` |
+| `buildDefinition.internalParameters` | `dialect`, `defaultSchema`, `convention`, `isRootModule`, `sourceModelRoot` |
+| `buildDefinition.resolvedDependencies[0]` | the source: `uri` (`git+<url>@<ref>`, with a repository URL), `digest` (`gitCommit`), and `annotations` with `workingTree` and `modifiedFiles` (plus `vcs` and `ref` without a URL) |
+| `runDetails.builder.id` | `SourceModelProvenanceBuilderId` |
+
+The file is unsigned. To sign it, wrap it in a DSSE envelope with your own
+tooling (cosign, for example).
+
+`SourceModelProvenanceFormat=simple` writes the same facts as a flat document:
+`format`, `manifest` (`name`, `sha256`), `builder`, `project`, `configuration`,
+`targetFramework`, `globalProperties`, `parameters` and `source` (`vcs`,
+`repository`, `ref`, `revision`, `workingTree`, `modifiedFiles`).
+
+### Another version control system
+
+The source comes from the targets in `CollectSourceModelProvenanceSourceDependsOn`
+(git by default). Replace it with your own target, which adds one
+`SourceModelProvenanceSource` item and, if it knows them,
+`SourceModelProvenanceModifiedFile` items (paths relative to the source root):
+
+```xml
+<PropertyGroup>
+  <CollectSourceModelProvenanceSourceDependsOn>CollectSvnProvenance</CollectSourceModelProvenanceSourceDependsOn>
+</PropertyGroup>
+
+<Target Name="CollectSvnProvenance">
+  <!-- Run your VCS here and fill these in. -->
+  <ItemGroup>
+    <SourceModelProvenanceSource Include="svn"
+                                 Vcs="svn"
+                                 RepositoryUrl="https://svn.example.com/repo/trunk"
+                                 Revision="$(SvnRevision)"
+                                 DigestName="svnRevision"
+                                 RootPath="$(MSBuildThisFileDirectory)"
+                                 WorkingTree="clean" />
+  </ItemGroup>
+</Target>
+```
+
+`Revision` is recorded under `DigestName`, `RootPath` is the directory paths
+are made relative to, and `WorkingTree` is `clean`, `modified`, `unknown` or
+`unchecked` (or `checked`, to have the modified file items decide between
+`clean` and `modified`).
+
+### Verifying
+
+```
+dotnet build -t:VerifySourceModel -p:DatabaseDialect=postgres
+```
+
+checks the manifest in `bin/` (or `-p:SourceModelVerifyManifest=<path>`) and the
+provenance beside it (or `-p:SourceModelVerifyProvenance=<path>`) against the
+current checkout. It doesn't build, so it never overwrites what it checks:
+
+1. the provenance exists (`FMSDK006`);
+2. the manifest still has the SHA-256 the provenance records (`FMSDK007`);
+3. regenerating the manifest from this checkout gives the same bytes
+   (`FMSDK008`);
+4. regenerating the provenance gives the same bytes (`FMSDK009`): same commit,
+   global properties, format and working tree state.
+
+Pass the same `-p:` values the provenance records, from a checkout of the commit
+it records. A failure names the lines that differ. With several target
+frameworks, each one is checked.
+
 ## Properties and diagnostics
 
 | Property | Default | Purpose |
@@ -256,17 +365,30 @@ Recommended in `.gitattributes`, so the committed file is LF everywhere:
 | `GenerateSourceModelLockFile` | `false` | Compare the lock file every build; create or update it |
 | `SourceModelLockedMode` | `false` | Fail (`FMSDK004`) instead of writing the lock; for CI |
 | `SourceModelLockFilePath` | `$(MSBuildProjectDirectory)/$(MSBuildProjectName).sourcemodel.lock.json` | Where the lock file goes |
+| `GenerateSourceModelProvenance` | `true` | Write the provenance beside the manifest |
+| `SourceModelProvenanceFormat` | `slsa` | `slsa` (in-toto + SLSA v1) or `simple` (`FMSDK010` otherwise) |
+| `SourceModelProvenanceCheckWorkingTree` | `false` | Run `git status` and record modified files |
+| `SourceModelProvenanceExcludedGlobalProperties` | *(empty)* | More global properties to leave out of the provenance |
+| `SourceModelProvenanceBuilderId` | the SDK's repository URL | `runDetails.builder.id` |
+| `CollectSourceModelProvenanceSourceDependsOn` | `_CollectGitSourceModelProvenanceSource` | Targets that describe the source; replace for another VCS |
+| `SourceModelVerifyManifest` / `SourceModelVerifyProvenance` | the `bin/` manifest / its provenance | What `-t:VerifySourceModel` checks |
 
 Diagnostics: `FMSDK001` duplicate object identity — case-insensitive, only for
 pivots declaring `UniqueIdentity` (error); `FMSDK002` missing file (error);
 `FMSDK003` path in `SourceModelManifestFileName` (error); `FMSDK004` locked
 mode: lock file missing or out of date (error); `FMSDK005` target frameworks
 produced different source models, so there is no single lock (error);
+`FMSDK006` verify: the manifest or its provenance is missing (error);
+`FMSDK007` verify: the manifest changed after its provenance was written
+(error); `FMSDK008` verify: this checkout produces a different manifest (error);
+`FMSDK009` verify: this checkout produces a different provenance (error);
+`FMSDK010` unknown `SourceModelProvenanceFormat` (error);
 `FMSDK100` file with no `ObjectType` (warning); `FMSDK101` empty file (warning);
 `FMSDK102` `Tools/` artifact in a non-root module (warning); `FMSDK103` file
 outside `SourceModelRoot` without `Link` metadata (warning); `FMSDK104`
 `Execution` other than `once`, `onChange` or `always` (warning; a known value in
-another case is written in its canonical spelling instead).
+another case is written in its canonical spelling instead); `FMSDK105`
+`SourceModelProvenanceCheckWorkingTree` is on but `git status` failed (warning).
 
 ## Building and testing
 

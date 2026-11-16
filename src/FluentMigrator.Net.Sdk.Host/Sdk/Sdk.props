@@ -50,6 +50,9 @@
 
     <GenerateHostManifest Condition="'$(GenerateHostManifest)' == ''">true</GenerateHostManifest>
     <TreatHostWarningsAsErrors Condition="'$(TreatHostWarningsAsErrors)' == ''">false</TreatHostWarningsAsErrors>
+    <!-- A module manifest without its provenance, or with a different hash, is
+         FMSDK211/FMSDK212: a warning unless this is true. -->
+    <RequireSourceModelProvenance Condition="'$(RequireSourceModelProvenance)' == ''">false</RequireSourceModelProvenance>
     <HostManifestFileName Condition="'$(HostManifestFileName)' == ''">$(MSBuildProjectName).host.json</HostManifestFileName>
 
     <!--

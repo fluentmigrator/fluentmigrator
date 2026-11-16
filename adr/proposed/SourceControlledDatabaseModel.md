@@ -748,3 +748,49 @@ lock file, built to the opposite rules.
   never deletes a committed file.
 - **A dedicated path property**, `SourceModelLockFilePath`, defaulting to next
   to the project, instead of path tricks in a file-name property.
+
+## Provenance
+
+The manifest says what the database model is. A consumer that receives one, a
+host build or a deployment pipeline, also needs to know where that claim came
+from, and that nothing changed it since. So the build writes a second file
+beside the manifest, `$(MSBuildProjectName).sourcemodel.provenance.json`, and
+keeps the two separate: the manifest stays a pure description of the model,
+comparable across machines and committed as the lock file, while the provenance
+describes one production of it.
+
+| Artifact | Answers | Location | Committed |
+|---|---|---|---|
+| `.sourcemodel.json` | what the model is | `obj/`, `bin/` | no |
+| `.sourcemodel.lock.json` | what the model is expected to be | next to the project | yes |
+| `.sourcemodel.provenance.json` | how this manifest was produced | `obj/`, `bin/` | no |
+
+### Requirements (implemented in PR #2325)
+
+- **It binds to the manifest by hash.** The provenance records the manifest's
+  SHA-256. A manifest without its provenance, or with another hash, is not
+  accepted: the Host SDK reports `FMSDK211`/`FMSDK212` (warnings by default,
+  errors with `RequireSourceModelProvenance`) and records each module manifest's
+  hash in `host.json`, so the chain of hashes runs from the host manifest down.
+- **A standard format by default.** An in-toto Statement v1 with a SLSA
+  Provenance v1 predicate, so supply-chain tooling can read it and sign it
+  (signing is left to that tooling). A flat `simple` format carries the same
+  facts for readers who don't want the envelope.
+- **Deterministic.** No timestamps, machine names or absolute paths. The same
+  commit, inputs and global properties give the same bytes. That is what makes
+  verification a byte comparison rather than a parser, and it keeps the file
+  from churning on every build.
+- **"How it was generated" is the global properties.** MSBuild doesn't expose
+  the command line, but the global properties are the `-p:` values plus what a
+  parent build passed down. Build-host noise and absolute paths are left out.
+- **Source control without a git process.** The commit and branch come from the
+  .NET SDK's SourceLink data. Checking the working tree runs `git status`, so it
+  is opt-in (`SourceModelProvenanceCheckWorkingTree`). Other VCSs plug in by
+  replacing the targets in `CollectSourceModelProvenanceSourceDependsOn`.
+- **No up-to-date check.** A new commit changes the provenance without changing
+  any manifest input, so it is regenerated on every build (one hash) and written
+  only when its content changes.
+- **Verifiable.** `-t:VerifySourceModel` checks a manifest and its provenance
+  against a checkout: the recorded hash (`FMSDK007`), then regenerating both
+  from the checkout and comparing bytes (`FMSDK008`, `FMSDK009`). It doesn't
+  build, so it never overwrites what it checks.

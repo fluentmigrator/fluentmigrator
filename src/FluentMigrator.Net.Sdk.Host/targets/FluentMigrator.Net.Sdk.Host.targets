@@ -51,7 +51,8 @@
                        RunnerPackages="@(MigrationRunnerPackage)"
                        ProjectName="$(MSBuildProjectName)"
                        ManifestPath="$(HostIntermediateManifestPath)"
-                       TreatValidationWarningsAsErrors="$(TreatHostWarningsAsErrors)" />
+                       TreatValidationWarningsAsErrors="$(TreatHostWarningsAsErrors)"
+                       RequireSourceModelProvenance="$(RequireSourceModelProvenance)" />
 
     <Copy SourceFiles="$(HostIntermediateManifestPath)"
           DestinationFiles="$(HostManifestPath)"

@@ -428,6 +428,74 @@ restore "$ADVENTURE_PROJ"
 rm -f "$LOCK"
 build "$ADVENTURE" > /dev/null
 
+section "provenance"
+# How the manifest was produced, beside it and separate from it, with the
+# manifest's SHA-256: the in-toto + SLSA v1 format by default.
+PROVENANCE=$OUT/AdventureLite.sourcemodel.provenance.json
+build "$ADVENTURE" > /dev/null
+assert_file "$PROVENANCE" "the build writes a provenance beside the manifest"
+assert_file "$ADVENTURE/obj/Debug/$TFM/AdventureLite.sourcemodel.provenance.json" "and in obj/"
+assert_contains "$PROVENANCE" '"_type": "https://in-toto.io/Statement/v1"' "an in-toto statement by default"
+assert_contains "$PROVENANCE" '"predicateType": "https://slsa.dev/provenance/v1"' "with a SLSA provenance v1 predicate"
+assert_contains "$PROVENANCE" "\"sha256\": \"$(sha256sum "$MANIFEST" | cut -d' ' -f1)\"" "recording the manifest's SHA-256"
+if git -C "$REPO_ROOT" rev-parse HEAD > /dev/null 2>&1; then
+  assert_contains "$PROVENANCE" "\"gitCommit\": \"$(git -C "$REPO_ROOT" rev-parse HEAD)\"" "and the commit it was built from"
+fi
+assert_not_contains "$PROVENANCE" '"workingTree": "clean"' "the working tree is unchecked unless asked"
+cp "$PROVENANCE" "$SCRATCH/provenance.first"
+build "$ADVENTURE" > /dev/null
+if cmp -s "$PROVENANCE" "$SCRATCH/provenance.first"; then pass "deterministic: a rebuild writes the same bytes"; else fail "a rebuild changed the provenance"; fi
+
+build "$ADVENTURE" -p:DatabaseDialect=postgres > /dev/null
+assert_contains "$PROVENANCE" '"DatabaseDialect": "postgres"' "a -p: value is recorded as a global property"
+extra_targets '<PropertyGroup />'
+build_extra "$ADVENTURE" > /dev/null
+assert_not_contains "$PROVENANCE" 'CustomAfterMicrosoftCommonTargets' "a global property holding an absolute path is left out"
+assert_not_contains "$PROVENANCE" 'NuGetInteractive' "and so is dotnet build's own NuGetInteractive"
+
+build "$ADVENTURE" -p:SourceModelProvenanceFormat=simple > /dev/null
+assert_contains "$PROVENANCE" '"manifest": {"name": "AdventureLite.sourcemodel.json", "sha256": ' "the simple format on request"
+FORMAT_OUT=$(build "$ADVENTURE" -p:SourceModelProvenanceFormat=spdx 2>&1 || true)
+if printf '%s' "$FORMAT_OUT" | grep -q "FMSDK010"; then pass "FMSDK010 for an unknown format"; else fail "FMSDK010 expected for an unknown format"; fi
+
+if git -C "$REPO_ROOT" rev-parse HEAD > /dev/null 2>&1; then
+  backup "$VIEW"
+  printf -- '-- uncommitted\n' >> "$VIEW"
+  build "$ADVENTURE" -p:SourceModelProvenanceCheckWorkingTree=true > /dev/null
+  assert_contains "$PROVENANCE" '"workingTree": "modified"' "SourceModelProvenanceCheckWorkingTree records a modified tree"
+  assert_contains "$PROVENANCE" "$ADVENTURE/$VIEW_PATH" "and lists the modified file"
+  restore "$VIEW"
+  build "$ADVENTURE" -p:SourceModelProvenanceCheckWorkingTree=true > /dev/null
+  assert_not_contains "$PROVENANCE" "$ADVENTURE/$VIEW_PATH" "a restored file is no longer listed"
+fi
+
+# Another VCS replaces the git source through CollectSourceModelProvenanceSourceDependsOn.
+extra_targets '<PropertyGroup><CollectSourceModelProvenanceSourceDependsOn>SmokeVcs</CollectSourceModelProvenanceSourceDependsOn></PropertyGroup>
+<Target Name="SmokeVcs"><ItemGroup><SourceModelProvenanceSource Include="svn" Vcs="svn" Revision="1234" DigestName="svnRevision" WorkingTree="clean" /></ItemGroup></Target>'
+build_extra "$ADVENTURE" > /dev/null
+assert_contains "$PROVENANCE" '"svnRevision": "1234"' "a custom VCS target supplies the revision"
+assert_not_contains "$PROVENANCE" '"gitCommit"' "instead of git"
+
+build "$ADVENTURE" > /dev/null
+verify() { dotnet build "$ADVENTURE" -t:VerifySourceModel -v:minimal "$@" 2>&1 || true; }
+if verify | grep -q "Verified"; then pass "VerifySourceModel accepts the build's own manifest"; else fail "VerifySourceModel should accept the build's own manifest"; fi
+if verify -p:DatabaseDialect=postgres | grep -q "FMSDK008"; then pass "FMSDK008 when the checkout produces another manifest"; else fail "FMSDK008 expected for other -p: values"; fi
+if verify -p:SmokeOnly=1 | grep -q "FMSDK009"; then pass "FMSDK009 when only the provenance differs"; else fail "FMSDK009 expected for an extra global property"; fi
+backup "$MANIFEST"
+printf '\n' >> "$MANIFEST"
+if verify | grep -q "FMSDK007"; then pass "FMSDK007 when the manifest changed after the build"; else fail "FMSDK007 expected for an altered manifest"; fi
+restore "$MANIFEST"
+mv "$PROVENANCE" "$SCRATCH/provenance.moved"
+if verify | grep -q "FMSDK006"; then pass "FMSDK006 when the provenance is missing"; else fail "FMSDK006 expected without a provenance"; fi
+mv "$SCRATCH/provenance.moved" "$PROVENANCE"
+
+build "$ADVENTURE" -p:GenerateSourceModelProvenance=false > /dev/null
+assert_no_file "$PROVENANCE" "turning provenance off removes the old one"
+build "$ADVENTURE" > /dev/null
+dotnet clean "$ADVENTURE" -v:minimal > /dev/null
+assert_no_file "$PROVENANCE" "dotnet clean removes the provenance"
+build "$ADVENTURE" > /dev/null
+
 # -------------------------------------------------------------- host manifest
 
 section "FluentMigrator.Net.Sdk.Host: host manifest"
@@ -545,6 +613,24 @@ else
   pass "no FMSDK210 for a target with its own dialect"
 fi
 restore "$HOSTPROJ"
+build "$COMPOSITE/AdventureHost" > /dev/null
+
+section "module provenance in the host"
+SALES_MANIFEST=$COMPOSITE/Sales/bin/Debug/$TFM/Sales.sourcemodel.json
+assert_contains "$HOST" "\"sourceModelSha256\": \"$(sha256sum "$SALES_MANIFEST" | cut -d' ' -f1)\"" "the host records each module manifest's SHA-256"
+extra_targets '<PropertyGroup Condition="'"'"'$(MSBuildProjectName)'"'"' == '"'"'Sales'"'"'"><GenerateSourceModelProvenance>false</GenerateSourceModelProvenance></PropertyGroup>'
+NOPROV_OUT=$(build_extra "$COMPOSITE/AdventureHost" 2>&1 || true)
+if printf '%s' "$NOPROV_OUT" | grep "warning FMSDK211" | grep -q "Sales"; then pass "FMSDK211 warns about a module manifest without provenance"; else fail "FMSDK211 warning expected for Sales"; fi
+REQUIRED_OUT=$(build_extra "$COMPOSITE/AdventureHost" -p:RequireSourceModelProvenance=true 2>&1 || true)
+if printf '%s' "$REQUIRED_OUT" | grep -q "error FMSDK211"; then pass "and is an error with RequireSourceModelProvenance"; else fail "FMSDK211 error expected with RequireSourceModelProvenance"; fi
+build "$COMPOSITE/AdventureHost" > /dev/null
+# A manifest changed after its module's build: newer than obj/, so the copy
+# to bin/ leaves it alone, and the host sees it next to the old provenance.
+backup "$SALES_MANIFEST"
+printf '\n' >> "$SALES_MANIFEST"
+ALTERED_OUT=$(build "$COMPOSITE/AdventureHost" 2>&1 || true)
+if printf '%s' "$ALTERED_OUT" | grep "FMSDK212" | grep -q "Sales"; then pass "FMSDK212 when a module manifest doesn't match its provenance"; else fail "FMSDK212 expected for an altered Sales manifest"; fi
+restore "$SALES_MANIFEST"
 build "$COMPOSITE/AdventureHost" > /dev/null
 
 section "custom host manifest escape hatch"

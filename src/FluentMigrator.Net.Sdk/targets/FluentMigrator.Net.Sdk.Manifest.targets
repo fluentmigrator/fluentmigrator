@@ -21,6 +21,26 @@
     <GenerateSourceModelLockFile Condition="'$(GenerateSourceModelLockFile)' == ''">false</GenerateSourceModelLockFile>
     <SourceModelLockedMode Condition="'$(SourceModelLockedMode)' == ''">false</SourceModelLockedMode>
     <SourceModelLockFilePath Condition="'$(SourceModelLockFilePath)' == ''">$(MSBuildProjectDirectory)/$(MSBuildProjectName).sourcemodel.lock.json</SourceModelLockFilePath>
+
+    <!--
+      Provenance: how the manifest was produced, beside it and separate from
+      it (<Project>.sourcemodel.provenance.json). See the Provenance targets
+      below.
+    -->
+    <GenerateSourceModelProvenance Condition="'$(GenerateSourceModelProvenance)' == ''">true</GenerateSourceModelProvenance>
+    <SourceModelProvenanceFormat Condition="'$(SourceModelProvenanceFormat)' == ''">slsa</SourceModelProvenanceFormat>
+    <SourceModelProvenanceCheckWorkingTree Condition="'$(SourceModelProvenanceCheckWorkingTree)' == ''">false</SourceModelProvenanceCheckWorkingTree>
+    <SourceModelProvenanceBuilderId Condition="'$(SourceModelProvenanceBuilderId)' == ''">https://github.com/fluentmigrator/fluentmigrator/tree/main/src/FluentMigrator.Net.Sdk</SourceModelProvenanceBuilderId>
+    <SourceModelProvenanceFileName>$([System.IO.Path]::GetFileNameWithoutExtension('$(SourceModelManifestFileName)')).provenance.json</SourceModelProvenanceFileName>
+    <SourceModelIntermediateProvenancePath>$(IntermediateOutputPath)$(SourceModelProvenanceFileName)</SourceModelIntermediateProvenancePath>
+    <SourceModelProvenancePath>$(OutputPath)$(SourceModelProvenanceFileName)</SourceModelProvenancePath>
+    <!--
+      The extension point for source control: targets listed here run before
+      the provenance is written and add the SourceModelProvenanceSource item
+      (and SourceModelProvenanceModifiedFile items). Replace the default to
+      describe a VCS other than git.
+    -->
+    <CollectSourceModelProvenanceSourceDependsOn Condition="'$(CollectSourceModelProvenanceSourceDependsOn)' == ''">_CollectGitSourceModelProvenanceSource</CollectSourceModelProvenanceSourceDependsOn>
   </PropertyGroup>
 
   <UsingTask TaskName="FluentMigrator.Net.Sdk.Tasks.BuildSourceModel"
@@ -36,6 +56,22 @@
              AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
     <Task>
       <Code Type="Class" Language="cs" Source="$(MSBuildThisFileDirectory)../tasks/SourceModelLock.cs" />
+    </Task>
+  </UsingTask>
+
+  <UsingTask TaskName="FluentMigrator.Net.Sdk.Tasks.WriteSourceModelProvenance"
+             TaskFactory="RoslynCodeTaskFactory"
+             AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <Task>
+      <Code Type="Class" Language="cs" Source="$(MSBuildThisFileDirectory)../tasks/SourceModelProvenance.cs" />
+    </Task>
+  </UsingTask>
+
+  <UsingTask TaskName="FluentMigrator.Net.Sdk.Tasks.VerifySourceModel"
+             TaskFactory="RoslynCodeTaskFactory"
+             AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <Task>
+      <Code Type="Class" Language="cs" Source="$(MSBuildThisFileDirectory)../tasks/VerifySourceModel.cs" />
     </Task>
   </UsingTask>
 
@@ -248,7 +284,199 @@
           Condition="'$(GenerateSourceModelManifest)' == 'true'">
     <ItemGroup>
       <FileWrites Include="$(SourceModelInputsStampPath);$(SourceModelIntermediateManifestPath);$(SourceModelManifestPath)" />
+      <FileWrites Include="$(SourceModelIntermediateProvenancePath);$(SourceModelProvenancePath)"
+                  Condition="'$(GenerateSourceModelProvenance)' == 'true'" />
     </ItemGroup>
+  </Target>
+
+  <!--
+    Provenance: <Project>.sourcemodel.provenance.json beside the manifest, in
+    obj/ and bin/. It records how the manifest was produced and the manifest's
+    SHA-256 (see tasks/SourceModelProvenance.cs for what goes in it).
+
+      GenerateSourceModelProvenance=false          don't write it
+      SourceModelProvenanceFormat=slsa|simple      in-toto + SLSA v1 (default), or a flat document
+      SourceModelProvenanceCheckWorkingTree=true   run git status and record modified files
+      SourceModelProvenanceExcludedGlobalProperties  more global properties to leave out
+      CollectSourceModelProvenanceSourceDependsOn  replace git with another VCS
+      -t:VerifySourceModel                         check a manifest and its provenance against this checkout
+
+    Unlike the manifest, it has no up-to-date check: a new commit changes the
+    provenance without changing any input of the manifest. It is cheap (one
+    hash of the manifest) and written only when its content changes.
+  -->
+  <Target Name="CollectSourceModelProvenanceSource"
+          DependsOnTargets="$(CollectSourceModelProvenanceSourceDependsOn)" />
+
+  <!--
+    git, from the .NET SDK's SourceLink data, so a normal build starts no git
+    process: the top-level SourceRoot with SourceControl=git. The repository
+    URL is recorded only when PublishRepositoryUrl is true, the rule NuGet pack
+    follows too, because it can be an internal address.
+
+    With SourceModelProvenanceCheckWorkingTree=true, git status runs over
+    SourceModelRoot and any source model file outside it, and the provenance
+    lists what differs from the commit. A failure (no git, not a repository)
+    records the working tree as unknown, with FMSDK105.
+  -->
+  <Target Name="_CollectGitSourceModelProvenanceSource"
+          DependsOnTargets="InitializeSourceControlInformation;CollectSourceModel"
+          Condition="'$(SourceControlInformationFeatureSupported)' == 'true'">
+    <ItemGroup>
+      <_SourceModelGitRoot Include="@(SourceRoot)"
+                           Condition="'%(SourceRoot.SourceControl)' == 'git' and '%(SourceRoot.NestedRoot)' == ''" />
+    </ItemGroup>
+    <PropertyGroup Condition="'@(_SourceModelGitRoot)' != ''">
+      <_SourceModelGitRootPath>@(_SourceModelGitRoot->'%(FullPath)')</_SourceModelGitRootPath>
+      <_SourceModelGitRevision>@(_SourceModelGitRoot->'%(RevisionId)')</_SourceModelGitRevision>
+      <_SourceModelGitRef>@(_SourceModelGitRoot->'%(BranchName)')</_SourceModelGitRef>
+      <_SourceModelGitUrl Condition="'$(PublishRepositoryUrl)' == 'true'">@(_SourceModelGitRoot->'%(ScmRepositoryUrl)')</_SourceModelGitUrl>
+      <_SourceModelWorkingTree>unchecked</_SourceModelWorkingTree>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(SourceModelProvenanceCheckWorkingTree)' == 'true' and '$(_SourceModelGitRootPath)' != ''">
+      <_SourceModelRootFull>$([MSBuild]::NormalizeDirectory('$(MSBuildProjectDirectory)', '$(SourceModelRoot)'))</_SourceModelRootFull>
+      <_SourceModelRootLower>$(_SourceModelRootFull.ToLowerInvariant())</_SourceModelRootLower>
+    </PropertyGroup>
+    <ItemGroup Condition="'$(SourceModelProvenanceCheckWorkingTree)' == 'true' and '$(_SourceModelGitRootPath)' != ''">
+      <_SourceModelGitPathspec Include="$(_SourceModelRootFull.TrimEnd('\').TrimEnd('/'))" />
+      <_SourceModelGitPathspec Include="@(SourceModelFile->'%(FullPath)')"
+                               Condition="!$([System.String]::Copy('%(FullPath)').ToLowerInvariant().StartsWith('$(_SourceModelRootLower)'))" />
+    </ItemGroup>
+    <Exec Condition="'@(_SourceModelGitPathspec)' != ''"
+          Command="git -c core.quotepath=off status --porcelain=v1 --untracked-files=all -- @(_SourceModelGitPathspec->'&quot;%(Identity)&quot;', ' ')"
+          WorkingDirectory="$(_SourceModelGitRootPath)"
+          ConsoleToMsBuild="true"
+          IgnoreExitCode="true"
+          IgnoreStandardErrorWarningFormat="true"
+          EchoOff="true"
+          StandardOutputImportance="low"
+          StandardErrorImportance="low">
+      <Output TaskParameter="ConsoleOutput" ItemName="_SourceModelGitStatusLine" />
+      <Output TaskParameter="ExitCode" PropertyName="_SourceModelGitStatusExitCode" />
+    </Exec>
+    <PropertyGroup Condition="'$(_SourceModelGitStatusExitCode)' != ''">
+      <_SourceModelWorkingTree Condition="'$(_SourceModelGitStatusExitCode)' == '0'">checked</_SourceModelWorkingTree>
+      <_SourceModelWorkingTree Condition="'$(_SourceModelGitStatusExitCode)' != '0'">unknown</_SourceModelWorkingTree>
+    </PropertyGroup>
+    <Warning Code="FMSDK105"
+             Condition="'$(_SourceModelWorkingTree)' == 'unknown'"
+             Text="SourceModelProvenanceCheckWorkingTree is on, but git status failed (exit code $(_SourceModelGitStatusExitCode)), so the provenance records the working tree as unknown." />
+
+    <ItemGroup Condition="'@(_SourceModelGitRoot)' != ''">
+      <SourceModelProvenanceModifiedFile Include="@(_SourceModelGitStatusLine)"
+                                         GitPorcelain="true"
+                                         Condition="'$(_SourceModelWorkingTree)' == 'checked'" />
+      <SourceModelProvenanceSource Include="git"
+                                   Vcs="git"
+                                   RepositoryUrl="$(_SourceModelGitUrl)"
+                                   Ref="$(_SourceModelGitRef)"
+                                   Revision="$(_SourceModelGitRevision)"
+                                   DigestName="gitCommit"
+                                   RootPath="$(_SourceModelGitRootPath)"
+                                   WorkingTree="$(_SourceModelWorkingTree)" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="WriteSourceModelProvenance"
+          Condition="'$(GenerateSourceModelManifest)' == 'true' and '$(GenerateSourceModelProvenance)' == 'true'"
+          AfterTargets="BuildSourceModelManifest"
+          DependsOnTargets="BuildSourceModelManifest;CollectSourceModelProvenanceSource">
+    <WriteSourceModelProvenance ManifestPath="$(SourceModelIntermediateManifestPath)"
+                                ManifestName="$(SourceModelManifestFileName)"
+                                ProvenancePath="$(SourceModelIntermediateProvenancePath)"
+                                Format="$(SourceModelProvenanceFormat)"
+                                ProjectPath="$(MSBuildProjectFullPath)"
+                                Configuration="$(Configuration)"
+                                TargetFramework="$(TargetFramework)"
+                                Dialect="$(DatabaseDialect)"
+                                DefaultSchema="$(DefaultSchema)"
+                                Convention="$(SourceModelConvention)"
+                                IsRootModule="$(IsDatabaseRootModule)"
+                                SourceModelRoot="$(SourceModelRoot)"
+                                BuilderId="$(SourceModelProvenanceBuilderId)"
+                                Source="@(SourceModelProvenanceSource)"
+                                ModifiedFiles="@(SourceModelProvenanceModifiedFile)"
+                                ExcludedGlobalProperties="$(SourceModelProvenanceExcludedGlobalProperties)" />
+
+    <Copy SourceFiles="$(SourceModelIntermediateProvenancePath)"
+          DestinationFiles="$(SourceModelProvenancePath)"
+          SkipUnchangedFiles="true" />
+
+    <ItemGroup>
+      <FileWrites Include="$(SourceModelIntermediateProvenancePath);$(SourceModelProvenancePath)" />
+    </ItemGroup>
+  </Target>
+
+  <!--
+    dotnet build -t:VerifySourceModel [-p:SourceModelVerifyManifest=path] [-p:...]
+
+    Checks a manifest (bin/ by default, or any path) and the provenance beside
+    it against this checkout: the manifest still has the hash its provenance
+    records (FMSDK007), and regenerating both from the checkout, with this
+    invocation's global properties, gives the same bytes (FMSDK008, FMSDK009).
+    Pass the -p: values the provenance records. It doesn't build, so it never
+    overwrites what it is checking. With several target frameworks it checks
+    each one.
+  -->
+  <PropertyGroup>
+    <_VerifySourceModelDependsOn Condition="'$(IsCrossTargetingBuild)' == 'true'">_VerifyInnerSourceModels</_VerifySourceModelDependsOn>
+    <_VerifySourceModelDependsOn Condition="'$(IsCrossTargetingBuild)' != 'true'">_VerifyOwnSourceModel</_VerifySourceModelDependsOn>
+  </PropertyGroup>
+
+  <Target Name="VerifySourceModel" DependsOnTargets="$(_VerifySourceModelDependsOn)" />
+
+  <Target Name="_VerifyInnerSourceModels">
+    <ItemGroup>
+      <_SourceModelVerifyFramework Include="$(TargetFrameworks)" />
+    </ItemGroup>
+    <MSBuild Projects="$(MSBuildProjectFullPath)"
+             Targets="VerifySourceModel"
+             Properties="TargetFramework=%(_SourceModelVerifyFramework.Identity)" />
+  </Target>
+
+  <Target Name="_VerifyOwnSourceModel"
+          Condition="'$(GenerateSourceModelManifest)' == 'true'"
+          DependsOnTargets="CollectSourceModel;CollectSourceModelProvenanceSource">
+    <PropertyGroup>
+      <_SourceModelVerifyManifest>$(SourceModelVerifyManifest)</_SourceModelVerifyManifest>
+      <_SourceModelVerifyManifest Condition="'$(_SourceModelVerifyManifest)' == ''">$(SourceModelManifestPath)</_SourceModelVerifyManifest>
+      <_SourceModelVerifyManifest>$([MSBuild]::NormalizePath('$(MSBuildProjectDirectory)', '$(_SourceModelVerifyManifest)'))</_SourceModelVerifyManifest>
+      <_SourceModelVerifyProvenance>$(SourceModelVerifyProvenance)</_SourceModelVerifyProvenance>
+      <_SourceModelVerifyProvenance Condition="'$(_SourceModelVerifyProvenance)' == ''">$([System.IO.Path]::GetDirectoryName('$(_SourceModelVerifyManifest)'))/$([System.IO.Path]::GetFileNameWithoutExtension('$(_SourceModelVerifyManifest)')).provenance.json</_SourceModelVerifyProvenance>
+      <_SourceModelVerifyProvenance>$([MSBuild]::NormalizePath('$(MSBuildProjectDirectory)', '$(_SourceModelVerifyProvenance)'))</_SourceModelVerifyProvenance>
+      <_SourceModelVerifyDirectory>$(IntermediateOutputPath)sourcemodel-verify/</_SourceModelVerifyDirectory>
+    </PropertyGroup>
+
+    <BuildSourceModel SourceFiles="@(SourceModelFile)"
+                      ProjectName="$(MSBuildProjectName)"
+                      SourceModelRoot="$(SourceModelRoot)"
+                      Dialect="$(DatabaseDialect)"
+                      DefaultSchema="$(DefaultSchema)"
+                      IsRootModule="$(IsDatabaseRootModule)"
+                      Convention="$(SourceModelConvention)"
+                      ManifestPath="$(_SourceModelVerifyDirectory)$(SourceModelManifestFileName)"
+                      TreatValidationWarningsAsErrors="$(TreatSourceModelWarningsAsErrors)" />
+    <WriteSourceModelProvenance ManifestPath="$(_SourceModelVerifyDirectory)$(SourceModelManifestFileName)"
+                                ManifestName="$(SourceModelManifestFileName)"
+                                ProvenancePath="$(_SourceModelVerifyDirectory)$(SourceModelProvenanceFileName)"
+                                Format="$(SourceModelProvenanceFormat)"
+                                ProjectPath="$(MSBuildProjectFullPath)"
+                                Configuration="$(Configuration)"
+                                TargetFramework="$(TargetFramework)"
+                                Dialect="$(DatabaseDialect)"
+                                DefaultSchema="$(DefaultSchema)"
+                                Convention="$(SourceModelConvention)"
+                                IsRootModule="$(IsDatabaseRootModule)"
+                                SourceModelRoot="$(SourceModelRoot)"
+                                BuilderId="$(SourceModelProvenanceBuilderId)"
+                                Source="@(SourceModelProvenanceSource)"
+                                ModifiedFiles="@(SourceModelProvenanceModifiedFile)"
+                                ExcludedGlobalProperties="$(SourceModelProvenanceExcludedGlobalProperties)" />
+    <VerifySourceModel ManifestPath="$(_SourceModelVerifyManifest)"
+                       ProvenancePath="$(_SourceModelVerifyProvenance)"
+                       RegeneratedManifestPath="$(_SourceModelVerifyDirectory)$(SourceModelManifestFileName)"
+                       RegeneratedProvenancePath="$(_SourceModelVerifyDirectory)$(SourceModelProvenanceFileName)" />
   </Target>
 
   <!--
@@ -319,7 +547,7 @@
 
   <!-- Friendly standalone entry point: dotnet msbuild -t:SourceModel -->
   <Target Name="SourceModel"
-          DependsOnTargets="BuildSourceModelManifest;CopySourceModelManifestToOutput" />
+          DependsOnTargets="BuildSourceModelManifest;CopySourceModelManifestToOutput;WriteSourceModelProvenance" />
 
   <!--
     Composition protocol for FluentMigrator.Net.Sdk.Host (same pattern as
@@ -330,17 +558,20 @@
     SkipNonexistentTargets.
   -->
   <Target Name="GetDeploymentModuleInfo"
-          DependsOnTargets="BuildSourceModelManifest;CopySourceModelManifestToOutput"
+          DependsOnTargets="BuildSourceModelManifest;CopySourceModelManifestToOutput;WriteSourceModelProvenance"
           Returns="@(DeploymentModuleInfo)">
     <ItemGroup>
       <_FmModuleReference Include="@(ProjectReference->'%(Filename)')" />
     </ItemGroup>
     <PropertyGroup>
       <_FmModuleReferenceList>@(_FmModuleReference)</_FmModuleReferenceList>
+      <_FmModuleProvenancePath Condition="'$(GenerateSourceModelProvenance)' == 'true'">$([MSBuild]::NormalizePath('$(MSBuildProjectDirectory)', '$(SourceModelProvenancePath)'))</_FmModuleProvenancePath>
     </PropertyGroup>
     <ItemGroup>
       <DeploymentModuleInfo Include="$(MSBuildProjectName)">
-        <ManifestPath>$(SourceModelManifestPath)</ManifestPath>
+        <!-- Full paths: the Host task reads these files from another directory. -->
+        <ManifestPath>$([MSBuild]::NormalizePath('$(MSBuildProjectDirectory)', '$(SourceModelManifestPath)'))</ManifestPath>
+        <ProvenancePath>$(_FmModuleProvenancePath)</ProvenancePath>
         <AssemblyPath>$(TargetPath)</AssemblyPath>
         <IsRoot>$(IsDatabaseRootModule)</IsRoot>
         <References>$(_FmModuleReferenceList)</References>

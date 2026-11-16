@@ -155,6 +155,7 @@ VersionInfo tables make mechanically possible.
 | `HostManifestFile` | *(empty)* | Ship a hand-authored manifest verbatim |
 | `HostManifestFileName` | `$(MSBuildProjectName).host.json` | Output name |
 | `TreatHostWarningsAsErrors` | `false` | Promote FMSDK2xx warnings |
+| `RequireSourceModelProvenance` | `false` | Make `FMSDK211` and `FMSDK212` errors |
 | `GenerateMigrationHost` | `false` | Reserved: `OutputType=Exe` entry-point generation over `FluentMigrator.Runner.Host` |
 
 Diagnostics: `FMSDK201` declared order contradicts the reference graph (warn),
@@ -163,4 +164,17 @@ Diagnostics: `FMSDK201` declared order contradicts the reference graph (warn),
 `FMSDK206` custom manifest file missing (error), `FMSDK207` unknown host
 context (error), `FMSDK208` no runner registered for a target's dialect (warn),
 `FMSDK209` a module listed twice in a target's `Modules` (error), `FMSDK210` the
-modules of a target without a `Dialect` declare different dialects (warn).
+modules of a target without a `Dialect` declare different dialects (warn),
+`FMSDK211` a module's source model manifest has no provenance beside it (warn),
+`FMSDK212` a module's manifest doesn't have the SHA-256 its provenance records
+(warn). `FMSDK211` and `FMSDK212` are errors with `RequireSourceModelProvenance`.
+
+## Module provenance
+
+Each module's source model manifest comes with a provenance file (see
+FluentMigrator.Net.Sdk's README, "Provenance") that records how it was produced
+and its SHA-256. The host accepts a module manifest only with that provenance
+beside it and with the hash it records; otherwise it warns, or fails with
+`RequireSourceModelProvenance=true`. Each module entry in the host manifest
+records `sourceModelSha256`, so the chain of hashes runs from the host manifest
+to each module manifest, and from there to its provenance.
