@@ -30,8 +30,9 @@
 //    CRLF becomes LF before hashing. A Windows checkout with core.autocrlf and
 //    a Linux CI run then agree, and so does the onChange facet keyed off them.
 //  - Paths never leak the build machine. A file outside SourceModelRoot is
-//    recorded by its Link metadata, or else relative to the root with '../'
-//    (FMSDK103 warns about the latter).
+//    recorded by its Link metadata, or else relative to the root with '../';
+//    on another drive or network share, where no relative path exists, by its
+//    file name (FMSDK103 warns about both).
 //
 // Classification is driven entirely by pivot metadata on the items
 // (ObjectType, NamePolicy, Role, ContentType, UniqueIdentity), declared in
@@ -298,13 +299,17 @@ namespace FluentMigrator.Net.Sdk.Tasks
         /// The path the manifest records: relative to SourceModelRoot, with '/'
         /// separators. A file outside the root is recorded by its Link metadata
         /// (the item's path in the project, which MSBuild uses for exactly this),
-        /// or else relative to the root with '../' and an FMSDK103 warning. An
-        /// absolute path would make the committed manifest differ per machine.
+        /// or else relative to the root with '../' and an FMSDK103 warning. A
+        /// file on another drive or network share has no relative path, so it
+        /// is recorded by its file name, again with FMSDK103. An absolute path
+        /// would make the committed manifest differ per machine.
         private string ManifestPathFor(ITaskItem item, string rootWithSeparator, string fullPath)
         {
-            if (fullPath.StartsWith(rootWithSeparator, StringComparison.OrdinalIgnoreCase))
+            string root = WithoutExtendedPrefix(rootWithSeparator);
+            string file = WithoutExtendedPrefix(fullPath);
+            if (file.StartsWith(root, PathComparison))
             {
-                return fullPath.Substring(rootWithSeparator.Length).Replace('\\', '/');
+                return file.Substring(root.Length).Replace('\\', '/');
             }
 
             string link = item.GetMetadata("Link");
@@ -313,32 +318,81 @@ namespace FluentMigrator.Net.Sdk.Tasks
                 return link.Replace('\\', '/');
             }
 
-            string rel = RelativeTo(rootWithSeparator, fullPath);
+            string rel = RelativeTo(root, file);
+            if (rel != null)
+            {
+                Report("FMSDK103",
+                    "'" + rel + "' is outside SourceModelRoot, so the manifest records it relative to the root. " +
+                    "Set Link metadata on the item to give it a path inside the project.", true);
+                return rel;
+            }
+
+            string name = Path.GetFileName(file);
             Report("FMSDK103",
-                "'" + rel + "' is outside SourceModelRoot, so the manifest records it relative to the root. " +
+                "'" + fullPath + "' is on a different drive or network share from SourceModelRoot, so no relative " +
+                "path exists and the manifest records only its file name, '" + name + "'. " +
                 "Set Link metadata on the item to give it a path inside the project.", true);
-            return rel;
+            return name;
         }
 
+        /// Windows paths compare without case; elsewhere, case is significant.
+        private static readonly StringComparison PathComparison =
+            Path.DirectorySeparatorChar == '\\' ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+
+        /// \\?\C:\x and \\?\UNC\server\share\x name the same files as C:\x and
+        /// \\server\share\x; dropping the prefix lets them compare equal.
+        private static string WithoutExtendedPrefix(string path)
+        {
+            if (path.StartsWith(@"\\?\UNC\", StringComparison.OrdinalIgnoreCase))
+            {
+                return @"\\" + path.Substring(8);
+            }
+            if (path.StartsWith(@"\\?\", StringComparison.Ordinal) || path.StartsWith(@"\\.\", StringComparison.Ordinal))
+            {
+                return path.Substring(4);
+            }
+            return path;
+        }
+
+        /// The '../' path from the root directory to a file, or null when the two
+        /// have different path roots: another drive (C:\ vs D:\) or another share
+        /// (\\server\a vs \\server\b, or the same share under another host name).
+        /// A share's root is the share itself, so '..' can't climb from one share
+        /// into another, and a relative path between them would name a different file.
         private static string RelativeTo(string rootWithSeparator, string fullPath)
         {
-            var rootUri = new Uri(rootWithSeparator);
-            var fileUri = new Uri(fullPath);
-            if (!string.Equals(rootUri.Scheme, fileUri.Scheme, StringComparison.OrdinalIgnoreCase)
-                || !string.Equals(rootUri.Host, fileUri.Host, StringComparison.OrdinalIgnoreCase))
+            string rootRoot = Path.GetPathRoot(rootWithSeparator);
+            string fileRoot = Path.GetPathRoot(fullPath);
+            if (string.IsNullOrEmpty(rootRoot)
+                || !string.Equals(rootRoot.TrimEnd('\\', '/'), fileRoot.TrimEnd('\\', '/'), PathComparison))
             {
-                return Path.GetFileName(fullPath);
+                return null;
             }
 
-            Uri relative = rootUri.MakeRelativeUri(fileUri);
-            if (relative.IsAbsoluteUri)
+            char[] separators = { '\\', '/' };
+            string[] from = rootWithSeparator.Substring(rootRoot.Length).Split(separators, StringSplitOptions.RemoveEmptyEntries);
+            string[] to = fullPath.Substring(fileRoot.Length).Split(separators, StringSplitOptions.RemoveEmptyEntries);
+
+            int common = 0;
+            while (common < from.Length && common < to.Length - 1 && string.Equals(from[common], to[common], PathComparison))
             {
-                // Another drive: no relative path exists, and the absolute one
-                // is exactly what must not reach the manifest.
-                return Path.GetFileName(fullPath);
+                common++;
             }
 
-            return Uri.UnescapeDataString(relative.ToString()).Replace('\\', '/');
+            var rel = new StringBuilder();
+            for (int i = common; i < from.Length; i++)
+            {
+                rel.Append("../");
+            }
+            for (int i = common; i < to.Length; i++)
+            {
+                if (i > common)
+                {
+                    rel.Append('/');
+                }
+                rel.Append(to[i]);
+            }
+            return rel.ToString();
         }
 
         private static string Display(ModelObject obj)

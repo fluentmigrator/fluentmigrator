@@ -177,8 +177,11 @@ checkout:
   two steps before hashing.
 - **Paths are relative.** `path` is relative to `SourceModelRoot` (the project
   directory by default). A file outside it is recorded by its `Link`
-  metadata, or else relative to the root with `../` and an `FMSDK103` warning;
-  an absolute path never reaches the manifest.
+  metadata, or else relative to the root with `../` and an `FMSDK103` warning.
+  A file on another drive or network share (`\\server\b` from a project on
+  `\\server\a`, say) has no relative path, so it is recorded by its file name,
+  again with `FMSDK103`; give it `Link` metadata to choose its path. An
+  absolute path never reaches the manifest.
 
 The manifest is rebuilt whenever anything it's made from changes: the set of
 files, a file's content, an item's classification metadata (even when an

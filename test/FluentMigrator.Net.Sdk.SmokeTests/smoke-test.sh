@@ -274,6 +274,37 @@ rm -rf "$SHARED"
 build "$ADVENTURE" > /dev/null
 assert_count "$MANIFEST" '"provider": "sql"' 14 "back to 14 objects without the shared file"
 
+section "FMSDK103 other drives and network shares (Windows only)"
+# Regression: only the URI host was compared, so a file on another share of
+# the same server got '../../shareB/...', a path that names a different file
+# ('..' stops at a share's root). Such a file has no relative path; it is
+# recorded by its file name. Exercised through this machine's admin shares,
+# so it runs only where \\localhost\<drive>$ is reachable, not on Linux CI.
+WIN_ROOT=$(cygpath -w "$REPO_ROOT" 2>/dev/null || true)
+DRIVE=${WIN_ROOT%%:*}
+if [ -n "$WIN_ROOT" ] && [ -d "//localhost/$DRIVE\$/" ] && [ -f '//localhost/ADMIN$/win.ini' ]; then
+  UNC_ROOT="\\\\localhost\\$DRIVE\$${WIN_ROOT#?:}"
+  UNC_ADVENTURE="$UNC_ROOT\\$(cygpath -w "$ADVENTURE")"
+  UNC_SHARED_FILE="$UNC_ROOT\\$(cygpath -w "$SHARED")\\sales.v_shared.sql"
+  mkdir -p "$SHARED"
+  printf 'CREATE VIEW sales.v_shared AS SELECT 1 AS one;\n' > "$SHARED/sales.v_shared.sql"
+  extra_targets "<ItemGroup><SqlObject Include=\"$UNC_SHARED_FILE\" ObjectType=\"view\" NamePolicy=\"SchemaDotObject\" UniqueIdentity=\"true\" Execution=\"onChange\" /></ItemGroup>"
+  SHARE_OUT=$(build_extra "$ADVENTURE" 2>&1 || true)
+  assert_object "$MANIFEST" "sales.v_shared.sql" '"name": "v_shared"' "a local project records a file on a share by its file name"
+  if printf '%s' "$SHARE_OUT" | grep "FMSDK103" | grep -q "different drive or network share"; then pass "with FMSDK103 saying why"; else fail "FMSDK103 expected for a file on a share"; fi
+  SAME_SHARE_OUT=$(build_extra "$UNC_ADVENTURE" 2>&1 || true)
+  assert_object "$MANIFEST" "../shared-smoke/sales.v_shared.sql" '"name": "v_shared"' "a project and file on the same share get a relative path"
+  extra_targets '<ItemGroup><SqlObject Include="\\localhost\ADMIN$\win.ini" ObjectType="view" NamePolicy="SchemaDotObject" UniqueIdentity="true" Execution="onChange" /></ItemGroup>'
+  OTHER_SHARE_OUT=$(build_extra "$UNC_ADVENTURE" 2>&1 || true)
+  assert_contains "$MANIFEST" '"path": "win.ini"' "a file on another share of the same server is recorded by its file name"
+  if printf '%s' "$OTHER_SHARE_OUT" | grep "FMSDK103" | grep -q "different drive or network share"; then pass "with FMSDK103 saying why"; else fail "FMSDK103 expected for a file on another share"; fi
+  if grep -qaE '"path": "(/|[A-Za-z]:|\\\\)' "$MANIFEST"; then fail "an absolute or UNC path reached the manifest"; else pass "no absolute or UNC path in the manifest"; fi
+  rm -rf "$SHARED"
+  build "$ADVENTURE" > /dev/null
+else
+  printf '  skip no \\\\localhost admin share on this machine\n'
+fi
+
 section "FMSDK104 execution facet spelling"
 # Regression: Execution was copied verbatim, so "OnChange" or a typo produced
 # a manifest that no longer compared with others.
