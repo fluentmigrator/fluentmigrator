@@ -16,6 +16,7 @@
 //
 #endregion
 
+using FluentMigrator.Generation;
 using FluentMigrator.Runner.Generators.Generic;
 
 namespace FluentMigrator.Runner.Generators.Oracle
@@ -29,6 +30,29 @@ namespace FluentMigrator.Runner.Generators.Oracle
     /// </remarks>
     public class OracleDescriptionGenerator : GenericDescriptionGenerator
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OracleDescriptionGenerator"/> class
+        /// that writes table and column names as given.
+        /// </summary>
+        public OracleDescriptionGenerator()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OracleDescriptionGenerator"/> class
+        /// that quotes table and column names with <paramref name="quoter"/>, as the generator does.
+        /// </summary>
+        /// <param name="quoter">The quoter used for table and column names.</param>
+        public OracleDescriptionGenerator(IQuoter quoter)
+        {
+            Quoter = quoter;
+        }
+
+        /// <summary>
+        /// Gets the quoter used for table and column names, or <c>null</c> when they are written as given.
+        /// </summary>
+        protected IQuoter Quoter { get; }
+
         #region Constants
 
         private const string TableDescriptionTemplate = "COMMENT ON TABLE {0} IS '{1}'";
@@ -38,6 +62,9 @@ namespace FluentMigrator.Runner.Generators.Oracle
 
         private string GetFullTableName(string schemaName, string tableName)
         {
+            if (Quoter != null)
+                return Quoter.QuoteTableName(tableName, schemaName);
+
             return string.IsNullOrEmpty(schemaName)
                ? tableName
                : string.Format("{0}.{1}", schemaName, tableName);
@@ -66,7 +93,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
             return string.Format(
                 ColumnDescriptionTemplate,
                 GetFullTableName(schemaName, tableName),
-                columnName,
+                Quoter?.QuoteColumnName(columnName) ?? columnName,
                 columnDescription.Replace("'", "''"));
         }
     }

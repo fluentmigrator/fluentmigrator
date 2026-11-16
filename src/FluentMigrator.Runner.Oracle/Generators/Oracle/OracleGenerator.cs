@@ -60,7 +60,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
         public OracleGenerator(
             [NotNull] OracleQuoterBase quoter,
             [NotNull] IOptions<GeneratorOptions> generatorOptions)
-            : base(new OracleColumn(quoter), quoter, new OracleDescriptionGenerator(), generatorOptions)
+            : base(new OracleColumn(quoter), quoter, new OracleDescriptionGenerator(quoter), generatorOptions)
         {
         }
 
@@ -69,7 +69,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
             [NotNull] IColumn column,
             [NotNull] OracleQuoterBase quoter,
             [NotNull] IOptions<GeneratorOptions> generatorOptions)
-            : base(column, quoter, new OracleDescriptionGenerator(), generatorOptions)
+            : base(column, quoter, new OracleDescriptionGenerator(quoter), generatorOptions)
         {
         }
 

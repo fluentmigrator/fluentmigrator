@@ -138,6 +138,16 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
+        public void CanAlterTableWithDescriptionWhenTableNameIsAKeyword()
+        {
+            var expression = GeneratorTestHelper.GetAlterTableWithDescriptionExpression();
+            expression.TableName = "Order";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("COMMENT ON TABLE \"Order\" IS 'TestDescription';");
+        }
+
+        [Test]
         public void CanAlterTableWithoutAnyDescripion()
         {
             var expression = GeneratorTestHelper.GetAlterTable();
