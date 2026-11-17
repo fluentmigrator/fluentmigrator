@@ -19,23 +19,25 @@ describing the full database object model.
 
 This SDK ships on the same release train as the FluentMigrator runtime
 libraries, the way `Microsoft.NET.Sdk` ships with the .NET SDK it belongs to.
-Pin it once in `global.json` and every project gets it without repeating a
-version:
+While it is a preview, its version adds a prerelease label to the runtime
+libraries' version: with FluentMigrator 9.0.0, it is 9.0.0-alpha.1. Pin it
+once in `global.json` and every project gets it without repeating a version:
 
 ```json
 {
   "msbuild-sdks": {
-    "FluentMigrator.Net.Sdk": "9.0.0",
-    "FluentMigrator.Net.Sdk.Host": "9.0.0"
+    "FluentMigrator.Net.Sdk": "9.0.0-alpha.1",
+    "FluentMigrator.Net.Sdk.Host": "9.0.0-alpha.1"
   }
 }
 ```
 
-Use the same version as the `FluentMigrator` packages you reference. Pinning
-inline instead — `<Project Sdk="FluentMigrator.Net.Sdk/9.0.0">` — works too and
-is the right choice for a single project. Because the version matches the
-runtime libraries, the implicit `FluentMigrator` reference this SDK emits (see
-Central Package Management below) lines up with the SDK by construction.
+Use the same major.minor.patch as the `FluentMigrator` packages you reference,
+and the same version for both SDKs. Pinning inline instead —
+`<Project Sdk="FluentMigrator.Net.Sdk/9.0.0-alpha.1">` — works too and is the
+right choice for a single project. Because the version follows the runtime
+libraries, the implicit `FluentMigrator` reference this SDK emits (see Central
+Package Management below) lines up with the SDK by construction.
 
 Design rationale is recorded in
 [`adr/proposed/SourceControlledDatabaseModel.md`](https://github.com/fluentmigrator/fluentmigrator/blob/main/adr/proposed/SourceControlledDatabaseModel.md).

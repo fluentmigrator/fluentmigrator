@@ -11,6 +11,8 @@
     pinning FluentMigrator.Net.Sdk pins one number, and the implicit
     FluentMigrator reference it emits lines up with it. Hence no <Version>
     here — Global.props supplies VersionPrefix, and CI's -p:Version wins.
+    NetSdkPackage.props adds the preview's prerelease label to PackageVersion
+    (9.0.0-alpha.1 with FluentMigrator 9.0.0).
   -->
 
   <PropertyGroup>
@@ -22,6 +24,7 @@
   </PropertyGroup>
 
   <Import Project="$(MSBuildThisFileDirectory)../../PackageTool.props" />
+  <Import Project="$(MSBuildThisFileDirectory)../../NetSdkPackage.props" />
 
   <PropertyGroup>
     <!-- This package's own README, not the shared docs/README-nuget.md. -->

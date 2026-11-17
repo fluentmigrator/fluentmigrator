@@ -12,8 +12,9 @@
     </Project>
 
   with the version pinned once in global.json under "msbuild-sdks" — the SDK
-  ships on the FluentMigrator release train, so it is the same version as the
-  FluentMigrator packages the project references.
+  ships on the FluentMigrator release train, so it has the same major.minor.patch
+  as the FluentMigrator packages the project references, with a prerelease
+  label while it is a preview (9.0.0-alpha.1 with FluentMigrator 9.0.0).
 
   The migration/seed classes here are deliberately dependency-free stubs:
   the sample exercises the SDK's classification and manifest pipeline, not

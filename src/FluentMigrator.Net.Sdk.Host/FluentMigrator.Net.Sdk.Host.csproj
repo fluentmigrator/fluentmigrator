@@ -12,7 +12,9 @@
     -p:Version wins. It also means this SDK and FluentMigrator.Net.Sdk are
     always pinned to the same number, which matters: the two halves share a
     manifest contract (GetDeploymentModuleInfo) that has no other version
-    negotiation.
+    negotiation. NetSdkPackage.props, which both csprojs import, adds the
+    preview's prerelease label to PackageVersion (9.0.0-alpha.1 with
+    FluentMigrator 9.0.0).
   -->
 
   <PropertyGroup>
@@ -24,6 +26,7 @@
   </PropertyGroup>
 
   <Import Project="$(MSBuildThisFileDirectory)../../PackageTool.props" />
+  <Import Project="$(MSBuildThisFileDirectory)../../NetSdkPackage.props" />
 
   <PropertyGroup>
     <!-- This package's own README, not the shared docs/README-nuget.md. -->

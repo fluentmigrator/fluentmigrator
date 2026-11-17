@@ -39,6 +39,11 @@ The SDK ships on the FluentMigrator release train and is pinned in
 project two numbers to reconcile and a matrix to support. One number, and the
 reference it emits lines up by construction.
 
+While the SDKs are previews, both add a prerelease label to that number
+(9.0.0-alpha.1 with FluentMigrator 9.0.0), so their early versions are marked
+as previews on NuGet without leaving the release train. `NetSdkPackage.props`
+sets the label for both, and removing it ships them stable.
+
 The project is a *real* class library: migrations, maintenance migrations and
 seed implementations compile into the assembly through the normal `Compile`
 glob; scripts and data embed as resources. The manifest classifies rather than

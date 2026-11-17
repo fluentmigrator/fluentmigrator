@@ -668,14 +668,31 @@ section "pack"
 # <Version> of its own. Packing with an explicit -p:Version, the way CI does,
 # is therefore also the regression test for that: a reintroduced hardcoded
 # version would win over this and the assertions below would name the wrong file.
+#
+# While the SDKs are previews, NetSdkPackage.props adds its prerelease label to
+# PackageVersion, after dropping the prerelease part of -p:Version (GitVersion's
+# on an untagged commit). The label is read from the project, so these
+# assertions hold whatever it is, and once it is removed.
 PACK_VERSION=9.9.9-smoketest
+LABEL=$(dotnet msbuild src/FluentMigrator.Net.Sdk -getProperty:NetSdkPrereleaseLabel | tr -d '\r')
+HOST_LABEL=$(dotnet msbuild src/FluentMigrator.Net.Sdk.Host -getProperty:NetSdkPrereleaseLabel | tr -d '\r')
+if [ "$HOST_LABEL" = "$LABEL" ]; then pass "both SDKs carry the same prerelease label ('$LABEL')"
+else fail "both SDKs carry the same prerelease label (Net.Sdk '$LABEL', Host '$HOST_LABEL')"; fi
+EXPECTED_VERSION=$PACK_VERSION
+[ -n "$LABEL" ] && EXPECTED_VERSION="9.9.9-$LABEL"
 dotnet pack src/FluentMigrator.Net.Sdk      -c Release -o "$FEED" -v:minimal -p:Version=$PACK_VERSION
 dotnet pack src/FluentMigrator.Net.Sdk.Host -c Release -o "$FEED" -v:minimal -p:Version=$PACK_VERSION
 ls -la "$FEED"
-assert_file "$FEED/FluentMigrator.Net.Sdk.$PACK_VERSION.nupkg" \
-  "FluentMigrator.Net.Sdk packs on the version the build was given"
-assert_file "$FEED/FluentMigrator.Net.Sdk.Host.$PACK_VERSION.nupkg" \
-  "FluentMigrator.Net.Sdk.Host packs on the version the build was given"
+assert_file "$FEED/FluentMigrator.Net.Sdk.$EXPECTED_VERSION.nupkg" \
+  "FluentMigrator.Net.Sdk packs on the version the build was given, with the preview label"
+assert_file "$FEED/FluentMigrator.Net.Sdk.Host.$EXPECTED_VERSION.nupkg" \
+  "FluentMigrator.Net.Sdk.Host packs on the version the build was given, with the preview label"
+# Without the label, the packages are exactly the version the build was given.
+STABLE_FEED="$SCRATCH/feed-stable"
+dotnet pack src/FluentMigrator.Net.Sdk      -c Release -o "$STABLE_FEED" -v:minimal -p:Version=9.9.9 -p:NetSdkPrereleaseLabel=
+dotnet pack src/FluentMigrator.Net.Sdk.Host -c Release -o "$STABLE_FEED" -v:minimal -p:Version=9.9.9 -p:NetSdkPrereleaseLabel=
+assert_file "$STABLE_FEED/FluentMigrator.Net.Sdk.9.9.9.nupkg"      "an empty NetSdkPrereleaseLabel packs Net.Sdk stable"
+assert_file "$STABLE_FEED/FluentMigrator.Net.Sdk.Host.9.9.9.nupkg" "and Net.Sdk.Host"
 
 # ------------------------------------------------------------------ summary
 

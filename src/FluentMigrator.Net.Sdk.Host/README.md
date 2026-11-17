@@ -14,7 +14,9 @@ door reinventing composition.
 Both SDKs ship on the same release train as the FluentMigrator runtime
 libraries and must be pinned to the same version as each other — they share a
 manifest contract (`GetDeploymentModuleInfo`) with no other version
-negotiation. Pin them together in `global.json`; see the
+negotiation. While they are previews, both add the same prerelease label to the
+runtime libraries' version (9.0.0-alpha.1 with FluentMigrator 9.0.0). Pin them
+together in `global.json`; see the
 [`FluentMigrator.Net.Sdk`](https://www.nuget.org/packages/FluentMigrator.Net.Sdk)
 readme.
 
