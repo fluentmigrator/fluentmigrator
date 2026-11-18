@@ -15,7 +15,7 @@ Some key features of FluentMigrator include:
 For a brief overview on getting started with FluentMigrator, please see the documentation links here:
 
 - [FluentMigrator Docs](https://fluentmigrator.github.io/index.html)
-- [FluentMigrator Introduction](https://fluentmigrator.github.io/articles/intro.html)
+- [FluentMigrator Introduction](https://fluentmigrator.github.io/intro/quick-start.html)
 
 ### Installation
 
@@ -56,7 +56,7 @@ We welcome your feedback, bug reports, and contributions to FluentMigrator.
 
 - To report a bug or request a feature, please [open an issue](https://github.com/fluentmigrator/fluentmigrator/issues) on our GitHub repository.
 
-If you'd like to contribute to the project, please follow our [contributing guidelines](https://fluentmigrator.github.io/articles/guides/contribution.html).
+If you'd like to contribute to the project, please follow our [contributing guidelines](https://fluentmigrator.github.io/intro/contributing.html).
 
 ## License
 
