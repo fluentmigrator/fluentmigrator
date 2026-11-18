@@ -86,7 +86,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         public void ResourceFinderIsCaseInsensitive()
         {
             var provider = new DefaultEmbeddedResourceProvider(Assembly.GetExecutingAssembly());
-            var expression = new ExecuteEmbeddedSqlScriptExpression(new[] { provider }) { SqlScript = TestSqlScript.ToUpper() };
+            var expression = new ExecuteEmbeddedSqlScriptExpression(new[] { provider }) { SqlScript = TestSqlScript.ToUpperInvariant() };
             var processor = new Mock<IMigrationProcessor>();
             processor.Setup(x => x.Execute(ScriptContents)).Verifiable();
 

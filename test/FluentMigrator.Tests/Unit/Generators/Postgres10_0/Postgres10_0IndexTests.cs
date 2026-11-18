@@ -33,7 +33,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres10_0
             });
 
             var result = Generator.Generate(expression);
-            result.ShouldBe($"CREATE INDEX \"TestIndex\" ON \"public\".\"TestTable1\" (\"TestColumn1\" ASC) WITH ( BUFFERING = {buffering.ToString().ToUpper()} );");
+            result.ShouldBe($"CREATE INDEX \"TestIndex\" ON \"public\".\"TestTable1\" (\"TestColumn1\" ASC) WITH ( BUFFERING = {buffering.ToString().ToUpperInvariant()} );");
         }
 
         [Test]
