@@ -1,0 +1,17 @@
+<Project>
+
+  <!-- dotnet fm. ReferenceKind=tool: installed with `dotnet tool install`
+       and invoked out of process, so this pack contributes no reference. -->
+
+  <ItemGroup>
+    <HostContextDefinition Include="dotnet-cli"
+                           Package="FluentMigrator.DotNet.Cli"
+                           ReferenceKind="tool"
+                           Invocation="argv"
+                           Availability="shipping"
+                           Discovery="true"
+                           Version="$(DotNetCliHostContextVersion)"
+                           Description="dotnet fm — the reference argv adapter every other context is checked against." />
+  </ItemGroup>
+
+</Project>

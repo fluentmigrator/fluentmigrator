@@ -1,0 +1,33 @@
+<Project>
+
+  <!--
+    The package version of FluentMigrator.Net.Sdk and FluentMigrator.Net.Sdk.Host.
+    Both csprojs import this one file, so the two always carry the same version:
+    they share a manifest contract (GetDeploymentModuleInfo) with no other
+    version negotiation.
+
+    The SDKs take major.minor.patch from the runtime libraries' release train
+    and, while they are previews, add a prerelease label of their own: with
+    FluentMigrator 9.0.0 they are 9.0.0-alpha.1.
+
+    CI packs with -p:Version, a global property that no project file can
+    override, so the label goes into PackageVersion, which CI doesn't set. Any
+    prerelease part of Version is dropped first: GitVersion's 9.0.0-1 on an
+    untagged commit gives 9.0.0-alpha.1 too. Without -p:Version (a local pack)
+    the base is Global.props' VersionPrefix.
+
+    To ship the SDKs stable, delete NetSdkPrereleaseLabel: PackageVersion then
+    defaults to $(Version), as for every other package. -p:NetSdkPrereleaseLabel=
+    does the same for a single pack.
+  -->
+  <PropertyGroup>
+    <NetSdkPrereleaseLabel>alpha.1</NetSdkPrereleaseLabel>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(NetSdkPrereleaseLabel)' != ''">
+    <_NetSdkBaseVersion>$(Version)</_NetSdkBaseVersion>
+    <_NetSdkBaseVersion Condition="'$(_NetSdkBaseVersion)' == ''">$(VersionPrefix)</_NetSdkBaseVersion>
+    <PackageVersion>$([System.Text.RegularExpressions.Regex]::Replace('$(_NetSdkBaseVersion)', '[-+].*$', ''))-$(NetSdkPrereleaseLabel)</PackageVersion>
+  </PropertyGroup>
+
+</Project>

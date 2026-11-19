@@ -1,0 +1,16 @@
+<Project>
+
+  <!-- Migrate.exe. ReferenceKind=tool: invoked out of process, no reference. -->
+
+  <ItemGroup>
+    <HostContextDefinition Include="console"
+                           Package="FluentMigrator.Console"
+                           ReferenceKind="tool"
+                           Invocation="argv-legacy"
+                           Availability="shipping"
+                           Discovery="false"
+                           Version="$(ConsoleHostContextVersion)"
+                           Description="Migrate.exe — legacy /option argv rewritten onto the same commands for back-compat." />
+  </ItemGroup>
+
+</Project>

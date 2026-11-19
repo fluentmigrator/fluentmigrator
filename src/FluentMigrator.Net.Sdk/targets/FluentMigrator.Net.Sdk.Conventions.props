@@ -1,0 +1,131 @@
+<Project>
+
+  <!--
+    Source model pivots.
+
+    Analogous in spirit to .NET artifacts-output pivots, but for INPUTS:
+    one fixed, deterministic layout rather than inference over multiple
+    possible matches. Each pivot is a single glob carrying its own
+    classification metadata. Extension = declaring more pivots (by users or
+    by provider packages such as a future dbt/LookML provider), never by
+    teaching the SDK new heuristics.
+
+      Maintenance/**/*.cs                       maintenance migrations (compiled)
+      Migrations/**/*.cs                        migrations (compiled)
+      Migrations/Data/**/*.csv                  data files loaded by migrations (embedded)
+      Migrations/Scripts/**/*.sql               scripts run by migrations (embedded by
+                                                default; ContentType=External copies to
+                                                output instead)
+      Schema/Functions/[schema].[object].sql        functions (scalar/table-valued/aggregate)
+      Schema/StoredProcedures/[schema].[object].sql stored procedures
+      Schema/Triggers/[schema].[object].sql         triggers
+      Schema/Views/[schema].[object].sql            views
+      Schema/Types/[schema].[object].sql            user-defined types (table types, scalar
+                                                    types, CLR/component types)
+      Seed/**/*.csv                             seed data
+      Seed/**/*.cs                              ISeed implementations (compiled)
+      Tools/CreateDatabase.sql                  creates the database container
+      Tools/DatabaseSchema.sql                  baseline: full transitive closure of objects
+
+    Filename policy for Schema/* pivots is SchemaDotObject: the segment
+    before the first '.' is the schema, the rest is the object name.
+    A filename with no schema segment falls back to $(DefaultSchema).
+
+    Note there is deliberately no Schema/Tables pivot: tables evolve through
+    migrations; Schema/ holds idempotently re-creatable programmable objects.
+  -->
+
+  <PropertyGroup>
+    <SourceModelRoot Condition="'$(SourceModelRoot)' == ''">$(MSBuildProjectDirectory)/</SourceModelRoot>
+    <DatabaseDialect Condition="'$(DatabaseDialect)' == ''">generic</DatabaseDialect>
+
+    <!--
+      Layout convention (a dialect of the sql provider): 'fluentmigrator'
+      (default pivots) or 'flyway' (V__/U__/R__/B__ prefixed flat layout).
+      May also be a path to a custom convention props file.
+    -->
+    <SourceModelConvention Condition="'$(SourceModelConvention)' == ''">fluentmigrator</SourceModelConvention>
+
+    <!--
+      Fallback schema for SchemaDotObject-policy files without a schema
+      segment. Empty by default (any concrete default is a dialect opinion).
+      Exposed to Roslyn source generators below: overriding it lets the
+      FluentMigrator generator emit a matching convention set
+      (build_property.DefaultSchema in AnalyzerConfigOptions.GlobalOptions).
+    -->
+    <DefaultSchema Condition="'$(DefaultSchema)' == ''"></DefaultSchema>
+
+    <EnableDefaultSourceModelItems Condition="'$(EnableDefaultSourceModelItems)' == ''">true</EnableDefaultSourceModelItems>
+    <GenerateSourceModelManifest Condition="'$(GenerateSourceModelManifest)' == ''">true</GenerateSourceModelManifest>
+    <TreatSourceModelWarningsAsErrors Condition="'$(TreatSourceModelWarningsAsErrors)' == ''">false</TreatSourceModelWarningsAsErrors>
+    <SourceModelManifestFileName Condition="'$(SourceModelManifestFileName)' == ''">$(MSBuildProjectName).sourcemodel.json</SourceModelManifestFileName>
+
+    <!--
+      Root module: the one module per database permitted to carry Tools/
+      (CreateDatabase.sql, DatabaseSchema.sql baseline) and shared
+      Maintenance/ migrations with database-wide scope. Self-declared, never
+      inferred; the Host SDK validates exactly-one-root-first per target.
+    -->
+    <IsDatabaseRootModule Condition="'$(IsDatabaseRootModule)' == ''">false</IsDatabaseRootModule>
+
+    <!--
+      Per-module VersionInfo table (scenario: one module per team/schema,
+      each with its own migration history). Compiler-visible so the
+      FluentMigrator source generator can emit the IVersionTableMetaData
+      implementation; two properties instead of a hand-written class.
+
+      The defaults are resolved in the Manifest targets, not here:
+      VersionTableSchema falls back to $(DefaultSchema), which the project
+      body has not set yet at this point in evaluation.
+    -->
+  </PropertyGroup>
+
+  <!--
+    Convention seam: a convention is a layout dialect within a provider.
+    Same provider (sql), different mapping of paths/filenames to the object
+    model.
+
+    Every built-in pack is imported here and stamps its items with
+    Convention metadata; the SelectSourceModelConvention target then keeps
+    only the selected pack's items. Declaring the pivots before the project
+    body is what makes body-level `<MigrationScript Update="..." />` edits
+    work at all — but $(SourceModelConvention) itself is usually set *in*
+    that body, so the choice cannot be an import condition without silently
+    producing an empty model. Declare-then-filter is how the .NET SDK
+    handles EnableDefaultCompileItems for exactly the same reason.
+
+    Custom packs are imported by path from $(CustomSourceModelConventionPacks)
+    (a ';'-separated list). That list is read at import time, so it has to be
+    set before the SDK's props are evaluated — Directory.Build.props or a
+    global property — while $(SourceModelConvention) may be set anywhere.
+  -->
+  <Import Project="$(MSBuildThisFileDirectory)conventions/*.props"
+          Condition="'$(EnableDefaultSourceModelItems)' == 'true'" />
+  <Import Project="$(CustomSourceModelConventionPacks)"
+          Condition="'$(EnableDefaultSourceModelItems)' == 'true' and '$(CustomSourceModelConventionPacks)' != ''" />
+
+  <!--
+    Roslyn source generator contract. The FluentMigrator generator can read:
+      - build_property.DefaultSchema / build_property.DatabaseDialect from
+        AnalyzerConfigOptionsProvider.GlobalOptions (e.g. to generate a
+        convention set matching the overridden default schema), and
+      - the source model files themselves as AdditionalFiles, with
+        ObjectType/NamePolicy/Role available through
+        GetOptions(additionalFile) via CompilerVisibleItemMetadata.
+
+    AdditionalFiles is populated by SelectSourceModelConvention rather than
+    here: at this point every convention's pivots are still present, and the
+    compiler should only ever see the selected one's.
+  -->
+  <ItemGroup>
+    <CompilerVisibleProperty Include="DefaultSchema" />
+    <CompilerVisibleProperty Include="DatabaseDialect" />
+    <CompilerVisibleProperty Include="IsDatabaseRootModule" />
+    <CompilerVisibleProperty Include="VersionTableName" />
+    <CompilerVisibleProperty Include="VersionTableSchema" />
+    <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="ObjectType" />
+    <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="NamePolicy" />
+    <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="Role" />
+  </ItemGroup>
+
+</Project>

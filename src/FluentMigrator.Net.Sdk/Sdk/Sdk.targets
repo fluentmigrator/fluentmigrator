@@ -1,0 +1,17 @@
+<Project>
+
+  <!--
+    The default target framework is resolved here, after the project body, not
+    in Sdk.props: a TargetFrameworks set in the body isn't visible yet when
+    Sdk.props is evaluated, so a default there made every multi-targeting
+    project a single-framework netstandard2.0 build.
+  -->
+  <PropertyGroup>
+    <TargetFramework Condition="'$(TargetFramework)' == '' and '$(TargetFrameworks)' == ''">netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+
+  <Import Project="$(MSBuildThisFileDirectory)../targets/FluentMigrator.Net.Sdk.Manifest.targets" />
+
+</Project>

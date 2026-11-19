@@ -1,0 +1,586 @@
+<Project>
+
+  <PropertyGroup>
+    <SourceModelIntermediateManifestPath>$(IntermediateOutputPath)$(SourceModelManifestFileName)</SourceModelIntermediateManifestPath>
+    <SourceModelManifestPath>$(OutputPath)$(SourceModelManifestFileName)</SourceModelManifestPath>
+    <SourceModelInputsStampPath>$(IntermediateOutputPath)sourcemodel.inputs.txt</SourceModelInputsStampPath>
+
+    <!--
+      Resolved here, not in the Conventions props: the fallback is
+      $(DefaultSchema), which the project body sets after the props have
+      already been evaluated. Getting this wrong is silent — the host
+      manifest simply carries an empty versionTable schema.
+    -->
+    <VersionTableName Condition="'$(VersionTableName)' == ''">VersionInfo</VersionTableName>
+    <VersionTableSchema Condition="'$(VersionTableSchema)' == ''">$(DefaultSchema)</VersionTableSchema>
+
+    <!--
+      The lock file: the committed copy of the manifest, next to the project by
+      default. See the SourceModelLock targets below.
+    -->
+    <GenerateSourceModelLockFile Condition="'$(GenerateSourceModelLockFile)' == ''">false</GenerateSourceModelLockFile>
+    <SourceModelLockedMode Condition="'$(SourceModelLockedMode)' == ''">false</SourceModelLockedMode>
+    <SourceModelLockFilePath Condition="'$(SourceModelLockFilePath)' == ''">$(MSBuildProjectDirectory)/$(MSBuildProjectName).sourcemodel.lock.json</SourceModelLockFilePath>
+
+    <!--
+      Provenance: how the manifest was produced, beside it and separate from
+      it (<Project>.sourcemodel.provenance.json). See the Provenance targets
+      below.
+    -->
+    <GenerateSourceModelProvenance Condition="'$(GenerateSourceModelProvenance)' == ''">true</GenerateSourceModelProvenance>
+    <SourceModelProvenanceFormat Condition="'$(SourceModelProvenanceFormat)' == ''">slsa</SourceModelProvenanceFormat>
+    <SourceModelProvenanceCheckWorkingTree Condition="'$(SourceModelProvenanceCheckWorkingTree)' == ''">false</SourceModelProvenanceCheckWorkingTree>
+    <SourceModelProvenanceBuilderId Condition="'$(SourceModelProvenanceBuilderId)' == ''">https://github.com/fluentmigrator/fluentmigrator/tree/main/src/FluentMigrator.Net.Sdk</SourceModelProvenanceBuilderId>
+    <SourceModelProvenanceFileName>$([System.IO.Path]::GetFileNameWithoutExtension('$(SourceModelManifestFileName)')).provenance.json</SourceModelProvenanceFileName>
+    <SourceModelIntermediateProvenancePath>$(IntermediateOutputPath)$(SourceModelProvenanceFileName)</SourceModelIntermediateProvenancePath>
+    <SourceModelProvenancePath>$(OutputPath)$(SourceModelProvenanceFileName)</SourceModelProvenancePath>
+    <!--
+      The extension point for source control: targets listed here run before
+      the provenance is written and add the SourceModelProvenanceSource item
+      (and SourceModelProvenanceModifiedFile items). Replace the default to
+      describe a VCS other than git.
+    -->
+    <CollectSourceModelProvenanceSourceDependsOn Condition="'$(CollectSourceModelProvenanceSourceDependsOn)' == ''">_CollectGitSourceModelProvenanceSource</CollectSourceModelProvenanceSourceDependsOn>
+  </PropertyGroup>
+
+  <UsingTask TaskName="FluentMigrator.Net.Sdk.Tasks.BuildSourceModel"
+             TaskFactory="RoslynCodeTaskFactory"
+             AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <Task>
+      <Code Type="Class" Language="cs" Source="$(MSBuildThisFileDirectory)../tasks/BuildSourceModel.cs" />
+    </Task>
+  </UsingTask>
+
+  <UsingTask TaskName="FluentMigrator.Net.Sdk.Tasks.SourceModelLock"
+             TaskFactory="RoslynCodeTaskFactory"
+             AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <Task>
+      <Code Type="Class" Language="cs" Source="$(MSBuildThisFileDirectory)../tasks/SourceModelLock.cs" />
+    </Task>
+  </UsingTask>
+
+  <UsingTask TaskName="FluentMigrator.Net.Sdk.Tasks.WriteSourceModelProvenance"
+             TaskFactory="RoslynCodeTaskFactory"
+             AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <Task>
+      <Code Type="Class" Language="cs" Source="$(MSBuildThisFileDirectory)../tasks/SourceModelProvenance.cs" />
+    </Task>
+  </UsingTask>
+
+  <UsingTask TaskName="FluentMigrator.Net.Sdk.Tasks.VerifySourceModel"
+             TaskFactory="RoslynCodeTaskFactory"
+             AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <Task>
+      <Code Type="Class" Language="cs" Source="$(MSBuildThisFileDirectory)../tasks/VerifySourceModel.cs" />
+    </Task>
+  </UsingTask>
+
+  <!--
+    Convention selection. Every built-in pack was imported before the
+    project body so that body-level `Update` edits have items to update;
+    this is where the packs the project did not select are dropped, by the
+    Convention metadata each pivot carries.
+
+    Filtering (rather than a conditional import) is what makes
+    $(SourceModelConvention) settable in the project body at all. Items
+    without Convention metadata are user-declared pivots and are always
+    kept — the property selects among *packs*, it does not police
+    hand-written items.
+  -->
+  <Target Name="SelectSourceModelConvention" BeforeTargets="CoreCompile">
+    <ItemGroup>
+      <SqlObject Remove="@(SqlObject)"
+                 Condition="'%(SqlObject.Convention)' != '' and '%(SqlObject.Convention)' != '$(SourceModelConvention)'" />
+      <MigrationSource Remove="@(MigrationSource)"
+                       Condition="'%(MigrationSource.Convention)' != '' and '%(MigrationSource.Convention)' != '$(SourceModelConvention)'" />
+      <MaintenanceSource Remove="@(MaintenanceSource)"
+                         Condition="'%(MaintenanceSource.Convention)' != '' and '%(MaintenanceSource.Convention)' != '$(SourceModelConvention)'" />
+      <MigrationScript Remove="@(MigrationScript)"
+                       Condition="'%(MigrationScript.Convention)' != '' and '%(MigrationScript.Convention)' != '$(SourceModelConvention)'" />
+      <MigrationData Remove="@(MigrationData)"
+                     Condition="'%(MigrationData.Convention)' != '' and '%(MigrationData.Convention)' != '$(SourceModelConvention)'" />
+      <SeedSource Remove="@(SeedSource)"
+                  Condition="'%(SeedSource.Convention)' != '' and '%(SeedSource.Convention)' != '$(SourceModelConvention)'" />
+      <SeedData Remove="@(SeedData)"
+                Condition="'%(SeedData.Convention)' != '' and '%(SeedData.Convention)' != '$(SourceModelConvention)'" />
+      <DatabaseTool Remove="@(DatabaseTool)"
+                    Condition="'%(DatabaseTool.Convention)' != '' and '%(DatabaseTool.Convention)' != '$(SourceModelConvention)'" />
+    </ItemGroup>
+
+    <!-- Only the surviving pivots reach the compiler as AdditionalFiles. -->
+    <ItemGroup>
+      <AdditionalFiles Include="@(SqlObject);@(MigrationScript);@(MigrationData);@(SeedData);@(DatabaseTool)" />
+      <UpToDateCheckInput Include="@(SqlObject);@(MigrationScript);@(MigrationData);@(SeedData);@(DatabaseTool)" />
+    </ItemGroup>
+  </Target>
+
+  <!--
+    Map content pivots to build actions. Runs at target time (after the
+    project body has evaluated) so per-item Update edits (e.g. flipping a
+    script's ContentType to External) are respected. AssignTargetPaths is
+    the canonical pre-embed/pre-copy hook.
+  -->
+  <Target Name="MapSourceModelContent" BeforeTargets="AssignTargetPaths"
+          DependsOnTargets="SelectSourceModelConvention">
+    <ItemGroup>
+      <None Remove="@(MigrationScript);@(MigrationData);@(SeedData)" />
+
+      <EmbeddedResource Include="@(MigrationScript)"
+                        Condition="'%(MigrationScript.ContentType)' != 'External'" />
+      <Content Include="@(MigrationScript)"
+               CopyToOutputDirectory="PreserveNewest"
+               Condition="'%(MigrationScript.ContentType)' == 'External'" />
+
+      <EmbeddedResource Include="@(MigrationData)" />
+      <EmbeddedResource Include="@(SeedData)" />
+    </ItemGroup>
+  </Target>
+
+  <!--
+    Provider aggregation seam. A future dbt/LookML provider package declares
+    its own pivot items and hooks BeforeTargets="CollectSourceModel" to map
+    them into SourceModelFile with Provider metadata set. The manifest task
+    treats providers uniformly; ObjectType is an open vocabulary.
+  -->
+  <Target Name="CollectSourceModel" DependsOnTargets="SelectSourceModelConvention">
+    <ItemGroup>
+      <SourceModelFile Include="@(SqlObject)"          Provider="sql" />
+      <SourceModelFile Include="@(MigrationSource)"    Provider="sql" />
+      <SourceModelFile Include="@(MaintenanceSource)"  Provider="sql" />
+      <SourceModelFile Include="@(MigrationScript)"    Provider="sql" />
+      <SourceModelFile Include="@(MigrationData)"      Provider="sql" />
+      <SourceModelFile Include="@(SeedSource)"         Provider="sql" />
+      <SourceModelFile Include="@(SeedData)"           Provider="sql" />
+      <SourceModelFile Include="@(DatabaseTool)"       Provider="sql" />
+    </ItemGroup>
+  </Target>
+
+  <!--
+    A timestamp-based up-to-date check cannot see a *deleted* input: remove a
+    view from Schema/ and every surviving input is still older than the
+    manifest, so the target is skipped and the manifest keeps describing an
+    object that no longer exists. For a document whose entire purpose is to be
+    committed and diffed, silently stale is the one unacceptable outcome.
+
+    This stamp file's content is everything the manifest task reads: the input
+    list, each item's classification metadata, the task's property inputs, and
+    each input's content hash. WriteOnlyWhenDifferent touches it exactly when
+    one of those changes, and it joins Inputs below. Timestamps can't be
+    trusted for any of them: not a deleted input, not a property passed with
+    -p: or set in Directory.Build.props or an imported .props file, not an
+    Update in a shared props file that flips an item's ContentType or
+    Execution, and not even a file's content, since a git checkout, a stash pop
+    or a restored CI cache can leave the manifest newer than an input that
+    changed. Each of those used to leave the old manifest in place.
+
+    Hashing reads every input on every build. Pivot files are small, and the
+    manifest task reads them all anyway whenever it runs.
+  -->
+  <Target Name="WriteSourceModelInputsStamp"
+          Condition="'$(GenerateSourceModelManifest)' == 'true'"
+          DependsOnTargets="CollectSourceModel">
+    <!--
+      The manifest is a build output; its file name is only a name. A path here
+      would put it in the source tree, where git and merges change it behind
+      the up-to-date check's back, and make the obj/ and bin/ copies collapse
+      onto one file. The committed copy is the lock file instead.
+    -->
+    <Error Code="FMSDK003"
+           Condition="$(SourceModelManifestFileName.Contains('/')) or $(SourceModelManifestFileName.Contains('\')) or $(SourceModelManifestFileName.Contains('..'))"
+           Text="SourceModelManifestFileName '$(SourceModelManifestFileName)' contains a path. It is a file name: the manifest is a build output in obj/ and bin/. To commit the source model, set GenerateSourceModelLockFile=true (and SourceModelLockFilePath to choose where the lock goes)." />
+    <ItemGroup>
+      <!-- A missing file is FMSDK002, reported by the manifest task; don't let
+           GetFileHash fail on it first with a less useful error. -->
+      <_SourceModelExistingFile Include="@(SourceModelFile)" Condition="Exists('%(FullPath)')" />
+    </ItemGroup>
+    <GetFileHash Files="@(_SourceModelExistingFile)" Algorithm="SHA256" HashEncoding="hex"
+                 Condition="'@(_SourceModelExistingFile)' != ''">
+      <Output TaskParameter="Items" ItemName="_SourceModelFileHash" />
+    </GetFileHash>
+    <ItemGroup>
+      <_SourceModelInputsStampLine Include="property:Root=$(SourceModelRoot)" />
+      <_SourceModelInputsStampLine Include="property:Dialect=$(DatabaseDialect)" />
+      <_SourceModelInputsStampLine Include="property:DefaultSchema=$(DefaultSchema)" />
+      <_SourceModelInputsStampLine Include="property:Convention=$(SourceModelConvention)" />
+      <_SourceModelInputsStampLine Include="property:IsRoot=$(IsDatabaseRootModule)" />
+      <_SourceModelInputsStampLine Include="property:WarningsAsErrors=$(TreatSourceModelWarningsAsErrors)" />
+      <_SourceModelInputsStampLine Include="@(SourceModelFile->'item:%(Identity)|Provider=%(Provider)|ObjectType=%(ObjectType)|UniqueIdentity=%(UniqueIdentity)|NamePolicy=%(NamePolicy)|Schema=%(Schema)|ObjectName=%(ObjectName)|Role=%(Role)|ContentType=%(ContentType)|Execution=%(Execution)|Stage=%(Stage)|Link=%(Link)')" />
+      <_SourceModelInputsStampLine Include="@(_SourceModelFileHash->'hash:%(Identity)=%(FileHash)')" />
+    </ItemGroup>
+    <WriteLinesToFile File="$(SourceModelInputsStampPath)"
+                      Lines="@(_SourceModelInputsStampLine)"
+                      Overwrite="true"
+                      WriteOnlyWhenDifferent="true" />
+    <ItemGroup>
+      <FileWrites Include="$(SourceModelInputsStampPath)" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="BuildSourceModelManifest"
+          Condition="'$(GenerateSourceModelManifest)' == 'true'"
+          AfterTargets="CoreBuild"
+          DependsOnTargets="CollectSourceModel;WriteSourceModelInputsStamp"
+          Inputs="@(SourceModelFile);$(MSBuildProjectFullPath);$(SourceModelInputsStampPath)"
+          Outputs="$(SourceModelIntermediateManifestPath)">
+
+    <BuildSourceModel SourceFiles="@(SourceModelFile)"
+                      ProjectName="$(MSBuildProjectName)"
+                      SourceModelRoot="$(SourceModelRoot)"
+                      Dialect="$(DatabaseDialect)"
+                      DefaultSchema="$(DefaultSchema)"
+                      IsRootModule="$(IsDatabaseRootModule)"
+                      Convention="$(SourceModelConvention)"
+                      ManifestPath="$(SourceModelIntermediateManifestPath)"
+                      TreatValidationWarningsAsErrors="$(TreatSourceModelWarningsAsErrors)" />
+
+    <!--
+      The task leaves an unchanged manifest alone, so that an input change
+      which doesn't change the document (TreatSourceModelWarningsAsErrors, say)
+      doesn't churn it. Its timestamp still has to move past the stamp's, or
+      this target would run on every build from then on.
+    -->
+    <Touch Files="$(SourceModelIntermediateManifestPath)" />
+
+    <ItemGroup>
+      <FileWrites Include="$(SourceModelIntermediateManifestPath)" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="CopySourceModelManifestToOutput"
+          Condition="'$(GenerateSourceModelManifest)' == 'true'"
+          AfterTargets="BuildSourceModelManifest"
+          Inputs="$(SourceModelIntermediateManifestPath)"
+          Outputs="$(SourceModelManifestPath)">
+
+    <Copy SourceFiles="$(SourceModelIntermediateManifestPath)"
+          DestinationFiles="$(SourceModelManifestPath)"
+          SkipUnchangedFiles="true" />
+
+    <ItemGroup>
+      <FileWrites Include="$(SourceModelManifestPath)" />
+    </ItemGroup>
+
+    <Message Importance="normal" Text="Source model manifest -> $(SourceModelManifestPath)" />
+  </Target>
+
+  <!--
+    IncrementalClean runs inside CoreBuild, before the targets above (they run
+    AfterTargets="CoreBuild"), so the FileWrites they add arrive too late to be
+    recorded: dotnet clean never removed a manifest, and turning generation off
+    left the last one in bin/. Registering the paths here, before
+    IncrementalClean and from properties alone, records them in every build
+    that generates them, including one where the manifest target is skipped
+    as up to date; IncrementalClean must never delete a manifest the build
+    still owns. A build that doesn't generate them doesn't register them, so
+    IncrementalClean removes the old ones.
+
+    The hook is CopyFilesToOutputDirectory, not BeforeTargets="IncrementalClean":
+    IncrementalClean takes its snapshot of FileWrites in a target it depends on,
+    and dependencies run before BeforeTargets, so that would be too late too.
+    CopyFilesToOutputDirectory is public and runs earlier in CoreBuild.
+  -->
+  <Target Name="RegisterSourceModelFileWrites"
+          BeforeTargets="CopyFilesToOutputDirectory"
+          Condition="'$(GenerateSourceModelManifest)' == 'true'">
+    <ItemGroup>
+      <FileWrites Include="$(SourceModelInputsStampPath);$(SourceModelIntermediateManifestPath);$(SourceModelManifestPath)" />
+      <FileWrites Include="$(SourceModelIntermediateProvenancePath);$(SourceModelProvenancePath)"
+                  Condition="'$(GenerateSourceModelProvenance)' == 'true'" />
+    </ItemGroup>
+  </Target>
+
+  <!--
+    Provenance: <Project>.sourcemodel.provenance.json beside the manifest, in
+    obj/ and bin/. It records how the manifest was produced and the manifest's
+    SHA-256 (see tasks/SourceModelProvenance.cs for what goes in it).
+
+      GenerateSourceModelProvenance=false          don't write it
+      SourceModelProvenanceFormat=slsa|simple      in-toto + SLSA v1 (default), or a flat document
+      SourceModelProvenanceCheckWorkingTree=true   run git status and record modified files
+      SourceModelProvenanceExcludedGlobalProperties  more global properties to leave out
+      CollectSourceModelProvenanceSourceDependsOn  replace git with another VCS
+      -t:VerifySourceModel                         check a manifest and its provenance against this checkout
+
+    Unlike the manifest, it has no up-to-date check: a new commit changes the
+    provenance without changing any input of the manifest. It is cheap (one
+    hash of the manifest) and written only when its content changes.
+  -->
+  <Target Name="CollectSourceModelProvenanceSource"
+          DependsOnTargets="$(CollectSourceModelProvenanceSourceDependsOn)" />
+
+  <!--
+    git, from the .NET SDK's SourceLink data, so a normal build starts no git
+    process: the top-level SourceRoot with SourceControl=git. The repository
+    URL is recorded only when PublishRepositoryUrl is true, the rule NuGet pack
+    follows too, because it can be an internal address.
+
+    With SourceModelProvenanceCheckWorkingTree=true, git status runs over
+    SourceModelRoot and any source model file outside it, and the provenance
+    lists what differs from the commit. A failure (no git, not a repository)
+    records the working tree as unknown, with FMSDK105.
+  -->
+  <Target Name="_CollectGitSourceModelProvenanceSource"
+          DependsOnTargets="InitializeSourceControlInformation;CollectSourceModel"
+          Condition="'$(SourceControlInformationFeatureSupported)' == 'true'">
+    <ItemGroup>
+      <_SourceModelGitRoot Include="@(SourceRoot)"
+                           Condition="'%(SourceRoot.SourceControl)' == 'git' and '%(SourceRoot.NestedRoot)' == ''" />
+    </ItemGroup>
+    <PropertyGroup Condition="'@(_SourceModelGitRoot)' != ''">
+      <_SourceModelGitRootPath>@(_SourceModelGitRoot->'%(FullPath)')</_SourceModelGitRootPath>
+      <_SourceModelGitRevision>@(_SourceModelGitRoot->'%(RevisionId)')</_SourceModelGitRevision>
+      <_SourceModelGitRef>@(_SourceModelGitRoot->'%(BranchName)')</_SourceModelGitRef>
+      <_SourceModelGitUrl Condition="'$(PublishRepositoryUrl)' == 'true'">@(_SourceModelGitRoot->'%(ScmRepositoryUrl)')</_SourceModelGitUrl>
+      <_SourceModelWorkingTree>unchecked</_SourceModelWorkingTree>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(SourceModelProvenanceCheckWorkingTree)' == 'true' and '$(_SourceModelGitRootPath)' != ''">
+      <_SourceModelRootFull>$([MSBuild]::NormalizeDirectory('$(MSBuildProjectDirectory)', '$(SourceModelRoot)'))</_SourceModelRootFull>
+      <_SourceModelRootLower>$(_SourceModelRootFull.ToLowerInvariant())</_SourceModelRootLower>
+    </PropertyGroup>
+    <ItemGroup Condition="'$(SourceModelProvenanceCheckWorkingTree)' == 'true' and '$(_SourceModelGitRootPath)' != ''">
+      <_SourceModelGitPathspec Include="$(_SourceModelRootFull.TrimEnd('\').TrimEnd('/'))" />
+      <_SourceModelGitPathspec Include="@(SourceModelFile->'%(FullPath)')"
+                               Condition="!$([System.String]::Copy('%(FullPath)').ToLowerInvariant().StartsWith('$(_SourceModelRootLower)'))" />
+    </ItemGroup>
+    <Exec Condition="'@(_SourceModelGitPathspec)' != ''"
+          Command="git -c core.quotepath=off status --porcelain=v1 --untracked-files=all -- @(_SourceModelGitPathspec->'&quot;%(Identity)&quot;', ' ')"
+          WorkingDirectory="$(_SourceModelGitRootPath)"
+          ConsoleToMsBuild="true"
+          IgnoreExitCode="true"
+          IgnoreStandardErrorWarningFormat="true"
+          EchoOff="true"
+          StandardOutputImportance="low"
+          StandardErrorImportance="low">
+      <Output TaskParameter="ConsoleOutput" ItemName="_SourceModelGitStatusLine" />
+      <Output TaskParameter="ExitCode" PropertyName="_SourceModelGitStatusExitCode" />
+    </Exec>
+    <PropertyGroup Condition="'$(_SourceModelGitStatusExitCode)' != ''">
+      <_SourceModelWorkingTree Condition="'$(_SourceModelGitStatusExitCode)' == '0'">checked</_SourceModelWorkingTree>
+      <_SourceModelWorkingTree Condition="'$(_SourceModelGitStatusExitCode)' != '0'">unknown</_SourceModelWorkingTree>
+    </PropertyGroup>
+    <Warning Code="FMSDK105"
+             Condition="'$(_SourceModelWorkingTree)' == 'unknown'"
+             Text="SourceModelProvenanceCheckWorkingTree is on, but git status failed (exit code $(_SourceModelGitStatusExitCode)), so the provenance records the working tree as unknown." />
+
+    <ItemGroup Condition="'@(_SourceModelGitRoot)' != ''">
+      <SourceModelProvenanceModifiedFile Include="@(_SourceModelGitStatusLine)"
+                                         GitPorcelain="true"
+                                         Condition="'$(_SourceModelWorkingTree)' == 'checked'" />
+      <SourceModelProvenanceSource Include="git"
+                                   Vcs="git"
+                                   RepositoryUrl="$(_SourceModelGitUrl)"
+                                   Ref="$(_SourceModelGitRef)"
+                                   Revision="$(_SourceModelGitRevision)"
+                                   DigestName="gitCommit"
+                                   RootPath="$(_SourceModelGitRootPath)"
+                                   WorkingTree="$(_SourceModelWorkingTree)" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="WriteSourceModelProvenance"
+          Condition="'$(GenerateSourceModelManifest)' == 'true' and '$(GenerateSourceModelProvenance)' == 'true'"
+          AfterTargets="BuildSourceModelManifest"
+          DependsOnTargets="BuildSourceModelManifest;CollectSourceModelProvenanceSource">
+    <WriteSourceModelProvenance ManifestPath="$(SourceModelIntermediateManifestPath)"
+                                ManifestName="$(SourceModelManifestFileName)"
+                                ProvenancePath="$(SourceModelIntermediateProvenancePath)"
+                                Format="$(SourceModelProvenanceFormat)"
+                                ProjectPath="$(MSBuildProjectFullPath)"
+                                Configuration="$(Configuration)"
+                                TargetFramework="$(TargetFramework)"
+                                Dialect="$(DatabaseDialect)"
+                                DefaultSchema="$(DefaultSchema)"
+                                Convention="$(SourceModelConvention)"
+                                IsRootModule="$(IsDatabaseRootModule)"
+                                SourceModelRoot="$(SourceModelRoot)"
+                                BuilderId="$(SourceModelProvenanceBuilderId)"
+                                Source="@(SourceModelProvenanceSource)"
+                                ModifiedFiles="@(SourceModelProvenanceModifiedFile)"
+                                ExcludedGlobalProperties="$(SourceModelProvenanceExcludedGlobalProperties)" />
+
+    <Copy SourceFiles="$(SourceModelIntermediateProvenancePath)"
+          DestinationFiles="$(SourceModelProvenancePath)"
+          SkipUnchangedFiles="true" />
+
+    <ItemGroup>
+      <FileWrites Include="$(SourceModelIntermediateProvenancePath);$(SourceModelProvenancePath)" />
+    </ItemGroup>
+  </Target>
+
+  <!--
+    dotnet build -t:VerifySourceModel [-p:SourceModelVerifyManifest=path] [-p:...]
+
+    Checks a manifest (bin/ by default, or any path) and the provenance beside
+    it against this checkout: the manifest still has the hash its provenance
+    records (FMSDK007), and regenerating both from the checkout, with this
+    invocation's global properties, gives the same bytes (FMSDK008, FMSDK009).
+    Pass the -p: values the provenance records. It doesn't build, so it never
+    overwrites what it is checking. With several target frameworks it checks
+    each one.
+  -->
+  <PropertyGroup>
+    <_VerifySourceModelDependsOn Condition="'$(IsCrossTargetingBuild)' == 'true'">_VerifyInnerSourceModels</_VerifySourceModelDependsOn>
+    <_VerifySourceModelDependsOn Condition="'$(IsCrossTargetingBuild)' != 'true'">_VerifyOwnSourceModel</_VerifySourceModelDependsOn>
+  </PropertyGroup>
+
+  <Target Name="VerifySourceModel" DependsOnTargets="$(_VerifySourceModelDependsOn)" />
+
+  <Target Name="_VerifyInnerSourceModels">
+    <ItemGroup>
+      <_SourceModelVerifyFramework Include="$(TargetFrameworks)" />
+    </ItemGroup>
+    <MSBuild Projects="$(MSBuildProjectFullPath)"
+             Targets="VerifySourceModel"
+             Properties="TargetFramework=%(_SourceModelVerifyFramework.Identity)" />
+  </Target>
+
+  <Target Name="_VerifyOwnSourceModel"
+          Condition="'$(GenerateSourceModelManifest)' == 'true'"
+          DependsOnTargets="CollectSourceModel;CollectSourceModelProvenanceSource">
+    <PropertyGroup>
+      <_SourceModelVerifyManifest>$(SourceModelVerifyManifest)</_SourceModelVerifyManifest>
+      <_SourceModelVerifyManifest Condition="'$(_SourceModelVerifyManifest)' == ''">$(SourceModelManifestPath)</_SourceModelVerifyManifest>
+      <_SourceModelVerifyManifest>$([MSBuild]::NormalizePath('$(MSBuildProjectDirectory)', '$(_SourceModelVerifyManifest)'))</_SourceModelVerifyManifest>
+      <_SourceModelVerifyProvenance>$(SourceModelVerifyProvenance)</_SourceModelVerifyProvenance>
+      <_SourceModelVerifyProvenance Condition="'$(_SourceModelVerifyProvenance)' == ''">$([System.IO.Path]::GetDirectoryName('$(_SourceModelVerifyManifest)'))/$([System.IO.Path]::GetFileNameWithoutExtension('$(_SourceModelVerifyManifest)')).provenance.json</_SourceModelVerifyProvenance>
+      <_SourceModelVerifyProvenance>$([MSBuild]::NormalizePath('$(MSBuildProjectDirectory)', '$(_SourceModelVerifyProvenance)'))</_SourceModelVerifyProvenance>
+      <_SourceModelVerifyDirectory>$(IntermediateOutputPath)sourcemodel-verify/</_SourceModelVerifyDirectory>
+    </PropertyGroup>
+
+    <BuildSourceModel SourceFiles="@(SourceModelFile)"
+                      ProjectName="$(MSBuildProjectName)"
+                      SourceModelRoot="$(SourceModelRoot)"
+                      Dialect="$(DatabaseDialect)"
+                      DefaultSchema="$(DefaultSchema)"
+                      IsRootModule="$(IsDatabaseRootModule)"
+                      Convention="$(SourceModelConvention)"
+                      ManifestPath="$(_SourceModelVerifyDirectory)$(SourceModelManifestFileName)"
+                      TreatValidationWarningsAsErrors="$(TreatSourceModelWarningsAsErrors)" />
+    <WriteSourceModelProvenance ManifestPath="$(_SourceModelVerifyDirectory)$(SourceModelManifestFileName)"
+                                ManifestName="$(SourceModelManifestFileName)"
+                                ProvenancePath="$(_SourceModelVerifyDirectory)$(SourceModelProvenanceFileName)"
+                                Format="$(SourceModelProvenanceFormat)"
+                                ProjectPath="$(MSBuildProjectFullPath)"
+                                Configuration="$(Configuration)"
+                                TargetFramework="$(TargetFramework)"
+                                Dialect="$(DatabaseDialect)"
+                                DefaultSchema="$(DefaultSchema)"
+                                Convention="$(SourceModelConvention)"
+                                IsRootModule="$(IsDatabaseRootModule)"
+                                SourceModelRoot="$(SourceModelRoot)"
+                                BuilderId="$(SourceModelProvenanceBuilderId)"
+                                Source="@(SourceModelProvenanceSource)"
+                                ModifiedFiles="@(SourceModelProvenanceModifiedFile)"
+                                ExcludedGlobalProperties="$(SourceModelProvenanceExcludedGlobalProperties)" />
+    <VerifySourceModel ManifestPath="$(_SourceModelVerifyManifest)"
+                       ProvenancePath="$(_SourceModelVerifyProvenance)"
+                       RegeneratedManifestPath="$(_SourceModelVerifyDirectory)$(SourceModelManifestFileName)"
+                       RegeneratedProvenancePath="$(_SourceModelVerifyDirectory)$(SourceModelProvenanceFileName)" />
+  </Target>
+
+  <!--
+    Lock file: the committed copy of the source model (packages.lock.json's
+    role; see adr/proposed/SourceControlledDatabaseModel.md, "Lock file").
+
+      GenerateSourceModelLockFile=true   compare on every build; create or update the lock
+      SourceModelLockedMode=true         CI: fail (FMSDK004) instead of writing
+      -t:RewriteSourceModelLock          the explicit writer, even in locked mode
+      SourceModelLockFilePath            where it goes (default: next to the project)
+
+    Unlike the manifest, the lock has no Inputs/Outputs and is never in
+    FileWrites. It lives in the source tree, where checkouts, merges and hand
+    edits change it, so it is compared by content every build and never
+    deleted by a clean. One writer per project: the build itself with one
+    target framework, the outer build with several, after checking that every
+    framework produced the same manifest (FMSDK005).
+  -->
+  <PropertyGroup>
+    <_SourceModelLockManifestsDependsOn Condition="'$(IsCrossTargetingBuild)' == 'true'">_CollectInnerSourceModelManifests</_SourceModelLockManifestsDependsOn>
+    <_SourceModelLockManifestsDependsOn Condition="'$(IsCrossTargetingBuild)' != 'true'">_CollectOwnSourceModelManifest</_SourceModelLockManifestsDependsOn>
+  </PropertyGroup>
+
+  <!-- Inner build protocol for the outer build's lock check. -->
+  <Target Name="GetSourceModelManifest"
+          DependsOnTargets="BuildSourceModelManifest"
+          Returns="@(_SourceModelOwnManifest)">
+    <ItemGroup>
+      <_SourceModelOwnManifest Include="$([MSBuild]::NormalizePath('$(MSBuildProjectDirectory)', '$(SourceModelIntermediateManifestPath)'))"
+                               TargetFramework="$(TargetFramework)" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="_CollectOwnSourceModelManifest" DependsOnTargets="GetSourceModelManifest">
+    <ItemGroup>
+      <_SourceModelLockManifest Include="@(_SourceModelOwnManifest)" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="_CollectInnerSourceModelManifests">
+    <ItemGroup>
+      <_SourceModelLockFramework Include="$(TargetFrameworks)" />
+    </ItemGroup>
+    <MSBuild Projects="$(MSBuildProjectFullPath)"
+             Targets="GetSourceModelManifest"
+             Properties="TargetFramework=%(_SourceModelLockFramework.Identity)">
+      <Output TaskParameter="TargetOutputs" ItemName="_SourceModelLockManifest" />
+    </MSBuild>
+  </Target>
+
+  <Target Name="CheckSourceModelLock"
+          AfterTargets="Build"
+          Condition="'$(GenerateSourceModelLockFile)' == 'true' and '$(GenerateSourceModelManifest)' == 'true' and ('$(IsCrossTargetingBuild)' == 'true' or '$(TargetFrameworks)' == '')"
+          DependsOnTargets="$(_SourceModelLockManifestsDependsOn)">
+    <SourceModelLock Manifests="@(_SourceModelLockManifest)"
+                     LockPath="$(SourceModelLockFilePath)"
+                     LockedMode="$(SourceModelLockedMode)" />
+  </Target>
+
+  <Target Name="RewriteSourceModelLock"
+          Condition="'$(GenerateSourceModelManifest)' == 'true'"
+          DependsOnTargets="$(_SourceModelLockManifestsDependsOn)">
+    <SourceModelLock Manifests="@(_SourceModelLockManifest)"
+                     LockPath="$(SourceModelLockFilePath)"
+                     LockedMode="$(SourceModelLockedMode)"
+                     Rewrite="true" />
+  </Target>
+
+  <!-- Friendly standalone entry point: dotnet msbuild -t:SourceModel -->
+  <Target Name="SourceModel"
+          DependsOnTargets="BuildSourceModelManifest;CopySourceModelManifestToOutput;WriteSourceModelProvenance" />
+
+  <!--
+    Composition protocol for FluentMigrator.Net.Sdk.Host (same pattern as
+    GetTargetPath). Returns this module's identity, artifacts, and its own
+    ProjectReference names so the host-side validator can lint declared
+    deployment order against the reference graph without parsing projects.
+    Non-module references simply lack this target; the Host SDK calls with
+    SkipNonexistentTargets.
+  -->
+  <Target Name="GetDeploymentModuleInfo"
+          DependsOnTargets="BuildSourceModelManifest;CopySourceModelManifestToOutput;WriteSourceModelProvenance"
+          Returns="@(DeploymentModuleInfo)">
+    <ItemGroup>
+      <_FmModuleReference Include="@(ProjectReference->'%(Filename)')" />
+    </ItemGroup>
+    <PropertyGroup>
+      <_FmModuleReferenceList>@(_FmModuleReference)</_FmModuleReferenceList>
+      <_FmModuleProvenancePath Condition="'$(GenerateSourceModelProvenance)' == 'true'">$([MSBuild]::NormalizePath('$(MSBuildProjectDirectory)', '$(SourceModelProvenancePath)'))</_FmModuleProvenancePath>
+    </PropertyGroup>
+    <ItemGroup>
+      <DeploymentModuleInfo Include="$(MSBuildProjectName)">
+        <!-- Full paths: the Host task reads these files from another directory. -->
+        <ManifestPath>$([MSBuild]::NormalizePath('$(MSBuildProjectDirectory)', '$(SourceModelManifestPath)'))</ManifestPath>
+        <ProvenancePath>$(_FmModuleProvenancePath)</ProvenancePath>
+        <AssemblyPath>$(TargetPath)</AssemblyPath>
+        <IsRoot>$(IsDatabaseRootModule)</IsRoot>
+        <References>$(_FmModuleReferenceList)</References>
+        <DefaultSchema>$(DefaultSchema)</DefaultSchema>
+        <Dialect>$(DatabaseDialect)</Dialect>
+        <VersionTableName>$(VersionTableName)</VersionTableName>
+        <VersionTableSchema>$(VersionTableSchema)</VersionTableSchema>
+      </DeploymentModuleInfo>
+    </ItemGroup>
+  </Target>
+
+</Project>

@@ -1,0 +1,24 @@
+<Project>
+  <Import Project="../../../../src/FluentMigrator.Net.Sdk/Sdk/Sdk.props" />
+
+  <!--
+    The stubs here reference nothing, so no implicit FluentMigrator package:
+    this repository manages package versions centrally and has no
+    PackageVersion for its own package, so the default versionless
+    reference would fail restore with NU1010.
+  -->
+  <PropertyGroup>
+    <IncludeFluentMigratorReference>false</IncludeFluentMigratorReference>
+  </PropertyGroup>
+  <PropertyGroup>
+    <DatabaseDialect>sqlserver</DatabaseDialect>
+    <DefaultSchema>sales</DefaultSchema>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Module dependency: Sales builds after Core AND the host linter
+         knows Core must deploy first. No compile-time need for Core's types,
+         hence ReferenceOutputAssembly=false. -->
+    <ProjectReference Include="../Core/Core.csproj" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+  <Import Project="../../../../src/FluentMigrator.Net.Sdk/Sdk/Sdk.targets" />
+</Project>
