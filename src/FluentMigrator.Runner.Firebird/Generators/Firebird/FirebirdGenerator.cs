@@ -39,6 +39,8 @@ namespace FluentMigrator.Runner.Generators.Firebird
     /// </summary>
     public class FirebirdGenerator : GenericGenerator, ICreateTableIfNotExistsGenerator
     {
+        private readonly FirebirdQuoter _quoter;
+
         /// <inheritdoc />
         [Obsolete("Use the Truncator property")]
         protected readonly FirebirdTruncator truncator;
@@ -65,6 +67,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
             [NotNull] IOptions<GeneratorOptions> generatorOptions)
             : base(new FirebirdColumn(fbOptions, quoter), quoter, new EmptyDescriptionGenerator(), generatorOptions)
         {
+            _quoter = quoter;
             FBOptions = fbOptions ?? throw new ArgumentNullException(nameof(fbOptions));
 #pragma warning disable 618
             truncator = new FirebirdTruncator(FBOptions.TruncateLongNames, FBOptions.PackKeyNames);
@@ -247,8 +250,8 @@ namespace FluentMigrator.Runner.Generators.Firebird
         /// <summary>
         /// Firebird has no <c>CREATE TABLE IF NOT EXISTS</c> before 6.0. The statement and the table's
         /// <see cref="CreateTableExpression.ExpressionsForNewTable"/> run through <c>EXECUTE STATEMENT</c> in an
-        /// <c>EXECUTE BLOCK</c>, when <c>RDB$RELATIONS</c> has no such table: the same check as
-        /// <c>FirebirdProcessor.TableExists</c>.
+        /// <c>EXECUTE BLOCK</c>, when <c>RDB$RELATIONS</c> has no table of the name the statement stores, compared exactly, as
+        /// <c>FirebirdProcessor</c> checks before it creates the table.
         /// </summary>
         /// <remarks>
         /// Each statement runs in its own autonomous transaction, which commits it, as isql's AUTODDL does: the indexes
@@ -267,9 +270,10 @@ namespace FluentMigrator.Runner.Generators.Firebird
 
             var statements = new[] { createTable }.Concat(GenerateExpressionsForNewTable(expression, IsIndexOrForeignKey));
 
-            var tableName = Quoter.IsQuoted(expression.TableName)
-                ? Quoter.UnQuote(expression.TableName)
-                : expression.TableName.ToUpperInvariant();
+            // The name as the CREATE TABLE stores it: as written when quoted (by the migration, or by the quoter for a
+            // keyword or with ForceQuote), otherwise in upper case. Compared exactly, since USERS and "Users" are
+            // different tables.
+            var tableName = _quoter.ToFbObjectName(expression.TableName);
 
             var builder = new StringBuilder();
             builder.AppendLine("SET TERM ^ ;");
@@ -277,7 +281,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
             builder.AppendLine("BEGIN");
             builder.AppendLine(
                 "IF (NOT EXISTS (SELECT 1 FROM RDB$RELATIONS WHERE (RDB$FLAGS IS NOT NULL) AND "
-              + $"(LOWER(RDB$RELATION_NAME) = LOWER('{FormatHelper.FormatSqlEscape(tableName)}')))) THEN");
+              + $"(RDB$RELATION_NAME = '{FormatHelper.FormatSqlEscape(tableName)}'))) THEN");
             builder.AppendLine("BEGIN");
             foreach (var statement in statements)
             {

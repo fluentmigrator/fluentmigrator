@@ -81,7 +81,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
                 "SET TERM ^ ;" + Environment.NewLine +
                 "EXECUTE BLOCK AS" + Environment.NewLine +
                 "BEGIN" + Environment.NewLine +
-                "IF (NOT EXISTS (SELECT 1 FROM RDB$RELATIONS WHERE (RDB$FLAGS IS NOT NULL) AND (LOWER(RDB$RELATION_NAME) = LOWER('TESTTABLE1')))) THEN" + Environment.NewLine +
+                "IF (NOT EXISTS (SELECT 1 FROM RDB$RELATIONS WHERE (RDB$FLAGS IS NOT NULL) AND (RDB$RELATION_NAME = 'TESTTABLE1'))) THEN" + Environment.NewLine +
                 "BEGIN" + Environment.NewLine +
                 "IN AUTONOMOUS TRANSACTION DO EXECUTE STATEMENT 'CREATE TABLE TestTable1 (TestColumn1 VARCHAR(255) NOT NULL, TestColumn2 INTEGER DEFAULT ''it''''s'' NOT NULL)';" + Environment.NewLine +
                 "END" + Environment.NewLine +
@@ -101,7 +101,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
                 "SET TERM ^ ;" + Environment.NewLine +
                 "EXECUTE BLOCK AS" + Environment.NewLine +
                 "BEGIN" + Environment.NewLine +
-                "IF (NOT EXISTS (SELECT 1 FROM RDB$RELATIONS WHERE (RDB$FLAGS IS NOT NULL) AND (LOWER(RDB$RELATION_NAME) = LOWER('TESTTABLE1')))) THEN" + Environment.NewLine +
+                "IF (NOT EXISTS (SELECT 1 FROM RDB$RELATIONS WHERE (RDB$FLAGS IS NOT NULL) AND (RDB$RELATION_NAME = 'TESTTABLE1'))) THEN" + Environment.NewLine +
                 "BEGIN" + Environment.NewLine +
                 "IN AUTONOMOUS TRANSACTION DO EXECUTE STATEMENT 'CREATE TABLE TestTable1 (TestColumn1 VARCHAR(255) NOT NULL, TestColumn2 INTEGER NOT NULL)';" + Environment.NewLine +
                 "IN AUTONOMOUS TRANSACTION DO EXECUTE STATEMENT 'CREATE UNIQUE ASC INDEX UX_TestTable1_TestColumn1 ON TestTable1 (TestColumn1)';" + Environment.NewLine +
@@ -109,6 +109,26 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
                 "END" + Environment.NewLine +
                 "END^" + Environment.NewLine +
                 "SET TERM ; ^");
+        }
+
+        [TestCase("Users", false, "USERS")]
+        [TestCase("\"Users\"", false, "Users")]
+        [TestCase("Users", true, "Users")]
+        [TestCase("Order", false, "Order")]
+        public void CreateTableIfNotExistsLooksForTheNameAsFirebirdStoresIt(string tableName, bool forceQuote, string storedName)
+        {
+            // Unquoted names are stored in upper case, quoted ones as written, and USERS and "Users" are different
+            // tables, so the guard compares the stored name exactly. Order is a keyword, which the quoter quotes.
+            var options = FirebirdOptions.StandardBehaviour();
+            options.ForceQuote = forceQuote;
+            var generator = new FirebirdGenerator(options);
+            var expression = GeneratorTestHelper.GetCreateTableExpression();
+            expression.TableName = tableName;
+            expression.IfNotExists = true;
+
+            var result = generator.Generate(expression);
+
+            result.ShouldContain($"(RDB$RELATION_NAME = '{storedName}')");
         }
 
         [Test]

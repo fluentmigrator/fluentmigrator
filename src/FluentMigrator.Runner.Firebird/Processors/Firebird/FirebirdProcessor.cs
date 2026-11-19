@@ -788,7 +788,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             {
                 // Checked here rather than with the generator's EXECUTE BLOCK, so that an existing table also keeps
                 // its identity sequences and triggers, indexes and foreign keys, which are created below.
-                if (TableExists(expression.SchemaName, expression.TableName))
+                if (TableToCreateExists(expression.TableName))
                 {
                     Logger.LogSay($"Table {expression.TableName} already exists; Create.Table(...).IfNotExists() leaves it as it is");
                     return;
@@ -815,6 +815,18 @@ namespace FluentMigrator.Runner.Processors.Firebird
             {
                 expressionForNewTable.ExecuteWith(this);
             }
+        }
+
+        /// <summary>
+        /// Whether the table that a <c>CREATE TABLE</c> of <paramref name="tableName"/> would create exists: the name as
+        /// Firebird stores it, compared exactly. Unlike <see cref="TableExists"/>, it tells <c>USERS</c> from
+        /// <c>"Users"</c>, which are different tables.
+        /// </summary>
+        private bool TableToCreateExists(string tableName)
+        {
+            return Exists(
+                "select rdb$relation_name from rdb$relations where (rdb$flags IS NOT NULL) and (rdb$relation_name = '{0}')",
+                FormatHelper.FormatSqlEscape(_quoter.ToFbObjectName(tableName)));
         }
 
         /// <inheritdoc />
