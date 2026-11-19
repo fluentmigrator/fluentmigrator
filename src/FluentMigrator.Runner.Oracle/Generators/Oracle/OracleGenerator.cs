@@ -244,17 +244,17 @@ namespace FluentMigrator.Runner.Generators.Oracle
         /// <inheritdoc />
         public override string Generate(CreateTableExpression expression)
         {
-            if (expression.IfNotExists)
-            {
-                return CompatibilityMode.HandleCompatibility("Create.Table(...).IfNotExists() is not supported");
-            }
-
             if (expression.Columns.Any(x => x.ExpressionStored))
             {
                 CompatibilityMode.HandleCompatibility("Stored computed columns are not supported");
             }
             var descriptionStatements = DescriptionGenerator.GenerateDescriptionStatements(expression);
             var statements = descriptionStatements as string[] ?? descriptionStatements.ToArray();
+
+            if (expression.IfNotExists)
+            {
+                return GenerateCreateTableIfNotExists(expression, statements);
+            }
 
             if (!statements.Any())
             {
@@ -274,6 +274,37 @@ namespace FluentMigrator.Runner.Generators.Oracle
             }
 
             return WrapInBlock(createTableWithDescriptionsBuilder.ToString());
+        }
+
+        /// <summary>
+        /// Oracle has no <c>CREATE TABLE IF NOT EXISTS</c> before 23ai. The statement and the table's descriptions run as
+        /// dynamic SQL in a PL/SQL block, once, when the data dictionary has no such table: the same check as
+        /// <c>OracleProcessorBase.TableExists</c>.
+        /// </summary>
+        /// <remarks>
+        /// The block has no <c>DECLARE</c>: the loop over a query that returns one row or none needs no variable, and
+        /// a <c>DECLARE ... BEGIN</c> would be split into two blocks by <c>OracleSqlParser</c>, which runs scripts.
+        /// </remarks>
+        private string GenerateCreateTableIfNotExists(CreateTableExpression expression, IEnumerable<string> descriptionStatements)
+        {
+            var tableName = FormatHelper.FormatSqlEscape(expression.TableName.ToUpperInvariant());
+            var catalogQuery = string.IsNullOrEmpty(expression.SchemaName)
+                ? $"SELECT 1 FROM USER_TABLES WHERE upper(TABLE_NAME) = '{tableName}'"
+                : $"SELECT 1 FROM ALL_TABLES WHERE upper(OWNER) = '{FormatHelper.FormatSqlEscape(expression.SchemaName.ToUpperInvariant())}' AND upper(TABLE_NAME) = '{tableName}'";
+
+            var builder = new StringBuilder();
+            builder.AppendLine("BEGIN");
+            builder.AppendLine($"FOR missing_table IN (SELECT 1 FROM DUAL WHERE NOT EXISTS ({catalogQuery})) LOOP");
+            builder.AppendLine(WrapStatementInExecuteImmediateBlock(InnerGenerate(expression)));
+            foreach (var descriptionStatement in descriptionStatements.Where(s => !string.IsNullOrEmpty(s)))
+            {
+                builder.AppendLine(WrapStatementInExecuteImmediateBlock(descriptionStatement));
+            }
+
+            builder.AppendLine("END LOOP;");
+            builder.Append("END");
+            AppendSqlStatementEndToken(builder);
+            return builder.ToString();
         }
 
         /// <inheritdoc />

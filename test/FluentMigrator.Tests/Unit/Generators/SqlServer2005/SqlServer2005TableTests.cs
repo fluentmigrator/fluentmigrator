@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -317,14 +318,54 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe(@"IF OBJECT_ID('[dbo].[TestTable1]','U') IS NOT NULL DROP TABLE [dbo].[TestTable1];");
         }
 
-        [Test]
-        public void CanCreateTableIfNotExistsWithDefaultSchema()
+        [TestCase(CompatibilityMode.LOOSE)]
+        [TestCase(CompatibilityMode.STRICT)]
+        public void CanCreateTableIfNotExistsWithDefaultSchema(CompatibilityMode compatibilityMode)
         {
+            Generator.CompatibilityMode = compatibilityMode;
             var expression = GeneratorTestHelper.GetCreateTableExpression();
             expression.IfNotExists = true;
 
             var result = Generator.Generate(expression);
-            result.ShouldBeEmpty();
+            result.ShouldBe(
+                "IF OBJECT_ID(N'[dbo].[TestTable1]', N'U') IS NULL" + Environment.NewLine +
+                "BEGIN" + Environment.NewLine +
+                "CREATE TABLE [dbo].[TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL);" + Environment.NewLine +
+                "END;");
+        }
+
+        [Test]
+        public void CanCreateTableIfNotExistsWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableExpression();
+            expression.IfNotExists = true;
+            expression.SchemaName = "Test'Schema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe(
+                "IF OBJECT_ID(N'[Test''Schema].[TestTable1]', N'U') IS NULL" + Environment.NewLine +
+                "BEGIN" + Environment.NewLine +
+                "CREATE TABLE [Test'Schema].[TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL);" + Environment.NewLine +
+                "END;");
+        }
+
+        [Test]
+        public void CanCreateTableIfNotExistsWithDescriptionsInTheSameBatch()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableWithTableDescriptionAndColumnDescriptions();
+            expression.IfNotExists = true;
+
+            var result = Generator.Generate(expression);
+
+            // No GO: the descriptions run only when the table is created.
+            result.ShouldBe(
+                "IF OBJECT_ID(N'[dbo].[TestTable1]', N'U') IS NULL" + Environment.NewLine +
+                "BEGIN" + Environment.NewLine +
+                "CREATE TABLE [dbo].[TestTable1] ([TestColumn1] NVARCHAR(255), [TestColumn2] INT NOT NULL);" + Environment.NewLine +
+                "EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'TestDescription', @level0type=N'SCHEMA', @level0name='dbo', @level1type=N'TABLE', @level1name='TestTable1';" + Environment.NewLine +
+                "EXEC sys.sp_addextendedproperty @name = N'MS_Description', @value = N'TestColumn1Description', @level0type = N'SCHEMA', @level0name = 'dbo', @level1type = N'Table', @level1name = 'TestTable1', @level2type = N'Column',  @level2name = 'TestColumn1';" + Environment.NewLine +
+                "EXEC sys.sp_addextendedproperty @name = N'MS_Description', @value = N'TestColumn2Description', @level0type = N'SCHEMA', @level0name = 'dbo', @level1type = N'Table', @level1name = 'TestTable1', @level2type = N'Column',  @level2name = 'TestColumn2';" + Environment.NewLine +
+                "END;");
         }
 
         [Test]

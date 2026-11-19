@@ -1,3 +1,8 @@
+using System;
+using System.Linq;
+
+using FirebirdSql.Data.Isql;
+
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Generators.Firebird;
 using FluentMigrator.Runner.Processors.Firebird;
@@ -62,14 +67,40 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             result.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 VARCHAR(255) NOT NULL, TestColumn2 INTEGER NOT NULL);");
         }
 
+        [TestCase(CompatibilityMode.LOOSE)]
+        [TestCase(CompatibilityMode.STRICT)]
+        public void CanCreateTableIfNotExistsWithDefaultSchema(CompatibilityMode compatibilityMode)
+        {
+            Generator.CompatibilityMode = compatibilityMode;
+            var expression = GeneratorTestHelper.GetCreateTableExpression();
+            expression.IfNotExists = true;
+            expression.Columns[1].DefaultValue = "it's";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe(
+                "SET TERM ^ ;" + Environment.NewLine +
+                "EXECUTE BLOCK AS" + Environment.NewLine +
+                "BEGIN" + Environment.NewLine +
+                "IF (NOT EXISTS (SELECT 1 FROM RDB$RELATIONS WHERE (RDB$FLAGS IS NOT NULL) AND (LOWER(RDB$RELATION_NAME) = LOWER('TESTTABLE1')))) THEN" + Environment.NewLine +
+                "EXECUTE STATEMENT 'CREATE TABLE TestTable1 (TestColumn1 VARCHAR(255) NOT NULL, TestColumn2 INTEGER DEFAULT ''it''''s'' NOT NULL)';" + Environment.NewLine +
+                "END^" + Environment.NewLine +
+                "SET TERM ; ^");
+        }
+
         [Test]
-        public void CanCreateTableIfNotExistsWithDefaultSchema()
+        public void CreateTableIfNotExistsIsOneStatementForIsql()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
             expression.IfNotExists = true;
 
-            var result = Generator.Generate(expression);
-            result.ShouldBeEmpty();
+            var script = new FbScript(Generator.Generate(expression) + Environment.NewLine + "SELECT 1 FROM RDB$DATABASE;");
+            script.Parse();
+
+            // The parser applies SET TERM itself; it is not one of the results.
+            var statements = script.Results.ToList();
+            statements.Count.ShouldBe(2);
+            statements[0].StatementType.ShouldBe(SqlStatementType.ExecuteBlock);
+            statements[1].StatementType.ShouldBe(SqlStatementType.Select);
         }
 
         [Test]

@@ -258,7 +258,19 @@ public class CreateProjectsTable : ForwardOnlyMigration
 }
 ```
 
-`IfNotExists()` avoids errors when the table might already exist, removing the need for a manual `Schema.Table(...).Exists()` check before creating the table. Support for `CREATE TABLE IF NOT EXISTS` varies by database provider; where a provider lacks native support (for example Oracle, Firebird, and SQL Server), the clause is silently ignored (in `LOOSE` compatibility mode) or throws a `DatabaseOperationNotSupportedException` (in `STRICT` compatibility mode).
+`IfNotExists()` avoids errors when the table might already exist, removing the need for a manual `Schema.Table(...).Exists()` check before creating the table. It works in connectionless and `--preview` scripts too, because the check runs in the database when the script does.
+
+| Provider | SQL generated |
+|---|---|
+| PostgreSQL, MySQL, SQLite, Redshift, Snowflake, SAP HANA | `CREATE TABLE IF NOT EXISTS ...` |
+| SQL Server 2005 and later | `IF OBJECT_ID(N'[dbo].[Projects]', N'U') IS NULL BEGIN CREATE TABLE ... END;` |
+| SQL Server 2000 | The same, checking `dbo.sysobjects` |
+| Oracle | `CREATE TABLE` through `EXECUTE IMMEDIATE`, in a PL/SQL block that checks `USER_TABLES` (or `ALL_TABLES` with a schema) |
+| Firebird | `CREATE TABLE` through `EXECUTE STATEMENT`, in an `EXECUTE BLOCK` that checks `RDB$RELATIONS`, between `SET TERM ^ ;` and `SET TERM ; ^` |
+
+On SQL Server and Oracle, the table and column descriptions run inside the same check, so they are only written to a table the migration created.
+
+Only the `CREATE TABLE` is conditional. `.Indexed()`, `.Unique()` and `.ForeignKey(...)` on a column each become a separate statement after it, which runs whether or not the table already existed, and fails if the index or key is already there. Create those separately, with your own `Schema.Table(...).Index(...).Exists()` check, when the table may already exist.
 
 Conditional table creation cannot be automatically reversed safely. If the table already existed, dropping it during rollback would delete an object the migration did not create. Use a `ForwardOnlyMigration`, or avoid `IfNotExists()` when the migration must support automatic reversal.
 

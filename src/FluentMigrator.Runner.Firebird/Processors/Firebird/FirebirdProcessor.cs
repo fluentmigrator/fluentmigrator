@@ -782,6 +782,20 @@ namespace FluentMigrator.Runner.Processors.Firebird
         public override void Process(CreateTableExpression expression)
         {
             Truncator.Truncate(expression);
+
+            if (expression.IfNotExists)
+            {
+                // Checked here rather than with the generator's EXECUTE BLOCK, so that an existing table also keeps
+                // its identity sequences and triggers, which are created below.
+                if (TableExists(expression.SchemaName, expression.TableName))
+                {
+                    Logger.LogSay($"Table {expression.TableName} already exists; Create.Table(...).IfNotExists() leaves it as it is");
+                    return;
+                }
+
+                expression = FirebirdGenerator.CopyWithoutIfNotExists(expression);
+            }
+
             LockTable(expression.TableName);
             RegisterTableCreation(expression.TableName);
             InternalProcess(Generator.Generate(expression));
