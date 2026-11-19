@@ -142,21 +142,32 @@ namespace FluentMigrator.Runner.Generators.Postgres
 
             var schemaName = string.IsNullOrEmpty(expression.SchemaName) ? "public" : NameInCatalog(expression.SchemaName);
 
-            var builder = new StringBuilder();
-            builder.AppendLine("DO $fluentmigrator$");
-            builder.AppendLine("BEGIN");
-            builder.AppendLine(
+            var body = new StringBuilder();
+            body.AppendLine("BEGIN");
+            body.AppendLine(
                 "IF NOT EXISTS (SELECT 1 FROM information_schema.tables WHERE "
               + $"table_schema = '{FormatHelper.FormatSqlEscape(schemaName)}' AND table_name = '{FormatHelper.FormatSqlEscape(NameInCatalog(expression.TableName))}') THEN");
-            builder.AppendLine(createTable);
+            body.AppendLine(createTable);
             foreach (var statement in GenerateExpressionsForNewTable(expression, IsIndexOrForeignKey))
             {
-                builder.AppendLine(statement);
+                body.AppendLine(statement);
             }
 
-            builder.AppendLine("END IF;");
-            builder.AppendLine("END");
-            builder.Append("$fluentmigrator$");
+            body.AppendLine("END IF;");
+            body.AppendLine("END");
+
+            // A dollar-quote tag that the body, such as a column default, does not contain, so it does not end early.
+            var bodyText = body.ToString();
+            var tag = "$fluentmigrator$";
+            while (bodyText.Contains(tag))
+            {
+                tag = tag.Insert(tag.Length - 1, "_");
+            }
+
+            var builder = new StringBuilder();
+            builder.AppendLine("DO " + tag);
+            builder.Append(bodyText);
+            builder.Append(tag);
             AppendSqlStatementEndToken(builder);
             return builder.ToString();
         }

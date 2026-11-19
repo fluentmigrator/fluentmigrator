@@ -301,6 +301,19 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
+        public void CreateTableIfNotExistsWithIndexUsesADollarQuoteTagNotInTheBody()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableIfNotExistsWithIndexAndForeignKey();
+            expression.Columns[0].DefaultValue = "$fluentmigrator$";
+
+            var result = Generator.Generate(expression);
+
+            result.ShouldStartWith("DO $fluentmigrator_$" + Environment.NewLine);
+            result.ShouldEndWith(Environment.NewLine + "$fluentmigrator_$;");
+            result.ShouldContain("DEFAULT '$fluentmigrator$'");
+        }
+
+        [Test]
         public void CanCreateTableIfNotExistsWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
