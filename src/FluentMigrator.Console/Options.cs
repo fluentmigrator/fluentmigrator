@@ -813,12 +813,12 @@ namespace Mono.Options
 
         private bool ContainsKey(string key)
         {
-            return this.SelectMany(op => op.Names.Select(n => n.ToLower())).Contains(key.ToLower());
+            return this.SelectMany(op => op.Names.Select(n => n.ToLowerInvariant())).Contains(key.ToLowerInvariant());
         }
 
         private Option GetOptionForKey(string key)
         {
-            return this.SingleOrDefault(op => op.Names.Select(n => n.ToLower()).Contains(key.ToLower()));
+            return this.SingleOrDefault(op => op.Names.Select(n => n.ToLowerInvariant()).Contains(key.ToLowerInvariant()));
         }
 
         private void ParseValue(string option, OptionContext c)

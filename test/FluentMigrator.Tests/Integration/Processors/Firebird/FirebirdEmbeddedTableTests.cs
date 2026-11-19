@@ -458,8 +458,8 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             var sql =
                 "select RDB$FIELD_TYPE fieldType, RDB$FIELD_SUB_TYPE subType from RDB$RELATION_FIELDS rf " +
                 "inner join RDB$FIELDS f on rf.RDB$FIELD_SOURCE = f.RDB$FIELD_NAME where rf.RDB$FIELD_NAME = '" +
-                fieldName.ToUpper() + "' " +
-                "and rf.RDB$RELATION_NAME = '" + tableName.ToUpper() + "'";
+                fieldName.ToUpperInvariant() + "' " +
+                "and rf.RDB$RELATION_NAME = '" + tableName.ToUpperInvariant() + "'";
             var result = processor.Read(sql);
             Assert.That(result.Tables, Is.Not.Empty, "Unable to query schema for table '" + tableName + "'");
             var table = result.Tables[0];
@@ -549,7 +549,7 @@ ORDER BY s.RDB$FIELD_POSITION";
                             var constraintName = rdr["CONSTRAINT_NAME"];
                             if (constraintName == null) continue;
                             if (constraintName is DBNull) continue;
-                            if (constraintName.ToString().Trim() == withName.ToUpper())
+                            if (constraintName.ToString().Trim() == withName.ToUpperInvariant())
                             {
                                 result = true;
                                 break;
