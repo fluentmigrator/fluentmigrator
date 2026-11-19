@@ -23,6 +23,7 @@ using System.Text;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Generation;
+using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Generic;
 using FluentMigrator.Runner.Helpers;
 using FluentMigrator.SqlServer;
@@ -36,7 +37,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
     /// <summary>
     /// The SQL Server 2000 SQL generator for FluentMigrator.
     /// </summary>
-    public class SqlServer2000Generator : GenericGenerator
+    public class SqlServer2000Generator : GenericGenerator, ICreateTableIfNotExistsGenerator
     {
         /// <inheritdoc />
         public SqlServer2000Generator()
@@ -122,10 +123,19 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                 builder.AppendLine(statement);
             }
 
+            foreach (var statement in GenerateExpressionsForNewTable(expression, IsIndexOrForeignKey))
+            {
+                builder.AppendLine(statement);
+            }
+
             builder.Append("END");
             AppendSqlStatementEndToken(builder);
             return builder.ToString();
         }
+
+        /// <inheritdoc />
+        public virtual bool GeneratesWithTable(CreateTableExpression expression, IMigrationExpression expressionForNewTable) =>
+            IsIndexOrForeignKey(expressionForNewTable);
 
         /// <summary>
         /// The condition, for an <c>IF</c>, that no user table has the given name.

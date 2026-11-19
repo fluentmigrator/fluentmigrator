@@ -16,6 +16,8 @@
 //
 #endregion
 
+using System;
+
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Generators.Postgres;
 using FluentMigrator.Runner.Processors.Postgres;
@@ -276,6 +278,26 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
 
             var result = Generator.Generate(expression);
             result.ShouldBe("DROP TABLE IF EXISTS \"TestSchema\".\"TestTable1\";");
+        }
+
+        [Test]
+        public void CanCreateTableIfNotExistsWithIndexAndForeignKey()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableIfNotExistsWithIndexAndForeignKey();
+
+            var result = Generator.Generate(expression);
+
+            // CREATE TABLE IF NOT EXISTS would skip only the table, so a DO block skips all three.
+            result.ShouldBe(
+                "DO $fluentmigrator$" + Environment.NewLine +
+                "BEGIN" + Environment.NewLine +
+                "IF NOT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'TestTable1') THEN" + Environment.NewLine +
+                "CREATE TABLE \"public\".\"TestTable1\" (\"TestColumn1\" text NOT NULL, \"TestColumn2\" integer NOT NULL);" + Environment.NewLine +
+                "CREATE UNIQUE INDEX \"UX_TestTable1_TestColumn1\" ON \"public\".\"TestTable1\" (\"TestColumn1\" ASC);" + Environment.NewLine +
+                "ALTER TABLE \"public\".\"TestTable1\" ADD CONSTRAINT \"FK_TestTable1_TestTable2\" FOREIGN KEY (\"TestColumn2\") REFERENCES \"public\".\"TestTable2\" (\"TestColumn2\");" + Environment.NewLine +
+                "END IF;" + Environment.NewLine +
+                "END" + Environment.NewLine +
+                "$fluentmigrator$;");
         }
 
         [Test]

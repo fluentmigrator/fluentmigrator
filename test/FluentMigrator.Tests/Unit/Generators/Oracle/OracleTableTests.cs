@@ -63,6 +63,24 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
+        public void CanCreateTableIfNotExistsWithIndexAndForeignKey()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableIfNotExistsWithIndexAndForeignKey();
+
+            var result = Generator.Generate(expression);
+
+            // In the loop with the table, so they are created only with it.
+            result.ShouldBe(
+                "BEGIN" + Environment.NewLine +
+                "FOR missing_table IN (SELECT 1 FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM USER_TABLES WHERE upper(TABLE_NAME) = 'TESTTABLE1')) LOOP" + Environment.NewLine +
+                "EXECUTE IMMEDIATE 'CREATE TABLE TestTable1 (TestColumn1 NVARCHAR2(255) NOT NULL, TestColumn2 NUMBER(10,0) NOT NULL)';" + Environment.NewLine +
+                "EXECUTE IMMEDIATE 'CREATE UNIQUE INDEX UX_TestTable1_TestColumn1 ON TestTable1 (TestColumn1 ASC)';" + Environment.NewLine +
+                "EXECUTE IMMEDIATE 'ALTER TABLE TestTable1 ADD CONSTRAINT FK_TestTable1_TestTable2 FOREIGN KEY (TestColumn2) REFERENCES TestTable2 (TestColumn2)';" + Environment.NewLine +
+                "END LOOP;" + Environment.NewLine +
+                "END;");
+        }
+
+        [Test]
         public void CanCreateTableIfNotExistsWithCustomSchemaAndDescriptions()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithTableDescriptionAndColumnDescriptions();

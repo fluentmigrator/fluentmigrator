@@ -37,7 +37,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
     /// <summary>
     /// The Firebird SQL generator for FluentMigrator.
     /// </summary>
-    public class FirebirdGenerator : GenericGenerator
+    public class FirebirdGenerator : GenericGenerator, ICreateTableIfNotExistsGenerator
     {
         /// <inheritdoc />
         [Obsolete("Use the Truncator property")]
@@ -240,28 +240,32 @@ namespace FluentMigrator.Runner.Generators.Firebird
             return base.Generate(expression);
         }
 
+        /// <inheritdoc />
+        public virtual bool GeneratesWithTable(CreateTableExpression expression, IMigrationExpression expressionForNewTable) =>
+            IsIndexOrForeignKey(expressionForNewTable);
+
         /// <summary>
-        /// Firebird has no <c>CREATE TABLE IF NOT EXISTS</c> before 6.0. The statement runs through
-        /// <c>EXECUTE STATEMENT</c> in an <c>EXECUTE BLOCK</c>, when <c>RDB$RELATIONS</c> has no such table: the same check
-        /// as <c>FirebirdProcessor.TableExists</c>.
+        /// Firebird has no <c>CREATE TABLE IF NOT EXISTS</c> before 6.0. The statement and the table's
+        /// <see cref="CreateTableExpression.ExpressionsForNewTable"/> run through <c>EXECUTE STATEMENT</c> in an
+        /// <c>EXECUTE BLOCK</c>, when <c>RDB$RELATIONS</c> has no such table: the same check as
+        /// <c>FirebirdProcessor.TableExists</c>.
         /// </summary>
         /// <remarks>
-        /// The block is wrapped in <c>SET TERM</c>, as isql and other script tools need for a block whose body has
-        /// <c>;</c> in it. This is the form for a script: <c>FirebirdProcessor</c> checks for the table itself and runs
-        /// a plain <c>CREATE TABLE</c>, because it also creates the identity columns' sequences and triggers.
+        /// Each statement runs in its own autonomous transaction, which commits it, as isql's AUTODDL does: the indexes
+        /// and foreign keys are created on a committed table. The block is wrapped in <c>SET TERM</c>, as isql and other
+        /// script tools need for a block whose body has <c>;</c> in it. This is the form for a script:
+        /// <c>FirebirdProcessor</c> checks for the table itself and runs a plain <c>CREATE TABLE</c>, because it also
+        /// creates the identity columns' sequences and triggers.
         /// </remarks>
         private string GenerateCreateTableIfNotExists(CreateTableExpression expression)
         {
-            var createTable = base.Generate(CopyWithoutIfNotExists(expression)).TrimEnd();
+            var createTable = base.Generate(CopyWithoutIfNotExists(expression));
             if (string.IsNullOrEmpty(createTable))
             {
                 return createTable;
             }
 
-            if (createTable.EndsWith(";"))
-            {
-                createTable = createTable.Substring(0, createTable.Length - 1);
-            }
+            var statements = new[] { createTable }.Concat(GenerateExpressionsForNewTable(expression, IsIndexOrForeignKey));
 
             var tableName = Quoter.IsQuoted(expression.TableName)
                 ? Quoter.UnQuote(expression.TableName)
@@ -274,10 +278,22 @@ namespace FluentMigrator.Runner.Generators.Firebird
             builder.AppendLine(
                 "IF (NOT EXISTS (SELECT 1 FROM RDB$RELATIONS WHERE (RDB$FLAGS IS NOT NULL) AND "
               + $"(LOWER(RDB$RELATION_NAME) = LOWER('{FormatHelper.FormatSqlEscape(tableName)}')))) THEN");
-            builder.AppendLine($"EXECUTE STATEMENT '{FormatHelper.FormatSqlEscape(createTable)}';");
+            builder.AppendLine("BEGIN");
+            foreach (var statement in statements)
+            {
+                builder.AppendLine($"IN AUTONOMOUS TRANSACTION DO EXECUTE STATEMENT '{FormatHelper.FormatSqlEscape(WithoutEndToken(statement))}';");
+            }
+
+            builder.AppendLine("END");
             builder.AppendLine("END^");
             builder.Append("SET TERM ; ^");
             return builder.ToString();
+        }
+
+        private static string WithoutEndToken(string statement)
+        {
+            statement = statement.TrimEnd();
+            return statement.EndsWith(";") ? statement.Substring(0, statement.Length - 1) : statement;
         }
 
         /// <summary>

@@ -28,6 +28,7 @@ using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Model;
 using FluentMigrator.Postgres;
 using FluentMigrator.Runner.Generators.Generic;
+using FluentMigrator.Runner.Helpers;
 
 using JetBrains.Annotations;
 
@@ -38,7 +39,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
     /// <summary>
     /// The PostgreSQL SQL generator for FluentMigrator.
     /// </summary>
-    public class PostgresGenerator : GenericGenerator
+    public class PostgresGenerator : GenericGenerator, ICreateTableIfNotExistsGenerator
     {
         private static readonly HashSet<string> _supportedAdditionalFeatures = new HashSet<string>
         {
@@ -107,6 +108,67 @@ namespace FluentMigrator.Runner.Generators.Postgres
 
         /// <inheritdoc />
         public override List<string> GeneratorIdAliases => [GeneratorIdConstants.PostgreSQL, GeneratorIdConstants.Postgres];
+
+        /// <inheritdoc />
+        public virtual bool GeneratesWithTable(CreateTableExpression expression, IMigrationExpression expressionForNewTable) =>
+            IsIndexOrForeignKey(expressionForNewTable);
+
+        /// <inheritdoc />
+        /// <remarks>
+        /// <c>CREATE TABLE IF NOT EXISTS</c> skips only the table. When the table has
+        /// <see cref="CreateTableExpression.ExpressionsForNewTable"/>, the table and those run in a <c>DO</c> block when
+        /// <c>information_schema.tables</c> has no such table, the same check as <c>PostgresProcessor.TableExists</c>, so
+        /// an existing table's indexes and foreign keys are not created again.
+        /// </remarks>
+        public override string Generate(CreateTableExpression expression)
+        {
+            if (!expression.IfNotExists || !expression.ExpressionsForNewTable.Any(IsIndexOrForeignKey))
+            {
+                return base.Generate(expression);
+            }
+
+            var createTable = base.Generate(new CreateTableExpression
+            {
+                SchemaName = expression.SchemaName,
+                TableName = expression.TableName,
+                Columns = expression.Columns,
+                TableDescription = expression.TableDescription,
+            });
+
+            if (string.IsNullOrEmpty(createTable))
+            {
+                return createTable;
+            }
+
+            var schemaName = string.IsNullOrEmpty(expression.SchemaName) ? "public" : NameInCatalog(expression.SchemaName);
+
+            var builder = new StringBuilder();
+            builder.AppendLine("DO $fluentmigrator$");
+            builder.AppendLine("BEGIN");
+            builder.AppendLine(
+                "IF NOT EXISTS (SELECT 1 FROM information_schema.tables WHERE "
+              + $"table_schema = '{FormatHelper.FormatSqlEscape(schemaName)}' AND table_name = '{FormatHelper.FormatSqlEscape(NameInCatalog(expression.TableName))}') THEN");
+            builder.AppendLine(createTable);
+            foreach (var statement in GenerateExpressionsForNewTable(expression, IsIndexOrForeignKey))
+            {
+                builder.AppendLine(statement);
+            }
+
+            builder.AppendLine("END IF;");
+            builder.AppendLine("END");
+            builder.Append("$fluentmigrator$");
+            AppendSqlStatementEndToken(builder);
+            return builder.ToString();
+        }
+
+        /// <summary>
+        /// A name as PostgreSQL stores it: as written when the quoter quotes it, otherwise folded to lower case.
+        /// </summary>
+        private string NameInCatalog(string name)
+        {
+            var quoted = Quoter.Quote(name);
+            return Quoter.IsQuoted(quoted) ? Quoter.UnQuote(quoted) : name.ToLowerInvariant();
+        }
 
         /// <inheritdoc />
         public override string Generate(CreateSchemaExpression expression)

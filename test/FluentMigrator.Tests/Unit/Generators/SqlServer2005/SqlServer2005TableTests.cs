@@ -335,6 +335,23 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
+        public void CanCreateTableIfNotExistsWithIndexAndForeignKey()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableIfNotExistsWithIndexAndForeignKey();
+
+            var result = Generator.Generate(expression);
+
+            // In the same batch as the table, so they are created only with it.
+            result.ShouldBe(
+                "IF OBJECT_ID(N'[dbo].[TestTable1]', N'U') IS NULL" + Environment.NewLine +
+                "BEGIN" + Environment.NewLine +
+                "CREATE TABLE [dbo].[TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL);" + Environment.NewLine +
+                "CREATE UNIQUE INDEX [UX_TestTable1_TestColumn1] ON [dbo].[TestTable1] ([TestColumn1] ASC);" + Environment.NewLine +
+                "ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [FK_TestTable1_TestTable2] FOREIGN KEY ([TestColumn2]) REFERENCES [dbo].[TestTable2] ([TestColumn2]);" + Environment.NewLine +
+                "END;");
+        }
+
+        [Test]
         public void CanCreateTableIfNotExistsWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();

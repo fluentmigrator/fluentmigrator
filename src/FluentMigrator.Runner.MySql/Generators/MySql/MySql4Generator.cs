@@ -22,6 +22,7 @@ using System.Linq;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Generation;
+using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Generic;
 
 using JetBrains.Annotations;
@@ -33,7 +34,7 @@ namespace FluentMigrator.Runner.Generators.MySql
     /// <summary>
     /// The MySQL 4 SQL generator for FluentMigrator.
     /// </summary>
-    public class MySql4Generator : GenericGenerator
+    public class MySql4Generator : GenericGenerator, ICreateTableIfNotExistsGenerator
     {
 
         /// <inheritdoc />
@@ -104,10 +105,58 @@ namespace FluentMigrator.Runner.Generators.MySql
                 ? string.Empty
                 : string.Format(" COMMENT {0}", Quoter.QuoteValue(expression.TableDescription));
 
+            var definitions = Column.Generate(expression.Columns, quotedTableName);
+            if (expression.IfNotExists)
+            {
+                // MySQL has no conditional DDL outside stored programs. Declared in the CREATE TABLE IF NOT EXISTS, the
+                // indexes and foreign keys are skipped along with the table.
+                foreach (var expressionForNewTable in expression.ExpressionsForNewTable.Where(e => GeneratesWithTable(expression, e)))
+                {
+                    definitions += ", " + GenerateTableDefinition(expressionForNewTable);
+                }
+            }
+
             return FormatStatement(expression.IfNotExists ? "CREATE TABLE IF NOT EXISTS {0} ({1}){2} ENGINE = INNODB" : "CREATE TABLE {0} ({1}){2} ENGINE = INNODB",
                 quotedTableName,
-                Column.Generate(expression.Columns, quotedTableName),
+                definitions,
                 tableDescription);
+        }
+
+        /// <inheritdoc />
+        /// <remarks>
+        /// The indexes of the table itself that have no options, and its own foreign keys. A foreign key from another
+        /// table (<c>ReferencedBy(...)</c>) can't be declared in this table's <c>CREATE TABLE</c>, so it runs separately.
+        /// </remarks>
+        public virtual bool GeneratesWithTable(CreateTableExpression expression, IMigrationExpression expressionForNewTable)
+        {
+            switch (expressionForNewTable)
+            {
+                case CreateIndexExpression index:
+                    return index.Index.TableName == expression.TableName
+                        && index.Index.AdditionalFeatures.Count == 0
+                        && index.Index.Columns.All(c => c.AdditionalFeatures.Count == 0);
+                case CreateForeignKeyExpression foreignKey:
+                    return foreignKey.ForeignKey.ForeignTable == expression.TableName;
+                default:
+                    return false;
+            }
+        }
+
+        /// <summary>
+        /// An index or foreign key as a definition in <c>CREATE TABLE</c>.
+        /// </summary>
+        private string GenerateTableDefinition(IMigrationExpression expressionForNewTable)
+        {
+            if (expressionForNewTable is CreateForeignKeyExpression foreignKey)
+            {
+                return Column.FormatForeignKey(foreignKey.ForeignKey, GenerateForeignKeyName);
+            }
+
+            var index = ((CreateIndexExpression) expressionForNewTable).Index;
+            var columns = index.Columns.Select(
+                c => Quoter.QuoteColumnName(c.Name) + (c.Direction == Direction.Ascending ? " ASC" : " DESC"));
+
+            return $"{(index.IsUnique ? "UNIQUE " : string.Empty)}INDEX {Quoter.QuoteIndexName(index.Name)} ({string.Join(", ", columns)})";
         }
 
         /// <inheritdoc />

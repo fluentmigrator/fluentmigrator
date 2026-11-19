@@ -782,11 +782,12 @@ namespace FluentMigrator.Runner.Processors.Firebird
         public override void Process(CreateTableExpression expression)
         {
             Truncator.Truncate(expression);
+            var expressionsForNewTable = expression.ExpressionsForNewTable?.ToList() ?? new List<IMigrationExpression>();
 
             if (expression.IfNotExists)
             {
                 // Checked here rather than with the generator's EXECUTE BLOCK, so that an existing table also keeps
-                // its identity sequences and triggers, which are created below.
+                // its identity sequences and triggers, indexes and foreign keys, which are created below.
                 if (TableExists(expression.SchemaName, expression.TableName))
                 {
                     Logger.LogSay($"Table {expression.TableName} already exists; Create.Table(...).IfNotExists() leaves it as it is");
@@ -807,6 +808,13 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
             if (FBOptions.TransactionModel != FirebirdTransactionModel.None)
                 CommitRetaining();
+
+            // The indexes and foreign keys of Create.Table(...).IfNotExists(), as the separate expressions they are
+            // without it: the table is new.
+            foreach (var expressionForNewTable in expressionsForNewTable)
+            {
+                expressionForNewTable.ExecuteWith(this);
+            }
         }
 
         /// <inheritdoc />

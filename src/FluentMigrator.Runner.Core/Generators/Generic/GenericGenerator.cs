@@ -111,6 +111,46 @@ namespace FluentMigrator.Runner.Generators.Generic
         /// </summary>
         protected virtual bool SupportsAlterTableIfExistsForColumns => false;
 
+        /// <summary>
+        /// The SQL for each of the <see cref="CreateTableExpression.ExpressionsForNewTable"/> that
+        /// <paramref name="generatesWithTable"/> selects, for a generator that writes them inside the table's existence
+        /// check. Empty statements are left out.
+        /// </summary>
+        /// <exception cref="NotSupportedException">An expression is neither an index nor a foreign key.</exception>
+        protected IEnumerable<string> GenerateExpressionsForNewTable(
+            CreateTableExpression expression,
+            Func<IMigrationExpression, bool> generatesWithTable)
+        {
+            foreach (var expressionForNewTable in expression.ExpressionsForNewTable.Where(generatesWithTable))
+            {
+                string sql;
+                switch (expressionForNewTable)
+                {
+                    case CreateIndexExpression index:
+                        sql = Generate(index);
+                        break;
+                    case CreateForeignKeyExpression foreignKey:
+                        sql = Generate(foreignKey);
+                        break;
+                    default:
+                        throw new NotSupportedException(
+                            $"{expressionForNewTable.GetType().Name} can't be created along with the table of Create.Table(...).IfNotExists()");
+                }
+
+                if (!string.IsNullOrWhiteSpace(sql))
+                {
+                    yield return sql;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Whether <paramref name="expressionForNewTable"/> is an index or a foreign key, the kinds
+        /// <see cref="GenerateExpressionsForNewTable"/> can write.
+        /// </summary>
+        protected static bool IsIndexOrForeignKey(IMigrationExpression expressionForNewTable) =>
+            expressionForNewTable is CreateIndexExpression || expressionForNewTable is CreateForeignKeyExpression;
+
         /// <inheritdoc />
         [StringFormatMethod("format")]
         protected string FormatStatement(string format, params object[] args)

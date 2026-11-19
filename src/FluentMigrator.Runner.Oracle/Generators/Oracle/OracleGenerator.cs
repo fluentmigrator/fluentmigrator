@@ -35,7 +35,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
     /// <summary>
     /// The Oracle SQL generator for FluentMigrator.
     /// </summary>
-    public class OracleGenerator : GenericGenerator, IOracleGenerator
+    public class OracleGenerator : GenericGenerator, IOracleGenerator, ICreateTableIfNotExistsGenerator
     {
         /// <inheritdoc />
         public OracleGenerator()
@@ -276,8 +276,12 @@ namespace FluentMigrator.Runner.Generators.Oracle
             return WrapInBlock(createTableWithDescriptionsBuilder.ToString());
         }
 
+        /// <inheritdoc />
+        public virtual bool GeneratesWithTable(CreateTableExpression expression, IMigrationExpression expressionForNewTable) =>
+            IsIndexOrForeignKey(expressionForNewTable);
+
         /// <summary>
-        /// Oracle has no <c>CREATE TABLE IF NOT EXISTS</c> before 23ai. The statement and the table's descriptions run as
+        /// Oracle has no <c>CREATE TABLE IF NOT EXISTS</c> before 23ai. The statement, the table's descriptions and its <see cref="CreateTableExpression.ExpressionsForNewTable"/> run as
         /// dynamic SQL in a PL/SQL block, once, when the data dictionary has no such table: the same check as
         /// <c>OracleProcessorBase.TableExists</c>.
         /// </summary>
@@ -299,6 +303,11 @@ namespace FluentMigrator.Runner.Generators.Oracle
             foreach (var descriptionStatement in descriptionStatements.Where(s => !string.IsNullOrEmpty(s)))
             {
                 builder.AppendLine(WrapStatementInExecuteImmediateBlock(descriptionStatement));
+            }
+
+            foreach (var statement in GenerateExpressionsForNewTable(expression, IsIndexOrForeignKey))
+            {
+                builder.AppendLine(WrapStatementInExecuteImmediateBlock(statement));
             }
 
             builder.AppendLine("END LOOP;");

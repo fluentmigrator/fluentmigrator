@@ -52,7 +52,36 @@ namespace FluentMigrator.Builders.Create.Table
             : base(expression)
         {
             _context = context;
-            ColumnHelper = new ColumnExpressionBuilderHelper(this, context);
+            ColumnHelper = new CreateTableColumnHelper(this, context);
+        }
+
+        /// <summary>
+        /// Adds an index or foreign key declared on a column. With <c>IfNotExists()</c> it belongs to the table, so it is
+        /// created only along with it; otherwise it is a separate expression of the migration.
+        /// </summary>
+        private void AddExpressionForColumn(IMigrationExpression expression)
+        {
+            if (Expression.IfNotExists)
+            {
+                Expression.ExpressionsForNewTable.Add(expression);
+            }
+            else
+            {
+                _context.Expressions.Add(expression);
+            }
+        }
+
+        private sealed class CreateTableColumnHelper : ColumnExpressionBuilderHelper
+        {
+            private readonly CreateTableExpressionBuilder _owner;
+
+            public CreateTableColumnHelper(CreateTableExpressionBuilder owner, IMigrationContext context)
+                : base(owner, context)
+            {
+                _owner = owner;
+            }
+
+            protected override void AddIndex(CreateIndexExpression index) => _owner.AddExpressionForColumn(index);
         }
 
         /// <summary>
@@ -275,7 +304,7 @@ namespace FluentMigrator.Builders.Create.Table
             fk.ForeignKey.PrimaryColumns.Add(primaryColumnName);
             fk.ForeignKey.ForeignColumns.Add(CurrentColumn.Name);
 
-            _context.Expressions.Add(fk);
+            AddExpressionForColumn(fk);
             CurrentForeignKey = fk.ForeignKey;
             CurrentColumn.ForeignKey = fk.ForeignKey;
             return this;
@@ -316,7 +345,7 @@ namespace FluentMigrator.Builders.Create.Table
             fk.ForeignKey.PrimaryColumns.Add(CurrentColumn.Name);
             fk.ForeignKey.ForeignColumns.Add(foreignColumnName);
 
-            _context.Expressions.Add(fk);
+            AddExpressionForColumn(fk);
             CurrentForeignKey = fk.ForeignKey;
             return this;
         }

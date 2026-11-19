@@ -260,17 +260,23 @@ public class CreateProjectsTable : ForwardOnlyMigration
 
 `IfNotExists()` avoids errors when the table might already exist, removing the need for a manual `Schema.Table(...).Exists()` check before creating the table. It works in connectionless and `--preview` scripts too, because the check runs in the database when the script does.
 
+Everything declared in the `Create.Table(...)` is conditional, not only the table: its descriptions, and the indexes and foreign keys declared on its columns with `.Indexed()`, `.Unique()`, `.ForeignKey(...)` and `.ReferencedBy(...)`. When the table already exists, none of them is created, and the existing table is left as it is.
+
 | Provider | SQL generated |
 |---|---|
-| PostgreSQL, MySQL, SQLite, Redshift, Snowflake, SAP HANA | `CREATE TABLE IF NOT EXISTS ...` |
-| SQL Server 2005 and later | `IF OBJECT_ID(N'[dbo].[Projects]', N'U') IS NULL BEGIN CREATE TABLE ... END;` |
+| SQL Server 2005 and later | `IF OBJECT_ID(N'[dbo].[Projects]', N'U') IS NULL BEGIN CREATE TABLE ...; CREATE INDEX ...; ALTER TABLE ... ADD CONSTRAINT ...; END;` |
 | SQL Server 2000 | The same, checking `dbo.sysobjects` |
-| Oracle | `CREATE TABLE` through `EXECUTE IMMEDIATE`, in a PL/SQL block that checks `USER_TABLES` (or `ALL_TABLES` with a schema) |
-| Firebird | `CREATE TABLE` through `EXECUTE STATEMENT`, in an `EXECUTE BLOCK` that checks `RDB$RELATIONS`, between `SET TERM ^ ;` and `SET TERM ; ^` |
+| Oracle | The statements through `EXECUTE IMMEDIATE`, in a PL/SQL block that checks `USER_TABLES` (or `ALL_TABLES` with a schema) |
+| Firebird | The statements through `EXECUTE STATEMENT`, in an `EXECUTE BLOCK` that checks `RDB$RELATIONS`, between `SET TERM ^ ;` and `SET TERM ; ^` |
+| PostgreSQL | `CREATE TABLE IF NOT EXISTS ...`; with indexes or foreign keys, a `DO` block that checks `information_schema.tables` |
+| MySQL | `CREATE TABLE IF NOT EXISTS ...`, with the indexes and foreign keys declared in it |
+| SQLite | `CREATE TABLE IF NOT EXISTS ...`, with the foreign keys declared in it, then `CREATE INDEX IF NOT EXISTS ...` |
+| Redshift, Snowflake, SAP HANA, Db2 | `CREATE TABLE IF NOT EXISTS ...`, then the indexes and foreign keys as separate statements |
 
-On SQL Server and Oracle, the table and column descriptions run inside the same check, so they are only written to a table the migration created.
+Two exceptions:
 
-Only the `CREATE TABLE` is conditional. `.Indexed()`, `.Unique()` and `.ForeignKey(...)` on a column each become a separate statement after it, which runs whether or not the table already existed, and fails if the index or key is already there. Create those separately, with your own `Schema.Table(...).Index(...).Exists()` check, when the table may already exist.
+- **SQLite** has no conditional block, so its indexes use `CREATE INDEX IF NOT EXISTS`: an index that the existing table lacks is created.
+- **Redshift, Snowflake, SAP HANA and Db2** run the indexes and foreign keys as separate statements after the table, which fail if the existing table already has them. On MySQL and SQLite, so does a foreign key from another table (`.ReferencedBy(...)`), which can't be declared in this table's `CREATE TABLE`. Declare those separately, with your own `Schema.Table(...).Index(...).Exists()` check, when the table may already exist.
 
 Conditional table creation cannot be automatically reversed safely. If the table already existed, dropping it during rollback would delete an object the migration did not create. Use a `ForwardOnlyMigration`, or avoid `IfNotExists()` when the migration must support automatic reversal.
 

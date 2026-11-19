@@ -88,6 +88,28 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         }
 
         [Test]
+        public void CanCreateTableIfNotExistsWithIndexAndForeignKey()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableIfNotExistsWithIndexAndForeignKey();
+
+            var result = Generator.Generate(expression);
+
+            // In the block with the table, each committed before the next, as isql's AUTODDL does.
+            result.ShouldBe(
+                "SET TERM ^ ;" + Environment.NewLine +
+                "EXECUTE BLOCK AS" + Environment.NewLine +
+                "BEGIN" + Environment.NewLine +
+                "IF (NOT EXISTS (SELECT 1 FROM RDB$RELATIONS WHERE (RDB$FLAGS IS NOT NULL) AND (LOWER(RDB$RELATION_NAME) = LOWER('TESTTABLE1')))) THEN" + Environment.NewLine +
+                "BEGIN" + Environment.NewLine +
+                "IN AUTONOMOUS TRANSACTION DO EXECUTE STATEMENT 'CREATE TABLE TestTable1 (TestColumn1 VARCHAR(255) NOT NULL, TestColumn2 INTEGER NOT NULL)';" + Environment.NewLine +
+                "IN AUTONOMOUS TRANSACTION DO EXECUTE STATEMENT 'CREATE UNIQUE ASC INDEX UX_TestTable1_TestColumn1 ON TestTable1 (TestColumn1)';" + Environment.NewLine +
+                "IN AUTONOMOUS TRANSACTION DO EXECUTE STATEMENT 'ALTER TABLE TestTable1 ADD CONSTRAINT FK_TestTable1_TestTable2 FOREIGN KEY (TestColumn2) REFERENCES TestTable2 (TestColumn2)';" + Environment.NewLine +
+                "END" + Environment.NewLine +
+                "END^" + Environment.NewLine +
+                "SET TERM ; ^");
+        }
+
+        [Test]
         public void CreateTableIfNotExistsIsOneStatementForIsql()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
