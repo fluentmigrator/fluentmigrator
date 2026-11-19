@@ -30,6 +30,10 @@
     <None Include="$(MSBuildThisFileDirectory)docs/README-nuget.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
+  <PropertyGroup>
+    <MicrosoftPackageVersion>10.0.8</MicrosoftPackageVersion>
+  </PropertyGroup>
+
   <!-- Package versions are managed centrally; see Directory.Packages.props in the repository root. -->
   <ItemGroup>
     <PackageReference Include="JetBrains.Annotations" PrivateAssets="All" />
