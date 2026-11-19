@@ -44,7 +44,7 @@ namespace FluentMigrator.Runner.Generators.Snowflake
             clauses.Add(setNullableClause);
             var typeClause = $"COLUMN {FormatString(column)} {FormatType(column)}";
             clauses.Add(typeClause);
-            var commentClause = $"COLUMN {FormatString(column)} COMMENT '{column.ColumnDescription ?? string.Empty}'";
+            var commentClause = $"COLUMN {FormatString(column)} COMMENT '{(column.ColumnDescription ?? string.Empty).Replace("'", "''")}'";
             clauses.Add(commentClause);
 
             return string.Join(", ", clauses);

@@ -157,6 +157,16 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
+        public void CanBuildMaskedWithFunctionWithApostropheCharArgument()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithFunction("anon.partial", "name", 1, '\'', 2);
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.partial(name, 1, '''', 2)");
+        }
+
+        [Test]
         public void ThrowsWhenMaskedWithFunctionIsNull()
         {
             var builder = new AnonSecurityLabelBuilder();
@@ -730,6 +740,28 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             var result = builder.Build();
 
             result.ShouldBe("MASKED WITH FUNCTION anon.partial(foo, 2, '*', 2)");
+        }
+
+        [Test]
+        public void CanBuildMaskedWithPartialScramblingWithApostrophePadding()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+            builder.MaskedWithPartialScrambling("foo", 2, '\'', 2);
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.partial(foo, 2, '''', 2)");
+        }
+
+        [Test]
+        public void CanBuildObsoleteMaskedWithPartialScramblingWithApostrophePadding()
+        {
+            var builder = new AnonSecurityLabelBuilder();
+#pragma warning disable CS0618 // Type or member is obsolete
+            builder.MaskedWithPartialScrambling(2, '\'', 2);
+#pragma warning restore CS0618 // Type or member is obsolete
+            var result = builder.Build();
+
+            result.ShouldBe("MASKED WITH FUNCTION anon.partial(2, '''', 2)");
         }
 
         [Test]

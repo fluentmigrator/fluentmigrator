@@ -141,6 +141,13 @@ namespace FluentMigrator.Tests.Unit.Generators.GenericGenerator
         }
 
         [Test]
+        public void ApostropheCharIsEscaped()
+        {
+            _quoter.QuoteValue('\'')
+                .ShouldBe("''''");
+        }
+
+        [Test]
         public void CustomTypeIsBare()
         {
             _quoter.QuoteValue(new CustomClass())

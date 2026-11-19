@@ -95,7 +95,7 @@ public partial class AnonSecurityLabelBuilder
         {
             throw new ArgumentOutOfRangeException(nameof(suffix), "Suffix cannot be negative.");
         }
-        RawLabel($"MASKED WITH FUNCTION anon.partial({prefix}, '{padding}', {suffix})");
+        RawLabel($"MASKED WITH FUNCTION anon.partial({prefix}, {BuildSqlValue(padding)}, {suffix})");
         return this;
     }
 }
