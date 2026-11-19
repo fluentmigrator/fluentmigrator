@@ -145,7 +145,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
 
 
             var result = Generator.Generate(expression);
-            result.ShouldBe($"CREATE INDEX \"TestIndex\" ON \"public\".\"TestTable1\" USING {algorithm.ToString().ToUpper()} (\"TestColumn1\");");
+            result.ShouldBe($"CREATE INDEX \"TestIndex\" ON \"public\".\"TestTable1\" USING {algorithm.ToString().ToUpperInvariant()} (\"TestColumn1\");");
         }
 
         [TestCase(Algorithm.Brin, "BRIN")]
@@ -235,7 +235,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             });
 
             var result = Generator.Generate(expression);
-            result.ShouldBe($"CREATE INDEX \"TestIndex\" ON \"public\".\"TestTable1\" (\"TestColumn1\" ASC NULLS {sort.ToString().ToUpper()});");
+            result.ShouldBe($"CREATE INDEX \"TestIndex\" ON \"public\".\"TestTable1\" (\"TestColumn1\" ASC NULLS {sort.ToString().ToUpperInvariant()});");
         }
 
         [Test]
