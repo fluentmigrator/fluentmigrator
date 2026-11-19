@@ -18,6 +18,12 @@
 
 using FluentMigrator.Builders.Schema;
 using FluentMigrator.Infrastructure;
+using FluentMigrator.Runner;
+using FluentMigrator.Runner.Conventions;
+using FluentMigrator.Runner.Infrastructure;
+
+using Microsoft.Extensions.DependencyInjection;
+
 using Moq;
 using NUnit.Framework;
 
@@ -145,6 +151,97 @@ namespace FluentMigrator.Tests.Unit.Builders.Schema
 
             _builder.Schema(_testSchema).Sequence(_testSequence).Exists().ShouldBeTrue();
             _querySchemaMock.Verify(x => x.SequenceExists(_testSchema, _testSequence));
+        }
+
+        [Test]
+        public void QueriesWithoutASchemaUseTheDefaultSchema()
+        {
+            UseDefaultSchema("foo");
+
+            _builder.Table(_testTable).Exists();
+            _builder.Table(_testTable).Column(_testColumn).Exists();
+            _builder.Table(_testTable).Index(_testIndex).Exists();
+            _builder.Table(_testTable).Constraint(_testConstraint).Exists();
+            _builder.Sequence(_testSequence).Exists();
+
+            _querySchemaMock.Verify(x => x.TableExists("foo", _testTable));
+            _querySchemaMock.Verify(x => x.ColumnExists("foo", _testTable, _testColumn));
+            _querySchemaMock.Verify(x => x.IndexExists("foo", _testTable, _testIndex));
+            _querySchemaMock.Verify(x => x.ConstraintExists("foo", _testTable, _testConstraint));
+            _querySchemaMock.Verify(x => x.SequenceExists("foo", _testSequence));
+        }
+
+        [Test]
+        public void QueriesWithASchemaKeepIt()
+        {
+            UseDefaultSchema("foo");
+
+            _builder.Schema(_testSchema).Exists();
+            _builder.Schema(_testSchema).Table(_testTable).Exists();
+            _builder.Schema(_testSchema).Table(_testTable).Column(_testColumn).Exists();
+            _builder.Schema(_testSchema).Sequence(_testSequence).Exists();
+
+            _querySchemaMock.Verify(x => x.SchemaExists(_testSchema));
+            _querySchemaMock.Verify(x => x.TableExists(_testSchema, _testTable));
+            _querySchemaMock.Verify(x => x.ColumnExists(_testSchema, _testTable, _testColumn));
+            _querySchemaMock.Verify(x => x.SequenceExists(_testSchema, _testSequence));
+        }
+
+        [Test]
+        public void QueriesWithoutADefaultSchemaPassNoSchema()
+        {
+            UseDefaultSchema(null);
+
+            _builder.Table(_testTable).Exists();
+            _builder.Sequence(_testSequence).Exists();
+
+            _querySchemaMock.Verify(x => x.TableExists(null, _testTable));
+            _querySchemaMock.Verify(x => x.SequenceExists(null, _testSequence));
+        }
+
+        [Test]
+        public void ASchemaCheckUsesTheNameAsGivenButItsObjectsGoThroughTheConvention()
+        {
+            // Create.Schema("audit") creates audit: CreateSchemaExpression doesn't go through the schema convention.
+            // Create.Table("Log").InSchema("audit") does, and creates tenant_audit.Log.
+            var conventionSet = new ConventionSet { SchemaConvention = new DefaultSchemaConvention(new TenantSchemaNameConvention()) };
+            UseResolver(new ConventionSetDefaultSchemaNameResolver(conventionSet));
+
+            _builder.Schema("audit").Exists();
+            _builder.Schema("audit").Table(_testTable).Exists();
+            _builder.Schema("audit").Sequence(_testSequence).Exists();
+
+            _querySchemaMock.Verify(x => x.SchemaExists("audit"));
+            _querySchemaMock.Verify(x => x.TableExists("tenant_audit", _testTable));
+            _querySchemaMock.Verify(x => x.SequenceExists("tenant_audit", _testSequence));
+        }
+
+        /// <summary>
+        /// What the runner registers: the default schema of the convention set.
+        /// </summary>
+        private void UseDefaultSchema(string defaultSchema)
+        {
+            UseResolver(new ConventionSetDefaultSchemaNameResolver(new DefaultConventionSet(defaultSchema, workingDirectory: null)));
+        }
+
+        private void UseResolver(IDefaultSchemaNameResolver resolver)
+        {
+            var serviceProvider = new ServiceCollection()
+                .AddSingleton(resolver)
+                .BuildServiceProvider();
+
+            _migrationContextMock.Setup(x => x.ServiceProvider).Returns(serviceProvider);
+        }
+
+        /// <summary>
+        /// A convention that also renames schemas the migration names, as a multi-tenant setup might.
+        /// </summary>
+        private class TenantSchemaNameConvention : IDefaultSchemaNameConvention
+        {
+            public string GetSchemaName(string originalSchemaName)
+            {
+                return originalSchemaName == null ? "tenant" : "tenant_" + originalSchemaName;
+            }
         }
     }
 }

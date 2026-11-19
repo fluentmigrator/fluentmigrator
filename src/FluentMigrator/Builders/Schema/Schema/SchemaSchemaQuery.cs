@@ -50,13 +50,13 @@ namespace FluentMigrator.Builders.Schema.Schema
         /// <inheritdoc />
         public ISchemaTableSyntax Table(string tableName)
         {
-            return new SchemaTableQuery(_context, _schemaName, tableName);
+            return new SchemaTableQuery(_context, _context.GetObjectSchemaName(_schemaName), tableName);
         }
 
         /// <inheritdoc />
         public ISchemaSequenceSyntax Sequence(string sequenceName)
         {
-            return new SchemaSequenceQuery(_context, _schemaName, sequenceName);
+            return new SchemaSequenceQuery(_context, _context.GetObjectSchemaName(_schemaName), sequenceName);
         }
     }
 }

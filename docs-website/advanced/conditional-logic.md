@@ -175,6 +175,71 @@ public class SchemaStateConditionals : Migration
 }
 ```
 
+### Which schema the checks look in
+
+An idempotent migration has two halves, and they only work together if they point at the same schema:
+
+```csharp
+if (!Schema.Table("Users").Exists())   // the check: a query the processor runs right away
+{
+    Create.Table("Users")              // the create: SQL the generator writes
+        .WithColumn("Id").AsInt32().PrimaryKey();
+}
+```
+
+The two halves are handled differently. `Create.Table(...)` is an expression: the runner collects it, applies its conventions (such as the default schema), and the generator turns it into SQL after `Up()` returns. `Schema.Table(...).Exists()` is a processor-level check: it queries the database through the processor right away, while `Up()` is still running. The runner's conventions don't apply to it by themselves. Since 9.0 the check asks the runner for the schema the convention would use, as described below. If you call the processor yourself, for example `IMigrationProcessor.TableExists(schema, table)`, no convention is applied at all, so pass the schema you mean.
+
+If the check looks in one schema and the create writes to another, the check never finds the table. The first run is fine, and the next migration that repeats the check fails with "already exists". The opposite mismatch is worse: if the check finds a table of the same name in some other schema, the migration skips the create, and nothing reports that the table is missing.
+
+#### With a default schema (recommended)
+
+If your convention set has a default schema, both halves use it:
+
+```csharp
+services.AddSingleton<IConventionSet>(new DefaultConventionSet("app", workingDirectory: null));
+```
+
+With `dotnet-fm`, use `--default-schema-name app`. Then `Schema.Table("Users").Exists()` checks `app.Users`, and `Create.Table("Users")` creates `app.Users`. The same goes for `Schema.Sequence(...)` and for the column, index and constraint checks under `Schema.Table(...)`. The `$(DefaultSchema)` token in `Execute.Sql` is `app` too, because the token and the checks get the schema from the same service, `IDefaultSchemaNameResolver`.
+
+This is the most reliable setup on every provider, because neither half falls back to a provider default.
+
+#### Without a default schema
+
+The check passes no schema to the database provider, and the provider picks one. That isn't always the connection's current schema. What matters is whether the provider's check and its generated SQL pick the same one:
+
+| Provider | Check with no schema | Create with no schema | Agree? |
+|---|---|---|---|
+| PostgreSQL, tables | `public` | `"public"."Users"` | Yes |
+| PostgreSQL, sequences | `public` | `CREATE SEQUENCE "Seq"`, so the first schema on `search_path` | Only if that schema is `public` |
+| SQL Server | `dbo` | `[dbo].[Users]` | Yes |
+| Oracle | `USER_TABLES` / `USER_SEQUENCES`: the login's own schema | `CREATE TABLE Users`, so the session's current schema | Yes, unless the session changes `CURRENT_SCHEMA` |
+| Db2 | any schema: the check has no schema filter | `CREATE TABLE Users`, so `CURRENT SCHEMA` | Only if no other schema has an object with that name |
+
+On PostgreSQL and SQL Server, the connection's `search_path` or the login's default schema doesn't change where the check looks.
+
+Two cases fail:
+
+- **PostgreSQL sequences.** With the default `search_path` (`"$user", public`) and a schema named after the login, `Create.Sequence("Seq")` creates the sequence in that schema. `Schema.Sequence("Seq").Exists()` still looks in `public`, so a repeated check creates the sequence again and fails.
+- **Db2.** If another schema already has a `Users` table, `Schema.Table("Users").Exists()` returns `true`. The migration skips `Create.Table("Users")`, and the table is never created in your schema.
+
+In both cases, configure a default schema as shown above, or name the schema in both halves:
+
+```csharp
+if (!Schema.Schema("app").Sequence("Seq").Exists())
+{
+    Create.Sequence("Seq").InSchema("app");
+}
+```
+
+#### Naming a schema explicitly
+
+- `Schema.Schema("audit").Table("Users").Exists()` looks for `Users` in `audit`. The name goes through the same schema convention as `Create.Table("Users").InSchema("audit")`, so a custom convention that renames schemas applies to both.
+- `Schema.Schema("audit").Exists()` checks for `audit` exactly as written. `Create.Schema("audit")` doesn't go through the schema convention, so the check doesn't either.
+
+#### Before 9.0
+
+Checks without a schema ignored the convention set's default schema and always used the provider's choice from the table above. With a default schema configured, `Create.Table("Users")` created `app.Users` while `Schema.Table("Users").Exists()` looked in `public` or `dbo`. So an idempotent migration missed the table it had created itself and tried to create it again (issue #1055).
+
 ## Custom Conditional Logic
 
 ### Feature Flag-Based Conditionals

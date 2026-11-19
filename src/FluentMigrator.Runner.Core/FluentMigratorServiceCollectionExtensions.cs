@@ -209,8 +209,14 @@ namespace Microsoft.Extensions.DependencyInjection
             services
                 // Provides well-known token variables (e.g. DefaultSchema) usable from
                 // Execute.Sql/Script/EmbeddedScript. Additional providers may be registered
-                // alongside this one.
+                // alongside this one. DefaultSchema comes from IDefaultSchemaNameResolver, so it is
+                // always the schema the Schema.* checks use.
                 .TryAddEnumerable(ServiceDescriptor.Scoped<ISqlTokenProvider, DefaultSqlTokenProvider>());
+
+            services
+                // Gives Schema.Table(...).Exists() and the other schema queries the convention set's
+                // default schema, as the runner gives it to expressions (#1055)
+                .TryAddScoped<IDefaultSchemaNameResolver, ConventionSetDefaultSchemaNameResolver>();
 
             services
                 // Configure the accessor for the version table metadata
